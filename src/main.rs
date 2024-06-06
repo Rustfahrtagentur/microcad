@@ -6,7 +6,14 @@ use pest_derive::Parser;
 struct IdentParser;
 
 fn main() {
-    let pairs = IdentParser::parse(Rule::ident_list, "a1 bc2").unwrap_or_else(|e| panic!("{}", e));
+    let input = r#"r = 5mm;
+        angle = 90°;
+        my_vec3 = (5mm, 5mm, 5mm);
+        my_vec3 = (5, 5, 5)mm;
+        my_vec3 = (5, 5mm, 5)cm;
+    "#;
+
+    let pairs = IdentParser::parse(Rule::main, input).unwrap_or_else(|e| panic!("{}", e));
 
     // Because ident_list is silent, the iterator will contain idents
     for pair in pairs {
@@ -15,6 +22,7 @@ fn main() {
         println!("Span:    {:?}", pair.as_span());
         println!("Text:    {}", pair.as_str());
 
+        /*
         // A pair can be converted to an iterator of the tokens which make it up:
         for inner_pair in pair.into_inner() {
             match inner_pair.as_rule() {
@@ -22,6 +30,6 @@ fn main() {
                 Rule::digit => println!("Digit:   {}", inner_pair.as_str()),
                 _ => unreachable!(),
             };
-        }
+        }*/
     }
 }

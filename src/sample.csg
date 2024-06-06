@@ -1,0 +1,40 @@
+
+module thing()
+{
+    $fa = 30;
+    difference() {
+                  sphere(r = 25);
+                  cylinder(h = 62.5, r1 = 12.5, r2 = 6.25, center = true);
+                  rotate(90, [ 1, 0, 0 ]) cylinder(h = 62.5,
+                          r1 = 12.5, r2 = 6.25, center = true);
+                  rotate(90, [ 0, 1, 0 ]) cylinder(h = 62.5,
+                          r1 = 12.5, r2 = 6.25, center = true);
+              }
+          }
+
+trait Screw {
+
+}
+
+module Thing: Mesh + Screw {
+    r: length = 5mm;
+    r = 5mm;
+    angle = 90°;
+    my_vec3 = (5mm, 5mm, 5mm); // Type: (length, length, length)
+    my_vec3 = (5, 5, 5)mm; // Type: (length, length, length)
+    my_vec3 = (5, 5mm, 5)cm; // Type: (length, length, length)
+
+
+    
+
+    Difference {
+        r = 100mm;
+
+        Sphere(r = self.r) - Cylinder(r = 10mm, h = 62mm) - Cylinder(r = 20mm, h = 62.5mm).rotate(90°)
+
+    }
+
+
+
+
+}

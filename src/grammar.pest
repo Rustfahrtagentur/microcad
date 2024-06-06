@@ -1,8 +1,30 @@
-alpha = { 'a'..'z' | 'A'..'Z' }
-digit = { '0'..'9' }
+alpha = _{ 'a'..'z' | 'A'..'Z' }
+digit = _{ '0'..'9' }
 
-ident = { (alpha | digit)+ }
+ident = { (alpha | "_") ~ (alpha | digit | "_")* }
 
-ident_list = _{ !digit ~ ident ~ (" " ~ ident)+ }
-          // ^
-          // ident_list rule is silent (produces no tokens or error reports)
+number = { digit+ } // Integer only :)
+
+length_unit = { "mm" | "m" | "cm" | "in" }
+
+length_literal = { number ~ length_unit }
+
+angle_unit = { "°" | "deg" | "rad" | "pi" }
+
+vec3_literal = { "(" ~ literal ~ "," ~ literal ~ "," ~ literal ~ ")" ~ literal?  }
+
+unit = { length_unit | angle_unit }
+
+literal = { number ~ unit }
+
+expression = { literal }
+
+assignment = { ident ~ ws* ~ "=" ~ ws* ~ expression }
+
+statement = { assignment? ~ ";" }
+
+statement_list = _{ ws* ~ (statement ~ ws*)* }
+
+main = { SOI ~ statement_list ~ EOI }
+
+ws = _{ " " | "\n" | "\t" | "\r" }
