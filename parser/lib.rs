@@ -1,4 +1,6 @@
+#[allow(unused_imports)]
 use pest::Parser;
+
 use pest_derive::Parser;
 
 #[derive(Parser)]
