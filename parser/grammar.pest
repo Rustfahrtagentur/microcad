@@ -1,27 +1,71 @@
-alpha = _{ 'a'..'z' | 'A'..'Z' }
+alpha_lower = _{ 'a'..'z' }
+alpha_upper = _{ 'A'..'Z' }
+alpha = _{ alpha_lower | alpha_upper }
 digit = _{ '0'..'9' }
 
-ident = { (alpha | "_") ~ (alpha | digit | "_")* }
+ident = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
+constant = { (alpha_upper | "_") ~ (alpha | digit | "_")* }
 
-number = { digit+ } // Integer only :)
+int = { digit+ } // Integer only :)
+float = { digit* ~ "." ~ digit+ } // Float
+number = { float | int }
+
+string_literal = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+bool_literal = { "true" | "false" }
 
 length_unit = { "mm" | "m" | "cm" | "in" }
-
-length_literal = { number ~ length_unit }
-
 angle_unit = { "°" | "deg" | "rad" | "pi" }
-
-vec3_literal = { "(" ~ literal ~ "," ~ literal ~ "," ~ literal ~ ")" ~ literal?  }
 
 unit = { length_unit | angle_unit }
 
-literal = { number ~ unit }
+vec3_literal = { "(" ~ literal ~ "," ~ literal ~ "," ~ literal ~ ")" ~ literal?  }
 
-expression = { literal }
+literal = { number ~ unit | string_literal | bool_literal }
 
-assignment = { ident ~ ws* ~ "=" ~ ws* ~ expression }
+binary_operator = { "+" | "-" | "*" | "/" | "%" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "&&" | "||" | "^" | "&" | "|" }
+unary_operator = { "-" | "!" | "~" }
 
-statement = { assignment? ~ ";" }
+use_statement = { "use" ~ ws+ ~ qualified_name ~ ws* ~ ";" 
+    | "use" ~ ws+ ~ qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident ~ ws* ~ ";" 
+    | "use" ~ ws+ ~ "*" ~ ws+ ~ "from" ~ ws+ ~ qualified_name ~ ws* ~ ";"
+
+}
+
+expression = { literal | qualified_name | array | tuple | function_call | "(" ~ ws* ~ expression ~ ws* ~ ")" | unary_operator ~ ws* ~ expression }
+
+array = { "[" ~ ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression)* ~ "]" }
+tuple = { "(" ~ ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression)* ~ ")" }
+
+qualified_name = { ident ~ ("." ~ ident)* }
+
+type = { qualified_name | array_type | tuple_type }
+tuple_type = { "(" ~ type ~ ("," ~ type)* ~ ")" }
+array_type = { "[" ~ type ~ "]" }
+
+type_specifier = { ":" ~ ws* ~ type }
+
+qualified_namelist = { qualified_name ~ ws* ~ ("," ~ ws* ~ qualified_name)* }
+
+argument_list = { expression ~ ws* ~ ("," ~ ws* ~ expression)* }
+
+function_argument_list = { ident ~ ws* ~ type_specifier ~ ws* ~ ("," ~ ws* ~ ident ~ ws* ~ ":" ~ ws* ~ qualified_name ~ ws*)* }
+function = { visibility? ~ ws* ~ "fn" ~ ws* ~ ident ~ ws* ~ "(" ~ ws* ~ function_argument_list ~ ws* ~ ")" ~ ws* ~ ("->" ~ ws* ~ ident ~ ws*)? ~ "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
+
+function_call = { qualified_name ~ ws* ~ "(" ~ ws* ~ argument_list ~ ws* ~ ")" }
+
+node = { ((function_call | qualified_name) ~ ws*)+ ~ "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
+
+
+visibility = { "pub" }
+
+assignment = { qualified_name ~ ws* ~ (type_specifier)? ~ ws* ~ "=" ~ ws* ~ expression }
+
+constructor = { "(" ~ ws* ~ argument_list ~ ws* ~ ")" ~ ws* ~ "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
+
+statement = { assignment? ~ ";" | node | function | constructor }
+
+
+module = { visibility? ~ "mod" ~ ws* ~ ident ~ ws* ~ (type_specifier)? ~ ws* ~ "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
 
 statement_list = _{ ws* ~ (statement ~ ws*)* }
 
