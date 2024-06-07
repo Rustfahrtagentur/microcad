@@ -1,0 +1,13 @@
+[package]
+name = "csg-parser"
+description = "A parser for the CSG language"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+pest = "2.7"
+pest_derive = "2.7"
