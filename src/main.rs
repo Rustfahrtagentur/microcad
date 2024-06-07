@@ -6,11 +6,9 @@ use pest_derive::Parser;
 struct IdentParser;
 
 fn main() {
-    let input = r#"r = 5mm;
+    let input = r#"
+        r = 5mm;
         angle = 90°;
-        my_vec3 = (5mm, 5mm, 5mm);
-        my_vec3 = (5, 5, 5)mm;
-        my_vec3 = (5, 5mm, 5)cm;
     "#;
 
     let pairs = IdentParser::parse(Rule::main, input).unwrap_or_else(|e| panic!("{}", e));

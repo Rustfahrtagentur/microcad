@@ -1,16 +1,72 @@
+        import * from std.math;
+        import * from std.polygon;
+        import { polygon } from std.polygon;
+        
+        r = 5mm;
+        angle = 90°;
+        my_vec3 = (5mm, 5mm, 5mm);
+        my_vec3 = (5, 5, 5)mm;
+        my_vec3 = (5, 5mm, 5)cm;
 
-module thing()
-{
-    $fa = 30;
-    difference() {
-                  sphere(r = 25);
-                  cylinder(h = 62.5, r1 = 12.5, r2 = 6.25, center = true);
-                  rotate(90, [ 1, 0, 0 ]) cylinder(h = 62.5,
-                          r1 = 12.5, r2 = 6.25, center = true);
-                  rotate(90, [ 0, 1, 0 ]) cylinder(h = 62.5,
-                          r1 = 12.5, r2 = 6.25, center = true);
-              }
-          }
+        mod mesh {
+        
+            t: mat4;
+
+            fn translate(self, v: (scalar, scalar, scalar)) -> self { self.t.translate(v); &self }
+            fn rotate(self, r: (angle, angle, angle)) -> self { self.t.rotate(r); &self }
+        
+        }
+
+        mod path {
+            t: mat3;
+            p: [point2];
+        }
+
+        mod linear_extrude: [polygon, path] -> mesh {
+            (h: )
+
+        }
+
+        mod circle: polygon {
+            (r: length) { r }
+            (d: length) { r = 0.5 * d }
+            (p0: point2, p1: point2, p2: point2) { ...  } // Construct
+            (p: [point2]) { }
+
+            pub r: length;
+            pub radius <=> self.r;
+            
+            pub fn diameter(self) -> length { 0.5 * self.r }
+            
+            //out diameter: length = 0.5 * self.r;
+        }
+
+        circle(r = 5.0mm) {
+            rectangle(w = 5.0mm, h = 5.0mm) {
+
+            }
+        }
+
+        mod translate {
+            (x: length = 0, y: length = 0, z: length = 0) {
+                v: (x, y, z)
+            }
+            (v: vec3) {
+            }
+            v: vec3
+            
+        }
+
+        circle(r = 5mm).translate()
+
+        translate(x = 5mm) {
+            circle(d = 2.5mm);
+            circle(d = 2.5mm);
+        }
+
+        circles = [circle(r = 25mm), circle(r = 5mm)].translate(x = 5mm);
+        
+        circles.rotated(30°)
 
 trait Screw {
 
