@@ -134,7 +134,7 @@ impl PestFile {
             writeln!(w, "    fn test_{}() {{", rule.name)?;
             for test in &rule.tests {
                 writeln!(w, "        {{")?;
-                writeln!(w, "            let input = r#\"\"{}\"\"#;", test.source)?;
+                writeln!(w, "            let input = r#\"{}\"#;", test.source)?;
                 writeln!(
                     w,
                     "            match {}::parse(Rule::{}, input) {{",
