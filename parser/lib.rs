@@ -5,8 +5,9 @@ use pest_derive::Parser;
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
-struct IdentParser;
+struct CsglParser;
 
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -17,6 +18,11 @@ mod tests {
             r = 5mm;
             angle = 90°;
         "#;
+
+        match IdentParser::parse(Rule::main, input) {
+            Ok(_) => (),
+            Err(e) => panic!("{}", e),
+        }
 
         let pairs = IdentParser::parse(Rule::main, input).unwrap_or_else(|e| panic!("{}", e));
 
@@ -39,3 +45,7 @@ mod tests {
         }
     }
 }
+
+
+*/
+include!(concat!(env!("OUT_DIR"), "/test.rs"));

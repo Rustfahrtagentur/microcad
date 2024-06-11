@@ -29,7 +29,7 @@ struct PestRule {
     tests: Vec<PestTest>,
 }
 
-struct PestFile {
+pub struct PestFile {
     rules: Vec<PestRule>,
 }
 
@@ -79,7 +79,7 @@ impl std::str::FromStr for PestTest {
 }
 
 impl std::str::FromStr for PestFile {
-    type Err = ();
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut rules = Vec::new();
@@ -95,8 +95,8 @@ impl std::str::FromStr for PestFile {
             if let Some(tokens) = line.split_once('=') {
                 let name = tokens.0.trim();
                 // Check if name is identifier
-                if name.chars().any(|c| !c.is_alphanumeric()) {
-                    return Err(());
+                if name.chars().any(|c| !c.is_alphanumeric() && c != '_') {
+                    return Err(format!("Invalid rule name: {}", name));
                 }
                 rules.push(PestRule {
                     name: name.to_string(),
@@ -111,15 +111,68 @@ impl std::str::FromStr for PestFile {
 }
 
 impl PestFile {
-    fn parse_from_file(path: &impl AsRef<std::path::Path>) -> Self {
+    pub fn from_file(path: impl AsRef<std::path::Path>) -> Result<Self, String> {
         // Read file line by line
         let mut buf = String::new();
         // Read file to string
         let mut file = std::fs::File::open(path).unwrap();
         file.read_to_string(&mut buf).unwrap();
 
-        buf.parse().unwrap()
+        buf.parse()
     }
+
+    pub fn generate_test_rs(
+        &self,
+        parser_struct_name: &str,
+        w: &mut impl std::io::Write,
+    ) -> Result<(), std::io::Error> {
+        writeln!(w, "#[cfg(test)]")?;
+        writeln!(w, "mod tests {{")?;
+        writeln!(w, "    use super::*;")?;
+        for rule in &self.rules {
+            writeln!(w, "    #[test]")?;
+            writeln!(w, "    fn test_{}() {{", rule.name)?;
+            for test in &rule.tests {
+                writeln!(w, "        {{")?;
+                writeln!(w, "            let input = r#\"\"{}\"\"#;", test.source)?;
+                writeln!(
+                    w,
+                    "            match {}::parse(Rule::{}, input) {{",
+                    parser_struct_name, rule.name
+                )?;
+
+                match test.result {
+                    PestResult::Ok => {
+                        writeln!(w, "                Ok(_) => (),")?;
+                        writeln!(w, "                Err(e) => panic!(\"{{}}\", e),")?;
+                    }
+                    PestResult::Err => {
+                        writeln!(w, "                Ok(_) => panic!(\"Expected error\"),")?;
+                        writeln!(w, "                Err(_) => (),")?;
+                    }
+                }
+                writeln!(w, "            }}")?;
+                writeln!(w, "        }}")?;
+            }
+            writeln!(w, "    }}")?;
+        }
+        writeln!(w, "}}")?;
+        Ok(())
+    }
+}
+
+pub fn generate(parser_struct_name: &str, grammar_file: impl AsRef<std::path::Path>) {
+    let out_dir = std::env::var("OUT_DIR").unwrap();
+    let dest_path = std::path::Path::new(&out_dir).join("test.rs");
+
+    PestFile::from_file(&grammar_file)
+        .unwrap()
+        .generate_test_rs(
+            parser_struct_name,
+            &mut std::fs::File::create(dest_path).unwrap(),
+        )
+        .unwrap();
+    println!("cargo:rerun-if-changed={}", grammar_file.as_ref().display());
 }
 
 #[cfg(test)]

@@ -13,4 +13,4 @@ pest = "2.7"
 pest_derive = "2.7"
 
 [build-dependencies]
-csg-parser-testgen = { path = "testgen" }
+pest_test = { path = "pest_test" }

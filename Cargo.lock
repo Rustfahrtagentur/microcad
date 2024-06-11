@@ -40,17 +40,9 @@ dependencies = [
 name = "csg-parser"
 version = "0.1.0"
 dependencies = [
- "csg-parser-testgen",
  "pest",
  "pest_derive",
-]
-
-[[package]]
-name = "csg-parser-testgen"
-version = "0.1.0"
-dependencies = [
- "pest",
- "pest_derive",
+ "pest_test",
 ]
 
 [[package]]
@@ -134,6 +126,14 @@ dependencies = [
  "once_cell",
  "pest",
  "sha2",
+]
+
+[[package]]
+name = "pest_test"
+version = "0.1.0"
+dependencies = [
+ "pest",
+ "pest_derive",
 ]
 
 [[package]]
