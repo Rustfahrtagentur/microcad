@@ -12,7 +12,7 @@ impl std::str::FromStr for PestResult {
     fn from_str(s: &str) -> Result<Self, <PestResult as std::str::FromStr>::Err> {
         match s.trim() {
             "ok" => Ok(Self::Ok),
-            "err" => Ok(Self::Err),
+            "error" => Ok(Self::Err),
             _ => Err(()),
         }
     }
@@ -92,6 +92,10 @@ impl std::str::FromStr for PestFile {
                 continue;
             }
 
+            if line.starts_with("//") {
+                continue;
+            }
+
             if let Some(tokens) = line.split_once('=') {
                 let name = tokens.0.trim();
                 // Check if name is identifier
@@ -129,25 +133,38 @@ impl PestFile {
         writeln!(w, "#[cfg(test)]")?;
         writeln!(w, "mod tests {{")?;
         writeln!(w, "    use super::*;")?;
+
+        // Generate tests for each rule
         for rule in &self.rules {
+            // Do not generate tests for rules without tests
+            if rule.tests.is_empty() {
+                continue;
+            }
+
             writeln!(w, "    #[test]")?;
-            writeln!(w, "    fn test_{}() {{", rule.name)?;
+            writeln!(w, "    fn rule_{}() {{", rule.name)?;
             for test in &rule.tests {
                 writeln!(w, "        {{")?;
                 writeln!(w, "            let input = r#\"{}\"#;", test.source)?;
                 writeln!(
                     w,
-                    "            match {}::parse(Rule::{}, input) {{",
+                    "            match {}::parse(Rule::r#{}, input) {{",
                     parser_struct_name, rule.name
                 )?;
 
                 match test.result {
                     PestResult::Ok => {
                         writeln!(w, "                Ok(_) => (),")?;
-                        writeln!(w, "                Err(e) => panic!(\"{{}}\", e),")?;
+                        writeln!(
+                            w,
+                            "                Err(e) => panic!(\"{{}}: {{}}\", input, e),"
+                        )?;
                     }
                     PestResult::Err => {
-                        writeln!(w, "                Ok(_) => panic!(\"Expected error\"),")?;
+                        writeln!(
+                            w,
+                            "                Ok(_) => panic!(\"`{{}}`: Expected error\", input),"
+                        )?;
                         writeln!(w, "                Err(_) => (),")?;
                     }
                 }
