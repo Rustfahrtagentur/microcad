@@ -11,3 +11,6 @@ path = "lib.rs"
 [dependencies]
 pest = "2.7"
 pest_derive = "2.7"
+
+[build-dependencies]
+csg-parser-testgen = { path = "testgen" }
