@@ -132,6 +132,44 @@ impl std::str::FromStr for PestFile {
         Ok(Self { rules })
     }
 }
+struct RustWriter<'a> {
+    w: &'a mut dyn std::io::Write,
+    indent: usize,
+}
+
+impl<'a> RustWriter<'a> {
+    pub fn new(w: &'a mut dyn std::io::Write) -> Self {
+        Self { w, indent: 0 }
+    }
+
+    pub fn begin_scope(&mut self, s: &str) -> Result<(), std::io::Error> {
+        if s.is_empty() {
+            self.writeln("{")?;
+        } else {
+            self.writeln(format!("{} {{", s).as_str())?;
+        }
+
+        self.indent += 1;
+        Ok(())
+    }
+
+    pub fn write(&mut self, s: &str) -> Result<(), std::io::Error> {
+        self.writeln(s)?;
+        Ok(())
+    }
+
+    pub fn end_scope(&mut self) -> Result<(), std::io::Error> {
+        self.writeln("}")?;
+        self.indent -= 1;
+        Ok(())
+    }
+
+    pub fn writeln(&mut self, s: &str) -> Result<(), std::io::Error> {
+        write!(self.w, "{}", "    ".repeat(self.indent))?;
+        writeln!(self.w, "{}", s)?;
+        Ok(())
+    }
+}
 
 impl PestFile {
     pub fn from_file(path: impl AsRef<std::path::Path>) -> Result<Self, String> {
@@ -149,9 +187,10 @@ impl PestFile {
         parser_struct_name: &str,
         w: &mut impl std::io::Write,
     ) -> Result<(), std::io::Error> {
-        writeln!(w, "#[cfg(test)]")?;
-        writeln!(w, "mod tests {{")?;
-        writeln!(w, "    use super::*;")?;
+        let mut r = RustWriter::new(w);
+        r.write("#[cfg(test)]")?;
+        r.begin_scope("mod tests")?;
+        r.write("use super::*;")?;
 
         // Generate tests for each rule
         for rule in &self.rules {
@@ -160,47 +199,45 @@ impl PestFile {
                 continue;
             }
 
-            writeln!(w, "    #[test]")?;
-            writeln!(w, "    fn rule_{}() {{", rule.name)?;
-            writeln!(w, "        let rule_line = {};", rule.line.unwrap())?;
+            r.write("#[test]")?;
+            r.begin_scope(&format!("fn rule_{}()", rule.name))?;
+            r.writeln(&format!("let _rule_line = {};", rule.line.unwrap()))?;
+
             for test in &rule.tests {
-                writeln!(w, "        {{")?;
-                writeln!(
-                    w,
-                    "            let test_line = {};",
-                    test.line.unwrap_or_else(|| rule.line.unwrap())
-                )?;
-                writeln!(w, "            let input = r#\"{}\"#;", test.source)?;
-                writeln!(
-                    w,
-                    "            match {}::parse(Rule::r#{}, input) {{",
-                    parser_struct_name, rule.name
+                r.begin_scope("")?;
+                r.writeln(&format!("let test_line = {};", test.line.unwrap()))?;
+                r.writeln(std::format!("let input = r#\"{}\"#;", test.source).as_str())?;
+                r.begin_scope(
+                    std::format!(
+                        "match {}::parse(Rule::r#{}, input)",
+                        parser_struct_name,
+                        rule.name
+                    )
+                    .as_str(),
                 )?;
 
                 match &test.result {
                     PestResult::Ok(s) => {
-                        writeln!(w, "                Ok(_) => (),")?;
-                        writeln!(
-                            w,
-                            "                Err(e) => panic!(\"{{}} at `{{}}`:{{}} {}\", e, input, test_line),",
-                            s
+                        r.writeln("Ok(_) => (),")?;
+                        r.writeln(
+                            std::format!(
+                                "Err(e) => panic!(\"{{}} at `{{}}`:{{}} {}\", e, input, test_line),",
+                                s
+                            )
+                            .as_str(),
                         )?;
                     }
                     PestResult::Err(s) => {
-                        writeln!(
-                            w,
-                            "                Ok(_) => panic!(\"Expected parsing error at `{{}}`:{{}}: {}\", input, test_line),",
-                            s
-                        )?;
-                        writeln!(w, "                Err(_) => (),")?;
+                        r.writeln(format!("Ok(_) => panic!(\"Expected parsing error at `{{}}`:{{}}: {}\", input, test_line),", s).as_str())?;
+                        r.writeln("Err(_) => (),")?;
                     }
                 }
-                writeln!(w, "            }}")?;
-                writeln!(w, "        }}")?;
+                r.end_scope()?;
+                r.end_scope()?;
             }
-            writeln!(w, "    }}")?;
+            r.end_scope()?;
         }
-        writeln!(w, "}}")?;
+        r.end_scope()?;
         Ok(())
     }
 }
