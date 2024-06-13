@@ -228,7 +228,12 @@ impl PestFile {
                         )?;
                     }
                     PestResult::Err(s) => {
-                        r.writeln(format!("Ok(_) => panic!(\"Expected parsing error at `{{}}`:{{}}: {}\", input, test_line),", s).as_str())?;
+                        r.begin_scope("Ok(pairs) =>")?;
+                        r.begin_scope("if input == pairs.as_str()")?;
+                        r.writeln(format!("panic!(\"Expected parsing error at `{{}}`:{{}}: {}\", input, test_line);", s).as_str())?;
+                        r.end_scope()?;
+
+                        r.end_scope()?;
                         r.writeln("Err(_) => (),")?;
                     }
                 }
