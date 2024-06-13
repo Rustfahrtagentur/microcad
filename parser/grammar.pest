@@ -24,7 +24,7 @@ ident = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
 constant_ident = { (alpha_upper | "_") ~ (alpha | digit | "_")* }
 
 //`1.0`: ok
-//`1.`: ok
+//`1`: ok
 //`.1`: error
 //`qwqeaq`: error
 number = @{ ("-"? ~ int) ~ ("." ~ ASCII_DIGIT+ ~ exp? | exp)? }
@@ -58,9 +58,9 @@ literal = { number ~ unit | string_literal | bool_literal | number }
 binary_operator = { "+" | "-" | "*" | "/" | "%" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "&&" | "||" | "^" | "&" | "|" }
 unary_operator = { "-" | "!" | "~" }
 
-//`a`: ok
-//`a.b`: ok
-//`a.b. c`: ok
+//`a`: ok # Single identifier
+//`a.b`: ok # Nested identifiers
+//`a.b. c`: error # No whitespace between identifiers
 qualified_name = { ident ~ ("." ~ ident)* }
 
 //`int`: ok
