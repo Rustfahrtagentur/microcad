@@ -25,9 +25,8 @@ mod tests {
         println!("{input}");
 
         match CsglParser::parse(Rule::r#code, &input) {
-            Ok(mut pairs) => {
-                println!("{pairs:?}");
-                //   println!("{:?}", &pairs.next().unwrap().as_rule());
+            Ok(pairs) => {
+                println!("{pairs:#?}");
             }
             Err(e) => {
                 panic!("Failed parsing file in {}: {}", test_filename, e);
