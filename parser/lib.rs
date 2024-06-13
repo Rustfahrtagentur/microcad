@@ -19,8 +19,16 @@ mod tests {
         let input = std::fs::read_to_string(test_filename)
             .expect(format!("Test file not found: {}", test_filename).as_str());
 
+        //use log::trace;
+        //assert!(!input.is_empty());
+        //trace!("{input}");
+        println!("{input}");
+
         match CsglParser::parse(Rule::r#code, &input) {
-            Ok(_) => (),
+            Ok(mut pairs) => {
+                println!("{pairs:?}");
+                //   println!("{:?}", &pairs.next().unwrap().as_rule());
+            }
             Err(e) => {
                 panic!("Failed parsing file in {}: {}", test_filename, e);
             }
