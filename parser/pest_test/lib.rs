@@ -218,7 +218,7 @@ impl PestFile {
 
                 match &test.result {
                     PestResult::Ok(s) => {
-                        r.writeln("Ok(_) => (),")?;
+                        r.writeln("Ok(pairs) =>  assert_eq!(input, pairs.as_str()),")?;
                         r.writeln(
                             std::format!(
                                 "Err(e) => panic!(\"{{}} at `{{}}`:{{}} {}\", e, input, test_line),",
