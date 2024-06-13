@@ -249,7 +249,7 @@ impl PestFile {
 
 pub fn generate(parser_struct_name: &str, grammar_file: impl AsRef<std::path::Path>) {
     let out_dir = std::env::var("OUT_DIR").unwrap();
-    let dest_path = std::path::Path::new(&out_dir).join("test.rs");
+    let dest_path = std::path::Path::new(&out_dir).join("pest_test.rs");
 
     PestFile::from_file(&grammar_file)
         .unwrap()

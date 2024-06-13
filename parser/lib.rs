@@ -7,4 +7,4 @@ use pest_derive::Parser;
 #[grammar = "grammar.pest"]
 struct CsglParser;
 
-include!(concat!(env!("OUT_DIR"), "/test.rs"));
+include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
