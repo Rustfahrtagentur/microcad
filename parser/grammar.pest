@@ -55,9 +55,6 @@ unit = @{ length_unit | angle_unit }
 //`1.0`: ok
 literal = { number ~ unit | string_literal | bool_literal | number }
 
-binary_operator = { "+" | "-" | "*" | "/" | "%" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "&&" | "||" | "^" | "&" | "|" }
-unary_operator = { "-" | "!" | "~" }
-
 //`a`: ok # Single identifier
 //`a.b`: ok # Nested identifiers
 //`a.b. c`: error # No whitespace between identifiers
@@ -94,3 +91,27 @@ use_statement = { "use" ~ ws+ ~ qualified_name ~ ws* ~ ";"
     | "use" ~ ws+ ~ "*" ~ ws+ ~ "from" ~ ws+ ~ qualified_name ~ ws* ~ ";"
 }
 
+expression = { literal }
+
+
+//`r = 5.0mm`: ok
+//`a = 5m`: ok
+node_argument = { ident ~ ws* ~ "=" ~ ws* ~ expression }
+
+//`a = 5.0mm, b = false`: ok
+node_argument_list = { node_argument ~ ws* ~ ("," ~ ws* ~ node_argument ~ ws*)* }
+
+//`function(a = 3.0mm)`: ok
+//`function(a = 3.0mm, b = 2.0mm)`: ok
+function_call = { ident ~ ws* ~ "(" ~ ws* ~ node_argument_list? ~ ws* ~ ")" }
+
+//`circle(r = 5.0mm);`: ok
+node_statement = { (function_call ~ ws*)+ ~ ";" }
+
+//`translate(x = 5.0mm) { rectangle(width = 5.0); }`: ok
+//`translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
+//`translate(r = 5.0mm) circle(r = 5.0mm);`: ok
+modify_statement = { function_call ~ ws* ~ (("{" ~ ws* ~ (modify_statement | node_statement*) ~ ws* ~ "}") | node_statement) }
+
+//`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
+code = { ((node_statement | modify_statement) ~ ws* )* }
