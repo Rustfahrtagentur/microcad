@@ -22,11 +22,13 @@ impl std::str::FromStr for PestResult {
 struct PestTest {
     source: String,
     result: PestResult,
+    line: Option<usize>,
 }
 
 struct PestRule {
     name: String,
     tests: Vec<PestTest>,
+    line: Option<usize>,
 }
 
 pub struct PestFile {
@@ -74,6 +76,7 @@ impl std::str::FromStr for PestTest {
         Ok(Self {
             source: test_str,
             result,
+            line: None,
         })
     }
 }
@@ -85,17 +88,24 @@ impl std::str::FromStr for PestFile {
         let mut rules = Vec::new();
         let mut tests = Vec::new();
 
+        let mut line_count = 0;
+
         for line in s.lines() {
-            if let Ok(test) = line.parse::<PestTest>() {
-                println!("{:?}", test);
+            line_count += 1;
+
+            // If line is a test comment, add to tests
+            if let Ok(mut test) = line.parse::<PestTest>() {
+                test.line = Some(line_count);
                 tests.push(test);
                 continue;
             }
 
+            // Skip other comments
             if line.starts_with("//") {
                 continue;
             }
 
+            // Check if we have a parser rule
             if let Some(tokens) = line.split_once('=') {
                 let name = tokens.0.trim();
                 // Check if name is identifier
@@ -105,6 +115,7 @@ impl std::str::FromStr for PestFile {
                 rules.push(PestRule {
                     name: name.to_string(),
                     tests: tests.clone(),
+                    line: Some(line_count),
                 });
                 tests.clear();
             }
@@ -143,8 +154,14 @@ impl PestFile {
 
             writeln!(w, "    #[test]")?;
             writeln!(w, "    fn rule_{}() {{", rule.name)?;
+            writeln!(w, "        let rule_line = {};", rule.line.unwrap())?;
             for test in &rule.tests {
                 writeln!(w, "        {{")?;
+                writeln!(
+                    w,
+                    "            let test_line = {};",
+                    test.line.unwrap_or_else(|| rule.line.unwrap())
+                )?;
                 writeln!(w, "            let input = r#\"{}\"#;", test.source)?;
                 writeln!(
                     w,
@@ -157,13 +174,13 @@ impl PestFile {
                         writeln!(w, "                Ok(_) => (),")?;
                         writeln!(
                             w,
-                            "                Err(e) => panic!(\"{{}}: {{}}\", input, e),"
+                            "                Err(e) => panic!(\"{{}} at `{{}}` grammar.pest:{{}} \", e, input, test_line),"
                         )?;
                     }
                     PestResult::Err => {
                         writeln!(
                             w,
-                            "                Ok(_) => panic!(\"`{{}}`: Expected error\", input),"
+                            "                Ok(_) => panic!(\"Expected error at `{{}}`:{{}}\", input, test_line),"
                         )?;
                         writeln!(w, "                Err(_) => (),")?;
                     }
@@ -208,7 +225,7 @@ mod tests {
     fn parse_pest_file() {
         let test = r#"
             //`test1`: ok
-            //`test2`: err
+            //`test2`: error
             expr = {  "{" ~ expr_interior ~ "}" }
         "#;
 
