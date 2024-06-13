@@ -8,16 +8,90 @@ use pest_derive::Parser;
 #[grammar = "grammar.pest"]
 struct CsglParser;
 
+trait Statement {
+    fn run() {}
+}
+
+struct Expression {
+    literal: String,
+}
+
+struct FunctionArgument {
+    ident: String,
+    expression: Expression,
+}
+
+struct FunctionCall {
+    ident: String,
+    function_argument_list: Vec<FunctionArgument>,
+}
+
+struct NodeStatement {
+    ident: String,
+    function_argument_list: Vec<FunctionArgument>,
+}
+
+impl Statement for NodeStatement {}
+
 impl CsglParser {
     pub fn parse_code(pairs: Pairs<Rule>) {
         for pair in pairs {
             match pair.as_rule() {
                 Rule::node_statement => {
-                    println!("node statement: {pair:#?}");
+                    let pairs = pair.into_inner();
+                    println!("node statement: {pairs:#?}");
+                    Self::parse_node_statement(pairs).unwrap();
                 }
                 _ => Self::parse_code(pair.into_inner()),
             }
         }
+    }
+
+    pub fn parse_expression(pairs: Pairs<Rule>) -> Result<Expression, ()> {
+        Ok(Expression {
+            literal: pairs.clone().next().unwrap().into_inner().to_string(),
+        })
+    }
+
+    pub fn parse_function_argument(pairs: Pairs<Rule>) -> Result<FunctionArgument, ()> {
+        Ok(FunctionArgument {
+            ident: pairs.clone().next().unwrap().to_string(),
+            expression: Self::parse_expression(pairs).unwrap(),
+        })
+    }
+
+    pub fn parse_function_argument_list(pairs: Pairs<Rule>) -> Result<Vec<FunctionArgument>, ()> {
+        let mut args = Vec::new();
+        for pair in pairs {
+            match pair.as_rule() {
+                Rule::function_argument => {
+                    args.push(Self::parse_function_argument(pair.into_inner()).unwrap());
+                }
+                _ => unreachable!(),
+            }
+        }
+        Ok(args)
+    }
+
+    pub fn parse_node_statement(pairs: Pairs<Rule>) -> Result<NodeStatement, ()> {
+        let mut node_statement = NodeStatement {
+            ident: Default::default(),
+            function_argument_list: Vec::default(),
+        };
+
+        for pair in pairs {
+            match pair.as_rule() {
+                Rule::function_call => return Self::parse_node_statement(pair.into_inner()),
+                Rule::ident => node_statement.ident = pair.to_string(),
+                Rule::function_argument_list => {
+                    node_statement.function_argument_list =
+                        Self::parse_function_argument_list(pair.into_inner()).unwrap()
+                }
+                _ => unreachable!(),
+            }
+        }
+
+        Ok(node_statement)
     }
 }
 
