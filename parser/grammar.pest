@@ -115,3 +115,12 @@ modify_statement = { function_call ~ ws* ~ (("{" ~ ws* ~ (modify_statement | nod
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 code = { ((node_statement | modify_statement) ~ ws* )* }
+
+COMMENT = ${ single_line_comment | multi_line_comment }
+
+//`// ok`: ok
+//`/ err` error
+single_line_comment = { "//" ~ (!"\n" ~ ANY)* }
+
+//`/* ok */`: ok
+multi_line_comment = { "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
