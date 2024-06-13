@@ -2,17 +2,25 @@ use std::io::Read;
 
 #[derive(Debug, Clone, PartialEq)]
 enum PestResult {
-    Ok,
-    Err,
+    Ok(String),
+    Err(String),
 }
 
 impl std::str::FromStr for PestResult {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, <PestResult as std::str::FromStr>::Err> {
-        match s.trim() {
-            "ok" => Ok(Self::Ok),
-            "error" => Ok(Self::Err),
+        let tokens = s.splitn(2, '#').collect::<Vec<_>>();
+        if tokens.is_empty() {
+            return Err(());
+        }
+
+        let result = tokens.first().unwrap().trim();
+        let comment = tokens.get(1).unwrap_or(&"").trim().to_string();
+
+        match result {
+            "ok" => Ok(Self::Ok(comment.to_string())),
+            "error" => Ok(Self::Err(comment.to_string())),
             _ => Err(()),
         }
     }
@@ -169,18 +177,20 @@ impl PestFile {
                     parser_struct_name, rule.name
                 )?;
 
-                match test.result {
-                    PestResult::Ok => {
+                match &test.result {
+                    PestResult::Ok(s) => {
                         writeln!(w, "                Ok(_) => (),")?;
                         writeln!(
                             w,
-                            "                Err(e) => panic!(\"{{}} at `{{}}` grammar.pest:{{}} \", e, input, test_line),"
+                            "                Err(e) => panic!(\"{{}} at `{{}}`:{{}} {}\", e, input, test_line),",
+                            s
                         )?;
                     }
-                    PestResult::Err => {
+                    PestResult::Err(s) => {
                         writeln!(
                             w,
-                            "                Ok(_) => panic!(\"Expected error at `{{}}`:{{}}\", input, test_line),"
+                            "                Ok(_) => panic!(\"Expected parsing error at `{{}}`:{{}}: {}\", input, test_line),",
+                            s
                         )?;
                         writeln!(w, "                Err(_) => (),")?;
                     }
@@ -215,17 +225,17 @@ mod tests {
 
     #[test]
     fn test_comment() {
-        let test = r#"//`test`: ok"#;
+        let test = r#"//`test`: ok # Test"#;
         let test = test.parse::<PestTest>().unwrap();
         assert_eq!(test.source, "test");
-        assert_eq!(test.result, PestResult::Ok);
+        assert_eq!(test.result, PestResult::Ok("Test".into()));
     }
 
     #[test]
     fn parse_pest_file() {
         let test = r#"
-            //`test1`: ok
-            //`test2`: error
+            //`test1`: ok # Ok Test
+            //`test2`: error # Error Test
             expr = {  "{" ~ expr_interior ~ "}" }
         "#;
 
@@ -234,8 +244,14 @@ mod tests {
         assert_eq!(test.rules[0].name, "expr");
         assert_eq!(test.rules[0].tests.len(), 2);
         assert_eq!(test.rules[0].tests[0].source, "test1");
-        assert_eq!(test.rules[0].tests[0].result, PestResult::Ok);
+        assert_eq!(
+            test.rules[0].tests[0].result,
+            PestResult::Ok("Ok Test".into())
+        );
         assert_eq!(test.rules[0].tests[1].source, "test2");
-        assert_eq!(test.rules[0].tests[1].result, PestResult::Err);
+        assert_eq!(
+            test.rules[0].tests[1].result,
+            PestResult::Err("Error Test".into())
+        );
     }
 }
