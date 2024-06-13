@@ -1,3 +1,4 @@
+use pest::iterators::Pairs;
 #[allow(unused_imports)]
 use pest::Parser;
 
@@ -6,6 +7,19 @@ use pest_derive::Parser;
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
 struct CsglParser;
+
+impl CsglParser {
+    pub fn parse_code(pairs: Pairs<Rule>) {
+        for pair in pairs {
+            match pair.as_rule() {
+                Rule::node_statement => {
+                    println!("node statement: {pair:#?}");
+                }
+                _ => Self::parse_code(pair.into_inner()),
+            }
+        }
+    }
+}
 
 //include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
 
@@ -26,7 +40,8 @@ mod tests {
 
         match CsglParser::parse(Rule::r#code, &input) {
             Ok(pairs) => {
-                println!("{pairs:#?}");
+                CsglParser::parse_code(pairs);
+                //println!("{pairs:#?}");
             }
             Err(e) => {
                 panic!("Failed parsing file in {}: {}", test_filename, e);
