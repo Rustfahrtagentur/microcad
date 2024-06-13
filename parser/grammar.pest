@@ -11,7 +11,7 @@ digit = _{ '0'..'9' }
 //`_a`: ok
 //`_`: ok
 //`1`: error
-//`A`: error
+//`A`: error # Identifiers are lowercase
 ident = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
 
 //`A`: ok
@@ -20,8 +20,8 @@ ident = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
 //`_A`: ok
 //`_`: ok
 //`1`: error
-//`a`: error
-constant = { (alpha_upper | "_") ~ (alpha | digit | "_")* }
+//`a`: error # Constant identifiers are uppercase
+constant_ident = { (alpha_upper | "_") ~ (alpha | digit | "_")* }
 
 //`1.0`: ok
 //`1.`: ok
@@ -66,31 +66,31 @@ qualified_name = { ident ~ ("." ~ ident)* }
 //`int`: ok
 type = { qualified_name | array_type | tuple_type }
 
-//`(int, int)`: ok
-//`( int, int  )`: ok
+//`(number, number)`: ok
+//`( number, number  )`: ok
 tuple_type = { "(" ~ ws * ~ type ~ ws * ~ ("," ~ ws* ~ type)* ~ ws* ~ ")" }
 
-//`[int]`: ok
+//`[number]`: ok
 array_type = { "[" ~ ws* ~ type ~ ws * ~ "]" }
 
-//`: int`: ok
+//`: number`: ok
 //`: <Vec3>`: error
 type_specifier = { ":" ~ ws* ~ type }
 
-//`a: int`: ok
-//`a: int = 1`: ok
+//`a: number`: ok
+//`a: number = 1`: ok
 //`a = 1.0`: error
 function_argument = { ident ~ ws* ~ type_specifier ~ (ws* ~ "=" ~ ws* ~ literal)? }
 
-//`a: int, b: int`: ok
+//`a: number, b: number`: ok
 function_argument_list = { ident ~ ws* ~ type_specifier ~ ws* ~ ("," ~ ws* ~ ident ~ ws* ~ ":" ~ ws* ~ qualified_name ~ ws*)* }
 
-//`use a;`: ok 
-//`use a as b;`: ok
-//`use a as b.a;`: error
-//`use * from a;`: ok
+//`use a;`: ok  # Import a module
+//`use a as b;`: ok # Import as alias
+//`use a as b.a;`: error # Cannot use nested identifiers alias 
+//`use * from a;`: ok # Import all and merge into current scope
 use_statement = { "use" ~ ws+ ~ qualified_name ~ ws* ~ ";" 
     | "use" ~ ws+ ~ qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident ~ ws* ~ ";" 
     | "use" ~ ws+ ~ "*" ~ ws+ ~ "from" ~ ws+ ~ qualified_name ~ ws* ~ ";"
-
 }
+
