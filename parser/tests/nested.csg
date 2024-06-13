@@ -1,0 +1,10 @@
+translate(x = 5.0mm) { 
+    rectangle(width = 5.0mm);
+    translate(r = 5.0mm) circle(r = 5.0mm);
+
+}
+translate(x = 5.0mm) { 
+    rotate(angle = 90°) { 
+        rectangle(width = 5.0); 
+    } 
+}
