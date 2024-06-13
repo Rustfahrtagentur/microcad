@@ -111,12 +111,12 @@ node_statement = { (function_call ~ ws*)+ ~ ";" }
 //`translate(x = 5.0mm) { rectangle(width = 5.0); }`: ok
 //`translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
 //`translate(r = 5.0mm) circle(r = 5.0mm);`: ok
-modify_statement = { function_call ~ ws* ~ (("{" ~ ws* ~ (modify_statement | node_statement*) ~ ws* ~ "}") | node_statement) }
+modify_statement = { function_call ~ ws* ~ (("{" ~ ws* ~ ((modify_statement | node_statement) ~ ws*)* ~ "}") | node_statement) }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-code = { ((node_statement | modify_statement) ~ ws* )* }
+code = { SOI ~ ((node_statement | modify_statement) ~ ws* )* ~ EOI }
 
-COMMENT = ${ single_line_comment | multi_line_comment }
+//COMMENT = ${ single_line_comment | multi_line_comment }
 
 //`// ok`: ok
 //`/ err` error
