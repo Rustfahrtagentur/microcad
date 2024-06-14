@@ -87,7 +87,12 @@ impl CsglParser {
                     node_statement.function_argument_list =
                         Self::parse_function_argument_list(pair.into_inner()).unwrap()
                 }
-                _ => unreachable!(),
+                Rule::node_name_assignment => {}
+                Rule::node_inner => return Self::parse_node_statement(pair.into_inner()),
+                _ => {
+                    println!("{:?}", pair.as_rule());
+                    unreachable!();
+                }
             }
         }
 
@@ -95,11 +100,10 @@ impl CsglParser {
     }
 }
 
-//include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
-
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::*;
+    include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
 
     #[test]
     fn test_file_nested() {
