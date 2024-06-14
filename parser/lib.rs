@@ -34,38 +34,38 @@ struct NodeStatement {
 impl Statement for NodeStatement {}
 
 impl CsglParser {
-    pub fn parse_code(pairs: Pairs<Rule>) {
+    fn code(pairs: Pairs<Rule>) {
         for pair in pairs {
             match pair.as_rule() {
                 Rule::node_statement => {
                     let pairs = pair.into_inner();
                     println!("node statement: {pairs:#?}");
-                    Self::parse_node_statement(pairs).unwrap();
+                    Self::node_statement(pairs).unwrap();
                 }
-                _ => Self::parse_code(pair.into_inner()),
+                _ => Self::code(pair.into_inner()),
             }
         }
     }
 
-    pub fn parse_expression(pairs: Pairs<Rule>) -> Result<Expression, ()> {
+    fn expression(pairs: Pairs<Rule>) -> Result<Expression, ()> {
         Ok(Expression {
             literal: pairs.clone().next().unwrap().into_inner().to_string(),
         })
     }
 
-    pub fn parse_function_argument(pairs: Pairs<Rule>) -> Result<FunctionArgument, ()> {
+    fn function_argument(pairs: Pairs<Rule>) -> Result<FunctionArgument, ()> {
         Ok(FunctionArgument {
             ident: pairs.clone().next().unwrap().to_string(),
-            expression: Self::parse_expression(pairs).unwrap(),
+            expression: Self::expression(pairs).unwrap(),
         })
     }
 
-    pub fn parse_function_argument_list(pairs: Pairs<Rule>) -> Result<Vec<FunctionArgument>, ()> {
+    fn function_argument_list(pairs: Pairs<Rule>) -> Result<Vec<FunctionArgument>, ()> {
         let mut args = Vec::new();
         for pair in pairs {
             match pair.as_rule() {
                 Rule::function_argument => {
-                    args.push(Self::parse_function_argument(pair.into_inner()).unwrap());
+                    args.push(Self::function_argument(pair.into_inner()).unwrap());
                 }
                 _ => unreachable!(),
             }
@@ -73,7 +73,7 @@ impl CsglParser {
         Ok(args)
     }
 
-    pub fn parse_node_statement(pairs: Pairs<Rule>) -> Result<NodeStatement, ()> {
+    fn node_statement(pairs: Pairs<Rule>) -> Result<NodeStatement, ()> {
         let mut node_statement = NodeStatement {
             ident: Default::default(),
             function_argument_list: Vec::default(),
@@ -81,14 +81,14 @@ impl CsglParser {
 
         for pair in pairs {
             match pair.as_rule() {
-                Rule::function_call => return Self::parse_node_statement(pair.into_inner()),
+                Rule::function_call => return Self::node_statement(pair.into_inner()),
                 Rule::ident => node_statement.ident = pair.to_string(),
                 Rule::function_argument_list => {
                     node_statement.function_argument_list =
-                        Self::parse_function_argument_list(pair.into_inner()).unwrap()
+                        Self::function_argument_list(pair.into_inner()).unwrap()
                 }
                 Rule::node_name_assignment => {}
-                Rule::node_inner => return Self::parse_node_statement(pair.into_inner()),
+                Rule::node_inner => return Self::node_statement(pair.into_inner()),
                 _ => {
                     println!("{:?}", pair.as_rule());
                     unreachable!();
@@ -118,7 +118,7 @@ mod tests {
 
         match CsglParser::parse(Rule::r#code, &input) {
             Ok(pairs) => {
-                CsglParser::parse_code(pairs);
+                CsglParser::code(pairs);
                 //println!("{pairs:#?}");
             }
             Err(e) => {
