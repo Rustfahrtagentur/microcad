@@ -188,9 +188,7 @@ impl PestFile {
         w: &mut impl std::io::Write,
     ) -> Result<(), std::io::Error> {
         let mut r = RustWriter::new(w);
-        r.write("#[cfg(test)]")?;
-        r.begin_scope("mod tests")?;
-        r.write("use super::*;")?;
+        r.write("use crate::*;");
 
         // Generate tests for each rule
         for rule in &self.rules {
@@ -242,7 +240,6 @@ impl PestFile {
             }
             r.end_scope()?;
         }
-        r.end_scope()?;
         Ok(())
     }
 }
