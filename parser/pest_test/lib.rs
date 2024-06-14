@@ -19,8 +19,8 @@ impl std::str::FromStr for PestResult {
         let comment = tokens.get(1).unwrap_or(&"").trim().to_string();
 
         match result {
-            "ok" => Ok(Self::Ok(comment.to_string())),
-            "error" => Ok(Self::Err(comment.to_string())),
+            "ok" => Ok(Self::Ok(comment)),
+            "error" => Ok(Self::Err(comment)),
             _ => Err(()),
         }
     }
@@ -257,6 +257,8 @@ pub fn generate(parser_struct_name: &str, grammar_file: impl AsRef<std::path::Pa
         .unwrap();
     println!("cargo:rerun-if-changed={}", grammar_file.as_ref().display());
 }
+
+//pub fn generate_test_case_from_file(test_file: impl AsRef<std::path::Path>)
 
 #[cfg(test)]
 mod tests {
