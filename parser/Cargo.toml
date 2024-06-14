@@ -12,6 +12,7 @@ path = "lib.rs"
 pest = "2.7"
 pest_derive = "2.7"
 log = "0.4"
+rctree = "0.6.0"
 
 [build-dependencies]
 pest_test = { path = "pest_test" }
