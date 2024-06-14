@@ -188,7 +188,7 @@ impl PestFile {
         w: &mut impl std::io::Write,
     ) -> Result<(), std::io::Error> {
         let mut r = RustWriter::new(w);
-        r.write("use crate::*;");
+        r.write("use crate::*;")?;
 
         // Generate tests for each rule
         for rule in &self.rules {
