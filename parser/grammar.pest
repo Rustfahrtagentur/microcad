@@ -106,19 +106,25 @@ function_argument_list = { function_argument ~ ws* ~ ("," ~ ws* ~ function_argum
 function_call = { ident ~ ws* ~ "(" ~ ws* ~ function_argument_list? ~ ws* ~ ")" }
 
 //`circle(r = 5.0mm);`: ok
-node_statement = { function_call ~ ws* ~ ";" }
-
+//`circle(r = 5.0mm) {}`: ok
 //`translate(x = 5.0mm) { rectangle(width = 5.0); }`: ok
 //`translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
 //`translate(r = 5.0mm) circle(r = 5.0mm);`: ok
-modify_statement = { function_call ~ ws* ~ (("{" ~ ws* ~ ((statement) ~ ws*)* ~ "}") | node_statement) }
+//`name := node() {}`: ok
+//`name := node();`: ok
+node_statement = { 
+    node_name_assignment? ~ (function_call ~ ws*)+ ~ ";" |
+    node_name_assignment? ~ (function_call ~ ws*)+ ~ "{" ~ node_inner ~ "}" 
+}
+node_name_assignment = { ident ~ ws* ~ ":=" ~ ws* }
+node_inner = { (ws* ~ node_statement ~ ws*)* }
 
-statement = { modify_statement | node_statement }
+statement = { node_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 code = { SOI ~ (statement ~ ws* )* ~ EOI }
 
-//COMMENT = ${ single_line_comment | multi_line_comment }
+COMMENT = ${ single_line_comment | multi_line_comment }
 
 //`// ok`: ok
 //`/ err` error
