@@ -4,6 +4,8 @@ use pest::Parser;
 
 use pest_derive::Parser;
 
+mod moduletree;
+
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
 struct CsglParser;
