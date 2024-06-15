@@ -1,10 +1,9 @@
 use pest::iterators::Pairs;
 #[allow(unused_imports)]
 use pest::Parser;
-
 use pest_derive::Parser;
 
-mod moduletree;
+mod document;
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
