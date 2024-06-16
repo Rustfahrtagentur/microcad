@@ -3,6 +3,14 @@
 use core::fmt;
 
 pub type Node = rctree::Node<NodeKind>;
+use pest::iterators::Pairs;
+
+struct BuildDiagnostics {}
+
+enum ParseError {
+    UnknownNodeType(String),
+    AccessPrivateIdentifier(String),
+}
 
 struct Expression(String);
 
@@ -12,7 +20,22 @@ impl From<&str> for Expression {
     }
 }
 
+enum Visibility {
+    Private,
+    Public,
+}
+
 struct Identifier(String);
+
+impl Identifier {
+    pub fn visibility(self) -> Visibility {
+        if self.0.starts_with('_') {
+            Visibility::Private
+        } else {
+            Visibility::Public
+        }
+    }
+}
 
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {
@@ -104,8 +127,6 @@ impl Depth for Node {
         depth
     }
 }
-
-impl NodeKind {}
 
 #[cfg(test)]
 mod tests {
