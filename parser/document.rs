@@ -75,7 +75,7 @@ struct FunctionCall {
 }
 
 struct NodeStatement {
-    name: Option<Identifier>,
+    id: Option<Identifier>,
     call: FunctionCall,
 }
 
@@ -138,7 +138,7 @@ mod tests {
 
         // translate(x = 5.0mm)
         let translate: Node = NodeKind::NodeStatement(NodeStatement {
-            name: None,
+            id: None,
             call: FunctionCall {
                 name: "translate".into(),
                 arguments: vec![FunctionArgument {
@@ -151,7 +151,7 @@ mod tests {
         node.append(translate.clone());
 
         let circle: Node = NodeKind::NodeStatement(NodeStatement {
-            name: None,
+            id: None,
             call: FunctionCall {
                 name: "circle".into(),
                 arguments: vec![FunctionArgument {
