@@ -1,16 +1,45 @@
 // Intermediate Representation
 
 use core::fmt;
+use std::path::PathBuf;
 
 pub type Node = rctree::Node<NodeKind>;
 use pest::iterators::Pairs;
 
-struct BuildDiagnostics {}
+use crate::CsglParser;
+
+struct Document {
+    path: std::path::PathBuf,
+    root: Node,
+}
 
 enum ParseError {
     UnknownNodeType(String),
     AccessPrivateIdentifier(String),
+    IoError(std::io::Error),
 }
+
+impl From<std::io::Error> for ParseError {
+    fn from(value: std::io::Error) -> Self {
+        ParseError::IoError(value)
+    }
+}
+
+impl Document {
+    pub fn from_file(
+        path: impl AsRef<std::path::Path>,
+        diag: &mut BuildDiagnostics,
+    ) -> Result<Self, ParseError> {
+        let input = std::fs::read_to_string(&path)?;
+
+        Ok(Self {
+            path: PathBuf::from(path.as_ref()),
+            root: NodeKind::Root.into(),
+        })
+    }
+}
+
+struct BuildDiagnostics {}
 
 struct Expression(String);
 
@@ -95,6 +124,8 @@ enum NodeKind {
     // ParameterDeclaration(ParameterDeclaration),
     // ConstantDeclaration(Constant),
 }
+
+use crate::Rule;
 
 impl Into<Node> for NodeKind {
     fn into(self) -> Node {
