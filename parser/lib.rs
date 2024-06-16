@@ -111,7 +111,7 @@ mod tests {
     fn test_file_nested() {
         let test_filename = "tests/nested.csg";
         let input = std::fs::read_to_string(test_filename)
-            .expect(format!("Test file not found: {}", test_filename).as_str());
+            .unwrap_or_else(|_| panic!("Test file not found: {}", test_filename));
 
         //use log::trace;
         //assert!(!input.is_empty());
