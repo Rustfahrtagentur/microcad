@@ -7,11 +7,7 @@ mod document;
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
-struct CsglParser;
-
-trait Statement {
-    fn run() {}
-}
+pub struct CsglParser;
 
 struct Expression {
     literal: String,
@@ -31,8 +27,6 @@ struct NodeStatement {
     ident: String,
     function_argument_list: Vec<FunctionArgument>,
 }
-
-impl Statement for NodeStatement {}
 
 impl CsglParser {
     fn code(pairs: Pairs<Rule>) {
