@@ -114,14 +114,14 @@ function_call = { ident ~ ws* ~ "(" ~ ws* ~ function_argument_list? ~ ws* ~ ")" 
 //`translate(r = 5.0mm) circle(r = 5.0mm);`: ok
 //`name := node() {}`: ok
 //`name := node();`: ok
-node_statement = { 
-    node_id_assignment? ~ (function_call ~ ws*)+ ~ ";" |
-    node_id_assignment? ~ (function_call ~ ws*)+ ~ "{" ~ node_inner ~ "}" 
+object_node_statement = { 
+    object_node_id_assignment? ~ (function_call ~ ws*)+ ~ ";" |
+    object_node_id_assignment? ~ (function_call ~ ws*)+ ~ "{" ~ object_node_inner ~ "}" 
 }
-node_id_assignment = { ident ~ ws* ~ ":=" ~ ws* }
-node_inner = { (ws* ~ node_statement ~ ws*)* }
+object_node_id_assignment = { ident ~ ws* ~ ":=" ~ ws* }
+object_node_inner = { (ws* ~ object_node_statement ~ ws*)* }
 
-statement = { node_statement }
+statement = { object_node_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 code = { SOI ~ (statement ~ ws* )* ~ EOI }
