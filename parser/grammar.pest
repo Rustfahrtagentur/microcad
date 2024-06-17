@@ -105,6 +105,8 @@ function_argument_list = { function_argument ~ ws* ~ ("," ~ ws* ~ function_argum
 //`function(a = 3.0mm, b = 2.0mm)`: ok
 function_call = { ident ~ ws* ~ "(" ~ ws* ~ function_argument_list? ~ ws* ~ ")" }
 
+
+
 //`circle(r = 5.0mm);`: ok
 //`circle(r = 5.0mm) {}`: ok
 //`translate(x = 5.0mm) { rectangle(width = 5.0); }`: ok
@@ -113,10 +115,10 @@ function_call = { ident ~ ws* ~ "(" ~ ws* ~ function_argument_list? ~ ws* ~ ")" 
 //`name := node() {}`: ok
 //`name := node();`: ok
 node_statement = { 
-    node_name_assignment? ~ (function_call ~ ws*)+ ~ ";" |
-    node_name_assignment? ~ (function_call ~ ws*)+ ~ "{" ~ node_inner ~ "}" 
+    node_id_assignment? ~ (function_call ~ ws*)+ ~ ";" |
+    node_id_assignment? ~ (function_call ~ ws*)+ ~ "{" ~ node_inner ~ "}" 
 }
-node_name_assignment = { ident ~ ws* ~ ":=" ~ ws* }
+node_id_assignment = { ident ~ ws* ~ ":=" ~ ws* }
 node_inner = { (ws* ~ node_statement ~ ws*)* }
 
 statement = { node_statement }
