@@ -38,7 +38,7 @@ enum Visibility {
     Public,
 }
 
-#[derive(Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq)]
 struct Identifier(String);
 
 impl Identifier {
@@ -109,7 +109,7 @@ impl CsglParser {
 
     fn identifier(pair: Pair<Rule>) -> Result<Identifier, ()> {
         if pair.as_rule() == Rule::ident {
-            Ok(Identifier(pair.to_string()))
+            Ok(Identifier(pair.as_span().as_str().into()))
         } else {
             Err(())
         }
@@ -162,6 +162,7 @@ impl CsglParser {
                     object_node_statement.calls.push(call);
                 }
                 _ => {
+                    println!("{:?}", pair.as_rule());
                     unreachable!();
                 }
             }
@@ -179,6 +180,24 @@ impl CsglParser {
 mod tests {
     use crate::*;
     include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
+
+    #[test]
+    fn object_node_statement() {
+        let pairs = CsglParser::parse(
+            Rule::object_node_statement,
+            "node_id := translate(x = 5.0mm) rotate(angle = 90°) { rectangle(width = 5.0mm); }",
+        );
+
+        assert!(pairs.is_ok());
+        let mut pairs = pairs.unwrap();
+        let pair = pairs.next().unwrap();
+
+        let object_node_statement = CsglParser::object_node_statement(pair.into_inner()).unwrap();
+
+        assert_eq!(object_node_statement.calls.len(), 2);
+        assert_eq!(object_node_statement.id, Some("node_id".into()));
+        assert!(object_node_statement.has_inner);
+    }
 
     #[test]
     fn test_file_nested() {
