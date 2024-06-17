@@ -207,7 +207,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_node() {
+    fn empty_document() {
         let node: Node = Document::new().into();
 
         // translate(x = 5.0mm)
@@ -242,5 +242,11 @@ mod tests {
             let c = child.borrow();
             println!("{}{:?}", "    ".repeat(child.clone().depth()), c);
         }
+    }
+
+    #[test]
+    fn from_file() {
+        let node: Node = Document::from_path("tests/nested.csg").into();
+        assert!(node.has_children());
     }
 }
