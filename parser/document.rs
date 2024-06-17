@@ -1,123 +1,145 @@
 // Intermediate Representation
 
+use crate::Rule;
 use core::fmt;
-use std::path::PathBuf;
 
 pub type Node = rctree::Node<NodeKind>;
+use crate::diagnostics::SourceLocation;
+use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier};
+
 use pest::iterators::Pairs;
 
-use crate::CsglParser;
-
-struct Document {
-    path: std::path::PathBuf,
-    root: Node,
-}
-
-enum ParseError {
-    UnknownNodeType(String),
-    AccessPrivateIdentifier(String),
+enum Error {
     IoError(std::io::Error),
+    SyntaxError(Box<pest::error::Error<Rule>>),
 }
 
-impl From<std::io::Error> for ParseError {
-    fn from(value: std::io::Error) -> Self {
-        ParseError::IoError(value)
-    }
+pub struct Document {
+    path: Option<std::path::PathBuf>,
 }
 
 impl Document {
-    pub fn from_file(
-        path: impl AsRef<std::path::Path>,
-        diag: &mut BuildDiagnostics,
-    ) -> Result<Self, ParseError> {
-        let input = std::fs::read_to_string(&path)?;
-
-        Ok(Self {
-            path: PathBuf::from(path.as_ref()),
-            root: NodeKind::Root.into(),
-        })
+    fn new() -> Self {
+        Self { path: None }
     }
-}
 
-struct BuildDiagnostics {}
-
-struct Expression(String);
-
-impl From<&str> for Expression {
-    fn from(value: &str) -> Self {
-        Self(value.to_string())
-    }
-}
-
-enum Visibility {
-    Private,
-    Public,
-}
-
-struct Identifier(String);
-
-impl Identifier {
-    pub fn visibility(self) -> Visibility {
-        if self.0.starts_with('_') {
-            Visibility::Private
-        } else {
-            Visibility::Public
+    fn from_path(path: impl AsRef<std::path::Path>) -> Self {
+        Self {
+            path: Some(std::path::PathBuf::from(path.as_ref())),
         }
     }
 }
 
-impl From<&str> for Identifier {
-    fn from(value: &str) -> Self {
-        Self(value.to_string())
+impl Into<Node> for Document {
+    fn into(self) -> Node {
+        NodeKind::Document(self).into()
     }
 }
 
-impl fmt::Display for Identifier {
+impl From<std::io::Error> for Error {
+    fn from(value: std::io::Error) -> Self {
+        Error::IoError(value)
+    }
+}
+
+struct TreeBuilder();
+
+impl TreeBuilder {
+    pub fn from_file(path: impl AsRef<std::path::Path>) -> Result<Node, Error> {
+        let input = std::fs::read_to_string(&path)?;
+
+        let root: Node = Document::from_path(path).into();
+        Self::from_str(root, &input)
+    }
+
+    fn from_str(root: Node, input: &str) -> Result<Node, Error> {
+        use pest::Parser;
+
+        match CsglParser::parse(Rule::r#document, &input) {
+            Ok(pairs) => {
+                for pair in pairs {
+                    match pair.as_rule() {
+                        Rule::object_node_statement => {
+                            let pairs = pair.into_inner();
+                            if let Some(node) = Self::object_node(root.clone(), pairs) {
+                                root.append(node);
+                            }
+                        }
+                        _ => unreachable!(),
+                    }
+                }
+                Ok(root)
+            }
+            Err(e) => Err(Error::SyntaxError(Box::new(e))),
+        }
+    }
+
+    fn object_node(parent: Node, pairs: Pairs<Rule>) -> Option<Node> {
+        let object_node_statement = CsglParser::object_node_statement(pairs.clone()).unwrap();
+        let mut node = parent.clone();
+        let id = object_node_statement.ident.as_ref();
+
+        let mut first_node = None;
+
+        for call in object_node_statement.calls {
+            let object_node: Node = ObjectNode {
+                id: if id.is_some() && first_node.is_none() {
+                    Some(id.unwrap().clone())
+                } else {
+                    None
+                },
+                call,
+            }
+            .into();
+            node.append(object_node.clone());
+            node = object_node; // Nest the nodes
+
+            // Save the first node because we need to return it
+            if first_node.is_none() {
+                first_node = Some(node.clone());
+            }
+        }
+
+        if object_node_statement.has_inner {
+            for pair in pairs {
+                if pair.as_rule() == Rule::object_node_inner {
+                    for inner_pair in pair.into_inner() {
+                        // Fetch all object nodes
+                        if inner_pair.as_rule() == Rule::object_node_statement {
+                            node.clone().append(
+                                Self::object_node(node.clone(), inner_pair.into_inner()).unwrap(),
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        first_node
+    }
+}
+
+impl fmt::Display for Document {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
+        write!(f, "{:?}", self.path)
     }
 }
 
-struct QualifiedName(Vec<Identifier>);
-
-enum Type {
-    Scalar,
-    Length,
-    Angle,
-    Bool,
-}
-
-struct FunctionDeclarationArgument {
-    name: Identifier,
-    r#type: Type,
-    default_value: Option<Expression>,
-}
-
-struct FunctionArgument {
-    name: Identifier,
-    value: Expression,
-}
-
-struct FunctionCall {
-    name: Identifier,
-    arguments: Vec<FunctionArgument>,
-}
-
-struct NodeStatement {
+struct ObjectNode {
     id: Option<Identifier>,
     call: FunctionCall,
 }
 
-struct UseStatement {
-    module: QualifiedName,
-    submodules: Vec<String>,
-    alias: Option<String>,
+impl From<ObjectNode> for Node {
+    fn from(value: ObjectNode) -> Self {
+        NodeKind::ObjectNode(value).into()
+    }
 }
 
 enum NodeKind {
-    Root,
+    Document(Document),
     /// E.g. circle(r = 5.0mm) or translate(x = 10.0)
-    NodeStatement(NodeStatement),
+    ObjectNode(ObjectNode),
     // UseStatement(UseStatement),
     // FunctionDeclaration(FunctionDeclaration),
     // ModuleDeclaration(ModuleDeclaration),
@@ -125,7 +147,26 @@ enum NodeKind {
     // ConstantDeclaration(Constant),
 }
 
-use crate::Rule;
+impl NodeKind {
+    fn id(&self) -> Option<&Identifier> {
+        match self {
+            NodeKind::ObjectNode(object_node) => object_node.id.as_ref(),
+            _ => None,
+        }
+    }
+
+    fn find_node_with_id(parent: Node, id: &Identifier) -> Option<Node> {
+        for child in parent.children() {
+            if let Some(child_id) = child.borrow().id() {
+                if child_id == id {
+                    return Some(child.clone());
+                }
+            }
+        }
+
+        None
+    }
+}
 
 impl Into<Node> for NodeKind {
     fn into(self) -> Node {
@@ -136,8 +177,10 @@ impl Into<Node> for NodeKind {
 impl fmt::Debug for NodeKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            NodeKind::Root => write!(f, "root"),
-            NodeKind::NodeStatement(node_statement) => write!(f, "{}", node_statement.call.name),
+            NodeKind::Document(doc) => write!(f, "{doc}"),
+            NodeKind::ObjectNode(object_node) => {
+                write!(f, "{}", object_node.call.ident)
+            }
         }
     }
 }
@@ -165,32 +208,32 @@ mod tests {
 
     #[test]
     fn test_node() {
-        let node: Node = NodeKind::Root.into();
+        let node: Node = Document::new().into();
 
         // translate(x = 5.0mm)
-        let translate: Node = NodeKind::NodeStatement(NodeStatement {
+        let translate: Node = ObjectNode {
             id: None,
             call: FunctionCall {
-                name: "translate".into(),
-                arguments: vec![FunctionArgument {
-                    name: "x".into(),
-                    value: "5.0mm".into(),
+                ident: "translate".into(),
+                function_argument_list: vec![FunctionArgument {
+                    ident: "x".into(),
+                    expression: "5.0mm".into(),
                 }],
             },
-        })
+        }
         .into();
         node.append(translate.clone());
 
-        let circle: Node = NodeKind::NodeStatement(NodeStatement {
+        let circle: Node = ObjectNode {
             id: None,
             call: FunctionCall {
-                name: "circle".into(),
-                arguments: vec![FunctionArgument {
-                    name: "r".into(),
-                    value: "5.0mm".into(),
+                ident: "circle".into(),
+                function_argument_list: vec![FunctionArgument {
+                    ident: "r".into(),
+                    expression: "5.0mm".into(),
                 }],
             },
-        })
+        }
         .into();
 
         translate.append(circle);
