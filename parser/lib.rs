@@ -28,7 +28,7 @@ struct FunctionCall {
 }
 
 struct ObjectNodeStatement {
-    id: Option<Identifier>,
+    ident: Option<Identifier>,
     calls: Vec<FunctionCall>,
     has_inner: bool,
 }
@@ -67,20 +67,6 @@ impl std::fmt::Display for Identifier {
 struct QualifiedName(Vec<Identifier>);
 
 impl CsglParser {
-    /*
-        fn code(pairs: Pairs<Rule>) {
-            for pair in pairs {
-                match pair.as_rule() {
-                    Rule::object_node_statement => {
-                        let pairs = pair.into_inner();
-                        println!("node statement: {pairs:#?}");
-                        Self::node_statement(pairs).unwrap();
-                    }
-                    _ => Self::code(pair.into_inner()),
-                }
-            }
-        }
-    */
     fn expression(pairs: Pairs<Rule>) -> Result<Expression, ()> {
         Ok(Expression {
             literal: pairs.clone().next().unwrap().into_inner().to_string(),
@@ -143,7 +129,7 @@ impl CsglParser {
 
     fn object_node_statement(pairs: Pairs<Rule>) -> Result<ObjectNodeStatement, ()> {
         let mut object_node_statement = ObjectNodeStatement {
-            id: Default::default(),
+            ident: Default::default(),
             calls: Vec::new(),
             has_inner: false,
         };
@@ -151,7 +137,7 @@ impl CsglParser {
         for pair in pairs {
             match pair.as_rule() {
                 Rule::object_node_id_assignment => {
-                    object_node_statement.id =
+                    object_node_statement.ident =
                         Some(Self::object_node_id_assignment(pair.into_inner())?);
                 }
                 Rule::object_node_inner => {
@@ -195,8 +181,15 @@ mod tests {
         let object_node_statement = CsglParser::object_node_statement(pair.into_inner()).unwrap();
 
         assert_eq!(object_node_statement.calls.len(), 2);
-        assert_eq!(object_node_statement.id, Some("node_id".into()));
+        assert_eq!(object_node_statement.ident, Some("node_id".into()));
         assert!(object_node_statement.has_inner);
+
+        // Test function call
+        {
+            let call = object_node_statement.calls.first().unwrap();
+            assert_eq!(call.ident, "translate".into());
+            assert_eq!(call.function_argument_list.len(), 1);
+        }
     }
 
     #[test]
@@ -205,19 +198,6 @@ mod tests {
         let input = std::fs::read_to_string(test_filename)
             .unwrap_or_else(|_| panic!("Test file not found: {}", test_filename));
 
-        //use log::trace;
-        //assert!(!input.is_empty());
-        //trace!("{input}");
-        println!("{input}");
-
-        match CsglParser::parse(Rule::r#code, &input) {
-            Ok(pairs) => {
-                //CsglParser::code(pairs);
-                //println!("{pairs:#?}");
-            }
-            Err(e) => {
-                panic!("Failed parsing file in {}: {}", test_filename, e);
-            }
-        }
+        assert!(CsglParser::parse(Rule::document, &input).is_ok())
     }
 }

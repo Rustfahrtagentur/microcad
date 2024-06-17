@@ -124,7 +124,7 @@ object_node_inner = { (ws* ~ object_node_statement ~ ws*)* }
 statement = { object_node_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-code = { SOI ~ (statement ~ ws* )* ~ EOI }
+document = { SOI ~ (statement ~ ws* )* ~ EOI }
 
 COMMENT = ${ single_line_comment | multi_line_comment }
 
