@@ -1,0 +1,14 @@
+[package]
+name = "csg-scenegraph"
+description = "A scenegraph for the CSG language"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+log = "0.4"
+rctree = "0.6.0"
+geo = "0.28.0"
