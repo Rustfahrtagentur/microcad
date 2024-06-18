@@ -3,7 +3,18 @@
 use crate::Rule;
 use core::fmt;
 
-pub type SyntaxNode = rctree::Node<SyntaxNodeKind>;
+struct SyntaxNodeInner {
+    inner: SyntaxNodeKind,
+    //    span: pest::Span<'i>,
+}
+
+impl SyntaxNodeInner {
+    fn id(&self) -> Option<&Identifier> {
+        self.inner.id()
+    }
+}
+
+pub type SyntaxNode = rctree::Node<SyntaxNodeInner>;
 use crate::diagnostics::SourceLocation;
 use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier};
 
@@ -182,7 +193,7 @@ impl SyntaxNodeKind {
 
 impl Into<SyntaxNode> for SyntaxNodeKind {
     fn into(self) -> SyntaxNode {
-        SyntaxNode::new(self)
+        SyntaxNode::new(SyntaxNodeInner { inner: self })
     }
 }
 
@@ -252,7 +263,7 @@ mod tests {
 
         for child in node.descendants() {
             let c = child.borrow();
-            println!("{}{:?}", "    ".repeat(child.clone().depth()), c);
+            println!("{}{:?}", "    ".repeat(child.clone().depth()), c.inner);
         }
     }
 
@@ -263,7 +274,7 @@ mod tests {
 
         for child in node.descendants() {
             let c = child.borrow();
-            println!("{}{:?}", "    ".repeat(child.clone().depth()), c);
+            println!("{}{:?}", "    ".repeat(child.clone().depth()), c.inner);
         }
     }
 }
