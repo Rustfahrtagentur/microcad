@@ -1,9 +1,7 @@
-// Intermediate Representation
-
 use crate::Rule;
 use core::fmt;
 
-struct SyntaxNodeInner {
+pub struct SyntaxNodeInner {
     inner: SyntaxNodeKind,
     //    span: pest::Span<'i>,
 }
@@ -191,9 +189,9 @@ impl SyntaxNodeKind {
     }
 }
 
-impl Into<SyntaxNode> for SyntaxNodeKind {
-    fn into(self) -> SyntaxNode {
-        SyntaxNode::new(SyntaxNodeInner { inner: self })
+impl From<SyntaxNodeKind> for SyntaxNode {
+    fn from(value: SyntaxNodeKind) -> Self {
+        SyntaxNode::new(SyntaxNodeInner { inner: value })
     }
 }
 
