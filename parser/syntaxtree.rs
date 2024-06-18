@@ -206,7 +206,7 @@ impl fmt::Debug for SyntaxNodeKind {
         match self {
             SyntaxNodeKind::Document(doc) => write!(f, "{doc}"),
             SyntaxNodeKind::ObjectNode(object_node) => {
-                write!(f, "{}", object_node.call.ident)
+                write!(f, "{}", object_node.call.qualified_name.to_string())
             }
         }
     }
@@ -241,7 +241,7 @@ mod tests {
         let translate: SyntaxNode = ObjectNode {
             id: None,
             call: FunctionCall {
-                ident: "translate".into(),
+                qualified_name: "translate".into(),
                 function_argument_list: vec![FunctionArgument {
                     ident: "x".into(),
                     expression: "5.0mm".into(),
@@ -254,7 +254,7 @@ mod tests {
         let circle: SyntaxNode = ObjectNode {
             id: None,
             call: FunctionCall {
-                ident: "circle".into(),
+                qualified_name: "circle".into(),
                 function_argument_list: vec![FunctionArgument {
                     ident: "r".into(),
                     expression: "5.0mm".into(),

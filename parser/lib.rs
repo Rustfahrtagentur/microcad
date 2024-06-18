@@ -31,7 +31,7 @@ struct FunctionArgument {
 
 #[derive(Default, Clone)]
 struct FunctionCall {
-    ident: Identifier,
+    qualified_name: QualifiedName,
     function_argument_list: Vec<FunctionArgument>,
 }
 
@@ -72,7 +72,42 @@ impl std::fmt::Display for Identifier {
     }
 }
 
+#[derive(Debug, Default, Clone)]
 struct QualifiedName(Vec<Identifier>);
+
+impl std::fmt::Display for QualifiedName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = self
+            .0
+            .iter()
+            .map(|ident| ident.0.clone())
+            .collect::<Vec<_>>()
+            .join(".");
+        write!(f, "{}", s)
+    }
+}
+
+impl From<&str> for QualifiedName {
+    fn from(value: &str) -> Self {
+        let mut name = Vec::new();
+        for ident in value.split('.') {
+            name.push(Identifier(ident.to_string()));
+        }
+        Self(name)
+    }
+}
+
+impl From<QualifiedName> for String {
+    fn from(value: QualifiedName) -> Self {
+        let s = value
+            .0
+            .iter()
+            .map(|ident| ident.0.clone())
+            .collect::<Vec<_>>()
+            .join(".");
+        s
+    }
+}
 
 impl CsglParser {
     fn expression(pairs: Pairs<Rule>) -> Result<Expression, ()> {
@@ -109,13 +144,26 @@ impl CsglParser {
         }
     }
 
+    fn qualified_name(pairs: Pairs<Rule>) -> Result<QualifiedName, ()> {
+        let mut name = Vec::new();
+        for pair in pairs {
+            match pair.as_rule() {
+                Rule::ident => {
+                    name.push(Self::identifier(pair)?);
+                }
+                _ => unreachable!(),
+            }
+        }
+        Ok(QualifiedName(name))
+    }
+
     fn function_call(pairs: Pairs<Rule>) -> Result<FunctionCall, ()> {
         let mut call = FunctionCall::default();
 
         for pair in pairs {
             match pair.as_rule() {
-                Rule::ident => {
-                    call.ident = Self::identifier(pair)?;
+                Rule::qualified_name => {
+                    call.qualified_name = Self::qualified_name(pair.into_inner())?;
                 }
                 Rule::function_argument_list => {
                     call.function_argument_list = Self::function_argument_list(pair.into_inner())?;
@@ -195,7 +243,7 @@ mod tests {
         // Test function call
         {
             let call = object_node_statement.calls.first().unwrap();
-            assert_eq!(call.ident, "translate".into());
+            assert_eq!(call.qualified_name.to_string(), "translate".to_string());
             assert_eq!(call.function_argument_list.len(), 1);
         }
     }
