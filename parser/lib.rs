@@ -4,7 +4,7 @@ use pest::Parser;
 use pest_derive::Parser;
 
 mod diagnostics;
-mod document;
+mod syntaxtree;
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
