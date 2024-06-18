@@ -3,7 +3,7 @@
 use crate::Rule;
 use core::fmt;
 
-pub type Node = rctree::Node<NodeKind>;
+pub type SyntaxNode = rctree::Node<NodeKind>;
 use crate::diagnostics::SourceLocation;
 use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier};
 
@@ -31,8 +31,8 @@ impl Document {
     }
 }
 
-impl Into<Node> for Document {
-    fn into(self) -> Node {
+impl Into<SyntaxNode> for Document {
+    fn into(self) -> SyntaxNode {
         NodeKind::Document(self).into()
     }
 }
@@ -46,14 +46,14 @@ impl From<std::io::Error> for Error {
 struct TreeBuilder();
 
 impl TreeBuilder {
-    pub fn from_path(path: impl AsRef<std::path::Path>) -> Result<Node, Error> {
+    pub fn from_path(path: impl AsRef<std::path::Path>) -> Result<SyntaxNode, Error> {
         let input = std::fs::read_to_string(&path)?;
 
-        let root: Node = Document::from_path(path).into();
+        let root: SyntaxNode = Document::from_path(path).into();
         Self::from_str(root, &input)
     }
 
-    fn from_str(root: Node, input: &str) -> Result<Node, Error> {
+    fn from_str(root: SyntaxNode, input: &str) -> Result<SyntaxNode, Error> {
         use pest::Parser;
 
         match CsglParser::parse(Rule::r#document, input) {
@@ -86,7 +86,7 @@ impl TreeBuilder {
         }
     }
 
-    fn object_node(parent: Node, pairs: Pairs<Rule>) -> Option<Node> {
+    fn object_node(parent: SyntaxNode, pairs: Pairs<Rule>) -> Option<SyntaxNode> {
         let object_node_statement = CsglParser::object_node_statement(pairs.clone()).unwrap();
         let mut node = parent.clone();
         let id = object_node_statement.ident.as_ref();
@@ -94,7 +94,7 @@ impl TreeBuilder {
         let mut first_node = None;
 
         for call in object_node_statement.calls {
-            let object_node: Node = ObjectNode {
+            let object_node: SyntaxNode = ObjectNode {
                 id: if id.is_some() && first_node.is_none() {
                     Some(id.unwrap().clone())
                 } else {
@@ -142,7 +142,7 @@ struct ObjectNode {
     call: FunctionCall,
 }
 
-impl From<ObjectNode> for Node {
+impl From<ObjectNode> for SyntaxNode {
     fn from(value: ObjectNode) -> Self {
         NodeKind::ObjectNode(value).into()
     }
@@ -167,7 +167,7 @@ impl NodeKind {
         }
     }
 
-    fn find_node_with_id(parent: Node, id: &Identifier) -> Option<Node> {
+    fn find_node_with_id(parent: SyntaxNode, id: &Identifier) -> Option<SyntaxNode> {
         for child in parent.children() {
             if let Some(child_id) = child.borrow().id() {
                 if child_id == id {
@@ -180,9 +180,9 @@ impl NodeKind {
     }
 }
 
-impl Into<Node> for NodeKind {
-    fn into(self) -> Node {
-        Node::new(self)
+impl Into<SyntaxNode> for NodeKind {
+    fn into(self) -> SyntaxNode {
+        SyntaxNode::new(self)
     }
 }
 
@@ -201,7 +201,7 @@ trait Depth {
     fn depth(self) -> usize;
 }
 
-impl Depth for Node {
+impl Depth for SyntaxNode {
     fn depth(self) -> usize {
         let mut depth = 0;
         let mut node = self.clone();
@@ -220,10 +220,10 @@ mod tests {
 
     #[test]
     fn empty_document() {
-        let node: Node = Document::new().into();
+        let node: SyntaxNode = Document::new().into();
 
         // translate(x = 5.0mm)
-        let translate: Node = ObjectNode {
+        let translate: SyntaxNode = ObjectNode {
             id: None,
             call: FunctionCall {
                 ident: "translate".into(),
@@ -236,7 +236,7 @@ mod tests {
         .into();
         node.append(translate.clone());
 
-        let circle: Node = ObjectNode {
+        let circle: SyntaxNode = ObjectNode {
             id: None,
             call: FunctionCall {
                 ident: "circle".into(),
