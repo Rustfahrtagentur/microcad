@@ -83,8 +83,8 @@ impl<'a> SvgWriter<'a> {
 
 impl<'a> Drop for SvgWriter<'a> {
     fn drop(&mut self) {
-        writeln!(self.writer, "</g>");
-        writeln!(self.writer, "</svg>");
+        writeln!(self.writer, "</g>").unwrap();
+        writeln!(self.writer, "</svg>").unwrap();
     }
 }
 
@@ -92,12 +92,9 @@ impl<'a> Drop for SvgWriter<'a> {
 mod tests {
     #[test]
     fn svg_write() {
-        use std::io::Cursor;
-
         // Write to file test.svg
         let mut file = std::fs::File::create("test.svg").unwrap();
 
-        let bounds = geo::Rect::new(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
         let mut svg = super::SvgWriter::new(
             &mut file,
             geo::Rect::new(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0)),
