@@ -15,6 +15,14 @@ struct Expression {
     literal: String,
 }
 
+impl From<&str> for Expression {
+    fn from(value: &str) -> Self {
+        Self {
+            literal: value.to_string(),
+        }
+    }
+}
+
 #[derive(Default, Clone)]
 struct FunctionArgument {
     ident: Identifier,
