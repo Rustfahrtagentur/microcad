@@ -1,14 +1,17 @@
-type Scalar = f64;
+pub type Scalar = f64;
+pub type LineString = geo::LineString<Scalar>;
+pub type Polygon = geo::Polygon<Scalar>;
+pub type MultiPolygon = geo::MultiPolygon<Scalar>;
+pub type Rect = geo::Rect<Scalar>;
+pub type Point = geo::Point<Scalar>;
 
-type LineString = geo::LineString<Scalar>;
-type Polygon = geo::Polygon<Scalar>;
-type MultiPolygon = geo::MultiPolygon<Scalar>;
+mod svg;
 
-trait Primitive {
+pub trait Primitive {
     fn render(&self) -> MultiPolygon;
 }
 
-struct Circle {
+pub struct Circle {
     radius: f64,
     points: usize,
 }
