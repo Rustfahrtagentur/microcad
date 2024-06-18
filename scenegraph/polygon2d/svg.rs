@@ -93,7 +93,7 @@ mod tests {
     #[test]
     fn svg_write() {
         // Write to file test.svg
-        let mut file = std::fs::File::create("test.svg").unwrap();
+        let mut file = std::fs::File::create("svg_write.svg").unwrap();
 
         let mut svg = super::SvgWriter::new(
             &mut file,
