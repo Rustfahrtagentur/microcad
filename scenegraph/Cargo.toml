@@ -10,5 +10,5 @@ path = "lib.rs"
 
 [dependencies]
 log = "0.4"
-rctree = "0.6.0"
-geo = "0.28.0"
+rctree = "0.6"
+geo = "0.28"
