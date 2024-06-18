@@ -3,7 +3,7 @@
 use crate::Rule;
 use core::fmt;
 
-pub type SyntaxNode = rctree::Node<NodeKind>;
+pub type SyntaxNode = rctree::Node<SyntaxNodeKind>;
 use crate::diagnostics::SourceLocation;
 use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier};
 
@@ -33,7 +33,7 @@ impl Document {
 
 impl Into<SyntaxNode> for Document {
     fn into(self) -> SyntaxNode {
-        NodeKind::Document(self).into()
+        SyntaxNodeKind::Document(self).into()
     }
 }
 
@@ -144,11 +144,11 @@ struct ObjectNode {
 
 impl From<ObjectNode> for SyntaxNode {
     fn from(value: ObjectNode) -> Self {
-        NodeKind::ObjectNode(value).into()
+        SyntaxNodeKind::ObjectNode(value).into()
     }
 }
 
-enum NodeKind {
+enum SyntaxNodeKind {
     Document(Document),
     /// E.g. circle(r = 5.0mm) or translate(x = 10.0)
     ObjectNode(ObjectNode),
@@ -159,10 +159,10 @@ enum NodeKind {
     // ConstantDeclaration(Constant),
 }
 
-impl NodeKind {
+impl SyntaxNodeKind {
     fn id(&self) -> Option<&Identifier> {
         match self {
-            NodeKind::ObjectNode(object_node) => object_node.id.as_ref(),
+            SyntaxNodeKind::ObjectNode(object_node) => object_node.id.as_ref(),
             _ => None,
         }
     }
@@ -180,17 +180,17 @@ impl NodeKind {
     }
 }
 
-impl Into<SyntaxNode> for NodeKind {
+impl Into<SyntaxNode> for SyntaxNodeKind {
     fn into(self) -> SyntaxNode {
         SyntaxNode::new(self)
     }
 }
 
-impl fmt::Debug for NodeKind {
+impl fmt::Debug for SyntaxNodeKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            NodeKind::Document(doc) => write!(f, "{doc}"),
-            NodeKind::ObjectNode(object_node) => {
+            SyntaxNodeKind::Document(doc) => write!(f, "{doc}"),
+            SyntaxNodeKind::ObjectNode(object_node) => {
                 write!(f, "{}", object_node.call.ident)
             }
         }
