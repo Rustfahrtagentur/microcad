@@ -7,8 +7,12 @@ pub struct SyntaxNodeInner {
 }
 
 impl SyntaxNodeInner {
-    fn id(&self) -> Option<&Identifier> {
+    pub fn id(&self) -> Option<&Identifier> {
         self.inner.id()
+    }
+
+    pub fn kind(&self) -> &SyntaxNodeKind {
+        &self.inner
     }
 }
 
@@ -146,10 +150,12 @@ impl fmt::Display for Document {
     }
 }
 
-struct ObjectNode {
+pub struct ObjectNode {
     id: Option<Identifier>,
     call: FunctionCall,
 }
+
+impl ObjectNode {}
 
 impl From<ObjectNode> for SyntaxNode {
     fn from(value: ObjectNode) -> Self {
@@ -157,7 +163,7 @@ impl From<ObjectNode> for SyntaxNode {
     }
 }
 
-enum SyntaxNodeKind {
+pub enum SyntaxNodeKind {
     Document(Document),
     /// E.g. circle(r = 5.0mm) or translate(x = 10.0)
     ObjectNode(ObjectNode),

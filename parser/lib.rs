@@ -4,7 +4,7 @@ use pest::Parser;
 use pest_derive::Parser;
 
 mod diagnostics;
-mod syntaxtree;
+pub mod syntaxtree;
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
@@ -47,7 +47,7 @@ enum Visibility {
 }
 
 #[derive(Debug, Default, Clone, PartialEq)]
-struct Identifier(String);
+pub struct Identifier(String);
 
 impl Identifier {
     /// @brief Every identifier starting with '_' is private
