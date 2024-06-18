@@ -9,6 +9,7 @@ use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier};
 
 use pest::iterators::Pairs;
 
+#[derive(Debug)]
 enum Error {
     IoError(std::io::Error),
     SyntaxError(Box<pest::error::Error<Rule>>),
@@ -45,7 +46,7 @@ impl From<std::io::Error> for Error {
 struct TreeBuilder();
 
 impl TreeBuilder {
-    pub fn from_file(path: impl AsRef<std::path::Path>) -> Result<Node, Error> {
+    pub fn from_path(path: impl AsRef<std::path::Path>) -> Result<Node, Error> {
         let input = std::fs::read_to_string(&path)?;
 
         let root: Node = Document::from_path(path).into();
@@ -55,17 +56,28 @@ impl TreeBuilder {
     fn from_str(root: Node, input: &str) -> Result<Node, Error> {
         use pest::Parser;
 
-        match CsglParser::parse(Rule::r#document, &input) {
-            Ok(pairs) => {
+        match CsglParser::parse(Rule::r#document, input) {
+            Ok(mut pairs) => {
+                let pairs = pairs.next().unwrap().into_inner();
                 for pair in pairs {
                     match pair.as_rule() {
-                        Rule::object_node_statement => {
-                            let pairs = pair.into_inner();
-                            if let Some(node) = Self::object_node(root.clone(), pairs) {
-                                root.append(node);
+                        Rule::statement => {
+                            let inner_pairs = pair.into_inner();
+                            for inner_pair in inner_pairs {
+                                match inner_pair.as_rule() {
+                                    Rule::object_node_statement => {
+                                        Self::object_node(root.clone(), inner_pair.into_inner());
+                                        continue;
+                                    }
+                                    _ => unreachable!(),
+                                }
                             }
                         }
-                        _ => unreachable!(),
+                        Rule::EOI => continue,
+                        _ => {
+                            println!("{:?}", pair.as_rule());
+                            unreachable!();
+                        }
                     }
                 }
                 Ok(root)
@@ -100,15 +112,15 @@ impl TreeBuilder {
             }
         }
 
+        let last_node = node.clone();
+
         if object_node_statement.has_inner {
             for pair in pairs {
                 if pair.as_rule() == Rule::object_node_inner {
                     for inner_pair in pair.into_inner() {
                         // Fetch all object nodes
                         if inner_pair.as_rule() == Rule::object_node_statement {
-                            node.clone().append(
-                                Self::object_node(node.clone(), inner_pair.into_inner()).unwrap(),
-                            );
+                            Self::object_node(last_node.clone(), inner_pair.into_inner());
                         }
                     }
                 }
@@ -246,7 +258,12 @@ mod tests {
 
     #[test]
     fn from_file() {
-        let node: Node = Document::from_path("tests/nested.csg").into();
+        let node = TreeBuilder::from_path("tests/nested.csg").unwrap();
         assert!(node.has_children());
+
+        for child in node.descendants() {
+            let c = child.borrow();
+            println!("{}{:?}", "    ".repeat(child.clone().depth()), c);
+        }
     }
 }
