@@ -90,6 +90,7 @@ dependencies = [
 name = "csg-scenegraph"
 version = "0.1.0"
 dependencies = [
+ "csg-parser",
  "geo",
  "log",
  "rctree",
