@@ -2,8 +2,11 @@ use pest::iterators::{Pair, Pairs};
 #[allow(unused_imports)]
 use pest::Parser;
 use pest_derive::Parser;
+use syntaxtree::UseStatement;
 
 mod diagnostics;
+mod qualified_name;
+
 pub mod syntaxtree;
 
 #[derive(Parser)]
@@ -157,6 +160,19 @@ impl CsglParser {
         Ok(QualifiedName(name))
     }
 
+    fn qualified_name_list(pairs: Pairs<Rule>) -> Result<Vec<QualifiedName>, ()> {
+        let mut names = Vec::new();
+        for pair in pairs {
+            match pair.as_rule() {
+                Rule::qualified_name => {
+                    names.push(Self::qualified_name(pair.into_inner()).unwrap());
+                }
+                _ => unreachable!(),
+            }
+        }
+        Ok(names)
+    }
+
     fn function_call(pairs: Pairs<Rule>) -> Result<FunctionCall, ()> {
         let mut call = FunctionCall::default();
 
@@ -215,6 +231,18 @@ impl CsglParser {
         } else {
             Ok(object_node_statement)
         }
+    }
+
+    fn use_statement(pairs: Pairs<Rule>) -> Result<UseStatement, ()> {
+        let mut use_statement = UseStatement {
+            qualified_names: Default::default(),
+            from: Vec::new(),
+            alias: None,
+        };
+
+        // @todo: Implement use statement parsing
+
+        Ok(use_statement)
     }
 }
 
