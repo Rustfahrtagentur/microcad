@@ -1,5 +1,7 @@
 use crate::Rule;
+use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier, QualifiedName};
 use core::fmt;
+use pest::iterators::Pairs;
 
 pub struct SyntaxNodeInner {
     inner: SyntaxNodeKind,
@@ -16,16 +18,68 @@ impl SyntaxNodeInner {
     }
 }
 
-pub type SyntaxNode = rctree::Node<SyntaxNodeInner>;
-use crate::diagnostics::SourceLocation;
-use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier, QualifiedName};
+pub enum SyntaxNodeKind {
+    Document(Document),
+    /// E.g. circle(r = 5.0mm) or translate(x = 10.0)
+    ObjectNode(ObjectNode),
+    UseStatement(UseStatement),
+    // FunctionDeclaration(FunctionDeclaration),
+    // ModuleDeclaration(ModuleDeclaration),
+    // ParameterDeclaration(ParameterDeclaration),
+    // ConstantDeclaration(Constant),
+}
 
-use pest::iterators::Pairs;
+impl SyntaxNodeKind {
+    fn id(&self) -> Option<&Identifier> {
+        match self {
+            SyntaxNodeKind::ObjectNode(object_node) => object_node.id.as_ref(),
+            _ => None,
+        }
+    }
+
+    fn find_node_with_id(parent: SyntaxNode, id: &Identifier) -> Option<SyntaxNode> {
+        for child in parent.children() {
+            if let Some(child_id) = child.borrow().id() {
+                if child_id == id {
+                    return Some(child.clone());
+                }
+            }
+        }
+
+        None
+    }
+}
+
+impl From<SyntaxNodeKind> for SyntaxNode {
+    fn from(value: SyntaxNodeKind) -> Self {
+        SyntaxNode::new(SyntaxNodeInner { inner: value })
+    }
+}
+
+impl fmt::Debug for SyntaxNodeKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            SyntaxNodeKind::Document(doc) => write!(f, "{doc}"),
+            SyntaxNodeKind::ObjectNode(object_node) => {
+                write!(f, "{}", object_node.call.qualified_name.to_string())
+            }
+            SyntaxNodeKind::UseStatement(use_statement) => write!(f, "{:?}", use_statement),
+        }
+    }
+}
+
+pub type SyntaxNode = rctree::Node<SyntaxNodeInner>;
 
 #[derive(Debug)]
 enum Error {
     IoError(std::io::Error),
     SyntaxError(Box<pest::error::Error<Rule>>),
+}
+
+impl From<std::io::Error> for Error {
+    fn from(value: std::io::Error) -> Self {
+        Error::IoError(value)
+    }
 }
 
 pub struct Document {
@@ -47,12 +101,6 @@ impl Document {
 impl Into<SyntaxNode> for Document {
     fn into(self) -> SyntaxNode {
         SyntaxNodeKind::Document(self).into()
-    }
-}
-
-impl From<std::io::Error> for Error {
-    fn from(value: std::io::Error) -> Self {
-        Error::IoError(value)
     }
 }
 
@@ -167,52 +215,15 @@ impl From<ObjectNode> for SyntaxNode {
     }
 }
 
-pub enum SyntaxNodeKind {
-    Document(Document),
-    /// E.g. circle(r = 5.0mm) or translate(x = 10.0)
-    ObjectNode(ObjectNode),
-    // UseStatement(UseStatement),
-    // FunctionDeclaration(FunctionDeclaration),
-    // ModuleDeclaration(ModuleDeclaration),
-    // ParameterDeclaration(ParameterDeclaration),
-    // ConstantDeclaration(Constant),
+pub struct UseStatement {
+    pub qualified_names: Vec<QualifiedName>,
+    pub from: Vec<QualifiedName>,
+    pub alias: Option<Identifier>,
 }
 
-impl SyntaxNodeKind {
-    fn id(&self) -> Option<&Identifier> {
-        match self {
-            SyntaxNodeKind::ObjectNode(object_node) => object_node.id.as_ref(),
-            _ => None,
-        }
-    }
-
-    fn find_node_with_id(parent: SyntaxNode, id: &Identifier) -> Option<SyntaxNode> {
-        for child in parent.children() {
-            if let Some(child_id) = child.borrow().id() {
-                if child_id == id {
-                    return Some(child.clone());
-                }
-            }
-        }
-
-        None
-    }
-}
-
-impl From<SyntaxNodeKind> for SyntaxNode {
-    fn from(value: SyntaxNodeKind) -> Self {
-        SyntaxNode::new(SyntaxNodeInner { inner: value })
-    }
-}
-
-impl fmt::Debug for SyntaxNodeKind {
+impl fmt::Debug for UseStatement {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            SyntaxNodeKind::Document(doc) => write!(f, "{doc}"),
-            SyntaxNodeKind::ObjectNode(object_node) => {
-                write!(f, "{}", object_node.call.qualified_name.to_string())
-            }
-        }
+        write!(f, "use {:?}", self.qualified_names)
     }
 }
 
