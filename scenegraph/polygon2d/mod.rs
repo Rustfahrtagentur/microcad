@@ -12,8 +12,8 @@ pub trait Primitive {
 }
 
 pub struct Circle {
-    radius: f64,
-    points: usize,
+    pub radius: f64,
+    pub points: usize,
 }
 
 fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
