@@ -18,7 +18,7 @@ impl SyntaxNodeInner {
 
 pub type SyntaxNode = rctree::Node<SyntaxNodeInner>;
 use crate::diagnostics::SourceLocation;
-use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier};
+use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier, QualifiedName};
 
 use pest::iterators::Pairs;
 
@@ -155,7 +155,11 @@ pub struct ObjectNode {
     call: FunctionCall,
 }
 
-impl ObjectNode {}
+impl ObjectNode {
+    pub fn qualified_name(&self) -> &QualifiedName {
+        &self.call.qualified_name
+    }
+}
 
 impl From<ObjectNode> for SyntaxNode {
     fn from(value: ObjectNode) -> Self {
