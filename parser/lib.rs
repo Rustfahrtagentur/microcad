@@ -73,7 +73,7 @@ impl std::fmt::Display for Identifier {
 }
 
 #[derive(Debug, Default, Clone)]
-struct QualifiedName(Vec<Identifier>);
+pub struct QualifiedName(Vec<Identifier>);
 
 impl std::fmt::Display for QualifiedName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
