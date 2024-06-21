@@ -279,12 +279,15 @@ mod tests {
         }
     }
 
+    fn test_file(path: impl AsRef<std::path::Path>) {
+        let input = std::fs::read_to_string(&path)
+            .unwrap_or_else(|_| panic!("Test file not found: {:?}", path.as_ref()));
+        assert!(CsglParser::parse(Rule::document, &input).is_ok())
+    }
+
     #[test]
     fn test_file_nested() {
-        let test_filename = "tests/nested.csg";
-        let input = std::fs::read_to_string(test_filename)
-            .unwrap_or_else(|_| panic!("Test file not found: {}", test_filename));
-        use pest::Parser;
-        assert!(CsglParser::parse(Rule::document, &input).is_ok())
+        test_file("tests/nested.csg");
+        test_file("tests/module.csg");
     }
 }
