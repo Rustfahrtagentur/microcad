@@ -67,10 +67,10 @@ qualified_name_all = { "*" }
 qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
 //`int`: ok
-type = { qualified_name | array_type }
+type = { qualified_name | list_type }
 
 //`[number]`: ok
-array_type = { "[" ~ ws* ~ type ~ ws * ~ "]" }
+list_type = { "[" ~ ws* ~ type ~ ws * ~ "]" }
 
 //`: number`: ok
 //`: <Vec3>`: error
@@ -103,7 +103,7 @@ unary_operator = { "-" }
 //`[1, 2, 3]`: ok
 //`[1, 2, 3,]`: error # Trailing comma
 //`[]`: ok
-array_literal = { "[" ~ (ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)*)? ~ ws* ~ "]" }
+list_literal = { "[" ~ (ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)*)? ~ ws* ~ "]" }
 
 //`r = 5.0mm`: ok # Named argument
 //`2.0mm`: ok # Positional argument
