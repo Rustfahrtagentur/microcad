@@ -13,6 +13,10 @@ pub mod syntaxtree;
 #[grammar = "grammar.pest"]
 pub struct CsglParser;
 
+pub trait Parse {
+    fn parse(pair: Pair<Rule>) -> Self;
+}
+
 #[derive(Default, Clone)]
 struct Expression {
     literal: String,
