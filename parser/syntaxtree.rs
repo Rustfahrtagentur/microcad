@@ -2,6 +2,7 @@ use crate::Rule;
 use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier, QualifiedName};
 use core::fmt;
 use pest::iterators::Pairs;
+use std::fmt::write;
 
 pub struct SyntaxNodeInner {
     inner: SyntaxNodeKind,
@@ -69,6 +70,10 @@ impl fmt::Debug for SyntaxNodeKind {
 }
 
 pub type SyntaxNode = rctree::Node<SyntaxNodeInner>;
+
+trait AppendSyntaxNode {
+    fn append_node(&mut self, node: SyntaxNode);
+}
 
 #[derive(Debug)]
 enum Error {
@@ -215,15 +220,33 @@ impl From<ObjectNode> for SyntaxNode {
     }
 }
 
-pub struct UseStatement {
-    pub qualified_names: Vec<QualifiedName>,
-    pub from: Vec<QualifiedName>,
-    pub alias: Option<Identifier>,
+pub struct UseAlias(pub QualifiedName, pub Identifier);
+
+impl fmt::Debug for UseAlias {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "use {:?} as {:?}", self.0, self.1)
+    }
+}
+
+pub enum UseStatement {
+    Use(Vec<QualifiedName>),
+    UseFrom(Vec<QualifiedName>, QualifiedName),
+    UseAll(Vec<QualifiedName>),
+    UseAlias(UseAlias),
+    UseAliasFrom(UseAlias, QualifiedName),
 }
 
 impl fmt::Debug for UseStatement {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "use {:?}", self.qualified_names)
+        match self {
+            UseStatement::Use(qualified_names) => write!(f, "use {:?}", qualified_names),
+            UseStatement::UseFrom(qualified_names, from) => {
+                write!(f, "use {:?} from {:?}", qualified_names, from)
+            }
+            UseStatement::UseAll(qualified_names) => write!(f, "use * from {:?}", qualified_names),
+            UseStatement::UseAlias(alias) => write!(f, "{:?}", alias),
+            UseStatement::UseAliasFrom(alias, from) => write!(f, "{:?} from {:?}", alias, from),
+        }
     }
 }
 
