@@ -27,7 +27,7 @@ constant_ident = { (alpha_upper | "_") ~ (alpha_upper | digit | "_")* }
 //`1`: ok
 //`.1`: error
 //`qwqeaq`: error
-number = @{ ("-"? ~ int) ~ ("." ~ ASCII_DIGIT+ ~ exp? | exp)? }
+number_literal = @{ ("-"? ~ int) ~ ("." ~ ASCII_DIGIT+ ~ exp? | exp)? }
 int    = @{ "0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
 exp    = @{ ("E" | "e") ~ ("+" | "-")? ~ ASCII_DIGIT+ }
 
@@ -58,7 +58,7 @@ color_literal = { "#" ~ (ASCII_HEX_DIGIT{8} | ASCII_HEX_DIGIT{6} | ASCII_HEX_DIG
 //`1mm`: ok
 //`1.0mm`: ok
 //`1.0`: ok
-literal = { number ~ unit? | string_literal | bool_literal | color_literal }
+literal = { number_literal ~ unit? | string_literal | bool_literal | color_literal }
 
 //`a`: ok # Single identifier
 //`a.b`: ok # Nested identifiers
@@ -75,10 +75,10 @@ qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 //`[scalar]`: ok # List type
 type = { qualified_name | list_type }
 
-//`[number]`: ok
+//`[scalar]`: ok
 list_type = { "[" ~ ws* ~ type ~ ws * ~ "]" }
 
-//`: number`: ok
+//`: scalar`: ok
 //`: <Vec3>`: error
 type_specifier = { ":" ~ ws* ~ type }
 
