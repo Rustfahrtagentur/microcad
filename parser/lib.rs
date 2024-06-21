@@ -113,13 +113,33 @@ impl From<QualifiedName> for String {
 }
 
 impl CsglParser {
+    /// @brief Helper function to parse a vector of pairs into a vector of T
+    /// @param pairs The pairs to parse
+    /// @param rule The rule to match
+    /// @param f The function to parse the pair into T
+    /// @return A vector of T
+    fn list<T>(
+        pairs: Pairs<Rule>,
+        rule: Rule,
+        f: impl Fn(Pair<Rule>) -> Result<T, ()>,
+    ) -> Result<Vec<T>, ()> {
+        let mut vec = Vec::new();
+        for pair in pairs {
+            if pair.as_rule() == rule {
+                vec.push(f(pair).unwrap());
+            }
+        }
+        Ok(vec)
+    }
+
     fn expression(pairs: Pairs<Rule>) -> Result<Expression, ()> {
         Ok(Expression {
             literal: pairs.clone().next().unwrap().into_inner().to_string(),
         })
     }
 
-    fn function_argument(pairs: Pairs<Rule>) -> Result<FunctionArgument, ()> {
+    fn function_argument(pair: Pair<Rule>) -> Result<FunctionArgument, ()> {
+        let pairs = pair.into_inner();
         Ok(FunctionArgument {
             ident: Self::identifier(pairs.clone().nth(0).unwrap())?,
             expression: Self::expression(pairs).unwrap(),
@@ -127,16 +147,7 @@ impl CsglParser {
     }
 
     fn function_argument_list(pairs: Pairs<Rule>) -> Result<Vec<FunctionArgument>, ()> {
-        let mut args = Vec::new();
-        for pair in pairs {
-            match pair.as_rule() {
-                Rule::function_argument => {
-                    args.push(Self::function_argument(pair.into_inner()).unwrap());
-                }
-                _ => unreachable!(),
-            }
-        }
-        Ok(args)
+        Self::list(pairs, Rule::function_argument, Self::function_argument)
     }
 
     fn identifier(pair: Pair<Rule>) -> Result<Identifier, ()> {
@@ -147,30 +158,17 @@ impl CsglParser {
         }
     }
 
-    fn qualified_name(pairs: Pairs<Rule>) -> Result<QualifiedName, ()> {
-        let mut name = Vec::new();
-        for pair in pairs {
-            match pair.as_rule() {
-                Rule::ident => {
-                    name.push(Self::identifier(pair)?);
-                }
-                _ => unreachable!(),
-            }
-        }
-        Ok(QualifiedName(name))
+    fn qualified_name(pair: Pair<Rule>) -> Result<QualifiedName, ()> {
+        let pairs = pair.into_inner();
+        Ok(QualifiedName(Self::list::<Identifier>(
+            pairs,
+            Rule::ident,
+            Self::identifier,
+        )?))
     }
 
     fn qualified_name_list(pairs: Pairs<Rule>) -> Result<Vec<QualifiedName>, ()> {
-        let mut names = Vec::new();
-        for pair in pairs {
-            match pair.as_rule() {
-                Rule::qualified_name => {
-                    names.push(Self::qualified_name(pair.into_inner()).unwrap());
-                }
-                _ => unreachable!(),
-            }
-        }
-        Ok(names)
+        Self::list(pairs, Rule::qualified_name, Self::qualified_name)
     }
 
     fn function_call(pairs: Pairs<Rule>) -> Result<FunctionCall, ()> {
@@ -179,7 +177,7 @@ impl CsglParser {
         for pair in pairs {
             match pair.as_rule() {
                 Rule::qualified_name => {
-                    call.qualified_name = Self::qualified_name(pair.into_inner())?;
+                    call.qualified_name = Self::qualified_name(pair)?;
                 }
                 Rule::function_argument_list => {
                     call.function_argument_list = Self::function_argument_list(pair.into_inner())?;
