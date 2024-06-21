@@ -13,8 +13,15 @@ pub mod syntaxtree;
 #[grammar = "grammar.pest"]
 pub struct CsglParser;
 
-pub trait Parse {
-    fn parse(pair: Pair<Rule>) -> Self;
+#[derive(Debug)]
+pub enum ParseError {
+    ExpectedIdentifier,
+    ObjectNodeAtLeastOneCall,
+    InvalidUseStatement,
+}
+
+pub trait Parse: Sized {
+    fn parse(pair: Pair<Rule>) -> Result<Self, ParseError>;
 }
 
 #[derive(Default, Clone)]
@@ -125,8 +132,8 @@ impl CsglParser {
     fn list<T>(
         pairs: Pairs<Rule>,
         rule: Rule,
-        f: impl Fn(Pair<Rule>) -> Result<T, ()>,
-    ) -> Result<Vec<T>, ()> {
+        f: impl Fn(Pair<Rule>) -> Result<T, ParseError>,
+    ) -> Result<Vec<T>, ParseError> {
         let mut vec = Vec::new();
         for pair in pairs {
             if pair.as_rule() == rule {
@@ -142,7 +149,7 @@ impl CsglParser {
         })
     }
 
-    fn function_argument(pair: Pair<Rule>) -> Result<FunctionArgument, ()> {
+    fn function_argument(pair: Pair<Rule>) -> Result<FunctionArgument, ParseError> {
         let pairs = pair.into_inner();
         Ok(FunctionArgument {
             ident: Self::identifier(pairs.clone().nth(0).unwrap())?,
@@ -150,19 +157,19 @@ impl CsglParser {
         })
     }
 
-    fn function_argument_list(pairs: Pairs<Rule>) -> Result<Vec<FunctionArgument>, ()> {
+    fn function_argument_list(pairs: Pairs<Rule>) -> Result<Vec<FunctionArgument>, ParseError> {
         Self::list(pairs, Rule::function_argument, Self::function_argument)
     }
 
-    fn identifier(pair: Pair<Rule>) -> Result<Identifier, ()> {
+    fn identifier(pair: Pair<Rule>) -> Result<Identifier, ParseError> {
         if pair.as_rule() == Rule::ident {
             Ok(Identifier(pair.as_span().as_str().into()))
         } else {
-            Err(())
+            Err(ParseError::ExpectedIdentifier)
         }
     }
 
-    fn qualified_name(pair: Pair<Rule>) -> Result<QualifiedName, ()> {
+    fn qualified_name(pair: Pair<Rule>) -> Result<QualifiedName, ParseError> {
         let pairs = pair.into_inner();
         Ok(QualifiedName(Self::list::<Identifier>(
             pairs,
@@ -171,11 +178,11 @@ impl CsglParser {
         )?))
     }
 
-    fn qualified_name_list(pairs: Pairs<Rule>) -> Result<Vec<QualifiedName>, ()> {
+    fn qualified_name_list(pairs: Pairs<Rule>) -> Result<Vec<QualifiedName>, ParseError> {
         Self::list(pairs, Rule::qualified_name, Self::qualified_name)
     }
 
-    fn function_call(pairs: Pairs<Rule>) -> Result<FunctionCall, ()> {
+    fn function_call(pairs: Pairs<Rule>) -> Result<FunctionCall, ParseError> {
         let mut call = FunctionCall::default();
 
         for pair in pairs {
@@ -193,15 +200,15 @@ impl CsglParser {
         Ok(call)
     }
 
-    fn object_node_id_assignment(pairs: Pairs<Rule>) -> Result<Identifier, ()> {
+    fn object_node_id_assignment(pairs: Pairs<Rule>) -> Result<Identifier, ParseError> {
         if let Some(pair) = pairs.peek() {
             Self::identifier(pair)
         } else {
-            Err(())
+            Err(ParseError::ExpectedIdentifier)
         }
     }
 
-    fn object_node_statement(pairs: Pairs<Rule>) -> Result<ObjectNodeStatement, ()> {
+    fn object_node_statement(pairs: Pairs<Rule>) -> Result<ObjectNodeStatement, ParseError> {
         let mut object_node_statement = ObjectNodeStatement {
             ident: Default::default(),
             calls: Vec::new(),
@@ -229,22 +236,10 @@ impl CsglParser {
         }
 
         if object_node_statement.calls.is_empty() {
-            Err(())
+            Err(ParseError::ObjectNodeAtLeastOneCall)
         } else {
             Ok(object_node_statement)
         }
-    }
-
-    fn use_statement(pairs: Pairs<Rule>) -> Result<UseStatement, ()> {
-        let mut use_statement = UseStatement {
-            qualified_names: Default::default(),
-            from: Vec::new(),
-            alias: None,
-        };
-
-        // @todo: Implement use statement parsing
-
-        Ok(use_statement)
     }
 }
 
