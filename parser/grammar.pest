@@ -67,11 +67,7 @@ qualified_name_all = { "*" }
 qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
 //`int`: ok
-type = { qualified_name | array_type | tuple_type }
-
-//`(number, number)`: ok
-//`( number, number  )`: ok
-tuple_type = { "(" ~ ws * ~ type ~ ws * ~ ("," ~ ws* ~ type)* ~ ws* ~ ")" }
+type = { qualified_name | array_type }
 
 //`[number]`: ok
 array_type = { "[" ~ ws* ~ type ~ ws * ~ "]" }
@@ -98,14 +94,16 @@ use_statement = { "use" ~ ws+ ~ qualified_name_list ~ ws* ~ ";"
 }
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident }
 
-expression = { literal | qualified_name /*| function_call | qualified_name | array_literal | tuple_literal 
+expression = { literal | qualified_name /*| function_call | qualified_name | array_literal 
  | "(" ~ ws* ~ expression ~ ws* ~ ")" | unary_expression  | binary_expression */ }
 
 unary_expression = { unary_operator ~ ws* ~ expression }
 unary_operator = { "-" }
 
-array_literal = { "[" ~ ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)* ~ ws* ~ "]" }
-tuple_literal = { "(" ~ ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)* ~ ws* ~ ")" }
+//`[1, 2, 3]`: ok
+//`[1, 2, 3,]`: error # Trailing comma
+//`[]`: ok
+array_literal = { "[" ~ (ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)*)? ~ ws* ~ "]" }
 
 //`r = 5.0mm`: ok # Named argument
 //`2.0mm`: ok # Positional argument
@@ -147,6 +145,8 @@ function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 //`a: scalar, b: scalar`: ok
 //`a: scalar, b: scalar = 5.0mm`: ok
 function_declaration_argument_list = { function_declaration_argument ~ ws* ~ ("," ~ ws* ~ function_declaration_argument ~ ws*)* }
+
+
 
 //`circle(r = 5.0mm);`: ok
 //`circle(r = 5.0mm) {}`: ok
