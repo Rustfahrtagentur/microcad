@@ -5,7 +5,7 @@ use pest_derive::Parser;
 use syntaxtree::UseStatement;
 
 mod diagnostics;
-mod qualified_name;
+mod module;
 
 pub mod syntaxtree;
 
