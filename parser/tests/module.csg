@@ -1,0 +1,6 @@
+module donut(outer_radius: scalar, inner_radius: scalar) {
+    difference() {
+        circle(r = self.outer_radius);
+        circle(r = self.inner_radius);
+    }
+}
