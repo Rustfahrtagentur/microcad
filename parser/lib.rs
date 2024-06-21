@@ -251,6 +251,7 @@ mod tests {
 
     #[test]
     fn object_node_statement() {
+        use pest::Parser;
         let pairs = CsglParser::parse(
             Rule::object_node_statement,
             "node_id := translate(x = 5.0mm) rotate(angle = 90°) { rectangle(width = 5.0mm); }",
@@ -279,7 +280,7 @@ mod tests {
         let test_filename = "tests/nested.csg";
         let input = std::fs::read_to_string(test_filename)
             .unwrap_or_else(|_| panic!("Test file not found: {}", test_filename));
-
+        use pest::Parser;
         assert!(CsglParser::parse(Rule::document, &input).is_ok())
     }
 }
