@@ -45,15 +45,20 @@ unicode = @{ "u" ~ ASCII_HEX_DIGIT{4} }
 //`False`: error
 bool_literal = @{ "true" | "false" }
 
-length_unit = @{ "mm" | "m" | "cm" | "in" }
-angle_unit = @{ "°" | "deg" | "rad" | "pi" }
-unit = @{ length_unit | angle_unit }
+unit = @{ (alpha_lower)+ | "°" }
+
+//`#FFF`: ok # RGB, single hex
+//`#00FF00`: ok # RGB, double hex
+//`#FFFF`: ok # RGBA, single hex
+//`#00FF00FF`: ok # RGBA, double hex
+//`#00FF0`: error # No valid color
+color_literal = { "#" ~ (ASCII_HEX_DIGIT{8} | ASCII_HEX_DIGIT{6} | ASCII_HEX_DIGIT{4} | ASCII_HEX_DIGIT{3}) }
 
 //`1`: ok
 //`1mm`: ok
 //`1.0mm`: ok
 //`1.0`: ok
-literal = { number ~ unit | string_literal | bool_literal | number }
+literal = { number ~ unit? | string_literal | bool_literal | color_literal }
 
 //`a`: ok # Single identifier
 //`a.b`: ok # Nested identifiers
@@ -95,16 +100,18 @@ use_statement = { "use" ~ ws+ ~ qualified_name_list ~ ws* ~ ";"
 }
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident }
 
-expression = { literal | qualified_name /*| function_call | qualified_name | array_literal 
+expression = { literal | qualified_name | list_expression /*| function_call | qualified_name | array_literal 
  | "(" ~ ws* ~ expression ~ ws* ~ ")" | unary_expression  | binary_expression */ }
 
-unary_expression = { unary_operator ~ ws* ~ expression }
-unary_operator = { "-" }
 
 //`[1, 2, 3]`: ok
 //`[1, 2, 3,]`: error # Trailing comma
 //`[]`: ok
-list_literal = { "[" ~ (ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)*)? ~ ws* ~ "]" }
+list_expression = { "[" ~ (ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)*)? ~ ws* ~ "]" }
+
+
+unary_expression = { unary_operator ~ ws* ~ expression }
+unary_operator = { "-" }
 
 //`r = 5.0mm`: ok # Named argument
 //`2.0mm`: ok # Positional argument
