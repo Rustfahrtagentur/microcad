@@ -143,10 +143,10 @@ function_declaration_return_value = { "->" ~ ws* ~ type }
 //`return 5.0mm;`: ok
 function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 
-//`a: scalar, b: scalar`: ok
-//`a: scalar, b: scalar = 5.0mm`: ok
+//`a: scalar, b: scalar`: ok # Multiple arguments
+//`a: scalar, b: scalar = 5.0mm`: ok # Default value for second argument
+//`a: scalar = 5.0mm, b: scalar`: ok # Even first argument can have default value and rest can be positional
 function_declaration_argument_list = { function_declaration_argument ~ ws* ~ ("," ~ ws* ~ function_declaration_argument ~ ws*)* }
-
 
 
 //`circle(r = 5.0mm);`: ok
@@ -163,7 +163,7 @@ object_node_statement = {
 object_node_id_assignment = { ident ~ ws* ~ ":=" ~ ws* }
 object_node_inner = { (ws* ~ statement ~ ws*)* }
 
-statement = { object_node_statement | use_statement | parameter_declaration_statement }
+statement = { object_node_statement | use_statement | function_declaration | parameter_declaration_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 document = { SOI ~ (statement ~ ws* )* ~ EOI }
