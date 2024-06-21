@@ -144,11 +144,15 @@ statement = { object_node_statement | use_statement }
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 document = { SOI ~ (statement ~ ws* )* ~ EOI }
 
-COMMENT = ${ single_line_comment | multi_line_comment }
+COMMENT = { doc_comment | single_line_comment | multi_line_comment }
 
 //`// ok`: ok
 //`/ err` error
-single_line_comment = { "//" ~ (!"\n" ~ ANY)* }
+single_line_comment = ${ "//" ~ (!"\n" ~ ANY)* }
+
+//`/// ok`: ok
+//`// err` error
+doc_comment = { "///" ~ (!"\n" ~ ANY)* }
 
 //`/* ok */`: ok
-multi_line_comment = { "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
+multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
