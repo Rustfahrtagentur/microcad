@@ -67,6 +67,7 @@ qualified_name_all = { "*" }
 qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
 //`int`: ok
+//`[scalar]`: ok # List type
 type = { qualified_name | list_type }
 
 //`[number]`: ok
