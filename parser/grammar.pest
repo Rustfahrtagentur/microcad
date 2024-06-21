@@ -14,14 +14,14 @@ digit = _{ '0'..'9' }
 //`A`: error # Identifiers are lowercase
 ident = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
 
-//`A`: ok
+//`PI`: ok
 //`A1`: ok
 //`A_`: ok
 //`_A`: ok
 //`_`: ok
 //`1`: error
 //`a`: error # Constant identifiers are uppercase
-constant_ident = { (alpha_upper | "_") ~ (alpha | digit | "_")* }
+constant_ident = { (alpha_upper | "_") ~ (alpha_upper | digit | "_")* }
 
 //`1.0`: ok
 //`1`: ok
@@ -58,7 +58,11 @@ literal = { number ~ unit | string_literal | bool_literal | number }
 //`a`: ok # Single identifier
 //`a.b`: ok # Nested identifiers
 //`a.b. c`: error # No whitespace between identifiers
-qualified_name = { ident ~ ("." ~ ident)* }
+//`a.b.c.`: error # No trailing dot
+//`math.PI`: ok # Constant identifiers are allowed
+//`PI`: ok # Single constant identifier
+//`math.PI.PI`: ok # Nested constant identifiers (todo: check if this is allowed) 
+qualified_name = { (ident | constant_ident) ~ ("." ~ (ident | constant_ident))* }
 qualified_name_all = { "*" }
 qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
@@ -75,14 +79,6 @@ array_type = { "[" ~ ws* ~ type ~ ws * ~ "]" }
 //`: number`: ok
 //`: <Vec3>`: error
 type_specifier = { ":" ~ ws* ~ type }
-
-//`a: number`: ok
-//`a: number = 1`: ok
-//`a = 1.0`: error
-function_decl_argument = { ident ~ ws* ~ type_specifier ~ (ws* ~ "=" ~ ws* ~ literal)? }
-
-//`a: number, b: number`: ok
-function_decl_argument_list = { ident ~ ws* ~ type_specifier ~ ws* ~ ("," ~ ws* ~ ident ~ ws* ~ ":" ~ ws* ~ qualified_name ~ ws*)* }
 
 //`use a;`: ok  # Import a single module
 //`use ;`: error # Must import at least one module
@@ -102,7 +98,7 @@ use_statement = { "use" ~ ws+ ~ qualified_name_list ~ ws* ~ ";"
 }
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident }
 
-expression = { literal /*| function_call | qualified_name | array_literal | tuple_literal 
+expression = { literal | qualified_name /*| function_call | qualified_name | array_literal | tuple_literal 
  | "(" ~ ws* ~ expression ~ ws* ~ ")" | unary_expression  | binary_expression */ }
 
 unary_expression = { unary_operator ~ ws* ~ expression }
@@ -111,9 +107,9 @@ unary_operator = { "-" }
 array_literal = { "[" ~ ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)* ~ ws* ~ "]" }
 tuple_literal = { "(" ~ ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)* ~ ws* ~ ")" }
 
-//`r = 5.0mm`: ok
-//`a = 5m`: ok
-function_argument = { ident ~ ws* ~ "=" ~ ws* ~ expression }
+//`r = 5.0mm`: ok # Named argument
+//`2.0mm`: ok # Positional argument
+function_argument = { (ident ~ ws* ~ "=" ~ ws*)? ~ expression }
 
 //`a = 5.0mm, b = false`: ok
 function_argument_list = { function_argument ~ ws* ~ ("," ~ ws* ~ function_argument ~ ws*)* }
@@ -123,7 +119,34 @@ function_argument_list = { function_argument ~ ws* ~ ("," ~ ws* ~ function_argum
 //`a.nested.function(a = 3.0mm, b = 2.0mm)`: ok
 function_call = { qualified_name ~ ws* ~ "(" ~ ws* ~ function_argument_list? ~ ws* ~ ")" }
 
+//`r: length = 5.0mm`: ok
+//`r = 5.0mm`: error # Type specifier is required, type inference is not supported yet
+//`r: length`: ok # Default value is not required
+//`r: length = math.PI`: ok # Constant value is allowed
+parameter_declaration = { ident ~ ws* ~ type_specifier ~ ws* ~ ("=" ~ ws* ~ expression)? }
 
+//`r: length = 5.0mm;`: ok
+parameter_declaration_statement = { parameter_declaration ~ ws* ~ ";" }
+
+//`fn foo() -> scalar { return math.PI; }`: ok
+//`fn foo() -> scalar {}`: error # Function must have a return statement
+//`fn foo() { return 5.0mm; }`: error # Function must have specified return type
+//`fn foo(a: scalar) -> scalar { return a; }`: ok # Function with arguments
+//`fn foo(a: scalar, b: scalar) -> scalar { return b; }`: ok # Function with multiple arguments
+function_declaration = { "fn" ~ ws+ ~ ident ~ ws* ~ "(" ~ ws* ~ function_declaration_argument_list? ~ ws* ~ ")" ~ ws* ~ function_declaration_return_value ~ ws* ~ "{" ~ ws* ~ statement* ~ ws* ~ function_return_statement ~ ws* ~ "}" }
+
+//`a: scalar`: ok
+function_declaration_argument =  { parameter_declaration }
+
+//`-> scalar`: ok
+function_declaration_return_value = { "->" ~ ws* ~ type }
+
+//`return 5.0mm;`: ok
+function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
+
+//`a: scalar, b: scalar`: ok
+//`a: scalar, b: scalar = 5.0mm`: ok
+function_declaration_argument_list = { function_declaration_argument ~ ws* ~ ("," ~ ws* ~ function_declaration_argument ~ ws*)* }
 
 //`circle(r = 5.0mm);`: ok
 //`circle(r = 5.0mm) {}`: ok
@@ -137,9 +160,9 @@ object_node_statement = {
     object_node_id_assignment? ~ (function_call ~ ws*)+ ~ "{" ~ object_node_inner ~ "}" 
 }
 object_node_id_assignment = { ident ~ ws* ~ ":=" ~ ws* }
-object_node_inner = { (ws* ~ object_node_statement ~ ws*)* }
+object_node_inner = { (ws* ~ statement ~ ws*)* }
 
-statement = { object_node_statement | use_statement }
+statement = { object_node_statement | use_statement | parameter_declaration_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 document = { SOI ~ (statement ~ ws* )* ~ EOI }
