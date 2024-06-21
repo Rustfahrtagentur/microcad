@@ -102,8 +102,14 @@ use_statement = { "use" ~ ws+ ~ qualified_name_list ~ ws* ~ ";"
 }
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident }
 
-expression = { literal }
+expression = { literal /*| function_call | qualified_name | array_literal | tuple_literal 
+ | "(" ~ ws* ~ expression ~ ws* ~ ")" | unary_expression  | binary_expression */ }
 
+unary_expression = { unary_operator ~ ws* ~ expression }
+unary_operator = { "-" }
+
+array_literal = { "[" ~ ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)* ~ ws* ~ "]" }
+tuple_literal = { "(" ~ ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)* ~ ws* ~ ")" }
 
 //`r = 5.0mm`: ok
 //`a = 5m`: ok
