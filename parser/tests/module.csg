@@ -4,3 +4,8 @@ module donut(outer_radius: scalar, inner_radius: scalar) {
         circle(r = self.inner_radius);
     }
 }
+
+export("test.svg") {
+    stroke_color: color = #00FF00;    
+    donut(5.0mm, 2.0mm);
+} 
