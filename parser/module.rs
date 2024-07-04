@@ -87,8 +87,9 @@ mod tests {
 
     #[test]
     fn test_qualified_name() {
-        let used_modules = vec!["shape2d", "math"];
+        let used_modules = vec!["primitives", "math"];
 
-        let qualified_names: Vec<QualifiedName> = vec!["shape2d.circle".into(), "math.PI".into()];
+        let qualified_names: Vec<QualifiedName> =
+            vec!["primitives.circle".into(), "math.PI".into()];
     }
 }
