@@ -1,10 +1,10 @@
-mod polygon2d;
+mod primitive;
 
 use csg_parser::syntaxtree::{SyntaxNode, SyntaxNodeKind};
 
 pub enum NodeInner {
     Root,
-    Shape2D(Box<dyn polygon2d::Primitive>),
+    Shape2D(Box<dyn primitive::Primitive>),
 }
 
 pub type Node = rctree::Node<NodeInner>;
@@ -29,7 +29,7 @@ impl TreeBuilder {
                     match object_node.qualified_name().to_string().as_str() {
                         "circle" => {
                             // Todo: Parse arguments
-                            let circle = polygon2d::Circle {
+                            let circle = primitive::Circle {
                                 radius: 5.0,
                                 points: 10,
                             };

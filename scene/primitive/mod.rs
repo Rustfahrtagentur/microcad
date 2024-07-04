@@ -115,7 +115,7 @@ mod tests {
         let result = difference.render();
         let mut file = std::fs::File::create("difference.svg").unwrap();
 
-        let mut svg = svg::SvgWriter::new(
+        let svg = svg::SvgWriter::new(
             &mut file,
             geo::Rect::new(geo::Point::new(-2.0, -2.0), geo::Point::new(2.0, 2.0)),
             100.0,
