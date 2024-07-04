@@ -1,10 +1,12 @@
-mod primitive;
+mod algorithm;
+mod primitive2d;
 
 use csg_parser::syntaxtree::{SyntaxNode, SyntaxNodeKind};
 
 pub enum NodeInner {
     Root,
-    Shape2D(Box<dyn primitive::Primitive>),
+    Primitive2D(Box<dyn primitive2d::Primitive2D>),
+    Algorithm(Box<dyn algorithm::Algorithm>),
 }
 
 pub type Node = rctree::Node<NodeInner>;
@@ -29,11 +31,11 @@ impl TreeBuilder {
                     match object_node.qualified_name().to_string().as_str() {
                         "circle" => {
                             // Todo: Parse arguments
-                            let circle = primitive::Circle {
+                            let circle = primitive2d::Circle {
                                 radius: 5.0,
                                 points: 10,
                             };
-                            node = Some(Node::new(NodeInner::Shape2D(Box::new(circle))));
+                            node = Some(Node::new(NodeInner::Primitive2D(Box::new(circle))));
                         }
                         "rectangle" => {
                             // Todo: Create rectangle

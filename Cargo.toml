@@ -1,5 +1,5 @@
 [workspace]
-members = ["parser", "scene"]
+members = ["parser", "tree"]
 
 [workspace.package]
 name = "scad"

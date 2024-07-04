@@ -7,7 +7,7 @@ pub type Point = geo::Point<Scalar>;
 
 mod svg;
 
-pub trait Primitive {
+pub trait Primitive2D {
     fn render(&self) -> MultiPolygon;
 }
 
@@ -20,7 +20,7 @@ fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
     MultiPolygon::new(vec![Polygon::new(line_string, vec![])])
 }
 
-impl Primitive for Circle {
+impl Primitive2D for Circle {
     fn render(&self) -> MultiPolygon {
         let mut points = Vec::new();
         for i in 0..self.points {
@@ -36,7 +36,7 @@ struct Rectangle {
     height: f64,
 }
 
-impl Primitive for Rectangle {
+impl Primitive2D for Rectangle {
     fn render(&self) -> MultiPolygon {
         use geo::line_string;
         let line_string = geo::line_string![
@@ -51,32 +51,11 @@ impl Primitive for Rectangle {
     }
 }
 
-struct Union {
-    primitives: Vec<Box<dyn Primitive>>,
-}
-
-impl Primitive for Union {
-    fn render(&self) -> MultiPolygon {
-        let mut polygons = Vec::new();
-        for primitive in &self.primitives {
-            polygons.push(primitive.render());
-        }
-
-        let mut result = polygons[0].clone();
-        for polygon in polygons.iter().skip(1) {
-            use geo::BooleanOps;
-            result = result.union(polygon);
-        }
-
-        result
-    }
-}
-
 struct Difference {
-    primitives: Vec<Box<dyn Primitive>>,
+    primitives: Vec<Box<dyn Primitive2D>>,
 }
 
-impl Primitive for Difference {
+impl Primitive2D for Difference {
     fn render(&self) -> MultiPolygon {
         let mut polygons = Vec::new();
         for primitive in &self.primitives {

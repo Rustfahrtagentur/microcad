@@ -1,6 +1,6 @@
 [package]
-name = "csg-scene"
-description = "A scene for the CSG language"
+name = "csg-tree"
+description = "A tree for the CSG language"
 edition.workspace = true
 rust-version.workspace = true
 version.workspace = true

@@ -111,7 +111,7 @@ mod tests {
         let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
         svg.line(line.0, line.1, "stroke:black;").unwrap();
 
-        use super::Primitive;
+        use super::Primitive2D;
         let circle_polygon = super::Circle {
             radius: 40.0,
             points: 32,

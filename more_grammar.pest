@@ -1,0 +1,73 @@
+
+a: length = 3.0mm;
+
+"A debug statement {a:.2mm}"!; debug("A", 3.0) 
+info("A", a == 3.0) 
+"Info startment"!;
+warn("A warning", a > 2.5) 
+"Warning statement"!!
+error("A conditional statement {a:.2mm}");
+"Error statement"!!!;
+
+if a > 3.0: "An error"!!!;
+
+
+
+assert(a > 3.0 && a < 6.0);
+assert(a > 3.0 && a < 6.0, "Wrong value for a: {a}");
+
+init(b: scalar) {
+    a = b * 1.0mm;
+}
+
+
+module donut: geo2d {
+    init(d_outer: length, d_inner: length) {
+        debug("Debug statement");
+
+        r_outer = d_outer / 2;
+        r_inner = d_inner / 2;
+    }
+
+    assert(r_inner < self.r_outer, "Inner radius is larger than outer radius");
+    
+    circle(r = r_outer) - circle(r = r_inner);
+}
+
+module donut(d_outer: length, d_inner: length) {
+    r_outer = d_outer / 2;
+    r_inner = d_inner / 2;
+    
+
+}
+
+
+
+/*
+
+expression = { literal | qualified_name | array | tuple | function_call | "(" ~ ws* ~ expression ~ ws* ~ ")" | unary_operator ~ ws* ~ expression }
+
+argument_list = { expression ~ ws* ~ ("," ~ ws* ~ expression)* }
+
+function_argument_list = { ident ~ ws* ~ type_specifier ~ ws* ~ ("," ~ ws* ~ ident ~ ws* ~ ":" ~ ws* ~ qualified_name ~ ws*)* }
+function = { visibility? ~ ws* ~ "fn" ~ ws* ~ ident ~ ws* ~ "(" ~ ws* ~ function_argument_list ~ ws* ~ ")" ~ ws* ~ ("->" ~ ws* ~ ident ~ ws*)? ~ "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
+
+function_call = { qualified_name ~ ws* ~ "(" ~ ws* ~ argument_list ~ ws* ~ ")" }
+
+node = { ((function_call | qualified_name) ~ ws*)+ ~ "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
+
+
+assignment = { qualified_name ~ ws* ~ (type_specifier)? ~ ws* ~ "=" ~ ws* ~ expression }
+
+constructor = { "(" ~ ws* ~ argument_list ~ ws* ~ ")" ~ ws* ~ "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
+
+statement = { assignment? ~ ";" | node | function | constructor }
+
+
+module = { visibility? ~ "mod" ~ ws* ~ ident ~ ws* ~ (type_specifier)? ~ ws* ~ "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
+
+
+statement_list = _{ ws* ~ (statement ~ ws*)* }
+
+main = { SOI ~ statement_list ~ EOI }
+*/
