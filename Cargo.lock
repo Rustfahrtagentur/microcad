@@ -87,7 +87,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "csg-scenegraph"
+name = "csg-scene"
 version = "0.1.0"
 dependencies = [
  "csg-parser",
