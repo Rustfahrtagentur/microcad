@@ -39,7 +39,7 @@ impl From<&str> for Expression {
 
 #[derive(Default, Clone)]
 struct FunctionArgument {
-    ident: Identifier,
+    ident: Option<Identifier>,
     expression: Expression,
 }
 
@@ -55,7 +55,7 @@ struct ObjectNodeStatement {
     has_inner: bool,
 }
 
-enum Visibility {
+pub enum Visibility {
     Private,
     Public,
 }
@@ -151,10 +151,20 @@ impl CsglParser {
 
     fn function_argument(pair: Pair<Rule>) -> Result<FunctionArgument, ParseError> {
         let pairs = pair.into_inner();
-        Ok(FunctionArgument {
-            ident: Self::identifier(pairs.clone().nth(0).unwrap())?,
-            expression: Self::expression(pairs).unwrap(),
-        })
+        let first = pairs.clone().nth(0).unwrap();
+        let second = pairs.clone().nth(1).unwrap();
+
+        match first.as_rule() {
+            Rule::ident => Ok(FunctionArgument {
+                ident: Some(Self::identifier(first)?),
+                expression: Self::expression(second.into_inner()).unwrap(),
+            }),
+            Rule::expression => Ok(FunctionArgument {
+                ident: None,
+                expression: Self::expression(first.into_inner()).unwrap(),
+            }),
+            _ => unreachable!(),
+        }
     }
 
     fn function_argument_list(pairs: Pairs<Rule>) -> Result<Vec<FunctionArgument>, ParseError> {

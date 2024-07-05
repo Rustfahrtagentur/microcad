@@ -290,7 +290,7 @@ mod tests {
             call: FunctionCall {
                 qualified_name: "translate".into(),
                 function_argument_list: vec![FunctionArgument {
-                    ident: "x".into(),
+                    ident: Some("x".into()),
                     expression: "5.0mm".into(),
                 }],
             },
@@ -298,12 +298,13 @@ mod tests {
         .into();
         node.append(translate.clone());
 
+        // circle(r = 5.0mm)
         let circle: SyntaxNode = ObjectNode {
             id: None,
             call: FunctionCall {
                 qualified_name: "circle".into(),
                 function_argument_list: vec![FunctionArgument {
-                    ident: "r".into(),
+                    ident: Some("r".into()),
                     expression: "5.0mm".into(),
                 }],
             },
