@@ -100,9 +100,18 @@ use_statement = { "use" ~ ws+ ~ qualified_name_list ~ ws* ~ ";"
 }
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident }
 
-expression = { literal | qualified_name | list_expression /*| function_call | qualified_name | array_literal 
- | "(" ~ ws* ~ expression ~ ws* ~ ")" | unary_expression  | binary_expression */ }
-
+//`-5.0mm`: ok # Negate
+//`(a + b) * (c - a)`: ok 
+//`a-`: error # Unknown postfix operator `-`
+expression       =   { prefix* ~ ws* ~ primary ~ ws* ~ (infix ~ ws* ~ prefix* ~ ws* ~ primary )* }
+infix            =  _{ add | sub | mul | div }
+  add            =   { "+" } // Addition
+  sub            =   { "-" } // Subtraction
+  mul            =   { "*" } // Multiplication
+  div            =   { "/" } // Division
+prefix           =  _{ neg }
+  neg            =   { "-" } // Negation
+primary  =  _{ literal | qualified_name | list_expression | "(" ~ expression ~ ")" }
 
 //`[1, 2, 3]`: ok
 //`[1, 2, 3,]`: error # Trailing comma
