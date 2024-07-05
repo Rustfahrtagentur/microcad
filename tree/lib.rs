@@ -4,8 +4,16 @@ mod primitive2d;
 use csg_parser::syntaxtree::{SyntaxNode, SyntaxNodeKind};
 
 pub enum NodeInner {
+    /// Root Node
     Root,
-    Primitive2D(Box<dyn primitive2d::Primitive2D>),
+
+    /// The node contains a MultiPolygon
+    MultiPolygon(primitive2d::MultiPolygon),
+
+    /// The node contains a trait that renders MultiPolygon, e.g. a primitive like a circle
+    RenderMultiPolygon(Box<dyn primitive2d::RenderMultiPolygon>),
+
+    /// The node contains an algorithm that manipulates the node or its children
     Algorithm(Box<dyn algorithm::Algorithm>),
 }
 
@@ -31,11 +39,7 @@ impl TreeBuilder {
                     match object_node.qualified_name().to_string().as_str() {
                         "circle" => {
                             // Todo: Parse arguments
-                            let circle = primitive2d::Circle {
-                                radius: 5.0,
-                                points: 10,
-                            };
-                            node = Some(Node::new(NodeInner::Primitive2D(Box::new(circle))));
+                            node = Some(crate::primitive2d::circle(5.0, 32));
                         }
                         "rectangle" => {
                             // Todo: Create rectangle
