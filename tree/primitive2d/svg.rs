@@ -49,7 +49,7 @@ impl<'a> SvgWriter<'a> {
         )
     }
 
-    pub fn line(self: &mut Self, p1: Point, p2: Point, style: &str) -> std::io::Result<()> {
+    pub fn line(&mut self, p1: Point, p2: Point, style: &str) -> std::io::Result<()> {
         let ((x1, y1), (x2, y2)) = (p1.x_y(), p2.x_y());
         writeln!(
             self.writer,
@@ -57,15 +57,35 @@ impl<'a> SvgWriter<'a> {
         )
     }
 
-    pub fn polygon(self: &mut Self, polygon: &Polygon, style: &str) -> std::io::Result<()> {
-        write!(self.writer, "<polygon points=\"")?;
+    pub fn polygon(&mut self, polygon: &Polygon, style: &str) -> std::io::Result<()> {
+        write!(self.writer, "<path d=\"")?;
         for (i, point) in polygon.exterior().points().enumerate() {
             let (x, y) = point.x_y();
+            match i {
+                0 => write!(self.writer, "M")?,
+                _ => write!(self.writer, "L")?,
+            }
+
             write!(self.writer, "{x},{y}", x = x, y = y)?;
-            if i < polygon.exterior().coords_count() - 1 {
-                write!(self.writer, " ")?;
+            if i == polygon.exterior().coords_count() - 1 {
+                write!(self.writer, " Z ")?;
             }
         }
+        for interior in polygon.interiors() {
+            for (i, point) in interior.points().enumerate() {
+                let (x, y) = point.x_y();
+                match i {
+                    0 => write!(self.writer, "M")?,
+                    _ => write!(self.writer, "L")?,
+                }
+
+                write!(self.writer, "{x},{y}", x = x, y = y)?;
+                if i == interior.coords_count() - 1 {
+                    write!(self.writer, " Z ")?;
+                }
+            }
+        }
+
         writeln!(self.writer, "\" style=\"{style}\"/>")
     }
 
@@ -111,13 +131,12 @@ mod tests {
         let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
         svg.line(line.0, line.1, "stroke:black;").unwrap();
 
-        use super::Primitive2D;
+        use super::RenderMultiPolygon;
         let circle_polygon = super::Circle {
             radius: 40.0,
             points: 32,
         }
         .render();
-
         svg.multi_polygon(&circle_polygon, "fill:none;stroke:black;")
             .unwrap();
     }
