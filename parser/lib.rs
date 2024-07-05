@@ -5,12 +5,12 @@ use pest::{
     pratt_parser::Op,
 };
 use pest_derive::Parser;
-use syntaxtree::UseStatement;
+use syntax_tree::UseStatement;
 
 mod diagnostics;
 pub mod langtype;
 mod module;
-pub mod syntaxtree;
+pub mod syntax_tree;
 pub mod units;
 
 use units::Unit;

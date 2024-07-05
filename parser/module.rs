@@ -1,7 +1,7 @@
 // Resolve a qualified name to a type or value.
 
 use crate::{
-    syntaxtree::{UseAlias, UseStatement},
+    syntax_tree::{UseAlias, UseStatement},
     CsglParser, FunctionArgument, Identifier, Parse, ParseError, QualifiedName, Rule,
 };
 
