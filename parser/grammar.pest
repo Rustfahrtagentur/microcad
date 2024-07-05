@@ -103,14 +103,16 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident }
 //`-5.0mm`: ok # Negate
 //`(a + b) * (c - a)`: ok 
 //`a-`: error # Unknown postfix operator `-`
-expression       =   { prefix* ~ ws* ~ primary ~ ws* ~ (infix ~ ws* ~ prefix* ~ ws* ~ primary )* }
-infix            =  _{ add | sub | mul | div }
+expression       =   { prefix* ~ ws* ~ primary ~ ws* ~ (bin_op ~ ws* ~ prefix* ~ ws* ~ primary )* }
+bin_op            =  _{ add | sub | mul | div }
   add            =   { "+" } // Addition
   sub            =   { "-" } // Subtraction
   mul            =   { "*" } // Multiplication
   div            =   { "/" } // Division
 prefix           =  _{ neg }
   neg            =   { "-" } // Negation
+  pos            =   { "+" } // Positive
+  not            =   { "!" } // Negation
 primary  =  _{ literal | qualified_name | list_expression | "(" ~ expression ~ ")" }
 
 //`[1, 2, 3]`: ok

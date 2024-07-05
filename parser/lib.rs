@@ -1,6 +1,9 @@
-use pest::iterators::{Pair, Pairs};
 #[allow(unused_imports)]
 use pest::Parser;
+use pest::{
+    iterators::{Pair, Pairs},
+    pratt_parser::Op,
+};
 use pest_derive::Parser;
 use syntaxtree::UseStatement;
 
@@ -16,6 +19,21 @@ use units::Unit;
 #[grammar = "grammar.pest"]
 pub struct CsglParser;
 
+use pest::pratt_parser::PrattParser;
+
+lazy_static::lazy_static! {
+    static ref PRATT_PARSER: PrattParser<Rule> = {
+        use pest::pratt_parser::{Assoc::*, Op};
+        use Rule::*;
+
+        // Precedence is defined lowest to highest
+        PrattParser::new()
+            // Addition and subtract have equal precedence
+            .op(Op::infix(add, Left) | Op::infix(sub, Left))
+            .op(Op::infix(mul, Left) | Op::infix(div, Left))
+    };
+}
+
 #[derive(Debug)]
 pub enum ParseError {
     ExpectedIdentifier,
@@ -27,7 +45,7 @@ pub trait Parse: Sized {
     fn parse(pair: Pair<Rule>) -> Result<Self, ParseError>;
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
@@ -39,9 +57,20 @@ enum Expression {
     NumberLiteral(f64, Unit),
     /// Bool
     BoolLiteral(bool),
+
+    BinOp {
+        lhs: Box<Expression>,
+        op: Op<Rule>,
+        rhs: Box<Expression>,
+    },
+
+    UnaryOp {
+        sub: Box<Expression>,
+        /// '+', '-', '!'
+        op: char,
+    },
 }
 
-#[derive(Clone)]
 enum FunctionArgument {
     PositionalArgument(Expression),
     NamedArgument(Identifier, Expression),
@@ -63,7 +92,7 @@ impl FunctionArgument {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 struct FunctionCall {
     qualified_name: QualifiedName,
     function_argument_list: Vec<FunctionArgument>,
