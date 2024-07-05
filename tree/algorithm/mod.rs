@@ -11,34 +11,18 @@ pub trait Algorithm {
     fn process(&self, parent: Node) -> Node;
 }
 
-struct Difference;
+enum BooleanOp {
+    Difference,
+    Union,
+    Xor,
+    Intersection,
+}
 
 enum ProcessError {
     Unsupported,
 }
 
-/*impl Algorithm for Difference {
-    fn process(&self, parent: Node) -> Result<Node, ProcessError> {
-        let mut result = None;
-
-        for child in parent.children() {
-            let child = child.borrow();
-
-            match *child {
-                NodeInner::MultiPolygon(node) => match result {
-                    Some(result) => Ok(merge(result, node)),
-                    None => Ok(node),
-                },
-                NodeInner::Algorithm(algorithm) => Ok(algorithm.process(node)),
-                _ => Err(ProcessError::Unsupported),
-            }
-        }
-
-        Ok(result.unwrap_or(Node::new(NodeInner::Root)))
-    }
-}*/
-
-impl Algorithm for Difference {
+impl Algorithm for BooleanOp {
     fn process(&self, parent: Node) -> Node {
         let mut polygons = Vec::new();
 
@@ -70,7 +54,12 @@ impl Algorithm for Difference {
                 continue;
             }
             use geo::BooleanOps;
-            result = result.difference(polygon);
+            match self {
+                BooleanOp::Difference => result = result.difference(polygon),
+                BooleanOp::Union => result = result.union(polygon),
+                BooleanOp::Intersection => result = result.intersection(polygon),
+                BooleanOp::Xor => result = result.xor(polygon),
+            }
         }
 
         Node::new(NodeInner::MultiPolygon(result))
@@ -78,7 +67,7 @@ impl Algorithm for Difference {
 }
 
 pub fn difference() -> Node {
-    Node::new(NodeInner::Algorithm(Box::new(Difference)))
+    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Difference)))
 }
 
 #[cfg(test)]
