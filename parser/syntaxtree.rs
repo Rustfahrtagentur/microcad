@@ -289,10 +289,10 @@ mod tests {
             id: None,
             call: FunctionCall {
                 qualified_name: "translate".into(),
-                function_argument_list: vec![FunctionArgument {
-                    ident: Some("x".into()),
-                    expression: "5.0mm".into(),
-                }],
+                function_argument_list: vec![FunctionArgument::NamedArgument(
+                    "x".into(),
+                    "5.0mm".into(),
+                )],
             },
         }
         .into();
@@ -303,10 +303,10 @@ mod tests {
             id: None,
             call: FunctionCall {
                 qualified_name: "circle".into(),
-                function_argument_list: vec![FunctionArgument {
-                    ident: Some("r".into()),
-                    expression: "5.0mm".into(),
-                }],
+                function_argument_list: vec![FunctionArgument::NamedArgument(
+                    "r".into(),
+                    "5.0mm".into(),
+                )],
             },
         }
         .into();

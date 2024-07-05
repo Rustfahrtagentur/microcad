@@ -37,10 +37,10 @@ impl From<&str> for Expression {
     }
 }
 
-#[derive(Default, Clone)]
-struct FunctionArgument {
-    ident: Option<Identifier>,
-    expression: Expression,
+#[derive(Clone)]
+enum FunctionArgument {
+    PositionalArgument(Expression),
+    NamedArgument(Identifier, Expression),
 }
 
 #[derive(Default, Clone)]
@@ -143,7 +143,7 @@ impl CsglParser {
         Ok(vec)
     }
 
-    fn expression(pairs: Pairs<Rule>) -> Result<Expression, ()> {
+    fn expression(pairs: Pairs<Rule>) -> Result<Expression, ParseError> {
         Ok(Expression {
             literal: pairs.clone().next().unwrap().into_inner().to_string(),
         })
@@ -155,14 +155,13 @@ impl CsglParser {
         let second = pairs.clone().nth(1).unwrap();
 
         match first.as_rule() {
-            Rule::ident => Ok(FunctionArgument {
-                ident: Some(Self::identifier(first)?),
-                expression: Self::expression(second.into_inner()).unwrap(),
-            }),
-            Rule::expression => Ok(FunctionArgument {
-                ident: None,
-                expression: Self::expression(first.into_inner()).unwrap(),
-            }),
+            Rule::ident => Ok(FunctionArgument::NamedArgument(
+                Self::identifier(first)?,
+                Self::expression(second.into_inner())?,
+            )),
+            Rule::expression => Ok(FunctionArgument::PositionalArgument(Self::expression(
+                first.into_inner(),
+            )?)),
             _ => unreachable!(),
         }
     }
