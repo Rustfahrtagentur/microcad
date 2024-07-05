@@ -1,38 +1,21 @@
+use pest::iterators::{Pair, Pairs};
 #[allow(unused_imports)]
 use pest::Parser;
-use pest::{
-    iterators::{Pair, Pairs},
-    pratt_parser::Op,
-};
 use pest_derive::Parser;
 use syntax_tree::UseStatement;
 
 mod diagnostics;
+pub mod expression;
 pub mod langtype;
 mod module;
 pub mod syntax_tree;
 pub mod units;
 
-use units::Unit;
-
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
 pub struct CsglParser;
 
-use pest::pratt_parser::PrattParser;
-
-lazy_static::lazy_static! {
-    static ref PRATT_PARSER: PrattParser<Rule> = {
-        use pest::pratt_parser::{Assoc::*, Op};
-        use Rule::*;
-
-        // Precedence is defined lowest to highest
-        PrattParser::new()
-            // Addition and subtract have equal precedence
-            .op(Op::infix(add, Left) | Op::infix(sub, Left))
-            .op(Op::infix(mul, Left) | Op::infix(div, Left))
-    };
-}
+use expression::Expression;
 
 #[derive(Debug)]
 pub enum ParseError {
@@ -43,32 +26,6 @@ pub enum ParseError {
 
 pub trait Parse: Sized {
     fn parse(pair: Pair<Rule>) -> Result<Self, ParseError>;
-}
-
-#[derive(Default)]
-enum Expression {
-    /// Something went wrong (and an error will be reported)
-    #[default]
-    Invalid,
-
-    /// A string literal. The .0 is the content of the string, without the quotes
-    StringLiteral(String),
-    /// Number
-    NumberLiteral(f64, Unit),
-    /// Bool
-    BoolLiteral(bool),
-
-    BinOp {
-        lhs: Box<Expression>,
-        op: Op<Rule>,
-        rhs: Box<Expression>,
-    },
-
-    UnaryOp {
-        sub: Box<Expression>,
-        /// '+', '-', '!'
-        op: char,
-    },
 }
 
 enum FunctionArgument {
@@ -202,7 +159,7 @@ impl CsglParser {
                 .to_string()
                 .parse()
                 .unwrap_or(0.0),
-            Unit::Mm,
+            units::Unit::Mm,
         ))
         //todo!("Expression parsing")
     }
