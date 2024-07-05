@@ -1,5 +1,7 @@
 use crate::{Node, NodeInner};
 
+use std::convert::From;
+
 pub type Scalar = f64;
 pub type LineString = geo::LineString<Scalar>;
 pub type Polygon = geo::Polygon<Scalar>;
@@ -16,6 +18,18 @@ pub trait RenderMultiPolygon {
 pub struct Circle {
     pub radius: f64,
     pub points: usize,
+}
+
+impl From<Circle> for Node {
+    fn from(value: Circle) -> Self {
+        Node::new(NodeInner::RenderMultiPolygon(Box::new(value)))
+    }
+}
+
+impl From<Rectangle> for Node {
+    fn from(value: Rectangle) -> Self {
+        Node::new(NodeInner::RenderMultiPolygon(Box::new(value)))
+    }
 }
 
 fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
@@ -68,61 +82,5 @@ impl RenderMultiPolygon for Rectangle {
     }
 }
 
-/*struct Difference {
-    primitives: Vec<Box<dyn RenderMultiPolygon>>,
-}
-
-impl RenderMultiPolygon for Difference {
-    fn render(&self) -> MultiPolygon {
-        let mut polygons = Vec::new();
-        for primitive in &self.primitives {
-            polygons.push(primitive.render());
-        }
-
-        let mut result = polygons[0].clone();
-        for polygon in polygons.iter().skip(1) {
-            use geo::BooleanOps;
-            result = result.difference(polygon);
-        }
-
-        result
-    }
-}
-*/
-
 #[cfg(test)]
-mod tests {
-
-    use super::*;
-
-    #[test]
-    fn difference() {
-        let circle1 = Circle {
-            radius: 1.0,
-            points: 32,
-        };
-        let circle2 = Circle {
-            radius: 0.5,
-            points: 32,
-        };
-        /*
-                let difference = Difference {
-                    primitives: vec![Box::new(circle1), Box::new(circle2)],
-                };
-
-                let result = difference.render();
-                let mut file = std::fs::File::create("difference.svg").unwrap();
-
-                let svg = svg::SvgWriter::new(
-                    &mut file,
-                    geo::Rect::new(geo::Point::new(-2.0, -2.0), geo::Point::new(2.0, 2.0)),
-                    100.0,
-                );
-
-                svg.unwrap()
-                    .multi_polygon(&result, "fill:none;stroke:black;")
-                    .unwrap();
-        println!("{:?}", result);
-        */
-    }
-}
+mod tests {}
