@@ -5,9 +5,12 @@ use pest_derive::Parser;
 use syntaxtree::UseStatement;
 
 mod diagnostics;
+pub mod langtype;
 mod module;
-
 pub mod syntaxtree;
+pub mod units;
+
+use units::Unit;
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
@@ -25,22 +28,39 @@ pub trait Parse: Sized {
 }
 
 #[derive(Default, Clone)]
-struct Expression {
-    literal: String,
-}
+enum Expression {
+    /// Something went wrong (and an error will be reported)
+    #[default]
+    Invalid,
 
-impl From<&str> for Expression {
-    fn from(value: &str) -> Self {
-        Self {
-            literal: value.to_string(),
-        }
-    }
+    /// A string literal. The .0 is the content of the string, without the quotes
+    StringLiteral(String),
+    /// Number
+    NumberLiteral(f64, Unit),
+    /// Bool
+    BoolLiteral(bool),
 }
 
 #[derive(Clone)]
 enum FunctionArgument {
     PositionalArgument(Expression),
     NamedArgument(Identifier, Expression),
+}
+
+impl FunctionArgument {
+    pub fn name(&self) -> Option<&Identifier> {
+        match self {
+            Self::PositionalArgument(_) => None,
+            Self::NamedArgument(ident, _) => Some(ident),
+        }
+    }
+
+    pub fn expression(&self) -> &Expression {
+        match self {
+            Self::PositionalArgument(expr) => expr,
+            Self::NamedArgument(_, expr) => expr,
+        }
+    }
 }
 
 #[derive(Default, Clone)]
@@ -144,9 +164,18 @@ impl CsglParser {
     }
 
     fn expression(pairs: Pairs<Rule>) -> Result<Expression, ParseError> {
-        Ok(Expression {
-            literal: pairs.clone().next().unwrap().into_inner().to_string(),
-        })
+        Ok(Expression::NumberLiteral(
+            pairs
+                .clone()
+                .next()
+                .unwrap()
+                .into_inner()
+                .to_string()
+                .parse()
+                .unwrap_or(0.0),
+            Unit::Mm,
+        ))
+        //todo!("Expression parsing")
     }
 
     fn function_argument(pair: Pair<Rule>) -> Result<FunctionArgument, ParseError> {

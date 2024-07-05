@@ -278,6 +278,8 @@ impl Depth for SyntaxNode {
 
 #[cfg(test)]
 mod tests {
+    use crate::{units::Unit, Expression};
+
     use super::*;
 
     #[test]
@@ -291,7 +293,7 @@ mod tests {
                 qualified_name: "translate".into(),
                 function_argument_list: vec![FunctionArgument::NamedArgument(
                     "x".into(),
-                    "5.0mm".into(),
+                    Expression::NumberLiteral(5.0, Unit::Mm),
                 )],
             },
         }
@@ -305,7 +307,7 @@ mod tests {
                 qualified_name: "circle".into(),
                 function_argument_list: vec![FunctionArgument::NamedArgument(
                     "r".into(),
-                    "5.0mm".into(),
+                    Expression::NumberLiteral(5.0, Unit::Mm),
                 )],
             },
         }

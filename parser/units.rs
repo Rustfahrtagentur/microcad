@@ -1,58 +1,71 @@
-pub enum LengthUnit {
-    Millimeter,
-    Centimeter,
-    Meter,
-    Kilometer,
-    Inch,
-    Foot,
-    Yard,
-    Mile,
+use crate::langtype::Type;
+
+macro_rules! declare_units {
+    ($( $(#[$m:meta])* $ident:ident = $string:literal -> $ty:ident $(* $factor:expr)? ,)*) => {
+        /// The units that can be used after numbers in the language
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+        pub enum Unit {
+            $($(#[$m])* $ident,)*
+        }
+
+        impl std::fmt::Display for Unit {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                match self {
+                    $(Self::$ident => write!(f, $string), )*
+                }
+            }
+        }
+
+        impl std::str::FromStr for Unit {
+            type Err = ();
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                match s {
+                    $($string => Ok(Self::$ident), )*
+                    _ => Err(())
+                }
+            }
+        }
+
+        impl Unit {
+            pub fn ty(self) -> Type {
+                match self {
+                    $(Self::$ident => Type::$ty, )*
+                }
+            }
+
+            pub fn normalize(self, x: f64) -> f64 {
+                match self {
+                    $(Self::$ident => x $(* $factor as f64)?, )*
+                }
+            }
+
+        }
+    };
 }
 
-impl LengthUnit {
-    pub fn to_millimeters(&self) -> f64 {
-        match self {
-            LengthUnit::Millimeter => 1.0,
-            LengthUnit::Centimeter => 10.0,
-            LengthUnit::Meter => 1000.0,
-            LengthUnit::Kilometer => 1_000_000.0,
-            LengthUnit::Inch => 25.4,
-            LengthUnit::Foot => 304.8,
-            LengthUnit::Yard => 914.4,
-            LengthUnit::Mile => 1_609_344.0,
-        }
-    }
+declare_units! {
+    /// No unit was given
+    None = "" -> Scalar,
 
-    pub fn sign(&self) -> &'static str {
-        match self {
-            LengthUnit::Millimeter => "mm",
-            LengthUnit::Centimeter => "cm",
-            LengthUnit::Meter => "m",
-            LengthUnit::Kilometer => "km",
-            LengthUnit::Inch => "in",
-            LengthUnit::Foot => "ft",
-            LengthUnit::Yard => "yd",
-            LengthUnit::Mile => "mi",
-        }
-    }
+    // Lengths or Coord
 
-    pub fn from_str(s: &str) -> Option<Self> {
-        match s {
-            "mm" => Some(LengthUnit::Millimeter),
-            "cm" => Some(LengthUnit::Centimeter),
-            "m" => Some(LengthUnit::Meter),
-            "km" => Some(LengthUnit::Kilometer),
-            "in" => Some(LengthUnit::Inch),
-            "ft" => Some(LengthUnit::Foot),
-            "yd" => Some(LengthUnit::Yard),
-            "mi" => Some(LengthUnit::Mile),
-            _ => None,
-        }
-    }
-}
+    /// Centimeters
+    Cm = "cm" -> Length * 10.0,
+    /// Millimeters
+    Mm = "mm" -> Length,
+    /// inches
+    In = "in" -> Length * 25.4,
 
-impl fmt::Display for LengthUnit {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.sign())
-    }
+    // angles
+
+    /// Degree
+    Deg = "deg" -> Angle,
+    /// Degree
+    DegS = "°" -> Angle,
+    /// Gradians
+    Grad = "grad" -> Angle * 360./180.,
+    /// Turns
+    Turn = "turn" -> Angle * 360.,
+    /// Radians
+    Rad = "rad" -> Angle * 360./std::f32::consts::TAU,
 }
