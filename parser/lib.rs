@@ -164,14 +164,14 @@ impl CsglParser {
         assert_eq!(pair.as_rule(), Rule::number_literal);
 
         let mut pairs = pair.into_inner();
-        let number_token = pairs.nth(0).unwrap();
+        let number_token = pairs.next().unwrap();
 
         assert_eq!(number_token.as_rule(), Rule::number);
 
         let value = number_token.as_str().parse::<f64>()?;
         let mut unit = Unit::None;
 
-        if let Some(unit_token) = pairs.nth(0) {
+        if let Some(unit_token) = pairs.next() {
             unit = Unit::from_str(unit_token.as_str())
                 .map_err(|u| ParseError::UnknownUnit(unit_token.to_string()))?;
         }
@@ -300,6 +300,19 @@ impl CsglParser {
 mod tests {
     use crate::*;
     include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
+
+    #[test]
+    fn number_literal() {
+        let pairs = CsglParser::parse(Rule::number_literal, "90°");
+
+        assert!(pairs.is_ok());
+        let pair = pairs.unwrap().next().unwrap();
+
+        let (number, unit) = CsglParser::number_literal(pair).unwrap();
+
+        assert_eq!(number, 90.0);
+        assert_eq!(unit, Unit::DegS);
+    }
 
     #[test]
     fn object_node_statement() {

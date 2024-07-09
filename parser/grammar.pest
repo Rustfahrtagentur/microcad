@@ -23,11 +23,16 @@ ident = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
 //`a`: error # Constant identifiers are uppercase
 constant_ident = { (alpha_upper | "_") ~ (alpha_upper | digit | "_")* }
 
+//`90.0°`: ok, with `°` unit
+//`5.0mm`: ok, with `mm` unit
+//`90.0`: ok, no unit
+//`mm`: error
+number_literal = { number ~ unit? }
+
 //`1.0`: ok
 //`1`: ok
 //`.1`: error
 //`qwqeaq`: error
-number_literal = @{ number ~ unit? }
 number = @{ ("-"? ~ int) ~ ("." ~ ASCII_DIGIT+ ~ exp? | exp)? }
 int    = @{ "0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
 exp    = @{ ("E" | "e") ~ ("+" | "-")? ~ ASCII_DIGIT+ }
