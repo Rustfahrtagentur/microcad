@@ -1,7 +1,5 @@
-use crate::units::Unit;
+use crate::{units::Unit, CsglParser};
 use pest::pratt_parser::PrattParser;
-
-type Op = pest::pratt_parser::Op<crate::Rule>;
 
 lazy_static::lazy_static! {
     static ref PRATT_PARSER: PrattParser<crate::Rule> = {
@@ -11,8 +9,8 @@ lazy_static::lazy_static! {
         // Precedence is defined lowest to highest
         PrattParser::new()
             // Addition and subtract have equal precedence
-            .op(Op::infix(add, Left) | Op::infix(sub, Left))
-            .op(Op::infix(mul, Left) | Op::infix(div, Left))
+            .op(Op::infix(add, Left) | Op::infix(subtract, Left))
+            .op(Op::infix(multiply, Left) | Op::infix(divide, Left))
     };
 }
 
@@ -29,15 +27,60 @@ pub enum Expression {
     /// Bool
     BoolLiteral(bool),
 
-    BinOp {
+    BinaryOp {
         lhs: Box<Expression>,
-        op: Op,
+        /// '+', '-', '/', '*', '=', '!', '<', '>', '≤', '≥', '&', '|'
+        op: char,
         rhs: Box<Expression>,
     },
 
     UnaryOp {
-        sub: Box<Expression>,
         /// '+', '-', '!'
         op: char,
+        rhs: Box<Expression>,
     },
+}
+
+impl crate::Parse for Expression {
+    fn parse(pair: pest::iterators::Pair<crate::Rule>) -> Result<Self, crate::ParseError> {
+        use crate::Rule;
+
+        Ok(PRATT_PARSER
+            .map_primary(|primary| match primary.as_rule() {
+                Rule::number_literal => {
+                    let (number, unit) = CsglParser::number_literal(primary).unwrap();
+                    Expression::NumberLiteral(number, unit)
+                }
+                Rule::expression => Self::parse(primary).unwrap(),
+                rule => unreachable!("Expr::parse expected atom, found {:?}", rule),
+            })
+            .map_infix(|lhs, op, rhs| {
+                let op = match op.as_rule() {
+                    Rule::add => '+',
+                    Rule::subtract => '-',
+                    Rule::multiply => '*',
+                    Rule::divide => '/',
+                    rule => unreachable!("Expr::parse expected infix operation, found {:?}", rule),
+                };
+                Expression::BinaryOp {
+                    lhs: Box::new(lhs),
+                    op,
+                    rhs: Box::new(rhs),
+                }
+            })
+            .map_prefix(|op, rhs| {
+                let op = match op.as_rule() {
+                    Rule::unary_minus => '-',
+                    Rule::unary_plus => '+',
+                    Rule::unary_not => '!',
+                    _ => unreachable!(),
+                };
+
+                Expression::UnaryOp {
+                    op,
+                    rhs: Box::new(rhs),
+                }
+            })
+            .parse(pair.into_inner()))
+    }
 }

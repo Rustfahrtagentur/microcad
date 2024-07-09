@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use pest::iterators::{Pair, Pairs};
 #[allow(unused_imports)]
 use pest::Parser;
@@ -16,12 +18,21 @@ pub mod units;
 pub struct CsglParser;
 
 use expression::Expression;
+use units::Unit;
 
 #[derive(Debug)]
 pub enum ParseError {
     ExpectedIdentifier,
     ObjectNodeAtLeastOneCall,
     InvalidUseStatement,
+    ParseFloatError(std::num::ParseFloatError),
+    UnknownUnit(String),
+}
+
+impl From<std::num::ParseFloatError> for ParseError {
+    fn from(value: std::num::ParseFloatError) -> Self {
+        Self::ParseFloatError(value)
+    }
 }
 
 pub trait Parse: Sized {
@@ -147,6 +158,24 @@ impl CsglParser {
             }
         }
         Ok(vec)
+    }
+
+    fn number_literal(pair: Pair<Rule>) -> Result<(f64, units::Unit), ParseError> {
+        assert_eq!(pair.as_rule(), Rule::number_literal);
+
+        let mut pairs = pair.into_inner();
+        let number_token = pairs.nth(0).unwrap();
+
+        assert_eq!(number_token.as_rule(), Rule::number);
+
+        let value = number_token.as_str().parse::<f64>()?;
+        let mut unit = Unit::None;
+
+        if let Some(unit_token) = pairs.nth(0) {
+            unit = Unit::from_str(unit_token.as_str())
+                .map_err(|u| ParseError::UnknownUnit(unit_token.to_string()))?;
+        }
+        Ok((value, unit))
     }
 
     fn expression(pairs: Pairs<Rule>) -> Result<Expression, ParseError> {
