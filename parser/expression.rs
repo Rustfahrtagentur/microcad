@@ -43,6 +43,7 @@ pub enum Expression {
     },
 }
 
+#[derive(Debug)]
 pub enum EvalError {
     InvalidOperation,
 }
@@ -66,7 +67,7 @@ impl Expression {
         match self {
             Self::NumberLiteral(_) | Self::StringLiteral(_) => Ok(Box::new(self)),
             Self::BinaryOp { lhs, op, rhs } => match op {
-                '*' => lhs * rhs,
+                '*' => lhs.eval()? * rhs.eval()?,
                 _ => unimplemented!(),
             },
             _ => Err(EvalError::InvalidOperation),
@@ -149,6 +150,12 @@ mod tests {
                 assert_eq!(op, '*');
             }
             _ => panic!("Wrong Expression Type"),
+        }
+
+        let new_expr = expr.eval().unwrap();
+
+        if let Expression::NumberLiteral(num) = new_expr.as_ref() {
+            assert_eq!(num.value(), 16.0);
         }
     }
 }
