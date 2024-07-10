@@ -9,6 +9,7 @@ use syntax_tree::UseStatement;
 mod diagnostics;
 pub mod expression;
 pub mod langtype;
+pub mod literal;
 mod module;
 pub mod syntax_tree;
 pub mod units;
@@ -160,7 +161,7 @@ impl CsglParser {
         Ok(vec)
     }
 
-    fn number_literal(pair: Pair<Rule>) -> Result<(f64, units::Unit), ParseError> {
+    fn number_literal(pair: Pair<Rule>) -> Result<literal::NumberLiteral, ParseError> {
         assert_eq!(pair.as_rule(), Rule::number_literal);
 
         let mut pairs = pair.into_inner();
@@ -175,22 +176,11 @@ impl CsglParser {
             unit = Unit::from_str(unit_token.as_str())
                 .map_err(|u| ParseError::UnknownUnit(unit_token.to_string()))?;
         }
-        Ok((value, unit))
+        Ok(literal::NumberLiteral(value, unit))
     }
 
-    fn expression(pairs: Pairs<Rule>) -> Result<Expression, ParseError> {
-        Ok(Expression::NumberLiteral(
-            pairs
-                .clone()
-                .next()
-                .unwrap()
-                .into_inner()
-                .to_string()
-                .parse()
-                .unwrap_or(0.0),
-            units::Unit::Mm,
-        ))
-        //todo!("Expression parsing")
+    fn expression(pair: Pair<Rule>) -> Result<Expression, ParseError> {
+        Expression::parse(pair)
     }
 
     fn function_argument(pair: Pair<Rule>) -> Result<FunctionArgument, ParseError> {
@@ -201,10 +191,10 @@ impl CsglParser {
         match first.as_rule() {
             Rule::ident => Ok(FunctionArgument::NamedArgument(
                 Self::identifier(first)?,
-                Self::expression(second.into_inner())?,
+                Self::expression(second)?,
             )),
             Rule::expression => Ok(FunctionArgument::PositionalArgument(Self::expression(
-                first.into_inner(),
+                first,
             )?)),
             _ => unreachable!(),
         }
@@ -298,6 +288,8 @@ impl CsglParser {
 
 #[cfg(test)]
 mod tests {
+    use literal::NumberLiteral;
+
     use crate::*;
     include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
 
@@ -308,7 +300,7 @@ mod tests {
         assert!(pairs.is_ok());
         let pair = pairs.unwrap().next().unwrap();
 
-        let (number, unit) = CsglParser::number_literal(pair).unwrap();
+        let NumberLiteral(number, unit) = CsglParser::number_literal(pair).unwrap();
 
         assert_eq!(number, 90.0);
         assert_eq!(unit, Unit::DegS);
