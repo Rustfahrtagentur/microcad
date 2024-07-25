@@ -183,28 +183,26 @@ impl crate::Parse for Expression {
 mod tests {
     use super::*;
 
-    #[test]
-    fn expression() {
+    fn run_operator_test<T: std::fmt::Debug + Into<f64>>(expr: &str, expected_result: T) {
         use pest::Parser;
-        let pair = CsglParser::parse(crate::Rule::expression, "4 * 4")
+        let pair = CsglParser::parse(crate::Rule::expression, expr)
             .unwrap()
             .next()
             .unwrap();
 
         use crate::Parse;
         let expr = Expression::parse(pair).unwrap();
-
-        match expr {
-            Expression::BinaryOp { lhs: _, op, rhs: _ } => {
-                assert_eq!(op, '*');
-            }
-            _ => panic!("Wrong Expression Type"),
-        }
-
         let new_expr = expr.eval().unwrap();
 
         if let Expression::NumberLiteral(num) = new_expr.as_ref() {
-            assert_eq!(num.value(), 16.0);
+            assert_eq!(num.value(), expected_result.into());
         }
+    }
+
+    #[test]
+    fn operators() {
+        run_operator_test("4 * 4", 16.0);
+        run_operator_test("4 * (4 + 4)", 32.0);
+        run_operator_test("10.0 / 2.5 + 6", 10.0);
     }
 }
