@@ -12,15 +12,15 @@ pub enum Error {
 
 // Context for evaluation
 pub struct Context {
-    node: Option<SyntaxNode>,
+    node: SyntaxNode,
     symbols: HashMap<String, SyntaxNode>,
     //    type_registry: HashMap<String, SyntaxNode>,
 }
 
 impl Context {
-    pub fn new() -> Self {
+    pub fn new(node: SyntaxNode) -> Self {
         Self {
-            node: None,
+            node,
             symbols: HashMap::new(),
         }
     }
