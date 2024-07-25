@@ -32,7 +32,7 @@ impl FormatString {
 }
 
 impl Eval for FormatString {
-    fn eval(self, context: &Context) -> Result<Box<Expression>, Error> {
+    fn eval(self, context: Option<&Context>) -> Result<Box<Expression>, Error> {
         let mut result = String::new();
         for elem in self.0 {
             match elem {
@@ -52,7 +52,9 @@ impl crate::Parse for FormatString {
         let mut fs = Self::default();
         for pair in pairs {
             match pair.as_rule() {
-                crate::Rule::string_literal_inner => fs.push_string(pair.to_string()),
+                crate::Rule::string_literal_inner => {
+                    fs.push_string(pair.as_span().as_str().to_string())
+                }
                 crate::Rule::format_expression => {
                     fs.push_format_expr(FormatString::parse_format_expression(pair)?)
                 }
@@ -73,12 +75,16 @@ mod tests {
     #[test]
     fn format_string() {
         use pest::Parser;
-        let pair = crate::CsglParser::parse(crate::Rule::format_string, "\"A{2.0}B\"")
+        let pair = crate::CsglParser::parse(crate::Rule::format_string, "\"A{2 + 4}B\"")
             .unwrap()
             .next()
             .unwrap();
 
         let s = FormatString::parse(pair).unwrap();
         assert_eq!(s.section_count(), 3);
+
+        let s = s.eval_to_string(None).unwrap();
+
+        assert_eq!(&s, "A6B");
     }
 }
