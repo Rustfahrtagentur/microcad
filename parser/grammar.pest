@@ -40,10 +40,16 @@ exp    = @{ ("E" | "e") ~ ("+" | "-")? ~ ASCII_DIGIT+ }
 //`"a"`: ok
 //`"a\n"`: ok
 //`"a\""`: ok
-string_literal  = @{ "\"" ~ inner ~ "\"" }
-inner   = @{ (!("\"" | "\\") ~ ANY)* ~ (escape ~ inner)? }
+//`"hello{10}world": ok
+format_string = { "\"" ~ string_literal_inner? ~ (format_expression ~ string_literal_inner?)* ~ "\"" }
+string_literal_inner   = { (!("\"" | "\\" | "{{" | "}}" ) ~ ANY)* ~ ((bracket_escape | escape) ~ string_literal_inner)? }
+bracket_escape = { "{{" | "}}" }
 escape  = @{ "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | unicode) }
 unicode = @{ "u" ~ ASCII_HEX_DIGIT{4} }
+
+///`{a}`: ok
+///`{a + b}`: ok
+format_expression = { "{" ~ ws* ~ expression ~ ws* ~ "}" }
 
 //`true`: ok
 //`false`: ok
@@ -64,7 +70,7 @@ color_literal = { "#" ~ (ASCII_HEX_DIGIT{8} | ASCII_HEX_DIGIT{6} | ASCII_HEX_DIG
 //`1mm`: ok
 //`1.0mm`: ok
 //`1.0`: ok
-literal = { number_literal | string_literal | bool_literal | color_literal }
+literal = { number_literal | bool_literal | color_literal }
 
 //`a`: ok # Single identifier
 //`a.b`: ok # Nested identifiers
@@ -79,10 +85,13 @@ qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
 //`int`: ok
 //`[scalar]`: ok # List type
-type = { qualified_name | list_type }
+type = { qualified_name | list_type | array_type }
 
 //`[scalar]`: ok
 list_type = { "[" ~ ws* ~ type ~ ws * ~ "]" }
+
+array_type = { qualified_name ~ ws* ~ array_length+ }
+array_length = { "[" ~ ws* ~ int ~ ws* ~ "]" }
 
 //`: scalar`: ok
 //`: <Vec3>`: error
@@ -111,7 +120,7 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident }
 //`a + b + c`: ok 
 //`! a`: ok # Unary operator with whitespace 
 //`a-`: error # Unknown postfix operator `-`
-expression       =   { unary_op* ~ ws* ~  primary ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary)* }
+expression       =   { unary_op* ~ ws* ~ primary ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary)* }
 bin_op           =  _{ add | subtract | multiply | divide }
   add            =   { "+" }
   subtract       =   { "-" }
@@ -121,7 +130,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_minus    =   { "-" }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
-primary  =  _{ literal | qualified_name | list_expression | "(" ~ expression ~ ")" }
+primary  =  _{ literal | format_string | qualified_name | list_expression | "(" ~ expression ~ ")" }
 
 //`[1, 2, 3]`: ok
 //`[1, 2, 3,]`: error # Trailing comma
