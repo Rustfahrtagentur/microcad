@@ -107,9 +107,11 @@ use_statement = { "use" ~ ws+ ~ qualified_name_list ~ ws* ~ ";"
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident }
 
 //`-5.0mm`: ok # Negate
-//`(a + b) * (c - a)`: ok 
+//`(a+b)*(c-a)`: ok 
+//`a + b + c`: ok 
+//`! a`: ok # Unary operator with whitespace 
 //`a-`: error # Unknown postfix operator `-`
-expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ (bin_op ~ ws* ~ unary_op* ~ ws* ~ primary )* }
+expression       =   { unary_op* ~ ws* ~  primary ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary)* }
 bin_op           =  _{ add | subtract | multiply | divide }
   add            =   { "+" }
   subtract       =   { "-" }
