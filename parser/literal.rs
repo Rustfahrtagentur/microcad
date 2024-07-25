@@ -14,6 +14,7 @@ impl NumberLiteral {
     }
 }
 
+/// Rules for operator +
 impl std::ops::Add for &NumberLiteral {
     type Output = Option<NumberLiteral>;
 
@@ -33,6 +34,7 @@ impl std::ops::Add for &NumberLiteral {
     }
 }
 
+/// Rules for operator -
 impl std::ops::Sub for &NumberLiteral {
     type Output = Option<NumberLiteral>;
 
@@ -52,6 +54,7 @@ impl std::ops::Sub for &NumberLiteral {
     }
 }
 
+/// Rules for operator *
 impl std::ops::Mul for &NumberLiteral {
     type Output = Option<NumberLiteral>;
 
@@ -71,6 +74,7 @@ impl std::ops::Mul for &NumberLiteral {
     }
 }
 
+/// Rules for operator -
 impl std::ops::Div for &NumberLiteral {
     type Output = Option<NumberLiteral>;
 
