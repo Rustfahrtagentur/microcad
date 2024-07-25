@@ -42,7 +42,7 @@ exp    = @{ ("E" | "e") ~ ("+" | "-")? ~ ASCII_DIGIT+ }
 //`"a\""`: ok
 //`"hello{10}world": ok
 format_string = { "\"" ~ string_literal_inner? ~ (format_expression ~ string_literal_inner?)* ~ "\"" }
-string_literal_inner   = { (!("\"" | "\\" | "{{" | "}}" ) ~ ANY)* ~ ((bracket_escape | escape) ~ string_literal_inner)? }
+string_literal_inner   = { (!("\"" | "\\" | "{" | "}" ) ~ ANY)* ~ ((bracket_escape | escape) ~ string_literal_inner)? }
 bracket_escape = { "{{" | "}}" }
 escape  = @{ "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | unicode) }
 unicode = @{ "u" ~ ASCII_HEX_DIGIT{4} }

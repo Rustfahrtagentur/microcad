@@ -7,13 +7,10 @@ enum FormatStringInner {
 }
 
 /// Definition and implementation for `StringLiteral`
+#[derive(Default)]
 pub struct FormatString(Vec<FormatStringInner>);
 
 impl FormatString {
-    pub fn new() -> Self {
-        Self(Vec::new())
-    }
-
     pub fn push_string(&mut self, s: String) {
         self.0.push(FormatStringInner::String(s));
     }
@@ -22,11 +19,15 @@ impl FormatString {
         self.0.push(FormatStringInner::FormatExpression(expr));
     }
 
+    pub fn section_count(&self) -> usize {
+        self.0.len()
+    }
+
     pub fn parse_format_expression(
         pair: pest::iterators::Pair<crate::Rule>,
     ) -> Result<Box<Expression>, crate::ParseError> {
         use crate::Parse;
-        Expression::parse(pair.into_inner().next().unwrap()).map(|expr| Box::new(expr))
+        Expression::parse(pair.into_inner().next().unwrap()).map(Box::new)
     }
 }
 
@@ -48,7 +49,7 @@ impl Eval for FormatString {
 impl crate::Parse for FormatString {
     fn parse(pair: pest::iterators::Pair<crate::Rule>) -> Result<Self, crate::ParseError> {
         let pairs = pair.into_inner();
-        let mut fs = Self::new();
+        let mut fs = Self::default();
         for pair in pairs {
             match pair.as_rule() {
                 crate::Rule::string_literal_inner => fs.push_string(pair.to_string()),
@@ -78,5 +79,6 @@ mod tests {
             .unwrap();
 
         let s = FormatString::parse(pair).unwrap();
+        assert_eq!(s.section_count(), 3);
     }
 }
