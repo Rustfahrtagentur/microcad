@@ -42,7 +42,9 @@ pub enum Expression {
 
     //    TupleExpression(TupleExpression),
 
-    //    FunctionCall(FunctionCall)
+    //    FunctionCall(FunctionCall),
+
+    //    QualifiedName(QualifiedName)
     /// A binary operation: a + b
     BinaryOp {
         lhs: Box<Expression>,
