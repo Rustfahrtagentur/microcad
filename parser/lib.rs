@@ -7,8 +7,11 @@ use pest_derive::Parser;
 use syntax_tree::UseStatement;
 
 mod diagnostics;
+pub mod eval;
 pub mod expression;
+pub mod format_string;
 pub mod langtype;
+pub mod list;
 pub mod literal;
 mod module;
 pub mod syntax_tree;
