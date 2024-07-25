@@ -1,6 +1,7 @@
-use std::os::windows::io::InvalidHandleError;
-
-use crate::{literal::NumberLiteral, units::Unit, CsglParser};
+use crate::eval::{self, Context, Eval};
+use crate::format_string::FormatString;
+use crate::list::ListExpression;
+use crate::{literal::NumberLiteral, CsglParser};
 use pest::pratt_parser::PrattParser;
 
 lazy_static::lazy_static! {
@@ -24,11 +25,25 @@ pub enum Expression {
 
     /// A string literal. The .0 is the content of the string, without the quotes
     StringLiteral(String),
-    /// Number
+
+    /// Number with an optional unit: 4.0mm, 3.0
     NumberLiteral(NumberLiteral),
-    /// Bool
+
+    /// Boolean: true, false
     BoolLiteral(bool),
 
+    /// A string that contains format expressions: "value = {a}"
+    FormatString(FormatString),
+
+    /// A list: [a, b, c]
+    ListExpression(ListExpression),
+
+    //    ArrayExpression(ArrayExpression),
+
+    //    TupleExpression(TupleExpression),
+
+    //    FunctionCall(FunctionCall)
+    /// A binary operation: a + b
     BinaryOp {
         lhs: Box<Expression>,
         /// '+', '-', '/', '*', '=', '!', '<', '>', '≤', '≥', '&', '|'
@@ -36,6 +51,7 @@ pub enum Expression {
         rhs: Box<Expression>,
     },
 
+    /// A unary operation: !a
     UnaryOp {
         /// '+', '-', '!'
         op: char,
@@ -43,83 +59,83 @@ pub enum Expression {
     },
 }
 
-#[derive(Debug)]
-pub enum EvalError {
-    InvalidOperation,
-}
-
 /// Rules for operator +
 impl std::ops::Add for Box<Expression> {
-    type Output = Result<Box<Expression>, EvalError>;
+    type Output = Result<Box<Expression>, eval::Error>;
 
     fn add(self, rhs: Self) -> Self::Output {
         match (self.as_ref(), rhs.as_ref()) {
             (Expression::NumberLiteral(lhs), Expression::NumberLiteral(rhs)) => match lhs + rhs {
                 Some(result) => Ok(Box::new(Expression::NumberLiteral(result))),
-                None => Err(EvalError::InvalidOperation),
+                None => Err(eval::Error::InvalidOperation),
             },
-            _ => Err(EvalError::InvalidOperation),
+            _ => Err(eval::Error::InvalidOperation),
         }
     }
 }
 
 /// Rules for operator -
 impl std::ops::Sub for Box<Expression> {
-    type Output = Result<Box<Expression>, EvalError>;
+    type Output = Result<Box<Expression>, eval::Error>;
 
     fn sub(self, rhs: Self) -> Self::Output {
         match (self.as_ref(), rhs.as_ref()) {
             (Expression::NumberLiteral(lhs), Expression::NumberLiteral(rhs)) => match lhs - rhs {
                 Some(result) => Ok(Box::new(Expression::NumberLiteral(result))),
-                None => Err(EvalError::InvalidOperation),
+                None => Err(eval::Error::InvalidOperation),
             },
-            _ => Err(EvalError::InvalidOperation),
+            _ => Err(eval::Error::InvalidOperation),
         }
     }
 }
 
 /// Rules for operator *
 impl std::ops::Mul for Box<Expression> {
-    type Output = Result<Box<Expression>, EvalError>;
+    type Output = Result<Box<Expression>, eval::Error>;
 
     fn mul(self, rhs: Self) -> Self::Output {
         match (self.as_ref(), rhs.as_ref()) {
             (Expression::NumberLiteral(lhs), Expression::NumberLiteral(rhs)) => match lhs * rhs {
                 Some(result) => Ok(Box::new(Expression::NumberLiteral(result))),
-                None => Err(EvalError::InvalidOperation),
+                None => Err(eval::Error::InvalidOperation),
             },
-            _ => Err(EvalError::InvalidOperation),
+            _ => Err(eval::Error::InvalidOperation),
         }
     }
 }
 
 /// Rules for operator /
 impl std::ops::Div for Box<Expression> {
-    type Output = Result<Box<Expression>, EvalError>;
+    type Output = Result<Box<Expression>, eval::Error>;
 
     fn div(self, rhs: Self) -> Self::Output {
         match (self.as_ref(), rhs.as_ref()) {
             (Expression::NumberLiteral(lhs), Expression::NumberLiteral(rhs)) => match lhs / rhs {
                 Some(result) => Ok(Box::new(Expression::NumberLiteral(result))),
-                None => Err(EvalError::InvalidOperation),
+                None => Err(eval::Error::InvalidOperation),
             },
-            _ => Err(EvalError::InvalidOperation),
+            _ => Err(eval::Error::InvalidOperation),
         }
     }
 }
 
-impl Expression {
-    fn eval(self) -> Result<Box<Self>, EvalError> {
+impl Eval for Expression {
+    fn eval(self, context: &Context) -> Result<Box<Self>, eval::Error> {
         match self {
             Self::NumberLiteral(_) | Self::StringLiteral(_) => Ok(Box::new(self)),
-            Self::BinaryOp { lhs, op, rhs } => match op {
-                '+' => lhs.eval()? + rhs.eval()?,
-                '-' => lhs.eval()? - rhs.eval()?,
-                '*' => lhs.eval()? * rhs.eval()?,
-                '/' => lhs.eval()? / rhs.eval()?,
-                _ => unimplemented!(),
-            },
-            _ => Err(EvalError::InvalidOperation),
+            Self::BinaryOp { lhs, op, rhs } => {
+                let lhs = lhs.eval(context)?;
+                let rhs = rhs.eval(context)?;
+
+                match op {
+                    '+' => lhs + rhs,
+                    '-' => lhs - rhs,
+                    '*' => lhs * rhs,
+                    '/' => lhs / rhs,
+                    _ => unimplemented!(),
+                }
+            }
+            _ => Err(eval::Error::InvalidOperation),
         }
     }
 }
@@ -183,7 +199,7 @@ impl crate::Parse for Expression {
 mod tests {
     use super::*;
 
-    fn run_operator_test<T: std::fmt::Debug + Into<f64>>(expr: &str, expected_result: T) {
+    fn run_operator_test(expr: &str, context: &Context, evaluator: impl FnOnce(&Expression)) {
         use pest::Parser;
         let pair = CsglParser::parse(crate::Rule::expression, expr)
             .unwrap()
@@ -192,17 +208,28 @@ mod tests {
 
         use crate::Parse;
         let expr = Expression::parse(pair).unwrap();
-        let new_expr = expr.eval().unwrap();
+        let new_expr = expr.eval(context).unwrap();
 
-        if let Expression::NumberLiteral(num) = new_expr.as_ref() {
-            assert_eq!(num.value(), expected_result.into());
-        }
+        evaluator(new_expr.as_ref());
     }
 
     #[test]
     fn operators() {
-        run_operator_test("4 * 4", 16.0);
-        run_operator_test("4 * (4 + 4)", 32.0);
-        run_operator_test("10.0 / 2.5 + 6", 10.0);
+        let context = Context::new();
+        run_operator_test("4 * 4", &context, |e| {
+            if let Expression::NumberLiteral(num) = e {
+                assert_eq!(num.value(), 16.0);
+            }
+        });
+        run_operator_test("4 * (4 + 4)", &context, |e| {
+            if let Expression::NumberLiteral(num) = e {
+                assert_eq!(num.value(), 32.0);
+            }
+        });
+        run_operator_test("10.0 / 2.5 + 6", &context, |e| {
+            if let Expression::NumberLiteral(num) = e {
+                assert_eq!(num.value(), 10.0);
+            }
+        });
     }
 }
