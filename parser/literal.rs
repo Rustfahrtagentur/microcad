@@ -1,6 +1,7 @@
 use crate::langtype::Type;
 use crate::units::Unit;
 
+/// Definition and implementation for `NumberLiteral`
 pub struct NumberLiteral(pub f64, pub Unit);
 
 impl NumberLiteral {
@@ -93,5 +94,11 @@ impl std::ops::Div for &NumberLiteral {
             }
             _ => None,
         }
+    }
+}
+
+impl ToString for NumberLiteral {
+    fn to_string(&self) -> String {
+        format!("{}{}", self.0.to_string(), self.1)
     }
 }
