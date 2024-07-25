@@ -120,7 +120,7 @@ impl std::ops::Div for Box<Expression> {
 }
 
 impl Eval for Expression {
-    fn eval(self, context: &Context) -> Result<Box<Self>, eval::Error> {
+    fn eval(self, context: Option<&Context>) -> Result<Box<Self>, eval::Error> {
         match self {
             Self::NumberLiteral(_) | Self::StringLiteral(_) => Ok(Box::new(self)),
             Self::BinaryOp { lhs, op, rhs } => {
@@ -199,7 +199,11 @@ impl crate::Parse for Expression {
 mod tests {
     use super::*;
 
-    fn run_operator_test(expr: &str, context: &Context, evaluator: impl FnOnce(&Expression)) {
+    fn run_operator_test(
+        expr: &str,
+        context: Option<&Context>,
+        evaluator: impl FnOnce(&Expression),
+    ) {
         use pest::Parser;
         let pair = CsglParser::parse(crate::Rule::expression, expr)
             .unwrap()
@@ -215,18 +219,17 @@ mod tests {
 
     #[test]
     fn operators() {
-        let context = Context::new();
-        run_operator_test("4 * 4", &context, |e| {
+        run_operator_test("4 * 4", None, |e| {
             if let Expression::NumberLiteral(num) = e {
                 assert_eq!(num.value(), 16.0);
             }
         });
-        run_operator_test("4 * (4 + 4)", &context, |e| {
+        run_operator_test("4 * (4 + 4)", None, |e| {
             if let Expression::NumberLiteral(num) = e {
                 assert_eq!(num.value(), 32.0);
             }
         });
-        run_operator_test("10.0 / 2.5 + 6", &context, |e| {
+        run_operator_test("10.0 / 2.5 + 6", None, |e| {
             if let Expression::NumberLiteral(num) = e {
                 assert_eq!(num.value(), 10.0);
             }

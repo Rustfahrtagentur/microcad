@@ -27,9 +27,9 @@ impl Context {
 }
 
 pub trait Eval: Sized {
-    fn eval(self, context: &Context) -> Result<Box<Expression>, Error>;
+    fn eval(self, context: Option<&Context>) -> Result<Box<Expression>, Error>;
 
-    fn eval_to_string(self, context: &Context) -> Result<String, Error> {
+    fn eval_to_string(self, context: Option<&Context>) -> Result<String, Error> {
         let result = self.eval(context)?;
         match result.as_ref() {
             Expression::NumberLiteral(n) => Ok(n.to_string()),
