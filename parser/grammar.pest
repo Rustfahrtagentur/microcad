@@ -49,16 +49,16 @@ unicode = @{ "u" ~ ASCII_HEX_DIGIT{4} }
 
 ///`{a}`: ok
 ///`{a + b}`: ok
-format_expression = { "{" ~ ws* ~ (format_option ~ ws* ~ ":" )? ~ ws* ~ expression ~ ws* ~ "}" }
+format_expression = { "{" ~ ws* ~ (format_spec ~ ws* ~ ":" )? ~ ws* ~ expression ~ ws* ~ "}" }
 
 ///`05.5`: ok # Five leading zeros with 5 precision
-format_option = { format_option_leading_zeros ~ format_option_precision | format_option_leading_zeros | format_option_precision }
+format_spec = { format_spec_leading_zeros ~ format_spec_precision | format_spec_leading_zeros | format_spec_precision }
 
 //`.5`: print with precision = 5
-format_option_precision = { "." ~ int }
+format_spec_precision = { "." ~ int }
 
 //`05`: print with 5 leading zeros and precision = 0
-format_option_leading_zeros = { "0" ~ int }
+format_spec_leading_zeros = { "0" ~ int }
 
 //`true`: ok
 //`false`: ok

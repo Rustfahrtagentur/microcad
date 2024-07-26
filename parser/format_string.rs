@@ -1,24 +1,23 @@
 use crate::eval::{Context, Error, Eval};
 use crate::expression::Expression;
-use crate::literal::NumberLiteral;
 
 #[derive(Default)]
-struct FormatOption {
+struct FormatSpec {
     precision: Option<u32>,
     leading_zeros: Option<u32>,
 }
 
-impl crate::Parse for FormatOption {
+impl crate::Parse for FormatSpec {
     fn parse(pair: pest::iterators::Pair<crate::Rule>) -> Result<Self, crate::ParseError> {
-        let mut opt = FormatOption::default();
+        let mut opt = FormatSpec::default();
         use crate::Rule;
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
-                Rule::format_option_precision => {
+                Rule::format_spec_precision => {
                     opt.precision = Some(pair.as_span().as_str()[1..].parse().unwrap())
                 }
-                Rule::format_option_leading_zeros => {
+                Rule::format_spec_leading_zeros => {
                     opt.leading_zeros = Some(pair.as_span().as_str()[1..].parse().unwrap())
                 }
                 _ => unreachable!(),
@@ -29,15 +28,15 @@ impl crate::Parse for FormatOption {
     }
 }
 
-struct FormatExpression(FormatOption, Box<Expression>);
+struct FormatExpression(FormatSpec, Box<Expression>);
 
 impl crate::Parse for FormatExpression {
     fn parse(pair: pest::iterators::Pair<crate::Rule>) -> Result<Self, crate::ParseError> {
-        let mut fo = FormatOption::default();
+        let mut fo = FormatSpec::default();
         let mut expr = Expression::default();
         for pair in pair.into_inner() {
             match pair.as_rule() {
-                crate::Rule::format_option => fo = FormatOption::parse(pair)?,
+                crate::Rule::format_spec => fo = FormatSpec::parse(pair)?,
                 crate::Rule::expression => expr = Expression::parse(pair)?,
                 _ => unreachable!(),
             }
