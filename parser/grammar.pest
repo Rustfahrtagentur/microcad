@@ -94,7 +94,11 @@ qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
 //`int`: ok
 //`[scalar]`: ok # List type
-type = { qualified_name | list_type | array_type }
+type = { qualified_name | list_type | array_type | tuple_type }
+
+//`: scalar`: ok
+//`: <Vec3>`: error
+type_specifier = { ":" ~ ws* ~ type }
 
 //`[scalar]`: ok
 //`[]`: ok # List with elements of arbitrary type
@@ -108,9 +112,17 @@ array_type = { qualified_name ~ ws* ~ array_length+ }
 //`[T]`: error # Must be a number
 array_length = { "[" ~ ws* ~ int ~ ws* ~ "]" }
 
-//`: scalar`: ok
-//`: <Vec3>`: error
-type_specifier = { ":" ~ ws* ~ type }
+//`(length,scalar)`: ok # 2 unnamed fields
+tuple_type = { "(" ~ ws* ~ (tuple_unnamed_type_list | tuple_named_type_list | tuple_unnamed_type_list ~ ws* ~ "," ~ ws* ~ tuple_named_type_list) ~ ws* ~ ")" }
+
+//`length,scalar`: ok
+//`length,`: error # Trailing comma
+tuple_unnamed_type_list = { type ~ ws* ~ ("," ~ type)* }
+
+//`r = 4.0mm, a: type = b, c: scalar`: ok
+tuple_named_type_list = { variable_declaration ~ ws* ~ ("," ~ ws* ~ variable_declaration ~ ws*)* }
+
+
 
 //`use a;`: ok  # Import a single module
 //`use ;`: error # Must import at least one module
@@ -156,6 +168,11 @@ list_expression = { "[" ~ (ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws
 unary_expression = { unary_operator ~ ws* ~ expression }
 unary_operator = { "-" }
 
+//`= 4.0mm`: ok
+//`= `: error # No expression
+//`= 1 + 2`: ok
+default_value = { "=" ~ ws* ~ expression }
+
 //`r = 5.0mm`: ok # Named argument
 //`2.0mm`: ok # Positional argument
 function_argument = { (ident ~ ws* ~ "=" ~ ws*)? ~ expression }
@@ -169,13 +186,14 @@ function_argument_list = { function_argument ~ ws* ~ ("," ~ ws* ~ function_argum
 function_call = { qualified_name ~ ws* ~ "(" ~ ws* ~ function_argument_list? ~ ws* ~ ")" }
 
 //`r: length = 5.0mm`: ok
-//`r = 5.0mm`: error # Type specifier is required, type inference is not supported yet
+//`r = 5.0mm`: ok # Type specifier with type inference
 //`r: length`: ok # Default value is not required
-//`r: length = math.PI`: ok # Constant value is allowed
-parameter_declaration = { ident ~ ws* ~ type_specifier ~ ws* ~ ("=" ~ ws* ~ expression)? }
+//`r: length = math.PI`: ok # Type specifier + Default value from constant
+//`r`: error # neither type specifier or default value
+variable_declaration = { ident ~ ws* ~ (type_specifier ~ ws* ~ default_value | type_specifier | default_value) }
 
 //`r: length = 5.0mm;`: ok
-parameter_declaration_statement = { parameter_declaration ~ ws* ~ ";" }
+variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
 
 //`function foo() -> scalar { return math.PI; }`: ok
 //`function foo() -> scalar {}`: error # Function must have a return statement
@@ -185,7 +203,7 @@ parameter_declaration_statement = { parameter_declaration ~ ws* ~ ";" }
 function_declaration = { "function" ~ ws+ ~ ident ~ ws* ~ "(" ~ ws* ~ function_declaration_argument_list? ~ ws* ~ ")" ~ ws* ~ function_declaration_return_value ~ ws* ~ "{" ~ ws* ~ statement* ~ ws* ~ function_return_statement ~ ws* ~ "}" }
 
 //`a: scalar`: ok
-function_declaration_argument =  { parameter_declaration }
+function_declaration_argument =  { variable_declaration }
 
 //`-> scalar`: ok
 function_declaration_return_value = { "->" ~ ws* ~ type }
@@ -224,7 +242,7 @@ object_node_statement = {
 object_node_id_assignment = { ident ~ ws* ~ ":=" ~ ws* }
 object_node_inner = { ws* ~ (statement ~ ws*)* }
 
-statement = { object_node_statement | use_statement | module_declaration | function_declaration | parameter_declaration_statement }
+statement = { object_node_statement | use_statement | module_declaration | function_declaration | variable_declaration_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 document = { SOI ~ (statement ~ ws* )* ~ EOI }
