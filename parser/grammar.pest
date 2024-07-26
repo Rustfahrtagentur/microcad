@@ -113,7 +113,10 @@ array_type = { qualified_name ~ ws* ~ array_length+ }
 array_length = { "[" ~ ws* ~ int ~ ws* ~ "]" }
 
 //`(length,scalar)`: ok # 2 unnamed fields
-tuple_type = { "(" ~ ws* ~ (tuple_unnamed_type_list | tuple_named_type_list | tuple_unnamed_type_list ~ ws* ~ "," ~ ws* ~ tuple_named_type_list) ~ ws* ~ ")" }
+//`(a: length, b = 4.0mm)`: ok # No default value for a, but for b
+//`(length, a: length = 4.0mm)`: ok # First argument is unnamed, second is named 
+//`(a: length = 4.0mm, length)`: error # Unnamed argument followed by named argument
+tuple_type = { "(" ~ ws* ~ (tuple_unnamed_type_list ~ ws* ~ "," ~ ws* ~ tuple_named_type_list | tuple_named_type_list | tuple_unnamed_type_list) ~ ws* ~ ")" }
 
 //`length,scalar`: ok
 //`length,`: error # Trailing comma
