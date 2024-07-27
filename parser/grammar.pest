@@ -145,7 +145,7 @@ tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
 
 //`(a,b)`: ok
 //`(a.b,d)`: error # `a.b` is a qualified name and not an identifier
-tuple_identifier = { "(" ~ ws* ~ identifier_list ~ ws* ~ ")" }
+tuple_declaration = { "(" ~ ws* ~ identifier_list ~ ws* ~ ")" }
 
 //`.0`: ok
 //`.height`: ok
@@ -185,7 +185,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_minus    =   { "-" }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
-primary  =  _{ literal | format_string | qualified_name | list_expression | "(" ~ expression ~ ")" }
+primary  =  _{ literal | format_string | qualified_name | list_expression | "(" ~ expression ~ ")" | tuple_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok
@@ -205,24 +205,27 @@ unary_operator = { "-" }
 default_value = { "=" ~ ws* ~ expression }
 
 //`r = 5.0mm`: ok # Named argument
-function_named_argument = { identifier ~ ws* ~ default_value }
+call_named_argument = { identifier ~ ws* ~ default_value }
+
+//`(a,b) = (4.0mm, 4.0mm)`: ok # Default values
+call_named_tuple_argument = { "(" ~ identifier_list ~ ")" ~ ws* ~ default_value }
 
 //`2.0mm`: ok # Positional argument
-function_positional_argument = { expression }
+call_positional_argument = { expression }
 
-function_positional_argument_list = { function_positional_argument ~ (ws* ~ "," ~ ws* ~ (function_named_argument | function_positional_argument))* }
-function_named_argument_list = { function_named_argument ~ (ws* ~ "," ~ ws* ~ function_named_argument)* }
+call_argument = { call_named_tuple_argument | call_named_argument | call_positional_argument }
 
 //`a = 5.0mm, b = false`: ok
 //`4.0mm, a = false`: ok
-//`a = false, 4.0mm`: error # Positional argument after named argument
-//`a = false, 4.0mm, b = 3.0`: error # Positional argument after named argument
-function_argument_list = { function_positional_argument_list ~ ws* ~ "," ~ ws* ~ function_named_argument_list | function_named_argument_list | function_positional_argument_list }
+//`a = false, 4.0mm`: ok # Positional argument after named argument (Syntactically correct, semantically wrong) 
+call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* }
 
 //`function(a = 3.0mm)`: ok
 //`function(a = 3.0mm, b = 2.0mm)`: ok
 //`a.nested.function(a = 3.0mm, b = 2.0mm)`: ok
-function_call = { qualified_name ~ ws* ~ "(" ~ ws* ~ function_argument_list? ~ ws* ~ ")" }
+call = { qualified_name ~ ws* ~ "(" ~ ws* ~ call_argument_list? ~ ws* ~ ")" }
+
+function_call = { call }
 
 //`r: length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
@@ -275,8 +278,8 @@ module_declaration_argument_list = { ("(" ~ ws* ~ function_declaration_argument_
 //`name := node() {}`: ok
 //`name := node();`: ok
 object_node_statement = { 
-    object_node_id_assignment? ~ (function_call ~ ws*)+ ~ ";" |
-    object_node_id_assignment? ~ (function_call ~ ws*)+ ~ "{" ~ object_node_inner ~ "}" 
+    object_node_id_assignment? ~ (call ~ ws*)+ ~ ";" |
+    object_node_id_assignment? ~ (call ~ ws*)+ ~ "{" ~ object_node_inner ~ "}" 
 }
 object_node_id_assignment = { identifier ~ ws* ~ ":=" ~ ws* }
 object_node_inner = { ws* ~ (statement ~ ws*)* }
