@@ -204,7 +204,11 @@ impl CsglParser {
     }
 
     fn function_argument_list(pairs: Pairs<Rule>) -> Result<Vec<FunctionArgument>, ParseError> {
-        Self::list(pairs, Rule::function_argument, Self::function_argument)
+        Self::list(
+            pairs,
+            Rule::function_named_argument,
+            Self::function_argument,
+        )
     }
 
     fn identifier(pair: Pair<Rule>) -> Result<Identifier, ParseError> {
