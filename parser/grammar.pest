@@ -172,6 +172,9 @@ expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 //`[]`: ok
 list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" }
 
+//`1..4`: ok
+//`a..b`: ok
+range_expression = { expression ~ ws* ~ ".." ~ ws* ~ expression }
 
 tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
 
