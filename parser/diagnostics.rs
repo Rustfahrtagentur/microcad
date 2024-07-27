@@ -10,10 +10,7 @@ pub struct SourceLocation {
 }
 
 impl SourceLocation {
-    pub fn from_pair<'i>(
-        path: impl AsRef<std::path::Path>,
-        pair: pest::iterators::Pair<'i, crate::Rule>,
-    ) -> Self {
+    pub fn from_pair<'i>(path: impl AsRef<std::path::Path>, pair: crate::parser::Pair) -> Self {
         let (line, column) = pair.as_span().start_pos().line_col();
         Self {
             path: std::path::PathBuf::from(path.as_ref()),

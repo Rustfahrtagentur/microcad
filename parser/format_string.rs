@@ -1,5 +1,6 @@
 use crate::eval::{Context, Error, Eval};
 use crate::expression::Expression;
+use crate::parser::*;
 
 #[derive(Default)]
 struct FormatSpec {
@@ -7,10 +8,9 @@ struct FormatSpec {
     leading_zeros: Option<u32>,
 }
 
-impl crate::Parse for FormatSpec {
-    fn parse(pair: pest::iterators::Pair<crate::Rule>) -> Result<Self, crate::ParseError> {
+impl Parse for FormatSpec {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
         let mut opt = FormatSpec::default();
-        use crate::Rule;
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
@@ -30,14 +30,14 @@ impl crate::Parse for FormatSpec {
 
 struct FormatExpression(FormatSpec, Box<Expression>);
 
-impl crate::Parse for FormatExpression {
-    fn parse(pair: pest::iterators::Pair<crate::Rule>) -> Result<Self, crate::ParseError> {
+impl Parse for FormatExpression {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
         let mut fo = FormatSpec::default();
         let mut expr = Expression::default();
         for pair in pair.into_inner() {
             match pair.as_rule() {
-                crate::Rule::format_spec => fo = FormatSpec::parse(pair)?,
-                crate::Rule::expression => expr = Expression::parse(pair)?,
+                Rule::format_spec => fo = FormatSpec::parse(pair)?,
+                Rule::expression => expr = Expression::parse(pair)?,
                 _ => unreachable!(),
             }
         }
@@ -97,18 +97,14 @@ impl Eval for FormatString {
     }
 }
 
-impl crate::Parse for FormatString {
-    fn parse(pair: pest::iterators::Pair<crate::Rule>) -> Result<Self, crate::ParseError> {
+impl Parse for FormatString {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
         let pairs = pair.into_inner();
         let mut fs = Self::default();
         for pair in pairs {
             match pair.as_rule() {
-                crate::Rule::string_literal_inner => {
-                    fs.push_string(pair.as_span().as_str().to_string())
-                }
-                crate::Rule::format_expression => {
-                    fs.push_format_expr(FormatExpression::parse(pair)?)
-                }
+                Rule::string_literal_inner => fs.push_string(pair.as_span().as_str().to_string()),
+                Rule::format_expression => fs.push_format_expr(FormatExpression::parse(pair)?),
                 _ => unreachable!(),
             }
         }
@@ -119,14 +115,13 @@ impl crate::Parse for FormatString {
 
 #[cfg(test)]
 mod tests {
-    use crate::Parse;
 
     use super::*;
 
     #[test]
     fn format_string() {
         use pest::Parser;
-        let pair = crate::CsglParser::parse(crate::Rule::format_string, "\"A{2 + 4}B\"")
+        let pair = crate::parser::Parser::parse(Rule::format_string, "\"A{2 + 4}B\"")
             .unwrap()
             .next()
             .unwrap();

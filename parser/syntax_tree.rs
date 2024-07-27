@@ -1,8 +1,5 @@
-use crate::Rule;
-use crate::{CsglParser, FunctionArgument, FunctionCall, Identifier, QualifiedName};
+use crate::parser::*;
 use core::fmt;
-use pest::iterators::Pairs;
-use std::fmt::write;
 
 pub struct SyntaxNodeInner {
     inner: SyntaxNodeKind,
@@ -121,8 +118,7 @@ impl TreeBuilder {
 
     fn from_str(root: SyntaxNode, input: &str) -> Result<SyntaxNode, Error> {
         use pest::Parser;
-
-        match CsglParser::parse(Rule::r#document, input) {
+        match crate::parser::Parser::parse(Rule::r#document, input) {
             Ok(mut pairs) => {
                 let pairs = pairs.next().unwrap().into_inner();
                 for pair in pairs {
@@ -152,8 +148,9 @@ impl TreeBuilder {
         }
     }
 
-    fn object_node(parent: SyntaxNode, pairs: Pairs<Rule>) -> Option<SyntaxNode> {
-        let object_node_statement = CsglParser::object_node_statement(pairs.clone()).unwrap();
+    fn object_node(parent: SyntaxNode, pairs: Pairs) -> Option<SyntaxNode> {
+        use pest::Parser;
+        let object_node_statement = crate::parser::Parser::object_node_statement(pairs.clone()).unwrap();
         let mut node = parent.clone();
         let id = object_node_statement.ident.as_ref();
 
@@ -278,7 +275,7 @@ impl Depth for SyntaxNode {
 
 #[cfg(test)]
 mod tests {
-    use crate::{units::Unit, Expression};
+    use crate::{expression::Expression, units::Unit};
 
     use super::*;
 

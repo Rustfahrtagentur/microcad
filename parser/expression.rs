@@ -1,13 +1,14 @@
 use crate::eval::{self, Context, Eval};
 use crate::format_string::FormatString;
 use crate::list::ListExpression;
-use crate::{literal::NumberLiteral, CsglParser};
+use crate::literal::NumberLiteral;
+use crate::parser::*;
 use pest::pratt_parser::PrattParser;
 
 lazy_static::lazy_static! {
-    static ref PRATT_PARSER: PrattParser<crate::Rule> = {
+    static ref PRATT_PARSER: PrattParser<Rule> = {
         use pest::pratt_parser::{Assoc::*, Op};
-        use crate::Rule::*;
+        use Rule::*;
 
         // Precedence is defined lowest to highest
         PrattParser::new()
@@ -142,10 +143,8 @@ impl Eval for Expression {
     }
 }
 
-impl crate::Parse for Expression {
-    fn parse(pair: pest::iterators::Pair<crate::Rule>) -> Result<Self, crate::ParseError> {
-        use crate::Rule;
-
+impl Parse for Expression {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
         Ok(PRATT_PARSER
             .map_primary(|primary| match primary.as_rule() {
                 Rule::literal => {
@@ -153,14 +152,14 @@ impl crate::Parse for Expression {
 
                     match inner.as_rule() {
                         Rule::number_literal => {
-                            let number_literal = CsglParser::number_literal(inner).unwrap();
+                            let number_literal = Parser::number_literal(inner).unwrap();
                             Expression::NumberLiteral(number_literal)
                         }
                         rule => unreachable!("Expr::parse expected literal, found {:?}", rule),
                     }
                 }
                 Rule::number_literal => {
-                    let number_literal = CsglParser::number_literal(primary).unwrap();
+                    let number_literal = Parser::number_literal(primary).unwrap();
                     Expression::NumberLiteral(number_literal)
                 }
                 Rule::expression => Self::parse(primary).unwrap(),
@@ -207,12 +206,11 @@ mod tests {
         evaluator: impl FnOnce(&Expression),
     ) {
         use pest::Parser;
-        let pair = CsglParser::parse(crate::Rule::expression, expr)
+        let pair = crate::parser::Parser::parse(Rule::expression, expr)
             .unwrap()
             .next()
             .unwrap();
 
-        use crate::Parse;
         let expr = Expression::parse(pair).unwrap();
         let new_expr = expr.eval(context).unwrap();
 

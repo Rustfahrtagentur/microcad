@@ -1,9 +1,7 @@
 // Resolve a qualified name to a type or value.
 
-use crate::{
-    syntax_tree::{UseAlias, UseStatement},
-    CsglParser, FunctionArgument, Identifier, Parse, ParseError, QualifiedName, Rule,
-};
+use crate::parser::*;
+use crate::syntax_tree::{UseAlias, UseStatement};
 
 pub struct Constructor {
     arguments: Vec<FunctionArgument>,
@@ -14,21 +12,21 @@ pub struct Module {
     constructor: Vec<FunctionArgument>,
 }
 
-impl crate::Parse for UseAlias {
-    fn parse(pair: pest::iterators::Pair<Rule>) -> Result<Self, crate::ParseError> {
+impl Parse for UseAlias {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
         let mut pairs = pair.into_inner();
         let first = pairs.next().unwrap();
         let second = pairs.next().unwrap();
 
         Ok(UseAlias(
-            CsglParser::qualified_name(first)?,
-            CsglParser::identifier(second)?,
+            Parser::qualified_name(first)?,
+            Parser::identifier(second)?,
         ))
     }
 }
 
-impl crate::Parse for UseStatement {
-    fn parse(pair: pest::iterators::Pair<Rule>) -> Result<Self, crate::ParseError> {
+impl Parse for UseStatement {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
         let mut pairs = pair.into_inner();
 
         let first = pairs.next().unwrap();
@@ -36,12 +34,12 @@ impl crate::Parse for UseStatement {
 
         match first.as_rule() {
             Rule::qualified_name_list => {
-                let qualified_name_list = CsglParser::qualified_name_list(first.into_inner())?;
+                let qualified_name_list = Parser::qualified_name_list(first.into_inner())?;
                 if let Some(second) = second {
                     if second.as_rule() == Rule::qualified_name {
                         return Ok(UseStatement::UseFrom(
                             qualified_name_list,
-                            CsglParser::qualified_name(second)?,
+                            Parser::qualified_name(second)?,
                         ));
                     } else {
                         unreachable!();
@@ -53,7 +51,7 @@ impl crate::Parse for UseStatement {
             Rule::qualified_name_all => {
                 if let Some(second) = second {
                     if second.as_rule() == Rule::qualified_name_list {
-                        return Ok(UseStatement::UseAll(CsglParser::qualified_name_list(
+                        return Ok(UseStatement::UseAll(Parser::qualified_name_list(
                             second.into_inner(),
                         )?));
                     } else {
@@ -65,7 +63,7 @@ impl crate::Parse for UseStatement {
                 if let Some(second) = second {
                     return Ok(UseStatement::UseAliasFrom(
                         UseAlias::parse(first)?,
-                        CsglParser::qualified_name(second)?,
+                        Parser::qualified_name(second)?,
                     ));
                 } else {
                     return Ok(UseStatement::UseAlias(UseAlias::parse(first)?));
