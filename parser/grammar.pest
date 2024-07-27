@@ -104,19 +104,19 @@ type_specifier = { ":" ~ ws* ~ type }
 //`[]`: ok # List with elements of arbitrary type
 list_type = { "[" ~ ws* ~ type? ~ ws * ~ "]" }
 
-//`my.array[1]`: ok
-//`my.array[1][2]`: ok # two-dimensional array
-array_type = { qualified_name ~ ws* ~ array_length+ }
+//`[length;3]`: ok # Three-dimensional array 
+//`[4.0mm;2]`: ok # two-dimensional array with default value 0.0mm
+array_type = { "[" ~ (type | expression) ~ ws* ~ array_length ~ ws* ~ "]" }
 
-//`[0]`: ok
-//`[T]`: error # Must be a number
-array_length = { "[" ~ ws* ~ int ~ ws* ~ "]" }
+//`;2`: ok
+//`;2.0mm`: ok # Ok, but expression must evaluate to int
+array_length = { ";" ~ ws* ~ expression }
 
 //`(length,scalar)`: ok # 2 unnamed fields
 //`(a: length, b = 4.0mm)`: ok # No default value for a, but for b
-//`(length, a: length = 4.0mm)`: ok # First argument is unnamed, second is named 
+//`(length, a: length = 4.0mm)`: error # Cannot mix named and unnamed arguments
 //`(a: length = 4.0mm, length)`: error # Unnamed argument followed by named argument
-tuple_type = { "(" ~ ws* ~ (tuple_unnamed_type_list ~ ws* ~ "," ~ ws* ~ tuple_named_type_list | tuple_named_type_list | tuple_unnamed_type_list) ~ ws* ~ ")" }
+tuple_type = { "(" ~ ws* ~ (tuple_named_type_list | tuple_unnamed_type_list) ~ ws* ~ ")" }
 
 //`length,scalar`: ok
 //`length,`: error # Trailing comma
