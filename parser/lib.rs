@@ -192,7 +192,7 @@ impl CsglParser {
         let second = pairs.clone().nth(1).unwrap();
 
         match first.as_rule() {
-            Rule::ident => Ok(FunctionArgument::NamedArgument(
+            Rule::identifier => Ok(FunctionArgument::NamedArgument(
                 Self::identifier(first)?,
                 Self::expression(second)?,
             )),
@@ -204,15 +204,11 @@ impl CsglParser {
     }
 
     fn function_argument_list(pairs: Pairs<Rule>) -> Result<Vec<FunctionArgument>, ParseError> {
-        Self::list(
-            pairs,
-            Rule::function_named_argument,
-            Self::function_argument,
-        )
+        Self::list(pairs, Rule::call_named_argument, Self::function_argument)
     }
 
     fn identifier(pair: Pair<Rule>) -> Result<Identifier, ParseError> {
-        if pair.as_rule() == Rule::ident {
+        if pair.as_rule() == Rule::identifier {
             Ok(Identifier(pair.as_span().as_str().into()))
         } else {
             Err(ParseError::ExpectedIdentifier)
@@ -223,7 +219,7 @@ impl CsglParser {
         let pairs = pair.into_inner();
         Ok(QualifiedName(Self::list::<Identifier>(
             pairs,
-            Rule::ident,
+            Rule::identifier,
             Self::identifier,
         )?))
     }
@@ -240,7 +236,7 @@ impl CsglParser {
                 Rule::qualified_name => {
                     call.qualified_name = Self::qualified_name(pair)?;
                 }
-                Rule::function_argument_list => {
+                Rule::call_argument_list => {
                     call.function_argument_list = Self::function_argument_list(pair.into_inner())?;
                 }
                 _ => unreachable!(),
@@ -274,13 +270,15 @@ impl CsglParser {
                 Rule::object_node_inner => {
                     object_node_statement.has_inner = true;
                 }
-                Rule::function_call => {
+                Rule::call => {
                     let call = Self::function_call(pair.into_inner())?;
                     object_node_statement.calls.push(call);
                 }
                 _ => {
-                    println!("{:?}", pair.as_rule());
-                    unreachable!();
+                    unreachable!(
+                        "Expr::parse expected infix operation, found {:?}",
+                        pair.as_rule()
+                    );
                 }
             }
         }
