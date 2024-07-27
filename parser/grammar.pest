@@ -307,7 +307,7 @@ object_node_primary  =  _{ object_node_nested | qualified_name | "(" ~ object_no
 
 //`name := node() {}`: ok
 //`name := node();`: ok
-object_node_assignment = { identifier ~ ws* ~ ":=" ~ ws* ~ object_node_expression }
+object_node_assignment = { identifier ~ ws* ~ ":=" ~ ws* ~ object_node_statement }
 
 //`return node();`: ok
 //`return node() {}`: ok
