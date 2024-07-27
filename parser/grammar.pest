@@ -94,24 +94,34 @@ qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
 //`int`: ok
 //`[scalar]`: ok # List type
+//`(scalar, scalar)`: Tuple type
 type = { qualified_name | list_type | tuple_type }
 
 //`: scalar`: ok
 //`: <Vec3>`: error
 type_specifier = { ":" ~ ws* ~ type }
 
-//`[scalar]`: ok
+//`[scalar]`: ok list with elements of type `scalar`
 //`[]`: ok # List with elements of arbitrary type
-list_type = { "[" ~ ws* ~ (list_type_array | type?) ~ ws * ~ "]" }
+list_type = { "[" ~ ws* ~ (list_type_array | list_type_map | type)? ~ ws* ~ "]" }
 
 // Array sub type of list type 
 //`length;3`: ok # List with three elements of same type
 //`4.0mm;2`: ok # List with two elements with default value 0.0mm
 list_type_array = { (type | expression) ~ ws* ~ ";" ~ ws* ~ expression }
 
+// Associative list, behaves like a map
+//`length => string`: maps a length to a string
+list_type_map = { type ~ ws* ~ "=>" ~ ws* ~ type }
 
+//`[1, 2, 3]`: ok
+//`[1, 2, 3,]`: error # Trailing comma
+//`[]`: ok
+list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" }
 
-
+//`[0]`: ok # Access first element
+//`["test"]`: ok # Associative lists, access value of `\"test\"`
+list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" } 
 
 //`(length,scalar)`: ok # 2 unnamed fields
 //`(a: length, b = 4.0mm)`: ok # No default value for a, but for b
@@ -129,11 +139,6 @@ tuple_named_type_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_dec
 //`(1.0mm, 2.0mm)`: ok
 //`(1.0mm,)`: error # Trailing comma
 tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
-
-//`.0`: ok
-//`.height`: ok
-//`.=`: error # Neither an identifier nor an integer
-tuple_element_access = { "." ~ ws* ~ (identifier | int) }
 
 //`use a;`: ok  # Import a single module
 //`use ;`: error # Must import at least one module
@@ -174,11 +179,6 @@ primary  =  _{ literal | format_string | qualified_name | list_expression | "(" 
 //`1+2, 4*3, 3.2`: ok
 //`,,`: error # No expression 
 expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
-
-//`[1, 2, 3]`: ok
-//`[1, 2, 3,]`: error # Trailing comma
-//`[]`: ok
-list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" }
 
 //`1..4`: ok
 //`a..b`: ok
