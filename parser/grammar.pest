@@ -12,7 +12,7 @@ digit = _{ '0'..'9' }
 //`_`: ok
 //`1`: error
 //`A`: error # Identifiers are lowercase
-ident = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
+identifier = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
 
 //`PI`: ok
 //`A1`: ok
@@ -21,7 +21,10 @@ ident = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
 //`_`: ok
 //`1`: error
 //`a`: error # Constant identifiers are uppercase
-constant_ident = { (alpha_upper | "_") ~ (alpha_upper | digit | "_")* }
+constant_identifier = { (alpha_upper | "_") ~ (alpha_upper | digit | "_")* }
+
+//`a,b`: ok # A comma-separated list of identifier
+identifier_list = { identifier ~ (ws* ~ "," ~ ws* ~ identifier)*}
 
 //`90.0°`: ok, with `°` unit
 //`5.0mm`: ok, with `mm` unit
@@ -88,7 +91,7 @@ literal = { number_literal | bool_literal | color_literal }
 //`math.PI`: ok # Constant identifiers are allowed
 //`PI`: ok # Single constant identifier
 //`math.PI.PI`: ok # Nested constant identifiers (todo: check if this is allowed) 
-qualified_name = { (ident | constant_ident) ~ ("." ~ (ident | constant_ident))* }
+qualified_name = { (identifier | constant_identifier) ~ ("." ~ (identifier | constant_identifier))* }
 qualified_name_all = { "*" }
 qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
@@ -140,10 +143,14 @@ tuple_named_type_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_dec
 //`(1.0mm,)`: error # Trailing comma
 tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
 
+//`(a,b)`: ok
+//`(a.b,d)`: error # `a.b` is a qualified name and not an identifier
+tuple_identifier = { "(" ~ ws* ~ identifier_list ~ ws* ~ ")" }
+
 //`.0`: ok
 //`.height`: ok
 //`.=`: error # Neither an identifier nor an integer
-tuple_element_access = { "." ~ ws* ~ (ident | int) }
+tuple_element_access = { "." ~ ws* ~ (identifier | int) }
 
 //`use a;`: ok  # Import a single module
 //`use ;`: error # Must import at least one module
@@ -161,7 +168,7 @@ use_statement = { "use" ~ ws+ ~ qualified_name_list ~ ws* ~ ";"
     | "use" ~ ws+ ~ use_alias ~ ws* ~ ";"
     | "use" ~ ws+ ~ use_alias ~ ws+ ~ "from" ~ ws+ ~ qualified_name ~ ws* ~ ";" 
 }
-use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ ident }
+use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 
 //`-5.0mm`: ok # Negate
 //`(a+b)*(c-a)`: ok 
@@ -198,7 +205,7 @@ unary_operator = { "-" }
 default_value = { "=" ~ ws* ~ expression }
 
 //`r = 5.0mm`: ok # Named argument
-function_named_argument = { ident ~ ws* ~ default_value }
+function_named_argument = { identifier ~ ws* ~ default_value }
 
 //`2.0mm`: ok # Positional argument
 function_positional_argument = { expression }
@@ -222,7 +229,7 @@ function_call = { qualified_name ~ ws* ~ "(" ~ ws* ~ function_argument_list? ~ w
 //`r: length`: ok # Default value is not required
 //`r: length = math.PI`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
-variable_declaration = { ident ~ ws* ~ (type_specifier ~ ws* ~ default_value | type_specifier | default_value) }
+variable_declaration = { identifier ~ ws* ~ (type_specifier ~ ws* ~ default_value | type_specifier | default_value) }
 
 //`r: length = 5.0mm;`: ok
 variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
@@ -232,7 +239,7 @@ variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
 //`function foo() { return 5.0mm; }`: error # Function must have specified return type
 //`function foo(a: scalar) -> scalar { return a; }`: ok # Function with arguments
 //`function foo(a: scalar, b: scalar) -> scalar { return b; }`: ok # Function with multiple arguments
-function_declaration = { "function" ~ ws+ ~ ident ~ ws* ~ "(" ~ ws* ~ function_declaration_argument_list? ~ ws* ~ ")" ~ ws* ~ function_declaration_return_value ~ ws* ~ "{" ~ ws* ~ statement* ~ ws* ~ function_return_statement ~ ws* ~ "}" }
+function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ "(" ~ ws* ~ function_declaration_argument_list? ~ ws* ~ ")" ~ ws* ~ function_declaration_return_value ~ ws* ~ "{" ~ ws* ~ statement* ~ ws* ~ function_return_statement ~ ws* ~ "}" }
 
 //`a: scalar`: ok
 function_declaration_argument =  { variable_declaration }
@@ -255,7 +262,7 @@ function_declaration_argument_list = { function_declaration_argument ~ ws* ~ (",
 //`module foo() { module bar() { } }`: ok # Nested module
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
-module_declaration = { "module" ~ ws+ ~ ident ~ ws* ~  
+module_declaration = { "module" ~ ws+ ~ identifier ~ ws* ~  
     module_declaration_argument_list? ~
     "{" ~ ws* ~ (statement ~ ws*)* ~ "}" }
 module_declaration_argument_list = { ("(" ~ ws* ~ function_declaration_argument_list? ~ ws* ~ ")")? ~ ws* }
@@ -271,7 +278,7 @@ object_node_statement = {
     object_node_id_assignment? ~ (function_call ~ ws*)+ ~ ";" |
     object_node_id_assignment? ~ (function_call ~ ws*)+ ~ "{" ~ object_node_inner ~ "}" 
 }
-object_node_id_assignment = { ident ~ ws* ~ ":=" ~ ws* }
+object_node_id_assignment = { identifier ~ ws* ~ ":=" ~ ws* }
 object_node_inner = { ws* ~ (statement ~ ws*)* }
 
 statement = { object_node_statement | use_statement | module_declaration | function_declaration | variable_declaration_statement }
