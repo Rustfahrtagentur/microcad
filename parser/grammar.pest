@@ -26,6 +26,10 @@ constant_identifier = { (alpha_upper | "_") ~ (alpha_upper | digit | "_")* }
 //`a,b`: ok # A comma-separated list of identifier
 identifier_list = { identifier ~ (ws* ~ "," ~ ws* ~ identifier)*}
 
+//`(a,b)`: ok
+//`(a.b,d)`: error # `a.b` is a qualified name and not an identifier
+identifier_tuple = { "(" ~ ws* ~ identifier_list ~ ws* ~ ")" }
+
 //`90.0°`: ok, with `°` unit
 //`5.0mm`: ok, with `mm` unit
 //`90.0`: ok, no unit
@@ -134,7 +138,7 @@ tuple_type = { "(" ~ ws* ~ (tuple_named_type_list | tuple_unnamed_type_list) ~ w
 
 //`length,scalar`: ok
 //`length,`: error # Trailing comma
-tuple_unnamed_type_list = { type ~ ws* ~ ("," ~ type)* }
+tuple_unnamed_type_list = { type ~ (ws* ~ "," ~ ws* ~ type)* }
 
 //`r = 4.0mm, a: type = b, c: scalar`: ok
 tuple_named_type_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_declaration)* }
@@ -142,10 +146,6 @@ tuple_named_type_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_dec
 //`(1.0mm, 2.0mm)`: ok
 //`(1.0mm,)`: error # Trailing comma
 tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
-
-//`(a,b)`: ok
-//`(a.b,d)`: error # `a.b` is a qualified name and not an identifier
-tuple_declaration = { "(" ~ ws* ~ identifier_list ~ ws* ~ ")" }
 
 //`.0`: ok
 //`.height`: ok
@@ -232,7 +232,11 @@ function_call = { call }
 //`r: length`: ok # Default value is not required
 //`r: length = math.PI`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
-variable_declaration = { identifier ~ ws* ~ (type_specifier ~ ws* ~ default_value | type_specifier | default_value) }
+//`(a,b): length`: ok # Tuple idenfifier with same type
+//`(a,b): (length, length)`: ok # Tuple identifier with tuple type
+//`(a,b) = 5.0mm`: ok # Tuple identifier with same default value
+//`(a,b): length = 5.0mm`: ok # Tuple identifier with same type and default value
+variable_declaration = { (identifier | identifier_tuple) ~ ws* ~ (type_specifier ~ ws* ~ default_value | type_specifier | default_value) }
 
 //`r: length = 5.0mm;`: ok
 variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
