@@ -232,7 +232,7 @@ function_call = { call }
 //`r: length`: ok # Default value is not required
 //`r: length = math.PI`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
-//`(a,b): length`: ok # Tuple idenfifier with same type
+//`(a,b): length`: ok # Tuple identifier with same type
 //`(a,b): (length, length)`: ok # Tuple identifier with tuple type
 //`(a,b) = 5.0mm`: ok # Tuple identifier with same default value
 //`(a,b): length = 5.0mm`: ok # Tuple identifier with same type and default value
@@ -253,13 +253,15 @@ variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
 //`function foo(a: scalar) -> scalar { return a; }`: ok # Function with arguments
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
-function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ "(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")" ~ ws* ~ function_declaration_return_value ~ ws* ~ "{" ~ ws* ~ statement* ~ ws* ~ function_return_statement ~ ws* ~ "}" }
+function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ "(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")" ~ ws* ~ function_declaration_return_value ~ ws* ~ "{" ~ ws* ~ function_statement* ~ ws* ~ function_return_statement ~ ws* ~ ws* ~ "}" }
 
 //`a: scalar`: ok
 function_declaration_argument =  { variable_declaration }
 
 //`-> scalar`: ok
 function_declaration_return_value = { "->" ~ ws* ~ type }
+
+function_statement = { variable_declaration | use_statement }
 
 //`return 5.0mm;`: ok
 function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
@@ -283,16 +285,37 @@ module_declaration_argument_list = { ("(" ~ ws* ~ variable_declaration_list? ~ w
 //`translate(x = 5.0mm) { rectangle(width = 5.0); }`: ok
 //`translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
 //`translate(r = 5.0mm) circle(r = 5.0mm);`: ok
+object_node_statement = {
+  object_node_expression ~ ";" |
+  object_node_expression ~ "{" ~ ws* ~ object_node_inner? ~ ws* ~ "}" 
+}
+
+object_node_nested = { (call ~ ws*)+ }
+
+object_node_expression       =   { object_node_unary_op* ~ ws* ~ object_node_primary ~ ws* ~ object_node_postfix* ~ 
+    (ws* ~ object_node_bin_op ~ ws* ~ object_node_unary_op* ~ ws* ~ object_node_primary ~ ws* ~ object_node_postfix)* }
+object_node_bin_op           =  _{ object_node_union | object_node_difference | object_node_intersection | object_node_xor }
+  object_node_union          =   { "|" }
+  object_node_difference     =   { "-" }
+  object_node_intersection   =   { "&" }
+  object_node_xor            =   { "^" }
+object_node_unary_op         =  _{ object_node_unary_neg }
+  object_node_unary_neg      =   { "!" }
+object_node_postfix          =  _{ object_node_access }
+  object_node_access         =   { "." ~ ws* ~ (qualified_name | call) }
+object_node_primary  =  _{ object_node_nested | qualified_name | "(" ~ object_node_expression ~ ")" }
+
 //`name := node() {}`: ok
 //`name := node();`: ok
-object_node_statement = { 
-    object_node_id_assignment? ~ (call ~ ws*)+ ~ ";" |
-    object_node_id_assignment? ~ (call ~ ws*)+ ~ "{" ~ object_node_inner ~ "}" 
-}
-object_node_id_assignment = { identifier ~ ws* ~ ":=" ~ ws* }
-object_node_inner = { ws* ~ (statement ~ ws*)* }
+object_node_assignment = { identifier ~ ws* ~ ":=" ~ ws* ~ object_node_expression }
 
-statement = { object_node_statement | use_statement | module_declaration | function_declaration | variable_declaration_statement }
+//`return node();`: ok
+//`return node() {}`: ok
+object_node_return_statement = { "return" ~ ws* ~ object_node_statement }
+
+object_node_inner = { (statement ~ ws*)+ }
+
+statement = { object_node_assignment | object_node_return_statement | object_node_statement | use_statement | module_declaration | function_declaration | variable_declaration_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 document = { SOI ~ (statement ~ ws* )* ~ EOI }
