@@ -140,6 +140,11 @@ tuple_named_type_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_dec
 //`(1.0mm,)`: error # Trailing comma
 tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
 
+//`.0`: ok
+//`.height`: ok
+//`.=`: error # Neither an identifier nor an integer
+tuple_element_access = { "." ~ ws* ~ (ident | int) }
+
 //`use a;`: ok  # Import a single module
 //`use ;`: error # Must import at least one module
 //`use foo.bar, bar.foo;`: ok # Import multiple modules
