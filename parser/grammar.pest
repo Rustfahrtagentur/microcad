@@ -124,9 +124,16 @@ tuple_type = { "(" ~ ws* ~ (tuple_named_type_list | tuple_unnamed_type_list) ~ w
 tuple_unnamed_type_list = { type ~ ws* ~ ("," ~ type)* }
 
 //`r = 4.0mm, a: type = b, c: scalar`: ok
-tuple_named_type_list = { variable_declaration ~  (ws* ~ "," ~ ws* ~ variable_declaration)* }
+tuple_named_type_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_declaration)* }
 
+//`(1.0mm, 2.0mm)`: ok
+//`(1.0mm,)`: error # Trailing comma
+tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
 
+//`.0`: ok
+//`.height`: ok
+//`.=`: error # Neither an identifier nor an integer
+tuple_element_access = { "." ~ ws* ~ (identifier | int) }
 
 //`use a;`: ok  # Import a single module
 //`use ;`: error # Must import at least one module
@@ -176,8 +183,6 @@ list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" }
 //`1..4`: ok
 //`a..b`: ok
 range_expression = { expression ~ ws* ~ ".." ~ ws* ~ expression }
-
-tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
 
 unary_expression = { unary_operator ~ ws* ~ expression }
 unary_operator = { "-" }
