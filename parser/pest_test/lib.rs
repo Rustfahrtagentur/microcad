@@ -185,11 +185,11 @@ impl PestFile {
     pub fn generate_test_rs(
         &self,
         parser_struct_name: &str,
+        rule_enum_name: &str,
         w: &mut impl std::io::Write,
     ) -> Result<(), std::io::Error> {
         let mut r = RustWriter::new(w);
         r.write("use crate::*;")?;
-        r.write("use pest::Parser;")?;
 
         // Generate tests for each rule
         for rule in &self.rules {
@@ -204,12 +204,12 @@ impl PestFile {
 
             for test in &rule.tests {
                 r.begin_scope("")?;
+                r.writeln("use pest::Parser;")?;
                 r.writeln(&format!("let test_line = {};", test.line.unwrap()))?;
                 r.writeln(std::format!("let input = r#\"{}\"#;", test.source).as_str())?;
                 r.begin_scope(
                     std::format!(
-                        "match {}::parse(Rule::r#{}, input)",
-                        parser_struct_name,
+                        "match {parser_struct_name}::parse({rule_enum_name}::r#{}, input)",
                         rule.name
                     )
                     .as_str(),
@@ -245,7 +245,11 @@ impl PestFile {
     }
 }
 
-pub fn generate(parser_struct_name: &str, grammar_file: impl AsRef<std::path::Path>) {
+pub fn generate(
+    parser_struct_name: &str,
+    rule_enum_name: &str,
+    grammar_file: impl AsRef<std::path::Path>,
+) {
     let out_dir = std::env::var("OUT_DIR").unwrap();
     let dest_path = std::path::Path::new(&out_dir).join("pest_test.rs");
 
@@ -253,6 +257,7 @@ pub fn generate(parser_struct_name: &str, grammar_file: impl AsRef<std::path::Pa
         .unwrap()
         .generate_test_rs(
             parser_struct_name,
+            rule_enum_name,
             &mut std::fs::File::create(dest_path).unwrap(),
         )
         .unwrap();
