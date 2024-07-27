@@ -94,7 +94,7 @@ qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
 //`int`: ok
 //`[scalar]`: ok # List type
-type = { qualified_name | list_type | array_type | tuple_type }
+type = { qualified_name | list_type | tuple_type }
 
 //`: scalar`: ok
 //`: <Vec3>`: error
@@ -102,15 +102,16 @@ type_specifier = { ":" ~ ws* ~ type }
 
 //`[scalar]`: ok
 //`[]`: ok # List with elements of arbitrary type
-list_type = { "[" ~ ws* ~ type? ~ ws * ~ "]" }
+list_type = { "[" ~ ws* ~ (list_type_array | type?) ~ ws * ~ "]" }
 
-//`[length;3]`: ok # Three-dimensional array 
-//`[4.0mm;2]`: ok # two-dimensional array with default value 0.0mm
-array_type = { "[" ~ (type | expression) ~ ws* ~ array_length ~ ws* ~ "]" }
+// Array sub type of list type 
+//`length;3`: ok # List with three elements of same type
+//`4.0mm;2`: ok # List with two elements with default value 0.0mm
+list_type_array = { (type | expression) ~ ws* ~ ";" ~ ws* ~ expression }
 
-//`;2`: ok
-//`;2.0mm`: ok # Ok, but expression must evaluate to int
-array_length = { ";" ~ ws* ~ expression }
+
+
+
 
 //`(length,scalar)`: ok # 2 unnamed fields
 //`(a: length, b = 4.0mm)`: ok # No default value for a, but for b
