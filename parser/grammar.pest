@@ -238,6 +238,12 @@ function_call = { call }
 //`(a,b): length = 5.0mm`: ok # Tuple identifier with same type and default value
 variable_declaration = { (identifier | identifier_tuple) ~ ws* ~ (type_specifier ~ ws* ~ default_value | type_specifier | default_value) }
 
+//`a: scalar, b: scalar`: ok # Multiple arguments
+//`a: scalar, b: scalar = 5.0mm`: ok # Default value for second argument
+//`a: scalar = 5.0mm, b: scalar`: ok # Even first argument can have default value and rest can be positional
+//`(a,b): scalar = 5.0mm, (c,d): length`: ok # Identifier tuples
+variable_declaration_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ function_declaration_argument)* }
+
 //`r: length = 5.0mm;`: ok
 variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
 
@@ -245,8 +251,9 @@ variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
 //`function foo() -> scalar {}`: error # Function must have a return statement
 //`function foo() { return 5.0mm; }`: error # Function must have specified return type
 //`function foo(a: scalar) -> scalar { return a; }`: ok # Function with arguments
-//`function foo(a: scalar, b: scalar) -> scalar { return b; }`: ok # Function with multiple arguments
-function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ "(" ~ ws* ~ function_declaration_argument_list? ~ ws* ~ ")" ~ ws* ~ function_declaration_return_value ~ ws* ~ "{" ~ ws* ~ statement* ~ ws* ~ function_return_statement ~ ws* ~ "}" }
+//`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
+//`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
+function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ "(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")" ~ ws* ~ function_declaration_return_value ~ ws* ~ "{" ~ ws* ~ statement* ~ ws* ~ function_return_statement ~ ws* ~ "}" }
 
 //`a: scalar`: ok
 function_declaration_argument =  { variable_declaration }
@@ -257,11 +264,6 @@ function_declaration_return_value = { "->" ~ ws* ~ type }
 //`return 5.0mm;`: ok
 function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 
-//`a: scalar, b: scalar`: ok # Multiple arguments
-//`a: scalar, b: scalar = 5.0mm`: ok # Default value for second argument
-//`a: scalar = 5.0mm, b: scalar`: ok # Even first argument can have default value and rest can be positional
-function_declaration_argument_list = { function_declaration_argument ~ ws* ~ ("," ~ ws* ~ function_declaration_argument ~ ws*)* }
-
 //`module foo() { }`: ok # Module with no arguments
 //`module foo(a: scalar) { }`: ok # Module with arguments
 //`module foo(a: scalar, b: scalar) { }`: ok # Module with multiple arguments
@@ -269,10 +271,12 @@ function_declaration_argument_list = { function_declaration_argument ~ ws* ~ (",
 //`module foo() { module bar() { } }`: ok # Nested module
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
+//`module cube((x,y,w,h) : length) { }`: ok # Identifier tuples
 module_declaration = { "module" ~ ws+ ~ identifier ~ ws* ~  
     module_declaration_argument_list? ~
     "{" ~ ws* ~ (statement ~ ws*)* ~ "}" }
-module_declaration_argument_list = { ("(" ~ ws* ~ function_declaration_argument_list? ~ ws* ~ ")")? ~ ws* }
+
+module_declaration_argument_list = { ("(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")")? ~ ws* }
 
 //`circle(r = 5.0mm);`: ok
 //`circle(r = 5.0mm) {}`: ok
