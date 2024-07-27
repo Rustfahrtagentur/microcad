@@ -199,10 +199,8 @@ range_expression = { expression ~ ws* ~ ".." ~ ws* ~ expression }
 unary_expression = { unary_operator ~ ws* ~ expression }
 unary_operator = { "-" }
 
-//`= 4.0mm`: ok
-//`= `: error # No expression
-//`= 1 + 2`: ok
-default_value = { "=" ~ ws* ~ expression }
+// Default value collapses to a single expression
+default_value = _{ "=" ~ ws* ~ expression }
 
 //`r = 5.0mm`: ok # Named argument
 call_named_argument = { identifier ~ ws* ~ default_value }
@@ -225,7 +223,7 @@ call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* }
 //`a.nested.function(a = 3.0mm, b = 2.0mm)`: ok
 call = { qualified_name ~ ws* ~ "(" ~ ws* ~ call_argument_list? ~ ws* ~ ")" }
 
-function_call = { call }
+function_call = _{ call }
 
 //`r: length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
@@ -242,7 +240,7 @@ variable_declaration = { (identifier | identifier_tuple) ~ ws* ~ (type_specifier
 //`a: scalar, b: scalar = 5.0mm`: ok # Default value for second argument
 //`a: scalar = 5.0mm, b: scalar`: ok # Even first argument can have default value and rest can be positional
 //`(a,b): scalar = 5.0mm, (c,d): length`: ok # Identifier tuples
-variable_declaration_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ function_declaration_argument)* }
+variable_declaration_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_declaration)* }
 
 //`r: length = 5.0mm;`: ok
 variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
@@ -255,13 +253,10 @@ variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ "(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")" ~ ws* ~ function_declaration_return_value ~ ws* ~ "{" ~ ws* ~ function_statement* ~ ws* ~ function_return_statement ~ ws* ~ ws* ~ "}" }
 
-//`a: scalar`: ok
-function_declaration_argument =  { variable_declaration }
-
 //`-> scalar`: ok
 function_declaration_return_value = { "->" ~ ws* ~ type }
 
-function_statement = { variable_declaration | use_statement }
+function_statement = { variable_declaration_statement | use_statement | function_declaration }
 
 //`return 5.0mm;`: ok
 function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
@@ -303,7 +298,7 @@ object_node_unary_op         =  _{ object_node_unary_neg }
   object_node_unary_neg      =   { "!" }
 object_node_postfix          =  _{ object_node_access }
   object_node_access         =   { "." ~ ws* ~ (qualified_name | call) }
-object_node_primary  =  _{ object_node_nested | qualified_name | "(" ~ object_node_expression ~ ")" }
+object_node_primary          =  _{ object_node_nested | qualified_name | "(" ~ object_node_expression ~ ")" }
 
 //`name := node() {}`: ok
 //`name := node();`: ok
