@@ -123,7 +123,7 @@ tuple_type = { "(" ~ ws* ~ (tuple_unnamed_type_list ~ ws* ~ "," ~ ws* ~ tuple_na
 tuple_unnamed_type_list = { type ~ ws* ~ ("," ~ type)* }
 
 //`r = 4.0mm, a: type = b, c: scalar`: ok
-tuple_named_type_list = { variable_declaration ~ ws* ~ ("," ~ ws* ~ variable_declaration ~ ws*)* }
+tuple_named_type_list = { variable_declaration ~  (ws* ~ "," ~ ws* ~ variable_declaration)* }
 
 
 
@@ -162,11 +162,18 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_not      =   { "!" }
 primary  =  _{ literal | format_string | qualified_name | list_expression | "(" ~ expression ~ ")" }
 
+//`a, b, c`: ok
+//`1+2, 4*3, 3.2`: ok
+//`,,`: error # No expression 
+expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
+
 //`[1, 2, 3]`: ok
 //`[1, 2, 3,]`: error # Trailing comma
 //`[]`: ok
-list_expression = { "[" ~ (ws* ~ expression ~ ws* ~ ("," ~ ws* ~ expression ~ ws*)*)? ~ ws* ~ "]" }
+list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" }
 
+
+tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
 
 unary_expression = { unary_operator ~ ws* ~ expression }
 unary_operator = { "-" }
@@ -177,11 +184,19 @@ unary_operator = { "-" }
 default_value = { "=" ~ ws* ~ expression }
 
 //`r = 5.0mm`: ok # Named argument
+function_named_argument = { ident ~ ws* ~ default_value }
+
 //`2.0mm`: ok # Positional argument
-function_argument = { (ident ~ ws* ~ "=" ~ ws*)? ~ expression }
+function_positional_argument = { expression }
+
+function_positional_argument_list = { function_positional_argument ~ (ws* ~ "," ~ ws* ~ (function_named_argument | function_positional_argument))* }
+function_named_argument_list = { function_named_argument ~ (ws* ~ "," ~ ws* ~ function_named_argument)* }
 
 //`a = 5.0mm, b = false`: ok
-function_argument_list = { function_argument ~ ws* ~ ("," ~ ws* ~ function_argument ~ ws*)* }
+//`4.0mm, a = false`: ok
+//`a = false, 4.0mm`: error # Positional argument after named argument
+//`a = false, 4.0mm, b = 3.0`: error # Positional argument after named argument
+function_argument_list = { function_positional_argument_list ~ ws* ~ "," ~ ws* ~ function_named_argument_list | function_named_argument_list | function_positional_argument_list }
 
 //`function(a = 3.0mm)`: ok
 //`function(a = 3.0mm, b = 2.0mm)`: ok
