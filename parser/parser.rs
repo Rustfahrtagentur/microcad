@@ -105,7 +105,14 @@ impl Parse for IdentifierList {
         Ok(Self(vec))
     }
 }
+impl std::iter::IntoIterator for IdentifierList {
+    type Item = Identifier;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
 
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
 #[derive(Debug, Default, Clone)]
 pub struct QualifiedName(Vec<Identifier>);
 
