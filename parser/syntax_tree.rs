@@ -1,4 +1,6 @@
+use crate::identifier::{Identifier, QualifiedName};
 use crate::parser::*;
+
 use core::fmt;
 
 pub struct SyntaxNodeInner {
@@ -150,7 +152,8 @@ impl TreeBuilder {
 
     fn object_node(parent: SyntaxNode, pairs: Pairs) -> Option<SyntaxNode> {
         use pest::Parser;
-        let object_node_statement = crate::parser::Parser::object_node_statement(pairs.clone()).unwrap();
+        let object_node_statement =
+            crate::parser::Parser::object_node_statement(pairs.clone()).unwrap();
         let mut node = parent.clone();
         let id = object_node_statement.ident.as_ref();
 

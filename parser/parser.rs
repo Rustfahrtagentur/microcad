@@ -5,6 +5,7 @@ use std::str::FromStr;
 pub struct Parser;
 
 use crate::expression::Expression;
+use crate::identifier::{Identifier, QualifiedName};
 use crate::literal::NumberLiteral;
 use crate::units::Unit;
 
@@ -63,93 +64,6 @@ pub struct ObjectNodeStatement {
     pub has_inner: bool,
 }
 
-pub enum Visibility {
-    Private,
-    Public,
-}
-
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-pub struct Identifier(String);
-
-impl Identifier {
-    /// @brief Every identifier starting with '_' is private
-    pub fn visibility(self) -> Visibility {
-        if self.0.starts_with('_') {
-            Visibility::Private
-        } else {
-            Visibility::Public
-        }
-    }
-}
-
-impl From<&str> for Identifier {
-    fn from(value: &str) -> Self {
-        Self(value.to_string())
-    }
-}
-
-impl std::fmt::Display for Identifier {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-pub struct IdentifierList(Vec<Identifier>);
-
-impl Parse for IdentifierList {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
-        let mut vec = Vec::new();
-        for pair in pair.into_inner() {
-            vec.push(Identifier(pair.as_str().into()));
-        }
-        Ok(Self(vec))
-    }
-}
-impl std::iter::IntoIterator for IdentifierList {
-    type Item = Identifier;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter()
-    }
-}
-#[derive(Debug, Default, Clone)]
-pub struct QualifiedName(Vec<Identifier>);
-
-impl std::fmt::Display for QualifiedName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = self
-            .0
-            .iter()
-            .map(|ident| ident.0.clone())
-            .collect::<Vec<_>>()
-            .join(".");
-        write!(f, "{}", s)
-    }
-}
-
-impl From<&str> for QualifiedName {
-    fn from(value: &str) -> Self {
-        let mut name = Vec::new();
-        for ident in value.split('.') {
-            name.push(Identifier(ident.to_string()));
-        }
-        Self(name)
-    }
-}
-
-impl From<QualifiedName> for String {
-    fn from(value: QualifiedName) -> Self {
-        let s = value
-            .0
-            .iter()
-            .map(|ident| ident.0.clone())
-            .collect::<Vec<_>>()
-            .join(".");
-        s
-    }
-}
-
 impl Parser {
     /// @brief Helper function to parse a vector of pairs into a vector of T
     /// @param pairs The pairs to parse
@@ -161,13 +75,10 @@ impl Parser {
         rule: Rule,
         f: impl Fn(Pair) -> Result<T, ParseError>,
     ) -> Result<Vec<T>, ParseError> {
-        let mut vec = Vec::new();
-        for pair in pairs {
-            if pair.as_rule() == rule {
-                vec.push(f(pair).unwrap());
-            }
-        }
-        Ok(vec)
+        Ok(pairs
+            .map(|pair| f(pair))
+            .map(|x| x.unwrap())
+            .collect::<Vec<_>>())
     }
 
     pub fn number_literal(pair: Pair) -> Result<NumberLiteral, ParseError> {
@@ -199,7 +110,7 @@ impl Parser {
 
         match first.as_rule() {
             Rule::identifier => Ok(FunctionArgument::NamedArgument(
-                Self::identifier(first)?,
+                Identifier::parse(first)?,
                 Self::expression(second)?,
             )),
             Rule::expression => Ok(FunctionArgument::PositionalArgument(Self::expression(
@@ -213,25 +124,8 @@ impl Parser {
         Self::list(pairs, Rule::call_named_argument, Self::function_argument)
     }
 
-    pub fn identifier(pair: Pair) -> Result<Identifier, ParseError> {
-        if pair.as_rule() == Rule::identifier {
-            Ok(Identifier(pair.as_span().as_str().into()))
-        } else {
-            Err(ParseError::ExpectedIdentifier)
-        }
-    }
-
-    pub fn qualified_name(pair: Pair) -> Result<QualifiedName, ParseError> {
-        let pairs = pair.into_inner();
-        Ok(QualifiedName(Self::list::<Identifier>(
-            pairs,
-            Rule::identifier,
-            Self::identifier,
-        )?))
-    }
-
     pub fn qualified_name_list(pairs: Pairs) -> Result<Vec<QualifiedName>, ParseError> {
-        Self::list(pairs, Rule::qualified_name, Self::qualified_name)
+        Self::list(pairs, Rule::qualified_name, QualifiedName::parse)
     }
 
     fn function_call(pairs: Pairs) -> Result<FunctionCall, ParseError> {
@@ -240,7 +134,7 @@ impl Parser {
         for pair in pairs {
             match pair.as_rule() {
                 Rule::qualified_name => {
-                    call.qualified_name = Self::qualified_name(pair)?;
+                    call.qualified_name = QualifiedName::parse(pair)?;
                 }
                 Rule::call_argument_list => {
                     call.function_argument_list = Self::function_argument_list(pair.into_inner())?;
@@ -254,7 +148,7 @@ impl Parser {
 
     fn object_node_id_assignment(pairs: Pairs) -> Result<Identifier, ParseError> {
         if let Some(pair) = pairs.peek() {
-            Self::identifier(pair)
+            Identifier::parse(pair)
         } else {
             Err(ParseError::ExpectedIdentifier)
         }

@@ -211,9 +211,9 @@ call_named_argument = { identifier ~ ws* ~ default_value }
 call_named_tuple_argument = { "(" ~ identifier_list ~ ")" ~ ws* ~ default_value }
 
 //`2.0mm`: ok # Positional argument
-call_positional_argument = { expression }
+call_positional_argument = _{ expression }
 
-call_argument = { call_named_tuple_argument | call_named_argument | call_positional_argument }
+call_argument = _{ call_named_tuple_argument | call_named_argument | call_positional_argument }
 
 //`a = 5.0mm, b = false`: ok
 //`4.0mm, a = false`: ok

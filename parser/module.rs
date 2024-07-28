@@ -1,5 +1,6 @@
 // Resolve a qualified name to a type or value.
 
+use crate::identifier::{Identifier, QualifiedName};
 use crate::parser::*;
 use crate::syntax_tree::{UseAlias, UseStatement};
 
@@ -15,12 +16,9 @@ pub struct Module {
 impl Parse for UseAlias {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
         let mut pairs = pair.into_inner();
-        let first = pairs.next().unwrap();
-        let second = pairs.next().unwrap();
-
         Ok(UseAlias(
-            Parser::qualified_name(first)?,
-            Parser::identifier(second)?,
+            QualifiedName::parse(pairs.next().unwrap())?,
+            Identifier::parse(pairs.next().unwrap())?,
         ))
     }
 }
@@ -39,7 +37,7 @@ impl Parse for UseStatement {
                     if second.as_rule() == Rule::qualified_name {
                         return Ok(UseStatement::UseFrom(
                             qualified_name_list,
-                            Parser::qualified_name(second)?,
+                            QualifiedName::parse(second)?,
                         ));
                     } else {
                         unreachable!();
@@ -63,7 +61,7 @@ impl Parse for UseStatement {
                 if let Some(second) = second {
                     return Ok(UseStatement::UseAliasFrom(
                         UseAlias::parse(first)?,
-                        Parser::qualified_name(second)?,
+                        QualifiedName::parse(second)?,
                     ));
                 } else {
                     return Ok(UseStatement::UseAlias(UseAlias::parse(first)?));
