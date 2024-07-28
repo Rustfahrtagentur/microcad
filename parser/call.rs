@@ -112,6 +112,28 @@ impl Parse for CallArgumentList {
     }
 }
 
+#[derive(Default, Clone)]
+pub struct MethodCall {
+    pub name: Identifier,
+    pub argument_list: CallArgumentList,
+}
+
+impl Parse for MethodCall {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let mut pairs = pair.into_inner();
+        println!("{:?}", pairs);
+
+        Ok(MethodCall {
+            name: Identifier::parse(pairs.next().unwrap())?,
+            argument_list: if let Some(pair) = pairs.next() {
+                CallArgumentList::parse(pair)?
+            } else {
+                CallArgumentList::default()
+            },
+        })
+    }
+}
+
 struct Call {
     name: QualifiedName,
     argument_list: CallArgumentList,

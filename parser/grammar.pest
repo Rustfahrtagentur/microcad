@@ -179,7 +179,7 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`a-`: error # Unknown postfix operator `-`
 //`a[2]`: ok # List access
 //`a.b`: ok # Tuple access
-//`a()`: ok # Function call
+//`a.b()`: ok # Method call
 //`[3,5,5]`: ok # List expression
 expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
 bin_op           =  _{ add | subtract | multiply | divide }
@@ -191,7 +191,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_minus    =   { "-" }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
-postfix          =  _{ element_access | call_op }
+postfix          =  _{ method_call | element_access }
 primary          =  _{ literal | format_string | identifier | constant_identifier  | "(" ~ expression ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
@@ -226,6 +226,9 @@ call_argument = _{ call_named_tuple_argument | call_named_argument | call_positi
 call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* }
 
 call_op = _{ "(" ~ ws* ~ call_argument_list? ~ ws* ~ ")" }
+
+//`.sum()`: ok
+method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 
 //`function(a = 3.0mm)`: ok
 //`function(a = 3.0mm, b = 2.0mm)`: ok

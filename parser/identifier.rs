@@ -19,15 +19,15 @@ impl Identifier {
     }
 }
 
-impl Parse for Identifier {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
-        Ok(Self(pair.as_str().into()))
-    }
-}
-
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {
         Self(value.to_string())
+    }
+}
+
+impl Parse for Identifier {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        Ok(Self(pair.as_str().into()))
     }
 }
 

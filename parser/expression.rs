@@ -22,7 +22,7 @@ lazy_static::lazy_static! {
             .op(Op::prefix(unary_not))
             .op(Op::postfix(list_element_access))
             .op(Op::postfix(tuple_element_access))
-            .op(Op::postfix(call_op))
+            .op(Op::postfix(method_call))
     };
 }
 
@@ -77,7 +77,7 @@ pub enum Expression {
     ElementAccess(Box<Expression>, Box<Expression>),
 
     /// First expression must evaluate to `ModuleRef` or `FunctionRef`
-    CallOp(Box<Expression>, crate::call::CallArgumentList),
+    MethodCall(Box<Expression>, crate::call::MethodCall),
 }
 
 impl Expression {}
@@ -181,7 +181,21 @@ impl Eval for Expression {
                     _ => unimplemented!(),
                 }
             }
-            _ => Err(eval::Error::InvalidOperation),
+            Self::MethodCall(lhs, method_call) => {
+                let lhs = lhs.eval(context)?;
+                let name: &str = &method_call.name.to_string();
+
+                match lhs.as_ref() {
+                    Expression::ListExpression(list) => match name {
+                        "len" => Ok(Box::new(Expression::NumberLiteral(
+                            NumberLiteral::from_usize(list.len()),
+                        ))),
+                        _ => Err(eval::Error::InvalidOperation),
+                    },
+                    _ => Err(eval::Error::InvalidOperation),
+                }
+            }
+            _ => unimplemented!(),
         }
     }
 
@@ -254,9 +268,10 @@ impl Parse for Expression {
                 Rule::list_element_access | Rule::tuple_element_access => {
                     Expression::ElementAccess(Box::new(lhs), Box::new(Self::parse(op).unwrap()))
                 }
-                Rule::call_op => {
-                    Expression::CallOp(Box::new(lhs), CallArgumentList::parse(op).unwrap())
-                }
+                Rule::method_call => Expression::MethodCall(
+                    Box::new(lhs),
+                    crate::call::MethodCall::parse(op).unwrap(),
+                ),
                 rule => {
                     unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
                 }
@@ -388,6 +403,13 @@ mod tests {
             if let Err(eval::Error::ListIndexOutOfBounds { index, len }) = e {
                 assert_eq!(index, 3);
                 assert_eq!(len, 3);
+            }
+        });
+
+        // Return the length of a list
+        run_expression_test("[1.0,2.0,3.0].len()", None, |e| {
+            if let Ok(Expression::NumberLiteral(n)) = e {
+                assert_eq!(n.value(), 3.0);
             }
         });
     }

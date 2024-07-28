@@ -9,6 +9,10 @@ use crate::units::Unit;
 pub struct NumberLiteral(pub f64, pub Unit);
 
 impl NumberLiteral {
+    pub fn from_usize(value: usize) -> Self {
+        NumberLiteral(value as f64, Unit::None)
+    }
+
     pub fn ty(&self) -> Type {
         self.1.ty()
     }
