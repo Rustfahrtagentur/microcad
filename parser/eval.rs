@@ -9,6 +9,7 @@ pub enum Error {
     InvalidOperation,
     InvalidFormatString,
     InvalidType,
+    ListIndexOutOfBounds { index: usize, len: usize },
     TypeMismatch,
     EvaluateToStringError,
 }

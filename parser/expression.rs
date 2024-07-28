@@ -20,7 +20,8 @@ lazy_static::lazy_static! {
             .op(Op::prefix(unary_minus))
             .op(Op::prefix(unary_plus))
             .op(Op::prefix(unary_not))
-            .op(Op::postfix(element_access))
+            .op(Op::postfix(list_element_access))
+            .op(Op::postfix(tuple_element_access))
             .op(Op::postfix(call_op))
     };
 }
@@ -161,6 +162,25 @@ impl Eval for Expression {
                     _ => unimplemented!(),
                 }
             }
+            Self::ElementAccess(lhs, rhs) => {
+                let lhs = lhs.eval(context)?;
+                let rhs = rhs.eval(context)?;
+
+                match (lhs.as_ref(), rhs.as_ref()) {
+                    (Expression::ListExpression(list), Expression::NumberLiteral(index)) => {
+                        let index = index.value() as usize;
+                        if index < list.len() {
+                            Ok(Box::new(list.get(index).unwrap().clone()))
+                        } else {
+                            Err(eval::Error::ListIndexOutOfBounds {
+                                index,
+                                len: list.len(),
+                            })
+                        }
+                    }
+                    _ => unimplemented!(),
+                }
+            }
             _ => Err(eval::Error::InvalidOperation),
         }
     }
@@ -231,7 +251,7 @@ impl Parse for Expression {
                 }
             })
             .map_postfix(|lhs, op| match op.as_rule() {
-                Rule::element_access => {
+                Rule::list_element_access | Rule::tuple_element_access => {
                     Expression::ElementAccess(Box::new(lhs), Box::new(Self::parse(op).unwrap()))
                 }
                 Rule::call_op => {
@@ -349,9 +369,17 @@ mod tests {
 
     #[test]
     fn list_expression() {
+        // Simple list expression with 3 elements
         run_expression_test("[1,2,3]", None, |e| {
             if let Expression::ListExpression(list) = e {
                 assert_eq!(list.len(), 3);
+            }
+        });
+
+        // Accessing the third element of a list
+        run_expression_test("[1.0,2.0,3.0][2]", None, |e| {
+            if let Expression::NumberLiteral(n) = e {
+                assert_eq!(n.value(), 3.0);
             }
         });
     }
