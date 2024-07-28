@@ -1,3 +1,4 @@
+use crate::call::CallArgumentList;
 use crate::eval::{self, Context, Eval};
 use crate::format_string::FormatString;
 use crate::list::ListExpression;
@@ -15,6 +16,11 @@ lazy_static::lazy_static! {
             // Addition and subtract have equal precedence
             .op(Op::infix(add, Left) | Op::infix(subtract, Left))
             .op(Op::infix(multiply, Left) | Op::infix(divide, Left))
+            .op(Op::prefix(unary_minus))
+            .op(Op::prefix(unary_plus))
+            .op(Op::prefix(unary_not))
+            .op(Op::postfix(element_access))
+            .op(Op::postfix(call_op))
     };
 }
 
@@ -39,8 +45,6 @@ pub enum Expression {
     /// A list: [a, b, c]
     ListExpression(ListExpression),
 
-    //    ArrayExpression(ArrayExpression),
-
     //    TupleExpression(TupleExpression),
 
     //    FunctionCall(FunctionCall),
@@ -49,7 +53,7 @@ pub enum Expression {
     /// A binary operation: a + b
     BinaryOp {
         lhs: Box<Expression>,
-        /// '+', '-', '/', '*', '=', '!', '<', '>', '≤', '≥', '&', '|'
+        /// '+', '-', '/', '*', '<', '>', '≤', '≥', '&', '|'
         op: char,
         rhs: Box<Expression>,
     },
@@ -60,6 +64,18 @@ pub enum Expression {
         op: char,
         rhs: Box<Expression>,
     },
+
+    /// A reference to a module, syntax node must contain a Module declaration
+    ModuleRef(crate::syntax_tree::SyntaxNode),
+
+    /// A reference to a function, syntax node must contain a Function declaration
+    FunctionRef(crate::syntax_tree::SyntaxNode),
+
+    /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
+    ElementAccess(Box<Expression>, Box<Expression>),
+
+    /// First expression must evaluate to `ModuleRef` or `FunctionRef`
+    CallOp(Box<Expression>, crate::call::CallArgumentList),
 }
 
 /// Rules for operator +
@@ -192,7 +208,17 @@ impl Parse for Expression {
                     rhs: Box::new(rhs),
                 }
             })
-            //            .map_postfix(|op, rhs| {})
+            .map_postfix(|lhs, op| match op.as_rule() {
+                Rule::element_access => {
+                    Expression::ElementAccess(Box::new(lhs), Box::new(Self::parse(op).unwrap()))
+                }
+                Rule::call_op => {
+                    Expression::CallOp(Box::new(lhs), CallArgumentList::parse(op).unwrap())
+                }
+                rule => {
+                    unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
+                }
+            })
             .parse(pair.into_inner()))
     }
 }

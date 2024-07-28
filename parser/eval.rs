@@ -40,3 +40,7 @@ pub trait Eval: Sized {
         }
     }
 }
+
+pub trait EvalTo<T> {
+    fn eval_to(self, context: Option<&Context>) -> Result<T, Error>;
+}

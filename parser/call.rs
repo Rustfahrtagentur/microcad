@@ -44,8 +44,8 @@ impl Parse for CallArgument {
     }
 }
 
-#[derive(Default)]
-struct CallArgumentList {
+#[derive(Default, Clone)]
+pub struct CallArgumentList {
     positional: Vec<Box<Expression>>,
     named: HashMap<Identifier, Box<Expression>>,
 }
