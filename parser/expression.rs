@@ -329,7 +329,7 @@ mod tests {
     fn run_expression_test(
         expr: &str,
         context: Option<&Context>,
-        evaluator: impl FnOnce(&Expression),
+        evaluator: impl FnOnce(Result<Expression, eval::Error>),
     ) {
         use pest::Parser;
         let pair = crate::parser::Parser::parse(Rule::expression, expr)
@@ -338,30 +338,30 @@ mod tests {
             .unwrap();
 
         let expr = Expression::parse(pair).unwrap();
-        let new_expr = expr.eval(context).unwrap();
+        let new_expr = expr.eval(context);
 
-        evaluator(new_expr.as_ref());
+        evaluator(new_expr.map(|e| *e));
     }
 
     #[test]
     fn operators() {
         run_expression_test("4", None, |e| {
-            if let Expression::NumberLiteral(num) = e {
+            if let Ok(Expression::NumberLiteral(num)) = e {
                 assert_eq!(num.value(), 4.0);
             }
         });
         run_expression_test("4 * 4", None, |e| {
-            if let Expression::NumberLiteral(num) = e {
+            if let Ok(Expression::NumberLiteral(num)) = e {
                 assert_eq!(num.value(), 16.0);
             }
         });
         run_expression_test("4 * (4 + 4)", None, |e| {
-            if let Expression::NumberLiteral(num) = e {
+            if let Ok(Expression::NumberLiteral(num)) = e {
                 assert_eq!(num.value(), 32.0);
             }
         });
         run_expression_test("10.0 / 2.5 + 6", None, |e| {
-            if let Expression::NumberLiteral(num) = e {
+            if let Ok(Expression::NumberLiteral(num)) = e {
                 assert_eq!(num.value(), 10.0);
             }
         });
@@ -371,15 +371,23 @@ mod tests {
     fn list_expression() {
         // Simple list expression with 3 elements
         run_expression_test("[1,2,3]", None, |e| {
-            if let Expression::ListExpression(list) = e {
+            if let Ok(Expression::ListExpression(list)) = e {
                 assert_eq!(list.len(), 3);
             }
         });
 
         // Accessing the third element of a list
         run_expression_test("[1.0,2.0,3.0][2]", None, |e| {
-            if let Expression::NumberLiteral(n) = e {
+            if let Ok(Expression::NumberLiteral(n)) = e {
                 assert_eq!(n.value(), 3.0);
+            }
+        });
+
+        // Test out of bounds access
+        run_expression_test("[1.0,2.0,3.0][3]", None, |e| {
+            if let Err(eval::Error::ListIndexOutOfBounds { index, len }) = e {
+                assert_eq!(index, 3);
+                assert_eq!(len, 3);
             }
         });
     }
