@@ -2,7 +2,7 @@ use crate::eval::{Context, Error, Eval};
 use crate::expression::Expression;
 use crate::parser::*;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 struct FormatSpec {
     precision: Option<u32>,
     leading_zeros: Option<u32>,
@@ -28,7 +28,8 @@ impl Parse for FormatSpec {
     }
 }
 
-struct FormatExpression(FormatSpec, Box<Expression>);
+#[derive(Default, Clone)]
+pub struct FormatExpression(FormatSpec, Box<Expression>);
 
 impl Parse for FormatExpression {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
@@ -59,13 +60,14 @@ impl Eval for FormatExpression {
     }
 }
 
+#[derive(Clone)]
 enum FormatStringInner {
     String(String),
     FormatExpression(FormatExpression),
 }
 
 /// Definition and implementation for `StringLiteral`
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct FormatString(Vec<FormatStringInner>);
 
 impl FormatString {

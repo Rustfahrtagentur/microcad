@@ -2,6 +2,7 @@ use crate::langtype::Type;
 use crate::units::Unit;
 
 /// Definition and implementation for `NumberLiteral`
+#[derive(Debug, Clone)]
 pub struct NumberLiteral(pub f64, pub Unit);
 
 impl NumberLiteral {

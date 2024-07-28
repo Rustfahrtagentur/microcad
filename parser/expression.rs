@@ -18,7 +18,7 @@ lazy_static::lazy_static! {
     };
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
@@ -192,6 +192,7 @@ impl Parse for Expression {
                     rhs: Box::new(rhs),
                 }
             })
+            //            .map_postfix(|op, rhs| {})
             .parse(pair.into_inner()))
     }
 }
