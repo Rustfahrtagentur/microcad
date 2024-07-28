@@ -68,7 +68,7 @@ pub enum Visibility {
     Public,
 }
 
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct Identifier(String);
 
 impl Identifier {
@@ -91,6 +91,18 @@ impl From<&str> for Identifier {
 impl std::fmt::Display for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+pub struct IdentifierList(Vec<Identifier>);
+
+impl Parse for IdentifierList {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let mut vec = Vec::new();
+        for pair in pair.into_inner() {
+            vec.push(Identifier(pair.as_str().into()));
+        }
+        Ok(Self(vec))
     }
 }
 
