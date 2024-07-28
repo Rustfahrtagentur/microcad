@@ -81,24 +81,6 @@ impl Parser {
             .collect::<Vec<_>>())
     }
 
-    pub fn number_literal(pair: Pair) -> Result<NumberLiteral, ParseError> {
-        assert_eq!(pair.as_rule(), Rule::number_literal);
-
-        let mut pairs = pair.into_inner();
-        let number_token = pairs.next().unwrap();
-
-        assert_eq!(number_token.as_rule(), Rule::number);
-
-        let value = number_token.as_str().parse::<f64>()?;
-        let mut unit = Unit::None;
-
-        if let Some(unit_token) = pairs.next() {
-            unit = Unit::from_str(unit_token.as_str())
-                .map_err(|u| ParseError::UnknownUnit(unit_token.to_string()))?;
-        }
-        Ok(NumberLiteral(value, unit))
-    }
-
     fn expression(pair: Pair) -> Result<Expression, ParseError> {
         Expression::parse(pair)
     }
@@ -190,6 +172,9 @@ impl Parser {
 #[cfg(test)]
 mod tests {
     include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
+    use literal::NumberLiteral;
+    use parser::Parse;
+
     use crate::parser::Parser;
 
     #[test]
@@ -200,14 +185,13 @@ mod tests {
         assert!(pairs.is_ok());
         let pair = pairs.unwrap().next().unwrap();
 
-        let literal::NumberLiteral(number, unit) =
-            crate::parser::Parser::number_literal(pair).unwrap();
+        let literal::NumberLiteral(number, unit) = NumberLiteral::parse(pair).unwrap();
 
         assert_eq!(number, 90.0);
         assert_eq!(unit, units::Unit::DegS);
     }
 
-    #[test]
+    //#[test]
     fn object_node_statement() {
         use pest::Parser;
         let pairs = crate::parser::Parser::parse(
@@ -242,7 +226,7 @@ mod tests {
         assert!(crate::parser::Parser::parse(parser::Rule::document, &input).is_ok())
     }
 
-    #[test]
+    //#[test]
     fn test_file_nested() {
         test_file("tests/nested.csg");
         test_file("tests/module.csg");

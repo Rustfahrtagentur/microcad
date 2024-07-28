@@ -180,6 +180,7 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`a[2]`: ok # List access
 //`a.b`: ok # Tuple access
 //`a()`: ok # Function call
+//`[3,5,5]`: ok # List expression
 expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
 bin_op           =  _{ add | subtract | multiply | divide }
   add            =   { "+" }
@@ -191,7 +192,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ element_access | call_op }
-primary          =  _{ literal | format_string | identifier | constant_identifier | list_expression | "(" ~ expression ~ ")" | tuple_expression }
+primary          =  _{ literal | format_string | identifier | constant_identifier  | "(" ~ expression ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok

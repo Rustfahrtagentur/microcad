@@ -1,4 +1,5 @@
 use crate::langtype::Type;
+use crate::parser::{Pair, Parse, ParseError, Rule};
 
 macro_rules! declare_units {
     ($( $(#[$m:meta])* $ident:ident = $string:literal -> $ty:ident $(* $factor:expr)? ,)*) => {
@@ -68,4 +69,11 @@ declare_units! {
     Turn = "turn" -> Angle * 360.,
     /// Radians
     Rad = "rad" -> Angle * 360./std::f32::consts::TAU,
+}
+
+impl Parse for Unit {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        use std::str::FromStr;
+        Unit::from_str(pair.as_str()).map_err(|u| ParseError::UnknownUnit(pair.to_string()))
+    }
 }

@@ -1,6 +1,7 @@
 use crate::call::CallArgumentList;
 use crate::eval::{self, Context, Eval};
 use crate::format_string::FormatString;
+use crate::langtype::Type;
 use crate::list::ListExpression;
 use crate::literal::NumberLiteral;
 use crate::parser::*;
@@ -78,6 +79,8 @@ pub enum Expression {
     CallOp(Box<Expression>, crate::call::CallArgumentList),
 }
 
+impl Expression {}
+
 /// Rules for operator +
 impl std::ops::Add for Box<Expression> {
     type Output = Result<Box<Expression>, eval::Error>;
@@ -141,7 +144,11 @@ impl std::ops::Div for Box<Expression> {
 impl Eval for Expression {
     fn eval(self, context: Option<&Context>) -> Result<Box<Self>, eval::Error> {
         match self {
-            Self::NumberLiteral(_) | Self::StringLiteral(_) => Ok(Box::new(self)),
+            Self::NumberLiteral(_) | Self::StringLiteral(_) | Self::BoolLiteral(_) => {
+                Ok(Box::new(self))
+            }
+            Self::FormatString(format_string) => FormatString::eval(format_string, context),
+            Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
             Self::BinaryOp { lhs, op, rhs } => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
@@ -157,6 +164,17 @@ impl Eval for Expression {
             _ => Err(eval::Error::InvalidOperation),
         }
     }
+
+    /// The type this expression will evaluate to
+    fn eval_type(&self, context: Option<&Context>) -> Result<Type, eval::Error> {
+        match &self {
+            Self::NumberLiteral(n) => n.eval_type(context),
+            Self::StringLiteral(_) => Ok(Type::String),
+            Self::BoolLiteral(_) => Ok(Type::Bool),
+            Self::ListExpression(list) => list.eval_type(context),
+            _ => Err(eval::Error::InvalidType),
+        }
+    }
 }
 
 impl Parse for Expression {
@@ -168,17 +186,21 @@ impl Parse for Expression {
 
                     match inner.as_rule() {
                         Rule::number_literal => {
-                            let number_literal = Parser::number_literal(inner).unwrap();
+                            let number_literal = NumberLiteral::parse(inner).unwrap();
                             Expression::NumberLiteral(number_literal)
                         }
                         rule => unreachable!("Expr::parse expected literal, found {:?}", rule),
                     }
                 }
                 Rule::number_literal => {
-                    let number_literal = Parser::number_literal(primary).unwrap();
+                    let number_literal = NumberLiteral::parse(primary).unwrap();
                     Expression::NumberLiteral(number_literal)
                 }
                 Rule::expression => Self::parse(primary).unwrap(),
+                Rule::list_expression => {
+                    println!("Parsing list expression: {}", primary.as_str());
+                    Expression::ListExpression(ListExpression::parse(primary).unwrap())
+                }
                 rule => unreachable!("Expr::parse expected atom, found {:?}", rule),
             })
             .map_infix(|lhs, op, rhs| {
@@ -223,11 +245,68 @@ impl Parse for Expression {
     }
 }
 
+#[derive(Default, Clone)]
+pub struct ExpressionList(Vec<Expression>);
+
+impl ExpressionList {
+    pub fn new(v: Vec<Expression>) -> Self {
+        Self(v)
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    pub fn get(&self, index: usize) -> Option<&Expression> {
+        self.0.get(index)
+    }
+
+    pub fn common_eval_type(&self, context: Option<&Context>) -> Result<Type, crate::eval::Error> {
+        let types = self
+            .0
+            .iter()
+            .map(|expr| expr.eval_type(context))
+            .collect::<Result<Vec<Type>, crate::eval::Error>>()?;
+        Ok(types.into_iter().fold(Type::Invalid, |acc, ty| {
+            if acc == Type::Invalid {
+                ty
+            } else if acc == ty {
+                acc
+            } else {
+                Type::Invalid
+            }
+        }))
+    }
+}
+
+impl IntoIterator for ExpressionList {
+    type Item = Expression;
+    type IntoIter = std::vec::IntoIter<Expression>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
+impl Parse for ExpressionList {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        Ok(Self(
+            pair.into_inner()
+                .map(|pair| Expression::parse(pair))
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn run_operator_test(
+    fn run_expression_test(
         expr: &str,
         context: Option<&Context>,
         evaluator: impl FnOnce(&Expression),
@@ -246,19 +325,33 @@ mod tests {
 
     #[test]
     fn operators() {
-        run_operator_test("4 * 4", None, |e| {
+        run_expression_test("4", None, |e| {
+            if let Expression::NumberLiteral(num) = e {
+                assert_eq!(num.value(), 4.0);
+            }
+        });
+        run_expression_test("4 * 4", None, |e| {
             if let Expression::NumberLiteral(num) = e {
                 assert_eq!(num.value(), 16.0);
             }
         });
-        run_operator_test("4 * (4 + 4)", None, |e| {
+        run_expression_test("4 * (4 + 4)", None, |e| {
             if let Expression::NumberLiteral(num) = e {
                 assert_eq!(num.value(), 32.0);
             }
         });
-        run_operator_test("10.0 / 2.5 + 6", None, |e| {
+        run_expression_test("10.0 / 2.5 + 6", None, |e| {
             if let Expression::NumberLiteral(num) = e {
                 assert_eq!(num.value(), 10.0);
+            }
+        });
+    }
+
+    #[test]
+    fn list_expression() {
+        run_expression_test("[1,2,3]", None, |e| {
+            if let Expression::ListExpression(list) = e {
+                assert_eq!(list.len(), 3);
             }
         });
     }

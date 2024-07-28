@@ -1,12 +1,15 @@
 use std::collections::HashMap;
 
 use crate::expression::Expression;
+use crate::langtype::Type;
 use crate::syntax_tree::SyntaxNode;
 
 #[derive(Debug)]
 pub enum Error {
     InvalidOperation,
     InvalidFormatString,
+    InvalidType,
+    TypeMismatch,
     EvaluateToStringError,
 }
 
@@ -27,18 +30,23 @@ impl Context {
 }
 
 pub trait Eval: Sized {
+    /// Evaluate the type into an expression
     fn eval(self, context: Option<&Context>) -> Result<Box<Expression>, Error>;
 
+    /// Evaluate the type into a string, TODO remove this and implement Display for Expression
     fn eval_to_string(self, context: Option<&Context>) -> Result<String, Error> {
         let result = self.eval(context)?;
         match result.as_ref() {
             Expression::NumberLiteral(n) => Ok(n.to_string()),
             Expression::BoolLiteral(b) => Ok(b.to_string()),
             Expression::StringLiteral(s) => Ok(s.clone()),
-            //Expression::ListExpression(list) => list.eval_to_string(context)?,
+            Expression::ListExpression(list) => list.clone().eval_to_string(context),
             _ => Err(Error::EvaluateToStringError),
         }
     }
+
+    /// The expected destination type after evaluation
+    fn eval_type(&self, context: Option<&Context>) -> Result<Type, crate::eval::Error>;
 }
 
 pub trait EvalTo<T> {

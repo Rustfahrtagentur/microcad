@@ -1,4 +1,7 @@
+use crate::eval;
+use crate::expression::Expression;
 use crate::langtype::Type;
+use crate::parser::{Pair, Parse, ParseError, Rule};
 use crate::units::Unit;
 
 /// Definition and implementation for `NumberLiteral`
@@ -101,5 +104,37 @@ impl std::ops::Div for &NumberLiteral {
 impl ToString for NumberLiteral {
     fn to_string(&self) -> String {
         format!("{}{}", self.0.to_string(), self.1)
+    }
+}
+
+impl Parse for NumberLiteral {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        assert_eq!(pair.as_rule(), Rule::number_literal);
+
+        let mut pairs = pair.into_inner();
+        let number_token = pairs.next().unwrap();
+
+        assert_eq!(number_token.as_rule(), Rule::number);
+
+        let value = number_token.as_str().parse::<f64>()?;
+        let mut unit = Unit::None;
+
+        if let Some(unit_token) = pairs.next() {
+            unit = Unit::parse(unit_token)?;
+        }
+        Ok(NumberLiteral(value, unit))
+    }
+}
+
+impl eval::Eval for NumberLiteral {
+    fn eval(self, _: Option<&eval::Context>) -> Result<Box<Expression>, eval::Error> {
+        Ok(Box::new(Expression::NumberLiteral(NumberLiteral(
+            self.value(),
+            self.1.ty().default_unit(),
+        ))))
+    }
+
+    fn eval_type(&self, _: Option<&eval::Context>) -> Result<Type, eval::Error> {
+        Ok(self.1.ty())
     }
 }

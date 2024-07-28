@@ -58,6 +58,13 @@ impl Eval for FormatExpression {
             _ => expr.eval_to_string(context),
         }
     }
+
+    fn eval_type(
+        &self,
+        context: Option<&Context>,
+    ) -> Result<crate::langtype::Type, crate::eval::Error> {
+        Ok(crate::langtype::Type::String)
+    }
 }
 
 #[derive(Clone)]
@@ -96,6 +103,13 @@ impl Eval for FormatString {
             }
         }
         Ok(Box::new(Expression::StringLiteral(result)))
+    }
+
+    fn eval_type(
+        &self,
+        context: Option<&Context>,
+    ) -> Result<crate::langtype::Type, crate::eval::Error> {
+        Ok(crate::langtype::Type::String)
     }
 }
 
