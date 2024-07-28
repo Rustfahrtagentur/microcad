@@ -175,7 +175,7 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`a + b + c`: ok 
 //`! a`: ok # Unary operator with whitespace 
 //`a-`: error # Unknown postfix operator `-`
-expression       =   { unary_op* ~ ws* ~ primary ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary)* }
+expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix? ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix?)* }
 bin_op           =  _{ add | subtract | multiply | divide }
   add            =   { "+" }
   subtract       =   { "-" }
@@ -185,6 +185,8 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_minus    =   { "-" }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
+postfix          =  _{ postfix_call }
+  postfix_call   =   { "." ~ call }
 primary  =  _{ literal | format_string | qualified_name | list_expression | "(" ~ expression ~ ")" | tuple_expression }
 
 //`a, b, c`: ok
@@ -245,6 +247,11 @@ variable_declaration_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable
 //`r: length = 5.0mm;`: ok
 variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
 
+//`PI = 3.14159`: ok
+constant_declaration = { constant_identifier ~ ws* ~ (type_specifier ~ ws* ~ default_value | type_specifier | default_value) }
+
+constant_declaration_statement = _{ constant_declaration ~ ws* ~ ";" }
+
 //`function foo() -> scalar { return math.PI; }`: ok
 //`function foo() -> scalar {}`: error # Function must have a return statement
 //`function foo() { return 5.0mm; }`: error # Function must have specified return type
@@ -256,7 +263,7 @@ function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ "(" ~ ws* ~ varia
 //`-> scalar`: ok
 function_declaration_return_value = { "->" ~ ws* ~ type }
 
-function_statement = { variable_declaration_statement | use_statement | function_declaration }
+function_statement = { variable_declaration_statement | constant_declaration_statement | use_statement | function_declaration }
 
 //`return 5.0mm;`: ok
 function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
@@ -310,7 +317,7 @@ object_node_return_statement = { "return" ~ ws* ~ object_node_statement }
 
 object_node_inner = { (statement ~ ws*)+ }
 
-statement = { object_node_assignment | object_node_return_statement | object_node_statement | use_statement | module_declaration | function_declaration | variable_declaration_statement }
+statement = { object_node_assignment | object_node_return_statement | object_node_statement | use_statement | module_declaration | function_declaration | variable_declaration_statement | constant_declaration_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 document = { SOI ~ (statement ~ ws* )* ~ EOI }
