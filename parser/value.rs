@@ -238,6 +238,44 @@ pub enum Value {
     Node(SyntaxNode),
 }
 
+impl Value {
+    pub fn less_than(self, rhs: Self) -> Result<bool, ValueError> {
+        match (self, rhs) {
+            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs < rhs),
+            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs < rhs),
+            (Value::Length(lhs), Value::Length(rhs)) => Ok(lhs < rhs),
+            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.length() < rhs.length()),
+            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.length() < rhs.length()),
+            (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs < rhs),
+            _ => Err(ValueError::InvalidOperation('<')),
+        }
+    }
+
+    pub fn greater_than(self, rhs: Self) -> Result<bool, ValueError> {
+        match (self, rhs) {
+            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs > rhs),
+            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs > rhs),
+            (Value::Length(lhs), Value::Length(rhs)) => Ok(lhs > rhs),
+            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.length() > rhs.length()),
+            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.length() > rhs.length()),
+            (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs > rhs),
+            _ => Err(ValueError::InvalidOperation('>')),
+        }
+    }
+
+    pub fn less_than_or_equal(self, rhs: Self) -> Result<bool, ValueError> {
+        match (self, rhs) {
+            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs <= rhs),
+            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs <= rhs),
+            (Value::Length(lhs), Value::Length(rhs)) => Ok(lhs <= rhs),
+            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.length() <= rhs.length()),
+            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.length() <= rhs.length()),
+            (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs <= rhs),
+            _ => Err(ValueError::InvalidOperation('<')),
+        }
+    }
+}
+
 impl Ty for Value {
     fn ty(&self) -> Type {
         match self {
@@ -370,19 +408,6 @@ impl std::ops::Div for Value {
             (Value::Length(lhs), Value::Scalar(rhs)) => Ok(Value::Length(lhs / rhs)),
             (Value::Angle(lhs), Value::Scalar(rhs)) => Ok(Value::Angle(lhs / rhs)),
             _ => Err(ValueError::InvalidOperation('/')),
-        }
-    }
-}
-
-/// Rules for operators <, <=, ==, >=, >
-impl std::cmp::PartialOrd for Value {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        match (self, other) {
-            (Value::Integer(lhs), Value::Integer(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Length(lhs), Value::Length(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Angle(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
-            _ => None,
         }
     }
 }

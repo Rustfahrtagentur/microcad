@@ -104,6 +104,10 @@ impl Eval for Expression {
                     '-' => lhs - rhs,
                     '*' => lhs * rhs,
                     '/' => lhs / rhs,
+                    '>' => lhs.greater_than(rhs).map(Value::Bool),
+                    '<' => lhs.less_than(rhs).map(Value::Bool),
+                    '=' => Ok(Value::Bool(lhs.eq(&rhs))),
+                    '≠' => Ok(Value::Bool(!lhs.eq(&rhs))),
                     _ => unimplemented!(),
                 }
                 .map_err(eval::Error::ValueError)
@@ -420,7 +424,11 @@ mod tests {
                 assert_eq!(num, 9.0);
             }
         });
-
+        run_expression_test("a < b", Some(&context), |e| {
+            if let Ok(Value::Bool(b)) = e {
+                assert!(b);
+            }
+        });
         run_expression_test("a + b + c", Some(&context), |e| {
             if let Err(eval::Error::UnknownIdentifier(identifier)) = e {
                 assert_eq!(identifier, "c".into());
