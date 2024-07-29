@@ -270,6 +270,8 @@ variable_declaration = { (identifier | identifier_tuple) ~ ws* ~ (type_specifier
 //`(a,b): scalar = 5.0mm, (c,d): length`: ok # Identifier tuples
 variable_declaration_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_declaration)* }
 
+argument_list = _{ "(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")" }
+
 //`r: length = 5.0mm;`: ok
 variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
 
@@ -279,7 +281,7 @@ constant_declaration = { constant_identifier ~ ws* ~ (type_specifier ~ ws* ~ def
 constant_declaration_statement = _{ constant_declaration ~ ws* ~ ";" }
 
 //`(a: scalar) -> scalar`: ok # Function signature with arguments
-function_signature = { "(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")" ~ ws* ~ "->" ~ ws* ~ type }
+function_signature = { argument_list ~ ws* ~ "->" ~ ws* ~ type }
 
 //`function foo() -> scalar { return math.PI; }`: ok
 //`function foo() -> scalar {}`: error # Function must have a return statement
@@ -288,7 +290,6 @@ function_signature = { "(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")" ~ ws* 
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ "{" ~ ws* ~ function_statement* ~ ws* ~ function_return_statement ~ ws* ~ ws* ~ "}" }
-
 
 function_statement = { variable_declaration_statement | constant_declaration_statement | use_statement | function_declaration }
 
@@ -307,7 +308,7 @@ module_declaration = { "module" ~ ws+ ~ identifier ~ ws* ~
     module_declaration_argument_list? ~
     "{" ~ ws* ~ module_node_inner? ~ "}" }
 
-module_declaration_argument_list = { ("(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")")? ~ ws* }
+module_declaration_argument_list = { argument_list? ~ ws* }
 
 //`circle(r = 5.0mm);`: ok
 //`circle(r = 5.0mm) {}`: ok
@@ -345,6 +346,8 @@ module_node_assignment = { identifier ~ ws* ~ ":=" ~ ws* ~ module_node_statement
 //`return node();`: ok
 //`return node() {}`: ok
 module_node_return_statement = { "return" ~ ws* ~ module_node_statement }
+
+module_node_init_statement = { "init" ~ ws* ~ argument_list ~ ws* ~ "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
 
 module_node_inner = { (module_statement ~ ws*)+ }
 

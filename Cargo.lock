@@ -76,24 +76,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "csg-parser"
-version = "0.1.0"
-dependencies = [
- "log",
- "pest",
- "pest_derive",
- "pest_test",
- "rctree",
-]
-
-[[package]]
 name = "csg-tree"
 version = "0.1.0"
 dependencies = [
- "csg-parser",
  "geo",
  "log",
  "rctree",
+ "ucad-parser",
 ]
 
 [[package]]
@@ -121,6 +110,15 @@ name = "either"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3dca9240753cf90908d7e4aac30f630662b02aebaa1b58a3cadabdb23385b58b"
+
+[[package]]
+name = "euclid"
+version = "0.22.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0f0eb73b934648cd7a4a61f1b15391cd95dab0b4da6e2e66c2a072c144b4a20"
+dependencies = [
+ "num-traits",
+]
 
 [[package]]
 name = "float_next_after"
@@ -213,6 +211,12 @@ checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
 dependencies = [
  "either",
 ]
+
+[[package]]
+name = "lazy_static"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "libc"
@@ -439,6 +443,19 @@ name = "typenum"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
+
+[[package]]
+name = "ucad-parser"
+version = "0.1.0"
+dependencies = [
+ "euclid",
+ "lazy_static",
+ "log",
+ "pest",
+ "pest_derive",
+ "pest_test",
+ "rctree",
+]
 
 [[package]]
 name = "ucd-trie"

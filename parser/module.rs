@@ -1,9 +1,12 @@
 // Resolve a qualified name to a type or value.
 
+use std::task::Context;
+
 use pest::pratt_parser::PrattParser;
 
 use crate::identifier::{Identifier, QualifiedName};
 use crate::parser::*;
+use crate::syntax_tree::SyntaxNode;
 
 lazy_static::lazy_static! {
     static ref PRATT_PARSER: PrattParser<Rule> = {
@@ -46,6 +49,32 @@ pub struct Module {
     name: Identifier,
     constructor: Vec<FunctionArgument>,
 }
+
+/*
+trait ParseNode {
+    fn parse_node(pair: Pair, root: SyntaxNode) -> Result<Self, ParseError>;
+}
+
+trait Build {
+    fn build(
+        self,
+        node: SyntaxNode,
+        context: &mut Context,
+    ) -> Result<crate::tree::Node, ParseError>;
+}
+
+fn build(root: SyntaxNode) -> Result<crate::tree::Node, BuildError> {
+    let mut context = Context::default();
+    let mut tree = Tree::default();
+
+    for node in root.children() {
+        tree.append_node(node);
+    }
+
+    Ok(node)
+}
+
+*/
 
 pub struct UseAlias(pub QualifiedName, pub Identifier);
 

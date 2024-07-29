@@ -1,6 +1,6 @@
 [package]
-name = "csg-parser"
-description = "A parser for the CSG language"
+name = "ucad-parser"
+description = "A parser for the µCAD language"
 edition.workspace = true
 rust-version.workspace = true
 version.workspace = true

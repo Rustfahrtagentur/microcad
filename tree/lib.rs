@@ -1,7 +1,7 @@
 mod algorithm;
 mod primitive2d;
 
-use csg_parser::syntax_tree::{SyntaxNode, SyntaxNodeKind};
+use ucad_parser::syntax_tree::{SyntaxNode, SyntaxNodeKind};
 
 pub enum NodeInner {
     /// Root Node

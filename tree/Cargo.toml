@@ -13,4 +13,4 @@ log = "0.4"
 rctree = "0.6"
 geo = "0.28"
 
-csg-parser = { path = "../parser" }
+ucad-parser = { path = "../parser" }
