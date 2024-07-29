@@ -104,8 +104,10 @@ impl Eval for Expression {
                     '-' => lhs - rhs,
                     '*' => lhs * rhs,
                     '/' => lhs / rhs,
-                    '>' => lhs.greater_than(rhs).map(Value::Bool),
-                    '<' => lhs.less_than(rhs).map(Value::Bool),
+                    '>' => lhs.greater_than(&rhs).map(Value::Bool),
+                    '<' => lhs.less_than(&rhs).map(Value::Bool),
+                    '≤' => lhs.less_than_or_equal(&rhs).map(Value::Bool),
+                    '≥' => lhs.greater_than_or_equal(&rhs).map(Value::Bool),
                     '=' => Ok(Value::Bool(lhs.eq(&rhs))),
                     '≠' => Ok(Value::Bool(!lhs.eq(&rhs))),
                     _ => unimplemented!(),
@@ -432,6 +434,32 @@ mod tests {
         run_expression_test("a + b + c", Some(&context), |e| {
             if let Err(eval::Error::UnknownIdentifier(identifier)) = e {
                 assert_eq!(identifier, "c".into());
+            }
+        });
+    }
+
+    #[test]
+    fn nested_context() {
+        let mut context = Context::default();
+        context.insert("a", Value::Scalar(4.0));
+        context.insert("b", Value::Scalar(5.0));
+
+        // Enter a new scope
+        context.push();
+        context.insert("a", Value::String("Hello".into()));
+        context.insert("b", Value::String("World".into()));
+
+        run_expression_test("a + b", Some(&context), |e| {
+            if let Ok(Value::String(s)) = e {
+                assert_eq!(&s, "HelloWorld");
+            }
+        });
+
+        context.pop();
+
+        run_expression_test("a + b", Some(&context), |e| {
+            if let Ok(Value::Scalar(num)) = e {
+                assert_eq!(num, 9.0);
             }
         });
     }

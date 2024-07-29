@@ -239,7 +239,7 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn less_than(self, rhs: Self) -> Result<bool, ValueError> {
+    pub fn less_than(&self, rhs: &Self) -> Result<bool, ValueError> {
         match (self, rhs) {
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs < rhs),
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs < rhs),
@@ -251,7 +251,7 @@ impl Value {
         }
     }
 
-    pub fn greater_than(self, rhs: Self) -> Result<bool, ValueError> {
+    pub fn greater_than(&self, rhs: &Self) -> Result<bool, ValueError> {
         match (self, rhs) {
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs > rhs),
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs > rhs),
@@ -263,16 +263,12 @@ impl Value {
         }
     }
 
-    pub fn less_than_or_equal(self, rhs: Self) -> Result<bool, ValueError> {
-        match (self, rhs) {
-            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs <= rhs),
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs <= rhs),
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(lhs <= rhs),
-            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.length() <= rhs.length()),
-            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.length() <= rhs.length()),
-            (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs <= rhs),
-            _ => Err(ValueError::InvalidOperation('<')),
-        }
+    pub fn less_than_or_equal(&self, rhs: &Self) -> Result<bool, ValueError> {
+        Ok(self.less_than(rhs)? || self.eq(rhs))
+    }
+
+    pub fn greater_than_or_equal(&self, rhs: &Self) -> Result<bool, ValueError> {
+        Ok(self.greater_than(rhs)? || self.eq(rhs))
     }
 }
 
