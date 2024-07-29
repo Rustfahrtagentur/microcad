@@ -190,6 +190,14 @@ impl Parse for Expression {
                     Rule::subtract => '-',
                     Rule::multiply => '*',
                     Rule::divide => '/',
+                    Rule::greater_than => '>',
+                    Rule::less_than => '<',
+                    Rule::less_equal => '≤',
+                    Rule::greater_equal => '≥',
+                    Rule::equal => '=',
+                    Rule::not_equal => '≠',
+                    Rule::and => '&',
+
                     rule => unreachable!("Expr::parse expected infix operation, found {:?}", rule),
                 };
                 Expression::BinaryOp {
@@ -357,6 +365,30 @@ mod tests {
         run_expression_test("[1.0,2.0,3.0].len()", None, |e| {
             if let Ok(Value::Integer(n)) = e {
                 assert_eq!(n, 3);
+            }
+        });
+    }
+
+    #[test]
+    fn conditions() {
+        run_expression_test("4 < 5", None, |e| {
+            if let Ok(Value::Bool(b)) = e {
+                assert_eq!(b, true);
+            }
+        });
+        run_expression_test("4 > 5", None, |e| {
+            if let Ok(Value::Bool(b)) = e {
+                assert_eq!(b, false);
+            }
+        });
+        run_expression_test("4 == 5", None, |e| {
+            if let Ok(Value::Bool(b)) = e {
+                assert_eq!(b, false);
+            }
+        });
+        run_expression_test("4 != 5", None, |e| {
+            if let Ok(Value::Bool(b)) = e {
+                assert_eq!(b, true);
             }
         });
     }

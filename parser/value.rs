@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use crate::{
     identifier::Identifier,
     langtype::{Ty, Type},
+    syntax_tree::SyntaxNode,
 };
 
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -232,6 +233,8 @@ pub enum Value {
     NamedTuple(NamedTuple),
 
     UnnamedTuple(UnnamedTuple),
+    // TODO: Add syntax node as value
+    //Node(SyntaxNode)
 }
 
 impl Ty for Value {
@@ -359,6 +362,19 @@ impl std::ops::Div for Value {
             (Value::Length(lhs), Value::Scalar(rhs)) => Ok(Value::Length(lhs / rhs)),
             (Value::Angle(lhs), Value::Scalar(rhs)) => Ok(Value::Angle(lhs / rhs)),
             _ => Err(ValueError::InvalidOperation('/')),
+        }
+    }
+}
+
+/// Rules for operators <, <=, ==, >=, >
+impl std::cmp::PartialOrd for Value {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        match (self, other) {
+            (Value::Integer(lhs), Value::Integer(rhs)) => lhs.partial_cmp(rhs),
+            (Value::Scalar(lhs), Value::Scalar(rhs)) => lhs.partial_cmp(rhs),
+            (Value::Length(lhs), Value::Length(rhs)) => lhs.partial_cmp(rhs),
+            (Value::Angle(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
+            _ => None,
         }
     }
 }

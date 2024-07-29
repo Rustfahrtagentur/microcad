@@ -14,6 +14,7 @@ pest_derive = "2.7"
 log = "0.4"
 rctree = "0.6.0"
 lazy_static = "1.5"
+euclid = "0.22.10"
 
 [build-dependencies]
 pest_test = { path = "pest_test" }

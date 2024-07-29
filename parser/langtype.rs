@@ -46,7 +46,8 @@ pub enum Type {
 
     NamedTuple(HashMap<Identifier, Type>),
 
-    QualifiedName(QualifiedName),
+    /// A node in the syntax tree
+    Node(QualifiedName),
 }
 
 impl Type {
@@ -108,7 +109,7 @@ impl std::fmt::Display for Type {
                 }
                 write!(f, ")")
             }
-            Self::QualifiedName(qn) => write!(f, "{}", qn),
+            Self::Node(qn) => write!(f, "{}", qn),
         }
     }
 }

@@ -190,6 +190,16 @@ bin_op           =  _{ add | subtract | multiply | divide }
   subtract       =   { "-" }
   multiply       =   { "*" }
   divide         =   { "/" }
+  greater_than   =   { ">" }
+  less_than      =   { "<" }
+  greater_equal  =   { ">=" }
+  less_equal     =   { "<=" }
+  equal          =   { "==" }
+  not_equal      =   { "!=" }
+  and            =   { "and" }
+  or             =   { "or" }
+  xor            =   { "xor" }
+  
 unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_minus    =   { "-" }
   unary_plus     =   { "+" }
