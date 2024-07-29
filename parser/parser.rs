@@ -18,6 +18,7 @@ pub enum ParseError {
     ObjectNodeAtLeastOneCall,
     InvalidUseStatement,
     ParseFloatError(std::num::ParseFloatError),
+    ParseIntError(std::num::ParseIntError),
     UnknownUnit(String),
     UnexpectedToken,
 }
@@ -25,6 +26,12 @@ pub enum ParseError {
 impl From<std::num::ParseFloatError> for ParseError {
     fn from(value: std::num::ParseFloatError) -> Self {
         Self::ParseFloatError(value)
+    }
+}
+
+impl From<std::num::ParseIntError> for ParseError {
+    fn from(value: std::num::ParseIntError) -> Self {
+        Self::ParseIntError(value)
     }
 }
 

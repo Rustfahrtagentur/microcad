@@ -15,6 +15,9 @@ impl NumberLiteral {
     }
 
     pub fn ty(&self) -> Type {
+        if self.1 == Unit::None && self.0.fract() == 0.0 {
+            return Type::Integer;
+        }
         self.1.ty()
     }
 
@@ -70,15 +73,6 @@ impl std::ops::Mul for NumberLiteral {
 
     fn mul(self, rhs: Self) -> Self::Output {
         match (self.ty(), rhs.ty()) {
-            (Type::Scalar, Type::Scalar) => {
-                Some(NumberLiteral(self.value() * rhs.value(), Unit::None))
-            }
-            (Type::Angle, Type::Scalar) | (Type::Scalar, Type::Angle) => {
-                Some(NumberLiteral(self.value() * rhs.value(), Unit::Deg))
-            }
-            (Type::Length, Type::Scalar) | (Type::Scalar, Type::Length) => {
-                Some(NumberLiteral(self.value() * rhs.value(), Unit::Mm))
-            }
             _ => None,
         }
     }
@@ -116,6 +110,7 @@ impl Parse for NumberLiteral {
         assert_eq!(number_token.as_rule(), Rule::number);
 
         let value = number_token.as_str().parse::<f64>()?;
+
         let mut unit = Unit::None;
 
         if let Some(unit_token) = pairs.next() {
@@ -127,10 +122,15 @@ impl Parse for NumberLiteral {
 
 impl eval::Eval for NumberLiteral {
     fn eval(self, _: Option<&eval::Context>) -> Result<Value, crate::eval::Error> {
-        Ok(Value::Number(crate::literal::NumberLiteral(
-            self.value(),
-            self.1.ty().default_unit(),
-        )))
+        let v = self.value();
+
+        match self.1.ty() {
+            Type::Integer => Ok(Value::Integer(v as i64)),
+            Type::Scalar => Ok(Value::Scalar(v)),
+            Type::Angle => Ok(Value::Angle(v)),
+            Type::Length => Ok(Value::Length(v)),
+            _ => unreachable!(),
+        }
     }
 
     fn eval_type(&self, _: Option<&eval::Context>) -> Result<Type, eval::Error> {

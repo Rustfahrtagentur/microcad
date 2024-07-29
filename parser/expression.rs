@@ -33,8 +33,8 @@ pub enum Expression {
     #[default]
     Invalid,
 
-    /// A string literal. The .0 is the content of the string, without the quotes
-    StringLiteral(String),
+    /// Integer literal: 4, 3, 0
+    IntegerLiteral(i64),
 
     /// Number with an optional unit: 4.0mm, 3.0
     NumberLiteral(NumberLiteral),
@@ -86,8 +86,8 @@ impl Expression {}
 impl Eval for Expression {
     fn eval(self, context: Option<&Context>) -> Result<Value, eval::Error> {
         match self {
-            Self::NumberLiteral(n) => Ok(Value::Number(n)),
-            Self::StringLiteral(s) => Ok(Value::String(s)),
+            Self::NumberLiteral(n) => n.eval(context),
+            Self::IntegerLiteral(n) => Ok(Value::Integer(n)),
             Self::BoolLiteral(b) => Ok(Value::Bool(b)),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
             Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
@@ -102,15 +102,15 @@ impl Eval for Expression {
                     '/' => lhs / rhs,
                     _ => unimplemented!(),
                 }
-                .map_err(|err| eval::Error::ValueError(err))
+                .map_err(eval::Error::ValueError)
             }
             Self::ElementAccess(lhs, rhs) => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
 
                 match (lhs, rhs) {
-                    (Value::List(list), Value::Number(index)) => {
-                        let index = index.value() as usize;
+                    (Value::List(list), Value::Integer(index)) => {
+                        let index = index as usize;
                         if index < list.len() {
                             Ok(list.get(index).unwrap().clone())
                         } else {
@@ -129,7 +129,7 @@ impl Eval for Expression {
 
                 match lhs {
                     Value::List(list) => match name {
-                        "len" => Ok(Value::Number(NumberLiteral::from_usize(list.len()))),
+                        "len" => Ok(Value::Integer(list.len() as i64)),
                         _ => Err(eval::Error::InvalidOperation),
                     },
                     _ => Err(eval::Error::InvalidOperation),
@@ -143,7 +143,7 @@ impl Eval for Expression {
     fn eval_type(&self, context: Option<&Context>) -> Result<Type, eval::Error> {
         match &self {
             Self::NumberLiteral(n) => n.eval_type(context),
-            Self::StringLiteral(_) => Ok(Type::String),
+            Self::IntegerLiteral(_) => Ok(Type::Integer),
             Self::BoolLiteral(_) => Ok(Type::Bool),
             Self::ListExpression(list) => list.eval_type(context),
             _ => Err(eval::Error::InvalidType),
@@ -159,6 +159,10 @@ impl Parse for Expression {
                     let inner = primary.into_inner().next().unwrap();
 
                     match inner.as_rule() {
+                        Rule::integer_literal => {
+                            let number_literal = NumberLiteral::parse(inner).unwrap();
+                            Expression::NumberLiteral(number_literal)
+                        }
                         Rule::number_literal => {
                             let number_literal = NumberLiteral::parse(inner).unwrap();
                             Expression::NumberLiteral(number_literal)
@@ -169,6 +173,9 @@ impl Parse for Expression {
                 Rule::number_literal => {
                     let number_literal = NumberLiteral::parse(primary).unwrap();
                     Expression::NumberLiteral(number_literal)
+                }
+                Rule::integer_literal => {
+                    Expression::IntegerLiteral(primary.as_str().parse::<i64>().unwrap())
                 }
                 Rule::expression => Self::parse(primary).unwrap(),
                 Rule::list_expression => {
@@ -301,23 +308,23 @@ mod tests {
     #[test]
     fn operators() {
         run_expression_test("4", None, |e| {
-            if let Ok(Value::Number(num)) = e {
-                assert_eq!(num.value(), 4.0);
+            if let Ok(Value::Scalar(num)) = e {
+                assert_eq!(num, 4.0);
             }
         });
         run_expression_test("4 * 4", None, |e| {
-            if let Ok(Value::Number(num)) = e {
-                assert_eq!(num.value(), 16.0);
+            if let Ok(Value::Scalar(num)) = e {
+                assert_eq!(num, 16.0);
             }
         });
         run_expression_test("4 * (4 + 4)", None, |e| {
-            if let Ok(Value::Number(num)) = e {
-                assert_eq!(num.value(), 32.0);
+            if let Ok(Value::Scalar(num)) = e {
+                assert_eq!(num, 32.0);
             }
         });
         run_expression_test("10.0 / 2.5 + 6", None, |e| {
-            if let Ok(Value::Number(num)) = e {
-                assert_eq!(num.value(), 10.0);
+            if let Ok(Value::Scalar(num)) = e {
+                assert_eq!(num, 10.0);
             }
         });
     }
@@ -333,8 +340,8 @@ mod tests {
 
         // Accessing the third element of a list
         run_expression_test("[1.0,2.0,3.0][2]", None, |e| {
-            if let Ok(Value::Number(n)) = e {
-                assert_eq!(n.value(), 3.0);
+            if let Ok(Value::Integer(n)) = e {
+                assert_eq!(n, 3);
             }
         });
 
@@ -348,8 +355,8 @@ mod tests {
 
         // Return the length of a list
         run_expression_test("[1.0,2.0,3.0].len()", None, |e| {
-            if let Ok(Value::Number(n)) = e {
-                assert_eq!(n.value(), 3.0);
+            if let Ok(Value::Integer(n)) = e {
+                assert_eq!(n, 3);
             }
         });
     }

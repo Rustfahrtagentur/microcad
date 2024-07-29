@@ -11,7 +11,10 @@ pub enum Type {
     #[default]
     Invalid,
 
-    /// An f64
+    // A 64-bit integer number
+    Integer,
+
+    /// A 64-bit floating-point number
     Scalar,
 
     /// A string
@@ -25,6 +28,12 @@ pub enum Type {
 
     /// An angle, e.g. 90°
     Angle,
+
+    /// A two-dimensional vector
+    Vec2,
+
+    /// A three-dimensional vector
+    Vec3,
 
     /// A boolean
     Bool,
@@ -61,12 +70,15 @@ impl Type {
 impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::Integer => write!(f, "integer"),
             Self::Invalid => write!(f, "invalid"),
             Self::Scalar => write!(f, "scalar"),
             Self::String => write!(f, "string"),
             Self::Color => write!(f, "color"),
             Self::Length => write!(f, "length"),
             Self::Angle => write!(f, "angle"),
+            Self::Vec2 => write!(f, "vec2"),
+            Self::Vec3 => write!(f, "vec3"),
             Self::Bool => write!(f, "bool"),
             Self::List(t) => {
                 if let Some(t) = t {

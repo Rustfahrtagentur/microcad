@@ -36,6 +36,11 @@ identifier_tuple = { "(" ~ ws* ~ identifier_list ~ ws* ~ ")" }
 //`mm`: error
 number_literal = { number ~ unit? }
 
+//`-1`: ok
+//`1`: ok
+//`-1.0`: error # Is float
+integer_literal = { "-" ~ int | int }
+
 //`1.0`: ok
 //`1`: ok
 //`.1`: error
@@ -126,7 +131,7 @@ list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" }
 
 //`[0]`: ok # Access first element
 //`["test"]`: ok # Associative lists, access value of `\"test\"`
-list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" } 
+list_element_access = { "[" ~ ws* ~ (integer_literal | expression) ~ ws* ~ "]" } 
 
 //`(length,scalar)`: ok # 2 unnamed fields
 //`(a: length, b = 4.0mm)`: ok # No default value for a, but for b

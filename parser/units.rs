@@ -48,6 +48,9 @@ declare_units! {
     /// No unit was given
     None = "" -> Scalar,
 
+    // Percentages
+    Percent = "%" -> Scalar * 0.01,
+
     // Lengths or Coord
 
     /// Centimeters
