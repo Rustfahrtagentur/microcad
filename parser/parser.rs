@@ -136,7 +136,7 @@ impl Parser {
         Ok(call)
     }
 
-    fn object_node_id_assignment(pairs: Pairs) -> Result<Identifier, ParseError> {
+    fn module_node_id_assignment(pairs: Pairs) -> Result<Identifier, ParseError> {
         if let Some(pair) = pairs.peek() {
             Identifier::parse(pair)
         } else {
@@ -144,8 +144,8 @@ impl Parser {
         }
     }
 
-    pub fn object_node_statement(pairs: Pairs) -> Result<ObjectNodeStatement, ParseError> {
-        let mut object_node_statement = ObjectNodeStatement {
+    pub fn module_node_statement(pairs: Pairs) -> Result<ObjectNodeStatement, ParseError> {
+        let mut module_node_statement = ObjectNodeStatement {
             ident: Default::default(),
             calls: Vec::new(),
             has_inner: false,
@@ -153,26 +153,26 @@ impl Parser {
 
         for pair in pairs {
             match pair.as_rule() {
-                Rule::object_node_inner => {
-                    object_node_statement.has_inner = true;
+                Rule::module_node_inner => {
+                    module_node_statement.has_inner = true;
                 }
                 Rule::call => {
                     let call = Self::function_call(pair.into_inner())?;
-                    object_node_statement.calls.push(call);
+                    module_node_statement.calls.push(call);
                 }
                 _ => {
                     unreachable!(
-                        "Expr::parse expected call or object_node_inner, found {:?}",
+                        "Expr::parse expected call or module_node_inner, found {:?}",
                         pair.as_rule()
                     );
                 }
             }
         }
 
-        if object_node_statement.calls.is_empty() {
+        if module_node_statement.calls.is_empty() {
             Err(ParseError::ObjectNodeAtLeastOneCall)
         } else {
-            Ok(object_node_statement)
+            Ok(module_node_statement)
         }
     }
 }
@@ -200,10 +200,10 @@ mod tests {
     }
 
     //#[test]
-    fn object_node_statement() {
+    fn module_node_statement() {
         use pest::Parser;
         let pairs = crate::parser::Parser::parse(
-            parser::Rule::object_node_assignment,
+            parser::Rule::module_node_assignment,
             "node_id := translate(x = 5.0mm) rotate(angle = 90°) { rectangle(width = 5.0mm); }",
         );
 
@@ -211,16 +211,16 @@ mod tests {
         let mut pairs = pairs.unwrap();
         let pair = pairs.next().unwrap();
 
-        let object_node_statement =
-            crate::parser::Parser::object_node_statement(pair.into_inner()).unwrap();
+        let module_node_statement =
+            crate::parser::Parser::module_node_statement(pair.into_inner()).unwrap();
 
-        assert_eq!(object_node_statement.calls.len(), 2);
-        assert_eq!(object_node_statement.ident, Some("node_id".into()));
-        assert!(object_node_statement.has_inner);
+        assert_eq!(module_node_statement.calls.len(), 2);
+        assert_eq!(module_node_statement.ident, Some("node_id".into()));
+        assert!(module_node_statement.has_inner);
 
         // Test function call
         {
-            let call = object_node_statement.calls.first().unwrap();
+            let call = module_node_statement.calls.first().unwrap();
             assert_eq!(call.qualified_name.to_string(), "translate".to_string());
             assert_eq!(call.function_argument_list.len(), 1);
         }

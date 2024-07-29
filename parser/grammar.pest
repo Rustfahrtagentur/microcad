@@ -305,7 +305,7 @@ function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 //`module cube((x,y,w,h) : length) { }`: ok # Identifier tuples
 module_declaration = { "module" ~ ws+ ~ identifier ~ ws* ~  
     module_declaration_argument_list? ~
-    "{" ~ ws* ~ (statement ~ ws*)* ~ "}" }
+    "{" ~ ws* ~ module_node_inner? ~ "}" }
 
 module_declaration_argument_list = { ("(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")")? ~ ws* }
 
@@ -314,43 +314,42 @@ module_declaration_argument_list = { ("(" ~ ws* ~ variable_declaration_list? ~ w
 //`translate(x = 5.0mm) { rectangle(width = 5.0); }`: ok
 //`translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
 //`translate(r = 5.0mm) circle(r = 5.0mm);`: ok
-object_node_statement = {
-  object_node_expression ~ ";" |
-  object_node_expression ~ "{" ~ ws* ~ object_node_inner? ~ ws* ~ "}" 
+module_node_statement = {
+  module_node_expression ~ ";" |
+  module_node_expression ~ "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" 
 }
 
 //`translate(r = 5.0mm) circle(r = 5.0mm)` : ok
-object_node_nested = { (call ~ ws*)+ }
+module_node_nested = { (call ~ ws*)+ }
 
 //`a | a.b()`: ok
 //`a | b & c`: ok
-object_node_expression       =   { object_node_unary_op* ~ ws* ~ object_node_primary ~ ws* ~ object_node_postfix* ~ 
-  (ws* ~ object_node_bin_op ~ ws* ~ object_node_unary_op* ~ ws* ~ object_node_primary ~ ws* ~ object_node_postfix*)* }
-object_node_bin_op           =  _{ object_node_union | object_node_difference | object_node_intersection | object_node_xor }
-  object_node_union          =   { "|" }
-  object_node_difference     =   { "-" }
-  object_node_intersection   =   { "&" }
-  object_node_xor            =   { "^" }
-object_node_unary_op         =  _{ object_node_unary_neg }
-  object_node_unary_neg      =   { "!" }
-object_node_postfix          =  _{ object_node_access }
-  object_node_access         =   { method_call | element_access }
-object_node_primary          =  _{ object_node_nested | identifier | "(" ~ object_node_expression ~ ")" }
+module_node_expression       =   { module_node_unary_op* ~ ws* ~ module_node_primary ~ ws* ~ module_node_postfix* ~ 
+  (ws* ~ module_node_bin_op ~ ws* ~ module_node_unary_op* ~ ws* ~ module_node_primary ~ ws* ~ module_node_postfix*)* }
+module_node_bin_op           =  _{ module_node_union | module_node_difference | module_node_intersection | module_node_xor }
+  module_node_union          =   { "|" }
+  module_node_difference     =   { "-" }
+  module_node_intersection   =   { "&" }
+  module_node_xor            =   { "^" }
+module_node_unary_op         =  _{ module_node_unary_neg }
+  module_node_unary_neg      =   { "!" }
+module_node_postfix          =  _{ call_op | element_access }
+module_node_primary          =  _{ module_node_nested | identifier | "(" ~ module_node_expression ~ ")" }
 
 //`name := node() {}`: ok
 //`name := node();`: ok
-object_node_assignment = { identifier ~ ws* ~ ":=" ~ ws* ~ object_node_statement }
+module_node_assignment = { identifier ~ ws* ~ ":=" ~ ws* ~ module_node_statement }
 
 //`return node();`: ok
 //`return node() {}`: ok
-object_node_return_statement = { "return" ~ ws* ~ object_node_statement }
+module_node_return_statement = { "return" ~ ws* ~ module_node_statement }
 
-object_node_inner = { (statement ~ ws*)+ }
+module_node_inner = { (module_statement ~ ws*)+ }
 
-statement = { object_node_assignment | object_node_return_statement | object_node_statement | use_statement | module_declaration | function_declaration | variable_declaration_statement | constant_declaration_statement }
+module_statement = { module_node_assignment | module_node_return_statement | module_node_statement | use_statement | module_declaration | function_declaration | variable_declaration_statement | constant_declaration_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-document = { SOI ~ (statement ~ ws* )* ~ EOI }
+document = { SOI ~ (module_statement ~ ws* )* ~ EOI }
 
 COMMENT = { doc_comment | single_line_comment | multi_line_comment }
 

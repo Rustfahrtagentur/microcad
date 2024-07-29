@@ -33,7 +33,7 @@ pub enum SyntaxNodeKind {
 impl SyntaxNodeKind {
     fn id(&self) -> Option<&Identifier> {
         match self {
-            SyntaxNodeKind::ObjectNode(object_node) => object_node.id.as_ref(),
+            SyntaxNodeKind::ObjectNode(module_node) => module_node.id.as_ref(),
             _ => None,
         }
     }
@@ -61,8 +61,8 @@ impl fmt::Debug for SyntaxNodeKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             SyntaxNodeKind::Document(doc) => write!(f, "{doc}"),
-            SyntaxNodeKind::ObjectNode(object_node) => {
-                write!(f, "{}", object_node.call.qualified_name.to_string())
+            SyntaxNodeKind::ObjectNode(module_node) => {
+                write!(f, "{}", module_node.call.qualified_name.to_string())
             }
             SyntaxNodeKind::UseStatement(use_statement) => write!(f, "{:?}", use_statement),
         }
@@ -140,12 +140,12 @@ impl TreeBuilder {
                 let pairs = pairs.next().unwrap().into_inner();
                 for pair in pairs {
                     match pair.as_rule() {
-                        Rule::statement => {
+                        Rule::module_statement => {
                             let inner_pairs = pair.into_inner();
                             for inner_pair in inner_pairs {
                                 match inner_pair.as_rule() {
-                                    Rule::object_node_statement => {
-                                        Self::object_node(root.clone(), inner_pair.into_inner());
+                                    Rule::module_node_statement => {
+                                        Self::module_node(root.clone(), inner_pair.into_inner());
                                         continue;
                                     }
                                     _ => unreachable!(),
@@ -165,17 +165,17 @@ impl TreeBuilder {
         }
     }
 
-    fn object_node(parent: SyntaxNode, pairs: Pairs) -> Option<SyntaxNode> {
+    fn module_node(parent: SyntaxNode, pairs: Pairs) -> Option<SyntaxNode> {
         use pest::Parser;
-        let object_node_statement =
-            crate::parser::Parser::object_node_statement(pairs.clone()).unwrap();
+        let module_node_statement =
+            crate::parser::Parser::module_node_statement(pairs.clone()).unwrap();
         let mut node = parent.clone();
-        let id = object_node_statement.ident.as_ref();
+        let id = module_node_statement.ident.as_ref();
 
         let mut first_node = None;
 
-        for call in object_node_statement.calls {
-            let object_node: SyntaxNode = ObjectNode {
+        for call in module_node_statement.calls {
+            let module_node: SyntaxNode = ObjectNode {
                 id: if id.is_some() && first_node.is_none() {
                     Some(id.unwrap().clone())
                 } else {
@@ -184,8 +184,8 @@ impl TreeBuilder {
                 call,
             }
             .into();
-            node.append(object_node.clone());
-            node = object_node; // Nest the nodes
+            node.append(module_node.clone());
+            node = module_node; // Nest the nodes
 
             // Save the first node because we need to return it
             if first_node.is_none() {
@@ -195,13 +195,13 @@ impl TreeBuilder {
 
         let last_node = node.clone();
 
-        if object_node_statement.has_inner {
+        if module_node_statement.has_inner {
             for pair in pairs {
-                if pair.as_rule() == Rule::object_node_inner {
+                if pair.as_rule() == Rule::module_node_inner {
                     for inner_pair in pair.into_inner() {
                         // Fetch all object nodes
-                        if inner_pair.as_rule() == Rule::object_node_statement {
-                            Self::object_node(last_node.clone(), inner_pair.into_inner());
+                        if inner_pair.as_rule() == Rule::module_node_statement {
+                            Self::module_node(last_node.clone(), inner_pair.into_inner());
                         }
                     }
                 }
