@@ -15,7 +15,7 @@ pub type Pairs<'i> = pest::iterators::Pairs<'i, Rule>;
 #[derive(Debug)]
 pub enum ParseError {
     ExpectedIdentifier,
-    ObjectNodeAtLeastOneCall,
+    ModuleNodeAtLeastOneCall,
     InvalidUseStatement,
     ParseFloatError(std::num::ParseFloatError),
     ParseIntError(std::num::ParseIntError),
@@ -66,7 +66,7 @@ pub struct FunctionCall {
     pub function_argument_list: Vec<FunctionArgument>,
 }
 
-pub struct ObjectNodeStatement {
+pub struct ModuleNodeStatement {
     pub ident: Option<Identifier>,
     pub calls: Vec<FunctionCall>,
     pub has_inner: bool,
@@ -144,8 +144,8 @@ impl Parser {
         }
     }
 
-    pub fn module_node_statement(pairs: Pairs) -> Result<ObjectNodeStatement, ParseError> {
-        let mut module_node_statement = ObjectNodeStatement {
+    pub fn module_node_statement(pairs: Pairs) -> Result<ModuleNodeStatement, ParseError> {
+        let mut module_node_statement = ModuleNodeStatement {
             ident: Default::default(),
             calls: Vec::new(),
             has_inner: false,
@@ -170,7 +170,7 @@ impl Parser {
         }
 
         if module_node_statement.calls.is_empty() {
-            Err(ParseError::ObjectNodeAtLeastOneCall)
+            Err(ParseError::ModuleNodeAtLeastOneCall)
         } else {
             Ok(module_node_statement)
         }

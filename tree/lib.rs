@@ -34,7 +34,7 @@ impl TreeBuilder {
             let c = child.borrow();
 
             match c.kind() {
-                SyntaxNodeKind::ObjectNode(object_node) => {
+                SyntaxNodeKind::ModuleNode(object_node) => {
                     let mut node = None;
                     match object_node.qualified_name().to_string().as_str() {
                         "circle" => {

@@ -4,7 +4,6 @@ use pest::pratt_parser::PrattParser;
 
 use crate::identifier::{Identifier, QualifiedName};
 use crate::parser::*;
-use crate::syntax_tree::{UseAlias, UseStatement};
 
 lazy_static::lazy_static! {
     static ref PRATT_PARSER: PrattParser<Rule> = {
@@ -46,6 +45,45 @@ pub enum ModuleNodeExpression {
 pub struct Module {
     name: Identifier,
     constructor: Vec<FunctionArgument>,
+}
+
+pub struct UseAlias(pub QualifiedName, pub Identifier);
+
+impl std::fmt::Display for UseAlias {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "use {:?} as {:?}", self.0, self.1)
+    }
+}
+
+pub enum UseStatement {
+    /// Import symbols given as qualified names: `use a, b`
+    Use(Vec<QualifiedName>),
+
+    /// Import specific symbol from a module: `use a,b from c`
+    UseFrom(Vec<QualifiedName>, QualifiedName),
+
+    /// Import all symbols from a module: `use * from a, b`
+    UseAll(Vec<QualifiedName>),
+
+    /// Import as alias: `use a as b`
+    UseAlias(UseAlias),
+
+    /// Import as alias from a module: `use a as b from c`
+    UseAliasFrom(UseAlias, QualifiedName),
+}
+
+impl std::fmt::Display for UseStatement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            UseStatement::Use(qualified_names) => write!(f, "use {:?}", qualified_names),
+            UseStatement::UseFrom(qualified_names, from) => {
+                write!(f, "use {:?} from {:?}", qualified_names, from)
+            }
+            UseStatement::UseAll(qualified_names) => write!(f, "use * from {:?}", qualified_names),
+            UseStatement::UseAlias(alias) => write!(f, "{}", alias),
+            UseStatement::UseAliasFrom(alias, from) => write!(f, "{} from {}", alias, from),
+        }
+    }
 }
 
 impl Parse for UseAlias {

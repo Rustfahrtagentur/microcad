@@ -314,9 +314,11 @@ module_declaration_argument_list = { ("(" ~ ws* ~ variable_declaration_list? ~ w
 //`translate(x = 5.0mm) { rectangle(width = 5.0); }`: ok
 //`translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
 //`translate(r = 5.0mm) circle(r = 5.0mm);`: ok
+//`{}`: ok # Empty block
+//`{ rectangle(width = 5.0mm); }`: ok # Single statement block
 module_node_statement = {
   module_node_expression ~ ";" |
-  module_node_expression ~ "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" 
+  module_node_expression? ~ "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" 
 }
 
 //`translate(r = 5.0mm) circle(r = 5.0mm)` : ok

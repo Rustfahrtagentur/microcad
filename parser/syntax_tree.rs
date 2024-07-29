@@ -1,4 +1,5 @@
 use crate::identifier::{Identifier, QualifiedName};
+use crate::module::UseStatement;
 use crate::parser::*;
 
 use core::fmt;
@@ -22,7 +23,7 @@ impl SyntaxNodeInner {
 pub enum SyntaxNodeKind {
     Document(Document),
     /// E.g. circle(r = 5.0mm) or translate(x = 10.0)
-    ObjectNode(ObjectNode),
+    ModuleNode(ModuleNode),
     UseStatement(UseStatement),
     // FunctionDeclaration(FunctionDeclaration),
     // ModuleDeclaration(ModuleDeclaration),
@@ -33,7 +34,7 @@ pub enum SyntaxNodeKind {
 impl SyntaxNodeKind {
     fn id(&self) -> Option<&Identifier> {
         match self {
-            SyntaxNodeKind::ObjectNode(module_node) => module_node.id.as_ref(),
+            SyntaxNodeKind::ModuleNode(module_node) => module_node.id.as_ref(),
             _ => None,
         }
     }
@@ -61,10 +62,10 @@ impl fmt::Debug for SyntaxNodeKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             SyntaxNodeKind::Document(doc) => write!(f, "{doc}"),
-            SyntaxNodeKind::ObjectNode(module_node) => {
+            SyntaxNodeKind::ModuleNode(module_node) => {
                 write!(f, "{}", module_node.call.qualified_name.to_string())
             }
-            SyntaxNodeKind::UseStatement(use_statement) => write!(f, "{:?}", use_statement),
+            SyntaxNodeKind::UseStatement(use_statement) => write!(f, "{}", use_statement),
         }
     }
 }
@@ -175,7 +176,7 @@ impl TreeBuilder {
         let mut first_node = None;
 
         for call in module_node_statement.calls {
-            let module_node: SyntaxNode = ObjectNode {
+            let module_node: SyntaxNode = ModuleNode {
                 id: if id.is_some() && first_node.is_none() {
                     Some(id.unwrap().clone())
                 } else {
@@ -218,59 +219,20 @@ impl fmt::Display for Document {
     }
 }
 
-pub struct ObjectNode {
+pub struct ModuleNode {
     id: Option<Identifier>,
     call: FunctionCall,
 }
 
-impl ObjectNode {
+impl ModuleNode {
     pub fn qualified_name(&self) -> &QualifiedName {
         &self.call.qualified_name
     }
 }
 
-impl From<ObjectNode> for SyntaxNode {
-    fn from(value: ObjectNode) -> Self {
-        SyntaxNodeKind::ObjectNode(value).into()
-    }
-}
-
-pub struct UseAlias(pub QualifiedName, pub Identifier);
-
-impl fmt::Debug for UseAlias {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "use {:?} as {:?}", self.0, self.1)
-    }
-}
-
-pub enum UseStatement {
-    /// Import symbols given as qualified names: `use a, b`
-    Use(Vec<QualifiedName>),
-
-    /// Import specific symbol from a module: `use a,b from c`
-    UseFrom(Vec<QualifiedName>, QualifiedName),
-
-    /// Import all symbols from a module: `use * from a, b`
-    UseAll(Vec<QualifiedName>),
-
-    /// Import as alias: `use a as b`
-    UseAlias(UseAlias),
-
-    /// Import as alias from a module: `use a as b from c`
-    UseAliasFrom(UseAlias, QualifiedName),
-}
-
-impl fmt::Debug for UseStatement {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            UseStatement::Use(qualified_names) => write!(f, "use {:?}", qualified_names),
-            UseStatement::UseFrom(qualified_names, from) => {
-                write!(f, "use {:?} from {:?}", qualified_names, from)
-            }
-            UseStatement::UseAll(qualified_names) => write!(f, "use * from {:?}", qualified_names),
-            UseStatement::UseAlias(alias) => write!(f, "{:?}", alias),
-            UseStatement::UseAliasFrom(alias, from) => write!(f, "{:?} from {:?}", alias, from),
-        }
+impl From<ModuleNode> for SyntaxNode {
+    fn from(value: ModuleNode) -> Self {
+        SyntaxNodeKind::ModuleNode(value).into()
     }
 }
 
@@ -302,7 +264,7 @@ mod tests {
         let node: SyntaxNode = Document::new().into();
 
         // translate(x = 5.0mm)
-        let translate: SyntaxNode = ObjectNode {
+        let translate: SyntaxNode = ModuleNode {
             id: None,
             call: FunctionCall {
                 qualified_name: "translate".into(),
@@ -316,7 +278,7 @@ mod tests {
         node.append(translate.clone());
 
         // circle(r = 5.0mm)
-        let circle: SyntaxNode = ObjectNode {
+        let circle: SyntaxNode = ModuleNode {
             id: None,
             call: FunctionCall {
                 qualified_name: "circle".into(),
