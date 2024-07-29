@@ -420,5 +420,11 @@ mod tests {
                 assert_eq!(num, 9.0);
             }
         });
+
+        run_expression_test("a + b + c", Some(&context), |e| {
+            if let Err(eval::Error::UnknownIdentifier(identifier)) = e {
+                assert_eq!(identifier, "c".into());
+            }
+        });
     }
 }
