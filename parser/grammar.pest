@@ -185,7 +185,7 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`a.b()`: ok # Method call
 //`[3,5,5]`: ok # List expression
 expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
-bin_op           =  _{ add | subtract | multiply | divide }
+bin_op           =  _{ add | subtract | multiply | divide | greater_than | less_than | greater_equal | less_equal | equal | not_equal | and | or | xor }
   add            =   { "+" }
   subtract       =   { "-" }
   multiply       =   { "*" }
@@ -199,7 +199,7 @@ bin_op           =  _{ add | subtract | multiply | divide }
   and            =   { "and" }
   or             =   { "or" }
   xor            =   { "xor" }
-  
+
 unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_minus    =   { "-" }
   unary_plus     =   { "+" }

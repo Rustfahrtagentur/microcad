@@ -19,6 +19,9 @@ lazy_static::lazy_static! {
             // Addition and subtract have equal precedence
             .op(Op::infix(add, Left) | Op::infix(subtract, Left))
             .op(Op::infix(multiply, Left) | Op::infix(divide, Left))
+            .op(Op::infix(greater_than, Left) | Op::infix(less_than, Left))
+            .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
+            .op(Op::infix(equal, Left) | Op::infix(not_equal, Left))
             .op(Op::prefix(unary_minus))
             .op(Op::prefix(unary_plus))
             .op(Op::prefix(unary_not))
@@ -208,6 +211,7 @@ impl Parse for Expression {
                 rule => unreachable!("Expr::parse expected atom, found {:?}", rule),
             })
             .map_infix(|lhs, op, rhs| {
+                println!("Parsing infix operation:  {}", op);
                 let op = match op.as_rule() {
                     Rule::add => '+',
                     Rule::subtract => '-',
@@ -396,21 +400,29 @@ mod tests {
         run_expression_test("4 < 5", None, |e| {
             if let Ok(Value::Bool(b)) = e {
                 assert!(b);
+            } else {
+                panic!("Expected boolean value: {:?}", e);
             }
         });
         run_expression_test("4 > 5", None, |e| {
             if let Ok(Value::Bool(b)) = e {
                 assert!(!b);
+            } else {
+                panic!("Expected boolean value: {:?}", e);
             }
         });
         run_expression_test("4 == 5", None, |e| {
             if let Ok(Value::Bool(b)) = e {
                 assert!(!b);
+            } else {
+                panic!("Expected boolean value: {:?}", e);
             }
         });
         run_expression_test("4 != 5", None, |e| {
             if let Ok(Value::Bool(b)) = e {
                 assert!(b);
+            } else {
+                panic!("Expected boolean value: {:?}", e);
             }
         });
     }
@@ -429,6 +441,8 @@ mod tests {
         run_expression_test("a < b", Some(&context), |e| {
             if let Ok(Value::Bool(b)) = e {
                 assert!(b);
+            } else {
+                panic!("Expected boolean value");
             }
         });
         run_expression_test("a + b + c", Some(&context), |e| {
