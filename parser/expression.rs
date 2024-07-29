@@ -1,6 +1,7 @@
 use crate::call::CallArgumentList;
 use crate::eval::{self, Context, Eval};
 use crate::format_string::FormatString;
+use crate::identifier::Identifier;
 use crate::langtype::Type;
 use crate::list::ListExpression;
 use crate::literal::NumberLiteral;
@@ -79,6 +80,9 @@ pub enum Expression {
 
     /// First expression must evaluate to `ModuleRef` or `FunctionRef`
     MethodCall(Box<Expression>, crate::call::MethodCall),
+
+    /// An identifier that maps to a symbol in the symbol table: a, b, c
+    Identifier(Identifier),
 }
 
 impl Expression {}
@@ -123,6 +127,13 @@ impl Eval for Expression {
                     _ => unimplemented!(),
                 }
             }
+            Self::Identifier(identifier) => {
+                if let Some(value) = context.and_then(|ctx| ctx.get(&identifier.to_string())) {
+                    Ok(value.clone())
+                } else {
+                    Err(eval::Error::UnknownIdentifier(identifier))
+                }
+            }
             Self::MethodCall(lhs, method_call) => {
                 let lhs = lhs.eval(context)?;
                 let name: &str = &method_call.name.to_string();
@@ -161,27 +172,33 @@ impl Parse for Expression {
                     match inner.as_rule() {
                         Rule::integer_literal => {
                             let number_literal = NumberLiteral::parse(inner).unwrap();
-                            Expression::NumberLiteral(number_literal)
+                            Self::NumberLiteral(number_literal)
                         }
                         Rule::number_literal => {
                             let number_literal = NumberLiteral::parse(inner).unwrap();
-                            Expression::NumberLiteral(number_literal)
+                            Self::NumberLiteral(number_literal)
                         }
                         rule => unreachable!("Expr::parse expected literal, found {:?}", rule),
                     }
                 }
                 Rule::number_literal => {
                     let number_literal = NumberLiteral::parse(primary).unwrap();
-                    Expression::NumberLiteral(number_literal)
+                    Self::NumberLiteral(number_literal)
                 }
                 Rule::integer_literal => {
-                    Expression::IntegerLiteral(primary.as_str().parse::<i64>().unwrap())
+                    Self::IntegerLiteral(primary.as_str().parse::<i64>().unwrap())
                 }
                 Rule::expression => Self::parse(primary).unwrap(),
                 Rule::list_expression => {
                     println!("Parsing list expression: {}", primary.as_str());
-                    Expression::ListExpression(ListExpression::parse(primary).unwrap())
+                    Self::ListExpression(ListExpression::parse(primary).unwrap())
                 }
+                Rule::format_string => Self::FormatString(FormatString::parse(primary).unwrap()),
+                Rule::bool_literal => {
+                    let bool_literal = primary.as_str().parse::<bool>().unwrap();
+                    Self::BoolLiteral(bool_literal)
+                }
+                Rule::identifier => Self::Identifier(Identifier::parse(primary).unwrap()),
                 rule => unreachable!("Expr::parse expected atom, found {:?}", rule),
             })
             .map_infix(|lhs, op, rhs| {
@@ -200,7 +217,7 @@ impl Parse for Expression {
 
                     rule => unreachable!("Expr::parse expected infix operation, found {:?}", rule),
                 };
-                Expression::BinaryOp {
+                Self::BinaryOp {
                     lhs: Box::new(lhs),
                     op,
                     rhs: Box::new(rhs),
@@ -214,19 +231,18 @@ impl Parse for Expression {
                     _ => unreachable!(),
                 };
 
-                Expression::UnaryOp {
+                Self::UnaryOp {
                     op,
                     rhs: Box::new(rhs),
                 }
             })
             .map_postfix(|lhs, op| match op.as_rule() {
                 Rule::list_element_access | Rule::tuple_element_access => {
-                    Expression::ElementAccess(Box::new(lhs), Box::new(Self::parse(op).unwrap()))
+                    Self::ElementAccess(Box::new(lhs), Box::new(Self::parse(op).unwrap()))
                 }
-                Rule::method_call => Expression::MethodCall(
-                    Box::new(lhs),
-                    crate::call::MethodCall::parse(op).unwrap(),
-                ),
+                Rule::method_call => {
+                    Self::MethodCall(Box::new(lhs), crate::call::MethodCall::parse(op).unwrap())
+                }
                 rule => {
                     unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
                 }
@@ -373,22 +389,35 @@ mod tests {
     fn conditions() {
         run_expression_test("4 < 5", None, |e| {
             if let Ok(Value::Bool(b)) = e {
-                assert_eq!(b, true);
+                assert!(b);
             }
         });
         run_expression_test("4 > 5", None, |e| {
             if let Ok(Value::Bool(b)) = e {
-                assert_eq!(b, false);
+                assert!(!b);
             }
         });
         run_expression_test("4 == 5", None, |e| {
             if let Ok(Value::Bool(b)) = e {
-                assert_eq!(b, false);
+                assert!(!b);
             }
         });
         run_expression_test("4 != 5", None, |e| {
             if let Ok(Value::Bool(b)) = e {
-                assert_eq!(b, true);
+                assert!(b);
+            }
+        });
+    }
+
+    #[test]
+    fn context() {
+        let mut context = Context::default();
+        context.insert("a", Value::Scalar(4.0));
+        context.insert("b", Value::Scalar(5.0));
+
+        run_expression_test("a + b", Some(&context), |e| {
+            if let Ok(Value::Scalar(num)) = e {
+                assert_eq!(num, 9.0);
             }
         });
     }

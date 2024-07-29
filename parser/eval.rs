@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::vec;
 
+use crate::identifier::Identifier;
 use crate::langtype::Type;
 use crate::syntax_tree::SyntaxNode;
 use crate::value::{Value, ValueError};
@@ -14,6 +15,7 @@ pub enum Error {
     TypeMismatch,
     EvaluateToStringError,
     ValueError(ValueError),
+    UnknownIdentifier(Identifier),
 }
 
 impl From<ValueError> for Error {
@@ -54,12 +56,6 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(node: SyntaxNode) -> Self {
-        Self {
-            stack: vec![SymbolTable::default()],
-        }
-    }
-
     pub fn push(&mut self) {
         self.stack.push(SymbolTable::default());
     }
@@ -68,17 +64,26 @@ impl Context {
         self.stack.pop();
     }
 
-    pub fn insert(&mut self, name: String, value: Value) {
-        self.stack.last_mut().unwrap().insert(name, value);
+    pub fn insert(&mut self, name: impl Into<String>, value: Value) {
+        self.stack.last_mut().unwrap().insert(name.into(), value);
     }
 
-    pub fn get(&self, name: &str) -> Option<&Value> {
+    pub fn get(&self, name: impl Into<String>) -> Option<&Value> {
+        let name = name.into();
         for table in self.stack.iter().rev() {
-            if let Some(value) = table.get(name) {
+            if let Some(value) = table.get(&name) {
                 return Some(value);
             }
         }
         None
+    }
+}
+
+impl Default for Context {
+    fn default() -> Self {
+        Self {
+            stack: vec![SymbolTable::default()],
+        }
     }
 }
 
