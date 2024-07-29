@@ -410,7 +410,7 @@ mod tests {
     }
 
     #[test]
-    fn context() {
+    fn basic_context() {
         let mut context = Context::default();
         context.insert("a", Value::Scalar(4.0));
         context.insert("b", Value::Scalar(5.0));

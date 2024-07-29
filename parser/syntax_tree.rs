@@ -3,6 +3,7 @@ use crate::parser::*;
 
 use core::fmt;
 
+#[derive(Debug)]
 pub struct SyntaxNodeInner {
     inner: SyntaxNodeKind,
     //    span: pest::Span<'i>,
@@ -25,7 +26,7 @@ pub enum SyntaxNodeKind {
     UseStatement(UseStatement),
     // FunctionDeclaration(FunctionDeclaration),
     // ModuleDeclaration(ModuleDeclaration),
-    // ParameterDeclaration(ParameterDeclaration),
+    // VariableDeclaration(VariableDeclaration),
     // ConstantDeclaration(Constant),
 }
 
@@ -69,6 +70,20 @@ impl fmt::Debug for SyntaxNodeKind {
 }
 
 pub type SyntaxNode = rctree::Node<SyntaxNodeInner>;
+
+pub fn qualified_name(node: SyntaxNode) -> Option<QualifiedName> {
+    let mut node = node.clone();
+    let mut q = QualifiedName::default();
+
+    while let Some(parent) = node.parent() {
+        if let Some(id) = node.borrow().id() {
+            q.push(id.clone());
+        }
+        node = parent;
+    }
+
+    Some(q)
+}
 
 trait AppendSyntaxNode {
     fn append_node(&mut self, node: SyntaxNode);

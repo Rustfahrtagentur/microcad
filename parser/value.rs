@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use crate::{
     identifier::Identifier,
     langtype::{Ty, Type},
-    syntax_tree::SyntaxNode,
+    syntax_tree::{qualified_name, SyntaxNode},
 };
 
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -233,8 +233,9 @@ pub enum Value {
     NamedTuple(NamedTuple),
 
     UnnamedTuple(UnnamedTuple),
+
     // TODO: Add syntax node as value
-    //Node(SyntaxNode)
+    Node(SyntaxNode),
 }
 
 impl Ty for Value {
@@ -253,6 +254,13 @@ impl Ty for Value {
             Value::Array(array) => array.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
+            Value::Node(node) => {
+                if let Some(qualified_name) = crate::syntax_tree::qualified_name(node.clone()) {
+                    Type::Node(qualified_name)
+                } else {
+                    Type::Invalid
+                }
+            }
         }
     }
 }
@@ -429,6 +437,13 @@ impl std::fmt::Display for Value {
                     write!(f, "{}", v)?;
                 }
                 write!(f, ")")
+            }
+            Value::Node(node) => {
+                write!(
+                    f,
+                    "{}",
+                    qualified_name(node.clone()).unwrap_or("<unknown>".into())
+                )
             }
         }
     }

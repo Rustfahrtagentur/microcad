@@ -68,6 +68,16 @@ impl std::iter::IntoIterator for IdentifierList {
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct QualifiedName(Vec<Identifier>);
 
+impl QualifiedName {
+    pub fn last(&self) -> &Identifier {
+        self.0.last().unwrap()
+    }
+
+    pub fn push(&mut self, ident: Identifier) {
+        self.0.push(ident);
+    }
+}
+
 impl Parse for QualifiedName {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
         Ok(Self(
