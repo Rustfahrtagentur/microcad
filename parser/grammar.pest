@@ -183,6 +183,9 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`a[2]`: ok # List access
 //`a.b`: ok # Tuple access
 //`a.b()`: ok # Method call
+//`a.b().c`: ok # Nested method call
+//`a.b.c`: ok # Nested tuple access
+//`a and b`: ok # Binary operator
 //`[3,5,5]`: ok # List expression
 expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
 bin_op           =  _{ add | subtract | multiply | divide | greater_than | less_than | greater_equal | less_equal | equal | not_equal | and | or | xor }
@@ -316,10 +319,13 @@ object_node_statement = {
   object_node_expression ~ "{" ~ ws* ~ object_node_inner? ~ ws* ~ "}" 
 }
 
+//`translate(r = 5.0mm) circle(r = 5.0mm)` : ok
 object_node_nested = { (call ~ ws*)+ }
 
+//`a | a.b()`: ok
+//`a | b & c`: ok
 object_node_expression       =   { object_node_unary_op* ~ ws* ~ object_node_primary ~ ws* ~ object_node_postfix* ~ 
-    (ws* ~ object_node_bin_op ~ ws* ~ object_node_unary_op* ~ ws* ~ object_node_primary ~ ws* ~ object_node_postfix)* }
+  (ws* ~ object_node_bin_op ~ ws* ~ object_node_unary_op* ~ ws* ~ object_node_primary ~ ws* ~ object_node_postfix*)* }
 object_node_bin_op           =  _{ object_node_union | object_node_difference | object_node_intersection | object_node_xor }
   object_node_union          =   { "|" }
   object_node_difference     =   { "-" }
@@ -328,8 +334,8 @@ object_node_bin_op           =  _{ object_node_union | object_node_difference | 
 object_node_unary_op         =  _{ object_node_unary_neg }
   object_node_unary_neg      =   { "!" }
 object_node_postfix          =  _{ object_node_access }
-  object_node_access         =   { "." ~ ws* ~ (qualified_name | call) }
-object_node_primary          =  _{ object_node_nested | qualified_name | "(" ~ object_node_expression ~ ")" }
+  object_node_access         =   { method_call | element_access }
+object_node_primary          =  _{ object_node_nested | identifier | "(" ~ object_node_expression ~ ")" }
 
 //`name := node() {}`: ok
 //`name := node();`: ok
