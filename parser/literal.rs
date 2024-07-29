@@ -3,9 +3,10 @@ use crate::expression::Expression;
 use crate::langtype::Type;
 use crate::parser::{Pair, Parse, ParseError, Rule};
 use crate::units::Unit;
+use crate::value::{Number, Value};
 
 /// Definition and implementation for `NumberLiteral`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct NumberLiteral(pub f64, pub Unit);
 
 impl NumberLiteral {
@@ -24,7 +25,7 @@ impl NumberLiteral {
 }
 
 /// Rules for operator +
-impl std::ops::Add for &NumberLiteral {
+impl std::ops::Add for NumberLiteral {
     type Output = Option<NumberLiteral>;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -44,7 +45,7 @@ impl std::ops::Add for &NumberLiteral {
 }
 
 /// Rules for operator -
-impl std::ops::Sub for &NumberLiteral {
+impl std::ops::Sub for NumberLiteral {
     type Output = Option<NumberLiteral>;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -64,7 +65,7 @@ impl std::ops::Sub for &NumberLiteral {
 }
 
 /// Rules for operator *
-impl std::ops::Mul for &NumberLiteral {
+impl std::ops::Mul for NumberLiteral {
     type Output = Option<NumberLiteral>;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -84,7 +85,7 @@ impl std::ops::Mul for &NumberLiteral {
 }
 
 /// Rules for operator -
-impl std::ops::Div for &NumberLiteral {
+impl std::ops::Div for NumberLiteral {
     type Output = Option<NumberLiteral>;
 
     fn div(self, rhs: Self) -> Self::Output {
@@ -102,12 +103,6 @@ impl std::ops::Div for &NumberLiteral {
             }
             _ => None,
         }
-    }
-}
-
-impl ToString for NumberLiteral {
-    fn to_string(&self) -> String {
-        format!("{}{}", self.0.to_string(), self.1)
     }
 }
 
@@ -131,14 +126,20 @@ impl Parse for NumberLiteral {
 }
 
 impl eval::Eval for NumberLiteral {
-    fn eval(self, _: Option<&eval::Context>) -> Result<Box<Expression>, eval::Error> {
-        Ok(Box::new(Expression::NumberLiteral(NumberLiteral(
+    fn eval(self, _: Option<&eval::Context>) -> Result<Value, crate::eval::Error> {
+        Ok(Value::Number(crate::literal::NumberLiteral(
             self.value(),
             self.1.ty().default_unit(),
-        ))))
+        )))
     }
 
     fn eval_type(&self, _: Option<&eval::Context>) -> Result<Type, eval::Error> {
         Ok(self.1.ty())
+    }
+}
+
+impl std::fmt::Display for NumberLiteral {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}{}", self.0, self.1)
     }
 }

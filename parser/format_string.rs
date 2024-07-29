@@ -1,6 +1,7 @@
 use crate::eval::{Context, Error, Eval};
 use crate::expression::Expression;
 use crate::parser::*;
+use crate::value::Value;
 
 #[derive(Default, Clone)]
 struct FormatSpec {
@@ -47,16 +48,9 @@ impl Parse for FormatExpression {
 }
 
 impl Eval for FormatExpression {
-    fn eval(self, context: Option<&Context>) -> Result<Box<Expression>, Error> {
-        self.1.eval(context)
-    }
-
-    fn eval_to_string(self, context: Option<&Context>) -> Result<String, Error> {
-        let expr = self.eval(context)?;
-        match expr.as_ref() {
-            Expression::NumberLiteral(n) => Ok(format!("{}", n.value()).to_string()), // TODO Consider format options
-            _ => expr.eval_to_string(context),
-        }
+    fn eval(self, context: Option<&Context>) -> Result<Value, Error> {
+        let value = self.1.eval(context)?;
+        Ok(Value::String(format!("{}", value)))
     }
 
     fn eval_type(
@@ -92,17 +86,19 @@ impl FormatString {
 }
 
 impl Eval for FormatString {
-    fn eval(self, context: Option<&Context>) -> Result<Box<Expression>, Error> {
+    fn eval(self, context: Option<&Context>) -> Result<Value, Error> {
         let mut result = String::new();
         for elem in self.0 {
             match elem {
                 FormatStringInner::String(s) => result += &s,
-                FormatStringInner::FormatExpression(expr) => {
-                    result += &expr.eval_to_string(context)?
-                }
+                FormatStringInner::FormatExpression(expr) => match expr.eval(context) {
+                    Ok(Value::String(s)) => result += &s,
+                    Err(e) => return Err(e),
+                    _ => unreachable!("FormatExpression should always evaluate to a string"),
+                },
             }
         }
-        Ok(Box::new(Expression::StringLiteral(result)))
+        Ok(Value::String(result))
     }
 
     fn eval_type(
@@ -145,8 +141,8 @@ mod tests {
         let s = FormatString::parse(pair).unwrap();
         assert_eq!(s.section_count(), 3);
 
-        let s = s.eval_to_string(None).unwrap();
+        let value = s.eval(None).unwrap();
 
-        assert_eq!(&s, "A6B");
+        assert_eq!(value, Value::String("A6B".to_string()));
     }
 }

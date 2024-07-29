@@ -2,6 +2,7 @@ use crate::eval::{Context, Eval};
 use crate::expression::{Expression, ExpressionList};
 use crate::langtype::Type;
 use crate::parser::{Pair, Parse, ParseError};
+use crate::value::Value;
 
 #[derive(Default, Clone)]
 pub struct ListExpression(ExpressionList);
@@ -33,14 +34,12 @@ impl Parse for ListExpression {
 }
 
 impl Eval for ListExpression {
-    fn eval(self, context: Option<&Context>) -> Result<Box<Expression>, crate::eval::Error> {
+    fn eval(self, context: Option<&Context>) -> Result<Value, crate::eval::Error> {
         let mut vec = Vec::new();
         for expr in self.0 {
-            vec.push(*expr.eval(context)?);
+            vec.push(expr.eval(context)?);
         }
-        Ok(Box::new(Expression::ListExpression(ListExpression::new(
-            ExpressionList::new(vec),
-        ))))
+        Ok(Value::List(vec))
     }
 
     fn eval_type(&self, context: Option<&Context>) -> Result<Type, crate::eval::Error> {

@@ -1,4 +1,9 @@
-use crate::units;
+use std::collections::HashMap;
+
+use crate::{
+    identifier::{Identifier, QualifiedName},
+    units,
+};
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub enum Type {
@@ -28,7 +33,11 @@ pub enum Type {
 
     Array(Box<Type>, usize),
 
-    Tuple(Vec<Type>),
+    UnnamedTuple(Vec<Type>),
+
+    NamedTuple(HashMap<Identifier, Type>),
+
+    QualifiedName(QualifiedName),
 }
 
 impl Type {
@@ -67,7 +76,7 @@ impl std::fmt::Display for Type {
                 }
             }
             Self::Array(t, n) => write!(f, "[{}; {}]", t, n),
-            Self::Tuple(t) => {
+            Self::UnnamedTuple(t) => {
                 write!(f, "(")?;
                 for (i, t) in t.iter().enumerate() {
                     if i > 0 {
@@ -77,6 +86,17 @@ impl std::fmt::Display for Type {
                 }
                 write!(f, ")")
             }
+            Self::NamedTuple(t) => {
+                write!(f, "(")?;
+                for (i, (name, t)) in t.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "{}: {}", name, t)?;
+                }
+                write!(f, ")")
+            }
+            Self::QualifiedName(qn) => write!(f, "{}", qn),
         }
     }
 }

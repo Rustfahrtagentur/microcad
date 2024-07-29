@@ -19,6 +19,7 @@ pub enum ParseError {
     InvalidUseStatement,
     ParseFloatError(std::num::ParseFloatError),
     UnknownUnit(String),
+    UnexpectedToken,
 }
 
 impl From<std::num::ParseFloatError> for ParseError {

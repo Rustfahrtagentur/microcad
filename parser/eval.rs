@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use crate::expression::Expression;
 use crate::langtype::Type;
 use crate::syntax_tree::SyntaxNode;
+use crate::value::{Value, ValueError};
 
 #[derive(Debug)]
 pub enum Error {
@@ -12,6 +12,13 @@ pub enum Error {
     ListIndexOutOfBounds { index: usize, len: usize },
     TypeMismatch,
     EvaluateToStringError,
+    ValueError(ValueError),
+}
+
+impl From<ValueError> for Error {
+    fn from(value_error: ValueError) -> Self {
+        Error::ValueError(value_error)
+    }
 }
 
 // Context for evaluation
@@ -32,19 +39,7 @@ impl Context {
 
 pub trait Eval: Sized {
     /// Evaluate the type into an expression
-    fn eval(self, context: Option<&Context>) -> Result<Box<Expression>, Error>;
-
-    /// Evaluate the type into a string, TODO remove this and implement Display for Expression
-    fn eval_to_string(self, context: Option<&Context>) -> Result<String, Error> {
-        let result = self.eval(context)?;
-        match result.as_ref() {
-            Expression::NumberLiteral(n) => Ok(n.to_string()),
-            Expression::BoolLiteral(b) => Ok(b.to_string()),
-            Expression::StringLiteral(s) => Ok(s.clone()),
-            Expression::ListExpression(list) => list.clone().eval_to_string(context),
-            _ => Err(Error::EvaluateToStringError),
-        }
-    }
+    fn eval(self, context: Option<&Context>) -> Result<Value, Error>;
 
     /// The expected destination type after evaluation
     fn eval_type(&self, context: Option<&Context>) -> Result<Type, crate::eval::Error>;

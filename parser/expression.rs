@@ -5,6 +5,7 @@ use crate::langtype::Type;
 use crate::list::ListExpression;
 use crate::literal::NumberLiteral;
 use crate::parser::*;
+use crate::value::Value;
 use pest::pratt_parser::PrattParser;
 
 lazy_static::lazy_static! {
@@ -82,72 +83,12 @@ pub enum Expression {
 
 impl Expression {}
 
-/// Rules for operator +
-impl std::ops::Add for Box<Expression> {
-    type Output = Result<Box<Expression>, eval::Error>;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        match (self.as_ref(), rhs.as_ref()) {
-            (Expression::NumberLiteral(lhs), Expression::NumberLiteral(rhs)) => match lhs + rhs {
-                Some(result) => Ok(Box::new(Expression::NumberLiteral(result))),
-                None => Err(eval::Error::InvalidOperation),
-            },
-            _ => Err(eval::Error::InvalidOperation),
-        }
-    }
-}
-
-/// Rules for operator -
-impl std::ops::Sub for Box<Expression> {
-    type Output = Result<Box<Expression>, eval::Error>;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        match (self.as_ref(), rhs.as_ref()) {
-            (Expression::NumberLiteral(lhs), Expression::NumberLiteral(rhs)) => match lhs - rhs {
-                Some(result) => Ok(Box::new(Expression::NumberLiteral(result))),
-                None => Err(eval::Error::InvalidOperation),
-            },
-            _ => Err(eval::Error::InvalidOperation),
-        }
-    }
-}
-
-/// Rules for operator *
-impl std::ops::Mul for Box<Expression> {
-    type Output = Result<Box<Expression>, eval::Error>;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        match (self.as_ref(), rhs.as_ref()) {
-            (Expression::NumberLiteral(lhs), Expression::NumberLiteral(rhs)) => match lhs * rhs {
-                Some(result) => Ok(Box::new(Expression::NumberLiteral(result))),
-                None => Err(eval::Error::InvalidOperation),
-            },
-            _ => Err(eval::Error::InvalidOperation),
-        }
-    }
-}
-
-/// Rules for operator /
-impl std::ops::Div for Box<Expression> {
-    type Output = Result<Box<Expression>, eval::Error>;
-
-    fn div(self, rhs: Self) -> Self::Output {
-        match (self.as_ref(), rhs.as_ref()) {
-            (Expression::NumberLiteral(lhs), Expression::NumberLiteral(rhs)) => match lhs / rhs {
-                Some(result) => Ok(Box::new(Expression::NumberLiteral(result))),
-                None => Err(eval::Error::InvalidOperation),
-            },
-            _ => Err(eval::Error::InvalidOperation),
-        }
-    }
-}
-
 impl Eval for Expression {
-    fn eval(self, context: Option<&Context>) -> Result<Box<Self>, eval::Error> {
+    fn eval(self, context: Option<&Context>) -> Result<Value, eval::Error> {
         match self {
-            Self::NumberLiteral(_) | Self::StringLiteral(_) | Self::BoolLiteral(_) => {
-                Ok(Box::new(self))
-            }
+            Self::NumberLiteral(n) => Ok(Value::Number(n)),
+            Self::StringLiteral(s) => Ok(Value::String(s)),
+            Self::BoolLiteral(b) => Ok(Value::Bool(b)),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
             Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
             Self::BinaryOp { lhs, op, rhs } => {
@@ -161,16 +102,17 @@ impl Eval for Expression {
                     '/' => lhs / rhs,
                     _ => unimplemented!(),
                 }
+                .map_err(|err| eval::Error::ValueError(err))
             }
             Self::ElementAccess(lhs, rhs) => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
 
-                match (lhs.as_ref(), rhs.as_ref()) {
-                    (Expression::ListExpression(list), Expression::NumberLiteral(index)) => {
+                match (lhs, rhs) {
+                    (Value::List(list), Value::Number(index)) => {
                         let index = index.value() as usize;
                         if index < list.len() {
-                            Ok(Box::new(list.get(index).unwrap().clone()))
+                            Ok(list.get(index).unwrap().clone())
                         } else {
                             Err(eval::Error::ListIndexOutOfBounds {
                                 index,
@@ -185,11 +127,9 @@ impl Eval for Expression {
                 let lhs = lhs.eval(context)?;
                 let name: &str = &method_call.name.to_string();
 
-                match lhs.as_ref() {
-                    Expression::ListExpression(list) => match name {
-                        "len" => Ok(Box::new(Expression::NumberLiteral(
-                            NumberLiteral::from_usize(list.len()),
-                        ))),
+                match lhs {
+                    Value::List(list) => match name {
+                        "len" => Ok(Value::Number(NumberLiteral::from_usize(list.len()))),
                         _ => Err(eval::Error::InvalidOperation),
                     },
                     _ => Err(eval::Error::InvalidOperation),
@@ -344,7 +284,7 @@ mod tests {
     fn run_expression_test(
         expr: &str,
         context: Option<&Context>,
-        evaluator: impl FnOnce(Result<Expression, eval::Error>),
+        evaluator: impl FnOnce(Result<Value, eval::Error>),
     ) {
         use pest::Parser;
         let pair = crate::parser::Parser::parse(Rule::expression, expr)
@@ -355,28 +295,28 @@ mod tests {
         let expr = Expression::parse(pair).unwrap();
         let new_expr = expr.eval(context);
 
-        evaluator(new_expr.map(|e| *e));
+        evaluator(new_expr);
     }
 
     #[test]
     fn operators() {
         run_expression_test("4", None, |e| {
-            if let Ok(Expression::NumberLiteral(num)) = e {
+            if let Ok(Value::Number(num)) = e {
                 assert_eq!(num.value(), 4.0);
             }
         });
         run_expression_test("4 * 4", None, |e| {
-            if let Ok(Expression::NumberLiteral(num)) = e {
+            if let Ok(Value::Number(num)) = e {
                 assert_eq!(num.value(), 16.0);
             }
         });
         run_expression_test("4 * (4 + 4)", None, |e| {
-            if let Ok(Expression::NumberLiteral(num)) = e {
+            if let Ok(Value::Number(num)) = e {
                 assert_eq!(num.value(), 32.0);
             }
         });
         run_expression_test("10.0 / 2.5 + 6", None, |e| {
-            if let Ok(Expression::NumberLiteral(num)) = e {
+            if let Ok(Value::Number(num)) = e {
                 assert_eq!(num.value(), 10.0);
             }
         });
@@ -386,14 +326,14 @@ mod tests {
     fn list_expression() {
         // Simple list expression with 3 elements
         run_expression_test("[1,2,3]", None, |e| {
-            if let Ok(Expression::ListExpression(list)) = e {
+            if let Ok(Value::List(list)) = e {
                 assert_eq!(list.len(), 3);
             }
         });
 
         // Accessing the third element of a list
         run_expression_test("[1.0,2.0,3.0][2]", None, |e| {
-            if let Ok(Expression::NumberLiteral(n)) = e {
+            if let Ok(Value::Number(n)) = e {
                 assert_eq!(n.value(), 3.0);
             }
         });
@@ -408,7 +348,7 @@ mod tests {
 
         // Return the length of a list
         run_expression_test("[1.0,2.0,3.0].len()", None, |e| {
-            if let Ok(Expression::NumberLiteral(n)) = e {
+            if let Ok(Value::Number(n)) = e {
                 assert_eq!(n.value(), 3.0);
             }
         });
