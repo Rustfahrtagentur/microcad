@@ -153,21 +153,17 @@ impl Parse for VariableDeclarationList {
 
 #[cfg(test)]
 mod tests {
-    use pest::Parser;
 
     use super::*;
-    use crate::{eval::Context, parser::Rule};
+    use crate::eval::Context;
+    use crate::parser::Parser;
 
     #[test]
     fn variable_single_declaration() {
-        let input = "a = 1";
-        use crate::parser::Rule;
-
-        let pair = crate::parser::Parser::parse(Rule::variable_single_declaration, input)
-            .unwrap()
-            .next()
-            .unwrap();
-        let decl = VariableDeclaration::parse(pair).unwrap();
+        let decl = Parser::parse_rule_or_panic::<VariableDeclaration>(
+            Rule::variable_single_declaration,
+            "a = 1",
+        );
 
         let context = Context::default();
         use crate::eval::Eval;
@@ -191,14 +187,10 @@ mod tests {
 
     #[test]
     fn variable_multi_declaration() {
-        let input = "(a, b) = 1";
-        use crate::parser::Rule;
-
-        let pair = crate::parser::Parser::parse(Rule::variable_multi_declaration, input)
-            .unwrap()
-            .next()
-            .unwrap();
-        let decl = VariableDeclaration::parse(pair).unwrap();
+        let decl = Parser::parse_rule_or_panic::<VariableDeclaration>(
+            Rule::variable_multi_declaration,
+            "(a, b) = 1",
+        );
 
         let context = Context::default();
         use crate::eval::Eval;
@@ -224,14 +216,10 @@ mod tests {
 
     #[test]
     fn variable_declaration_list() {
-        let input = "a = 1, (b, c) = 2";
-        use crate::parser::Rule;
-
-        let pair = crate::parser::Parser::parse(Rule::variable_declaration_list, input)
-            .unwrap()
-            .next()
-            .unwrap();
-        let decls = VariableDeclarationList::parse(pair).unwrap();
+        let decls = Parser::parse_rule_or_panic::<VariableDeclarationList>(
+            Rule::variable_declaration_list,
+            "a = 1, (b, c) = 2",
+        );
 
         assert_eq!(decls.get(0).unwrap().name, Identifier::from("a"));
         assert_eq!(decls.get(1).unwrap().name, Identifier::from("b"));

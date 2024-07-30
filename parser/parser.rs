@@ -76,6 +76,19 @@ impl Parser {
         Ok(pairs.map(f).map(|x| x.unwrap()).collect::<Vec<_>>())
     }
 
+    /// Convenience function to parse a rule for type `T` and panic on error
+    pub fn parse_rule_or_panic<T>(rule: Rule, input: &str) -> T
+    where
+        T: Parse,
+    {
+        use pest::Parser;
+        let pair = crate::parser::Parser::parse(rule, input)
+            .unwrap()
+            .next()
+            .unwrap();
+        T::parse(pair).unwrap()
+    }
+
     fn function_argument(pair: Pair) -> Result<FunctionArgument, ParseError> {
         let pairs = pair.into_inner();
         let first = pairs.clone().nth(0).unwrap();
