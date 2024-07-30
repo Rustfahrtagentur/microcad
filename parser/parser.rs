@@ -4,7 +4,6 @@ pub struct Parser;
 
 use crate::expression::Expression;
 use crate::identifier::{Identifier, IdentifierListError, QualifiedName};
-use crate::literal::NumberLiteral;
 use thiserror::Error;
 
 pub type Pair<'i> = pest::iterators::Pair<'i, Rule>;
@@ -68,12 +67,10 @@ pub struct ModuleNodeStatement {
 impl Parser {
     /// @brief Helper function to parse a vector of pairs into a vector of T
     /// @param pairs The pairs to parse
-    /// @param rule The rule to match
     /// @param f The function to parse the pair into T
     /// @return A vector of T
-    fn list<T>(
+    pub fn vec<T>(
         pairs: Pairs,
-        rule: Rule,
         f: impl Fn(Pair) -> Result<T, ParseError>,
     ) -> Result<Vec<T>, ParseError> {
         Ok(pairs.map(f).map(|x| x.unwrap()).collect::<Vec<_>>())
@@ -97,11 +94,7 @@ impl Parser {
     }
 
     fn function_argument_list(pairs: Pairs) -> Result<Vec<FunctionArgument>, ParseError> {
-        Self::list(pairs, Rule::call_named_argument, Self::function_argument)
-    }
-
-    pub fn qualified_name_list(pairs: Pairs) -> Result<Vec<QualifiedName>, ParseError> {
-        Self::list(pairs, Rule::qualified_name, QualifiedName::parse)
+        Self::vec(pairs, Self::function_argument)
     }
 
     fn function_call(pairs: Pairs) -> Result<FunctionCall, ParseError> {

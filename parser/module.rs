@@ -134,7 +134,7 @@ impl Parse for UseStatement {
 
         match first.as_rule() {
             Rule::qualified_name_list => {
-                let qualified_name_list = Parser::qualified_name_list(first.into_inner())?;
+                let qualified_name_list = Parser::vec(first.into_inner(), QualifiedName::parse)?;
                 if let Some(second) = second {
                     if second.as_rule() == Rule::qualified_name {
                         return Ok(UseStatement::UseFrom(
@@ -151,8 +151,9 @@ impl Parse for UseStatement {
             Rule::qualified_name_all => {
                 if let Some(second) = second {
                     if second.as_rule() == Rule::qualified_name_list {
-                        return Ok(UseStatement::UseAll(Parser::qualified_name_list(
+                        return Ok(UseStatement::UseAll(Parser::vec(
                             second.into_inner(),
+                            QualifiedName::parse,
                         )?));
                     } else {
                         unreachable!();
