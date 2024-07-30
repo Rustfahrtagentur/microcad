@@ -455,6 +455,7 @@ dependencies = [
  "pest_derive",
  "pest_test",
  "rctree",
+ "thiserror",
 ]
 
 [[package]]
