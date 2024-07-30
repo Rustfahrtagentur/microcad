@@ -1,38 +1,31 @@
-use std::str::FromStr;
-
 #[derive(pest_derive::Parser)]
 #[grammar = "grammar.pest"]
 pub struct Parser;
 
 use crate::expression::Expression;
-use crate::identifier::{Identifier, QualifiedName};
+use crate::identifier::{Identifier, IdentifierListError, QualifiedName};
 use crate::literal::NumberLiteral;
-use crate::units::Unit;
+use thiserror::Error;
 
 pub type Pair<'i> = pest::iterators::Pair<'i, Rule>;
 pub type Pairs<'i> = pest::iterators::Pairs<'i, Rule>;
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum ParseError {
+    #[error("Expected identifier")]
     ExpectedIdentifier,
-    ModuleNodeAtLeastOneCall,
+    #[error("Invalid use statement")]
     InvalidUseStatement,
-    ParseFloatError(std::num::ParseFloatError),
-    ParseIntError(std::num::ParseIntError),
+    #[error("Error parsing floating point number: {0}")]
+    ParseFloatError(#[from] std::num::ParseFloatError),
+    #[error("Error parsing int point number: {0}")]
+    ParseIntError(#[from] std::num::ParseIntError),
+    #[error("Unknown unit: {0}")]
     UnknownUnit(String),
+    #[error("Unexpected token")]
     UnexpectedToken,
-}
-
-impl From<std::num::ParseFloatError> for ParseError {
-    fn from(value: std::num::ParseFloatError) -> Self {
-        Self::ParseFloatError(value)
-    }
-}
-
-impl From<std::num::ParseIntError> for ParseError {
-    fn from(value: std::num::ParseIntError) -> Self {
-        Self::ParseIntError(value)
-    }
+    #[error("Identifier list error: {0}")]
+    IdentifierListError(#[from] IdentifierListError),
 }
 
 pub trait Parse: Sized {
@@ -83,14 +76,7 @@ impl Parser {
         rule: Rule,
         f: impl Fn(Pair) -> Result<T, ParseError>,
     ) -> Result<Vec<T>, ParseError> {
-        Ok(pairs
-            .map(|pair| f(pair))
-            .map(|x| x.unwrap())
-            .collect::<Vec<_>>())
-    }
-
-    fn expression(pair: Pair) -> Result<Expression, ParseError> {
-        Expression::parse(pair)
+        Ok(pairs.map(f).map(|x| x.unwrap()).collect::<Vec<_>>())
     }
 
     fn function_argument(pair: Pair) -> Result<FunctionArgument, ParseError> {
@@ -101,9 +87,9 @@ impl Parser {
         match first.as_rule() {
             Rule::identifier => Ok(FunctionArgument::NamedArgument(
                 Identifier::parse(first)?,
-                Self::expression(second)?,
+                Expression::parse(second)?,
             )),
-            Rule::expression => Ok(FunctionArgument::PositionalArgument(Self::expression(
+            Rule::expression => Ok(FunctionArgument::PositionalArgument(Expression::parse(
                 first,
             )?)),
             _ => unreachable!(),
@@ -170,7 +156,7 @@ impl Parser {
         }
 
         if module_node_statement.calls.is_empty() {
-            Err(ParseError::ModuleNodeAtLeastOneCall)
+            panic!("No calls found in module node statement");
         } else {
             Ok(module_node_statement)
         }

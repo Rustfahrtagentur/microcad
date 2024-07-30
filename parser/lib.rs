@@ -1,4 +1,5 @@
 mod call;
+pub mod declaration;
 mod diagnostics;
 pub mod eval;
 pub mod expression;

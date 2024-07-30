@@ -26,9 +26,8 @@ constant_identifier = { (alpha_upper | "_") ~ (alpha_upper | digit | "_")* }
 //`a,b`: ok # A comma-separated list of identifier
 identifier_list = { identifier ~ (ws* ~ "," ~ ws* ~ identifier)*}
 
-//`(a,b)`: ok
-//`(a.b,d)`: error # `a.b` is a qualified name and not an identifier
-identifier_tuple = { "(" ~ ws* ~ identifier_list ~ ws* ~ ")" }
+// A tuple of identifiers: (a,b,c)
+identifier_tuple = _{ "(" ~ ws* ~ identifier_list ~ ws* ~ ")" }
 
 //`90.0°`: ok, with `°` unit
 //`5.0mm`: ok, with `mm` unit
@@ -109,7 +108,7 @@ qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 //`(scalar, scalar)`: Tuple type
 type = { qualified_name | list_type | tuple_type }
 
-type_specifier = _{ ":" ~ ws* ~ type }
+type_annotation = _{ ":" ~ ws* ~ type }
 
 //`[scalar]`: ok list with elements of type `scalar`
 //`[]`: ok # List with elements of arbitrary type
@@ -258,11 +257,20 @@ function_call = _{ call }
 //`r: length`: ok # Default value is not required
 //`r: length = math.PI`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
+variable_single_declaration = { identifier ~ ws* ~ variant_declaration_type_specifier }
+
 //`(a,b): length`: ok # Tuple identifier with same type
 //`(a,b): (length, length)`: ok # Tuple identifier with tuple type
 //`(a,b) = 5.0mm`: ok # Tuple identifier with same default value
 //`(a,b): length = 5.0mm`: ok # Tuple identifier with same type and default value
-variable_declaration = { (identifier | identifier_tuple) ~ ws* ~ (type_specifier ~ ws* ~ default_value | type_specifier | default_value) }
+variable_multi_declaration = { identifier_tuple ~ ws* ~ variant_declaration_type_specifier }
+
+variable_declaration = _{ variable_single_declaration | variable_multi_declaration }
+
+//`: length = 5.0mm`: ok # Type specifier with default value
+//`: length`: ok # Type specifier without default value
+//`= 5.0mm`: ok # Default value without type specifier
+variant_declaration_type_specifier = { type_annotation ~ ws* ~ default_value | type_annotation | default_value }
 
 //`a: scalar, b: scalar`: ok # Multiple arguments
 //`a: scalar, b: scalar = 5.0mm`: ok # Default value for second argument
@@ -276,7 +284,7 @@ argument_list = _{ "(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")" }
 variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
 
 //`PI = 3.14159`: ok
-constant_declaration = { constant_identifier ~ ws* ~ (type_specifier ~ ws* ~ default_value | type_specifier | default_value) }
+constant_declaration = { constant_identifier ~ ws* ~ (type_annotation ~ ws* ~ default_value | type_annotation | default_value) }
 
 constant_declaration_statement = _{ constant_declaration ~ ws* ~ ";" }
 

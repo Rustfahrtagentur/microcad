@@ -1,5 +1,7 @@
 use crate::parser::{Pair, Parse, ParseError};
 
+use thiserror::Error;
+
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct Identifier(String);
 
@@ -43,7 +45,42 @@ impl std::fmt::Display for Identifier {
     }
 }
 
+#[derive(Debug, Error)]
+pub enum IdentifierListError {
+    #[error("Duplicate identifier: {0}")]
+    DuplicateIdentifier(Identifier),
+}
+
+/// @brief A list of identifiers
+/// @details Used e.g. for multiple variable declarations.
+///          Cannot contain duplicates.
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct IdentifierList(Vec<Identifier>);
+
+impl IdentifierList {
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    pub fn push(&mut self, ident: Identifier) -> Result<(), IdentifierListError> {
+        if self.contains(&ident) {
+            Err(IdentifierListError::DuplicateIdentifier(ident))
+        } else {
+            Ok(self.0.push(ident))
+        }
+    }
+
+    pub fn contains(&self, ident: &Identifier) -> bool {
+        self.0.contains(ident)
+    }
+
+    pub fn extend(&mut self, other: IdentifierList) -> Result<(), IdentifierListError> {
+        for ident in other {
+            self.push(ident)?;
+        }
+        Ok(())
+    }
+}
 
 impl Parse for IdentifierList {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
