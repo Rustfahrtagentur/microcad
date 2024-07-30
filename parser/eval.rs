@@ -24,6 +24,8 @@ pub enum Error {
     UnknownIdentifier(Identifier),
     #[error("Unknown method: {0}")]
     UnknownMethod(Identifier),
+    #[error("Elements of list have different types")]
+    ListElementsDifferentTypes,
 }
 
 /// @brief Symbol table

@@ -2,7 +2,7 @@ use crate::eval::{Context, Eval};
 use crate::expression::{Expression, ExpressionList};
 use crate::langtype::Type;
 use crate::parser::{Pair, Parse, ParseError};
-use crate::value::{self, Value};
+use crate::value::Value;
 
 #[derive(Default, Clone)]
 pub struct ListExpression(ExpressionList);
@@ -44,12 +44,13 @@ impl Eval for ListExpression {
             vec.push(value);
         }
         types.dedup();
-        let common_type = match types.len() {
-            1 => Some(types.first().unwrap().clone()),
-            _ => None,
-        };
-
-        Ok(Value::List(crate::value::List(vec, common_type.unwrap())))
+        match types.len() {
+            1 => Ok(Value::List(crate::value::List(
+                vec,
+                types.first().unwrap().clone(),
+            ))),
+            _ => Err(crate::eval::Error::ListElementsDifferentTypes),
+        }
     }
 
     fn eval_type(&self, context: Option<&Context>) -> Result<Type, crate::eval::Error> {
