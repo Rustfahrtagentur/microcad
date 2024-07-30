@@ -10,11 +10,11 @@ struct TupleExpression(CallArgumentList);
 
 impl Parse for TupleExpression {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        let call_argument_list = CallArgumentList::parse(pair)?;
+        let call_argument_list = CallArgumentList::parse(pair.into_inner().next().unwrap())?;
         if call_argument_list.is_empty() {
             return Err(ParseError::EmptyTupleExpression);
         }
-        if call_argument_list.contains_positional() ^ call_argument_list.contains_named() {
+        if call_argument_list.contains_positional() && call_argument_list.contains_named() {
             return Err(ParseError::MixedTupleArguments);
         }
 
@@ -106,5 +106,84 @@ impl Eval for TupleExpression {
 
             Ok(Type::NamedTuple(crate::langtype::NamedTupleType(map)))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{langtype::Ty, parser::Rule, tuple::TupleExpression};
+
+    #[test]
+    fn test_unnamed_tuple() {
+        use crate::eval::Eval;
+        use crate::langtype::Type;
+
+        let input = "(1.0, 2.0, 3.0)";
+        let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
+            Rule::tuple_expression,
+            input,
+        );
+        let value = expr.eval(None).unwrap();
+        assert_eq!(
+            value.ty(),
+            Type::UnnamedTuple(crate::langtype::UnnamedTupleType(vec![
+                Type::Scalar,
+                Type::Scalar,
+                Type::Scalar
+            ]))
+        );
+    }
+
+    #[test]
+    fn test_named_tuple() {
+        use crate::eval::Eval;
+        use crate::langtype::Type;
+
+        let input = "(a = 1.0, b = 2.0, c = 3.0)";
+        let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
+            Rule::tuple_expression,
+            input,
+        );
+        let value = expr.eval(None).unwrap();
+        assert_eq!(
+            value.ty(),
+            Type::NamedTuple(crate::langtype::NamedTupleType(
+                vec![
+                    ("a".into(), Type::Scalar),
+                    ("b".into(), Type::Scalar),
+                    ("c".into(), Type::Scalar)
+                ]
+                .into_iter()
+                .collect()
+            ))
+        );
+    }
+
+    #[test]
+    fn test_vec2() {
+        use crate::eval::Eval;
+        use crate::langtype::Type;
+
+        let input = "((x,y) = 1.0mm)";
+        let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
+            Rule::tuple_expression,
+            input,
+        );
+        let value = expr.eval(None).unwrap();
+        assert_eq!(value.ty(), Type::Vec2);
+    }
+
+    #[test]
+    fn test_vec3() {
+        use crate::eval::Eval;
+        use crate::langtype::Type;
+
+        let input = "(x = 1.0mm, (y,z) = 2.0mm)";
+        let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
+            Rule::tuple_expression,
+            input,
+        );
+        let value = expr.eval(None).unwrap();
+        assert_eq!(value.ty(), Type::Vec3);
     }
 }
