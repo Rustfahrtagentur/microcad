@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use thiserror::Error;
 
 use crate::{
@@ -130,14 +130,12 @@ impl std::fmt::Display for UnnamedTupleType {
 }
 
 #[derive(Debug, Clone, Default, PartialEq)]
-pub struct NamedTupleType(HashMap<Identifier, Type>);
+pub struct NamedTupleType(BTreeMap<Identifier, Type>);
 
 impl Parse for NamedTupleType {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        let mut inner = pair.into_inner();
-
-        let mut types = HashMap::new();
-        for pair in inner {
+        let mut types = BTreeMap::new();
+        for pair in pair.into_inner() {
             let mut inner = pair.into_inner();
             let name = Identifier::parse(inner.next().unwrap())?;
             let ty = Type::parse(inner.next().unwrap())?;
@@ -197,7 +195,7 @@ pub enum Type {
     /// An angle, e.g. 90°
     Angle,
 
-    /// A two-dimensional vector
+    /// A two-dimensional vector, maps from named tuple ((x,y): length)
     Vec2,
 
     /// A three-dimensional vector, maps from named tuple ((x,y,z): length)
@@ -209,13 +207,16 @@ pub enum Type {
     /// A list of elements of the same type: [scalar]
     List(ListType),
 
+    /// A map of elements: [string => scalar]
     Map(MapType),
 
+    /// An unnamed tuple of elements: (scalar, string)
     UnnamedTuple(UnnamedTupleType),
 
+    /// A named tuple of elements: (x: scalar, y: string)
     NamedTuple(NamedTupleType),
 
-    /// A node in the syntax tree
+    /// A custom type or a module node in the syntax tree
     Custom(QualifiedName),
 }
 
@@ -281,4 +282,72 @@ impl std::fmt::Display for Type {
 /// Trait for structs and expressions that have a type
 pub trait Ty {
     fn ty(&self) -> Type;
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        langtype::Type,
+        parser::{Parser, Rule},
+    };
+
+    #[test]
+    fn builtin_type() {
+        let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "int");
+        assert_eq!(ty.to_string(), "int");
+        assert_eq!(ty, Type::Integer);
+    }
+
+    #[test]
+    fn list_type() {
+        use crate::langtype::ListType;
+        let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int]");
+        assert_eq!(ty.to_string(), "[int]");
+        assert_eq!(ty, Type::List(ListType::from_type(Type::Integer)));
+    }
+
+    #[test]
+    fn map_type() {
+        use crate::langtype::MapType;
+        let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int => string]");
+        assert_eq!(ty.to_string(), "[int => string]");
+        assert_eq!(
+            ty,
+            Type::Map(MapType::from_types(
+                crate::langtype::MapKeyType::Integer,
+                Type::String
+            ))
+        );
+    }
+
+    #[test]
+    fn unnamed_tuple_type() {
+        use crate::langtype::UnnamedTupleType;
+        let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(int, string)");
+        assert_eq!(ty.to_string(), "(int, string)");
+        assert_eq!(
+            ty,
+            Type::UnnamedTuple(UnnamedTupleType(vec![Type::Integer, Type::String]))
+        );
+    }
+
+    #[test]
+    fn named_tuple_type() {
+        use crate::identifier::Identifier;
+        use crate::langtype::NamedTupleType;
+
+        let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(x: int, y: string)");
+        assert_eq!(ty.to_string(), "(x: int, y: string)");
+        assert_eq!(
+            ty,
+            Type::NamedTuple(NamedTupleType(
+                vec![
+                    (Identifier::from("x"), Type::Integer),
+                    (Identifier::from("y"), Type::String)
+                ]
+                .into_iter()
+                .collect()
+            ))
+        );
+    }
 }

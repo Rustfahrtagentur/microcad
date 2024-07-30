@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use crate::expression::Expression;
 use crate::identifier::{Identifier, IdentifierList, QualifiedName};
@@ -47,7 +47,7 @@ impl Parse for CallArgument {
 #[derive(Default, Clone)]
 pub struct CallArgumentList {
     positional: Vec<Box<Expression>>,
-    named: HashMap<Identifier, Box<Expression>>,
+    named: BTreeMap<Identifier, Box<Expression>>,
 }
 
 impl CallArgumentList {

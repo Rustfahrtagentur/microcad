@@ -2,7 +2,7 @@ use crate::parser::{Pair, Parse, ParseError};
 
 use thiserror::Error;
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Identifier(String);
 
 pub enum Visibility {
