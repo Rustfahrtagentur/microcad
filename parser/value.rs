@@ -5,7 +5,7 @@ use thiserror::Error;
 
 use crate::{
     identifier::Identifier,
-    langtype::{MapKeyType, Ty, Type},
+    langtype::{MapKeyType, NamedTupleType, Ty, Type, UnnamedTupleType},
     syntax_tree::{qualified_name, SyntaxNode},
 };
 
@@ -128,7 +128,7 @@ impl std::fmt::Display for MapKeyValue {
 }
 
 #[derive(Debug, Default, Clone, PartialEq)]
-struct Map(HashMap<MapKeyValue, Value>, pub MapKeyType, pub Type);
+pub struct Map(pub HashMap<MapKeyValue, Value>, pub MapKeyType, Type);
 
 impl Map {
     fn len(&self) -> usize {
@@ -147,7 +147,7 @@ impl Ty for Map {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct NamedTuple(pub HashMap<Identifier, Value>);
+pub struct NamedTuple(pub HashMap<Identifier, Value>, NamedTupleType);
 
 impl NamedTuple {
     pub fn len(&self) -> usize {
@@ -165,12 +165,12 @@ impl NamedTuple {
 
 impl Ty for NamedTuple {
     fn ty(&self) -> Type {
-        Type::NamedTuple(self.0.iter().map(|(k, v)| (k.clone(), v.ty())).collect())
+        Type::NamedTuple(self.1.clone())
     }
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct UnnamedTuple(pub Vec<Value>);
+pub struct UnnamedTuple(pub Vec<Value>, pub UnnamedTupleType);
 
 impl UnnamedTuple {
     fn len(&self) -> usize {
@@ -180,11 +180,34 @@ impl UnnamedTuple {
     fn iter(&self) -> std::slice::Iter<Value> {
         self.0.iter()
     }
+
+    pub fn binary_op(
+        self,
+        rhs: Self,
+        op: char,
+        f: impl Fn(Value, Value) -> Result<Value, ValueError>,
+    ) -> Result<Self, ValueError> {
+        if self.len() != rhs.len() {
+            return Err(ValueError::TupleLengthMismatchForOperator {
+                operator: op,
+                lhs: self.len(),
+                rhs: rhs.len(),
+            });
+        }
+        let mut result = Vec::new();
+        let mut types = Vec::new();
+        for (l, r) in self.0.iter().zip(rhs.0.iter()) {
+            let add_result = f(l.clone(), r.clone())?;
+            types.push(add_result.ty());
+            result.push(add_result);
+        }
+        Ok(UnnamedTuple(result, UnnamedTupleType(types)))
+    }
 }
 
 impl Ty for UnnamedTuple {
     fn ty(&self) -> Type {
-        Type::UnnamedTuple(self.0.iter().map(Value::ty).collect())
+        Type::UnnamedTuple(self.1.clone())
     }
 }
 
@@ -192,18 +215,7 @@ impl std::ops::Add for UnnamedTuple {
     type Output = Result<UnnamedTuple, ValueError>;
 
     fn add(self, rhs: Self) -> Self::Output {
-        if self.len() != rhs.len() {
-            return Err(ValueError::TupleLengthMismatchForOperator {
-                operator: '+',
-                lhs: self.len(),
-                rhs: rhs.len(),
-            });
-        }
-        let mut result = Vec::new();
-        for (l, r) in self.0.into_iter().zip(rhs.0.into_iter()) {
-            result.push((l + r)?);
-        }
-        Ok(UnnamedTuple(result))
+        self.binary_op(rhs, '+', |lhs, rhs| lhs + rhs)
     }
 }
 
@@ -211,18 +223,7 @@ impl std::ops::Sub for UnnamedTuple {
     type Output = Result<UnnamedTuple, ValueError>;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        if self.len() != rhs.len() {
-            return Err(ValueError::TupleLengthMismatchForOperator {
-                operator: '-',
-                lhs: self.len(),
-                rhs: rhs.len(),
-            });
-        }
-        let mut result = Vec::new();
-        for (l, r) in self.0.into_iter().zip(rhs.0.into_iter()) {
-            result.push((l - r)?);
-        }
-        Ok(UnnamedTuple(result))
+        self.binary_op(rhs, '-', |lhs, rhs| lhs - rhs)
     }
 }
 

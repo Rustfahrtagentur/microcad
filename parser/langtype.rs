@@ -100,10 +100,77 @@ impl std::fmt::Display for MapType {
     }
 }
 
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct UnnamedTupleType(pub Vec<Type>);
+
+impl Parse for UnnamedTupleType {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let mut inner = pair.into_inner();
+
+        let mut types = Vec::new();
+        for pair in inner {
+            types.push(Type::parse(pair)?);
+        }
+
+        Ok(Self(types))
+    }
+}
+
+impl std::fmt::Display for UnnamedTupleType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(")?;
+        for (i, t) in self.0.iter().enumerate() {
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}", t)?;
+        }
+        write!(f, ")")
+    }
+}
+
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct NamedTupleType(HashMap<Identifier, Type>);
+
+impl Parse for NamedTupleType {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let mut inner = pair.into_inner();
+
+        let mut types = HashMap::new();
+        for pair in inner {
+            let mut inner = pair.into_inner();
+            let name = Identifier::parse(inner.next().unwrap())?;
+            let ty = Type::parse(inner.next().unwrap())?;
+            if types.contains_key(&name) {
+                return Err(TypeError::DuplicatedMapField(name.clone()).into());
+            }
+            types.insert(name, ty);
+        }
+
+        Ok(Self(types))
+    }
+}
+
+impl std::fmt::Display for NamedTupleType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(")?;
+        for (i, (name, ty)) in self.0.iter().enumerate() {
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}: {}", name, ty)?;
+        }
+        write!(f, ")")
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum TypeError {
     #[error("Invalid map key type: {0}")]
     InvalidMapKeyType(String),
+
+    #[error("Duplicated field name in map: {0}")]
+    DuplicatedMapField(Identifier),
 }
 
 #[derive(Debug, Clone, Default, PartialEq)]
@@ -133,19 +200,20 @@ pub enum Type {
     /// A two-dimensional vector
     Vec2,
 
-    /// A three-dimensional vector
+    /// A three-dimensional vector, maps from named tuple ((x,y,z): length)
     Vec3,
 
-    /// A boolean
+    /// A boolean: true, false
     Bool,
 
+    /// A list of elements of the same type: [scalar]
     List(ListType),
 
     Map(MapType),
 
-    UnnamedTuple(Vec<Type>),
+    UnnamedTuple(UnnamedTupleType),
 
-    NamedTuple(HashMap<Identifier, Type>),
+    NamedTuple(NamedTupleType),
 
     /// A node in the syntax tree
     Custom(QualifiedName),
@@ -201,26 +269,8 @@ impl std::fmt::Display for Type {
             Self::Bool => write!(f, "bool"),
             Self::List(t) => write!(f, "{}", t),
             Self::Map(t) => write!(f, "{}", t),
-            Self::UnnamedTuple(t) => {
-                write!(f, "(")?;
-                for (i, t) in t.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{}", t)?;
-                }
-                write!(f, ")")
-            }
-            Self::NamedTuple(t) => {
-                write!(f, "(")?;
-                for (i, (name, t)) in t.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{}: {}", name, t)?;
-                }
-                write!(f, ")")
-            }
+            Self::UnnamedTuple(t) => write!(f, "{}", t),
+            Self::NamedTuple(t) => write!(f, "{}", t),
             Self::Custom(qn) => write!(f, "{}", qn),
         }
     }
