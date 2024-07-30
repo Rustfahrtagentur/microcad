@@ -105,7 +105,7 @@ pub struct UnnamedTupleType(pub Vec<Type>);
 
 impl Parse for UnnamedTupleType {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        let mut inner = pair.into_inner();
+        let inner = pair.into_inner();
 
         let mut types = Vec::new();
         for pair in inner {
@@ -237,6 +237,8 @@ impl Parse for Type {
         match inner.as_rule() {
             Rule::list_type => Ok(Self::List(ListType::parse(inner)?)),
             Rule::map_type => Ok(Self::Map(MapType::parse(inner)?)),
+            Rule::unnamed_tuple_type => Ok(Self::UnnamedTuple(UnnamedTupleType::parse(inner)?)),
+            Rule::named_tuple_type => Ok(Self::NamedTuple(NamedTupleType::parse(inner)?)),
             Rule::qualified_name => match inner.as_str() {
                 "int" => Ok(Self::Integer),
                 "scalar" => Ok(Self::Scalar),
