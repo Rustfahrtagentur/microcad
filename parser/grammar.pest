@@ -135,11 +135,11 @@ list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" }
 //`["test"]`: ok # Associative lists, access value of `\"test\"`
 list_element_access = { "[" ~ ws* ~ (integer_literal | expression) ~ ws* ~ "]" } 
 
+// An expression for named or unnamed tuple
 //`(1.0mm, 2.0mm)`: ok
 //`(1.0mm,)`: error # Trailing comma
-unnamed_tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
-
-named_tuple_expression = { "(" ~ ws* ~ call_named_tuple_argument ~ (ws* ~ "," ~ ws* ~ call_named_tuple_argument)* ~ ws* ~ ")" }
+//`(x = 1.0mm, y = 2.0mm)`: ok
+tuple_expression = { "(" ~ ws* ~ call_argument_list ~ ws* ~ ")" }
 
 //`.0`: ok
 //`.height`: ok
@@ -199,7 +199,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ method_call | element_access }
-primary          =  _{ literal | format_string | identifier | constant_identifier  | "(" ~ expression ~ ")" | named_tuple_expression | unnamed_tuple_expression | list_expression }
+primary          =  _{ literal | format_string | identifier | constant_identifier  | "(" ~ expression ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok

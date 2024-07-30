@@ -5,9 +5,9 @@ use crate::identifier::{Identifier, IdentifierList, QualifiedName};
 use crate::parser::*;
 
 enum CallArgument {
-    CallNamedArgument(Identifier, Box<Expression>),
-    CallNamedTupleArgument(IdentifierList, Box<Expression>),
-    CallPositionalArgument(Box<Expression>),
+    NamedArgument(Identifier, Box<Expression>),
+    NamedTupleArgument(IdentifierList, Box<Expression>),
+    PositionalArgument(Box<Expression>),
 }
 
 impl Parse for CallArgument {
@@ -18,7 +18,7 @@ impl Parse for CallArgument {
                 let first = pairs.next().unwrap();
                 let second = pairs.next().unwrap();
 
-                Ok(CallArgument::CallNamedArgument(
+                Ok(CallArgument::NamedArgument(
                     Identifier::parse(first)?,
                     Box::new(Expression::parse(second)?),
                 ))
@@ -28,12 +28,12 @@ impl Parse for CallArgument {
                 let first = pairs.next().unwrap();
                 let second = pairs.next().unwrap();
 
-                Ok(CallArgument::CallNamedTupleArgument(
+                Ok(CallArgument::NamedTupleArgument(
                     IdentifierList::parse(first)?,
                     Box::new(Expression::parse(second)?),
                 ))
             }
-            Rule::expression => Ok(CallArgument::CallPositionalArgument(Box::new(
+            Rule::expression => Ok(CallArgument::PositionalArgument(Box::new(
                 Expression::parse(pair)?,
             ))),
             rule => unreachable!(
@@ -46,16 +46,16 @@ impl Parse for CallArgument {
 
 #[derive(Default, Clone)]
 pub struct CallArgumentList {
-    positional: Vec<Box<Expression>>,
-    named: BTreeMap<Identifier, Box<Expression>>,
+    positional: Vec<Expression>,
+    named: BTreeMap<Identifier, Expression>,
 }
 
 impl CallArgumentList {
-    fn get_named(&self, ident: &Identifier) -> Option<&Box<Expression>> {
+    fn get_named(&self, ident: &Identifier) -> Option<&Expression> {
         self.named.get(ident)
     }
 
-    fn get_positional(&self, index: usize) -> Option<&Box<Expression>> {
+    fn get_positional(&self, index: usize) -> Option<&Expression> {
         self.positional.get(index)
     }
 
@@ -67,15 +67,15 @@ impl CallArgumentList {
         self.positional.is_empty() && self.named.is_empty()
     }
 
-    fn iter(&self) -> impl Iterator<Item = &Box<Expression>> {
+    fn iter(&self) -> impl Iterator<Item = &Expression> {
         self.positional.iter().chain(self.named.values())
     }
 
-    fn insert_named(&mut self, ident: Identifier, expr: Box<Expression>) {
+    fn insert_named(&mut self, ident: Identifier, expr: Expression) {
         self.named.insert(ident, expr);
     }
 
-    fn insert_positional(&mut self, expr: Box<Expression>) {
+    fn insert_positional(&mut self, expr: Expression) {
         self.positional.push(expr);
     }
 }
@@ -88,16 +88,16 @@ impl Parse for CallArgumentList {
             Rule::call_argument_list => {
                 for pair in pair.into_inner() {
                     match CallArgument::parse(pair)? {
-                        CallArgument::CallNamedArgument(ident, expr) => {
-                            call_argument_list.insert_named(ident, expr);
+                        CallArgument::NamedArgument(ident, expr) => {
+                            call_argument_list.insert_named(ident, *expr);
                         }
-                        CallArgument::CallNamedTupleArgument(idents, expr) => {
+                        CallArgument::NamedTupleArgument(idents, expr) => {
                             for ident in idents {
-                                call_argument_list.insert_named(ident, expr.clone());
+                                call_argument_list.insert_named(ident, *expr.clone());
                             }
                         }
-                        CallArgument::CallPositionalArgument(expr) => {
-                            call_argument_list.insert_positional(expr);
+                        CallArgument::PositionalArgument(expr) => {
+                            call_argument_list.insert_positional(*expr);
                         }
                     }
                 }

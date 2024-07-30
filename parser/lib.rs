@@ -11,5 +11,6 @@ pub mod literal;
 mod module;
 pub mod parser;
 pub mod syntax_tree;
+pub mod tuple;
 pub mod units;
 pub mod value;
