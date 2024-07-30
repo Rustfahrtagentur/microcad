@@ -267,10 +267,7 @@ variable_multi_declaration = { identifier_tuple ~ ws* ~ variant_declaration_type
 
 variable_declaration = _{ variable_single_declaration | variable_multi_declaration }
 
-//`: length = 5.0mm`: ok # Type specifier with default value
-//`: length`: ok # Type specifier without default value
-//`= 5.0mm`: ok # Default value without type specifier
-variant_declaration_type_specifier = { type_annotation ~ ws* ~ default_value | type_annotation | default_value }
+variant_declaration_type_specifier = _{ type_annotation ~ ws* ~ default_value | type_annotation | default_value }
 
 //`a: scalar, b: scalar`: ok # Multiple arguments
 //`a: scalar, b: scalar = 5.0mm`: ok # Default value for second argument

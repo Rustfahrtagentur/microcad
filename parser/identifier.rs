@@ -21,6 +21,14 @@ impl Identifier {
     }
 }
 
+impl std::str::FromStr for Identifier {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(s.to_string()))
+    }
+}
+
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {
         Self(value.to_string())
@@ -58,15 +66,28 @@ pub enum IdentifierListError {
 pub struct IdentifierList(Vec<Identifier>);
 
 impl IdentifierList {
+    pub fn get(&self, index: usize) -> Option<&Identifier> {
+        self.0.get(index)
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<Identifier> {
+        self.0.iter()
     }
 
     pub fn push(&mut self, ident: Identifier) -> Result<(), IdentifierListError> {
         if self.contains(&ident) {
             Err(IdentifierListError::DuplicateIdentifier(ident))
         } else {
-            Ok(self.0.push(ident))
+            self.0.push(ident);
+            Ok(())
         }
     }
 
