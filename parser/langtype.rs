@@ -130,7 +130,7 @@ impl std::fmt::Display for UnnamedTupleType {
 }
 
 #[derive(Debug, Clone, Default, PartialEq)]
-pub struct NamedTupleType(BTreeMap<Identifier, Type>);
+pub struct NamedTupleType(pub BTreeMap<Identifier, Type>);
 
 impl Parse for NamedTupleType {
     fn parse(pair: Pair) -> Result<Self, ParseError> {

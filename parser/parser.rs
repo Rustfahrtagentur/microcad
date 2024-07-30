@@ -27,6 +27,14 @@ pub enum ParseError {
     TypeError(#[from] crate::langtype::TypeError),
     #[error("Identifier list error: {0}")]
     IdentifierListError(#[from] IdentifierListError),
+    #[error("Tuple expression contains both named and positional arguments")]
+    MixedTupleArguments,
+    #[error("Duplicate named argument: {0}")]
+    DuplicateNamedArgument(Identifier),
+    #[error("Positional argument after named argument")]
+    PositionalArgumentAfterNamed,
+    #[error("Empty tuple expression")]
+    EmptyTupleExpression,
 }
 
 pub trait Parse: Sized {

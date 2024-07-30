@@ -1,6 +1,6 @@
 pub type Number = crate::literal::NumberLiteral;
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use thiserror::Error;
 
 use crate::{
@@ -29,6 +29,8 @@ pub enum ValueError {
     },
     #[error("Type cannot be a key in a map: {0}")]
     InvalidMapKeyType(Type),
+    #[error("Cannot convert value into scalar: {0}")]
+    CannotConvertToScalar(Value),
 }
 
 pub type Scalar = f64;
@@ -147,7 +149,7 @@ impl Ty for Map {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct NamedTuple(pub HashMap<Identifier, Value>, NamedTupleType);
+pub struct NamedTuple(pub BTreeMap<Identifier, Value>);
 
 impl NamedTuple {
     pub fn len(&self) -> usize {
@@ -165,12 +167,17 @@ impl NamedTuple {
 
 impl Ty for NamedTuple {
     fn ty(&self) -> Type {
-        Type::NamedTuple(self.1.clone())
+        Type::NamedTuple(NamedTupleType(
+            self.0
+                .iter()
+                .map(|(name, v)| (name.clone(), v.ty().clone()))
+                .collect(),
+        ))
     }
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct UnnamedTuple(pub Vec<Value>, pub UnnamedTupleType);
+pub struct UnnamedTuple(pub Vec<Value>);
 
 impl UnnamedTuple {
     fn len(&self) -> usize {
@@ -195,19 +202,19 @@ impl UnnamedTuple {
             });
         }
         let mut result = Vec::new();
-        let mut types = Vec::new();
         for (l, r) in self.0.iter().zip(rhs.0.iter()) {
             let add_result = f(l.clone(), r.clone())?;
-            types.push(add_result.ty());
             result.push(add_result);
         }
-        Ok(UnnamedTuple(result, UnnamedTupleType(types)))
+        Ok(UnnamedTuple(result))
     }
 }
 
 impl Ty for UnnamedTuple {
     fn ty(&self) -> Type {
-        Type::UnnamedTuple(self.1.clone())
+        Type::UnnamedTuple(UnnamedTupleType(
+            self.0.iter().map(|v| v.ty().clone()).collect(),
+        ))
     }
 }
 
@@ -299,6 +306,13 @@ impl Value {
 
     pub fn greater_than_or_equal(&self, rhs: &Self) -> Result<bool, ValueError> {
         Ok(self.greater_than(rhs)? || self.eq(rhs))
+    }
+
+    pub fn into_scalar(&self) -> Result<Scalar, ValueError> {
+        match self {
+            Value::Scalar(s) | Value::Length(s) | Value::Angle(s) => Ok(*s),
+            value => Err(ValueError::CannotConvertToScalar(value.clone())),
+        }
     }
 }
 

@@ -51,19 +51,27 @@ pub struct CallArgumentList {
 }
 
 impl CallArgumentList {
-    fn get_named(&self, ident: &Identifier) -> Option<&Expression> {
+    pub fn get_named(&self) -> &BTreeMap<Identifier, Expression> {
+        &self.named
+    }
+
+    pub fn get_named_arg(&self, ident: &Identifier) -> Option<&Expression> {
         self.named.get(ident)
     }
 
-    fn get_positional(&self, index: usize) -> Option<&Expression> {
+    pub fn get_positional(&self) -> &[Expression] {
+        &self.positional
+    }
+
+    pub fn get_positional_arg(&self, index: usize) -> Option<&Expression> {
         self.positional.get(index)
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.positional.len() + self.named.len()
     }
 
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.positional.is_empty() && self.named.is_empty()
     }
 
@@ -71,12 +79,29 @@ impl CallArgumentList {
         self.positional.iter().chain(self.named.values())
     }
 
-    fn insert_named(&mut self, ident: Identifier, expr: Expression) {
-        self.named.insert(ident, expr);
+    pub fn contains_positional(&self) -> bool {
+        !self.positional.is_empty()
     }
 
-    fn insert_positional(&mut self, expr: Expression) {
+    pub fn contains_named(&self) -> bool {
+        !self.named.is_empty()
+    }
+
+    fn insert_named(&mut self, ident: Identifier, expr: Expression) -> Result<(), ParseError> {
+        if self.named.contains_key(&ident) {
+            return Err(ParseError::DuplicateNamedArgument(ident));
+        }
+
+        self.named.insert(ident, expr);
+        Ok(())
+    }
+
+    fn insert_positional(&mut self, expr: Expression) -> Result<(), ParseError> {
+        if !self.named.is_empty() {
+            return Err(ParseError::PositionalArgumentAfterNamed);
+        }
         self.positional.push(expr);
+        Ok(())
     }
 }
 
@@ -89,15 +114,15 @@ impl Parse for CallArgumentList {
                 for pair in pair.into_inner() {
                     match CallArgument::parse(pair)? {
                         CallArgument::NamedArgument(ident, expr) => {
-                            call_argument_list.insert_named(ident, *expr);
+                            call_argument_list.insert_named(ident, *expr)?;
                         }
                         CallArgument::NamedTupleArgument(idents, expr) => {
                             for ident in idents {
-                                call_argument_list.insert_named(ident, *expr.clone());
+                                call_argument_list.insert_named(ident, *expr.clone())?;
                             }
                         }
                         CallArgument::PositionalArgument(expr) => {
-                            call_argument_list.insert_positional(*expr);
+                            call_argument_list.insert_positional(*expr)?;
                         }
                     }
                 }
