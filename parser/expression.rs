@@ -149,9 +149,9 @@ impl Eval for Expression {
                 match lhs {
                     Value::List(list) => match name {
                         "len" => Ok(Value::Integer(list.len() as i64)),
-                        _ => Err(eval::Error::InvalidOperation),
+                        _ => Err(eval::Error::UnknownMethod(name.into())),
                     },
-                    _ => Err(eval::Error::InvalidOperation),
+                    _ => Err(eval::Error::UnknownMethod(name.into())),
                 }
             }
             _ => unimplemented!(),
@@ -160,12 +160,13 @@ impl Eval for Expression {
 
     /// The type this expression will evaluate to
     fn eval_type(&self, context: Option<&Context>) -> Result<Type, eval::Error> {
-        match &self {
+        use crate::langtype::Ty;
+        match self {
             Self::NumberLiteral(n) => n.eval_type(context),
             Self::IntegerLiteral(_) => Ok(Type::Integer),
             Self::BoolLiteral(_) => Ok(Type::Bool),
             Self::ListExpression(list) => list.eval_type(context),
-            _ => Err(eval::Error::InvalidType),
+            expr => Self::eval(expr.clone(), context).map(|v| v.ty()),
         }
     }
 }

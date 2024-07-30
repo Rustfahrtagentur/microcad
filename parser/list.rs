@@ -49,7 +49,7 @@ impl Eval for ListExpression {
             _ => None,
         };
 
-        Ok(Value::List(crate::value::List(vec, common_type)))
+        Ok(Value::List(crate::value::List(vec, common_type.unwrap())))
     }
 
     fn eval_type(&self, context: Option<&Context>) -> Result<Type, crate::eval::Error> {

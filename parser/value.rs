@@ -1,10 +1,11 @@
 pub type Number = crate::literal::NumberLiteral;
 
 use std::collections::HashMap;
+use thiserror::Error;
 
 use crate::{
     identifier::Identifier,
-    langtype::{Ty, Type},
+    langtype::{MapKeyType, Ty, Type},
     syntax_tree::{qualified_name, SyntaxNode},
 };
 
@@ -16,19 +17,18 @@ pub struct Color {
     pub a: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum ValueError {
-    InvalidOperation(char),
-    ArrayLengthMismatchForOperator {
-        operator: char,
-        lhs: usize,
-        rhs: usize,
-    },
+    #[error("Invalid operator: {0}")]
+    InvalidOperator(char),
+    #[error("Tuple length mismatch for operator {operator}: lhs={lhs}, rhs={rhs}")]
     TupleLengthMismatchForOperator {
         operator: char,
         lhs: usize,
         rhs: usize,
     },
+    #[error("Type cannot be a key in a map: {0}")]
+    InvalidMapKeyType(Type),
 }
 
 pub type Scalar = f64;
@@ -37,11 +37,11 @@ pub type Vec2 = euclid::Vector2D<Scalar, ()>;
 pub type Vec3 = euclid::Vector3D<Scalar, ()>;
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct List(pub Vec<Value>, pub Option<Type>);
+pub struct List(pub Vec<Value>, pub Type);
 
 impl List {
-    pub fn new() -> Self {
-        Self(Vec::new(), None)
+    pub fn new(ty: Type) -> Self {
+        Self(Vec::new(), ty)
     }
 
     pub fn push(&mut self, value: Value) {
@@ -82,38 +82,67 @@ impl List {
 
 impl Ty for List {
     fn ty(&self) -> Type {
-        if let Some(t) = &self.1 {
-            Type::List(Some(Box::new(t.clone())))
-        } else {
-            Type::List(None)
+        self.1.clone()
+    }
+}
+
+/// A value type that can be used as a key in a map
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+pub enum MapKeyValue {
+    Integer(i64),
+    Bool(bool),
+    String(String),
+}
+
+impl MapKeyValue {
+    pub fn ty(&self) -> MapKeyType {
+        match self {
+            MapKeyValue::Integer(_) => MapKeyType::Integer,
+            MapKeyValue::Bool(_) => MapKeyType::Bool,
+            MapKeyValue::String(_) => MapKeyType::String,
         }
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct Array(pub Vec<Value>, pub Type);
+impl TryFrom<Value> for MapKeyValue {
+    type Error = ValueError;
 
-impl Array {
-    pub fn new(ty: Type) -> Self {
-        Self(Vec::new(), ty)
-    }
-
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
-    pub fn iter(&self) -> std::slice::Iter<Value> {
-        self.0.iter()
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Integer(n) => Ok(MapKeyValue::Integer(n)),
+            Value::Bool(b) => Ok(MapKeyValue::Bool(b)),
+            Value::String(s) => Ok(MapKeyValue::String(s)),
+            value => Err(ValueError::InvalidMapKeyType(value.ty())),
+        }
     }
 }
 
-impl Ty for Array {
+impl std::fmt::Display for MapKeyValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MapKeyValue::Integer(n) => write!(f, "{}", n),
+            MapKeyValue::Bool(b) => write!(f, "{}", b),
+            MapKeyValue::String(s) => write!(f, "{}", s),
+        }
+    }
+}
+
+#[derive(Debug, Default, Clone, PartialEq)]
+struct Map(HashMap<MapKeyValue, Value>, pub MapKeyType, pub Type);
+
+impl Map {
+    fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+
+impl Ty for Map {
     fn ty(&self) -> Type {
-        Type::Array(Box::new(self.1.clone()), self.0.len())
+        self.2.clone()
     }
 }
 
@@ -228,7 +257,7 @@ pub enum Value {
 
     List(List),
 
-    Array(Array),
+    Map(Map),
 
     NamedTuple(NamedTuple),
 
@@ -247,7 +276,7 @@ impl Value {
             (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.length() < rhs.length()),
             (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.length() < rhs.length()),
             (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs < rhs),
-            _ => Err(ValueError::InvalidOperation('<')),
+            _ => Err(ValueError::InvalidOperator('<')),
         }
     }
 
@@ -259,7 +288,7 @@ impl Value {
             (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.length() > rhs.length()),
             (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.length() > rhs.length()),
             (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs > rhs),
-            _ => Err(ValueError::InvalidOperation('>')),
+            _ => Err(ValueError::InvalidOperator('>')),
         }
     }
 
@@ -285,12 +314,12 @@ impl Ty for Value {
             Value::String(_) => Type::String,
             Value::Color(_) => Type::Color,
             Value::List(list) => list.ty(),
-            Value::Array(array) => array.ty(),
+            Value::Map(map) => map.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
             Value::Node(node) => {
                 if let Some(qualified_name) = crate::syntax_tree::qualified_name(node.clone()) {
-                    Type::Node(qualified_name)
+                    Type::Custom(qualified_name)
                 } else {
                     Type::Invalid
                 }
@@ -326,7 +355,7 @@ impl std::ops::Add for Value {
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
                 Ok(Value::UnnamedTuple((lhs + rhs)?))
             }
-            _ => Err(ValueError::InvalidOperation('+')),
+            _ => Err(ValueError::InvalidOperator('+')),
         }
     }
 }
@@ -356,7 +385,7 @@ impl std::ops::Sub for Value {
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
                 Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
-            _ => Err(ValueError::InvalidOperation('-')),
+            _ => Err(ValueError::InvalidOperator('-')),
         }
     }
 }
@@ -386,7 +415,7 @@ impl std::ops::Mul for Value {
                 Value::Vec3(Vec3::new(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z)),
             ),
 
-            _ => Err(ValueError::InvalidOperation('*')),
+            _ => Err(ValueError::InvalidOperator('*')),
         }
     }
 }
@@ -403,7 +432,7 @@ impl std::ops::Div for Value {
             | (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Scalar(lhs / rhs)),
             (Value::Length(lhs), Value::Scalar(rhs)) => Ok(Value::Length(lhs / rhs)),
             (Value::Angle(lhs), Value::Scalar(rhs)) => Ok(Value::Angle(lhs / rhs)),
-            _ => Err(ValueError::InvalidOperation('/')),
+            _ => Err(ValueError::InvalidOperator('/')),
         }
     }
 }
@@ -429,13 +458,13 @@ impl std::fmt::Display for Value {
                 }
                 write!(f, "]")
             }
-            Value::Array(a) => {
+            Value::Map(m) => {
                 write!(f, "[")?;
-                for (i, v) in a.iter().enumerate() {
+                for (i, (k, v)) in m.0.iter().enumerate() {
                     if i > 0 {
                         write!(f, ", ")?;
                     }
-                    write!(f, "{}", v)?;
+                    write!(f, "{} => {}", k, v)?;
                 }
                 write!(f, "]")
             }

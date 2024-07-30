@@ -1,27 +1,29 @@
 use std::collections::HashMap;
 use std::vec;
+use thiserror::Error;
 
+use crate::format_string::FormatString;
 use crate::identifier::Identifier;
 use crate::langtype::Type;
 use crate::syntax_tree::SyntaxNode;
 use crate::value::{Value, ValueError};
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum Error {
-    InvalidOperation,
-    InvalidFormatString,
-    InvalidType,
+    #[error("Invalid type: {0}")]
+    InvalidType(Type),
+    #[error("List index out of bounds: {index} >= {len}")]
     ListIndexOutOfBounds { index: usize, len: usize },
-    TypeMismatch,
-    EvaluateToStringError,
-    ValueError(ValueError),
+    #[error("Type mismatch: expected {0}, got {1}")]
+    TypeMismatch(Type, Type),
+    #[error("Cannot evaluate to type: {0}")]
+    EvaluateToTypeError(Type),
+    #[error("Value error {0}")]
+    ValueError(#[from] ValueError),
+    #[error("Unknown identifier: {0}")]
     UnknownIdentifier(Identifier),
-}
-
-impl From<ValueError> for Error {
-    fn from(value_error: ValueError) -> Self {
-        Error::ValueError(value_error)
-    }
+    #[error("Unknown method: {0}")]
+    UnknownMethod(Identifier),
 }
 
 /// @brief Symbol table

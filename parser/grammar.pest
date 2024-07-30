@@ -106,22 +106,25 @@ qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 //`int`: ok
 //`[scalar]`: ok # List type
 //`(scalar, scalar)`: Tuple type
-type = { qualified_name | list_type | tuple_type }
+type = { qualified_name | list_type | map_type | named_tuple_type | unnamed_tuple_type }
 
 type_annotation = _{ ":" ~ ws* ~ type }
 
 //`[scalar]`: ok list with elements of type `scalar`
-//`[]`: ok # List with elements of arbitrary type
-list_type = { "[" ~ ws* ~ (list_type_array | list_type_map | type)? ~ ws* ~ "]" }
-
-// Array sub type of list type 
-//`length;3`: ok # List with three elements of same type
-//`4.0mm;2`: ok # List with two elements with default value 0.0mm
-list_type_array = { (type | expression) ~ ws* ~ ";" ~ ws* ~ expression }
+//`[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
+list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 
 // Associative list, behaves like a map
-//`length => string`: maps a length to a string
-list_type_map = { type ~ ws* ~ "=>" ~ ws* ~ type }
+//`[length => string]`: maps a length to a string
+map_type = { "[" ~ ws* ~ type ~ ws* ~ "=>" ~ ws* ~ type ~ ws* ~ "]" }
+
+//`(length,scalar)`: ok # 2 unnamed fields
+//`(length, a: length = 4.0mm)`: error # Cannot mix named and unnamed arguments
+unnamed_tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ")" }
+
+//`(a: length, b = 4.0mm)`: ok # No default value for a, but for b
+named_tuple_type = { "(" ~ ws* ~ variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_declaration)* ~ ws* ~ ")" }
+
 
 //`[1, 2, 3]`: ok
 //`[1, 2, 3,]`: error # Trailing comma
@@ -132,22 +135,11 @@ list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" }
 //`["test"]`: ok # Associative lists, access value of `\"test\"`
 list_element_access = { "[" ~ ws* ~ (integer_literal | expression) ~ ws* ~ "]" } 
 
-//`(length,scalar)`: ok # 2 unnamed fields
-//`(a: length, b = 4.0mm)`: ok # No default value for a, but for b
-//`(length, a: length = 4.0mm)`: error # Cannot mix named and unnamed arguments
-//`(a: length = 4.0mm, length)`: error # Unnamed argument followed by named argument
-tuple_type = { "(" ~ ws* ~ (tuple_named_type_list | tuple_unnamed_type_list) ~ ws* ~ ")" }
-
-//`length,scalar`: ok
-//`length,`: error # Trailing comma
-tuple_unnamed_type_list = { type ~ (ws* ~ "," ~ ws* ~ type)* }
-
-//`r = 4.0mm, a: type = b, c: scalar`: ok
-tuple_named_type_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_declaration)* }
-
 //`(1.0mm, 2.0mm)`: ok
 //`(1.0mm,)`: error # Trailing comma
-tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
+unnamed_tuple_expression = { "(" ~ ws* ~ expression_list ~ ws* ~ ")" }
+
+named_tuple_expression = { "(" ~ ws* ~ call_named_tuple_argument ~ (ws* ~ "," ~ ws* ~ call_named_tuple_argument)* ~ ws* ~ ")" }
 
 //`.0`: ok
 //`.height`: ok
@@ -207,7 +199,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ method_call | element_access }
-primary          =  _{ literal | format_string | identifier | constant_identifier  | "(" ~ expression ~ ")" | tuple_expression | list_expression }
+primary          =  _{ literal | format_string | identifier | constant_identifier  | "(" ~ expression ~ ")" | named_tuple_expression | unnamed_tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok

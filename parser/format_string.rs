@@ -94,7 +94,7 @@ impl Eval for FormatString {
                 FormatStringInner::FormatExpression(expr) => match expr.eval(context) {
                     Ok(Value::String(s)) => result += &s,
                     Err(e) => return Err(e),
-                    _ => unreachable!("FormatExpression should always evaluate to a string"),
+                    _ => unreachable!("FormatExpression must always evaluate to a string"),
                 },
             }
         }

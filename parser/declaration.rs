@@ -1,4 +1,5 @@
 use crate::identifier::IdentifierListError;
+use crate::langtype::Type;
 use crate::parser::*;
 use crate::{
     expression::Expression,
@@ -10,13 +11,13 @@ use std::collections::HashMap;
 struct VariableSingleDeclaration {
     name: Identifier,
     default_value: Option<Expression>,
-    specified_type: Option<Identifier>,
+    specified_type: Option<Type>,
 }
 
 struct VariableMultiDeclaration {
     names: IdentifierList,
     default_value: Option<Expression>,
-    specified_type: Option<Identifier>,
+    specified_type: Option<Type>,
 }
 
 impl VariableMultiDeclaration {
@@ -70,7 +71,7 @@ impl Parse for VariableDeclaration {
                     names.extend(IdentifierList::parse(pair)?)?;
                 }
                 (_, Rule::expression) => default_value = Some(Expression::parse(pair)?),
-                (_, Rule::type_annotation) => specified_type = Some(Identifier::parse(pair)?),
+                (_, Rule::type_annotation) => specified_type = Some(Type::parse(pair)?),
                 _ => {
                     println!("{:?}", pair.as_rule());
                     return Err(ParseError::UnexpectedToken);
@@ -150,6 +151,8 @@ impl Parse for VariableDeclarationList {
         Ok(l)
     }
 }
+
+struct FunctionSignature(VariableDeclarationList, Type);
 
 #[cfg(test)]
 mod tests {

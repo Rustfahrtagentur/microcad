@@ -1,9 +1,110 @@
 use std::collections::HashMap;
+use thiserror::Error;
 
 use crate::{
     identifier::{Identifier, QualifiedName},
+    parser::{Pair, Parse, ParseError, Rule},
     units,
 };
+
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct ListType(Box<Type>);
+
+impl ListType {
+    fn from_type(t: Type) -> Self {
+        Self(Box::new(t))
+    }
+}
+
+impl Ty for ListType {
+    fn ty(&self) -> Type {
+        self.0.as_ref().clone()
+    }
+}
+
+impl Parse for ListType {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let mut inner = pair.into_inner();
+
+        let pair = inner.next().unwrap();
+        match pair.as_rule() {
+            Rule::r#type => Ok(Self::from_type(Type::parse(pair)?)),
+            _ => unreachable!("Expected type, found {:?}", pair.as_rule()),
+        }
+    }
+}
+
+impl std::fmt::Display for ListType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}]", self.0)
+    }
+}
+
+#[derive(Debug, Default, Clone, PartialEq)]
+pub enum MapKeyType {
+    #[default]
+    Integer,
+    Bool,
+    String,
+}
+
+impl TryFrom<Type> for MapKeyType {
+    type Error = TypeError;
+
+    fn try_from(t: Type) -> Result<Self, Self::Error> {
+        match t {
+            Type::Integer => Ok(Self::Integer),
+            Type::Bool => Ok(Self::Bool),
+            Type::String => Ok(Self::String),
+            _ => Err(TypeError::InvalidMapKeyType(t.to_string())),
+        }
+    }
+}
+
+impl std::fmt::Display for MapKeyType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Integer => write!(f, "int"),
+            Self::Bool => write!(f, "bool"),
+            Self::String => write!(f, "string"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct MapType(MapKeyType, Box<Type>);
+
+impl MapType {
+    fn from_types(key: MapKeyType, value: Type) -> Self {
+        Self(key, Box::new(value))
+    }
+}
+
+impl Parse for MapType {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let mut inner = pair.into_inner();
+
+        let key = inner.next().unwrap();
+        let value = inner.next().unwrap();
+
+        Ok(Self::from_types(
+            Type::parse(key)?.try_into()?,
+            Type::parse(value)?,
+        ))
+    }
+}
+
+impl std::fmt::Display for MapType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{} => {}]", self.0, self.1)
+    }
+}
+
+#[derive(Debug, Error)]
+pub enum TypeError {
+    #[error("Invalid map key type: {0}")]
+    InvalidMapKeyType(String),
+}
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub enum Type {
@@ -38,16 +139,16 @@ pub enum Type {
     /// A boolean
     Bool,
 
-    List(Option<Box<Type>>),
+    List(ListType),
 
-    Array(Box<Type>, usize),
+    Map(MapType),
 
     UnnamedTuple(Vec<Type>),
 
     NamedTuple(HashMap<Identifier, Type>),
 
     /// A node in the syntax tree
-    Node(QualifiedName),
+    Custom(QualifiedName),
 }
 
 impl Type {
@@ -55,15 +156,32 @@ impl Type {
         match self {
             Self::Length => units::Unit::Mm,
             Self::Angle => units::Unit::Rad,
-            Self::List(t) => {
-                if let Some(t) = t {
-                    t.default_unit()
-                } else {
-                    units::Unit::None
-                }
-            }
-            Self::Array(t, _) => t.default_unit(),
+            Self::List(t) => t.ty().default_unit(),
             _ => units::Unit::None,
+        }
+    }
+}
+
+impl Parse for Type {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let inner = pair.into_inner().next().unwrap();
+
+        match inner.as_rule() {
+            Rule::list_type => Ok(Self::List(ListType::parse(inner)?)),
+            Rule::map_type => Ok(Self::Map(MapType::parse(inner)?)),
+            Rule::qualified_name => match inner.as_str() {
+                "int" => Ok(Self::Integer),
+                "scalar" => Ok(Self::Scalar),
+                "string" => Ok(Self::String),
+                "color" => Ok(Self::Color),
+                "length" => Ok(Self::Length),
+                "angle" => Ok(Self::Angle),
+                "vec2" => Ok(Self::Vec2),
+                "vec3" => Ok(Self::Vec3),
+                "bool" => Ok(Self::Bool),
+                _ => Ok(Self::Custom(QualifiedName::parse(inner)?)),
+            },
+            _ => unreachable!("Expected type, found {:?}", inner.as_rule()),
         }
     }
 }
@@ -71,7 +189,7 @@ impl Type {
 impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Integer => write!(f, "integer"),
+            Self::Integer => write!(f, "int"),
             Self::Invalid => write!(f, "invalid"),
             Self::Scalar => write!(f, "scalar"),
             Self::String => write!(f, "string"),
@@ -81,14 +199,8 @@ impl std::fmt::Display for Type {
             Self::Vec2 => write!(f, "vec2"),
             Self::Vec3 => write!(f, "vec3"),
             Self::Bool => write!(f, "bool"),
-            Self::List(t) => {
-                if let Some(t) = t {
-                    write!(f, "[{}]", t)
-                } else {
-                    write!(f, "[]")
-                }
-            }
-            Self::Array(t, n) => write!(f, "[{}; {}]", t, n),
+            Self::List(t) => write!(f, "{}", t),
+            Self::Map(t) => write!(f, "{}", t),
             Self::UnnamedTuple(t) => {
                 write!(f, "(")?;
                 for (i, t) in t.iter().enumerate() {
@@ -109,7 +221,7 @@ impl std::fmt::Display for Type {
                 }
                 write!(f, ")")
             }
-            Self::Node(qn) => write!(f, "{}", qn),
+            Self::Custom(qn) => write!(f, "{}", qn),
         }
     }
 }

@@ -23,6 +23,8 @@ pub enum ParseError {
     UnknownUnit(String),
     #[error("Unexpected token")]
     UnexpectedToken,
+    #[error("Type error: {0}")]
+    TypeError(#[from] crate::langtype::TypeError),
     #[error("Identifier list error: {0}")]
     IdentifierListError(#[from] IdentifierListError),
 }
