@@ -82,6 +82,19 @@ impl List {
     }
 }
 
+impl std::fmt::Display for List {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[")?;
+        for (i, v) in self.0.iter().enumerate() {
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}", v)?;
+        }
+        write!(f, "]")
+    }
+}
+
 impl Ty for List {
     fn ty(&self) -> Type {
         self.1.clone()
@@ -148,6 +161,19 @@ impl Ty for Map {
     }
 }
 
+impl std::fmt::Display for Map {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[")?;
+        for (i, (k, v)) in self.0.iter().enumerate() {
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{} => {}", k, v)?;
+        }
+        write!(f, "]")
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct NamedTuple(pub BTreeMap<Identifier, Value>);
 
@@ -162,6 +188,19 @@ impl NamedTuple {
 
     pub fn iter(&self) -> impl Iterator<Item = (&Identifier, &Value)> {
         self.0.iter()
+    }
+}
+
+impl std::fmt::Display for NamedTuple {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(")?;
+        for (i, (name, v)) in self.0.iter().enumerate() {
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{} = {}", name, v)?;
+        }
+        write!(f, ")")
     }
 }
 
@@ -207,6 +246,19 @@ impl UnnamedTuple {
             result.push(add_result);
         }
         Ok(UnnamedTuple(result))
+    }
+}
+
+impl std::fmt::Display for UnnamedTuple {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(")?;
+        for (i, v) in self.0.iter().enumerate() {
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}", v)?;
+        }
+        write!(f, ")")
     }
 }
 
@@ -463,46 +515,10 @@ impl std::fmt::Display for Value {
             Value::Bool(b) => write!(f, "{}", b),
             Value::String(s) => write!(f, "{}", s),
             Value::Color(c) => write!(f, "rgba({}, {}, {}, {})", c.r, c.g, c.b, c.a),
-            Value::List(l) => {
-                write!(f, "[")?;
-                for (i, v) in l.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{}", v)?;
-                }
-                write!(f, "]")
-            }
-            Value::Map(m) => {
-                write!(f, "[")?;
-                for (i, (k, v)) in m.0.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{} => {}", k, v)?;
-                }
-                write!(f, "]")
-            }
-            Value::NamedTuple(t) => {
-                write!(f, "(")?;
-                for (i, (name, v)) in t.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{}: {}", name, v)?;
-                }
-                write!(f, ")")
-            }
-            Value::UnnamedTuple(t) => {
-                write!(f, "(")?;
-                for (i, v) in t.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{}", v)?;
-                }
-                write!(f, ")")
-            }
+            Value::List(l) => write!(f, "{}", l),
+            Value::Map(m) => write!(f, "{}", m),
+            Value::NamedTuple(t) => write!(f, "{}", t),
+            Value::UnnamedTuple(t) => write!(f, "{}", t),
             Value::Node(node) => {
                 write!(
                     f,
