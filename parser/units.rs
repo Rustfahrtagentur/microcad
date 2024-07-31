@@ -59,6 +59,8 @@ declare_units! {
     Mm = "mm" -> Length,
     /// inches
     In = "in" -> Length * 25.4,
+    /// Meters
+    M = "m" -> Length * 1000.0,
 
     // angles
 
@@ -77,6 +79,7 @@ declare_units! {
 impl Parse for Unit {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
         use std::str::FromStr;
-        Unit::from_str(pair.as_str()).map_err(|u| ParseError::UnknownUnit(pair.to_string()))
+        Unit::from_str(pair.as_str())
+            .map_err(|_| ParseError::UnknownUnit(pair.as_span().as_str().to_string()))
     }
 }
