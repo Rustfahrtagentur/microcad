@@ -111,6 +111,11 @@ qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 //`(scalar, scalar)`: Tuple type
 type = { qualified_name | list_type | map_type | named_tuple_type | unnamed_tuple_type }
 
+//`type a = scalar`: ok
+type_declaration = { "type" ~ ws* ~ identifier ~ ws* ~ "=" ~ ws* ~ type }
+
+type_declaration_statement = _{ type_declaration ~ ws* ~ ";"}
+
 type_annotation = _{ ":" ~ ws* ~ type }
 
 //`[scalar]`: ok list with elements of type `scalar`
