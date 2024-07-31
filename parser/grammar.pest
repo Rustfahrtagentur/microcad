@@ -129,17 +129,17 @@ named_tuple_type = { "(" ~ ws* ~ variable_declaration ~ (ws* ~ "," ~ ws* ~ varia
 //`[1, 2, 3]`: ok
 //`[1, 2, 3,]`: error # Trailing comma
 //`[]`: ok
-list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" }
+list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" ~ unit? }
 
 //`[0]`: ok # Access first element
 //`["test"]`: ok # Associative lists, access value of `\"test\"`
 list_element_access = { "[" ~ ws* ~ (integer_literal | expression) ~ ws* ~ "]" } 
 
-// An expression for named or unnamed tuple
+// An expression for both named and unnamed tuple
 //`(1.0mm, 2.0mm)`: ok
 //`(1.0mm,)`: error # Trailing comma
 //`(x = 1.0mm, y = 2.0mm)`: ok
-tuple_expression = { "(" ~ ws* ~ call_argument_list ~ ws* ~ ")" }
+tuple_expression = { "(" ~ ws* ~ call_argument_list ~ ws* ~ ")" ~ unit? }
 
 //`.0`: ok
 //`.height`: ok
@@ -178,8 +178,9 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`a.b.c`: ok # Nested tuple access
 //`a and b`: ok # Binary operator
 //`[3,5,5]`: ok # List expression
+//`1 if 3 > 2 else 0`: ok # Ternary operator
 expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
-bin_op           =  _{ add | subtract | multiply | divide | greater_than | less_than | greater_equal | less_equal | equal | not_equal | and | or | xor }
+bin_op           =  _{ add | subtract | multiply | divide | greater_than | less_than | greater_equal | less_equal | equal | not_equal | and | or | xor | if_binary_op | else_binary_op }
   add            =   { "+" }
   subtract       =   { "-" }
   multiply       =   { "*" }
@@ -193,6 +194,8 @@ bin_op           =  _{ add | subtract | multiply | divide | greater_than | less_
   and            =   { "and" }
   or             =   { "or" }
   xor            =   { "xor" }
+  if_binary_op   =   { "if" }
+  else_binary_op =   { "else" }
 
 unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_minus    =   { "-" }
