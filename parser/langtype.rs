@@ -7,11 +7,11 @@ use crate::{
     units,
 };
 
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ListType(Box<Type>);
 
 impl ListType {
-    fn from_type(t: Type) -> Self {
+    pub fn from_type(t: Type) -> Self {
         Self(Box::new(t))
     }
 }
@@ -71,7 +71,7 @@ impl std::fmt::Display for MapKeyType {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct MapType(MapKeyType, Box<Type>);
 
 impl MapType {
@@ -171,12 +171,8 @@ pub enum TypeError {
     DuplicatedMapField(Identifier),
 }
 
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Type {
-    /// Correspond to an uninitialized type, or an error
-    #[default]
-    Invalid,
-
     // A 64-bit integer number
     Integer,
 
@@ -261,7 +257,6 @@ impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Integer => write!(f, "int"),
-            Self::Invalid => write!(f, "invalid"),
             Self::Scalar => write!(f, "scalar"),
             Self::String => write!(f, "string"),
             Self::Color => write!(f, "color"),
@@ -282,6 +277,26 @@ impl std::fmt::Display for Type {
 /// Trait for structs and expressions that have a type
 pub trait Ty {
     fn ty(&self) -> Type;
+}
+
+pub struct TypeList(Vec<Type>);
+
+impl TypeList {
+    pub fn from_types(types: Vec<Type>) -> Self {
+        Self(types)
+    }
+
+    pub fn common_type(&self) -> Option<Type> {
+        let mut common_type = None;
+        for ty in &self.0 {
+            match common_type {
+                None => common_type = Some(ty.clone()),
+                Some(ref t) if t == ty => {}
+                _ => return None,
+            }
+        }
+        common_type
+    }
 }
 
 #[cfg(test)]

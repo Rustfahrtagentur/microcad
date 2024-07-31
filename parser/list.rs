@@ -1,17 +1,14 @@
 use crate::eval::{Context, Eval};
 use crate::expression::{Expression, ExpressionList};
-use crate::langtype::Type;
+use crate::langtype::{ListType, Type};
 use crate::parser::{Pair, Parse, ParseError};
-use crate::value::Value;
+use crate::units::Unit;
+use crate::value::{Value, ValueList};
 
 #[derive(Default, Clone)]
-pub struct ListExpression(ExpressionList);
+pub struct ListExpression(ExpressionList, Option<Unit>);
 
 impl ListExpression {
-    pub fn new(expression_list: ExpressionList) -> Self {
-        Self(expression_list)
-    }
-
     pub fn len(&self) -> usize {
         self.0.len()
     }
@@ -27,33 +24,38 @@ impl ListExpression {
 
 impl Parse for ListExpression {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        Ok(Self::new(ExpressionList::parse(
-            pair.into_inner().next().unwrap(),
-        )?))
+        let mut pairs = pair.into_inner();
+        Ok(Self(
+            ExpressionList::parse(pairs.next().unwrap())?,
+            match pairs.next() {
+                Some(pair) => Some(Unit::parse(pair)?),
+                None => None,
+            },
+        ))
     }
 }
 
 impl Eval for ListExpression {
     fn eval(self, context: Option<&Context>) -> Result<Value, crate::eval::Error> {
-        let mut vec = Vec::new();
-        let mut types = Vec::new();
+        let mut value_list = ValueList::new();
         for expr in self.0 {
-            let value = expr.eval(context)?;
-            use crate::langtype::Ty;
-            types.push(value.ty());
-            vec.push(value);
+            value_list.push(expr.eval(context)?);
         }
-        types.dedup();
-        match types.len() {
-            1 => Ok(Value::List(crate::value::List(
-                vec,
-                types.first().unwrap().clone(),
-            ))),
-            _ => Err(crate::eval::Error::ListElementsDifferentTypes),
+        if let Some(unit) = self.1 {
+            value_list.add_unit_to_scalar_types(unit);
+        }
+
+        match value_list.types().common_type() {
+            Some(common_type) => Ok(Value::List(crate::value::List(value_list, common_type))),
+            None => Err(crate::eval::Error::ListElementsDifferentTypes),
         }
     }
 
-    fn eval_type(&self, context: Option<&Context>) -> Result<Type, crate::eval::Error> {
-        self.0.common_eval_type(context)
+    fn eval_type(&self, _: Option<&Context>) -> Result<Type, crate::eval::Error> {
+        let types = self.0.type_list()?;
+        match types.common_type() {
+            Some(t) => Ok(Type::List(ListType::from_type(t))),
+            None => Err(crate::eval::Error::ListElementsDifferentTypes),
+        }
     }
 }

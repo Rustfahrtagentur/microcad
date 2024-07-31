@@ -1,7 +1,7 @@
 use crate::eval::{self, Context, Eval};
 use crate::format_string::FormatString;
 use crate::identifier::Identifier;
-use crate::langtype::Type;
+use crate::langtype::{Type, TypeList};
 use crate::list::ListExpression;
 use crate::literal::{Literal, NumberLiteral};
 use crate::parser::*;
@@ -180,7 +180,7 @@ impl Parse for Expression {
                 }
                 Rule::format_string => Self::FormatString(FormatString::parse(primary).unwrap()),
                 Rule::identifier => Self::Identifier(Identifier::parse(primary).unwrap()),
-                rule => unreachable!("Expr::parse expected atom, found {:?}", rule),
+                rule => unreachable!("Expression::parse expected atom, found {:?}", rule),
             })
             .map_infix(|lhs, op, rhs| {
                 let op = match op.as_rule() {
@@ -196,7 +196,10 @@ impl Parse for Expression {
                     Rule::not_equal => '≠',
                     Rule::and => '&',
 
-                    rule => unreachable!("Expr::parse expected infix operation, found {:?}", rule),
+                    rule => unreachable!(
+                        "Expression::parse expected infix operation, found {:?}",
+                        rule
+                    ),
                 };
                 Self::BinaryOp {
                     lhs: Box::new(lhs),
@@ -252,21 +255,13 @@ impl ExpressionList {
         self.0.get(index)
     }
 
-    pub fn common_eval_type(&self, context: Option<&Context>) -> Result<Type, crate::eval::Error> {
+    pub fn type_list(&self) -> Result<TypeList, crate::eval::Error> {
         let types = self
             .0
             .iter()
-            .map(|expr| expr.eval_type(context))
-            .collect::<Result<Vec<Type>, crate::eval::Error>>()?;
-        Ok(types.into_iter().fold(Type::Invalid, |acc, ty| {
-            if acc == Type::Invalid {
-                ty
-            } else if acc == ty {
-                acc
-            } else {
-                Type::Invalid
-            }
-        }))
+            .map(|expr| expr.eval_type(None))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(TypeList::from_types(types))
     }
 }
 

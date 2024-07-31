@@ -6,8 +6,9 @@ use thiserror::Error;
 use crate::{
     color::Color,
     identifier::Identifier,
-    langtype::{MapKeyType, NamedTupleType, Ty, Type, UnnamedTupleType},
+    langtype::{MapKeyType, NamedTupleType, Ty, Type, TypeList, UnnamedTupleType},
     syntax_tree::{qualified_name, SyntaxNode},
+    units::Unit,
 };
 
 #[derive(Debug, Error)]
@@ -32,11 +33,11 @@ pub type Vec2 = euclid::Vector2D<Scalar, ()>;
 pub type Vec3 = euclid::Vector3D<Scalar, ()>;
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct List(pub Vec<Value>, pub Type);
+pub struct List(pub ValueList, pub Type);
 
 impl List {
     pub fn new(ty: Type) -> Self {
-        Self(Vec::new(), ty)
+        Self(ValueList::new(), ty)
     }
 
     pub fn push(&mut self, value: Value) {
@@ -135,7 +136,7 @@ impl std::fmt::Display for MapKeyValue {
     }
 }
 
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Map(pub HashMap<MapKeyValue, Value>, pub MapKeyType, Type);
 
 impl Map {
@@ -209,7 +210,7 @@ impl Ty for NamedTuple {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct UnnamedTuple(pub Vec<Value>);
+pub struct UnnamedTuple(pub ValueList);
 
 impl UnnamedTuple {
     fn len(&self) -> usize {
@@ -233,7 +234,7 @@ impl UnnamedTuple {
                 rhs: rhs.len(),
             });
         }
-        let mut result = Vec::new();
+        let mut result = ValueList::new();
         for (l, r) in self.0.iter().zip(rhs.0.iter()) {
             let add_result = f(l.clone(), r.clone())?;
             result.push(add_result);
@@ -359,6 +360,20 @@ impl Value {
             value => Err(ValueError::CannotConvertToScalar(value.clone())),
         }
     }
+
+    /// Add a unit to a scalar value
+    pub fn add_unit_to_scalar_types(&mut self, unit: Unit) {
+        match (&self, unit.ty()) {
+            (Value::Integer(i), Type::Length) => {
+                *self = Value::Length(unit.normalize(*i as Scalar))
+            }
+            (Value::Integer(i), Type::Angle) => *self = Value::Angle(unit.normalize(*i as Scalar)),
+            (Value::Scalar(s), Type::Length) => *self = Value::Length(unit.normalize(*s)),
+            (Value::Scalar(s), Type::Angle) => *self = Value::Angle(unit.normalize(*s)),
+            //(Value::List(list), _) => list.add_unit_to_scalar_types(unit),
+            _ => {}
+        }
+    }
 }
 
 impl Ty for Value {
@@ -381,7 +396,8 @@ impl Ty for Value {
                 if let Some(qualified_name) = crate::syntax_tree::qualified_name(node.clone()) {
                     Type::Custom(qualified_name)
                 } else {
-                    Type::Invalid
+                    // TODO Trait Ty should return a Result<Type, TypeError>
+                    panic!("Cannot get type of node: {:?}", node);
                 }
             }
         }
@@ -540,5 +556,66 @@ impl std::fmt::Display for Value {
                 )
             }
         }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct ValueList(Vec<Value>);
+
+impl ValueList {
+    pub fn new() -> Self {
+        Self(Vec::new())
+    }
+
+    pub fn push(&mut self, value: Value) {
+        self.0.push(value);
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    pub fn get(&self, index: usize) -> Option<&Value> {
+        self.0.get(index)
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<Value> {
+        self.0.iter()
+    }
+
+    pub fn extend(&mut self, other: Self) {
+        self.0.extend(other.0);
+    }
+
+    pub fn contains(&self, value: &Value) -> bool {
+        self.0.contains(value)
+    }
+
+    pub fn retain<F>(&mut self, f: F)
+    where
+        F: FnMut(&Value) -> bool,
+    {
+        self.0.retain(f);
+    }
+
+    pub fn add_unit_to_scalar_types(&mut self, unit: Unit) {
+        for value in self.0.iter_mut() {
+            value.add_unit_to_scalar_types(unit);
+        }
+    }
+
+    pub fn types(&self) -> TypeList {
+        TypeList::from_types(
+            self.0
+                .iter()
+                .map(|v| v.ty())
+                .collect::<Vec<Type>>()
+                .into_iter()
+                .collect(),
+        )
     }
 }

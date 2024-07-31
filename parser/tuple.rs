@@ -5,7 +5,7 @@ use crate::eval::{Context, Eval};
 use crate::langtype::{Ty, Type};
 use crate::parser::{Pair, Parse, ParseError};
 use crate::units::Unit;
-use crate::value::{NamedTuple, UnnamedTuple, Value, Vec2, Vec3};
+use crate::value::{NamedTuple, UnnamedTuple, Value, ValueList, Vec2, Vec3};
 
 #[derive(Default, Clone)]
 pub struct TupleExpression(CallArgumentList, Option<Unit>);
@@ -35,17 +35,24 @@ impl Eval for TupleExpression {
     fn eval(self, context: Option<&Context>) -> Result<Value, crate::eval::Error> {
         if self.0.contains_positional() {
             // Unnamed tuple
-            let mut vec = Vec::new();
+            let mut value_list = ValueList::new();
             for expr in self.0.get_positional() {
                 let value = expr.clone().eval(context)?;
-                vec.push(value);
+                value_list.push(value);
             }
-            Ok(Value::UnnamedTuple(UnnamedTuple(vec)))
+            if let Some(unit) = self.1 {
+                value_list.add_unit_to_scalar_types(unit);
+            }
+            Ok(Value::UnnamedTuple(UnnamedTuple(value_list)))
         } else {
             // Named tuple
             let mut map = BTreeMap::new();
             for (ident, expr) in self.0.get_named() {
-                map.insert(ident.clone(), expr.clone().eval(context)?);
+                let mut value = expr.clone().eval(context)?;
+                if let Some(unit) = self.1 {
+                    value.add_unit_to_scalar_types(unit);
+                }
+                map.insert(ident.clone(), value);
             }
 
             let (x_ident, y_ident, z_ident) = (&"x".into(), &"y".into(), &"z".into());
@@ -127,7 +134,7 @@ mod tests {
         use crate::eval::Eval;
         use crate::langtype::Type;
 
-        let input = "(1.0, 2.0, 3.0)";
+        let input = "(1.0, 2.0m, 3.0)mm";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
             Rule::tuple_expression,
             input,
@@ -136,9 +143,9 @@ mod tests {
         assert_eq!(
             value.ty(),
             Type::UnnamedTuple(crate::langtype::UnnamedTupleType(vec![
-                Type::Scalar,
-                Type::Scalar,
-                Type::Scalar
+                Type::Length,
+                Type::Length,
+                Type::Length
             ]))
         );
     }
@@ -148,7 +155,7 @@ mod tests {
         use crate::eval::Eval;
         use crate::langtype::Type;
 
-        let input = "(a = 1.0, b = 2.0, c = 3.0)";
+        let input = "(a = 1.0, b = 2.0m, c = 3.0°)mm";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
             Rule::tuple_expression,
             input,
@@ -158,9 +165,9 @@ mod tests {
             value.ty(),
             Type::NamedTuple(crate::langtype::NamedTupleType(
                 vec![
-                    ("a".into(), Type::Scalar),
-                    ("b".into(), Type::Scalar),
-                    ("c".into(), Type::Scalar)
+                    ("a".into(), Type::Length),
+                    ("b".into(), Type::Length),
+                    ("c".into(), Type::Angle)
                 ]
                 .into_iter()
                 .collect()
@@ -173,7 +180,7 @@ mod tests {
         use crate::eval::Eval;
         use crate::langtype::Type;
 
-        let input = "((x,y) = 1.0mm)";
+        let input = "((x,y) = 1mm)";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
             Rule::tuple_expression,
             input,
@@ -187,7 +194,7 @@ mod tests {
         use crate::eval::Eval;
         use crate::langtype::Type;
 
-        let input = "(x = 1.0mm, (y,z) = 2.0mm)";
+        let input = "(x = 1mm, (y,z) = 2)mm";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
             Rule::tuple_expression,
             input,
