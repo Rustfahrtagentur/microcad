@@ -75,7 +75,7 @@ impl CallArgumentList {
         self.positional.is_empty() && self.named.is_empty()
     }
 
-    fn iter(&self) -> impl Iterator<Item = &Expression> {
+    pub fn iter(&self) -> impl Iterator<Item = &Expression> {
         self.positional.iter().chain(self.named.values())
     }
 
