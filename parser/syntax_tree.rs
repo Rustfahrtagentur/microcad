@@ -39,7 +39,7 @@ impl SyntaxNodeKind {
         }
     }
 
-    fn find_node_with_id(parent: SyntaxNode, id: &Identifier) -> Option<SyntaxNode> {
+    fn _find_node_with_id(parent: SyntaxNode, id: &Identifier) -> Option<SyntaxNode> {
         for child in parent.children() {
             if let Some(child_id) = child.borrow().id() {
                 if child_id == id {
@@ -298,7 +298,7 @@ mod tests {
     }
 
     //#[test]
-    fn from_file() {
+    fn _from_file() {
         let node = TreeBuilder::from_path("tests/nested.csg").unwrap();
         assert!(node.has_children());
 

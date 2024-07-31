@@ -118,7 +118,7 @@ impl std::str::FromStr for PestFile {
                 let name = tokens.0.trim();
                 // Check if name is identifier
                 if name.chars().any(|c| !c.is_alphanumeric() && c != '_') {
-                    return Err(format!("Invalid rule name: {}", name));
+                    return Err(format!("Invalid rule name: {name}"));
                 }
                 rules.push(PestRule {
                     name: name.to_string(),
@@ -146,7 +146,7 @@ impl<'a> RustWriter<'a> {
         if s.is_empty() {
             self.writeln("{")?;
         } else {
-            self.writeln(format!("{} {{", s).as_str())?;
+            self.writeln(format!("{s} {{").as_str())?;
         }
 
         self.indent += 1;

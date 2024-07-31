@@ -65,11 +65,12 @@ pub fn difference() -> Node {
 
 #[cfg(test)]
 mod tests {
-    use crate::NodeInner;
 
     #[test]
     fn difference() {
+        use crate::NodeInner;
         use crate::{algorithm, primitive2d};
+
         let difference = algorithm::difference();
 
         difference.append(primitive2d::circle(4.0, 32));

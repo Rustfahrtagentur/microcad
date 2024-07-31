@@ -1,13 +1,11 @@
-use std::io::Write;
-
-use geo::CoordsIter;
-
 use super::*;
+use geo::CoordsIter;
+use std::io::Write;
 
 pub struct SvgWriter<'a> {
     writer: &'a mut dyn Write,
-    bounds: Rect,
-    scale: Scalar,
+    _bounds: Rect,
+    _scale: Scalar,
 }
 
 impl<'a> SvgWriter<'a> {
@@ -25,8 +23,8 @@ impl<'a> SvgWriter<'a> {
 
         Ok(Self {
             writer: w,
-            bounds,
-            scale,
+            _bounds: bounds,
+            _scale: scale,
         })
     }
 
@@ -90,7 +88,7 @@ impl<'a> SvgWriter<'a> {
     }
 
     pub fn multi_polygon(
-        self: &mut Self,
+        &mut self,
         multi_polygon: &MultiPolygon,
         style: &str,
     ) -> std::io::Result<()> {

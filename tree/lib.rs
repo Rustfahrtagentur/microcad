@@ -1,5 +1,5 @@
-mod algorithm;
-mod primitive2d;
+pub mod algorithm;
+pub mod primitive2d;
 
 use ucad_parser::syntax_tree::{SyntaxNode, SyntaxNodeKind};
 

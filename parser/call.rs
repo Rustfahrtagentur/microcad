@@ -36,10 +36,7 @@ impl Parse for CallArgument {
                 ))
             }
             Rule::expression => Ok(CallArgument::Position(Box::new(Expression::parse(pair)?))),
-            rule => unreachable!(
-                "CallArgument::parse expected call argument, found {:?}",
-                rule
-            ),
+            rule => unreachable!("CallArgument::parse expected call argument, found {rule:?}"),
         }
     }
 }
@@ -129,10 +126,9 @@ impl Parse for CallArgumentList {
 
                 Ok(call_argument_list)
             }
-            rule => unreachable!(
-                "CallArgumentList::parse expected call argument list, found {:?}",
-                rule
-            ),
+            rule => {
+                unreachable!("CallArgumentList::parse expected call argument list, found {rule:?}")
+            }
         }
     }
 }

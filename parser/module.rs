@@ -41,7 +41,7 @@ pub enum ModuleNodeExpression {
     },
 }
 
-pub struct Module {
+pub struct _Module {
     name: Identifier,
     constructor: Vec<FunctionArgument>,
 }

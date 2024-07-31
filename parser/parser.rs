@@ -194,7 +194,7 @@ mod tests {
     }
 
     //#[test]
-    fn module_node_statement() {
+    fn _module_node_statement() {
         use pest::Parser;
         let pairs = crate::parser::Parser::parse(
             parser::Rule::module_node_assignment,
@@ -220,7 +220,7 @@ mod tests {
         }
     }
 
-    fn test_file(path: impl AsRef<std::path::Path>) {
+    fn _test_file(path: impl AsRef<std::path::Path>) {
         use pest::Parser;
 
         let input = std::fs::read_to_string(&path)
@@ -229,8 +229,8 @@ mod tests {
     }
 
     //#[test]
-    fn test_file_nested() {
-        test_file("tests/nested.csg");
-        test_file("tests/module.csg");
+    fn _test_file_nested() {
+        _test_file("tests/nested.csg");
+        _test_file("tests/module.csg");
     }
 }

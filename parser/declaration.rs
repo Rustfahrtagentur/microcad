@@ -10,8 +10,8 @@ use std::collections::HashMap;
 
 pub struct VariableSingleDeclaration {
     name: Identifier,
-    default_value: Option<Expression>,
-    specified_type: Option<Type>,
+    _default_value: Option<Expression>,
+    _specified_type: Option<Type>,
 }
 
 pub struct VariableMultiDeclaration {
@@ -32,8 +32,8 @@ impl VariableMultiDeclaration {
             .iter()
             .map(|name| VariableSingleDeclaration {
                 name: name.clone(),
-                default_value: self.default_value.clone(),
-                specified_type: self.specified_type.clone(),
+                _default_value: self.default_value.clone(),
+                _specified_type: self.specified_type.clone(),
             })
             .collect()
     }
@@ -77,8 +77,8 @@ impl Parse for VariableDeclaration {
             0 => Err(ParseError::ExpectedIdentifier),
             1 => Ok(Self::Single(VariableSingleDeclaration {
                 name: names.get(0).unwrap().clone(),
-                default_value,
-                specified_type,
+                _default_value: default_value,
+                _specified_type: specified_type,
             })),
             _ => Ok(Self::Multi(VariableMultiDeclaration {
                 names,
@@ -146,7 +146,7 @@ impl Parse for VariableDeclarationList {
     }
 }
 
-pub struct FunctionSignature(VariableDeclarationList, Type);
+pub struct _FunctionSignature(VariableDeclarationList, Type);
 
 #[cfg(test)]
 mod tests {
@@ -169,14 +169,14 @@ mod tests {
             VariableDeclaration::Single(decl) => {
                 assert_eq!(decl.name, Identifier::from("a"));
                 assert_eq!(
-                    decl.default_value
+                    decl._default_value
                         .unwrap()
                         .eval(Some(&context))
                         .unwrap()
                         .to_string(),
                     "1"
                 );
-                assert!(decl.specified_type.is_none());
+                assert!(decl._specified_type.is_none());
             }
             _ => panic!("Expected single declaration"),
         }
