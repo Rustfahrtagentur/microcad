@@ -63,7 +63,7 @@ impl fmt::Debug for SyntaxNodeKind {
         match self {
             SyntaxNodeKind::Document(doc) => write!(f, "{doc}"),
             SyntaxNodeKind::ModuleNode(module_node) => {
-                write!(f, "{}", module_node.call.qualified_name.to_string())
+                write!(f, "{}", module_node.call.qualified_name)
             }
             SyntaxNodeKind::UseStatement(use_statement) => write!(f, "{}", use_statement),
         }
@@ -86,12 +86,12 @@ pub fn qualified_name(node: SyntaxNode) -> Option<QualifiedName> {
     Some(q)
 }
 
-trait AppendSyntaxNode {
+pub trait AppendSyntaxNode {
     fn append_node(&mut self, node: SyntaxNode);
 }
 
 #[derive(Debug)]
-enum Error {
+pub enum Error {
     IoError(std::io::Error),
     SyntaxError(Box<pest::error::Error<Rule>>),
 }
@@ -102,29 +102,30 @@ impl From<std::io::Error> for Error {
     }
 }
 
+#[derive(Default)]
 pub struct Document {
     path: Option<std::path::PathBuf>,
 }
 
 impl Document {
-    fn new() -> Self {
-        Self { path: None }
+    pub fn new() -> Self {
+        Self::default()
     }
 
-    fn from_path(path: impl AsRef<std::path::Path>) -> Self {
+    pub fn from_path(path: impl AsRef<std::path::Path>) -> Self {
         Self {
             path: Some(std::path::PathBuf::from(path.as_ref())),
         }
     }
 }
 
-impl Into<SyntaxNode> for Document {
-    fn into(self) -> SyntaxNode {
-        SyntaxNodeKind::Document(self).into()
+impl From<Document> for SyntaxNode {
+    fn from(val: Document) -> Self {
+        SyntaxNodeKind::Document(val).into()
     }
 }
 
-struct TreeBuilder();
+pub struct TreeBuilder();
 
 impl TreeBuilder {
     pub fn from_path(path: impl AsRef<std::path::Path>) -> Result<SyntaxNode, Error> {
@@ -167,7 +168,6 @@ impl TreeBuilder {
     }
 
     fn module_node(parent: SyntaxNode, pairs: Pairs) -> Option<SyntaxNode> {
-        use pest::Parser;
         let module_node_statement =
             crate::parser::Parser::module_node_statement(pairs.clone()).unwrap();
         let mut node = parent.clone();
@@ -177,10 +177,9 @@ impl TreeBuilder {
 
         for call in module_node_statement.calls {
             let module_node: SyntaxNode = ModuleNode {
-                id: if id.is_some() && first_node.is_none() {
-                    Some(id.unwrap().clone())
-                } else {
-                    None
+                id: match (id, &first_node) {
+                    (Some(id), None) => Some(id.clone()),
+                    _ => None,
                 },
                 call,
             }
@@ -236,7 +235,7 @@ impl From<ModuleNode> for SyntaxNode {
     }
 }
 
-trait Depth {
+pub trait Depth {
     fn depth(self) -> usize;
 }
 

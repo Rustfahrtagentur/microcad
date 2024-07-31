@@ -139,13 +139,9 @@ impl std::fmt::Display for MapKeyValue {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Map(pub HashMap<MapKeyValue, Value>, pub MapKeyType, Type);
 
-impl Map {
-    fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.0.is_empty()
+impl From<Map> for HashMap<MapKeyValue, Value> {
+    fn from(val: Map) -> Self {
+        val.0
     }
 }
 
@@ -213,25 +209,17 @@ impl Ty for NamedTuple {
 pub struct UnnamedTuple(pub ValueList);
 
 impl UnnamedTuple {
-    fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    fn iter(&self) -> std::slice::Iter<Value> {
-        self.0.iter()
-    }
-
     pub fn binary_op(
         self,
         rhs: Self,
         op: char,
         f: impl Fn(Value, Value) -> Result<Value, ValueError>,
     ) -> Result<Self, ValueError> {
-        if self.len() != rhs.len() {
+        if self.0.len() != rhs.0.len() {
             return Err(ValueError::TupleLengthMismatchForOperator {
                 operator: op,
-                lhs: self.len(),
-                rhs: rhs.len(),
+                lhs: self.0.len(),
+                rhs: rhs.0.len(),
             });
         }
         let mut result = ValueList::new();
@@ -559,12 +547,12 @@ impl std::fmt::Display for Value {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub struct ValueList(Vec<Value>);
 
 impl ValueList {
     pub fn new() -> Self {
-        Self(Vec::new())
+        Self::default()
     }
 
     pub fn push(&mut self, value: Value) {

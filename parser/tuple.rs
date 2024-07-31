@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::call::{self, CallArgumentList};
+use crate::call::CallArgumentList;
 use crate::eval::{Context, Eval};
 use crate::langtype::{Ty, Type};
 use crate::parser::{Pair, Parse, ParseError};

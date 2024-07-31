@@ -8,32 +8,26 @@ use crate::{
 
 use std::collections::HashMap;
 
-struct VariableSingleDeclaration {
+pub struct VariableSingleDeclaration {
     name: Identifier,
     default_value: Option<Expression>,
     specified_type: Option<Type>,
 }
 
-struct VariableMultiDeclaration {
+pub struct VariableMultiDeclaration {
     names: IdentifierList,
     default_value: Option<Expression>,
     specified_type: Option<Type>,
 }
 
+impl From<VariableMultiDeclaration> for IdentifierList {
+    fn from(value: VariableMultiDeclaration) -> Self {
+        value.names
+    }
+}
+
 impl VariableMultiDeclaration {
-    fn len(&self) -> usize {
-        self.names.len()
-    }
-
-    fn get(&self, index: usize) -> Option<&Identifier> {
-        self.names.get(index)
-    }
-
-    fn contains(&self, ident: &Identifier) -> bool {
-        self.names.contains(ident)
-    }
-
-    fn fetch_single_declarations(&self) -> Vec<VariableSingleDeclaration> {
+    pub fn fetch_single_declarations(&self) -> Vec<VariableSingleDeclaration> {
         self.names
             .iter()
             .map(|name| VariableSingleDeclaration {
@@ -45,7 +39,7 @@ impl VariableMultiDeclaration {
     }
 }
 
-enum VariableDeclaration {
+pub enum VariableDeclaration {
     Single(VariableSingleDeclaration),
     Multi(VariableMultiDeclaration),
 }
@@ -96,7 +90,7 @@ impl Parse for VariableDeclaration {
 }
 
 #[derive(Default)]
-struct VariableDeclarationList {
+pub struct VariableDeclarationList {
     decls: Vec<VariableSingleDeclaration>,
     map: HashMap<Identifier, usize>,
 }
@@ -152,7 +146,7 @@ impl Parse for VariableDeclarationList {
     }
 }
 
-struct FunctionSignature(VariableDeclarationList, Type);
+pub struct FunctionSignature(VariableDeclarationList, Type);
 
 #[cfg(test)]
 mod tests {

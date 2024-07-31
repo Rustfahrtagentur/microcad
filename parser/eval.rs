@@ -2,10 +2,8 @@ use std::collections::HashMap;
 use std::vec;
 use thiserror::Error;
 
-use crate::format_string::FormatString;
 use crate::identifier::Identifier;
 use crate::langtype::Type;
-use crate::syntax_tree::SyntaxNode;
 use crate::value::{Value, ValueError};
 
 #[derive(Debug, Error)]

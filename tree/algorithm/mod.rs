@@ -1,24 +1,17 @@
-use std::borrow::Borrow;
-
-use geo::{algorithm, CoordsIter};
-
-use crate::{
-    primitive2d::{self, RenderMultiPolygon},
-    Node, NodeInner,
-};
+use crate::{Node, NodeInner};
 
 pub trait Algorithm {
     fn process(&self, parent: Node) -> Node;
 }
 
-enum BooleanOp {
+pub enum BooleanOp {
     Difference,
     Union,
     Xor,
     Intersection,
 }
 
-enum ProcessError {
+pub enum ProcessError {
     Unsupported,
 }
 

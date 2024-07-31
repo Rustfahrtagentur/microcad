@@ -3,7 +3,7 @@ use crate::format_string::FormatString;
 use crate::identifier::Identifier;
 use crate::langtype::{Type, TypeList};
 use crate::list::ListExpression;
-use crate::literal::{Literal, NumberLiteral};
+use crate::literal::Literal;
 use crate::parser::*;
 use crate::tuple::TupleExpression;
 use crate::value::Value;
@@ -133,7 +133,7 @@ impl Eval for Expression {
                 }
             }
             Self::Identifier(identifier) => {
-                if let Some(value) = context.and_then(|ctx| ctx.get(&identifier.to_string())) {
+                if let Some(value) = context.and_then(|ctx| ctx.get(identifier.to_string())) {
                     Ok(value.clone())
                 } else {
                     Err(eval::Error::UnknownIdentifier(identifier))

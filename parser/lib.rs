@@ -1,7 +1,7 @@
-mod call;
+pub mod call;
 pub mod color;
 pub mod declaration;
-mod diagnostics;
+pub mod diagnostics;
 pub mod eval;
 pub mod expression;
 pub mod format_string;
@@ -9,7 +9,7 @@ pub mod identifier;
 pub mod langtype;
 pub mod list;
 pub mod literal;
-mod module;
+pub mod module;
 pub mod parser;
 pub mod syntax_tree;
 pub mod tuple;

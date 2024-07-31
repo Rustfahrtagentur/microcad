@@ -179,8 +179,6 @@ mod tests {
     use literal::NumberLiteral;
     use parser::Parse;
 
-    use crate::parser::Parser;
-
     #[test]
     fn number_literal() {
         use pest::Parser;

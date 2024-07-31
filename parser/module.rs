@@ -1,12 +1,8 @@
 // Resolve a qualified name to a type or value.
 
-use std::task::Context;
-
-use pest::pratt_parser::PrattParser;
-
 use crate::identifier::{Identifier, QualifiedName};
 use crate::parser::*;
-use crate::syntax_tree::SyntaxNode;
+use pest::pratt_parser::PrattParser;
 
 lazy_static::lazy_static! {
     static ref PRATT_PARSER: PrattParser<Rule> = {
@@ -190,5 +186,7 @@ mod tests {
 
         let qualified_names: Vec<QualifiedName> =
             vec!["primitives.circle".into(), "math.PI".into()];
+
+        unimplemented!();
     }
 }

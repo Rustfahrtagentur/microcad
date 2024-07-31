@@ -1,5 +1,5 @@
 use crate::langtype::Type;
-use crate::parser::{Pair, Parse, ParseError, Rule};
+use crate::parser::{Pair, Parse, ParseError};
 
 macro_rules! declare_units {
     ($( $(#[$m:meta])* $ident:ident = $string:literal -> $ty:ident $(* $factor:expr)? ,)*) => {

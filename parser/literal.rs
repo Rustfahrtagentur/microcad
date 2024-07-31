@@ -3,7 +3,7 @@ use crate::eval::{Eval, OperatorError};
 use crate::langtype::{Ty, Type};
 use crate::parser::{Pair, Parse, ParseError, Rule};
 use crate::units::Unit;
-use crate::value::{Number, Value};
+use crate::value::Value;
 
 /// Definition and implementation for `NumberLiteral`
 #[derive(Debug, Clone, PartialEq)]

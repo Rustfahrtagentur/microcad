@@ -1,13 +1,15 @@
 use std::collections::BTreeMap;
 
 use crate::expression::Expression;
-use crate::identifier::{Identifier, IdentifierList, QualifiedName};
+#[cfg(test)]
+use crate::identifier::QualifiedName;
+use crate::identifier::{Identifier, IdentifierList};
 use crate::parser::*;
 
 enum CallArgument {
-    NamedArgument(Identifier, Box<Expression>),
-    NamedTupleArgument(IdentifierList, Box<Expression>),
-    PositionalArgument(Box<Expression>),
+    Named(Identifier, Box<Expression>),
+    NamedTuple(IdentifierList, Box<Expression>),
+    Position(Box<Expression>),
 }
 
 impl Parse for CallArgument {
@@ -18,7 +20,7 @@ impl Parse for CallArgument {
                 let first = pairs.next().unwrap();
                 let second = pairs.next().unwrap();
 
-                Ok(CallArgument::NamedArgument(
+                Ok(CallArgument::Named(
                     Identifier::parse(first)?,
                     Box::new(Expression::parse(second)?),
                 ))
@@ -28,14 +30,12 @@ impl Parse for CallArgument {
                 let first = pairs.next().unwrap();
                 let second = pairs.next().unwrap();
 
-                Ok(CallArgument::NamedTupleArgument(
+                Ok(CallArgument::NamedTuple(
                     IdentifierList::parse(first)?,
                     Box::new(Expression::parse(second)?),
                 ))
             }
-            Rule::expression => Ok(CallArgument::PositionalArgument(Box::new(
-                Expression::parse(pair)?,
-            ))),
+            Rule::expression => Ok(CallArgument::Position(Box::new(Expression::parse(pair)?))),
             rule => unreachable!(
                 "CallArgument::parse expected call argument, found {:?}",
                 rule
@@ -113,15 +113,15 @@ impl Parse for CallArgumentList {
             Rule::call_argument_list => {
                 for pair in pair.into_inner() {
                     match CallArgument::parse(pair)? {
-                        CallArgument::NamedArgument(ident, expr) => {
+                        CallArgument::Named(ident, expr) => {
                             call_argument_list.insert_named(ident, *expr)?;
                         }
-                        CallArgument::NamedTupleArgument(idents, expr) => {
+                        CallArgument::NamedTuple(idents, expr) => {
                             for ident in idents {
                                 call_argument_list.insert_named(ident, *expr.clone())?;
                             }
                         }
-                        CallArgument::PositionalArgument(expr) => {
+                        CallArgument::Position(expr) => {
                             call_argument_list.insert_positional(*expr)?;
                         }
                     }
@@ -159,11 +159,13 @@ impl Parse for MethodCall {
     }
 }
 
+#[cfg(test)]
 struct Call {
     name: QualifiedName,
     argument_list: CallArgumentList,
 }
 
+#[cfg(test)]
 impl Parse for Call {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
         let mut pairs = pair.into_inner();

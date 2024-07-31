@@ -19,7 +19,7 @@ pub enum NodeInner {
 
 pub type Node = rctree::Node<NodeInner>;
 
-struct TreeBuilder;
+pub struct TreeBuilder;
 
 impl TreeBuilder {
     pub fn from_syntax_node(syntax_node: SyntaxNode) -> Node {
