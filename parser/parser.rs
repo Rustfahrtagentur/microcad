@@ -17,7 +17,7 @@ pub enum ParseError {
     InvalidUseStatement,
     #[error("Error parsing floating point number: {0}")]
     ParseFloatError(#[from] std::num::ParseFloatError),
-    #[error("Error parsing int point number: {0}")]
+    #[error("Error parsing integer number: {0}")]
     ParseIntError(#[from] std::num::ParseIntError),
     #[error("Unknown unit: {0}")]
     UnknownUnit(String),
@@ -136,14 +136,6 @@ impl Parser {
         }
 
         Ok(call)
-    }
-
-    fn module_node_id_assignment(pairs: Pairs) -> Result<Identifier, ParseError> {
-        if let Some(pair) = pairs.peek() {
-            Identifier::parse(pair)
-        } else {
-            Err(ParseError::ExpectedIdentifier)
-        }
     }
 
     pub fn module_node_statement(pairs: Pairs) -> Result<ModuleNodeStatement, ParseError> {
