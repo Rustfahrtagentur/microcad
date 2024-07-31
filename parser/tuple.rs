@@ -4,13 +4,15 @@ use crate::call::{self, CallArgumentList};
 use crate::eval::{Context, Eval};
 use crate::langtype::{Ty, Type};
 use crate::parser::{Pair, Parse, ParseError};
+use crate::units::Unit;
 use crate::value::{NamedTuple, UnnamedTuple, Value, Vec2, Vec3};
 
-struct TupleExpression(CallArgumentList);
+struct TupleExpression(CallArgumentList, Option<Unit>);
 
 impl Parse for TupleExpression {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        let call_argument_list = CallArgumentList::parse(pair.into_inner().next().unwrap())?;
+        let mut pairs = pair.into_inner();
+        let call_argument_list = CallArgumentList::parse(pairs.next().unwrap())?;
         if call_argument_list.is_empty() {
             return Err(ParseError::EmptyTupleExpression);
         }
@@ -18,7 +20,13 @@ impl Parse for TupleExpression {
             return Err(ParseError::MixedTupleArguments);
         }
 
-        Ok(TupleExpression(call_argument_list))
+        Ok(TupleExpression(
+            call_argument_list,
+            match pairs.next() {
+                Some(pair) => Some(Unit::parse(pair)?),
+                None => None,
+            },
+        ))
     }
 }
 
