@@ -6,7 +6,7 @@ use thiserror::Error;
 use crate::{
     color::Color,
     identifier::Identifier,
-    langtype::{MapKeyType, NamedTupleType, Ty, Type, TypeList, UnnamedTupleType},
+    lang_type::{MapKeyType, NamedTupleType, Ty, Type, TypeList, UnnamedTupleType},
     syntax_tree::{qualified_name, SyntaxNode},
     units::Unit,
 };

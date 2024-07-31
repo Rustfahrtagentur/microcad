@@ -53,8 +53,8 @@ impl Eval for FormatExpression {
         Ok(Value::String(format!("{}", value)))
     }
 
-    fn eval_type(&self, _: Option<&Context>) -> Result<crate::langtype::Type, crate::eval::Error> {
-        Ok(crate::langtype::Type::String)
+    fn eval_type(&self, _: Option<&Context>) -> Result<crate::lang_type::Type, crate::eval::Error> {
+        Ok(crate::lang_type::Type::String)
     }
 }
 
@@ -98,8 +98,8 @@ impl Eval for FormatString {
         Ok(Value::String(result))
     }
 
-    fn eval_type(&self, _: Option<&Context>) -> Result<crate::langtype::Type, crate::eval::Error> {
-        Ok(crate::langtype::Type::String)
+    fn eval_type(&self, _: Option<&Context>) -> Result<crate::lang_type::Type, crate::eval::Error> {
+        Ok(crate::lang_type::Type::String)
     }
 }
 

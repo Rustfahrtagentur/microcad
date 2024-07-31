@@ -1,4 +1,4 @@
-use crate::langtype::Type;
+use crate::lang_type::Type;
 use crate::parser::{Pair, Parse, ParseError};
 
 macro_rules! declare_units {

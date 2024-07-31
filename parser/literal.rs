@@ -1,6 +1,6 @@
 use crate::color::Color;
 use crate::eval::{Eval, OperatorError};
-use crate::langtype::{Ty, Type};
+use crate::lang_type::{Ty, Type};
 use crate::parser::{Pair, Parse, ParseError, Rule};
 use crate::units::Unit;
 use crate::value::Value;

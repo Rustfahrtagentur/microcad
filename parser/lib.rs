@@ -6,7 +6,7 @@ pub mod eval;
 pub mod expression;
 pub mod format_string;
 pub mod identifier;
-pub mod langtype;
+pub mod lang_type;
 pub mod list;
 pub mod literal;
 pub mod module;

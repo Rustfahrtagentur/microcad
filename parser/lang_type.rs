@@ -302,7 +302,7 @@ impl TypeList {
 #[cfg(test)]
 mod tests {
     use crate::{
-        langtype::Type,
+        lang_type::Type,
         parser::{Parser, Rule},
     };
 
@@ -315,7 +315,7 @@ mod tests {
 
     #[test]
     fn list_type() {
-        use crate::langtype::ListType;
+        use crate::lang_type::ListType;
         let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int]");
         assert_eq!(ty.to_string(), "[int]");
         assert_eq!(ty, Type::List(ListType::from_type(Type::Integer)));
@@ -323,13 +323,13 @@ mod tests {
 
     #[test]
     fn map_type() {
-        use crate::langtype::MapType;
+        use crate::lang_type::MapType;
         let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int => string]");
         assert_eq!(ty.to_string(), "[int => string]");
         assert_eq!(
             ty,
             Type::Map(MapType::from_types(
-                crate::langtype::MapKeyType::Integer,
+                crate::lang_type::MapKeyType::Integer,
                 Type::String
             ))
         );
@@ -337,7 +337,7 @@ mod tests {
 
     #[test]
     fn unnamed_tuple_type() {
-        use crate::langtype::UnnamedTupleType;
+        use crate::lang_type::UnnamedTupleType;
         let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(int, string)");
         assert_eq!(ty.to_string(), "(int, string)");
         assert_eq!(
@@ -349,7 +349,7 @@ mod tests {
     #[test]
     fn named_tuple_type() {
         use crate::identifier::Identifier;
-        use crate::langtype::NamedTupleType;
+        use crate::lang_type::NamedTupleType;
 
         let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(x: int, y: string)");
         assert_eq!(ty.to_string(), "(x: int, y: string)");

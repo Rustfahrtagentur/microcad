@@ -26,7 +26,7 @@ pub enum ParseError {
     #[error("Unexpected token")]
     UnexpectedToken,
     #[error("Type error: {0}")]
-    TypeError(#[from] crate::langtype::TypeError),
+    TypeError(#[from] crate::lang_type::TypeError),
     #[error("Identifier list error: {0}")]
     IdentifierListError(#[from] IdentifierListError),
     #[error("Tuple expression contains both named and positional arguments")]

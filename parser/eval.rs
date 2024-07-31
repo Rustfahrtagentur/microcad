@@ -3,7 +3,7 @@ use std::vec;
 use thiserror::Error;
 
 use crate::identifier::Identifier;
-use crate::langtype::Type;
+use crate::lang_type::Type;
 use crate::value::{Value, ValueError};
 
 #[derive(Debug, Error)]

@@ -1,5 +1,5 @@
 use crate::identifier::IdentifierListError;
-use crate::langtype::Type;
+use crate::lang_type::Type;
 use crate::parser::*;
 use crate::{
     expression::Expression,

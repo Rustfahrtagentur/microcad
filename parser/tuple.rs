@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use crate::call::CallArgumentList;
 use crate::eval::{Context, Eval};
-use crate::langtype::{Ty, Type};
+use crate::lang_type::{Ty, Type};
 use crate::parser::{Pair, Parse, ParseError};
 use crate::units::Unit;
 use crate::value::{NamedTuple, UnnamedTuple, Value, ValueList, Vec2, Vec3};
@@ -91,7 +91,9 @@ impl Eval for TupleExpression {
                 let value = expr.clone().eval(context)?;
                 types.push(value.ty());
             }
-            Ok(Type::UnnamedTuple(crate::langtype::UnnamedTupleType(types)))
+            Ok(Type::UnnamedTuple(crate::lang_type::UnnamedTupleType(
+                types,
+            )))
         } else {
             // Named tuple
 
@@ -120,19 +122,19 @@ impl Eval for TupleExpression {
                 _ => {}
             }
 
-            Ok(Type::NamedTuple(crate::langtype::NamedTupleType(map)))
+            Ok(Type::NamedTuple(crate::lang_type::NamedTupleType(map)))
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{langtype::Ty, parser::Rule, tuple::TupleExpression};
+    use crate::{lang_type::Ty, parser::Rule, tuple::TupleExpression};
 
     #[test]
     fn unnamed_tuple() {
         use crate::eval::Eval;
-        use crate::langtype::Type;
+        use crate::lang_type::Type;
 
         let input = "(1.0, 2.0m, 3.0)mm";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
@@ -142,7 +144,7 @@ mod tests {
         let value = expr.eval(None).unwrap();
         assert_eq!(
             value.ty(),
-            Type::UnnamedTuple(crate::langtype::UnnamedTupleType(vec![
+            Type::UnnamedTuple(crate::lang_type::UnnamedTupleType(vec![
                 Type::Length,
                 Type::Length,
                 Type::Length
@@ -153,7 +155,7 @@ mod tests {
     #[test]
     fn test_named_tuple() {
         use crate::eval::Eval;
-        use crate::langtype::Type;
+        use crate::lang_type::Type;
 
         let input = "(a = 1.0, b = 2.0m, c = 3.0°)mm";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
@@ -163,7 +165,7 @@ mod tests {
         let value = expr.eval(None).unwrap();
         assert_eq!(
             value.ty(),
-            Type::NamedTuple(crate::langtype::NamedTupleType(
+            Type::NamedTuple(crate::lang_type::NamedTupleType(
                 vec![
                     ("a".into(), Type::Length),
                     ("b".into(), Type::Length),
@@ -178,7 +180,7 @@ mod tests {
     #[test]
     fn test_vec2() {
         use crate::eval::Eval;
-        use crate::langtype::Type;
+        use crate::lang_type::Type;
 
         let input = "((x,y) = 1mm)";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
@@ -192,7 +194,7 @@ mod tests {
     #[test]
     fn test_vec3() {
         use crate::eval::Eval;
-        use crate::langtype::Type;
+        use crate::lang_type::Type;
 
         let input = "(x = 1mm, (y,z) = 2)mm";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(

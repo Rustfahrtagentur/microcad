@@ -1,7 +1,7 @@
 use crate::eval::{self, Context, Eval};
 use crate::format_string::FormatString;
 use crate::identifier::Identifier;
-use crate::langtype::{Type, TypeList};
+use crate::lang_type::{Type, TypeList};
 use crate::list::ListExpression;
 use crate::literal::Literal;
 use crate::parser::*;
@@ -157,7 +157,7 @@ impl Eval for Expression {
 
     /// The type this expression will evaluate to
     fn eval_type(&self, context: Option<&Context>) -> Result<Type, eval::Error> {
-        use crate::langtype::Ty;
+        use crate::lang_type::Ty;
         match self {
             Self::Literal(l) => l.eval_type(context),
             Self::ListExpression(list) => list.eval_type(context),
