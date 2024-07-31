@@ -43,7 +43,7 @@ impl Eval for TupleExpression {
             if let Some(unit) = self.1 {
                 value_list.add_unit_to_scalar_types(unit);
             }
-            Ok(Value::UnnamedTuple(UnnamedTuple(value_list)))
+            Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
         } else {
             // Named tuple
             let mut map = BTreeMap::new();

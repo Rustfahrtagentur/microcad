@@ -206,9 +206,12 @@ impl Ty for NamedTuple {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct UnnamedTuple(pub ValueList);
+pub struct UnnamedTuple(ValueList);
 
 impl UnnamedTuple {
+    pub fn new(list: ValueList) -> Self {
+        Self(list)
+    }
     pub fn binary_op(
         self,
         rhs: Self,
@@ -233,14 +236,15 @@ impl UnnamedTuple {
 
 impl std::fmt::Display for UnnamedTuple {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "(")?;
-        for (i, v) in self.0.iter().enumerate() {
-            if i > 0 {
-                write!(f, ", ")?;
-            }
-            write!(f, "{}", v)?;
-        }
-        write!(f, ")")
+        write!(
+            f,
+            "({})",
+            self.0
+                .iter()
+                .map(|v| v.to_string())
+                .collect::<Vec<String>>()
+                .join(", ")
+        )
     }
 }
 
