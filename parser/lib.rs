@@ -1,4 +1,5 @@
 mod call;
+pub mod color;
 pub mod declaration;
 mod diagnostics;
 pub mod eval;

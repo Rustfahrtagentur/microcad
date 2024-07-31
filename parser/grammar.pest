@@ -29,24 +29,25 @@ identifier_list = { identifier ~ (ws* ~ "," ~ ws* ~ identifier)*}
 // A tuple of identifiers: (a,b,c)
 identifier_tuple = _{ "(" ~ ws* ~ identifier_list ~ ws* ~ ")" }
 
-//`90.0°`: ok, with `°` unit
+//`1.0`: ok
+//`.1`: ok
+//`0.`: ok
+//`1`: error: Missing decimal point
+//`qwqeaq`: error
+number = @{ "-"? ~ (((int ~ "." ~ ASCII_DIGIT+) | (int ~ ".") | ("." ~ ASCII_DIGIT+)) ~  exp?) | exp }
+int    = @{ "0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
+exp    = @{ ("E" | "e") ~ ("+" | "-")? ~ ASCII_DIGIT+ }
+
+//`90°`: ok, with `°` unit
 //`5.0mm`: ok, with `mm` unit
 //`90.0`: ok, no unit
 //`mm`: error
-number_literal = { number ~ unit? }
+number_literal = { number ~ unit? | integer_literal ~ unit }
 
 //`-1`: ok
 //`1`: ok
 //`-1.0`: error # Is float
 integer_literal = { "-" ~ int | int }
-
-//`1.0`: ok
-//`1`: ok
-//`.1`: error
-//`qwqeaq`: error
-number = @{ ("-"? ~ int) ~ ("." ~ ASCII_DIGIT+ ~ exp? | exp)? }
-int    = @{ "0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
-exp    = @{ ("E" | "e") ~ ("+" | "-")? ~ ASCII_DIGIT+ }
 
 //`"a"`: ok
 //`"a\n"`: ok
@@ -77,7 +78,7 @@ format_spec_leading_zeros = { "0" ~ int }
 //`False`: error
 bool_literal = @{ "true" | "false" }
 
-unit = @{ (alpha_lower)+ | "°" }
+unit = @{ (alpha_lower)+ | "°" | "%" }
 
 //`#FFF`: ok # RGB, single hex
 //`#00FF00`: ok # RGB, double hex
@@ -86,11 +87,13 @@ unit = @{ (alpha_lower)+ | "°" }
 //`#00FF0`: error # No valid color
 color_literal = { "#" ~ (ASCII_HEX_DIGIT{8} | ASCII_HEX_DIGIT{6} | ASCII_HEX_DIGIT{4} | ASCII_HEX_DIGIT{3}) }
 
-//`1`: ok
-//`1mm`: ok
-//`1.0mm`: ok
-//`1.0`: ok
-literal = { number_literal | bool_literal | color_literal }
+//`1`: ok # Integer
+//`1mm`: ok # Number (length)
+//`1.0mm`: ok # Number (length)
+//`1.0`: ok # Scalar
+//`true`: ok # Boolean
+//`#00CCFF`: ok # Color
+literal = { number_literal | integer_literal | bool_literal | color_literal }
 
 //`a`: ok # Single identifier
 //`a.b`: ok # Nested identifiers
@@ -133,7 +136,7 @@ list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" ~ unit? }
 
 //`[0]`: ok # Access first element
 //`["test"]`: ok # Associative lists, access value of `\"test\"`
-list_element_access = { "[" ~ ws* ~ (integer_literal | expression) ~ ws* ~ "]" } 
+list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" } 
 
 // An expression for both named and unnamed tuple
 //`(1.0mm, 2.0mm)`: ok
@@ -211,7 +214,7 @@ expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
 //`1..4`: ok
 //`a..b`: ok
-range_expression = { expression ~ ws* ~ ".." ~ ws* ~ expression }
+range_expression = { (integer_literal | expression) ~ ws* ~ ".." ~ ws* ~ (integer_literal | expression) }
 
 unary_expression = { unary_operator ~ ws* ~ expression }
 unary_operator = { "-" }

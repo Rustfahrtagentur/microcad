@@ -7,7 +7,8 @@ use crate::parser::{Pair, Parse, ParseError};
 use crate::units::Unit;
 use crate::value::{NamedTuple, UnnamedTuple, Value, Vec2, Vec3};
 
-struct TupleExpression(CallArgumentList, Option<Unit>);
+#[derive(Default, Clone)]
+pub struct TupleExpression(CallArgumentList, Option<Unit>);
 
 impl Parse for TupleExpression {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
@@ -122,7 +123,7 @@ mod tests {
     use crate::{langtype::Ty, parser::Rule, tuple::TupleExpression};
 
     #[test]
-    fn test_unnamed_tuple() {
+    fn unnamed_tuple() {
         use crate::eval::Eval;
         use crate::langtype::Type;
 

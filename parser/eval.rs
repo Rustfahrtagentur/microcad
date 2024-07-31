@@ -9,9 +9,25 @@ use crate::syntax_tree::SyntaxNode;
 use crate::value::{Value, ValueError};
 
 #[derive(Debug, Error)]
+pub enum OperatorError {
+    #[error("Invalid operator: {0}")]
+    InvalidOperator(String),
+    #[error("Incompatible types {0} and {1} for addition")]
+    AddIncompatibleTypes(Type, Type),
+    #[error("Incompatible types {0} and {1} for subtraction")]
+    SubIncompatibleTypes(Type, Type),
+    #[error("Incompatible types {0} and {1} for multiplication")]
+    MulIncompatibleTypes(Type, Type),
+    #[error("Incompatible types {0} and {1} for division")]
+    DivIncompatibleTypes(Type, Type),
+}
+
+#[derive(Debug, Error)]
 pub enum Error {
     #[error("Invalid type: {0}")]
     InvalidType(Type),
+    #[error("Operator error: {0}")]
+    OperatorError(#[from] OperatorError),
     #[error("List index out of bounds: {index} >= {len}")]
     ListIndexOutOfBounds { index: usize, len: usize },
     #[error("Type mismatch: expected {0}, got {1}")]

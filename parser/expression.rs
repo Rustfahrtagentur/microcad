@@ -3,8 +3,9 @@ use crate::format_string::FormatString;
 use crate::identifier::Identifier;
 use crate::langtype::Type;
 use crate::list::ListExpression;
-use crate::literal::NumberLiteral;
+use crate::literal::{Literal, NumberLiteral};
 use crate::parser::*;
+use crate::tuple::TupleExpression;
 use crate::value::Value;
 use pest::pratt_parser::PrattParser;
 
@@ -36,14 +37,8 @@ pub enum Expression {
     #[default]
     Invalid,
 
-    /// Integer literal: 4, 3, 0
-    IntegerLiteral(i64),
-
-    /// Number with an optional unit: 4.0mm, 3.0
-    NumberLiteral(NumberLiteral),
-
-    /// Boolean: true, false
-    BoolLiteral(bool),
+    /// An integer, float, color or bool literal: 1, 1.0, #00FF00, false
+    Literal(Literal),
 
     /// A string that contains format expressions: "value = {a}"
     FormatString(FormatString),
@@ -51,7 +46,8 @@ pub enum Expression {
     /// A list: [a, b, c]
     ListExpression(ListExpression),
 
-    //    TupleExpression(TupleExpression),
+    // A tuple: (a, b, c)
+    TupleExpression(TupleExpression),
 
     //    FunctionCall(FunctionCall),
 
@@ -92,11 +88,12 @@ impl Expression {}
 impl Eval for Expression {
     fn eval(self, context: Option<&Context>) -> Result<Value, eval::Error> {
         match self {
-            Self::NumberLiteral(n) => n.eval(context),
-            Self::IntegerLiteral(n) => Ok(Value::Integer(n)),
-            Self::BoolLiteral(b) => Ok(Value::Bool(b)),
+            Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
             Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
+            Self::TupleExpression(tuple_expression) => {
+                TupleExpression::eval(tuple_expression, context)
+            }
             Self::BinaryOp { lhs, op, rhs } => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
@@ -162,9 +159,7 @@ impl Eval for Expression {
     fn eval_type(&self, context: Option<&Context>) -> Result<Type, eval::Error> {
         use crate::langtype::Ty;
         match self {
-            Self::NumberLiteral(n) => n.eval_type(context),
-            Self::IntegerLiteral(_) => Ok(Type::Integer),
-            Self::BoolLiteral(_) => Ok(Type::Bool),
+            Self::Literal(l) => l.eval_type(context),
             Self::ListExpression(list) => list.eval_type(context),
             expr => Self::eval(expr.clone(), context).map(|v| v.ty()),
         }
@@ -175,43 +170,19 @@ impl Parse for Expression {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
         Ok(PRATT_PARSER
             .map_primary(|primary| match primary.as_rule() {
-                Rule::literal => {
-                    let inner = primary.into_inner().next().unwrap();
-
-                    match inner.as_rule() {
-                        Rule::integer_literal => {
-                            let number_literal = NumberLiteral::parse(inner).unwrap();
-                            Self::NumberLiteral(number_literal)
-                        }
-                        Rule::number_literal => {
-                            let number_literal = NumberLiteral::parse(inner).unwrap();
-                            Self::NumberLiteral(number_literal)
-                        }
-                        rule => unreachable!("Expr::parse expected literal, found {:?}", rule),
-                    }
-                }
-                Rule::number_literal => {
-                    let number_literal = NumberLiteral::parse(primary).unwrap();
-                    Self::NumberLiteral(number_literal)
-                }
-                Rule::integer_literal => {
-                    Self::IntegerLiteral(primary.as_str().parse::<i64>().unwrap())
-                }
+                Rule::literal => Self::Literal(Literal::parse(primary).unwrap()),
                 Rule::expression => Self::parse(primary).unwrap(),
                 Rule::list_expression => {
-                    println!("Parsing list expression: {}", primary.as_str());
                     Self::ListExpression(ListExpression::parse(primary).unwrap())
                 }
-                Rule::format_string => Self::FormatString(FormatString::parse(primary).unwrap()),
-                Rule::bool_literal => {
-                    let bool_literal = primary.as_str().parse::<bool>().unwrap();
-                    Self::BoolLiteral(bool_literal)
+                Rule::tuple_expression => {
+                    Self::TupleExpression(TupleExpression::parse(primary).unwrap())
                 }
+                Rule::format_string => Self::FormatString(FormatString::parse(primary).unwrap()),
                 Rule::identifier => Self::Identifier(Identifier::parse(primary).unwrap()),
                 rule => unreachable!("Expr::parse expected atom, found {:?}", rule),
             })
             .map_infix(|lhs, op, rhs| {
-                println!("Parsing infix operation:  {}", op);
                 let op = match op.as_rule() {
                     Rule::add => '+',
                     Rule::subtract => '-',
@@ -369,13 +340,17 @@ mod tests {
         run_expression_test("[1,2,3]", None, |e| {
             if let Ok(Value::List(list)) = e {
                 assert_eq!(list.len(), 3);
+            } else {
+                panic!("Expected list value: {:?}", e);
             }
         });
 
         // Accessing the third element of a list
         run_expression_test("[1.0,2.0,3.0][2]", None, |e| {
-            if let Ok(Value::Integer(n)) = e {
-                assert_eq!(n, 3);
+            if let Ok(Value::Scalar(n)) = e {
+                assert_eq!(n, 3.0);
+            } else {
+                panic!("Expected scalar value: {:?}", e);
             }
         });
 

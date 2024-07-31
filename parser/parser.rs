@@ -15,10 +15,12 @@ pub enum ParseError {
     ExpectedIdentifier,
     #[error("Invalid use statement")]
     InvalidUseStatement,
-    #[error("Error parsing floating point number: {0}")]
+    #[error("Error parsing floating point literal: {0}")]
     ParseFloatError(#[from] std::num::ParseFloatError),
-    #[error("Error parsing integer number: {0}")]
+    #[error("Error parsing integer literal: {0}")]
     ParseIntError(#[from] std::num::ParseIntError),
+    #[error("Error parsing color literal: {0}")]
+    ParseColorError(String),
     #[error("Unknown unit: {0}")]
     UnknownUnit(String),
     #[error("Unexpected token")]
@@ -182,7 +184,7 @@ mod tests {
     #[test]
     fn number_literal() {
         use pest::Parser;
-        let pairs = crate::parser::Parser::parse(parser::Rule::number_literal, "90°");
+        let pairs = crate::parser::Parser::parse(parser::Rule::number_literal, "90.0°");
 
         assert!(pairs.is_ok());
         let pair = pairs.unwrap().next().unwrap();

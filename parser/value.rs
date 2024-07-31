@@ -4,18 +4,11 @@ use std::collections::{BTreeMap, HashMap};
 use thiserror::Error;
 
 use crate::{
+    color::Color,
     identifier::Identifier,
     langtype::{MapKeyType, NamedTupleType, Ty, Type, UnnamedTupleType},
     syntax_tree::{qualified_name, SyntaxNode},
 };
-
-#[derive(Debug, Default, Clone, PartialEq)]
-pub struct Color {
-    pub r: f32,
-    pub g: f32,
-    pub b: f32,
-    pub a: f32,
-}
 
 #[derive(Debug, Error)]
 pub enum ValueError {
@@ -401,6 +394,11 @@ impl std::ops::Add for Value {
 
     fn add(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
+            // Add two integers
+            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs + rhs)),
+            // Add an integer and a scalar
+            (Value::Integer(lhs), Value::Scalar(rhs))
+            | (Value::Scalar(rhs), Value::Integer(lhs)) => Ok(Value::Scalar(lhs as Scalar + rhs)),
             // Add two scalars
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs + rhs)),
             // Add two angles
@@ -433,6 +431,12 @@ impl std::ops::Sub for Value {
 
     fn sub(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
+            // Subtract two integers
+            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs - rhs)),
+            // Subtract an scalar and an integer
+            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs - rhs as Scalar)),
+            // Subtract an integer and a scalar
+            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar - rhs)),
             // Subtract two numbers
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs - rhs)),
             // Subtract two angles
@@ -463,6 +467,11 @@ impl std::ops::Mul for Value {
 
     fn mul(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
+            // Multiply two integers
+            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs * rhs)),
+            // Multiply an integer and a scalar
+            (Value::Integer(lhs), Value::Scalar(rhs))
+            | (Value::Scalar(rhs), Value::Integer(lhs)) => Ok(Value::Scalar(lhs as Scalar * rhs)),
             // Multiply two scalars
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs * rhs)),
             // Scale an angle
@@ -481,7 +490,6 @@ impl std::ops::Mul for Value {
             (Value::Scalar(lhs), Value::Vec3(rhs)) | (Value::Vec3(rhs), Value::Scalar(lhs)) => Ok(
                 Value::Vec3(Vec3::new(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z)),
             ),
-
             _ => Err(ValueError::InvalidOperator('*')),
         }
     }
@@ -493,7 +501,12 @@ impl std::ops::Div for Value {
 
     fn div(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            // Divide two scalars
+            // Division with scalar result
+            (Value::Integer(lhs), Value::Integer(rhs)) => {
+                Ok(Value::Scalar(lhs as Scalar / rhs as Scalar))
+            }
+            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs / rhs as Scalar)),
+            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar / rhs)),
             (Value::Scalar(lhs), Value::Scalar(rhs))
             | (Value::Length(lhs), Value::Length(rhs))
             | (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Scalar(lhs / rhs)),
@@ -514,7 +527,7 @@ impl std::fmt::Display for Value {
             Value::Vec3(v) => write!(f, "({}, {}, {})", v.x, v.y, v.z),
             Value::Bool(b) => write!(f, "{}", b),
             Value::String(s) => write!(f, "{}", s),
-            Value::Color(c) => write!(f, "rgba({}, {}, {}, {})", c.r, c.g, c.b, c.a),
+            Value::Color(c) => write!(f, "{}", c),
             Value::List(l) => write!(f, "{}", l),
             Value::Map(m) => write!(f, "{}", m),
             Value::NamedTuple(t) => write!(f, "{}", t),

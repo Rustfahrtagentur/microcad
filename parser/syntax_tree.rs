@@ -270,7 +270,7 @@ mod tests {
                 qualified_name: "translate".into(),
                 function_argument_list: vec![FunctionArgument::NamedArgument(
                     "x".into(),
-                    Expression::NumberLiteral(crate::literal::NumberLiteral(5.0, Unit::Mm)),
+                    Expression::Literal(crate::literal::Literal::number_unit(5.0, Unit::Mm)),
                 )],
             },
         }
@@ -284,7 +284,7 @@ mod tests {
                 qualified_name: "circle".into(),
                 function_argument_list: vec![FunctionArgument::NamedArgument(
                     "r".into(),
-                    Expression::NumberLiteral(crate::literal::NumberLiteral(5.0, Unit::Mm)),
+                    Expression::Literal(crate::literal::Literal::number_unit(5.0, Unit::Mm)),
                 )],
             },
         }
