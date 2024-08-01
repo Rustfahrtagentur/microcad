@@ -35,7 +35,7 @@ module hex_nut(outer_diameter: length, hole_diameter: length) {
 use colors;
 
 // We want to export our nut as SVG, with blue lines
-export("hex_nut.svg", stroke_color = colors.BLUE) {
+export("hex_nut.svg", stroke_color = colors::blue) {
     hex_nut(11.5mm, 6.0mm);
 }
 ```
@@ -119,12 +119,26 @@ Fortunately, we can write this differently without brackets and nesting.
 Instead, we will use the `:=` operator to assign a name to each sub-part of the `csg_cube` module, in this case `body` and `axes`.
 Moreover, we use the operator `&` and `-` to express the boolean operations:
 
-```csg
+```µcad
 module csg_cube(size: length) {
-    body := cube(self.size) & sphere(r = self.size / 1.5);
-    axes := orient([X,Y,Z]) cylinder(d = self.size / 2, h = self.size * 1.5);
+    body := cube(size) & sphere(r = size / 1.5);
+    axes := orient([X,Y,Z]) cylinder(d = size / 2, h = size * 1.5);
 
-    return body - axes;
+    body - axes;
+}
+```
+
+```µcad
+module csg_cube {
+    init(size: length) {
+        // Module substitution
+        body := cube(size) & sphere(r = size / 1.5);
+        axes := orient([X,Y,Z]) cylinder(d = size / 2, h = size * 1.5);
+
+        // Export difference of body and axes 
+        body - axes;
+    }
+
 }
 ```
 
