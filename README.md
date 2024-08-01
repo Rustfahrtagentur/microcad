@@ -1,5 +1,11 @@
 # µCAD
 
+[![Status](https://github.com/Rustfahrtagentur/mcad/actions/workflows/rust.yml/badge.svg)](https://github.com/Rustfahrtagentur/mcad/actions)
+[![Crates.io](https://img.shields.io/crates/v/mcad.svg)](https://crates.io/crates/mcad)
+[![Documentation](https://docs.rs/mcad/badge.svg)](https://docs.rs/mcad/)
+[![Codecov](https://codecov.io/github/Rustfahrtagentur/mcad/coverage.svg?branch=main)](https://codecov.io/gh/Rustfahrtagentur/mcad)
+[![Dependency status](https://deps.rs/repo/github/Rustfahrtagentur/mcad/status.svg)](https://deps.rs/repo/github/Rustfahrtagentur/mcad)
+
 µcad (pronounced *microcat*) is a declarative programming language for modeling geometric objects.
 
 CSG modeling
