@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::vec;
 use thiserror::Error;
 
-use crate::identifier::Identifier;
+use crate::identifier::{Identifier, QualifiedName};
 use crate::lang_type::Type;
 use crate::value::{Value, ValueError};
 
@@ -34,8 +34,8 @@ pub enum Error {
     EvaluateToTypeError(Type),
     #[error("Value error {0}")]
     ValueError(#[from] ValueError),
-    #[error("Unknown identifier: {0}")]
-    UnknownIdentifier(Identifier),
+    #[error("Unknown qualified name: {0}")]
+    UnknownQualifiedName(QualifiedName),
     #[error("Unknown method: {0}")]
     UnknownMethod(Identifier),
     #[error("Elements of list have different types")]

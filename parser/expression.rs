@@ -1,7 +1,7 @@
 use crate::call::Call;
 use crate::eval::{self, Context, Eval};
 use crate::format_string::FormatString;
-use crate::identifier::Identifier;
+use crate::identifier::QualifiedName;
 use crate::lang_type::{Type, TypeList};
 use crate::list::ListExpression;
 use crate::literal::Literal;
@@ -53,7 +53,6 @@ pub enum Expression {
     // A call to a function: foo(a, b, c)
     Call(Call),
 
-    //    QualifiedName(QualifiedName)
     /// A binary operation: a + b
     BinaryOp {
         lhs: Box<Expression>,
@@ -82,8 +81,8 @@ pub enum Expression {
     /// First expression must evaluate to `ModuleRef` or `FunctionRef`
     MethodCall(Box<Expression>, crate::call::MethodCall),
 
-    /// An identifier that maps to a symbol in the symbol table: a, b, c
-    Identifier(Identifier),
+    /// A qualified name that maps to a symbol in the symbol table: `a`, `b::c`
+    QualifiedName(QualifiedName),
 }
 
 impl Expression {}
@@ -135,18 +134,17 @@ impl Eval for Expression {
                     _ => unimplemented!(),
                 }
             }
-            Self::Identifier(identifier) => {
-                if let Some(value) = context.and_then(|ctx| ctx.get(identifier.to_string())) {
+            Self::QualifiedName(qualified_name) => {
+                if let Some(value) = context.and_then(|ctx| ctx.get(qualified_name.to_string())) {
                     Ok(value.clone())
                 } else {
-                    Err(eval::Error::UnknownIdentifier(identifier))
+                    Err(eval::Error::UnknownQualifiedName(qualified_name))
                 }
             }
             Self::MethodCall(lhs, method_call) => {
-                let lhs = lhs.eval(context)?;
                 let name: &str = &method_call.name.to_string();
 
-                match lhs {
+                match lhs.eval(context)? {
                     Value::List(list) => match name {
                         "len" => Ok(Value::Integer(list.len() as i64)),
                         _ => Err(eval::Error::UnknownMethod(name.into())),
@@ -182,7 +180,7 @@ impl Parse for Expression {
                     Self::TupleExpression(TupleExpression::parse(primary).unwrap())
                 }
                 Rule::format_string => Self::FormatString(FormatString::parse(primary).unwrap()),
-                Rule::identifier => Self::Identifier(Identifier::parse(primary).unwrap()),
+                Rule::qualified_name => Self::QualifiedName(QualifiedName::parse(primary).unwrap()),
                 rule => unreachable!("Expression::parse expected atom, found {:?}", rule),
             })
             .map_infix(|lhs, op, rhs| {
@@ -419,8 +417,8 @@ mod tests {
             }
         });
         run_expression_test("a + b + c", Some(&context), |e| {
-            if let Err(eval::Error::UnknownIdentifier(identifier)) = e {
-                assert_eq!(identifier, "c".into());
+            if let Err(eval::Error::UnknownQualifiedName(qualified_name)) = e {
+                assert_eq!(qualified_name, "c".into());
             }
         });
     }

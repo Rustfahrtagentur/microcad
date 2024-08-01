@@ -154,7 +154,7 @@ impl std::fmt::Display for QualifiedName {
             .iter()
             .map(|ident| ident.0.clone())
             .collect::<Vec<_>>()
-            .join(".");
+            .join("::");
         write!(f, "{}", s)
     }
 }
@@ -162,7 +162,7 @@ impl std::fmt::Display for QualifiedName {
 impl From<&str> for QualifiedName {
     fn from(value: &str) -> Self {
         let mut name = Vec::new();
-        for ident in value.split('.') {
+        for ident in value.split("::") {
             name.push(Identifier(ident.to_string()));
         }
         Self(name)
@@ -176,7 +176,7 @@ impl From<QualifiedName> for String {
             .iter()
             .map(|ident| ident.0.clone())
             .collect::<Vec<_>>()
-            .join(".");
+            .join("::");
         s
     }
 }
