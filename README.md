@@ -18,7 +18,7 @@ Let make a 2D sketch of the nut first:
 
 ```csg
 // We have to import the primitive2d module to use `hexagon` and `circle` sub-modules
-use * from primitives2d;
+use * from geo2d;
 
 // A generic module for the hex nut
 module hex_nut(outer_diameter: length, hole_diameter: length) {
@@ -29,7 +29,7 @@ module hex_nut(outer_diameter: length, hole_diameter: length) {
 use colors;
 
 // We want to export our nut as SVG, with blue lines
-export("hex_nut.svg", stroke_color = colors.blue) {
+export("hex_nut.svg", stroke_color = colors.BLUE) {
     hex_nut(11.5mm, 6.0mm);
 }
 ```
@@ -118,26 +118,8 @@ module csg_cube(size: length) {
     body := cube(self.size) & sphere(r = self.size / 1.5);
     axes := orient([X,Y,Z]) cylinder(d = self.size / 2, h = self.size * 1.5);
 
-    body - axes;
+    return body - axes;
 }
-```
-
-But know we have the problem that, the module will generate three meshes:
-The `body`, the `axes` and the resulting difference `body - axes`.
-However, we only want the latter to be exported.
-We use the `#` operator to exclude `body` and `axes` from the export:
-
-```csg
-use * from primitive3d;
-
-module csg_cube(size: length) {
-    #body := cube(self.size) & sphere(r = self.size / 1.5);
-    #axes := orient([X,Y,Z]) cylinder(d = self.size / 2, h = self.size * 1.5);
-
-    body - axes;
-}
-
-export("csg_cube.stl") csg_cube(40mm);
 ```
 
 ## Conditional statement
@@ -155,61 +137,6 @@ module example(size: length) {
     }
 }
 ```
-
-## For loops
-
-You can define for loops:
-
-```csg
-use * from primitive2d;
-
-module example(size: length, n: scalar = 8.0) {
-    for i in 0..count {
-        rotate(angle = i * 360° / n) rect(width = 1cm, length = 10cm); 
-    }
-}
-```
-
-Please be aware that for loops are rarely necessary because of uCAD's built-in implicit list evaluation.
-The following statement is equivalent to the one with the `for`-loop above:
-
-```ucad
-module example(size: length, n: scalar) {
-    rotate(angle = [0..n] *360° / n) translate(x = size) rect(width = size, length = 2.0 * size);
-}
-```
-
-## Debug and assert
-
-We can add debug messages and asserts:
-
-```csg
-use * from primitive3d;
-
-module example(size: length) {
-    // We define the maximum size as constant:
-    MAX_SIZE = 20mm; // Constants are written in upper case, type is inferenced
-
-    assert(size > MAX_SIZE, "Size must be larger than {MAX_SIZE}!");
-    
-    if self.size > 40mm {
-        debug("{self.size}");
-        sphere(d = 40mm);
-    } else {
-        info("Make cube: {self.size}")
-        cube(40mm);
-    }
-}
-```
-
-The following message types are available:
-
-* `assert(cond[, message])`
-* `trace(message, ...)`
-* `debug(message, ...)`
-* `info(message, ...)`
-* `warning(message, ...)`
-* `error(message, ...)`
 
 ### Modules
 
