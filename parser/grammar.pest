@@ -107,9 +107,13 @@ qualified_name_all = { "*" }
 qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
 //`int`: ok
+//`a.nested.typename`: ok
 //`[scalar]`: ok # List type
-//`(scalar, scalar)`: Tuple type
-type = { qualified_name | list_type | map_type | named_tuple_type | unnamed_tuple_type }
+//`[scalar => scalar]`: ok # Map type
+//`(scalar, scalar)`: Unnamed tuple type
+//`(a: scalar, b: scalar)`: Named tuple type
+//`{}`: ok # Module type
+type = { qualified_name | list_type | map_type | named_tuple_type | unnamed_tuple_type | module_type }
 
 //`type a = scalar`: ok
 type_declaration = { "type" ~ ws* ~ identifier ~ ws* ~ "=" ~ ws* ~ type }
@@ -125,6 +129,9 @@ list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 // Associative list, behaves like a map
 //`[length => string]`: maps a length to a string
 map_type = { "[" ~ ws* ~ type ~ ws* ~ "=>" ~ ws* ~ type ~ ws* ~ "]" }
+
+// Generic type for modules
+module_type = { "{" ~ ws* ~ "}" }
 
 //`(length,scalar)`: ok # 2 unnamed fields
 //`(length, a: length = 4.0mm)`: error # Cannot mix named and unnamed arguments
@@ -187,6 +194,8 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`a and b`: ok # Binary operator
 //`[3,5,5]`: ok # List expression
 //`1 if 3 > 2 else 0`: ok # Ternary operator
+//`a()`: ok # Simple call
+//`a({sphere(4.0)})`: ok # Pass a module as function parameter
 expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
 bin_op           =  _{ add | subtract | multiply | divide | greater_than | less_than | greater_equal | less_equal | equal | not_equal | and | or | xor | if_binary_op | else_binary_op }
   add            =   { "+" }
@@ -210,7 +219,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ method_call | element_access }
-primary          =  _{ literal | format_string | identifier | constant_identifier  | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
+primary          =  _{ literal | format_string| call | identifier | constant_identifier | module_node_inner_statement | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok
@@ -322,7 +331,7 @@ module_declaration_argument_list = { argument_list? ~ ws* }
 module_node_nested = { module_node_expression ~ (ws+ ~ module_node_expression)* }
 
 //`{ translate() rotate(); }`: ok
-module_node_inner_statement = { "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}"  }
+module_node_inner_statement = { "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
 
 
 //`circle(r = 5.0mm);`: ok
@@ -380,7 +389,7 @@ module_node_return_statement = { "return" ~ ws* ~ module_node_statement }
 //`init(r: length) { r := r; }`: ok
 module_node_init_declaration = { "init" ~ ws* ~ argument_list ~ ws* ~ "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
 
-module_node_inner = { (module_statement ~ ws*)+ }
+module_node_inner = { (module_statement ~ ws*)+ ~ (ws* ~ module_node_nested)? | module_node_nested }
 
 module_statement = { use_statement | module_node_init_declaration | module_declaration | function_declaration | variable_declaration_statement | constant_declaration_statement | field_assignment_statement | module_id_assignment | module_node_return_statement | module_node_statement }
 
