@@ -112,9 +112,6 @@ pub enum UseStatement {
 
     /// Import as alias: `use a as b`
     UseAlias(UseAlias),
-
-    /// Import as alias from a module: `use a as b from c`
-    UseAliasFrom(UseAlias, QualifiedName),
 }
 
 impl std::fmt::Display for UseStatement {
@@ -126,7 +123,6 @@ impl std::fmt::Display for UseStatement {
             }
             UseStatement::UseAll(qualified_names) => write!(f, "use * from {:?}", qualified_names),
             UseStatement::UseAlias(alias) => write!(f, "{}", alias),
-            UseStatement::UseAliasFrom(alias, from) => write!(f, "{} from {}", alias, from),
         }
     }
 }
@@ -177,14 +173,7 @@ impl Parse for UseStatement {
                 }
             }
             Rule::use_alias => {
-                if let Some(second) = second {
-                    return Ok(UseStatement::UseAliasFrom(
-                        UseAlias::parse(first)?,
-                        QualifiedName::parse(second)?,
-                    ));
-                } else {
-                    return Ok(UseStatement::UseAlias(UseAlias::parse(first)?));
-                }
+                return Ok(UseStatement::UseAlias(UseAlias::parse(first)?));
             }
 
             _ => unreachable!(),
