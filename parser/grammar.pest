@@ -321,7 +321,7 @@ function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
 //`module cube((x,y,w,h) : length) { }`: ok # Identifier tuples
-module_declaration = { "module" ~ ws+ ~ identifier ~ ws* ~  
+module_declaration = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~  
     module_declaration_argument_list? ~
     "{" ~ ws* ~ module_node_inner? ~ "}" }
 
@@ -341,9 +341,10 @@ module_node_inner_statement = { "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
 //`translate(r = 5.0mm) circle(r = 5.0mm);`: ok
 //`{}`: ok # Empty block
 //`{ rectangle(width = 5.0mm); }`: ok # Single statement block
-module_node_statement = {
-  module_node_nested ~ ws* ~ module_node_inner_statement? ~ ws* ~ ";" |
-  module_node_nested? ~ ws* ~ module_node_inner_statement ~ ws* ~ ";"?
+//`@foo {}`: ok # Module statement with attribute
+module_node_statement = { (attribute_list ~ ws+)? ~ 
+  (module_node_nested ~ ws* ~ module_node_inner_statement? ~ ws* ~ ";" |
+   module_node_nested? ~ ws* ~ module_node_inner_statement ~ ws* ~ ";"?)
 }
 
 //`a | a.b()`: ok
@@ -362,6 +363,13 @@ module_node_unary_op         =  _{ module_node_unary_neg }
 module_node_postfix          =  _{ call_op | element_access }
 module_node_primary          =  _{ qualified_name | call | "(" ~ ws* ~ module_node_expression ~ ws* ~ ")" }
 
+//`@foo`: ok
+//`@foo(x)`: ok
+attribute = { "@" ~ qualified_name ~ (tuple_expression | list_expression)? }
+
+//`@foo`: ok
+//`@foo(a) @bar`: ok
+attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
 //`a := 5.0mm`: ok # Single assignment
 //`b: length := 5.0mm`: ok
@@ -391,7 +399,9 @@ module_node_init_declaration = { "init" ~ ws* ~ argument_list ~ ws* ~ "{" ~ ws* 
 
 module_node_inner = { (module_statement ~ ws*)+ ~ (ws* ~ module_node_nested)? | module_node_nested }
 
-module_statement = { use_statement | module_node_init_declaration | module_declaration | function_declaration | variable_declaration_statement | constant_declaration_statement | field_assignment_statement | module_id_assignment | module_node_return_statement | module_node_statement }
+module_statement = { use_statement | 
+  module_node_init_declaration | module_declaration | function_declaration | variable_declaration_statement | constant_declaration_statement | 
+  field_assignment_statement | module_id_assignment | module_node_return_statement | module_node_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 document = { SOI ~ (module_statement ~ ws* )* ~ EOI }
