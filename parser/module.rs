@@ -1,5 +1,6 @@
 // Resolve a qualified name to a type or value.
 
+use crate::call::Call;
 use crate::identifier::{Identifier, QualifiedName};
 use crate::parser::*;
 use pest::pratt_parser::PrattParser;
@@ -18,12 +19,23 @@ lazy_static::lazy_static! {
 }
 
 #[derive(Default)]
+pub struct ModuleNested(Vec<Call>);
+
+impl Parse for ModuleNested {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        Ok(ModuleNested(Parser::vec(pair.into_inner(), Call::parse)?))
+    }
+}
+
+#[derive(Default)]
 pub enum ModuleNodeExpression {
     /// Something went wrong (and an error will be reported)
     #[default]
     Invalid,
 
     Identifier(Identifier),
+
+    Nested(ModuleNested),
 
     /// A binary operation: a | b
     BinaryOp {
@@ -41,12 +53,20 @@ pub enum ModuleNodeExpression {
     },
 }
 
+/*impl Parse for ModuleNodeExpression {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+
+
+    }
+}*/
+
+/*
+
 pub struct _Module {
     name: Identifier,
     constructor: Vec<FunctionArgument>,
 }
 
-/*
 trait ParseNode {
     fn parse_node(pair: Pair, root: SyntaxNode) -> Result<Self, ParseError>;
 }
@@ -171,22 +191,5 @@ impl Parse for UseStatement {
         }
 
         Err(ParseError::InvalidUseStatement)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::vec;
-
-    use super::*;
-
-    #[test]
-    fn test_qualified_name() {
-        let used_modules = vec!["primitives", "math"];
-
-        let qualified_names: Vec<QualifiedName> =
-            vec!["primitives.circle".into(), "math.PI".into()];
-
-        unimplemented!();
     }
 }

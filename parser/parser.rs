@@ -197,7 +197,7 @@ mod tests {
     fn _module_node_statement() {
         use pest::Parser;
         let pairs = crate::parser::Parser::parse(
-            parser::Rule::module_node_assignment,
+            parser::Rule::module_id_assignment,
             "node_id := translate(x = 5.0mm) rotate(angle = 90°) { rectangle(width = 5.0mm); }",
         );
 

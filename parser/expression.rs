@@ -1,3 +1,4 @@
+use crate::call::Call;
 use crate::eval::{self, Context, Eval};
 use crate::format_string::FormatString;
 use crate::identifier::Identifier;
@@ -49,7 +50,8 @@ pub enum Expression {
     // A tuple: (a, b, c)
     TupleExpression(TupleExpression),
 
-    //    FunctionCall(FunctionCall),
+    // A call to a function: foo(a, b, c)
+    Call(Call),
 
     //    QualifiedName(QualifiedName)
     /// A binary operation: a + b
@@ -76,6 +78,7 @@ pub enum Expression {
     /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
     ElementAccess(Box<Expression>, Box<Expression>),
 
+    /// Call to a method: `[2,3].len()`
     /// First expression must evaluate to `ModuleRef` or `FunctionRef`
     MethodCall(Box<Expression>, crate::call::MethodCall),
 

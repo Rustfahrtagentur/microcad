@@ -1,9 +1,9 @@
 use std::collections::BTreeMap;
 
 use crate::expression::Expression;
-#[cfg(test)]
 use crate::identifier::QualifiedName;
 use crate::identifier::{Identifier, IdentifierList};
+
 use crate::parser::*;
 
 enum CallArgument {
@@ -155,13 +155,14 @@ impl Parse for MethodCall {
     }
 }
 
-#[cfg(test)]
-struct Call {
+#[derive(Default, Clone)]
+pub struct Call {
+    #[allow(dead_code)]
     name: QualifiedName,
+    #[allow(dead_code)]
     argument_list: CallArgumentList,
 }
 
-#[cfg(test)]
 impl Parse for Call {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
         let mut pairs = pair.into_inner();

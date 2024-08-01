@@ -210,7 +210,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ method_call | element_access }
-primary          =  _{ literal | format_string | identifier | constant_identifier  | "(" ~ expression ~ ")" | tuple_expression | list_expression }
+primary          =  _{ literal | format_string | identifier | constant_identifier  | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok
@@ -318,6 +318,13 @@ module_declaration = { "module" ~ ws+ ~ identifier ~ ws* ~
 
 module_declaration_argument_list = { argument_list? ~ ws* }
 
+//`translate() rotate()`: ok
+module_node_nested = { module_node_expression ~ (ws+ ~ module_node_expression)* }
+
+//`{ translate() rotate(); }`: ok
+module_node_inner_statement = { "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}"  }
+
+
 //`circle(r = 5.0mm);`: ok
 //`circle(r = 5.0mm) {}`: ok
 //`translate(x = 5.0mm) { rectangle(width = 5.0); }`: ok
@@ -326,17 +333,16 @@ module_declaration_argument_list = { argument_list? ~ ws* }
 //`{}`: ok # Empty block
 //`{ rectangle(width = 5.0mm); }`: ok # Single statement block
 module_node_statement = {
-  module_node_expression ~ ";" |
-  module_node_expression? ~ "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" 
+  module_node_nested ~ ws* ~ module_node_inner_statement? ~ ws* ~ ";" |
+  module_node_nested? ~ ws* ~ module_node_inner_statement ~ ws* ~ ";"?
 }
-
-//`translate(r = 5.0mm) circle(r = 5.0mm)` : ok
-module_node_nested = { (call ~ ws*)+ }
 
 //`a | a.b()`: ok
 //`a | b & c`: ok
-module_node_expression       =   { module_node_unary_op* ~ ws* ~ module_node_primary ~ ws* ~ module_node_postfix* ~ 
-  (ws* ~ module_node_bin_op ~ ws* ~ module_node_unary_op* ~ ws* ~ module_node_primary ~ ws* ~ module_node_postfix*)* }
+//`a b | b & c | d`: ok
+//`translate(x = 5mm)`: ok
+module_node_expression       =   { module_node_unary_op* ~ ws* ~ module_node_primary ~ (ws+ ~ module_node_primary)* ~ ws* ~ module_node_postfix* ~ 
+  (ws* ~ module_node_bin_op ~ ws* ~ module_node_unary_op* ~ ws* ~ module_node_primary ~ (ws+ ~ module_node_primary)* ~ ws* ~ module_node_postfix*)* }
 module_node_bin_op           =  _{ module_node_union | module_node_difference | module_node_intersection | module_node_xor }
   module_node_union          =   { "|" }
   module_node_difference     =   { "-" }
@@ -345,21 +351,38 @@ module_node_bin_op           =  _{ module_node_union | module_node_difference | 
 module_node_unary_op         =  _{ module_node_unary_neg }
   module_node_unary_neg      =   { "!" }
 module_node_postfix          =  _{ call_op | element_access }
-module_node_primary          =  _{ module_node_nested | identifier | "(" ~ module_node_expression ~ ")" }
+module_node_primary          =  _{ qualified_name | call | "(" ~ ws* ~ module_node_expression ~ ws* ~ ")" }
+
+
+//`a := 5.0mm`: ok # Single assignment
+//`b: length := 5.0mm`: ok
+field_single_assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ ":=" ~ ws* ~ expression }
+
+//`(a, b) := 5.0mm`: ok # Multiple assignments
+field_multi_assignment = { identifier_tuple ~ ws* ~ type_annotation? ~ ws* ~ ":=" ~ ws* ~ expression }
+
+field_assignment = _{ field_single_assignment | field_multi_assignment }
+
+field_assignment_list = _{ field_assignment ~ (ws* ~ "," ~ ws* ~ field_assignment)* }
+
+//`a := 5.0mm, (b, c) := 3.0mm;`: ok
+field_assignment_statement = { field_assignment_list ~ ws* ~ ";" }
 
 //`name := node() {}`: ok
 //`name := node();`: ok
-module_node_assignment = { identifier ~ ws* ~ ":=" ~ ws* ~ module_node_statement }
+//`field_name := 2 + 4;`: ok
+module_id_assignment = { identifier ~ ws* ~ ":=" ~ ws* ~ (module_node_statement | expression ~ ws* ~ ";") }
 
 //`return node();`: ok
 //`return node() {}`: ok
 module_node_return_statement = { "return" ~ ws* ~ module_node_statement }
 
-module_node_init_statement = { "init" ~ ws* ~ argument_list ~ ws* ~ "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
+//`init(r: length) { r := r; }`: ok
+module_node_init_declaration = { "init" ~ ws* ~ argument_list ~ ws* ~ "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
 
 module_node_inner = { (module_statement ~ ws*)+ }
 
-module_statement = { module_node_assignment | module_node_return_statement | module_node_statement | use_statement | module_declaration | function_declaration | variable_declaration_statement | constant_declaration_statement }
+module_statement = { use_statement | module_node_init_declaration | module_declaration | function_declaration | variable_declaration_statement | constant_declaration_statement | field_assignment_statement | module_id_assignment | module_node_return_statement | module_node_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 document = { SOI ~ (module_statement ~ ws* )* ~ EOI }
