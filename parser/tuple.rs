@@ -41,7 +41,7 @@ impl Eval for TupleExpression {
                 value_list.push(value);
             }
             if let Some(unit) = self.1 {
-                value_list.add_unit_to_scalar_types(unit);
+                value_list.add_unit_to_unitless_types(unit)?;
             }
             Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
         } else {
@@ -50,7 +50,7 @@ impl Eval for TupleExpression {
             for (ident, expr) in self.0.get_named() {
                 let mut value = expr.clone().eval(context)?;
                 if let Some(unit) = self.1 {
-                    value.add_unit_to_scalar_types(unit)?;
+                    value.add_unit_to_unitless_types(unit)?;
                 }
                 map.insert(ident.clone(), value);
             }

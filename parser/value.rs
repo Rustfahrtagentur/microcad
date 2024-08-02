@@ -356,7 +356,7 @@ impl Value {
     }
 
     /// Add a unit to a scalar value
-    pub fn add_unit_to_scalar_types(&mut self, unit: Unit) -> Result<(), ValueError> {
+    pub fn add_unit_to_unitless_types(&mut self, unit: Unit) -> Result<(), ValueError> {
         match (&self, unit.ty()) {
             (Value::Integer(i), Type::Length) => {
                 *self = Value::Length(unit.normalize(*i as Scalar))
@@ -597,9 +597,9 @@ impl ValueList {
         self.0.retain(f);
     }
 
-    pub fn add_unit_to_scalar_types(&mut self, unit: Unit) -> Result<(), ValueError> {
+    pub fn add_unit_to_unitless_types(&mut self, unit: Unit) -> Result<(), ValueError> {
         for value in self.0.iter_mut() {
-            value.add_unit_to_scalar_types(unit)?;
+            value.add_unit_to_unitless_types(unit)?;
         }
         Ok(())
     }
