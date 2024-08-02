@@ -42,7 +42,7 @@ impl Eval for ListExpression {
             value_list.push(expr.eval(context)?);
         }
         if let Some(unit) = self.1 {
-            value_list.add_unit_to_scalar_types(unit);
+            value_list.add_unit_to_unitless_types(unit)?;
         }
 
         match value_list.types().common_type() {

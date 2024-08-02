@@ -76,6 +76,10 @@ impl List {
     pub fn iter(&self) -> std::slice::Iter<Value> {
         self.0.iter()
     }
+
+    pub fn add_unit_to_unitless_types(&mut self, unit: Unit) -> Result<(), ValueError> {
+        self.0.add_unit_to_unitless_types(unit)
+    }
 }
 
 impl std::fmt::Display for List {
@@ -357,15 +361,12 @@ impl Value {
 
     /// Add a unit to a scalar value
     pub fn add_unit_to_unitless_types(&mut self, unit: Unit) -> Result<(), ValueError> {
-        match (&self, unit.ty()) {
-            (Value::Integer(i), Type::Length) => {
-                *self = Value::Length(unit.normalize(*i as Scalar))
-            }
-            (Value::Integer(i), Type::Angle) => *self = Value::Angle(unit.normalize(*i as Scalar)),
-            (Value::Scalar(s), Type::Length) => *self = Value::Length(unit.normalize(*s)),
-            (Value::Scalar(s), Type::Angle) => *self = Value::Angle(unit.normalize(*s)),
-            //(Value::List(list), _) => list.add_unit_to_scalar_types(unit),
-            _ => return Err(ValueError::CannotAddUnitToUnitfulValue(self.clone())),
+        match (self.clone(), unit.ty()) {
+            (Value::Integer(i), Type::Length) => *self = Value::Length(unit.normalize(i as Scalar)),
+            (Value::Integer(i), Type::Angle) => *self = Value::Angle(unit.normalize(i as Scalar)),
+            (Value::Scalar(s), Type::Length) => *self = Value::Length(unit.normalize(s)),
+            (Value::Scalar(s), Type::Angle) => *self = Value::Angle(unit.normalize(s)),
+            (value, _) => return Err(ValueError::CannotAddUnitToUnitfulValue(value.clone())),
         }
         Ok(())
     }
