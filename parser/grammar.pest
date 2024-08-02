@@ -17,9 +17,6 @@ identifier = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
 //`a,b`: ok # A comma-separated list of identifier
 identifier_list = { identifier ~ (ws* ~ "," ~ ws* ~ identifier)*}
 
-// A tuple of identifiers: (a,b,c)
-identifier_tuple = _{ "(" ~ ws* ~ identifier_list ~ ws* ~ ")" }
-
 //`1.0`: ok
 //`.1`: ok
 //`0.`: ok
@@ -257,22 +254,13 @@ function_call = _{ call }
 //`r: length`: ok # Default value is not required
 //`r: length = math::pi`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
-variable_single_declaration = { identifier ~ ws* ~ variant_declaration_type_specifier }
-
-//`(a,b): length`: ok # Tuple identifier with same type
-//`(a,b): (length, length)`: ok # Tuple identifier with tuple type
-//`(a,b) = 5.0mm`: ok # Tuple identifier with same default value
-//`(a,b): length = 5.0mm`: ok # Tuple identifier with same type and default value
-variable_multi_declaration = { identifier_tuple ~ ws* ~ variant_declaration_type_specifier }
-
-variable_declaration = _{ variable_single_declaration | variable_multi_declaration }
+variable_declaration = { identifier ~ ws* ~ variant_declaration_type_specifier }
 
 variant_declaration_type_specifier = _{ type_annotation ~ ws* ~ default_value | type_annotation | default_value }
 
 //`a: scalar, b: scalar`: ok # Multiple arguments
 //`a: scalar, b: scalar = 5.0mm`: ok # Default value for second argument
 //`a: scalar = 5.0mm, b: scalar`: ok # Even first argument can have default value and rest can be positional
-//`(a,b): scalar = 5.0mm, (c,d): length`: ok # Identifier tuples
 variable_declaration_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_declaration)* }
 
 argument_list = _{ "(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")" }
@@ -303,7 +291,6 @@ function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 //`module foo() { module bar() { } }`: ok # Nested module
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
-//`module cube((x,y,w,h) : length) { }`: ok # Identifier tuples
 module_declaration = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~  
     module_declaration_argument_list? ~
     "{" ~ ws* ~ module_node_inner? ~ "}" }
@@ -356,17 +343,10 @@ attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
 //`a := 5.0mm`: ok # Single assignment
 //`b: length := 5.0mm`: ok
-field_single_assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ ":=" ~ ws* ~ expression }
+field_assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ ":=" ~ ws* ~ expression }
 
-//`(a, b) := 5.0mm`: ok # Multiple assignments
-field_multi_assignment = { identifier_tuple ~ ws* ~ type_annotation? ~ ws* ~ ":=" ~ ws* ~ expression }
-
-field_assignment = _{ field_single_assignment | field_multi_assignment }
-
-field_assignment_list = _{ field_assignment ~ (ws* ~ "," ~ ws* ~ field_assignment)* }
-
-//`a := 5.0mm, (b, c) := 3.0mm;`: ok
-field_assignment_statement = { field_assignment_list ~ ws* ~ ";" }
+//`a := 5.0mm;`: ok
+field_assignment_statement = { field_assignment ~ ws* ~ ";" }
 
 //`name := node() {}`: ok
 //`name := node();`: ok
