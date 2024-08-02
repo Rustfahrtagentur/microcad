@@ -5,19 +5,6 @@ use crate::identifier::{Identifier, QualifiedName};
 use crate::parser::*;
 use pest::pratt_parser::PrattParser;
 
-lazy_static::lazy_static! {
-    static ref PRATT_PARSER: PrattParser<Rule> = {
-        use pest::pratt_parser::{Assoc::*, Op};
-        use Rule::*;
-
-        // Precedence is defined lowest to highest
-        PrattParser::new()
-            // Addition and subtract have equal precedence
-            .op(Op::infix(module_node_union, Left) | Op::infix(module_node_difference, Left))
-            .op(Op::infix(module_node_intersection, Left) | Op::infix(module_node_xor, Left))
-    };
-}
-
 #[derive(Default)]
 pub struct ModuleNested(Vec<Call>);
 
@@ -26,33 +13,6 @@ impl Parse for ModuleNested {
         Ok(ModuleNested(Parser::vec(pair.into_inner(), Call::parse)?))
     }
 }
-
-#[derive(Default)]
-pub enum ModuleNodeExpression {
-    /// Something went wrong (and an error will be reported)
-    #[default]
-    Invalid,
-
-    Identifier(Identifier),
-
-    Nested(ModuleNested),
-
-    /// A binary operation: a | b
-    BinaryOp {
-        lhs: Box<ModuleNodeExpression>,
-        /// '|', '-', '&', '^'
-        op: char,
-        rhs: Box<ModuleNodeExpression>,
-    },
-
-    /// A unary operation: !a
-    UnaryOp {
-        /// '!'
-        op: char,
-        rhs: Box<ModuleNodeExpression>,
-    },
-}
-
 /*impl Parse for ModuleNodeExpression {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
 

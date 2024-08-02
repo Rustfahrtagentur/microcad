@@ -193,33 +193,6 @@ mod tests {
         assert_eq!(unit, units::Unit::DegS);
     }
 
-    //#[test]
-    fn _module_node_statement() {
-        use pest::Parser;
-        let pairs = crate::parser::Parser::parse(
-            parser::Rule::module_id_assignment,
-            "node_id := translate(x = 5.0mm) rotate(angle = 90°) { rectangle(width = 5.0mm); }",
-        );
-
-        assert!(pairs.is_ok());
-        let mut pairs = pairs.unwrap();
-        let pair = pairs.next().unwrap();
-
-        let module_node_statement =
-            crate::parser::Parser::module_node_statement(pair.into_inner()).unwrap();
-
-        assert_eq!(module_node_statement.calls.len(), 2);
-        assert_eq!(module_node_statement.ident, Some("node_id".into()));
-        assert!(module_node_statement.has_inner);
-
-        // Test function call
-        {
-            let call = module_node_statement.calls.first().unwrap();
-            assert_eq!(call.qualified_name.to_string(), "translate".to_string());
-            assert_eq!(call.function_argument_list.len(), 1);
-        }
-    }
-
     fn _test_file(path: impl AsRef<std::path::Path>) {
         use pest::Parser;
 

@@ -125,93 +125,6 @@ impl From<Document> for SyntaxNode {
     }
 }
 
-pub struct TreeBuilder();
-
-impl TreeBuilder {
-    pub fn from_path(path: impl AsRef<std::path::Path>) -> Result<SyntaxNode, Error> {
-        let input = std::fs::read_to_string(&path)?;
-
-        let root: SyntaxNode = Document::from_path(path).into();
-        Self::from_str(root, &input)
-    }
-
-    fn from_str(root: SyntaxNode, input: &str) -> Result<SyntaxNode, Error> {
-        use pest::Parser;
-        match crate::parser::Parser::parse(Rule::r#document, input) {
-            Ok(mut pairs) => {
-                let pairs = pairs.next().unwrap().into_inner();
-                for pair in pairs {
-                    match pair.as_rule() {
-                        Rule::module_statement => {
-                            let inner_pairs = pair.into_inner();
-                            for inner_pair in inner_pairs {
-                                match inner_pair.as_rule() {
-                                    Rule::module_node_statement => {
-                                        Self::module_node(root.clone(), inner_pair.into_inner());
-                                        continue;
-                                    }
-                                    _ => unreachable!(),
-                                }
-                            }
-                        }
-                        Rule::EOI => continue,
-                        _ => {
-                            println!("{:?}", pair.as_rule());
-                            unreachable!();
-                        }
-                    }
-                }
-                Ok(root)
-            }
-            Err(e) => Err(Error::SyntaxError(Box::new(e))),
-        }
-    }
-
-    fn module_node(parent: SyntaxNode, pairs: Pairs) -> Option<SyntaxNode> {
-        let module_node_statement =
-            crate::parser::Parser::module_node_statement(pairs.clone()).unwrap();
-        let mut node = parent.clone();
-        let id = module_node_statement.ident.as_ref();
-
-        let mut first_node = None;
-
-        for call in module_node_statement.calls {
-            let module_node: SyntaxNode = ModuleNode {
-                id: match (id, &first_node) {
-                    (Some(id), None) => Some(id.clone()),
-                    _ => None,
-                },
-                call,
-            }
-            .into();
-            node.append(module_node.clone());
-            node = module_node; // Nest the nodes
-
-            // Save the first node because we need to return it
-            if first_node.is_none() {
-                first_node = Some(node.clone());
-            }
-        }
-
-        let last_node = node.clone();
-
-        if module_node_statement.has_inner {
-            for pair in pairs {
-                if pair.as_rule() == Rule::module_node_inner {
-                    for inner_pair in pair.into_inner() {
-                        // Fetch all object nodes
-                        if inner_pair.as_rule() == Rule::module_node_statement {
-                            Self::module_node(last_node.clone(), inner_pair.into_inner());
-                        }
-                    }
-                }
-            }
-        }
-
-        first_node
-    }
-}
-
 impl fmt::Display for Document {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self.path)
@@ -290,17 +203,6 @@ mod tests {
         .into();
 
         translate.append(circle);
-
-        for child in node.descendants() {
-            let c = child.borrow();
-            println!("{}{:?}", "    ".repeat(child.clone().depth()), c.inner);
-        }
-    }
-
-    //#[test]
-    fn _from_file() {
-        let node = TreeBuilder::from_path("tests/nested.csg").unwrap();
-        assert!(node.has_children());
 
         for child in node.descendants() {
             let c = child.borrow();

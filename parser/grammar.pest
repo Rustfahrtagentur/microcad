@@ -148,7 +148,7 @@ tuple_element_access = { "." ~ ws* ~ (identifier | int) }
 
 element_access = _{ tuple_element_access | list_element_access }
 
-//`use a;`: ok  # Import a single module
+//`use a;`: ok # Import a single module
 //`use ;`: error # Must import at least one module
 //`use foo::bar, bar::foo;`: ok # Import multiple modules
 //`use bar, baz from a;`: ok # Import multiple sub modules from module a 
@@ -163,6 +163,11 @@ use_statement = { "use" ~ ws+ ~ qualified_name_list ~ ws* ~ ";"
     | "use" ~ ws+ ~ use_alias ~ ws* ~ ";"
 }
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
+
+
+//`translate() rotate()`: ok
+nested = { (call | module_node_inner_statement | qualified_name) ~ (ws+ ~ (call | module_node_inner_statement | qualified_name))* }
+
 
 //`-5.0mm`: ok # Negate
 //`(a+b)*(c-a)`: ok 
@@ -181,12 +186,28 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`1 if 3 > 2 else 0`: ok # Ternary operator
 //`a()`: ok # Simple call
 //`a({sphere(4.0)})`: ok # Pass a module as function parameter
+//`translate() rotate()`: ok # Nested call
+//`translate() rotate() { translate() rotate() {} }`: ok # Nested call
+//`a | a::b()`: ok
+//`a | b & c`: ok
+//`a() b() | b & c | d`: ok
+//`circle(r = 5.0mm)`: ok
+//`circle(r = 5.0mm) {}`: ok
+//`translate(x = 5.0mm) { rectangle(width = 5.0mm); }`: ok
+//`translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
+//`translate(r = 5.0mm) circle(r = 5.0mm)`: ok
+//`{}`: ok # Empty block
+//`{ rectangle(width = 5.0mm); }`: ok # Single statement block
+//`translate(x = 5mm)`: ok
 expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
-bin_op           =  _{ add | subtract | multiply | divide | greater_than | less_than | greater_equal | less_equal | equal | not_equal | and | or | xor | if_binary_op | else_binary_op }
+bin_op           =  _{ add | subtract | multiply | divide | union | intersection | module_xor | greater_than | less_than | greater_equal | less_equal | equal | not_equal | and | or | xor | if_binary_op | else_binary_op }
   add            =   { "+" }
   subtract       =   { "-" }
   multiply       =   { "*" }
   divide         =   { "/" }
+  union          =   { "|" }
+  intersection   =   { "&" }
+  module_xor     =   { "^" }
   greater_than   =   { ">" }
   less_than      =   { "<" }
   greater_equal  =   { ">=" }
@@ -204,7 +225,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ method_call | element_access }
-primary          =  _{ literal | format_string| call | qualified_name | module_node_inner_statement | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
+primary          =  _{ nested ~ ws* ~ module_node_inner_statement | nested | literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok
@@ -238,6 +259,9 @@ call_argument = _{ call_named_tuple_argument | call_named_argument | call_positi
 call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* }
 
 call_op = _{ "(" ~ ws* ~ call_argument_list? ~ ws* ~ ")" }
+
+//`translate() rotate()`: ok
+nested_call = { call ~ (ws+ ~ call)* }
 
 //`.sum()`: ok
 method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
@@ -297,41 +321,8 @@ module_declaration = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ w
 
 module_declaration_argument_list = { argument_list? ~ ws* }
 
-//`translate() rotate()`: ok
-module_node_nested = { module_node_expression ~ (ws+ ~ module_node_expression)* }
-
 //`{ translate() rotate(); }`: ok
 module_node_inner_statement = { "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
-
-
-//`circle(r = 5.0mm);`: ok
-//`circle(r = 5.0mm) {}`: ok
-//`translate(x = 5.0mm) { rectangle(width = 5.0mm); }`: ok
-//`translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
-//`translate(r = 5.0mm) circle(r = 5.0mm);`: ok
-//`{}`: ok # Empty block
-//`{ rectangle(width = 5.0mm); }`: ok # Single statement block
-//`@foo {}`: ok # Module statement with attribute
-module_node_statement = { (attribute_list ~ ws+)? ~ 
-  (module_node_nested ~ ws* ~ module_node_inner_statement? ~ ws* ~ ";" |
-   module_node_nested? ~ ws* ~ module_node_inner_statement ~ ws* ~ ";"?)
-}
-
-//`a | a::b()`: ok
-//`a | b & c`: ok
-//`a b | b & c | d`: ok
-//`translate(x = 5mm)`: ok
-module_node_expression       =   { module_node_unary_op* ~ ws* ~ module_node_primary ~ (ws+ ~ module_node_primary)* ~ ws* ~ module_node_postfix* ~ 
-  (ws* ~ module_node_bin_op ~ ws* ~ module_node_unary_op* ~ ws* ~ module_node_primary ~ (ws+ ~ module_node_primary)* ~ ws* ~ module_node_postfix*)* }
-module_node_bin_op           =  _{ module_node_union | module_node_difference | module_node_intersection | module_node_xor }
-  module_node_union          =   { "|" }
-  module_node_difference     =   { "-" }
-  module_node_intersection   =   { "&" }
-  module_node_xor            =   { "^" }
-module_node_unary_op         =  _{ module_node_unary_neg }
-  module_node_unary_neg      =   { "!" }
-module_node_postfix          =  _{ call_op | element_access }
-module_node_primary          =  _{ qualified_name | call | "(" ~ ws* ~ module_node_expression ~ ws* ~ ")" }
 
 //`@foo`: ok
 //`@foo(x)`: ok
@@ -343,31 +334,22 @@ attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
 //`a := 5.0mm`: ok # Single assignment
 //`b: length := 5.0mm`: ok
-field_assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ ":=" ~ ws* ~ expression }
+id_assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ ":=" ~ ws* ~ expression }
 
 //`a := 5.0mm;`: ok
-field_assignment_statement = { field_assignment ~ ws* ~ ";" }
-
-//`name := node() {}`: ok
-//`name := node();`: ok
-//`field_name := 2 + 4;`: ok
-module_id_assignment = { identifier ~ ws* ~ ":=" ~ ws* ~ (module_node_statement | expression ~ ws* ~ ";") }
-
-//`return node();`: ok
-//`return node() {}`: ok
-module_node_return_statement = { "return" ~ ws* ~ module_node_statement }
+id_assignment_statement = { id_assignment ~ ws* ~ ";" }
 
 //`init(r: length) { r := r; }`: ok
 module_node_init_declaration = { "init" ~ ws* ~ argument_list ~ ws* ~ "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
 
-module_node_inner = { (module_statement ~ ws*)+ ~ (ws* ~ module_node_nested)? | module_node_nested }
+module_node_inner = { (module_statement ~ ws*)+ ~ (ws* ~ expression)? | expression }
 
-module_statement = { use_statement | 
+module_statement = { use_statement | expression ~ ws* ~ ";" |
   module_node_init_declaration | module_declaration | function_declaration | variable_declaration_statement | 
-  field_assignment_statement | module_id_assignment | module_node_return_statement | module_node_statement }
+  id_assignment_statement }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-document = { SOI ~ (module_statement ~ ws* )* ~ EOI }
+document = { SOI ~ ((module_statement ~ ws*)* ~ expression?) ~ EOI }
 
 COMMENT = { doc_comment | single_line_comment | multi_line_comment }
 
