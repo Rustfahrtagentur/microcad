@@ -50,7 +50,7 @@ impl Eval for TupleExpression {
             for (ident, expr) in self.0.get_named() {
                 let mut value = expr.clone().eval(context)?;
                 if let Some(unit) = self.1 {
-                    value.add_unit_to_scalar_types(unit);
+                    value.add_unit_to_scalar_types(unit)?;
                 }
                 map.insert(ident.clone(), value);
             }
@@ -136,7 +136,7 @@ mod tests {
         use crate::eval::Eval;
         use crate::lang_type::Type;
 
-        let input = "(1.0, 2.0m, 3.0)mm";
+        let input = "(1.0, 2.0, 3.0)mm";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
             Rule::tuple_expression,
             input,
@@ -157,7 +157,7 @@ mod tests {
         use crate::eval::Eval;
         use crate::lang_type::Type;
 
-        let input = "(a = 1.0, b = 2.0m, c = 3.0°)mm";
+        let input = "(a = 1.0, b = 2.0, c = 3.0)mm";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
             Rule::tuple_expression,
             input,
@@ -169,7 +169,7 @@ mod tests {
                 vec![
                     ("a".into(), Type::Length),
                     ("b".into(), Type::Length),
-                    ("c".into(), Type::Angle)
+                    ("c".into(), Type::Length),
                 ]
                 .into_iter()
                 .collect()
@@ -196,7 +196,7 @@ mod tests {
         use crate::eval::Eval;
         use crate::lang_type::Type;
 
-        let input = "(x = 1mm, (y,z) = 2)mm";
+        let input = "(x = 1, y = 2, z = 3)mm";
         let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
             Rule::tuple_expression,
             input,

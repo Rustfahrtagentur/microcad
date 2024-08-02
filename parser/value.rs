@@ -25,6 +25,8 @@ pub enum ValueError {
     InvalidMapKeyType(Type),
     #[error("Cannot convert value into scalar: {0}")]
     CannotConvertToScalar(Value),
+    #[error("Cannot add unit to a unitful value: {0}")]
+    CannotAddUnitToUnitfulValue(Value),
 }
 
 pub type Scalar = f64;
@@ -354,7 +356,7 @@ impl Value {
     }
 
     /// Add a unit to a scalar value
-    pub fn add_unit_to_scalar_types(&mut self, unit: Unit) {
+    pub fn add_unit_to_scalar_types(&mut self, unit: Unit) -> Result<(), ValueError> {
         match (&self, unit.ty()) {
             (Value::Integer(i), Type::Length) => {
                 *self = Value::Length(unit.normalize(*i as Scalar))
@@ -363,8 +365,9 @@ impl Value {
             (Value::Scalar(s), Type::Length) => *self = Value::Length(unit.normalize(*s)),
             (Value::Scalar(s), Type::Angle) => *self = Value::Angle(unit.normalize(*s)),
             //(Value::List(list), _) => list.add_unit_to_scalar_types(unit),
-            _ => {}
+            _ => return Err(ValueError::CannotAddUnitToUnitfulValue(self.clone())),
         }
+        Ok(())
     }
 }
 
@@ -594,10 +597,11 @@ impl ValueList {
         self.0.retain(f);
     }
 
-    pub fn add_unit_to_scalar_types(&mut self, unit: Unit) {
+    pub fn add_unit_to_scalar_types(&mut self, unit: Unit) -> Result<(), ValueError> {
         for value in self.0.iter_mut() {
-            value.add_unit_to_scalar_types(unit);
+            value.add_unit_to_scalar_types(unit)?;
         }
+        Ok(())
     }
 
     pub fn types(&self) -> TypeList {
