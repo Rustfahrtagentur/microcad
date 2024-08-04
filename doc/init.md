@@ -6,7 +6,7 @@ A module with arguments has one implicit init:
 
 ```µcad
 module box(size: length) {
-    cube(size);
+    rectangle(size);
 }
 ```
 
