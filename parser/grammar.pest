@@ -296,14 +296,16 @@ variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
 function_signature = { argument_list ~ ws* ~ "->" ~ ws* ~ type }
 
 //`function foo() -> scalar { return math::pi; }`: ok
-//`function foo() -> scalar {}`: error # Function must have a return statement
+//`function foo() -> scalar {}`: ok # Empty function
 //`function foo() { return 5.0mm; }`: error # Function must have specified return type
 //`function foo(a: scalar) -> scalar { return a; }`: ok # Function with arguments
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
-function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ "{" ~ ws* ~ function_statement* ~ ws* ~ function_return_statement ~ ws* ~ ws* ~ "}" }
+function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ function_body }
 
-function_statement = { variable_declaration_statement | use_statement | function_declaration }
+function_body = { "{" ~ ws* ~ function_statement* ~ ws* ~ "}" }
+
+function_statement = _{ variable_declaration_statement | use_statement | function_declaration | function_return_statement }
 
 //`return 5.0mm;`: ok
 function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
