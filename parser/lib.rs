@@ -5,6 +5,7 @@ pub mod diagnostics;
 pub mod eval;
 pub mod expression;
 pub mod format_string;
+pub mod function;
 pub mod identifier;
 pub mod lang_type;
 pub mod list;

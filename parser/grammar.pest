@@ -303,9 +303,9 @@ function_signature = { argument_list ~ ws* ~ "->" ~ ws* ~ type }
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ function_body }
 
-function_body = { "{" ~ ws* ~ function_statement* ~ ws* ~ "}" }
+function_body = _{ "{" ~ ws* ~ function_statement* ~ ws* ~ "}" }
 
-function_statement = _{ variable_declaration_statement | use_statement | function_declaration | function_return_statement | function_if_statement }
+function_statement = { variable_declaration_statement | use_statement | function_declaration | function_return_statement | function_if_statement }
 
 //`return 5.0mm;`: ok
 function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
