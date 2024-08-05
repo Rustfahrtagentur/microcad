@@ -5,6 +5,19 @@ alpha_upper = _{ 'A'..'Z' }
 alpha = _{ alpha_lower | alpha_upper }
 digit = _{ '0'..'9' }
 
+COMMENT = { doc_comment | single_line_comment | multi_line_comment }
+
+//`// ok`: ok
+//`/ err` error
+single_line_comment = ${ "//" ~ (!"\n" ~ ANY)* }
+
+//`/// ok`: ok
+//`// err` error
+doc_comment = { "///" ~ (!"\n" ~ ANY)* }
+
+//`/* ok */`: ok
+multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
+
 //`a`: ok
 //`a1`: ok
 //`a_`: ok
@@ -360,16 +373,3 @@ module_statement = { use_statement | expression ~ ws* ~ ";" |
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 document = { SOI ~ ((module_statement ~ ws*)* ~ expression?) ~ EOI }
-
-COMMENT = { doc_comment | single_line_comment | multi_line_comment }
-
-//`// ok`: ok
-//`/ err` error
-single_line_comment = ${ "//" ~ (!"\n" ~ ANY)* }
-
-//`/// ok`: ok
-//`// err` error
-doc_comment = { "///" ~ (!"\n" ~ ANY)* }
-
-//`/* ok */`: ok
-multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
