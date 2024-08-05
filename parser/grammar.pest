@@ -318,11 +318,11 @@ function_signature = { argument_list ~ ws* ~ "->" ~ ws* ~ type }
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 //`function test(a: scalar, b: scalar) -> scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
-function_declaration = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ function_body }
+function_definition = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ function_body }
 
 function_body = _{ "{" ~ (ws* ~ function_statement)* ~ ws* ~ "}" }
 
-function_statement = { variable_declaration_statement | use_statement | function_declaration | function_return_statement | function_if_statement }
+function_statement = { variable_declaration_statement | use_statement | function_definition | function_return_statement | function_if_statement }
 
 //`return 5.0mm;`: ok
 function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
@@ -367,11 +367,11 @@ id_assignment_statement = { id_assignment ~ ws* ~ ";" }
 //`init(r: length) { r := r; }`: ok
 module_node_init_declaration = { "init" ~ ws* ~ argument_list ~ ws* ~ "{" ~ ws* ~ module_node_init_inner? ~ ws* ~ "}" }
 
-module_node_init_inner = { ((use_statement | expression_statement | id_assignment_statement | variable_declaration_statement | function_declaration) ~ ws*)+ }
+module_node_init_inner = { ((use_statement | expression_statement | id_assignment_statement | variable_declaration_statement | function_definition) ~ ws*)+ }
 
 //`{sphere(4.0mm)}`: ok
 module_statement = { use_statement | expression_statement |
-  module_node_init_declaration | module_definition | function_declaration | variable_declaration_statement | 
+  module_node_init_declaration | module_definition | function_definition | variable_declaration_statement | 
   id_assignment_statement }
 
 module_node_inner = { ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
