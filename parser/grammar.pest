@@ -245,6 +245,9 @@ primary          =  _{ nested ~ ws* ~ module_node_inner_statement | nested | lit
 //`,,`: error # No expression 
 expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
+// A statement that is an single expression
+expression_statement = { expression ~ ws* ~ ";" | expression? ~ ws* ~ module_node_inner_statement | module_node_inner_statement }
+
 //`1..4`: ok
 //`a..b`: ok
 range_expression = { (integer_literal | expression) ~ ws* ~ ".." ~ ws* ~ (integer_literal | expression) }
@@ -339,10 +342,9 @@ function_else_statement = { "else" ~ ws* ~ function_body }
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
 module_declaration = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~  
-    module_declaration_argument_list? ~
+  argument_list? ~ ws* ~
     "{" ~ ws* ~ module_node_inner? ~ "}" }
-
-module_declaration_argument_list = { argument_list? ~ ws* }
+// RENAME: module_definition
 
 //`{ translate() rotate(); }`: ok
 module_node_inner_statement = { "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
@@ -363,13 +365,17 @@ id_assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ ":=" ~ ws* ~ expre
 id_assignment_statement = { id_assignment ~ ws* ~ ";" }
 
 //`init(r: length) { r := r; }`: ok
-module_node_init_declaration = { "init" ~ ws* ~ argument_list ~ ws* ~ "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
+module_node_init_declaration = { "init" ~ ws* ~ argument_list ~ ws* ~ "{" ~ ws* ~ module_node_init_inner? ~ ws* ~ "}" }
 
-module_node_inner = { (module_statement ~ ws*)+ ~ (ws* ~ expression)? | expression }
+module_node_init_inner = { ((use_statement | expression_statement | id_assignment_statement | variable_declaration_statement | function_declaration) ~ ws*)+ }
 
-module_statement = { use_statement | expression ~ ws* ~ ";" |
+//`{sphere(4.0mm)}`: ok
+module_statement = { use_statement | expression_statement |
   module_node_init_declaration | module_declaration | function_declaration | variable_declaration_statement | 
   id_assignment_statement }
 
+module_node_inner = { ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
+
+
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-document = { SOI ~ ((module_statement ~ ws*)* ~ expression?) ~ EOI }
+document = { SOI ~ module_node_inner? ~ EOI }
