@@ -341,7 +341,7 @@ function_else_statement = { "else" ~ ws* ~ function_body }
 //`module foo() { module bar() { } }`: ok # Nested module
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
-module_declaration = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~  
+module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~  
   argument_list? ~ ws* ~
     "{" ~ ws* ~ module_node_inner? ~ "}" }
 // RENAME: module_definition
@@ -371,7 +371,7 @@ module_node_init_inner = { ((use_statement | expression_statement | id_assignmen
 
 //`{sphere(4.0mm)}`: ok
 module_statement = { use_statement | expression_statement |
-  module_node_init_declaration | module_declaration | function_declaration | variable_declaration_statement | 
+  module_node_init_declaration | module_definition | function_declaration | variable_declaration_statement | 
   id_assignment_statement }
 
 module_node_inner = { ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
