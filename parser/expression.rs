@@ -83,8 +83,8 @@ pub enum Expression {
     // A tuple: (a, b, c)
     TupleExpression(TupleExpression),
 
-    // A call to a function: foo(a, b, c)
-    Call(Call),
+    /// A list whitespace separated of nested items: `translate() rotate()`, `b c`, `a b() {}`
+    Nested(Nested),
 
     /// A binary operation: a + b
     BinaryOp {
@@ -113,9 +113,6 @@ pub enum Expression {
     /// Call to a method: `[2,3].len()`
     /// First expression must evaluate to `ModuleRef` or `FunctionRef`
     MethodCall(Box<Expression>, crate::call::MethodCall),
-
-    /// A list whitespace separated of nested items: `translate() rotate()`, `b c`, `a b() {}`
-    Nested(Nested),
 }
 
 impl Expression {}
@@ -195,9 +192,16 @@ impl Eval for Expression {
 
 impl Parse for Expression {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        Ok(PRATT_PARSER
+        let mut error: Option<ParseError> = None;
+        let result = PRATT_PARSER
             .map_primary(|primary| match primary.as_rule() {
-                Rule::literal => Self::Literal(Literal::parse(primary).unwrap()),
+                Rule::literal => match Literal::parse(primary) {
+                    Ok(literal) => Self::Literal(literal),
+                    Err(e) => {
+                        error = Some(e);
+                        Self::Invalid
+                    }
+                },
                 Rule::expression => Self::parse(primary).unwrap(),
                 Rule::list_expression => {
                     Self::ListExpression(ListExpression::parse(primary).unwrap())
@@ -258,7 +262,12 @@ impl Parse for Expression {
                     unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
                 }
             })
-            .parse(pair.into_inner()))
+            .parse(pair.into_inner());
+
+        match error {
+            Some(e) => Err(e),
+            None => Ok(result),
+        }
     }
 }
 
@@ -452,7 +461,7 @@ mod tests {
     #[test]
     fn nested_context() {
         let mut context = Context::default();
-        context.insert("a", Value::Scalar(4.0));
+        context.insert("a", Value::Scalar(4.0));S
         context.insert("b", Value::Scalar(5.0));
 
         // Enter a new scope

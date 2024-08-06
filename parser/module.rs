@@ -3,7 +3,6 @@
 use crate::call::Call;
 use crate::identifier::{Identifier, QualifiedName};
 use crate::parser::*;
-use pest::pratt_parser::PrattParser;
 
 #[derive(Default)]
 pub struct ModuleNested(Vec<Call>);
@@ -52,6 +51,7 @@ fn build(root: SyntaxNode) -> Result<crate::tree::Node, BuildError> {
 
 */
 
+#[derive(Clone)]
 pub struct UseAlias(pub QualifiedName, pub Identifier);
 
 impl std::fmt::Display for UseAlias {
@@ -60,6 +60,7 @@ impl std::fmt::Display for UseAlias {
     }
 }
 
+#[derive(Clone)]
 pub enum UseStatement {
     /// Import symbols given as qualified names: `use a, b`
     Use(Vec<QualifiedName>),

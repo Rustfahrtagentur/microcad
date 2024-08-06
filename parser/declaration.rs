@@ -1,14 +1,31 @@
+use crate::eval::{Context, Eval};
 use crate::identifier::IdentifierListError;
-use crate::lang_type::Type;
+use crate::lang_type::{Ty, Type};
 use crate::parser::*;
+use crate::value::Value;
 use crate::{expression::Expression, identifier::Identifier};
 
 use std::collections::HashMap;
 
+#[derive(Clone)]
 pub struct VariableDeclaration {
     name: Identifier,
-    _default_value: Option<Expression>,
-    _specified_type: Option<Type>,
+    default_value: Option<Expression>,
+    specified_type: Option<Type>,
+}
+
+impl VariableDeclaration {
+    pub fn name(&self) -> &Identifier {
+        &self.name
+    }
+
+    pub fn default_value(&self) -> Option<&Expression> {
+        self.default_value.as_ref()
+    }
+
+    pub fn specified_type(&self) -> Option<&Type> {
+        self.specified_type.as_ref()
+    }
 }
 
 impl Parse for VariableDeclaration {
@@ -36,13 +53,51 @@ impl Parse for VariableDeclaration {
 
         Ok(Self {
             name,
-            _default_value: default_value,
-            _specified_type: specified_type,
+            default_value,
+            specified_type,
         })
     }
 }
 
-#[derive(Default)]
+/*
+impl Eval for VariableDeclaration {
+    fn eval(self, context: Option<&Context>) -> Result<Value, crate::eval::Error> {
+        match (self.default_value, self.specified_type) {
+            (Some(value_expr), Some(specified_type)) => {
+            }
+            (Some(value_expr), None) => {
+            }
+            (None, Some(specified_type)) => {
+            }
+        if let Some(value_expr) = self.default_value {
+            let value = value_expr.eval(context)?;
+            if let Some(specified_type) = &self.specified_type {
+                if value.ty() == *specified_type {
+                    return Ok(value);
+                } else {
+                    return Err(crate::eval::Error::TypeMismatch {
+                        expected: specified_type.clone(),
+                        found: value.ty(),
+                    });
+                }
+            } else {
+                Ok(value)
+            }
+        } else {
+            Ok(Value::None)
+        }
+    }
+
+    fn eval_type(&self, _: Option<&Context>) -> Result<Type, crate::eval::Error> {
+        if let Some(specified_type) = &self.specified_type {
+            Ok(specified_type.clone())
+        } else {
+            Ok(Type::Angle) // TODO this is a placeholder
+        }
+    }
+}
+*/
+#[derive(Default, Clone)]
 pub struct VariableDeclarationList {
     decls: Vec<VariableDeclaration>,
     map: HashMap<Identifier, usize>,
@@ -80,8 +135,6 @@ impl Parse for VariableDeclarationList {
     }
 }
 
-pub struct _FunctionSignature(VariableDeclarationList, Type);
-
 #[cfg(test)]
 mod tests {
 
@@ -99,14 +152,14 @@ mod tests {
 
         assert_eq!(decl.name, Identifier::from("a"));
         assert_eq!(
-            decl._default_value
+            decl.default_value
                 .unwrap()
                 .eval(Some(&context))
                 .unwrap()
                 .to_string(),
             "1"
         );
-        assert!(decl._specified_type.is_none());
+        assert!(decl.specified_type.is_none());
     }
 
     #[test]

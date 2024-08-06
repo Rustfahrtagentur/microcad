@@ -41,6 +41,12 @@ impl From<Identifier> for String {
     }
 }
 
+impl<'a> From<&'a Identifier> for &'a str {
+    fn from(value: &'a Identifier) -> Self {
+        &value.0
+    }
+}
+
 impl Parse for Identifier {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
         Ok(Self(pair.as_str().into()))
