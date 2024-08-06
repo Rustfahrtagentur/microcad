@@ -50,6 +50,8 @@ impl Parse for FormatExpression {
 }
 
 impl Eval for FormatExpression {
+    type Output = crate::value::Value;
+
     fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         Ok(Value::String(format!("{}", self.1.eval(context)?)))
     }
@@ -80,6 +82,8 @@ impl FormatString {
 }
 
 impl Eval for FormatString {
+    type Output = crate::value::Value;
+
     fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         let mut result = String::new();
         for elem in &self.0 {

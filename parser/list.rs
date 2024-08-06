@@ -37,6 +37,8 @@ impl Parse for ListExpression {
 }
 
 impl Eval for ListExpression {
+    type Output = crate::value::Value;
+
     fn eval(&self, context: &mut Context) -> Result<Value, crate::eval::Error> {
         let mut value_list = ValueList::new();
         for expr in self.0.clone() {

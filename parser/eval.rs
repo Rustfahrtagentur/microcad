@@ -137,8 +137,10 @@ impl Default for Context {
 }
 
 pub trait Eval {
+    type Output;
+
     /// Evaluate the type into an expression
-    fn eval(&self, context: &mut Context) -> Result<Value, Error>;
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error>;
 }
 
 #[cfg(test)]

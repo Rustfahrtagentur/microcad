@@ -33,6 +33,8 @@ impl Parse for TupleExpression {
 }
 
 impl Eval for TupleExpression {
+    type Output = crate::value::Value;
+
     fn eval(&self, context: &mut Context) -> Result<Value, crate::eval::Error> {
         if self.0.contains_positional() {
             // Unnamed tuple

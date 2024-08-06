@@ -67,6 +67,8 @@ impl Parse for Nested {
 }
 
 impl Eval for Nested {
+    type Output = crate::value::Value;
+
     fn eval(&self, context: &mut Context) -> Result<Value, eval::Error> {
         for item in &self.0 {
             match item {
@@ -135,6 +137,8 @@ pub enum Expression {
 impl Expression {}
 
 impl Eval for Expression {
+    type Output = crate::value::Value;
+
     fn eval(&self, context: &mut Context) -> Result<Value, eval::Error> {
         match self {
             Self::Literal(literal) => Literal::eval(literal, context),

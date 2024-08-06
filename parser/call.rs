@@ -206,6 +206,8 @@ impl Parse for Call {
 }
 
 impl crate::eval::Eval for Call {
+    type Output = crate::value::Value;
+
     fn eval(&self, context: &mut Context) -> Result<crate::value::Value, crate::eval::Error> {
         match context.resolve(&self.name)?.clone() {
             Symbol::Function(f) => {

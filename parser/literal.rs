@@ -137,6 +137,8 @@ impl Parse for NumberLiteral {
 }
 
 impl Eval for NumberLiteral {
+    type Output = crate::value::Value;
+
     fn eval(&self, _: &mut Context) -> Result<Value, crate::eval::Error> {
         let v = self.value();
 
@@ -200,6 +202,8 @@ impl Parse for Literal {
 }
 
 impl Eval for Literal {
+    type Output = crate::value::Value;
+
     fn eval(&self, context: &mut Context) -> Result<Value, crate::eval::Error> {
         match self {
             Literal::Integer(i) => Ok(Value::Integer(*i)),
