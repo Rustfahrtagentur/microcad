@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::eval::{Context, Error, Eval};
 use crate::expression::Expression;
 use crate::parser::*;
@@ -48,7 +50,7 @@ impl Parse for FormatExpression {
 }
 
 impl Eval for FormatExpression {
-    fn eval(self, context: Option<&Context>) -> Result<Value, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         Ok(Value::String(format!("{}", self.1.eval(context)?)))
     }
 }
@@ -78,9 +80,9 @@ impl FormatString {
 }
 
 impl Eval for FormatString {
-    fn eval(self, context: Option<&Context>) -> Result<Value, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         let mut result = String::new();
-        for elem in self.0 {
+        for elem in &self.0 {
             match elem {
                 FormatStringInner::String(s) => result += &s,
                 FormatStringInner::FormatExpression(expr) => match expr.eval(context) {
@@ -125,8 +127,8 @@ mod tests {
 
         let s = FormatString::parse(pair).unwrap();
         assert_eq!(s.section_count(), 3);
-
-        let value = s.eval(None).unwrap();
+        let mut context = Context::default();
+        let value = s.eval(&mut context).unwrap();
 
         assert_eq!(value, Value::String("A6B".to_string()));
     }

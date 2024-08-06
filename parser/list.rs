@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::eval::{Context, Eval};
 use crate::expression::{Expression, ExpressionList};
 use crate::parser::{Pair, Parse, ParseError};
@@ -35,9 +37,9 @@ impl Parse for ListExpression {
 }
 
 impl Eval for ListExpression {
-    fn eval(self, context: Option<&Context>) -> Result<Value, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, crate::eval::Error> {
         let mut value_list = ValueList::new();
-        for expr in self.0 {
+        for expr in self.0.clone() {
             value_list.push(expr.eval(context)?);
         }
         if let Some(unit) = self.1 {

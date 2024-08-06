@@ -1,9 +1,14 @@
+use std::rc::Rc;
+
+use crate::call::EvaluatedCallArgumentList;
+use crate::eval::Context;
 use crate::expression::Expression;
 use crate::identifier::Identifier;
 use crate::parser::*;
 
 use crate::lang_type::Type;
 use crate::module::UseStatement;
+use crate::value::Value;
 
 #[derive(Clone)]
 pub struct DefinitionParameter {
@@ -20,8 +25,6 @@ impl Parse for DefinitionParameter {
         let mut name = Identifier::default();
         let mut specified_type = None;
         let mut value = None;
-
-        println!("DefinitionParameter::parse: {:?}", pair);
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
@@ -215,6 +218,16 @@ pub struct FunctionDefinition {
     pub body: Vec<FunctionStatement>,
 }
 
+impl FunctionDefinition {
+    pub fn call(
+        &self,
+        args: EvaluatedCallArgumentList,
+        context: &mut Context,
+    ) -> Result<Value, crate::eval::Error> {
+        unreachable!("FunctionDefinition::call not implemented")
+    }
+}
+
 impl Parse for FunctionDefinition {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
         let mut pairs = pair.into_inner();
@@ -231,7 +244,9 @@ impl Parse for FunctionDefinition {
 
 #[cfg(test)]
 mod tests {
-    use crate::eval::Symbol;
+    use std::{borrow::BorrowMut, rc::Rc};
+
+    use crate::eval::{Context, Symbol};
 
     #[test]
     fn assignment() {
@@ -241,11 +256,11 @@ mod tests {
         let assignment =
             Parser::parse_rule_or_panic::<crate::function::Assignment>(Rule::assignment, "a = 1");
 
-        let context = Context::default();
+        let mut context = Context::default();
 
         assert_eq!(assignment.name(), &"a".into());
         assert_eq!(
-            assignment.value().eval(Some(&context)).unwrap().to_string(),
+            assignment.value().eval(&mut context).unwrap().to_string(),
             "1"
         );
         assert!(assignment.specified_type().is_none());
@@ -288,5 +303,30 @@ mod tests {
     }
 
     #[test]
-    fn function_eval() {}
+    fn function_eval() {
+        use crate::eval::Eval;
+        use crate::parser::Parser;
+        use crate::parser::Rule;
+
+        let input = "function test(a: scalar, b: scalar) -> scalar {
+            c = 1.0;
+            return a + b + c;
+        }";
+
+        let function_decl = Parser::parse_rule_or_panic::<crate::function::FunctionDefinition>(
+            Rule::function_definition,
+            input,
+        );
+
+        let mut context = Context::default();
+        let mut mut_context = context.borrow_mut();
+        mut_context.add_symbol(Symbol::Function(function_decl.clone()));
+
+        let input = "test(1, 2)";
+        let expr =
+            Parser::parse_rule_or_panic::<crate::expression::Expression>(Rule::expression, input);
+
+        let value = expr.eval(&mut context).unwrap();
+        assert_eq!(value.to_string(), "4");
+    }
 }

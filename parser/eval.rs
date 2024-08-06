@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::rc::Rc;
 use std::vec;
 use thiserror::Error;
 
@@ -41,6 +42,8 @@ pub enum Error {
     UnknownMethod(Identifier),
     #[error("Elements of list have different types")]
     ListElementsDifferentTypes,
+    #[error("Unknown error")]
+    Unknown,
 }
 
 #[derive(Clone)]
@@ -111,6 +114,18 @@ impl Context {
         }
         None
     }
+
+    pub fn resolve(&self, name: &QualifiedName) -> Result<&Symbol, Error> {
+        // TODO: handle qualified names
+        // We only handle the last piece of the qualified name
+        let last = name.last();
+        let symbol = self.get_symbol(last.clone());
+        if let Some(symbol) = symbol {
+            Ok(symbol)
+        } else {
+            Err(Error::UnknownQualifiedName(name.clone()))
+        }
+    }
 }
 
 impl Default for Context {
@@ -121,13 +136,9 @@ impl Default for Context {
     }
 }
 
-pub trait Eval: Sized {
+pub trait Eval {
     /// Evaluate the type into an expression
-    fn eval(self, context: Option<&Context>) -> Result<Value, Error>;
-}
-
-pub trait EvalTo<T> {
-    fn eval_to(self, context: Option<&Context>) -> Result<T, Error>;
+    fn eval(&self, context: &mut Context) -> Result<Value, Error>;
 }
 
 #[cfg(test)]

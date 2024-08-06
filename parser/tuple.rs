@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::rc::Rc;
 
 use crate::call::CallArgumentList;
 use crate::eval::{Context, Eval};
@@ -32,7 +33,7 @@ impl Parse for TupleExpression {
 }
 
 impl Eval for TupleExpression {
-    fn eval(self, context: Option<&Context>) -> Result<Value, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, crate::eval::Error> {
         if self.0.contains_positional() {
             // Unnamed tuple
             let mut value_list = ValueList::new();
@@ -86,7 +87,9 @@ impl Eval for TupleExpression {
 
 #[cfg(test)]
 mod tests {
-    use crate::{lang_type::Ty, parser::Rule, tuple::TupleExpression};
+    use std::rc::Rc;
+
+    use crate::{eval::Context, lang_type::Ty, parser::Rule, tuple::TupleExpression};
 
     #[test]
     fn unnamed_tuple() {
@@ -98,7 +101,8 @@ mod tests {
             Rule::tuple_expression,
             input,
         );
-        let value = expr.eval(None).unwrap();
+        let mut context = Context::default();
+        let value = expr.eval(&mut context).unwrap();
         assert_eq!(
             value.ty(),
             Type::UnnamedTuple(crate::lang_type::UnnamedTupleType(vec![
@@ -119,7 +123,9 @@ mod tests {
             Rule::tuple_expression,
             input,
         );
-        let value = expr.eval(None).unwrap();
+        let mut context = Context::default();
+
+        let value = expr.eval(&mut context).unwrap();
         assert_eq!(
             value.ty(),
             Type::NamedTuple(crate::lang_type::NamedTupleType(
@@ -144,7 +150,9 @@ mod tests {
             Rule::tuple_expression,
             input,
         );
-        let value = expr.eval(None).unwrap();
+        let mut context = Context::default();
+
+        let value = expr.eval(&mut context).unwrap();
         assert_eq!(value.ty(), Type::Vec2);
     }
 
@@ -158,7 +166,9 @@ mod tests {
             Rule::tuple_expression,
             input,
         );
-        let value = expr.eval(None).unwrap();
+        let mut context = Context::default();
+
+        let value = expr.eval(&mut context).unwrap();
         assert_eq!(value.ty(), Type::Vec3);
     }
 }

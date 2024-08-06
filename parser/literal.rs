@@ -1,5 +1,7 @@
+use std::rc::Rc;
+
 use crate::color::Color;
-use crate::eval::{Eval, OperatorError};
+use crate::eval::{Context, Eval, OperatorError};
 use crate::lang_type::{Ty, Type};
 use crate::parser::{Pair, Parse, ParseError, Rule};
 use crate::units::Unit;
@@ -135,7 +137,7 @@ impl Parse for NumberLiteral {
 }
 
 impl Eval for NumberLiteral {
-    fn eval(self, _: Option<&crate::eval::Context>) -> Result<Value, crate::eval::Error> {
+    fn eval(&self, _: &mut Context) -> Result<Value, crate::eval::Error> {
         let v = self.value();
 
         match self.1.ty() {
@@ -198,12 +200,12 @@ impl Parse for Literal {
 }
 
 impl Eval for Literal {
-    fn eval(self, _: Option<&crate::eval::Context>) -> Result<Value, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, crate::eval::Error> {
         match self {
-            Literal::Integer(i) => Ok(Value::Integer(i)),
-            Literal::Number(n) => n.eval(None),
-            Literal::Bool(b) => Ok(Value::Bool(b)),
-            Literal::Color(c) => Ok(Value::Color(c)),
+            Literal::Integer(i) => Ok(Value::Integer(*i)),
+            Literal::Number(n) => n.eval(context),
+            Literal::Bool(b) => Ok(Value::Bool(*b)),
+            Literal::Color(c) => Ok(Value::Color(*c)),
         }
     }
 }

@@ -1,5 +1,8 @@
+use std::borrow::Borrow;
 use std::collections::BTreeMap;
+use std::rc::Rc;
 
+use crate::eval::{Context, Symbol};
 use crate::expression::Expression;
 use crate::identifier::QualifiedName;
 use crate::identifier::{Identifier, IdentifierList};
@@ -42,25 +45,35 @@ impl Parse for CallArgument {
 }
 
 #[derive(Default, Clone)]
-pub struct CallArgumentList {
-    positional: Vec<Expression>,
-    named: BTreeMap<Identifier, Expression>,
+pub struct PositionalNamedList<T> {
+    positional: Vec<T>,
+    named: BTreeMap<Identifier, T>,
 }
 
-impl CallArgumentList {
-    pub fn get_named(&self) -> &BTreeMap<Identifier, Expression> {
+pub type CallArgumentList = PositionalNamedList<Expression>;
+pub type EvaluatedCallArgumentList = PositionalNamedList<crate::value::Value>;
+
+impl<T> PositionalNamedList<T> {
+    pub fn new() -> Self {
+        Self {
+            positional: Vec::new(),
+            named: BTreeMap::new(),
+        }
+    }
+
+    pub fn get_named(&self) -> &BTreeMap<Identifier, T> {
         &self.named
     }
 
-    pub fn get_named_arg(&self, ident: &Identifier) -> Option<&Expression> {
+    pub fn get_named_arg(&self, ident: &Identifier) -> Option<&T> {
         self.named.get(ident)
     }
 
-    pub fn get_positional(&self) -> &[Expression] {
+    pub fn get_positional(&self) -> &[T] {
         &self.positional
     }
 
-    pub fn get_positional_arg(&self, index: usize) -> Option<&Expression> {
+    pub fn get_positional_arg(&self, index: usize) -> Option<&T> {
         self.positional.get(index)
     }
 
@@ -72,7 +85,7 @@ impl CallArgumentList {
         self.positional.is_empty() && self.named.is_empty()
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = &Expression> {
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
         self.positional.iter().chain(self.named.values())
     }
 
@@ -84,21 +97,38 @@ impl CallArgumentList {
         !self.named.is_empty()
     }
 
-    fn insert_named(&mut self, ident: Identifier, expr: Expression) -> Result<(), ParseError> {
+    fn insert_named(&mut self, ident: Identifier, v: T) -> Result<(), ParseError> {
         if self.named.contains_key(&ident) {
             return Err(ParseError::DuplicateNamedArgument(ident));
         }
 
-        self.named.insert(ident, expr);
+        self.named.insert(ident, v);
         Ok(())
     }
 
-    fn insert_positional(&mut self, expr: Expression) -> Result<(), ParseError> {
+    fn insert_positional(&mut self, v: T) -> Result<(), ParseError> {
         if !self.named.is_empty() {
             return Err(ParseError::PositionalArgumentAfterNamed);
         }
-        self.positional.push(expr);
+        self.positional.push(v);
         Ok(())
+    }
+}
+
+impl CallArgumentList {
+    pub fn eval(
+        &self,
+        context: &mut Context,
+    ) -> Result<EvaluatedCallArgumentList, crate::eval::Error> {
+        use crate::eval::Eval;
+        let mut evaluated = EvaluatedCallArgumentList::new();
+        for (ident, expr) in self.named.iter() {
+            evaluated.insert_named(ident.clone(), expr.eval(context)?);
+        }
+        for expr in self.positional.iter() {
+            evaluated.insert_positional(expr.eval(context)?);
+        }
+        Ok(evaluated)
     }
 }
 
@@ -172,6 +202,20 @@ impl Parse for Call {
             name: QualifiedName::parse(first)?,
             argument_list: CallArgumentList::parse(second)?,
         })
+    }
+}
+
+impl crate::eval::Eval for Call {
+    fn eval(&self, context: &mut Context) -> Result<crate::value::Value, crate::eval::Error> {
+        match context.resolve(&self.name)?.clone() {
+            Symbol::Function(f) => {
+                let args = self.argument_list.eval(context)?;
+                {
+                    f.call(args, context)
+                }
+            }
+            _ => unimplemented!("Call::eval for symbol"),
+        }
     }
 }
 
