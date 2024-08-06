@@ -286,4 +286,7 @@ mod tests {
         let mut context = crate::eval::Context::default();
         context.add_symbol(Symbol::Function(function_decl));
     }
+
+    #[test]
+    fn function_eval() {}
 }

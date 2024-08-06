@@ -124,9 +124,6 @@ impl Default for Context {
 pub trait Eval: Sized {
     /// Evaluate the type into an expression
     fn eval(self, context: Option<&Context>) -> Result<Value, Error>;
-
-    /// The expected destination type after evaluation
-    fn eval_type(&self, context: Option<&Context>) -> Result<Type, crate::eval::Error>;
 }
 
 pub trait EvalTo<T> {

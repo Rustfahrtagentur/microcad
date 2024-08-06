@@ -51,10 +51,6 @@ impl Eval for FormatExpression {
     fn eval(self, context: Option<&Context>) -> Result<Value, Error> {
         Ok(Value::String(format!("{}", self.1.eval(context)?)))
     }
-
-    fn eval_type(&self, _: Option<&Context>) -> Result<crate::lang_type::Type, crate::eval::Error> {
-        Ok(crate::lang_type::Type::String)
-    }
 }
 
 #[derive(Clone)]
@@ -95,10 +91,6 @@ impl Eval for FormatString {
             }
         }
         Ok(Value::String(result))
-    }
-
-    fn eval_type(&self, _: Option<&Context>) -> Result<crate::lang_type::Type, crate::eval::Error> {
-        Ok(crate::lang_type::Type::String)
     }
 }
 

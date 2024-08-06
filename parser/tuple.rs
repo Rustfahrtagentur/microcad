@@ -82,49 +82,6 @@ impl Eval for TupleExpression {
             Ok(Value::NamedTuple(NamedTuple(map)))
         }
     }
-
-    fn eval_type(&self, context: Option<&Context>) -> Result<Type, crate::eval::Error> {
-        if self.0.contains_positional() {
-            // Unnamed tuple
-            let mut types = Vec::new();
-            for expr in self.0.get_positional() {
-                let value = expr.clone().eval(context)?;
-                types.push(value.ty());
-            }
-            Ok(Type::UnnamedTuple(crate::lang_type::UnnamedTupleType(
-                types,
-            )))
-        } else {
-            // Named tuple
-
-            let mut map = BTreeMap::new();
-            for (ident, expr) in self.0.get_named() {
-                map.insert(ident.clone(), expr.eval_type(context)?);
-            }
-
-            let (x_ident, y_ident, z_ident) = (&"x".into(), &"y".into(), &"z".into());
-
-            match (map.len(), map.values().all(|ty| *ty == Type::Length)) {
-                // Special case for Vec2: if we have exactly two lengths with names "x" and "y", we can create a Vec2
-                (2, true) => {
-                    if let (Some(_), Some(_)) = (map.get(x_ident), map.get(y_ident)) {
-                        return Ok(Type::Vec2);
-                    }
-                }
-                // Special case for Vec3: if we have exactly three lengths with names "x", "y" and "z", we can create a Vec3
-                (3, true) => {
-                    if let (Some(_), Some(_), Some(_)) =
-                        (map.get(x_ident), map.get(y_ident), map.get(z_ident))
-                    {
-                        return Ok(Type::Vec3);
-                    }
-                }
-                _ => {}
-            }
-
-            Ok(Type::NamedTuple(crate::lang_type::NamedTupleType(map)))
-        }
-    }
 }
 
 #[cfg(test)]

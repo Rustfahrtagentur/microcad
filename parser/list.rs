@@ -1,6 +1,5 @@
 use crate::eval::{Context, Eval};
 use crate::expression::{Expression, ExpressionList};
-use crate::lang_type::{ListType, Type};
 use crate::parser::{Pair, Parse, ParseError};
 use crate::units::Unit;
 use crate::value::{Value, ValueList};
@@ -47,14 +46,6 @@ impl Eval for ListExpression {
 
         match value_list.types().common_type() {
             Some(common_type) => Ok(Value::List(crate::value::List(value_list, common_type))),
-            None => Err(crate::eval::Error::ListElementsDifferentTypes),
-        }
-    }
-
-    fn eval_type(&self, _: Option<&Context>) -> Result<Type, crate::eval::Error> {
-        let types = self.0.type_list()?;
-        match types.common_type() {
-            Some(t) => Ok(Type::List(ListType::from_type(t))),
             None => Err(crate::eval::Error::ListElementsDifferentTypes),
         }
     }

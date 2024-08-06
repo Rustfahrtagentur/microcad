@@ -145,10 +145,6 @@ impl Eval for NumberLiteral {
             _ => unreachable!(),
         }
     }
-
-    fn eval_type(&self, _: Option<&crate::eval::Context>) -> Result<Type, crate::eval::Error> {
-        Ok(self.1.ty())
-    }
 }
 
 impl std::fmt::Display for NumberLiteral {
@@ -208,15 +204,6 @@ impl Eval for Literal {
             Literal::Number(n) => n.eval(None),
             Literal::Bool(b) => Ok(Value::Bool(b)),
             Literal::Color(c) => Ok(Value::Color(c)),
-        }
-    }
-
-    fn eval_type(&self, _: Option<&crate::eval::Context>) -> Result<Type, crate::eval::Error> {
-        match self {
-            Literal::Integer(_) => Ok(Type::Integer),
-            Literal::Number(n) => n.eval_type(None),
-            Literal::Bool(_) => Ok(Type::Bool),
-            Literal::Color(_) => Ok(Type::Color),
         }
     }
 }

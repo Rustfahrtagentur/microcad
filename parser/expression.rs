@@ -2,7 +2,6 @@ use crate::call::Call;
 use crate::eval::{self, Context, Eval};
 use crate::format_string::FormatString;
 use crate::identifier::QualifiedName;
-use crate::lang_type::{Type, TypeList};
 use crate::list::ListExpression;
 use crate::literal::Literal;
 use crate::parser::*;
@@ -178,16 +177,6 @@ impl Eval for Expression {
             _ => unimplemented!(),
         }
     }
-
-    /// The type this expression will evaluate to
-    fn eval_type(&self, context: Option<&Context>) -> Result<Type, eval::Error> {
-        use crate::lang_type::Ty;
-        match self {
-            Self::Literal(l) => l.eval_type(context),
-            Self::ListExpression(list) => list.eval_type(context),
-            expr => Self::eval(expr.clone(), context).map(|v| v.ty()),
-        }
-    }
 }
 
 impl Parse for Expression {
@@ -289,15 +278,6 @@ impl ExpressionList {
 
     pub fn get(&self, index: usize) -> Option<&Expression> {
         self.0.get(index)
-    }
-
-    pub fn type_list(&self) -> Result<TypeList, crate::eval::Error> {
-        let types = self
-            .0
-            .iter()
-            .map(|expr| expr.eval_type(None))
-            .collect::<Result<Vec<_>, _>>()?;
-        Ok(TypeList::from_types(types))
     }
 }
 
