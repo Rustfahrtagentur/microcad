@@ -229,6 +229,12 @@ impl Type {
 
 impl Parse for Type {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
+        assert_eq!(
+            pair.as_rule(),
+            Rule::r#type,
+            "Expected type, found {:?}",
+            pair.as_rule()
+        );
         let inner = pair.into_inner().next().unwrap();
 
         match inner.as_rule() {

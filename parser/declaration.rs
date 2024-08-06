@@ -146,40 +146,12 @@ mod tests {
     fn variable_declaration() {
         use crate::eval::Eval;
         let decl =
-            Parser::parse_rule_or_panic::<VariableDeclaration>(Rule::variable_declaration, "a = 1");
+            Parser::parse_rule_or_panic::<crate::function::Assignment>(Rule::assignment, "a = 1");
 
         let context = Context::default();
 
-        assert_eq!(decl.name, Identifier::from("a"));
-        assert_eq!(
-            decl.default_value
-                .unwrap()
-                .eval(Some(&context))
-                .unwrap()
-                .to_string(),
-            "1"
-        );
-        assert!(decl.specified_type.is_none());
-    }
-
-    #[test]
-    fn variable_declaration_list() {
-        let decls = Parser::parse_rule_or_panic::<VariableDeclarationList>(
-            Rule::variable_declaration_list,
-            "a = 1, b: length = 2mm, c = 2",
-        );
-
-        assert_eq!(decls.get(0).unwrap().name, Identifier::from("a"));
-        assert_eq!(decls.get(1).unwrap().name, Identifier::from("b"));
-        assert_eq!(decls.get(2).unwrap().name, Identifier::from("c"));
-        use std::str::FromStr;
-
-        assert_eq!(
-            decls
-                .get_by_name(&Identifier::from_str("a").unwrap())
-                .unwrap()
-                .name,
-            Identifier::from("a")
-        );
+        assert_eq!(decl.name(), &"a".into());
+        assert_eq!(decl.value().eval(Some(&context)).unwrap().to_string(), "1");
+        assert!(decl.specified_type().is_none());
     }
 }

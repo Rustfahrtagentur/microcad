@@ -136,7 +136,7 @@ module_type = { "{" ~ ws* ~ "}" }
 unnamed_tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ")" }
 
 //`(a: length, b = 4.0mm)`: ok # No default value for a, but for b
-named_tuple_type = { "(" ~ ws* ~ variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_declaration)* ~ ws* ~ ")" }
+named_tuple_type = { definition_parameter_list }
 
 
 //`[1, 2, 3]`: ok
@@ -291,25 +291,27 @@ function_call = _{ call }
 
 //`r: length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
-//`r: length`: ok # Default value is not required
+//`r: length`: error # Default value is required
 //`r: length = math::pi`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
-variable_declaration = { identifier ~ ws* ~ variant_declaration_type_specifier }
+assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
 
-variant_declaration_type_specifier = _{ type_annotation ~ ws* ~ default_value | type_annotation | default_value }
+assignment_statement = _{ assignment ~ ws* ~ ";" }
 
-//`a: scalar, b: scalar`: ok # Multiple arguments
-//`a: scalar, b: scalar = 5.0mm`: ok # Default value for second argument
-//`a: scalar = 5.0mm, b: scalar`: ok # Even first argument can have default value and rest can be positional
-variable_declaration_list = { variable_declaration ~ (ws* ~ "," ~ ws* ~ variable_declaration)* }
 
-argument_list = _{ "(" ~ ws* ~ variable_declaration_list? ~ ws* ~ ")" }
+// Rule for a single parameter of a definition
+//`r: length = 5.0mm`: ok
+//`r = 5.0mm`: ok # Type specifier with type inference
+//`r: length`: ok # Default value is NOT required
+//`r: length = math::pi`: ok # Type specifier + Default value from constant
+//`r`: error # neither type specifier or default value
+definition_parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation  }
 
-//`r: length = 5.0mm;`: ok
-variable_declaration_statement = { variable_declaration ~ ws* ~ ";" }
+definition_parameter_list = _{ "(" ~ ws* ~ (definition_parameter ~ (ws* ~ "," ~ ws* ~ definition_parameter)* ~ ws*)? ~ ")" }
+
 
 //`(a: scalar) -> scalar`: ok # Function signature with arguments
-function_signature = { argument_list ~ ws* ~ "->" ~ ws* ~ type }
+function_signature = { definition_parameter_list ~ ws* ~ "->" ~ ws* ~ type }
 
 //`function foo() -> scalar { return math::pi; }`: ok
 //`function foo() -> scalar {}`: ok # Empty function
@@ -322,7 +324,7 @@ function_definition = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature
 
 function_body = _{ "{" ~ (ws* ~ function_statement)* ~ ws* ~ "}" }
 
-function_statement = { variable_declaration_statement | use_statement | function_definition | function_return_statement | function_if_statement }
+function_statement = { assignment_statement | use_statement | function_definition | function_return_statement | function_if_statement }
 
 //`return 5.0mm;`: ok
 function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
@@ -335,11 +337,11 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo(a: scalar) { }`: ok # Module with arguments
 //`module foo(a: scalar, b: scalar) { }`: ok # Module with multiple arguments
 //`module foo() { return 5.0mm; }`: error # Module cannot have return statement
-//`module foo() { module bar() { } }`: ok # Nested module
+//`module foo() { module bar() { } }`: ok # Nested module definition
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
 module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~  
-  argument_list? ~ ws* ~
+definition_parameter_list? ~ ws* ~
     "{" ~ ws* ~ module_node_inner? ~ "}" }
 
 //`{ translate() rotate(); }`: ok
@@ -353,22 +355,14 @@ attribute = { "@" ~ qualified_name ~ (tuple_expression | list_expression)? }
 //`@foo(a) @bar`: ok
 attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
-//`a := 5.0mm`: ok # Single assignment
-//`b: length := 5.0mm`: ok
-id_assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ ":=" ~ ws* ~ expression }
+//`init(d: length) { r = d / 2; }`: ok
+module_init_definition = { "init" ~ ws* ~ definition_parameter_list ~ ws* ~ "{" ~ ws* ~ module_init_inner? ~ ws* ~ "}" }
 
-//`a := 5.0mm;`: ok
-id_assignment_statement = { id_assignment ~ ws* ~ ";" }
-
-//`init(r: length) { r := r; }`: ok
-module_node_init_declaration = { "init" ~ ws* ~ argument_list ~ ws* ~ "{" ~ ws* ~ module_node_init_inner? ~ ws* ~ "}" }
-
-module_node_init_inner = { ((use_statement | expression_statement | id_assignment_statement | variable_declaration_statement | function_definition) ~ ws*)+ }
+module_init_inner = { ((use_statement | expression_statement | function_definition | assignment_statement) ~ ws*)+ }
 
 //`{sphere(4.0mm)}`: ok
-module_statement = { use_statement | expression_statement |
-  module_node_init_declaration | module_definition | function_definition | variable_declaration_statement | 
-  id_assignment_statement }
+module_statement = { use_statement | expression_statement | assignment_statement |
+  module_init_definition | module_definition | function_definition }
 
 module_node_inner = { ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
 

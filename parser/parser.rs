@@ -37,6 +37,8 @@ pub enum ParseError {
     PositionalArgumentAfterNamed,
     #[error("Empty tuple expression")]
     EmptyTupleExpression,
+    #[error("Missing type or value for definition parameter: {0}")]
+    DefinitionParameterMissingTypeOrValue(Identifier),
 }
 
 pub trait Parse: Sized {

@@ -149,8 +149,8 @@ mod tests {
         assert_eq!(context.get_symbol("a").unwrap().name(), "a");
         assert_eq!(context.get_symbol("b").unwrap().name(), "b");
 
-        let c = Parser::parse_rule_or_panic::<VariableDeclaration>(
-            Rule::variable_declaration,
+        let c = Parser::parse_rule_or_panic::<crate::function::Assignment>(
+            Rule::assignment,
             "c = a + b",
         );
 
