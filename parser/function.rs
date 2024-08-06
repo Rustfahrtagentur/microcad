@@ -2,14 +2,16 @@ use crate::expression::Expression;
 use crate::identifier::Identifier;
 use crate::parser::*;
 
-use crate::declaration::{VariableDeclaration, VariableDeclarationList};
 use crate::lang_type::Type;
 use crate::module::UseStatement;
 
 #[derive(Clone)]
 pub struct DefinitionParameter {
+    #[allow(dead_code)]
     name: Identifier,
+    #[allow(dead_code)]
     specified_type: Option<Type>,
+    #[allow(dead_code)]
     value: Option<Expression>,
 }
 
@@ -74,12 +76,10 @@ impl FunctionSignature {
 
 impl Parse for FunctionSignature {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        let mut pairs = pair.into_inner();
-
         let mut arguments = Vec::new();
         let mut return_type = None;
 
-        for pair in pairs {
+        for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::definition_parameter => {
                     arguments.push(DefinitionParameter::parse(pair)?);
@@ -232,6 +232,24 @@ impl Parse for FunctionDefinition {
 #[cfg(test)]
 mod tests {
     use crate::eval::Symbol;
+
+    #[test]
+    fn assignment() {
+        use crate::eval::*;
+        use crate::parser::Parser;
+        use crate::parser::Rule;
+        let assignment =
+            Parser::parse_rule_or_panic::<crate::function::Assignment>(Rule::assignment, "a = 1");
+
+        let context = Context::default();
+
+        assert_eq!(assignment.name(), &"a".into());
+        assert_eq!(
+            assignment.value().eval(Some(&context)).unwrap().to_string(),
+            "1"
+        );
+        assert!(assignment.specified_type().is_none());
+    }
 
     #[test]
     fn function_signature() {

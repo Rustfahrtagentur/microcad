@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::vec;
 use thiserror::Error;
 
-use crate::declaration::VariableDeclaration;
 use crate::function::FunctionDefinition;
 use crate::identifier::{Identifier, QualifiedName};
 use crate::lang_type::Type;
@@ -149,7 +148,7 @@ mod tests {
         assert_eq!(context.get_symbol("a").unwrap().name(), "a");
         assert_eq!(context.get_symbol("b").unwrap().name(), "b");
 
-        let c = Parser::parse_rule_or_panic::<crate::function::Assignment>(
+        let _c = Parser::parse_rule_or_panic::<crate::function::Assignment>(
             Rule::assignment,
             "c = a + b",
         );

@@ -1,6 +1,5 @@
 pub mod call;
 pub mod color;
-pub mod declaration;
 pub mod diagnostics;
 pub mod eval;
 pub mod expression;
