@@ -217,6 +217,7 @@ nested = { (call | module_body | qualified_name) ~ (ws+ ~ (call | module_body | 
 //`{}`: ok # Empty block
 //`{ rectangle(width = 5.0mm); }`: ok # Single statement block
 //`translate(x = 5mm)`: ok
+//`ring_array(30mm, 8, {circle(5mm)})`: ok # Pass a module as function parameter
 expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
 bin_op           =  _{ add | subtract | multiply | divide | union | intersection | module_xor | greater_than | less_than | greater_equal | less_equal | equal | not_equal | and | or | xor | if_binary_op | else_binary_op }
   add            =   { "+" }
@@ -350,6 +351,7 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { module bar() { } }`: ok # Nested module definition
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
+//`module list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Module with module as argument
 module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ definition_parameter_list? ~ ws* ~ module_body }
 
 //`{ translate() rotate(); }`: ok
