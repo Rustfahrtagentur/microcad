@@ -146,6 +146,34 @@ impl ModuleDefinition {
             body: Vec::new(),
         }
     }
+
+    pub fn add_function(&mut self, function: FunctionDefinition) {
+        self.body
+            .push(ModuleStatement::FunctionDefinition(function));
+    }
+
+    pub fn add_module(&mut self, module: ModuleDefinition) {
+        self.body.push(ModuleStatement::ModuleDefinition(module));
+    }
+
+    pub fn get_symbol(&self, name: &Identifier) -> Option<crate::eval::Symbol> {
+        for statement in &self.body {
+            match statement {
+                ModuleStatement::FunctionDefinition(function) => {
+                    if &function.name == name {
+                        return Some(crate::eval::Symbol::Function(function.clone()));
+                    }
+                }
+                ModuleStatement::ModuleDefinition(module) => {
+                    if &module.name == name {
+                        return Some(crate::eval::Symbol::ModuleDefinition(module.clone()));
+                    }
+                }
+                _ => {}
+            }
+        }
+        None
+    }
 }
 
 impl Parse for ModuleDefinition {

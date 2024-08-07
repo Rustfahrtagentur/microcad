@@ -352,6 +352,18 @@ impl Value {
         Ok(self.greater_than(rhs)? || self.eq(rhs))
     }
 
+    pub fn neg(&self) -> Result<Value, ValueError> {
+        match self {
+            Value::Integer(n) => Ok(Value::Integer(-n)),
+            Value::Scalar(n) => Ok(Value::Scalar(-n)),
+            Value::Length(n) => Ok(Value::Length(-n)),
+            Value::Vec2(v) => Ok(Value::Vec2(-*v)),
+            Value::Vec3(v) => Ok(Value::Vec3(-*v)),
+            Value::Angle(n) => Ok(Value::Angle(-n)),
+            _ => Err(ValueError::InvalidOperator('-')),
+        }
+    }
+
     pub fn into_scalar(&self) -> Result<Scalar, ValueError> {
         match self {
             Value::Scalar(s) | Value::Length(s) | Value::Angle(s) => Ok(*s),

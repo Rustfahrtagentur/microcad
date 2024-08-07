@@ -5,6 +5,7 @@ use thiserror::Error;
 use crate::function::FunctionDefinition;
 use crate::identifier::{Identifier, QualifiedName};
 use crate::lang_type::Type;
+use crate::module::ModuleDefinition;
 use crate::value::{Value, ValueError};
 
 #[derive(Debug, Error)]
@@ -55,6 +56,7 @@ pub enum Error {
 pub enum Symbol {
     Value(Identifier, Value),
     Function(FunctionDefinition),
+    ModuleDefinition(ModuleDefinition),
 }
 
 impl Symbol {
@@ -62,6 +64,14 @@ impl Symbol {
         match self {
             Self::Value(decl, _) => decl.into(),
             Self::Function(decl) => (&decl.name).into(),
+            Self::ModuleDefinition(decl) => (&decl.name).into(),
+        }
+    }
+
+    pub fn get_symbol(&self, name: &Identifier) -> Option<Symbol> {
+        match self {
+            Self::ModuleDefinition(module) => module.get_symbol(name),
+            _ => None,
         }
     }
 }

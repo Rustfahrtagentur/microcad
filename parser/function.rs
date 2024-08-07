@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::call::EvaluatedCallArgumentList;
 use crate::eval::{Context, Eval, Symbol};
 use crate::expression::Expression;
@@ -96,8 +98,8 @@ impl Parse for DefinitionParameter {
 
 #[derive(Clone)]
 pub struct FunctionSignature {
-    parameters: Vec<DefinitionParameter>,
-    return_type: Type,
+    pub parameters: Vec<DefinitionParameter>,
+    pub return_type: Type,
 }
 
 impl FunctionSignature {
@@ -258,14 +260,31 @@ impl FunctionStatement {
     }
 }
 
+pub type BuiltinFunction =
+    Rc<dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Value, crate::eval::Error>>;
+
 #[derive(Clone)]
 pub struct FunctionDefinition {
     pub name: Identifier,
     pub signature: FunctionSignature,
     pub body: Vec<FunctionStatement>,
+    pub builtin: Option<BuiltinFunction>,
 }
 
 impl FunctionDefinition {
+    pub fn builtin(
+        name: Identifier,
+        signature: FunctionSignature,
+        builtin: BuiltinFunction,
+    ) -> Self {
+        Self {
+            name,
+            signature,
+            body: Vec::new(),
+            builtin: Some(builtin),
+        }
+    }
+
     pub fn name(&self) -> &Identifier {
         &self.name
     }
@@ -280,11 +299,28 @@ impl FunctionDefinition {
 }
 
 impl FunctionDefinition {
+    pub fn new(
+        name: Identifier,
+        signature: FunctionSignature,
+        body: Vec<FunctionStatement>,
+    ) -> Self {
+        Self {
+            name,
+            signature,
+            body,
+            builtin: None,
+        }
+    }
+
     pub fn call(
         &self,
         args: EvaluatedCallArgumentList,
         context: &mut Context,
     ) -> Result<Value, crate::eval::Error> {
+        if let Some(builtin) = &self.builtin {
+            return builtin(args, context);
+        }
+
         let params = self.signature.parameters();
 
         for param in params {
@@ -321,6 +357,7 @@ impl Parse for FunctionDefinition {
             name,
             signature,
             body,
+            builtin: None,
         })
     }
 }
@@ -388,12 +425,7 @@ mod tests {
             c = 1.0;
             return a + b + c;
         }";
-
-        let function_decl =
-            Parser::parse_rule_or_panic::<FunctionDefinition>(Rule::function_definition, input);
-
-        let mut context = crate::eval::Context::default();
-        context.add_symbol(Symbol::Function(function_decl));
+        Parser::parse_rule_or_panic::<FunctionDefinition>(Rule::function_definition, input);
     }
 
     #[test]

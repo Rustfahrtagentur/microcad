@@ -207,6 +207,15 @@ impl Eval for Expression {
                 }
                 .map_err(eval::Error::ValueError)
             }
+            Self::UnaryOp { op, rhs } => {
+                let rhs = rhs.eval(context)?;
+
+                match op {
+                    '-' => rhs.neg(),
+                    _ => unimplemented!(),
+                }
+                .map_err(eval::Error::ValueError)
+            }
             Self::ElementAccess(lhs, rhs) => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
@@ -238,7 +247,7 @@ impl Eval for Expression {
                 }
             }
             Self::Nested(nested) => nested.eval(context),
-            _ => unimplemented!(),
+            _ => unimplemented!("{:?}", self),
         }
     }
 }

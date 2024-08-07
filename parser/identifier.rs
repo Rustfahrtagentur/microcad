@@ -184,12 +184,25 @@ impl Eval for QualifiedName {
     type Output = crate::eval::Symbol;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, crate::eval::Error> {
-        let identifier = self.0.first().unwrap();
-        let first_symbol = context.get_symbol(identifier.into());
-        match first_symbol {
-            Some(symbol) => Ok(symbol.clone()),
-            None => Err(crate::eval::Error::SymbolNotFound(identifier.clone())),
+        let mut symbol = None;
+
+        for (i, ident) in self.0.iter().enumerate() {
+            if i == 0 {
+                match context.get_symbol(ident.into()) {
+                    Some(s) => {
+                        symbol = Some(s.clone());
+                    }
+                    _ => return Err(crate::eval::Error::SymbolNotFound(ident.clone())),
+                }
+            } else {
+                symbol = match symbol {
+                    Some(crate::eval::Symbol::ModuleDefinition(module)) => module.get_symbol(ident),
+                    _ => return Err(crate::eval::Error::SymbolNotFound(ident.clone())),
+                }
+            }
         }
+
+        Ok(symbol.unwrap())
     }
 }
 
