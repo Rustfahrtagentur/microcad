@@ -132,12 +132,15 @@ map_type = { "[" ~ ws* ~ type ~ ws* ~ "=>" ~ ws* ~ type ~ ws* ~ "]" }
 module_type = { "{" ~ ws* ~ "}" }
 
 //`(length,scalar)`: ok # 2 unnamed fields
-//`(length, a: length = 4.0mm)`: error # Cannot mix named and unnamed arguments
-unnamed_tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ")" }
+//`(length, a: length)`: error # Cannot mix named and unnamed arguments
+unnamed_tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
-//`(a: length, b = 4.0mm)`: ok # No default value for a, but for b
-named_tuple_type = { definition_parameter_list }
+//`(a: length, b: scalar)`: ok
+//`(a: length, )`: ok # Trailing comma 
+named_tuple_type = { "(" ~ ws* ~ named_tuple_type_element ~ (ws* ~ "," ~ ws* ~ named_tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
+//`a: length`: ok
+named_tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
 
 //`[1, 2, 3]`: ok
 //`[1, 2, 3,]`: error # Trailing comma
@@ -293,9 +296,7 @@ call = { qualified_name ~ ws* ~ call_op }
 //`@foo(x)`: ok
 attribute = { "@" ~ qualified_name ~ call_op? }
 
-//`@foo`: ok
-//`@foo(a) @bar`: ok
-attribute_list = { attribute ~ (ws+ ~ attribute)* }
+attribute_list = _{ attribute ~ (ws+ ~ attribute)* }
 
 
 //`r: length = 5.0mm`: ok
@@ -316,7 +317,7 @@ assignment_statement = _{ assignment ~ ws* ~ ";" }
 //`r`: error # neither type specifier or default value
 definition_parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation  }
 
-definition_parameter_list = _{ "(" ~ ws* ~ (definition_parameter ~ (ws* ~ "," ~ ws* ~ definition_parameter)* ~ ws*)? ~ ")" }
+definition_parameter_list = { "(" ~ ws* ~ (definition_parameter ~ (ws* ~ "," ~ ws* ~ definition_parameter)* ~ ws*)? ~ ","? ~ ")" }
 
 
 //`(a: scalar) -> scalar`: ok # Function signature with arguments
@@ -349,22 +350,23 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { module bar() { } }`: ok # Nested module definition
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
-module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~  
-definition_parameter_list? ~ ws* ~ module_body }
+module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ definition_parameter_list? ~ ws* ~ module_body }
 
 //`{ translate() rotate(); }`: ok
 module_body = { "{" ~ ws* ~ module_node_inner? ~ ws*~ "}" }
 
+module_node_inner = _{ ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
+
+module_statement = _{ use_statement | expression_statement | assignment_statement |
+  module_init_definition | module_definition | function_definition }
+
 //`init(d: length) { r = d / 2; }`: ok
 module_init_definition = { "init" ~ ws* ~ definition_parameter_list ~ ws* ~ "{" ~ ws* ~ module_init_inner? ~ ws* ~ "}" }
 
-module_init_inner = { ((use_statement | expression_statement | function_definition | assignment_statement) ~ ws*)+ }
+module_init_statement = _{ assignment_statement | use_statement | function_definition | module_init_definition }
 
-//`{sphere(4.0mm)}`: ok
-module_statement = { use_statement | expression_statement | assignment_statement |
-  module_init_definition | module_definition | function_definition }
+module_init_inner = _{ ws* ~ (module_init_statement ~ ws*)+ | ws* ~ (module_init_statement ~ ws*)* ~ expression }
 
-module_node_inner = { ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
 
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok

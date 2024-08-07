@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::rc::Rc;
 use std::vec;
 use thiserror::Error;
 
@@ -44,6 +43,12 @@ pub enum Error {
     ListElementsDifferentTypes,
     #[error("Unknown error")]
     Unknown,
+    #[error("Function call missing argument: {0}")]
+    FunctionCallMissingArgument(Identifier),
+    #[error("Function must return a value")]
+    FunctionCallMissingReturn,
+    #[error("Symbol not found: {0}")]
+    SymbolNotFound(Identifier),
 }
 
 #[derive(Clone)]
@@ -105,26 +110,13 @@ impl Context {
         self.stack.last_mut().unwrap().add(symbol);
     }
 
-    pub fn get_symbol(&self, name: impl Into<String>) -> Option<&Symbol> {
-        let name = name.into();
+    pub fn get_symbol(&self, name: &str) -> Option<&Symbol> {
         for table in self.stack.iter().rev() {
-            if let Some(symbol) = table.get(&name) {
+            if let Some(symbol) = table.get(name) {
                 return Some(symbol);
             }
         }
         None
-    }
-
-    pub fn resolve(&self, name: &QualifiedName) -> Result<&Symbol, Error> {
-        // TODO: handle qualified names
-        // We only handle the last piece of the qualified name
-        let last = name.last();
-        let symbol = self.get_symbol(last.clone());
-        if let Some(symbol) = symbol {
-            Ok(symbol)
-        } else {
-            Err(Error::UnknownQualifiedName(name.clone()))
-        }
     }
 }
 

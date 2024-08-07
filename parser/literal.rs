@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::color::Color;
 use crate::eval::{Context, Eval, OperatorError};
 use crate::lang_type::{Ty, Type};

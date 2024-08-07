@@ -1,5 +1,4 @@
 use std::collections::BTreeMap;
-use std::rc::Rc;
 
 use crate::call::CallArgumentList;
 use crate::eval::{Context, Eval};
@@ -8,7 +7,7 @@ use crate::parser::{Pair, Parse, ParseError};
 use crate::units::Unit;
 use crate::value::{NamedTuple, UnnamedTuple, Value, ValueList, Vec2, Vec3};
 
-#[derive(Default, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct TupleExpression(CallArgumentList, Option<Unit>);
 
 impl Parse for TupleExpression {
@@ -29,6 +28,34 @@ impl Parse for TupleExpression {
                 None => None,
             },
         ))
+    }
+}
+
+impl std::fmt::Display for TupleExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if self.0.contains_positional() {
+            write!(f, "(")?;
+            for (i, expr) in self.0.get_positional().iter().enumerate() {
+                if i > 0 {
+                    write!(f, ", ")?;
+                }
+                write!(f, "{}", expr)?;
+            }
+            write!(f, ")")?;
+        } else {
+            write!(f, "(")?;
+            for (i, (ident, expr)) in self.0.get_named().iter().enumerate() {
+                if i > 0 {
+                    write!(f, ", ")?;
+                }
+                write!(f, "{} = {}", ident, expr)?;
+            }
+            write!(f, ")")?;
+        }
+        if let Some(unit) = self.1 {
+            write!(f, "{}", unit)?;
+        }
+        Ok(())
     }
 }
 
@@ -89,8 +116,6 @@ impl Eval for TupleExpression {
 
 #[cfg(test)]
 mod tests {
-    use std::rc::Rc;
-
     use crate::{eval::Context, lang_type::Ty, parser::Rule, tuple::TupleExpression};
 
     #[test]

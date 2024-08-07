@@ -1,4 +1,7 @@
-use crate::parser::{Pair, Parse, ParseError};
+use crate::{
+    eval::{Context, Eval},
+    parser::{Pair, Parse, ParseError},
+};
 
 use thiserror::Error;
 
@@ -109,6 +112,18 @@ impl IdentifierList {
     }
 }
 
+impl std::fmt::Display for IdentifierList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = self
+            .0
+            .iter()
+            .map(|ident| ident.0.clone())
+            .collect::<Vec<_>>()
+            .join(", ");
+        write!(f, "{}", s)
+    }
+}
+
 impl Parse for IdentifierList {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
         let mut vec = Vec::new();
@@ -162,6 +177,19 @@ impl std::fmt::Display for QualifiedName {
             .collect::<Vec<_>>()
             .join("::");
         write!(f, "{}", s)
+    }
+}
+
+impl Eval for QualifiedName {
+    type Output = crate::eval::Symbol;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, crate::eval::Error> {
+        let identifier = self.0.first().unwrap();
+        let first_symbol = context.get_symbol(identifier.into());
+        match first_symbol {
+            Some(symbol) => Ok(symbol.clone()),
+            None => Err(crate::eval::Error::SymbolNotFound(identifier.clone())),
+        }
     }
 }
 

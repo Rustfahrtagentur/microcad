@@ -1,55 +1,186 @@
 // Resolve a qualified name to a type or value.
 
-use crate::call::Call;
+use std::fmt::Display;
+
+use crate::call::CallArgumentList;
+use crate::expression::Expression;
+use crate::function::{Assignment, DefinitionParameter, FunctionDefinition};
 use crate::identifier::{Identifier, QualifiedName};
 use crate::parser::*;
 
-#[derive(Default)]
-pub struct ModuleNested(Vec<Call>);
+#[derive(Clone)]
+pub struct Attribute {
+    pub name: QualifiedName,
+    pub arguments: Option<CallArgumentList>,
+}
 
-impl Parse for ModuleNested {
+impl Parse for Attribute {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        Ok(ModuleNested(Parser::vec(pair.into_inner(), Call::parse)?))
+        let mut pairs = pair.into_inner();
+        let name = QualifiedName::parse(pairs.next().unwrap())?;
+
+        if let Some(p) = pairs.next() {
+            Ok(Attribute {
+                name,
+                arguments: Some(CallArgumentList::parse(p)?),
+            })
+        } else {
+            Ok(Attribute {
+                name,
+                arguments: None,
+            })
+        }
     }
 }
-/*impl Parse for ModuleNodeExpression {
+
+impl Display for Attribute {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match &self.arguments {
+            Some(arguments) => write!(f, "{}({})", self.name, arguments),
+            None => write!(f, "{}", self.name),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub enum ModuleInitStatement {
+    Use(UseStatement),
+    Expression(Expression),
+    Assignment(Assignment),
+    FunctionDefinition(FunctionDefinition),
+}
+
+impl Parse for ModuleInitStatement {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let mut pairs = pair.into_inner();
+        let first = pairs.next().unwrap();
 
-
+        match first.as_rule() {
+            Rule::use_statement => Ok(ModuleInitStatement::Use(UseStatement::parse(first)?)),
+            Rule::expression => Ok(ModuleInitStatement::Expression(Expression::parse(first)?)),
+            Rule::assignment => Ok(ModuleInitStatement::Assignment(Assignment::parse(first)?)),
+            Rule::function_definition => Ok(ModuleInitStatement::FunctionDefinition(
+                FunctionDefinition::parse(first)?,
+            )),
+            _ => unreachable!(),
+        }
     }
-}*/
-
-/*
-
-pub struct _Module {
-    name: Identifier,
-    constructor: Vec<FunctionArgument>,
 }
 
-trait ParseNode {
-    fn parse_node(pair: Pair, root: SyntaxNode) -> Result<Self, ParseError>;
+#[derive(Clone)]
+pub struct ModuleInitDefinition {
+    #[allow(dead_code)]
+    parameters: Vec<DefinitionParameter>,
+    #[allow(dead_code)]
+    body: Vec<ModuleInitStatement>,
 }
 
-trait Build {
-    fn build(
-        self,
-        node: SyntaxNode,
-        context: &mut Context,
-    ) -> Result<crate::tree::Node, ParseError>;
-}
+impl Parse for ModuleInitDefinition {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let mut parameters = Vec::new();
+        let mut body = Vec::new();
 
-fn build(root: SyntaxNode) -> Result<crate::tree::Node, BuildError> {
-    let mut context = Context::default();
-    let mut tree = Tree::default();
+        for pair in pair.into_inner() {
+            match pair.as_rule() {
+                Rule::definition_parameter => {
+                    parameters.push(DefinitionParameter::parse(pair)?);
+                }
+                Rule::module_init_statement => {
+                    body.push(ModuleInitStatement::parse(pair)?);
+                }
+                _ => unreachable!(),
+            }
+        }
 
-    for node in root.children() {
-        tree.append_node(node);
+        Ok(ModuleInitDefinition { parameters, body })
     }
-
-    Ok(node)
 }
 
-*/
+#[derive(Clone)]
+pub enum ModuleStatement {
+    Use(UseStatement),
+    Expression(Expression),
+    Assignment(Assignment),
+    ModuleDefinition(ModuleDefinition),
+    ModuleInitDefinition(ModuleInitDefinition),
+    FunctionDefinition(FunctionDefinition),
+}
+
+impl Parse for ModuleStatement {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let mut pairs = pair.into_inner();
+        let first = pairs.next().unwrap();
+
+        match first.as_rule() {
+            Rule::use_statement => Ok(ModuleStatement::Use(UseStatement::parse(first)?)),
+            Rule::expression => Ok(ModuleStatement::Expression(Expression::parse(first)?)),
+            Rule::assignment => Ok(ModuleStatement::Assignment(Assignment::parse(first)?)),
+            Rule::module_definition => Ok(ModuleStatement::ModuleDefinition(
+                ModuleDefinition::parse(first)?,
+            )),
+            Rule::module_init_definition => Ok(ModuleStatement::ModuleInitDefinition(
+                ModuleInitDefinition::parse(first)?,
+            )),
+            Rule::function_definition => Ok(ModuleStatement::FunctionDefinition(
+                FunctionDefinition::parse(first)?,
+            )),
+            _ => unreachable!(),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct ModuleDefinition {
+    pub attributes: Vec<Attribute>,
+    pub name: Identifier,
+    pub parameters: Option<Vec<DefinitionParameter>>,
+    pub body: Vec<ModuleStatement>,
+}
+
+impl ModuleDefinition {
+    pub fn namespace(name: Identifier) -> Self {
+        ModuleDefinition {
+            attributes: Vec::new(),
+            name,
+            parameters: None,
+            body: Vec::new(),
+        }
+    }
+}
+
+impl Parse for ModuleDefinition {
+    fn parse(pair: Pair) -> Result<Self, ParseError> {
+        let mut attributes = Vec::new();
+        let mut name = Identifier::default();
+        let mut parameters = None;
+        let mut body = Vec::new();
+
+        for pair in pair.into_inner() {
+            match pair.as_rule() {
+                Rule::attribute_list => {
+                    attributes.push(Attribute::parse(pair)?);
+                }
+                Rule::identifier => {
+                    name = Identifier::parse(pair)?;
+                }
+                Rule::definition_parameter_list => {
+                    parameters = Some(Parser::vec(pair.into_inner(), DefinitionParameter::parse)?);
+                }
+                Rule::module_statement => {
+                    body.push(ModuleStatement::parse(pair)?);
+                }
+                _ => unreachable!(),
+            }
+        }
+
+        Ok(ModuleDefinition {
+            attributes,
+            name,
+            parameters,
+            body,
+        })
+    }
+}
 
 #[derive(Clone)]
 pub struct UseAlias(pub QualifiedName, pub Identifier);

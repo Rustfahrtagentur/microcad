@@ -1,12 +1,10 @@
-use std::rc::Rc;
-
 use crate::eval::{Context, Eval};
 use crate::expression::{Expression, ExpressionList};
 use crate::parser::{Pair, Parse, ParseError};
 use crate::units::Unit;
 use crate::value::{Value, ValueList};
 
-#[derive(Default, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct ListExpression(ExpressionList, Option<Unit>);
 
 impl ListExpression {
@@ -33,6 +31,23 @@ impl Parse for ListExpression {
                 None => None,
             },
         ))
+    }
+}
+
+impl std::fmt::Display for ListExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "[")?;
+        for (i, expr) in self.0.iter().enumerate() {
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}", expr)?;
+        }
+        write!(f, "]")?;
+        if let Some(unit) = self.1 {
+            write!(f, "{}", unit)?;
+        }
+        Ok(())
     }
 }
 

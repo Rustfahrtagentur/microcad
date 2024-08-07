@@ -1,11 +1,9 @@
-use std::rc::Rc;
-
 use crate::eval::{Context, Error, Eval};
 use crate::expression::Expression;
 use crate::parser::*;
 use crate::value::Value;
 
-#[derive(Default, Clone)]
+#[derive(Clone, Debug, Default)]
 struct FormatSpec {
     precision: Option<u32>,
     leading_zeros: Option<u32>,
@@ -31,7 +29,7 @@ impl Parse for FormatSpec {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct FormatExpression(FormatSpec, Box<Expression>);
 
 impl Parse for FormatExpression {
@@ -57,14 +55,20 @@ impl Eval for FormatExpression {
     }
 }
 
-#[derive(Clone)]
+impl std::fmt::Display for FormatExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{{{}}}", self.1)
+    }
+}
+
+#[derive(Clone, Debug)]
 enum FormatStringInner {
     String(String),
     FormatExpression(FormatExpression),
 }
 
 /// Definition and implementation for `StringLiteral`
-#[derive(Default, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct FormatString(Vec<FormatStringInner>);
 
 impl FormatString {
@@ -78,6 +82,18 @@ impl FormatString {
 
     pub fn section_count(&self) -> usize {
         self.0.len()
+    }
+}
+
+impl std::fmt::Display for FormatString {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        for elem in &self.0 {
+            match elem {
+                FormatStringInner::String(s) => write!(f, "{}", s)?,
+                FormatStringInner::FormatExpression(expr) => write!(f, "{}", expr)?,
+            }
+        }
+        Ok(())
     }
 }
 

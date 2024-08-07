@@ -1,14 +1,13 @@
-use std::borrow::Borrow;
 use std::collections::BTreeMap;
-use std::rc::Rc;
 
-use crate::eval::{Context, Symbol};
+use crate::eval::{Context, Eval, Symbol};
 use crate::expression::Expression;
 use crate::identifier::QualifiedName;
 use crate::identifier::{Identifier, IdentifierList};
 
 use crate::parser::*;
 
+#[derive(Clone, Debug)]
 enum CallArgument {
     Named(Identifier, Box<Expression>),
     NamedTuple(IdentifierList, Box<Expression>),
@@ -44,7 +43,19 @@ impl Parse for CallArgument {
     }
 }
 
-#[derive(Default, Clone)]
+impl std::fmt::Display for CallArgument {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            CallArgument::Named(ident, expr) => write!(f, "{} = {}", ident, expr),
+            CallArgument::NamedTuple(idents, expr) => {
+                write!(f, "({}) = {}", idents, expr)
+            }
+            CallArgument::Position(expr) => write!(f, "{}", expr),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default)]
 pub struct PositionalNamedList<T> {
     positional: Vec<T>,
     named: BTreeMap<Identifier, T>,
@@ -115,18 +126,37 @@ impl<T> PositionalNamedList<T> {
     }
 }
 
-impl CallArgumentList {
-    pub fn eval(
-        &self,
-        context: &mut Context,
-    ) -> Result<EvaluatedCallArgumentList, crate::eval::Error> {
-        use crate::eval::Eval;
-        let mut evaluated = EvaluatedCallArgumentList::new();
-        for (ident, expr) in self.named.iter() {
-            evaluated.insert_named(ident.clone(), expr.eval(context)?);
+impl<T> std::fmt::Display for PositionalNamedList<T>
+where
+    T: std::fmt::Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let mut first = true;
+        for arg in self.iter() {
+            if first {
+                first = false;
+            } else {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}", arg)?;
         }
+        Ok(())
+    }
+}
+
+impl Eval for CallArgumentList {
+    type Output = EvaluatedCallArgumentList;
+
+    fn eval(&self, context: &mut Context) -> Result<EvaluatedCallArgumentList, crate::eval::Error> {
+        let mut evaluated = EvaluatedCallArgumentList::new();
         for expr in self.positional.iter() {
-            evaluated.insert_positional(expr.eval(context)?);
+            evaluated.insert_positional(expr.eval(context)?).unwrap(); // Unwrap is safe because we checked for named arguments already
+        }
+
+        for (ident, expr) in self.named.iter() {
+            evaluated
+                .insert_named(ident.clone(), expr.eval(context)?)
+                .unwrap(); // Unwrap is safe because we checked for duplicates in insert_named
         }
         Ok(evaluated)
     }
@@ -163,7 +193,7 @@ impl Parse for CallArgumentList {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct MethodCall {
     pub name: Identifier,
     pub argument_list: CallArgumentList,
@@ -185,7 +215,13 @@ impl Parse for MethodCall {
     }
 }
 
-#[derive(Default, Clone)]
+impl std::fmt::Display for MethodCall {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}({})", self.name, self.argument_list)
+    }
+}
+
+#[derive(Clone, Debug, Default)]
 pub struct Call {
     #[allow(dead_code)]
     name: QualifiedName,
@@ -205,16 +241,20 @@ impl Parse for Call {
     }
 }
 
+impl std::fmt::Display for Call {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}({})", self.name, self.argument_list)
+    }
+}
+
 impl crate::eval::Eval for Call {
     type Output = crate::value::Value;
 
     fn eval(&self, context: &mut Context) -> Result<crate::value::Value, crate::eval::Error> {
-        match context.resolve(&self.name)?.clone() {
+        match &self.name.eval(context)? {
             Symbol::Function(f) => {
                 let args = self.argument_list.eval(context)?;
-                {
-                    f.call(args, context)
-                }
+                f.call(args, context)
             }
             _ => unimplemented!("Call::eval for symbol"),
         }

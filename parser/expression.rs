@@ -1,7 +1,5 @@
-use std::rc::Rc;
-
-use crate::call::Call;
-use crate::eval::{self, Context, Eval};
+use crate::call::{Call, MethodCall};
+use crate::eval::{self, Context, Eval, Symbol};
 use crate::format_string::FormatString;
 use crate::identifier::QualifiedName;
 use crate::list::ListExpression;
@@ -33,7 +31,7 @@ lazy_static::lazy_static! {
     };
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum NestedItem {
     Call(Call),
     QualifiedName(QualifiedName),
@@ -53,7 +51,16 @@ impl Parse for NestedItem {
     }
 }
 
-#[derive(Clone)]
+impl std::fmt::Display for NestedItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            NestedItem::Call(call) => write!(f, "{}", call),
+            NestedItem::QualifiedName(qualified_name) => write!(f, "{}", qualified_name),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Nested(Vec<NestedItem>);
 
 impl Parse for Nested {
@@ -70,21 +77,29 @@ impl Eval for Nested {
     type Output = crate::value::Value;
 
     fn eval(&self, context: &mut Context) -> Result<Value, eval::Error> {
+        let mut value = None;
         for item in &self.0 {
-            match item {
-                NestedItem::Call(call) => {
-                    // Ok(call.eval(context)?);
-                } //NestedItem::QualifiedName(qualified_name) => match context {
-                //    Ok(qualified_name.eval(context)?)
-                //}
-                _ => todo!(),
+            if value.is_none() {
+                match item {
+                    NestedItem::Call(call) => value = Some(call.eval(context)?),
+                    NestedItem::QualifiedName(qualified_name) => {
+                        match qualified_name.eval(context)? {
+                            Symbol::Value(_, v) => value = Some(v),
+                            _ => todo!(),
+                        }
+                    }
+                }
             }
         }
-        Err(eval::Error::Unknown)
+
+        match value {
+            Some(v) => Ok(v),
+            None => Err(eval::Error::Unknown),
+        }
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Debug, Default, Clone)]
 pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
@@ -130,8 +145,34 @@ pub enum Expression {
     ElementAccess(Box<Expression>, Box<Expression>),
 
     /// Call to a method: `[2,3].len()`
-    /// First expression must evaluate to `ModuleRef` or `FunctionRef`
-    MethodCall(Box<Expression>, crate::call::MethodCall),
+    /// First expression must evaluate to a value
+    MethodCall(Box<Expression>, MethodCall),
+}
+
+impl std::fmt::Display for Expression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::Literal(literal) => write!(f, "{}", literal),
+            Self::FormatString(format_string) => write!(f, "{}", format_string),
+            Self::ListExpression(list_expression) => write!(f, "{}", list_expression),
+            Self::TupleExpression(tuple_expression) => write!(f, "{}", tuple_expression),
+            Self::BinaryOp { lhs, op, rhs } => write!(f, "({} {} {})", lhs, op, rhs),
+            Self::UnaryOp { op, rhs } => write!(f, "({}{})", op, rhs),
+            Self::ElementAccess(lhs, rhs) => write!(f, "{}[{}]", lhs, rhs),
+            Self::MethodCall(lhs, method_call) => write!(f, "{}.{}", lhs, method_call),
+            Self::Nested(nested) => {
+                let mut iter = nested.0.iter();
+                if let Some(first) = iter.next() {
+                    write!(f, "{}", first)?;
+                    for item in iter {
+                        write!(f, " {}", item)?;
+                    }
+                }
+                Ok(())
+            }
+            _ => unimplemented!(),
+        }
+    }
 }
 
 impl Expression {}
@@ -196,6 +237,7 @@ impl Eval for Expression {
                     _ => Err(eval::Error::UnknownMethod(name.into())),
                 }
             }
+            Self::Nested(nested) => nested.eval(context),
             _ => unimplemented!(),
         }
     }
@@ -282,7 +324,7 @@ impl Parse for Expression {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Clone, Default, Debug)]
 pub struct ExpressionList(Vec<Expression>);
 
 impl ExpressionList {
@@ -300,6 +342,10 @@ impl ExpressionList {
 
     pub fn get(&self, index: usize) -> Option<&Expression> {
         self.0.get(index)
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<Expression> {
+        self.0.iter()
     }
 }
 
@@ -319,6 +365,18 @@ impl Parse for ExpressionList {
                 .map(|pair| Expression::parse(pair))
                 .collect::<Result<Vec<_>, _>>()?,
         ))
+    }
+}
+
+impl std::fmt::Display for ExpressionList {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        for (i, expr) in self.0.iter().enumerate() {
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}", expr)?;
+        }
+        Ok(())
     }
 }
 

@@ -134,6 +134,12 @@ pub struct NamedTupleType(pub BTreeMap<Identifier, Type>);
 
 impl Parse for NamedTupleType {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
+        assert_eq!(
+            pair.as_rule(),
+            Rule::named_tuple_type,
+            "Expected named tuple type, found {:?}",
+            pair.as_rule()
+        );
         let mut types = BTreeMap::new();
         for pair in pair.into_inner() {
             let mut inner = pair.into_inner();
@@ -152,11 +158,11 @@ impl Parse for NamedTupleType {
 impl std::fmt::Display for NamedTupleType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "(")?;
-        for (i, (name, ty)) in self.0.iter().enumerate() {
+        for (i, (identifier, ty)) in self.0.iter().enumerate() {
             if i > 0 {
                 write!(f, ", ")?;
             }
-            write!(f, "{}: {}", name, ty)?;
+            write!(f, "{}: {}", identifier, ty)?;
         }
         write!(f, ")")
     }
