@@ -179,7 +179,9 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 
 
 //`translate() rotate()`: ok
-nested = { (call | module_node_inner_statement | qualified_name) ~ (ws+ ~ (call | module_node_inner_statement | qualified_name))* }
+//`translate() rotate() { translate() rotate() {} }`: ok
+//`rotate() {}`: ok
+nested = { (call | module_body | qualified_name) ~ (ws+ ~ (call | module_body | qualified_name))* }
 
 
 //`-5.0mm`: ok # Negate
@@ -238,7 +240,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ method_call | element_access }
-primary          =  _{ nested ~ ws* ~ module_node_inner_statement | nested | literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
+primary          =  _{ nested ~ ws* ~ module_body | nested | literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok
@@ -246,7 +248,7 @@ primary          =  _{ nested ~ ws* ~ module_node_inner_statement | nested | lit
 expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
 // A statement that is an single expression
-expression_statement = { expression ~ ws* ~ ";" | expression? ~ ws* ~ module_node_inner_statement | module_node_inner_statement }
+expression_statement = { expression ~ ws* ~ ";" | expression? ~ ws* ~ module_body | module_body }
 
 //`1..4`: ok
 //`a..b`: ok
@@ -287,7 +289,14 @@ method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 //`a::nested::function(a = 3.0mm, b = 2.0mm)`: ok
 call = { qualified_name ~ ws* ~ call_op }
 
-function_call = _{ call }
+//`@foo`: ok
+//`@foo(x)`: ok
+attribute = { "@" ~ qualified_name ~ call_op? }
+
+//`@foo`: ok
+//`@foo(a) @bar`: ok
+attribute_list = { attribute ~ (ws+ ~ attribute)* }
+
 
 //`r: length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
@@ -341,19 +350,10 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
 module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~  
-definition_parameter_list? ~ ws* ~
-    "{" ~ ws* ~ module_node_inner? ~ "}" }
+definition_parameter_list? ~ ws* ~ module_body }
 
 //`{ translate() rotate(); }`: ok
-module_node_inner_statement = { "{" ~ ws* ~ module_node_inner? ~ ws* ~ "}" }
-
-//`@foo`: ok
-//`@foo(x)`: ok
-attribute = { "@" ~ qualified_name ~ (tuple_expression | list_expression)? }
-
-//`@foo`: ok
-//`@foo(a) @bar`: ok
-attribute_list = { attribute ~ (ws+ ~ attribute)* }
+module_body = { "{" ~ ws* ~ module_node_inner? ~ ws*~ "}" }
 
 //`init(d: length) { r = d / 2; }`: ok
 module_init_definition = { "init" ~ ws* ~ definition_parameter_list ~ ws* ~ "{" ~ ws* ~ module_init_inner? ~ ws* ~ "}" }
