@@ -407,13 +407,13 @@ mod tests {
             return a + b + c;
         }";
 
-        let function_decl = Parser::parse_rule_or_panic::<crate::function::FunctionDefinition>(
+        let function_def = Parser::parse_rule_or_panic::<crate::function::FunctionDefinition>(
             Rule::function_definition,
             input,
         );
 
         let mut context = Context::default();
-        context.add_symbol(Symbol::Function(function_decl.clone()));
+        context.add_symbol(Symbol::Function(function_def));
 
         let input = "test(a = 1, b = 2)";
         let expr =
