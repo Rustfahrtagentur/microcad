@@ -1,7 +1,7 @@
 use crate::color::Color;
 use crate::eval::{Context, Eval, OperatorError};
 use crate::lang_type::{Ty, Type};
-use crate::parser::{Pair, Parse, ParseError, Rule};
+use crate::parser::{Pair, Parse, ParseError, Parser, Rule};
 use crate::units::Unit;
 use crate::value::Value;
 
@@ -113,7 +113,7 @@ impl std::ops::Div for NumberLiteral {
 
 impl Parse for NumberLiteral {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        assert_eq!(pair.as_rule(), Rule::number_literal);
+        Parser::ensure_rule(&pair, Rule::number_literal);
 
         let mut pairs = pair.into_inner();
         let number_token = pairs.next().unwrap();
@@ -182,7 +182,8 @@ impl Ty for Literal {
 
 impl Parse for Literal {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        assert_eq!(pair.as_rule(), Rule::literal);
+        Parser::ensure_rule(&pair, Rule::literal);
+
         let inner = pair.into_inner().next().unwrap();
 
         match inner.as_rule() {

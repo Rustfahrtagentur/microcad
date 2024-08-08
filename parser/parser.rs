@@ -68,6 +68,11 @@ impl Parser {
             .unwrap();
         T::parse(pair).unwrap()
     }
+
+    pub fn ensure_rule(pair: &Pair, expected: Rule) {
+        let rule = pair.as_rule();
+        assert_eq!(rule, expected, "Unexpected rule: {:?}", rule);
+    }
 }
 
 #[cfg(test)]

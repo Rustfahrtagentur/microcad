@@ -108,7 +108,7 @@ pub enum ModuleStatement {
 
 impl Parse for ModuleStatement {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
-        assert_eq!(pair.as_rule(), Rule::module_statement);
+        Parser::ensure_rule(&pair, Rule::module_statement);
         let mut pairs = pair.into_inner();
         let first = pairs.next().unwrap();
 
