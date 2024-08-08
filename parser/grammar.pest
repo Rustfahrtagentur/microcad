@@ -368,7 +368,7 @@ module_statement = { use_statement | expression_statement | assignment_statement
 //`init(size: length) { rectangle(size); }: ok
 module_init_definition = { "init" ~ ws* ~ definition_parameter_list ~ ws* ~ "{" ~ ws* ~ module_init_inner? ~ ws* ~ "}" }
 
-module_init_statement = _{ assignment_statement | use_statement | function_definition | expression_statement }
+module_init_statement = { assignment_statement | use_statement | function_definition | expression_statement }
 
 module_init_inner = _{ ws* ~ (module_init_statement ~ ws*)+ | ws* ~ (module_init_statement ~ ws*)* ~ expression }
 
