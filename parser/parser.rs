@@ -40,23 +40,14 @@ pub enum ParseError {
     DefinitionParameterMissingTypeOrValue(Identifier),
 }
 
-pub struct Loc<'a, T> {
-    source: u64, // Save the hash of the source file name to avoid storing the source file name itself
+pub struct WithPair<'a, T> {
     pair: Pair<'a>,
     value: T,
 }
 
-impl<'a, T> Loc<'a, T> {
-    pub fn new(source: impl core::hash::Hash, pair: Pair<'a>, value: T) -> Self {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::Hasher;
-        let mut hasher = DefaultHasher::new();
-        source.hash(&mut hasher);
-        Self {
-            source: hasher.finish(),
-            pair,
-            value,
-        }
+impl<'a, T> WithPair<'a, T> {
+    pub fn new(pair: Pair<'a>, value: T) -> Self {
+        Self { pair, value }
     }
 
     pub fn pair(&self) -> Pair<'a> {
@@ -66,9 +57,21 @@ impl<'a, T> Loc<'a, T> {
     pub fn value(&self) -> &T {
         &self.value
     }
+
+    pub fn rule(&self) -> Rule {
+        self.pair.as_rule()
+    }
+
+    pub fn start_pos(&self) -> pest::Position<'a> {
+        self.pair.as_span().start_pos()
+    }
+
+    pub fn end_pos(&self) -> pest::Position<'a> {
+        self.pair.as_span().end_pos()
+    }
 }
 
-impl<'a, T> std::ops::Deref for Loc<'a, T> {
+impl<'a, T> std::ops::Deref for WithPair<'a, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
