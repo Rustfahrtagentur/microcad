@@ -108,6 +108,7 @@ pub enum ModuleStatement {
 
 impl Parse for ModuleStatement {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
+        assert_eq!(pair.as_rule(), Rule::module_statement);
         let mut pairs = pair.into_inner();
         let first = pairs.next().unwrap();
 
@@ -124,7 +125,7 @@ impl Parse for ModuleStatement {
             Rule::function_definition => Ok(ModuleStatement::FunctionDefinition(
                 FunctionDefinition::parse(first)?,
             )),
-            _ => unreachable!(),
+            rule => unreachable!("Unexpected module statement, got {:?}", rule),
         }
     }
 }
@@ -194,10 +195,12 @@ impl Parse for ModuleDefinition {
                 Rule::definition_parameter_list => {
                     parameters = Some(Parser::vec(pair.into_inner(), DefinitionParameter::parse)?);
                 }
-                Rule::module_statement => {
-                    body.push(ModuleStatement::parse(pair)?);
+                Rule::module_body => {
+                    for pair in pair.into_inner() {
+                        body.push(ModuleStatement::parse(pair)?);
+                    }
                 }
-                _ => unreachable!(),
+                rule => unreachable!("Unexpected module definition, got {:?}", rule),
             }
         }
 

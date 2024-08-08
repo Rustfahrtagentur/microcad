@@ -2,6 +2,7 @@ pub mod builtin;
 pub mod call;
 pub mod color;
 pub mod diagnostics;
+pub mod document;
 pub mod eval;
 pub mod expression;
 pub mod format_string;

@@ -252,7 +252,7 @@ primary          =  _{ nested ~ ws* ~ module_body | nested | literal | format_st
 expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
 // A statement that is an single expression
-expression_statement = { expression ~ ws* ~ ";" | expression? ~ ws* ~ module_body | module_body }
+expression_statement = _{ expression ~ ws* ~ ";" | expression? ~ ws* ~ module_body | module_body }
 
 //`1..4`: ok
 //`a..b`: ok
@@ -359,7 +359,7 @@ module_body = { "{" ~ ws* ~ module_node_inner? ~ ws*~ "}" }
 
 module_node_inner = _{ ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
 
-module_statement = _{ use_statement | expression_statement | assignment_statement |
+module_statement = { use_statement | expression_statement | assignment_statement |
   module_init_definition | module_definition | function_definition }
 
 //`init(d: length) { r = d / 2; }`: ok
