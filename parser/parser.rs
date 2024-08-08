@@ -2,8 +2,7 @@
 #[grammar = "grammar.pest"]
 pub struct Parser;
 
-use crate::expression::Expression;
-use crate::identifier::{Identifier, IdentifierListError, QualifiedName};
+use crate::identifier::{Identifier, IdentifierListError};
 use thiserror::Error;
 
 pub type Pair<'i> = pest::iterators::Pair<'i, Rule>;
@@ -45,39 +44,6 @@ pub trait Parse: Sized {
     fn parse(pair: Pair) -> Result<Self, ParseError>;
 }
 
-pub enum FunctionArgument {
-    PositionalArgument(Expression),
-    NamedArgument(Identifier, Expression),
-}
-
-impl FunctionArgument {
-    pub fn name(&self) -> Option<&Identifier> {
-        match self {
-            Self::PositionalArgument(_) => None,
-            Self::NamedArgument(ident, _) => Some(ident),
-        }
-    }
-
-    pub fn expression(&self) -> &Expression {
-        match self {
-            Self::PositionalArgument(expr) => expr,
-            Self::NamedArgument(_, expr) => expr,
-        }
-    }
-}
-
-#[derive(Default)]
-pub struct FunctionCall {
-    pub qualified_name: QualifiedName,
-    pub function_argument_list: Vec<FunctionArgument>,
-}
-
-pub struct ModuleNodeStatement {
-    pub ident: Option<Identifier>,
-    pub calls: Vec<FunctionCall>,
-    pub has_inner: bool,
-}
-
 impl Parser {
     /// @brief Helper function to parse a vector of pairs into a vector of T
     /// @param pairs The pairs to parse
@@ -96,82 +62,11 @@ impl Parser {
         T: Parse,
     {
         use pest::Parser;
-        let pair = crate::parser::Parser::parse(rule, input)
+        let pair = crate::parser::Parser::parse(rule, input.trim())
             .unwrap()
             .next()
             .unwrap();
         T::parse(pair).unwrap()
-    }
-
-    fn function_argument(pair: Pair) -> Result<FunctionArgument, ParseError> {
-        let pairs = pair.into_inner();
-        let first = pairs.clone().nth(0).unwrap();
-        let second = pairs.clone().nth(1).unwrap();
-
-        match first.as_rule() {
-            Rule::identifier => Ok(FunctionArgument::NamedArgument(
-                Identifier::parse(first)?,
-                Expression::parse(second)?,
-            )),
-            Rule::expression => Ok(FunctionArgument::PositionalArgument(Expression::parse(
-                first,
-            )?)),
-            _ => unreachable!(),
-        }
-    }
-
-    fn function_argument_list(pairs: Pairs) -> Result<Vec<FunctionArgument>, ParseError> {
-        Self::vec(pairs, Self::function_argument)
-    }
-
-    fn function_call(pairs: Pairs) -> Result<FunctionCall, ParseError> {
-        let mut call = FunctionCall::default();
-
-        for pair in pairs {
-            match pair.as_rule() {
-                Rule::qualified_name => {
-                    call.qualified_name = QualifiedName::parse(pair)?;
-                }
-                Rule::call_argument_list => {
-                    call.function_argument_list = Self::function_argument_list(pair.into_inner())?;
-                }
-                _ => unreachable!(),
-            }
-        }
-
-        Ok(call)
-    }
-
-    pub fn module_node_statement(pairs: Pairs) -> Result<ModuleNodeStatement, ParseError> {
-        let mut module_node_statement = ModuleNodeStatement {
-            ident: Default::default(),
-            calls: Vec::new(),
-            has_inner: false,
-        };
-
-        for pair in pairs {
-            match pair.as_rule() {
-                Rule::module_node_inner => {
-                    module_node_statement.has_inner = true;
-                }
-                Rule::call => {
-                    let call = Self::function_call(pair.into_inner())?;
-                    module_node_statement.calls.push(call);
-                }
-                _ => {
-                    unreachable!(
-                        "Expr::parse expected call or module_node_inner, found {:?}",
-                        pair.as_rule()
-                    );
-                }
-            }
-        }
-
-        if module_node_statement.calls.is_empty() {
-            panic!("No calls found in module node statement");
-        } else {
-            Ok(module_node_statement)
-        }
     }
 }
 

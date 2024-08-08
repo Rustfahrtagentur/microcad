@@ -429,15 +429,16 @@ mod tests {
     }
 
     #[test]
-    fn function_eval() {
+    fn function_evaluate() {
         use crate::eval::Eval;
         use crate::parser::Parser;
         use crate::parser::Rule;
 
-        let input = "function test(a: scalar, b: scalar) -> scalar {
+        let input = r#"
+        function test(a: scalar, b: scalar) -> scalar {
             c = 1.0;
             return a + b + c;
-        }";
+        }"#;
 
         let function_def = Parser::parse_rule_or_panic::<crate::function::FunctionDefinition>(
             Rule::function_definition,

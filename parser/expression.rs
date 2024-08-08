@@ -135,12 +135,6 @@ pub enum Expression {
         rhs: Box<Expression>,
     },
 
-    /// A reference to a module, syntax node must contain a Module declaration
-    ModuleRef(crate::syntax_tree::SyntaxNode),
-
-    /// A reference to a function, syntax node must contain a Function declaration
-    FunctionRef(crate::syntax_tree::SyntaxNode),
-
     /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
     ElementAccess(Box<Expression>, Box<Expression>),
 

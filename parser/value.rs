@@ -7,7 +7,6 @@ use crate::{
     color::Color,
     identifier::Identifier,
     lang_type::{MapKeyType, NamedTupleType, Ty, Type, TypeList, UnnamedTupleType},
-    syntax_tree::{qualified_name, SyntaxNode},
     units::Unit,
 };
 
@@ -314,9 +313,6 @@ pub enum Value {
     NamedTuple(NamedTuple),
 
     UnnamedTuple(UnnamedTuple),
-
-    // TODO: Add syntax node as value
-    Node(SyntaxNode),
 }
 
 impl Value {
@@ -400,14 +396,6 @@ impl Ty for Value {
             Value::Map(map) => map.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
-            Value::Node(node) => {
-                if let Some(qualified_name) = crate::syntax_tree::qualified_name(node.clone()) {
-                    Type::Custom(qualified_name)
-                } else {
-                    // TODO Trait Ty should return a Result<Type, TypeError>
-                    panic!("Cannot get type of node: {:?}", node);
-                }
-            }
         }
     }
 }
@@ -556,13 +544,6 @@ impl std::fmt::Display for Value {
             Value::Map(m) => write!(f, "{}", m),
             Value::NamedTuple(t) => write!(f, "{}", t),
             Value::UnnamedTuple(t) => write!(f, "{}", t),
-            Value::Node(node) => {
-                write!(
-                    f,
-                    "{}",
-                    qualified_name(node.clone()).unwrap_or("<unknown>".into())
-                )
-            }
         }
     }
 }

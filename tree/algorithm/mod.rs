@@ -1,5 +1,5 @@
-use crate::{Node, NodeInner};
-
+use crate::NodeInner;
+struct Node;
 pub trait Algorithm {
     fn process(&self, parent: Node) -> Node;
 }
