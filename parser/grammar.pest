@@ -352,6 +352,7 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module math { }`: ok # Module with no argument list acts as namespace
 //`module list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Module with module as argument
+//`module foo { init(size: length) { rectangle(size); } }`: ok # Module with init function
 module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ definition_parameter_list? ~ ws* ~ module_body }
 
 //`{ translate() rotate(); }`: ok
@@ -363,13 +364,15 @@ module_statement = { use_statement | expression_statement | assignment_statement
   module_init_definition | module_definition | function_definition }
 
 //`init(d: length) { r = d / 2; }`: ok
+//`init(size: length) { size = size; }`: ok
+//`init(size: length) { rectangle(size); }: ok
 module_init_definition = { "init" ~ ws* ~ definition_parameter_list ~ ws* ~ "{" ~ ws* ~ module_init_inner? ~ ws* ~ "}" }
 
-module_init_statement = _{ assignment_statement | use_statement | function_definition | module_init_definition }
+module_init_statement = _{ assignment_statement | use_statement | function_definition | expression_statement }
 
 module_init_inner = _{ ws* ~ (module_init_statement ~ ws*)+ | ws* ~ (module_init_statement ~ ws*)* ~ expression }
 
 
-
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
+//`module foo { init(size: length) { rectangle(size); } }`: ok # Module with init function
 document = { SOI ~ module_node_inner? ~ EOI }
