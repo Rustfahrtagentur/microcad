@@ -2,7 +2,7 @@ pub fn generate_test(w: &mut impl std::io::Write, test_name: &str, listing: &str
     let template = format!(
         r##"
         #[test]
-        fn {test_name}() {{
+        fn r#{test_name}() {{
             use crate::*;
             let document = crate::parser::Parser::parse_rule_or_panic::<Document>(
                 Rule::document,
@@ -55,7 +55,7 @@ pub fn generate(path: impl AsRef<std::path::Path>) {
                 if file_type.is_dir() {
                     writeln!(
                         w,
-                        "mod {module}_ {{",
+                        r#"mod r#{module} {{"#,
                         module = entry.file_name().to_string_lossy()
                     )
                     .unwrap();
