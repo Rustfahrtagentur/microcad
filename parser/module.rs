@@ -84,8 +84,10 @@ impl Parse for ModuleInitDefinition {
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
-                Rule::definition_parameter => {
-                    parameters.push(DefinitionParameter::parse(pair)?);
+                Rule::definition_parameter_list => {
+                    for pair in pair.into_inner() {
+                        parameters.push(DefinitionParameter::parse(pair)?);
+                    }
                 }
                 Rule::module_init_statement => {
                     body.push(ModuleInitStatement::parse(pair)?);
