@@ -205,7 +205,7 @@ impl Eval for Assignment {
 pub enum FunctionStatement {
     Assignment(Assignment),
     Use(UseStatement),
-    FunctionDefinition(FunctionDefinition),
+    FunctionDefinition(Rc<FunctionDefinition>),
     Return(Box<Expression>),
     If {
         condition: Expression,
@@ -227,9 +227,9 @@ impl FunctionStatement {
         match first.as_rule() {
             Rule::assignment => Ok(Self::Assignment(Assignment::parse(first)?)),
             Rule::use_statement => Ok(Self::Use(UseStatement::parse(first)?)),
-            Rule::function_definition => {
-                Ok(Self::FunctionDefinition(FunctionDefinition::parse(first)?))
-            }
+            Rule::function_definition => Ok(Self::FunctionDefinition(Rc::new(
+                FunctionDefinition::parse(first)?,
+            ))),
             Rule::function_return_statement => {
                 Ok(Self::Return(Box::new(Expression::parse(first)?)))
             }
@@ -276,13 +276,13 @@ impl FunctionDefinition {
         name: Identifier,
         signature: FunctionSignature,
         builtin: BuiltinFunction,
-    ) -> Self {
-        Self {
+    ) -> Rc<Self> {
+        Rc::new(Self {
             name,
             signature,
             body: Vec::new(),
             builtin: Some(builtin),
-        }
+        })
     }
 
     pub fn name(&self) -> &Identifier {
@@ -362,7 +362,7 @@ impl Parse for FunctionDefinition {
     }
 }
 
-impl Eval for FunctionDefinition {
+impl Eval for Rc<FunctionDefinition> {
     type Output = ();
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, crate::eval::Error> {
@@ -373,6 +373,8 @@ impl Eval for FunctionDefinition {
 
 #[cfg(test)]
 mod tests {
+    use std::rc::Rc;
+
     use crate::eval::{Context, Symbol};
 
     #[test]
@@ -440,10 +442,9 @@ mod tests {
             return a + b + c;
         }"#;
 
-        let function_def = Parser::parse_rule_or_panic::<crate::function::FunctionDefinition>(
-            Rule::function_definition,
-            input,
-        );
+        let function_def = Rc::new(Parser::parse_rule_or_panic::<
+            crate::function::FunctionDefinition,
+        >(Rule::function_definition, input));
 
         let mut context = Context::default();
         context.add_symbol(Symbol::Function(function_def));

@@ -8,7 +8,7 @@ use crate::{
 };
 
 #[allow(dead_code)]
-fn build_math_module() -> ModuleDefinition {
+fn build_math_module() -> Rc<ModuleDefinition> {
     let mut module = ModuleDefinition::namespace("math".into());
 
     let fn_abs_signature = FunctionSignature {
@@ -31,7 +31,7 @@ fn build_math_module() -> ModuleDefinition {
 
     module.add_function(fn_abs);
 
-    module
+    Rc::new(module)
 }
 
 #[cfg(test)]

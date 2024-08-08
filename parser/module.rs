@@ -1,8 +1,10 @@
 // Resolve a qualified name to a type or value.
 
 use std::fmt::Display;
+use std::rc::Rc;
 
 use crate::call::CallArgumentList;
+use crate::eval::Symbol;
 use crate::expression::Expression;
 use crate::function::{Assignment, DefinitionParameter, FunctionDefinition};
 use crate::identifier::{Identifier, QualifiedName};
@@ -101,9 +103,9 @@ pub enum ModuleStatement {
     Use(UseStatement),
     Expression(Expression),
     Assignment(Assignment),
-    ModuleDefinition(ModuleDefinition),
+    ModuleDefinition(Rc<ModuleDefinition>),
+    FunctionDefinition(Rc<FunctionDefinition>),
     ModuleInitDefinition(ModuleInitDefinition),
-    FunctionDefinition(FunctionDefinition),
 }
 
 impl Parse for ModuleStatement {
@@ -116,15 +118,15 @@ impl Parse for ModuleStatement {
             Rule::use_statement => Ok(ModuleStatement::Use(UseStatement::parse(first)?)),
             Rule::expression => Ok(ModuleStatement::Expression(Expression::parse(first)?)),
             Rule::assignment => Ok(ModuleStatement::Assignment(Assignment::parse(first)?)),
-            Rule::module_definition => Ok(ModuleStatement::ModuleDefinition(
+            Rule::module_definition => Ok(ModuleStatement::ModuleDefinition(Rc::new(
                 ModuleDefinition::parse(first)?,
-            )),
+            ))),
             Rule::module_init_definition => Ok(ModuleStatement::ModuleInitDefinition(
                 ModuleInitDefinition::parse(first)?,
             )),
-            Rule::function_definition => Ok(ModuleStatement::FunctionDefinition(
+            Rule::function_definition => Ok(ModuleStatement::FunctionDefinition(Rc::new(
                 FunctionDefinition::parse(first)?,
-            )),
+            ))),
             rule => unreachable!("Unexpected module statement, got {:?}", rule),
         }
     }
@@ -148,16 +150,16 @@ impl ModuleDefinition {
         }
     }
 
-    pub fn add_function(&mut self, function: FunctionDefinition) {
+    pub fn add_function(&mut self, function: Rc<FunctionDefinition>) {
         self.body
             .push(ModuleStatement::FunctionDefinition(function));
     }
 
-    pub fn add_module(&mut self, module: ModuleDefinition) {
+    pub fn add_module(&mut self, module: Rc<ModuleDefinition>) {
         self.body.push(ModuleStatement::ModuleDefinition(module));
     }
 
-    pub fn get_symbol(&self, name: &Identifier) -> Option<crate::eval::Symbol> {
+    pub fn get_symbol(&self, name: &Identifier) -> Option<Symbol> {
         for statement in &self.body {
             match statement {
                 ModuleStatement::FunctionDefinition(function) => {

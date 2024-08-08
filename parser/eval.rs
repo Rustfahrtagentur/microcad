@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::rc::Rc;
 use std::vec;
 use thiserror::Error;
 
@@ -55,8 +56,8 @@ pub enum Error {
 #[derive(Clone)]
 pub enum Symbol {
     Value(Identifier, Value),
-    Function(FunctionDefinition),
-    ModuleDefinition(ModuleDefinition),
+    Function(Rc<FunctionDefinition>),
+    ModuleDefinition(Rc<ModuleDefinition>),
 }
 
 impl Symbol {
