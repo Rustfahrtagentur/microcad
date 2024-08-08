@@ -201,7 +201,9 @@ impl Parse for ModuleDefinition {
                 }
                 Rule::module_body => {
                     for pair in pair.into_inner() {
-                        body.push(ModuleStatement::parse(pair)?);
+                        if pair.as_rule() == Rule::module_statement {
+                            body.push(ModuleStatement::parse(pair)?);
+                        }
                     }
                 }
                 rule => unreachable!("Unexpected module definition, got {:?}", rule),
