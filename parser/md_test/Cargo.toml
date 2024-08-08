@@ -7,5 +7,4 @@ edition = "2021"
 path = "lib.rs"
 
 [dependencies]
-walkdir = "2"
 regex = "1"

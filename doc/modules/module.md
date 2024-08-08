@@ -1,31 +1,27 @@
 # Modules
 
-## Declaration
+## Syntax
 
-`module` *name* `(`*parameters*`)` `{` 
-    *use_statement* | 
-    *expression_statement* | 
+`module` *name* `(`*parameter_list*`)` `{`
+    *use_statement* |
+    *expression_statement* |
     *assignment_statement* |
-    *module_init_definition* | 
-    *module_definition* | 
-    *function_definition* 
+    *module_init_definition* |
+    *module_definition* |
+    *function_definition*
 `}`
 
-* *name*: the module name
-* *parameters*: an optional comma-separated list of parameter declarations.
-* *use_statement*
-* *expression_statement*
-* *assignment_statement*
-* *module_init_definition*
-* *module_definition*
-* *function_definition* 
+### Basic Example
 
-### Donut example
+A 2D donut as circle with a hole.
 
-A donut as circle with a hole.
+```µCAD,basic_example
+// load module circle from module geo2d
+use circle from geo2d;
 
-```µCAD.donut
+// define module donut with two parameters
 module donut(r_outer: length, r_inner: length) {
+    // generate donut which is the difference from two circles
     circle(r_outer) - circle(r_inner);
 }
 ```

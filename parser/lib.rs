@@ -17,3 +17,6 @@ pub mod syntax_tree;
 pub mod tuple;
 pub mod units;
 pub mod value;
+
+pub use document::Document;
+pub use parser::Rule;

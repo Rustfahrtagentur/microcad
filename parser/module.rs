@@ -92,7 +92,7 @@ impl Parse for ModuleInitDefinition {
                 Rule::module_init_statement => {
                     body.push(ModuleInitStatement::parse(pair)?);
                 }
-                _ => unreachable!(),
+                rule => unreachable!("expected definition_parameter_list or module_init_statement. Instead found {rule:?}" ),
             }
         }
 

@@ -1,37 +1,31 @@
-use std::{
-    ffi::OsStr,
-    io::{BufRead, BufWriter, Read, Write},
-};
-
-use walkdir::WalkDir;
-
-pub fn generate_test(test_name: &str, listing: &str, w: &mut impl std::io::Write) {
+pub fn generate_test(w: &mut impl std::io::Write, test_name: &str, listing: &str) {
     let template = format!(
         r##"
         #[test]
         fn {test_name}() {{
-            let input = r#"{}{listing}"#;
+            use crate::*;
+            let document = crate::parser::Parser::parse_rule_or_panic::<Document>(
+                Rule::document,
+                r#"{}{listing}"#
+            );
+
         }}
     "##,
-        "\n"
+        "\n",
     );
-
-    writeln!(w, "{}", template);
+    writeln!(w, "{}", template).unwrap();
 }
 
-pub fn generate_tests_for_md_file(
-    md_path: impl AsRef<std::path::Path>,
-    w: &mut impl std::io::Write,
-) {
-    let md_file = std::fs::File::open(md_path).unwrap();
+fn generate_tests_for_md_file(w: &mut impl std::io::Write, md_path: &std::path::Path) {
+    use std::{fs::*, io::*};
 
-    let buf_reader = std::io::BufReader::new(md_file);
-
+    let module_name = md_path.file_stem().unwrap().to_str().unwrap().to_string();
+    let buf_reader = BufReader::new(File::open(md_path).unwrap());
     let mut listing = String::new();
     let mut test_name = None;
 
     for line in buf_reader.lines().map_while(Result::ok) {
-        if line.starts_with("```µcad") {
+        if line.to_lowercase().starts_with("```µcad") {
             listing.clear();
             let tokens = line.split(",").collect::<Vec<_>>();
             if tokens.len() >= 2 {
@@ -39,7 +33,7 @@ pub fn generate_tests_for_md_file(
             }
         } else if &line == "```" {
             if test_name.is_some() {
-                generate_test(test_name.as_ref().unwrap(), &listing, w);
+                generate_test(w, test_name.as_ref().unwrap(), &listing);
                 test_name = None;
             }
         } else if test_name.is_some() {
@@ -49,21 +43,35 @@ pub fn generate_tests_for_md_file(
 }
 
 pub fn generate(path: impl AsRef<std::path::Path>) {
-    let walker = WalkDir::new(path).into_iter();
+    use std::{env, fs::*, io::*, path::*};
 
-    let out_dir = std::env::var("OUT_DIR").unwrap();
-    let dest_path = std::path::Path::new(&out_dir).join("md_test.rs");
+    let out_dir = env::var("OUT_DIR").unwrap();
+    let dest_path = Path::new(&out_dir).join("md_test.rs");
+    let mut w = BufWriter::new(File::create(dest_path).unwrap());
 
-    let rs_file = std::fs::File::create(dest_path).unwrap();
-    let mut w = BufWriter::new(rs_file);
+    fn recurse(w: &mut BufWriter<File>, path: &Path) {
+        for entry in read_dir(path).unwrap().flatten() {
+            if let Ok(file_type) = entry.file_type() {
+                if file_type.is_dir() {
+                    writeln!(
+                        w,
+                        "mod {module}_ {{",
+                        module = entry.file_name().to_string_lossy()
+                    )
+                    .unwrap();
 
-    for entry in walker {
-        let path = entry.as_ref().unwrap().path();
-        if Some(OsStr::new("md")) == path.extension() {
-            generate_tests_for_md_file(path, &mut w);
-            println!("cargo:rerun-if-changed={}", path.display());
+                    recurse(w, &entry.path());
+
+                    writeln!(w, "}}").unwrap();
+                } else if file_type.is_file()
+                    && entry.file_name().to_str().unwrap().ends_with(".md")
+                {
+                    generate_tests_for_md_file(w, &entry.path());
+                    println!("cargo:rerun-if-changed={}", path.display());
+                }
+            }
         }
     }
 
-    // regex::Regex::new(r"```µcad(\.\w+)?\n(.*)```").unwrap();
+    recurse(&mut w, path.as_ref());
 }
