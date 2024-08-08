@@ -11,39 +11,87 @@
     *function_definition*
 `}`
 
-### Basic Example
+## Declaration
+
+A fixed circle.
+
+```µCAD,declaration
+// define custom module circle
+module circle() {
+    // generate circle
+    geo2d::circle(1cm);
+}
+
+// generate module circle
+circle();
+```
+
+## Parameter initialization
 
 A 2D donut as circle with a hole.
 
-```µCAD,basic_example
-// load module circle from module geo2d
-use circle from geo2d;
-
-// define module donut with two parameters
-module donut(r_outer: length, r_inner: length) {
-    // generate donut which is the difference from two circles
-    circle(r_outer) - circle(r_inner);
+```µCAD,init_parameters
+// declare two parameters
+module donut(outer: length, inner: length) {
+    // parameters can used anywhere within the module
+    geo2d::circle(outer) - geo2d::circle(inner);
 }
+
+// generate donut of specific size
+donut(2cm,1cm);
 ```
 
-## Declaration
+## Use other modules more elegant
 
-```µcad
-// We have to import the primitive2d module to use `hexagon` and `circle` sub-modules
-use * from geo2d;
+```µCAD,use
+module donut(outer: length, inner: length) {
+    // load circle from module geo2d
+    use circle from geo2d;
 
-// A generic module for the hex nut
-module hex_nut(outer_diameter: length, hole_diameter: length) {
-    hexagon(d = outer_diameter) - circle(d = hole_diameter);
+    // circle is now without geo2d prefix
+    circle(outer) - circle(inner);
 }
 
+donut(2cm,1cm);
+```
 
+## Alternative initializations
 
-## Initializers
+```µCAD,init_alternative
+module donut(radius_outer: length, radius_inner: length) {
+    // alternative initialization with diameters
+    init( diameter_outer: length, diameter_inner: length ) {
+        // calculate radiuses from diameters
+        radius_inner = diameter_inner/2;
+        radius_outer = diameter_outer/2;
+    }
+    // generate donut based on radiuses
+    geo2d::circle(radius_outer) - geo2d::circle(radius_inner);
+}
+
+// generate three equal donuts
+donut( 2cm, 1cm );
+donut( radius_outer=2cm, radius_outer=1cm );
+donut( diameter_outer=4cm, diameter_outer=2cm );
+```
 
 ## Member fields
 
+```µCAD,member_fields
+module donut(radius) {
+    inner = radius/2;
+    geo2d::circle(radius) - geo2d::circle(inner);
+}
+```
+
 ## Methods
+
+```µCAD,member_methods
+module donut(radius) {
+    function inner() { radius/2 }
+    geo2d::circle(radius) - geo2d::circle(inner());
+}
+```
 
 ## Namespace module
 
