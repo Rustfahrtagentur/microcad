@@ -34,6 +34,33 @@ fn build_math_module() -> Rc<ModuleDefinition> {
     Rc::new(module)
 }
 
+#[allow(dead_code)]
+fn geo2d_builtin_module() -> Rc<ModuleDefinition> {
+    let mut module = ModuleDefinition::namespace("geo2d".into());
+
+    let fn_add_signature = FunctionSignature {
+        parameters: vec![
+            DefinitionParameter::new("x".into(), Some(Type::Scalar), None),
+            DefinitionParameter::new("y".into(), Some(Type::Scalar), None),
+        ],
+        return_type: Type::Scalar,
+    };
+
+    let fn_add = FunctionDefinition::builtin(
+        "add".into(),
+        fn_add_signature,
+        Rc::new(|args, _| -> Result<Value, crate::eval::Error> {
+            let x = args.get_positional_arg(0).unwrap().into_scalar()?;
+            let y = args.get_positional_arg(1).unwrap().into_scalar()?;
+            Ok(crate::value::Value::Scalar(x + y))
+        }),
+    );
+
+    module.add_function(fn_add);
+
+    Rc::new(module)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{
