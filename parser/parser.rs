@@ -40,6 +40,42 @@ pub enum ParseError {
     DefinitionParameterMissingTypeOrValue(Identifier),
 }
 
+pub struct Loc<'a, T> {
+    source: u64, // Save the hash of the source file name to avoid storing the source file name itself
+    pair: Pair<'a>,
+    value: T,
+}
+
+impl<'a, T> Loc<'a, T> {
+    pub fn new(source: impl core::hash::Hash, pair: Pair<'a>, value: T) -> Self {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::Hasher;
+        let mut hasher = DefaultHasher::new();
+        source.hash(&mut hasher);
+        Self {
+            source: hasher.finish(),
+            pair,
+            value,
+        }
+    }
+
+    pub fn pair(&self) -> Pair<'a> {
+        self.pair.clone()
+    }
+
+    pub fn value(&self) -> &T {
+        &self.value
+    }
+}
+
+impl<'a, T> std::ops::Deref for Loc<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
 pub trait Parse: Sized {
     fn parse(pair: Pair) -> Result<Self, ParseError>;
 }
