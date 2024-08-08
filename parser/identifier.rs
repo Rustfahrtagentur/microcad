@@ -1,6 +1,7 @@
 use crate::{
     eval::{Context, Eval},
-    parser::{Pair, Parse, ParseError},
+    parser::{Pair, Parse, ParseError, Parser},
+    Rule,
 };
 
 use thiserror::Error;
@@ -52,6 +53,7 @@ impl<'a> From<&'a Identifier> for &'a str {
 
 impl Parse for Identifier {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
+        Parser::ensure_rule(&pair, Rule::identifier);
         Ok(Self(pair.as_str().into()))
     }
 }
@@ -128,7 +130,9 @@ impl Parse for IdentifierList {
     fn parse(pair: Pair) -> Result<Self, ParseError> {
         let mut vec = Vec::new();
         for pair in pair.into_inner() {
-            vec.push(Identifier(pair.as_str().into()));
+            if pair.as_rule() == Rule::identifier {
+                vec.push(Identifier::parse(pair)?);
+            }
         }
         Ok(Self(vec))
     }
