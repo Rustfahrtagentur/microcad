@@ -3,7 +3,7 @@ use crate::{
     parser::{Pair, Parse, ParseError, Rule},
 };
 
-struct Document {
+pub struct Document {
     body: Vec<ModuleStatement>,
 }
 
