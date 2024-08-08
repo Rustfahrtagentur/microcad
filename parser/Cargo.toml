@@ -19,3 +19,4 @@ thiserror = "1.0"
 
 [build-dependencies]
 pest_test = { path = "pest_test" }
+md_test = { path = "md_test" }

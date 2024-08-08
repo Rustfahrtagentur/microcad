@@ -4,4 +4,6 @@ fn main() {
         "crate::parser::Rule",
         "grammar.pest",
     );
+
+    md_test::generate("../doc");
 }

@@ -73,6 +73,7 @@ impl Parser {
 #[cfg(test)]
 mod tests {
     include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
+    include!(concat!(env!("OUT_DIR"), "/md_test.rs"));
     use literal::NumberLiteral;
     use parser::Parse;
 

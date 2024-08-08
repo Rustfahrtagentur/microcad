@@ -1,0 +1,11 @@
+[package]
+name = "md_test"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+walkdir = "2"
+regex = "1"

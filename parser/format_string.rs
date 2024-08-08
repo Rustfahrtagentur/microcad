@@ -104,7 +104,7 @@ impl Eval for FormatString {
         let mut result = String::new();
         for elem in &self.0 {
             match elem {
-                FormatStringInner::String(s) => result += &s,
+                FormatStringInner::String(s) => result += s,
                 FormatStringInner::FormatExpression(expr) => match expr.eval(context) {
                     Ok(Value::String(s)) => result += &s,
                     Err(e) => return Err(e),
