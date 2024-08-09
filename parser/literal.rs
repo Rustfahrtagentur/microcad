@@ -1,7 +1,7 @@
 use crate::color::Color;
 use crate::eval::{Context, Eval, OperatorError};
 use crate::lang_type::{Ty, Type};
-use crate::parser::{Pair, Parse, ParseError, Parser, Rule};
+use crate::parser::{Pair, Parse, ParseResult, Parser, Rule, WithPair};
 use crate::units::Unit;
 use crate::value::Value;
 
@@ -112,7 +112,8 @@ impl std::ops::Div for NumberLiteral {
 }
 
 impl Parse for NumberLiteral {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         Parser::ensure_rule(&pair, Rule::number_literal);
 
         let mut pairs = pair.into_inner();
@@ -128,9 +129,9 @@ impl Parse for NumberLiteral {
         let mut unit = Unit::None;
 
         if let Some(unit_token) = pairs.next() {
-            unit = Unit::parse(unit_token)?;
+            unit = *Unit::parse(unit_token)?;
         }
-        Ok(NumberLiteral(value, unit))
+        Ok(WithPair::new(NumberLiteral(value, unit), p))
     }
 }
 
@@ -181,22 +182,27 @@ impl Ty for Literal {
 }
 
 impl Parse for Literal {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
-        Parser::ensure_rule(&pair, Rule::literal);
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
+        Parser::ensure_rule(&p, Rule::literal);
+        use crate::with_pair_ok;
 
         let inner = pair.into_inner().next().unwrap();
 
-        match inner.as_rule() {
-            Rule::number_literal => Ok(Literal::Number(NumberLiteral::parse(inner)?)),
-            Rule::integer_literal => Ok(Literal::Integer(inner.as_str().parse::<i64>()?)),
+        let s = match inner.as_rule() {
+            Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?.value().clone()),
+
+            Rule::integer_literal => Literal::Integer(inner.as_str().parse::<i64>()?),
             Rule::bool_literal => match inner.as_str() {
-                "true" => Ok(Literal::Bool(true)),
-                "false" => Ok(Literal::Bool(false)),
+                "true" => Literal::Bool(true),
+                "false" => Literal::Bool(false),
                 _ => unreachable!(),
             },
-            Rule::color_literal => Ok(Literal::Color(Color::parse(inner)?)),
+            Rule::color_literal => Literal::Color(*Color::parse(inner)?),
             _ => unreachable!(),
-        }
+        };
+
+        with_pair_ok!(s, p)
     }
 }
 

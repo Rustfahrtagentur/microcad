@@ -3,15 +3,17 @@ use std::collections::BTreeMap;
 use crate::call::CallArgumentList;
 use crate::eval::{Context, Eval};
 use crate::lang_type::{Ty, Type};
-use crate::parser::{Pair, Parse, ParseError};
+use crate::parser::{Pair, Parse, ParseError, ParseResult};
 use crate::units::Unit;
 use crate::value::{NamedTuple, UnnamedTuple, Value, ValueList, Vec2, Vec3};
+use crate::with_pair_ok;
 
 #[derive(Debug, Default, Clone)]
 pub struct TupleExpression(CallArgumentList, Option<Unit>);
 
 impl Parse for TupleExpression {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut pairs = pair.into_inner();
         let call_argument_list = CallArgumentList::parse(pairs.next().unwrap())?;
         if call_argument_list.is_empty() {
@@ -21,13 +23,16 @@ impl Parse for TupleExpression {
             return Err(ParseError::MixedTupleArguments);
         }
 
-        Ok(TupleExpression(
-            call_argument_list,
-            match pairs.next() {
-                Some(pair) => Some(Unit::parse(pair)?),
-                None => None,
-            },
-        ))
+        with_pair_ok!(
+            TupleExpression(
+                call_argument_list.value().clone(),
+                match pairs.next() {
+                    Some(pair) => Some(*Unit::parse(pair)?),
+                    None => None,
+                },
+            ),
+            p
+        )
     }
 }
 

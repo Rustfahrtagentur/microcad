@@ -4,7 +4,7 @@ use crate::call::EvaluatedCallArgumentList;
 use crate::eval::{Context, Eval, Symbol};
 use crate::expression::Expression;
 use crate::identifier::Identifier;
-use crate::parser::*;
+use crate::{parser::*, with_pair_ok};
 
 use crate::lang_type::Type;
 use crate::module::UseStatement;
@@ -56,7 +56,8 @@ impl std::fmt::Display for DefinitionParameter {
 }
 
 impl Parse for DefinitionParameter {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut name = Identifier::default();
         let mut specified_type = None;
         let mut value = None;
@@ -64,13 +65,13 @@ impl Parse for DefinitionParameter {
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::identifier => {
-                    name = Identifier::parse(pair)?;
+                    name = Identifier::parse(pair)?.value().clone();
                 }
                 Rule::r#type => {
-                    specified_type = Some(Type::parse(pair)?);
+                    specified_type = Some(Type::parse(pair)?.value().clone());
                 }
                 Rule::expression => {
-                    value = Some(Expression::parse(pair)?);
+                    value = Some(Expression::parse(pair)?.value().clone());
                 }
                 rule => {
                     unreachable!(
@@ -88,11 +89,14 @@ impl Parse for DefinitionParameter {
             ));
         }
 
-        Ok(Self {
-            name,
-            specified_type,
-            value,
-        })
+        with_pair_ok!(
+            Self {
+                name,
+                specified_type,
+                value,
+            },
+            p
+        )
     }
 }
 
@@ -117,24 +121,30 @@ impl FunctionSignature {
 }
 
 impl Parse for FunctionSignature {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut parameters = Vec::new();
         let mut return_type = None;
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::definition_parameter_list => {
-                    parameters = Parser::vec(pair.into_inner(), DefinitionParameter::parse)?;
+                    parameters = Parser::vec(pair, DefinitionParameter::parse)?
+                        .value()
+                        .clone();
                 }
-                Rule::r#type => return_type = Some(Type::parse(pair)?),
+                Rule::r#type => return_type = Some(Type::parse(pair)?.value().clone()),
                 rule => unreachable!("Unexpected token in function signature: {:?}", rule),
             }
         }
 
-        Ok(Self {
-            parameters,
-            return_type: return_type.unwrap(),
-        })
+        with_pair_ok!(
+            Self {
+                parameters,
+                return_type: return_type.unwrap(),
+            },
+            p
+        )
     }
 }
 
@@ -161,7 +171,8 @@ impl Assignment {
 }
 
 impl Parse for Assignment {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut name = Identifier::default();
         let mut specified_type = None;
         let mut value = Expression::default();
@@ -169,13 +180,13 @@ impl Parse for Assignment {
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::identifier => {
-                    name = Identifier::parse(pair)?;
+                    name = Identifier::parse(pair)?.value().clone();
                 }
                 Rule::r#type => {
-                    specified_type = Some(Type::parse(pair)?);
+                    specified_type = Some(Type::parse(pair)?.value().clone());
                 }
                 Rule::expression => {
-                    value = Expression::parse(pair)?;
+                    value = Expression::parse(pair)?.value().clone();
                 }
                 rule => {
                     unreachable!("Unexpected token in assignment: {:?}", rule);
@@ -183,11 +194,14 @@ impl Parse for Assignment {
             }
         }
 
-        Ok(Self {
-            name,
-            specified_type,
-            value,
-        })
+        with_pair_ok!(
+            Self {
+                name,
+                specified_type,
+                value,
+            },
+            p
+        )
     }
 }
 
@@ -214,49 +228,50 @@ pub enum FunctionStatement {
     },
 }
 
-impl FunctionStatement {
-    pub fn parse(pair: Pair) -> Result<Self, ParseError> {
-        assert_eq!(
-            pair.as_rule(),
-            Rule::function_statement,
-            "Unexpected rule: {:?}",
-            pair.as_rule()
-        );
+impl Parse for FunctionStatement {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        Parser::ensure_rule(&pair, Rule::function_statement);
+        let p = pair.clone();
+
         let mut pairs = pair.into_inner();
         let first = pairs.next().unwrap();
-        match first.as_rule() {
-            Rule::assignment => Ok(Self::Assignment(Assignment::parse(first)?)),
-            Rule::use_statement => Ok(Self::Use(UseStatement::parse(first)?)),
-            Rule::function_definition => Ok(Self::FunctionDefinition(Rc::new(
-                FunctionDefinition::parse(first)?,
-            ))),
+        let s = match first.as_rule() {
+            Rule::assignment => Self::Assignment(Assignment::parse(first)?.value().clone()),
+            Rule::use_statement => Self::Use(UseStatement::parse(first)?.value().clone()),
+            Rule::function_definition => {
+                Self::FunctionDefinition(Rc::new(FunctionDefinition::parse(first)?.value().clone()))
+            }
             Rule::function_return_statement => {
-                Ok(Self::Return(Box::new(Expression::parse(first)?)))
+                Self::Return(Box::new(Expression::parse(first)?.value().clone()))
             }
             Rule::function_if_statement => {
                 let mut pairs = first.into_inner();
-                let condition = Expression::parse(pairs.next().unwrap())?;
-                let if_body =
-                    Parser::vec(pairs.next().unwrap().into_inner(), FunctionStatement::parse)?;
+                let condition = Expression::parse(pairs.next().unwrap())?.value().clone();
+                let if_body = Parser::vec(pairs.next().unwrap(), FunctionStatement::parse)?
+                    .value()
+                    .clone();
 
                 match pairs.next() {
-                    None => Ok(Self::If {
+                    None => Self::If {
                         condition,
                         if_body,
                         else_body: Vec::new(),
-                    }),
+                    },
                     Some(pair) => {
-                        let else_body = Parser::vec(pair.into_inner(), FunctionStatement::parse)?;
-                        Ok(Self::If {
+                        let else_body =
+                            Parser::vec(pair, FunctionStatement::parse)?.value().clone();
+                        Self::If {
                             condition,
                             if_body,
                             else_body,
-                        })
+                        }
                     }
                 }
             }
             rule => unreachable!("Unexpected token in function statement: {:?}", rule),
-        }
+        };
+
+        with_pair_ok!(s, p)
     }
 }
 
@@ -348,17 +363,26 @@ impl FunctionDefinition {
 }
 
 impl Parse for FunctionDefinition {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
+        Parser::ensure_rule(&pair, Rule::function_definition);
         let mut pairs = pair.into_inner();
-        let name = Identifier::parse(pairs.next().unwrap())?;
-        let signature = FunctionSignature::parse(pairs.next().unwrap())?;
-        let body = Parser::vec(pairs, FunctionStatement::parse)?;
-        Ok(Self {
-            name,
-            signature,
-            body,
-            builtin: None,
-        })
+        let name = Identifier::parse(pairs.next().unwrap())?.value().clone();
+        let signature = FunctionSignature::parse(pairs.next().unwrap())?
+            .value()
+            .clone();
+        let body = Parser::vec(pairs.next().unwrap(), FunctionStatement::parse)?
+            .value()
+            .clone();
+        with_pair_ok!(
+            Self {
+                name,
+                signature,
+                body,
+                builtin: None,
+            },
+            p
+        )
     }
 }
 

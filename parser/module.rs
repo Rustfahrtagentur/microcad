@@ -8,7 +8,7 @@ use crate::eval::Symbol;
 use crate::expression::Expression;
 use crate::function::{Assignment, DefinitionParameter, FunctionDefinition};
 use crate::identifier::{Identifier, QualifiedName};
-use crate::parser::*;
+use crate::{parser::*, with_pair_ok};
 
 #[derive(Clone)]
 pub struct Attribute {
@@ -17,20 +17,27 @@ pub struct Attribute {
 }
 
 impl Parse for Attribute {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut pairs = pair.into_inner();
-        let name = QualifiedName::parse(pairs.next().unwrap())?;
+        let name = QualifiedName::parse(pairs.next().unwrap())?.value().clone();
 
         if let Some(p) = pairs.next() {
-            Ok(Attribute {
-                name,
-                arguments: Some(CallArgumentList::parse(p)?),
-            })
+            with_pair_ok!(
+                Attribute {
+                    name,
+                    arguments: Some(CallArgumentList::parse(p.clone())?.value().clone()),
+                },
+                p
+            )
         } else {
-            Ok(Attribute {
-                name,
-                arguments: None,
-            })
+            with_pair_ok!(
+                Attribute {
+                    name,
+                    arguments: None,
+                },
+                p
+            )
         }
     }
 }
@@ -53,19 +60,28 @@ pub enum ModuleInitStatement {
 }
 
 impl Parse for ModuleInitStatement {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut pairs = pair.into_inner();
         let first = pairs.next().unwrap();
 
-        match first.as_rule() {
-            Rule::use_statement => Ok(ModuleInitStatement::Use(UseStatement::parse(first)?)),
-            Rule::expression => Ok(ModuleInitStatement::Expression(Expression::parse(first)?)),
-            Rule::assignment => Ok(ModuleInitStatement::Assignment(Assignment::parse(first)?)),
-            Rule::function_definition => Ok(ModuleInitStatement::FunctionDefinition(
-                FunctionDefinition::parse(first)?,
-            )),
+        let s = match first.as_rule() {
+            Rule::use_statement => {
+                ModuleInitStatement::Use(UseStatement::parse(first)?.value().clone())
+            }
+            Rule::expression => {
+                ModuleInitStatement::Expression(Expression::parse(first)?.value().clone())
+            }
+            Rule::assignment => {
+                ModuleInitStatement::Assignment(Assignment::parse(first)?.value().clone())
+            }
+            Rule::function_definition => ModuleInitStatement::FunctionDefinition(
+                FunctionDefinition::parse(first)?.value().clone(),
+            ),
             _ => unreachable!(),
-        }
+        };
+
+        with_pair_ok!(s, p)
     }
 }
 
@@ -78,7 +94,8 @@ pub struct ModuleInitDefinition {
 }
 
 impl Parse for ModuleInitDefinition {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut parameters = Vec::new();
         let mut body = Vec::new();
 
@@ -86,17 +103,17 @@ impl Parse for ModuleInitDefinition {
             match pair.as_rule() {
                 Rule::definition_parameter_list => {
                     for pair in pair.into_inner() {
-                        parameters.push(DefinitionParameter::parse(pair)?);
+                        parameters.push(DefinitionParameter::parse(pair)?.value().clone());
                     }
                 }
                 Rule::module_init_statement => {
-                    body.push(ModuleInitStatement::parse(pair)?);
+                    body.push(ModuleInitStatement::parse(pair)?.value().clone());
                 }
                 rule => unreachable!("expected definition_parameter_list or module_init_statement. Instead found {rule:?}" ),
             }
         }
 
-        Ok(ModuleInitDefinition { parameters, body })
+        with_pair_ok!(ModuleInitDefinition { parameters, body }, p)
     }
 }
 
@@ -111,26 +128,35 @@ pub enum ModuleStatement {
 }
 
 impl Parse for ModuleStatement {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::module_statement);
+        let p = pair.clone();
         let mut pairs = pair.into_inner();
         let first = pairs.next().unwrap();
 
-        match first.as_rule() {
-            Rule::use_statement => Ok(ModuleStatement::Use(UseStatement::parse(first)?)),
-            Rule::expression => Ok(ModuleStatement::Expression(Expression::parse(first)?)),
-            Rule::assignment => Ok(ModuleStatement::Assignment(Assignment::parse(first)?)),
-            Rule::module_definition => Ok(ModuleStatement::ModuleDefinition(Rc::new(
-                ModuleDefinition::parse(first)?,
-            ))),
-            Rule::module_init_definition => Ok(ModuleStatement::ModuleInitDefinition(
-                ModuleInitDefinition::parse(first)?,
+        let s = match first.as_rule() {
+            Rule::use_statement => {
+                ModuleStatement::Use(UseStatement::parse(first)?.value().clone())
+            }
+            Rule::expression => {
+                ModuleStatement::Expression(Expression::parse(first)?.value().clone())
+            }
+            Rule::assignment => {
+                ModuleStatement::Assignment(Assignment::parse(first)?.value().clone())
+            }
+            Rule::module_definition => ModuleStatement::ModuleDefinition(Rc::new(
+                ModuleDefinition::parse(first)?.value().clone(),
             )),
-            Rule::function_definition => Ok(ModuleStatement::FunctionDefinition(Rc::new(
-                FunctionDefinition::parse(first)?,
-            ))),
+            Rule::module_init_definition => ModuleStatement::ModuleInitDefinition(
+                ModuleInitDefinition::parse(first)?.value().clone(),
+            ),
+            Rule::function_definition => ModuleStatement::FunctionDefinition(Rc::new(
+                FunctionDefinition::parse(first)?.value().clone(),
+            )),
             rule => unreachable!("Unexpected module statement, got {:?}", rule),
-        }
+        };
+
+        with_pair_ok!(s, p)
     }
 }
 
@@ -182,7 +208,8 @@ impl ModuleDefinition {
 }
 
 impl Parse for ModuleDefinition {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut attributes = Vec::new();
         let mut name = Identifier::default();
         let mut parameters = None;
@@ -191,18 +218,22 @@ impl Parse for ModuleDefinition {
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::attribute_list => {
-                    attributes.push(Attribute::parse(pair)?);
+                    attributes.push(Attribute::parse(pair)?.value().clone());
                 }
                 Rule::identifier => {
-                    name = Identifier::parse(pair)?;
+                    name = Identifier::parse(pair)?.value().clone();
                 }
                 Rule::definition_parameter_list => {
-                    parameters = Some(Parser::vec(pair.into_inner(), DefinitionParameter::parse)?);
+                    parameters = Some(
+                        Parser::vec(pair, DefinitionParameter::parse)?
+                            .value()
+                            .clone(),
+                    );
                 }
                 Rule::module_body => {
                     for pair in pair.into_inner() {
                         if pair.as_rule() == Rule::module_statement {
-                            body.push(ModuleStatement::parse(pair)?);
+                            body.push(ModuleStatement::parse(pair)?.value().clone());
                         }
                     }
                 }
@@ -210,12 +241,15 @@ impl Parse for ModuleDefinition {
             }
         }
 
-        Ok(ModuleDefinition {
-            attributes,
-            name,
-            parameters,
-            body,
-        })
+        with_pair_ok!(
+            ModuleDefinition {
+                attributes,
+                name,
+                parameters,
+                body,
+            },
+            p
+        )
     }
 }
 
@@ -257,17 +291,22 @@ impl std::fmt::Display for UseStatement {
 }
 
 impl Parse for UseAlias {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut pairs = pair.into_inner();
-        Ok(UseAlias(
-            QualifiedName::parse(pairs.next().unwrap())?,
-            Identifier::parse(pairs.next().unwrap())?,
-        ))
+        with_pair_ok!(
+            UseAlias(
+                QualifiedName::parse(pairs.next().unwrap())?.value().clone(),
+                Identifier::parse(pairs.next().unwrap())?.value().clone(),
+            ),
+            p
+        )
     }
 }
 
 impl Parse for UseStatement {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut pairs = pair.into_inner();
 
         let first = pairs.next().unwrap();
@@ -275,34 +314,42 @@ impl Parse for UseStatement {
 
         match first.as_rule() {
             Rule::qualified_name_list => {
-                let qualified_name_list = Parser::vec(first.into_inner(), QualifiedName::parse)?;
+                let qualified_name_list = Parser::vec(first, QualifiedName::parse)?.value().clone();
                 if let Some(second) = second {
                     if second.as_rule() == Rule::qualified_name {
-                        return Ok(UseStatement::UseFrom(
-                            qualified_name_list,
-                            QualifiedName::parse(second)?,
-                        ));
+                        return with_pair_ok!(
+                            UseStatement::UseFrom(
+                                qualified_name_list,
+                                QualifiedName::parse(second)?.value().clone(),
+                            ),
+                            p
+                        );
                     } else {
                         unreachable!();
                     }
                 } else {
-                    return Ok(UseStatement::Use(qualified_name_list));
+                    return with_pair_ok!(UseStatement::Use(qualified_name_list), p);
                 }
             }
             Rule::qualified_name_all => {
                 if let Some(second) = second {
                     if second.as_rule() == Rule::qualified_name_list {
-                        return Ok(UseStatement::UseAll(Parser::vec(
-                            second.into_inner(),
-                            QualifiedName::parse,
-                        )?));
+                        return with_pair_ok!(
+                            UseStatement::UseAll(
+                                Parser::vec(second, QualifiedName::parse)?.value().clone()
+                            ),
+                            p
+                        );
                     } else {
                         unreachable!();
                     }
                 }
             }
             Rule::use_alias => {
-                return Ok(UseStatement::UseAlias(UseAlias::parse(first)?));
+                return with_pair_ok!(
+                    UseStatement::UseAlias(UseAlias::parse(first)?.value().clone()),
+                    p
+                );
             }
 
             _ => unreachable!(),

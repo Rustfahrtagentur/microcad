@@ -1,5 +1,5 @@
 use crate::lang_type::Type;
-use crate::parser::{Pair, Parse, ParseError};
+use crate::parser::{Pair, Parse, ParseError, ParseResult, WithPair};
 
 macro_rules! declare_units {
     ($( $(#[$m:meta])* $ident:ident = $string:literal -> $ty:ident $(* $factor:expr)? ,)*) => {
@@ -18,11 +18,11 @@ macro_rules! declare_units {
         }
 
         impl std::str::FromStr for Unit {
-            type Err = ();
+            type Err = ParseError;
             fn from_str(s: &str) -> Result<Self, Self::Err> {
                 match s {
                     $($string => Ok(Self::$ident), )*
-                    _ => Err(())
+                    _ => Err(ParseError::UnknownUnit(s.to_string())),
                 }
             }
         }
@@ -77,9 +77,12 @@ declare_units! {
 }
 
 impl Parse for Unit {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         use std::str::FromStr;
-        Unit::from_str(pair.as_str())
-            .map_err(|_| ParseError::UnknownUnit(pair.as_span().as_str().to_string()))
+        let p = pair.clone();
+        match Unit::from_str(pair.as_str()) {
+            Ok(unit) => Ok(WithPair::new(unit, p)),
+            Err(_) => Err(ParseError::UnknownUnit(pair.as_str().to_string())),
+        }
     }
 }

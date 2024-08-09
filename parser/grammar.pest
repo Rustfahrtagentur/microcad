@@ -333,7 +333,7 @@ function_signature = { definition_parameter_list ~ ws* ~ "->" ~ ws* ~ type }
 //`function test(a: scalar, b: scalar) -> scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
 function_definition = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ function_body }
 
-function_body = _{ "{" ~ (ws* ~ function_statement)* ~ ws* ~ "}" }
+function_body = { "{" ~ (ws* ~ function_statement)* ~ ws* ~ "}" }
 
 function_statement = { assignment_statement | use_statement | function_definition | function_return_statement | function_if_statement }
 

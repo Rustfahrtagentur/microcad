@@ -1,8 +1,9 @@
 use crate::eval::{Context, Eval};
 use crate::expression::{Expression, ExpressionList};
-use crate::parser::{Pair, Parse, ParseError};
+use crate::parser::{Pair, Parse, ParseResult};
 use crate::units::Unit;
 use crate::value::{Value, ValueList};
+use crate::with_pair_ok;
 
 #[derive(Debug, Default, Clone)]
 pub struct ListExpression(ExpressionList, Option<Unit>);
@@ -22,15 +23,21 @@ impl ListExpression {
 }
 
 impl Parse for ListExpression {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut pairs = pair.into_inner();
-        Ok(Self(
-            ExpressionList::parse(pairs.next().unwrap())?,
-            match pairs.next() {
-                Some(pair) => Some(Unit::parse(pair)?),
-                None => None,
-            },
-        ))
+        with_pair_ok!(
+            Self(
+                ExpressionList::parse(pairs.next().unwrap())?
+                    .value()
+                    .clone(),
+                match pairs.next() {
+                    Some(pair) => Some(*Unit::parse(pair)?),
+                    None => None,
+                },
+            ),
+            p
+        )
     }
 }
 

@@ -1,7 +1,7 @@
 use crate::{
     eval::{Context, Eval},
-    parser::{Pair, Parse, ParseError, Parser},
-    Rule,
+    parser::{Pair, Parse, ParseError, ParseResult, Parser, Rule},
+    with_pair_ok,
 };
 
 use thiserror::Error;
@@ -52,9 +52,9 @@ impl<'a> From<&'a Identifier> for &'a str {
 }
 
 impl Parse for Identifier {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::identifier);
-        Ok(Self(pair.as_str().into()))
+        with_pair_ok!(Self(pair.as_str().into()), pair)
     }
 }
 
@@ -127,14 +127,15 @@ impl std::fmt::Display for IdentifierList {
 }
 
 impl Parse for IdentifierList {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut vec = Vec::new();
         for pair in pair.into_inner() {
             if pair.as_rule() == Rule::identifier {
-                vec.push(Identifier::parse(pair)?);
+                vec.push(Identifier::parse(pair)?.value().clone());
             }
         }
-        Ok(Self(vec))
+        with_pair_ok!(Self(vec), p)
     }
 }
 impl std::iter::IntoIterator for IdentifierList {
@@ -162,13 +163,17 @@ impl QualifiedName {
 }
 
 impl Parse for QualifiedName {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
-        Ok(Self(
-            pair.into_inner()
-                .map(|pair| Identifier::parse(pair))
-                .map(|ident| ident.unwrap())
-                .collect(),
-        ))
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
+        with_pair_ok!(
+            Self(
+                pair.into_inner()
+                    .map(|pair| Identifier::parse(pair))
+                    .map(|ident| ident.unwrap().value().clone())
+                    .collect(),
+            ),
+            p
+        )
     }
 }
 

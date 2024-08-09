@@ -1,7 +1,7 @@
 use crate::eval::{Context, Error, Eval};
 use crate::expression::Expression;
-use crate::parser::*;
 use crate::value::Value;
+use crate::{parser::*, with_pair_ok};
 
 #[derive(Clone, Debug, Default)]
 struct FormatSpec {
@@ -10,7 +10,8 @@ struct FormatSpec {
 }
 
 impl Parse for FormatSpec {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut opt = FormatSpec::default();
 
         for pair in pair.into_inner() {
@@ -25,7 +26,7 @@ impl Parse for FormatSpec {
             }
         }
 
-        Ok(opt)
+        with_pair_ok!(opt, p)
     }
 }
 
@@ -33,17 +34,18 @@ impl Parse for FormatSpec {
 pub struct FormatExpression(FormatSpec, Box<Expression>);
 
 impl Parse for FormatExpression {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut fo = FormatSpec::default();
         let mut expr = Expression::default();
         for pair in pair.into_inner() {
             match pair.as_rule() {
-                Rule::format_spec => fo = FormatSpec::parse(pair)?,
-                Rule::expression => expr = Expression::parse(pair)?,
+                Rule::format_spec => fo = FormatSpec::parse(pair)?.value().clone(),
+                Rule::expression => expr = Expression::parse(pair)?.value().clone(),
                 _ => unreachable!(),
             }
         }
-        Ok(Self(fo, Box::new(expr)))
+        with_pair_ok!(Self(fo, Box::new(expr)), p)
     }
 }
 
@@ -117,18 +119,21 @@ impl Eval for FormatString {
 }
 
 impl Parse for FormatString {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let pairs = pair.into_inner();
         let mut fs = Self::default();
         for pair in pairs {
             match pair.as_rule() {
                 Rule::string_literal_inner => fs.push_string(pair.as_span().as_str().to_string()),
-                Rule::format_expression => fs.push_format_expr(FormatExpression::parse(pair)?),
+                Rule::format_expression => {
+                    fs.push_format_expr(FormatExpression::parse(pair)?.value().clone())
+                }
                 _ => unreachable!(),
             }
         }
 
-        Ok(fs)
+        with_pair_ok!(fs, p)
     }
 }
 

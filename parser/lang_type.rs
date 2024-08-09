@@ -3,8 +3,8 @@ use thiserror::Error;
 
 use crate::{
     identifier::{Identifier, QualifiedName},
-    parser::{Pair, Parse, ParseError, Rule},
-    units,
+    parser::{Pair, Parse, ParseResult, Parser, Rule},
+    units, with_pair_ok,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -23,12 +23,15 @@ impl Ty for ListType {
 }
 
 impl Parse for ListType {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut inner = pair.into_inner();
 
         let pair = inner.next().unwrap();
         match pair.as_rule() {
-            Rule::r#type => Ok(Self::from_type(Type::parse(pair)?)),
+            Rule::r#type => {
+                with_pair_ok!(Self::from_type(Type::parse(pair)?.value().clone()), p)
+            }
             _ => unreachable!("Expected type, found {:?}", pair.as_rule()),
         }
     }
@@ -81,16 +84,20 @@ impl MapType {
 }
 
 impl Parse for MapType {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut inner = pair.into_inner();
 
         let key = inner.next().unwrap();
         let value = inner.next().unwrap();
 
-        Ok(Self::from_types(
-            Type::parse(key)?.try_into()?,
-            Type::parse(value)?,
-        ))
+        with_pair_ok!(
+            Self::from_types(
+                (Type::parse(key)?.value().clone()).try_into()?,
+                Type::parse(value)?.value().clone(),
+            ),
+            p
+        )
     }
 }
 
@@ -104,15 +111,16 @@ impl std::fmt::Display for MapType {
 pub struct UnnamedTupleType(pub Vec<Type>);
 
 impl Parse for UnnamedTupleType {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let inner = pair.into_inner();
 
         let mut types = Vec::new();
         for pair in inner {
-            types.push(Type::parse(pair)?);
+            types.push(Type::parse(pair)?.value().clone());
         }
 
-        Ok(Self(types))
+        with_pair_ok!(Self(types), p)
     }
 }
 
@@ -133,25 +141,22 @@ impl std::fmt::Display for UnnamedTupleType {
 pub struct NamedTupleType(pub BTreeMap<Identifier, Type>);
 
 impl Parse for NamedTupleType {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
-        assert_eq!(
-            pair.as_rule(),
-            Rule::named_tuple_type,
-            "Expected named tuple type, found {:?}",
-            pair.as_rule()
-        );
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
+        Parser::ensure_rule(&p, Rule::named_tuple_type);
+
         let mut types = BTreeMap::new();
         for pair in pair.into_inner() {
             let mut inner = pair.into_inner();
-            let name = Identifier::parse(inner.next().unwrap())?;
-            let ty = Type::parse(inner.next().unwrap())?;
+            let name = Identifier::parse(inner.next().unwrap())?.value().clone();
+            let ty = Type::parse(inner.next().unwrap())?.value().clone();
             if types.contains_key(&name) {
                 return Err(TypeError::DuplicatedMapField(name.clone()).into());
             }
             types.insert(name, ty);
         }
 
-        Ok(Self(types))
+        with_pair_ok!(Self(types), p)
     }
 }
 
@@ -234,34 +239,36 @@ impl Type {
 }
 
 impl Parse for Type {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
-        assert_eq!(
-            pair.as_rule(),
-            Rule::r#type,
-            "Expected type, found {:?}",
-            pair.as_rule()
-        );
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
+        Parser::ensure_rule(&p, Rule::r#type);
         let inner = pair.into_inner().next().unwrap();
 
-        match inner.as_rule() {
-            Rule::list_type => Ok(Self::List(ListType::parse(inner)?)),
-            Rule::map_type => Ok(Self::Map(MapType::parse(inner)?)),
-            Rule::unnamed_tuple_type => Ok(Self::UnnamedTuple(UnnamedTupleType::parse(inner)?)),
-            Rule::named_tuple_type => Ok(Self::NamedTuple(NamedTupleType::parse(inner)?)),
+        let s = match inner.as_rule() {
+            Rule::list_type => Self::List(ListType::parse(inner)?.value().clone()),
+            Rule::map_type => Self::Map(MapType::parse(inner)?.value().clone()),
+            Rule::unnamed_tuple_type => {
+                Self::UnnamedTuple(UnnamedTupleType::parse(inner)?.value().clone())
+            }
+            Rule::named_tuple_type => {
+                Self::NamedTuple(NamedTupleType::parse(inner)?.value().clone())
+            }
             Rule::qualified_name => match inner.as_str() {
-                "int" => Ok(Self::Integer),
-                "scalar" => Ok(Self::Scalar),
-                "string" => Ok(Self::String),
-                "color" => Ok(Self::Color),
-                "length" => Ok(Self::Length),
-                "angle" => Ok(Self::Angle),
-                "vec2" => Ok(Self::Vec2),
-                "vec3" => Ok(Self::Vec3),
-                "bool" => Ok(Self::Bool),
-                _ => Ok(Self::Custom(QualifiedName::parse(inner)?)),
+                "int" => Self::Integer,
+                "scalar" => Self::Scalar,
+                "string" => Self::String,
+                "color" => Self::Color,
+                "length" => Self::Length,
+                "angle" => Self::Angle,
+                "vec2" => Self::Vec2,
+                "vec3" => Self::Vec3,
+                "bool" => Self::Bool,
+                _ => Self::Custom(QualifiedName::parse(inner)?.value().clone()),
             },
             _ => unreachable!("Expected type, found {:?}", inner.as_rule()),
-        }
+        };
+
+        with_pair_ok!(s, p)
     }
 }
 

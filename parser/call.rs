@@ -5,7 +5,7 @@ use crate::expression::Expression;
 use crate::identifier::QualifiedName;
 use crate::identifier::{Identifier, IdentifierList};
 
-use crate::parser::*;
+use crate::{parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 enum CallArgument {
@@ -15,29 +15,41 @@ enum CallArgument {
 }
 
 impl Parse for CallArgument {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         match pair.as_rule() {
             Rule::call_named_argument => {
                 let mut pairs = pair.into_inner();
                 let first = pairs.next().unwrap();
                 let second = pairs.next().unwrap();
 
-                Ok(CallArgument::Named(
-                    Identifier::parse(first)?,
-                    Box::new(Expression::parse(second)?),
-                ))
+                with_pair_ok!(
+                    CallArgument::Named(
+                        Identifier::parse(first)?.value().clone(),
+                        Box::new(Expression::parse(second)?.value().clone()),
+                    ),
+                    p
+                )
             }
             Rule::call_named_tuple_argument => {
                 let mut pairs = pair.into_inner();
                 let first = pairs.next().unwrap();
                 let second = pairs.next().unwrap();
 
-                Ok(CallArgument::NamedTuple(
-                    IdentifierList::parse(first)?,
-                    Box::new(Expression::parse(second)?),
-                ))
+                with_pair_ok!(
+                    CallArgument::NamedTuple(
+                        IdentifierList::parse(first)?.value().clone(),
+                        Box::new(Expression::parse(second)?.value().clone()),
+                    ),
+                    p
+                )
             }
-            Rule::expression => Ok(CallArgument::Position(Box::new(Expression::parse(pair)?))),
+            Rule::expression => {
+                with_pair_ok!(
+                    CallArgument::Position(Box::new(Expression::parse(pair)?.value().clone())),
+                    p
+                )
+            }
             rule => unreachable!("CallArgument::parse expected call argument, found {rule:?}"),
         }
     }
@@ -163,13 +175,14 @@ impl Eval for CallArgumentList {
 }
 
 impl Parse for CallArgumentList {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let mut call_argument_list = CallArgumentList::default();
+        let p = pair.clone();
 
         match pair.as_rule() {
             Rule::call_argument_list => {
                 for pair in pair.into_inner() {
-                    match CallArgument::parse(pair)? {
+                    match CallArgument::parse(pair)?.value().clone() {
                         CallArgument::Named(ident, expr) => {
                             call_argument_list.insert_named(ident, *expr)?;
                         }
@@ -184,7 +197,7 @@ impl Parse for CallArgumentList {
                     }
                 }
 
-                Ok(call_argument_list)
+                with_pair_ok!(call_argument_list, p)
             }
             rule => {
                 unreachable!("CallArgumentList::parse expected call argument list, found {rule:?}")
@@ -200,18 +213,22 @@ pub struct MethodCall {
 }
 
 impl Parse for MethodCall {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut pairs = pair.into_inner();
         println!("{:?}", pairs);
 
-        Ok(MethodCall {
-            name: Identifier::parse(pairs.next().unwrap())?,
-            argument_list: if let Some(pair) = pairs.next() {
-                CallArgumentList::parse(pair)?
-            } else {
-                CallArgumentList::default()
+        with_pair_ok!(
+            MethodCall {
+                name: Identifier::parse(pairs.next().unwrap())?.value().clone(),
+                argument_list: if let Some(pair) = pairs.next() {
+                    CallArgumentList::parse(pair)?.value().clone()
+                } else {
+                    CallArgumentList::default()
+                },
             },
-        })
+            p
+        )
     }
 }
 
@@ -230,14 +247,18 @@ pub struct Call {
 }
 
 impl Parse for Call {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut pairs = pair.into_inner();
         let (first, second) = (pairs.next().unwrap(), pairs.next().unwrap());
 
-        Ok(Call {
-            name: QualifiedName::parse(first)?,
-            argument_list: CallArgumentList::parse(second)?,
-        })
+        with_pair_ok!(
+            Call {
+                name: QualifiedName::parse(first)?.value().clone(),
+                argument_list: CallArgumentList::parse(second)?.value().clone(),
+            },
+            p
+        )
     }
 }
 

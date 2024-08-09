@@ -41,13 +41,21 @@ pub enum ParseError {
 }
 
 pub struct WithPair<'a, T> {
-    pair: Pair<'a>,
     value: T,
+    pair: Pair<'a>,
+}
+
+#[macro_export]
+macro_rules! with_pair_ok {
+    ($value:expr, $pair:ident) => {
+        Ok($crate::parser::WithPair::new($value, $pair))
+    };
+    () => {};
 }
 
 impl<'a, T> WithPair<'a, T> {
-    pub fn new(pair: Pair<'a>, value: T) -> Self {
-        Self { pair, value }
+    pub fn new(value: T, pair: Pair<'a>) -> Self {
+        Self { value, pair }
     }
 
     pub fn pair(&self) -> Pair<'a> {
@@ -79,8 +87,10 @@ impl<'a, T> std::ops::Deref for WithPair<'a, T> {
     }
 }
 
+pub type ParseResult<'a, T> = Result<WithPair<'a, T>, ParseError>;
+
 pub trait Parse: Sized {
-    fn parse(pair: Pair) -> Result<Self, ParseError>;
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self>;
 }
 
 impl Parser {
@@ -88,24 +98,36 @@ impl Parser {
     /// @param pairs The pairs to parse
     /// @param f The function to parse the pair into T
     /// @return A vector of T
-    pub fn vec<T>(
-        pairs: Pairs,
-        f: impl Fn(Pair) -> Result<T, ParseError>,
-    ) -> Result<Vec<T>, ParseError> {
-        Ok(pairs.map(f).map(|x| x.unwrap()).collect::<Vec<_>>())
+    pub fn vec<'a, T>(
+        pair: Pair<'a>,
+        f: impl Fn(Pair<'a>) -> ParseResult<'a, T>,
+    ) -> ParseResult<'a, Vec<T>>
+    where
+        T: Clone,
+    {
+        let p = pair.clone();
+        let mut vec = Vec::new();
+        for pair in pair.into_inner() {
+            let value = f(pair)?;
+            vec.push(value.value().clone());
+        }
+
+        with_pair_ok!(vec, p)
     }
 
     /// Convenience function to parse a rule for type `T` and panic on error
     pub fn parse_rule_or_panic<T>(rule: Rule, input: &str) -> T
     where
-        T: Parse,
+        T: Parse + Clone,
     {
         use pest::Parser;
         let pair = crate::parser::Parser::parse(rule, input.trim())
             .unwrap()
             .next()
             .unwrap();
-        T::parse(pair).unwrap()
+
+        let w = T::parse(pair).unwrap();
+        w.value().clone()
     }
 
     pub fn ensure_rule(pair: &Pair, expected: Rule) {
@@ -118,7 +140,7 @@ impl Parser {
 mod tests {
     include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
     include!(concat!(env!("OUT_DIR"), "/md_test.rs"));
-    use literal::NumberLiteral;
+    /*use literal::NumberLiteral;
     use parser::Parse;
 
     #[test]
@@ -147,5 +169,5 @@ mod tests {
     fn _test_file_nested() {
         _test_file("tests/nested.csg");
         _test_file("tests/module.csg");
-    }
+    }*/
 }

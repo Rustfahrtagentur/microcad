@@ -4,9 +4,9 @@ use crate::format_string::FormatString;
 use crate::identifier::QualifiedName;
 use crate::list::ListExpression;
 use crate::literal::Literal;
-use crate::parser::*;
 use crate::tuple::TupleExpression;
 use crate::value::Value;
+use crate::{parser::*, with_pair_ok};
 use pest::pratt_parser::PrattParser;
 
 lazy_static::lazy_static! {
@@ -39,10 +39,16 @@ pub enum NestedItem {
 }
 
 impl Parse for NestedItem {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         match pair.as_rule() {
-            Rule::call => Call::parse(pair).map(NestedItem::Call),
-            Rule::qualified_name => QualifiedName::parse(pair).map(NestedItem::QualifiedName),
+            Rule::call => with_pair_ok!(NestedItem::Call(Call::parse(pair)?.value().clone()), p),
+            Rule::qualified_name => {
+                with_pair_ok!(
+                    NestedItem::QualifiedName(QualifiedName::parse(pair)?.value().clone()),
+                    p
+                )
+            }
             rule => unreachable!(
                 "NestedItem::parse expected call or qualified name, found {:?}",
                 rule
@@ -64,12 +70,14 @@ impl std::fmt::Display for NestedItem {
 pub struct Nested(Vec<NestedItem>);
 
 impl Parse for Nested {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
-        Ok(Nested(
-            pair.into_inner()
-                .map(NestedItem::parse)
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
+        let mut vec = Vec::new();
+        for pair in pair.into_inner() {
+            vec.push(NestedItem::parse(pair)?.value().clone());
+        }
+
+        with_pair_ok!(Nested(vec), p)
     }
 }
 
@@ -247,26 +255,29 @@ impl Eval for Expression {
 }
 
 impl Parse for Expression {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
         let mut error: Option<ParseError> = None;
         let result = PRATT_PARSER
             .map_primary(|primary| match primary.as_rule() {
                 Rule::literal => match Literal::parse(primary) {
-                    Ok(literal) => Self::Literal(literal),
+                    Ok(literal) => Self::Literal(literal.value().clone()),
                     Err(e) => {
                         error = Some(e);
                         Self::Invalid
                     }
                 },
-                Rule::expression => Self::parse(primary).unwrap(),
+                Rule::expression => Self::parse(primary).unwrap().value().clone(),
                 Rule::list_expression => {
-                    Self::ListExpression(ListExpression::parse(primary).unwrap())
+                    Self::ListExpression(ListExpression::parse(primary).unwrap().value().clone())
                 }
                 Rule::tuple_expression => {
-                    Self::TupleExpression(TupleExpression::parse(primary).unwrap())
+                    Self::TupleExpression(TupleExpression::parse(primary).unwrap().value().clone())
                 }
-                Rule::format_string => Self::FormatString(FormatString::parse(primary).unwrap()),
-                Rule::nested => Self::Nested(Nested::parse(primary).unwrap()),
+                Rule::format_string => {
+                    Self::FormatString(FormatString::parse(primary).unwrap().value().clone())
+                }
+                Rule::nested => Self::Nested(Nested::parse(primary).unwrap().value().clone()),
                 rule => unreachable!("Expression::parse expected atom, found {:?}", rule),
             })
             .map_infix(|lhs, op, rhs| {
@@ -308,12 +319,14 @@ impl Parse for Expression {
                 }
             })
             .map_postfix(|lhs, op| match op.as_rule() {
-                Rule::list_element_access | Rule::tuple_element_access => {
-                    Self::ElementAccess(Box::new(lhs), Box::new(Self::parse(op).unwrap()))
-                }
-                Rule::method_call => {
-                    Self::MethodCall(Box::new(lhs), crate::call::MethodCall::parse(op).unwrap())
-                }
+                Rule::list_element_access | Rule::tuple_element_access => Self::ElementAccess(
+                    Box::new(lhs),
+                    Box::new(Self::parse(op).unwrap().value().clone()),
+                ),
+                Rule::method_call => Self::MethodCall(
+                    Box::new(lhs),
+                    crate::call::MethodCall::parse(op).unwrap().value().clone(),
+                ),
                 rule => {
                     unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
                 }
@@ -322,7 +335,7 @@ impl Parse for Expression {
 
         match error {
             Some(e) => Err(e),
-            None => Ok(result),
+            None => with_pair_ok!(result, p),
         }
     }
 }
@@ -362,12 +375,15 @@ impl IntoIterator for ExpressionList {
 }
 
 impl Parse for ExpressionList {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
-        Ok(Self(
-            pair.into_inner()
-                .map(|pair| Expression::parse(pair))
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
+        let mut vec = Vec::new();
+
+        for pair in pair.into_inner() {
+            vec.push(Expression::parse(pair)?.value().clone());
+        }
+
+        with_pair_ok!(Self(vec), p)
     }
 }
 

@@ -1,27 +1,30 @@
 use crate::{
     module::ModuleStatement,
-    parser::{Pair, Parse, ParseError, Rule},
+    parser::{Pair, Parse, ParseResult, Rule},
+    with_pair_ok,
 };
 
+#[derive(Clone)]
 pub struct Document {
     body: Vec<ModuleStatement>,
 }
 
 impl Parse for Document {
-    fn parse(pair: Pair) -> Result<Self, ParseError> {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let mut body = Vec::new();
+        let p = pair.clone();
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::module_statement => {
-                    body.push(ModuleStatement::parse(pair)?);
+                    body.push(ModuleStatement::parse(pair)?.value().clone());
                 }
                 Rule::EOI => break,
                 _ => {}
             }
         }
 
-        Ok(Document { body })
+        with_pair_ok!(Document { body }, p)
     }
 }
 
