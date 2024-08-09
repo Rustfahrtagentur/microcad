@@ -5,7 +5,7 @@ use crate::units::Unit;
 use crate::value::{Value, ValueList};
 use crate::with_pair_ok;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Default, Clone)]
 pub struct ListExpression(ExpressionList, Option<Unit>);
 
 impl ListExpression {

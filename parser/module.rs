@@ -95,6 +95,7 @@ pub struct ModuleInitDefinition {
 
 impl Parse for ModuleInitDefinition {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        Parser::ensure_rule(&pair, Rule::module_init_definition);
         let p = pair.clone();
         let mut parameters = Vec::new();
         let mut body = Vec::new();
@@ -109,6 +110,7 @@ impl Parse for ModuleInitDefinition {
                 Rule::module_init_statement => {
                     body.push(ModuleInitStatement::parse(pair)?.value().clone());
                 }
+                Rule::COMMENT => {}
                 rule => unreachable!("expected definition_parameter_list or module_init_statement. Instead found {rule:?}" ),
             }
         }
@@ -157,6 +159,23 @@ impl Parse for ModuleStatement {
         };
 
         with_pair_ok!(s, p)
+    }
+}
+
+impl Display for ModuleStatement {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            ModuleStatement::Use(use_statement) => write!(f, "{}", use_statement),
+            ModuleStatement::Expression(expression) => write!(f, "{}", expression),
+            ModuleStatement::Assignment(assignment) => write!(f, "{}", assignment),
+            ModuleStatement::ModuleDefinition(module_definition) => {
+                write!(f, "{}", module_definition.name)
+            }
+            ModuleStatement::FunctionDefinition(function_definition) => {
+                write!(f, "{}", function_definition.name)
+            }
+            ModuleStatement::ModuleInitDefinition(_) => write!(f, "module init"),
+        }
     }
 }
 

@@ -10,7 +10,7 @@ use crate::lang_type::Type;
 use crate::module::UseStatement;
 use crate::value::Value;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct DefinitionParameter {
     #[allow(dead_code)]
     name: Identifier,
@@ -212,6 +212,15 @@ impl Eval for Assignment {
         let value = self.value.eval(context)?;
         context.add_symbol(Symbol::Value(self.name.clone(), value));
         Ok(())
+    }
+}
+
+impl std::fmt::Display for Assignment {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.specified_type {
+            Some(t) => write!(f, "{}: {} = {}", self.name, t, self.value),
+            None => write!(f, "{} = {}", self.name, self.value),
+        }
     }
 }
 

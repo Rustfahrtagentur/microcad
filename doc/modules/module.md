@@ -71,8 +71,8 @@ module donut(radius_outer: length, radius_inner: length) {
 
 // generate three equal donuts
 donut( 2cm, 1cm );
-donut( radius_outer=2cm, radius_outer=1cm );
-donut( diameter_outer=4cm, diameter_outer=2cm );
+donut( radius_outer=2cm, radius_inner=1cm );
+donut( diameter_outer=4cm, diameter_inner=2cm );
 ```
 
 ## Member fields

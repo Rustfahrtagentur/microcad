@@ -7,7 +7,7 @@ use crate::identifier::{Identifier, IdentifierList};
 
 use crate::{parser::*, with_pair_ok};
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 enum CallArgument {
     Named(Identifier, Box<Expression>),
     NamedTuple(IdentifierList, Box<Expression>),
@@ -206,7 +206,7 @@ impl Parse for CallArgumentList {
     }
 }
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Clone)]
 pub struct MethodCall {
     pub name: Identifier,
     pub argument_list: CallArgumentList,
@@ -238,7 +238,7 @@ impl std::fmt::Display for MethodCall {
     }
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct Call {
     #[allow(dead_code)]
     name: QualifiedName,
@@ -249,13 +249,18 @@ pub struct Call {
 impl Parse for Call {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let p = pair.clone();
+        Parser::ensure_rule(&pair, Rule::call);
         let mut pairs = pair.into_inner();
-        let (first, second) = (pairs.next().unwrap(), pairs.next().unwrap());
+
+        let first = pairs.next().unwrap();
 
         with_pair_ok!(
             Call {
                 name: QualifiedName::parse(first)?.value().clone(),
-                argument_list: CallArgumentList::parse(second)?.value().clone(),
+                argument_list: match pairs.next() {
+                    Some(pair) => CallArgumentList::parse(pair)?.value().clone(),
+                    None => CallArgumentList::default(),
+                }
             },
             p
         )

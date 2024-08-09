@@ -8,7 +8,7 @@ use crate::units::Unit;
 use crate::value::{NamedTuple, UnnamedTuple, Value, ValueList, Vec2, Vec3};
 use crate::with_pair_ok;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Default, Clone)]
 pub struct TupleExpression(CallArgumentList, Option<Unit>);
 
 impl Parse for TupleExpression {

@@ -4,6 +4,7 @@ use crate::format_string::FormatString;
 use crate::identifier::QualifiedName;
 use crate::list::ListExpression;
 use crate::literal::Literal;
+use crate::module::ModuleStatement;
 use crate::tuple::TupleExpression;
 use crate::value::Value;
 use crate::{parser::*, with_pair_ok};
@@ -31,11 +32,11 @@ lazy_static::lazy_static! {
     };
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum NestedItem {
     Call(Call),
     QualifiedName(QualifiedName),
-    // TODO: ModuleInner(ModuleInner),
+    ModuleBody(Vec<ModuleStatement>),
 }
 
 impl Parse for NestedItem {
@@ -48,6 +49,15 @@ impl Parse for NestedItem {
                     NestedItem::QualifiedName(QualifiedName::parse(pair)?.value().clone()),
                     p
                 )
+            }
+            Rule::module_body => {
+                let mut vec = Vec::new();
+                for pair in pair.into_inner() {
+                    if pair.as_rule() == Rule::module_statement {
+                        vec.push(ModuleStatement::parse(pair)?.value().clone());
+                    }
+                }
+                with_pair_ok!(NestedItem::ModuleBody(vec), p)
             }
             rule => unreachable!(
                 "NestedItem::parse expected call or qualified name, found {:?}",
@@ -62,11 +72,17 @@ impl std::fmt::Display for NestedItem {
         match self {
             NestedItem::Call(call) => write!(f, "{}", call),
             NestedItem::QualifiedName(qualified_name) => write!(f, "{}", qualified_name),
+            NestedItem::ModuleBody(body) => {
+                for stmt in body {
+                    write!(f, "{{{}}}", stmt)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Nested(Vec<NestedItem>);
 
 impl Parse for Nested {
@@ -74,7 +90,12 @@ impl Parse for Nested {
         let p = pair.clone();
         let mut vec = Vec::new();
         for pair in pair.into_inner() {
-            vec.push(NestedItem::parse(pair)?.value().clone());
+            if pair.as_rule() == Rule::qualified_name
+                || pair.as_rule() == Rule::call
+                || pair.as_rule() == Rule::module_body
+            {
+                vec.push(NestedItem::parse(pair)?.value().clone());
+            }
         }
 
         with_pair_ok!(Nested(vec), p)
@@ -96,6 +117,12 @@ impl Eval for Nested {
                             _ => todo!(),
                         }
                     }
+                    NestedItem::ModuleBody(body) => {
+                        for stmt in body {
+                            // stmt.eval(context)?;
+                            todo!()
+                        }
+                    }
                 }
             }
         }
@@ -107,7 +134,7 @@ impl Eval for Nested {
     }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Default, Clone)]
 pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
@@ -249,7 +276,7 @@ impl Eval for Expression {
                 }
             }
             Self::Nested(nested) => nested.eval(context),
-            _ => unimplemented!("{:?}", self),
+            _ => unimplemented!(),
         }
     }
 }
@@ -340,7 +367,7 @@ impl Parse for Expression {
     }
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default)]
 pub struct ExpressionList(Vec<Expression>);
 
 impl ExpressionList {
