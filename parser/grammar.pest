@@ -24,8 +24,7 @@ multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 //`_a`: ok
 //`_`: ok
 //`1`: error
-//`A`: error # Identifiers are lowercase
-identifier = { (alpha_lower | "_") ~ (alpha_lower | digit | "_")* }
+identifier = { (alpha_lower | alpha_upper | "_") ~ (alpha_lower | alpha_upper | digit | "_")* }
 
 //`a,b`: ok # A comma-separated list of identifier
 identifier_list = { identifier ~ (ws* ~ "," ~ ws* ~ identifier)*}
@@ -333,7 +332,7 @@ function_signature = { definition_parameter_list ~ ws* ~ "->" ~ ws* ~ type }
 //`function test(a: scalar, b: scalar) -> scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
 function_definition = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ function_body }
 
-function_body = { "{" ~ (ws* ~ function_statement)* ~ ws* ~ "}" }
+function_body = { "{" ~ ((ws* ~ function_statement)+ | ws* ~ expression)? ~ ws* ~ "}" }
 
 function_statement = { assignment_statement | use_statement | function_definition | function_return_statement | function_if_statement }
 
@@ -358,9 +357,9 @@ module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws
 namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ module_body }
 
 //`{ translate() rotate(); }`: ok
-module_body = { "{" ~ ws* ~ module_node_inner? ~ ws*~ "}" }
+module_body = { "{" ~ ws* ~ module_inner? ~ ws*~ "}" }
 
-module_node_inner = _{ ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
+module_inner = _{ ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
 
 module_statement = { use_statement | expression_statement | assignment_statement |
   module_init_definition | module_definition | namespace_definition | function_definition }
@@ -377,4 +376,4 @@ module_init_inner = _{ ws* ~ (module_init_statement ~ ws*)+ | ws* ~ (module_init
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 //`module foo { init(size: length) { rectangle(size); } }`: ok # Module with init function
-document = { SOI ~ module_node_inner? ~ EOI }
+document = { SOI ~ module_inner? ~ EOI }
