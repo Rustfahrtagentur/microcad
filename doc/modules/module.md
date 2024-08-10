@@ -1,52 +1,45 @@
 # Modules
 
-## Syntax
-
-`module` *name* `(`*parameter_list*`)` `{`
-    *use_statement* |
-    *expression_statement* |
-    *assignment_statement* |
-    *module_init_definition* |
-    *module_definition* |
-    *function_definition*
-`}`
-
 ## Declaration
-
-A fixed circle.
 
 ```µCAD,declaration
 // define custom module circle
 module circle() {
-    // generate circle
-    geo2d::circle(1cm);
+    // generate circle by using module geo2d
+    std::geo2d::circle(1cm);
 }
 
 // generate module circle
 circle();
 ```
 
-## Parameter List
+## Module Elements
+
+### Module Attributes
+
+TODO
+
+### Module Parameter List
 
 A 2D donut as circle with a hole.
 
-```µCAD,init.parameters
+```µCAD,parameters
 // declare two parameters
 module donut(outer: length, inner: length) {
-    // parameters can used anywhere within the module
-    geo2d::circle(outer) - geo2d::circle(inner);
+    // parameters can be used anywhere within the module
+    std::geo2d::circle(outer) - std::geo2d::circle(inner);
 }
 
 // generate donut of specific size
 donut(2cm,1cm);
 ```
 
-## Use Statement
+### Module Use
 
-```µCAD,use
+```µCAD,use_statement
 module donut(outer: length, inner: length) {
     // load circle from module geo2d
-    use circle from geo2d;
+    use circle from std::geo2d;
 
     // circle is now without geo2d prefix
     circle(outer) - circle(inner);
@@ -55,10 +48,12 @@ module donut(outer: length, inner: length) {
 donut(2cm,1cm);
 ```
 
-## Module Init Definition
+### Module Initialization
 
-```µCAD,init.alternative
+```µCAD,initialization
 module donut(radius_outer: length, radius_inner: length) {
+    use circle from std::geo2d;
+
     // alternative initialization with diameters
     init( diameter_outer: length, diameter_inner: length ) {
         // calculate radiuses from diameters
@@ -67,7 +62,7 @@ module donut(radius_outer: length, radius_inner: length) {
     }
 
     // generate donut based on radiuses
-    geo2d::circle(radius_outer) - geo2d::circle(radius_inner);
+    circle(radius_outer) - circle(radius_inner);
 }
 
 // generate three equal donuts
@@ -76,57 +71,69 @@ donut( radius_outer=2cm, radius_inner=1cm );
 donut( diameter_outer=4cm, diameter_inner=2cm );
 ```
 
-## Member fields
+### Module Fields
 
 ```µCAD,member.fields
 module donut(radius) {
+    use circle from std::geo2d;
+
     // calculate inner from radius
     inner = radius/2;
 
     // generate donut
-    geo2d::circle(radius) - geo2d::circle(inner);
+    circle(radius) - circle(inner);
 }
 ```
 
-## Functions
+### Module Functions
 
 ```µCAD,member.functions
 module donut(radius) {
-    // calculate inner from radius in a method
+    use circle from std::geo2d;
+
+#    // calculate inner from radius in a method
     function inner() { radius/2 }
 
-    geo2d::circle(radius) - geo2d::circle(inner());
+    // generate donut
+    circle(radius) - circle(inner());
 }
 ```
 
-## Namespace module
+## Module Types
+
+### Namespace Modules
 
 * Provides function and modules
 * No parameter list
 
 ```µcad,namespaces
-module math {
-    function abs(x:scalar) -> scalar {
-        if scalar < 0 { -scalar } else { scalar }
-    }
-}
+// namespace module std
+module std {
+    
+    // namespace module math
+    module math {
 
-module algorithm {
-    module union() {
-        init() {
-            
+        // define PI as field
+        PI = 3.1315;
+
+        // define calculation function
+        function abs(x:scalar) -> scalar {
+            if scalar < 0 { -scalar } else { scalar }
         }
     }
 }
+
+// call both
+x = std::math::abs(-1) * std::math::PI;
 ```
 
-## Parametric module
+### Parametric Modules
 
 * Parametric modules have a parameter lists
 
-### Member functions
+#### Calculation in Member Function
 
-```µcad,member.functions1
+```µcad,parametric.functions
 module cube_with_volume(size: length) {
 
     function volume() {
@@ -145,13 +152,12 @@ info("Cube volume: {my_cube.volume()}");
 info("Cube weight: {my_cube.weight(40g/mm^3)}");
 ```
 
-### Member variable with initialization
+#### Calculation in Member Field Initialization
 
-```µcad
+```µcad,parametric.init
 module cube_with_volume(size: length) {
 
     volume = size*size*size;
-    volume = math::volume(size);
 
     function weight(density: weight / length^3 = 20g/mm^3) {
         volume * density
@@ -164,7 +170,3 @@ my_cube = cube_with_volume(40mm);
 info("Cube volume: {my_cube.volume}");
 info("Cube weight: {my_cube.weight(40g/mm^3)}");
 ```
-
-### Member function with parameters
-
-module cube_with_volume(size: length) {
