@@ -350,10 +350,12 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { return 5.0mm; }`: error # Module cannot have return statement
 //`module foo() { module bar() { } }`: ok # Nested module definition
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
-//`module math { }`: ok # Module with no argument list acts as namespace
 //`module list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Module with module as argument
-//`module foo { init(size: length) { rectangle(size); } }`: ok # Module with init function
+//`module foo() { init(size: length) { rectangle(size); } }`: ok # Module with init function
 module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ definition_parameter_list? ~ ws* ~ module_body }
+
+//`namespace math { }`: ok # namespace (like module with no arguments)
+namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ module_body }
 
 //`{ translate() rotate(); }`: ok
 module_body = { "{" ~ ws* ~ module_node_inner? ~ ws*~ "}" }
@@ -361,7 +363,7 @@ module_body = { "{" ~ ws* ~ module_node_inner? ~ ws*~ "}" }
 module_node_inner = _{ ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
 
 module_statement = { use_statement | expression_statement | assignment_statement |
-  module_init_definition | module_definition | function_definition }
+  module_init_definition | module_definition | namespace_definition | function_definition }
 
 //`init(d: length) { r = d / 2; }`: ok
 //`init(size: length) { size = size; }`: ok

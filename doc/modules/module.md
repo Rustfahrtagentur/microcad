@@ -99,41 +99,15 @@ module donut(radius) {
 }
 ```
 
-## Module Types
+## Usage Examples
 
-### Namespace Modules
-
-* Provides function and modules
-* No parameter list
-
-```µcad,namespaces
-// namespace module std
-module std {
-    
-    // namespace module math
-    module math {
-
-        // define PI as field
-        PI = 3.1315;
-
-        // define calculation function
-        function abs(x:scalar) -> scalar {
-            if scalar < 0 { -scalar } else { scalar }
-        }
-    }
-}
-
-// call both
-x = std::math::abs(-1) * std::math::PI;
-```
-
-### Parametric Modules
+### Parametric Module
 
 * Parametric modules have a parameter lists
 
-#### Calculation in Member Function
+#### Calculation in Function
 
-```µcad,parametric.functions
+```µcad,examples.parametric_module.functions
 module cube_with_volume(size: length) {
 
     function volume() {
@@ -152,9 +126,9 @@ info("Cube volume: {my_cube.volume()}");
 info("Cube weight: {my_cube.weight(40g/mm^3)}");
 ```
 
-#### Calculation in Member Field Initialization
+#### Calculation in Field Initialization
 
-```µcad,parametric.init
+```µcad,examples.parametric_module.fields
 module cube_with_volume(size: length) {
 
     volume = size*size*size;
