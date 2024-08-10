@@ -1,14 +1,5 @@
-use std::rc::Rc;
-
-use crate::call::EvaluatedCallArgumentList;
-use crate::eval::{Context, Eval, Symbol};
-use crate::expression::Expression;
-use crate::identifier::Identifier;
-use crate::{parser::*, with_pair_ok};
-
-use crate::lang_type::Type;
-use crate::module::UseStatement;
-use crate::value::Value;
+use super::{call::*, expression::*, identifier::*, lang_type::*, module::*, value::*};
+use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone)]
 pub struct DefinitionParameter {
@@ -208,7 +199,7 @@ impl Parse for Assignment {
 impl Eval for Assignment {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         let value = self.value.eval(context)?;
         context.add_symbol(Symbol::Value(self.name.clone(), value));
         Ok(())
@@ -228,7 +219,7 @@ impl std::fmt::Display for Assignment {
 pub enum FunctionStatement {
     Assignment(Assignment),
     Use(UseStatement),
-    FunctionDefinition(Rc<FunctionDefinition>),
+    FunctionDefinition(std::rc::Rc<FunctionDefinition>),
     Return(Box<Expression>),
     If {
         condition: Expression,
@@ -247,9 +238,9 @@ impl Parse for FunctionStatement {
         let s = match first.as_rule() {
             Rule::assignment => Self::Assignment(Assignment::parse(first)?.value().clone()),
             Rule::use_statement => Self::Use(UseStatement::parse(first)?.value().clone()),
-            Rule::function_definition => {
-                Self::FunctionDefinition(Rc::new(FunctionDefinition::parse(first)?.value().clone()))
-            }
+            Rule::function_definition => Self::FunctionDefinition(std::rc::Rc::new(
+                FunctionDefinition::parse(first)?.value().clone(),
+            )),
             Rule::function_return_statement => {
                 Self::Return(Box::new(Expression::parse(first)?.value().clone()))
             }
@@ -285,7 +276,7 @@ impl Parse for FunctionStatement {
 }
 
 pub type BuiltinFunction =
-    Rc<dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Value, crate::eval::Error>>;
+    std::rc::Rc<dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Value, Error>>;
 
 #[derive(Clone)]
 pub struct FunctionDefinition {
@@ -300,8 +291,8 @@ impl FunctionDefinition {
         name: Identifier,
         signature: FunctionSignature,
         builtin: BuiltinFunction,
-    ) -> Rc<Self> {
-        Rc::new(Self {
+    ) -> std::rc::Rc<Self> {
+        std::rc::Rc::new(Self {
             name,
             signature,
             body: Vec::new(),
@@ -340,7 +331,7 @@ impl FunctionDefinition {
         &self,
         args: EvaluatedCallArgumentList,
         context: &mut Context,
-    ) -> Result<Value, crate::eval::Error> {
+    ) -> Result<Value, Error> {
         if let Some(builtin) = &self.builtin {
             return builtin(args, context);
         }
@@ -395,10 +386,10 @@ impl Parse for FunctionDefinition {
     }
 }
 
-impl Eval for Rc<FunctionDefinition> {
+impl Eval for std::rc::Rc<FunctionDefinition> {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         context.add_symbol(Symbol::Function(self.clone()));
         Ok(())
     }
@@ -406,8 +397,7 @@ impl Eval for Rc<FunctionDefinition> {
 
 #[test]
 fn assignment() {
-    let assignment =
-        Parser::parse_rule_or_panic::<crate::function::Assignment>(Rule::assignment, "a = 1");
+    let assignment = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "a = 1");
 
     let mut context = Context::default();
 
@@ -431,10 +421,7 @@ fn function_signature() {
         Parser::parse_rule_or_panic::<FunctionSignature>(Rule::function_signature, input);
 
     assert_eq!(function_signature.parameters().len(), 2);
-    assert_eq!(
-        function_signature.return_type(),
-        &crate::lang_type::Type::Scalar
-    );
+    assert_eq!(function_signature.return_type(), &Type::Scalar);
 }
 
 #[test]
@@ -454,16 +441,16 @@ fn function_evaluate() {
             return a + b + c;
         }"#;
 
-    let function_def = Rc::new(Parser::parse_rule_or_panic::<
-        crate::function::FunctionDefinition,
-    >(Rule::function_definition, input));
+    let function_def = std::rc::Rc::new(Parser::parse_rule_or_panic::<FunctionDefinition>(
+        Rule::function_definition,
+        input,
+    ));
 
     let mut context = Context::default();
     context.add_symbol(Symbol::Function(function_def));
 
     let input = "test(a = 1, b = 2)";
-    let expr =
-        Parser::parse_rule_or_panic::<crate::expression::Expression>(Rule::expression, input);
+    let expr = Parser::parse_rule_or_panic::<Expression>(Rule::expression, input);
 
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.to_string(), "4");

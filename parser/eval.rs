@@ -1,13 +1,5 @@
-use std::collections::HashMap;
-use std::rc::Rc;
-use std::vec;
+use crate::language::{function::*, identifier::*, lang_type::*, module::*, value::*};
 use thiserror::Error;
-
-use crate::function::FunctionDefinition;
-use crate::identifier::{Identifier, QualifiedName};
-use crate::lang_type::Type;
-use crate::module::ModuleDefinition;
-use crate::value::{Value, ValueError};
 
 #[derive(Debug, Error)]
 pub enum OperatorError {
@@ -56,8 +48,8 @@ pub enum Error {
 #[derive(Clone)]
 pub enum Symbol {
     Value(Identifier, Value),
-    Function(Rc<FunctionDefinition>),
-    ModuleDefinition(Rc<ModuleDefinition>),
+    Function(std::rc::Rc<FunctionDefinition>),
+    ModuleDefinition(std::rc::Rc<ModuleDefinition>),
 }
 
 impl Symbol {
@@ -81,13 +73,13 @@ impl Symbol {
 /// @details A symbol table is a mapping of symbol
 #[derive(Default, Clone)]
 pub struct SymbolTable {
-    symbols: HashMap<String, Symbol>,
+    symbols: std::collections::HashMap<String, Symbol>,
 }
 
 impl SymbolTable {
     pub fn new() -> Self {
         Self {
-            symbols: HashMap::new(),
+            symbols: std::collections::HashMap::new(),
         }
     }
 
@@ -158,8 +150,7 @@ fn context_basic() {
     assert_eq!(context.get_symbol("a").unwrap().name(), "a");
     assert_eq!(context.get_symbol("b").unwrap().name(), "b");
 
-    let _c =
-        Parser::parse_rule_or_panic::<crate::function::Assignment>(Rule::assignment, "c = a + b");
+    let _c = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "c = a + b");
 
     //c.eval(Some(&context)).unwrap();
 }

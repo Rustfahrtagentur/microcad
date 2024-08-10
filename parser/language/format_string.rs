@@ -1,7 +1,5 @@
-use crate::eval::{Context, Error, Eval};
-use crate::expression::Expression;
-use crate::value::Value;
-use crate::{parser::*, with_pair_ok};
+use super::{expression::*, value::*};
+use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug, Default)]
 struct FormatSpec {
@@ -50,7 +48,7 @@ impl Parse for FormatExpression {
 }
 
 impl Eval for FormatExpression {
-    type Output = crate::value::Value;
+    type Output = Value;
 
     fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         Ok(Value::String(format!("{}", self.1.eval(context)?)))
@@ -100,7 +98,7 @@ impl std::fmt::Display for FormatString {
 }
 
 impl Eval for FormatString {
-    type Output = crate::value::Value;
+    type Output = Value;
 
     fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         let mut result = String::new();
@@ -139,9 +137,8 @@ impl Parse for FormatString {
 
 #[test]
 fn format_string() {
-    use pest::Parser;
-
-    let pair = crate::parser::Parser::parse(Rule::format_string, "\"A{2 + 4}B\"")
+    use pest::Parser as _;
+    let pair = Parser::parse(Rule::format_string, "\"A{2 + 4}B\"")
         .unwrap()
         .next()
         .unwrap();

@@ -1,11 +1,6 @@
-use std::collections::BTreeMap;
+use super::{identifier::*, units::*};
+use crate::{parser::*, with_pair_ok};
 use thiserror::Error;
-
-use crate::{
-    identifier::{Identifier, QualifiedName},
-    parser::{Pair, Parse, ParseResult, Parser, Rule},
-    units, with_pair_ok,
-};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ListType(Box<Type>);
@@ -138,14 +133,14 @@ impl std::fmt::Display for UnnamedTupleType {
 }
 
 #[derive(Debug, Clone, Default, PartialEq)]
-pub struct NamedTupleType(pub BTreeMap<Identifier, Type>);
+pub struct NamedTupleType(pub std::collections::BTreeMap<Identifier, Type>);
 
 impl Parse for NamedTupleType {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let p = pair.clone();
         Parser::ensure_rule(&p, Rule::named_tuple_type);
 
-        let mut types = BTreeMap::new();
+        let mut types = std::collections::BTreeMap::new();
         for pair in pair.into_inner() {
             let mut inner = pair.into_inner();
             let name = Identifier::parse(inner.next().unwrap())?.value().clone();
@@ -228,12 +223,12 @@ pub enum Type {
 }
 
 impl Type {
-    pub fn default_unit(&self) -> units::Unit {
+    pub fn default_unit(&self) -> Unit {
         match self {
-            Self::Length => units::Unit::Mm,
-            Self::Angle => units::Unit::Rad,
+            Self::Length => Unit::Mm,
+            Self::Angle => Unit::Rad,
             Self::List(t) => t.ty().default_unit(),
-            _ => units::Unit::None,
+            _ => Unit::None,
         }
     }
 }
@@ -327,7 +322,6 @@ fn builtin_type() {
 
 #[test]
 fn list_type() {
-    use crate::lang_type::ListType;
     let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int]");
     assert_eq!(ty.to_string(), "[int]");
     assert_eq!(ty, Type::List(ListType::from_type(Type::Integer)));
@@ -335,21 +329,16 @@ fn list_type() {
 
 #[test]
 fn map_type() {
-    use crate::lang_type::MapType;
     let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int => string]");
     assert_eq!(ty.to_string(), "[int => string]");
     assert_eq!(
         ty,
-        Type::Map(MapType::from_types(
-            crate::lang_type::MapKeyType::Integer,
-            Type::String
-        ))
+        Type::Map(MapType::from_types(MapKeyType::Integer, Type::String))
     );
 }
 
 #[test]
 fn unnamed_tuple_type() {
-    use crate::lang_type::UnnamedTupleType;
     let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(int, string)");
     assert_eq!(ty.to_string(), "(int, string)");
     assert_eq!(
@@ -360,9 +349,6 @@ fn unnamed_tuple_type() {
 
 #[test]
 fn named_tuple_type() {
-    use crate::identifier::Identifier;
-    use crate::lang_type::NamedTupleType;
-
     let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(x: int, y: string)");
     assert_eq!(ty.to_string(), "(x: int, y: string)");
     assert_eq!(

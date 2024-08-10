@@ -1,8 +1,5 @@
-use crate::{
-    module::ModuleStatement,
-    parser::{Pair, Parse, ParseResult, Rule},
-    with_pair_ok,
-};
+use super::module::*;
+use crate::{parser::*, with_pair_ok};
 
 #[derive(Clone)]
 pub struct Document {
@@ -30,7 +27,7 @@ impl Parse for Document {
 
 #[test]
 fn document() {
-    let document = crate::parser::Parser::parse_rule_or_panic::<Document>(
+    let document = Parser::parse_rule_or_panic::<Document>(
         Rule::document,
         r#"use std::io::println;
             module foo(r: scalar) {

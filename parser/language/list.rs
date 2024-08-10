@@ -1,9 +1,5 @@
-use crate::eval::{Context, Eval};
-use crate::expression::{Expression, ExpressionList};
-use crate::parser::{Pair, Parse, ParseResult};
-use crate::units::Unit;
-use crate::value::{Value, ValueList};
-use crate::with_pair_ok;
+use super::{expression::*, units::*, value::*};
+use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Default, Clone)]
 pub struct ListExpression(ExpressionList, Option<Unit>);
@@ -59,9 +55,9 @@ impl std::fmt::Display for ListExpression {
 }
 
 impl Eval for ListExpression {
-    type Output = crate::value::Value;
+    type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         let mut value_list = ValueList::new();
         for expr in self.0.clone() {
             value_list.push(expr.eval(context)?);
@@ -71,8 +67,8 @@ impl Eval for ListExpression {
         }
 
         match value_list.types().common_type() {
-            Some(common_type) => Ok(Value::List(crate::value::List(value_list, common_type))),
-            None => Err(crate::eval::Error::ListElementsDifferentTypes),
+            Some(common_type) => Ok(Value::List(List(value_list, common_type))),
+            None => Err(Error::ListElementsDifferentTypes),
         }
     }
 }

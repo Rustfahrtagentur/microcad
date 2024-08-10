@@ -1,9 +1,5 @@
-use crate::color::Color;
-use crate::eval::{Context, Eval, OperatorError};
-use crate::lang_type::{Ty, Type};
-use crate::parser::{Pair, Parse, ParseResult, Parser, Rule, WithPair};
-use crate::units::Unit;
-use crate::value::Value;
+use super::{color::*, lang_type::*, units::*, value::*};
+use crate::{eval::*, parser::*};
 
 /// Definition and implementation for `NumberLiteral`
 #[derive(Debug, Clone, PartialEq)]
@@ -136,9 +132,9 @@ impl Parse for NumberLiteral {
 }
 
 impl Eval for NumberLiteral {
-    type Output = crate::value::Value;
+    type Output = Value;
 
-    fn eval(&self, _: &mut Context) -> Result<Value, crate::eval::Error> {
+    fn eval(&self, _: &mut Context) -> Result<Value, Error> {
         let v = self.value();
 
         match self.1.ty() {
@@ -207,9 +203,9 @@ impl Parse for Literal {
 }
 
 impl Eval for Literal {
-    type Output = crate::value::Value;
+    type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         match self {
             Literal::Integer(i) => Ok(Value::Integer(*i)),
             Literal::Number(n) => n.eval(context),

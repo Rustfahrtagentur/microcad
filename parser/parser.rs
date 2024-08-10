@@ -2,7 +2,7 @@
 #[grammar = "grammar.pest"]
 pub struct Parser;
 
-use crate::identifier::{Identifier, IdentifierListError};
+use crate::language::{identifier::*, lang_type::*};
 use thiserror::Error;
 
 pub type Pair<'i> = pest::iterators::Pair<'i, Rule>;
@@ -25,7 +25,7 @@ pub enum ParseError {
     #[error("Unexpected token")]
     UnexpectedToken,
     #[error("Type error: {0}")]
-    TypeError(#[from] crate::lang_type::TypeError),
+    TypeError(#[from] TypeError),
     #[error("Identifier list error: {0}")]
     IdentifierListError(#[from] IdentifierListError),
     #[error("Tuple expression contains both named and positional arguments")]

@@ -1,4 +1,4 @@
-use crate::parser::{Pair, Parse, ParseError, ParseResult, Parser, Rule};
+use crate::{parser::*, with_pair_ok};
 
 // A color with RGBA channels
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -24,7 +24,6 @@ impl std::fmt::Display for Color {
 impl Parse for Color {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::color_literal);
-        use crate::with_pair_ok;
         let p = pair.clone();
         let mut pairs = pair.into_inner();
         let s = &pairs.next().unwrap().as_str()[1..];

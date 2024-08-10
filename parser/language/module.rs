@@ -1,14 +1,6 @@
 // Resolve a qualified name to a type or value.
-
-use std::fmt::Display;
-use std::rc::Rc;
-
-use crate::call::CallArgumentList;
-use crate::eval::Symbol;
-use crate::expression::Expression;
-use crate::function::{Assignment, DefinitionParameter, FunctionDefinition};
-use crate::identifier::{Identifier, QualifiedName};
-use crate::{parser::*, with_pair_ok};
+use super::{call::*, expression::*, function::*, identifier::*};
+use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone)]
 pub struct Attribute {
@@ -42,7 +34,7 @@ impl Parse for Attribute {
     }
 }
 
-impl Display for Attribute {
+impl std::fmt::Display for Attribute {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.arguments {
             Some(arguments) => write!(f, "{}({})", self.name, arguments),
@@ -124,8 +116,8 @@ pub enum ModuleStatement {
     Use(UseStatement),
     Expression(Expression),
     Assignment(Assignment),
-    ModuleDefinition(Rc<ModuleDefinition>),
-    FunctionDefinition(Rc<FunctionDefinition>),
+    ModuleDefinition(std::rc::Rc<ModuleDefinition>),
+    FunctionDefinition(std::rc::Rc<FunctionDefinition>),
     ModuleInitDefinition(ModuleInitDefinition),
 }
 
@@ -146,13 +138,13 @@ impl Parse for ModuleStatement {
             Rule::assignment => {
                 ModuleStatement::Assignment(Assignment::parse(first)?.value().clone())
             }
-            Rule::module_definition => ModuleStatement::ModuleDefinition(Rc::new(
+            Rule::module_definition => ModuleStatement::ModuleDefinition(std::rc::Rc::new(
                 ModuleDefinition::parse(first)?.value().clone(),
             )),
             Rule::module_init_definition => ModuleStatement::ModuleInitDefinition(
                 ModuleInitDefinition::parse(first)?.value().clone(),
             ),
-            Rule::function_definition => ModuleStatement::FunctionDefinition(Rc::new(
+            Rule::function_definition => ModuleStatement::FunctionDefinition(std::rc::Rc::new(
                 FunctionDefinition::parse(first)?.value().clone(),
             )),
             rule => unreachable!("Unexpected module statement, got {:?}", rule),
@@ -162,7 +154,7 @@ impl Parse for ModuleStatement {
     }
 }
 
-impl Display for ModuleStatement {
+impl std::fmt::Display for ModuleStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             ModuleStatement::Use(use_statement) => write!(f, "{}", use_statement),
@@ -197,12 +189,12 @@ impl ModuleDefinition {
         }
     }
 
-    pub fn add_function(&mut self, function: Rc<FunctionDefinition>) {
+    pub fn add_function(&mut self, function: std::rc::Rc<FunctionDefinition>) {
         self.body
             .push(ModuleStatement::FunctionDefinition(function));
     }
 
-    pub fn add_module(&mut self, module: Rc<ModuleDefinition>) {
+    pub fn add_module(&mut self, module: std::rc::Rc<ModuleDefinition>) {
         self.body.push(ModuleStatement::ModuleDefinition(module));
     }
 

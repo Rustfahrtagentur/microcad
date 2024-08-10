@@ -1,12 +1,5 @@
-use std::collections::BTreeMap;
-
-use crate::call::CallArgumentList;
-use crate::eval::{Context, Eval};
-use crate::lang_type::{Ty, Type};
-use crate::parser::{Pair, Parse, ParseError, ParseResult};
-use crate::units::Unit;
-use crate::value::{NamedTuple, UnnamedTuple, Value, ValueList, Vec2, Vec3};
-use crate::with_pair_ok;
+use super::{call::*, lang_type::*, units::*, value::*};
+use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Default, Clone)]
 pub struct TupleExpression(CallArgumentList, Option<Unit>);
@@ -65,9 +58,9 @@ impl std::fmt::Display for TupleExpression {
 }
 
 impl Eval for TupleExpression {
-    type Output = crate::value::Value;
+    type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         if self.0.contains_positional() {
             // Unnamed tuple
             let mut value_list = ValueList::new();
@@ -81,7 +74,7 @@ impl Eval for TupleExpression {
             Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
         } else {
             // Named tuple
-            let mut map = BTreeMap::new();
+            let mut map = std::collections::BTreeMap::new();
             for (ident, expr) in self.0.get_named() {
                 let mut value = expr.clone().eval(context)?;
                 if let Some(unit) = self.1 {
@@ -121,18 +114,13 @@ impl Eval for TupleExpression {
 
 #[test]
 fn unnamed_tuple() {
-    use crate::Rule;
-
     let input = "(1.0, 2.0, 3.0)mm";
-    let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
-        Rule::tuple_expression,
-        input,
-    );
+    let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
     let mut context = Context::default();
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(
         value.ty(),
-        Type::UnnamedTuple(crate::lang_type::UnnamedTupleType(vec![
+        Type::UnnamedTuple(UnnamedTupleType(vec![
             Type::Length,
             Type::Length,
             Type::Length
@@ -142,19 +130,14 @@ fn unnamed_tuple() {
 
 #[test]
 fn test_named_tuple() {
-    use crate::Rule;
-
     let input = "(a = 1.0, b = 2.0, c = 3.0)mm";
-    let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
-        Rule::tuple_expression,
-        input,
-    );
+    let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
     let mut context = Context::default();
 
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(
         value.ty(),
-        Type::NamedTuple(crate::lang_type::NamedTupleType(
+        Type::NamedTuple(NamedTupleType(
             vec![
                 ("a".into(), Type::Length),
                 ("b".into(), Type::Length),
@@ -168,13 +151,8 @@ fn test_named_tuple() {
 
 #[test]
 fn test_vec2() {
-    use crate::Rule;
-
     let input = "((x,y) = 1mm)";
-    let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
-        Rule::tuple_expression,
-        input,
-    );
+    let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
     let mut context = Context::default();
 
     let value = expr.eval(&mut context).unwrap();
@@ -183,13 +161,8 @@ fn test_vec2() {
 
 #[test]
 fn test_vec3() {
-    use crate::Rule;
-
     let input = "(x = 1, y = 2, z = 3)mm";
-    let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
-        Rule::tuple_expression,
-        input,
-    );
+    let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
     let mut context = Context::default();
 
     let value = expr.eval(&mut context).unwrap();

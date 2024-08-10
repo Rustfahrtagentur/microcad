@@ -1,11 +1,5 @@
-use std::collections::BTreeMap;
-
-use crate::eval::{Context, Eval, Symbol};
-use crate::expression::Expression;
-use crate::identifier::QualifiedName;
-use crate::identifier::{Identifier, IdentifierList};
-
-use crate::{parser::*, with_pair_ok};
+use super::{expression::*, identifier::*, value::*};
+use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone)]
 enum CallArgument {
@@ -70,21 +64,21 @@ impl std::fmt::Display for CallArgument {
 #[derive(Clone, Debug, Default)]
 pub struct PositionalNamedList<T> {
     positional: Vec<T>,
-    named: BTreeMap<Identifier, T>,
+    named: std::collections::BTreeMap<Identifier, T>,
 }
 
 pub type CallArgumentList = PositionalNamedList<Expression>;
-pub type EvaluatedCallArgumentList = PositionalNamedList<crate::value::Value>;
+pub type EvaluatedCallArgumentList = PositionalNamedList<Value>;
 
 impl<T> PositionalNamedList<T> {
     pub fn new() -> Self {
         Self {
             positional: Vec::new(),
-            named: BTreeMap::new(),
+            named: std::collections::BTreeMap::new(),
         }
     }
 
-    pub fn get_named(&self) -> &BTreeMap<Identifier, T> {
+    pub fn get_named(&self) -> &std::collections::BTreeMap<Identifier, T> {
         &self.named
     }
 
@@ -159,7 +153,7 @@ where
 impl Eval for CallArgumentList {
     type Output = EvaluatedCallArgumentList;
 
-    fn eval(&self, context: &mut Context) -> Result<EvaluatedCallArgumentList, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<EvaluatedCallArgumentList, Error> {
         let mut evaluated = EvaluatedCallArgumentList::new();
         for expr in self.positional.iter() {
             evaluated.insert_positional(expr.eval(context)?).unwrap(); // Unwrap is safe because we checked for named arguments already
@@ -273,10 +267,10 @@ impl std::fmt::Display for Call {
     }
 }
 
-impl crate::eval::Eval for Call {
-    type Output = crate::value::Value;
+impl Eval for Call {
+    type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<crate::value::Value, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         match &self.name.eval(context)? {
             Symbol::Function(f) => {
                 let args = self.argument_list.eval(context)?;
@@ -289,9 +283,8 @@ impl crate::eval::Eval for Call {
 
 #[test]
 fn call() {
-    use pest::Parser;
-
-    let pair = crate::parser::Parser::parse(Rule::call, "foo(1, 2, bar = 3, baz = 4)")
+    use pest::Parser as _;
+    let pair = Parser::parse(Rule::call, "foo(1, 2, bar = 3, baz = 4)")
         .unwrap()
         .next()
         .unwrap();

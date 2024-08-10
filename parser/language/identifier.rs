@@ -1,9 +1,4 @@
-use crate::{
-    eval::{Context, Eval},
-    parser::{Pair, Parse, ParseError, ParseResult, Parser, Rule},
-    with_pair_ok,
-};
-
+use crate::{eval::*, parser::*, with_pair_ok};
 use thiserror::Error;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -190,9 +185,9 @@ impl std::fmt::Display for QualifiedName {
 }
 
 impl Eval for QualifiedName {
-    type Output = crate::eval::Symbol;
+    type Output = Symbol;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, crate::eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         let mut symbol = None;
 
         for (i, ident) in self.0.iter().enumerate() {

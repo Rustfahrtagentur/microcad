@@ -1,23 +1,26 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+type Child = std::rc::Rc<std::cell::RefCell<Tree>>;
+type Children = std::collections::HashMap<String, Child>;
 
 /// tree catching markdown tests into a valid rust module structure
 #[derive(Debug)]
 pub enum Tree {
-    Root(HashMap<String, Rc<RefCell<Tree>>>),
-    Module(String, HashMap<String, Rc<RefCell<Tree>>>),
+    Root(Children),
+    Module(String, Children),
     Test(String, String),
 }
 
 impl Tree {
     /// create empty tree
     pub fn new() -> Self {
-        Self::Root(HashMap::new())
+        Self::Root(Children::new())
     }
 
     /// insert new test code by module path
     /// - `path`: list of nested rust module names separated by `.`
     /// - `code`: µcad test code
     pub fn insert(&mut self, path: &str, code: String) {
+        use std::{cell::RefCell, rc::Rc};
+
         if let Some((module, path)) = path.split_once(".") {
             match self {
                 Tree::Root(ref mut children) | Tree::Module(_, ref mut children) => {
@@ -25,7 +28,7 @@ impl Tree {
                         module.borrow_mut().insert(path, code);
                     } else {
                         _ = children.insert(module.into(), {
-                            let mut new = Self::Module(module.into(), HashMap::new());
+                            let mut new = Self::Module(module.into(), Children::new());
                             // recursively fill module
                             new.insert(path, code);
                             Rc::new(RefCell::new(new))
@@ -57,9 +60,9 @@ impl std::fmt::Display for Tree {
                 format!(
                     r##"#[test]
 fn r#{name}() {{
-    use crate::*;
-    let document = crate::parser::Parser::parse_rule_or_panic::<Document>(
-        Rule::document,
+    use crate::{{language::document::Document,parser}};
+    let document = parser::Parser::parse_rule_or_panic::<Document>(
+        parser::Rule::document,
         r#"
 {code}"#
     );

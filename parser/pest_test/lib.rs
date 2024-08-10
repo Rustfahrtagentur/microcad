@@ -1,5 +1,3 @@
-use std::io::Read;
-
 #[derive(Debug, Clone, PartialEq)]
 enum PestResult {
     Ok(String),
@@ -173,6 +171,8 @@ impl<'a> RustWriter<'a> {
 
 impl PestFile {
     pub fn from_file(path: impl AsRef<std::path::Path>) -> Result<Self, String> {
+        use std::io::Read;
+
         // Read file line by line
         let mut buf = String::new();
         // Read file to string

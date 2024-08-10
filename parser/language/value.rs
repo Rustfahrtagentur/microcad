@@ -1,14 +1,10 @@
-pub type Number = crate::literal::NumberLiteral;
-
-use std::collections::{BTreeMap, HashMap};
+use super::{color::*, identifier::*, lang_type::*, units::*};
 use thiserror::Error;
 
-use crate::{
-    color::Color,
-    identifier::Identifier,
-    lang_type::{MapKeyType, NamedTupleType, Ty, Type, TypeList, UnnamedTupleType},
-    units::Unit,
-};
+pub type Number = super::literal::NumberLiteral;
+pub type Scalar = f64;
+pub type Vec2 = euclid::Vector2D<Scalar, ()>;
+pub type Vec3 = euclid::Vector3D<Scalar, ()>;
 
 #[derive(Debug, Error)]
 pub enum ValueError {
@@ -27,11 +23,6 @@ pub enum ValueError {
     #[error("Cannot add unit to a unitful value: {0}")]
     CannotAddUnitToUnitfulValue(Value),
 }
-
-pub type Scalar = f64;
-
-pub type Vec2 = euclid::Vector2D<Scalar, ()>;
-pub type Vec3 = euclid::Vector3D<Scalar, ()>;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct List(pub ValueList, pub Type);
@@ -142,9 +133,13 @@ impl std::fmt::Display for MapKeyValue {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Map(pub HashMap<MapKeyValue, Value>, pub MapKeyType, Type);
+pub struct Map(
+    pub std::collections::HashMap<MapKeyValue, Value>,
+    pub MapKeyType,
+    Type,
+);
 
-impl From<Map> for HashMap<MapKeyValue, Value> {
+impl From<Map> for std::collections::HashMap<MapKeyValue, Value> {
     fn from(val: Map) -> Self {
         val.0
     }
@@ -170,7 +165,7 @@ impl std::fmt::Display for Map {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct NamedTuple(pub BTreeMap<Identifier, Value>);
+pub struct NamedTuple(pub std::collections::BTreeMap<Identifier, Value>);
 
 impl NamedTuple {
     pub fn len(&self) -> usize {

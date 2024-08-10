@@ -1,18 +1,12 @@
-use crate::call::{Call, MethodCall};
-use crate::eval::{self, Context, Eval, Symbol};
-use crate::format_string::FormatString;
-use crate::identifier::QualifiedName;
-use crate::list::ListExpression;
-use crate::literal::Literal;
-use crate::module::ModuleStatement;
-use crate::tuple::TupleExpression;
-use crate::value::Value;
-use crate::{parser::*, with_pair_ok};
-use pest::pratt_parser::PrattParser;
+use super::{
+    call::*, format_string::*, identifier::*, list::*, literal::*, module::*, tuple::*, value::*,
+};
+use crate::{eval::*, parser::*, with_pair_ok};
+use pest::pratt_parser::*;
 
 lazy_static::lazy_static! {
     static ref PRATT_PARSER: PrattParser<Rule> = {
-        use pest::pratt_parser::{Assoc::*, Op};
+        use Assoc::*;
         use Rule::*;
 
         // Precedence is defined lowest to highest
@@ -103,9 +97,9 @@ impl Parse for Nested {
 }
 
 impl Eval for Nested {
-    type Output = crate::value::Value;
+    type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         let mut value = None;
         for item in &self.0 {
             if value.is_none() {
@@ -129,7 +123,7 @@ impl Eval for Nested {
 
         match value {
             Some(v) => Ok(v),
-            None => Err(eval::Error::Unknown),
+            None => Err(Error::Unknown),
         }
     }
 }
@@ -207,9 +201,9 @@ impl std::fmt::Display for Expression {
 impl Expression {}
 
 impl Eval for Expression {
-    type Output = crate::value::Value;
+    type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, eval::Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         match self {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
@@ -234,7 +228,7 @@ impl Eval for Expression {
                     '≠' => Ok(Value::Bool(!lhs.eq(&rhs))),
                     _ => unimplemented!(),
                 }
-                .map_err(eval::Error::ValueError)
+                .map_err(Error::ValueError)
             }
             Self::UnaryOp { op, rhs } => {
                 let rhs = rhs.eval(context)?;
@@ -243,7 +237,7 @@ impl Eval for Expression {
                     '-' => rhs.neg(),
                     _ => unimplemented!(),
                 }
-                .map_err(eval::Error::ValueError)
+                .map_err(Error::ValueError)
             }
             Self::ElementAccess(lhs, rhs) => {
                 let lhs = lhs.eval(context)?;
@@ -255,7 +249,7 @@ impl Eval for Expression {
                         if index < list.len() {
                             Ok(list.get(index).unwrap().clone())
                         } else {
-                            Err(eval::Error::ListIndexOutOfBounds {
+                            Err(Error::ListIndexOutOfBounds {
                                 index,
                                 len: list.len(),
                             })
@@ -270,9 +264,9 @@ impl Eval for Expression {
                 match lhs.eval(context)? {
                     Value::List(list) => match name {
                         "len" => Ok(Value::Integer(list.len() as i64)),
-                        _ => Err(eval::Error::UnknownMethod(name.into())),
+                        _ => Err(Error::UnknownMethod(name.into())),
                     },
-                    _ => Err(eval::Error::UnknownMethod(name.into())),
+                    _ => Err(Error::UnknownMethod(name.into())),
                 }
             }
             Self::Nested(nested) => nested.eval(context),
@@ -352,7 +346,7 @@ impl Parse for Expression {
                 ),
                 Rule::method_call => Self::MethodCall(
                     Box::new(lhs),
-                    crate::call::MethodCall::parse(op).unwrap().value().clone(),
+                    MethodCall::parse(op).unwrap().value().clone(),
                 ),
                 rule => {
                     unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
@@ -430,10 +424,10 @@ impl std::fmt::Display for ExpressionList {
 fn run_expression_test(
     expr: &str,
     context: &mut Context,
-    evaluator: impl FnOnce(Result<Value, eval::Error>),
+    evaluator: impl FnOnce(Result<Value, Error>),
 ) {
-    use pest::Parser;
-    let pair = crate::parser::Parser::parse(Rule::expression, expr)
+    use pest::Parser as _;
+    let pair = Parser::parse(Rule::expression, expr)
         .unwrap()
         .next()
         .unwrap();
@@ -493,7 +487,7 @@ fn list_expression() {
 
     // Test out of bounds access
     run_expression_test("[1.0,2.0,3.0][3]", &mut context, |e| {
-        if let Err(eval::Error::ListIndexOutOfBounds { index, len }) = e {
+        if let Err(Error::ListIndexOutOfBounds { index, len }) = e {
             assert_eq!(index, 3);
             assert_eq!(len, 3);
         }
