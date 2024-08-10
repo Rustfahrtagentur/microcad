@@ -58,11 +58,11 @@ module mountable_plate(
     outer_distance: length, 
     hole_diameter = 5mm)
 {
-    plate := rounded_rect(width, height, radius = corner_radius);
+    plate = rounded_rect(width, height, radius = corner_radius);
 
-    holes := translate(x = [-1, 1] * (width - outer_distance) / 2, 
-                       y = [-1, 1] * (height - outer_distance) / 2)
-                 circle(diameter = hole_diameter);
+    holes = translate(x = [-1, 1] * (width - outer_distance) / 2, 
+                      y = [-1, 1] * (height - outer_distance) / 2)
+                circle(diameter = hole_diameter);
 
     plate - holes;
 }
@@ -75,10 +75,10 @@ module mountable_plate(
     rel_hole_positions: [(x: scalar, y: scalar)], 
     hole_diameter = 5mm)
 {
-    plate := rounded_rect(width, height, radius = corner_radius);
+    plate = rounded_rect(width, height, radius = corner_radius);
 
-    holes := translate(hole_positions)
-                 circle(diameter = hole_diameter);
+    holes = translate(hole_positions)
+                circle(diameter = hole_diameter);
 
     plate - holes;
 }

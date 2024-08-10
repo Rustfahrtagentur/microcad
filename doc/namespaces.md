@@ -15,7 +15,7 @@ namespace std {
 
         // define calculation function
         function abs(x:scalar) -> scalar {
-            if scalar < 0 { -scalar } else { scalar }
+            if x < 0 { -x } else { x }
         }
     }
 }
