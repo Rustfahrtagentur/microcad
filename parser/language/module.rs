@@ -269,13 +269,10 @@ impl std::fmt::Display for UseAlias {
 pub enum UseStatement {
     /// Import symbols given as qualified names: `use a, b`
     Use(Vec<QualifiedName>),
-
     /// Import specific symbol from a module: `use a,b from c`
     UseFrom(Vec<QualifiedName>, QualifiedName),
-
     /// Import all symbols from a module: `use * from a, b`
     UseAll(Vec<QualifiedName>),
-
     /// Import as alias: `use a as b`
     UseAlias(UseAlias),
 }

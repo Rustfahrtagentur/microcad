@@ -10,10 +10,9 @@ enum CallArgument {
 
 impl Parse for CallArgument {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        match pair.as_rule() {
+        match pair.clone().as_rule() {
             Rule::call_named_argument => {
-                let mut pairs = pair.into_inner();
+                let mut pairs = pair.clone().into_inner();
                 let first = pairs.next().unwrap();
                 let second = pairs.next().unwrap();
 
@@ -22,11 +21,11 @@ impl Parse for CallArgument {
                         Identifier::parse(first)?.value().clone(),
                         Box::new(Expression::parse(second)?.value().clone()),
                     ),
-                    p
+                    pair
                 )
             }
             Rule::call_named_tuple_argument => {
-                let mut pairs = pair.into_inner();
+                let mut pairs = pair.clone().into_inner();
                 let first = pairs.next().unwrap();
                 let second = pairs.next().unwrap();
 
@@ -35,13 +34,15 @@ impl Parse for CallArgument {
                         IdentifierList::parse(first)?.value().clone(),
                         Box::new(Expression::parse(second)?.value().clone()),
                     ),
-                    p
+                    pair
                 )
             }
             Rule::expression => {
                 with_pair_ok!(
-                    CallArgument::Position(Box::new(Expression::parse(pair)?.value().clone())),
-                    p
+                    CallArgument::Position(Box::new(
+                        Expression::parse(pair.clone())?.value().clone()
+                    )),
+                    pair
                 )
             }
             rule => unreachable!("CallArgument::parse expected call argument, found {rule:?}"),
@@ -70,6 +71,14 @@ pub struct PositionalNamedList<T> {
 pub type CallArgumentList = PositionalNamedList<Expression>;
 pub type EvaluatedCallArgumentList = PositionalNamedList<Value>;
 
+impl<T> std::ops::Deref for PositionalNamedList<T> {
+    type Target = Vec<T>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.positional
+    }
+}
+
 impl<T> PositionalNamedList<T> {
     pub fn new() -> Self {
         Self {
@@ -84,14 +93,6 @@ impl<T> PositionalNamedList<T> {
 
     pub fn get_named_arg(&self, ident: &Identifier) -> Option<&T> {
         self.named.get(ident)
-    }
-
-    pub fn get_positional(&self) -> &[T] {
-        &self.positional
-    }
-
-    pub fn get_positional_arg(&self, index: usize) -> Option<&T> {
-        self.positional.get(index)
     }
 
     pub fn len(&self) -> usize {

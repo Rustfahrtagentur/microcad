@@ -33,7 +33,7 @@ impl std::fmt::Display for TupleExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.0.contains_positional() {
             write!(f, "(")?;
-            for (i, expr) in self.0.get_positional().iter().enumerate() {
+            for (i, expr) in self.0.iter().enumerate() {
                 if i > 0 {
                     write!(f, ", ")?;
                 }
@@ -64,7 +64,7 @@ impl Eval for TupleExpression {
         if self.0.contains_positional() {
             // Unnamed tuple
             let mut value_list = ValueList::new();
-            for expr in self.0.get_positional() {
+            for expr in self.0.iter() {
                 let value = expr.clone().eval(context)?;
                 value_list.push(value);
             }

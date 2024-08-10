@@ -33,6 +33,7 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> std::io::Result<()> {
             if let Ok(file_type) = entry.file_type() {
                 if file_type.is_dir() {
                     // begin a rust module
+                    writeln!(w, "#[allow(non_snake_case)]\n")?;
                     writeln!(
                         w,
                         r#"mod r#{module} {{"#,

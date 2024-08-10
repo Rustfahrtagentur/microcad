@@ -17,7 +17,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         "abs".into(),
         fn_abs_signature,
         std::rc::Rc::new(|args, _| -> Result<Value, Error> {
-            let x = args.get_positional_arg(0).unwrap().into_scalar()?;
+            let x = args[0].into_scalar()?;
             Ok(Value::Scalar(x.abs()))
         }),
     );

@@ -59,9 +59,10 @@ impl std::fmt::Display for Tree {
                 "{}",
                 format!(
                     r##"#[test]
+#[allow(non_snake_case)]
 fn r#{name}() {{
     use crate::{{language::document::Document,parser}};
-    let document = parser::Parser::parse_rule_or_panic::<Document>(
+    let _ = parser::Parser::parse_rule_or_panic::<Document>(
         parser::Rule::document,
         r#"
 {code}"#
@@ -76,6 +77,7 @@ fn r#{name}() {{
                 }
             }
             Tree::Module(name, children) => {
+                writeln!(f, "#[allow(non_snake_case)]\n")?;
                 writeln!(f, r##"mod r#{name} {{"##)?;
                 for child in children {
                     writeln!(f, "{}", child.1.as_ref().borrow().to_string().trim())?;
