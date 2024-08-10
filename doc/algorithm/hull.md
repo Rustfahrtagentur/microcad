@@ -5,7 +5,7 @@
 In the following examples the hull of two circles is calculated.
 
 ```µCAD,operator
-°translate(x = [-10, 10]mm, y = [-10, 10]mm)
+translate(x = [-10, 10]mm, y = [-10, 10]mm)
     circle(1mm);
 ```
 
