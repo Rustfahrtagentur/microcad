@@ -25,7 +25,7 @@ donut( diameter_outer=4cm, diameter_inner=2cm );
 
 A module with arguments has one implicit init:
 
-```µcad,implicit_init
+```µCAD,implicit_init
 module box(size: length) {
     cube(size);
 }
@@ -33,7 +33,7 @@ module box(size: length) {
 
 ## Explicit init
 
-```µcad
+```µCAD
 module box {
     init(size: length) {
         rectangle(size);
@@ -43,7 +43,7 @@ module box {
 
 ## Explicit init overloading
 
-```µcad
+```µCAD
 module box {
     init(size: length) {
         rectangle(size);
@@ -56,7 +56,7 @@ module box {
 
 ## Default init
 
-```µcad
+```µCAD
 module box {
     init(size: length) {
         rectangle(size);
@@ -71,7 +71,7 @@ module box {
 
 TODO: (Besseres Beispiel)
 
-```µcad
+```µCAD
 module box {
     y := 0mm; // If this field is missing then, an error "MissingField" is raised 
 

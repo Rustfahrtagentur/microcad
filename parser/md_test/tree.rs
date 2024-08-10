@@ -17,7 +17,7 @@ impl Tree {
 
     /// insert new test code by module path
     /// - `path`: list of nested rust module names separated by `.`
-    /// - `code`: µcad test code
+    /// - `code`: µCAD test code
     pub fn insert(&mut self, path: &str, code: String) {
         use std::{cell::RefCell, rc::Rc};
 

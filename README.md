@@ -6,7 +6,7 @@
 [![Codecov](https://codecov.io/github/Rustfahrtagentur/mcad/coverage.svg?branch=main)](https://codecov.io/gh/Rustfahrtagentur/mcad)
 [![Dependency status](https://deps.rs/repo/github/Rustfahrtagentur/mcad/status.svg)](https://deps.rs/repo/github/Rustfahrtagentur/mcad)
 
-µcad (pronounced *microcat*) is a declarative programming language for modeling geometric objects.
+µCAD (pronounced *microcat*) is a declarative programming language for modeling geometric objects.
 
 CSG modeling
 Constructing a tree
@@ -119,7 +119,7 @@ Fortunately, we can write this differently without brackets and nesting.
 Instead, we will use the `:=` operator to assign a name to each sub-part of the `csg_cube` module, in this case `body` and `axes`.
 Moreover, we use the operator `&` and `-` to express the boolean operations:
 
-```µcad
+```µCAD
 module csg_cube(size: length) {
     body := cube(size) & sphere(r = size / 1.5);
     axes := orient([X,Y,Z]) cylinder(d = size / 2, h = size * 1.5);
@@ -128,7 +128,7 @@ module csg_cube(size: length) {
 }
 ```
 
-```µcad
+```µCAD
 module csg_cube {
     init(size: length) {
         // Module substitution

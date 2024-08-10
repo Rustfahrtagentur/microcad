@@ -69,7 +69,7 @@ fn generate_tests_for_md_file(tree: &mut Tree, path: &std::path::Path) {
             .expect("file read error");
     }
 
-    // match markdown code markers for µcad
+    // match markdown code markers for µCAD
     let reg = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[.\w]+))?\n(?<code>[^`]*)+```"#)
         .expect("bad regex");
 

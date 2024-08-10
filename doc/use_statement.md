@@ -35,7 +35,7 @@ cube(size = 40mm);
 
 ## `use as` statement
 
-```µcad
+```µCAD
 use geo3d::sphere as ball;
 
 ball(r = 40mm);

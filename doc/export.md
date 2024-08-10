@@ -1,5 +1,5 @@
 # Export
 
-```µcad,export
+```µCAD,export
 export("cube.stl") cube(40mm);
 ```
