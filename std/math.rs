@@ -1,8 +1,7 @@
 use ucad_parser::eval::*;
 use ucad_parser::language::{function::*, lang_type::*, module::*, value::*};
 
-#[allow(dead_code)]
-fn build_math_module() -> std::rc::Rc<ModuleDefinition> {
+pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     let mut module = ModuleDefinition::namespace("math".into());
 
     let fn_abs_signature = FunctionSignature {
@@ -33,7 +32,7 @@ fn test_build_math_module() {
     use ucad_parser::language::expression::*;
     use ucad_parser::parser::*;
 
-    let module = build_math_module();
+    let module = builtin_module();
     assert_eq!(module.name, "math".into());
 
     let mut context = Context::default();
