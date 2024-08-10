@@ -1,6 +1,6 @@
 # Module Fields
 
-```µCAD,member.fields
+```µCAD,donut
 module donut(radius) {
     use circle from std::geo2d;
 
