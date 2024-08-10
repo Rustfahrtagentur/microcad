@@ -1,0 +1,13 @@
+# Module Functions
+
+```µCAD,member.functions
+module donut(radius) {
+    use circle from std::geo2d;
+
+#    // calculate inner from radius in a method
+    function inner() { radius/2 }
+
+    // generate donut
+    circle(radius) - circle(inner());
+}
+```

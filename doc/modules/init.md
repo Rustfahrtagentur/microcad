@@ -1,4 +1,25 @@
-# Module initializers with `init`
+# Module Initialization
+
+```µCAD,initialization
+module donut(radius_outer: length, radius_inner: length) {
+    use circle from std::geo2d;
+
+    // alternative initialization with diameters
+    init( diameter_outer: length, diameter_inner: length ) {
+        // calculate radiuses from diameters
+        radius_inner = diameter_inner/2;
+        radius_outer = diameter_outer/2;
+    }
+
+    // generate donut based on radiuses
+    circle(radius_outer) - circle(radius_inner);
+}
+
+// generate three equal donuts
+donut( 2cm, 1cm );
+donut( radius_outer=2cm, radius_inner=1cm );
+donut( diameter_outer=4cm, diameter_inner=2cm );
+```
 
 ## Implicit init
 
