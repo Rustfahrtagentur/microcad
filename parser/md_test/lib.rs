@@ -1,77 +1,95 @@
-pub fn generate_test(w: &mut impl std::io::Write, test_name: &str, listing: &str) {
-    let template = format!(
-        r##"
-        #[test]
-        fn r#{test_name}() {{
-            use crate::*;
-            let document = crate::parser::Parser::parse_rule_or_panic::<Document>(
-                Rule::document,
-                r#"{}{listing}"#
-            );
+use std::{
+    env,
+    fs::{read_dir, File},
+    io::{BufWriter, Read, Result, Write},
+    path::Path,
+};
+use tree::Tree;
 
-        }}
-    "##,
-        "\n",
-    );
-    writeln!(w, "{}", template).unwrap();
+mod tree;
+
+#[test]
+fn test_generate_md_file() {
+    let mut tree = Tree::new();
+    generate_tests_for_md_file(&mut tree, Path::new("../../doc/modules/module.md"));
+    eprintln!("{tree}");
 }
 
-fn generate_tests_for_md_file(w: &mut impl std::io::Write, md_path: &std::path::Path) {
-    use std::{fs::*, io::*};
-
-    let module_name = md_path.file_stem().unwrap().to_str().unwrap().to_string();
-    let buf_reader = BufReader::new(File::open(md_path).unwrap());
-    let mut listing = String::new();
-    let mut test_name = None;
-
-    for line in buf_reader.lines().map_while(Result::ok) {
-        if line.to_lowercase().starts_with("```µcad") {
-            listing.clear();
-            let tokens = line.split(",").collect::<Vec<_>>();
-            if tokens.len() >= 2 {
-                test_name = Some(tokens[1].to_string());
-            }
-        } else if &line == "```" {
-            if test_name.is_some() {
-                generate_test(w, test_name.as_ref().unwrap(), &listing);
-                test_name = None;
-            }
-        } else if test_name.is_some() {
-            listing += &format!("{line}\n");
-        }
-    }
-}
-
-pub fn generate(path: impl AsRef<std::path::Path>) {
-    use std::{env, fs::*, io::*, path::*};
-
+pub fn generate(path: impl AsRef<Path>) -> Result<()> {
+    // get target path
     let out_dir = env::var("OUT_DIR").unwrap();
     let dest_path = Path::new(&out_dir).join("md_test.rs");
-    let mut w = BufWriter::new(File::create(dest_path).unwrap());
+    // create target file
+    let mut w = BufWriter::new(File::create(dest_path).expect("cannot create file 'md_test.rs'"));
 
-    fn recurse(w: &mut BufWriter<File>, path: &Path) {
+    // read all into a tree to reorder modules
+    let mut tree = Tree::new();
+
+    // recursive directory scanner
+    fn recurse(w: &mut BufWriter<File>, tree: &mut Tree, path: &Path) -> Result<()> {
         for entry in read_dir(path).unwrap().flatten() {
             if let Ok(file_type) = entry.file_type() {
                 if file_type.is_dir() {
+                    // begin a rust module
                     writeln!(
                         w,
                         r#"mod r#{module} {{"#,
                         module = entry.file_name().to_string_lossy()
-                    )
-                    .unwrap();
-
-                    recurse(w, &entry.path());
-
-                    writeln!(w, "}}").unwrap();
+                    )?;
+                    // scan deeper
+                    recurse(w, tree, &entry.path())?;
+                    // end the rust module
+                    writeln!(w, "}}")?;
                 } else if file_type.is_file()
                     && entry.file_name().to_str().unwrap().ends_with(".md")
                 {
-                    generate_tests_for_md_file(w, &entry.path());
+                    generate_tests_for_md_file(tree, &entry.path());
                     println!("cargo:rerun-if-changed={}", path.display());
                 }
             }
         }
+        Ok(())
     }
 
-    recurse(&mut w, path.as_ref());
+    recurse(&mut w, &mut tree, path.as_ref())?;
+
+    // generate output rust code
+    writeln!(w, "{tree}")
+}
+
+fn generate_tests_for_md_file(tree: &mut Tree, path: &Path) {
+    // load markdown file
+    let mut md_content = String::new();
+    {
+        File::open(path)
+            .expect("file open error")
+            .read_to_string(&mut md_content)
+            .expect("file read error");
+    }
+
+    // match markdown code markers for µcad
+    let reg = regex::Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[.\w]+))?\n(?<code>[^`]*)+```"#)
+        .expect("bad regex");
+
+    let path = path
+        .iter()
+        .map(|f| f.to_str().unwrap())
+        .filter(|f| *f != "..")
+        .map(|f| *f.split('.').next().as_ref().unwrap())
+        .collect::<Vec<&str>>()
+        .join(".");
+
+    for cap in reg.captures_iter(&md_content) {
+        // check if code is named
+        if let (Some(code), Some(name)) = (cap.name("code"), cap.name("name")) {
+            if path.is_empty() {
+                tree.insert(name.as_str(), code.as_str().to_string());
+            } else {
+                tree.insert(
+                    &format!("{path}.{}", name.as_str()),
+                    code.as_str().to_string(),
+                );
+            }
+        }
+    }
 }

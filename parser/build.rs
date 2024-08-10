@@ -5,5 +5,5 @@ fn main() {
         "grammar.pest",
     );
 
-    md_test::generate("../doc");
+    md_test::generate("../doc").unwrap();
 }
