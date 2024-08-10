@@ -14,7 +14,7 @@ namespace std {
         PI = 3.1315;
 
         // define calculation function
-        function abs(x:scalar) -> scalar {
+        function abs(x: scalar) -> scalar {
             if x < 0 { -x } else { x }
         }
     }

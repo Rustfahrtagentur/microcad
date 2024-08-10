@@ -220,8 +220,8 @@ pub enum FunctionStatement {
     Return(Box<Expression>),
     If {
         condition: Expression,
-        if_body: Vec<FunctionStatement>,
-        else_body: Vec<FunctionStatement>,
+        if_body: FunctionBody,
+        else_body: FunctionBody,
     },
 }
 
@@ -243,19 +243,16 @@ impl Parse for FunctionStatement {
             Rule::function_if_statement => {
                 let mut pairs = first.into_inner();
                 let condition = Expression::parse(pairs.next().unwrap())?.value().clone();
-                let if_body = Parser::vec(pairs.next().unwrap(), FunctionStatement::parse)?
-                    .value()
-                    .clone();
+                let if_body = FunctionBody::parse(pairs.next().unwrap())?.value().clone();
 
                 match pairs.next() {
                     None => Self::If {
                         condition,
                         if_body,
-                        else_body: Vec::new(),
+                        else_body: FunctionBody::default(),
                     },
                     Some(pair) => {
-                        let else_body =
-                            Parser::vec(pair, FunctionStatement::parse)?.value().clone();
+                        let else_body = FunctionBody::parse(pair)?.value().clone();
                         Self::If {
                             condition,
                             if_body,
@@ -274,11 +271,39 @@ impl Parse for FunctionStatement {
 pub type BuiltinFunction =
     std::rc::Rc<dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Value, Error>>;
 
+#[derive(Clone, Default)]
+pub struct FunctionBody(pub Vec<FunctionStatement>);
+
+impl Parse for FunctionBody {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        Parser::ensure_rule(&pair, Rule::function_body);
+
+        let mut body = Vec::new();
+        let p = pair.clone();
+
+        for pair in pair.into_inner() {
+            match pair.as_rule() {
+                Rule::function_statement => {
+                    body.push(FunctionStatement::parse(pair)?.value().clone());
+                }
+                Rule::expression => {
+                    body.push(FunctionStatement::Return(Box::new(
+                        Expression::parse(pair)?.value().clone(),
+                    )));
+                }
+                rule => unreachable!("Unexpected token in function body: {:?}", rule),
+            }
+        }
+
+        with_pair_ok!(Self(body), p)
+    }
+}
+
 #[derive(Clone)]
 pub struct FunctionDefinition {
     pub name: Identifier,
     pub signature: FunctionSignature,
-    pub body: Vec<FunctionStatement>,
+    pub body: FunctionBody,
     pub builtin: Option<BuiltinFunction>,
 }
 
@@ -291,18 +316,14 @@ impl FunctionDefinition {
         std::rc::Rc::new(Self {
             name,
             signature,
-            body: Vec::new(),
+            body: FunctionBody::default(),
             builtin: Some(builtin),
         })
     }
 }
 
 impl FunctionDefinition {
-    pub fn new(
-        name: Identifier,
-        signature: FunctionSignature,
-        body: Vec<FunctionStatement>,
-    ) -> Self {
+    pub fn new(name: Identifier, signature: FunctionSignature, body: FunctionBody) -> Self {
         Self {
             name,
             signature,
@@ -333,7 +354,7 @@ impl FunctionDefinition {
             }
         }
 
-        for statement in self.body.iter() {
+        for statement in self.body.0.iter() {
             match statement {
                 FunctionStatement::Assignment(assignment) => assignment.eval(context)?,
                 FunctionStatement::Return(expr) => return expr.eval(context),
@@ -354,9 +375,8 @@ impl Parse for FunctionDefinition {
         let signature = FunctionSignature::parse(inner.next().unwrap())?
             .value()
             .clone();
-        let body = Parser::vec(inner.next().unwrap(), FunctionStatement::parse)?
-            .value()
-            .clone();
+        let body = FunctionBody::parse(inner.next().unwrap())?.value().clone();
+
         with_pair_ok!(
             Self {
                 name,

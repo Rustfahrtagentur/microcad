@@ -193,9 +193,10 @@ impl Parse for ModuleStatement {
                 Rule::module_for_statement => {
                     ModuleStatement::For(ForStatement::parse(first)?.value().clone())
                 }
-                Rule::module_definition => ModuleStatement::ModuleDefinition(std::rc::Rc::new(
-                    ModuleDefinition::parse(first)?.value().clone(),
-                )),
+                Rule::module_definition | Rule::namespace_definition =>
+                    ModuleStatement::ModuleDefinition(std::rc::Rc::new(
+                        ModuleDefinition::parse(first)?.value().clone(),
+                    )),
                 Rule::module_init_definition => ModuleStatement::ModuleInitDefinition(
                     ModuleInitDefinition::parse(first)?.value().clone(),
                 ),
