@@ -149,9 +149,9 @@ impl Parse for ModuleStatement {
 impl std::fmt::Display for ModuleStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            ModuleStatement::Use(use_statement) => write!(f, "{}", use_statement),
-            ModuleStatement::Expression(expression) => write!(f, "{}", expression),
-            ModuleStatement::Assignment(assignment) => write!(f, "{}", assignment),
+            ModuleStatement::Use(use_statement) => write!(f, "{use_statement}"),
+            ModuleStatement::Expression(expression) => write!(f, "{expression}"),
+            ModuleStatement::Assignment(assignment) => write!(f, "{assignment}"),
             ModuleStatement::ModuleDefinition(module_definition) => {
                 write!(f, "{}", module_definition.name)
             }
@@ -309,50 +309,38 @@ impl Parse for UseStatement {
         let mut pairs = pair.clone().into_inner();
         let first = pairs.next().unwrap();
         let second = pairs.next();
-
-        match first.as_rule() {
-            Rule::qualified_name_list => {
-                let qualified_name_list = Parser::vec(first, QualifiedName::parse)?.value().clone();
-                if let Some(second) = second {
-                    if second.as_rule() == Rule::qualified_name {
-                        return with_pair_ok!(
-                            UseStatement::UseFrom(
-                                qualified_name_list,
-                                QualifiedName::parse(second)?.value().clone(),
-                            ),
-                            pair
-                        );
-                    } else {
-                        unreachable!();
-                    }
-                } else {
-                    return with_pair_ok!(UseStatement::Use(qualified_name_list), pair);
-                }
+        let names = Parser::vec(first.clone(), QualifiedName::parse)?
+            .value()
+            .clone();
+        match (first.as_rule(), second) {
+            (Rule::qualified_name_list, Some(second))
+                if second.as_rule() == Rule::qualified_name =>
+            {
+                with_pair_ok!(
+                    UseStatement::UseFrom(names, QualifiedName::parse(second)?.value().clone(),),
+                    pair
+                )
             }
-            Rule::qualified_name_all => {
-                if let Some(second) = second {
-                    if second.as_rule() == Rule::qualified_name_list {
-                        return with_pair_ok!(
-                            UseStatement::UseAll(
-                                Parser::vec(second, QualifiedName::parse)?.value().clone()
-                            ),
-                            pair
-                        );
-                    } else {
-                        unreachable!();
-                    }
-                }
+            (Rule::qualified_name_list, None) => {
+                with_pair_ok!(UseStatement::Use(names), pair)
             }
-            Rule::use_alias => {
-                return with_pair_ok!(
+            (Rule::qualified_name_all, Some(second))
+                if second.as_rule() == Rule::qualified_name_list =>
+            {
+                with_pair_ok!(
+                    UseStatement::UseAll(
+                        Parser::vec(second, QualifiedName::parse)?.value().clone()
+                    ),
+                    pair
+                )
+            }
+            (Rule::use_alias, _) => {
+                with_pair_ok!(
                     UseStatement::UseAlias(UseAlias::parse(first)?.value().clone()),
                     pair
-                );
+                )
             }
-
-            _ => unreachable!(),
+            _ => Err(ParseError::InvalidUseStatement),
         }
-
-        Err(ParseError::InvalidUseStatement)
     }
 }
