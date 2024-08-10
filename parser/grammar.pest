@@ -28,7 +28,8 @@ multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 //`_a`: ok
 //`_`: ok
 //`1`: error
-identifier = { (alpha_lower | alpha_upper | "_") ~ (alpha_lower | alpha_upper | digit | "_")* }
+//`.test`: error
+identifier = { (alpha | "_") ~ (alpha | digit | "_")* }
 
 //`a,b`: ok # A comma-separated list of identifier
 identifier_list = { identifier ~ (ws* ~ "," ~ ws* ~ identifier)*}
@@ -179,9 +180,9 @@ tuple_expression = { "(" ~ ws* ~ call_argument_list ~ ws* ~ ")" ~ unit? }
 //`.0`: ok
 //`.height`: ok
 //`.=`: error # Neither an identifier nor an integer
-tuple_element_access = { "." ~ ws* ~ (identifier | int) }
+tuple_element_access = { "." ~ (identifier | int) }
 
-element_access = _{ tuple_element_access | list_element_access }
+element_access = _{ list_element_access | tuple_element_access }
 
 //`use a;`: ok # Import a single module
 //`use ;`: error # Must import at least one module
@@ -203,6 +204,8 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`translate() rotate()`: ok
 //`translate() rotate() { translate() rotate() {} }`: ok
 //`rotate() {}`: ok
+//`{}`: ok # Empty block
+//`holes.edges`: error # No tuple access in nested module
 nested = { (call | module_body | qualified_name) ~ (ws+ ~ (call | module_body | qualified_name))* }
 
 
@@ -237,6 +240,8 @@ nested = { (call | module_body | qualified_name) ~ (ws+ ~ (call | module_body | 
 //`{ rectangle(width = 5.0mm); }`: ok # Single statement block
 //`translate(x = 5mm)`: ok
 //`ring_array(30mm, 8, {circle(5mm)})`: ok # Pass a module as function parameter
+//`[hole_positions.bottom]`: ok # List access with tuple access
+//`mountable_plate(hole_positions = hole_positions.edges - [hole_positions.bottom])`: ok # Tuple access
 expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
 bin_op           =  _{ add | subtract | multiply | divide | union | intersection | module_xor | greater_than | less_than | greater_equal | less_equal | equal | not_equal | and | or | xor | if_binary_op | else_binary_op }
   add            =   { "+" }
@@ -262,7 +267,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_minus    =   { "-" }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
-postfix          =  _{ method_call | element_access }
+postfix          =  _{ method_call | list_element_access | tuple_element_access }
 primary          =  _{ nested ~ ws* ~ module_body | nested | literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok

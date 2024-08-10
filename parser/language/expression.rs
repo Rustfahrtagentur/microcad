@@ -21,9 +21,9 @@ lazy_static::lazy_static! {
             .op(Op::prefix(unary_minus))
             .op(Op::prefix(unary_plus))
             .op(Op::prefix(unary_not))
+            .op(Op::postfix(method_call))
             .op(Op::postfix(list_element_access))
             .op(Op::postfix(tuple_element_access))
-            .op(Op::postfix(method_call))
     };
 }
 
@@ -156,7 +156,14 @@ pub enum Expression {
         rhs: Box<Expression>,
     },
     /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
-    ElementAccess(Box<Expression>, Box<Expression>),
+    ListElementAccess(Box<Expression>, Box<Expression>),
+
+    /// Access an element of a named tuple: `a.b`
+    NamedTupleElementAccess(Box<Expression>, Identifier),
+
+    /// Access an element of an unnamed tuple: `a.0`
+    UnnamedTupleElementAccess(Box<Expression>, u32),
+
     /// Call to a method: `[2,3].len()`
     /// First expression must evaluate to a value
     MethodCall(Box<Expression>, MethodCall),
@@ -171,7 +178,9 @@ impl std::fmt::Display for Expression {
             Self::TupleExpression(tuple_expression) => write!(f, "{}", tuple_expression),
             Self::BinaryOp { lhs, op, rhs } => write!(f, "({} {} {})", lhs, op, rhs),
             Self::UnaryOp { op, rhs } => write!(f, "({}{})", op, rhs),
-            Self::ElementAccess(lhs, rhs) => write!(f, "{}[{}]", lhs, rhs),
+            Self::ListElementAccess(lhs, rhs) => write!(f, "{}[{}]", lhs, rhs),
+            Self::NamedTupleElementAccess(lhs, rhs) => write!(f, "{}.{}", lhs, rhs),
+            Self::UnnamedTupleElementAccess(lhs, rhs) => write!(f, "{}.{}", lhs, rhs),
             Self::MethodCall(lhs, method_call) => write!(f, "{}.{}", lhs, method_call),
             Self::Nested(nested) => {
                 let mut iter = nested.0.iter();
@@ -229,7 +238,7 @@ impl Eval for Expression {
                 }
                 .map_err(Error::ValueError)
             }
-            Self::ElementAccess(lhs, rhs) => {
+            Self::ListElementAccess(lhs, rhs) => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
 
@@ -288,7 +297,11 @@ impl Parse for Expression {
                     Self::FormatString(FormatString::parse(primary).unwrap().value().clone())
                 }
                 Rule::nested => Self::Nested(Nested::parse(primary).unwrap().value().clone()),
-                rule => unreachable!("Expression::parse expected atom, found {:?}", rule),
+                rule => unreachable!(
+                    "Expression::parse expected atom, found {:?} {:?}",
+                    rule,
+                    pair.as_span().as_str()
+                ),
             })
             .map_infix(|lhs, op, rhs| {
                 let op = match op.as_rule() {
@@ -331,10 +344,24 @@ impl Parse for Expression {
                 }
             })
             .map_postfix(|lhs, op| match op.as_rule() {
-                Rule::list_element_access | Rule::tuple_element_access => Self::ElementAccess(
+                Rule::list_element_access => Self::ListElementAccess(
                     Box::new(lhs),
                     Box::new(Self::parse(op).unwrap().value().clone()),
                 ),
+                Rule::tuple_element_access => {
+                    let op = op.into_inner().next().unwrap();
+                    match op.as_rule() {
+                        Rule::identifier => Self::NamedTupleElementAccess(
+                            Box::new(lhs),
+                            Identifier::parse(op).unwrap().value().clone(),
+                        ),
+                        Rule::int => Self::UnnamedTupleElementAccess(
+                            Box::new(lhs),
+                            op.as_str().parse().unwrap(),
+                        ),
+                        rule => unreachable!("Expected identifier or int, found {:?}", rule),
+                    }
+                }
                 Rule::method_call => Self::MethodCall(
                     Box::new(lhs),
                     MethodCall::parse(op).unwrap().value().clone(),

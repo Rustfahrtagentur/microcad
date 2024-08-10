@@ -125,9 +125,6 @@ impl<T> PositionalNamedList<T> {
     }
 
     fn insert_positional(&mut self, v: T) -> Result<(), ParseError> {
-        if !self.named.is_empty() {
-            return Err(ParseError::PositionalArgumentAfterNamed);
-        }
         self.positional.push(v);
         Ok(())
     }
