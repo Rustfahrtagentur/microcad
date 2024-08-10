@@ -119,13 +119,18 @@ impl Parser {
         T: Parse + Clone,
     {
         use pest::Parser as _;
-        let pair = Parser::parse(rule, input.trim()).unwrap().next().unwrap();
+
+        let no_match = format!("Rule {rule:?} does not match");
+        let pair = Parser::parse(rule, input.trim())
+            .expect(&no_match)
+            .next()
+            .unwrap();
         T::parse(pair).unwrap().value().clone()
     }
 
     pub fn ensure_rule(pair: &Pair, expected: Rule) {
         let rule = pair.as_rule();
-        assert_eq!(rule, expected, "Unexpected rule: {:?}", rule);
+        assert_eq!(rule, expected, "Unexpected rule: {rule:?}");
     }
 }
 
