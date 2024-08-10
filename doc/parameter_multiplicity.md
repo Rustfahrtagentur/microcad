@@ -89,37 +89,36 @@ module directions {
 
 }
 
-module hole_positions {
-    top_left := (x = -100%, y =  100%);
-    north := top_left;
-    bottom_left := (x = -100%, y = -100%);
-    top_right := (x = 100%, y =  100%);
-    bottom_right := (x =  100%, y = -100%);
-    top := (x = 0%, y = 100%);
-    bottom := (x = 0%, y = -100%);
-    left := (x = 100%, y = 0%);
-    right := (x = -100%, y = 0%);
-    center := (x = 0%, y = 0%);
+namespace hole_positions {
+    top_left = (x = -100%, y =  100%);
+    north = top_left;
+    bottom_left = (x = -100%, y = -100%);
+    top_right = (x = 100%, y =  100%);
+    bottom_right = (x =  100%, y = -100%);
+    top = (x = 0%, y = 100%);
+    bottom = (x = 0%, y = -100%);
+    left = (x = 100%, y = 0%);
+    right = (x = -100%, y = 0%);
+    center = (x = 0%, y = 0%);
 
-    corners := [top_left, bottom_left, top_right, bottom_right];
+    corners = [top_left, bottom_left, top_right, bottom_right];
 
-    edges := [top, bottom, left, right]
+    edges = [top, bottom, left, right];
 
-    all := corners + edges + [center];
+    all = corners + edges + [center];
 }
 
 mountable_plate(
     size = (10cm, 10cm),
     corner_radius = 5mm,
-    outer_distance = 1cm, 
+    outer_distance = 1cm,
     hole_positions = hole_positions.edges - [hole_positions.bottom]
 );
 
 
 
 
-mountable_plate(size: (10cm, 10cm), corner_radius = 5mm, outer_distance = 1cm, 
+mountable_plate(size = (10cm, 10cm), corner_radius = 5mm, outer_distance = 1cm,
     [(x = [-100%, 100%], y = [-100%, 100%])]) {
-
-}
+};
 ```
