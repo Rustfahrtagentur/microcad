@@ -79,7 +79,7 @@ export("hex_screw.stl") iso.m10.hex_screw(length = 40mm);
 In our language, we can do constructive solid geometry (CSG).
 Let's create a simple cube with a size of 40mm:
 
-```ucad
+```µCAD
 use cube from geo3d;
 
 cube(size = 40mm);
@@ -88,14 +88,14 @@ cube(size = 40mm);
 Notice that the `size` parameter name is optional an can be omitted.
 We need to export the cube as an STL file.
 
-```ucad
+```µCAD
 export("cube40mm.stl") cube(40mm);
 ```
 
 One of the defining features of CSG is the usage of boolean operations on primitives.
 Let's create a module for a cube as shown in the image:
 
-```ucad
+```µCAD
 use * from geo3d;
 
 module csg_cube(size: length) {
@@ -162,7 +162,7 @@ module example(size: length) {
 
 A module can be defined with arguments:
 
-```ucad
+```µCAD
 module a(b: length)
 ```
 

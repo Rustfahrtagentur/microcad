@@ -3,24 +3,38 @@
 
 ## Tuple as module parameters
 
-module box((x,y,z) = 0mm) {
+```µCAD,parameters.A
+module box((x,y,z) = 0mm) {}
+```
 
-}
+```µCAD,parameters.B
+module box(x = 0mm, y = 0mm, z = 0mm) {}
+```
 
-module box(x = 0mm, y = 0mm, z = 0mm) {
-}
-
-module box(x,y,z = 0mm) {
-}
+```µCAD,parameters.C
+module box(x,y,z = 0mm) {}
+```
 
 ## Field declaration for a module
 
-(width, height) := (1,2)mm;
-width := 1.2mm;
-height := 2mm;
-(width, height) := (0mm,0mm);
+```µCAD,fields.A
+(width, height) = (1,2)mm;
+```
 
-width := (0.0, 0.0)mm;
-height := (0.0, 0.0)mm;
+```µCAD,fields.B
+width = 1.2mm;
+height = 2mm;
+```
 
-width, height := 0mm;
+```µCAD,fields.C
+(width, height) = (0mm,0mm);
+```
+
+```µCAD,fields.D
+width = (0.0, 0.0)mm;
+height = (0.0, 0.0)mm;
+```
+
+```µCAD,fields.E
+width, height = 0mm;
+```
