@@ -137,24 +137,19 @@ impl Parse for FormatString {
     }
 }
 
-#[cfg(test)]
-mod tests {
+#[test]
+fn format_string() {
+    use pest::Parser;
 
-    use super::*;
+    let pair = crate::parser::Parser::parse(Rule::format_string, "\"A{2 + 4}B\"")
+        .unwrap()
+        .next()
+        .unwrap();
 
-    #[test]
-    fn format_string() {
-        use pest::Parser;
-        let pair = crate::parser::Parser::parse(Rule::format_string, "\"A{2 + 4}B\"")
-            .unwrap()
-            .next()
-            .unwrap();
+    let s = FormatString::parse(pair).unwrap();
+    assert_eq!(s.section_count(), 3);
+    let mut context = Context::default();
+    let value = s.eval(&mut context).unwrap();
 
-        let s = FormatString::parse(pair).unwrap();
-        assert_eq!(s.section_count(), 3);
-        let mut context = Context::default();
-        let value = s.eval(&mut context).unwrap();
-
-        assert_eq!(value, Value::String("A6B".to_string()));
-    }
+    assert_eq!(value, Value::String("A6B".to_string()));
 }

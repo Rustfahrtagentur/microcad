@@ -287,22 +287,18 @@ impl crate::eval::Eval for Call {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[test]
+fn call() {
+    use pest::Parser;
 
-    #[test]
-    fn call() {
-        use pest::Parser;
-        let pair = crate::parser::Parser::parse(Rule::call, "foo(1, 2, bar = 3, baz = 4)")
-            .unwrap()
-            .next()
-            .unwrap();
+    let pair = crate::parser::Parser::parse(Rule::call, "foo(1, 2, bar = 3, baz = 4)")
+        .unwrap()
+        .next()
+        .unwrap();
 
-        let call = Call::parse(pair).unwrap();
+    let call = Call::parse(pair).unwrap();
 
-        assert_eq!(call.name, crate::identifier::QualifiedName::from("foo"));
-        assert_eq!(call.argument_list.positional.len(), 2);
-        assert_eq!(call.argument_list.named.len(), 2);
-    }
+    assert_eq!(call.name, QualifiedName::from("foo"));
+    assert_eq!(call.argument_list.positional.len(), 2);
+    assert_eq!(call.argument_list.named.len(), 2);
 }

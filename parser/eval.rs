@@ -146,26 +146,20 @@ pub trait Eval {
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error>;
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::parser::{Parser, Rule};
+#[test]
+fn context_basic() {
+    use crate::parser::*;
 
-    #[test]
-    fn context_basic() {
-        use crate::eval::*;
-        let mut context = Context::default();
+    let mut context = Context::default();
 
-        context.add_symbol(Symbol::Value("a".into(), Value::Integer(1)));
-        context.add_symbol(Symbol::Value("b".into(), Value::Integer(2)));
+    context.add_symbol(Symbol::Value("a".into(), Value::Integer(1)));
+    context.add_symbol(Symbol::Value("b".into(), Value::Integer(2)));
 
-        assert_eq!(context.get_symbol("a").unwrap().name(), "a");
-        assert_eq!(context.get_symbol("b").unwrap().name(), "b");
+    assert_eq!(context.get_symbol("a").unwrap().name(), "a");
+    assert_eq!(context.get_symbol("b").unwrap().name(), "b");
 
-        let _c = Parser::parse_rule_or_panic::<crate::function::Assignment>(
-            Rule::assignment,
-            "c = a + b",
-        );
+    let _c =
+        Parser::parse_rule_or_panic::<crate::function::Assignment>(Rule::assignment, "c = a + b");
 
-        //c.eval(Some(&context)).unwrap();
-    }
+    //c.eval(Some(&context)).unwrap();
 }

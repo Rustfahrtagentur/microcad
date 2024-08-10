@@ -28,25 +28,17 @@ impl Parse for Document {
     }
 }
 
-#[cfg(test)]
-mod tests {
-
-    use crate::parser::Rule;
-
-    use super::*;
-
-    #[test]
-    fn document() {
-        let document = crate::parser::Parser::parse_rule_or_panic::<Document>(
-            Rule::document,
-            r#"use std::io::println;
+#[test]
+fn document() {
+    let document = crate::parser::Parser::parse_rule_or_panic::<Document>(
+        Rule::document,
+        r#"use std::io::println;
             module foo(r: scalar) {
                 info("Hello, world, {r}!");
             }
             foo(20.0);
             "#,
-        );
+    );
 
-        assert_eq!(document.body.len(), 3);
-    }
+    assert_eq!(document.body.len(), 3);
 }

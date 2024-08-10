@@ -427,171 +427,167 @@ impl std::fmt::Display for ExpressionList {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
+fn run_expression_test(
+    expr: &str,
+    context: &mut Context,
+    evaluator: impl FnOnce(Result<Value, eval::Error>),
+) {
+    use pest::Parser;
+    let pair = crate::parser::Parser::parse(Rule::expression, expr)
+        .unwrap()
+        .next()
+        .unwrap();
 
-    fn run_expression_test(
-        expr: &str,
-        context: &mut Context,
-        evaluator: impl FnOnce(Result<Value, eval::Error>),
-    ) {
-        use pest::Parser;
-        let pair = crate::parser::Parser::parse(Rule::expression, expr)
-            .unwrap()
-            .next()
-            .unwrap();
+    let expr = Expression::parse(pair).unwrap();
+    let new_expr = expr.eval(context);
 
-        let expr = Expression::parse(pair).unwrap();
-        let new_expr = expr.eval(context);
-
-        evaluator(new_expr);
-    }
-
-    #[test]
-    fn operators() {
-        let mut context = Context::default();
-        run_expression_test("4", &mut context, |e| {
-            if let Ok(Value::Scalar(num)) = e {
-                assert_eq!(num, 4.0);
-            }
-        });
-        run_expression_test("4 * 4", &mut context, |e| {
-            if let Ok(Value::Scalar(num)) = e {
-                assert_eq!(num, 16.0);
-            }
-        });
-        run_expression_test("4 * (4 + 4)", &mut context, |e| {
-            if let Ok(Value::Scalar(num)) = e {
-                assert_eq!(num, 32.0);
-            }
-        });
-        run_expression_test("10.0 / 2.5 + 6", &mut context, |e| {
-            if let Ok(Value::Scalar(num)) = e {
-                assert_eq!(num, 10.0);
-            }
-        });
-    }
-
-    #[test]
-    fn list_expression() {
-        let mut context = Context::default();
-
-        // Simple list expression with 3 elements
-        run_expression_test("[1,2,3]", &mut context, |e| {
-            if let Ok(Value::List(list)) = e {
-                assert_eq!(list.len(), 3);
-            } else {
-                panic!("Expected list value: {:?}", e);
-            }
-        });
-
-        // Accessing the third element of a list
-        run_expression_test("[1.0,2.0,3.0][2]", &mut context, |e| {
-            if let Ok(Value::Scalar(n)) = e {
-                assert_eq!(n, 3.0);
-            } else {
-                panic!("Expected scalar value: {:?}", e);
-            }
-        });
-
-        // Test out of bounds access
-        run_expression_test("[1.0,2.0,3.0][3]", &mut context, |e| {
-            if let Err(eval::Error::ListIndexOutOfBounds { index, len }) = e {
-                assert_eq!(index, 3);
-                assert_eq!(len, 3);
-            }
-        });
-
-        // Return the length of a list
-        run_expression_test("[1.0,2.0,3.0].len()", &mut context, |e| {
-            if let Ok(Value::Integer(n)) = e {
-                assert_eq!(n, 3);
-            }
-        });
-    }
-
-    #[test]
-    fn conditions() {
-        let mut context = Context::default();
-
-        run_expression_test("4 < 5", &mut context, |e| {
-            if let Ok(Value::Bool(b)) = e {
-                assert!(b);
-            } else {
-                panic!("Expected boolean value: {:?}", e);
-            }
-        });
-        run_expression_test("4 > 5", &mut context, |e| {
-            if let Ok(Value::Bool(b)) = e {
-                assert!(!b);
-            } else {
-                panic!("Expected boolean value: {:?}", e);
-            }
-        });
-        run_expression_test("4 == 5", &mut context, |e| {
-            if let Ok(Value::Bool(b)) = e {
-                assert!(!b);
-            } else {
-                panic!("Expected boolean value: {:?}", e);
-            }
-        });
-        run_expression_test("4 != 5", &mut context, |e| {
-            if let Ok(Value::Bool(b)) = e {
-                assert!(b);
-            } else {
-                panic!("Expected boolean value: {:?}", e);
-            }
-        });
-    }
-    /*
-    #[test]
-    fn basic_context() {
-        let mut context = Context::default();
-        context.insert("a", Value::Scalar(4.0));
-        context.insert("b", Value::Scalar(5.0));
-
-        run_expression_test("a + b", Some(&context), |e| {
-            if let Ok(Value::Scalar(num)) = e {
-                assert_eq!(num, 9.0);
-            }
-        });
-        run_expression_test("a < b", Some(&context), |e| {
-            if let Ok(Value::Bool(b)) = e {
-                assert!(b);
-            } else {
-                panic!("Expected boolean value");
-            }
-        });
-        run_expression_test("a + b + c", Some(&context), |e| {
-            if let Err(eval::Error::UnknownQualifiedName(qualified_name)) = e {
-                assert_eq!(qualified_name, "c".into());
-            }
-        });
-    }
-
-    #[test]
-    fn nested_context() {
-        let mut context = Context::default();
-        context.insert("a", Value::Scalar(4.0));S
-        context.insert("b", Value::Scalar(5.0));
-
-        // Enter a new scope
-        context.push();
-        context.insert("a", Value::String("Hello".into()));
-        context.insert("b", Value::String("World".into()));
-
-        run_expression_test("a + b", Some(&context), |e| {
-            if let Ok(Value::String(s)) = e {
-                assert_eq!(&s, "HelloWorld");
-            }
-        });
-
-        context.pop();
-
-        run_expression_test("a + b", Some(&context), |e| {
-            if let Ok(Value::Scalar(num)) = e {
-                assert_eq!(num, 9.0);
-            }
-        });
-    }*/
+    evaluator(new_expr);
 }
+
+#[test]
+fn operators() {
+    let mut context = Context::default();
+    run_expression_test("4", &mut context, |e| {
+        if let Ok(Value::Scalar(num)) = e {
+            assert_eq!(num, 4.0);
+        }
+    });
+    run_expression_test("4 * 4", &mut context, |e| {
+        if let Ok(Value::Scalar(num)) = e {
+            assert_eq!(num, 16.0);
+        }
+    });
+    run_expression_test("4 * (4 + 4)", &mut context, |e| {
+        if let Ok(Value::Scalar(num)) = e {
+            assert_eq!(num, 32.0);
+        }
+    });
+    run_expression_test("10.0 / 2.5 + 6", &mut context, |e| {
+        if let Ok(Value::Scalar(num)) = e {
+            assert_eq!(num, 10.0);
+        }
+    });
+}
+
+#[test]
+fn list_expression() {
+    let mut context = Context::default();
+
+    // Simple list expression with 3 elements
+    run_expression_test("[1,2,3]", &mut context, |e| {
+        if let Ok(Value::List(list)) = e {
+            assert_eq!(list.len(), 3);
+        } else {
+            panic!("Expected list value: {:?}", e);
+        }
+    });
+
+    // Accessing the third element of a list
+    run_expression_test("[1.0,2.0,3.0][2]", &mut context, |e| {
+        if let Ok(Value::Scalar(n)) = e {
+            assert_eq!(n, 3.0);
+        } else {
+            panic!("Expected scalar value: {:?}", e);
+        }
+    });
+
+    // Test out of bounds access
+    run_expression_test("[1.0,2.0,3.0][3]", &mut context, |e| {
+        if let Err(eval::Error::ListIndexOutOfBounds { index, len }) = e {
+            assert_eq!(index, 3);
+            assert_eq!(len, 3);
+        }
+    });
+
+    // Return the length of a list
+    run_expression_test("[1.0,2.0,3.0].len()", &mut context, |e| {
+        if let Ok(Value::Integer(n)) = e {
+            assert_eq!(n, 3);
+        }
+    });
+}
+
+#[test]
+fn conditions() {
+    let mut context = Context::default();
+
+    run_expression_test("4 < 5", &mut context, |e| {
+        if let Ok(Value::Bool(b)) = e {
+            assert!(b);
+        } else {
+            panic!("Expected boolean value: {:?}", e);
+        }
+    });
+    run_expression_test("4 > 5", &mut context, |e| {
+        if let Ok(Value::Bool(b)) = e {
+            assert!(!b);
+        } else {
+            panic!("Expected boolean value: {:?}", e);
+        }
+    });
+    run_expression_test("4 == 5", &mut context, |e| {
+        if let Ok(Value::Bool(b)) = e {
+            assert!(!b);
+        } else {
+            panic!("Expected boolean value: {:?}", e);
+        }
+    });
+    run_expression_test("4 != 5", &mut context, |e| {
+        if let Ok(Value::Bool(b)) = e {
+            assert!(b);
+        } else {
+            panic!("Expected boolean value: {:?}", e);
+        }
+    });
+}
+/*
+#[test]
+fn basic_context() {
+    let mut context = Context::default();
+    context.insert("a", Value::Scalar(4.0));
+    context.insert("b", Value::Scalar(5.0));
+
+    run_expression_test("a + b", Some(&context), |e| {
+        if let Ok(Value::Scalar(num)) = e {
+            assert_eq!(num, 9.0);
+        }
+    });
+    run_expression_test("a < b", Some(&context), |e| {
+        if let Ok(Value::Bool(b)) = e {
+            assert!(b);
+        } else {
+            panic!("Expected boolean value");
+        }
+    });
+    run_expression_test("a + b + c", Some(&context), |e| {
+        if let Err(eval::Error::UnknownQualifiedName(qualified_name)) = e {
+            assert_eq!(qualified_name, "c".into());
+        }
+    });
+}
+
+#[test]
+fn nested_context() {
+    let mut context = Context::default();
+    context.insert("a", Value::Scalar(4.0));S
+    context.insert("b", Value::Scalar(5.0));
+
+    // Enter a new scope
+    context.push();
+    context.insert("a", Value::String("Hello".into()));
+    context.insert("b", Value::String("World".into()));
+
+    run_expression_test("a + b", Some(&context), |e| {
+        if let Ok(Value::String(s)) = e {
+            assert_eq!(&s, "HelloWorld");
+        }
+    });
+
+    context.pop();
+
+    run_expression_test("a + b", Some(&context), |e| {
+        if let Ok(Value::Scalar(num)) = e {
+            assert_eq!(num, 9.0);
+        }
+    });
+}*/

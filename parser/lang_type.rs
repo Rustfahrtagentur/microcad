@@ -318,70 +318,62 @@ impl TypeList {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::{
-        lang_type::Type,
-        parser::{Parser, Rule},
-    };
+#[test]
+fn builtin_type() {
+    let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "int");
+    assert_eq!(ty.to_string(), "int");
+    assert_eq!(ty, Type::Integer);
+}
 
-    #[test]
-    fn builtin_type() {
-        let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "int");
-        assert_eq!(ty.to_string(), "int");
-        assert_eq!(ty, Type::Integer);
-    }
+#[test]
+fn list_type() {
+    use crate::lang_type::ListType;
+    let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int]");
+    assert_eq!(ty.to_string(), "[int]");
+    assert_eq!(ty, Type::List(ListType::from_type(Type::Integer)));
+}
 
-    #[test]
-    fn list_type() {
-        use crate::lang_type::ListType;
-        let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int]");
-        assert_eq!(ty.to_string(), "[int]");
-        assert_eq!(ty, Type::List(ListType::from_type(Type::Integer)));
-    }
+#[test]
+fn map_type() {
+    use crate::lang_type::MapType;
+    let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int => string]");
+    assert_eq!(ty.to_string(), "[int => string]");
+    assert_eq!(
+        ty,
+        Type::Map(MapType::from_types(
+            crate::lang_type::MapKeyType::Integer,
+            Type::String
+        ))
+    );
+}
 
-    #[test]
-    fn map_type() {
-        use crate::lang_type::MapType;
-        let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int => string]");
-        assert_eq!(ty.to_string(), "[int => string]");
-        assert_eq!(
-            ty,
-            Type::Map(MapType::from_types(
-                crate::lang_type::MapKeyType::Integer,
-                Type::String
-            ))
-        );
-    }
+#[test]
+fn unnamed_tuple_type() {
+    use crate::lang_type::UnnamedTupleType;
+    let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(int, string)");
+    assert_eq!(ty.to_string(), "(int, string)");
+    assert_eq!(
+        ty,
+        Type::UnnamedTuple(UnnamedTupleType(vec![Type::Integer, Type::String]))
+    );
+}
 
-    #[test]
-    fn unnamed_tuple_type() {
-        use crate::lang_type::UnnamedTupleType;
-        let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(int, string)");
-        assert_eq!(ty.to_string(), "(int, string)");
-        assert_eq!(
-            ty,
-            Type::UnnamedTuple(UnnamedTupleType(vec![Type::Integer, Type::String]))
-        );
-    }
+#[test]
+fn named_tuple_type() {
+    use crate::identifier::Identifier;
+    use crate::lang_type::NamedTupleType;
 
-    #[test]
-    fn named_tuple_type() {
-        use crate::identifier::Identifier;
-        use crate::lang_type::NamedTupleType;
-
-        let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(x: int, y: string)");
-        assert_eq!(ty.to_string(), "(x: int, y: string)");
-        assert_eq!(
-            ty,
-            Type::NamedTuple(NamedTupleType(
-                vec![
-                    (Identifier::from("x"), Type::Integer),
-                    (Identifier::from("y"), Type::String)
-                ]
-                .into_iter()
-                .collect()
-            ))
-        );
-    }
+    let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(x: int, y: string)");
+    assert_eq!(ty.to_string(), "(x: int, y: string)");
+    assert_eq!(
+        ty,
+        Type::NamedTuple(NamedTupleType(
+            vec![
+                (Identifier::from("x"), Type::Integer),
+                (Identifier::from("y"), Type::String)
+            ]
+            .into_iter()
+            .collect()
+        ))
+    );
 }

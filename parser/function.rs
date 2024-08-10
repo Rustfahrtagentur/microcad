@@ -404,89 +404,67 @@ impl Eval for Rc<FunctionDefinition> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use std::rc::Rc;
+#[test]
+fn assignment() {
+    let assignment =
+        Parser::parse_rule_or_panic::<crate::function::Assignment>(Rule::assignment, "a = 1");
 
-    use crate::eval::{Context, Symbol};
+    let mut context = Context::default();
 
-    #[test]
-    fn assignment() {
-        use crate::eval::*;
-        use crate::parser::Parser;
-        use crate::parser::Rule;
-        let assignment =
-            Parser::parse_rule_or_panic::<crate::function::Assignment>(Rule::assignment, "a = 1");
+    assert_eq!(assignment.name(), &"a".into());
+    assert_eq!(
+        assignment.value().eval(&mut context).unwrap().to_string(),
+        "1"
+    );
+    assert!(assignment.specified_type().is_none());
 
-        let mut context = Context::default();
+    assignment.eval(&mut context).unwrap();
 
-        assert_eq!(assignment.name(), &"a".into());
-        assert_eq!(
-            assignment.value().eval(&mut context).unwrap().to_string(),
-            "1"
-        );
-        assert!(assignment.specified_type().is_none());
+    assert_eq!(context.get_symbol("a").unwrap().name(), "a");
+}
 
-        assignment.eval(&mut context).unwrap();
+#[test]
+fn function_signature() {
+    let input = "(a: scalar, b: scalar) -> scalar";
 
-        assert_eq!(context.get_symbol("a").unwrap().name(), "a");
-    }
+    let function_signature =
+        Parser::parse_rule_or_panic::<FunctionSignature>(Rule::function_signature, input);
 
-    #[test]
-    fn function_signature() {
-        use crate::function::FunctionSignature;
-        use crate::parser::Parser;
-        use crate::parser::Rule;
+    assert_eq!(function_signature.parameters().len(), 2);
+    assert_eq!(
+        function_signature.return_type(),
+        &crate::lang_type::Type::Scalar
+    );
+}
 
-        let input = "(a: scalar, b: scalar) -> scalar";
-
-        let function_signature =
-            Parser::parse_rule_or_panic::<FunctionSignature>(Rule::function_signature, input);
-
-        assert_eq!(function_signature.parameters().len(), 2);
-        assert_eq!(
-            function_signature.return_type(),
-            &crate::lang_type::Type::Scalar
-        );
-    }
-
-    #[test]
-    fn function_declaration() {
-        use crate::function::FunctionDefinition;
-        use crate::parser::Parser;
-        use crate::parser::Rule;
-
-        let input = "function test(a: scalar, b: scalar) -> scalar {
+#[test]
+fn function_declaration() {
+    let input = "function test(a: scalar, b: scalar) -> scalar {
             c = 1.0;
             return a + b + c;
         }";
-        Parser::parse_rule_or_panic::<FunctionDefinition>(Rule::function_definition, input);
-    }
+    Parser::parse_rule_or_panic::<FunctionDefinition>(Rule::function_definition, input);
+}
 
-    #[test]
-    fn function_evaluate() {
-        use crate::eval::Eval;
-        use crate::parser::Parser;
-        use crate::parser::Rule;
-
-        let input = r#"
+#[test]
+fn function_evaluate() {
+    let input = r#"
         function test(a: scalar, b: scalar) -> scalar {
             c = 1.0;
             return a + b + c;
         }"#;
 
-        let function_def = Rc::new(Parser::parse_rule_or_panic::<
-            crate::function::FunctionDefinition,
-        >(Rule::function_definition, input));
+    let function_def = Rc::new(Parser::parse_rule_or_panic::<
+        crate::function::FunctionDefinition,
+    >(Rule::function_definition, input));
 
-        let mut context = Context::default();
-        context.add_symbol(Symbol::Function(function_def));
+    let mut context = Context::default();
+    context.add_symbol(Symbol::Function(function_def));
 
-        let input = "test(a = 1, b = 2)";
-        let expr =
-            Parser::parse_rule_or_panic::<crate::expression::Expression>(Rule::expression, input);
+    let input = "test(a = 1, b = 2)";
+    let expr =
+        Parser::parse_rule_or_panic::<crate::expression::Expression>(Rule::expression, input);
 
-        let value = expr.eval(&mut context).unwrap();
-        assert_eq!(value.to_string(), "4");
-    }
+    let value = expr.eval(&mut context).unwrap();
+    assert_eq!(value.to_string(), "4");
 }

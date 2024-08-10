@@ -81,6 +81,3 @@ impl RenderMultiPolygon for Rectangle {
         line_string_to_multi_polygon(line_string)
     }
 }
-
-#[cfg(test)]
-mod tests {}

@@ -189,7 +189,8 @@ impl PestFile {
         w: &mut impl std::io::Write,
     ) -> Result<(), std::io::Error> {
         let mut r = RustWriter::new(w);
-        r.write("use crate::*;")?;
+        r.writeln("mod grammar {")?;
+        r.writeln("use crate::*;")?;
 
         // Generate tests for each rule
         for rule in &self.rules {
@@ -241,6 +242,7 @@ impl PestFile {
             }
             r.end_scope()?;
         }
+        r.writeln("}")?;
         Ok(())
     }
 }
@@ -266,39 +268,34 @@ pub fn generate(
 
 //pub fn generate_test_case_from_file(test_file: impl AsRef<std::path::Path>)
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[test]
+fn test_comment() {
+    let test = r#"//`test`: ok # Test"#;
+    let test = test.parse::<PestTest>().unwrap();
+    assert_eq!(test.source, "test");
+    assert_eq!(test.result, PestResult::Ok("Test".into()));
+}
 
-    #[test]
-    fn test_comment() {
-        let test = r#"//`test`: ok # Test"#;
-        let test = test.parse::<PestTest>().unwrap();
-        assert_eq!(test.source, "test");
-        assert_eq!(test.result, PestResult::Ok("Test".into()));
-    }
-
-    #[test]
-    fn parse_pest_file() {
-        let test = r#"
+#[test]
+fn parse_pest_file() {
+    let test = r#"
             //`test1`: ok # Ok Test
             //`test2`: error # Error Test
             expr = {  "{" ~ expr_interior ~ "}" }
         "#;
 
-        let test = test.parse::<PestFile>().unwrap();
-        assert_eq!(test.rules.len(), 1);
-        assert_eq!(test.rules[0].name, "expr");
-        assert_eq!(test.rules[0].tests.len(), 2);
-        assert_eq!(test.rules[0].tests[0].source, "test1");
-        assert_eq!(
-            test.rules[0].tests[0].result,
-            PestResult::Ok("Ok Test".into())
-        );
-        assert_eq!(test.rules[0].tests[1].source, "test2");
-        assert_eq!(
-            test.rules[0].tests[1].result,
-            PestResult::Err("Error Test".into())
-        );
-    }
+    let test = test.parse::<PestFile>().unwrap();
+    assert_eq!(test.rules.len(), 1);
+    assert_eq!(test.rules[0].name, "expr");
+    assert_eq!(test.rules[0].tests.len(), 2);
+    assert_eq!(test.rules[0].tests[0].source, "test1");
+    assert_eq!(
+        test.rules[0].tests[0].result,
+        PestResult::Ok("Ok Test".into())
+    );
+    assert_eq!(test.rules[0].tests[1].source, "test2");
+    assert_eq!(
+        test.rules[0].tests[1].result,
+        PestResult::Err("Error Test".into())
+    );
 }

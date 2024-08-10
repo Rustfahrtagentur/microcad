@@ -119,88 +119,79 @@ impl Eval for TupleExpression {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::{eval::Context, lang_type::Ty, parser::Rule, tuple::TupleExpression};
+#[test]
+fn unnamed_tuple() {
+    use crate::Rule;
 
-    #[test]
-    fn unnamed_tuple() {
-        use crate::eval::Eval;
-        use crate::lang_type::Type;
+    let input = "(1.0, 2.0, 3.0)mm";
+    let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
+        Rule::tuple_expression,
+        input,
+    );
+    let mut context = Context::default();
+    let value = expr.eval(&mut context).unwrap();
+    assert_eq!(
+        value.ty(),
+        Type::UnnamedTuple(crate::lang_type::UnnamedTupleType(vec![
+            Type::Length,
+            Type::Length,
+            Type::Length
+        ]))
+    );
+}
 
-        let input = "(1.0, 2.0, 3.0)mm";
-        let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
-            Rule::tuple_expression,
-            input,
-        );
-        let mut context = Context::default();
-        let value = expr.eval(&mut context).unwrap();
-        assert_eq!(
-            value.ty(),
-            Type::UnnamedTuple(crate::lang_type::UnnamedTupleType(vec![
-                Type::Length,
-                Type::Length,
-                Type::Length
-            ]))
-        );
-    }
+#[test]
+fn test_named_tuple() {
+    use crate::Rule;
 
-    #[test]
-    fn test_named_tuple() {
-        use crate::eval::Eval;
-        use crate::lang_type::Type;
+    let input = "(a = 1.0, b = 2.0, c = 3.0)mm";
+    let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
+        Rule::tuple_expression,
+        input,
+    );
+    let mut context = Context::default();
 
-        let input = "(a = 1.0, b = 2.0, c = 3.0)mm";
-        let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
-            Rule::tuple_expression,
-            input,
-        );
-        let mut context = Context::default();
+    let value = expr.eval(&mut context).unwrap();
+    assert_eq!(
+        value.ty(),
+        Type::NamedTuple(crate::lang_type::NamedTupleType(
+            vec![
+                ("a".into(), Type::Length),
+                ("b".into(), Type::Length),
+                ("c".into(), Type::Length),
+            ]
+            .into_iter()
+            .collect()
+        ))
+    );
+}
 
-        let value = expr.eval(&mut context).unwrap();
-        assert_eq!(
-            value.ty(),
-            Type::NamedTuple(crate::lang_type::NamedTupleType(
-                vec![
-                    ("a".into(), Type::Length),
-                    ("b".into(), Type::Length),
-                    ("c".into(), Type::Length),
-                ]
-                .into_iter()
-                .collect()
-            ))
-        );
-    }
+#[test]
+fn test_vec2() {
+    use crate::Rule;
 
-    #[test]
-    fn test_vec2() {
-        use crate::eval::Eval;
-        use crate::lang_type::Type;
+    let input = "((x,y) = 1mm)";
+    let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
+        Rule::tuple_expression,
+        input,
+    );
+    let mut context = Context::default();
 
-        let input = "((x,y) = 1mm)";
-        let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
-            Rule::tuple_expression,
-            input,
-        );
-        let mut context = Context::default();
+    let value = expr.eval(&mut context).unwrap();
+    assert_eq!(value.ty(), Type::Vec2);
+}
 
-        let value = expr.eval(&mut context).unwrap();
-        assert_eq!(value.ty(), Type::Vec2);
-    }
+#[test]
+fn test_vec3() {
+    use crate::Rule;
 
-    #[test]
-    fn test_vec3() {
-        use crate::eval::Eval;
-        use crate::lang_type::Type;
+    let input = "(x = 1, y = 2, z = 3)mm";
+    let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
+        Rule::tuple_expression,
+        input,
+    );
+    let mut context = Context::default();
 
-        let input = "(x = 1, y = 2, z = 3)mm";
-        let expr = crate::parser::Parser::parse_rule_or_panic::<TupleExpression>(
-            Rule::tuple_expression,
-            input,
-        );
-        let mut context = Context::default();
-
-        let value = expr.eval(&mut context).unwrap();
-        assert_eq!(value.ty(), Type::Vec3);
-    }
+    let value = expr.eval(&mut context).unwrap();
+    assert_eq!(value.ty(), Type::Vec3);
 }

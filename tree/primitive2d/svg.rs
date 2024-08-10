@@ -106,36 +106,33 @@ impl<'a> Drop for SvgWriter<'a> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn svg_write() {
-        // Write to file test.svg
-        let mut file = std::fs::File::create("svg_write.svg").unwrap();
+#[test]
+fn svg_write() {
+    // Write to file test.svg
+    let mut file = std::fs::File::create("svg_write.svg").unwrap();
 
-        let mut svg = super::SvgWriter::new(
-            &mut file,
-            geo::Rect::new(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0)),
-            1.0,
-        )
-        .unwrap();
+    let mut svg = super::SvgWriter::new(
+        &mut file,
+        geo::Rect::new(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0)),
+        1.0,
+    )
+    .unwrap();
 
-        let rect = geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0));
-        svg.rect(&rect, "fill:blue;").unwrap();
+    let rect = geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0));
+    svg.rect(&rect, "fill:blue;").unwrap();
 
-        let circle = geo::Point::new(50.0, 50.0);
-        svg.circle(&circle, 10.0, "fill:red;").unwrap();
+    let circle = geo::Point::new(50.0, 50.0);
+    svg.circle(&circle, 10.0, "fill:red;").unwrap();
 
-        let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
-        svg.line(line.0, line.1, "stroke:black;").unwrap();
+    let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
+    svg.line(line.0, line.1, "stroke:black;").unwrap();
 
-        use super::RenderMultiPolygon;
-        let circle_polygon = super::Circle {
-            radius: 40.0,
-            points: 32,
-        }
-        .render();
-        svg.multi_polygon(&circle_polygon, "fill:none;stroke:black;")
-            .unwrap();
+    use super::RenderMultiPolygon;
+    let circle_polygon = super::Circle {
+        radius: 40.0,
+        points: 32,
     }
+    .render();
+    svg.multi_polygon(&circle_polygon, "fill:none;stroke:black;")
+        .unwrap();
 }

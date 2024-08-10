@@ -137,37 +137,36 @@ impl Parser {
 }
 
 #[cfg(test)]
-mod tests {
-    include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
-    include!(concat!(env!("OUT_DIR"), "/md_test.rs"));
-    /*use literal::NumberLiteral;
-    use parser::Parse;
+include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
+#[cfg(test)]
+include!(concat!(env!("OUT_DIR"), "/md_test.rs"));
+/*use literal::NumberLiteral;
+use parser::Parse;
 
-    #[test]
-    fn number_literal() {
-        use pest::Parser;
-        let pairs = crate::parser::Parser::parse(parser::Rule::number_literal, "90.0°");
+#[test]
+fn number_literal() {
+    use pest::Parser;
+    let pairs = crate::parser::Parser::parse(parser::Rule::number_literal, "90.0°");
 
-        assert!(pairs.is_ok());
-        let pair = pairs.unwrap().next().unwrap();
+    assert!(pairs.is_ok());
+    let pair = pairs.unwrap().next().unwrap();
 
-        let literal::NumberLiteral(number, unit) = NumberLiteral::parse(pair).unwrap();
+    let literal::NumberLiteral(number, unit) = NumberLiteral::parse(pair).unwrap();
 
-        assert_eq!(number, 90.0);
-        assert_eq!(unit, units::Unit::DegS);
-    }
-
-    fn _test_file(path: impl AsRef<std::path::Path>) {
-        use pest::Parser;
-
-        let input = std::fs::read_to_string(&path)
-            .unwrap_or_else(|_| panic!("Test file not found: {:?}", path.as_ref()));
-        assert!(crate::parser::Parser::parse(parser::Rule::document, &input).is_ok())
-    }
-
-    //#[test]
-    fn _test_file_nested() {
-        _test_file("tests/nested.csg");
-        _test_file("tests/module.csg");
-    }*/
+    assert_eq!(number, 90.0);
+    assert_eq!(unit, units::Unit::DegS);
 }
+
+fn _test_file(path: impl AsRef<std::path::Path>) {
+    use pest::Parser;
+
+    let input = std::fs::read_to_string(&path)
+        .unwrap_or_else(|_| panic!("Test file not found: {:?}", path.as_ref()));
+    assert!(crate::parser::Parser::parse(parser::Rule::document, &input).is_ok())
+}
+
+//#[test]
+fn _test_file_nested() {
+    _test_file("tests/nested.csg");
+    _test_file("tests/module.csg");
+}*/

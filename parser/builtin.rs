@@ -61,29 +61,21 @@ fn geo2d_builtin_module() -> Rc<ModuleDefinition> {
     Rc::new(module)
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::{
-        eval::{Eval, Symbol},
-        parser::{Parser, Rule},
-    };
+#[test]
+fn test_build_math_module() {
+    use crate::{eval::*, parser::*};
 
-    use super::*;
+    let module = build_math_module();
+    assert_eq!(module.name, "math".into());
 
-    #[test]
-    fn test_build_math_module() {
-        let module = build_math_module();
-        assert_eq!(module.name, "math".into());
+    let mut context = crate::eval::Context::default();
 
-        let mut context = crate::eval::Context::default();
+    context.add_symbol(Symbol::ModuleDefinition(module));
 
-        context.add_symbol(Symbol::ModuleDefinition(module));
+    let input = "math::abs(-1.0)";
+    let expr =
+        Parser::parse_rule_or_panic::<crate::expression::Expression>(Rule::expression, input);
 
-        let input = "math::abs(-1.0)";
-        let expr =
-            Parser::parse_rule_or_panic::<crate::expression::Expression>(Rule::expression, input);
-
-        let value = expr.eval(&mut context).unwrap();
-        assert_eq!(value.to_string(), "1");
-    }
+    let value = expr.eval(&mut context).unwrap();
+    assert_eq!(value.to_string(), "1");
 }
