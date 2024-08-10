@@ -4,6 +4,7 @@ alpha_lower = _{ 'a'..'z' }
 alpha_upper = _{ 'A'..'Z' }
 alpha = _{ alpha_lower | alpha_upper }
 digit = _{ '0'..'9' }
+dimension = _{ '2'..'3' }
 
 COMMENT = { 
   doc_comment | 
@@ -47,6 +48,8 @@ exp    = @{ ("E" | "e") ~ ("+" | "-")? ~ ASCII_DIGIT+ }
 //`5.0mm`: ok, with `mm` unit
 //`90.0`: ok, no unit
 //`mm`: error
+//`1weight/length^3`: ok
+//`20g/mm^3`: ok
 number_literal = { number ~ unit? | integer_literal ~ unit }
 
 //`-1`: ok
@@ -87,7 +90,9 @@ format_spec_leading_zeros = { "0" ~ int }
 //`False`: error
 bool_literal = @{ "true" | "false" }
 
-unit = @{ (alpha_lower)+ | "°" | "%" }
+//`weight/length^3`: ok
+//`g/mm^3`: ok
+unit = @{ (alpha_lower+ ~ (("^" ~ dimension | ("/" | "*") ~ alpha_lower+))*) | "°" | "%" }
 
 //`#FFF`: ok # RGB, single hex
 //`#00FF00`: ok # RGB, double hex
