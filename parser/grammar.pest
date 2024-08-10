@@ -5,7 +5,11 @@ alpha_upper = _{ 'A'..'Z' }
 alpha = _{ alpha_lower | alpha_upper }
 digit = _{ '0'..'9' }
 
-COMMENT = { doc_comment | single_line_comment | multi_line_comment }
+COMMENT = { 
+  doc_comment | 
+  single_line_comment | 
+  multi_line_comment 
+}
 
 //`// ok`: ok
 //`/ err` error
@@ -64,7 +68,11 @@ unicode = @{ "u" ~ ASCII_HEX_DIGIT{4} }
 format_expression = { "{" ~ ws* ~ (format_spec ~ ws* ~ ":" )? ~ ws* ~ expression ~ ws* ~ "}" }
 
 ///`05.5`: ok # Five leading zeros with 5 precision
-format_spec = { format_spec_leading_zeros ~ format_spec_precision | format_spec_leading_zeros | format_spec_precision }
+format_spec = { 
+  format_spec_leading_zeros ~ format_spec_precision | 
+  format_spec_leading_zeros | 
+  format_spec_precision 
+}
 
 //`.5`: print with precision = 5
 format_spec_precision = { "." ~ int }
@@ -93,7 +101,12 @@ color_literal = { "#" ~ (ASCII_HEX_DIGIT{8} | ASCII_HEX_DIGIT{6} | ASCII_HEX_DIG
 //`1.0`: ok # Scalar
 //`true`: ok # Boolean
 //`#00CCFF`: ok # Color
-literal = { number_literal | integer_literal | bool_literal | color_literal }
+literal = { 
+  number_literal | 
+  integer_literal | 
+  bool_literal | 
+  color_literal 
+}
 
 //`a`: ok # Single identifier
 //`a::b`: ok # Nested identifiers
@@ -110,7 +123,14 @@ qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 //`(scalar, scalar)`: Unnamed tuple type
 //`(a: scalar, b: scalar)`: Named tuple type
 //`{}`: ok # Module type
-type = { qualified_name | list_type | map_type | named_tuple_type | unnamed_tuple_type | module_type }
+type = { 
+  qualified_name | 
+  list_type | 
+  map_type | 
+  named_tuple_type | 
+  unnamed_tuple_type | 
+  module_type 
+}
 
 //`type a = scalar`: ok
 type_declaration = { "type" ~ ws* ~ identifier ~ ws* ~ "=" ~ ws* ~ type }
@@ -272,7 +292,11 @@ call_named_tuple_argument = { "(" ~ identifier_list ~ ")" ~ ws* ~ default_value 
 //`2.0mm`: ok # Positional argument
 call_positional_argument = _{ expression }
 
-call_argument = _{ call_named_tuple_argument | call_named_argument | call_positional_argument }
+call_argument = _{ 
+  call_named_tuple_argument | 
+  call_named_argument | 
+  call_positional_argument 
+}
 
 //`a = 5.0mm, b = false`: ok
 //`4.0mm, a = false`: ok
@@ -334,7 +358,13 @@ function_definition = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature
 
 function_body = { "{" ~ ((ws* ~ function_statement)+ | ws* ~ expression)? ~ ws* ~ "}" }
 
-function_statement = { assignment_statement | use_statement | function_definition | function_return_statement | function_if_statement }
+function_statement = { 
+  assignment_statement | 
+  use_statement | 
+  function_definition | 
+  function_return_statement | 
+  function_if_statement 
+}
 
 //`return 5.0mm;`: ok
 function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
@@ -359,23 +389,42 @@ namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ module_body }
 //`{ translate() rotate(); }`: ok
 //`{ translate() }`: ok # Single expression block (no semicolon)
 //`{}`: ok # Empty block
-module_body = { "{" ~ ws* ~ module_inner? ~ ws*~ "}" }
+module_body = { "{" ~ ws* ~ module_inner? ~ ws* ~ "}" }
 
-module_inner = _{ ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
+module_inner = _{ 
+  ws* ~ (module_statement ~ ws*)+ | 
+  ws* ~ (module_statement ~ ws*)* ~ expression 
+}
 
 module_for_statement = { "for" ~ ws* ~ assignment ~ ws* ~ module_body }
 
-module_statement = { use_statement | module_for_statement | expression_statement | assignment_statement |
-  module_init_definition | module_definition | namespace_definition | function_definition }
+module_statement = { 
+  use_statement |
+  module_for_statement |
+  expression_statement |
+  assignment_statement |
+  module_init_definition |
+  module_definition |
+  namespace_definition |
+  function_definition
+}
 
 //`init(d: length) { r = d / 2; }`: ok
 //`init(size: length) { size = size; }`: ok
 //`init(size: length) { rectangle(size); }: ok
 module_init_definition = { "init" ~ ws* ~ definition_parameter_list ~ ws* ~ "{" ~ ws* ~ module_init_inner? ~ ws* ~ "}" }
 
-module_init_statement = { assignment_statement | use_statement | function_definition | expression_statement }
+module_init_statement = { 
+  assignment_statement | 
+  use_statement | 
+  function_definition | 
+  expression_statement 
+}
 
-module_init_inner = _{ ws* ~ (module_init_statement ~ ws*)+ | ws* ~ (module_init_statement ~ ws*)* ~ expression }
+module_init_inner = _{ 
+  ws* ~ (module_init_statement ~ ws*)+ |
+  ws* ~ (module_init_statement ~ ws*)* ~ expression 
+}
 
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
