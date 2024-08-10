@@ -4,17 +4,17 @@ use crate::{eval::*, parser::*, with_pair_ok};
 #[derive(Default, Clone)]
 pub struct ListExpression(ExpressionList, Option<Unit>);
 
-impl ListExpression {
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
+impl std::ops::Deref for ListExpression {
+    type Target = ExpressionList;
 
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
+}
 
-    pub fn get(&self, index: usize) -> Option<&Expression> {
-        self.0.get(index)
+impl std::ops::DerefMut for ListExpression {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
@@ -38,17 +38,21 @@ impl Parse for ListExpression {
 
 impl std::fmt::Display for ListExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "[")?;
-        for (i, expr) in self.0.iter().enumerate() {
-            if i > 0 {
-                write!(f, ", ")?;
+        write!(
+            f,
+            "[{}]{}",
+            self.0
+                .iter()
+                .map(|c| c.to_string())
+                .collect::<Vec<String>>()
+                .join(", "),
+            if let Some(unit) = self.1 {
+                unit.to_string()
+            } else {
+                String::new()
             }
-            write!(f, "{}", expr)?;
-        }
-        write!(f, "]")?;
-        if let Some(unit) = self.1 {
-            write!(f, "{}", unit)?;
-        }
+        )?;
+
         Ok(())
     }
 }

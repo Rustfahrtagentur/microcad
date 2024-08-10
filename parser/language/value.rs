@@ -27,48 +27,23 @@ pub enum ValueError {
 #[derive(Clone, Debug, PartialEq)]
 pub struct List(pub ValueList, pub Type);
 
+impl std::ops::Deref for List {
+    type Target = ValueList;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for List {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
 impl List {
     pub fn new(ty: Type) -> Self {
         Self(ValueList::new(), ty)
-    }
-
-    pub fn push(&mut self, value: Value) {
-        self.0.push(value);
-    }
-
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
-    pub fn get(&self, index: usize) -> Option<&Value> {
-        self.0.get(index)
-    }
-
-    pub fn extend(&mut self, other: Self) {
-        self.0.extend(other.0);
-    }
-
-    pub fn contains(&self, value: &Value) -> bool {
-        self.0.contains(value)
-    }
-
-    pub fn retain<F>(&mut self, f: F)
-    where
-        F: FnMut(&Value) -> bool,
-    {
-        self.0.retain(f);
-    }
-
-    pub fn iter(&self) -> std::slice::Iter<Value> {
-        self.0.iter()
-    }
-
-    pub fn add_unit_to_unitless_types(&mut self, unit: Unit) -> Result<(), ValueError> {
-        self.0.add_unit_to_unitless_types(unit)
     }
 }
 
@@ -419,8 +394,8 @@ impl std::ops::Add for Value {
             // Concatenate two strings
             (Value::String(lhs), Value::String(rhs)) => Ok(Value::String(lhs + &rhs)),
             // Concatenate two lists
-            (Value::List(mut lhs), Value::List(rhs)) => {
-                lhs.extend(rhs);
+            (Value::List(mut lhs), Value::List(mut rhs)) => {
+                lhs.append(&mut rhs);
                 Ok(Value::List(lhs))
             }
             // Add values of two tuples of the same length
@@ -546,44 +521,23 @@ impl std::fmt::Display for Value {
 #[derive(Clone, Debug, PartialEq, Default)]
 pub struct ValueList(Vec<Value>);
 
+impl std::ops::Deref for ValueList {
+    type Target = Vec<Value>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for ValueList {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
 impl ValueList {
     pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn push(&mut self, value: Value) {
-        self.0.push(value);
-    }
-
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
-    pub fn get(&self, index: usize) -> Option<&Value> {
-        self.0.get(index)
-    }
-
-    pub fn iter(&self) -> std::slice::Iter<Value> {
-        self.0.iter()
-    }
-
-    pub fn extend(&mut self, other: Self) {
-        self.0.extend(other.0);
-    }
-
-    pub fn contains(&self, value: &Value) -> bool {
-        self.0.contains(value)
-    }
-
-    pub fn retain<F>(&mut self, f: F)
-    where
-        F: FnMut(&Value) -> bool,
-    {
-        self.0.retain(f);
+        Self(Vec::new())
     }
 
     pub fn add_unit_to_unitless_types(&mut self, unit: Unit) -> Result<(), ValueError> {

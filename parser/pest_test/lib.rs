@@ -94,25 +94,16 @@ impl std::str::FromStr for PestFile {
         let mut rules = Vec::new();
         let mut tests = Vec::new();
 
-        let mut line_count = 0;
-
-        for line in s.lines() {
-            line_count += 1;
-
+        for (line_count, line) in s.lines().enumerate() {
+            let line_count = line_count + 1;
             // If line is a test comment, add to tests
             if let Ok(mut test) = line.parse::<PestTest>() {
                 test.line = Some(line_count);
                 tests.push(test);
-                continue;
-            }
-
-            // Skip other comments
-            if line.starts_with("//") {
-                continue;
-            }
-
-            // Check if we have a parser rule
-            if let Some(tokens) = line.split_once('=') {
+            } else if line.starts_with("//") {
+                // Skip other comments
+            } else if let Some(tokens) = line.split_once('=') {
+                // read parser rule
                 let name = tokens.0.trim();
                 // Check if name is identifier
                 if name.chars().any(|c| !c.is_alphanumeric() && c != '_') {
@@ -171,13 +162,12 @@ impl<'a> RustWriter<'a> {
 
 impl PestFile {
     pub fn from_file(path: impl AsRef<std::path::Path>) -> Result<Self, String> {
-        use std::io::Read;
+        use std::{fs::*, io::*};
 
         // Read file line by line
         let mut buf = String::new();
         // Read file to string
-        let mut file = std::fs::File::open(path).unwrap();
-        file.read_to_string(&mut buf).unwrap();
+        File::open(path).unwrap().read_to_string(&mut buf).unwrap();
 
         buf.parse()
     }
@@ -207,7 +197,7 @@ impl PestFile {
                 r.begin_scope("")?;
                 r.writeln("use pest::Parser;")?;
                 r.writeln(&format!("let test_line = {};", test.line.unwrap()))?;
-                r.writeln(std::format!("let input = r#\"{}\"#;", test.source).as_str())?;
+                r.writeln(&format!("let input = r#\"{}\"#;", test.source))?;
                 r.begin_scope(
                     std::format!(
                         "match {parser_struct_name}::parse({rule_enum_name}::r#{}, input)",
@@ -219,18 +209,15 @@ impl PestFile {
                 match &test.result {
                     PestResult::Ok(s) => {
                         r.writeln("Ok(pairs) =>  assert_eq!(input, pairs.as_str()),")?;
-                        r.writeln(
-                            std::format!(
-                                "Err(e) => panic!(\"{{}} at `{{}}`:{{}} {}\", e, input, test_line),",
-                                s
-                            )
-                            .as_str(),
-                        )?;
+                        r.writeln(&format!(
+                            "Err(e) => panic!(\"{{}} at `{{}}`:{{}} {}\", e, input, test_line),",
+                            s
+                        ))?;
                     }
                     PestResult::Err(s) => {
                         r.begin_scope("Ok(pairs) =>")?;
                         r.begin_scope("if input == pairs.as_str()")?;
-                        r.writeln(format!("panic!(\"Expected parsing error at `{{}}`:{{}}: {}\", input, test_line);", s).as_str())?;
+                        r.writeln(&format!("panic!(\"Expected parsing error at `{{}}`:{{}}: {}\", input, test_line);", s))?;
                         r.end_scope()?;
 
                         r.end_scope()?;
@@ -252,15 +239,17 @@ pub fn generate(
     rule_enum_name: &str,
     grammar_file: impl AsRef<std::path::Path>,
 ) {
-    let out_dir = std::env::var("OUT_DIR").unwrap();
-    let dest_path = std::path::Path::new(&out_dir).join("pest_test.rs");
+    use std::{env::*, fs::*, path::*};
+
+    let out_dir = var("OUT_DIR").unwrap();
+    let dest_path = Path::new(&out_dir).join("pest_test.rs");
 
     PestFile::from_file(&grammar_file)
         .unwrap()
         .generate_test_rs(
             parser_struct_name,
             rule_enum_name,
-            &mut std::fs::File::create(dest_path).unwrap(),
+            &mut File::create(dest_path).unwrap(),
         )
         .unwrap();
     println!("cargo:rerun-if-changed={}", grammar_file.as_ref().display());

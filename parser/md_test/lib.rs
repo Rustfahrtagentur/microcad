@@ -4,32 +4,28 @@ mod tree;
 
 #[test]
 fn test_generate_md_file() {
+    use std::path::*;
+
     let mut tree = Tree::new();
-    generate_tests_for_md_file(&mut tree, std::path::Path::new("../../doc/namespaces.md"));
+    generate_tests_for_md_file(&mut tree, Path::new("../../doc/namespaces.md"));
     eprintln!("{tree}");
 }
 
 pub fn generate(path: impl AsRef<std::path::Path>) -> std::io::Result<()> {
-    use std::io::Write;
+    use std::{env::*, fs::*, io::*, path::*};
 
     // get target path
-    let out_dir = std::env::var("OUT_DIR").unwrap();
-    let dest_path = std::path::Path::new(&out_dir).join("md_test.rs");
+    let out_dir = var("OUT_DIR").unwrap();
+    let dest_path = Path::new(&out_dir).join("md_test.rs");
     // create target file
-    let mut w = std::io::BufWriter::new(
-        std::fs::File::create(dest_path).expect("cannot create file 'md_test.rs'"),
-    );
+    let mut w = BufWriter::new(File::create(dest_path).expect("cannot create file 'md_test.rs'"));
 
     // read all into a tree to reorder modules
     let mut tree = Tree::new();
 
     // recursive directory scanner
-    fn recurse(
-        w: &mut std::io::BufWriter<std::fs::File>,
-        tree: &mut Tree,
-        path: &std::path::Path,
-    ) -> std::io::Result<()> {
-        for entry in std::fs::read_dir(path).unwrap().flatten() {
+    fn recurse(w: &mut BufWriter<File>, tree: &mut Tree, path: &Path) -> Result<()> {
+        for entry in read_dir(path).unwrap().flatten() {
             if let Ok(file_type) = entry.file_type() {
                 if file_type.is_dir() {
                     // begin a rust module
@@ -61,19 +57,20 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> std::io::Result<()> {
 }
 
 fn generate_tests_for_md_file(tree: &mut Tree, path: &std::path::Path) {
-    use std::io::Read;
+    use regex::*;
+    use std::{fs::*, io::*};
 
     // load markdown file
     let mut md_content = String::new();
     {
-        std::fs::File::open(path)
+        File::open(path)
             .expect("file open error")
             .read_to_string(&mut md_content)
             .expect("file read error");
     }
 
     // match markdown code markers for µcad
-    let reg = regex::Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[.\w]+))?\n(?<code>[^`]*)+```"#)
+    let reg = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[.\w]+))?\n(?<code>[^`]*)+```"#)
         .expect("bad regex");
 
     let path = path

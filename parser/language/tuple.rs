@@ -31,23 +31,26 @@ impl Parse for TupleExpression {
 impl std::fmt::Display for TupleExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.0.contains_positional() {
-            write!(f, "(")?;
-            for (i, expr) in self.0.iter().enumerate() {
-                if i > 0 {
-                    write!(f, ", ")?;
-                }
-                write!(f, "{}", expr)?;
-            }
-            write!(f, ")")?;
+            write!(
+                f,
+                "({})",
+                self.0
+                    .iter()
+                    .map(|c| c.to_string())
+                    .collect::<Vec<String>>()
+                    .join(", ")
+            )?;
         } else {
-            write!(f, "(")?;
-            for (i, (ident, expr)) in self.0.get_named().iter().enumerate() {
-                if i > 0 {
-                    write!(f, ", ")?;
-                }
-                write!(f, "{} = {}", ident, expr)?;
-            }
-            write!(f, ")")?;
+            write!(
+                f,
+                "({})",
+                self.0
+                    .get_named()
+                    .iter()
+                    .map(|(ident, expr)| format!("{ident} = {expr}"))
+                    .collect::<Vec<String>>()
+                    .join(", ")
+            )?;
         }
         if let Some(unit) = self.1 {
             write!(f, "{}", unit)?;
@@ -132,7 +135,6 @@ fn test_named_tuple() {
     let input = "(a = 1.0, b = 2.0, c = 3.0)mm";
     let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
     let mut context = Context::default();
-
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(
         value.ty(),
@@ -153,7 +155,6 @@ fn test_vec2() {
     let input = "((x,y) = 1mm)";
     let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
     let mut context = Context::default();
-
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.ty(), Type::Vec2);
 }
@@ -163,7 +164,6 @@ fn test_vec3() {
     let input = "(x = 1, y = 2, z = 3)mm";
     let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
     let mut context = Context::default();
-
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.ty(), Type::Vec3);
 }

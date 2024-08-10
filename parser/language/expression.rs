@@ -132,22 +132,16 @@ pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
     Invalid,
-
     /// An integer, float, color or bool literal: 1, 1.0, #00FF00, false
     Literal(Literal),
-
     /// A string that contains format expressions: "value = {a}"
     FormatString(FormatString),
-
     /// A list: [a, b, c]
     ListExpression(ListExpression),
-
     // A tuple: (a, b, c)
     TupleExpression(TupleExpression),
-
     /// A list whitespace separated of nested items: `translate() rotate()`, `b c`, `a b() {}`
     Nested(Nested),
-
     /// A binary operation: a + b
     BinaryOp {
         lhs: Box<Expression>,
@@ -155,17 +149,14 @@ pub enum Expression {
         op: char,
         rhs: Box<Expression>,
     },
-
     /// A unary operation: !a
     UnaryOp {
         /// '+', '-', '!'
         op: char,
         rhs: Box<Expression>,
     },
-
     /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
     ElementAccess(Box<Expression>, Box<Expression>),
-
     /// Call to a method: `[2,3].len()`
     /// First expression must evaluate to a value
     MethodCall(Box<Expression>, MethodCall),
@@ -364,25 +355,23 @@ impl Parse for Expression {
 #[derive(Clone, Default)]
 pub struct ExpressionList(Vec<Expression>);
 
+impl std::ops::Deref for ExpressionList {
+    type Target = Vec<Expression>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for ExpressionList {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
 impl ExpressionList {
     pub fn new(v: Vec<Expression>) -> Self {
         Self(v)
-    }
-
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
-    pub fn get(&self, index: usize) -> Option<&Expression> {
-        self.0.get(index)
-    }
-
-    pub fn iter(&self) -> std::slice::Iter<Expression> {
-        self.0.iter()
     }
 }
 

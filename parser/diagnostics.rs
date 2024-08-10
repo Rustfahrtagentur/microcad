@@ -11,9 +11,11 @@ pub struct SourceLocation {
 
 impl SourceLocation {
     pub fn from_pair(path: impl AsRef<std::path::Path>, pair: crate::parser::Pair) -> Self {
+        use std::path::*;
+
         let (line, column) = pair.as_span().start_pos().line_col();
         Self {
-            path: std::path::PathBuf::from(path.as_ref()),
+            path: PathBuf::from(path.as_ref()),
             line,
             column,
         }

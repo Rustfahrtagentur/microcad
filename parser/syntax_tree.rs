@@ -25,8 +25,9 @@ impl Document {
     }
 
     pub fn from_path(path: impl AsRef<std::path::Path>) -> Self {
+        use std::path::*;
         Self {
-            path: Some(std::path::PathBuf::from(path.as_ref())),
+            path: Some(PathBuf::from(path.as_ref())),
         }
     }
 }

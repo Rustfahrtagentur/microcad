@@ -178,43 +178,30 @@ pub enum TypeError {
 pub enum Type {
     // A 64-bit integer number
     Integer,
-
     /// A 64-bit floating-point number
     Scalar,
-
     /// A string
     String,
-
     /// An RGBA color
     Color,
-
     /// A physical length, e.g. 4.0mm
     Length,
-
     /// An angle, e.g. 90°
     Angle,
-
     /// A two-dimensional vector, maps from named tuple ((x,y): length)
     Vec2,
-
     /// A three-dimensional vector, maps from named tuple ((x,y,z): length)
     Vec3,
-
     /// A boolean: true, false
     Bool,
-
     /// A list of elements of the same type: [scalar]
     List(ListType),
-
     /// A map of elements: [string => scalar]
     Map(MapType),
-
     /// An unnamed tuple of elements: (scalar, string)
     UnnamedTuple(UnnamedTupleType),
-
     /// A named tuple of elements: (x: scalar, y: string)
     NamedTuple(NamedTupleType),
-
     /// A custom type or a module node in the syntax tree
     Custom(QualifiedName),
 }

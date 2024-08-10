@@ -81,8 +81,9 @@ pub struct SymbolTable {
 
 impl SymbolTable {
     pub fn new() -> Self {
+        use std::collections::*;
         Self {
-            symbols: std::collections::HashMap::new(),
+            symbols: HashMap::new(),
         }
     }
 

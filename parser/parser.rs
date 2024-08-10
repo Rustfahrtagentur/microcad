@@ -118,14 +118,9 @@ impl Parser {
     where
         T: Parse + Clone,
     {
-        use pest::Parser;
-        let pair = crate::parser::Parser::parse(rule, input.trim())
-            .unwrap()
-            .next()
-            .unwrap();
-
-        let w = T::parse(pair).unwrap();
-        w.value().clone()
+        use pest::Parser as _;
+        let pair = Parser::parse(rule, input.trim()).unwrap().next().unwrap();
+        T::parse(pair).unwrap().value().clone()
     }
 
     pub fn ensure_rule(pair: &Pair, expected: Rule) {
