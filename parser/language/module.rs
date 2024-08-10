@@ -106,9 +106,69 @@ impl Parse for ModuleInitDefinition {
 }
 
 #[derive(Clone)]
+pub struct ModuleBody(pub Vec<ModuleStatement>);
+
+impl Parse for ModuleBody {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let body = pair
+            .clone()
+            .into_inner()
+            .filter(|pair| pair.as_rule() == Rule::module_statement)
+            .map(|pair| ModuleStatement::parse(pair).unwrap().value().clone())
+            .collect::<Vec<_>>();
+
+        with_pair_ok!(ModuleBody(body), pair)
+    }
+}
+
+impl std::fmt::Display for ModuleBody {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        writeln!(f, " {{")?;
+        for statement in &self.0 {
+            writeln!(f, "{}", statement)?;
+        }
+        writeln!(f, "}}")?;
+        Ok(())
+    }
+}
+
+#[derive(Clone)]
+pub struct ForStatement {
+    loop_var: Assignment,
+    body: ModuleBody,
+}
+
+impl Parse for ForStatement {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        let p = pair.clone();
+        Parser::ensure_rule(&pair, Rule::module_for_statement);
+
+        let mut pairs = pair.into_inner();
+
+        let loop_var = Assignment::parse(pairs.next().unwrap())?;
+        let body = ModuleBody::parse(pairs.next().unwrap())?;
+
+        with_pair_ok!(
+            ForStatement {
+                loop_var: loop_var.value().clone(),
+                body: body.value().clone(),
+            },
+            p
+        )
+    }
+}
+
+impl std::fmt::Display for ForStatement {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "for {} {}", self.loop_var, self.body)
+    }
+}
+
+#[derive(Clone)]
 pub enum ModuleStatement {
     Use(UseStatement),
     Expression(Expression),
+    For(ForStatement),
     Assignment(Assignment),
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
     FunctionDefinition(std::rc::Rc<FunctionDefinition>),
@@ -129,6 +189,9 @@ impl Parse for ModuleStatement {
                 }
                 Rule::assignment => {
                     ModuleStatement::Assignment(Assignment::parse(first)?.value().clone())
+                }
+                Rule::module_for_statement => {
+                    ModuleStatement::For(ForStatement::parse(first)?.value().clone())
                 }
                 Rule::module_definition => ModuleStatement::ModuleDefinition(std::rc::Rc::new(
                     ModuleDefinition::parse(first)?.value().clone(),
@@ -152,6 +215,7 @@ impl std::fmt::Display for ModuleStatement {
             ModuleStatement::Use(use_statement) => write!(f, "{use_statement}"),
             ModuleStatement::Expression(expression) => write!(f, "{expression}"),
             ModuleStatement::Assignment(assignment) => write!(f, "{assignment}"),
+            ModuleStatement::For(for_statement) => write!(f, "{for_statement}"),
             ModuleStatement::ModuleDefinition(module_definition) => {
                 write!(f, "{}", module_definition.name)
             }

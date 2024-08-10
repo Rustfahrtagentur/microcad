@@ -357,11 +357,15 @@ module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws
 namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ module_body }
 
 //`{ translate() rotate(); }`: ok
+//`{ translate() }`: ok # Single expression block (no semicolon)
+//`{}`: ok # Empty block
 module_body = { "{" ~ ws* ~ module_inner? ~ ws*~ "}" }
 
 module_inner = _{ ws* ~ (module_statement ~ ws*)+ | ws* ~ (module_statement ~ ws*)* ~ expression }
 
-module_statement = { use_statement | expression_statement | assignment_statement |
+module_for_statement = { "for" ~ ws* ~ assignment ~ ws* ~ module_body }
+
+module_statement = { use_statement | module_for_statement | expression_statement | assignment_statement |
   module_init_definition | module_definition | namespace_definition | function_definition }
 
 //`init(d: length) { r = d / 2; }`: ok
