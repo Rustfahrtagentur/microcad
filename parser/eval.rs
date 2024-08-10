@@ -50,6 +50,8 @@ pub enum Symbol {
     Value(Identifier, Value),
     Function(std::rc::Rc<FunctionDefinition>),
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
+    BuiltinFunction(Identifier, BuiltinFunction),
+    // BuiltinModule(Identifier, BuiltinModule),
 }
 
 impl Symbol {
@@ -58,6 +60,7 @@ impl Symbol {
             Self::Value(decl, _) => decl.into(),
             Self::Function(decl) => (&decl.name).into(),
             Self::ModuleDefinition(decl) => (&decl.name).into(),
+            Self::BuiltinFunction(decl, _) => decl.into(),
         }
     }
 
