@@ -4,7 +4,7 @@
 
 A module with arguments has one implicit init:
 
-```µcad
+```µcad,implicit
 module box(size: length) {
     rectangle(size);
 }
@@ -12,7 +12,7 @@ module box(size: length) {
 
 ## Explicit init
 
-```µcad
+```µcad,explicit
 module box {
     init(size: length) {
         rectangle(size);
@@ -20,14 +20,14 @@ module box {
 }
 ```
 
-## Explicit init overloading
+## Init overloading
 
-```µcad
+```µcad,overloading
 module box {
     init(size: length) {
         rectangle(size);
     }
-    init((width, height): length) {
+    init(width: length, height: length) {
         rectangle(width, height);
     }
 }
@@ -35,12 +35,12 @@ module box {
 
 ## Default init
 
-```µcad
-module box {
+```µcad,default
+module box() {
     init(size: length) {
         rectangle(size);
     }
-    init((width, height): length) {
+    init(width: length, height: length) {
         rectangle(width, height);
     }
 }
@@ -50,19 +50,20 @@ module box {
 
 TODO: (Besseres Beispiel)
 
-```µcad
+```µcad,multiple_inits
 module box {
-    y := 0mm; // If this field is missing then, an error "MissingField" is raised 
+    // If this field is missing then, an error "MissingField" is raised 
+    y = 0mm;
 
     init(size: length) {
-        x := 10mm;
-        ...
+        x = 10mm;
+        // ...
     }
 
     init(width: length, height: length) {
-        x := 10mm;
-        y := 10mm;
-        ...
+        x = 10mm;
+        y = 10mm;
+        // ...
     }
 }
 ```

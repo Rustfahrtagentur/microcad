@@ -4,14 +4,14 @@ This way, we can intuitively express a call that is called for each parameter va
 
 The following example will produce 4 rectangles on different positions:
 
-```µcad
+```µcad,example.A
 translate(x = [-4.0mm, 4.0mm], y = [-4.0mm, 4.0mm]) 
   rectangle(2.0mm, 2.0mm);
 ```
 
 The example results in the following calls:
 
-```µcad
+```µcad,example.B
 translate(x = -4.0mm, y = -4.0mm) rectangle(2.0mm, 2.0mm);
 translate(x = -4.0mm, y = 4.0mm) rectangle(2.0mm, 2.0mm);
 translate(x = 4.0mm, y = -4.0mm) rectangle(2.0mm, 2.0mm);
@@ -20,12 +20,12 @@ translate(x = 4.0mm, y = 4.0mm) rectangle(2.0mm, 2.0mm);
 
 Normally, this would require 2 nested for loops:
 
-```ucad
+```µcad,example.C
 for x = [-4.0mm, 4.0mm] {
-  for y = [-4.0mm, 4.0mm] {
- translate(x = x, y = y) 
-   rectangle(2.0mm, 2.0mm);
-  }
+    for y = [-4.0mm, 4.0mm] {
+        translate(x = x, y = y) 
+        rectangle(2.0mm, 2.0mm);
+    }
 }
 ```
 
@@ -35,7 +35,7 @@ for x = [-4.0mm, 4.0mm] {
 
 * `translate(x = [-1,1] * 4mm)`
 
-```µcad
+```µcad,example.D
 module rounded_rect(width: length, height: length, radius: length) {
     hull()
         translate(x = [-width, width]/2, y = [-height, height]/2)

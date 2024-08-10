@@ -4,13 +4,13 @@
 
 Express union with binary operator `|`:
 
-```µCAD
-circle(r = 3.0mm) | rect(3.0mm);
+```µCAD,union.operator
+circle(r = 3.0mm) | rect(size = 3.0mm);
 ```
 
 ## Union module
 
-```µCAD
+```µCAD,union.module
 union() {
     circle(r = 3.0mm);
     rect(size = 3.0mm);
