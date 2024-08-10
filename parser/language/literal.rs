@@ -111,8 +111,8 @@ impl Parse for NumberLiteral {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::number_literal);
 
-        let mut pairs = pair.clone().into_inner();
-        let number_token = pairs.next().unwrap();
+        let mut inner = pair.clone().into_inner();
+        let number_token = inner.next().unwrap();
 
         assert!(
             number_token.as_rule() == Rule::number
@@ -123,7 +123,7 @@ impl Parse for NumberLiteral {
 
         let mut unit = Unit::None;
 
-        if let Some(unit_token) = pairs.next() {
+        if let Some(unit_token) = inner.next() {
             unit = *Unit::parse(unit_token)?;
         }
         Ok(WithPair::new(NumberLiteral(value, unit), pair))

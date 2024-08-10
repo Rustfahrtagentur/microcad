@@ -10,9 +10,9 @@ pub struct Attribute {
 
 impl Parse for Attribute {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut pairs = pair.clone().into_inner();
-        let name = QualifiedName::parse(pairs.next().unwrap())?.value().clone();
-        match pairs.next() {
+        let mut inner = pair.clone().into_inner();
+        let name = QualifiedName::parse(inner.next().unwrap())?.value().clone();
+        match inner.next() {
             Some(pair) => with_pair_ok!(
                 Attribute {
                     name,
@@ -290,11 +290,11 @@ impl std::fmt::Display for UseStatement {
 
 impl Parse for UseAlias {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut pairs = pair.clone().into_inner();
+        let mut inner = pair.clone().into_inner();
         with_pair_ok!(
             UseAlias(
-                QualifiedName::parse(pairs.next().unwrap())?.value().clone(),
-                Identifier::parse(pairs.next().unwrap())?.value().clone(),
+                QualifiedName::parse(inner.next().unwrap())?.value().clone(),
+                Identifier::parse(inner.next().unwrap())?.value().clone(),
             ),
             pair
         )
@@ -303,9 +303,9 @@ impl Parse for UseAlias {
 
 impl Parse for UseStatement {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut pairs = pair.clone().into_inner();
-        let first = pairs.next().unwrap();
-        let second = pairs.next();
+        let mut inner = pair.clone().into_inner();
+        let first = inner.next().unwrap();
+        let second = inner.next();
         let names = Parser::vec(first.clone(), QualifiedName::parse)?
             .value()
             .clone();

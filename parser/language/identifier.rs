@@ -71,23 +71,15 @@ pub enum IdentifierListError {
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct IdentifierList(Vec<Identifier>);
 
+impl std::ops::Deref for IdentifierList {
+    type Target = Vec<Identifier>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 impl IdentifierList {
-    pub fn get(&self, index: usize) -> Option<&Identifier> {
-        self.0.get(index)
-    }
-
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
-    pub fn iter(&self) -> std::slice::Iter<Identifier> {
-        self.0.iter()
-    }
-
     pub fn push(&mut self, ident: Identifier) -> Result<(), IdentifierListError> {
         if self.contains(&ident) {
             Err(IdentifierListError::DuplicateIdentifier(ident))
@@ -96,11 +88,6 @@ impl IdentifierList {
             Ok(())
         }
     }
-
-    pub fn contains(&self, ident: &Identifier) -> bool {
-        self.0.contains(ident)
-    }
-
     pub fn extend(&mut self, other: IdentifierList) -> Result<(), IdentifierListError> {
         for ident in other {
             self.push(ident)?;
@@ -112,7 +99,6 @@ impl IdentifierList {
 impl std::fmt::Display for IdentifierList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = self
-            .0
             .iter()
             .map(|ident| ident.0.clone())
             .collect::<Vec<_>>()
@@ -132,6 +118,7 @@ impl Parse for IdentifierList {
         with_pair_ok!(Self(vec), pair)
     }
 }
+
 impl std::iter::IntoIterator for IdentifierList {
     type Item = Identifier;
     type IntoIter = std::vec::IntoIter<Self::Item>;
@@ -146,13 +133,17 @@ impl std::iter::IntoIterator for IdentifierList {
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct QualifiedName(Vec<Identifier>);
 
-impl QualifiedName {
-    pub fn last(&self) -> &Identifier {
-        self.0.last().unwrap()
-    }
+impl std::ops::Deref for QualifiedName {
+    type Target = Vec<Identifier>;
 
-    pub fn push(&mut self, ident: Identifier) {
-        self.0.push(ident);
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for QualifiedName {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 

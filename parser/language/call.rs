@@ -12,9 +12,9 @@ impl Parse for CallArgument {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         match pair.clone().as_rule() {
             Rule::call_named_argument => {
-                let mut pairs = pair.clone().into_inner();
-                let first = pairs.next().unwrap();
-                let second = pairs.next().unwrap();
+                let mut inner = pair.clone().into_inner();
+                let first = inner.next().unwrap();
+                let second = inner.next().unwrap();
 
                 with_pair_ok!(
                     CallArgument::Named(
@@ -25,9 +25,9 @@ impl Parse for CallArgument {
                 )
             }
             Rule::call_named_tuple_argument => {
-                let mut pairs = pair.clone().into_inner();
-                let first = pairs.next().unwrap();
-                let second = pairs.next().unwrap();
+                let mut inner = pair.clone().into_inner();
+                let first = inner.next().unwrap();
+                let second = inner.next().unwrap();
 
                 with_pair_ok!(
                     CallArgument::NamedTuple(
@@ -208,13 +208,13 @@ pub struct MethodCall {
 
 impl Parse for MethodCall {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut pairs = pair.clone().into_inner();
-        println!("{:?}", pairs);
+        let mut inner = pair.clone().into_inner();
+        println!("{inner:?}");
 
         with_pair_ok!(
             MethodCall {
-                name: Identifier::parse(pairs.next().unwrap())?.value().clone(),
-                argument_list: if let Some(pair) = pairs.next() {
+                name: Identifier::parse(inner.next().unwrap())?.value().clone(),
+                argument_list: if let Some(pair) = inner.next() {
                     CallArgumentList::parse(pair)?.value().clone()
                 } else {
                     CallArgumentList::default()
@@ -242,13 +242,13 @@ pub struct Call {
 impl Parse for Call {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::call);
-        let mut pairs = pair.clone().into_inner();
-        let first = pairs.next().unwrap();
+        let mut inner = pair.clone().into_inner();
+        let first = inner.next().unwrap();
 
         with_pair_ok!(
             Call {
                 name: QualifiedName::parse(first)?.value().clone(),
-                argument_list: match pairs.next() {
+                argument_list: match inner.next() {
                     Some(pair) => CallArgumentList::parse(pair)?.value().clone(),
                     None => CallArgumentList::default(),
                 }

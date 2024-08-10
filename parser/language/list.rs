@@ -20,13 +20,13 @@ impl ListExpression {
 
 impl Parse for ListExpression {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut pairs = pair.clone().into_inner();
+        let mut inner = pair.clone().into_inner();
         with_pair_ok!(
             Self(
-                ExpressionList::parse(pairs.next().unwrap())?
+                ExpressionList::parse(inner.next().unwrap())?
                     .value()
                     .clone(),
-                match pairs.next() {
+                match inner.next() {
                     Some(pair) => Some(*Unit::parse(pair)?),
                     None => None,
                 },

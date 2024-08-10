@@ -229,8 +229,8 @@ impl Parse for FunctionStatement {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::function_statement);
 
-        let mut pairs = pair.clone().into_inner();
-        let first = pairs.next().unwrap();
+        let mut inner = pair.clone().into_inner();
+        let first = inner.next().unwrap();
         let s = match first.as_rule() {
             Rule::assignment => Self::Assignment(Assignment::parse(first)?.value().clone()),
             Rule::use_statement => Self::Use(UseStatement::parse(first)?.value().clone()),
@@ -295,18 +295,6 @@ impl FunctionDefinition {
             builtin: Some(builtin),
         })
     }
-
-    pub fn name(&self) -> &Identifier {
-        &self.name
-    }
-
-    pub fn signature(&self) -> &FunctionSignature {
-        &self.signature
-    }
-
-    pub fn body(&self) -> &Vec<FunctionStatement> {
-        &self.body
-    }
 }
 
 impl FunctionDefinition {
@@ -361,12 +349,12 @@ impl FunctionDefinition {
 impl Parse for FunctionDefinition {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::function_definition);
-        let mut pairs = pair.clone().into_inner();
-        let name = Identifier::parse(pairs.next().unwrap())?.value().clone();
-        let signature = FunctionSignature::parse(pairs.next().unwrap())?
+        let mut inner = pair.clone().into_inner();
+        let name = Identifier::parse(inner.next().unwrap())?.value().clone();
+        let signature = FunctionSignature::parse(inner.next().unwrap())?
             .value()
             .clone();
-        let body = Parser::vec(pairs.next().unwrap(), FunctionStatement::parse)?
+        let body = Parser::vec(inner.next().unwrap(), FunctionStatement::parse)?
             .value()
             .clone();
         with_pair_ok!(
