@@ -1,5 +1,5 @@
 [workspace]
-members = ["parser", "tree"]
+members = ["parser", "tree", "std"]
 
 [workspace.package]
 name = "scad"

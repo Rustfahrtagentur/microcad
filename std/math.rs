@@ -1,5 +1,5 @@
-use super::{function::*, lang_type::*, module::*, value::*};
-use crate::eval::*;
+use ucad_parser::eval::*;
+use ucad_parser::language::{function::*, lang_type::*, module::*, value::*};
 
 #[allow(dead_code)]
 fn build_math_module() -> std::rc::Rc<ModuleDefinition> {
@@ -28,37 +28,10 @@ fn build_math_module() -> std::rc::Rc<ModuleDefinition> {
     std::rc::Rc::new(module)
 }
 
-#[allow(dead_code)]
-fn geo2d_builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    let mut module = ModuleDefinition::namespace("geo2d".into());
-
-    let fn_add_signature = FunctionSignature {
-        parameters: vec![
-            DefinitionParameter::new("x".into(), Some(Type::Scalar), None),
-            DefinitionParameter::new("y".into(), Some(Type::Scalar), None),
-        ],
-        return_type: Type::Scalar,
-    };
-
-    let fn_add = FunctionDefinition::builtin(
-        "add".into(),
-        fn_add_signature,
-        std::rc::Rc::new(|args, _| -> Result<Value, Error> {
-            let x = args.get_positional_arg(0).unwrap().into_scalar()?;
-            let y = args.get_positional_arg(1).unwrap().into_scalar()?;
-            Ok(Value::Scalar(x + y))
-        }),
-    );
-
-    module.add_function(fn_add);
-
-    std::rc::Rc::new(module)
-}
-
 #[test]
 fn test_build_math_module() {
-    use super::expression::*;
-    use crate::parser::*;
+    use ucad_parser::language::expression::*;
+    use ucad_parser::parser::*;
 
     let module = build_math_module();
     assert_eq!(module.name, "math".into());

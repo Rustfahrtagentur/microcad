@@ -1,0 +1,19 @@
+[package]
+name = "ucad-stdlib"
+description = "µCAD Standard Library"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+pest = "2.7"
+pest_derive = "2.7"
+log = "0.4"
+rctree = "0.6.0"
+lazy_static = "1.5"
+thiserror = "1.0"
+
+ucad-parser = { path = "../parser" }
