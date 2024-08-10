@@ -68,7 +68,7 @@ declare_units! {
     Deg = "deg" -> Angle,
     /// Degree
     DegS = "°" -> Angle,
-    /// Gradians
+    /// Gradient
     Grad = "grad" -> Angle * 360./180.,
     /// Turns
     Turn = "turn" -> Angle * 360.,
@@ -79,9 +79,8 @@ declare_units! {
 impl Parse for Unit {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         use std::str::FromStr;
-        let p = pair.clone();
         match Unit::from_str(pair.as_str()) {
-            Ok(unit) => Ok(WithPair::new(unit, p)),
+            Ok(unit) => Ok(WithPair::new(unit, pair)),
             Err(_) => Err(ParseError::UnknownUnit(pair.as_str().to_string())),
         }
     }

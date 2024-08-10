@@ -36,23 +36,25 @@ pub enum NestedItem {
 
 impl Parse for NestedItem {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        match pair.as_rule() {
-            Rule::call => with_pair_ok!(NestedItem::Call(Call::parse(pair)?.value().clone()), p),
+        match pair.clone().as_rule() {
+            Rule::call => with_pair_ok!(
+                NestedItem::Call(Call::parse(pair.clone())?.value().clone()),
+                pair
+            ),
             Rule::qualified_name => {
                 with_pair_ok!(
-                    NestedItem::QualifiedName(QualifiedName::parse(pair)?.value().clone()),
-                    p
+                    NestedItem::QualifiedName(QualifiedName::parse(pair.clone())?.value().clone()),
+                    pair
                 )
             }
             Rule::module_body => {
                 let mut vec = Vec::new();
-                for pair in pair.into_inner() {
+                for pair in pair.clone().into_inner() {
                     if pair.as_rule() == Rule::module_statement {
-                        vec.push(ModuleStatement::parse(pair)?.value().clone());
+                        vec.push(ModuleStatement::parse(pair.clone())?.value().clone());
                     }
                 }
-                with_pair_ok!(NestedItem::ModuleBody(vec), p)
+                with_pair_ok!(NestedItem::ModuleBody(vec), pair)
             }
             rule => unreachable!(
                 "NestedItem::parse expected call or qualified name, found {:?}",
@@ -82,18 +84,14 @@ pub struct Nested(Vec<NestedItem>);
 
 impl Parse for Nested {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         let mut vec = Vec::new();
-        for pair in pair.into_inner() {
-            if pair.as_rule() == Rule::qualified_name
-                || pair.as_rule() == Rule::call
-                || pair.as_rule() == Rule::module_body
-            {
-                vec.push(NestedItem::parse(pair)?.value().clone());
-            }
+        for pair in pair.clone().into_inner().filter(|pair| {
+            [Rule::qualified_name, Rule::call, Rule::module_body].contains(&pair.as_rule())
+        }) {
+            vec.push(NestedItem::parse(pair)?.value().clone());
         }
 
-        with_pair_ok!(Nested(vec), p)
+        with_pair_ok!(Nested(vec), pair)
     }
 }
 
@@ -278,7 +276,6 @@ impl Eval for Expression {
 
 impl Parse for Expression {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         let mut error: Option<ParseError> = None;
         let result = PRATT_PARSER
             .map_primary(|primary| match primary.as_rule() {
@@ -355,11 +352,11 @@ impl Parse for Expression {
                     unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
                 }
             })
-            .parse(pair.into_inner());
+            .parse(pair.clone().into_inner());
 
         match error {
             Some(e) => Err(e),
-            None => with_pair_ok!(result, p),
+            None => with_pair_ok!(result, pair),
         }
     }
 }
@@ -400,14 +397,13 @@ impl IntoIterator for ExpressionList {
 
 impl Parse for ExpressionList {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         let mut vec = Vec::new();
 
-        for pair in pair.into_inner() {
+        for pair in pair.clone().into_inner() {
             vec.push(Expression::parse(pair)?.value().clone());
         }
 
-        with_pair_ok!(Self(vec), p)
+        with_pair_ok!(Self(vec), pair)
     }
 }
 

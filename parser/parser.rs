@@ -105,14 +105,12 @@ impl Parser {
     where
         T: Clone,
     {
-        let p = pair.clone();
         let mut vec = Vec::new();
-        for pair in pair.into_inner() {
-            let value = f(pair)?;
-            vec.push(value.value().clone());
+        for pair in pair.clone().into_inner() {
+            vec.push(f(pair)?.value().clone());
         }
 
-        with_pair_ok!(vec, p)
+        with_pair_ok!(vec, pair)
     }
 
     /// Convenience function to parse a rule for type `T` and panic on error

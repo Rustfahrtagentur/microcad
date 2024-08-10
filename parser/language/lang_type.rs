@@ -19,13 +19,15 @@ impl Ty for ListType {
 
 impl Parse for ListType {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        let mut inner = pair.into_inner();
+        let mut inner = pair.clone().into_inner();
 
         let pair = inner.next().unwrap();
         match pair.as_rule() {
             Rule::r#type => {
-                with_pair_ok!(Self::from_type(Type::parse(pair)?.value().clone()), p)
+                with_pair_ok!(
+                    Self::from_type(Type::parse(pair.clone())?.value().clone()),
+                    pair
+                )
             }
             _ => unreachable!("Expected type, found {:?}", pair.as_rule()),
         }
@@ -80,9 +82,7 @@ impl MapType {
 
 impl Parse for MapType {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        let mut inner = pair.into_inner();
-
+        let mut inner = pair.clone().into_inner();
         let key = inner.next().unwrap();
         let value = inner.next().unwrap();
 
@@ -91,7 +91,7 @@ impl Parse for MapType {
                 (Type::parse(key)?.value().clone()).try_into()?,
                 Type::parse(value)?.value().clone(),
             ),
-            p
+            pair
         )
     }
 }
@@ -107,15 +107,13 @@ pub struct UnnamedTupleType(pub Vec<Type>);
 
 impl Parse for UnnamedTupleType {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        let inner = pair.into_inner();
-
+        let inner = pair.clone().into_inner();
         let mut types = Vec::new();
         for pair in inner {
             types.push(Type::parse(pair)?.value().clone());
         }
 
-        with_pair_ok!(Self(types), p)
+        with_pair_ok!(Self(types), pair)
     }
 }
 
@@ -137,11 +135,10 @@ pub struct NamedTupleType(pub std::collections::BTreeMap<Identifier, Type>);
 
 impl Parse for NamedTupleType {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        Parser::ensure_rule(&p, Rule::named_tuple_type);
+        Parser::ensure_rule(&pair, Rule::named_tuple_type);
 
         let mut types = std::collections::BTreeMap::new();
-        for pair in pair.into_inner() {
+        for pair in pair.clone().into_inner() {
             let mut inner = pair.into_inner();
             let name = Identifier::parse(inner.next().unwrap())?.value().clone();
             let ty = Type::parse(inner.next().unwrap())?.value().clone();
@@ -151,7 +148,7 @@ impl Parse for NamedTupleType {
             types.insert(name, ty);
         }
 
-        with_pair_ok!(Self(types), p)
+        with_pair_ok!(Self(types), pair)
     }
 }
 
@@ -235,9 +232,8 @@ impl Type {
 
 impl Parse for Type {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        Parser::ensure_rule(&p, Rule::r#type);
-        let inner = pair.into_inner().next().unwrap();
+        Parser::ensure_rule(&pair, Rule::r#type);
+        let inner = pair.clone().into_inner().next().unwrap();
 
         let s = match inner.as_rule() {
             Rule::list_type => Self::List(ListType::parse(inner)?.value().clone()),
@@ -263,7 +259,7 @@ impl Parse for Type {
             _ => unreachable!("Expected type, found {:?}", inner.as_rule()),
         };
 
-        with_pair_ok!(s, p)
+        with_pair_ok!(s, pair)
     }
 }
 

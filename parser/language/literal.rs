@@ -109,10 +109,9 @@ impl std::ops::Div for NumberLiteral {
 
 impl Parse for NumberLiteral {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         Parser::ensure_rule(&pair, Rule::number_literal);
 
-        let mut pairs = pair.into_inner();
+        let mut pairs = pair.clone().into_inner();
         let number_token = pairs.next().unwrap();
 
         assert!(
@@ -127,7 +126,7 @@ impl Parse for NumberLiteral {
         if let Some(unit_token) = pairs.next() {
             unit = *Unit::parse(unit_token)?;
         }
-        Ok(WithPair::new(NumberLiteral(value, unit), p))
+        Ok(WithPair::new(NumberLiteral(value, unit), pair))
     }
 }
 
@@ -179,11 +178,10 @@ impl Ty for Literal {
 
 impl Parse for Literal {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        Parser::ensure_rule(&p, Rule::literal);
+        Parser::ensure_rule(&pair, Rule::literal);
         use crate::with_pair_ok;
 
-        let inner = pair.into_inner().next().unwrap();
+        let inner = pair.clone().into_inner().next().unwrap();
 
         let s = match inner.as_rule() {
             Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?.value().clone()),
@@ -198,7 +196,7 @@ impl Parse for Literal {
             _ => unreachable!(),
         };
 
-        with_pair_ok!(s, p)
+        with_pair_ok!(s, pair)
     }
 }
 

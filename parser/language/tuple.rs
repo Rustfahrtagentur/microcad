@@ -6,8 +6,7 @@ pub struct TupleExpression(CallArgumentList, Option<Unit>);
 
 impl Parse for TupleExpression {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        let mut pairs = pair.into_inner();
+        let mut pairs = pair.clone().into_inner();
         let call_argument_list = CallArgumentList::parse(pairs.next().unwrap())?;
         if call_argument_list.is_empty() {
             return Err(ParseError::EmptyTupleExpression);
@@ -24,7 +23,7 @@ impl Parse for TupleExpression {
                     None => None,
                 },
             ),
-            p
+            pair
         )
     }
 }

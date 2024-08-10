@@ -48,12 +48,11 @@ impl std::fmt::Display for DefinitionParameter {
 
 impl Parse for DefinitionParameter {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         let mut name = Identifier::default();
         let mut specified_type = None;
         let mut value = None;
 
-        for pair in pair.into_inner() {
+        for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::identifier => {
                     name = Identifier::parse(pair)?.value().clone();
@@ -86,7 +85,7 @@ impl Parse for DefinitionParameter {
                 specified_type,
                 value,
             },
-            p
+            pair
         )
     }
 }
@@ -113,11 +112,10 @@ impl FunctionSignature {
 
 impl Parse for FunctionSignature {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         let mut parameters = Vec::new();
         let mut return_type = None;
 
-        for pair in pair.into_inner() {
+        for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::definition_parameter_list => {
                     parameters = Parser::vec(pair, DefinitionParameter::parse)?
@@ -134,7 +132,7 @@ impl Parse for FunctionSignature {
                 parameters,
                 return_type: return_type.unwrap(),
             },
-            p
+            pair
         )
     }
 }
@@ -163,12 +161,11 @@ impl Assignment {
 
 impl Parse for Assignment {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         let mut name = Identifier::default();
         let mut specified_type = None;
         let mut value = Expression::default();
 
-        for pair in pair.into_inner() {
+        for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::identifier => {
                     name = Identifier::parse(pair)?.value().clone();
@@ -191,7 +188,7 @@ impl Parse for Assignment {
                 specified_type,
                 value,
             },
-            p
+            pair
         )
     }
 }
@@ -231,9 +228,8 @@ pub enum FunctionStatement {
 impl Parse for FunctionStatement {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::function_statement);
-        let p = pair.clone();
 
-        let mut pairs = pair.into_inner();
+        let mut pairs = pair.clone().into_inner();
         let first = pairs.next().unwrap();
         let s = match first.as_rule() {
             Rule::assignment => Self::Assignment(Assignment::parse(first)?.value().clone()),
@@ -271,7 +267,7 @@ impl Parse for FunctionStatement {
             rule => unreachable!("Unexpected token in function statement: {:?}", rule),
         };
 
-        with_pair_ok!(s, p)
+        with_pair_ok!(s, pair)
     }
 }
 
@@ -364,9 +360,8 @@ impl FunctionDefinition {
 
 impl Parse for FunctionDefinition {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         Parser::ensure_rule(&pair, Rule::function_definition);
-        let mut pairs = pair.into_inner();
+        let mut pairs = pair.clone().into_inner();
         let name = Identifier::parse(pairs.next().unwrap())?.value().clone();
         let signature = FunctionSignature::parse(pairs.next().unwrap())?
             .value()
@@ -381,7 +376,7 @@ impl Parse for FunctionDefinition {
                 body,
                 builtin: None,
             },
-            p
+            pair
         )
     }
 }

@@ -172,11 +172,10 @@ impl Eval for CallArgumentList {
 impl Parse for CallArgumentList {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let mut call_argument_list = CallArgumentList::default();
-        let p = pair.clone();
 
-        match pair.as_rule() {
+        match pair.clone().as_rule() {
             Rule::call_argument_list => {
-                for pair in pair.into_inner() {
+                for pair in pair.clone().into_inner() {
                     match CallArgument::parse(pair)?.value().clone() {
                         CallArgument::Named(ident, expr) => {
                             call_argument_list.insert_named(ident, *expr)?;
@@ -192,7 +191,7 @@ impl Parse for CallArgumentList {
                     }
                 }
 
-                with_pair_ok!(call_argument_list, p)
+                with_pair_ok!(call_argument_list, pair)
             }
             rule => {
                 unreachable!("CallArgumentList::parse expected call argument list, found {rule:?}")
@@ -209,8 +208,7 @@ pub struct MethodCall {
 
 impl Parse for MethodCall {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        let mut pairs = pair.into_inner();
+        let mut pairs = pair.clone().into_inner();
         println!("{:?}", pairs);
 
         with_pair_ok!(
@@ -222,7 +220,7 @@ impl Parse for MethodCall {
                     CallArgumentList::default()
                 },
             },
-            p
+            pair
         )
     }
 }
@@ -243,10 +241,8 @@ pub struct Call {
 
 impl Parse for Call {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         Parser::ensure_rule(&pair, Rule::call);
-        let mut pairs = pair.into_inner();
-
+        let mut pairs = pair.clone().into_inner();
         let first = pairs.next().unwrap();
 
         with_pair_ok!(
@@ -257,7 +253,7 @@ impl Parse for Call {
                     None => CallArgumentList::default(),
                 }
             },
-            p
+            pair
         )
     }
 }

@@ -20,8 +20,7 @@ impl ListExpression {
 
 impl Parse for ListExpression {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        let mut pairs = pair.into_inner();
+        let mut pairs = pair.clone().into_inner();
         with_pair_ok!(
             Self(
                 ExpressionList::parse(pairs.next().unwrap())?
@@ -32,7 +31,7 @@ impl Parse for ListExpression {
                     None => None,
                 },
             ),
-            p
+            pair
         )
     }
 }

@@ -123,14 +123,13 @@ impl std::fmt::Display for IdentifierList {
 
 impl Parse for IdentifierList {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         let mut vec = Vec::new();
-        for pair in pair.into_inner() {
+        for pair in pair.clone().into_inner() {
             if pair.as_rule() == Rule::identifier {
                 vec.push(Identifier::parse(pair)?.value().clone());
             }
         }
-        with_pair_ok!(Self(vec), p)
+        with_pair_ok!(Self(vec), pair)
     }
 }
 impl std::iter::IntoIterator for IdentifierList {
@@ -159,15 +158,15 @@ impl QualifiedName {
 
 impl Parse for QualifiedName {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         with_pair_ok!(
             Self(
-                pair.into_inner()
+                pair.clone()
+                    .into_inner()
                     .map(|pair| Identifier::parse(pair))
                     .map(|ident| ident.unwrap().value().clone())
                     .collect(),
             ),
-            p
+            pair
         )
     }
 }

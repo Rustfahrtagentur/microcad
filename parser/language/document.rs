@@ -9,9 +9,8 @@ pub struct Document {
 impl Parse for Document {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let mut body = Vec::new();
-        let p = pair.clone();
 
-        for pair in pair.into_inner() {
+        for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::module_statement => {
                     body.push(ModuleStatement::parse(pair)?.value().clone());
@@ -21,7 +20,7 @@ impl Parse for Document {
             }
         }
 
-        with_pair_ok!(Document { body }, p)
+        with_pair_ok!(Document { body }, pair)
     }
 }
 

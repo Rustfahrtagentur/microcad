@@ -9,10 +9,9 @@ struct FormatSpec {
 
 impl Parse for FormatSpec {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         let mut opt = FormatSpec::default();
 
-        for pair in pair.into_inner() {
+        for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::format_spec_precision => {
                     opt.precision = Some(pair.as_span().as_str()[1..].parse().unwrap())
@@ -24,7 +23,7 @@ impl Parse for FormatSpec {
             }
         }
 
-        with_pair_ok!(opt, p)
+        with_pair_ok!(opt, pair)
     }
 }
 
@@ -33,17 +32,16 @@ pub struct FormatExpression(FormatSpec, Box<Expression>);
 
 impl Parse for FormatExpression {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
         let mut fo = FormatSpec::default();
         let mut expr = Expression::default();
-        for pair in pair.into_inner() {
+        for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::format_spec => fo = FormatSpec::parse(pair)?.value().clone(),
                 Rule::expression => expr = Expression::parse(pair)?.value().clone(),
                 _ => unreachable!(),
             }
         }
-        with_pair_ok!(Self(fo, Box::new(expr)), p)
+        with_pair_ok!(Self(fo, Box::new(expr)), pair)
     }
 }
 
@@ -118,10 +116,8 @@ impl Eval for FormatString {
 
 impl Parse for FormatString {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
-        let pairs = pair.into_inner();
         let mut fs = Self::default();
-        for pair in pairs {
+        for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::string_literal_inner => fs.push_string(pair.as_span().as_str().to_string()),
                 Rule::format_expression => {
@@ -131,7 +127,7 @@ impl Parse for FormatString {
             }
         }
 
-        with_pair_ok!(fs, p)
+        with_pair_ok!(fs, pair)
     }
 }
 
