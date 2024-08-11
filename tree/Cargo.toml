@@ -12,5 +12,4 @@ path = "lib.rs"
 log = "0.4"
 rctree = "0.6"
 geo = "0.28"
-
-ucad-parser = { path = "../parser" }
+microcad-parser = { path = "../parser" }

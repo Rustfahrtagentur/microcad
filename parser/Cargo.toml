@@ -1,5 +1,5 @@
 [package]
-name = "ucad-parser"
+name = "microcad-parser"
 description = "A parser for the µCAD language"
 edition.workspace = true
 rust-version.workspace = true

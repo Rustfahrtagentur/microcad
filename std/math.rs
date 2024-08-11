@@ -1,5 +1,5 @@
-use ucad_parser::eval::*;
-use ucad_parser::language::{function::*, lang_type::*, module::*, value::*};
+use microcad_parser::eval::*;
+use microcad_parser::language::{function::*, lang_type::*, module::*, value::*};
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     let mut module = ModuleDefinition::namespace("math".into());
@@ -29,8 +29,8 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
 
 #[test]
 fn test_build_math_module() {
-    use ucad_parser::language::expression::*;
-    use ucad_parser::parser::*;
+    use microcad_parser::language::expression::*;
+    use microcad_parser::parser::*;
 
     let module = builtin_module();
     assert_eq!(module.name, "math".into());
