@@ -87,6 +87,7 @@ impl<T> PositionalNamedList<T> {
         }
     }
 
+    // Checks if the argument list contains a single argument only and returns it
     pub fn arg_1(&self, ident: &str) -> Result<&T, Error> {
         if self.len() != 1 {
             return Err(Error::ArgumentCountMismatch {
