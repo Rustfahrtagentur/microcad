@@ -53,7 +53,12 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
         recurse(&mut w, &mut tree, path.as_ref())?;
 
         // generate output rust code
-        writeln!(w, "{}", rustfmt_wrapper::rustfmt(format!("{tree}"))?)?;
+        let code = format!("{tree}");
+        writeln!(
+            w,
+            "{}",
+            rustfmt_wrapper::rustfmt(code.clone()).context(code)?
+        )?;
     }
 
     Ok(())
@@ -70,7 +75,7 @@ fn generate_tests_for_md_file(tree: &mut Tree, path: &std::path::Path) -> Result
     }
 
     // match markdown code markers for µCAD
-    let reg = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[.\w]+))?\n(?<code>[^`]*)+```"#)
+    let reg = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#\w]+))?\n(?<code>[^`]*)+```"#)
         .expect("bad regex");
 
     let path = path

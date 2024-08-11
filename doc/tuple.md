@@ -17,7 +17,7 @@ module box(x,y,z = 0mm) {}
 
 ## Field declaration for a module
 
-```µCAD,fields.A
+```µCAD,fields.A#fail
 (width, height) = (1,2)mm;
 ```
 
@@ -26,7 +26,7 @@ width = 1.2mm;
 height = 2mm;
 ```
 
-```µCAD,fields.C
+```µCAD,fields.C#fail
 (width, height) = (0mm,0mm);
 ```
 
@@ -35,6 +35,6 @@ width = (0.0, 0.0)mm;
 height = (0.0, 0.0)mm;
 ```
 
-```µCAD,fields.E
+```µCAD,fields.E#fail
 width, height = 0mm;
 ```

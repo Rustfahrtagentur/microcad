@@ -54,25 +54,41 @@ impl Tree {
 impl std::fmt::Display for Tree {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Tree::Test(name, code) => writeln!(
-                f,
-                "{}",
-                &format!(
-                    r##"#[test]
-#[allow(non_snake_case)]
-fn r#{name}() {{
-    use crate::{{language::document::Document,parser}};
-    match parser::Parser::parse_rule::<Document>(
-        parser::Rule::document,
-        r#"
-{code}"#
-    ) {{
-        Ok(_) => (),
-        Err(err) => panic!("ERROR: {{err}}")
-    }};
-}}"##
-                )
-            )?,
+            Tree::Test(name, code) => {
+                let (name, suffix) = if let Some((name, suffix)) = name.split_once('#') {
+                    (name, Some(suffix))
+                } else {
+                    (name.as_str(), None)
+                };
+                writeln!(
+                    f,
+                    "{}",
+                    &format!(
+                        r##"#[test]
+                            #[allow(non_snake_case)]
+                            fn r#{name}() {{
+                                use crate::{{language::document::Document,parser}};
+                                match parser::Parser::parse_rule::<Document>(
+                                    parser::Rule::document,
+                                    r#"
+                                    {code}"#
+                                ) {handling};
+                            }}"##,
+                        handling = match suffix {
+                            Some("fail") =>
+                                r##"{
+                                        Err(_) => (),
+                                        Ok(_) => panic!("ERROR: test is marked to fail but succeeded"),
+                                    }"##,
+                            _ =>
+                                r##"{
+                                        Ok(_) => (),
+                                        Err(err) => panic!("ERROR: {{err}}"),
+                                    }"##,
+                        }
+                    )
+                )?;
+            }
             Tree::Root(children) => {
                 for child in children {
                     writeln!(f, "{}", child.1.as_ref().borrow())?;
