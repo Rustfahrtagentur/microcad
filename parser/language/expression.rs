@@ -15,6 +15,7 @@ lazy_static::lazy_static! {
             .op(Op::infix(add, Left) | Op::infix(subtract, Left))
             .op(Op::infix(multiply, Left) | Op::infix(divide, Left))
             .op(Op::infix(union, Left) | Op::infix(intersection, Left))
+            .op(Op::infix(power_xor, Left))
             .op(Op::infix(greater_than, Left) | Op::infix(less_than, Left))
             .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
             .op(Op::infix(equal, Left) | Op::infix(not_equal, Left))
@@ -219,6 +220,7 @@ impl Eval for Expression {
                     '-' => lhs - rhs,
                     '*' => lhs * rhs,
                     '/' => lhs / rhs,
+                    '^' => unimplemented!(), // lhs.pow(&rhs),
                     '>' => lhs.greater_than(&rhs).map(Value::Bool),
                     '<' => lhs.less_than(&rhs).map(Value::Bool),
                     '≤' => lhs.less_than_or_equal(&rhs).map(Value::Bool),
