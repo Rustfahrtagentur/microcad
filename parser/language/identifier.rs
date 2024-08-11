@@ -20,6 +20,14 @@ impl Identifier {
     }
 }
 
+impl std::ops::Deref for Identifier {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 impl std::str::FromStr for Identifier {
     type Err = ParseError;
 
@@ -56,6 +64,12 @@ impl Parse for Identifier {
 impl std::fmt::Display for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+impl PartialEq<str> for Identifier {
+    fn eq(&self, other: &str) -> bool {
+        self.0 == other
     }
 }
 
@@ -182,21 +196,23 @@ impl Eval for QualifiedName {
 
         for (i, ident) in self.0.iter().enumerate() {
             if i == 0 {
-                match context.get_symbol(ident.into()) {
+                match context.get_symbols(ident).first() {
                     Some(s) => {
-                        symbol = Some(s.clone());
+                        symbol = Some(*s);
                     }
                     _ => return Err(crate::eval::Error::SymbolNotFound(ident.clone())),
                 }
             } else {
                 symbol = match symbol {
-                    Some(crate::eval::Symbol::ModuleDefinition(module)) => module.get_symbol(ident),
+                    Some(crate::eval::Symbol::ModuleDefinition(module)) => {
+                        Some(*module.get_symbols(ident).first().unwrap())
+                    }
                     _ => return Err(crate::eval::Error::SymbolNotFound(ident.clone())),
                 }
             }
         }
 
-        Ok(symbol.unwrap())
+        Ok(symbol.unwrap().clone())
     }
 }
 

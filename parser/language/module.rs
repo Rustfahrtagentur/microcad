@@ -106,25 +106,71 @@ impl Parse for ModuleInitDefinition {
 }
 
 #[derive(Clone)]
-pub struct ModuleBody(pub Vec<ModuleStatement>);
+pub struct ModuleBody {
+    pub statements: Vec<ModuleStatement>,
+    pub symbols: SymbolTable,
+}
+
+impl ModuleBody {
+    fn new() -> Self {
+        ModuleBody {
+            statements: Vec::new(),
+            symbols: SymbolTable::new(),
+        }
+    }
+
+    pub fn add_statement(&mut self, statement: ModuleStatement) {
+        self.statements.push(statement.clone());
+        match statement {
+            ModuleStatement::FunctionDefinition(function) => {
+                self.symbols.add(Symbol::Function(function));
+            }
+            ModuleStatement::ModuleDefinition(module) => {
+                self.symbols.add(Symbol::ModuleDefinition(module));
+            }
+            _ => {}
+        }
+    }
+
+    pub fn get_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+        self.symbols.get(name)
+    }
+
+    pub fn get_symbol(&self, name: &Identifier) -> Option<&Symbol> {
+        self.symbols.get(name).first().cloned()
+    }
+
+    pub fn add_symbol(&mut self, symbol: Symbol) {
+        self.symbols.add(symbol);
+    }
+}
 
 impl Parse for ModuleBody {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let body = pair
-            .clone()
-            .into_inner()
-            .filter(|pair| pair.as_rule() == Rule::module_statement)
-            .map(|pair| ModuleStatement::parse(pair).unwrap().value().clone())
-            .collect::<Vec<_>>();
+        let mut body = ModuleBody::new();
 
-        with_pair_ok!(ModuleBody(body), pair)
+        for pair in pair.clone().into_inner() {
+            match pair.as_rule() {
+                Rule::module_statement => {
+                    let statement = ModuleStatement::parse(pair.clone())?.value().clone();
+                    body.add_statement(statement);
+                }
+                Rule::expression => {
+                    let expression = Expression::parse(pair.clone())?.value().clone();
+                    body.add_statement(ModuleStatement::Expression(expression));
+                }
+                _ => {}
+            }
+        }
+
+        with_pair_ok!(body, pair)
     }
 }
 
 impl std::fmt::Display for ModuleBody {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, " {{")?;
-        for statement in &self.0 {
+        for statement in &self.statements {
             writeln!(f, "{}", statement)?;
         }
         writeln!(f, "}}")?;
@@ -233,7 +279,7 @@ pub struct ModuleDefinition {
     pub attributes: Vec<Attribute>,
     pub name: Identifier,
     pub parameters: Option<Vec<DefinitionParameter>>,
-    pub body: Vec<ModuleStatement>,
+    pub body: ModuleBody,
 }
 
 impl ModuleDefinition {
@@ -242,36 +288,25 @@ impl ModuleDefinition {
             attributes: Vec::new(),
             name,
             parameters: None,
-            body: Vec::new(),
+            body: ModuleBody::new(),
         }
     }
 
     pub fn add_function(&mut self, function: std::rc::Rc<FunctionDefinition>) {
-        self.body
-            .push(ModuleStatement::FunctionDefinition(function));
+        self.body.add_symbol(Symbol::Function(function.clone()));
     }
 
     pub fn add_module(&mut self, module: std::rc::Rc<ModuleDefinition>) {
-        self.body.push(ModuleStatement::ModuleDefinition(module));
+        self.body
+            .add_symbol(Symbol::ModuleDefinition(module.clone()));
     }
 
-    pub fn get_symbol(&self, name: &Identifier) -> Option<Symbol> {
-        for statement in &self.body {
-            match statement {
-                ModuleStatement::FunctionDefinition(function) => {
-                    if &function.name == name {
-                        return Some(crate::eval::Symbol::Function(function.clone()));
-                    }
-                }
-                ModuleStatement::ModuleDefinition(module) => {
-                    if &module.name == name {
-                        return Some(crate::eval::Symbol::ModuleDefinition(module.clone()));
-                    }
-                }
-                _ => {}
-            }
-        }
-        None
+    pub fn add_symbol(&mut self, symbol: Symbol) {
+        self.body.add_symbol(symbol);
+    }
+
+    pub fn get_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+        self.body.get_symbols(name)
     }
 }
 
@@ -280,7 +315,7 @@ impl Parse for ModuleDefinition {
         let mut attributes = Vec::new();
         let mut name = Identifier::default();
         let mut parameters = None;
-        let mut body = Vec::new();
+        let mut body = ModuleBody::new();
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
@@ -298,12 +333,7 @@ impl Parse for ModuleDefinition {
                     );
                 }
                 Rule::module_body => {
-                    for pair in pair
-                        .into_inner()
-                        .filter(|pair| pair.as_rule() == Rule::module_statement)
-                    {
-                        body.push(ModuleStatement::parse(pair)?.value().clone());
-                    }
+                    body = ModuleBody::parse(pair.clone())?.value().clone();
                 }
                 rule => unreachable!("Unexpected module definition, got {:?}", rule),
             }

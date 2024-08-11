@@ -1,28 +1,16 @@
 use microcad_parser::eval::*;
-use microcad_parser::language::{function::*, lang_type::*, module::*, value::*};
+use microcad_parser::language::{function::*, module::*, value::*};
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     let mut module = ModuleDefinition::namespace("math".into());
 
-    let fn_abs_signature = FunctionSignature {
-        parameters: vec![DefinitionParameter::new(
-            "x".into(),
-            Some(Type::Scalar),
-            None,
-        )],
-        return_type: Some(Type::Scalar),
-    };
-
-    let fn_abs = FunctionDefinition::builtin(
-        "abs".into(),
-        fn_abs_signature,
-        std::rc::Rc::new(|args, _| -> Result<Value, Error> {
+    module.add_symbol(Symbol::BuiltinFunction(BuiltinFunction {
+        name: "abs".into(),
+        f: std::rc::Rc::new(|args, _| -> Result<Value, Error> {
             let x = args[0].into_scalar()?;
             Ok(Value::Scalar(x.abs()))
         }),
-    );
-
-    module.add_function(fn_abs);
+    }));
 
     std::rc::Rc::new(module)
 }
@@ -33,7 +21,7 @@ fn test_build_math_module() {
     use microcad_parser::parser::*;
 
     let module = builtin_module();
-    assert_eq!(module.name, "math".into());
+    assert_eq!(&module.name, "math");
 
     let mut context = Context::default();
 

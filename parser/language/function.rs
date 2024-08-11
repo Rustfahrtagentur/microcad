@@ -268,8 +268,28 @@ impl Parse for FunctionStatement {
     }
 }
 
-pub type BuiltinFunction =
+pub type BuiltinFunctionFunctor =
     std::rc::Rc<dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Value, Error>>;
+
+#[derive(Clone)]
+pub struct BuiltinFunction {
+    pub name: Identifier,
+    pub f: BuiltinFunctionFunctor,
+}
+
+impl BuiltinFunction {
+    pub fn new(name: Identifier, f: BuiltinFunctionFunctor) -> Self {
+        Self { name, f }
+    }
+
+    pub fn call(
+        &self,
+        args: EvaluatedCallArgumentList,
+        context: &mut Context,
+    ) -> Result<Value, Error> {
+        (self.f)(args, context)
+    }
+}
 
 #[derive(Clone, Default)]
 pub struct FunctionBody(pub Vec<FunctionStatement>);
@@ -304,22 +324,6 @@ pub struct FunctionDefinition {
     pub name: Identifier,
     pub signature: FunctionSignature,
     pub body: FunctionBody,
-    pub builtin: Option<BuiltinFunction>,
-}
-
-impl FunctionDefinition {
-    pub fn builtin(
-        name: Identifier,
-        signature: FunctionSignature,
-        builtin: BuiltinFunction,
-    ) -> std::rc::Rc<Self> {
-        std::rc::Rc::new(Self {
-            name,
-            signature,
-            body: FunctionBody::default(),
-            builtin: Some(builtin),
-        })
-    }
 }
 
 impl FunctionDefinition {
@@ -328,7 +332,6 @@ impl FunctionDefinition {
             name,
             signature,
             body,
-            builtin: None,
         }
     }
 
@@ -337,10 +340,7 @@ impl FunctionDefinition {
         args: EvaluatedCallArgumentList,
         context: &mut Context,
     ) -> Result<Value, Error> {
-        if let Some(builtin) = &self.builtin {
-            return builtin(args, context);
-        }
-
+        // TODO: Check if the arguments are correct
         let params = self.signature.parameters();
 
         for param in params {
@@ -382,7 +382,6 @@ impl Parse for FunctionDefinition {
                 name,
                 signature,
                 body,
-                builtin: None,
             },
             pair
         )
@@ -404,7 +403,7 @@ fn assignment() {
 
     let mut context = Context::default();
 
-    assert_eq!(assignment.name(), &"a".into());
+    assert_eq!(assignment.name(), "a");
     assert_eq!(
         assignment.value().eval(&mut context).unwrap().to_string(),
         "1"
@@ -413,7 +412,10 @@ fn assignment() {
 
     assignment.eval(&mut context).unwrap();
 
-    assert_eq!(context.get_symbol("a").unwrap().name(), "a");
+    assert_eq!(
+        context.get_symbols(&"a".into()).first().unwrap().name(),
+        "a"
+    );
 }
 
 #[test]

@@ -270,6 +270,10 @@ impl Eval for Call {
                 let args = self.argument_list.eval(context)?;
                 f.call(args, context)
             }
+            Symbol::BuiltinFunction(f) => {
+                let args = self.argument_list.eval(context)?;
+                f.call(args, context)
+            }
             _ => unimplemented!("Call::eval for symbol"),
         }
     }

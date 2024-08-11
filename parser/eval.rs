@@ -50,24 +50,24 @@ pub enum Symbol {
     Value(Identifier, Value),
     Function(std::rc::Rc<FunctionDefinition>),
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
-    BuiltinFunction(Identifier, BuiltinFunction),
+    BuiltinFunction(BuiltinFunction),
     // BuiltinModule(Identifier, BuiltinModule),
 }
 
 impl Symbol {
-    pub fn name(&self) -> &str {
+    pub fn name(&self) -> &Identifier {
         match self {
-            Self::Value(decl, _) => decl.into(),
-            Self::Function(decl) => (&decl.name).into(),
-            Self::ModuleDefinition(decl) => (&decl.name).into(),
-            Self::BuiltinFunction(decl, _) => decl.into(),
+            Self::Value(v, _) => v,
+            Self::Function(f) => &f.name,
+            Self::ModuleDefinition(m) => &m.name,
+            Self::BuiltinFunction(f) => &f.name,
         }
     }
 
-    pub fn get_symbol(&self, name: &Identifier) -> Option<Symbol> {
+    pub fn get_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
         match self {
-            Self::ModuleDefinition(module) => module.get_symbol(name),
-            _ => None,
+            Self::ModuleDefinition(module) => module.get_symbols(name),
+            _ => Vec::new(),
         }
     }
 }
@@ -76,23 +76,28 @@ impl Symbol {
 /// @details A symbol table is a mapping of symbol
 #[derive(Default, Clone)]
 pub struct SymbolTable {
-    symbols: std::collections::HashMap<String, Symbol>,
+    symbols: Vec<Symbol>,
 }
 
 impl SymbolTable {
     pub fn new() -> Self {
-        use std::collections::*;
         Self {
-            symbols: HashMap::new(),
+            symbols: Vec::new(),
         }
     }
 
     pub fn add(&mut self, symbol: Symbol) {
-        self.symbols.insert(symbol.name().to_string(), symbol);
+        self.symbols.push(symbol);
     }
 
-    pub fn get(&self, name: &str) -> Option<&Symbol> {
-        self.symbols.get(name)
+    pub fn get(&self, name: &Identifier) -> Vec<&Symbol> {
+        let mut symbols = Vec::new();
+        for symbol in self.symbols.iter() {
+            if symbol.name() == name {
+                symbols.push(symbol);
+            }
+        }
+        symbols
     }
 }
 
@@ -117,13 +122,12 @@ impl Context {
         self.stack.last_mut().unwrap().add(symbol);
     }
 
-    pub fn get_symbol(&self, name: &str) -> Option<&Symbol> {
+    pub fn get_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+        let mut symbols = Vec::new();
         for table in self.stack.iter().rev() {
-            if let Some(symbol) = table.get(name) {
-                return Some(symbol);
-            }
+            symbols.extend(table.get(name));
         }
-        None
+        symbols
     }
 }
 
@@ -151,8 +155,8 @@ fn context_basic() {
     context.add_symbol(Symbol::Value("a".into(), Value::Integer(1)));
     context.add_symbol(Symbol::Value("b".into(), Value::Integer(2)));
 
-    assert_eq!(context.get_symbol("a").unwrap().name(), "a");
-    assert_eq!(context.get_symbol("b").unwrap().name(), "b");
+    assert_eq!(context.get_symbols(&"a".into())[0].name(), "a");
+    assert_eq!(context.get_symbols(&"b".into())[0].name(), "b");
 
     let _c = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "c = a + b");
 

@@ -112,7 +112,7 @@ impl Eval for Nested {
                         }
                     }
                     NestedItem::ModuleBody(body) => {
-                        for stmt in body {
+                        for _stmt in body {
                             // stmt.eval(context)?;
                             todo!()
                         }
