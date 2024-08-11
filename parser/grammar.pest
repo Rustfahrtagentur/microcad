@@ -1,3 +1,18 @@
+// Grammar for the µCAD language
+//
+// Comments starting with //` generate tests for the grammar
+// The strings inside the backticks (``) are the test input.
+//
+// Example, the following comment generates two tests for the rule "list_type":
+//
+// ```pest
+//     //`[scalar]`: ok # list with elements of type `scalar`
+//     //`[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
+//     list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
+// ```
+//
+// See the crate microcad-pest-test for more info.
+
 ws = _{ " " | "\n" | "\t" | "\r" } // Whitespace
 
 alpha_lower = _{ 'a'..'z' }
@@ -15,6 +30,7 @@ COMMENT = {
 //`/ err` error
 single_line_comment = ${ "//" ~ (!"\n" ~ ANY)* }
 
+// Documentation comments for µCAD language
 //`/// ok`: ok
 //`// err` error
 doc_comment = { "///" ~ (!"\n" ~ ANY)* }
