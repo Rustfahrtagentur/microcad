@@ -190,10 +190,12 @@ pub enum Type {
     Angle,
     /// A physical weight, e.g. 4.0kg
     Weight,
-    /// A two-dimensional vector, maps from named tuple ((x,y): length)    
+    /// A two-dimensional vector, maps from named tuple (x: length, y: length)    
     Vec2,
-    /// A three-dimensional vector, maps from named tuple ((x,y,z): length)
+    /// A three-dimensional vector, maps from named tuple (x: length, y: length, z: length)
     Vec3,
+    /// A three-dimensional vector, maps from named tuple (x: length, y: length, z: length, w: length)
+    Vec4,
     /// A boolean: true, false
     Bool,
     /// A list of elements of the same type: [scalar]
@@ -264,6 +266,7 @@ impl std::fmt::Display for Type {
             Self::Weight => write!(f, "weight"),
             Self::Vec2 => write!(f, "vec2"),
             Self::Vec3 => write!(f, "vec3"),
+            Self::Vec4 => write!(f, "vec4"),
             Self::Bool => write!(f, "bool"),
             Self::List(t) => write!(f, "{}", t),
             Self::Map(t) => write!(f, "{}", t),

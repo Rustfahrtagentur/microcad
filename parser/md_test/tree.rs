@@ -21,7 +21,7 @@ impl Tree {
     pub fn insert(&mut self, path: &str, code: String) {
         use std::{cell::RefCell, rc::Rc};
 
-        if let Some((module, path)) = path.split_once(".") {
+        if let Some((module, path)) = path.split_once('.') {
             match self {
                 Tree::Root(ref mut children) | Tree::Module(_, ref mut children) => {
                     if let Some(ref mut module) = children.get(module) {

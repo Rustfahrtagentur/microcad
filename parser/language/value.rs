@@ -1,10 +1,16 @@
 use super::{color::*, identifier::*, lang_type::*, units::*};
+use cgmath::InnerSpace;
 use thiserror::Error;
 
 pub type Number = super::literal::NumberLiteral;
 pub type Scalar = f64;
-pub type Vec2 = euclid::Vector2D<Scalar, ()>;
-pub type Vec3 = euclid::Vector3D<Scalar, ()>;
+pub type Vec2 = cgmath::Vector2<Scalar>;
+pub type Vec3 = cgmath::Vector3<Scalar>;
+pub type Vec4 = cgmath::Vector4<Scalar>;
+pub type Mat2 = cgmath::Matrix2<Scalar>;
+pub type Mat3 = cgmath::Matrix3<Scalar>;
+pub type Mat4 = cgmath::Matrix4<Scalar>;
+pub type Angle = cgmath::Rad<Scalar>;
 
 #[derive(Debug, Error)]
 pub enum ValueError {
@@ -264,6 +270,9 @@ pub enum Value {
     // A 3D vector with length
     Vec3(Vec3),
 
+    // A 4D vector with length
+    Vec4(Vec4),
+
     // An angle in radians
     Angle(Scalar),
 
@@ -291,8 +300,8 @@ impl Value {
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs < rhs),
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs < rhs),
             (Value::Length(lhs), Value::Length(rhs)) => Ok(lhs < rhs),
-            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.length() < rhs.length()),
-            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.length() < rhs.length()),
+            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.magnitude2() < rhs.magnitude2()),
+            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.magnitude2() < rhs.magnitude2()),
             (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs < rhs),
             _ => Err(ValueError::InvalidOperator('<')),
         }
@@ -303,8 +312,8 @@ impl Value {
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs > rhs),
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs > rhs),
             (Value::Length(lhs), Value::Length(rhs)) => Ok(lhs > rhs),
-            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.length() > rhs.length()),
-            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.length() > rhs.length()),
+            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.magnitude2() > rhs.magnitude2()),
+            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.magnitude2() > rhs.magnitude2()),
             (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs > rhs),
             _ => Err(ValueError::InvalidOperator('>')),
         }
@@ -358,6 +367,7 @@ impl Ty for Value {
             Value::Length(_) => Type::Length,
             Value::Vec2(_) => Type::Vec2,
             Value::Vec3(_) => Type::Vec3,
+            Value::Vec4(_) => Type::Vec4,
             Value::Angle(_) => Type::Angle,
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
@@ -507,6 +517,7 @@ impl std::fmt::Display for Value {
             Value::Length(n) | Value::Angle(n) => write!(f, "{}{}", n, self.ty().default_unit()),
             Value::Vec2(v) => write!(f, "({}, {})", v.x, v.y),
             Value::Vec3(v) => write!(f, "({}, {}, {})", v.x, v.y, v.z),
+            Value::Vec4(v) => write!(f, "({}, {}, {}, {})", v.x, v.y, v.z, v.w),
             Value::Bool(b) => write!(f, "{}", b),
             Value::String(s) => write!(f, "{}", s),
             Value::Color(c) => write!(f, "{}", c),

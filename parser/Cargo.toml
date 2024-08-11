@@ -14,7 +14,7 @@ pest_derive = "2.7"
 log = "0.4"
 rctree = "0.6.0"
 lazy_static = "1.5"
-euclid = "0.22.10"
+cgmath = "0.18"
 thiserror = "1.0"
 anyhow = "1"
 
