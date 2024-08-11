@@ -3,17 +3,6 @@ use tree::Tree;
 
 mod tree;
 
-#[test]
-fn test_generate_md_file() {
-    use std::path::*;
-
-    let mut tree = Tree::new();
-    match generate_tests_for_md_file(&mut tree, Path::new("../../doc/namespaces.md")) {
-        Err(err) => panic!("ERROR: {err}"),
-        _ => eprintln!("{tree}"),
-    }
-}
-
 pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
     use std::{
         env::*,
