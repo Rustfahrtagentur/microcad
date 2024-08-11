@@ -124,13 +124,14 @@ qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 //`(scalar, scalar)`: Unnamed tuple type
 //`(a: scalar, b: scalar)`: Named tuple type
 //`{}`: ok # Module type
-type = { 
+type = {
   qualified_name | 
   list_type | 
   map_type | 
   named_tuple_type | 
   unnamed_tuple_type | 
-  module_type 
+  module_type |
+  unit
 }
 
 //`type a = scalar`: ok
