@@ -31,15 +31,23 @@ impl ModuleBuilder {
     }
 }
 
+macro_rules! arg_1 {
+    ($args:expr, $name:ident, $f:ident, $($ty:tt),+) => {
+        match $args.arg_1(stringify!(name))? {
+            $(Value::$ty($name) => Ok(Value::$ty($name.$f())),)*
+            v => Err(Error::InvalidArgumentType(v.ty())),
+        }
+    };
+}
+
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("math")
-        .builtin_function("abs", &|args, _| match args.arg_1("x")? {
-            Value::Scalar(x) => Ok(Value::Scalar(x.abs())),
-            Value::Length(x) => Ok(Value::Length(x.abs())),
-            Value::Angle(x) => Ok(Value::Angle(x.abs())),
-            Value::Integer(x) => Ok(Value::Integer(x.abs())),
-            v => Err(Error::InvalidArgumentType(v.ty())),
+        // abs(x): Absolute value of x
+        .builtin_function("abs", &|args, _| {
+            arg_1!(args, x, abs, Scalar, Length, Angle, Integer)
         })
+        // sin(x): Sine of x
+        .builtin_function("sin", &|args, _| arg_1!(args, x, sin, Scalar, Angle))
         .build()
 }
 
