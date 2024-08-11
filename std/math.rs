@@ -32,21 +32,61 @@ impl ModuleBuilder {
 }
 
 macro_rules! arg_1 {
-    ($f:ident($name:ident) => $($ty:tt),+) => { &|args, _| {
+    ($f:ident($name:ident) for $($ty:tt),+) => { &|args, _| {
         match args.arg_1(stringify!(name))? {
             $(Value::$ty($name) => Ok(Value::$ty($name.$f())),)*
             v => Err(Error::InvalidArgumentType(v.ty())),
         }
     }
-};
+    };
+    ($f:ident($name:ident) => $inner:expr) => {
+        &|args, _| {
+            let l = |$name| $inner;
+            l(args.arg_1(stringify!($name))?.clone())
+    }
+}
 }
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("math")
         // abs(x): Absolute value of x
-        .builtin_function("abs", arg_1!(abs(x) => Scalar, Length, Angle, Integer))
+        .builtin_function("abs", arg_1!(abs(x) for Scalar, Length, Angle, Integer))
         // sin(x): Sine of x
-        .builtin_function("sin", arg_1!(sin(x) => Scalar, Angle))
+        .builtin_function("sin", arg_1!(sin(x) for Scalar, Angle))
+        // cos(x): Cosine of x
+        .builtin_function("cos", arg_1!(cos(x) for Scalar, Angle))
+        // tan(x): Tangent of x
+        .builtin_function("tan", arg_1!(tan(x) for Scalar, Angle))
+        // asin(x): Arcsine of x
+        .builtin_function(
+            "asin",
+            arg_1!(asin(x) => {
+                match x {
+                    Value::Scalar(x) => Ok(Value::Angle(x.asin())),
+                    _ => Err(Error::InvalidArgumentType(x.ty())),
+                }
+            }),
+        )
+        // acos(x): Arccosine of x
+        .builtin_function(
+            "acos",
+            arg_1!(acos(x) => {
+                match x {
+                    Value::Scalar(x) => Ok(Value::Angle(x.acos())),
+                    _ => Err(Error::InvalidArgumentType(x.ty())),
+                }
+            }),
+        )
+        // atan(x): Arctangent of x
+        .builtin_function(
+            "atan",
+            arg_1!(atan(x) => {
+                match x {
+                    Value::Scalar(x) => Ok(Value::Angle(x.atan())),
+                    _ => Err(Error::InvalidArgumentType(x.ty())),
+                }
+            }),
+        )
         .build()
 }
 
