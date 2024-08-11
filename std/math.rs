@@ -33,20 +33,12 @@ impl ModuleBuilder {
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("math")
-        .builtin_function("abs", &|args, _| {
-            if args.len() != 1 {
-                return Err(Error::ArgumentCountMismatch {
-                    expected: 1,
-                    found: args.len(),
-                });
-            }
-
-            match args.get(&"x".into(), 0).unwrap() {
-                Value::Scalar(x) => Ok(Value::Scalar(x.abs())),
-                Value::Length(x) => Ok(Value::Length(x.abs())),
-                Value::Integer(x) => Ok(Value::Integer(x.abs())),
-                v => Err(Error::InvalidArgumentType(v.ty())),
-            }
+        .builtin_function("abs", &|args, _| match args.arg_1("x")? {
+            Value::Scalar(x) => Ok(Value::Scalar(x.abs())),
+            Value::Length(x) => Ok(Value::Length(x.abs())),
+            Value::Angle(x) => Ok(Value::Angle(x.abs())),
+            Value::Integer(x) => Ok(Value::Integer(x.abs())),
+            v => Err(Error::InvalidArgumentType(v.ty())),
         })
         .build()
 }

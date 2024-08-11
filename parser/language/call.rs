@@ -87,6 +87,20 @@ impl<T> PositionalNamedList<T> {
         }
     }
 
+    pub fn arg_1(&self, ident: &str) -> Result<&T, Error> {
+        if self.len() != 1 {
+            return Err(Error::ArgumentCountMismatch {
+                expected: 1,
+                found: self.len(),
+            });
+        }
+
+        match self.get(&Identifier::from(ident), 0) {
+            Some(v) => Ok(v),
+            None => Err(Error::FunctionCallMissingArgument(Identifier::from(ident))),
+        }
+    }
+
     /// Tries get the argument by identifier, if it fails, it tries to get the argument by index
     pub fn get(&self, ident: &Identifier, index: usize) -> Option<&T> {
         match self.named.get(ident) {
