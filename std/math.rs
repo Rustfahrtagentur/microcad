@@ -10,7 +10,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             Some(Type::Scalar),
             None,
         )],
-        return_type: Type::Scalar,
+        return_type: Some(Type::Scalar),
     };
 
     let fn_abs = FunctionDefinition::builtin(

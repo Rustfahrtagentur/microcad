@@ -351,16 +351,21 @@ definition_parameter_list = { "(" ~ ws* ~ (definition_parameter ~ (ws* ~ "," ~ w
 
 
 //`(a: scalar) -> scalar`: ok # Function signature with arguments
-function_signature = { definition_parameter_list ~ ws* ~ "->" ~ ws* ~ type }
+//`() -> scalar`: ok # Function signature with no arguments
+//`(a: scalar, b: scalar) -> scalar`: ok # Function signature with multiple arguments
+//`(a: scalar = 2.0, b: scalar = 3.0) -> scalar`: ok # Function signature with default values
+//`(a: scalar = 2.0, b: scalar = 3.0)`: ok # Function signature without return type
+function_signature = { definition_parameter_list ~ (ws* ~ "->" ~ ws* ~ type)? }
 
 //`function foo() -> scalar { return math::pi; }`: ok
 //`function foo() -> scalar {}`: ok # Empty function
-//`function foo() { return 5.0mm; }`: error # Function must have specified return type
+//`function foo() { return 5.0mm; }`: ok # Function return type is inferred
 //`function foo(a: scalar) -> scalar { return a; }`: ok # Function with arguments
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 //`function test(a: scalar, b: scalar) -> scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
-//`function weight(density: density = 20g/1mm^3)` ok # Function with default value
+//`function weight(density: density = 20g/1mm^3) -> weight {}` ok # Function with default value
+//`function bar(a: scalar) -> scalar { a }`: ok # Function with no return type
 function_definition = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ function_body }
 
 function_body = { "{" ~ ((ws* ~ function_statement)+ | ws* ~ expression)? ~ ws* ~ "}" }
@@ -388,6 +393,7 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Module with module as argument
 //`module foo() { init(size: length) { rectangle(size); } }`: ok # Module with init function
+//`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
 module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ definition_parameter_list? ~ ws* ~ module_body }
 
 //`namespace math { }`: ok # namespace (like module with no arguments)
@@ -400,20 +406,20 @@ module_body = { "{" ~ ws* ~ module_inner? ~ ws* ~ "}" }
 
 module_inner = _{ 
   ws* ~ (module_statement ~ ws*)+ | 
-  ws* ~ (module_statement ~ ws*)* ~ expression 
+  ws* ~ (module_statement ~ ws*)* ~ (function_definition | expression) 
 }
 
 module_for_statement = { "for" ~ ws* ~ assignment ~ ws* ~ module_body }
 
 module_statement = { 
   use_statement |
-  module_for_statement |
-  expression_statement |
-  assignment_statement |
-  module_init_definition |
   module_definition |
   namespace_definition |
-  function_definition
+  function_definition |
+  module_init_definition |
+  module_for_statement |
+  assignment_statement |
+  expression_statement
 }
 
 //`init(d: length) { r = d / 2; }`: ok
@@ -422,9 +428,9 @@ module_statement = {
 module_init_definition = { "init" ~ ws* ~ definition_parameter_list ~ ws* ~ "{" ~ ws* ~ module_init_inner? ~ ws* ~ "}" }
 
 module_init_statement = { 
-  assignment_statement | 
   use_statement | 
   function_definition | 
+  assignment_statement | 
   expression_statement 
 }
 

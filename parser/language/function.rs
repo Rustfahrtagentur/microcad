@@ -93,7 +93,7 @@ impl Parse for DefinitionParameter {
 #[derive(Clone)]
 pub struct FunctionSignature {
     pub parameters: Vec<DefinitionParameter>,
-    pub return_type: Type,
+    pub return_type: Option<Type>,
 }
 
 impl FunctionSignature {
@@ -101,7 +101,7 @@ impl FunctionSignature {
         &self.parameters
     }
 
-    pub fn return_type(&self) -> &Type {
+    pub fn return_type(&self) -> &Option<Type> {
         &self.return_type
     }
 
@@ -130,7 +130,7 @@ impl Parse for FunctionSignature {
         with_pair_ok!(
             Self {
                 parameters,
-                return_type: return_type.unwrap(),
+                return_type,
             },
             pair
         )
@@ -424,7 +424,7 @@ fn function_signature() {
         Parser::parse_rule_or_panic::<FunctionSignature>(Rule::function_signature, input);
 
     assert_eq!(function_signature.parameters().len(), 2);
-    assert_eq!(function_signature.return_type(), &Type::Scalar);
+    assert_eq!(function_signature.return_type(), &Some(Type::Scalar));
 }
 
 #[test]

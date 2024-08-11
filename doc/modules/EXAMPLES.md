@@ -13,7 +13,7 @@ module cube_with_volume(size: length) {
         size*size*size
     }
 
-    function weight(density: weight / length^3 = 20g/1mm^3) {
+    function weight(density: density = 20g/1mm^3) {
         volume() * density
     }
 
@@ -32,7 +32,7 @@ module cube_with_volume(size: length) {
 
     volume = size*size*size;
 
-    function weight(density: weight / length^3 = 20g/mm^3) {
+    function weight(density: density = 20g/1mm^3) {
         volume * density
     }
 
