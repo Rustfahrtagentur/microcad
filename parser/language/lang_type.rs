@@ -188,7 +188,9 @@ pub enum Type {
     Length,
     /// An angle, e.g. 90°
     Angle,
-    /// A two-dimensional vector, maps from named tuple ((x,y): length)
+    /// A physical weight, e.g. 4.0kg
+    Weight,
+    /// A two-dimensional vector, maps from named tuple ((x,y): length)    
     Vec2,
     /// A three-dimensional vector, maps from named tuple ((x,y,z): length)
     Vec3,
@@ -259,6 +261,7 @@ impl std::fmt::Display for Type {
             Self::Color => write!(f, "color"),
             Self::Length => write!(f, "length"),
             Self::Angle => write!(f, "angle"),
+            Self::Weight => write!(f, "weight"),
             Self::Vec2 => write!(f, "vec2"),
             Self::Vec3 => write!(f, "vec3"),
             Self::Bool => write!(f, "bool"),

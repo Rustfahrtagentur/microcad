@@ -74,6 +74,15 @@ declare_units! {
     Turn = "turn" -> Angle * 360.,
     /// Radians
     Rad = "rad" -> Angle * 360./std::f32::consts::TAU,
+
+    // Weights
+
+    /// Grams
+    G = "g" -> Weight,
+    /// Kilograms
+    Kg = "kg" -> Weight * 1000.0,
+    /// Pounds
+    Lb = "lb" -> Weight * 453.59237,
 }
 
 impl Parse for Unit {
