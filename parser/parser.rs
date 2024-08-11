@@ -150,9 +150,9 @@ impl Parser {
 }
 
 #[cfg(test)]
-include!(concat!(env!("OUT_DIR"), "/pest_test.rs"));
+include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
 #[cfg(test)]
-include!(concat!(env!("OUT_DIR"), "/md_test.rs"));
+include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 /*use literal::NumberLiteral;
 use parser::Parse;
 

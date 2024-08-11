@@ -242,7 +242,7 @@ pub fn generate(
     use std::{env::*, fs::*, path::*};
 
     let out_dir = var("OUT_DIR").unwrap();
-    let dest_path = Path::new(&out_dir).join("pest_test.rs");
+    let dest_path = Path::new(&out_dir).join("microcad_pest_test.rs");
 
     PestFile::from_file(&grammar_file)
         .unwrap()

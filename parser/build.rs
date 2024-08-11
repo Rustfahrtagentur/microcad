@@ -1,9 +1,9 @@
 fn main() {
-    pest_test::generate(
+    microcad_pest_test::generate(
         "crate::parser::Parser",
         "crate::parser::Rule",
         "grammar.pest",
     );
 
-    md_test::generate("../doc").unwrap();
+    microcad_markdown_test::generate("../doc").unwrap();
 }

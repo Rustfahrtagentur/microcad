@@ -19,5 +19,5 @@ thiserror = "1.0"
 anyhow = "1"
 
 [build-dependencies]
-pest_test = { path = "pest_test", version = "0.1.0" }
-md_test = { path = "md_test", version = "0.1.0" }
+microcad_pest_test = { path = "microcad_pest_test", version = "0.1.0" }
+microcad_markdown_test = { path = "microcad_markdown_test", version = "0.1.0" }

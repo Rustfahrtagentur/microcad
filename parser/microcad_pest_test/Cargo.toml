@@ -1,5 +1,5 @@
 [package]
-name = "pest_test"
+name = "microcad_pest_test"
 version = "0.1.0"
 edition = "2021"
 

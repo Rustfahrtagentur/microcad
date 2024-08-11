@@ -13,12 +13,13 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
 
     // get target path
     let out_dir = var("OUT_DIR")?;
-    let dest_path = Path::new(&out_dir).join("md_test.rs");
+    let dest_path = Path::new(&out_dir).join("microcad_markdown_test.rs");
 
     {
         // create target file
-        let mut w =
-            BufWriter::new(File::create(dest_path).context("cannot create file 'md_test.rs'")?);
+        let mut w = BufWriter::new(
+            File::create(dest_path).context("cannot create file 'microcad_markdown_test.rs'")?,
+        );
 
         // read all into a tree to reorder modules
         let mut tree = Tree::new();
