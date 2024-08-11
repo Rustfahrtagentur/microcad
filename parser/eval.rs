@@ -43,6 +43,8 @@ pub enum Error {
     FunctionCallMissingReturn,
     #[error("Symbol not found: {0}")]
     SymbolNotFound(Identifier),
+    #[error("Argument count mismatch: expected {expected}, got {found}")]
+    ArgumentCountMismatch { expected: usize, found: usize },
 }
 
 #[derive(Clone)]

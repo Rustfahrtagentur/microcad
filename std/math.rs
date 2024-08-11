@@ -32,8 +32,15 @@ impl ModuleBuilder {
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("math")
-        .builtin_function("abs", &|args, _| -> Result<Value, Error> {
-            let x = args[0].into_scalar()?;
+        .builtin_function("abs", &|args, _| {
+            if args.len() != 1 {
+                return Err(Error::ArgumentCountMismatch {
+                    expected: 1,
+                    found: args.len(),
+                });
+            }
+
+            let x = args.get(&"x".into(), 0).unwrap().into_scalar()?;
             Ok(Value::Scalar(x.abs()))
         })
         .build()

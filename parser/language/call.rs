@@ -87,6 +87,14 @@ impl<T> PositionalNamedList<T> {
         }
     }
 
+    /// Tries get the argument by identifier, if it fails, it tries to get the argument by index
+    pub fn get(&self, ident: &Identifier, index: usize) -> Option<&T> {
+        match self.named.get(ident) {
+            Some(v) => Some(v),
+            None => self.positional.get(index),
+        }
+    }
+
     pub fn get_named(&self) -> &std::collections::BTreeMap<Identifier, T> {
         &self.named
     }
