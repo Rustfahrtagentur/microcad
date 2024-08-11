@@ -4,6 +4,7 @@ description = "µCAD Standard Library"
 edition.workspace = true
 rust-version.workspace = true
 version.workspace = true
+license = "MIT"
 
 [lib]
 path = "lib.rs"
