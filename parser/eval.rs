@@ -45,6 +45,8 @@ pub enum Error {
     SymbolNotFound(Identifier),
     #[error("Argument count mismatch: expected {expected}, got {found}")]
     ArgumentCountMismatch { expected: usize, found: usize },
+    #[error("Invalid argument type: {0}")]
+    InvalidArgumentType(Type),
 }
 
 #[derive(Clone)]

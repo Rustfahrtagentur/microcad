@@ -1,4 +1,5 @@
 use microcad_parser::eval::*;
+use microcad_parser::language::lang_type::Ty;
 use microcad_parser::language::{function::*, module::*, value::*};
 
 struct ModuleBuilder {
@@ -40,8 +41,12 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 });
             }
 
-            let x = args.get(&"x".into(), 0).unwrap().into_scalar()?;
-            Ok(Value::Scalar(x.abs()))
+            match args.get(&"x".into(), 0).unwrap() {
+                Value::Scalar(x) => Ok(Value::Scalar(x.abs())),
+                Value::Length(x) => Ok(Value::Length(x.abs())),
+                Value::Integer(x) => Ok(Value::Integer(x.abs())),
+                v => Err(Error::InvalidArgumentType(v.ty())),
+            }
         })
         .build()
 }
