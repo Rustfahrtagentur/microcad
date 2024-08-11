@@ -19,5 +19,5 @@ thiserror = "1.0"
 anyhow = "1"
 
 [build-dependencies]
-pest_test = { path = "pest_test" }
-md_test = { path = "md_test" }
+pest_test = { path = "pest_test", version = "0.1.0" }
+md_test = { path = "md_test", version = "0.1.0" }
