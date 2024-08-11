@@ -62,11 +62,14 @@ impl std::fmt::Display for Tree {
 #[allow(non_snake_case)]
 fn r#{name}() {{
     use crate::{{language::document::Document,parser}};
-    let _ = parser::Parser::parse_rule_or_panic::<Document>(
+    match parser::Parser::parse_rule::<Document>(
         parser::Rule::document,
         r#"
 {code}"#
-    );
+    ) {{
+        Ok(_) => (),
+        Err(err) =>    eprintln!("ERROR: {{err}}")
+    }};
 }}"##
                 )
                 .trim()

@@ -3,6 +3,7 @@
 pub struct Parser;
 
 use crate::language::{identifier::*, lang_type::*};
+use anyhow::Error;
 use thiserror::Error;
 
 pub type Pair<'i> = pest::iterators::Pair<'i, Rule>;
@@ -111,6 +112,20 @@ impl Parser {
         }
 
         with_pair_ok!(vec, pair)
+    }
+
+    /// Parse a rule for type `T`
+    pub fn parse_rule<T>(rule: Rule, input: &str) -> anyhow::Result<T>
+    where
+        T: Parse + Clone,
+    {
+        use pest::Parser as _;
+
+        if let Some(pair) = Parser::parse(rule, input.trim())?.next() {
+            Ok(T::parse(pair)?.value().clone())
+        } else {
+            Err(Error::msg("could not parse"))
+        }
     }
 
     /// Convenience function to parse a rule for type `T` and panic on error
