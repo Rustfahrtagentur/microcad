@@ -8,3 +8,5 @@ path = "lib.rs"
 
 [dependencies]
 regex = "1"
+rustfmt-wrapper = "0.2"
+anyhow = "1"

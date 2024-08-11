@@ -57,7 +57,7 @@ impl std::fmt::Display for Tree {
             Tree::Test(name, code) => writeln!(
                 f,
                 "{}",
-                format!(
+                &format!(
                     r##"#[test]
 #[allow(non_snake_case)]
 fn r#{name}() {{
@@ -68,22 +68,25 @@ fn r#{name}() {{
 {code}"#
     ) {{
         Ok(_) => (),
-        Err(err) =>    eprintln!("ERROR: {{err}}")
+        Err(err) => panic!("ERROR: {{err}}")
     }};
 }}"##
                 )
-                .trim()
             )?,
             Tree::Root(children) => {
                 for child in children {
-                    writeln!(f, "{}", child.1.as_ref().borrow().to_string().trim())?;
+                    writeln!(f, "{}", child.1.as_ref().borrow())?;
                 }
             }
             Tree::Module(name, children) => {
-                writeln!(f, "#[allow(non_snake_case)]\n")?;
-                writeln!(f, r##"mod r#{name} {{"##)?;
+                write!(
+                    f,
+                    r##"
+#[allow(non_snake_case)]
+mod r#{name} {{"##
+                )?;
                 for child in children {
-                    writeln!(f, "{}", child.1.as_ref().borrow().to_string().trim())?;
+                    writeln!(f, "\n{}", child.1.as_ref().borrow())?;
                 }
                 writeln!(f, "}}\n")?;
             }
