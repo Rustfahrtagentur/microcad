@@ -1,18 +1,42 @@
 use microcad_parser::eval::*;
 use microcad_parser::language::{function::*, module::*, value::*};
 
-pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    let mut module = ModuleDefinition::namespace("math".into());
+struct ModuleBuilder {
+    module: ModuleDefinition,
+}
 
-    module.add_symbol(Symbol::BuiltinFunction(BuiltinFunction {
-        name: "abs".into(),
-        f: std::rc::Rc::new(|args, _| -> Result<Value, Error> {
+impl ModuleBuilder {
+    pub fn namespace(name: &str) -> ModuleBuilder {
+        Self {
+            module: ModuleDefinition::namespace(name.into()),
+        }
+    }
+
+    pub fn builtin_function(
+        &mut self,
+        name: &str,
+        f: &'static BuiltinFunctionFunctor,
+    ) -> &mut Self {
+        self.module
+            .add_symbol(Symbol::BuiltinFunction(BuiltinFunction {
+                name: name.into(),
+                f,
+            }));
+        self
+    }
+
+    pub fn build(&mut self) -> std::rc::Rc<ModuleDefinition> {
+        std::rc::Rc::new(self.module.clone())
+    }
+}
+
+pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
+    ModuleBuilder::namespace("math")
+        .builtin_function("abs", &|args, _| -> Result<Value, Error> {
             let x = args[0].into_scalar()?;
             Ok(Value::Scalar(x.abs()))
-        }),
-    }));
-
-    std::rc::Rc::new(module)
+        })
+        .build()
 }
 
 #[test]

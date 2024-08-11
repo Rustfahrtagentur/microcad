@@ -269,16 +269,16 @@ impl Parse for FunctionStatement {
 }
 
 pub type BuiltinFunctionFunctor =
-    std::rc::Rc<dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Value, Error>>;
+    dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Value, Error>;
 
 #[derive(Clone)]
 pub struct BuiltinFunction {
     pub name: Identifier,
-    pub f: BuiltinFunctionFunctor,
+    pub f: &'static BuiltinFunctionFunctor,
 }
 
 impl BuiltinFunction {
-    pub fn new(name: Identifier, f: BuiltinFunctionFunctor) -> Self {
+    pub fn new(name: Identifier, f: &'static BuiltinFunctionFunctor) -> Self {
         Self { name, f }
     }
 
