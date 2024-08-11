@@ -360,6 +360,7 @@ function_signature = { definition_parameter_list ~ ws* ~ "->" ~ ws* ~ type }
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 //`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
 //`function test(a: scalar, b: scalar) -> scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
+//`function weight(density: density = 20g/1mm^3)` ok # Function with default value
 function_definition = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ function_body }
 
 function_body = { "{" ~ ((ws* ~ function_statement)+ | ws* ~ expression)? ~ ws* ~ "}" }

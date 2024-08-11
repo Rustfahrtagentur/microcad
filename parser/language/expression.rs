@@ -313,6 +313,7 @@ impl Parse for Expression {
                     Rule::divide => '/',
                     Rule::union => '|',
                     Rule::intersection => '&',
+                    Rule::power_xor => '^',
                     Rule::greater_than => '>',
                     Rule::less_than => '<',
                     Rule::less_equal => '≤',
