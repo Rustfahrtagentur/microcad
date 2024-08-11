@@ -102,6 +102,25 @@ impl<T> PositionalNamedList<T> {
         }
     }
 
+    // Checks if the argument list contains a two argument only and returns them as tuple
+    pub fn arg_2(&self, x: &str, y: &str) -> Result<(&T, &T), Error> {
+        if self.len() != 2 {
+            return Err(Error::ArgumentCountMismatch {
+                expected: 2,
+                found: self.len(),
+            });
+        }
+
+        match (
+            self.get(&Identifier::from(x), 0),
+            self.get(&Identifier::from(y), 1),
+        ) {
+            (Some(x), Some(y)) => Ok((x, y)),
+            (None, _) => Err(Error::FunctionCallMissingArgument(Identifier::from(x))),
+            (_, None) => Err(Error::FunctionCallMissingArgument(Identifier::from(y))),
+        }
+    }
+
     /// Tries get the argument by identifier, if it fails, it tries to get the argument by index
     pub fn get(&self, ident: &Identifier, index: usize) -> Option<&T> {
         match self.named.get(ident) {

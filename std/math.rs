@@ -58,6 +58,16 @@ macro_rules! arg_1 {
 }
 }
 
+macro_rules! arg_2 {
+    ($f:ident($x:ident, $y:ident) $inner:expr) => {
+        &|args, _| {
+            let l = |$x, $y| $inner;
+            let (x, y) = args.arg_2(stringify!($x), stringify!($y))?;
+            l(x.clone(), y.clone())
+        }
+    };
+}
+
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("math")
         // abs(x): Absolute value of x
@@ -91,6 +101,45 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                     Value::Angle(x) => Ok(Value::Integer(x as i64)),
                     Value::Integer(x) => Ok(Value::Integer(x)),
                     _ => Err(Error::InvalidArgumentType(x.ty())),
+                }
+            }),
+        )
+        // to_scalar(x): Convert x to scalar
+        .builtin_function(
+            "to_scalar",
+            arg_1!(to_scalar(x) {
+                match x {
+                    Value::Scalar(x) => Ok(Value::Scalar(x)),
+                    Value::Length(x) => Ok(Value::Scalar(x)),
+                    Value::Angle(x) => Ok(Value::Scalar(x)),
+                    Value::Integer(x) => Ok(Value::Scalar(x as Scalar)),
+                    _ => Err(Error::InvalidArgumentType(x.ty())),
+                }
+            }),
+        )
+        // min(x,y): Minimum of x and y
+        .builtin_function(
+            "min",
+            arg_2!(min(x, y) {
+                match (x, y) {
+                    (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(x.min(y))),
+                    (Value::Length(x), Value::Length(y)) => Ok(Value::Length(x.min(y))),
+                    (Value::Angle(x), Value::Angle(y)) => Ok(Value::Angle(x.min(y))),
+                    (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x.min(y))),
+                    (x,_) => Err(Error::InvalidArgumentType(x.ty())),
+                }
+            }),
+        )
+        // max(x,y): Maximum of x and y
+        .builtin_function(
+            "max",
+            arg_2!(max(x, y) {
+                match (x, y) {
+                    (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(x.max(y))),
+                    (Value::Length(x), Value::Length(y)) => Ok(Value::Length(x.max(y))),
+                    (Value::Angle(x), Value::Angle(y)) => Ok(Value::Angle(x.max(y))),
+                    (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x.max(y))),
+                    (x,_) => Err(Error::InvalidArgumentType(x.ty())),
                 }
             }),
         )
@@ -140,25 +189,40 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .builtin_function("log10", arg_1!(log10(x) for Scalar))
         // exp(x): Exponential of x
         .builtin_function("exp", arg_1!(exp(x) for Scalar))
+        // pow(x,y): x raised to the power of y
+        .builtin_function(
+            "pow",
+            arg_2!(pow(x, y) {
+                match (x, y) {
+                    (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(x.powf(y))),
+                    (Value::Length(x), Value::Scalar(y)) => Ok(Value::Length(x.powf(y))),
+                    (Value::Angle(x), Value::Scalar(y)) => Ok(Value::Angle(x.powf(y))),
+                    (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x.pow(y as u32))),
+                    (Value::Scalar(x), Value::Integer(y)) => Ok(Value::Scalar(x.powf(y as Scalar))),
+                    (Value::Length(x), Value::Integer(y)) => Ok(Value::Length(x.powf(y as Scalar))),
+                    (Value::Angle(x), Value::Integer(y)) => Ok(Value::Angle(x.powf(y as Scalar))),
+                    (x,_) => Err(Error::InvalidArgumentType(x.ty())),
+                }
+            }),
+        )
         // length(x): Length of x
         .builtin_function(
             "length",
-            arg_1!(length(v) {
-                match v {
-                    Value::Vec2(v) => Ok(Value::Length(v.magnitude())),
-                    Value::Vec3(v) => Ok(Value::Length(v.magnitude())),
-                    Value::Vec4(v) => Ok(Value::Length(v.magnitude())),
-                    _ => Err(Error::InvalidArgumentType(v.ty())),
+            arg_1!(length(x) {
+                match x {
+                    Value::Vec2(x) => Ok(Value::Length(x.magnitude())),
+                    Value::Vec3(x) => Ok(Value::Length(x.magnitude())),
+                    Value::Vec4(x) => Ok(Value::Length(x.magnitude())),
+                    _ => Err(Error::InvalidArgumentType(x.ty())),
                 }
             }),
         )
         // normalize(x): Normalize x
-        .builtin_function("normalize", arg_1!(normalize(v) for Vec2, Vec3, Vec4))
+        .builtin_function("normalize", arg_1!(normalize(x) for Vec2, Vec3, Vec4))
         .build()
 }
 
-#[test]
-fn test_build_math_module() {
+fn test_builtin_function(name: &str, input: &str, expected: &str) {
     use microcad_parser::language::expression::*;
     use microcad_parser::parser::*;
 
@@ -169,9 +233,13 @@ fn test_build_math_module() {
 
     context.add_symbol(Symbol::ModuleDefinition(module));
 
-    let input = "math::abs(-1.0)";
     let expr = Parser::parse_rule_or_panic::<Expression>(Rule::expression, input);
 
     let value = expr.eval(&mut context).unwrap();
-    assert_eq!(value.to_string(), "1");
+    assert_eq!(value.to_string(), expected, "Failed for '{}'", name);
+}
+
+#[test]
+fn test_build_math_module() {
+    test_builtin_function("abs", "math::abs(-1.0)", "1");
 }
