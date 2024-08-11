@@ -83,7 +83,7 @@ impl std::fmt::Display for Tree {
                             _ =>
                                 r##"{
                                         Ok(_) => (),
-                                        Err(err) => panic!("ERROR: {{err}}"),
+                                        Err(err) => panic!("ERROR: {err}"),
                                     }"##,
                         }
                     )
@@ -98,8 +98,8 @@ impl std::fmt::Display for Tree {
                 write!(
                     f,
                     r##"
-#[allow(non_snake_case)]
-mod r#{name} {{"##
+                        #[allow(non_snake_case)]
+                        mod r#{name} {{"##
                 )?;
                 for child in children {
                     writeln!(f, "\n{}", child.1.as_ref().borrow())?;
