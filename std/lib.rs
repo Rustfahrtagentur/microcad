@@ -1,6 +1,8 @@
 mod math;
 
 use microcad_parser::eval::*;
+use microcad_parser::language::call::PositionalNamedList;
+use microcad_parser::language::value::Value;
 use microcad_parser::language::{function::*, module::*};
 
 pub struct ModuleBuilder {
@@ -71,5 +73,9 @@ macro_rules! arg_2 {
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("std")
         .module(math::builtin_module())
+        .builtin_function(BuiltinFunction::new("assert".into(), &|args, _| {
+            assert!(args[0].into_bool()?);
+            unreachable!()
+        }))
         .build()
 }

@@ -26,6 +26,8 @@ pub enum ValueError {
     InvalidMapKeyType(Type),
     #[error("Cannot convert value into scalar: {0}")]
     CannotConvertToScalar(Value),
+    #[error("Cannot convert value into boolean: {0}")]
+    CannotConvertToBool(Value),
     #[error("Cannot add unit to a unitful value: {0}")]
     CannotAddUnitToUnitfulValue(Value),
 }
@@ -343,6 +345,13 @@ impl Value {
         match self {
             Value::Scalar(s) | Value::Length(s) | Value::Angle(s) => Ok(*s),
             value => Err(ValueError::CannotConvertToScalar(value.clone())),
+        }
+    }
+
+    pub fn into_bool(&self) -> Result<bool, ValueError> {
+        match self {
+            Value::Bool(b) => Ok(*b),
+            value => Err(ValueError::CannotConvertToBool(value.clone())),
         }
     }
 
