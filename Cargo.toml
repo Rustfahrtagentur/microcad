@@ -1,5 +1,5 @@
 [workspace]
-members = ["parser", "tree", "std"]
+members = ["parser", "tree", "std", "tests"]
 
 [workspace.package]
 name = "microcad"
