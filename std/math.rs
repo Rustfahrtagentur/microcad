@@ -67,9 +67,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         // sign(x): Sign of x
         .builtin_function(arg_1!(sign(x) {
             match x {
-                Value::Scalar(x) => Ok(Value::Scalar(x.signum())),
-                Value::Length(x) => Ok(Value::Scalar(x.signum())),
-                Value::Angle(x) => Ok(Value::Scalar(x.signum())),
+                Value::Scalar(x) | Value::Length(x) | Value::Angle(x) => Ok(Value::Scalar(x.signum())),
                 Value::Integer(x) => Ok(Value::Integer(x.signum())),
                 _ => Err(Error::InvalidArgumentType(x.ty())),
             }
@@ -83,9 +81,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         // to_int(x): Convert x to integer
         .builtin_function(arg_1!(to_int(x) {
             match x {
-                Value::Scalar(x) => Ok(Value::Integer(x as i64)),
-                Value::Length(x) => Ok(Value::Integer(x as i64)),
-                Value::Angle(x) => Ok(Value::Integer(x as i64)),
+                Value::Scalar(x) | Value::Length(x) | Value::Angle(x) => Ok(Value::Integer(x as i64)),
                 Value::Integer(x) => Ok(Value::Integer(x)),
                 _ => Err(Error::InvalidArgumentType(x.ty())),
             }
