@@ -1,5 +1,5 @@
 [package]
-name = "microcad-stdlib"
+name = "microcad-std"
 description = "µCAD Standard Library"
 edition.workspace = true
 rust-version.workspace = true
@@ -10,7 +10,6 @@ license = "MIT"
 path = "lib.rs"
 
 [dependencies]
-microcad-parser = { path = "../parser" }
 pest = "2.7"
 pest_derive = "2.7"
 log = "0.4"
@@ -18,3 +17,5 @@ rctree = "0.6.0"
 lazy_static = "1.5"
 thiserror = "1.0"
 cgmath = "0.18"
+
+microcad-parser = { path = "../parser" }

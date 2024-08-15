@@ -4,6 +4,4 @@ fn main() {
         "crate::parser::Rule",
         "grammar.pest",
     );
-
-    microcad_markdown_test::generate("../doc").unwrap();
 }

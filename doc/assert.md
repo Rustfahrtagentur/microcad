@@ -1,9 +1,11 @@
 # Assertions
 
 ```µCAD,assert
-std::assert(true);
+use * from std;
+assert(true);
 ```
 
 ```µCAD,assert_fail#fail
-std::assert(false);
+use * from std;
+assert(false);
 ```

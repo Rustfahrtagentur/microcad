@@ -67,8 +67,10 @@ impl std::fmt::Display for Tree {
                         r##"#[test]
                             #[allow(non_snake_case)]
                             fn r#{name}() {{
-                                use crate::{{language::document::Document,parser}};
-                                match parser::Parser::parse_rule::<Document>(
+                                use microcad_parser::{{language::document::Document,parser}};
+                                use microcad_parser::eval::{{Symbol, Eval, Context}};
+
+                                let doc = match parser::Parser::parse_rule::<Document>(
                                     parser::Rule::document,
                                     r#"
                                     {code}"#
@@ -78,11 +80,27 @@ impl std::fmt::Display for Tree {
                             Some("fail") =>
                                 r##"{
                                         Err(_) => (),
-                                        Ok(_) => panic!("ERROR: test is marked to fail but succeeded"),
+                                        Ok(doc) => {{ 
+                                            let mut context = Context::default();
+                                            context.add_symbol(Symbol::ModuleDefinition(microcad_std::builtin_module()));
+
+                                            if let Err(err) = doc.eval(&mut context) {{
+                                                println!("{{err}}");
+                                            }} else {{
+                                                panic!("ERROR: test is marked to fail but succeeded");
+                                            }}
+                                        }}
                                     }"##,
                             _ =>
                                 r##"{
-                                        Ok(_) => (),
+                                        Ok(doc) => {{
+                                            let mut context = Context::default();
+                                            context.add_symbol(Symbol::ModuleDefinition(microcad_std::builtin_module()));
+
+                                            if let Err(err) = doc.eval(&mut context) {{
+                                                println!("{{err}}");
+                                            }}
+                                        }},
                                         Err(err) => panic!("ERROR: {err}"),
                                     }"##,
                         }

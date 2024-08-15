@@ -1,6 +1,6 @@
 [package]
-name = "microcad-parser"
-description = "A parser for the µCAD language"
+name = "microcad-tests"
+description = "Tests for the µCAD language"
 edition.workspace = true
 rust-version.workspace = true
 version.workspace = true
@@ -18,5 +18,9 @@ cgmath = "0.18"
 thiserror = "1.0"
 anyhow = "1"
 
+microcad-parser = { path = "../parser" }
+microcad-std = { path = "../std" }
+
+
 [build-dependencies]
-microcad_pest_test = { path = "microcad_pest_test", version = "0.1.0" }
+microcad_markdown_test = { path = "microcad_markdown_test", version = "0.1.0" }
