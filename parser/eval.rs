@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use crate::language::{function::*, identifier::*, lang_type::*, module::*, value::*};
 use thiserror::Error;
 
@@ -47,6 +49,8 @@ pub enum Error {
     ArgumentCountMismatch { expected: usize, found: usize },
     #[error("Invalid argument type: {0}")]
     InvalidArgumentType(Type),
+    #[error("Expected module: {0}")]
+    ExpectedModule(QualifiedName),
 }
 
 #[derive(Clone)]
@@ -70,7 +74,7 @@ impl Symbol {
 
     pub fn get_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
         match self {
-            Self::ModuleDefinition(module) => module.get_symbols(name),
+            Self::ModuleDefinition(module) => module.get_symbols_by_name(name),
             _ => Vec::new(),
         }
     }
@@ -102,6 +106,14 @@ impl SymbolTable {
             }
         }
         symbols
+    }
+}
+
+impl Deref for SymbolTable {
+    type Target = Vec<Symbol>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.symbols
     }
 }
 

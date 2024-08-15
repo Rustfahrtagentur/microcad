@@ -205,7 +205,7 @@ impl Eval for QualifiedName {
             } else {
                 symbol = match symbol {
                     Some(crate::eval::Symbol::ModuleDefinition(module)) => {
-                        Some(*module.get_symbols(ident).first().unwrap())
+                        Some(*module.get_symbols_by_name(ident).first().unwrap())
                     }
                     _ => return Err(crate::eval::Error::SymbolNotFound(ident.clone())),
                 }
