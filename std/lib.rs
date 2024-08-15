@@ -75,7 +75,28 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .module(math::builtin_module())
         .builtin_function(BuiltinFunction::new("assert".into(), &|args, _| {
             assert!(args[0].into_bool()?);
-            unreachable!()
+            Ok(args[0].clone())
         }))
         .build()
+}
+
+#[test]
+fn test_assert() {
+    use microcad_parser::{language::document::Document, parser};
+    let doc = match parser::Parser::parse_rule::<Document>(
+        parser::Rule::document,
+        r#"
+            std::assert(std::math::abs(-1.0) == 1.0);
+            "#,
+    ) {
+        Ok(doc) => doc,
+        Err(err) => panic!("ERROR: {err}"),
+    };
+
+    let mut context = Context::default();
+    context.add_symbol(Symbol::ModuleDefinition(builtin_module()));
+
+    if let Err(err) = doc.eval(&mut context) {
+        println!("{err}");
+    }
 }

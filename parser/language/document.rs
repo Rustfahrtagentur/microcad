@@ -1,4 +1,5 @@
 use super::module::*;
+use crate::eval::*;
 use crate::{parser::*, with_pair_ok};
 
 #[derive(Clone)]
@@ -21,6 +22,17 @@ impl Parse for Document {
         }
 
         with_pair_ok!(Document { body }, pair)
+    }
+}
+
+impl Eval for Document {
+    type Output = ();
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        for statement in &self.body {
+            statement.eval(context)?;
+        }
+        Ok(())
     }
 }
 

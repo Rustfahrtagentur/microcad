@@ -256,6 +256,21 @@ impl Parse for ModuleStatement {
     }
 }
 
+impl Eval for ModuleStatement {
+    type Output = ();
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        match self {
+            ModuleStatement::Expression(expr) => {
+                expr.eval(context)?;
+            }
+            _ => unimplemented!(),
+        }
+
+        Ok(())
+    }
+}
+
 impl std::fmt::Display for ModuleStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
