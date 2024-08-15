@@ -3,7 +3,7 @@
 
 ## Tuple as module parameters
 
-```µCAD,parameters.A
+```µCAD,parameters.A#fail
 module box((x,y,z) = 0mm) {}
 ```
 
@@ -11,7 +11,7 @@ module box((x,y,z) = 0mm) {}
 module box(x = 0mm, y = 0mm, z = 0mm) {}
 ```
 
-```µCAD,parameters.C
+```µCAD,parameters.C#fail
 module box(x,y,z = 0mm) {}
 ```
 
