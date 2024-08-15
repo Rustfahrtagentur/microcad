@@ -11,3 +11,9 @@ module donut(radius: length) {
     circle(radius) - circle(inner);
 }
 ```
+
+## Failures
+
+```µCAD,fail.donut#fail
+module donut(radius) {} // Missing type parameter
+```
