@@ -1,7 +1,7 @@
 use super::{expression::*, identifier::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 enum CallArgument {
     Named(Identifier, Box<Expression>),
     NamedTuple(IdentifierList, Box<Expression>),
@@ -239,7 +239,7 @@ impl Parse for CallArgumentList {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct MethodCall {
     pub name: Identifier,
     pub argument_list: CallArgumentList,
@@ -270,7 +270,7 @@ impl std::fmt::Display for MethodCall {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Call {
     #[allow(dead_code)]
     name: QualifiedName,

@@ -28,7 +28,7 @@ lazy_static::lazy_static! {
     };
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum NestedItem {
     Call(Call),
     QualifiedName(QualifiedName),
@@ -80,7 +80,7 @@ impl std::fmt::Display for NestedItem {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Nested(Vec<NestedItem>);
 
 impl Parse for Nested {
@@ -128,7 +128,7 @@ impl Eval for Nested {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
@@ -382,7 +382,7 @@ impl Parse for Expression {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct ExpressionList(Vec<Expression>);
 
 impl std::ops::Deref for ExpressionList {

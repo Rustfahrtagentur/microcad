@@ -1,7 +1,7 @@
 use super::{call::*, expression::*, identifier::*, lang_type::*, module::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct DefinitionParameter {
     #[allow(dead_code)]
     name: Identifier,
@@ -90,7 +90,7 @@ impl Parse for DefinitionParameter {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct FunctionSignature {
     pub parameters: Vec<DefinitionParameter>,
     pub return_type: Option<Type>,
@@ -137,7 +137,7 @@ impl Parse for FunctionSignature {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Assignment {
     name: Identifier,
     specified_type: Option<Type>,
@@ -212,7 +212,7 @@ impl std::fmt::Display for Assignment {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum FunctionStatement {
     Assignment(Assignment),
     Use(UseStatement),
@@ -277,6 +277,12 @@ pub struct BuiltinFunction {
     pub f: &'static BuiltinFunctionFunctor,
 }
 
+impl std::fmt::Debug for BuiltinFunction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "BUILTIN({})", &self.name)
+    }
+}
+
 impl BuiltinFunction {
     pub fn new(name: Identifier, f: &'static BuiltinFunctionFunctor) -> Self {
         Self { name, f }
@@ -291,7 +297,7 @@ impl BuiltinFunction {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct FunctionBody(pub Vec<FunctionStatement>);
 
 impl Parse for FunctionBody {
@@ -319,7 +325,7 @@ impl Parse for FunctionBody {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct FunctionDefinition {
     pub name: Identifier,
     pub signature: FunctionSignature,

@@ -27,7 +27,7 @@ impl Parse for FormatSpec {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct FormatExpression(FormatSpec, Box<Expression>);
 
 impl Parse for FormatExpression {
@@ -59,14 +59,14 @@ impl std::fmt::Display for FormatExpression {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 enum FormatStringInner {
     String(String),
     FormatExpression(FormatExpression),
 }
 
 /// Definition and implementation for `StringLiteral`
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct FormatString(Vec<FormatStringInner>);
 
 impl FormatString {

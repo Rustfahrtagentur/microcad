@@ -2,7 +2,7 @@ use super::module::*;
 use crate::eval::*;
 use crate::{parser::*, with_pair_ok};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Document {
     body: Vec<ModuleStatement>,
 }

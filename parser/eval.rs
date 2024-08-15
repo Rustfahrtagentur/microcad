@@ -53,7 +53,7 @@ pub enum Error {
     ExpectedModule(QualifiedName),
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Symbol {
     Value(Identifier, Value),
     Function(std::rc::Rc<FunctionDefinition>),
@@ -82,7 +82,7 @@ impl Symbol {
 
 /// @brief Symbol table
 /// @details A symbol table is a mapping of symbol
-#[derive(Default, Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct SymbolTable {
     symbols: Vec<Symbol>,
 }

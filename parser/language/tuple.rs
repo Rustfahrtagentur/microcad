@@ -1,7 +1,7 @@
 use super::{call::*, lang_type::*, units::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
-#[derive(Default, Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct TupleExpression(CallArgumentList, Option<Unit>);
 
 impl Parse for TupleExpression {

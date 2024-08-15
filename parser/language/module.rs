@@ -2,7 +2,7 @@
 use super::{call::*, expression::*, function::*, identifier::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Attribute {
     pub name: QualifiedName,
     pub arguments: Option<CallArgumentList>,
@@ -40,7 +40,7 @@ impl std::fmt::Display for Attribute {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum ModuleInitStatement {
     Use(UseStatement),
     Expression(Expression),
@@ -72,7 +72,7 @@ impl Parse for ModuleInitStatement {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
     #[allow(dead_code)]
     parameters: Vec<DefinitionParameter>,
@@ -105,7 +105,7 @@ impl Parse for ModuleInitDefinition {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ModuleBody {
     pub statements: Vec<ModuleStatement>,
     pub symbols: SymbolTable,
@@ -182,7 +182,7 @@ impl std::fmt::Display for ModuleBody {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ForStatement {
     loop_var: Assignment,
     body: ModuleBody,
@@ -214,7 +214,7 @@ impl std::fmt::Display for ForStatement {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum ModuleStatement {
     Use(UseStatement),
     Expression(Expression),
@@ -271,7 +271,7 @@ impl Eval for ModuleStatement {
             ModuleStatement::Expression(expr) => {
                 expr.eval(context)?;
             }
-            statement => unimplemented!("{statement}"),
+            statement => unimplemented!("{statement:#?}"),
         }
 
         Ok(())
@@ -296,7 +296,7 @@ impl std::fmt::Display for ModuleStatement {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ModuleDefinition {
     pub attributes: Vec<Attribute>,
     pub name: Identifier,
@@ -377,7 +377,7 @@ impl Parse for ModuleDefinition {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct UseAlias(pub QualifiedName, pub Identifier);
 
 impl std::fmt::Display for UseAlias {
@@ -386,7 +386,7 @@ impl std::fmt::Display for UseAlias {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum UseStatement {
     /// Import symbols given as qualified names: `use a, b`
     Use(Vec<QualifiedName>),

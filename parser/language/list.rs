@@ -1,7 +1,7 @@
 use super::{expression::*, units::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct ListExpression(ExpressionList, Option<Unit>);
 
 impl std::ops::Deref for ListExpression {
