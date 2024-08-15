@@ -17,6 +17,3 @@ lazy_static = "1.5"
 cgmath = "0.18"
 thiserror = "1.0"
 anyhow = "1"
-
-[build-dependencies]
-microcad_pest_test = { path = "microcad_pest_test", version = "0.1.0" }

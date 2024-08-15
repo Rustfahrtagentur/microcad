@@ -149,8 +149,6 @@ impl Parser {
     }
 }
 
-#[cfg(test)]
-include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
 /*use literal::NumberLiteral;
 use parser::Parse;
 
