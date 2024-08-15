@@ -113,7 +113,7 @@ pub struct ModuleBody {
 
 impl ModuleBody {
     fn new() -> Self {
-        ModuleBody {
+        Self {
             statements: Vec::new(),
             symbols: SymbolTable::new(),
         }
@@ -132,8 +132,12 @@ impl ModuleBody {
         }
     }
 
-    pub fn get_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+    pub fn get_symbols_by_name(&self, name: &Identifier) -> Vec<&Symbol> {
         self.symbols.get(name)
+    }
+
+    pub fn symbols(&self) -> &SymbolTable {
+        &self.symbols
     }
 
     pub fn get_symbol(&self, name: &Identifier) -> Option<&Symbol> {
@@ -261,6 +265,9 @@ impl Eval for ModuleStatement {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         match self {
+            ModuleStatement::Use(use_statement) => {
+                use_statement.eval(context)?;
+            }
             ModuleStatement::Expression(expr) => {
                 expr.eval(context)?;
             }
@@ -320,8 +327,12 @@ impl ModuleDefinition {
         self.body.add_symbol(symbol);
     }
 
-    pub fn get_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
-        self.body.get_symbols(name)
+    pub fn get_symbols_by_name(&self, name: &Identifier) -> Vec<&Symbol> {
+        self.body.get_symbols_by_name(name)
+    }
+
+    pub fn symbols(&self) -> &SymbolTable {
+        &self.body.symbols()
     }
 }
 
@@ -448,6 +459,33 @@ impl Parse for UseStatement {
                 )
             }
             _ => Err(ParseError::InvalidUseStatement),
+        }
+    }
+}
+
+impl Eval for UseStatement {
+    type Output = ();
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        match self {
+            UseStatement::UseAll(names) => {
+                for name in names {
+                    let symbol = name.eval(context)?;
+                    match symbol {
+                        Symbol::ModuleDefinition(module_definition) => {
+                            let symbols = module_definition.symbols();
+                            for symbol in symbols.iter() {
+                                context.add_symbol(symbol.clone());
+                            }
+                        }
+                        _ => {
+                            return Err(Error::ExpectedModule(name.clone()));
+                        }
+                    }
+                }
+                Ok(())
+            }
+            _ => unimplemented!(),
         }
     }
 }
