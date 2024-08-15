@@ -271,7 +271,7 @@ impl Eval for ModuleStatement {
             ModuleStatement::Expression(expr) => {
                 expr.eval(context)?;
             }
-            _ => unimplemented!(),
+            statement => unimplemented!("{statement}"),
         }
 
         Ok(())

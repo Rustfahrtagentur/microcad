@@ -70,7 +70,7 @@ impl std::fmt::Display for Tree {
                                 use microcad_parser::{{language::document::Document,parser}};
                                 use microcad_parser::eval::{{Symbol, Eval, Context}};
 
-                                let doc = match parser::Parser::parse_rule::<Document>(
+                                match parser::Parser::parse_rule::<Document>(
                                     parser::Rule::document,
                                     r#"
                                     {code}"#
@@ -85,7 +85,7 @@ impl std::fmt::Display for Tree {
                                             context.add_symbol(Symbol::ModuleDefinition(microcad_std::builtin_module()));
 
                                             if let Err(err) = doc.eval(&mut context) {{
-                                                println!("{{err}}");
+                                                println!("{err}");
                                             }} else {{
                                                 panic!("ERROR: test is marked to fail but succeeded");
                                             }}
@@ -98,7 +98,7 @@ impl std::fmt::Display for Tree {
                                             context.add_symbol(Symbol::ModuleDefinition(microcad_std::builtin_module()));
 
                                             if let Err(err) = doc.eval(&mut context) {{
-                                                println!("{{err}}");
+                                                println!("{err}");
                                             }}
                                         }},
                                         Err(err) => panic!("ERROR: {err}"),
