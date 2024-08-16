@@ -4,7 +4,7 @@ mod math;
 
 use microcad_parser::eval::*;
 use microcad_parser::language::{function::*, module::*};
-use microcad_render::tree::{Node, NodeInner};
+use microcad_render::tree::{Depth, Node, NodeInner};
 
 pub struct ModuleBuilder {
     module: ModuleDefinition,
@@ -144,10 +144,10 @@ fn test_export() {
         r#"
 use * from std;
 
-export("difference.svg") algorithm::difference() {{
+export("difference.svg") algorithm::difference() {
     geo2d::circle(radius = 3.0mm);
     geo2d::rect(width = 3.0mm, height = 2.0mm);
-}};
+};
             "#,
     ) {
         Ok(doc) => doc,
@@ -160,6 +160,10 @@ export("difference.svg") algorithm::difference() {{
     let node = doc.eval(&mut context).unwrap();
 
     for n in node.descendants() {
+        // Indent with depth
+        for _ in 0..n.depth() {
+            print!("  ");
+        }
         println!("{:?}", n);
     }
 }

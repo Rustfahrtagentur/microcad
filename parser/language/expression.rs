@@ -138,19 +138,16 @@ impl Eval for Nested {
                     _ => todo!(),
                 },
                 NestedItem::ModuleBody(body) => {
-                    new_nodes.push(body.eval(context)?);
-                    context.set_current_node(new_nodes.last().unwrap().clone());
+                    let new_node = body.eval(context)?;
+                    new_node.detach();
+                    let new_append = context.append_node(new_node);
+                    context.set_current_node(new_append);
                 }
             }
         }
 
-        // Finally, nest the new nodes
-        for node in new_nodes.iter().skip(1) {
-            context.current_node().append(node.clone());
-            context.set_current_node(node.clone());
-        }
-
         context.set_current_node(root.clone());
+        // Finally, nest the new nodes
 
         Ok(Value::Node(root.clone()))
     }
