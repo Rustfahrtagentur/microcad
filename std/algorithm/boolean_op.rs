@@ -30,8 +30,9 @@ impl Algorithm for BooleanOp {
                     _ => unimplemented!("This should throw a warning"),
                 }
             };
-
-        for child in parent.children() {
+        // TODO: This is a bit of a mess, we should probably refactor this
+        // first_child() must be a Group node
+        for child in parent.first_child().unwrap().children() {
             let c = &*child.borrow();
             match c {
                 NodeInner::Geometry2D(g) => handle_geo2d(g, &mut polygons),
