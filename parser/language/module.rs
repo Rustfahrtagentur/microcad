@@ -1,3 +1,5 @@
+use strum::IntoStaticStr;
+
 // Resolve a qualified name to a type or value.
 use super::{call::*, expression::*, function::*, identifier::*};
 use crate::{eval::*, parser::*, with_pair_ok};
@@ -214,7 +216,7 @@ impl std::fmt::Display for ForStatement {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum ModuleStatement {
     Use(UseStatement),
     Expression(Expression),
@@ -271,7 +273,10 @@ impl Eval for ModuleStatement {
             ModuleStatement::Expression(expr) => {
                 expr.eval(context)?;
             }
-            statement => unimplemented!("{statement:#?}"),
+            statement => {
+                let s: &'static str = statement.into();
+                unimplemented!(" {s}")
+            }
         }
 
         Ok(())
@@ -386,7 +391,7 @@ impl std::fmt::Display for UseAlias {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, IntoStaticStr)]
 pub enum UseStatement {
     /// Import symbols given as qualified names: `use a, b`
     Use(Vec<QualifiedName>),
@@ -485,7 +490,10 @@ impl Eval for UseStatement {
                 }
                 Ok(())
             }
-            _ => unimplemented!(),
+            statement => {
+                let s: &'static str = statement.into();
+                unimplemented!(" {s}")
+            }
         }
     }
 }
