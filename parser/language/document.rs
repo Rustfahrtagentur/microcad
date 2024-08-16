@@ -1,3 +1,5 @@
+use microcad_render::tree::{self, Node};
+
 use super::module::*;
 use crate::eval::*;
 use crate::{parser::*, with_pair_ok};
@@ -26,13 +28,15 @@ impl Parse for Document {
 }
 
 impl Eval for Document {
-    type Output = ();
+    type Output = Node;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        let node = tree::root();
+        context.set_current_node(node.clone());
         for statement in &self.body {
             statement.eval(context)?;
         }
-        Ok(())
+        Ok(node)
     }
 }
 
