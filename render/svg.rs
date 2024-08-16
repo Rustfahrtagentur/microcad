@@ -129,7 +129,7 @@ impl<'a> Renderer for SvgRenderer<'a> {
         let inner = node.borrow();
         let result = match &*inner {
             NodeInner::Algorithm(algorithm) => Some(algorithm.process(self, node.clone())),
-            _ => panic!("Node must be an algorithm"),
+            _ => panic!("Node must be an algorithm but is {:?}", node),
         };
 
         if let Some(result) = result {
