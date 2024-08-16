@@ -57,3 +57,19 @@ pub fn root() -> Node {
 pub fn group() -> Node {
     Node::new(NodeInner::Group)
 }
+
+pub trait Depth {
+    fn depth(&self) -> usize;
+}
+
+impl Depth for Node {
+    fn depth(&self) -> usize {
+        let mut depth = 0;
+        let mut node = Some(self.clone());
+        while let Some(n) = node {
+            depth += 1;
+            node = n.parent();
+        }
+        depth
+    }
+}
