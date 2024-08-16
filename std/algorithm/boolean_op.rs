@@ -7,7 +7,7 @@ pub enum BooleanOp {
 
 use geo::MultiPolygon;
 use microcad_render::{
-    geo2d::{self, Generator, Geometry},
+    geo2d::{Generator, Geometry},
     tree::{Algorithm, Node, NodeInner},
     Renderer,
 };
@@ -18,13 +18,13 @@ impl Algorithm for BooleanOp {
 
         let mut new_nodes = Vec::new();
 
-        let handle_geo2d = |g: &Box<Geometry>, polygons: &mut Vec<MultiPolygon>| match g.as_ref() {
+        let handle_geo2d = |g: &Geometry, polygons: &mut Vec<MultiPolygon>| match g {
             Geometry::MultiPolygon(p) => polygons.push(p.clone()),
             _ => unimplemented!("This should throw a warning"),
         };
 
         let handle_generator2d =
-            |generator: &Box<dyn Generator>, node: Node, polygons: &mut Vec<MultiPolygon>| {
+            |generator: &dyn Generator, node: Node, polygons: &mut Vec<MultiPolygon>| {
                 match generator.generate(renderer, node) {
                     Geometry::MultiPolygon(p) => polygons.push(p),
                     _ => unimplemented!("This should throw a warning"),
@@ -36,7 +36,7 @@ impl Algorithm for BooleanOp {
             match c {
                 NodeInner::Geometry2D(g) => handle_geo2d(g, &mut polygons),
                 NodeInner::Generator2D(generator) => {
-                    handle_generator2d(generator, child.clone(), &mut polygons)
+                    handle_generator2d(generator.as_ref(), child.clone(), &mut polygons)
                 }
                 NodeInner::Algorithm(algorithm) => {
                     new_nodes.push(algorithm.process(renderer, child.clone()))
@@ -50,7 +50,7 @@ impl Algorithm for BooleanOp {
             match c {
                 NodeInner::Geometry2D(g) => handle_geo2d(g, &mut polygons),
                 NodeInner::Generator2D(generator) => {
-                    handle_generator2d(generator, node.clone(), &mut polygons)
+                    handle_generator2d(generator.as_ref(), node.clone(), &mut polygons)
                 }
                 _ => continue,
             }

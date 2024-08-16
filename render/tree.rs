@@ -6,7 +6,7 @@ pub trait Algorithm {
 }
 
 pub struct Transform {
-    mat: Mat4,
+    _mat: Mat4,
 }
 
 pub enum NodeInner {
