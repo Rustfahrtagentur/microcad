@@ -149,17 +149,17 @@ impl Context {
         symbols
     }
 
-    pub fn append_node(&mut self, node: Node) {
-        self.current_node.append(node.clone())
+    pub fn current_node(&self) -> Node {
+        self.current_node.clone()
     }
 
-    pub fn add_parent(&mut self, node: Node) {
-        self.append_node(node.clone());
-        self.current_node = node.clone();
+    pub fn set_current_node(&mut self, node: Node) {
+        self.current_node = node;
     }
 
-    pub fn up(&mut self) {
-        self.current_node = self.current_node.parent().unwrap();
+    pub fn append_node(&mut self, node: Node) -> Node {
+        self.current_node.append(node.clone());
+        self.current_node.clone()
     }
 }
 

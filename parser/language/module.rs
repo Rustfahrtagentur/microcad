@@ -1,3 +1,4 @@
+use microcad_render::tree::Node;
 use strum::IntoStaticStr;
 
 // Resolve a qualified name to a type or value.
@@ -175,6 +176,17 @@ impl Parse for ModuleBody {
         }
 
         with_pair_ok!(body, pair)
+    }
+}
+
+impl Eval for ModuleBody {
+    type Output = ();
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        for statement in &self.statements {
+            statement.eval(context)?;
+        }
+        Ok(())
     }
 }
 
@@ -503,7 +515,8 @@ impl Eval for UseStatement {
     }
 }
 
-pub type BuiltinModuleFunctor = dyn Fn(EvaluatedCallArgumentList, &mut Context);
+pub type BuiltinModuleFunctor =
+    dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Node, Error>;
 
 #[derive(Clone)]
 pub struct BuiltinModule {
@@ -514,5 +527,19 @@ pub struct BuiltinModule {
 impl std::fmt::Debug for BuiltinModule {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "BUILTIN_MOD({})", &self.name)
+    }
+}
+
+impl BuiltinModule {
+    pub fn new(name: Identifier, f: &'static BuiltinModuleFunctor) -> Self {
+        Self { name, f }
+    }
+
+    pub fn call(
+        &self,
+        args: EvaluatedCallArgumentList,
+        context: &mut Context,
+    ) -> Result<Node, Error> {
+        (self.f)(args, context)
     }
 }

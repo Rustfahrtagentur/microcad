@@ -9,9 +9,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("geo2d")
         .builtin_module(BuiltinModule {
             name: "difference".into(),
-            f: &|_, ctx| {
-                ctx.append_node(difference());
-            },
+            f: &|_, ctx| Ok(ctx.append_node(difference())),
         })
         .build()
 }

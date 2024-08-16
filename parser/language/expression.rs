@@ -32,7 +32,7 @@ lazy_static::lazy_static! {
 pub enum NestedItem {
     Call(Call),
     QualifiedName(QualifiedName),
-    ModuleBody(Vec<ModuleStatement>),
+    ModuleBody(ModuleBody),
 }
 
 impl Parse for NestedItem {
@@ -49,13 +49,10 @@ impl Parse for NestedItem {
                 )
             }
             Rule::module_body => {
-                let mut vec = Vec::new();
-                for pair in pair.clone().into_inner() {
-                    if pair.as_rule() == Rule::module_statement {
-                        vec.push(ModuleStatement::parse(pair.clone())?.value().clone());
-                    }
-                }
-                with_pair_ok!(NestedItem::ModuleBody(vec), pair)
+                with_pair_ok!(
+                    NestedItem::ModuleBody(ModuleBody::parse(pair.clone())?.value().clone()),
+                    pair
+                )
             }
             rule => unreachable!(
                 "NestedItem::parse expected call or qualified name, found {:?}",
@@ -70,12 +67,7 @@ impl std::fmt::Display for NestedItem {
         match self {
             NestedItem::Call(call) => write!(f, "{}", call),
             NestedItem::QualifiedName(qualified_name) => write!(f, "{}", qualified_name),
-            NestedItem::ModuleBody(body) => {
-                for stmt in body {
-                    write!(f, "{{{}}}", stmt)?;
-                }
-                Ok(())
-            }
+            NestedItem::ModuleBody(body) => write!(f, "{}", body),
         }
     }
 }
@@ -101,25 +93,36 @@ impl Eval for Nested {
 
     fn eval(&self, context: &mut Context) -> Result<Value, Error> {
         let mut value = None;
+        let root = context.current_node();
+        let mut current_node = context.current_node();
         for item in &self.0 {
             if value.is_none() {
                 match item {
-                    NestedItem::Call(call) => value = Some(call.eval(context)?),
+                    NestedItem::Call(call) => {
+                        let args = call.argument_list.eval(context)?;
+                        match &call.name.eval(context)? {
+                            Symbol::Function(f) => value = Some(f.call(args, context)?),
+                            Symbol::BuiltinFunction(f) => value = Some(f.call(args, context)?),
+                            Symbol::BuiltinModule(m) => {
+                                let new_node = m.call(args, context)?;
+                                current_node.append(new_node.clone());
+                                current_node = new_node;
+                            }
+                            _ => unimplemented!("Call::eval for symbol"),
+                        };
+                    }
                     NestedItem::QualifiedName(qualified_name) => {
                         match qualified_name.eval(context)? {
                             Symbol::Value(_, v) => value = Some(v),
                             _ => todo!(),
                         }
                     }
-                    NestedItem::ModuleBody(body) => {
-                        for _stmt in body {
-                            // stmt.eval(context)?;
-                            todo!()
-                        }
-                    }
+                    NestedItem::ModuleBody(body) => body.eval(context)?,
                 }
             }
         }
+
+        context.set_current_node(root);
 
         match value {
             Some(v) => Ok(v),

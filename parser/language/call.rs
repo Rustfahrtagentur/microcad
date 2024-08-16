@@ -273,9 +273,9 @@ impl std::fmt::Display for MethodCall {
 #[derive(Clone, Debug, Default)]
 pub struct Call {
     #[allow(dead_code)]
-    name: QualifiedName,
+    pub name: QualifiedName,
     #[allow(dead_code)]
-    argument_list: CallArgumentList,
+    pub argument_list: CallArgumentList,
 }
 
 impl Parse for Call {
@@ -304,18 +304,15 @@ impl std::fmt::Display for Call {
 }
 
 impl Eval for Call {
-    type Output = Value;
+    type Output = Option<Value>;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        let args = self.argument_list.eval(context)?;
+
         match &self.name.eval(context)? {
-            Symbol::Function(f) => {
-                let args = self.argument_list.eval(context)?;
-                f.call(args, context)
-            }
-            Symbol::BuiltinFunction(f) => {
-                let args = self.argument_list.eval(context)?;
-                f.call(args, context)
-            }
+            Symbol::Function(f) => Ok(Some(f.call(args, context)?)),
+            Symbol::BuiltinFunction(f) => Ok(Some(f.call(args, context)?)),
+            Symbol::BuiltinModule(m) => Ok(None),
             _ => unimplemented!("Call::eval for symbol"),
         }
     }
