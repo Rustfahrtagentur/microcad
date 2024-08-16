@@ -92,7 +92,6 @@ impl Eval for Nested {
     type Output = Value;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
-        println!("{:#?}", context);
         let root = context.current_node();
 
         let mut new_nodes = Vec::new();
@@ -101,8 +100,20 @@ impl Eval for Nested {
                 NestedItem::Call(call) => {
                     let args = call.argument_list.eval(context)?;
                     match &call.name.eval(context)? {
-                        Symbol::Function(f) => return f.call(args, context),
-                        Symbol::BuiltinFunction(f) => return f.call(args, context),
+                        Symbol::Function(f) => {
+                            if index == 0 {
+                                return f.call(args, context);
+                            } else {
+                                return Err(Error::CannotNestFunctionCall);
+                            }
+                        }
+                        Symbol::BuiltinFunction(f) => {
+                            if index == 0 {
+                                return f.call(args, context);
+                            } else {
+                                return Err(Error::CannotNestFunctionCall);
+                            }
+                        }
                         Symbol::BuiltinModule(m) => {
                             new_nodes.push(m.call(args, context)?);
                             context.set_current_node(new_nodes.last().unwrap().clone());
@@ -116,12 +127,27 @@ impl Eval for Nested {
                             new_nodes.push(node.clone());
                             context.set_current_node(new_nodes.last().unwrap().clone());
                         }
-                        _ => return Ok(v),
+                        v => {
+                            if index == 0 {
+                                return Ok(v);
+                            } else {
+                                return Err(Error::CannotNestFunctionCall);
+                            }
+                        }
                     },
                     _ => todo!(),
                 },
-                NestedItem::ModuleBody(body) => body.eval(context)?,
+                NestedItem::ModuleBody(body) => {
+                    new_nodes.push(body.eval(context)?);
+                    context.set_current_node(new_nodes.last().unwrap().clone());
+                }
             }
+        }
+
+        // Finally, nest the new nodes
+        for node in new_nodes.iter().skip(1) {
+            context.current_node().append(node.clone());
+            context.set_current_node(node.clone());
         }
 
         context.set_current_node(root.clone());

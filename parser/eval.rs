@@ -52,6 +52,8 @@ pub enum Error {
     InvalidArgumentType(Type),
     #[error("Expected module: {0}")]
     ExpectedModule(QualifiedName),
+    #[error("Cannot nest function call")]
+    CannotNestFunctionCall,
 }
 
 #[derive(Clone, Debug)]
