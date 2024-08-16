@@ -47,12 +47,15 @@ impl Generator for Rectangle {
         _: microcad_render::tree::Node,
     ) -> Geometry {
         use geo::line_string;
-        let line_string = geo::line_string![
-            (x: 0.0, y: 0.0),
-            (x: self.width, y: 0.0),
-            (x: self.width, y: self.height),
-            (x: 0.0, y: self.height),
-            (x: 0.0, y: 0.0),
+        let w2 = self.width / 2.0;
+        let h2 = self.height / 2.0;
+        // Rect is centered at 0,0
+        let line_string = line_string![
+            (x: -w2, y: -h2),
+            (x: w2, y: -h2),
+            (x: w2, y: h2),
+            (x: -w2, y: h2),
+            (x: -w2, y: -h2),
         ];
 
         Geometry::MultiPolygon(microcad_render::geo2d::line_string_to_multi_polygon(
