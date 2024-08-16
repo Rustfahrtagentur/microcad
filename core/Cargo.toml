@@ -1,0 +1,13 @@
+[package]
+name = "microcad-core"
+description = "µCAD core"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+log = "0.4"
+cgmath = "0.18"
