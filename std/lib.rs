@@ -78,6 +78,8 @@ macro_rules! arg_2 {
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("std")
         .module(math::builtin_module())
+        .module(geo2d::builtin_module())
+        .module(algorithm::builtin_module())
         .builtin_function(BuiltinFunction::new("assert".into(), &|args, _| {
             assert!(args[0].into_bool()?);
             Ok(args[0].clone())

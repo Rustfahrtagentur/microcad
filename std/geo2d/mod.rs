@@ -31,6 +31,7 @@ impl Generator for Circle {
 
 use microcad_render::tree::{Node, NodeInner};
 
+use crate::algorithm::boolean_op::difference;
 use crate::ModuleBuilder;
 
 pub fn circle(radius: Scalar) -> Node {
