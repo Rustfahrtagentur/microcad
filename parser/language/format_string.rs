@@ -27,6 +27,7 @@ impl Parse for FormatSpec {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Clone, Default, Debug)]
 pub struct FormatExpression(FormatSpec, Box<Expression>);
 

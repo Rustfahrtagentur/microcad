@@ -180,7 +180,6 @@ impl PestFile {
     ) -> Result<(), std::io::Error> {
         let mut r = RustWriter::new(w);
         r.writeln("mod grammar {")?;
-        r.writeln("use crate::*;")?;
         r.writeln("use log::error;")?;
 
         // Generate tests for each rule

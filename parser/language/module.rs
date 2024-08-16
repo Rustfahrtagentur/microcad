@@ -332,7 +332,7 @@ impl ModuleDefinition {
     }
 
     pub fn symbols(&self) -> &SymbolTable {
-        &self.body.symbols()
+        self.body.symbols()
     }
 }
 
