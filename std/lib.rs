@@ -4,6 +4,7 @@ mod math;
 
 use microcad_parser::eval::*;
 use microcad_parser::language::{function::*, module::*};
+use microcad_render::tree::{Node, NodeInner};
 
 pub struct ModuleBuilder {
     module: ModuleDefinition,
@@ -75,6 +76,10 @@ macro_rules! arg_2 {
     };
 }
 
+pub fn export(filename: String) -> Node {
+    Node::new(NodeInner::Export(filename))
+}
+
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("std")
         .module(math::builtin_module())
@@ -84,6 +89,13 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             assert!(args[0].into_bool()?);
             Ok(args[0].clone())
         }))
+        .builtin_module(BuiltinModule {
+            name: "export".into(),
+            f: &|args, ctx| {
+                let filename = args.arg_1("filename")?.to_string();
+                Ok(ctx.append_node(export(filename)))
+            },
+        })
         .build()
 }
 
@@ -122,4 +134,32 @@ fn difference_svg() {
     let mut renderer = SvgRenderer::new(&mut file).unwrap();
 
     renderer.render(difference);
+}
+
+#[test]
+fn test_export() {
+    use microcad_parser::{language::document::Document, parser};
+    let doc = match parser::Parser::parse_rule::<Document>(
+        parser::Rule::document,
+        r#"
+use * from std;
+
+export("difference.svg") algorithm::difference() {{
+    geo2d::circle(radius = 3.0mm);
+    geo2d::rect(width = 3.0mm, height = 2.0mm);
+}};
+            "#,
+    ) {
+        Ok(doc) => doc,
+        Err(err) => panic!("ERROR: {err}"),
+    };
+
+    let mut context = Context::default();
+    context.add_symbol(Symbol::ModuleDefinition(builtin_module()));
+
+    let node = doc.eval(&mut context).unwrap();
+
+    for n in node.descendants() {
+        println!("{:?}", n);
+    }
 }
