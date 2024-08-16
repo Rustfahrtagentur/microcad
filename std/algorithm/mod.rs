@@ -10,7 +10,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .builtin_module(BuiltinModule {
             name: "difference".into(),
             f: &|_, ctx| {
-                ctx.add_parent(difference());
+                ctx.append_node(difference());
             },
         })
         .build()

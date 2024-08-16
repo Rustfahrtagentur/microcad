@@ -31,12 +31,44 @@ impl Generator for Circle {
 
 use microcad_render::tree::{Node, NodeInner};
 
-use crate::algorithm::boolean_op::difference;
-use crate::ModuleBuilder;
-
 pub fn circle(radius: Scalar) -> Node {
     Node::new(NodeInner::Generator2D(Box::new(Circle { radius })))
 }
+
+struct Rectangle {
+    width: f64,
+    height: f64,
+}
+
+impl Generator for Rectangle {
+    fn generate(
+        &self,
+        renderer: &dyn microcad_render::Renderer,
+        _: microcad_render::tree::Node,
+    ) -> Geometry {
+        use geo::line_string;
+        let line_string = geo::line_string![
+            (x: 0.0, y: 0.0),
+            (x: self.width, y: 0.0),
+            (x: self.width, y: self.height),
+            (x: 0.0, y: self.height),
+            (x: 0.0, y: 0.0),
+        ];
+
+        Geometry::MultiPolygon(microcad_render::geo2d::line_string_to_multi_polygon(
+            line_string,
+        ))
+    }
+}
+
+pub fn rect(width: f64, height: f64) -> Node {
+    Node::new(NodeInner::Generator2D(Box::new(Rectangle {
+        width,
+        height,
+    })))
+}
+
+use crate::ModuleBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("geo2d")
@@ -45,6 +77,17 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             f: &|args, ctx| {
                 if let Ok(arg) = args.arg_1("radius") {
                     ctx.append_node(circle(arg.into_scalar().unwrap()));
+                }
+            },
+        })
+        .builtin_module(BuiltinModule {
+            name: "rect".into(),
+            f: &|args, ctx| {
+                if let Ok((width, height)) = args.arg_2("width", "height") {
+                    ctx.append_node(rect(
+                        width.into_scalar().unwrap(),
+                        height.into_scalar().unwrap(),
+                    ));
                 }
             },
         })
