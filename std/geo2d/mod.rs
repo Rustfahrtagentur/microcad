@@ -4,6 +4,7 @@ pub struct Circle {
     pub radius: Scalar,
 }
 
+use microcad_parser::language::module::{BuiltinModule, ModuleDefinition};
 use microcad_render::geo2d::{Generator, Geometry, LineString};
 
 impl Generator for Circle {
@@ -30,6 +31,21 @@ impl Generator for Circle {
 
 use microcad_render::tree::{Node, NodeInner};
 
+use crate::ModuleBuilder;
+
 pub fn circle(radius: Scalar) -> Node {
     Node::new(NodeInner::Generator2D(Box::new(Circle { radius })))
+}
+
+pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
+    ModuleBuilder::namespace("geo2d")
+        .builtin_module(BuiltinModule {
+            name: "circle".into(),
+            f: &|args, ctx| {
+                if let Ok(arg) = args.arg_1("radius") {
+                    ctx.append_node(circle(arg.into_scalar().unwrap()));
+                }
+            },
+        })
+        .build()
 }

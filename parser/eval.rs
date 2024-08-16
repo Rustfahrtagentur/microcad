@@ -1,6 +1,7 @@
 use std::ops::Deref;
 
 use crate::language::{function::*, identifier::*, lang_type::*, module::*, value::*};
+use microcad_render::tree::Node;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -59,7 +60,7 @@ pub enum Symbol {
     Function(std::rc::Rc<FunctionDefinition>),
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
     BuiltinFunction(BuiltinFunction),
-    // BuiltinModule(Identifier, BuiltinModule),
+    BuiltinModule(BuiltinModule),
 }
 
 impl Symbol {
@@ -69,6 +70,7 @@ impl Symbol {
             Self::Function(f) => &f.name,
             Self::ModuleDefinition(m) => &m.name,
             Self::BuiltinFunction(f) => &f.name,
+            Self::BuiltinModule(m) => &m.name,
         }
     }
 
@@ -123,6 +125,7 @@ impl Deref for SymbolTable {
 pub struct Context {
     stack: Vec<SymbolTable>,
     //    type_registry: HashMap<String, SyntaxNode>,
+    current_node: microcad_render::tree::Node,
 }
 
 impl Context {
@@ -145,12 +148,26 @@ impl Context {
         }
         symbols
     }
+
+    pub fn append_node(&mut self, node: Node) {
+        self.current_node.append(node.clone())
+    }
+
+    pub fn add_parent(&mut self, node: Node) {
+        self.append_node(node.clone());
+        self.current_node = node.clone();
+    }
+
+    pub fn up(&mut self) {
+        self.current_node = self.current_node.parent().unwrap();
+    }
 }
 
 impl Default for Context {
     fn default() -> Self {
         Self {
             stack: vec![SymbolTable::default()],
+            current_node: microcad_render::tree::root(),
         }
     }
 }

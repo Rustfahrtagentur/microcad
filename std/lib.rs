@@ -21,6 +21,11 @@ impl ModuleBuilder {
         self
     }
 
+    pub fn builtin_module(&mut self, m: BuiltinModule) -> &mut Self {
+        self.module.add_symbol(Symbol::BuiltinModule(m));
+        self
+    }
+
     pub fn module(&mut self, m: std::rc::Rc<ModuleDefinition>) -> &mut Self {
         self.module.add_module(m);
         self

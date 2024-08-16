@@ -111,6 +111,7 @@ impl Parse for ModuleInitDefinition {
 pub struct ModuleBody {
     pub statements: Vec<ModuleStatement>,
     pub symbols: SymbolTable,
+    pub inits: Vec<std::rc::Rc<ModuleInitDefinition>>,
 }
 
 impl ModuleBody {
@@ -118,6 +119,7 @@ impl ModuleBody {
         Self {
             statements: Vec::new(),
             symbols: SymbolTable::new(),
+            inits: Vec::new(),
         }
     }
 
@@ -129,6 +131,9 @@ impl ModuleBody {
             }
             ModuleStatement::ModuleDefinition(module) => {
                 self.symbols.add(Symbol::ModuleDefinition(module));
+            }
+            ModuleStatement::ModuleInitDefinition(init) => {
+                self.inits.push(init.clone());
             }
             _ => {}
         }
@@ -224,7 +229,7 @@ pub enum ModuleStatement {
     Assignment(Assignment),
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
     FunctionDefinition(std::rc::Rc<FunctionDefinition>),
-    ModuleInitDefinition(ModuleInitDefinition),
+    ModuleInitDefinition(std::rc::Rc<ModuleInitDefinition>),
 }
 
 impl Parse for ModuleStatement {
@@ -250,7 +255,7 @@ impl Parse for ModuleStatement {
                         ModuleDefinition::parse(first)?.value().clone(),
                     )),
                 Rule::module_init_definition => ModuleStatement::ModuleInitDefinition(
-                    ModuleInitDefinition::parse(first)?.value().clone(),
+                    std::rc::Rc::new(ModuleInitDefinition::parse(first)?.value().clone(),)
                 ),
                 Rule::function_definition => ModuleStatement::FunctionDefinition(std::rc::Rc::new(
                     FunctionDefinition::parse(first)?.value().clone(),
@@ -495,5 +500,19 @@ impl Eval for UseStatement {
                 unimplemented!(" {s}")
             }
         }
+    }
+}
+
+pub type BuiltinModuleFunctor = dyn Fn(EvaluatedCallArgumentList, &mut Context);
+
+#[derive(Clone)]
+pub struct BuiltinModule {
+    pub name: Identifier,
+    pub f: &'static BuiltinModuleFunctor,
+}
+
+impl std::fmt::Debug for BuiltinModule {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "BUILTIN_MOD({})", &self.name)
     }
 }

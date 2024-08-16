@@ -10,8 +10,8 @@ pub struct Transform {
 }
 
 pub enum NodeInner {
-    // A group node that only contains children
-    Group,
+    // A root node that only contains children
+    Root,
 
     /// A trait that generates a 2D geometry, e.g. a primitive like a circle
     Generator2D(Box<dyn geo2d::Generator>),
@@ -27,3 +27,7 @@ pub enum NodeInner {
 }
 
 pub type Node = rctree::Node<NodeInner>;
+
+pub fn root() -> Node {
+    Node::new(NodeInner::Root)
+}
