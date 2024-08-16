@@ -208,6 +208,8 @@ pub enum Type {
     NamedTuple(NamedTupleType),
     /// A custom type or a module node in the syntax tree
     Custom(QualifiedName),
+    /// Node
+    Node,
 }
 
 impl Type {
@@ -273,6 +275,7 @@ impl std::fmt::Display for Type {
             Self::UnnamedTuple(t) => write!(f, "{}", t),
             Self::NamedTuple(t) => write!(f, "{}", t),
             Self::Custom(qn) => write!(f, "{}", qn),
+            Self::Node => write!(f, "{{}}"),
         }
     }
 }

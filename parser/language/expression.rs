@@ -91,43 +91,42 @@ impl Parse for Nested {
 impl Eval for Nested {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
-        let mut value = None;
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        println!("{:#?}", context);
         let root = context.current_node();
-        let mut current_node = context.current_node();
-        for item in &self.0 {
-            if value.is_none() {
-                match item {
-                    NestedItem::Call(call) => {
-                        let args = call.argument_list.eval(context)?;
-                        match &call.name.eval(context)? {
-                            Symbol::Function(f) => value = Some(f.call(args, context)?),
-                            Symbol::BuiltinFunction(f) => value = Some(f.call(args, context)?),
-                            Symbol::BuiltinModule(m) => {
-                                let new_node = m.call(args, context)?;
-                                current_node.append(new_node.clone());
-                                current_node = new_node;
-                            }
-                            _ => unimplemented!("Call::eval for symbol"),
-                        };
-                    }
-                    NestedItem::QualifiedName(qualified_name) => {
-                        match qualified_name.eval(context)? {
-                            Symbol::Value(_, v) => value = Some(v),
-                            _ => todo!(),
+
+        let mut new_nodes = Vec::new();
+        for (index, item) in self.0.iter().enumerate() {
+            match item {
+                NestedItem::Call(call) => {
+                    let args = call.argument_list.eval(context)?;
+                    match &call.name.eval(context)? {
+                        Symbol::Function(f) => return f.call(args, context),
+                        Symbol::BuiltinFunction(f) => return f.call(args, context),
+                        Symbol::BuiltinModule(m) => {
+                            new_nodes.push(m.call(args, context)?);
+                            context.set_current_node(new_nodes.last().unwrap().clone());
                         }
-                    }
-                    NestedItem::ModuleBody(body) => body.eval(context)?,
+                        _ => unimplemented!("Call::eval for symbol"),
+                    };
                 }
+                NestedItem::QualifiedName(qualified_name) => match qualified_name.eval(context)? {
+                    Symbol::Value(_, v) => match v {
+                        Value::Node(node) => {
+                            new_nodes.push(node.clone());
+                            context.set_current_node(new_nodes.last().unwrap().clone());
+                        }
+                        _ => return Ok(v),
+                    },
+                    _ => todo!(),
+                },
+                NestedItem::ModuleBody(body) => body.eval(context)?,
             }
         }
 
-        context.set_current_node(root);
+        context.set_current_node(root.clone());
 
-        match value {
-            Some(v) => Ok(v),
-            None => Err(Error::Unknown),
-        }
+        Ok(Value::Node(root.clone()))
     }
 }
 

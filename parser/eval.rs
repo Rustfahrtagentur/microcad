@@ -122,6 +122,7 @@ impl Deref for SymbolTable {
 /// @brief Context for evaluation
 /// @details The context is used to store the current state of the evaluation.
 /// A context is essentially a stack of symbol tables
+#[derive(Debug)]
 pub struct Context {
     stack: Vec<SymbolTable>,
     //    type_registry: HashMap<String, SyntaxNode>,
@@ -157,9 +158,10 @@ impl Context {
         self.current_node = node;
     }
 
+    /// Append a node to the current node and return the new node
     pub fn append_node(&mut self, node: Node) -> Node {
         self.current_node.append(node.clone());
-        self.current_node.clone()
+        node.clone()
     }
 }
 

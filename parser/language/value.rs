@@ -1,6 +1,7 @@
 use super::{color::*, identifier::*, lang_type::*, units::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
+use microcad_render::tree::Node;
 use thiserror::Error;
 
 pub type Number = super::literal::NumberLiteral;
@@ -287,6 +288,9 @@ pub enum Value {
     NamedTuple(NamedTuple),
 
     UnnamedTuple(UnnamedTuple),
+
+    /// A node in the render tree
+    Node(Node),
 }
 
 impl Value {
@@ -378,6 +382,7 @@ impl Ty for Value {
             Value::Map(map) => map.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
+            Value::Node(_) => Type::Node,
         }
     }
 }
@@ -527,6 +532,7 @@ impl std::fmt::Display for Value {
             Value::Map(m) => write!(f, "{}", m),
             Value::NamedTuple(t) => write!(f, "{}", t),
             Value::UnnamedTuple(t) => write!(f, "{}", t),
+            Value::Node(n) => write!(f, "{:?}", n),
         }
     }
 }

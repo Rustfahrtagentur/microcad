@@ -6,7 +6,7 @@ use crate::ModuleBuilder;
 pub mod boolean_op;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    ModuleBuilder::namespace("geo2d")
+    ModuleBuilder::namespace("algorithm")
         .builtin_module(BuiltinModule {
             name: "difference".into(),
             f: &|_, ctx| Ok(ctx.append_node(difference())),
