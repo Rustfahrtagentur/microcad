@@ -1,4 +1,4 @@
-use microcad_render::tree::Node;
+use microcad_render::tree::{self, Node};
 use strum::IntoStaticStr;
 
 // Resolve a qualified name to a type or value.
@@ -159,6 +159,7 @@ impl ModuleBody {
 
 impl Parse for ModuleBody {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        Parser::ensure_rule(&pair, Rule::module_body);
         let mut body = ModuleBody::new();
 
         for pair in pair.clone().into_inner() {
@@ -180,13 +181,20 @@ impl Parse for ModuleBody {
 }
 
 impl Eval for ModuleBody {
-    type Output = ();
+    type Output = Node;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        let node = tree::group();
+        let current = context.current_node();
+        context.set_current_node(node.clone());
+        context.push();
         for statement in &self.statements {
             statement.eval(context)?;
         }
-        Ok(())
+        context.pop();
+        context.set_current_node(current.clone());
+
+        Ok(node.clone())
     }
 }
 
@@ -272,7 +280,11 @@ impl Parse for ModuleStatement {
                 Rule::function_definition => ModuleStatement::FunctionDefinition(std::rc::Rc::new(
                     FunctionDefinition::parse(first)?.value().clone(),
                 )),
-                rule => unreachable!("Unexpected module statement, got {:?}", rule),
+                rule => unreachable!(
+                    "Unexpected module statement, got {:?} {:?}",
+                    rule,
+                    first.clone()
+                ),
             },
             pair
         )
