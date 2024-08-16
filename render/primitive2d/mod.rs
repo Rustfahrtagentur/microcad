@@ -2,12 +2,6 @@ use crate::{Node, NodeInner};
 
 use std::convert::From;
 
-pub type Scalar = f64;
-pub type LineString = geo::LineString<Scalar>;
-pub type Polygon = geo::Polygon<Scalar>;
-pub type MultiPolygon = geo::MultiPolygon<Scalar>;
-pub type Rect = geo::Rect<Scalar>;
-pub type Point = geo::Point<Scalar>;
 
 pub mod svg;
 
@@ -30,10 +24,6 @@ impl From<Rectangle> for Node {
     fn from(value: Rectangle) -> Self {
         Node::new(NodeInner::RenderMultiPolygon(Box::new(value)))
     }
-}
-
-fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
-    MultiPolygon::new(vec![Polygon::new(line_string, vec![])])
 }
 
 impl RenderMultiPolygon for Circle {

@@ -1,3 +1,5 @@
+mod algorithm;
+mod geo2d;
 mod math;
 
 use microcad_parser::eval::*;
@@ -97,4 +99,20 @@ fn test_assert() {
     if let Err(err) = doc.eval(&mut context) {
         println!("{err}");
     }
+}
+
+#[test]
+fn difference_svg() {
+    use crate::algorithm;
+    use microcad_render::svg::SvgRenderer;
+    use microcad_render::Renderer;
+
+    let difference = algorithm::boolean_op::difference();
+    difference.append(crate::geo2d::circle(4.0));
+    difference.append(crate::geo2d::circle(2.0));
+
+    let mut file = std::fs::File::create("difference.svg").unwrap();
+    let mut renderer = SvgRenderer::new(&mut file).unwrap();
+
+    renderer.render(difference);
 }
