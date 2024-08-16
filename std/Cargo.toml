@@ -19,3 +19,4 @@ thiserror = "1.0"
 cgmath = "0.18"
 
 microcad-parser = { path = "../parser" }
+microcad-core = { path = "../core" }
