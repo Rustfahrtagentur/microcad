@@ -102,6 +102,8 @@ impl Eval for Nested {
                     None => {
                         if index != 0 {
                             return Err(Error::CannotNestFunctionCall);
+                        } else {
+                            return Ok(Value::Scalar(0.0)); // @todo This is a hack. Return a Option::None here
                         }
                     }
                 },
@@ -121,13 +123,6 @@ impl Eval for Nested {
                     values.push(Value::Node(new_node));
                 }
             }
-
-            if let Value::Node(node) = values.last().unwrap() {
-                let new_append = context.append_node(node.clone());
-                context.set_current_node(new_append);
-            } else if values.len() > 1 {
-                return Err(Error::CannotNestFunctionCall);
-            }
         }
 
         assert!(!values.is_empty());
@@ -136,10 +131,13 @@ impl Eval for Nested {
             return Ok(values[0].clone());
         }
 
+        // Finally, nest all nodes
         for value in values {
             match value {
                 Value::Node(node) => {
-                    context.current_node().append(node);
+                    node.detach();
+                    let nested = context.append_node(node);
+                    context.set_current_node(nested);
                 }
                 _ => {
                     return Err(Error::CannotNestFunctionCall);
@@ -148,7 +146,6 @@ impl Eval for Nested {
         }
 
         context.set_current_node(root.clone());
-        // Finally, nest the new nodes
 
         Ok(Value::Node(root.clone()))
     }
