@@ -1,22 +1,30 @@
-use super::{call::*, expression::*, identifier::*, lang_type::*, module::*, value::*};
+use super::{
+    call::*,
+    expression::*,
+    identifier::*,
+    lang_type::*,
+    module::*,
+    value::{self, *},
+};
 use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub struct DefinitionParameter {
-    #[allow(dead_code)]
     name: Identifier,
-    #[allow(dead_code)]
     specified_type: Option<Type>,
-    #[allow(dead_code)]
-    value: Option<Expression>,
+    default_value: Option<Expression>,
 }
 
 impl DefinitionParameter {
-    pub fn new(name: Identifier, specified_type: Option<Type>, value: Option<Expression>) -> Self {
+    pub fn new(
+        name: Identifier,
+        specified_type: Option<Type>,
+        default_value: Option<Expression>,
+    ) -> Self {
         Self {
             name,
             specified_type,
-            value,
+            default_value,
         }
     }
 
@@ -28,14 +36,14 @@ impl DefinitionParameter {
         self.specified_type.as_ref()
     }
 
-    pub fn value(&self) -> Option<&Expression> {
-        self.value.as_ref()
+    pub fn default_value(&self) -> Option<&Expression> {
+        self.default_value.as_ref()
     }
 }
 
 impl std::fmt::Display for DefinitionParameter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match (&self.specified_type, &self.value) {
+        match (&self.specified_type, &self.default_value) {
             (Some(t), Some(v)) => write!(f, "{}: {} = {}", self.name, t, v)?,
             (Some(t), None) => write!(f, "{}: {}", self.name, t)?,
             (None, Some(v)) => write!(f, "{} = {}", self.name, v)?,
@@ -50,7 +58,7 @@ impl Parse for DefinitionParameter {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let mut name = Identifier::default();
         let mut specified_type = None;
-        let mut value = None;
+        let mut default_value = None;
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
@@ -61,7 +69,7 @@ impl Parse for DefinitionParameter {
                     specified_type = Some(Type::parse(pair)?.value().clone());
                 }
                 Rule::expression => {
-                    value = Some(Expression::parse(pair)?.value().clone());
+                    default_value = Some(Expression::parse(pair)?.value().clone());
                 }
                 rule => {
                     unreachable!(
@@ -73,7 +81,7 @@ impl Parse for DefinitionParameter {
             }
         }
 
-        if specified_type.is_none() && value.is_none() {
+        if specified_type.is_none() && default_value.is_none() {
             return Err(ParseError::DefinitionParameterMissingTypeOrValue(
                 name.clone(),
             ));
@@ -83,10 +91,39 @@ impl Parse for DefinitionParameter {
             Self {
                 name,
                 specified_type,
-                value,
+                default_value,
             },
             pair
         )
+    }
+}
+
+impl Eval for DefinitionParameter {
+    type Output = (Option<Value>, Type);
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        match (&self.specified_type, &self.default_value) {
+            (Some(specified_type), Some(expr)) => {
+                let default_value = expr.eval(context)?;
+                if specified_type != &default_value.ty() {
+                    Err(Error::DefinitionParameterTypeMismatch(
+                        self.name.clone(),
+                        specified_type.clone(),
+                        default_value.ty(),
+                    ))
+                } else {
+                    Ok((Some(default_value), specified_type.clone()))
+                }
+            }
+            (Some(t), None) => Ok((None, t.clone())),
+            (None, Some(expr)) => {
+                let default_value = expr.eval(context)?;
+                Ok((Some(default_value.clone()), default_value.ty()))
+            }
+            (None, None) => Err(Error::DefinitionParameterMissingTypeOrValue(
+                self.name.clone(),
+            )),
+        }
     }
 }
 
@@ -269,11 +306,12 @@ impl Parse for FunctionStatement {
 }
 
 pub type BuiltinFunctionFunctor =
-    dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Value, Error>;
+    dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>, Error>;
 
 #[derive(Clone)]
 pub struct BuiltinFunction {
     pub name: Identifier,
+    pub signature: FunctionSignature,
     pub f: &'static BuiltinFunctionFunctor,
 }
 
@@ -284,16 +322,37 @@ impl std::fmt::Debug for BuiltinFunction {
 }
 
 impl BuiltinFunction {
-    pub fn new(name: Identifier, f: &'static BuiltinFunctionFunctor) -> Self {
-        Self { name, f }
+    pub fn new(
+        name: Identifier,
+        signature: FunctionSignature,
+        f: &'static BuiltinFunctionFunctor,
+    ) -> Self {
+        Self { name, signature, f }
     }
 
     pub fn call(
         &self,
-        args: EvaluatedCallArgumentList,
+        args: &CallArgumentList,
         context: &mut Context,
-    ) -> Result<Value, Error> {
-        (self.f)(args, context)
+    ) -> Result<Option<Value>, Error> {
+        let arg_map = args.match_definition(&self.signature.parameters, context)?;
+        let result = (self.f)(&arg_map, context)?;
+
+        match (&result, &self.signature.return_type) {
+            (Some(result), Some(return_type)) => {
+                if result.ty() != *return_type {
+                    Err(Error::TypeMismatch {
+                        expected: return_type.clone(),
+                        found: result.ty(),
+                    })
+                } else {
+                    Ok(Some(result.clone()))
+                }
+            }
+            (Some(result), None) => Ok(Some(result.clone())),
+            (None, Some(_)) => Err(Error::FunctionCallMissingReturn),
+            _ => Ok(None),
+        }
     }
 }
 
@@ -343,33 +402,28 @@ impl FunctionDefinition {
 
     pub fn call(
         &self,
-        args: EvaluatedCallArgumentList,
+        args: &CallArgumentList,
         context: &mut Context,
-    ) -> Result<Value, Error> {
+    ) -> Result<Option<Value>, Error> {
         // TODO: Check if the arguments are correct
         let params = self.signature.parameters();
+        let arg_map = args.match_definition(params, context)?;
 
-        for param in params {
-            match args.get_named_arg(&param.name) {
-                Some(value) => context.add_symbol(Symbol::Value(param.name.clone(), value.clone())),
-                None => {
-                    return Err(crate::eval::Error::FunctionCallMissingArgument(
-                        param.name.clone(),
-                    ))
-                }
-            }
+        context.push();
+        for (name, value) in arg_map.iter() {
+            context.add_symbol(Symbol::Value(name.clone(), value.clone()));
         }
 
         for statement in self.body.0.iter() {
             match statement {
                 FunctionStatement::Assignment(assignment) => assignment.eval(context)?,
-                FunctionStatement::Return(expr) => return expr.eval(context),
+                FunctionStatement::Return(expr) => return Ok(Some(expr.eval(context)?)),
                 FunctionStatement::FunctionDefinition(f) => f.eval(context)?,
                 _ => unimplemented!(),
             }
         }
-
-        Err(crate::eval::Error::FunctionCallMissingReturn)
+        context.pop();
+        Ok(None)
     }
 }
 

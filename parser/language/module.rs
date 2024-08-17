@@ -37,7 +37,7 @@ impl Parse for Attribute {
 impl std::fmt::Display for Attribute {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.arguments {
-            Some(arguments) => write!(f, "{}({})", self.name, arguments),
+            Some(arguments) => write!(f, "{}({:?})", self.name, arguments),
             None => write!(f, "{}", self.name),
         }
     }
@@ -187,11 +187,9 @@ impl Eval for ModuleBody {
         let node = tree::group();
         let current = context.current_node();
         context.set_current_node(node.clone());
-        context.push();
         for statement in &self.statements {
             statement.eval(context)?;
         }
-        context.pop();
         context.set_current_node(current.clone());
 
         Ok(node.clone())
@@ -504,16 +502,18 @@ impl Eval for UseStatement {
         match self {
             UseStatement::UseAll(names) => {
                 for name in names {
-                    let symbol = name.eval(context)?;
-                    match symbol {
-                        Symbol::ModuleDefinition(module_definition) => {
-                            let symbols = module_definition.symbols();
-                            for symbol in symbols.iter() {
-                                context.add_symbol(symbol.clone());
+                    let symbols = name.eval(context)?;
+                    for symbol in symbols {
+                        match symbol {
+                            Symbol::ModuleDefinition(module_definition) => {
+                                let symbols = module_definition.symbols();
+                                for symbol in symbols.iter() {
+                                    context.add_symbol(symbol.clone());
+                                }
                             }
-                        }
-                        _ => {
-                            return Err(Error::ExpectedModule(name.clone()));
+                            _ => {
+                                return Err(Error::ExpectedModule(name.clone()));
+                            }
                         }
                     }
                 }
@@ -527,12 +527,12 @@ impl Eval for UseStatement {
     }
 }
 
-pub type BuiltinModuleFunctor =
-    dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Node, Error>;
+pub type BuiltinModuleFunctor = dyn Fn(&ArgumentMap, &mut Context) -> Result<Node, Error>;
 
 #[derive(Clone)]
 pub struct BuiltinModule {
     pub name: Identifier,
+    pub parameters: Vec<DefinitionParameter>,
     pub f: &'static BuiltinModuleFunctor,
 }
 
@@ -543,16 +543,21 @@ impl std::fmt::Debug for BuiltinModule {
 }
 
 impl BuiltinModule {
-    pub fn new(name: Identifier, f: &'static BuiltinModuleFunctor) -> Self {
-        Self { name, f }
+    pub fn new(
+        name: Identifier,
+        parameters: Vec<DefinitionParameter>,
+        f: &'static BuiltinModuleFunctor,
+    ) -> Self {
+        Self {
+            name,
+            parameters,
+            f,
+        }
     }
 
-    pub fn call(
-        &self,
-        args: EvaluatedCallArgumentList,
-        context: &mut Context,
-    ) -> Result<Node, Error> {
-        (self.f)(args, context)
+    pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Node, Error> {
+        let arg_map = args.match_definition(&self.parameters, context)?;
+        (self.f)(&arg_map, context)
     }
 }
 
@@ -569,6 +574,7 @@ macro_rules! builtin_module {
     ($name:ident) => {
         BuiltinModule::new(
             microcad_parser::language::identifier::Identifier::from(stringify!($name)),
+            Vec::new(),
             &|_, ctx| Ok(ctx.append_node($name())),
         )
     };

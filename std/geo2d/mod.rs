@@ -4,6 +4,8 @@ pub struct Circle {
     pub radius: Scalar,
 }
 
+use microcad_parser::language::function::DefinitionParameter;
+use microcad_parser::language::lang_type::Type;
 use microcad_parser::language::module::{BuiltinModule, ModuleDefinition};
 use microcad_render::geo2d::{Generator, Geometry, LineString};
 
@@ -43,7 +45,7 @@ struct Rectangle {
 impl Generator for Rectangle {
     fn generate(
         &self,
-        renderer: &dyn microcad_render::Renderer,
+        _: &dyn microcad_render::Renderer,
         _: microcad_render::tree::Node,
     ) -> Geometry {
         use geo::line_string;
@@ -77,15 +79,28 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("geo2d")
         .builtin_module(BuiltinModule {
             name: "circle".into(),
+            parameters: vec![DefinitionParameter::new(
+                "radius".into(),
+                Some(Type::Length),
+                None,
+            )],
             f: &|args, ctx| {
-                let arg = args.arg_1("radius")?;
+                let arg = args.get(&"radius".into()).unwrap(); // We have checked that the parameter exists before, so unwrap is safe
                 Ok(ctx.append_node(circle(arg.try_into()?)))
             },
         })
         .builtin_module(BuiltinModule {
             name: "rect".into(),
+            parameters: vec![
+                DefinitionParameter::new("width".into(), Some(Type::Length), None),
+                DefinitionParameter::new("height".into(), Some(Type::Length), None),
+                //DefinitionParameter::new("x".into(), Some(Type::Length), None),
+                //DefinitionParameter::new("y".into(), Some(Type::Length), None),
+            ],
             f: &|args, ctx| {
-                let (width, height) = args.arg_2("width", "height")?;
+                let width = args.get(&"width".into()).unwrap();
+                let height = args.get(&"height".into()).unwrap();
+
                 Ok(ctx.append_node(rect(width.try_into()?, height.try_into()?)))
             },
         })

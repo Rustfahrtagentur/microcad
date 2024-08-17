@@ -94,55 +94,41 @@ impl Eval for Nested {
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         let root = context.current_node();
 
-        let mut new_nodes = Vec::new();
+        let mut values = Vec::new();
         for (index, item) in self.0.iter().enumerate() {
             match item {
-                NestedItem::Call(call) => {
-                    let args = call.argument_list.eval(context)?;
-                    match &call.name.eval(context)? {
-                        Symbol::Function(f) => {
-                            if index == 0 {
-                                return f.call(args, context);
-                            } else {
-                                return Err(Error::CannotNestFunctionCall);
-                            }
+                NestedItem::Call(call) => match call.eval(context)? {
+                    Some(value) => values.push(value),
+                    None => {
+                        if index != 0 {
+                            return Err(Error::CannotNestFunctionCall);
                         }
-                        Symbol::BuiltinFunction(f) => {
-                            if index == 0 {
-                                return f.call(args, context);
-                            } else {
-                                return Err(Error::CannotNestFunctionCall);
-                            }
-                        }
-                        Symbol::BuiltinModule(m) => {
-                            new_nodes.push(m.call(args, context)?);
-                            context.set_current_node(new_nodes.last().unwrap().clone());
-                        }
-                        _ => unimplemented!("Call::eval for symbol"),
-                    };
-                }
-                NestedItem::QualifiedName(qualified_name) => match qualified_name.eval(context)? {
-                    Symbol::Value(_, v) => match v {
-                        Value::Node(node) => {
-                            new_nodes.push(node.clone());
-                            context.set_current_node(new_nodes.last().unwrap().clone());
-                        }
-                        v => {
-                            if index == 0 {
-                                return Ok(v);
-                            } else {
-                                return Err(Error::CannotNestFunctionCall);
-                            }
-                        }
-                    },
-                    _ => todo!(),
+                    }
                 },
+                NestedItem::QualifiedName(qualified_name) => {
+                    let symbols = qualified_name.eval(context)?;
+                    if symbols.is_empty() {
+                        return Err(Error::SymbolNotFound(qualified_name.clone()));
+                    }
+                    for symbol in symbols {
+                        if let Symbol::Value(_, v) = symbol {
+                            values.push(v.clone()); // Find first value only. @todo Backpropagation of values
+                            break;
+                        }
+                    }
+                }
                 NestedItem::ModuleBody(body) => {
                     let new_node = body.eval(context)?;
                     new_node.detach();
-                    let new_append = context.append_node(new_node);
-                    context.set_current_node(new_append);
+                    values.push(Value::Node(new_node));
                 }
+            }
+
+            if let Value::Node(node) = values.last().unwrap() {
+                let new_append = context.append_node(node.clone());
+                context.set_current_node(new_append);
+            } else if values.len() > 1 {
+                return Err(Error::CannotNestFunctionCall);
             }
         }
 

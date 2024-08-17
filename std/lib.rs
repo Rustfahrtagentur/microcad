@@ -3,6 +3,7 @@ mod geo2d;
 mod math;
 
 use microcad_parser::eval::*;
+use microcad_parser::language::lang_type::Type;
 use microcad_parser::language::{function::*, module::*};
 use microcad_render::tree::{self, Depth, Node, NodeInner};
 use microcad_render::Renderer;
@@ -41,9 +42,15 @@ impl ModuleBuilder {
 /// @todo: Check if is possible to rewrite this macro with arbitrary number of arguments
 #[macro_export]
 macro_rules! arg_1 {
-    ($f:ident($name:ident) for $($ty:tt),+) => { BuiltinFunction::new(stringify!($f).into(), &|args, _| {
-        match args.arg_1(stringify!(name))? {
-            $(Value::$ty($name) => Ok(Value::$ty($name.$f())),)*
+    ($f:ident($name:ident) for $($ty:tt),+) => { BuiltinFunction::new(
+        stringify!($f).into(),
+        FunctionSignature {
+            parameters: vec![DefinitionParameter::new(stringify!($name).into(), None, None)],
+            return_type: None,
+        },
+        &|args, _| {
+        match args.get(&stringify!(name).into()).unwrap() {
+            $(Value::$ty($name) => Ok(Some(Value::$ty($name.$f()))),)*
             Value::List(v) => {
                 let mut result = ValueList::new();
                 for x in v.iter() {
@@ -52,16 +59,19 @@ macro_rules! arg_1 {
                         _ => return Err(Error::InvalidArgumentType(x.ty())),
                     }
                 }
-                Ok(Value::List(List(result, v.ty())))
+                Ok(Some(Value::List(List(result, v.ty()))))
             }
             v => Err(Error::InvalidArgumentType(v.ty())),
         }
     })
     };
     ($f:ident($name:ident) $inner:expr) => {
-        BuiltinFunction::new(stringify!($f).into(), &|args, _| {
-            let l = |$name| $inner;
-            l(args.arg_1(stringify!($name))?.clone())
+        BuiltinFunction::new(stringify!($f).into(), FunctionSignature {
+            parameters: vec![DefinitionParameter::new(stringify!($name).into(), None, None)],
+            return_type: None,
+        }, &|args, _| {
+            let l = |$name| Ok(Some($inner?));
+            l(args.get(&stringify!($name).into()).unwrap().clone())
     })
 }
 }
@@ -69,11 +79,24 @@ macro_rules! arg_1 {
 #[macro_export]
 macro_rules! arg_2 {
     ($f:ident($x:ident, $y:ident) $inner:expr) => {
-        BuiltinFunction::new(stringify!($f).into(), &|args, _| {
-            let l = |$x, $y| $inner;
-            let (x, y) = args.arg_2(stringify!($x), stringify!($y))?;
-            l(x.clone(), y.clone())
-        })
+        BuiltinFunction::new(
+            stringify!($f).into(),
+            FunctionSignature {
+                parameters: vec![
+                    DefinitionParameter::new(stringify!($x).into(), None, None),
+                    DefinitionParameter::new(stringify!($y).into(), None, None),
+                ],
+                return_type: None,
+            },
+            &|args, _| {
+                let l = |$x, $y| Ok(Some($inner?));
+                let (x, y) = (
+                    args.get(&stringify!($x).into()).unwrap().clone(),
+                    args.get(&stringify!($y).into()).unwrap().clone(),
+                );
+                l(x.clone(), y.clone())
+            },
+        )
     };
 }
 
@@ -86,14 +109,30 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .module(math::builtin_module())
         .module(geo2d::builtin_module())
         .module(algorithm::builtin_module())
-        .builtin_function(BuiltinFunction::new("assert".into(), &|args, _| {
-            assert!(args[0].into_bool()?);
-            Ok(args[0].clone())
-        }))
+        .builtin_function(BuiltinFunction::new(
+            "assert".into(),
+            FunctionSignature {
+                parameters: vec![DefinitionParameter::new(
+                    "condition".into(),
+                    Some(Type::Bool),
+                    None,
+                )],
+                return_type: None,
+            },
+            &|args, _| {
+                assert!(args[&"condition".into()].into_bool()?);
+                Ok(None)
+            },
+        ))
         .builtin_module(BuiltinModule {
             name: "export".into(),
+            parameters: vec![DefinitionParameter::new(
+                "filename".into(),
+                Some(Type::String),
+                None,
+            )],
             f: &|args, ctx| {
-                let filename = args.arg_1("filename")?.to_string();
+                let filename = args.get(&"filename".into()).unwrap().try_into()?;
                 Ok(ctx.append_node(export(filename)))
             },
         })

@@ -45,7 +45,7 @@ pub enum Error {
     #[error("Function must return a value")]
     FunctionCallMissingReturn,
     #[error("Symbol not found: {0}")]
-    SymbolNotFound(Identifier),
+    SymbolNotFound(QualifiedName),
     #[error("Argument count mismatch: expected {expected}, got {found}")]
     ArgumentCountMismatch { expected: usize, found: usize },
     #[error("Invalid argument type: {0}")]
@@ -54,6 +54,14 @@ pub enum Error {
     ExpectedModule(QualifiedName),
     #[error("Cannot nest function call")]
     CannotNestFunctionCall,
+    #[error("Missing arguments: {0}")]
+    MissingArguments(IdentifierList),
+    #[error("Parameter type mismatch: {0} expected {1}, got {2}")]
+    DefinitionParameterTypeMismatch(Identifier, Type, Type),
+    #[error("Parameter missing type or value: {0}")]
+    DefinitionParameterMissingTypeOrValue(Identifier),
+    #[error("Unexpected argument: {0}")]
+    UnexpectedArgument(Identifier),
 }
 
 #[derive(Clone, Debug)]

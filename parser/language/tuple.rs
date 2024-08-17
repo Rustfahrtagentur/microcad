@@ -3,7 +3,29 @@ use crate::{eval::*, parser::*, with_pair_ok};
 use microcad_core::*;
 
 #[derive(Clone, Debug, Default)]
-pub struct TupleExpression(CallArgumentList, Option<Unit>);
+pub struct TupleExpression {
+    args: CallArgumentList,
+    unit: Option<Unit>,
+    is_named: bool,
+}
+
+impl TupleExpression {
+    pub fn args(&self) -> &CallArgumentList {
+        &self.args
+    }
+
+    pub fn unit(&self) -> Option<&Unit> {
+        self.unit.as_ref()
+    }
+
+    pub fn is_named(&self) -> bool {
+        self.is_named
+    }
+
+    pub fn is_unnamed(&self) -> bool {
+        !self.is_named
+    }
+}
 
 impl Parse for TupleExpression {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
@@ -12,18 +34,26 @@ impl Parse for TupleExpression {
         if call_argument_list.is_empty() {
             return Err(ParseError::EmptyTupleExpression);
         }
-        if call_argument_list.contains_positional() && call_argument_list.contains_named() {
+
+        // Count number of positional and named arguments
+        let named_count: usize = call_argument_list
+            .iter()
+            .map(|c| if c.name().is_some() { 1 } else { 0 })
+            .sum();
+
+        if named_count > 0 && named_count < call_argument_list.len() {
             return Err(ParseError::MixedTupleArguments);
         }
 
         with_pair_ok!(
-            TupleExpression(
-                call_argument_list.value().clone(),
-                match inner.next() {
+            TupleExpression {
+                args: call_argument_list.value().clone(),
+                unit: match inner.next() {
                     Some(pair) => Some(*Unit::parse(pair)?),
                     None => None,
                 },
-            ),
+                is_named: named_count == call_argument_list.len(),
+            },
             pair
         )
     }
@@ -31,29 +61,20 @@ impl Parse for TupleExpression {
 
 impl std::fmt::Display for TupleExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if self.0.contains_positional() {
-            write!(
-                f,
-                "({})",
-                self.0
-                    .iter()
-                    .map(|c| c.to_string())
-                    .collect::<Vec<String>>()
-                    .join(", ")
-            )?;
-        } else {
-            write!(
-                f,
-                "({})",
-                self.0
-                    .get_named()
-                    .iter()
-                    .map(|(ident, expr)| format!("{ident} = {expr}"))
-                    .collect::<Vec<String>>()
-                    .join(", ")
-            )?;
-        }
-        if let Some(unit) = self.1 {
+        write!(
+            f,
+            "({})",
+            self.args
+                .iter()
+                .map(|c| if self.is_named {
+                    format!("{} = {}", c.name().unwrap(), c.value().to_string())
+                } else {
+                    c.to_string()
+                })
+                .collect::<Vec<String>>()
+                .join(", ")
+        )?;
+        if let Some(unit) = self.unit {
             write!(f, "{}", unit)?;
         }
         Ok(())
@@ -64,23 +85,23 @@ impl Eval for TupleExpression {
     type Output = Value;
 
     fn eval(&self, context: &mut Context) -> Result<Value, Error> {
-        if self.0.contains_positional() {
+        if self.is_unnamed() {
             // Unnamed tuple
             let mut value_list = ValueList::new();
-            for expr in self.0.iter() {
-                let value = expr.clone().eval(context)?;
+            for arg in self.args.iter() {
+                let value = arg.value().eval(context)?;
                 value_list.push(value);
             }
-            if let Some(unit) = self.1 {
+            if let Some(unit) = self.unit {
                 value_list.add_unit_to_unitless_types(unit)?;
             }
             Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
         } else {
             // Named tuple
             let mut map = std::collections::BTreeMap::new();
-            for (ident, expr) in self.0.get_named() {
+            for (ident, expr) in self.args.iter().map(|c| (c.name().unwrap(), c.value())) {
                 let mut value = expr.clone().eval(context)?;
-                if let Some(unit) = self.1 {
+                if let Some(unit) = self.unit {
                     value.add_unit_to_unitless_types(unit)?;
                 }
                 map.insert(ident.clone(), value);

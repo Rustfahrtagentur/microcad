@@ -1,10 +1,25 @@
-use super::{expression::*, identifier::*, value::*};
+use std::{
+    collections::HashMap,
+    ops::{Deref, DerefMut},
+};
+
+use super::{expression::*, function::DefinitionParameter, identifier::*, lang_type::Ty, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
-struct CallArgument {
+pub struct CallArgument {
     name: Option<Identifier>,
     value: Expression,
+}
+
+impl CallArgument {
+    pub fn name(&self) -> Option<&Identifier> {
+        self.name.as_ref()
+    }
+
+    pub fn value(&self) -> &Expression {
+        &self.value
+    }
 }
 
 impl Parse for CallArgument {
@@ -47,148 +62,152 @@ impl std::fmt::Display for CallArgument {
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct PositionalNamedList<T> {
-    positional: Vec<T>,
-    named: std::collections::BTreeMap<Identifier, T>,
+pub struct CallArgumentList {
+    arguments: Vec<CallArgument>,
+    named: HashMap<Identifier, usize>,
 }
 
-pub type CallArgumentList = PositionalNamedList<Expression>;
-pub type EvaluatedCallArgumentList = PositionalNamedList<Value>;
+impl CallArgumentList {
+    pub fn push(&mut self, arg: CallArgument) {
+        self.arguments.push(arg.clone());
+        if let Some(name) = arg.name() {
+            self.named.insert(name.clone(), self.arguments.len() - 1);
+        }
+    }
 
-impl<T> std::ops::Deref for PositionalNamedList<T> {
-    type Target = Vec<T>;
+    pub fn get(&self, name: &Identifier) -> Option<&CallArgument> {
+        self.named.get(name).map(|index| &self.arguments[*index])
+    }
+
+    pub fn match_definition(
+        &self,
+        parameters: &Vec<DefinitionParameter>,
+        context: &mut Context,
+    ) -> Result<ArgumentMap, Error> {
+        self._match_definition(parameters, context, true)
+    }
+
+    pub fn match_definition_no_type_check(
+        &self,
+        parameters: &Vec<DefinitionParameter>,
+        context: &mut Context,
+    ) -> Result<ArgumentMap, Error> {
+        self._match_definition(parameters, context, false)
+    }
+
+    fn _match_definition(
+        &self,
+        parameters: &Vec<DefinitionParameter>,
+        context: &mut Context,
+        check_types: bool,
+    ) -> Result<ArgumentMap, Error> {
+        let mut arg_map = ArgumentMap::new();
+
+        // Check for unexpected arguments.
+        // We are looking for call arguments that are not in the parameter list
+        for name in self.named.keys() {
+            if !parameters.iter().any(|p| p.name() == name) {
+                return Err(Error::UnexpectedArgument(name.clone()));
+            }
+        }
+
+        let mut eval_params = Vec::new();
+        for param in parameters {
+            if check_types {
+                let (default_value, ty) = param.eval(context)?;
+                eval_params.push((param.name(), default_value, Some(ty)));
+            } else {
+                eval_params.push((
+                    param.name(),
+                    match &param.default_value() {
+                        Some(default) => Some(default.eval(context)?),
+                        None => None,
+                    },
+                    None,
+                ));
+            }
+        }
+
+        // Check for matching named arguments
+        for (param_name, param_default_value, param_ty) in &eval_params {
+            match self.get(param_name) {
+                Some(arg) => {
+                    let value = arg.value.eval(context)?;
+                    if !check_types || value.ty() == *param_ty.as_ref().unwrap() {
+                        arg_map.insert((*param_name).clone(), value);
+                    } // @todo Throw error on else?
+                }
+                None => {
+                    if let Some(default) = param_default_value {
+                        arg_map.insert((*param_name).clone(), default.clone());
+                    }
+                }
+            }
+        }
+
+        // Check for matching positional arguments
+        let mut positional_index = 0;
+        for arg in &self.arguments {
+            if arg.name.is_none() {
+                let (param_name, _, param_ty) = &eval_params[positional_index];
+                if !arg_map.contains_key(param_name)
+                    && (!check_types
+                        || *param_ty.as_ref().unwrap() == arg.value.eval(context)?.ty())
+                {
+                    arg_map.insert((*param_name).clone(), arg.value.eval(context)?);
+                    positional_index += 1;
+                }
+            }
+        }
+
+        // Finally, we need to check if all arguments have been matched
+        let mut missing_args = IdentifierList::new();
+        for (param_name, _, _) in &eval_params {
+            if !arg_map.contains_key(param_name) {
+                missing_args.push((*param_name).clone()).unwrap();
+            }
+        }
+        if !missing_args.is_empty() {
+            return Err(Error::MissingArguments(missing_args));
+        }
+
+        Ok(arg_map)
+    }
+}
+
+impl Deref for CallArgumentList {
+    type Target = Vec<CallArgument>;
 
     fn deref(&self) -> &Self::Target {
-        &self.positional
+        &self.arguments
     }
 }
 
-impl<T> PositionalNamedList<T> {
+pub struct ArgumentMap(HashMap<Identifier, Value>);
+
+impl ArgumentMap {
     pub fn new() -> Self {
-        Self {
-            positional: Vec::new(),
-            named: std::collections::BTreeMap::new(),
-        }
-    }
-
-    // Checks if the argument list contains a single argument only and returns it
-    pub fn arg_1(&self, ident: &str) -> Result<&T, Error> {
-        if self.len() != 1 {
-            return Err(Error::ArgumentCountMismatch {
-                expected: 1,
-                found: self.len(),
-            });
-        }
-
-        match self.get(&Identifier::from(ident), 0) {
-            Some(v) => Ok(v),
-            None => Err(Error::FunctionCallMissingArgument(Identifier::from(ident))),
-        }
-    }
-
-    // Checks if the argument list contains a two argument only and returns them as tuple
-    pub fn arg_2(&self, x: &str, y: &str) -> Result<(&T, &T), Error> {
-        if self.len() != 2 {
-            return Err(Error::ArgumentCountMismatch {
-                expected: 2,
-                found: self.len(),
-            });
-        }
-
-        match (
-            self.get(&Identifier::from(x), 0),
-            self.get(&Identifier::from(y), 1),
-        ) {
-            (Some(x), Some(y)) => Ok((x, y)),
-            (None, _) => Err(Error::FunctionCallMissingArgument(Identifier::from(x))),
-            (_, None) => Err(Error::FunctionCallMissingArgument(Identifier::from(y))),
-        }
-    }
-
-    /// Tries to get the argument by identifier, if it fails, it tries to get the argument by index
-    pub fn get(&self, ident: &Identifier, index: usize) -> Option<&T> {
-        match self.named.get(ident) {
-            Some(v) => Some(v),
-            None => self.positional.get(index),
-        }
-    }
-
-    pub fn get_named(&self) -> &std::collections::BTreeMap<Identifier, T> {
-        &self.named
-    }
-
-    pub fn get_named_arg(&self, ident: &Identifier) -> Option<&T> {
-        self.named.get(ident)
-    }
-
-    pub fn len(&self) -> usize {
-        self.positional.len() + self.named.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.positional.is_empty() && self.named.is_empty()
-    }
-
-    pub fn iter(&self) -> impl Iterator<Item = &T> {
-        self.positional.iter().chain(self.named.values())
-    }
-
-    pub fn contains_positional(&self) -> bool {
-        !self.positional.is_empty()
-    }
-
-    pub fn contains_named(&self) -> bool {
-        !self.named.is_empty()
-    }
-
-    fn insert_named(&mut self, ident: Identifier, v: T) -> Result<(), ParseError> {
-        if self.named.contains_key(&ident) {
-            return Err(ParseError::DuplicateNamedArgument(ident));
-        }
-
-        self.named.insert(ident, v);
-        Ok(())
-    }
-
-    fn insert_positional(&mut self, v: T) -> Result<(), ParseError> {
-        self.positional.push(v);
-        Ok(())
+        Self(HashMap::new())
     }
 }
 
-impl<T> std::fmt::Display for PositionalNamedList<T>
-where
-    T: std::fmt::Display,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let mut first = true;
-        for arg in self.iter() {
-            if first {
-                first = false;
-            } else {
-                write!(f, ", ")?;
-            }
-            write!(f, "{}", arg)?;
-        }
-        Ok(())
+impl Default for ArgumentMap {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-impl Eval for CallArgumentList {
-    type Output = EvaluatedCallArgumentList;
+impl Deref for ArgumentMap {
+    type Target = HashMap<Identifier, Value>;
 
-    fn eval(&self, context: &mut Context) -> Result<EvaluatedCallArgumentList, Error> {
-        let mut evaluated = EvaluatedCallArgumentList::new();
-        for expr in self.positional.iter() {
-            evaluated.insert_positional(expr.eval(context)?).unwrap(); // Unwrap is safe because we checked for named arguments already
-        }
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
-        for (ident, expr) in self.named.iter() {
-            evaluated
-                .insert_named(ident.clone(), expr.eval(context)?)
-                .unwrap(); // Unwrap is safe because we checked for duplicates in insert_named
-        }
-        Ok(evaluated)
+impl DerefMut for ArgumentMap {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
@@ -202,10 +221,16 @@ impl Parse for CallArgumentList {
                     let call = CallArgument::parse(pair.clone())?.value().clone();
                     match call.name {
                         Some(ident) => {
-                            call_argument_list.insert_named(ident, call.value)?;
+                            call_argument_list.push(CallArgument {
+                                name: Some(ident),
+                                value: call.value,
+                            });
                         }
                         None => {
-                            call_argument_list.insert_positional(call.value)?;
+                            call_argument_list.push(CallArgument {
+                                name: None,
+                                value: call.value,
+                            });
                         }
                     }
                 }
@@ -246,7 +271,7 @@ impl Parse for MethodCall {
 
 impl std::fmt::Display for MethodCall {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}({})", self.name, self.argument_list)
+        write!(f, "{}({:?})", self.name, self.argument_list)
     }
 }
 
@@ -279,22 +304,40 @@ impl Parse for Call {
 
 impl std::fmt::Display for Call {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}({})", self.name, self.argument_list)
+        write!(f, "{}({:?})", self.name, self.argument_list)
     }
 }
+
+impl Call {}
 
 impl Eval for Call {
     type Output = Option<Value>;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
-        let args = self.argument_list.eval(context)?;
+        let symbols = self.name.eval(context)?;
 
-        match &self.name.eval(context)? {
-            Symbol::Function(f) => Ok(Some(f.call(args, context)?)),
-            Symbol::BuiltinFunction(f) => Ok(Some(f.call(args, context)?)),
-            Symbol::BuiltinModule(m) => Ok(None),
-            _ => unimplemented!("Call::eval for symbol"),
+        for symbol in symbols {
+            match symbol {
+                Symbol::Function(f) => {
+                    if let Ok(value) = f.call(&self.argument_list, context) {
+                        return Ok(value);
+                    }
+                }
+                Symbol::BuiltinFunction(f) => {
+                    if let Ok(value) = f.call(&self.argument_list, context) {
+                        return Ok(value);
+                    }
+                }
+                Symbol::BuiltinModule(m) => {
+                    if let Ok(value) = m.call(&self.argument_list, context) {
+                        return Ok(Some(Value::Node(value)));
+                    }
+                }
+                _ => unimplemented!("Call::eval for symbol"),
+            }
         }
+
+        Err(Error::SymbolNotFound(self.name.clone()))
     }
 }
 
@@ -309,6 +352,13 @@ fn call() {
     let call = Call::parse(pair).unwrap();
 
     assert_eq!(call.name, QualifiedName::from("foo"));
-    assert_eq!(call.argument_list.positional.len(), 2);
-    assert_eq!(call.argument_list.named.len(), 2);
+    assert_eq!(call.argument_list.len(), 4);
+
+    // Count named arguments
+    let named = call
+        .argument_list
+        .iter()
+        .filter(|arg| arg.name.is_some())
+        .count();
+    assert_eq!(named, 2);
 }
