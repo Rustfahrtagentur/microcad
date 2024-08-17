@@ -163,7 +163,7 @@ module example(size: length) {
 A module can be defined with arguments:
 
 ```µCAD,module
-module a(b: length)
+module a(b: length) {}
 ```
 
 A module can have initializers:
