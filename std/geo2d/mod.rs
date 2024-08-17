@@ -79,17 +79,14 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             name: "circle".into(),
             f: &|args, ctx| {
                 let arg = args.arg_1("radius")?;
-                Ok(ctx.append_node(circle(arg.into_scalar().unwrap())))
+                Ok(ctx.append_node(circle(arg.try_into()?)))
             },
         })
         .builtin_module(BuiltinModule {
             name: "rect".into(),
             f: &|args, ctx| {
                 let (width, height) = args.arg_2("width", "height")?;
-                Ok(ctx.append_node(rect(
-                    width.into_scalar().unwrap(),
-                    height.into_scalar().unwrap(),
-                )))
+                Ok(ctx.append_node(rect(width.try_into()?, height.try_into()?)))
             },
         })
         .build()

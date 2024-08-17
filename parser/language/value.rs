@@ -18,8 +18,8 @@ pub enum ValueError {
     },
     #[error("Type cannot be a key in a map: {0}")]
     InvalidMapKeyType(Type),
-    #[error("Cannot convert value into scalar: {0}")]
-    CannotConvertToScalar(Value),
+    #[error("Cannot convert value {0} to {1}")]
+    CannotConvert(Value, String),
     #[error("Cannot convert value into boolean: {0}")]
     CannotConvertToBool(Value),
     #[error("Cannot add unit to a unitful value: {0}")]
@@ -338,13 +338,7 @@ impl Value {
         }
     }
 
-    pub fn into_scalar(&self) -> Result<Scalar, ValueError> {
-        match self {
-            Value::Scalar(s) | Value::Length(s) | Value::Angle(s) => Ok(*s),
-            value => Err(ValueError::CannotConvertToScalar(value.clone())),
-        }
-    }
-
+    // @todo Remove this method
     pub fn into_bool(&self) -> Result<bool, ValueError> {
         match self {
             Value::Bool(b) => Ok(*b),
@@ -536,6 +530,41 @@ impl std::fmt::Display for Value {
         }
     }
 }
+
+macro_rules! impl_try_from {
+    ($($variant:ident),+ => $ty:ty ) => {
+        impl TryFrom<Value> for $ty {
+            type Error = ValueError;
+
+            fn try_from(value: Value) -> Result<Self, Self::Error> {
+                match value {
+                    $(Value::$variant(v) => Ok(v.into()),)*
+                    value => Err(ValueError::CannotConvert(value, stringify!($ty).into())),
+                }
+            }
+        }
+
+        impl TryFrom<&Value> for $ty {
+            type Error = ValueError;
+
+            fn try_from(value: &Value) -> Result<Self, Self::Error> {
+                match value {
+                    $(Value::$variant(v) => Ok(v.clone().into()),)*
+                    value => Err(ValueError::CannotConvert(value.clone(), stringify!($ty).into())),
+                }
+            }
+        }
+    };
+}
+
+impl_try_from!(Integer => i64);
+impl_try_from!(Scalar, Length, Angle => Scalar);
+impl_try_from!(Vec2 => Vec2);
+impl_try_from!(Vec3 => Vec3);
+impl_try_from!(Vec4 => Vec4);
+impl_try_from!(Bool => bool);
+impl_try_from!(String => String);
+impl_try_from!(Color => Color);
 
 #[derive(Clone, Debug, PartialEq, Default)]
 pub struct ValueList(Vec<Value>);

@@ -92,7 +92,7 @@ impl Eval for TupleExpression {
                 // Special case for Vec2: if we have exactly two lengths with names "x" and "y", we can create a Vec2
                 (2, true) => {
                     if let (Some(x), Some(y)) = (map.get(x_ident), map.get(y_ident)) {
-                        return Ok(Value::Vec2(Vec2::new(x.into_scalar()?, y.into_scalar()?)));
+                        return Ok(Value::Vec2(Vec2::new(x.try_into()?, y.try_into()?)));
                     }
                 }
                 // Special case for Vec3: if we have exactly three lengths with names "x", "y" and "z", we can create a Vec3
@@ -101,9 +101,9 @@ impl Eval for TupleExpression {
                         (map.get(x_ident), map.get(y_ident), map.get(z_ident))
                     {
                         return Ok(Value::Vec3(Vec3::new(
-                            x.into_scalar()?,
-                            y.into_scalar()?,
-                            z.into_scalar()?,
+                            x.try_into()?,
+                            y.try_into()?,
+                            z.try_into()?,
                         )));
                     }
                 }
