@@ -306,16 +306,12 @@ unary_operator = { "-" }
 default_value = _{ "=" ~ ws* ~ expression }
 
 //`r = 5.0mm`: ok # Named argument
-call_named_argument = { identifier ~ ws* ~ default_value }
-
-//`(a,b) = (4.0mm, 4.0mm)`: ok # Default values
-call_named_tuple_argument = { "(" ~ identifier_list ~ ")" ~ ws* ~ default_value }
+call_named_argument = { identifier ~ ws* ~ "=" ~ ws* ~ expression }
 
 //`2.0mm`: ok # Positional argument
 call_positional_argument = _{ expression }
 
-call_argument = _{ 
-  call_named_tuple_argument | 
+call_argument = _{
   call_named_argument | 
   call_positional_argument 
 }

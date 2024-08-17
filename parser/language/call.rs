@@ -2,10 +2,9 @@ use super::{expression::*, identifier::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
-enum CallArgument {
-    Named(Identifier, Box<Expression>),
-    NamedTuple(IdentifierList, Box<Expression>),
-    Position(Box<Expression>),
+struct CallArgument {
+    name: Option<Identifier>,
+    value: Expression,
 }
 
 impl Parse for CallArgument {
@@ -17,31 +16,19 @@ impl Parse for CallArgument {
                 let second = inner.next().unwrap();
 
                 with_pair_ok!(
-                    CallArgument::Named(
-                        Identifier::parse(first)?.value().clone(),
-                        Box::new(Expression::parse(second)?.value().clone()),
-                    ),
-                    pair
-                )
-            }
-            Rule::call_named_tuple_argument => {
-                let mut inner = pair.clone().into_inner();
-                let first = inner.next().unwrap();
-                let second = inner.next().unwrap();
-
-                with_pair_ok!(
-                    CallArgument::NamedTuple(
-                        IdentifierList::parse(first)?.value().clone(),
-                        Box::new(Expression::parse(second)?.value().clone()),
-                    ),
+                    CallArgument {
+                        name: Some(Identifier::parse(first)?.value().clone()),
+                        value: Expression::parse(second)?.value().clone(),
+                    },
                     pair
                 )
             }
             Rule::expression => {
                 with_pair_ok!(
-                    CallArgument::Position(Box::new(
-                        Expression::parse(pair.clone())?.value().clone()
-                    )),
+                    CallArgument {
+                        name: None,
+                        value: Expression::parse(pair.clone())?.value().clone(),
+                    },
                     pair
                 )
             }
@@ -52,12 +39,9 @@ impl Parse for CallArgument {
 
 impl std::fmt::Display for CallArgument {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            CallArgument::Named(ident, expr) => write!(f, "{} = {}", ident, expr),
-            CallArgument::NamedTuple(idents, expr) => {
-                write!(f, "({}) = {}", idents, expr)
-            }
-            CallArgument::Position(expr) => write!(f, "{}", expr),
+        match self.name {
+            Some(ref name) => write!(f, "{} = {}", name, self.value),
+            None => write!(f, "{}", self.value),
         }
     }
 }
@@ -121,7 +105,7 @@ impl<T> PositionalNamedList<T> {
         }
     }
 
-    /// Tries get the argument by identifier, if it fails, it tries to get the argument by index
+    /// Tries to get the argument by identifier, if it fails, it tries to get the argument by index
     pub fn get(&self, ident: &Identifier, index: usize) -> Option<&T> {
         match self.named.get(ident) {
             Some(v) => Some(v),
@@ -215,17 +199,13 @@ impl Parse for CallArgumentList {
         match pair.clone().as_rule() {
             Rule::call_argument_list => {
                 for pair in pair.clone().into_inner() {
-                    match CallArgument::parse(pair)?.value().clone() {
-                        CallArgument::Named(ident, expr) => {
-                            call_argument_list.insert_named(ident, *expr)?;
+                    let call = CallArgument::parse(pair.clone())?.value().clone();
+                    match call.name {
+                        Some(ident) => {
+                            call_argument_list.insert_named(ident, call.value)?;
                         }
-                        CallArgument::NamedTuple(idents, expr) => {
-                            for ident in idents {
-                                call_argument_list.insert_named(ident, *expr.clone())?;
-                            }
-                        }
-                        CallArgument::Position(expr) => {
-                            call_argument_list.insert_positional(*expr)?;
+                        None => {
+                            call_argument_list.insert_positional(call.value)?;
                         }
                     }
                 }
