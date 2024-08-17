@@ -160,6 +160,13 @@ impl Context {
         symbols
     }
 
+    pub fn get_symbols_by_qualified_name(
+        &self,
+        name: &QualifiedName,
+    ) -> Result<Vec<Symbol>, Error> {
+        name.get_symbols(self)
+    }
+
     pub fn current_node(&self) -> Node {
         self.current_node.clone()
     }

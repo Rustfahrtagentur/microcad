@@ -183,6 +183,7 @@ impl Deref for CallArgumentList {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct ArgumentMap(HashMap<Identifier, Value>);
 
 impl ArgumentMap {
@@ -253,7 +254,6 @@ pub struct MethodCall {
 impl Parse for MethodCall {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let mut inner = pair.clone().into_inner();
-        println!("{inner:?}");
 
         with_pair_ok!(
             MethodCall {
@@ -315,7 +315,6 @@ impl Eval for Call {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         let symbols = self.name.eval(context)?;
-
         for symbol in symbols {
             match symbol {
                 Symbol::Function(f) => {
@@ -336,7 +335,7 @@ impl Eval for Call {
                 _ => unimplemented!("Call::eval for symbol"),
             }
         }
-
+        //  Ok(None)
         Err(Error::SymbolNotFound(self.name.clone()))
     }
 }

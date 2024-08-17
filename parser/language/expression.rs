@@ -107,9 +107,7 @@ impl Eval for Nested {
                 },
                 NestedItem::QualifiedName(qualified_name) => {
                     let symbols = qualified_name.eval(context)?;
-                    if symbols.is_empty() {
-                        return Err(Error::SymbolNotFound(qualified_name.clone()));
-                    }
+
                     for symbol in symbols {
                         if let Symbol::Value(_, v) = symbol {
                             values.push(v.clone()); // Find first value only. @todo Backpropagation of values
@@ -129,6 +127,23 @@ impl Eval for Nested {
                 context.set_current_node(new_append);
             } else if values.len() > 1 {
                 return Err(Error::CannotNestFunctionCall);
+            }
+        }
+
+        assert!(!values.is_empty());
+
+        if values.len() == 1 {
+            return Ok(values[0].clone());
+        }
+
+        for value in values {
+            match value {
+                Value::Node(node) => {
+                    context.current_node().append(node);
+                }
+                _ => {
+                    return Err(Error::CannotNestFunctionCall);
+                }
             }
         }
 

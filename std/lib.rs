@@ -4,6 +4,7 @@ mod math;
 
 use microcad_parser::eval::*;
 use microcad_parser::language::lang_type::Type;
+use microcad_parser::language::value::Value;
 use microcad_parser::language::{function::*, module::*};
 use microcad_render::tree::{self, Depth, Node, NodeInner};
 use microcad_render::Renderer;
@@ -17,6 +18,11 @@ impl ModuleBuilder {
         Self {
             module: ModuleDefinition::namespace(name.into()),
         }
+    }
+
+    pub fn value(&mut self, name: &str, value: Value) -> &mut Self {
+        self.module.add_symbol(Symbol::Value(name.into(), value));
+        self
     }
 
     pub fn builtin_function(&mut self, f: BuiltinFunction) -> &mut Self {
@@ -49,7 +55,7 @@ macro_rules! arg_1 {
             return_type: None,
         },
         &|args, _| {
-        match args.get(&stringify!(name).into()).unwrap() {
+        match args.get(&stringify!($name).into()).unwrap() {
             $(Value::$ty($name) => Ok(Some(Value::$ty($name.$f()))),)*
             Value::List(v) => {
                 let mut result = ValueList::new();
@@ -137,6 +143,23 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             },
         })
         .build()
+}
+
+#[test]
+fn context_namespace() {
+    let mut context = Context::default();
+
+    let module = ModuleBuilder::namespace("math")
+        .value("pi", Value::Scalar(std::f64::consts::PI))
+        .build();
+
+    context.add_symbol(Symbol::ModuleDefinition(module));
+
+    let symbols = context
+        .get_symbols_by_qualified_name(&"math::pi".into())
+        .unwrap();
+    assert_eq!(symbols.len(), 1);
+    assert_eq!(symbols[0].name(), "pi");
 }
 
 #[test]

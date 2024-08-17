@@ -335,7 +335,7 @@ impl BuiltinFunction {
         args: &CallArgumentList,
         context: &mut Context,
     ) -> Result<Option<Value>, Error> {
-        let arg_map = args.match_definition(&self.signature.parameters, context)?;
+        let arg_map = args.match_definition_no_type_check(&self.signature.parameters, context)?;
         let result = (self.f)(&arg_map, context)?;
 
         match (&result, &self.signature.return_type) {

@@ -203,29 +203,33 @@ impl QualifiedName {
         context: &Context,
         functor: &mut dyn FnMut(&Symbol, usize),
     ) -> Result<(), Error> {
-        for ident in &self.0[index..] {
-            let new_symbols = match root {
-                Some(ref root) => root.get_symbols(ident),
-                None => context.get_symbols(ident),
-            };
+        if index >= self.0.len() {
+            return Ok(());
+        }
+        let ident = &self.0[index];
 
-            for symbol in new_symbols {
-                self._visit_symbols(
-                    Some(symbol.clone()),
-                    index + 1,
-                    context,
-                    &mut |symbol, i| {
-                        functor(symbol, i + 1);
-                    },
-                )?;
-            }
+        let new_symbols = match root {
+            Some(ref root) => root.get_symbols(ident),
+            None => context.get_symbols(ident),
+        };
+
+        for symbol in new_symbols {
+            functor(symbol, index);
+            self._visit_symbols(
+                Some(symbol.clone()),
+                index + 1,
+                context,
+                &mut |symbol, i| {
+                    functor(symbol, i + 1);
+                },
+            )?;
         }
 
         Ok(())
     }
 
     /// @brief Visit all symbols in the qualified name recursively, starting from the root
-    fn visit_symbols(
+    pub fn visit_symbols(
         &self,
         context: &Context,
         functor: &mut dyn FnMut(&Symbol, usize),
@@ -234,11 +238,11 @@ impl QualifiedName {
     }
 
     /// @brief Get all symbols for the qualified name
-    fn get_symbols(&self, context: &Context) -> Result<Vec<Symbol>, Error> {
+    pub fn get_symbols(&self, context: &Context) -> Result<Vec<Symbol>, Error> {
         let mut symbols = Vec::new();
         self.visit_symbols(context, &mut |symbol, depth| {
             // Only take symbols that match the full qualified name
-            if depth == self.0.len() - 1 {
+            if depth == self.0.len() {
                 symbols.push(symbol.clone());
             }
         })?;

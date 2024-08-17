@@ -128,6 +128,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
 #[cfg(test)]
 fn test_builtin_function(name: &str, input: &str, expected: &str) {
     use microcad_parser::language::expression::*;
+    use microcad_parser::language::lang_type::Type;
     use microcad_parser::parser::*;
 
     let module = builtin_module();
@@ -137,9 +138,15 @@ fn test_builtin_function(name: &str, input: &str, expected: &str) {
 
     context.add_symbol(Symbol::ModuleDefinition(module));
 
+    let symbols = context
+        .get_symbols_by_qualified_name(&"math::abs".into())
+        .unwrap();
+    assert_eq!(symbols.len(), 1);
+
     let expr = Parser::parse_rule_or_panic::<Expression>(Rule::expression, input);
 
     let value = expr.eval(&mut context).unwrap();
+    assert_eq!(value.ty(), Type::Scalar);
     assert_eq!(value.to_string(), expected, "Failed for '{}'", name);
 }
 
