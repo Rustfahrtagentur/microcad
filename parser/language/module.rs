@@ -555,3 +555,21 @@ impl BuiltinModule {
         (self.f)(args, context)
     }
 }
+
+#[macro_export]
+macro_rules! builtin_module {
+    // This macro is used to create a BuiltinModule from a function
+    ($name:ident, $f:expr) => {
+        BuiltinModule::new(
+            microcad_parser::language::identifier::Identifier::from(stringify!($name)),
+            &$f,
+        )
+    };
+    // This macro is used to create a BuiltinModule from a function with no arguments
+    ($name:ident) => {
+        BuiltinModule::new(
+            microcad_parser::language::identifier::Identifier::from(stringify!($name)),
+            &|_, ctx| Ok(ctx.append_node($name())),
+        )
+    };
+}

@@ -81,3 +81,15 @@ impl Algorithm for BooleanOp {
 pub fn difference() -> Node {
     Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Difference)))
 }
+
+pub fn union() -> Node {
+    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Union)))
+}
+
+pub fn intersection() -> Node {
+    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Intersection)))
+}
+
+pub fn xor() -> Node {
+    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Xor)))
+}
