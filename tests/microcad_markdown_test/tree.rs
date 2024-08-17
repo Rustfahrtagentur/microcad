@@ -65,7 +65,6 @@ impl std::fmt::Display for Tree {
                     "{}",
                     &format!(
                         r##"#[test]
-                            #[allow(non_snake_case)]
                             fn r#{name}() {{
                                 use microcad_parser::{{language::document::Document,parser}};
                                 use microcad_parser::eval::{{Symbol, Eval, Context}};
@@ -116,7 +115,6 @@ impl std::fmt::Display for Tree {
                 write!(
                     f,
                     r##"
-                        #[allow(non_snake_case)]
                         mod r#{name} {{"##
                 )?;
                 for child in children {

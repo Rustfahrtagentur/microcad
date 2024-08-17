@@ -22,7 +22,7 @@ When you write a csg file, you basically construct a tree.
 Let's assume we can to construct an ISO metric hexagonal nut with the size M10.
 Let make a 2D sketch of the nut first:
 
-```csg
+```µCAD,example.A
 // We have to import the primitive2d module to use `hexagon` and `circle` sub-modules
 use * from geo2d;
 
@@ -44,7 +44,7 @@ Now, we only have 2D version of the nut.
 But of course we want to have 3D version!
 We can simply generate a 3D model by extruding the nut using the `linear_extrude` operator:
 
-```csg
+```µCAD,example.B
 module hex_nut(outer_diameter: length, inner_diameter: length, height: length) {
     linear_extrude(h = self.height) {
         hexagon(d = self.inner_diameter) - circle(d = self.outer_diameter);
@@ -119,7 +119,7 @@ Fortunately, we can write this differently without brackets and nesting.
 Instead, we will use the `:=` operator to assign a name to each sub-part of the `csg_cube` module, in this case `body` and `axes`.
 Moreover, we use the operator `&` and `-` to express the boolean operations:
 
-```µCAD
+```µCAD,example.C
 module csg_cube(size: length) {
     body := cube(size) & sphere(r = size / 1.5);
     axes := orient([X,Y,Z]) cylinder(d = size / 2, h = size * 1.5);
@@ -128,7 +128,7 @@ module csg_cube(size: length) {
 }
 ```
 
-```µCAD
+```µCAD,example.D
 module csg_cube {
     init(size: length) {
         // Module substitution
@@ -146,7 +146,7 @@ module csg_cube {
 
 A module can define a conditional statement using `if cond {} else {}`:
 
-```csg
+```µCAD,conditional_statement
 use * from geo3d;
 
 module example(size: length) {
@@ -162,7 +162,7 @@ module example(size: length) {
 
 A module can be defined with arguments:
 
-```µCAD
+```µCAD,module
 module a(b: length)
 ```
 
