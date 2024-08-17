@@ -174,7 +174,7 @@ fn test_named_tuple() {
 
 #[test]
 fn test_vec2() {
-    let input = "((x,y) = 1mm)";
+    let input = "(x = 1mm, y = 1mm)";
     let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
     let mut context = Context::default();
     let value = expr.eval(&mut context).unwrap();

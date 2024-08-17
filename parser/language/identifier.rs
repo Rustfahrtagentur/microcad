@@ -215,14 +215,7 @@ impl QualifiedName {
 
         for symbol in new_symbols {
             functor(symbol, index);
-            self._visit_symbols(
-                Some(symbol.clone()),
-                index + 1,
-                context,
-                &mut |symbol, i| {
-                    functor(symbol, i + 1);
-                },
-            )?;
+            self._visit_symbols(Some(symbol.clone()), index + 1, context, functor)?;
         }
 
         Ok(())
@@ -242,10 +235,11 @@ impl QualifiedName {
         let mut symbols = Vec::new();
         self.visit_symbols(context, &mut |symbol, depth| {
             // Only take symbols that match the full qualified name
-            if depth == self.0.len() {
+            if depth == self.0.len() - 1 {
                 symbols.push(symbol.clone());
             }
         })?;
+
         if symbols.is_empty() {
             return Err(Error::SymbolNotFound(self.clone()));
         }

@@ -514,7 +514,7 @@ fn function_evaluate() {
     let mut context = Context::default();
     context.add_symbol(Symbol::Function(function_def));
 
-    let input = "test(a = 1, b = 2)";
+    let input = "test(a = 1.0, b = 2.0)";
     let expr = Parser::parse_rule_or_panic::<Expression>(Rule::expression, input);
 
     let value = expr.eval(&mut context).unwrap();

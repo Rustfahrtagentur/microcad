@@ -234,13 +234,10 @@ export("export.svg") algorithm::difference() {
 
     for n in node.descendants() {
         let inner = n.borrow();
-        match *inner {
-            NodeInner::Export(ref filename) => {
-                let mut file = std::fs::File::create(filename).unwrap();
-                let mut renderer = microcad_render::svg::SvgRenderer::new(&mut file).unwrap();
-                renderer.render(n.first_child().unwrap().clone());
-            }
-            _ => (),
+        if let NodeInner::Export(ref filename) = *inner {
+            let mut file = std::fs::File::create(filename).unwrap();
+            let mut renderer = microcad_render::svg::SvgRenderer::new(&mut file).unwrap();
+            renderer.render(n.clone());
         }
     }
 }

@@ -128,6 +128,12 @@ impl<'a> Renderer for SvgRenderer<'a> {
     fn render(&mut self, node: Node) {
         let inner = node.borrow();
         let result = match &*inner {
+            NodeInner::Export(_) | NodeInner::Group | NodeInner::Root => {
+                for child in node.children() {
+                    self.render(child.clone());
+                }
+                return;
+            }
             NodeInner::Algorithm(algorithm) => Some(algorithm.process(self, node.clone())),
             _ => panic!("Node must be an algorithm but is {:?}", node),
         };
