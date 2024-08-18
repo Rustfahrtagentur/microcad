@@ -52,6 +52,7 @@ impl Parse for CallArgument {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct CallArgumentValue {
     name: Option<Identifier>,
     value: Value,
@@ -93,86 +94,6 @@ impl CallArgumentList {
 
     pub fn get(&self, name: &Identifier) -> Option<&CallArgument> {
         self.named.get(name).map(|index| &self.arguments[*index])
-    }
-
-    pub fn match_definition(
-        &self,
-        parameters: &ParameterList,
-        context: &mut Context,
-    ) -> Result<ArgumentMap, Error> {
-        let mut arg_map = ArgumentMap::new();
-
-        // Check for unexpected arguments.
-        // We are looking for call arguments that are not in the parameter list
-        for name in self.named.keys() {
-            if !parameters.iter().any(|p| p.name() == name) {
-                return Err(Error::UnexpectedArgument(name.clone()));
-            }
-        }
-
-        let parameter_values = parameters.eval(context)?;
-
-        // Check for matching named arguments
-        // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
-        for parameter_value in &parameter_values {
-            let ParameterValue {
-                name,
-                default_value,
-                ..
-            } = parameter_value;
-
-            match self.get(name) {
-                // We have a matching argument with the same name as the parameter.
-                Some(arg) => {
-                    let arg_value = arg.value.eval(context)?;
-
-                    // Now we need to check if the argument type matches the parameter type
-                    if parameter_value.type_check(&arg_value.ty())? {
-                        arg_map.insert(name.clone(), arg_value);
-                    }
-                }
-                // No matching argument found, check if a default value is defined
-                None => {
-                    // If we have a default value, we can use it
-                    if let Some(default) = default_value {
-                        arg_map.insert(name.clone(), default.clone());
-                    }
-                }
-            }
-        }
-
-        // Check for matching positional arguments
-        // @todo: All check for tuple arguments and if the tuple fields match the parameters
-        let mut positional_index = 0;
-        for arg in &self.arguments {
-            if arg.name.is_none() {
-                let ParameterValue {
-                    name,
-                    specified_type,
-                    ..
-                } = &parameter_values[positional_index];
-                if !arg_map.contains_key(name)
-                    && (parameter_values[positional_index]
-                        .type_check(&arg.value.eval(context)?.ty())?)
-                {
-                    arg_map.insert((*name).clone(), arg.value.eval(context)?);
-                    positional_index += 1;
-                }
-            }
-        }
-
-        // Finally, we need to check if all arguments have been matched
-        let mut missing_args = IdentifierList::new();
-        for ParameterValue { name, .. } in &parameter_values {
-            if !arg_map.contains_key(name) {
-                missing_args.push(name.clone()).unwrap();
-            }
-        }
-        if !missing_args.is_empty() {
-            return Err(Error::MissingArguments(missing_args));
-        }
-
-        Ok(arg_map)
     }
 }
 
@@ -243,6 +164,112 @@ impl Parse for CallArgumentList {
                 unreachable!("CallArgumentList::parse expected call argument list, found {rule:?}")
             }
         }
+    }
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct CallArgumentValueList {
+    arguments: Vec<CallArgumentValue>,
+    named: HashMap<Identifier, usize>,
+}
+
+impl CallArgumentValueList {
+    pub fn get(&self, name: &Identifier) -> Option<&CallArgumentValue> {
+        self.named.get(name).map(|index| &self.arguments[*index])
+    }
+
+    pub fn push(&mut self, arg: CallArgumentValue) {
+        self.arguments.push(arg.clone());
+        if let Some(name) = arg.name {
+            self.named.insert(name.clone(), self.arguments.len() - 1);
+        }
+    }
+
+    pub fn match_definition(
+        &self,
+        parameters: &ParameterList,
+        context: &mut Context,
+    ) -> Result<ArgumentMap, Error> {
+        let mut arg_map = ArgumentMap::new();
+
+        // Check for unexpected arguments.
+        // We are looking for call arguments that are not in the parameter list
+        for name in self.named.keys() {
+            if !parameters.iter().any(|p| p.name() == name) {
+                return Err(Error::UnexpectedArgument(name.clone()));
+            }
+        }
+
+        let parameter_values = parameters.eval(context)?;
+
+        // Check for matching named arguments
+        // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
+        for parameter_value in &parameter_values {
+            let ParameterValue {
+                name,
+                default_value,
+                ..
+            } = parameter_value;
+
+            match self.get(name) {
+                // We have a matching argument with the same name as the parameter.
+                Some(arg) => {
+                    // Now we need to check if the argument type matches the parameter type
+                    if parameter_value.type_check(&arg.value.ty())? {
+                        arg_map.insert(name.clone(), arg.value.clone());
+                    }
+                }
+                // No matching argument found, check if a default value is defined
+                None => {
+                    // If we have a default value, we can use it
+                    if let Some(default) = default_value {
+                        arg_map.insert(name.clone(), default.clone());
+                    }
+                }
+            }
+        }
+
+        // Check for matching positional arguments
+        // @todo: All check for tuple arguments and if the tuple fields match the parameters
+        let mut positional_index = 0;
+        for arg in &self.arguments {
+            if arg.name.is_none() {
+                let ParameterValue { name, .. } = &parameter_values[positional_index];
+                if !arg_map.contains_key(name)
+                    && (parameter_values[positional_index].type_check(&arg.value.ty())?)
+                {
+                    arg_map.insert((*name).clone(), arg.value.clone());
+                    positional_index += 1;
+                }
+            }
+        }
+
+        // Finally, we need to check if all arguments have been matched
+        let mut missing_args = IdentifierList::new();
+        for ParameterValue { name, .. } in &parameter_values {
+            if !arg_map.contains_key(name) {
+                missing_args.push(name.clone()).unwrap();
+            }
+        }
+        if !missing_args.is_empty() {
+            return Err(Error::MissingArguments(missing_args));
+        }
+
+        Ok(arg_map)
+    }
+}
+
+impl Eval for CallArgumentList {
+    type Output = CallArgumentValueList;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        let mut call_argument_list = CallArgumentValueList::default();
+
+        for arg in &self.arguments {
+            call_argument_list.push(arg.eval(context)?);
+        }
+
+        Ok(call_argument_list)
     }
 }
 

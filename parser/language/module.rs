@@ -442,7 +442,9 @@ impl BuiltinModule {
     }
 
     pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Node, Error> {
-        let arg_map = args.match_definition(&self.parameters, context)?;
+        let arg_map = args
+            .eval(context)?
+            .match_definition(&self.parameters, context)?;
         (self.f)(&arg_map, context)
     }
 }
