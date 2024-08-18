@@ -2,9 +2,12 @@ mod algorithm;
 mod geo2d;
 mod math;
 
+use microcad_parser::builtin_module;
 use microcad_parser::eval::*;
 use microcad_parser::function_signature;
+use microcad_parser::language::expression::Expression;
 use microcad_parser::language::lang_type::Type;
+use microcad_parser::language::parameter;
 use microcad_parser::language::parameter::Parameter;
 use microcad_parser::language::value::Value;
 use microcad_parser::language::{function::*, module::*};
@@ -114,20 +117,18 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .module(algorithm::builtin_module())
         .builtin_function(BuiltinFunction::new(
             "assert".into(),
-            function_signature!(parameter_list![parameter!(condition: Bool)]),
+            function_signature!(parameter_list![
+                parameter!(condition: Bool),
+                parameter!(message: String = "Assertion failed")
+            ]),
             &|args, _| {
-                assert!(args[&"condition".into()].into_bool()?);
+                let message: String = args[&"message".into()].clone().try_into()?;
+                let condition: bool = args[&"condition".into()].clone().try_into()?;
+                assert!(condition, "{message}");
                 Ok(None)
             },
         ))
-        .builtin_module(BuiltinModule {
-            name: "export".into(),
-            parameters: parameter_list![parameter!(filename: String)],
-            f: &|args, ctx| {
-                let filename = args.get(&"filename".into()).unwrap().try_into()?;
-                Ok(ctx.append_node(export(filename)))
-            },
-        })
+        .builtin_module(builtin_module!(export(filename: String)))
         .build()
 }
 
@@ -196,8 +197,8 @@ fn test_export() {
 use * from std;
 
 export("export.svg") algorithm::difference() {
-    geo2d::circle(radius = 3.0mm);
-    geo2d::rect(width = 3.0mm, height = 2.0mm);
+    geo2d::circle(radius = 3.0);
+    geo2d::rect(width = 3.0, height = 2.0);
 };
             "#,
     ) {
