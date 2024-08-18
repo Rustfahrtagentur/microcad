@@ -7,14 +7,12 @@ use microcad_parser::eval::*;
 use microcad_parser::function_signature;
 use microcad_parser::language::expression::Expression;
 use microcad_parser::language::lang_type::Type;
-use microcad_parser::language::parameter;
 use microcad_parser::language::parameter::Parameter;
 use microcad_parser::language::value::Value;
 use microcad_parser::language::{function::*, module::*};
 use microcad_parser::parameter;
 use microcad_parser::parameter_list;
-use microcad_render::tree::{self, Depth, Node, NodeInner};
-use microcad_render::Renderer;
+use microcad_render::tree::{Node, NodeInner};
 
 pub struct ModuleBuilder {
     module: ModuleDefinition,
@@ -177,7 +175,7 @@ fn difference_svg() {
     use microcad_render::Renderer;
 
     let difference = algorithm::boolean_op::difference();
-    let group = tree::group();
+    let group = microcad_render::tree::group();
     group.append(crate::geo2d::circle(4.0));
     group.append(crate::geo2d::circle(2.0));
     difference.append(group);
@@ -213,7 +211,7 @@ export("export.svg") algorithm::difference() {
 
     for n in node.descendants() {
         // Indent with depth
-        for _ in 0..n.depth() {
+        for _ in 0..microcad_render::tree::Depth::depth(&n) {
             print!("  ");
         }
         println!("{:?}", n);
@@ -224,7 +222,7 @@ export("export.svg") algorithm::difference() {
         if let NodeInner::Export(ref filename) = *inner {
             let mut file = std::fs::File::create(filename).unwrap();
             let mut renderer = microcad_render::svg::SvgRenderer::new(&mut file).unwrap();
-            renderer.render(n.clone());
+            microcad_render::Renderer::render(&mut renderer, n.clone());
         }
     }
 }
