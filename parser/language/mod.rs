@@ -12,4 +12,5 @@ pub mod module;
 pub mod statement;
 pub mod tuple;
 pub mod units;
+pub mod use_statement;
 pub mod value;

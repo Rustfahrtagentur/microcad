@@ -1,11 +1,4 @@
-use super::{
-    call::*,
-    expression::*,
-    identifier::*,
-    lang_type::*,
-    module::*,
-    value::{self, *},
-};
+use super::{call::*, expression::*, identifier::*, lang_type::*, use_statement::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
