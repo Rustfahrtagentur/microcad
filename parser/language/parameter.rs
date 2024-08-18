@@ -3,6 +3,7 @@ use std::ops::Deref;
 use super::{expression::*, identifier::*, lang_type::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
+/// @brief A parameter for a function or module definition
 #[derive(Clone, Debug)]
 pub struct Parameter {
     name: Identifier,
@@ -11,6 +12,7 @@ pub struct Parameter {
 }
 
 impl Parameter {
+    /// @brief Create a new parameter
     pub fn new(
         name: Identifier,
         specified_type: Option<Type>,
@@ -124,29 +126,41 @@ pub struct ParameterList {
     by_name: std::collections::HashMap<String, usize>,
 }
 
+impl ParameterList {
+    pub fn new(parameters: Vec<Parameter>) -> Self {
+        let mut by_name = std::collections::HashMap::new();
+        for (i, parameter) in parameters.iter().enumerate() {
+            by_name.insert(parameter.name().to_string(), i);
+        }
+
+        Self {
+            parameters,
+            by_name,
+        }
+    }
+
+    pub fn push(&mut self, parameter: Parameter) -> Result<(), ParseError> {
+        if self.by_name.contains_key(&parameter.name().to_string()) {
+            return Err(ParseError::DuplicateParameter(parameter.name().clone()));
+        }
+
+        self.by_name
+            .insert(parameter.name().to_string(), self.parameters.len());
+        self.parameters.push(parameter);
+        Ok(())
+    }
+}
+
 impl Parse for ParameterList {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::parameter_list);
-        let mut parameters = Vec::new();
-        let mut by_name = std::collections::HashMap::new();
+        let mut parameters = ParameterList::default();
 
         for pair in pair.clone().into_inner() {
-            let parameter = Parameter::parse(pair)?.value().clone();
-            if by_name.contains_key(&parameter.name().to_string()) {
-                return Err(ParseError::DuplicateParameter(parameter.name().clone()));
-            }
-
-            by_name.insert(parameter.name().to_string(), parameters.len());
-            parameters.push(parameter);
+            parameters.push(Parameter::parse(pair)?.value().clone())?;
         }
 
-        with_pair_ok!(
-            Self {
-                parameters,
-                by_name
-            },
-            pair
-        )
+        with_pair_ok!(parameters, pair)
     }
 }
 
@@ -156,4 +170,30 @@ impl Deref for ParameterList {
     fn deref(&self) -> &Self::Target {
         &self.parameters
     }
+}
+
+#[macro_export]
+macro_rules! parameter {
+    ($name:ident) => {
+        Parameter::new(stringify!($name).into(), None, None)
+    };
+    ($name:ident: $ty:ident) => {
+        Parameter::new(stringify!($name).into(), Some(Type::$ty), None)
+    };
+    ($name:ident: $ty:ident = $value:expr) => {
+        Parameter::new(
+            stringify!($name).into(),
+            Some(Type::$ty),
+            Some(Expression::new($value)),
+        )
+    };
+}
+
+#[macro_export]
+macro_rules! parameter_list {
+    ($($param:expr),*) => {
+        microcad_parser::language::parameter::ParameterList::new(vec![
+            $($param,)*
+        ])
+    };
 }

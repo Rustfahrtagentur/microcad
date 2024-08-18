@@ -16,6 +16,13 @@ pub struct FunctionSignature {
 }
 
 impl FunctionSignature {
+    pub fn new(parameters: ParameterList, return_type: Option<Type>) -> Self {
+        Self {
+            parameters,
+            return_type,
+        }
+    }
+
     pub fn parameters(&self) -> &ParameterList {
         &self.parameters
     }
@@ -52,6 +59,17 @@ impl Parse for FunctionSignature {
             pair
         )
     }
+}
+
+#[macro_export]
+macro_rules! function_signature {
+    ($parameters:expr) => {
+        FunctionSignature::new($parameters, None)
+    };
+    (($parameters:expr) -> $return_type:ident) => {
+        FunctionSignature::new($parameters, Some(Type::$return_type))
+    };
+    () => {};
 }
 
 #[derive(Clone, Debug)]

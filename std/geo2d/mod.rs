@@ -1,13 +1,12 @@
 use microcad_core::Scalar;
+use microcad_parser::language::lang_type::Type;
+use microcad_parser::language::module::{BuiltinModule, ModuleDefinition};
+use microcad_parser::language::parameter::Parameter;
+use microcad_render::geo2d::{Generator, Geometry, LineString};
 
 pub struct Circle {
     pub radius: Scalar,
 }
-
-use microcad_parser::language::function::Parameter;
-use microcad_parser::language::lang_type::Type;
-use microcad_parser::language::module::{BuiltinModule, ModuleDefinition};
-use microcad_render::geo2d::{Generator, Geometry, LineString};
 
 impl Generator for Circle {
     fn generate(
