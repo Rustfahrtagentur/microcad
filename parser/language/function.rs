@@ -1,103 +1,30 @@
-use super::{call::*, expression::*, identifier::*, lang_type::*, module::*, value::*};
+use super::{
+    assignment::*,
+    call::*,
+    expression::*,
+    identifier::*,
+    lang_type::*,
+    parameter::{Parameter, ParameterList},
+    use_statement::*,
+    value::*,
+};
 use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
-pub struct DefinitionParameter {
-    #[allow(dead_code)]
-    name: Identifier,
-    #[allow(dead_code)]
-    specified_type: Option<Type>,
-    #[allow(dead_code)]
-    value: Option<Expression>,
-}
-
-impl DefinitionParameter {
-    pub fn new(name: Identifier, specified_type: Option<Type>, value: Option<Expression>) -> Self {
-        Self {
-            name,
-            specified_type,
-            value,
-        }
-    }
-
-    pub fn name(&self) -> &Identifier {
-        &self.name
-    }
-
-    pub fn specified_type(&self) -> Option<&Type> {
-        self.specified_type.as_ref()
-    }
-
-    pub fn value(&self) -> Option<&Expression> {
-        self.value.as_ref()
-    }
-}
-
-impl std::fmt::Display for DefinitionParameter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match (&self.specified_type, &self.value) {
-            (Some(t), Some(v)) => write!(f, "{}: {} = {}", self.name, t, v)?,
-            (Some(t), None) => write!(f, "{}: {}", self.name, t)?,
-            (None, Some(v)) => write!(f, "{} = {}", self.name, v)?,
-            _ => {}
-        }
-
-        write!(f, "{}", self.name)
-    }
-}
-
-impl Parse for DefinitionParameter {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut name = Identifier::default();
-        let mut specified_type = None;
-        let mut value = None;
-
-        for pair in pair.clone().into_inner() {
-            match pair.as_rule() {
-                Rule::identifier => {
-                    name = Identifier::parse(pair)?.value().clone();
-                }
-                Rule::r#type => {
-                    specified_type = Some(Type::parse(pair)?.value().clone());
-                }
-                Rule::expression => {
-                    value = Some(Expression::parse(pair)?.value().clone());
-                }
-                rule => {
-                    unreachable!(
-                        "Unexpected token in definition parameter: {:?} {:?}",
-                        rule,
-                        pair.as_span().as_str()
-                    );
-                }
-            }
-        }
-
-        if specified_type.is_none() && value.is_none() {
-            return Err(ParseError::DefinitionParameterMissingTypeOrValue(
-                name.clone(),
-            ));
-        }
-
-        with_pair_ok!(
-            Self {
-                name,
-                specified_type,
-                value,
-            },
-            pair
-        )
-    }
-}
-
-#[derive(Clone, Debug)]
 pub struct FunctionSignature {
-    pub parameters: Vec<DefinitionParameter>,
+    pub parameters: ParameterList,
     pub return_type: Option<Type>,
 }
 
 impl FunctionSignature {
-    pub fn parameters(&self) -> &Vec<DefinitionParameter> {
+    pub fn new(parameters: ParameterList, return_type: Option<Type>) -> Self {
+        Self {
+            parameters,
+            return_type,
+        }
+    }
+
+    pub fn parameters(&self) -> &ParameterList {
         &self.parameters
     }
 
@@ -105,22 +32,20 @@ impl FunctionSignature {
         &self.return_type
     }
 
-    pub fn get_parameter_by_name(&self, name: &Identifier) -> Option<&DefinitionParameter> {
+    pub fn get_parameter_by_name(&self, name: &Identifier) -> Option<&Parameter> {
         self.parameters.iter().find(|arg| arg.name() == name)
     }
 }
 
 impl Parse for FunctionSignature {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut parameters = Vec::new();
+        let mut parameters = ParameterList::default();
         let mut return_type = None;
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
-                Rule::definition_parameter_list => {
-                    parameters = Parser::vec(pair, DefinitionParameter::parse)?
-                        .value()
-                        .clone();
+                Rule::parameter_list => {
+                    parameters = ParameterList::parse(pair)?.value().clone();
                 }
                 Rule::r#type => return_type = Some(Type::parse(pair)?.value().clone()),
                 rule => unreachable!("Unexpected token in function signature: {:?}", rule),
@@ -137,79 +62,15 @@ impl Parse for FunctionSignature {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct Assignment {
-    name: Identifier,
-    specified_type: Option<Type>,
-    value: Expression,
-}
-
-impl Assignment {
-    pub fn name(&self) -> &Identifier {
-        &self.name
-    }
-
-    pub fn specified_type(&self) -> Option<&Type> {
-        self.specified_type.as_ref()
-    }
-
-    pub fn value(&self) -> Expression {
-        // TODO Return reference here
-        self.value.clone()
-    }
-}
-
-impl Parse for Assignment {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut name = Identifier::default();
-        let mut specified_type = None;
-        let mut value = Expression::default();
-
-        for pair in pair.clone().into_inner() {
-            match pair.as_rule() {
-                Rule::identifier => {
-                    name = Identifier::parse(pair)?.value().clone();
-                }
-                Rule::r#type => {
-                    specified_type = Some(Type::parse(pair)?.value().clone());
-                }
-                Rule::expression => {
-                    value = Expression::parse(pair)?.value().clone();
-                }
-                rule => {
-                    unreachable!("Unexpected token in assignment: {:?}", rule);
-                }
-            }
-        }
-
-        with_pair_ok!(
-            Self {
-                name,
-                specified_type,
-                value,
-            },
-            pair
-        )
-    }
-}
-
-impl Eval for Assignment {
-    type Output = ();
-
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
-        let value = self.value.eval(context)?;
-        context.add_symbol(Symbol::Value(self.name.clone(), value));
-        Ok(())
-    }
-}
-
-impl std::fmt::Display for Assignment {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self.specified_type {
-            Some(t) => write!(f, "{}: {} = {}", self.name, t, self.value),
-            None => write!(f, "{} = {}", self.name, self.value),
-        }
-    }
+#[macro_export]
+macro_rules! function_signature {
+    ($parameters:expr) => {
+        FunctionSignature::new($parameters, None)
+    };
+    (($parameters:expr) -> $return_type:ident) => {
+        FunctionSignature::new($parameters, Some(Type::$return_type))
+    };
+    () => {};
 }
 
 #[derive(Clone, Debug)]
@@ -269,11 +130,12 @@ impl Parse for FunctionStatement {
 }
 
 pub type BuiltinFunctionFunctor =
-    dyn Fn(EvaluatedCallArgumentList, &mut Context) -> Result<Value, Error>;
+    dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>, Error>;
 
 #[derive(Clone)]
 pub struct BuiltinFunction {
     pub name: Identifier,
+    pub signature: FunctionSignature,
     pub f: &'static BuiltinFunctionFunctor,
 }
 
@@ -284,16 +146,39 @@ impl std::fmt::Debug for BuiltinFunction {
 }
 
 impl BuiltinFunction {
-    pub fn new(name: Identifier, f: &'static BuiltinFunctionFunctor) -> Self {
-        Self { name, f }
+    pub fn new(
+        name: Identifier,
+        signature: FunctionSignature,
+        f: &'static BuiltinFunctionFunctor,
+    ) -> Self {
+        Self { name, signature, f }
     }
 
     pub fn call(
         &self,
-        args: EvaluatedCallArgumentList,
+        args: &CallArgumentList,
         context: &mut Context,
-    ) -> Result<Value, Error> {
-        (self.f)(args, context)
+    ) -> Result<Option<Value>, Error> {
+        let arg_map = args
+            .eval(context)?
+            .get_matching_arguments(&self.signature.parameters.eval(context)?)?;
+        let result = (self.f)(&arg_map, context)?;
+
+        match (&result, &self.signature.return_type) {
+            (Some(result), Some(return_type)) => {
+                if result.ty() != *return_type {
+                    Err(Error::TypeMismatch {
+                        expected: return_type.clone(),
+                        found: result.ty(),
+                    })
+                } else {
+                    Ok(Some(result.clone()))
+                }
+            }
+            (Some(result), None) => Ok(Some(result.clone())),
+            (None, Some(_)) => Err(Error::FunctionCallMissingReturn),
+            _ => Ok(None),
+        }
     }
 }
 
@@ -343,33 +228,30 @@ impl FunctionDefinition {
 
     pub fn call(
         &self,
-        args: EvaluatedCallArgumentList,
+        args: &CallArgumentList,
         context: &mut Context,
-    ) -> Result<Value, Error> {
+    ) -> Result<Option<Value>, Error> {
         // TODO: Check if the arguments are correct
         let params = self.signature.parameters();
+        let arg_map = args
+            .eval(context)?
+            .get_matching_arguments(&params.eval(context)?)?;
 
-        for param in params {
-            match args.get_named_arg(&param.name) {
-                Some(value) => context.add_symbol(Symbol::Value(param.name.clone(), value.clone())),
-                None => {
-                    return Err(crate::eval::Error::FunctionCallMissingArgument(
-                        param.name.clone(),
-                    ))
-                }
-            }
+        context.push();
+        for (name, value) in arg_map.iter() {
+            context.add_symbol(Symbol::Value(name.clone(), value.clone()));
         }
 
         for statement in self.body.0.iter() {
             match statement {
                 FunctionStatement::Assignment(assignment) => assignment.eval(context)?,
-                FunctionStatement::Return(expr) => return expr.eval(context),
+                FunctionStatement::Return(expr) => return Ok(Some(expr.eval(context)?)),
                 FunctionStatement::FunctionDefinition(f) => f.eval(context)?,
                 _ => unimplemented!(),
             }
         }
-
-        Err(crate::eval::Error::FunctionCallMissingReturn)
+        context.pop();
+        Ok(None)
     }
 }
 
@@ -460,7 +342,7 @@ fn function_evaluate() {
     let mut context = Context::default();
     context.add_symbol(Symbol::Function(function_def));
 
-    let input = "test(a = 1, b = 2)";
+    let input = "test(a = 1.0, b = 2.0)";
     let expr = Parser::parse_rule_or_panic::<Expression>(Rule::expression, input);
 
     let value = expr.eval(&mut context).unwrap();

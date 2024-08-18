@@ -1,11 +1,11 @@
 use super::*;
-use geo::CoordsIter;
+use geo::{CoordsIter, Geometry};
+use geo2d::*;
 use std::io::Write;
+use tree::NodeInner;
 
 pub struct SvgWriter<'a> {
     writer: &'a mut dyn Write,
-    _bounds: Rect,
-    _scale: Scalar,
 }
 
 impl<'a> SvgWriter<'a> {
@@ -21,11 +21,7 @@ impl<'a> SvgWriter<'a> {
         )?;
         writeln!(&mut w, "<g transform='scale({scale})'>")?;
 
-        Ok(Self {
-            writer: w,
-            _bounds: bounds,
-            _scale: scale,
-        })
+        Ok(Self { writer: w })
     }
 
     pub fn rect(&mut self, rect: &Rect, style: &str) -> std::io::Result<()> {
@@ -106,12 +102,65 @@ impl<'a> Drop for SvgWriter<'a> {
     }
 }
 
+pub struct SvgRenderer<'a> {
+    writer: SvgWriter<'a>,
+    precision: Scalar,
+}
+
+impl<'a> SvgRenderer<'a> {
+    pub fn new(w: &'a mut dyn Write) -> std::io::Result<Self> {
+        Ok(Self {
+            writer: SvgWriter::new(
+                w,
+                geo::Rect::new(geo::Point::new(-10.0, -10.0), geo::Point::new(10.0, 10.0)),
+                1.0,
+            )?,
+            precision: 0.1,
+        })
+    }
+}
+
+impl<'a> Renderer for SvgRenderer<'a> {
+    fn precision(&self) -> Scalar {
+        self.precision
+    }
+
+    fn render(&mut self, node: Node) {
+        let inner = node.borrow();
+        let result = match &*inner {
+            NodeInner::Export(_) | NodeInner::Group | NodeInner::Root => {
+                for child in node.children() {
+                    self.render(child.clone());
+                }
+                return;
+            }
+            NodeInner::Algorithm(algorithm) => Some(algorithm.process(self, node.clone())),
+            _ => panic!("Node must be an algorithm but is {:?}", node),
+        };
+
+        if let Some(result) = result {
+            let inner = result.borrow();
+            match &*inner {
+                NodeInner::Geometry2D(geometry) => match geometry.as_ref() {
+                    Geometry::MultiPolygon(p) => {
+                        self.writer
+                            .multi_polygon(p, "fill:black;stroke:none;")
+                            .unwrap();
+                    }
+                    _ => panic!("Resulting node must be a MultiPolygon"),
+                },
+                _ => panic!("Node must be Geometry2D"),
+            }
+        }
+    }
+}
+
 #[test]
 fn svg_write() {
     // Write to file test.svg
     let mut file = std::fs::File::create("svg_write.svg").unwrap();
 
-    let mut svg = super::SvgWriter::new(
+    let mut svg = SvgWriter::new(
         &mut file,
         geo::Rect::new(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0)),
         1.0,
@@ -126,13 +175,4 @@ fn svg_write() {
 
     let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
     svg.line(line.0, line.1, "stroke:black;").unwrap();
-
-    use super::RenderMultiPolygon;
-    let circle_polygon = super::Circle {
-        radius: 40.0,
-        points: 32,
-    }
-    .render();
-    svg.multi_polygon(&circle_polygon, "fill:none;stroke:black;")
-        .unwrap();
 }

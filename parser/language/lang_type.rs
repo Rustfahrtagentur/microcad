@@ -208,6 +208,8 @@ pub enum Type {
     NamedTuple(NamedTupleType),
     /// A custom type or a module node in the syntax tree
     Custom(QualifiedName),
+    /// Node
+    Node,
 }
 
 impl Type {
@@ -217,6 +219,19 @@ impl Type {
             Self::Angle => Unit::Rad,
             Self::List(t) => t.ty().default_unit(),
             _ => Unit::None,
+        }
+    }
+
+    /// Check if the type is a named tuple
+    pub fn is_named_tuple(&self) -> bool {
+        matches!(self, Self::NamedTuple(_))
+    }
+
+    /// Check if the type is a list of the given type `ty`
+    pub fn is_list_of(&self, ty: &Type) -> bool {
+        match self {
+            Self::List(list_type) => &list_type.ty() == ty,
+            _ => false,
         }
     }
 }
@@ -273,6 +288,7 @@ impl std::fmt::Display for Type {
             Self::UnnamedTuple(t) => write!(f, "{}", t),
             Self::NamedTuple(t) => write!(f, "{}", t),
             Self::Custom(qn) => write!(f, "{}", qn),
+            Self::Node => write!(f, "{{}}"),
         }
     }
 }

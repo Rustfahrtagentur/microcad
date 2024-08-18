@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use super::{
     call::*, format_string::*, identifier::*, list::*, literal::*, module::*, tuple::*, value::*,
 };
@@ -32,7 +34,7 @@ lazy_static::lazy_static! {
 pub enum NestedItem {
     Call(Call),
     QualifiedName(QualifiedName),
-    ModuleBody(Vec<ModuleStatement>),
+    ModuleBody(ModuleBody),
 }
 
 impl Parse for NestedItem {
@@ -49,13 +51,10 @@ impl Parse for NestedItem {
                 )
             }
             Rule::module_body => {
-                let mut vec = Vec::new();
-                for pair in pair.clone().into_inner() {
-                    if pair.as_rule() == Rule::module_statement {
-                        vec.push(ModuleStatement::parse(pair.clone())?.value().clone());
-                    }
-                }
-                with_pair_ok!(NestedItem::ModuleBody(vec), pair)
+                with_pair_ok!(
+                    NestedItem::ModuleBody(ModuleBody::parse(pair.clone())?.value().clone()),
+                    pair
+                )
             }
             rule => unreachable!(
                 "NestedItem::parse expected call or qualified name, found {:?}",
@@ -70,12 +69,7 @@ impl std::fmt::Display for NestedItem {
         match self {
             NestedItem::Call(call) => write!(f, "{}", call),
             NestedItem::QualifiedName(qualified_name) => write!(f, "{}", qualified_name),
-            NestedItem::ModuleBody(body) => {
-                for stmt in body {
-                    write!(f, "{{{}}}", stmt)?;
-                }
-                Ok(())
-            }
+            NestedItem::ModuleBody(body) => write!(f, "{}", body),
         }
     }
 }
@@ -99,32 +93,63 @@ impl Parse for Nested {
 impl Eval for Nested {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
-        let mut value = None;
-        for item in &self.0 {
-            if value.is_none() {
-                match item {
-                    NestedItem::Call(call) => value = Some(call.eval(context)?),
-                    NestedItem::QualifiedName(qualified_name) => {
-                        match qualified_name.eval(context)? {
-                            Symbol::Value(_, v) => value = Some(v),
-                            _ => todo!(),
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        let root = context.current_node();
+
+        let mut values = Vec::new();
+        for (index, item) in self.0.iter().enumerate() {
+            match item {
+                NestedItem::Call(call) => match call.eval(context)? {
+                    Some(value) => values.push(value),
+                    None => {
+                        if index != 0 {
+                            return Err(Error::CannotNestFunctionCall);
+                        } else {
+                            return Ok(Value::Scalar(0.0)); // @todo This is a hack. Return a Option::None here
                         }
                     }
-                    NestedItem::ModuleBody(body) => {
-                        for _stmt in body {
-                            // stmt.eval(context)?;
-                            todo!()
+                },
+                NestedItem::QualifiedName(qualified_name) => {
+                    let symbols = qualified_name.eval(context)?;
+
+                    for symbol in symbols {
+                        if let Symbol::Value(_, v) = symbol {
+                            values.push(v.clone()); // Find first value only. @todo Backpropagation of values
+                            break;
                         }
                     }
+                }
+                NestedItem::ModuleBody(body) => {
+                    let new_node = body.eval(context)?;
+                    new_node.detach();
+                    values.push(Value::Node(new_node));
                 }
             }
         }
 
-        match value {
-            Some(v) => Ok(v),
-            None => Err(Error::Unknown),
+        assert!(!values.is_empty());
+
+        if values.len() == 1 {
+            return Ok(values[0].clone());
         }
+
+        // Finally, nest all nodes
+        for value in values {
+            match value {
+                Value::Node(node) => {
+                    node.detach();
+                    let nested = context.append_node(node);
+                    context.set_current_node(nested);
+                }
+                _ => {
+                    return Err(Error::CannotNestFunctionCall);
+                }
+            }
+        }
+
+        context.set_current_node(root.clone());
+
+        Ok(Value::Node(root.clone()))
     }
 }
 
@@ -198,7 +223,18 @@ impl std::fmt::Display for Expression {
     }
 }
 
-impl Expression {}
+impl Expression {
+    pub fn literal(literal: Literal) -> Self {
+        Self::Literal(literal)
+    }
+
+    pub fn literal_from_str(s: &str) -> Result<Self, anyhow::Error> {
+        if s.starts_with('"') && s.ends_with('"') {
+            return Ok(Self::FormatString(FormatString::from_str(s)?));
+        }
+        Ok(Self::Literal(Literal::from_str(s)?))
+    }
+}
 
 impl Eval for Expression {
     type Output = Value;

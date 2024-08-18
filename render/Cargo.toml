@@ -1,6 +1,6 @@
 [package]
-name = "csg-tree"
-description = "A tree for the CSG language"
+name = "microcad-render"
+description = "µCAD renderers"
 edition.workspace = true
 rust-version.workspace = true
 version.workspace = true
@@ -12,4 +12,7 @@ path = "lib.rs"
 log = "0.4"
 rctree = "0.6"
 geo = "0.28"
-microcad-parser = { path = "../parser" }
+cgmath = "0.18"
+strum = { version = "0.26", features = ["derive"] }
+
+microcad-core = { path = "../core" }

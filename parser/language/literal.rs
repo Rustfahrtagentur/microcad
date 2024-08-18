@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use super::{color::*, lang_type::*, units::*, value::*};
 use crate::{eval::*, parser::*};
 
@@ -162,6 +164,14 @@ pub enum Literal {
 impl Literal {
     pub fn number_unit(n: f64, u: Unit) -> Self {
         Self::Number(NumberLiteral(n, u))
+    }
+}
+
+impl FromStr for Literal {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Parser::parse_rule::<Self>(Rule::literal, s)
     }
 }
 

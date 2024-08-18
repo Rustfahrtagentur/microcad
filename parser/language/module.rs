@@ -1,7 +1,9 @@
-use strum::IntoStaticStr;
+use microcad_render::tree::{self, Node};
 
-// Resolve a qualified name to a type or value.
-use super::{call::*, expression::*, function::*, identifier::*};
+use super::{
+    assignment::*, call::*, expression::*, function::*, identifier::*, parameter::ParameterList,
+    use_statement::*,
+};
 use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
@@ -36,7 +38,7 @@ impl Parse for Attribute {
 impl std::fmt::Display for Attribute {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.arguments {
-            Some(arguments) => write!(f, "{}({})", self.name, arguments),
+            Some(arguments) => write!(f, "{}({:?})", self.name, arguments),
             None => write!(f, "{}", self.name),
         }
     }
@@ -76,30 +78,28 @@ impl Parse for ModuleInitStatement {
 
 #[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
-    #[allow(dead_code)]
-    parameters: Vec<DefinitionParameter>,
-    #[allow(dead_code)]
+    parameters: ParameterList,
     body: Vec<ModuleInitStatement>,
 }
 
 impl Parse for ModuleInitDefinition {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::module_init_definition);
-        let mut parameters = Vec::new();
+        let mut parameters = ParameterList::default();
         let mut body = Vec::new();
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
-                Rule::definition_parameter_list => {
-                    for pair in pair.into_inner() {
-                        parameters.push(DefinitionParameter::parse(pair)?.value().clone());
-                    }
+                Rule::parameter_list => {
+                    parameters = ParameterList::parse(pair)?.value().clone();
                 }
                 Rule::module_init_statement => {
                     body.push(ModuleInitStatement::parse(pair)?.value().clone());
                 }
                 Rule::COMMENT => {}
-                rule => unreachable!("expected definition_parameter_list or module_init_statement. Instead found {rule:?}" ),
+                rule => unreachable!(
+                    "expected parameter_list or module_init_statement. Instead found {rule:?}"
+                ),
             }
         }
 
@@ -111,6 +111,7 @@ impl Parse for ModuleInitDefinition {
 pub struct ModuleBody {
     pub statements: Vec<ModuleStatement>,
     pub symbols: SymbolTable,
+    pub inits: Vec<std::rc::Rc<ModuleInitDefinition>>,
 }
 
 impl ModuleBody {
@@ -118,6 +119,7 @@ impl ModuleBody {
         Self {
             statements: Vec::new(),
             symbols: SymbolTable::new(),
+            inits: Vec::new(),
         }
     }
 
@@ -129,6 +131,9 @@ impl ModuleBody {
             }
             ModuleStatement::ModuleDefinition(module) => {
                 self.symbols.add(Symbol::ModuleDefinition(module));
+            }
+            ModuleStatement::ModuleInitDefinition(init) => {
+                self.inits.push(init.clone());
             }
             _ => {}
         }
@@ -153,6 +158,7 @@ impl ModuleBody {
 
 impl Parse for ModuleBody {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        Parser::ensure_rule(&pair, Rule::module_body);
         let mut body = ModuleBody::new();
 
         for pair in pair.clone().into_inner() {
@@ -170,6 +176,22 @@ impl Parse for ModuleBody {
         }
 
         with_pair_ok!(body, pair)
+    }
+}
+
+impl Eval for ModuleBody {
+    type Output = Node;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        let node = tree::group();
+        let current = context.current_node();
+        context.set_current_node(node.clone());
+        for statement in &self.statements {
+            statement.eval(context)?;
+        }
+        context.set_current_node(current.clone());
+
+        Ok(node.clone())
     }
 }
 
@@ -224,7 +246,7 @@ pub enum ModuleStatement {
     Assignment(Assignment),
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
     FunctionDefinition(std::rc::Rc<FunctionDefinition>),
-    ModuleInitDefinition(ModuleInitDefinition),
+    ModuleInitDefinition(std::rc::Rc<ModuleInitDefinition>),
 }
 
 impl Parse for ModuleStatement {
@@ -250,12 +272,16 @@ impl Parse for ModuleStatement {
                         ModuleDefinition::parse(first)?.value().clone(),
                     )),
                 Rule::module_init_definition => ModuleStatement::ModuleInitDefinition(
-                    ModuleInitDefinition::parse(first)?.value().clone(),
+                    std::rc::Rc::new(ModuleInitDefinition::parse(first)?.value().clone(),)
                 ),
                 Rule::function_definition => ModuleStatement::FunctionDefinition(std::rc::Rc::new(
                     FunctionDefinition::parse(first)?.value().clone(),
                 )),
-                rule => unreachable!("Unexpected module statement, got {:?}", rule),
+                rule => unreachable!(
+                    "Unexpected module statement, got {:?} {:?}",
+                    rule,
+                    first.clone()
+                ),
             },
             pair
         )
@@ -272,6 +298,15 @@ impl Eval for ModuleStatement {
             }
             ModuleStatement::Expression(expr) => {
                 expr.eval(context)?;
+            }
+            ModuleStatement::Assignment(assignment) => {
+                assignment.eval(context)?;
+            }
+            ModuleStatement::FunctionDefinition(function_definition) => {
+                context.add_symbol(Symbol::Function(function_definition.clone()));
+            }
+            ModuleStatement::ModuleDefinition(module_definition) => {
+                context.add_symbol(Symbol::ModuleDefinition(module_definition.clone()));
             }
             statement => {
                 let s: &'static str = statement.into();
@@ -305,7 +340,7 @@ impl std::fmt::Display for ModuleStatement {
 pub struct ModuleDefinition {
     pub attributes: Vec<Attribute>,
     pub name: Identifier,
-    pub parameters: Option<Vec<DefinitionParameter>>,
+    pub parameters: Option<ParameterList>,
     pub body: ModuleBody,
 }
 
@@ -356,12 +391,8 @@ impl Parse for ModuleDefinition {
                 Rule::identifier => {
                     name = Identifier::parse(pair)?.value().clone();
                 }
-                Rule::definition_parameter_list => {
-                    parameters = Some(
-                        Parser::vec(pair, DefinitionParameter::parse)?
-                            .value()
-                            .clone(),
-                    );
+                Rule::parameter_list => {
+                    parameters = Some(ParameterList::parse(pair)?.value().clone());
                 }
                 Rule::module_body => {
                     body = ModuleBody::parse(pair.clone())?.value().clone();
@@ -382,118 +413,70 @@ impl Parse for ModuleDefinition {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct UseAlias(pub QualifiedName, pub Identifier);
+pub type BuiltinModuleFunctor = dyn Fn(&ArgumentMap, &mut Context) -> Result<Node, Error>;
 
-impl std::fmt::Display for UseAlias {
+#[derive(Clone)]
+pub struct BuiltinModule {
+    pub name: Identifier,
+    pub parameters: ParameterList,
+    pub f: &'static BuiltinModuleFunctor,
+}
+
+impl std::fmt::Debug for BuiltinModule {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "use {:?} as {:?}", self.0, self.1)
+        write!(f, "BUILTIN_MOD({})", &self.name)
     }
 }
 
-#[derive(Clone, Debug, IntoStaticStr)]
-pub enum UseStatement {
-    /// Import symbols given as qualified names: `use a, b`
-    Use(Vec<QualifiedName>),
-    /// Import specific symbol from a module: `use a,b from c`
-    UseFrom(Vec<QualifiedName>, QualifiedName),
-    /// Import all symbols from a module: `use * from a, b`
-    UseAll(Vec<QualifiedName>),
-    /// Import as alias: `use a as b`
-    UseAlias(UseAlias),
-}
-
-impl std::fmt::Display for UseStatement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            UseStatement::Use(names) => write!(f, "use {names:?}"),
-            UseStatement::UseFrom(names, from) => write!(f, "use {names:?} from {from:?}"),
-            UseStatement::UseAll(names) => write!(f, "use * from {names:?}"),
-            UseStatement::UseAlias(alias) => write!(f, "{}", alias),
+impl BuiltinModule {
+    pub fn new(
+        name: Identifier,
+        parameters: ParameterList,
+        f: &'static BuiltinModuleFunctor,
+    ) -> Self {
+        Self {
+            name,
+            parameters,
+            f,
         }
     }
+
+    pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Node, Error> {
+        let arg_map = args
+            .eval(context)?
+            .get_matching_arguments(&self.parameters.eval(context)?)?;
+        (self.f)(&arg_map, context)
+    }
 }
 
-impl Parse for UseAlias {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut inner = pair.clone().into_inner();
-        with_pair_ok!(
-            UseAlias(
-                QualifiedName::parse(inner.next().unwrap())?.value().clone(),
-                Identifier::parse(inner.next().unwrap())?.value().clone(),
-            ),
-            pair
+#[macro_export]
+macro_rules! builtin_module {
+    // This macro is used to create a BuiltinModule from a function
+    ($name:ident, $f:expr) => {
+        BuiltinModule::new(
+            stringify!($name).into(),
+            &$f,
         )
-    }
-}
-
-impl Parse for UseStatement {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut inner = pair.clone().into_inner();
-        let first = inner.next().unwrap();
-        let second = inner.next();
-        let names = Parser::vec(first.clone(), QualifiedName::parse)?
-            .value()
-            .clone();
-        match (first.as_rule(), second) {
-            (Rule::qualified_name_list, Some(second))
-                if second.as_rule() == Rule::qualified_name =>
-            {
-                with_pair_ok!(
-                    UseStatement::UseFrom(names, QualifiedName::parse(second)?.value().clone(),),
-                    pair
-                )
-            }
-            (Rule::qualified_name_list, None) => {
-                with_pair_ok!(UseStatement::Use(names), pair)
-            }
-            (Rule::qualified_name_all, Some(second))
-                if second.as_rule() == Rule::qualified_name_list =>
-            {
-                with_pair_ok!(
-                    UseStatement::UseAll(
-                        Parser::vec(second, QualifiedName::parse)?.value().clone()
-                    ),
-                    pair
-                )
-            }
-            (Rule::use_alias, _) => {
-                with_pair_ok!(
-                    UseStatement::UseAlias(UseAlias::parse(first)?.value().clone()),
-                    pair
-                )
-            }
-            _ => Err(ParseError::InvalidUseStatement),
-        }
-    }
-}
-
-impl Eval for UseStatement {
-    type Output = ();
-
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
-        match self {
-            UseStatement::UseAll(names) => {
-                for name in names {
-                    let symbol = name.eval(context)?;
-                    match symbol {
-                        Symbol::ModuleDefinition(module_definition) => {
-                            let symbols = module_definition.symbols();
-                            for symbol in symbols.iter() {
-                                context.add_symbol(symbol.clone());
-                            }
-                        }
-                        _ => {
-                            return Err(Error::ExpectedModule(name.clone()));
-                        }
-                    }
-                }
-                Ok(())
-            }
-            statement => {
-                let s: &'static str = statement.into();
-                unimplemented!(" {s}")
-            }
-        }
-    }
+    };
+    // This macro is used to create a BuiltinModule from a function with no arguments
+    ($name:ident) => {
+        BuiltinModule::new(
+            stringify!($name).into(),
+            microcad_parser::language::parameter::ParameterList::default(),
+            &|_, ctx| Ok(ctx.append_node($name())),
+        )
+    };
+    ($name:ident($($arg:ident: $type:ident),*)) => {
+        BuiltinModule::new(
+            stringify!($name).into(),
+            microcad_parser::parameter_list![$(microcad_parser::parameter!($arg: $type)),*],
+            &|args, ctx| {
+                let mut l = |$($arg: $type),*| Ok(ctx.append_node($name($($arg),*)));
+                let ($($arg),*) = (
+                    $(args.get(&stringify!($arg).into()).unwrap().clone().try_into()?),*
+                );
+                l($($arg),*)
+            },
+        )
+    };
 }

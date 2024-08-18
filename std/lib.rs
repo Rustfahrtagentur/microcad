@@ -1,7 +1,18 @@
+mod algorithm;
+mod geo2d;
 mod math;
 
+use microcad_parser::builtin_module;
 use microcad_parser::eval::*;
+use microcad_parser::function_signature;
+use microcad_parser::language::expression::Expression;
+use microcad_parser::language::lang_type::Type;
+use microcad_parser::language::parameter::Parameter;
+use microcad_parser::language::value::Value;
 use microcad_parser::language::{function::*, module::*};
+use microcad_parser::parameter;
+use microcad_parser::parameter_list;
+use microcad_render::tree::{Node, NodeInner};
 
 pub struct ModuleBuilder {
     module: ModuleDefinition,
@@ -14,8 +25,18 @@ impl ModuleBuilder {
         }
     }
 
+    pub fn value(&mut self, name: &str, value: Value) -> &mut Self {
+        self.module.add_symbol(Symbol::Value(name.into(), value));
+        self
+    }
+
     pub fn builtin_function(&mut self, f: BuiltinFunction) -> &mut Self {
         self.module.add_symbol(Symbol::BuiltinFunction(f));
+        self
+    }
+
+    pub fn builtin_module(&mut self, m: BuiltinModule) -> &mut Self {
+        self.module.add_symbol(Symbol::BuiltinModule(m));
         self
     }
 
@@ -32,9 +53,12 @@ impl ModuleBuilder {
 /// @todo: Check if is possible to rewrite this macro with arbitrary number of arguments
 #[macro_export]
 macro_rules! arg_1 {
-    ($f:ident($name:ident) for $($ty:tt),+) => { BuiltinFunction::new(stringify!($f).into(), &|args, _| {
-        match args.arg_1(stringify!(name))? {
-            $(Value::$ty($name) => Ok(Value::$ty($name.$f())),)*
+    ($f:ident($name:ident) for $($ty:tt),+) => { BuiltinFunction::new(
+        stringify!($f).into(),
+        microcad_parser::function_signature!(microcad_parser::parameter_list![microcad_parser::parameter!($name)]),
+        &|args, _| {
+        match args.get(&stringify!($name).into()).unwrap() {
+            $(Value::$ty($name) => Ok(Some(Value::$ty($name.$f()))),)*
             Value::List(v) => {
                 let mut result = ValueList::new();
                 for x in v.iter() {
@@ -43,16 +67,18 @@ macro_rules! arg_1 {
                         _ => return Err(Error::InvalidArgumentType(x.ty())),
                     }
                 }
-                Ok(Value::List(List(result, v.ty())))
+                Ok(Some(Value::List(List(result, v.ty()))))
             }
             v => Err(Error::InvalidArgumentType(v.ty())),
         }
     })
     };
     ($f:ident($name:ident) $inner:expr) => {
-        BuiltinFunction::new(stringify!($f).into(), &|args, _| {
-            let l = |$name| $inner;
-            l(args.arg_1(stringify!($name))?.clone())
+        BuiltinFunction::new(stringify!($f).into(),
+        microcad_parser::function_signature!(microcad_parser::parameter_list![microcad_parser::parameter!($name)]),
+        &|args, _| {
+            let l = |$name| Ok(Some($inner?));
+            l(args.get(&stringify!($name).into()).unwrap().clone())
     })
 }
 }
@@ -60,22 +86,65 @@ macro_rules! arg_1 {
 #[macro_export]
 macro_rules! arg_2 {
     ($f:ident($x:ident, $y:ident) $inner:expr) => {
-        BuiltinFunction::new(stringify!($f).into(), &|args, _| {
-            let l = |$x, $y| $inner;
-            let (x, y) = args.arg_2(stringify!($x), stringify!($y))?;
-            l(x.clone(), y.clone())
-        })
+        BuiltinFunction::new(
+            stringify!($f).into(),
+            microcad_parser::function_signature!(microcad_parser::parameter_list![
+                microcad_parser::parameter!($x),
+                microcad_parser::parameter!($y)
+            ]),
+            &|args, _| {
+                let l = |$x, $y| Ok(Some($inner?));
+                let (x, y) = (
+                    args.get(&stringify!($x).into()).unwrap().clone(),
+                    args.get(&stringify!($y).into()).unwrap().clone(),
+                );
+                l(x.clone(), y.clone())
+            },
+        )
     };
+}
+
+pub fn export(filename: String) -> Node {
+    Node::new(NodeInner::Export(filename))
 }
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("std")
         .module(math::builtin_module())
-        .builtin_function(BuiltinFunction::new("assert".into(), &|args, _| {
-            assert!(args[0].into_bool()?);
-            Ok(args[0].clone())
-        }))
+        .module(geo2d::builtin_module())
+        .module(algorithm::builtin_module())
+        .builtin_function(BuiltinFunction::new(
+            "assert".into(),
+            function_signature!(parameter_list![
+                parameter!(condition: Bool),
+                parameter!(message: String = "Assertion failed")
+            ]),
+            &|args, _| {
+                let message: String = args[&"message".into()].clone().try_into()?;
+                let condition: bool = args[&"condition".into()].clone().try_into()?;
+                assert!(condition, "{message}");
+                Ok(None)
+            },
+        ))
+        .builtin_module(builtin_module!(export(filename: String)))
         .build()
+}
+
+#[test]
+fn context_namespace() {
+    let mut context = Context::default();
+
+    let module = ModuleBuilder::namespace("math")
+        .value("pi", Value::Scalar(std::f64::consts::PI))
+        .build();
+
+    context.add_symbol(Symbol::ModuleDefinition(module));
+
+    let symbols = context
+        .get_symbols_by_qualified_name(&"math::pi".into())
+        .unwrap();
+    assert_eq!(symbols.len(), 1);
+    assert_eq!(symbols[0].name(), "pi");
 }
 
 #[test]
@@ -96,5 +165,66 @@ fn test_assert() {
 
     if let Err(err) = doc.eval(&mut context) {
         println!("{err}");
+    }
+}
+
+#[test]
+fn difference_svg() {
+    use crate::algorithm;
+    use microcad_render::svg::SvgRenderer;
+    use microcad_render::Renderer;
+
+    let difference = algorithm::boolean_op::difference();
+    let group = microcad_render::tree::group();
+    group.append(crate::geo2d::circle(4.0));
+    group.append(crate::geo2d::circle(2.0));
+    difference.append(group);
+
+    let mut file = std::fs::File::create("difference.svg").unwrap();
+    let mut renderer = SvgRenderer::new(&mut file).unwrap();
+
+    renderer.render(difference);
+}
+
+#[test]
+fn test_export() {
+    use microcad_parser::{language::document::Document, parser};
+    let doc = match parser::Parser::parse_rule::<Document>(
+        parser::Rule::document,
+        r#"
+use * from std;
+
+export("export.svg") algorithm::difference() {
+    geo2d::circle(radius = 3.0);
+    geo2d::rect(width = 3.0, height = 2.0);
+};
+            "#,
+    ) {
+        Ok(doc) => doc,
+        Err(err) => panic!("ERROR: {err}"),
+    };
+
+    let mut context = Context::default();
+    context.add_symbol(Symbol::ModuleDefinition(builtin_module()));
+
+    let node = doc.eval(&mut context).unwrap();
+
+    for n in node.descendants() {
+        // Indent with depth
+        for _ in 0..microcad_render::tree::Depth::depth(&n) {
+            print!("  ");
+        }
+        println!("{:?}", n);
+    }
+
+    // Iterate over all nodes and export the ones with the Export tag
+    // @todo: This must be a method in the tree
+    for n in node.descendants() {
+        let inner = n.borrow();
+        if let NodeInner::Export(ref filename) = *inner {
+            let mut file = std::fs::File::create(filename).unwrap();
+            let mut renderer = microcad_render::svg::SvgRenderer::new(&mut file).unwrap();
+            microcad_render::Renderer::render(&mut renderer, n.clone());
+        }
     }
 }

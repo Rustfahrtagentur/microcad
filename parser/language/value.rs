@@ -1,16 +1,10 @@
 use super::{color::*, identifier::*, lang_type::*, units::*};
 use cgmath::InnerSpace;
+use microcad_core::*;
+use microcad_render::tree::Node;
 use thiserror::Error;
 
 pub type Number = super::literal::NumberLiteral;
-pub type Scalar = f64;
-pub type Vec2 = cgmath::Vector2<Scalar>;
-pub type Vec3 = cgmath::Vector3<Scalar>;
-pub type Vec4 = cgmath::Vector4<Scalar>;
-pub type Mat2 = cgmath::Matrix2<Scalar>;
-pub type Mat3 = cgmath::Matrix3<Scalar>;
-pub type Mat4 = cgmath::Matrix4<Scalar>;
-pub type Angle = cgmath::Rad<Scalar>;
 
 #[derive(Debug, Error)]
 pub enum ValueError {
@@ -24,8 +18,8 @@ pub enum ValueError {
     },
     #[error("Type cannot be a key in a map: {0}")]
     InvalidMapKeyType(Type),
-    #[error("Cannot convert value into scalar: {0}")]
-    CannotConvertToScalar(Value),
+    #[error("Cannot convert value {0} to {1}")]
+    CannotConvert(Value, String),
     #[error("Cannot convert value into boolean: {0}")]
     CannotConvertToBool(Value),
     #[error("Cannot add unit to a unitful value: {0}")]
@@ -151,6 +145,10 @@ impl std::fmt::Display for Map {
 pub struct NamedTuple(pub std::collections::BTreeMap<Identifier, Value>);
 
 impl NamedTuple {
+    pub fn from_vec(vec: Vec<(Identifier, Value)>) -> Self {
+        Self(vec.into_iter().collect())
+    }
+
     pub fn len(&self) -> usize {
         self.0.len()
     }
@@ -162,6 +160,13 @@ impl NamedTuple {
     pub fn iter(&self) -> impl Iterator<Item = (&Identifier, &Value)> {
         self.0.iter()
     }
+}
+
+#[macro_export]
+macro_rules! named_tuple {
+    ($($name:ident: $ty:ident = $value:expr),*) => {
+        NamedTuple::from_vec(vec![$((stringify!($name).into(), Value::$ty($value)),)*])
+    };
 }
 
 impl std::fmt::Display for NamedTuple {
@@ -294,6 +299,9 @@ pub enum Value {
     NamedTuple(NamedTuple),
 
     UnnamedTuple(UnnamedTuple),
+
+    /// A node in the render tree
+    Node(Node),
 }
 
 impl Value {
@@ -341,13 +349,7 @@ impl Value {
         }
     }
 
-    pub fn into_scalar(&self) -> Result<Scalar, ValueError> {
-        match self {
-            Value::Scalar(s) | Value::Length(s) | Value::Angle(s) => Ok(*s),
-            value => Err(ValueError::CannotConvertToScalar(value.clone())),
-        }
-    }
-
+    // @todo Remove this method
     pub fn into_bool(&self) -> Result<bool, ValueError> {
         match self {
             Value::Bool(b) => Ok(*b),
@@ -385,6 +387,7 @@ impl Ty for Value {
             Value::Map(map) => map.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
+            Value::Node(_) => Type::Node,
         }
     }
 }
@@ -534,9 +537,45 @@ impl std::fmt::Display for Value {
             Value::Map(m) => write!(f, "{}", m),
             Value::NamedTuple(t) => write!(f, "{}", t),
             Value::UnnamedTuple(t) => write!(f, "{}", t),
+            Value::Node(n) => write!(f, "{:?}", n),
         }
     }
 }
+
+macro_rules! impl_try_from {
+    ($($variant:ident),+ => $ty:ty ) => {
+        impl TryFrom<Value> for $ty {
+            type Error = ValueError;
+
+            fn try_from(value: Value) -> Result<Self, Self::Error> {
+                match value {
+                    $(Value::$variant(v) => Ok(v.into()),)*
+                    value => Err(ValueError::CannotConvert(value, stringify!($ty).into())),
+                }
+            }
+        }
+
+        impl TryFrom<&Value> for $ty {
+            type Error = ValueError;
+
+            fn try_from(value: &Value) -> Result<Self, Self::Error> {
+                match value {
+                    $(Value::$variant(v) => Ok(v.clone().into()),)*
+                    value => Err(ValueError::CannotConvert(value.clone(), stringify!($ty).into())),
+                }
+            }
+        }
+    };
+}
+
+impl_try_from!(Integer => i64);
+impl_try_from!(Scalar, Length, Angle => Scalar);
+impl_try_from!(Vec2 => Vec2);
+impl_try_from!(Vec3 => Vec3);
+impl_try_from!(Vec4 => Vec4);
+impl_try_from!(Bool => bool);
+impl_try_from!(String => String);
+impl_try_from!(Color => Color);
 
 #[derive(Clone, Debug, PartialEq, Default)]
 pub struct ValueList(Vec<Value>);

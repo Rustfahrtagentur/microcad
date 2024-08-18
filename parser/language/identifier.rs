@@ -85,6 +85,12 @@ pub enum IdentifierListError {
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct IdentifierList(Vec<Identifier>);
 
+impl IdentifierList {
+    pub fn new() -> Self {
+        Self(Vec::new())
+    }
+}
+
 impl std::ops::Deref for IdentifierList {
     type Target = Vec<Identifier>;
 
@@ -188,31 +194,64 @@ impl std::fmt::Display for QualifiedName {
     }
 }
 
-impl Eval for QualifiedName {
-    type Output = Symbol;
+impl QualifiedName {
+    /// @brief Visit all symbols in the qualified name recursively
+    fn _visit_symbols(
+        &self,
+        root: Option<Symbol>,
+        index: usize,
+        context: &Context,
+        functor: &mut dyn FnMut(&Symbol, usize),
+    ) -> Result<(), Error> {
+        if index >= self.0.len() {
+            return Ok(());
+        }
+        let ident = &self.0[index];
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
-        let mut symbol = None;
+        let new_symbols = match root {
+            Some(ref root) => root.get_symbols(ident),
+            None => context.get_symbols(ident),
+        };
 
-        for (i, ident) in self.0.iter().enumerate() {
-            if i == 0 {
-                match context.get_symbols(ident).first() {
-                    Some(s) => {
-                        symbol = Some(*s);
-                    }
-                    _ => return Err(crate::eval::Error::SymbolNotFound(ident.clone())),
-                }
-            } else {
-                symbol = match symbol {
-                    Some(crate::eval::Symbol::ModuleDefinition(module)) => {
-                        Some(*module.get_symbols_by_name(ident).first().unwrap())
-                    }
-                    _ => return Err(crate::eval::Error::SymbolNotFound(ident.clone())),
-                }
-            }
+        for symbol in new_symbols {
+            functor(symbol, index);
+            self._visit_symbols(Some(symbol.clone()), index + 1, context, functor)?;
         }
 
-        Ok(symbol.unwrap().clone())
+        Ok(())
+    }
+
+    /// @brief Visit all symbols in the qualified name recursively, starting from the root
+    pub fn visit_symbols(
+        &self,
+        context: &Context,
+        functor: &mut dyn FnMut(&Symbol, usize),
+    ) -> Result<(), Error> {
+        self._visit_symbols(None, 0, context, functor)
+    }
+
+    /// @brief Get all symbols for the qualified name
+    pub fn get_symbols(&self, context: &Context) -> Result<Vec<Symbol>, Error> {
+        let mut symbols = Vec::new();
+        self.visit_symbols(context, &mut |symbol, depth| {
+            // Only take symbols that match the full qualified name
+            if depth == self.0.len() - 1 {
+                symbols.push(symbol.clone());
+            }
+        })?;
+
+        if symbols.is_empty() {
+            return Err(Error::SymbolNotFound(self.clone()));
+        }
+        Ok(symbols)
+    }
+}
+
+impl Eval for QualifiedName {
+    type Output = Vec<Symbol>;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        self.get_symbols(context)
     }
 }
 
