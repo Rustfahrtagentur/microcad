@@ -247,6 +247,21 @@ impl ParameterValueList {
     pub fn get(&self, name: &Identifier) -> Option<&ParameterValue> {
         self.by_name.get(name).map(|i| &self.parameters[*i])
     }
+
+    pub fn remove(&mut self, name: &Identifier) {
+        if let Some(new_index) = self.by_name.remove(name) {
+            self.parameters.remove(new_index);
+            for index in &mut self.by_name.values_mut() {
+                if *index > new_index {
+                    *index -= 1;
+                }
+            }
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.by_name.is_empty()
+    }
 }
 
 impl Deref for ParameterValueList {
