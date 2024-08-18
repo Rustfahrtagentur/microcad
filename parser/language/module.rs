@@ -298,6 +298,15 @@ impl Eval for ModuleStatement {
             ModuleStatement::Expression(expr) => {
                 expr.eval(context)?;
             }
+            ModuleStatement::Assignment(assignment) => {
+                assignment.eval(context)?;
+            }
+            ModuleStatement::FunctionDefinition(function_definition) => {
+                context.add_symbol(Symbol::Function(function_definition.clone()));
+            }
+            ModuleStatement::ModuleDefinition(module_definition) => {
+                context.add_symbol(Symbol::ModuleDefinition(module_definition.clone()));
+            }
             statement => {
                 let s: &'static str = statement.into();
                 unimplemented!(" {s}")
