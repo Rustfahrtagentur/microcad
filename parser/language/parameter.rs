@@ -101,6 +101,13 @@ pub struct ParameterValue {
     pub default_value: Option<Value>,
 }
 
+pub enum TypeCheckResult {
+    Ok,
+    Tuple,
+    List,
+    Err(Error),
+}
+
 impl ParameterValue {
     pub fn name(&self) -> &Identifier {
         &self.name
@@ -121,11 +128,13 @@ impl ParameterValue {
         }
     }
 
-    pub fn type_check(&self, ty: &Type) -> Result<bool, Error> {
+    pub fn type_check(&self, ty: &Type) -> TypeCheckResult {
         if self.type_matches(ty) {
-            Ok(true)
+            TypeCheckResult::Ok
+        } else if ty.is_list_of(&self.specified_type.clone().unwrap()) {
+            TypeCheckResult::List
         } else {
-            Err(Error::ParameterTypeMismatch(
+            TypeCheckResult::Err(Error::ParameterTypeMismatch(
                 self.name.clone(),
                 self.specified_type.clone().unwrap(),
                 ty.clone(),

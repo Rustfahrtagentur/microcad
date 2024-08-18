@@ -221,6 +221,19 @@ impl Type {
             _ => Unit::None,
         }
     }
+
+    /// Check if the type is a named tuple
+    pub fn is_named_tuple(&self) -> bool {
+        matches!(self, Self::NamedTuple(_))
+    }
+
+    /// Check if the type is a list of the given type `ty`
+    pub fn is_list_of(&self, ty: &Type) -> bool {
+        match self {
+            Self::List(list_type) => &list_type.ty() == ty,
+            _ => false,
+        }
+    }
 }
 
 impl Parse for Type {

@@ -195,7 +195,7 @@ impl CallArgumentValueList {
         parameter_values.remove(name);
     }
 
-    pub fn get_matching_named_arguments(
+    fn get_matching_named_arguments(
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut ArgumentMap,
@@ -213,7 +213,7 @@ impl CallArgumentValueList {
                 // We have a matching argument with the same name as the parameter.
                 Some(arg) => {
                     // Now we need to check if the argument type matches the parameter type
-                    if parameter_value.type_check(&arg.value.ty())? {
+                    if let TypeCheckResult::Ok = parameter_value.type_check(&arg.value.ty()) {
                         Self::insert_and_remove(arg_map, parameter_values, name, arg.value.clone());
                     }
                 }
@@ -230,7 +230,7 @@ impl CallArgumentValueList {
         Ok(())
     }
 
-    pub fn get_matching_positional_arguments(
+    fn get_matching_positional_arguments(
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut ArgumentMap,
@@ -242,15 +242,21 @@ impl CallArgumentValueList {
         for arg in &self.arguments {
             if arg.name.is_none() {
                 let ParameterValue { name, .. } = parameter_values[positional_index].clone();
-                // @todo: Check for tuple arguments and whether the tuple fields match the parameters
-
-                if !arg_map.contains_key(&name)
-                    && (parameter_values[positional_index].type_check(&arg.value.ty())?)
-                {
-                    Self::insert_and_remove(arg_map, parameter_values, &name, arg.value.clone());
-                    positional_index += 1;
-                    if positional_index >= parameter_values.len() {
-                        break;
+                if !arg_map.contains_key(&name) {
+                    // @todo: Check for tuple arguments and whether the tuple fields match the parameters
+                    if let TypeCheckResult::Ok =
+                        parameter_values[positional_index].type_check(&arg.value.ty())
+                    {
+                        Self::insert_and_remove(
+                            arg_map,
+                            parameter_values,
+                            &name,
+                            arg.value.clone(),
+                        );
+                        positional_index += 1;
+                        if positional_index >= parameter_values.len() {
+                            break;
+                        }
                     }
                 }
             }
