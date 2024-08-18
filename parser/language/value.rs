@@ -145,6 +145,10 @@ impl std::fmt::Display for Map {
 pub struct NamedTuple(pub std::collections::BTreeMap<Identifier, Value>);
 
 impl NamedTuple {
+    pub fn from_vec(vec: Vec<(Identifier, Value)>) -> Self {
+        Self(vec.into_iter().collect())
+    }
+
     pub fn len(&self) -> usize {
         self.0.len()
     }
@@ -156,6 +160,13 @@ impl NamedTuple {
     pub fn iter(&self) -> impl Iterator<Item = (&Identifier, &Value)> {
         self.0.iter()
     }
+}
+
+#[macro_export]
+macro_rules! named_tuple {
+    ($($name:ident: $ty:ident = $value:expr),*) => {
+        NamedTuple::from_vec(vec![$((stringify!($name).into(), Value::$ty($value)),)*])
+    };
 }
 
 impl std::fmt::Display for NamedTuple {

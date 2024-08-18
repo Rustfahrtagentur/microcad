@@ -96,9 +96,9 @@ impl Parse for Parameter {
 /// @brief Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
 pub struct ParameterValue {
-    pub name: Identifier,
-    pub specified_type: Option<Type>,
-    pub default_value: Option<Value>,
+    name: Identifier,
+    specified_type: Option<Type>,
+    default_value: Option<Value>,
 }
 
 pub enum TypeCheckResult {
@@ -109,6 +109,18 @@ pub enum TypeCheckResult {
 }
 
 impl ParameterValue {
+    pub fn new(
+        name: Identifier,
+        specified_type: Option<Type>,
+        default_value: Option<Value>,
+    ) -> Self {
+        Self {
+            name,
+            specified_type,
+            default_value,
+        }
+    }
+
     pub fn name(&self) -> &Identifier {
         &self.name
     }
@@ -242,6 +254,18 @@ pub struct ParameterValueList {
 }
 
 impl ParameterValueList {
+    pub fn new(parameters: Vec<ParameterValue>) -> Self {
+        let mut by_name = std::collections::HashMap::new();
+        for (i, parameter) in parameters.iter().enumerate() {
+            by_name.insert(parameter.name().clone(), i);
+        }
+
+        Self {
+            parameters,
+            by_name,
+        }
+    }
+
     pub fn push(&mut self, parameter: ParameterValue) -> Result<(), ParseError> {
         if self.by_name.contains_key(parameter.name()) {
             return Err(ParseError::DuplicateParameter(parameter.name().clone()));
@@ -317,6 +341,27 @@ macro_rules! parameter {
             Some(Expression::literal_from_str(stringify!($value)).expect("Invalid literal")),
         )
     };
+}
+
+#[macro_export]
+macro_rules! parameter_value {
+    ($name:ident) => {
+        ParameterValue::new(stringify!($name).into(), None, None)
+    };
+    ($name:ident: $ty:ident) => {
+        ParameterValue::new(stringify!($name).into(), Some(Type::$ty), None)
+    };
+    ($name:ident: $ty:ident = $value:expr) => {
+        ParameterValue::new(
+            stringify!($name).into(),
+            Some(Type::$ty),
+            Some(Value::$ty($value)),
+        )
+    };
+    ($name:ident = $value:expr) => {
+        ParameterValue::new(stringify!($name).into(), None, Some($value))
+    };
+    () => {};
 }
 
 #[macro_export]

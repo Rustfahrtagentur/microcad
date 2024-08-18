@@ -6,6 +6,9 @@ use std::{
 use super::{expression::*, identifier::*, lang_type::Ty, parameter::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
+#[cfg(test)]
+use crate::{language::lang_type::Type, parameter_value};
+
 #[derive(Clone, Debug)]
 pub struct CallArgument {
     name: Option<Identifier>,
@@ -56,6 +59,31 @@ impl Parse for CallArgument {
 pub struct CallArgumentValue {
     name: Option<Identifier>,
     value: Value,
+}
+
+impl CallArgumentValue {
+    pub fn new(name: Option<Identifier>, value: Value) -> Self {
+        Self { name, value }
+    }
+
+    pub fn name(&self) -> Option<&Identifier> {
+        self.name.as_ref()
+    }
+
+    pub fn value(&self) -> &Value {
+        &self.value
+    }
+}
+
+#[macro_export]
+macro_rules! call_argument_value {
+    ($name:ident: $ty:ident = $value:expr) => {
+        CallArgumentValue::new(Some(stringify!($name).into()), Value::$ty($value))
+    };
+    ($ty:ident = $value:expr) => {
+        CallArgumentValue::new(None, Value::$ty($value))
+    };
+    () => {};
 }
 
 impl Eval for CallArgument {
@@ -174,6 +202,14 @@ pub struct CallArgumentValueList {
 }
 
 impl CallArgumentValueList {
+    pub fn new(args: Vec<CallArgumentValue>) -> Self {
+        let mut l = Self::default();
+        for arg in args {
+            l.push(arg);
+        }
+        l
+    }
+
     pub fn get_by_name(&self, name: &Identifier) -> Option<&CallArgumentValue> {
         self.named.get(name).map(|index| &self.arguments[*index])
     }
@@ -185,6 +221,7 @@ impl CallArgumentValueList {
         }
     }
 
+    /// Insert into the argument map and remove the parameter from the list of parameters
     fn insert_and_remove(
         arg_map: &mut ArgumentMap,
         parameter_values: &mut ParameterValueList,
@@ -204,24 +241,29 @@ impl CallArgumentValueList {
 
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
         for parameter_value in old_parameter_values.iter() {
-            let ParameterValue {
-                name,
-                default_value,
-                ..
-            } = parameter_value;
-            match self.get_by_name(name) {
+            match self.get_by_name(parameter_value.name()) {
                 // We have a matching argument with the same name as the parameter.
                 Some(arg) => {
                     // Now we need to check if the argument type matches the parameter type
                     if let TypeCheckResult::Ok = parameter_value.type_check(&arg.value.ty()) {
-                        Self::insert_and_remove(arg_map, parameter_values, name, arg.value.clone());
+                        Self::insert_and_remove(
+                            arg_map,
+                            parameter_values,
+                            parameter_value.name(),
+                            arg.value.clone(),
+                        );
                     }
                 }
                 // No matching argument found, check if a default value is defined
                 None => {
                     // If we have a default value, we can use it
-                    if let Some(default) = &default_value {
-                        Self::insert_and_remove(arg_map, parameter_values, name, default.clone());
+                    if let Some(default) = parameter_value.default_value() {
+                        Self::insert_and_remove(
+                            arg_map,
+                            parameter_values,
+                            parameter_value.name(),
+                            default.clone(),
+                        );
                     }
                 }
             }
@@ -241,8 +283,8 @@ impl CallArgumentValueList {
         let mut positional_index = 0;
         for arg in &self.arguments {
             if arg.name.is_none() {
-                let ParameterValue { name, .. } = parameter_values[positional_index].clone();
-                if !arg_map.contains_key(&name) {
+                let param_value = parameter_values[positional_index].clone();
+                if !arg_map.contains_key(param_value.name()) {
                     // @todo: Check for tuple arguments and whether the tuple fields match the parameters
                     if let TypeCheckResult::Ok =
                         parameter_values[positional_index].type_check(&arg.value.ty())
@@ -250,14 +292,15 @@ impl CallArgumentValueList {
                         Self::insert_and_remove(
                             arg_map,
                             parameter_values,
-                            &name,
+                            param_value.name(),
                             arg.value.clone(),
                         );
-                        positional_index += 1;
                         if positional_index >= parameter_values.len() {
                             break;
                         }
                     }
+                } else {
+                    positional_index += 1;
                 }
             }
         }
@@ -452,3 +495,70 @@ fn call() {
         .count();
     assert_eq!(named, 2);
 }
+
+#[cfg(test)]
+macro_rules! assert_eq_arg_map_value {
+    ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
+        $(assert_eq!(
+            $arg_map.get(&stringify!($name).into()).unwrap(),
+            &Value::$ty($value)
+        ));*
+    };
+}
+
+#[test]
+fn call_get_matching_arguments() {
+    let param_values = ParameterValueList::new(vec![
+        parameter_value!(foo: Integer),
+        parameter_value!(bar: Integer),
+        parameter_value!(baz: Scalar = 4.0),
+    ]);
+    let call_values = CallArgumentValueList::new(vec![
+        call_argument_value!(Integer = 1),
+        call_argument_value!(bar: Integer = 2),
+        call_argument_value!(baz: Scalar = 3.0),
+    ]);
+
+    let arg_map = call_values.get_matching_arguments(&param_values).unwrap();
+    assert_eq_arg_map_value!(arg_map, foo: Integer = 1, bar: Integer = 2, baz: Scalar = 3.0);
+}
+
+#[test]
+fn call_get_matching_arguments_missing() {
+    let param_values = ParameterValueList::new(vec![
+        parameter_value!(foo: Integer),
+        parameter_value!(bar: Integer),
+        parameter_value!(baz: Scalar = 4.0),
+    ]);
+    let call_values = CallArgumentValueList::new(vec![
+        call_argument_value!(Integer = 1),
+        call_argument_value!(baz: Scalar = 3.0),
+    ]);
+
+    let arg_map = call_values.get_matching_arguments(&param_values);
+
+    if let Err(Error::MissingArguments(missing)) = arg_map {
+        assert_eq!(missing.len(), 1);
+        assert_eq!(&missing[0], "bar");
+    } else {
+        panic!("Expected MissingArguments error");
+    }
+}
+
+/*
+#[test]
+fn tuple_substitution() {
+    let param_values = ParameterValueList::new(vec![
+        parameter_value!(foo: Integer),
+        parameter_value!(bar: Integer),
+        parameter_value!(baz: Scalar = 4.0),
+    ]);
+    let call_values = CallArgumentValueList::new(vec![
+        call_argument_value!(NamedTuple = named_tuple!(foo: Integer = 1, bar: Integer = 2)),
+        call_argument_value!(baz: Scalar = 3.0),
+    ]);
+
+    let arg_map = call_values.get_matching_arguments(&param_values).unwrap();
+    assert_eq_arg_map_value!(arg_map, foo: Integer = 1, bar: Integer = 2, baz: Scalar = 3.0);
+}
+*/
