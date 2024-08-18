@@ -75,9 +75,7 @@ impl Parse for ModuleInitStatement {
 
 #[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
-    #[allow(dead_code)]
     parameters: Vec<DefinitionParameter>,
-    #[allow(dead_code)]
     body: Vec<ModuleInitStatement>,
 }
 
