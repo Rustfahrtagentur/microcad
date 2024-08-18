@@ -310,7 +310,7 @@ impl Eval for ModuleStatement {
             }
             statement => {
                 let s: &'static str = statement.into();
-                unimplemented!(" {s}")
+                unimplemented!("ModuleStatement::{s}")
             }
         }
 
