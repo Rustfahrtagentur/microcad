@@ -3,6 +3,7 @@ pub mod call;
 pub mod color;
 pub mod document;
 pub mod expression;
+pub mod r#for;
 pub mod format_string;
 pub mod function;
 pub mod identifier;

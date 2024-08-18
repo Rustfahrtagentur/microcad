@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use super::{expression::*, identifier::*, lang_type::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
@@ -297,7 +295,7 @@ impl ParameterValueList {
     }
 }
 
-impl Deref for ParameterValueList {
+impl std::ops::Deref for ParameterValueList {
     type Target = Vec<ParameterValue>;
 
     fn deref(&self) -> &Self::Target {
@@ -318,7 +316,7 @@ impl Eval for ParameterList {
     }
 }
 
-impl Deref for ParameterList {
+impl std::ops::Deref for ParameterList {
     type Target = Vec<Parameter>;
 
     fn deref(&self) -> &Self::Target {

@@ -1,8 +1,3 @@
-use std::{
-    collections::HashMap,
-    ops::{Deref, DerefMut},
-};
-
 use super::{expression::*, identifier::*, lang_type::Ty, parameter::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
@@ -109,7 +104,7 @@ impl std::fmt::Display for CallArgument {
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentList {
     arguments: Vec<CallArgument>,
-    named: HashMap<Identifier, usize>,
+    named: std::collections::HashMap<Identifier, usize>,
 }
 
 impl CallArgumentList {
@@ -125,7 +120,7 @@ impl CallArgumentList {
     }
 }
 
-impl Deref for CallArgumentList {
+impl std::ops::Deref for CallArgumentList {
     type Target = Vec<CallArgument>;
 
     fn deref(&self) -> &Self::Target {
@@ -134,11 +129,11 @@ impl Deref for CallArgumentList {
 }
 
 #[derive(Clone, Debug)]
-pub struct ArgumentMap(HashMap<Identifier, Value>);
+pub struct ArgumentMap(std::collections::HashMap<Identifier, Value>);
 
 impl ArgumentMap {
     pub fn new() -> Self {
-        Self(HashMap::new())
+        Self(std::collections::HashMap::new())
     }
 }
 
@@ -148,15 +143,15 @@ impl Default for ArgumentMap {
     }
 }
 
-impl Deref for ArgumentMap {
-    type Target = HashMap<Identifier, Value>;
+impl std::ops::Deref for ArgumentMap {
+    type Target = std::collections::HashMap<Identifier, Value>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl DerefMut for ArgumentMap {
+impl std::ops::DerefMut for ArgumentMap {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
@@ -169,23 +164,8 @@ impl Parse for CallArgumentList {
         match pair.clone().as_rule() {
             Rule::call_argument_list => {
                 for pair in pair.clone().into_inner() {
-                    let call = CallArgument::parse(pair.clone())?.value().clone();
-                    match call.name {
-                        Some(ident) => {
-                            call_argument_list.push(CallArgument {
-                                name: Some(ident),
-                                value: call.value,
-                            });
-                        }
-                        None => {
-                            call_argument_list.push(CallArgument {
-                                name: None,
-                                value: call.value,
-                            });
-                        }
-                    }
+                    call_argument_list.push(CallArgument::parse(pair.clone())?.value().clone());
                 }
-
                 with_pair_ok!(call_argument_list, pair)
             }
             rule => {
@@ -198,7 +178,7 @@ impl Parse for CallArgumentList {
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentValueList {
     arguments: Vec<CallArgumentValue>,
-    named: HashMap<Identifier, usize>,
+    named: std::collections::HashMap<Identifier, usize>,
 }
 
 impl CallArgumentValueList {

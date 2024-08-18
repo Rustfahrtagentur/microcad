@@ -1,5 +1,3 @@
-use strum::IntoStaticStr;
-
 use super::identifier::*;
 use crate::{eval::*, parser::*, with_pair_ok};
 
@@ -12,7 +10,7 @@ impl std::fmt::Display for UseAlias {
     }
 }
 
-#[derive(Clone, Debug, IntoStaticStr)]
+#[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum UseStatement {
     /// Import symbols given as qualified names: `use a, b`
     Use(Vec<QualifiedName>),

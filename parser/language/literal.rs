@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use super::{color::*, lang_type::*, units::*, value::*};
 use crate::{eval::*, parser::*};
 
@@ -167,7 +165,7 @@ impl Literal {
     }
 }
 
-impl FromStr for Literal {
+impl std::str::FromStr for Literal {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
