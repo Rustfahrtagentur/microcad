@@ -117,15 +117,15 @@ impl CallArgumentList {
             }
         }
 
-        let mut parameter_values = parameters.eval(context)?;
+        let parameter_values = parameters.eval(context)?;
 
         // Check for matching named arguments
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
         for parameter_value in &parameter_values {
             let ParameterValue {
                 name,
-                specified_type,
                 default_value,
+                ..
             } = parameter_value;
 
             match self.get(name) {
