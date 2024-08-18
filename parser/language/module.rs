@@ -78,22 +78,20 @@ impl Parse for ModuleInitStatement {
 
 #[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
-    parameters: Vec<Parameter>,
+    parameters: ParameterList,
     body: Vec<ModuleInitStatement>,
 }
 
 impl Parse for ModuleInitDefinition {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::module_init_definition);
-        let mut parameters = Vec::new();
+        let mut parameters = ParameterList::default();
         let mut body = Vec::new();
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::parameter_list => {
-                    for pair in pair.into_inner() {
-                        parameters.push(Parameter::parse(pair)?.value().clone());
-                    }
+                    parameters = ParameterList::parse(pair)?.value().clone();
                 }
                 Rule::module_init_statement => {
                     body.push(ModuleInitStatement::parse(pair)?.value().clone());
@@ -342,7 +340,7 @@ impl std::fmt::Display for ModuleStatement {
 pub struct ModuleDefinition {
     pub attributes: Vec<Attribute>,
     pub name: Identifier,
-    pub parameters: Option<Vec<Parameter>>,
+    pub parameters: Option<ParameterList>,
     pub body: ModuleBody,
 }
 
@@ -394,7 +392,7 @@ impl Parse for ModuleDefinition {
                     name = Identifier::parse(pair)?.value().clone();
                 }
                 Rule::parameter_list => {
-                    parameters = Some(Parser::vec(pair, Parameter::parse)?.value().clone());
+                    parameters = Some(ParameterList::parse(pair)?.value().clone());
                 }
                 Rule::module_body => {
                     body = ModuleBody::parse(pair.clone())?.value().clone();

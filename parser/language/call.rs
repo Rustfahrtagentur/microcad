@@ -81,7 +81,7 @@ impl CallArgumentList {
 
     pub fn match_definition(
         &self,
-        parameters: &Vec<Parameter>,
+        parameters: &ParameterList,
         context: &mut Context,
     ) -> Result<ArgumentMap, Error> {
         self._match_definition(parameters, context, true)
@@ -89,7 +89,7 @@ impl CallArgumentList {
 
     pub fn match_definition_no_type_check(
         &self,
-        parameters: &Vec<Parameter>,
+        parameters: &ParameterList,
         context: &mut Context,
     ) -> Result<ArgumentMap, Error> {
         self._match_definition(parameters, context, false)
@@ -97,7 +97,7 @@ impl CallArgumentList {
 
     fn _match_definition(
         &self,
-        parameters: &Vec<Parameter>,
+        parameters: &ParameterList,
         context: &mut Context,
         check_types: bool,
     ) -> Result<ArgumentMap, Error> {
@@ -112,7 +112,7 @@ impl CallArgumentList {
         }
 
         let mut eval_params = Vec::new();
-        for param in parameters {
+        for param in parameters.iter() {
             if check_types {
                 let (default_value, ty) = param.eval(context)?;
                 eval_params.push((param.name(), default_value, Some(ty)));
