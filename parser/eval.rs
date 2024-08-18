@@ -1,8 +1,6 @@
 use std::ops::Deref;
 
-use crate::language::{
-    assignment::Assignment, function::*, identifier::*, lang_type::*, module::*, value::*,
-};
+use crate::language::{function::*, identifier::*, lang_type::*, module::*, value::*};
 use microcad_render::tree::Node;
 use thiserror::Error;
 
@@ -200,6 +198,7 @@ pub trait Eval {
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error>;
 }
 
+// @todo Move this test elsewhere
 #[test]
 fn context_basic() {
     use crate::parser::*;
@@ -212,7 +211,10 @@ fn context_basic() {
     assert_eq!(context.get_symbols(&"a".into())[0].name(), "a");
     assert_eq!(context.get_symbols(&"b".into())[0].name(), "b");
 
-    let c = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "c = a + b");
+    let c = Parser::parse_rule_or_panic::<crate::language::assignment::Assignment>(
+        Rule::assignment,
+        "c = a + b",
+    );
 
     c.eval(&mut context).unwrap();
 }

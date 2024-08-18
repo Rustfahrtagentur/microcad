@@ -3,13 +3,7 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
-use super::{
-    expression::*,
-    identifier::*,
-    lang_type::Ty,
-    parameter::{self, *},
-    value::*,
-};
+use super::{expression::*, identifier::*, lang_type::Ty, parameter::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
