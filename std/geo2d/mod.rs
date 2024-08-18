@@ -76,12 +76,8 @@ pub fn rect(width: f64, height: f64) -> Node {
 use crate::ModuleBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    let module = ModuleBuilder::namespace("geo2d")
+    ModuleBuilder::namespace("geo2d")
         .builtin_module(builtin_module!(circle(radius: Scalar)))
         .builtin_module(builtin_module!(rect(width: Scalar, height: Scalar)))
-        .build();
-
-    println!("Module: {:?}", module.clone());
-
-    module
+        .build()
 }
