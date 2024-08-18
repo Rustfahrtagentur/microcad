@@ -1,6 +1,8 @@
 use microcad_render::tree::{self, Node};
 
-use super::{call::*, expression::*, function::*, identifier::*, use_statement::*};
+use super::{
+    call::*, expression::*, function::*, identifier::*, parameter::ParameterList, use_statement::*,
+};
 use crate::{eval::*, language::parameter::Parameter, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
@@ -417,7 +419,7 @@ pub type BuiltinModuleFunctor = dyn Fn(&ArgumentMap, &mut Context) -> Result<Nod
 #[derive(Clone)]
 pub struct BuiltinModule {
     pub name: Identifier,
-    pub parameters: Vec<Parameter>,
+    pub parameters: ParameterList,
     pub f: &'static BuiltinModuleFunctor,
 }
 
@@ -430,7 +432,7 @@ impl std::fmt::Debug for BuiltinModule {
 impl BuiltinModule {
     pub fn new(
         name: Identifier,
-        parameters: Vec<Parameter>,
+        parameters: ParameterList,
         f: &'static BuiltinModuleFunctor,
     ) -> Self {
         Self {
@@ -459,7 +461,7 @@ macro_rules! builtin_module {
     ($name:ident) => {
         BuiltinModule::new(
             microcad_parser::language::identifier::Identifier::from(stringify!($name)),
-            Vec::new(),
+            microcad_parser::language::parameter::ParameterList::default(),
             &|_, ctx| Ok(ctx.append_node($name())),
         )
     };

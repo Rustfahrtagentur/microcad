@@ -122,7 +122,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         ))
         .builtin_module(BuiltinModule {
             name: "export".into(),
-            parameters: vec![Parameter::new("filename".into(), Some(Type::String), None)],
+            parameters: parameter_list!(parameter!(filename: String)),
             f: &|args, ctx| {
                 let filename = args.get(&"filename".into()).unwrap().try_into()?;
                 Ok(ctx.append_node(export(filename)))
