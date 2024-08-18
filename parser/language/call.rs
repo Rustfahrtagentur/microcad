@@ -508,19 +508,27 @@ macro_rules! assert_eq_arg_map_value {
 
 #[test]
 fn call_get_matching_arguments() {
+    // module my_module(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = ParameterValueList::new(vec![
         parameter_value!(foo: Integer),
         parameter_value!(bar: Integer),
         parameter_value!(baz: Scalar = 4.0),
     ]);
+
+    // my_module(1, bar = 2, baz = 3.0)
     let call_values = CallArgumentValueList::new(vec![
         call_argument_value!(Integer = 1),
-        call_argument_value!(bar: Integer = 2),
+        call_argument_value!(foo: Integer = 2),
         call_argument_value!(baz: Scalar = 3.0),
     ]);
 
     let arg_map = call_values.get_matching_arguments(&param_values).unwrap();
-    assert_eq_arg_map_value!(arg_map, foo: Integer = 1, bar: Integer = 2, baz: Scalar = 3.0);
+
+    assert_eq_arg_map_value!(arg_map,
+        foo: Integer = 2,
+        bar: Integer = 1,
+        baz: Scalar = 3.0
+    );
 }
 
 #[test]

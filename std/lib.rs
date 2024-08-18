@@ -217,6 +217,8 @@ export("export.svg") algorithm::difference() {
         println!("{:?}", n);
     }
 
+    // Iterate over all nodes and export the ones with the Export tag
+    // @todo: This must be a method in the tree
     for n in node.descendants() {
         let inner = n.borrow();
         if let NodeInner::Export(ref filename) = *inner {
