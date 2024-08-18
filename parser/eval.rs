@@ -1,6 +1,8 @@
 use std::ops::Deref;
 
-use crate::language::{function::*, identifier::*, lang_type::*, module::*, value::*};
+use crate::language::{
+    assignment::Assignment, function::*, identifier::*, lang_type::*, module::*, value::*,
+};
 use microcad_render::tree::Node;
 use thiserror::Error;
 
@@ -210,7 +212,7 @@ fn context_basic() {
     assert_eq!(context.get_symbols(&"a".into())[0].name(), "a");
     assert_eq!(context.get_symbols(&"b".into())[0].name(), "b");
 
-    let _c = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "c = a + b");
+    let c = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "c = a + b");
 
-    //c.eval(Some(&context)).unwrap();
+    c.eval(&mut context).unwrap();
 }

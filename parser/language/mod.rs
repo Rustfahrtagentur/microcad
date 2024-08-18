@@ -1,3 +1,4 @@
+pub mod assignment;
 pub mod call;
 pub mod color;
 pub mod document;

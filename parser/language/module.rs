@@ -1,7 +1,8 @@
 use microcad_render::tree::{self, Node};
 
 use super::{
-    call::*, expression::*, function::*, identifier::*, parameter::ParameterList, use_statement::*,
+    assignment::*, call::*, expression::*, function::*, identifier::*, parameter::ParameterList,
+    use_statement::*,
 };
 use crate::{eval::*, language::parameter::Parameter, parser::*, with_pair_ok};
 
