@@ -51,7 +51,7 @@ macro_rules! arg_1 {
     ($f:ident($name:ident) for $($ty:tt),+) => { BuiltinFunction::new(
         stringify!($f).into(),
         FunctionSignature {
-            parameters: vec![DefinitionParameter::new(stringify!($name).into(), None, None)],
+            parameters: vec![Parameter::new(stringify!($name).into(), None, None)],
             return_type: None,
         },
         &|args, _| {
@@ -73,7 +73,7 @@ macro_rules! arg_1 {
     };
     ($f:ident($name:ident) $inner:expr) => {
         BuiltinFunction::new(stringify!($f).into(), FunctionSignature {
-            parameters: vec![DefinitionParameter::new(stringify!($name).into(), None, None)],
+            parameters: vec![Parameter::new(stringify!($name).into(), None, None)],
             return_type: None,
         }, &|args, _| {
             let l = |$name| Ok(Some($inner?));
@@ -89,8 +89,8 @@ macro_rules! arg_2 {
             stringify!($f).into(),
             FunctionSignature {
                 parameters: vec![
-                    DefinitionParameter::new(stringify!($x).into(), None, None),
-                    DefinitionParameter::new(stringify!($y).into(), None, None),
+                    Parameter::new(stringify!($x).into(), None, None),
+                    Parameter::new(stringify!($y).into(), None, None),
                 ],
                 return_type: None,
             },
@@ -118,11 +118,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .builtin_function(BuiltinFunction::new(
             "assert".into(),
             FunctionSignature {
-                parameters: vec![DefinitionParameter::new(
-                    "condition".into(),
-                    Some(Type::Bool),
-                    None,
-                )],
+                parameters: vec![Parameter::new("condition".into(), Some(Type::Bool), None)],
                 return_type: None,
             },
             &|args, _| {
@@ -132,11 +128,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         ))
         .builtin_module(BuiltinModule {
             name: "export".into(),
-            parameters: vec![DefinitionParameter::new(
-                "filename".into(),
-                Some(Type::String),
-                None,
-            )],
+            parameters: vec![Parameter::new("filename".into(), Some(Type::String), None)],
             f: &|args, ctx| {
                 let filename = args.get(&"filename".into()).unwrap().try_into()?;
                 Ok(ctx.append_node(export(filename)))

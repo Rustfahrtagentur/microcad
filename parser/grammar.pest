@@ -357,9 +357,9 @@ assignment_statement = _{ assignment ~ ws* ~ ";" }
 //`r: length`: ok # Default value is NOT required
 //`r: length = math::pi`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
-definition_parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation  }
+parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation  }
 
-definition_parameter_list = { "(" ~ ws* ~ (definition_parameter ~ (ws* ~ "," ~ ws* ~ definition_parameter)* ~ ws*)? ~ ","? ~ ")" }
+parameter_list = { "(" ~ ws* ~ (parameter ~ (ws* ~ "," ~ ws* ~ parameter)* ~ ws*)? ~ ","? ~ ")" }
 
 
 //`(a: scalar) -> scalar`: ok # Function signature with arguments
@@ -367,7 +367,7 @@ definition_parameter_list = { "(" ~ ws* ~ (definition_parameter ~ (ws* ~ "," ~ w
 //`(a: scalar, b: scalar) -> scalar`: ok # Function signature with multiple arguments
 //`(a: scalar = 2.0, b: scalar = 3.0) -> scalar`: ok # Function signature with default values
 //`(a: scalar = 2.0, b: scalar = 3.0)`: ok # Function signature without return type
-function_signature = { definition_parameter_list ~ (ws* ~ "->" ~ ws* ~ type)? }
+function_signature = { parameter_list ~ (ws* ~ "->" ~ ws* ~ type)? }
 
 //`function foo() -> scalar { return math::pi; }`: ok
 //`function foo() -> scalar {}`: ok # Empty function
@@ -407,7 +407,7 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { init(size: length) { rectangle(size); } }`: ok # Module with init function
 //`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
 //`module donut(radius) { }`: error # Module must have type annotations
-module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ definition_parameter_list? ~ ws* ~ module_body }
+module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_body }
 
 //`namespace math { }`: ok # namespace (like module with no arguments)
 namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ module_body }
@@ -438,7 +438,7 @@ module_statement = {
 //`init(d: length) { r = d / 2; }`: ok
 //`init(size: length) { size = size; }`: ok
 //`init(size: length) { rectangle(size); }: ok
-module_init_definition = { "init" ~ ws* ~ definition_parameter_list ~ ws* ~ "{" ~ ws* ~ module_init_inner? ~ ws* ~ "}" }
+module_init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ "{" ~ ws* ~ module_init_inner? ~ ws* ~ "}" }
 
 module_init_statement = { 
   use_statement | 

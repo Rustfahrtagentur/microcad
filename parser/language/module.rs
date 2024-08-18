@@ -75,7 +75,7 @@ impl Parse for ModuleInitStatement {
 
 #[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
-    parameters: Vec<DefinitionParameter>,
+    parameters: Vec<Parameter>,
     body: Vec<ModuleInitStatement>,
 }
 
@@ -87,16 +87,18 @@ impl Parse for ModuleInitDefinition {
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
-                Rule::definition_parameter_list => {
+                Rule::parameter_list => {
                     for pair in pair.into_inner() {
-                        parameters.push(DefinitionParameter::parse(pair)?.value().clone());
+                        parameters.push(Parameter::parse(pair)?.value().clone());
                     }
                 }
                 Rule::module_init_statement => {
                     body.push(ModuleInitStatement::parse(pair)?.value().clone());
                 }
                 Rule::COMMENT => {}
-                rule => unreachable!("expected definition_parameter_list or module_init_statement. Instead found {rule:?}" ),
+                rule => unreachable!(
+                    "expected parameter_list or module_init_statement. Instead found {rule:?}"
+                ),
             }
         }
 
@@ -337,7 +339,7 @@ impl std::fmt::Display for ModuleStatement {
 pub struct ModuleDefinition {
     pub attributes: Vec<Attribute>,
     pub name: Identifier,
-    pub parameters: Option<Vec<DefinitionParameter>>,
+    pub parameters: Option<Vec<Parameter>>,
     pub body: ModuleBody,
 }
 
@@ -388,12 +390,8 @@ impl Parse for ModuleDefinition {
                 Rule::identifier => {
                     name = Identifier::parse(pair)?.value().clone();
                 }
-                Rule::definition_parameter_list => {
-                    parameters = Some(
-                        Parser::vec(pair, DefinitionParameter::parse)?
-                            .value()
-                            .clone(),
-                    );
+                Rule::parameter_list => {
+                    parameters = Some(Parser::vec(pair, Parameter::parse)?.value().clone());
                 }
                 Rule::module_body => {
                     body = ModuleBody::parse(pair.clone())?.value().clone();
@@ -419,7 +417,7 @@ pub type BuiltinModuleFunctor = dyn Fn(&ArgumentMap, &mut Context) -> Result<Nod
 #[derive(Clone)]
 pub struct BuiltinModule {
     pub name: Identifier,
-    pub parameters: Vec<DefinitionParameter>,
+    pub parameters: Vec<Parameter>,
     pub f: &'static BuiltinModuleFunctor,
 }
 
@@ -432,7 +430,7 @@ impl std::fmt::Debug for BuiltinModule {
 impl BuiltinModule {
     pub fn new(
         name: Identifier,
-        parameters: Vec<DefinitionParameter>,
+        parameters: Vec<Parameter>,
         f: &'static BuiltinModuleFunctor,
     ) -> Self {
         Self {

@@ -57,9 +57,9 @@ pub enum Error {
     #[error("Missing arguments: {0}")]
     MissingArguments(IdentifierList),
     #[error("Parameter type mismatch: {0} expected {1}, got {2}")]
-    DefinitionParameterTypeMismatch(Identifier, Type, Type),
+    ParameterTypeMismatch(Identifier, Type, Type),
     #[error("Parameter missing type or value: {0}")]
-    DefinitionParameterMissingTypeOrValue(Identifier),
+    ParameterMissingTypeOrValue(Identifier),
     #[error("Unexpected argument: {0}")]
     UnexpectedArgument(Identifier),
 }

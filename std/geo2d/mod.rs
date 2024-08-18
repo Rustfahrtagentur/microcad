@@ -4,7 +4,7 @@ pub struct Circle {
     pub radius: Scalar,
 }
 
-use microcad_parser::language::function::DefinitionParameter;
+use microcad_parser::language::function::Parameter;
 use microcad_parser::language::lang_type::Type;
 use microcad_parser::language::module::{BuiltinModule, ModuleDefinition};
 use microcad_render::geo2d::{Generator, Geometry, LineString};
@@ -79,11 +79,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("geo2d")
         .builtin_module(BuiltinModule {
             name: "circle".into(),
-            parameters: vec![DefinitionParameter::new(
-                "radius".into(),
-                Some(Type::Length),
-                None,
-            )],
+            parameters: vec![Parameter::new("radius".into(), Some(Type::Length), None)],
             f: &|args, ctx| {
                 let arg = args.get(&"radius".into()).unwrap(); // We have checked that the parameter exists before, so unwrap is safe
                 Ok(ctx.append_node(circle(arg.try_into()?)))
@@ -92,10 +88,10 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .builtin_module(BuiltinModule {
             name: "rect".into(),
             parameters: vec![
-                DefinitionParameter::new("width".into(), Some(Type::Length), None),
-                DefinitionParameter::new("height".into(), Some(Type::Length), None),
-                //DefinitionParameter::new("x".into(), Some(Type::Length), None),
-                //DefinitionParameter::new("y".into(), Some(Type::Length), None),
+                Parameter::new("width".into(), Some(Type::Length), None),
+                Parameter::new("height".into(), Some(Type::Length), None),
+                //Parameter::new("x".into(), Some(Type::Length), None),
+                //Parameter::new("y".into(), Some(Type::Length), None),
             ],
             f: &|args, ctx| {
                 let width = args.get(&"width".into()).unwrap();

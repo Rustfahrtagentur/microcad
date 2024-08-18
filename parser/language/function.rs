@@ -2,13 +2,13 @@ use super::{call::*, expression::*, identifier::*, lang_type::*, use_statement::
 use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
-pub struct DefinitionParameter {
+pub struct Parameter {
     name: Identifier,
     specified_type: Option<Type>,
     default_value: Option<Expression>,
 }
 
-impl DefinitionParameter {
+impl Parameter {
     pub fn new(
         name: Identifier,
         specified_type: Option<Type>,
@@ -34,7 +34,7 @@ impl DefinitionParameter {
     }
 }
 
-impl std::fmt::Display for DefinitionParameter {
+impl std::fmt::Display for Parameter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match (&self.specified_type, &self.default_value) {
             (Some(t), Some(v)) => write!(f, "{}: {} = {}", self.name, t, v)?,
@@ -47,7 +47,7 @@ impl std::fmt::Display for DefinitionParameter {
     }
 }
 
-impl Parse for DefinitionParameter {
+impl Parse for Parameter {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let mut name = Identifier::default();
         let mut specified_type = None;
@@ -75,9 +75,7 @@ impl Parse for DefinitionParameter {
         }
 
         if specified_type.is_none() && default_value.is_none() {
-            return Err(ParseError::DefinitionParameterMissingTypeOrValue(
-                name.clone(),
-            ));
+            return Err(ParseError::ParameterMissingTypeOrValue(name.clone()));
         }
 
         with_pair_ok!(
@@ -91,7 +89,7 @@ impl Parse for DefinitionParameter {
     }
 }
 
-impl Eval for DefinitionParameter {
+impl Eval for Parameter {
     type Output = (Option<Value>, Type);
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
@@ -99,7 +97,7 @@ impl Eval for DefinitionParameter {
             (Some(specified_type), Some(expr)) => {
                 let default_value = expr.eval(context)?;
                 if specified_type != &default_value.ty() {
-                    Err(Error::DefinitionParameterTypeMismatch(
+                    Err(Error::ParameterTypeMismatch(
                         self.name.clone(),
                         specified_type.clone(),
                         default_value.ty(),
@@ -113,21 +111,19 @@ impl Eval for DefinitionParameter {
                 let default_value = expr.eval(context)?;
                 Ok((Some(default_value.clone()), default_value.ty()))
             }
-            (None, None) => Err(Error::DefinitionParameterMissingTypeOrValue(
-                self.name.clone(),
-            )),
+            (None, None) => Err(Error::ParameterMissingTypeOrValue(self.name.clone())),
         }
     }
 }
 
 #[derive(Clone, Debug)]
 pub struct FunctionSignature {
-    pub parameters: Vec<DefinitionParameter>,
+    pub parameters: Vec<Parameter>,
     pub return_type: Option<Type>,
 }
 
 impl FunctionSignature {
-    pub fn parameters(&self) -> &Vec<DefinitionParameter> {
+    pub fn parameters(&self) -> &Vec<Parameter> {
         &self.parameters
     }
 
@@ -135,7 +131,7 @@ impl FunctionSignature {
         &self.return_type
     }
 
-    pub fn get_parameter_by_name(&self, name: &Identifier) -> Option<&DefinitionParameter> {
+    pub fn get_parameter_by_name(&self, name: &Identifier) -> Option<&Parameter> {
         self.parameters.iter().find(|arg| arg.name() == name)
     }
 }
@@ -147,10 +143,8 @@ impl Parse for FunctionSignature {
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
-                Rule::definition_parameter_list => {
-                    parameters = Parser::vec(pair, DefinitionParameter::parse)?
-                        .value()
-                        .clone();
+                Rule::parameter_list => {
+                    parameters = Parser::vec(pair, Parameter::parse)?.value().clone();
                 }
                 Rule::r#type => return_type = Some(Type::parse(pair)?.value().clone()),
                 rule => unreachable!("Unexpected token in function signature: {:?}", rule),
