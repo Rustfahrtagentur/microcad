@@ -102,6 +102,18 @@ pub struct ParameterValue {
 }
 
 impl ParameterValue {
+    pub fn name(&self) -> &Identifier {
+        &self.name
+    }
+
+    pub fn specified_type(&self) -> Option<&Type> {
+        self.specified_type.as_ref()
+    }
+
+    pub fn default_value(&self) -> Option<&Value> {
+        self.default_value.as_ref()
+    }
+
     pub fn type_matches(&self, ty: &Type) -> bool {
         match &self.specified_type {
             Some(t) => t == ty,
@@ -214,13 +226,44 @@ impl Parse for ParameterList {
     }
 }
 
+#[derive(Clone, Debug, Default)]
+pub struct ParameterValueList {
+    parameters: Vec<ParameterValue>,
+    by_name: std::collections::HashMap<Identifier, usize>,
+}
+
+impl ParameterValueList {
+    pub fn push(&mut self, parameter: ParameterValue) -> Result<(), ParseError> {
+        if self.by_name.contains_key(parameter.name()) {
+            return Err(ParseError::DuplicateParameter(parameter.name().clone()));
+        }
+
+        self.by_name
+            .insert(parameter.name().clone(), self.parameters.len());
+        self.parameters.push(parameter);
+        Ok(())
+    }
+
+    pub fn get(&self, name: &Identifier) -> Option<&ParameterValue> {
+        self.by_name.get(name).map(|i| &self.parameters[*i])
+    }
+}
+
+impl Deref for ParameterValueList {
+    type Target = Vec<ParameterValue>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.parameters
+    }
+}
+
 impl Eval for ParameterList {
-    type Output = Vec<ParameterValue>;
+    type Output = ParameterValueList;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
-        let mut values = Vec::new();
+        let mut values = ParameterValueList::default();
         for parameter in &self.parameters {
-            values.push(parameter.eval(context)?);
+            values.push(parameter.eval(context)?).unwrap(); // Unwrap is safe here because we know the parameter is unique
         }
 
         Ok(values)

@@ -187,24 +187,21 @@ impl CallArgumentValueList {
 
     pub fn match_definition(
         &self,
-        parameters: &ParameterList,
-        context: &mut Context,
+        parameter_values: &ParameterValueList,
     ) -> Result<ArgumentMap, Error> {
         let mut arg_map = ArgumentMap::new();
 
         // Check for unexpected arguments.
         // We are looking for call arguments that are not in the parameter list
         for name in self.named.keys() {
-            if !parameters.iter().any(|p| p.name() == name) {
+            if parameter_values.get(name).is_none() {
                 return Err(Error::UnexpectedArgument(name.clone()));
             }
         }
 
-        let parameter_values = parameters.eval(context)?;
-
         // Check for matching named arguments
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
-        for parameter_value in &parameter_values {
+        for parameter_value in parameter_values.iter() {
             let ParameterValue {
                 name,
                 default_value,
@@ -246,7 +243,7 @@ impl CallArgumentValueList {
 
         // Finally, we need to check if all arguments have been matched
         let mut missing_args = IdentifierList::new();
-        for ParameterValue { name, .. } in &parameter_values {
+        for ParameterValue { name, .. } in parameter_values.iter() {
             if !arg_map.contains_key(name) {
                 missing_args.push(name.clone()).unwrap();
             }

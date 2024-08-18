@@ -161,7 +161,7 @@ impl BuiltinFunction {
     ) -> Result<Option<Value>, Error> {
         let arg_map = args
             .eval(context)?
-            .match_definition(&self.signature.parameters, context)?;
+            .match_definition(&self.signature.parameters.eval(context)?)?;
         let result = (self.f)(&arg_map, context)?;
 
         match (&result, &self.signature.return_type) {
@@ -233,7 +233,9 @@ impl FunctionDefinition {
     ) -> Result<Option<Value>, Error> {
         // TODO: Check if the arguments are correct
         let params = self.signature.parameters();
-        let arg_map = args.eval(context)?.match_definition(params, context)?;
+        let arg_map = args
+            .eval(context)?
+            .match_definition(&params.eval(context)?)?;
 
         context.push();
         for (name, value) in arg_map.iter() {
