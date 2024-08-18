@@ -316,32 +316,51 @@ impl Eval for Call {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         let symbols = self.name.eval(context)?;
-        for symbol in symbols {
+        let mut non_matching_symbols = Vec::new();
+        for symbol in &symbols {
             match symbol {
                 Symbol::Function(f) => {
                     if let Ok(value) = f.call(&self.argument_list, context) {
                         return Ok(value);
+                    } else {
+                        non_matching_symbols.push(symbol.clone());
                     }
                 }
                 Symbol::BuiltinFunction(f) => {
                     if let Ok(value) = f.call(&self.argument_list, context) {
                         return Ok(value);
+                    } else {
+                        non_matching_symbols.push(symbol.clone());
                     }
                 }
                 Symbol::BuiltinModule(m) => {
                     if let Ok(value) = m.call(&self.argument_list, context) {
                         return Ok(Some(Value::Node(value)));
+                    } else {
+                        non_matching_symbols.push(symbol.clone());
                     }
                 }
                 /*Symbol::ModuleDefinition(m) => {
                     if let Ok(value) = m.call(&self.argument_list, context) {
                         return Ok(Some(Value::Node(value)));
+                    } else {
+                        non_matching_symbols.push(symbol.clone());
                     }
                 }*/
                 symbol => unimplemented!("Call::eval for {symbol:?}"),
             }
         }
-        //  Ok(None)
+
+        if non_matching_symbols.is_empty() {
+            println!("No matching symbol found for `{}`", self.name);
+            return Ok(None);
+        } else {
+            println!("No matching symbol found for `{}`. Candidates:", self.name);
+            for symbol in non_matching_symbols {
+                println!("\t{} => {:#?}", symbol.name(), symbol);
+            }
+        }
+
         Err(Error::SymbolNotFound(self.name.clone()))
     }
 }
