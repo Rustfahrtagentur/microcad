@@ -3,7 +3,13 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
-use super::{expression::*, identifier::*, lang_type::Ty, parameter::*, value::*};
+use super::{
+    expression::*,
+    identifier::*,
+    lang_type::Ty,
+    parameter::{self, *},
+    value::*,
+};
 use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
@@ -111,35 +117,32 @@ impl CallArgumentList {
             }
         }
 
-        let mut eval_params = Vec::new();
-        for param in parameters.iter() {
-            if check_types {
-                let (default_value, ty) = param.eval(context)?;
-                eval_params.push((param.name(), default_value, Some(ty)));
-            } else {
-                eval_params.push((
-                    param.name(),
-                    match &param.default_value() {
-                        Some(default) => Some(default.eval(context)?),
-                        None => None,
-                    },
-                    None,
-                ));
-            }
-        }
+        let mut parameter_values = parameters.eval(context)?;
 
         // Check for matching named arguments
-        for (param_name, param_default_value, param_ty) in &eval_params {
-            match self.get(param_name) {
+        // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
+        for parameter_value in &parameter_values {
+            let ParameterValue {
+                name,
+                specified_type,
+                default_value,
+            } = parameter_value;
+
+            match self.get(name) {
+                // We have a matching argument with the same name as the parameter.
                 Some(arg) => {
-                    let value = arg.value.eval(context)?;
-                    if !check_types || value.ty() == *param_ty.as_ref().unwrap() {
-                        arg_map.insert((*param_name).clone(), value);
-                    } // @todo Throw error on else?
+                    let arg_value = arg.value.eval(context)?;
+
+                    // Now we need to check if the argument type matches the parameter type
+                    if parameter_value.type_check(&arg_value.ty())? {
+                        arg_map.insert(name.clone(), arg_value);
+                    }
                 }
+                // No matching argument found, check if a default value is defined
                 None => {
-                    if let Some(default) = param_default_value {
-                        arg_map.insert((*param_name).clone(), default.clone());
+                    // If we have a default value, we can use it
+                    if let Some(default) = default_value {
+                        arg_map.insert(name.clone(), default.clone());
                     }
                 }
             }
@@ -150,12 +153,16 @@ impl CallArgumentList {
         let mut positional_index = 0;
         for arg in &self.arguments {
             if arg.name.is_none() {
-                let (param_name, _, param_ty) = &eval_params[positional_index];
-                if !arg_map.contains_key(param_name)
+                let ParameterValue {
+                    name,
+                    specified_type,
+                    ..
+                } = &parameter_values[positional_index];
+                if !arg_map.contains_key(name)
                     && (!check_types
-                        || *param_ty.as_ref().unwrap() == arg.value.eval(context)?.ty())
+                        || *specified_type.as_ref().unwrap() == arg.value.eval(context)?.ty())
                 {
-                    arg_map.insert((*param_name).clone(), arg.value.eval(context)?);
+                    arg_map.insert((*name).clone(), arg.value.eval(context)?);
                     positional_index += 1;
                 }
             }
@@ -163,9 +170,9 @@ impl CallArgumentList {
 
         // Finally, we need to check if all arguments have been matched
         let mut missing_args = IdentifierList::new();
-        for (param_name, _, _) in &eval_params {
-            if !arg_map.contains_key(param_name) {
-                missing_args.push((*param_name).clone()).unwrap();
+        for ParameterValue { name, .. } in &parameter_values {
+            if !arg_map.contains_key(name) {
+                missing_args.push(name.clone()).unwrap();
             }
         }
         if !missing_args.is_empty() {

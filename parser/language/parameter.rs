@@ -93,11 +93,41 @@ impl Parse for Parameter {
     }
 }
 
+/// @brief Parameter value is the result of evaluating a parameter
+#[derive(Clone, Debug)]
+pub struct ParameterValue {
+    pub name: Identifier,
+    pub specified_type: Option<Type>,
+    pub default_value: Option<Value>,
+}
+
+impl ParameterValue {
+    pub fn type_matches(&self, ty: &Type) -> bool {
+        match &self.specified_type {
+            Some(t) => t == ty,
+            None => true, // Accept any type if none is specified
+        }
+    }
+
+    pub fn type_check(&self, ty: &Type) -> Result<bool, Error> {
+        if self.type_matches(ty) {
+            Ok(true)
+        } else {
+            Err(Error::ParameterTypeMismatch(
+                self.name.clone(),
+                self.specified_type.clone().unwrap(),
+                ty.clone(),
+            ))
+        }
+    }
+}
+
 impl Eval for Parameter {
-    type Output = (Option<Value>, Type);
+    type Output = ParameterValue;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         match (&self.specified_type, &self.default_value) {
+            // Type and value are specified
             (Some(specified_type), Some(expr)) => {
                 let default_value = expr.eval(context)?;
                 if specified_type != &default_value.ty() {
@@ -107,15 +137,35 @@ impl Eval for Parameter {
                         default_value.ty(),
                     ))
                 } else {
-                    Ok((Some(default_value), specified_type.clone()))
+                    Ok(ParameterValue {
+                        name: self.name.clone(),
+                        specified_type: Some(specified_type.clone()),
+                        default_value: Some(default_value),
+                    })
                 }
             }
-            (Some(t), None) => Ok((None, t.clone())),
+            // Only type is specified
+            (Some(t), None) => Ok(ParameterValue {
+                name: self.name.clone(),
+                specified_type: Some(t.clone()),
+                default_value: None,
+            }),
+            // Only value is specified
             (None, Some(expr)) => {
                 let default_value = expr.eval(context)?;
-                Ok((Some(default_value.clone()), default_value.ty()))
+
+                Ok(ParameterValue {
+                    name: self.name.clone(),
+                    specified_type: Some(default_value.ty().clone()),
+                    default_value: Some(default_value),
+                })
             }
-            (None, None) => Err(Error::ParameterMissingTypeOrValue(self.name.clone())),
+            // Neither type nor value is specified
+            (None, None) => Ok(ParameterValue {
+                name: self.name.clone(),
+                specified_type: None,
+                default_value: None,
+            }),
         }
     }
 }
@@ -161,6 +211,19 @@ impl Parse for ParameterList {
         }
 
         with_pair_ok!(parameters, pair)
+    }
+}
+
+impl Eval for ParameterList {
+    type Output = Vec<ParameterValue>;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        let mut values = Vec::new();
+        for parameter in &self.parameters {
+            values.push(parameter.eval(context)?);
+        }
+
+        Ok(values)
     }
 }
 
