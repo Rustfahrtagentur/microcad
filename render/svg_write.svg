@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+<g transform='scale(1)'>
+<rect x="10" y="10" width="10" height="10" style="fill:blue;"/>
+<circle cx="50" cy="50" r="10" style="fill:red;"/>
+<line x1="0" y1="0" x2="100" y2="100" style="stroke:black;"/>
+</g>
+</svg>
