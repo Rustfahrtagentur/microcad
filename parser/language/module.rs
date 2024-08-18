@@ -453,16 +453,29 @@ macro_rules! builtin_module {
     // This macro is used to create a BuiltinModule from a function
     ($name:ident, $f:expr) => {
         BuiltinModule::new(
-            microcad_parser::language::identifier::Identifier::from(stringify!($name)),
+            stringify!($name).into(),
             &$f,
         )
     };
     // This macro is used to create a BuiltinModule from a function with no arguments
     ($name:ident) => {
         BuiltinModule::new(
-            microcad_parser::language::identifier::Identifier::from(stringify!($name)),
+            stringify!($name).into(),
             microcad_parser::language::parameter::ParameterList::default(),
             &|_, ctx| Ok(ctx.append_node($name())),
+        )
+    };
+    ($name:ident($($arg:ident: $type:ident),*)) => {
+        BuiltinModule::new(
+            stringify!($name).into(),
+            microcad_parser::parameter_list![$(microcad_parser::parameter!($arg: $type)),*],
+            &|args, ctx| {
+                let mut l = |$($arg: $type),*| Ok(ctx.append_node($name($($arg),*)));
+                let ($($arg),*) = (
+                    $(args.get(&stringify!($arg).into()).unwrap().clone().try_into()?),*
+                );
+                l($($arg),*)
+            },
         )
     };
 }

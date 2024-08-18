@@ -1,8 +1,8 @@
 use microcad_core::Scalar;
+use microcad_parser::builtin_module;
 use microcad_parser::language::lang_type::Type;
 use microcad_parser::language::module::{BuiltinModule, ModuleDefinition};
 use microcad_parser::language::parameter::Parameter;
-use microcad_parser::{parameter, parameter_list};
 use microcad_render::geo2d::{Generator, Geometry, LineString};
 
 pub struct Circle {
@@ -76,24 +76,12 @@ pub fn rect(width: f64, height: f64) -> Node {
 use crate::ModuleBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    ModuleBuilder::namespace("geo2d")
-        .builtin_module(BuiltinModule {
-            name: "circle".into(),
-            parameters: parameter_list![parameter!(radius: Length)],
-            f: &|args, ctx| {
-                let arg = args.get(&"radius".into()).unwrap(); // We have checked that the parameter exists before, so unwrap is safe
-                Ok(ctx.append_node(circle(arg.try_into()?)))
-            },
-        })
-        .builtin_module(BuiltinModule {
-            name: "rect".into(),
-            parameters: parameter_list![parameter!(width: Length), parameter!(height: Length)],
-            f: &|args, ctx| {
-                let width = args.get(&"width".into()).unwrap();
-                let height = args.get(&"height".into()).unwrap();
+    let module = ModuleBuilder::namespace("geo2d")
+        .builtin_module(builtin_module!(circle(radius: Scalar)))
+        .builtin_module(builtin_module!(rect(width: Scalar, height: Scalar)))
+        .build();
 
-                Ok(ctx.append_node(rect(width.try_into()?, height.try_into()?)))
-            },
-        })
-        .build()
+    println!("Module: {:?}", module.clone());
+
+    module
 }

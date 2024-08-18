@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use super::{
     call::*, format_string::*, identifier::*, list::*, literal::*, module::*, tuple::*, value::*,
 };
@@ -221,7 +223,18 @@ impl std::fmt::Display for Expression {
     }
 }
 
-impl Expression {}
+impl Expression {
+    pub fn literal(literal: Literal) -> Self {
+        Self::Literal(literal)
+    }
+
+    pub fn literal_from_str(s: &str) -> Result<Self, anyhow::Error> {
+        if s.starts_with('"') && s.ends_with('"') {
+            return Ok(Self::FormatString(FormatString::from_str(s)?));
+        }
+        Ok(Self::Literal(Literal::from_str(s)?))
+    }
+}
 
 impl Eval for Expression {
     type Output = Value;

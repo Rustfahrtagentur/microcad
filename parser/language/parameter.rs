@@ -184,7 +184,7 @@ macro_rules! parameter {
         Parameter::new(
             stringify!($name).into(),
             Some(Type::$ty),
-            Some(Expression::new($value)),
+            Some(Expression::literal_from_str(stringify!($value)).expect("Invalid literal")),
         )
     };
 }
@@ -195,5 +195,14 @@ macro_rules! parameter_list {
         microcad_parser::language::parameter::ParameterList::new(vec![
             $($param,)*
         ])
+    };
+    ($($name:ident),*) => {
+        microcad_parser::language::parameter_list![$(microcad_parser::parameter!($name)),*]
+    };
+    ($($name:ident: $ty:ident),*) => {
+        microcad_parser::language::parameter_list![$(microcad_parser::parameter!($name: $ty)),*]
+    };
+    ($($name:ident: $ty:ident = $value:expr),*) => {
+        microcad_parser::language::parameter_list![$(microcad_parser::parameter!($name: $ty = $value)),*]
     };
 }

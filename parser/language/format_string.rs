@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use super::{expression::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
@@ -69,6 +71,14 @@ enum FormatStringInner {
 /// Definition and implementation for `StringLiteral`
 #[derive(Default, Clone, Debug)]
 pub struct FormatString(Vec<FormatStringInner>);
+
+impl FromStr for FormatString {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Parser::parse_rule::<Self>(Rule::format_string, s)
+    }
+}
 
 impl FormatString {
     pub fn push_string(&mut self, s: String) {
