@@ -54,7 +54,7 @@ impl ModuleBuilder {
 macro_rules! arg_1 {
     ($f:ident($name:ident) for $($ty:tt),+) => { BuiltinFunction::new(
         stringify!($f).into(),
-        microcad_parser::function_signature!(microcad_parser::parameter_list!(microcad_parser::parameter!($name))),
+        microcad_parser::function_signature!(microcad_parser::parameter_list![microcad_parser::parameter!($name)]),
         &|args, _| {
         match args.get(&stringify!($name).into()).unwrap() {
             $(Value::$ty($name) => Ok(Some(Value::$ty($name.$f()))),)*
@@ -74,7 +74,7 @@ macro_rules! arg_1 {
     };
     ($f:ident($name:ident) $inner:expr) => {
         BuiltinFunction::new(stringify!($f).into(),
-        microcad_parser::function_signature!(microcad_parser::parameter_list!(microcad_parser::parameter!($name))),
+        microcad_parser::function_signature!(microcad_parser::parameter_list![microcad_parser::parameter!($name)]),
         &|args, _| {
             let l = |$name| Ok(Some($inner?));
             l(args.get(&stringify!($name).into()).unwrap().clone())
@@ -87,10 +87,10 @@ macro_rules! arg_2 {
     ($f:ident($x:ident, $y:ident) $inner:expr) => {
         BuiltinFunction::new(
             stringify!($f).into(),
-            microcad_parser::function_signature!(microcad_parser::parameter_list!(
+            microcad_parser::function_signature!(microcad_parser::parameter_list![
                 microcad_parser::parameter!($x),
                 microcad_parser::parameter!($y)
-            )),
+            ]),
             &|args, _| {
                 let l = |$x, $y| Ok(Some($inner?));
                 let (x, y) = (
@@ -114,7 +114,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .module(algorithm::builtin_module())
         .builtin_function(BuiltinFunction::new(
             "assert".into(),
-            function_signature!(parameter_list!(parameter!(condition: Bool))),
+            function_signature!(parameter_list![parameter!(condition: Bool)]),
             &|args, _| {
                 assert!(args[&"condition".into()].into_bool()?);
                 Ok(None)
@@ -122,7 +122,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         ))
         .builtin_module(BuiltinModule {
             name: "export".into(),
-            parameters: parameter_list!(parameter!(filename: String)),
+            parameters: parameter_list![parameter!(filename: String)],
             f: &|args, ctx| {
                 let filename = args.get(&"filename".into()).unwrap().try_into()?;
                 Ok(ctx.append_node(export(filename)))

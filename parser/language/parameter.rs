@@ -191,7 +191,7 @@ macro_rules! parameter {
 
 #[macro_export]
 macro_rules! parameter_list {
-    ($($param:expr),*) => {
+    [$($param:expr),*] => {
         microcad_parser::language::parameter::ParameterList::new(vec![
             $($param,)*
         ])

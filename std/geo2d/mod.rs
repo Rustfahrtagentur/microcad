@@ -79,7 +79,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("geo2d")
         .builtin_module(BuiltinModule {
             name: "circle".into(),
-            parameters: parameter_list!(parameter!(radius: Length)),
+            parameters: parameter_list![parameter!(radius: Length)],
             f: &|args, ctx| {
                 let arg = args.get(&"radius".into()).unwrap(); // We have checked that the parameter exists before, so unwrap is safe
                 Ok(ctx.append_node(circle(arg.try_into()?)))
@@ -87,7 +87,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         })
         .builtin_module(BuiltinModule {
             name: "rect".into(),
-            parameters: parameter_list!(parameter!(width: Length), parameter!(height: Length)),
+            parameters: parameter_list![parameter!(width: Length), parameter!(height: Length)],
             f: &|args, ctx| {
                 let width = args.get(&"width".into()).unwrap();
                 let height = args.get(&"height".into()).unwrap();
