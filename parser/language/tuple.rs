@@ -67,7 +67,7 @@ impl std::fmt::Display for TupleExpression {
             self.args
                 .iter()
                 .map(|c| if self.is_named {
-                    format!("{} = {}", c.name().unwrap(), c.value().to_string())
+                    format!("{} = {}", c.name().unwrap(), c.value())
                 } else {
                     c.to_string()
                 })
