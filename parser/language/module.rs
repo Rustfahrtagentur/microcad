@@ -127,10 +127,10 @@ impl ModuleBody {
         self.statements.push(statement.clone());
         match statement {
             ModuleStatement::FunctionDefinition(function) => {
-                self.symbols.add(Symbol::Function(function));
+                self.symbols.add_symbol(Symbol::Function(function));
             }
             ModuleStatement::ModuleDefinition(module) => {
-                self.symbols.add(Symbol::ModuleDefinition(module));
+                self.symbols.add_symbol(Symbol::ModuleDefinition(module));
             }
             ModuleStatement::ModuleInitDefinition(init) => {
                 self.inits.push(init.clone());
@@ -138,21 +138,17 @@ impl ModuleBody {
             _ => {}
         }
     }
+}
 
-    pub fn get_symbols_by_name(&self, name: &Identifier) -> Vec<&Symbol> {
-        self.symbols.get(name)
+impl Symbols for ModuleBody {
+    fn find_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+        self.symbols.find_symbols(name)
     }
-
-    pub fn symbols(&self) -> &SymbolTable {
-        &self.symbols
+    fn add_symbol(&mut self, symbol: Symbol) {
+        self.symbols.add_symbol(symbol)
     }
-
-    pub fn get_symbol(&self, name: &Identifier) -> Option<&Symbol> {
-        self.symbols.get(name).first().cloned()
-    }
-
-    pub fn add_symbol(&mut self, symbol: Symbol) {
-        self.symbols.add(symbol);
+    fn copy_symbols<T: Symbols>(&self, symbols: &mut T) {
+        self.symbols.copy_symbols(symbols)
     }
 }
 
@@ -183,15 +179,14 @@ impl Eval for ModuleBody {
     type Output = Node;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
-        let node = tree::group();
-        let current = context.current_node();
-        context.set_current_node(node.clone());
+        let current = context.current_node().clone();
+        context.set_current_node(tree::group());
         for statement in &self.statements {
             statement.eval(context)?;
         }
         context.set_current_node(current.clone());
 
-        Ok(node.clone())
+        Ok(tree::group())
     }
 }
 
@@ -353,26 +348,19 @@ impl ModuleDefinition {
             body: ModuleBody::new(),
         }
     }
+}
 
-    pub fn add_function(&mut self, function: std::rc::Rc<FunctionDefinition>) {
-        self.body.add_symbol(Symbol::Function(function.clone()));
+impl Symbols for ModuleDefinition {
+    fn add_symbol(&mut self, symbol: Symbol) {
+        self.body.symbols.add_symbol(symbol);
     }
 
-    pub fn add_module(&mut self, module: std::rc::Rc<ModuleDefinition>) {
-        self.body
-            .add_symbol(Symbol::ModuleDefinition(module.clone()));
+    fn find_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+        self.body.symbols.find_symbols(name)
     }
 
-    pub fn add_symbol(&mut self, symbol: Symbol) {
-        self.body.add_symbol(symbol);
-    }
-
-    pub fn get_symbols_by_name(&self, name: &Identifier) -> Vec<&Symbol> {
-        self.body.get_symbols_by_name(name)
-    }
-
-    pub fn symbols(&self) -> &SymbolTable {
-        self.body.symbols()
+    fn copy_symbols<T: Symbols>(&self, symbols: &mut T) {
+        self.body.symbols.copy_symbols(symbols)
     }
 }
 

@@ -94,7 +94,7 @@ impl Eval for Nested {
     type Output = Value;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
-        let root = context.current_node();
+        let root = context.current_node().clone();
 
         let mut values = Vec::new();
         for (index, item) in self.0.iter().enumerate() {
@@ -105,7 +105,8 @@ impl Eval for Nested {
                         if index != 0 {
                             return Err(Error::CannotNestFunctionCall);
                         } else {
-                            return Ok(Value::Scalar(0.0)); // @todo This is a hack. Return a Option::None here
+                            // TODO This is a hack. Return a Option::None here
+                            return Ok(Value::Scalar(0.0));
                         }
                     }
                 },
@@ -114,7 +115,9 @@ impl Eval for Nested {
 
                     for symbol in symbols {
                         if let Symbol::Value(_, v) = symbol {
-                            values.push(v.clone()); // Find first value only. @todo Backpropagation of values
+                            // Find first value only.
+                            // TODO back propagation of values
+                            values.push(v.clone());
                             break;
                         }
                     }

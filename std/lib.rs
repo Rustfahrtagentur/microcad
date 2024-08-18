@@ -2,16 +2,16 @@ mod algorithm;
 mod geo2d;
 mod math;
 
-use microcad_parser::builtin_module;
-use microcad_parser::eval::*;
-use microcad_parser::function_signature;
-use microcad_parser::language::expression::Expression;
-use microcad_parser::language::lang_type::Type;
-use microcad_parser::language::parameter::Parameter;
-use microcad_parser::language::value::Value;
-use microcad_parser::language::{function::*, module::*};
-use microcad_parser::parameter;
-use microcad_parser::parameter_list;
+use microcad_parser::{
+    builtin_module,
+    eval::*,
+    function_signature,
+    language::{
+        expression::Expression, function::*, lang_type::Type, module::*, parameter::Parameter,
+        value::Value,
+    },
+    parameter, parameter_list,
+};
 use microcad_render::tree::{Node, NodeInner};
 
 pub struct ModuleBuilder {
@@ -41,7 +41,7 @@ impl ModuleBuilder {
     }
 
     pub fn module(&mut self, m: std::rc::Rc<ModuleDefinition>) -> &mut Self {
-        self.module.add_module(m);
+        self.module.add_symbol(Symbol::ModuleDefinition(m));
         self
     }
 
@@ -132,6 +132,8 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
 
 #[test]
 fn context_namespace() {
+    use microcad_parser::language::identifier::QualifiedName;
+
     let mut context = Context::default();
 
     let module = ModuleBuilder::namespace("math")
@@ -140,8 +142,8 @@ fn context_namespace() {
 
     context.add_symbol(Symbol::ModuleDefinition(module));
 
-    let symbols = context
-        .get_symbols_by_qualified_name(&"math::pi".into())
+    let symbols = QualifiedName::from("math::pi")
+        .get_symbols(&context)
         .unwrap();
     assert_eq!(symbols.len(), 1);
     assert_eq!(symbols[0].name(), "pi");

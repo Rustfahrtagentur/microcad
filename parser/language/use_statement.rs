@@ -100,10 +100,12 @@ impl Eval for UseStatement {
                     for symbol in symbols {
                         match symbol {
                             Symbol::ModuleDefinition(module_definition) => {
-                                let symbols = module_definition.symbols();
-                                for symbol in symbols.iter() {
-                                    context.add_symbol(symbol.clone());
-                                }
+                                module_definition
+                                    .body
+                                    .symbols
+                                    .iter()
+                                    .cloned()
+                                    .for_each(|symbol| context.add_symbol(symbol));
                             }
                             _ => {
                                 return Err(Error::ExpectedModule(name.clone()));
