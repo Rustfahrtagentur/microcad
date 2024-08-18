@@ -52,6 +52,22 @@ impl Parse for CallArgument {
     }
 }
 
+pub struct CallArgumentValue {
+    name: Option<Identifier>,
+    value: Value,
+}
+
+impl Eval for CallArgument {
+    type Output = CallArgumentValue;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+        Ok(CallArgumentValue {
+            name: self.name.clone(),
+            value: self.value.eval(context)?,
+        })
+    }
+}
+
 impl std::fmt::Display for CallArgument {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.name {
@@ -83,23 +99,6 @@ impl CallArgumentList {
         &self,
         parameters: &ParameterList,
         context: &mut Context,
-    ) -> Result<ArgumentMap, Error> {
-        self._match_definition(parameters, context, true)
-    }
-
-    pub fn match_definition_no_type_check(
-        &self,
-        parameters: &ParameterList,
-        context: &mut Context,
-    ) -> Result<ArgumentMap, Error> {
-        self._match_definition(parameters, context, false)
-    }
-
-    fn _match_definition(
-        &self,
-        parameters: &ParameterList,
-        context: &mut Context,
-        check_types: bool,
     ) -> Result<ArgumentMap, Error> {
         let mut arg_map = ArgumentMap::new();
 
@@ -153,8 +152,8 @@ impl CallArgumentList {
                     ..
                 } = &parameter_values[positional_index];
                 if !arg_map.contains_key(name)
-                    && (!check_types
-                        || *specified_type.as_ref().unwrap() == arg.value.eval(context)?.ty())
+                    && (parameter_values[positional_index]
+                        .type_check(&arg.value.eval(context)?.ty())?)
                 {
                     arg_map.insert((*name).clone(), arg.value.eval(context)?);
                     positional_index += 1;
