@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use super::{expression::*, identifier::*, lang_type::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
 
@@ -113,5 +115,45 @@ impl Eval for Parameter {
             }
             (None, None) => Err(Error::ParameterMissingTypeOrValue(self.name.clone())),
         }
+    }
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct ParameterList {
+    parameters: Vec<Parameter>,
+    by_name: std::collections::HashMap<String, usize>,
+}
+
+impl Parse for ParameterList {
+    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+        Parser::ensure_rule(&pair, Rule::parameter_list);
+        let mut parameters = Vec::new();
+        let mut by_name = std::collections::HashMap::new();
+
+        for pair in pair.clone().into_inner() {
+            let parameter = Parameter::parse(pair)?.value().clone();
+            if by_name.contains_key(&parameter.name().to_string()) {
+                return Err(ParseError::DuplicateParameter(parameter.name().clone()));
+            }
+
+            by_name.insert(parameter.name().to_string(), parameters.len());
+            parameters.push(parameter);
+        }
+
+        with_pair_ok!(
+            Self {
+                parameters,
+                by_name
+            },
+            pair
+        )
+    }
+}
+
+impl Deref for ParameterList {
+    type Target = Vec<Parameter>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.parameters
     }
 }

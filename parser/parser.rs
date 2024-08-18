@@ -39,6 +39,8 @@ pub enum ParseError {
     EmptyTupleExpression,
     #[error("Missing type or value for definition parameter: {0}")]
     ParameterMissingTypeOrValue(Identifier),
+    #[error("Duplicate parameter: {0}")]
+    DuplicateParameter(Identifier),
 }
 
 pub struct WithPair<'a, T> {
