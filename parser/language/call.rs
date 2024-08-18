@@ -185,7 +185,7 @@ impl CallArgumentValueList {
         }
     }
 
-    pub fn match_definition(
+    pub fn get_matching_arguments(
         &self,
         parameter_values: &ParameterValueList,
     ) -> Result<ArgumentMap, Error> {

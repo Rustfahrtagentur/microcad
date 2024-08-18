@@ -444,7 +444,7 @@ impl BuiltinModule {
     pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Node, Error> {
         let arg_map = args
             .eval(context)?
-            .match_definition(&self.parameters.eval(context)?)?;
+            .get_matching_arguments(&self.parameters.eval(context)?)?;
         (self.f)(&arg_map, context)
     }
 }
