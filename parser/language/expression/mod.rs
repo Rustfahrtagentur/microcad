@@ -1,9 +1,9 @@
-use std::str::FromStr;
+mod nested;
+mod nested_item;
 
-use super::{
-    call::*, format_string::*, identifier::*, list::*, literal::*, module::*, tuple::*, value::*,
-};
+use super::{call::*, format_string::*, identifier::*, list::*, literal::*, tuple::*, value::*};
 use crate::{eval::*, parser::*, with_pair_ok};
+use nested::*;
 use pest::pratt_parser::*;
 
 lazy_static::lazy_static! {
@@ -28,129 +28,6 @@ lazy_static::lazy_static! {
             .op(Op::postfix(list_element_access))
             .op(Op::postfix(tuple_element_access))
     };
-}
-
-#[derive(Clone, Debug)]
-pub enum NestedItem {
-    Call(Call),
-    QualifiedName(QualifiedName),
-    ModuleBody(ModuleBody),
-}
-
-impl Parse for NestedItem {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        match pair.clone().as_rule() {
-            Rule::call => with_pair_ok!(
-                NestedItem::Call(Call::parse(pair.clone())?.value().clone()),
-                pair
-            ),
-            Rule::qualified_name => {
-                with_pair_ok!(
-                    NestedItem::QualifiedName(QualifiedName::parse(pair.clone())?.value().clone()),
-                    pair
-                )
-            }
-            Rule::module_body => {
-                with_pair_ok!(
-                    NestedItem::ModuleBody(ModuleBody::parse(pair.clone())?.value().clone()),
-                    pair
-                )
-            }
-            rule => unreachable!(
-                "NestedItem::parse expected call or qualified name, found {:?}",
-                rule
-            ),
-        }
-    }
-}
-
-impl std::fmt::Display for NestedItem {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            NestedItem::Call(call) => write!(f, "{}", call),
-            NestedItem::QualifiedName(qualified_name) => write!(f, "{}", qualified_name),
-            NestedItem::ModuleBody(body) => write!(f, "{}", body),
-        }
-    }
-}
-
-#[derive(Clone, Debug)]
-pub struct Nested(Vec<NestedItem>);
-
-impl Parse for Nested {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut vec = Vec::new();
-        for pair in pair.clone().into_inner().filter(|pair| {
-            [Rule::qualified_name, Rule::call, Rule::module_body].contains(&pair.as_rule())
-        }) {
-            vec.push(NestedItem::parse(pair)?.value().clone());
-        }
-
-        with_pair_ok!(Nested(vec), pair)
-    }
-}
-
-impl Eval for Nested {
-    type Output = Value;
-
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
-        let root = context.current_node();
-
-        let mut values = Vec::new();
-        for (index, item) in self.0.iter().enumerate() {
-            match item {
-                NestedItem::Call(call) => match call.eval(context)? {
-                    Some(value) => values.push(value),
-                    None => {
-                        if index != 0 {
-                            return Err(Error::CannotNestFunctionCall);
-                        } else {
-                            return Ok(Value::Scalar(0.0)); // @todo This is a hack. Return a Option::None here
-                        }
-                    }
-                },
-                NestedItem::QualifiedName(qualified_name) => {
-                    let symbols = qualified_name.eval(context)?;
-
-                    for symbol in symbols {
-                        if let Symbol::Value(_, v) = symbol {
-                            values.push(v.clone()); // Find first value only. @todo Backpropagation of values
-                            break;
-                        }
-                    }
-                }
-                NestedItem::ModuleBody(body) => {
-                    let new_node = body.eval(context)?;
-                    new_node.detach();
-                    values.push(Value::Node(new_node));
-                }
-            }
-        }
-
-        assert!(!values.is_empty());
-
-        if values.len() == 1 {
-            return Ok(values[0].clone());
-        }
-
-        // Finally, nest all nodes
-        for value in values {
-            match value {
-                Value::Node(node) => {
-                    node.detach();
-                    let nested = context.append_node(node);
-                    context.set_current_node(nested);
-                }
-                _ => {
-                    return Err(Error::CannotNestFunctionCall);
-                }
-            }
-        }
-
-        context.set_current_node(root.clone());
-
-        Ok(Value::Node(root.clone()))
-    }
 }
 
 #[derive(Default, Clone, Debug)]
@@ -208,16 +85,7 @@ impl std::fmt::Display for Expression {
             Self::NamedTupleElementAccess(lhs, rhs) => write!(f, "{}.{}", lhs, rhs),
             Self::UnnamedTupleElementAccess(lhs, rhs) => write!(f, "{}.{}", lhs, rhs),
             Self::MethodCall(lhs, method_call) => write!(f, "{}.{}", lhs, method_call),
-            Self::Nested(nested) => {
-                let mut iter = nested.0.iter();
-                if let Some(first) = iter.next() {
-                    write!(f, "{}", first)?;
-                    for item in iter {
-                        write!(f, " {}", item)?;
-                    }
-                }
-                Ok(())
-            }
+            Self::Nested(nested) => write!(f, "{nested}"),
             _ => unimplemented!(),
         }
     }
@@ -229,6 +97,7 @@ impl Expression {
     }
 
     pub fn literal_from_str(s: &str) -> Result<Self, anyhow::Error> {
+        use std::str::FromStr;
         if s.starts_with('"') && s.ends_with('"') {
             return Ok(Self::FormatString(FormatString::from_str(s)?));
         }
@@ -464,13 +333,15 @@ impl Parse for ExpressionList {
 
 impl std::fmt::Display for ExpressionList {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        for (i, expr) in self.0.iter().enumerate() {
-            if i > 0 {
-                write!(f, ", ")?;
-            }
-            write!(f, "{}", expr)?;
-        }
-        Ok(())
+        write!(
+            f,
+            "{}",
+            self.0
+                .iter()
+                .map(|expr| expr.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
     }
 }
 
