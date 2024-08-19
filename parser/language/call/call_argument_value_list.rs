@@ -52,7 +52,7 @@ impl CallArgumentValueList {
 
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
         old_parameter_values.iter().for_each(|parameter_value| {
-            match self.get_by_name(parameter_value.name()) {
+            match self.get_by_name(&parameter_value.name) {
                 // We have a matching argument with the same name as the parameter.
                 Some(arg) => {
                     // Now we need to check if the argument type matches the parameter type
@@ -60,7 +60,7 @@ impl CallArgumentValueList {
                         Self::insert_and_remove(
                             arg_map,
                             parameter_values,
-                            parameter_value.name(),
+                            &parameter_value.name,
                             arg.value.clone(),
                         );
                     }
@@ -68,11 +68,11 @@ impl CallArgumentValueList {
                 // No matching argument found, check if a default value is defined
                 None => {
                     // If we have a default value, we can use it
-                    if let Some(default) = parameter_value.default_value() {
+                    if let Some(default) = &parameter_value.default_value {
                         Self::insert_and_remove(
                             arg_map,
                             parameter_values,
-                            parameter_value.name(),
+                            &parameter_value.name,
                             default.clone(),
                         );
                     }
@@ -95,7 +95,7 @@ impl CallArgumentValueList {
         for arg in &self.arguments {
             if arg.name.is_none() {
                 let param_value = parameter_values[positional_index].clone();
-                if !arg_map.contains_key(param_value.name()) {
+                if !arg_map.contains_key(&param_value.name) {
                     // @todo: Check for tuple arguments and whether the tuple fields match the parameters
                     if let TypeCheckResult::Ok =
                         parameter_values[positional_index].type_check(&arg.value.ty())
@@ -103,7 +103,7 @@ impl CallArgumentValueList {
                         Self::insert_and_remove(
                             arg_map,
                             parameter_values,
-                            param_value.name(),
+                            &param_value.name,
                             arg.value.clone(),
                         );
                         if positional_index >= parameter_values.len() {
@@ -144,7 +144,7 @@ impl CallArgumentValueList {
             // TODO: prevent mut and for
             let mut missing_args = IdentifierList::new();
             for parameter in missing_parameter_values.iter() {
-                missing_args.push(parameter.name().clone()).unwrap(); // Unwrap is safe here because we know the parameter is unique
+                missing_args.push(parameter.name.clone()).unwrap(); // Unwrap is safe here because we know the parameter is unique
             }
             return Err(Error::MissingArguments(missing_args));
         }

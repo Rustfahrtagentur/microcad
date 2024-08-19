@@ -31,7 +31,7 @@ impl FunctionSignature {
     }
 
     pub fn get_parameter_by_name(&self, name: &Identifier) -> Option<&Parameter> {
-        self.parameters.iter().find(|arg| arg.name() == name)
+        self.parameters.iter().find(|arg| arg.name == *name)
     }
 }
 

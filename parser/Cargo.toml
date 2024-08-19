@@ -20,3 +20,4 @@ anyhow = "1"
 strum = { version = "0.26", features = ["derive"] }
 microcad-core = { path = "../core" }
 microcad-render = { path = "../render" }
+ord-collections = "0"
