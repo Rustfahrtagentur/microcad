@@ -51,10 +51,7 @@ pub trait DefineBuiltInModule {
     fn node(args: &ArgumentMap) -> Result<Node, Error>;
 
     fn function() -> &'static BuiltInModuleFn {
-        &|args, ctx| {
-            // Parse each argument from the args map used to create the new node
-            Ok(ctx.append_node(Self::node(args)?))
-        }
+        &|args, ctx| Ok(ctx.append_node(Self::node(args)?))
     }
 
     fn builtin_module() -> BuiltinModule {
