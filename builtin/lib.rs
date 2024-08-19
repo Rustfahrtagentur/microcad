@@ -21,7 +21,7 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
             let mut parameter_impl = quote! {
                 let mut parameters = ParameterList::default();
             };
-            let mut node_fn_impl = quote! {};
+            let field_identifiers: Vec<&syn::Ident> = fields.iter().map(|item| item.ident.as_ref().unwrap()).collect::<Vec<_>>();
 
             for field in fields {
                 let identifier = field.ident.as_ref().unwrap();
@@ -29,10 +29,6 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
                 // Add each field in the struct as a parameter
                 parameter_impl.extend(quote! {
                     parameters.push(Parameter::new(stringify!(#identifier).into(), Some(Type::#ty), None));
-                });
-                // Parse each argument from the args map used to create the new node
-                node_fn_impl.extend(quote! {
-                    #identifier: args[&stringify!(#identifier).into()].clone().try_into()?,
                 });
             }
 
@@ -51,9 +47,11 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
                     fn function() -> &'static BuiltInModuleFn {
                         &|args, ctx| {
                             use microcad_render::tree::{Node, NodeInner};
-
+                            // Parse each argument from the args map used to create the new node
                             let node = Node::new(NodeInner::Generator2D(Box::new(#struct_name {
-                                #node_fn_impl
+                                #(
+                                    #field_identifiers: args[&stringify!(#field_identifiers).into()].clone().try_into()?,
+                                )*
                             })));
                             Ok(ctx.append_node(node))
                         }
