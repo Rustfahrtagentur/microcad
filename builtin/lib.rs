@@ -19,6 +19,7 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
     match &input.data {
         Data::Struct(syn::DataStruct { fields, .. }) => {
             let mut parameter_impl = quote! {
+                use microcad_parser::language::parameter::ParameterList;
                 let mut parameters = ParameterList::default();
             };
             let field_identifiers = fields.iter().map(|item| item.ident.as_ref().unwrap()).collect::<Vec<_>>();
@@ -28,7 +29,10 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
                 let ty = &field.ty;
                 // Add each field in the struct as a parameter
                 parameter_impl.extend(quote! {
-                    parameters.push(Parameter::new(stringify!(#identifier).into(), Some(Type::#ty), None)).unwrap();
+                    parameters.push(microcad_parser::language::parameter::Parameter { 
+                        name: stringify!(#identifier).into(),
+                        specified_type: Some(Type::#ty),
+                        default_value: None }).unwrap();
                 });
             }
 
