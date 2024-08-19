@@ -34,7 +34,7 @@ impl FunctionDefinition {
         context: &mut Context,
     ) -> Result<Option<Value>, Error> {
         // TODO: Check if the arguments are correct
-        let params = self.signature.parameters();
+        let params = &self.signature.parameters;
         let arg_map = args
             .eval(context)?
             .get_matching_arguments(&params.eval(context)?)?;

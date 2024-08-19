@@ -22,14 +22,6 @@ impl FunctionSignature {
         }
     }
 
-    pub fn parameters(&self) -> &ParameterList {
-        &self.parameters
-    }
-
-    pub fn return_type(&self) -> &Option<Type> {
-        &self.return_type
-    }
-
     pub fn get_parameter_by_name(&self, name: &Identifier) -> Option<&Parameter> {
         self.parameters.iter().find(|arg| arg.name == *name)
     }

@@ -5,7 +5,7 @@ use microcad_parser::{
     language::{
         lang_type::Type,
         module::{DefineBuiltInModule, ModuleDefinition},
-        parameter::{Parameter, ParameterList},
+        parameter::ParameterList,
     },
 };
 use microcad_render::geo2d::{Generator, Geometry, LineString};

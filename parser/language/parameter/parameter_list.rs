@@ -1,39 +1,31 @@
-use super::{
-    Context, Error, Eval, Pair, Parameter, ParameterValueList, Parse, ParseError, ParseResult,
-};
+use super::{Context, Error, Eval, Pair, Parameter, ParameterValueList, Parse, ParseResult};
 use crate::{
+    language::parameter::{Identifier, IdentifierListError},
+    ord_map::OrdMap,
     parser::{Parser, Rule},
     with_pair_ok,
 };
 
 #[derive(Clone, Debug, Default)]
-pub struct ParameterList {
-    parameters: Vec<Parameter>,
-    by_name: std::collections::HashMap<String, usize>,
+pub struct ParameterList(OrdMap<Identifier, Parameter>);
+
+impl std::ops::Deref for ParameterList {
+    type Target = OrdMap<Identifier, Parameter>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
-impl ParameterList {
-    pub fn new(parameters: Vec<Parameter>) -> Self {
-        let mut by_name = std::collections::HashMap::new();
-        for (i, parameter) in parameters.iter().enumerate() {
-            by_name.insert(parameter.name.to_string(), i);
-        }
-
-        Self {
-            parameters,
-            by_name,
-        }
+impl std::ops::DerefMut for ParameterList {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
+}
 
-    pub fn push(&mut self, parameter: Parameter) -> Result<(), ParseError> {
-        if self.by_name.contains_key(&parameter.name.to_string()) {
-            return Err(ParseError::DuplicateParameter(parameter.name.clone()));
-        }
-
-        self.by_name
-            .insert(parameter.name.to_string(), self.parameters.len());
-        self.parameters.push(parameter);
-        Ok(())
+impl From<Vec<Parameter>> for ParameterList {
+    fn from(value: Vec<Parameter>) -> Self {
+        Self(OrdMap::<Identifier, Parameter>::new(value))
     }
 }
 
@@ -43,7 +35,9 @@ impl Parse for ParameterList {
         let mut parameters = ParameterList::default();
 
         for pair in pair.clone().into_inner() {
-            parameters.push(Parameter::parse(pair)?.value().clone())?;
+            parameters
+                .push(Parameter::parse(pair)?.value().clone())
+                .map_err(IdentifierListError::DuplicateIdentifier)?;
         }
 
         with_pair_ok!(parameters, pair)
@@ -55,7 +49,7 @@ impl Eval for ParameterList {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         let mut values = ParameterValueList::default();
-        for parameter in &self.parameters {
+        for parameter in self.iter() {
             values.push(parameter.eval(context)?).unwrap(); // Unwrap is safe here because we know the parameter is unique
         }
 
@@ -63,20 +57,12 @@ impl Eval for ParameterList {
     }
 }
 
-impl std::ops::Deref for ParameterList {
-    type Target = Vec<Parameter>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.parameters
-    }
-}
-
 #[macro_export]
 macro_rules! parameter_list {
     [$($param:expr),*] => {
-        microcad_parser::language::parameter::ParameterList::new(vec![
+        vec![
             $($param,)*
-        ])
+        ].into()
     };
     ($($name:ident),*) => {
         microcad_parser::language::parameter_list![$(microcad_parser::parameter!($name)),*]

@@ -43,8 +43,8 @@ fn function_signature() {
     let function_signature =
         Parser::parse_rule_or_panic::<FunctionSignature>(Rule::function_signature, input);
 
-    assert_eq!(function_signature.parameters().len(), 2);
-    assert_eq!(function_signature.return_type(), &Some(Type::Scalar));
+    assert_eq!(function_signature.parameters.len(), 2);
+    assert_eq!(function_signature.return_type, Some(Type::Scalar));
 }
 
 #[test]

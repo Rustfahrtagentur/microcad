@@ -7,14 +7,20 @@ pub use parameter_value::*;
 pub use parameter_value_list::*;
 
 use super::{expression::*, identifier::*, lang_type::*};
-use crate::{eval::*, parser::*, with_pair_ok};
+use crate::{eval::*, ord_map::OrdMapItem, parser::*, with_pair_ok};
 
 /// @brief A parameter for a function or module definition
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Parameter {
     pub name: Identifier,
     pub specified_type: Option<Type>,
     pub default_value: Option<Expression>,
+}
+
+impl OrdMapItem<Identifier> for Parameter {
+    fn name(&self) -> Option<Identifier> {
+        Some(self.name.clone())
+    }
 }
 
 impl std::fmt::Display for Parameter {
