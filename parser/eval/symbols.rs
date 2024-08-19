@@ -16,7 +16,7 @@ impl Symbol {
             Self::Function(f) => &f.name,
             Self::ModuleDefinition(m) => &m.name,
             Self::BuiltinFunction(f) => &f.name,
-            Self::BuiltinModule(m) => &m.name,
+            Self::BuiltinModule(m) => m.name(),
         }
     }
 

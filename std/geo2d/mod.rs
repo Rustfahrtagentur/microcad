@@ -4,9 +4,10 @@ use microcad_parser::{
     eval::Symbols,
     language::{
         lang_type::Type,
-        module::{BuiltinModule, ModuleDefinition},
-        parameter::Parameter,
+        module::{BuiltInModuleFn, BuiltinModule, DefineBuiltInModule, ModuleDefinition},
+        parameter::{Parameter, ParameterList},
     },
+    parameter, parameter_list,
 };
 use microcad_render::geo2d::{Generator, Geometry, LineString};
 
@@ -42,27 +43,28 @@ pub fn circle(radius: Scalar) -> Node {
     Node::new(NodeInner::Generator2D(Box::new(Circle { radius })))
 }
 
-struct Rectangle {
+struct Rect {
     width: f64,
     height: f64,
+    x: f64,
+    y: f64,
 }
 
-impl Generator for Rectangle {
+impl Generator for Rect {
     fn generate(
         &self,
         _: &dyn microcad_render::Renderer,
         _: microcad_render::tree::Node,
     ) -> Geometry {
         use geo::line_string;
-        let w2 = self.width / 2.0;
-        let h2 = self.height / 2.0;
-        // Rect is centered at 0,0
+
+        // Create a rectangle from the given width, height, x and y
         let line_string = line_string![
-            (x: -w2, y: -h2),
-            (x: w2, y: -h2),
-            (x: w2, y: h2),
-            (x: -w2, y: h2),
-            (x: -w2, y: -h2),
+            (x: self.x, y: self.y),
+            (x: self.x + self.width, y: self.y),
+            (x: self.x + self.width, y: self.y + self.height),
+            (x: self.x, y: self.y + self.height),
+            (x: self.x, y: self.y),
         ];
 
         Geometry::MultiPolygon(microcad_render::geo2d::line_string_to_multi_polygon(
@@ -71,11 +73,31 @@ impl Generator for Rectangle {
     }
 }
 
-pub fn rect(width: f64, height: f64) -> Node {
-    Node::new(NodeInner::Generator2D(Box::new(Rectangle {
-        width,
-        height,
-    })))
+impl DefineBuiltInModule for Rect {
+    fn name() -> &'static str {
+        "rect"
+    }
+
+    fn parameters() -> ParameterList {
+        parameter_list![
+            parameter!(width: Scalar),
+            parameter!(height: Scalar),
+            parameter!(x: Scalar),
+            parameter!(y: Scalar)
+        ]
+    }
+
+    fn function() -> &'static BuiltInModuleFn {
+        &|args, ctx| {
+            let node = Node::new(NodeInner::Generator2D(Box::new(Rect {
+                width: args[&"width".into()].clone().try_into()?,
+                height: args[&"height".into()].clone().try_into()?,
+                x: args[&"x".into()].clone().try_into()?,
+                y: args[&"y".into()].clone().try_into()?,
+            })));
+            Ok(ctx.append_node(node))
+        }
+    }
 }
 
 use crate::ModuleBuilder;
@@ -83,6 +105,6 @@ use crate::ModuleBuilder;
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("geo2d")
         .add_builtin_module(builtin_module!(circle(radius: Scalar)))
-        .add_builtin_module(builtin_module!(rect(width: Scalar, height: Scalar)))
+        .add_builtin_module(Rect::builtin_module())
         .build()
 }

@@ -25,12 +25,16 @@ impl std::fmt::Debug for BuiltinModule {
 }
 
 impl BuiltinModule {
-    pub fn new(name: Identifier, parameters: ParameterList, f: &'static BuiltInModuleFn) -> Self {
+    pub fn new(name: &'static str, parameters: ParameterList, f: &'static BuiltInModuleFn) -> Self {
         Self {
-            name,
+            name: name.into(),
             parameters,
             f,
         }
+    }
+
+    pub fn name(&self) -> &Identifier {
+        &self.name
     }
 
     pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Node, Error> {
@@ -38,6 +42,20 @@ impl BuiltinModule {
             .eval(context)?
             .get_matching_arguments(&self.parameters.eval(context)?)?;
         (self.f)(&arg_map, context)
+    }
+}
+
+pub trait DefineBuiltInModule {
+    fn name() -> &'static str;
+    fn parameters() -> ParameterList;
+    fn function() -> &'static BuiltInModuleFn;
+
+    fn builtin_module() -> BuiltinModule {
+        BuiltinModule {
+            name: Self::name().into(),
+            parameters: Self::parameters(),
+            f: Self::function(),
+        }
     }
 }
 
