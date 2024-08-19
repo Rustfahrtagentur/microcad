@@ -9,13 +9,13 @@ use crate::{
     },
 };
 
-pub type BuiltinModuleFunctor = dyn Fn(&ArgumentMap, &mut Context) -> Result<Node, Error>;
+pub type BuiltInModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<Node, Error>;
 
 #[derive(Clone)]
 pub struct BuiltinModule {
     pub name: Identifier,
     pub parameters: ParameterList,
-    pub f: &'static BuiltinModuleFunctor,
+    pub f: &'static BuiltInModuleFn,
 }
 
 impl std::fmt::Debug for BuiltinModule {
@@ -25,11 +25,7 @@ impl std::fmt::Debug for BuiltinModule {
 }
 
 impl BuiltinModule {
-    pub fn new(
-        name: Identifier,
-        parameters: ParameterList,
-        f: &'static BuiltinModuleFunctor,
-    ) -> Self {
+    pub fn new(name: Identifier, parameters: ParameterList, f: &'static BuiltInModuleFn) -> Self {
         Self {
             name,
             parameters,
