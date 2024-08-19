@@ -176,13 +176,15 @@ fn test_assert() {
 #[test]
 fn difference_svg() {
     use crate::algorithm;
+    use microcad_parser::args;
+    use microcad_parser::language::call::ArgumentMap;
     use microcad_render::svg::SvgRenderer;
     use microcad_render::Renderer;
 
     let difference = algorithm::boolean_op::difference();
     let group = microcad_render::tree::group();
-    group.append(crate::geo2d::circle(4.0));
-    group.append(crate::geo2d::circle(2.0));
+    group.append(crate::geo2d::Circle::node(args!(radius: Scalar = 4.0)).unwrap());
+    group.append(crate::geo2d::Circle::node(args!(radius: Scalar = 2.0)).unwrap());
     difference.append(group);
 
     let mut file = std::fs::File::create("difference.svg").unwrap();
@@ -201,7 +203,7 @@ use * from std;
 
 export("export.svg") algorithm::difference() {
     geo2d::circle(radius = 3.0);
-    geo2d::rect(width = 3.0, height = 2.0);
+    geo2d::rect(width = 3.0, height = 2.0, x = 0.0, y = 0.0);
 };
             "#,
     ) {

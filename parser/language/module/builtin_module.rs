@@ -9,13 +9,13 @@ use crate::{
     },
 };
 
-pub type BuiltinModuleFunctor = dyn Fn(&ArgumentMap, &mut Context) -> Result<Node, Error>;
+pub type BuiltInModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<Node, Error>;
 
 #[derive(Clone)]
 pub struct BuiltinModule {
     pub name: Identifier,
     pub parameters: ParameterList,
-    pub f: &'static BuiltinModuleFunctor,
+    pub f: &'static BuiltInModuleFn,
 }
 
 impl std::fmt::Debug for BuiltinModule {
@@ -25,16 +25,16 @@ impl std::fmt::Debug for BuiltinModule {
 }
 
 impl BuiltinModule {
-    pub fn new(
-        name: Identifier,
-        parameters: ParameterList,
-        f: &'static BuiltinModuleFunctor,
-    ) -> Self {
+    pub fn new(name: &'static str, parameters: ParameterList, f: &'static BuiltInModuleFn) -> Self {
         Self {
-            name,
+            name: name.into(),
             parameters,
             f,
         }
+    }
+
+    pub fn name(&self) -> &Identifier {
+        &self.name
     }
 
     pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Node, Error> {
@@ -42,6 +42,24 @@ impl BuiltinModule {
             .eval(context)?
             .get_matching_arguments(&self.parameters.eval(context)?)?;
         (self.f)(&arg_map, context)
+    }
+}
+
+pub trait DefineBuiltInModule {
+    fn name() -> &'static str;
+    fn parameters() -> ParameterList;
+    fn node(args: &ArgumentMap) -> Result<Node, Error>;
+
+    fn function() -> &'static BuiltInModuleFn {
+        &|args, ctx| Ok(ctx.append_node(Self::node(args)?))
+    }
+
+    fn builtin_module() -> BuiltinModule {
+        BuiltinModule {
+            name: Self::name().into(),
+            parameters: Self::parameters(),
+            f: Self::function(),
+        }
     }
 }
 
