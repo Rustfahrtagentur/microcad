@@ -201,7 +201,7 @@ use * from std;
 
 export("export.svg") algorithm::difference() {
     geo2d::circle(radius = 3.0);
-    geo2d::rect(width = 3.0, height = 2.0);
+    geo2d::rect(width = 3.0, height = 2.0, x = 0.0, y = 0.0);
 };
             "#,
     ) {
