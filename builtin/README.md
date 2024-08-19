@@ -31,7 +31,9 @@ The `DefineBuiltInModule` trait is defined as follows:
 pub trait DefineBuiltInModule {
     fn name() -> &'static str;
     fn parameters() -> ParameterList;
-    fn function() -> &'static BuiltInModuleFn;
+    fn node(args: &ArgumentMap) -> Node;
+    fn function() -> &'static BuiltInModuleFn { ... }
+    }
 
     fn builtin_module() -> BuiltinModule {
         BuiltinModule {
@@ -60,16 +62,13 @@ impl DefineBuiltInModule for Rectangle {
         ]
     }
 
-    fn function() -> &'static BuiltInModuleFn {
-        |args, ctx| {
-            let node = Node::new(NodeInner::Generator2D(Box::new(Rect {
-                width: args["width"].clone().try_into()?,
-                height: args["height"].clone().try_into()?,
-                x: args["x"].clone().try_into()?,
-                y: args["y"].clone().try_into()?,
-            })));
-            Ok(ctx.append_node(node))
-        }
+    fn node(args: &ArgumentMap) -> Result<Node, Error> {
+        Ok(Node::new(NodeInner::Generator2D(Box::new(Rect {
+            width: args["width"].clone().try_into().unwrap(),
+            height: args["height"].clone().try_into().unwrap(),
+            x: args["x"].clone().try_into().unwrap(),
+            y: args["y"].clone().try_into().unwrap(),
+        })))
     }
 }
 ```
