@@ -127,10 +127,10 @@ impl ModuleBody {
         self.statements.push(statement.clone());
         match statement {
             ModuleStatement::FunctionDefinition(function) => {
-                self.symbols.add(Symbol::Function(function));
+                self.symbols.add_symbol(Symbol::Function(function));
             }
             ModuleStatement::ModuleDefinition(module) => {
-                self.symbols.add(Symbol::ModuleDefinition(module));
+                self.symbols.add_symbol(Symbol::ModuleDefinition(module));
             }
             ModuleStatement::ModuleInitDefinition(init) => {
                 self.inits.push(init.clone());
@@ -140,7 +140,7 @@ impl ModuleBody {
     }
 
     pub fn get_symbols_by_name(&self, name: &Identifier) -> Vec<&Symbol> {
-        self.symbols.get(name)
+        self.symbols.find_symbols(name)
     }
 
     pub fn symbols(&self) -> &SymbolTable {
@@ -148,11 +148,11 @@ impl ModuleBody {
     }
 
     pub fn get_symbol(&self, name: &Identifier) -> Option<&Symbol> {
-        self.symbols.get(name).first().cloned()
+        self.symbols.find_symbols(name).first().cloned()
     }
 
     pub fn add_symbol(&mut self, symbol: Symbol) {
-        self.symbols.add(symbol);
+        self.symbols.add_symbol(symbol);
     }
 }
 

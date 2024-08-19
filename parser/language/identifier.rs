@@ -210,7 +210,7 @@ impl QualifiedName {
 
         let new_symbols = match root {
             Some(ref root) => root.get_symbols(ident),
-            None => context.get_symbols(ident),
+            None => context.find_symbols(ident),
         };
 
         for symbol in new_symbols {
