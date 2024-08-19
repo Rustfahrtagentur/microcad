@@ -1,9 +1,4 @@
-use crate::language::{
-    function::*,
-    identifier::{self, *},
-    module::*,
-    value::*,
-};
+use crate::language::{function::*, identifier::*, module::*, value::*};
 
 #[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum Symbol {
@@ -60,7 +55,7 @@ pub trait Symbols {
         self
     }
     fn add_function(&mut self, f: std::rc::Rc<FunctionDefinition>) -> &mut Self {
-        self.add_symbol(Symbol::Function(f.into()));
+        self.add_symbol(Symbol::Function(f));
         self
     }
 }

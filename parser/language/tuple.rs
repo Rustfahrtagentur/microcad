@@ -38,7 +38,7 @@ impl Parse for TupleExpression {
         // Count number of positional and named arguments
         let named_count: usize = call_argument_list
             .iter()
-            .map(|c| if c.name().is_some() { 1 } else { 0 })
+            .map(|c| if c.name.is_some() { 1 } else { 0 })
             .sum();
 
         if named_count > 0 && named_count < call_argument_list.len() {
@@ -67,7 +67,7 @@ impl std::fmt::Display for TupleExpression {
             self.args
                 .iter()
                 .map(|c| if self.is_named {
-                    format!("{} = {}", c.name().unwrap(), c.value())
+                    format!("{} = {}", c.name.clone().unwrap(), c.value)
                 } else {
                     c.to_string()
                 })
@@ -89,7 +89,7 @@ impl Eval for TupleExpression {
             // Unnamed tuple
             let mut value_list = ValueList::new();
             for arg in self.args.iter() {
-                let value = arg.value().eval(context)?;
+                let value = arg.value.eval(context)?;
                 value_list.push(value);
             }
             if let Some(unit) = self.unit {
@@ -99,7 +99,11 @@ impl Eval for TupleExpression {
         } else {
             // Named tuple
             let mut map = std::collections::BTreeMap::new();
-            for (ident, expr) in self.args.iter().map(|c| (c.name().unwrap(), c.value())) {
+            for (ident, expr) in self
+                .args
+                .iter()
+                .map(|c| (c.name.clone().unwrap(), c.value.clone()))
+            {
                 let mut value = expr.clone().eval(context)?;
                 if let Some(unit) = self.unit {
                     value.add_unit_to_unitless_types(unit)?;

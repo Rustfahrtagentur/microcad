@@ -349,10 +349,10 @@ macro_rules! parameter_value {
         ParameterValue::new(stringify!($name).into(), None, None)
     };
     ($name:ident: $ty:ident) => {
-        ParameterValue::new(stringify!($name).into(), Some(Type::$ty), None)
+        $crate::language::call::ParameterValue::new(stringify!($name).into(), Some(Type::$ty), None)
     };
     ($name:ident: $ty:ident = $value:expr) => {
-        ParameterValue::new(
+        $crate::language::call::ParameterValue::new(
             stringify!($name).into(),
             Some(Type::$ty),
             Some(Value::$ty($value)),

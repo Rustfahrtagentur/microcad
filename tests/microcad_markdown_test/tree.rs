@@ -89,7 +89,7 @@ impl std::fmt::Display for Tree {
                     &format!(
                         r##"#[test]
                             fn r#{name}() {{
-                                use microcad_parser::{{eval::{{Symbol, Symbols, Eval, Context}},language::document::Document,parser}};
+                                use microcad_parser::{{eval::{{Symbols, Eval, Context}},language::document::Document,parser}};
                                 match parser::Parser::parse_rule::<Document>(
                                     parser::Rule::document,
                                     r#"
