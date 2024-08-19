@@ -22,3 +22,4 @@ geo = "0.28"
 microcad-core = { path = "../core" }
 microcad-parser = { path = "../parser" }
 microcad-render = { path = "../render" }
+microcad-builtin-proc-macro = { path = "../builtin" }

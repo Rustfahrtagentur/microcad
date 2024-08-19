@@ -11,14 +11,16 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
 
     // Name of our struct, e.g. Rect
-    let struct_name = &input.ident.to_string();
+    let struct_name = &input.ident;
 
     // Name of the module, e.g. "rect"
-    let module_name = &struct_name.to_lowercase();
+    let module_name = &struct_name.to_string().to_lowercase();
 
     match &input.data {
         Data::Struct(syn::DataStruct { fields, .. }) => {
-            let mut parameter_impl = quote! {};
+            let mut parameter_impl = quote! {
+                let mut parameters = ParameterList::default();
+            };
             let mut node_fn_impl = quote! {};
 
             for field in fields {
@@ -26,11 +28,11 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
                 let ty = &field.ty;
                 // Add each field in the struct as a parameter
                 parameter_impl.extend(quote! {
-                    parameter!(#identifier: #ty),
+                    parameters.push(Parameter::new(stringify!(#identifier).into(), Some(Type::#ty), None));
                 });
                 // Parse each argument from the args map used to create the new node
                 node_fn_impl.extend(quote! {
-                    #identifier: args[#identifier].clone().try_into()?,
+                    #identifier: args[&stringify!(#identifier).into()].clone().try_into()?,
                 });
             }
 
@@ -42,13 +44,14 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
                     }
 
                     fn parameters() -> ParameterList {
-                        parameter_list![
-                            #parameter_impl
-                        ]
+                        #parameter_impl
+                        parameters
                     }
 
                     fn function() -> &'static BuiltInModuleFn {
-                        |args, ctx| {
+                        &|args, ctx| {
+                            use microcad_render::tree::{Node, NodeInner};
+
                             let node = Node::new(NodeInner::Generator2D(Box::new(#struct_name {
                                 #node_fn_impl
                             })));

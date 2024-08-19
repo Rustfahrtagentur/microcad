@@ -1,3 +1,4 @@
+use microcad_builtin_proc_macro::DefineBuiltInModule;
 use microcad_core::Scalar;
 use microcad_parser::{
     builtin_module,
@@ -7,7 +8,6 @@ use microcad_parser::{
         module::{BuiltInModuleFn, BuiltinModule, DefineBuiltInModule, ModuleDefinition},
         parameter::{Parameter, ParameterList},
     },
-    parameter, parameter_list,
 };
 use microcad_render::geo2d::{Generator, Geometry, LineString};
 
@@ -43,11 +43,12 @@ pub fn circle(radius: Scalar) -> Node {
     Node::new(NodeInner::Generator2D(Box::new(Circle { radius })))
 }
 
+#[derive(DefineBuiltInModule)]
 struct Rect {
-    width: f64,
-    height: f64,
-    x: f64,
-    y: f64,
+    width: Scalar,
+    height: Scalar,
+    x: Scalar,
+    y: Scalar,
 }
 
 impl Generator for Rect {
@@ -72,7 +73,7 @@ impl Generator for Rect {
         ))
     }
 }
-
+/*
 impl DefineBuiltInModule for Rect {
     fn name() -> &'static str {
         "rect"
@@ -99,7 +100,7 @@ impl DefineBuiltInModule for Rect {
         }
     }
 }
-
+*/
 use crate::ModuleBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
