@@ -1,157 +1,16 @@
-use std::str::FromStr;
+mod number_literal;
 
-use super::{color::*, lang_type::*, units::*, value::*};
-use crate::{eval::*, parser::*};
-
-/// Definition and implementation for `NumberLiteral`
-#[derive(Debug, Clone, PartialEq)]
-pub struct NumberLiteral(pub f64, pub Unit);
-
-impl NumberLiteral {
-    pub fn from_usize(value: usize) -> Self {
-        NumberLiteral(value as f64, Unit::None)
-    }
-
-    pub fn from_int(value: i64) -> Self {
-        NumberLiteral(value as f64, Unit::None)
-    }
-
-    pub fn ty(&self) -> Type {
-        if self.1 == Unit::None && self.0.fract() == 0.0 {
-            return Type::Integer;
-        }
-        self.1.ty()
-    }
-
-    /// Returns the actual value of the literal
-    pub fn value(&self) -> f64 {
-        self.1.normalize(self.0)
-    }
-
-    pub fn unit(&self) -> Unit {
-        self.1
-    }
-}
-
-/// Rules for operator +
-impl std::ops::Add for NumberLiteral {
-    type Output = Result<Self, OperatorError>;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        match (self.ty(), rhs.ty()) {
-            (Type::Scalar, Type::Scalar) => {
-                Ok(NumberLiteral(self.value() + rhs.value(), Unit::None))
-            }
-            (Type::Angle, Type::Angle) => Ok(NumberLiteral(self.value() + rhs.value(), Unit::Deg)),
-            (Type::Length, Type::Length) => Ok(NumberLiteral(self.value() + rhs.value(), Unit::Mm)),
-            (l, r) => Err(OperatorError::AddIncompatibleTypes(l, r)),
-        }
-    }
-}
-
-/// Rules for operator -
-impl std::ops::Sub for NumberLiteral {
-    type Output = Result<Self, OperatorError>;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        match (self.ty(), rhs.ty()) {
-            (Type::Scalar, Type::Scalar) => {
-                Ok(NumberLiteral(self.value() - rhs.value(), Unit::None))
-            }
-            (Type::Angle, Type::Angle) => Ok(NumberLiteral(self.value() - rhs.value(), Unit::Deg)),
-            (Type::Length, Type::Length) => Ok(NumberLiteral(self.value() - rhs.value(), Unit::Mm)),
-            (l, r) => Err(OperatorError::SubIncompatibleTypes(l, r)),
-        }
-    }
-}
-
-/// Rules for operator *
-impl std::ops::Mul for NumberLiteral {
-    type Output = Result<Self, OperatorError>;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        match (self.ty(), rhs.ty()) {
-            (Type::Scalar, Type::Scalar) => {
-                Ok(NumberLiteral(self.value() * rhs.value(), Unit::None))
-            }
-            (Type::Angle, Type::Scalar) => {
-                Ok(NumberLiteral(self.value() * rhs.value(), self.unit()))
-            }
-            (Type::Scalar, Type::Angle) => {
-                Ok(NumberLiteral(self.value() * rhs.value(), rhs.unit()))
-            }
-            (Type::Length, Type::Scalar) => {
-                Ok(NumberLiteral(self.value() * rhs.value(), self.unit()))
-            }
-            (Type::Scalar, Type::Length) => {
-                Ok(NumberLiteral(self.value() * rhs.value(), rhs.unit()))
-            }
-            (l, r) => Err(OperatorError::MulIncompatibleTypes(l, r)),
-        }
-    }
-}
-
-/// Rules for operator -
-impl std::ops::Div for NumberLiteral {
-    type Output = Result<Self, OperatorError>;
-
-    fn div(self, rhs: Self) -> Self::Output {
-        match (self.ty(), rhs.ty()) {
-            (Type::Scalar, Type::Scalar)
-            | (Type::Length, Type::Length)
-            | (Type::Angle, Type::Angle) => {
-                Ok(NumberLiteral(self.value() / rhs.value(), Unit::None))
-            }
-            (Type::Angle, Type::Scalar) => Ok(NumberLiteral(self.value() / rhs.value(), Unit::Deg)),
-            (Type::Length, Type::Scalar) => Ok(NumberLiteral(self.value() / rhs.value(), Unit::Mm)),
-            (l, r) => Err(OperatorError::DivIncompatibleTypes(l, r)),
-        }
-    }
-}
-
-impl Parse for NumberLiteral {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        Parser::ensure_rule(&pair, Rule::number_literal);
-
-        let mut inner = pair.clone().into_inner();
-        let number_token = inner.next().unwrap();
-
-        assert!(
-            number_token.as_rule() == Rule::number
-                || number_token.as_rule() == Rule::integer_literal
-        );
-
-        let value = number_token.as_str().parse::<f64>()?;
-
-        let mut unit = Unit::None;
-
-        if let Some(unit_token) = inner.next() {
-            unit = *Unit::parse(unit_token)?;
-        }
-        Ok(WithPair::new(NumberLiteral(value, unit), pair))
-    }
-}
-
-impl Eval for NumberLiteral {
-    type Output = Value;
-
-    fn eval(&self, _: &mut Context) -> Result<Value, Error> {
-        let v = self.value();
-
-        match self.1.ty() {
-            Type::Scalar => Ok(Value::Scalar(v)),
-            Type::Angle => Ok(Value::Angle(v)),
-            Type::Length => Ok(Value::Length(v)),
-            _ => unreachable!(),
-        }
-    }
-}
-
-impl std::fmt::Display for NumberLiteral {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}{}", self.0, self.1)
-    }
-}
+use super::{
+    color::Color,
+    lang_type::{Ty, Type},
+    units::Unit,
+    value::Value,
+};
+use crate::{
+    eval::{Context, Error, Eval, OperatorError},
+    parser::{Pair, Parse, ParseResult, Parser, Rule},
+};
+use number_literal::NumberLiteral;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
@@ -167,7 +26,7 @@ impl Literal {
     }
 }
 
-impl FromStr for Literal {
+impl std::str::FromStr for Literal {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -195,7 +54,6 @@ impl Parse for Literal {
 
         let s = match inner.as_rule() {
             Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?.value().clone()),
-
             Rule::integer_literal => Literal::Integer(inner.as_str().parse::<i64>()?),
             Rule::bool_literal => match inner.as_str() {
                 "true" => Literal::Bool(true),

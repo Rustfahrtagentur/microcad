@@ -4,8 +4,6 @@ use microcad_core::*;
 use microcad_render::tree::Node;
 use thiserror::Error;
 
-pub type Number = super::literal::NumberLiteral;
-
 #[derive(Debug, Error)]
 pub enum ValueError {
     #[error("Invalid operator: {0}")]

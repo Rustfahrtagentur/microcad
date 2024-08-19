@@ -12,5 +12,6 @@
     "[markdown]": {
         "editor.wordWrap": "off"
     },
-    "editor.wordWrap": "off"
+    "editor.wordWrap": "off",
+    "errorLens.codeLensEnabled": true
 }
