@@ -28,3 +28,15 @@ impl std::ops::DerefMut for ArgumentMap {
         &mut self.0
     }
 }
+
+#[macro_export]
+macro_rules! args {
+    ($($name:ident: $ty:ident = $value:expr),*) => {&{
+        let mut map = ArgumentMap::new();
+        $(map.insert(stringify!($name).into(), microcad_parser::language::value::Value::$ty($value));)*
+        map
+    }};
+    () => {
+
+    };
+}

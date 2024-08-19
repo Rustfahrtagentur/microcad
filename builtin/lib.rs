@@ -44,17 +44,12 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
                         parameters
                     }
 
-                    fn function() -> &'static BuiltInModuleFn {
-                        &|args, ctx| {
-                            use microcad_render::tree::{Node, NodeInner};
-                            // Parse each argument from the args map used to create the new node
-                            let node = Node::new(NodeInner::Generator2D(Box::new(#struct_name {
-                                #(
-                                    #field_identifiers: args[&stringify!(#field_identifiers).into()].clone().try_into()?,
-                                )*
-                            })));
-                            Ok(ctx.append_node(node))
-                        }
+                    fn node(args: &microcad_parser::language::call::ArgumentMap) -> Result<microcad_render::tree::Node, microcad_parser::eval::Error> {
+                        Ok(Node::new(NodeInner::Generator2D(Box::new(#struct_name {
+                            #(
+                                #field_identifiers: args[&stringify!(#field_identifiers).into()].clone().try_into()?,
+                            )*
+                        }))))
                     }
                 }
             }
