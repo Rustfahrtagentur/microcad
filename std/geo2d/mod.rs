@@ -73,34 +73,6 @@ impl Generator for Rect {
         ))
     }
 }
-/*
-impl DefineBuiltInModule for Rect {
-    fn name() -> &'static str {
-        "rect"
-    }
-
-    fn parameters() -> ParameterList {
-        parameter_list![
-            parameter!(width: Scalar),
-            parameter!(height: Scalar),
-            parameter!(x: Scalar),
-            parameter!(y: Scalar)
-        ]
-    }
-
-    fn function() -> &'static BuiltInModuleFn {
-        &|args, ctx| {
-            let node = Node::new(NodeInner::Generator2D(Box::new(Rect {
-                width: args[&"width".into()].clone().try_into()?,
-                height: args[&"height".into()].clone().try_into()?,
-                x: args[&"x".into()].clone().try_into()?,
-                y: args[&"y".into()].clone().try_into()?,
-            })));
-            Ok(ctx.append_node(node))
-        }
-    }
-}
-*/
 use crate::ModuleBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
