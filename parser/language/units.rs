@@ -19,6 +19,7 @@ macro_rules! declare_units {
 
         impl std::str::FromStr for Unit {
             type Err = ParseError;
+
             fn from_str(s: &str) -> Result<Self, Self::Err> {
                 match s {
                     $($string => Ok(Self::$ident), )*

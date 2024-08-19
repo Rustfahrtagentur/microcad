@@ -1,8 +1,6 @@
+use super::module::ModuleStatement;
+use crate::{eval::*, parser::*, with_pair_ok};
 use microcad_render::tree::{self, Node};
-
-use super::module::*;
-use crate::eval::*;
-use crate::{parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub struct Document {
