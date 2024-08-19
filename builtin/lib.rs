@@ -21,14 +21,14 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
             let mut parameter_impl = quote! {
                 let mut parameters = ParameterList::default();
             };
-            let field_identifiers: Vec<&syn::Ident> = fields.iter().map(|item| item.ident.as_ref().unwrap()).collect::<Vec<_>>();
+            let field_identifiers = fields.iter().map(|item| item.ident.as_ref().unwrap()).collect::<Vec<_>>();
 
             for field in fields {
                 let identifier = field.ident.as_ref().unwrap();
                 let ty = &field.ty;
                 // Add each field in the struct as a parameter
                 parameter_impl.extend(quote! {
-                    parameters.push(Parameter::new(stringify!(#identifier).into(), Some(Type::#ty), None));
+                    parameters.push(Parameter::new(stringify!(#identifier).into(), Some(Type::#ty), None)).unwrap();
                 });
             }
 
