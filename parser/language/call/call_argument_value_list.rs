@@ -1,37 +1,34 @@
-use crate::language::lang_type::Ty;
-
 use super::{
     ArgumentMap, CallArgumentValue, Error, Identifier, IdentifierList, ParameterValueList,
     TypeCheckResult, Value,
 };
+use crate::{language::lang_type::Ty, ord_map::OrdMap};
+use std::ops::{Deref, DerefMut};
 
 #[derive(Clone, Debug, Default)]
-pub struct CallArgumentValueList {
-    arguments: Vec<CallArgumentValue>,
-    named: std::collections::HashMap<Identifier, usize>,
+pub struct CallArgumentValueList(OrdMap<Identifier, CallArgumentValue>);
+
+impl Deref for CallArgumentValueList {
+    type Target = OrdMap<Identifier, CallArgumentValue>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for CallArgumentValueList {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
+    fn from(value: Vec<CallArgumentValue>) -> Self {
+        Self(OrdMap::<Identifier, CallArgumentValue>::from(value))
+    }
 }
 
 impl CallArgumentValueList {
-    pub fn new(args: Vec<CallArgumentValue>) -> Self {
-        // TODO: prevent mut
-        let mut l = Self::default();
-        for arg in args {
-            l.push(arg);
-        }
-        l
-    }
-
-    pub fn get_by_name(&self, name: &Identifier) -> Option<&CallArgumentValue> {
-        self.named.get(name).map(|index| &self.arguments[*index])
-    }
-
-    pub fn push(&mut self, arg: CallArgumentValue) {
-        self.arguments.push(arg.clone());
-        if let Some(name) = arg.name {
-            self.named.insert(name.clone(), self.arguments.len() - 1);
-        }
-    }
-
     /// Insert into the argument map and remove the parameter from the list of parameters
     fn insert_and_remove(
         arg_map: &mut ArgumentMap,
@@ -52,7 +49,7 @@ impl CallArgumentValueList {
 
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
         old_parameter_values.iter().for_each(|parameter_value| {
-            match self.get_by_name(&parameter_value.name) {
+            match self.get(&parameter_value.name) {
                 // We have a matching argument with the same name as the parameter.
                 Some(arg) => {
                     // Now we need to check if the argument type matches the parameter type
@@ -92,7 +89,7 @@ impl CallArgumentValueList {
             return Ok(());
         }
         let mut positional_index = 0;
-        for arg in &self.arguments {
+        for arg in self.iter() {
             if arg.name.is_none() {
                 let param_value = parameter_values[positional_index].clone();
                 if !arg_map.contains_key(&param_value.name) {
@@ -129,7 +126,7 @@ impl CallArgumentValueList {
 
         // Check for unexpected arguments.
         // We are looking for call arguments that are not in the parameter list
-        for name in self.named.keys() {
+        for name in self.keys() {
             if parameter_values.get(name).is_none() {
                 return Err(Error::UnexpectedArgument(name.clone()));
             }
@@ -175,7 +172,7 @@ fn call_get_matching_arguments() {
     ]);
 
     // my_module(1, bar = 2, baz = 3.0)
-    let call_values = CallArgumentValueList::new(vec![
+    let call_values = CallArgumentValueList::from(vec![
         call_argument_value!(Integer = 1),
         call_argument_value!(foo: Integer = 2),
         call_argument_value!(baz: Scalar = 3.0),
@@ -199,7 +196,7 @@ fn call_get_matching_arguments_missing() {
         parameter_value!(bar: Integer),
         parameter_value!(baz: Scalar = 4.0),
     ]);
-    let call_values = CallArgumentValueList::new(vec![
+    let call_values = CallArgumentValueList::from(vec![
         call_argument_value!(Integer = 1),
         call_argument_value!(baz: Scalar = 3.0),
     ]);

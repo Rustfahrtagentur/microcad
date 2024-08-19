@@ -1,9 +1,17 @@
+use crate::ord_map::OrdMapItem;
+
 use super::{Identifier, Value};
 
 #[derive(Clone, Debug)]
 pub struct CallArgumentValue {
     pub name: Option<Identifier>,
     pub value: Value,
+}
+
+impl OrdMapItem<Identifier> for CallArgumentValue {
+    fn name(&self) -> Option<Identifier> {
+        self.name.clone()
+    }
 }
 
 impl CallArgumentValue {

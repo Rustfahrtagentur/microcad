@@ -25,7 +25,7 @@ impl std::ops::DerefMut for ParameterList {
 
 impl From<Vec<Parameter>> for ParameterList {
     fn from(value: Vec<Parameter>) -> Self {
-        Self(OrdMap::<Identifier, Parameter>::new(value))
+        Self(OrdMap::<Identifier, Parameter>::from(value))
     }
 }
 

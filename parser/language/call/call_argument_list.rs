@@ -1,4 +1,4 @@
-use crate::with_pair_ok;
+use crate::{ord_map::OrdMap, parser::ParseError, with_pair_ok};
 
 use super::{
     CallArgument, CallArgumentValueList, Context, Error, Eval, Identifier, Pair, Parse,
@@ -6,29 +6,19 @@ use super::{
 };
 
 #[derive(Clone, Debug, Default)]
-pub struct CallArgumentList {
-    arguments: Vec<CallArgument>,
-    named: std::collections::HashMap<Identifier, usize>,
-}
-
-impl CallArgumentList {
-    pub fn push(&mut self, arg: CallArgument) {
-        self.arguments.push(arg.clone());
-        if let Some(name) = arg.name {
-            self.named.insert(name.clone(), self.arguments.len() - 1);
-        }
-    }
-
-    pub fn get(&self, name: &Identifier) -> Option<&CallArgument> {
-        self.named.get(name).map(|index| &self.arguments[*index])
-    }
-}
+pub struct CallArgumentList(OrdMap<Identifier, CallArgument>);
 
 impl std::ops::Deref for CallArgumentList {
-    type Target = Vec<CallArgument>;
+    type Target = OrdMap<Identifier, CallArgument>;
 
     fn deref(&self) -> &Self::Target {
-        &self.arguments
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for CallArgumentList {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
@@ -39,7 +29,9 @@ impl Eval for CallArgumentList {
         let mut call_argument_list = CallArgumentValueList::default();
 
         for arg in self.iter() {
-            call_argument_list.push(arg.eval(context)?);
+            call_argument_list
+                .push(arg.eval(context)?)
+                .map_err(Error::DuplicateCallArgument)?;
         }
 
         Ok(call_argument_list)
@@ -53,7 +45,9 @@ impl Parse for CallArgumentList {
         match pair.clone().as_rule() {
             Rule::call_argument_list => {
                 for pair in pair.clone().into_inner() {
-                    call_argument_list.push(CallArgument::parse(pair.clone())?.value().clone());
+                    call_argument_list
+                        .push(CallArgument::parse(pair.clone())?.value().clone())
+                        .map_err(ParseError::DuplicateCallArgument)?;
                 }
                 with_pair_ok!(call_argument_list, pair)
             }

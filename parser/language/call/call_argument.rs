@@ -1,10 +1,16 @@
 use super::{CallArgumentValue, Context, Error, Eval, Identifier};
-use crate::{language::expression::Expression, parser::*, with_pair_ok};
+use crate::{language::expression::Expression, ord_map::OrdMapItem, parser::*, with_pair_ok};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct CallArgument {
     pub name: Option<Identifier>,
     pub value: Expression,
+}
+
+impl OrdMapItem<Identifier> for CallArgument {
+    fn name(&self) -> Option<Identifier> {
+        self.name.clone()
+    }
 }
 
 impl Parse for CallArgument {

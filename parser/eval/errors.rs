@@ -83,4 +83,7 @@ pub enum Error {
 
     #[error("Unexpected argument: {0}")]
     UnexpectedArgument(Identifier),
+
+    #[error("duplicate call argument: {0}")]
+    DuplicateCallArgument(Identifier),
 }
