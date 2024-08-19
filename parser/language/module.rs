@@ -1,10 +1,9 @@
-use microcad_render::tree::{self, Node};
-
 use super::{
     assignment::*, call::*, expression::*, function::*, identifier::*, parameter::ParameterList,
     use_statement::*,
 };
 use crate::{eval::*, parser::*, with_pair_ok};
+use microcad_render::tree::{self, Node};
 
 #[derive(Clone, Debug)]
 pub struct Attribute {
@@ -127,10 +126,10 @@ impl ModuleBody {
         self.statements.push(statement.clone());
         match statement {
             ModuleStatement::FunctionDefinition(function) => {
-                self.symbols.add(Symbol::Function(function));
+                self.add_function(function);
             }
             ModuleStatement::ModuleDefinition(module) => {
-                self.symbols.add(Symbol::ModuleDefinition(module));
+                self.add_module(module);
             }
             ModuleStatement::ModuleInitDefinition(init) => {
                 self.inits.push(init.clone());
@@ -138,21 +137,20 @@ impl ModuleBody {
             _ => {}
         }
     }
+}
 
-    pub fn get_symbols_by_name(&self, name: &Identifier) -> Vec<&Symbol> {
-        self.symbols.get(name)
+impl Symbols for ModuleBody {
+    fn find_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+        self.symbols.find_symbols(name)
     }
 
-    pub fn symbols(&self) -> &SymbolTable {
-        &self.symbols
+    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
+        self.symbols.add_symbol(symbol);
+        self
     }
 
-    pub fn get_symbol(&self, name: &Identifier) -> Option<&Symbol> {
-        self.symbols.get(name).first().cloned()
-    }
-
-    pub fn add_symbol(&mut self, symbol: Symbol) {
-        self.symbols.add(symbol);
+    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
+        self.symbols.copy_symbols(into)
     }
 }
 
@@ -303,14 +301,14 @@ impl Eval for ModuleStatement {
                 assignment.eval(context)?;
             }
             ModuleStatement::FunctionDefinition(function_definition) => {
-                context.add_symbol(Symbol::Function(function_definition.clone()));
+                context.add_function(function_definition.clone());
             }
             ModuleStatement::ModuleDefinition(module_definition) => {
-                context.add_symbol(Symbol::ModuleDefinition(module_definition.clone()));
+                context.add_module(module_definition.clone());
             }
             statement => {
                 let s: &'static str = statement.into();
-                unimplemented!(" {s}")
+                unimplemented!("ModuleStatement::{s}")
             }
         }
 
@@ -353,26 +351,21 @@ impl ModuleDefinition {
             body: ModuleBody::new(),
         }
     }
+}
 
-    pub fn add_function(&mut self, function: std::rc::Rc<FunctionDefinition>) {
-        self.body.add_symbol(Symbol::Function(function.clone()));
+impl Symbols for ModuleDefinition {
+    fn find_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+        self.body.find_symbols(name)
     }
 
-    pub fn add_module(&mut self, module: std::rc::Rc<ModuleDefinition>) {
-        self.body
-            .add_symbol(Symbol::ModuleDefinition(module.clone()));
-    }
-
-    pub fn add_symbol(&mut self, symbol: Symbol) {
+    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
         self.body.add_symbol(symbol);
+        self
     }
-
-    pub fn get_symbols_by_name(&self, name: &Identifier) -> Vec<&Symbol> {
-        self.body.get_symbols_by_name(name)
-    }
-
-    pub fn symbols(&self) -> &SymbolTable {
-        self.body.symbols()
+    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
+        self.body.symbols.iter().for_each(|symbol| {
+            into.add_symbol(symbol.clone());
+        });
     }
 }
 

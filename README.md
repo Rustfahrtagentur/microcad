@@ -22,7 +22,7 @@ When you write a csg file, you basically construct a tree.
 Let's assume we can to construct an ISO metric hexagonal nut with the size M10.
 Let make a 2D sketch of the nut first:
 
-```csg
+```µCAD,example.A
 // We have to import the primitive2d module to use `hexagon` and `circle` sub-modules
 use * from geo2d;
 
@@ -44,7 +44,7 @@ Now, we only have 2D version of the nut.
 But of course we want to have 3D version!
 We can simply generate a 3D model by extruding the nut using the `linear_extrude` operator:
 
-```csg
+```µCAD,example.B
 module hex_nut(outer_diameter: length, inner_diameter: length, height: length) {
     linear_extrude(h = self.height) {
         hexagon(d = self.inner_diameter) - circle(d = self.outer_diameter);
@@ -63,7 +63,7 @@ Of course now the winding is missing for the nut.
 We could construct the winding using `rotate_extrude` operator.
 But, even better, there is a built-in module for ISO metric nuts and screws!
 
-```csg
+```µCAD,example.C
 // Import the iso module
 use iso;
 
@@ -79,7 +79,7 @@ export("hex_screw.stl") iso.m10.hex_screw(length = 40mm);
 In our language, we can do constructive solid geometry (CSG).
 Let's create a simple cube with a size of 40mm:
 
-```µCAD
+```µCAD,example.D
 use cube from geo3d;
 
 cube(size = 40mm);
@@ -88,14 +88,14 @@ cube(size = 40mm);
 Notice that the `size` parameter name is optional an can be omitted.
 We need to export the cube as an STL file.
 
-```µCAD
+```µCAD,example.E
 export("cube40mm.stl") cube(40mm);
 ```
 
 One of the defining features of CSG is the usage of boolean operations on primitives.
 Let's create a module for a cube as shown in the image:
 
-```µCAD
+```µCAD,example.F
 use * from geo3d;
 
 module csg_cube(size: length) {
@@ -119,21 +119,21 @@ Fortunately, we can write this differently without brackets and nesting.
 Instead, we will use the `:=` operator to assign a name to each sub-part of the `csg_cube` module, in this case `body` and `axes`.
 Moreover, we use the operator `&` and `-` to express the boolean operations:
 
-```µCAD
+```µCAD,example.G
 module csg_cube(size: length) {
-    body := cube(size) & sphere(r = size / 1.5);
-    axes := orient([X,Y,Z]) cylinder(d = size / 2, h = size * 1.5);
+    body = cube(size) & sphere(r = size / 1.5);
+    axes = orient([X,Y,Z]) cylinder(d = size / 2, h = size * 1.5);
 
     body - axes;
 }
 ```
 
-```µCAD
+```µCAD,example.H
 module csg_cube {
     init(size: length) {
         // Module substitution
-        body := cube(size) & sphere(r = size / 1.5);
-        axes := orient([X,Y,Z]) cylinder(d = size / 2, h = size * 1.5);
+        body = cube(size) & sphere(r = size / 1.5);
+        axes = orient([X,Y,Z]) cylinder(d = size / 2, h = size * 1.5);
 
         // Export difference of body and axes 
         body - axes;
@@ -146,7 +146,7 @@ module csg_cube {
 
 A module can define a conditional statement using `if cond {} else {}`:
 
-```csg
+```µCAD,conditional_statement
 use * from geo3d;
 
 module example(size: length) {
@@ -162,8 +162,8 @@ module example(size: length) {
 
 A module can be defined with arguments:
 
-```µCAD
-module a(b: length)
+```µCAD,module
+module a(b: length) {}
 ```
 
 A module can have initializers:

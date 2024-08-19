@@ -4,68 +4,63 @@ use tree::Tree;
 mod tree;
 
 pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
-    use std::{
-        env::*,
-        fs::*,
-        io::{BufWriter, Write},
-        path::*,
-    };
+    use std::{env::*, fs::*, path::*};
+
+    /// recursive directory scanner
+    /// returns `false` if no code was generated
+    fn recurse(tree: &mut Tree, path: &Path) -> Result<bool> {
+        // prepare return value
+        let mut found = false;
+        // read given directory
+        for entry in read_dir(path)?.flatten() {
+            // get file type
+            if let Ok(file_type) = entry.file_type() {
+                let file_name = entry.file_name().into_string().unwrap();
+                // check if directory or Markdown file
+                if file_type.is_dir() && ![".", ".."].contains(&file_name.as_str()) {
+                    // scan deeper
+                    if recurse(tree, &entry.path())? {
+                        // generated code
+                        found = true;
+                    }
+                } else if file_type.is_file()
+                    && file_name.ends_with(".md")
+                    && !generate_tests_for_md_file(tree, &entry.path())?
+                {
+                    // tell cargo to watch this file
+                    println!("cargo:rerun-if-changed={}", entry.path().display());
+                    // generated code
+                    found = true;
+                }
+            }
+        }
+        Ok(found)
+    }
 
     // get target path
     let out_dir = var("OUT_DIR")?;
     let dest_path = Path::new(&out_dir).join("microcad_markdown_test.rs");
 
-    {
-        // create target file
-        let mut w = BufWriter::new(
-            File::create(dest_path).context("cannot create file 'microcad_markdown_test.rs'")?,
-        );
+    // read all into a tree to reorder modules
+    let mut tree = Tree::new();
+    recurse(&mut tree, path.as_ref())?;
 
-        // read all into a tree to reorder modules
-        let mut tree = Tree::new();
-
-        // recursive directory scanner
-        fn recurse(w: &mut BufWriter<File>, tree: &mut Tree, path: &Path) -> Result<()> {
-            for entry in read_dir(path)?.flatten() {
-                if let Ok(file_type) = entry.file_type() {
-                    if file_type.is_dir() {
-                        // begin a rust module
-                        writeln!(w, "#[allow(non_snake_case)]")?;
-                        write!(
-                            w,
-                            r#"mod r#{module} {{"#,
-                            module = entry.file_name().to_string_lossy()
-                        )?;
-                        // scan deeper
-                        recurse(w, tree, &entry.path())?;
-                        // end the rust module
-                        writeln!(w, "}}\n")?;
-                    } else if file_type.is_file()
-                        && entry.file_name().to_str().unwrap().ends_with(".md")
-                    {
-                        generate_tests_for_md_file(tree, &entry.path())?;
-                        println!("cargo:rerun-if-changed={}", path.display());
-                    }
-                }
-            }
+    match rustfmt_wrapper::rustfmt(tree.to_string()) {
+        Ok(code) =>
+        // write all rust code at once
+        {
+            std::fs::write(dest_path, code)
+                .context("cannot create file 'microcad_markdown_test.rs'")?;
             Ok(())
         }
-
-        recurse(&mut w, &mut tree, path.as_ref())?;
-
-        // generate output rust code
-        let code = format!("{tree}");
-        writeln!(
-            w,
-            "{}",
-            rustfmt_wrapper::rustfmt(code.clone()).context(code)?
-        )?;
+        Err(rustfmt_wrapper::Error::Rustfmt(msg)) => {
+            Err(anyhow::Error::msg(msg.clone())).context(msg)
+        }
+        Err(err) => Err(anyhow::Error::new(err)),
     }
-
-    Ok(())
 }
 
-fn generate_tests_for_md_file(tree: &mut Tree, path: &std::path::Path) -> Result<()> {
+fn generate_tests_for_md_file(tree: &mut Tree, path: &std::path::Path) -> Result<bool> {
     use regex::*;
     use std::{fs::*, io::*};
 
@@ -87,6 +82,7 @@ fn generate_tests_for_md_file(tree: &mut Tree, path: &std::path::Path) -> Result
         .collect::<Vec<&str>>()
         .join(".");
 
+    let mut result = true;
     for cap in reg.captures_iter(&md_content) {
         // check if code is named
         if let (Some(code), Some(name)) = (cap.name("code"), cap.name("name")) {
@@ -98,8 +94,9 @@ fn generate_tests_for_md_file(tree: &mut Tree, path: &std::path::Path) -> Result
                     code.as_str().to_string(),
                 );
             }
+            result = false;
         }
     }
 
-    Ok(())
+    Ok(result)
 }

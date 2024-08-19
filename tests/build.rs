@@ -5,5 +5,7 @@ fn main() {
         "../parser/grammar.pest",
     );
 
-    microcad_markdown_test::generate("../doc").unwrap();
+    if let Err(err) = microcad_markdown_test::generate("..") {
+        panic!("error generating rust test code: {err}");
+    }
 }

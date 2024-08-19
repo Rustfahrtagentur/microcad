@@ -25,3 +25,4 @@ microcad-std = { path = "../std" }
 [build-dependencies]
 microcad_markdown_test = { path = "microcad_markdown_test", version = "0.1.0" }
 microcad_pest_test = { path = "microcad_pest_test", version = "0.1.0" }
+rustfmt-wrapper = "0.2"

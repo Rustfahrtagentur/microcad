@@ -364,7 +364,6 @@ pub struct MethodCall {
 impl Parse for MethodCall {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let mut inner = pair.clone().into_inner();
-
         with_pair_ok!(
             MethodCall {
                 name: Identifier::parse(inner.next().unwrap())?.value().clone(),
@@ -456,7 +455,10 @@ impl Eval for Call {
                         non_matching_symbols.push(symbol.clone());
                     }
                 }*/
-                symbol => unimplemented!("Call::eval for {symbol:?}"),
+                symbol => {
+                    let s: &'static str = symbol.into();
+                    unimplemented!("Symbol::{s}")
+                }
             }
         }
 

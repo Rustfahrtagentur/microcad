@@ -239,7 +239,7 @@ impl FunctionDefinition {
 
         context.push();
         for (name, value) in arg_map.iter() {
-            context.add_symbol(Symbol::Value(name.clone(), value.clone()));
+            context.add_value(name.clone(), value.clone());
         }
 
         for statement in self.body.0.iter() {
@@ -280,7 +280,7 @@ impl Eval for std::rc::Rc<FunctionDefinition> {
     type Output = ();
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
-        context.add_symbol(Symbol::Function(self.clone()));
+        context.add_function(self.clone());
         Ok(())
     }
 }
@@ -301,7 +301,7 @@ fn assignment() {
     assignment.eval(&mut context).unwrap();
 
     assert_eq!(
-        context.get_symbols(&"a".into()).first().unwrap().name(),
+        context.find_symbols(&"a".into()).first().unwrap().name(),
         "a"
     );
 }
@@ -340,7 +340,7 @@ fn function_evaluate() {
     ));
 
     let mut context = Context::default();
-    context.add_symbol(Symbol::Function(function_def));
+    context.add_function(function_def);
 
     let input = "test(a = 1.0, b = 2.0)";
     let expr = Parser::parse_rule_or_panic::<Expression>(Rule::expression, input);

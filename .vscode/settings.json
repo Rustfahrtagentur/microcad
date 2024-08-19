@@ -1,7 +1,10 @@
 {
     "cSpell.words": [
+        "cgmath",
         "microcad",
+        "powf",
         "rustfmt",
+        "signum",
         "thiserror",
         "unitless",
         "µCAD"

@@ -100,7 +100,7 @@ impl Eval for UseStatement {
                     for symbol in symbols {
                         match symbol {
                             Symbol::ModuleDefinition(module_definition) => {
-                                let symbols = module_definition.symbols();
+                                let symbols = &module_definition.body.symbols;
                                 for symbol in symbols.iter() {
                                     context.add_symbol(symbol.clone());
                                 }
