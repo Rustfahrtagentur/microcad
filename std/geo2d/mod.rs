@@ -1,8 +1,13 @@
 use microcad_core::Scalar;
-use microcad_parser::builtin_module;
-use microcad_parser::language::lang_type::Type;
-use microcad_parser::language::module::{BuiltinModule, ModuleDefinition};
-use microcad_parser::language::parameter::Parameter;
+use microcad_parser::{
+    builtin_module,
+    eval::Symbols,
+    language::{
+        lang_type::Type,
+        module::{BuiltinModule, ModuleDefinition},
+        parameter::Parameter,
+    },
+};
 use microcad_render::geo2d::{Generator, Geometry, LineString};
 
 pub struct Circle {
@@ -77,7 +82,7 @@ use crate::ModuleBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("geo2d")
-        .builtin_module(builtin_module!(circle(radius: Scalar)))
-        .builtin_module(builtin_module!(rect(width: Scalar, height: Scalar)))
+        .add_builtin_module(builtin_module!(circle(radius: Scalar)))
+        .add_builtin_module(builtin_module!(rect(width: Scalar, height: Scalar)))
         .build()
 }

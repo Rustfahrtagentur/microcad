@@ -102,7 +102,7 @@ impl std::fmt::Display for Tree {
                                         Err(_) => (),
                                         Ok(doc) => {{ 
                                             let mut context = Context::default();
-                                            context.add_symbol(Symbol::ModuleDefinition(microcad_std::builtin_module()));
+                                            context.add_module(microcad_std::builtin_module());
 
                                             if let Err(err) = doc.eval(&mut context) {{
                                                 println!("{err}");
@@ -115,7 +115,7 @@ impl std::fmt::Display for Tree {
                                 r##"{
                                         Ok(doc) => {{
                                             let mut context = Context::default();
-                                            context.add_symbol(Symbol::ModuleDefinition(microcad_std::builtin_module()));
+                                            context.add_module(microcad_std::builtin_module());
 
                                             if let Err(err) = doc.eval(&mut context) {{
                                                 println!("{err}");

@@ -52,8 +52,15 @@ impl Symbols for Context {
             .collect()
     }
 
-    fn add_symbol(&mut self, symbol: Symbol) {
+    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
         self.stack.last_mut().unwrap().add_symbol(symbol);
+        self
+    }
+
+    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
+        self.stack.last().unwrap().iter().for_each(|symbol| {
+            into.add_symbol(symbol.clone());
+        });
     }
 }
 
@@ -77,8 +84,8 @@ fn context_basic() {
 
     let mut context = Context::default();
 
-    context.add_symbol(Symbol::Value("a".into(), Value::Integer(1)));
-    context.add_symbol(Symbol::Value("b".into(), Value::Integer(2)));
+    context.add_value("a".into(), Value::Integer(1));
+    context.add_value("b".into(), Value::Integer(2));
 
     assert_eq!(context.find_symbols(&"a".into())[0].name(), "a");
     assert_eq!(context.find_symbols(&"b".into())[0].name(), "b");

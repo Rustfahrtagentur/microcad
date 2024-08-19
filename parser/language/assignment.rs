@@ -62,7 +62,7 @@ impl Eval for Assignment {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         let value = self.value.eval(context)?;
-        context.add_symbol(Symbol::Value(self.name.clone(), value));
+        context.add_value(self.name.clone(), value);
         Ok(())
     }
 }

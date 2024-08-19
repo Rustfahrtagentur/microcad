@@ -2,16 +2,17 @@ mod algorithm;
 mod geo2d;
 mod math;
 
-use microcad_parser::builtin_module;
-use microcad_parser::eval::*;
-use microcad_parser::function_signature;
-use microcad_parser::language::expression::Expression;
-use microcad_parser::language::lang_type::Type;
-use microcad_parser::language::parameter::Parameter;
-use microcad_parser::language::value::Value;
-use microcad_parser::language::{function::*, module::*};
 use microcad_parser::parameter;
 use microcad_parser::parameter_list;
+use microcad_parser::{
+    builtin_module,
+    eval::*,
+    function_signature,
+    language::{
+        expression::Expression, function::*, lang_type::Type, module::*, parameter::Parameter,
+        value::Value,
+    },
+};
 use microcad_render::tree::{Node, NodeInner};
 
 pub struct ModuleBuilder {
@@ -26,27 +27,30 @@ impl ModuleBuilder {
     }
 
     pub fn value(&mut self, name: &str, value: Value) -> &mut Self {
-        self.module.add_symbol(Symbol::Value(name.into(), value));
-        self
-    }
-
-    pub fn builtin_function(&mut self, f: BuiltinFunction) -> &mut Self {
-        self.module.add_symbol(Symbol::BuiltinFunction(f));
-        self
-    }
-
-    pub fn builtin_module(&mut self, m: BuiltinModule) -> &mut Self {
-        self.module.add_symbol(Symbol::BuiltinModule(m));
-        self
-    }
-
-    pub fn module(&mut self, m: std::rc::Rc<ModuleDefinition>) -> &mut Self {
-        self.module.add_module(m);
+        self.module.add_value(name.into(), value);
         self
     }
 
     pub fn build(&mut self) -> std::rc::Rc<ModuleDefinition> {
         std::rc::Rc::new(self.module.clone())
+    }
+}
+
+impl Symbols for ModuleBuilder {
+    fn find_symbols(
+        &self,
+        name: &microcad_parser::language::identifier::Identifier,
+    ) -> Vec<&Symbol> {
+        self.module.find_symbols(name)
+    }
+
+    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
+        self.module.add_symbol(symbol);
+        self
+    }
+
+    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
+        self.module.copy_symbols(into)
     }
 }
 
@@ -110,10 +114,11 @@ pub fn export(filename: String) -> Node {
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("std")
-        .module(math::builtin_module())
-        .module(geo2d::builtin_module())
-        .module(algorithm::builtin_module())
-        .builtin_function(BuiltinFunction::new(
+        // TODO: is this correct= Shouldn't this use add_builtin_module() =
+        .add_module(math::builtin_module())
+        .add_module(geo2d::builtin_module())
+        .add_module(algorithm::builtin_module())
+        .add_builtin_function(BuiltinFunction::new(
             "assert".into(),
             function_signature!(parameter_list![
                 parameter!(condition: Bool),
@@ -126,7 +131,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 Ok(None)
             },
         ))
-        .builtin_module(builtin_module!(export(filename: String)))
+        .add_builtin_module(builtin_module!(export(filename: String)))
         .build()
 }
 
@@ -138,7 +143,7 @@ fn context_namespace() {
         .value("pi", Value::Scalar(std::f64::consts::PI))
         .build();
 
-    context.add_symbol(Symbol::ModuleDefinition(module));
+    context.add_module(module);
 
     let symbols = context
         .get_symbols_by_qualified_name(&"math::pi".into())
@@ -161,7 +166,7 @@ fn test_assert() {
     };
 
     let mut context = Context::default();
-    context.add_symbol(Symbol::ModuleDefinition(builtin_module()));
+    context.add_module(builtin_module());
 
     if let Err(err) = doc.eval(&mut context) {
         println!("{err}");
@@ -205,7 +210,7 @@ export("export.svg") algorithm::difference() {
     };
 
     let mut context = Context::default();
-    context.add_symbol(Symbol::ModuleDefinition(builtin_module()));
+    context.add_module(builtin_module());
 
     let node = doc.eval(&mut context).unwrap();
 

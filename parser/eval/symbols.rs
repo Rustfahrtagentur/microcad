@@ -1,6 +1,11 @@
-use crate::language::{function::*, identifier::*, module::*, value::*};
+use crate::language::{
+    function::*,
+    identifier::{self, *},
+    module::*,
+    value::*,
+};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum Symbol {
     Value(Identifier, Value),
     Function(std::rc::Rc<FunctionDefinition>),
@@ -22,7 +27,7 @@ impl Symbol {
 
     pub fn get_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
         match self {
-            Self::ModuleDefinition(module) => module.get_symbols_by_name(name),
+            Self::ModuleDefinition(module) => module.find_symbols(name),
             _ => Vec::new(),
         }
     }
@@ -35,7 +40,29 @@ pub struct SymbolTable(Vec<Symbol>);
 
 pub trait Symbols {
     fn find_symbols(&self, name: &Identifier) -> Vec<&Symbol>;
-    fn add_symbol(&mut self, symbol: Symbol);
+    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self;
+    fn copy_symbols<T: Symbols>(&self, into: &mut T);
+
+    fn add_builtin_function(&mut self, f: BuiltinFunction) -> &mut Self {
+        self.add_symbol(Symbol::BuiltinFunction(f));
+        self
+    }
+    fn add_builtin_module(&mut self, m: BuiltinModule) -> &mut Self {
+        self.add_symbol(Symbol::BuiltinModule(m));
+        self
+    }
+    fn add_module(&mut self, m: std::rc::Rc<ModuleDefinition>) -> &mut Self {
+        self.add_symbol(Symbol::ModuleDefinition(m));
+        self
+    }
+    fn add_value(&mut self, id: Identifier, value: Value) -> &mut Self {
+        self.add_symbol(Symbol::Value(id, value));
+        self
+    }
+    fn add_function(&mut self, f: std::rc::Rc<FunctionDefinition>) -> &mut Self {
+        self.add_symbol(Symbol::Function(f.into()));
+        self
+    }
 }
 
 impl SymbolTable {
@@ -51,8 +78,15 @@ impl Symbols for SymbolTable {
             .filter(|symbol| symbol.name() == name)
             .collect()
     }
-    fn add_symbol(&mut self, symbol: Symbol) {
-        self.0.push(symbol)
+    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
+        self.0.push(symbol);
+        self
+    }
+
+    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
+        self.0.iter().for_each(|symbol| {
+            into.add_symbol(symbol.clone());
+        });
     }
 }
 

@@ -455,7 +455,10 @@ impl Eval for Call {
                         non_matching_symbols.push(symbol.clone());
                     }
                 }*/
-                symbol => unimplemented!("Call::eval for {symbol:?}"),
+                symbol => {
+                    let s: &'static str = symbol.into();
+                    unimplemented!("Symbol::{s}")
+                }
             }
         }
 
