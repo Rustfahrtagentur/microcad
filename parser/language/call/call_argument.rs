@@ -1,5 +1,5 @@
 use super::{CallArgumentValue, Context, Error, Eval, Identifier};
-use crate::{language::expression::Expression, ord_map::OrdMapItem, parser::*, with_pair_ok};
+use crate::{language::expression::Expression, ord_map::OrdMapValue, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug, Default)]
 pub struct CallArgument {
@@ -7,8 +7,8 @@ pub struct CallArgument {
     pub value: Expression,
 }
 
-impl OrdMapItem<Identifier> for CallArgument {
-    fn name(&self) -> Option<Identifier> {
+impl OrdMapValue<Identifier> for CallArgument {
+    fn key(&self) -> Option<Identifier> {
         self.name.clone()
     }
 }

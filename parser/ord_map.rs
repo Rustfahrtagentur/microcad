@@ -1,20 +1,30 @@
-pub trait OrdMapItem<I> {
-    fn name(&self) -> Option<I>;
-}
-
-#[derive(Clone, Debug)]
-pub struct OrdMap<K, T>
+/// trait of an value in an `OrdMap`
+/// # Types
+/// `K`: key type
+pub trait OrdMapValue<K>
 where
-    T: OrdMapItem<K>,
     K: std::cmp::Eq + std::hash::Hash + Clone,
 {
-    vec: Vec<T>,
+    /// return some unique key of this value or `None`
+    fn key(&self) -> Option<K>;
+}
+
+/// Map whose values cam be accessed in original insert order
+#[derive(Clone, Debug)]
+pub struct OrdMap<K, V>
+where
+    V: OrdMapValue<K>,
+    K: std::cmp::Eq + std::hash::Hash + Clone,
+{
+    /// vec to store values
+    vec: Vec<V>,
+    /// map to store key -> index of value in vec
     map: std::collections::HashMap<K, usize>,
 }
 
-impl<K, T> Default for OrdMap<K, T>
+impl<K, V> Default for OrdMap<K, V>
 where
-    T: OrdMapItem<K>,
+    V: OrdMapValue<K>,
     K: std::cmp::Eq + std::hash::Hash + Clone,
 {
     fn default() -> Self {
@@ -25,17 +35,17 @@ where
     }
 }
 
-impl<K, T> From<Vec<T>> for OrdMap<K, T>
+impl<K, V> From<Vec<V>> for OrdMap<K, V>
 where
-    T: OrdMapItem<K>,
+    V: OrdMapValue<K>,
     K: std::cmp::Eq + std::hash::Hash + Clone,
 {
-    fn from(vec: Vec<T>) -> Self {
+    fn from(vec: Vec<V>) -> Self {
         let mut map = std::collections::HashMap::new();
         // TODO remove for loop use for_each and filter
         for (i, item) in vec.iter().enumerate() {
-            if let Some(name) = item.name() {
-                map.insert(name, i);
+            if let Some(key) = item.key() {
+                map.insert(key, i);
             }
         }
 
@@ -43,38 +53,44 @@ where
     }
 }
 
-impl<K, T> OrdMap<K, T>
+impl<K, V> OrdMap<K, V>
 where
-    T: OrdMapItem<K>,
+    V: OrdMapValue<K>,
     K: std::cmp::Eq + std::hash::Hash + Clone,
 {
-    pub fn iter(&self) -> std::slice::Iter<'_, T> {
+    /// get iterator over values in original order
+    pub fn iter(&self) -> std::slice::Iter<'_, V> {
         self.vec.iter()
     }
 
+    /// return number of stored values
     pub fn len(&self) -> usize {
         self.vec.len()
     }
 
+    /// `true` no values are stored`
     pub fn is_empty(&self) -> bool {
         self.vec.is_empty()
     }
 
-    pub fn push(&mut self, item: T) -> Result<(), K> {
-        if let Some(name) = item.name().clone() {
-            if self.map.contains_key(&name) {
-                return Err(name);
+    /// add new value
+    pub fn push(&mut self, item: V) -> Result<(), K> {
+        if let Some(key) = item.key().clone() {
+            if self.map.contains_key(&key) {
+                return Err(key);
             }
-            self.map.insert(name, self.vec.len());
+            self.map.insert(key, self.vec.len());
         }
         self.vec.push(item);
         Ok(())
     }
 
-    pub fn get(&self, name: &K) -> Option<&T> {
-        self.map.get(name).map(|index| &self.vec[*index])
+    /// get value by key
+    pub fn get(&self, key: &K) -> Option<&V> {
+        self.map.get(key).map(|index| &self.vec[*index])
     }
 
+    /// get list of all keys
     pub fn keys(&self) -> std::collections::hash_map::Keys<'_, K, usize> {
         self.map.keys()
     }

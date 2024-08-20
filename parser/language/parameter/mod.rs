@@ -7,7 +7,7 @@ pub use parameter_value::*;
 pub use parameter_value_list::*;
 
 use super::{expression::*, identifier::*, lang_type::*};
-use crate::{eval::*, ord_map::OrdMapItem, parser::*, with_pair_ok};
+use crate::{eval::*, ord_map::OrdMapValue, parser::*, with_pair_ok};
 
 /// @brief A parameter for a function or module definition
 #[derive(Clone, Debug, Default)]
@@ -17,8 +17,8 @@ pub struct Parameter {
     pub default_value: Option<Expression>,
 }
 
-impl OrdMapItem<Identifier> for Parameter {
-    fn name(&self) -> Option<Identifier> {
+impl OrdMapValue<Identifier> for Parameter {
+    fn key(&self) -> Option<Identifier> {
         Some(self.name.clone())
     }
 }

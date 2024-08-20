@@ -1,4 +1,4 @@
-use crate::ord_map::OrdMapItem;
+use crate::ord_map::OrdMapValue;
 
 use super::{Identifier, Value};
 
@@ -8,8 +8,8 @@ pub struct CallArgumentValue {
     pub value: Value,
 }
 
-impl OrdMapItem<Identifier> for CallArgumentValue {
-    fn name(&self) -> Option<Identifier> {
+impl OrdMapValue<Identifier> for CallArgumentValue {
+    fn key(&self) -> Option<Identifier> {
         self.name.clone()
     }
 }
