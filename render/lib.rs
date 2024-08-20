@@ -2,8 +2,6 @@ pub mod geo2d;
 pub mod svg;
 pub mod tree;
 
-use std::hash;
-
 use geo2d::Geometry;
 use microcad_core::Scalar;
 use tree::Node;
