@@ -1,303 +1,58 @@
-use super::{color::*, identifier::*, lang_type::*, units::*};
+mod error;
+mod list;
+mod map;
+mod map_key_value;
+mod named_tuple;
+mod unnamed_tuple;
+mod value_list;
+
+pub use error::*;
+pub use list::*;
+pub use map::*;
+pub use map_key_value::*;
+pub use named_tuple::*;
+pub use unnamed_tuple::*;
+pub use value_list::*;
+
+use super::{
+    color::Color,
+    lang_type::{Ty, Type},
+    units::Unit,
+};
 use cgmath::InnerSpace;
-use microcad_core::*;
+use microcad_core::{Scalar, Vec2, Vec3, Vec4};
 use microcad_render::tree::Node;
-use thiserror::Error;
-
-#[derive(Debug, Error)]
-pub enum ValueError {
-    #[error("Invalid operator: {0}")]
-    InvalidOperator(char),
-    #[error("Tuple length mismatch for operator {operator}: lhs={lhs}, rhs={rhs}")]
-    TupleLengthMismatchForOperator {
-        operator: char,
-        lhs: usize,
-        rhs: usize,
-    },
-    #[error("Type cannot be a key in a map: {0}")]
-    InvalidMapKeyType(Type),
-    #[error("Cannot convert value {0} to {1}")]
-    CannotConvert(Value, String),
-    #[error("Cannot convert value into boolean: {0}")]
-    CannotConvertToBool(Value),
-    #[error("Cannot add unit to a unitful value: {0}")]
-    CannotAddUnitToUnitfulValue(Value),
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct List(pub ValueList, pub Type);
-
-impl std::ops::Deref for List {
-    type Target = ValueList;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for List {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl List {
-    pub fn new(ty: Type) -> Self {
-        Self(ValueList::new(), ty)
-    }
-}
-
-impl std::fmt::Display for List {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[")?;
-        for (i, v) in self.0.iter().enumerate() {
-            if i > 0 {
-                write!(f, ", ")?;
-            }
-            write!(f, "{}", v)?;
-        }
-        write!(f, "]")
-    }
-}
-
-impl Ty for List {
-    fn ty(&self) -> Type {
-        self.1.clone()
-    }
-}
-
-/// A value type that can be used as a key in a map
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
-pub enum MapKeyValue {
-    Integer(i64),
-    Bool(bool),
-    String(String),
-}
-
-impl MapKeyValue {
-    pub fn ty(&self) -> MapKeyType {
-        match self {
-            MapKeyValue::Integer(_) => MapKeyType::Integer,
-            MapKeyValue::Bool(_) => MapKeyType::Bool,
-            MapKeyValue::String(_) => MapKeyType::String,
-        }
-    }
-}
-
-impl TryFrom<Value> for MapKeyValue {
-    type Error = ValueError;
-
-    fn try_from(value: Value) -> Result<Self, Self::Error> {
-        match value {
-            Value::Integer(n) => Ok(MapKeyValue::Integer(n)),
-            Value::Bool(b) => Ok(MapKeyValue::Bool(b)),
-            Value::String(s) => Ok(MapKeyValue::String(s)),
-            value => Err(ValueError::InvalidMapKeyType(value.ty())),
-        }
-    }
-}
-
-impl std::fmt::Display for MapKeyValue {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            MapKeyValue::Integer(n) => write!(f, "{}", n),
-            MapKeyValue::Bool(b) => write!(f, "{}", b),
-            MapKeyValue::String(s) => write!(f, "{}", s),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct Map(
-    pub std::collections::HashMap<MapKeyValue, Value>,
-    pub MapKeyType,
-    Type,
-);
-
-impl From<Map> for std::collections::HashMap<MapKeyValue, Value> {
-    fn from(val: Map) -> Self {
-        val.0
-    }
-}
-
-impl Ty for Map {
-    fn ty(&self) -> Type {
-        self.2.clone()
-    }
-}
-
-impl std::fmt::Display for Map {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[")?;
-        for (i, (k, v)) in self.0.iter().enumerate() {
-            if i > 0 {
-                write!(f, ", ")?;
-            }
-            write!(f, "{} => {}", k, v)?;
-        }
-        write!(f, "]")
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct NamedTuple(pub std::collections::BTreeMap<Identifier, Value>);
-
-impl NamedTuple {
-    pub fn from_vec(vec: Vec<(Identifier, Value)>) -> Self {
-        Self(vec.into_iter().collect())
-    }
-
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
-    pub fn iter(&self) -> impl Iterator<Item = (&Identifier, &Value)> {
-        self.0.iter()
-    }
-}
-
-#[macro_export]
-macro_rules! named_tuple {
-    ($($name:ident: $ty:ident = $value:expr),*) => {
-        NamedTuple::from_vec(vec![$((stringify!($name).into(), Value::$ty($value)),)*])
-    };
-}
-
-impl std::fmt::Display for NamedTuple {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "(")?;
-        for (i, (name, v)) in self.0.iter().enumerate() {
-            if i > 0 {
-                write!(f, ", ")?;
-            }
-            write!(f, "{} = {}", name, v)?;
-        }
-        write!(f, ")")
-    }
-}
-
-impl Ty for NamedTuple {
-    fn ty(&self) -> Type {
-        Type::NamedTuple(NamedTupleType(
-            self.0
-                .iter()
-                .map(|(name, v)| (name.clone(), v.ty().clone()))
-                .collect(),
-        ))
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct UnnamedTuple(ValueList);
-
-impl UnnamedTuple {
-    pub fn new(list: ValueList) -> Self {
-        Self(list)
-    }
-    pub fn binary_op(
-        self,
-        rhs: Self,
-        op: char,
-        f: impl Fn(Value, Value) -> Result<Value, ValueError>,
-    ) -> Result<Self, ValueError> {
-        if self.0.len() != rhs.0.len() {
-            return Err(ValueError::TupleLengthMismatchForOperator {
-                operator: op,
-                lhs: self.0.len(),
-                rhs: rhs.0.len(),
-            });
-        }
-        let mut result = ValueList::new();
-        for (l, r) in self.0.iter().zip(rhs.0.iter()) {
-            let add_result = f(l.clone(), r.clone())?;
-            result.push(add_result);
-        }
-        Ok(UnnamedTuple(result))
-    }
-}
-
-impl std::fmt::Display for UnnamedTuple {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "({})",
-            self.0
-                .iter()
-                .map(|v| v.to_string())
-                .collect::<Vec<String>>()
-                .join(", ")
-        )
-    }
-}
-
-impl Ty for UnnamedTuple {
-    fn ty(&self) -> Type {
-        Type::UnnamedTuple(UnnamedTupleType(
-            self.0.iter().map(|v| v.ty().clone()).collect(),
-        ))
-    }
-}
-
-impl std::ops::Add for UnnamedTuple {
-    type Output = Result<UnnamedTuple, ValueError>;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        self.binary_op(rhs, '+', |lhs, rhs| lhs + rhs)
-    }
-}
-
-impl std::ops::Sub for UnnamedTuple {
-    type Output = Result<UnnamedTuple, ValueError>;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        self.binary_op(rhs, '-', |lhs, rhs| lhs - rhs)
-    }
-}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
-    // An integer value
+    /// An integer value
     Integer(i64),
-
-    // A scalar value
+    /// A scalar value
     Scalar(Scalar),
-
-    // Length in mm
+    /// Length in mm
     Length(Scalar),
-
-    // A 2D vector with length
+    /// A 2D vector with length
     Vec2(Vec2),
-
-    // A 3D vector with length
+    /// A 3D vector with length
     Vec3(Vec3),
-
-    // A 4D vector with length
+    /// A 4D vector with length
     Vec4(Vec4),
-
-    // An angle in radians
+    /// An angle in radians
     Angle(Scalar),
-
-    // Boolean value
+    /// Boolean value
     Bool(bool),
-
-    // String value
+    /// String value
     String(String),
-
-    // Color value
+    /// Color value
     Color(Color),
-
+    // List
     List(List),
-
+    // Hash Map
     Map(Map),
-
+    /// Tuple of named items
     NamedTuple(NamedTuple),
-
+    /// Tuple of unnamed items
     UnnamedTuple(UnnamedTuple),
-
     /// A node in the render tree
     Node(Node),
 }
@@ -347,14 +102,6 @@ impl Value {
         }
     }
 
-    // @todo Remove this method
-    pub fn into_bool(&self) -> Result<bool, ValueError> {
-        match self {
-            Value::Bool(b) => Ok(*b),
-            value => Err(ValueError::CannotConvertToBool(value.clone())),
-        }
-    }
-
     /// Add a unit to a scalar value
     pub fn add_unit_to_unitless_types(&mut self, unit: Unit) -> Result<(), ValueError> {
         match (self.clone(), unit.ty()) {
@@ -362,7 +109,7 @@ impl Value {
             (Value::Integer(i), Type::Angle) => *self = Value::Angle(unit.normalize(i as Scalar)),
             (Value::Scalar(s), Type::Length) => *self = Value::Length(unit.normalize(s)),
             (Value::Scalar(s), Type::Angle) => *self = Value::Angle(unit.normalize(s)),
-            (value, _) => return Err(ValueError::CannotAddUnitToUnitfulValue(value.clone())),
+            (value, _) => return Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
         }
         Ok(())
     }
@@ -574,44 +321,3 @@ impl_try_from!(Vec4 => Vec4);
 impl_try_from!(Bool => bool);
 impl_try_from!(String => String);
 impl_try_from!(Color => Color);
-
-#[derive(Clone, Debug, PartialEq, Default)]
-pub struct ValueList(Vec<Value>);
-
-impl std::ops::Deref for ValueList {
-    type Target = Vec<Value>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for ValueList {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl ValueList {
-    pub fn new() -> Self {
-        Self(Vec::new())
-    }
-
-    pub fn add_unit_to_unitless_types(&mut self, unit: Unit) -> Result<(), ValueError> {
-        for value in self.0.iter_mut() {
-            value.add_unit_to_unitless_types(unit)?;
-        }
-        Ok(())
-    }
-
-    pub fn types(&self) -> TypeList {
-        TypeList::from_types(
-            self.0
-                .iter()
-                .map(|v| v.ty())
-                .collect::<Vec<Type>>()
-                .into_iter()
-                .collect(),
-        )
-    }
-}

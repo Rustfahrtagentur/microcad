@@ -95,7 +95,7 @@ impl Eval for TupleExpression {
             if let Some(unit) = self.unit {
                 value_list.add_unit_to_unitless_types(unit)?;
             }
-            Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
+            Ok(Value::UnnamedTuple(value_list.into()))
         } else {
             // Named tuple
             let mut map = std::collections::BTreeMap::new();
@@ -135,7 +135,7 @@ impl Eval for TupleExpression {
                 _ => {}
             }
 
-            Ok(Value::NamedTuple(NamedTuple(map)))
+            Ok(Value::NamedTuple(map.into()))
         }
     }
 }
