@@ -49,7 +49,7 @@ pub trait Renderer2D {
 
     fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> Result<(), Error>;
 
-    fn fetch_geometry(&mut self, hash: u64) -> Option<std::rc::Rc<geo2d::Geometry>> {
+    fn fetch_geometry(&mut self, _hash: u64) -> Option<std::rc::Rc<geo2d::Geometry>> {
         None
     }
 

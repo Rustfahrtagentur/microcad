@@ -64,7 +64,7 @@ impl RenderHash for Rect {
 impl Renderable2D for Rect {
     fn render_geometry(
         &self,
-        renderer: &mut dyn microcad_render::Renderer2D,
+        _renderer: &mut dyn microcad_render::Renderer2D,
     ) -> Result<Geometry, microcad_render::Error> {
         use geo::line_string;
 

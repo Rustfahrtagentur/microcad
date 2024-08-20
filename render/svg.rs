@@ -1,5 +1,5 @@
 use super::*;
-use geo::{CoordsIter, Geometry};
+use geo::CoordsIter;
 use geo2d::*;
 use std::io::Write;
 use tree::NodeInner;

@@ -6,7 +6,6 @@ pub enum BooleanOp {
 }
 
 use geo::MultiPolygon;
-use microcad_parser::eval::Error;
 use microcad_render::{
     geo2d::Geometry,
     tree::{Algorithm, Node, NodeInner},

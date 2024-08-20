@@ -4,7 +4,7 @@ use crate::{geo2d, Error, Renderable2D, Renderer2D};
 use microcad_core::*;
 
 pub trait Algorithm {
-    fn process_2d(&self, renderer: &mut dyn Renderer2D, parent: Node) -> Result<Node, Error> {
+    fn process_2d(&self, _renderer: &mut dyn Renderer2D, _parent: Node) -> Result<Node, Error> {
         unimplemented!()
     }
     /*     fn process_3d(
