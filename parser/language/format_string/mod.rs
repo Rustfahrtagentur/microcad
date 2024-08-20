@@ -1,66 +1,15 @@
-use std::str::FromStr;
+mod format_expression;
+mod format_spec;
 
-use super::{expression::*, value::*};
-use crate::{eval::*, parser::*, with_pair_ok};
+pub use format_expression::*;
+pub use format_spec::*;
 
-#[derive(Clone, Debug, Default)]
-struct FormatSpec {
-    precision: Option<u32>,
-    leading_zeros: Option<u32>,
-}
-
-impl Parse for FormatSpec {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut opt = FormatSpec::default();
-
-        for pair in pair.clone().into_inner() {
-            match pair.as_rule() {
-                Rule::format_spec_precision => {
-                    opt.precision = Some(pair.as_span().as_str()[1..].parse().unwrap())
-                }
-                Rule::format_spec_leading_zeros => {
-                    opt.leading_zeros = Some(pair.as_span().as_str()[1..].parse().unwrap())
-                }
-                _ => unreachable!(),
-            }
-        }
-
-        with_pair_ok!(opt, pair)
-    }
-}
-
-#[allow(dead_code)]
-#[derive(Clone, Default, Debug)]
-pub struct FormatExpression(FormatSpec, Box<Expression>);
-
-impl Parse for FormatExpression {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut fo = FormatSpec::default();
-        let mut expr = Expression::default();
-        for pair in pair.clone().into_inner() {
-            match pair.as_rule() {
-                Rule::format_spec => fo = FormatSpec::parse(pair)?.value().clone(),
-                Rule::expression => expr = Expression::parse(pair)?.value().clone(),
-                _ => unreachable!(),
-            }
-        }
-        with_pair_ok!(Self(fo, Box::new(expr)), pair)
-    }
-}
-
-impl Eval for FormatExpression {
-    type Output = Value;
-
-    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
-        Ok(Value::String(format!("{}", self.1.eval(context)?)))
-    }
-}
-
-impl std::fmt::Display for FormatExpression {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{{{}}}", self.1)
-    }
-}
+use crate::{
+    eval::{Context, Error, Eval},
+    language::value::Value,
+    parser::{Pair, Parse, ParseResult, Parser, Rule},
+    with_pair_ok,
+};
 
 #[derive(Clone, Debug)]
 enum FormatStringInner {
@@ -72,7 +21,7 @@ enum FormatStringInner {
 #[derive(Default, Clone, Debug)]
 pub struct FormatString(Vec<FormatStringInner>);
 
-impl FromStr for FormatString {
+impl std::str::FromStr for FormatString {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
