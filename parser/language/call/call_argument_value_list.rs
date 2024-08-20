@@ -138,12 +138,12 @@ impl CallArgumentValueList {
         self.get_matching_positional_arguments(&mut missing_parameter_values, &mut arg_map)?;
 
         if !missing_parameter_values.is_empty() {
-            // TODO: prevent mut and for
-            let mut missing_args = IdentifierList::new();
-            for parameter in missing_parameter_values.iter() {
-                missing_args.push(parameter.name.clone()).unwrap(); // Unwrap is safe here because we know the parameter is unique
-            }
-            return Err(Error::MissingArguments(missing_args));
+            return Err(Error::MissingArguments(IdentifierList::from(
+                missing_parameter_values
+                    .iter()
+                    .map(|parameter| parameter.name.clone())
+                    .collect::<Vec<_>>(),
+            )));
         }
 
         Ok(arg_map)

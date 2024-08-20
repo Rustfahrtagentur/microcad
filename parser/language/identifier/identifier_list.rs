@@ -20,6 +20,12 @@ impl IdentifierList {
     }
 }
 
+impl From<Vec<Identifier>> for IdentifierList {
+    fn from(value: Vec<Identifier>) -> Self {
+        Self(value)
+    }
+}
+
 impl std::ops::Deref for IdentifierList {
     type Target = Vec<Identifier>;
 
