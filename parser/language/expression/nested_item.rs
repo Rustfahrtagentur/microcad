@@ -1,6 +1,8 @@
-use crate::{language::module::ModuleBody, with_pair_ok};
-
-use super::{Call, Pair, Parse, ParseResult, QualifiedName, Rule};
+use crate::{
+    language::{call::Call, identifier::QualifiedName, module::ModuleBody},
+    parser::{Pair, Parse, ParseResult, Rule},
+    with_pair_ok,
+};
 
 #[derive(Clone, Debug)]
 pub enum NestedItem {

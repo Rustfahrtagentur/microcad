@@ -1,10 +1,21 @@
+mod expression_list;
 mod nested;
 mod nested_item;
 
-use super::{call::*, format_string::*, identifier::*, list::*, literal::*, tuple::*, value::*};
-use crate::{eval::*, parser::*, with_pair_ok};
-use nested::*;
-use pest::pratt_parser::*;
+pub use expression_list::*;
+pub use nested::*;
+pub use nested_item::*;
+
+use super::{
+    call::MethodCall, format_string::FormatString, identifier::Identifier, list::ListExpression,
+    literal::Literal, tuple::TupleExpression, value::Value,
+};
+use crate::{
+    eval::{Context, Error, Eval},
+    parser::{Pair, Parse, ParseError, ParseResult, Rule},
+    with_pair_ok,
+};
+use pest::pratt_parser::{Assoc, Op, PrattParser};
 
 lazy_static::lazy_static! {
     static ref PRATT_PARSER: PrattParser<Rule> = {
@@ -60,13 +71,10 @@ pub enum Expression {
     },
     /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
     ListElementAccess(Box<Expression>, Box<Expression>),
-
     /// Access an element of a named tuple: `a.b`
     NamedTupleElementAccess(Box<Expression>, Identifier),
-
     /// Access an element of an unnamed tuple: `a.0`
     UnnamedTupleElementAccess(Box<Expression>, u32),
-
     /// Call to a method: `[2,3].len()`
     /// First expression must evaluate to a value
     MethodCall(Box<Expression>, MethodCall),
@@ -287,109 +295,13 @@ impl Parse for Expression {
     }
 }
 
-#[derive(Clone, Default, Debug)]
-pub struct ExpressionList(Vec<Expression>);
-
-impl std::ops::Deref for ExpressionList {
-    type Target = Vec<Expression>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for ExpressionList {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl ExpressionList {
-    pub fn new(v: Vec<Expression>) -> Self {
-        Self(v)
-    }
-}
-
-impl IntoIterator for ExpressionList {
-    type Item = Expression;
-    type IntoIter = std::vec::IntoIter<Expression>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter()
-    }
-}
-
-impl Parse for ExpressionList {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut vec = Vec::new();
-
-        for pair in pair.clone().into_inner() {
-            vec.push(Expression::parse(pair)?.value().clone());
-        }
-
-        with_pair_ok!(Self(vec), pair)
-    }
-}
-
-impl std::fmt::Display for ExpressionList {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            self.0
-                .iter()
-                .map(|expr| expr.to_string())
-                .collect::<Vec<_>>()
-                .join(", ")
-        )
-    }
-}
-
-#[cfg(test)]
-fn run_expression_test(
-    expr: &str,
-    context: &mut Context,
-    evaluator: impl FnOnce(Result<Value, Error>),
-) {
-    use pest::Parser as _;
-    let pair = Parser::parse(Rule::expression, expr)
-        .unwrap()
-        .next()
-        .unwrap();
-
-    let expr = Expression::parse(pair).unwrap();
-    let new_expr = expr.eval(context);
-
-    evaluator(new_expr);
-}
-
-#[test]
-fn operators() {
-    let mut context = Context::default();
-    run_expression_test("4", &mut context, |e| {
-        if let Ok(Value::Scalar(num)) = e {
-            assert_eq!(num, 4.0);
-        }
-    });
-    run_expression_test("4 * 4", &mut context, |e| {
-        if let Ok(Value::Scalar(num)) = e {
-            assert_eq!(num, 16.0);
-        }
-    });
-    run_expression_test("4 * (4 + 4)", &mut context, |e| {
-        if let Ok(Value::Scalar(num)) = e {
-            assert_eq!(num, 32.0);
-        }
-    });
-    run_expression_test("10.0 / 2.5 + 6", &mut context, |e| {
-        if let Ok(Value::Scalar(num)) = e {
-            assert_eq!(num, 10.0);
-        }
-    });
-}
-
 #[test]
 fn list_expression() {
+    use crate::{
+        eval::{Context, Error},
+        language::value::Value,
+    };
+
     let mut context = Context::default();
 
     // Simple list expression with 3 elements
@@ -422,6 +334,51 @@ fn list_expression() {
     run_expression_test("[1.0,2.0,3.0].len()", &mut context, |e| {
         if let Ok(Value::Integer(n)) = e {
             assert_eq!(n, 3);
+        }
+    });
+}
+
+#[cfg(test)]
+fn run_expression_test(
+    expr: &str,
+    context: &mut crate::eval::Context,
+    evaluator: impl FnOnce(Result<crate::language::value::Value, crate::eval::Error>),
+) {
+    use pest::Parser as _;
+
+    use crate::parser::{Parser, Rule};
+    let pair = Parser::parse(Rule::expression, expr)
+        .unwrap()
+        .next()
+        .unwrap();
+
+    let expr = Expression::parse(pair).unwrap();
+    let new_expr = expr.eval(context);
+
+    evaluator(new_expr);
+}
+
+#[test]
+fn operators() {
+    let mut context = Context::default();
+    run_expression_test("4", &mut context, |e| {
+        if let Ok(Value::Scalar(num)) = e {
+            assert_eq!(num, 4.0);
+        }
+    });
+    run_expression_test("4 * 4", &mut context, |e| {
+        if let Ok(Value::Scalar(num)) = e {
+            assert_eq!(num, 16.0);
+        }
+    });
+    run_expression_test("4 * (4 + 4)", &mut context, |e| {
+        if let Ok(Value::Scalar(num)) = e {
+            assert_eq!(num, 32.0);
+        }
+    });
+    run_expression_test("10.0 / 2.5 + 6", &mut context, |e| {
+        if let Ok(Value::Scalar(num)) = e {
+            assert_eq!(num, 10.0);
         }
     });
 }

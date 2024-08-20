@@ -1,6 +1,11 @@
-use crate::{eval::Symbol, parser::Rule, with_pair_ok};
+use crate::{
+    eval::{Context, Error, Eval, Symbol},
+    language::value::Value,
+    parser::{Pair, Parse, ParseResult, Rule},
+    with_pair_ok,
+};
 
-use super::{nested_item::NestedItem, Context, Error, Eval, Pair, Parse, ParseResult, Value};
+use super::nested_item::NestedItem;
 
 #[derive(Clone, Debug)]
 pub struct Nested(Vec<NestedItem>);
@@ -42,7 +47,7 @@ impl Eval for Nested {
 
                     for symbol in symbols {
                         if let Symbol::Value(_, v) = symbol {
-                            values.push(v.clone()); // Find first value only. @todo Backpropagation of values
+                            values.push(v.clone()); // Find first value only. @todo Back propagation of values
                             break;
                         }
                     }
