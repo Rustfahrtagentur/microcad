@@ -1,10 +1,19 @@
 use std::fmt::Debug;
 
-use crate::{geo2d, Renderer};
+use crate::{geo2d, Error, Renderable2D, Renderer2D};
 use microcad_core::*;
 
 pub trait Algorithm {
-    fn process(&self, renderer: &dyn Renderer, parent: Node) -> Node;
+    fn process_2d(&self, renderer: &mut dyn Renderer2D, parent: Node) -> Result<Node, Error> {
+        unimplemented!()
+    }
+    /*     fn process_3d(
+        &self,
+        renderer: &dyn Renderer3D,
+        parent: Node,
+    ) -> Result<Box<dyn Renderable3D>, Error> {
+        unimplemented!()
+    }*/
 }
 
 pub struct Transform {
@@ -18,11 +27,15 @@ pub enum NodeInner {
     /// A group node that contains children
     Group,
 
-    /// A trait that generates a 2D geometry, e.g. a primitive like a circle
-    Generator2D(Box<dyn geo2d::Generator>),
+    /// A 2D geometry
+    /// This is an rc::Rc to allow for sharing of geometries
+    Geometry2D(std::rc::Rc<geo2d::Geometry>),
 
     /// A generated geometry
-    Geometry2D(Box<geo2d::Geometry>),
+    Renderable2D(Box<dyn Renderable2D>),
+
+    /// Changes in render state, given as a key-value pairs
+    RenderStateChange(Vec<(String, String)>),
 
     /// An algorithm trait that manipulates the node or its children
     Algorithm(Box<dyn Algorithm>),
@@ -39,10 +52,11 @@ impl Debug for NodeInner {
         match self {
             NodeInner::Root => write!(f, "Root"),
             NodeInner::Group => write!(f, "Group"),
-            NodeInner::Generator2D(_) => write!(f, "Generator2D"),
             NodeInner::Geometry2D(_) => write!(f, "Geometry2D"),
+            NodeInner::Renderable2D(_) => write!(f, "Renderable2D"),
             NodeInner::Algorithm(_) => write!(f, "Algorithm"),
             NodeInner::Transform(_) => write!(f, "Transform"),
+            NodeInner::RenderStateChange(_) => write!(f, "RenderStateChange"),
             NodeInner::Export(_) => write!(f, "Export"),
         }
     }

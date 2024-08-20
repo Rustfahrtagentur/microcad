@@ -102,9 +102,18 @@ impl<'a> Drop for SvgWriter<'a> {
     }
 }
 
+#[derive(Default)]
+pub struct SvgRendererState {
+    fill: Option<String>,
+    stroke: Option<String>,
+    stroke_width: Option<Scalar>,
+}
+
 pub struct SvgRenderer<'a> {
     writer: SvgWriter<'a>,
     precision: Scalar,
+
+    state: SvgRendererState,
 }
 
 impl<'a> SvgRenderer<'a> {
@@ -116,42 +125,71 @@ impl<'a> SvgRenderer<'a> {
                 1.0,
             )?,
             precision: 0.1,
+            state: SvgRendererState::default(),
         })
+    }
+
+    fn render_state_to_style(&self) -> String {
+        let mut style = String::new();
+        if let Some(fill) = &self.state.fill {
+            style.push_str(&format!("fill:{};", fill));
+        }
+        if let Some(stroke) = &self.state.stroke {
+            style.push_str(&format!("stroke:{};", stroke));
+        }
+        if let Some(stroke_width) = self.state.stroke_width {
+            style.push_str(&format!("stroke-width:{};", stroke_width));
+        }
+        style
     }
 }
 
-impl<'a> Renderer for SvgRenderer<'a> {
+impl<'a> Renderer2D for SvgRenderer<'a> {
     fn precision(&self) -> Scalar {
         self.precision
     }
 
-    fn render(&mut self, node: Node) {
+    fn change_render_state(&mut self, key: &str, value: &str) -> Result<(), Error> {
+        match key {
+            "fill" => self.state.fill = Some(value.to_string()),
+            "stroke" => self.state.stroke = Some(value.to_string()),
+            "stroke-width" => {
+                self.state.stroke_width = Some(value.parse().unwrap());
+            }
+            _ => return Err(Error::NotImplemented),
+        }
+        Ok(())
+    }
+
+    fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> Result<(), Error> {
+        self.writer
+            .multi_polygon(multi_polygon, &self.render_state_to_style())
+            .unwrap();
+        Ok(())
+    }
+
+    fn render_node(&mut self, node: Node) -> Result<(), Error> {
         let inner = node.borrow();
-        let result = match &*inner {
+        match &*inner {
             NodeInner::Export(_) | NodeInner::Group | NodeInner::Root => {
                 for child in node.children() {
-                    self.render(child.clone());
+                    self.render_node(child.clone())?;
                 }
-                return;
+                return Ok(());
             }
-            NodeInner::Algorithm(algorithm) => Some(algorithm.process(self, node.clone())),
+            NodeInner::Algorithm(algorithm) => {
+                let new_node = algorithm.process_2d(self, node.clone())?;
+                self.render_node(new_node)?;
+            }
+            NodeInner::Renderable2D(renderable) => {
+                renderable.render_geometry(self)?;
+                return Ok(());
+            }
+            NodeInner::Geometry2D(geometry) => self.render_geometry(geometry)?,
             _ => panic!("Node must be an algorithm but is {:?}", node),
         };
 
-        if let Some(result) = result {
-            let inner = result.borrow();
-            match &*inner {
-                NodeInner::Geometry2D(geometry) => match geometry.as_ref() {
-                    Geometry::MultiPolygon(p) => {
-                        self.writer
-                            .multi_polygon(p, "fill:black;stroke:none;")
-                            .unwrap();
-                    }
-                    _ => panic!("Resulting node must be a MultiPolygon"),
-                },
-                _ => panic!("Node must be Geometry2D"),
-            }
-        }
+        Ok(())
     }
 }
 

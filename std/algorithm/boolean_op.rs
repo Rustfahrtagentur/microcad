@@ -6,14 +6,19 @@ pub enum BooleanOp {
 }
 
 use geo::MultiPolygon;
+use microcad_parser::eval::Error;
 use microcad_render::{
-    geo2d::{Generator, Geometry},
+    geo2d::Geometry,
     tree::{Algorithm, Node, NodeInner},
-    Renderer,
+    Renderable2D, Renderer2D,
 };
 
 impl Algorithm for BooleanOp {
-    fn process(&self, renderer: &dyn Renderer, parent: Node) -> Node {
+    fn process_2d(
+        &self,
+        renderer: &mut dyn Renderer2D,
+        parent: Node,
+    ) -> Result<Node, microcad_render::Error> {
         let mut polygons = Vec::new();
 
         let mut new_nodes = Vec::new();
@@ -23,24 +28,27 @@ impl Algorithm for BooleanOp {
             _ => unimplemented!("This should throw a warning"),
         };
 
-        let handle_generator2d =
-            |generator: &dyn Generator, node: Node, polygons: &mut Vec<MultiPolygon>| {
-                match generator.generate(renderer, node) {
-                    Geometry::MultiPolygon(p) => polygons.push(p),
-                    _ => unimplemented!("This should throw a warning"),
-                }
+        let handle_renderable2d =
+            |renderer: &mut dyn Renderer2D,
+             renderable: &dyn Renderable2D,
+             polygons: &mut Vec<MultiPolygon>| match &*renderable
+                .request_geometry(renderer)
+                .unwrap()
+            {
+                Geometry::MultiPolygon(p) => polygons.push(p.clone()),
+                _ => unimplemented!("This should throw a warning"),
             };
         // TODO: This is a bit of a mess, we should probably refactor this
         // first_child() must be a Group node
         for child in parent.first_child().unwrap().children() {
             let c = &*child.borrow();
             match c {
-                NodeInner::Geometry2D(g) => handle_geo2d(g, &mut polygons),
-                NodeInner::Generator2D(generator) => {
-                    handle_generator2d(generator.as_ref(), child.clone(), &mut polygons)
+                NodeInner::Renderable2D(renderable) => {
+                    handle_renderable2d(renderer, &**renderable, &mut polygons)
                 }
+                NodeInner::Geometry2D(g) => handle_geo2d(g, &mut polygons),
                 NodeInner::Algorithm(algorithm) => {
-                    new_nodes.push(algorithm.process(renderer, child.clone()))
+                    new_nodes.push(algorithm.process_2d(renderer, child.clone())?)
                 }
                 _ => continue,
             }
@@ -50,8 +58,8 @@ impl Algorithm for BooleanOp {
             let c = &*node.borrow();
             match c {
                 NodeInner::Geometry2D(g) => handle_geo2d(g, &mut polygons),
-                NodeInner::Generator2D(generator) => {
-                    handle_generator2d(generator.as_ref(), node.clone(), &mut polygons)
+                NodeInner::Renderable2D(generator) => {
+                    handle_renderable2d(renderer, generator.as_ref(), &mut polygons)
                 }
                 _ => continue,
             }
@@ -72,8 +80,8 @@ impl Algorithm for BooleanOp {
             }
         }
 
-        Node::new(NodeInner::Geometry2D(Box::new(Geometry::MultiPolygon(
-            result,
+        Ok(Node::new(NodeInner::Geometry2D(std::rc::Rc::new(
+            Geometry::MultiPolygon(result),
         ))))
     }
 }

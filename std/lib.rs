@@ -179,7 +179,7 @@ fn difference_svg() {
     use microcad_parser::args;
     use microcad_parser::language::call::ArgumentMap;
     use microcad_render::svg::SvgRenderer;
-    use microcad_render::Renderer;
+    use microcad_render::Renderer2D;
 
     let difference = algorithm::boolean_op::difference();
     let group = microcad_render::tree::group();
@@ -190,7 +190,7 @@ fn difference_svg() {
     let mut file = std::fs::File::create("difference.svg").unwrap();
     let mut renderer = SvgRenderer::new(&mut file).unwrap();
 
-    renderer.render(difference);
+    renderer.render_node(difference);
 }
 
 #[test]
@@ -231,7 +231,7 @@ export("export.svg") algorithm::difference() {
         if let NodeInner::Export(ref filename) = *inner {
             let mut file = std::fs::File::create(filename).unwrap();
             let mut renderer = microcad_render::svg::SvgRenderer::new(&mut file).unwrap();
-            microcad_render::Renderer::render(&mut renderer, n.clone());
+            microcad_render::Renderer2D::render_node(&mut renderer, n.clone());
         }
     }
 }

@@ -49,7 +49,7 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
                     }
 
                     fn node(args: &microcad_parser::language::call::ArgumentMap) -> Result<microcad_render::tree::Node, microcad_parser::eval::Error> {
-                        Ok(Node::new(NodeInner::Generator2D(Box::new(#struct_name {
+                        Ok(Node::new(NodeInner::Renderable2D(Box::new(#struct_name {
                             // For each struct field, the corresponding argument value is assigned
                             #(
                                 #field_identifiers: args[&stringify!(#field_identifiers).into()].clone().try_into()?,

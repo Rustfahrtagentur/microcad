@@ -8,19 +8,27 @@ use microcad_parser::{
         parameter::ParameterList,
     },
 };
-use microcad_render::geo2d::{Generator, Geometry, LineString};
+use microcad_render::{
+    geo2d::{Geometry, LineString},
+    RenderHash, Renderable2D,
+};
 
 #[derive(DefineBuiltInModule)]
 pub struct Circle {
     pub radius: Scalar,
 }
 
-impl Generator for Circle {
-    fn generate(
+impl RenderHash for Circle {
+    fn render_hash(&self) -> Option<u64> {
+        None
+    }
+}
+
+impl Renderable2D for Circle {
+    fn render_geometry(
         &self,
-        renderer: &dyn microcad_render::Renderer,
-        _: microcad_render::tree::Node,
-    ) -> Geometry {
+        renderer: &mut dyn microcad_render::Renderer2D,
+    ) -> Result<Geometry, microcad_render::Error> {
         let mut points = Vec::new();
         use std::f64::consts::PI;
 
@@ -31,8 +39,8 @@ impl Generator for Circle {
             points.push(geo::coord!(x: self.radius * angle.cos(), y: self.radius * angle.sin()));
         }
 
-        Geometry::MultiPolygon(microcad_render::geo2d::line_string_to_multi_polygon(
-            LineString::new(points),
+        Ok(Geometry::MultiPolygon(
+            microcad_render::geo2d::line_string_to_multi_polygon(LineString::new(points)),
         ))
     }
 }
@@ -47,12 +55,17 @@ struct Rect {
     y: Scalar,
 }
 
-impl Generator for Rect {
-    fn generate(
+impl RenderHash for Rect {
+    fn render_hash(&self) -> Option<u64> {
+        None
+    }
+}
+
+impl Renderable2D for Rect {
+    fn render_geometry(
         &self,
-        _: &dyn microcad_render::Renderer,
-        _: microcad_render::tree::Node,
-    ) -> Geometry {
+        renderer: &mut dyn microcad_render::Renderer2D,
+    ) -> Result<Geometry, microcad_render::Error> {
         use geo::line_string;
 
         // Create a rectangle from the given width, height, x and y
@@ -64,8 +77,8 @@ impl Generator for Rect {
             (x: self.x, y: self.y),
         ];
 
-        Geometry::MultiPolygon(microcad_render::geo2d::line_string_to_multi_polygon(
-            line_string,
+        Ok(Geometry::MultiPolygon(
+            microcad_render::geo2d::line_string_to_multi_polygon(line_string),
         ))
     }
 }
