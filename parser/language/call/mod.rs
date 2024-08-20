@@ -1,4 +1,4 @@
-mod argument_list;
+mod argument_map;
 mod call_argument;
 #[macro_use]
 mod call_argument_value;
@@ -6,7 +6,7 @@ mod call_argument_list;
 mod call_argument_value_list;
 mod method_call;
 
-pub use argument_list::*;
+pub use argument_map::*;
 pub use call_argument::*;
 pub use call_argument_list::*;
 pub use call_argument_value::*;
