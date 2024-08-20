@@ -27,7 +27,7 @@ lazy_static::lazy_static! {
             // Addition and subtract have equal precedence
             .op(Op::infix(add, Left) | Op::infix(subtract, Left))
             .op(Op::infix(multiply, Left) | Op::infix(divide, Left))
-            .op(Op::infix(union, Left) | Op::infix(intersection, Left))
+            .op(Op::infix(r#union, Left) | Op::infix(intersection, Left))
             .op(Op::infix(power_xor, Left))
             .op(Op::infix(greater_than, Left) | Op::infix(less_than, Left))
             .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
@@ -224,7 +224,7 @@ impl Parse for Expression {
                     Rule::subtract => '-',
                     Rule::multiply => '*',
                     Rule::divide => '/',
-                    Rule::union => '|',
+                    Rule::r#union => '|',
                     Rule::intersection => '&',
                     Rule::power_xor => '^',
                     Rule::greater_than => '>',
