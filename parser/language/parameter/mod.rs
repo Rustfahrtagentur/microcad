@@ -1,6 +1,6 @@
 mod parameter_list;
 
-use crate::{eval::*, language::*, ord_map::OrdMapValue, parser::*, with_pair_ok};
+use crate::{eval::*, language::*, ord_map::OrdMapValue, parser::*, r#type::*, with_pair_ok};
 
 pub use parameter_list::*;
 
@@ -133,14 +133,14 @@ macro_rules! parameter {
     ($name:ident: $ty:ident) => {
         Parameter {
             name: stringify!($name).into(),
-            specified_type: Some(Type::$ty),
+            specified_type: Some(microcad_parser::r#type::Type::$ty),
             default_value: None,
         }
     };
     ($name:ident: $ty:ident = $value:expr) => {
         Parameter {
             name: stringify!($name).into(),
-            specified_type: Some(Type::$ty),
+            specified_type: Some(microcad_parser::r#type::Type::$ty),
             default_value: Some(
                 Expression::literal_from_str(stringify!($value)).expect("Invalid literal"),
             ),

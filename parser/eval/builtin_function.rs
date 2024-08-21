@@ -1,4 +1,3 @@
-use super::FunctionSignature;
 use crate::{eval::*, language::*};
 
 pub type BuiltinFunctionFunctor =

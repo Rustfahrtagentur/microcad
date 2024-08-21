@@ -158,7 +158,7 @@ macro_rules! assert_eq_arg_map_value {
 
 #[test]
 fn call_get_matching_arguments() {
-    use crate::{language::lang_type::Type, parameter_value};
+    use crate::{parameter_value, r#type::*};
 
     // module my_module(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = ParameterValueList::new(vec![
@@ -185,7 +185,7 @@ fn call_get_matching_arguments() {
 
 #[test]
 fn call_get_matching_arguments_missing() {
-    use crate::{language::lang_type::Type, parameter_value};
+    use crate::{parameter_value, r#type::*};
 
     let param_values = ParameterValueList::new(vec![
         parameter_value!(foo: Integer),

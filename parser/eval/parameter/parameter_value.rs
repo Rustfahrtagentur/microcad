@@ -1,4 +1,4 @@
-use crate::{eval::*, language::*};
+use crate::{eval::*, language::*, r#type::*};
 
 /// @brief Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]

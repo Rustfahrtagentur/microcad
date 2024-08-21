@@ -1,4 +1,4 @@
-use crate::{eval::*, language::*, parser::*, with_pair_ok};
+use crate::{eval::*, language::*, parser::*, r#type::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub struct Assignment {

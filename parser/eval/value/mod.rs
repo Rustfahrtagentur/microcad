@@ -14,7 +14,7 @@ pub use named_tuple::*;
 pub use unnamed_tuple::*;
 pub use value_list::*;
 
-use crate::language::*;
+use crate::{eval::*, language::*, r#type::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
 use microcad_render::tree::Node;

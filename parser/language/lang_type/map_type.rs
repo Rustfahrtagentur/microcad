@@ -1,4 +1,4 @@
-use crate::{language::*, parser::*, with_pair_ok};
+use crate::{map_key_type::*, parser::*, r#type::*, with_pair_ok};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MapType(MapKeyType, Box<Type>);

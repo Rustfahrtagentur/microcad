@@ -1,4 +1,4 @@
-use crate::{eval::*, language::*};
+use crate::{eval::*, language::*, r#type::*};
 
 #[derive(Clone, Debug, PartialEq, Default)]
 pub struct ValueList(Vec<Value>);

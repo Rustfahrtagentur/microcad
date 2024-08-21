@@ -126,8 +126,8 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
 #[cfg(test)]
 fn test_builtin_function(name: &str, input: &str, expected: &str) {
     use microcad_parser::language::expression::*;
-    use microcad_parser::language::lang_type::Type;
     use microcad_parser::parser::*;
+    use microcad_parser::r#type::Type;
 
     let module = builtin_module();
     assert_eq!(&module.name, "math");

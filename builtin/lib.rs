@@ -31,7 +31,7 @@ pub fn derive_define_builtin_module(item: TokenStream) -> TokenStream {
                 parameter_impl.extend(quote! {
                     parameters.push(microcad_parser::language::parameter::Parameter { 
                         name: stringify!(#identifier).into(),
-                        specified_type: Some(Type::#ty),
+                        specified_type: Some(microcad_parser::r#type::Type::#ty),
                         default_value: None }).unwrap();
                 });
             }

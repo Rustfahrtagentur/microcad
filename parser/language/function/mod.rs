@@ -1,10 +1,8 @@
-mod builtin_function;
 mod function_body;
 mod function_definition;
 mod function_signature;
 mod function_statement;
 
-pub use builtin_function::*;
 pub use function_body::*;
 pub use function_definition::*;
 pub use function_signature::*;
@@ -12,8 +10,7 @@ pub use function_statement::*;
 
 #[test]
 fn assignment() {
-    use crate::language::assignment::Assignment;
-    use crate::{eval::*, parser::*};
+    use crate::{eval::*, language::*, parser::*};
 
     let assignment = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "a = 1");
 
@@ -36,7 +33,7 @@ fn assignment() {
 
 #[test]
 fn function_signature() {
-    use crate::{language::lang_type::Type, parser::*};
+    use crate::{parser::*, r#type::Type};
 
     let input = "(a: scalar, b: scalar) -> scalar";
 

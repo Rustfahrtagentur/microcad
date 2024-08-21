@@ -1,4 +1,4 @@
-use crate::{eval::*, language::*, parser::*};
+use crate::{eval::*, language::*, parser::*, r#type::*};
 
 /// Definition and implementation for `NumberLiteral`
 #[derive(Debug, Clone, PartialEq)]

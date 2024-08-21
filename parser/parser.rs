@@ -2,7 +2,7 @@
 #[grammar = "grammar.pest"]
 pub struct Parser;
 
-use crate::language::{identifier::*, lang_type::*};
+use crate::{language::*, type_error::*};
 use anyhow::Error;
 use thiserror::Error;
 

@@ -1,4 +1,4 @@
-use crate::{language::*, parser::*};
+use crate::{parser::*, r#type::*};
 
 macro_rules! declare_units {
     ($( $(#[$m:meta])* $ident:ident = $string:literal -> $ty:ident $(* $factor:expr)? ,)*) => {

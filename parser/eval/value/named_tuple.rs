@@ -1,4 +1,4 @@
-use crate::{eval::*, language::*};
+use crate::{eval::*, language::*, r#type::*};
 
 #[macro_export]
 macro_rules! named_tuple {
