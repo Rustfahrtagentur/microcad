@@ -45,7 +45,7 @@ impl Parse for CallArgument {
 impl Eval for CallArgument {
     type Output = CallArgumentValue;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
         Ok(CallArgumentValue {
             name: self.name.clone(),
             value: self.value.eval(context)?,

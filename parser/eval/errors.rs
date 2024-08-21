@@ -20,7 +20,7 @@ pub enum OperatorError {
 }
 
 #[derive(Debug, Error)]
-pub enum Error {
+pub enum EvalError {
     #[error("Invalid type: {0}")]
     InvalidType(Type),
 

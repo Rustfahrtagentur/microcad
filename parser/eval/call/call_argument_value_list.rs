@@ -1,5 +1,4 @@
-use crate::{language::*, ord_map::OrdMap};
-use call::Error;
+use crate::{eval::*, language::*, ord_map::OrdMap};
 use std::ops::{Deref, DerefMut};
 
 #[derive(Clone, Debug, Default)]
@@ -41,7 +40,7 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut ArgumentMap,
-    ) -> Result<(), Error> {
+    ) -> Result<(), EvalError> {
         let old_parameter_values = parameter_values.clone();
 
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
@@ -81,7 +80,7 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut ArgumentMap,
-    ) -> Result<(), Error> {
+    ) -> Result<(), EvalError> {
         if parameter_values.is_empty() {
             return Ok(());
         }
@@ -118,14 +117,14 @@ impl CallArgumentValueList {
     pub fn get_matching_arguments(
         &self,
         parameter_values: &ParameterValueList,
-    ) -> Result<ArgumentMap, Error> {
+    ) -> Result<ArgumentMap, EvalError> {
         let mut arg_map = ArgumentMap::new();
 
         // Check for unexpected arguments.
         // We are looking for call arguments that are not in the parameter list
         for name in self.keys() {
             if parameter_values.get(name).is_none() {
-                return Err(Error::UnexpectedArgument(name.clone()));
+                return Err(EvalError::UnexpectedArgument(name.clone()));
             }
         }
 
@@ -135,7 +134,7 @@ impl CallArgumentValueList {
         self.get_matching_positional_arguments(&mut missing_parameter_values, &mut arg_map)?;
 
         if !missing_parameter_values.is_empty() {
-            return Err(Error::MissingArguments(IdentifierList::from(
+            return Err(EvalError::MissingArguments(IdentifierList::from(
                 missing_parameter_values
                     .iter()
                     .map(|parameter| parameter.name.clone())
@@ -200,7 +199,7 @@ fn call_get_matching_arguments_missing() {
 
     let arg_map = call_values.get_matching_arguments(&param_values);
 
-    if let Err(Error::MissingArguments(missing)) = arg_map {
+    if let Err(EvalError::MissingArguments(missing)) = arg_map {
         assert_eq!(missing.len(), 1);
         assert_eq!(&missing[0], "bar");
     } else {

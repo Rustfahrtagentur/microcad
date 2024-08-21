@@ -112,7 +112,7 @@ impl Expression {
 impl Eval for Expression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, EvalError> {
         match self {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
@@ -138,7 +138,7 @@ impl Eval for Expression {
                     '≠' => Ok(Value::Bool(!lhs.eq(&rhs))),
                     _ => unimplemented!(),
                 }
-                .map_err(Error::ValueError)
+                .map_err(EvalError::ValueError)
             }
             Self::UnaryOp { op, rhs } => {
                 let rhs = rhs.eval(context)?;
@@ -147,7 +147,7 @@ impl Eval for Expression {
                     '-' => rhs.neg(),
                     _ => unimplemented!(),
                 }
-                .map_err(Error::ValueError)
+                .map_err(EvalError::ValueError)
             }
             Self::ListElementAccess(lhs, rhs) => {
                 let lhs = lhs.eval(context)?;
@@ -159,7 +159,7 @@ impl Eval for Expression {
                         if index < list.len() {
                             Ok(list.get(index).unwrap().clone())
                         } else {
-                            Err(Error::ListIndexOutOfBounds {
+                            Err(EvalError::ListIndexOutOfBounds {
                                 index,
                                 len: list.len(),
                             })
@@ -174,9 +174,9 @@ impl Eval for Expression {
                 match lhs.eval(context)? {
                     Value::List(list) => match name {
                         "len" => Ok(Value::Integer(list.len() as i64)),
-                        _ => Err(Error::UnknownMethod(name.into())),
+                        _ => Err(EvalError::UnknownMethod(name.into())),
                     },
-                    _ => Err(Error::UnknownMethod(name.into())),
+                    _ => Err(EvalError::UnknownMethod(name.into())),
                 }
             }
             Self::Nested(nested) => nested.eval(context),
@@ -294,7 +294,7 @@ impl Parse for Expression {
 #[test]
 fn list_expression() {
     use crate::{
-        eval::{Context, Error},
+        eval::{Context, EvalError},
         language::value::Value,
     };
 
@@ -320,7 +320,7 @@ fn list_expression() {
 
     // Test out of bounds access
     run_expression_test("[1.0,2.0,3.0][3]", &mut context, |e| {
-        if let Err(Error::ListIndexOutOfBounds { index, len }) = e {
+        if let Err(EvalError::ListIndexOutOfBounds { index, len }) = e {
             assert_eq!(index, 3);
             assert_eq!(len, 3);
         }
@@ -338,7 +338,7 @@ fn list_expression() {
 fn run_expression_test(
     expr: &str,
     context: &mut crate::eval::Context,
-    evaluator: impl FnOnce(Result<crate::language::value::Value, crate::eval::Error>),
+    evaluator: impl FnOnce(Result<crate::language::value::Value, crate::eval::EvalError>),
 ) {
     use pest::Parser as _;
 

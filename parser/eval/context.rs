@@ -1,4 +1,4 @@
-use super::{Error, Symbol, SymbolTable, Symbols};
+use super::{EvalError, Symbol, SymbolTable, Symbols};
 use crate::language::identifier::*;
 use microcad_render::tree;
 
@@ -24,7 +24,7 @@ impl Context {
     pub fn get_symbols_by_qualified_name(
         &self,
         name: &QualifiedName,
-    ) -> Result<Vec<Symbol>, Error> {
+    ) -> Result<Vec<Symbol>, EvalError> {
         name.get_symbols(self)
     }
 

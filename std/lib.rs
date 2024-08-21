@@ -68,12 +68,12 @@ macro_rules! arg_1 {
                 for x in v.iter() {
                     match x {
                         $(Value::$ty(x) => result.push(Value::$ty(x.$f())),)*
-                        _ => return Err(Error::InvalidArgumentType(x.ty())),
+                        _ => return Err(EvalError::InvalidArgumentType(x.ty())),
                     }
                 }
                 Ok(Some(Value::List(List(result, v.ty()))))
             }
-            v => Err(Error::InvalidArgumentType(v.ty())),
+            v => Err(EvalError::InvalidArgumentType(v.ty())),
         }
     })
     };
@@ -177,7 +177,7 @@ fn test_assert() {
 fn difference_svg() {
     use crate::algorithm;
     use microcad_parser::args;
-    use microcad_parser::language::call::ArgumentMap;
+    use microcad_parser::eval::ArgumentMap;
     use microcad_render::svg::SvgRenderer;
     use microcad_render::Renderer2D;
 

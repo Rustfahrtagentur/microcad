@@ -1,13 +1,6 @@
 use microcad_builtin_proc_macro::DefineBuiltInModule;
 use microcad_core::Scalar;
-use microcad_parser::{
-    eval::Symbols,
-    language::{
-        lang_type::Type,
-        module::{DefineBuiltInModule, ModuleDefinition},
-        parameter::ParameterList,
-    },
-};
+use microcad_parser::{eval::*, language::*};
 use microcad_render::{
     geo2d::{Geometry, LineString},
     RenderHash, Renderable2D,

@@ -59,7 +59,7 @@ impl Parse for Assignment {
 impl Eval for Assignment {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
         let value = self.value.eval(context)?;
         context.add_value(self.name.clone(), value);
         Ok(())

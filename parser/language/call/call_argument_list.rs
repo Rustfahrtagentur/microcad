@@ -20,13 +20,13 @@ impl std::ops::DerefMut for CallArgumentList {
 impl Eval for CallArgumentList {
     type Output = CallArgumentValueList;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
         let mut call_argument_list = CallArgumentValueList::default();
 
         for arg in self.iter() {
             call_argument_list
                 .push(arg.eval(context)?)
-                .map_err(Error::DuplicateCallArgument)?;
+                .map_err(EvalError::DuplicateCallArgument)?;
         }
 
         Ok(call_argument_list)

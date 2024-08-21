@@ -129,7 +129,7 @@ impl Parse for NumberLiteral {
 impl Eval for NumberLiteral {
     type Output = Value;
 
-    fn eval(&self, _: &mut Context) -> Result<Value, Error> {
+    fn eval(&self, _: &mut Context) -> Result<Value, EvalError> {
         let v = self.value();
 
         match self.1.ty() {

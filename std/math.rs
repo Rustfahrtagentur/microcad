@@ -15,7 +15,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             match x {
                 Value::Scalar(x) | Value::Length(x) | Value::Angle(x) => Ok(Value::Scalar(x.signum())),
                 Value::Integer(x) => Ok(Value::Integer(x.signum())),
-                _ => Err(Error::InvalidArgumentType(x.ty())),
+                _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // floor(x): Floor of x
@@ -29,7 +29,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             match x {
                 Value::Scalar(x) | Value::Length(x) | Value::Angle(x) => Ok(Value::Integer(x as i64)),
                 Value::Integer(x) => Ok(Value::Integer(x)),
-                _ => Err(Error::InvalidArgumentType(x.ty())),
+                _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // to_scalar(x): Convert x to scalar
@@ -39,7 +39,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 Value::Length(x) => Ok(Value::Scalar(x)),
                 Value::Angle(x) => Ok(Value::Scalar(x)),
                 Value::Integer(x) => Ok(Value::Scalar(x as Scalar)),
-                _ => Err(Error::InvalidArgumentType(x.ty())),
+                _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // min(x,y): Minimum of x and y
@@ -49,7 +49,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 (Value::Length(x), Value::Length(y)) => Ok(Value::Length(x.min(y))),
                 (Value::Angle(x), Value::Angle(y)) => Ok(Value::Angle(x.min(y))),
                 (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x.min(y))),
-                (x,_) => Err(Error::InvalidArgumentType(x.ty())),
+                (x,_) => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // max(x,y): Maximum of x and y
@@ -59,7 +59,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 (Value::Length(x), Value::Length(y)) => Ok(Value::Length(x.max(y))),
                 (Value::Angle(x), Value::Angle(y)) => Ok(Value::Angle(x.max(y))),
                 (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x.max(y))),
-                (x,_) => Err(Error::InvalidArgumentType(x.ty())),
+                (x,_) => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // sin(x): Sine of x
@@ -72,21 +72,21 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .add_builtin_function(arg_1!(asin(x) {
             match x {
                 Value::Scalar(x) => Ok(Value::Angle(x.asin())),
-                _ => Err(Error::InvalidArgumentType(x.ty())),
+                _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // acos(x): Arccosine of x
         .add_builtin_function(arg_1!(acos(x) {
             match x {
                 Value::Scalar(x) => Ok(Value::Angle(x.acos())),
-                _ => Err(Error::InvalidArgumentType(x.ty())),
+                _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // atan(x): Arctangent of x
         .add_builtin_function(arg_1!(atan(x) {
             match x {
                 Value::Scalar(x) => Ok(Value::Angle(x.atan())),
-                _ => Err(Error::InvalidArgumentType(x.ty())),
+                _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // sqrt(x): Square root of x
@@ -109,7 +109,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 (Value::Scalar(x), Value::Integer(y)) => Ok(Value::Scalar(x.powf(y as Scalar))),
                 (Value::Length(x), Value::Integer(y)) => Ok(Value::Length(x.powf(y as Scalar))),
                 (Value::Angle(x), Value::Integer(y)) => Ok(Value::Angle(x.powf(y as Scalar))),
-                (x,_) => Err(Error::InvalidArgumentType(x.ty())),
+                (x,_) => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // length(x): Length of x
@@ -118,7 +118,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 Value::Vec2(x) => Ok(Value::Length(x.magnitude())),
                 Value::Vec3(x) => Ok(Value::Length(x.magnitude())),
                 Value::Vec4(x) => Ok(Value::Length(x.magnitude())),
-                _ => Err(Error::InvalidArgumentType(x.ty())),
+                _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // normalize(x): Normalize x

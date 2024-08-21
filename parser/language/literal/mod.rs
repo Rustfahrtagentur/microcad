@@ -63,7 +63,7 @@ impl Parse for Literal {
 impl Eval for Literal {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, EvalError> {
         match self {
             Literal::Integer(i) => Ok(Value::Integer(*i)),
             Literal::Number(n) => n.eval(context),

@@ -53,7 +53,7 @@ impl Parse for ModuleStatement {
 impl Eval for ModuleStatement {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
         match self {
             ModuleStatement::Use(use_statement) => {
                 use_statement.eval(context)?;

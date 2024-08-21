@@ -52,7 +52,7 @@ impl QualifiedName {
         &self,
         context: &Context,
         functor: &mut dyn FnMut(&Symbol, usize),
-    ) -> Result<(), Error> {
+    ) -> Result<(), EvalError> {
         self._visit_symbols(None, 0, context, functor)
     }
 
@@ -63,7 +63,7 @@ impl QualifiedName {
         index: usize,
         context: &Context,
         functor: &mut dyn FnMut(&Symbol, usize),
-    ) -> Result<(), Error> {
+    ) -> Result<(), EvalError> {
         if index >= self.0.len() {
             return Ok(());
         }
@@ -83,7 +83,7 @@ impl QualifiedName {
     }
 
     /// @brief Get all symbols for the qualified name
-    pub fn get_symbols(&self, context: &Context) -> Result<Vec<Symbol>, Error> {
+    pub fn get_symbols(&self, context: &Context) -> Result<Vec<Symbol>, EvalError> {
         let mut symbols = Vec::new();
         self.visit_symbols(context, &mut |symbol, depth| {
             // Only take symbols that match the full qualified name
@@ -93,7 +93,7 @@ impl QualifiedName {
         })?;
 
         if symbols.is_empty() {
-            return Err(Error::SymbolNotFound(self.clone()));
+            return Err(EvalError::SymbolNotFound(self.clone()));
         }
         Ok(symbols)
     }
@@ -102,7 +102,7 @@ impl QualifiedName {
 impl Eval for QualifiedName {
     type Output = Vec<Symbol>;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
         self.get_symbols(context)
     }
 }

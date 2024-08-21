@@ -1,12 +1,8 @@
 mod parameter_list;
-mod parameter_value;
-mod parameter_value_list;
-
-pub use parameter_list::*;
-pub use parameter_value::*;
-pub use parameter_value_list::*;
 
 use crate::{eval::*, language::*, ord_map::OrdMapValue, parser::*, with_pair_ok};
+
+pub use parameter_list::*;
 
 /// @brief A parameter for a function or module definition
 #[derive(Clone, Debug, Default)]
@@ -80,13 +76,13 @@ impl Parse for Parameter {
 impl Eval for Parameter {
     type Output = ParameterValue;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
         match (&self.specified_type, &self.default_value) {
             // Type and value are specified
             (Some(specified_type), Some(expr)) => {
                 let default_value = expr.eval(context)?;
                 if specified_type != &default_value.ty() {
-                    Err(Error::ParameterTypeMismatch(
+                    Err(EvalError::ParameterTypeMismatch(
                         self.name.clone(),
                         specified_type.clone(),
                         default_value.ty(),

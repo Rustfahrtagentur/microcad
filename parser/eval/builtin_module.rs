@@ -1,7 +1,7 @@
 use crate::{eval::*, language::*};
 use microcad_render::tree;
 
-pub type BuiltInModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<tree::Node, Error>;
+pub type BuiltInModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<tree::Node, EvalError>;
 
 #[derive(Clone)]
 pub struct BuiltinModule {
@@ -33,7 +33,7 @@ impl BuiltinModule {
         &self,
         args: &CallArgumentList,
         context: &mut Context,
-    ) -> Result<tree::Node, Error> {
+    ) -> Result<tree::Node, EvalError> {
         let arg_map = args
             .eval(context)?
             .get_matching_arguments(&self.parameters.eval(context)?)?;
@@ -44,7 +44,7 @@ impl BuiltinModule {
 pub trait DefineBuiltInModule {
     fn name() -> &'static str;
     fn parameters() -> ParameterList;
-    fn node(args: &ArgumentMap) -> Result<tree::Node, Error>;
+    fn node(args: &ArgumentMap) -> Result<tree::Node, EvalError>;
 
     fn function() -> &'static BuiltInModuleFn {
         &|args, ctx| Ok(ctx.append_node(Self::node(args)?))
@@ -77,7 +77,7 @@ macro_rules! builtin_module {
         )
     };
     ($name:ident($($arg:ident: $type:ident),*)) => {
-        BuiltinModule::new(
+        microcad_parser::eval::BuiltinModule::new(
             stringify!($name).into(),
             microcad_parser::parameter_list![$(microcad_parser::parameter!($arg: $type)),*],
             &|args, ctx| {

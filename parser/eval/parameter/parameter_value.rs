@@ -1,5 +1,4 @@
-use crate::language::*;
-use parameter::Error;
+use crate::{eval::*, language::*};
 
 /// @brief Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
@@ -13,7 +12,7 @@ pub enum TypeCheckResult {
     Ok,
     Tuple,
     List,
-    Err(Error),
+    Err(EvalError),
 }
 
 impl ParameterValue {
@@ -30,7 +29,7 @@ impl ParameterValue {
         } else if ty.is_list_of(&self.specified_type.clone().unwrap()) {
             TypeCheckResult::List
         } else {
-            TypeCheckResult::Err(Error::ParameterTypeMismatch(
+            TypeCheckResult::Err(EvalError::ParameterTypeMismatch(
                 self.name.clone(),
                 self.specified_type.clone().unwrap(),
                 ty.clone(),
@@ -49,14 +48,14 @@ macro_rules! parameter_value {
         }
     };
     ($name:ident: $ty:ident) => {
-        $crate::language::parameter::ParameterValue {
+        $crate::eval::ParameterValue {
             name: stringify!($name).into(),
             specified_type: Some(Type::$ty),
             default_value: None,
         }
     };
     ($name:ident: $ty:ident = $value:expr) => {
-        $crate::language::parameter::ParameterValue {
+        $crate::eval::ParameterValue {
             name: stringify!($name).into(),
             specified_type: Some(Type::$ty),
             default_value: Some(Value::$ty($value)),

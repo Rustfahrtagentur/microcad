@@ -22,7 +22,7 @@ impl Parse for FormatExpression {
 impl Eval for FormatExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, EvalError> {
         Ok(Value::String(format!("{}", self.1.eval(context)?)))
     }
 }

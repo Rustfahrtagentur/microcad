@@ -20,7 +20,7 @@ impl FunctionDefinition {
         &self,
         args: &CallArgumentList,
         context: &mut Context,
-    ) -> Result<Option<Value>, Error> {
+    ) -> Result<Option<Value>, EvalError> {
         // TODO: Check if the arguments are correct
         let params = &self.signature.parameters;
         let arg_map = args
@@ -69,7 +69,7 @@ impl Parse for FunctionDefinition {
 impl Eval for std::rc::Rc<FunctionDefinition> {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
         context.add_function(self.clone());
         Ok(())
     }

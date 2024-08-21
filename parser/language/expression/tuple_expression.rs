@@ -83,7 +83,7 @@ impl std::fmt::Display for TupleExpression {
 impl Eval for TupleExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, EvalError> {
         if self.is_unnamed() {
             // Unnamed tuple
             let mut value_list = ValueList::new();

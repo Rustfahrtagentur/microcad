@@ -2,7 +2,7 @@ use super::FunctionSignature;
 use crate::{eval::*, language::*};
 
 pub type BuiltinFunctionFunctor =
-    dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>, Error>;
+    dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>, EvalError>;
 
 #[derive(Clone)]
 pub struct BuiltinFunction {
@@ -30,7 +30,7 @@ impl BuiltinFunction {
         &self,
         args: &CallArgumentList,
         context: &mut Context,
-    ) -> Result<Option<Value>, Error> {
+    ) -> Result<Option<Value>, EvalError> {
         let arg_map = args
             .eval(context)?
             .get_matching_arguments(&self.signature.parameters.eval(context)?)?;
@@ -39,7 +39,7 @@ impl BuiltinFunction {
         match (&result, &self.signature.return_type) {
             (Some(result), Some(return_type)) => {
                 if result.ty() != *return_type {
-                    Err(Error::TypeMismatch {
+                    Err(EvalError::TypeMismatch {
                         expected: return_type.clone(),
                         found: result.ty(),
                     })
@@ -48,7 +48,7 @@ impl BuiltinFunction {
                 }
             }
             (Some(result), None) => Ok(Some(result.clone())),
-            (None, Some(_)) => Err(Error::FunctionCallMissingReturn),
+            (None, Some(_)) => Err(EvalError::FunctionCallMissingReturn),
             _ => Ok(None),
         }
     }

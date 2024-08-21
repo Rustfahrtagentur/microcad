@@ -19,7 +19,7 @@ impl Parse for Nested {
 impl Eval for Nested {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
         let root = context.current_node();
 
         let mut values = Vec::new();
@@ -29,7 +29,7 @@ impl Eval for Nested {
                     Some(value) => values.push(value),
                     None => {
                         if index != 0 {
-                            return Err(Error::CannotNestFunctionCall);
+                            return Err(EvalError::CannotNestFunctionCall);
                         } else {
                             return Ok(Value::Scalar(0.0)); // @todo This is a hack. Return a Option::None here
                         }
@@ -68,7 +68,7 @@ impl Eval for Nested {
                     context.set_current_node(nested);
                 }
                 _ => {
-                    return Err(Error::CannotNestFunctionCall);
+                    return Err(EvalError::CannotNestFunctionCall);
                 }
             }
         }

@@ -27,7 +27,7 @@ impl Parse for Document {
 impl Eval for Document {
     type Output = tree::Node;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
         let node = tree::root();
         context.set_current_node(node.clone());
         for statement in &self.body {

@@ -1,16 +1,9 @@
-mod argument_map;
 mod call_argument;
-#[macro_use]
-mod call_argument_value;
 mod call_argument_list;
-mod call_argument_value_list;
 mod method_call;
 
-pub use argument_map::*;
 pub use call_argument::*;
 pub use call_argument_list::*;
-pub use call_argument_value::*;
-pub use call_argument_value_list::*;
 pub use method_call::*;
 
 use super::{identifier::*, value::*};
@@ -52,7 +45,7 @@ impl std::fmt::Display for Call {
 impl Eval for Call {
     type Output = Option<Value>;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
         let symbols = self.name.eval(context)?;
         let mut non_matching_symbols = Vec::new();
         for symbol in &symbols {
@@ -102,7 +95,7 @@ impl Eval for Call {
             }
         }
 
-        Err(Error::SymbolNotFound(self.name.clone()))
+        Err(EvalError::SymbolNotFound(self.name.clone()))
     }
 }
 

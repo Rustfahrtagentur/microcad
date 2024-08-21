@@ -59,7 +59,7 @@ impl std::fmt::Display for ListExpression {
 impl Eval for ListExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, Error> {
+    fn eval(&self, context: &mut Context) -> Result<Value, EvalError> {
         let mut value_list = ValueList::new();
         for expr in self.0.clone() {
             value_list.push(expr.eval(context)?);
@@ -70,7 +70,7 @@ impl Eval for ListExpression {
 
         match value_list.types().common_type() {
             Some(common_type) => Ok(Value::List(List(value_list, common_type))),
-            None => Err(Error::ListElementsDifferentTypes),
+            None => Err(EvalError::ListElementsDifferentTypes),
         }
     }
 }
