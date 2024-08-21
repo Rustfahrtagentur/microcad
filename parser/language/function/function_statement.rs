@@ -1,6 +1,6 @@
 use super::{FunctionBody, FunctionDefinition};
 use crate::{
-    language::{assignment::Assignment, expression::Expression, use_statement::UseStatement},
+    language::{assignment::Assignment, expression::Expression, r#use::UseStatement},
     parser::{Pair, Parse, ParseResult, Parser, Rule},
     with_pair_ok,
 };

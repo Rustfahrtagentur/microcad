@@ -2,7 +2,7 @@ use crate::{
     eval::{Context, Error, Eval, Symbols},
     language::{
         assignment::Assignment, expression::Expression, function::FunctionDefinition,
-        use_statement::UseStatement,
+        r#use::UseStatement,
     },
     parser::{Pair, Parse, ParseResult, Parser, Rule},
     with_pair_ok,

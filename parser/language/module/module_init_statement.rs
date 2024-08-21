@@ -1,7 +1,7 @@
 use crate::{
     language::{
         assignment::Assignment, expression::Expression, function::FunctionDefinition,
-        use_statement::UseStatement,
+        r#use::UseStatement,
     },
     parser::{Pair, Parse, ParseResult, Rule},
     with_pair_ok,

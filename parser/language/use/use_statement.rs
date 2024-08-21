@@ -1,16 +1,8 @@
 use strum::IntoStaticStr;
 
-use super::identifier::*;
-use crate::{eval::*, parser::*, with_pair_ok};
+use crate::{eval::*, language::identifier::*, parser::*, with_pair_ok};
 
-#[derive(Clone, Debug)]
-pub struct UseAlias(pub QualifiedName, pub Identifier);
-
-impl std::fmt::Display for UseAlias {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "use {:?} as {:?}", self.0, self.1)
-    }
-}
+use super::use_alias::UseAlias;
 
 #[derive(Clone, Debug, IntoStaticStr)]
 pub enum UseStatement {
@@ -32,19 +24,6 @@ impl std::fmt::Display for UseStatement {
             UseStatement::UseAll(names) => write!(f, "use * from {names:?}"),
             UseStatement::UseAlias(alias) => write!(f, "{}", alias),
         }
-    }
-}
-
-impl Parse for UseAlias {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let mut inner = pair.clone().into_inner();
-        with_pair_ok!(
-            UseAlias(
-                QualifiedName::parse(inner.next().unwrap())?.value().clone(),
-                Identifier::parse(inner.next().unwrap())?.value().clone(),
-            ),
-            pair
-        )
     }
 }
 

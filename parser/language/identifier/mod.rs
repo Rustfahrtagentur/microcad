@@ -9,11 +9,6 @@ use crate::{parser::*, with_pair_ok};
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Identifier(String);
 
-pub enum Visibility {
-    Private,
-    Public,
-}
-
 impl std::ops::Deref for Identifier {
     type Target = str;
 
