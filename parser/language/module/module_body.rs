@@ -1,13 +1,5 @@
-use super::ModuleInitDefinition;
-use crate::{
-    eval::{Context, Error, Eval, Symbol, SymbolTable, Symbols},
-    language::{
-        expression::Expression, identifier::Identifier, module::module_statement::ModuleStatement,
-    },
-    parser::{Pair, Parse, ParseResult, Parser, Rule},
-    with_pair_ok,
-};
-use microcad_render::tree::{self, Node};
+use crate::{eval::*, language::*, parser::*, with_pair_ok};
+use microcad_render::tree;
 
 #[derive(Clone, Debug, Default)]
 pub struct ModuleBody {
@@ -81,7 +73,7 @@ impl Parse for ModuleBody {
 }
 
 impl Eval for ModuleBody {
-    type Output = Node;
+    type Output = tree::Node;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         let node = tree::group();

@@ -1,12 +1,4 @@
-use crate::{
-    language::{
-        identifier::Identifier,
-        lang_type::Type,
-        parameter::{Parameter, ParameterList},
-    },
-    parser::{Pair, Parse, ParseResult, Rule},
-    with_pair_ok,
-};
+use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub struct FunctionSignature {

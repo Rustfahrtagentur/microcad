@@ -1,8 +1,4 @@
-use crate::{
-    language::{call::CallArgumentList, identifier::QualifiedName},
-    parser::{Pair, Parse, ParseResult},
-    with_pair_ok,
-};
+use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub struct Attribute {

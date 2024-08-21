@@ -1,9 +1,4 @@
-use super::{ListType, MapType, NamedTupleType, Ty, UnnamedTupleType};
-use crate::{
-    language::{identifier::QualifiedName, units::Unit},
-    parser::*,
-    with_pair_ok,
-};
+use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {

@@ -1,8 +1,5 @@
+use crate::{eval::*, language::*, parser::*, with_pair_ok};
 use strum::IntoStaticStr;
-
-use crate::{eval::*, language::identifier::*, parser::*, with_pair_ok};
-
-use super::use_alias::UseAlias;
 
 #[derive(Clone, Debug, IntoStaticStr)]
 pub enum UseStatement {

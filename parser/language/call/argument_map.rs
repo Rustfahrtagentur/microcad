@@ -1,4 +1,4 @@
-use super::{Identifier, Value};
+use crate::language::*;
 
 #[derive(Clone, Debug)]
 pub struct ArgumentMap(std::collections::HashMap<Identifier, Value>);

@@ -1,6 +1,5 @@
-use super::module::ModuleStatement;
-use crate::{eval::*, parser::*, with_pair_ok};
-use microcad_render::tree::{self, Node};
+use crate::{eval::*, language::*, parser::*, with_pair_ok};
+use microcad_render::tree;
 
 #[derive(Clone, Debug)]
 pub struct Document {
@@ -26,7 +25,7 @@ impl Parse for Document {
 }
 
 impl Eval for Document {
-    type Output = Node;
+    type Output = tree::Node;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output, Error> {
         let node = tree::root();

@@ -1,8 +1,4 @@
-use super::Value;
-use crate::language::{
-    identifier::Identifier,
-    lang_type::{NamedTupleType, Ty, Type},
-};
+use crate::language::*;
 
 #[macro_export]
 macro_rules! named_tuple {

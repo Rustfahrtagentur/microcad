@@ -1,13 +1,5 @@
 use super::FunctionSignature;
-use crate::{
-    eval::{Context, Error, Eval},
-    language::{
-        call::{ArgumentMap, CallArgumentList},
-        identifier::Identifier,
-        lang_type::Ty,
-        value::Value,
-    },
-};
+use crate::{eval::*, language::*};
 
 pub type BuiltinFunctionFunctor =
     dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>, Error>;

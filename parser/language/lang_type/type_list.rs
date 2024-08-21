@@ -1,4 +1,4 @@
-use super::Type;
+use crate::language::*;
 
 pub struct TypeList(Vec<Type>);
 

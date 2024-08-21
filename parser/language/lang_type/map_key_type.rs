@@ -1,4 +1,4 @@
-use super::{Type, TypeError};
+use crate::language::*;
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub enum MapKeyType {

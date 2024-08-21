@@ -1,9 +1,4 @@
-use super::{FunctionBody, FunctionDefinition};
-use crate::{
-    language::{assignment::Assignment, expression::Expression, r#use::UseStatement},
-    parser::{Pair, Parse, ParseResult, Parser, Rule},
-    with_pair_ok,
-};
+use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub enum FunctionStatement {

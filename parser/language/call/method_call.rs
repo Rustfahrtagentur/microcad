@@ -1,6 +1,4 @@
-use crate::with_pair_ok;
-
-use super::{CallArgumentList, Identifier, Pair, Parse, ParseResult};
+use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug, Default)]
 pub struct MethodCall {

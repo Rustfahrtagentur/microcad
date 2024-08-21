@@ -1,5 +1,4 @@
-use super::ValueList;
-use crate::language::lang_type::{Ty, Type};
+use crate::language::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct List(pub ValueList, pub Type);

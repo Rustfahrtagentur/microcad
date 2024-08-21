@@ -1,5 +1,4 @@
-use super::{Value, ValueError};
-use crate::language::lang_type::{MapKeyType, Ty};
+use crate::language::*;
 
 /// A value type that can be used as a key in a map
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]

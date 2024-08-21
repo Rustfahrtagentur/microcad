@@ -1,9 +1,4 @@
-use super::MapKeyType;
-use crate::{
-    language::lang_type::Type,
-    parser::{Pair, Parse, ParseResult},
-    with_pair_ok,
-};
+use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MapType(MapKeyType, Box<Type>);

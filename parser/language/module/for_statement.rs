@@ -1,10 +1,4 @@
-use crate::{
-    language::assignment::Assignment,
-    parser::{Pair, Parse, ParseResult, Parser, Rule},
-    with_pair_ok,
-};
-
-use super::ModuleBody;
+use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub struct ForStatement {

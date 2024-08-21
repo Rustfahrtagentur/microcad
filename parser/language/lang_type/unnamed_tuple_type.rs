@@ -1,8 +1,4 @@
-use super::Type;
-use crate::{
-    parser::{Pair, Parse, ParseResult},
-    with_pair_ok,
-};
+use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct UnnamedTupleType(pub Vec<Type>);

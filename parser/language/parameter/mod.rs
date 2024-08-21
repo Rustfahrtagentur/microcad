@@ -6,8 +6,7 @@ pub use parameter_list::*;
 pub use parameter_value::*;
 pub use parameter_value_list::*;
 
-use super::{expression::*, identifier::*, lang_type::*};
-use crate::{eval::*, ord_map::OrdMapValue, parser::*, with_pair_ok};
+use crate::{eval::*, language::*, ord_map::OrdMapValue, parser::*, with_pair_ok};
 
 /// @brief A parameter for a function or module definition
 #[derive(Clone, Debug, Default)]

@@ -1,10 +1,4 @@
-use super::{Attribute, ModuleBody};
-use crate::{
-    eval::{Symbol, Symbols},
-    language::{identifier::Identifier, parameter::ParameterList},
-    parser::{Pair, Parse, ParseResult, Rule},
-    with_pair_ok,
-};
+use crate::{eval::*, language::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub struct ModuleDefinition {

@@ -1,16 +1,4 @@
-use crate::{
-    eval::{Context, Error, Eval, Symbols},
-    language::{
-        call::CallArgumentList,
-        function::{FunctionBody, FunctionSignature},
-        identifier::Identifier,
-        value::Value,
-    },
-    parser::{Pair, Parse, ParseResult, Parser, Rule},
-    with_pair_ok,
-};
-
-use super::FunctionStatement;
+use crate::{eval::*, language::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub struct FunctionDefinition {

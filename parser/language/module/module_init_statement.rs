@@ -1,11 +1,4 @@
-use crate::{
-    language::{
-        assignment::Assignment, expression::Expression, function::FunctionDefinition,
-        r#use::UseStatement,
-    },
-    parser::{Pair, Parse, ParseResult, Rule},
-    with_pair_ok,
-};
+use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub enum ModuleInitStatement {

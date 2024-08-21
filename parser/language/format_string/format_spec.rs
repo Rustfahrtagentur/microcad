@@ -1,7 +1,4 @@
-use crate::{
-    parser::{Pair, Parse, ParseResult, Rule},
-    with_pair_ok,
-};
+use crate::{parser::*, with_pair_ok};
 
 #[derive(Clone, Debug, Default)]
 pub struct FormatSpec {

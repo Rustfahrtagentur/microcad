@@ -1,8 +1,5 @@
-use super::{
-    ArgumentMap, CallArgumentValue, Error, Identifier, IdentifierList, ParameterValueList,
-    TypeCheckResult, Value,
-};
-use crate::{language::lang_type::Ty, ord_map::OrdMap};
+use crate::{language::*, ord_map::OrdMap};
+use call::Error;
 use std::ops::{Deref, DerefMut};
 
 #[derive(Clone, Debug, Default)]

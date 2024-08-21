@@ -1,15 +1,7 @@
-use microcad_render::tree::Node;
+use crate::{eval::*, language::*};
+use microcad_render::tree;
 
-use crate::{
-    eval::{Context, Error, Eval},
-    language::{
-        call::{ArgumentMap, CallArgumentList},
-        identifier::Identifier,
-        parameter::ParameterList,
-    },
-};
-
-pub type BuiltInModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<Node, Error>;
+pub type BuiltInModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<tree::Node, Error>;
 
 #[derive(Clone)]
 pub struct BuiltinModule {
@@ -37,7 +29,11 @@ impl BuiltinModule {
         &self.name
     }
 
-    pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Node, Error> {
+    pub fn call(
+        &self,
+        args: &CallArgumentList,
+        context: &mut Context,
+    ) -> Result<tree::Node, Error> {
         let arg_map = args
             .eval(context)?
             .get_matching_arguments(&self.parameters.eval(context)?)?;
@@ -48,7 +44,7 @@ impl BuiltinModule {
 pub trait DefineBuiltInModule {
     fn name() -> &'static str;
     fn parameters() -> ParameterList;
-    fn node(args: &ArgumentMap) -> Result<Node, Error>;
+    fn node(args: &ArgumentMap) -> Result<tree::Node, Error>;
 
     fn function() -> &'static BuiltInModuleFn {
         &|args, ctx| Ok(ctx.append_node(Self::node(args)?))

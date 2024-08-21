@@ -1,9 +1,4 @@
-use super::Identifier;
-use crate::{
-    eval::{Context, Error, Eval, Symbol, Symbols},
-    parser::*,
-    with_pair_ok,
-};
+use crate::{eval::*, language::*, parser::*, with_pair_ok};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a.b.c`
@@ -114,12 +109,7 @@ impl Eval for QualifiedName {
 
 impl From<&str> for QualifiedName {
     fn from(value: &str) -> Self {
-        Self(
-            value
-                .split("::")
-                .map(|identifier| Identifier(identifier.to_string()))
-                .collect(),
-        )
+        Self(value.split("::").map(Identifier::from).collect())
     }
 }
 

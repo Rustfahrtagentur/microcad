@@ -1,5 +1,4 @@
-use super::{MapKeyValue, Value};
-use crate::language::lang_type::{MapKeyType, Ty, Type};
+use crate::language::*;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Map(

@@ -1,5 +1,5 @@
-use super::{Error, Identifier, Type};
-use crate::language::value::Value;
+use crate::language::*;
+use parameter::Error;
 
 /// @brief Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
@@ -49,14 +49,14 @@ macro_rules! parameter_value {
         }
     };
     ($name:ident: $ty:ident) => {
-        $crate::language::call::ParameterValue {
+        $crate::language::parameter::ParameterValue {
             name: stringify!($name).into(),
             specified_type: Some(Type::$ty),
             default_value: None,
         }
     };
     ($name:ident: $ty:ident = $value:expr) => {
-        $crate::language::call::ParameterValue {
+        $crate::language::parameter::ParameterValue {
             name: stringify!($name).into(),
             specified_type: Some(Type::$ty),
             default_value: Some(Value::$ty($value)),

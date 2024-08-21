@@ -1,11 +1,4 @@
-use crate::{
-    language::{
-        identifier::Identifier,
-        lang_type::{Type, TypeError},
-    },
-    parser::{Pair, Parse, ParseResult, Parser, Rule},
-    with_pair_ok,
-};
+use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct NamedTupleType(pub std::collections::BTreeMap<Identifier, Type>);
