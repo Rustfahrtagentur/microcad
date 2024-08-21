@@ -1,4 +1,4 @@
-use crate::language::*;
+use crate::{eval::*, language::*};
 
 /// A value type that can be used as a key in a map
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]

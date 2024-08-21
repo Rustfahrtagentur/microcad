@@ -6,8 +6,7 @@ pub use call_argument::*;
 pub use call_argument_list::*;
 pub use method_call::*;
 
-use super::{identifier::*, value::*};
-use crate::{eval::*, parser::*, with_pair_ok};
+use crate::{eval::*, language::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug, Default)]
 pub struct Call {

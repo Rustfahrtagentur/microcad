@@ -293,10 +293,7 @@ impl Parse for Expression {
 
 #[test]
 fn list_expression() {
-    use crate::{
-        eval::{Context, EvalError},
-        language::value::Value,
-    };
+    use crate::eval::*;
 
     let mut context = Context::default();
 
@@ -338,7 +335,7 @@ fn list_expression() {
 fn run_expression_test(
     expr: &str,
     context: &mut crate::eval::Context,
-    evaluator: impl FnOnce(Result<crate::language::value::Value, crate::eval::EvalError>),
+    evaluator: impl FnOnce(Result<crate::eval::Value, crate::eval::EvalError>),
 ) {
     use pest::Parser as _;
 

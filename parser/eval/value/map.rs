@@ -1,4 +1,4 @@
-use crate::language::*;
+use crate::{eval::*, language::*};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Map(

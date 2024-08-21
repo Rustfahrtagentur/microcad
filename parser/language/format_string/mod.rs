@@ -4,7 +4,7 @@ mod format_spec;
 pub use format_expression::*;
 pub use format_spec::*;
 
-use crate::{eval::*, language::*, parser::*, with_pair_ok};
+use crate::{eval::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 enum FormatStringInner {

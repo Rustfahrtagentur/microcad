@@ -12,7 +12,6 @@ pub mod module;
 pub mod parameter;
 pub mod units;
 pub mod r#use;
-pub mod value;
 
 pub use assignment::*;
 pub use call::*;
@@ -28,4 +27,3 @@ pub use module::*;
 pub use parameter::*;
 pub use r#use::*;
 pub use units::*;
-pub use value::*;

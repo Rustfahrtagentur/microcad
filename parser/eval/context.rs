@@ -76,11 +76,7 @@ impl Default for Context {
 // @todo Move this test elsewhere
 #[test]
 fn context_basic() {
-    use crate::{
-        eval::Eval,
-        language::{assignment::Assignment, value::Value},
-        parser::*,
-    };
+    use crate::{eval::*, language::*, parser::*};
 
     let mut context = Context::default();
 

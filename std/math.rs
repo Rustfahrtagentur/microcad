@@ -1,10 +1,7 @@
 use crate::{arg_1, arg_2, ModuleBuilder};
 use cgmath::InnerSpace;
 use microcad_core::Scalar;
-use microcad_parser::eval::*;
-use microcad_parser::language::lang_type::Ty;
-use microcad_parser::language::parameter::Parameter;
-use microcad_parser::language::{function::*, module::*, value::*};
+use microcad_parser::{eval::*, language::*};
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("math")

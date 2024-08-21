@@ -1,4 +1,4 @@
-use crate::language::*;
+use crate::{eval::*, language::*};
 
 #[derive(Clone, Debug)]
 pub struct ArgumentMap(std::collections::HashMap<Identifier, Value>);
@@ -33,7 +33,7 @@ impl std::ops::DerefMut for ArgumentMap {
 macro_rules! args {
     ($($name:ident: $ty:ident = $value:expr),*) => {&{
         let mut map = ArgumentMap::new();
-        $(map.insert(stringify!($name).into(), microcad_parser::language::value::Value::$ty($value));)*
+        $(map.insert(stringify!($name).into(), microcad_parser::eval::Value::$ty($value));)*
         map
     }};
     () => {
