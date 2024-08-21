@@ -4,7 +4,7 @@ use crate::{eval::*, language::*, ord_map::OrdMapValue, parser::*, r#type::*, wi
 
 pub use parameter_list::*;
 
-/// @brief A parameter for a function or module definition
+/// A parameter for a function or module definition
 #[derive(Clone, Debug, Default)]
 pub struct Parameter {
     pub name: Identifier,

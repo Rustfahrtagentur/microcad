@@ -114,10 +114,14 @@ pub trait Parse: Sized {
 }
 
 impl Parser {
-    /// @brief Helper function to parse a vector of pairs into a vector of T
-    /// @param pairs The pairs to parse
-    /// @param f The function to parse the pair into T
-    /// @return A vector of T
+    /// Helper function to parse a vector of pairs into a vector of T
+    ///
+    /// # Arguments
+    ///
+    /// - `pairs`: The pairs to parse
+    /// - `f`: The function to parse the pair into `T`
+    ///
+    /// Returns a vector of `T`
     pub fn vec<'a, T>(
         pair: Pair<'a>,
         f: impl Fn(Pair<'a>) -> ParseResult<'a, T>,

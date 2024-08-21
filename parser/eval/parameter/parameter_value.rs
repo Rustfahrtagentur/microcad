@@ -1,6 +1,6 @@
 use crate::{eval::*, language::*, r#type::*};
 
-/// @brief Parameter value is the result of evaluating a parameter
+/// Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
 pub struct ParameterValue {
     pub name: Identifier,

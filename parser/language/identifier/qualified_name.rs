@@ -47,7 +47,7 @@ impl std::fmt::Display for QualifiedName {
 }
 
 impl QualifiedName {
-    /// @brief Visit all symbols in the qualified name recursively, starting from the root
+    /// Visit all symbols in the qualified name recursively, starting from the root
     pub fn visit_symbols(
         &self,
         context: &Context,
@@ -56,7 +56,7 @@ impl QualifiedName {
         self._visit_symbols(None, 0, context, functor)
     }
 
-    /// @brief Visit all symbols in the qualified name recursively
+    /// Visit all symbols in the qualified name recursively
     fn _visit_symbols(
         &self,
         root: Option<Symbol>,
@@ -82,7 +82,7 @@ impl QualifiedName {
         Ok(())
     }
 
-    /// @brief Get all symbols for the qualified name
+    /// Get all symbols for the qualified name
     pub fn get_symbols(&self, context: &Context) -> Result<Vec<Symbol>, EvalError> {
         let mut symbols = Vec::new();
         self.visit_symbols(context, &mut |symbol, depth| {

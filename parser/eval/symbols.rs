@@ -28,8 +28,9 @@ impl Symbol {
     }
 }
 
-// @brief Symbol table
-/// @details A symbol table is a mapping of symbol
+/// Symbol table
+///
+/// A symbol table is a mapping of symbol
 #[derive(Clone, Debug, Default)]
 pub struct SymbolTable(Vec<Symbol>);
 

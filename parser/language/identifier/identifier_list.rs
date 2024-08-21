@@ -7,9 +7,10 @@ pub enum IdentifierListError {
     DuplicateIdentifier(Identifier),
 }
 
-/// @brief A list of identifiers
-/// @details Used e.g. for multiple variable declarations.
-///          Cannot contain duplicates.
+/// A list of identifiers
+///
+/// Used e.g. for multiple variable declarations.
+/// Cannot contain duplicates.
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct IdentifierList(Vec<Identifier>);
 

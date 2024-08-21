@@ -2,13 +2,13 @@ use super::{EvalError, Symbol, SymbolTable, Symbols};
 use crate::language::identifier::*;
 use microcad_render::tree;
 
-/// @brief Context for evaluation
-/// @details The context is used to store the current state of the evaluation.
+/// Context for evaluation
+///
+/// The context is used to store the current state of the evaluation.
 /// A context is essentially a stack of symbol tables
 #[derive(Debug)]
 pub struct Context {
     stack: Vec<SymbolTable>,
-    //    type_registry: HashMap<String, SyntaxNode>,
     current_node: tree::Node,
 }
 
