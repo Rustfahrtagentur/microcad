@@ -1,0 +1,12 @@
+[package]
+name = "walk_path"
+description = "Path Walker"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+anyhow = "1"
