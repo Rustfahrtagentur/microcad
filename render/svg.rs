@@ -186,7 +186,8 @@ impl<'a> Renderer2D for SvgRenderer<'a> {
                 return Ok(());
             }
             NodeInner::Geometry2D(geometry) => self.render_geometry(geometry)?,
-            _ => panic!("Node must be an algorithm but is {:?}", node),
+            NodeInner::Transform(_) => unimplemented!(),
+            NodeInner::RenderStateChange(_) => unimplemented!(),
         };
 
         Ok(())
