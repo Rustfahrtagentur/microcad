@@ -3,7 +3,6 @@ use anyhow::Result;
 pub type Child<T> = std::rc::Rc<std::cell::RefCell<WalkPath<T>>>;
 pub type Children<T> = std::collections::HashMap<std::path::PathBuf, Child<T>>;
 
-/// tree catching markdown tests into a valid rust module structure
 #[derive(Debug)]
 pub enum WalkPath<T> {
     Root(Children<T>),
@@ -24,7 +23,7 @@ impl<T> WalkPath<T> {
     }
 
     /// recursive directory scanner
-    /// returns `false` if no code was generated
+    /// returns `false` if no leafs were generated
     pub fn scan(
         &mut self,
         path: &std::path::Path,
@@ -38,11 +37,11 @@ impl<T> WalkPath<T> {
             // get file type
             if let Ok(file_type) = entry.file_type() {
                 let file_name = entry.file_name().into_string().unwrap();
-                // check if directory or Markdown file
+                // check if directory or file
                 if file_type.is_dir() && ![".", ".."].contains(&file_name.as_str()) {
                     // scan deeper
                     if self.scan(&entry.path(), extension, f)? {
-                        // generated code
+                        // found something
                         found = true;
                     }
                 } else if file_type.is_file()
@@ -51,7 +50,7 @@ impl<T> WalkPath<T> {
                 {
                     // tell cargo to watch this file
                     println!("cargo:rerun-if-changed={}", entry.path().display());
-                    // generated code
+                    // found something
                     found = true;
                 }
             }
