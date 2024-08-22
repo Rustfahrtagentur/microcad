@@ -4,6 +4,7 @@
         "microcad",
         "powf",
         "rustfmt",
+        "rustmod",
         "signum",
         "thiserror",
         "unitless",
