@@ -1,5 +1,6 @@
 [workspace]
-members = ["core", "parser", "render", "std", "tests", "builtin", "rustmod"]
+members = ["core", "parser", "render", "std", "tests", "builtin"]
+resolver = "2"
 
 [workspace.package]
 name = "microcad"
