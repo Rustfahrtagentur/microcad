@@ -150,10 +150,10 @@ A module can define a conditional statement using `if cond {} else {}`:
 use * from geo3d;
 
 module example(size: length) {
-    if self.size > 40mm {
-        sphere(d = self.size);
+    if size > 40mm {
+        sphere(d = size);
     } else {
-        cube(self.size);
+        cube(size);
     }
 }
 ```
