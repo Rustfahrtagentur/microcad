@@ -89,8 +89,9 @@ impl Eval for Call {
             return Ok(None);
         } else {
             println!("No matching symbol found for `{}`. Candidates:", self.name);
-            for symbol in non_matching_symbols {
-                println!("\t{} => {:#?}", symbol.name(), symbol);
+            for symbol in &non_matching_symbols {
+                let s: &'static str = symbol.into();
+                println!("\t{} => {}", symbol.name(), s);
             }
         }
 
