@@ -1,5 +1,14 @@
 [workspace]
-members = ["core", "parser", "render", "std", "tests", "builtin", "rustmod"]
+members = [
+    "core",
+    "parser",
+    "render",
+    "std",
+    "tests",
+    "builtin",
+    "rustmod",
+    "thirdparty/manifold-rs",
+]
 
 [workspace.package]
 name = "microcad"
