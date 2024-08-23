@@ -1,24 +1,7 @@
 #pragma once
 
 #include "rust/cxx.h"
-#include <memory>
-
-#ifdef MANIFOLD_RS_STATIC_DEFINE
-#define MANIFOLD_RS_EXPORT
-#define MANIFOLD_RS_NO_EXPORT
-#else
-#ifndef MANIFOLD_RS_LIBRARY
-/* We are building this library */
-#define MANIFOLD_RS_EXPORT __declspec(dllimport)
-#else
-/* We are using this library */
-#define MANIFOLD_RS_EXPORT __declspec(dllexport)
-#endif
-
-#ifndef MANIFOLD_RS_NO_EXPORT
-#define MANIFOLD_RS_NO_EXPORT
-#endif
-#endif
+#include <memory
 
 namespace manifold
 {
