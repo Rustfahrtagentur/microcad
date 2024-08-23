@@ -1,7 +1,6 @@
 #include "manifold_rs.h"
 
 #include "manifold.h"
-// #include "meshIO.h"
 
 namespace manifold_rs
 {
@@ -30,10 +29,33 @@ namespace manifold_rs
         return std::make_unique<Mesh>(manifold.manifold->GetMesh());
     }
 
-    void export_mesh(const std::string &filename, const Mesh &mesh)
+    std::unique_ptr<std::vector<float>> mesh_vertices(const Mesh &mesh)
     {
-
-        //        Mesh ::manifold::Mesh::Export(filename, *mesh.mesh);
+        std::vector<float> vertices;
+        vertices.reserve(mesh.mesh->vertPos.size() * 6);
+        assert(mesh.mesh->vertPos.size() == mesh.mesh->vertNormal.size());
+        for (size_t i = 0; i < mesh.mesh->vertPos.size(); i++)
+        {
+            vertices.push_back(mesh.mesh->vertPos[i].x);
+            vertices.push_back(mesh.mesh->vertPos[i].y);
+            vertices.push_back(mesh.mesh->vertPos[i].z);
+            vertices.push_back(mesh.mesh->vertNormal[i].x);
+            vertices.push_back(mesh.mesh->vertNormal[i].y);
+            vertices.push_back(mesh.mesh->vertNormal[i].z);
+        }
+        return std::make_unique<std::vector<float>>(vertices);
     }
 
+    std::unique_ptr<std::vector<uint32_t>> mesh_indices(const Mesh &mesh)
+    {
+        std::vector<uint32_t> indices;
+        indices.reserve(mesh.mesh->triVerts.size() * 3);
+        for (size_t i = 0; i < mesh.mesh->triVerts.size(); i++)
+        {
+            indices.push_back(mesh.mesh->triVerts[i].x);
+            indices.push_back(mesh.mesh->triVerts[i].y);
+            indices.push_back(mesh.mesh->triVerts[i].z);
+        }
+        return std::make_unique<std::vector<uint32_t>>(indices);
+    }
 } // namespace manifold_rs

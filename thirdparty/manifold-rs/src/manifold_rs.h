@@ -48,5 +48,6 @@ namespace manifold_rs
 
     std::unique_ptr<Mesh> mesh_from_manifold(const Manifold &manifold);
 
-    void export_mesh(const std::string &filename, const Mesh &mesh);
+    std::unique_ptr<std::vector<float>> mesh_vertices(const Mesh &mesh);
+    std::unique_ptr<std::vector<uint32_t>> mesh_indices(const Mesh &mesh);
 }
