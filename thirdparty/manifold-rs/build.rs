@@ -13,12 +13,9 @@ fn main() {
 
     std::env::set_var("CMAKE_GENERATOR", "Ninja");
 
-    let glm = Config::new("../glm").cxxflag("/EHsc").build();
-
     let manifold = Config::new("../manifold").cxxflag("/EHsc").build();
 
-    println!("cargo:rustc-link-search={out_dir}/lib");
-    println!("cargo:rustc-link-search=native={}", glm.display());
+    println!("cargo:rustc-link-search=native={out_dir}/build/src/manifold");
     println!("cargo:rustc-link-search=native={}", manifold.display());
 
     cxx_build::bridge("src/lib.rs")
@@ -35,8 +32,4 @@ fn main() {
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=src/manifold_rs.h");
     println!("cargo:rerun-if-changed=src/manifold_rs.cpp");
-    println!("cargo:rustc-link=manifold_rs");
-
-    println!("cargo:rustc-link-lib=manifold");
-    println!("cargo:rustc-link-lib=glm");
 }

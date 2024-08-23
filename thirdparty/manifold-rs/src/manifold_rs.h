@@ -1,7 +1,7 @@
 #pragma once
 
 #include "rust/cxx.h"
-#include "manifold.h"
+#include <memory>
 
 #ifdef MANIFOLD_RS_STATIC_DEFINE
 #define MANIFOLD_RS_EXPORT
@@ -19,6 +19,13 @@
 #define MANIFOLD_RS_NO_EXPORT
 #endif
 #endif
+
+namespace manifold
+{
+    class Manifold
+    {
+    };
+} // namespace manifold
 
 namespace manifold_rs
 {
