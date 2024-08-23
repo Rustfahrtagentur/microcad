@@ -1,7 +1,7 @@
 #pragma once
 
 #include "rust/cxx.h"
-#include <memory
+#include <memory>
 
 namespace manifold
 {
