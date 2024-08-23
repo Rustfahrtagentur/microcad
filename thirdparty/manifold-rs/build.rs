@@ -11,8 +11,12 @@ fn main() {
     println!("cargo:rustc-link-search=native={}", glm.display());
 
     Config::new("../manifold")
-        .cxxflag("/EHsc")
+        .cxxflag("/EHsc") //  MSVC flag to enable exception handling
         .define("CMAKE_BUILD_TYPE", "Release")
+        .define("MANIFOLD_TEST", "OFF")
+        .define("BUILD_SHARED_LIBS", "OFF")
+        .define("MANIFOLD_CBIND", "OFF")
+        .define("MANIFOLD_EXCEPTIONS", "OFF")
         .build();
 
     println!("cargo:rustc-link-search={out_dir}/lib");
@@ -25,7 +29,6 @@ fn main() {
         .include("../manifold/src/utilities/include")
         .include(format!("{out_dir}/build/_deps/glm-src"))
         .include(format!("{out_dir}/include"))
-        .define("MANIFOLD_RS_LIBRARY", "1")
         .compile("manifold_rs");
 
     println!("cargo:rustc-link-lib=static=manifold");
