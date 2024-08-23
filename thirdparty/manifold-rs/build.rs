@@ -12,10 +12,18 @@ fn main() {
     std::env::set_var("CMAKE_PREFIX_PATH", format!("{out_dir}/build/glm"));
 
     std::env::set_var("CMAKE_GENERATOR", "Ninja");
+    std::env::set_var("CMAKE_BUILD_TYPE", "Release");
 
-    let manifold = Config::new("../manifold").cxxflag("/EHsc").build();
+    let glm = Config::new("../glm").cxxflag("/EHsc").build();
+    println!("cargo:rustc-link-search=native={}", glm.display());
 
-    println!("cargo:rustc-link-search=native={out_dir}/build/src/manifold");
+    let manifold = Config::new("../manifold")
+        .cxxflag("/EHsc")
+        .define("CMAKE_BUILD_TYPE", "Release")
+        .build();
+
+    println!("cargo:rustc-link-search={out_dir}/lib");
+    //    println!("cargo:rustc-link-search={out_dir}/build/src/polygon");
     println!("cargo:rustc-link-search=native={}", manifold.display());
 
     cxx_build::bridge("src/lib.rs")
@@ -28,6 +36,9 @@ fn main() {
         .include(format!("{out_dir}/include"))
         .define("MANIFOLD_RS_LIBRARY", "1")
         .compile("manifold_rs");
+
+    println!("cargo:rustc-link-lib=static=manifold");
+    println!("cargo:rustc-link-lib=static=polygon");
 
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=src/manifold_rs.h");

@@ -22,9 +22,7 @@
 
 namespace manifold
 {
-    class Manifold
-    {
-    };
+    class Manifold;
 } // namespace manifold
 
 namespace manifold_rs
