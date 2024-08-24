@@ -1,6 +1,6 @@
 use crate::{language::*, parser::*, with_pair_ok};
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct MethodCall {
     pub name: Identifier,
     pub argument_list: CallArgumentList,

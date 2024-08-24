@@ -36,13 +36,7 @@ impl Parse for QualifiedName {
 
 impl std::fmt::Display for QualifiedName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = self
-            .0
-            .iter()
-            .map(|ident| ident.0.clone())
-            .collect::<Vec<_>>()
-            .join("::");
-        write!(f, "{}", s)
+        write!(f, "{}", join_identifiers(&self.0, "::"))
     }
 }
 
@@ -115,11 +109,6 @@ impl From<&str> for QualifiedName {
 
 impl From<QualifiedName> for String {
     fn from(value: QualifiedName) -> Self {
-        value
-            .0
-            .iter()
-            .map(|identifier| identifier.0.clone())
-            .collect::<Vec<_>>()
-            .join("::")
+        join_identifiers(&value.0, "::")
     }
 }

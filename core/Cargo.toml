@@ -11,3 +11,4 @@ path = "lib.rs"
 [dependencies]
 log = "0.4"
 cgmath = "0.18"
+compact_str = "0.8"

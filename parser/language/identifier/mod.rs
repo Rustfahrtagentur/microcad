@@ -1,16 +1,18 @@
 mod identifier_list;
 mod qualified_name;
 
+use std::ops::Deref;
+
 pub use identifier_list::*;
 pub use qualified_name::*;
 
 use crate::{parser::*, with_pair_ok};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Identifier(String);
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct Identifier(microcad_core::Identifier);
 
-impl std::ops::Deref for Identifier {
-    type Target = str;
+impl Deref for Identifier {
+    type Target = microcad_core::Identifier;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -21,19 +23,13 @@ impl std::str::FromStr for Identifier {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self(s.to_string()))
+        Ok(Self(s.into()))
     }
 }
 
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {
-        Self(value.to_string())
-    }
-}
-
-impl From<Identifier> for String {
-    fn from(value: Identifier) -> Self {
-        Self::from(&value.0)
+        Self(value.into())
     }
 }
 
@@ -58,6 +54,14 @@ impl std::fmt::Display for Identifier {
 
 impl PartialEq<str> for Identifier {
     fn eq(&self, other: &str) -> bool {
-        self.0 == other
+        self.0 == *other
     }
+}
+
+pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
+    identifiers
+        .iter()
+        .map(|ident| ident.to_string())
+        .collect::<Vec<_>>()
+        .join(separator)
 }
