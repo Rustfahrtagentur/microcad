@@ -28,10 +28,10 @@ fn test_manifold() {
     let mesh = ffi::mesh_from_manifold(&sphere);
 
     let vertices_binding = ffi::mesh_vertices(&mesh);
-    let vertices = Box::new(vertices_binding.as_ref().unwrap().as_slice());
+    let vertices = vertices_binding.as_ref().unwrap().as_slice();
     assert!(!vertices.is_empty());
 
     let indices_binding = ffi::mesh_indices(&mesh);
-    let indices: Box<_> = Box::new(indices_binding.as_ref().unwrap().as_slice());
+    let indices = indices_binding.as_ref().unwrap().as_slice();
     assert!(!indices.is_empty());
 }
