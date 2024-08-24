@@ -1,15 +1,16 @@
 use super::*;
+use export::Exporter;
 use geo::CoordsIter;
 use geo2d::*;
 use std::io::Write;
 use tree::NodeInner;
 
-pub struct SvgWriter<'a> {
-    writer: &'a mut dyn Write,
+pub struct SvgWriter {
+    writer: Box<dyn Write>,
 }
 
-impl<'a> SvgWriter<'a> {
-    pub fn new(mut w: &'a mut dyn Write, bounds: Rect, scale: f64) -> std::io::Result<Self> {
+impl SvgWriter {
+    pub fn new(mut w: Box<dyn Write>, bounds: Rect, scale: f64) -> std::io::Result<Self> {
         writeln!(&mut w, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
             &mut w,
@@ -21,7 +22,9 @@ impl<'a> SvgWriter<'a> {
         )?;
         writeln!(&mut w, "<g transform='scale({scale})'>")?;
 
-        Ok(Self { writer: w })
+        Ok(Self {
+            writer: Box::new(w),
+        })
     }
 
     pub fn rect(&mut self, rect: &Rect, style: &str) -> std::io::Result<()> {
@@ -95,7 +98,7 @@ impl<'a> SvgWriter<'a> {
     }
 }
 
-impl<'a> Drop for SvgWriter<'a> {
+impl Drop for SvgWriter {
     fn drop(&mut self) {
         writeln!(self.writer, "</g>").unwrap();
         writeln!(self.writer, "</svg>").unwrap();
@@ -109,24 +112,22 @@ pub struct SvgRendererState {
     stroke_width: Option<Scalar>,
 }
 
-pub struct SvgRenderer<'a> {
-    writer: SvgWriter<'a>,
+pub struct SvgRenderer {
+    writer: Option<SvgWriter>,
     precision: Scalar,
-
+    scale: Scalar,
+    bounds: Rect,
     state: SvgRendererState,
 }
 
-impl<'a> SvgRenderer<'a> {
-    pub fn new(w: &'a mut dyn Write) -> std::io::Result<Self> {
-        Ok(Self {
-            writer: SvgWriter::new(
-                w,
-                geo::Rect::new(geo::Point::new(-10.0, -10.0), geo::Point::new(10.0, 10.0)),
-                1.0,
-            )?,
-            precision: 0.1,
-            state: SvgRendererState::default(),
-        })
+impl SvgRenderer {
+    pub fn set_output(&mut self, file: Box<dyn Write>) -> std::io::Result<()> {
+        self.writer = Some(SvgWriter::new(Box::new(file), self.bounds, self.scale)?);
+        Ok(())
+    }
+
+    fn writer(&mut self) -> &mut SvgWriter {
+        self.writer.as_mut().unwrap()
     }
 
     fn render_state_to_style(&self) -> String {
@@ -144,7 +145,19 @@ impl<'a> SvgRenderer<'a> {
     }
 }
 
-impl<'a> Renderer2D for SvgRenderer<'a> {
+impl Default for SvgRenderer {
+    fn default() -> Self {
+        Self {
+            writer: None,
+            precision: 0.1,
+            bounds: Rect::new(Point::new(0.0, 0.0), Point::new(100.0, 100.0)),
+            scale: 1.0,
+            state: SvgRendererState::default(),
+        }
+    }
+}
+
+impl Renderer2D for SvgRenderer {
     fn precision(&self) -> Scalar {
         self.precision
     }
@@ -162,9 +175,8 @@ impl<'a> Renderer2D for SvgRenderer<'a> {
     }
 
     fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> Result<(), Error> {
-        self.writer
-            .multi_polygon(multi_polygon, &self.render_state_to_style())
-            .unwrap();
+        let style = self.render_state_to_style();
+        self.writer().multi_polygon(multi_polygon, &style).unwrap();
         Ok(())
     }
 
@@ -194,13 +206,33 @@ impl<'a> Renderer2D for SvgRenderer<'a> {
     }
 }
 
+impl Exporter for SvgRenderer {
+    fn from_settings(settings: &export::ExportSettings) -> Result<Self, crate::Error>
+    where
+        Self: Sized,
+    {
+        let mut renderer = SvgRenderer::default();
+        let file = std::fs::File::create(&settings.filename)?;
+        renderer.set_output(Box::new(file))?;
+        Ok(renderer)
+    }
+
+    fn file_extensions(&self) -> Vec<&str> {
+        vec!["svg"]
+    }
+
+    fn export(&mut self, node: Node) -> Result<(), crate::Error> {
+        self.render_node(node)
+    }
+}
+
 #[test]
 fn svg_write() {
     // Write to file test.svg
-    let mut file = std::fs::File::create("svg_write.svg").unwrap();
+    let file = std::fs::File::create("svg_write.svg").unwrap();
 
     let mut svg = SvgWriter::new(
-        &mut file,
+        Box::new(file),
         geo::Rect::new(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0)),
         1.0,
     )

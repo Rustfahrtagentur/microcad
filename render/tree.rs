@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::{geo2d, Error, Renderable2D, Renderer2D};
+use crate::{export::ExportSettings, geo2d, Error, Renderable2D, Renderer2D};
 use microcad_core::*;
 
 pub trait Algorithm {
@@ -44,7 +44,7 @@ pub enum NodeInner {
     Transform(Transform),
 
     // An export node that exports the geometry to a file
-    Export(String),
+    Export(ExportSettings),
 }
 
 impl Debug for NodeInner {

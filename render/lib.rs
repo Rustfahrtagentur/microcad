@@ -1,14 +1,26 @@
+pub mod export;
 pub mod geo2d;
 pub mod svg;
 pub mod tree;
 
 use geo2d::Geometry;
 use microcad_core::Scalar;
+use thiserror::Error;
 use tree::Node;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Error)]
 pub enum Error {
+    #[error("Not implemented")]
     NotImplemented,
+
+    #[error("Unknown file extension to export to: {0}")]
+    UnknownFileExtension(String),
+
+    #[error("IO error: {0}")]
+    IoError(#[from] std::io::Error),
+
+    #[error("No suitable exporter found for extension: {0}")]
+    NoExporterForExtension(String),
 }
 
 pub trait RenderHash {
