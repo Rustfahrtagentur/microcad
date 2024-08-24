@@ -6,7 +6,6 @@ members = [
     "std",
     "tests",
     "builtin",
-    "rustmod",
     "thirdparty/manifold-rs",
 ]
 
