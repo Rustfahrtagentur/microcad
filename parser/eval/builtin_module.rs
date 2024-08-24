@@ -62,10 +62,19 @@ pub trait DefineBuiltInModule {
 #[macro_export]
 macro_rules! builtin_module {
     // This macro is used to create a BuiltinModule from a function
-    ($name:ident, $f:expr) => {
+    ($name:ident($($arg:ident: $type:ident),*) $f:expr) => {
         BuiltinModule::new(
             stringify!($name).into(),
-            &$f,
+            microcad_parser::parameter_list![$(microcad_parser::parameter!($arg: $type)),*],
+            &|args, ctx| {
+                let mut l = |$($arg: $type),*| $f;
+                let ($($arg),*) = (
+                    $(args.get(&stringify!($arg).into()).unwrap().clone().try_into()?),*
+                );
+                l($($arg),*)
+            }
+
+            ,
         )
     };
     // This macro is used to create a BuiltinModule from a function with no arguments
@@ -76,6 +85,7 @@ macro_rules! builtin_module {
             &|_, ctx| Ok(ctx.append_node($name())),
         )
     };
+    // This macro will create a BuiltinModule from a function with arguments
     ($name:ident($($arg:ident: $type:ident),*)) => {
         microcad_parser::eval::BuiltinModule::new(
             stringify!($name).into(),
