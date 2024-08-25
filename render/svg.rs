@@ -202,6 +202,7 @@ impl Renderer2D for SvgRenderer {
             }
             NodeInner::Geometry2D(geometry) => self.render_geometry(geometry)?,
             NodeInner::Transform(_) => unimplemented!(),
+            _ => return Err(Error::NotImplemented),
         };
 
         Ok(())

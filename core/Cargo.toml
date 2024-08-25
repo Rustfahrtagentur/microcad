@@ -8,6 +8,10 @@ version.workspace = true
 [lib]
 path = "lib.rs"
 
+[features]
+default = ["geo3d"]
+geo3d = ["dep:manifold-rs"]
+
 [dependencies]
 log = "0.4"
 cgmath = "0.18"
@@ -16,3 +20,5 @@ thiserror = "1.0"
 geo = "0.28"
 rctree = "0.6"
 toml = "0.8"
+
+manifold-rs = { path = "../thirdparty/manifold-rs", optional = true }

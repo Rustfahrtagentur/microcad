@@ -29,32 +29,32 @@ namespace manifold_rs
         return std::make_unique<Mesh>(manifold.manifold->GetMesh());
     }
 
-    std::unique_ptr<std::vector<float>> mesh_vertices(const Mesh &mesh)
+    std::unique_ptr<std::vector<float>> Mesh::vertices() const
     {
         std::vector<float> vertices;
-        vertices.reserve(mesh.mesh->vertPos.size() * 6);
-        assert(mesh.mesh->vertPos.size() == mesh.mesh->vertNormal.size());
-        for (size_t i = 0; i < mesh.mesh->vertPos.size(); i++)
+        vertices.reserve(mesh->vertPos.size() * 6);
+        assert(mesh->vertPos.size() == mesh->vertNormal.size());
+        for (size_t i = 0; i < mesh->vertPos.size(); i++)
         {
-            vertices.push_back(mesh.mesh->vertPos[i].x);
-            vertices.push_back(mesh.mesh->vertPos[i].y);
-            vertices.push_back(mesh.mesh->vertPos[i].z);
-            vertices.push_back(mesh.mesh->vertNormal[i].x);
-            vertices.push_back(mesh.mesh->vertNormal[i].y);
-            vertices.push_back(mesh.mesh->vertNormal[i].z);
+            vertices.push_back(mesh->vertPos[i].x);
+            vertices.push_back(mesh->vertPos[i].y);
+            vertices.push_back(mesh->vertPos[i].z);
+            vertices.push_back(mesh->vertNormal[i].x);
+            vertices.push_back(mesh->vertNormal[i].y);
+            vertices.push_back(mesh->vertNormal[i].z);
         }
         return std::make_unique<std::vector<float>>(vertices);
     }
 
-    std::unique_ptr<std::vector<uint32_t>> mesh_indices(const Mesh &mesh)
+    std::unique_ptr<std::vector<uint32_t>> Mesh::indices() const
     {
         std::vector<uint32_t> indices;
-        indices.reserve(mesh.mesh->triVerts.size() * 3);
-        for (size_t i = 0; i < mesh.mesh->triVerts.size(); i++)
+        indices.reserve(mesh->triVerts.size() * 3);
+        for (size_t i = 0; i < mesh->triVerts.size(); i++)
         {
-            indices.push_back(mesh.mesh->triVerts[i].x);
-            indices.push_back(mesh.mesh->triVerts[i].y);
-            indices.push_back(mesh.mesh->triVerts[i].z);
+            indices.push_back(mesh->triVerts[i].x);
+            indices.push_back(mesh->triVerts[i].y);
+            indices.push_back(mesh->triVerts[i].z);
         }
         return std::make_unique<std::vector<uint32_t>>(indices);
     }

@@ -2,6 +2,9 @@ pub mod algorithm;
 pub mod error;
 pub mod export;
 pub mod geo2d;
+#[cfg(feature = "geo3d")]
+pub mod geo3d;
+
 pub mod render;
 
 pub type Scalar = f64;

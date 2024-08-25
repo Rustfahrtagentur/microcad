@@ -1,5 +1,14 @@
 [workspace]
-members = ["core", "parser", "render", "std", "tests", "builtin"]
+default-members = ["core", "parser", "render", "std", "tests", "builtin"]
+members = [
+    "core",
+    "parser",
+    "render",
+    "std",
+    "tests",
+    "builtin",
+    "thirdparty/manifold-rs",
+]
 resolver = "2"
 
 [workspace.package]

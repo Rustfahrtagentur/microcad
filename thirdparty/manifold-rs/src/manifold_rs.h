@@ -21,6 +21,9 @@ namespace manifold_rs
         std::unique_ptr<::manifold::Manifold> manifold;
     };
 
+    std::unique_ptr<Manifold> sphere(double radius);
+    std::unique_ptr<Manifold> cube(double x_size, double y_size, double z_size);
+
     class Mesh
     {
     public:
@@ -28,26 +31,11 @@ namespace manifold_rs
         Mesh(::manifold::Mesh &&mesh);
         ~Mesh();
 
+        std::unique_ptr<std::vector<float>> vertices() const;
+        std::unique_ptr<std::vector<uint32_t>> indices() const;
+
         std::unique_ptr<::manifold::Mesh> mesh;
     };
 
-    struct Material
-    {
-        float roughness = 0.2;
-        float metalness = 1;
-    };
-
-    struct ExportOptions
-    {
-        bool faceted = true;
-        Material mat = {};
-    };
-
-    std::unique_ptr<Manifold> sphere(double radius);
-    std::unique_ptr<Manifold> cube(double x_size, double y_size, double z_size);
-
     std::unique_ptr<Mesh> mesh_from_manifold(const Manifold &manifold);
-
-    std::unique_ptr<std::vector<float>> mesh_vertices(const Mesh &mesh);
-    std::unique_ptr<std::vector<uint32_t>> mesh_indices(const Mesh &mesh);
 }

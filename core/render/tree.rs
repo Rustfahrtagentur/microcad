@@ -4,6 +4,9 @@ use crate::render::*;
 
 use crate::{export::ExportSettings, geo2d};
 
+#[cfg(feature = "geo3d")]
+use crate::geo3d;
+
 pub struct Transform {
     _mat: crate::Mat4,
 }
@@ -22,6 +25,12 @@ pub enum NodeInner {
     /// A generated geometry
     Renderable2D(Box<dyn Renderable2D>),
 
+    #[cfg(feature = "geo3d")]
+    Geometry3D(std::rc::Rc<geo3d::Geometry>),
+
+    #[cfg(feature = "geo3d")]
+    Renderable3D(Box<dyn Renderable3D>),
+
     /// An algorithm trait that manipulates the node or its children
     Algorithm(Box<dyn crate::Algorithm>),
 
@@ -39,6 +48,10 @@ impl Debug for NodeInner {
             NodeInner::Group => write!(f, "Group"),
             NodeInner::Geometry2D(_) => write!(f, "Geometry2D"),
             NodeInner::Renderable2D(_) => write!(f, "Renderable2D"),
+            #[cfg(feature = "geo3d")]
+            NodeInner::Geometry3D(_) => write!(f, "Geometry3D"),
+            #[cfg(feature = "geo3d")]
+            NodeInner::Renderable3D(_) => write!(f, "Renderable3D"),
             NodeInner::Algorithm(_) => write!(f, "Algorithm"),
             NodeInner::Transform(_) => write!(f, "Transform"),
             NodeInner::Export(_) => write!(f, "Export"),
