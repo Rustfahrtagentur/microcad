@@ -2,8 +2,8 @@ use crate::{language::*, parser::*, with_pair_ok};
 
 #[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
-    parameters: ParameterList,
-    body: Vec<ModuleInitStatement>,
+    _parameters: ParameterList,
+    _body: Vec<ModuleInitStatement>,
 }
 
 impl Parse for ModuleInitDefinition {
@@ -27,6 +27,12 @@ impl Parse for ModuleInitDefinition {
             }
         }
 
-        with_pair_ok!(ModuleInitDefinition { parameters, body }, pair)
+        with_pair_ok!(
+            ModuleInitDefinition {
+                _parameters: parameters,
+                _body: body
+            },
+            pair
+        )
     }
 }

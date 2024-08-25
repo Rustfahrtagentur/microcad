@@ -3,7 +3,6 @@ members = ["core", "parser", "render", "std", "tests", "builtin"]
 resolver = "2"
 
 [workspace.package]
-name = "microcad"
 authors = [
     "Michael Winkelmann (michael@winkelmann.site)",
     "Patrick Hoffmann (p.hoffmann@berlin.de)",
