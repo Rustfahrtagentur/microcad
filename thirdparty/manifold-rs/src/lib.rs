@@ -1,5 +1,3 @@
-use cxx::{let_cxx_string, CxxVector};
-
 #[cxx::bridge(namespace = "manifold_rs")]
 mod ffi {
     // C++ types and signatures exposed to Rust.
