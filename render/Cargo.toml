@@ -10,7 +10,6 @@ path = "lib.rs"
 
 [dependencies]
 log = "0.4"
-rctree = "0.6"
 geo = "0.28"
 cgmath = "0.18"
 strum = { version = "0.26", features = ["derive"] }

@@ -213,10 +213,14 @@ impl Exporter for SvgRenderer {
     where
         Self: Sized,
     {
-        let mut renderer = SvgRenderer::default();
-        let file = std::fs::File::create(&settings.filename)?;
-        renderer.set_output(Box::new(file))?;
-        Ok(renderer)
+        if let Some(filename) = settings.filename() {
+            let file = std::fs::File::create(filename)?;
+            let mut renderer = SvgRenderer::default();
+            renderer.set_output(Box::new(file))?;
+            Ok(renderer)
+        } else {
+            Err(Error::NoFilenameSpecifiedForExport)
+        }
     }
 
     fn file_extensions(&self) -> Vec<&str> {

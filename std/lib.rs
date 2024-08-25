@@ -121,10 +121,8 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             },
         ))
         .add_builtin_module(builtin_module!(export(filename: String) {
-            let export_settings = ExportSettings {
-                filename: filename.clone(),
-                settings: Default::default(),
-            };
+            let export_settings = ExportSettings::with_filename(filename.clone());
+
             Ok(microcad_core::export::export(export_settings))
         }))
         .build()
@@ -222,10 +220,16 @@ export("export.svg") algorithm::difference() {
     use microcad_core::export::{export_tree, ExportSettings, Exporter};
     use microcad_render::svg::SvgRenderer;
 
-    let export_factory = |file_ext: &str, settings: &ExportSettings| {
-        let exporter: Box<dyn Exporter> = match file_ext {
+    let export_factory = |settings: &ExportSettings| {
+        if settings.exporter_id().is_none() {
+            panic!("No exporter specified");
+        }
+
+        println!("Filename: {}", settings.filename().unwrap());
+
+        let exporter: Box<dyn Exporter> = match settings.exporter_id().as_ref().unwrap().as_str() {
             "svg" => Box::new(SvgRenderer::from_settings(settings)?),
-            _ => panic!("No exporter for extension: {file_ext}"),
+            id => panic!("Unknown exporter: {id}"),
         };
         Ok(exporter)
     };

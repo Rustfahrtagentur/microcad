@@ -87,6 +87,22 @@ impl Parse for FormatString {
 }
 
 #[test]
+fn simple_string() {
+    use pest::Parser as _;
+    let pair = Parser::parse(Rule::format_string, "\"Hello, World!\"")
+        .unwrap()
+        .next()
+        .unwrap();
+
+    let s = FormatString::parse(pair).unwrap();
+    assert_eq!(s.section_count(), 1);
+    let mut context = Context::default();
+    let value = s.eval(&mut context).unwrap();
+
+    assert_eq!(value, Value::String("Hello, World!".to_string()));
+}
+
+#[test]
 fn format_string() {
     use pest::Parser as _;
     let pair = Parser::parse(Rule::format_string, "\"A{2 + 4}B\"")

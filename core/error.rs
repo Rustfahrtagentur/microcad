@@ -13,4 +13,7 @@ pub enum Error {
 
     #[error("No suitable exporter found for extension: {0}")]
     NoExporterForExtension(String),
+
+    #[error("No filename specified for export")]
+    NoFilenameSpecifiedForExport,
 }
