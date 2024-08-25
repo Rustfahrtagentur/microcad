@@ -8,7 +8,7 @@ It provides the basic data structures used to handle geometries and operations o
 This module contains the rendering logic for the core crate.
 It provides the `Render` trait, which is implemented by all types that can be rendered.
 
-This specific renderers like `SvgRenderer` can be found in the `microcad_render` crate.
+Specific renderers like `SvgRenderer` can be found in the `microcad_render` crate.
 
 ## mod `geo2d`
 
