@@ -1,10 +1,10 @@
-use microcad_builtin_proc_macro::DefineBuiltInModule;
+use microcad_builtin_proc_macro::DefineBuiltInRenderable2D;
 use microcad_core::geo2d::{Geometry, LineString};
 use microcad_core::Scalar;
 use microcad_parser::{eval::*, language::*};
 use microcad_render::{RenderHash, Renderable2D};
 
-#[derive(DefineBuiltInModule)]
+#[derive(DefineBuiltInRenderable2D)]
 pub struct Circle {
     pub radius: Scalar,
 }
@@ -36,9 +36,7 @@ impl Renderable2D for Circle {
     }
 }
 
-use microcad_render::tree::{Node, NodeInner};
-
-#[derive(DefineBuiltInModule)]
+#[derive(DefineBuiltInRenderable2D)]
 struct Rect {
     width: Scalar,
     height: Scalar,
