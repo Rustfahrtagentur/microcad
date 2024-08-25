@@ -9,3 +9,13 @@ pub trait RenderHash {
         None
     }
 }
+
+pub trait Renderer {
+    // The precision of the renderer in mm
+    fn precision(&self) -> crate::Scalar;
+
+    // Change the render state
+    fn change_render_state(&mut self, _: &str, _: &str) -> crate::Result<()> {
+        Ok(())
+    }
+}

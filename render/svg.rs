@@ -158,7 +158,7 @@ impl Default for SvgRenderer {
     }
 }
 
-impl Renderer2D for SvgRenderer {
+impl Renderer for SvgRenderer {
     fn precision(&self) -> Scalar {
         self.precision
     }
@@ -174,7 +174,9 @@ impl Renderer2D for SvgRenderer {
         }
         Ok(())
     }
+}
 
+impl Renderer2D for SvgRenderer {
     fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> microcad_core::Result<()> {
         let style = self.render_state_to_style();
         self.writer().multi_polygon(multi_polygon, &style).unwrap();

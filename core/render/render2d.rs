@@ -22,14 +22,7 @@ pub trait Renderable2D: RenderHash {
     fn render_geometry(&self, renderer: &mut dyn Renderer2D) -> Result<geo2d::Geometry>;
 }
 
-pub trait Renderer2D {
-    /// Precision in mm
-    fn precision(&self) -> Scalar;
-
-    fn change_render_state(&mut self, _: &str, _: &str) -> Result<()> {
-        Ok(())
-    }
-
+pub trait Renderer2D: Renderer {
     fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> Result<()>;
 
     fn fetch_geometry(&mut self, _hash: u64) -> Option<std::rc::Rc<geo2d::Geometry>> {
