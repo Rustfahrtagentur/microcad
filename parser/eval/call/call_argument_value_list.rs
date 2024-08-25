@@ -40,7 +40,7 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut ArgumentMap,
-    ) -> Result<(), EvalError> {
+    ) -> Result<()> {
         let old_parameter_values = parameter_values.clone();
 
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
@@ -80,7 +80,7 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut ArgumentMap,
-    ) -> Result<(), EvalError> {
+    ) -> Result<()> {
         if parameter_values.is_empty() {
             return Ok(());
         }
@@ -117,7 +117,7 @@ impl CallArgumentValueList {
     pub fn get_matching_arguments(
         &self,
         parameter_values: &ParameterValueList,
-    ) -> Result<ArgumentMap, EvalError> {
+    ) -> Result<ArgumentMap> {
         let mut arg_map = ArgumentMap::new();
 
         // Check for unexpected arguments.

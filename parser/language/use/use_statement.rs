@@ -68,7 +68,7 @@ impl Parse for UseStatement {
 impl Eval for UseStatement {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         match self {
             UseStatement::UseAll(names) => {
                 for name in names {

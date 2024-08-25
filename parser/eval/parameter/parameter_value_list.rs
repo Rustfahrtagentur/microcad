@@ -19,7 +19,7 @@ impl ParameterValueList {
         }
     }
 
-    pub fn push(&mut self, parameter: ParameterValue) -> Result<(), ParseError> {
+    pub fn push(&mut self, parameter: ParameterValue) -> std::result::Result<(), ParseError> {
         if self.by_name.contains_key(&parameter.name) {
             return Err(ParseError::DuplicateParameter(parameter.name.clone()));
         }

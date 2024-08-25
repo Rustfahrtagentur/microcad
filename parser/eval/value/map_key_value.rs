@@ -1,3 +1,5 @@
+use value::error::ValueError;
+
 use crate::{eval::*, map_key_type::*};
 
 /// A value type that can be used as a key in a map
@@ -21,7 +23,7 @@ impl MapKeyValue {
 impl TryFrom<Value> for MapKeyValue {
     type Error = ValueError;
 
-    fn try_from(value: Value) -> Result<Self, Self::Error> {
+    fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
         match value {
             Value::Integer(n) => Ok(MapKeyValue::Integer(n)),
             Value::Bool(b) => Ok(MapKeyValue::Bool(b)),

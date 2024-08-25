@@ -1,23 +1,11 @@
 use std::fmt::Debug;
 
-use crate::{export::ExportSettings, geo2d, Error, Renderable2D, Renderer2D};
-use microcad_core::*;
+use crate::render::*;
 
-pub trait Algorithm {
-    fn process_2d(&self, _renderer: &mut dyn Renderer2D, _parent: Node) -> Result<Node, Error> {
-        unimplemented!()
-    }
-    /*     fn process_3d(
-        &self,
-        renderer: &dyn Renderer3D,
-        parent: Node,
-    ) -> Result<Box<dyn Renderable3D>, Error> {
-        unimplemented!()
-    }*/
-}
+use crate::{export::ExportSettings, geo2d};
 
 pub struct Transform {
-    _mat: Mat4,
+    _mat: crate::Mat4,
 }
 
 pub enum NodeInner {
@@ -34,11 +22,8 @@ pub enum NodeInner {
     /// A generated geometry
     Renderable2D(Box<dyn Renderable2D>),
 
-    /// Changes in render state, given as a key-value pairs
-    RenderStateChange(Vec<(String, String)>),
-
     /// An algorithm trait that manipulates the node or its children
-    Algorithm(Box<dyn Algorithm>),
+    Algorithm(Box<dyn crate::Algorithm>),
 
     // An affine transformation of a geometry
     Transform(Transform),
@@ -56,7 +41,6 @@ impl Debug for NodeInner {
             NodeInner::Renderable2D(_) => write!(f, "Renderable2D"),
             NodeInner::Algorithm(_) => write!(f, "Algorithm"),
             NodeInner::Transform(_) => write!(f, "Transform"),
-            NodeInner::RenderStateChange(_) => write!(f, "RenderStateChange"),
             NodeInner::Export(_) => write!(f, "Export"),
         }
     }

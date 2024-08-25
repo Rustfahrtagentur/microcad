@@ -1,3 +1,9 @@
+pub mod algorithm;
+pub mod error;
+pub mod export;
+pub mod geo2d;
+pub mod render;
+
 pub type Scalar = f64;
 pub type Vec2 = cgmath::Vector2<Scalar>;
 pub type Vec3 = cgmath::Vector3<Scalar>;
@@ -8,3 +14,9 @@ pub type Mat4 = cgmath::Matrix4<Scalar>;
 pub type Angle = cgmath::Rad<Scalar>;
 
 pub type Identifier = compact_str::CompactString;
+
+pub use algorithm::Algorithm;
+pub use error::Error;
+pub use export::{ExportSettings, Exporter};
+
+pub type Result<T> = std::result::Result<T, Error>;

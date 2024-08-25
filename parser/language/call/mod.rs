@@ -44,7 +44,7 @@ impl std::fmt::Display for Call {
 impl Eval for Call {
     type Output = Option<Value>;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let symbols = self.name.eval(context)?;
         let mut non_matching_symbols = Vec::new();
         for symbol in &symbols {

@@ -99,7 +99,7 @@ macro_rules! arg_2 {
     };
 }
 
-use microcad_render::export::ExportSettings;
+use microcad_core::ExportSettings;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("std")
@@ -125,7 +125,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 filename: filename.clone(),
                 settings: Default::default(),
             };
-            Ok(microcad_render::export::export(export_settings))
+            Ok(microcad_core::export::export(export_settings))
         }))
         .build()
 }
@@ -184,7 +184,7 @@ fn difference_svg() {
 
     let file = std::fs::File::create("difference.svg").unwrap();
     let mut renderer = SvgRenderer::default();
-    renderer.set_output(Box::new(file));
+    renderer.set_output(Box::new(file)).unwrap();
     renderer.render_node(difference).unwrap();
 }
 
@@ -219,7 +219,7 @@ export("export.svg") algorithm::difference() {
         println!("{:?}", n);
     }
 
-    use microcad_render::export::{export_tree, ExportSettings, Exporter};
+    use microcad_core::export::{export_tree, ExportSettings, Exporter};
     use microcad_render::svg::SvgRenderer;
 
     let export_factory = |file_ext: &str, settings: &ExportSettings| {

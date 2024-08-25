@@ -1,5 +1,4 @@
-use microcad_core::Scalar;
-
+use crate::Scalar;
 pub type LineString = geo::LineString<Scalar>;
 pub type Polygon = geo::Polygon<Scalar>;
 pub type MultiPolygon = geo::MultiPolygon<Scalar>;

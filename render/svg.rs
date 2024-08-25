@@ -1,7 +1,8 @@
 use super::*;
-use export::Exporter;
 use geo::CoordsIter;
-use geo2d::*;
+use microcad_core::geo2d::*;
+use microcad_core::render::Renderer2D;
+use microcad_core::*;
 use std::io::Write;
 use tree::NodeInner;
 
@@ -162,7 +163,7 @@ impl Renderer2D for SvgRenderer {
         self.precision
     }
 
-    fn change_render_state(&mut self, key: &str, value: &str) -> Result<(), Error> {
+    fn change_render_state(&mut self, key: &str, value: &str) -> microcad_core::Result<()> {
         match key {
             "fill" => self.state.fill = Some(value.to_string()),
             "stroke" => self.state.stroke = Some(value.to_string()),
@@ -174,13 +175,13 @@ impl Renderer2D for SvgRenderer {
         Ok(())
     }
 
-    fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> Result<(), Error> {
+    fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> microcad_core::Result<()> {
         let style = self.render_state_to_style();
         self.writer().multi_polygon(multi_polygon, &style).unwrap();
         Ok(())
     }
 
-    fn render_node(&mut self, node: Node) -> Result<(), Error> {
+    fn render_node(&mut self, node: Node) -> microcad_core::Result<()> {
         let inner = node.borrow();
         match &*inner {
             NodeInner::Export(_) | NodeInner::Group | NodeInner::Root => {
@@ -199,7 +200,6 @@ impl Renderer2D for SvgRenderer {
             }
             NodeInner::Geometry2D(geometry) => self.render_geometry(geometry)?,
             NodeInner::Transform(_) => unimplemented!(),
-            NodeInner::RenderStateChange(_) => unimplemented!(),
         };
 
         Ok(())
@@ -207,7 +207,7 @@ impl Renderer2D for SvgRenderer {
 }
 
 impl Exporter for SvgRenderer {
-    fn from_settings(settings: &export::ExportSettings) -> Result<Self, crate::Error>
+    fn from_settings(settings: &export::ExportSettings) -> microcad_core::Result<Self>
     where
         Self: Sized,
     {
@@ -221,7 +221,7 @@ impl Exporter for SvgRenderer {
         vec!["svg"]
     }
 
-    fn export(&mut self, node: Node) -> Result<(), crate::Error> {
+    fn export(&mut self, node: Node) -> microcad_core::Result<()> {
         self.render_node(node)
     }
 }

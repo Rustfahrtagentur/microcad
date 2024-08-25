@@ -6,19 +6,16 @@ pub enum BooleanOp {
 }
 
 use geo::MultiPolygon;
+use microcad_core::render::{Node, NodeInner, Renderable2D, Renderer2D};
+use microcad_core::{geo2d::*, Algorithm};
 use microcad_parser::eval::EvalError;
-use microcad_render::{
-    geo2d::Geometry,
-    tree::{Algorithm, Node, NodeInner},
-    Renderable2D, Renderer2D,
-};
 
 impl Algorithm for BooleanOp {
     fn process_2d(
         &self,
         renderer: &mut dyn Renderer2D,
         parent: Node,
-    ) -> Result<Node, microcad_render::Error> {
+    ) -> microcad_core::Result<Node> {
         let mut polygons = Vec::new();
 
         let mut new_nodes = Vec::new();
