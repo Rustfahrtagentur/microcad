@@ -19,7 +19,7 @@ impl Parse for Nested {
 impl Eval for Nested {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let root = context.current_node();
 
         let mut values = Vec::new();

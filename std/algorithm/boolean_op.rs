@@ -6,18 +6,16 @@ pub enum BooleanOp {
 }
 
 use geo::MultiPolygon;
-use microcad_render::{
-    geo2d::Geometry,
-    tree::{Algorithm, Node, NodeInner},
-    Renderable2D, Renderer2D,
-};
+use microcad_core::render::{Node, NodeInner, Renderable2D, Renderer2D};
+use microcad_core::{geo2d::*, Algorithm};
+use microcad_parser::eval::EvalError;
 
 impl Algorithm for BooleanOp {
     fn process_2d(
         &self,
         renderer: &mut dyn Renderer2D,
         parent: Node,
-    ) -> Result<Node, microcad_render::Error> {
+    ) -> microcad_core::Result<Node> {
         let mut polygons = Vec::new();
 
         let mut new_nodes = Vec::new();
@@ -85,18 +83,22 @@ impl Algorithm for BooleanOp {
     }
 }
 
-pub fn difference() -> Node {
-    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Difference)))
+pub fn difference() -> Result<Node, EvalError> {
+    Ok(Node::new(NodeInner::Algorithm(Box::new(
+        BooleanOp::Difference,
+    ))))
 }
 
-pub fn union() -> Node {
-    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Union)))
+pub fn union() -> Result<Node, EvalError> {
+    Ok(Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Union))))
 }
 
-pub fn intersection() -> Node {
-    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Intersection)))
+pub fn intersection() -> Result<Node, EvalError> {
+    Ok(Node::new(NodeInner::Algorithm(Box::new(
+        BooleanOp::Intersection,
+    ))))
 }
 
-pub fn xor() -> Node {
-    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Xor)))
+pub fn xor() -> Result<Node, EvalError> {
+    Ok(Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Xor))))
 }

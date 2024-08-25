@@ -1,0 +1,21 @@
+pub mod render2d;
+pub use render2d::{Renderable2D, Renderer2D};
+
+pub mod tree;
+pub use tree::{Node, NodeInner};
+
+pub trait RenderHash {
+    fn render_hash(&self) -> Option<u64> {
+        None
+    }
+}
+
+pub trait Renderer {
+    // The precision of the renderer in mm
+    fn precision(&self) -> crate::Scalar;
+
+    // Change the render state
+    fn change_render_state(&mut self, _: &str, _: &str) -> crate::Result<()> {
+        Ok(())
+    }
+}

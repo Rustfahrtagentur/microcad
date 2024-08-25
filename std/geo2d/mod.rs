@@ -1,10 +1,8 @@
 use microcad_builtin_proc_macro::DefineBuiltInModule;
+use microcad_core::geo2d::{Geometry, LineString};
 use microcad_core::Scalar;
 use microcad_parser::{eval::*, language::*};
-use microcad_render::{
-    geo2d::{Geometry, LineString},
-    RenderHash, Renderable2D,
-};
+use microcad_render::{RenderHash, Renderable2D};
 
 #[derive(DefineBuiltInModule)]
 pub struct Circle {
@@ -21,7 +19,7 @@ impl Renderable2D for Circle {
     fn render_geometry(
         &self,
         renderer: &mut dyn microcad_render::Renderer2D,
-    ) -> Result<Geometry, microcad_render::Error> {
+    ) -> microcad_core::Result<Geometry> {
         let mut points = Vec::new();
         use std::f64::consts::PI;
 
@@ -33,7 +31,7 @@ impl Renderable2D for Circle {
         }
 
         Ok(Geometry::MultiPolygon(
-            microcad_render::geo2d::line_string_to_multi_polygon(LineString::new(points)),
+            microcad_core::geo2d::line_string_to_multi_polygon(LineString::new(points)),
         ))
     }
 }
@@ -58,7 +56,7 @@ impl Renderable2D for Rect {
     fn render_geometry(
         &self,
         _renderer: &mut dyn microcad_render::Renderer2D,
-    ) -> Result<Geometry, microcad_render::Error> {
+    ) -> microcad_core::Result<Geometry> {
         use geo::line_string;
 
         // Create a rectangle from the given width, height, x and y
@@ -71,7 +69,7 @@ impl Renderable2D for Rect {
         ];
 
         Ok(Geometry::MultiPolygon(
-            microcad_render::geo2d::line_string_to_multi_polygon(line_string),
+            microcad_core::geo2d::line_string_to_multi_polygon(line_string),
         ))
     }
 }

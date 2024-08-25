@@ -41,7 +41,7 @@ impl Parse for ParameterList {
 impl Eval for ParameterList {
     type Output = ParameterValueList;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let mut values = ParameterValueList::default();
         for parameter in self.iter() {
             values.push(parameter.eval(context)?).unwrap(); // Unwrap is safe here because we know the parameter is unique

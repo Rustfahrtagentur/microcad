@@ -1,6 +1,4 @@
 use crate::{eval::*, language::*, parser::*, r#type::*, with_pair_ok};
-use microcad_core::*;
-
 #[derive(Clone, Debug, Default)]
 pub struct TupleExpression {
     args: CallArgumentList,
@@ -83,7 +81,7 @@ impl std::fmt::Display for TupleExpression {
 impl Eval for TupleExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, EvalError> {
+    fn eval(&self, context: &mut Context) -> crate::eval::Result<Value> {
         if self.is_unnamed() {
             // Unnamed tuple
             let mut value_list = ValueList::new();
@@ -111,6 +109,8 @@ impl Eval for TupleExpression {
             }
 
             let (x_ident, y_ident, z_ident) = (&"x".into(), &"y".into(), &"z".into());
+
+            use microcad_core::{Vec2, Vec3};
 
             match (map.len(), map.values().all(|v| v.ty() == Type::Length)) {
                 // Special case for Vec2: if we have exactly two lengths with names "x" and "y", we can create a Vec2

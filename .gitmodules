@@ -1,0 +1,6 @@
+[submodule "thirdparty/manifold"]
+	path = thirdparty/manifold
+	url = https://github.com/elalish/manifold/
+[submodule "thirdparty/glm"]
+	path = thirdparty/glm
+	url = https://github.com/g-truc/glm

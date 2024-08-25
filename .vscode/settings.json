@@ -14,5 +14,8 @@
         "editor.wordWrap": "off"
     },
     "editor.wordWrap": "off",
-    "errorLens.codeLensEnabled": true
+    "errorLens.codeLensEnabled": true,
+    "files.associations": {
+        "memory": "cpp"
+    }
 }

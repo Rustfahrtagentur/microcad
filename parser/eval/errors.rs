@@ -37,7 +37,7 @@ pub enum EvalError {
     EvaluateToTypeError(Type),
 
     #[error("Value error {0}")]
-    ValueError(#[from] ValueError),
+    ValueError(#[from] crate::eval::value::ValueError),
 
     #[error("Unknown qualified name: {0}")]
     UnknownQualifiedName(QualifiedName),

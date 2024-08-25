@@ -1,0 +1,20 @@
+[package]
+name = "manifold-rs"
+version = "0.1.0"
+description = "Rust wrapper for manifold"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[lib]
+name = "manifold_rs"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+
+[dependencies]
+cxx = "1.0"
+
+[build-dependencies]
+cxx-build = "1.0"
+cmake = "0.1"

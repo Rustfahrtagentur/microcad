@@ -19,7 +19,7 @@ pub struct FormatString(Vec<FormatStringInner>);
 impl std::str::FromStr for FormatString {
     type Err = anyhow::Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         Parser::parse_rule::<Self>(Rule::format_string, s)
     }
 }
@@ -53,7 +53,7 @@ impl std::fmt::Display for FormatString {
 impl Eval for FormatString {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Value> {
         let mut result = String::new();
         for elem in &self.0 {
             match elem {
@@ -84,6 +84,22 @@ impl Parse for FormatString {
 
         with_pair_ok!(fs, pair)
     }
+}
+
+#[test]
+fn simple_string() {
+    use pest::Parser as _;
+    let pair = Parser::parse(Rule::format_string, "\"Hello, World!\"")
+        .unwrap()
+        .next()
+        .unwrap();
+
+    let s = FormatString::parse(pair).unwrap();
+    assert_eq!(s.section_count(), 1);
+    let mut context = Context::default();
+    let value = s.eval(&mut context).unwrap();
+
+    assert_eq!(value, Value::String("Hello, World!".to_string()));
 }
 
 #[test]

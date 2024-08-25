@@ -59,7 +59,7 @@ impl std::fmt::Display for ListExpression {
 impl Eval for ListExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Value> {
         let mut value_list = ValueList::new();
         for expr in self.0.clone() {
             value_list.push(expr.eval(context)?);

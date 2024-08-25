@@ -75,7 +75,7 @@ impl Parse for ModuleBody {
 impl Eval for ModuleBody {
     type Output = tree::Node;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let node = tree::group();
         let current = context.current_node();
         context.set_current_node(node.clone());

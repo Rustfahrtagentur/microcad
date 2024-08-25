@@ -53,12 +53,7 @@ impl IdentifierList {
 
 impl std::fmt::Display for IdentifierList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = self
-            .iter()
-            .map(|ident| ident.0.clone())
-            .collect::<Vec<_>>()
-            .join(", ");
-        write!(f, "{}", s)
+        write!(f, "{}", join_identifiers(&self.0, ", "))
     }
 }
 

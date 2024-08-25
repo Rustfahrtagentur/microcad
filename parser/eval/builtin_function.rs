@@ -1,7 +1,6 @@
 use crate::{eval::*, language::*};
 
-pub type BuiltinFunctionFunctor =
-    dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>, EvalError>;
+pub type BuiltinFunctionFunctor = dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>>;
 
 #[derive(Clone)]
 pub struct BuiltinFunction {
@@ -25,11 +24,7 @@ impl BuiltinFunction {
         Self { name, signature, f }
     }
 
-    pub fn call(
-        &self,
-        args: &CallArgumentList,
-        context: &mut Context,
-    ) -> Result<Option<Value>, EvalError> {
+    pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
         let arg_map = args
             .eval(context)?
             .get_matching_arguments(&self.signature.parameters.eval(context)?)?;

@@ -6,7 +6,7 @@ mod named_tuple;
 mod unnamed_tuple;
 mod value_list;
 
-pub use error::*;
+pub use error::ValueError;
 pub use list::*;
 pub use map::*;
 pub use map_key_value::*;
@@ -18,6 +18,8 @@ use crate::{eval::*, language::*, r#type::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
 use microcad_render::tree::Node;
+
+pub(crate) type ValueResult = std::result::Result<Value, ValueError>;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
@@ -54,7 +56,7 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn less_than(&self, rhs: &Self) -> Result<bool, ValueError> {
+    pub fn less_than(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
         match (self, rhs) {
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs < rhs),
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs < rhs),
@@ -66,7 +68,7 @@ impl Value {
         }
     }
 
-    pub fn greater_than(&self, rhs: &Self) -> Result<bool, ValueError> {
+    pub fn greater_than(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
         match (self, rhs) {
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs > rhs),
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs > rhs),
@@ -78,15 +80,15 @@ impl Value {
         }
     }
 
-    pub fn less_than_or_equal(&self, rhs: &Self) -> Result<bool, ValueError> {
+    pub fn less_than_or_equal(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
         Ok(self.less_than(rhs)? || self.eq(rhs))
     }
 
-    pub fn greater_than_or_equal(&self, rhs: &Self) -> Result<bool, ValueError> {
+    pub fn greater_than_or_equal(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
         Ok(self.greater_than(rhs)? || self.eq(rhs))
     }
 
-    pub fn neg(&self) -> Result<Value, ValueError> {
+    pub fn neg(&self) -> ValueResult {
         match self {
             Value::Integer(n) => Ok(Value::Integer(-n)),
             Value::Scalar(n) => Ok(Value::Scalar(-n)),
@@ -99,7 +101,10 @@ impl Value {
     }
 
     /// Add a unit to a scalar value
-    pub fn add_unit_to_unitless_types(&mut self, unit: Unit) -> Result<(), ValueError> {
+    pub fn add_unit_to_unitless_types(
+        &mut self,
+        unit: Unit,
+    ) -> std::result::Result<(), ValueError> {
         match (self.clone(), unit.ty()) {
             (Value::Integer(i), Type::Length) => *self = Value::Length(unit.normalize(i as Scalar)),
             (Value::Integer(i), Type::Angle) => *self = Value::Angle(unit.normalize(i as Scalar)),
@@ -135,7 +140,7 @@ impl Ty for Value {
 
 /// Rules for operator +
 impl std::ops::Add for Value {
-    type Output = Result<Value, ValueError>;
+    type Output = ValueResult;
 
     fn add(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
@@ -172,7 +177,7 @@ impl std::ops::Add for Value {
 
 /// Rules for operator -
 impl std::ops::Sub for Value {
-    type Output = Result<Value, ValueError>;
+    type Output = ValueResult;
 
     fn sub(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
@@ -208,7 +213,7 @@ impl std::ops::Sub for Value {
 
 /// Rules for operator *
 impl std::ops::Mul for Value {
-    type Output = Result<Value, ValueError>;
+    type Output = ValueResult;
 
     fn mul(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
@@ -242,7 +247,7 @@ impl std::ops::Mul for Value {
 
 /// Rules for operator /
 impl std::ops::Div for Value {
-    type Output = Result<Value, ValueError>;
+    type Output = ValueResult;
 
     fn div(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
@@ -288,7 +293,7 @@ macro_rules! impl_try_from {
         impl TryFrom<Value> for $ty {
             type Error = ValueError;
 
-            fn try_from(value: Value) -> Result<Self, Self::Error> {
+            fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
                 match value {
                     $(Value::$variant(v) => Ok(v.into()),)*
                     value => Err(ValueError::CannotConvert(value, stringify!($ty).into())),
@@ -299,7 +304,7 @@ macro_rules! impl_try_from {
         impl TryFrom<&Value> for $ty {
             type Error = ValueError;
 
-            fn try_from(value: &Value) -> Result<Self, Self::Error> {
+            fn try_from(value: &Value) -> std::result::Result<Self, Self::Error> {
                 match value {
                     $(Value::$variant(v) => Ok(v.clone().into()),)*
                     value => Err(ValueError::CannotConvert(value.clone(), stringify!($ty).into())),

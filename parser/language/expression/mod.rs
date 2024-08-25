@@ -100,7 +100,7 @@ impl Expression {
         Self::Literal(literal)
     }
 
-    pub fn literal_from_str(s: &str) -> Result<Self, anyhow::Error> {
+    pub fn literal_from_str(s: &str) -> std::result::Result<Self, anyhow::Error> {
         use std::str::FromStr;
         if s.starts_with('"') && s.ends_with('"') {
             return Ok(Self::FormatString(FormatString::from_str(s)?));
@@ -112,7 +112,7 @@ impl Expression {
 impl Eval for Expression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Value> {
         match self {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
@@ -335,7 +335,7 @@ fn list_expression() {
 fn run_expression_test(
     expr: &str,
     context: &mut crate::eval::Context,
-    evaluator: impl FnOnce(Result<crate::eval::Value, crate::eval::EvalError>),
+    evaluator: impl FnOnce(Result<crate::eval::Value>),
 ) {
     use pest::Parser as _;
 

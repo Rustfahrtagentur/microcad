@@ -1,3 +1,5 @@
+use value::error::ValueError;
+
 use crate::{eval::*, language::*, r#type::*};
 
 #[derive(Clone, Debug, PartialEq, Default)]
@@ -22,7 +24,10 @@ impl ValueList {
         Self(Vec::new())
     }
 
-    pub fn add_unit_to_unitless_types(&mut self, unit: Unit) -> Result<(), ValueError> {
+    pub fn add_unit_to_unitless_types(
+        &mut self,
+        unit: Unit,
+    ) -> std::result::Result<(), ValueError> {
         for value in self.0.iter_mut() {
             value.add_unit_to_unitless_types(unit)?;
         }

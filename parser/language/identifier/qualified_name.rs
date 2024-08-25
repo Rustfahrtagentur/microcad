@@ -36,13 +36,7 @@ impl Parse for QualifiedName {
 
 impl std::fmt::Display for QualifiedName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = self
-            .0
-            .iter()
-            .map(|ident| ident.0.clone())
-            .collect::<Vec<_>>()
-            .join("::");
-        write!(f, "{}", s)
+        write!(f, "{}", join_identifiers(&self.0, "::"))
     }
 }
 
@@ -52,7 +46,7 @@ impl QualifiedName {
         &self,
         context: &Context,
         functor: &mut dyn FnMut(&Symbol, usize),
-    ) -> Result<(), EvalError> {
+    ) -> Result<()> {
         self._visit_symbols(None, 0, context, functor)
     }
 
@@ -63,7 +57,7 @@ impl QualifiedName {
         index: usize,
         context: &Context,
         functor: &mut dyn FnMut(&Symbol, usize),
-    ) -> Result<(), EvalError> {
+    ) -> Result<()> {
         if index >= self.0.len() {
             return Ok(());
         }
@@ -83,7 +77,7 @@ impl QualifiedName {
     }
 
     /// Get all symbols for the qualified name
-    pub fn get_symbols(&self, context: &Context) -> Result<Vec<Symbol>, EvalError> {
+    pub fn get_symbols(&self, context: &Context) -> Result<Vec<Symbol>> {
         let mut symbols = Vec::new();
         self.visit_symbols(context, &mut |symbol, depth| {
             // Only take symbols that match the full qualified name
@@ -102,7 +96,7 @@ impl QualifiedName {
 impl Eval for QualifiedName {
     type Output = Vec<Symbol>;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         self.get_symbols(context)
     }
 }
@@ -115,11 +109,6 @@ impl From<&str> for QualifiedName {
 
 impl From<QualifiedName> for String {
     fn from(value: QualifiedName) -> Self {
-        value
-            .0
-            .iter()
-            .map(|identifier| identifier.0.clone())
-            .collect::<Vec<_>>()
-            .join("::")
+        join_identifiers(&value.0, "::")
     }
 }

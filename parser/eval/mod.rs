@@ -18,9 +18,11 @@ pub use symbols::*;
 pub use ty::*;
 pub use value::*;
 
+pub type Result<T> = std::result::Result<T, EvalError>;
+
 pub trait Eval {
     type Output;
 
     /// Evaluate the type into an expression
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError>;
+    fn eval(&self, context: &mut Context) -> Result<Self::Output>;
 }

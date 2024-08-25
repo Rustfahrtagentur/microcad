@@ -20,7 +20,7 @@ impl std::ops::DerefMut for CallArgumentList {
 impl Eval for CallArgumentList {
     type Output = CallArgumentValueList;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let mut call_argument_list = CallArgumentValueList::default();
 
         for arg in self.iter() {

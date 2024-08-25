@@ -5,7 +5,6 @@ mod math;
 use microcad_parser::parameter;
 use microcad_parser::parameter_list;
 use microcad_parser::{builtin_module, eval::*, function_signature, language::*};
-use microcad_render::tree::{Node, NodeInner};
 
 pub struct ModuleBuilder {
     module: ModuleDefinition,
@@ -100,9 +99,7 @@ macro_rules! arg_2 {
     };
 }
 
-pub fn export(filename: String) -> Node {
-    Node::new(NodeInner::Export(filename))
-}
+use microcad_core::ExportSettings;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("std")
@@ -123,7 +120,11 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 Ok(None)
             },
         ))
-        .add_builtin_module(builtin_module!(export(filename: String)))
+        .add_builtin_module(builtin_module!(export(filename: String) {
+            let export_settings = ExportSettings::with_filename(filename.clone());
+
+            Ok(microcad_core::export::export(export_settings))
+        }))
         .build()
 }
 
@@ -173,15 +174,15 @@ fn difference_svg() {
     use microcad_render::svg::SvgRenderer;
     use microcad_render::Renderer2D;
 
-    let difference = algorithm::boolean_op::difference();
+    let difference = algorithm::boolean_op::difference().unwrap();
     let group = microcad_render::tree::group();
     group.append(crate::geo2d::Circle::node(args!(radius: Scalar = 4.0)).unwrap());
     group.append(crate::geo2d::Circle::node(args!(radius: Scalar = 2.0)).unwrap());
     difference.append(group);
 
-    let mut file = std::fs::File::create("difference.svg").unwrap();
-    let mut renderer = SvgRenderer::new(&mut file).unwrap();
-
+    let file = std::fs::File::create("difference.svg").unwrap();
+    let mut renderer = SvgRenderer::default();
+    renderer.set_output(Box::new(file)).unwrap();
     renderer.render_node(difference).unwrap();
 }
 
@@ -216,14 +217,24 @@ export("export.svg") algorithm::difference() {
         println!("{:?}", n);
     }
 
+    use microcad_core::export::{export_tree, ExportSettings, Exporter};
+    use microcad_render::svg::SvgRenderer;
+
+    let export_factory = |settings: &ExportSettings| {
+        if settings.exporter_id().is_none() {
+            panic!("No exporter specified");
+        }
+
+        println!("Filename: {}", settings.filename().unwrap());
+
+        let exporter: Box<dyn Exporter> = match settings.exporter_id().as_ref().unwrap().as_str() {
+            "svg" => Box::new(SvgRenderer::from_settings(settings)?),
+            id => panic!("Unknown exporter: {id}"),
+        };
+        Ok(exporter)
+    };
+
     // Iterate over all nodes and export the ones with the Export tag
     // @todo: This must be a method in the tree
-    for n in node.descendants() {
-        let inner = n.borrow();
-        if let NodeInner::Export(ref filename) = *inner {
-            let mut file = std::fs::File::create(filename).unwrap();
-            let mut renderer = microcad_render::svg::SvgRenderer::new(&mut file).unwrap();
-            microcad_render::Renderer2D::render_node(&mut renderer, n.clone()).unwrap();
-        }
-    }
+    export_tree(node, export_factory).unwrap();
 }

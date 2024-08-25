@@ -29,7 +29,7 @@ impl NumberLiteral {
 
 /// Rules for operator +
 impl std::ops::Add for NumberLiteral {
-    type Output = Result<Self, OperatorError>;
+    type Output = std::result::Result<Self, OperatorError>;
 
     fn add(self, rhs: Self) -> Self::Output {
         match (self.ty(), rhs.ty()) {
@@ -45,7 +45,7 @@ impl std::ops::Add for NumberLiteral {
 
 /// Rules for operator -
 impl std::ops::Sub for NumberLiteral {
-    type Output = Result<Self, OperatorError>;
+    type Output = std::result::Result<Self, OperatorError>;
 
     fn sub(self, rhs: Self) -> Self::Output {
         match (self.ty(), rhs.ty()) {
@@ -61,7 +61,7 @@ impl std::ops::Sub for NumberLiteral {
 
 /// Rules for operator *
 impl std::ops::Mul for NumberLiteral {
-    type Output = Result<Self, OperatorError>;
+    type Output = std::result::Result<Self, OperatorError>;
 
     fn mul(self, rhs: Self) -> Self::Output {
         match (self.ty(), rhs.ty()) {
@@ -87,7 +87,7 @@ impl std::ops::Mul for NumberLiteral {
 
 /// Rules for operator -
 impl std::ops::Div for NumberLiteral {
-    type Output = Result<Self, OperatorError>;
+    type Output = std::result::Result<Self, OperatorError>;
 
     fn div(self, rhs: Self) -> Self::Output {
         match (self.ty(), rhs.ty()) {
@@ -129,7 +129,7 @@ impl Parse for NumberLiteral {
 impl Eval for NumberLiteral {
     type Output = Value;
 
-    fn eval(&self, _: &mut Context) -> Result<Value, EvalError> {
+    fn eval(&self, _: &mut Context) -> std::result::Result<Value, EvalError> {
         let v = self.value();
 
         match self.1.ty() {
