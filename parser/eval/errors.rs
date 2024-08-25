@@ -1,4 +1,4 @@
-use crate::{eval::*, language::*, r#type::*};
+use crate::{language::*, r#type::*};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
