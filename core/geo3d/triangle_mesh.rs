@@ -7,6 +7,7 @@ pub struct Vertex {
     pub normal: Vec3,
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct Triangle<T>(pub T, pub T, pub T);
 
 impl Triangle<Vertex> {
@@ -15,6 +16,7 @@ impl Triangle<Vertex> {
     }
 }
 
+#[derive(Default, Clone)]
 pub struct TriangleMesh {
     vertices: Vec<Vertex>,
     triangle_indices: Vec<Triangle<u32>>,
@@ -36,6 +38,15 @@ impl TriangleMesh {
             ));
         }
         triangles
+    }
+
+    pub fn append(&mut self, other: &TriangleMesh) {
+        let offset = self.vertices.len() as u32;
+        self.vertices.extend_from_slice(&other.vertices);
+        for t in &other.triangle_indices {
+            self.triangle_indices
+                .push(Triangle(t.0 + offset, t.1 + offset, t.2 + offset));
+        }
     }
 }
 

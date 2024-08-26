@@ -1,10 +1,9 @@
 use super::*;
 use geo::CoordsIter;
 use microcad_core::geo2d::*;
-use microcad_core::render::Renderer2D;
+use microcad_core::render::NodeInner;
 use microcad_core::*;
 use std::io::Write;
-use tree::NodeInner;
 
 pub struct SvgWriter {
     writer: Box<dyn Write>,
@@ -190,7 +189,6 @@ impl Renderer2D for SvgRenderer {
                 for child in node.children() {
                     self.render_node(child.clone())?;
                 }
-                return Ok(());
             }
             NodeInner::Algorithm(algorithm) => {
                 let new_node = algorithm.process_2d(self, node.clone())?;
@@ -198,7 +196,6 @@ impl Renderer2D for SvgRenderer {
             }
             NodeInner::Renderable2D(renderable) => {
                 renderable.render_geometry(self)?;
-                return Ok(());
             }
             NodeInner::Geometry2D(geometry) => self.render_geometry(geometry)?,
             NodeInner::Transform(_) => unimplemented!(),
