@@ -6,7 +6,7 @@ mod ffi {
 
         type Manifold;
 
-        fn sphere(radius: f64) -> UniquePtr<Manifold>;
+        fn sphere(radius: f64, segments: u32) -> UniquePtr<Manifold>;
         fn cube(x_size: f64, y_size: f64, z_size: f64) -> UniquePtr<Manifold>;
 
         type Mesh;
@@ -20,8 +20,8 @@ mod ffi {
 pub struct Manifold(cxx::UniquePtr<ffi::Manifold>);
 
 impl Manifold {
-    pub fn sphere(radius: f64) -> Self {
-        let manifold = ffi::sphere(radius);
+    pub fn sphere(radius: f64, segments: u32) -> Self {
+        let manifold = ffi::sphere(radius, segments);
         Self(manifold)
     }
 
@@ -53,8 +53,8 @@ impl Mesh {
 }
 
 #[test]
-fn test_manifold() {
-    let sphere = ffi::sphere(1.0);
+fn test_manifold_ffi() {
+    let sphere = ffi::sphere(1.0, 32);
 
     let mesh = ffi::mesh_from_manifold(&sphere);
 

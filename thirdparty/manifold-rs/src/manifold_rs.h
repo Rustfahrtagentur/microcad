@@ -21,8 +21,12 @@ namespace manifold_rs
         std::unique_ptr<::manifold::Manifold> manifold;
     };
 
-    std::unique_ptr<Manifold> sphere(double radius);
+    std::unique_ptr<Manifold> sphere(double radius, uint32_t circular_segments);
     std::unique_ptr<Manifold> cube(double x_size, double y_size, double z_size);
+
+    std::unique_ptr<Manifold> union_(const Manifold &a, const Manifold &b);
+    std::unique_ptr<Manifold> intersection(const Manifold &a, const Manifold &b);
+    std::unique_ptr<Manifold> difference(const Manifold &a, const Manifold &b);
 
     class Mesh
     {

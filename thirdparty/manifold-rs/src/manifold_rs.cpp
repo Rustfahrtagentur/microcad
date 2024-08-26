@@ -8,14 +8,29 @@ namespace manifold_rs
     Manifold::Manifold(::manifold::Manifold &&manifold) : manifold(std::make_unique<::manifold::Manifold>(std::move(manifold))) {}
     Manifold::~Manifold() {}
 
-    std::unique_ptr<Manifold> sphere(double radius)
+    std::unique_ptr<Manifold> sphere(double radius, uint32_t circular_segments)
     {
-        return std::make_unique<Manifold>(::manifold::Manifold::Sphere(radius));
+        return std::make_unique<Manifold>(::manifold::Manifold::Sphere(radius, circular_segments));
     }
 
     std::unique_ptr<Manifold> cube(double x_size, double y_size, double z_size)
     {
         return std::make_unique<Manifold>(::manifold::Manifold::Cube({x_size, y_size, z_size}));
+    }
+
+    std::unique_ptr<Manifold> union_(const Manifold &a, const Manifold &b)
+    {
+        return std::make_unique<Manifold>(a.manifold->Boolean(*b.manifold, ::manifold::OpType::Add));
+    }
+
+    std::unique_ptr<Manifold> intersection(const Manifold &a, const Manifold &b)
+    {
+        return std::make_unique<Manifold>(a.manifold->Boolean(*b.manifold, ::manifold::OpType::Intersect));
+    }
+
+    std::unique_ptr<Manifold> difference(const Manifold &a, const Manifold &b)
+    {
+        return std::make_unique<Manifold>(a.manifold->Boolean(*b.manifold, ::manifold::OpType::Subtract));
     }
 
     Mesh::Mesh() : mesh(std::make_unique<::manifold::Mesh>()) {}
