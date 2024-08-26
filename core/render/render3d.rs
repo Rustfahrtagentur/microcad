@@ -22,7 +22,7 @@ pub trait Renderable3D: RenderHash {
 }
 
 pub trait Renderer3D: Renderer {
-    fn mesh(&mut self, mesh: &geo3d::Mesh) -> Result<()>;
+    fn mesh(&mut self, mesh: &geo3d::TriangleMesh) -> Result<()>;
 
     fn fetch_geometry(&mut self, _hash: u64) -> Option<std::rc::Rc<geo3d::Geometry>> {
         None
