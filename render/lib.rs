@@ -1,7 +1,4 @@
 #[cfg(feature = "geo3d")]
-pub mod stl;
-
-#[cfg(feature = "geo3d")]
 pub mod mesh;
 
 pub mod svg;

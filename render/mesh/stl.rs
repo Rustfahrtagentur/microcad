@@ -2,11 +2,11 @@ use std::io::Write;
 
 use microcad_core::geo3d::{Triangle, Vertex};
 
-pub struct STLWriter<'a> {
+pub struct StlWriter<'a> {
     writer: &'a mut dyn Write,
 }
 
-impl<'a> STLWriter<'a> {
+impl<'a> StlWriter<'a> {
     pub fn new(mut w: &'a mut dyn Write) -> Self {
         writeln!(&mut w, "solid").unwrap();
 
@@ -38,7 +38,7 @@ impl<'a> STLWriter<'a> {
     }
 }
 
-impl<'a> Drop for STLWriter<'a> {
+impl<'a> Drop for StlWriter<'a> {
     fn drop(&mut self) {
         writeln!(self.writer, "endsolid").unwrap();
     }

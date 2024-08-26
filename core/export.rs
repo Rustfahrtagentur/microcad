@@ -60,6 +60,7 @@ pub fn export(export_settings: ExportSettings) -> Node {
 /// The `ExporterFactory` creates a new exporter based on the file extension and the export settings
 type ExporterFactory = fn(&ExportSettings) -> Result<Box<dyn Exporter>, crate::Error>;
 
+// Iterate over all descendent nodes and export the ones with an Export tag
 pub fn export_tree(node: Node, factory: ExporterFactory) -> Result<(), crate::Error> {
     for n in node.descendants() {
         let inner = n.borrow();

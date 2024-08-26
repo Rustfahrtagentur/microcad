@@ -238,7 +238,5 @@ export("export.svg") algorithm::difference() {
         Ok(exporter)
     };
 
-    // Iterate over all nodes and export the ones with the Export tag
-    // @todo: This must be a method in the tree
     export_tree(node, export_factory).unwrap();
 }

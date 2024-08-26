@@ -28,6 +28,14 @@ impl TriangleMesh {
         self.triangle_indices.clear();
     }
 
+    pub fn vertices(&self) -> &[Vertex] {
+        &self.vertices
+    }
+
+    pub fn triangle_indices(&self) -> &Vec<Triangle<u32>> {
+        &self.triangle_indices
+    }
+
     pub fn fetch_triangles(&self) -> Vec<Triangle<Vertex>> {
         let mut triangles = Vec::with_capacity(self.triangle_indices.len());
         for t in &self.triangle_indices {
