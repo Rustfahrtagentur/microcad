@@ -1,5 +1,9 @@
 mod algorithm;
 mod geo2d;
+
+#[cfg(feature = "geo3d")]
+mod geo3d;
+
 mod math;
 
 use microcad_parser::parameter;
