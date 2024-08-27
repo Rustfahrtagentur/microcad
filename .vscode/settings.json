@@ -1,8 +1,13 @@
 {
     "cSpell.words": [
+        "CBIND",
         "cgmath",
+        "cxxflag",
+        "cxxflags",
         "microcad",
+        "MSVC",
         "powf",
+        "rustc",
         "rustfmt",
         "rustmod",
         "signum",

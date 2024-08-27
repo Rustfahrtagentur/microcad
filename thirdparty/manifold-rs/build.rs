@@ -7,11 +7,13 @@ fn main() {
     std::env::set_var("CMAKE_GENERATOR", "Ninja");
     std::env::set_var("CMAKE_BUILD_TYPE", "Release");
 
-    let glm = Config::new("../glm").cxxflag("/EHsc").build();
+    let cxxflags = if cfg!(windows) { "/EHsc" } else { "" };
+
+    let glm = Config::new("../glm").cxxflag(cxxflags).build();
     println!("cargo:rustc-link-search=native={}", glm.display());
 
     Config::new("../manifold")
-        .cxxflag("/EHsc") //  MSVC flag to enable exception handling
+        .cxxflag(cxxflags) //  MSVC flag to enable exception handling
         .define("CMAKE_BUILD_TYPE", "Release")
         .define("MANIFOLD_TEST", "OFF")
         .define("BUILD_SHARED_LIBS", "OFF")
