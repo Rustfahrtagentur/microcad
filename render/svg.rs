@@ -1,16 +1,16 @@
-use super::*;
 use geo::CoordsIter;
-use microcad_core::geo2d::*;
-use microcad_core::render::NodeInner;
-use microcad_core::*;
-use std::io::Write;
+use microcad_core::{
+    geo2d::*,
+    render::{Node, NodeInner, Renderer, Renderer2D},
+    Error, ExportSettings, Exporter, Scalar,
+};
 
 pub struct SvgWriter {
-    writer: Box<dyn Write>,
+    writer: Box<dyn std::io::Write>,
 }
 
 impl SvgWriter {
-    pub fn new(mut w: Box<dyn Write>, bounds: Rect, scale: f64) -> std::io::Result<Self> {
+    pub fn new(mut w: Box<dyn std::io::Write>, bounds: Rect, scale: f64) -> std::io::Result<Self> {
         writeln!(&mut w, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
             &mut w,
@@ -121,7 +121,7 @@ pub struct SvgRenderer {
 }
 
 impl SvgRenderer {
-    pub fn set_output(&mut self, file: Box<dyn Write>) -> std::io::Result<()> {
+    pub fn set_output(&mut self, file: Box<dyn std::io::Write>) -> std::io::Result<()> {
         self.writer = Some(SvgWriter::new(Box::new(file), self.bounds, self.scale)?);
         Ok(())
     }
@@ -176,7 +176,7 @@ impl Renderer for SvgRenderer {
 }
 
 impl Renderer2D for SvgRenderer {
-    fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> microcad_core::Result<()> {
+    fn multi_polygon(&mut self, multi_polygon: &MultiPolygon) -> microcad_core::Result<()> {
         let style = self.render_state_to_style();
         self.writer().multi_polygon(multi_polygon, &style).unwrap();
         Ok(())
@@ -207,7 +207,7 @@ impl Renderer2D for SvgRenderer {
 }
 
 impl Exporter for SvgRenderer {
-    fn from_settings(settings: &export::ExportSettings) -> microcad_core::Result<Self>
+    fn from_settings(settings: &ExportSettings) -> microcad_core::Result<Self>
     where
         Self: Sized,
     {

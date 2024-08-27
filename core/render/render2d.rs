@@ -1,6 +1,5 @@
-use crate::*;
-
 use super::*;
+use crate::*;
 
 pub trait Renderable2D: RenderHash {
     fn request_geometry(

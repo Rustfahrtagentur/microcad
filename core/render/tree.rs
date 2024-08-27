@@ -1,16 +1,10 @@
-use std::fmt::Debug;
-
-use crate::render::*;
-
-use crate::{export::ExportSettings, geo2d};
+use crate::{export::ExportSettings, geo2d, render::*, Algorithm, Transform};
+use strum::IntoStaticStr;
 
 #[cfg(feature = "geo3d")]
 use crate::geo3d;
 
-pub struct Transform {
-    _mat: crate::Mat4,
-}
-
+#[derive(IntoStaticStr)]
 pub enum NodeInner {
     // A root node that only contains children
     Root,
@@ -32,7 +26,7 @@ pub enum NodeInner {
     Renderable3D(Box<dyn Renderable3D>),
 
     /// An algorithm trait that manipulates the node or its children
-    Algorithm(Box<dyn crate::Algorithm>),
+    Algorithm(Box<dyn Algorithm>),
 
     // An affine transformation of a geometry
     Transform(Transform),
@@ -41,21 +35,10 @@ pub enum NodeInner {
     Export(ExportSettings),
 }
 
-impl Debug for NodeInner {
+impl std::fmt::Debug for NodeInner {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            NodeInner::Root => write!(f, "Root"),
-            NodeInner::Group => write!(f, "Group"),
-            NodeInner::Geometry2D(_) => write!(f, "Geometry2D"),
-            NodeInner::Renderable2D(_) => write!(f, "Renderable2D"),
-            #[cfg(feature = "geo3d")]
-            NodeInner::Geometry3D(_) => write!(f, "Geometry3D"),
-            #[cfg(feature = "geo3d")]
-            NodeInner::Renderable3D(_) => write!(f, "Renderable3D"),
-            NodeInner::Algorithm(_) => write!(f, "Algorithm"),
-            NodeInner::Transform(_) => write!(f, "Transform"),
-            NodeInner::Export(_) => write!(f, "Export"),
-        }
+        let name: &'static str = self.into();
+        write!(f, "{name}")
     }
 }
 
@@ -75,12 +58,10 @@ pub trait Depth {
 
 impl Depth for Node {
     fn depth(&self) -> usize {
-        let mut depth = 0;
-        let mut node = Some(self.clone());
-        while let Some(n) = node {
-            depth += 1;
-            node = n.parent();
+        if let Some(parent) = self.parent() {
+            parent.depth() + 1
+        } else {
+            1
         }
-        depth
     }
 }

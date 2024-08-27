@@ -63,7 +63,7 @@ impl Renderer3D for MeshRenderer {
 impl MeshRenderer {
     fn export_stl(&self, settings: &export::ExportSettings) -> microcad_core::Result<()> {
         assert!(settings.filename().is_some());
-        let file = std::fs::File::create(&settings.filename().unwrap())?;
+        let file = std::fs::File::create(settings.filename().unwrap())?;
         let mut file = std::io::BufWriter::new(file);
         let mut stl = stl::StlWriter::new(&mut file);
 

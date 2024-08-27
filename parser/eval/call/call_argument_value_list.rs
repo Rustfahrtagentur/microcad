@@ -1,10 +1,9 @@
 use crate::{eval::*, language::*, ord_map::OrdMap};
-use std::ops::{Deref, DerefMut};
 
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentValueList(OrdMap<Identifier, CallArgumentValue>);
 
-impl Deref for CallArgumentValueList {
+impl std::ops::Deref for CallArgumentValueList {
     type Target = OrdMap<Identifier, CallArgumentValue>;
 
     fn deref(&self) -> &Self::Target {
@@ -12,7 +11,7 @@ impl Deref for CallArgumentValueList {
     }
 }
 
-impl DerefMut for CallArgumentValueList {
+impl std::ops::DerefMut for CallArgumentValueList {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }

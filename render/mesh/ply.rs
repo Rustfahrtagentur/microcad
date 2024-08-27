@@ -1,13 +1,11 @@
-use std::io::Write;
-
 use microcad_core::geo3d::{Triangle, Vertex};
 
 pub struct PlyWriter<'a> {
-    writer: &'a mut dyn Write,
+    writer: &'a mut dyn std::io::Write,
 }
 
 impl<'a> PlyWriter<'a> {
-    pub fn new(mut w: &'a mut dyn Write) -> std::io::Result<Self> {
+    pub fn new(mut w: &'a mut dyn std::io::Write) -> std::io::Result<Self> {
         writeln!(&mut w, "ply")?;
         writeln!(&mut w, "format ascii 1.0")?;
         writeln!(&mut w, "comment written by rust-sdf")?;

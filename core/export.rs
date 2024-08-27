@@ -1,11 +1,9 @@
-use std::ops::Deref;
-
 use crate::{render::Node, render::NodeInner};
 
 #[derive(Debug, Default)]
 pub struct ExportSettings(toml::Table);
 
-impl Deref for ExportSettings {
+impl std::ops::Deref for ExportSettings {
     type Target = toml::Table;
 
     fn deref(&self) -> &Self::Target {

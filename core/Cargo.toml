@@ -16,6 +16,7 @@ thiserror = "1.0"
 geo = "0.28"
 rctree = "0.6"
 toml = "0.8"
+strum = "0.26"
 
 manifold-rs = { path = "../thirdparty/manifold-rs", optional = true }
 

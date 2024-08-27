@@ -1,4 +1,3 @@
-use microcad_builtin_proc_macro::DefineBuiltInRenderable3D;
 use microcad_core::*;
 use microcad_render::{RenderHash, Renderable3D};
 

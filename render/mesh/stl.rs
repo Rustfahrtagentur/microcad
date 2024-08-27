@@ -1,13 +1,11 @@
-use std::io::Write;
-
 use microcad_core::geo3d::{Triangle, Vertex};
 
 pub struct StlWriter<'a> {
-    writer: &'a mut dyn Write,
+    writer: &'a mut dyn std::io::Write,
 }
 
 impl<'a> StlWriter<'a> {
-    pub fn new(mut w: &'a mut dyn Write) -> Self {
+    pub fn new(mut w: &'a mut dyn std::io::Write) -> Self {
         writeln!(&mut w, "solid").unwrap();
 
         Self { writer: w }

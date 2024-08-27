@@ -4,8 +4,8 @@ pub mod export;
 pub mod geo2d;
 #[cfg(feature = "geo3d")]
 pub mod geo3d;
-
 pub mod render;
+pub mod transform;
 
 pub type Scalar = f64;
 pub type Vec2 = cgmath::Vector2<Scalar>;
@@ -21,5 +21,6 @@ pub type Identifier = compact_str::CompactString;
 pub use algorithm::Algorithm;
 pub use error::Error;
 pub use export::{ExportSettings, Exporter};
+pub use transform::Transform;
 
 pub type Result<T> = std::result::Result<T, Error>;

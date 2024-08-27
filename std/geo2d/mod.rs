@@ -1,6 +1,8 @@
 use microcad_builtin_proc_macro::DefineBuiltInRenderable2D;
-use microcad_core::geo2d::{Geometry, LineString};
-use microcad_core::Scalar;
+use microcad_core::{
+    geo2d::{Geometry, LineString},
+    Scalar,
+};
 use microcad_parser::{eval::*, language::*};
 use microcad_render::{RenderHash, Renderable2D};
 
@@ -20,15 +22,17 @@ impl Renderable2D for Circle {
         &self,
         renderer: &mut dyn microcad_render::Renderer2D,
     ) -> microcad_core::Result<Geometry> {
-        let mut points = Vec::new();
         use std::f64::consts::PI;
 
         let n = (self.radius / renderer.precision() * PI * 0.5).max(3.0) as u64;
 
-        for i in 0..n {
-            let angle = 2.0 * std::f64::consts::PI * (i as f64) / (n as f64);
-            points.push(geo::coord!(x: self.radius * angle.cos(), y: self.radius * angle.sin()));
-        }
+        let range = 0..n;
+        let points = range
+            .map(|i| {
+                let angle = 2.0 * PI * (i as f64) / (n as f64);
+                geo::coord!(x: self.radius * angle.cos(), y: self.radius * angle.sin())
+            })
+            .collect();
 
         Ok(Geometry::MultiPolygon(
             microcad_core::geo2d::line_string_to_multi_polygon(LineString::new(points)),

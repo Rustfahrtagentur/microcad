@@ -1,8 +1,6 @@
 mod identifier_list;
 mod qualified_name;
 
-use std::ops::Deref;
-
 pub use identifier_list::*;
 pub use qualified_name::*;
 
@@ -11,7 +9,7 @@ use crate::{parser::*, with_pair_ok};
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Identifier(microcad_core::Identifier);
 
-impl Deref for Identifier {
+impl std::ops::Deref for Identifier {
     type Target = microcad_core::Identifier;
 
     fn deref(&self) -> &Self::Target {

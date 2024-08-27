@@ -1,7 +1,7 @@
-use crate::render::Node;
-use crate::render::{Renderer2D, Renderer3D};
-
-use crate::*;
+use crate::{
+    render::{Node, Renderer2D, Renderer3D},
+    Result,
+};
 
 pub trait Algorithm {
     fn process_2d(&self, _renderer: &mut dyn Renderer2D, _parent: Node) -> Result<Node> {
