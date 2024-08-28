@@ -193,3 +193,30 @@ fn difference_svg() {
     renderer.set_output(Box::new(file)).unwrap();
     renderer.render_node(difference).unwrap();
 }
+
+#[test]
+fn difference_stl() {
+    use crate::algorithm;
+    use microcad_export::stl::StlExporter;
+    use microcad_parser::args;
+    use microcad_parser::eval::ArgumentMap;
+
+    let difference = algorithm::difference().unwrap();
+    let group = microcad_render::tree::group();
+    group.append(
+        crate::geo3d::Cube::node(
+            args!(size_x: Scalar = 4.0, size_y: Scalar = 4.0, size_z: Scalar = 4.0),
+        )
+        .unwrap(),
+    );
+    group.append(crate::geo3d::Sphere::node(args!(radius: Scalar = 2.0)).unwrap());
+    difference.append(group);
+
+    use microcad_export::Exporter;
+    let mut exporter = StlExporter::from_settings(&microcad_core::ExportSettings::with_filename(
+        "difference.stl".to_string(),
+    ))
+    .unwrap();
+
+    exporter.export(difference).unwrap();
+}

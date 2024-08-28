@@ -43,6 +43,21 @@ impl Renderer3D for MeshRenderer {
         Ok(())
     }
 
+    fn fetch_geometry(&mut self, _hash: u64) -> Option<std::rc::Rc<geo3d::Geometry>> {
+        None
+    }
+
+    fn render_geometry(&mut self, geometry: &geo3d::Geometry) -> microcad_core::Result<()> {
+        match geometry {
+            geo3d::Geometry::Mesh(mesh) => self.mesh(mesh),
+            geo3d::Geometry::Manifold(manifold) => {
+                let mesh = geo3d::TriangleMesh::from(manifold.to_mesh());
+                self.mesh(&mesh)
+            }
+            _ => unimplemented!(),
+        }
+    }
+
     fn render_node(&mut self, node: Node) -> microcad_core::Result<()> {
         let inner = node.borrow();
 
