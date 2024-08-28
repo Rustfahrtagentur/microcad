@@ -9,6 +9,10 @@ mod ffi {
         fn sphere(radius: f64, segments: u32) -> UniquePtr<Manifold>;
         fn cube(x_size: f64, y_size: f64, z_size: f64) -> UniquePtr<Manifold>;
 
+        fn union_(a: &Manifold, b: &Manifold) -> UniquePtr<Manifold>;
+        fn intersection(a: &Manifold, b: &Manifold) -> UniquePtr<Manifold>;
+        fn difference(a: &Manifold, b: &Manifold) -> UniquePtr<Manifold>;
+
         type Mesh;
 
         fn mesh_from_manifold(manifold: &Manifold) -> UniquePtr<Mesh>;
@@ -17,22 +21,49 @@ mod ffi {
     }
 }
 
+/// Manifold rust wrapper for C++ manifold object.
 pub struct Manifold(cxx::UniquePtr<ffi::Manifold>);
 
 impl Manifold {
+    /// Create a sphere manifold.
     pub fn sphere(radius: f64, segments: u32) -> Self {
         let manifold = ffi::sphere(radius, segments);
         Self(manifold)
     }
 
+    /// Create a cube manifold.
     pub fn cube(x_size: f64, y_size: f64, z_size: f64) -> Self {
         let manifold = ffi::cube(x_size, y_size, z_size);
         Self(manifold)
     }
 
+    /// Get the union of two manifolds.
+    pub fn union(&self, b: &Self) -> Self {
+        let manifold = ffi::union_(self.inner(), b.inner());
+        Self(manifold)
+    }
+
+    /// Get the intersection of two manifolds.
+    pub fn intersection(&self, b: &Self) -> Self {
+        let manifold = ffi::intersection(self.inner(), b.inner());
+        Self(manifold)
+    }
+
+    /// Get the difference of two manifolds.
+    pub fn difference(&self, b: &Self) -> Self {
+        let manifold = ffi::difference(self.inner(), b.inner());
+        Self(manifold)
+    }
+
+    /// Get the mesh representation of the manifold.
     pub fn mesh(&self) -> Mesh {
         let mesh = ffi::mesh_from_manifold(&self.0);
         Mesh(mesh)
+    }
+
+    /// Get the inner C++ manifold object.
+    fn inner(&self) -> &ffi::Manifold {
+        self.0.as_ref().unwrap()
     }
 }
 

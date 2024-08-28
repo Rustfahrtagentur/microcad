@@ -96,10 +96,13 @@ fn test_stl_export() {
     let node = microcad_render::Node::new(NodeInner::Root);
 
     use microcad_core::geo3d::*;
-    let manifold: Geometry = Manifold::cube(1.0, 1.0, 1.0).into();
+    let a = Manifold::cube(1.0, 1.0, 1.0);
+    let b = Manifold::sphere(1.0, 32);
+
+    let intersection: Geometry = a.intersection(&b).into();
 
     node.append(microcad_render::Node::new(NodeInner::Geometry3D(
-        std::rc::Rc::new(manifold.fetch_mesh().into()),
+        std::rc::Rc::new(intersection.fetch_mesh().into()),
     )));
 
     exporter.export(node).unwrap();
