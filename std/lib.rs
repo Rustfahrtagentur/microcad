@@ -11,6 +11,8 @@ use microcad_parser::parameter;
 use microcad_parser::parameter_list;
 use microcad_parser::{builtin_module, eval::*, function_signature, language::*};
 
+pub use export::export;
+
 pub struct ModuleBuilder {
     module: ModuleDefinition,
 }
@@ -111,6 +113,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         // TODO: is this correct= Shouldn't this use add_builtin_module() =
         .add_module(math::builtin_module())
         .add_module(geo2d::builtin_module())
+        .add_module(geo3d::builtin_module())
         .add_module(algorithm::builtin_module())
         .add_builtin_function(BuiltinFunction::new(
             "assert".into(),
@@ -189,38 +192,4 @@ fn difference_svg() {
     let mut renderer = SvgRenderer::default();
     renderer.set_output(Box::new(file)).unwrap();
     renderer.render_node(difference).unwrap();
-}
-
-#[test]
-fn test_export() {
-    use microcad_parser::{language::document::Document, parser};
-    let doc = match parser::Parser::parse_rule::<Document>(
-        parser::Rule::document,
-        r#"
-use * from std;
-
-export("export.svg") algorithm::difference() {
-    geo2d::circle(radius = 3.0);
-    geo2d::rect(width = 3.0, height = 2.0, x = 0.0, y = 0.0);
-};
-            "#,
-    ) {
-        Ok(doc) => doc,
-        Err(err) => panic!("ERROR: {err}"),
-    };
-
-    let mut context = Context::default();
-    context.add_module(builtin_module());
-
-    let node = doc.eval(&mut context).unwrap();
-
-    for n in node.descendants() {
-        // Indent with depth
-        for _ in 0..microcad_render::tree::Depth::depth(&n) {
-            print!("  ");
-        }
-        println!("{:?}", n);
-    }
-
-    crate::export::export(node).unwrap();
 }

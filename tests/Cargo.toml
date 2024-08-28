@@ -11,13 +11,12 @@ path = "lib.rs"
 [dependencies]
 pest = "2.7"
 pest_derive = "2.7"
-log = "0.4"
-rctree = "0.6.0"
-lazy_static = "1.5"
-cgmath = "0.18"
 thiserror = "1.0"
 anyhow = "1"
+log = "0.4"
 
+microcad-core = { path = "../core" }
+microcad-export = { path = "../export" }
 microcad-parser = { path = "../parser" }
 microcad-std = { path = "../std" }
 
