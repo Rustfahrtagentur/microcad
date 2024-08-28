@@ -206,30 +206,6 @@ impl Renderer2D for SvgRenderer {
     }
 }
 
-impl Exporter for SvgRenderer {
-    fn from_settings(settings: &ExportSettings) -> microcad_core::Result<Self>
-    where
-        Self: Sized,
-    {
-        if let Some(filename) = settings.filename() {
-            let file = std::fs::File::create(filename)?;
-            let mut renderer = SvgRenderer::default();
-            renderer.set_output(Box::new(file))?;
-            Ok(renderer)
-        } else {
-            Err(Error::NoFilenameSpecifiedForExport)
-        }
-    }
-
-    fn file_extensions(&self) -> Vec<&str> {
-        vec!["svg"]
-    }
-
-    fn export(&mut self, node: Node) -> microcad_core::Result<()> {
-        self.render_node(node)
-    }
-}
-
 #[test]
 fn svg_write() {
     // Write to file test.svg

@@ -1,6 +1,6 @@
-use std::{path::PathBuf, rc::Rc};
+use std::path::PathBuf;
 
-use microcad_core::geo3d::{Manifold, Triangle, Vertex};
+use microcad_core::geo3d::{Triangle, Vertex};
 
 pub struct StlWriter<'a> {
     writer: &'a mut dyn std::io::Write,
@@ -95,11 +95,12 @@ fn test_stl_export() {
 
     let node = microcad_render::Node::new(NodeInner::Root);
 
-    let manifold: microcad_core::geo3d::Geometry = Manifold::cube(1.0, 1.0, 1.0).into();
+    use microcad_core::geo3d::*;
+    let manifold: Geometry = Manifold::cube(1.0, 1.0, 1.0).into();
 
-    node.append(microcad_render::Node::new(NodeInner::Geometry3D(Rc::new(
-        manifold.fetch_mesh().into(),
-    ))));
+    node.append(microcad_render::Node::new(NodeInner::Geometry3D(
+        std::rc::Rc::new(manifold.fetch_mesh().into()),
+    )));
 
     exporter.export(node).unwrap();
 }

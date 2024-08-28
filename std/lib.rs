@@ -222,7 +222,6 @@ export("export.svg") algorithm::difference() {
     }
 
     use microcad_core::export::{export_tree, ExportSettings, Exporter};
-    use microcad_render::svg::SvgRenderer;
 
     let export_factory = |settings: &ExportSettings| {
         if settings.exporter_id().is_none() {
@@ -232,7 +231,7 @@ export("export.svg") algorithm::difference() {
         println!("Filename: {}", settings.filename().unwrap());
 
         let exporter: Box<dyn Exporter> = match settings.exporter_id().as_ref().unwrap().as_str() {
-            "svg" => Box::new(SvgRenderer::from_settings(settings)?),
+            "svg" => Box::new(microcad_export::svg::SvgExporter::from_settings(settings)?),
             id => panic!("Unknown exporter: {id}"),
         };
         Ok(exporter)
