@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use crate::*;
 use microcad_core::geo3d::{Triangle, Vertex};
 
 pub struct StlWriter<'a> {
@@ -48,10 +49,8 @@ pub struct StlExporter {
     filename: PathBuf,
 }
 
-impl microcad_core::Exporter for StlExporter {
-    fn from_settings(
-        settings: &microcad_core::export::ExportSettings,
-    ) -> microcad_core::Result<Self>
+impl Exporter for StlExporter {
+    fn from_settings(settings: &ExportSettings) -> microcad_core::Result<Self>
     where
         Self: Sized,
     {
@@ -86,7 +85,6 @@ impl microcad_core::Exporter for StlExporter {
 
 #[test]
 fn test_stl_export() {
-    use microcad_core::export::ExportSettings;
     use microcad_render::NodeInner;
 
     let settings = ExportSettings::with_filename("test.stl".to_string());

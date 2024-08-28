@@ -18,6 +18,9 @@ impl ExporterRegistry {
         use microcad_export::*;
         match id.unwrap().as_str() {
             "svg" => Self::make::<svg::SvgExporter>(settings),
+            "stl" => Self::make::<stl::StlExporter>(settings),
+            "ply" => Self::make::<ply::PlyExporter>(settings),
+            "yaml" => Self::make::<yaml::YamlExporter>(settings),
             id => Err(microcad_core::Error::NoSuitableExporterFound(
                 id.to_string(),
             )),
