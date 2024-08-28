@@ -2,7 +2,7 @@ use geo::CoordsIter;
 use microcad_core::{
     geo2d::*,
     render::{Node, NodeInner, Renderer, Renderer2D},
-    Error, ExportSettings, Exporter, Scalar,
+    Error, Scalar,
 };
 
 pub struct SvgWriter {

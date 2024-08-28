@@ -11,8 +11,8 @@ pub enum Error {
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
 
-    #[error("No suitable exporter found for extension: {0}")]
-    NoExporterForExtension(String),
+    #[error("No suitable exporter found for `{0}`")]
+    NoSuitableExporterFound(String),
 
     #[error("No filename specified for export")]
     NoFilenameSpecifiedForExport,

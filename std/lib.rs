@@ -1,4 +1,5 @@
 mod algorithm;
+mod export;
 mod geo2d;
 
 #[cfg(feature = "geo3d")]
@@ -221,21 +222,5 @@ export("export.svg") algorithm::difference() {
         println!("{:?}", n);
     }
 
-    use microcad_core::export::{export_tree, ExportSettings, Exporter};
-
-    let export_factory = |settings: &ExportSettings| {
-        if settings.exporter_id().is_none() {
-            panic!("No exporter specified");
-        }
-
-        println!("Filename: {}", settings.filename().unwrap());
-
-        let exporter: Box<dyn Exporter> = match settings.exporter_id().as_ref().unwrap().as_str() {
-            "svg" => Box::new(microcad_export::svg::SvgExporter::from_settings(settings)?),
-            id => panic!("Unknown exporter: {id}"),
-        };
-        Ok(exporter)
-    };
-
-    export_tree(node, export_factory).unwrap();
+    crate::export::export(node).unwrap();
 }
