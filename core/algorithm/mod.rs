@@ -5,6 +5,8 @@ use crate::{
     Result,
 };
 
+pub use boolean_op::BooleanOp;
+
 pub trait Algorithm {
     fn process_2d(&self, _renderer: &mut dyn Renderer2D, _parent: Node) -> Result<Node> {
         unimplemented!()

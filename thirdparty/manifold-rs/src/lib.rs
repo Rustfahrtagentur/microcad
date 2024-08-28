@@ -23,6 +23,12 @@ mod ffi {
     }
 }
 
+pub enum BooleanOp {
+    Union,
+    Intersection,
+    Difference,
+}
+
 /// Manifold rust wrapper for C++ manifold object.
 pub struct Manifold(cxx::UniquePtr<ffi::Manifold>);
 
@@ -57,10 +63,22 @@ impl Manifold {
         Self(manifold)
     }
 
+    pub fn boolean_op(&self, b: &Self, op: crate::BooleanOp) -> Self {
+        match op {
+            crate::BooleanOp::Union => self.union(b),
+            crate::BooleanOp::Intersection => self.intersection(b),
+            crate::BooleanOp::Difference => self.difference(b),
+        }
+    }
+
     /// Get the mesh representation of the manifold.
-    pub fn mesh(&self) -> Mesh {
+    pub fn to_mesh(&self) -> Mesh {
         let mesh = ffi::mesh_from_manifold(&self.0);
         Mesh(mesh)
+    }
+
+    pub fn from_mesh(mesh: Mesh) -> Self {
+        mesh.into()
     }
 
     /// Get the inner C++ manifold object.
@@ -98,7 +116,7 @@ impl From<Mesh> for Manifold {
 
 impl From<Manifold> for Mesh {
     fn from(manifold: Manifold) -> Self {
-        manifold.mesh()
+        manifold.to_mesh()
     }
 }
 

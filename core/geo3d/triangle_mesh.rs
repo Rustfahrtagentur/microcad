@@ -1,5 +1,5 @@
 use crate::Vec3;
-use manifold_rs::Mesh;
+use manifold_rs::{Manifold, Mesh};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Vertex {
@@ -59,6 +59,10 @@ impl TriangleMesh {
                 .map(|t| Triangle(t.0 + offset, t.1 + offset, t.2 + offset)),
         )
     }
+
+    pub fn to_manifold(&self) -> Manifold {
+        Manifold::from_mesh(self.into())
+    }
 }
 
 impl From<Mesh> for TriangleMesh {
@@ -90,5 +94,17 @@ impl From<Mesh> for TriangleMesh {
                 .map(|i| Triangle(indices[i], indices[i + 1], indices[i + 2]))
                 .collect(),
         }
+    }
+}
+
+impl From<&TriangleMesh> for Mesh {
+    fn from(mesh: &TriangleMesh) -> Self {
+        mesh.to_manifold().to_mesh()
+    }
+}
+
+impl From<Manifold> for TriangleMesh {
+    fn from(manifold: Manifold) -> Self {
+        TriangleMesh::from(manifold.to_mesh())
     }
 }
