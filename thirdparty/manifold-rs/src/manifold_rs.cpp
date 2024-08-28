@@ -39,11 +39,6 @@ namespace manifold_rs
 
     Mesh::~Mesh() {}
 
-    std::unique_ptr<Mesh> mesh_from_manifold(const Manifold &manifold)
-    {
-        return std::make_unique<Mesh>(manifold.manifold->GetMesh());
-    }
-
     std::unique_ptr<std::vector<float>> Mesh::vertices() const
     {
         std::vector<float> vertices;
@@ -73,4 +68,15 @@ namespace manifold_rs
         }
         return std::make_unique<std::vector<uint32_t>>(indices);
     }
+
+    std::unique_ptr<Mesh> mesh_from_manifold(const Manifold &manifold)
+    {
+        return std::make_unique<Mesh>(manifold.manifold->GetMesh());
+    }
+
+    std::unique_ptr<Manifold> manifold_from_mesh(const Mesh &mesh)
+    {
+        return std::make_unique<Manifold>(::manifold::Manifold(*mesh.mesh));
+    }
+
 } // namespace manifold_rs

@@ -15,9 +15,11 @@ mod ffi {
 
         type Mesh;
 
-        fn mesh_from_manifold(manifold: &Manifold) -> UniquePtr<Mesh>;
         fn vertices(self: &Mesh) -> UniquePtr<CxxVector<f32>>;
         fn indices(self: &Mesh) -> UniquePtr<CxxVector<u32>>;
+
+        fn mesh_from_manifold(manifold: &Manifold) -> UniquePtr<Mesh>;
+        fn manifold_from_mesh(mesh: &Mesh) -> UniquePtr<Manifold>;
     }
 }
 
@@ -80,6 +82,23 @@ impl Mesh {
         let indices_binding = self.0.indices();
         let indices = indices_binding.as_ref().unwrap().as_slice();
         indices.to_vec()
+    }
+
+    pub fn manifold(&self) -> Manifold {
+        let manifold = ffi::manifold_from_mesh(&self.0);
+        Manifold(manifold)
+    }
+}
+
+impl From<Mesh> for Manifold {
+    fn from(mesh: Mesh) -> Self {
+        mesh.manifold()
+    }
+}
+
+impl From<Manifold> for Mesh {
+    fn from(manifold: Manifold) -> Self {
+        manifold.mesh()
     }
 }
 

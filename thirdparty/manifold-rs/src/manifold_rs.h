@@ -42,4 +42,5 @@ namespace manifold_rs
     };
 
     std::unique_ptr<Mesh> mesh_from_manifold(const Manifold &manifold);
+    std::unique_ptr<Manifold> manifold_from_mesh(const Mesh &mesh);
 }
