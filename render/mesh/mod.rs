@@ -1,11 +1,25 @@
 use crate::*;
-use microcad_core::{export, geo3d, Error, Scalar};
+use microcad_core::{
+    geo3d::{self},
+    Error, Scalar,
+};
 
-mod ply;
-mod stl;
-struct MeshRenderer {
+pub struct MeshRenderer {
     precision: Scalar,
     triangle_mesh: geo3d::TriangleMesh,
+}
+
+impl MeshRenderer {
+    pub fn new(precision: Scalar) -> Self {
+        Self {
+            precision,
+            triangle_mesh: geo3d::TriangleMesh::default(),
+        }
+    }
+
+    pub fn triangle_mesh(&self) -> &geo3d::TriangleMesh {
+        &self.triangle_mesh
+    }
 }
 
 impl Renderer for MeshRenderer {
@@ -57,58 +71,5 @@ impl Renderer3D for MeshRenderer {
         }
 
         Ok(())
-    }
-}
-
-impl MeshRenderer {
-    fn export_stl(&self, settings: &export::ExportSettings) -> microcad_core::Result<()> {
-        assert!(settings.filename().is_some());
-        let file = std::fs::File::create(settings.filename().unwrap())?;
-        let mut file = std::io::BufWriter::new(file);
-        let mut stl = stl::StlWriter::new(&mut file);
-
-        let triangles = self.triangle_mesh.fetch_triangles();
-        for triangle in triangles {
-            stl.write_triangle(&triangle)?;
-        }
-
-        Ok(())
-    }
-
-    fn export_ply(&self, settings: &export::ExportSettings) -> microcad_core::Result<()> {
-        assert!(settings.filename().is_some());
-        let file = std::fs::File::create(settings.filename().unwrap())?;
-        let mut file = std::io::BufWriter::new(file);
-        let mut ply_writer = ply::PlyWriter::new(&mut file)?;
-
-        let mesh = &self.triangle_mesh;
-        ply_writer.header_element_vertex3d(mesh.vertices().len())?;
-        ply_writer.header_element_face(mesh.triangle_indices().len())?;
-        ply_writer.header_end()?;
-
-        ply_writer.vertices(mesh.vertices())?;
-        ply_writer.tri_faces(mesh.triangle_indices())?;
-
-        Ok(())
-    }
-}
-
-impl microcad_core::Exporter for MeshRenderer {
-    fn from_settings(_: &export::ExportSettings) -> microcad_core::Result<Self>
-    where
-        Self: Sized,
-    {
-        Ok(Self {
-            precision: 0.1,
-            triangle_mesh: geo3d::TriangleMesh::default(),
-        })
-    }
-
-    fn export(&mut self, _: Node) -> microcad_core::Result<()> {
-        todo!("Implement export for MeshRenderer")
-    }
-
-    fn file_extensions(&self) -> Vec<&str> {
-        vec!["stl", "ply"]
     }
 }

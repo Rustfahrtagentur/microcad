@@ -1,4 +1,9 @@
-use microcad_core::geo3d::{Triangle, Vertex};
+use std::path::PathBuf;
+
+use microcad_core::{
+    geo3d::{Triangle, Vertex},
+    Exporter, Scalar,
+};
 
 pub struct PlyWriter<'a> {
     writer: &'a mut dyn std::io::Write,
@@ -89,6 +94,49 @@ impl<'a> PlyWriter<'a> {
         for face in tri_faces {
             self.tri_face(face)?;
         }
+        Ok(())
+    }
+}
+
+pub struct PlyExporter {
+    filename: PathBuf,
+    precision: Scalar,
+}
+
+impl Exporter for PlyExporter {
+    fn from_settings(settings: &microcad_core::ExportSettings) -> microcad_core::Result<Self>
+    where
+        Self: Sized,
+    {
+        assert!(settings.filename().is_some());
+
+        Ok(Self {
+            filename: PathBuf::from(settings.filename().unwrap()),
+            precision: settings.render_precision(),
+        })
+    }
+
+    fn file_extensions(&self) -> Vec<&str> {
+        vec!["ply"]
+    }
+
+    fn export(&mut self, node: microcad_render::Node) -> Result<(), microcad_core::Error> {
+        let mut renderer = microcad_render::mesh::MeshRenderer::new(self.precision);
+        use microcad_render::Renderer3D;
+        renderer.render_node(node)?;
+
+        let file = std::fs::File::create(&self.filename)?;
+        let mut file = std::io::BufWriter::new(file);
+        let mut ply_writer = PlyWriter::new(&mut file)?;
+
+        let mesh = renderer.triangle_mesh();
+        ply_writer.header_element_vertex3d(mesh.vertices().len())?;
+        ply_writer.header_element_face(mesh.triangle_indices().len())?;
+        ply_writer.header_end()?;
+
+        ply_writer.vertices(mesh.vertices())?;
+        ply_writer.tri_faces(mesh.triangle_indices())?;
+
         Ok(())
     }
 }

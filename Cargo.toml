@@ -1,7 +1,17 @@
 [workspace]
-default-members = ["core", "parser", "render", "std", "tests", "builtin"]
+default-members = [
+    "core",
+    "export",
+    "parser",
+    "render",
+    "std",
+    "tests",
+    "builtin",
+]
+
 members = [
     "core",
+    "export",
     "parser",
     "render",
     "std",

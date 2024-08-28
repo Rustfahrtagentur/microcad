@@ -26,6 +26,13 @@ impl ExportSettings {
             .map(|filename| filename.as_str().unwrap().to_string())
     }
 
+    pub fn render_precision(&self) -> f64 {
+        self.0
+            .get("render_precision")
+            .map(|precision| precision.as_float().unwrap())
+            .unwrap_or(0.1)
+    }
+
     pub fn exporter_id(&self) -> Option<String> {
         if let Some(exporter) = self.0.get("exporter") {
             Some(exporter.to_string())

@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use microcad_core::geo3d::{Triangle, Vertex};
 
 pub struct StlWriter<'a> {
@@ -39,5 +41,45 @@ impl<'a> StlWriter<'a> {
 impl<'a> Drop for StlWriter<'a> {
     fn drop(&mut self) {
         writeln!(self.writer, "endsolid").unwrap();
+    }
+}
+
+pub struct StlExporter {
+    filename: PathBuf,
+}
+
+impl microcad_core::Exporter for StlExporter {
+    fn from_settings(
+        settings: &microcad_core::export::ExportSettings,
+    ) -> microcad_core::Result<Self>
+    where
+        Self: Sized,
+    {
+        assert!(settings.filename().is_some());
+
+        Ok(Self {
+            filename: PathBuf::from(settings.filename().unwrap()),
+        })
+    }
+
+    fn file_extensions(&self) -> Vec<&str> {
+        vec!["stl"]
+    }
+
+    fn export(&mut self, node: microcad_render::Node) -> microcad_core::Result<()> {
+        let mut renderer = microcad_render::mesh::MeshRenderer::default();
+        use microcad_render::Renderer3D;
+        renderer.render_node(node)?;
+
+        let file = std::fs::File::create(&self.filename)?;
+        let mut file = std::io::BufWriter::new(file);
+        let mut writer = StlWriter::new(&mut file);
+
+        let triangles = renderer.triangle_mesh().fetch_triangles();
+        for triangle in triangles {
+            writer.write_triangle(&triangle)?;
+        }
+
+        Ok(())
     }
 }

@@ -1,0 +1,14 @@
+[package]
+name = "microcad-export"
+description = "µCAD export"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+
+microcad-core = { path = "../core" }
+microcad-render = { path = "../render" }
