@@ -1,8 +1,26 @@
 use crate::ModuleBuilder;
-use boolean_op::*;
-use microcad_parser::{builtin_module, eval::Symbols, language::*};
+use microcad_parser::{
+    builtin_module,
+    eval::{EvalError, Symbols},
+    language::*,
+};
+use microcad_render::Node;
 
-pub mod boolean_op;
+pub fn difference() -> Result<Node, EvalError> {
+    Ok(microcad_core::algorithm::boolean_op::difference())
+}
+
+pub fn union() -> Result<Node, EvalError> {
+    Ok(microcad_core::algorithm::boolean_op::union())
+}
+
+pub fn intersection() -> Result<Node, EvalError> {
+    Ok(microcad_core::algorithm::boolean_op::intersection())
+}
+
+pub fn xor() -> Result<Node, EvalError> {
+    Ok(microcad_core::algorithm::boolean_op::xor())
+}
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("algorithm")

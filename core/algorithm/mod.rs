@@ -1,3 +1,5 @@
+pub mod boolean_op;
+
 use crate::{
     render::{Node, Renderer2D, Renderer3D},
     Result,

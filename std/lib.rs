@@ -178,7 +178,7 @@ fn difference_svg() {
     use microcad_render::svg::SvgRenderer;
     use microcad_render::Renderer2D;
 
-    let difference = algorithm::boolean_op::difference().unwrap();
+    let difference = algorithm::difference().unwrap();
     let group = microcad_render::tree::group();
     group.append(crate::geo2d::Circle::node(args!(radius: Scalar = 4.0)).unwrap());
     group.append(crate::geo2d::Circle::node(args!(radius: Scalar = 2.0)).unwrap());
