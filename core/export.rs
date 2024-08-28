@@ -71,7 +71,7 @@ pub fn export_tree(node: Node, factory: ExporterFactory) -> Result<(), crate::Er
         let inner = n.borrow();
         if let NodeInner::Export(ref export_settings) = *inner {
             let mut exporter = factory(export_settings)?;
-            exporter.export(node.clone())?;
+            exporter.export(n.clone())?;
         }
     }
 
