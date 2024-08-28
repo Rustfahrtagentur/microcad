@@ -75,6 +75,7 @@ impl Renderable2D for Rect {
         ))
     }
 }
+
 use crate::ModuleBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
