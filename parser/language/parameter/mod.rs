@@ -40,13 +40,13 @@ impl Parse for Parameter {
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::identifier => {
-                    name = Identifier::parse(pair)?.value().clone();
+                    name = Identifier::parse(pair)?.value;
                 }
                 Rule::r#type => {
-                    specified_type = Some(Type::parse(pair)?.value().clone());
+                    specified_type = Some(Type::parse(pair)?.value);
                 }
                 Rule::expression => {
-                    default_value = Some(Expression::parse(pair)?.value().clone());
+                    default_value = Some(Expression::parse(pair)?.value);
                 }
                 rule => {
                     unreachable!(

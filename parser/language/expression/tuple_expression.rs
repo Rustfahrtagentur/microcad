@@ -44,12 +44,12 @@ impl Parse for TupleExpression {
 
         with_pair_ok!(
             TupleExpression {
-                args: call_argument_list.value().clone(),
+                is_named: named_count == call_argument_list.len(),
+                args: call_argument_list.value,
                 unit: match inner.next() {
                     Some(pair) => Some(*Unit::parse(pair)?),
                     None => None,
                 },
-                is_named: named_count == call_argument_list.len(),
             },
             pair
         )

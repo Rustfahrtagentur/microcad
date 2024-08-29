@@ -10,8 +10,8 @@ impl Parse for NamedTupleType {
         let mut types = std::collections::BTreeMap::new();
         for pair in pair.clone().into_inner() {
             let mut inner = pair.into_inner();
-            let name = Identifier::parse(inner.next().unwrap())?.value().clone();
-            let ty = Type::parse(inner.next().unwrap())?.value().clone();
+            let name = Identifier::parse(inner.next().unwrap())?.value;
+            let ty = Type::parse(inner.next().unwrap())?.value;
             if types.contains_key(&name) {
                 return Err(TypeError::DuplicatedMapField(name.clone()).into());
             }

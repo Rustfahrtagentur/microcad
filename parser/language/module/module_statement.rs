@@ -18,26 +18,26 @@ impl Parse for ModuleStatement {
         with_pair_ok!(
             match first.as_rule() {
                 Rule::use_statement => {
-                    ModuleStatement::Use(UseStatement::parse(first)?.value().clone())
+                    ModuleStatement::Use(UseStatement::parse(first)?.value)
                 }
                 Rule::expression => {
-                    ModuleStatement::Expression(Expression::parse(first)?.value().clone())
+                    ModuleStatement::Expression(Expression::parse(first)?.value)
                 }
                 Rule::assignment => {
-                    ModuleStatement::Assignment(Assignment::parse(first)?.value().clone())
+                    ModuleStatement::Assignment(Assignment::parse(first)?.value)
                 }
                 Rule::module_for_statement => {
-                    ModuleStatement::For(ForStatement::parse(first)?.value().clone())
+                    ModuleStatement::For(ForStatement::parse(first)?.value)
                 }
                 Rule::module_definition | Rule::namespace_definition =>
                     ModuleStatement::ModuleDefinition(std::rc::Rc::new(
-                        ModuleDefinition::parse(first)?.value().clone(),
+                        ModuleDefinition::parse(first)?.value,
                     )),
                 Rule::module_init_definition => ModuleStatement::ModuleInitDefinition(
-                    std::rc::Rc::new(ModuleInitDefinition::parse(first)?.value().clone(),)
+                    std::rc::Rc::new(ModuleInitDefinition::parse(first)?.value,)
                 ),
                 Rule::function_definition => ModuleStatement::FunctionDefinition(std::rc::Rc::new(
-                    FunctionDefinition::parse(first)?.value().clone(),
+                    FunctionDefinition::parse(first)?.value,
                 )),
                 rule => unreachable!(
                     "Unexpected module statement, got {:?} {:?}",

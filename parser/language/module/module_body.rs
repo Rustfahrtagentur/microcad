@@ -57,11 +57,11 @@ impl Parse for ModuleBody {
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::module_statement => {
-                    let statement = ModuleStatement::parse(pair.clone())?.value().clone();
+                    let statement = ModuleStatement::parse(pair.clone())?.value;
                     body.add_statement(statement);
                 }
                 Rule::expression => {
-                    let expression = Expression::parse(pair.clone())?.value().clone();
+                    let expression = Expression::parse(pair.clone())?.value;
                     body.add_statement(ModuleStatement::Expression(expression));
                 }
                 _ => {}

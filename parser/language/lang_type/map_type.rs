@@ -17,8 +17,8 @@ impl Parse for MapType {
 
         with_pair_ok!(
             Self::from_types(
-                (Type::parse(key)?.value().clone()).try_into()?,
-                Type::parse(value)?.value().clone(),
+                (Type::parse(key)?.value).try_into()?,
+                Type::parse(value)?.value,
             ),
             pair
         )

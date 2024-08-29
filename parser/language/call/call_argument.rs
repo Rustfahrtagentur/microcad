@@ -22,8 +22,8 @@ impl Parse for CallArgument {
 
                 with_pair_ok!(
                     CallArgument {
-                        name: Some(Identifier::parse(first)?.value().clone()),
-                        value: Expression::parse(second)?.value().clone(),
+                        name: Some(Identifier::parse(first)?.value),
+                        value: Expression::parse(second)?.value,
                     },
                     pair
                 )
@@ -32,7 +32,7 @@ impl Parse for CallArgument {
                 with_pair_ok!(
                     CallArgument {
                         name: None,
-                        value: Expression::parse(pair.clone())?.value().clone(),
+                        value: Expression::parse(pair.clone())?.value,
                     },
                     pair
                 )

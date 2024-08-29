@@ -8,7 +8,7 @@ impl Parse for UnnamedTupleType {
         let inner = pair.clone().into_inner();
         let mut types = Vec::new();
         for pair in inner {
-            types.push(Type::parse(pair)?.value().clone());
+            types.push(Type::parse(pair)?.value);
         }
 
         with_pair_ok!(Self(types), pair)

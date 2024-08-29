@@ -65,9 +65,9 @@ pub enum ParseError {
 /// Add a parser `Pair` to a type `T`
 pub struct WithPair<'a, T> {
     /// value
-    value: T,
+    pub value: T,
     /// attached `Pair`
-    pair: Pair<'a>,
+    pub pair: Pair<'a>,
 }
 
 /// attach parser `Pair` to a value and return it in a `Result`
@@ -82,18 +82,6 @@ macro_rules! with_pair_ok {
 impl<'a, T> WithPair<'a, T> {
     pub fn new(value: T, pair: Pair<'a>) -> Self {
         Self { value, pair }
-    }
-
-    pub fn pair(&self) -> Pair<'a> {
-        self.pair.clone()
-    }
-
-    pub fn value(&self) -> &T {
-        &self.value
-    }
-
-    pub fn rule(&self) -> Rule {
-        self.pair.as_rule()
     }
 
     pub fn start_pos(&self) -> pest::Position<'a> {
@@ -137,7 +125,7 @@ impl Parser {
     {
         let mut vec = Vec::new();
         for pair in pair.clone().into_inner() {
-            vec.push(f(pair)?.value().clone());
+            vec.push(f(pair)?.value);
         }
 
         with_pair_ok!(vec, pair)
@@ -151,7 +139,7 @@ impl Parser {
         use pest::Parser as _;
 
         if let Some(pair) = Parser::parse(rule, input.trim())?.next() {
-            Ok(T::parse(pair)?.value().clone())
+            Ok(T::parse(pair)?.value)
         } else {
             Err(anyhow::Error::msg("could not parse"))
         }
@@ -169,7 +157,7 @@ impl Parser {
             .expect(&no_match)
             .next()
             .unwrap();
-        T::parse(pair).unwrap().value().clone()
+        T::parse(pair).unwrap().value
     }
 
     pub fn ensure_rule(pair: &Pair, expected: Rule) {

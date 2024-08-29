@@ -110,10 +110,7 @@ impl Algorithm for BooleanOp {
         }
 
         let mut result = geos[0].clone();
-        for (i, geo) in geos.iter().enumerate() {
-            if i == 0 {
-                continue;
-            }
+        for geo in geos[1..].iter() {
             if let Some(r) = result.boolean_op(geo.as_ref(), self) {
                 result = std::rc::Rc::new(r)
             }

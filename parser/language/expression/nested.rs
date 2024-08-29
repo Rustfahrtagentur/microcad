@@ -9,7 +9,7 @@ impl Parse for Nested {
         for pair in pair.clone().into_inner().filter(|pair| {
             [Rule::qualified_name, Rule::call, Rule::module_body].contains(&pair.as_rule())
         }) {
-            vec.push(NestedItem::parse(pair)?.value().clone());
+            vec.push(NestedItem::parse(pair)?.value);
         }
 
         with_pair_ok!(Nested(vec), pair)

@@ -10,8 +10,8 @@ impl Parse for FormatExpression {
         let mut expr = Expression::default();
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
-                Rule::format_spec => fo = FormatSpec::parse(pair)?.value().clone(),
-                Rule::expression => expr = Expression::parse(pair)?.value().clone(),
+                Rule::format_spec => fo = FormatSpec::parse(pair)?.value,
+                Rule::expression => expr = Expression::parse(pair)?.value,
                 _ => unreachable!(),
             }
         }

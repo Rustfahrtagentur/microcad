@@ -45,16 +45,16 @@ impl Parse for ModuleDefinition {
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::attribute_list => {
-                    attributes.push(Attribute::parse(pair)?.value().clone());
+                    attributes.push(Attribute::parse(pair)?.value);
                 }
                 Rule::identifier => {
-                    name = Identifier::parse(pair)?.value().clone();
+                    name = Identifier::parse(pair)?.value;
                 }
                 Rule::parameter_list => {
-                    parameters = Some(ParameterList::parse(pair)?.value().clone());
+                    parameters = Some(ParameterList::parse(pair)?.value);
                 }
                 Rule::module_body => {
-                    body = ModuleBody::parse(pair.clone())?.value().clone();
+                    body = ModuleBody::parse(pair.clone())?.value;
                 }
                 rule => unreachable!("Unexpected module definition, got {:?}", rule),
             }

@@ -26,7 +26,7 @@ impl Parse for QualifiedName {
                 pair.clone()
                     .into_inner()
                     .map(|pair| Identifier::parse(pair))
-                    .map(|ident| ident.unwrap().value().clone())
+                    .map(|ident| ident.unwrap().value)
                     .collect(),
             ),
             pair

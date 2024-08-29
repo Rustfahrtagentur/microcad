@@ -29,15 +29,13 @@ impl Parse for UseStatement {
         let mut inner = pair.clone().into_inner();
         let first = inner.next().unwrap();
         let second = inner.next();
-        let names = Parser::vec(first.clone(), QualifiedName::parse)?
-            .value()
-            .clone();
+        let names = Parser::vec(first.clone(), QualifiedName::parse)?.value;
         match (first.as_rule(), second) {
             (Rule::qualified_name_list, Some(second))
                 if second.as_rule() == Rule::qualified_name =>
             {
                 with_pair_ok!(
-                    UseStatement::UseFrom(names, QualifiedName::parse(second)?.value().clone(),),
+                    UseStatement::UseFrom(names, QualifiedName::parse(second)?.value,),
                     pair
                 )
             }
@@ -48,17 +46,12 @@ impl Parse for UseStatement {
                 if second.as_rule() == Rule::qualified_name_list =>
             {
                 with_pair_ok!(
-                    UseStatement::UseAll(
-                        Parser::vec(second, QualifiedName::parse)?.value().clone()
-                    ),
+                    UseStatement::UseAll(Parser::vec(second, QualifiedName::parse)?.value),
                     pair
                 )
             }
             (Rule::use_alias, _) => {
-                with_pair_ok!(
-                    UseStatement::UseAlias(UseAlias::parse(first)?.value().clone()),
-                    pair
-                )
+                with_pair_ok!(UseStatement::UseAlias(UseAlias::parse(first)?.value), pair)
             }
             _ => Err(ParseError::InvalidUseStatement),
         }

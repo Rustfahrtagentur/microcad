@@ -24,9 +24,9 @@ impl Parse for Call {
 
         with_pair_ok!(
             Call {
-                name: QualifiedName::parse(first)?.value().clone(),
+                name: QualifiedName::parse(first)?.value,
                 argument_list: match inner.next() {
-                    Some(pair) => CallArgumentList::parse(pair)?.value().clone(),
+                    Some(pair) => CallArgumentList::parse(pair)?.value,
                     None => CallArgumentList::default(),
                 }
             },

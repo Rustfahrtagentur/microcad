@@ -15,10 +15,10 @@ impl Parse for ModuleInitDefinition {
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::parameter_list => {
-                    parameters = ParameterList::parse(pair)?.value().clone();
+                    parameters = ParameterList::parse(pair)?.value;
                 }
                 Rule::module_init_statement => {
-                    body.push(ModuleInitStatement::parse(pair)?.value().clone());
+                    body.push(ModuleInitStatement::parse(pair)?.value);
                 }
                 Rule::COMMENT => {}
                 rule => unreachable!(

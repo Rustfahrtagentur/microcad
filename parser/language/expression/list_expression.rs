@@ -22,9 +22,7 @@ impl Parse for ListExpression {
         let mut inner = pair.clone().into_inner();
         with_pair_ok!(
             Self(
-                ExpressionList::parse(inner.next().unwrap())?
-                    .value()
-                    .clone(),
+                ExpressionList::parse(inner.next().unwrap())?.value,
                 match inner.next() {
                     Some(pair) => Some(*Unit::parse(pair)?),
                     None => None,

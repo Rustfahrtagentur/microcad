@@ -9,12 +9,12 @@ pub struct Attribute {
 impl Parse for Attribute {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         let mut inner = pair.clone().into_inner();
-        let name = QualifiedName::parse(inner.next().unwrap())?.value().clone();
+        let name = QualifiedName::parse(inner.next().unwrap())?.value;
         match inner.next() {
             Some(pair) => with_pair_ok!(
                 Attribute {
                     name,
-                    arguments: Some(CallArgumentList::parse(pair.clone())?.value().clone()),
+                    arguments: Some(CallArgumentList::parse(pair.clone())?.value),
                 },
                 pair
             ),

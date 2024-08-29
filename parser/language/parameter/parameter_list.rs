@@ -30,7 +30,7 @@ impl Parse for ParameterList {
 
         for pair in pair.clone().into_inner() {
             parameters
-                .push(Parameter::parse(pair)?.value().clone())
+                .push(Parameter::parse(pair)?.value)
                 .map_err(IdentifierListError::DuplicateIdentifier)?;
         }
 

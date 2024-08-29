@@ -76,7 +76,7 @@ impl Parse for FormatString {
             match pair.as_rule() {
                 Rule::string_literal_inner => fs.push_string(pair.as_span().as_str().to_string()),
                 Rule::format_expression => {
-                    fs.push_format_expr(FormatExpression::parse(pair)?.value().clone())
+                    fs.push_format_expr(FormatExpression::parse(pair)?.value)
                 }
                 _ => unreachable!(),
             }

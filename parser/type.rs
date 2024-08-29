@@ -70,14 +70,10 @@ impl Parse for Type {
         let inner = pair.clone().into_inner().next().unwrap();
 
         let s = match inner.as_rule() {
-            Rule::list_type => Self::List(ListType::parse(inner)?.value().clone()),
-            Rule::map_type => Self::Map(MapType::parse(inner)?.value().clone()),
-            Rule::unnamed_tuple_type => {
-                Self::UnnamedTuple(UnnamedTupleType::parse(inner)?.value().clone())
-            }
-            Rule::named_tuple_type => {
-                Self::NamedTuple(NamedTupleType::parse(inner)?.value().clone())
-            }
+            Rule::list_type => Self::List(ListType::parse(inner)?.value),
+            Rule::map_type => Self::Map(MapType::parse(inner)?.value),
+            Rule::unnamed_tuple_type => Self::UnnamedTuple(UnnamedTupleType::parse(inner)?.value),
+            Rule::named_tuple_type => Self::NamedTuple(NamedTupleType::parse(inner)?.value),
             Rule::qualified_name => match inner.as_str() {
                 "int" => Self::Integer,
                 "scalar" => Self::Scalar,
@@ -88,7 +84,7 @@ impl Parse for Type {
                 "vec2" => Self::Vec2,
                 "vec3" => Self::Vec3,
                 "bool" => Self::Bool,
-                _ => Self::Custom(QualifiedName::parse(inner)?.value().clone()),
+                _ => Self::Custom(QualifiedName::parse(inner)?.value),
             },
             _ => unreachable!("Expected type, found {:?}", inner.as_rule()),
         };

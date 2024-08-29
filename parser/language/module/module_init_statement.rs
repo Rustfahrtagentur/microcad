@@ -14,17 +14,16 @@ impl Parse for ModuleInitStatement {
         with_pair_ok!(
             match first.as_rule() {
                 Rule::use_statement => {
-                    ModuleInitStatement::Use(UseStatement::parse(first)?.value().clone())
+                    ModuleInitStatement::Use(UseStatement::parse(first)?.value)
                 }
                 Rule::expression => {
-                    ModuleInitStatement::Expression(Expression::parse(first)?.value().clone())
+                    ModuleInitStatement::Expression(Expression::parse(first)?.value)
                 }
                 Rule::assignment => {
-                    ModuleInitStatement::Assignment(Assignment::parse(first)?.value().clone())
+                    ModuleInitStatement::Assignment(Assignment::parse(first)?.value)
                 }
-                Rule::function_definition => ModuleInitStatement::FunctionDefinition(
-                    FunctionDefinition::parse(first)?.value().clone(),
-                ),
+                Rule::function_definition =>
+                    ModuleInitStatement::FunctionDefinition(FunctionDefinition::parse(first)?.value,),
                 _ => unreachable!(),
             },
             pair

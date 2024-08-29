@@ -45,7 +45,7 @@ impl Parse for Literal {
         let inner = pair.clone().into_inner().next().unwrap();
 
         let s = match inner.as_rule() {
-            Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?.value().clone()),
+            Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?.value),
             Rule::integer_literal => Literal::Integer(inner.as_str().parse::<i64>()?),
             Rule::bool_literal => match inner.as_str() {
                 "true" => Literal::Bool(true),

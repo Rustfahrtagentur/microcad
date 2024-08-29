@@ -62,7 +62,7 @@ impl Parse for IdentifierList {
         let mut vec = Vec::new();
         for pair in pair.clone().into_inner() {
             if pair.as_rule() == Rule::identifier {
-                vec.push(Identifier::parse(pair)?.value().clone());
+                vec.push(Identifier::parse(pair)?.value);
             }
         }
         with_pair_ok!(Self(vec), pair)

@@ -14,8 +14,8 @@ impl Parse for UseAlias {
         let mut inner = pair.clone().into_inner();
         with_pair_ok!(
             UseAlias(
-                QualifiedName::parse(inner.next().unwrap())?.value().clone(),
-                Identifier::parse(inner.next().unwrap())?.value().clone(),
+                QualifiedName::parse(inner.next().unwrap())?.value,
+                Identifier::parse(inner.next().unwrap())?.value,
             ),
             pair
         )

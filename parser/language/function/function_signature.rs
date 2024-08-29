@@ -27,9 +27,9 @@ impl Parse for FunctionSignature {
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::parameter_list => {
-                    parameters = ParameterList::parse(pair)?.value().clone();
+                    parameters = ParameterList::parse(pair)?.value;
                 }
-                Rule::r#type => return_type = Some(Type::parse(pair)?.value().clone()),
+                Rule::r#type => return_type = Some(Type::parse(pair)?.value),
                 rule => unreachable!("Unexpected token in function signature: {:?}", rule),
             }
         }

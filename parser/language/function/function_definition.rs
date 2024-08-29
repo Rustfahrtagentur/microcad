@@ -45,11 +45,9 @@ impl Parse for FunctionDefinition {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::function_definition);
         let mut inner = pair.clone().into_inner();
-        let name = Identifier::parse(inner.next().unwrap())?.value().clone();
-        let signature = FunctionSignature::parse(inner.next().unwrap())?
-            .value()
-            .clone();
-        let body = FunctionBody::parse(inner.next().unwrap())?.value().clone();
+        let name = Identifier::parse(inner.next().unwrap())?.value;
+        let signature = FunctionSignature::parse(inner.next().unwrap())?.value;
+        let body = FunctionBody::parse(inner.next().unwrap())?.value;
 
         with_pair_ok!(
             Self {

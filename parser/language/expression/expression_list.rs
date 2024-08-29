@@ -37,7 +37,7 @@ impl Parse for ExpressionList {
         let mut vec = Vec::new();
 
         for pair in pair.clone().into_inner() {
-            vec.push(Expression::parse(pair)?.value().clone());
+            vec.push(Expression::parse(pair)?.value);
         }
 
         with_pair_ok!(Self(vec), pair)

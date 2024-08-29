@@ -14,11 +14,11 @@ impl Parse for FunctionBody {
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::function_statement => {
-                    body.push(FunctionStatement::parse(pair)?.value().clone());
+                    body.push(FunctionStatement::parse(pair)?.value);
                 }
                 Rule::expression => {
                     body.push(FunctionStatement::Return(Box::new(
-                        Expression::parse(pair)?.value().clone(),
+                        Expression::parse(pair)?.value,
                     )));
                 }
                 rule => unreachable!("Unexpected token in function body: {:?}", rule),

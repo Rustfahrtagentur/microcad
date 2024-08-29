@@ -13,7 +13,7 @@ impl Parse for Document {
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::module_statement => {
-                    body.push(ModuleStatement::parse(pair)?.value().clone());
+                    body.push(ModuleStatement::parse(pair)?.value);
                 }
                 Rule::EOI => break,
                 _ => {}

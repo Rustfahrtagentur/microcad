@@ -41,7 +41,7 @@ impl Parse for CallArgumentList {
             Rule::call_argument_list => {
                 for pair in pair.clone().into_inner() {
                     call_argument_list
-                        .push(CallArgument::parse(pair.clone())?.value().clone())
+                        .push(CallArgument::parse(pair.clone())?.value)
                         .map_err(ParseError::DuplicateCallArgument)?;
                 }
                 with_pair_ok!(call_argument_list, pair)

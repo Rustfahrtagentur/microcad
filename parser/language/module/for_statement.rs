@@ -18,8 +18,8 @@ impl Parse for ForStatement {
 
         with_pair_ok!(
             ForStatement {
-                loop_var: loop_var.value().clone(),
-                body: body.value().clone(),
+                loop_var: loop_var.value,
+                body: body.value,
             },
             p
         )

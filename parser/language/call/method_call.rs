@@ -11,9 +11,9 @@ impl Parse for MethodCall {
         let mut inner = pair.clone().into_inner();
         with_pair_ok!(
             MethodCall {
-                name: Identifier::parse(inner.next().unwrap())?.value().clone(),
+                name: Identifier::parse(inner.next().unwrap())?.value,
                 argument_list: if let Some(pair) = inner.next() {
-                    CallArgumentList::parse(pair)?.value().clone()
+                    CallArgumentList::parse(pair)?.value
                 } else {
                     CallArgumentList::default()
                 },

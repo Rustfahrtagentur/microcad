@@ -22,10 +22,7 @@ impl Parse for ListType {
         let pair = inner.next().unwrap();
         match pair.as_rule() {
             Rule::r#type => {
-                with_pair_ok!(
-                    Self::from_type(Type::parse(pair.clone())?.value().clone()),
-                    pair
-                )
+                with_pair_ok!(Self::from_type(Type::parse(pair.clone())?.value), pair)
             }
             _ => unreachable!("Expected type, found {:?}", pair.as_rule()),
         }

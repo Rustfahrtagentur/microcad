@@ -10,19 +10,16 @@ pub enum NestedItem {
 impl Parse for NestedItem {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         match pair.clone().as_rule() {
-            Rule::call => with_pair_ok!(
-                NestedItem::Call(Call::parse(pair.clone())?.value().clone()),
-                pair
-            ),
+            Rule::call => with_pair_ok!(NestedItem::Call(Call::parse(pair.clone())?.value), pair),
             Rule::qualified_name => {
                 with_pair_ok!(
-                    NestedItem::QualifiedName(QualifiedName::parse(pair.clone())?.value().clone()),
+                    NestedItem::QualifiedName(QualifiedName::parse(pair.clone())?.value),
                     pair
                 )
             }
             Rule::module_body => {
                 with_pair_ok!(
-                    NestedItem::ModuleBody(ModuleBody::parse(pair.clone())?.value().clone()),
+                    NestedItem::ModuleBody(ModuleBody::parse(pair.clone())?.value),
                     pair
                 )
             }
