@@ -37,7 +37,7 @@ impl Geometry {
                 Some(Geometry::Manifold(result))
             }
             (Geometry::Manifold(a), Geometry::Manifold(b)) => {
-                let result: Manifold = a.boolean_op(&b, op);
+                let result: Manifold = a.boolean_op(b, op);
                 Some(Geometry::Manifold(result))
             }
             (Geometry::Mesh(a), Geometry::Manifold(b)) => {

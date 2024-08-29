@@ -54,7 +54,6 @@ impl Renderer3D for MeshRenderer {
                 let mesh = geo3d::TriangleMesh::from(manifold.to_mesh());
                 self.mesh(&mesh)
             }
-            _ => unimplemented!(),
         }
     }
 
