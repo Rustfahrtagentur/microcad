@@ -1,3 +1,5 @@
+//! µCAD Basic Types
+
 use crate::{eval::*, language::*, parser::*, with_pair_ok};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -24,13 +26,13 @@ pub enum Type {
     Vec4,
     /// A boolean: true, false
     Bool,
-    /// A list of elements of the same type: [scalar]
+    /// A list of elements of the same type: `[scalar]`
     List(ListType),
-    /// A map of elements: [string => scalar]
+    /// A map of elements: `[string => scalar]`
     Map(MapType),
-    /// An unnamed tuple of elements: (scalar, string)
+    /// An unnamed tuple of elements: `(scalar, string)`
     UnnamedTuple(UnnamedTupleType),
-    /// A named tuple of elements: (x: scalar, y: string)
+    /// A named tuple of elements: `(x: scalar, y: string)`
     NamedTuple(NamedTupleType),
     /// A custom type or a module node in the syntax tree
     Custom(QualifiedName),

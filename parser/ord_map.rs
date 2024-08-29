@@ -1,3 +1,5 @@
+//! Ordered Map
+
 /// trait of an value in an `OrdMap`
 /// # Types
 /// `K`: key type

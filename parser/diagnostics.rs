@@ -1,5 +1,8 @@
+//! Remember source code position for diagnosis
+
 use core::fmt;
 
+/// Position in source code file
 pub struct SourceLocation {
     /// Path of the source it was parsed from
     path: std::path::PathBuf,

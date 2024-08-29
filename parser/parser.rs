@@ -1,14 +1,16 @@
+//! µCAD Code Parser
+
 #[derive(pest_derive::Parser)]
 #[grammar = "grammar.pest"]
 pub struct Parser;
 
-use crate::{language::*, type_error::*};
-use anyhow::Error;
+use crate::{errors::*, language::*};
 use thiserror::Error;
 
 pub type Pair<'i> = pest::iterators::Pair<'i, Rule>;
 pub type Pairs<'i> = pest::iterators::Pairs<'i, Rule>;
 
+/// Parsing errors
 #[derive(Debug, Error)]
 pub enum ParseError {
     #[error("Expected identifier")]
@@ -60,11 +62,15 @@ pub enum ParseError {
     DuplicateCallArgument(Identifier),
 }
 
+/// Add a parser `Pair` to a type `T`
 pub struct WithPair<'a, T> {
+    /// value
     value: T,
+    /// attached `Pair`
     pair: Pair<'a>,
 }
 
+/// attach parser `Pair` to a value and return it in a `Result`
 #[macro_export]
 macro_rules! with_pair_ok {
     ($value:expr, $pair:ident) => {
@@ -147,7 +153,7 @@ impl Parser {
         if let Some(pair) = Parser::parse(rule, input.trim())?.next() {
             Ok(T::parse(pair)?.value().clone())
         } else {
-            Err(Error::msg("could not parse"))
+            Err(anyhow::Error::msg("could not parse"))
         }
     }
 

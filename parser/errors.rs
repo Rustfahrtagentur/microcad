@@ -1,6 +1,9 @@
+//! Type Errors
+
 use crate::language::*;
 use thiserror::Error;
 
+/// Errors about failed interpretation of `Type`
 #[derive(Debug, Error)]
 pub enum TypeError {
     #[error("Invalid map key type: {0}")]

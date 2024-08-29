@@ -1,10 +1,16 @@
-use crate::{r#type::*, type_error::*};
+//! Type of a key in a `MapType`
 
+use crate::{errors::*, r#type::*};
+
+/// Key type for use in a `MapType`
 #[derive(Debug, Default, Clone, PartialEq)]
 pub enum MapKeyType {
     #[default]
+    /// Integer value as key
     Integer,
+    /// Boolean as key
     Bool,
+    /// String as key
     String,
 }
 
