@@ -48,7 +48,7 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
                         use microcad_core::render::{Node, NodeInner};
                         Ok(Node::new(NodeInner::#node_type(Box::new(#struct_name {
                             #(
-                                #field_identifiers: args[&stringify!(#field_identifiers).into()].try_into()?,
+                                #field_identifiers: args[&stringify!(#field_identifiers).into()].clone().try_into()?,
                             )*
                         }))))
                     }
