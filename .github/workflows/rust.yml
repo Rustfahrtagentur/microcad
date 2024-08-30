@@ -15,7 +15,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: Symbitic/install-cmake@v0.1.0
     - uses: actions/checkout@v4
     - name: Build
       run: cargo build --verbose
