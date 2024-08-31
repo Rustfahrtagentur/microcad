@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, with_pair_ok};
+use crate::{parse::*, parser::*};
 
 #[derive(Clone, Debug)]
 pub struct ForStatement {
@@ -7,8 +7,7 @@ pub struct ForStatement {
 }
 
 impl Parse for ForStatement {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        let p = pair.clone();
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::module_for_statement);
 
         let mut pairs = pair.into_inner();
@@ -16,13 +15,7 @@ impl Parse for ForStatement {
         let loop_var = Assignment::parse(pairs.next().unwrap())?;
         let body = ModuleBody::parse(pairs.next().unwrap())?;
 
-        with_pair_ok!(
-            ForStatement {
-                loop_var: loop_var.value,
-                body: body.value,
-            },
-            p
-        )
+        Ok(ForStatement { loop_var, body })
     }
 }
 

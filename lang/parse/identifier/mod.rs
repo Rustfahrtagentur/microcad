@@ -4,7 +4,7 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{eval::Sym, parser::*, with_pair_ok};
+use crate::{eval::Sym, parser::*};
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Identifier(microcad_core::Id);
@@ -28,9 +28,9 @@ impl<'a> From<&'a Identifier> for &'a str {
 }
 
 impl Parse for Identifier {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::identifier);
-        with_pair_ok!(Self(pair.as_str().into()), pair)
+        Ok(Self(pair.as_str().into()))
     }
 }
 

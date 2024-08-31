@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 
 #[derive(Default, Clone, Debug)]
 pub struct ListExpression(ExpressionList, Option<Unit>);
@@ -18,18 +18,15 @@ impl std::ops::DerefMut for ListExpression {
 }
 
 impl Parse for ListExpression {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut inner = pair.clone().into_inner();
-        with_pair_ok!(
-            Self(
-                ExpressionList::parse(inner.next().unwrap())?.value,
-                match inner.next() {
-                    Some(pair) => Some(*Unit::parse(pair)?),
-                    None => None,
-                },
-            ),
-            pair
-        )
+        Ok(Self(
+            ExpressionList::parse(inner.next().unwrap())?,
+            match inner.next() {
+                Some(pair) => Some(Unit::parse(pair)?),
+                None => None,
+            },
+        ))
     }
 }
 

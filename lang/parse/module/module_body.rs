@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 use microcad_render::tree;
 
 #[derive(Clone, Debug, Default)]
@@ -50,25 +50,25 @@ impl Symbols for ModuleBody {
 }
 
 impl Parse for ModuleBody {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::module_body);
         let mut body = ModuleBody::new();
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::module_statement => {
-                    let statement = ModuleStatement::parse(pair.clone())?.value;
+                    let statement = ModuleStatement::parse(pair.clone())?;
                     body.add_statement(statement);
                 }
                 Rule::expression => {
-                    let expression = Expression::parse(pair.clone())?.value;
+                    let expression = Expression::parse(pair.clone())?;
                     body.add_statement(ModuleStatement::Expression(expression));
                 }
                 _ => {}
             }
         }
 
-        with_pair_ok!(body, pair)
+        Ok(body)
     }
 }
 

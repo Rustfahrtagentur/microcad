@@ -1,4 +1,4 @@
-use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct CallArgument {
@@ -23,30 +23,22 @@ impl OrdMapValue<Identifier> for CallArgument {
 }
 
 impl Parse for CallArgument {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         match pair.clone().as_rule() {
             Rule::call_named_argument => {
                 let mut inner = pair.clone().into_inner();
                 let first = inner.next().unwrap();
                 let second = inner.next().unwrap();
 
-                with_pair_ok!(
-                    CallArgument {
-                        name: Some(Identifier::parse(first)?.value),
-                        value: Expression::parse(second)?.value,
-                    },
-                    pair
-                )
+                Ok(CallArgument {
+                    name: Some(Identifier::parse(first)?),
+                    value: Expression::parse(second)?,
+                })
             }
-            Rule::expression => {
-                with_pair_ok!(
-                    CallArgument {
-                        name: None,
-                        value: Expression::parse(pair.clone())?.value,
-                    },
-                    pair
-                )
-            }
+            Rule::expression => Ok(CallArgument {
+                name: None,
+                value: Expression::parse(pair.clone())?,
+            }),
             rule => unreachable!("CallArgument::parse expected call argument, found {rule:?}"),
         }
     }

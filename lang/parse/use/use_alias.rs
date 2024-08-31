@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, with_pair_ok};
+use crate::{parse::*, parser::*};
 
 #[derive(Clone, Debug)]
 pub struct UseAlias(pub QualifiedName, pub Identifier);
@@ -10,14 +10,11 @@ impl std::fmt::Display for UseAlias {
 }
 
 impl Parse for UseAlias {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut inner = pair.clone().into_inner();
-        with_pair_ok!(
-            UseAlias(
-                QualifiedName::parse(inner.next().unwrap())?.value,
-                Identifier::parse(inner.next().unwrap())?.value,
-            ),
-            pair
-        )
+        Ok(UseAlias(
+            QualifiedName::parse(inner.next().unwrap())?,
+            Identifier::parse(inner.next().unwrap())?,
+        ))
     }
 }

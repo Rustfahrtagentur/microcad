@@ -1,4 +1,4 @@
-use crate::{parser::*, with_pair_ok};
+use crate::parser::*;
 
 // A color with RGBA channels
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -22,7 +22,7 @@ impl std::fmt::Display for Color {
 }
 
 impl Parse for Color {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::color_literal);
         let values = &pair.clone().into_inner().next().unwrap().as_str()[1..];
 
@@ -31,25 +31,19 @@ impl Parse for Color {
 
         match values.len() {
             // #RGB or #RGBA single digit hex
-            3 | 4 => with_pair_ok!(
-                Color::new(
-                    hex4bit(0)?,
-                    hex4bit(1)?,
-                    hex4bit(2)?,
-                    if values.len() == 4 { hex4bit(3)? } else { 1.0 },
-                ),
-                pair
-            ),
+            3 | 4 => Ok(Color::new(
+                hex4bit(0)?,
+                hex4bit(1)?,
+                hex4bit(2)?,
+                if values.len() == 4 { hex4bit(3)? } else { 1.0 },
+            )),
             // #RRGGBB or #RRGGBBAA double digit hex
-            6 | 8 => with_pair_ok!(
-                Color::new(
-                    hex8bit(0)?,
-                    hex8bit(2)?,
-                    hex8bit(4)?,
-                    if values.len() == 8 { hex8bit(6)? } else { 1.0 },
-                ),
-                pair
-            ),
+            6 | 8 => Ok(Color::new(
+                hex8bit(0)?,
+                hex8bit(2)?,
+                hex8bit(4)?,
+                if values.len() == 8 { hex8bit(6)? } else { 1.0 },
+            )),
             _ => Err(ParseError::ParseColorError(values.to_string())),
         }
     }

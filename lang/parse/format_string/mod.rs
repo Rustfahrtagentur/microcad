@@ -4,7 +4,7 @@ mod format_spec;
 pub use format_expression::*;
 pub use format_spec::*;
 
-use crate::{eval::*, parser::*, with_pair_ok};
+use crate::{eval::*, parser::*};
 
 #[derive(Clone, Debug)]
 enum FormatStringInner {
@@ -70,19 +70,17 @@ impl Eval for FormatString {
 }
 
 impl Parse for FormatString {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut fs = Self::default();
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::string_literal_inner => fs.push_string(pair.as_span().as_str().to_string()),
-                Rule::format_expression => {
-                    fs.push_format_expr(FormatExpression::parse(pair)?.value)
-                }
+                Rule::format_expression => fs.push_format_expr(FormatExpression::parse(pair)?),
                 _ => unreachable!(),
             }
         }
 
-        with_pair_ok!(fs, pair)
+        Ok(fs)
     }
 }
 

@@ -62,49 +62,10 @@ pub enum ParseError {
     DuplicateCallArgument(Identifier),
 }
 
-/// Add a parser `Pair` to a type `T`
-pub struct WithPair<'a, T> {
-    /// value
-    pub value: T,
-    /// attached `Pair`
-    pub pair: Pair<'a>,
-}
-
-/// attach parser `Pair` to a value and return it in a `Result`
-#[macro_export]
-macro_rules! with_pair_ok {
-    ($value:expr, $pair:ident) => {
-        Ok($crate::parser::WithPair::new($value, $pair))
-    };
-    () => {};
-}
-
-impl<'a, T> WithPair<'a, T> {
-    pub fn new(value: T, pair: Pair<'a>) -> Self {
-        Self { value, pair }
-    }
-
-    pub fn start_pos(&self) -> pest::Position<'a> {
-        self.pair.as_span().start_pos()
-    }
-
-    pub fn end_pos(&self) -> pest::Position<'a> {
-        self.pair.as_span().end_pos()
-    }
-}
-
-impl<'a, T> std::ops::Deref for WithPair<'a, T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.value
-    }
-}
-
-pub type ParseResult<'a, T> = Result<WithPair<'a, T>, ParseError>;
+pub type ParseResult<T> = Result<T, ParseError>;
 
 pub trait Parse: Sized {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self>;
+    fn parse(pair: Pair<'_>) -> ParseResult<Self>;
 }
 
 impl Parser {
@@ -116,19 +77,16 @@ impl Parser {
     /// - `f`: The function to parse the pair into `T`
     ///
     /// Returns a vector of `T`
-    pub fn vec<'a, T>(
-        pair: Pair<'a>,
-        f: impl Fn(Pair<'a>) -> ParseResult<'a, T>,
-    ) -> ParseResult<'a, Vec<T>>
+    pub fn vec<'a, T>(pair: Pair<'a>, f: impl Fn(Pair<'a>) -> ParseResult<T>) -> ParseResult<Vec<T>>
     where
         T: Clone,
     {
         let mut vec = Vec::new();
         for pair in pair.clone().into_inner() {
-            vec.push(f(pair)?.value);
+            vec.push(f(pair)?);
         }
 
-        with_pair_ok!(vec, pair)
+        Ok(vec)
     }
 
     /// Parse a rule for type `T`
@@ -139,7 +97,7 @@ impl Parser {
         use pest::Parser as _;
 
         if let Some(pair) = Parser::parse(rule, input.trim())?.next() {
-            Ok(T::parse(pair)?.value)
+            Ok(T::parse(pair)?)
         } else {
             Err(anyhow::Error::msg("could not parse"))
         }
@@ -157,7 +115,7 @@ impl Parser {
             .expect(&no_match)
             .next()
             .unwrap();
-        T::parse(pair).unwrap().value
+        T::parse(pair).unwrap()
     }
 
     pub fn ensure_rule(pair: &Pair, expected: Rule) {

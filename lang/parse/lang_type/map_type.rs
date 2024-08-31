@@ -1,4 +1,4 @@
-use crate::{map_key_type::*, parser::*, r#type::*, with_pair_ok};
+use crate::{map_key_type::*, parser::*, r#type::*};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MapType(MapKeyType, Box<Type>);
@@ -10,18 +10,15 @@ impl MapType {
 }
 
 impl Parse for MapType {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut inner = pair.clone().into_inner();
         let key = inner.next().unwrap();
         let value = inner.next().unwrap();
 
-        with_pair_ok!(
-            Self::from_types(
-                (Type::parse(key)?.value).try_into()?,
-                Type::parse(value)?.value,
-            ),
-            pair
-        )
+        Ok(Self::from_types(
+            (Type::parse(key)?).try_into()?,
+            Type::parse(value)?,
+        ))
     }
 }
 

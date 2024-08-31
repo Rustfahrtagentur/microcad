@@ -6,7 +6,7 @@ pub use call_argument::*;
 pub use call_argument_list::*;
 pub use method_call::*;
 
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct Call {
@@ -23,21 +23,18 @@ impl Sym for Call {
 }
 
 impl Parse for Call {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::call);
         let mut inner = pair.clone().into_inner();
         let first = inner.next().unwrap();
 
-        with_pair_ok!(
-            Call {
-                name: QualifiedName::parse(first)?.value,
-                argument_list: match inner.next() {
-                    Some(pair) => CallArgumentList::parse(pair)?.value,
-                    None => CallArgumentList::default(),
-                }
+        Ok(Call {
+            name: QualifiedName::parse(first)?,
+            argument_list: match inner.next() {
+                Some(pair) => CallArgumentList::parse(pair)?,
+                None => CallArgumentList::default(),
             },
-            pair
-        )
+        })
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, with_pair_ok};
+use crate::{parse::*, parser::*};
 
 #[derive(Clone, Debug)]
 pub struct MethodCall {
@@ -7,19 +7,17 @@ pub struct MethodCall {
 }
 
 impl Parse for MethodCall {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut inner = pair.clone().into_inner();
-        with_pair_ok!(
-            MethodCall {
-                name: Identifier::parse(inner.next().unwrap())?.value,
-                argument_list: if let Some(pair) = inner.next() {
-                    CallArgumentList::parse(pair)?.value
-                } else {
-                    CallArgumentList::default()
-                },
+
+        Ok(MethodCall {
+            name: Identifier::parse(inner.next().unwrap())?,
+            argument_list: if let Some(pair) = inner.next() {
+                CallArgumentList::parse(pair)?
+            } else {
+                CallArgumentList::default()
             },
-            pair
-        )
+        })
     }
 }
 

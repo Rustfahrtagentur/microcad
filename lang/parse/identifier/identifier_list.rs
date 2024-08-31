@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, with_pair_ok};
+use crate::{parse::*, parser::*};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -58,14 +58,14 @@ impl std::fmt::Display for IdentifierList {
 }
 
 impl Parse for IdentifierList {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut vec = Vec::new();
         for pair in pair.clone().into_inner() {
             if pair.as_rule() == Rule::identifier {
-                vec.push(Identifier::parse(pair)?.value);
+                vec.push(Identifier::parse(pair)?);
             }
         }
-        with_pair_ok!(Self(vec), pair)
+        Ok(Self(vec))
     }
 }
 

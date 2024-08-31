@@ -104,7 +104,7 @@ impl std::ops::Div for NumberLiteral {
 }
 
 impl Parse for NumberLiteral {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::number_literal);
 
         let mut inner = pair.clone().into_inner();
@@ -120,9 +120,9 @@ impl Parse for NumberLiteral {
         let mut unit = Unit::None;
 
         if let Some(unit_token) = inner.next() {
-            unit = *Unit::parse(unit_token)?;
+            unit = Unit::parse(unit_token)?;
         }
-        Ok(WithPair::new(NumberLiteral(value, unit), pair))
+        Ok(NumberLiteral(value, unit))
     }
 }
 

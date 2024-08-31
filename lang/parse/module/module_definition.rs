@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 
 #[derive(Clone, Debug)]
 pub struct ModuleDefinition {
@@ -36,7 +36,7 @@ impl Symbols for ModuleDefinition {
 }
 
 impl Parse for ModuleDefinition {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut attributes = Vec::new();
         let mut name = Identifier::default();
         let mut parameters = None;
@@ -45,29 +45,26 @@ impl Parse for ModuleDefinition {
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::attribute_list => {
-                    attributes.push(Attribute::parse(pair)?.value);
+                    attributes.push(Attribute::parse(pair)?);
                 }
                 Rule::identifier => {
-                    name = Identifier::parse(pair)?.value;
+                    name = Identifier::parse(pair)?;
                 }
                 Rule::parameter_list => {
-                    parameters = Some(ParameterList::parse(pair)?.value);
+                    parameters = Some(ParameterList::parse(pair)?);
                 }
                 Rule::module_body => {
-                    body = ModuleBody::parse(pair.clone())?.value;
+                    body = ModuleBody::parse(pair.clone())?;
                 }
                 rule => unreachable!("Unexpected module definition, got {:?}", rule),
             }
         }
 
-        with_pair_ok!(
-            ModuleDefinition {
-                attributes,
-                name,
-                parameters,
-                body,
-            },
-            pair
-        )
+        Ok(ModuleDefinition {
+            attributes,
+            name,
+            parameters,
+            body,
+        })
     }
 }

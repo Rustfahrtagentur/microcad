@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, r#type::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*, r#type::*};
 #[derive(Clone, Debug, Default)]
 pub struct TupleExpression {
     args: CallArgumentList,
@@ -25,7 +25,7 @@ impl TupleExpression {
 }
 
 impl Parse for TupleExpression {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut inner = pair.clone().into_inner();
         let call_argument_list = CallArgumentList::parse(inner.next().unwrap())?;
         if call_argument_list.is_empty() {
@@ -42,17 +42,14 @@ impl Parse for TupleExpression {
             return Err(ParseError::MixedTupleArguments);
         }
 
-        with_pair_ok!(
-            TupleExpression {
-                is_named: named_count == call_argument_list.len(),
-                args: call_argument_list.value,
-                unit: match inner.next() {
-                    Some(pair) => Some(*Unit::parse(pair)?),
-                    None => None,
-                },
+        Ok(TupleExpression {
+            is_named: named_count == call_argument_list.len(),
+            args: call_argument_list,
+            unit: match inner.next() {
+                Some(pair) => Some(Unit::parse(pair)?),
+                None => None,
             },
-            pair
-        )
+        })
     }
 }
 

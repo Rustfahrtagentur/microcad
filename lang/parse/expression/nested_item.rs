@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, with_pair_ok};
+use crate::{parse::*, parser::*};
 
 #[derive(Clone, Debug)]
 pub enum NestedItem {
@@ -8,21 +8,13 @@ pub enum NestedItem {
 }
 
 impl Parse for NestedItem {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         match pair.clone().as_rule() {
-            Rule::call => with_pair_ok!(NestedItem::Call(Call::parse(pair.clone())?.value), pair),
-            Rule::qualified_name => {
-                with_pair_ok!(
-                    NestedItem::QualifiedName(QualifiedName::parse(pair.clone())?.value),
-                    pair
-                )
-            }
-            Rule::module_body => {
-                with_pair_ok!(
-                    NestedItem::ModuleBody(ModuleBody::parse(pair.clone())?.value),
-                    pair
-                )
-            }
+            Rule::call => Ok(NestedItem::Call(Call::parse(pair.clone())?)),
+            Rule::qualified_name => Ok(NestedItem::QualifiedName(QualifiedName::parse(
+                pair.clone(),
+            )?)),
+            Rule::module_body => Ok(NestedItem::ModuleBody(ModuleBody::parse(pair.clone())?)),
             rule => unreachable!(
                 "NestedItem::parse expected call or qualified name, found {:?}",
                 rule

@@ -10,7 +10,7 @@ pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
 
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 use pest::pratt_parser::{Assoc, Op, PrattParser};
 
 lazy_static::lazy_static! {
@@ -186,28 +186,26 @@ impl Eval for Expression {
 }
 
 impl Parse for Expression {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut error: Option<ParseError> = None;
         let result = PRATT_PARSER
             .map_primary(|primary| match primary.as_rule() {
                 Rule::literal => match Literal::parse(primary) {
-                    Ok(literal) => Self::Literal(literal.value),
+                    Ok(literal) => Self::Literal(literal),
                     Err(e) => {
                         error = Some(e);
                         Self::Invalid
                     }
                 },
-                Rule::expression => Self::parse(primary).unwrap().value,
+                Rule::expression => Self::parse(primary).unwrap(),
                 Rule::list_expression => {
-                    Self::ListExpression(ListExpression::parse(primary).unwrap().value)
+                    Self::ListExpression(ListExpression::parse(primary).unwrap())
                 }
                 Rule::tuple_expression => {
-                    Self::TupleExpression(TupleExpression::parse(primary).unwrap().value)
+                    Self::TupleExpression(TupleExpression::parse(primary).unwrap())
                 }
-                Rule::format_string => {
-                    Self::FormatString(FormatString::parse(primary).unwrap().value)
-                }
-                Rule::nested => Self::Nested(Nested::parse(primary).unwrap().value),
+                Rule::format_string => Self::FormatString(FormatString::parse(primary).unwrap()),
+                Rule::nested => Self::Nested(Nested::parse(primary).unwrap()),
                 rule => unreachable!(
                     "Expression::parse expected atom, found {:?} {:?}",
                     rule,
@@ -257,14 +255,14 @@ impl Parse for Expression {
             })
             .map_postfix(|lhs, op| match op.as_rule() {
                 Rule::list_element_access => {
-                    Self::ListElementAccess(Box::new(lhs), Box::new(Self::parse(op).unwrap().value))
+                    Self::ListElementAccess(Box::new(lhs), Box::new(Self::parse(op).unwrap()))
                 }
                 Rule::tuple_element_access => {
                     let op = op.into_inner().next().unwrap();
                     match op.as_rule() {
                         Rule::identifier => Self::NamedTupleElementAccess(
                             Box::new(lhs),
-                            Identifier::parse(op).unwrap().value,
+                            Identifier::parse(op).unwrap(),
                         ),
                         Rule::int => Self::UnnamedTupleElementAccess(
                             Box::new(lhs),
@@ -274,7 +272,7 @@ impl Parse for Expression {
                     }
                 }
                 Rule::method_call => {
-                    Self::MethodCall(Box::new(lhs), MethodCall::parse(op).unwrap().value)
+                    Self::MethodCall(Box::new(lhs), MethodCall::parse(op).unwrap())
                 }
                 rule => {
                     unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
@@ -284,7 +282,7 @@ impl Parse for Expression {
 
         match error {
             Some(e) => Err(e),
-            None => with_pair_ok!(result, pair),
+            None => Ok(result),
         }
     }
 }

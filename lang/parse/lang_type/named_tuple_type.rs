@@ -1,24 +1,24 @@
-use crate::{errors::*, parse::*, parser::*, r#type::*, with_pair_ok};
+use crate::{errors::*, parse::*, parser::*, r#type::*};
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct NamedTupleType(pub std::collections::BTreeMap<Identifier, Type>);
 
 impl Parse for NamedTupleType {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::named_tuple_type);
 
         let mut types = std::collections::BTreeMap::new();
         for pair in pair.clone().into_inner() {
             let mut inner = pair.into_inner();
-            let name = Identifier::parse(inner.next().unwrap())?.value;
-            let ty = Type::parse(inner.next().unwrap())?.value;
+            let name = Identifier::parse(inner.next().unwrap())?;
+            let ty = Type::parse(inner.next().unwrap())?;
             if types.contains_key(&name) {
                 return Err(TypeError::DuplicatedMapField(name.clone()).into());
             }
             types.insert(name, ty);
         }
 
-        with_pair_ok!(Self(types), pair)
+        Ok(Self(types))
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 
 #[derive(Clone, Debug)]
 pub struct FunctionDefinition {
@@ -42,21 +42,18 @@ impl FunctionDefinition {
 }
 
 impl Parse for FunctionDefinition {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_definition);
         let mut inner = pair.clone().into_inner();
-        let name = Identifier::parse(inner.next().unwrap())?.value;
-        let signature = FunctionSignature::parse(inner.next().unwrap())?.value;
-        let body = FunctionBody::parse(inner.next().unwrap())?.value;
+        let name = Identifier::parse(inner.next().unwrap())?;
+        let signature = FunctionSignature::parse(inner.next().unwrap())?;
+        let body = FunctionBody::parse(inner.next().unwrap())?;
 
-        with_pair_ok!(
-            Self {
-                name,
-                signature,
-                body,
-            },
-            pair
-        )
+        Ok(Self {
+            name,
+            signature,
+            body,
+        })
     }
 }
 

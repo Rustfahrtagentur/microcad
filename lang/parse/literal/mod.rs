@@ -38,25 +38,24 @@ impl Ty for Literal {
 }
 
 impl Parse for Literal {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::literal);
-        use crate::with_pair_ok;
 
         let inner = pair.clone().into_inner().next().unwrap();
 
         let s = match inner.as_rule() {
-            Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?.value),
+            Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?),
             Rule::integer_literal => Literal::Integer(inner.as_str().parse::<i64>()?),
             Rule::bool_literal => match inner.as_str() {
                 "true" => Literal::Bool(true),
                 "false" => Literal::Bool(false),
                 _ => unreachable!(),
             },
-            Rule::color_literal => Literal::Color(*Color::parse(inner)?),
+            Rule::color_literal => Literal::Color(Color::parse(inner)?),
             _ => unreachable!(),
         };
 
-        with_pair_ok!(s, pair)
+        Ok(s)
     }
 }
 

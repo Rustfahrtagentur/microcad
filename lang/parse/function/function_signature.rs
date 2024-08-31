@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, r#type::*, with_pair_ok};
+use crate::{parse::*, parser::*, r#type::*};
 
 #[derive(Clone, Debug)]
 pub struct FunctionSignature {
@@ -20,27 +20,24 @@ impl FunctionSignature {
 }
 
 impl Parse for FunctionSignature {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut parameters = ParameterList::default();
         let mut return_type = None;
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::parameter_list => {
-                    parameters = ParameterList::parse(pair)?.value;
+                    parameters = ParameterList::parse(pair)?;
                 }
-                Rule::r#type => return_type = Some(Type::parse(pair)?.value),
+                Rule::r#type => return_type = Some(Type::parse(pair)?),
                 rule => unreachable!("Unexpected token in function signature: {:?}", rule),
             }
         }
 
-        with_pair_ok!(
-            Self {
-                parameters,
-                return_type,
-            },
-            pair
-        )
+        Ok(Self {
+            parameters,
+            return_type,
+        })
     }
 }
 

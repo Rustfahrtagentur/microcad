@@ -1,4 +1,4 @@
-use crate::{eval::*, ord_map::OrdMap, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, ord_map::OrdMap, parse::*, parser::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentList(OrdMap<Identifier, CallArgument>);
@@ -34,17 +34,17 @@ impl Eval for CallArgumentList {
 }
 
 impl Parse for CallArgumentList {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut call_argument_list = CallArgumentList::default();
 
         match pair.clone().as_rule() {
             Rule::call_argument_list => {
                 for pair in pair.clone().into_inner() {
                     call_argument_list
-                        .push(CallArgument::parse(pair.clone())?.value)
+                        .push(CallArgument::parse(pair.clone())?)
                         .map_err(ParseError::DuplicateCallArgument)?;
                 }
-                with_pair_ok!(call_argument_list, pair)
+                Ok(call_argument_list)
             }
             rule => {
                 unreachable!("CallArgumentList::parse expected call argument list, found {rule:?}")

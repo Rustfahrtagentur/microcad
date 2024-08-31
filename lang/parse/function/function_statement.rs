@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, with_pair_ok};
+use crate::{parse::*, parser::*};
 
 #[derive(Clone, Debug)]
 pub enum FunctionStatement {
@@ -14,24 +14,22 @@ pub enum FunctionStatement {
 }
 
 impl Parse for FunctionStatement {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_statement);
 
         let mut inner = pair.clone().into_inner();
         let first = inner.next().unwrap();
         let s = match first.as_rule() {
-            Rule::assignment => Self::Assignment(Assignment::parse(first)?.value),
-            Rule::use_statement => Self::Use(UseStatement::parse(first)?.value),
+            Rule::assignment => Self::Assignment(Assignment::parse(first)?),
+            Rule::use_statement => Self::Use(UseStatement::parse(first)?),
             Rule::function_definition => {
-                Self::FunctionDefinition(std::rc::Rc::new(FunctionDefinition::parse(first)?.value))
+                Self::FunctionDefinition(std::rc::Rc::new(FunctionDefinition::parse(first)?))
             }
-            Rule::function_return_statement => {
-                Self::Return(Box::new(Expression::parse(first)?.value))
-            }
+            Rule::function_return_statement => Self::Return(Box::new(Expression::parse(first)?)),
             Rule::function_if_statement => {
                 let mut pairs = first.into_inner();
-                let condition = Expression::parse(pairs.next().unwrap())?.value;
-                let if_body = FunctionBody::parse(pairs.next().unwrap())?.value;
+                let condition = Expression::parse(pairs.next().unwrap())?;
+                let if_body = FunctionBody::parse(pairs.next().unwrap())?;
 
                 match pairs.next() {
                     None => Self::If {
@@ -40,7 +38,7 @@ impl Parse for FunctionStatement {
                         else_body: FunctionBody::default(),
                     },
                     Some(pair) => {
-                        let else_body = FunctionBody::parse(pair)?.value;
+                        let else_body = FunctionBody::parse(pair)?;
                         Self::If {
                             condition,
                             if_body,
@@ -52,6 +50,6 @@ impl Parse for FunctionStatement {
             rule => unreachable!("Unexpected token in function statement: {:?}", rule),
         };
 
-        with_pair_ok!(s, pair)
+        Ok(s)
     }
 }

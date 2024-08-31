@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, r#type::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*, r#type::*};
 
 #[derive(Clone, Debug)]
 pub struct Assignment {
@@ -23,7 +23,7 @@ impl Assignment {
 }
 
 impl Parse for Assignment {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut name = Identifier::default();
         let mut specified_type = None;
         let mut value = Expression::default();
@@ -31,13 +31,13 @@ impl Parse for Assignment {
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::identifier => {
-                    name = Identifier::parse(pair)?.value;
+                    name = Identifier::parse(pair)?;
                 }
                 Rule::r#type => {
-                    specified_type = Some(Type::parse(pair)?.value);
+                    specified_type = Some(Type::parse(pair)?);
                 }
                 Rule::expression => {
-                    value = Expression::parse(pair)?.value;
+                    value = Expression::parse(pair)?;
                 }
                 rule => {
                     unreachable!("Unexpected token in assignment: {:?}", rule);
@@ -45,14 +45,11 @@ impl Parse for Assignment {
             }
         }
 
-        with_pair_ok!(
-            Self {
-                name,
-                specified_type,
-                value,
-            },
-            pair
-        )
+        Ok(Self {
+            name,
+            specified_type,
+            value,
+        })
     }
 }
 

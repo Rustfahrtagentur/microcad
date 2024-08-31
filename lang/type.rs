@@ -1,6 +1,6 @@
 //! µCAD Basic Types
 
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
@@ -65,15 +65,15 @@ impl Type {
 }
 
 impl Parse for Type {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::r#type);
         let inner = pair.clone().into_inner().next().unwrap();
 
         let s = match inner.as_rule() {
-            Rule::list_type => Self::List(ListType::parse(inner)?.value),
-            Rule::map_type => Self::Map(MapType::parse(inner)?.value),
-            Rule::unnamed_tuple_type => Self::UnnamedTuple(UnnamedTupleType::parse(inner)?.value),
-            Rule::named_tuple_type => Self::NamedTuple(NamedTupleType::parse(inner)?.value),
+            Rule::list_type => Self::List(ListType::parse(inner)?),
+            Rule::map_type => Self::Map(MapType::parse(inner)?),
+            Rule::unnamed_tuple_type => Self::UnnamedTuple(UnnamedTupleType::parse(inner)?),
+            Rule::named_tuple_type => Self::NamedTuple(NamedTupleType::parse(inner)?),
             Rule::qualified_name => match inner.as_str() {
                 "int" => Self::Integer,
                 "scalar" => Self::Scalar,
@@ -84,12 +84,12 @@ impl Parse for Type {
                 "vec2" => Self::Vec2,
                 "vec3" => Self::Vec3,
                 "bool" => Self::Bool,
-                _ => Self::Custom(QualifiedName::parse(inner)?.value),
+                _ => Self::Custom(QualifiedName::parse(inner)?),
             },
             _ => unreachable!("Expected type, found {:?}", inner.as_rule()),
         };
 
-        with_pair_ok!(s, pair)
+        Ok(s)
     }
 }
 

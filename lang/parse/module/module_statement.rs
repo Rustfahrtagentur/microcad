@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 
 #[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum ModuleStatement {
@@ -12,41 +12,29 @@ pub enum ModuleStatement {
 }
 
 impl Parse for ModuleStatement {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::module_statement);
         let first = pair.clone().into_inner().next().unwrap();
-        with_pair_ok!(
-            match first.as_rule() {
-                Rule::use_statement => {
-                    ModuleStatement::Use(UseStatement::parse(first)?.value)
-                }
-                Rule::expression => {
-                    ModuleStatement::Expression(Expression::parse(first)?.value)
-                }
-                Rule::assignment => {
-                    ModuleStatement::Assignment(Assignment::parse(first)?.value)
-                }
-                Rule::module_for_statement => {
-                    ModuleStatement::For(ForStatement::parse(first)?.value)
-                }
-                Rule::module_definition | Rule::namespace_definition =>
-                    ModuleStatement::ModuleDefinition(std::rc::Rc::new(
-                        ModuleDefinition::parse(first)?.value,
-                    )),
-                Rule::module_init_definition => ModuleStatement::ModuleInitDefinition(
-                    std::rc::Rc::new(ModuleInitDefinition::parse(first)?.value,)
-                ),
-                Rule::function_definition => ModuleStatement::FunctionDefinition(std::rc::Rc::new(
-                    FunctionDefinition::parse(first)?.value,
-                )),
-                rule => unreachable!(
-                    "Unexpected module statement, got {:?} {:?}",
-                    rule,
-                    first.clone()
-                ),
-            },
-            pair
-        )
+        Ok(match first.as_rule() {
+            Rule::use_statement => ModuleStatement::Use(UseStatement::parse(first)?),
+            Rule::expression => ModuleStatement::Expression(Expression::parse(first)?),
+            Rule::assignment => ModuleStatement::Assignment(Assignment::parse(first)?),
+            Rule::module_for_statement => ModuleStatement::For(ForStatement::parse(first)?),
+            Rule::module_definition | Rule::namespace_definition => {
+                ModuleStatement::ModuleDefinition(std::rc::Rc::new(ModuleDefinition::parse(first)?))
+            }
+            Rule::module_init_definition => ModuleStatement::ModuleInitDefinition(
+                std::rc::Rc::new(ModuleInitDefinition::parse(first)?),
+            ),
+            Rule::function_definition => ModuleStatement::FunctionDefinition(std::rc::Rc::new(
+                FunctionDefinition::parse(first)?,
+            )),
+            rule => unreachable!(
+                "Unexpected module statement, got {:?} {:?}",
+                rule,
+                first.clone()
+            ),
+        })
     }
 }
 

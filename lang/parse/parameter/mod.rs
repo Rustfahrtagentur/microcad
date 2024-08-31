@@ -1,6 +1,6 @@
 mod parameter_list;
 
-use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*, r#type::*, with_pair_ok};
+use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*, r#type::*};
 
 pub use parameter_list::*;
 
@@ -32,7 +32,7 @@ impl std::fmt::Display for Parameter {
 }
 
 impl Parse for Parameter {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut name = Identifier::default();
         let mut specified_type = None;
         let mut default_value = None;
@@ -40,13 +40,13 @@ impl Parse for Parameter {
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::identifier => {
-                    name = Identifier::parse(pair)?.value;
+                    name = Identifier::parse(pair)?;
                 }
                 Rule::r#type => {
-                    specified_type = Some(Type::parse(pair)?.value);
+                    specified_type = Some(Type::parse(pair)?);
                 }
                 Rule::expression => {
-                    default_value = Some(Expression::parse(pair)?.value);
+                    default_value = Some(Expression::parse(pair)?);
                 }
                 rule => {
                     unreachable!(
@@ -62,14 +62,11 @@ impl Parse for Parameter {
             return Err(ParseError::ParameterMissingTypeOrValue(name.clone()));
         }
 
-        with_pair_ok!(
-            Self {
-                name,
-                specified_type,
-                default_value,
-            },
-            pair
-        )
+        Ok(Self {
+            name,
+            specified_type,
+            default_value,
+        })
     }
 }
 

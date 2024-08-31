@@ -1,4 +1,4 @@
-use crate::{eval::*, ord_map::OrdMap, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, ord_map::OrdMap, parse::*, parser::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct ParameterList(OrdMap<Identifier, Parameter>);
@@ -24,17 +24,17 @@ impl From<Vec<Parameter>> for ParameterList {
 }
 
 impl Parse for ParameterList {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::parameter_list);
         let mut parameters = ParameterList::default();
 
         for pair in pair.clone().into_inner() {
             parameters
-                .push(Parameter::parse(pair)?.value)
+                .push(Parameter::parse(pair)?)
                 .map_err(IdentifierListError::DuplicateIdentifier)?;
         }
 
-        with_pair_ok!(parameters, pair)
+        Ok(parameters)
     }
 }
 

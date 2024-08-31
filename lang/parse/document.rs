@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 use microcad_render::tree;
 
 #[derive(Clone, Debug)]
@@ -7,20 +7,20 @@ pub struct Document {
 }
 
 impl Parse for Document {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut body = Vec::new();
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::module_statement => {
-                    body.push(ModuleStatement::parse(pair)?.value);
+                    body.push(ModuleStatement::parse(pair)?);
                 }
                 Rule::EOI => break,
                 _ => {}
             }
         }
 
-        with_pair_ok!(Document { body }, pair)
+        Ok(Document { body })
     }
 }
 

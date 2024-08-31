@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 use strum::IntoStaticStr;
 
 #[derive(Clone, Debug, IntoStaticStr)]
@@ -25,34 +25,27 @@ impl std::fmt::Display for UseStatement {
 }
 
 impl Parse for UseStatement {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut inner = pair.clone().into_inner();
         let first = inner.next().unwrap();
         let second = inner.next();
-        let names = Parser::vec(first.clone(), QualifiedName::parse)?.value;
+        let names = Parser::vec(first.clone(), QualifiedName::parse)?;
         match (first.as_rule(), second) {
             (Rule::qualified_name_list, Some(second))
                 if second.as_rule() == Rule::qualified_name =>
             {
-                with_pair_ok!(
-                    UseStatement::UseFrom(names, QualifiedName::parse(second)?.value,),
-                    pair
-                )
+                Ok(UseStatement::UseFrom(names, QualifiedName::parse(second)?))
             }
-            (Rule::qualified_name_list, None) => {
-                with_pair_ok!(UseStatement::Use(names), pair)
-            }
+            (Rule::qualified_name_list, None) => Ok(UseStatement::Use(names)),
             (Rule::qualified_name_all, Some(second))
                 if second.as_rule() == Rule::qualified_name_list =>
             {
-                with_pair_ok!(
-                    UseStatement::UseAll(Parser::vec(second, QualifiedName::parse)?.value),
-                    pair
-                )
+                Ok(UseStatement::UseAll(Parser::vec(
+                    second,
+                    QualifiedName::parse,
+                )?))
             }
-            (Rule::use_alias, _) => {
-                with_pair_ok!(UseStatement::UseAlias(UseAlias::parse(first)?.value), pair)
-            }
+            (Rule::use_alias, _) => Ok(UseStatement::UseAlias(UseAlias::parse(first)?)),
             _ => Err(ParseError::InvalidUseStatement),
         }
     }

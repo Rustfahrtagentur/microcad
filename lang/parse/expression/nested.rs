@@ -1,18 +1,18 @@
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 
 #[derive(Clone, Debug)]
 pub struct Nested(Vec<NestedItem>);
 
 impl Parse for Nested {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut vec = Vec::new();
         for pair in pair.clone().into_inner().filter(|pair| {
             [Rule::qualified_name, Rule::call, Rule::module_body].contains(&pair.as_rule())
         }) {
-            vec.push(NestedItem::parse(pair)?.value);
+            vec.push(NestedItem::parse(pair)?);
         }
 
-        with_pair_ok!(Nested(vec), pair)
+        Ok(Nested(vec))
     }
 }
 

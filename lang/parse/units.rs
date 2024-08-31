@@ -86,10 +86,10 @@ declare_units! {
 }
 
 impl Parse for Unit {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         use std::str::FromStr;
         match Unit::from_str(pair.as_str()) {
-            Ok(unit) => Ok(WithPair::new(unit, pair)),
+            Ok(unit) => Ok(unit),
             Err(_) => Err(ParseError::UnknownUnit(pair.as_str().to_string())),
         }
     }

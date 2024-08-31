@@ -1,4 +1,4 @@
-use crate::{parser::*, with_pair_ok};
+use crate::parser::*;
 
 #[derive(Clone, Debug, Default)]
 pub struct FormatSpec {
@@ -7,7 +7,7 @@ pub struct FormatSpec {
 }
 
 impl Parse for FormatSpec {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut opt = FormatSpec::default();
 
         for pair in pair.clone().into_inner() {
@@ -22,6 +22,6 @@ impl Parse for FormatSpec {
             }
         }
 
-        with_pair_ok!(opt, pair)
+        Ok(opt)
     }
 }

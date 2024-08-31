@@ -1,4 +1,4 @@
-use crate::{eval::*, parser::*, r#type::Type, with_pair_ok};
+use crate::{eval::*, parser::*, r#type::Type};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ListType(Box<Type>);
@@ -16,14 +16,12 @@ impl Ty for ListType {
 }
 
 impl Parse for ListType {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut inner = pair.clone().into_inner();
 
         let pair = inner.next().unwrap();
         match pair.as_rule() {
-            Rule::r#type => {
-                with_pair_ok!(Self::from_type(Type::parse(pair.clone())?.value), pair)
-            }
+            Rule::r#type => Ok(Self::from_type(Type::parse(pair.clone())?)),
             _ => unreachable!("Expected type, found {:?}", pair.as_rule()),
         }
     }

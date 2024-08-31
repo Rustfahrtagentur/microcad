@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, with_pair_ok};
+use crate::{parse::*, parser::*};
 
 #[derive(Clone, Debug)]
 pub struct Attribute {
@@ -7,24 +7,18 @@ pub struct Attribute {
 }
 
 impl Parse for Attribute {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut inner = pair.clone().into_inner();
-        let name = QualifiedName::parse(inner.next().unwrap())?.value;
+        let name = QualifiedName::parse(inner.next().unwrap())?;
         match inner.next() {
-            Some(pair) => with_pair_ok!(
-                Attribute {
-                    name,
-                    arguments: Some(CallArgumentList::parse(pair.clone())?.value),
-                },
-                pair
-            ),
-            _ => with_pair_ok!(
-                Attribute {
-                    name,
-                    arguments: None,
-                },
-                pair
-            ),
+            Some(pair) => Ok(Attribute {
+                name,
+                arguments: Some(CallArgumentList::parse(pair.clone())?),
+            }),
+            _ => Ok(Attribute {
+                name,
+                arguments: None,
+            }),
         }
     }
 }

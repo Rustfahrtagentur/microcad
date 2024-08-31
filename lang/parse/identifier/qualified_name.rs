@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, with_pair_ok};
+use crate::{eval::*, parse::*, parser::*};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a.b.c`
@@ -27,17 +27,14 @@ impl std::ops::DerefMut for QualifiedName {
 }
 
 impl Parse for QualifiedName {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
-        with_pair_ok!(
-            Self(
-                pair.clone()
-                    .into_inner()
-                    .map(|pair| Identifier::parse(pair))
-                    .map(|ident| ident.unwrap().value)
-                    .collect(),
-            ),
-            pair
-        )
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+        Ok(Self(
+            pair.clone()
+                .into_inner()
+                .map(|pair| Identifier::parse(pair))
+                .map(|ident| ident.unwrap())
+                .collect(),
+        ))
     }
 }
 

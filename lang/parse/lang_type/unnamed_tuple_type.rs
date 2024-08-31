@@ -1,17 +1,17 @@
-use crate::{parser::*, r#type::*, with_pair_ok};
+use crate::{parser::*, r#type::*};
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct UnnamedTupleType(pub Vec<Type>);
 
 impl Parse for UnnamedTupleType {
-    fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
+    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let inner = pair.clone().into_inner();
         let mut types = Vec::new();
         for pair in inner {
-            types.push(Type::parse(pair)?.value);
+            types.push(Type::parse(pair)?);
         }
 
-        with_pair_ok!(Self(types), pair)
+        Ok(Self(types))
     }
 }
 
