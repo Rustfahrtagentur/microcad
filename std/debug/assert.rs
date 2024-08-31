@@ -1,14 +1,14 @@
-use microcad_parser::{
+use microcad_lang::{
     eval::BuiltinFunction,
-    language::{Expression, Identifier, Parameter},
     parameter_list,
+    parse::{Expression, Identifier, Parameter},
     r#type::Type,
 };
 
 pub fn builtin_fn() -> BuiltinFunction {
     BuiltinFunction::new(
         "assert".into(),
-        microcad_parser::language::function::FunctionSignature::new(
+        microcad_lang::parse::function::FunctionSignature::new(
             parameter_list![
                 Parameter {
                     name: Identifier::builtin("condition"),

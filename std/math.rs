@@ -1,7 +1,7 @@
 use crate::{arg_1, arg_2, ModuleBuilder};
 use cgmath::InnerSpace;
 use microcad_core::Scalar;
-use microcad_parser::{eval::*, language::*};
+use microcad_lang::{eval::*, parse::*};
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     ModuleBuilder::namespace("math")
@@ -125,9 +125,9 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
 
 #[cfg(test)]
 fn test_builtin_function(name: &str, input: &str, expected: &str) {
-    use microcad_parser::language::expression::*;
-    use microcad_parser::parser::*;
-    use microcad_parser::r#type::Type;
+    use microcad_lang::parse::expression::*;
+    use microcad_lang::parser::*;
+    use microcad_lang::r#type::Type;
 
     let module = builtin_module();
     assert_eq!(&module.name, "math");

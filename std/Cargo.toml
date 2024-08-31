@@ -16,7 +16,7 @@ cgmath = "0.18"
 geo = "0.28"
 
 microcad-core = { path = "../core" }
-microcad-parser = { path = "../parser" }
+microcad-lang = { path = "../lang" }
 microcad-render = { path = "../render" }
 microcad-export = { path = "../export" }
 microcad-builtin-proc-macro = { path = "../builtin" }

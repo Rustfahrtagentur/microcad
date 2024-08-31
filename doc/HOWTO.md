@@ -13,7 +13,7 @@ cargo test
 
 The output will be written into one file called (in which `*` stands for the *GUID* of your build):
 
-* `target/debug/build/microcad-parser-*/out/md_test.rs`
+* `target/debug/build/microcad-lang-*/out/md_test.rs`
 
 ### Generator Source Code
 

@@ -7,9 +7,9 @@ mod geo3d;
 
 mod math;
 
-use microcad_parser::parameter;
-use microcad_parser::parameter_list;
-use microcad_parser::{builtin_module, eval::*, function_signature, language::*};
+use microcad_lang::parameter;
+use microcad_lang::parameter_list;
+use microcad_lang::{builtin_module, eval::*, function_signature, parse::*};
 
 pub use export::export;
 
@@ -54,7 +54,7 @@ impl Symbols for ModuleBuilder {
 macro_rules! arg_1 {
     ($f:ident($name:ident) for $($ty:tt),+) => { BuiltinFunction::new(
         stringify!($f).into(),
-        microcad_parser::function_signature!(microcad_parser::parameter_list![microcad_parser::parameter!($name)]),
+        microcad_lang::function_signature!(microcad_lang::parameter_list![microcad_lang::parameter!($name)]),
         &|args, _| {
         match args.get(stringify!($name)).unwrap() {
             $(Value::$ty($name) => Ok(Some(Value::$ty($name.$f()))),)*
@@ -74,7 +74,7 @@ macro_rules! arg_1 {
     };
     ($f:ident($name:ident) $inner:expr) => {
         BuiltinFunction::new(stringify!($f).into(),
-        microcad_parser::function_signature!(microcad_parser::parameter_list![microcad_parser::parameter!($name)]),
+        microcad_lang::function_signature!(microcad_lang::parameter_list![microcad_lang::parameter!($name)]),
         &|args, _| {
             let l = |$name| Ok(Some($inner?));
             l(args.get(stringify!($name)).unwrap().clone())
@@ -87,9 +87,9 @@ macro_rules! arg_2 {
     ($f:ident($x:ident, $y:ident) $inner:expr) => {
         BuiltinFunction::new(
             stringify!($f).into(),
-            microcad_parser::function_signature!(microcad_parser::parameter_list![
-                microcad_parser::parameter!($x),
-                microcad_parser::parameter!($y)
+            microcad_lang::function_signature!(microcad_lang::parameter_list![
+                microcad_lang::parameter!($x),
+                microcad_lang::parameter!($y)
             ]),
             &|args, _| {
                 let l = |$x, $y| Ok(Some($inner?));
@@ -152,7 +152,7 @@ fn context_namespace() {
 
 #[test]
 fn test_assert() {
-    use microcad_parser::{language::document::Document, parser};
+    use microcad_lang::{parse::document::Document, parser};
     let doc = match parser::Parser::parse_rule::<Document>(
         parser::Rule::document,
         r#"
@@ -174,8 +174,8 @@ fn test_assert() {
 #[test]
 fn difference_svg() {
     use crate::algorithm;
-    use microcad_parser::args;
-    use microcad_parser::eval::ArgumentMap;
+    use microcad_lang::args;
+    use microcad_lang::eval::ArgumentMap;
     use microcad_render::svg::SvgRenderer;
     use microcad_render::Renderer2D;
 
@@ -195,8 +195,8 @@ fn difference_svg() {
 fn difference_stl() {
     use crate::algorithm;
     use microcad_export::stl::StlExporter;
-    use microcad_parser::args;
-    use microcad_parser::eval::ArgumentMap;
+    use microcad_lang::args;
+    use microcad_lang::eval::ArgumentMap;
 
     let difference = algorithm::difference().unwrap();
     let group = microcad_render::tree::group();

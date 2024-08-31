@@ -14,7 +14,7 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
     match &input.data {
         Data::Struct(syn::DataStruct { fields, .. }) => {
             let mut parameter_impl = quote! {
-                use microcad_parser::language::parameter::ParameterList;
+                use microcad_lang::parse::parameter::ParameterList;
                 let mut parameters = ParameterList::default();
             };
             let field_identifiers = fields.iter().map(|item| item.ident.as_ref().unwrap()).collect::<Vec<_>>();
@@ -24,9 +24,9 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
                 let identifier = field.ident.as_ref().unwrap();
                 let ty = &field.ty;
                 parameter_impl.extend(quote! {
-                    parameters.push(microcad_parser::language::parameter::Parameter { 
+                    parameters.push(microcad_lang::parse::parameter::Parameter { 
                         name: stringify!(#identifier).into(),
-                        specified_type: Some(microcad_parser::r#type::Type::#ty),
+                        specified_type: Some(microcad_lang::r#type::Type::#ty),
                         default_value: None 
                     }).unwrap();
                 });
@@ -44,7 +44,7 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
                         parameters
                     }
 
-                    fn node(args: &microcad_parser::eval::ArgumentMap) -> microcad_parser::eval::Result<microcad_core::render::Node> {
+                    fn node(args: &microcad_lang::eval::ArgumentMap) -> microcad_lang::eval::Result<microcad_core::render::Node> {
                         use microcad_core::render::{Node, NodeInner};
                         Ok(Node::new(NodeInner::#node_type(Box::new(#struct_name {
                             #(

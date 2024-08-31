@@ -17,7 +17,7 @@ log = "0.4"
 
 microcad-core = { path = "../core" }
 microcad-export = { path = "../export" }
-microcad-parser = { path = "../parser" }
+microcad-lang = { path = "../lang" }
 microcad-std = { path = "../std" }
 
 

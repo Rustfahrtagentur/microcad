@@ -1,8 +1,8 @@
 use crate::ModuleBuilder;
-use microcad_parser::{
+use microcad_lang::{
     builtin_module,
     eval::{EvalError, Symbols},
-    language::*,
+    parse::*,
 };
 use microcad_render::Node;
 

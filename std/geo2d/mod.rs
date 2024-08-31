@@ -3,7 +3,7 @@ use microcad_core::{
     geo2d::{Geometry, LineString},
     Scalar,
 };
-use microcad_parser::{eval::*, language::*};
+use microcad_lang::{eval::*, parse::*};
 use microcad_render::{RenderHash, Renderable2D};
 
 #[derive(DefineBuiltInRenderable2D)]

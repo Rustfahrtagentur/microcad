@@ -2,7 +2,7 @@
 default-members = [
     "core",
     "export",
-    "parser",
+    "lang",
     "render",
     "std",
     "tests",
@@ -12,7 +12,7 @@ default-members = [
 members = [
     "core",
     "export",
-    "parser",
+    "lang",
     "render",
     "std",
     "tests",

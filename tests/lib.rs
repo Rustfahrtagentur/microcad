@@ -5,7 +5,7 @@ include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
 
 #[cfg(test)]
 fn eval_input(input: &str) -> microcad_core::render::Node {
-    use microcad_parser::{eval::*, language::document::Document, parser};
+    use microcad_lang::{eval::*, parse::document::Document, parser};
     let doc = match parser::Parser::parse_rule::<Document>(parser::Rule::document, input) {
         Ok(doc) => doc,
         Err(err) => panic!("ERROR: {err}"),
@@ -14,7 +14,7 @@ fn eval_input(input: &str) -> microcad_core::render::Node {
     let mut context = Context::default();
     context.add_module(microcad_std::builtin_module());
 
-    use microcad_parser::eval::Eval;
+    use microcad_lang::eval::Eval;
 
     doc.eval(&mut context).unwrap()
 }
