@@ -1,17 +1,23 @@
 use crate::eval::*;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ArgumentMap(std::collections::HashMap<Id, Value>);
 
 impl ArgumentMap {
     pub fn new() -> Self {
         Self(std::collections::HashMap::new())
     }
-}
 
-impl Default for ArgumentMap {
-    fn default() -> Self {
-        Self::new()
+    pub fn get_value<'a, T>(&'a self, name: &str) -> T
+    where
+        T: std::convert::TryFrom<&'a Value>,
+        T::Error: std::fmt::Debug,
+    {
+        if let Some(value) = self.0.get(name) {
+            value.try_into().expect("cannot convert argument value")
+        } else {
+            unreachable!()
+        }
     }
 }
 
