@@ -83,13 +83,13 @@ impl Eval for Parameter {
                 let default_value = expr.eval(context)?;
                 if specified_type != &default_value.ty() {
                     Err(EvalError::ParameterTypeMismatch(
-                        self.name.clone(),
+                        self.name.id().expect("unnamed parameter type mismatch"),
                         specified_type.clone(),
                         default_value.ty(),
                     ))
                 } else {
                     Ok(ParameterValue {
-                        name: self.name.clone(),
+                        name: self.name.id().expect("nameless parameter"),
                         specified_type: Some(specified_type.clone()),
                         default_value: Some(default_value),
                     })
@@ -97,7 +97,7 @@ impl Eval for Parameter {
             }
             // Only type is specified
             (Some(t), None) => Ok(ParameterValue {
-                name: self.name.clone(),
+                name: self.name.id().expect("nameless parameter"),
                 specified_type: Some(t.clone()),
                 default_value: None,
             }),
@@ -106,14 +106,14 @@ impl Eval for Parameter {
                 let default_value = expr.eval(context)?;
 
                 Ok(ParameterValue {
-                    name: self.name.clone(),
+                    name: self.name.id().expect("nameless parameter"),
                     specified_type: Some(default_value.ty().clone()),
                     default_value: Some(default_value),
                 })
             }
             // Neither type nor value is specified
             (None, None) => Ok(ParameterValue {
-                name: self.name.clone(),
+                name: self.name.id().expect("nameless parameter"),
                 specified_type: None,
                 default_value: None,
             }),

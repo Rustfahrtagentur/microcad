@@ -61,7 +61,7 @@ impl Eval for Assignment {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let value = self.value.eval(context)?;
-        context.add_value(self.name.clone(), value);
+        context.add_value(self.name.id().expect("nameless lvalue"), value);
         Ok(())
     }
 }

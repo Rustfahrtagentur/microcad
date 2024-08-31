@@ -1,9 +1,9 @@
-use crate::{eval::*, language::*, parser::*};
+use crate::eval::*;
 
 #[derive(Clone, Debug, Default)]
 pub struct ParameterValueList {
     parameters: Vec<ParameterValue>,
-    by_name: std::collections::HashMap<Identifier, usize>,
+    by_name: std::collections::HashMap<Id, usize>,
 }
 
 impl ParameterValueList {
@@ -19,9 +19,9 @@ impl ParameterValueList {
         }
     }
 
-    pub fn push(&mut self, parameter: ParameterValue) -> std::result::Result<(), ParseError> {
+    pub fn push(&mut self, parameter: ParameterValue) -> std::result::Result<(), EvalError> {
         if self.by_name.contains_key(&parameter.name) {
-            return Err(ParseError::DuplicateParameter(parameter.name.clone()));
+            return Err(EvalError::DuplicateParameter(parameter.name.clone()));
         }
 
         self.by_name
@@ -30,11 +30,11 @@ impl ParameterValueList {
         Ok(())
     }
 
-    pub fn get(&self, name: &Identifier) -> Option<&ParameterValue> {
+    pub fn get(&self, name: &Id) -> Option<&ParameterValue> {
         self.by_name.get(name).map(|i| &self.parameters[*i])
     }
 
-    pub fn remove(&mut self, name: &Identifier) {
+    pub fn remove(&mut self, name: &Id) {
         if let Some(new_index) = self.by_name.remove(name) {
             self.parameters.remove(new_index);
             for index in &mut self.by_name.values_mut() {

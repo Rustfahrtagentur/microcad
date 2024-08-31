@@ -5,6 +5,13 @@ use crate::{eval::*, language::*, parser::*, with_pair_ok};
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct QualifiedName(Vec<Identifier>);
 
+impl Sym for QualifiedName {
+    fn id(&self) -> Option<microcad_core::Id> {
+        // TODO: how to convert qualified name into one single id?
+        self.last().and_then(|i| i.id())
+    }
+}
+
 impl std::ops::Deref for QualifiedName {
     type Target = Vec<Identifier>;
 
@@ -63,9 +70,10 @@ impl QualifiedName {
         }
         let ident = &self.0[index];
 
-        let new_symbols = match root {
-            Some(ref root) => root.get_symbols(ident),
-            None => context.find_symbols(ident),
+        let new_symbols = match (&root, ident.id()) {
+            (Some(ref root), Some(id)) => root.get_symbols(&id),
+            (None, Some(id)) => context.find_symbols(&id),
+            _ => unreachable!("can't search unnamed symbol"),
         };
 
         for symbol in new_symbols {
@@ -87,7 +95,9 @@ impl QualifiedName {
         })?;
 
         if symbols.is_empty() {
-            return Err(EvalError::SymbolNotFound(self.clone()));
+            return Err(EvalError::SymbolNotFound(
+                self.id().expect("unnamed symbol not found"),
+            ));
         }
         Ok(symbols)
     }

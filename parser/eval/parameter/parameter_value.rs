@@ -1,9 +1,9 @@
-use crate::{eval::*, language::*, r#type::*};
+use crate::{eval::*, r#type::*};
 
 /// Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
 pub struct ParameterValue {
-    pub name: Identifier,
+    pub name: Id,
     pub specified_type: Option<Type>,
     pub default_value: Option<Value>,
 }

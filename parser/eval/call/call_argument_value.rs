@@ -1,19 +1,19 @@
-use crate::{eval::*, language::*, ord_map::OrdMapValue};
+use crate::{eval::*, ord_map::OrdMapValue};
 
 #[derive(Clone, Debug)]
 pub struct CallArgumentValue {
-    pub name: Option<Identifier>,
+    pub name: Option<Id>,
     pub value: Value,
 }
 
-impl OrdMapValue<Identifier> for CallArgumentValue {
-    fn key(&self) -> Option<Identifier> {
+impl OrdMapValue<Id> for CallArgumentValue {
+    fn key(&self) -> Option<Id> {
         self.name.clone()
     }
 }
 
 impl CallArgumentValue {
-    pub fn new(name: Option<Identifier>, value: Value) -> Self {
+    pub fn new(name: Option<Id>, value: Value) -> Self {
         Self { name, value }
     }
 }

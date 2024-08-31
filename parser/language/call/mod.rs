@@ -16,6 +16,12 @@ pub struct Call {
     pub argument_list: CallArgumentList,
 }
 
+impl Sym for Call {
+    fn id(&self) -> Option<microcad_core::Id> {
+        self.name.id()
+    }
+}
+
 impl Parse for Call {
     fn parse(pair: Pair<'_>) -> ParseResult<'_, Self> {
         Parser::ensure_rule(&pair, Rule::call);
@@ -91,11 +97,21 @@ impl Eval for Call {
             println!("No matching symbol found for `{}`. Candidates:", self.name);
             for symbol in &non_matching_symbols {
                 let s: &'static str = symbol.into();
-                println!("\t{} => {}", symbol.name(), s);
+                println!(
+                    "\t{} => {}",
+                    if let Some(id) = &symbol.id() {
+                        id.as_str()
+                    } else {
+                        "<unnamed>"
+                    },
+                    s
+                );
             }
         }
 
-        Err(EvalError::SymbolNotFound(self.name.clone()))
+        Err(EvalError::SymbolNotFound(
+            self.id().expect("unnamed symbol not found)"),
+        ))
     }
 }
 

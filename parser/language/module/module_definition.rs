@@ -20,8 +20,8 @@ impl ModuleDefinition {
 }
 
 impl Symbols for ModuleDefinition {
-    fn find_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
-        self.body.find_symbols(name)
+    fn find_symbols(&self, id: &Id) -> Vec<&Symbol> {
+        self.body.find_symbols(id)
     }
 
     fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {

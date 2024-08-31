@@ -28,3 +28,5 @@ pub trait Eval {
     /// Evaluate the type into an expression
     fn eval(&self, context: &mut Context) -> Result<Self::Output>;
 }
+
+pub use microcad_core::Id;

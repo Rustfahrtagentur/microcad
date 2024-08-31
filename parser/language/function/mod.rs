@@ -26,7 +26,12 @@ fn assignment() {
     assignment.eval(&mut context).unwrap();
 
     assert_eq!(
-        context.find_symbols(&"a".into()).first().unwrap().name(),
+        context
+            .find_symbols(&"a".into())
+            .first()
+            .unwrap()
+            .id()
+            .unwrap(),
         "a"
     );
 }

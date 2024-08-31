@@ -1,5 +1,6 @@
 use super::{EvalError, Symbol, SymbolTable, Symbols};
 use crate::language::identifier::*;
+use microcad_core::Id;
 use microcad_render::tree;
 
 /// Context for evaluation
@@ -44,11 +45,11 @@ impl Context {
 }
 
 impl Symbols for Context {
-    fn find_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+    fn find_symbols(&self, id: &Id) -> Vec<&Symbol> {
         self.stack
             .iter()
             .rev()
-            .flat_map(|table| table.find_symbols(name))
+            .flat_map(|table| table.find_symbols(id))
             .collect()
     }
 
@@ -83,8 +84,8 @@ fn context_basic() {
     context.add_value("a".into(), Value::Integer(1));
     context.add_value("b".into(), Value::Integer(2));
 
-    assert_eq!(context.find_symbols(&"a".into())[0].name(), "a");
-    assert_eq!(context.find_symbols(&"b".into())[0].name(), "b");
+    assert_eq!(context.find_symbols(&"a".into())[0].id().unwrap(), "a");
+    assert_eq!(context.find_symbols(&"b".into())[0].id().unwrap(), "b");
 
     let c = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "c = a + b");
 

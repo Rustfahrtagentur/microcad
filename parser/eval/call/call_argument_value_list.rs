@@ -1,10 +1,10 @@
-use crate::{eval::*, language::*, ord_map::OrdMap};
+use crate::{eval::*, ord_map::OrdMap};
 
 #[derive(Clone, Debug, Default)]
-pub struct CallArgumentValueList(OrdMap<Identifier, CallArgumentValue>);
+pub struct CallArgumentValueList(OrdMap<Id, CallArgumentValue>);
 
 impl std::ops::Deref for CallArgumentValueList {
-    type Target = OrdMap<Identifier, CallArgumentValue>;
+    type Target = OrdMap<Id, CallArgumentValue>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -19,7 +19,7 @@ impl std::ops::DerefMut for CallArgumentValueList {
 
 impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
     fn from(value: Vec<CallArgumentValue>) -> Self {
-        Self(OrdMap::<Identifier, CallArgumentValue>::from(value))
+        Self(OrdMap::<Id, CallArgumentValue>::from(value))
     }
 }
 
@@ -28,7 +28,7 @@ impl CallArgumentValueList {
     fn insert_and_remove(
         arg_map: &mut ArgumentMap,
         parameter_values: &mut ParameterValueList,
-        name: &Identifier,
+        name: &Id,
         value: Value,
     ) {
         arg_map.insert(name.clone(), value.clone());
@@ -133,12 +133,12 @@ impl CallArgumentValueList {
         self.get_matching_positional_arguments(&mut missing_parameter_values, &mut arg_map)?;
 
         if !missing_parameter_values.is_empty() {
-            return Err(EvalError::MissingArguments(IdentifierList::from(
+            return Err(EvalError::MissingArguments(
                 missing_parameter_values
                     .iter()
                     .map(|parameter| parameter.name.clone())
                     .collect::<Vec<_>>(),
-            )));
+            ));
         }
 
         Ok(arg_map)
@@ -149,7 +149,7 @@ impl CallArgumentValueList {
 macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
-            $arg_map.get(&stringify!($name).into()).unwrap(),
+            $arg_map.get(stringify!($name)).unwrap(),
             &Value::$ty($value)
         ));*
     };

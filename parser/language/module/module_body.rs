@@ -35,8 +35,8 @@ impl ModuleBody {
 }
 
 impl Symbols for ModuleBody {
-    fn find_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
-        self.symbols.find_symbols(name)
+    fn find_symbols(&self, id: &Id) -> Vec<&Symbol> {
+        self.symbols.find_symbols(id)
     }
 
     fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {

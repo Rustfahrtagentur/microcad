@@ -2,25 +2,31 @@ use crate::{eval::*, language::*};
 
 #[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum Symbol {
-    Value(Identifier, Value),
+    Value(Id, Value),
     Function(std::rc::Rc<FunctionDefinition>),
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
     BuiltinFunction(BuiltinFunction),
     BuiltinModule(BuiltinModule),
 }
 
-impl Symbol {
-    pub fn name(&self) -> &Identifier {
+pub trait Sym {
+    fn id(&self) -> Option<microcad_core::Id>;
+}
+
+impl Sym for Symbol {
+    fn id(&self) -> Option<Id> {
         match self {
-            Self::Value(v, _) => v,
-            Self::Function(f) => &f.name,
-            Self::ModuleDefinition(m) => &m.name,
-            Self::BuiltinFunction(f) => &f.name,
-            Self::BuiltinModule(m) => m.name(),
+            Self::Value(id, _) => Some(id.clone()),
+            Self::Function(f) => f.name.id(),
+            Self::ModuleDefinition(m) => m.name.id(),
+            Self::BuiltinFunction(f) => f.name.id(),
+            Self::BuiltinModule(m) => m.name.id(),
         }
     }
+}
 
-    pub fn get_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+impl Symbol {
+    pub fn get_symbols(&self, name: &Id) -> Vec<&Symbol> {
         match self {
             Self::ModuleDefinition(module) => module.find_symbols(name),
             _ => Vec::new(),
@@ -35,7 +41,7 @@ impl Symbol {
 pub struct SymbolTable(Vec<Symbol>);
 
 pub trait Symbols {
-    fn find_symbols(&self, name: &Identifier) -> Vec<&Symbol>;
+    fn find_symbols(&self, id: &Id) -> Vec<&Symbol>;
     fn add_symbol(&mut self, symbol: Symbol) -> &mut Self;
     fn copy_symbols<T: Symbols>(&self, into: &mut T);
 
@@ -51,7 +57,7 @@ pub trait Symbols {
         self.add_symbol(Symbol::ModuleDefinition(m));
         self
     }
-    fn add_value(&mut self, id: Identifier, value: Value) -> &mut Self {
+    fn add_value(&mut self, id: Id, value: Value) -> &mut Self {
         self.add_symbol(Symbol::Value(id, value));
         self
     }
@@ -68,10 +74,16 @@ impl SymbolTable {
 }
 
 impl Symbols for SymbolTable {
-    fn find_symbols(&self, name: &Identifier) -> Vec<&Symbol> {
+    fn find_symbols(&self, id: &Id) -> Vec<&Symbol> {
         self.0
             .iter()
-            .filter(|symbol| symbol.name() == name)
+            .filter(|symbol| {
+                if let Some(n) = symbol.id() {
+                    n == id
+                } else {
+                    false
+                }
+            })
             .collect()
     }
     fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {

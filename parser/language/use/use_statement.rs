@@ -75,7 +75,9 @@ impl Eval for UseStatement {
                                 }
                             }
                             _ => {
-                                return Err(EvalError::ExpectedModule(name.clone()));
+                                return Err(EvalError::ExpectedModule(
+                                    name.id().expect("nameless module"),
+                                ));
                             }
                         }
                     }

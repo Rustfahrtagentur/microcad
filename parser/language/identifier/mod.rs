@@ -4,24 +4,14 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{parser::*, with_pair_ok};
+use crate::{eval::Sym, parser::*, with_pair_ok};
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Identifier(microcad_core::Identifier);
+pub struct Identifier(microcad_core::Id);
 
-impl std::ops::Deref for Identifier {
-    type Target = microcad_core::Identifier;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::str::FromStr for Identifier {
-    type Err = ParseError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self(s.into()))
+impl Sym for Identifier {
+    fn id(&self) -> Option<microcad_core::Id> {
+        Some(self.0.clone())
     }
 }
 

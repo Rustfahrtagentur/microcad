@@ -35,10 +35,7 @@ impl ModuleBuilder {
 }
 
 impl Symbols for ModuleBuilder {
-    fn find_symbols(
-        &self,
-        name: &microcad_parser::language::identifier::Identifier,
-    ) -> Vec<&Symbol> {
+    fn find_symbols(&self, name: &microcad_core::Id) -> Vec<&Symbol> {
         self.module.find_symbols(name)
     }
 
@@ -59,7 +56,7 @@ macro_rules! arg_1 {
         stringify!($f).into(),
         microcad_parser::function_signature!(microcad_parser::parameter_list![microcad_parser::parameter!($name)]),
         &|args, _| {
-        match args.get(&stringify!($name).into()).unwrap() {
+        match args.get(stringify!($name)).unwrap() {
             $(Value::$ty($name) => Ok(Some(Value::$ty($name.$f()))),)*
             Value::List(v) => {
                 let mut result = ValueList::new();
@@ -80,7 +77,7 @@ macro_rules! arg_1 {
         microcad_parser::function_signature!(microcad_parser::parameter_list![microcad_parser::parameter!($name)]),
         &|args, _| {
             let l = |$name| Ok(Some($inner?));
-            l(args.get(&stringify!($name).into()).unwrap().clone())
+            l(args.get(stringify!($name)).unwrap().clone())
     })
 }
 }
@@ -97,8 +94,8 @@ macro_rules! arg_2 {
             &|args, _| {
                 let l = |$x, $y| Ok(Some($inner?));
                 let (x, y) = (
-                    args.get(&stringify!($x).into()).unwrap().clone(),
-                    args.get(&stringify!($y).into()).unwrap().clone(),
+                    args.get(stringify!($x)).unwrap().clone(),
+                    args.get(stringify!($y)).unwrap().clone(),
                 );
                 l(x.clone(), y.clone())
             },
@@ -122,8 +119,8 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 parameter!(message: String = "Assertion failed")
             ]),
             &|args, _| {
-                let message: String = args[&"message".into()].clone().try_into()?;
-                let condition: bool = args[&"condition".into()].clone().try_into()?;
+                let message: String = args["message"].clone().try_into()?;
+                let condition: bool = args["condition"].clone().try_into()?;
                 assert!(condition, "{message}");
                 Ok(None)
             },
@@ -150,7 +147,7 @@ fn context_namespace() {
         .get_symbols_by_qualified_name(&"math::pi".into())
         .unwrap();
     assert_eq!(symbols.len(), 1);
-    assert_eq!(symbols[0].name(), "pi");
+    assert_eq!(symbols[0].id().unwrap(), "pi");
 }
 
 #[test]

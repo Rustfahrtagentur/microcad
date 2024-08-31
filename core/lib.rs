@@ -16,7 +16,7 @@ pub type Mat3 = cgmath::Matrix3<Scalar>;
 pub type Mat4 = cgmath::Matrix4<Scalar>;
 pub type Angle = cgmath::Rad<Scalar>;
 
-pub type Identifier = compact_str::CompactString;
+pub type Id = compact_str::CompactString;
 
 pub use algorithm::Algorithm;
 pub use error::Error;

@@ -65,7 +65,7 @@ macro_rules! builtin_module {
             &|args, ctx| {
                 let mut l = |$($arg: $type),*| $f;
                 let ($($arg),*) = (
-                    $(args.get(&stringify!($arg).into()).unwrap().clone().try_into()?),*
+                    $(args.get(stringify!($arg)).unwrap().clone().try_into()?),*
                 );
                 l($($arg),*)
             }
@@ -81,7 +81,7 @@ macro_rules! builtin_module {
             &|args, ctx| {
                 let mut l = |$($arg: $type),*| Ok(ctx.append_node($name($($arg),*)?));
                 let ($($arg),*) = (
-                    $(args.get(&stringify!($arg).into()).unwrap().clone().try_into()?),*
+                    $(args.get(stringify!($arg)).unwrap().clone().try_into()?),*
                 );
                 l($($arg),*)
             },

@@ -1,7 +1,7 @@
-use crate::{eval::*, language::*};
+use crate::eval::*;
 
 #[derive(Clone, Debug)]
-pub struct ArgumentMap(std::collections::HashMap<Identifier, Value>);
+pub struct ArgumentMap(std::collections::HashMap<Id, Value>);
 
 impl ArgumentMap {
     pub fn new() -> Self {
@@ -16,7 +16,7 @@ impl Default for ArgumentMap {
 }
 
 impl std::ops::Deref for ArgumentMap {
-    type Target = std::collections::HashMap<Identifier, Value>;
+    type Target = std::collections::HashMap<Id, Value>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

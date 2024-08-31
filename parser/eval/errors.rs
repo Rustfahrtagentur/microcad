@@ -1,4 +1,5 @@
-use crate::{language::*, r#type::*};
+use crate::r#type::*;
+use microcad_core::Id;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -40,10 +41,10 @@ pub enum EvalError {
     ValueError(#[from] crate::eval::value::ValueError),
 
     #[error("Unknown qualified name: {0}")]
-    UnknownQualifiedName(QualifiedName),
+    UnknownQualifiedName(Id),
 
     #[error("Unknown method: {0}")]
-    UnknownMethod(Identifier),
+    UnknownMethod(Id),
 
     #[error("Elements of list have different types")]
     ListElementsDifferentTypes,
@@ -52,13 +53,13 @@ pub enum EvalError {
     Unknown,
 
     #[error("Function call missing argument: {0}")]
-    FunctionCallMissingArgument(Identifier),
+    FunctionCallMissingArgument(Id),
 
     #[error("Function must return a value")]
     FunctionCallMissingReturn,
 
     #[error("Symbol not found: {0}")]
-    SymbolNotFound(QualifiedName),
+    SymbolNotFound(Id),
 
     #[error("Argument count mismatch: expected {expected}, got {found}")]
     ArgumentCountMismatch { expected: usize, found: usize },
@@ -67,23 +68,26 @@ pub enum EvalError {
     InvalidArgumentType(Type),
 
     #[error("Expected module: {0}")]
-    ExpectedModule(QualifiedName),
+    ExpectedModule(Id),
 
     #[error("Cannot nest function call")]
     CannotNestFunctionCall,
 
-    #[error("Missing arguments: {0}")]
-    MissingArguments(IdentifierList),
+    #[error("Missing arguments: {0:?}")]
+    MissingArguments(Vec<Id>),
 
     #[error("Parameter type mismatch: {0} expected {1}, got {2}")]
-    ParameterTypeMismatch(Identifier, Type, Type),
+    ParameterTypeMismatch(Id, Type, Type),
 
     #[error("Parameter missing type or value: {0}")]
-    ParameterMissingTypeOrValue(Identifier),
+    ParameterMissingTypeOrValue(Id),
 
     #[error("Unexpected argument: {0}")]
-    UnexpectedArgument(Identifier),
+    UnexpectedArgument(Id),
 
     #[error("duplicate call argument: {0}")]
-    DuplicateCallArgument(Identifier),
+    DuplicateCallArgument(Id),
+
+    #[error("Duplicate parameter: {0}")]
+    DuplicateParameter(Id),
 }

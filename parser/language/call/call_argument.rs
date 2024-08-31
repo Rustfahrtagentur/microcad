@@ -6,6 +6,16 @@ pub struct CallArgument {
     pub value: Expression,
 }
 
+impl Sym for CallArgument {
+    fn id(&self) -> Option<microcad_core::Id> {
+        if let Some(name) = &self.name {
+            name.id()
+        } else {
+            None
+        }
+    }
+}
+
 impl OrdMapValue<Identifier> for CallArgument {
     fn key(&self) -> Option<Identifier> {
         self.name.clone()
@@ -47,7 +57,7 @@ impl Eval for CallArgument {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         Ok(CallArgumentValue {
-            name: self.name.clone(),
+            name: self.id(),
             value: self.value.eval(context)?,
         })
     }
