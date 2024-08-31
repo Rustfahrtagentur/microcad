@@ -59,12 +59,12 @@ macro_rules! parameter_list {
         ].into()
     };
     ($($name:ident),*) => {
-        microcad_lang::language::parameter_list![$(microcad_lang::parameter!($name)),*]
+        microcad_lang::parse::parameter_list![$(microcad_lang::parameter!($name)),*]
     };
     ($($name:ident: $ty:ident),*) => {
-        microcad_lang::language::parameter_list![$(microcad_lang::parameter!($name: $ty)),*]
+        microcad_lang::parse::parameter_list![$(microcad_lang::parameter!($name: $ty)),*]
     };
     ($($name:ident: $ty:ident = $value:expr),*) => {
-        microcad_lang::language::parameter_list![$(microcad_lang::parameter!($name: $ty = $value)),*]
+        microcad_lang::parse::parameter_list![$(microcad_lang::parameter!($name: $ty = $value)),*]
     };
 }
