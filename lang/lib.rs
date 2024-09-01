@@ -7,4 +7,5 @@ pub mod map_key_type;
 pub mod ord_map;
 pub mod parse;
 pub mod parser;
+pub mod src_ref;
 pub mod r#type;
