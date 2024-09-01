@@ -18,7 +18,7 @@ impl std::fmt::Display for LineCol {
 pub struct SrcRef(pub Option<SrcRefInner>);
 
 impl SrcRef {
-    fn new(range: std::ops::Range<usize>, line: u32, col: u32) -> Self {
+    pub fn new(range: std::ops::Range<usize>, line: u32, col: u32) -> Self {
         Self(Some(SrcRefInner {
             range,
             at: LineCol { line, col },
@@ -118,6 +118,20 @@ impl From<Pair<'_>> for SrcRef {
 
 pub trait SrcReferrer {
     fn src_ref(&self) -> SrcRef;
+}
+
+/// We want to be able to use SrcRef directly in functions with `impl SrcReferrer` argument
+impl SrcReferrer for SrcRef {
+    fn src_ref(&self) -> SrcRef {
+        self.clone()
+    }
+}
+
+/// We want to be able to use type references as well
+impl<T: SrcReferrer> SrcReferrer for &T {
+    fn src_ref(&self) -> SrcRef {
+        (*self).src_ref()
+    }
 }
 
 #[test]
