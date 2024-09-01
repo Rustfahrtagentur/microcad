@@ -1,6 +1,6 @@
 mod parameter_list;
 
-use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*, r#type::*};
+use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*, r#type::*, src_ref::*};
 
 pub use parameter_list::*;
 
@@ -8,8 +8,15 @@ pub use parameter_list::*;
 #[derive(Clone, Debug, Default)]
 pub struct Parameter {
     pub name: Identifier,
-    pub specified_type: Option<Type>,
+    pub specified_type: Option<TypeAnnotation>,
     pub default_value: Option<Expression>,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for Parameter {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl OrdMapValue<Identifier> for Parameter {
@@ -43,7 +50,7 @@ impl Parse for Parameter {
                     name = Identifier::parse(pair)?;
                 }
                 Rule::r#type => {
-                    specified_type = Some(Type::parse(pair)?);
+                    specified_type = Some(TypeAnnotation::parse(pair)?);
                 }
                 Rule::expression => {
                     default_value = Some(Expression::parse(pair)?);
@@ -66,6 +73,7 @@ impl Parse for Parameter {
             name,
             specified_type,
             default_value,
+            src_ref: pair.into(),
         })
     }
 }
@@ -78,16 +86,16 @@ impl Eval for Parameter {
             // Type and value are specified
             (Some(specified_type), Some(expr)) => {
                 let default_value = expr.eval(context)?;
-                if specified_type != &default_value.ty() {
+                if specified_type.ty() != default_value.ty() {
                     Err(EvalError::ParameterTypeMismatch(
                         self.name.id().expect("unnamed parameter type mismatch"),
-                        specified_type.clone(),
+                        specified_type.ty(),
                         default_value.ty(),
                     ))
                 } else {
                     Ok(ParameterValue {
                         name: self.name.id().expect("nameless parameter"),
-                        specified_type: Some(specified_type.clone()),
+                        specified_type: Some(specified_type.ty()),
                         default_value: Some(default_value),
                     })
                 }
@@ -95,7 +103,7 @@ impl Eval for Parameter {
             // Only type is specified
             (Some(t), None) => Ok(ParameterValue {
                 name: self.name.id().expect("nameless parameter"),
-                specified_type: Some(t.clone()),
+                specified_type: Some(t.ty()),
                 default_value: None,
             }),
             // Only value is specified
@@ -125,22 +133,25 @@ macro_rules! parameter {
             name: stringify!($name).into(),
             specified_type: None,
             default_value: None,
+            src_ref: $crate::src_ref::SrcRef(None),
         }
     };
     ($name:ident: $ty:ident) => {
         Parameter {
             name: stringify!($name).into(),
-            specified_type: Some(microcad_lang::r#type::Type::$ty),
+            specified_type: Some(microcad_lang::r#type::Type::$ty.into()),
             default_value: None,
+            src_ref: $crate::src_ref::SrcRef(None),
         }
     };
     ($name:ident: $ty:ident = $value:expr) => {
         Parameter {
             name: stringify!($name).into(),
-            specified_type: Some(microcad_lang::r#type::Type::$ty),
+            specified_type: Some(microcad_lang::r#type::Type::$ty.into()),
             default_value: Some(
                 Expression::literal_from_str(stringify!($value)).expect("Invalid literal"),
             ),
+            src_ref: $crate::src_ref::SrcRef(None),
         }
     };
 }

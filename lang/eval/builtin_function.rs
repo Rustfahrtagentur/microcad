@@ -32,9 +32,9 @@ impl BuiltinFunction {
 
         match (&result, &self.signature.return_type) {
             (Some(result), Some(return_type)) => {
-                if result.ty() != *return_type {
+                if result.ty() != return_type.ty() {
                     Err(EvalError::TypeMismatch {
-                        expected: return_type.clone(),
+                        expected: return_type.ty(),
                         found: result.ty(),
                     })
                 } else {

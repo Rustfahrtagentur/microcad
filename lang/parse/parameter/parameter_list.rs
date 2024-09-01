@@ -1,13 +1,21 @@
+use parameter::{SrcRef, SrcReferrer};
+
 use crate::{eval::*, ord_map::OrdMap, parse::*, parser::*};
 
 #[derive(Clone, Debug, Default)]
-pub struct ParameterList(OrdMap<Identifier, Parameter>);
+pub struct ParameterList(OrdMap<Identifier, Parameter>, SrcRef);
 
 impl std::ops::Deref for ParameterList {
     type Target = OrdMap<Identifier, Parameter>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl SrcReferrer for ParameterList {
+    fn src_ref(&self) -> parameter::SrcRef {
+        self.1.clone()
     }
 }
 
@@ -19,7 +27,7 @@ impl std::ops::DerefMut for ParameterList {
 
 impl From<Vec<Parameter>> for ParameterList {
     fn from(value: Vec<Parameter>) -> Self {
-        Self(OrdMap::<Identifier, Parameter>::from(value))
+        Self(OrdMap::<Identifier, Parameter>::from(value), SrcRef(None))
     }
 }
 

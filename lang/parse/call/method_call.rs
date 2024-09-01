@@ -1,9 +1,16 @@
-use crate::{parse::*, parser::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug)]
 pub struct MethodCall {
     pub name: Identifier,
     pub argument_list: CallArgumentList,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for MethodCall {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl Parse for MethodCall {
@@ -17,6 +24,7 @@ impl Parse for MethodCall {
             } else {
                 CallArgumentList::default()
             },
+            src_ref: pair.into(),
         })
     }
 }

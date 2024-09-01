@@ -1,9 +1,10 @@
-use crate::{eval::*, parse::*, parser::*, r#type::*};
+use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*};
 #[derive(Clone, Debug, Default)]
 pub struct TupleExpression {
     args: CallArgumentList,
     unit: Option<Unit>,
     is_named: bool,
+    src_ref: SrcRef,
 }
 
 impl TupleExpression {
@@ -21,6 +22,12 @@ impl TupleExpression {
 
     pub fn is_unnamed(&self) -> bool {
         !self.is_named
+    }
+}
+
+impl SrcReferrer for TupleExpression {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        self.src_ref.clone()
     }
 }
 
@@ -49,6 +56,7 @@ impl Parse for TupleExpression {
                 Some(pair) => Some(Unit::parse(pair)?),
                 None => None,
             },
+            src_ref: pair.into(),
         })
     }
 }

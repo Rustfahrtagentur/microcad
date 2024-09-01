@@ -1,9 +1,16 @@
-use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*};
+use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct CallArgument {
     pub name: Option<Identifier>,
     pub value: Expression,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for CallArgument {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl Sym for CallArgument {
@@ -33,11 +40,13 @@ impl Parse for CallArgument {
                 Ok(CallArgument {
                     name: Some(Identifier::parse(first)?),
                     value: Expression::parse(second)?,
+                    src_ref: pair.into(),
                 })
             }
             Rule::expression => Ok(CallArgument {
                 name: None,
                 value: Expression::parse(pair.clone())?,
+                src_ref: pair.into(),
             }),
             rule => unreachable!("CallArgument::parse expected call argument, found {rule:?}"),
         }

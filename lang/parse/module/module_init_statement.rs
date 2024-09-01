@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*};
+use crate::{parse::*, parser::*, src_ref::SrcReferrer};
 
 #[derive(Clone, Debug)]
 pub enum ModuleInitStatement {
@@ -6,6 +6,17 @@ pub enum ModuleInitStatement {
     Expression(Expression),
     Assignment(Assignment),
     FunctionDefinition(FunctionDefinition),
+}
+
+impl SrcReferrer for ModuleInitStatement {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        match self {
+            Self::Use(us) => us.src_ref(),
+            Self::Expression(us) => us.src_ref(),
+            Self::Assignment(us) => us.src_ref(),
+            Self::FunctionDefinition(us) => us.src_ref(),
+        }
+    }
 }
 
 impl Parse for ModuleInitStatement {

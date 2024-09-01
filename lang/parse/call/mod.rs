@@ -6,14 +6,19 @@ pub use call_argument::*;
 pub use call_argument_list::*;
 pub use method_call::*;
 
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct Call {
-    #[allow(dead_code)]
     pub name: QualifiedName,
-    #[allow(dead_code)]
     pub argument_list: CallArgumentList,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for Call {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl Sym for Call {
@@ -34,6 +39,7 @@ impl Parse for Call {
                 Some(pair) => CallArgumentList::parse(pair)?,
                 None => CallArgumentList::default(),
             },
+            src_ref: pair.into(),
         })
     }
 }

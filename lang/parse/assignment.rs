@@ -1,10 +1,23 @@
-use crate::{eval::*, parse::*, parser::*, r#type::*};
+use crate::{
+    eval::*,
+    parse::*,
+    parser::*,
+    r#type::*,
+    src_ref::{SrcRef, SrcReferrer},
+};
 
 #[derive(Clone, Debug)]
 pub struct Assignment {
     name: Identifier,
-    specified_type: Option<Type>,
+    specified_type: Option<TypeAnnotation>,
     value: Expression,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for Assignment {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl Assignment {
@@ -12,7 +25,7 @@ impl Assignment {
         &self.name
     }
 
-    pub fn specified_type(&self) -> Option<&Type> {
+    pub fn specified_type(&self) -> Option<&TypeAnnotation> {
         self.specified_type.as_ref()
     }
 
@@ -34,7 +47,7 @@ impl Parse for Assignment {
                     name = Identifier::parse(pair)?;
                 }
                 Rule::r#type => {
-                    specified_type = Some(Type::parse(pair)?);
+                    specified_type = Some(TypeAnnotation::parse(pair)?);
                 }
                 Rule::expression => {
                     value = Expression::parse(pair)?;
@@ -49,6 +62,7 @@ impl Parse for Assignment {
             name,
             specified_type,
             value,
+            src_ref: pair.into(),
         })
     }
 }
@@ -66,7 +80,7 @@ impl Eval for Assignment {
 impl std::fmt::Display for Assignment {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.specified_type {
-            Some(t) => write!(f, "{}: {} = {}", self.name, t, self.value),
+            Some(t) => write!(f, "{}: {} = {}", self.name, t.ty(), self.value),
             None => write!(f, "{} = {}", self.name, self.value),
         }
     }

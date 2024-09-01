@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 use microcad_render::tree;
 
 #[derive(Clone, Debug, Default)]
@@ -6,6 +6,7 @@ pub struct ModuleBody {
     pub statements: Vec<ModuleStatement>,
     pub symbols: SymbolTable,
     pub inits: Vec<std::rc::Rc<ModuleInitDefinition>>,
+    src_ref: SrcRef,
 }
 
 impl ModuleBody {
@@ -14,6 +15,7 @@ impl ModuleBody {
             statements: Vec::new(),
             symbols: SymbolTable::new(),
             inits: Vec::new(),
+            src_ref: SrcRef(None),
         }
     }
 
@@ -31,6 +33,12 @@ impl ModuleBody {
             }
             _ => {}
         }
+    }
+}
+
+impl SrcReferrer for ModuleBody {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
     }
 }
 
@@ -67,6 +75,8 @@ impl Parse for ModuleBody {
                 _ => {}
             }
         }
+
+        body.src_ref = pair.into();
 
         Ok(body)
     }

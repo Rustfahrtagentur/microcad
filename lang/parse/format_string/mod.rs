@@ -4,12 +4,25 @@ mod format_spec;
 pub use format_expression::*;
 pub use format_spec::*;
 
-use crate::{eval::*, parser::*};
+use crate::{
+    eval::*,
+    parser::*,
+    src_ref::{SrcRef, SrcReferrer},
+};
 
 #[derive(Clone, Debug)]
 enum FormatStringInner {
-    String(String),
+    String(String, SrcRef),
     FormatExpression(FormatExpression),
+}
+
+impl SrcReferrer for FormatStringInner {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        match self {
+            FormatStringInner::String(_, r) => r.clone(),
+            FormatStringInner::FormatExpression(e) => e.src_ref(),
+        }
+    }
 }
 
 /// Definition and implementation for `StringLiteral`
@@ -24,9 +37,15 @@ impl std::str::FromStr for FormatString {
     }
 }
 
+impl SrcReferrer for FormatString {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        SrcRef::from_vec(&self.0)
+    }
+}
+
 impl FormatString {
     pub fn push_string(&mut self, s: String) {
-        self.0.push(FormatStringInner::String(s));
+        self.0.push(FormatStringInner::String(s, SrcRef(None)));
     }
 
     pub fn push_format_expr(&mut self, expr: FormatExpression) {
@@ -42,7 +61,7 @@ impl std::fmt::Display for FormatString {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         for elem in &self.0 {
             match elem {
-                FormatStringInner::String(s) => write!(f, "{}", s)?,
+                FormatStringInner::String(s, _) => write!(f, "{}", s)?,
                 FormatStringInner::FormatExpression(expr) => write!(f, "{}", expr)?,
             }
         }
@@ -57,7 +76,7 @@ impl Eval for FormatString {
         let mut result = String::new();
         for elem in &self.0 {
             match elem {
-                FormatStringInner::String(s) => result += s,
+                FormatStringInner::String(s, _) => result += s,
                 FormatStringInner::FormatExpression(expr) => match expr.eval(context) {
                     Ok(Value::String(s)) => result += &s,
                     Err(e) => return Err(e),

@@ -1,7 +1,7 @@
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 #[derive(Default, Clone, Debug)]
-pub struct ListExpression(ExpressionList, Option<Unit>);
+pub struct ListExpression(ExpressionList, Option<Unit>, SrcRef);
 
 impl std::ops::Deref for ListExpression {
     type Target = ExpressionList;
@@ -17,6 +17,12 @@ impl std::ops::DerefMut for ListExpression {
     }
 }
 
+impl SrcReferrer for ListExpression {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        self.2.clone()
+    }
+}
+
 impl Parse for ListExpression {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut inner = pair.clone().into_inner();
@@ -26,6 +32,7 @@ impl Parse for ListExpression {
                 Some(pair) => Some(Unit::parse(pair)?),
                 None => None,
             },
+            pair.into(),
         ))
     }
 }

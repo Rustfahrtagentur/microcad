@@ -145,7 +145,7 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                         fn r#{name}() {{
                             use microcad_lang::{{eval::{{Symbols, Eval, Context}},parse::source_file::SourceFile,parser}};
                             match parser::Parser::parse_rule::<SourceFile>(
-                                parser::Rule::document,
+                                parser::Rule::source_file,
                                 r#"
                                 {code}"#
                             ) {handling};
