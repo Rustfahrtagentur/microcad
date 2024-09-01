@@ -1,6 +1,6 @@
 mod parameter_list;
 
-use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*, r#type::*};
+use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*, r#type::*, src_ref::*};
 
 pub use parameter_list::*;
 
@@ -10,6 +10,13 @@ pub struct Parameter {
     pub name: Identifier,
     pub specified_type: Option<TypeAnnotation>,
     pub default_value: Option<Expression>,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for Parameter {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl OrdMapValue<Identifier> for Parameter {
@@ -66,6 +73,7 @@ impl Parse for Parameter {
             name,
             specified_type,
             default_value,
+            src_ref: pair.into(),
         })
     }
 }
@@ -125,6 +133,7 @@ macro_rules! parameter {
             name: stringify!($name).into(),
             specified_type: None,
             default_value: None,
+            src_ref: $crate::src_ref::SrcRef(None),
         }
     };
     ($name:ident: $ty:ident) => {
@@ -132,6 +141,7 @@ macro_rules! parameter {
             name: stringify!($name).into(),
             specified_type: Some(microcad_lang::r#type::Type::$ty.into()),
             default_value: None,
+            src_ref: $crate::src_ref::SrcRef(None),
         }
     };
     ($name:ident: $ty:ident = $value:expr) => {
@@ -141,6 +151,7 @@ macro_rules! parameter {
             default_value: Some(
                 Expression::literal_from_str(stringify!($value)).expect("Invalid literal"),
             ),
+            src_ref: $crate::src_ref::SrcRef(None),
         }
     };
 }

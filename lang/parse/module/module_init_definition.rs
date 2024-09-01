@@ -1,9 +1,16 @@
-use crate::{parse::*, parser::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
     _parameters: ParameterList,
     _body: Vec<ModuleInitStatement>,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for ModuleInitDefinition {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl Parse for ModuleInitDefinition {
@@ -30,6 +37,7 @@ impl Parse for ModuleInitDefinition {
         Ok(ModuleInitDefinition {
             _parameters: parameters,
             _body: body,
+            src_ref: pair.into(),
         })
     }
 }

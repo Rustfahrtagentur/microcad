@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug)]
 pub struct ModuleDefinition {
@@ -6,6 +6,13 @@ pub struct ModuleDefinition {
     pub name: Identifier,
     pub parameters: Option<ParameterList>,
     pub body: ModuleBody,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for ModuleDefinition {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl ModuleDefinition {
@@ -15,6 +22,7 @@ impl ModuleDefinition {
             name,
             parameters: None,
             body: ModuleBody::new(),
+            src_ref: SrcRef(None),
         }
     }
 }
@@ -65,6 +73,7 @@ impl Parse for ModuleDefinition {
             name,
             parameters,
             body,
+            src_ref: pair.into(),
         })
     }
 }

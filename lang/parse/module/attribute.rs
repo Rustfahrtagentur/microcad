@@ -1,25 +1,30 @@
-use crate::{parse::*, parser::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug)]
 pub struct Attribute {
     pub name: QualifiedName,
     pub arguments: Option<CallArgumentList>,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for Attribute {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl Parse for Attribute {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut inner = pair.clone().into_inner();
         let name = QualifiedName::parse(inner.next().unwrap())?;
-        match inner.next() {
-            Some(pair) => Ok(Attribute {
-                name,
-                arguments: Some(CallArgumentList::parse(pair.clone())?),
-            }),
-            _ => Ok(Attribute {
-                name,
-                arguments: None,
-            }),
-        }
+        Ok(Attribute {
+            name,
+            arguments: match inner.next() {
+                Some(pair) => Some(CallArgumentList::parse(pair.clone())?),
+                _ => None,
+            },
+            src_ref: pair.into(),
+        })
     }
 }
 
