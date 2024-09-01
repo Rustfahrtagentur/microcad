@@ -1,11 +1,19 @@
 use crate::{eval::*, parse::*};
 
+/// A symbol is a named entity that is used in the
+/// symbol table and in the evaluation context to
+/// represent a value, a function, a module, etc.
 #[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum Symbol {
+    /// A value symbol, e.g. a result of an assignment
     Value(Id, Value),
+    /// A function symbol, e.g. function a() {}
     Function(std::rc::Rc<FunctionDefinition>),
+    /// A module definition symbol, e.g. module a() {}, or namespace a {}
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
+    /// A builtin function symbol, e.g. assert()
     BuiltinFunction(BuiltinFunction),
+    /// A builtin module symbol, e.g. math::pi
     BuiltinModule(BuiltinModule),
 }
 
