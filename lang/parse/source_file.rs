@@ -1,6 +1,7 @@
+use core::panic;
 use std::io::Read;
 
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::SrcReferer};
 use microcad_render::tree;
 
 #[derive(Clone, Debug)]
@@ -77,12 +78,20 @@ fn parse_source_file() {
 
 #[test]
 fn load_source_file() {
-    let source_file = SourceFile::from_file("tests/std/algorithm_difference.µcad");
-    assert!(source_file.is_ok());
+    eprintln!("{:?}", std::env::current_dir());
+
+    let source_file = SourceFile::from_file(r#"../tests/std/algorithm_difference.µcad"#);
+    if let Err(ref err) = source_file {
+        eprintln!("{err}");
+    }
 
     let source_file = source_file.unwrap();
 
     let first_statement = source_file.body.first().unwrap();
+    match first_statement {
+        ModuleStatement::Use(u) => eprintln!("{}", u.src_ref()),
+        _ => panic!(),
+    }
 }
 
 #[test]

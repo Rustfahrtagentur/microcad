@@ -16,7 +16,7 @@ pub enum UseStatement {
 impl SrcReferer for UseStatement {
     fn src_ref(&self) -> SrcRef {
         match self {
-            Self::Use(u) => SrcRef::from_vec(u),
+            Self::Use(u) | Self::UseAll(u) => SrcRef::from_vec(u),
             _ => todo!(),
         }
     }

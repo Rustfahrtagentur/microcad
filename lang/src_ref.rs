@@ -60,14 +60,14 @@ impl PartialEq for SrcRef {
 
 impl PartialOrd for SrcRef {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(std::cmp::Ordering::Equal)
+        Some(self.cmp(other))
     }
 }
 
 impl Eq for SrcRef {}
 
 impl Ord for SrcRef {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, _: &Self) -> std::cmp::Ordering {
         std::cmp::Ordering::Equal
     }
 }
