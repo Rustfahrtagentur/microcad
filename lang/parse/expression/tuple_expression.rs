@@ -18,24 +18,6 @@ pub struct TupleExpression {
     src_ref: SrcRef,
 }
 
-impl TupleExpression {
-    pub fn args(&self) -> &CallArgumentList {
-        &self.args
-    }
-
-    pub fn unit(&self) -> Option<&Unit> {
-        self.unit.as_ref()
-    }
-
-    pub fn is_named(&self) -> bool {
-        self.is_named
-    }
-
-    pub fn is_unnamed(&self) -> bool {
-        !self.is_named
-    }
-}
-
 impl SrcReferrer for TupleExpression {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         self.src_ref.clone()
@@ -98,7 +80,7 @@ impl Eval for TupleExpression {
     type Output = Value;
 
     fn eval(&self, context: &mut Context) -> crate::eval::Result<Value> {
-        if self.is_unnamed() {
+        if !self.is_named {
             // Unnamed tuple
             let mut value_list = ValueList::new();
             for arg in self.args.iter() {
