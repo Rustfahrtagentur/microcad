@@ -1,27 +1,27 @@
-use core::panic;
 use std::io::Read;
 
-use crate::{eval::*, parse::*, parser::*, src_ref::SrcReferer};
+use crate::{eval::*, parse::*, parser::*};
 use microcad_render::tree;
 
 #[derive(Clone, Debug)]
 pub struct SourceFile {
     body: Vec<ModuleStatement>,
-    file_name: Option<std::path::PathBuf>,
+    _file_name: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
-    source: String,
+    _source: String,
 }
 
 impl SourceFile {
-    fn from_file(path: impl AsRef<std::path::Path>) -> anyhow::Result<Self> {
+    fn _from_file(path: impl AsRef<std::path::Path>) -> anyhow::Result<Self> {
         let mut file = std::fs::File::open(&path)?;
         let mut buf = String::new();
         use anyhow::Context;
         file.read_to_string(&mut buf)
             .context("Cannot load source file")?;
-        let mut source_file = Parser::parse_rule::<SourceFile>(crate::parser::Rule::document, &buf)
-            .context("Could not parse file")?;
-        source_file.file_name = Some(std::path::PathBuf::from(path.as_ref()));
+        let mut source_file =
+            Parser::parse_rule::<SourceFile>(crate::parser::Rule::source_file, &buf)
+                .context("Could not parse file")?;
+        source_file._file_name = Some(std::path::PathBuf::from(path.as_ref()));
         Ok(source_file)
     }
 }
@@ -42,8 +42,8 @@ impl Parse for SourceFile {
 
         Ok(SourceFile {
             body,
-            file_name: None,
-            source: pair.as_span().as_str().to_string(),
+            _file_name: None,
+            _source: pair.as_span().as_str().to_string(),
         })
     }
 }
@@ -64,7 +64,7 @@ impl Eval for SourceFile {
 #[test]
 fn parse_source_file() {
     let source_file = Parser::parse_rule_or_panic::<SourceFile>(
-        Rule::document,
+        Rule::source_file,
         r#"use std::io::println;
             module foo(r: scalar) {
                 info("Hello, world, {r}!");
@@ -90,8 +90,9 @@ fn load_source_file() {
     let first_statement = source_file.body.first().unwrap();
     match first_statement {
         ModuleStatement::Use(u) => {
+            use crate::src_ref::SrcReferer;
             assert_eq!(
-                u.src_ref().source_slice(&source_file.source),
+                u.src_ref().source_slice(&source_file._source),
                 "use * from std;"
             );
         }

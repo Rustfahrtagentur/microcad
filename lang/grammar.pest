@@ -455,4 +455,4 @@ module_init_inner = _{
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 //`module foo { init(size: length) { rectangle(size); } }`: ok # Module with init function
-document = { SOI ~ module_inner? ~ EOI }
+source_file = { SOI ~ module_inner? ~ EOI }
