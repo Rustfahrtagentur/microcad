@@ -1,9 +1,15 @@
+//! Method call
+
 use crate::{parse::*, parser::*, src_ref::*};
 
+/// Method call
 #[derive(Clone, Debug)]
 pub struct MethodCall {
+    /// Name of the method
     pub name: Identifier,
+    /// List of arguments
     pub argument_list: CallArgumentList,
+    /// Source code reference
     src_ref: SrcRef,
 }
 

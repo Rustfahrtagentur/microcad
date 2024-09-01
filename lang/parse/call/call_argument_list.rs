@@ -1,5 +1,8 @@
-use crate::{eval::*, ord_map::OrdMap, parse::*, parser::*, src_ref::*};
+//! Parse `call_argument_list` rule into CallArgumentList
 
+use crate::{eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
+
+/// List of call arguments
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentList(OrdMap<Identifier, CallArgument>, SrcRef);
 

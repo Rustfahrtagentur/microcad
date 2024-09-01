@@ -1,3 +1,5 @@
+//! Parser entities related to expressions
+
 mod expression_list;
 mod list_expression;
 mod nested;
@@ -11,10 +13,11 @@ pub use nested_item::*;
 pub use tuple_expression::*;
 
 use crate::{eval::*, parse::*, parser::*, src_ref::*};
-use pest::pratt_parser::{Assoc, Op, PrattParser};
 
 lazy_static::lazy_static! {
-    static ref PRATT_PARSER: PrattParser<Rule> = {
+    /// Expression parser
+    static ref PRATT_PARSER: pest::pratt_parser::PrattParser<Rule> = {
+        use pest::pratt_parser::{Assoc, Op,PrattParser};
         use Assoc::*;
         use Rule::*;
 
@@ -37,6 +40,7 @@ lazy_static::lazy_static! {
     };
 }
 
+/// Expressions
 #[derive(Default, Clone, Debug)]
 pub enum Expression {
     /// Something went wrong (and an error will be reported)

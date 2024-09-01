@@ -1,9 +1,20 @@
+//! Tuple expression
+
 use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*};
+
+/// TODO: maybe CallArgumentList should be `ArgumentList` and get independent of module `call`?
+type ArgumentList = CallArgumentList;
+
+/// Tuple expression
 #[derive(Clone, Debug, Default)]
 pub struct TupleExpression {
-    args: CallArgumentList,
-    unit: Option<Unit>,
-    is_named: bool,
+    /// List of tuple members
+    pub args: ArgumentList,
+    /// Common unit
+    pub unit: Option<Unit>,
+    /// `true` if this is a named tuple
+    pub is_named: bool,
+    /// Source code reference
     src_ref: SrcRef,
 }
 

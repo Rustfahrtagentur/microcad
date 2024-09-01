@@ -1,3 +1,5 @@
+//! Parser entities related to function or module calls
+
 mod call_argument;
 mod call_argument_list;
 mod method_call;
@@ -8,10 +10,14 @@ pub use method_call::*;
 
 use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
+/// Call of a function or module initialization
 #[derive(Clone, Debug, Default)]
 pub struct Call {
+    /// Qualified name of the call
     pub name: QualifiedName,
+    /// Argument list of the call
     pub argument_list: CallArgumentList,
+    /// Source code reference
     src_ref: SrcRef,
 }
 

@@ -1,9 +1,15 @@
-use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*, src_ref::*};
+//! A single call argument
 
+use crate::{eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
+
+/// Call argument
 #[derive(Clone, Debug, Default)]
 pub struct CallArgument {
+    /// Name of the argument
     pub name: Option<Identifier>,
+    /// Value of the argument
     pub value: Expression,
+    /// Source code reference
     src_ref: SrcRef,
 }
 

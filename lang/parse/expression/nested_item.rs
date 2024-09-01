@@ -1,11 +1,13 @@
 use crate::{parse::*, parser::*, src_ref::*};
 
+/// Nested item
 #[derive(Clone, Debug)]
 pub enum NestedItem {
     Call(Call),
     QualifiedName(QualifiedName),
     ModuleBody(ModuleBody),
 }
+
 impl SrcReferrer for NestedItem {
     fn src_ref(&self) -> SrcRef {
         match self {

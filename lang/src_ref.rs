@@ -1,10 +1,13 @@
-use std::ops::Deref;
+//! Source code reference
 
 use crate::parser::Pair;
 
+/// Line and column within a source code file
 #[derive(Clone, Debug, Default)]
 pub struct LineCol {
+    /// Line number (0..)
     pub line: u32,
+    /// Column number (0..)
     pub col: u32,
 }
 
@@ -14,10 +17,17 @@ impl std::fmt::Display for LineCol {
     }
 }
 
+/// Reference into a source file
+///
+/// *Hint*: Source file is not part of `SrcRef` and must be provided from outside
 #[derive(Clone, Debug, Default)]
 pub struct SrcRef(pub Option<SrcRefInner>);
 
 impl SrcRef {
+    /// Create new `SrcRef?
+    /// - `range`: Position in file
+    /// - `line`: Line number (0..) in file
+    /// - `col`: Column number (ß..) in file
     pub fn new(range: std::ops::Range<usize>, line: u32, col: u32) -> Self {
         Self(Some(SrcRefInner {
             range,
@@ -25,12 +35,19 @@ impl SrcRef {
         }))
     }
 
+    /// return length of
     pub fn len(&self) -> usize {
         self.0.as_ref().map(|s| s.range.len()).unwrap_or(0)
     }
+
+    /// return true if code base is empty
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
-impl Deref for SrcRef {
+impl std::ops::Deref for SrcRef {
     type Target = Option<SrcRefInner>;
 
     fn deref(&self) -> &Self::Target {
@@ -77,21 +94,30 @@ impl Ord for SrcRef {
 }
 
 impl SrcRef {
+    /// return slice to code base
     pub fn source_slice<'a>(&self, src: &'a str) -> &'a str {
         &src[self.0.as_ref().unwrap().range.to_owned()]
     }
 
+    /// merge two `SrcRef` into a single one by
     pub fn merge(lhs: SrcRef, rhs: SrcRef) -> SrcRef {
         match (lhs, rhs) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => SrcRef(Some(SrcRefInner {
-                range: lhs.range.start..rhs.range.end,
+                range: {
+                    // paranoia check
+                    assert!(lhs.range.end <= rhs.range.end);
+                    assert!(lhs.range.start <= rhs.range.start);
+
+                    lhs.range.start..rhs.range.end
+                },
                 at: lhs.at,
             })),
+            (SrcRef(Some(hs)), SrcRef(None)) | (SrcRef(None), SrcRef(Some(hs))) => SrcRef(Some(hs)),
             _ => unreachable!(),
         }
     }
 
-    /// Return a Src from from Vec, by looking at first at and last element only.
+    /// Return a `Src` from from `Vec`, by looking at first at and last element only.
     /// Assume that position of SrcRefs in v is sorted
     pub fn from_vec<T: SrcReferrer>(v: &[T]) -> SrcRef {
         match v.is_empty() {
@@ -100,6 +126,7 @@ impl SrcRef {
         }
     }
 
+    /// Return line (0..) and column (0..) in source code or `None` if not available
     pub fn at(&self) -> Option<LineCol> {
         self.0.as_ref().map(|s| s.at.clone())
     }

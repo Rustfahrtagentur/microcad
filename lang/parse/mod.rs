@@ -1,3 +1,5 @@
+//! µCAD source code parse entities
+
 pub mod assignment;
 pub mod call;
 pub mod color;

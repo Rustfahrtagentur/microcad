@@ -1,5 +1,8 @@
+//! Nested item list
+
 use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
+/// Nested item list
 #[derive(Clone, Debug)]
 pub struct Nested(Vec<NestedItem>);
 
