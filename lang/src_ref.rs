@@ -28,7 +28,9 @@ impl std::fmt::Display for SrcRef {
 }
 
 impl SrcRef {
-    fn src(&self, source_file: &SourceFile) {}
+    fn src(&self, source_file: &SourceFile) {
+        
+    }
 
     fn source_slice<'a>(&self, src: &'a str) -> &'a str {
         &src[self.range.to_owned()]
