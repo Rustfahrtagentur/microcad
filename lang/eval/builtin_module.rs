@@ -17,18 +17,6 @@ impl std::fmt::Debug for BuiltinModule {
 }
 
 impl BuiltinModule {
-    pub fn new(name: &'static str, parameters: ParameterList, f: &'static BuiltInModuleFn) -> Self {
-        Self {
-            name: name.into(),
-            parameters,
-            f,
-        }
-    }
-
-    pub fn name(&self) -> &Identifier {
-        &self.name
-    }
-
     pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<tree::Node> {
         let arg_map = args
             .eval(context)?
