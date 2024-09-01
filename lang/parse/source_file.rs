@@ -5,14 +5,14 @@ use microcad_render::tree;
 
 #[derive(Clone, Debug)]
 pub struct SourceFile {
-    body: Vec<ModuleStatement>,
-    _file_name: Option<std::path::PathBuf>,
+    pub body: Vec<ModuleStatement>,
+    pub file_name: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
     _source: String,
 }
 
 impl SourceFile {
-    fn _from_file(path: impl AsRef<std::path::Path>) -> anyhow::Result<Self> {
+    pub fn from_file(path: impl AsRef<std::path::Path>) -> anyhow::Result<Self> {
         let mut file = std::fs::File::open(&path)?;
         let mut buf = String::new();
         use anyhow::Context;
@@ -21,8 +21,19 @@ impl SourceFile {
         let mut source_file =
             Parser::parse_rule::<SourceFile>(crate::parser::Rule::source_file, &buf)
                 .context("Could not parse file")?;
-        source_file._file_name = Some(std::path::PathBuf::from(path.as_ref()));
+        source_file.file_name = Some(std::path::PathBuf::from(path.as_ref()));
         Ok(source_file)
+    }
+
+    pub fn file_name_as_str(&self) -> &str {
+        self.file_name
+            .as_ref()
+            .map(|p| p.to_str().unwrap_or("<no file>"))
+            .unwrap_or("<no file>")
+    }
+
+    pub fn get_line(&self, line: usize) -> Option<&str> {
+        self._source.lines().nth(line)
     }
 }
 
@@ -42,7 +53,7 @@ impl Parse for SourceFile {
 
         Ok(SourceFile {
             body,
-            _file_name: None,
+            file_name: None,
             _source: pair.as_span().as_str().to_string(),
         })
     }
@@ -80,7 +91,7 @@ fn parse_source_file() {
 fn load_source_file() {
     eprintln!("{:?}", std::env::current_dir());
 
-    let source_file = SourceFile::_from_file(r#"../tests/std/algorithm_difference.µcad"#);
+    let source_file = SourceFile::from_file(r#"../tests/std/algorithm_difference.µcad"#);
     if let Err(ref err) = source_file {
         eprintln!("{err}");
     }
@@ -102,7 +113,7 @@ fn load_source_file() {
 
 #[test]
 fn load_source_file_wrong_location() {
-    let source_file = SourceFile::_from_file("I do not exist.µcad");
+    let source_file = SourceFile::from_file("I do not exist.µcad");
     if let Err(err) = source_file {
         eprintln!("{err}");
         //assert_eq!(format!("{err}"), "Cannot load source file");
