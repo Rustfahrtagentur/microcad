@@ -79,13 +79,13 @@ impl Eval for Call {
                         non_matching_symbols.push(symbol.clone());
                     }
                 }
-                /*Symbol::ModuleDefinition(m) => {
+                Symbol::ModuleDefinition(m) => {
                     if let Ok(value) = m.call(&self.argument_list, context) {
                         return Ok(Some(Value::Node(value)));
                     } else {
                         non_matching_symbols.push(symbol.clone());
                     }
-                }*/
+                }
                 symbol => {
                     let s: &'static str = symbol.into();
                     unimplemented!("Symbol::{s}")

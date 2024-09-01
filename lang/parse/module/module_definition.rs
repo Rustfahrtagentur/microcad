@@ -1,4 +1,5 @@
 use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use microcad_render::tree;
 
 #[derive(Clone, Debug)]
 pub struct ModuleDefinition {
@@ -24,6 +25,10 @@ impl ModuleDefinition {
             body: ModuleBody::new(),
             src_ref: SrcRef(None),
         }
+    }
+
+    pub fn call(&self, _args: &CallArgumentList, _context: &mut Context) -> Result<tree::Node> {
+        todo!()
     }
 }
 
