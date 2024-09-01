@@ -90,7 +90,7 @@ fn load_source_file() {
     let first_statement = source_file.body.first().unwrap();
     match first_statement {
         ModuleStatement::Use(u) => {
-            use crate::src_ref::SrcReferer;
+            use crate::src_ref::SrcReferrer;
             assert_eq!(
                 u.src_ref().source_slice(&source_file._source),
                 "use * from std;"
