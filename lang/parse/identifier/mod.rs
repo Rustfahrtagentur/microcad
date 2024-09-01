@@ -4,10 +4,22 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{eval::Sym, parser::*};
+use crate::{eval::Sym, parser::*, src_ref::*};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Identifier(microcad_core::Id);
+#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Identifier(microcad_core::Id, SrcRef);
+
+impl SrcReferer for Identifier {
+    fn src_ref(&self) -> SrcRef {
+        self.1.clone()
+    }
+}
+
+impl std::hash::Hash for Identifier {
+    fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
+        self.0.hash(hasher)
+    }
+}
 
 impl Sym for Identifier {
     fn id(&self) -> Option<microcad_core::Id> {
@@ -17,7 +29,7 @@ impl Sym for Identifier {
 
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {
-        Self(value.into())
+        Self(value.into(), SrcRef(None))
     }
 }
 
@@ -30,7 +42,7 @@ impl<'a> From<&'a Identifier> for &'a str {
 impl Parse for Identifier {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::identifier);
-        Ok(Self(pair.as_str().into()))
+        Ok(Self(pair.as_str().into(), pair.into()))
     }
 }
 

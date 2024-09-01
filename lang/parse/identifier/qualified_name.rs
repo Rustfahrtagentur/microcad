@@ -1,9 +1,15 @@
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a.b.c`
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct QualifiedName(Vec<Identifier>);
+
+impl SrcReferer for QualifiedName {
+    fn src_ref(&self) -> SrcRef {
+        SrcRef::from_vec(&self.0)
+    }
+}
 
 impl Sym for QualifiedName {
     fn id(&self) -> Option<microcad_core::Id> {

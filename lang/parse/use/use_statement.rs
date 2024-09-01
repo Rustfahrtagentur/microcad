@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 use strum::IntoStaticStr;
 
 #[derive(Clone, Debug, IntoStaticStr)]
@@ -11,6 +11,15 @@ pub enum UseStatement {
     UseAll(Vec<QualifiedName>),
     /// Import as alias: `use a as b`
     UseAlias(UseAlias),
+}
+
+impl SrcReferer for UseStatement {
+    fn src_ref(&self) -> SrcRef {
+        match self {
+            Self::Use(u) => SrcRef::from_vec(u),
+            _ => todo!(),
+        }
+    }
 }
 
 impl std::fmt::Display for UseStatement {
