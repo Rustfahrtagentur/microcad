@@ -2,19 +2,22 @@ mod number_literal;
 
 pub use number_literal::NumberLiteral;
 
-use crate::{eval::*, parse::*, parser::*, r#type::*};
+use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
-    Integer(i64),
+    Integer(i64, SrcRef),
     Number(NumberLiteral),
-    Bool(bool),
-    Color(Color),
+    Bool(bool, SrcRef),
+    Color(Color, SrcRef),
 }
 
-impl Literal {
-    pub fn number_unit(n: f64, u: Unit) -> Self {
-        Self::Number(NumberLiteral(n, u))
+impl SrcReferrer for Literal {
+    fn src_ref(&self) -> SrcRef {
+        match self {
+            Literal::Number(n) => n.src_ref(),
+            Literal::Integer(_, r) | Literal::Bool(_, r) | Literal::Color(_, r) => r.clone(),
+        }
     }
 }
 
@@ -29,10 +32,10 @@ impl std::str::FromStr for Literal {
 impl Ty for Literal {
     fn ty(&self) -> Type {
         match self {
-            Literal::Integer(_) => Type::Integer,
+            Literal::Integer(_, _) => Type::Integer,
             Literal::Number(n) => n.ty(),
-            Literal::Bool(_) => Type::Bool,
-            Literal::Color(_) => Type::Color,
+            Literal::Bool(_, _) => Type::Bool,
+            Literal::Color(_, _) => Type::Color,
         }
     }
 }
@@ -45,13 +48,13 @@ impl Parse for Literal {
 
         let s = match inner.as_rule() {
             Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?),
-            Rule::integer_literal => Literal::Integer(inner.as_str().parse::<i64>()?),
+            Rule::integer_literal => Literal::Integer(inner.as_str().parse::<i64>()?, pair.into()),
             Rule::bool_literal => match inner.as_str() {
-                "true" => Literal::Bool(true),
-                "false" => Literal::Bool(false),
+                "true" => Literal::Bool(true, pair.into()),
+                "false" => Literal::Bool(false, pair.into()),
                 _ => unreachable!(),
             },
-            Rule::color_literal => Literal::Color(Color::parse(inner)?),
+            Rule::color_literal => Literal::Color(Color::parse(inner)?, pair.into()),
             _ => unreachable!(),
         };
 
@@ -64,10 +67,10 @@ impl Eval for Literal {
 
     fn eval(&self, context: &mut Context) -> std::result::Result<Value, EvalError> {
         match self {
-            Literal::Integer(i) => Ok(Value::Integer(*i)),
+            Literal::Integer(i, _) => Ok(Value::Integer(*i)),
             Literal::Number(n) => n.eval(context),
-            Literal::Bool(b) => Ok(Value::Bool(*b)),
-            Literal::Color(c) => Ok(Value::Color(*c)),
+            Literal::Bool(b, _) => Ok(Value::Bool(*b)),
+            Literal::Color(c, _) => Ok(Value::Color(*c)),
         }
     }
 }
@@ -75,80 +78,10 @@ impl Eval for Literal {
 impl std::fmt::Display for Literal {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Literal::Integer(i) => write!(f, "{}", i),
+            Literal::Integer(i, _) => write!(f, "{}", i),
             Literal::Number(n) => write!(f, "{}", n),
-            Literal::Bool(b) => write!(f, "{}", b),
-            Literal::Color(c) => write!(f, "{}", c),
-        }
-    }
-}
-
-impl std::ops::Add for Literal {
-    type Output = std::result::Result<Self, OperatorError>;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        match (self, rhs) {
-            (Literal::Number(n1), Literal::Number(n2)) => Ok(Literal::Number((n1 + n2)?)),
-            (Literal::Integer(i1), Literal::Integer(i2)) => Ok(Literal::Integer(i1 + i2)),
-            (Literal::Number(n), Literal::Integer(i))
-            | (Literal::Integer(i), Literal::Number(n)) => {
-                Ok(Literal::Number((n + NumberLiteral::from_int(i))?))
-            }
-            (l, r) => Err(OperatorError::AddIncompatibleTypes(l.ty(), r.ty())),
-        }
-    }
-}
-
-impl std::ops::Sub for Literal {
-    type Output = std::result::Result<Self, OperatorError>;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        match (self, rhs) {
-            (Literal::Number(n1), Literal::Number(n2)) => Ok(Literal::Number((n1 - n2)?)),
-            (Literal::Integer(i1), Literal::Integer(i2)) => Ok(Literal::Integer(i1 - i2)),
-            (Literal::Number(n), Literal::Integer(i)) => {
-                Ok(Literal::Number((n - NumberLiteral::from_int(i))?))
-            }
-            (Literal::Integer(i), Literal::Number(n)) => {
-                Ok(Literal::Number((NumberLiteral::from_int(i) - n)?))
-            }
-            (l, r) => Err(OperatorError::SubIncompatibleTypes(l.ty(), r.ty())),
-        }
-    }
-}
-
-impl std::ops::Mul for Literal {
-    type Output = std::result::Result<Self, OperatorError>;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        match (self, rhs) {
-            (Literal::Number(n1), Literal::Number(n2)) => Ok(Literal::Number((n1 * n2)?)),
-            (Literal::Integer(i1), Literal::Integer(i2)) => Ok(Literal::Integer(i1 * i2)),
-            (Literal::Number(n), Literal::Integer(i))
-            | (Literal::Integer(i), Literal::Number(n)) => {
-                Ok(Literal::Number((n * NumberLiteral::from_int(i))?))
-            }
-            (l, r) => Err(OperatorError::MulIncompatibleTypes(l.ty(), r.ty())),
-        }
-    }
-}
-
-impl std::ops::Div for Literal {
-    type Output = std::result::Result<Self, OperatorError>;
-
-    fn div(self, rhs: Self) -> Self::Output {
-        match (self, rhs) {
-            (Literal::Number(n1), Literal::Number(n2)) => Ok(Literal::Number((n1 / n2)?)),
-            (Literal::Integer(i1), Literal::Integer(i2)) => Ok(Literal::Number(
-                (NumberLiteral::from_int(i1) / NumberLiteral::from_int(i2))?,
-            )),
-            (Literal::Number(n), Literal::Integer(i)) => {
-                Ok(Literal::Number((n / NumberLiteral::from_int(i))?))
-            }
-            (Literal::Integer(i), Literal::Number(n)) => {
-                Ok(Literal::Number((NumberLiteral::from_int(i) / n)?))
-            }
-            (l, r) => Err(OperatorError::DivIncompatibleTypes(l.ty(), r.ty())),
+            Literal::Bool(b, _) => write!(f, "{}", b),
+            Literal::Color(c, _) => write!(f, "{}", c),
         }
     }
 }

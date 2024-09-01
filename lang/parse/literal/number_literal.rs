@@ -1,16 +1,19 @@
 use crate::{eval::*, parse::*, parser::*, r#type::*};
+use literal::*;
 
 /// Definition and implementation for `NumberLiteral`
 #[derive(Debug, Clone, PartialEq)]
-pub struct NumberLiteral(pub f64, pub Unit);
+pub struct NumberLiteral(pub f64, pub Unit, SrcRef);
 
 impl NumberLiteral {
+    #[cfg(test)]
     pub fn from_usize(value: usize) -> Self {
-        NumberLiteral(value as f64, Unit::None)
+        Self(value as f64, Unit::None, SrcRef(None))
     }
 
+    #[cfg(test)]
     pub fn from_int(value: i64) -> Self {
-        NumberLiteral(value as f64, Unit::None)
+        Self(value as f64, Unit::None, SrcRef(None))
     }
 
     pub fn ty(&self) -> Type {
@@ -27,79 +30,9 @@ impl NumberLiteral {
     }
 }
 
-/// Rules for operator +
-impl std::ops::Add for NumberLiteral {
-    type Output = std::result::Result<Self, OperatorError>;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        match (self.ty(), rhs.ty()) {
-            (Type::Scalar, Type::Scalar) => {
-                Ok(NumberLiteral(self.value() + rhs.value(), Unit::None))
-            }
-            (Type::Angle, Type::Angle) => Ok(NumberLiteral(self.value() + rhs.value(), Unit::Deg)),
-            (Type::Length, Type::Length) => Ok(NumberLiteral(self.value() + rhs.value(), Unit::Mm)),
-            (l, r) => Err(OperatorError::AddIncompatibleTypes(l, r)),
-        }
-    }
-}
-
-/// Rules for operator -
-impl std::ops::Sub for NumberLiteral {
-    type Output = std::result::Result<Self, OperatorError>;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        match (self.ty(), rhs.ty()) {
-            (Type::Scalar, Type::Scalar) => {
-                Ok(NumberLiteral(self.value() - rhs.value(), Unit::None))
-            }
-            (Type::Angle, Type::Angle) => Ok(NumberLiteral(self.value() - rhs.value(), Unit::Deg)),
-            (Type::Length, Type::Length) => Ok(NumberLiteral(self.value() - rhs.value(), Unit::Mm)),
-            (l, r) => Err(OperatorError::SubIncompatibleTypes(l, r)),
-        }
-    }
-}
-
-/// Rules for operator *
-impl std::ops::Mul for NumberLiteral {
-    type Output = std::result::Result<Self, OperatorError>;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        match (self.ty(), rhs.ty()) {
-            (Type::Scalar, Type::Scalar) => {
-                Ok(NumberLiteral(self.value() * rhs.value(), Unit::None))
-            }
-            (Type::Angle, Type::Scalar) => {
-                Ok(NumberLiteral(self.value() * rhs.value(), self.unit()))
-            }
-            (Type::Scalar, Type::Angle) => {
-                Ok(NumberLiteral(self.value() * rhs.value(), rhs.unit()))
-            }
-            (Type::Length, Type::Scalar) => {
-                Ok(NumberLiteral(self.value() * rhs.value(), self.unit()))
-            }
-            (Type::Scalar, Type::Length) => {
-                Ok(NumberLiteral(self.value() * rhs.value(), rhs.unit()))
-            }
-            (l, r) => Err(OperatorError::MulIncompatibleTypes(l, r)),
-        }
-    }
-}
-
-/// Rules for operator -
-impl std::ops::Div for NumberLiteral {
-    type Output = std::result::Result<Self, OperatorError>;
-
-    fn div(self, rhs: Self) -> Self::Output {
-        match (self.ty(), rhs.ty()) {
-            (Type::Scalar, Type::Scalar)
-            | (Type::Length, Type::Length)
-            | (Type::Angle, Type::Angle) => {
-                Ok(NumberLiteral(self.value() / rhs.value(), Unit::None))
-            }
-            (Type::Angle, Type::Scalar) => Ok(NumberLiteral(self.value() / rhs.value(), Unit::Deg)),
-            (Type::Length, Type::Scalar) => Ok(NumberLiteral(self.value() / rhs.value(), Unit::Mm)),
-            (l, r) => Err(OperatorError::DivIncompatibleTypes(l, r)),
-        }
+impl SrcReferrer for NumberLiteral {
+    fn src_ref(&self) -> literal::SrcRef {
+        self.2.clone()
     }
 }
 
@@ -122,7 +55,7 @@ impl Parse for NumberLiteral {
         if let Some(unit_token) = inner.next() {
             unit = Unit::parse(unit_token)?;
         }
-        Ok(NumberLiteral(value, unit))
+        Ok(NumberLiteral(value, unit, pair.into()))
     }
 }
 
