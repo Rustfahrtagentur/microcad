@@ -2,7 +2,7 @@ use crate::{
     eval::*,
     parse::*,
     parser::*,
-    src_ref::{SrcRef, SrcReferer},
+    src_ref::{SrcRef, SrcReferrer},
 };
 
 #[derive(Clone, Debug, strum::IntoStaticStr)]
@@ -16,7 +16,7 @@ pub enum ModuleStatement {
     ModuleInitDefinition(std::rc::Rc<ModuleInitDefinition>),
 }
 
-impl SrcReferer for ModuleStatement {
+impl SrcReferrer for ModuleStatement {
     fn src_ref(&self) -> SrcRef {
         match self {
             ModuleStatement::Use(x) => x.src_ref(),

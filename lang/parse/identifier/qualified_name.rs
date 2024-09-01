@@ -5,7 +5,7 @@ use crate::{eval::*, parse::*, parser::*, src_ref::*};
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct QualifiedName(Vec<Identifier>);
 
-impl SrcReferer for QualifiedName {
+impl SrcReferrer for QualifiedName {
     fn src_ref(&self) -> SrcRef {
         SrcRef::from_vec(&self.0)
     }

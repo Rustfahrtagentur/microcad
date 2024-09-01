@@ -13,7 +13,7 @@ pub enum UseStatement {
     UseAlias(UseAlias, SrcRef),
 }
 
-impl SrcReferer for UseStatement {
+impl SrcReferrer for UseStatement {
     fn src_ref(&self) -> SrcRef {
         match self {
             Self::Use(_, src_ref)

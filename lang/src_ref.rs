@@ -89,7 +89,7 @@ impl SrcRef {
 
     /// Return a Src from from Vec, by looking at first at and last element only.
     /// Assume that position of SrcRefs in v is sorted
-    pub fn from_vec<T: SrcReferer>(v: &[T]) -> SrcRef {
+    pub fn from_vec<T: SrcReferrer>(v: &[T]) -> SrcRef {
         match v.is_empty() {
             true => SrcRef(None),
             false => Self::merge(v.first().unwrap().src_ref(), v.last().unwrap().src_ref()),
@@ -108,7 +108,7 @@ impl From<Pair<'_>> for SrcRef {
     }
 }
 
-pub trait SrcReferer {
+pub trait SrcReferrer {
     fn src_ref(&self) -> SrcRef;
 }
 

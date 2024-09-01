@@ -9,7 +9,7 @@ use crate::{eval::Sym, parser::*, src_ref::*};
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(microcad_core::Id, SrcRef);
 
-impl SrcReferer for Identifier {
+impl SrcReferrer for Identifier {
     fn src_ref(&self) -> SrcRef {
         self.1.clone()
     }
