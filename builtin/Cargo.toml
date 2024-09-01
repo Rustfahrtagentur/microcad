@@ -1,5 +1,6 @@
 [package]
 name = "microcad-builtin-proc-macro"
+version = "0.1.0"
 
 [lib]
 proc-macro = true
