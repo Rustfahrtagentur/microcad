@@ -84,8 +84,7 @@ impl Eval for TupleExpression {
             // Unnamed tuple
             let mut value_list = ValueList::new();
             for arg in self.args.iter() {
-                let value = arg.value.eval(context)?;
-                value_list.push(value);
+                value_list.push(arg.value.eval(context)?);
             }
             if let Some(unit) = self.unit {
                 value_list.add_unit_to_unitless_types(unit)?;
@@ -106,22 +105,20 @@ impl Eval for TupleExpression {
                 map.insert(ident.clone(), value);
             }
 
-            let (x_ident, y_ident, z_ident) = (&"x".into(), &"y".into(), &"z".into());
+            let (x, y, z) = (&"x".into(), &"y".into(), &"z".into());
 
             use microcad_core::{Vec2, Vec3};
 
             match (map.len(), map.values().all(|v| v.ty() == Type::Length)) {
                 // Special case for Vec2: if we have exactly two lengths with names "x" and "y", we can create a Vec2
                 (2, true) => {
-                    if let (Some(x), Some(y)) = (map.get(x_ident), map.get(y_ident)) {
+                    if let (Some(x), Some(y)) = (map.get(x), map.get(y)) {
                         return Ok(Value::Vec2(Vec2::new(x.try_into()?, y.try_into()?)));
                     }
                 }
                 // Special case for Vec3: if we have exactly three lengths with names "x", "y" and "z", we can create a Vec3
                 (3, true) => {
-                    if let (Some(x), Some(y), Some(z)) =
-                        (map.get(x_ident), map.get(y_ident), map.get(z_ident))
-                    {
+                    if let (Some(x), Some(y), Some(z)) = (map.get(x), map.get(y), map.get(z)) {
                         return Ok(Value::Vec3(Vec3::new(
                             x.try_into()?,
                             y.try_into()?,
