@@ -4,8 +4,8 @@ use crate::parser::Pair;
 
 #[derive(Clone, Debug, Default)]
 pub struct LineCol {
-    line: u32,
-    col: u32,
+    pub line: u32,
+    pub col: u32,
 }
 
 impl std::fmt::Display for LineCol {
@@ -38,9 +38,9 @@ impl Deref for SrcRef {
 #[derive(Clone, Debug, Default)]
 pub struct SrcRefInner {
     /// Range in bytes
-    range: std::ops::Range<usize>,
+    pub range: std::ops::Range<usize>,
     /// Line and column (aka position)
-    at: LineCol,
+    pub at: LineCol,
 }
 
 impl std::fmt::Display for SrcRef {
@@ -94,6 +94,10 @@ impl SrcRef {
             true => SrcRef(None),
             false => Self::merge(v.first().unwrap().src_ref(), v.last().unwrap().src_ref()),
         }
+    }
+
+    pub fn at(&self) -> Option<LineCol> {
+        self.0.as_ref().map(|s| s.at.clone())
     }
 }
 
