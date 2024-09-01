@@ -4,20 +4,22 @@ use strum::IntoStaticStr;
 #[derive(Clone, Debug, IntoStaticStr)]
 pub enum UseStatement {
     /// Import symbols given as qualified names: `use a, b`
-    Use(Vec<QualifiedName>),
+    Use(Vec<QualifiedName>, SrcRef),
     /// Import specific symbol from a module: `use a,b from c`
-    UseFrom(Vec<QualifiedName>, QualifiedName),
+    UseFrom(Vec<QualifiedName>, QualifiedName, SrcRef),
     /// Import all symbols from a module: `use * from a, b`
-    UseAll(Vec<QualifiedName>),
+    UseAll(Vec<QualifiedName>, SrcRef),
     /// Import as alias: `use a as b`
-    UseAlias(UseAlias),
+    UseAlias(UseAlias, SrcRef),
 }
 
 impl SrcReferer for UseStatement {
     fn src_ref(&self) -> SrcRef {
         match self {
-            Self::Use(u) | Self::UseAll(u) => SrcRef::from_vec(u),
-            _ => todo!(),
+            Self::Use(_, src_ref)
+            | Self::UseAll(_, src_ref)
+            | Self::UseAlias(_, src_ref)
+            | Self::UseFrom(_, _, src_ref) => src_ref.clone(),
         }
     }
 }
@@ -25,10 +27,10 @@ impl SrcReferer for UseStatement {
 impl std::fmt::Display for UseStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            UseStatement::Use(names) => write!(f, "use {names:?}"),
-            UseStatement::UseFrom(names, from) => write!(f, "use {names:?} from {from:?}"),
-            UseStatement::UseAll(names) => write!(f, "use * from {names:?}"),
-            UseStatement::UseAlias(alias) => write!(f, "{}", alias),
+            UseStatement::Use(names, _) => write!(f, "use {names:?}"),
+            UseStatement::UseFrom(names, from, _) => write!(f, "use {names:?} from {from:?}"),
+            UseStatement::UseAll(names, _) => write!(f, "use * from {names:?}"),
+            UseStatement::UseAlias(alias, _) => write!(f, "{}", alias),
         }
     }
 }
@@ -43,18 +45,24 @@ impl Parse for UseStatement {
             (Rule::qualified_name_list, Some(second))
                 if second.as_rule() == Rule::qualified_name =>
             {
-                Ok(UseStatement::UseFrom(names, QualifiedName::parse(second)?))
+                Ok(UseStatement::UseFrom(
+                    names,
+                    QualifiedName::parse(second)?,
+                    pair.into(),
+                ))
             }
-            (Rule::qualified_name_list, None) => Ok(UseStatement::Use(names)),
+            (Rule::qualified_name_list, None) => Ok(UseStatement::Use(names, pair.into())),
             (Rule::qualified_name_all, Some(second))
                 if second.as_rule() == Rule::qualified_name_list =>
             {
-                Ok(UseStatement::UseAll(Parser::vec(
-                    second,
-                    QualifiedName::parse,
-                )?))
+                Ok(UseStatement::UseAll(
+                    Parser::vec(second, QualifiedName::parse)?,
+                    pair.into(),
+                ))
             }
-            (Rule::use_alias, _) => Ok(UseStatement::UseAlias(UseAlias::parse(first)?)),
+            (Rule::use_alias, _) => {
+                Ok(UseStatement::UseAlias(UseAlias::parse(first)?, pair.into()))
+            }
             _ => Err(ParseError::InvalidUseStatement),
         }
     }
@@ -65,7 +73,7 @@ impl Eval for UseStatement {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         match self {
-            UseStatement::UseAll(names) => {
+            UseStatement::UseAll(names, _) => {
                 for name in names {
                     let symbols = name.eval(context)?;
                     for symbol in symbols {
@@ -86,7 +94,7 @@ impl Eval for UseStatement {
                 }
                 Ok(())
             }
-            UseStatement::Use(names) => {
+            UseStatement::Use(names, _) => {
                 for name in names {
                     let symbols = name.eval(context)?;
                     for symbol in symbols {

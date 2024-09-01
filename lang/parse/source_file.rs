@@ -89,7 +89,12 @@ fn load_source_file() {
 
     let first_statement = source_file.body.first().unwrap();
     match first_statement {
-        ModuleStatement::Use(u) => eprintln!("{}", u.src_ref()),
+        ModuleStatement::Use(u) => {
+            assert_eq!(
+                u.src_ref().source_slice(&source_file.source),
+                "use * from std;"
+            );
+        }
         _ => panic!(),
     }
 }

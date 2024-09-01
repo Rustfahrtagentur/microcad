@@ -1,4 +1,4 @@
-use std::{hash::Hasher, ops::Deref};
+use std::ops::Deref;
 
 use crate::parser::Pair;
 
@@ -73,7 +73,7 @@ impl Ord for SrcRef {
 }
 
 impl SrcRef {
-    fn source_slice<'a>(&self, src: &'a str) -> &'a str {
+    pub fn source_slice<'a>(&self, src: &'a str) -> &'a str {
         &src[self.0.as_ref().unwrap().range.to_owned()]
     }
 
@@ -89,7 +89,7 @@ impl SrcRef {
 
     /// Return a Src from from Vec, by looking at first at and last element only.
     /// Assume that position of SrcRefs in v is sorted
-    pub fn from_vec<T: SrcReferer>(v: &Vec<T>) -> SrcRef {
+    pub fn from_vec<T: SrcReferer>(v: &[T]) -> SrcRef {
         match v.is_empty() {
             true => SrcRef(None),
             false => Self::merge(v.first().unwrap().src_ref(), v.last().unwrap().src_ref()),
