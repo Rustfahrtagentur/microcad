@@ -152,8 +152,8 @@ fn context_namespace() {
 
 #[test]
 fn test_assert() {
-    use microcad_lang::{parse::document::Document, parser};
-    let doc = match parser::Parser::parse_rule::<Document>(
+    use microcad_lang::{parse::source_file::SourceFile, parser};
+    let doc = match parser::Parser::parse_rule::<SourceFile>(
         parser::Rule::document,
         r#"
             std::assert(std::math::abs(-1.0) == 1.0);

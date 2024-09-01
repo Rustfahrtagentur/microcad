@@ -2,11 +2,11 @@ use crate::{eval::*, parse::*, parser::*};
 use microcad_render::tree;
 
 #[derive(Clone, Debug)]
-pub struct Document {
+pub struct SourceFile {
     body: Vec<ModuleStatement>,
 }
 
-impl Parse for Document {
+impl Parse for SourceFile {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut body = Vec::new();
 
@@ -20,11 +20,11 @@ impl Parse for Document {
             }
         }
 
-        Ok(Document { body })
+        Ok(SourceFile { body })
     }
 }
 
-impl Eval for Document {
+impl Eval for SourceFile {
     type Output = tree::Node;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
@@ -39,7 +39,7 @@ impl Eval for Document {
 
 #[test]
 fn document() {
-    let document = Parser::parse_rule_or_panic::<Document>(
+    let document = Parser::parse_rule_or_panic::<SourceFile>(
         Rule::document,
         r#"use std::io::println;
             module foo(r: scalar) {
