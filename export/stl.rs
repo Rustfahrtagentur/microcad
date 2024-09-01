@@ -87,7 +87,7 @@ impl Exporter for StlExporter {
 fn test_stl_export() {
     use microcad_render::NodeInner;
 
-    let settings = ExportSettings::with_filename("test.stl".to_string());
+    let settings = ExportSettings::with_filename("../test_output/tests/test.stl".to_string());
     use crate::Exporter;
     let mut exporter = StlExporter::from_settings(&settings).unwrap();
 

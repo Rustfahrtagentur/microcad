@@ -52,7 +52,7 @@ fn export_yaml_for_source_file(file: &str) {
     use std::io::Read;
     file.read_to_string(&mut buf).unwrap();
 
-    export_yaml_for_input(&buf, "test.yaml");
+    export_yaml_for_input(&buf, "../test_output/tests/test.yaml");
 }
 
 #[test]

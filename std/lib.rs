@@ -185,7 +185,7 @@ fn difference_svg() {
     group.append(crate::geo2d::Circle::node(args!(radius: Scalar = 2.0)).unwrap());
     difference.append(group);
 
-    let file = std::fs::File::create("difference.svg").unwrap();
+    let file = std::fs::File::create("../test_output/std/difference.svg").unwrap();
     let mut renderer = SvgRenderer::default();
     renderer.set_output(Box::new(file)).unwrap();
     renderer.render_node(difference).unwrap();
@@ -211,7 +211,7 @@ fn difference_stl() {
 
     use microcad_export::Exporter;
     let mut exporter = StlExporter::from_settings(&microcad_core::ExportSettings::with_filename(
-        "difference.stl".to_string(),
+        "../test_output/std/difference.stl".to_string(),
     ))
     .unwrap();
 
