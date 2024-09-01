@@ -30,8 +30,8 @@ impl std::fmt::Display for SrcRef {
 impl SrcRef {
     fn src(&self, source_file: &SourceFile) {}
 
-    fn source_slice<'a>(&self, src: &'a str) -> (&'a str, LineCol) {
-        (&src[self.range.to_owned()], self.at.to_owned())
+    fn source_slice<'a>(&self, src: &'a str) -> &'a str {
+        &src[self.range.to_owned()]
     }
 }
 
@@ -46,4 +46,24 @@ impl From<Pair<'_>> for SrcRef {
             },
         }
     }
+}
+
+#[test]
+fn test_src_ref() {
+    let input = "geo3d::cube(size_x = 3.0, size_y = 3.0, size_z = 3.0);";
+
+    let cube = 7..11;
+    let size_y = 26..32;
+
+    let cube = SrcRef {
+        range: cube,
+        at: LineCol { line: 1, col: 0 },
+    };
+    let size_y = SrcRef {
+        range: size_y,
+        at: LineCol { line: 1, col: 0 },
+    };
+
+    assert_eq!(cube.source_slice(input), "cube");
+    assert_eq!(size_y.source_slice(input), "size_y");
 }
