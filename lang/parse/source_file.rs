@@ -80,7 +80,7 @@ fn parse_source_file() {
 fn load_source_file() {
     eprintln!("{:?}", std::env::current_dir());
 
-    let source_file = SourceFile::from_file(r#"../tests/std/algorithm_difference.µcad"#);
+    let source_file = SourceFile::_from_file(r#"../tests/std/algorithm_difference.µcad"#);
     if let Err(ref err) = source_file {
         eprintln!("{err}");
     }
@@ -102,7 +102,7 @@ fn load_source_file() {
 
 #[test]
 fn load_source_file_wrong_location() {
-    let source_file = SourceFile::from_file("I do not exist.µcad");
+    let source_file = SourceFile::_from_file("I do not exist.µcad");
     if let Err(err) = source_file {
         eprintln!("{err}");
         //assert_eq!(format!("{err}"), "Cannot load source file");
