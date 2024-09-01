@@ -20,21 +20,21 @@ and [*Rust*](https://www.rust-lang.org/tools/install).
 ### Get Source Code
 
 ```sh
-> git clone https://github.com/Rustfahrtagentur/mcad.git
-> cd mcad
+git clone https://github.com/Rustfahrtagentur/mcad.git
+cd mcad
 ```
 
 ### Get External Libraries
 
 ```sh
-> git submodule init
-> git submodule update
+git submodule init
+git submodule update
 ```
 
 ### Build µCAD
 
 ```sh
-> cargo build
+cargo build
 ```
 
 ## Examples
