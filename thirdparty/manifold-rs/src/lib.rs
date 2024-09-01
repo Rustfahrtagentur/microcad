@@ -1,3 +1,5 @@
+//! Rust integration of C++ library *Manifold* for geometric operations
+
 #[cxx::bridge(namespace = "manifold_rs")]
 mod ffi {
     // C++ types and signatures exposed to Rust.
@@ -35,32 +37,27 @@ pub struct Manifold(cxx::UniquePtr<ffi::Manifold>);
 impl Manifold {
     /// Create a sphere manifold.
     pub fn sphere(radius: f64, segments: u32) -> Self {
-        let manifold = ffi::sphere(radius, segments);
-        Self(manifold)
+        Self(ffi::sphere(radius, segments))
     }
 
     /// Create a cube manifold.
     pub fn cube(x_size: f64, y_size: f64, z_size: f64) -> Self {
-        let manifold = ffi::cube(x_size, y_size, z_size);
-        Self(manifold)
+        Self(ffi::cube(x_size, y_size, z_size))
     }
 
     /// Get the union of two manifolds.
     pub fn union(&self, b: &Self) -> Self {
-        let manifold = ffi::union_(self.inner(), b.inner());
-        Self(manifold)
+        Self(ffi::union_(self.inner(), b.inner()))
     }
 
     /// Get the intersection of two manifolds.
     pub fn intersection(&self, b: &Self) -> Self {
-        let manifold = ffi::intersection(self.inner(), b.inner());
-        Self(manifold)
+        Self(ffi::intersection(self.inner(), b.inner()))
     }
 
     /// Get the difference of two manifolds.
     pub fn difference(&self, b: &Self) -> Self {
-        let manifold = ffi::difference(self.inner(), b.inner());
-        Self(manifold)
+        Self(ffi::difference(self.inner(), b.inner()))
     }
 
     pub fn boolean_op(&self, b: &Self, op: crate::BooleanOp) -> Self {
@@ -73,8 +70,7 @@ impl Manifold {
 
     /// Get the mesh representation of the manifold.
     pub fn to_mesh(&self) -> Mesh {
-        let mesh = ffi::mesh_from_manifold(&self.0);
-        Mesh(mesh)
+        Mesh(ffi::mesh_from_manifold(&self.0))
     }
 
     pub fn from_mesh(mesh: Mesh) -> Self {
