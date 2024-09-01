@@ -15,9 +15,11 @@ impl Parse for MapType {
         let key = inner.next().unwrap();
         let value = inner.next().unwrap();
 
+        use crate::eval::Ty;
+
         Ok(Self::from_types(
-            (Type::parse(key)?).try_into()?,
-            Type::parse(value)?,
+            (TypeAnnotation::parse(key)?.ty()).try_into()?,
+            TypeAnnotation::parse(value)?.ty(),
         ))
     }
 }
@@ -30,12 +32,14 @@ impl std::fmt::Display for MapType {
 
 #[test]
 fn map_type() {
+    use crate::eval::Ty;
     use crate::parser::{Parser, Rule};
 
-    let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int => string]");
-    assert_eq!(ty.to_string(), "[int => string]");
+    let type_annotation =
+        Parser::parse_rule_or_panic::<TypeAnnotation>(Rule::r#type, "[int => string]");
+    assert_eq!(type_annotation.ty().to_string(), "[int => string]");
     assert_eq!(
-        ty,
+        type_annotation.ty(),
         Type::Map(MapType::from_types(MapKeyType::Integer, Type::String))
     );
 }

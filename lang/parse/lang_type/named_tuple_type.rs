@@ -8,10 +8,13 @@ impl Parse for NamedTupleType {
         Parser::ensure_rule(&pair, Rule::named_tuple_type);
 
         let mut types = std::collections::BTreeMap::new();
+
+        use crate::eval::Ty;
+
         for pair in pair.clone().into_inner() {
             let mut inner = pair.into_inner();
             let name = Identifier::parse(inner.next().unwrap())?;
-            let ty = Type::parse(inner.next().unwrap())?;
+            let ty = TypeAnnotation::parse(inner.next().unwrap())?.ty();
             if types.contains_key(&name) {
                 return Err(TypeError::DuplicatedMapField(name.clone()).into());
             }
@@ -37,12 +40,14 @@ impl std::fmt::Display for NamedTupleType {
 
 #[test]
 fn named_tuple_type() {
-    use crate::parser::{Parser, Rule};
+    use crate::eval::Ty;
+    use crate::parser::*;
 
-    let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "(x: int, y: string)");
-    assert_eq!(ty.to_string(), "(x: int, y: string)");
+    let type_annotation =
+        Parser::parse_rule_or_panic::<TypeAnnotation>(Rule::r#type, "(x: int, y: string)");
+    assert_eq!(type_annotation.ty().to_string(), "(x: int, y: string)");
     assert_eq!(
-        ty,
+        type_annotation.ty(),
         Type::NamedTuple(NamedTupleType(
             vec![
                 (Identifier::from("x"), Type::Integer),

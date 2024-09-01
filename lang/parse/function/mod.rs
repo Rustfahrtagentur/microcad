@@ -38,6 +38,7 @@ fn assignment() {
 
 #[test]
 fn function_signature() {
+    use crate::eval::Ty;
     use crate::{parser::*, r#type::Type};
 
     let input = "(a: scalar, b: scalar) -> scalar";
@@ -46,7 +47,7 @@ fn function_signature() {
         Parser::parse_rule_or_panic::<FunctionSignature>(Rule::function_signature, input);
 
     assert_eq!(function_signature.parameters.len(), 2);
-    assert_eq!(function_signature.return_type, Some(Type::Scalar));
+    assert_eq!(function_signature.return_type.unwrap().ty(), Type::Scalar);
 }
 
 #[test]

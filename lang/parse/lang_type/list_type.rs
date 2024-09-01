@@ -1,4 +1,4 @@
-use crate::{eval::*, parser::*, r#type::Type};
+use crate::{eval::*, parser::*, r#type::*};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ListType(Box<Type>);
@@ -21,7 +21,7 @@ impl Parse for ListType {
 
         let pair = inner.next().unwrap();
         match pair.as_rule() {
-            Rule::r#type => Ok(Self::from_type(Type::parse(pair.clone())?)),
+            Rule::r#type => Ok(Self::from_type(TypeAnnotation::parse(pair.clone())?.ty())),
             _ => unreachable!("Expected type, found {:?}", pair.as_rule()),
         }
     }
@@ -36,7 +36,10 @@ impl std::fmt::Display for ListType {
 #[test]
 fn list_type() {
     use crate::parser::{Parser, Rule};
-    let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "[int]");
-    assert_eq!(ty.to_string(), "[int]");
-    assert_eq!(ty, Type::List(ListType::from_type(Type::Integer)));
+    let type_annotation = Parser::parse_rule_or_panic::<TypeAnnotation>(Rule::r#type, "[int]");
+    assert_eq!(type_annotation.ty().to_string(), "[int]");
+    assert_eq!(
+        type_annotation.ty(),
+        Type::List(ListType::from_type(Type::Integer))
+    );
 }

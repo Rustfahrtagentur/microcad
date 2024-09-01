@@ -1,6 +1,11 @@
 //! µCAD Basic Types
 
-use crate::{eval::*, parse::*, parser::*};
+use crate::{
+    eval::*,
+    parse::*,
+    parser::*,
+    src_ref::{SrcRef, SrcReferrer},
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
@@ -64,27 +69,59 @@ impl Type {
     }
 }
 
-impl Parse for Type {
+#[derive(Debug, Clone, PartialEq)]
+pub struct TypeAnnotation(pub Type, pub SrcRef);
+
+impl SrcReferrer for TypeAnnotation {
+    fn src_ref(&self) -> SrcRef {
+        self.1.clone()
+    }
+}
+
+impl std::fmt::Display for TypeAnnotation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl Ty for TypeAnnotation {
+    fn ty(&self) -> Type {
+        self.0.clone()
+    }
+}
+
+impl From<Type> for TypeAnnotation {
+    fn from(value: Type) -> Self {
+        TypeAnnotation(value, SrcRef(None))
+    }
+}
+
+impl Parse for TypeAnnotation {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::r#type);
         let inner = pair.clone().into_inner().next().unwrap();
 
         let s = match inner.as_rule() {
-            Rule::list_type => Self::List(ListType::parse(inner)?),
-            Rule::map_type => Self::Map(MapType::parse(inner)?),
-            Rule::unnamed_tuple_type => Self::UnnamedTuple(UnnamedTupleType::parse(inner)?),
-            Rule::named_tuple_type => Self::NamedTuple(NamedTupleType::parse(inner)?),
+            Rule::list_type => Self(Type::List(ListType::parse(inner)?), pair.into()),
+            Rule::map_type => Self(Type::Map(MapType::parse(inner)?), pair.into()),
+            Rule::unnamed_tuple_type => Self(
+                Type::UnnamedTuple(UnnamedTupleType::parse(inner)?),
+                pair.into(),
+            ),
+            Rule::named_tuple_type => {
+                Self(Type::NamedTuple(NamedTupleType::parse(inner)?), pair.into())
+            }
             Rule::qualified_name => match inner.as_str() {
-                "int" => Self::Integer,
-                "scalar" => Self::Scalar,
-                "string" => Self::String,
-                "color" => Self::Color,
-                "length" => Self::Length,
-                "angle" => Self::Angle,
-                "vec2" => Self::Vec2,
-                "vec3" => Self::Vec3,
-                "bool" => Self::Bool,
-                _ => Self::Custom(QualifiedName::parse(inner)?),
+                "int" => Self(Type::Integer, pair.into()),
+                "scalar" => Self(Type::Scalar, pair.into()),
+                "string" => Self(Type::String, pair.into()),
+                "color" => Self(Type::Color, pair.into()),
+                "length" => Self(Type::Length, pair.into()),
+                "angle" => Self(Type::Angle, pair.into()),
+                "vec2" => Self(Type::Vec2, pair.into()),
+                "vec3" => Self(Type::Vec3, pair.into()),
+                "bool" => Self(Type::Bool, pair.into()),
+                _ => Self(Type::Custom(QualifiedName::parse(inner)?), pair.into()),
             },
             _ => unreachable!("Expected type, found {:?}", inner.as_rule()),
         };
@@ -119,7 +156,7 @@ impl std::fmt::Display for Type {
 
 #[test]
 fn builtin_type() {
-    let ty = Parser::parse_rule_or_panic::<Type>(Rule::r#type, "int");
-    assert_eq!(ty.to_string(), "int");
-    assert_eq!(ty, Type::Integer);
+    let ty = Parser::parse_rule_or_panic::<TypeAnnotation>(Rule::r#type, "int");
+    assert_eq!(ty.0.to_string(), "int");
+    assert_eq!(ty.0, Type::Integer);
 }

@@ -3,7 +3,7 @@ use crate::{parse::*, parser::*, r#type::*, src_ref::*};
 #[derive(Clone, Debug)]
 pub struct FunctionSignature {
     pub parameters: ParameterList,
-    pub return_type: Option<Type>,
+    pub return_type: Option<TypeAnnotation>,
     src_ref: SrcRef,
 }
 
@@ -14,10 +14,11 @@ impl SrcReferrer for FunctionSignature {
 }
 
 impl FunctionSignature {
+    // TODO: Is this function #cfg(test) only
     pub fn new(parameters: ParameterList, return_type: Option<Type>) -> Self {
         Self {
             parameters,
-            return_type,
+            return_type: return_type.map(|r| TypeAnnotation(r, SrcRef(None))),
             src_ref: SrcRef(None),
         }
     }
@@ -37,7 +38,7 @@ impl Parse for FunctionSignature {
                 Rule::parameter_list => {
                     parameters = ParameterList::parse(pair)?;
                 }
-                Rule::r#type => return_type = Some(Type::parse(pair)?),
+                Rule::r#type => return_type = Some(TypeAnnotation::parse(pair)?),
                 rule => unreachable!("Unexpected token in function signature: {:?}", rule),
             }
         }

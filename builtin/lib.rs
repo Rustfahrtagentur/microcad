@@ -26,7 +26,7 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
                 parameter_impl.extend(quote! {
                     parameters.push(microcad_lang::parse::parameter::Parameter { 
                         name: stringify!(#identifier).into(),
-                        specified_type: Some(microcad_lang::r#type::Type::#ty),
+                        specified_type: Some(microcad_lang::r#type::Type::#ty.into()),
                         default_value: None 
                     }).unwrap();
                 });
