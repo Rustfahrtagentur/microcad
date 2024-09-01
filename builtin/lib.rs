@@ -6,7 +6,6 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{Data, Ident};
 
-
 fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream {
     let struct_name = &input.ident;
     let module_name = &struct_name.to_string().to_lowercase();
@@ -14,7 +13,7 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
     match &input.data {
         Data::Struct(syn::DataStruct { fields, .. }) => {
             let mut parameter_impl = quote! {
-                use microcad_lang::parse::parameter::ParameterList;
+                use microcad_lang::parse::parameter::{Parameter,ParameterList};
                 let mut parameters = ParameterList::default();
             };
             let field_identifiers = fields.iter().map(|item| item.ident.as_ref().unwrap()).collect::<Vec<_>>();
@@ -24,11 +23,11 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
                 let identifier = field.ident.as_ref().unwrap();
                 let ty = &field.ty;
                 parameter_impl.extend(quote! {
-                    parameters.push(microcad_lang::parse::parameter::Parameter { 
-                        name: stringify!(#identifier).into(),
-                        specified_type: Some(microcad_lang::r#type::Type::#ty.into()),
-                        default_value: None 
-                    }).unwrap();
+                    parameters.push(Parameter::new(
+                        stringify!(#identifier).into(),
+                        Some(microcad_lang::r#type::Type::#ty.into()),
+                        None
+                    )).unwrap();
                 });
             }
 
@@ -63,7 +62,7 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
 #[proc_macro_derive(DefineBuiltInRenderable2D)]
 pub fn derive_define_builtin_renderable2d(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
-    builtin_module_impl( "Renderable2D", input)
+    builtin_module_impl("Renderable2D", input)
 }
 
 #[proc_macro_derive(DefineBuiltInRenderable3D)]

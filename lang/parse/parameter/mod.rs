@@ -13,6 +13,21 @@ pub struct Parameter {
     src_ref: SrcRef,
 }
 
+impl Parameter {
+    pub fn new(
+        name: Identifier,
+        specified_type: Option<TypeAnnotation>,
+        default_value: Option<Expression>,
+    ) -> Self {
+        Self {
+            name,
+            specified_type,
+            default_value,
+            src_ref: SrcRef(None),
+        }
+    }
+}
+
 impl SrcReferrer for Parameter {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()
@@ -129,29 +144,20 @@ impl Eval for Parameter {
 #[macro_export]
 macro_rules! parameter {
     ($name:ident) => {
-        Parameter {
-            name: stringify!($name).into(),
-            specified_type: None,
-            default_value: None,
-            src_ref: $crate::src_ref::SrcRef(None),
-        }
+        Parameter::new(stringify!($name).into(), None, None)
     };
     ($name:ident: $ty:ident) => {
-        Parameter {
-            name: stringify!($name).into(),
-            specified_type: Some(microcad_lang::r#type::Type::$ty.into()),
-            default_value: None,
-            src_ref: $crate::src_ref::SrcRef(None),
-        }
+        Parameter::new(
+            stringify!($name).into(),
+            Some(microcad_lang::r#type::Type::$ty.into()),
+            None,
+        )
     };
     ($name:ident: $ty:ident = $value:expr) => {
-        Parameter {
-            name: stringify!($name).into(),
-            specified_type: Some(microcad_lang::r#type::Type::$ty.into()),
-            default_value: Some(
-                Expression::literal_from_str(stringify!($value)).expect("Invalid literal"),
-            ),
-            src_ref: $crate::src_ref::SrcRef(None),
-        }
+        Parameter::new(
+            stringify!($name).into(),
+            Some(microcad_lang::r#type::Type::$ty.into()),
+            Some(Expression::literal_from_str(stringify!($value)).expect("Invalid literal")),
+        )
     };
 }
