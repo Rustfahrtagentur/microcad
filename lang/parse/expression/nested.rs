@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug)]
 pub struct Nested(Vec<NestedItem>);
@@ -13,6 +13,12 @@ impl Parse for Nested {
         }
 
         Ok(Nested(vec))
+    }
+}
+
+impl SrcReferrer for Nested {
+    fn src_ref(&self) -> expression::SrcRef {
+        SrcRef::from_vec(&self.0)
     }
 }
 

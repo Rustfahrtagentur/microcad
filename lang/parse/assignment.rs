@@ -1,10 +1,23 @@
-use crate::{eval::*, parse::*, parser::*, r#type::*};
+use crate::{
+    eval::*,
+    parse::*,
+    parser::*,
+    r#type::*,
+    src_ref::{SrcRef, SrcReferrer},
+};
 
 #[derive(Clone, Debug)]
 pub struct Assignment {
     name: Identifier,
     specified_type: Option<Type>,
     value: Expression,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for Assignment {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl Assignment {
@@ -49,6 +62,7 @@ impl Parse for Assignment {
             name,
             specified_type,
             value,
+            src_ref: pair.into(),
         })
     }
 }

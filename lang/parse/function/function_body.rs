@@ -1,8 +1,14 @@
 use super::FunctionStatement;
-use crate::{parse::*, parser::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct FunctionBody(pub Vec<FunctionStatement>);
+
+impl SrcReferrer for FunctionBody {
+    fn src_ref(&self) -> SrcRef {
+        SrcRef::from_vec(&self.0)
+    }
+}
 
 impl Parse for FunctionBody {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {

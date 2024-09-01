@@ -1,9 +1,16 @@
-use crate::{parse::*, parser::*, r#type::*};
+use crate::{parse::*, parser::*, r#type::*, src_ref::*};
 
 #[derive(Clone, Debug)]
 pub struct FunctionSignature {
     pub parameters: ParameterList,
     pub return_type: Option<Type>,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for FunctionSignature {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl FunctionSignature {
@@ -11,6 +18,7 @@ impl FunctionSignature {
         Self {
             parameters,
             return_type,
+            src_ref: SrcRef(None),
         }
     }
 
@@ -37,6 +45,7 @@ impl Parse for FunctionSignature {
         Ok(Self {
             parameters,
             return_type,
+            src_ref: pair.into(),
         })
     }
 }

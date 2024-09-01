@@ -1,9 +1,16 @@
-use crate::parser::*;
+use crate::{parser::*, src_ref::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct FormatSpec {
     precision: Option<u32>,
     leading_zeros: Option<u32>,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for FormatSpec {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl Parse for FormatSpec {
@@ -21,6 +28,8 @@ impl Parse for FormatSpec {
                 _ => unreachable!(),
             }
         }
+
+        opt.src_ref = pair.into();
 
         Ok(opt)
     }

@@ -1,8 +1,13 @@
-use crate::{parse::*, parser::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Default, Debug)]
 pub struct ExpressionList(Vec<Expression>);
 
+impl SrcReferrer for ExpressionList {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        SrcRef::from_vec(&self.0)
+    }
+}
 impl std::ops::Deref for ExpressionList {
     type Target = Vec<Expression>;
 

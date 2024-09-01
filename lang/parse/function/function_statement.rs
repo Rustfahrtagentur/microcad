@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug)]
 pub enum FunctionStatement {
@@ -10,7 +10,25 @@ pub enum FunctionStatement {
         condition: Expression,
         if_body: FunctionBody,
         else_body: FunctionBody,
+        src_ref: SrcRef,
     },
+}
+
+impl SrcReferrer for FunctionStatement {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        match self {
+            Self::Assignment(a) => a.src_ref(),
+            Self::Use(u) => u.src_ref(),
+            Self::FunctionDefinition(fd) => fd.src_ref(),
+            Self::Return(e) => e.src_ref(),
+            Self::If {
+                condition: _,
+                if_body: _,
+                else_body: _,
+                src_ref,
+            } => src_ref.clone(),
+        }
+    }
 }
 
 impl Parse for FunctionStatement {
@@ -36,13 +54,15 @@ impl Parse for FunctionStatement {
                         condition,
                         if_body,
                         else_body: FunctionBody::default(),
+                        src_ref: pair.into(),
                     },
-                    Some(pair) => {
-                        let else_body = FunctionBody::parse(pair)?;
+                    Some(p) => {
+                        let else_body = FunctionBody::parse(p)?;
                         Self::If {
                             condition,
                             if_body,
                             else_body,
+                            src_ref: pair.into(),
                         }
                     }
                 }

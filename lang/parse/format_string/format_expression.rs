@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 #[allow(dead_code)]
 #[derive(Clone, Default, Debug)]
@@ -16,6 +16,12 @@ impl Parse for FormatExpression {
             }
         }
         Ok(Self(fo, Box::new(expr)))
+    }
+}
+
+impl SrcReferrer for FormatExpression {
+    fn src_ref(&self) -> SrcRef {
+        SrcRef::merge(self.0.src_ref(), self.1.src_ref())
     }
 }
 

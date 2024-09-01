@@ -1,10 +1,17 @@
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug)]
 pub struct FunctionDefinition {
     pub name: Identifier,
     pub signature: FunctionSignature,
     pub body: FunctionBody,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for FunctionDefinition {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
 }
 
 impl FunctionDefinition {
@@ -13,6 +20,7 @@ impl FunctionDefinition {
             name,
             signature,
             body,
+            src_ref: SrcRef(None),
         }
     }
 
@@ -53,6 +61,7 @@ impl Parse for FunctionDefinition {
             name,
             signature,
             body,
+            src_ref: pair.into(),
         })
     }
 }

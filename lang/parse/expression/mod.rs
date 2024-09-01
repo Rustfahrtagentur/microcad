@@ -10,7 +10,7 @@ pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
 
-use crate::{eval::*, parse::*, parser::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 use pest::pratt_parser::{Assoc, Op, PrattParser};
 
 lazy_static::lazy_static! {
@@ -58,22 +58,52 @@ pub enum Expression {
         /// '+', '-', '/', '*', '<', '>', '≤', '≥', '&', '|'
         op: char,
         rhs: Box<Expression>,
+        src_ref: SrcRef,
     },
     /// A unary operation: !a
     UnaryOp {
         /// '+', '-', '!'
         op: char,
         rhs: Box<Expression>,
+        src_ref: SrcRef,
     },
     /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
-    ListElementAccess(Box<Expression>, Box<Expression>),
+    ListElementAccess(Box<Expression>, Box<Expression>, SrcRef),
     /// Access an element of a named tuple: `a.b`
-    NamedTupleElementAccess(Box<Expression>, Identifier),
+    NamedTupleElementAccess(Box<Expression>, Identifier, SrcRef),
     /// Access an element of an unnamed tuple: `a.0`
-    UnnamedTupleElementAccess(Box<Expression>, u32),
+    UnnamedTupleElementAccess(Box<Expression>, u32, SrcRef),
     /// Call to a method: `[2,3].len()`
     /// First expression must evaluate to a value
-    MethodCall(Box<Expression>, MethodCall),
+    MethodCall(Box<Expression>, MethodCall, SrcRef),
+}
+
+impl SrcReferrer for Expression {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        match self {
+            Self::Invalid => SrcRef(None),
+            Self::Literal(l) => l.src_ref(),
+            Self::FormatString(fs) => fs.src_ref(),
+            Self::ListExpression(le) => le.src_ref(),
+            Self::TupleExpression(te) => te.src_ref(),
+            Self::Nested(n) => n.src_ref().clone(),
+            Self::BinaryOp {
+                lhs: _,
+                op: _,
+                rhs: _,
+                src_ref,
+            } => src_ref.clone(),
+            Self::UnaryOp {
+                op: _,
+                rhs: _,
+                src_ref,
+            } => src_ref.clone(),
+            Self::ListElementAccess(_, _, src_ref) => src_ref.clone(),
+            Self::NamedTupleElementAccess(_, _, src_ref) => src_ref.clone(),
+            Self::UnnamedTupleElementAccess(_, _, src_ref) => src_ref.clone(),
+            Self::MethodCall(_, _, src_ref) => src_ref.clone(),
+        }
+    }
 }
 
 impl std::fmt::Display for Expression {
@@ -83,12 +113,21 @@ impl std::fmt::Display for Expression {
             Self::FormatString(format_string) => write!(f, "{}", format_string),
             Self::ListExpression(list_expression) => write!(f, "{}", list_expression),
             Self::TupleExpression(tuple_expression) => write!(f, "{}", tuple_expression),
-            Self::BinaryOp { lhs, op, rhs } => write!(f, "({} {} {})", lhs, op, rhs),
-            Self::UnaryOp { op, rhs } => write!(f, "({}{})", op, rhs),
-            Self::ListElementAccess(lhs, rhs) => write!(f, "{}[{}]", lhs, rhs),
-            Self::NamedTupleElementAccess(lhs, rhs) => write!(f, "{}.{}", lhs, rhs),
-            Self::UnnamedTupleElementAccess(lhs, rhs) => write!(f, "{}.{}", lhs, rhs),
-            Self::MethodCall(lhs, method_call) => write!(f, "{}.{}", lhs, method_call),
+            Self::BinaryOp {
+                lhs,
+                op,
+                rhs,
+                src_ref: _,
+            } => write!(f, "({} {} {})", lhs, op, rhs),
+            Self::UnaryOp {
+                op,
+                rhs,
+                src_ref: _,
+            } => write!(f, "({}{})", op, rhs),
+            Self::ListElementAccess(lhs, rhs, _) => write!(f, "{}[{}]", lhs, rhs),
+            Self::NamedTupleElementAccess(lhs, rhs, _) => write!(f, "{}.{}", lhs, rhs),
+            Self::UnnamedTupleElementAccess(lhs, rhs, _) => write!(f, "{}.{}", lhs, rhs),
+            Self::MethodCall(lhs, method_call, _) => write!(f, "{}.{}", lhs, method_call),
             Self::Nested(nested) => write!(f, "{nested}"),
             _ => unimplemented!(),
         }
@@ -120,7 +159,12 @@ impl Eval for Expression {
             Self::TupleExpression(tuple_expression) => {
                 TupleExpression::eval(tuple_expression, context)
             }
-            Self::BinaryOp { lhs, op, rhs } => {
+            Self::BinaryOp {
+                lhs,
+                op,
+                rhs,
+                src_ref: _,
+            } => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
 
@@ -140,7 +184,11 @@ impl Eval for Expression {
                 }
                 .map_err(EvalError::ValueError)
             }
-            Self::UnaryOp { op, rhs } => {
+            Self::UnaryOp {
+                op,
+                rhs,
+                src_ref: _,
+            } => {
                 let rhs = rhs.eval(context)?;
 
                 match op {
@@ -149,7 +197,7 @@ impl Eval for Expression {
                 }
                 .map_err(EvalError::ValueError)
             }
-            Self::ListElementAccess(lhs, rhs) => {
+            Self::ListElementAccess(lhs, rhs, _) => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
 
@@ -168,7 +216,7 @@ impl Eval for Expression {
                     _ => unimplemented!(),
                 }
             }
-            Self::MethodCall(lhs, method_call) => {
+            Self::MethodCall(lhs, method_call, _) => {
                 let name: &str = &method_call.name.to_string();
 
                 match lhs.eval(context)? {
@@ -238,6 +286,7 @@ impl Parse for Expression {
                     lhs: Box::new(lhs),
                     op,
                     rhs: Box::new(rhs),
+                    src_ref: pair.clone().into(),
                 }
             })
             .map_prefix(|op, rhs| {
@@ -251,29 +300,36 @@ impl Parse for Expression {
                 Self::UnaryOp {
                     op,
                     rhs: Box::new(rhs),
+                    src_ref: pair.clone().into(),
                 }
             })
             .map_postfix(|lhs, op| match op.as_rule() {
-                Rule::list_element_access => {
-                    Self::ListElementAccess(Box::new(lhs), Box::new(Self::parse(op).unwrap()))
-                }
+                Rule::list_element_access => Self::ListElementAccess(
+                    Box::new(lhs),
+                    Box::new(Self::parse(op).unwrap()),
+                    pair.clone().into(),
+                ),
                 Rule::tuple_element_access => {
                     let op = op.into_inner().next().unwrap();
                     match op.as_rule() {
                         Rule::identifier => Self::NamedTupleElementAccess(
                             Box::new(lhs),
                             Identifier::parse(op).unwrap(),
+                            pair.clone().into(),
                         ),
                         Rule::int => Self::UnnamedTupleElementAccess(
                             Box::new(lhs),
                             op.as_str().parse().unwrap(),
+                            pair.clone().into(),
                         ),
                         rule => unreachable!("Expected identifier or int, found {:?}", rule),
                     }
                 }
-                Rule::method_call => {
-                    Self::MethodCall(Box::new(lhs), MethodCall::parse(op).unwrap())
-                }
+                Rule::method_call => Self::MethodCall(
+                    Box::new(lhs),
+                    MethodCall::parse(op).unwrap(),
+                    pair.clone().into(),
+                ),
                 rule => {
                     unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
                 }
