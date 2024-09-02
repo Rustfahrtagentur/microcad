@@ -4,7 +4,7 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{eval::Sym, parser::*, src_ref::*};
+use crate::{errors::*, eval::Sym, parser::*, src_ref::*};
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(microcad_core::Id, SrcRef);

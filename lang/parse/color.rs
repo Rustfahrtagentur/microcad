@@ -1,4 +1,4 @@
-use crate::parser::*;
+use crate::{errors::*, parser::*};
 
 // A color with RGBA channels
 #[derive(Copy, Clone, Debug, PartialEq)]

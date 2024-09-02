@@ -1,6 +1,6 @@
 //! A single call argument
 
-use crate::{eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
 
 /// Call argument
 #[derive(Clone, Debug, Default)]

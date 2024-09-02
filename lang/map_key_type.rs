@@ -15,14 +15,14 @@ pub enum MapKeyType {
 }
 
 impl TryFrom<Type> for MapKeyType {
-    type Error = TypeError;
+    type Error = ParseError;
 
     fn try_from(t: Type) -> Result<Self, Self::Error> {
         match t {
             Type::Integer => Ok(Self::Integer),
             Type::Bool => Ok(Self::Bool),
             Type::String => Ok(Self::String),
-            _ => Err(TypeError::InvalidMapKeyType(t.to_string())),
+            _ => Err(ParseError::InvalidMapKeyType(t.to_string())),
         }
     }
 }

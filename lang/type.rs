@@ -1,12 +1,14 @@
 //! µCAD Basic Types
 
 use crate::{
+    errors::*,
     eval::*,
     parse::*,
     parser::*,
     src_ref::{SrcRef, SrcReferrer},
 };
 
+/// µCAD Basic Types
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
     // A 64-bit integer number

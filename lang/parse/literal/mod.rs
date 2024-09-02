@@ -2,7 +2,7 @@ mod number_literal;
 
 pub use number_literal::NumberLiteral;
 
-use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, r#type::*, src_ref::*};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {

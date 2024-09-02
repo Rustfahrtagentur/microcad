@@ -12,7 +12,7 @@ pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 lazy_static::lazy_static! {
     /// Expression parser

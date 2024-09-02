@@ -1,4 +1,4 @@
-use crate::{parser::*, r#type::*};
+use crate::{errors::*, parser::*, r#type::*};
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct UnnamedTupleType(pub Vec<Type>);

@@ -1,6 +1,6 @@
 use parameter::{SrcRef, SrcReferrer};
 
-use crate::{eval::*, ord_map::OrdMap, parse::*, parser::*};
+use crate::{errors::*, eval::*, ord_map::OrdMap, parse::*, parser::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct ParameterList(OrdMap<Identifier, Parameter>, SrcRef);
@@ -39,7 +39,7 @@ impl Parse for ParameterList {
         for pair in pair.clone().into_inner() {
             parameters
                 .push(Parameter::parse(pair)?)
-                .map_err(IdentifierListError::DuplicateIdentifier)?;
+                .map_err(ParseError::DuplicateIdentifier)?;
         }
 
         Ok(parameters)

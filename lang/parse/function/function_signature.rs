@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{errors::*, parse::*, parser::*, r#type::*, src_ref::*};
 
 #[derive(Clone, Debug)]
 pub struct FunctionSignature {

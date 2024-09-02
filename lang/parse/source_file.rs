@@ -1,6 +1,6 @@
 use std::io::Read;
 
-use crate::{eval::*, parse::*, parser::*};
+use crate::{errors::*, eval::*, parse::*, parser::*};
 use microcad_render::tree;
 
 #[derive(Clone, Debug)]

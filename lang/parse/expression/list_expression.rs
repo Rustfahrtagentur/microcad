@@ -1,6 +1,6 @@
 //! List expression
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// List expression (expression list maybe with common unit)
 #[derive(Default, Clone, Debug)]

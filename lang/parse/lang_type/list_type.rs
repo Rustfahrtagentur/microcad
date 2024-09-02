@@ -1,4 +1,4 @@
-use crate::{eval::*, parser::*, r#type::*};
+use crate::{errors::*, eval::*, parser::*, r#type::*};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ListType(Box<Type>);

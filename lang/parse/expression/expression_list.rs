@@ -1,6 +1,6 @@
 //! List of expressions
 
-use crate::{parse::*, parser::*, src_ref::*};
+use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
 /// Expression list
 #[derive(Clone, Default, Debug)]

@@ -16,7 +16,7 @@ impl Parse for NamedTupleType {
             let name = Identifier::parse(inner.next().unwrap())?;
             let ty = TypeAnnotation::parse(inner.next().unwrap())?.ty();
             if types.contains_key(&name) {
-                return Err(TypeError::DuplicatedMapField(name.clone()).into());
+                return Err(ParseError::DuplicatedMapField(name.clone()));
             }
             types.insert(name, ty);
         }

@@ -5,6 +5,7 @@ pub use format_expression::*;
 pub use format_spec::*;
 
 use crate::{
+    errors::*,
     eval::*,
     parser::*,
     src_ref::{SrcRef, SrcReferrer},

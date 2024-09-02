@@ -1,11 +1,4 @@
-use crate::{parse::*, parser::*};
-use thiserror::Error;
-
-#[derive(Debug, Error)]
-pub enum IdentifierListError {
-    #[error("Duplicate identifier: {0}")]
-    DuplicateIdentifier(Identifier),
-}
+use crate::{errors::*, parse::*, parser::*};
 
 /// A list of identifiers
 ///
@@ -35,15 +28,15 @@ impl std::ops::Deref for IdentifierList {
 }
 
 impl IdentifierList {
-    pub fn push(&mut self, ident: Identifier) -> Result<(), IdentifierListError> {
+    pub fn push(&mut self, ident: Identifier) -> Result<(), ParseError> {
         if self.contains(&ident) {
-            Err(IdentifierListError::DuplicateIdentifier(ident))
+            Err(ParseError::DuplicateIdentifier(ident))
         } else {
             self.0.push(ident);
             Ok(())
         }
     }
-    pub fn extend(&mut self, other: IdentifierList) -> Result<(), IdentifierListError> {
+    pub fn extend(&mut self, other: IdentifierList) -> Result<(), ParseError> {
         for ident in other {
             self.push(ident)?;
         }

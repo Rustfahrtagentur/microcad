@@ -1,5 +1,5 @@
 use super::FunctionStatement;
-use crate::{parse::*, parser::*, src_ref::*};
+use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct FunctionBody(pub Vec<FunctionStatement>);

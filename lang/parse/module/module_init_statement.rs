@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, src_ref::SrcReferrer};
+use crate::{errors::*, parse::*, parser::*, src_ref::SrcReferrer};
 
 #[derive(Clone, Debug)]
 pub enum ModuleInitStatement {

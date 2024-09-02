@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use microcad_render::tree;
 
 #[derive(Clone, Debug)]

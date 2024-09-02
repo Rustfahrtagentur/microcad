@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a.b.c`

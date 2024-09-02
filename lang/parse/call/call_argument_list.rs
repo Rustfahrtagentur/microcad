@@ -1,6 +1,6 @@
 //! Parse `call_argument_list` rule into CallArgumentList
 
-use crate::{eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
 
 /// List of call arguments
 #[derive(Clone, Debug, Default)]
