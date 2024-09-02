@@ -8,8 +8,6 @@ mod geo3d;
 
 mod math;
 
-use core::panic;
-
 use microcad_lang::parameter;
 use microcad_lang::parameter_list;
 use microcad_lang::{builtin_module, eval::*, function_signature, parse::*};
