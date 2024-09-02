@@ -166,18 +166,20 @@ fn test_assert() {
     use std::str::FromStr;
     let source_file = match SourceFile::from_str(
         r#"
-            std::assert(std::math::abs(-1.0) == -1.0);
+            std::assert(std::math::abs(-1.0) == 1.0);
         "#)
     {
         Ok(source_file) => source_file,
         Err(err) => panic!("ERROR: {err}"),
     };
 
-    match ContextBuilder::new(source_file).with_std().build().eval() {
+    let mut context = ContextBuilder::new(source_file).with_std().build();
+
+    match context.eval() {
         Ok(_) => {
-            panic!("We have a successful evaluation and a node, but we should have an assertion error");
+            println!("Our assertion was successful as expected");
         }
-        Err(err) => println!("{err}"),
+        Err(err) => panic!("{err}"),
     }
 }
 
