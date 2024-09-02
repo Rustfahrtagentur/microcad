@@ -122,11 +122,18 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 parameter!(condition: Bool),
                 parameter!(message: String = "Assertion failed")
             ]),
-            &|args, _| {
+            &|args, ctx| {
                 let message: String = args["message"].clone().try_into()?;
                 let condition: bool = args["condition"].clone().try_into()?;
-                assert!(condition, "{message}");
-                Ok(None)
+                if !condition {
+                    use microcad_lang::diagnostics::AddDiagnostic;
+                    ctx.error(
+                        microcad_lang::src_ref::SrcRef(None), // TODO: This should be the source reference of the assert function call 
+                        format!("Assertion failed: {message}"));
+                    Err(EvalError::AssertionFailed(message))
+                } else {
+                    Ok(None)
+                }
             },
         ))
         .add_builtin_module(builtin_module!(export(filename: String) {
@@ -161,7 +168,7 @@ fn test_assert() {
     use std::str::FromStr;
     let source_file = match SourceFile::from_str(
         r#"
-            std::assert(std::math::abs(-1.0) == 1.0);
+            std::assert(std::math::abs(-1.0) == -1.0);
         "#)
     {
         Ok(source_file) => source_file,

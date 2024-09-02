@@ -1,5 +1,5 @@
-use super::{value, Eval, EvalError, Symbol, SymbolTable, Symbols};
-use crate::{diagnostics::Diagnostics, parse::{identifier::*, SourceFile}};
+use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
+use crate::{diagnostics::{Diagnostic, AddDiagnostic, Diagnostics}, parse::{identifier::*, SourceFile}};
 use microcad_core::Id;
 use microcad_render::tree;
 
@@ -74,6 +74,12 @@ impl Context {
     pub fn append_node(&mut self, node: tree::Node) -> tree::Node {
         self.current_node.append(node.clone());
         node.clone()
+    }
+}
+
+impl AddDiagnostic for Context {
+    fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
+        self.diagnostics.add_diagnostic(diagnostic);
     }
 }
 

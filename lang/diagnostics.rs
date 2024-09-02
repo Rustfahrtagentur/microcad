@@ -25,20 +25,20 @@ impl std::fmt::Display for Level {
 
 
 /// A trait to add diagnostics with different levels conveniently
-pub trait DiagnosticAdd {
-    fn add(&mut self, diagnostic: Diagnostic);
+pub trait AddDiagnostic {
+    fn add_diagnostic(&mut self, diagnostic: Diagnostic);
 
     fn trace(&mut self, src: impl SrcReferrer, message: String) {
-        self.add(Diagnostic::new(src.src_ref(), message, Level::Trace));
+        self.add_diagnostic(Diagnostic::new(src.src_ref(), message, Level::Trace));
     }
     fn info(&mut self, src: impl SrcReferrer, message: String) {
-        self.add(Diagnostic::new(src.src_ref(), message, Level::Info));
+        self.add_diagnostic(Diagnostic::new(src.src_ref(), message, Level::Info));
     }
     fn warning(&mut self, src: impl SrcReferrer, message: String) {
-        self.add(Diagnostic::new(src.src_ref(), message, Level::Warning));
+        self.add_diagnostic(Diagnostic::new(src.src_ref(), message, Level::Warning));
     }
     fn error(&mut self, src: impl SrcReferrer, message: String) {
-        self.add(Diagnostic::new(src.src_ref(), message, Level::Error));
+        self.add_diagnostic(Diagnostic::new(src.src_ref(), message, Level::Error));
     }
 }
 
@@ -121,14 +121,14 @@ impl SourceFileDiagnostics {
     }
 }
 
-impl DiagnosticAdd for SourceFileDiagnostics {
-    fn add(&mut self, diagnostic: Diagnostic) {
+impl AddDiagnostic for SourceFileDiagnostics {
+    fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
         self.diagnostics.push(diagnostic);
     }
 }
 
-impl DiagnosticAdd for &mut SourceFileDiagnostics {
-    fn add(&mut self, diagnostic: Diagnostic) {
+impl AddDiagnostic for &mut SourceFileDiagnostics {
+    fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
         self.diagnostics.push(diagnostic);
     }
 }
@@ -188,9 +188,9 @@ impl Diagnostics {
     }
 }
 
-impl DiagnosticAdd for Diagnostics {
-    fn add(&mut self, diagnostic: Diagnostic) {
-        self.diagnostics.last_mut().unwrap().add(diagnostic);
+impl AddDiagnostic for Diagnostics {
+    fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
+        self.diagnostics.last_mut().unwrap().add_diagnostic(diagnostic);
     }
 }
 

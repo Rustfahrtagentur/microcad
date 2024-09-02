@@ -90,4 +90,7 @@ pub enum EvalError {
 
     #[error("Duplicate parameter: {0}")]
     DuplicateParameter(Id),
+
+    #[error("Assertion failed: {0}")]
+    AssertionFailed(String),
 }
