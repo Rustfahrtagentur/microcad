@@ -19,8 +19,8 @@ pub struct ModuleDefinition {
 }
 
 impl ModuleDefinition {
-    /// creater
-    pub fn new(name: Identifier) -> Self {
+    /// Create module definition
+    pub fn namespace(name: Identifier) -> Self {
         ModuleDefinition {
             attributes: Vec::new(),
             name,

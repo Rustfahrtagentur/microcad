@@ -25,7 +25,7 @@ impl ModuleBuilder {
     /// Create new module
     pub fn new(name: &str) -> ModuleBuilder {
         Self {
-            module: ModuleDefinition::new(name.into()),
+            module: ModuleDefinition::namespace(name.into()),
         }
     }
 
