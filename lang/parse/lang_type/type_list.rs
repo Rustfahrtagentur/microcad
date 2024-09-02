@@ -1,3 +1,5 @@
+//! Type list type parser entity
+
 use crate::r#type::*;
 
 pub struct TypeList(Vec<Type>);

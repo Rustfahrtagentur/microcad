@@ -1,3 +1,5 @@
+//! µCAD identifier parser entities
+
 mod identifier_list;
 mod qualified_name;
 

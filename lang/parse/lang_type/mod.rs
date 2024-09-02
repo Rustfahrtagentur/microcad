@@ -1,3 +1,5 @@
+//! µCAD parser entities of types
+
 mod list_type;
 mod map_type;
 mod named_tuple_type;

@@ -1,4 +1,4 @@
-//! µCAD Format expression parser entities
+//! µCAD format expression parser entities
 
 mod format_expression;
 mod format_spec;

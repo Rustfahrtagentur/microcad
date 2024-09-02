@@ -1,5 +1,8 @@
+//! Named tuple type parser entity
+
 use crate::{errors::*, parse::*, parser::*, r#type::*};
 
+/// Named tuple (e.g. `(n: scalar, m: string)`)
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct NamedTupleType(pub std::collections::BTreeMap<Identifier, Type>);
 

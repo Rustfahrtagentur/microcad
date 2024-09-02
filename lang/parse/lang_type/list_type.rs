@@ -1,10 +1,14 @@
+//! List type parser entity
+
 use crate::{errors::*, eval::*, parser::*, r#type::*};
 
+/// List type (e.g. '[scalar]')
 #[derive(Debug, Clone, PartialEq)]
 pub struct ListType(Box<Type>);
 
 impl ListType {
-    pub fn from_type(t: Type) -> Self {
+    /// Generate `ListType` from `Type`
+    fn from_type(t: Type) -> Self {
         Self(Box::new(t))
     }
 }
