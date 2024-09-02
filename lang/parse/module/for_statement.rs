@@ -1,9 +1,15 @@
+//! For statement parser entity
+
 use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
+/// For statement
 #[derive(Clone, Debug)]
 pub struct ForStatement {
+    /// Initial assignment
     loop_var: Assignment,
+    /// For loop body
     body: ModuleBody,
+    /// Source code reference
     src_ref: SrcRef,
 }
 

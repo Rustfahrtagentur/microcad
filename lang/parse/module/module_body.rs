@@ -1,15 +1,23 @@
+//! Module body parser entity
+
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use microcad_render::tree;
 
+/// Module body
 #[derive(Clone, Debug, Default)]
 pub struct ModuleBody {
+    /// Module statements
     pub statements: Vec<ModuleStatement>,
+    /// Module's local symbol table
     pub symbols: SymbolTable,
+    /// Initializers
     pub inits: Vec<std::rc::Rc<ModuleInitDefinition>>,
+    /// Source code reference
     src_ref: SrcRef,
 }
 
 impl ModuleBody {
+    /// Create empty module
     pub fn new() -> Self {
         Self {
             statements: Vec::new(),
@@ -19,6 +27,7 @@ impl ModuleBody {
         }
     }
 
+    /// Add statement to module
     pub fn add_statement(&mut self, statement: ModuleStatement) {
         self.statements.push(statement.clone());
         match statement {

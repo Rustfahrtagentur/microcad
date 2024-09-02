@@ -26,12 +26,6 @@ impl std::ops::DerefMut for ExpressionList {
     }
 }
 
-impl ExpressionList {
-    pub fn new(v: Vec<Expression>) -> Self {
-        Self(v)
-    }
-}
-
 impl IntoIterator for ExpressionList {
     type Item = Expression;
     type IntoIter = std::vec::IntoIter<Expression>;

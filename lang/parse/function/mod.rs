@@ -1,3 +1,5 @@
+//! µCAD function parser entities
+
 mod function_body;
 mod function_definition;
 mod function_signature;

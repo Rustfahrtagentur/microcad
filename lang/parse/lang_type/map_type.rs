@@ -1,5 +1,8 @@
+//! Map type parser entity
+
 use crate::{errors::*, map_key_type::*, parser::*, r#type::*};
 
+/// Map type (e.g. `[scalar => string]`)
 #[derive(Debug, Clone, PartialEq)]
 pub struct MapType(MapKeyType, Box<Type>);
 

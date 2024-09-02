@@ -1,4 +1,4 @@
-//! µCAD Unit parser entity
+//! µCAD unit parser entity
 
 use crate::{errors::*, parser::*, r#type::*};
 

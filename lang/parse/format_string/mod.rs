@@ -1,4 +1,4 @@
-//! µCAD Format expression parser entities
+//! µCAD format expression parser entities
 
 mod format_expression;
 mod format_spec;
@@ -43,23 +43,26 @@ impl std::str::FromStr for FormatString {
     }
 }
 
-impl SrcReferrer for FormatString {
-    fn src_ref(&self) -> crate::src_ref::SrcRef {
-        SrcRef::from_vec(&self.0)
-    }
-}
-
 impl FormatString {
+    /// Insert a string to this module
     pub fn push_string(&mut self, s: String) {
         self.0.push(FormatStringInner::String(s, SrcRef(None)));
     }
 
+    /// Insert a format expression to this module
     pub fn push_format_expr(&mut self, expr: FormatExpression) {
         self.0.push(FormatStringInner::FormatExpression(expr));
     }
 
+    /// Return the number of sections (inserted elements)
     pub fn section_count(&self) -> usize {
         self.0.len()
+    }
+}
+
+impl SrcReferrer for FormatString {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        SrcRef::from_vec(&self.0)
     }
 }
 

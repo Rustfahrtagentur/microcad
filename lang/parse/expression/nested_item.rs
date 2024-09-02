@@ -1,10 +1,15 @@
+//! Nested item parser entity
+
 use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
 /// Nested item
 #[derive(Clone, Debug)]
 pub enum NestedItem {
+    /// Call
     Call(Call),
+    /// Qualified Name
     QualifiedName(QualifiedName),
+    /// Module body
     ModuleBody(ModuleBody),
 }
 

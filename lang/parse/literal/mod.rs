@@ -1,14 +1,21 @@
+//! µCAD literal parser entities
+
 mod number_literal;
 
 pub use number_literal::NumberLiteral;
 
 use crate::{errors::*, eval::*, parse::*, parser::*, r#type::*, src_ref::*};
 
+/// Literal entity
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
+    /// Integer literal
     Integer(i64, SrcRef),
+    /// Number literal
     Number(NumberLiteral),
+    /// Boolean literal
     Bool(bool, SrcRef),
+    /// Color literal
     Color(Color, SrcRef),
 }
 

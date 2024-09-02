@@ -1,4 +1,4 @@
-//! Nested item list
+//! Nested item list parser entity
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
