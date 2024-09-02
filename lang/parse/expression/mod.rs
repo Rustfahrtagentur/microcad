@@ -1,4 +1,4 @@
-//! Parser entities related to expressions
+//! µCAD parser entities related to expressions
 
 mod expression_list;
 mod list_expression;

@@ -1,15 +1,27 @@
+//! Function statement parser entity
+
 use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
+/// Function statement
 #[derive(Clone, Debug)]
 pub enum FunctionStatement {
+    /// Assignment statement
     Assignment(Assignment),
+    /// Use statement
     Use(UseStatement),
+    /// Function definition
     FunctionDefinition(std::rc::Rc<FunctionDefinition>),
+    /// Return statement
     Return(Box<Expression>),
+    /// If-then-else statement
     If {
+        /// Condition
         condition: Expression,
+        /// If body
         if_body: FunctionBody,
+        /// Else body
         else_body: FunctionBody,
+        /// Source code reference
         src_ref: SrcRef,
     },
 }

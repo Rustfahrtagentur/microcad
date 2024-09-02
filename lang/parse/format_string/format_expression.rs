@@ -1,5 +1,8 @@
+//! Format expression parser entity
+
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
+/// Format expression including format specification
 #[allow(dead_code)]
 #[derive(Clone, Default, Debug)]
 pub struct FormatExpression(FormatSpec, Box<Expression>);

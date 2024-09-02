@@ -1,10 +1,17 @@
+//! Function definition parser entity
+
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
+/// Function definition
 #[derive(Clone, Debug)]
 pub struct FunctionDefinition {
+    /// NAme of the function
     pub name: Identifier,
+    /// Function signature
     pub signature: FunctionSignature,
+    /// Function body
     pub body: FunctionBody,
+    /// Source code reference
     src_ref: SrcRef,
 }
 

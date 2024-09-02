@@ -1,9 +1,15 @@
+//! Format Specification parser entity
+
 use crate::{errors::*, parser::*, src_ref::*};
 
+/// Format specification
 #[derive(Clone, Debug, Default)]
 pub struct FormatSpec {
+    /// Precision for number formatting
     precision: Option<u32>,
-    leading_zeros: Option<u32>,
+    /// Alignment width (leading zeros)
+    width: Option<u32>,
+    /// Source code reference
     src_ref: SrcRef,
 }
 
@@ -23,7 +29,7 @@ impl Parse for FormatSpec {
                     opt.precision = Some(pair.as_span().as_str()[1..].parse().unwrap())
                 }
                 Rule::format_spec_leading_zeros => {
-                    opt.leading_zeros = Some(pair.as_span().as_str()[1..].parse().unwrap())
+                    opt.width = Some(pair.as_span().as_str()[1..].parse().unwrap())
                 }
                 _ => unreachable!(),
             }

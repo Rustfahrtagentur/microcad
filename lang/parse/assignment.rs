@@ -1,4 +1,4 @@
-//! Assignment entity
+//! µCAD assignment parser entity
 
 use crate::{
     errors::*,
@@ -12,9 +12,13 @@ use crate::{
 /// Assignment specifying an identifier, type and value
 #[derive(Clone, Debug)]
 pub struct Assignment {
+    /// Assignee
     pub name: Identifier,
+    /// Type of the assignee
     pub specified_type: Option<TypeAnnotation>,
+    /// Value to assign
     pub value: Expression,
+    /// Source code reference
     src_ref: SrcRef,
 }
 

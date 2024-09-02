@@ -1,6 +1,9 @@
+//! Function body parser entity
+
 use super::FunctionStatement;
 use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
+/// Function body
 #[derive(Clone, Debug, Default)]
 pub struct FunctionBody(pub Vec<FunctionStatement>);
 

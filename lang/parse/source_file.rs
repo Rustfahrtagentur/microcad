@@ -1,3 +1,5 @@
+//! µCAD source file representation
+
 use std::io::Read;
 
 use crate::{errors::*, eval::*, parse::*, parser::*};

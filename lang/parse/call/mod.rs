@@ -1,4 +1,4 @@
-//! Parser entities related to function or module calls
+//! µCAD parser entities related to function or module calls
 
 mod call_argument;
 mod call_argument_list;
