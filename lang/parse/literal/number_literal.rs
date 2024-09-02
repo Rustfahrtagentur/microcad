@@ -15,11 +15,6 @@ impl NumberLiteral {
     pub fn from_int(value: i64) -> Self {
         Self(value as f64, Unit::None, SrcRef(None))
     }
-
-    pub fn ty(&self) -> Type {
-        self.1.ty()
-    }
-
     /// Returns the actual value of the literal
     pub fn value(&self) -> f64 {
         self.1.normalize(self.0)
@@ -27,6 +22,12 @@ impl NumberLiteral {
 
     pub fn unit(&self) -> Unit {
         self.1
+    }
+}
+
+impl Ty for NumberLiteral {
+    fn ty(&self) -> Type {
+        self.1.ty()
     }
 }
 
