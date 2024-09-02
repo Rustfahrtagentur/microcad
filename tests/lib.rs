@@ -5,8 +5,9 @@ include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
 
 #[cfg(test)]
 fn eval_input(input: &str) -> microcad_core::render::Node {
-    use microcad_lang::{eval::*, parse::source_file::SourceFile, parser};
-    let doc = match parser::Parser::parse_rule::<SourceFile>(parser::Rule::source_file, input) {
+    use microcad_lang::parse::source_file::SourceFile;
+    use std::str::FromStr;
+    let source_file = match SourceFile::from_str(input) {
         Ok(doc) => doc,
         Err(err) => panic!("ERROR: {err}"),
     };

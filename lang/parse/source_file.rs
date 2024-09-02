@@ -16,7 +16,7 @@ pub struct SourceFile {
 
 impl SourceFile {
     /// Load µCAD source file from given `path`
-    pub fn from_file(path: impl AsRef<std::path::Path>) -> anyhow::Result<Self> {
+    pub fn load(path: impl AsRef<std::path::Path>) -> anyhow::Result<Self> {
         let mut file = std::fs::File::open(&path)?;
         let mut buf = String::new();
         use anyhow::Context;
@@ -80,6 +80,15 @@ impl Eval for SourceFile {
     }
 }
 
+/// Implement `FromStr` trait for `SourceFile` to allow parsing from string
+impl std::str::FromStr for SourceFile {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> anyhow::Result<Self> {
+        Parser::parse_rule(crate::parser::Rule::source_file, s)
+    }
+}
+
 #[test]
 fn parse_source_file() {
     let source_file = Parser::parse_rule_or_panic::<SourceFile>(
@@ -99,7 +108,7 @@ fn parse_source_file() {
 fn load_source_file() {
     eprintln!("{:?}", std::env::current_dir());
 
-    let source_file = SourceFile::from_file(r#"../tests/std/algorithm_difference.µcad"#);
+    let source_file = SourceFile::load(r#"../tests/std/algorithm_difference.µcad"#);
     if let Err(ref err) = source_file {
         eprintln!("{err}");
     }
@@ -121,7 +130,7 @@ fn load_source_file() {
 
 #[test]
 fn load_source_file_wrong_location() {
-    let source_file = SourceFile::from_file("I do not exist.µcad");
+    let source_file = SourceFile::load("I do not exist.µcad");
     if let Err(err) = source_file {
         eprintln!("{err}");
         //assert_eq!(format!("{err}"), "Cannot load source file");
