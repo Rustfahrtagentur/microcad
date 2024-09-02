@@ -24,6 +24,14 @@ impl<T> WalkPath<T> {
 
     /// recursive directory scanner
     /// returns `false` if no leafs were generated
+    /// 
+    /// # Arguments
+    /// - `path`: directory to scan
+    /// - `extension`: file extension to scan for
+    /// - `f`: function to call for each file found
+    /// 
+    /// # Returns
+    /// `true` if any leafs were generated
     pub fn scan(
         &mut self,
         path: &std::path::Path,
