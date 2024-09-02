@@ -57,7 +57,7 @@ fn scan_for_tests(tree: &mut WalkPath<String>, file_path: &std::path::Path) -> R
     }
 
     // match markdown code markers for µCAD
-    let reg = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#\w]+))?\n(?<code>[^`]*)+```"#)
+    let reg = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#\w]+))?[\r\n]+(?<code>[^`]*)+```"#)
         .expect("bad regex");
 
     let path = file_path
@@ -71,6 +71,7 @@ fn scan_for_tests(tree: &mut WalkPath<String>, file_path: &std::path::Path) -> R
     let mut result = true;
     for cap in reg.captures_iter(&md_content) {
         // check if code is named
+
         if let (Some(code), Some(name)) = (cap.name("code"), cap.name("name")) {
             if path.is_empty() {
                 insert(tree, name.as_str(), code.as_str().to_string());
