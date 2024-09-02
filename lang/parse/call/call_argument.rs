@@ -3,7 +3,7 @@
 use crate::{errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
 
 /// Call argument
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct CallArgument {
     /// Name of the argument
     pub name: Option<Identifier>,
