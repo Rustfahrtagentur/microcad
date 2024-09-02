@@ -12,25 +12,30 @@ use microcad_lang::parameter;
 use microcad_lang::parameter_list;
 use microcad_lang::{builtin_module, eval::*, function_signature, parse::*};
 
-pub use export::export;
 pub use context_builder::ContextBuilder;
+pub use export::export;
 
+/// Module builder
 pub struct ModuleBuilder {
+    /// Module definition
     module: ModuleDefinition,
 }
 
 impl ModuleBuilder {
-    pub fn namespace(name: &str) -> ModuleBuilder {
+    /// Create new module
+    pub fn new(name: &str) -> ModuleBuilder {
         Self {
-            module: ModuleDefinition::namespace(name.into()),
+            module: ModuleDefinition::new(name.into()),
         }
     }
 
-    pub fn value(&mut self, name: &str, value: Value) -> &mut Self {
+    /// Add a value
+    pub fn add_value(&mut self, name: &str, value: Value) -> &mut Self {
         self.module.add_value(name.into(), value);
         self
     }
 
+    /// Build module builder
     pub fn build(&mut self) -> std::rc::Rc<ModuleDefinition> {
         std::rc::Rc::new(self.module.clone())
     }
@@ -108,7 +113,7 @@ macro_rules! arg_2 {
 use microcad_core::ExportSettings;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    ModuleBuilder::namespace("std")
+    ModuleBuilder::new("std")
         // TODO: is this correct= Shouldn't this use add_builtin_module() =
         .add_module(math::builtin_module())
         .add_module(geo2d::builtin_module())
@@ -126,8 +131,9 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 if !condition {
                     use microcad_lang::diagnostics::AddDiagnostic;
                     ctx.error(
-                        microcad_lang::src_ref::SrcRef(None), // TODO: This should be the source reference of the assert function call 
-                        format!("Assertion failed: {message}"));
+                        microcad_lang::src_ref::SrcRef(None), // TODO: This should be the source reference of the assert function call
+                        format!("Assertion failed: {message}"),
+                    );
                     Err(EvalError::AssertionFailed(message))
                 } else {
                     Ok(None)
@@ -146,8 +152,8 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
 fn context_namespace() {
     let mut context = Context::default();
 
-    let module = ModuleBuilder::namespace("math")
-        .value("pi", Value::Scalar(std::f64::consts::PI))
+    let module = ModuleBuilder::new("math")
+        .add_value("pi", Value::Scalar(std::f64::consts::PI))
         .build();
 
     context.add_module(module);
@@ -167,8 +173,8 @@ fn test_assert() {
     let source_file = match SourceFile::from_str(
         r#"
             std::assert(std::math::abs(-1.0) == 1.0);
-        "#)
-    {
+        "#,
+    ) {
         Ok(source_file) => source_file,
         Err(err) => panic!("ERROR: {err}"),
     };

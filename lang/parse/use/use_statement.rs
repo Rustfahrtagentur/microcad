@@ -1,6 +1,9 @@
+//! Use statement parser entity
+
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use strum::IntoStaticStr;
 
+/// Use statement
 #[derive(Clone, Debug, IntoStaticStr)]
 pub enum UseStatement {
     /// Import symbols given as qualified names: `use a, b`

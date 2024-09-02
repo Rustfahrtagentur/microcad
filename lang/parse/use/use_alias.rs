@@ -1,5 +1,8 @@
+//! Use alias parser entity
+
 use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
+/// Use alias
 #[derive(Clone, Debug)]
 pub struct UseAlias(pub QualifiedName, pub Identifier, SrcRef);
 

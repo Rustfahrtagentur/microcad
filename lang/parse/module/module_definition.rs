@@ -1,23 +1,26 @@
+//! Module definition parser entity
+
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use microcad_render::tree;
 
+/// Module definition
 #[derive(Clone, Debug)]
 pub struct ModuleDefinition {
+    /// Module attributes
     pub attributes: Vec<Attribute>,
+    /// Module name
     pub name: Identifier,
+    /// Module Parameters
     pub parameters: Option<ParameterList>,
+    /// Module body
     pub body: ModuleBody,
+    /// Source code reference
     src_ref: SrcRef,
 }
 
-impl SrcReferrer for ModuleDefinition {
-    fn src_ref(&self) -> SrcRef {
-        self.src_ref.clone()
-    }
-}
-
 impl ModuleDefinition {
-    pub fn namespace(name: Identifier) -> Self {
+    /// creater
+    pub fn new(name: Identifier) -> Self {
         ModuleDefinition {
             attributes: Vec::new(),
             name,
@@ -29,6 +32,12 @@ impl ModuleDefinition {
 
     pub fn call(&self, _args: &CallArgumentList, _context: &mut Context) -> Result<tree::Node> {
         todo!()
+    }
+}
+
+impl SrcReferrer for ModuleDefinition {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
     }
 }
 

@@ -58,7 +58,7 @@ impl Renderable3D for Cube {
 use crate::ModuleBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    ModuleBuilder::namespace("geo3d")
+    ModuleBuilder::new("geo3d")
         .add_builtin_module(Sphere::builtin_module())
         .add_builtin_module(Cube::builtin_module())
         .build()

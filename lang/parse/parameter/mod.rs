@@ -1,3 +1,5 @@
+//! µCAD parameter parser entities
+
 mod parameter_list;
 
 use crate::{errors::*, eval::*, ord_map::OrdMapValue, parse::*, parser::*, r#type::*, src_ref::*};
@@ -7,13 +9,18 @@ pub use parameter_list::*;
 /// A parameter for a function or module definition
 #[derive(Clone, Debug, Default)]
 pub struct Parameter {
+    /// Name of the parameter
     pub name: Identifier,
+    /// Type of the parameter or `None`
     pub specified_type: Option<TypeAnnotation>,
+    /// default value of the parameter or `None`
     pub default_value: Option<Expression>,
+    /// Source code reference
     src_ref: SrcRef,
 }
 
 impl Parameter {
+    /// Create new parameter
     pub fn new(
         name: Identifier,
         specified_type: Option<TypeAnnotation>,
