@@ -4,7 +4,7 @@ use microcad_core::Scalar;
 use microcad_lang::{eval::*, parse::*};
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    ModuleBuilder::namespace("math")
+    ModuleBuilder::new("math")
         // abs(x): Absolute value of x
         .add_builtin_function(arg_1!(abs(x) for Scalar, Length, Angle, Integer))
         // sign(x): Sign of x

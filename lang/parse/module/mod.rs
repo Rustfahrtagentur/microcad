@@ -1,3 +1,5 @@
+//! µCAD module related  parser entities
+
 mod attribute;
 mod for_statement;
 mod module_body;

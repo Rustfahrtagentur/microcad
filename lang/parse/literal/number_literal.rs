@@ -1,16 +1,20 @@
+//! Number literal parser entity
+
 use crate::{eval::*, parse::*, parser::*, r#type::*};
 use literal::*;
 
-/// Definition and implementation for `NumberLiteral`
+/// Number literal
 #[derive(Debug, Clone, PartialEq)]
 pub struct NumberLiteral(pub f64, pub Unit, SrcRef);
 
 impl NumberLiteral {
+    /// Create from usize value
     #[cfg(test)]
     pub fn from_usize(value: usize) -> Self {
         Self(value as f64, Unit::None, SrcRef(None))
     }
 
+    /// Create from integer value
     #[cfg(test)]
     pub fn from_int(value: i64) -> Self {
         Self(value as f64, Unit::None, SrcRef(None))

@@ -1,7 +1,10 @@
+//! Parameter list parser entity
+
 use parameter::{SrcRef, SrcReferrer};
 
 use crate::{errors::*, eval::*, ord_map::OrdMap, parse::*, parser::*};
 
+/// Parameter list
 #[derive(Clone, Debug, Default)]
 pub struct ParameterList(OrdMap<Identifier, Parameter>, SrcRef);
 

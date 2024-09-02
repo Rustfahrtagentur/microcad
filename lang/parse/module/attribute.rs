@@ -1,9 +1,15 @@
+//! µCAD attribute parser entity
+
 use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
+/// Attribute entity
 #[derive(Clone, Debug)]
 pub struct Attribute {
+    /// Name of the attribute
     pub name: QualifiedName,
+    /// Arguments of the attribute
     pub arguments: Option<CallArgumentList>,
+    /// Source code reference
     src_ref: SrcRef,
 }
 
