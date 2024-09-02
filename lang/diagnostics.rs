@@ -2,7 +2,11 @@
 
 use crate::{parse::SourceFile, src_ref::*};
 
-enum Level {
+
+/// The level of the diagnostic
+#[derive(Debug, Clone)]
+pub enum Level {
+    Trace,
     Error,
     Warning,
     Info,
@@ -11,6 +15,7 @@ enum Level {
 impl std::fmt::Display for Level {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
+            Level::Trace => write!(f, "trace"),
             Level::Error => write!(f, "error"),
             Level::Warning => write!(f, "warning"),
             Level::Info => write!(f, "info"),
@@ -18,31 +23,43 @@ impl std::fmt::Display for Level {
     }
 }
 
-struct Diagnostic {
+
+/// A trait to add diagnostics with different levels conveniently
+pub trait DiagnosticAdd {
+    fn add(&mut self, diagnostic: Diagnostic);
+
+    fn trace(&mut self, src: impl SrcReferrer, message: String) {
+        self.add(Diagnostic::new(src.src_ref(), message, Level::Trace));
+    }
+    fn info(&mut self, src: impl SrcReferrer, message: String) {
+        self.add(Diagnostic::new(src.src_ref(), message, Level::Info));
+    }
+    fn warning(&mut self, src: impl SrcReferrer, message: String) {
+        self.add(Diagnostic::new(src.src_ref(), message, Level::Warning));
+    }
+    fn error(&mut self, src: impl SrcReferrer, message: String) {
+        self.add(Diagnostic::new(src.src_ref(), message, Level::Error));
+    }
+}
+
+
+
+/// A diagnostic containing a source reference, a message and a level
+#[derive(Debug, Clone)]
+pub struct Diagnostic {
     pub src_ref: SrcRef,
     pub message: String,
     pub level: Level,
 }
 
 impl Diagnostic {
+    /// Create a new diagnostic
     pub fn new(src_ref: SrcRef, message: String, level: Level) -> Self {
         Self {
             src_ref,
             message,
             level,
         }
-    }
-
-    pub fn info(src: impl SrcReferrer, message: String) -> Self {
-        Self::new(src.src_ref(), message, Level::Info)
-    }
-
-    pub fn warning(src: impl SrcReferrer, message: String) -> Self {
-        Self::new(src.src_ref(), message, Level::Warning)
-    }
-
-    pub fn error(src: impl SrcReferrer, message: String) -> Self {
-        Self::new(src.src_ref(), message, Level::Error)
     }
 
     pub fn pretty_print(
@@ -77,7 +94,10 @@ impl Diagnostic {
 }
 
 /// Diagnostics for a single source file
-struct SourceFileDiagnostics {
+#[derive(Debug)]
+pub struct SourceFileDiagnostics {
+    /// The source is an `Rc` because we want to share the source file between the diagnostics and the context
+    /// This way we can keep track of the source file and the diagnostics separately.
     source_file: std::rc::Rc<SourceFile>,
     diagnostics: Vec<Diagnostic>,
 }
@@ -90,20 +110,26 @@ impl SourceFileDiagnostics {
         }
     }
 
-    pub fn add(&mut self, diagnostic: Diagnostic) {
+    pub fn pretty_print(
+        &self,
+        w: &mut dyn std::fmt::Write,
+    ) -> std::fmt::Result {
+        for diagnostic in &self.diagnostics {
+            diagnostic.pretty_print(w, self.source_file.as_ref())?;
+        }
+        Ok(())
+    }
+}
+
+impl DiagnosticAdd for SourceFileDiagnostics {
+    fn add(&mut self, diagnostic: Diagnostic) {
         self.diagnostics.push(diagnostic);
     }
+}
 
-    pub fn info(&mut self, src: impl SrcReferrer, message: String) {
-        self.add(Diagnostic::info(src, message));
-    }
-
-    pub fn warning(&mut self, src: impl SrcReferrer, message: String) {
-        self.add(Diagnostic::warning(src, message));
-    }
-
-    pub fn error(&mut self, src: impl SrcReferrer, message: String) {
-        self.add(Diagnostic::error(src, message));
+impl DiagnosticAdd for &mut SourceFileDiagnostics {
+    fn add(&mut self, diagnostic: Diagnostic) {
+        self.diagnostics.push(diagnostic);
     }
 }
 
@@ -116,10 +142,63 @@ impl std::fmt::Display for SourceFileDiagnostics {
     }
 }
 
+
+#[derive(Debug, Default)]
+pub struct Diagnostics {
+    /// We have a vec of source file diagnostics because we want to keep track of diagnostics for each source file separately
+    diagnostics: Vec<SourceFileDiagnostics>,
+
+    /// Trace with indices to the diagnostics vector
+    trace: Vec<usize>,
+}
+
+impl Diagnostics {
+    pub fn new(source_file: std::rc::Rc<SourceFile>) -> Self {
+        Self {
+            diagnostics: vec![SourceFileDiagnostics::new(source_file.clone())],
+            trace: Vec::new(),
+        }
+    }
+
+    pub fn current_source_file(&self) -> std::rc::Rc<SourceFile> {
+        self.diagnostics.last().map(|d| d.source_file.clone()).unwrap()
+    }
+
+    pub fn push(&mut self, source_file: std::rc::Rc<SourceFile>) {
+        self.trace.push(self.diagnostics.len());
+        self.diagnostics.push(SourceFileDiagnostics::new(source_file));
+    }
+
+    pub fn pop(&mut self) {
+        self.trace.pop();
+    }
+
+    pub fn pretty_print(&self, w: &mut dyn std::fmt::Write) -> std::fmt::Result {
+        for source_file_diagnostics in &self.diagnostics {
+            source_file_diagnostics.pretty_print(w)?;
+        }
+        Ok(())
+    }
+
+    pub fn print_backtrace(&self, w: &mut dyn std::fmt::Write) -> std::fmt::Result {
+        for index in &self.trace {
+            self.diagnostics[*index].pretty_print(w)?;
+        }
+        Ok(())
+    }
+}
+
+impl DiagnosticAdd for Diagnostics {
+    fn add(&mut self, diagnostic: Diagnostic) {
+        self.diagnostics.last_mut().unwrap().add(diagnostic);
+    }
+}
+
+
 #[test]
 fn test_diagnostics() {
     let source_file = std::rc::Rc::new(
-        SourceFile::from_file(r#"../tests/std/algorithm_difference.µcad"#).unwrap(),
+        SourceFile::load(r#"../tests/std/algorithm_difference.µcad"#).unwrap(),
     );
 
     let mut diagnostics = SourceFileDiagnostics::new(source_file.clone());

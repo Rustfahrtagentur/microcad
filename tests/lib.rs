@@ -12,12 +12,7 @@ fn eval_input(input: &str) -> microcad_core::render::Node {
         Err(err) => panic!("ERROR: {err}"),
     };
 
-    let mut context = Context::default();
-    context.add_module(microcad_std::builtin_module());
-
-    use microcad_lang::eval::Eval;
-
-    doc.eval(&mut context).unwrap()
+    microcad_std::ContextBuilder::new(source_file).with_std().build().eval().unwrap()
 }
 
 #[cfg(test)]

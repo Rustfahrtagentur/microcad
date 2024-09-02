@@ -1,5 +1,5 @@
-use super::{EvalError, Symbol, SymbolTable, Symbols};
-use crate::parse::identifier::*;
+use super::{value, Eval, EvalError, Symbol, SymbolTable, Symbols};
+use crate::{diagnostics::Diagnostics, parse::{identifier::*, SourceFile}};
 use microcad_core::Id;
 use microcad_render::tree;
 
@@ -9,11 +9,44 @@ use microcad_render::tree;
 /// A context is essentially a stack of symbol tables
 #[derive(Debug)]
 pub struct Context {
+    /// Stack of symbol tables
     stack: Vec<SymbolTable>,
+
+    /// Current node in the tree where the evaluation is happening
     current_node: tree::Node,
+
+    /// Source files loaded in the context
+    source_files: std::collections::HashMap<String, std::rc::Rc<SourceFile>>,
+
+    /// Source file diagnostics
+    diagnostics: Diagnostics,
 }
 
 impl Context {
+    pub fn from_source_file(source_file: SourceFile) -> Self {
+        let mut context = Self::default();
+        context.add_source_file(source_file);
+    
+        context
+    }
+
+    /// Evaluate the context with the current source file
+    pub fn eval(&mut self) -> super::Result<tree::Node> {
+        self.current_source_file().eval(self)
+    }
+
+    pub fn current_source_file(&self) -> std::rc::Rc<SourceFile> {
+        self.diagnostics.current_source_file().clone()
+    }
+
+    /// Add a new source file to the context and set it as the current source file
+    pub fn add_source_file(&mut self, source_file: SourceFile) {
+        let new_source_file = std::rc::Rc::new(source_file);
+        self.source_files.insert(new_source_file.filename().to_string(), new_source_file.clone());
+    
+        self.diagnostics.push(new_source_file.clone());
+    }
+
     pub fn push(&mut self) {
         self.stack.push(SymbolTable::default());
     }
@@ -70,6 +103,8 @@ impl Default for Context {
         Self {
             stack: vec![SymbolTable::default()],
             current_node: tree::root(),
+            source_files: std::collections::HashMap::new(),
+            diagnostics: Diagnostics::default(),
         }
     }
 }

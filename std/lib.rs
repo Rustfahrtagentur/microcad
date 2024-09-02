@@ -1,4 +1,5 @@
 mod algorithm;
+mod context_builder;
 mod export;
 mod geo2d;
 
@@ -7,11 +8,14 @@ mod geo3d;
 
 mod math;
 
+use core::panic;
+
 use microcad_lang::parameter;
 use microcad_lang::parameter_list;
 use microcad_lang::{builtin_module, eval::*, function_signature, parse::*};
 
 pub use export::export;
+pub use context_builder::ContextBuilder;
 
 pub struct ModuleBuilder {
     module: ModuleDefinition,
@@ -164,11 +168,11 @@ fn test_assert() {
         Err(err) => panic!("ERROR: {err}"),
     };
 
-    let mut context = Context::default();
-    context.add_module(builtin_module());
-
-    if let Err(err) = doc.eval(&mut context) {
-        println!("{err}");
+    match ContextBuilder::new(source_file).with_std().build().eval() {
+        Ok(_) => {
+            panic!("We have a successful evaluation and a node, but we should have an assertion error");
+        }
+        Err(err) => println!("{err}"),
     }
 }
 
