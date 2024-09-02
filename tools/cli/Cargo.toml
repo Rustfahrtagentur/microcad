@@ -1,0 +1,13 @@
+[package]
+name = "microcad-cli"
+version = "0.1.0"
+
+[[bin]]
+name = "µcad"
+path = "main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+
+microcad-std = { path = "../../std" }
+microcad-lang = { path = "../../lang" }

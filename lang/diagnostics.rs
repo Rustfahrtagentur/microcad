@@ -64,31 +64,36 @@ impl Diagnostic {
 
     pub fn pretty_print(
         &self,
-        w: &mut dyn std::fmt::Write,
+        w: &mut dyn std::io::Write,
         source_file: &SourceFile,
-    ) -> std::fmt::Result {
-        writeln!(w, "{}: {}", self.level, self.message)?;
-        writeln!(
-            w,
-            "  ---> {}:{}",
-            source_file.filename(),
-            self.src_ref.at().unwrap(),
-        )?;
-        writeln!(w, "     |",)?;
-
-        let line = source_file
-            .get_line(self.src_ref.at().unwrap().line as usize - 1)
-            .unwrap_or("<no line>");
-
-        writeln!(w, "{: >4} | {}", self.src_ref.at().unwrap().line, line)?;
-        writeln!(
-            w,
-            "{: >4} | {}",
-            "",
-            " ".repeat(self.src_ref.at().unwrap().col as usize - 1)
-                + &"^".repeat(self.src_ref.len().min(line.len())),
-        )?;
-        writeln!(w, "     |",)?;
+    ) -> std::io::Result<()> {
+        match self.src_ref {
+            SrcRef(None) => writeln!(w, "{}: {}", self.level, self.message)?,
+            SrcRef(Some(ref src_ref)) => {  
+                writeln!(w, "{}: {}", self.level, self.message)?;
+                writeln!(
+                w,
+                "  ---> {}:{}",
+                source_file.filename(),
+                src_ref.at,
+            )?;
+            writeln!(w, "     |",)?;
+    
+            let line = source_file
+                .get_line(src_ref.at.line as usize - 1)
+                .unwrap_or("<no line>");
+    
+            writeln!(w, "{: >4} | {}", self.src_ref.at().unwrap().line, line)?;
+            writeln!(
+                w,
+                "{: >4} | {}",
+                "",
+                " ".repeat(self.src_ref.at().unwrap().col as usize - 1)
+                    + &"^".repeat(self.src_ref.len().min(line.len())),
+            )?;
+            writeln!(w, "     |",)?;
+        }}
+      
         Ok(())
     }
 }
@@ -112,8 +117,8 @@ impl SourceFileDiagnostics {
 
     pub fn pretty_print(
         &self,
-        w: &mut dyn std::fmt::Write,
-    ) -> std::fmt::Result {
+        w: &mut dyn std::io::Write,
+    ) -> std::io::Result<()> {
         for diagnostic in &self.diagnostics {
             diagnostic.pretty_print(w, self.source_file.as_ref())?;
         }
@@ -133,14 +138,6 @@ impl AddDiagnostic for &mut SourceFileDiagnostics {
     }
 }
 
-impl std::fmt::Display for SourceFileDiagnostics {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        for diagnostic in &self.diagnostics {
-            diagnostic.pretty_print(f, &self.source_file)?;
-        }
-        Ok(())
-    }
-}
 
 
 #[derive(Debug, Default)]
@@ -173,14 +170,14 @@ impl Diagnostics {
         self.trace.pop();
     }
 
-    pub fn pretty_print(&self, w: &mut dyn std::fmt::Write) -> std::fmt::Result {
+    pub fn pretty_print(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
         for source_file_diagnostics in &self.diagnostics {
             source_file_diagnostics.pretty_print(w)?;
         }
         Ok(())
     }
 
-    pub fn print_backtrace(&self, w: &mut dyn std::fmt::Write) -> std::fmt::Result {
+    pub fn print_backtrace(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
         for index in &self.trace {
             self.diagnostics[*index].pretty_print(w)?;
         }
@@ -209,5 +206,5 @@ fn test_diagnostics() {
     diagnostics.error(body_iter.next().unwrap(), "This is an error".to_string());
 
     assert_eq!(diagnostics.diagnostics.len(), 3);
-    eprintln!("{}", diagnostics);
+    diagnostics.pretty_print(&mut std::io::stdout()).unwrap();
 }

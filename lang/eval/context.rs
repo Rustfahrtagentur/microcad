@@ -32,11 +32,19 @@ impl Context {
 
     /// Evaluate the context with the current source file
     pub fn eval(&mut self) -> super::Result<tree::Node> {
-        self.current_source_file().eval(self)
+        let node = self.current_source_file().eval(self)?;
+
+        self.info(crate::src_ref::SrcRef(None), "Evaluation complete".into());
+        Ok(node)
     }
 
     pub fn current_source_file(&self) -> std::rc::Rc<SourceFile> {
         self.diagnostics.current_source_file().clone()
+    }
+
+    /// Read-only access to the diagnostics
+    pub fn diagnostics(&self) -> &Diagnostics {
+        &self.diagnostics
     }
 
     /// Add a new source file to the context and set it as the current source file

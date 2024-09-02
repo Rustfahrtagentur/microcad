@@ -7,6 +7,7 @@ default-members = [
     "std",
     "tests",
     "builtin",
+    "tools/cli",
 ]
 
 members = [
@@ -18,6 +19,7 @@ members = [
     "tests",
     "builtin",
     "thirdparty/manifold-rs",
+    "tools/cli",
 ]
 resolver = "2"
 
