@@ -16,12 +16,12 @@ fn assignment() {
 
     let mut context = Context::default();
 
-    assert_eq!(assignment.name(), "a");
+    assert_eq!(&assignment.name, "a");
     assert_eq!(
-        assignment.value().eval(&mut context).unwrap().to_string(),
+        assignment.value.eval(&mut context).unwrap().to_string(),
         "1"
     );
-    assert!(assignment.specified_type().is_none());
+    assert!(assignment.specified_type.is_none());
 
     assignment.eval(&mut context).unwrap();
 

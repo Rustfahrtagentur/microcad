@@ -7,32 +7,18 @@ use crate::{
     src_ref::{SrcRef, SrcReferrer},
 };
 
+/// Assignment specifying an identifier, type and value
 #[derive(Clone, Debug)]
 pub struct Assignment {
-    name: Identifier,
-    specified_type: Option<TypeAnnotation>,
-    value: Expression,
+    pub name: Identifier,
+    pub specified_type: Option<TypeAnnotation>,
+    pub value: Expression,
     src_ref: SrcRef,
 }
 
 impl SrcReferrer for Assignment {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()
-    }
-}
-
-impl Assignment {
-    pub fn name(&self) -> &Identifier {
-        &self.name
-    }
-
-    pub fn specified_type(&self) -> Option<&TypeAnnotation> {
-        self.specified_type.as_ref()
-    }
-
-    pub fn value(&self) -> Expression {
-        // TODO Return reference here
-        self.value.clone()
     }
 }
 
