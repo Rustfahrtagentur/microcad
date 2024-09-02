@@ -1,3 +1,5 @@
+//! µCAD color parser entity
+
 use crate::{errors::*, parser::*};
 
 /// A color with RGBA channels

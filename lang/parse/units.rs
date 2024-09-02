@@ -1,3 +1,5 @@
+//! µCAD Unit parser entity
+
 use crate::{errors::*, parser::*, r#type::*};
 
 macro_rules! declare_units {

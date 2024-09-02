@@ -1,3 +1,5 @@
+//! µCAD Format expression parser entities
+
 mod format_expression;
 mod format_spec;
 
@@ -11,9 +13,12 @@ use crate::{
     src_ref::{SrcRef, SrcReferrer},
 };
 
+/// Format string item
 #[derive(Clone, Debug)]
 enum FormatStringInner {
+    /// String literal
     String(String, SrcRef),
+    /// Format expression
     FormatExpression(FormatExpression),
 }
 
@@ -26,7 +31,7 @@ impl SrcReferrer for FormatStringInner {
     }
 }
 
-/// Definition and implementation for `StringLiteral`
+/// Format string
 #[derive(Default, Clone, Debug)]
 pub struct FormatString(Vec<FormatStringInner>);
 
