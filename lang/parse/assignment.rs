@@ -1,3 +1,5 @@
+//! Assignment entity
+
 use crate::{
     errors::*,
     eval::*,

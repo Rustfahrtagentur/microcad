@@ -1,6 +1,19 @@
+//! Generate tests out of *Markdown* files which include µCAD code
+//!
+//! Path will be scanned recursively for *Markdown* files (`*.md`).
+//! Code must be marked by *Markdown* code markers (code type: `µCAD`) with a test ID attached.
+//! In case of a failing test `#fail` must be appended to the test ID.
+//!
+//! Relative path's of scanned folder names will be used to build a modules structure  
+//! in the resulting code.
+//! If test IDs include `.` name will be split into several names which will be
+//! used to crates sub modules.
 use anyhow::{Context, Result};
 use walk_path::*;
 
+/// Generate tests from the *Markdown* files which are within the given `path`
+///
+/// Path will be scanned recursively
 pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
     use std::{env::*, path::*};
 
@@ -8,9 +21,9 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
     let out_dir = var("OUT_DIR")?;
     let dest_path = Path::new(&out_dir).join("microcad_markdown_test.rs");
 
-    // read all into a tree to reorder modules
+    // read all *Markdown files into a tree to reorder modules
     let mut wp = WalkPath::new();
-    wp.scan(path.as_ref(), "md", &generate_tests_for_md_file)?;
+    wp.scan(path.as_ref(), "md", &scan_for_tests)?;
 
     let mut code = String::new();
     write(&mut code, &wp);
@@ -30,21 +43,24 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
     }
 }
 
-fn generate_tests_for_md_file(tree: &mut WalkPath<String>, path: &std::path::Path) -> Result<bool> {
+/// Read single *Markdown* file and collect included tests in `tree`.
+///
+/// Generates tree nodes if name can be split into several names which are separated by `.`.
+fn scan_for_tests(tree: &mut WalkPath<String>, file_path: &std::path::Path) -> Result<bool> {
     use regex::*;
     use std::{fs::*, io::*};
 
     // load markdown file
     let mut md_content = String::new();
     {
-        File::open(path)?.read_to_string(&mut md_content)?;
+        File::open(file_path)?.read_to_string(&mut md_content)?;
     }
 
     // match markdown code markers for µCAD
     let reg = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#\w]+))?\n(?<code>[^`]*)+```"#)
         .expect("bad regex");
 
-    let path = path
+    let path = file_path
         .iter()
         .map(|f| f.to_str().unwrap())
         .filter(|f| *f != "..")

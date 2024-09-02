@@ -45,47 +45,36 @@ impl Diagnostic {
         Self::new(src.src_ref(), message, Level::Error)
     }
 
-    pub fn pretty_print(&self, w: &mut dyn std::fmt::Write, source_file: &SourceFile) -> std::fmt::Result {
-        writeln!(
-            w,
-            "{}: {}",
-            self.level,
-            self.message
-        )?;
+    pub fn pretty_print(
+        &self,
+        w: &mut dyn std::fmt::Write,
+        source_file: &SourceFile,
+    ) -> std::fmt::Result {
+        writeln!(w, "{}: {}", self.level, self.message)?;
         writeln!(
             w,
             "  ---> {}:{}",
-            source_file.file_name_as_str(),
+            source_file.filename(),
             self.src_ref.at().unwrap(),
         )?;
-        writeln!(
-            w,
-            "     |",
-        )?;
+        writeln!(w, "     |",)?;
 
-        let line = source_file.get_line(self.src_ref.at().unwrap().line as usize - 1).unwrap_or("<no line>");
+        let line = source_file
+            .get_line(self.src_ref.at().unwrap().line as usize - 1)
+            .unwrap_or("<no line>");
 
-        writeln!(
-            w,
-            "{: >4} | {}",
-            self.src_ref.at().unwrap().line,
-            line
-        )?;
+        writeln!(w, "{: >4} | {}", self.src_ref.at().unwrap().line, line)?;
         writeln!(
             w,
             "{: >4} | {}",
             "",
-            " ".repeat(self.src_ref.at().unwrap().col as usize - 1) + &"^".repeat(self.src_ref.len().min(line.len())),
+            " ".repeat(self.src_ref.at().unwrap().col as usize - 1)
+                + &"^".repeat(self.src_ref.len().min(line.len())),
         )?;
-        writeln!(
-            w,
-            "     |",
-        )?;
+        writeln!(w, "     |",)?;
         Ok(())
     }
 }
-
-
 
 /// Diagnostics for a single source file
 struct SourceFileDiagnostics {
@@ -129,7 +118,9 @@ impl std::fmt::Display for SourceFileDiagnostics {
 
 #[test]
 fn test_diagnostics() {
-    let source_file = std::rc::Rc::new(SourceFile::from_file(r#"../tests/std/algorithm_difference.µcad"#).unwrap());
+    let source_file = std::rc::Rc::new(
+        SourceFile::from_file(r#"../tests/std/algorithm_difference.µcad"#).unwrap(),
+    );
 
     let mut diagnostics = SourceFileDiagnostics::new(source_file.clone());
 
@@ -137,7 +128,6 @@ fn test_diagnostics() {
     diagnostics.info(body_iter.next().unwrap(), "This is an info".to_string());
     diagnostics.warning(body_iter.next().unwrap(), "This is a warning".to_string());
     diagnostics.error(body_iter.next().unwrap(), "This is an error".to_string());
-
 
     assert_eq!(diagnostics.diagnostics.len(), 3);
     eprintln!("{}", diagnostics);

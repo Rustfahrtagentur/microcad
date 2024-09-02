@@ -3,15 +3,19 @@ use std::io::Read;
 use crate::{errors::*, eval::*, parse::*, parser::*};
 use microcad_render::tree;
 
+/// µCAD source file
 #[derive(Clone, Debug)]
 pub struct SourceFile {
+    /// Root code body
     pub body: Vec<ModuleStatement>,
-    pub file_name: Option<std::path::PathBuf>,
+    /// Name of loaded file or `None`
+    pub filename: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
     _source: String,
 }
 
 impl SourceFile {
+    /// Load µCAD source file from given `path`
     pub fn from_file(path: impl AsRef<std::path::Path>) -> anyhow::Result<Self> {
         let mut file = std::fs::File::open(&path)?;
         let mut buf = String::new();
@@ -21,17 +25,21 @@ impl SourceFile {
         let mut source_file =
             Parser::parse_rule::<SourceFile>(crate::parser::Rule::source_file, &buf)
                 .context("Could not parse file")?;
-        source_file.file_name = Some(std::path::PathBuf::from(path.as_ref()));
+        source_file.filename = Some(std::path::PathBuf::from(path.as_ref()));
         Ok(source_file)
     }
 
-    pub fn file_name_as_str(&self) -> &str {
-        self.file_name
+    /// Return filename of loaded file or `<no file>`
+    pub fn filename(&self) -> &str {
+        self.filename
             .as_ref()
             .map(|p| p.to_str().unwrap_or("<no file>"))
             .unwrap_or("<no file>")
     }
 
+    /// get a specific line
+    ///
+    /// - `line`: line number beginning at `0`
     pub fn get_line(&self, line: usize) -> Option<&str> {
         self._source.lines().nth(line)
     }
@@ -53,7 +61,7 @@ impl Parse for SourceFile {
 
         Ok(SourceFile {
             body,
-            file_name: None,
+            filename: None,
             _source: pair.as_span().as_str().to_string(),
         })
     }

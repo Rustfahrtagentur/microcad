@@ -1,11 +1,15 @@
 use crate::{errors::*, parser::*};
 
-// A color with RGBA channels
+/// A color with RGBA channels
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Color {
+    /// red value
     r: f32,
+    /// green value
     g: f32,
+    /// blue value
     b: f32,
+    /// alpha value
     a: f32,
 }
 
