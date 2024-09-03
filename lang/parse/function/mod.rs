@@ -60,7 +60,7 @@ fn function_definition() {
             c = 1.0;
             return a + b + c;
         }";
-    Parser::parse_rule_or_panic::<FunctionDefinition>(Rule::function_definition, input);
+    Parser::parse_rule_or_panic::<std::rc::Rc<FunctionDefinition>>(Rule::function_definition, input);
 }
 
 #[test]
@@ -73,10 +73,10 @@ fn function_evaluate() {
             return a + b + c;
         }"#;
 
-    let function_def = std::rc::Rc::new(Parser::parse_rule_or_panic::<FunctionDefinition>(
+    let function_def = Parser::parse_rule_or_panic::<std::rc::Rc<FunctionDefinition>>(
         Rule::function_definition,
         input,
-    ));
+    );
 
     let mut context = Context::default();
     context.add_function(function_def);

@@ -41,7 +41,7 @@ impl Parse for ModuleStatement {
                 Self::ModuleInitDefinition(std::rc::Rc::new(ModuleInitDefinition::parse(first)?))
             }
             Rule::function_definition => {
-                Self::FunctionDefinition(std::rc::Rc::new(FunctionDefinition::parse(first)?))
+                Self::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?)
             }
             rule => unreachable!(
                 "Unexpected module statement, got {:?} {:?}",

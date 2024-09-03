@@ -3,7 +3,7 @@
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Function definition
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct FunctionDefinition {
     /// NAme of the function
     pub name: Identifier,
@@ -56,7 +56,7 @@ impl FunctionDefinition {
     }
 }
 
-impl Parse for FunctionDefinition {
+impl Parse for std::rc::Rc<FunctionDefinition> {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_definition);
         let mut inner = pair.clone().into_inner();
@@ -64,12 +64,12 @@ impl Parse for FunctionDefinition {
         let signature = FunctionSignature::parse(inner.next().unwrap())?;
         let body = FunctionBody::parse(inner.next().unwrap())?;
 
-        Ok(Self {
+        Ok(std::rc::Rc::new(FunctionDefinition {
             name,
             signature,
             body,
             src_ref: pair.into(),
-        })
+        }))
     }
 }
 

@@ -53,7 +53,7 @@ impl Parse for FunctionStatement {
             Rule::assignment => Self::Assignment(Assignment::parse(first)?),
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
             Rule::function_definition => {
-                Self::FunctionDefinition(std::rc::Rc::new(FunctionDefinition::parse(first)?))
+                Self::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?)
             }
             Rule::function_return_statement => Self::Return(Box::new(Expression::parse(first)?)),
             Rule::function_if_statement => {

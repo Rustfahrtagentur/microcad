@@ -5,7 +5,7 @@ pub enum ModuleInitStatement {
     Use(UseStatement),
     Expression(Expression),
     Assignment(Assignment),
-    FunctionDefinition(FunctionDefinition),
+    FunctionDefinition(std::rc::Rc<FunctionDefinition>),
 }
 
 impl SrcReferrer for ModuleInitStatement {
@@ -27,7 +27,7 @@ impl Parse for ModuleInitStatement {
             Rule::expression => ModuleInitStatement::Expression(Expression::parse(first)?),
             Rule::assignment => ModuleInitStatement::Assignment(Assignment::parse(first)?),
             Rule::function_definition => {
-                ModuleInitStatement::FunctionDefinition(FunctionDefinition::parse(first)?)
+                ModuleInitStatement::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?)
             }
             _ => unreachable!(),
         })
