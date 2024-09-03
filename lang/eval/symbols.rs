@@ -9,8 +9,10 @@ pub enum Symbol {
     Value(Id, Value),
     /// A function symbol, e.g. function a() {}
     Function(std::rc::Rc<FunctionDefinition>),
-    /// A module definition symbol, e.g. module a() {}, or namespace a {}
+    /// A module definition symbol, e.g. module a() {}
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
+    /// A namespace definition symbol, e.g. namespace foo {}
+    NamespaceDefinition(std::rc::Rc<NamespaceDefinition>),
     /// A builtin function symbol, e.g. assert()
     BuiltinFunction(BuiltinFunction),
     /// A builtin module symbol, e.g. math::pi
@@ -27,6 +29,7 @@ impl Sym for Symbol {
             Self::Value(id, _) => Some(id.clone()),
             Self::Function(f) => f.name.id(),
             Self::ModuleDefinition(m) => m.name.id(),
+            Self::NamespaceDefinition(n) => n.name.id(),
             Self::BuiltinFunction(f) => f.name.id(),
             Self::BuiltinModule(m) => m.name.id(),
         }
@@ -37,6 +40,7 @@ impl Symbol {
     pub fn get_symbols(&self, name: &Id) -> Vec<&Symbol> {
         match self {
             Self::ModuleDefinition(module) => module.find_symbols(name),
+            Self::NamespaceDefinition(namespace) => namespace.find_symbols(name),
             _ => Vec::new(),
         }
     }
@@ -53,24 +57,28 @@ pub trait Symbols {
     fn add_symbol(&mut self, symbol: Symbol) -> &mut Self;
     fn copy_symbols<T: Symbols>(&self, into: &mut T);
 
-    fn add_builtin_function(&mut self, f: BuiltinFunction) -> &mut Self {
-        self.add_symbol(Symbol::BuiltinFunction(f));
-        self
-    }
-    fn add_builtin_module(&mut self, m: BuiltinModule) -> &mut Self {
-        self.add_symbol(Symbol::BuiltinModule(m));
-        self
-    }
-    fn add_module(&mut self, m: std::rc::Rc<ModuleDefinition>) -> &mut Self {
-        self.add_symbol(Symbol::ModuleDefinition(m));
-        self
-    }
     fn add_value(&mut self, id: Id, value: Value) -> &mut Self {
         self.add_symbol(Symbol::Value(id, value));
         self
     }
     fn add_function(&mut self, f: std::rc::Rc<FunctionDefinition>) -> &mut Self {
         self.add_symbol(Symbol::Function(f));
+        self
+    }
+    fn add_module(&mut self, m: std::rc::Rc<ModuleDefinition>) -> &mut Self {
+        self.add_symbol(Symbol::ModuleDefinition(m));
+        self
+    }
+    fn add_namespace(&mut self, n: std::rc::Rc<NamespaceDefinition>) -> &mut Self {
+        self.add_symbol(Symbol::NamespaceDefinition(n));
+        self
+    }
+    fn add_builtin_function(&mut self, f: BuiltinFunction) -> &mut Self {
+        self.add_symbol(Symbol::BuiltinFunction(f));
+        self
+    }
+    fn add_builtin_module(&mut self, m: BuiltinModule) -> &mut Self {
+        self.add_symbol(Symbol::BuiltinModule(m));
         self
     }
 }

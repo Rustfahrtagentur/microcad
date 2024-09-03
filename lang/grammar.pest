@@ -409,9 +409,6 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module donut(radius) { }`: error # Module must have type annotations
 module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_body }
 
-//`namespace math { }`: ok # namespace (like module with no arguments)
-namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ module_body }
-
 //`{ translate() rotate(); }`: ok
 //`{ translate() }`: ok # Single expression block (no semicolon)
 //`{}`: ok # Empty block
@@ -425,10 +422,9 @@ module_inner = _{
 module_statement = { 
   use_statement |
   module_definition |
-  namespace_definition |
   function_definition |
   module_init_definition |
-  module_for_statement |
+  for_statement |
   assignment_statement |
   expression_statement
 }
@@ -454,6 +450,34 @@ module_init_inner = _{
 for_statement = { "for" ~ ws* ~ identifier ~ ws* ~ "in" ~ ws* ~ expression ~ ws* ~ module_body }
 
 
+//`namespace math { }`: ok # namespace (like module with no arguments)
+//`namespace math { function pi() -> scalar { return 3.14159; } }`: ok # namespace with function
+namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ namespace_body }
+
+namespace_body = { "{" ~ ws* ~ namespace_inner? ~ ws* ~ "}" }
+
+namespace_inner = _{ ws* ~ (namespace_statement ~ ws*)+ }
+
+namespace_statement = { 
+  use_statement | 
+  module_definition | 
+  namespace_definition | 
+  function_definition | 
+  assignment_statement 
+}
+
+source_file_statement = { 
+  use_statement | 
+  module_definition | 
+  namespace_definition | 
+  function_definition | 
+  assignment_statement |
+  for_statement |
+  expression_statement
+}
+
+source_file_inner = _{ ws* ~ (source_file_statement ~ ws*)+ }
+
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 //`module foo { init(size: length) { rectangle(size); } }`: ok # Module with init function
-source_file = { SOI ~ module_inner? ~ EOI }
+source_file = { SOI ~ ws* ~ source_file_inner? ~ ws* ~ EOI }
