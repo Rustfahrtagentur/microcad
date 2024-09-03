@@ -222,8 +222,10 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`translate() rotate() { translate() rotate() {} }`: ok
 //`rotate() {}`: ok
 //`{}`: ok # Empty block
+//`{ translate() rotate(); }`: ok
+//`{} {}`: error # Cannot nest module bodies
 //`holes.edges`: error # No tuple access in nested module
-nested = { (call | module_body | qualified_name) ~ (ws+ ~ (call | module_body | qualified_name))* }
+nested = { (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* ~ (ws* ~ module_body)? | module_body }
 
 
 //`-5.0mm`: ok # Negate
@@ -285,7 +287,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ method_call | list_element_access | tuple_element_access }
-primary          =  _{ nested ~ ws* ~ module_body | nested | literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
+primary          =  _{ nested | literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok
