@@ -2,89 +2,107 @@
 
 use crate::{errors::*, parser::*, r#type::*};
 
-macro_rules! declare_units {
-    ($( $(#[$m:meta])* $ident:ident = $string:literal -> $ty:ident $(* $factor:expr)? ,)*) => {
-        /// The units that can be used after numbers in the language
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-        pub enum Unit {
-            $($(#[$m])* $ident,)*
-        }
-
-        impl std::fmt::Display for Unit {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                match self {
-                    $(Self::$ident => write!(f, $string), )*
-                }
-            }
-        }
-
-        impl std::str::FromStr for Unit {
-            type Err = ParseError;
-
-            fn from_str(s: &str) -> Result<Self, Self::Err> {
-                match s {
-                    $($string => Ok(Self::$ident), )*
-                    _ => Err(ParseError::UnknownUnit(s.to_string())),
-                }
-            }
-        }
-
-        impl Unit {
-            pub fn ty(self) -> Type {
-                match self {
-                    $(Self::$ident => Type::$ty, )*
-                }
-            }
-
-            pub fn normalize(self, x: f64) -> f64 {
-                match self {
-                    $(Self::$ident => x $(* $factor as f64)?, )*
-                }
-            }
-
-        }
-    };
-}
-
-declare_units! {
+/// The units that can be used after numbers in the language"
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Unit {
     /// No unit was given
-    None = "" -> Scalar,
-
-    // Percentages
-    Percent = "%" -> Scalar * 0.01,
-
-    // Lengths or Coord
-
+    None,
+    /// Percents
+    Percent,
     /// Centimeters
-    Cm = "cm" -> Length * 10.0,
+    Cm,
     /// Millimeters
-    Mm = "mm" -> Length,
+    Mm,
     /// inches
-    In = "in" -> Length * 25.4,
+    In,
     /// Meters
-    M = "m" -> Length * 1000.0,
-
-    // angles
-
+    M,
     /// Degree
-    Deg = "deg" -> Angle,
+    Deg,
     /// Degree
-    DegS = "°" -> Angle,
+    DegS,
     /// Gradient
-    Grad = "grad" -> Angle * 360./180.,
+    Grad,
     /// Turns
-    Turn = "turn" -> Angle * 360.,
+    Turn,
     /// Radians
-    Rad = "rad" -> Angle * 360./std::f32::consts::TAU,
-
-    // Weights
-
+    Rad,
     /// Grams
-    G = "g" -> Weight,
+    G,
     /// Kilograms
-    Kg = "kg" -> Weight * 1000.0,
+    Kg,
     /// Pounds
-    Lb = "lb" -> Weight * 453.59237,
+    Lb,
+}
+impl std::fmt::Display for Unit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::None => write!(f, ""),
+            Self::Percent => write!(f, "%"),
+            Self::Cm => write!(f, "cm"),
+            Self::Mm => write!(f, "mm"),
+            Self::In => write!(f, "in"),
+            Self::M => write!(f, "m"),
+            Self::Deg => write!(f, "deg"),
+            Self::DegS => write!(f, "°"),
+            Self::Grad => write!(f, "grad"),
+            Self::Turn => write!(f, "turn"),
+            Self::Rad => write!(f, "rad"),
+            Self::G => write!(f, "g"),
+            Self::Kg => write!(f, "kg"),
+            Self::Lb => write!(f, "lb"),
+        }
+    }
+}
+impl std::str::FromStr for Unit {
+    type Err = ParseError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "" => Ok(Self::None),
+            "%" => Ok(Self::Percent),
+            "cm" => Ok(Self::Cm),
+            "mm" => Ok(Self::Mm),
+            "in" => Ok(Self::In),
+            "m" => Ok(Self::M),
+            "deg" => Ok(Self::Deg),
+            "°" => Ok(Self::DegS),
+            "grad" => Ok(Self::Grad),
+            "turn" => Ok(Self::Turn),
+            "rad" => Ok(Self::Rad),
+            "g" => Ok(Self::G),
+            "kg" => Ok(Self::Kg),
+            "lb" => Ok(Self::Lb),
+            _ => Err(ParseError::UnknownUnit(s.to_string())),
+        }
+    }
+}
+impl Unit {
+    pub fn ty(self) -> Type {
+        match self {
+            Self::None | Self::Percent => Type::Scalar,
+            Self::Cm | Self::Mm | Self::In | Self::M => Type::Length,
+            Self::Deg | Self::DegS | Self::Grad | Self::Turn | Self::Rad => Type::Angle,
+            Self::G | Self::Kg | Self::Lb => Type::Weight,
+        }
+    }
+    pub fn normalize(self, x: f64) -> f64 {
+        match self {
+            Self::None => x,
+            Self::Percent => x * 0.01 as f64,
+            Self::Cm => x * 10.0 as f64,
+            Self::Mm => x,
+            Self::In => x * 25.4 as f64,
+            Self::M => x * 1000.0 as f64,
+            Self::Deg => x,
+            Self::DegS => x,
+            Self::Grad => x * (360. / 180.) as f64,
+            Self::Turn => x * 360. as f64,
+            Self::Rad => x * (360. / std::f32::consts::TAU) as f64,
+            Self::G => x,
+            Self::Kg => x * 1000.0 as f64,
+            Self::Lb => x * 453.59237 as f64,
+        }
+    }
 }
 
 impl Parse for Unit {
