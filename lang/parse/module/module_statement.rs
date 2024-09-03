@@ -33,9 +33,9 @@ impl Parse for ModuleStatement {
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
             Rule::expression => Self::Expression(Expression::parse(first)?),
             Rule::assignment => Self::Assignment(Assignment::parse(first)?),
-            Rule::module_for_statement => Self::For(ForStatement::parse(first)?),
-            Rule::module_definition | Rule::namespace_definition => {
-                Self::ModuleDefinition(std::rc::Rc::new(ModuleDefinition::parse(first)?))
+            Rule::for_statement => Self::For(ForStatement::parse(first)?),
+            Rule::module_definition => {
+                Self::ModuleDefinition(std::rc::Rc::<ModuleDefinition>::parse(first)?)
             }
             Rule::module_init_definition => {
                 Self::ModuleInitDefinition(std::rc::Rc::new(ModuleInitDefinition::parse(first)?))
