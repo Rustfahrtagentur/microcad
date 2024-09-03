@@ -1,10 +1,10 @@
-use crate::{arg_1, arg_2, ModuleBuilder};
+use crate::{arg_1, arg_2, NamespaceBuilder};
 use cgmath::InnerSpace;
 use microcad_core::Scalar;
 use microcad_lang::{eval::*, parse::*};
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    ModuleBuilder::new("math")
+    NamespaceBuilder::new("math")
         // abs(x): Absolute value of x
         .add_builtin_function(arg_1!(abs(x) for Scalar, Length, Angle, Integer))
         // sign(x): Sign of x

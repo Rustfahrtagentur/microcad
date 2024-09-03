@@ -16,43 +16,43 @@ pub use context_builder::ContextBuilder;
 pub use export::export;
 
 /// Module builder
-pub struct ModuleBuilder {
-    /// Module definition
-    module: ModuleDefinition,
+pub struct NamespaceBuilder {
+    /// Namespace definition
+    namespace: ModuleDefinition,
 }
 
-impl ModuleBuilder {
+impl NamespaceBuilder {
     /// Create new module
-    pub fn new(name: &str) -> ModuleBuilder {
+    pub fn new(name: &str) -> NamespaceBuilder {
         Self {
-            module: ModuleDefinition::namespace(name.into()),
+            namespace: ModuleDefinition::new(name.into()),
         }
     }
 
     /// Add a value
     pub fn add_value(&mut self, name: &str, value: Value) -> &mut Self {
-        self.module.add_value(name.into(), value);
+        self.namespace.add_value(name.into(), value);
         self
     }
 
-    /// Build module builder
+    /// Build namespace definition
     pub fn build(&mut self) -> std::rc::Rc<ModuleDefinition> {
-        std::rc::Rc::new(self.module.clone())
+        std::rc::Rc::new(self.namespace.clone())
     }
 }
 
-impl Symbols for ModuleBuilder {
+impl Symbols for NamespaceBuilder {
     fn find_symbols(&self, name: &microcad_core::Id) -> Vec<&Symbol> {
-        self.module.find_symbols(name)
+        self.namespace.find_symbols(name)
     }
 
     fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
-        self.module.add_symbol(symbol);
+        self.namespace.add_symbol(symbol);
         self
     }
 
     fn copy_symbols<T: Symbols>(&self, into: &mut T) {
-        self.module.copy_symbols(into)
+        self.namespace.copy_symbols(into)
     }
 }
 
@@ -113,7 +113,7 @@ macro_rules! arg_2 {
 use microcad_core::ExportSettings;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    ModuleBuilder::new("std")
+    NamespaceBuilder::new("std")
         // TODO: is this correct= Shouldn't this use add_builtin_module() =
         .add_module(math::builtin_module())
         .add_module(geo2d::builtin_module())
@@ -152,7 +152,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
 fn context_namespace() {
     let mut context = Context::default();
 
-    let module = ModuleBuilder::new("math")
+    let module = NamespaceBuilder::new("math")
         .add_value("pi", Value::Scalar(std::f64::consts::PI))
         .build();
 

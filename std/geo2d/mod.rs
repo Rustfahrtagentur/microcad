@@ -76,10 +76,10 @@ impl Renderable2D for Rect {
     }
 }
 
-use crate::ModuleBuilder;
+use crate::NamespaceBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    ModuleBuilder::new("geo2d")
+    NamespaceBuilder::new("geo2d")
         .add_builtin_module(Circle::builtin_module())
         .add_builtin_module(Rect::builtin_module())
         .build()
