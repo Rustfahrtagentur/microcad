@@ -51,7 +51,10 @@ impl Parse for NamespaceBody {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut body = NamespaceBody::default();
         for pair in pair.clone().into_inner() {
-            body.add_statement(NamespaceStatement::parse(pair)?);
+            match pair.as_rule() {
+                Rule::namespace_statement => { body.add_statement(NamespaceStatement::parse(pair)?); }
+                _ => {}
+            }
         }
 
         body.src_ref = pair.into();
