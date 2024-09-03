@@ -57,7 +57,7 @@ impl Parse for SourceFileStatement {
             Rule::assignment =>
                 Self::Assignment(Assignment::parse(first)?),
             Rule::for_statement => Self::For(ForStatement::parse(first)?),
-            Rule::expression => Self::Expression(Expression::parse(first)?),
+            Rule::expression | Rule::expression_no_semicolon => Self::Expression(Expression::parse(first)?),
             rule => unreachable!(
                 "Unexpected source file statement, got {:?} {:?}",
                 rule,

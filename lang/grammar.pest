@@ -225,8 +225,9 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`{ translate() rotate(); }`: ok
 //`{} {}`: error # Cannot nest module bodies
 //`holes.edges`: error # No tuple access in nested module
-nested = { (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* ~ (ws* ~ module_body)? | module_body }
+nested = { nested_with_module_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
 
+nested_with_module_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ module_body }
 
 //`-5.0mm`: ok # Negate
 //`(a+b)*(c-a)`: ok 
@@ -294,8 +295,14 @@ primary          =  _{ nested | literal | format_string | "(" ~ ws* ~ expression
 //`,,`: error # No expression 
 expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
+// A nested expression that does end with a module body
+//`a {}`: ok # Module body at the end
+//`b c`: error # No module body at the end
+//`a b()`: error # No module body at the end
+expression_no_semicolon = { nested_with_module_body }
+
 // A statement that is an single expression
-expression_statement = _{ expression ~ ws* ~ ";" | expression? ~ ws* ~ module_body | module_body }
+expression_statement = _{ expression_no_semicolon ~ (ws* ~ ";")? | expression ~ ws* ~ ";" }
 
 //`1..4`: ok
 //`a..b`: ok
