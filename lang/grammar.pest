@@ -422,8 +422,6 @@ module_inner = _{
   ws* ~ (module_statement ~ ws*)* ~ (function_definition | expression) 
 }
 
-module_for_statement = { "for" ~ ws* ~ assignment ~ ws* ~ module_body }
-
 module_statement = { 
   use_statement |
   module_definition |
@@ -451,6 +449,9 @@ module_init_inner = _{
   ws* ~ (module_init_statement ~ ws*)+ |
   ws* ~ (module_init_statement ~ ws*)* ~ expression 
 }
+
+//`for i in [0..10] { translate(x = i*5mm); }`: ok
+for_statement = { "for" ~ ws* ~ identifier ~ ws* ~ "in" ~ ws* ~ expression ~ ws* ~ module_body }
 
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
