@@ -63,6 +63,9 @@ impl Eval for ModuleStatement {
             Self::Expression(expr) => {
                 expr.eval(context)?;
             }
+            Self::For(for_statement) => {
+                for_statement.eval(context)?;
+            }
             Self::Assignment(assignment) => {
                 assignment.eval(context)?;
             }
