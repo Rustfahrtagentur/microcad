@@ -19,13 +19,13 @@ pub struct ModuleDefinition {
 }
 
 impl ModuleDefinition {
-    /// Create module definition
-    pub fn namespace(name: Identifier) -> Self {
+    /// Create new module definition
+    pub fn new(name: Identifier) -> Self {
         ModuleDefinition {
             attributes: Vec::new(),
             name,
             parameters: None,
-            body: ModuleBody::new(),
+            body: ModuleBody::default(),
             src_ref: SrcRef(None),
         }
     }
@@ -57,12 +57,12 @@ impl Symbols for ModuleDefinition {
     }
 }
 
-impl Parse for ModuleDefinition {
+impl Parse for std::rc::Rc<ModuleDefinition> {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut attributes = Vec::new();
         let mut name = Identifier::default();
         let mut parameters = None;
-        let mut body = ModuleBody::new();
+        let mut body = ModuleBody::default();
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
@@ -82,12 +82,12 @@ impl Parse for ModuleDefinition {
             }
         }
 
-        Ok(ModuleDefinition {
+        Ok(std::rc::Rc::new(ModuleDefinition {
             attributes,
             name,
             parameters,
             body,
             src_ref: pair.into(),
-        })
+        }))
     }
 }

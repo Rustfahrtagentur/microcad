@@ -238,6 +238,10 @@ impl Eval for Expression {
 
 impl Parse for Expression {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+        if pair.as_rule() == Rule::expression_no_semicolon {
+            return Ok(Self::Nested(Nested::parse(pair)?));
+        }
+
         let mut error: Option<ParseError> = None;
         let result = PRATT_PARSER
             .map_primary(|primary| match primary.as_rule() {

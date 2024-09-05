@@ -1,4 +1,4 @@
-use crate::ModuleBuilder;
+use crate::NamespaceBuilder;
 use microcad_lang::{
     builtin_module,
     eval::{EvalError, Symbols},
@@ -23,7 +23,7 @@ pub fn xor() -> Result<Node, EvalError> {
 }
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
-    ModuleBuilder::new("algorithm")
+    NamespaceBuilder::new("algorithm")
         .add_builtin_module(builtin_module!(difference()))
         .add_builtin_module(builtin_module!(intersection()))
         .add_builtin_module(builtin_module!(union()))

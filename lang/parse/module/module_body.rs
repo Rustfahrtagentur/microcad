@@ -17,16 +17,6 @@ pub struct ModuleBody {
 }
 
 impl ModuleBody {
-    /// Create empty module
-    pub fn new() -> Self {
-        Self {
-            statements: Vec::new(),
-            symbols: SymbolTable::new(),
-            inits: Vec::new(),
-            src_ref: SrcRef(None),
-        }
-    }
-
     /// Add statement to module
     pub fn add_statement(&mut self, statement: ModuleStatement) {
         self.statements.push(statement.clone());
@@ -69,7 +59,7 @@ impl Symbols for ModuleBody {
 impl Parse for ModuleBody {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::module_body);
-        let mut body = ModuleBody::new();
+        let mut body = ModuleBody::default();
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {

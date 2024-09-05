@@ -23,8 +23,8 @@ translate(x = 4.0mm, y = 4.0mm) rectangle(2.0mm, 2.0mm);
 Normally, this would require 2 nested for loops:
 
 ```µCAD,example.C
-for x = [-4.0mm, 4.0mm] {
-    for y = [-4.0mm, 4.0mm] {
+for x in [-4.0mm, 4.0mm] {
+    for y in [-4.0mm, 4.0mm] {
         translate(x = x, y = y) 
         rectangle(2.0mm, 2.0mm);
     }

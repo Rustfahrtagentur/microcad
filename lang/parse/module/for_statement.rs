@@ -1,12 +1,14 @@
 //! For statement parser entity
 
-use crate::{errors::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// For statement
 #[derive(Clone, Debug)]
 pub struct ForStatement {
-    /// Initial assignment
-    loop_var: Assignment,
+    /// Loop variable
+    loop_var: Identifier,
+    /// Loop expression
+    loop_expr: Expression,
     /// For loop body
     body: ModuleBody,
     /// Source code reference
@@ -21,16 +23,39 @@ impl SrcReferrer for ForStatement {
 
 impl Parse for ForStatement {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::module_for_statement);
+        Parser::ensure_rule(&pair, Rule::for_statement);
 
-        let src_ref = pair.clone().into();
-        let mut pairs = pair.into_inner();
+        let mut pairs = pair.clone().into_inner();
 
         Ok(ForStatement {
-            loop_var: Assignment::parse(pairs.next().unwrap())?,
+            loop_var: Identifier::parse(pairs.next().unwrap())?,
+            loop_expr: Expression::parse(pairs.next().unwrap())?,
             body: ModuleBody::parse(pairs.next().unwrap())?,
-            src_ref,
+            src_ref: pair.into(),
         })
+    }
+}
+
+impl Eval for ForStatement {
+    type Output = ();
+
+    fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
+        match self.loop_expr.eval(context)? {
+            Value::List(list) => {
+                for value in list {
+                    context.push();
+                    context.add_symbol(Symbol::Value(self.loop_var.id().unwrap(), value));
+                    self.body.eval(context)?;
+                    context.pop();
+                }
+            }
+            value => {
+                use crate::diagnostics::AddDiagnostic;
+                context.error(self, format!("Expected list, got {}", value.ty()));
+            } 
+        }
+
+        Ok(())
     }
 }
 

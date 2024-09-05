@@ -222,9 +222,12 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`translate() rotate() { translate() rotate() {} }`: ok
 //`rotate() {}`: ok
 //`{}`: ok # Empty block
+//`{ translate() rotate(); }`: ok
+//`{} {}`: error # Cannot nest module bodies
 //`holes.edges`: error # No tuple access in nested module
-nested = { (call | module_body | qualified_name) ~ (ws+ ~ (call | module_body | qualified_name))* }
+nested = { nested_with_module_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
 
+nested_with_module_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ module_body }
 
 //`-5.0mm`: ok # Negate
 //`(a+b)*(c-a)`: ok 
@@ -285,15 +288,21 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ method_call | list_element_access | tuple_element_access }
-primary          =  _{ nested ~ ws* ~ module_body | nested | literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
+primary          =  _{ nested | literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok
 //`,,`: error # No expression 
 expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
+// A nested expression that does end with a module body
+//`a {}`: ok # Module body at the end
+//`b c`: error # No module body at the end
+//`a b()`: error # No module body at the end
+expression_no_semicolon = { nested_with_module_body }
+
 // A statement that is an single expression
-expression_statement = _{ expression ~ ws* ~ ";" | expression? ~ ws* ~ module_body | module_body }
+expression_statement = _{ expression_no_semicolon ~ (ws* ~ ";")? | expression ~ ws* ~ ";" }
 
 //`1..4`: ok
 //`a..b`: ok
@@ -409,9 +418,6 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module donut(radius) { }`: error # Module must have type annotations
 module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_body }
 
-//`namespace math { }`: ok # namespace (like module with no arguments)
-namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ module_body }
-
 //`{ translate() rotate(); }`: ok
 //`{ translate() }`: ok # Single expression block (no semicolon)
 //`{}`: ok # Empty block
@@ -422,15 +428,12 @@ module_inner = _{
   ws* ~ (module_statement ~ ws*)* ~ (function_definition | expression) 
 }
 
-module_for_statement = { "for" ~ ws* ~ assignment ~ ws* ~ module_body }
-
 module_statement = { 
   use_statement |
   module_definition |
-  namespace_definition |
   function_definition |
   module_init_definition |
-  module_for_statement |
+  for_statement |
   assignment_statement |
   expression_statement
 }
@@ -452,7 +455,38 @@ module_init_inner = _{
   ws* ~ (module_init_statement ~ ws*)* ~ expression 
 }
 
+//`for i in [0..10] { translate(x = i*5mm); }`: ok
+for_statement = { "for" ~ ws* ~ identifier ~ ws* ~ "in" ~ ws* ~ expression ~ ws* ~ module_body }
+
+
+//`namespace math { }`: ok # namespace (like module with no arguments)
+//`namespace math { function pi() -> scalar { return 3.14159; } }`: ok # namespace with function
+namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ namespace_body }
+
+namespace_body = { "{" ~ ws* ~ namespace_inner? ~ ws* ~ "}" }
+
+namespace_inner = _{ ws* ~ (namespace_statement ~ ws*)+ }
+
+namespace_statement = { 
+  use_statement | 
+  module_definition | 
+  namespace_definition | 
+  function_definition | 
+  assignment_statement 
+}
+
+source_file_statement = { 
+  use_statement | 
+  module_definition | 
+  namespace_definition | 
+  function_definition | 
+  assignment_statement |
+  for_statement |
+  expression_statement
+}
+
+source_file_inner = _{ ws* ~ (source_file_statement ~ ws*)+ }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 //`module foo { init(size: length) { rectangle(size); } }`: ok # Module with init function
-source_file = { SOI ~ module_inner? ~ EOI }
+source_file = { SOI ~ ws* ~ source_file_inner? ~ ws* ~ EOI }

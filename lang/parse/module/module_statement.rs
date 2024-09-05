@@ -31,17 +31,17 @@ impl Parse for ModuleStatement {
         let first = pair.clone().into_inner().next().unwrap();
         Ok(match first.as_rule() {
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
-            Rule::expression => Self::Expression(Expression::parse(first)?),
+            Rule::expression | Rule::expression_no_semicolon => Self::Expression(Expression::parse(first)?),
             Rule::assignment => Self::Assignment(Assignment::parse(first)?),
-            Rule::module_for_statement => Self::For(ForStatement::parse(first)?),
-            Rule::module_definition | Rule::namespace_definition => {
-                Self::ModuleDefinition(std::rc::Rc::new(ModuleDefinition::parse(first)?))
+            Rule::for_statement => Self::For(ForStatement::parse(first)?),
+            Rule::module_definition => {
+                Self::ModuleDefinition(std::rc::Rc::<ModuleDefinition>::parse(first)?)
             }
             Rule::module_init_definition => {
                 Self::ModuleInitDefinition(std::rc::Rc::new(ModuleInitDefinition::parse(first)?))
             }
             Rule::function_definition => {
-                Self::FunctionDefinition(std::rc::Rc::new(FunctionDefinition::parse(first)?))
+                Self::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?)
             }
             rule => unreachable!(
                 "Unexpected module statement, got {:?} {:?}",
@@ -62,6 +62,9 @@ impl Eval for ModuleStatement {
             }
             Self::Expression(expr) => {
                 expr.eval(context)?;
+            }
+            Self::For(for_statement) => {
+                for_statement.eval(context)?;
             }
             Self::Assignment(assignment) => {
                 assignment.eval(context)?;
