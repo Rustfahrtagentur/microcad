@@ -156,6 +156,10 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
             } else {
                 (name, None)
             };
+            // Early exit for "#no_test" and "#todo" suffixes
+            if suffix == Some("no_test") || suffix == Some("todo") {
+                return;
+            }
             f.push_str(
                 &format!(
                     r##"#[test]
