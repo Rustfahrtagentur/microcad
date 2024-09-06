@@ -18,7 +18,7 @@ torus(r1 = 10mm, r2 = 2mm);
 
 ## `use from` statement
 
-```µCAD,use_from
+```µCAD,use_from#todo
 use sphere, torus from geo3d;
 
 sphere(4mm);
@@ -35,7 +35,7 @@ cube(size = 40mm);
 
 ## `use as` statement
 
-```µCAD,use_as
+```µCAD,use_as#todo
 use geo3d::sphere as ball;
 
 ball(r = 40mm);

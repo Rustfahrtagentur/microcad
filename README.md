@@ -104,7 +104,7 @@ export("hex_screw.stl") iso.m10.hex_screw(length = 40mm);
 In our language, we can do constructive solid geometry (CSG).
 Let's create a simple cube with a size of 40mm:
 
-```µCAD,example.D
+```µCAD,example.D#todo
 use cube from geo3d;
 
 cube(size = 40mm);
@@ -171,7 +171,7 @@ module csg_cube {
 
 A module can define a conditional statement using `if cond {} else {}`:
 
-```µCAD,conditional_statement
+```µCAD,conditional_statement#todo
 use * from geo3d;
 
 module example(size: length) {
