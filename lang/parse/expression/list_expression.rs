@@ -74,7 +74,10 @@ impl Eval for ListExpression {
         }
 
         match value_list.types().common_type() {
-            Some(common_type) => Ok(Value::List(List(value_list, common_type))),
+            Some(common_type) => Ok(Value::List(Refer::new(
+                List::new(value_list, common_type),
+                self.src_ref(),
+            ))),
             None => Err(EvalError::ListElementsDifferentTypes),
         }
     }

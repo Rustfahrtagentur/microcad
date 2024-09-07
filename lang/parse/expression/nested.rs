@@ -8,7 +8,7 @@ pub struct Nested(Vec<NestedItem>);
 
 impl Parse for Nested {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        assert!(pair.as_rule() == Rule::nested ||pair.as_rule() == Rule::expression_no_semicolon);
+        assert!(pair.as_rule() == Rule::nested || pair.as_rule() == Rule::expression_no_semicolon);
 
         let mut vec = Vec::new();
         for pair in pair.clone().into_inner().filter(|pair| {
@@ -43,7 +43,8 @@ impl Eval for Nested {
                         if index != 0 {
                             return Err(EvalError::CannotNestFunctionCall);
                         } else {
-                            return Ok(Value::Scalar(0.0)); // @todo This is a hack. Return a Option::None here
+                            return Ok(Value::Scalar(Refer::new(0.0, call.src_ref())));
+                            // TODO: This is a hack. Return a Option::None here
                         }
                     }
                 },

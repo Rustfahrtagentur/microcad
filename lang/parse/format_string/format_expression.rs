@@ -32,7 +32,10 @@ impl Eval for FormatExpression {
     type Output = Value;
 
     fn eval(&self, context: &mut Context) -> Result<Value> {
-        Ok(Value::String(format!("{}", self.1.eval(context)?)))
+        Ok(Value::String(Refer::new(
+            format!("{}", self.1.eval(context)?),
+            SrcRef(None),
+        )))
     }
 }
 

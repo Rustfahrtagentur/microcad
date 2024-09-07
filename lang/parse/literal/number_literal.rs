@@ -68,12 +68,10 @@ impl Eval for NumberLiteral {
     type Output = Value;
 
     fn eval(&self, _: &mut Context) -> std::result::Result<Value, EvalError> {
-        let v = self.value();
-
         match self.1.ty() {
-            Type::Scalar => Ok(Value::Scalar(v)),
-            Type::Angle => Ok(Value::Angle(v)),
-            Type::Length => Ok(Value::Length(v)),
+            Type::Scalar => Ok(Value::Scalar(Refer::new(self.0, self.2.clone()))),
+            Type::Angle => Ok(Value::Angle(Refer::new(self.0, self.2.clone()))),
+            Type::Length => Ok(Value::Length(Refer::new(self.0, self.2.clone()))),
             _ => unreachable!(),
         }
     }

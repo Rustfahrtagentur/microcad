@@ -1,7 +1,7 @@
 use crate::{eval::*, r#type::*};
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct List(pub ValueList, pub Type);
+pub struct List(ValueList, Type);
 
 impl std::ops::Deref for List {
     type Target = ValueList;
@@ -18,8 +18,8 @@ impl std::ops::DerefMut for List {
 }
 
 impl List {
-    pub fn new(ty: Type) -> Self {
-        Self(ValueList::new(), ty)
+    pub fn new(list: ValueList, ty: Type) -> Self {
+        Self(list, ty)
     }
 }
 

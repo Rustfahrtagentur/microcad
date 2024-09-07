@@ -1,7 +1,7 @@
 use crate::{arg_1, arg_2, NamespaceBuilder};
 use cgmath::InnerSpace;
 use microcad_core::Scalar;
-use microcad_lang::{eval::*, parse::*};
+use microcad_lang::{eval::*, parse::*, src_ref::*};
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     NamespaceBuilder::new("math")
@@ -10,8 +10,8 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         // sign(x): Sign of x
         .add_builtin_function(arg_1!(sign(x) {
             match x {
-                Value::Scalar(x) | Value::Length(x) | Value::Angle(x) => Ok(Value::Scalar(x.signum())),
-                Value::Integer(x) => Ok(Value::Integer(x.signum())),
+                Value::Scalar(x) | Value::Length(x) | Value::Angle(x) => Ok(Value::Scalar(x.map(|x|x.signum()))),
+                Value::Integer(x) => Ok(Value::Integer(x.map(|x|x.signum()))),
                 _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
@@ -24,7 +24,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         // to_int(x): Convert x to integer
         .add_builtin_function(arg_1!(to_int(x) {
             match x {
-                Value::Scalar(x) | Value::Length(x) | Value::Angle(x) => Ok(Value::Integer(x as i64)),
+                Value::Scalar(x) | Value::Length(x) | Value::Angle(x) => Ok(Value::Integer(x.map(|x|x as i64))),
                 Value::Integer(x) => Ok(Value::Integer(x)),
                 _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
@@ -35,27 +35,27 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 Value::Scalar(x) => Ok(Value::Scalar(x)),
                 Value::Length(x) => Ok(Value::Scalar(x)),
                 Value::Angle(x) => Ok(Value::Scalar(x)),
-                Value::Integer(x) => Ok(Value::Scalar(x as Scalar)),
+                Value::Integer(x) => Ok(Value::Scalar(Refer::new(x.value as Scalar,x.src_ref))),
                 _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // min(x,y): Minimum of x and y
         .add_builtin_function(arg_2!(min(x, y) {
             match (x, y) {
-                (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(x.min(y))),
-                (Value::Length(x), Value::Length(y)) => Ok(Value::Length(x.min(y))),
-                (Value::Angle(x), Value::Angle(y)) => Ok(Value::Angle(x.min(y))),
-                (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x.min(y))),
+                (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(Refer::merge(x,y,|x,y| x.min(y)))),
+                (Value::Length(x), Value::Length(y)) => Ok(Value::Length(Refer::merge(x,y,|x,y| x.min(y)))),
+                (Value::Angle(x), Value::Angle(y)) => Ok(Value::Angle(Refer::merge(x,y,|x,y| x.min(y)))),
+                (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(Refer::merge(x,y,|x,y| x.min(y)))),
                 (x,_) => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // max(x,y): Maximum of x and y
         .add_builtin_function(arg_2!(max(x, y) {
             match (x, y) {
-                (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(x.max(y))),
-                (Value::Length(x), Value::Length(y)) => Ok(Value::Length(x.max(y))),
-                (Value::Angle(x), Value::Angle(y)) => Ok(Value::Angle(x.max(y))),
-                (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x.max(y))),
+                (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(Refer::merge(x,y,|x,y| x.max(y)))),
+                (Value::Length(x), Value::Length(y)) => Ok(Value::Length(Refer::merge(x,y,|x,y| x.max(y)))),
+                (Value::Angle(x), Value::Angle(y)) => Ok(Value::Angle(Refer::merge(x,y,|x,y| x.max(y)))),
+                (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(Refer::merge(x,y,|x,y| x.max(y)))),
                 (x,_) => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
@@ -68,21 +68,21 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         // asin(x): Arcsine of x
         .add_builtin_function(arg_1!(asin(x) {
             match x {
-                Value::Scalar(x) => Ok(Value::Angle(x.asin())),
+                Value::Scalar(x) => Ok(Value::Angle(Refer::map(x,|x| x.asin()))),
                 _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // acos(x): Arccosine of x
         .add_builtin_function(arg_1!(acos(x) {
             match x {
-                Value::Scalar(x) => Ok(Value::Angle(x.acos())),
+                Value::Scalar(x) => Ok(Value::Angle(Refer::map(x,|x| x.acos()))),
                 _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // atan(x): Arctangent of x
         .add_builtin_function(arg_1!(atan(x) {
             match x {
-                Value::Scalar(x) => Ok(Value::Angle(x.atan())),
+                Value::Scalar(x) => Ok(Value::Angle(Refer::map(x,|x| x.atan()))),
                 _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
@@ -99,22 +99,22 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         // pow(x,y): x raised to the power of y
         .add_builtin_function(arg_2!(pow(x, y) {
             match (x, y) {
-                (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(x.powf(y))),
-                (Value::Length(x), Value::Scalar(y)) => Ok(Value::Length(x.powf(y))),
-                (Value::Angle(x), Value::Scalar(y)) => Ok(Value::Angle(x.powf(y))),
-                (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(x.pow(y as u32))),
-                (Value::Scalar(x), Value::Integer(y)) => Ok(Value::Scalar(x.powf(y as Scalar))),
-                (Value::Length(x), Value::Integer(y)) => Ok(Value::Length(x.powf(y as Scalar))),
-                (Value::Angle(x), Value::Integer(y)) => Ok(Value::Angle(x.powf(y as Scalar))),
+                (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(Refer::merge(x,y,|x,y| x.powf(y)))),
+                (Value::Length(x), Value::Scalar(y)) => Ok(Value::Length(Refer::merge(x,y,|x,y| x.powf(y)))),
+                (Value::Angle(x), Value::Scalar(y)) => Ok(Value::Angle(Refer::merge(x,y,|x,y| x.powf(y)))),
+                (Value::Integer(x), Value::Integer(y)) => Ok(Value::Integer(Refer::merge(x,y,|x,y| x.pow(y as u32)))),
+                (Value::Scalar(x), Value::Integer(y)) => Ok(Value::Scalar(Refer::merge(x,y,|x,y| x.powf(y as Scalar)))),
+                (Value::Length(x), Value::Integer(y)) => Ok(Value::Length(Refer::merge(x,y,|x,y| x.powf(y as Scalar)))),
+                (Value::Angle(x), Value::Integer(y)) => Ok(Value::Angle(Refer::merge(x,y,|x,y| x.powf(y as Scalar)))),
                 (x,_) => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // length(x): Length of x
         .add_builtin_function(arg_1!(length(x) {
             match x {
-                Value::Vec2(x) => Ok(Value::Length(x.magnitude())),
-                Value::Vec3(x) => Ok(Value::Length(x.magnitude())),
-                Value::Vec4(x) => Ok(Value::Length(x.magnitude())),
+                Value::Vec2(x) => Ok(Value::Length(x.map(|x|x.magnitude()))),
+                Value::Vec3(x) => Ok(Value::Length(x.map(|x|x.magnitude()))),
+                Value::Vec4(x) => Ok(Value::Length(x.map(|x|x.magnitude()))),
                 _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))

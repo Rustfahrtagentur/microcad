@@ -1,4 +1,4 @@
-use super::SrcRef;
+use super::{SrcRef, SrcReferrer};
 #[derive(Clone, Default, Ord, Debug, PartialEq, PartialOrd)]
 pub struct Refer<T> {
     pub value: T,
@@ -6,13 +6,25 @@ pub struct Refer<T> {
 }
 
 impl<T> Refer<T> {
+    pub fn none(value: T) -> Self {
+        Self {
+            value,
+            src_ref: SrcRef(None),
+        }
+    }
     pub fn new(value: T, src_ref: SrcRef) -> Self {
         Self { value, src_ref }
     }
-    pub fn merge<U>(left: Refer<T>, right: Refer<U>, f: fn(T, U) -> T) -> Self {
+    pub fn merge<U, V>(left: Refer<U>, right: Refer<V>, f: fn(U, V) -> T) -> Self {
         Self {
             value: f(left.value, right.value),
             src_ref: SrcRef::merge(left.src_ref, right.src_ref),
+        }
+    }
+    pub fn map<U>(self, f: fn(T) -> U) -> Refer<U> {
+        Refer::<U> {
+            value: f(self.value),
+            src_ref: self.src_ref,
         }
     }
 }
@@ -22,6 +34,18 @@ impl<T> std::ops::Deref for Refer<T> {
 
     fn deref(&self) -> &Self::Target {
         &self.value
+    }
+}
+
+impl<T> std::ops::DerefMut for Refer<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.value
+    }
+}
+
+impl<T> SrcReferrer for Refer<T> {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
     }
 }
 

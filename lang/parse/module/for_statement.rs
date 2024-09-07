@@ -42,9 +42,9 @@ impl Eval for ForStatement {
     fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
         match self.loop_expr.eval(context)? {
             Value::List(list) => {
-                for value in list {
+                for value in list.iter() {
                     context.push();
-                    context.add_symbol(Symbol::Value(self.loop_var.id().unwrap(), value));
+                    context.add_symbol(Symbol::Value(self.loop_var.id().unwrap(), value.clone()));
                     self.body.eval(context)?;
                     context.pop();
                 }
@@ -52,7 +52,7 @@ impl Eval for ForStatement {
             value => {
                 use crate::diagnostics::AddDiagnostic;
                 context.error(self, format!("Expected list, got {}", value.ty()));
-            } 
+            }
         }
 
         Ok(())

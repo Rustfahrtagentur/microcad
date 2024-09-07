@@ -39,7 +39,7 @@ impl std::ops::DerefMut for ArgumentMap {
 macro_rules! args {
     ($($name:ident: $ty:ident = $value:expr),*) => {&{
         let mut map = ArgumentMap::new();
-        $(map.insert(stringify!($name).into(), microcad_lang::eval::Value::$ty($value));)*
+        $(map.insert(stringify!($name).into(), microcad_lang::eval::Value::$ty(microcad_lang::src_ref::Refer::none($value)));)*
         map
     }};
     () => {

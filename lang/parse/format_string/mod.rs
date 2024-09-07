@@ -6,12 +6,7 @@ mod format_spec;
 pub use format_expression::*;
 pub use format_spec::*;
 
-use crate::{
-    errors::*,
-    eval::*,
-    parser::*,
-    src_ref::{SrcRef, SrcReferrer},
-};
+use crate::{errors::*, eval::*, parser::*, src_ref::*};
 
 /// Format string item
 #[derive(Clone, Debug)]
@@ -93,7 +88,7 @@ impl Eval for FormatString {
                 },
             }
         }
-        Ok(Value::String(result))
+        Ok(Value::String(Refer::new(result, SrcRef::from_vec(&self.0))))
     }
 }
 
@@ -125,7 +120,10 @@ fn simple_string() {
     let mut context = Context::default();
     let value = s.eval(&mut context).unwrap();
 
-    assert_eq!(value, Value::String("Hello, World!".to_string()));
+    assert_eq!(
+        value,
+        Value::String(Refer::new("Hello, World!".to_string(), SrcRef(None)))
+    );
 }
 
 #[test]
@@ -141,5 +139,8 @@ fn format_string() {
     let mut context = Context::default();
     let value = s.eval(&mut context).unwrap();
 
-    assert_eq!(value, Value::String("A6B".to_string()));
+    assert_eq!(
+        value,
+        Value::String(Refer::new("A6B".to_string(), SrcRef(None)))
+    );
 }

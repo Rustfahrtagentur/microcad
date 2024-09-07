@@ -64,16 +64,16 @@ macro_rules! arg_1 {
         microcad_lang::function_signature!(microcad_lang::parameter_list![microcad_lang::parameter!($name)]),
         &|args, _| {
         match args.get(stringify!($name)).unwrap() {
-            $(Value::$ty($name) => Ok(Some(Value::$ty($name.$f()))),)*
+            $(Value::$ty($name) => Ok(Some(Value::$ty(Refer::none($name.$f())))),)*
             Value::List(v) => {
                 let mut result = ValueList::new();
                 for x in v.iter() {
                     match x {
-                        $(Value::$ty(x) => result.push(Value::$ty(x.$f())),)*
+                        $(Value::$ty(x) => result.push(Value::$ty(Refer::none(x.$f()))),)*
                         _ => return Err(EvalError::InvalidArgumentType(x.ty())),
                     }
                 }
-                Ok(Some(Value::List(List(result, v.ty()))))
+                Ok(Some(Value::List(Refer::none(List::new(result, v.ty())))))
             }
             v => Err(EvalError::InvalidArgumentType(v.ty())),
         }
@@ -150,10 +150,12 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
 
 #[test]
 fn context_namespace() {
+    use microcad_lang::src_ref::*;
+
     let mut context = Context::default();
 
     let module = NamespaceBuilder::new("math")
-        .add_value("pi", Value::Scalar(std::f64::consts::PI))
+        .add_value("pi", Value::Scalar(Refer::none(std::f64::consts::PI)))
         .build();
 
     context.add_module(module);

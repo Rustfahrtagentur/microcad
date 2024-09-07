@@ -177,12 +177,30 @@ impl Eval for Expression {
                     '*' => lhs * rhs,
                     '/' => lhs / rhs,
                     '^' => unimplemented!(), // lhs.pow(&rhs),
-                    '>' => lhs.greater_than(&rhs).map(Value::Bool),
-                    '<' => lhs.less_than(&rhs).map(Value::Bool),
-                    '≤' => lhs.less_than_or_equal(&rhs).map(Value::Bool),
-                    '≥' => lhs.greater_than_or_equal(&rhs).map(Value::Bool),
-                    '=' => Ok(Value::Bool(lhs.eq(&rhs))),
-                    '≠' => Ok(Value::Bool(!lhs.eq(&rhs))),
+                    '>' => Ok(Value::Bool(Refer::new(
+                        lhs > rhs,
+                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
+                    ))),
+                    '<' => Ok(Value::Bool(Refer::new(
+                        lhs < rhs,
+                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
+                    ))),
+                    '≤' => Ok(Value::Bool(Refer::new(
+                        lhs <= rhs,
+                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
+                    ))),
+                    '≥' => Ok(Value::Bool(Refer::new(
+                        lhs >= rhs,
+                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
+                    ))),
+                    '=' => Ok(Value::Bool(Refer::new(
+                        lhs == rhs,
+                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
+                    ))),
+                    '≠' => Ok(Value::Bool(Refer::new(
+                        lhs != rhs,
+                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
+                    ))),
                     _ => unimplemented!(),
                 }
                 .map_err(EvalError::ValueError)
@@ -206,7 +224,7 @@ impl Eval for Expression {
 
                 match (lhs, rhs) {
                     (Value::List(list), Value::Integer(index)) => {
-                        let index = index as usize;
+                        let index = index.value as usize;
                         if index < list.len() {
                             Ok(list.get(index).unwrap().clone())
                         } else {
@@ -224,7 +242,10 @@ impl Eval for Expression {
 
                 match lhs.eval(context)? {
                     Value::List(list) => match name {
-                        "len" => Ok(Value::Integer(list.len() as i64)),
+                        "len" => Ok(Value::Integer(Refer::new(
+                            list.len() as i64,
+                            list.src_ref(),
+                        ))),
                         _ => Err(EvalError::UnknownMethod(name.into())),
                     },
                     _ => Err(EvalError::UnknownMethod(name.into())),
@@ -368,7 +389,7 @@ fn list_expression() {
     // Accessing the third element of a list
     run_expression_test("[1.0,2.0,3.0][2]", &mut context, |e| {
         if let Ok(Value::Scalar(n)) = e {
-            assert_eq!(n, 3.0);
+            assert_eq!(*n, 3.0);
         } else {
             panic!("Expected scalar value: {:?}", e);
         }
@@ -385,7 +406,7 @@ fn list_expression() {
     // Return the length of a list
     run_expression_test("[1.0,2.0,3.0].len()", &mut context, |e| {
         if let Ok(Value::Integer(n)) = e {
-            assert_eq!(n, 3);
+            assert_eq!(*n, 3);
         }
     });
 }
@@ -415,22 +436,22 @@ fn operators() {
     let mut context = Context::default();
     run_expression_test("4", &mut context, |e| {
         if let Ok(Value::Scalar(num)) = e {
-            assert_eq!(num, 4.0);
+            assert_eq!(*num, 4.0);
         }
     });
     run_expression_test("4 * 4", &mut context, |e| {
         if let Ok(Value::Scalar(num)) = e {
-            assert_eq!(num, 16.0);
+            assert_eq!(*num, 16.0);
         }
     });
     run_expression_test("4 * (4 + 4)", &mut context, |e| {
         if let Ok(Value::Scalar(num)) = e {
-            assert_eq!(num, 32.0);
+            assert_eq!(*num, 32.0);
         }
     });
     run_expression_test("10.0 / 2.5 + 6", &mut context, |e| {
         if let Ok(Value::Scalar(num)) = e {
-            assert_eq!(num, 10.0);
+            assert_eq!(*num, 10.0);
         }
     });
 }
@@ -441,28 +462,28 @@ fn conditions() {
 
     run_expression_test("4 < 5", &mut context, |e| {
         if let Ok(Value::Bool(b)) = e {
-            assert!(b);
+            assert!(*b);
         } else {
             panic!("Expected boolean value: {:?}", e);
         }
     });
     run_expression_test("4 > 5", &mut context, |e| {
         if let Ok(Value::Bool(b)) = e {
-            assert!(!b);
+            assert!(!*b);
         } else {
             panic!("Expected boolean value: {:?}", e);
         }
     });
     run_expression_test("4 == 5", &mut context, |e| {
         if let Ok(Value::Bool(b)) = e {
-            assert!(!b);
+            assert!(!*b);
         } else {
             panic!("Expected boolean value: {:?}", e);
         }
     });
     run_expression_test("4 != 5", &mut context, |e| {
         if let Ok(Value::Bool(b)) = e {
-            assert!(b);
+            assert!(*b);
         } else {
             panic!("Expected boolean value: {:?}", e);
         }
