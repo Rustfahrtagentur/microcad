@@ -88,19 +88,19 @@ impl Unit {
     pub fn normalize(self, x: f64) -> f64 {
         match self {
             Self::None => x,
-            Self::Percent => x * 0.01 as f64,
-            Self::Cm => x * 10.0 as f64,
+            Self::Percent => x * 0.01_f64,
+            Self::Cm => x * 10.0_f64,
             Self::Mm => x,
-            Self::In => x * 25.4 as f64,
-            Self::M => x * 1000.0 as f64,
+            Self::In => x * 25.4_f64,
+            Self::M => x * 1000.0_f64,
             Self::Deg => x,
             Self::DegS => x,
-            Self::Grad => x * (360. / 180.) as f64,
-            Self::Turn => x * 360. as f64,
+            Self::Grad => x * (360. / 180.),
+            Self::Turn => x * 360_f64,
             Self::Rad => x * (360. / std::f32::consts::TAU) as f64,
             Self::G => x,
-            Self::Kg => x * 1000.0 as f64,
-            Self::Lb => x * 453.59237 as f64,
+            Self::Kg => x * 1000.0_f64,
+            Self::Lb => x * 453.59237_f64,
         }
     }
 }
