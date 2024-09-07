@@ -1,19 +1,28 @@
 //! Source code reference
 
+mod line_col;
+mod refer;
+
+pub use line_col::*;
+pub use refer::*;
+
 use crate::parser::Pair;
 
-/// Line and column within a source code file
-#[derive(Clone, Debug, Default)]
-pub struct LineCol {
-    /// Line number (0..)
-    pub line: u32,
-    /// Column number (0..)
-    pub col: u32,
+pub trait SrcReferrer {
+    fn src_ref(&self) -> SrcRef;
 }
 
-impl std::fmt::Display for LineCol {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}:{}", self.line, self.col)
+/// We want to be able to use SrcRef directly in functions with `impl SrcReferrer` argument
+impl SrcReferrer for SrcRef {
+    fn src_ref(&self) -> SrcRef {
+        self.clone()
+    }
+}
+
+/// We want to be able to use type references as well
+impl<T: SrcReferrer> SrcReferrer for &T {
+    fn src_ref(&self) -> SrcRef {
+        (*self).src_ref()
     }
 }
 
@@ -140,24 +149,6 @@ impl From<Pair<'_>> for SrcRef {
             line as u32,
             col as u32,
         )
-    }
-}
-
-pub trait SrcReferrer {
-    fn src_ref(&self) -> SrcRef;
-}
-
-/// We want to be able to use SrcRef directly in functions with `impl SrcReferrer` argument
-impl SrcReferrer for SrcRef {
-    fn src_ref(&self) -> SrcRef {
-        self.clone()
-    }
-}
-
-/// We want to be able to use type references as well
-impl<T: SrcReferrer> SrcReferrer for &T {
-    fn src_ref(&self) -> SrcRef {
-        (*self).src_ref()
     }
 }
 
