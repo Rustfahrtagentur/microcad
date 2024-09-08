@@ -1,12 +1,10 @@
 //! Parameter list parser entity
 
-use parameter::{SrcRef, SrcReferrer};
-
-use crate::{errors::*, eval::*, ord_map::OrdMap, parse::*, parser::*};
+use crate::{errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
 
 /// Parameter list
 #[derive(Clone, Debug, Default)]
-pub struct ParameterList(OrdMap<Identifier, Parameter>, SrcRef);
+pub struct ParameterList(Refer<OrdMap<Identifier, Parameter>>);
 
 impl std::ops::Deref for ParameterList {
     type Target = OrdMap<Identifier, Parameter>;
@@ -18,7 +16,7 @@ impl std::ops::Deref for ParameterList {
 
 impl SrcReferrer for ParameterList {
     fn src_ref(&self) -> parameter::SrcRef {
-        self.1.clone()
+        self.0.src_ref()
     }
 }
 
@@ -30,7 +28,15 @@ impl std::ops::DerefMut for ParameterList {
 
 impl From<Vec<Parameter>> for ParameterList {
     fn from(value: Vec<Parameter>) -> Self {
-        Self(OrdMap::<Identifier, Parameter>::from(value), SrcRef(None))
+        Self(Refer::new(
+            OrdMap::<Identifier, Parameter>::from(value.clone()),
+            match (value.first(), value.last()) {
+                (Some(first), Some(last)) => {
+                    SrcRef::merge(first.src_ref.clone(), last.src_ref.clone())
+                }
+                _ => SrcRef(None),
+            },
+        ))
     }
 }
 

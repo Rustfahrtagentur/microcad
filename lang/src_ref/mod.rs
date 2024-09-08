@@ -8,7 +8,9 @@ pub use refer::*;
 
 use crate::parser::Pair;
 
+/// Elements holding a source code reference shall implement this trait
 pub trait SrcReferrer {
+    /// return source code reference
     fn src_ref(&self) -> SrcRef;
 }
 

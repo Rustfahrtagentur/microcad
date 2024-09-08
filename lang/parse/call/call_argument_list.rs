@@ -4,11 +4,11 @@ use crate::{errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
 
 /// List of call arguments
 #[derive(Clone, Debug, Default)]
-pub struct CallArgumentList(OrdMap<Identifier, CallArgument>, SrcRef);
+pub struct CallArgumentList(Refer<OrdMap<Identifier, CallArgument>>);
 
 impl SrcReferrer for CallArgumentList {
     fn src_ref(&self) -> SrcRef {
-        self.1.clone()
+        self.0.src_ref()
     }
 }
 
@@ -44,16 +44,16 @@ impl Eval for CallArgumentList {
 
 impl Parse for CallArgumentList {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let mut call_argument_list = CallArgumentList::default();
+        let mut call_argument_list =
+            CallArgumentList(Refer::new(OrdMap::default(), pair.clone().into()));
 
-        match pair.clone().as_rule() {
+        match pair.as_rule() {
             Rule::call_argument_list => {
                 for pair in pair.clone().into_inner() {
                     call_argument_list
                         .push(CallArgument::parse(pair.clone())?)
                         .map_err(ParseError::DuplicateCallArgument)?;
                 }
-                call_argument_list.1 = pair.into();
 
                 Ok(call_argument_list)
             }
