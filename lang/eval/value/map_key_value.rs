@@ -1,13 +1,13 @@
+use crate::{eval::*, map_key_type::*, src_ref::*};
+use microcad_core::Integer;
 use value::error::ValueError;
-
-use crate::{eval::*, map_key_type::*};
 
 /// A value type that can be used as a key in a map
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum MapKeyValue {
-    Integer(i64),
-    Bool(bool),
-    String(String),
+    Integer(Refer<Integer>),
+    Bool(Refer<bool>),
+    String(Refer<String>),
 }
 
 impl MapKeyValue {

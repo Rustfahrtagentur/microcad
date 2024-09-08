@@ -24,4 +24,7 @@ pub enum ValueError {
 
     #[error("Cannot add unit to a value that has already a unit: {0}")]
     CannotAddUnitToValueWithUnit(Value),
+
+    #[error("Cannot concat two vec with different types {0} and {1}")]
+    CannotCombineVecOfDifferentType(Type, Type),
 }

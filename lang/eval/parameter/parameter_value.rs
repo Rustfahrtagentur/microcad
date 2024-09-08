@@ -58,7 +58,7 @@ macro_rules! parameter_value {
         $crate::eval::ParameterValue {
             name: stringify!($name).into(),
             specified_type: Some(Type::$ty),
-            default_value: Some(Value::$ty($value)),
+            default_value: Some(Value::$ty($crate::src_ref::Refer::none($value))),
         }
     };
     ($name:ident = $value:expr) => {

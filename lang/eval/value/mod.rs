@@ -14,7 +14,7 @@ pub use named_tuple::*;
 pub use unnamed_tuple::*;
 pub use value_list::*;
 
-use crate::{eval::*, parse::*, r#type::*};
+use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
 use microcad_render::tree::Node;
@@ -24,33 +24,33 @@ pub(crate) type ValueResult = std::result::Result<Value, ValueError>;
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
     /// An integer value
-    Integer(i64),
+    Integer(Refer<Integer>),
     /// A scalar value
-    Scalar(Scalar),
+    Scalar(Refer<Scalar>),
     /// Length in mm
-    Length(Scalar),
+    Length(Refer<Scalar>),
     /// A 2D vector with length
-    Vec2(Vec2),
+    Vec2(Refer<Vec2>),
     /// A 3D vector with length
-    Vec3(Vec3),
+    Vec3(Refer<Vec3>),
     /// A 4D vector with length
-    Vec4(Vec4),
+    Vec4(Refer<Vec4>),
     /// An angle in radians
-    Angle(Scalar),
+    Angle(Refer<Scalar>),
     /// Boolean value
-    Bool(bool),
+    Bool(Refer<bool>),
     /// String value
-    String(String),
+    String(Refer<String>),
     /// Color value
-    Color(Color),
+    Color(Refer<Color>),
     // List
-    List(List),
+    List(Refer<List>),
     // Hash Map
-    Map(Map),
+    Map(Refer<Map>),
     /// Tuple of named items
-    NamedTuple(NamedTuple),
+    NamedTuple(Refer<NamedTuple>),
     /// Tuple of unnamed items
-    UnnamedTuple(UnnamedTuple),
+    UnnamedTuple(Refer<UnnamedTuple>),
     /// A node in the render tree
     Node(Node),
 }
@@ -90,12 +90,12 @@ impl Value {
 
     pub fn neg(&self) -> ValueResult {
         match self {
-            Value::Integer(n) => Ok(Value::Integer(-n)),
-            Value::Scalar(n) => Ok(Value::Scalar(-n)),
-            Value::Length(n) => Ok(Value::Length(-n)),
-            Value::Vec2(v) => Ok(Value::Vec2(-*v)),
-            Value::Vec3(v) => Ok(Value::Vec3(-*v)),
-            Value::Angle(n) => Ok(Value::Angle(-n)),
+            Value::Integer(n) => Ok(Value::Integer(-n.clone())),
+            Value::Scalar(n) => Ok(Value::Scalar(-n.clone())),
+            Value::Length(n) => Ok(Value::Length(-n.clone())),
+            Value::Vec2(v) => Ok(Value::Vec2(-v.clone())),
+            Value::Vec3(v) => Ok(Value::Vec3(-v.clone())),
+            Value::Angle(n) => Ok(Value::Angle(-n.clone())),
             _ => Err(ValueError::InvalidOperator('-')),
         }
     }
@@ -106,13 +106,57 @@ impl Value {
         unit: Unit,
     ) -> std::result::Result<(), ValueError> {
         match (self.clone(), unit.ty()) {
-            (Value::Integer(i), Type::Length) => *self = Value::Length(unit.normalize(i as Scalar)),
-            (Value::Integer(i), Type::Angle) => *self = Value::Angle(unit.normalize(i as Scalar)),
-            (Value::Scalar(s), Type::Length) => *self = Value::Length(unit.normalize(s)),
-            (Value::Scalar(s), Type::Angle) => *self = Value::Angle(unit.normalize(s)),
+            (Value::Integer(i), Type::Length) => {
+                *self = Value::Length(Refer::new(unit.normalize(*i as Scalar), i.src_ref))
+            }
+            (Value::Integer(i), Type::Angle) => {
+                *self = Value::Angle(Refer::new(unit.normalize(*i as Scalar), i.src_ref))
+            }
+            (Value::Scalar(s), Type::Length) => {
+                *self = Value::Length(Refer::new(unit.normalize(*s), s.src_ref))
+            }
+            (Value::Scalar(s), Type::Angle) => {
+                *self = Value::Angle(Refer::new(unit.normalize(*s), s.src_ref))
+            }
             (value, _) => return Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
         }
         Ok(())
+    }
+}
+
+impl SrcReferrer for Value {
+    fn src_ref(&self) -> SrcRef {
+        match self {
+            Value::Integer(i) => i.src_ref.clone(),
+            Value::Scalar(s) => s.src_ref.clone(),
+            Value::Length(l) => l.src_ref.clone(),
+            Value::Vec2(v) => v.src_ref.clone(),
+            Value::Vec3(v) => v.src_ref.clone(),
+            Value::Vec4(v) => v.src_ref.clone(),
+            Value::Angle(a) => a.src_ref.clone(),
+            Value::Bool(b) => b.src_ref.clone(),
+            Value::String(s) => s.src_ref.clone(),
+            Value::Color(c) => c.src_ref.clone(),
+            Value::List(list) => list.src_ref.clone(),
+            Value::Map(map) => map.src_ref.clone(),
+            Value::NamedTuple(named_tuple) => named_tuple.src_ref.clone(),
+            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.src_ref.clone(),
+            Value::Node(_) => SrcRef(None),
+        }
+    }
+}
+
+impl PartialOrd for Value {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        match (self, other) {
+            (Value::Integer(lhs), Value::Integer(rhs)) => lhs.partial_cmp(rhs),
+            (Value::Scalar(lhs), Value::Scalar(rhs)) => lhs.partial_cmp(rhs),
+            (Value::Length(lhs), Value::Length(rhs)) => lhs.partial_cmp(rhs),
+            (Value::Vec2(lhs), Value::Vec2(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
+            (Value::Vec3(lhs), Value::Vec3(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
+            (Value::Angle(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
+            _ => None,
+        }
     }
 }
 
@@ -146,9 +190,18 @@ impl std::ops::Add for Value {
         match (self, rhs) {
             // Add two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs + rhs)),
-            // Add an integer and a scalar
-            (Value::Integer(lhs), Value::Scalar(rhs))
-            | (Value::Scalar(rhs), Value::Integer(lhs)) => Ok(Value::Scalar(lhs as Scalar + rhs)),
+            // Add a scalar to an integer
+            (Value::Integer(lhs), Value::Scalar(rhs)) => {
+                Ok(Value::Integer(Refer::merge(lhs, rhs, |l, r| {
+                    l + r as Integer
+                })))
+            }
+            // Add an integer to a scalar
+            (Value::Scalar(lhs), Value::Integer(rhs)) => {
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l + r as Scalar
+                })))
+            }
             // Add two scalars
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs + rhs)),
             // Add two angles
@@ -160,15 +213,30 @@ impl std::ops::Add for Value {
             // Add two Vec3
             (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(Value::Vec3(lhs + rhs)),
             // Concatenate two strings
-            (Value::String(lhs), Value::String(rhs)) => Ok(Value::String(lhs + &rhs)),
+            (Value::String(lhs), Value::String(rhs)) => {
+                Ok(Value::String(Refer::merge(lhs, rhs, |l, r| l + &r)))
+            }
             // Concatenate two lists
-            (Value::List(mut lhs), Value::List(mut rhs)) => {
-                lhs.append(&mut rhs);
-                Ok(Value::List(lhs))
+            (Value::List(lhs), Value::List(rhs)) => {
+                if lhs.value.ty() == rhs.value.ty() {
+                    let res = lhs.value.iter().chain(rhs.value.iter());
+                    Ok(Value::List(Refer::new(
+                        List::new(res.cloned().collect(), lhs.value.ty()),
+                        SrcRef::merge(lhs.src_ref, rhs.src_ref),
+                    )))
+                } else {
+                    Err(ValueError::CannotCombineVecOfDifferentType(
+                        lhs.value.ty(),
+                        rhs.value.ty(),
+                    ))
+                }
             }
             // Add values of two tuples of the same length
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple((lhs + rhs)?))
+                Ok(Value::UnnamedTuple(Refer::new(
+                    (lhs.value + rhs.value)?,
+                    SrcRef::merge(lhs.src_ref, rhs.src_ref),
+                )))
             }
             _ => Err(ValueError::InvalidOperator('+')),
         }
@@ -184,9 +252,17 @@ impl std::ops::Sub for Value {
             // Subtract two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs - rhs)),
             // Subtract an scalar and an integer
-            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs - rhs as Scalar)),
+            (Value::Scalar(lhs), Value::Integer(rhs)) => {
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l - r as Scalar
+                })))
+            }
             // Subtract an integer and a scalar
-            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar - rhs)),
+            (Value::Integer(lhs), Value::Scalar(rhs)) => {
+                Ok(Value::Integer(Refer::merge(lhs, rhs, |l, r| {
+                    l - r as Integer
+                })))
+            }
             // Subtract two numbers
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs - rhs)),
             // Subtract two angles
@@ -199,12 +275,22 @@ impl std::ops::Sub for Value {
             (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(Value::Vec3(lhs - rhs)),
             // Remove an elements from list `rhs` from list `lhs`
             (Value::List(mut lhs), Value::List(rhs)) => {
-                lhs.retain(|x| !rhs.contains(x));
-                Ok(Value::List(lhs))
+                if lhs.value.ty() == rhs.value.ty() {
+                    lhs.retain(|x| !rhs.contains(x));
+                    Ok(Value::List(lhs))
+                } else {
+                    Err(ValueError::CannotCombineVecOfDifferentType(
+                        lhs.value.ty(),
+                        rhs.value.ty(),
+                    ))
+                }
             }
             // Subtract values of two arrays of the same length
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple((lhs - rhs)?))
+                Ok(Value::UnnamedTuple(Refer::new(
+                    (lhs.value - rhs.value)?,
+                    SrcRef::merge(lhs.src_ref, rhs.src_ref),
+                )))
             }
             _ => Err(ValueError::InvalidOperator('-')),
         }
@@ -220,8 +306,16 @@ impl std::ops::Mul for Value {
             // Multiply two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs * rhs)),
             // Multiply an integer and a scalar
-            (Value::Integer(lhs), Value::Scalar(rhs))
-            | (Value::Scalar(rhs), Value::Integer(lhs)) => Ok(Value::Scalar(lhs as Scalar * rhs)),
+            (Value::Integer(lhs), Value::Scalar(rhs)) => {
+                Ok(Value::Integer(Refer::merge(lhs, rhs, |l, r| {
+                    l * r as Integer
+                })))
+            }
+            (Value::Scalar(lhs), Value::Integer(rhs)) => {
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l * r as Scalar
+                })))
+            }
             // Multiply two scalars
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs * rhs)),
             // Scale an angle
@@ -234,12 +328,16 @@ impl std::ops::Mul for Value {
             }
             // Scale Vec2
             (Value::Scalar(lhs), Value::Vec2(rhs)) | (Value::Vec2(rhs), Value::Scalar(lhs)) => {
-                Ok(Value::Vec2(Vec2::new(lhs * rhs.x, lhs * rhs.y)))
+                Ok(Value::Vec2(Refer::merge(lhs, rhs, |l, r| {
+                    Vec2::new(l * r.x, l * r.y)
+                })))
             }
             // Scale Vec3
-            (Value::Scalar(lhs), Value::Vec3(rhs)) | (Value::Vec3(rhs), Value::Scalar(lhs)) => Ok(
-                Value::Vec3(Vec3::new(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z)),
-            ),
+            (Value::Scalar(lhs), Value::Vec3(rhs)) | (Value::Vec3(rhs), Value::Scalar(lhs)) => {
+                Ok(Value::Vec3(Refer::merge(lhs, rhs, |l, r| {
+                    Vec3::new(l * r.x, l * r.y, l * r.z)
+                })))
+            }
             _ => Err(ValueError::InvalidOperator('*')),
         }
     }
@@ -253,10 +351,20 @@ impl std::ops::Div for Value {
         match (self, rhs) {
             // Division with scalar result
             (Value::Integer(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Scalar(lhs as Scalar / rhs as Scalar))
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l as Scalar / r as Scalar
+                })))
             }
-            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs / rhs as Scalar)),
-            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar / rhs)),
+            (Value::Scalar(lhs), Value::Integer(rhs)) => {
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l / r as Scalar
+                })))
+            }
+            (Value::Integer(lhs), Value::Scalar(rhs)) => {
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l as Scalar / r
+                })))
+            }
             (Value::Scalar(lhs), Value::Scalar(rhs))
             | (Value::Length(lhs), Value::Length(rhs))
             | (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Scalar(lhs / rhs)),
@@ -295,7 +403,7 @@ macro_rules! impl_try_from {
 
             fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
                 match value {
-                    $(Value::$variant(v) => Ok(v.into()),)*
+                    $(Value::$variant(v) => Ok(v.value.into()),)*
                     value => Err(ValueError::CannotConvert(value, stringify!($ty).into())),
                 }
             }
@@ -306,7 +414,7 @@ macro_rules! impl_try_from {
 
             fn try_from(value: &Value) -> std::result::Result<Self, Self::Error> {
                 match value {
-                    $(Value::$variant(v) => Ok(v.clone().into()),)*
+                    $(Value::$variant(v) => Ok(v.value.clone().into()),)*
                     value => Err(ValueError::CannotConvert(value.clone(), stringify!($ty).into())),
                 }
             }

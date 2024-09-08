@@ -21,10 +21,13 @@ impl CallArgumentValue {
 #[macro_export]
 macro_rules! call_argument_value {
     ($name:ident: $ty:ident = $value:expr) => {
-        CallArgumentValue::new(Some(stringify!($name).into()), Value::$ty($value))
+        CallArgumentValue::new(
+            Some(stringify!($name).into()),
+            Value::$ty($crate::src_ref::Refer::none($value)),
+        )
     };
     ($ty:ident = $value:expr) => {
-        CallArgumentValue::new(None, Value::$ty($value))
+        CallArgumentValue::new(None, Value::$ty($crate::src_ref::Refer::none($value)))
     };
     () => {};
 }

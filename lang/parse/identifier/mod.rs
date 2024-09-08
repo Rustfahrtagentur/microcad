@@ -9,11 +9,11 @@ pub use qualified_name::*;
 use crate::{errors::*, eval::Sym, parser::*, src_ref::*};
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Identifier(microcad_core::Id, SrcRef);
+pub struct Identifier(Refer<microcad_core::Id>);
 
 impl SrcReferrer for Identifier {
     fn src_ref(&self) -> SrcRef {
-        self.1.clone()
+        self.0.src_ref.clone()
     }
 }
 
@@ -25,13 +25,13 @@ impl std::hash::Hash for Identifier {
 
 impl Sym for Identifier {
     fn id(&self) -> Option<microcad_core::Id> {
-        Some(self.0.clone())
+        Some(self.0.value.clone())
     }
 }
 
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {
-        Self(value.into(), SrcRef(None))
+        Self(Refer::new(value.into(), SrcRef(None)))
     }
 }
 
@@ -44,7 +44,7 @@ impl<'a> From<&'a Identifier> for &'a str {
 impl Parse for Identifier {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::identifier);
-        Ok(Self(pair.as_str().into(), pair.into()))
+        Ok(Self(Refer::new(pair.as_str().into(), pair.into())))
     }
 }
 
@@ -56,7 +56,7 @@ impl std::fmt::Display for Identifier {
 
 impl PartialEq<str> for Identifier {
     fn eq(&self, other: &str) -> bool {
-        self.0 == *other
+        *self.0 == other
     }
 }
 

@@ -89,7 +89,10 @@ impl Eval for TupleExpression {
             if let Some(unit) = self.unit {
                 value_list.add_unit_to_unitless_types(unit)?;
             }
-            Ok(Value::UnnamedTuple(value_list.into()))
+            Ok(Value::UnnamedTuple(Refer::new(
+                value_list.into(),
+                self.args.src_ref(),
+            )))
         } else {
             // Named tuple
             let mut map = std::collections::BTreeMap::new();
@@ -113,23 +116,25 @@ impl Eval for TupleExpression {
                 // Special case for Vec2: if we have exactly two lengths with names "x" and "y", we can create a Vec2
                 (2, true) => {
                     if let (Some(x), Some(y)) = (map.get(x), map.get(y)) {
-                        return Ok(Value::Vec2(Vec2::new(x.try_into()?, y.try_into()?)));
+                        return Ok(Value::Vec2(Refer::new(
+                            Vec2::new(x.try_into()?, y.try_into()?),
+                            SrcRef::merge(x.src_ref(), y.src_ref()),
+                        )));
                     }
                 }
                 // Special case for Vec3: if we have exactly three lengths with names "x", "y" and "z", we can create a Vec3
                 (3, true) => {
                     if let (Some(x), Some(y), Some(z)) = (map.get(x), map.get(y), map.get(z)) {
-                        return Ok(Value::Vec3(Vec3::new(
-                            x.try_into()?,
-                            y.try_into()?,
-                            z.try_into()?,
+                        return Ok(Value::Vec3(Refer::new(
+                            Vec3::new(x.try_into()?, y.try_into()?, z.try_into()?),
+                            SrcRef::merge(x.src_ref(), z.src_ref()),
                         )));
                     }
                 }
                 _ => {}
             }
 
-            Ok(Value::NamedTuple(map.into()))
+            Ok(Value::NamedTuple(Refer::new(map.into(), self.src_ref())))
         }
     }
 }

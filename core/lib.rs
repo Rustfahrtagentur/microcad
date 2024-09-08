@@ -7,6 +7,7 @@ pub mod geo3d;
 pub mod render;
 pub mod transform;
 
+pub type Integer = i64;
 pub type Scalar = f64;
 pub type Vec2 = cgmath::Vector2<Scalar>;
 pub type Vec3 = cgmath::Vector3<Scalar>;

@@ -74,10 +74,10 @@ impl Eval for Literal {
 
     fn eval(&self, context: &mut Context) -> std::result::Result<Value, EvalError> {
         match self {
-            Literal::Integer(i, _) => Ok(Value::Integer(*i)),
+            Literal::Integer(i, r) => Ok(Value::Integer(Refer::new(*i, r.clone()))),
             Literal::Number(n) => n.eval(context),
-            Literal::Bool(b, _) => Ok(Value::Bool(*b)),
-            Literal::Color(c, _) => Ok(Value::Color(*c)),
+            Literal::Bool(b, r) => Ok(Value::Bool(Refer::new(*b, r.clone()))),
+            Literal::Color(c, r) => Ok(Value::Color(Refer::new(*c, r.clone()))),
         }
     }
 }

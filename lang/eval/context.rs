@@ -1,5 +1,8 @@
 use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
-use crate::{diagnostics::{Diagnostic, AddDiagnostic, Diagnostics}, parse::{identifier::*, SourceFile}};
+use crate::{
+    diagnostics::{AddDiagnostic, Diagnostic, Diagnostics},
+    parse::{identifier::*, SourceFile},
+};
 use microcad_core::Id;
 use microcad_render::tree;
 
@@ -26,7 +29,7 @@ impl Context {
     pub fn from_source_file(source_file: SourceFile) -> Self {
         let mut context = Self::default();
         context.add_source_file(source_file);
-    
+
         context
     }
 
@@ -50,8 +53,11 @@ impl Context {
     /// Add a new source file to the context and set it as the current source file
     pub fn add_source_file(&mut self, source_file: SourceFile) {
         let new_source_file = std::rc::Rc::new(source_file);
-        self.source_files.insert(new_source_file.filename().to_string(), new_source_file.clone());
-    
+        self.source_files.insert(
+            new_source_file.filename().to_string(),
+            new_source_file.clone(),
+        );
+
         self.diagnostics.push(new_source_file.clone());
     }
 
@@ -126,12 +132,12 @@ impl Default for Context {
 // @todo Move this test elsewhere
 #[test]
 fn context_basic() {
-    use crate::{eval::*, parse::*, parser::*};
+    use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
     let mut context = Context::default();
 
-    context.add_value("a".into(), Value::Integer(1));
-    context.add_value("b".into(), Value::Integer(2));
+    context.add_value("a".into(), Value::Integer(Refer::new(1, SrcRef(None))));
+    context.add_value("b".into(), Value::Integer(Refer::new(2, SrcRef(None))));
 
     assert_eq!(context.find_symbols(&"a".into())[0].id().unwrap(), "a");
     assert_eq!(context.find_symbols(&"b".into())[0].id().unwrap(), "b");
