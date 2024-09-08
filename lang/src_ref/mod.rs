@@ -122,7 +122,7 @@ impl SrcRef {
                 at: lhs.at,
             })),
             (SrcRef(Some(hs)), SrcRef(None)) | (SrcRef(None), SrcRef(Some(hs))) => SrcRef(Some(hs)),
-            _ => unreachable!(),
+            _ => SrcRef(None),
         }
     }
 
