@@ -415,44 +415,44 @@ fn check(result: ValueResult, value: Value) {
 
 #[test]
 fn test_value_integer() {
-    let u = integer(2, &SrcRef::new(3..4, 5, 6));
-    let v = integer(5, &SrcRef::new(6..7, 8, 9));
-    let w = scalar(5.0, &SrcRef::new(6..7, 8, 9));
+    let u = || integer(2, &SrcRef::new(3..4, 5, 6));
+    let v = || integer(5, &SrcRef::new(6..7, 8, 9));
+    let w = || scalar(5.0, &SrcRef::new(6..7, 8, 9));
 
     let r = SrcRef::new(3..7, 5, 6);
 
     // symmetric operations
-    check(u.clone() + v.clone(), integer(2 + 5, &r));
-    check(u.clone() - v.clone(), integer(2 - 5, &r));
-    check(u.clone() * v.clone(), integer(2 * 5, &r));
-    check(u.clone() / v.clone(), scalar(2.0 / 5.0, &r));
-    check(-u.clone(), integer(-2, &r));
+    check(u() + v(), integer(2 + 5, &r));
+    check(u() - v(), integer(2 - 5, &r));
+    check(u() * v(), integer(2 * 5, &r));
+    check(u() / v(), scalar(2.0 / 5.0, &r));
+    check(-u(), integer(-2, &r));
 
     // asymmetric operations
-    check(u.clone() + w.clone(), integer(2 + 5, &r));
-    check(u.clone() - w.clone(), integer(2 - 5, &r));
-    check(u.clone() * w.clone(), integer(2 * 5, &r));
-    check(u.clone() / w.clone(), scalar(2.0 / 5.0, &r));
+    check(u() + w(), integer(2 + 5, &r));
+    check(u() - w(), integer(2 - 5, &r));
+    check(u() * w(), integer(2 * 5, &r));
+    check(u() / w(), scalar(2.0 / 5.0, &r));
 }
 
 #[test]
 fn test_value_scalar() {
-    let u = scalar(2.0, &SrcRef::new(3..4, 5, 6));
-    let v = scalar(5.0, &SrcRef::new(6..7, 8, 9));
-    let w = integer(5, &SrcRef::new(6..7, 8, 9));
+    let u = || scalar(2.0, &SrcRef::new(3..4, 5, 6));
+    let v = || scalar(5.0, &SrcRef::new(6..7, 8, 9));
+    let w = || integer(5, &SrcRef::new(6..7, 8, 9));
 
     let r = SrcRef::new(3..7, 5, 6);
 
     // symmetric operations
-    check(u.clone() + v.clone(), scalar(2.0 + 5.0, &r));
-    check(u.clone() - v.clone(), scalar(2.0 - 5.0, &r));
-    check(u.clone() * v.clone(), scalar(2.0 * 5.0, &r));
-    check(u.clone() / v.clone(), scalar(2.0 / 5.0, &r));
-    check(-u.clone(), scalar(-2.0, &r));
+    check(u() + v(), scalar(2.0 + 5.0, &r));
+    check(u() - v(), scalar(2.0 - 5.0, &r));
+    check(u() * v(), scalar(2.0 * 5.0, &r));
+    check(u() / v(), scalar(2.0 / 5.0, &r));
+    check(-u(), scalar(-2.0, &r));
 
     // asymmetric operations
-    check(u.clone() + w.clone(), scalar(2.0 + 5.0, &r));
-    check(u.clone() - w.clone(), scalar(2.0 - 5.0, &r));
-    check(u.clone() * w.clone(), scalar(2.0 * 5.0, &r));
-    check(u.clone() / w.clone(), scalar(2.0 / 5.0, &r));
+    check(u() + w(), scalar(2.0 + 5.0, &r));
+    check(u() - w(), scalar(2.0 - 5.0, &r));
+    check(u() * w(), scalar(2.0 * 5.0, &r));
+    check(u() / w(), scalar(2.0 / 5.0, &r));
 }
