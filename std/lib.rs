@@ -1,5 +1,7 @@
 #![warn(missing_docs)]
 
+//! µCAD Standard library
+
 mod algorithm;
 mod context_builder;
 mod export;
@@ -24,6 +26,7 @@ pub use export::export;
 use microcad_core::ExportSettings;
 use namespace_builder::NamespaceBuilder;
 
+/// Build the standard module
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     NamespaceBuilder::new("std")
         // TODO: is this correct= Shouldn't this use add_builtin_module() =

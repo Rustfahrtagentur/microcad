@@ -21,11 +21,11 @@ impl SrcReferrer for FunctionSignature {
 
 impl FunctionSignature {
     // TODO: Is this function #cfg(test) only
-    pub fn new(parameters: ParameterList, return_type: Option<Type>) -> Self {
+    pub fn new(parameters: ParameterList, return_type: Option<Type>, src_ref: SrcRef) -> Self {
         Self {
             parameters,
             return_type: return_type.map(|r| TypeAnnotation(Refer::none(r))),
-            src_ref: SrcRef(None),
+            src_ref,
         }
     }
 
@@ -60,7 +60,11 @@ impl Parse for FunctionSignature {
 #[macro_export]
 macro_rules! function_signature {
     ($parameters:expr) => {
-        microcad_lang::parse::function::FunctionSignature::new($parameters, None)
+        microcad_lang::parse::function::FunctionSignature::new(
+            $parameters,
+            None,
+            microcad_lang::src_ref::SrcRef(None),
+        )
     };
     (($parameters:expr) -> $return_type:ident) => {
         microcad_lang::parse::function::FunctionSignature::new(

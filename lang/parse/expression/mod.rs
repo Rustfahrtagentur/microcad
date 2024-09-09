@@ -51,23 +51,28 @@ pub enum Expression {
     FormatString(FormatString),
     /// A list: [a, b, c]
     ListExpression(ListExpression),
-    // A tuple: (a, b, c)
+    /// A tuple: (a, b, c)
     TupleExpression(TupleExpression),
     /// A list whitespace separated of nested items: `translate() rotate()`, `b c`, `a b() {}`
     Nested(Nested),
     /// A binary operation: a + b
     BinaryOp {
+        /// Left-hand side
         lhs: Box<Expression>,
-        /// '+', '-', '/', '*', '<', '>', '≤', '≥', '&', '|'
+        /// Operator  ('+', '-', '/', '*', '<', '>', '≤', '≥', '&', '|')
         op: char,
+        /// Right -hand side
         rhs: Box<Expression>,
+        /// Source code reference
         src_ref: SrcRef,
     },
     /// A unary operation: !a
     UnaryOp {
-        /// '+', '-', '!'
+        /// Operator ('+', '-', '!')
         op: char,
+        /// Right -hand side
         rhs: Box<Expression>,
+        /// Source code reference
         src_ref: SrcRef,
     },
     /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
@@ -138,10 +143,7 @@ impl std::fmt::Display for Expression {
 }
 
 impl Expression {
-    pub fn literal(literal: Literal) -> Self {
-        Self::Literal(literal)
-    }
-
+    /// Generate literal from string
     pub fn literal_from_str(s: &str) -> std::result::Result<Self, anyhow::Error> {
         use std::str::FromStr;
         if s.starts_with('"') && s.ends_with('"') {

@@ -6,8 +6,11 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub struct FormatExpression {
+    /// Format specifier
     pub spec: FormatSpec,
+    /// Expression to format
     pub expression: Box<Expression>,
+    /// Source code reference
     src_ref: SrcRef,
 }
 
