@@ -13,7 +13,6 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
     match &input.data {
         Data::Struct(syn::DataStruct { fields, .. }) => {
             let mut parameter_impl = quote! {
-                use microcad_lang::parse::parameter::{Parameter,ParameterList};
                 let mut parameters = ParameterList::default();
             };
             let field_identifiers = fields.iter().map(|item| item.ident.as_ref().unwrap()).collect::<Vec<_>>();
@@ -26,7 +25,8 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
                     parameters.push(Parameter::new(
                         stringify!(#identifier).into(),
                         Some(microcad_lang::r#type::Type::#ty.into()),
-                        None
+                        None,
+                        microcad_lang::src_ref::SrcRef(None),
                     )).unwrap();
                 });
             }

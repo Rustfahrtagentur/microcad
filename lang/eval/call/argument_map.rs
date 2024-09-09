@@ -21,6 +21,12 @@ impl ArgumentMap {
     }
 }
 
+impl SrcReferrer for ArgumentMap {
+    fn src_ref(&self) -> SrcRef {
+        self.0.src_ref()
+    }
+}
+
 impl std::ops::Deref for ArgumentMap {
     type Target = std::collections::HashMap<Id, Value>;
 
