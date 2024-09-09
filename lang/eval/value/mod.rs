@@ -42,13 +42,13 @@ pub enum Value {
     /// Color value
     Color(Refer<Color>),
     // List
-    List(Refer<List>),
+    List(List),
     // Hash Map
-    Map(Refer<Map>),
+    Map(Map),
     /// Tuple of named items
-    NamedTuple(Refer<NamedTuple>),
+    NamedTuple(NamedTuple),
     /// Tuple of unnamed items
-    UnnamedTuple(Refer<UnnamedTuple>),
+    UnnamedTuple(UnnamedTuple),
     /// A node in the render tree
     Node(Node),
 }
@@ -135,10 +135,10 @@ impl SrcReferrer for Value {
             Value::Bool(b) => b.src_ref.clone(),
             Value::String(s) => s.src_ref.clone(),
             Value::Color(c) => c.src_ref.clone(),
-            Value::List(list) => list.src_ref.clone(),
-            Value::Map(map) => map.src_ref.clone(),
-            Value::NamedTuple(named_tuple) => named_tuple.src_ref.clone(),
-            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.src_ref.clone(),
+            Value::List(list) => list.src_ref(),
+            Value::Map(map) => map.src_ref(),
+            Value::NamedTuple(named_tuple) => named_tuple.src_ref(),
+            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.src_ref(),
             Value::Node(_) => SrcRef(None),
         }
     }
@@ -216,25 +216,22 @@ impl std::ops::Add for Value {
             }
             // Concatenate two lists
             (Value::List(lhs), Value::List(rhs)) => {
-                if lhs.value.ty() == rhs.value.ty() {
-                    let res = lhs.value.iter().chain(rhs.value.iter());
-                    Ok(Value::List(Refer::new(
-                        List::new(res.cloned().collect(), lhs.value.ty()),
-                        SrcRef::merge(lhs.src_ref, rhs.src_ref),
-                    )))
-                } else {
-                    Err(ValueError::CannotCombineVecOfDifferentType(
-                        lhs.value.ty(),
-                        rhs.value.ty(),
-                    ))
+                if lhs.ty() != rhs.ty() {
+                    return Err(ValueError::CannotCombineVecOfDifferentType(
+                        lhs.ty(),
+                        rhs.ty(),
+                    ));
                 }
+
+                Ok(Value::List(List::new(
+                    lhs.iter().chain(rhs.iter()).cloned().collect(),
+                    lhs.ty(),
+                    SrcRef::merge(lhs, rhs),
+                )))
             }
             // Add values of two tuples of the same length
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple(Refer::new(
-                    (lhs.value + rhs.value)?,
-                    SrcRef::merge(lhs.src_ref, rhs.src_ref),
-                )))
+                Ok(Value::UnnamedTuple((lhs + rhs)?))
             }
             _ => Err(ValueError::InvalidOperator('+')),
         }
@@ -273,22 +270,19 @@ impl std::ops::Sub for Value {
             (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(Value::Vec3(lhs - rhs)),
             // Remove an elements from list `rhs` from list `lhs`
             (Value::List(mut lhs), Value::List(rhs)) => {
-                if lhs.value.ty() == rhs.value.ty() {
+                if lhs.ty() == rhs.ty() {
                     lhs.retain(|x| !rhs.contains(x));
                     Ok(Value::List(lhs))
                 } else {
                     Err(ValueError::CannotCombineVecOfDifferentType(
-                        lhs.value.ty(),
-                        rhs.value.ty(),
+                        lhs.ty(),
+                        rhs.ty(),
                     ))
                 }
             }
             // Subtract values of two arrays of the same length
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple(Refer::new(
-                    (lhs.value - rhs.value)?,
-                    SrcRef::merge(lhs.src_ref, rhs.src_ref),
-                )))
+                Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
             _ => Err(ValueError::InvalidOperator('-')),
         }

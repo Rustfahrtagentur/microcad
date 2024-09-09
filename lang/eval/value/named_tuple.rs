@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*, r#type::*};
+use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
 #[cfg(test)]
 #[macro_export]
@@ -9,7 +9,19 @@ macro_rules! named_tuple {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct NamedTuple(std::collections::BTreeMap<Identifier, Value>);
+pub struct NamedTuple(Refer<std::collections::BTreeMap<Identifier, Value>>);
+
+impl NamedTuple {
+    pub fn new(map: std::collections::BTreeMap<Identifier, Value>, src_ref: SrcRef) -> Self {
+        Self(Refer::new(map, src_ref))
+    }
+}
+
+impl SrcReferrer for NamedTuple {
+    fn src_ref(&self) -> SrcRef {
+        self.0.src_ref()
+    }
+}
 
 impl std::ops::Deref for NamedTuple {
     type Target = std::collections::BTreeMap<Identifier, Value>;
@@ -22,18 +34,6 @@ impl std::ops::Deref for NamedTuple {
 impl std::ops::DerefMut for NamedTuple {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
-    }
-}
-
-impl From<std::collections::BTreeMap<Identifier, Value>> for NamedTuple {
-    fn from(value: std::collections::BTreeMap<Identifier, Value>) -> Self {
-        Self(value)
-    }
-}
-
-impl NamedTuple {
-    pub fn from_vec(vec: Vec<(Identifier, Value)>) -> Self {
-        Self(vec.into_iter().collect())
     }
 }
 

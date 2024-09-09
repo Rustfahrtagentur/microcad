@@ -1,9 +1,13 @@
-use crate::{eval::*, parse::*, r#type::*};
+use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct UnnamedTuple(ValueList);
 
 impl UnnamedTuple {
+    pub fn new(list: ValueList) -> Self {
+        Self(list)
+    }
+
     pub fn binary_op(
         self,
         rhs: Self,
@@ -17,12 +21,22 @@ impl UnnamedTuple {
                 rhs: rhs.0.len(),
             });
         }
-        let mut result = ValueList::new();
+        let mut result = Vec::new();
         for (l, r) in self.0.iter().zip(rhs.0.iter()) {
             let add_result = f(l.clone(), r.clone())?;
             result.push(add_result);
         }
-        Ok(UnnamedTuple(result))
+
+        Ok(UnnamedTuple(ValueList::new(
+            result,
+            SrcRef::merge(&self, &rhs),
+        )))
+    }
+}
+
+impl SrcReferrer for UnnamedTuple {
+    fn src_ref(&self) -> SrcRef {
+        self.0.src_ref()
     }
 }
 

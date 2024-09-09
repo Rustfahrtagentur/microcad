@@ -1,21 +1,30 @@
+use value::{SrcRef, SrcReferrer};
+
 use crate::{eval::*, map_key_type::*, r#type::*};
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Map(
-    pub std::collections::HashMap<MapKeyValue, Value>,
-    pub MapKeyType,
-    Type,
-);
+pub struct Map {
+    pub map: std::collections::HashMap<MapKeyValue, Value>,
+    pub key_type: MapKeyType,
+    pub ty: Type,
+    src_ref: SrcRef,
+}
+
+impl SrcReferrer for Map {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
+}
 
 impl From<Map> for std::collections::HashMap<MapKeyValue, Value> {
     fn from(val: Map) -> Self {
-        val.0
+        val.map
     }
 }
 
 impl Ty for Map {
     fn ty(&self) -> Type {
-        self.2.clone()
+        self.ty.clone()
     }
 }
 
@@ -25,7 +34,7 @@ impl std::fmt::Display for Map {
             f,
             "[{items}]",
             items = self
-                .0
+                .map
                 .iter()
                 .map(|(k, v)| format!("{k} => {v}"))
                 .collect::<Vec<_>>()

@@ -1,25 +1,35 @@
-use crate::{eval::*, r#type::*};
+use crate::{eval::*, r#type::*, src_ref::*};
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct List(ValueList, Type);
+pub struct List {
+    list: ValueList,
+    ty: Type,
+    src_ref: SrcRef,
+}
+
+impl List {
+    pub fn new(list: ValueList, ty: Type, src_ref: SrcRef) -> Self {
+        Self { list, ty, src_ref }
+    }
+}
+
+impl SrcReferrer for List {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
+}
 
 impl std::ops::Deref for List {
     type Target = ValueList;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.list
     }
 }
 
 impl std::ops::DerefMut for List {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl List {
-    pub fn new(list: ValueList, ty: Type) -> Self {
-        Self(list, ty)
+        &mut self.list
     }
 }
 
@@ -28,7 +38,7 @@ impl IntoIterator for List {
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter()
+        self.list.into_iter()
     }
 }
 
@@ -38,7 +48,7 @@ impl std::fmt::Display for List {
             f,
             "[{items}]",
             items = self
-                .0
+                .list
                 .iter()
                 .map(|v| v.to_string())
                 .collect::<Vec<_>>()
@@ -49,6 +59,6 @@ impl std::fmt::Display for List {
 
 impl Ty for List {
     fn ty(&self) -> Type {
-        self.1.clone()
+        self.ty.clone()
     }
 }

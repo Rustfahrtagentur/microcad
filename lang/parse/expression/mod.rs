@@ -177,30 +177,12 @@ impl Eval for Expression {
                     '*' => lhs * rhs,
                     '/' => lhs / rhs,
                     '^' => unimplemented!(), // lhs.pow(&rhs),
-                    '>' => Ok(Value::Bool(Refer::new(
-                        lhs > rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
-                    '<' => Ok(Value::Bool(Refer::new(
-                        lhs < rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
-                    '≤' => Ok(Value::Bool(Refer::new(
-                        lhs <= rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
-                    '≥' => Ok(Value::Bool(Refer::new(
-                        lhs >= rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
-                    '=' => Ok(Value::Bool(Refer::new(
-                        lhs == rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
-                    '≠' => Ok(Value::Bool(Refer::new(
-                        lhs != rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
+                    '>' => Ok(Value::Bool(Refer::new(lhs > rhs, SrcRef::merge(lhs, rhs)))),
+                    '<' => Ok(Value::Bool(Refer::new(lhs < rhs, SrcRef::merge(lhs, rhs)))),
+                    '≤' => Ok(Value::Bool(Refer::new(lhs <= rhs, SrcRef::merge(lhs, rhs)))),
+                    '≥' => Ok(Value::Bool(Refer::new(lhs >= rhs, SrcRef::merge(lhs, rhs)))),
+                    '=' => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
+                    '≠' => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
                     _ => unimplemented!(),
                 }
                 .map_err(EvalError::ValueError)

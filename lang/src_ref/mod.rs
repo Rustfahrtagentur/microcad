@@ -111,8 +111,8 @@ impl SrcRef {
     }
 
     /// merge two `SrcRef` into a single one by
-    pub fn merge(lhs: SrcRef, rhs: SrcRef) -> SrcRef {
-        match (lhs, rhs) {
+    pub fn merge(lhs: impl SrcReferrer, rhs: impl SrcReferrer) -> SrcRef {
+        match (lhs.src_ref(), rhs.src_ref()) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => SrcRef(Some(SrcRefInner {
                 range: {
                     // paranoia check

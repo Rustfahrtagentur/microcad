@@ -82,17 +82,14 @@ impl Eval for TupleExpression {
     fn eval(&self, context: &mut Context) -> crate::eval::Result<Value> {
         if !self.is_named {
             // Unnamed tuple
-            let mut value_list = ValueList::new();
+            let mut value_list = ValueList::new(Vec::new(), self.args.src_ref());
             for arg in self.args.iter() {
                 value_list.push(arg.value.eval(context)?);
             }
             if let Some(unit) = self.unit {
                 value_list.add_unit_to_unitless_types(unit)?;
             }
-            Ok(Value::UnnamedTuple(Refer::new(
-                value_list.into(),
-                self.args.src_ref(),
-            )))
+            Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
         } else {
             // Named tuple
             let mut map = std::collections::BTreeMap::new();
@@ -118,7 +115,7 @@ impl Eval for TupleExpression {
                     if let (Some(x), Some(y)) = (map.get(x), map.get(y)) {
                         return Ok(Value::Vec2(Refer::new(
                             Vec2::new(x.try_into()?, y.try_into()?),
-                            SrcRef::merge(x.src_ref(), y.src_ref()),
+                            SrcRef::merge(x, y),
                         )));
                     }
                 }
@@ -127,14 +124,14 @@ impl Eval for TupleExpression {
                     if let (Some(x), Some(y), Some(z)) = (map.get(x), map.get(y), map.get(z)) {
                         return Ok(Value::Vec3(Refer::new(
                             Vec3::new(x.try_into()?, y.try_into()?, z.try_into()?),
-                            SrcRef::merge(x.src_ref(), z.src_ref()),
+                            SrcRef::merge(x, z),
                         )));
                     }
                 }
                 _ => {}
             }
 
-            Ok(Value::NamedTuple(Refer::new(map.into(), self.src_ref())))
+            Ok(Value::NamedTuple(NamedTuple::new(map, self.src_ref())))
         }
     }
 }

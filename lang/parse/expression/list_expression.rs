@@ -69,7 +69,7 @@ impl Eval for ListExpression {
     type Output = Value;
 
     fn eval(&self, context: &mut Context) -> Result<Value> {
-        let mut value_list = ValueList::new();
+        let mut value_list = ValueList::new(Vec::new(), self.src_ref());
         for expr in self.list.clone() {
             value_list.push(expr.eval(context)?);
         }
@@ -78,8 +78,9 @@ impl Eval for ListExpression {
         }
 
         match value_list.types().common_type() {
-            Some(common_type) => Ok(Value::List(Refer::new(
-                List::new(value_list, common_type),
+            Some(common_type) => Ok(Value::List(List::new(
+                value_list,
+                common_type,
                 self.src_ref(),
             ))),
             None => Err(EvalError::ListElementsDifferentTypes),
