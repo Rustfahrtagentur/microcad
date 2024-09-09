@@ -1,4 +1,5 @@
 //! evaluation of parsed content
+#![warn(missing_docs)]
 
 mod builtin_function;
 mod builtin_module;

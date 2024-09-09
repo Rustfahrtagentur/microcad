@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 fn main() {
     microcad_pest_test::generate(
         "microcad_lang::parser::Parser",

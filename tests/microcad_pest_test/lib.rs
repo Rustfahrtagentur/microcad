@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 #[derive(Debug, Clone, PartialEq)]
 enum PestResult {
     Ok(String),

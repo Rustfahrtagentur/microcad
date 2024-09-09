@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 extern crate proc_macro;
 extern crate quote;
 extern crate syn;

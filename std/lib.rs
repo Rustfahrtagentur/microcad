@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 mod algorithm;
 mod context_builder;
 mod export;

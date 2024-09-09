@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 pub mod ply;
 pub mod stl;
 pub mod svg;
