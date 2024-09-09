@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 #[cfg(feature = "geo3d")]
 pub mod mesh;
 

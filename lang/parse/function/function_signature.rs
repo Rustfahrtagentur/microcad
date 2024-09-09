@@ -24,7 +24,7 @@ impl FunctionSignature {
     pub fn new(parameters: ParameterList, return_type: Option<Type>) -> Self {
         Self {
             parameters,
-            return_type: return_type.map(|r| TypeAnnotation(r, SrcRef(None))),
+            return_type: return_type.map(|r| TypeAnnotation(Refer::none(r))),
             src_ref: SrcRef(None),
         }
     }

@@ -63,10 +63,11 @@ impl Eval for CallArgument {
     type Output = CallArgumentValue;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        Ok(CallArgumentValue {
-            name: self.id(),
-            value: self.value.eval(context)?,
-        })
+        Ok(CallArgumentValue::new(
+            self.id(),
+            self.value.eval(context)?,
+            self.src_ref(),
+        ))
     }
 }
 

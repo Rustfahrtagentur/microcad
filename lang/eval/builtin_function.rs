@@ -47,3 +47,53 @@ impl BuiltinFunction {
         }
     }
 }
+
+/// @todo: Check if is possible to rewrite this macro with arbitrary number of arguments
+#[macro_export]
+macro_rules! builtin_function {
+    ($f:ident($name:ident) for $($ty:tt),+) => { BuiltinFunction::new(
+        stringify!($f).into(),
+        microcad_lang::function_signature!(microcad_lang::parameter_list![microcad_lang::parameter!($name)]),
+        &|args, _| {
+        match args.get(stringify!($name)).unwrap() {
+            $(Value::$ty($name) => Ok(Some(Value::$ty(Refer::none($name.$f())))),)*
+            Value::List(v) => {
+                let mut result = ValueList::new(Vec::new(),SrcRef(None));
+                for x in v.iter() {
+                    match x {
+                        $(Value::$ty(x) => result.push(Value::$ty(Refer::none(x.$f()))),)*
+                        _ => return Err(EvalError::InvalidArgumentType(x.ty())),
+                    }
+                }
+                Ok(Some(Value::List(List::new(result, v.ty(),SrcRef(None)))))
+            }
+            v => Err(EvalError::InvalidArgumentType(v.ty())),
+        }
+    })
+    };
+    ($f:ident($name:ident) $inner:expr) => {
+        BuiltinFunction::new(stringify!($f).into(),
+        microcad_lang::function_signature!(microcad_lang::parameter_list![microcad_lang::parameter!($name)]),
+        &|args, _| {
+            let l = |$name| Ok(Some($inner?));
+            l(args.get(stringify!($name)).unwrap().clone())
+        })
+    };
+    ($f:ident($x:ident, $y:ident) $inner:expr) => {
+        BuiltinFunction::new(
+            stringify!($f).into(),
+            microcad_lang::function_signature!(microcad_lang::parameter_list![
+                microcad_lang::parameter!($x),
+                microcad_lang::parameter!($y)
+            ]),
+            &|args, _| {
+                let l = |$x, $y| Ok(Some($inner?));
+                let (x, y) = (
+                    args.get(stringify!($x)).unwrap().clone(),
+                    args.get(stringify!($y)).unwrap().clone(),
+                );
+                l(x.clone(), y.clone())
+            },
+        )
+    };
+}

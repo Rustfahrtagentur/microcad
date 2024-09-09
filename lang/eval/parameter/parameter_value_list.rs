@@ -1,9 +1,10 @@
-use crate::eval::*;
+use crate::{eval::*, src_ref::*};
 
 #[derive(Clone, Debug, Default)]
 pub struct ParameterValueList {
     parameters: Vec<ParameterValue>,
     by_name: std::collections::HashMap<Id, usize>,
+    src_ref: SrcRef,
 }
 
 impl ParameterValueList {
@@ -14,8 +15,9 @@ impl ParameterValueList {
         }
 
         Self {
-            parameters,
             by_name,
+            src_ref: SrcRef::from_vec(&parameters),
+            parameters,
         }
     }
 
@@ -47,6 +49,12 @@ impl ParameterValueList {
 
     pub fn is_empty(&self) -> bool {
         self.by_name.is_empty()
+    }
+}
+
+impl SrcReferrer for ParameterValueList {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
     }
 }
 

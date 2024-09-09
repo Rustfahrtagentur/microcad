@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 //! Generate tests out of *Markdown* files which include µCAD code
 //!
 //! Path will be scanned recursively for *Markdown* files (`*.md`).

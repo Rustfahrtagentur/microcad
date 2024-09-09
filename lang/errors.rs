@@ -54,6 +54,9 @@ pub enum ParseError {
 
     #[error("Duplicate identifier: {0}")]
     DuplicateIdentifier(Identifier),
+
+    #[error("Missing format expression")]
+    MissingFormatExpression,
 }
 
 pub type ParseResult<T> = Result<T, ParseError>;

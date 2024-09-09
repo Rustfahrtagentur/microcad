@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 extern crate clap;
 
 extern crate microcad_lang;
@@ -17,7 +19,9 @@ fn main() {
     match cli {
         Cli { input: Some(input) } => {
             let source_file = SourceFile::load(input).unwrap();
-            let mut context =  microcad_std::ContextBuilder::new(source_file).with_std().build();
+            let mut context = microcad_std::ContextBuilder::new(source_file)
+                .with_std()
+                .build();
 
             let node = context.eval().unwrap();
             let mut w = std::io::stdout();

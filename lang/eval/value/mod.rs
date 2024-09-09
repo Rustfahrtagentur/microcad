@@ -1,4 +1,3 @@
-mod error;
 mod list;
 mod map;
 mod map_key_value;
@@ -6,7 +5,6 @@ mod named_tuple;
 mod unnamed_tuple;
 mod value_list;
 
-pub use error::ValueError;
 pub use list::*;
 pub use map::*;
 pub use map_key_value::*;
@@ -44,62 +42,18 @@ pub enum Value {
     /// Color value
     Color(Refer<Color>),
     // List
-    List(Refer<List>),
+    List(List),
     // Hash Map
-    Map(Refer<Map>),
+    Map(Map),
     /// Tuple of named items
-    NamedTuple(Refer<NamedTuple>),
+    NamedTuple(NamedTuple),
     /// Tuple of unnamed items
-    UnnamedTuple(Refer<UnnamedTuple>),
+    UnnamedTuple(UnnamedTuple),
     /// A node in the render tree
     Node(Node),
 }
 
 impl Value {
-    pub fn less_than(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
-        match (self, rhs) {
-            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs < rhs),
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs < rhs),
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(lhs < rhs),
-            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.magnitude2() < rhs.magnitude2()),
-            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.magnitude2() < rhs.magnitude2()),
-            (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs < rhs),
-            _ => Err(ValueError::InvalidOperator('<')),
-        }
-    }
-
-    pub fn greater_than(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
-        match (self, rhs) {
-            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs > rhs),
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs > rhs),
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(lhs > rhs),
-            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.magnitude2() > rhs.magnitude2()),
-            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.magnitude2() > rhs.magnitude2()),
-            (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs > rhs),
-            _ => Err(ValueError::InvalidOperator('>')),
-        }
-    }
-
-    pub fn less_than_or_equal(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
-        Ok(self.less_than(rhs)? || self.eq(rhs))
-    }
-
-    pub fn greater_than_or_equal(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
-        Ok(self.greater_than(rhs)? || self.eq(rhs))
-    }
-
-    pub fn neg(&self) -> ValueResult {
-        match self {
-            Value::Integer(n) => Ok(Value::Integer(-n.clone())),
-            Value::Scalar(n) => Ok(Value::Scalar(-n.clone())),
-            Value::Length(n) => Ok(Value::Length(-n.clone())),
-            Value::Vec2(v) => Ok(Value::Vec2(-v.clone())),
-            Value::Vec3(v) => Ok(Value::Vec3(-v.clone())),
-            Value::Angle(n) => Ok(Value::Angle(-n.clone())),
-            _ => Err(ValueError::InvalidOperator('-')),
-        }
-    }
-
     /// Add a unit to a scalar value
     pub fn add_unit_to_unitless_types(
         &mut self,
@@ -127,20 +81,20 @@ impl Value {
 impl SrcReferrer for Value {
     fn src_ref(&self) -> SrcRef {
         match self {
-            Value::Integer(i) => i.src_ref.clone(),
-            Value::Scalar(s) => s.src_ref.clone(),
-            Value::Length(l) => l.src_ref.clone(),
-            Value::Vec2(v) => v.src_ref.clone(),
-            Value::Vec3(v) => v.src_ref.clone(),
-            Value::Vec4(v) => v.src_ref.clone(),
-            Value::Angle(a) => a.src_ref.clone(),
-            Value::Bool(b) => b.src_ref.clone(),
-            Value::String(s) => s.src_ref.clone(),
-            Value::Color(c) => c.src_ref.clone(),
-            Value::List(list) => list.src_ref.clone(),
-            Value::Map(map) => map.src_ref.clone(),
-            Value::NamedTuple(named_tuple) => named_tuple.src_ref.clone(),
-            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.src_ref.clone(),
+            Value::Integer(i) => i.src_ref(),
+            Value::Scalar(s) => s.src_ref(),
+            Value::Length(l) => l.src_ref(),
+            Value::Vec2(v) => v.src_ref(),
+            Value::Vec3(v) => v.src_ref(),
+            Value::Vec4(v) => v.src_ref(),
+            Value::Angle(a) => a.src_ref(),
+            Value::Bool(b) => b.src_ref(),
+            Value::String(s) => s.src_ref(),
+            Value::Color(c) => c.src_ref(),
+            Value::List(list) => list.src_ref(),
+            Value::Map(map) => map.src_ref(),
+            Value::NamedTuple(named_tuple) => named_tuple.src_ref(),
+            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.src_ref(),
             Value::Node(_) => SrcRef(None),
         }
     }
@@ -182,6 +136,22 @@ impl Ty for Value {
     }
 }
 
+impl std::ops::Neg for Value {
+    type Output = ValueResult;
+
+    fn neg(self) -> Self::Output {
+        match self {
+            Value::Integer(n) => Ok(Value::Integer(-n.clone())),
+            Value::Scalar(n) => Ok(Value::Scalar(-n.clone())),
+            Value::Length(n) => Ok(Value::Length(-n.clone())),
+            Value::Vec2(v) => Ok(Value::Vec2(-v.clone())),
+            Value::Vec3(v) => Ok(Value::Vec3(-v.clone())),
+            Value::Angle(n) => Ok(Value::Angle(-n.clone())),
+            _ => Err(ValueError::InvalidOperator('-')),
+        }
+    }
+}
+
 /// Rules for operator +
 impl std::ops::Add for Value {
     type Output = ValueResult;
@@ -218,25 +188,22 @@ impl std::ops::Add for Value {
             }
             // Concatenate two lists
             (Value::List(lhs), Value::List(rhs)) => {
-                if lhs.value.ty() == rhs.value.ty() {
-                    let res = lhs.value.iter().chain(rhs.value.iter());
-                    Ok(Value::List(Refer::new(
-                        List::new(res.cloned().collect(), lhs.value.ty()),
-                        SrcRef::merge(lhs.src_ref, rhs.src_ref),
-                    )))
-                } else {
-                    Err(ValueError::CannotCombineVecOfDifferentType(
-                        lhs.value.ty(),
-                        rhs.value.ty(),
-                    ))
+                if lhs.ty() != rhs.ty() {
+                    return Err(ValueError::CannotCombineVecOfDifferentType(
+                        lhs.ty(),
+                        rhs.ty(),
+                    ));
                 }
+
+                Ok(Value::List(List::new(
+                    lhs.iter().chain(rhs.iter()).cloned().collect(),
+                    lhs.ty(),
+                    SrcRef::merge(lhs, rhs),
+                )))
             }
             // Add values of two tuples of the same length
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple(Refer::new(
-                    (lhs.value + rhs.value)?,
-                    SrcRef::merge(lhs.src_ref, rhs.src_ref),
-                )))
+                Ok(Value::UnnamedTuple((lhs + rhs)?))
             }
             _ => Err(ValueError::InvalidOperator('+')),
         }
@@ -275,22 +242,19 @@ impl std::ops::Sub for Value {
             (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(Value::Vec3(lhs - rhs)),
             // Remove an elements from list `rhs` from list `lhs`
             (Value::List(mut lhs), Value::List(rhs)) => {
-                if lhs.value.ty() == rhs.value.ty() {
+                if lhs.ty() == rhs.ty() {
                     lhs.retain(|x| !rhs.contains(x));
                     Ok(Value::List(lhs))
                 } else {
                     Err(ValueError::CannotCombineVecOfDifferentType(
-                        lhs.value.ty(),
-                        rhs.value.ty(),
+                        lhs.ty(),
+                        rhs.ty(),
                     ))
                 }
             }
             // Subtract values of two arrays of the same length
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple(Refer::new(
-                    (lhs.value - rhs.value)?,
-                    SrcRef::merge(lhs.src_ref, rhs.src_ref),
-                )))
+                Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
             _ => Err(ValueError::InvalidOperator('-')),
         }
@@ -378,20 +342,20 @@ impl std::ops::Div for Value {
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Value::Integer(n) => write!(f, "{}", n),
-            Value::Scalar(n) => write!(f, "{}", n),
-            Value::Length(n) | Value::Angle(n) => write!(f, "{}{}", n, self.ty().default_unit()),
+            Value::Integer(n) => write!(f, "{n}"),
+            Value::Scalar(n) => write!(f, "{n}"),
+            Value::Length(n) | Value::Angle(n) => write!(f, "{n}{}", self.ty().default_unit()),
             Value::Vec2(v) => write!(f, "({}, {})", v.x, v.y),
             Value::Vec3(v) => write!(f, "({}, {}, {})", v.x, v.y, v.z),
             Value::Vec4(v) => write!(f, "({}, {}, {}, {})", v.x, v.y, v.z, v.w),
-            Value::Bool(b) => write!(f, "{}", b),
-            Value::String(s) => write!(f, "{}", s),
-            Value::Color(c) => write!(f, "{}", c),
-            Value::List(l) => write!(f, "{}", l),
-            Value::Map(m) => write!(f, "{}", m),
-            Value::NamedTuple(t) => write!(f, "{}", t),
-            Value::UnnamedTuple(t) => write!(f, "{}", t),
-            Value::Node(n) => write!(f, "{:?}", n),
+            Value::Bool(b) => write!(f, "{b}"),
+            Value::String(s) => write!(f, "{s}"),
+            Value::Color(c) => write!(f, "{c}"),
+            Value::List(l) => write!(f, "{l}"),
+            Value::Map(m) => write!(f, "{m}"),
+            Value::NamedTuple(t) => write!(f, "{t}"),
+            Value::UnnamedTuple(t) => write!(f, "{t}"),
+            Value::Node(n) => write!(f, "{n:?}"),
         }
     }
 }
@@ -430,3 +394,65 @@ impl_try_from!(Vec4 => Vec4);
 impl_try_from!(Bool => bool);
 impl_try_from!(String => String);
 impl_try_from!(Color => Color);
+
+#[cfg(test)]
+fn integer(value: i64, src_ref: &SrcRef) -> Value {
+    Value::Integer(Refer::new(value, src_ref.clone()))
+}
+
+#[cfg(test)]
+fn scalar(value: f64, src_ref: &SrcRef) -> Value {
+    Value::Scalar(Refer::new(value, src_ref.clone()))
+}
+
+#[cfg(test)]
+fn check(result: ValueResult, value: Value) {
+    let result = result.expect("error result");
+    assert_eq!(result, value);
+    // SrcRef cannot be compared with PartialEq
+    assert_eq!(result.src_ref().to_string(), value.src_ref().to_string());
+}
+
+#[test]
+fn test_value_integer() {
+    let u = || integer(2, &SrcRef::new(3..4, 5, 6));
+    let v = || integer(5, &SrcRef::new(6..7, 8, 9));
+    let w = || scalar(5.0, &SrcRef::new(6..7, 8, 9));
+
+    let r = SrcRef::new(3..7, 5, 6);
+
+    // symmetric operations
+    check(u() + v(), integer(2 + 5, &r));
+    check(u() - v(), integer(2 - 5, &r));
+    check(u() * v(), integer(2 * 5, &r));
+    check(u() / v(), scalar(2.0 / 5.0, &r));
+    check(-u(), integer(-2, &r));
+
+    // asymmetric operations
+    check(u() + w(), integer(2 + 5, &r));
+    check(u() - w(), integer(2 - 5, &r));
+    check(u() * w(), integer(2 * 5, &r));
+    check(u() / w(), scalar(2.0 / 5.0, &r));
+}
+
+#[test]
+fn test_value_scalar() {
+    let u = || scalar(2.0, &SrcRef::new(3..4, 5, 6));
+    let v = || scalar(5.0, &SrcRef::new(6..7, 8, 9));
+    let w = || integer(5, &SrcRef::new(6..7, 8, 9));
+
+    let r = SrcRef::new(3..7, 5, 6);
+
+    // symmetric operations
+    check(u() + v(), scalar(2.0 + 5.0, &r));
+    check(u() - v(), scalar(2.0 - 5.0, &r));
+    check(u() * v(), scalar(2.0 * 5.0, &r));
+    check(u() / v(), scalar(2.0 / 5.0, &r));
+    check(-u(), scalar(-2.0, &r));
+
+    // asymmetric operations
+    check(u() + w(), scalar(2.0 + 5.0, &r));
+    check(u() - w(), scalar(2.0 - 5.0, &r));
+    check(u() * w(), scalar(2.0 * 5.0, &r));
+    check(u() / w(), scalar(2.0 / 5.0, &r));
+}

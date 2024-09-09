@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 use anyhow::Result;
 
 pub type Child<T> = std::rc::Rc<std::cell::RefCell<WalkPath<T>>>;
@@ -24,12 +26,12 @@ impl<T> WalkPath<T> {
 
     /// recursive directory scanner
     /// returns `false` if no leafs were generated
-    /// 
+    ///
     /// # Arguments
     /// - `path`: directory to scan
     /// - `extension`: file extension to scan for
     /// - `f`: function to call for each file found
-    /// 
+    ///
     /// # Returns
     /// `true` if any leafs were generated
     pub fn scan(

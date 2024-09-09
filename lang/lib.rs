@@ -1,5 +1,7 @@
 //! µCAD source code parser
 
+#![warn(missing_docs)]
+
 pub mod diagnostics;
 pub mod errors;
 pub mod eval;

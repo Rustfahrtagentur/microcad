@@ -12,7 +12,7 @@ use crate::{errors::*, eval::*, parser::*, src_ref::*};
 #[derive(Clone, Debug)]
 enum FormatStringInner {
     /// String literal
-    String(String, SrcRef),
+    String(Refer<String>),
     /// Format expression
     FormatExpression(FormatExpression),
 }
@@ -20,7 +20,7 @@ enum FormatStringInner {
 impl SrcReferrer for FormatStringInner {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         match self {
-            FormatStringInner::String(_, r) => r.clone(),
+            FormatStringInner::String(s) => s.src_ref(),
             FormatStringInner::FormatExpression(e) => e.src_ref(),
         }
     }
@@ -41,7 +41,7 @@ impl std::str::FromStr for FormatString {
 impl FormatString {
     /// Insert a string to this module
     pub fn push_string(&mut self, s: String) {
-        self.0.push(FormatStringInner::String(s, SrcRef(None)));
+        self.0.push(FormatStringInner::String(Refer::none(s)));
     }
 
     /// Insert a format expression to this module
@@ -65,7 +65,7 @@ impl std::fmt::Display for FormatString {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         for elem in &self.0 {
             match elem {
-                FormatStringInner::String(s, _) => write!(f, "{}", s)?,
+                FormatStringInner::String(s) => write!(f, "{}", s.value)?,
                 FormatStringInner::FormatExpression(expr) => write!(f, "{}", expr)?,
             }
         }
@@ -80,7 +80,7 @@ impl Eval for FormatString {
         let mut result = String::new();
         for elem in &self.0 {
             match elem {
-                FormatStringInner::String(s, _) => result += s,
+                FormatStringInner::String(s) => result += &s.value,
                 FormatStringInner::FormatExpression(expr) => match expr.eval(context) {
                     Ok(Value::String(s)) => result += &s,
                     Err(e) => return Err(e),
@@ -120,10 +120,7 @@ fn simple_string() {
     let mut context = Context::default();
     let value = s.eval(&mut context).unwrap();
 
-    assert_eq!(
-        value,
-        Value::String(Refer::new("Hello, World!".to_string(), SrcRef(None)))
-    );
+    assert_eq!(value, Value::String(Refer::none("Hello, World!".into())));
 }
 
 #[test]
@@ -139,8 +136,5 @@ fn format_string() {
     let mut context = Context::default();
     let value = s.eval(&mut context).unwrap();
 
-    assert_eq!(
-        value,
-        Value::String(Refer::new("A6B".to_string(), SrcRef(None)))
-    );
+    assert_eq!(value, Value::String(Refer::none("A6B".into())));
 }

@@ -1,7 +1,7 @@
-use crate::{eval::*, ord_map::OrdMap};
+use crate::{eval::*, ord_map::*, src_ref::*};
 
 #[derive(Clone, Debug, Default)]
-pub struct CallArgumentValueList(OrdMap<Id, CallArgumentValue>);
+pub struct CallArgumentValueList(Refer<OrdMap<Id, CallArgumentValue>>);
 
 impl std::ops::Deref for CallArgumentValueList {
     type Target = OrdMap<Id, CallArgumentValue>;
@@ -17,9 +17,11 @@ impl std::ops::DerefMut for CallArgumentValueList {
     }
 }
 
+#[cfg(test)]
 impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
     fn from(value: Vec<CallArgumentValue>) -> Self {
-        Self(OrdMap::<Id, CallArgumentValue>::from(value))
+        let src_ref = SrcRef::from_vec(&value);
+        Self(Refer::new(value.into(), src_ref))
     }
 }
 

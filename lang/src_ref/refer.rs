@@ -1,4 +1,6 @@
 use super::{SrcRef, SrcReferrer};
+
+/// Packs any value together with a source reference
 #[derive(Clone, Default, Ord, Debug, PartialEq, PartialOrd)]
 pub struct Refer<T> {
     pub value: T,

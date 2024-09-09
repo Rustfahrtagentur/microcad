@@ -136,8 +136,8 @@ fn context_basic() {
 
     let mut context = Context::default();
 
-    context.add_value("a".into(), Value::Integer(Refer::new(1, SrcRef(None))));
-    context.add_value("b".into(), Value::Integer(Refer::new(2, SrcRef(None))));
+    context.add_value("a".into(), Value::Integer(Refer::none(1)));
+    context.add_value("b".into(), Value::Integer(Refer::none(2)));
 
     assert_eq!(context.find_symbols(&"a".into())[0].id().unwrap(), "a");
     assert_eq!(context.find_symbols(&"b".into())[0].id().unwrap(), "b");

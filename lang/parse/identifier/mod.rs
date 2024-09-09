@@ -31,7 +31,7 @@ impl Sym for Identifier {
 
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {
-        Self(Refer::new(value.into(), SrcRef(None)))
+        Self(Refer::none(value.into()))
     }
 }
 

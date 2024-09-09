@@ -112,25 +112,25 @@ impl SrcReferrer for Expression {
 impl std::fmt::Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Literal(literal) => write!(f, "{}", literal),
-            Self::FormatString(format_string) => write!(f, "{}", format_string),
-            Self::ListExpression(list_expression) => write!(f, "{}", list_expression),
-            Self::TupleExpression(tuple_expression) => write!(f, "{}", tuple_expression),
+            Self::Literal(literal) => write!(f, "{literal}"),
+            Self::FormatString(format_string) => write!(f, "{format_string}"),
+            Self::ListExpression(list_expression) => write!(f, "{list_expression}"),
+            Self::TupleExpression(tuple_expression) => write!(f, "{tuple_expression}"),
             Self::BinaryOp {
                 lhs,
                 op,
                 rhs,
                 src_ref: _,
-            } => write!(f, "({} {} {})", lhs, op, rhs),
+            } => write!(f, "({lhs} {op} {rhs})"),
             Self::UnaryOp {
                 op,
                 rhs,
                 src_ref: _,
-            } => write!(f, "({}{})", op, rhs),
-            Self::ListElementAccess(lhs, rhs, _) => write!(f, "{}[{}]", lhs, rhs),
-            Self::NamedTupleElementAccess(lhs, rhs, _) => write!(f, "{}.{}", lhs, rhs),
-            Self::UnnamedTupleElementAccess(lhs, rhs, _) => write!(f, "{}.{}", lhs, rhs),
-            Self::MethodCall(lhs, method_call, _) => write!(f, "{}.{}", lhs, method_call),
+            } => write!(f, "({op}{rhs})"),
+            Self::ListElementAccess(lhs, rhs, _) => write!(f, "{lhs}[{rhs}]"),
+            Self::NamedTupleElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
+            Self::UnnamedTupleElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
+            Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs}.{method_call}"),
             Self::Nested(nested) => write!(f, "{nested}"),
             _ => unimplemented!(),
         }
@@ -177,30 +177,12 @@ impl Eval for Expression {
                     '*' => lhs * rhs,
                     '/' => lhs / rhs,
                     '^' => unimplemented!(), // lhs.pow(&rhs),
-                    '>' => Ok(Value::Bool(Refer::new(
-                        lhs > rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
-                    '<' => Ok(Value::Bool(Refer::new(
-                        lhs < rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
-                    '≤' => Ok(Value::Bool(Refer::new(
-                        lhs <= rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
-                    '≥' => Ok(Value::Bool(Refer::new(
-                        lhs >= rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
-                    '=' => Ok(Value::Bool(Refer::new(
-                        lhs == rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
-                    '≠' => Ok(Value::Bool(Refer::new(
-                        lhs != rhs,
-                        SrcRef::merge(lhs.src_ref(), rhs.src_ref()),
-                    ))),
+                    '>' => Ok(Value::Bool(Refer::new(lhs > rhs, SrcRef::merge(lhs, rhs)))),
+                    '<' => Ok(Value::Bool(Refer::new(lhs < rhs, SrcRef::merge(lhs, rhs)))),
+                    '≤' => Ok(Value::Bool(Refer::new(lhs <= rhs, SrcRef::merge(lhs, rhs)))),
+                    '≥' => Ok(Value::Bool(Refer::new(lhs >= rhs, SrcRef::merge(lhs, rhs)))),
+                    '=' => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
+                    '≠' => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
                     _ => unimplemented!(),
                 }
                 .map_err(EvalError::ValueError)
@@ -211,9 +193,8 @@ impl Eval for Expression {
                 src_ref: _,
             } => {
                 let rhs = rhs.eval(context)?;
-
                 match op {
-                    '-' => rhs.neg(),
+                    '-' => -rhs.clone(),
                     _ => unimplemented!(),
                 }
                 .map_err(EvalError::ValueError)

@@ -1,11 +1,11 @@
-use crate::eval::*;
+use crate::{eval::*, src_ref::*};
 
 #[derive(Clone, Debug, Default)]
-pub struct ArgumentMap(std::collections::HashMap<Id, Value>);
+pub struct ArgumentMap(Refer<std::collections::HashMap<Id, Value>>);
 
 impl ArgumentMap {
     pub fn new() -> Self {
-        Self(std::collections::HashMap::new())
+        Self(Refer::new(std::collections::HashMap::new(), SrcRef(None)))
     }
 
     pub fn get_value<'a, T>(&'a self, name: &str) -> T
@@ -13,11 +13,17 @@ impl ArgumentMap {
         T: std::convert::TryFrom<&'a Value>,
         T::Error: std::fmt::Debug,
     {
-        if let Some(value) = self.0.get(name) {
-            value.try_into().expect("cannot convert argument value")
-        } else {
-            unreachable!()
-        }
+        self.0
+            .get(name)
+            .expect("no name found")
+            .try_into()
+            .expect("cannot convert argument value")
+    }
+}
+
+impl SrcReferrer for ArgumentMap {
+    fn src_ref(&self) -> SrcRef {
+        self.0.src_ref()
     }
 }
 
@@ -33,16 +39,4 @@ impl std::ops::DerefMut for ArgumentMap {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
-}
-
-#[macro_export]
-macro_rules! args {
-    ($($name:ident: $ty:ident = $value:expr),*) => {&{
-        let mut map = ArgumentMap::new();
-        $(map.insert(stringify!($name).into(), microcad_lang::eval::Value::$ty(microcad_lang::src_ref::Refer::none($value)));)*
-        map
-    }};
-    () => {
-
-    };
 }
