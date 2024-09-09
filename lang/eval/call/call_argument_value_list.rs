@@ -20,10 +20,8 @@ impl std::ops::DerefMut for CallArgumentValueList {
 #[cfg(test)]
 impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
     fn from(value: Vec<CallArgumentValue>) -> Self {
-        Self(Refer::new(
-            OrdMap::<Id, CallArgumentValue>::from(value),
-            SrcRef(None),
-        ))
+        let src_ref = SrcRef::from_vec(&value);
+        Self(Refer::new(value.into(), src_ref))
     }
 }
 
