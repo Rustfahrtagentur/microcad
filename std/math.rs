@@ -1,14 +1,14 @@
-use crate::{arg_1, arg_2, NamespaceBuilder};
+use crate::NamespaceBuilder;
 use cgmath::InnerSpace;
 use microcad_core::Scalar;
-use microcad_lang::{eval::*, parse::*, src_ref::*};
+use microcad_lang::{builtin_function, eval::*, parse::*, src_ref::*};
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     NamespaceBuilder::new("math")
         // abs(x): Absolute value of x
-        .add_builtin_function(arg_1!(abs(x) for Scalar, Length, Angle, Integer))
+        .add_builtin_function(builtin_function!(abs(x) for Scalar, Length, Angle, Integer))
         // sign(x): Sign of x
-        .add_builtin_function(arg_1!(sign(x) {
+        .add_builtin_function(builtin_function!(sign(x) {
             match x {
                 Value::Scalar(x) | Value::Length(x) | Value::Angle(x) => Ok(Value::Scalar(x.map(|x|x.signum()))),
                 Value::Integer(x) => Ok(Value::Integer(x.map(|x|x.signum()))),
@@ -16,13 +16,13 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             }
         }))
         // floor(x): Floor of x
-        .add_builtin_function(arg_1!(floor(x) for Scalar, Length, Angle))
+        .add_builtin_function(builtin_function!(floor(x) for Scalar, Length, Angle))
         // ceil(x): Ceiling of x
-        .add_builtin_function(arg_1!(ceil(x) for Scalar, Length, Angle))
+        .add_builtin_function(builtin_function!(ceil(x) for Scalar, Length, Angle))
         // round(x): Round of x
-        .add_builtin_function(arg_1!(round(x) for Scalar, Length, Angle))
+        .add_builtin_function(builtin_function!(round(x) for Scalar, Length, Angle))
         // to_int(x): Convert x to integer
-        .add_builtin_function(arg_1!(to_int(x) {
+        .add_builtin_function(builtin_function!(to_int(x) {
             match x {
                 Value::Scalar(x) | Value::Length(x) | Value::Angle(x) => Ok(Value::Integer(x.map(|x|x as i64))),
                 Value::Integer(x) => Ok(Value::Integer(x)),
@@ -30,7 +30,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             }
         }))
         // to_scalar(x): Convert x to scalar
-        .add_builtin_function(arg_1!(to_scalar(x) {
+        .add_builtin_function(builtin_function!(to_scalar(x) {
             match x {
                 Value::Scalar(x) => Ok(Value::Scalar(x)),
                 Value::Length(x) => Ok(Value::Scalar(x)),
@@ -40,7 +40,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             }
         }))
         // min(x,y): Minimum of x and y
-        .add_builtin_function(arg_2!(min(x, y) {
+        .add_builtin_function(builtin_function!(min(x, y) {
             match (x, y) {
                 (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(Refer::merge(x,y,|x,y| x.min(y)))),
                 (Value::Length(x), Value::Length(y)) => Ok(Value::Length(Refer::merge(x,y,|x,y| x.min(y)))),
@@ -50,7 +50,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             }
         }))
         // max(x,y): Maximum of x and y
-        .add_builtin_function(arg_2!(max(x, y) {
+        .add_builtin_function(builtin_function!(max(x, y) {
             match (x, y) {
                 (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(Refer::merge(x,y,|x,y| x.max(y)))),
                 (Value::Length(x), Value::Length(y)) => Ok(Value::Length(Refer::merge(x,y,|x,y| x.max(y)))),
@@ -60,44 +60,44 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             }
         }))
         // sin(x): Sine of x
-        .add_builtin_function(arg_1!(sin(x) for Scalar, Angle))
+        .add_builtin_function(builtin_function!(sin(x) for Scalar, Angle))
         // cos(x): Cosine of x
-        .add_builtin_function(arg_1!(cos(x) for Scalar, Angle))
+        .add_builtin_function(builtin_function!(cos(x) for Scalar, Angle))
         // tan(x): Tangent of x
-        .add_builtin_function(arg_1!(tan(x) for Scalar, Angle))
+        .add_builtin_function(builtin_function!(tan(x) for Scalar, Angle))
         // asin(x): Arcsine of x
-        .add_builtin_function(arg_1!(asin(x) {
+        .add_builtin_function(builtin_function!(asin(x) {
             match x {
                 Value::Scalar(x) => Ok(Value::Angle(Refer::map(x,|x| x.asin()))),
                 _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // acos(x): Arccosine of x
-        .add_builtin_function(arg_1!(acos(x) {
+        .add_builtin_function(builtin_function!(acos(x) {
             match x {
                 Value::Scalar(x) => Ok(Value::Angle(Refer::map(x,|x| x.acos()))),
                 _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // atan(x): Arctangent of x
-        .add_builtin_function(arg_1!(atan(x) {
+        .add_builtin_function(builtin_function!(atan(x) {
             match x {
                 Value::Scalar(x) => Ok(Value::Angle(Refer::map(x,|x| x.atan()))),
                 _ => Err(EvalError::InvalidArgumentType(x.ty())),
             }
         }))
         // sqrt(x): Square root of x
-        .add_builtin_function(arg_1!(sqrt(x) for Scalar))
+        .add_builtin_function(builtin_function!(sqrt(x) for Scalar))
         // ln(x): Natural logarithm of x
-        .add_builtin_function(arg_1!(ln(x) for Scalar))
+        .add_builtin_function(builtin_function!(ln(x) for Scalar))
         // log2(x): Base 2 logarithm of x
-        .add_builtin_function(arg_1!(log2(x) for Scalar))
+        .add_builtin_function(builtin_function!(log2(x) for Scalar))
         // log10(x): Base 10 logarithm of x
-        .add_builtin_function(arg_1!(log10(x) for Scalar))
+        .add_builtin_function(builtin_function!(log10(x) for Scalar))
         // exp(x): Exponential of x
-        .add_builtin_function(arg_1!(exp(x) for Scalar))
+        .add_builtin_function(builtin_function!(exp(x) for Scalar))
         // pow(x,y): x raised to the power of y
-        .add_builtin_function(arg_2!(pow(x, y) {
+        .add_builtin_function(builtin_function!(pow(x, y) {
             match (x, y) {
                 (Value::Scalar(x), Value::Scalar(y)) => Ok(Value::Scalar(Refer::merge(x,y,|x,y| x.powf(y)))),
                 (Value::Length(x), Value::Scalar(y)) => Ok(Value::Length(Refer::merge(x,y,|x,y| x.powf(y)))),
@@ -110,7 +110,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             }
         }))
         // length(x): Length of x
-        .add_builtin_function(arg_1!(length(x) {
+        .add_builtin_function(builtin_function!(length(x) {
             match x {
                 Value::Vec2(x) => Ok(Value::Length(x.map(|x|x.magnitude()))),
                 Value::Vec3(x) => Ok(Value::Length(x.map(|x|x.magnitude()))),
@@ -119,7 +119,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             }
         }))
         // normalize(x): Normalize x
-        .add_builtin_function(arg_1!(normalize(x) for Vec2, Vec3, Vec4))
+        .add_builtin_function(builtin_function!(normalize(x) for Vec2, Vec3, Vec4))
         .build()
 }
 

@@ -2,115 +2,25 @@ mod algorithm;
 mod context_builder;
 mod export;
 mod geo2d;
+mod math;
+mod namespace_builder;
 
 #[cfg(feature = "geo3d")]
 mod geo3d;
 
-mod math;
+#[cfg(test)]
+mod tests;
 
 use microcad_lang::parameter;
 use microcad_lang::parameter_list;
+use microcad_lang::src_ref::SrcReferrer;
 use microcad_lang::{builtin_module, eval::*, function_signature, parse::*};
 
 pub use context_builder::ContextBuilder;
 pub use export::export;
 
-/// Module builder
-pub struct NamespaceBuilder {
-    /// Namespace definition
-    namespace: ModuleDefinition,
-}
-
-impl NamespaceBuilder {
-    /// Create new module
-    pub fn new(name: &str) -> NamespaceBuilder {
-        Self {
-            namespace: ModuleDefinition::new(name.into()),
-        }
-    }
-
-    /// Add a value
-    pub fn add_value(&mut self, name: &str, value: Value) -> &mut Self {
-        self.namespace.add_value(name.into(), value);
-        self
-    }
-
-    /// Build namespace definition
-    pub fn build(&mut self) -> std::rc::Rc<ModuleDefinition> {
-        std::rc::Rc::new(self.namespace.clone())
-    }
-}
-
-impl Symbols for NamespaceBuilder {
-    fn find_symbols(&self, name: &microcad_core::Id) -> Vec<&Symbol> {
-        self.namespace.find_symbols(name)
-    }
-
-    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
-        self.namespace.add_symbol(symbol);
-        self
-    }
-
-    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
-        self.namespace.copy_symbols(into)
-    }
-}
-
-/// @todo: Check if is possible to rewrite this macro with arbitrary number of arguments
-#[macro_export]
-macro_rules! arg_1 {
-    ($f:ident($name:ident) for $($ty:tt),+) => { BuiltinFunction::new(
-        stringify!($f).into(),
-        microcad_lang::function_signature!(microcad_lang::parameter_list![microcad_lang::parameter!($name)]),
-        &|args, _| {
-        match args.get(stringify!($name)).unwrap() {
-            $(Value::$ty($name) => Ok(Some(Value::$ty(Refer::none($name.$f())))),)*
-            Value::List(v) => {
-                let mut result = ValueList::new();
-                for x in v.iter() {
-                    match x {
-                        $(Value::$ty(x) => result.push(Value::$ty(Refer::none(x.$f()))),)*
-                        _ => return Err(EvalError::InvalidArgumentType(x.ty())),
-                    }
-                }
-                Ok(Some(Value::List(Refer::none(List::new(result, v.ty())))))
-            }
-            v => Err(EvalError::InvalidArgumentType(v.ty())),
-        }
-    })
-    };
-    ($f:ident($name:ident) $inner:expr) => {
-        BuiltinFunction::new(stringify!($f).into(),
-        microcad_lang::function_signature!(microcad_lang::parameter_list![microcad_lang::parameter!($name)]),
-        &|args, _| {
-            let l = |$name| Ok(Some($inner?));
-            l(args.get(stringify!($name)).unwrap().clone())
-    })
-}
-}
-
-#[macro_export]
-macro_rules! arg_2 {
-    ($f:ident($x:ident, $y:ident) $inner:expr) => {
-        BuiltinFunction::new(
-            stringify!($f).into(),
-            microcad_lang::function_signature!(microcad_lang::parameter_list![
-                microcad_lang::parameter!($x),
-                microcad_lang::parameter!($y)
-            ]),
-            &|args, _| {
-                let l = |$x, $y| Ok(Some($inner?));
-                let (x, y) = (
-                    args.get(stringify!($x)).unwrap().clone(),
-                    args.get(stringify!($y)).unwrap().clone(),
-                );
-                l(x.clone(), y.clone())
-            },
-        )
-    };
-}
-
 use microcad_core::ExportSettings;
+use namespace_builder::NamespaceBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     NamespaceBuilder::new("std")
@@ -130,10 +40,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 let condition: bool = args["condition"].clone().try_into()?;
                 if !condition {
                     use microcad_lang::diagnostics::AddDiagnostic;
-                    ctx.error(
-                        microcad_lang::src_ref::SrcRef(None), // TODO: This should be the source reference of the assert function call
-                        format!("Assertion failed: {message}"),
-                    );
+                    ctx.error(args.src_ref(), format!("Assertion failed: {message}"));
                     Err(EvalError::AssertionFailed(message))
                 } else {
                     Ok(None)
@@ -146,94 +53,4 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
             Ok(microcad_core::export::export(export_settings))
         }))
         .build()
-}
-
-#[test]
-fn context_namespace() {
-    use microcad_lang::src_ref::*;
-
-    let mut context = Context::default();
-
-    let module = NamespaceBuilder::new("math")
-        .add_value("pi", Value::Scalar(Refer::none(std::f64::consts::PI)))
-        .build();
-
-    context.add_module(module);
-
-    let symbols = context
-        .get_symbols_by_qualified_name(&"math::pi".into())
-        .unwrap();
-    assert_eq!(symbols.len(), 1);
-    assert_eq!(symbols[0].id().unwrap(), "pi");
-}
-
-#[test]
-fn test_assert() {
-    use microcad_lang::parse::source_file::SourceFile;
-
-    use std::str::FromStr;
-    let source_file = match SourceFile::from_str(
-        r#"
-            std::assert(std::math::abs(-1.0) == 1.0);
-        "#,
-    ) {
-        Ok(source_file) => source_file,
-        Err(err) => panic!("ERROR: {err}"),
-    };
-
-    let mut context = ContextBuilder::new(source_file).with_std().build();
-
-    match context.eval() {
-        Ok(_) => {
-            println!("Our assertion was successful as expected");
-        }
-        Err(err) => panic!("{err}"),
-    }
-}
-
-#[test]
-fn difference_svg() {
-    use crate::algorithm;
-    use microcad_lang::args;
-    use microcad_lang::eval::ArgumentMap;
-    use microcad_render::svg::SvgRenderer;
-    use microcad_render::Renderer2D;
-
-    let difference = algorithm::difference().unwrap();
-    let group = microcad_render::tree::group();
-    group.append(crate::geo2d::Circle::node(args!(radius: Scalar = 4.0)).unwrap());
-    group.append(crate::geo2d::Circle::node(args!(radius: Scalar = 2.0)).unwrap());
-    difference.append(group);
-
-    let file = std::fs::File::create("../test_output/std/difference.svg").unwrap();
-    let mut renderer = SvgRenderer::default();
-    renderer.set_output(Box::new(file)).unwrap();
-    renderer.render_node(difference).unwrap();
-}
-
-#[test]
-fn difference_stl() {
-    use crate::algorithm;
-    use microcad_export::stl::StlExporter;
-    use microcad_lang::args;
-    use microcad_lang::eval::ArgumentMap;
-
-    let difference = algorithm::difference().unwrap();
-    let group = microcad_render::tree::group();
-    group.append(
-        crate::geo3d::Cube::node(
-            args!(size_x: Scalar = 4.0, size_y: Scalar = 4.0, size_z: Scalar = 4.0),
-        )
-        .unwrap(),
-    );
-    group.append(crate::geo3d::Sphere::node(args!(radius: Scalar = 2.0)).unwrap());
-    difference.append(group);
-
-    use microcad_export::Exporter;
-    let mut exporter = StlExporter::from_settings(&microcad_core::ExportSettings::with_filename(
-        "../test_output/std/difference.stl".to_string(),
-    ))
-    .unwrap();
-
-    exporter.export(difference).unwrap();
 }

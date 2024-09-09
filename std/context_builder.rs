@@ -1,4 +1,7 @@
-use microcad_lang::{eval::{Context, Symbols}, parse::{ModuleDefinition, SourceFile}};
+use microcad_lang::{
+    eval::{Context, Symbols},
+    parse::{ModuleDefinition, SourceFile},
+};
 
 /// Builder for a context
 pub struct ContextBuilder {
@@ -7,11 +10,11 @@ pub struct ContextBuilder {
 
 impl ContextBuilder {
     /// Create a new context builder from a source file
-    /// 
+    ///
     /// - `source_file`: source file to build the context from
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A new context builder
     pub fn new(source_file: SourceFile) -> Self {
         Self {

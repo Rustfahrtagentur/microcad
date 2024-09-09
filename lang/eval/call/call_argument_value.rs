@@ -30,6 +30,7 @@ impl CallArgumentValue {
 }
 
 #[macro_export]
+#[cfg(test)]
 macro_rules! call_argument_value {
     ($name:ident: $ty:ident = $value:expr) => {
         CallArgumentValue::new(

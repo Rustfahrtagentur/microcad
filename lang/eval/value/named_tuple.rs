@@ -1,5 +1,6 @@
 use crate::{eval::*, parse::*, r#type::*};
 
+#[cfg(test)]
 #[macro_export]
 macro_rules! named_tuple {
     ($($name:ident: $ty:ident = $value:expr),*) => {

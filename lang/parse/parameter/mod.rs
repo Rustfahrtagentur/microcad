@@ -25,12 +25,13 @@ impl Parameter {
         name: Identifier,
         specified_type: Option<TypeAnnotation>,
         default_value: Option<Expression>,
+        src_ref: SrcRef,
     ) -> Self {
         Self {
             name,
             specified_type,
             default_value,
-            src_ref: SrcRef(None),
+            src_ref,
         }
     }
 }
@@ -115,35 +116,39 @@ impl Eval for Parameter {
                         default_value.ty(),
                     ))
                 } else {
-                    Ok(ParameterValue {
-                        name: self.name.id().expect("nameless parameter"),
-                        specified_type: Some(specified_type.ty()),
-                        default_value: Some(default_value),
-                    })
+                    Ok(ParameterValue::new(
+                        self.name.id().expect("nameless parameter"),
+                        Some(specified_type.ty()),
+                        Some(default_value),
+                        self.src_ref(),
+                    ))
                 }
             }
             // Only type is specified
-            (Some(t), None) => Ok(ParameterValue {
-                name: self.name.id().expect("nameless parameter"),
-                specified_type: Some(t.ty()),
-                default_value: None,
-            }),
+            (Some(t), None) => Ok(ParameterValue::new(
+                self.name.id().expect("nameless parameter"),
+                Some(t.ty()),
+                None,
+                self.src_ref(),
+            )),
             // Only value is specified
             (None, Some(expr)) => {
                 let default_value = expr.eval(context)?;
 
-                Ok(ParameterValue {
-                    name: self.name.id().expect("nameless parameter"),
-                    specified_type: Some(default_value.ty().clone()),
-                    default_value: Some(default_value),
-                })
+                Ok(ParameterValue::new(
+                    self.name.id().expect("nameless parameter"),
+                    Some(default_value.ty().clone()),
+                    Some(default_value),
+                    self.src_ref(),
+                ))
             }
             // Neither type nor value is specified
-            (None, None) => Ok(ParameterValue {
-                name: self.name.id().expect("nameless parameter"),
-                specified_type: None,
-                default_value: None,
-            }),
+            (None, None) => Ok(ParameterValue::new(
+                self.name.id().expect("nameless parameter"),
+                None,
+                None,
+                self.src_ref(),
+            )),
         }
     }
 }
@@ -151,13 +156,14 @@ impl Eval for Parameter {
 #[macro_export]
 macro_rules! parameter {
     ($name:ident) => {
-        Parameter::new(stringify!($name).into(), None, None)
+        Parameter::new(stringify!($name).into(), None, None, SrcRef(None))
     };
     ($name:ident: $ty:ident) => {
         Parameter::new(
             stringify!($name).into(),
             Some(microcad_lang::r#type::Type::$ty.into()),
             None,
+            microcad_lang::src_ref::SrcRef(None),
         )
     };
     ($name:ident: $ty:ident = $value:expr) => {
@@ -165,6 +171,7 @@ macro_rules! parameter {
             stringify!($name).into(),
             Some(microcad_lang::r#type::Type::$ty.into()),
             Some(Expression::literal_from_str(stringify!($value)).expect("Invalid literal")),
+            microcad_lang::src_ref::SrcRef(None),
         )
     };
 }

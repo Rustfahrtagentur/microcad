@@ -1,4 +1,4 @@
-use crate::{eval::*, r#type::*};
+use crate::{eval::*, r#type::*, src_ref::*};
 
 /// Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
@@ -6,6 +6,7 @@ pub struct ParameterValue {
     pub name: Id,
     pub specified_type: Option<Type>,
     pub default_value: Option<Value>,
+    src_ref: SrcRef,
 }
 
 pub enum TypeCheckResult {
@@ -16,6 +17,19 @@ pub enum TypeCheckResult {
 }
 
 impl ParameterValue {
+    pub fn new(
+        name: Id,
+        specified_type: Option<Type>,
+        default_value: Option<Value>,
+        src_ref: SrcRef,
+    ) -> Self {
+        Self {
+            name,
+            specified_type,
+            default_value,
+            src_ref,
+        }
+    }
     pub fn type_matches(&self, ty: &Type) -> bool {
         match &self.specified_type {
             Some(t) => t == ty,
@@ -38,6 +52,13 @@ impl ParameterValue {
     }
 }
 
+impl SrcReferrer for ParameterValue {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
+    }
+}
+
+#[cfg(test)]
 #[macro_export]
 macro_rules! parameter_value {
     ($name:ident) => {
@@ -45,24 +66,27 @@ macro_rules! parameter_value {
             name: stringify!($name).into(),
             specified_type: None,
             default_value: None,
+            SrcRef(None),
         }
     };
     ($name:ident: $ty:ident) => {
-        $crate::eval::ParameterValue {
-            name: stringify!($name).into(),
-            specified_type: Some(Type::$ty),
-            default_value: None,
-        }
+        ParameterValue::new(
+            stringify!($name).into(),
+            Some(Type::$ty),
+            None,
+            SrcRef(None),
+        )
     };
     ($name:ident: $ty:ident = $value:expr) => {
-        $crate::eval::ParameterValue {
-            name: stringify!($name).into(),
-            specified_type: Some(Type::$ty),
-            default_value: Some(Value::$ty($crate::src_ref::Refer::none($value))),
-        }
+        ParameterValue::new(
+            stringify!($name).into(),
+            Some(Type::$ty),
+            Some(Value::$ty(Refer::none($value))),
+            SrcRef(None),
+        )
     };
     ($name:ident = $value:expr) => {
-        ParameterValue::new(stringify!($name).into(), None, Some($value))
+        ParameterValue::new(stringify!($name).into(), None, Some($value), SrcRef(None))
     };
     () => {};
 }
