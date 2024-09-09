@@ -1,21 +1,28 @@
-use crate::{errors::*, parse::*, parser::*};
+use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
 /// A list of identifiers
 ///
 /// Used e.g. for multiple variable declarations.
 /// Cannot contain duplicates.
 #[derive(Debug, Default, Clone, PartialEq)]
-pub struct IdentifierList(Vec<Identifier>);
+pub struct IdentifierList(Refer<Vec<Identifier>>);
 
 impl IdentifierList {
-    pub fn new() -> Self {
-        Self(Vec::new())
+    /// Create new identifier list
+    pub fn new(identifiers: Vec<Identifier>, src_ref: SrcRef) -> Self {
+        Self(Refer::new(identifiers, src_ref))
+    }
+}
+
+impl SrcReferrer for IdentifierList {
+    fn src_ref(&self) -> identifier::SrcRef {
+        self.0.src_ref()
     }
 }
 
 impl From<Vec<Identifier>> for IdentifierList {
     fn from(value: Vec<Identifier>) -> Self {
-        Self(value)
+        Self(Refer::new(value, SrcRef(None)))
     }
 }
 
@@ -24,23 +31,6 @@ impl std::ops::Deref for IdentifierList {
 
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-impl IdentifierList {
-    pub fn push(&mut self, ident: Identifier) -> Result<(), ParseError> {
-        if self.contains(&ident) {
-            Err(ParseError::DuplicateIdentifier(ident))
-        } else {
-            self.0.push(ident);
-            Ok(())
-        }
-    }
-    pub fn extend(&mut self, other: IdentifierList) -> Result<(), ParseError> {
-        for ident in other {
-            self.push(ident)?;
-        }
-        Ok(())
     }
 }
 
@@ -58,7 +48,7 @@ impl Parse for IdentifierList {
                 vec.push(Identifier::parse(pair)?);
             }
         }
-        Ok(Self(vec))
+        Ok(Self(Refer::new(vec, pair.into())))
     }
 }
 

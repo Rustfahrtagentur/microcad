@@ -119,3 +119,12 @@ impl<T: std::hash::Hash> std::hash::Hash for Refer<T> {
         self.value.hash(state);
     }
 }
+
+impl<T: std::iter::IntoIterator> std::iter::IntoIterator for Refer<T> {
+    type Item = T::Item;
+    type IntoIter = T::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.value.into_iter()
+    }
+}
