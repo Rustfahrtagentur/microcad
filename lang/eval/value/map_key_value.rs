@@ -35,9 +35,9 @@ impl TryFrom<Value> for MapKeyValue {
 impl std::fmt::Display for MapKeyValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            MapKeyValue::Integer(n) => write!(f, "{}", n),
-            MapKeyValue::Bool(b) => write!(f, "{}", b),
-            MapKeyValue::String(s) => write!(f, "{}", s),
+            MapKeyValue::Integer(n) => write!(f, "{n}"),
+            MapKeyValue::Bool(b) => write!(f, "{b}"),
+            MapKeyValue::String(s) => write!(f, "{s}"),
         }
     }
 }

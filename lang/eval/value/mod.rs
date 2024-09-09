@@ -342,20 +342,20 @@ impl std::ops::Div for Value {
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Value::Integer(n) => write!(f, "{}", n),
-            Value::Scalar(n) => write!(f, "{}", n),
-            Value::Length(n) | Value::Angle(n) => write!(f, "{}{}", n, self.ty().default_unit()),
+            Value::Integer(n) => write!(f, "{n}"),
+            Value::Scalar(n) => write!(f, "{n}"),
+            Value::Length(n) | Value::Angle(n) => write!(f, "{n}{}", self.ty().default_unit()),
             Value::Vec2(v) => write!(f, "({}, {})", v.x, v.y),
             Value::Vec3(v) => write!(f, "({}, {}, {})", v.x, v.y, v.z),
             Value::Vec4(v) => write!(f, "({}, {}, {}, {})", v.x, v.y, v.z, v.w),
-            Value::Bool(b) => write!(f, "{}", b),
-            Value::String(s) => write!(f, "{}", s),
-            Value::Color(c) => write!(f, "{}", c),
-            Value::List(l) => write!(f, "{}", l),
-            Value::Map(m) => write!(f, "{}", m),
-            Value::NamedTuple(t) => write!(f, "{}", t),
-            Value::UnnamedTuple(t) => write!(f, "{}", t),
-            Value::Node(n) => write!(f, "{:?}", n),
+            Value::Bool(b) => write!(f, "{b}"),
+            Value::String(s) => write!(f, "{s}"),
+            Value::Color(c) => write!(f, "{c}"),
+            Value::List(l) => write!(f, "{l}"),
+            Value::Map(m) => write!(f, "{m}"),
+            Value::NamedTuple(t) => write!(f, "{t}"),
+            Value::UnnamedTuple(t) => write!(f, "{t}"),
+            Value::Node(n) => write!(f, "{n:?}"),
         }
     }
 }
