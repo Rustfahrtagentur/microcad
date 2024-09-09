@@ -1,11 +1,16 @@
+/// Parameter value evaluation entity
 use crate::{eval::*, r#type::*, src_ref::*};
 
 /// Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
 pub struct ParameterValue {
+    /// Parameter name
     pub name: Id,
+    /// Parameter type
     pub specified_type: Option<Type>,
+    /// Parameter default
     pub default_value: Option<Value>,
+    /// Source code reference
     src_ref: SrcRef,
 }
 

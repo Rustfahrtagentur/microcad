@@ -1,5 +1,8 @@
+//! Call argument value list evaluation entity
+
 use crate::{eval::*, ord_map::*, src_ref::*};
 
+/// List of call argument values
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentValueList(Refer<OrdMap<Id, CallArgumentValue>>);
 

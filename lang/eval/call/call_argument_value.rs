@@ -1,9 +1,15 @@
+//! call argument value evaluation entity
+
 use crate::{eval::*, ord_map::*, src_ref::*};
 
+/// Call argument value
 #[derive(Clone, Debug)]
 pub struct CallArgumentValue {
+    /// Argument name
     pub name: Option<Id>,
+    /// Argument value
     pub value: Value,
+    /// Source code reference
     src_ref: SrcRef,
 }
 
@@ -20,6 +26,7 @@ impl SrcReferrer for CallArgumentValue {
 }
 
 impl CallArgumentValue {
+    /// Create new call argument value
     pub fn new(name: Option<Id>, value: Value, src_ref: SrcRef) -> Self {
         Self {
             name,
