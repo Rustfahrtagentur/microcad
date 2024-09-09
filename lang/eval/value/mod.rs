@@ -54,50 +54,6 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn less_than(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
-        match (self, rhs) {
-            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs < rhs),
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs < rhs),
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(lhs < rhs),
-            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.magnitude2() < rhs.magnitude2()),
-            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.magnitude2() < rhs.magnitude2()),
-            (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs < rhs),
-            _ => Err(ValueError::InvalidOperator('<')),
-        }
-    }
-
-    pub fn greater_than(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
-        match (self, rhs) {
-            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(lhs > rhs),
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(lhs > rhs),
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(lhs > rhs),
-            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(lhs.magnitude2() > rhs.magnitude2()),
-            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(lhs.magnitude2() > rhs.magnitude2()),
-            (Value::Angle(lhs), Value::Angle(rhs)) => Ok(lhs > rhs),
-            _ => Err(ValueError::InvalidOperator('>')),
-        }
-    }
-
-    pub fn less_than_or_equal(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
-        Ok(self.less_than(rhs)? || self.eq(rhs))
-    }
-
-    pub fn greater_than_or_equal(&self, rhs: &Self) -> std::result::Result<bool, ValueError> {
-        Ok(self.greater_than(rhs)? || self.eq(rhs))
-    }
-
-    pub fn neg(&self) -> ValueResult {
-        match self {
-            Value::Integer(n) => Ok(Value::Integer(-n.clone())),
-            Value::Scalar(n) => Ok(Value::Scalar(-n.clone())),
-            Value::Length(n) => Ok(Value::Length(-n.clone())),
-            Value::Vec2(v) => Ok(Value::Vec2(-v.clone())),
-            Value::Vec3(v) => Ok(Value::Vec3(-v.clone())),
-            Value::Angle(n) => Ok(Value::Angle(-n.clone())),
-            _ => Err(ValueError::InvalidOperator('-')),
-        }
-    }
-
     /// Add a unit to a scalar value
     pub fn add_unit_to_unitless_types(
         &mut self,
