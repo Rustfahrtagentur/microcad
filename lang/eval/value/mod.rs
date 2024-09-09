@@ -422,3 +422,29 @@ impl_try_from!(Vec4 => Vec4);
 impl_try_from!(Bool => bool);
 impl_try_from!(String => String);
 impl_try_from!(Color => Color);
+
+#[cfg(test)]
+fn integer(value: i64, range: std::ops::Range<usize>, line: u32, col: u32) -> Value {
+    Value::Integer(Refer::new(value, SrcRef::new(range, line, col)))
+}
+
+#[cfg(test)]
+fn scalar(value: f64, range: std::ops::Range<usize>, line: u32, col: u32) -> Value {
+    Value::Scalar(Refer::new(value, SrcRef::new(range, line, col)))
+}
+
+#[test]
+fn test_value_integer() {
+    let v = integer(2, 3..4, 5, 6);
+    let w = integer(5, 6..7, 8, 9);
+
+    assert_eq!((v.clone() + w.clone()).unwrap(), integer(2 + 5, 3..7, 5, 6));
+    assert_eq!((v.clone() - w.clone()).unwrap(), integer(2 - 5, 3..7, 5, 6));
+    assert_eq!((v.clone() * w.clone()).unwrap(), integer(2 * 5, 3..7, 5, 6));
+    assert_eq!(
+        (v.clone() / w.clone()).unwrap(),
+        scalar(2.0 / 5.0, 3..7, 5, 6)
+    );
+
+    // TODO test more cases
+}
