@@ -4,8 +4,8 @@ use crate::{eval::*, src_ref::*};
 pub struct ArgumentMap(Refer<std::collections::HashMap<Id, Value>>);
 
 impl ArgumentMap {
-    pub fn new() -> Self {
-        Self(Refer::new(std::collections::HashMap::new(), SrcRef(None)))
+    pub fn new(src_ref: SrcRef) -> Self {
+        Self(Refer::new(std::collections::HashMap::new(), src_ref))
     }
 
     pub fn get_value<'a, T>(&'a self, name: &str) -> T

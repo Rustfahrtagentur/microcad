@@ -3,28 +3,6 @@ use crate::{eval::*, ord_map::*, src_ref::*};
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentValueList(Refer<OrdMap<Id, CallArgumentValue>>);
 
-impl std::ops::Deref for CallArgumentValueList {
-    type Target = OrdMap<Id, CallArgumentValue>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for CallArgumentValueList {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-#[cfg(test)]
-impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
-    fn from(value: Vec<CallArgumentValue>) -> Self {
-        let src_ref = SrcRef::from_vec(&value);
-        Self(Refer::new(value.into(), src_ref))
-    }
-}
-
 impl CallArgumentValueList {
     /// Insert into the argument map and remove the parameter from the list of parameters
     fn insert_and_remove(
@@ -119,7 +97,7 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &ParameterValueList,
     ) -> Result<ArgumentMap> {
-        let mut arg_map = ArgumentMap::new();
+        let mut arg_map = ArgumentMap::new(self.src_ref());
 
         // Check for unexpected arguments.
         // We are looking for call arguments that are not in the parameter list
@@ -144,6 +122,34 @@ impl CallArgumentValueList {
         }
 
         Ok(arg_map)
+    }
+}
+
+impl SrcReferrer for CallArgumentValueList {
+    fn src_ref(&self) -> SrcRef {
+        self.0.src_ref()
+    }
+}
+
+impl std::ops::Deref for CallArgumentValueList {
+    type Target = OrdMap<Id, CallArgumentValue>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for CallArgumentValueList {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+#[cfg(test)]
+impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
+    fn from(value: Vec<CallArgumentValue>) -> Self {
+        let src_ref = SrcRef::from_vec(&value);
+        Self(Refer::new(value.into(), src_ref))
     }
 }
 
