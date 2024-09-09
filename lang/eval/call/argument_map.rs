@@ -1,11 +1,11 @@
-use crate::eval::*;
+use crate::{eval::*, src_ref::*};
 
 #[derive(Clone, Debug, Default)]
-pub struct ArgumentMap(std::collections::HashMap<Id, Value>);
+pub struct ArgumentMap(Refer<std::collections::HashMap<Id, Value>>);
 
 impl ArgumentMap {
     pub fn new() -> Self {
-        Self(std::collections::HashMap::new())
+        Self(Refer::new(std::collections::HashMap::new(), SrcRef(None)))
     }
 
     pub fn get_value<'a, T>(&'a self, name: &str) -> T
