@@ -153,6 +153,7 @@ impl Eval for Parameter {
     }
 }
 
+/// Short cut to create a `Parameter` instance
 #[macro_export]
 macro_rules! parameter {
     ($name:ident) => {

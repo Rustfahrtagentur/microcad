@@ -1,3 +1,5 @@
+//! µCAD namespace related  parser entities
+
 mod namespace_body;
 mod namespace_definition;
 mod namespace_statement;

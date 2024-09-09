@@ -19,11 +19,13 @@ impl NumberLiteral {
     pub fn from_int(value: i64) -> Self {
         Self(value as f64, Unit::None, SrcRef(None))
     }
+
     /// Returns the actual value of the literal
     pub fn value(&self) -> f64 {
         self.1.normalize(self.0)
     }
 
+    /// return unit
     pub fn unit(&self) -> Unit {
         self.1
     }

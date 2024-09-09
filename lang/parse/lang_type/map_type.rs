@@ -7,7 +7,8 @@ use crate::{errors::*, map_key_type::*, parser::*, r#type::*};
 pub struct MapType(MapKeyType, Box<Type>);
 
 impl MapType {
-    pub fn from_types(key: MapKeyType, value: Type) -> Self {
+    /// create new map type
+    pub fn new(key: MapKeyType, value: Type) -> Self {
         Self(key, Box::new(value))
     }
 }
@@ -20,7 +21,7 @@ impl Parse for MapType {
 
         use crate::eval::Ty;
 
-        Ok(Self::from_types(
+        Ok(Self::new(
             (TypeAnnotation::parse(key)?.ty()).try_into()?,
             TypeAnnotation::parse(value)?.ty(),
         ))
@@ -43,6 +44,6 @@ fn map_type() {
     assert_eq!(type_annotation.ty().to_string(), "[int => string]");
     assert_eq!(
         type_annotation.ty(),
-        Type::Map(MapType::from_types(MapKeyType::Integer, Type::String))
+        Type::Map(MapType::new(MapKeyType::Integer, Type::String))
     );
 }

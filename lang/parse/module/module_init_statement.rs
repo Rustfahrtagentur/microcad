@@ -1,10 +1,17 @@
+//! Module initialization statement parser entities
+
 use crate::{errors::*, parse::*, parser::*, src_ref::SrcReferrer};
 
+/// Module initialization statement
 #[derive(Clone, Debug)]
 pub enum ModuleInitStatement {
+    /// Use statement
     Use(UseStatement),
+    /// Expresson
     Expression(Expression),
+    /// Assignment
     Assignment(Assignment),
+    /// Function definition
     FunctionDefinition(std::rc::Rc<FunctionDefinition>),
 }
 
@@ -27,7 +34,9 @@ impl Parse for ModuleInitStatement {
             Rule::expression => ModuleInitStatement::Expression(Expression::parse(first)?),
             Rule::assignment => ModuleInitStatement::Assignment(Assignment::parse(first)?),
             Rule::function_definition => {
-                ModuleInitStatement::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?)
+                ModuleInitStatement::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(
+                    first,
+                )?)
             }
             _ => unreachable!(),
         })

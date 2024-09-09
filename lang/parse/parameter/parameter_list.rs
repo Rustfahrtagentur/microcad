@@ -68,6 +68,7 @@ impl Eval for ParameterList {
     }
 }
 
+/// Short cut to create a `ParameterList` instance
 #[macro_export]
 macro_rules! parameter_list {
     [$($param:expr),*] => {

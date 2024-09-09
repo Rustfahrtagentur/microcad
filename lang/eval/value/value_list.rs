@@ -19,7 +19,7 @@ impl ValueList {
     }
 
     pub fn types(&self) -> TypeList {
-        TypeList::from_types(
+        TypeList::new(
             self.0
                 .iter()
                 .map(|v| v.ty())

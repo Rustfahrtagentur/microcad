@@ -1,13 +1,23 @@
+//! Module statement parser entities
+//!
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
+/// Module statement
 #[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum ModuleStatement {
+    /// Use statement
     Use(UseStatement),
+    /// Expression
     Expression(Expression),
+    /// For statement
     For(ForStatement),
+    /// Assignment
     Assignment(Assignment),
+    /// Module definition
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
+    /// Function definition
     FunctionDefinition(std::rc::Rc<FunctionDefinition>),
+    /// Module init definition
     ModuleInitDefinition(std::rc::Rc<ModuleInitDefinition>),
 }
 
@@ -31,7 +41,9 @@ impl Parse for ModuleStatement {
         let first = pair.clone().into_inner().next().unwrap();
         Ok(match first.as_rule() {
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
-            Rule::expression | Rule::expression_no_semicolon => Self::Expression(Expression::parse(first)?),
+            Rule::expression | Rule::expression_no_semicolon => {
+                Self::Expression(Expression::parse(first)?)
+            }
             Rule::assignment => Self::Assignment(Assignment::parse(first)?),
             Rule::for_statement => Self::For(ForStatement::parse(first)?),
             Rule::module_definition => {

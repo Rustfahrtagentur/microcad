@@ -1,5 +1,8 @@
+//! Module initialization definition parser entity
+
 use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
+/// Module initialization definition
 #[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
     _parameters: ParameterList,

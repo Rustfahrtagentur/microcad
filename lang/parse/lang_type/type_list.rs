@@ -2,10 +2,12 @@
 
 use crate::r#type::*;
 
+/// List of types
 pub struct TypeList(Vec<Type>);
 
 impl TypeList {
-    pub fn from_types(types: Vec<Type>) -> Self {
+    /// Create new type list
+    pub fn new(types: Vec<Type>) -> Self {
         Self(types)
     }
 

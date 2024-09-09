@@ -2,15 +2,13 @@
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
-
+/// Namespace definition
 #[derive(Debug)]
 pub struct NamespaceDefinition {
     /// Name of the namespace
     pub name: Identifier,
-
     /// Namespace body
     pub body: NamespaceBody,
-
     /// Source code reference
     src_ref: SrcRef,
 }
@@ -59,4 +57,3 @@ impl Parse for std::rc::Rc<NamespaceDefinition> {
         }))
     }
 }
-

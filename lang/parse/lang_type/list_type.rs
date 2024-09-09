@@ -9,7 +9,7 @@ pub struct ListType(Box<Type>);
 
 impl ListType {
     /// Generate `ListType` from `Type`
-    fn from_type(t: Type) -> Self {
+    fn new(t: Type) -> Self {
         Self(Box::new(t))
     }
 }
@@ -26,7 +26,7 @@ impl Parse for ListType {
 
         let pair = inner.next().unwrap();
         match pair.as_rule() {
-            Rule::r#type => Ok(Self::from_type(TypeAnnotation::parse(pair.clone())?.ty())),
+            Rule::r#type => Ok(Self::new(TypeAnnotation::parse(pair.clone())?.ty())),
             _ => unreachable!("Expected type, found {:?}", pair.as_rule()),
         }
     }
@@ -45,6 +45,6 @@ fn list_type() {
     assert_eq!(type_annotation.ty().to_string(), "[int]");
     assert_eq!(
         type_annotation.ty(),
-        Type::List(ListType::from_type(Type::Integer))
+        Type::List(ListType::new(Type::Integer))
     );
 }

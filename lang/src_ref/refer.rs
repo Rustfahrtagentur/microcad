@@ -3,26 +3,32 @@ use super::{SrcRef, SrcReferrer};
 /// Packs any value together with a source reference
 #[derive(Clone, Default, Ord, Debug, PartialEq, PartialOrd)]
 pub struct Refer<T> {
+    /// Value
     pub value: T,
+    /// Source code reference
     pub src_ref: SrcRef,
 }
 
 impl<T> Refer<T> {
+    /// Create a `Refer` instance without source code reference
     pub fn none(value: T) -> Self {
         Self {
             value,
             src_ref: SrcRef(None),
         }
     }
+    /// Create a `Refer` instance with source code reference
     pub fn new(value: T, src_ref: SrcRef) -> Self {
         Self { value, src_ref }
     }
+    /// Create a `Refer` instance with two source code references
     pub fn merge<U, V>(left: Refer<U>, right: Refer<V>, f: fn(U, V) -> T) -> Self {
         Self {
             value: f(left.value, right.value),
             src_ref: SrcRef::merge(left.src_ref, right.src_ref),
         }
     }
+    /// Map a `Refer` instance to a new one
     pub fn map<U>(self, f: fn(T) -> U) -> Refer<U> {
         Refer::<U> {
             value: f(self.value),

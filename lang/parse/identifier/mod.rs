@@ -8,6 +8,7 @@ pub use qualified_name::*;
 
 use crate::{errors::*, eval::Sym, parser::*, src_ref::*};
 
+/// µCAD identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(Refer<microcad_core::Id>);
 
@@ -60,6 +61,7 @@ impl PartialEq<str> for Identifier {
     }
 }
 
+/// join several identifiers with `::` and return as string
 pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
     identifiers
         .iter()

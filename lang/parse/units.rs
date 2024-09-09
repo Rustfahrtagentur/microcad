@@ -77,6 +77,7 @@ impl std::str::FromStr for Unit {
     }
 }
 impl Unit {
+    /// Return type to use with this unit
     pub fn ty(self) -> Type {
         match self {
             Self::None | Self::Percent => Type::Scalar,
@@ -85,6 +86,7 @@ impl Unit {
             Self::G | Self::Kg | Self::Lb => Type::Weight,
         }
     }
+    /// Normalize value to mm, deg or gram
     pub fn normalize(self, x: f64) -> f64 {
         match self {
             Self::None => x,

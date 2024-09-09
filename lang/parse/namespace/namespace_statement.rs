@@ -1,12 +1,19 @@
+//! Namespace statement parser entities
+
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
-
+/// Namespace statement
 #[derive(Debug, Clone)]
 pub enum NamespaceStatement {
+    /// Use statement
     Use(UseStatement),
+    /// Module definition
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
+    /// Namespace definition
     NamespaceDefinition(std::rc::Rc<NamespaceDefinition>),
+    /// Function definition
     FunctionDefinition(std::rc::Rc<FunctionDefinition>),
+    /// Assignment
     Assignment(Assignment),
 }
 
@@ -28,41 +35,47 @@ impl Parse for NamespaceStatement {
         let first = pair.clone().into_inner().next().unwrap();
         Ok(match first.as_rule() {
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
-            Rule::module_definition => Self::ModuleDefinition(std::rc::Rc::<ModuleDefinition>::parse(first)?),
-            Rule::namespace_definition => Self::NamespaceDefinition(std::rc::Rc::<NamespaceDefinition>::parse(first)?),
-            Rule::function_definition => Self::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?),
+            Rule::module_definition => {
+                Self::ModuleDefinition(std::rc::Rc::<ModuleDefinition>::parse(first)?)
+            }
+            Rule::namespace_definition => {
+                Self::NamespaceDefinition(std::rc::Rc::<NamespaceDefinition>::parse(first)?)
+            }
+            Rule::function_definition => {
+                Self::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?)
+            }
             Rule::assignment => Self::Assignment(Assignment::parse(first)?),
             rule => unreachable!(
                 "Unexpected namespace statement, got {:?} {:?}",
                 rule,
                 first.clone()
             ),
-        }) 
+        })
     }
 }
 
 impl Eval for NamespaceStatement {
     type Output = ();
 
-        fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
-            match self {
-                Self::Use(use_statement) => {
-                    use_statement.eval(context)?;
-                }
-                Self::Assignment(assignment) => {
-                    assignment.eval(context)?;
-                }
-                Self::FunctionDefinition(function_definition) => {
-                    context.add_function(function_definition.clone());
-                }
-                Self::ModuleDefinition(module_definition) => {
-                    context.add_module(module_definition.clone());
-                }
-                Self::NamespaceDefinition(namespace_definition) => {
-                    context.add_namespace(namespace_definition.clone());
-                }
+    fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
+        match self {
+            Self::Use(use_statement) => {
+                use_statement.eval(context)?;
             }
-    
-            Ok(())
+            Self::Assignment(assignment) => {
+                assignment.eval(context)?;
+            }
+            Self::FunctionDefinition(function_definition) => {
+                context.add_function(function_definition.clone());
+            }
+            Self::ModuleDefinition(module_definition) => {
+                context.add_module(module_definition.clone());
+            }
+            Self::NamespaceDefinition(namespace_definition) => {
+                context.add_namespace(namespace_definition.clone());
+            }
         }
+
+        Ok(())
     }
+}
