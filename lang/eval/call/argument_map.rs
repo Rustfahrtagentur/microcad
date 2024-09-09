@@ -13,11 +13,11 @@ impl ArgumentMap {
         T: std::convert::TryFrom<&'a Value>,
         T::Error: std::fmt::Debug,
     {
-        if let Some(value) = self.0.get(name) {
-            value.try_into().expect("cannot convert argument value")
-        } else {
-            unreachable!()
-        }
+        self.0
+            .get(name)
+            .expect("no name found")
+            .try_into()
+            .expect("cannot convert argument value")
     }
 }
 
