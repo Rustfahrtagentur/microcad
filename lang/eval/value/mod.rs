@@ -136,6 +136,22 @@ impl Ty for Value {
     }
 }
 
+impl std::ops::Neg for Value {
+    type Output = ValueResult;
+
+    fn neg(self) -> Self::Output {
+        match self {
+            Value::Integer(n) => Ok(Value::Integer(-n.clone())),
+            Value::Scalar(n) => Ok(Value::Scalar(-n.clone())),
+            Value::Length(n) => Ok(Value::Length(-n.clone())),
+            Value::Vec2(v) => Ok(Value::Vec2(-v.clone())),
+            Value::Vec3(v) => Ok(Value::Vec3(-v.clone())),
+            Value::Angle(n) => Ok(Value::Angle(-n.clone())),
+            _ => Err(ValueError::InvalidOperator('-')),
+        }
+    }
+}
+
 /// Rules for operator +
 impl std::ops::Add for Value {
     type Output = ValueResult;
@@ -380,27 +396,63 @@ impl_try_from!(String => String);
 impl_try_from!(Color => Color);
 
 #[cfg(test)]
-fn integer(value: i64, range: std::ops::Range<usize>, line: u32, col: u32) -> Value {
-    Value::Integer(Refer::new(value, SrcRef::new(range, line, col)))
+fn integer(value: i64, src_ref: &SrcRef) -> Value {
+    Value::Integer(Refer::new(value, src_ref.clone()))
 }
 
 #[cfg(test)]
-fn scalar(value: f64, range: std::ops::Range<usize>, line: u32, col: u32) -> Value {
-    Value::Scalar(Refer::new(value, SrcRef::new(range, line, col)))
+fn scalar(value: f64, src_ref: &SrcRef) -> Value {
+    Value::Scalar(Refer::new(value, src_ref.clone()))
+}
+
+#[cfg(test)]
+fn check(result: ValueResult, value: Value) {
+    let result = result.expect("error result");
+    assert_eq!(result, value);
+    // SrcRef cannot be compared with PartialEq
+    assert_eq!(result.src_ref().to_string(), value.src_ref().to_string());
 }
 
 #[test]
 fn test_value_integer() {
-    let v = integer(2, 3..4, 5, 6);
-    let w = integer(5, 6..7, 8, 9);
+    let u = integer(2, &SrcRef::new(3..4, 5, 6));
+    let v = integer(5, &SrcRef::new(6..7, 8, 9));
+    let w = scalar(5.0, &SrcRef::new(6..7, 8, 9));
 
-    assert_eq!((v.clone() + w.clone()).unwrap(), integer(2 + 5, 3..7, 5, 6));
-    assert_eq!((v.clone() - w.clone()).unwrap(), integer(2 - 5, 3..7, 5, 6));
-    assert_eq!((v.clone() * w.clone()).unwrap(), integer(2 * 5, 3..7, 5, 6));
-    assert_eq!(
-        (v.clone() / w.clone()).unwrap(),
-        scalar(2.0 / 5.0, 3..7, 5, 6)
-    );
+    let r = SrcRef::new(3..7, 5, 6);
 
-    // TODO test more cases
+    // symmetric operations
+    check(u.clone() + v.clone(), integer(2 + 5, &r));
+    check(u.clone() - v.clone(), integer(2 - 5, &r));
+    check(u.clone() * v.clone(), integer(2 * 5, &r));
+    check(u.clone() / v.clone(), scalar(2.0 / 5.0, &r));
+    check(-u.clone(), integer(-2, &r));
+
+    // asymmetric operations
+    check(u.clone() + w.clone(), integer(2 + 5, &r));
+    check(u.clone() - w.clone(), integer(2 - 5, &r));
+    check(u.clone() * w.clone(), integer(2 * 5, &r));
+    check(u.clone() / w.clone(), scalar(2.0 / 5.0, &r));
+}
+
+#[test]
+fn test_value_scalar() {
+    let u = scalar(2.0, &SrcRef::new(3..4, 5, 6));
+    let v = scalar(5.0, &SrcRef::new(6..7, 8, 9));
+    let w = integer(5, &SrcRef::new(6..7, 8, 9));
+
+    let r = SrcRef::new(3..7, 5, 6);
+
+    // symmetric operations
+    check(u.clone() + v.clone(), scalar(2.0 + 5.0, &r));
+    check(u.clone() - v.clone(), scalar(2.0 - 5.0, &r));
+    check(u.clone() * v.clone(), scalar(2.0 * 5.0, &r));
+    check(u.clone() / v.clone(), scalar(2.0 / 5.0, &r));
+    check(-u.clone(), scalar(-2.0, &r));
+
+    // asymmetric operations
+    check(u.clone() + w.clone(), scalar(2.0 + 5.0, &r));
+    check(u.clone() - w.clone(), scalar(2.0 - 5.0, &r));
+    check(u.clone() * w.clone(), scalar(2.0 * 5.0, &r));
+    check(u.clone() / w.clone(), scalar(2.0 / 5.0, &r));
 }

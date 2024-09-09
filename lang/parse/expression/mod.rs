@@ -193,9 +193,8 @@ impl Eval for Expression {
                 src_ref: _,
             } => {
                 let rhs = rhs.eval(context)?;
-
                 match op {
-                    '-' => rhs.neg(),
+                    '-' => -rhs.clone(),
                     _ => unimplemented!(),
                 }
                 .map_err(EvalError::ValueError)
