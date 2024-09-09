@@ -1,6 +1,5 @@
 use crate::{eval::*, map_key_type::*, src_ref::*};
 use microcad_core::Integer;
-use value::error::ValueError;
 
 /// A value type that can be used as a key in a map
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]

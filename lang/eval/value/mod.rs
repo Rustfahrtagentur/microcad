@@ -1,4 +1,3 @@
-mod error;
 mod list;
 mod map;
 mod map_key_value;
@@ -6,7 +5,6 @@ mod named_tuple;
 mod unnamed_tuple;
 mod value_list;
 
-pub use error::ValueError;
 pub use list::*;
 pub use map::*;
 pub use map_key_value::*;

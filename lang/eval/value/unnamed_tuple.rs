@@ -1,5 +1,3 @@
-use value::error::ValueError;
-
 use crate::{eval::*, parse::*, r#type::*};
 
 #[derive(Clone, Debug, PartialEq)]
