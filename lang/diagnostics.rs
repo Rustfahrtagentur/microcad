@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Remember source code position for diagnosis
 
 use crate::{parse::SourceFile, src_ref::*};
@@ -208,3 +211,4 @@ fn test_diagnostics() {
     assert_eq!(diagnostics.diagnostics.len(), 3);
     diagnostics.pretty_print(&mut std::io::stdout()).unwrap();
 }
+

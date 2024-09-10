@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 mod triangle_mesh;
 
 pub use manifold_rs::Manifold;
@@ -63,3 +66,4 @@ impl From<TriangleMesh> for Geometry {
         Geometry::Mesh(mesh)
     }
 }
+

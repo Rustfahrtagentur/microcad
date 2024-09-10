@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{eval::*, map_key_type::*, src_ref::*};
 use microcad_core::Integer;
 
@@ -41,3 +44,4 @@ impl std::fmt::Display for MapKeyValue {
         }
     }
 }
+

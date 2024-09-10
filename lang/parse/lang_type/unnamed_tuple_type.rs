@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Unnamed tuple parser entity
 
 use crate::{errors::*, parser::*, r#type::*};
@@ -45,3 +48,4 @@ fn unnamed_tuple_type() {
         Type::UnnamedTuple(UnnamedTupleType(vec![Type::Integer, Type::String]))
     );
 }
+

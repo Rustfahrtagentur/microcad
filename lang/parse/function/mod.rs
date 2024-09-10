@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! µCAD function parser entities
 
 mod function_body;
@@ -87,3 +90,4 @@ fn function_evaluate() {
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.to_string(), "4");
 }
+

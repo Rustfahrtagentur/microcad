@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Number literal parser entity
 
 use crate::{eval::*, parse::*, parser::*, r#type::*};
@@ -84,3 +87,4 @@ impl std::fmt::Display for NumberLiteral {
         write!(f, "{}{}", self.0, self.1)
     }
 }
+

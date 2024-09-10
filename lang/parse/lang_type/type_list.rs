@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Type list type parser entity
 
 use crate::r#type::*;
@@ -23,3 +26,4 @@ impl TypeList {
         common_type
     }
 }
+

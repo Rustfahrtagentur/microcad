@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Source code reference
 
 mod line_col;
@@ -167,3 +170,4 @@ fn test_src_ref() {
     assert_eq!(cube.source_slice(input), "cube");
     assert_eq!(size_y.source_slice(input), "size_y");
 }
+

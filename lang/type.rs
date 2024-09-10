@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! µCAD Basic Types
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
@@ -160,3 +163,4 @@ fn builtin_type() {
     assert_eq!(ty.0.to_string(), "int");
     assert_eq!(ty.0.value, Type::Integer);
 }
+

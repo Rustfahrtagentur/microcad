@@ -1,3 +1,6 @@
+# Copyright © 2024 The µCAD authors <info@ucad.xyz>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 [package]
 name = "walk_path"
 description = "Path Walker"
@@ -10,3 +13,4 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = "1"
+

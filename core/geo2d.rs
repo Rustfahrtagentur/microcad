@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::Scalar;
 pub type LineString = geo::LineString<Scalar>;
 pub type MultiLineString = geo::MultiLineString<Scalar>;
@@ -53,3 +56,4 @@ impl Geometry {
 pub fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
     MultiPolygon::new(vec![Polygon::new(line_string, vec![])])
 }
+

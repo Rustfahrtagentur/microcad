@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use super::{SrcRef, SrcReferrer};
 
 /// Packs any value together with a source reference
@@ -134,3 +137,4 @@ impl<T: std::iter::IntoIterator> std::iter::IntoIterator for Refer<T> {
         self.value.into_iter()
     }
 }
+

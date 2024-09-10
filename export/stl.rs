@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use std::path::PathBuf;
 
 use crate::*;
@@ -105,3 +108,4 @@ fn test_stl_export() {
 
     exporter.export(node).unwrap();
 }
+

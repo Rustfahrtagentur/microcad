@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{eval::*, parse::*};
 
 pub type BuiltinFunctionFunctor = dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>>;
@@ -97,3 +100,4 @@ macro_rules! builtin_function {
         )
     };
 }
+

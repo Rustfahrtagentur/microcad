@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{ContextBuilder, NamespaceBuilder};
 use microcad_lang::eval::*;
 
@@ -98,3 +101,4 @@ fn difference_stl() {
 
     exporter.export(difference).unwrap();
 }
+

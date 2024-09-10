@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 /// Parameter value evaluation entity
 use crate::{eval::*, r#type::*, src_ref::*};
 
@@ -95,3 +98,4 @@ macro_rules! parameter_value {
     };
     () => {};
 }
+

@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! µCAD attribute parser entity
 
 use crate::{errors::*, parse::*, parser::*, src_ref::*};
@@ -42,3 +45,4 @@ impl std::fmt::Display for Attribute {
         }
     }
 }
+

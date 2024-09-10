@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! evaluation of parsed content
 #![warn(missing_docs)]
 
@@ -31,3 +34,4 @@ pub trait Eval {
 }
 
 pub use microcad_core::Id;
+

@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{errors::*, parse::*, parser::*, src_ref::*};
 
 /// A list of identifiers
@@ -60,3 +63,4 @@ impl std::iter::IntoIterator for IdentifierList {
         self.0.into_iter()
     }
 }
+

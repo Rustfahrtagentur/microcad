@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 #![warn(missing_docs)]
 
 extern crate proc_macro;
@@ -72,3 +75,4 @@ pub fn derive_define_builtin_renderable3d(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
     builtin_module_impl("Renderable3D", input)
 }
+

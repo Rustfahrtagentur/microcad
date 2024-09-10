@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Module initialization statement parser entities
 
 use crate::{errors::*, parse::*, parser::*, src_ref::SrcReferrer};
@@ -42,3 +45,4 @@ impl Parse for ModuleInitStatement {
         })
     }
 }
+

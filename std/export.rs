@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use microcad_core::{ExportSettings, Exporter};
 
 pub struct ExporterRegistry;
@@ -42,3 +45,4 @@ lazy_static::lazy_static! {
 pub fn export(node: microcad_render::Node) -> microcad_core::Result<()> {
     microcad_core::export::export_tree(node.clone(), |settings| EXPORTERS.create(settings))
 }
+

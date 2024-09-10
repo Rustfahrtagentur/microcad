@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::NamespaceBuilder;
 use microcad_lang::{
     builtin_module,
@@ -30,3 +33,4 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .add_builtin_module(builtin_module!(xor()))
         .build()
 }
+

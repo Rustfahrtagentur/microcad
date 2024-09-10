@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Function body parser entity
 
 use super::FunctionStatement;
@@ -36,3 +39,4 @@ impl Parse for FunctionBody {
         Ok(Self(body))
     }
 }
+

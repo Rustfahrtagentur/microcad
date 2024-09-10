@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 #![warn(missing_docs)]
 
 fn main() {
@@ -11,3 +14,4 @@ fn main() {
         panic!("error generating rust test code: {err}");
     }
 }
+

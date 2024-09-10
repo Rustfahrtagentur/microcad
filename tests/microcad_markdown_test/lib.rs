@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 #![warn(missing_docs)]
 
 //! Generate tests out of *Markdown* files which include µCAD code
@@ -206,3 +209,4 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
         }
     }
 }
+

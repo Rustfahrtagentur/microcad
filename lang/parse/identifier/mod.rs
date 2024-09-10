@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! µCAD identifier parser entities
 
 mod identifier_list;
@@ -69,3 +72,4 @@ pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
         .collect::<Vec<_>>()
         .join(separator)
 }
+

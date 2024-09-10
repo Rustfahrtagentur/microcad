@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 pub mod render2d;
 pub use render2d::{Renderable2D, Renderer2D};
 
@@ -22,3 +25,4 @@ pub trait Renderer {
         Ok(())
     }
 }
+

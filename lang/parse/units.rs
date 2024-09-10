@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! µCAD unit parser entity
 
 use crate::{errors::*, parser::*, r#type::*};
@@ -116,3 +119,4 @@ impl Parse for Unit {
         }
     }
 }
+

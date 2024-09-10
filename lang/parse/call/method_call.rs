@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Method call
 
 use crate::{errors::*, parse::*, parser::*, src_ref::*};
@@ -40,3 +43,4 @@ impl std::fmt::Display for MethodCall {
         write!(f, "{}({:?})", self.name, self.argument_list)
     }
 }
+

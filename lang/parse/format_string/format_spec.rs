@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Format Specification parser entity
 
 use crate::{errors::*, parser::*, src_ref::*};
@@ -40,3 +43,4 @@ impl Parse for FormatSpec {
         Ok(opt)
     }
 }
+

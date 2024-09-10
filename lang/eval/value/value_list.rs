@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
 #[derive(Clone, Debug, PartialEq, Default)]
@@ -66,3 +69,4 @@ impl std::iter::FromIterator<Value> for ValueList {
         ValueList(Refer::new(vec, src_ref))
     }
 }
+

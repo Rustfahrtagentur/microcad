@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 pub enum BooleanOp {
     Difference,
     Union,
@@ -135,3 +138,4 @@ pub fn intersection() -> Node {
 pub fn xor() -> Node {
     Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Xor)))
 }
+

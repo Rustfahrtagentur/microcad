@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::NamespaceBuilder;
 use cgmath::InnerSpace;
 use microcad_core::Scalar;
@@ -153,3 +156,4 @@ fn test_build_math_module() {
     test_builtin_function("abs", "math::abs(-1.0)", "1");
     test_builtin_function("sqrt", "math::sqrt(4.0)", "2");
 }
+

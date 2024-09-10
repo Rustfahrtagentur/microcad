@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{eval::*, r#type::*};
 use microcad_core::Id;
 use thiserror::Error;
@@ -122,3 +125,4 @@ pub enum ValueError {
     #[error("Cannot concat two vec with different types {0} and {1}")]
     CannotCombineVecOfDifferentType(Type, Type),
 }
+

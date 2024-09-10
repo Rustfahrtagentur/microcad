@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Module definition parser entity
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
@@ -91,3 +94,4 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
         }))
     }
 }
+

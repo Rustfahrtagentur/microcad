@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Function definition parser entity
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
@@ -87,3 +90,4 @@ impl Eval for std::rc::Rc<FunctionDefinition> {
         Ok(())
     }
 }
+

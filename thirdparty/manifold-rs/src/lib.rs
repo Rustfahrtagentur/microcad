@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Rust integration of C++ library *Manifold* for geometric operations
 
 #[cxx::bridge(namespace = "manifold_rs")]
@@ -130,3 +133,4 @@ fn test_manifold_ffi() {
     let indices = indices_binding.as_ref().unwrap().as_slice();
     assert!(!indices.is_empty());
 }
+

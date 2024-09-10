@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use std::path::PathBuf;
 
 use microcad_render::svg::SvgRenderer;
@@ -33,3 +36,4 @@ impl Exporter for SvgExporter {
         renderer.render_node(node)
     }
 }
+

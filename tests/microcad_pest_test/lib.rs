@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 #![warn(missing_docs)]
 
 #[derive(Debug, Clone, PartialEq)]
@@ -290,3 +293,4 @@ fn parse_pest_file() {
         PestResult::Err("Error Test".into())
     );
 }
+

@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::Vec3;
 use manifold_rs::{Manifold, Mesh};
 
@@ -108,3 +111,4 @@ impl From<Manifold> for TriangleMesh {
         TriangleMesh::from(manifold.to_mesh())
     }
 }
+

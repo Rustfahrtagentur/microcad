@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
 #[derive(Clone, Debug, PartialEq)]
@@ -83,3 +86,4 @@ impl std::ops::Sub for UnnamedTuple {
         self.binary_op(rhs, '-', |lhs, rhs| lhs - rhs)
     }
 }
+

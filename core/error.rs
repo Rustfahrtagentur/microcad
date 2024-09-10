@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -17,3 +20,4 @@ pub enum Error {
     #[error("No filename specified for export")]
     NoFilenameSpecifiedForExport,
 }
+

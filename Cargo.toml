@@ -1,3 +1,6 @@
+# Copyright © 2024 The µCAD authors <info@ucad.xyz>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 [workspace]
 default-members = [
     "core",
@@ -37,3 +40,4 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
+

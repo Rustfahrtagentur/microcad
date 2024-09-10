@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Parameter list parser entity
 
 use crate::{errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
@@ -86,3 +89,4 @@ macro_rules! parameter_list {
         microcad_lang::parse::parameter_list![$(microcad_lang::parameter!($name: $ty = $value)),*]
     };
 }
+

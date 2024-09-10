@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Format expression parser entity
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
@@ -59,3 +62,4 @@ impl std::fmt::Display for FormatExpression {
         write!(f, "{{{}}}", self.expression)
     }
 }
+

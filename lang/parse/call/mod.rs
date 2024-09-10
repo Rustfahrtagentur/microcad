@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! µCAD parser entities related to function or module calls
 
 mod call_argument;
@@ -145,3 +148,4 @@ fn call() {
         .count();
     assert_eq!(named, 2);
 }
+

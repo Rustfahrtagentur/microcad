@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use microcad_lang::{
     eval::BuiltinFunction,
     parameter_list,
@@ -33,3 +36,4 @@ pub fn builtin_fn() -> BuiltinFunction {
         },
     )
 }
+

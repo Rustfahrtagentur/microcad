@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 #![warn(missing_docs)]
 
 pub mod algorithm;
@@ -27,3 +30,4 @@ pub use export::{ExportSettings, Exporter};
 pub use transform::Transform;
 
 pub type Result<T> = std::result::Result<T, Error>;
+

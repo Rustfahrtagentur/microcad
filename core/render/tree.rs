@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{export::ExportSettings, geo2d, render::*, Algorithm, Transform};
 use strum::IntoStaticStr;
 
@@ -65,3 +68,4 @@ impl Depth for Node {
         }
     }
 }
+

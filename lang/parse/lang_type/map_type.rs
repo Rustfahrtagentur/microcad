@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Map type parser entity
 
 use crate::{errors::*, map_key_type::*, parser::*, r#type::*};
@@ -47,3 +50,4 @@ fn map_type() {
         Type::Map(MapType::new(MapKeyType::Integer, Type::String))
     );
 }
+

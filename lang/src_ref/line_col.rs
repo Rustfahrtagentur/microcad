@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 /// Line and column within a source code file
 #[derive(Clone, Debug, Default)]
 pub struct LineCol {
@@ -12,3 +15,4 @@ impl std::fmt::Display for LineCol {
         write!(f, "{}:{}", self.line, self.col)
     }
 }
+

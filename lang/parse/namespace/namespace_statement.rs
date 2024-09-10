@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Namespace statement parser entities
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
@@ -79,3 +82,4 @@ impl Eval for NamespaceStatement {
         Ok(())
     }
 }
+

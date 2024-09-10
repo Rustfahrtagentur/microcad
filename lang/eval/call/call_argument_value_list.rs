@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Call argument value list evaluation entity
 
 use crate::{eval::*, ord_map::*, src_ref::*};
@@ -216,3 +219,4 @@ fn call_get_matching_arguments_missing() {
         panic!("Expected MissingArguments error");
     }
 }
+

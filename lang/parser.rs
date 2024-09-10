@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! µCAD Code Parser
 
 #[derive(pest_derive::Parser)]
@@ -67,3 +70,4 @@ impl Parser {
         assert_eq!(rule, expected, "Unexpected rule: {rule:?}");
     }
 }
+

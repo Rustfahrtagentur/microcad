@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
 use crate::{
     diagnostics::{AddDiagnostic, Diagnostic, Diagnostics},
@@ -146,3 +149,4 @@ fn context_basic() {
 
     c.eval(&mut context).unwrap();
 }
+

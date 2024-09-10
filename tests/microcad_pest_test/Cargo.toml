@@ -1,3 +1,6 @@
+# Copyright © 2024 The µCAD authors <info@ucad.xyz>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 [package]
 name = "microcad_pest_test"
 version = "0.1.0"
@@ -9,3 +12,4 @@ path = "lib.rs"
 [dependencies]
 pest = "2.7"
 pest_derive = "2.7"
+

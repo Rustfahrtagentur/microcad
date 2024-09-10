@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Parse `call_argument_list` rule into CallArgumentList
 
 use crate::{errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
@@ -63,3 +66,4 @@ impl Parse for CallArgumentList {
         }
     }
 }
+

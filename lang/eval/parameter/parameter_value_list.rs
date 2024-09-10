@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Parameter value list evaluation entity
 
 use crate::{eval::*, src_ref::*};
@@ -76,3 +79,4 @@ impl std::ops::Deref for ParameterValueList {
         &self.parameters
     }
 }
+

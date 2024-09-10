@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use microcad_builtin_proc_macro::DefineBuiltInRenderable2D;
 use microcad_core::{
     geo2d::{Geometry, LineString},
@@ -84,3 +87,4 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .add_builtin_module(Rect::builtin_module())
         .build()
 }
+

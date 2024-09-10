@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use microcad_builtin_proc_macro::DefineBuiltInRenderable3D;
 use microcad_core::*;
 use microcad_lang::{eval::*, parse::*};
@@ -63,3 +66,4 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .add_builtin_module(Cube::builtin_module())
         .build()
 }
+

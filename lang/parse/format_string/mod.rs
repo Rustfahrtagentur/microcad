@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! µCAD format expression parser entities
 
 mod format_expression;
@@ -138,3 +141,4 @@ fn format_string() {
 
     assert_eq!(value, Value::String(Refer::none("A6B".into())));
 }
+

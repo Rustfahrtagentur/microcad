@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! call argument value evaluation entity
 
 use crate::{eval::*, ord_map::*, src_ref::*};
@@ -55,3 +58,4 @@ macro_rules! call_argument_value {
     };
     () => {};
 }
+

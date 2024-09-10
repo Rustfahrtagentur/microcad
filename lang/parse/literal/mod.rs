@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! µCAD literal parser entities
 
 mod number_literal;
@@ -96,3 +99,4 @@ impl std::fmt::Display for Literal {
         }
     }
 }
+

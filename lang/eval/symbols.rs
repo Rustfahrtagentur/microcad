@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{eval::*, parse::*};
 
 /// A symbol is a named entity that is used in the
@@ -127,3 +130,4 @@ impl std::ops::DerefMut for SymbolTable {
         &mut self.0
     }
 }
+

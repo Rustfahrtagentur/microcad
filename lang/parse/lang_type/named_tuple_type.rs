@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Named tuple type parser entity
 
 use crate::{errors::*, parse::*, parser::*, r#type::*};
@@ -61,3 +64,4 @@ fn named_tuple_type() {
         ))
     );
 }
+

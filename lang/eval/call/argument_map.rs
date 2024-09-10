@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Argument map evaluation entity
 
 use crate::{eval::*, src_ref::*};
@@ -45,3 +48,4 @@ impl std::ops::DerefMut for ArgumentMap {
         &mut self.0
     }
 }
+

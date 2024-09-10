@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Tuple expression
 
 use crate::{errors::*, eval::*, parse::*, parser::*, r#type::*, src_ref::*};
@@ -189,3 +192,4 @@ fn test_vec3() {
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.ty(), Type::Vec3);
 }
+

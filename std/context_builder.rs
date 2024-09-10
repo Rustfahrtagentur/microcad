@@ -1,3 +1,6 @@
+// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use microcad_lang::{
     eval::{Context, Symbols},
     parse::{ModuleDefinition, SourceFile},
@@ -39,3 +42,4 @@ impl ContextBuilder {
         self.context
     }
 }
+
