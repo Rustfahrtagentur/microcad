@@ -16,8 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Update submodule
-      run: git submodule update --init --recursive --remote -f
+      with:
+        submodules: 'true'
     - name: Build
       run: cargo build --verbose
     - name: Run clippy
