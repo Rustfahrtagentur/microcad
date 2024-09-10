@@ -8,7 +8,6 @@ use std::io::Read;
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use microcad_render::tree;
 
-
 /// µCAD source file statement
 #[derive(Clone, Debug)]
 pub enum SourceFileStatement {
@@ -57,10 +56,11 @@ impl Parse for SourceFileStatement {
             Rule::function_definition => {
                 Self::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?)
             }
-            Rule::assignment =>
-                Self::Assignment(Assignment::parse(first)?),
+            Rule::assignment => Self::Assignment(Assignment::parse(first)?),
             Rule::for_statement => Self::For(ForStatement::parse(first)?),
-            Rule::expression | Rule::expression_no_semicolon => Self::Expression(Expression::parse(first)?),
+            Rule::expression | Rule::expression_no_semicolon => {
+                Self::Expression(Expression::parse(first)?)
+            }
             rule => unreachable!(
                 "Unexpected source file statement, got {:?} {:?}",
                 rule,
@@ -110,6 +110,13 @@ pub struct SourceFile {
     pub filename: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
     _source: String,
+
+    /// Hash of the source file
+    ///
+    /// This hash is calculated from the filename or the source code itself
+    ///
+    /// This is used to map `SrcRef` -> `SourceFile`
+    hash: u64,
 }
 
 impl SourceFile {
@@ -123,6 +130,12 @@ impl SourceFile {
         use std::str::FromStr;
         let mut source_file = Self::from_str(&buf).context("Could not parse file")?;
 
+        use std::hash::Hash;
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        path.as_ref().hash(&mut hasher);
+
+        use std::hash::Hasher;
+        source_file.hash = hasher.finish();
         source_file.filename = Some(std::path::PathBuf::from(path.as_ref()));
         Ok(source_file)
     }
@@ -133,6 +146,11 @@ impl SourceFile {
             .as_ref()
             .map(|p| p.to_str().unwrap_or("<no file>"))
             .unwrap_or("<no file>")
+    }
+
+    /// Return source file hash
+    pub fn hash(&self) -> u64 {
+        self.hash
     }
 
     /// get a specific line
@@ -146,6 +164,11 @@ impl SourceFile {
 impl Parse for SourceFile {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut body = Vec::new();
+
+        use std::hash::{Hash, Hasher};
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        pair.as_str().hash(&mut hasher);
+        let hash = hasher.finish();
 
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
@@ -161,6 +184,7 @@ impl Parse for SourceFile {
             body,
             filename: None,
             _source: pair.as_span().as_str().to_string(),
+            hash,
         })
     }
 }
@@ -236,4 +260,3 @@ fn load_source_file_wrong_location() {
         panic!("Does file exist?");
     }
 }
-
