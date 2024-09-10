@@ -38,7 +38,7 @@ impl<T: SrcReferrer> SrcReferrer for &T {
 pub struct SrcRef(pub Option<SrcRefInner>);
 
 impl SrcRef {
-    /// Create new `SrcRef?
+    /// Create new `SrcRef`
     /// - `range`: Position in file
     /// - `line`: Line number (0..) in file
     /// - `col`: Column number (ß..) in file
@@ -46,6 +46,7 @@ impl SrcRef {
         Self(Some(SrcRefInner {
             range,
             at: LineCol { line, col },
+            source_file_hash: 0,
         }))
     }
 
@@ -58,6 +59,15 @@ impl SrcRef {
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
+    }
+
+    /// return source file hash
+    /// - `0` if not `SrcRefInner` is none
+    /// - `u64` if `SrcRefInner` is some
+    ///
+    /// This is used to map `SrcRef` -> `SourceFile`
+    pub fn source_file_hash(&self) -> u64 {
+        self.0.as_ref().map(|s| s.source_file_hash).unwrap_or(0)
     }
 }
 
@@ -76,6 +86,8 @@ pub struct SrcRefInner {
     pub range: std::ops::Range<usize>,
     /// Line and column (aka position)
     pub at: LineCol,
+    /// Hash of the source code file to map `SrcRef` -> `SourceFile`
+    source_file_hash: u64,
 }
 
 impl std::fmt::Display for SrcRef {
@@ -115,6 +127,10 @@ impl SrcRef {
 
     /// merge two `SrcRef` into a single one by
     pub fn merge(lhs: impl SrcReferrer, rhs: impl SrcReferrer) -> SrcRef {
+        assert!(
+            lhs.src_ref().source_file_hash() == rhs.src_ref().source_file_hash(),
+            "Source file hash must be the same",
+        );
         match (lhs.src_ref(), rhs.src_ref()) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => SrcRef(Some(SrcRefInner {
                 range: {
@@ -125,6 +141,7 @@ impl SrcRef {
                     lhs.range.start..rhs.range.end
                 },
                 at: lhs.at,
+                source_file_hash: lhs.source_file_hash,
             })),
             (SrcRef(Some(hs)), SrcRef(None)) | (SrcRef(None), SrcRef(Some(hs))) => SrcRef(Some(hs)),
             _ => SrcRef(None),
@@ -170,4 +187,3 @@ fn test_src_ref() {
     assert_eq!(cube.source_slice(input), "cube");
     assert_eq!(size_y.source_slice(input), "size_y");
 }
-
