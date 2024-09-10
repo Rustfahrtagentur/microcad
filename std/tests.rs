@@ -48,7 +48,8 @@ fn test_assert() {
 #[macro_export]
 macro_rules! args {
     ($($name:ident: $ty:ident = $value:expr),*) => {&{
-        let mut map = ArgumentMap::new();
+        use microcad_lang::src_ref::*;
+        let mut map = ArgumentMap::new(SrcRef(None));
         $(map.insert(stringify!($name).into(), microcad_lang::eval::Value::$ty(microcad_lang::src_ref::Refer::none($value)));)*
         map
     }};
