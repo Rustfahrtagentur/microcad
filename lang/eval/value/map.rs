@@ -1,15 +1,22 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Map type evaluation entity
+
 use value::{SrcRef, SrcReferrer};
 
 use crate::{eval::*, map_key_type::*, r#type::*};
 
+/// Map evaluation entity
 #[derive(Debug, Clone, PartialEq)]
 pub struct Map {
+    /// Map
     pub map: std::collections::HashMap<MapKeyValue, Value>,
+    /// Key type of the map
     pub key_type: MapKeyType,
+    /// Type of the map's values
     pub ty: Type,
+    /// Source code reference
     src_ref: SrcRef,
 }
 
@@ -45,4 +52,3 @@ impl std::fmt::Display for Map {
         )
     }
 }
-

@@ -34,7 +34,7 @@ impl CallArgumentValueList {
                 // We have a matching argument with the same name as the parameter.
                 Some(arg) => {
                     // Now we need to check if the argument type matches the parameter type
-                    if let TypeCheckResult::Ok = parameter_value.type_check(&arg.value.ty()) {
+                    if let TypeCheckResult::Match = parameter_value.type_check(&arg.value.ty()) {
                         Self::insert_and_remove(
                             arg_map,
                             parameter_values,
@@ -75,7 +75,7 @@ impl CallArgumentValueList {
                 let param_value = parameter_values[positional_index].clone();
                 if !arg_map.contains_key(&param_value.name) {
                     // @todo: Check for tuple arguments and whether the tuple fields match the parameters
-                    if let TypeCheckResult::Ok =
+                    if let TypeCheckResult::Match =
                         parameter_values[positional_index].type_check(&arg.value.ty())
                     {
                         Self::insert_and_remove(
@@ -219,4 +219,3 @@ fn call_get_matching_arguments_missing() {
         panic!("Expected MissingArguments error");
     }
 }
-

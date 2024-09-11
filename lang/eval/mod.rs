@@ -1,7 +1,8 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! evaluation of parsed content
+//! Evaluation of parsed content
+
 #![warn(missing_docs)]
 
 mod builtin_function;
@@ -24,9 +25,12 @@ pub use symbols::*;
 pub use ty::*;
 pub use value::*;
 
+/// Result type of any evaluation
 pub type Result<T> = std::result::Result<T, EvalError>;
 
+/// Evaluation trait
 pub trait Eval {
+    /// Implementor's ok result type
     type Output;
 
     /// Evaluate the type into an expression
@@ -34,4 +38,3 @@ pub trait Eval {
 }
 
 pub use microcad_core::Id;
-

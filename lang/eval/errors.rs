@@ -125,4 +125,3 @@ pub enum ValueError {
     #[error("Cannot concat two vec with different types {0} and {1}")]
     CannotCombineVecOfDifferentType(Type, Type),
 }
-

@@ -1,6 +1,8 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Value related evaluation entities
+
 mod list;
 mod map;
 mod map_key_value;
@@ -22,6 +24,7 @@ use microcad_render::tree::Node;
 
 pub(crate) type ValueResult = std::result::Result<Value, ValueError>;
 
+/// A variant value
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
     /// An integer value
@@ -44,9 +47,9 @@ pub enum Value {
     String(Refer<String>),
     /// Color value
     Color(Refer<Color>),
-    // List
+    /// List
     List(List),
-    // Hash Map
+    /// Hash Map
     Map(Map),
     /// Tuple of named items
     NamedTuple(NamedTuple),
@@ -459,4 +462,3 @@ fn test_value_scalar() {
     check(u() * w(), scalar(2.0 * 5.0, &r));
     check(u() / w(), scalar(2.0 / 5.0, &r));
 }
-

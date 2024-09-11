@@ -1,16 +1,21 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Typed list of values evaluation entity
+
 use crate::{eval::*, r#type::*, src_ref::*};
 
+/// List of values of the same type
 #[derive(Clone, Debug, PartialEq)]
 pub struct List {
+    /// List of values
     list: ValueList,
     ty: Type,
     src_ref: SrcRef,
 }
 
 impl List {
+    /// Create new list
     pub fn new(list: ValueList, ty: Type, src_ref: SrcRef) -> Self {
         Self { list, ty, src_ref }
     }
@@ -65,4 +70,3 @@ impl Ty for List {
         self.ty.clone()
     }
 }
-
