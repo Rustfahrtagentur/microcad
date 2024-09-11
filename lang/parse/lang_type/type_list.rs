@@ -14,16 +14,25 @@ impl TypeList {
         Self(types)
     }
 
+    /// Check if all list items are of a common type
     pub fn common_type(&self) -> Option<Type> {
-        let mut common_type = None;
-        for ty in &self.0 {
-            match common_type {
-                None => common_type = Some(ty.clone()),
-                Some(ref t) if t == ty => {}
-                _ => return None,
+        if let Some(ty) = self.0.first() {
+            if self.0[1..].iter().all(|t| t == ty) {
+                return Some(ty.clone());
             }
         }
-        common_type
+        None
     }
 }
 
+#[test]
+fn test_common_type() {
+    let list = TypeList::new(vec![Type::Integer, Type::Integer]);
+    assert_eq!(Some(Type::Integer), list.common_type());
+
+    let list = TypeList::new(vec![Type::Integer, Type::Scalar]);
+    assert_eq!(None, list.common_type());
+
+    let list = TypeList::new(Vec::new());
+    assert_eq!(None, list.common_type());
+}
