@@ -159,6 +159,39 @@ impl SourceFile {
     pub fn get_line(&self, line: usize) -> Option<&str> {
         self._source.lines().nth(line)
     }
+
+    /// Evaluate the source file as a namespace
+    ///
+    /// This is used to evaluate the source file as a namespace, which can be used to import
+    /// functions and values from the source file.
+    /// This functionality is used for the `use` statement.
+    pub fn eval_as_namespace(
+        &self,
+        context: &mut Context,
+        namespace_name: Identifier,
+    ) -> Result<std::rc::Rc<NamespaceDefinition>> {
+        let mut namespace = NamespaceDefinition::new(namespace_name);
+
+        for statement in &self.body {
+            match statement {
+                SourceFileStatement::Assignment(a) => {
+                    namespace.add_value(a.name.id().unwrap(), a.value.eval(context)?);
+                }
+                SourceFileStatement::FunctionDefinition(f) => {
+                    namespace.add_function(f.clone());
+                }
+                SourceFileStatement::ModuleDefinition(m) => {
+                    namespace.add_module(m.clone());
+                }
+                SourceFileStatement::NamespaceDefinition(n) => {
+                    namespace.add_namespace(n.clone());
+                }
+                _ => {}
+            }
+        }
+
+        Ok(std::rc::Rc::new(namespace))
+    }
 }
 
 impl Parse for SourceFile {
