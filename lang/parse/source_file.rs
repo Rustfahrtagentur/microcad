@@ -242,6 +242,28 @@ impl std::str::FromStr for SourceFile {
     }
 }
 
+/// Trait to get a source file by its hash
+pub trait GetSourceFileByHash {
+    /// Get a source file by its hash
+    fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile>;
+
+    /// Convenience function to get a source file by from a `SrcRef`
+    fn get_source_file_by_src_ref(&self, src_ref: impl SrcReferrer) -> Option<&SourceFile> {
+        self.get_source_file_by_hash(src_ref.src_ref().source_file_hash())
+    }
+}
+
+/// We can get a source file by its hash
+impl GetSourceFileByHash for SourceFile {
+    fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile> {
+        if self.hash == hash {
+            Some(self)
+        } else {
+            None
+        }
+    }
+}
+
 #[test]
 fn parse_source_file() {
     let source_file = Parser::parse_rule_or_panic::<SourceFile>(
