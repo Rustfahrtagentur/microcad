@@ -101,7 +101,6 @@ impl Eval for SourceFileStatement {
     }
 }
 
-
 /// µCAD source file
 #[derive(Clone, Debug)]
 pub struct SourceFile {

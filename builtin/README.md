@@ -12,11 +12,11 @@ This is because the built-in module is not aware of the unit system.
 The built-in modules are not meant to be used directly.
 Instead, they are wrapped in a module written µCAD language that provides units, asserts, default values and multiple initializers.
 
-In Rust, a built-in module is defined by a struct that implements the `BuiltInModule` trait.
+In Rust, a built-in module is defined by a struct that implements the `BuiltinModule` trait.
 For our `rect` module, the struct looks like this:
 
 ```rust
-#[derive(DefineBuiltInModule)]
+#[derive(DefineBuiltinModule)]
 struct Rect {
     width: Scalar,
     height: Scalar,
@@ -25,14 +25,14 @@ struct Rect {
 }
 ```
 
-The `DefineBuiltInModule` trait is defined as follows:
+The `DefineBuiltinModule` trait is defined as follows:
 
 ```rust
-pub trait DefineBuiltInModule {
+pub trait DefineBuiltinModule {
     fn name() -> &'static str;
     fn parameters() -> ParameterList;
     fn node(args: &ArgumentMap) -> Node;
-    fn function() -> &'static BuiltInModuleFn { ... }
+    fn function() -> &'static BuiltinModuleFn { ... }
     }
 
     fn builtin_module() -> BuiltinModule {
@@ -45,10 +45,10 @@ pub trait DefineBuiltInModule {
 }
 ```
 
-For the `rect` module, the implementation of the `DefineBuiltInModule` trait looks like this approximately:
+For the `rect` module, the implementation of the `DefineBuiltinModule` trait looks like this approximately:
 
 ```rust
-impl DefineBuiltInModule for Rectangle {
+impl DefineBuiltinModule for Rectangle {
     fn name() -> &'static str {
         "rect"
     }

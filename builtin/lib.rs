@@ -38,7 +38,7 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
 
             quote! {
                 #[automatically_derived]
-                impl DefineBuiltInModule for #struct_name {
+                impl DefineBuiltinModule for #struct_name {
                     fn name() -> &'static str {
                         #module_name
                     }
@@ -64,15 +64,14 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
     .into()
 }
 
-#[proc_macro_derive(DefineBuiltInRenderable2D)]
+#[proc_macro_derive(DefineBuiltinRenderable2D)]
 pub fn derive_define_builtin_renderable2d(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
     builtin_module_impl("Renderable2D", input)
 }
 
-#[proc_macro_derive(DefineBuiltInRenderable3D)]
+#[proc_macro_derive(DefineBuiltinRenderable3D)]
 pub fn derive_define_builtin_renderable3d(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
     builtin_module_impl("Renderable3D", input)
 }
-

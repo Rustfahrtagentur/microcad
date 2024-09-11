@@ -1,7 +1,7 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_builtin_proc_macro::DefineBuiltInRenderable2D;
+use microcad_builtin_proc_macro::DefineBuiltinRenderable2D;
 use microcad_core::{
     geo2d::{Geometry, LineString},
     Scalar,
@@ -9,7 +9,7 @@ use microcad_core::{
 use microcad_lang::{eval::*, parse::*};
 use microcad_render::{RenderHash, Renderable2D};
 
-#[derive(DefineBuiltInRenderable2D)]
+#[derive(DefineBuiltinRenderable2D)]
 pub struct Circle {
     pub radius: Scalar,
 }
@@ -43,7 +43,7 @@ impl Renderable2D for Circle {
     }
 }
 
-#[derive(DefineBuiltInRenderable2D)]
+#[derive(DefineBuiltinRenderable2D)]
 struct Rect {
     width: Scalar,
     height: Scalar,
@@ -87,4 +87,3 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .add_builtin_module(Rect::builtin_module())
         .build()
 }
-

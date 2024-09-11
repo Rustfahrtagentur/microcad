@@ -4,13 +4,13 @@
 use crate::{eval::*, parse::*};
 use microcad_render::tree;
 
-pub type BuiltInModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<tree::Node>;
+pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<tree::Node>;
 
 #[derive(Clone)]
 pub struct BuiltinModule {
     pub name: Identifier,
     pub parameters: ParameterList,
-    pub f: &'static BuiltInModuleFn,
+    pub f: &'static BuiltinModuleFn,
 }
 
 impl std::fmt::Debug for BuiltinModule {
@@ -28,12 +28,12 @@ impl BuiltinModule {
     }
 }
 
-pub trait DefineBuiltInModule {
+pub trait DefineBuiltinModule {
     fn name() -> &'static str;
     fn parameters() -> ParameterList;
     fn node(args: &ArgumentMap) -> Result<tree::Node>;
 
-    fn function() -> &'static BuiltInModuleFn {
+    fn function() -> &'static BuiltinModuleFn {
         &|args, ctx| Ok(ctx.append_node(Self::node(args)?))
     }
 

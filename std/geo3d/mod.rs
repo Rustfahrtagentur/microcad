@@ -1,12 +1,12 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_builtin_proc_macro::DefineBuiltInRenderable3D;
+use microcad_builtin_proc_macro::DefineBuiltinRenderable3D;
 use microcad_core::*;
 use microcad_lang::{eval::*, parse::*};
 use microcad_render::{RenderHash, Renderable3D};
 
-#[derive(DefineBuiltInRenderable3D)]
+#[derive(DefineBuiltinRenderable3D)]
 pub struct Sphere {
     pub radius: Scalar,
 }
@@ -32,7 +32,7 @@ impl Renderable3D for Sphere {
     }
 }
 
-#[derive(DefineBuiltInRenderable3D)]
+#[derive(DefineBuiltinRenderable3D)]
 pub struct Cube {
     pub size_x: Scalar,
     pub size_y: Scalar,
@@ -66,4 +66,3 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         .add_builtin_module(Cube::builtin_module())
         .build()
 }
-
