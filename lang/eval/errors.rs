@@ -1,10 +1,13 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Evaluation error
+
 use crate::{eval::*, r#type::*};
 use microcad_core::Id;
 use thiserror::Error;
 
+/// Evaluation error
 #[derive(Debug, Error)]
 pub enum EvalError {
     /// Unknown error

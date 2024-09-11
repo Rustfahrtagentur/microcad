@@ -130,4 +130,3 @@ impl std::ops::DerefMut for SymbolTable {
         &mut self.0
     }
 }
-

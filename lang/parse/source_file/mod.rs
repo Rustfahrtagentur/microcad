@@ -3,101 +3,23 @@
 
 //! µCAD source file representation
 
+mod statement;
+
+pub use statement::*;
+
 use std::io::Read;
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use microcad_render::tree;
 
-/// µCAD source file statement
-#[derive(Clone, Debug)]
-pub enum SourceFileStatement {
-    /// Use statement, e.g. `use * from std;`
-    Use(UseStatement),
-    /// Module definition, e.g. `module foo(r: scalar) { info("Hello, world, {r}!"); }`
-    ModuleDefinition(std::rc::Rc<ModuleDefinition>),
-    /// Namespace definition, e.g. `namespace foo { }`
-    NamespaceDefinition(std::rc::Rc<NamespaceDefinition>),
-    /// Function definition, e.g. `fn foo() { }`
-    FunctionDefinition(std::rc::Rc<FunctionDefinition>),
-    /// Assignment statement, e.g. `a = 10;`
-    Assignment(Assignment),
-    /// For loop, e.g. `for i in 0..10 { }`
-    For(ForStatement),
-    /// Expression statement, e.g. `a + b;`
-    Expression(Expression),
-}
+/// Trait to get a source file by its hash
+pub trait GetSourceFileByHash {
+    /// Get a source file by its hash
+    fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile>;
 
-impl SrcReferrer for SourceFileStatement {
-    fn src_ref(&self) -> SrcRef {
-        match self {
-            Self::Use(u) => u.src_ref(),
-            Self::ModuleDefinition(m) => m.src_ref(),
-            Self::NamespaceDefinition(n) => n.src_ref(),
-            Self::FunctionDefinition(f) => f.src_ref(),
-            Self::Assignment(a) => a.src_ref(),
-            Self::For(f) => f.src_ref(),
-            Self::Expression(e) => e.src_ref(),
-        }
-    }
-}
-
-impl Parse for SourceFileStatement {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::source_file_statement);
-        let first = pair.clone().into_inner().next().unwrap();
-        Ok(match first.as_rule() {
-            Rule::use_statement => Self::Use(UseStatement::parse(first)?),
-            Rule::module_definition => {
-                Self::ModuleDefinition(std::rc::Rc::<ModuleDefinition>::parse(first)?)
-            }
-            Rule::namespace_definition => {
-                Self::NamespaceDefinition(std::rc::Rc::<NamespaceDefinition>::parse(first)?)
-            }
-            Rule::function_definition => {
-                Self::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?)
-            }
-            Rule::assignment => Self::Assignment(Assignment::parse(first)?),
-            Rule::for_statement => Self::For(ForStatement::parse(first)?),
-            Rule::expression | Rule::expression_no_semicolon => {
-                Self::Expression(Expression::parse(first)?)
-            }
-            rule => unreachable!(
-                "Unexpected source file statement, got {:?} {:?}",
-                rule,
-                first.clone()
-            ),
-        })
-    }
-}
-
-impl Eval for SourceFileStatement {
-    type Output = ();
-
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        match self {
-            Self::Use(use_statement) => {
-                use_statement.eval(context)?;
-            }
-            Self::Assignment(assignment) => {
-                assignment.eval(context)?;
-            }
-            Self::FunctionDefinition(function_definition) => {
-                context.add_function(function_definition.clone());
-            }
-            Self::ModuleDefinition(module_definition) => {
-                context.add_module(module_definition.clone());
-            }
-            Self::NamespaceDefinition(namespace_definition) => {
-                context.add_namespace(namespace_definition.clone());
-            }
-            Self::For(for_statement) => {
-                for_statement.eval(context)?;
-            }
-            Self::Expression(expression) => {
-                expression.eval(context)?;
-            }
-        }
-        Ok(())
+    /// Convenience function to get a source file by from a `SrcRef`
+    fn get_source_file_by_src_ref(&self, src_ref: impl SrcReferrer) -> Option<&SourceFile> {
+        self.get_source_file_by_hash(src_ref.src_ref().source_file_hash())
     }
 }
 
@@ -105,7 +27,7 @@ impl Eval for SourceFileStatement {
 #[derive(Clone, Debug)]
 pub struct SourceFile {
     /// Root code body
-    pub body: Vec<SourceFileStatement>,
+    pub body: Vec<Statement>,
     /// Name of loaded file or `None`
     pub filename: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
@@ -172,16 +94,16 @@ impl SourceFile {
 
         for statement in &self.body {
             match statement {
-                SourceFileStatement::Assignment(a) => {
+                Statement::Assignment(a) => {
                     namespace.add_value(a.name.id().unwrap(), a.value.eval(context)?);
                 }
-                SourceFileStatement::FunctionDefinition(f) => {
+                Statement::FunctionDefinition(f) => {
                     namespace.add_function(f.clone());
                 }
-                SourceFileStatement::ModuleDefinition(m) => {
+                Statement::ModuleDefinition(m) => {
                     namespace.add_module(m.clone());
                 }
-                SourceFileStatement::NamespaceDefinition(n) => {
+                Statement::NamespaceDefinition(n) => {
                     namespace.add_namespace(n.clone());
                 }
                 _ => {}
@@ -204,7 +126,7 @@ impl Parse for SourceFile {
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::source_file_statement => {
-                    body.push(SourceFileStatement::parse(pair)?);
+                    body.push(Statement::parse(pair)?);
                 }
                 Rule::EOI => break,
                 _ => {}
@@ -239,17 +161,6 @@ impl std::str::FromStr for SourceFile {
 
     fn from_str(s: &str) -> anyhow::Result<Self> {
         Parser::parse_rule(crate::parser::Rule::source_file, s)
-    }
-}
-
-/// Trait to get a source file by its hash
-pub trait GetSourceFileByHash {
-    /// Get a source file by its hash
-    fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile>;
-
-    /// Convenience function to get a source file by from a `SrcRef`
-    fn get_source_file_by_src_ref(&self, src_ref: impl SrcReferrer) -> Option<&SourceFile> {
-        self.get_source_file_by_hash(src_ref.src_ref().source_file_hash())
     }
 }
 
@@ -292,7 +203,7 @@ fn load_source_file() {
 
     let first_statement = source_file.body.first().unwrap();
     match first_statement {
-        SourceFileStatement::Use(u) => {
+        Statement::Use(u) => {
             use crate::src_ref::SrcReferrer;
             assert_eq!(
                 u.src_ref().source_slice(&source_file._source),
