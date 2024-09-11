@@ -38,7 +38,7 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
 
             quote! {
                 #[automatically_derived]
-                impl DefineBuiltinModule for #struct_name {
+                impl BuiltinModuleDefinition for #struct_name {
                     fn name() -> &'static str {
                         #module_name
                     }
