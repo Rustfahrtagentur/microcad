@@ -7,7 +7,7 @@ description = "µCAD Standard Library"
 edition.workspace = true
 rust-version.workspace = true
 version.workspace = true
-license = "MIT"
+license = "AGPL-3.0-or-later"
 
 [lib]
 path = "lib.rs"
