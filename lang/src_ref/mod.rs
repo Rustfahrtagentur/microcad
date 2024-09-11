@@ -87,7 +87,7 @@ pub struct SrcRefInner {
     /// Line and column (aka position)
     pub at: LineCol,
     /// Hash of the source code file to map `SrcRef` -> `SourceFile`
-    source_file_hash: u64,
+    pub source_file_hash: u64,
 }
 
 impl std::fmt::Display for SrcRef {
