@@ -28,7 +28,10 @@ fn main() {
 
             let node = context.eval().unwrap();
             let mut w = std::io::stdout();
-            context.diagnostics().pretty_print(&mut w).unwrap();
+            context
+                .diagnostics()
+                .pretty_print(&mut w, &context)
+                .unwrap();
 
             microcad_std::export(node).unwrap();
         }
@@ -38,4 +41,3 @@ fn main() {
         }
     }
 }
-
