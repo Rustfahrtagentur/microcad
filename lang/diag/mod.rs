@@ -13,48 +13,60 @@ use crate::{parse::GetSourceFileByHash, src_ref::*};
 
 /// A trait to add diagnostics with different levels conveniently
 pub trait PushDiag {
+    /// Push a diagnostic message (must be implemented)
     fn push_diag(&mut self, diag: Diag);
 
+    /// Push new trace message
     fn trace(&mut self, src: impl SrcReferrer, message: String) {
-        self.push_diag(Diag::Trace(src.src_ref(), message));
+        self.push_diag(Diag::Trace(Refer::new(message, src.src_ref())));
     }
+    /// Push new informative message
     fn info(&mut self, src: impl SrcReferrer, message: String) {
-        self.push_diag(Diag::Info(src.src_ref(), message));
+        self.push_diag(Diag::Info(Refer::new(message, src.src_ref())));
     }
+    /// Push new warning
     fn warning(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> anyhow::Result<()> {
-        self.push_diag(Diag::Warning(src.src_ref(), error));
+        self.push_diag(Diag::Warning(Refer::new(error, src.src_ref())));
         Ok(())
     }
+    /// Push new error
     fn error(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> anyhow::Result<()> {
-        self.push_diag(Diag::Error(src.src_ref(), error));
+        self.push_diag(Diag::Error(Refer::new(error, src.src_ref())));
         Ok(())
     }
 }
 
+/// Diagnostic message with source code reference
 #[derive(Debug)]
 pub enum Diag {
-    Trace(SrcRef, String),
-    Info(SrcRef, String),
-    Error(SrcRef, anyhow::Error),
-    Warning(SrcRef, anyhow::Error),
+    /// Trace message with source code reference attached
+    Trace(Refer<String>),
+    /// Informative message with source code reference attached
+    Info(Refer<String>),
+    /// Warning with source code reference attached
+    Warning(Refer<anyhow::Error>),
+    /// Error  with source code reference attached
+    Error(Refer<anyhow::Error>),
 }
 
 impl Diag {
+    /// Get diagnostic level
     pub fn level(&self) -> Level {
         match self {
-            Diag::Trace(_, _) => Level::Trace,
-            Diag::Info(_, _) => Level::Info,
-            Diag::Error(_, _) => Level::Error,
-            Diag::Warning(_, _) => Level::Warning,
+            Diag::Trace(_) => Level::Trace,
+            Diag::Info(_) => Level::Info,
+            Diag::Warning(_) => Level::Warning,
+            Diag::Error(_) => Level::Error,
         }
     }
 
+    /// get message (errors will be serialized)
     pub fn message(&self) -> String {
         match self {
-            Diag::Trace(_, message) => message.to_string(),
-            Diag::Info(_, message) => message.to_string(),
-            Diag::Error(_, error) => error.to_string(),
-            Diag::Warning(_, error) => error.to_string(),
+            Diag::Trace(message) => message.to_string(),
+            Diag::Info(message) => message.to_string(),
+            Diag::Warning(error) => error.to_string(),
+            Diag::Error(error) => error.to_string(),
         }
     }
 
@@ -116,10 +128,10 @@ impl Diag {
 impl SrcReferrer for Diag {
     fn src_ref(&self) -> SrcRef {
         match self {
-            Diag::Trace(src, _) => src.clone(),
-            Diag::Info(src, _) => src.clone(),
-            Diag::Error(src, _) => src.clone(),
-            Diag::Warning(src, _) => src.clone(),
+            Diag::Trace(message) => message.src_ref(),
+            Diag::Info(message) => message.src_ref(),
+            Diag::Warning(error) => error.src_ref(),
+            Diag::Error(error) => error.src_ref(),
         }
     }
 }
@@ -127,10 +139,10 @@ impl SrcReferrer for Diag {
 impl std::fmt::Display for Diag {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Diag::Trace(src, message) => write!(f, "trace: {}: {}", src, message),
-            Diag::Info(src, message) => write!(f, "info: {}: {}", src, message),
-            Diag::Error(src, error) => write!(f, "error: {}: {}", src, error),
-            Diag::Warning(src, error) => write!(f, "warning: {}: {}", src, error),
+            Diag::Trace(message) => write!(f, "trace: {}: {message}", self.src_ref()),
+            Diag::Info(message) => write!(f, "info: {}: {message}", self.src_ref()),
+            Diag::Warning(error) => write!(f, "warning: {}: {error}", self.src_ref()),
+            Diag::Error(error) => write!(f, "error: {}: {error}", self.src_ref()),
         }
     }
 }
@@ -146,9 +158,13 @@ fn test_diagnostics() {
     use anyhow::anyhow;
 
     diagnostics.info(body_iter.next().unwrap(), "This is an info".to_string());
-    diagnostics.warning(body_iter.next().unwrap(), anyhow!("This is a warning"));
+    diagnostics
+        .warning(body_iter.next().unwrap(), anyhow!("This is a warning"))
+        .unwrap();
 
-    diagnostics.error(body_iter.next().unwrap(), anyhow!("This is an error"));
+    diagnostics
+        .error(body_iter.next().unwrap(), anyhow!("This is an error"))
+        .unwrap();
 
     assert_eq!(diagnostics.len(), 3);
     diagnostics

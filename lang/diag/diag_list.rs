@@ -7,6 +7,7 @@ use crate::{diag::*, parse::*};
 pub struct DiagList(Vec<Diag>);
 
 impl DiagList {
+    /// Pretty print this list of diagnostics
     pub fn pretty_print(
         &self,
         w: &mut dyn std::io::Write,

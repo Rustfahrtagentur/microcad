@@ -1,10 +1,16 @@
 /// The level of the diagnostic
+///
+/// Levels have a priority in order
 #[derive(Debug, Clone)]
 pub enum Level {
+    /// Trace message (highest diagnosis level)
     Trace,
-    Error,
-    Warning,
+    /// Informative message
     Info,
+    /// Warning
+    Warning,
+    /// Error (lowest diagnosis level)
+    Error,
 }
 
 impl std::fmt::Display for Level {
