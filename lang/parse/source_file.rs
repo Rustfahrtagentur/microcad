@@ -130,12 +130,6 @@ impl SourceFile {
         use std::str::FromStr;
         let mut source_file = Self::from_str(&buf).context("Could not parse file")?;
 
-        use std::hash::Hash;
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        path.as_ref().hash(&mut hasher);
-
-        use std::hash::Hasher;
-        source_file.hash = hasher.finish();
         source_file.filename = Some(std::path::PathBuf::from(path.as_ref()));
         Ok(source_file)
     }
