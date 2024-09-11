@@ -53,8 +53,9 @@ impl Eval for ForStatement {
                 }
             }
             value => {
-                use crate::diagnostics::AddDiagnostic;
-                context.error(self, format!("Expected list, got {}", value.ty()));
+                use crate::diagnostics::PushDiagnostic;
+                use anyhow::anyhow;
+                context.error(self, anyhow!("Expected list, got {}", value.ty()));
             }
         }
 
@@ -67,4 +68,3 @@ impl std::fmt::Display for ForStatement {
         write!(f, "for {} {}", self.loop_var, self.body)
     }
 }
-

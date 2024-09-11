@@ -47,8 +47,9 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 let message: String = args["message"].clone().try_into()?;
                 let condition: bool = args["condition"].clone().try_into()?;
                 if !condition {
-                    use microcad_lang::diagnostics::AddDiagnostic;
-                    ctx.error(args.src_ref(), format!("Assertion failed: {message}"));
+                    use anyhow::anyhow;
+                    use microcad_lang::diagnostics::PushDiagnostic;
+                    ctx.error(args.src_ref(), anyhow!("Assertion failed: {message}"));
                     Err(EvalError::AssertionFailed(message))
                 } else {
                     Ok(None)
@@ -62,4 +63,3 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
         }))
         .build()
 }
-

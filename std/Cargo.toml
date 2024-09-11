@@ -17,6 +17,7 @@ log = "0.4"
 lazy_static = "1.5"
 cgmath = "0.18"
 geo = "0.28"
+anyhow = "1.0"
 
 microcad-core = { path = "../core" }
 microcad-lang = { path = "../lang" }
@@ -27,4 +28,3 @@ microcad-builtin-proc-macro = { path = "../builtin" }
 [features]
 default = ["geo3d"]
 geo3d = []
-
