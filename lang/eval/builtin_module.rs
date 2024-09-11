@@ -38,14 +38,17 @@ impl std::fmt::Debug for BuiltinModule {
 
 /// Builtin module definition
 pub trait BuiltinModuleDefinition {
+    /// Get name of the builtin module
     fn name() -> &'static str;
+    /// Get parameters of the builtin module (implicit init)
     fn parameters() -> ParameterList;
+    /// Create node from argument map
     fn node(args: &ArgumentMap) -> Result<tree::Node>;
-
+    /// Implicit initialization functor
     fn function() -> &'static BuiltinModuleFn {
         &|args, ctx| Ok(ctx.append_node(Self::node(args)?))
     }
-
+    /// Generate builtin module
     fn builtin_module() -> BuiltinModule {
         BuiltinModule {
             name: Self::name().into(),
