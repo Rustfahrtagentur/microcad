@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
+use crate::parse::GetSourceFileByHash;
+use crate::source_file_cache::SourceFileCache;
 use crate::{
-    diagnostics::{AddDiagnostic, Diagnostic, Diagnostics},
+    diagnostics::{Diagnostic, Diagnostics},
     parse::{identifier::*, SourceFile},
 };
+
 use microcad_core::Id;
 use microcad_render::tree;
 
@@ -21,31 +24,41 @@ pub struct Context {
     /// Current node in the tree where the evaluation is happening
     current_node: tree::Node,
 
-    /// Source files loaded in the context
-    source_files: std::collections::HashMap<String, std::rc::Rc<SourceFile>>,
+    /// Current source file being evaluated
+    current_source_file: Option<std::rc::Rc<SourceFile>>,
+
+    /// Source file cache containing all source files loaded in the context
+    source_files: SourceFileCache,
 
     /// Source file diagnostics
     diagnostics: Diagnostics,
 }
 
 impl Context {
+    /// Create a new context from a source file
     pub fn from_source_file(source_file: SourceFile) -> Self {
-        let mut context = Self::default();
-        context.add_source_file(source_file);
-
-        context
+        Self {
+            stack: vec![SymbolTable::default()],
+            current_node: tree::root(),
+            current_source_file: Some(std::rc::Rc::new(source_file)),
+            source_files: SourceFileCache::default(),
+            diagnostics: Diagnostics::default(),
+        }
     }
 
     /// Evaluate the context with the current source file
     pub fn eval(&mut self) -> super::Result<tree::Node> {
-        let node = self.current_source_file().eval(self)?;
-
+        let node = self.current_source_file().unwrap().eval(self)?;
+        use crate::diagnostics::PushDiagnostic;
         self.info(crate::src_ref::SrcRef(None), "Evaluation complete".into());
         Ok(node)
     }
 
-    pub fn current_source_file(&self) -> std::rc::Rc<SourceFile> {
-        self.diagnostics.current_source_file().clone()
+    /// Return the current source file
+    ///
+    /// Note: This should not be an optional value, as the context is always created with a source file
+    pub fn current_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
+        self.current_source_file.clone()
     }
 
     /// Read-only access to the diagnostics
@@ -53,23 +66,24 @@ impl Context {
         &self.diagnostics
     }
 
-    /// Add a new source file to the context and set it as the current source file
-    pub fn add_source_file(&mut self, source_file: SourceFile) {
-        let new_source_file = std::rc::Rc::new(source_file);
-        self.source_files.insert(
-            new_source_file.filename().to_string(),
-            new_source_file.clone(),
-        );
-
-        self.diagnostics.push(new_source_file.clone());
-    }
-
+    /// Push a new symbol table to the stack (enter a new scope)
     pub fn push(&mut self) {
         self.stack.push(SymbolTable::default());
     }
 
+    /// Pop the top symbol table from the stack (exit the current scope)
     pub fn pop(&mut self) {
         self.stack.pop();
+    }
+
+    /// Open a new scope and execute the given closure
+    pub fn scope<F>(&mut self, f: F)
+    where
+        F: FnOnce(&mut Self),
+    {
+        self.push();
+        f(self);
+        self.pop();
     }
 
     pub fn get_symbols_by_qualified_name(
@@ -94,9 +108,9 @@ impl Context {
     }
 }
 
-impl AddDiagnostic for Context {
-    fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
-        self.diagnostics.add_diagnostic(diagnostic);
+impl crate::diagnostics::PushDiagnostic for Context {
+    fn push_diagnostic(&mut self, diagnostic: Diagnostic) {
+        self.diagnostics.push_diagnostic(diagnostic);
     }
 }
 
@@ -121,12 +135,21 @@ impl Symbols for Context {
     }
 }
 
+impl GetSourceFileByHash for Context {
+    fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile> {
+        self.source_files.get_source_file_by_hash(hash)
+    }
+}
+
+/// Default implementation for the context
+/// TODO: Remove this, it's just for testing
 impl Default for Context {
     fn default() -> Self {
         Self {
             stack: vec![SymbolTable::default()],
             current_node: tree::root(),
-            source_files: std::collections::HashMap::new(),
+            current_source_file: None,
+            source_files: SourceFileCache::default(),
             diagnostics: Diagnostics::default(),
         }
     }
@@ -149,4 +172,3 @@ fn context_basic() {
 
     c.eval(&mut context).unwrap();
 }
-

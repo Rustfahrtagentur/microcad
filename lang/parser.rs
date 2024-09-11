@@ -12,7 +12,7 @@ pub type Pair<'i> = pest::iterators::Pair<'i, Rule>;
 pub type Pairs<'i> = pest::iterators::Pairs<'i, Rule>;
 
 pub trait Parse: Sized {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self>;
+    fn parse(pair: Pair) -> ParseResult<Self>;
 }
 
 impl Parser {
@@ -70,4 +70,3 @@ impl Parser {
         assert_eq!(rule, expected, "Unexpected rule: {rule:?}");
     }
 }
-

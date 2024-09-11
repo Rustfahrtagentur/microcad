@@ -3,8 +3,7 @@
 
 //! Remember source code position for diagnosis
 
-use crate::{parse::SourceFile, src_ref::*};
-
+use crate::{parse::GetSourceFileByHash, src_ref::*};
 
 /// The level of the diagnostic
 #[derive(Debug, Clone)]
@@ -26,189 +25,177 @@ impl std::fmt::Display for Level {
     }
 }
 
-
 /// A trait to add diagnostics with different levels conveniently
-pub trait AddDiagnostic {
-    fn add_diagnostic(&mut self, diagnostic: Diagnostic);
+pub trait PushDiagnostic {
+    fn push_diagnostic(&mut self, diagnostic: Diagnostic);
 
     fn trace(&mut self, src: impl SrcReferrer, message: String) {
-        self.add_diagnostic(Diagnostic::new(src.src_ref(), message, Level::Trace));
+        self.push_diagnostic(Diagnostic::Trace(src.src_ref(), message));
     }
     fn info(&mut self, src: impl SrcReferrer, message: String) {
-        self.add_diagnostic(Diagnostic::new(src.src_ref(), message, Level::Info));
+        self.push_diagnostic(Diagnostic::Info(src.src_ref(), message));
     }
-    fn warning(&mut self, src: impl SrcReferrer, message: String) {
-        self.add_diagnostic(Diagnostic::new(src.src_ref(), message, Level::Warning));
+    fn warning(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> anyhow::Result<()> {
+        self.push_diagnostic(Diagnostic::Warning(src.src_ref(), error));
+        Ok(())
     }
-    fn error(&mut self, src: impl SrcReferrer, message: String) {
-        self.add_diagnostic(Diagnostic::new(src.src_ref(), message, Level::Error));
+    fn error(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> anyhow::Result<()> {
+        self.push_diagnostic(Diagnostic::Error(src.src_ref(), error));
+        Ok(())
     }
 }
 
-
-
-/// A diagnostic containing a source reference, a message and a level
-#[derive(Debug, Clone)]
-pub struct Diagnostic {
-    pub src_ref: SrcRef,
-    pub message: String,
-    pub level: Level,
+#[derive(Debug)]
+pub enum Diagnostic {
+    Trace(SrcRef, String),
+    Info(SrcRef, String),
+    Error(SrcRef, anyhow::Error),
+    Warning(SrcRef, anyhow::Error),
 }
 
 impl Diagnostic {
-    /// Create a new diagnostic
-    pub fn new(src_ref: SrcRef, message: String, level: Level) -> Self {
-        Self {
-            src_ref,
-            message,
-            level,
+    pub fn level(&self) -> Level {
+        match self {
+            Diagnostic::Trace(_, _) => Level::Trace,
+            Diagnostic::Info(_, _) => Level::Info,
+            Diagnostic::Error(_, _) => Level::Error,
+            Diagnostic::Warning(_, _) => Level::Warning,
         }
     }
 
+    pub fn message(&self) -> String {
+        match self {
+            Diagnostic::Trace(_, message) => message.to_string(),
+            Diagnostic::Info(_, message) => message.to_string(),
+            Diagnostic::Error(_, error) => error.to_string(),
+            Diagnostic::Warning(_, error) => error.to_string(),
+        }
+    }
+
+    /// Pretty print the diagnostic
+    ///
+    /// This will print the diagnostic to the given writer, including the source code reference
+    ///
+    /// # Arguments
+    ///
+    /// * `w` - The writer to write to
+    /// * `source_file_by_hash` - Hash provider to get the source file by hash
+    ///
+    /// This will print:
+    ///
+    /// ```text
+    /// error: This is an error
+    ///   ---> filename:1:8
+    ///     |
+    ///  1  | module circle(radius: length) {}
+    ///     |        ^^^^^^
+    /// ```
     pub fn pretty_print(
         &self,
         w: &mut dyn std::io::Write,
-        source_file: &SourceFile,
+        source_file_by_hash: &impl GetSourceFileByHash,
     ) -> std::io::Result<()> {
-        match self.src_ref {
-            SrcRef(None) => writeln!(w, "{}: {}", self.level, self.message)?,
-            SrcRef(Some(ref src_ref)) => {  
-                writeln!(w, "{}: {}", self.level, self.message)?;
+        let src_ref = self.src_ref();
+        let source_file = source_file_by_hash
+            .get_source_file_by_src_ref(&src_ref)
+            .unwrap();
+
+        match &src_ref {
+            SrcRef(None) => writeln!(w, "{}: {}", self.level(), self.message())?,
+            SrcRef(Some(ref src_ref)) => {
+                writeln!(w, "{}: {}", self.level(), self.message())?;
+                writeln!(w, "  ---> {}:{}", source_file.filename(), src_ref.at)?;
+                writeln!(w, "     |",)?;
+
+                let line = source_file
+                    .get_line(src_ref.at.line as usize - 1)
+                    .unwrap_or("<no line>");
+
+                writeln!(w, "{: >4} | {}", src_ref.at.line, line)?;
                 writeln!(
-                w,
-                "  ---> {}:{}",
-                source_file.filename(),
-                src_ref.at,
-            )?;
-            writeln!(w, "     |",)?;
-    
-            let line = source_file
-                .get_line(src_ref.at.line as usize - 1)
-                .unwrap_or("<no line>");
-    
-            writeln!(w, "{: >4} | {}", self.src_ref.at().unwrap().line, line)?;
-            writeln!(
-                w,
-                "{: >4} | {}",
-                "",
-                " ".repeat(self.src_ref.at().unwrap().col as usize - 1)
-                    + &"^".repeat(self.src_ref.len().min(line.len())),
-            )?;
-            writeln!(w, "     |",)?;
-        }}
-      
+                    w,
+                    "{: >4} | {}",
+                    "",
+                    " ".repeat(src_ref.at.col as usize - 1)
+                        + &"^".repeat(src_ref.range.len().min(line.len())),
+                )?;
+                writeln!(w, "     |",)?;
+            }
+        }
+
         Ok(())
     }
 }
 
-/// Diagnostics for a single source file
-#[derive(Debug)]
-pub struct SourceFileDiagnostics {
-    /// The source is an `Rc` because we want to share the source file between the diagnostics and the context
-    /// This way we can keep track of the source file and the diagnostics separately.
-    source_file: std::rc::Rc<SourceFile>,
-    diagnostics: Vec<Diagnostic>,
-}
-
-impl SourceFileDiagnostics {
-    pub fn new(source_file: std::rc::Rc<SourceFile>) -> Self {
-        Self {
-            source_file,
-            diagnostics: Vec::new(),
+impl SrcReferrer for Diagnostic {
+    fn src_ref(&self) -> SrcRef {
+        match self {
+            Diagnostic::Trace(src, _) => src.clone(),
+            Diagnostic::Info(src, _) => src.clone(),
+            Diagnostic::Error(src, _) => src.clone(),
+            Diagnostic::Warning(src, _) => src.clone(),
         }
     }
+}
 
-    pub fn pretty_print(
-        &self,
-        w: &mut dyn std::io::Write,
-    ) -> std::io::Result<()> {
-        for diagnostic in &self.diagnostics {
-            diagnostic.pretty_print(w, self.source_file.as_ref())?;
+impl std::fmt::Display for Diagnostic {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Diagnostic::Trace(src, message) => write!(f, "trace: {}: {}", src, message),
+            Diagnostic::Info(src, message) => write!(f, "info: {}: {}", src, message),
+            Diagnostic::Error(src, error) => write!(f, "error: {}: {}", src, error),
+            Diagnostic::Warning(src, error) => write!(f, "warning: {}: {}", src, error),
         }
-        Ok(())
     }
 }
-
-impl AddDiagnostic for SourceFileDiagnostics {
-    fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
-        self.diagnostics.push(diagnostic);
-    }
-}
-
-impl AddDiagnostic for &mut SourceFileDiagnostics {
-    fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
-        self.diagnostics.push(diagnostic);
-    }
-}
-
-
 
 #[derive(Debug, Default)]
 pub struct Diagnostics {
     /// We have a vec of source file diagnostics because we want to keep track of diagnostics for each source file separately
-    diagnostics: Vec<SourceFileDiagnostics>,
-
-    /// Trace with indices to the diagnostics vector
-    trace: Vec<usize>,
+    diagnostics: Vec<Diagnostic>,
 }
 
 impl Diagnostics {
-    pub fn new(source_file: std::rc::Rc<SourceFile>) -> Self {
-        Self {
-            diagnostics: vec![SourceFileDiagnostics::new(source_file.clone())],
-            trace: Vec::new(),
-        }
-    }
-
-    pub fn current_source_file(&self) -> std::rc::Rc<SourceFile> {
-        self.diagnostics.last().map(|d| d.source_file.clone()).unwrap()
-    }
-
-    pub fn push(&mut self, source_file: std::rc::Rc<SourceFile>) {
-        self.trace.push(self.diagnostics.len());
-        self.diagnostics.push(SourceFileDiagnostics::new(source_file));
-    }
-
-    pub fn pop(&mut self) {
-        self.trace.pop();
-    }
-
-    pub fn pretty_print(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
+    pub fn pretty_print(
+        &self,
+        w: &mut dyn std::io::Write,
+        source_file_by_hash: &impl GetSourceFileByHash,
+    ) -> std::io::Result<()> {
         for source_file_diagnostics in &self.diagnostics {
-            source_file_diagnostics.pretty_print(w)?;
-        }
-        Ok(())
-    }
-
-    pub fn print_backtrace(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
-        for index in &self.trace {
-            self.diagnostics[*index].pretty_print(w)?;
+            source_file_diagnostics.pretty_print(w, source_file_by_hash)?;
         }
         Ok(())
     }
 }
 
-impl AddDiagnostic for Diagnostics {
-    fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
-        self.diagnostics.last_mut().unwrap().add_diagnostic(diagnostic);
+impl PushDiagnostic for Diagnostics {
+    fn push_diagnostic(&mut self, diagnostic: Diagnostic) {
+        self.diagnostics.push(diagnostic);
     }
 }
-
 
 #[test]
 fn test_diagnostics() {
-    let source_file = std::rc::Rc::new(
-        SourceFile::load(r#"../tests/std/algorithm_difference.µcad"#).unwrap(),
-    );
+    let source_file =
+        crate::parse::SourceFile::load(r#"../tests/std/algorithm_difference.µcad"#).unwrap();
 
-    let mut diagnostics = SourceFileDiagnostics::new(source_file.clone());
+    let mut diagnostics = Diagnostics::default();
 
     let mut body_iter = source_file.body.iter();
+    use anyhow::anyhow;
+
     diagnostics.info(body_iter.next().unwrap(), "This is an info".to_string());
-    diagnostics.warning(body_iter.next().unwrap(), "This is a warning".to_string());
-    diagnostics.error(body_iter.next().unwrap(), "This is an error".to_string());
+    diagnostics.warning(body_iter.next().unwrap(), anyhow!("This is a warning"));
+
+    diagnostics.error(body_iter.next().unwrap(), anyhow!("This is an error"));
 
     assert_eq!(diagnostics.diagnostics.len(), 3);
-    diagnostics.pretty_print(&mut std::io::stdout()).unwrap();
+    diagnostics
+        .pretty_print(
+            &mut std::io::stdout(),
+            source_file
+                .get_source_file_by_hash(source_file.hash())
+                .unwrap(),
+        )
+        .unwrap();
 }
-
