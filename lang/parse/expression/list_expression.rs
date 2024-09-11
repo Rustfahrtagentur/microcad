@@ -77,7 +77,7 @@ impl Eval for ListExpression {
             value_list.push(expr.eval(context)?);
         }
         if let Some(unit) = self.unit {
-            value_list.add_unit_to_unitless_types(unit)?;
+            value_list.add_unit_to_unitless(unit)?;
         }
 
         match value_list.types().common_type() {
@@ -90,4 +90,3 @@ impl Eval for ListExpression {
         }
     }
 }
-

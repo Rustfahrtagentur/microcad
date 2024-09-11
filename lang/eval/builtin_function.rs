@@ -1,15 +1,22 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Builtin function evaluation entity
+
 use crate::{eval::*, parse::*};
 
-pub type BuiltinFunctionFunctor = dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>>;
+/// Type of the functor which receives a call
+pub type BuiltinFunctionFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>>;
 
+/// Builtin function
 #[derive(Clone)]
 pub struct BuiltinFunction {
+    /// Name of the builtin function
     pub name: Identifier,
+    /// Signature of the builtin function
     pub signature: FunctionSignature,
-    pub f: &'static BuiltinFunctionFunctor,
+    /// Functor to evaluate this function
+    pub f: &'static BuiltinFunctionFn,
 }
 
 impl std::fmt::Debug for BuiltinFunction {
@@ -19,14 +26,19 @@ impl std::fmt::Debug for BuiltinFunction {
 }
 
 impl BuiltinFunction {
+    /// Create new builtin function
     pub fn new(
         name: Identifier,
         signature: FunctionSignature,
-        f: &'static BuiltinFunctionFunctor,
+        f: &'static BuiltinFunctionFn,
     ) -> Self {
         Self { name, signature, f }
     }
 
+    /// Call builtin function with given parameter
+    /// # Arguments
+    /// - `args`: Function arguments
+    /// - `context`: Execution context
     pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
         let arg_map = args
             .eval(context)?
@@ -100,4 +112,3 @@ macro_rules! builtin_function {
         )
     };
 }
-

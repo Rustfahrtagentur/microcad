@@ -140,7 +140,7 @@ fn test_builtin_function(name: &str, input: &str, expected: &str) {
     context.add_module(module);
 
     let symbols = context
-        .get_symbols_by_qualified_name(&"math::abs".into())
+        .find_symbols_by_qualified_name(&"math::abs".into())
         .unwrap();
     assert_eq!(symbols.len(), 1);
 
@@ -156,4 +156,3 @@ fn test_build_math_module() {
     test_builtin_function("abs", "math::abs(-1.0)", "1");
     test_builtin_function("sqrt", "math::sqrt(4.0)", "2");
 }
-

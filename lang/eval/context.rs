@@ -80,17 +80,20 @@ impl Context {
         self.pop();
     }
 
-    pub fn get_symbols_by_qualified_name(
+    /// Fetch symbols by qualified name
+    pub fn find_symbols_by_qualified_name(
         &self,
         name: &QualifiedName,
     ) -> Result<Vec<Symbol>, EvalError> {
         name.get_symbols(self)
     }
 
+    /// Get current evaluation node
     pub fn current_node(&self) -> tree::Node {
         self.current_node.clone()
     }
 
+    /// Set current evaluation node
     pub fn set_current_node(&mut self, node: tree::Node) {
         self.current_node = node;
     }

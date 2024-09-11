@@ -1,16 +1,21 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Unnamed tuple evaluation entity
+
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
+/// Unnamed tuple
 #[derive(Clone, Debug, PartialEq)]
 pub struct UnnamedTuple(ValueList);
 
 impl UnnamedTuple {
+    /// create a new unnamed tuple
     pub fn new(list: ValueList) -> Self {
         Self(list)
     }
 
+    /// evaluate the given operation
     pub fn binary_op(
         self,
         rhs: Self,
@@ -86,4 +91,3 @@ impl std::ops::Sub for UnnamedTuple {
         self.binary_op(rhs, '-', |lhs, rhs| lhs - rhs)
     }
 }
-

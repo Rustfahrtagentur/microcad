@@ -90,7 +90,7 @@ impl Eval for TupleExpression {
                 value_list.push(arg.value.eval(context)?);
             }
             if let Some(unit) = self.unit {
-                value_list.add_unit_to_unitless_types(unit)?;
+                value_list.add_unit_to_unitless(unit)?;
             }
             Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
         } else {
@@ -103,7 +103,7 @@ impl Eval for TupleExpression {
             {
                 let mut value = expr.clone().eval(context)?;
                 if let Some(unit) = self.unit {
-                    value.add_unit_to_unitless_types(unit)?;
+                    value.add_unit_to_unitless(unit)?;
                 }
                 map.insert(ident.clone(), value);
             }
@@ -192,4 +192,3 @@ fn test_vec3() {
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.ty(), Type::Vec3);
 }
-

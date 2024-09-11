@@ -1,26 +1,29 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Value list evaluation entity
+
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
+/// List of values
 #[derive(Clone, Debug, PartialEq, Default)]
 pub struct ValueList(Refer<Vec<Value>>);
 
 impl ValueList {
+    /// Create new value list
     pub fn new(list: Vec<Value>, src_ref: SrcRef) -> Self {
         Self(Refer::new(list, src_ref))
     }
 
-    pub fn add_unit_to_unitless_types(
-        &mut self,
-        unit: Unit,
-    ) -> std::result::Result<(), ValueError> {
+    /// add unit to values of primitive types (Scalar or Integer)
+    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
         for value in self.0.iter_mut() {
-            value.add_unit_to_unitless_types(unit)?;
+            value.add_unit_to_unitless(unit)?;
         }
         Ok(())
     }
 
+    /// Return list with types of values
     pub fn types(&self) -> TypeList {
         TypeList::new(
             self.0
@@ -69,4 +72,3 @@ impl std::iter::FromIterator<Value> for ValueList {
         ValueList(Refer::new(vec, src_ref))
     }
 }
-

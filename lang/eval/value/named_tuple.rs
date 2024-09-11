@@ -1,6 +1,8 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Named tuple evaluation entity
+
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
 #[cfg(test)]
@@ -11,10 +13,12 @@ macro_rules! named_tuple {
     };
 }
 
+/// Tuple with named values
 #[derive(Clone, Debug, PartialEq)]
 pub struct NamedTuple(Refer<std::collections::BTreeMap<Identifier, Value>>);
 
 impl NamedTuple {
+    /// Create new named tuple instance
     pub fn new(map: std::collections::BTreeMap<Identifier, Value>, src_ref: SrcRef) -> Self {
         Self(Refer::new(map, src_ref))
     }
@@ -65,4 +69,3 @@ impl Ty for NamedTuple {
         ))
     }
 }
-

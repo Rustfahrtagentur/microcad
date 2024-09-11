@@ -1,7 +1,7 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Value related evaluation entities
+//! µCAD value related evaluation entities
 
 mod list;
 mod map;
@@ -60,11 +60,8 @@ pub enum Value {
 }
 
 impl Value {
-    /// Add a unit to a scalar value
-    pub fn add_unit_to_unitless_types(
-        &mut self,
-        unit: Unit,
-    ) -> std::result::Result<(), ValueError> {
+    /// Add a unit to a primitive value (Scalar or Integer)
+    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
         match (self.clone(), unit.ty()) {
             (Value::Integer(i), Type::Length) => {
                 *self = Value::Length(Refer::new(unit.normalize(*i as Scalar), i.src_ref))
