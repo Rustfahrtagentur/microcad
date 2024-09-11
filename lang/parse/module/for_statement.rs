@@ -3,7 +3,7 @@
 
 //! For statement parser entity
 
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{diag::*, errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// For statement
 #[derive(Clone, Debug)]
@@ -53,7 +53,6 @@ impl Eval for ForStatement {
                 }
             }
             value => {
-                use crate::diagnostics::PushDiagnostic;
                 use anyhow::anyhow;
                 context.error(self, anyhow!("Expected list, got {}", value.ty()));
             }

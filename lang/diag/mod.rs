@@ -3,72 +3,58 @@
 
 //! Remember source code position for diagnosis
 
+mod diag_list;
+mod level;
+
+pub use diag_list::*;
+pub use level::*;
+
 use crate::{parse::GetSourceFileByHash, src_ref::*};
 
-/// The level of the diagnostic
-#[derive(Debug, Clone)]
-pub enum Level {
-    Trace,
-    Error,
-    Warning,
-    Info,
-}
-
-impl std::fmt::Display for Level {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            Level::Trace => write!(f, "trace"),
-            Level::Error => write!(f, "error"),
-            Level::Warning => write!(f, "warning"),
-            Level::Info => write!(f, "info"),
-        }
-    }
-}
-
 /// A trait to add diagnostics with different levels conveniently
-pub trait PushDiagnostic {
-    fn push_diagnostic(&mut self, diagnostic: Diagnostic);
+pub trait PushDiag {
+    fn push_diag(&mut self, diag: Diag);
 
     fn trace(&mut self, src: impl SrcReferrer, message: String) {
-        self.push_diagnostic(Diagnostic::Trace(src.src_ref(), message));
+        self.push_diag(Diag::Trace(src.src_ref(), message));
     }
     fn info(&mut self, src: impl SrcReferrer, message: String) {
-        self.push_diagnostic(Diagnostic::Info(src.src_ref(), message));
+        self.push_diag(Diag::Info(src.src_ref(), message));
     }
     fn warning(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> anyhow::Result<()> {
-        self.push_diagnostic(Diagnostic::Warning(src.src_ref(), error));
+        self.push_diag(Diag::Warning(src.src_ref(), error));
         Ok(())
     }
     fn error(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> anyhow::Result<()> {
-        self.push_diagnostic(Diagnostic::Error(src.src_ref(), error));
+        self.push_diag(Diag::Error(src.src_ref(), error));
         Ok(())
     }
 }
 
 #[derive(Debug)]
-pub enum Diagnostic {
+pub enum Diag {
     Trace(SrcRef, String),
     Info(SrcRef, String),
     Error(SrcRef, anyhow::Error),
     Warning(SrcRef, anyhow::Error),
 }
 
-impl Diagnostic {
+impl Diag {
     pub fn level(&self) -> Level {
         match self {
-            Diagnostic::Trace(_, _) => Level::Trace,
-            Diagnostic::Info(_, _) => Level::Info,
-            Diagnostic::Error(_, _) => Level::Error,
-            Diagnostic::Warning(_, _) => Level::Warning,
+            Diag::Trace(_, _) => Level::Trace,
+            Diag::Info(_, _) => Level::Info,
+            Diag::Error(_, _) => Level::Error,
+            Diag::Warning(_, _) => Level::Warning,
         }
     }
 
     pub fn message(&self) -> String {
         match self {
-            Diagnostic::Trace(_, message) => message.to_string(),
-            Diagnostic::Info(_, message) => message.to_string(),
-            Diagnostic::Error(_, error) => error.to_string(),
-            Diagnostic::Warning(_, error) => error.to_string(),
+            Diag::Trace(_, message) => message.to_string(),
+            Diag::Info(_, message) => message.to_string(),
+            Diag::Error(_, error) => error.to_string(),
+            Diag::Warning(_, error) => error.to_string(),
         }
     }
 
@@ -127,50 +113,25 @@ impl Diagnostic {
     }
 }
 
-impl SrcReferrer for Diagnostic {
+impl SrcReferrer for Diag {
     fn src_ref(&self) -> SrcRef {
         match self {
-            Diagnostic::Trace(src, _) => src.clone(),
-            Diagnostic::Info(src, _) => src.clone(),
-            Diagnostic::Error(src, _) => src.clone(),
-            Diagnostic::Warning(src, _) => src.clone(),
+            Diag::Trace(src, _) => src.clone(),
+            Diag::Info(src, _) => src.clone(),
+            Diag::Error(src, _) => src.clone(),
+            Diag::Warning(src, _) => src.clone(),
         }
     }
 }
 
-impl std::fmt::Display for Diagnostic {
+impl std::fmt::Display for Diag {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Diagnostic::Trace(src, message) => write!(f, "trace: {}: {}", src, message),
-            Diagnostic::Info(src, message) => write!(f, "info: {}: {}", src, message),
-            Diagnostic::Error(src, error) => write!(f, "error: {}: {}", src, error),
-            Diagnostic::Warning(src, error) => write!(f, "warning: {}: {}", src, error),
+            Diag::Trace(src, message) => write!(f, "trace: {}: {}", src, message),
+            Diag::Info(src, message) => write!(f, "info: {}: {}", src, message),
+            Diag::Error(src, error) => write!(f, "error: {}: {}", src, error),
+            Diag::Warning(src, error) => write!(f, "warning: {}: {}", src, error),
         }
-    }
-}
-
-#[derive(Debug, Default)]
-pub struct Diagnostics {
-    /// We have a vec of source file diagnostics because we want to keep track of diagnostics for each source file separately
-    diagnostics: Vec<Diagnostic>,
-}
-
-impl Diagnostics {
-    pub fn pretty_print(
-        &self,
-        w: &mut dyn std::io::Write,
-        source_file_by_hash: &impl GetSourceFileByHash,
-    ) -> std::io::Result<()> {
-        for source_file_diagnostics in &self.diagnostics {
-            source_file_diagnostics.pretty_print(w, source_file_by_hash)?;
-        }
-        Ok(())
-    }
-}
-
-impl PushDiagnostic for Diagnostics {
-    fn push_diagnostic(&mut self, diagnostic: Diagnostic) {
-        self.diagnostics.push(diagnostic);
     }
 }
 
@@ -179,7 +140,7 @@ fn test_diagnostics() {
     let source_file =
         crate::parse::SourceFile::load(r#"../tests/std/algorithm_difference.µcad"#).unwrap();
 
-    let mut diagnostics = Diagnostics::default();
+    let mut diagnostics = DiagList::default();
 
     let mut body_iter = source_file.body.iter();
     use anyhow::anyhow;
@@ -189,7 +150,7 @@ fn test_diagnostics() {
 
     diagnostics.error(body_iter.next().unwrap(), anyhow!("This is an error"));
 
-    assert_eq!(diagnostics.diagnostics.len(), 3);
+    assert_eq!(diagnostics.len(), 3);
     diagnostics
         .pretty_print(
             &mut std::io::stdout(),

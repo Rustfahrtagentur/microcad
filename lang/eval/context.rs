@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
-use crate::parse::GetSourceFileByHash;
-use crate::source_file_cache::SourceFileCache;
-use crate::{
-    diagnostics::{Diagnostic, Diagnostics},
-    parse::{identifier::*, SourceFile},
-};
+use crate::{diag::*, parse::*, source_file_cache::*};
 
 use microcad_core::Id;
 use microcad_render::tree;
@@ -31,7 +26,7 @@ pub struct Context {
     source_files: SourceFileCache,
 
     /// Source file diagnostics
-    diagnostics: Diagnostics,
+    diagnostics: DiagList,
 }
 
 impl Context {
@@ -42,14 +37,13 @@ impl Context {
             current_node: tree::root(),
             current_source_file: Some(std::rc::Rc::new(source_file)),
             source_files: SourceFileCache::default(),
-            diagnostics: Diagnostics::default(),
+            diagnostics: DiagList::default(),
         }
     }
 
     /// Evaluate the context with the current source file
     pub fn eval(&mut self) -> super::Result<tree::Node> {
         let node = self.current_source_file().unwrap().eval(self)?;
-        use crate::diagnostics::PushDiagnostic;
         self.info(crate::src_ref::SrcRef(None), "Evaluation complete".into());
         Ok(node)
     }
@@ -62,7 +56,7 @@ impl Context {
     }
 
     /// Read-only access to the diagnostics
-    pub fn diagnostics(&self) -> &Diagnostics {
+    pub fn diagnostics(&self) -> &DiagList {
         &self.diagnostics
     }
 
@@ -108,9 +102,9 @@ impl Context {
     }
 }
 
-impl crate::diagnostics::PushDiagnostic for Context {
-    fn push_diagnostic(&mut self, diagnostic: Diagnostic) {
-        self.diagnostics.push_diagnostic(diagnostic);
+impl crate::diag::PushDiag for Context {
+    fn push_diag(&mut self, diagnostic: Diag) {
+        self.diagnostics.push_diag(diagnostic);
     }
 }
 
@@ -150,7 +144,7 @@ impl Default for Context {
             current_node: tree::root(),
             current_source_file: None,
             source_files: SourceFileCache::default(),
-            diagnostics: Diagnostics::default(),
+            diagnostics: DiagList::default(),
         }
     }
 }

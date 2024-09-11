@@ -5,7 +5,7 @@
 
 #![warn(missing_docs)]
 
-pub mod diagnostics;
+pub mod diag;
 pub mod errors;
 pub mod eval;
 pub mod map_key_type;

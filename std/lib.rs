@@ -48,7 +48,7 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                 let condition: bool = args["condition"].clone().try_into()?;
                 if !condition {
                     use anyhow::anyhow;
-                    use microcad_lang::diagnostics::PushDiagnostic;
+                    use microcad_lang::diag::PushDiag;
                     ctx.error(args.src_ref(), anyhow!("Assertion failed: {message}"));
                     Err(EvalError::AssertionFailed(message))
                 } else {
