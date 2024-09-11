@@ -159,6 +159,10 @@ impl SourceFile {
     /// This is used to evaluate the source file as a namespace, which can be used to import
     /// functions and values from the source file.
     /// This functionality is used for the `use` statement.
+    ///
+    /// TODOs:
+    /// - [ ] Test this function
+    /// - [ ] Use this function in the `use` statement evaluation
     pub fn eval_as_namespace(
         &self,
         context: &mut Context,
