@@ -16,7 +16,7 @@ impl ValueList {
     }
 
     /// add unit to values of primitive types (Scalar or Integer)
-    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
+    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), EvalError> {
         for value in self.0.iter_mut() {
             value.add_unit_to_unitless(unit)?;
         }

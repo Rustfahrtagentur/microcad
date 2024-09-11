@@ -31,14 +31,14 @@ impl MapKeyValue {
 }
 
 impl TryFrom<Value> for MapKeyValue {
-    type Error = ValueError;
+    type Error = EvalError;
 
     fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
         match value {
             Value::Integer(n) => Ok(MapKeyValue::Integer(n)),
             Value::Bool(b) => Ok(MapKeyValue::Bool(b)),
             Value::String(s) => Ok(MapKeyValue::String(s)),
-            value => Err(ValueError::InvalidMapKeyType(value.ty())),
+            value => Err(EvalError::InvalidMapKeyType(value.ty())),
         }
     }
 }

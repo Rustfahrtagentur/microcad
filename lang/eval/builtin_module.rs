@@ -36,8 +36,7 @@ impl std::fmt::Debug for BuiltinModule {
     }
 }
 
-/// TODO: removed pub here to attract your attention ;)
-trait DefineBuiltinModule {
+pub trait DefineBuiltinModule {
     fn name() -> &'static str;
     fn parameters() -> ParameterList;
     fn node(args: &ArgumentMap) -> Result<tree::Node>;

@@ -22,7 +22,7 @@ use cgmath::InnerSpace;
 use microcad_core::*;
 use microcad_render::tree::Node;
 
-pub(crate) type ValueResult = std::result::Result<Value, ValueError>;
+pub(crate) type ValueResult = std::result::Result<Value, EvalError>;
 
 /// A variant value
 #[derive(Clone, Debug, PartialEq)]
@@ -61,7 +61,7 @@ pub enum Value {
 
 impl Value {
     /// Add a unit to a primitive value (Scalar or Integer)
-    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
+    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), EvalError> {
         match (self.clone(), unit.ty()) {
             (Value::Integer(i), Type::Length) => {
                 *self = Value::Length(Refer::new(unit.normalize(*i as Scalar), i.src_ref))
@@ -75,7 +75,7 @@ impl Value {
             (Value::Scalar(s), Type::Angle) => {
                 *self = Value::Angle(Refer::new(unit.normalize(*s), s.src_ref))
             }
-            (value, _) => return Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
+            (value, _) => return Err(EvalError::CannotAddUnitToValueWithUnit(value.clone())),
         }
         Ok(())
     }
@@ -150,7 +150,7 @@ impl std::ops::Neg for Value {
             Value::Vec2(v) => Ok(Value::Vec2(-v.clone())),
             Value::Vec3(v) => Ok(Value::Vec3(-v.clone())),
             Value::Angle(n) => Ok(Value::Angle(-n.clone())),
-            _ => Err(ValueError::InvalidOperator('-')),
+            _ => Err(EvalError::InvalidOperator("-".into())),
         }
     }
 }
@@ -192,7 +192,7 @@ impl std::ops::Add for Value {
             // Concatenate two lists
             (Value::List(lhs), Value::List(rhs)) => {
                 if lhs.ty() != rhs.ty() {
-                    return Err(ValueError::CannotCombineVecOfDifferentType(
+                    return Err(EvalError::CannotCombineVecOfDifferentType(
                         lhs.ty(),
                         rhs.ty(),
                     ));
@@ -208,7 +208,7 @@ impl std::ops::Add for Value {
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
                 Ok(Value::UnnamedTuple((lhs + rhs)?))
             }
-            _ => Err(ValueError::InvalidOperator('+')),
+            _ => Err(EvalError::InvalidOperator("+".into())),
         }
     }
 }
@@ -249,7 +249,7 @@ impl std::ops::Sub for Value {
                     lhs.retain(|x| !rhs.contains(x));
                     Ok(Value::List(lhs))
                 } else {
-                    Err(ValueError::CannotCombineVecOfDifferentType(
+                    Err(EvalError::CannotCombineVecOfDifferentType(
                         lhs.ty(),
                         rhs.ty(),
                     ))
@@ -259,7 +259,7 @@ impl std::ops::Sub for Value {
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
                 Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
-            _ => Err(ValueError::InvalidOperator('-')),
+            _ => Err(EvalError::InvalidOperator("-".into())),
         }
     }
 }
@@ -305,7 +305,7 @@ impl std::ops::Mul for Value {
                     Vec3::new(l * r.x, l * r.y, l * r.z)
                 })))
             }
-            _ => Err(ValueError::InvalidOperator('*')),
+            _ => Err(EvalError::InvalidOperator("*".into())),
         }
     }
 }
@@ -337,7 +337,7 @@ impl std::ops::Div for Value {
             | (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Scalar(lhs / rhs)),
             (Value::Length(lhs), Value::Scalar(rhs)) => Ok(Value::Length(lhs / rhs)),
             (Value::Angle(lhs), Value::Scalar(rhs)) => Ok(Value::Angle(lhs / rhs)),
-            _ => Err(ValueError::InvalidOperator('/')),
+            _ => Err(EvalError::InvalidOperator("/".into())),
         }
     }
 }
@@ -366,23 +366,23 @@ impl std::fmt::Display for Value {
 macro_rules! impl_try_from {
     ($($variant:ident),+ => $ty:ty ) => {
         impl TryFrom<Value> for $ty {
-            type Error = ValueError;
+            type Error = EvalError;
 
             fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
                 match value {
                     $(Value::$variant(v) => Ok(v.value.into()),)*
-                    value => Err(ValueError::CannotConvert(value, stringify!($ty).into())),
+                    value => Err(EvalError::CannotConvert(value, stringify!($ty).into())),
                 }
             }
         }
 
         impl TryFrom<&Value> for $ty {
-            type Error = ValueError;
+            type Error = EvalError;
 
             fn try_from(value: &Value) -> std::result::Result<Self, Self::Error> {
                 match value {
                     $(Value::$variant(v) => Ok(v.value.clone().into()),)*
-                    value => Err(ValueError::CannotConvert(value.clone(), stringify!($ty).into())),
+                    value => Err(EvalError::CannotConvert(value.clone(), stringify!($ty).into())),
                 }
             }
         }

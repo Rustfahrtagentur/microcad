@@ -190,7 +190,6 @@ impl Eval for Expression {
                     '≠' => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
                     _ => unimplemented!(),
                 }
-                .map_err(EvalError::ValueError)
             }
             Self::UnaryOp {
                 op,
@@ -202,7 +201,6 @@ impl Eval for Expression {
                     '-' => -rhs.clone(),
                     _ => unimplemented!(),
                 }
-                .map_err(EvalError::ValueError)
             }
             Self::ListElementAccess(lhs, rhs, _) => {
                 let lhs = lhs.eval(context)?;
@@ -526,4 +524,3 @@ fn nested_context() {
         }
     });
 }*/
-

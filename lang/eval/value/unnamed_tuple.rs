@@ -21,9 +21,9 @@ impl UnnamedTuple {
         rhs: Self,
         op: char,
         f: impl Fn(Value, Value) -> ValueResult,
-    ) -> std::result::Result<Self, ValueError> {
+    ) -> std::result::Result<Self, EvalError> {
         if self.0.len() != rhs.0.len() {
-            return Err(ValueError::TupleLengthMismatchForOperator {
+            return Err(EvalError::TupleLengthMismatchForOperator {
                 operator: op,
                 lhs: self.0.len(),
                 rhs: rhs.0.len(),
@@ -77,7 +77,7 @@ impl Ty for UnnamedTuple {
 }
 
 impl std::ops::Add for UnnamedTuple {
-    type Output = std::result::Result<UnnamedTuple, ValueError>;
+    type Output = std::result::Result<UnnamedTuple, EvalError>;
 
     fn add(self, rhs: Self) -> Self::Output {
         self.binary_op(rhs, '+', |lhs, rhs| lhs + rhs)
@@ -85,7 +85,7 @@ impl std::ops::Add for UnnamedTuple {
 }
 
 impl std::ops::Sub for UnnamedTuple {
-    type Output = std::result::Result<UnnamedTuple, ValueError>;
+    type Output = std::result::Result<UnnamedTuple, EvalError>;
 
     fn sub(self, rhs: Self) -> Self::Output {
         self.binary_op(rhs, '-', |lhs, rhs| lhs - rhs)

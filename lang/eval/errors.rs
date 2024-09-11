@@ -6,7 +6,7 @@ use microcad_core::Id;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum OperatorError {
+pub enum EvalError {
     #[error("Invalid operator: {0}")]
     InvalidOperator(String),
 
@@ -21,15 +21,9 @@ pub enum OperatorError {
 
     #[error("Incompatible types {0} and {1} for division")]
     DivIncompatibleTypes(Type, Type),
-}
 
-#[derive(Debug, Error)]
-pub enum EvalError {
     #[error("Invalid type: {0}")]
     InvalidType(Type),
-
-    #[error("Operator error: {0}")]
-    OperatorError(#[from] OperatorError),
 
     #[error("List index out of bounds: {index} >= {len}")]
     ListIndexOutOfBounds { index: usize, len: usize },
@@ -39,9 +33,6 @@ pub enum EvalError {
 
     #[error("Cannot evaluate to type: {0}")]
     EvaluateToTypeError(Type),
-
-    #[error("Value error {0}")]
-    ValueError(#[from] ValueError),
 
     #[error("Unknown qualified name: {0}")]
     UnknownQualifiedName(Id),
@@ -96,12 +87,6 @@ pub enum EvalError {
 
     #[error("Assertion failed: {0}")]
     AssertionFailed(String),
-}
-
-#[derive(Debug, Error)]
-pub enum ValueError {
-    #[error("Invalid operator: {0}")]
-    InvalidOperator(char),
 
     #[error("Tuple length mismatch for operator {operator}: lhs={lhs}, rhs={rhs}")]
     TupleLengthMismatchForOperator {
