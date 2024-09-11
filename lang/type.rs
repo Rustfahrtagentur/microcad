@@ -8,7 +8,7 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 /// µCAD Basic Types
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
-    // A 64-bit integer number
+    /// A 64-bit integer number
     Integer,
     /// A 64-bit floating-point number
     Scalar,
@@ -45,6 +45,7 @@ pub enum Type {
 }
 
 impl Type {
+    /// Return default unit if primitive type or list of primitive types)
     pub fn default_unit(&self) -> Unit {
         match self {
             Self::Length => Unit::Mm,
@@ -68,6 +69,7 @@ impl Type {
     }
 }
 
+/// Type within source code
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeAnnotation(pub Refer<Type>);
 
@@ -163,4 +165,3 @@ fn builtin_type() {
     assert_eq!(ty.0.to_string(), "int");
     assert_eq!(ty.0.value, Type::Integer);
 }
-
