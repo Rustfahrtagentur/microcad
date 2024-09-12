@@ -78,7 +78,7 @@ impl QualifiedName {
 
         let new_symbols = match (&root, ident.id()) {
             (Some(ref root), Some(id)) => root.fetch_symbols(&id),
-            (None, Some(id)) => context.fetch_symbols(&id),
+            (None, Some(id)) => context.fetch(&id),
             _ => unreachable!("can't search unnamed symbol"),
         };
 

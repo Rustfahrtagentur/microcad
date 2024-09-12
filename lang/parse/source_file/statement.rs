@@ -79,13 +79,13 @@ impl Eval for Statement {
                 assignment.eval(context)?;
             }
             Self::FunctionDefinition(function_definition) => {
-                context.add_function(function_definition.clone());
+                context.add(function_definition.clone().into());
             }
             Self::ModuleDefinition(module_definition) => {
-                context.add_module(module_definition.clone());
+                context.add(module_definition.clone().into());
             }
             Self::NamespaceDefinition(namespace_definition) => {
-                context.add_namespace(namespace_definition.clone());
+                context.add(namespace_definition.clone().into());
             }
             Self::For(for_statement) => {
                 for_statement.eval(context)?;

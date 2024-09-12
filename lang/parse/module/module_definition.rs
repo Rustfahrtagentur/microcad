@@ -45,17 +45,17 @@ impl SrcReferrer for ModuleDefinition {
 }
 
 impl Symbols for ModuleDefinition {
-    fn fetch_symbols(&self, id: &Id) -> Vec<&Symbol> {
-        self.body.fetch_symbols(id)
+    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
+        self.body.fetch(id)
     }
 
-    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
-        self.body.add_symbol(symbol);
+    fn add(&mut self, symbol: Symbol) -> &mut Self {
+        self.body.add(symbol);
         self
     }
-    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) {
         self.body.symbols.iter().for_each(|symbol| {
-            into.add_symbol(symbol.clone());
+            into.add(symbol.clone());
         });
     }
 }

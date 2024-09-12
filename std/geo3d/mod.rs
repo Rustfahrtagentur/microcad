@@ -62,7 +62,7 @@ use crate::NamespaceBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     NamespaceBuilder::new("geo3d")
-        .add_builtin_module(Sphere::builtin_module())
-        .add_builtin_module(Cube::builtin_module())
+        .add(Sphere::builtin_module().into())
+        .add(Cube::builtin_module().into())
         .build()
 }

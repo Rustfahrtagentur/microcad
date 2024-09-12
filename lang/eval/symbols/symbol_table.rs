@@ -1,4 +1,4 @@
-use crate::{eval::*, parse::*};
+use crate::eval::*;
 
 /// Symbol table
 ///
@@ -6,14 +6,8 @@ use crate::{eval::*, parse::*};
 #[derive(Clone, Debug, Default)]
 pub struct SymbolTable(Vec<Symbol>);
 
-impl SymbolTable {
-    pub fn new() -> Self {
-        Self(Vec::new())
-    }
-}
-
 impl Symbols for SymbolTable {
-    fn fetch_symbols(&self, id: &Id) -> Vec<&Symbol> {
+    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
         self.0
             .iter()
             .filter(|symbol| {
@@ -25,14 +19,15 @@ impl Symbols for SymbolTable {
             })
             .collect()
     }
-    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
+
+    fn add(&mut self, symbol: Symbol) -> &mut Self {
         self.0.push(symbol);
         self
     }
 
-    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) {
         self.0.iter().for_each(|symbol| {
-            into.add_symbol(symbol.clone());
+            into.add(symbol.clone());
         });
     }
 }

@@ -49,7 +49,7 @@ impl FunctionDefinition {
 
         context.push();
         for (name, value) in arg_map.iter() {
-            context.add_value(name.clone(), value.clone());
+            context.add(Symbol::Value(name.clone(), value.clone()));
         }
 
         for statement in self.body.0.iter() {
@@ -86,8 +86,7 @@ impl Eval for std::rc::Rc<FunctionDefinition> {
     type Output = ();
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        context.add_function(self.clone());
+        context.add(self.clone().into());
         Ok(())
     }
 }
-

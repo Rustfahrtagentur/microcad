@@ -182,7 +182,7 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                                     Err(_) => (),
                                     Ok(doc) => { 
                                         let mut context = Context::default();
-                                        context.add_module(microcad_std::builtin_module());
+                                        context.add(microcad_std::builtin_module().into());
 
                                         if let Err(err) = doc.eval(&mut context) {
                                             println!("{err}");
@@ -195,8 +195,8 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                             r##"{
                                     Ok(doc) => {
                                         let mut context = Context::default();
-                                        context.add_module(microcad_std::builtin_module());
-
+                                        context.add(microcad_std::builtin_module().into());
+                                        
                                         if let Err(err) = doc.eval(&mut context) {
                                             println!("{err}");
                                         }

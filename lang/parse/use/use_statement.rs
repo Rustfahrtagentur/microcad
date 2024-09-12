@@ -87,10 +87,10 @@ impl Eval for UseStatement {
                     let symbols = name.eval(context)?;
                     for symbol in symbols {
                         match symbol {
-                            Symbol::ModuleDefinition(module_definition) => {
+                            Symbol::Module(module_definition) => {
                                 let symbols = &module_definition.body.symbols;
                                 for symbol in symbols.iter() {
-                                    context.add_symbol(symbol.clone());
+                                    context.add(symbol.clone());
                                 }
                             }
                             _ => {
@@ -107,7 +107,7 @@ impl Eval for UseStatement {
                 for name in &names.value {
                     let symbols = name.eval(context)?;
                     for symbol in symbols {
-                        context.add_symbol(symbol.clone());
+                        context.add(symbol.clone());
                     }
                 }
                 Ok(())
@@ -119,4 +119,3 @@ impl Eval for UseStatement {
         }
     }
 }
-

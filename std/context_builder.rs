@@ -27,13 +27,13 @@ impl ContextBuilder {
 
     /// Add the standard library to the context
     pub fn with_std(mut self) -> Self {
-        self.context.add_module(crate::builtin_module());
+        self.context.add(crate::builtin_module().into());
         self
     }
 
     /// Add a module to the context
     pub fn with_module(mut self, module: std::rc::Rc<ModuleDefinition>) -> Self {
-        self.context.add_module(module);
+        self.context.add(module.into());
         self
     }
 
@@ -42,4 +42,3 @@ impl ContextBuilder {
         self.context
     }
 }
-

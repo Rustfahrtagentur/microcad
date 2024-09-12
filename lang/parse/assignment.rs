@@ -36,7 +36,7 @@ impl Parse for Assignment {
         let mut name = Identifier::default();
         let mut specified_type = None;
         let mut value = None;
-        
+
         for pair in pair.clone().into_inner() {
             match pair.as_rule() {
                 Rule::identifier => {
@@ -68,7 +68,10 @@ impl Eval for Assignment {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let value = self.value.eval(context)?;
-        context.add_value(self.name.id().expect("nameless lvalue"), value);
+        context.add(Symbol::Value(
+            self.name.id().expect("nameless lvalue"),
+            value,
+        ));
         Ok(())
     }
 }
@@ -81,4 +84,3 @@ impl std::fmt::Display for Assignment {
         }
     }
 }
-

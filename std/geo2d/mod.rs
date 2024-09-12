@@ -83,7 +83,7 @@ use crate::NamespaceBuilder;
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     NamespaceBuilder::new("geo2d")
-        .add_builtin_module(Circle::builtin_module())
-        .add_builtin_module(Rect::builtin_module())
+        .add(Circle::builtin_module().into())
+        .add(Rect::builtin_module().into())
         .build()
 }

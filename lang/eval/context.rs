@@ -112,22 +112,22 @@ impl crate::diag::PushDiag for Context {
 }
 
 impl Symbols for Context {
-    fn fetch_symbols(&self, id: &Id) -> Vec<&Symbol> {
+    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
         self.stack
             .iter()
             .rev()
-            .flat_map(|table| table.fetch_symbols(id))
+            .flat_map(|table| table.fetch(id))
             .collect()
     }
 
-    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
-        self.stack.last_mut().unwrap().add_symbol(symbol);
+    fn add(&mut self, symbol: Symbol) -> &mut Self {
+        self.stack.last_mut().unwrap().add(symbol);
         self
     }
 
-    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) {
         self.stack.last().unwrap().iter().for_each(|symbol| {
-            into.add_symbol(symbol.clone());
+            into.add(symbol.clone());
         });
     }
 }
@@ -162,8 +162,8 @@ fn context_basic() {
     context.add_value("a".into(), Value::Integer(Refer::none(1)));
     context.add_value("b".into(), Value::Integer(Refer::none(2)));
 
-    assert_eq!(context.fetch_symbols(&"a".into())[0].id().unwrap(), "a");
-    assert_eq!(context.fetch_symbols(&"b".into())[0].id().unwrap(), "b");
+    assert_eq!(context.fetch(&"a".into())[0].id().unwrap(), "a");
+    assert_eq!(context.fetch(&"b".into())[0].id().unwrap(), "b");
 
     let c = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "c = a + b");
 

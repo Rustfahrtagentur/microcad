@@ -33,33 +33,39 @@ use namespace_builder::NamespaceBuilder;
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     NamespaceBuilder::new("std")
         // TODO: is this correct= Shouldn't this use add_builtin_module() =
-        .add_module(math::builtin_module())
-        .add_module(geo2d::builtin_module())
-        .add_module(geo3d::builtin_module())
-        .add_module(algorithm::builtin_module())
-        .add_builtin_function(BuiltinFunction::new(
-            "assert".into(),
-            function_signature!(parameter_list![
-                parameter!(condition: Bool),
-                parameter!(message: String = "Assertion failed")
-            ]),
-            &|args, ctx| {
-                let message: String = args["message"].clone().try_into()?;
-                let condition: bool = args["condition"].clone().try_into()?;
-                if !condition {
-                    use anyhow::anyhow;
-                    use microcad_lang::diag::PushDiag;
-                    ctx.error(args.src_ref(), anyhow!("Assertion failed: {message}"));
-                    Err(EvalError::AssertionFailed(message))
-                } else {
-                    Ok(None)
-                }
-            },
-        ))
-        .add_builtin_module(builtin_module!(export(filename: String) {
-            let export_settings = ExportSettings::with_filename(filename.clone());
+        .add(math::builtin_module().into())
+        .add(geo2d::builtin_module().into())
+        .add(geo3d::builtin_module().into())
+        .add(algorithm::builtin_module().into())
+        .add(
+            BuiltinFunction::new(
+                "assert".into(),
+                function_signature!(parameter_list![
+                    parameter!(condition: Bool),
+                    parameter!(message: String = "Assertion failed")
+                ]),
+                &|args, ctx| {
+                    let message: String = args["message"].clone().try_into()?;
+                    let condition: bool = args["condition"].clone().try_into()?;
+                    if !condition {
+                        use anyhow::anyhow;
+                        use microcad_lang::diag::PushDiag;
+                        ctx.error(args.src_ref(), anyhow!("Assertion failed: {message}"));
+                        Err(EvalError::AssertionFailed(message))
+                    } else {
+                        Ok(None)
+                    }
+                },
+            )
+            .into(),
+        )
+        .add(
+            builtin_module!(export(filename: String) {
+                let export_settings = ExportSettings::with_filename(filename.clone());
 
-            Ok(microcad_core::export::export(export_settings))
-        }))
+                Ok(microcad_core::export::export(export_settings))
+            })
+            .into(),
+        )
         .build()
 }

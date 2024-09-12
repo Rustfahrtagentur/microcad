@@ -27,10 +27,9 @@ pub fn xor() -> Result<Node, EvalError> {
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     NamespaceBuilder::new("algorithm")
-        .add_builtin_module(builtin_module!(difference()))
-        .add_builtin_module(builtin_module!(intersection()))
-        .add_builtin_module(builtin_module!(union()))
-        .add_builtin_module(builtin_module!(xor()))
+        .add(builtin_module!(difference()).into())
+        .add(builtin_module!(intersection()).into())
+        .add(builtin_module!(union()).into())
+        .add(builtin_module!(xor()).into())
         .build()
 }
-

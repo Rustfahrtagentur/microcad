@@ -31,12 +31,7 @@ fn assignment() {
     assignment.eval(&mut context).unwrap();
 
     assert_eq!(
-        context
-            .fetch_symbols(&"a".into())
-            .first()
-            .unwrap()
-            .id()
-            .unwrap(),
+        context.fetch(&"a".into()).first().unwrap().id().unwrap(),
         "a"
     );
 }
@@ -85,7 +80,7 @@ fn function_evaluate() {
     );
 
     let mut context = Context::default();
-    context.add_function(function_def);
+    context.add(function_def.into());
 
     let input = "test(a = 1.0, b = 2.0)";
     let expr = Parser::parse_rule_or_panic::<Expression>(Rule::expression, input);

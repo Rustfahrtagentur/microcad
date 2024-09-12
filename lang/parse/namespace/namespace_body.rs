@@ -22,13 +22,13 @@ impl NamespaceBody {
         self.statements.push(statement.clone());
         match statement {
             NamespaceStatement::FunctionDefinition(function) => {
-                self.add_function(function);
+                self.add(function.into());
             }
             NamespaceStatement::NamespaceDefinition(namespace) => {
-                self.add_namespace(namespace);
+                self.add(namespace.into());
             }
             NamespaceStatement::ModuleDefinition(module) => {
-                self.add_module(module);
+                self.add(module.into());
             }
             _ => {}
         }
@@ -36,17 +36,17 @@ impl NamespaceBody {
 }
 
 impl Symbols for NamespaceBody {
-    fn fetch_symbols(&self, id: &Id) -> Vec<&Symbol> {
-        self.symbols.fetch_symbols(id)
+    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
+        self.symbols.fetch(id)
     }
 
-    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
-        self.symbols.add_symbol(symbol);
+    fn add(&mut self, symbol: Symbol) -> &mut Self {
+        self.symbols.add(symbol);
         self
     }
 
-    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
-        self.symbols.copy_symbols(into)
+    fn copy<T: Symbols>(&self, into: &mut T) {
+        self.symbols.copy(into)
     }
 }
 

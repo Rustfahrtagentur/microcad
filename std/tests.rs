@@ -14,7 +14,7 @@ fn context_namespace() {
         .add_value("pi", Value::Scalar(Refer::none(std::f64::consts::PI)))
         .build();
 
-    context.add_module(module);
+    context.add(module.into());
 
     let symbols = context
         .fetch_symbols_by_qualified_name(&"math::pi".into())

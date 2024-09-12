@@ -85,10 +85,10 @@ impl Eval for ModuleStatement {
                 assignment.eval(context)?;
             }
             Self::FunctionDefinition(function_definition) => {
-                context.add_function(function_definition.clone());
+                context.add(function_definition.clone().into());
             }
             Self::ModuleDefinition(module_definition) => {
-                context.add_module(module_definition.clone());
+                context.add(module_definition.clone().into());
             }
             statement => {
                 let s: &'static str = statement.into();
@@ -117,4 +117,3 @@ impl std::fmt::Display for ModuleStatement {
         }
     }
 }
-

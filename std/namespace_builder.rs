@@ -20,7 +20,7 @@ impl NamespaceBuilder {
     /// Add a value
     #[cfg(test)]
     pub fn add_value(&mut self, name: &str, value: Value) -> &mut Self {
-        self.namespace.add_value(name.into(), value);
+        self.namespace.add(Symbol::Value(name.into(), value));
         self
     }
 
@@ -31,16 +31,16 @@ impl NamespaceBuilder {
 }
 
 impl Symbols for NamespaceBuilder {
-    fn fetch_symbols(&self, name: &microcad_core::Id) -> Vec<&Symbol> {
-        self.namespace.fetch_symbols(name)
+    fn fetch(&self, name: &microcad_core::Id) -> Vec<&Symbol> {
+        self.namespace.fetch(name)
     }
 
-    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
-        self.namespace.add_symbol(symbol);
+    fn add(&mut self, symbol: Symbol) -> &mut Self {
+        self.namespace.add(symbol);
         self
     }
 
-    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
-        self.namespace.copy_symbols(into)
+    fn copy<T: Symbols>(&self, into: &mut T) {
+        self.namespace.copy(into)
     }
 }

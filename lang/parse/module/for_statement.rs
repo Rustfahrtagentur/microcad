@@ -47,7 +47,7 @@ impl Eval for ForStatement {
             Value::List(list) => {
                 for value in list.iter() {
                     context.push();
-                    context.add_symbol(Symbol::Value(self.loop_var.id().unwrap(), value.clone()));
+                    context.add(Symbol::Value(self.loop_var.id().unwrap(), value.clone()));
                     self.body.eval(context)?;
                     context.pop();
                 }

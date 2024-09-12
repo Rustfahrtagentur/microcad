@@ -95,16 +95,16 @@ impl SourceFile {
         for statement in &self.body {
             match statement {
                 Statement::Assignment(a) => {
-                    namespace.add_value(a.name.id().unwrap(), a.value.eval(context)?);
+                    namespace.add(Symbol::Value(a.name.id().unwrap(), a.value.eval(context)?));
                 }
                 Statement::FunctionDefinition(f) => {
-                    namespace.add_function(f.clone());
+                    namespace.add(f.clone().into());
                 }
                 Statement::ModuleDefinition(m) => {
-                    namespace.add_module(m.clone());
+                    namespace.add(m.clone().into());
                 }
                 Statement::NamespaceDefinition(n) => {
-                    namespace.add_namespace(n.clone());
+                    namespace.add(n.clone().into());
                 }
                 _ => {}
             }

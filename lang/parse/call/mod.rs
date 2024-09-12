@@ -88,7 +88,7 @@ impl Eval for Call {
                         non_matching_symbols.push(symbol.clone());
                     }
                 }
-                Symbol::ModuleDefinition(m) => {
+                Symbol::Module(m) => {
                     if let Ok(value) = m.call(&self.argument_list, context) {
                         return Ok(Some(Value::Node(value)));
                     } else {
@@ -148,4 +148,3 @@ fn call() {
         .count();
     assert_eq!(named, 2);
 }
-

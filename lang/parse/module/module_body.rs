@@ -25,10 +25,10 @@ impl ModuleBody {
         self.statements.push(statement.clone());
         match statement {
             ModuleStatement::FunctionDefinition(function) => {
-                self.add_function(function);
+                self.add(function.into());
             }
             ModuleStatement::ModuleDefinition(module) => {
-                self.add_module(module);
+                self.add(module.into());
             }
             ModuleStatement::ModuleInitDefinition(init) => {
                 self.inits.push(init.clone());
@@ -45,17 +45,17 @@ impl SrcReferrer for ModuleBody {
 }
 
 impl Symbols for ModuleBody {
-    fn fetch_symbols(&self, id: &Id) -> Vec<&Symbol> {
-        self.symbols.fetch_symbols(id)
+    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
+        self.symbols.fetch(id)
     }
 
-    fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
-        self.symbols.add_symbol(symbol);
+    fn add(&mut self, symbol: Symbol) -> &mut Self {
+        self.symbols.add(symbol);
         self
     }
 
-    fn copy_symbols<T: Symbols>(&self, into: &mut T) {
-        self.symbols.copy_symbols(into)
+    fn copy<T: Symbols>(&self, into: &mut T) {
+        self.symbols.copy(into)
     }
 }
 
