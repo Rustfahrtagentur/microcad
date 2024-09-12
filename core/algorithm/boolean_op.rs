@@ -1,10 +1,17 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Boolean operations
+
+/// Boolean operations
 pub enum BooleanOp {
-    Difference,
+    /// Computes the union R = P ∪ Q
     Union,
-    Xor,
+    /// computes the difference R = P ∖ Q
+    Difference,
+    /// computes the complement R=P̅
+    Complement,
+    /// computes the intersection R = P ∩ Q
     Intersection,
 }
 
@@ -28,7 +35,7 @@ impl From<BooleanOp> for OpType {
             BooleanOp::Difference => OpType::Difference,
             BooleanOp::Union => OpType::Union,
             BooleanOp::Intersection => OpType::Intersection,
-            BooleanOp::Xor => OpType::Xor,
+            BooleanOp::Complement => OpType::Xor,
         }
     }
 }
@@ -39,7 +46,7 @@ impl From<&BooleanOp> for OpType {
             BooleanOp::Difference => OpType::Difference,
             BooleanOp::Union => OpType::Union,
             BooleanOp::Intersection => OpType::Intersection,
-            BooleanOp::Xor => OpType::Xor,
+            BooleanOp::Complement => OpType::Xor,
         }
     }
 }
@@ -123,19 +130,22 @@ impl Algorithm for BooleanOp {
     }
 }
 
+/// Short cut to generate a difference operator node
 pub fn difference() -> Node {
     Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Difference)))
 }
 
+/// Short cut to generate a union operator node
 pub fn union() -> Node {
     Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Union)))
 }
 
+/// Short cut to generate an intersection operator node
 pub fn intersection() -> Node {
     Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Intersection)))
 }
 
-pub fn xor() -> Node {
-    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Xor)))
+/// Short cut to generate a complement operator node
+pub fn complement() -> Node {
+    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Complement)))
 }
-

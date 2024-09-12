@@ -21,15 +21,15 @@ pub fn intersection() -> Result<Node, EvalError> {
     Ok(microcad_core::algorithm::boolean_op::intersection())
 }
 
-pub fn xor() -> Result<Node, EvalError> {
-    Ok(microcad_core::algorithm::boolean_op::xor())
+pub fn complement() -> Result<Node, EvalError> {
+    Ok(microcad_core::algorithm::boolean_op::complement())
 }
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     NamespaceBuilder::new("algorithm")
         .add(builtin_module!(difference()).into())
         .add(builtin_module!(intersection()).into())
-        .add(builtin_module!(union()).into())
-        .add(builtin_module!(xor()).into())
+        .add(builtin_module!(r#union()).into())
+        .add(builtin_module!(complement()).into())
         .build()
 }

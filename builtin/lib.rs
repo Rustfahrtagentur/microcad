@@ -1,6 +1,8 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Helper macros to instrument renderable builtin symbols
+
 #![warn(missing_docs)]
 
 extern crate proc_macro;
@@ -64,12 +66,14 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
     .into()
 }
 
+/// Instrument a symbol to be renderable in 2D
 #[proc_macro_derive(DefineBuiltinRenderable2D)]
 pub fn derive_define_builtin_renderable2d(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
     builtin_module_impl("Renderable2D", input)
 }
 
+/// Instrument a symbol to be renderable in 3D
 #[proc_macro_derive(DefineBuiltinRenderable3D)]
 pub fn derive_define_builtin_renderable3d(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
