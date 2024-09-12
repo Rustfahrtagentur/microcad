@@ -1,6 +1,8 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! µCAD command line interpreter
+
 #![warn(missing_docs)]
 
 extern crate clap;
@@ -16,6 +18,7 @@ struct Cli {
     input: Option<String>,
 }
 
+/// Main of the command line interpreter
 fn main() {
     let cli = Cli::parse();
 

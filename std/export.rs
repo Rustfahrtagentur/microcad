@@ -42,7 +42,7 @@ lazy_static::lazy_static! {
     pub static ref EXPORTERS: ExporterRegistry = ExporterRegistry;
 }
 
+/// Shortcut to export a node
 pub fn export(node: microcad_render::Node) -> microcad_core::Result<()> {
     microcad_core::export::export_tree(node.clone(), |settings| EXPORTERS.create(settings))
 }
-

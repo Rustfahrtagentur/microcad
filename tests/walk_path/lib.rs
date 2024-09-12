@@ -1,17 +1,25 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Walk a path recursively
+
 #![warn(missing_docs)]
 
 use anyhow::Result;
 
-pub type Child<T> = std::rc::Rc<std::cell::RefCell<WalkPath<T>>>;
-pub type Children<T> = std::collections::HashMap<std::path::PathBuf, Child<T>>;
+/// Tree leaf node
+pub type File<T> = std::rc::Rc<std::cell::RefCell<WalkPath<T>>>;
+/// Tree node
+pub type Dir<T> = std::collections::HashMap<std::path::PathBuf, File<T>>;
 
+/// Walked path
 #[derive(Debug)]
 pub enum WalkPath<T> {
-    Root(Children<T>),
-    Dir(std::path::PathBuf, Children<T>),
+    /// Root node
+    Root(Dir<T>),
+    /// Tree node
+    Dir(std::path::PathBuf, Dir<T>),
+    /// Leaf node
     File(std::path::PathBuf, T),
 }
 
@@ -24,7 +32,7 @@ impl<T> Default for WalkPath<T> {
 impl<T> WalkPath<T> {
     /// create empty tree
     pub fn new() -> Self {
-        Self::Root(Children::new())
+        Self::Root(Dir::new())
     }
 
     /// recursive directory scanner

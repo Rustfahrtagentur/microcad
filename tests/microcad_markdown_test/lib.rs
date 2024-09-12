@@ -107,7 +107,7 @@ fn insert(wp: &mut WalkPath<String>, path: &str, code: String) {
                     insert(&mut file.borrow_mut(), crumbs, code);
                 } else {
                     _ = children.insert(path.into(), {
-                        let mut new = WalkPath::Dir(path.into(), Children::<String>::new());
+                        let mut new = WalkPath::Dir(path.into(), Dir::<String>::new());
                         // recursively fill module
                         insert(&mut new, crumbs, code);
                         Rc::new(RefCell::new(new))
