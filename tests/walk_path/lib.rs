@@ -71,4 +71,3 @@ impl<T> WalkPath<T> {
         Ok(found)
     }
 }
-

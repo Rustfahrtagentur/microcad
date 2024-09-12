@@ -2,9 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #[cfg(test)]
-mod walk_path;
-
-#[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
