@@ -3,6 +3,9 @@
 
 //! µCAD Code Parser
 
+#![allow(missing_docs)]
+
+/// include grammar from file
 #[derive(pest_derive::Parser)]
 #[grammar = "grammar.pest"]
 pub struct Parser;

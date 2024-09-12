@@ -1,6 +1,8 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Scalable Vector Graphics (SVG) file writer
+
 use geo::CoordsIter;
 use microcad_core::{
     geo2d::*,
@@ -230,4 +232,3 @@ fn svg_write() {
     let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
     svg.line(line.0, line.1, "stroke:black;").unwrap();
 }
-
