@@ -14,4 +14,3 @@ fn main() {
         panic!("error generating rust test code: {err}");
     }
 }
-

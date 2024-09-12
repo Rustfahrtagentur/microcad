@@ -13,5 +13,4 @@ path = "lib.rs"
 regex = "1"
 rustfmt-wrapper = "0.2"
 anyhow = "1"
-walk_path = { path = "../../walk_path" }
-
+walk_path = { path = "../walk_path" }

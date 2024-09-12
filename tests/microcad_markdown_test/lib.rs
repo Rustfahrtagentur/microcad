@@ -209,4 +209,3 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
         }
     }
 }
-
