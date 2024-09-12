@@ -44,4 +44,3 @@ impl Symbols for NamespaceBuilder {
         self.namespace.copy_symbols(into)
     }
 }
-

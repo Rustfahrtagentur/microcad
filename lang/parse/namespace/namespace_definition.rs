@@ -60,4 +60,3 @@ impl Parse for std::rc::Rc<NamespaceDefinition> {
         }))
     }
 }
-

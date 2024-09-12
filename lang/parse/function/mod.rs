@@ -63,7 +63,10 @@ fn function_definition() {
             c = 1.0;
             return a + b + c;
         }";
-    Parser::parse_rule_or_panic::<std::rc::Rc<FunctionDefinition>>(Rule::function_definition, input);
+    Parser::parse_rule_or_panic::<std::rc::Rc<FunctionDefinition>>(
+        Rule::function_definition,
+        input,
+    );
 }
 
 #[test]
@@ -90,4 +93,3 @@ fn function_evaluate() {
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.to_string(), "4");
 }
-

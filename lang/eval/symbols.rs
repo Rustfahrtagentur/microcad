@@ -22,7 +22,9 @@ pub enum Symbol {
     BuiltinModule(BuiltinModule),
 }
 
+/// Trait for symbols to identify themselves
 pub trait Sym {
+    /// Return id of this symbol
     fn id(&self) -> Option<microcad_core::Id>;
 }
 

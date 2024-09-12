@@ -82,4 +82,3 @@ impl Eval for NamespaceBody {
         Ok(())
     }
 }
-

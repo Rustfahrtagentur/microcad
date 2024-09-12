@@ -128,4 +128,3 @@ impl From<QualifiedName> for String {
         join_identifiers(&value.0, "::")
     }
 }
-
