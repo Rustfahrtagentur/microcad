@@ -25,14 +25,12 @@ pub trait PushDiag {
         self.push_diag(Diag::Info(Refer::new(message, src.src_ref())));
     }
     /// Push new warning
-    fn warning(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> anyhow::Result<()> {
+    fn warning(&mut self, src: impl SrcReferrer, error: anyhow::Error) {
         self.push_diag(Diag::Warning(Refer::new(error, src.src_ref())));
-        Ok(())
     }
     /// Push new error
-    fn error(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> anyhow::Result<()> {
+    fn error(&mut self, src: impl SrcReferrer, error: anyhow::Error) {
         self.push_diag(Diag::Error(Refer::new(error, src.src_ref())));
-        Ok(())
     }
 }
 
@@ -158,13 +156,9 @@ fn test_diagnostics() {
     use anyhow::anyhow;
 
     diagnostics.info(body_iter.next().unwrap(), "This is an info".to_string());
-    diagnostics
-        .warning(body_iter.next().unwrap(), anyhow!("This is a warning"))
-        .unwrap();
+    diagnostics.warning(body_iter.next().unwrap(), anyhow!("This is a warning"));
 
-    diagnostics
-        .error(body_iter.next().unwrap(), anyhow!("This is an error"))
-        .unwrap();
+    diagnostics.error(body_iter.next().unwrap(), anyhow!("This is an error"));
 
     assert_eq!(diagnostics.len(), 3);
     diagnostics
