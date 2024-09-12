@@ -31,8 +31,8 @@ impl NamespaceBuilder {
 }
 
 impl Symbols for NamespaceBuilder {
-    fn find_symbols(&self, name: &microcad_core::Id) -> Vec<&Symbol> {
-        self.namespace.find_symbols(name)
+    fn fetch_symbols(&self, name: &microcad_core::Id) -> Vec<&Symbol> {
+        self.namespace.fetch_symbols(name)
     }
 
     fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {

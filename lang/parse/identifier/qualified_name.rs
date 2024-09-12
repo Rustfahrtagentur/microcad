@@ -77,8 +77,8 @@ impl QualifiedName {
         let ident = &self.0[index];
 
         let new_symbols = match (&root, ident.id()) {
-            (Some(ref root), Some(id)) => root.get_symbols(&id),
-            (None, Some(id)) => context.find_symbols(&id),
+            (Some(ref root), Some(id)) => root.fetch_symbols(&id),
+            (None, Some(id)) => context.fetch_symbols(&id),
             _ => unreachable!("can't search unnamed symbol"),
         };
 
@@ -91,7 +91,7 @@ impl QualifiedName {
     }
 
     /// Get all symbols for the qualified name
-    pub fn get_symbols(&self, context: &Context) -> Result<Vec<Symbol>> {
+    pub fn fetch_symbols(&self, context: &Context) -> Result<Vec<Symbol>> {
         let mut symbols = Vec::new();
         self.visit_symbols(context, &mut |symbol, depth| {
             // Only take symbols that match the full qualified name
@@ -113,7 +113,7 @@ impl Eval for QualifiedName {
     type Output = Vec<Symbol>;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        self.get_symbols(context)
+        self.fetch_symbols(context)
     }
 }
 

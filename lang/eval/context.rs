@@ -81,11 +81,11 @@ impl Context {
     }
 
     /// Fetch symbols by qualified name
-    pub fn find_symbols_by_qualified_name(
+    pub fn fetch_symbols_by_qualified_name(
         &self,
         name: &QualifiedName,
     ) -> Result<Vec<Symbol>, EvalError> {
-        name.get_symbols(self)
+        name.fetch_symbols(self)
     }
 
     /// Get current evaluation node
@@ -112,11 +112,11 @@ impl crate::diag::PushDiag for Context {
 }
 
 impl Symbols for Context {
-    fn find_symbols(&self, id: &Id) -> Vec<&Symbol> {
+    fn fetch_symbols(&self, id: &Id) -> Vec<&Symbol> {
         self.stack
             .iter()
             .rev()
-            .flat_map(|table| table.find_symbols(id))
+            .flat_map(|table| table.fetch_symbols(id))
             .collect()
     }
 
@@ -162,8 +162,8 @@ fn context_basic() {
     context.add_value("a".into(), Value::Integer(Refer::none(1)));
     context.add_value("b".into(), Value::Integer(Refer::none(2)));
 
-    assert_eq!(context.find_symbols(&"a".into())[0].id().unwrap(), "a");
-    assert_eq!(context.find_symbols(&"b".into())[0].id().unwrap(), "b");
+    assert_eq!(context.fetch_symbols(&"a".into())[0].id().unwrap(), "a");
+    assert_eq!(context.fetch_symbols(&"b".into())[0].id().unwrap(), "b");
 
     let c = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "c = a + b");
 

@@ -34,8 +34,8 @@ impl SrcReferrer for NamespaceDefinition {
 }
 
 impl Symbols for NamespaceDefinition {
-    fn find_symbols(&self, id: &Id) -> Vec<&Symbol> {
-        self.body.find_symbols(id)
+    fn fetch_symbols(&self, id: &Id) -> Vec<&Symbol> {
+        self.body.fetch_symbols(id)
     }
 
     fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {

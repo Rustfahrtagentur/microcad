@@ -32,7 +32,7 @@ fn assignment() {
 
     assert_eq!(
         context
-            .find_symbols(&"a".into())
+            .fetch_symbols(&"a".into())
             .first()
             .unwrap()
             .id()

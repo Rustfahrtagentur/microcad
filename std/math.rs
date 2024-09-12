@@ -140,7 +140,7 @@ fn test_builtin_function(name: &str, input: &str, expected: &str) {
     context.add_module(module);
 
     let symbols = context
-        .find_symbols_by_qualified_name(&"math::abs".into())
+        .fetch_symbols_by_qualified_name(&"math::abs".into())
         .unwrap();
     assert_eq!(symbols.len(), 1);
 

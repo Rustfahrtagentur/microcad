@@ -17,7 +17,7 @@ fn context_namespace() {
     context.add_module(module);
 
     let symbols = context
-        .find_symbols_by_qualified_name(&"math::pi".into())
+        .fetch_symbols_by_qualified_name(&"math::pi".into())
         .unwrap();
     assert_eq!(symbols.len(), 1);
     assert_eq!(symbols[0].id().unwrap(), "pi");

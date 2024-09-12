@@ -40,10 +40,10 @@ impl Sym for Symbol {
 }
 
 impl Symbol {
-    pub fn get_symbols(&self, name: &Id) -> Vec<&Symbol> {
+    pub fn fetch_symbols(&self, name: &Id) -> Vec<&Symbol> {
         match self {
-            Self::ModuleDefinition(module) => module.find_symbols(name),
-            Self::NamespaceDefinition(namespace) => namespace.find_symbols(name),
+            Self::ModuleDefinition(module) => module.fetch_symbols(name),
+            Self::NamespaceDefinition(namespace) => namespace.fetch_symbols(name),
             _ => Vec::new(),
         }
     }
@@ -56,7 +56,7 @@ impl Symbol {
 pub struct SymbolTable(Vec<Symbol>);
 
 pub trait Symbols {
-    fn find_symbols(&self, id: &Id) -> Vec<&Symbol>;
+    fn fetch_symbols(&self, id: &Id) -> Vec<&Symbol>;
     fn add_symbol(&mut self, symbol: Symbol) -> &mut Self;
     fn copy_symbols<T: Symbols>(&self, into: &mut T);
 
@@ -93,7 +93,7 @@ impl SymbolTable {
 }
 
 impl Symbols for SymbolTable {
-    fn find_symbols(&self, id: &Id) -> Vec<&Symbol> {
+    fn fetch_symbols(&self, id: &Id) -> Vec<&Symbol> {
         self.0
             .iter()
             .filter(|symbol| {

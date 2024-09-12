@@ -36,8 +36,8 @@ impl NamespaceBody {
 }
 
 impl Symbols for NamespaceBody {
-    fn find_symbols(&self, id: &Id) -> Vec<&Symbol> {
-        self.symbols.find_symbols(id)
+    fn fetch_symbols(&self, id: &Id) -> Vec<&Symbol> {
+        self.symbols.fetch_symbols(id)
     }
 
     fn add_symbol(&mut self, symbol: Symbol) -> &mut Self {
