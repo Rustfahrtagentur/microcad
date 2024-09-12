@@ -13,6 +13,12 @@ pub use method_call::*;
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
+/// trait for calls of modules or functions with argument list
+pub trait CallTrait {
+    /// Evaluate call into value (if possible)
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>>;
+}
+
 /// Call of a function or module initialization
 #[derive(Clone, Debug, Default)]
 pub struct Call {
@@ -83,14 +89,14 @@ impl Eval for Call {
                 }
                 Symbol::BuiltinModule(m) => {
                     if let Ok(value) = m.call(&self.argument_list, context) {
-                        return Ok(Some(Value::Node(value)));
+                        return Ok(value);
                     } else {
                         non_matching_symbols.push(symbol.clone());
                     }
                 }
                 Symbol::Module(m) => {
                     if let Ok(value) = m.call(&self.argument_list, context) {
-                        return Ok(Some(Value::Node(value)));
+                        return Ok(value);
                     } else {
                         non_matching_symbols.push(symbol.clone());
                     }

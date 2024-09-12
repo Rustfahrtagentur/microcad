@@ -23,7 +23,7 @@ impl SrcReferrer for FunctionSignature {
 }
 
 impl FunctionSignature {
-    // TODO: Is this function #cfg(test) only
+    /// Create new function signature
     pub fn new(parameters: ParameterList, return_type: Option<Type>, src_ref: SrcRef) -> Self {
         Self {
             parameters,
@@ -32,7 +32,8 @@ impl FunctionSignature {
         }
     }
 
-    pub fn get_parameter_by_name(&self, name: &Identifier) -> Option<&Parameter> {
+    /// Get parameter by name
+    pub fn parameter_by_name(&self, name: &Identifier) -> Option<&Parameter> {
         self.parameters.iter().find(|arg| arg.name == *name)
     }
 }
@@ -60,6 +61,7 @@ impl Parse for FunctionSignature {
     }
 }
 
+/// Short cut to create a builtin function signature
 #[macro_export]
 macro_rules! function_signature {
     ($parameters:expr) => {
@@ -77,4 +79,3 @@ macro_rules! function_signature {
     };
     () => {};
 }
-

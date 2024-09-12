@@ -39,8 +39,10 @@ impl FunctionDefinition {
             src_ref,
         }
     }
+}
 
-    pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
+impl CallTrait for FunctionDefinition {
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
         // TODO: Check if the arguments are correct
         let params = &self.signature.parameters;
         let arg_map = args

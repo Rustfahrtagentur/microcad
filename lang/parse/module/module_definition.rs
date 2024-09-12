@@ -4,7 +4,6 @@
 //! Module definition parser entity
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
-use microcad_render::tree;
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -32,8 +31,10 @@ impl ModuleDefinition {
             src_ref: SrcRef(None),
         }
     }
+}
 
-    pub fn call(&self, _args: &CallArgumentList, _context: &mut Context) -> Result<tree::Node> {
+impl CallTrait for ModuleDefinition {
+    fn call(&self, _args: &CallArgumentList, _context: &mut Context) -> Result<Option<Value>> {
         todo!()
     }
 }

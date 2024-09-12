@@ -20,13 +20,13 @@ pub struct BuiltinModule {
     pub f: &'static BuiltinModuleFn,
 }
 
-impl BuiltinModule {
+impl CallTrait for BuiltinModule {
     /// Call implicit initialization of this module
-    pub fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<tree::Node> {
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
         let arg_map = args
             .eval(context)?
             .get_matching_arguments(&self.parameters.eval(context)?)?;
-        (self.f)(&arg_map, context)
+        Ok(Some(Value::Node((self.f)(&arg_map, context)?)))
     }
 }
 
