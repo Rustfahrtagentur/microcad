@@ -6,7 +6,7 @@
 use crate::*;
 use microcad_core::{
     geo3d::{self},
-    Error, Scalar,
+    CoreError, Scalar,
 };
 
 /// Renders a mesh
@@ -86,7 +86,7 @@ impl Renderer3D for MeshRenderer {
             }
             NodeInner::Transform(_) => unimplemented!(),
             NodeInner::Geometry2D(_) | NodeInner::Renderable2D(_) => {
-                return Err(Error::NotImplemented);
+                return Err(CoreError::NotImplemented);
             }
         }
 

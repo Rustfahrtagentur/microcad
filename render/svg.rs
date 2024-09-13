@@ -7,7 +7,7 @@ use geo::CoordsIter;
 use microcad_core::{
     geo2d::*,
     render::{Node, NodeInner, Renderer, Renderer2D},
-    Error, Scalar,
+    CoreError, Scalar,
 };
 
 /// Write SVG
@@ -189,7 +189,7 @@ impl Renderer for SvgRenderer {
             "stroke-width" => {
                 self.state.stroke_width = Some(value.parse().unwrap());
             }
-            _ => return Err(Error::NotImplemented),
+            _ => return Err(CoreError::NotImplemented),
         }
         Ok(())
     }
@@ -219,7 +219,7 @@ impl Renderer2D for SvgRenderer {
             }
             NodeInner::Geometry2D(geometry) => self.render_geometry(geometry)?,
             NodeInner::Transform(_) => unimplemented!(),
-            _ => return Err(Error::NotImplemented),
+            _ => return Err(CoreError::NotImplemented),
         };
 
         Ok(())

@@ -3,6 +3,7 @@
 
 use crate::{render::Node, render::NodeInner};
 
+/// Export settings
 #[derive(Debug, Default)]
 pub struct ExportSettings(toml::Table);
 
@@ -15,6 +16,7 @@ impl std::ops::Deref for ExportSettings {
 }
 
 impl ExportSettings {
+    /// Create export settings with an initial file name
     pub fn with_filename(filename: String) -> Self {
         let mut settings = ExportSettings::default();
         settings
@@ -23,12 +25,14 @@ impl ExportSettings {
         settings
     }
 
+    /// return file name
     pub fn filename(&self) -> Option<String> {
         self.0
             .get("filename")
             .map(|filename| filename.as_str().unwrap().to_string())
     }
 
+    /// Return render precision
     pub fn render_precision(&self) -> f64 {
         self.0
             .get("render_precision")
@@ -36,6 +40,7 @@ impl ExportSettings {
             .unwrap_or(0.1)
     }
 
+    /// Get exporter ID
     pub fn exporter_id(&self) -> Option<String> {
         if let Some(exporter) = self.0.get("exporter") {
             Some(exporter.to_string())
@@ -51,25 +56,30 @@ impl ExportSettings {
     }
 }
 
+/// Exporter trait
 pub trait Exporter {
-    fn from_settings(settings: &ExportSettings) -> Result<Self, crate::Error>
+    /// Create from settings
+    fn from_settings(settings: &ExportSettings) -> Result<Self, crate::CoreError>
     where
         Self: Sized;
 
+    /// Return file extensions
     fn file_extensions(&self) -> Vec<&str>;
 
-    fn export(&mut self, node: Node) -> Result<(), crate::Error>;
+    /// Do export
+    fn export(&mut self, node: Node) -> Result<(), crate::CoreError>;
 }
 
+/// Short cut to create an export node
 pub fn export(export_settings: ExportSettings) -> Node {
     Node::new(NodeInner::Export(export_settings))
 }
 
 /// The `ExporterFactory` creates a new exporter based on the file extension and the export settings
-type ExporterFactory = fn(&ExportSettings) -> Result<Box<dyn Exporter>, crate::Error>;
+type ExporterFactory = fn(&ExportSettings) -> Result<Box<dyn Exporter>, crate::CoreError>;
 
-// Iterate over all descendent nodes and export the ones with an Export tag
-pub fn export_tree(node: Node, factory: ExporterFactory) -> Result<(), crate::Error> {
+/// Iterate over all descendent nodes and export the ones with an Export tag
+pub fn export_tree(node: Node, factory: ExporterFactory) -> Result<(), crate::CoreError> {
     for n in node.descendants() {
         let inner = n.borrow();
         if let NodeInner::Export(ref export_settings) = *inner {
@@ -80,4 +90,3 @@ pub fn export_tree(node: Node, factory: ExporterFactory) -> Result<(), crate::Er
 
     Ok(())
 }
-
