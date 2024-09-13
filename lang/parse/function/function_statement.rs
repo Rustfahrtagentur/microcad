@@ -50,7 +50,7 @@ impl Parse for FunctionStatement {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_statement);
 
-        let mut inner = pair.clone().into_inner();
+        let mut inner = pair.inner();
         let first = inner.next().unwrap();
         let s = match first.as_rule() {
             Rule::assignment => Self::Assignment(Assignment::parse(first)?),
@@ -60,7 +60,7 @@ impl Parse for FunctionStatement {
             }
             Rule::function_return_statement => Self::Return(Box::new(Expression::parse(first)?)),
             Rule::function_if_statement => {
-                let mut pairs = first.into_inner();
+                let mut pairs = first.inner();
                 let condition = Expression::parse(pairs.next().unwrap())?;
                 let if_body = FunctionBody::parse(pairs.next().unwrap())?;
 
@@ -69,7 +69,7 @@ impl Parse for FunctionStatement {
                         condition,
                         if_body,
                         else_body: FunctionBody::default(),
-                        src_ref: pair.into(),
+                        src_ref: pair.clone().into(),
                     },
                     Some(p) => {
                         let else_body = FunctionBody::parse(p)?;
@@ -77,7 +77,7 @@ impl Parse for FunctionStatement {
                             condition,
                             if_body,
                             else_body,
-                            src_ref: pair.into(),
+                            src_ref: pair.clone().into(),
                         }
                     }
                 }
@@ -88,4 +88,3 @@ impl Parse for FunctionStatement {
         Ok(s)
     }
 }
-

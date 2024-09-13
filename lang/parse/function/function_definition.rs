@@ -70,7 +70,7 @@ impl CallTrait for FunctionDefinition {
 impl Parse for std::rc::Rc<FunctionDefinition> {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_definition);
-        let mut inner = pair.clone().into_inner();
+        let mut inner = pair.inner();
         let name = Identifier::parse(inner.next().unwrap())?;
         let signature = FunctionSignature::parse(inner.next().unwrap())?;
         let body = FunctionBody::parse(inner.next().unwrap())?;
@@ -79,7 +79,7 @@ impl Parse for std::rc::Rc<FunctionDefinition> {
             name,
             signature,
             body,
-            src_ref: pair.into(),
+            src_ref: pair.clone().into(),
         }))
     }
 }

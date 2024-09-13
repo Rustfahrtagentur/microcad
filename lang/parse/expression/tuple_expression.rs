@@ -29,7 +29,7 @@ impl SrcReferrer for TupleExpression {
 
 impl Parse for TupleExpression {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let mut inner = pair.clone().into_inner();
+        let mut inner = pair.inner();
         let call_argument_list = CallArgumentList::parse(inner.next().unwrap())?;
         if call_argument_list.is_empty() {
             return Err(ParseError::EmptyTupleExpression);
@@ -52,7 +52,7 @@ impl Parse for TupleExpression {
                 Some(pair) => Some(Unit::parse(pair)?),
                 None => None,
             },
-            src_ref: pair.into(),
+            src_ref: pair.clone().into(),
         })
     }
 }
@@ -142,7 +142,7 @@ impl Eval for TupleExpression {
 #[test]
 fn unnamed_tuple() {
     let input = "(1.0, 2.0, 3.0)mm";
-    let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
+    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0).unwrap();
     let mut context = Context::default();
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(
@@ -158,7 +158,7 @@ fn unnamed_tuple() {
 #[test]
 fn test_named_tuple() {
     let input = "(a = 1.0, b = 2.0, c = 3.0)mm";
-    let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
+    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0).unwrap();
     let mut context = Context::default();
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(
@@ -178,7 +178,7 @@ fn test_named_tuple() {
 #[test]
 fn test_vec2() {
     let input = "(x = 1mm, y = 1mm)";
-    let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
+    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0).unwrap();
     let mut context = Context::default();
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.ty(), Type::Vec2);
@@ -187,7 +187,7 @@ fn test_vec2() {
 #[test]
 fn test_vec3() {
     let input = "(x = 1, y = 2, z = 3)mm";
-    let expr = Parser::parse_rule_or_panic::<TupleExpression>(Rule::tuple_expression, input);
+    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0).unwrap();
     let mut context = Context::default();
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.ty(), Type::Vec3);

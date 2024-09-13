@@ -18,7 +18,7 @@ impl MapType {
 
 impl Parse for MapType {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let mut inner = pair.clone().into_inner();
+        let mut inner = pair.inner();
         let key = inner.next().unwrap();
         let value = inner.next().unwrap();
 
@@ -43,11 +43,10 @@ fn map_type() {
     use crate::parser::{Parser, Rule};
 
     let type_annotation =
-        Parser::parse_rule_or_panic::<TypeAnnotation>(Rule::r#type, "[int => string]");
+        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[int => string]", 0).unwrap();
     assert_eq!(type_annotation.ty().to_string(), "[int => string]");
     assert_eq!(
         type_annotation.ty(),
         Type::Map(MapType::new(MapKeyType::Integer, Type::String))
     );
 }
-

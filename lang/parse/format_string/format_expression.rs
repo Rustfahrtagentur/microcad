@@ -21,7 +21,7 @@ impl Parse for FormatExpression {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut spec = FormatSpec::default();
         let mut expression = None;
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::format_spec => spec = FormatSpec::parse(pair)?,
                 Rule::expression => expression = Some(Expression::parse(pair)?),
@@ -62,4 +62,3 @@ impl std::fmt::Display for FormatExpression {
         write!(f, "{{{}}}", self.expression)
     }
 }
-

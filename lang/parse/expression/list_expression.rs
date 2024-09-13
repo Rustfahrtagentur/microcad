@@ -35,14 +35,14 @@ impl SrcReferrer for ListExpression {
 
 impl Parse for ListExpression {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let mut inner = pair.clone().into_inner();
+        let mut inner = pair.inner();
         Ok(Self {
             list: ExpressionList::parse(inner.next().unwrap())?,
             unit: match inner.next() {
                 Some(pair) => Some(Unit::parse(pair)?),
                 None => None,
             },
-            src_ref: pair.into(),
+            src_ref: pair.clone().into(),
         })
     }
 }

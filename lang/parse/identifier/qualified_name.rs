@@ -38,8 +38,7 @@ impl std::ops::DerefMut for QualifiedName {
 impl Parse for QualifiedName {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Ok(Self(
-            pair.clone()
-                .into_inner()
+            pair.inner()
                 .map(|pair| Identifier::parse(pair))
                 .map(|ident| ident.unwrap())
                 .collect(),

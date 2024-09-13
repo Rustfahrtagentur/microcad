@@ -25,7 +25,7 @@ impl Ty for ListType {
 
 impl Parse for ListType {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let mut inner = pair.clone().into_inner();
+        let mut inner = pair.inner();
 
         let pair = inner.next().unwrap();
         match pair.as_rule() {
@@ -44,11 +44,10 @@ impl std::fmt::Display for ListType {
 #[test]
 fn list_type() {
     use crate::parser::{Parser, Rule};
-    let type_annotation = Parser::parse_rule_or_panic::<TypeAnnotation>(Rule::r#type, "[int]");
+    let type_annotation = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[int]", 0).unwrap();
     assert_eq!(type_annotation.ty().to_string(), "[int]");
     assert_eq!(
         type_annotation.ty(),
         Type::List(ListType::new(Type::Integer))
     );
 }
-

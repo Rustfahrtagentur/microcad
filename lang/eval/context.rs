@@ -165,7 +165,7 @@ fn context_basic() {
     assert_eq!(context.fetch(&"a".into())[0].id().unwrap(), "a");
     assert_eq!(context.fetch(&"b".into())[0].id().unwrap(), "b");
 
-    let c = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "c = a + b");
+    let c = Parser::parse_rule::<Assignment>(Rule::assignment, "c = a + b", 0).unwrap();
 
     c.eval(&mut context).unwrap();
 }

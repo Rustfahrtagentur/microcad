@@ -43,7 +43,7 @@ impl Parse for FunctionSignature {
         let mut parameters = ParameterList::default();
         let mut return_type = None;
 
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::parameter_list => {
                     parameters = ParameterList::parse(pair)?;

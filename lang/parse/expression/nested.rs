@@ -14,7 +14,7 @@ impl Parse for Nested {
         assert!(pair.as_rule() == Rule::nested || pair.as_rule() == Rule::expression_no_semicolon);
 
         let mut vec = Vec::new();
-        for pair in pair.clone().into_inner().filter(|pair| {
+        for pair in pair.inner().filter(|pair| {
             [Rule::qualified_name, Rule::call, Rule::module_body].contains(&pair.as_rule())
         }) {
             vec.push(NestedItem::parse(pair)?);
@@ -108,4 +108,3 @@ impl std::fmt::Display for Nested {
         )
     }
 }
-

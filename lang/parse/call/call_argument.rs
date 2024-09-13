@@ -42,14 +42,14 @@ impl Parse for CallArgument {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         match pair.clone().as_rule() {
             Rule::call_named_argument => {
-                let mut inner = pair.clone().into_inner();
+                let mut inner = pair.inner();
                 let first = inner.next().unwrap();
                 let second = inner.next().unwrap();
 
                 Ok(CallArgument {
                     name: Some(Identifier::parse(first)?),
                     value: Expression::parse(second)?,
-                    src_ref: pair.into(),
+                    src_ref: pair.src_ref(),
                 })
             }
             Rule::expression => Ok(CallArgument {
@@ -82,4 +82,3 @@ impl std::fmt::Display for CallArgument {
         }
     }
 }
-

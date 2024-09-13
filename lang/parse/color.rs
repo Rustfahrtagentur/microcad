@@ -34,7 +34,7 @@ impl std::fmt::Display for Color {
 impl Parse for Color {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::color_literal);
-        let values = &pair.clone().into_inner().next().unwrap().as_str()[1..];
+        let values = &pair.inner().next().unwrap().as_str()[1..];
 
         let hex4bit = |pos| u8::from_str_radix(&values[pos..pos + 1], 16).map(|v| v as f32 / 15.0);
         let hex8bit = |pos| u8::from_str_radix(&values[pos..pos + 2], 16).map(|v| v as f32 / 255.0);
@@ -58,4 +58,3 @@ impl Parse for Color {
         }
     }
 }
-

@@ -50,7 +50,7 @@ impl Parse for NumberLiteral {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::number_literal);
 
-        let mut inner = pair.clone().into_inner();
+        let mut inner = pair.inner();
         let number_token = inner.next().unwrap();
 
         assert!(
@@ -65,7 +65,7 @@ impl Parse for NumberLiteral {
         if let Some(unit_token) = inner.next() {
             unit = Unit::parse(unit_token)?;
         }
-        Ok(NumberLiteral(value, unit, pair.into()))
+        Ok(NumberLiteral(value, unit, pair.clone().into()))
     }
 }
 
@@ -87,4 +87,3 @@ impl std::fmt::Display for NumberLiteral {
         write!(f, "{}{}", self.0, self.1)
     }
 }
-

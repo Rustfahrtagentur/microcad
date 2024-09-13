@@ -418,11 +418,11 @@ fn check(result: ValueResult, value: Value) {
 
 #[test]
 fn test_value_integer() {
-    let u = || integer(2, &SrcRef::new(3..4, 5, 6));
-    let v = || integer(5, &SrcRef::new(6..7, 8, 9));
-    let w = || scalar(5.0, &SrcRef::new(6..7, 8, 9));
+    let u = || integer(2, &SrcRef::new(3..4, 5, 6, 0));
+    let v = || integer(5, &SrcRef::new(6..7, 8, 9, 0));
+    let w = || scalar(5.0, &SrcRef::new(6..7, 8, 9, 0));
 
-    let r = SrcRef::new(3..7, 5, 6);
+    let r = SrcRef::new(3..7, 5, 6, 0);
 
     // symmetric operations
     check(u() + v(), integer(2 + 5, &r));
@@ -440,11 +440,11 @@ fn test_value_integer() {
 
 #[test]
 fn test_value_scalar() {
-    let u = || scalar(2.0, &SrcRef::new(3..4, 5, 6));
-    let v = || scalar(5.0, &SrcRef::new(6..7, 8, 9));
-    let w = || integer(5, &SrcRef::new(6..7, 8, 9));
+    let u = || scalar(2.0, &SrcRef::new(3..4, 5, 6, 0));
+    let v = || scalar(5.0, &SrcRef::new(6..7, 8, 9, 0));
+    let w = || integer(5, &SrcRef::new(6..7, 8, 9, 0));
 
-    let r = SrcRef::new(3..7, 5, 6);
+    let r = SrcRef::new(3..7, 5, 6, 0);
 
     // symmetric operations
     check(u() + v(), scalar(2.0 + 5.0, &r));

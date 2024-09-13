@@ -24,7 +24,7 @@ impl SrcReferrer for MethodCall {
 
 impl Parse for MethodCall {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let mut inner = pair.clone().into_inner();
+        let mut inner = pair.inner();
 
         Ok(MethodCall {
             name: Identifier::parse(inner.next().unwrap())?,
@@ -33,7 +33,7 @@ impl Parse for MethodCall {
             } else {
                 CallArgumentList::default()
             },
-            src_ref: pair.into(),
+            src_ref: pair.clone().into(),
         })
     }
 }
@@ -43,4 +43,3 @@ impl std::fmt::Display for MethodCall {
         write!(f, "{}({:?})", self.name, self.argument_list)
     }
 }
-

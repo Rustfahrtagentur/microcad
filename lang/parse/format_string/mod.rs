@@ -37,7 +37,7 @@ impl std::str::FromStr for FormatString {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        Parser::parse_rule::<Self>(Rule::format_string, s)
+        Parser::parse_rule::<Self>(Rule::format_string, s, 0)
     }
 }
 
@@ -98,7 +98,7 @@ impl Eval for FormatString {
 impl Parse for FormatString {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut fs = Self::default();
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::string_literal_inner => fs.push_string(pair.as_span().as_str().to_string()),
                 Rule::format_expression => fs.push_format_expr(FormatExpression::parse(pair)?),
@@ -113,10 +113,13 @@ impl Parse for FormatString {
 #[test]
 fn simple_string() {
     use pest::Parser as _;
-    let pair = Parser::parse(Rule::format_string, "\"Hello, World!\"")
-        .unwrap()
-        .next()
-        .unwrap();
+    let pair = Pair::new(
+        Parser::parse(Rule::format_string, "\"Hello, World!\"")
+            .unwrap()
+            .next()
+            .unwrap(),
+        0,
+    );
 
     let s = FormatString::parse(pair).unwrap();
     assert_eq!(s.section_count(), 1);
@@ -129,10 +132,13 @@ fn simple_string() {
 #[test]
 fn format_string() {
     use pest::Parser as _;
-    let pair = Parser::parse(Rule::format_string, "\"A{2 + 4}B\"")
-        .unwrap()
-        .next()
-        .unwrap();
+    let pair = Pair::new(
+        Parser::parse(Rule::format_string, "\"A{2 + 4}B\"")
+            .unwrap()
+            .next()
+            .unwrap(),
+        0,
+    );
 
     let s = FormatString::parse(pair).unwrap();
     assert_eq!(s.section_count(), 3);
@@ -141,4 +147,3 @@ fn format_string() {
 
     assert_eq!(value, Value::String(Refer::none("A6B".into())));
 }
-

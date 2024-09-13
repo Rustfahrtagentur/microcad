@@ -52,11 +52,11 @@ impl Symbols for NamespaceDefinition {
 
 impl Parse for std::rc::Rc<NamespaceDefinition> {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let mut pairs = pair.clone().into_inner();
+        let mut pairs = pair.inner();
         Ok(std::rc::Rc::new(NamespaceDefinition {
             name: Identifier::parse(pairs.next().unwrap())?,
             body: NamespaceBody::parse(pairs.next().unwrap())?,
-            src_ref: pair.into(),
+            src_ref: pair.clone().into(),
         }))
     }
 }

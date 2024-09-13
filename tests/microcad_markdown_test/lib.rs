@@ -173,7 +173,8 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                             match parser::Parser::parse_rule::<SourceFile>(
                                 parser::Rule::source_file,
                                 r#"
-                                {code}"#
+                                {code}"#,
+                                0,
                             ) {handling};
                         }}"##,
                     handling = match suffix {

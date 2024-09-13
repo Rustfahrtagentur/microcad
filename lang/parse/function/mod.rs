@@ -17,7 +17,7 @@ pub use function_statement::*;
 fn assignment() {
     use crate::{eval::*, parse::*, parser::*};
 
-    let assignment = Parser::parse_rule_or_panic::<Assignment>(Rule::assignment, "a = 1");
+    let assignment = Parser::parse_rule::<Assignment>(Rule::assignment, "a = 1", 0).unwrap();
 
     let mut context = Context::default();
 
@@ -44,7 +44,7 @@ fn function_signature() {
     let input = "(a: scalar, b: scalar) -> scalar";
 
     let function_signature =
-        Parser::parse_rule_or_panic::<FunctionSignature>(Rule::function_signature, input);
+        Parser::parse_rule::<FunctionSignature>(Rule::function_signature, input, 0).unwrap();
 
     assert_eq!(function_signature.parameters.len(), 2);
     assert_eq!(function_signature.return_type.unwrap().ty(), Type::Scalar);
@@ -58,10 +58,8 @@ fn function_definition() {
             c = 1.0;
             return a + b + c;
         }";
-    Parser::parse_rule_or_panic::<std::rc::Rc<FunctionDefinition>>(
-        Rule::function_definition,
-        input,
-    );
+    Parser::parse_rule::<std::rc::Rc<FunctionDefinition>>(Rule::function_definition, input, 0)
+        .unwrap();
 }
 
 #[test]
@@ -74,16 +72,15 @@ fn function_evaluate() {
             return a + b + c;
         }"#;
 
-    let function_def = Parser::parse_rule_or_panic::<std::rc::Rc<FunctionDefinition>>(
-        Rule::function_definition,
-        input,
-    );
+    let function_def =
+        Parser::parse_rule::<std::rc::Rc<FunctionDefinition>>(Rule::function_definition, input, 0)
+            .unwrap();
 
     let mut context = Context::default();
     context.add(function_def.into());
 
     let input = "test(a = 1.0, b = 2.0)";
-    let expr = Parser::parse_rule_or_panic::<Expression>(Rule::expression, input);
+    let expr = Parser::parse_rule::<Expression>(Rule::expression, input, 0).unwrap();
 
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.to_string(), "4");
