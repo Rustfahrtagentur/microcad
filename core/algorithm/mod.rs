@@ -1,6 +1,8 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Boolean operator
+
 pub mod boolean_op;
 
 use crate::{
@@ -19,4 +21,3 @@ pub trait Algorithm {
         unimplemented!()
     }
 }
-

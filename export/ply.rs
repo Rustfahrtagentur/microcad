@@ -147,12 +147,12 @@ impl Exporter for PlyExporter {
         let mut ply_writer = PlyWriter::new(&mut file)?;
 
         let mesh = renderer.triangle_mesh;
-        ply_writer.header_element_vertex3d(mesh.vertices().len())?;
-        ply_writer.header_element_face(mesh.triangle_indices().len())?;
+        ply_writer.header_element_vertex3d(mesh.vertices.len())?;
+        ply_writer.header_element_face(mesh.triangle_indices.len())?;
         ply_writer.header_end()?;
 
-        ply_writer.vertices(mesh.vertices())?;
-        ply_writer.tri_faces(mesh.triangle_indices())?;
+        ply_writer.vertices(&mesh.vertices)?;
+        ply_writer.tri_faces(&mesh.triangle_indices)?;
 
         Ok(())
     }
