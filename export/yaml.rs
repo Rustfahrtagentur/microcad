@@ -1,12 +1,15 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! YAML Exporter
+
 use std::{fs::File, path::PathBuf};
 
 use microcad_render::Node;
 
 use crate::*;
 
+/// Export into YAML file
 pub struct YamlExporter {
     filename: PathBuf,
 }
@@ -45,4 +48,3 @@ impl Exporter for YamlExporter {
         vec!["yaml"]
     }
 }
-

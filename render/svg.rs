@@ -10,11 +10,17 @@ use microcad_core::{
     Error, Scalar,
 };
 
+/// Write SVG
 pub struct SvgWriter {
     writer: Box<dyn std::io::Write>,
 }
 
 impl SvgWriter {
+    /// Create new SvgWriter
+    /// # Arguments
+    /// - `w`: Output writer
+    /// - `bounds`: Clipping
+    /// - `scale`: Scale of the output
     pub fn new(mut w: Box<dyn std::io::Write>, bounds: Rect, scale: f64) -> std::io::Result<Self> {
         writeln!(&mut w, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
@@ -32,6 +38,7 @@ impl SvgWriter {
         })
     }
 
+    /// Generate rectangle
     pub fn rect(&mut self, rect: &Rect, style: &str) -> std::io::Result<()> {
         let x = rect.min().x;
         let y = rect.min().y;
@@ -43,6 +50,7 @@ impl SvgWriter {
         )
     }
 
+    /// Generate circle
     pub fn circle(&mut self, center: &Point, radius: f64, style: &str) -> std::io::Result<()> {
         let (cx, cy) = center.x_y();
         writeln!(
@@ -51,6 +59,7 @@ impl SvgWriter {
         )
     }
 
+    /// Generate line
     pub fn line(&mut self, p1: Point, p2: Point, style: &str) -> std::io::Result<()> {
         let ((x1, y1), (x2, y2)) = (p1.x_y(), p2.x_y());
         writeln!(
@@ -59,6 +68,7 @@ impl SvgWriter {
         )
     }
 
+    /// Generate polygon
     pub fn polygon(&mut self, polygon: &Polygon, style: &str) -> std::io::Result<()> {
         write!(self.writer, "<path d=\"")?;
         for (i, point) in polygon.exterior().points().enumerate() {
@@ -91,6 +101,7 @@ impl SvgWriter {
         writeln!(self.writer, "\" style=\"{style}\"/>")
     }
 
+    /// Generate multiple polygons
     pub fn multi_polygon(
         &mut self,
         multi_polygon: &MultiPolygon,
@@ -110,6 +121,7 @@ impl Drop for SvgWriter {
     }
 }
 
+/// SVG renderer state
 #[derive(Default)]
 pub struct SvgRendererState {
     fill: Option<String>,
@@ -117,6 +129,7 @@ pub struct SvgRendererState {
     stroke_width: Option<Scalar>,
 }
 
+/// SVG renderer
 pub struct SvgRenderer {
     writer: Option<SvgWriter>,
     precision: Scalar,
@@ -126,11 +139,13 @@ pub struct SvgRenderer {
 }
 
 impl SvgRenderer {
+    /// Set output
     pub fn set_output(&mut self, file: Box<dyn std::io::Write>) -> std::io::Result<()> {
         self.writer = Some(SvgWriter::new(Box::new(file), self.bounds, self.scale)?);
         Ok(())
     }
 
+    /// Return writer
     fn writer(&mut self) -> &mut SvgWriter {
         self.writer.as_mut().unwrap()
     }

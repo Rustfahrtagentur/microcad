@@ -1,22 +1,27 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! STL Export
+
 use std::path::PathBuf;
 
 use crate::*;
 use microcad_core::geo3d::{Triangle, Vertex};
 
+/// Write into STL file
 pub struct StlWriter<'a> {
     writer: &'a mut dyn std::io::Write,
 }
 
 impl<'a> StlWriter<'a> {
+    /// Create new STL writer
     pub fn new(mut w: &'a mut dyn std::io::Write) -> Self {
         writeln!(&mut w, "solid").unwrap();
 
         Self { writer: w }
     }
 
+    /// Write triangle
     pub fn write_triangle(&mut self, tri: &Triangle<Vertex>) -> std::io::Result<()> {
         let n = tri.normal();
         writeln!(&mut self.writer, "facet normal {} {} {}", n.x, n.y, n.z)?;
@@ -48,6 +53,7 @@ impl<'a> Drop for StlWriter<'a> {
     }
 }
 
+/// STL exproter
 pub struct StlExporter {
     filename: PathBuf,
 }
@@ -77,7 +83,7 @@ impl Exporter for StlExporter {
         let mut file = std::io::BufWriter::new(file);
         let mut writer = StlWriter::new(&mut file);
 
-        let triangles = renderer.triangle_mesh().fetch_triangles();
+        let triangles = renderer.triangle_mesh.fetch_triangles();
         for triangle in triangles {
             writer.write_triangle(&triangle)?;
         }
@@ -108,4 +114,3 @@ fn test_stl_export() {
 
     exporter.export(node).unwrap();
 }
-

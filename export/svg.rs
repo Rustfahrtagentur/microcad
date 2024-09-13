@@ -1,12 +1,15 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! SVG Export
+
 use std::path::PathBuf;
 
 use microcad_render::svg::SvgRenderer;
 
 use crate::*;
 
+/// SVG exporter
 pub struct SvgExporter {
     filename: PathBuf,
 }
@@ -36,4 +39,3 @@ impl Exporter for SvgExporter {
         renderer.render_node(node)
     }
 }
-

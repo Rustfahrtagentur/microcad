@@ -78,6 +78,7 @@ impl SrcReferrer for ParameterValue {
     }
 }
 
+/// Shortcut to create a `ParameterValue`
 #[cfg(test)]
 #[macro_export]
 macro_rules! parameter_value {
