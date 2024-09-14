@@ -3,23 +3,26 @@
 ## Declaration
 
 ```µCAD,declaration#todo
+/// use builtin function circle from standard library
+use std::geo2d::circle;
+
 // define custom module circle
-module circle() {
-    // generate circle by using module geo2d
-    std::geo2d::circle(1cm);
+module small_disc() {
+    // generate circle
+    circle(1cm);
 }
 
-// generate module circle
-circle();
+// generate small_disc
+small_disc();
 ```
 
 ## Elements
 
 * [Use Statements](use_statement.md)
+* [Functions](functions.md)
+* [Initialization](init.md)
 * [Parameter Lists](parameter_list.md)
 * [Fields](fields.md)
-* [Initialization](init.md)
-* [Functions](functions.md)
 
 ## Examples
 

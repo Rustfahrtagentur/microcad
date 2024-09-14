@@ -2,12 +2,14 @@
 
 ## Programming Elements
 
-* [Namespaces](namespaces.md)
 * [Modules](modules/README.md)
-* [Module initialization](init.md)
+* [Namespaces](namespaces.md)
 * [Use Statement](use_statement.md)
-* [Export Statement](export.md)
 * [Tuples](tuple.md)
+* [Export Statement](export.md)
+
+## Obscure Features
+
 * [Parameter Multiplicity](parameter_multiplicity.md)
 
 ## Builtin Libraries

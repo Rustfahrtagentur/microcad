@@ -1,5 +1,7 @@
 # Module Initialization
 
+## Example
+
 ```µCAD,initialization#todo
 module donut(radius_outer: length, radius_inner: length) {
     use circle from std::geo2d;
@@ -33,7 +35,7 @@ module box(size: length) {
 
 ## Explicit init
 
-```µCAD
+```µCAD,explicit_init
 module box {
     init(size: length) {
         rectangle(size);
@@ -43,20 +45,7 @@ module box {
 
 ## Explicit init overloading
 
-```µCAD
-module box {
-    init(size: length) {
-        rectangle(size);
-    }
-    init((width, height): length) {
-        rectangle(width, height);
-    }
-}
-```
-
-## Default init
-
-```µCAD
+```µCAD,explicit_init_overloading
 module box {
     init(size: length) {
         rectangle(size);
