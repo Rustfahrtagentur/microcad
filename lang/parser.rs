@@ -27,6 +27,10 @@ impl<'i> Pair<'i> {
         self.1
     }
 
+    pub fn set_source_hash(&mut self, hash: u64) {
+        self.1 = hash
+    }
+
     pub fn pest_pair(&self) -> &pest::iterators::Pair<'i, Rule> {
         &self.0
     }

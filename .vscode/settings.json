@@ -7,6 +7,7 @@
         "cxxflags",
         "endfacet",
         "endsolid",
+        "hasher",
         "Hasher",
         "lvalue",
         "microcad",
@@ -24,6 +25,7 @@
         "tendloop",
         "thiserror",
         "unitless",
+        "µcad",
         "µCAD"
     ],
     "[markdown]": {

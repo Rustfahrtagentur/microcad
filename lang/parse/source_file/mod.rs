@@ -49,11 +49,23 @@ impl SourceFile {
         use anyhow::Context;
         file.read_to_string(&mut buf)
             .context("Cannot load source file")?;
-        use std::str::FromStr;
-        let mut source_file = Self::from_str(&buf).context("Could not parse file")?;
+
+        let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)
+            .context("Could not parse file")?;
 
         source_file.filename = Some(std::path::PathBuf::from(path.as_ref()));
         Ok(source_file)
+    }
+
+    /// Create `SourceFile` from string
+    /// The hash of the result will be of `"<from_str>"`.
+    pub fn load_from_str(s: &str) -> anyhow::Result<Self> {
+        use std::hash::{Hash, Hasher};
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        "<from_str>".hash(&mut hasher);
+        let hash = hasher.finish();
+
+        Parser::parse_rule(crate::parser::Rule::source_file, s, hash)
     }
 
     /// Return filename of loaded file or `<no file>`
@@ -115,13 +127,14 @@ impl SourceFile {
 }
 
 impl Parse for SourceFile {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(mut pair: Pair<'_>) -> ParseResult<Self> {
         let mut body = Vec::new();
 
         use std::hash::{Hash, Hasher};
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         pair.as_str().hash(&mut hasher);
         let hash = hasher.finish();
+        pair.set_source_hash(hash);
 
         for pair in pair.inner() {
             match pair.as_rule() {
@@ -152,15 +165,6 @@ impl Eval for SourceFile {
             statement.eval(context)?;
         }
         Ok(node)
-    }
-}
-
-/// Implement `FromStr` trait for `SourceFile` to allow parsing from string
-impl std::str::FromStr for SourceFile {
-    type Err = anyhow::Error;
-
-    fn from_str(s: &str) -> anyhow::Result<Self> {
-        Parser::parse_rule(crate::parser::Rule::source_file, s, 0)
     }
 }
 

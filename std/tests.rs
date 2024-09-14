@@ -27,8 +27,7 @@ fn context_namespace() {
 fn test_assert() {
     use microcad_lang::parse::source_file::SourceFile;
 
-    use std::str::FromStr;
-    let source_file = match SourceFile::from_str(
+    let source_file = match SourceFile::load_from_str(
         r#"
             std::assert(std::math::abs(-1.0) == 1.0);
         "#,
