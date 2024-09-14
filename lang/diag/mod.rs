@@ -172,12 +172,38 @@ fn test_diagnostics() {
     diagnostics.error(body_iter.next().unwrap(), anyhow!("This is an error"));
 
     assert_eq!(diagnostics.len(), 3);
+    let mut output = std::io::Cursor::new(Vec::new());
     diagnostics
         .pretty_print(
-            &mut std::io::stdout(),
+            &mut output,
             source_file
                 .get_source_file_by_hash(source_file.hash())
                 .unwrap(),
         )
         .unwrap();
+
+    // Hol den Inhalt des Puffers
+    let result = String::from_utf8(output.into_inner()).expect("Invalid UTF-8");
+    assert_eq!(
+        result,
+        "info: This is an info
+  ---> <no file>:1:1
+     |
+   1 | <no file>
+     | ^^^^^^^^^
+     |
+warning: This is a warning
+  ---> <no file>:4:1
+     |
+   4 | <no file>
+     | ^^^^^^^^^
+     |
+error: This is an error
+  ---> <no file>:10:1
+     |
+  10 | <no file>
+     | ^^^^^^^^^
+     |
+"
+    );
 }
