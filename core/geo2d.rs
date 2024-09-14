@@ -2,23 +2,38 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::Scalar;
+
+/// Line string
 pub type LineString = geo::LineString<Scalar>;
+/// Multiple line string
 pub type MultiLineString = geo::MultiLineString<Scalar>;
+/// Polygon
 pub type Polygon = geo::Polygon<Scalar>;
+/// Multiple polygons
 pub type MultiPolygon = geo::MultiPolygon<Scalar>;
+/// Rectangle
 pub type Rect = geo::Rect<Scalar>;
+/// Point
 pub type Point = geo::Point<Scalar>;
 
+/// Geometry
 pub enum Geometry {
+    /// Line string
     LineString(LineString),
+    /// Multiple line string
     MultiLineString(MultiLineString),
+    /// Polygon
     Polygon(Polygon),
+    /// Multiple polygon
     MultiPolygon(MultiPolygon),
+    /// Rectangle
     Rect(Rect),
+    /// Point
     Point(Point),
 }
 
 impl Geometry {
+    /// Try to convert geometry into multiple polygons
     pub fn try_convert_to_multi_polygon(&self) -> Option<MultiPolygon> {
         match self {
             Geometry::LineString(_) | Geometry::Point(_) | Geometry::MultiLineString(_) => None,
@@ -40,6 +55,7 @@ impl Geometry {
         Polygon::new(line_string, vec![])
     }
 
+    /// Apply boolean operation
     pub fn boolean_op(
         &self,
         other: &Self,
@@ -53,7 +69,7 @@ impl Geometry {
     }
 }
 
+/// Shortcut to create a MultiPolygon
 pub fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
     MultiPolygon::new(vec![Polygon::new(line_string, vec![])])
 }
-

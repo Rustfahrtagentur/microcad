@@ -70,7 +70,7 @@ impl Parse for Parameter {
         let mut specified_type = None;
         let mut default_value = None;
 
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::identifier => {
                     name = Identifier::parse(pair)?;
@@ -179,4 +179,3 @@ macro_rules! parameter {
         )
     };
 }
-

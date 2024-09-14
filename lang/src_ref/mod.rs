@@ -9,7 +9,7 @@ mod refer;
 pub use line_col::*;
 pub use refer::*;
 
-use crate::parser::Pair;
+use crate::parser::*;
 
 /// Elements holding a source code reference shall implement this trait
 pub trait SrcReferrer {
@@ -42,11 +42,11 @@ impl SrcRef {
     /// - `range`: Position in file
     /// - `line`: Line number (0..) in file
     /// - `col`: Column number (ß..) in file
-    pub fn new(range: std::ops::Range<usize>, line: u32, col: u32) -> Self {
+    pub fn new(range: std::ops::Range<usize>, line: u32, col: u32, source_file_hash: u64) -> Self {
         Self(Some(SrcRefInner {
             range,
             at: LineCol { line, col },
-            source_file_hash: 0,
+            source_file_hash,
         }))
     }
 
@@ -66,7 +66,7 @@ impl SrcRef {
     /// - `u64` if `SrcRefInner` is some
     ///
     /// This is used to map `SrcRef` -> `SourceFile`
-    pub fn source_file_hash(&self) -> u64 {
+    pub fn source_hash(&self) -> u64 {
         self.0.as_ref().map(|s| s.source_file_hash).unwrap_or(0)
     }
 }
@@ -128,7 +128,7 @@ impl SrcRef {
     /// merge two `SrcRef` into a single one by
     pub fn merge(lhs: impl SrcReferrer, rhs: impl SrcReferrer) -> SrcRef {
         assert!(
-            lhs.src_ref().source_file_hash() == rhs.src_ref().source_file_hash(),
+            lhs.src_ref().source_hash() == rhs.src_ref().source_hash(),
             "Source file hash must be the same",
         );
         match (lhs.src_ref(), rhs.src_ref()) {
@@ -170,6 +170,7 @@ impl From<Pair<'_>> for SrcRef {
             pair.as_span().start()..pair.as_span().end(),
             line as u32,
             col as u32,
+            pair.source_hash(),
         )
     }
 }
@@ -181,8 +182,8 @@ fn test_src_ref() {
     let cube = 7..11;
     let size_y = 26..32;
 
-    let cube = SrcRef::new(cube, 1, 0);
-    let size_y = SrcRef::new(size_y, 1, 0);
+    let cube = SrcRef::new(cube, 1, 0, 0);
+    let size_y = SrcRef::new(size_y, 1, 0, 0);
 
     assert_eq!(cube.source_slice(input), "cube");
     assert_eq!(size_y.source_slice(input), "size_y");

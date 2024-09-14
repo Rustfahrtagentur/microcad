@@ -6,24 +6,25 @@
 use crate::*;
 use microcad_core::{
     geo3d::{self},
-    Error, Scalar,
+    CoreError, Scalar,
 };
 
+/// Renders a mesh
 pub struct MeshRenderer {
+    /// Render precision
     precision: Scalar,
-    triangle_mesh: geo3d::TriangleMesh,
+
+    /// Triangle soup
+    pub triangle_mesh: geo3d::TriangleMesh,
 }
 
 impl MeshRenderer {
+    /// Create a MeshRenderer
     pub fn new(precision: Scalar) -> Self {
         Self {
             precision,
             triangle_mesh: geo3d::TriangleMesh::default(),
         }
-    }
-
-    pub fn triangle_mesh(&self) -> &geo3d::TriangleMesh {
-        &self.triangle_mesh
     }
 }
 
@@ -85,7 +86,7 @@ impl Renderer3D for MeshRenderer {
             }
             NodeInner::Transform(_) => unimplemented!(),
             NodeInner::Geometry2D(_) | NodeInner::Renderable2D(_) => {
-                return Err(Error::NotImplemented);
+                return Err(CoreError::NotImplemented);
             }
         }
 

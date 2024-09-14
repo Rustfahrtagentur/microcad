@@ -13,13 +13,13 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use microcad_render::tree;
 
 /// Trait to get a source file by its hash
-pub trait GetSourceFileByHash {
+pub trait GetSourceFileByHash: std::fmt::Debug {
     /// Get a source file by its hash
     fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile>;
 
     /// Convenience function to get a source file by from a `SrcRef`
     fn get_source_file_by_src_ref(&self, src_ref: impl SrcReferrer) -> Option<&SourceFile> {
-        self.get_source_file_by_hash(src_ref.src_ref().source_file_hash())
+        self.get_source_file_by_hash(src_ref.src_ref().source_hash())
     }
 }
 
@@ -60,7 +60,7 @@ impl SourceFile {
     pub fn filename(&self) -> &str {
         self.filename
             .as_ref()
-            .map(|p| p.to_str().unwrap_or("<no file>"))
+            .map(|path| path.to_str().unwrap_or("<no file>"))
             .unwrap_or("<no file>")
     }
 
@@ -123,7 +123,7 @@ impl Parse for SourceFile {
         pair.as_str().hash(&mut hasher);
         let hash = hasher.finish();
 
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::source_file_statement => {
                     body.push(Statement::parse(pair)?);
@@ -160,7 +160,7 @@ impl std::str::FromStr for SourceFile {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> anyhow::Result<Self> {
-        Parser::parse_rule(crate::parser::Rule::source_file, s)
+        Parser::parse_rule(crate::parser::Rule::source_file, s, 0)
     }
 }
 
@@ -177,7 +177,7 @@ impl GetSourceFileByHash for SourceFile {
 
 #[test]
 fn parse_source_file() {
-    let source_file = Parser::parse_rule_or_panic::<SourceFile>(
+    let source_file = Parser::parse_rule::<SourceFile>(
         Rule::source_file,
         r#"use std::io::println;
             module foo(r: scalar) {
@@ -185,7 +185,9 @@ fn parse_source_file() {
             }
             foo(20.0);
             "#,
-    );
+        0,
+    )
+    .unwrap();
 
     assert_eq!(source_file.body.len(), 3);
 }

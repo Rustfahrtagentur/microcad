@@ -25,7 +25,7 @@ impl Parse for ModuleInitDefinition {
         let mut parameters = ParameterList::default();
         let mut body = Vec::new();
 
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::parameter_list => {
                     parameters = ParameterList::parse(pair)?;
@@ -47,4 +47,3 @@ impl Parse for ModuleInitDefinition {
         })
     }
 }
-

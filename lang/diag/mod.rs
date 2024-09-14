@@ -92,22 +92,33 @@ impl Diag {
         source_file_by_hash: &impl GetSourceFileByHash,
     ) -> std::io::Result<()> {
         let src_ref = self.src_ref();
-        let source_file = source_file_by_hash
-            .get_source_file_by_src_ref(&src_ref)
-            .unwrap();
+        let source_file = source_file_by_hash.get_source_file_by_src_ref(&src_ref);
 
         match &src_ref {
             SrcRef(None) => writeln!(w, "{}: {}", self.level(), self.message())?,
             SrcRef(Some(ref src_ref)) => {
                 writeln!(w, "{}: {}", self.level(), self.message())?;
-                writeln!(w, "  ---> {}:{}", source_file.filename(), src_ref.at)?;
+                writeln!(
+                    w,
+                    "  ---> {}:{}",
+                    if let Some(source_file) = source_file {
+                        source_file.filename()
+                    } else {
+                        "<no file>"
+                    },
+                    src_ref.at
+                )?;
                 writeln!(w, "     |",)?;
 
-                let line = source_file
-                    .get_line(src_ref.at.line as usize - 1)
-                    .unwrap_or("<no line>");
-
+                let line = if let Some(source_file) = source_file {
+                    source_file
+                        .get_line(src_ref.at.line as usize - 1)
+                        .unwrap_or("<no line>")
+                } else {
+                    "<no file>"
+                };
                 writeln!(w, "{: >4} | {}", src_ref.at.line, line)?;
+
                 writeln!(
                     w,
                     "{: >4} | {}",

@@ -68,7 +68,7 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
         let mut parameters = None;
         let mut body = ModuleBody::default();
 
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::attribute_list => {
                     attributes.push(Attribute::parse(pair)?);

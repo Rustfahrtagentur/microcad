@@ -11,7 +11,7 @@ pub struct UnnamedTupleType(pub Vec<Type>);
 
 impl Parse for UnnamedTupleType {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let inner = pair.clone().into_inner();
+        let inner = pair.inner();
         let mut types = Vec::new();
         use crate::eval::Ty;
         for pair in inner {
@@ -41,11 +41,10 @@ fn unnamed_tuple_type() {
     use crate::parser::*;
 
     let type_annotation =
-        Parser::parse_rule_or_panic::<TypeAnnotation>(Rule::r#type, "(int, string)");
+        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(int, string)", 0).unwrap();
     assert_eq!(type_annotation.ty().to_string(), "(int, string)");
     assert_eq!(
         type_annotation.ty(),
         Type::UnnamedTuple(UnnamedTupleType(vec![Type::Integer, Type::String]))
     );
 }
-

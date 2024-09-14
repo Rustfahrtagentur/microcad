@@ -43,7 +43,7 @@ impl std::fmt::Display for UseStatement {
 
 impl Parse for UseStatement {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let mut inner = pair.clone().into_inner();
+        let mut inner = pair.inner();
         let first = inner.next().unwrap();
         let second = inner.next();
         let names = Parser::vec(first.clone(), QualifiedName::parse)?;
@@ -54,23 +54,23 @@ impl Parse for UseStatement {
                 Ok(UseStatement::UseFrom(
                     names,
                     QualifiedName::parse(second)?,
-                    pair.into(),
+                    pair.clone().into(),
                 ))
             }
             (Rule::qualified_name_list, None) => {
-                Ok(UseStatement::Use(Refer::new(names, pair.into())))
+                Ok(UseStatement::Use(Refer::new(names, pair.clone().into())))
             }
             (Rule::qualified_name_all, Some(second))
                 if second.as_rule() == Rule::qualified_name_list =>
             {
                 Ok(UseStatement::UseAll(Refer::new(
                     Parser::vec(second, QualifiedName::parse)?,
-                    pair.into(),
+                    pair.clone().into(),
                 )))
             }
             (Rule::use_alias, _) => Ok(UseStatement::UseAlias(Refer::new(
                 UseAlias::parse(first)?,
-                pair.into(),
+                pair.clone().into(),
             ))),
             _ => Err(ParseError::InvalidUseStatement),
         }

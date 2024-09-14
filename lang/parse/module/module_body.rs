@@ -64,7 +64,7 @@ impl Parse for ModuleBody {
         Parser::ensure_rule(&pair, Rule::module_body);
         let mut body = ModuleBody::default();
 
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::module_statement => {
                     let statement = ModuleStatement::parse(pair.clone())?;

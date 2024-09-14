@@ -24,7 +24,7 @@ impl SrcReferrer for Attribute {
 
 impl Parse for Attribute {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let mut inner = pair.clone().into_inner();
+        let mut inner = pair.inner();
         let name = QualifiedName::parse(inner.next().unwrap())?;
         Ok(Attribute {
             name,
@@ -32,7 +32,7 @@ impl Parse for Attribute {
                 Some(pair) => Some(CallArgumentList::parse(pair.clone())?),
                 _ => None,
             },
-            src_ref: pair.into(),
+            src_ref: pair.clone().into(),
         })
     }
 }
@@ -45,4 +45,3 @@ impl std::fmt::Display for Attribute {
         }
     }
 }
-

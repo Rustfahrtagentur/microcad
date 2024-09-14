@@ -1,10 +1,14 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! 3D renderable
+
 use super::*;
 use crate::*;
 
+/// 3D renderable
 pub trait Renderable3D: RenderHash {
+    /// Get geometry
     fn request_geometry(
         &self,
         renderer: &mut dyn Renderer3D,
@@ -21,16 +25,21 @@ pub trait Renderable3D: RenderHash {
         Ok(std::rc::Rc::new(geometry))
     }
 
+    /// Render geometry
     fn render_geometry(&self, renderer: &mut dyn Renderer3D) -> Result<geo3d::Geometry>;
 }
 
+/// 3D Renderer
 pub trait Renderer3D: Renderer {
+    /// add mesh
     fn mesh(&mut self, mesh: &geo3d::TriangleMesh) -> Result<()>;
 
+    /// Get geometry
     fn fetch_geometry(&mut self, _hash: u64) -> Option<std::rc::Rc<geo3d::Geometry>> {
         None
     }
 
+    /// Render geometry
     fn render_geometry(&mut self, geometry: &geo3d::Geometry) -> Result<()> {
         match geometry {
             geo3d::Geometry::Mesh(m) => self.mesh(m),
@@ -38,6 +47,6 @@ pub trait Renderer3D: Renderer {
         }
     }
 
+    /// Render node
     fn render_node(&mut self, node: Node) -> Result<()>;
 }
-

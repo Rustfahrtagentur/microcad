@@ -10,8 +10,53 @@
 #[grammar = "grammar.pest"]
 pub struct Parser;
 
-use crate::errors::*;
-pub type Pair<'i> = pest::iterators::Pair<'i, Rule>;
+use crate::{
+    errors::*,
+    src_ref::{SrcRef, SrcReferrer},
+};
+
+#[derive(Debug, Clone)]
+pub struct Pair<'i>(pest::iterators::Pair<'i, Rule>, u64);
+
+impl<'i> Pair<'i> {
+    pub fn new(pest_pair: pest::iterators::Pair<'i, Rule>, source_hash: u64) -> Self {
+        Self(pest_pair, source_hash)
+    }
+
+    pub fn source_hash(&self) -> u64 {
+        self.1
+    }
+
+    pub fn pest_pair(&self) -> &pest::iterators::Pair<'i, Rule> {
+        &self.0
+    }
+
+    pub fn inner(&'i self) -> impl Iterator<Item = Self> {
+        self.0.clone().into_inner().map(|p| Self(p, self.1))
+    }
+}
+
+impl<'i> SrcReferrer for Pair<'i> {
+    fn src_ref(&self) -> SrcRef {
+        let pair = &self.0;
+        let (line, col) = pair.line_col();
+        SrcRef::new(
+            pair.as_span().start()..pair.as_span().end(),
+            line as u32,
+            col as u32,
+            self.1,
+        )
+    }
+}
+
+impl<'i> std::ops::Deref for Pair<'i> {
+    type Target = pest::iterators::Pair<'i, Rule>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 pub type Pairs<'i> = pest::iterators::Pairs<'i, Rule>;
 
 pub trait Parse: Sized {
@@ -32,40 +77,25 @@ impl Parser {
         T: Clone,
     {
         let mut vec = Vec::new();
-        for pair in pair.clone().into_inner() {
-            vec.push(f(pair)?);
+        for p in pair.0.clone().into_inner() {
+            vec.push(f(Pair(p, pair.1))?);
         }
 
         Ok(vec)
     }
 
     /// Parse a rule for type `T`
-    pub fn parse_rule<T>(rule: Rule, input: &str) -> anyhow::Result<T>
+    pub fn parse_rule<T>(rule: Rule, input: &str, src_hash: u64) -> anyhow::Result<T>
     where
         T: Parse + Clone,
     {
         use pest::Parser as _;
 
         if let Some(pair) = Parser::parse(rule, input.trim())?.next() {
-            Ok(T::parse(pair)?)
+            Ok(T::parse(Pair(pair, src_hash))?)
         } else {
             Err(anyhow::Error::msg("could not parse"))
         }
-    }
-
-    /// Convenience function to parse a rule for type `T` and panic on error
-    pub fn parse_rule_or_panic<T>(rule: Rule, input: &str) -> T
-    where
-        T: Parse + Clone,
-    {
-        use pest::Parser as _;
-
-        let no_match = format!("Rule {rule:?} does not match");
-        let pair = Parser::parse(rule, input.trim())
-            .expect(&no_match)
-            .next()
-            .unwrap();
-        T::parse(pair).unwrap()
     }
 
     pub fn ensure_rule(pair: &Pair, expected: Rule) {

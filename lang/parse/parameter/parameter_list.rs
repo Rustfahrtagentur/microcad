@@ -48,7 +48,7 @@ impl Parse for ParameterList {
         Parser::ensure_rule(&pair, Rule::parameter_list);
         let mut parameters = ParameterList::default();
 
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             parameters
                 .push(Parameter::parse(pair)?)
                 .map_err(ParseError::DuplicateIdentifier)?;
@@ -89,4 +89,3 @@ macro_rules! parameter_list {
         microcad_lang::parse::parameter_list![$(microcad_lang::parameter!($name: $ty = $value)),*]
     };
 }
-

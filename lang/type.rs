@@ -100,7 +100,7 @@ impl From<Type> for TypeAnnotation {
 impl Parse for TypeAnnotation {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::r#type);
-        let inner = pair.clone().into_inner().next().unwrap();
+        let inner = pair.inner().next().unwrap();
 
         let s = match inner.as_rule() {
             Rule::list_type => Self(Refer::new(Type::List(ListType::parse(inner)?), pair.into())),
@@ -161,7 +161,7 @@ impl std::fmt::Display for Type {
 
 #[test]
 fn builtin_type() {
-    let ty = Parser::parse_rule_or_panic::<TypeAnnotation>(Rule::r#type, "int");
+    let ty = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "int", 0).unwrap();
     assert_eq!(ty.0.to_string(), "int");
     assert_eq!(ty.0.value, Type::Integer);
 }

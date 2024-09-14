@@ -5,6 +5,7 @@
 
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
+/// Short cut to create a NamedTuple
 #[cfg(test)]
 #[macro_export]
 macro_rules! named_tuple {

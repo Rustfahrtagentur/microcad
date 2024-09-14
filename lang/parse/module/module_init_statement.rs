@@ -31,7 +31,7 @@ impl SrcReferrer for ModuleInitStatement {
 
 impl Parse for ModuleInitStatement {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
-        let first = pair.clone().into_inner().next().unwrap();
+        let first = pair.inner().next().unwrap();
         Ok(match first.as_rule() {
             Rule::use_statement => ModuleInitStatement::Use(UseStatement::parse(first)?),
             Rule::expression => ModuleInitStatement::Expression(Expression::parse(first)?),
@@ -45,4 +45,3 @@ impl Parse for ModuleInitStatement {
         })
     }
 }
-

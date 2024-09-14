@@ -144,7 +144,7 @@ fn test_builtin_function(name: &str, input: &str, expected: &str) {
         .unwrap();
     assert_eq!(symbols.len(), 1);
 
-    let expr = Parser::parse_rule_or_panic::<Expression>(Rule::expression, input);
+    let expr = Parser::parse_rule::<Expression>(Rule::expression, input, 0).unwrap();
 
     let value = expr.eval(&mut context).unwrap();
     assert_eq!(value.ty(), Type::Scalar);

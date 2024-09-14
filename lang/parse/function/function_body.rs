@@ -22,7 +22,7 @@ impl Parse for FunctionBody {
 
         let mut body = Vec::new();
 
-        for pair in pair.into_inner() {
+        for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::function_statement => {
                     body.push(FunctionStatement::parse(pair)?);
@@ -39,4 +39,3 @@ impl Parse for FunctionBody {
         Ok(Self(body))
     }
 }
-

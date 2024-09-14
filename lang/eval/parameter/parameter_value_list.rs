@@ -17,6 +17,7 @@ pub struct ParameterValueList {
 }
 
 impl ParameterValueList {
+    /// Create new ParameterValueList
     #[cfg(test)]
     pub fn new(parameters: Vec<ParameterValue>) -> Self {
         let mut by_name = std::collections::HashMap::new();
@@ -79,4 +80,3 @@ impl std::ops::Deref for ParameterValueList {
         &self.parameters
     }
 }
-

@@ -249,28 +249,35 @@ impl Parse for Expression {
 
         let mut error: Option<ParseError> = None;
         let result = PRATT_PARSER
-            .map_primary(|primary| match primary.as_rule() {
-                Rule::literal => match Literal::parse(primary) {
-                    Ok(literal) => Self::Literal(literal),
-                    Err(e) => {
-                        error = Some(e);
-                        Self::Invalid
+            .map_primary(|primary| {
+                match (
+                    Pair::new(primary.clone(), pair.source_hash()),
+                    primary.as_rule(),
+                ) {
+                    (primary, Rule::literal) => match Literal::parse(primary) {
+                        Ok(literal) => Self::Literal(literal),
+                        Err(e) => {
+                            error = Some(e);
+                            Self::Invalid
+                        }
+                    },
+                    (primary, Rule::expression) => Self::parse(primary).unwrap(),
+                    (primary, Rule::list_expression) => {
+                        Self::ListExpression(ListExpression::parse(primary).unwrap())
                     }
-                },
-                Rule::expression => Self::parse(primary).unwrap(),
-                Rule::list_expression => {
-                    Self::ListExpression(ListExpression::parse(primary).unwrap())
+                    (primary, Rule::tuple_expression) => {
+                        Self::TupleExpression(TupleExpression::parse(primary).unwrap())
+                    }
+                    (primary, Rule::format_string) => {
+                        Self::FormatString(FormatString::parse(primary).unwrap())
+                    }
+                    (primary, Rule::nested) => Self::Nested(Nested::parse(primary).unwrap()),
+                    rule => unreachable!(
+                        "Expression::parse expected atom, found {:?} {:?}",
+                        rule,
+                        pair.as_span().as_str()
+                    ),
                 }
-                Rule::tuple_expression => {
-                    Self::TupleExpression(TupleExpression::parse(primary).unwrap())
-                }
-                Rule::format_string => Self::FormatString(FormatString::parse(primary).unwrap()),
-                Rule::nested => Self::Nested(Nested::parse(primary).unwrap()),
-                rule => unreachable!(
-                    "Expression::parse expected atom, found {:?} {:?}",
-                    rule,
-                    pair.as_span().as_str()
-                ),
             })
             .map_infix(|lhs, op, rhs| {
                 let op = match op.as_rule() {
@@ -315,38 +322,40 @@ impl Parse for Expression {
                     src_ref: pair.clone().into(),
                 }
             })
-            .map_postfix(|lhs, op| match op.as_rule() {
-                Rule::list_element_access => Self::ListElementAccess(
-                    Box::new(lhs),
-                    Box::new(Self::parse(op).unwrap()),
-                    pair.clone().into(),
-                ),
-                Rule::tuple_element_access => {
-                    let op = op.into_inner().next().unwrap();
-                    match op.as_rule() {
-                        Rule::identifier => Self::NamedTupleElementAccess(
-                            Box::new(lhs),
-                            Identifier::parse(op).unwrap(),
-                            pair.clone().into(),
-                        ),
-                        Rule::int => Self::UnnamedTupleElementAccess(
-                            Box::new(lhs),
-                            op.as_str().parse().unwrap(),
-                            pair.clone().into(),
-                        ),
-                        rule => unreachable!("Expected identifier or int, found {:?}", rule),
+            .map_postfix(|lhs, op| {
+                match (Pair::new(op.clone(), pair.source_hash()), op.as_rule()) {
+                    (op, Rule::list_element_access) => Self::ListElementAccess(
+                        Box::new(lhs),
+                        Box::new(Self::parse(op).unwrap()),
+                        pair.clone().into(),
+                    ),
+                    (op, Rule::tuple_element_access) => {
+                        let op = op.inner().next().unwrap();
+                        match op.as_rule() {
+                            Rule::identifier => Self::NamedTupleElementAccess(
+                                Box::new(lhs),
+                                Identifier::parse(op).unwrap(),
+                                pair.clone().into(),
+                            ),
+                            Rule::int => Self::UnnamedTupleElementAccess(
+                                Box::new(lhs),
+                                op.as_str().parse().unwrap(),
+                                pair.clone().into(),
+                            ),
+                            rule => unreachable!("Expected identifier or int, found {:?}", rule),
+                        }
+                    }
+                    (op, Rule::method_call) => Self::MethodCall(
+                        Box::new(lhs),
+                        MethodCall::parse(op).unwrap(),
+                        pair.clone().into(),
+                    ),
+                    rule => {
+                        unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
                     }
                 }
-                Rule::method_call => Self::MethodCall(
-                    Box::new(lhs),
-                    MethodCall::parse(op).unwrap(),
-                    pair.clone().into(),
-                ),
-                rule => {
-                    unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
-                }
             })
-            .parse(pair.clone().into_inner());
+            .parse(pair.pest_pair().clone().into_inner());
 
         match error {
             Some(e) => Err(e),
@@ -404,10 +413,13 @@ fn run_expression_test(
     use crate::parser::{Parser, Rule};
     use pest::Parser as _;
 
-    let pair = Parser::parse(Rule::expression, expr)
-        .unwrap()
-        .next()
-        .unwrap();
+    let pair = Pair::new(
+        Parser::parse(Rule::expression, expr)
+            .unwrap()
+            .next()
+            .unwrap(),
+        0,
+    );
 
     let expr = Expression::parse(pair).unwrap();
     let new_expr = expr.eval(context);

@@ -42,7 +42,7 @@ impl Parse for ExpressionList {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut vec = Vec::new();
 
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             vec.push(Expression::parse(pair)?);
         }
 
@@ -63,4 +63,3 @@ impl std::fmt::Display for ExpressionList {
         )
     }
 }
-

@@ -17,8 +17,8 @@ impl Parse for NamedTupleType {
 
         use crate::eval::Ty;
 
-        for pair in pair.clone().into_inner() {
-            let mut inner = pair.into_inner();
+        for pair in pair.inner() {
+            let mut inner = pair.inner();
             let name = Identifier::parse(inner.next().unwrap())?;
             let ty = TypeAnnotation::parse(inner.next().unwrap())?.ty();
             if types.contains_key(&name) {
@@ -50,7 +50,7 @@ fn named_tuple_type() {
     use crate::parser::*;
 
     let type_annotation =
-        Parser::parse_rule_or_panic::<TypeAnnotation>(Rule::r#type, "(x: int, y: string)");
+        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(x: int, y: string)", 0).unwrap();
     assert_eq!(type_annotation.ty().to_string(), "(x: int, y: string)");
     assert_eq!(
         type_annotation.ty(),
@@ -64,4 +64,3 @@ fn named_tuple_type() {
         ))
     );
 }
-

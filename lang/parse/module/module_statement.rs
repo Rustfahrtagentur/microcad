@@ -41,7 +41,7 @@ impl SrcReferrer for ModuleStatement {
 impl Parse for ModuleStatement {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::module_statement);
-        let first = pair.clone().into_inner().next().unwrap();
+        let first = pair.inner().next().unwrap();
         Ok(match first.as_rule() {
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
             Rule::expression | Rule::expression_no_semicolon => {

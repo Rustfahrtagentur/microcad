@@ -4,41 +4,43 @@
 use crate::Vec3;
 use manifold_rs::{Manifold, Mesh};
 
+/// Vertex
 #[derive(Clone, Copy, Debug)]
 pub struct Vertex {
+    /// position
     pub pos: Vec3,
+    /// normal vector
     pub normal: Vec3,
 }
 
+/// Triangle
 #[derive(Clone, Copy, Debug)]
 pub struct Triangle<T>(pub T, pub T, pub T);
 
 impl Triangle<Vertex> {
+    /// Get normal of triangle
     pub fn normal(&self) -> Vec3 {
         (self.2.pos - self.0.pos).cross(self.1.pos - self.0.pos)
     }
 }
 
+/// Triangle mesh
 #[derive(Default, Clone)]
 pub struct TriangleMesh {
-    vertices: Vec<Vertex>,
-    triangle_indices: Vec<Triangle<u32>>,
+    /// Mesh Vertices
+    pub vertices: Vec<Vertex>,
+    /// Triangle indicies
+    pub triangle_indices: Vec<Triangle<u32>>,
 }
 
 impl TriangleMesh {
+    /// Clear mesh
     pub fn clear(&mut self) {
         self.vertices.clear();
         self.triangle_indices.clear();
     }
 
-    pub fn vertices(&self) -> &[Vertex] {
-        &self.vertices
-    }
-
-    pub fn triangle_indices(&self) -> &Vec<Triangle<u32>> {
-        &self.triangle_indices
-    }
-
+    /// Fetch triangles
     pub fn fetch_triangles(&self) -> Vec<Triangle<Vertex>> {
         self.triangle_indices
             .iter()
@@ -52,6 +54,7 @@ impl TriangleMesh {
             .collect()
     }
 
+    /// Append a triangle mesh
     pub fn append(&mut self, other: &TriangleMesh) {
         let offset = self.vertices.len() as u32;
         self.vertices.extend_from_slice(&other.vertices);
@@ -63,6 +66,7 @@ impl TriangleMesh {
         )
     }
 
+    /// convert intro manifold
     pub fn to_manifold(&self) -> Manifold {
         Manifold::from_mesh(self.into())
     }
@@ -111,4 +115,3 @@ impl From<Manifold> for TriangleMesh {
         TriangleMesh::from(manifold.to_mesh())
     }
 }
-

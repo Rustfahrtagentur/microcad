@@ -47,6 +47,7 @@ fn test_assert() {
     }
 }
 
+///Shortcut to create a ArgumentMap
 #[cfg(test)]
 #[macro_export]
 macro_rules! args {

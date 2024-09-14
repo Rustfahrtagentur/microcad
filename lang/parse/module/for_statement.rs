@@ -28,13 +28,13 @@ impl Parse for ForStatement {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::for_statement);
 
-        let mut pairs = pair.clone().into_inner();
+        let mut pairs = pair.inner();
 
         Ok(ForStatement {
             loop_var: Identifier::parse(pairs.next().unwrap())?,
             loop_expr: Expression::parse(pairs.next().unwrap())?,
             body: ModuleBody::parse(pairs.next().unwrap())?,
-            src_ref: pair.into(),
+            src_ref: pair.clone().into(),
         })
     }
 }

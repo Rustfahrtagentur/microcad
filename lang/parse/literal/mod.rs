@@ -37,7 +37,7 @@ impl std::str::FromStr for Literal {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        Parser::parse_rule::<Self>(Rule::literal, s)
+        Parser::parse_rule::<Self>(Rule::literal, s, 0)
     }
 }
 
@@ -56,7 +56,7 @@ impl Parse for Literal {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::literal);
 
-        let inner = pair.clone().into_inner().next().unwrap();
+        let inner = pair.inner().next().unwrap();
 
         let s = match inner.as_rule() {
             Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?),
@@ -99,4 +99,3 @@ impl std::fmt::Display for Literal {
         }
     }
 }
-

@@ -1,6 +1,8 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! 3D Geometry
+
 mod triangle_mesh;
 
 pub use manifold_rs::Manifold;
@@ -8,8 +10,11 @@ pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 
 use crate::algorithm::BooleanOp;
 
+/// 3D Geometry
 pub enum Geometry {
+    /// Triangle mesh
     Mesh(TriangleMesh),
+    /// Maniold
     Manifold(Manifold),
 }
 
@@ -25,6 +30,7 @@ impl From<&BooleanOp> for manifold_rs::BooleanOp {
 }
 
 impl Geometry {
+    /// Fetch mesh from geometry
     pub fn fetch_mesh(&self) -> TriangleMesh {
         match self {
             Geometry::Mesh(mesh) => mesh.clone(),
@@ -32,6 +38,7 @@ impl Geometry {
         }
     }
 
+    /// Execute boolean operation
     pub fn boolean_op(&self, other: &Geometry, op: &BooleanOp) -> Option<Self> {
         let op: manifold_rs::BooleanOp = op.into();
         match (self, other) {
@@ -66,4 +73,3 @@ impl From<TriangleMesh> for Geometry {
         Geometry::Mesh(mesh)
     }
 }
-

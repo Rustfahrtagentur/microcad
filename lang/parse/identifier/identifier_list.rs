@@ -46,7 +46,7 @@ impl std::fmt::Display for IdentifierList {
 impl Parse for IdentifierList {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut vec = Vec::new();
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             if pair.as_rule() == Rule::identifier {
                 vec.push(Identifier::parse(pair)?);
             }
@@ -63,4 +63,3 @@ impl std::iter::IntoIterator for IdentifierList {
         self.0.into_iter()
     }
 }
-

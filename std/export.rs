@@ -15,7 +15,7 @@ impl ExporterRegistry {
     pub fn create(&self, settings: &ExportSettings) -> microcad_core::Result<Box<dyn Exporter>> {
         let id = settings.exporter_id();
         if id.as_ref().is_none() {
-            return Err(microcad_core::Error::NoFilenameSpecifiedForExport);
+            return Err(microcad_core::CoreError::NoFilenameSpecifiedForExport);
         }
 
         use microcad_export::*;
@@ -24,7 +24,7 @@ impl ExporterRegistry {
             "stl" => Self::make::<stl::StlExporter>(settings),
             "ply" => Self::make::<ply::PlyExporter>(settings),
             "yaml" => Self::make::<yaml::YamlExporter>(settings),
-            id => Err(microcad_core::Error::NoSuitableExporterFound(
+            id => Err(microcad_core::CoreError::NoSuitableExporterFound(
                 id.to_string(),
             )),
         }

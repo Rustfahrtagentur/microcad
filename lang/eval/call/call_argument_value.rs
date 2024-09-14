@@ -39,6 +39,7 @@ impl CallArgumentValue {
     }
 }
 
+/// Shortcut to create a argument value
 #[macro_export]
 #[cfg(test)]
 macro_rules! call_argument_value {

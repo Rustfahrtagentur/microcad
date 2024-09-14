@@ -25,9 +25,9 @@ pub type Angle = cgmath::Rad<Scalar>;
 pub type Id = compact_str::CompactString;
 
 pub use algorithm::Algorithm;
-pub use error::Error;
+pub use error::CoreError;
 pub use export::{ExportSettings, Exporter};
 pub use transform::Transform;
 
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result<T> = std::result::Result<T, CoreError>;
 

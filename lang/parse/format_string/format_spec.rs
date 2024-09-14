@@ -26,7 +26,7 @@ impl Parse for FormatSpec {
     fn parse(pair: Pair<'_>) -> ParseResult<Self> {
         let mut opt = FormatSpec::default();
 
-        for pair in pair.clone().into_inner() {
+        for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::format_spec_precision => {
                     opt.precision = Some(pair.as_span().as_str()[1..].parse().unwrap())
@@ -43,4 +43,3 @@ impl Parse for FormatSpec {
         Ok(opt)
     }
 }
-
