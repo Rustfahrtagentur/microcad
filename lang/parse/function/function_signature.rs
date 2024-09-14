@@ -61,7 +61,7 @@ impl Parse for FunctionSignature {
     }
 }
 
-/// Short cut to create a builtin function signature
+/// Short cut to create a `FunctionSignature`
 #[macro_export]
 macro_rules! function_signature {
     ($parameters:expr) => {

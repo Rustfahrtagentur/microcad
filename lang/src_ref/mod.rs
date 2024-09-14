@@ -40,8 +40,8 @@ pub struct SrcRef(pub Option<SrcRefInner>);
 impl SrcRef {
     /// Create new `SrcRef`
     /// - `range`: Position in file
-    /// - `line`: Line number (0..) in file
-    /// - `col`: Column number (ß..) in file
+    /// - `line`: Line number within file
+    /// - `col`: Column number within file
     pub fn new(range: std::ops::Range<usize>, line: u32, col: u32, source_file_hash: u64) -> Self {
         Self(Some(SrcRefInner {
             range,
@@ -84,7 +84,7 @@ impl std::ops::Deref for SrcRef {
 pub struct SrcRefInner {
     /// Range in bytes
     pub range: std::ops::Range<usize>,
-    /// Line and column (aka position)
+    /// Line and column
     pub at: LineCol,
     /// Hash of the source code file to map `SrcRef` -> `SourceFile`
     pub source_file_hash: u64,
