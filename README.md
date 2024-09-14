@@ -193,12 +193,6 @@ module a(b: length) {}
 
 A module can have initializers:
 
-module a {
-
-}
-
-A module with no arguments and no initializers serves as a namespace.
-
 ### Functions
 
 ### Documentation
