@@ -169,7 +169,7 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                 &format!(
                     r##"#[test]
                         fn r#{name}() {{
-                            use microcad_lang::{{eval::*,parse::*,parser::*}};
+                            use microcad_lang::parse::*;
                             use microcad_std::*;
                             match SourceFile::load_from_str(
                                 r#"
