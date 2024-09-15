@@ -179,11 +179,11 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                         Some("fail") =>
                             r##"{
                                     Err(_) => (),
-                                    Ok(doc) => { 
+                                    Ok(source) => { 
                                         let mut context = Context::default();
                                         context.add(microcad_std::builtin_module().into());
 
-                                        if let Err(err) = doc.eval(&mut context) {
+                                        if let Err(err) = source.eval(&mut context) {
                                             println!("{err}");
                                         } else {
                                             panic!("ERROR: test is marked to fail but succeeded");
@@ -192,11 +192,11 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                                 }"##,
                         _ =>
                             r##"{
-                                    Ok(doc) => {
+                                    Ok(source) => {
                                         let mut context = Context::default();
                                         context.add(microcad_std::builtin_module().into());
                                         
-                                        if let Err(err) = doc.eval(&mut context) {
+                                        if let Err(err) = source.eval(&mut context) {
                                             println!("{err}");
                                         }
                                     },
