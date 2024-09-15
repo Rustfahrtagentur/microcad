@@ -18,6 +18,10 @@ pub enum Type {
     Color,
     /// A physical length, e.g. 4.0mm
     Length,
+    /// A physical area, e.g. 4.0mm²
+    Area,
+    /// A physical volume, e.g. 4.0mm³
+    Volume,
     /// An angle, e.g. 90°
     Angle,
     /// A physical weight, e.g. 4.0kg
@@ -143,6 +147,8 @@ impl std::fmt::Display for Type {
             Self::String => write!(f, "string"),
             Self::Color => write!(f, "color"),
             Self::Length => write!(f, "length"),
+            Self::Area => write!(f, "area"),
+            Self::Volume => write!(f, "volume"),
             Self::Angle => write!(f, "angle"),
             Self::Weight => write!(f, "weight"),
             Self::Vec2 => write!(f, "vec2"),

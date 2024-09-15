@@ -103,7 +103,7 @@ format_spec_leading_zeros = { "0" ~ int }
 //`False`: error
 bool_literal = @{ "true" | "false" }
 
-unit = @{ (alpha_lower)+ | "°" | "%" }
+unit = @{ ((alpha_lower)+ ~ ("²" | "³")?) | "°" | "%" }
 
 //`#FFF`: ok # RGB, single hex
 //`#00FF00`: ok # RGB, double hex

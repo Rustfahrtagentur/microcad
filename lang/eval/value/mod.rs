@@ -33,6 +33,10 @@ pub enum Value {
     Scalar(Refer<Scalar>),
     /// Length in mm
     Length(Refer<Scalar>),
+    /// Area in mm²
+    Area(Refer<Scalar>),
+    /// Volume in mm³
+    Volume(Refer<Scalar>),
     /// A 2D vector with length
     Vec2(Refer<Vec2>),
     /// A 3D vector with length
@@ -87,6 +91,8 @@ impl SrcReferrer for Value {
             Value::Integer(i) => i.src_ref(),
             Value::Scalar(s) => s.src_ref(),
             Value::Length(l) => l.src_ref(),
+            Value::Area(a) => a.src_ref(),
+            Value::Volume(v) => v.src_ref(),
             Value::Vec2(v) => v.src_ref(),
             Value::Vec3(v) => v.src_ref(),
             Value::Vec4(v) => v.src_ref(),
@@ -109,6 +115,8 @@ impl PartialOrd for Value {
             (Value::Integer(lhs), Value::Integer(rhs)) => lhs.partial_cmp(rhs),
             (Value::Scalar(lhs), Value::Scalar(rhs)) => lhs.partial_cmp(rhs),
             (Value::Length(lhs), Value::Length(rhs)) => lhs.partial_cmp(rhs),
+            (Value::Area(lhs), Value::Area(rhs)) => lhs.partial_cmp(rhs),
+            (Value::Volume(lhs), Value::Volume(rhs)) => lhs.partial_cmp(rhs),
             (Value::Vec2(lhs), Value::Vec2(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
             (Value::Vec3(lhs), Value::Vec3(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
             (Value::Angle(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
@@ -123,6 +131,8 @@ impl Ty for Value {
             Value::Integer(_) => Type::Integer,
             Value::Scalar(_) => Type::Scalar,
             Value::Length(_) => Type::Length,
+            Value::Area(_) => Type::Area,
+            Value::Volume(_) => Type::Volume,
             Value::Vec2(_) => Type::Vec2,
             Value::Vec3(_) => Type::Vec3,
             Value::Vec4(_) => Type::Vec4,
@@ -347,7 +357,9 @@ impl std::fmt::Display for Value {
         match self {
             Value::Integer(n) => write!(f, "{n}"),
             Value::Scalar(n) => write!(f, "{n}"),
-            Value::Length(n) | Value::Angle(n) => write!(f, "{n}{}", self.ty().default_unit()),
+            Value::Length(n) | Value::Angle(n) | Value::Area(n) | Value::Volume(n) => {
+                write!(f, "{n}{}", self.ty().default_unit())
+            }
             Value::Vec2(v) => write!(f, "({}, {})", v.x, v.y),
             Value::Vec3(v) => write!(f, "({}, {}, {})", v.x, v.y, v.z),
             Value::Vec4(v) => write!(f, "({}, {}, {}, {})", v.x, v.y, v.z, v.w),

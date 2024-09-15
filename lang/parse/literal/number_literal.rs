@@ -77,6 +77,8 @@ impl Eval for NumberLiteral {
             Type::Scalar => Ok(Value::Scalar(Refer::new(self.0, self.2.clone()))),
             Type::Angle => Ok(Value::Angle(Refer::new(self.0, self.2.clone()))),
             Type::Length => Ok(Value::Length(Refer::new(self.0, self.2.clone()))),
+            Type::Area => Ok(Value::Area(Refer::new(self.0, self.2.clone()))),
+            Type::Volume => Ok(Value::Volume(Refer::new(self.0, self.2.clone()))),
             _ => unreachable!(),
         }
     }
