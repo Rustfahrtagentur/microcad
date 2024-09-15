@@ -45,6 +45,8 @@ pub enum Value {
     Vec4(Refer<Vec4>),
     /// An angle in radians
     Angle(Refer<Scalar>),
+    /// Weight of a specific volume of material
+    Weight(Refer<Scalar>),
     /// Boolean value
     Bool(Refer<bool>),
     /// String value
@@ -90,14 +92,17 @@ impl SrcReferrer for Value {
         match self {
             Value::Integer(i) => i.src_ref(),
             Value::Scalar(s) => s.src_ref(),
+            Value::Bool(b) => b.src_ref(),
+
             Value::Length(l) => l.src_ref(),
+            Value::Angle(a) => a.src_ref(),
+            Value::Weight(w) => w.src_ref(),
+
             Value::Area(a) => a.src_ref(),
             Value::Volume(v) => v.src_ref(),
             Value::Vec2(v) => v.src_ref(),
             Value::Vec3(v) => v.src_ref(),
             Value::Vec4(v) => v.src_ref(),
-            Value::Angle(a) => a.src_ref(),
-            Value::Bool(b) => b.src_ref(),
             Value::String(s) => s.src_ref(),
             Value::Color(c) => c.src_ref(),
             Value::List(list) => list.src_ref(),
@@ -137,6 +142,7 @@ impl Ty for Value {
             Value::Vec3(_) => Type::Vec3,
             Value::Vec4(_) => Type::Vec4,
             Value::Angle(_) => Type::Angle,
+            Value::Weight(_) => Type::Weight,
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
             Value::Color(_) => Type::Color,
@@ -357,7 +363,11 @@ impl std::fmt::Display for Value {
         match self {
             Value::Integer(n) => write!(f, "{n}"),
             Value::Scalar(n) => write!(f, "{n}"),
-            Value::Length(n) | Value::Angle(n) | Value::Area(n) | Value::Volume(n) => {
+            Value::Length(n)
+            | Value::Angle(n)
+            | Value::Area(n)
+            | Value::Volume(n)
+            | Value::Weight(n) => {
                 write!(f, "{n}{}", self.ty().default_unit())
             }
             Value::Vec2(v) => write!(f, "({}, {})", v.x, v.y),
