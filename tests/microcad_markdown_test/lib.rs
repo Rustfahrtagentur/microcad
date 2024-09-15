@@ -169,7 +169,8 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                 &format!(
                     r##"#[test]
                         fn r#{name}() {{
-                            use microcad_lang::{{eval::{{Symbols, Eval, Context}},parse::source_file::SourceFile,parser}};
+                            use microcad_lang::{{eval::*,parse::*,parser::*}};
+                            use microcad_std::*;
                             match SourceFile::load_from_str(
                                 r#"
                                 {code}"#,
@@ -180,10 +181,9 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                             r##"{
                                     Err(_) => (),
                                     Ok(source) => { 
-                                        let mut context = Context::default();
-                                        context.add(microcad_std::builtin_module().into());
+                                        let mut context = ContextBuilder::new(source).with_std().build();
 
-                                        if let Err(err) = source.eval(&mut context) {
+                                        if let Err(err) = context.eval() {
                                             println!("{err}");
                                         } else {
                                             panic!("ERROR: test is marked to fail but succeeded");
@@ -193,10 +193,9 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                         _ =>
                             r##"{
                                     Ok(source) => {
-                                        let mut context = Context::default();
-                                        context.add(microcad_std::builtin_module().into());
+                                        let mut context = ContextBuilder::new(source).with_std().build();
                                         
-                                        if let Err(err) = source.eval(&mut context) {
+                                        if let Err(err) = context.eval() {
                                             println!("{err}");
                                         }
                                     },
