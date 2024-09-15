@@ -38,16 +38,16 @@ assert( millimeters == centimeters == meters == inches );
 Angles are used with rotations and in constrains when proving measures.
 
 ```µCAD,primitive.angle
-pi = PI;
+pi = std::math::PI;
 radian = 1rad;
 degree = 180°;
 degree_ = 180deg;
 gradient = 180grad;
 
-assert( radian = PI );
-assert( degree = PI );
-assert( degree = PI );
-assert( gradient = PI );
+assert( radian = pi );
+assert( degree = pi );
+assert( degree = pi );
+assert( gradient = pi );
 ```
 
 ### Area
@@ -56,7 +56,7 @@ assert( gradient = PI );
 square_millimeter = 100000mm²;
 square_centimeter = 1000cm²;
 square_meter = 0.1m²;
-square_inch = 155in³;
+square_inch = 155in²;
 
 assert(square_millimeter = 0.1m²);
 assert(square_centimeter = 0.1m²);
