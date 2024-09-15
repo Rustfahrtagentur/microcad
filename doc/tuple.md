@@ -1,6 +1,12 @@
 
 # Tuple expression
 
+Tuples are lists of items which might be of different types.
+
+```µCAD,tuples
+(width=10cm, depth=10cm, volume=1l);
+```
+
 ## Tuple as module parameters
 
 ```µCAD,parameters.A#fail

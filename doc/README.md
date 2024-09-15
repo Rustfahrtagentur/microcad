@@ -21,4 +21,4 @@
 ## Debugging
 
 * [Diagnostics](diag/README.md)
-* [Assertions](assert.md)
+* [Verification](verify.md)

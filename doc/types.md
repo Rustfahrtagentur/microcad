@@ -104,10 +104,13 @@ std::geo2d::string(text);
 Colors are defined by using hash mark (`#`) followed by hexadecimal digits for red, green and blue:
 
 ```µCAD,primitive.color
-RGB_single_hex = #FFF
-RGB_double_hex = #00FF00
-RGBA_single_hex = #FFFF
-RGBA_double_hex = #00FF00FF
+rgb_single_hex = #FFF;
+rgb_double_hex = #00FF00;
+rgba_single_hex = #FFFF;
+rgba_double_hex = #00FF00FF;
+
+assert( rgb_single_hex = rgba_single_hex );
+assert( rgb_double_hex = rgba_double_hex );
 ```
 
 Illegal values for color:
@@ -142,7 +145,7 @@ vec2 = (x=1, y=2)cm;
 3D vectors are written as named tuples with builtin values `x`, `y` and `z`.
 
 ```µCAD,primitive.vec3
-vec3 = (x=1, y=2, z=3) cm;
+vec3 = (x=1, y=2, z=3)cm;
 ```
 
 ### Vec4
