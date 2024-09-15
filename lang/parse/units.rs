@@ -111,7 +111,7 @@ impl Unit {
 }
 
 impl Parse for Unit {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         use std::str::FromStr;
         match Unit::from_str(pair.as_str()) {
             Ok(unit) => Ok(unit),
@@ -119,4 +119,3 @@ impl Parse for Unit {
         }
     }
 }
-

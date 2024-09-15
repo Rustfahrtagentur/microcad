@@ -23,7 +23,7 @@ impl SrcReferrer for MethodCall {
 }
 
 impl Parse for MethodCall {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
 
         Ok(MethodCall {

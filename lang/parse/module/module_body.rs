@@ -60,7 +60,7 @@ impl Symbols for ModuleBody {
 }
 
 impl Parse for ModuleBody {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::module_body);
         let mut body = ModuleBody::default();
 

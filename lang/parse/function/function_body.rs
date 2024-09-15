@@ -17,7 +17,7 @@ impl SrcReferrer for FunctionBody {
 }
 
 impl Parse for FunctionBody {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_body);
 
         let mut body = Vec::new();

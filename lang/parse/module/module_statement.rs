@@ -39,7 +39,7 @@ impl SrcReferrer for ModuleStatement {
 }
 
 impl Parse for ModuleStatement {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::module_statement);
         let first = pair.inner().next().unwrap();
         Ok(match first.as_rule() {

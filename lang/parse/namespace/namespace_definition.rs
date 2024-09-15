@@ -51,7 +51,7 @@ impl Symbols for NamespaceDefinition {
 }
 
 impl Parse for std::rc::Rc<NamespaceDefinition> {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut pairs = pair.inner();
         Ok(std::rc::Rc::new(NamespaceDefinition {
             name: Identifier::parse(pairs.next().unwrap())?,

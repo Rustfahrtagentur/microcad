@@ -25,7 +25,7 @@ impl SrcReferrer for ForStatement {
 }
 
 impl Parse for ForStatement {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::for_statement);
 
         let mut pairs = pair.inner();

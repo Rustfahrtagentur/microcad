@@ -17,7 +17,7 @@ impl MapType {
 }
 
 impl Parse for MapType {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
         let key = inner.next().unwrap();
         let value = inner.next().unwrap();

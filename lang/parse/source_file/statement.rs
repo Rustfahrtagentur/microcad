@@ -39,7 +39,7 @@ impl SrcReferrer for Statement {
 }
 
 impl Parse for Statement {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::source_file_statement);
         let first = pair.inner().next().unwrap();
         Ok(match first.as_rule() {

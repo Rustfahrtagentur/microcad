@@ -22,7 +22,7 @@ impl std::fmt::Display for UseAlias {
 }
 
 impl Parse for UseAlias {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
         Ok(UseAlias(
             QualifiedName::parse(inner.next().unwrap())?,

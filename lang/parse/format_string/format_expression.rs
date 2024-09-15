@@ -18,7 +18,7 @@ pub struct FormatExpression {
 }
 
 impl Parse for FormatExpression {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut spec = FormatSpec::default();
         let mut expression = None;
         for pair in pair.inner() {

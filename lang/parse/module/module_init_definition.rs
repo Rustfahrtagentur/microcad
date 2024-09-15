@@ -20,7 +20,7 @@ impl SrcReferrer for ModuleInitDefinition {
 }
 
 impl Parse for ModuleInitDefinition {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::module_init_definition);
         let mut parameters = ParameterList::default();
         let mut body = Vec::new();

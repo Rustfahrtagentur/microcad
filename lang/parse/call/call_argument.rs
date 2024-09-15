@@ -39,7 +39,7 @@ impl OrdMapValue<Identifier> for CallArgument {
 }
 
 impl Parse for CallArgument {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         match pair.clone().as_rule() {
             Rule::call_named_argument => {
                 let mut inner = pair.inner();

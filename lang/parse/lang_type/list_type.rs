@@ -24,7 +24,7 @@ impl Ty for ListType {
 }
 
 impl Parse for ListType {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
 
         let pair = inner.next().unwrap();

@@ -10,7 +10,7 @@ use crate::{errors::*, parser::*, r#type::*};
 pub struct UnnamedTupleType(pub Vec<Type>);
 
 impl Parse for UnnamedTupleType {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let inner = pair.inner();
         let mut types = Vec::new();
         use crate::eval::Ty;

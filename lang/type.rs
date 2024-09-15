@@ -98,7 +98,7 @@ impl From<Type> for TypeAnnotation {
 }
 
 impl Parse for TypeAnnotation {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::r#type);
         let inner = pair.inner().next().unwrap();
 

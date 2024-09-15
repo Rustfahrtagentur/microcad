@@ -32,7 +32,7 @@ impl SrcReferrer for Assignment {
 }
 
 impl Parse for Assignment {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut name = Identifier::default();
         let mut specified_type = None;
         let mut value = None;

@@ -36,7 +36,7 @@ impl std::ops::DerefMut for QualifiedName {
 }
 
 impl Parse for QualifiedName {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self(
             pair.inner()
                 .map(|pair| Identifier::parse(pair))

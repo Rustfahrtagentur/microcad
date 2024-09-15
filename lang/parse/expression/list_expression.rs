@@ -34,7 +34,7 @@ impl SrcReferrer for ListExpression {
 }
 
 impl Parse for ListExpression {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
         Ok(Self {
             list: ExpressionList::parse(inner.next().unwrap())?,

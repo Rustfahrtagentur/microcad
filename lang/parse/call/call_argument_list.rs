@@ -46,7 +46,7 @@ impl Eval for CallArgumentList {
 }
 
 impl Parse for CallArgumentList {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut call_argument_list =
             CallArgumentList(Refer::new(OrdMap::default(), pair.clone().into()));
 

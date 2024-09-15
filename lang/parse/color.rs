@@ -32,7 +32,7 @@ impl std::fmt::Display for Color {
 }
 
 impl Parse for Color {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::color_literal);
         let values = &pair.inner().next().unwrap().as_str()[1..];
 

@@ -43,7 +43,7 @@ impl Sym for Call {
 }
 
 impl Parse for Call {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::call);
         let mut inner = pair.inner();
         let first = inner.next().unwrap();

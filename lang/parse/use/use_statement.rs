@@ -42,7 +42,7 @@ impl std::fmt::Display for UseStatement {
 }
 
 impl Parse for UseStatement {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
         let first = inner.next().unwrap();
         let second = inner.next();

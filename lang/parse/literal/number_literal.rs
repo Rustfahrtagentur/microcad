@@ -47,7 +47,7 @@ impl SrcReferrer for NumberLiteral {
 }
 
 impl Parse for NumberLiteral {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::number_literal);
 
         let mut inner = pair.inner();

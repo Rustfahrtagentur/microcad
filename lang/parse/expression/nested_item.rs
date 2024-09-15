@@ -27,7 +27,7 @@ impl SrcReferrer for NestedItem {
 }
 
 impl Parse for NestedItem {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         match pair.clone().as_rule() {
             Rule::call => Ok(Self::Call(Call::parse(pair.clone())?)),
             Rule::qualified_name => Ok(Self::QualifiedName(QualifiedName::parse(pair.clone())?)),
@@ -49,4 +49,3 @@ impl std::fmt::Display for NestedItem {
         }
     }
 }
-

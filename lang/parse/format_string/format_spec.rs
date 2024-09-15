@@ -23,7 +23,7 @@ impl SrcReferrer for FormatSpec {
 }
 
 impl Parse for FormatSpec {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut opt = FormatSpec::default();
 
         for pair in pair.inner() {

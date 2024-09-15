@@ -242,7 +242,7 @@ impl Eval for Expression {
 }
 
 impl Parse for Expression {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         if pair.as_rule() == Rule::expression_no_semicolon {
             return Ok(Self::Nested(Nested::parse(pair)?));
         }

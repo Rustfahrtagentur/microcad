@@ -46,7 +46,7 @@ impl<'a> From<&'a Identifier> for &'a str {
 }
 
 impl Parse for Identifier {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::identifier);
         Ok(Self(Refer::new(pair.as_str().into(), pair.into())))
     }
@@ -72,4 +72,3 @@ pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
         .collect::<Vec<_>>()
         .join(separator)
 }
-

@@ -44,7 +44,7 @@ impl From<Vec<Parameter>> for ParameterList {
 }
 
 impl Parse for ParameterList {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::parameter_list);
         let mut parameters = ParameterList::default();
 

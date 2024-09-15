@@ -53,7 +53,7 @@ impl Ty for Literal {
 }
 
 impl Parse for Literal {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::literal);
 
         let inner = pair.inner().next().unwrap();

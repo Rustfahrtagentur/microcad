@@ -62,7 +62,7 @@ impl Symbols for ModuleDefinition {
 }
 
 impl Parse for std::rc::Rc<ModuleDefinition> {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut attributes = Vec::new();
         let mut name = Identifier::default();
         let mut parameters = None;

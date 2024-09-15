@@ -47,7 +47,7 @@ impl SrcReferrer for FunctionStatement {
 }
 
 impl Parse for FunctionStatement {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_statement);
 
         let mut inner = pair.inner();

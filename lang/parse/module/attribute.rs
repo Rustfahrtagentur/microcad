@@ -23,7 +23,7 @@ impl SrcReferrer for Attribute {
 }
 
 impl Parse for Attribute {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
         let name = QualifiedName::parse(inner.next().unwrap())?;
         Ok(Attribute {

@@ -44,7 +44,7 @@ impl std::fmt::Display for IdentifierList {
 }
 
 impl Parse for IdentifierList {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut vec = Vec::new();
         for pair in pair.inner() {
             if pair.as_rule() == Rule::identifier {

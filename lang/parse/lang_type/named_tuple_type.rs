@@ -10,7 +10,7 @@ use crate::{errors::*, parse::*, parser::*, r#type::*};
 pub struct NamedTupleType(pub std::collections::BTreeMap<Identifier, Type>);
 
 impl Parse for NamedTupleType {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::named_tuple_type);
 
         let mut types = std::collections::BTreeMap::new();

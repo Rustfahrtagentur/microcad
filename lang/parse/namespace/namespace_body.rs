@@ -51,7 +51,7 @@ impl Symbols for NamespaceBody {
 }
 
 impl Parse for NamespaceBody {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut body = NamespaceBody::default();
         for pair in pair.inner() {
             if pair.as_rule() == Rule::namespace_statement {

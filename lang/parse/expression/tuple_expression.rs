@@ -28,7 +28,7 @@ impl SrcReferrer for TupleExpression {
 }
 
 impl Parse for TupleExpression {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
         let call_argument_list = CallArgumentList::parse(inner.next().unwrap())?;
         if call_argument_list.is_empty() {

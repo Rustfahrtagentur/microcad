@@ -39,7 +39,7 @@ impl FunctionSignature {
 }
 
 impl Parse for FunctionSignature {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut parameters = ParameterList::default();
         let mut return_type = None;
 

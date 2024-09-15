@@ -96,7 +96,7 @@ impl Eval for FormatString {
 }
 
 impl Parse for FormatString {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         let mut fs = Self::default();
         for pair in pair.inner() {
             match pair.as_rule() {

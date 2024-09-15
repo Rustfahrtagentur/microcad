@@ -127,7 +127,7 @@ impl SourceFile {
 }
 
 impl Parse for SourceFile {
-    fn parse(mut pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(mut pair: Pair) -> ParseResult<Self> {
         let mut body = Vec::new();
 
         use std::hash::{Hash, Hasher};

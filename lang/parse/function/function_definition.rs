@@ -68,7 +68,7 @@ impl CallTrait for FunctionDefinition {
 }
 
 impl Parse for std::rc::Rc<FunctionDefinition> {
-    fn parse(pair: Pair<'_>) -> ParseResult<Self> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_definition);
         let mut inner = pair.inner();
         let name = Identifier::parse(inner.next().unwrap())?;
