@@ -43,11 +43,13 @@ radian = 1rad;
 degree = 180°;
 degree_ = 180deg;
 gradient = 180grad;
+turn = 0.5turn;
 
 assert( radian = pi );
 assert( degree = pi );
 assert( degree = pi );
 assert( gradient = pi );
+assert( turn = pi );
 ```
 
 ### Area
