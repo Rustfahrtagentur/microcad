@@ -182,7 +182,7 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                                     Err(_) => (),
                                     Ok(source) => { 
                                         let mut context = ContextBuilder::new(source).with_std().build();
-
+                                        
                                         if let Err(err) = context.eval() {
                                             println!("{err}");
                                         } else {
@@ -196,8 +196,8 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                                         let mut context = ContextBuilder::new(source).with_std().build();
                                         
                                         if let Err(err) = context.eval() {
-                                            println!("{err}");
-                                        }
+                                            panic!("{err}");
+                                        } 
                                     },
                                     Err(err) => panic!("ERROR: {err}"),
                                 }"##,

@@ -11,11 +11,11 @@ If the expression computes to `false` a compile error will occur at
 that point.
 
 ```µCAD,assert
-std::debug::assert(true, "You won't see this message");
+std::assert(true, "You won't see this message");
 ```
 
 ```µCAD,assert_fail#fail
-std::debug::assert(false, "this assertion fails");
+std::assert(false, "this assertion fails");
 ```
 
 ## Panic
@@ -24,7 +24,7 @@ std::debug::assert(false, "this assertion fails");
 a = 0;
 
 if a != 0
-    panic("this should not have happened");
+    std::panic("this should not have happened");
 ```
 
 ## Todo
@@ -32,12 +32,10 @@ if a != 0
 `todo()` is like `panic()` but aims on reminding you to finish code later.
 
 ```µCAD,todo#todo
-use * from std::debug;
-
 a = 0;
 
 if a = 0 
-    info("a is zero");
+    std::info("a is zero");
 else
-    todo("print proper message");
+    std::todo("print proper message");
 ```
