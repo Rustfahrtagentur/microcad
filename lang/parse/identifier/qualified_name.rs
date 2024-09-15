@@ -47,7 +47,7 @@ impl Parse for QualifiedName {
 }
 
 impl std::fmt::Display for QualifiedName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", join_identifiers(&self.0, "::"))
     }
 }

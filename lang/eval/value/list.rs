@@ -51,7 +51,7 @@ impl IntoIterator for List {
 }
 
 impl std::fmt::Display for List {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
             "[{items}]",

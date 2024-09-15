@@ -31,7 +31,7 @@ impl SrcReferrer for UseStatement {
 }
 
 impl std::fmt::Display for UseStatement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             UseStatement::Use(names) => write!(f, "use {names:?}"),
             UseStatement::UseFrom(names, from, _) => write!(f, "use {names:?} from {from:?}"),

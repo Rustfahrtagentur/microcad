@@ -52,7 +52,7 @@ impl OrdMapValue<Identifier> for Parameter {
 }
 
 impl std::fmt::Display for Parameter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match (&self.specified_type, &self.default_value) {
             (Some(t), Some(v)) => write!(f, "{}: {t} = {v}", self.name)?,
             (Some(t), None) => write!(f, "{}: {t}", self.name)?,

@@ -38,7 +38,7 @@ impl std::ops::Deref for IdentifierList {
 }
 
 impl std::fmt::Display for IdentifierList {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", join_identifiers(&self.0, ", "))
     }
 }

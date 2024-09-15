@@ -44,7 +44,7 @@ pub enum NodeInner {
 }
 
 impl std::fmt::Debug for NodeInner {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name: &'static str = self.into();
         write!(f, "{name}")
     }

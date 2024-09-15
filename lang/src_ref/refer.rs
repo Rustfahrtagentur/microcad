@@ -118,7 +118,7 @@ impl<T: std::ops::Div<Output = T>> std::ops::Div for Refer<T> {
 }
 
 impl<T: std::fmt::Display> std::fmt::Display for Refer<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         self.value.fmt(f)
     }
 }
@@ -137,4 +137,3 @@ impl<T: std::iter::IntoIterator> std::iter::IntoIterator for Refer<T> {
         self.value.into_iter()
     }
 }
-

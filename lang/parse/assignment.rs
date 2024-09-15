@@ -77,7 +77,7 @@ impl Eval for Assignment {
 }
 
 impl std::fmt::Display for Assignment {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.specified_type {
             Some(t) => write!(f, "{}: {} = {}", self.name, t.ty(), self.value),
             None => write!(f, "{} = {}", self.name, self.value),

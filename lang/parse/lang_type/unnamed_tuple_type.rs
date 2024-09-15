@@ -23,7 +23,7 @@ impl Parse for UnnamedTupleType {
 }
 
 impl std::fmt::Display for UnnamedTupleType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "(")?;
         for (i, t) in self.0.iter().enumerate() {
             if i > 0 {

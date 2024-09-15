@@ -32,7 +32,7 @@ impl Parse for MapType {
 }
 
 impl std::fmt::Display for MapType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "[{} => {}]", self.0, self.1)
     }
 }

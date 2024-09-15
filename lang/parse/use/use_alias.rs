@@ -16,7 +16,7 @@ impl SrcReferrer for UseAlias {
 }
 
 impl std::fmt::Display for UseAlias {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "use {:?} as {:?}", self.0, self.1)
     }
 }

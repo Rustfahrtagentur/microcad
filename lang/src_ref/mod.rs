@@ -91,7 +91,7 @@ pub struct SrcRefInner {
 }
 
 impl std::fmt::Display for SrcRef {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.0 {
             Some(s) => write!(f, "{}", s.at),
             _ => write!(f, "<no_ref>"),

@@ -80,7 +80,7 @@ impl SrcReferrer for TypeAnnotation {
 }
 
 impl std::fmt::Display for TypeAnnotation {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         self.0.fmt(f)
     }
 }
@@ -136,7 +136,7 @@ impl Parse for TypeAnnotation {
 }
 
 impl std::fmt::Display for Type {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Integer => write!(f, "int"),
             Self::Scalar => write!(f, "scalar"),
