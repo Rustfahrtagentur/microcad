@@ -131,26 +131,28 @@ assert(pound ~ 1kg +-1%);
 
 ### Vec2
 
+2D vectors are written as named tuples with builtin values `x` and `y`.
+
 ```µCAD,primitive.vec2
+vec2 = (x=1, y=2)cm;
 ```
 
 ### Vec3
 
+3D vectors are written as named tuples with builtin values `x`, `y` and `z`.
+
 ```µCAD,primitive.vec3
+vec3 = (x=1, y=2, z=3) cm;
 ```
 
 ### Vec4
 
-```µCAD,primitive.vec4
-```
+TODO
 
 ### Bool
 
-Boolean is the result type of boolean expressions.
+Boolean is the result type of boolean expressions which may just be `true` or `false`.
 
 ```µCAD,primitive.bool
-t = true;
-f = false;
-
-assert( t != f );
+assert( true != false );
 ```
