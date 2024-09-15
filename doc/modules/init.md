@@ -50,7 +50,7 @@ module box {
     init(size: length) {
         rectangle(size);
     }
-    init((width, height): length) {
+    init(width: length, height: length) {
         rectangle(width, height);
     }
 }
