@@ -30,7 +30,7 @@ centimeters = 100cm;
 meters = 1m;
 inches = 39.37008in;
 
-assert( millimeters == centimeters == meters == inches );
+std::assert( millimeters == centimeters == meters == inches );
 ```
 
 ### Angle
@@ -45,11 +45,11 @@ degree_ = 180deg;
 gradient = 180grad;
 turn = 0.5turn;
 
-assert( radian = pi );
-assert( degree = pi );
-assert( degree = pi );
-assert( gradient = pi );
-assert( turn = pi );
+std::assert( radian = pi );
+std::assert( degree = pi );
+std::assert( degree = pi );
+std::assert( gradient = pi );
+std::assert( turn = pi );
 ```
 
 ### Area
@@ -60,9 +60,9 @@ square_centimeter = 1000cm²;
 square_meter = 0.1m²;
 square_inch = 155in²;
 
-assert(square_millimeter = 0.1m²);
-assert(square_centimeter = 0.1m²);
-assert(square_inch ~ 0.1m² +-1%);
+std::assert(square_millimeter = 0.1m²);
+std::assert(square_centimeter = 0.1m²);
+std::assert(square_inch ~ 0.1m² +-1%);
 ```
 
 ### Volume
@@ -76,12 +76,12 @@ liter = 1l;
 centiliter = 100cl;
 milliliter = 1000ml;
 
-assert(cubic_millimeter = 1l);
-assert(cubic_centimeter = 1l);
-assert(cubic_meter = 1l);
-assert(cubic_inch ~ 1l +-1%);
-assert(centiliter = 1l);
-assert(milliliter = 1l);
+std::assert(cubic_millimeter = 1l);
+std::assert(cubic_centimeter = 1l);
+std::assert(cubic_meter = 1l);
+std::assert(cubic_inch ~ 1l +-1%);
+std::assert(centiliter = 1l);
+std::assert(milliliter = 1l);
 ```
 
 ### String
@@ -90,7 +90,7 @@ Text can be used to logging or to render text.
 
 ```µCAD,primitive.string
 text = "Hello µCAD!";
-assert(text.count(11));
+std::assert(text.count(11));
 
 // logging
 info(text);
@@ -109,8 +109,8 @@ rgb_double_hex = #00FF00;
 rgba_single_hex = #FFFF;
 rgba_double_hex = #00FF00FF;
 
-assert( rgb_single_hex = rgba_single_hex );
-assert( rgb_double_hex = rgba_double_hex );
+std::assert( rgb_single_hex = rgba_single_hex );
+std::assert( rgb_double_hex = rgba_double_hex );
 ```
 
 Illegal values for color:
@@ -128,8 +128,8 @@ gram = 1000g;
 kilogram = 1kg;
 pound = 2.204623lb;
 
-assert(gram = 1kg);
-assert(pound ~ 1kg +-1%);
+std::assert(gram = 1kg);
+std::assert(pound ~ 1kg +-1%);
 ```
 
 ### Vec2
@@ -157,5 +157,5 @@ TODO
 Boolean is the result type of boolean expressions which may just be `true` or `false`.
 
 ```µCAD,primitive.bool
-assert( true != false );
+std::assert( true != false );
 ```
