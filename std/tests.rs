@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{ContextBuilder, NamespaceBuilder};
+use log::info;
 use microcad_lang::eval::*;
 
 #[test]
@@ -40,7 +41,7 @@ fn test_assert() {
 
     match context.eval() {
         Ok(_) => {
-            println!("Our assertion was successful as expected");
+            info!("Our assertion was successful as expected");
         }
         Err(err) => panic!("{err}"),
     }

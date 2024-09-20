@@ -9,6 +9,7 @@ mod method_call;
 
 pub use call_argument::*;
 pub use call_argument_list::*;
+use log::{error, trace};
 pub use method_call::*;
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
@@ -91,6 +92,7 @@ impl Eval for Call {
                     if let Ok(value) = m.call(&self.argument_list, context) {
                         return Ok(value);
                     } else {
+                        error!("{m:?}");
                         non_matching_symbols.push(symbol.clone());
                     }
                 }
@@ -109,26 +111,22 @@ impl Eval for Call {
         }
 
         if non_matching_symbols.is_empty() {
-            println!("No matching symbol found for `{}`", self.name);
+            trace!("No matching symbol found for `{}`", self.name);
             return Ok(None);
         } else {
-            println!("No matching symbol found for `{}`. Candidates:", self.name);
-            for symbol in &non_matching_symbols {
+            error!("No matching symbol found for `{}`. Candidates:", self.name);
+            non_matching_symbols.iter().for_each(|symbol| {
                 let s: &'static str = symbol.into();
-                println!(
+                trace!(
                     "\t{} => {}",
-                    if let Some(id) = &symbol.id() {
-                        id.as_str()
-                    } else {
-                        "<unnamed>"
-                    },
+                    symbol.id().unwrap_or(Id::new("<unnamed>")).as_str(),
                     s
                 );
-            }
+            });
         }
 
         Err(EvalError::SymbolNotFound(
-            self.id().expect("unnamed symbol not found)"),
+            self.id().expect("unnamed symbol not found"),
         ))
     }
 }

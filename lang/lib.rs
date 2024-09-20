@@ -15,3 +15,12 @@ pub mod parser;
 pub mod source_file_cache;
 pub mod src_ref;
 pub mod r#type;
+
+use std::sync::Once;
+
+static INIT_EVENT_LOGGER: Once = Once::new();
+
+/// Initialize env_logger
+pub fn env_logger_init() {
+    INIT_EVENT_LOGGER.call_once(env_logger::init);
+}

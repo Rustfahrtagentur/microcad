@@ -198,11 +198,15 @@ fn parse_source_file() {
 
 #[test]
 fn load_source_file() {
-    eprintln!("{:?}", std::env::current_dir());
+    use log::*;
+
+    crate::env_logger_init();
+
+    info!("{:?}", std::env::current_dir());
 
     let source_file = SourceFile::load(r#"../tests/std/algorithm_difference.µcad"#);
     if let Err(ref err) = source_file {
-        eprintln!("{err}");
+        error!("{err}");
     }
 
     let source_file = source_file.unwrap();
@@ -222,9 +226,13 @@ fn load_source_file() {
 
 #[test]
 fn load_source_file_wrong_location() {
+    use log::*;
+
+    crate::env_logger_init();
+
     let source_file = SourceFile::load("I do not exist.µcad");
     if let Err(err) = source_file {
-        eprintln!("{err}");
+        info!("{err}");
         //assert_eq!(format!("{err}"), "Cannot load source file");
     } else {
         panic!("Does file exist?");

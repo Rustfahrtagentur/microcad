@@ -169,6 +169,7 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                 &format!(
                     r##"#[test]
                         fn r#{name}() {{
+                            microcad_lang::env_logger_init();
                             use microcad_lang::parse::*;
                             use microcad_std::*;
                             match SourceFile::load_from_str(
@@ -184,7 +185,7 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                                         let mut context = ContextBuilder::new(source).with_std().build();
                                         
                                         if let Err(err) = context.eval() {
-                                            println!("{err}");
+                                            log::debug!("{err}");
                                         } else {
                                             panic!("ERROR: test is marked to fail but succeeded");
                                         }
@@ -197,7 +198,9 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                                         
                                         if let Err(err) = context.eval() {
                                             panic!("{err}");
-                                        } 
+                                        } else {
+                                            log::trace!("test succeeded");
+                                        }
                                     },
                                     Err(err) => panic!("ERROR: {err}"),
                                 }"##,
