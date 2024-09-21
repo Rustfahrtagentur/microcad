@@ -18,6 +18,9 @@ pub type Rect = geo::Rect<Scalar>;
 /// Point
 pub type Point = geo::Point<Scalar>;
 
+/// Macro crate a 2d coordinate
+pub use geo::coord;
+
 /// Geometry
 pub enum Geometry {
     /// Line string
