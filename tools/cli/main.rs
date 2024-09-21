@@ -15,6 +15,7 @@ use microcad_lang::parse::SourceFile;
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
+    /// Input µCAD file
     input: Option<String>,
 }
 
