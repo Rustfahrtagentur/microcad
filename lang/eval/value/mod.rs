@@ -3,6 +3,7 @@
 
 //! µCAD value related evaluation entities
 
+mod into_value;
 mod list;
 mod map;
 mod map_key_value;
@@ -10,6 +11,7 @@ mod named_tuple;
 mod unnamed_tuple;
 mod value_list;
 
+pub use into_value::IntoValue;
 pub use list::*;
 pub use map::*;
 pub use map_key_value::*;
