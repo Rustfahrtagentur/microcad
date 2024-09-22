@@ -262,6 +262,8 @@ nested_with_module_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified
 //`ring_array(30mm, 8, {circle(5mm)})`: ok # Pass a module as function parameter
 //`[hole_positions.bottom]`: ok # List access with tuple access
 //`mountable_plate(hole_positions = hole_positions.edges - [hole_positions.bottom])`: ok # Tuple access
+//`1000mm == 1m`: ok # Comparison
+//`1000mm == 1m == 100cm`: ok # Multi comparison
 expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
 bin_op           =  _{ add | subtract | multiply | divide | union | intersection | power_xor | greater_than | less_than | greater_equal | less_equal | equal | near | not_equal | and | or | xor | if_binary_op | else_binary_op }
   add            =   { "+" }
@@ -289,7 +291,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ method_call | list_element_access | tuple_element_access }
-primary          =  _{ nested | literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
+primary          =  _{ literal | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok
