@@ -12,7 +12,10 @@ fn context_namespace() {
     let mut context = Context::default();
 
     let module = NamespaceBuilder::new("math")
-        .add_constant("pi", Value::Scalar(Refer::none(std::f64::consts::PI)))
+        .add(Symbol::Value(
+            "pi".into(),
+            Value::Scalar(Refer::none(std::f64::consts::PI)),
+        ))
         .build();
 
     context.add(module.into());
