@@ -74,12 +74,12 @@ impl Eval for NumberLiteral {
 
     fn eval(&self, _: &mut Context) -> std::result::Result<Value, EvalError> {
         match self.1.ty() {
-            Type::Scalar => Ok(Value::Scalar(Refer::new(self.0, self.2.clone()))),
-            Type::Angle => Ok(Value::Angle(Refer::new(self.0, self.2.clone()))),
-            Type::Length => Ok(Value::Length(Refer::new(self.0, self.2.clone()))),
-            Type::Weight => Ok(Value::Weight(Refer::new(self.0, self.2.clone()))),
-            Type::Area => Ok(Value::Area(Refer::new(self.0, self.2.clone()))),
-            Type::Volume => Ok(Value::Volume(Refer::new(self.0, self.2.clone()))),
+            Type::Scalar => Ok(Value::Scalar(Refer::new(self.value(), self.2.clone()))),
+            Type::Angle => Ok(Value::Angle(Refer::new(self.value(), self.2.clone()))),
+            Type::Length => Ok(Value::Length(Refer::new(self.value(), self.2.clone()))),
+            Type::Weight => Ok(Value::Weight(Refer::new(self.value(), self.2.clone()))),
+            Type::Area => Ok(Value::Area(Refer::new(self.value(), self.2.clone()))),
+            Type::Volume => Ok(Value::Volume(Refer::new(self.value(), self.2.clone()))),
             _ => unreachable!(),
         }
     }
