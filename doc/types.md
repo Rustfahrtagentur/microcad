@@ -38,7 +38,7 @@ std::assert( millimeters == centimeters == meters == inches );
 Angles are used with rotations and in constrains when proving measures.
 
 ```µCAD,primitive.angle
-pi = std::math::PI;
+pi = std::math::pi;
 radian = 1rad;
 degree = 180°;
 degree_ = 180deg;

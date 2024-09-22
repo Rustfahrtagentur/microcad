@@ -8,6 +8,7 @@ use microcad_lang::{builtin_function, eval::*, parse::*, src_ref::*};
 
 pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
     NamespaceBuilder::new("math")
+        .add_constant("pi", Value::Scalar(Refer::none(std::f64::consts::PI)))
         // abs(x): Absolute value of x
         .add(builtin_function!(abs(x) for Scalar, Length, Angle, Integer).into())
         // sign(x): Sign of x

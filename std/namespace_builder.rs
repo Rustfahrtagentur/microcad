@@ -17,9 +17,8 @@ impl NamespaceBuilder {
         }
     }
 
-    /// Add a value
-    #[cfg(test)]
-    pub fn add_value(&mut self, name: &str, value: Value) -> &mut Self {
+    /// Add a constant value
+    pub fn add_constant(&mut self, name: &str, value: Value) -> &mut Self {
         self.namespace.add(Symbol::Value(name.into(), value));
         self
     }
