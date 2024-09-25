@@ -341,9 +341,9 @@ nested_call = { call ~ (ws+ ~ call)* }
 //`.sum()`: ok
 method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 
-//`function(a = 3.0mm)`: ok
-//`function(a = 3.0mm, b = 2.0mm)`: ok
-//`a::nested::function(a = 3.0mm, b = 2.0mm)`: ok
+//`f(a = 3.0mm)`: ok
+//`f(a = 3.0mm, b = 2.0mm)`: ok
+//`a::nested::f(a = 3.0mm, b = 2.0mm)`: ok
 call = { qualified_name ~ ws* ~ call_op }
 
 //`@foo`: ok
