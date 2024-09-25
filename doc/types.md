@@ -30,7 +30,7 @@ centimeters = 100cm;
 meters = 1m;
 inches = 39.37008in;
 
-std::assert( millimeters == centimeters == meters == inches );
+std::assert( millimeters == centimeters and meters == inches and millimeters == inches );
 ```
 
 ### Angle
@@ -45,11 +45,11 @@ degree_ = 180deg;
 gradient = 180grad;
 turn = 0.5turn;
 
-std::assert( radian = pi );
-std::assert( degree = pi );
-std::assert( degree = pi );
-std::assert( gradient = pi );
-std::assert( turn = pi );
+std::assert( radian == pi );
+std::assert( degree == pi );
+std::assert( degree == pi );
+std::assert( gradient == pi );
+std::assert( turn == pi );
 ```
 
 ### Area
