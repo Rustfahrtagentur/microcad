@@ -180,7 +180,7 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                     handling = match suffix {
                         Some("fail") =>
                             r##"{
-                                    Err(_) => (),
+                                    Err(err) => log::debug!("{err}"),
                                     Ok(source) => { 
                                         let mut context = ContextBuilder::new(source).with_std().build();
                                         
