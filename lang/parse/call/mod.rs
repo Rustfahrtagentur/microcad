@@ -71,37 +71,19 @@ impl Eval for Call {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let symbols = self.name.eval(context)?;
-        let mut non_matching_symbols = Vec::new();
-        for symbol in &symbols {
+        if let Some(symbol) = symbols.first() {
             match symbol {
                 Symbol::Function(f) => {
-                    if let Ok(value) = f.call(&self.argument_list, context) {
-                        return Ok(value);
-                    } else {
-                        non_matching_symbols.push(symbol.clone());
-                    }
+                    return f.call(&self.argument_list, context);
                 }
                 Symbol::BuiltinFunction(f) => {
-                    if let Ok(value) = f.call(&self.argument_list, context) {
-                        return Ok(value);
-                    } else {
-                        non_matching_symbols.push(symbol.clone());
-                    }
+                    return f.call(&self.argument_list, context);
                 }
                 Symbol::BuiltinModule(m) => {
-                    if let Ok(value) = m.call(&self.argument_list, context) {
-                        return Ok(value);
-                    } else {
-                        error!("{m:?}");
-                        non_matching_symbols.push(symbol.clone());
-                    }
+                    return m.call(&self.argument_list, context);
                 }
                 Symbol::Module(m) => {
-                    if let Ok(value) = m.call(&self.argument_list, context) {
-                        return Ok(value);
-                    } else {
-                        non_matching_symbols.push(symbol.clone());
-                    }
+                    return m.call(&self.argument_list, context);
                 }
                 symbol => {
                     let s: &'static str = symbol.into();
@@ -110,24 +92,7 @@ impl Eval for Call {
             }
         }
 
-        if non_matching_symbols.is_empty() {
-            trace!("No matching symbol found for `{}`", self.name);
-            return Ok(None);
-        } else {
-            error!("No matching symbol found for `{}`. Candidates:", self.name);
-            non_matching_symbols.iter().for_each(|symbol| {
-                let s: &'static str = symbol.into();
-                trace!(
-                    "\t{} => {}",
-                    symbol.id().unwrap_or(Id::new("<unnamed>")).as_str(),
-                    s
-                );
-            });
-        }
-
-        Err(EvalError::SymbolNotFound(
-            self.id().expect("unnamed symbol not found"),
-        ))
+        Ok(None)
     }
 }
 
