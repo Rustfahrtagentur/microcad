@@ -89,7 +89,7 @@ Of course now the winding is missing for the nut.
 We could construct the winding using `rotate_extrude` operator.
 But, even better, there is a built-in module for ISO metric nuts and screws!
 
-```µCAD,example.C
+```µCAD,example.C#todo
 // Import the iso module
 use iso;
 
@@ -131,7 +131,7 @@ Notice that the `size` parameter name is optional an can be omitted.
 We need to export the cube as an STL file.
 
 ```µCAD,example.E
-export("cube40mm.stl") cube(40mm);
+std::export("cube40mm.stl") std::geo3d::cube(size_x = 40.0, size_y = 40.0, size_z = 40.0);
 ```
 
 One of the defining features of CSG is the usage of boolean operations on primitives.

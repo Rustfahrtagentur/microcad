@@ -17,13 +17,6 @@ impl NamespaceBuilder {
         }
     }
 
-    /// Add a value
-    #[cfg(test)]
-    pub fn add_value(&mut self, name: &str, value: Value) -> &mut Self {
-        self.namespace.add(Symbol::Value(name.into(), value));
-        self
-    }
-
     /// Build namespace definition
     pub fn build(&mut self) -> std::rc::Rc<ModuleDefinition> {
         std::rc::Rc::new(self.namespace.clone())

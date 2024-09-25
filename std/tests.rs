@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{ContextBuilder, NamespaceBuilder};
+use log::info;
 use microcad_lang::eval::*;
 
 #[test]
@@ -11,7 +12,10 @@ fn context_namespace() {
     let mut context = Context::default();
 
     let module = NamespaceBuilder::new("math")
-        .add_value("pi", Value::Scalar(Refer::none(std::f64::consts::PI)))
+        .add(Symbol::Value(
+            "pi".into(),
+            Value::Scalar(Refer::none(std::f64::consts::PI)),
+        ))
         .build();
 
     context.add(module.into());
@@ -40,7 +44,7 @@ fn test_assert() {
 
     match context.eval() {
         Ok(_) => {
-            println!("Our assertion was successful as expected");
+            info!("Our assertion was successful as expected");
         }
         Err(err) => panic!("{err}"),
     }

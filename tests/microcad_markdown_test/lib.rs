@@ -169,24 +169,23 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                 &format!(
                     r##"#[test]
                         fn r#{name}() {{
-                            use microcad_lang::{{eval::{{Symbols, Eval, Context}},parse::source_file::SourceFile,parser}};
-                            match parser::Parser::parse_rule::<SourceFile>(
-                                parser::Rule::source_file,
+                            microcad_lang::env_logger_init();
+                            use microcad_lang::parse::*;
+                            use microcad_std::*;
+                            match SourceFile::load_from_str(
                                 r#"
                                 {code}"#,
-                                0,
                             ) {handling};
                         }}"##,
                     handling = match suffix {
                         Some("fail") =>
                             r##"{
-                                    Err(_) => (),
-                                    Ok(doc) => { 
-                                        let mut context = Context::default();
-                                        context.add(microcad_std::builtin_module().into());
-
-                                        if let Err(err) = doc.eval(&mut context) {
-                                            println!("{err}");
+                                    Err(err) => log::debug!("{err}"),
+                                    Ok(source) => { 
+                                        let mut context = ContextBuilder::new(source).with_std().build();
+                                        
+                                        if let Err(err) = context.eval() {
+                                            log::debug!("{err}");
                                         } else {
                                             panic!("ERROR: test is marked to fail but succeeded");
                                         }
@@ -194,12 +193,13 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                                 }"##,
                         _ =>
                             r##"{
-                                    Ok(doc) => {
-                                        let mut context = Context::default();
-                                        context.add(microcad_std::builtin_module().into());
+                                    Ok(source) => {
+                                        let mut context = ContextBuilder::new(source).with_std().build();
                                         
-                                        if let Err(err) = doc.eval(&mut context) {
-                                            println!("{err}");
+                                        if let Err(err) = context.eval() {
+                                            panic!("{err}");
+                                        } else {
+                                            log::trace!("test succeeded");
                                         }
                                     },
                                     Err(err) => panic!("ERROR: {err}"),

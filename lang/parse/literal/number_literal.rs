@@ -24,7 +24,7 @@ impl NumberLiteral {
     }
 
     /// Returns the actual value of the literal
-    pub fn value(&self) -> f64 {
+    pub fn normalized_value(&self) -> f64 {
         self.1.normalize(self.0)
     }
 
@@ -74,9 +74,30 @@ impl Eval for NumberLiteral {
 
     fn eval(&self, _: &mut Context) -> std::result::Result<Value, EvalError> {
         match self.1.ty() {
-            Type::Scalar => Ok(Value::Scalar(Refer::new(self.0, self.2.clone()))),
-            Type::Angle => Ok(Value::Angle(Refer::new(self.0, self.2.clone()))),
-            Type::Length => Ok(Value::Length(Refer::new(self.0, self.2.clone()))),
+            Type::Scalar => Ok(Value::Scalar(Refer::new(
+                self.normalized_value(),
+                self.src_ref(),
+            ))),
+            Type::Angle => Ok(Value::Angle(Refer::new(
+                self.normalized_value(),
+                self.src_ref(),
+            ))),
+            Type::Length => Ok(Value::Length(Refer::new(
+                self.normalized_value(),
+                self.src_ref(),
+            ))),
+            Type::Weight => Ok(Value::Weight(Refer::new(
+                self.normalized_value(),
+                self.src_ref(),
+            ))),
+            Type::Area => Ok(Value::Area(Refer::new(
+                self.normalized_value(),
+                self.src_ref(),
+            ))),
+            Type::Volume => Ok(Value::Volume(Refer::new(
+                self.normalized_value(),
+                self.src_ref(),
+            ))),
             _ => unreachable!(),
         }
     }

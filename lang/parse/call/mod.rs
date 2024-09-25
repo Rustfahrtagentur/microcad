@@ -10,6 +10,7 @@ mod method_call;
 
 pub use call_argument::*;
 pub use call_argument_list::*;
+use log::{error, trace};
 pub use method_call::*;
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
@@ -71,36 +72,19 @@ impl Eval for Call {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let symbols = self.name.eval(context)?;
-        let mut non_matching_symbols = Vec::new();
-        for symbol in &symbols {
+        if let Some(symbol) = symbols.first() {
             match symbol {
                 Symbol::Function(f) => {
-                    if let Ok(value) = f.call(&self.argument_list, context) {
-                        return Ok(value);
-                    } else {
-                        non_matching_symbols.push(symbol.clone());
-                    }
+                    return f.call(&self.argument_list, context);
                 }
                 Symbol::BuiltinFunction(f) => {
-                    if let Ok(value) = f.call(&self.argument_list, context) {
-                        return Ok(value);
-                    } else {
-                        non_matching_symbols.push(symbol.clone());
-                    }
+                    return f.call(&self.argument_list, context);
                 }
                 Symbol::BuiltinModule(m) => {
-                    if let Ok(value) = m.call(&self.argument_list, context) {
-                        return Ok(value);
-                    } else {
-                        non_matching_symbols.push(symbol.clone());
-                    }
+                    return m.call(&self.argument_list, context);
                 }
                 Symbol::Module(m) => {
-                    if let Ok(value) = m.call(&self.argument_list, context) {
-                        return Ok(value);
-                    } else {
-                        non_matching_symbols.push(symbol.clone());
-                    }
+                    return m.call(&self.argument_list, context);
                 }
                 symbol => {
                     let s: &'static str = symbol.into();
@@ -109,28 +93,7 @@ impl Eval for Call {
             }
         }
 
-        if non_matching_symbols.is_empty() {
-            println!("No matching symbol found for `{}`", self.name);
-            return Ok(None);
-        } else {
-            println!("No matching symbol found for `{}`. Candidates:", self.name);
-            for symbol in &non_matching_symbols {
-                let s: &'static str = symbol.into();
-                println!(
-                    "\t{} => {}",
-                    if let Some(id) = &symbol.id() {
-                        id.as_str()
-                    } else {
-                        "<unnamed>"
-                    },
-                    s
-                );
-            }
-        }
-
-        Err(EvalError::SymbolNotFound(
-            self.id().expect("unnamed symbol not found)"),
-        ))
+        Ok(None)
     }
 }
 

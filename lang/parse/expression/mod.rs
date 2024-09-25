@@ -34,6 +34,7 @@ lazy_static::lazy_static! {
             .op(Op::infix(greater_than, Left) | Op::infix(less_than, Left))
             .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
             .op(Op::infix(equal, Left) | Op::infix(not_equal, Left))
+            .op(Op::infix(near, Left))
             .op(Op::prefix(unary_minus))
             .op(Op::prefix(unary_plus))
             .op(Op::prefix(unary_not))
@@ -63,7 +64,7 @@ pub enum Expression {
         /// Left-hand side
         lhs: Box<Expression>,
         /// Operator  ('+', '-', '/', '*', '<', '>', '≤', '≥', '&', '|')
-        op: char,
+        op: String,
         /// Right -hand side
         rhs: Box<Expression>,
         /// Source code reference
@@ -72,7 +73,7 @@ pub enum Expression {
     /// A unary operation: !a
     UnaryOp {
         /// Operator ('+', '-', '!')
-        op: char,
+        op: String,
         /// Right -hand side
         rhs: Box<Expression>,
         /// Source code reference
@@ -176,19 +177,20 @@ impl Eval for Expression {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
 
-                match op {
-                    '+' => lhs + rhs,
-                    '-' => lhs - rhs,
-                    '*' => lhs * rhs,
-                    '/' => lhs / rhs,
-                    '^' => unimplemented!(), // lhs.pow(&rhs),
-                    '>' => Ok(Value::Bool(Refer::new(lhs > rhs, SrcRef::merge(lhs, rhs)))),
-                    '<' => Ok(Value::Bool(Refer::new(lhs < rhs, SrcRef::merge(lhs, rhs)))),
-                    '≤' => Ok(Value::Bool(Refer::new(lhs <= rhs, SrcRef::merge(lhs, rhs)))),
-                    '≥' => Ok(Value::Bool(Refer::new(lhs >= rhs, SrcRef::merge(lhs, rhs)))),
-                    '=' => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
-                    '≠' => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
-                    _ => unimplemented!(),
+                match op.as_str() {
+                    "+" => lhs + rhs,
+                    "-" => lhs - rhs,
+                    "*" => lhs * rhs,
+                    "/" => lhs / rhs,
+                    "^" => unimplemented!(), // lhs.pow(&rhs),
+                    ">" => Ok(Value::Bool(Refer::new(lhs > rhs, SrcRef::merge(lhs, rhs)))),
+                    "<" => Ok(Value::Bool(Refer::new(lhs < rhs, SrcRef::merge(lhs, rhs)))),
+                    "≤" => Ok(Value::Bool(Refer::new(lhs <= rhs, SrcRef::merge(lhs, rhs)))),
+                    "≥" => Ok(Value::Bool(Refer::new(lhs >= rhs, SrcRef::merge(lhs, rhs)))),
+                    "~" => todo!("implement near ~="),
+                    "=" => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
+                    "!=" => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
+                    _ => unimplemented!("{op:?}"),
                 }
             }
             Self::UnaryOp {
@@ -197,8 +199,8 @@ impl Eval for Expression {
                 src_ref: _,
             } => {
                 let rhs = rhs.eval(context)?;
-                match op {
-                    '-' => -rhs.clone(),
+                match op.as_str() {
+                    "-" => -rhs.clone(),
                     _ => unimplemented!(),
                 }
             }
@@ -268,20 +270,21 @@ impl Parse for Expression {
             })
             .map_infix(|lhs, op, rhs| {
                 let op = match op.as_rule() {
-                    Rule::add => '+',
-                    Rule::subtract => '-',
-                    Rule::multiply => '*',
-                    Rule::divide => '/',
-                    Rule::r#union => '|',
-                    Rule::intersection => '&',
-                    Rule::power_xor => '^',
-                    Rule::greater_than => '>',
-                    Rule::less_than => '<',
-                    Rule::less_equal => '≤',
-                    Rule::greater_equal => '≥',
-                    Rule::equal => '=',
-                    Rule::not_equal => '≠',
-                    Rule::and => '&',
+                    Rule::add => "+",
+                    Rule::subtract => "-",
+                    Rule::multiply => "*",
+                    Rule::divide => "/",
+                    Rule::r#union => "|",
+                    Rule::intersection => "&",
+                    Rule::power_xor => "^",
+                    Rule::greater_than => ">",
+                    Rule::less_than => "<",
+                    Rule::less_equal => "≤",
+                    Rule::greater_equal => "≥",
+                    Rule::equal => "=",
+                    Rule::near => "~",
+                    Rule::not_equal => "!=",
+                    Rule::and => "&",
 
                     rule => unreachable!(
                         "Expression::parse expected infix operation, found {:?}",
@@ -290,7 +293,7 @@ impl Parse for Expression {
                 };
                 Self::BinaryOp {
                     lhs: Box::new(lhs),
-                    op,
+                    op: op.into(),
                     rhs: Box::new(rhs),
                     src_ref: pair.clone().into(),
                 }
@@ -304,7 +307,7 @@ impl Parse for Expression {
                 };
 
                 Self::UnaryOp {
-                    op,
+                    op: op.into(),
                     rhs: Box::new(rhs),
                     src_ref: pair.clone().into(),
                 }
