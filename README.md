@@ -53,14 +53,13 @@ use * from geo2d;
 
 // A generic module for the hex nut
 module hex_nut(outer_diameter: length, hole_diameter: length) {
-    hexagon(d = self.outer_diameter) - circle(d = self.hole_diameter);
+    outer = hexagon(d = outer_diameter);
+    inner = circle(d = hole_diameter);
+    outer - inner
 }
 
-// We want to use built-in colors
-use colors;
-
-// We want to export our nut as SVG, with blue lines
-export("hex_nut.svg", stroke_color = colors::blue) {
+// We want to export our nut as SVG
+export("hex_nut.svg") {
     hex_nut(11.5mm, 6.0mm);
 }
 ```
@@ -72,7 +71,9 @@ We can simply generate a 3D model by extruding the nut using the `linear_extrude
 ```µCAD,example.B
 module hex_nut(outer_diameter: length, inner_diameter: length, height: length) {
     linear_extrude(h = self.height) {
-        hexagon(d = self.inner_diameter) - circle(d = self.outer_diameter);
+        outer = hexagon(d = outer_diameter);
+        inner = circle(d = hole_diameter);
+        outer - inner
     }
 }
 
@@ -92,11 +93,27 @@ But, even better, there is a built-in module for ISO metric nuts and screws!
 // Import the iso module
 use iso;
 
+// `hex_nut` is our object
+hex_nut = iso::m10::hex_nut();
+
 // Export our nut from STL
-export("hex_nut.stl") iso.m10.hex_nut();
+export("hex_nut.stl") hex_nut;
 
 // Of course, we can generate the corresponding screw
-export("hex_screw.stl") iso.m10.hex_screw(length = 40mm);
+export("hex_screw.stl") hex_nut.screw(length = 40mm);
+
+screw = hex_nut.screw(length = 40mm);
+
+info("Anzahl der Drehungen: {screw.winding_count()}");
+
+hex_nut = translate(z = 10% * screw.height()) hex_nut;
+
+c = hex_nut.origin();
+
+export("hex_nut.gcode") hex_nut;
+
+
+
 ```
 
 ### A 3D constructive solid geometry example

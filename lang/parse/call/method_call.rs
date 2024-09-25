@@ -3,7 +3,7 @@
 
 //! Method call
 
-use crate::{errors::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Method call
 #[derive(Clone, Debug)]
@@ -14,6 +14,28 @@ pub struct MethodCall {
     pub argument_list: CallArgumentList,
     /// Source code reference
     src_ref: SrcRef,
+}
+
+impl MethodCall {
+    /// Evaluate the method call in a context
+    pub fn eval(&self, context: &mut Context, lhs: &Box<Expression>) -> Result<Value> {
+        let name: &str = &self.name.to_string();
+        let args = self.argument_list.eval(context)?;
+
+        use call::call_method::CallMethod;
+
+        match lhs.eval(context)? {
+            Value::Node(node) => node.call_method(&self.name, &args, self.src_ref()),
+            Value::List(list) => match name {
+                "len" => Ok(Value::Integer(Refer::new(
+                    list.len() as i64,
+                    list.src_ref(),
+                ))),
+                _ => Err(EvalError::UnknownMethod(name.into())),
+            },
+            _ => Err(EvalError::UnknownMethod(name.into())),
+        }
+    }
 }
 
 impl SrcReferrer for MethodCall {

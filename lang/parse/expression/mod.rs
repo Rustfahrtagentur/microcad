@@ -221,20 +221,7 @@ impl Eval for Expression {
                     _ => unimplemented!(),
                 }
             }
-            Self::MethodCall(lhs, method_call, _) => {
-                let name: &str = &method_call.name.to_string();
-
-                match lhs.eval(context)? {
-                    Value::List(list) => match name {
-                        "len" => Ok(Value::Integer(Refer::new(
-                            list.len() as i64,
-                            list.src_ref(),
-                        ))),
-                        _ => Err(EvalError::UnknownMethod(name.into())),
-                    },
-                    _ => Err(EvalError::UnknownMethod(name.into())),
-                }
-            }
+            Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Nested(nested) => nested.eval(context),
             _ => unimplemented!(),
         }

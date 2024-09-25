@@ -5,6 +5,7 @@
 
 mod call_argument;
 mod call_argument_list;
+mod call_method;
 mod method_call;
 
 pub use call_argument::*;
