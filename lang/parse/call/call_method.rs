@@ -52,6 +52,26 @@ impl CallMethod for microcad_render::Node {
     }
 }
 
+impl CallMethod for List {
+    fn call_method(
+        &self,
+        name: &Identifier,
+        _: &CallArgumentValueList,
+        src_ref: SrcRef,
+    ) -> Result<Value> {
+        match name.into() {
+            "equal" => {
+                let result = match self.first() {
+                    Some(first) => self.iter().all(|x| x == first),
+                    None => false,
+                };
+                Ok(Value::Bool(Refer::new(result, src_ref)))
+            }
+            method => Err(EvalError::UnknownMethod(method.into())),
+        }
+    }
+}
+
 #[test]
 fn call_method() {
     use microcad_core::geo2d::Rect;
@@ -79,5 +99,34 @@ fn call_method() {
         assert_eq!(value_list.len(), 4);
     } else {
         panic!("Expected a list of values");
+    }
+}
+
+#[test]
+fn call_list_method() {
+    let list = List::new(
+        ValueList::new(
+            vec![
+                Value::Scalar(Refer::none(3.0)),
+                Value::Scalar(Refer::none(3.0)),
+                Value::Scalar(Refer::none(3.0)),
+            ],
+            SrcRef(None),
+        ),
+        crate::r#type::Type::Scalar,
+        SrcRef(None),
+    );
+
+    if let Value::Bool(result) = list
+        .call_method(
+            &"equal".into(),
+            &CallArgumentValueList::default(),
+            SrcRef(None),
+        )
+        .unwrap()
+    {
+        assert!(result.value);
+    } else {
+        panic!("Test failed");
     }
 }
