@@ -9,6 +9,10 @@ use microcad_render::tree;
 /// Module body
 #[derive(Clone, Debug, Default)]
 pub struct ModuleBody {
+    /// Module statements before init
+    pub pre_init_statements: Vec<ModuleStatement>,
+    /// Module statements after init
+    pub post_init_statements: Vec<ModuleStatement>,
     /// Module statements
     pub statements: Vec<ModuleStatement>,
     /// Module's local symbol table
@@ -21,7 +25,7 @@ pub struct ModuleBody {
 
 impl ModuleBody {
     /// Add statement to module
-    pub fn add_statement(&mut self, statement: ModuleStatement) {
+    pub fn add_statement(&mut self, statement: ModuleStatement) -> ParseResult<()> {
         self.statements.push(statement.clone());
         match statement {
             ModuleStatement::FunctionDefinition(function) => {
@@ -31,10 +35,21 @@ impl ModuleBody {
                 self.add(module.into());
             }
             ModuleStatement::ModuleInitDefinition(init) => {
+                // Initializers are only allowed after pre-init statements
+                // and before post-init statements.
+                // Other statements between pre-init and post-init are not allowed
+                if self.post_init_statements.is_empty() {
+                    self.inits.push(init.clone());
+                } else {
+                    return Err(ParseError::StatementBetweenModuleInit);
+                }
+
                 self.inits.push(init.clone());
             }
             _ => {}
         }
+
+        Ok(())
     }
 }
 
