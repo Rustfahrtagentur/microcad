@@ -101,4 +101,16 @@ impl Parser {
         let rule = pair.as_rule();
         assert_eq!(rule, expected, "Unexpected rule: {rule:?}");
     }
+
+    /// Find an inner pair by rule
+    pub fn find<T: Parse>(pair: &Pair, rule: Rule) -> Option<T> {
+        match pair
+            .inner()
+            .find(|pair| pair.as_rule() == rule)
+            .map(T::parse)
+        {
+            Some(Err(_)) | None => None,
+            Some(Ok(x)) => Some(x),
+        }
+    }
 }
