@@ -113,4 +113,8 @@ impl Parser {
             Some(Ok(x)) => Some(x),
         }
     }
+
+    pub fn collect<T: Parse>(pair: &Pair, f: fn(Pair) -> ParseResult<T>) -> ParseResult<Vec<T>> {
+        pair.inner().map(f).collect::<ParseResult<_>>()
+    }
 }

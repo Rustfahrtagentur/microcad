@@ -20,14 +20,13 @@ impl Parse for FunctionBody {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_body);
 
-        Ok(Self(
-            pair.inner()
-                .map(|pair| match pair.as_rule() {
-                    Rule::function_statement => FunctionStatement::parse(pair),
-                    Rule::expression => Ok(FunctionStatement::Return(Expression::parse(pair)?)),
-                    rule => unreachable!("Unexpected token in function body: {:?}", rule),
-                })
-                .collect::<ParseResult<_>>()?,
-        ))
+        Ok(Self(Parser::collect::<FunctionStatement>(
+            &pair,
+            |pair| match pair.as_rule() {
+                Rule::function_statement => FunctionStatement::parse(pair),
+                Rule::expression => Ok(FunctionStatement::Return(Expression::parse(pair)?)),
+                rule => unreachable!("Unexpected token in function body: {:?}", rule),
+            },
+        )?))
     }
 }
