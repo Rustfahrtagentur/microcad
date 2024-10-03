@@ -53,39 +53,38 @@ impl From<&BooleanOp> for OpType {
 
 impl Algorithm for BooleanOp {
     fn process_2d(&self, renderer: &mut dyn Renderer2D, parent: Node) -> crate::Result<Node> {
-        let mut geos = Vec::new();
+        let mut geometries = Vec::new();
 
         // all algorithm nodes are nested in a group
         let group = into_group(parent).unwrap();
 
-        for child in group.children() {
+        group.children().try_for_each(|child| {
             let c = &*child.borrow();
-            let geo = match c {
-                NodeInner::Renderable2D(renderable) => renderable.request_geometry(renderer)?,
-                NodeInner::Geometry2D(g) => g.clone(),
+            match c {
+                NodeInner::Renderable2D(renderable) => {
+                    geometries.push(renderable.request_geometry(renderer)?)
+                }
+                NodeInner::Geometry2D(g) => geometries.push(g.clone()),
                 NodeInner::Algorithm(algorithm) => {
                     let new_node = algorithm.process_2d(renderer, child.clone())?;
                     let c = &*new_node.borrow();
-                    match c {
-                        NodeInner::Geometry2D(g) => g.clone(),
-                        _ => continue,
+                    if let NodeInner::Geometry2D(g) = c {
+                        geometries.push(g.clone())
                     }
                 }
-                _ => continue,
+                _ => (),
             };
 
-            geos.push(geo);
-        }
+            Ok::<(), crate::CoreError>(())
+        })?;
 
-        let mut result = geos[0].clone();
-        for (i, geo) in geos.iter().enumerate() {
-            if i == 0 {
-                continue;
-            }
+        let mut result = geometries[0].clone();
+
+        geometries[1..].iter().for_each(|geo| {
             if let Some(r) = result.boolean_op(geo.as_ref(), self) {
                 result = std::rc::Rc::new(r)
             }
-        }
+        });
 
         Ok(Node::new(NodeInner::Geometry2D(result)))
     }
@@ -95,38 +94,39 @@ impl Algorithm for BooleanOp {
         renderer: &mut dyn crate::render::Renderer3D,
         parent: Node,
     ) -> crate::Result<Node> {
-        let mut geos = Vec::new();
-
         // all algorithm nodes are nested in a group
         let group = into_group(parent).unwrap();
 
-        for child in group.children() {
-            let c = &*child.borrow();
-            let geo = match c {
-                NodeInner::Renderable3D(renderable) => renderable.request_geometry(renderer)?,
-                NodeInner::Geometry3D(g) => g.clone(),
+        let geometries: Vec<_> = group
+            .children()
+            .filter_map(|child| match &*child.borrow() {
+                NodeInner::Renderable3D(renderable) => renderable.request_geometry(renderer).ok(),
+                NodeInner::Geometry3D(g) => Some(g.clone()),
                 NodeInner::Algorithm(algorithm) => {
-                    let new_node = algorithm.process_3d(renderer, child.clone())?;
-                    let c = &*new_node.borrow();
-                    match c {
-                        NodeInner::Geometry3D(g) => g.clone(),
-                        _ => continue,
+                    if let Ok(new_node) = algorithm.process_3d(renderer, child.clone()) {
+                        if let NodeInner::Geometry3D(g) = &*new_node.borrow() {
+                            Some(g.clone())
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
                     }
                 }
-                _ => continue,
-            };
-
-            geos.push(geo);
-        }
-
-        let mut result = geos[0].clone();
-        for geo in geos[1..].iter() {
-            if let Some(r) = result.boolean_op(geo.as_ref(), self) {
-                result = std::rc::Rc::new(r)
-            }
-        }
-
-        Ok(Node::new(NodeInner::Geometry3D(result)))
+                _ => None,
+            })
+            .collect();
+        Ok(Node::new(NodeInner::Geometry3D(
+            geometries[1..]
+                .iter()
+                .fold(geometries[0].clone(), |acc, geo| {
+                    if let Some(r) = acc.boolean_op(geo.as_ref(), self) {
+                        std::rc::Rc::new(r)
+                    } else {
+                        acc
+                    }
+                }),
+        )))
     }
 }
 

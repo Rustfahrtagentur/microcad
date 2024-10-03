@@ -12,37 +12,34 @@ pub struct FormatExpression {
     /// Format specifier
     pub spec: FormatSpec,
     /// Expression to format
-    pub expression: Box<Expression>,
+    pub expression: Expression,
     /// Source code reference
     src_ref: SrcRef,
 }
 
+impl FormatExpression {
+    /// Create new format expression
+    pub fn new(spec: FormatSpec, expression: Expression) -> Self {
+        Self {
+            src_ref: SrcRef::merge(spec.src_ref(), expression.src_ref()),
+            spec,
+            expression,
+        }
+    }
+}
+
 impl Parse for FormatExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut spec = FormatSpec::default();
-        let mut expression = None;
-        for pair in pair.inner() {
-            match pair.as_rule() {
-                Rule::format_spec => spec = FormatSpec::parse(pair)?,
-                Rule::expression => expression = Some(Expression::parse(pair)?),
-                _ => unreachable!(),
-            }
-        }
-        if let Some(expression) = expression {
-            Ok(Self {
-                src_ref: SrcRef::merge(spec.src_ref(), expression.src_ref()),
-                spec,
-                expression: Box::new(expression),
-            })
-        } else {
-            Err(ParseError::MissingFormatExpression)
-        }
+        Ok(Self::new(
+            pair.find(Rule::format_spec).unwrap_or_default(),
+            pair.find(Rule::expression).expect("Missing expression"),
+        ))
     }
 }
 
 impl SrcReferrer for FormatExpression {
     fn src_ref(&self) -> SrcRef {
-        SrcRef::merge(&self.spec, self.expression.as_ref())
+        SrcRef::merge(&self.spec, &self.expression)
     }
 }
 

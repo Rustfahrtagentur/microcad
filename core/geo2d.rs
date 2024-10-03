@@ -78,11 +78,10 @@ impl Geometry {
     }
 
     fn polygon_vertices(p: &Polygon) -> Vec<crate::Vec2> {
-        let mut vertices = Vec::new();
-        vertices.append(&mut Self::line_string_vertices(p.exterior()));
-        for interior in p.interiors() {
-            vertices.append(&mut Self::line_string_vertices(interior));
-        }
+        let mut vertices = Self::line_string_vertices(p.exterior());
+        p.interiors()
+            .iter()
+            .for_each(|interior| vertices.append(&mut Self::line_string_vertices(interior)));
         vertices
     }
 
@@ -90,21 +89,9 @@ impl Geometry {
     pub fn vertices(&self) -> Vec<crate::Vec2> {
         match &self {
             Self::LineString(l) => Self::line_string_vertices(l),
-            Self::MultiLineString(ml) => {
-                let mut vertices = Vec::new();
-                for l in ml {
-                    vertices.append(&mut Self::line_string_vertices(l));
-                }
-                vertices
-            }
+            Self::MultiLineString(ml) => ml.iter().flat_map(Self::line_string_vertices).collect(),
             Self::Polygon(p) => Self::polygon_vertices(p),
-            Self::MultiPolygon(mp) => {
-                let mut vertices = Vec::new();
-                for p in mp {
-                    vertices.append(&mut Self::polygon_vertices(p))
-                }
-                vertices
-            }
+            Self::MultiPolygon(mp) => mp.iter().flat_map(Self::polygon_vertices).collect(),
             Self::Rect(r) => vec![
                 crate::Vec2::new(r.min().x, r.min().y),
                 crate::Vec2::new(r.max().x, r.min().y),

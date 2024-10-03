@@ -25,7 +25,7 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
             let field_identifiers = fields.iter().map(|item| item.ident.as_ref().unwrap()).collect::<Vec<_>>();
             let node_type = Ident::new(node_type, struct_name.span());
 
-            for field in fields {
+            fields.iter().for_each(|field| {
                 let identifier = field.ident.as_ref().unwrap();
                 let ty = &field.ty;
                 parameter_impl.extend(quote! {
@@ -36,7 +36,7 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
                         microcad_lang::src_ref::SrcRef(None),
                     )).unwrap();
                 });
-            }
+            });
 
             quote! {
                 #[automatically_derived]

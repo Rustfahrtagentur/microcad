@@ -53,11 +53,10 @@ impl ParameterValueList {
     pub fn remove(&mut self, name: &Id) {
         if let Some(new_index) = self.by_name.remove(name) {
             self.parameters.remove(new_index);
-            for index in &mut self.by_name.values_mut() {
-                if *index > new_index {
-                    *index -= 1;
-                }
-            }
+            self.by_name
+                .values_mut()
+                .skip(new_index)
+                .for_each(|index| *index -= 1);
         }
     }
 

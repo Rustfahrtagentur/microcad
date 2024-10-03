@@ -40,13 +40,11 @@ impl IntoIterator for ExpressionList {
 
 impl Parse for ExpressionList {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut vec = Vec::new();
-
-        for pair in pair.inner() {
-            vec.push(Expression::parse(pair)?);
-        }
-
-        Ok(Self(vec))
+        Ok(Self(
+            pair.inner()
+                .map(Expression::parse)
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
     }
 }
 

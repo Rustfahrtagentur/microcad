@@ -38,6 +38,23 @@ impl<'i> Pair<'i> {
     pub fn inner(&'i self) -> impl Iterator<Item = Self> {
         self.0.clone().into_inner().map(|p| Self(p, self.1))
     }
+
+    /// Map and collect inner pairs into a Vec<T>
+    pub fn map_collect<T: Parse>(&'i self, f: fn(Self) -> ParseResult<T>) -> ParseResult<Vec<T>> {
+        self.inner().map(f).collect::<ParseResult<_>>()
+    }
+
+    /// Find an inner pair by rule
+    pub fn find<T: Parse>(&'i self, rule: Rule) -> Option<T> {
+        match self
+            .inner()
+            .find(|pair| pair.as_rule() == rule)
+            .map(T::parse)
+        {
+            Some(Err(_)) | None => None,
+            Some(Ok(x)) => Some(x),
+        }
+    }
 }
 
 impl<'i> SrcReferrer for Pair<'i> {
@@ -80,12 +97,7 @@ impl Parser {
     where
         T: Clone,
     {
-        let mut vec = Vec::new();
-        for p in pair.0.clone().into_inner() {
-            vec.push(f(Pair(p, pair.1))?);
-        }
-
-        Ok(vec)
+        pair.0.into_inner().map(|p| f(Pair(p, pair.1))).collect()
     }
 
     /// Parse a rule for type `T`
