@@ -62,7 +62,7 @@ impl CallMethod for List {
         match name.into() {
             "equal" => {
                 let result = match self.first() {
-                    Some(first) => self.iter().all(|x| x == first),
+                    Some(first) => self[1..].iter().all(|x| x == first),
                     None => true,
                 };
                 Ok(Value::Bool(Refer::new(result, src_ref)))
