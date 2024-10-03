@@ -107,10 +107,11 @@ impl CallArgumentValueList {
 
         // Check for unexpected arguments.
         // We are looking for call arguments that are not in the parameter list
-        for name in self.keys() {
-            if parameter_values.get(name).is_none() {
-                return Err(EvalError::UnexpectedArgument(name.clone()));
-            }
+        if let Some(name) = self
+            .keys()
+            .find(|name| parameter_values.get(name).is_none())
+        {
+            return Err(EvalError::UnexpectedArgument(name.clone()));
         }
 
         let mut missing_parameter_values = parameter_values.clone();
