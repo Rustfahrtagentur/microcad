@@ -28,9 +28,7 @@ impl Parse for FunctionBody {
                     body.push(FunctionStatement::parse(pair)?);
                 }
                 Rule::expression => {
-                    body.push(FunctionStatement::Return(Box::new(Expression::parse(
-                        pair,
-                    )?)));
+                    body.push(FunctionStatement::Return(Expression::parse(pair)?));
                 }
                 rule => unreachable!("Unexpected token in function body: {:?}", rule),
             }

@@ -15,7 +15,7 @@ pub enum FunctionStatement {
     /// Function definition
     FunctionDefinition(std::rc::Rc<FunctionDefinition>),
     /// Return statement
-    Return(Box<Expression>),
+    Return(Expression),
     /// If-then-else statement
     If {
         /// Condition
@@ -58,7 +58,7 @@ impl Parse for FunctionStatement {
             Rule::function_definition => {
                 Self::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?)
             }
-            Rule::function_return_statement => Self::Return(Box::new(Expression::parse(first)?)),
+            Rule::function_return_statement => Self::Return(Expression::parse(first)?),
             Rule::function_if_statement => {
                 let mut pairs = first.inner();
                 let condition = Expression::parse(pairs.next().unwrap())?;
