@@ -13,15 +13,14 @@ impl Parse for Nested {
     fn parse(pair: Pair) -> ParseResult<Self> {
         assert!(pair.as_rule() == Rule::nested || pair.as_rule() == Rule::expression_no_semicolon);
 
-        let mut vec = Vec::new();
-        for pair in pair.inner().filter(|pair| {
-            [Rule::qualified_name, Rule::call, Rule::module_body].contains(&pair.as_rule())
-        }) {
-            vec.push(NestedItem::parse(pair)?);
-        }
-        assert!(!vec.is_empty());
-
-        Ok(Nested(vec))
+        Ok(Self(
+            pair.inner()
+                .filter(|pair| {
+                    [Rule::qualified_name, Rule::call, Rule::module_body].contains(&pair.as_rule())
+                })
+                .map(NestedItem::parse)
+                .collect::<ParseResult<_>>()?,
+        ))
     }
 }
 
