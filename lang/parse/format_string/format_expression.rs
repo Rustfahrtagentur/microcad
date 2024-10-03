@@ -31,8 +31,8 @@ impl FormatExpression {
 impl Parse for FormatExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self::new(
-            Parser::find(&pair, Rule::format_spec).unwrap_or_default(),
-            Parser::find(&pair, Rule::expression).expect("Missing expression"),
+            pair.find(Rule::format_spec).unwrap_or_default(),
+            pair.find(Rule::expression).expect("Missing expression"),
         ))
     }
 }

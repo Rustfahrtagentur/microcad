@@ -20,7 +20,7 @@ impl Parse for FunctionBody {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_body);
 
-        Ok(Self(pair.collect::<FunctionStatement>(
+        Ok(Self(pair.map_collect::<FunctionStatement>(
             |pair| match pair.as_rule() {
                 Rule::function_statement => FunctionStatement::parse(pair),
                 Rule::expression => Ok(FunctionStatement::Return(Expression::parse(pair)?)),

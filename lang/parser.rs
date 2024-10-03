@@ -39,8 +39,21 @@ impl<'i> Pair<'i> {
         self.0.clone().into_inner().map(|p| Self(p, self.1))
     }
 
-    pub fn collect<T: Parse>(&'i self, f: fn(Self) -> ParseResult<T>) -> ParseResult<Vec<T>> {
+    /// Map and collect inner pairs into a Vec<T>
+    pub fn map_collect<T: Parse>(&'i self, f: fn(Self) -> ParseResult<T>) -> ParseResult<Vec<T>> {
         self.inner().map(f).collect::<ParseResult<_>>()
+    }
+
+    /// Find an inner pair by rule
+    pub fn find<T: Parse>(&'i self, rule: Rule) -> Option<T> {
+        match self
+            .inner()
+            .find(|pair| pair.as_rule() == rule)
+            .map(T::parse)
+        {
+            Some(Err(_)) | None => None,
+            Some(Ok(x)) => Some(x),
+        }
     }
 }
 
@@ -104,17 +117,5 @@ impl Parser {
     pub fn ensure_rule(pair: &Pair, expected: Rule) {
         let rule = pair.as_rule();
         assert_eq!(rule, expected, "Unexpected rule: {rule:?}");
-    }
-
-    /// Find an inner pair by rule
-    pub fn find<T: Parse>(pair: &Pair, rule: Rule) -> Option<T> {
-        match pair
-            .inner()
-            .find(|pair| pair.as_rule() == rule)
-            .map(T::parse)
-        {
-            Some(Err(_)) | None => None,
-            Some(Ok(x)) => Some(x),
-        }
     }
 }
