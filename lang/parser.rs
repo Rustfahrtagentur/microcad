@@ -38,6 +38,10 @@ impl<'i> Pair<'i> {
     pub fn inner(&'i self) -> impl Iterator<Item = Self> {
         self.0.clone().into_inner().map(|p| Self(p, self.1))
     }
+
+    pub fn collect<T: Parse>(&'i self, f: fn(Self) -> ParseResult<T>) -> ParseResult<Vec<T>> {
+        self.inner().map(f).collect::<ParseResult<_>>()
+    }
 }
 
 impl<'i> SrcReferrer for Pair<'i> {
@@ -112,9 +116,5 @@ impl Parser {
             Some(Err(_)) | None => None,
             Some(Ok(x)) => Some(x),
         }
-    }
-
-    pub fn collect<T: Parse>(pair: &Pair, f: fn(Pair) -> ParseResult<T>) -> ParseResult<Vec<T>> {
-        pair.inner().map(f).collect::<ParseResult<_>>()
     }
 }
