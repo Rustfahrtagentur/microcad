@@ -13,10 +13,9 @@ impl DiagList {
         w: &mut dyn std::io::Write,
         source_file_by_hash: &impl GetSourceFileByHash,
     ) -> std::io::Result<()> {
-        for source_file_diags in &self.0 {
-            source_file_diags.pretty_print(w, source_file_by_hash)?;
-        }
-        Ok(())
+        self.0
+            .iter()
+            .try_for_each(|diags| diags.pretty_print(w, source_file_by_hash))
     }
 }
 
