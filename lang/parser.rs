@@ -80,12 +80,7 @@ impl Parser {
     where
         T: Clone,
     {
-        let mut vec = Vec::new();
-        for p in pair.0.clone().into_inner() {
-            vec.push(f(Pair(p, pair.1))?);
-        }
-
-        Ok(vec)
+        pair.0.into_inner().map(|p| f(Pair(p, pair.1))).collect()
     }
 
     /// Parse a rule for type `T`
