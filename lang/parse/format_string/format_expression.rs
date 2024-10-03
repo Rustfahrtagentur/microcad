@@ -12,7 +12,7 @@ pub struct FormatExpression {
     /// Format specifier
     pub spec: FormatSpec,
     /// Expression to format
-    pub expression: Box<Expression>,
+    pub expression: Expression,
     /// Source code reference
     src_ref: SrcRef,
 }
@@ -23,7 +23,7 @@ impl FormatExpression {
         Self {
             src_ref: SrcRef::merge(spec.src_ref(), expression.src_ref()),
             spec,
-            expression: Box::new(expression),
+            expression,
         }
     }
 }
@@ -39,7 +39,7 @@ impl Parse for FormatExpression {
 
 impl SrcReferrer for FormatExpression {
     fn src_ref(&self) -> SrcRef {
-        SrcRef::merge(&self.spec, self.expression.as_ref())
+        SrcRef::merge(&self.spec, &self.expression)
     }
 }
 
