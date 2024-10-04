@@ -70,10 +70,14 @@ impl CallArgumentValueList {
             return Ok(());
         }
         let mut positional_index = 0;
-        for arg in self.iter() {
-            if arg.name.is_none() {
-                let param_value = parameter_values[positional_index].clone();
-                if !arg_map.contains_key(&param_value.name) {
+
+        self.iter()
+            .filter(|arg| arg.name.is_none())
+            .try_for_each(|arg| {
+                use std::ops::ControlFlow;
+
+                let param_name = parameter_values[positional_index].name.clone();
+                if !arg_map.contains_key(&param_name) {
                     // @todo: Check for tuple arguments and whether the tuple fields match the parameters
                     if let TypeCheckResult::Match =
                         parameter_values[positional_index].type_check(&arg.value.ty())
@@ -81,18 +85,18 @@ impl CallArgumentValueList {
                         Self::insert_and_remove(
                             arg_map,
                             parameter_values,
-                            &param_value.name,
+                            &param_name,
                             arg.value.clone(),
                         );
                         if positional_index >= parameter_values.len() {
-                            break;
+                            return ControlFlow::Break(());
                         }
                     }
                 } else {
                     positional_index += 1;
                 }
-            }
-        }
+                ControlFlow::Continue(())
+            });
 
         Ok(())
     }
