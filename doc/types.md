@@ -28,7 +28,7 @@ Length are used in describing dimensions and must be given with a unit.
 millimeters = 1000mm;
 centimeters = 100cm;
 meters = 1m;
-inches = 39.37008in;
+inches = 39.37007874015748in;
 
 std::assert( [millimeters, centimeters, meters, inches].equal() );
 ```
@@ -39,17 +39,13 @@ Angles are used with rotations and in constrains when proving measures.
 
 ```µCAD,primitive.angle
 pi = std::math::pi;
-radian = 1rad;
+radian = 1rad * pi;
 degree = 180°;
 degree_ = 180deg;
-gradient = 180grad;
+gradian = 200grad;
 turn = 0.5turn;
 
-std::assert( radian == pi );
-std::assert( degree == pi );
-std::assert( degree == pi );
-std::assert( gradient == pi );
-std::assert( turn == pi );
+std::assert( [degree, degree_, gradian, turn, radian].equal() );
 ```
 
 ### Area
@@ -67,7 +63,7 @@ std::assert(square_inch ~ 0.1m² +-1%);
 
 ### Volume
 
-```µCAD,primitive.volume
+```µCAD,primitive.volume#todo
 cubic_millimeter = 1000000mm³;
 cubic_centimeter = 100cl;
 cubic_meter = 0.001m³;

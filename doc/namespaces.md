@@ -11,7 +11,7 @@ namespace std {
     namespace math {
 
         // define PI as field
-        PI = 3.14159;
+        pi = 3.14159;
 
         // define calculation function
         function abs(x: scalar) -> scalar {
@@ -21,5 +21,5 @@ namespace std {
 }
 
 // call both
-x = std::math::abs(-1) * std::math::PI;
+x = std::math::abs(-1) * std::math::pi;
 ```
