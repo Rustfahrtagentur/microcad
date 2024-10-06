@@ -26,13 +26,7 @@ impl MethodCall {
 
         match lhs.eval(context)? {
             Value::Node(node) => node.call_method(&self.name, &args, self.src_ref()),
-            Value::List(list) => match name {
-                "len" => Ok(Value::Integer(Refer::new(
-                    list.len() as i64,
-                    list.src_ref(),
-                ))),
-                _ => Err(EvalError::UnknownMethod(name.into())),
-            },
+            Value::List(list) => list.call_method(&self.name, &args, self.src_ref()),
             _ => Err(EvalError::UnknownMethod(name.into())),
         }
     }

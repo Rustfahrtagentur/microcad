@@ -58,6 +58,10 @@ impl CallMethod for List {
         src_ref: SrcRef,
     ) -> Result<Value> {
         match name.into() {
+            "count" => Ok(Value::Integer(Refer::new(
+                self.len() as i64,
+                self.src_ref(),
+            ))),
             "equal" => {
                 let result = match self.first() {
                     Some(first) => self[1..].iter().all(|x| x == first),
@@ -93,7 +97,7 @@ fn call_method() {
         // We expect a [(x: length, y: length)]
         assert_eq!(value_list.ty(), crate::r#type::Type::Vec2);
 
-        // A rect as 4 corners
+        // A rect has 4 corners
         assert_eq!(value_list.len(), 4);
     } else {
         panic!("Expected a list of values");
