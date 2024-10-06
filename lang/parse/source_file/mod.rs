@@ -13,7 +13,7 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use microcad_render::tree;
 
 /// Trait to get a source file by its hash
-pub trait GetSourceFileByHash: std::fmt::Debug {
+pub trait GetSourceFileByHash {
     /// Get a source file by its hash
     fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile>;
 

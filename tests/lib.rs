@@ -206,11 +206,6 @@ fn test_simple_module_definition() {
         .call(&CallArgumentList::default(), &mut context)
         .unwrap();
 
-    context
-        .diagnostics()
-        .pretty_print(&mut std::io::stderr(), &context)
-        .unwrap();
-
     if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
         match *node.borrow() {
             microcad_core::render::NodeInner::Group => {}

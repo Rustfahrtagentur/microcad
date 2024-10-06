@@ -54,7 +54,7 @@ impl Eval for ForStatement {
             }
             value => {
                 use anyhow::anyhow;
-                context.error(self, anyhow!("Expected list, got {}", value.ty()));
+                context.error(self, anyhow!("Expected list, got {}", value.ty()))?;
             }
         }
 

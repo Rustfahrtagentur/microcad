@@ -69,8 +69,12 @@ impl ModuleBody {
             return Err(ParseError::BothParameterListAndInitializer);
         }
 
-        let mut init = ModuleInitDefinition::new(parameters, Vec::new());
-        init.src_ref = init.parameters.src_ref();
+        let src_ref = parameters.src_ref();
+        let init = ModuleInitDefinition {
+            parameters,
+            body: Vec::new(),
+            src_ref,
+        };
         self.inits.push(std::rc::Rc::new(init));
 
         // Move pre-init statements to post-init statements

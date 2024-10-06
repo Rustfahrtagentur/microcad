@@ -59,14 +59,14 @@ impl CallTrait for ModuleDefinition {
         // There should be only one matching initializer
         match matching_init.len() {
             0 => {
-                context.error(self, anyhow!("No matching initializer found"));
+                context.error(self, anyhow!("No matching initializer found"))?;
             }
             1 => {
                 let (init, arg_map) = matching_init.first().unwrap();
                 init.call(arg_map, context)?;
             }
             _ => {
-                context.error(self, anyhow!("Multiple matching initializers found"));
+                context.error(self, anyhow!("Multiple matching initializers found"))?;
                 // TODO Add diagnostics for multiple matching initializers
             }
         }
