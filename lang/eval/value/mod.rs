@@ -277,6 +277,12 @@ impl std::ops::Sub for Value {
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
                 Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
+            (Value::Node(lhs), Value::Node(rhs)) => {
+                let difference = microcad_core::algorithm::boolean_op::difference();
+                difference.append(lhs);
+                difference.append(rhs);
+                Ok(Value::Node(difference))
+            }
             _ => Err(EvalError::InvalidOperator("-".into())),
         }
     }
