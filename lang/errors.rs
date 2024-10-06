@@ -85,7 +85,7 @@ pub enum ParseError {
     #[error("Statement between two init statements")]
     StatementBetweenModuleInit,
 
-    // A module has both a parameter list and initializer
+    /// A module has both a parameter list and initializer
     #[error("Module has both a parameter list and initializer")]
     BothParameterListAndInitializer,
 }

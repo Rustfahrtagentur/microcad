@@ -11,7 +11,6 @@ use microcad_render::tree;
 ///
 /// The context is used to store the current state of the evaluation.
 /// A context is essentially a stack of symbol tables
-#[derive(Debug)]
 pub struct Context {
     /// Stack of symbol tables
     stack: Vec<SymbolTable>,
@@ -26,7 +25,7 @@ pub struct Context {
     source_files: SourceFileCache,
 
     /// Source file diagnostics
-    diagnostics: DiagList,
+    diag_handler: DiagHandler,
 }
 
 impl Context {
@@ -36,8 +35,7 @@ impl Context {
             stack: vec![SymbolTable::default()],
             current_node: tree::root(),
             current_source_file: Some(std::rc::Rc::new(source_file)),
-            source_files: SourceFileCache::default(),
-            diagnostics: DiagList::default(),
+            ..Default::default()
         }
     }
 
@@ -53,11 +51,6 @@ impl Context {
     /// Note: This should not be an optional value, as the context is always created with a source file
     pub fn current_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
         self.current_source_file.clone()
-    }
-
-    /// Read-only access to the diagnostics
-    pub fn diagnostics(&self) -> &DiagList {
-        &self.diagnostics
     }
 
     /// Push a new symbol table to the stack (enter a new scope)
@@ -78,6 +71,11 @@ impl Context {
         self.push();
         f(self);
         self.pop();
+    }
+
+    /// Read-only access to diagnostic handler
+    pub fn diag(&self) -> &DiagHandler {
+        &self.diag_handler
     }
 
     /// Fetch symbols by qualified name
@@ -105,9 +103,9 @@ impl Context {
     }
 }
 
-impl crate::diag::PushDiag for Context {
-    fn push_diag(&mut self, diagnostic: Diag) {
-        self.diagnostics.push_diag(diagnostic);
+impl PushDiag for Context {
+    fn push_diag(&mut self, diag: Diag) -> crate::eval::Result<()> {
+        self.diag_handler.push_diag(diag)
     }
 }
 
@@ -147,7 +145,7 @@ impl Default for Context {
             current_node: tree::root(),
             current_source_file: None,
             source_files: SourceFileCache::default(),
-            diagnostics: DiagList::default(),
+            diag_handler: DiagHandler::default(),
         }
     }
 }
