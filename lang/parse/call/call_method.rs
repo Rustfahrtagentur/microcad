@@ -8,7 +8,7 @@ use crate::{eval::*, parse::*, src_ref::*};
 /// Trait to call method of something.
 /// This for example used to call `vertices()` on a `Node`.
 /// In µCAD, this is used to return vertices of a geometry, like a `rect` in this example:
-/// ```µCAD
+/// ```uCAD
 /// corners = std::geo2d::rect(size = 4mm).vertices();
 /// ```
 pub trait CallMethod {

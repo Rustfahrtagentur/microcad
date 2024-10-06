@@ -9,7 +9,7 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 ///
 /// Example:
 ///
-/// ```µCAD
+/// ```uCAD
 /// module a {
 ///     init(b: length) {} // The init definition
 /// }
