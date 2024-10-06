@@ -75,13 +75,15 @@ macro_rules! builtin_function {
         match args.get(stringify!($name)).unwrap() {
             $(Value::$ty($name) => Ok(Some(Value::$ty(Refer::none($name.$f())))),)*
             Value::List(v) => {
+                // TODO: Don't use `mut``
                 let mut result = ValueList::new(Vec::new(),SrcRef(None));
-                for x in v.iter() {
+                v.iter().try_for_each(|x| {
                     match x {
                         $(Value::$ty(x) => result.push(Value::$ty(Refer::none(x.$f()))),)*
                         _ => return Err(EvalError::InvalidArgumentType(x.ty())),
                     }
-                }
+                    Ok(())
+                })?;
                 Ok(Some(Value::List(List::new(result, v.ty(),SrcRef(None)))))
             }
             v => Err(EvalError::InvalidArgumentType(v.ty())),

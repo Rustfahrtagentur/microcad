@@ -18,7 +18,7 @@ pub struct MethodCall {
 
 impl MethodCall {
     /// Evaluate the method call in a context
-    pub fn eval(&self, context: &mut Context, lhs: &Box<Expression>) -> Result<Value> {
+    pub fn eval(&self, context: &mut Context, lhs: &Expression) -> Result<Value> {
         let name: &str = &self.name.to_string();
         let args = self.argument_list.eval(context)?;
 

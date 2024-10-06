@@ -71,10 +71,7 @@ impl<'a> PlyWriter<'a> {
 
     /// Generate multiple vertices
     pub fn vertices(&mut self, v: &[Vertex]) -> std::io::Result<()> {
-        for vertex in v {
-            self.vertex(vertex)?;
-        }
-        Ok(())
+        v.iter().try_for_each(|v| self.vertex(v))
     }
 
     /// Generate vertex with color
@@ -107,10 +104,7 @@ impl<'a> PlyWriter<'a> {
 
     /// Generate multiple tri-faces
     pub fn tri_faces(&mut self, tri_faces: &[Triangle<u32>]) -> std::io::Result<()> {
-        for face in tri_faces {
-            self.tri_face(face)?;
-        }
-        Ok(())
+        tri_faces.iter().try_for_each(|f| self.tri_face(f))
     }
 }
 

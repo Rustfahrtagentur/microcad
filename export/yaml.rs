@@ -34,13 +34,14 @@ impl Exporter for YamlExporter {
 
         use microcad_core::render::tree::Depth;
 
-        for child in node.descendants() {
-            for _ in 0..child.depth() {
-                write!(writer, "  ")?;
-            }
-            writeln!(writer, "- {:?}", child.borrow())?;
-        }
-
+        node.descendants().try_for_each(|child| {
+            writeln!(
+                writer,
+                "{}- {:?}",
+                "  ".repeat(child.depth()),
+                child.borrow()
+            )
+        })?;
         Ok(())
     }
 

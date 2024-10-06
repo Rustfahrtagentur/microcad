@@ -83,10 +83,11 @@ impl Exporter for StlExporter {
         let mut file = std::io::BufWriter::new(file);
         let mut writer = StlWriter::new(&mut file);
 
-        let triangles = renderer.triangle_mesh.fetch_triangles();
-        for triangle in triangles {
-            writer.write_triangle(&triangle)?;
-        }
+        renderer
+            .triangle_mesh
+            .fetch_triangles()
+            .iter()
+            .try_for_each(|triangle| writer.write_triangle(triangle))?;
 
         Ok(())
     }

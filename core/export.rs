@@ -82,13 +82,12 @@ type ExporterFactory = fn(&ExportSettings) -> Result<Box<dyn Exporter>, crate::C
 
 /// Iterate over all descendent nodes and export the ones with an Export tag
 pub fn export_tree(node: Node, factory: ExporterFactory) -> Result<(), crate::CoreError> {
-    for n in node.descendants() {
+    node.descendants().try_for_each(|n| {
         let inner = n.borrow();
         if let NodeInner::Export(ref export_settings) = *inner {
-            let mut exporter = factory(export_settings)?;
-            exporter.export(n.clone())?;
+            factory(export_settings)?.export(n.clone())
+        } else {
+            Ok(())
         }
-    }
-
-    Ok(())
+    })
 }

@@ -20,22 +20,12 @@ impl Parse for FunctionBody {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_body);
 
-        let mut body = Vec::new();
-
-        for pair in pair.inner() {
-            match pair.as_rule() {
-                Rule::function_statement => {
-                    body.push(FunctionStatement::parse(pair)?);
-                }
-                Rule::expression => {
-                    body.push(FunctionStatement::Return(Box::new(Expression::parse(
-                        pair,
-                    )?)));
-                }
+        Ok(Self(pair.map_collect::<FunctionStatement>(
+            |pair| match pair.as_rule() {
+                Rule::function_statement => FunctionStatement::parse(pair),
+                Rule::expression => Ok(FunctionStatement::Return(Expression::parse(pair)?)),
                 rule => unreachable!("Unexpected token in function body: {:?}", rule),
-            }
-        }
-
-        Ok(Self(body))
+            },
+        )?))
     }
 }

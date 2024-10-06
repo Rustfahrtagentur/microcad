@@ -3,8 +3,6 @@
 
 //! Call method
 
-use microcad_core::{algorithm, geo2d};
-
 use crate::{eval::*, parse::*, src_ref::*};
 
 /// Trait to call method of something.
