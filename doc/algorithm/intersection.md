@@ -5,14 +5,14 @@
 In the following examples the intersection of two circles is calculated.
 
 ```µCAD,intersection.operator
-circle(r = 3.0mm) - rect(size = 3.0mm);
+std::geo2d::circle(radius = 3.0) & std::geo2d::rect(x=0.0, y=0.0, width = 3.0, height = 2.0);
 ```
 
 ## Intersection module
 
 ```µCAD,intersection.module
-intersection() {
-    circle(r = 3.0mm);
-    rect(size = 3.0mm);
+std::algorithm::intersection() {
+    std::geo2d::circle(radius = 3.0);
+    std::geo2d::rect(x=0.0, y=0.0, width = 3.0, height = 2.0);
 }
 ```

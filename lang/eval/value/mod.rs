@@ -277,12 +277,13 @@ impl std::ops::Sub for Value {
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
                 Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
-            (Value::Node(lhs), Value::Node(rhs)) => {
-                let difference = microcad_core::algorithm::boolean_op::difference();
-                difference.append(lhs);
-                difference.append(rhs);
-                Ok(Value::Node(difference))
-            }
+            (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
+                microcad_core::algorithm::boolean_op::binary_op(
+                    algorithm::BooleanOp::Difference,
+                    lhs,
+                    rhs,
+                ),
+            )),
             _ => Err(EvalError::InvalidOperator("-".into())),
         }
     }
@@ -362,6 +363,42 @@ impl std::ops::Div for Value {
             (Value::Length(lhs), Value::Scalar(rhs)) => Ok(Value::Length(lhs / rhs)),
             (Value::Angle(lhs), Value::Scalar(rhs)) => Ok(Value::Angle(lhs / rhs)),
             _ => Err(EvalError::InvalidOperator("/".into())),
+        }
+    }
+}
+
+/// Rules for operator | (union operator)
+impl std::ops::BitOr for Value {
+    type Output = ValueResult;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        match (self, rhs) {
+            (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
+                microcad_core::algorithm::boolean_op::binary_op(
+                    algorithm::BooleanOp::Union,
+                    lhs,
+                    rhs,
+                ),
+            )),
+            _ => Err(EvalError::InvalidOperator("|".into())),
+        }
+    }
+}
+
+/// Rules for operator & (intersection operator)
+impl std::ops::BitAnd for Value {
+    type Output = ValueResult;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        match (self, rhs) {
+            (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
+                microcad_core::algorithm::boolean_op::binary_op(
+                    algorithm::BooleanOp::Intersection,
+                    lhs,
+                    rhs,
+                ),
+            )),
+            _ => Err(EvalError::InvalidOperator("&".into())),
         }
     }
 }

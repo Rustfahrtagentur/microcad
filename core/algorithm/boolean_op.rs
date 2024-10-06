@@ -149,3 +149,11 @@ pub fn intersection() -> Node {
 pub fn complement() -> Node {
     Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Complement)))
 }
+
+/// Short cut to generate boolean operator as binary operation with two nodes
+pub fn binary_op(op: BooleanOp, lhs: Node, rhs: Node) -> Node {
+    let root = Node::new(NodeInner::Algorithm(Box::new(op)));
+    root.append(lhs);
+    root.append(rhs);
+    root
+}
