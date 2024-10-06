@@ -46,7 +46,13 @@ impl ModuleBody {
 
                 self.inits.push(init.clone());
             }
-            _ => {}
+            statement => {
+                if self.inits.is_empty() {
+                    self.pre_init_statements.push(statement);
+                } else {
+                    self.post_init_statements.push(statement);
+                }
+            }
         }
 
         Ok(())

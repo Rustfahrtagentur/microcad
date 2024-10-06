@@ -12,8 +12,6 @@ pub struct ModuleDefinition {
     pub attributes: Vec<Attribute>,
     /// Module name
     pub name: Identifier,
-    /// Module Parameters
-    pub parameters: Option<ParameterList>,
     /// Module body
     pub body: ModuleBody,
     /// Source code reference
@@ -26,7 +24,6 @@ impl ModuleDefinition {
         ModuleDefinition {
             attributes: Vec::new(),
             name,
-            parameters: None,
             body: ModuleBody::default(),
             src_ref: SrcRef(None),
         }
@@ -130,10 +127,13 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
             }
         }
 
+        if let Some(parameters) = parameters {
+            body.add_initializer_from_parameter_list(parameters)?;
+        }
+
         Ok(std::rc::Rc::new(ModuleDefinition {
             attributes,
             name,
-            parameters,
             body,
             src_ref: pair.into(),
         }))
