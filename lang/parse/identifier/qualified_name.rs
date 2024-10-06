@@ -6,7 +6,7 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a.b.c`
 #[derive(Debug, Default, Clone, PartialEq)]
-pub struct QualifiedName(Vec<Identifier>);
+pub struct QualifiedName(pub Vec<Identifier>);
 
 impl SrcReferrer for QualifiedName {
     fn src_ref(&self) -> SrcRef {
