@@ -30,7 +30,7 @@ centimeters = 100cm;
 meters = 1m;
 inches = 39.37008in;
 
-std::assert( millimeters == centimeters and meters == inches and millimeters == inches );
+std::assert( [millimeters, centimeters, meters, inches].equal() );
 ```
 
 ### Angle
@@ -54,7 +54,7 @@ std::assert( turn == pi );
 
 ### Area
 
-```µCAD,primitive.area
+```µCAD,primitive.area#todo
 square_millimeter = 100000mm²;
 square_centimeter = 1000cm²;
 square_meter = 0.1m²;
@@ -88,22 +88,22 @@ std::assert(milliliter = 1l);
 
 Text can be used to logging or to render text.
 
-```µCAD,primitive.string
+```µCAD,primitive.string#todo
 text = "Hello µCAD!";
 std::assert(text.count(11));
 
 // logging
-info(text);
+std::info(text);
 
 // render text
-std::geo2d::string(text);
+std::geo2d::text(text);
 ```
 
 ### Color
 
 Colors are defined by using hash mark (`#`) followed by hexadecimal digits for red, green and blue:
 
-```µCAD,primitive.color
+```µCAD,primitive.color#todo
 rgb_single_hex = #FFF;
 rgb_double_hex = #00FF00;
 rgba_single_hex = #FFFF;
@@ -123,7 +123,7 @@ no_color = #00FF0
 
 Weights can be calculated by applying volumes to materials.
 
-```µCAD,primitive.weight
+```µCAD,primitive.weight#todo
 gram = 1000g;
 kilogram = 1kg;
 pound = 2.204623lb;

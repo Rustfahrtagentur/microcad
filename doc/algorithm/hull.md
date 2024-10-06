@@ -1,23 +1,14 @@
 # Hull
 
-## Hull operator `°`
+In the following examples the convex hull of circles is calculated.
 
-In the following examples the hull of two circles is calculated.
-
-```µCAD,operator
-translate(x = [-10, 10]mm, y = [-10, 10]mm)
-    circle(1mm);
-```
-
-## Hull module
-
-```µCAD,module.single
+```µCAD,module.single#todo
 hull()
     translate(x = [-10, 10]mm, y = [-10, 10]mm)
         circle(1mm);
 ```
 
-```µCAD,module.multiple
+```µCAD,module.multiple#todo
 hull() {
     union() {
         translate(x = [-10, 10]mm, y = [-10, 10]mm)
