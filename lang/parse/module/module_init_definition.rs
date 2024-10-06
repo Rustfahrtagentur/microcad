@@ -3,14 +3,35 @@
 
 //! Module initialization definition parser entity
 
-use crate::{errors::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Module initialization definition
 #[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
-    _parameters: ParameterList,
-    _body: Vec<ModuleInitStatement>,
-    src_ref: SrcRef,
+    pub parameters: ParameterList,
+    pub body: Vec<ModuleInitStatement>,
+    pub src_ref: SrcRef,
+}
+
+impl ModuleInitDefinition {
+    pub fn new(parameters: ParameterList, body: Vec<ModuleInitStatement>) -> Self {
+        Self {
+            parameters,
+            body,
+            src_ref: SrcRef(None),
+        }
+    }
+
+    pub fn call(&self, arg_map: &ArgumentMap, context: &mut Context) -> Result<()> {
+        for (name, value) in arg_map.iter() {
+            context.add(Symbol::Value(name.clone(), value.clone()));
+        }
+
+        for statement in &self.body {
+            statement.eval(context)?;
+        }
+        Ok(())
+    }
 }
 
 impl SrcReferrer for ModuleInitDefinition {
@@ -41,8 +62,8 @@ impl Parse for ModuleInitDefinition {
         }
 
         Ok(ModuleInitDefinition {
-            _parameters: parameters,
-            _body: body,
+            parameters,
+            body,
             src_ref: pair.into(),
         })
     }
