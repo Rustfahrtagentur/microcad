@@ -50,7 +50,7 @@ impl SrcRef {
         }))
     }
 
-    /// return length of
+    /// return length of `SrcRef`
     pub fn len(&self) -> usize {
         self.0.as_ref().map(|s| s.range.len()).unwrap_or(0)
     }

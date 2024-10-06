@@ -21,6 +21,15 @@ pub trait GetSourceFileByHash {
     fn get_source_file_by_src_ref(&self, src_ref: impl SrcReferrer) -> Option<&SourceFile> {
         self.get_source_file_by_hash(src_ref.src_ref().source_hash())
     }
+
+    /// Convenience function to get source slice by `SrcRef`
+    fn get_source_string(&self, src_ref: impl SrcReferrer) -> Option<&str> {
+        if let Some(source_file) = self.get_source_file_by_src_ref(&src_ref) {
+            Some(source_file.get_slice_by_src_ref(src_ref.src_ref()))
+        } else {
+            None
+        }
+    }
 }
 
 /// µCAD source file
@@ -31,7 +40,7 @@ pub struct SourceFile {
     /// Name of loaded file or `None`
     pub filename: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
-    _source: String,
+    source: String,
 
     /// Hash of the source file
     ///
@@ -85,7 +94,11 @@ impl SourceFile {
     ///
     /// - `line`: line number beginning at `0`
     pub fn get_line(&self, line: usize) -> Option<&str> {
-        self._source.lines().nth(line)
+        self.source.lines().nth(line)
+    }
+
+    pub fn get_slice_by_src_ref(&self, src_ref: SrcRef) -> &str {
+        src_ref.source_slice(&self.source)
     }
 
     /// Evaluate the source file as a namespace
@@ -149,7 +162,7 @@ impl Parse for SourceFile {
         Ok(SourceFile {
             body,
             filename: None,
-            _source: pair.as_span().as_str().to_string(),
+            source: pair.as_span().as_str().to_string(),
             hash,
         })
     }
@@ -216,7 +229,7 @@ fn load_source_file() {
         Statement::Use(u) => {
             use crate::src_ref::SrcReferrer;
             assert_eq!(
-                u.src_ref().source_slice(&source_file._source),
+                u.src_ref().source_slice(&source_file.source),
                 "use * from std;"
             );
         }
