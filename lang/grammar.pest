@@ -448,7 +448,6 @@ module_init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ "{" ~ ws* ~ mod
 
 module_init_statement = { 
   use_statement | 
-  function_definition | 
   assignment_statement | 
   expression_statement 
 }
