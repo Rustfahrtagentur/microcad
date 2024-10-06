@@ -120,13 +120,15 @@ impl PartialOrd for Value {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         match (self, other) {
             (Value::Integer(lhs), Value::Integer(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Length(lhs), Value::Length(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Area(lhs), Value::Area(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Volume(lhs), Value::Volume(rhs)) => lhs.partial_cmp(rhs),
+            (Value::Scalar(lhs), Value::Scalar(rhs))
+            | (Value::Length(lhs), Value::Length(rhs))
+            | (Value::Area(lhs), Value::Area(rhs))
+            | (Value::Volume(lhs), Value::Volume(rhs))
+            | (Value::Angle(lhs), Value::Angle(rhs))
+            | (Value::Angle(lhs), Value::Scalar(rhs))
+            | (Value::Scalar(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
             (Value::Vec2(lhs), Value::Vec2(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
             (Value::Vec3(lhs), Value::Vec3(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
-            (Value::Angle(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
             _ => None,
         }
     }
