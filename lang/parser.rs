@@ -57,7 +57,7 @@ impl<'i> Pair<'i> {
     }
 }
 
-impl<'i> SrcReferrer for Pair<'i> {
+impl SrcReferrer for Pair<'_> {
     fn src_ref(&self) -> SrcRef {
         let pair = &self.0;
         let (line, col) = pair.line_col();

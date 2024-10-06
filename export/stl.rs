@@ -47,7 +47,7 @@ impl<'a> StlWriter<'a> {
     }
 }
 
-impl<'a> Drop for StlWriter<'a> {
+impl Drop for StlWriter<'_> {
     fn drop(&mut self) {
         writeln!(self.writer, "endsolid").unwrap();
     }
