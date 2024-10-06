@@ -187,7 +187,13 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                                         if let Err(err) = context.eval() {
                                             log::debug!("{err}");
                                         } else {
-                                            panic!("ERROR: test is marked to fail but succeeded");
+                                            if context.diag().error_count > 0 {
+                                                let mut w = std::io::stdout();
+                                                context.diag().pretty_print(&mut w, &context).unwrap();
+                                            } else {
+                                                panic!("ERROR: test is marked to fail but succeeded");
+                                            }
+
                                         }
                                     }
                                 }"##,
@@ -199,6 +205,13 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                                         if let Err(err) = context.eval() {
                                             panic!("{err}");
                                         } else {
+                                            if context.diag().error_count > 0 {
+                                                let mut w = std::io::stderr();
+                                                context.diag().pretty_print(&mut w, &context).unwrap();
+                                                panic!("ERROR: there were {error_count} errors", error_count = context.diag().error_count);
+                                            } else {
+                                                log::trace!("test succeeded");
+                                            }
                                             log::trace!("test succeeded");
                                         }
                                     },

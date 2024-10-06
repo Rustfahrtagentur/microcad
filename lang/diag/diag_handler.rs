@@ -9,7 +9,7 @@ pub struct DiagHandler {
     diag_list: DiagList,
 
     /// The current number of errors in the evaluation process
-    error_count: u32,
+    pub error_count: u32,
 
     /// The maximum number of errors. `0` means unlimited number of errors.
     error_limit: u32,
