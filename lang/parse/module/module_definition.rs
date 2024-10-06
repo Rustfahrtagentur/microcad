@@ -34,8 +34,52 @@ impl ModuleDefinition {
 }
 
 impl CallTrait for ModuleDefinition {
-    fn call(&self, _args: &CallArgumentList, _context: &mut Context) -> Result<Option<Value>> {
-        todo!()
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
+        context.push();
+
+        let node = microcad_render::tree::group();
+        context.set_current_node(node.clone());
+
+        // Lets evaluate the pre-init statements
+        for statement in &self.body.pre_init_statements {
+            statement.eval(context)?;
+        }
+
+        let mut matching_init = Vec::new();
+        let arg_values = args.eval(context)?;
+
+        // Find all initializers that match the arguments and add it to the matching_init list
+        for init in &self.body.inits {
+            let param_values = init.parameters.eval(context)?;
+            if let Ok(arg_map) = arg_values.get_matching_arguments(&param_values) {
+                matching_init.push((init, arg_map));
+            }
+        }
+
+        use crate::diag::PushDiag;
+        use anyhow::anyhow;
+
+        // There should be only one matching initializer
+        match matching_init.len() {
+            0 => {
+                context.error(self, anyhow!("No matching initializer found"));
+            }
+            1 => {
+                let (init, arg_map) = matching_init.first().unwrap();
+                init.call(arg_map, context)?;
+            }
+            _ => {
+                context.error(self, anyhow!("Multiple matching initializers found"));
+                // TODO Add diagnostics for multiple matching initializers
+            }
+        }
+
+        for statement in &self.body.post_init_statements {
+            statement.eval(context)?;
+        }
+
+        context.pop();
+        Ok(Some(Value::Node(node)))
     }
 }
 
