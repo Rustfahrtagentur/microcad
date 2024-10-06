@@ -51,6 +51,30 @@ impl ModuleBody {
 
         Ok(())
     }
+
+    /// Add default initializer to body
+    /// If a body has no initializer, but the module definition has parameters,
+    /// this function will add a default initializer to the body
+    pub fn add_initializer_from_parameter_list(
+        &mut self,
+        parameters: ParameterList,
+    ) -> ParseResult<()> {
+        if !self.inits.is_empty() {
+            return Err(ParseError::BothParameterListAndInitializer);
+        }
+
+        let mut init = ModuleInitDefinition::new(parameters, Vec::new());
+        init.src_ref = init.parameters.src_ref();
+        self.inits.push(std::rc::Rc::new(init));
+
+        // Move pre-init statements to post-init statements
+        std::mem::swap(
+            &mut self.pre_init_statements,
+            &mut self.post_init_statements,
+        );
+
+        Ok(())
+    }
 }
 
 impl SrcReferrer for ModuleBody {
@@ -83,11 +107,11 @@ impl Parse for ModuleBody {
             match pair.as_rule() {
                 Rule::module_statement => {
                     let statement = ModuleStatement::parse(pair.clone())?;
-                    body.add_statement(statement);
+                    body.add_statement(statement)?;
                 }
                 Rule::expression => {
                     let expression = Expression::parse(pair.clone())?;
-                    body.add_statement(ModuleStatement::Expression(expression));
+                    body.add_statement(ModuleStatement::Expression(expression))?;
                 }
                 _ => {}
             }
