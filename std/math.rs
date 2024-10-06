@@ -6,7 +6,7 @@ use cgmath::InnerSpace;
 use microcad_core::Scalar;
 use microcad_lang::{builtin_function, eval::*, parse::*, src_ref::*};
 
-pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
+pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
     NamespaceBuilder::new("math")
         .add(Symbol::Value("pi".into(), Value::Scalar(Refer::none(std::f64::consts::PI))))
         // abs(x): Absolute value of x

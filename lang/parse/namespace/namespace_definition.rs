@@ -6,7 +6,7 @@
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Namespace definition
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NamespaceDefinition {
     /// Name of the namespace
     pub name: Identifier,

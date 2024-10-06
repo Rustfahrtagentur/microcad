@@ -30,7 +30,7 @@ use microcad_core::ExportSettings;
 use namespace_builder::NamespaceBuilder;
 
 /// Build the standard module
-pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
+pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
     NamespaceBuilder::new("std")
         // TODO: is this correct= Shouldn't this use add_builtin_module() =
         .add(math::builtin_module().into())

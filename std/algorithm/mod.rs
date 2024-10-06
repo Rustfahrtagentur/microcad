@@ -25,7 +25,7 @@ pub fn complement() -> Result<Node, EvalError> {
     Ok(microcad_core::algorithm::boolean_op::complement())
 }
 
-pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
+pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
     NamespaceBuilder::new("algorithm")
         .add(builtin_module!(difference()).into())
         .add(builtin_module!(intersection()).into())

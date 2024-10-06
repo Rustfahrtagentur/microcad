@@ -6,19 +6,19 @@ use microcad_lang::{eval::*, parse::*};
 /// Module builder
 pub struct NamespaceBuilder {
     /// Namespace definition
-    namespace: ModuleDefinition,
+    namespace: NamespaceDefinition,
 }
 
 impl NamespaceBuilder {
     /// Create new module
     pub fn new(name: &str) -> NamespaceBuilder {
         Self {
-            namespace: ModuleDefinition::new(name.into()),
+            namespace: NamespaceDefinition::new(name.into()),
         }
     }
 
     /// Build namespace definition
-    pub fn build(&mut self) -> std::rc::Rc<ModuleDefinition> {
+    pub fn build(&mut self) -> std::rc::Rc<NamespaceDefinition> {
         std::rc::Rc::new(self.namespace.clone())
     }
 }
