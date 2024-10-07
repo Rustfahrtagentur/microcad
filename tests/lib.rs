@@ -6,8 +6,11 @@ include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
 
+/// Evaluate source input from `&str` and return the resulting node and context
 #[cfg(test)]
-fn eval_input(input: &str) -> microcad_core::render::Node {
+fn eval_input_with_context(
+    input: &str,
+) -> (microcad_core::render::Node, microcad_lang::eval::Context) {
     use core::panic;
     use microcad_lang::parse::source_file::SourceFile;
     let source_file = match SourceFile::load_from_str(input) {
@@ -18,7 +21,23 @@ fn eval_input(input: &str) -> microcad_core::render::Node {
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_std()
         .build();
-    context.eval().unwrap()
+    let node = context.eval().unwrap();
+
+    if context.diag().has_errors() {
+        context
+            .diag()
+            .pretty_print(&mut std::io::stderr(), &context)
+            .unwrap();
+
+        panic!("ERROR: {} errors found", context.diag().error_count);
+    }
+
+    (node, context)
+}
+
+#[cfg(test)]
+fn eval_input(input: &str) -> microcad_core::render::Node {
+    eval_input_with_context(input).0
 }
 
 #[cfg(test)]
@@ -122,18 +141,6 @@ fn test_context_std() {
 
     let _ = context.eval().unwrap();
 
-    /*
-    let errors = context.diagnostics().fetch_errors();
-
-    if !errors.is_empty() {
-        for error in &errors {
-            error
-                .pretty_print(&mut std::io::stderr(), &context.current_source_file())
-                .unwrap();
-        }
-        panic!("ERROR: {} errors found", errors.len());
-    }*/
-
     // Now, after eval `use * from std` check again
 
     // Assert symbol, now called `assert`.
@@ -157,40 +164,28 @@ fn test_context_std() {
 
 #[test]
 fn test_simple_module_statement() {
-    use microcad_lang::parse::source_file::SourceFile;
-    let source_file = match SourceFile::load_from_str("std::geo2d::circle(radius = 3.0);") {
-        Ok(doc) => doc,
-        Err(err) => panic!("ERROR: {err}"),
-    };
-
-    let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_std()
-        .build();
-
-    let node = context.eval().unwrap();
-
-    export_yaml_for_node(node, "../test_output/tests/simple_module_statement.yaml");
+    export_yaml_for_node(
+        eval_input("std::geo2d::circle(radius = 3.0);"),
+        "../test_output/tests/simple_module_statement.yaml",
+    );
 }
 
 #[test]
 fn test_simple_module_definition() {
-    use microcad_lang::parse::source_file::SourceFile;
     use microcad_lang::parse::*;
 
-    let source_file = match SourceFile::load_from_str(
-        "module donut() { std::geo2d::circle(radius = 3.0); } donut();",
-    ) {
-        Ok(doc) => doc,
-        Err(err) => panic!("ERROR: {err}"),
-    };
-    assert_eq!(source_file.body.len(), 2);
+    // Define a module `donut` with an implicit initializer `()` and call it
+    let (_, mut context) = eval_input_with_context(
+        r#"
+        module donut() { 
+            std::geo2d::circle(radius = 3.0); 
+        }
 
-    let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_std()
-        .build();
+        donut();
+        "#,
+    );
 
-    let _ = context.eval().unwrap();
-
+    // Check the module definition
     let module_definition = context
         .fetch_symbols_by_qualified_name(&QualifiedName(vec!["donut".into()]))
         .unwrap();
@@ -202,6 +197,7 @@ fn test_simple_module_definition() {
     assert_eq!(module_definition.body.inits.len(), 1);
     assert_eq!(module_definition.body.post_init_statements.len(), 1);
 
+    // Call the module definition of `donut` and verify it
     let node = module_definition
         .call(&CallArgumentList::default(), &mut context)
         .unwrap();
