@@ -63,11 +63,19 @@ impl CallMethod for List {
                 self.src_ref(),
             ))),
             "equal" => {
-                let result = match self.first() {
+                let is_equal = match self.first() {
                     Some(first) => self[1..].iter().all(|x| x == first),
                     None => true,
                 };
-                Ok(Value::Bool(Refer::new(result, src_ref)))
+                Ok(Value::Bool(Refer::new(is_equal, src_ref)))
+            }
+            "ascending" => {
+                let is_ascending = self.as_slice().windows(2).all(|w| w[0] <= w[1]);
+                Ok(Value::Bool(Refer::new(is_ascending, src_ref)))
+            }
+            "descending" => {
+                let is_descending = self.as_slice().windows(2).all(|w| w[0] >= w[1]);
+                Ok(Value::Bool(Refer::new(is_descending, src_ref)))
             }
             method => Err(EvalError::UnknownMethod(method.into())),
         }
