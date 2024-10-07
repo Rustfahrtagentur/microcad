@@ -4,17 +4,32 @@
 //! Module body parser entity
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
-use microcad_render::tree;
 
 /// Module body
+///
+/// An example for a module definition body:
+///
+/// ```microCAD
+/// module donut {
+///     a = 2; // Pre-init statement
+///
+///     init(d: length) { // init definition
+///         radius = d / 2;
+///     }
+///
+///     init(r: length) { // Another init definition
+///
+///     }
+///
+///     b = 2; // Post-init statement
+/// }
+/// ```
 #[derive(Clone, Debug, Default)]
-pub struct ModuleBody {
+pub struct ModuleDefinitionBody {
     /// Module statements before init
-    pub pre_init_statements: Vec<ModuleStatement>,
+    pub pre_init_statements: Vec<ModuleDefinitionStatement>,
     /// Module statements after init
-    pub post_init_statements: Vec<ModuleStatement>,
-    /// Module statements
-    pub statements: Vec<ModuleStatement>,
+    pub post_init_statements: Vec<ModuleDefinitionStatement>,
     /// Module's local symbol table
     pub symbols: SymbolTable,
     /// Initializers
@@ -23,18 +38,17 @@ pub struct ModuleBody {
     src_ref: SrcRef,
 }
 
-impl ModuleBody {
+impl ModuleDefinitionBody {
     /// Add statement to module
-    pub fn add_statement(&mut self, statement: ModuleStatement) -> ParseResult<()> {
-        self.statements.push(statement.clone());
+    pub fn add_statement(&mut self, statement: ModuleDefinitionStatement) -> ParseResult<()> {
         match statement {
-            ModuleStatement::FunctionDefinition(function) => {
+            ModuleDefinitionStatement::FunctionDefinition(function) => {
                 self.add(function.into());
             }
-            ModuleStatement::ModuleDefinition(module) => {
+            ModuleDefinitionStatement::ModuleDefinition(module) => {
                 self.add(module.into());
             }
-            ModuleStatement::ModuleInitDefinition(init) => {
+            ModuleDefinitionStatement::ModuleInitDefinition(init) => {
                 // Initializers are only allowed after pre-init statements
                 // and before post-init statements.
                 // Other statements between pre-init and post-init are not allowed
@@ -72,7 +86,7 @@ impl ModuleBody {
         let src_ref = parameters.src_ref();
         let init = ModuleInitDefinition {
             parameters,
-            body: Vec::new(),
+            body: NodeBody::default(),
             src_ref,
         };
         self.inits.push(std::rc::Rc::new(init));
@@ -87,13 +101,13 @@ impl ModuleBody {
     }
 }
 
-impl SrcReferrer for ModuleBody {
+impl SrcReferrer for ModuleDefinitionBody {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()
     }
 }
 
-impl Symbols for ModuleBody {
+impl Symbols for ModuleDefinitionBody {
     fn fetch(&self, id: &Id) -> Vec<&Symbol> {
         self.symbols.fetch(id)
     }
@@ -108,20 +122,20 @@ impl Symbols for ModuleBody {
     }
 }
 
-impl Parse for ModuleBody {
+impl Parse for ModuleDefinitionBody {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::module_body);
-        let mut body = ModuleBody::default();
+        Parser::ensure_rule(&pair, Rule::module_definition_body);
+        let mut body = Self::default();
 
         for pair in pair.inner() {
             match pair.as_rule() {
-                Rule::module_statement => {
-                    let statement = ModuleStatement::parse(pair.clone())?;
+                Rule::module_definition_statement => {
+                    let statement = ModuleDefinitionStatement::parse(pair.clone())?;
                     body.add_statement(statement)?;
                 }
                 Rule::expression => {
                     let expression = Expression::parse(pair.clone())?;
-                    body.add_statement(ModuleStatement::Expression(expression))?;
+                    body.add_statement(ModuleDefinitionStatement::Expression(expression))?;
                 }
                 _ => {}
             }
@@ -133,26 +147,18 @@ impl Parse for ModuleBody {
     }
 }
 
-impl Eval for ModuleBody {
-    type Output = tree::Node;
-
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let node = tree::group();
-        let current = context.current_node();
-        context.set_current_node(node.clone());
-        for statement in &self.statements {
-            statement.eval(context)?;
-        }
-        context.set_current_node(current.clone());
-
-        Ok(node.clone())
-    }
-}
-
-impl std::fmt::Display for ModuleBody {
+impl std::fmt::Display for ModuleDefinitionBody {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, " {{")?;
-        for statement in &self.statements {
+        for statement in &self.pre_init_statements {
+            writeln!(f, "{}", statement)?;
+        }
+
+        for init in &self.inits {
+            writeln!(f, "{}", init)?;
+        }
+
+        for statement in &self.post_init_statements {
             writeln!(f, "{}", statement)?;
         }
         writeln!(f, "}}")?;

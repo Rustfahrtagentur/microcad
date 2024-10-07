@@ -13,7 +13,7 @@ pub struct ModuleDefinition {
     /// Module name
     pub name: Identifier,
     /// Module body
-    pub body: ModuleBody,
+    pub body: ModuleDefinitionBody,
     /// Source code reference
     src_ref: SrcRef,
 }
@@ -24,7 +24,7 @@ impl ModuleDefinition {
         ModuleDefinition {
             attributes: Vec::new(),
             name,
-            body: ModuleBody::default(),
+            body: ModuleDefinitionBody::default(),
             src_ref: SrcRef(None),
         }
     }
@@ -76,6 +76,7 @@ impl CallTrait for ModuleDefinition {
         }
 
         context.pop();
+
         Ok(Some(Value::Node(node)))
     }
 }
@@ -107,7 +108,7 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
         let mut attributes = Vec::new();
         let mut name = Identifier::default();
         let mut parameters = None;
-        let mut body = ModuleBody::default();
+        let mut body = ModuleDefinitionBody::default();
 
         for pair in pair.inner() {
             match pair.as_rule() {
@@ -120,10 +121,10 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
                 Rule::parameter_list => {
                     parameters = Some(ParameterList::parse(pair)?);
                 }
-                Rule::module_body => {
-                    body = ModuleBody::parse(pair.clone())?;
+                Rule::module_definition_body => {
+                    body = ModuleDefinitionBody::parse(pair.clone())?;
                 }
-                rule => unreachable!("Unexpected module definition, got {:?}", rule),
+                rule => unreachable!("Unexpected rule for module definition, got {:?}", rule),
             }
         }
 
