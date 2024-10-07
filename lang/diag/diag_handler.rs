@@ -28,6 +28,11 @@ impl DiagHandler {
     ) -> std::io::Result<()> {
         self.diag_list.pretty_print(w, source_file_by_hash)
     }
+
+    /// Returns true if there are errors
+    pub fn has_errors(&self) -> bool {
+        self.error_count > 0
+    }
 }
 
 impl PushDiag for DiagHandler {
