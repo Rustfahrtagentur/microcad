@@ -63,6 +63,22 @@ impl Context {
         self.stack.pop();
     }
 
+    /// Set new_node as current node, call function and set old node current
+    pub fn descend_node<F>(
+        &mut self,
+        new_node: microcad_core::render::Node,
+        f: F,
+    ) -> crate::eval::Result<microcad_core::render::Node>
+    where
+        F: FnOnce(&mut Self) -> crate::eval::Result<microcad_core::render::Node>,
+    {
+        let old_node: rctree::Node<tree::NodeInner> = self.current_node.clone();
+        self.set_current_node(new_node.clone());
+        f(self)?;
+        self.set_current_node(old_node);
+        Ok(new_node)
+    }
+
     /// Open a new scope and execute the given closure
     pub fn scope<F>(&mut self, f: F)
     where
