@@ -152,6 +152,7 @@ pub fn complement() -> Node {
 
 /// Short cut to generate boolean operator as binary operation with two nodes
 pub fn binary_op(op: BooleanOp, lhs: Node, rhs: Node) -> Node {
+    assert!(lhs != rhs, "lhs and rhs must be distinct.");
     let root = Node::new(NodeInner::Algorithm(Box::new(op)));
     root.append(lhs);
     root.append(rhs);
