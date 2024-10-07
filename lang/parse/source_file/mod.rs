@@ -25,7 +25,7 @@ pub trait GetSourceFileByHash {
     /// Convenience function to get source slice by `SrcRef`
     fn get_source_string(&self, src_ref: impl SrcReferrer) -> Option<&str> {
         if let Some(source_file) = self.get_source_file_by_src_ref(&src_ref) {
-            Some(source_file.get_slice_by_src_ref(src_ref.src_ref()))
+            Some(src_ref.src_ref().source_slice(&source_file.source))
         } else {
             None
         }
@@ -95,10 +95,6 @@ impl SourceFile {
     /// - `line`: line number beginning at `0`
     pub fn get_line(&self, line: usize) -> Option<&str> {
         self.source.lines().nth(line)
-    }
-
-    pub fn get_slice_by_src_ref(&self, src_ref: SrcRef) -> &str {
-        src_ref.source_slice(&self.source)
     }
 
     /// Evaluate the source file as a namespace
