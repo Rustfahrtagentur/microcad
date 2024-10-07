@@ -73,6 +73,7 @@ impl std::fmt::Display for NodeBodyStatement {
     }
 }
 
+/// A node body is a list of statements in curly brackets: `{a()}`
 #[derive(Clone, Debug, Default)]
 pub struct NodeBody {
     /// Node statements

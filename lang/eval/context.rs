@@ -63,7 +63,7 @@ impl Context {
         self.stack.pop();
     }
 
-    /// Set new_node as current node, call function and set old node current
+    /// Set new_node as current node, call function and set old node
     pub fn descend_node<F>(
         &mut self,
         new_node: microcad_core::render::Node,

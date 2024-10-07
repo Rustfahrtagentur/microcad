@@ -37,7 +37,7 @@ impl CallTrait for ModuleDefinition {
         let node = microcad_render::tree::group();
         context.set_current_node(node.clone());
 
-        // Lets evaluate the pre-init statements
+        // Let's evaluate the pre-init statements first
         for statement in &self.body.pre_init_statements {
             statement.eval(context)?;
         }

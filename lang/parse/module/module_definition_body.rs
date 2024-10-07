@@ -5,7 +5,7 @@
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
-/// Module body
+/// Module definition body
 ///
 /// An example for a module definition body:
 ///
