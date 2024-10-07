@@ -168,12 +168,35 @@ impl Eval for SourceFile {
     type Output = tree::Node;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let node = tree::root();
-        context.set_current_node(node.clone());
-        for statement in &self.body {
-            statement.eval(context)?;
+        let mut new_nodes = Vec::new();
+
+        // Descend into root node and find all child nodes
+        context.descend_node(tree::root(), |context| {
+            for statement in &self.body {
+                match statement {
+                    Statement::Expression(expression) => {
+                        // This statement has been evaluated into a new child node.
+                        // Add it to our `new_nodes` list
+                        if let Value::Node(node) = expression.eval(context)? {
+                            new_nodes.push(node);
+                        }
+                    }
+                    statement => {
+                        statement.eval(context)?;
+                    }
+                }
+            }
+
+            Ok(context.current_node().clone())
+        })?;
+
+        // Append all child nodes to root node
+        for node in new_nodes {
+            context.append_node(node);
         }
-        Ok(node)
+
+        // Return root node
+        Ok(context.current_node().clone())
     }
 }
 
