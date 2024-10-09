@@ -63,9 +63,7 @@ impl Eval for Nested {
                     }
                 }
                 NestedItem::NodeBody(body) => {
-                    values.push(Value::Node(
-                        context.descend_node(tree::group(), |context| body.eval(context))?,
-                    ));
+                    values.push(Value::Node(body.eval(context)?));
                 }
             }
         }
@@ -84,12 +82,7 @@ impl Eval for Nested {
             })
             .collect::<Vec<_>>();
 
-        // Finally, nest all nodes
-        for node_window in nodes.windows(2) {
-            node_window[0].append(node_window[1].clone());
-        }
-
-        Ok(Value::Node(nodes.first().unwrap().clone()))
+        Ok(Value::Node(tree::nest_nodes(nodes)))
     }
 }
 
