@@ -42,7 +42,8 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
             f.push_str(&format!(
                 r##"#[test]
                         fn r#{name}() {{
-                                                }}"##,
+                            {code}
+                        }}"##,
             ));
         }
     }
