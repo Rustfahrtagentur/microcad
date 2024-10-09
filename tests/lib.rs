@@ -82,19 +82,19 @@ fn export_tree_dump_for_source_file(file: &str) {
     let filename = path.file_name().unwrap().to_str().unwrap();
     println!("Exporting tree dump for {filename}");
 
-    export_tree_dump_for_input(&buf, &format!("../test_output/tests/{filename}.tree.dump"));
+    export_tree_dump_for_input(&buf, &format!("output/{filename}.tree.dump"));
 }
 
 #[test]
 fn test_algorithm_difference() {
-    export_tree_dump_for_source_file("std/algorithm_difference.µcad");
-    test_source_file("std/algorithm_difference.µcad");
+    export_tree_dump_for_source_file("test_cases/algorithm_difference.µcad");
+    test_source_file("test_cases/algorithm_difference.µcad");
 }
 
 #[test]
 fn test_node_body() {
-    export_tree_dump_for_source_file("std/node_body.µcad");
-    test_source_file("std/node_body.µcad");
+    export_tree_dump_for_source_file("test_cases/node_body.µcad");
+    test_source_file("test_cases/node_body.µcad");
 }
 
 #[test]
@@ -167,7 +167,7 @@ fn test_context_std() {
 fn test_simple_module_statement() {
     export_tree_dump_for_node(
         eval_input("std::geo2d::circle(radius = 3.0);"),
-        "../test_output/tests/simple_module_statement.tree.dump",
+        "output/simple_module_statement.tree.dump",
     );
 }
 
@@ -186,10 +186,7 @@ fn test_simple_module_definition() {
         "#,
     );
 
-    export_tree_dump_for_node(
-        root,
-        "../test_output/tests/simple_module_definition_root.tree.dump",
-    );
+    export_tree_dump_for_node(root, "output/simple_module_definition_root.tree.dump");
 
     // Check the module definition
     let module_definition = context
@@ -214,10 +211,7 @@ fn test_simple_module_definition() {
             ref inner => panic!("Expected node to be a Group, got {:?}", inner),
         }
 
-        export_tree_dump_for_node(
-            node,
-            "../test_output/tests/simple_module_definition.tree.dump",
-        );
+        export_tree_dump_for_node(node, "output/simple_module_definition.tree.dump");
     } else {
         panic!("Resulting value is not a node");
     }

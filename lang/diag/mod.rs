@@ -163,7 +163,7 @@ impl std::fmt::Display for Diag {
 #[test]
 fn test_diag_list() {
     let source_file =
-        crate::parse::SourceFile::load(r#"../tests/std/algorithm_difference.µcad"#).unwrap();
+        crate::parse::SourceFile::load(r#"../tests/test_cases/algorithm_difference.µcad"#).unwrap();
 
     let mut diagnostics = DiagList::default();
 
@@ -194,22 +194,22 @@ fn test_diag_list() {
     assert_eq!(
         result,
         "info: This is an info
-  ---> ../tests/std/algorithm_difference.µcad:1:1
+  ---> ../tests/test_cases/algorithm_difference.µcad:1:1
      |
    1 | use * from std;
      | ^^^^^^^^^^^^^^^
      |
 warning: This is a warning
-  ---> ../tests/std/algorithm_difference.µcad:4:1
+  ---> ../tests/test_cases/algorithm_difference.µcad:4:1
      |
-   4 | export(\"../test_output/tests/algorithm_difference.stl\") algorithm::difference() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 | export(\"output/algorithm_difference.stl\") algorithm::difference() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: This is an error
-  ---> ../tests/std/algorithm_difference.µcad:10:1
+  ---> ../tests/test_cases/algorithm_difference.µcad:10:1
      |
-  10 | export(\"../test_output/tests/algorithm_difference.svg\") algorithm::difference() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10 | export(\"output/algorithm_difference.svg\") algorithm::difference() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 "
     );

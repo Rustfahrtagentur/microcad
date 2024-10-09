@@ -1,4 +1,4 @@
 /target
 /tree/*.svg
 /Cargo.lock
-/test_output
+/tests/output
