@@ -1,0 +1,17 @@
+# Copyright © 2024 The µCAD authors <info@ucad.xyz>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[package]
+name = "microcad_source_file_test"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+regex = "1"
+rustfmt-wrapper = "0.2"
+anyhow = "1"
+walk_path = { path = "../walk_path" }
+env_logger = "0.11"
