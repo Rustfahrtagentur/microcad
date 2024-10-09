@@ -74,7 +74,7 @@ impl Depth for Node {
         if let Some(parent) = self.parent() {
             parent.depth() + 1
         } else {
-            1
+            0
         }
     }
 }
@@ -96,9 +96,8 @@ pub fn nest_nodes(nodes: Vec<Node>) -> Node {
 ///
 /// The depth of a node is marked by the number of white spaces
 pub fn dump(writer: &mut dyn std::io::Write, node: Node) -> std::io::Result<()> {
-    node.descendants().try_for_each(|child| {
-        writeln!(writer, "{}{:?}", "  ".repeat(child.depth()), child.borrow())
-    })
+    node.descendants()
+        .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
 }
 
 #[test]
