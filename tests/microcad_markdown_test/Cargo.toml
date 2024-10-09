@@ -14,4 +14,3 @@ regex = "1"
 rustfmt-wrapper = "0.2"
 anyhow = "1"
 walk_path = { path = "../walk_path" }
-env_logger = "0.11"

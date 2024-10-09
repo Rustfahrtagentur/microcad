@@ -37,8 +37,8 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
         Ok(code) =>
         // write all rust code at once
         {
-            std::fs::write(dest_path, code)
-                .context("cannot create file 'microcad_markdown_test.rs'")?;
+            std::fs::write(&dest_path, code)
+                .context(format!("cannot create file '{dest_path:?}'"))?;
             Ok(())
         }
         Err(rustfmt_wrapper::Error::Rustfmt(msg)) => {
