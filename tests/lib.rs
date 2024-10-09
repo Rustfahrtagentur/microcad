@@ -181,7 +181,7 @@ fn test_simple_module_definition() {
     use microcad_lang::parse::*;
 
     // Define a module `donut` with an implicit initializer `()` and call it
-    let (_, mut context) = eval_input_with_context(
+    let (root, mut context) = eval_input_with_context(
         r#"
         module donut() { 
             std::geo2d::circle(radius = 3.0); 
@@ -189,6 +189,11 @@ fn test_simple_module_definition() {
 
         donut();
         "#,
+    );
+
+    export_yaml_for_node(
+        root,
+        "../test_output/tests/simple_module_definition_root.yaml",
     );
 
     // Check the module definition
