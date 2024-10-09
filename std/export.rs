@@ -23,7 +23,7 @@ impl ExporterRegistry {
             "svg" => Self::make::<svg::SvgExporter>(settings),
             "stl" => Self::make::<stl::StlExporter>(settings),
             "ply" => Self::make::<ply::PlyExporter>(settings),
-            "yaml" => Self::make::<yaml::YamlExporter>(settings),
+            "tree.dump" => Self::make::<tree_dump::TreeDumpExporter>(settings),
             id => Err(microcad_core::CoreError::NoSuitableExporterFound(
                 id.to_string(),
             )),

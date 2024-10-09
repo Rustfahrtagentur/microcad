@@ -92,6 +92,15 @@ pub fn nest_nodes(nodes: Vec<Node>) -> Node {
     nodes[0].clone()
 }
 
+/// Dumps the tree structure of a node.
+///
+/// The depth of a node is marked by the number of white spaces
+pub fn dump(writer: &mut dyn std::io::Write, node: Node) -> std::io::Result<()> {
+    node.descendants().try_for_each(|child| {
+        writeln!(writer, "{}{:?}", "  ".repeat(child.depth()), child.borrow())
+    })
+}
+
 #[test]
 fn node_nest() {
     let nodes = vec![tree::group(), tree::group(), tree::group()];

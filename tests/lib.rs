@@ -41,20 +41,20 @@ fn eval_input(input: &str) -> microcad_core::render::Node {
 }
 
 #[cfg(test)]
-fn export_yaml_for_node(node: microcad_core::render::Node, yaml_file: &str) {
+fn export_tree_dump_for_node(node: microcad_core::render::Node, tree_dump_file: &str) {
     use microcad_export::Exporter;
-    let mut yaml_exporter = microcad_export::yaml::YamlExporter::from_settings(
-        &microcad_export::ExportSettings::with_filename(yaml_file.to_string()),
+    let mut tree_dump_exporter = microcad_export::tree_dump::TreeDumpExporter::from_settings(
+        &microcad_export::ExportSettings::with_filename(tree_dump_file.to_string()),
     )
     .unwrap();
 
-    yaml_exporter.export(node).unwrap();
+    tree_dump_exporter.export(node).unwrap();
 }
 
 #[cfg(test)]
-fn export_yaml_for_input(input: &str, yaml_file: &str) {
+fn export_tree_dump_for_input(input: &str, tree_dump_file: &str) {
     let node = eval_input(input);
-    export_yaml_for_node(node, yaml_file);
+    export_tree_dump_for_node(node, tree_dump_file);
 }
 
 #[cfg(test)]
@@ -70,7 +70,7 @@ fn test_source_file(file: &str) {
 }
 
 #[cfg(test)]
-fn export_yaml_for_source_file(file: &str) {
+fn export_tree_dump_for_source_file(file: &str) {
     let path = std::path::Path::new(file);
     let mut file = std::fs::File::open(file).unwrap();
 
@@ -80,26 +80,21 @@ fn export_yaml_for_source_file(file: &str) {
 
     // Extract filename without extension
     let filename = path.file_name().unwrap().to_str().unwrap();
-    println!("Exporting YAML for {filename}");
+    println!("Exporting tree dump for {filename}");
 
-    export_yaml_for_input(&buf, &format!("../test_output/tests/{filename}.yaml"));
+    export_tree_dump_for_input(&buf, &format!("../test_output/tests/{filename}.tree.dump"));
 }
 
 #[test]
 fn test_algorithm_difference() {
-    export_yaml_for_source_file("std/algorithm_difference.µcad");
+    export_tree_dump_for_source_file("std/algorithm_difference.µcad");
     test_source_file("std/algorithm_difference.µcad");
 }
 
 #[test]
 fn test_node_body() {
-    export_yaml_for_source_file("std/node_body.µcad");
+    export_tree_dump_for_source_file("std/node_body.µcad");
     test_source_file("std/node_body.µcad");
-}
-
-#[test]
-fn test_module_implicit_init() {
-    //export_yaml_for_source_file("std/module_implicit_init.µcad");
 }
 
 #[test]
@@ -170,9 +165,9 @@ fn test_context_std() {
 
 #[test]
 fn test_simple_module_statement() {
-    export_yaml_for_node(
+    export_tree_dump_for_node(
         eval_input("std::geo2d::circle(radius = 3.0);"),
-        "../test_output/tests/simple_module_statement.yaml",
+        "../test_output/tests/simple_module_statement.tree.dump",
     );
 }
 
@@ -191,9 +186,9 @@ fn test_simple_module_definition() {
         "#,
     );
 
-    export_yaml_for_node(
+    export_tree_dump_for_node(
         root,
-        "../test_output/tests/simple_module_definition_root.yaml",
+        "../test_output/tests/simple_module_definition_root.tree.dump",
     );
 
     // Check the module definition
@@ -219,7 +214,10 @@ fn test_simple_module_definition() {
             ref inner => panic!("Expected node to be a Group, got {:?}", inner),
         }
 
-        export_yaml_for_node(node, "../test_output/tests/simple_module_definition.yaml");
+        export_tree_dump_for_node(
+            node,
+            "../test_output/tests/simple_module_definition.tree.dump",
+        );
     } else {
         panic!("Resulting value is not a node");
     }

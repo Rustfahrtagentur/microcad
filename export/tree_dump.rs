@@ -1,7 +1,7 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! YAML Exporter
+//! Tree dump exporter
 
 use std::{fs::File, path::PathBuf};
 
@@ -9,12 +9,12 @@ use microcad_render::Node;
 
 use crate::*;
 
-/// Export into YAML file
-pub struct YamlExporter {
+/// Export a node into tree dump file
+pub struct TreeDumpExporter {
     filename: PathBuf,
 }
 
-impl Exporter for YamlExporter {
+impl Exporter for TreeDumpExporter {
     fn from_settings(settings: &ExportSettings) -> microcad_core::Result<Self>
     where
         Self: Sized,
@@ -29,23 +29,11 @@ impl Exporter for YamlExporter {
     fn export(&mut self, node: Node) -> microcad_core::Result<()> {
         let file = File::create(&self.filename)?;
         let mut writer = std::io::BufWriter::new(&file);
-
-        use std::io::Write;
-
-        use microcad_core::render::tree::Depth;
-
-        node.descendants().try_for_each(|child| {
-            writeln!(
-                writer,
-                "{}- {:?}",
-                "  ".repeat(child.depth()),
-                child.borrow()
-            )
-        })?;
+        microcad_render::tree::dump(&mut writer, node)?;
         Ok(())
     }
 
     fn file_extensions(&self) -> Vec<&str> {
-        vec!["yaml"]
+        vec!["tree.dump"]
     }
 }
