@@ -3,7 +3,7 @@
 
 //! Node body parser entity
 
-use microcad_render::Node;
+use microcad_render::{tree, Node};
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
@@ -41,24 +41,19 @@ impl Parse for NodeBodyStatement {
 }
 
 impl Eval for NodeBodyStatement {
-    type Output = ();
+    type Output = Option<Value>;
 
-    fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         match self {
-            Self::Use(use_statement) => use_statement.eval(context),
-            Self::Expression(expression) => {
-                let value = expression.eval(context)?;
-                match value {
-                    Value::Node(_) => Ok(()),
-                    _ => {
-                        //use crate::diagnostics::AddDiagnostic;
-                        // TODO Expression results should be Option<Value>
-                        //context.error(expression, format!("Expected node, got {}", value.ty()));
-                        Ok(())
-                    }
-                }
+            Self::Use(use_statement) => {
+                use_statement.eval(context)?;
+                Ok(None)
             }
-            Self::Assignment(assignment) => assignment.eval(context),
+            Self::Expression(expression) => Ok(Some(expression.eval(context)?)),
+            Self::Assignment(assignment) => {
+                assignment.eval(context)?;
+                Ok(None)
+            }
         }
     }
 }
@@ -98,7 +93,7 @@ impl Parse for NodeBody {
 
         for pair in pair.inner() {
             match pair.as_rule() {
-                Rule::module_definition_statement => {
+                Rule::node_body_statement => {
                     let statement = NodeBodyStatement::parse(pair.clone())?;
                     body.statements.push(statement);
                 }
@@ -121,11 +116,15 @@ impl Eval for NodeBody {
     type Output = Node;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+        let group = tree::group();
+
         for statement in &self.statements {
-            statement.eval(context)?;
+            if let Some(Value::Node(node)) = statement.eval(context)? {
+                group.append(node)
+            }
         }
 
-        Ok(context.current_node())
+        Ok(group)
     }
 }
 
