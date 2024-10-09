@@ -92,6 +92,12 @@ fn test_algorithm_difference() {
 }
 
 #[test]
+fn test_node_body() {
+    export_yaml_for_source_file("std/node_body.µcad");
+    test_source_file("std/node_body.µcad");
+}
+
+#[test]
 fn test_module_implicit_init() {
     //export_yaml_for_source_file("std/module_implicit_init.µcad");
 }
