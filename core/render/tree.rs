@@ -78,3 +78,30 @@ impl Depth for Node {
         }
     }
 }
+
+/// Nest a Vec of nodes
+///
+/// Assume, our `Vec<Node` has three nodes `a`, `b`, `c`.
+/// Then `c` will have `b` as parent and `b` will have `a` as parent.
+/// Node `a` will be returned.
+pub fn nest_nodes(nodes: Vec<Node>) -> Node {
+    for node_window in nodes.windows(2) {
+        node_window[0].append(node_window[1].clone());
+    }
+
+    nodes[0].clone()
+}
+
+#[test]
+fn node_nest() {
+    let nodes = vec![tree::group(), tree::group(), tree::group()];
+    let node = nest_nodes(nodes.clone());
+
+    nodes[0]
+        .descendants()
+        .for_each(|n| println!("{}{:?}", "  ".repeat(n.depth()), n.borrow()));
+
+    assert_eq!(nodes[2].parent().unwrap(), nodes[1]);
+    assert_eq!(nodes[1].parent().unwrap(), node);
+    assert!(node.parent().is_none());
+}
