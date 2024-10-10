@@ -60,8 +60,8 @@ fn export_tree_dump_for_input(input: &str, tree_dump_file: &str) {
 }
 
 #[cfg(test)]
-fn test_source_file(file: &str) {
-    let mut file = std::fs::File::open(file).unwrap();
+fn test_source_file(file_name: &str) {
+    let mut file = std::fs::File::open(file_name).unwrap();
 
     let mut buf = String::new();
     use std::io::Read;
@@ -69,6 +69,8 @@ fn test_source_file(file: &str) {
 
     let node = eval_input(&buf);
     microcad_std::export(node.clone()).unwrap();
+
+    export_tree_dump_for_source_file(file_name);
 }
 
 #[cfg(test)]
@@ -85,18 +87,6 @@ fn export_tree_dump_for_source_file(file: &str) {
     println!("Exporting tree dump for {filename}");
 
     export_tree_dump_for_input(&buf, &format!("output/{filename}.tree.dump"));
-}
-
-#[test]
-fn test_algorithm_difference() {
-    export_tree_dump_for_source_file("test_cases/algorithm_difference.µcad");
-    test_source_file("test_cases/algorithm_difference.µcad");
-}
-
-#[test]
-fn test_node_body() {
-    export_tree_dump_for_source_file("test_cases/node_body.µcad");
-    test_source_file("test_cases/node_body.µcad");
 }
 
 #[test]

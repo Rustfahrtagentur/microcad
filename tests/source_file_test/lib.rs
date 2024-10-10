@@ -77,11 +77,17 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
     let mut code = String::new();
 
     wp.scan(path.as_ref(), "µcad", &|tree, file_path| {
-        println!("{file_path:?}");
         insert(
             tree,
             file_path.file_stem().unwrap().to_str().unwrap(),
-            "/* test code */".into(),
+            format!(
+                r#"test_source_file("{file_path}");"#,
+                file_path = file_path // Escape characters correctly (e.g. backslashes in Windows paths)
+                    .to_str()
+                    .unwrap()
+                    .escape_default()
+                    .collect::<String>()
+            ),
         );
         Ok(true)
     })?;
