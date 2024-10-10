@@ -13,7 +13,7 @@ pub enum NestedItem {
     /// Qualified Name
     QualifiedName(QualifiedName),
     /// Module body
-    ModuleBody(ModuleBody),
+    NodeBody(NodeBody),
 }
 
 impl SrcReferrer for NestedItem {
@@ -21,7 +21,7 @@ impl SrcReferrer for NestedItem {
         match self {
             Self::Call(c) => c.src_ref(),
             Self::QualifiedName(qn) => qn.src_ref(),
-            Self::ModuleBody(mb) => mb.src_ref(),
+            Self::NodeBody(mb) => mb.src_ref(),
         }
     }
 }
@@ -31,7 +31,7 @@ impl Parse for NestedItem {
         match pair.clone().as_rule() {
             Rule::call => Ok(Self::Call(Call::parse(pair.clone())?)),
             Rule::qualified_name => Ok(Self::QualifiedName(QualifiedName::parse(pair.clone())?)),
-            Rule::module_body => Ok(Self::ModuleBody(ModuleBody::parse(pair.clone())?)),
+            Rule::node_body => Ok(Self::NodeBody(NodeBody::parse(pair.clone())?)),
             rule => unreachable!(
                 "NestedItem::parse expected call or qualified name, found {:?}",
                 rule
@@ -45,7 +45,7 @@ impl std::fmt::Display for NestedItem {
         match self {
             Self::Call(call) => write!(f, "{}", call),
             Self::QualifiedName(qualified_name) => write!(f, "{}", qualified_name),
-            Self::ModuleBody(body) => write!(f, "{}", body),
+            Self::NodeBody(body) => write!(f, "{}", body),
         }
     }
 }

@@ -28,9 +28,9 @@ Length are used in describing dimensions and must be given with a unit.
 millimeters = 1000mm;
 centimeters = 100cm;
 meters = 1m;
-inches = 39.37008in;
+inches = 39.37007874015748in;
 
-std::assert( millimeters == centimeters and meters == inches and millimeters == inches );
+std::assert( [millimeters, centimeters, meters, inches].equal() );
 ```
 
 ### Angle
@@ -39,22 +39,18 @@ Angles are used with rotations and in constrains when proving measures.
 
 ```µCAD,primitive.angle
 pi = std::math::pi;
-radian = 1rad;
+radian = 1rad * pi;
 degree = 180°;
 degree_ = 180deg;
-gradient = 180grad;
+gradian = 200grad;
 turn = 0.5turn;
 
-std::assert( radian == pi );
-std::assert( degree == pi );
-std::assert( degree == pi );
-std::assert( gradient == pi );
-std::assert( turn == pi );
+std::assert( [degree, degree_, gradian, turn, radian].equal() );
 ```
 
 ### Area
 
-```µCAD,primitive.area
+```µCAD,primitive.area#todo
 square_millimeter = 100000mm²;
 square_centimeter = 1000cm²;
 square_meter = 0.1m²;
@@ -67,7 +63,7 @@ std::assert(square_inch ~ 0.1m² +-1%);
 
 ### Volume
 
-```µCAD,primitive.volume
+```µCAD,primitive.volume#todo
 cubic_millimeter = 1000000mm³;
 cubic_centimeter = 100cl;
 cubic_meter = 0.001m³;
@@ -88,22 +84,22 @@ std::assert(milliliter = 1l);
 
 Text can be used to logging or to render text.
 
-```µCAD,primitive.string
+```µCAD,primitive.string#todo
 text = "Hello µCAD!";
 std::assert(text.count(11));
 
 // logging
-info(text);
+std::info(text);
 
 // render text
-std::geo2d::string(text);
+std::geo2d::text(text);
 ```
 
 ### Color
 
 Colors are defined by using hash mark (`#`) followed by hexadecimal digits for red, green and blue:
 
-```µCAD,primitive.color
+```µCAD,primitive.color#todo
 rgb_single_hex = #FFF;
 rgb_double_hex = #00FF00;
 rgba_single_hex = #FFFF;
@@ -123,7 +119,7 @@ no_color = #00FF0
 
 Weights can be calculated by applying volumes to materials.
 
-```µCAD,primitive.weight
+```µCAD,primitive.weight#todo
 gram = 1000g;
 kilogram = 1kg;
 pound = 2.204623lb;

@@ -3,14 +3,37 @@
 
 //! Module initialization definition parser entity
 
-use crate::{errors::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Module initialization definition
+///
+/// Example:
+///
+/// ```uCAD
+/// module a {
+///     init(b: length) {} // The init definition
+/// }
+/// ```
 #[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
-    _parameters: ParameterList,
-    _body: Vec<ModuleInitStatement>,
-    src_ref: SrcRef,
+    /// Parameter lsit for this init definition
+    pub parameters: ParameterList,
+    /// Body if the init definition
+    pub body: NodeBody,
+    /// Source reference
+    pub src_ref: SrcRef,
+}
+
+impl ModuleInitDefinition {
+    /// Call the initializer
+    pub fn call(&self, arg_map: &ArgumentMap, context: &mut Context) -> Result<()> {
+        for (name, value) in arg_map.iter() {
+            context.add(Symbol::Value(name.clone(), value.clone()));
+        }
+
+        self.body.eval(context)?;
+        Ok(())
+    }
 }
 
 impl SrcReferrer for ModuleInitDefinition {
@@ -22,28 +45,18 @@ impl SrcReferrer for ModuleInitDefinition {
 impl Parse for ModuleInitDefinition {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::module_init_definition);
-        let mut parameters = ParameterList::default();
-        let mut body = Vec::new();
-
-        for pair in pair.inner() {
-            match pair.as_rule() {
-                Rule::parameter_list => {
-                    parameters = ParameterList::parse(pair)?;
-                }
-                Rule::module_init_statement => {
-                    body.push(ModuleInitStatement::parse(pair)?);
-                }
-                Rule::COMMENT => {}
-                rule => unreachable!(
-                    "expected parameter_list or module_init_statement. Instead found {rule:?}"
-                ),
-            }
-        }
 
         Ok(ModuleInitDefinition {
-            _parameters: parameters,
-            _body: body,
+            parameters: pair.find(Rule::parameter_list).unwrap_or_default(),
+            body: pair.find(Rule::node_body).unwrap_or_default(),
             src_ref: pair.into(),
         })
+    }
+}
+
+impl std::fmt::Display for ModuleInitDefinition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "init({parameters}) ", parameters = self.parameters)?;
+        write!(f, "{body}", body = self.body)
     }
 }

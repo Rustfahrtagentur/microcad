@@ -183,6 +183,8 @@ impl Eval for Expression {
                     "*" => lhs * rhs,
                     "/" => lhs / rhs,
                     "^" => unimplemented!(), // lhs.pow(&rhs),
+                    "&" => lhs & rhs,
+                    "|" => lhs | rhs,
                     ">" => Ok(Value::Bool(Refer::new(lhs > rhs, SrcRef::merge(lhs, rhs)))),
                     "<" => Ok(Value::Bool(Refer::new(lhs < rhs, SrcRef::merge(lhs, rhs)))),
                     "≤" => Ok(Value::Bool(Refer::new(lhs <= rhs, SrcRef::merge(lhs, rhs)))),

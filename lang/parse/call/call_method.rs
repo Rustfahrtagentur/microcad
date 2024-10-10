@@ -8,7 +8,7 @@ use crate::{eval::*, parse::*, src_ref::*};
 /// Trait to call method of something.
 /// This for example used to call `vertices()` on a `Node`.
 /// In µCAD, this is used to return vertices of a geometry, like a `rect` in this example:
-/// ```µCAD
+/// ```uCAD
 /// corners = std::geo2d::rect(size = 4mm).vertices();
 /// ```
 pub trait CallMethod {
@@ -58,12 +58,24 @@ impl CallMethod for List {
         src_ref: SrcRef,
     ) -> Result<Value> {
         match name.into() {
+            "count" => Ok(Value::Integer(Refer::new(
+                self.len() as i64,
+                self.src_ref(),
+            ))),
             "equal" => {
-                let result = match self.first() {
-                    Some(first) => self.iter().all(|x| x == first),
+                let is_equal = match self.first() {
+                    Some(first) => self[1..].iter().all(|x| x == first),
                     None => true,
                 };
-                Ok(Value::Bool(Refer::new(result, src_ref)))
+                Ok(Value::Bool(Refer::new(is_equal, src_ref)))
+            }
+            "ascending" => {
+                let is_ascending = self.as_slice().windows(2).all(|w| w[0] <= w[1]);
+                Ok(Value::Bool(Refer::new(is_ascending, src_ref)))
+            }
+            "descending" => {
+                let is_descending = self.as_slice().windows(2).all(|w| w[0] >= w[1]);
+                Ok(Value::Bool(Refer::new(is_descending, src_ref)))
             }
             method => Err(EvalError::UnknownMethod(method.into())),
         }
@@ -93,7 +105,7 @@ fn call_method() {
         // We expect a [(x: length, y: length)]
         assert_eq!(value_list.ty(), crate::r#type::Type::Vec2);
 
-        // A rect as 4 corners
+        // A rect has 4 corners
         assert_eq!(value_list.len(), 4);
     } else {
         panic!("Expected a list of values");

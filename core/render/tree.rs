@@ -74,7 +74,42 @@ impl Depth for Node {
         if let Some(parent) = self.parent() {
             parent.depth() + 1
         } else {
-            1
+            0
         }
     }
+}
+
+/// Nest a Vec of nodes
+///
+/// Assume, our `Vec<Node` has three nodes `a`, `b`, `c`.
+/// Then `c` will have `b` as parent and `b` will have `a` as parent.
+/// Node `a` will be returned.
+pub fn nest_nodes(nodes: Vec<Node>) -> Node {
+    for node_window in nodes.windows(2) {
+        node_window[0].append(node_window[1].clone());
+    }
+
+    nodes[0].clone()
+}
+
+/// Dumps the tree structure of a node.
+///
+/// The depth of a node is marked by the number of white spaces
+pub fn dump(writer: &mut dyn std::io::Write, node: Node) -> std::io::Result<()> {
+    node.descendants()
+        .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
+}
+
+#[test]
+fn node_nest() {
+    let nodes = vec![tree::group(), tree::group(), tree::group()];
+    let node = nest_nodes(nodes.clone());
+
+    nodes[0]
+        .descendants()
+        .for_each(|n| println!("{}{:?}", "  ".repeat(n.depth()), n.borrow()));
+
+    assert_eq!(nodes[2].parent().unwrap(), nodes[1]);
+    assert_eq!(nodes[1].parent().unwrap(), node);
+    assert!(node.parent().is_none());
 }

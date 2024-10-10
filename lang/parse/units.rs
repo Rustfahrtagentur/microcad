@@ -170,7 +170,7 @@ impl Unit {
             | Self::Liter => Type::Volume,
         }
     }
-    /// Normalize value to mm, deg or gram
+    /// Normalize value to mm, rad or gram
     pub fn normalize(self, x: f64) -> f64 {
         match self {
             // Scalar
@@ -184,11 +184,10 @@ impl Unit {
             Self::In => x * 25.4_f64,
 
             // Angles
-            Self::Deg => x,
-            Self::DegS => x,
-            Self::Grad => x * (360. / 180.),
-            Self::Turn => x * 360_f64,
-            Self::Rad => x * (360. / std::f32::consts::TAU) as f64,
+            Self::Deg | Self::DegS => x / 180. * std::f64::consts::PI,
+            Self::Grad => x / 200. * std::f64::consts::PI,
+            Self::Turn => x * 2.0 * std::f64::consts::PI,
+            Self::Rad => x,
 
             // Weights
             Self::G => x,

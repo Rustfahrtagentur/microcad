@@ -120,13 +120,15 @@ impl PartialOrd for Value {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         match (self, other) {
             (Value::Integer(lhs), Value::Integer(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Length(lhs), Value::Length(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Area(lhs), Value::Area(rhs)) => lhs.partial_cmp(rhs),
-            (Value::Volume(lhs), Value::Volume(rhs)) => lhs.partial_cmp(rhs),
+            (Value::Scalar(lhs), Value::Scalar(rhs))
+            | (Value::Length(lhs), Value::Length(rhs))
+            | (Value::Area(lhs), Value::Area(rhs))
+            | (Value::Volume(lhs), Value::Volume(rhs))
+            | (Value::Angle(lhs), Value::Angle(rhs))
+            | (Value::Angle(lhs), Value::Scalar(rhs))
+            | (Value::Scalar(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
             (Value::Vec2(lhs), Value::Vec2(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
             (Value::Vec3(lhs), Value::Vec3(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
-            (Value::Angle(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
             _ => None,
         }
     }
@@ -277,6 +279,13 @@ impl std::ops::Sub for Value {
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
                 Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
+            (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
+                microcad_core::algorithm::boolean_op::binary_op(
+                    algorithm::BooleanOp::Difference,
+                    lhs,
+                    rhs,
+                ),
+            )),
             _ => Err(EvalError::InvalidOperator("-".into())),
         }
     }
@@ -356,6 +365,42 @@ impl std::ops::Div for Value {
             (Value::Length(lhs), Value::Scalar(rhs)) => Ok(Value::Length(lhs / rhs)),
             (Value::Angle(lhs), Value::Scalar(rhs)) => Ok(Value::Angle(lhs / rhs)),
             _ => Err(EvalError::InvalidOperator("/".into())),
+        }
+    }
+}
+
+/// Rules for operator | (union operator)
+impl std::ops::BitOr for Value {
+    type Output = ValueResult;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        match (self, rhs) {
+            (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
+                microcad_core::algorithm::boolean_op::binary_op(
+                    algorithm::BooleanOp::Union,
+                    lhs,
+                    rhs,
+                ),
+            )),
+            _ => Err(EvalError::InvalidOperator("|".into())),
+        }
+    }
+}
+
+/// Rules for operator & (intersection operator)
+impl std::ops::BitAnd for Value {
+    type Output = ValueResult;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        match (self, rhs) {
+            (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
+                microcad_core::algorithm::boolean_op::binary_op(
+                    algorithm::BooleanOp::Intersection,
+                    lhs,
+                    rhs,
+                ),
+            )),
+            _ => Err(EvalError::InvalidOperator("&".into())),
         }
     }
 }

@@ -163,4 +163,8 @@ pub enum EvalError {
     /// Cannot concat two vec with different types
     #[error("Cannot concat two vec with different types {0} and {1}")]
     CannotCombineVecOfDifferentType(Type, Type),
+
+    /// Cannot continue evaluation after error limit has been reached
+    #[error("Error limit reached: Stopped evaluation after {0} errors.")]
+    ErrorLimitReached(u32),
 }

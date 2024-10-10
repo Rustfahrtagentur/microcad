@@ -14,6 +14,10 @@ fn main() {
     );
 
     if let Err(err) = microcad_markdown_test::generate("..") {
-        panic!("error generating rust test code: {err}");
+        panic!("error generating rust test code from markdown file: {err}");
+    }
+
+    if let Err(err) = microcad_source_file_test::generate("test_cases") {
+        panic!("error generating rust test code from source: {err}");
     }
 }

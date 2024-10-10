@@ -71,6 +71,16 @@ impl Eval for ParameterList {
     }
 }
 
+impl std::fmt::Display for ParameterList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for parameter in self.0.value.iter() {
+            write!(f, "{parameter}, ")?;
+        }
+
+        Ok(())
+    }
+}
+
 /// Short cut to create a `ParameterList` instance
 #[macro_export]
 macro_rules! parameter_list {

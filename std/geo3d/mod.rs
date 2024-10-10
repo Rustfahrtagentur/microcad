@@ -60,7 +60,7 @@ impl Renderable3D for Cube {
 
 use crate::NamespaceBuilder;
 
-pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
+pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
     NamespaceBuilder::new("geo3d")
         .add(Sphere::builtin_module().into())
         .add(Cube::builtin_module().into())

@@ -1,36 +1,40 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Remember source code position for diagnosis
+//! Handling of diagnostics with source code references
 
+mod diag_handler;
 mod diag_list;
 mod level;
 
+pub use diag_handler::*;
 pub use diag_list::*;
 pub use level::*;
 
-use crate::{parse::GetSourceFileByHash, src_ref::*};
+use crate::{parse::*, src_ref::*};
 
 /// A trait to add diagnostics with different levels conveniently
 pub trait PushDiag {
     /// Push a diagnostic message (must be implemented)
-    fn push_diag(&mut self, diag: Diag);
+    fn push_diag(&mut self, diag: Diag) -> crate::eval::Result<()>;
 
     /// Push new trace message
     fn trace(&mut self, src: impl SrcReferrer, message: String) {
-        self.push_diag(Diag::Trace(Refer::new(message, src.src_ref())));
+        self.push_diag(Diag::Trace(Refer::new(message, src.src_ref())))
+            .unwrap();
     }
     /// Push new informative message
     fn info(&mut self, src: impl SrcReferrer, message: String) {
-        self.push_diag(Diag::Info(Refer::new(message, src.src_ref())));
+        self.push_diag(Diag::Info(Refer::new(message, src.src_ref())))
+            .unwrap();
     }
     /// Push new warning
-    fn warning(&mut self, src: impl SrcReferrer, error: anyhow::Error) {
-        self.push_diag(Diag::Warning(Refer::new(error, src.src_ref())));
+    fn warning(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> crate::eval::Result<()> {
+        self.push_diag(Diag::Warning(Refer::new(error, src.src_ref())))
     }
     /// Push new error
-    fn error(&mut self, src: impl SrcReferrer, error: anyhow::Error) {
-        self.push_diag(Diag::Error(Refer::new(error, src.src_ref())));
+    fn error(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> crate::eval::Result<()> {
+        self.push_diag(Diag::Error(Refer::new(error, src.src_ref())))
     }
 }
 
@@ -157,9 +161,9 @@ impl std::fmt::Display for Diag {
 }
 
 #[test]
-fn test_diag() {
+fn test_diag_list() {
     let source_file =
-        crate::parse::SourceFile::load(r#"../tests/std/algorithm_difference.µcad"#).unwrap();
+        crate::parse::SourceFile::load(r#"../tests/test_cases/algorithm_difference.µcad"#).unwrap();
 
     let mut diagnostics = DiagList::default();
 
@@ -167,8 +171,12 @@ fn test_diag() {
     use anyhow::anyhow;
 
     diagnostics.info(body_iter.next().unwrap(), "This is an info".to_string());
-    diagnostics.warning(body_iter.next().unwrap(), anyhow!("This is a warning"));
-    diagnostics.error(body_iter.next().unwrap(), anyhow!("This is an error"));
+    diagnostics
+        .warning(body_iter.next().unwrap(), anyhow!("This is a warning"))
+        .unwrap();
+    diagnostics
+        .error(body_iter.next().unwrap(), anyhow!("This is an error"))
+        .unwrap();
 
     assert_eq!(diagnostics.len(), 3);
     let mut output = std::io::Cursor::new(Vec::new());
@@ -186,22 +194,22 @@ fn test_diag() {
     assert_eq!(
         result,
         "info: This is an info
-  ---> ../tests/std/algorithm_difference.µcad:1:1
+  ---> ../tests/test_cases/algorithm_difference.µcad:1:1
      |
    1 | use * from std;
      | ^^^^^^^^^^^^^^^
      |
 warning: This is a warning
-  ---> ../tests/std/algorithm_difference.µcad:4:1
+  ---> ../tests/test_cases/algorithm_difference.µcad:4:1
      |
-   4 | export(\"../test_output/tests/algorithm_difference.stl\") algorithm::difference() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 | export(\"output/algorithm_difference.stl\") algorithm::difference() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: This is an error
-  ---> ../tests/std/algorithm_difference.µcad:10:1
+  ---> ../tests/test_cases/algorithm_difference.µcad:10:1
      |
-  10 | export(\"../test_output/tests/algorithm_difference.svg\") algorithm::difference() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10 | export(\"output/algorithm_difference.svg\") algorithm::difference() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 "
     );

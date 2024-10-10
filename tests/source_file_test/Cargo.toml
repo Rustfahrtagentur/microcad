@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [package]
-name = "microcad_markdown_test"
+name = "microcad_source_file_test"
 version = "0.1.0"
 edition = "2021"
 
@@ -14,3 +14,4 @@ regex = "1"
 rustfmt-wrapper = "0.2"
 anyhow = "1"
 walk_path = { path = "../walk_path" }
+env_logger = "0.11"

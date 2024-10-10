@@ -13,13 +13,22 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use microcad_render::tree;
 
 /// Trait to get a source file by its hash
-pub trait GetSourceFileByHash: std::fmt::Debug {
+pub trait GetSourceFileByHash {
     /// Get a source file by its hash
     fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile>;
 
     /// Convenience function to get a source file by from a `SrcRef`
     fn get_source_file_by_src_ref(&self, src_ref: impl SrcReferrer) -> Option<&SourceFile> {
         self.get_source_file_by_hash(src_ref.src_ref().source_hash())
+    }
+
+    /// Convenience function to get source slice by `SrcRef`
+    fn get_source_string(&self, src_ref: impl SrcReferrer) -> Option<&str> {
+        if let Some(source_file) = self.get_source_file_by_src_ref(&src_ref) {
+            Some(src_ref.src_ref().source_slice(&source_file.source))
+        } else {
+            None
+        }
     }
 }
 
@@ -31,7 +40,7 @@ pub struct SourceFile {
     /// Name of loaded file or `None`
     pub filename: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
-    _source: String,
+    source: String,
 
     /// Hash of the source file
     ///
@@ -85,7 +94,7 @@ impl SourceFile {
     ///
     /// - `line`: line number beginning at `0`
     pub fn get_line(&self, line: usize) -> Option<&str> {
-        self._source.lines().nth(line)
+        self.source.lines().nth(line)
     }
 
     /// Evaluate the source file as a namespace
@@ -149,7 +158,7 @@ impl Parse for SourceFile {
         Ok(SourceFile {
             body,
             filename: None,
-            _source: pair.as_span().as_str().to_string(),
+            source: pair.as_span().as_str().to_string(),
             hash,
         })
     }
@@ -159,12 +168,35 @@ impl Eval for SourceFile {
     type Output = tree::Node;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let node = tree::root();
-        context.set_current_node(node.clone());
-        for statement in &self.body {
-            statement.eval(context)?;
+        let mut new_nodes = Vec::new();
+
+        // Descend into root node and find all child nodes
+        context.descend_node(tree::root(), |context| {
+            for statement in &self.body {
+                match statement {
+                    Statement::Expression(expression) => {
+                        // This statement has been evaluated into a new child node.
+                        // Add it to our `new_nodes` list
+                        if let Value::Node(node) = expression.eval(context)? {
+                            new_nodes.push(node);
+                        }
+                    }
+                    statement => {
+                        statement.eval(context)?;
+                    }
+                }
+            }
+
+            Ok(context.current_node().clone())
+        })?;
+
+        // Append all child nodes to root node
+        for node in new_nodes {
+            context.append_node(node);
         }
-        Ok(node)
+
+        // Return root node
+        Ok(context.current_node().clone())
     }
 }
 
@@ -202,9 +234,7 @@ fn load_source_file() {
 
     crate::env_logger_init();
 
-    info!("{:?}", std::env::current_dir());
-
-    let source_file = SourceFile::load(r#"../tests/std/algorithm_difference.µcad"#);
+    let source_file = SourceFile::load(r#"../tests/test_cases/algorithm_difference.µcad"#);
     if let Err(ref err) = source_file {
         error!("{err}");
     }
@@ -216,7 +246,7 @@ fn load_source_file() {
         Statement::Use(u) => {
             use crate::src_ref::SrcReferrer;
             assert_eq!(
-                u.src_ref().source_slice(&source_file._source),
+                u.src_ref().source_slice(&source_file.source),
                 "use * from std;"
             );
         }

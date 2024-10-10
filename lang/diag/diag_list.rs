@@ -15,7 +15,7 @@ impl DiagList {
     ) -> std::io::Result<()> {
         self.0
             .iter()
-            .try_for_each(|diags| diags.pretty_print(w, source_file_by_hash))
+            .try_for_each(|diag| diag.pretty_print(w, source_file_by_hash))
     }
 }
 
@@ -28,7 +28,8 @@ impl Deref for DiagList {
 }
 
 impl PushDiag for DiagList {
-    fn push_diag(&mut self, diag: Diag) {
+    fn push_diag(&mut self, diag: Diag) -> crate::eval::Result<()> {
         self.0.push(diag);
+        Ok(())
     }
 }

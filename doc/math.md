@@ -7,15 +7,12 @@
 Calculate absolute value:
 
 ```µCAD,abs
-use std::assert;
-use std::math::abs;
-
-assert(abs(-1.0) == 1);
+std::assert(std::math::abs(-1.0) == 1.0);
 ```
 
 ### Trigonometric functions
 
-```µCAD,trigonometric
+```µCAD,trigonometric#todo
 use std::assert;
 use * from std::math;
 
@@ -28,7 +25,7 @@ assert(sin(x)^2 + cos(x)^2 == 1.0);
 
 ### PI
 
-```µCAD,pi
+```µCAD,pi#todo
 use std::assert;
 use std::math::PI;
 

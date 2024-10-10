@@ -7,7 +7,7 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Module statement
 #[derive(Clone, Debug, strum::IntoStaticStr)]
-pub enum ModuleStatement {
+pub enum ModuleDefinitionStatement {
     /// Use statement
     Use(UseStatement),
     /// Expression
@@ -24,7 +24,7 @@ pub enum ModuleStatement {
     ModuleInitDefinition(std::rc::Rc<ModuleInitDefinition>),
 }
 
-impl SrcReferrer for ModuleStatement {
+impl SrcReferrer for ModuleDefinitionStatement {
     fn src_ref(&self) -> SrcRef {
         match self {
             Self::Use(us) => us.src_ref(),
@@ -38,9 +38,9 @@ impl SrcReferrer for ModuleStatement {
     }
 }
 
-impl Parse for ModuleStatement {
+impl Parse for ModuleDefinitionStatement {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::module_statement);
+        Parser::ensure_rule(&pair, Rule::module_definition_statement);
         let first = pair.inner().next().unwrap();
         Ok(match first.as_rule() {
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
@@ -48,7 +48,7 @@ impl Parse for ModuleStatement {
                 Self::Expression(Expression::parse(first)?)
             }
             Rule::assignment => Self::Assignment(Assignment::parse(first)?),
-            Rule::for_statement => Self::For(ForStatement::parse(first)?),
+            Rule::module_for_statement => Self::For(ForStatement::parse(first)?),
             Rule::module_definition => {
                 Self::ModuleDefinition(std::rc::Rc::<ModuleDefinition>::parse(first)?)
             }
@@ -67,7 +67,7 @@ impl Parse for ModuleStatement {
     }
 }
 
-impl Eval for ModuleStatement {
+impl Eval for ModuleDefinitionStatement {
     type Output = ();
 
     fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
@@ -100,7 +100,7 @@ impl Eval for ModuleStatement {
     }
 }
 
-impl std::fmt::Display for ModuleStatement {
+impl std::fmt::Display for ModuleDefinitionStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Use(use_statement) => write!(f, "{use_statement}"),
@@ -113,7 +113,9 @@ impl std::fmt::Display for ModuleStatement {
             Self::FunctionDefinition(function_definition) => {
                 write!(f, "{}", function_definition.name)
             }
-            Self::ModuleInitDefinition(_) => write!(f, "module init"),
+            Self::ModuleInitDefinition(module_init_definition) => {
+                write!(f, "{module_init_definition}")
+            }
         }
     }
 }

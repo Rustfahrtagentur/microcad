@@ -8,6 +8,6 @@
 pub mod ply;
 pub mod stl;
 pub mod svg;
-pub mod yaml;
+pub mod tree_dump;
 
 pub use microcad_core::{ExportSettings, Exporter};

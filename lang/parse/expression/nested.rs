@@ -3,6 +3,8 @@
 
 //! Nested item list parser entity
 
+use microcad_render::tree;
+
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Nested item list
@@ -16,7 +18,7 @@ impl Parse for Nested {
         Ok(Self(
             pair.inner()
                 .filter(|pair| {
-                    [Rule::qualified_name, Rule::call, Rule::module_body].contains(&pair.as_rule())
+                    [Rule::qualified_name, Rule::call, Rule::node_body].contains(&pair.as_rule())
                 })
                 .map(NestedItem::parse)
                 .collect::<ParseResult<_>>()?,
@@ -34,13 +36,13 @@ impl Eval for Nested {
     type Output = Value;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let root = context.current_node();
-
         let mut values = Vec::new();
         for (index, item) in self.0.iter().enumerate() {
             match item {
                 NestedItem::Call(call) => match call.eval(context)? {
-                    Some(value) => values.push(value),
+                    Some(value) => {
+                        values.push(value);
+                    }
                     None => {
                         if index != 0 {
                             return Err(EvalError::CannotNestFunctionCall);
@@ -60,10 +62,8 @@ impl Eval for Nested {
                         }
                     }
                 }
-                NestedItem::ModuleBody(body) => {
-                    let new_node = body.eval(context)?;
-                    new_node.detach();
-                    values.push(Value::Node(new_node));
+                NestedItem::NodeBody(body) => {
+                    values.push(Value::Node(body.eval(context)?));
                 }
             }
         }
@@ -74,23 +74,15 @@ impl Eval for Nested {
             return Ok(values[0].clone());
         }
 
-        // Finally, nest all nodes
-        for value in values {
-            match value {
-                Value::Node(node) => {
-                    node.detach();
-                    let nested = context.append_node(node);
-                    context.set_current_node(nested);
-                }
-                _ => {
-                    return Err(EvalError::CannotNestFunctionCall);
-                }
-            }
-        }
+        let nodes = values
+            .iter()
+            .filter_map(|v| match v {
+                Value::Node(node) => Some(node.clone()),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
 
-        context.set_current_node(root.clone());
-
-        Ok(Value::Node(root.clone()))
+        Ok(Value::Node(tree::nest_nodes(nodes)))
     }
 }
 

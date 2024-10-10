@@ -54,7 +54,7 @@ impl Parse for Statement {
                 Self::FunctionDefinition(std::rc::Rc::<FunctionDefinition>::parse(first)?)
             }
             Rule::assignment => Self::Assignment(Assignment::parse(first)?),
-            Rule::for_statement => Self::For(ForStatement::parse(first)?),
+            Rule::module_for_statement => Self::For(ForStatement::parse(first)?),
             Rule::expression | Rule::expression_no_semicolon => {
                 Self::Expression(Expression::parse(first)?)
             }

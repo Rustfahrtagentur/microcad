@@ -11,7 +11,6 @@ use microcad_render::tree;
 ///
 /// The context is used to store the current state of the evaluation.
 /// A context is essentially a stack of symbol tables
-#[derive(Debug)]
 pub struct Context {
     /// Stack of symbol tables
     stack: Vec<SymbolTable>,
@@ -26,7 +25,7 @@ pub struct Context {
     source_files: SourceFileCache,
 
     /// Source file diagnostics
-    diagnostics: DiagList,
+    diag_handler: DiagHandler,
 }
 
 impl Context {
@@ -36,8 +35,7 @@ impl Context {
             stack: vec![SymbolTable::default()],
             current_node: tree::root(),
             current_source_file: Some(std::rc::Rc::new(source_file)),
-            source_files: SourceFileCache::default(),
-            diagnostics: DiagList::default(),
+            ..Default::default()
         }
     }
 
@@ -55,11 +53,6 @@ impl Context {
         self.current_source_file.clone()
     }
 
-    /// Read-only access to the diagnostics
-    pub fn diagnostics(&self) -> &DiagList {
-        &self.diagnostics
-    }
-
     /// Push a new symbol table to the stack (enter a new scope)
     pub fn push(&mut self) {
         self.stack.push(SymbolTable::default());
@@ -70,6 +63,22 @@ impl Context {
         self.stack.pop();
     }
 
+    /// Set new_node as current node, call function and set old node
+    pub fn descend_node<F>(
+        &mut self,
+        new_node: microcad_core::render::Node,
+        f: F,
+    ) -> crate::eval::Result<microcad_core::render::Node>
+    where
+        F: FnOnce(&mut Self) -> crate::eval::Result<microcad_core::render::Node>,
+    {
+        let old_node: rctree::Node<tree::NodeInner> = self.current_node.clone();
+        self.set_current_node(new_node.clone());
+        f(self)?;
+        self.set_current_node(old_node);
+        Ok(new_node)
+    }
+
     /// Open a new scope and execute the given closure
     pub fn scope<F>(&mut self, f: F)
     where
@@ -78,6 +87,11 @@ impl Context {
         self.push();
         f(self);
         self.pop();
+    }
+
+    /// Read-only access to diagnostic handler
+    pub fn diag(&self) -> &DiagHandler {
+        &self.diag_handler
     }
 
     /// Fetch symbols by qualified name
@@ -105,9 +119,9 @@ impl Context {
     }
 }
 
-impl crate::diag::PushDiag for Context {
-    fn push_diag(&mut self, diagnostic: Diag) {
-        self.diagnostics.push_diag(diagnostic);
+impl PushDiag for Context {
+    fn push_diag(&mut self, diag: Diag) -> crate::eval::Result<()> {
+        self.diag_handler.push_diag(diag)
     }
 }
 
@@ -147,7 +161,7 @@ impl Default for Context {
             current_node: tree::root(),
             current_source_file: None,
             source_files: SourceFileCache::default(),
-            diagnostics: DiagList::default(),
+            diag_handler: DiagHandler::default(),
         }
     }
 }

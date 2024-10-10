@@ -30,7 +30,7 @@ use microcad_core::ExportSettings;
 use namespace_builder::NamespaceBuilder;
 
 /// Build the standard module
-pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
+pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
     NamespaceBuilder::new("std")
         // TODO: is this correct= Shouldn't this use add_builtin_module() =
         .add(math::builtin_module().into())
@@ -50,11 +50,16 @@ pub fn builtin_module() -> std::rc::Rc<ModuleDefinition> {
                     if !condition {
                         use anyhow::anyhow;
                         use microcad_lang::diag::PushDiag;
-                        ctx.error(args.src_ref(), anyhow!("Assertion failed: {message}"));
-                        Err(EvalError::AssertionFailed(message))
-                    } else {
-                        Ok(None)
+
+                        if let Some(condition_src) =
+                            ctx.get_source_string(args["condition"].src_ref())
+                        {
+                            ctx.error(args.src_ref(), anyhow!("{message}: {condition_src}",))?;
+                        } else {
+                            ctx.error(args.src_ref(), anyhow!("{message}"))?;
+                        }
                     }
+                    Ok(None)
                 },
             )
             .into(),

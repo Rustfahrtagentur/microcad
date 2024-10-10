@@ -80,6 +80,14 @@ pub enum ParseError {
     /// Missing format expression
     #[error("Missing format expression")]
     MissingFormatExpression,
+
+    /// Statement between two init statements
+    #[error("Statement between two init statements")]
+    StatementBetweenModuleInit,
+
+    /// A module has both a parameter list and initializer
+    #[error("Module has both a parameter list and initializer")]
+    BothParameterListAndInitializer,
 }
 
 /// Result with parse error

@@ -217,7 +217,6 @@ use_statement = { "use" ~ ws+ ~ qualified_name_list ~ ws* ~ ";"
 }
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 
-
 //`translate() rotate()`: ok
 //`translate() rotate() { translate() rotate() {} }`: ok
 //`rotate() {}`: ok
@@ -225,9 +224,9 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`{ translate() rotate(); }`: ok
 //`{} {}`: error # Cannot nest module bodies
 //`holes.edges`: error # No tuple access in nested module
-nested = { nested_with_module_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
+nested = { nested_with_node_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
 
-nested_with_module_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ module_body }
+nested_with_node_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ node_body }
 
 //`-5.0mm`: ok # Negate
 //`(a+b)*(c-a)`: ok 
@@ -302,7 +301,7 @@ expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 //`a {}`: ok # Module body at the end
 //`b c`: error # No module body at the end
 //`a b()`: error # No module body at the end
-expression_no_semicolon = { nested_with_module_body }
+expression_no_semicolon = { nested_with_node_body }
 
 // A statement that is an single expression
 expression_statement = _{ expression_no_semicolon ~ (ws* ~ ";")? | expression ~ ws* ~ ";" }
@@ -363,6 +362,22 @@ assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expressio
 assignment_statement = _{ assignment ~ ws* ~ ";" }
 
 
+//`{ a() }`: ok # Single expression
+//`{ a() b(); c(); }: ok # Nested multiexpression
+node_body = { "{" ~ ws* ~ node_body_inner? ~ ws* ~ "}" }
+
+node_body_inner = _{ 
+  ws* ~ (node_body_statement ~ ws*)+ |
+  ws* ~ (node_body_statement ~ ws*)* ~ expression 
+}
+
+node_body_statement = { 
+  use_statement | 
+  assignment_statement | 
+  expression_statement |
+  module_for_statement
+}
+
 // Rule for a single parameter of a definition
 //`r: length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
@@ -419,47 +434,37 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { init(size: length) { rectangle(size); } }`: ok # Module with init function
 //`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
 //`module donut(radius) { }`: error # Module must have type annotations
-module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_body }
+module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_definition_body }
 
 //`{ translate() rotate(); }`: ok
 //`{ translate() }`: ok # Single expression block (no semicolon)
 //`{}`: ok # Empty block
-module_body = { "{" ~ ws* ~ module_inner? ~ ws* ~ "}" }
+module_definition_body = { "{" ~ ws* ~ module_definition_inner? ~ ws* ~ "}" }
 
-module_inner = _{ 
-  ws* ~ (module_statement ~ ws*)+ | 
-  ws* ~ (module_statement ~ ws*)* ~ (function_definition | expression) 
+module_definition_inner = _{ 
+  ws* ~ (module_definition_statement ~ ws*)+ | 
+  ws* ~ (module_definition_statement ~ ws*)* ~ (function_definition | expression) 
 }
 
-module_statement = { 
+module_definition_statement = { 
   use_statement |
   module_definition |
   function_definition |
   module_init_definition |
-  for_statement |
+  module_for_statement |
   assignment_statement |
   expression_statement
 }
 
+
+
 //`init(d: length) { r = d / 2; }`: ok
 //`init(size: length) { size = size; }`: ok
 //`init(size: length) { rectangle(size); }: ok
-module_init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ "{" ~ ws* ~ module_init_inner? ~ ws* ~ "}" }
-
-module_init_statement = { 
-  use_statement | 
-  function_definition | 
-  assignment_statement | 
-  expression_statement 
-}
-
-module_init_inner = _{ 
-  ws* ~ (module_init_statement ~ ws*)+ |
-  ws* ~ (module_init_statement ~ ws*)* ~ expression 
-}
+module_init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ node_body }
 
 //`for i in [0..10] { translate(x = i*5mm); }`: ok
-for_statement = { "for" ~ ws* ~ identifier ~ ws* ~ "in" ~ ws* ~ expression ~ ws* ~ module_body }
+module_for_statement = { "for" ~ ws* ~ identifier ~ ws* ~ "in" ~ ws* ~ expression ~ ws* ~ node_body }
 
 
 //`namespace math { }`: ok # namespace (like module with no arguments)
@@ -484,7 +489,7 @@ source_file_statement = {
   namespace_definition | 
   function_definition | 
   assignment_statement |
-  for_statement |
+  module_for_statement |
   expression_statement
 }
 

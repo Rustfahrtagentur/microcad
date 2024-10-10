@@ -6,7 +6,7 @@
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Namespace body
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct NamespaceBody {
     /// Namespace statements
     pub statements: Vec<NamespaceStatement>,

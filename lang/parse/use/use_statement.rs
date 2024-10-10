@@ -87,8 +87,8 @@ impl Eval for UseStatement {
                     let symbols = name.eval(context)?;
                     for symbol in symbols {
                         match symbol {
-                            Symbol::Module(module_definition) => {
-                                let symbols = &module_definition.body.symbols;
+                            Symbol::Namespace(namespace_definition) => {
+                                let symbols = &namespace_definition.body.symbols;
                                 for symbol in symbols.iter() {
                                     context.add(symbol.clone());
                                 }

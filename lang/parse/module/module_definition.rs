@@ -12,10 +12,8 @@ pub struct ModuleDefinition {
     pub attributes: Vec<Attribute>,
     /// Module name
     pub name: Identifier,
-    /// Module Parameters
-    pub parameters: Option<ParameterList>,
     /// Module body
-    pub body: ModuleBody,
+    pub body: ModuleDefinitionBody,
     /// Source code reference
     src_ref: SrcRef,
 }
@@ -26,16 +24,60 @@ impl ModuleDefinition {
         ModuleDefinition {
             attributes: Vec::new(),
             name,
-            parameters: None,
-            body: ModuleBody::default(),
+            body: ModuleDefinitionBody::default(),
             src_ref: SrcRef(None),
         }
     }
 }
 
 impl CallTrait for ModuleDefinition {
-    fn call(&self, _args: &CallArgumentList, _context: &mut Context) -> Result<Option<Value>> {
-        todo!()
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
+        context.push();
+
+        let node = microcad_render::tree::group();
+        context.set_current_node(node.clone());
+
+        // Let's evaluate the pre-init statements first
+        for statement in &self.body.pre_init_statements {
+            statement.eval(context)?;
+        }
+
+        let mut matching_init = Vec::new();
+        let arg_values = args.eval(context)?;
+
+        // Find all initializers that match the arguments and add it to the matching_init list
+        for init in &self.body.inits {
+            let param_values = init.parameters.eval(context)?;
+            if let Ok(arg_map) = arg_values.get_matching_arguments(&param_values) {
+                matching_init.push((init, arg_map));
+            }
+        }
+
+        use crate::diag::PushDiag;
+        use anyhow::anyhow;
+
+        // There should be only one matching initializer
+        match matching_init.len() {
+            0 => {
+                context.error(self, anyhow!("No matching initializer found"))?;
+            }
+            1 => {
+                let (init, arg_map) = matching_init.first().unwrap();
+                init.call(arg_map, context)?;
+            }
+            _ => {
+                context.error(self, anyhow!("Multiple matching initializers found"))?;
+                // TODO Add diagnostics for multiple matching initializers
+            }
+        }
+
+        for statement in &self.body.post_init_statements {
+            statement.eval(context)?;
+        }
+
+        context.pop();
+
+        Ok(Some(Value::Node(node)))
     }
 }
 
@@ -66,7 +108,7 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
         let mut attributes = Vec::new();
         let mut name = Identifier::default();
         let mut parameters = None;
-        let mut body = ModuleBody::default();
+        let mut body = ModuleDefinitionBody::default();
 
         for pair in pair.inner() {
             match pair.as_rule() {
@@ -79,17 +121,20 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
                 Rule::parameter_list => {
                     parameters = Some(ParameterList::parse(pair)?);
                 }
-                Rule::module_body => {
-                    body = ModuleBody::parse(pair.clone())?;
+                Rule::module_definition_body => {
+                    body = ModuleDefinitionBody::parse(pair.clone())?;
                 }
-                rule => unreachable!("Unexpected module definition, got {:?}", rule),
+                rule => unreachable!("Unexpected rule for module definition, got {:?}", rule),
             }
+        }
+
+        if let Some(parameters) = parameters {
+            body.add_initializer_from_parameter_list(parameters)?;
         }
 
         Ok(std::rc::Rc::new(ModuleDefinition {
             attributes,
             name,
-            parameters,
             body,
             src_ref: pair.into(),
         }))
