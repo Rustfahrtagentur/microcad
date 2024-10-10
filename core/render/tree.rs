@@ -46,7 +46,21 @@ pub enum NodeInner {
 impl std::fmt::Debug for NodeInner {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name: &'static str = self.into();
-        write!(f, "{name}")
+        write!(f, "{name}")?;
+
+        match &self {
+            NodeInner::Algorithm(algorithm) => {
+                write!(f, "({algorithm:?})")
+            }
+            NodeInner::Renderable2D(renderable2d) => {
+                write!(f, "({renderable2d:?})")
+            }
+            NodeInner::Renderable3D(renderable3d) => {
+                write!(f, "({renderable3d:?})")
+            }
+
+            _ => Ok(()),
+        }
     }
 }
 
