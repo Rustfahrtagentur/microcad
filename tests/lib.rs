@@ -8,6 +8,25 @@ include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
 
+#[cfg(test)]
+static TEST_OUTPUT_DIR: &str = "output";
+
+#[cfg(test)]
+fn eval_context(context: &mut microcad_lang::eval::Context) -> microcad_core::render::Node {
+    let node = context.eval().unwrap();
+
+    if context.diag().has_errors() {
+        context
+            .diag()
+            .pretty_print(&mut std::io::stderr(), context)
+            .unwrap();
+
+        panic!("ERROR: {} errors found", context.diag().error_count);
+    }
+
+    node
+}
+
 /// Evaluate source input from `&str` and return the resulting node and context
 #[cfg(test)]
 fn eval_input_with_context(
@@ -16,23 +35,14 @@ fn eval_input_with_context(
     use core::panic;
     use microcad_lang::parse::source_file::SourceFile;
     let source_file = match SourceFile::load_from_str(input) {
-        Ok(doc) => doc,
+        Ok(source_file) => source_file,
         Err(err) => panic!("ERROR: {err}"),
     };
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_std()
         .build();
-    let node = context.eval().unwrap();
-
-    if context.diag().has_errors() {
-        context
-            .diag()
-            .pretty_print(&mut std::io::stderr(), &context)
-            .unwrap();
-
-        panic!("ERROR: {} errors found", context.diag().error_count);
-    }
+    let node = eval_context(&mut context);
 
     (node, context)
 }
@@ -61,16 +71,40 @@ fn export_tree_dump_for_input(input: &str, tree_dump_file: &str) {
 
 #[cfg(test)]
 fn test_source_file(file_name: &str) {
-    let mut file = std::fs::File::open(file_name).unwrap();
+    use microcad_export::tree_dump;
+    use microcad_lang::parse::SourceFile;
 
-    let mut buf = String::new();
-    use std::io::Read;
-    file.read_to_string(&mut buf).unwrap();
+    let source_file = match SourceFile::load(file_name) {
+        Ok(source_file) => source_file,
+        Err(err) => panic!("ERROR: {err}"),
+    };
 
-    let node = eval_input(&buf);
+    let mut context = microcad_std::ContextBuilder::new(source_file)
+        .with_std()
+        .build();
+
+    use microcad_lang::eval::Symbols;
+
+    let path = std::path::Path::new(file_name);
+    let file_name: &str = path.file_name().unwrap().to_str().unwrap();
+
+    let output_file: std::path::PathBuf = [TEST_OUTPUT_DIR, file_name].iter().collect();
+
+    context.add(microcad_lang::eval::Symbol::Value(
+        "OUTPUT_FILE".into(),
+        microcad_lang::eval::Value::String(microcad_lang::src_ref::Refer::none(
+            output_file.to_str().unwrap().into(),
+        )),
+    ));
+
+    let node = eval_context(&mut context);
+
     microcad_std::export(node.clone()).unwrap();
 
-    export_tree_dump_for_source_file(file_name);
+    let mut tree_dump_file = output_file.clone();
+    tree_dump_file.set_extension("tree.dump");
+
+    export_tree_dump_for_node(node, tree_dump_file.to_str().unwrap());
 }
 
 #[cfg(test)]
@@ -83,10 +117,9 @@ fn export_tree_dump_for_source_file(file: &str) {
     file.read_to_string(&mut buf).unwrap();
 
     // Extract filename without extension
-    let filename = path.file_name().unwrap().to_str().unwrap();
-    println!("Exporting tree dump for {filename}");
+    let filename: &str = path.file_name().unwrap().to_str().unwrap();
 
-    export_tree_dump_for_input(&buf, &format!("output/{filename}.tree.dump"));
+    export_tree_dump_for_input(&buf, &format!("{TEST_OUTPUT_DIR}/{filename}.tree.dump"));
 }
 
 #[test]

@@ -1,13 +1,13 @@
 use * from std;
 
 
-export("output/algorithm_difference.stl") algorithm::difference() {
+export("{OUTPUT_FILE}.stl") algorithm::difference() {
     geo3d::sphere(radius = 3.0);
     geo3d::cube(size_x = 3.0, size_y = 3.0, size_z = 3.0);
 }
 
 
-export("output/algorithm_difference.svg") algorithm::difference() {
+export("{OUTPUT_FILE}.svg") algorithm::difference() {
     geo2d::circle(radius = 3.0);
     geo2d::rect(width = 3.0, height = 2.0, x = 0.0, y = 0.0);
 }
