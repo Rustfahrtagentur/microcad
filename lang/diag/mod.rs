@@ -106,7 +106,7 @@ impl Diag {
                     w,
                     "  ---> {}:{}",
                     if let Some(source_file) = source_file {
-                        source_file.filename()
+                        source_file.filename_as_str()
                     } else {
                         "<no file>"
                     },
