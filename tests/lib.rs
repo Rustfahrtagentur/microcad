@@ -64,12 +64,6 @@ fn export_tree_dump_for_node(node: microcad_core::render::Node, tree_dump_file: 
 }
 
 #[cfg(test)]
-fn export_tree_dump_for_input(input: &str, tree_dump_file: &str) {
-    let node = eval_input(input);
-    export_tree_dump_for_node(node, tree_dump_file);
-}
-
-#[cfg(test)]
 fn test_source_file(file_name: &str) {
     use microcad_lang::parse::SourceFile;
 
@@ -77,7 +71,17 @@ fn test_source_file(file_name: &str) {
         Ok(source_file) => source_file,
         Err(err) => panic!("ERROR: {err}"),
     };
-    let output_file: std::path::PathBuf = [TEST_OUTPUT_DIR, file_name].iter().collect();
+    let input_file_name = &source_file.filename.clone().unwrap();
+
+    let output_file_name: std::path::PathBuf = [
+        std::path::PathBuf::from(TEST_OUTPUT_DIR),
+        input_file_name
+            .strip_prefix(input_file_name.parent().unwrap())
+            .unwrap()
+            .to_path_buf(),
+    ]
+    .iter()
+    .collect();
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_std()
@@ -88,32 +92,28 @@ fn test_source_file(file_name: &str) {
     // Inject `output_file` into the context as a µCAD string value `OUTPUT_FILE`
     context.add(Symbol::Value(
         "OUTPUT_FILE".into(),
-        output_file.to_string_lossy().to_string().into(),
+        output_file_name.to_string_lossy().to_string().into(),
     ));
 
     let node = eval_context(&mut context);
 
     microcad_std::export(node.clone()).unwrap();
 
-    let mut tree_dump_file = output_file.clone();
+    let mut tree_dump_file = output_file_name;
     tree_dump_file.set_extension("tree.dump");
 
     export_tree_dump_for_node(node, tree_dump_file.to_str().unwrap());
-}
 
-#[cfg(test)]
-fn export_tree_dump_for_source_file(file: &str) {
-    let path = std::path::Path::new(file);
-    let mut file = std::fs::File::open(file).unwrap();
+    let mut ref_tree_dump_file = input_file_name.clone();
+    ref_tree_dump_file.set_extension("tree.dump");
 
-    let mut buf = String::new();
-    use std::io::Read;
-    file.read_to_string(&mut buf).unwrap();
-
-    // Extract filename without extension
-    let filename: &str = path.file_name().unwrap().to_str().unwrap();
-
-    export_tree_dump_for_input(&buf, &format!("{TEST_OUTPUT_DIR}/{filename}.tree.dump"));
+    // Compare tree dump files
+    if ref_tree_dump_file.exists() {
+        assert_eq!(
+            std::fs::read_to_string(tree_dump_file).unwrap(),
+            std::fs::read_to_string(ref_tree_dump_file).unwrap()
+        );
+    }
 }
 
 #[test]
