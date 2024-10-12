@@ -71,30 +71,24 @@ fn export_tree_dump_for_input(input: &str, tree_dump_file: &str) {
 
 #[cfg(test)]
 fn test_source_file(file_name: &str) {
-    use microcad_export::tree_dump;
     use microcad_lang::parse::SourceFile;
 
     let source_file = match SourceFile::load(file_name) {
         Ok(source_file) => source_file,
         Err(err) => panic!("ERROR: {err}"),
     };
+    let output_file: std::path::PathBuf = [TEST_OUTPUT_DIR, file_name].iter().collect();
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_std()
         .build();
 
-    use microcad_lang::eval::Symbols;
+    use microcad_lang::eval::*;
 
-    let path = std::path::Path::new(file_name);
-    let file_name: &str = path.file_name().unwrap().to_str().unwrap();
-
-    let output_file: std::path::PathBuf = [TEST_OUTPUT_DIR, file_name].iter().collect();
-
-    context.add(microcad_lang::eval::Symbol::Value(
+    // Inject `output_file` into the context as a µCAD string value `OUTPUT_FILE`
+    context.add(Symbol::Value(
         "OUTPUT_FILE".into(),
-        microcad_lang::eval::Value::String(microcad_lang::src_ref::Refer::none(
-            output_file.to_str().unwrap().into(),
-        )),
+        output_file.to_string_lossy().to_string().into(),
     ));
 
     let node = eval_context(&mut context);
