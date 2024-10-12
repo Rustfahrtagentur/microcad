@@ -27,7 +27,21 @@ impl Exporter for TreeDumpExporter {
     }
 
     fn export(&mut self, node: Node) -> microcad_core::Result<()> {
-        let file = File::create(&self.filename)?;
+        // TODO Make this a separate function
+        let path = std::path::absolute(&self.filename)?;
+
+        if let Some(containing_dir) = path.parent() {
+            // If we want to export "/home/user/export.svg", "/home/user" must exist.
+            if !containing_dir.exists() {
+                return Err(microcad_core::CoreError::DirectoryDoesNotExist(
+                    containing_dir.to_path_buf(),
+                ));
+            }
+        } else {
+            panic!("Tried to write to root!");
+        }
+
+        let file = File::create(&path)?;
         let mut writer = std::io::BufWriter::new(&file);
         microcad_render::tree::dump(&mut writer, node)?;
         Ok(())
