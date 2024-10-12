@@ -27,4 +27,8 @@ pub enum CoreError {
     /// No filename specified for export
     #[error("No filename specified for export")]
     NoFilenameSpecifiedForExport,
+
+    /// Directory does not exist
+    #[error("Directory does not exist: {0}")]
+    DirectoryDoesNotExist(std::path::PathBuf),
 }
