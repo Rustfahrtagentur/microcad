@@ -66,6 +66,10 @@ fn export_tree_dump_for_node(node: microcad_core::render::Node, tree_dump_file: 
 #[cfg(test)]
 fn test_source_file(file_name: &str) {
     use microcad_lang::parse::SourceFile;
+    let test_output_dir = std::path::PathBuf::from(TEST_OUTPUT_DIR);
+    if !test_output_dir.exists() {
+        std::fs::create_dir_all(&test_output_dir).unwrap();
+    }
 
     let source_file = match SourceFile::load(file_name) {
         Ok(source_file) => source_file,
@@ -74,7 +78,7 @@ fn test_source_file(file_name: &str) {
     let input_file_name = &source_file.filename.clone().unwrap();
 
     let output_file_name: std::path::PathBuf = [
-        std::path::PathBuf::from(TEST_OUTPUT_DIR),
+        test_output_dir,
         input_file_name
             .strip_prefix(input_file_name.parent().unwrap())
             .unwrap()
