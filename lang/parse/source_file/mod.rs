@@ -171,7 +171,7 @@ impl Eval for SourceFile {
         let mut new_nodes = Vec::new();
 
         // Descend into root node and find all child nodes
-        context.descend_node(tree::root(), |context| {
+        context.descend_node(tree::group(), |context| {
             for statement in &self.body {
                 match statement {
                     Statement::Expression(expression) => {

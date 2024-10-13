@@ -12,9 +12,6 @@ use crate::geo3d;
 /// Inner of a node
 #[derive(IntoStaticStr)]
 pub enum NodeInner {
-    /// A root node that only contains children
-    Root,
-
     /// A group node that contains children
     Group,
 
@@ -67,23 +64,12 @@ impl std::fmt::Debug for NodeInner {
 /// Render node
 pub type Node = rctree::Node<NodeInner>;
 
-/// Create root node
-pub fn root() -> Node {
-    Node::new(NodeInner::Root)
-}
-
-/// Create new render group
+/// Create new group node
 pub fn group() -> Node {
     Node::new(NodeInner::Group)
 }
 
-/// Calculate depth trait
-pub trait Depth {
-    /// Calculate depth
-    fn depth(&self) -> usize;
-}
-
-impl Depth for Node {
+impl crate::Depth for Node {
     fn depth(&self) -> usize {
         if let Some(parent) = self.parent() {
             parent.depth() + 1
@@ -110,12 +96,14 @@ pub fn nest_nodes(nodes: Vec<Node>) -> Node {
 ///
 /// The depth of a node is marked by the number of white spaces
 pub fn dump(writer: &mut dyn std::io::Write, node: Node) -> std::io::Result<()> {
+    use crate::Depth;
     node.descendants()
         .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
 }
 
 #[test]
 fn node_nest() {
+    use crate::Depth;
     let nodes = vec![tree::group(), tree::group(), tree::group()];
     let node = nest_nodes(nodes.clone());
 

@@ -272,7 +272,7 @@ fn test_stl_export() {
     use microcad_export::Exporter;
     let mut exporter = StlExporter::from_settings(&settings).unwrap();
 
-    let node = microcad_core::render::tree::root();
+    let node = microcad_core::render::tree::group();
 
     use microcad_core::geo3d::*;
     let a = Manifold::cube(1.0, 1.0, 1.0);

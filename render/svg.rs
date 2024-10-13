@@ -205,7 +205,7 @@ impl Renderer2D for SvgRenderer {
     fn render_node(&mut self, node: Node) -> microcad_core::Result<()> {
         let inner = node.borrow();
         match &*inner {
-            NodeInner::Export(_) | NodeInner::Group | NodeInner::Root => {
+            NodeInner::Export(_) | NodeInner::Group => {
                 for child in node.children() {
                     self.render_node(child.clone())?;
                 }

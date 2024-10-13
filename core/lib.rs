@@ -42,3 +42,10 @@ pub use transform::Transform;
 
 /// Core result type
 pub type Result<T> = std::result::Result<T, CoreError>;
+
+
+/// Trait to calculate depth for a node
+pub trait Depth {
+    /// Calculate depth
+    fn depth(&self) -> usize;
+}

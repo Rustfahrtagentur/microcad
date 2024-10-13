@@ -33,7 +33,7 @@ impl Context {
     pub fn from_source_file(source_file: SourceFile) -> Self {
         Self {
             stack: vec![SymbolTable::default()],
-            current_node: tree::root(),
+            current_node: tree::group(),
             current_source_file: Some(std::rc::Rc::new(source_file)),
             ..Default::default()
         }
@@ -158,7 +158,7 @@ impl Default for Context {
     fn default() -> Self {
         Self {
             stack: vec![SymbolTable::default()],
-            current_node: tree::root(),
+            current_node: tree::group(),
             current_source_file: None,
             source_files: SourceFileCache::default(),
             diag_handler: DiagHandler::default(),
