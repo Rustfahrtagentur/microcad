@@ -3,7 +3,12 @@
 
 //! 2D Geometry
 
+mod tree;
+
 use crate::Scalar;
+use strum::IntoStaticStr;
+
+pub use tree::{Node, NodeInner};
 
 /// Line string
 pub type LineString = geo::LineString<Scalar>;
@@ -22,6 +27,7 @@ pub type Point = geo::Point<Scalar>;
 pub use geo::coord;
 
 /// Geometry
+#[derive(IntoStaticStr)]
 pub enum Geometry {
     /// Line string
     LineString(LineString),

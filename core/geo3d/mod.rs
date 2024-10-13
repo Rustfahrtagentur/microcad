@@ -4,17 +4,23 @@
 //! 3D Geometry
 
 mod triangle_mesh;
+mod tree;
 
 pub use manifold_rs::Manifold;
 pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 
+pub use tree::{Node, NodeInner};
+
+use strum::IntoStaticStr;
+
 use crate::algorithm::BooleanOp;
 
 /// 3D Geometry
+#[derive(IntoStaticStr)]
 pub enum Geometry {
     /// Triangle mesh
     Mesh(TriangleMesh),
-    /// Maniold
+    /// Manifold
     Manifold(Manifold),
 }
 
