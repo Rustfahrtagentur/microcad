@@ -3,7 +3,7 @@
 
 //! Node body parser entity
 
-use microcad_render::{tree, Node};
+use microcad_render::{tree, ModelNode};
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
@@ -113,7 +113,7 @@ impl Parse for NodeBody {
 }
 
 impl Eval for NodeBody {
-    type Output = Node;
+    type Output = ModelNode;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let group = tree::group();

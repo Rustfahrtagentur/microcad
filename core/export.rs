@@ -3,7 +3,7 @@
 
 //! µCAD export
 
-use crate::{render::Node, render::NodeInner};
+use crate::{render::ModelNode, render::ModelNodeInner};
 
 /// Export settings
 #[derive(Debug, Default)]
@@ -69,22 +69,22 @@ pub trait Exporter {
     fn file_extensions(&self) -> Vec<&str>;
 
     /// Do export
-    fn export(&mut self, node: Node) -> Result<(), crate::CoreError>;
+    fn export(&mut self, node: ModelNode) -> Result<(), crate::CoreError>;
 }
 
 /// Short cut to create an export node
-pub fn export(export_settings: ExportSettings) -> Node {
-    Node::new(NodeInner::Export(export_settings))
+pub fn export(export_settings: ExportSettings) -> ModelNode {
+    ModelNode::new(ModelNodeInner::Export(export_settings))
 }
 
 /// The `ExporterFactory` creates a new exporter based on the file extension and the export settings
 type ExporterFactory = fn(&ExportSettings) -> Result<Box<dyn Exporter>, crate::CoreError>;
 
 /// Iterate over all descendent nodes and export the ones with an Export tag
-pub fn export_tree(node: Node, factory: ExporterFactory) -> Result<(), crate::CoreError> {
+pub fn export_tree(node: ModelNode, factory: ExporterFactory) -> Result<(), crate::CoreError> {
     node.descendants().try_for_each(|n| {
         let inner = n.borrow();
-        if let NodeInner::Export(ref export_settings) = *inner {
+        if let ModelNodeInner::Export(ref export_settings) = *inner {
             factory(export_settings)?.export(n.clone())
         } else {
             Ok(())

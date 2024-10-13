@@ -74,7 +74,7 @@ impl Exporter for StlExporter {
         vec!["stl"]
     }
 
-    fn export(&mut self, node: microcad_render::Node) -> microcad_core::Result<()> {
+    fn export(&mut self, node: microcad_render::ModelNode) -> microcad_core::Result<()> {
         let mut renderer = microcad_render::mesh::MeshRenderer::default();
         use microcad_render::Renderer3D;
         renderer.render_node(node)?;

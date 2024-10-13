@@ -7,25 +7,25 @@ use microcad_lang::{
     eval::{EvalError, Symbols},
     parse::*,
 };
-use microcad_render::Node;
+use microcad_render::ModelNode;
 
 /// Creates a node containing a difference algorithm
-pub fn difference() -> Result<Node, EvalError> {
+pub fn difference() -> Result<ModelNode, EvalError> {
     Ok(microcad_core::algorithm::boolean_op::difference())
 }
 
 /// Creates a node containing a union algorithm
-pub fn union() -> Result<Node, EvalError> {
+pub fn union() -> Result<ModelNode, EvalError> {
     Ok(microcad_core::algorithm::boolean_op::union())
 }
 
 /// Creates a node containing an intersection algorithm
-pub fn intersection() -> Result<Node, EvalError> {
+pub fn intersection() -> Result<ModelNode, EvalError> {
     Ok(microcad_core::algorithm::boolean_op::intersection())
 }
 
 /// Creates a node containing a complement algorithm
-pub fn complement() -> Result<Node, EvalError> {
+pub fn complement() -> Result<ModelNode, EvalError> {
     Ok(microcad_core::algorithm::boolean_op::complement())
 }
 

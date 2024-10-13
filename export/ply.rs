@@ -131,7 +131,7 @@ impl Exporter for PlyExporter {
         vec!["ply"]
     }
 
-    fn export(&mut self, node: microcad_render::Node) -> Result<(), microcad_core::CoreError> {
+    fn export(&mut self, node: microcad_render::ModelNode) -> Result<(), microcad_core::CoreError> {
         let mut renderer = microcad_render::mesh::MeshRenderer::new(self.precision);
         use microcad_render::Renderer3D;
         renderer.render_node(node)?;

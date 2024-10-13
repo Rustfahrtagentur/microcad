@@ -165,7 +165,7 @@ impl Parse for SourceFile {
 }
 
 impl Eval for SourceFile {
-    type Output = tree::Node;
+    type Output = tree::ModelNode;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let mut new_nodes = Vec::new();

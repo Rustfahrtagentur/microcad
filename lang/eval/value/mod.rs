@@ -22,7 +22,7 @@ pub use value_list::*;
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
-use microcad_render::tree::Node;
+use microcad_render::tree::ModelNode;
 
 pub(crate) type ValueResult = std::result::Result<Value, EvalError>;
 
@@ -64,7 +64,7 @@ pub enum Value {
     /// Tuple of unnamed items
     UnnamedTuple(UnnamedTuple),
     /// A node in the render tree
-    Node(Node),
+    Node(ModelNode),
 }
 
 impl Value {

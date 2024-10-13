@@ -7,7 +7,7 @@ use crate::{eval::*, parse::*};
 use microcad_render::tree;
 
 /// Builtin module initialization functor
-pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<tree::Node>;
+pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<tree::ModelNode>;
 
 /// Builtin module
 #[derive(Clone)]
@@ -43,7 +43,7 @@ pub trait BuiltinModuleDefinition {
     /// Get parameters of the builtin module (implicit init)
     fn parameters() -> ParameterList;
     /// Create node from argument map
-    fn node(args: &ArgumentMap) -> Result<tree::Node>;
+    fn node(args: &ArgumentMap) -> Result<tree::ModelNode>;
     /// Implicit initialization functor
     fn function() -> &'static BuiltinModuleFn {
         &|args, ctx| Ok(ctx.append_node(Self::node(args)?))

@@ -37,7 +37,7 @@ macro_rules! args {
 }
 
 #[cfg(test)]
-fn eval_context(context: &mut microcad_lang::eval::Context) -> microcad_core::render::Node {
+fn eval_context(context: &mut microcad_lang::eval::Context) -> microcad_core::render::ModelNode {
     let node = context.eval().unwrap();
 
     if context.diag().has_errors() {
@@ -56,7 +56,7 @@ fn eval_context(context: &mut microcad_lang::eval::Context) -> microcad_core::re
 #[cfg(test)]
 fn eval_input_with_context(
     input: &str,
-) -> (microcad_core::render::Node, microcad_lang::eval::Context) {
+) -> (microcad_core::render::ModelNode, microcad_lang::eval::Context) {
     use core::panic;
     use microcad_lang::parse::source_file::SourceFile;
     let source_file = match SourceFile::load_from_str(input) {
@@ -73,12 +73,12 @@ fn eval_input_with_context(
 }
 
 #[cfg(test)]
-fn eval_input(input: &str) -> microcad_core::render::Node {
+fn eval_input(input: &str) -> microcad_core::render::ModelNode {
     eval_input_with_context(input).0
 }
 
 #[cfg(test)]
-fn export_tree_dump_for_node(node: microcad_core::render::Node, tree_dump_file: &str) {
+fn export_tree_dump_for_node(node: microcad_core::render::ModelNode, tree_dump_file: &str) {
     use microcad_export::Exporter;
     let mut tree_dump_exporter = microcad_export::tree_dump::TreeDumpExporter::from_settings(
         &microcad_export::ExportSettings::with_filename(tree_dump_file.to_string()),
@@ -280,8 +280,8 @@ fn test_stl_export() {
 
     let intersection: Geometry = a.intersection(&b).into();
 
-    node.append(microcad_core::render::Node::new(
-        microcad_core::render::NodeInner::Geometry3D(std::rc::Rc::new(
+    node.append(microcad_core::render::ModelNode::new(
+        microcad_core::render::ModelNodeInner::Geometry3D(std::rc::Rc::new(
             intersection.fetch_mesh().into(),
         )),
     ));
@@ -336,7 +336,7 @@ fn test_simple_module_definition() {
 
     if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
         match *node.borrow() {
-            microcad_core::render::NodeInner::Group => {}
+            microcad_core::render::ModelNodeInner::Group => {}
             ref inner => panic!("Expected node to be a Group, got {:?}", inner),
         }
 

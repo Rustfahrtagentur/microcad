@@ -10,7 +10,7 @@ pub mod render3d;
 pub use render3d::{Primitive3D, Renderer3D};
 
 pub mod tree;
-pub use tree::{Node, NodeInner};
+pub use tree::{ModelNode, ModelNodeInner};
 
 /// Render hash trait
 pub trait RenderHash {

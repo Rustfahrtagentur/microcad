@@ -11,7 +11,7 @@ use crate::geo3d;
 
 /// Inner of a node
 #[derive(IntoStaticStr)]
-pub enum NodeInner {
+pub enum ModelNodeInner {
     /// A group node that contains children
     Group,
 
@@ -40,19 +40,19 @@ pub enum NodeInner {
     Export(ExportSettings),
 }
 
-impl std::fmt::Debug for NodeInner {
+impl std::fmt::Debug for ModelNodeInner {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name: &'static str = self.into();
         write!(f, "{name}")?;
 
         match &self {
-            NodeInner::Algorithm(algorithm) => {
+            ModelNodeInner::Algorithm(algorithm) => {
                 write!(f, "({algorithm:?})")
             }
-            NodeInner::Primitive2D(primitive2d) => {
+            ModelNodeInner::Primitive2D(primitive2d) => {
                 write!(f, "({primitive2d:?})")
             }
-            NodeInner::Primitive3D(primitive3d) => {
+            ModelNodeInner::Primitive3D(primitive3d) => {
                 write!(f, "({primitive3d:?})")
             }
 
@@ -62,14 +62,14 @@ impl std::fmt::Debug for NodeInner {
 }
 
 /// Render node
-pub type Node = rctree::Node<NodeInner>;
+pub type ModelNode = rctree::Node<ModelNodeInner>;
 
 /// Create new group node
-pub fn group() -> Node {
-    Node::new(NodeInner::Group)
+pub fn group() -> ModelNode {
+    ModelNode::new(ModelNodeInner::Group)
 }
 
-impl crate::Depth for Node {
+impl crate::Depth for ModelNode {
     fn depth(&self) -> usize {
         if let Some(parent) = self.parent() {
             parent.depth() + 1
@@ -84,7 +84,7 @@ impl crate::Depth for Node {
 /// Assume, our `Vec<Node` has three nodes `a`, `b`, `c`.
 /// Then `c` will have `b` as parent and `b` will have `a` as parent.
 /// Node `a` will be returned.
-pub fn nest_nodes(nodes: Vec<Node>) -> Node {
+pub fn nest_nodes(nodes: Vec<ModelNode>) -> ModelNode {
     for node_window in nodes.windows(2) {
         node_window[0].append(node_window[1].clone());
     }
@@ -95,7 +95,7 @@ pub fn nest_nodes(nodes: Vec<Node>) -> Node {
 /// Dumps the tree structure of a node.
 ///
 /// The depth of a node is marked by the number of white spaces
-pub fn dump(writer: &mut dyn std::io::Write, node: Node) -> std::io::Result<()> {
+pub fn dump(writer: &mut dyn std::io::Write, node: ModelNode) -> std::io::Result<()> {
     use crate::Depth;
     node.descendants()
         .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))

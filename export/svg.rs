@@ -30,7 +30,7 @@ impl Exporter for SvgExporter {
         vec!["svg"]
     }
 
-    fn export(&mut self, node: microcad_render::Node) -> microcad_core::Result<()> {
+    fn export(&mut self, node: microcad_render::ModelNode) -> microcad_core::Result<()> {
         let file = std::fs::File::create(&self.filename)?;
 
         use microcad_render::Renderer2D;

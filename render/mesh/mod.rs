@@ -63,29 +63,29 @@ impl Renderer3D for MeshRenderer {
         }
     }
 
-    fn render_node(&mut self, node: Node) -> microcad_core::Result<()> {
+    fn render_node(&mut self, node: ModelNode) -> microcad_core::Result<()> {
         let inner = node.borrow();
 
         match &*inner {
-            NodeInner::Export(_) | NodeInner::Group => {
+            ModelNodeInner::Export(_) | ModelNodeInner::Group => {
                 for child in node.children() {
                     self.render_node(child.clone())?;
                 }
                 return Ok(());
             }
-            NodeInner::Algorithm(algorithm) => {
+            ModelNodeInner::Algorithm(algorithm) => {
                 let new_node = algorithm.process_3d(self, node.clone())?;
                 self.render_node(new_node)?;
             }
-            NodeInner::Geometry3D(geometry) => {
+            ModelNodeInner::Geometry3D(geometry) => {
                 self.render_geometry(geometry)?;
             }
-            NodeInner::Primitive3D(renderable) => {
+            ModelNodeInner::Primitive3D(renderable) => {
                 let geometry = renderable.request_geometry(self)?;
                 self.render_geometry(&geometry)?;
             }
-            NodeInner::Transform(_) => unimplemented!(),
-            NodeInner::Geometry2D(_) | NodeInner::Primitive2D(_) => {
+            ModelNodeInner::Transform(_) => unimplemented!(),
+            ModelNodeInner::Geometry2D(_) | ModelNodeInner::Primitive2D(_) => {
                 return Err(CoreError::NotImplemented);
             }
         }

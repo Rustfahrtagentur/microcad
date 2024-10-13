@@ -5,7 +5,7 @@
 
 use std::{fs::File, path::PathBuf};
 
-use microcad_render::Node;
+use microcad_render::ModelNode;
 
 use crate::*;
 
@@ -26,7 +26,7 @@ impl Exporter for TreeDumpExporter {
         })
     }
 
-    fn export(&mut self, node: Node) -> microcad_core::Result<()> {
+    fn export(&mut self, node: ModelNode) -> microcad_core::Result<()> {
         // TODO Make this a separate function
         let path = std::path::absolute(&self.filename)?;
 

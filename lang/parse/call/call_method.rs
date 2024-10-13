@@ -25,14 +25,14 @@ pub trait CallMethod {
     ) -> Result<Value>;
 }
 
-impl CallMethod for microcad_render::Node {
+impl CallMethod for microcad_render::ModelNode {
     fn call_method(
         &self,
         name: &Identifier,
         args: &CallArgumentValueList,
         src_ref: SrcRef,
     ) -> Result<Value> {
-        use microcad_render::NodeInner;
+        use microcad_render::ModelNodeInner;
 
         match name.into() {
             // Return the vertices of a node
@@ -41,7 +41,7 @@ impl CallMethod for microcad_render::Node {
                 let _arg_map = args.get_matching_arguments(&parameter_values)?;
                 let inner = self.borrow();
                 match &*inner {
-                    NodeInner::Geometry2D(geo) => Ok(geo.vertices().into_value(src_ref)),
+                    ModelNodeInner::Geometry2D(geo) => Ok(geo.vertices().into_value(src_ref)),
                     _ => Err(EvalError::UnknownMethod("vertices".into())),
                 }
             }
@@ -85,8 +85,8 @@ impl CallMethod for List {
 #[test]
 fn call_method() {
     use microcad_core::geo2d::Rect;
-    use microcad_render::{Node, NodeInner};
-    let node = Node::new(NodeInner::Geometry2D(
+    use microcad_render::{ModelNode, ModelNodeInner};
+    let node = ModelNode::new(ModelNodeInner::Geometry2D(
         microcad_core::geo2d::Geometry::Rect(Rect::new(
             microcad_core::geo2d::coord! { x: 10., y: 20. },
             microcad_core::geo2d::coord! { x: 30., y: 10. },

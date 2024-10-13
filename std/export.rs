@@ -43,6 +43,6 @@ lazy_static::lazy_static! {
 }
 
 /// Shortcut to export a node
-pub fn export(node: microcad_render::Node) -> microcad_core::Result<()> {
+pub fn export(node: microcad_render::ModelNode) -> microcad_core::Result<()> {
     microcad_core::export::export_tree(node.clone(), |settings| EXPORTERS.create(settings))
 }

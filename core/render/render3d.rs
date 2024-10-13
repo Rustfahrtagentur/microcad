@@ -48,5 +48,5 @@ pub trait Renderer3D: Renderer {
     }
 
     /// Render node
-    fn render_node(&mut self, node: Node) -> Result<()>;
+    fn render_node(&mut self, node: ModelNode) -> Result<()>;
 }

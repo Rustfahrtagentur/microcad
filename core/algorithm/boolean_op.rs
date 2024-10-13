@@ -16,13 +16,13 @@ pub enum BooleanOp {
     Intersection,
 }
 
-use crate::render::{Node, NodeInner, Renderer2D};
+use crate::render::{ModelNode, ModelNodeInner, Renderer2D};
 use crate::Algorithm;
 use geo::OpType;
 
-fn into_group(node: Node) -> Option<Node> {
+fn into_group(node: ModelNode) -> Option<ModelNode> {
     node.first_child().and_then(|n| {
-        if let NodeInner::Group = *n.borrow() {
+        if let ModelNodeInner::Group = *n.borrow() {
             Some(n.clone())
         } else {
             None
@@ -53,7 +53,7 @@ impl From<&BooleanOp> for OpType {
 }
 
 impl Algorithm for BooleanOp {
-    fn process_2d(&self, renderer: &mut dyn Renderer2D, parent: Node) -> crate::Result<Node> {
+    fn process_2d(&self, renderer: &mut dyn Renderer2D, parent: ModelNode) -> crate::Result<ModelNode> {
         let mut geometries = Vec::new();
 
         // all algorithm nodes are nested in a group
@@ -62,14 +62,14 @@ impl Algorithm for BooleanOp {
         group.children().try_for_each(|child| {
             let c = &*child.borrow();
             match c {
-                NodeInner::Primitive2D(renderable) => {
+                ModelNodeInner::Primitive2D(renderable) => {
                     geometries.push(renderable.request_geometry(renderer)?)
                 }
-                NodeInner::Geometry2D(g) => geometries.push(g.clone()),
-                NodeInner::Algorithm(algorithm) => {
+                ModelNodeInner::Geometry2D(g) => geometries.push(g.clone()),
+                ModelNodeInner::Algorithm(algorithm) => {
                     let new_node = algorithm.process_2d(renderer, child.clone())?;
                     let c = &*new_node.borrow();
-                    if let NodeInner::Geometry2D(g) = c {
+                    if let ModelNodeInner::Geometry2D(g) = c {
                         geometries.push(g.clone())
                     }
                 }
@@ -87,25 +87,25 @@ impl Algorithm for BooleanOp {
             }
         });
 
-        Ok(Node::new(NodeInner::Geometry2D(result)))
+        Ok(ModelNode::new(ModelNodeInner::Geometry2D(result)))
     }
 
     fn process_3d(
         &self,
         renderer: &mut dyn crate::render::Renderer3D,
-        parent: Node,
-    ) -> crate::Result<Node> {
+        parent: ModelNode,
+    ) -> crate::Result<ModelNode> {
         // all algorithm nodes are nested in a group
         let group = into_group(parent).unwrap();
 
         let geometries: Vec<_> = group
             .children()
             .filter_map(|child| match &*child.borrow() {
-                NodeInner::Primitive3D(renderable) => renderable.request_geometry(renderer).ok(),
-                NodeInner::Geometry3D(g) => Some(g.clone()),
-                NodeInner::Algorithm(algorithm) => {
+                ModelNodeInner::Primitive3D(renderable) => renderable.request_geometry(renderer).ok(),
+                ModelNodeInner::Geometry3D(g) => Some(g.clone()),
+                ModelNodeInner::Algorithm(algorithm) => {
                     if let Ok(new_node) = algorithm.process_3d(renderer, child.clone()) {
-                        if let NodeInner::Geometry3D(g) = &*new_node.borrow() {
+                        if let ModelNodeInner::Geometry3D(g) = &*new_node.borrow() {
                             Some(g.clone())
                         } else {
                             None
@@ -117,7 +117,7 @@ impl Algorithm for BooleanOp {
                 _ => None,
             })
             .collect();
-        Ok(Node::new(NodeInner::Geometry3D(
+        Ok(ModelNode::new(ModelNodeInner::Geometry3D(
             geometries[1..]
                 .iter()
                 .fold(geometries[0].clone(), |acc, geo| {
@@ -132,29 +132,29 @@ impl Algorithm for BooleanOp {
 }
 
 /// Short cut to generate a difference operator node
-pub fn difference() -> Node {
-    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Difference)))
+pub fn difference() -> ModelNode {
+    ModelNode::new(ModelNodeInner::Algorithm(Box::new(BooleanOp::Difference)))
 }
 
 /// Short cut to generate a union operator node
-pub fn union() -> Node {
-    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Union)))
+pub fn union() -> ModelNode {
+    ModelNode::new(ModelNodeInner::Algorithm(Box::new(BooleanOp::Union)))
 }
 
 /// Short cut to generate an intersection operator node
-pub fn intersection() -> Node {
-    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Intersection)))
+pub fn intersection() -> ModelNode {
+    ModelNode::new(ModelNodeInner::Algorithm(Box::new(BooleanOp::Intersection)))
 }
 
 /// Short cut to generate a complement operator node
-pub fn complement() -> Node {
-    Node::new(NodeInner::Algorithm(Box::new(BooleanOp::Complement)))
+pub fn complement() -> ModelNode {
+    ModelNode::new(ModelNodeInner::Algorithm(Box::new(BooleanOp::Complement)))
 }
 
 /// Short cut to generate boolean operator as binary operation with two nodes
-pub fn binary_op(op: BooleanOp, lhs: Node, rhs: Node) -> Node {
+pub fn binary_op(op: BooleanOp, lhs: ModelNode, rhs: ModelNode) -> ModelNode {
     assert!(lhs != rhs, "lhs and rhs must be distinct.");
-    let root = Node::new(NodeInner::Algorithm(Box::new(op)));
+    let root = ModelNode::new(ModelNodeInner::Algorithm(Box::new(op)));
     root.append(lhs);
     root.append(rhs);
     root

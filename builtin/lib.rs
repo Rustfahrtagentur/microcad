@@ -50,9 +50,9 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
                         parameters
                     }
 
-                    fn node(args: &microcad_lang::eval::ArgumentMap) -> microcad_lang::eval::Result<microcad_core::render::Node> {
-                        use microcad_core::render::{Node, NodeInner};
-                        Ok(Node::new(NodeInner::#node_type(Box::new(#struct_name {
+                    fn node(args: &microcad_lang::eval::ArgumentMap) -> microcad_lang::eval::Result<microcad_core::render::ModelNode> {
+                        use microcad_core::render::{ModelNode, ModelNodeInner};
+                        Ok(ModelNode::new(ModelNodeInner::#node_type(Box::new(#struct_name {
                             #(
                                 #field_identifiers: args[stringify!(#field_identifiers)].clone().try_into()?,
                             )*

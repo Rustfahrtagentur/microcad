@@ -16,7 +16,7 @@ pub struct Context {
     stack: Vec<SymbolTable>,
 
     /// Current node in the tree where the evaluation is happening
-    current_node: tree::Node,
+    current_node: tree::ModelNode,
 
     /// Current source file being evaluated
     current_source_file: Option<std::rc::Rc<SourceFile>>,
@@ -40,7 +40,7 @@ impl Context {
     }
 
     /// Evaluate the context with the current source file
-    pub fn eval(&mut self) -> super::Result<tree::Node> {
+    pub fn eval(&mut self) -> super::Result<tree::ModelNode> {
         let node = self.current_source_file().unwrap().eval(self)?;
         self.info(crate::src_ref::SrcRef(None), "Evaluation complete".into());
         Ok(node)
@@ -66,13 +66,13 @@ impl Context {
     /// Set new_node as current node, call function and set old node
     pub fn descend_node<F>(
         &mut self,
-        new_node: microcad_core::render::Node,
+        new_node: microcad_core::render::ModelNode,
         f: F,
-    ) -> crate::eval::Result<microcad_core::render::Node>
+    ) -> crate::eval::Result<microcad_core::render::ModelNode>
     where
-        F: FnOnce(&mut Self) -> crate::eval::Result<microcad_core::render::Node>,
+        F: FnOnce(&mut Self) -> crate::eval::Result<microcad_core::render::ModelNode>,
     {
-        let old_node: rctree::Node<tree::NodeInner> = self.current_node.clone();
+        let old_node: rctree::Node<tree::ModelNodeInner> = self.current_node.clone();
         self.set_current_node(new_node.clone());
         f(self)?;
         self.set_current_node(old_node);
@@ -103,17 +103,17 @@ impl Context {
     }
 
     /// Get current evaluation node
-    pub fn current_node(&self) -> tree::Node {
+    pub fn current_node(&self) -> tree::ModelNode {
         self.current_node.clone()
     }
 
     /// Set current evaluation node
-    pub fn set_current_node(&mut self, node: tree::Node) {
+    pub fn set_current_node(&mut self, node: tree::ModelNode) {
         self.current_node = node;
     }
 
     /// Append a node to the current node and return the new node
-    pub fn append_node(&mut self, node: tree::Node) -> tree::Node {
+    pub fn append_node(&mut self, node: tree::ModelNode) -> tree::ModelNode {
         self.current_node.append(node.clone());
         node.clone()
     }
