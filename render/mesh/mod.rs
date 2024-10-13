@@ -80,12 +80,12 @@ impl Renderer3D for MeshRenderer {
             NodeInner::Geometry3D(geometry) => {
                 self.render_geometry(geometry)?;
             }
-            NodeInner::Renderable3D(renderable) => {
+            NodeInner::Primitive3D(renderable) => {
                 let geometry = renderable.request_geometry(self)?;
                 self.render_geometry(&geometry)?;
             }
             NodeInner::Transform(_) => unimplemented!(),
-            NodeInner::Geometry2D(_) | NodeInner::Renderable2D(_) => {
+            NodeInner::Geometry2D(_) | NodeInner::Primitive2D(_) => {
                 return Err(CoreError::NotImplemented);
             }
         }

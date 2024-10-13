@@ -23,7 +23,7 @@ pub enum NodeInner {
     Geometry2D(std::rc::Rc<geo2d::Geometry>),
 
     /// A generated 2D geometry
-    Renderable2D(Box<dyn Renderable2D>),
+    Primitive2D(Box<dyn Primitive2D>),
 
     /// 3D Geometry
     #[cfg(feature = "geo3d")]
@@ -31,7 +31,7 @@ pub enum NodeInner {
 
     /// Generated 3D geometry
     #[cfg(feature = "geo3d")]
-    Renderable3D(Box<dyn Renderable3D>),
+    Primitive3D(Box<dyn Primitive3D>),
 
     /// An algorithm trait that manipulates the node or its children
     Algorithm(Box<dyn Algorithm>),
@@ -52,11 +52,11 @@ impl std::fmt::Debug for NodeInner {
             NodeInner::Algorithm(algorithm) => {
                 write!(f, "({algorithm:?})")
             }
-            NodeInner::Renderable2D(renderable2d) => {
-                write!(f, "({renderable2d:?})")
+            NodeInner::Primitive2D(primitive2d) => {
+                write!(f, "({primitive2d:?})")
             }
-            NodeInner::Renderable3D(renderable3d) => {
-                write!(f, "({renderable3d:?})")
+            NodeInner::Primitive3D(primitive3d) => {
+                write!(f, "({primitive3d:?})")
             }
 
             _ => Ok(()),

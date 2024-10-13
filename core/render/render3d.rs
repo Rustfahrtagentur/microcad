@@ -6,8 +6,8 @@
 use super::*;
 use crate::*;
 
-/// 3D renderable
-pub trait Renderable3D: RenderHash + std::fmt::Debug {
+/// A `Primitive3D` is a hashable renderable object that can be rendered by a Renderer3D
+pub trait Primitive3D: RenderHash + std::fmt::Debug {
     /// Get geometry
     fn request_geometry(
         &self,

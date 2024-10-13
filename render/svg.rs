@@ -214,7 +214,7 @@ impl Renderer2D for SvgRenderer {
                 let new_node = algorithm.process_2d(self, node.clone())?;
                 self.render_node(new_node)?;
             }
-            NodeInner::Renderable2D(renderable) => {
+            NodeInner::Primitive2D(renderable) => {
                 renderable.render_geometry(self)?;
             }
             NodeInner::Geometry2D(geometry) => self.render_geometry(geometry)?,

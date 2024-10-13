@@ -1,12 +1,12 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_builtin_proc_macro::DefineBuiltinRenderable3D;
+use microcad_builtin_proc_macro::DefineBuiltinPrimitive3D;
 use microcad_core::*;
 use microcad_lang::{eval::*, parse::*};
-use microcad_render::{RenderHash, Renderable3D};
+use microcad_render::{RenderHash, Primitive3D};
 
-#[derive(DefineBuiltinRenderable3D, Debug)]
+#[derive(DefineBuiltinPrimitive3D, Debug)]
 pub struct Sphere {
     pub radius: Scalar,
 }
@@ -17,7 +17,7 @@ impl RenderHash for Sphere {
     }
 }
 
-impl Renderable3D for Sphere {
+impl Primitive3D for Sphere {
     fn render_geometry(
         &self,
         renderer: &mut dyn render::Renderer3D,
@@ -32,7 +32,7 @@ impl Renderable3D for Sphere {
     }
 }
 
-#[derive(DefineBuiltinRenderable3D, Debug)]
+#[derive(DefineBuiltinPrimitive3D, Debug)]
 pub struct Cube {
     pub size_x: Scalar,
     pub size_y: Scalar,
@@ -45,7 +45,7 @@ impl RenderHash for Cube {
     }
 }
 
-impl Renderable3D for Cube {
+impl Primitive3D for Cube {
     fn render_geometry(
         &self,
         _renderer: &mut dyn render::Renderer3D,

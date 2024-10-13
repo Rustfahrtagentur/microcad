@@ -1,13 +1,13 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! 2D Renderable
+//! 2D Primitive
 
 use super::*;
 use crate::*;
 
-/// 2D Renderable
-pub trait Renderable2D: RenderHash + std::fmt::Debug {
+/// A Primitive is a hashable renderable object that can be rendered by a Renderer2D
+pub trait Primitive2D: RenderHash + std::fmt::Debug {
     /// Get geometry
     fn request_geometry(
         &self,

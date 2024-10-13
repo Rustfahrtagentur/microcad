@@ -1,15 +1,15 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_builtin_proc_macro::DefineBuiltinRenderable2D;
+use microcad_builtin_proc_macro::DefineBuiltinPrimitive2D;
 use microcad_core::{
     geo2d::{Geometry, LineString},
     Scalar,
 };
 use microcad_lang::{eval::*, parse::*};
-use microcad_render::{RenderHash, Renderable2D};
+use microcad_render::{RenderHash, Primitive2D};
 
-#[derive(DefineBuiltinRenderable2D, Debug)]
+#[derive(DefineBuiltinPrimitive2D, Debug)]
 pub struct Circle {
     pub radius: Scalar,
 }
@@ -20,7 +20,7 @@ impl RenderHash for Circle {
     }
 }
 
-impl Renderable2D for Circle {
+impl Primitive2D for Circle {
     fn render_geometry(
         &self,
         renderer: &mut dyn microcad_render::Renderer2D,
@@ -43,7 +43,7 @@ impl Renderable2D for Circle {
     }
 }
 
-#[derive(DefineBuiltinRenderable2D, Debug)]
+#[derive(DefineBuiltinPrimitive2D, Debug)]
 struct Rect {
     width: Scalar,
     height: Scalar,
@@ -57,7 +57,7 @@ impl RenderHash for Rect {
     }
 }
 
-impl Renderable2D for Rect {
+impl Primitive2D for Rect {
     fn render_geometry(
         &self,
         _renderer: &mut dyn microcad_render::Renderer2D,

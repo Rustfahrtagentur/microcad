@@ -67,15 +67,15 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
 }
 
 /// Instrument a symbol to be renderable in 2D
-#[proc_macro_derive(DefineBuiltinRenderable2D)]
-pub fn derive_define_builtin_renderable2d(item: TokenStream) -> TokenStream {
+#[proc_macro_derive(DefineBuiltinPrimitive2D)]
+pub fn derive_define_builtin_primitive2d(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
-    builtin_module_impl("Renderable2D", input)
+    builtin_module_impl("Primitive2D", input)
 }
 
 /// Instrument a symbol to be renderable in 3D
-#[proc_macro_derive(DefineBuiltinRenderable3D)]
-pub fn derive_define_builtin_renderable3d(item: TokenStream) -> TokenStream {
+#[proc_macro_derive(DefineBuiltinPrimitive3D)]
+pub fn derive_define_builtin_primitive3d(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
-    builtin_module_impl("Renderable3D", input)
+    builtin_module_impl("Primitive3D", input)
 }

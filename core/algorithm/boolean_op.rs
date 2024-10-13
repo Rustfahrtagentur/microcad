@@ -62,7 +62,7 @@ impl Algorithm for BooleanOp {
         group.children().try_for_each(|child| {
             let c = &*child.borrow();
             match c {
-                NodeInner::Renderable2D(renderable) => {
+                NodeInner::Primitive2D(renderable) => {
                     geometries.push(renderable.request_geometry(renderer)?)
                 }
                 NodeInner::Geometry2D(g) => geometries.push(g.clone()),
@@ -101,7 +101,7 @@ impl Algorithm for BooleanOp {
         let geometries: Vec<_> = group
             .children()
             .filter_map(|child| match &*child.borrow() {
-                NodeInner::Renderable3D(renderable) => renderable.request_geometry(renderer).ok(),
+                NodeInner::Primitive3D(renderable) => renderable.request_geometry(renderer).ok(),
                 NodeInner::Geometry3D(g) => Some(g.clone()),
                 NodeInner::Algorithm(algorithm) => {
                     if let Ok(new_node) = algorithm.process_3d(renderer, child.clone()) {

@@ -4,10 +4,10 @@
 //! µCAD Renderer
 
 pub mod render2d;
-pub use render2d::{Renderable2D, Renderer2D};
+pub use render2d::{Primitive2D, Renderer2D};
 
 pub mod render3d;
-pub use render3d::{Renderable3D, Renderer3D};
+pub use render3d::{Primitive3D, Renderer3D};
 
 pub mod tree;
 pub use tree::{Node, NodeInner};
