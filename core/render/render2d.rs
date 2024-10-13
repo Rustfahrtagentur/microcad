@@ -7,7 +7,7 @@ use super::*;
 use crate::*;
 
 /// 2D Renderable
-pub trait Renderable2D: RenderHash {
+pub trait Renderable2D: RenderHash + std::fmt::Debug {
     /// Get geometry
     fn request_geometry(
         &self,

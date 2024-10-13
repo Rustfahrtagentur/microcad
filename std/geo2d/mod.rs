@@ -9,7 +9,7 @@ use microcad_core::{
 use microcad_lang::{eval::*, parse::*};
 use microcad_render::{RenderHash, Renderable2D};
 
-#[derive(DefineBuiltinRenderable2D)]
+#[derive(DefineBuiltinRenderable2D, Debug)]
 pub struct Circle {
     pub radius: Scalar,
 }
@@ -43,7 +43,7 @@ impl Renderable2D for Circle {
     }
 }
 
-#[derive(DefineBuiltinRenderable2D)]
+#[derive(DefineBuiltinRenderable2D, Debug)]
 struct Rect {
     width: Scalar,
     height: Scalar,

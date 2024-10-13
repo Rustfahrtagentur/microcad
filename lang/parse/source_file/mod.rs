@@ -78,7 +78,7 @@ impl SourceFile {
     }
 
     /// Return filename of loaded file or `<no file>`
-    pub fn filename(&self) -> &str {
+    pub fn filename_as_str(&self) -> &str {
         self.filename
             .as_ref()
             .map(|path| path.to_str().unwrap_or("<no file>"))

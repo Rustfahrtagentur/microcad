@@ -1,12 +1,56 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use microcad_export::stl::StlExporter;
+
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
+
+#[cfg(test)]
+static TEST_OUT_DIR: &str = "output";
+
+// Assure `TEST_OUT_DIR` exists
+#[cfg(test)]
+fn make_test_out_dir() -> std::path::PathBuf {
+    let test_out_dir = std::path::PathBuf::from(TEST_OUT_DIR);
+    if !test_out_dir.exists() {
+        std::fs::create_dir_all(&test_out_dir).unwrap();
+    }
+    test_out_dir
+}
+
+///Shortcut to create a ArgumentMap
+#[cfg(test)]
+#[macro_export]
+macro_rules! args {
+    ($($name:ident: $ty:ident = $value:expr),*) => {&{
+        use microcad_lang::src_ref::*;
+        let mut map = microcad_lang::eval::ArgumentMap::new(SrcRef(None));
+        $(map.insert(stringify!($name).into(), $value.into());)*
+        map
+    }};
+    () => {};
+}
+
+#[cfg(test)]
+fn eval_context(context: &mut microcad_lang::eval::Context) -> microcad_core::render::Node {
+    let node = context.eval().unwrap();
+
+    if context.diag().has_errors() {
+        context
+            .diag()
+            .pretty_print(&mut std::io::stderr(), context)
+            .unwrap();
+
+        panic!("ERROR: {} errors found", context.diag().error_count);
+    }
+
+    node
+}
 
 /// Evaluate source input from `&str` and return the resulting node and context
 #[cfg(test)]
@@ -16,23 +60,14 @@ fn eval_input_with_context(
     use core::panic;
     use microcad_lang::parse::source_file::SourceFile;
     let source_file = match SourceFile::load_from_str(input) {
-        Ok(doc) => doc,
+        Ok(source_file) => source_file,
         Err(err) => panic!("ERROR: {err}"),
     };
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_std()
         .build();
-    let node = context.eval().unwrap();
-
-    if context.diag().has_errors() {
-        context
-            .diag()
-            .pretty_print(&mut std::io::stderr(), &context)
-            .unwrap();
-
-        panic!("ERROR: {} errors found", context.diag().error_count);
-    }
+    let node = eval_context(&mut context);
 
     (node, context)
 }
@@ -54,49 +89,108 @@ fn export_tree_dump_for_node(node: microcad_core::render::Node, tree_dump_file: 
 }
 
 #[cfg(test)]
-fn export_tree_dump_for_input(input: &str, tree_dump_file: &str) {
-    let node = eval_input(input);
-    export_tree_dump_for_node(node, tree_dump_file);
-}
+fn test_source_file(file_name: &str) {
+    use microcad_lang::parse::SourceFile;
+    let test_out_dir = make_test_out_dir();
 
-#[cfg(test)]
-fn test_source_file(file: &str) {
-    let mut file = std::fs::File::open(file).unwrap();
+    let source_file = match SourceFile::load(file_name) {
+        Ok(source_file) => source_file,
+        Err(err) => panic!("ERROR: {err}"),
+    };
+    let in_file_name = &source_file.filename.clone().unwrap();
 
-    let mut buf = String::new();
-    use std::io::Read;
-    file.read_to_string(&mut buf).unwrap();
+    let out_file_name: std::path::PathBuf = [
+        test_out_dir,
+        in_file_name
+            .strip_prefix(in_file_name.parent().unwrap())
+            .unwrap()
+            .to_path_buf(),
+    ]
+    .iter()
+    .collect();
 
-    let node = eval_input(&buf);
+    let mut context = microcad_std::ContextBuilder::new(source_file)
+        .with_std()
+        .build();
+
+    use microcad_lang::eval::*;
+
+    // Inject `output_file` into the context as a µCAD string value `OUTPUT_FILE`
+    context.add(Symbol::Value(
+        "OUTPUT_FILE".into(),
+        out_file_name.to_string_lossy().to_string().into(),
+    ));
+
+    let node = eval_context(&mut context);
+
     microcad_std::export(node.clone()).unwrap();
-}
 
-#[cfg(test)]
-fn export_tree_dump_for_source_file(file: &str) {
-    let path = std::path::Path::new(file);
-    let mut file = std::fs::File::open(file).unwrap();
+    let mut tree_dump_file = out_file_name;
+    tree_dump_file.set_extension("tree.dump");
 
-    let mut buf = String::new();
-    use std::io::Read;
-    file.read_to_string(&mut buf).unwrap();
+    export_tree_dump_for_node(node, tree_dump_file.to_str().unwrap());
 
-    // Extract filename without extension
-    let filename = path.file_name().unwrap().to_str().unwrap();
-    println!("Exporting tree dump for {filename}");
+    let mut ref_tree_dump_file = in_file_name.clone();
+    ref_tree_dump_file.set_extension("tree.dump");
 
-    export_tree_dump_for_input(&buf, &format!("output/{filename}.tree.dump"));
-}
-
-#[test]
-fn test_algorithm_difference() {
-    export_tree_dump_for_source_file("test_cases/algorithm_difference.µcad");
-    test_source_file("test_cases/algorithm_difference.µcad");
+    // Compare tree dump files
+    if ref_tree_dump_file.exists() {
+        assert_eq!(
+            std::fs::read_to_string(tree_dump_file).unwrap(),
+            std::fs::read_to_string(ref_tree_dump_file).unwrap()
+        );
+    }
 }
 
 #[test]
-fn test_node_body() {
-    export_tree_dump_for_source_file("test_cases/node_body.µcad");
-    test_source_file("test_cases/node_body.µcad");
+fn difference_svg() {
+    use microcad_lang::eval::BuiltinModuleDefinition;
+    use microcad_render::{svg::SvgRenderer, tree, Renderer2D};
+    use microcad_std::{algorithm::*, geo2d::*};
+
+    let difference = difference().unwrap();
+    let group = tree::group();
+    group.append(Circle::node(args!(radius: Scalar = 4.0)).unwrap());
+    group.append(Circle::node(args!(radius: Scalar = 2.0)).unwrap());
+    difference.append(group);
+
+    let test_out_dir = make_test_out_dir();
+
+    let file = std::fs::File::create(test_out_dir.join("difference.svg")).unwrap();
+    let mut renderer = SvgRenderer::default();
+    renderer.set_output(Box::new(file)).unwrap();
+    renderer.render_node(difference).unwrap();
+}
+
+#[test]
+fn difference_stl() {
+    use microcad_export::stl::StlExporter;
+    use microcad_lang::eval::BuiltinModuleDefinition;
+    use microcad_std::algorithm;
+
+    let difference = algorithm::difference().unwrap();
+    let group = microcad_render::tree::group();
+    group.append(
+        microcad_std::geo3d::Cube::node(
+            args!(size_x: Scalar = 4.0, size_y: Scalar = 4.0, size_z: Scalar = 4.0),
+        )
+        .unwrap(),
+    );
+    group.append(microcad_std::geo3d::Sphere::node(args!(radius: Scalar = 2.0)).unwrap());
+    difference.append(group);
+
+    let test_out_dir = make_test_out_dir();
+
+    use microcad_export::Exporter;
+    let mut exporter = StlExporter::from_settings(&microcad_core::ExportSettings::with_filename(
+        test_out_dir
+            .join("difference.stl")
+            .to_string_lossy()
+            .to_string(),
+    ))
+    .unwrap();
+
+    exporter.export(difference).unwrap();
 }
 
 #[test]
@@ -166,10 +260,43 @@ fn test_context_std() {
 }
 
 #[test]
+fn test_stl_export() {
+    let test_out_dir = make_test_out_dir();
+
+    let settings = microcad_core::ExportSettings::with_filename(
+        test_out_dir
+            .join("test_stl_export.stl")
+            .to_string_lossy()
+            .to_string(),
+    );
+    use microcad_export::Exporter;
+    let mut exporter = StlExporter::from_settings(&settings).unwrap();
+
+    let node = microcad_core::render::tree::root();
+
+    use microcad_core::geo3d::*;
+    let a = Manifold::cube(1.0, 1.0, 1.0);
+    let b = Manifold::sphere(1.0, 32);
+
+    let intersection: Geometry = a.intersection(&b).into();
+
+    node.append(microcad_core::render::Node::new(
+        microcad_core::render::NodeInner::Geometry3D(std::rc::Rc::new(
+            intersection.fetch_mesh().into(),
+        )),
+    ));
+
+    exporter.export(node).unwrap();
+}
+
+#[test]
 fn test_simple_module_statement() {
+    let test_out_dir = make_test_out_dir();
+    let test_out_dir = test_out_dir.to_str().unwrap();
+
     export_tree_dump_for_node(
         eval_input("std::geo2d::circle(radius = 3.0);"),
-        "output/simple_module_statement.tree.dump",
+        format!("{test_out_dir}/simple_module_statement.tree.dump").as_str(),
     );
 }
 

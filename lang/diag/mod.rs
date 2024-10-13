@@ -106,7 +106,7 @@ impl Diag {
                     w,
                     "  ---> {}:{}",
                     if let Some(source_file) = source_file {
-                        source_file.filename()
+                        source_file.filename_as_str()
                     } else {
                         "<no file>"
                     },
@@ -202,14 +202,14 @@ fn test_diag_list() {
 warning: This is a warning
   ---> ../tests/test_cases/algorithm_difference.µcad:4:1
      |
-   4 | export(\"output/algorithm_difference.stl\") algorithm::difference() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 | export(\"{OUTPUT_FILE}.stl\") algorithm::difference() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: This is an error
   ---> ../tests/test_cases/algorithm_difference.µcad:10:1
      |
-  10 | export(\"output/algorithm_difference.svg\") algorithm::difference() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10 | export(\"{OUTPUT_FILE}.svg\") algorithm::difference() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 "
     );

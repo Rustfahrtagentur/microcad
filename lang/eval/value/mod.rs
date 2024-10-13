@@ -458,6 +458,18 @@ macro_rules! impl_try_from {
     };
 }
 
+impl From<String> for Value {
+    fn from(s: String) -> Self {
+        Value::String(Refer::none(s))
+    }
+}
+
+impl From<Scalar> for Value {
+    fn from(value: Scalar) -> Self {
+        Value::Scalar(Refer::none(value))
+    }
+}
+
 impl_try_from!(Integer => i64);
 impl_try_from!(Scalar, Length, Angle => Scalar);
 impl_try_from!(Vec2 => Vec2);

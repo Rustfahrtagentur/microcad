@@ -23,7 +23,7 @@ impl SourceFileCache {
         {
             e.insert(source_file.clone());
             self.source_files_by_name
-                .insert(source_file.filename().to_string(), source_file);
+                .insert(source_file.filename_as_str().to_string(), source_file);
         }
     }
 

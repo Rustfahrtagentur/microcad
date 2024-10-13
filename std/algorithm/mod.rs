@@ -9,22 +9,27 @@ use microcad_lang::{
 };
 use microcad_render::Node;
 
+/// Creates a node containing a difference algorithm
 pub fn difference() -> Result<Node, EvalError> {
     Ok(microcad_core::algorithm::boolean_op::difference())
 }
 
+/// Creates a node containing a union algorithm
 pub fn union() -> Result<Node, EvalError> {
     Ok(microcad_core::algorithm::boolean_op::union())
 }
 
+/// Creates a node containing an intersection algorithm
 pub fn intersection() -> Result<Node, EvalError> {
     Ok(microcad_core::algorithm::boolean_op::intersection())
 }
 
+/// Creates a node containing a complement algorithm
 pub fn complement() -> Result<Node, EvalError> {
     Ok(microcad_core::algorithm::boolean_op::complement())
 }
 
+/// Creates the builtin `algorithm` module
 pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
     NamespaceBuilder::new("algorithm")
         .add(builtin_module!(difference()).into())

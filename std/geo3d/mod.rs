@@ -6,7 +6,7 @@ use microcad_core::*;
 use microcad_lang::{eval::*, parse::*};
 use microcad_render::{RenderHash, Renderable3D};
 
-#[derive(DefineBuiltinRenderable3D)]
+#[derive(DefineBuiltinRenderable3D, Debug)]
 pub struct Sphere {
     pub radius: Scalar,
 }
@@ -32,7 +32,7 @@ impl Renderable3D for Sphere {
     }
 }
 
-#[derive(DefineBuiltinRenderable3D)]
+#[derive(DefineBuiltinRenderable3D, Debug)]
 pub struct Cube {
     pub size_x: Scalar,
     pub size_y: Scalar,
