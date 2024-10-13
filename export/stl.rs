@@ -92,26 +92,3 @@ impl Exporter for StlExporter {
         Ok(())
     }
 }
-
-#[test]
-fn test_stl_export() {
-    use microcad_render::NodeInner;
-
-    let settings = ExportSettings::with_filename("../tests/output/test_stl_export.stl".to_string());
-    use crate::Exporter;
-    let mut exporter = StlExporter::from_settings(&settings).unwrap();
-
-    let node = microcad_render::Node::new(NodeInner::Root);
-
-    use microcad_core::geo3d::*;
-    let a = Manifold::cube(1.0, 1.0, 1.0);
-    let b = Manifold::sphere(1.0, 32);
-
-    let intersection: Geometry = a.intersection(&b).into();
-
-    node.append(microcad_render::Node::new(NodeInner::Geometry3D(
-        std::rc::Rc::new(intersection.fetch_mesh().into()),
-    )));
-
-    exporter.export(node).unwrap();
-}

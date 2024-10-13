@@ -5,15 +5,20 @@
 
 //! µCAD Standard library
 
-mod algorithm;
+/// Algorithm module, e.g. `std::algorithm::difference`
+pub mod algorithm;
+
 mod context_builder;
 mod export;
-mod geo2d;
+
+/// Module containing builtin 2D geometries like `circle` or `rect`
+pub mod geo2d;
 mod math;
 mod namespace_builder;
 
+/// Module containing builtin 3D geometries like `sphere` or `cube`
 #[cfg(feature = "geo3d")]
-mod geo3d;
+pub mod geo3d;
 
 #[cfg(test)]
 mod tests;

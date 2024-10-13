@@ -21,6 +21,7 @@ log = "0.4"
 microcad-core = { path = "../core" }
 microcad-export = { path = "../export" }
 microcad-lang = { path = "../lang" }
+microcad-render = { path = "../render" }
 microcad-std = { path = "../std" }
 
 [build-dependencies]
