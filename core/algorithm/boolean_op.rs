@@ -16,7 +16,7 @@ pub enum BooleanOp {
     Intersection,
 }
 
-use crate::render::{ModelNode, ModelNodeInner, Renderer2D};
+use crate::render::{ModelNode, ModelNodeInner};
 use crate::Algorithm;
 use geo::OpType;
 
@@ -53,7 +53,7 @@ impl From<&BooleanOp> for OpType {
 }
 
 impl Algorithm for BooleanOp {
-    fn process_2d(&self, renderer: &mut dyn Renderer2D, parent: ModelNode) -> crate::Result<crate::geo2d::Node> {
+    fn process_2d(&self, renderer: &mut crate::Renderer2D, parent: ModelNode) -> crate::Result<crate::geo2d::Node> {
         let mut geometries = Vec::new();
 
         // all algorithm nodes are nested in a group
@@ -91,7 +91,7 @@ impl Algorithm for BooleanOp {
 
     fn process_3d(
         &self,
-        renderer: &mut dyn crate::render::Renderer3D,
+        renderer: &mut crate::Renderer3D,
         parent: ModelNode,
     ) -> crate::Result<crate::geo3d::Node> {
         // all algorithm nodes are nested in a group

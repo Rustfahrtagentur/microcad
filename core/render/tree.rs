@@ -3,11 +3,8 @@
 
 //! Render tree
 
-use crate::{export::ExportSettings, geo2d, render::*, Algorithm, CoreError, Transform};
+use crate::{export::ExportSettings, Algorithm, CoreError, Transform};
 use strum::IntoStaticStr;
-
-#[cfg(feature = "geo3d")]
-use crate::geo3d;
 
 /// Inner of a node
 #[derive(IntoStaticStr)]
@@ -16,11 +13,11 @@ pub enum ModelNodeInner {
     Group,
 
     /// A generated 2D geometry
-    Primitive2D(Box<dyn Primitive2D>),
+    Primitive2D(Box<crate::Primitive2D>),
 
     /// Generated 3D geometry
     #[cfg(feature = "geo3d")]
-    Primitive3D(Box<dyn Primitive3D>),
+    Primitive3D(Box<crate::Primitive3D>),
 
     /// An algorithm trait that manipulates the node or its children
     Algorithm(Box<dyn Algorithm>),
@@ -95,7 +92,7 @@ pub fn dump(writer: &mut dyn std::io::Write, node: ModelNode) -> std::io::Result
 
 
 
-pub fn bake2d(renderer: &mut dyn Renderer2D, node: ModelNode) -> Result<crate::geo2d::Node, CoreError> {
+pub fn bake2d(renderer: &mut crate::Renderer2D, node: ModelNode) -> Result<crate::geo2d::Node, CoreError> {
     let node2d = {
         match *node.borrow(){
             ModelNodeInner::Group | ModelNodeInner::Export(_) => crate::geo2d::tree::group(),
@@ -120,7 +117,7 @@ pub fn bake2d(renderer: &mut dyn Renderer2D, node: ModelNode) -> Result<crate::g
 }
 
 
-pub fn bake3d(renderer: &mut dyn Renderer3D, node: ModelNode) -> Result<crate::geo3d::Node, CoreError> {
+pub fn bake3d(renderer: &mut crate::Renderer3D, node: ModelNode) -> Result<crate::geo3d::Node, CoreError> {
     let node3d = {
         match *node.borrow(){
             ModelNodeInner::Group | ModelNodeInner::Export(_) => crate::geo3d::tree::group(),
@@ -146,7 +143,7 @@ pub fn bake3d(renderer: &mut dyn Renderer3D, node: ModelNode) -> Result<crate::g
 #[test]
 fn node_nest() {
     use crate::Depth;
-    let nodes = vec![tree::group(), tree::group(), tree::group()];
+    let nodes = vec![group(), group(), group()];
     let node = nest_nodes(nodes.clone());
 
     nodes[0]

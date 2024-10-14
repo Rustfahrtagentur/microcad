@@ -3,7 +3,6 @@
 
 //! Mesh renderer
 
-use crate::*;
 use microcad_core::{
     geo3d::{self},
     Scalar,
@@ -28,7 +27,7 @@ impl MeshRenderer {
     }
 }
 
-impl Renderer for MeshRenderer {
+impl microcad_core::Renderer for MeshRenderer {
     fn precision(&self) -> Scalar {
         self.precision
     }
@@ -43,7 +42,7 @@ impl Default for MeshRenderer {
     }
 }
 
-impl Renderer3D for MeshRenderer {
+impl geo3d::Renderer for MeshRenderer {
     fn mesh(&mut self, mesh: &geo3d::TriangleMesh) -> microcad_core::Result<()> {
         self.triangle_mesh.append(mesh);
         Ok(())

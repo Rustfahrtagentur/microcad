@@ -49,3 +49,29 @@ pub trait Depth {
     /// Calculate depth
     fn depth(&self) -> usize;
 }
+
+/// Render hash trait
+pub trait RenderHash {
+    /// Calculate a hash of self
+    fn render_hash(&self) -> Option<u64> {
+        None
+    }
+}
+
+/// Renderer trait
+pub trait Renderer {
+    /// The precision of the renderer in mm
+    fn precision(&self) -> crate::Scalar;
+
+    /// Change the render state
+    fn change_render_state(&mut self, _: &str, _: &str) -> crate::Result<()> {
+        Ok(())
+    }
+}
+
+pub type Renderer2D = dyn geo2d::Renderer;
+pub type Renderer3D = dyn geo3d::Renderer;
+
+pub type Primitive2D = dyn geo2d::Primitive;
+pub type Primitive3D = dyn geo3d::Primitive;
+

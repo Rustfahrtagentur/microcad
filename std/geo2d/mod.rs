@@ -2,29 +2,26 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_builtin_proc_macro::DefineBuiltinPrimitive2D;
-use microcad_core::{
-    geo2d::{Geometry, LineString},
-    Scalar,
-};
+use microcad_core::*;
+
 use microcad_lang::{eval::*, parse::*};
-use microcad_render::{RenderHash, Primitive2D};
 
 #[derive(DefineBuiltinPrimitive2D, Debug)]
 pub struct Circle {
     pub radius: Scalar,
 }
 
-impl RenderHash for Circle {
+impl microcad_core::RenderHash for Circle {
     fn render_hash(&self) -> Option<u64> {
         None
     }
 }
 
-impl Primitive2D for Circle {
+impl geo2d::Primitive for Circle {
     fn render_geometry(
         &self,
-        renderer: &mut dyn microcad_render::Renderer2D,
-    ) -> microcad_core::Result<Geometry> {
+        renderer: &mut dyn geo2d::Renderer,
+    ) -> microcad_core::Result<geo2d::Geometry> {
         use std::f64::consts::PI;
 
         let n = (self.radius / renderer.precision() * PI * 0.5).max(3.0) as u64;
@@ -37,8 +34,8 @@ impl Primitive2D for Circle {
             })
             .collect();
 
-        Ok(Geometry::MultiPolygon(
-            microcad_core::geo2d::line_string_to_multi_polygon(LineString::new(points)),
+        Ok(geo2d::Geometry::MultiPolygon(
+            microcad_core::geo2d::line_string_to_multi_polygon(geo2d::LineString::new(points)),
         ))
     }
 }
@@ -51,17 +48,17 @@ struct Rect {
     y: Scalar,
 }
 
-impl RenderHash for Rect {
+impl microcad_core::RenderHash for Rect {
     fn render_hash(&self) -> Option<u64> {
         None
     }
 }
 
-impl Primitive2D for Rect {
+impl geo2d::Primitive for Rect {
     fn render_geometry(
         &self,
-        _renderer: &mut dyn microcad_render::Renderer2D,
-    ) -> microcad_core::Result<Geometry> {
+        _renderer: &mut dyn geo2d::Renderer,
+    ) -> microcad_core::Result<geo2d::Geometry> {
         use geo::line_string;
 
         // Create a rectangle from the given width, height, x and y
@@ -73,7 +70,7 @@ impl Primitive2D for Rect {
             (x: self.x, y: self.y),
         ];
 
-        Ok(Geometry::MultiPolygon(
+        Ok(geo2d::Geometry::MultiPolygon(
             microcad_core::geo2d::line_string_to_multi_polygon(line_string),
         ))
     }

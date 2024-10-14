@@ -3,15 +3,14 @@
 
 //! 2D Primitive
 
-use super::*;
 use crate::*;
 
 /// A Primitive is a hashable renderable object that can be rendered by a Renderer2D
-pub trait Primitive2D: RenderHash + std::fmt::Debug {
+pub trait Primitive: RenderHash + std::fmt::Debug {
     /// Get geometry
     fn request_geometry(
         &self,
-        renderer: &mut dyn Renderer2D,
+        renderer: &mut dyn Renderer,
     ) -> Result<std::rc::Rc<geo2d::Geometry>> {
         // Try to fetch the geometry from the render cache
         if let Some(hash) = self.render_hash() {
@@ -26,11 +25,11 @@ pub trait Primitive2D: RenderHash + std::fmt::Debug {
     }
 
     /// Render geometry
-    fn render_geometry(&self, renderer: &mut dyn Renderer2D) -> Result<geo2d::Geometry>;
+    fn render_geometry(&self, renderer: &mut dyn Renderer) -> Result<geo2d::Geometry>;
 }
 
 /// 2D Renderer
-pub trait Renderer2D: Renderer {
+pub trait Renderer: crate::Renderer {
     /// Render multiple polygons
     fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> Result<()>;
 

@@ -33,7 +33,7 @@ impl Exporter for SvgExporter {
     fn export(&mut self, node: microcad_render::ModelNode) -> microcad_core::Result<()> {
         let file = std::fs::File::create(&self.filename)?;
 
-        use microcad_render::Renderer2D;
+        use microcad_core::geo2d::Renderer;
         let mut renderer = SvgRenderer::default();
         renderer.set_output(Box::new(file))?;
         let node = microcad_core::render::tree::bake2d(&mut renderer, node)?;

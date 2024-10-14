@@ -1,8 +1,6 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_export::stl::StlExporter;
-
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 #[cfg(test)]
@@ -145,7 +143,7 @@ fn test_source_file(file_name: &str) {
 #[test]
 fn difference_svg() {
     use microcad_lang::eval::BuiltinModuleDefinition;
-    use microcad_render::{svg::SvgRenderer, tree, Renderer2D};
+    use microcad_render::{svg::SvgRenderer, tree};
     use microcad_std::{algorithm::*, geo2d::*};
 
     let difference = difference().unwrap();
@@ -162,6 +160,7 @@ fn difference_svg() {
 
     let difference = microcad_core::render::tree::bake2d(&mut renderer, difference).unwrap();
 
+    use microcad_core::geo2d::Renderer;
     renderer.render_node(difference).unwrap();
 }
 

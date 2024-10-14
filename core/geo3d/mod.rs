@@ -5,11 +5,13 @@
 
 mod triangle_mesh;
 pub mod tree;
+mod render;
 
 pub use manifold_rs::Manifold;
 pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 
 pub use tree::{Node, NodeInner};
+pub use render::*;
 
 use strum::IntoStaticStr;
 

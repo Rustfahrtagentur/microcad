@@ -5,10 +5,13 @@
 
 pub mod tree;
 
+mod render;
+
 use crate::Scalar;
 use strum::IntoStaticStr;
 
 pub use tree::{Node, NodeInner};
+pub use render::*;
 
 /// Line string
 pub type LineString = geo::LineString<Scalar>;
