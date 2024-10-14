@@ -65,7 +65,6 @@ impl Algorithm for BooleanOp {
                 ModelNodeInner::Primitive2D(renderable) => {
                     geometries.push(renderable.request_geometry(renderer)?)
                 }
-                ModelNodeInner::Geometry2D(g) => geometries.push(g.clone()),
                 ModelNodeInner::Algorithm(algorithm) => {
                     let new_node = algorithm.process_2d(renderer, child.clone())?;
                     let c = &*new_node.borrow();
@@ -102,7 +101,6 @@ impl Algorithm for BooleanOp {
             .children()
             .filter_map(|child| match &*child.borrow() {
                 ModelNodeInner::Primitive3D(renderable) => renderable.request_geometry(renderer).ok(),
-                ModelNodeInner::Geometry3D(g) => Some(g.clone()),
                 ModelNodeInner::Algorithm(algorithm) => {
                     if let Ok(new_node) = algorithm.process_3d(renderer, child.clone()) {
                         if let crate::geo3d::NodeInner::Geometry(g) = &*new_node.borrow() {

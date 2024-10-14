@@ -15,16 +15,8 @@ pub enum ModelNodeInner {
     /// A group node that contains children
     Group,
 
-    /// A 2D geometry
-    /// This is an rc::Rc to allow for sharing of geometries
-    Geometry2D(std::rc::Rc<geo2d::Geometry>),
-
     /// A generated 2D geometry
     Primitive2D(Box<dyn Primitive2D>),
-
-    /// 3D Geometry
-    #[cfg(feature = "geo3d")]
-    Geometry3D(std::rc::Rc<geo3d::Geometry>),
 
     /// Generated 3D geometry
     #[cfg(feature = "geo3d")]

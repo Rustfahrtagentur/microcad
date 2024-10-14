@@ -29,22 +29,12 @@ impl CallMethod for microcad_render::ModelNode {
     fn call_method(
         &self,
         name: &Identifier,
-        args: &CallArgumentValueList,
-        src_ref: SrcRef,
+        _args: &CallArgumentValueList,
+        _src_ref: SrcRef,
     ) -> Result<Value> {
-        use microcad_render::ModelNodeInner;
-
         match name.into() {
             // Return the vertices of a node
-            "vertices" => {
-                let parameter_values = ParameterValueList::default();
-                let _arg_map = args.get_matching_arguments(&parameter_values)?;
-                let inner = self.borrow();
-                match &*inner {
-                    ModelNodeInner::Geometry2D(geo) => Ok(geo.vertices().into_value(src_ref)),
-                    _ => Err(EvalError::UnknownMethod("vertices".into())),
-                }
-            }
+            "vertices" => todo!(),
             method_name => Err(EvalError::UnknownMethod(method_name.into())),
         }
     }
@@ -82,35 +72,6 @@ impl CallMethod for List {
     }
 }
 
-#[test]
-fn call_method() {
-    use microcad_core::geo2d::Rect;
-    use microcad_render::{ModelNode, ModelNodeInner};
-    let node = ModelNode::new(ModelNodeInner::Geometry2D(
-        microcad_core::geo2d::Geometry::Rect(Rect::new(
-            microcad_core::geo2d::coord! { x: 10., y: 20. },
-            microcad_core::geo2d::coord! { x: 30., y: 10. },
-        ))
-        .into(),
-    ));
-
-    let value = node
-        .call_method(
-            &"vertices".into(),
-            &CallArgumentValueList::default(),
-            SrcRef(None),
-        )
-        .unwrap();
-    if let Value::List(value_list) = value {
-        // We expect a [(x: length, y: length)]
-        assert_eq!(value_list.ty(), crate::r#type::Type::Vec2);
-
-        // A rect has 4 corners
-        assert_eq!(value_list.len(), 4);
-    } else {
-        panic!("Expected a list of values");
-    }
-}
 
 #[test]
 fn call_list_method() {
