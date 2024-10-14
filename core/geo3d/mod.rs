@@ -82,14 +82,17 @@ impl From<TriangleMesh> for Geometry {
     }
 }
 
+/// Create a new group node
 pub fn group() -> Node {
     Node::new(NodeInner::Group)
 }
 
+/// Create a new geometry node
 pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
     Node::new(NodeInner::Geometry(geometry))
 }
 
+/// Create a new transform node
 pub fn transform(transform: crate::Mat4) -> Node {
     Node::new(NodeInner::Transform(transform))
 }
