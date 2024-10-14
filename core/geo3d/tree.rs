@@ -49,3 +49,15 @@ impl std::fmt::Debug for NodeInner {
         }
     }
 }
+
+pub fn group() -> Node {
+    Node::new(NodeInner::Group)
+}
+
+pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
+    Node::new(NodeInner::Geometry(geometry))
+}
+
+pub fn transform(transform: crate::Mat4) -> Node {
+    Node::new(NodeInner::Transform(transform))
+}

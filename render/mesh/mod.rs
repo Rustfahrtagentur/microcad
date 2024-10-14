@@ -6,7 +6,7 @@
 use crate::*;
 use microcad_core::{
     geo3d::{self},
-    CoreError, Scalar,
+    Scalar,
 };
 
 /// Renders a mesh
@@ -63,31 +63,21 @@ impl Renderer3D for MeshRenderer {
         }
     }
 
-    fn render_node(&mut self, node: ModelNode) -> microcad_core::Result<()> {
+    fn render_node(&mut self, node: microcad_core::geo3d::Node) -> microcad_core::Result<()> {
         let inner = node.borrow();
+        use microcad_core::geo3d::NodeInner;
 
         match &*inner {
-            ModelNodeInner::Export(_) | ModelNodeInner::Group => {
+            NodeInner::Group => {
                 for child in node.children() {
                     self.render_node(child.clone())?;
                 }
                 return Ok(());
             }
-            ModelNodeInner::Algorithm(algorithm) => {
-                let new_node = algorithm.process_3d(self, node.clone())?;
-                self.render_node(new_node)?;
-            }
-            ModelNodeInner::Geometry3D(geometry) => {
+            NodeInner::Geometry(geometry) => {
                 self.render_geometry(geometry)?;
             }
-            ModelNodeInner::Primitive3D(renderable) => {
-                let geometry = renderable.request_geometry(self)?;
-                self.render_geometry(&geometry)?;
-            }
-            ModelNodeInner::Transform(_) => unimplemented!(),
-            ModelNodeInner::Geometry2D(_) | ModelNodeInner::Primitive2D(_) => {
-                return Err(CoreError::NotImplemented);
-            }
+            NodeInner::Transform(_) => unimplemented!(),
         }
 
         Ok(())

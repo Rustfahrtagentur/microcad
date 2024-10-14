@@ -3,7 +3,7 @@
 
 //! 2D Geometry
 
-mod tree;
+pub mod tree;
 
 use crate::Scalar;
 use strum::IntoStaticStr;

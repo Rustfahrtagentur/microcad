@@ -48,5 +48,5 @@ pub trait Renderer2D: Renderer {
     }
 
     /// Render node
-    fn render_node(&mut self, node: ModelNode) -> Result<()>;
+    fn render_node(&mut self, node: crate::geo2d::Node) -> Result<()>;
 }

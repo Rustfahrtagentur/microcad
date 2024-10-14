@@ -53,7 +53,7 @@ impl From<&BooleanOp> for OpType {
 }
 
 impl Algorithm for BooleanOp {
-    fn process_2d(&self, renderer: &mut dyn Renderer2D, parent: ModelNode) -> crate::Result<ModelNode> {
+    fn process_2d(&self, renderer: &mut dyn Renderer2D, parent: ModelNode) -> crate::Result<crate::geo2d::Node> {
         let mut geometries = Vec::new();
 
         // all algorithm nodes are nested in a group
@@ -69,7 +69,7 @@ impl Algorithm for BooleanOp {
                 ModelNodeInner::Algorithm(algorithm) => {
                     let new_node = algorithm.process_2d(renderer, child.clone())?;
                     let c = &*new_node.borrow();
-                    if let ModelNodeInner::Geometry2D(g) = c {
+                    if let crate::geo2d::NodeInner::Geometry(g) = c {
                         geometries.push(g.clone())
                     }
                 }
@@ -87,14 +87,14 @@ impl Algorithm for BooleanOp {
             }
         });
 
-        Ok(ModelNode::new(ModelNodeInner::Geometry2D(result)))
+        Ok(crate::geo2d::tree::geometry(result))
     }
 
     fn process_3d(
         &self,
         renderer: &mut dyn crate::render::Renderer3D,
         parent: ModelNode,
-    ) -> crate::Result<ModelNode> {
+    ) -> crate::Result<crate::geo3d::Node> {
         // all algorithm nodes are nested in a group
         let group = into_group(parent).unwrap();
 
@@ -105,7 +105,7 @@ impl Algorithm for BooleanOp {
                 ModelNodeInner::Geometry3D(g) => Some(g.clone()),
                 ModelNodeInner::Algorithm(algorithm) => {
                     if let Ok(new_node) = algorithm.process_3d(renderer, child.clone()) {
-                        if let ModelNodeInner::Geometry3D(g) = &*new_node.borrow() {
+                        if let crate::geo3d::NodeInner::Geometry(g) = &*new_node.borrow() {
                             Some(g.clone())
                         } else {
                             None
@@ -117,7 +117,7 @@ impl Algorithm for BooleanOp {
                 _ => None,
             })
             .collect();
-        Ok(ModelNode::new(ModelNodeInner::Geometry3D(
+        Ok(crate::geo3d::geometry(
             geometries[1..]
                 .iter()
                 .fold(geometries[0].clone(), |acc, geo| {
@@ -127,7 +127,7 @@ impl Algorithm for BooleanOp {
                         acc
                     }
                 }),
-        )))
+        ))
     }
 }
 

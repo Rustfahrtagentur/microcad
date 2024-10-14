@@ -3,7 +3,7 @@
 
 //! Render tree
 
-use crate::{export::ExportSettings, geo2d, render::*, Algorithm, Transform};
+use crate::{export::ExportSettings, geo2d, render::*, Algorithm, CoreError, Transform};
 use strum::IntoStaticStr;
 
 #[cfg(feature = "geo3d")]
@@ -101,6 +101,56 @@ pub fn dump(writer: &mut dyn std::io::Write, node: ModelNode) -> std::io::Result
         .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
 }
 
+
+
+pub fn bake2d(renderer: &mut dyn Renderer2D, node: ModelNode) -> Result<crate::geo2d::Node, CoreError> {
+    let node2d = {
+        match *node.borrow(){
+            ModelNodeInner::Group | ModelNodeInner::Export(_) => crate::geo2d::tree::group(),
+            ModelNodeInner::Primitive2D(ref renderable) => return Ok(
+                    crate::geo2d::tree::geometry(renderable.request_geometry(renderer)?)),
+            ModelNodeInner::Algorithm(ref algorithm) => return algorithm.process_2d(renderer, node.clone()),
+            _ => return Err(CoreError::NotImplemented)
+        }
+    };
+
+    node.children().try_for_each(|child| {
+        if let Ok(child) = bake2d(renderer, child) {
+            node2d.append(child);
+            Ok(())
+        } else {
+            Err(CoreError::NotImplemented)
+        }
+    })?;
+
+
+    Ok(node2d)
+}
+
+
+pub fn bake3d(renderer: &mut dyn Renderer3D, node: ModelNode) -> Result<crate::geo3d::Node, CoreError> {
+    let node3d = {
+        match *node.borrow(){
+            ModelNodeInner::Group | ModelNodeInner::Export(_) => crate::geo3d::tree::group(),
+            ModelNodeInner::Primitive3D(ref renderable) => return Ok(
+                    crate::geo3d::tree::geometry(renderable.request_geometry(renderer)?)),
+            ModelNodeInner::Algorithm(ref algorithm) => return algorithm.process_3d(renderer, node.clone()),
+            _ => return Err(CoreError::NotImplemented)
+        }
+    };
+
+    node.children().try_for_each(|child| {
+        if let Ok(child) = bake3d(renderer, child) {
+            node3d.append(child);
+            Ok(())
+        } else {
+            Err(CoreError::NotImplemented)
+        }
+    })?;
+
+
+    Ok(node3d)
+}
 #[test]
 fn node_nest() {
     use crate::Depth;

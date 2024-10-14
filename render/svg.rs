@@ -6,7 +6,7 @@
 use geo::CoordsIter;
 use microcad_core::{
     geo2d::*,
-    render::{ModelNode, ModelNodeInner, Renderer, Renderer2D},
+    render::{Renderer, Renderer2D},
     CoreError, Scalar,
 };
 
@@ -202,23 +202,18 @@ impl Renderer2D for SvgRenderer {
         Ok(())
     }
 
-    fn render_node(&mut self, node: ModelNode) -> microcad_core::Result<()> {
+    fn render_node(&mut self, node: microcad_core::geo2d::Node) -> microcad_core::Result<()> {
         let inner = node.borrow();
+        use microcad_core::geo2d::NodeInner;
+
         match &*inner {
-            ModelNodeInner::Export(_) | ModelNodeInner::Group => {
+            NodeInner::Group => {
                 for child in node.children() {
                     self.render_node(child.clone())?;
                 }
             }
-            ModelNodeInner::Algorithm(algorithm) => {
-                let new_node = algorithm.process_2d(self, node.clone())?;
-                self.render_node(new_node)?;
-            }
-            ModelNodeInner::Primitive2D(renderable) => {
-                renderable.render_geometry(self)?;
-            }
-            ModelNodeInner::Geometry2D(geometry) => self.render_geometry(geometry)?,
-            ModelNodeInner::Transform(_) => unimplemented!(),
+            NodeInner::Geometry(geometry) => self.render_geometry(geometry)?,
+            NodeInner::Transform(_) => unimplemented!(),
             _ => return Err(CoreError::NotImplemented),
         };
 

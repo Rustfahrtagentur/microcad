@@ -4,7 +4,7 @@
 //! 3D Geometry
 
 mod triangle_mesh;
-mod tree;
+pub mod tree;
 
 pub use manifold_rs::Manifold;
 pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
@@ -78,4 +78,16 @@ impl From<TriangleMesh> for Geometry {
     fn from(mesh: TriangleMesh) -> Self {
         Geometry::Mesh(mesh)
     }
+}
+
+pub fn group() -> Node {
+    Node::new(NodeInner::Group)
+}
+
+pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
+    Node::new(NodeInner::Geometry(geometry))
+}
+
+pub fn transform(transform: crate::Mat4) -> Node {
+    Node::new(NodeInner::Transform(transform))
 }

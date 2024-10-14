@@ -36,6 +36,8 @@ impl Exporter for SvgExporter {
         use microcad_render::Renderer2D;
         let mut renderer = SvgRenderer::default();
         renderer.set_output(Box::new(file))?;
+        let node = microcad_core::render::tree::bake2d(&mut renderer, node)?;
+
         renderer.render_node(node)
     }
 }
