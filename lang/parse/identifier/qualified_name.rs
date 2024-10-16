@@ -65,7 +65,7 @@ impl QualifiedName {
     /// Visit all symbols in the qualified name recursively
     fn _visit_symbols(
         &self,
-        root: Option<Symbol>,
+        root: Option<std::rc::Rc<Symbol>>,
         index: usize,
         context: &Context,
         functor: &mut dyn FnMut(&Symbol, usize),
@@ -82,7 +82,7 @@ impl QualifiedName {
         };
 
         for symbol in new_symbols {
-            functor(symbol, index);
+            functor(&symbol, index);
             self._visit_symbols(Some(symbol.clone()), index + 1, context, functor)?;
         }
 

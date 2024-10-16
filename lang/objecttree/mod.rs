@@ -11,11 +11,13 @@ use strum::IntoStaticStr;
 
 use microcad_core::*;
 
+use crate::eval::*;
+
 /// Inner of a node
 #[derive(IntoStaticStr)]
 pub enum ObjectNodeInner {
     /// A group node that contains children
-    Group,
+    Group(SymbolTable),
 
     /// A generated 2D geometry
     Primitive2D(Box<Primitive2D>),
@@ -58,9 +60,34 @@ impl std::fmt::Debug for ObjectNodeInner {
 /// Render node
 pub type ObjectNode = rctree::Node<ObjectNodeInner>;
 
+
+impl Symbols for ObjectNode {
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+        match *self.borrow() {
+            ObjectNodeInner::Group(ref table) => table.fetch(id),
+            _ => unreachable!()
+        }
+    }
+
+    fn add(&mut self, symbol: Symbol) -> &mut Self {
+        match *self.borrow_mut() {
+            ObjectNodeInner::Group(ref mut table) => table.add(symbol),
+            _ => unreachable!()
+        };
+        self
+    }
+
+    fn copy<T: Symbols>(&self, into: &mut T) {
+        match *self.borrow_mut() {
+            ObjectNodeInner::Group(ref mut table) => table.copy(into),
+            _ => unreachable!()
+        };
+    }
+}
+
 /// Create new group node
 pub fn group() -> ObjectNode {
-    ObjectNode::new(ObjectNodeInner::Group)
+    ObjectNode::new(ObjectNodeInner::Group(SymbolTable::default()))
 }
 
 /// Trait to calculate depth for a node
@@ -105,7 +132,7 @@ pub fn dump(writer: &mut dyn std::io::Write, node: ObjectNode) -> std::io::Resul
 
 fn into_group(node: ObjectNode) -> Option<ObjectNode> {
     node.first_child().and_then(|n| {
-        if let ObjectNodeInner::Group = *n.borrow() {
+        if let ObjectNodeInner::Group(_) = *n.borrow() {
             Some(n.clone())
         } else {
             None
@@ -114,10 +141,11 @@ fn into_group(node: ObjectNode) -> Option<ObjectNode> {
 }
 
 
-pub fn bake2d(renderer: &mut Renderer2D, node: ObjectNode) -> Result<geo2d::Node> {
+pub fn bake2d(renderer: &mut Renderer2D, node: ObjectNode) -> core::result::Result<geo2d::Node, CoreError> {
     let node2d = {
         match *node.borrow(){
-            ObjectNodeInner::Group | ObjectNodeInner::Export(_) => geo2d::tree::group(),
+            ObjectNodeInner::Group(_) => geo2d::tree::group(),
+            ObjectNodeInner::Export(_) => geo2d::tree::group(),
             ObjectNodeInner::Primitive2D(ref renderable) => return Ok(
                     geo2d::tree::geometry(renderable.request_geometry(renderer)?)),
             ObjectNodeInner::Algorithm(ref algorithm) => return algorithm.process_2d(renderer, node.clone()),
@@ -139,10 +167,11 @@ pub fn bake2d(renderer: &mut Renderer2D, node: ObjectNode) -> Result<geo2d::Node
 }
 
 
-pub fn bake3d(renderer: &mut Renderer3D, node: ObjectNode) -> Result<geo3d::Node> {
+pub fn bake3d(renderer: &mut Renderer3D, node: ObjectNode) -> core::result::Result<geo3d::Node, CoreError> {
     let node3d = {
         match *node.borrow(){
-            ObjectNodeInner::Group | ObjectNodeInner::Export(_) => geo3d::tree::group(),
+            ObjectNodeInner::Group(_) => geo3d::tree::group(),
+            ObjectNodeInner::Export(_) => geo3d::tree::group(),
             ObjectNodeInner::Primitive3D(ref renderable) => return Ok(
                     geo3d::tree::geometry(renderable.request_geometry(renderer)?)),
             ObjectNodeInner::Algorithm(ref algorithm) => return algorithm.process_3d(renderer, node.clone()),

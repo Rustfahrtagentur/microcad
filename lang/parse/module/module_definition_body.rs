@@ -108,7 +108,7 @@ impl SrcReferrer for ModuleDefinitionBody {
 }
 
 impl Symbols for ModuleDefinitionBody {
-    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         self.symbols.fetch(id)
     }
 

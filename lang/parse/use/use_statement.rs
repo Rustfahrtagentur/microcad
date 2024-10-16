@@ -89,8 +89,8 @@ impl Eval for UseStatement {
                         match symbol {
                             Symbol::Namespace(namespace_definition) => {
                                 let symbols = &namespace_definition.body.symbols;
-                                for symbol in symbols.iter() {
-                                    context.add(symbol.clone());
+                                for (_, symbol) in symbols.iter() {
+                                    context.add(symbol.as_ref().clone());
                                 }
                             }
                             _ => {

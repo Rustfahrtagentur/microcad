@@ -24,7 +24,7 @@ impl NamespaceBuilder {
 }
 
 impl Symbols for NamespaceBuilder {
-    fn fetch(&self, name: &microcad_core::Id) -> Vec<&Symbol> {
+    fn fetch(&self, name: &microcad_core::Id) -> Option<std::rc::Rc<Symbol>> {
         self.namespace.fetch(name)
     }
 

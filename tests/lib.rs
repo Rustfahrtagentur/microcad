@@ -344,7 +344,7 @@ fn test_simple_module_definition() {
 
     if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
         match *node.borrow() {
-            ObjectNodeInner::Group => {}
+            ObjectNodeInner::Group(_) => {}
             ref inner => panic!("Expected node to be a Group, got {:?}", inner),
         }
 

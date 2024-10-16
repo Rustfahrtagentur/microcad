@@ -126,12 +126,12 @@ impl PushDiag for Context {
 }
 
 impl Symbols for Context {
-    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         self.stack
             .iter()
             .rev()
             .flat_map(|table| table.fetch(id))
-            .collect()
+            .next()
     }
 
     fn add(&mut self, symbol: Symbol) -> &mut Self {
@@ -140,8 +140,8 @@ impl Symbols for Context {
     }
 
     fn copy<T: Symbols>(&self, into: &mut T) {
-        self.stack.last().unwrap().iter().for_each(|symbol| {
-            into.add(symbol.clone());
+        self.stack.last().unwrap().iter().for_each(|(_, symbol)| {
+            into.add(symbol.as_ref().clone());
         });
     }
 }
@@ -176,8 +176,8 @@ fn context_basic() {
     context.add_value("a".into(), Value::Integer(Refer::none(1)));
     context.add_value("b".into(), Value::Integer(Refer::none(2)));
 
-    assert_eq!(context.fetch(&"a".into())[0].id().unwrap(), "a");
-    assert_eq!(context.fetch(&"b".into())[0].id().unwrap(), "b");
+    assert_eq!(context.fetch(&"a".into()).unwrap().id().unwrap(), "a");
+    assert_eq!(context.fetch(&"b".into()).unwrap().id().unwrap(), "b");
 
     let c = Parser::parse_rule::<Assignment>(Rule::assignment, "c = a + b", 0).unwrap();
 
