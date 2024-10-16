@@ -34,7 +34,7 @@ impl CallTrait for ModuleDefinition {
     fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
         context.push();
 
-        let node = crate::objecttree::group();
+        let mut node = crate::objecttree::group();
         context.set_current_node(node.clone());
 
         // Let's evaluate the pre-init statements first
@@ -63,6 +63,10 @@ impl CallTrait for ModuleDefinition {
             }
             1 => {
                 let (init, arg_map) = matching_init.first().unwrap();
+                // Copy the arguments to the symbol table of the node
+                for (name, value) in arg_map.iter() {
+                    node.add(Symbol::Value(name.clone(), value.clone()));
+                }
                 init.call(arg_map, context)?;
             }
             _ => {
