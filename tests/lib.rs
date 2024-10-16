@@ -367,6 +367,9 @@ fn test_module_definition_with_parameters() {
 
         donut(radius = 3.0);
         donut(radius = 5.0);
+
+        // Test if we can access the radius parameter
+        std::assert(donut(radius = 4.0).radius == 4.0);
         "#,
     );
 
