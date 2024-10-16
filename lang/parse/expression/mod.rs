@@ -225,6 +225,23 @@ impl Eval for Expression {
                     _ => unimplemented!(),
                 }
             }
+            Self::NamedTupleElementAccess(lhs, rhs, _) => {
+                let lhs = lhs.eval(context)?;
+                match lhs {
+                    Value::NamedTuple(tuple) => {
+                        let value = tuple.get(&rhs).unwrap();
+                        Ok(value.clone())
+                    }
+                    Value::Node(node) => {
+                        let symbol = node.fetch(&rhs.to_string().into()).unwrap();
+                        match symbol.as_ref() {
+                            Symbol::Value(_, value) => Ok(value.clone()),
+                            _ => unimplemented!(),
+                        }
+                    }
+                    _ => unimplemented!(),
+                }
+            }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Nested(nested) => nested.eval(context),
             _ => unimplemented!(),
