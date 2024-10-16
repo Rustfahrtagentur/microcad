@@ -97,7 +97,7 @@ impl Eval for FunctionStatement {
             FunctionStatement::Assignment(assignment) => assignment.eval(context)?,
             FunctionStatement::Return(expr) => return Ok(Some(expr.eval(context)?)),
             FunctionStatement::FunctionDefinition(f) => f.eval(context)?,
-            FunctionStatement::If { condition, if_body, else_body, src_ref } => {
+            FunctionStatement::If { condition, if_body, else_body, src_ref: _ } => {
                 let condition = condition.eval(context)?;
                 if let Value::Bool(b) = condition {
                     if *b {
