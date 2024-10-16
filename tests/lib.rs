@@ -353,3 +353,55 @@ fn test_simple_module_definition() {
         panic!("Resulting value is not a node");
     }
 }
+
+#[test]
+fn test_module_definition_with_parameters() {
+    use microcad_lang::parse::*;
+
+    // Define a module `donut` with an implicit initializer `()` and call it
+    let (root, mut context) = eval_input_with_context(
+        r#"
+        module donut(radius: scalar) { 
+            std::geo2d::circle(radius = radius); 
+        }
+
+        donut(radius = 3.0);
+        donut(radius = 5.0);
+        "#,
+    );
+
+    export_tree_dump_for_node(root, "output/module_definition_with_parameters_root.tree.dump");
+
+    // Check the module definition
+    let module_definition = context
+        .fetch_symbols_by_qualified_name(&QualifiedName(vec!["donut".into()]))
+        .unwrap();
+    let module_definition = match module_definition.first().unwrap() {
+        microcad_lang::eval::Symbol::Module(m) => m,
+        _ => panic!("Expected module definition"),
+    };
+    assert_eq!(module_definition.body.pre_init_statements.len(), 0);
+    assert_eq!(module_definition.body.inits.len(), 1);
+    assert_eq!(module_definition.body.post_init_statements.len(), 1);
+
+    // Call the module definition of `donut` and verify it
+    use crate::parser::*;
+
+    let node = module_definition
+        .call(&Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list,  "radius = 6.0", 0).unwrap(), &mut context)
+        .unwrap();
+
+    if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
+        match *node.borrow() {
+            ObjectNodeInner::Group(ref symbols) => {
+                use microcad_lang::eval::Symbols;
+                symbols.fetch(&"radius".into()).unwrap();
+            }
+            ref inner => panic!("Expected node to be a Group, got {:?}", inner),
+        }
+
+        export_tree_dump_for_node(node, "output/module_definition_with_parameters.tree.dump");
+    } else {
+        panic!("Resulting value is not a node");
+    }
+}
