@@ -3,7 +3,7 @@
 * Provides function and modules
 * No parameter list
 
-```µCAD,namespaces
+```µCAD,namespaces#todo
 // namespace module std
 namespace std {
     
@@ -15,11 +15,11 @@ namespace std {
 
         // define calculation function
         function abs(x: scalar) -> scalar {
-            if x < 0 { -x } else { x }
+            if x < 0 { return -x; } else { return x; }
         }
     }
 }
 
 // call both
-x = std::math::abs(-1) * std::math::pi;
+x = std::math::abs(-1.0) * std::math::pi;
 ```
