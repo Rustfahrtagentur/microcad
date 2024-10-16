@@ -4,11 +4,14 @@
 //! PLY Export
 
 use std::path::PathBuf;
+use crate::*;
 
 use microcad_core::{
     geo3d::{Triangle, Vertex},
-    Exporter, Scalar,
+    Scalar,
 };
+use microcad_lang::*;
+
 
 /// PLY writer
 pub struct PlyWriter<'a> {
@@ -131,10 +134,10 @@ impl Exporter for PlyExporter {
         vec!["ply"]
     }
 
-    fn export(&mut self, node: microcad_render::ModelNode) -> Result<(), microcad_core::CoreError> {
+    fn export(&mut self, node: objecttree::ObjectNode) -> Result<(), microcad_core::CoreError> {
         let mut renderer = microcad_render::mesh::MeshRenderer::new(self.precision);
         use microcad_core::geo3d::Renderer;
-        let node = microcad_core::render::tree::bake3d(&mut renderer, node)?;
+        let node = objecttree::bake3d(&mut renderer, node)?;
         renderer.render_node(node)?;
 
         let file = std::fs::File::create(&self.filename)?;

@@ -11,6 +11,10 @@ include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
 #[cfg(test)]
 static TEST_OUT_DIR: &str = "output";
 
+#[cfg(test)]
+use microcad_lang::*;
+
+
 // Assure `TEST_OUT_DIR` exists
 #[cfg(test)]
 fn make_test_out_dir() -> std::path::PathBuf {
@@ -35,7 +39,7 @@ macro_rules! args {
 }
 
 #[cfg(test)]
-fn eval_context(context: &mut microcad_lang::eval::Context) -> microcad_core::render::ModelNode {
+fn eval_context(context: &mut microcad_lang::eval::Context) -> ObjectNode {
     let node = context.eval().unwrap();
 
     if context.diag().has_errors() {
@@ -54,7 +58,7 @@ fn eval_context(context: &mut microcad_lang::eval::Context) -> microcad_core::re
 #[cfg(test)]
 fn eval_input_with_context(
     input: &str,
-) -> (microcad_core::render::ModelNode, microcad_lang::eval::Context) {
+) -> (ObjectNode, microcad_lang::eval::Context) {
     use core::panic;
     use microcad_lang::parse::source_file::SourceFile;
     let source_file = match SourceFile::load_from_str(input) {
@@ -71,12 +75,12 @@ fn eval_input_with_context(
 }
 
 #[cfg(test)]
-fn eval_input(input: &str) -> microcad_core::render::ModelNode {
+fn eval_input(input: &str) -> ObjectNode {
     eval_input_with_context(input).0
 }
 
 #[cfg(test)]
-fn export_tree_dump_for_node(node: microcad_core::render::ModelNode, tree_dump_file: &str) {
+fn export_tree_dump_for_node(node: ObjectNode, tree_dump_file: &str) {
     use microcad_export::Exporter;
     let mut tree_dump_exporter = microcad_export::tree_dump::TreeDumpExporter::from_settings(
         &microcad_export::ExportSettings::with_filename(tree_dump_file.to_string()),
@@ -143,11 +147,11 @@ fn test_source_file(file_name: &str) {
 #[test]
 fn difference_svg() {
     use microcad_lang::eval::BuiltinModuleDefinition;
-    use microcad_render::{svg::SvgRenderer, tree};
+    use microcad_render::svg::SvgRenderer;
     use microcad_std::{algorithm::*, geo2d::*};
 
     let difference = difference().unwrap();
-    let group = tree::group();
+    let group = objecttree::group();
     group.append(Circle::node(args!(radius: Scalar = 4.0)).unwrap());
     group.append(Circle::node(args!(radius: Scalar = 2.0)).unwrap());
     difference.append(group);
@@ -158,7 +162,7 @@ fn difference_svg() {
     let mut renderer = SvgRenderer::default();
     renderer.set_output(Box::new(file)).unwrap();
 
-    let difference = microcad_core::render::tree::bake2d(&mut renderer, difference).unwrap();
+    let difference = objecttree::bake2d(&mut renderer, difference).unwrap();
 
     use microcad_core::geo2d::Renderer;
     renderer.render_node(difference).unwrap();
@@ -171,7 +175,7 @@ fn difference_stl() {
     use microcad_std::algorithm;
 
     let difference = algorithm::difference().unwrap();
-    let group = microcad_render::tree::group();
+    let group = objecttree::group();
     group.append(
         microcad_std::geo3d::Cube::node(
             args!(size_x: Scalar = 4.0, size_y: Scalar = 4.0, size_z: Scalar = 4.0),
@@ -340,7 +344,7 @@ fn test_simple_module_definition() {
 
     if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
         match *node.borrow() {
-            microcad_core::render::ModelNodeInner::Group => {}
+            ObjectNodeInner::Group => {}
             ref inner => panic!("Expected node to be a Group, got {:?}", inner),
         }
 

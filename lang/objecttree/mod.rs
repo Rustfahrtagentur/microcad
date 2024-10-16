@@ -3,21 +3,26 @@
 
 //! Render tree
 
-use crate::{export::ExportSettings, Algorithm, CoreError, Transform};
+pub mod algorithm;
+
+pub use algorithm::Algorithm;
+
 use strum::IntoStaticStr;
+
+use microcad_core::*;
 
 /// Inner of a node
 #[derive(IntoStaticStr)]
-pub enum ModelNodeInner {
+pub enum ObjectNodeInner {
     /// A group node that contains children
     Group,
 
     /// A generated 2D geometry
-    Primitive2D(Box<crate::Primitive2D>),
+    Primitive2D(Box<Primitive2D>),
 
     /// Generated 3D geometry
     #[cfg(feature = "geo3d")]
-    Primitive3D(Box<crate::Primitive3D>),
+    Primitive3D(Box<Primitive3D>),
 
     /// An algorithm trait that manipulates the node or its children
     Algorithm(Box<dyn Algorithm>),
@@ -29,19 +34,19 @@ pub enum ModelNodeInner {
     Export(ExportSettings),
 }
 
-impl std::fmt::Debug for ModelNodeInner {
+impl std::fmt::Debug for ObjectNodeInner {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name: &'static str = self.into();
         write!(f, "{name}")?;
 
         match &self {
-            ModelNodeInner::Algorithm(algorithm) => {
+            ObjectNodeInner::Algorithm(algorithm) => {
                 write!(f, "({algorithm:?})")
             }
-            ModelNodeInner::Primitive2D(primitive2d) => {
+            ObjectNodeInner::Primitive2D(primitive2d) => {
                 write!(f, "({primitive2d:?})")
             }
-            ModelNodeInner::Primitive3D(primitive3d) => {
+            ObjectNodeInner::Primitive3D(primitive3d) => {
                 write!(f, "({primitive3d:?})")
             }
 
@@ -51,14 +56,20 @@ impl std::fmt::Debug for ModelNodeInner {
 }
 
 /// Render node
-pub type ModelNode = rctree::Node<ModelNodeInner>;
+pub type ObjectNode = rctree::Node<ObjectNodeInner>;
 
 /// Create new group node
-pub fn group() -> ModelNode {
-    ModelNode::new(ModelNodeInner::Group)
+pub fn group() -> ObjectNode {
+    ObjectNode::new(ObjectNodeInner::Group)
 }
 
-impl crate::Depth for ModelNode {
+/// Trait to calculate depth for a node
+pub trait Depth {
+    /// Calculate depth
+    fn depth(&self) -> usize;
+}
+
+impl Depth for ObjectNode {
     fn depth(&self) -> usize {
         if let Some(parent) = self.parent() {
             parent.depth() + 1
@@ -73,7 +84,7 @@ impl crate::Depth for ModelNode {
 /// Assume, our `Vec<Node` has three nodes `a`, `b`, `c`.
 /// Then `c` will have `b` as parent and `b` will have `a` as parent.
 /// Node `a` will be returned.
-pub fn nest_nodes(nodes: Vec<ModelNode>) -> ModelNode {
+pub fn nest_nodes(nodes: Vec<ObjectNode>) -> ObjectNode {
     for node_window in nodes.windows(2) {
         node_window[0].append(node_window[1].clone());
     }
@@ -84,21 +95,32 @@ pub fn nest_nodes(nodes: Vec<ModelNode>) -> ModelNode {
 /// Dumps the tree structure of a node.
 ///
 /// The depth of a node is marked by the number of white spaces
-pub fn dump(writer: &mut dyn std::io::Write, node: ModelNode) -> std::io::Result<()> {
-    use crate::Depth;
+pub fn dump(writer: &mut dyn std::io::Write, node: ObjectNode) -> std::io::Result<()> {
+    use Depth;
     node.descendants()
         .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
 }
 
 
 
-pub fn bake2d(renderer: &mut crate::Renderer2D, node: ModelNode) -> Result<crate::geo2d::Node, CoreError> {
+fn into_group(node: ObjectNode) -> Option<ObjectNode> {
+    node.first_child().and_then(|n| {
+        if let ObjectNodeInner::Group = *n.borrow() {
+            Some(n.clone())
+        } else {
+            None
+        }
+    })
+}
+
+
+pub fn bake2d(renderer: &mut Renderer2D, node: ObjectNode) -> Result<geo2d::Node> {
     let node2d = {
         match *node.borrow(){
-            ModelNodeInner::Group | ModelNodeInner::Export(_) => crate::geo2d::tree::group(),
-            ModelNodeInner::Primitive2D(ref renderable) => return Ok(
-                    crate::geo2d::tree::geometry(renderable.request_geometry(renderer)?)),
-            ModelNodeInner::Algorithm(ref algorithm) => return algorithm.process_2d(renderer, node.clone()),
+            ObjectNodeInner::Group | ObjectNodeInner::Export(_) => geo2d::tree::group(),
+            ObjectNodeInner::Primitive2D(ref renderable) => return Ok(
+                    geo2d::tree::geometry(renderable.request_geometry(renderer)?)),
+            ObjectNodeInner::Algorithm(ref algorithm) => return algorithm.process_2d(renderer, node.clone()),
             _ => return Err(CoreError::NotImplemented)
         }
     };
@@ -117,13 +139,13 @@ pub fn bake2d(renderer: &mut crate::Renderer2D, node: ModelNode) -> Result<crate
 }
 
 
-pub fn bake3d(renderer: &mut crate::Renderer3D, node: ModelNode) -> Result<crate::geo3d::Node, CoreError> {
+pub fn bake3d(renderer: &mut Renderer3D, node: ObjectNode) -> Result<geo3d::Node> {
     let node3d = {
         match *node.borrow(){
-            ModelNodeInner::Group | ModelNodeInner::Export(_) => crate::geo3d::tree::group(),
-            ModelNodeInner::Primitive3D(ref renderable) => return Ok(
-                    crate::geo3d::tree::geometry(renderable.request_geometry(renderer)?)),
-            ModelNodeInner::Algorithm(ref algorithm) => return algorithm.process_3d(renderer, node.clone()),
+            ObjectNodeInner::Group | ObjectNodeInner::Export(_) => geo3d::tree::group(),
+            ObjectNodeInner::Primitive3D(ref renderable) => return Ok(
+                    geo3d::tree::geometry(renderable.request_geometry(renderer)?)),
+            ObjectNodeInner::Algorithm(ref algorithm) => return algorithm.process_3d(renderer, node.clone()),
             _ => return Err(CoreError::NotImplemented)
         }
     };
@@ -142,7 +164,6 @@ pub fn bake3d(renderer: &mut crate::Renderer3D, node: ModelNode) -> Result<crate
 }
 #[test]
 fn node_nest() {
-    use crate::Depth;
     let nodes = vec![group(), group(), group()];
     let node = nest_nodes(nodes.clone());
 

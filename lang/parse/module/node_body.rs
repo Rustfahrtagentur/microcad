@@ -3,8 +3,6 @@
 
 //! Node body parser entity
 
-use microcad_render::{tree, ModelNode};
-
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Module initialization statement
@@ -113,10 +111,10 @@ impl Parse for NodeBody {
 }
 
 impl Eval for NodeBody {
-    type Output = ModelNode;
+    type Output = crate::objecttree::ObjectNode;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let group = tree::group();
+        let group = crate::objecttree::group();
 
         for statement in &self.statements {
             if let Some(Value::Node(node)) = statement.eval(context)? {

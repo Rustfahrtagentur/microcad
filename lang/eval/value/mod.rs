@@ -22,7 +22,7 @@ pub use value_list::*;
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
-use microcad_render::tree::ModelNode;
+use crate::objecttree::ObjectNode;
 
 pub(crate) type ValueResult = std::result::Result<Value, EvalError>;
 
@@ -64,7 +64,7 @@ pub enum Value {
     /// Tuple of unnamed items
     UnnamedTuple(UnnamedTuple),
     /// A node in the render tree
-    Node(ModelNode),
+    Node(ObjectNode),
 }
 
 impl Value {
@@ -280,8 +280,8 @@ impl std::ops::Sub for Value {
                 Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                microcad_core::algorithm::boolean_op::binary_op(
-                    algorithm::BooleanOp::Difference,
+                crate::objecttree::algorithm::binary_op(
+                    microcad_core::BooleanOp::Difference,
                     lhs,
                     rhs,
                 ),
@@ -376,8 +376,8 @@ impl std::ops::BitOr for Value {
     fn bitor(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                microcad_core::algorithm::boolean_op::binary_op(
-                    algorithm::BooleanOp::Union,
+                crate::objecttree::algorithm::binary_op(
+                    BooleanOp::Union,
                     lhs,
                     rhs,
                 ),
@@ -394,8 +394,8 @@ impl std::ops::BitAnd for Value {
     fn bitand(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                microcad_core::algorithm::boolean_op::binary_op(
-                    algorithm::BooleanOp::Intersection,
+                crate::objecttree::algorithm::binary_op(
+                    BooleanOp::Intersection,
                     lhs,
                     rhs,
                 ),

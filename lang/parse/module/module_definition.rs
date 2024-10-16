@@ -34,7 +34,7 @@ impl CallTrait for ModuleDefinition {
     fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
         context.push();
 
-        let node = microcad_render::tree::group();
+        let node = crate::objecttree::group();
         context.set_current_node(node.clone());
 
         // Let's evaluate the pre-init statements first

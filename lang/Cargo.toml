@@ -20,7 +20,14 @@ lazy_static = "1.5"
 cgmath = "0.18"
 thiserror = "1.0"
 anyhow = "1"
+env_logger = "0.11"
 strum = { version = "0.26", features = ["derive"] }
+
+manifold-rs = { path = "../thirdparty/manifold-rs", optional = true }
+
 microcad-core = { path = "../core" }
 microcad-render = { path = "../render" }
-env_logger = "0.11"
+
+[features]
+default = ["geo3d"]
+geo3d = ["dep:manifold-rs"]

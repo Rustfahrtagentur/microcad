@@ -7,6 +7,8 @@ use std::path::PathBuf;
 
 use crate::*;
 use microcad_core::{geo3d::{Triangle, Vertex}, Scalar};
+use microcad_lang::objecttree;
+use objecttree::ObjectNode;
 
 /// Write into STL file
 pub struct StlWriter<'a> {
@@ -76,10 +78,10 @@ impl Exporter for StlExporter {
         vec!["stl"]
     }
 
-    fn export(&mut self, node: microcad_render::ModelNode) -> microcad_core::Result<()> {
+    fn export(&mut self, node: ObjectNode) -> microcad_core::Result<()> {
         let mut renderer = microcad_render::mesh::MeshRenderer::new(self.precision);
         use microcad_core::geo3d::Renderer;
-        let node = microcad_core::render::tree::bake3d(&mut renderer, node)?;
+        let node = objecttree::bake3d(&mut renderer, node)?;
         renderer.render_node(node)?;
 
         let file = std::fs::File::create(&self.filename)?;

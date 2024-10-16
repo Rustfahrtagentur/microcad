@@ -3,7 +3,7 @@
 
 //! Call method
 
-use crate::{eval::*, parse::*, src_ref::*};
+use crate::{eval::*, parse::*, src_ref::*, objecttree::*};
 
 /// Trait to call method of something.
 /// This for example used to call `vertices()` on a `Node`.
@@ -25,7 +25,7 @@ pub trait CallMethod {
     ) -> Result<Value>;
 }
 
-impl CallMethod for microcad_render::ModelNode {
+impl CallMethod for ObjectNode {
     fn call_method(
         &self,
         name: &Identifier,

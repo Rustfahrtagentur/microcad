@@ -5,13 +5,11 @@
 
 #![warn(missing_docs)]
 
-pub mod algorithm;
+mod boolean_op;
 pub mod error;
-pub mod export;
 pub mod geo2d;
 #[cfg(feature = "geo3d")]
 pub mod geo3d;
-pub mod render;
 pub mod transform;
 
 /// Primitive integer type
@@ -35,9 +33,8 @@ pub type Angle = cgmath::Rad<Scalar>;
 /// Id type (base of all identifiers)
 pub type Id = compact_str::CompactString;
 
-pub use algorithm::Algorithm;
+pub use boolean_op::BooleanOp;
 pub use error::CoreError;
-pub use export::{ExportSettings, Exporter};
 pub use transform::Transform;
 
 /// Core result type
@@ -69,9 +66,69 @@ pub trait Renderer {
     }
 }
 
+/// 2D Renderer type alias
 pub type Renderer2D = dyn geo2d::Renderer;
+
+/// 3D Renderer type alias
 pub type Renderer3D = dyn geo3d::Renderer;
 
+/// 2D Primitive type alias
 pub type Primitive2D = dyn geo2d::Primitive;
+
+/// 3D Primitive type alias
 pub type Primitive3D = dyn geo3d::Primitive;
 
+
+
+/// Export settings, essentially a TOML table
+#[derive(Debug, Default)]
+pub struct ExportSettings(toml::Table);
+
+impl std::ops::Deref for ExportSettings {
+    type Target = toml::Table;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl ExportSettings {
+    /// Create export settings with an initial file name
+    pub fn with_filename(filename: String) -> Self {
+        let mut settings = ExportSettings::default();
+        settings
+            .0
+            .insert("filename".to_string(), toml::Value::String(filename));
+        settings
+    }
+
+    /// return file name
+    pub fn filename(&self) -> Option<String> {
+        self.0
+            .get("filename")
+            .map(|filename| filename.as_str().unwrap().to_string())
+    }
+
+    /// Return render precision
+    pub fn render_precision(&self) -> f64 {
+        self.0
+            .get("render_precision")
+            .map(|precision| precision.as_float().unwrap())
+            .unwrap_or(0.1)
+    }
+
+    /// Get exporter ID
+    pub fn exporter_id(&self) -> Option<String> {
+        if let Some(exporter) = self.0.get("exporter") {
+            Some(exporter.to_string())
+        } else if let Some(filename) = self.filename() {
+            let ext = std::path::Path::new(&filename)
+                .extension()
+                .and_then(std::ffi::OsStr::to_str)
+                .unwrap();
+            Some(ext.to_string())
+        } else {
+            None
+        }
+    }
+}

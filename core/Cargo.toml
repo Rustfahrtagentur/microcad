@@ -26,4 +26,3 @@ manifold-rs = { path = "../thirdparty/manifold-rs", optional = true }
 [features]
 default = ["geo3d"]
 geo3d = ["dep:manifold-rs"]
-

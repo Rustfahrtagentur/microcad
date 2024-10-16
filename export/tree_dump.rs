@@ -5,9 +5,8 @@
 
 use std::{fs::File, path::PathBuf};
 
-use microcad_render::ModelNode;
-
 use crate::*;
+use microcad_lang::objecttree::ObjectNode;
 
 /// Export a node into tree dump file
 pub struct TreeDumpExporter {
@@ -15,7 +14,7 @@ pub struct TreeDumpExporter {
 }
 
 impl Exporter for TreeDumpExporter {
-    fn from_settings(settings: &ExportSettings) -> microcad_core::Result<Self>
+    fn from_settings(settings: &ExportSettings) -> Result<Self, CoreError>
     where
         Self: Sized,
     {
@@ -26,7 +25,7 @@ impl Exporter for TreeDumpExporter {
         })
     }
 
-    fn export(&mut self, node: ModelNode) -> microcad_core::Result<()> {
+    fn export(&mut self, node: ObjectNode) -> Result<(), CoreError> {
         // TODO Make this a separate function
         let path = std::path::absolute(&self.filename)?;
 
@@ -43,7 +42,7 @@ impl Exporter for TreeDumpExporter {
 
         let file = File::create(&path)?;
         let mut writer = std::io::BufWriter::new(&file);
-        microcad_render::tree::dump(&mut writer, node)?;
+        microcad_lang::objecttree::dump(&mut writer, node)?;
         Ok(())
     }
 

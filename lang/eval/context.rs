@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
-use crate::{diag::*, parse::*, source_file_cache::*};
+use crate::{diag::*, parse::*, source_file_cache::*, objecttree::*};
 
 use microcad_core::Id;
-use microcad_render::tree;
+
 
 /// Context for evaluation
 ///
@@ -16,7 +16,7 @@ pub struct Context {
     stack: Vec<SymbolTable>,
 
     /// Current node in the tree where the evaluation is happening
-    current_node: tree::ModelNode,
+    current_node: ObjectNode,
 
     /// Current source file being evaluated
     current_source_file: Option<std::rc::Rc<SourceFile>>,
@@ -33,14 +33,14 @@ impl Context {
     pub fn from_source_file(source_file: SourceFile) -> Self {
         Self {
             stack: vec![SymbolTable::default()],
-            current_node: tree::group(),
+            current_node: group(),
             current_source_file: Some(std::rc::Rc::new(source_file)),
             ..Default::default()
         }
     }
 
     /// Evaluate the context with the current source file
-    pub fn eval(&mut self) -> super::Result<tree::ModelNode> {
+    pub fn eval(&mut self) -> super::Result<ObjectNode> {
         let node = self.current_source_file().unwrap().eval(self)?;
         self.info(crate::src_ref::SrcRef(None), "Evaluation complete".into());
         Ok(node)
@@ -66,13 +66,13 @@ impl Context {
     /// Set new_node as current node, call function and set old node
     pub fn descend_node<F>(
         &mut self,
-        new_node: microcad_core::render::ModelNode,
+        new_node: ObjectNode,
         f: F,
-    ) -> crate::eval::Result<microcad_core::render::ModelNode>
+    ) -> crate::eval::Result<ObjectNode>
     where
-        F: FnOnce(&mut Self) -> crate::eval::Result<microcad_core::render::ModelNode>,
+        F: FnOnce(&mut Self) -> crate::eval::Result<ObjectNode>,
     {
-        let old_node: rctree::Node<tree::ModelNodeInner> = self.current_node.clone();
+        let old_node = self.current_node.clone();
         self.set_current_node(new_node.clone());
         f(self)?;
         self.set_current_node(old_node);
@@ -103,17 +103,17 @@ impl Context {
     }
 
     /// Get current evaluation node
-    pub fn current_node(&self) -> tree::ModelNode {
+    pub fn current_node(&self) -> ObjectNode {
         self.current_node.clone()
     }
 
     /// Set current evaluation node
-    pub fn set_current_node(&mut self, node: tree::ModelNode) {
+    pub fn set_current_node(&mut self, node: ObjectNode) {
         self.current_node = node;
     }
 
     /// Append a node to the current node and return the new node
-    pub fn append_node(&mut self, node: tree::ModelNode) -> tree::ModelNode {
+    pub fn append_node(&mut self, node: ObjectNode) -> ObjectNode {
         self.current_node.append(node.clone());
         node.clone()
     }
@@ -158,7 +158,7 @@ impl Default for Context {
     fn default() -> Self {
         Self {
             stack: vec![SymbolTable::default()],
-            current_node: tree::group(),
+            current_node: group(),
             current_source_file: None,
             source_files: SourceFileCache::default(),
             diag_handler: DiagHandler::default(),

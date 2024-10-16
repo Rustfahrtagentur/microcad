@@ -12,7 +12,6 @@ version.workspace = true
 path = "lib.rs"
 
 [dependencies]
-
 microcad-core = { path = "../core" }
+microcad-lang = { path = "../lang" }
 microcad-render = { path = "../render" }
-

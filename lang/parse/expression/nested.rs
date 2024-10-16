@@ -3,8 +3,6 @@
 
 //! Nested item list parser entity
 
-use microcad_render::tree;
-
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Nested item list
@@ -82,7 +80,7 @@ impl Eval for Nested {
             })
             .collect::<Vec<_>>();
 
-        Ok(Value::Node(tree::nest_nodes(nodes)))
+        Ok(Value::Node(crate::objecttree::nest_nodes(nodes)))
     }
 }
 

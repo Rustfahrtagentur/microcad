@@ -14,8 +14,7 @@ pub use tree::{Node, NodeInner};
 pub use render::*;
 
 use strum::IntoStaticStr;
-
-use crate::algorithm::BooleanOp;
+use crate::BooleanOp;
 
 /// 3D Geometry
 #[derive(IntoStaticStr)]

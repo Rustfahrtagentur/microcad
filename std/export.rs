@@ -1,7 +1,7 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_core::{ExportSettings, Exporter};
+use microcad_export::*;
 
 pub struct ExporterRegistry;
 
@@ -43,6 +43,6 @@ lazy_static::lazy_static! {
 }
 
 /// Shortcut to export a node
-pub fn export(node: microcad_render::ModelNode) -> microcad_core::Result<()> {
-    microcad_core::export::export_tree(node.clone(), |settings| EXPORTERS.create(settings))
+pub fn export(node: microcad_lang::objecttree::ObjectNode) -> microcad_core::Result<()> {
+    export_tree(node.clone(), |settings| EXPORTERS.create(settings))
 }

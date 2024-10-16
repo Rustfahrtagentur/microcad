@@ -3,11 +3,10 @@
 
 //! Builtin module evaluation entity
 
-use crate::{eval::*, parse::*};
-use microcad_render::tree;
+use crate::{eval::*, parse::*, objecttree::*};
 
 /// Builtin module initialization functor
-pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<tree::ModelNode>;
+pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<ObjectNode>;
 
 /// Builtin module
 #[derive(Clone)]
@@ -43,7 +42,7 @@ pub trait BuiltinModuleDefinition {
     /// Get parameters of the builtin module (implicit init)
     fn parameters() -> ParameterList;
     /// Create node from argument map
-    fn node(args: &ArgumentMap) -> Result<tree::ModelNode>;
+    fn node(args: &ArgumentMap) -> Result<ObjectNode>;
     /// Implicit initialization functor
     fn function() -> &'static BuiltinModuleFn {
         &|args, ctx| Ok(ctx.append_node(Self::node(args)?))

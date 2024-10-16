@@ -71,7 +71,7 @@ impl Geometry {
     pub fn boolean_op(
         &self,
         other: &Self,
-        op: &crate::algorithm::boolean_op::BooleanOp,
+        op: &crate::BooleanOp,
     ) -> Option<Self> {
         let a = self.try_convert_to_multi_polygon()?;
         let b = other.try_convert_to_multi_polygon()?;
