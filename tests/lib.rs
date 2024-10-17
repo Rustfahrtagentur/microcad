@@ -482,3 +482,24 @@ fn module_definition_init() {
         panic!("Resulting value is not a node");
     }
 }
+
+#[test]
+fn test_module_src_ref() {
+    use microcad_lang::parse::*;
+
+    // Define a module `donut` with an implicit initializer `()` and call it
+    let (root, mut context) = eval_input_with_context(
+        r#"
+        module donut { 
+            init(d: scalar) {
+                radius = d / 2.0;
+                std::geo2d::circle(radius); 
+            }
+        }
+
+        donut(d = 3.0);
+        "#,
+    );
+    export_tree_dump_for_node(root, "output/test_module_src_ref.tree.dump");
+
+}
