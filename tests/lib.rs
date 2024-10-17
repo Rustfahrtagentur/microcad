@@ -397,8 +397,82 @@ fn test_module_definition_with_parameters() {
     if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
         match *node.borrow() {
             ObjectNodeInner::Group(ref symbols) => {
-                use microcad_lang::eval::Symbols;
-                symbols.fetch(&"radius".into()).unwrap();
+                use microcad_lang::eval::*;
+                let symbol = symbols.fetch(&"radius".into()).unwrap();
+                match symbol.as_ref() {
+                    Symbol::Value(_, value) => {
+                        assert_eq!(value, &6.0.into());
+                    }
+                    _ => panic!("Expected symbol to be a Value"),
+                }
+            }
+            ref inner => panic!("Expected node to be a Group, got {:?}", inner),
+        }
+
+        export_tree_dump_for_node(node, "output/module_definition_with_parameters.tree.dump");
+    } else {
+        panic!("Resulting value is not a node");
+    }
+}
+
+#[test]
+fn module_definition_init() {
+    use microcad_lang::parse::*;
+
+    // Define a module `donut` with an implicit initializer `()` and call it
+    let (root, mut context) = eval_input_with_context(
+        r#"
+        module circle {
+            pre_init_statement = 0;
+
+            init(r: scalar) {
+                radius = r;
+            }
+
+            init(d: scalar) {
+                radius = d / 2.0;
+            }
+
+            std::geo2d::circle(radius);
+        }
+
+        circle(r = 3.0);
+        circle(d = 6.0);
+        "#,
+    );
+
+    export_tree_dump_for_node(root, "output/module_definition_init_root.tree.dump");
+
+    // Check the module definition
+    let module_definition = context
+        .fetch_symbols_by_qualified_name(&QualifiedName(vec!["circle".into()]))
+        .unwrap();
+    let module_definition = match module_definition.first().unwrap() {
+        microcad_lang::eval::Symbol::Module(m) => m,
+        _ => panic!("Expected module definition"),
+    };
+    assert_eq!(module_definition.body.pre_init_statements.len(), 1);
+    assert_eq!(module_definition.body.inits.len(), 2);
+    assert_eq!(module_definition.body.post_init_statements.len(), 1);
+
+    // Call the module definition of `donut` and verify it
+    use crate::parser::*;
+
+    let node = module_definition
+        .call(&Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list,  "r = 6.0", 0).unwrap(), &mut context)
+        .unwrap();
+
+    if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
+        match *node.borrow() {
+            ObjectNodeInner::Group(ref symbols) => {
+                use microcad_lang::eval::*;
+                let symbol = symbols.fetch(&"radius".into()).unwrap();
+                match symbol.as_ref() {
+                    Symbol::Value(_, value) => {
+                        assert_eq!(value, &6.0.into());
+                    }
+                    _ => panic!("Expected symbol to be a Value"),
+                }
             }
             ref inner => panic!("Expected node to be a Group, got {:?}", inner),
         }
