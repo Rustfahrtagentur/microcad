@@ -94,7 +94,10 @@ impl Eval for FunctionStatement {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         match self {
-            FunctionStatement::Assignment(assignment) => assignment.eval(context)?,
+            FunctionStatement::Assignment(assignment) => {
+                assignment.eval(context)?; 
+                return Ok(None);
+            },
             FunctionStatement::Return(expr) => return Ok(Some(expr.eval(context)?)),
             FunctionStatement::FunctionDefinition(f) => f.eval(context)?,
             FunctionStatement::If { condition, if_body, else_body, src_ref: _ } => {

@@ -67,14 +67,28 @@ impl CallTrait for ModuleDefinition {
                 for (name, value) in arg_map.iter() {
                     node.add(Symbol::Value(name.clone(), value.clone()));
                 }
-                init.call(arg_map, context)?;
+                let init_object = init.call(arg_map, context)?;
+
+                // Add the init object's children to the node
+                for child in init_object.children() {
+                    child.detach();
+                    node.append(child.clone());
+                }
+
+                init_object.copy(&mut node);
             }
             _ => {
                 context.error(self, anyhow!("Multiple matching initializers found"))?;
                 // TODO Add diagnostics for multiple matching initializers
+                context.pop();
+                return Ok(None);
             }
         }
+        
+        // Now, copy the symbols of the node into the context
+        node.copy(context);
 
+        // Evaluate the post-init statements
         for statement in &self.body.post_init_statements {
             statement.eval(context)?;
         }

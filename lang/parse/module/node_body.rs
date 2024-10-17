@@ -114,11 +114,18 @@ impl Eval for NodeBody {
     type Output = crate::objecttree::ObjectNode;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let group = crate::objecttree::group();
+        let mut group = crate::objecttree::group();
 
         for statement in &self.statements {
-            if let Some(Value::Node(node)) = statement.eval(context)? {
-                group.append(node)
+            match statement {
+                NodeBodyStatement::Assignment(assignment) => {
+                    group.add(assignment.eval(context)?);
+                }
+                statement => {
+                    if let Some(Value::Node(node)) = statement.eval(context)? {
+                        group.append(node);
+                    }
+                }
             }
         }
 

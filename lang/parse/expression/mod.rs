@@ -233,9 +233,18 @@ impl Eval for Expression {
                         Ok(value.clone())
                     }
                     Value::Node(node) => {
-                        let symbol = node.fetch(&rhs.to_string().into()).unwrap();
-                        match symbol.as_ref() {
-                            Symbol::Value(_, value) => Ok(value.clone()),
+                        match node.fetch(&rhs.to_string().into()) {
+                            Some(symbol) =>
+                                match symbol.as_ref() {
+                                    Symbol::Value(_, value) => Ok(value.clone()),
+                                    _ => unimplemented!(),
+                                }
+                            None => {
+                                use crate::diag::PushDiag;
+                                use anyhow::anyhow;
+                                context.error(self, anyhow!("Unknown field: {rhs}"))?;
+                                todo!("Return none value on unknown field error (field name = {rhs})")
+                            }
                             _ => unimplemented!(),
                         }
                     }
