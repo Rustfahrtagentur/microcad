@@ -362,7 +362,7 @@ fn test_module_definition_with_parameters() {
     let (root, mut context) = eval_input_with_context(
         r#"
         module donut(radius: scalar) { 
-            std::geo2d::circle(radius = radius); 
+            std::geo2d::circle(radius); 
         }
 
         donut(radius = 3.0);
