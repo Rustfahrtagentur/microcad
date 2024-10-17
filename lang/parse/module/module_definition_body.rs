@@ -57,8 +57,6 @@ impl ModuleDefinitionBody {
                 } else {
                     return Err(ParseError::StatementBetweenModuleInit);
                 }
-
-                self.inits.push(init.clone());
             }
             statement => {
                 if self.inits.is_empty() {
