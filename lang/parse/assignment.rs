@@ -64,15 +64,16 @@ impl Parse for Assignment {
 }
 
 impl Eval for Assignment {
-    type Output = ();
+    type Output = Symbol;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let value = self.value.eval(context)?;
-        context.add(Symbol::Value(
+        let symbol = Symbol::Value(
             self.name.id().expect("nameless lvalue"),
-            value,
-        ));
-        Ok(())
+            value.clone(),
+        );
+        context.add(symbol.clone());
+        Ok(symbol)
     }
 }
 
