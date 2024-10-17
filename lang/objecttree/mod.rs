@@ -140,7 +140,7 @@ fn into_group(node: ObjectNode) -> Option<ObjectNode> {
     })
 }
 
-
+/// This function bakes the object node tree into a 2D geometry tree
 pub fn bake2d(renderer: &mut Renderer2D, node: ObjectNode) -> core::result::Result<geo2d::Node, CoreError> {
     let node2d = {
         match *node.borrow(){
@@ -167,6 +167,7 @@ pub fn bake2d(renderer: &mut Renderer2D, node: ObjectNode) -> core::result::Resu
 }
 
 
+/// This function bakes the object node tree into a 3D geometry tree
 pub fn bake3d(renderer: &mut Renderer3D, node: ObjectNode) -> core::result::Result<geo3d::Node, CoreError> {
     let node3d = {
         match *node.borrow(){
@@ -191,6 +192,8 @@ pub fn bake3d(renderer: &mut Renderer3D, node: ObjectNode) -> core::result::Resu
 
     Ok(node3d)
 }
+
+
 #[test]
 fn node_nest() {
     let nodes = vec![group(), group(), group()];
