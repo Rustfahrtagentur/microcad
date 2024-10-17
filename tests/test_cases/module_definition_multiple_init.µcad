@@ -1,0 +1,24 @@
+// Define a module `circle` with two initializers
+module circle {
+    init(r: scalar) {
+        radius = r;
+    }
+
+    init(d: scalar) {
+        radius = d / 2.0;
+    }
+
+    std::geo2d::circle(radius);
+}
+
+// Now, create two equal circles but with different initializations
+d_r = circle(r = 1.0);
+d_d = circle(d = 2.0);
+
+std::assert(d_r.radius == 1.0);
+std::assert(d_d.radius == 1.0);
+
+// Finally, insert the circles in the tree
+d_r;
+d_d;
+
