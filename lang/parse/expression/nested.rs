@@ -55,7 +55,7 @@ impl Eval for Nested {
 
                     for symbol in symbols {
                         if let Symbol::Value(_, v) = symbol {
-                            values.push(v.clone()); // Find first value only. @todo Back propagation of values
+                            values.push(v.clone_with_src_ref(qualified_name.src_ref())); // Find first value only. @todo Back propagation of values
                             break;
                         }
                     }
