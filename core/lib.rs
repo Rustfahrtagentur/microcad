@@ -109,7 +109,7 @@ impl ExportSettings {
 
     /// return file name
     pub fn filename(&self) -> Option<String> {
-        self.0
+        self
             .get("filename")
             .map(|filename| filename.as_str().unwrap().to_string())
     }
