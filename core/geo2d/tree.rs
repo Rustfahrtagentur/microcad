@@ -24,11 +24,7 @@ pub type Node = rctree::Node<NodeInner>;
 
 impl crate::Depth for Node {
     fn depth(&self) -> usize {
-        if let Some(parent) = self.parent() {
-            parent.depth() + 1
-        } else {
-            0
-        }
+        self.parent().map_or(0, |parent| parent.depth() + 1)
     }
 }
 
