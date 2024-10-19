@@ -95,28 +95,29 @@ impl Eval for FunctionStatement {
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         match self {
             FunctionStatement::Assignment(assignment) => {
-                assignment.eval(context)?; 
-                return Ok(None);
-            },
-            FunctionStatement::Return(expr) => return Ok(Some(expr.eval(context)?)),
-            FunctionStatement::FunctionDefinition(f) => f.eval(context)?,
-            FunctionStatement::If { condition, if_body, else_body, src_ref: _ } => {
-                let condition = condition.eval(context)?;
-                if let Value::Bool(b) = condition {
-                    if *b {
-                        if let Some(value) = if_body.eval(context)? {
-                            return Ok(Some(value));
-                        }
-                    } else {
-                        if let Some(value) = else_body.eval(context)? {
-                            return Ok(Some(value));
-                        }
-                    }
-                }
+                assignment.eval(context)?;
+                Ok(None)
             }
+            FunctionStatement::Return(expr) => Ok(Some(expr.eval(context)?)),
+            FunctionStatement::FunctionDefinition(f) => {
+                f.eval(context)?;
+                Ok(None)
+            }
+            FunctionStatement::If {
+                condition,
+                if_body,
+                else_body,
+                src_ref: _,
+            } => Ok(if let Value::Bool(b) = condition.eval(context)? {
+                if *b {
+                    if_body.eval(context)?
+                } else {
+                    else_body.eval(context)?
+                }
+            } else {
+                None
+            }),
             statement => unimplemented!("{statement:?}"),
         }
-
-        Ok(None)
     }
 }
