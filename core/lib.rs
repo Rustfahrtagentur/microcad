@@ -92,13 +92,18 @@ impl std::ops::Deref for ExportSettings {
     }
 }
 
+
+impl std::ops::DerefMut for ExportSettings {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
 impl ExportSettings {
     /// Create export settings with an initial file name
     pub fn with_filename(filename: String) -> Self {
         let mut settings = ExportSettings::default();
-        settings
-            .0
-            .insert("filename".to_string(), toml::Value::String(filename));
+        settings.insert("filename".to_string(), toml::Value::String(filename));
         settings
     }
 
