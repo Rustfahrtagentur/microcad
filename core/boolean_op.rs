@@ -20,12 +20,7 @@ use geo::OpType;
 
 impl From<BooleanOp> for OpType {
     fn from(op: BooleanOp) -> Self {
-        match op {
-            BooleanOp::Difference => OpType::Difference,
-            BooleanOp::Union => OpType::Union,
-            BooleanOp::Intersection => OpType::Intersection,
-            BooleanOp::Complement => OpType::Xor,
-        }
+        Self::from(&op)
     }
 }
 
