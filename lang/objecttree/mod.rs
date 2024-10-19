@@ -188,7 +188,6 @@ pub fn bake3d(renderer: &mut Renderer3D, node: ObjectNode) -> core::result::Resu
     Ok(node3d)
 }
 
-
 #[test]
 fn node_nest() {
     let nodes = vec![group(), group(), group()];
