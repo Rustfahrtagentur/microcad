@@ -71,17 +71,16 @@ impl Algorithm for BooleanOp {
             .children()
             .filter_map(|child| match &*child.borrow() {
                 ObjectNodeInner::Primitive3D(renderable) => renderable.request_geometry(renderer).ok(),
-                ObjectNodeInner::Algorithm(algorithm) => {
-                    if let Ok(new_node) = algorithm.process_3d(renderer, child.clone()) {
+               ObjectNodeInner::Algorithm(algorithm) => algorithm
+                    .process_3d(renderer, child.clone())
+                    .ok()
+                    .and_then(|new_node| {
                         if let geo3d::NodeInner::Geometry(g) = &*new_node.borrow() {
                             Some(g.clone())
                         } else {
                             None
                         }
-                    } else {
-                        None
-                    }
-                }
+                    }),
                 _ => None,
             })
             .collect();
