@@ -185,7 +185,6 @@ pub fn bake3d(renderer: &mut Renderer3D, node: ObjectNode) -> core::result::Resu
         }
     })?;
 
-
     Ok(node3d)
 }
 
