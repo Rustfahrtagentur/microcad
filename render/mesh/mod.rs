@@ -3,10 +3,9 @@
 
 //! Mesh renderer
 
-use crate::*;
 use microcad_core::{
     geo3d::{self},
-    CoreError, Scalar,
+    Scalar,
 };
 
 /// Renders a mesh
@@ -28,7 +27,7 @@ impl MeshRenderer {
     }
 }
 
-impl Renderer for MeshRenderer {
+impl microcad_core::Renderer for MeshRenderer {
     fn precision(&self) -> Scalar {
         self.precision
     }
@@ -43,7 +42,7 @@ impl Default for MeshRenderer {
     }
 }
 
-impl Renderer3D for MeshRenderer {
+impl geo3d::Renderer for MeshRenderer {
     fn mesh(&mut self, mesh: &geo3d::TriangleMesh) -> microcad_core::Result<()> {
         self.triangle_mesh.append(mesh);
         Ok(())
@@ -63,31 +62,21 @@ impl Renderer3D for MeshRenderer {
         }
     }
 
-    fn render_node(&mut self, node: Node) -> microcad_core::Result<()> {
+    fn render_node(&mut self, node: microcad_core::geo3d::Node) -> microcad_core::Result<()> {
         let inner = node.borrow();
+        use microcad_core::geo3d::NodeInner;
 
         match &*inner {
-            NodeInner::Export(_) | NodeInner::Group | NodeInner::Root => {
+            NodeInner::Group => {
                 for child in node.children() {
                     self.render_node(child.clone())?;
                 }
                 return Ok(());
             }
-            NodeInner::Algorithm(algorithm) => {
-                let new_node = algorithm.process_3d(self, node.clone())?;
-                self.render_node(new_node)?;
-            }
-            NodeInner::Geometry3D(geometry) => {
+            NodeInner::Geometry(geometry) => {
                 self.render_geometry(geometry)?;
             }
-            NodeInner::Renderable3D(renderable) => {
-                let geometry = renderable.request_geometry(self)?;
-                self.render_geometry(&geometry)?;
-            }
             NodeInner::Transform(_) => unimplemented!(),
-            NodeInner::Geometry2D(_) | NodeInner::Renderable2D(_) => {
-                return Err(CoreError::NotImplemented);
-            }
         }
 
         Ok(())

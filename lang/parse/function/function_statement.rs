@@ -3,7 +3,7 @@
 
 //! Function statement parser entity
 
-use crate::{errors::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Function statement
 #[derive(Clone, Debug)]
@@ -86,5 +86,38 @@ impl Parse for FunctionStatement {
         };
 
         Ok(s)
+    }
+}
+
+impl Eval for FunctionStatement {
+    type Output = Option<Value>;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+        match self {
+            FunctionStatement::Assignment(assignment) => {
+                assignment.eval(context)?;
+                Ok(None)
+            }
+            FunctionStatement::Return(expr) => Ok(Some(expr.eval(context)?)),
+            FunctionStatement::FunctionDefinition(f) => {
+                f.eval(context)?;
+                Ok(None)
+            }
+            FunctionStatement::If {
+                condition,
+                if_body,
+                else_body,
+                src_ref: _,
+            } => Ok(if let Value::Bool(b) = condition.eval(context)? {
+                if *b {
+                    if_body.eval(context)?
+                } else {
+                    else_body.eval(context)?
+                }
+            } else {
+                None
+            }),
+            statement => unimplemented!("{statement:?}"),
+        }
     }
 }

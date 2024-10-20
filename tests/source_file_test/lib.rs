@@ -75,6 +75,8 @@ fn insert(wp: &mut WalkPath<String>, path: &str, code: String) {
 pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
     use std::{env::*, path::*};
 
+    println!("cargo:rerun-if-changed={path}", path = path.as_ref().display());
+    
     // get target path
     let out_dir = var("OUT_DIR")?;
     let dest_path = Path::new(&out_dir).join("microcad_source_file_test.rs");

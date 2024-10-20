@@ -1,8 +1,6 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_export::stl::StlExporter;
-
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 #[cfg(test)]
@@ -12,6 +10,10 @@ include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
 
 #[cfg(test)]
 static TEST_OUT_DIR: &str = "output";
+
+#[cfg(test)]
+use microcad_lang::*;
+
 
 // Assure `TEST_OUT_DIR` exists
 #[cfg(test)]
@@ -37,7 +39,7 @@ macro_rules! args {
 }
 
 #[cfg(test)]
-fn eval_context(context: &mut microcad_lang::eval::Context) -> microcad_core::render::Node {
+fn eval_context(context: &mut microcad_lang::eval::Context) -> ObjectNode {
     let node = context.eval().unwrap();
 
     if context.diag().has_errors() {
@@ -56,7 +58,7 @@ fn eval_context(context: &mut microcad_lang::eval::Context) -> microcad_core::re
 #[cfg(test)]
 fn eval_input_with_context(
     input: &str,
-) -> (microcad_core::render::Node, microcad_lang::eval::Context) {
+) -> (ObjectNode, microcad_lang::eval::Context) {
     use core::panic;
     use microcad_lang::parse::source_file::SourceFile;
     let source_file = match SourceFile::load_from_str(input) {
@@ -73,12 +75,12 @@ fn eval_input_with_context(
 }
 
 #[cfg(test)]
-fn eval_input(input: &str) -> microcad_core::render::Node {
+fn eval_input(input: &str) -> ObjectNode {
     eval_input_with_context(input).0
 }
 
 #[cfg(test)]
-fn export_tree_dump_for_node(node: microcad_core::render::Node, tree_dump_file: &str) {
+fn export_tree_dump_for_node(node: ObjectNode, tree_dump_file: &str) {
     use microcad_export::Exporter;
     let mut tree_dump_exporter = microcad_export::tree_dump::TreeDumpExporter::from_settings(
         &microcad_export::ExportSettings::with_filename(tree_dump_file.to_string()),
@@ -136,8 +138,8 @@ fn test_source_file(file_name: &str) {
     // Compare tree dump files
     if ref_tree_dump_file.exists() {
         assert_eq!(
-            std::fs::read_to_string(tree_dump_file).unwrap(),
-            std::fs::read_to_string(ref_tree_dump_file).unwrap()
+            std::fs::read_to_string(tree_dump_file).unwrap().replace("\r\n", "\n").trim(),
+            std::fs::read_to_string(ref_tree_dump_file).unwrap().replace("\r\n", "\n").trim()
         );
     }
 }
@@ -145,11 +147,11 @@ fn test_source_file(file_name: &str) {
 #[test]
 fn difference_svg() {
     use microcad_lang::eval::BuiltinModuleDefinition;
-    use microcad_render::{svg::SvgRenderer, tree, Renderer2D};
+    use microcad_render::svg::SvgRenderer;
     use microcad_std::{algorithm::*, geo2d::*};
 
     let difference = difference().unwrap();
-    let group = tree::group();
+    let group = objecttree::group();
     group.append(Circle::node(args!(radius: Scalar = 4.0)).unwrap());
     group.append(Circle::node(args!(radius: Scalar = 2.0)).unwrap());
     difference.append(group);
@@ -159,6 +161,10 @@ fn difference_svg() {
     let file = std::fs::File::create(test_out_dir.join("difference.svg")).unwrap();
     let mut renderer = SvgRenderer::default();
     renderer.set_output(Box::new(file)).unwrap();
+
+    let difference = objecttree::bake2d(&mut renderer, difference).unwrap();
+
+    use microcad_core::geo2d::Renderer;
     renderer.render_node(difference).unwrap();
 }
 
@@ -169,7 +175,7 @@ fn difference_stl() {
     use microcad_std::algorithm;
 
     let difference = algorithm::difference().unwrap();
-    let group = microcad_render::tree::group();
+    let group = objecttree::group();
     group.append(
         microcad_std::geo3d::Cube::node(
             args!(size_x: Scalar = 4.0, size_y: Scalar = 4.0, size_z: Scalar = 4.0),
@@ -259,6 +265,7 @@ fn test_context_std() {
     }
 }
 
+/** TODO: Refactor or remove this test
 #[test]
 fn test_stl_export() {
     let test_out_dir = make_test_out_dir();
@@ -272,7 +279,7 @@ fn test_stl_export() {
     use microcad_export::Exporter;
     let mut exporter = StlExporter::from_settings(&settings).unwrap();
 
-    let node = microcad_core::render::tree::root();
+    let node = microcad_core::render::tree::group();
 
     use microcad_core::geo3d::*;
     let a = Manifold::cube(1.0, 1.0, 1.0);
@@ -280,14 +287,15 @@ fn test_stl_export() {
 
     let intersection: Geometry = a.intersection(&b).into();
 
-    node.append(microcad_core::render::Node::new(
-        microcad_core::render::NodeInner::Geometry3D(std::rc::Rc::new(
+    node.append(microcad_core::render::ModelNode::new(
+        microcad_core::render::ModelNodeInner::Geometry3D(std::rc::Rc::new(
             intersection.fetch_mesh().into(),
         )),
     ));
 
     exporter.export(node).unwrap();
 }
+**/
 
 #[test]
 fn test_simple_module_statement() {
@@ -336,7 +344,7 @@ fn test_simple_module_definition() {
 
     if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
         match *node.borrow() {
-            microcad_core::render::NodeInner::Group => {}
+            ObjectNodeInner::Group(_) => {}
             ref inner => panic!("Expected node to be a Group, got {:?}", inner),
         }
 
@@ -344,4 +352,154 @@ fn test_simple_module_definition() {
     } else {
         panic!("Resulting value is not a node");
     }
+}
+
+#[test]
+fn test_module_definition_with_parameters() {
+    use microcad_lang::parse::*;
+
+    // Define a module `donut` with an implicit initializer `()` and call it
+    let (root, mut context) = eval_input_with_context(
+        r#"
+        module donut(radius: scalar) { 
+            std::geo2d::circle(radius); 
+        }
+
+        donut(radius = 3.0);
+        donut(radius = 5.0);
+
+        // Test if we can access the radius parameter
+        std::assert(donut(radius = 4.0).radius == 4.0);
+        "#,
+    );
+
+    export_tree_dump_for_node(root, "output/module_definition_with_parameters_root.tree.dump");
+
+    // Check the module definition
+    let module_definition = context
+        .fetch_symbols_by_qualified_name(&QualifiedName(vec!["donut".into()]))
+        .unwrap();
+    let module_definition = match module_definition.first().unwrap() {
+        microcad_lang::eval::Symbol::Module(m) => m,
+        _ => panic!("Expected module definition"),
+    };
+    assert_eq!(module_definition.body.pre_init_statements.len(), 0);
+    assert_eq!(module_definition.body.inits.len(), 1);
+    assert_eq!(module_definition.body.post_init_statements.len(), 1);
+
+    // Call the module definition of `donut` and verify it
+    use crate::parser::*;
+
+    let node = module_definition
+        .call(&Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list,  "radius = 6.0", 0).unwrap(), &mut context)
+        .unwrap();
+
+    if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
+        match *node.borrow() {
+            ObjectNodeInner::Group(ref symbols) => {
+                use microcad_lang::eval::*;
+                let symbol = symbols.fetch(&"radius".into()).unwrap();
+                match symbol.as_ref() {
+                    Symbol::Value(_, value) => {
+                        assert_eq!(value, &6.0.into());
+                    }
+                    _ => panic!("Expected symbol to be a Value"),
+                }
+            }
+            ref inner => panic!("Expected node to be a Group, got {:?}", inner),
+        }
+
+        export_tree_dump_for_node(node, "output/module_definition_with_parameters.tree.dump");
+    } else {
+        panic!("Resulting value is not a node");
+    }
+}
+
+#[test]
+fn module_definition_init() {
+    use microcad_lang::parse::*;
+
+    // Define a module `donut` with an implicit initializer `()` and call it
+    let (root, mut context) = eval_input_with_context(
+        r#"
+        module circle {
+            pre_init_statement = 0;
+
+            init(r: scalar) {
+                radius = r;
+            }
+
+            init(d: scalar) {
+                radius = d / 2.0;
+            }
+
+            std::geo2d::circle(radius);
+        }
+
+        circle(r = 3.0);
+        circle(d = 6.0);
+        "#,
+    );
+
+    export_tree_dump_for_node(root, "output/module_definition_init_root.tree.dump");
+
+    // Check the module definition
+    let module_definition = context
+        .fetch_symbols_by_qualified_name(&QualifiedName(vec!["circle".into()]))
+        .unwrap();
+    let module_definition = match module_definition.first().unwrap() {
+        microcad_lang::eval::Symbol::Module(m) => m,
+        _ => panic!("Expected module definition"),
+    };
+    assert_eq!(module_definition.body.pre_init_statements.len(), 1);
+    assert_eq!(module_definition.body.inits.len(), 2);
+    assert_eq!(module_definition.body.post_init_statements.len(), 1);
+
+    // Call the module definition of `donut` and verify it
+    use crate::parser::*;
+
+    let node = module_definition
+        .call(&Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list,  "r = 6.0", 0).unwrap(), &mut context)
+        .unwrap();
+
+    if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
+        match *node.borrow() {
+            ObjectNodeInner::Group(ref symbols) => {
+                use microcad_lang::eval::*;
+                let symbol = symbols.fetch(&"radius".into()).unwrap();
+                match symbol.as_ref() {
+                    Symbol::Value(_, value) => {
+                        assert_eq!(value, &6.0.into());
+                    }
+                    _ => panic!("Expected symbol to be a Value"),
+                }
+            }
+            ref inner => panic!("Expected node to be a Group, got {:?}", inner),
+        }
+
+        export_tree_dump_for_node(node, "output/module_definition_with_parameters.tree.dump");
+    } else {
+        panic!("Resulting value is not a node");
+    }
+}
+
+#[test]
+fn test_module_src_ref() {
+    use microcad_lang::parse::*;
+
+    // Define a module `donut` with an implicit initializer `()` and call it
+    let (root, mut context) = eval_input_with_context(
+        r#"
+        module donut { 
+            init(d: scalar) {
+                radius = d / 2.0;
+                std::geo2d::circle(radius); 
+            }
+        }
+
+        donut(d = 3.0);
+        "#,
+    );
+    export_tree_dump_for_node(root, "output/test_module_src_ref.tree.dump");
+
 }

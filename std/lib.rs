@@ -73,7 +73,7 @@ pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
             builtin_module!(export(filename: String) {
                 let export_settings = ExportSettings::with_filename(filename.clone());
 
-                Ok(microcad_core::export::export(export_settings))
+                Ok(microcad_export::export(export_settings))
             })
             .into(),
         )

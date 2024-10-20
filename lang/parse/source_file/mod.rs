@@ -9,8 +9,7 @@ pub use statement::*;
 
 use std::io::Read;
 
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
-use microcad_render::tree;
+use crate::{errors::*, eval::*, objecttree, parse::*, parser::*, src_ref::*};
 
 /// Trait to get a source file by its hash
 pub trait GetSourceFileByHash {
@@ -165,13 +164,13 @@ impl Parse for SourceFile {
 }
 
 impl Eval for SourceFile {
-    type Output = tree::Node;
+    type Output = objecttree::ObjectNode;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let mut new_nodes = Vec::new();
 
         // Descend into root node and find all child nodes
-        context.descend_node(tree::root(), |context| {
+        context.descend_node(crate::objecttree::group(), |context| {
             for statement in &self.body {
                 match statement {
                     Statement::Expression(expression) => {

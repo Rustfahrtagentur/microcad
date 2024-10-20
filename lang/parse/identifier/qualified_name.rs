@@ -65,7 +65,7 @@ impl QualifiedName {
     /// Visit all symbols in the qualified name recursively
     fn _visit_symbols(
         &self,
-        root: Option<Symbol>,
+        root: Option<std::rc::Rc<Symbol>>,
         index: usize,
         context: &Context,
         functor: &mut dyn FnMut(&Symbol, usize),
@@ -75,14 +75,14 @@ impl QualifiedName {
         }
         let ident = &self.0[index];
 
-        let new_symbols = match (&root, ident.id()) {
+        let new_symbol = match (&root, ident.id()) {
             (Some(ref root), Some(id)) => root.fetch_symbols(&id),
             (None, Some(id)) => context.fetch(&id),
             _ => unreachable!("can't search unnamed symbol"),
         };
 
-        for symbol in new_symbols {
-            functor(symbol, index);
+        if let Some(symbol) = new_symbol {
+            functor(&symbol, index);
             self._visit_symbols(Some(symbol.clone()), index + 1, context, functor)?;
         }
 

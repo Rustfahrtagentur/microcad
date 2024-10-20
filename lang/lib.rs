@@ -15,8 +15,11 @@ pub mod parser;
 pub mod source_file_cache;
 pub mod src_ref;
 pub mod r#type;
+pub mod objecttree;
 
 use std::sync::Once;
+
+pub use objecttree::{ObjectNode, ObjectNodeInner};
 
 static INIT_EVENT_LOGGER: Once = Once::new();
 

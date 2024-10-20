@@ -34,7 +34,7 @@ impl CallTrait for ModuleDefinition {
     fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
         context.push();
 
-        let node = microcad_render::tree::group();
+        let mut node = crate::objecttree::group();
         context.set_current_node(node.clone());
 
         // Let's evaluate the pre-init statements first
@@ -63,14 +63,32 @@ impl CallTrait for ModuleDefinition {
             }
             1 => {
                 let (init, arg_map) = matching_init.first().unwrap();
-                init.call(arg_map, context)?;
+                // Copy the arguments to the symbol table of the node
+                for (name, value) in arg_map.iter() {
+                    node.add(Symbol::Value(name.clone(), value.clone()));
+                }
+                let init_object = init.call(arg_map, context)?;
+
+                // Add the init object's children to the node
+                for child in init_object.children() {
+                    child.detach();
+                    node.append(child.clone());
+                }
+
+                init_object.copy(&mut node);
             }
             _ => {
                 context.error(self, anyhow!("Multiple matching initializers found"))?;
                 // TODO Add diagnostics for multiple matching initializers
+                context.pop();
+                return Ok(None);
             }
         }
+        
+        // Now, copy the symbols of the node into the context
+        node.copy(context);
 
+        // Evaluate the post-init statements
         for statement in &self.body.post_init_statements {
             statement.eval(context)?;
         }
@@ -88,7 +106,7 @@ impl SrcReferrer for ModuleDefinition {
 }
 
 impl Symbols for ModuleDefinition {
-    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         self.body.fetch(id)
     }
 
@@ -97,8 +115,8 @@ impl Symbols for ModuleDefinition {
         self
     }
     fn copy<T: Symbols>(&self, into: &mut T) {
-        self.body.symbols.iter().for_each(|symbol| {
-            into.add(symbol.clone());
+        self.body.symbols.iter().for_each(|(_, symbol)| {
+            into.add(symbol.as_ref().clone());
         });
     }
 }

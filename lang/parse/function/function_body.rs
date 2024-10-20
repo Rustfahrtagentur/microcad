@@ -4,7 +4,7 @@
 //! Function body parser entity
 
 use super::FunctionStatement;
-use crate::{errors::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Function body
 #[derive(Clone, Debug, Default)]
@@ -27,5 +27,18 @@ impl Parse for FunctionBody {
                 rule => unreachable!("Unexpected token in function body: {:?}", rule),
             },
         )?))
+    }
+}
+
+impl Eval for FunctionBody {
+    type Output = Option<Value>;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+        for statement in self.0.iter() {
+            if let Some(result) = statement.eval(context)? {
+                return Ok(Some(result));
+            }
+        }
+        Ok(None)
     }
 }

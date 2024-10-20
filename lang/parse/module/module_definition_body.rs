@@ -57,8 +57,6 @@ impl ModuleDefinitionBody {
                 } else {
                     return Err(ParseError::StatementBetweenModuleInit);
                 }
-
-                self.inits.push(init.clone());
             }
             statement => {
                 if self.inits.is_empty() {
@@ -108,7 +106,7 @@ impl SrcReferrer for ModuleDefinitionBody {
 }
 
 impl Symbols for ModuleDefinitionBody {
-    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         self.symbols.fetch(id)
     }
 

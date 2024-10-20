@@ -1,0 +1,11 @@
+// Define a module `donut` with a radius as parameter
+module donut(radius: scalar) { 
+    std::geo2d::circle(radius = radius); 
+}
+
+// Make two donuts with radius = 3.0 and 5.0, respectively
+donut(radius = 3.0);
+donut(radius = 5.0);
+
+// Test if we can access the radius parameter
+std::assert(donut(radius = 4.0).radius == 4.0);

@@ -55,11 +55,9 @@ impl CallTrait for FunctionDefinition {
         }
 
         for statement in self.body.0.iter() {
-            match statement {
-                FunctionStatement::Assignment(assignment) => assignment.eval(context)?,
-                FunctionStatement::Return(expr) => return Ok(Some(expr.eval(context)?)),
-                FunctionStatement::FunctionDefinition(f) => f.eval(context)?,
-                _ => unimplemented!(),
+            if let Some(result) = statement.eval(context)? {
+                context.pop();
+                return Ok(Some(result));
             }
         }
         context.pop();

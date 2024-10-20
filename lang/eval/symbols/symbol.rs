@@ -64,11 +64,11 @@ impl Sym for Symbol {
 
 impl Symbol {
     /// fetch all symbols which match id
-    pub fn fetch_symbols(&self, name: &Id) -> Vec<&Symbol> {
+    pub fn fetch_symbols(&self, name: &Id) -> Option<std::rc::Rc<Symbol>> {
         match self {
             Self::Module(module) => module.fetch(name),
             Self::Namespace(namespace) => namespace.fetch(name),
-            _ => Vec::new(),
+            _ => None,
         }
     }
 }

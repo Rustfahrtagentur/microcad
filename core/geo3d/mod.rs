@@ -4,17 +4,24 @@
 //! 3D Geometry
 
 mod triangle_mesh;
+pub mod tree;
+mod render;
 
 pub use manifold_rs::Manifold;
 pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 
-use crate::algorithm::BooleanOp;
+pub use tree::{Node, NodeInner};
+pub use render::*;
+
+use strum::IntoStaticStr;
+use crate::BooleanOp;
 
 /// 3D Geometry
+#[derive(IntoStaticStr)]
 pub enum Geometry {
     /// Triangle mesh
     Mesh(TriangleMesh),
-    /// Maniold
+    /// Manifold
     Manifold(Manifold),
 }
 
@@ -72,4 +79,19 @@ impl From<TriangleMesh> for Geometry {
     fn from(mesh: TriangleMesh) -> Self {
         Geometry::Mesh(mesh)
     }
+}
+
+/// Create a new group node
+pub fn group() -> Node {
+    Node::new(NodeInner::Group)
+}
+
+/// Create a new geometry node
+pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
+    Node::new(NodeInner::Geometry(geometry))
+}
+
+/// Create a new transform node
+pub fn transform(transform: crate::Mat4) -> Node {
+    Node::new(NodeInner::Transform(transform))
 }

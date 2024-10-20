@@ -10,4 +10,4 @@ pub mod mesh;
 
 pub mod svg;
 
-pub use microcad_core::render::*;
+pub use microcad_core::*;

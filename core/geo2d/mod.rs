@@ -3,7 +3,15 @@
 
 //! 2D Geometry
 
+pub mod tree;
+
+mod render;
+
 use crate::Scalar;
+use strum::IntoStaticStr;
+
+pub use tree::{Node, NodeInner};
+pub use render::*;
 
 /// Line string
 pub type LineString = geo::LineString<Scalar>;
@@ -22,6 +30,7 @@ pub type Point = geo::Point<Scalar>;
 pub use geo::coord;
 
 /// Geometry
+#[derive(IntoStaticStr)]
 pub enum Geometry {
     /// Line string
     LineString(LineString),
@@ -62,7 +71,7 @@ impl Geometry {
     pub fn boolean_op(
         &self,
         other: &Self,
-        op: &crate::algorithm::boolean_op::BooleanOp,
+        op: &crate::BooleanOp,
     ) -> Option<Self> {
         let a = self.try_convert_to_multi_polygon()?;
         let b = other.try_convert_to_multi_polygon()?;

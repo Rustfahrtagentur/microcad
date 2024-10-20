@@ -22,7 +22,7 @@ pub use value_list::*;
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
-use microcad_render::tree::Node;
+use crate::objecttree::ObjectNode;
 
 pub(crate) type ValueResult = std::result::Result<Value, EvalError>;
 
@@ -64,7 +64,7 @@ pub enum Value {
     /// Tuple of unnamed items
     UnnamedTuple(UnnamedTuple),
     /// A node in the render tree
-    Node(Node),
+    Node(ObjectNode),
 }
 
 impl Value {
@@ -86,6 +86,31 @@ impl Value {
             (value, _) => return Err(EvalError::CannotAddUnitToValueWithUnit(value.clone())),
         }
         Ok(())
+    }
+
+    /// Clone the value with a new source reference
+    pub fn clone_with_src_ref(&self, src_ref: SrcRef) -> Self {
+        match self {
+            Value::Integer(i) => Value::Integer(Refer::new(i.value, src_ref)),
+            Value::Scalar(s) => Value::Scalar(Refer::new(s.value, src_ref)),
+            Value::Length(l) => Value::Length(Refer::new(l.value, src_ref)),
+            Value::Area(a) => Value::Area(Refer::new(a.value, src_ref)),
+            Value::Volume(v) => Value::Volume(Refer::new(v.value, src_ref)),
+            Value::Vec2(v) => Value::Vec2(Refer::new(v.value, src_ref)),
+            Value::Vec3(v) => Value::Vec3(Refer::new(v.value, src_ref)),
+            Value::Vec4(v) => Value::Vec4(Refer::new(v.value, src_ref)),
+            Value::Angle(a) => Value::Angle(Refer::new(a.value, src_ref)),
+            Value::Weight(w) => Value::Weight(Refer::new(w.value, src_ref)),
+            Value::Bool(b) => Value::Bool(Refer::new(b.value, src_ref)),
+            Value::String(s) => Value::String(Refer::new(s.value.clone(), src_ref)),
+            Value::Color(c) => Value::Color(Refer::new(c.value, src_ref)),
+            //Value::List(l) => Value::List(l.clone_with_src_ref(src_ref)),
+           // Value::Map(m) => Value::Map(m.clone_with_src_ref(src_ref)),
+            //Value::NamedTuple(t) => Value::NamedTuple(t.clone_with_src_ref(src_ref)),
+            //Value::UnnamedTuple(t) => Value::UnnamedTuple(t.clone_with_src_ref(src_ref)),
+            Value::Node(n) => Value::Node(n.clone()),
+            _ => todo!("Implement Value::clone_with_src_ref for all variants"),
+        }
     }
 }
 
@@ -280,8 +305,8 @@ impl std::ops::Sub for Value {
                 Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                microcad_core::algorithm::boolean_op::binary_op(
-                    algorithm::BooleanOp::Difference,
+                crate::objecttree::algorithm::binary_op(
+                    microcad_core::BooleanOp::Difference,
                     lhs,
                     rhs,
                 ),
@@ -376,8 +401,8 @@ impl std::ops::BitOr for Value {
     fn bitor(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                microcad_core::algorithm::boolean_op::binary_op(
-                    algorithm::BooleanOp::Union,
+                crate::objecttree::algorithm::binary_op(
+                    BooleanOp::Union,
                     lhs,
                     rhs,
                 ),
@@ -394,8 +419,8 @@ impl std::ops::BitAnd for Value {
     fn bitand(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                microcad_core::algorithm::boolean_op::binary_op(
-                    algorithm::BooleanOp::Intersection,
+                crate::objecttree::algorithm::binary_op(
+                    BooleanOp::Intersection,
                     lhs,
                     rhs,
                 ),

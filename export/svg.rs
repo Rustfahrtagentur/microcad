@@ -5,6 +5,7 @@
 
 use std::path::PathBuf;
 
+use microcad_lang::objecttree::ObjectNode;
 use microcad_render::svg::SvgRenderer;
 
 use crate::*;
@@ -30,12 +31,14 @@ impl Exporter for SvgExporter {
         vec!["svg"]
     }
 
-    fn export(&mut self, node: microcad_render::Node) -> microcad_core::Result<()> {
+    fn export(&mut self, node: ObjectNode) -> microcad_core::Result<()> {
         let file = std::fs::File::create(&self.filename)?;
 
-        use microcad_render::Renderer2D;
+        use microcad_core::geo2d::Renderer;
         let mut renderer = SvgRenderer::default();
         renderer.set_output(Box::new(file))?;
+        let node = microcad_lang::objecttree::bake2d(&mut renderer, node)?;
+
         renderer.render_node(node)
     }
 }

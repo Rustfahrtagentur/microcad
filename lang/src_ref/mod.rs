@@ -129,7 +129,7 @@ impl SrcRef {
     pub fn merge(lhs: impl SrcReferrer, rhs: impl SrcReferrer) -> SrcRef {
         match (lhs.src_ref(), rhs.src_ref()) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => {
-                let hash = {
+                let source_file_hash = {
                     if lhs.source_file_hash != rhs.source_file_hash {
                         0
                     } else {
@@ -146,7 +146,7 @@ impl SrcRef {
                         lhs.range.start..rhs.range.end
                     },
                     at: lhs.at,
-                    source_file_hash: hash,
+                    source_file_hash,
                 }))
             }
             (SrcRef(Some(hs)), SrcRef(None)) | (SrcRef(None), SrcRef(Some(hs))) => SrcRef(Some(hs)),

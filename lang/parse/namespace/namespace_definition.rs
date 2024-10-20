@@ -34,7 +34,7 @@ impl SrcReferrer for NamespaceDefinition {
 }
 
 impl Symbols for NamespaceDefinition {
-    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         self.body.fetch(id)
     }
 
@@ -44,8 +44,8 @@ impl Symbols for NamespaceDefinition {
     }
 
     fn copy<T: Symbols>(&self, into: &mut T) {
-        self.body.symbols.iter().for_each(|symbol| {
-            into.add(symbol.clone());
+        self.body.symbols.iter().for_each(|(_, symbol)| {
+            into.add(symbol.as_ref().clone());
         });
     }
 }

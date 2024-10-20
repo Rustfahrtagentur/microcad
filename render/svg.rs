@@ -5,8 +5,7 @@
 
 use geo::CoordsIter;
 use microcad_core::{
-    geo2d::*,
-    render::{Node, NodeInner, Renderer, Renderer2D},
+    *,
     CoreError, Scalar,
 };
 
@@ -21,7 +20,7 @@ impl SvgWriter {
     /// - `w`: Output writer
     /// - `bounds`: Clipping
     /// - `scale`: Scale of the output
-    pub fn new(mut w: Box<dyn std::io::Write>, bounds: Rect, scale: f64) -> std::io::Result<Self> {
+    pub fn new(mut w: Box<dyn std::io::Write>, bounds: geo2d::Rect, scale: f64) -> std::io::Result<Self> {
         writeln!(&mut w, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
             &mut w,
@@ -39,7 +38,7 @@ impl SvgWriter {
     }
 
     /// Generate rectangle
-    pub fn rect(&mut self, rect: &Rect, style: &str) -> std::io::Result<()> {
+    pub fn rect(&mut self, rect: &geo2d::Rect, style: &str) -> std::io::Result<()> {
         let x = rect.min().x;
         let y = rect.min().y;
         let width = rect.width();
@@ -51,7 +50,7 @@ impl SvgWriter {
     }
 
     /// Generate circle
-    pub fn circle(&mut self, center: &Point, radius: f64, style: &str) -> std::io::Result<()> {
+    pub fn circle(&mut self, center: &geo2d::Point, radius: f64, style: &str) -> std::io::Result<()> {
         let (cx, cy) = center.x_y();
         writeln!(
             self.writer,
@@ -60,7 +59,7 @@ impl SvgWriter {
     }
 
     /// Generate line
-    pub fn line(&mut self, p1: Point, p2: Point, style: &str) -> std::io::Result<()> {
+    pub fn line(&mut self, p1: geo2d::Point, p2: geo2d::Point, style: &str) -> std::io::Result<()> {
         let ((x1, y1), (x2, y2)) = (p1.x_y(), p2.x_y());
         writeln!(
             self.writer,
@@ -69,7 +68,7 @@ impl SvgWriter {
     }
 
     /// Generate polygon
-    pub fn polygon(&mut self, polygon: &Polygon, style: &str) -> std::io::Result<()> {
+    pub fn polygon(&mut self, polygon: &geo2d::Polygon, style: &str) -> std::io::Result<()> {
         write!(self.writer, "<path d=\"")?;
         for (i, point) in polygon.exterior().points().enumerate() {
             let (x, y) = point.x_y();
@@ -104,7 +103,7 @@ impl SvgWriter {
     /// Generate multiple polygons
     pub fn multi_polygon(
         &mut self,
-        multi_polygon: &MultiPolygon,
+        multi_polygon: &geo2d::MultiPolygon,
         style: &str,
     ) -> std::io::Result<()> {
         for polygon in multi_polygon {
@@ -134,7 +133,7 @@ pub struct SvgRenderer {
     writer: Option<SvgWriter>,
     precision: Scalar,
     scale: Scalar,
-    bounds: Rect,
+    bounds: geo2d::Rect,
     state: SvgRendererState,
 }
 
@@ -170,14 +169,14 @@ impl Default for SvgRenderer {
         Self {
             writer: None,
             precision: 0.1,
-            bounds: Rect::new(Point::new(0.0, 0.0), Point::new(100.0, 100.0)),
+            bounds: geo2d::Rect::new(geo2d::Point::new(0.0, 0.0), geo2d::Point::new(100.0, 100.0)),
             scale: 1.0,
             state: SvgRendererState::default(),
         }
     }
 }
 
-impl Renderer for SvgRenderer {
+impl microcad_core::Renderer for SvgRenderer {
     fn precision(&self) -> Scalar {
         self.precision
     }
@@ -195,29 +194,24 @@ impl Renderer for SvgRenderer {
     }
 }
 
-impl Renderer2D for SvgRenderer {
-    fn multi_polygon(&mut self, multi_polygon: &MultiPolygon) -> microcad_core::Result<()> {
+impl geo2d::Renderer for SvgRenderer {
+    fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> microcad_core::Result<()> {
         let style = self.render_state_to_style();
         self.writer().multi_polygon(multi_polygon, &style).unwrap();
         Ok(())
     }
 
-    fn render_node(&mut self, node: Node) -> microcad_core::Result<()> {
+    fn render_node(&mut self, node: microcad_core::geo2d::Node) -> microcad_core::Result<()> {
         let inner = node.borrow();
+        use microcad_core::geo2d::NodeInner;
+
         match &*inner {
-            NodeInner::Export(_) | NodeInner::Group | NodeInner::Root => {
+            NodeInner::Group => {
                 for child in node.children() {
                     self.render_node(child.clone())?;
                 }
             }
-            NodeInner::Algorithm(algorithm) => {
-                let new_node = algorithm.process_2d(self, node.clone())?;
-                self.render_node(new_node)?;
-            }
-            NodeInner::Renderable2D(renderable) => {
-                renderable.render_geometry(self)?;
-            }
-            NodeInner::Geometry2D(geometry) => self.render_geometry(geometry)?,
+            NodeInner::Geometry(geometry) => self.render_geometry(geometry)?,
             NodeInner::Transform(_) => unimplemented!(),
             _ => return Err(CoreError::NotImplemented),
         };

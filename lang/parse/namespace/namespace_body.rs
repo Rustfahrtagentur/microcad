@@ -36,7 +36,7 @@ impl NamespaceBody {
 }
 
 impl Symbols for NamespaceBody {
-    fn fetch(&self, id: &Id) -> Vec<&Symbol> {
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         self.symbols.fetch(id)
     }
 

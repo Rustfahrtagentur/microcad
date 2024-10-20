@@ -31,7 +31,7 @@ fn assignment() {
     assignment.eval(&mut context).unwrap();
 
     assert_eq!(
-        context.fetch(&"a".into()).first().unwrap().id().unwrap(),
+        context.fetch(&"a".into()).unwrap().id().unwrap(),
         "a"
     );
 }
@@ -77,7 +77,7 @@ fn function_evaluate() {
             .unwrap();
 
     let mut context = Context::default();
-    context.add(function_def.into());
+    context.add( function_def.into());
 
     let input = "test(a = 1.0, b = 2.0)";
     let expr = Parser::parse_rule::<Expression>(Rule::expression, input, 0).unwrap();

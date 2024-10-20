@@ -1,17 +1,16 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! 2D Renderable
+//! 2D Primitive
 
-use super::*;
 use crate::*;
 
-/// 2D Renderable
-pub trait Renderable2D: RenderHash + std::fmt::Debug {
+/// A Primitive is a hashable renderable object that can be rendered by a Renderer2D
+pub trait Primitive: RenderHash + std::fmt::Debug {
     /// Get geometry
     fn request_geometry(
         &self,
-        renderer: &mut dyn Renderer2D,
+        renderer: &mut dyn Renderer,
     ) -> Result<std::rc::Rc<geo2d::Geometry>> {
         // Try to fetch the geometry from the render cache
         if let Some(hash) = self.render_hash() {
@@ -26,11 +25,11 @@ pub trait Renderable2D: RenderHash + std::fmt::Debug {
     }
 
     /// Render geometry
-    fn render_geometry(&self, renderer: &mut dyn Renderer2D) -> Result<geo2d::Geometry>;
+    fn render_geometry(&self, renderer: &mut dyn Renderer) -> Result<geo2d::Geometry>;
 }
 
 /// 2D Renderer
-pub trait Renderer2D: Renderer {
+pub trait Renderer: crate::Renderer {
     /// Render multiple polygons
     fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> Result<()>;
 
@@ -48,5 +47,5 @@ pub trait Renderer2D: Renderer {
     }
 
     /// Render node
-    fn render_node(&mut self, node: Node) -> Result<()>;
+    fn render_node(&mut self, node: crate::geo2d::Node) -> Result<()>;
 }

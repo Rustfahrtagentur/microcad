@@ -1,12 +1,11 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_builtin_proc_macro::DefineBuiltinRenderable3D;
+use microcad_builtin_proc_macro::DefineBuiltinPrimitive3D;
 use microcad_core::*;
 use microcad_lang::{eval::*, parse::*};
-use microcad_render::{RenderHash, Renderable3D};
 
-#[derive(DefineBuiltinRenderable3D, Debug)]
+#[derive(DefineBuiltinPrimitive3D, Debug)]
 pub struct Sphere {
     pub radius: Scalar,
 }
@@ -17,10 +16,10 @@ impl RenderHash for Sphere {
     }
 }
 
-impl Renderable3D for Sphere {
+impl geo3d::Primitive for Sphere {
     fn render_geometry(
         &self,
-        renderer: &mut dyn render::Renderer3D,
+        renderer: &mut dyn geo3d::Renderer,
     ) -> microcad_core::Result<geo3d::Geometry> {
         use std::f64::consts::PI;
         let n = (self.radius / renderer.precision() * PI * 0.5).max(3.0) as u32;
@@ -32,7 +31,7 @@ impl Renderable3D for Sphere {
     }
 }
 
-#[derive(DefineBuiltinRenderable3D, Debug)]
+#[derive(DefineBuiltinPrimitive3D, Debug)]
 pub struct Cube {
     pub size_x: Scalar,
     pub size_y: Scalar,
@@ -45,10 +44,10 @@ impl RenderHash for Cube {
     }
 }
 
-impl Renderable3D for Cube {
+impl geo3d::Primitive for Cube {
     fn render_geometry(
         &self,
-        _renderer: &mut dyn render::Renderer3D,
+        _renderer: &mut dyn geo3d::Renderer,
     ) -> microcad_core::Result<geo3d::Geometry> {
         Ok(geo3d::Geometry::Manifold(geo3d::Manifold::cube(
             self.size_x,

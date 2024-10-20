@@ -16,7 +16,7 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 /// ```
 #[derive(Clone, Debug)]
 pub struct ModuleInitDefinition {
-    /// Parameter lsit for this init definition
+    /// Parameter list for this init definition
     pub parameters: ParameterList,
     /// Body if the init definition
     pub body: NodeBody,
@@ -26,13 +26,12 @@ pub struct ModuleInitDefinition {
 
 impl ModuleInitDefinition {
     /// Call the initializer
-    pub fn call(&self, arg_map: &ArgumentMap, context: &mut Context) -> Result<()> {
+    pub fn call(&self, arg_map: &ArgumentMap, context: &mut Context) -> Result<crate::objecttree::ObjectNode> {
         for (name, value) in arg_map.iter() {
             context.add(Symbol::Value(name.clone(), value.clone()));
         }
 
-        self.body.eval(context)?;
-        Ok(())
+        self.body.eval(context)
     }
 }
 
