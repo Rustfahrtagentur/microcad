@@ -1,25 +1,24 @@
 /// µCAD standard library
 
 namespace geo2d {
+    /// `circle(r = 10.0mm);`
+    /// `circle(d = 5.0mm);`
     module circle {
-        center = (x = 0mm, y = 0mm);
-
         init(radius: length) {}
 
         init(r: length) {
-            radius = r
+            radius = r;
         }
 
         init(diameter: length) {
-            radius = diameter / 2
+            radius = diameter / 2.0;
         }
 
         init(d: length) {
-            radius = d / 2
+            radius = d / 2.0;
         }
 
-        __builtin::translate(center)
-            __builtin::geo2d::circle(radius / 1mm)
+        __builtin::geo2d::circle(radius / 1mm);
     }
 }
 

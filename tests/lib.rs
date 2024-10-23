@@ -208,7 +208,7 @@ fn test_context_builtin() {
     use microcad_lang::parse::*;
     let source_file = match SourceFile::load_from_str("use * from __builtin;") {
         Ok(doc) => doc,
-        Err(err) => panic!("ERROR: {err}"),
+        Err(err) => panic!("ERROR: {err:?}"),
     };
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
@@ -513,4 +513,49 @@ fn test_module_src_ref() {
         "#,
     );
     export_tree_dump_for_node(root, "output/test_module_src_ref.tree.dump");
+}
+
+#[test]
+fn test_eval_std() {
+    use microcad_lang::parse::*;
+
+    let std_source_file = match SourceFile::load("../std/std.µcad") {
+        Ok(std_source_file) => std_source_file,
+        Err(err) => panic!("ERROR: {err:?}"),
+    };
+
+    let mut context = microcad_std::ContextBuilder::new(std_source_file)
+        .with_builtin()
+        //        .with_std()
+        .build();
+
+    let namespace = context
+        .current_source_file()
+        .unwrap()
+        .eval_as_namespace(&mut context, "std".into())
+        .unwrap();
+
+    let source_file = match SourceFile::load_from_str(
+        "
+        use * from std;
+        geo2d::circle(r = 2.0mm);
+        geo2d::circle(d = 2.0mm);
+        geo2d::circle(radius = 2.0mm);
+        geo2d::circle(diameter = 2.0mm);
+        ",
+    ) {
+        Ok(doc) => doc,
+        Err(err) => panic!("ERROR: {err:?}"),
+    };
+
+    let mut context = microcad_std::ContextBuilder::new(source_file)
+        .with_builtin()
+        .build();
+
+    use microcad_lang::eval::*;
+    context.add(Symbol::Namespace(namespace));
+
+    let node = context.eval().unwrap();
+
+    export_tree_dump_for_node(node, "output/test_eval_std.tree.dump");
 }
