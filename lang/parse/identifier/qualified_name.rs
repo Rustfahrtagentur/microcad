@@ -101,7 +101,7 @@ impl QualifiedName {
 
         if symbols.is_empty() {
             use crate::diag::PushDiag;
-            context.error(self, anyhow::anyhow!("Symbol not found"))?;
+            context.error(self, anyhow::anyhow!("Symbol not found: {}", self))?;
         }
         Ok(symbols)
     }
