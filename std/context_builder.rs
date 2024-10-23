@@ -48,6 +48,7 @@ impl ContextBuilder {
             .expect("failure evaluating std library");
         use microcad_lang::eval::*;
 
+        self.context.add_source_file(std_source_file);
         self.context.add(Symbol::Namespace(namespace));
 
         self
