@@ -111,9 +111,14 @@ fn test_source_file(file_name: &str) {
     .iter()
     .collect();
 
+    let hash = source_file.hash();
+
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_std("../std")
         .build();
+
+    use parse::GetSourceFileByHash;
+    assert!(context.get_source_file_by_hash(hash).is_some());
 
     use microcad_lang::eval::*;
 
@@ -537,6 +542,8 @@ fn test_load_std() {
         .eval_as_namespace(&mut context, "std".into())
         .unwrap();
 
+    assert!(namespace.fetch(&"export".into()).is_some());
+
     let source_file = match SourceFile::load_from_str(
         "
         use * from std;
@@ -544,6 +551,10 @@ fn test_load_std() {
         geo2d::circle(d = 2.0mm);
         geo2d::circle(radius = 2.0mm);
         geo2d::circle(diameter = 2.0mm);
+        
+        std::export(\"test.svg\") {
+            geo2d::circle(2.0mm);
+        }
         ",
     ) {
         Ok(doc) => doc,
