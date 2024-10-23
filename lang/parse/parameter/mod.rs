@@ -57,7 +57,7 @@ impl std::fmt::Display for Parameter {
             (Some(t), Some(v)) => write!(f, "{}: {t} = {v}", self.name),
             (Some(t), None) => write!(f, "{}: {t}", self.name),
             (None, Some(v)) => write!(f, "{} = {v}", self.name),
-            _ => Ok(())
+            _ => Ok(()),
         }
     }
 }
@@ -81,7 +81,7 @@ impl Parse for Parameter {
                 }
                 rule => {
                     unreachable!(
-                        "Unexpected token in definition parameter: {:?} {:?}",
+                        "Unexpected token in parameter: {:?} {:?}",
                         rule,
                         pair.as_span().as_str()
                     );
