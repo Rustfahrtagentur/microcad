@@ -61,6 +61,8 @@ impl SourceFile {
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)
             .context("Could not parse file")?;
 
+        assert_ne!(source_file.hash, 0);
+
         source_file.filename = Some(std::path::PathBuf::from(path.as_ref()));
         Ok(source_file)
     }

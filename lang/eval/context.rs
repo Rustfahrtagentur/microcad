@@ -30,12 +30,17 @@ pub struct Context {
 impl Context {
     /// Create a new context from a source file
     pub fn from_source_file(source_file: SourceFile) -> Self {
-        Self {
+        let rc_source_file = std::rc::Rc::new(source_file);
+
+        let mut ctx = Self {
             stack: vec![SymbolTable::default()],
             current_node: group(),
-            current_source_file: Some(std::rc::Rc::new(source_file)),
+            current_source_file: Some(rc_source_file.clone()),
             ..Default::default()
-        }
+        };
+
+        ctx.source_files.add(rc_source_file);
+        ctx
     }
 
     /// Evaluate the context with the current source file
@@ -111,6 +116,11 @@ impl Context {
     pub fn append_node(&mut self, node: ObjectNode) -> ObjectNode {
         self.current_node.append(node.clone());
         node.clone()
+    }
+
+    /// Add source file to Context
+    pub fn add_source_file(&mut self, source_file: SourceFile) {
+        self.source_files.add(std::rc::Rc::new(source_file))
     }
 }
 
