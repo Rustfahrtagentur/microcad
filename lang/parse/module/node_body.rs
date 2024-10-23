@@ -33,7 +33,7 @@ impl Parse for NodeBodyStatement {
             Rule::use_statement => NodeBodyStatement::Use(UseStatement::parse(first)?),
             Rule::expression => NodeBodyStatement::Expression(Expression::parse(first)?),
             Rule::assignment => NodeBodyStatement::Assignment(Assignment::parse(first)?),
-            _ => unreachable!(),
+            rule => unreachable!("{rule:?}"),
         })
     }
 }
