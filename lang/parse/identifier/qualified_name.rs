@@ -90,7 +90,7 @@ impl QualifiedName {
     }
 
     /// Get all symbols for the qualified name
-    pub fn fetch_symbols(&self, context: &Context) -> Result<Vec<Symbol>> {
+    pub fn fetch_symbols(&self, context: &mut Context) -> Result<Vec<Symbol>> {
         let mut symbols = Vec::new();
         self.visit_symbols(context, &mut |symbol, depth| {
             // Only take symbols that match the full qualified name
@@ -100,9 +100,8 @@ impl QualifiedName {
         })?;
 
         if symbols.is_empty() {
-            return Err(EvalError::SymbolNotFound(
-                self.id().expect("unnamed symbol not found"),
-            ));
+            use crate::diag::PushDiag;
+            context.error(self, anyhow::anyhow!("Symbol not found"))?;
         }
         Ok(symbols)
     }

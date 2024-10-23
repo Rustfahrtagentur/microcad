@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
-use crate::{diag::*, parse::*, source_file_cache::*, objecttree::*};
+use crate::{diag::*, objecttree::*, parse::*, source_file_cache::*};
 
 use microcad_core::Id;
-
 
 /// Context for evaluation
 ///
@@ -64,11 +63,7 @@ impl Context {
     }
 
     /// Set new_node as current node, call function and set old node
-    pub fn descend_node<F>(
-        &mut self,
-        new_node: ObjectNode,
-        f: F,
-    ) -> crate::eval::Result<ObjectNode>
+    pub fn descend_node<F>(&mut self, new_node: ObjectNode, f: F) -> crate::eval::Result<ObjectNode>
     where
         F: FnOnce(&mut Self) -> crate::eval::Result<ObjectNode>,
     {
@@ -96,7 +91,7 @@ impl Context {
 
     /// Fetch symbols by qualified name
     pub fn fetch_symbols_by_qualified_name(
-        &self,
+        &mut self,
         name: &QualifiedName,
     ) -> Result<Vec<Symbol>, EvalError> {
         name.fetch_symbols(self)

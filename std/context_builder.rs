@@ -31,6 +31,30 @@ impl ContextBuilder {
         self
     }
 
+    /// Add std library to context
+    pub fn with_std(mut self, search_path: impl AsRef<std::path::Path>) -> Self {
+        self.context.add(crate::builtin_module().into());
+        let std_source_file = match SourceFile::load(search_path.as_ref().join("std.µcad")) {
+            Ok(std_source_file) => std_source_file,
+            Err(err) => panic!("ERROR: {err:?}"),
+        };
+
+        // Make new context for the std source file
+        let mut context = Self::new(std_source_file).with_builtin().build();
+
+        let namespace = self
+            .context
+            .current_source_file()
+            .expect("std library missing")
+            .eval_as_namespace(&mut context, "std".into())
+            .expect("failure evaluating std library");
+        use microcad_lang::eval::*;
+
+        self.context.add(Symbol::Namespace(namespace));
+
+        self
+    }
+
     /// Add a module to the context
     pub fn with_module(mut self, module: std::rc::Rc<ModuleDefinition>) -> Self {
         self.context.add(module.into());

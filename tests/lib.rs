@@ -39,7 +39,10 @@ macro_rules! args {
 
 #[cfg(test)]
 fn eval_context(context: &mut microcad_lang::eval::Context) -> ObjectNode {
-    let node = context.eval().unwrap();
+    let node = context.eval();
+
+    println!("{node:?}");
+    let node = node.unwrap();
 
     if context.diag().has_errors() {
         context
@@ -109,7 +112,7 @@ fn test_source_file(file_name: &str) {
     .collect();
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_builtin()
+        .with_std("../std")
         .build();
 
     use microcad_lang::eval::*;
@@ -215,9 +218,9 @@ fn test_context_builtin() {
         .with_builtin()
         .build();
 
-    let verify_symbol = |context: &microcad_lang::eval::Context, names| {
+    let verify_symbol = |context: &mut microcad_lang::eval::Context, names| {
         use microcad_lang::parse::QualifiedName;
-        let symbol = context
+        let symbol = &context
             .fetch_symbols_by_qualified_name(&QualifiedName(names))
             .unwrap();
         assert_eq!(symbol.len(), 1);
@@ -225,20 +228,20 @@ fn test_context_builtin() {
     };
 
     // Check that the context has the assert symbol
-    match verify_symbol(&context, vec!["__builtin".into(), "assert".into()]) {
+    match verify_symbol(&mut context, vec!["__builtin".into(), "assert".into()]) {
         microcad_lang::eval::Symbol::BuiltinFunction(_) => {}
         _ => panic!("Expected assert symbol to be a BuiltinFunction"),
     }
 
     // Check that the context has the geo2d namespace
-    match verify_symbol(&context, vec!["__builtin".into(), "geo2d".into()]) {
+    match verify_symbol(&mut context, vec!["__builtin".into(), "geo2d".into()]) {
         microcad_lang::eval::Symbol::Namespace(_) => {}
         symbol => panic!("Expected geo2d symbol to be a NamespaceDefinition {symbol:?}"),
     }
 
     // Check that the context has the circle symbol
     match verify_symbol(
-        &context,
+        &mut context,
         vec!["__builtin".into(), "geo2d".into(), "circle".into()],
     ) {
         microcad_lang::eval::Symbol::BuiltinModule(_) => {}
@@ -250,19 +253,19 @@ fn test_context_builtin() {
     // Now, after eval `use * from std` check again
 
     // Assert symbol, now called `assert`.
-    match verify_symbol(&context, vec!["assert".into()]) {
+    match verify_symbol(&mut context, vec!["assert".into()]) {
         microcad_lang::eval::Symbol::BuiltinFunction(_) => {}
         _ => panic!("Expected assert symbol to be a BuiltinFunction"),
     }
 
     // geo2d namespace
-    match verify_symbol(&context, vec!["geo2d".into()]) {
+    match verify_symbol(&mut context, vec!["geo2d".into()]) {
         microcad_lang::eval::Symbol::Namespace(_) => {}
         _ => panic!("Expected geo2d symbol to be a NamespaceDefinition"),
     }
 
     // circle symbol
-    match verify_symbol(&context, vec!["geo2d".into(), "circle".into()]) {
+    match verify_symbol(&mut context, vec!["geo2d".into(), "circle".into()]) {
         microcad_lang::eval::Symbol::BuiltinModule(_) => {}
         _ => panic!("Expected circle symbol to be a BuildtinModule"),
     }
@@ -516,7 +519,7 @@ fn test_module_src_ref() {
 }
 
 #[test]
-fn test_eval_std() {
+fn test_load_std() {
     use microcad_lang::parse::*;
 
     let std_source_file = match SourceFile::load("../std/std.µcad") {
@@ -526,7 +529,6 @@ fn test_eval_std() {
 
     let mut context = microcad_std::ContextBuilder::new(std_source_file)
         .with_builtin()
-        //        .with_std()
         .build();
 
     let namespace = context
@@ -559,3 +561,6 @@ fn test_eval_std() {
 
     export_tree_dump_for_node(node, "output/test_eval_std.tree.dump");
 }
+
+#[test]
+fn test_std() {}
