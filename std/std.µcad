@@ -1,5 +1,14 @@
 /// µCAD standard library
 
+
+module export {
+    init(filename: string) {
+    }
+
+    __builtin::export(filename);
+}
+
+
 namespace geo2d {
     /// Circle module definition
     ///
@@ -29,7 +38,7 @@ namespace geo2d {
             x = -width/2;
             y = -height/2;
         }
-
+        
         __builtin::geo2d::rect(
                 width = width / 1mm,
                 height = height / 1mm,
@@ -37,5 +46,3 @@ namespace geo2d {
         );
     }
 }
-
-
