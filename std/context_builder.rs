@@ -26,7 +26,7 @@ impl ContextBuilder {
     }
 
     /// Add the standard library to the context
-    pub fn with_std(mut self) -> Self {
+    pub fn with_builtin(mut self) -> Self {
         self.context.add(crate::builtin_module().into());
         self
     }

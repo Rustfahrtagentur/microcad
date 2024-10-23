@@ -14,7 +14,6 @@ static TEST_OUT_DIR: &str = "output";
 #[cfg(test)]
 use microcad_lang::*;
 
-
 // Assure `TEST_OUT_DIR` exists
 #[cfg(test)]
 fn make_test_out_dir() -> std::path::PathBuf {
@@ -56,9 +55,7 @@ fn eval_context(context: &mut microcad_lang::eval::Context) -> ObjectNode {
 
 /// Evaluate source input from `&str` and return the resulting node and context
 #[cfg(test)]
-fn eval_input_with_context(
-    input: &str,
-) -> (ObjectNode, microcad_lang::eval::Context) {
+fn eval_input_with_context(input: &str) -> (ObjectNode, microcad_lang::eval::Context) {
     use core::panic;
     use microcad_lang::parse::source_file::SourceFile;
     let source_file = match SourceFile::load_from_str(input) {
@@ -67,7 +64,7 @@ fn eval_input_with_context(
     };
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_std()
+        .with_builtin()
         .build();
     let node = eval_context(&mut context);
 
@@ -112,7 +109,7 @@ fn test_source_file(file_name: &str) {
     .collect();
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_std()
+        .with_builtin()
         .build();
 
     use microcad_lang::eval::*;
@@ -138,8 +135,14 @@ fn test_source_file(file_name: &str) {
     // Compare tree dump files
     if ref_tree_dump_file.exists() {
         assert_eq!(
-            std::fs::read_to_string(tree_dump_file).unwrap().replace("\r\n", "\n").trim(),
-            std::fs::read_to_string(ref_tree_dump_file).unwrap().replace("\r\n", "\n").trim()
+            std::fs::read_to_string(tree_dump_file)
+                .unwrap()
+                .replace("\r\n", "\n")
+                .trim(),
+            std::fs::read_to_string(ref_tree_dump_file)
+                .unwrap()
+                .replace("\r\n", "\n")
+                .trim()
         );
     }
 }
@@ -200,16 +203,16 @@ fn difference_stl() {
 }
 
 #[test]
-fn test_context_std() {
+fn test_context_builtin() {
     use core::panic;
     use microcad_lang::parse::*;
-    let source_file = match SourceFile::load_from_str("use * from std;") {
+    let source_file = match SourceFile::load_from_str("use * from __builtin;") {
         Ok(doc) => doc,
         Err(err) => panic!("ERROR: {err}"),
     };
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_std()
+        .with_builtin()
         .build();
 
     let verify_symbol = |context: &microcad_lang::eval::Context, names| {
@@ -222,13 +225,13 @@ fn test_context_std() {
     };
 
     // Check that the context has the assert symbol
-    match verify_symbol(&context, vec!["std".into(), "assert".into()]) {
+    match verify_symbol(&context, vec!["__builtin".into(), "assert".into()]) {
         microcad_lang::eval::Symbol::BuiltinFunction(_) => {}
         _ => panic!("Expected assert symbol to be a BuiltinFunction"),
     }
 
     // Check that the context has the geo2d namespace
-    match verify_symbol(&context, vec!["std".into(), "geo2d".into()]) {
+    match verify_symbol(&context, vec!["__builtin".into(), "geo2d".into()]) {
         microcad_lang::eval::Symbol::Namespace(_) => {}
         symbol => panic!("Expected geo2d symbol to be a NamespaceDefinition {symbol:?}"),
     }
@@ -236,7 +239,7 @@ fn test_context_std() {
     // Check that the context has the circle symbol
     match verify_symbol(
         &context,
-        vec!["std".into(), "geo2d".into(), "circle".into()],
+        vec!["__builtin".into(), "geo2d".into(), "circle".into()],
     ) {
         microcad_lang::eval::Symbol::BuiltinModule(_) => {}
         _ => panic!("Expected circle symbol to be a BuildtinModule"),
@@ -303,7 +306,7 @@ fn test_simple_module_statement() {
     let test_out_dir = test_out_dir.to_str().unwrap();
 
     export_tree_dump_for_node(
-        eval_input("std::geo2d::circle(radius = 3.0);"),
+        eval_input("__builtin::geo2d::circle(radius = 3.0);"),
         format!("{test_out_dir}/simple_module_statement.tree.dump").as_str(),
     );
 }
@@ -316,7 +319,7 @@ fn test_simple_module_definition() {
     let (root, mut context) = eval_input_with_context(
         r#"
         module donut() { 
-            std::geo2d::circle(radius = 3.0); 
+            __builtin::geo2d::circle(radius = 3.0); 
         }
 
         donut();
@@ -362,18 +365,21 @@ fn test_module_definition_with_parameters() {
     let (root, mut context) = eval_input_with_context(
         r#"
         module donut(radius: scalar) { 
-            std::geo2d::circle(radius); 
+            __builtin::geo2d::circle(radius); 
         }
 
         donut(radius = 3.0);
         donut(radius = 5.0);
 
         // Test if we can access the radius parameter
-        std::assert(donut(radius = 4.0).radius == 4.0);
+        __builtin::assert(donut(radius = 4.0).radius == 4.0);
         "#,
     );
 
-    export_tree_dump_for_node(root, "output/module_definition_with_parameters_root.tree.dump");
+    export_tree_dump_for_node(
+        root,
+        "output/module_definition_with_parameters_root.tree.dump",
+    );
 
     // Check the module definition
     let module_definition = context
@@ -391,7 +397,11 @@ fn test_module_definition_with_parameters() {
     use crate::parser::*;
 
     let node = module_definition
-        .call(&Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list,  "radius = 6.0", 0).unwrap(), &mut context)
+        .call(
+            &Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list, "radius = 6.0", 0)
+                .unwrap(),
+            &mut context,
+        )
         .unwrap();
 
     if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
@@ -433,7 +443,7 @@ fn module_definition_init() {
                 radius = d / 2.0;
             }
 
-            std::geo2d::circle(radius);
+            __builtin::geo2d::circle(radius);
         }
 
         circle(r = 3.0);
@@ -459,7 +469,11 @@ fn module_definition_init() {
     use crate::parser::*;
 
     let node = module_definition
-        .call(&Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list,  "r = 6.0", 0).unwrap(), &mut context)
+        .call(
+            &Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list, "r = 6.0", 0)
+                .unwrap(),
+            &mut context,
+        )
         .unwrap();
 
     if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
@@ -485,15 +499,13 @@ fn module_definition_init() {
 
 #[test]
 fn test_module_src_ref() {
-    use microcad_lang::parse::*;
-
     // Define a module `donut` with an implicit initializer `()` and call it
-    let (root, mut context) = eval_input_with_context(
+    let (root, _) = eval_input_with_context(
         r#"
         module donut { 
             init(d: scalar) {
                 radius = d / 2.0;
-                std::geo2d::circle(radius); 
+                __builtin::geo2d::circle(radius); 
             }
         }
 
@@ -501,5 +513,4 @@ fn test_module_src_ref() {
         "#,
     );
     export_tree_dump_for_node(root, "output/test_module_src_ref.tree.dump");
-
 }

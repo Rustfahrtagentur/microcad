@@ -182,7 +182,7 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                             r##"{
                                     Err(err) => log::debug!("{err}"),
                                     Ok(source) => { 
-                                        let mut context = ContextBuilder::new(source).with_std().build();
+                                        let mut context = ContextBuilder::new(source).with_builtin().build();
                                         
                                         if let Err(err) = context.eval() {
                                             log::debug!("{err}");
@@ -200,7 +200,7 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                         _ =>
                             r##"{
                                     Ok(source) => {
-                                        let mut context = ContextBuilder::new(source).with_std().build();
+                                        let mut context = ContextBuilder::new(source).with_builtin().build();
                                         
                                         if let Err(err) = context.eval() {
                                             panic!("{err}");
