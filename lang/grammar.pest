@@ -386,7 +386,10 @@ node_body_statement = {
 //`r`: error # neither type specifier or default value
 parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation  }
 
-parameter_list = { "(" ~ ws* ~ (parameter ~ (ws* ~ "," ~ ws* ~ parameter)* ~ ws*)? ~ ","? ~ ")" }
+//`(r = 5.0mm, b = 4.0mm)`: ok
+//`(r = 5.0mm, b = 4.0mm, )`: ok
+//`(x, y, )`: ok
+parameter_list = { "(" ~ ws* ~ (parameter ~ (ws* ~ "," ~ ws* ~ parameter)* ~ ws*)? ~ ","? ~ ws* ~ ")" }
 
 
 //`(a: scalar) -> scalar`: ok # Function signature with arguments
