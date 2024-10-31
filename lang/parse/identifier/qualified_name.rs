@@ -105,6 +105,18 @@ impl QualifiedName {
         }
         Ok(symbols)
     }
+
+    /// Get the symbol for the qualified name
+    ///
+    /// If there are multiple symbols with the same name, an error is returned
+    pub fn fetch_symbol(&self, context: &mut Context) -> Result<Symbol> {
+        let symbols = self.fetch_symbols(context)?;
+        if symbols.len() > 1 {
+            use crate::diag::PushDiag;
+            context.error(self, anyhow::anyhow!("Ambiguous symbol: {}", self))?;
+        }
+        Ok(symbols.into_iter().next().unwrap())
+    }
 }
 
 impl Eval for QualifiedName {
