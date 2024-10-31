@@ -144,6 +144,11 @@ impl Symbols for Context {
         self
     }
 
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
+        self.stack.last_mut().unwrap().add_alias(symbol, alias);
+        self
+    }
+
     fn copy<T: Symbols>(&self, into: &mut T) {
         self.stack.last().unwrap().iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());

@@ -111,6 +111,12 @@ impl Symbols for ModuleDefinition {
         self.body.add(symbol);
         self
     }
+
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
+        self.body.add_alias(symbol, alias);
+        self
+    }
+
     fn copy<T: Symbols>(&self, into: &mut T) {
         self.body.symbols.iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());

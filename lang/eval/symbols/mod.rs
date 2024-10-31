@@ -23,6 +23,9 @@ pub trait Symbols {
     /// Add a symbol
     fn add(&mut self, symbol: Symbol) -> &mut Self;
 
+    /// Add an alias for a symbol
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self;
+
     /// Copy symbols into another Instance
     fn copy<T: Symbols>(&self, into: &mut T);
 

@@ -33,6 +33,11 @@ impl Symbols for NamespaceBuilder {
         self
     }
 
+    fn add_alias(&mut self, symbol: Symbol, alias: microcad_core::Id) -> &mut Self {
+        self.namespace.add_alias(symbol, alias);
+        self
+    }
+
     fn copy<T: Symbols>(&self, into: &mut T) {
         self.namespace.copy(into)
     }

@@ -114,16 +114,17 @@ impl QualifiedName {
         if symbols.len() > 1 {
             use crate::diag::PushDiag;
             context.error(self, anyhow::anyhow!("Ambiguous symbol: {}", self))?;
+            // TODO Output all symbols
         }
         Ok(symbols.into_iter().next().unwrap())
     }
 }
 
 impl Eval for QualifiedName {
-    type Output = Vec<Symbol>;
+    type Output = Symbol;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        self.fetch_symbols(context)
+        self.fetch_symbol(context)
     }
 }
 

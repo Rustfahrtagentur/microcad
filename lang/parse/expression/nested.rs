@@ -51,13 +51,10 @@ impl Eval for Nested {
                     }
                 },
                 NestedItem::QualifiedName(qualified_name) => {
-                    let symbols = qualified_name.eval(context)?;
-
-                    for symbol in symbols {
-                        if let Symbol::Value(_, v) = symbol {
-                            values.push(v.clone_with_src_ref(qualified_name.src_ref())); // Find first value only. @todo Back propagation of values
-                            break;
-                        }
+                    let symbol = qualified_name.eval(context)?;
+                    if let Symbol::Value(_, v) = symbol {
+                        values.push(v.clone_with_src_ref(qualified_name.src_ref()));
+                        break;
                     }
                 }
                 NestedItem::NodeBody(body) => {

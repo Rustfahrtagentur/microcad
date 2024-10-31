@@ -7,15 +7,18 @@ use crate::eval::*;
 pub struct SymbolTable(std::collections::HashMap<Id, std::rc::Rc<Symbol>>);
 
 impl Symbols for SymbolTable {
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {        
-        match self.0.get(id) {
-            Some(symbol) => Some(symbol.clone()),
-            None => None,
-        }
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+        self.0.get(id).cloned()
     }
 
     fn add(&mut self, symbol: Symbol) -> &mut Self {
-        self.0.insert(symbol.id().unwrap(), std::rc::Rc::new(symbol));
+        self.0
+            .insert(symbol.id().unwrap(), std::rc::Rc::new(symbol));
+        self
+    }
+
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
+        self.0.insert(alias, std::rc::Rc::new(symbol));
         self
     }
 
