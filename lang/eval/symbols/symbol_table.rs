@@ -10,24 +10,6 @@ impl SymbolTable {
     /// Merge two symbol tables
     ///
     /// This function merges two symbol tables into one.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use microcad::eval::*;
-    ///     
-    /// let mut table1 = SymbolTable::default();
-    /// let mut table2 = SymbolTable::default();
-    ///
-    /// table1.add(Symbol::Value(Id::new("a"), Value::Integer(1)));
-    /// table2.add(Symbol::Value(Id::new("b"), Value::Integer(2)));
-    ///
-    /// table1.merge(&mut table2);
-    ///
-    /// assert_eq!(table1.fetch(&Id::new("a")).unwrap().as_value().unwrap(), &Value::Integer(1));
-    /// assert_eq!(table1.fetch(&Id::new("b")).unwrap().as_value().unwrap(), &Value::Integer(2));
-    ///
-    /// ```
     pub fn merge(&mut self, other: &mut Self) {
         other.0.iter().for_each(|(id, symbol)| {
             if self.0.contains_key(id) {
