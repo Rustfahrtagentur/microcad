@@ -70,25 +70,23 @@ impl Eval for Call {
     type Output = Option<Value>;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let symbols = self.name.eval(context)?;
-        if let Some(symbol) = symbols.first() {
-            match symbol {
-                Symbol::Function(f) => {
-                    return f.call(&self.argument_list, context);
-                }
-                Symbol::BuiltinFunction(f) => {
-                    return f.call(&self.argument_list, context);
-                }
-                Symbol::BuiltinModule(m) => {
-                    return m.call(&self.argument_list, context);
-                }
-                Symbol::Module(m) => {
-                    return m.call(&self.argument_list, context);
-                }
-                symbol => {
-                    let s: &'static str = symbol.into();
-                    unimplemented!("Symbol::{s}")
-                }
+        match self.name.eval(context)? {
+            Symbol::Function(f) => {
+                return f.call(&self.argument_list, context);
+            }
+            Symbol::BuiltinFunction(f) => {
+                return f.call(&self.argument_list, context);
+            }
+            Symbol::BuiltinModule(m) => {
+                return m.call(&self.argument_list, context);
+            }
+            Symbol::Module(m) => {
+                return m.call(&self.argument_list, context);
+            }
+            symbol => {
+                use crate::diag::PushDiag;
+                use anyhow::anyhow;
+                context.error(self, anyhow!("{} is not callable", symbol))?;
             }
         }
 
