@@ -3,7 +3,7 @@
 ## No use statement
 
 ```µCAD,without_use
-std::geo3d::sphere(radius = 4.0);
+std::geo3d::sphere(radius = 40.0mm);
 ```
 
 ## Simple `use` statement
@@ -29,7 +29,7 @@ torus(r1 = 10mm, r2 = 2mm);
 ```µCAD,use_all_from
 use std::geo3d::*;
 
-cube(size_x = 40.0, size_y = 40.0, size_z = 40.0);
+cube(size = 40.0mm);
 ```
 
 ## `use as` statement

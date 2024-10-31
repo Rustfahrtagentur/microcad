@@ -121,17 +121,15 @@ export("hex_nut.gcode") hex_nut;
 In our language, we can do constructive solid geometry (CSG).
 Let's create a simple cube with a size of 40mm:
 
-```µCAD,example.D#todo
-use cube from geo3d;
-
-cube(size = 40mm);
+```µCAD,example.D
+std::geo3d::cube(size = 40mm);
 ```
 
 Notice that the `size` parameter name is optional an can be omitted.
 We need to export the cube as an STL file.
 
 ```µCAD,example.E
-std::export("cube40mm.stl") std::geo3d::cube(size_x = 40.0, size_y = 40.0, size_z = 40.0);
+std::export("cube40mm.stl") std::geo3d::cube(size = 40.0mm);
 ```
 
 One of the defining features of CSG is the usage of boolean operations on primitives.
