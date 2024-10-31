@@ -213,10 +213,10 @@ use_statement = { visibility? ~ ws* ~ "use" ~ ws+ ~ use_declaration ~ ws* ~ (","
 
 use_declaration = { use_all | use_alias | qualified_name } 
 
-//`use std::*;`: ok # Import everything from std
+//`std::*`: ok # Import everything from std
 use_all = { qualified_name ~ ws* ~ "::" ~ ws* ~ "*" }
 
-//`use std::math as math;`: ok # Import math from std as math
+//`std::math as my_math`: ok # Import math from std as my_math
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 
 //`translate() rotate()`: ok
