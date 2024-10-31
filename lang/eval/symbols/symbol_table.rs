@@ -6,19 +6,63 @@ use crate::eval::*;
 #[derive(Clone, Debug, Default)]
 pub struct SymbolTable(std::collections::HashMap<Id, std::rc::Rc<Symbol>>);
 
+impl SymbolTable {
+    /// Merge two symbol tables
+    ///
+    /// This function merges two symbol tables into one.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use microcad::eval::*;
+    ///     
+    /// let mut table1 = SymbolTable::default();
+    /// let mut table2 = SymbolTable::default();
+    ///
+    /// table1.add(Symbol::Value(Id::new("a"), Value::Integer(1)));
+    /// table2.add(Symbol::Value(Id::new("b"), Value::Integer(2)));
+    ///
+    /// table1.merge(&mut table2);
+    ///
+    /// assert_eq!(table1.fetch(&Id::new("a")).unwrap().as_value().unwrap(), &Value::Integer(1));
+    /// assert_eq!(table1.fetch(&Id::new("b")).unwrap().as_value().unwrap(), &Value::Integer(2));
+    ///
+    /// ```
+    pub fn merge(&mut self, other: &mut Self) {
+        other.0.iter().for_each(|(id, symbol)| {
+            if self.0.contains_key(id) {
+                panic!("Symbol with id `{}` already exists", id); // TODO Better error handling on symbol name collision
+            }
+            self.0.insert(id.clone(), symbol.clone());
+        });
+    }
+}
+
 impl Symbols for SymbolTable {
     fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         self.0.get(id).cloned()
     }
 
     fn add(&mut self, symbol: Symbol) -> &mut Self {
-        self.0
-            .insert(symbol.id().unwrap(), std::rc::Rc::new(symbol));
+        match symbol {
+            Symbol::None => {}
+            _ => {
+                self.0
+                    .insert(symbol.id().unwrap(), std::rc::Rc::new(symbol));
+            }
+        }
+
         self
     }
 
     fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
-        self.0.insert(alias, std::rc::Rc::new(symbol));
+        match symbol {
+            Symbol::None => {}
+            _ => {
+                self.0.insert(alias, std::rc::Rc::new(symbol));
+            }
+        }
+
         self
     }
 

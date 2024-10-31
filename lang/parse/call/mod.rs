@@ -83,6 +83,9 @@ impl Eval for Call {
             Symbol::Module(m) => {
                 return m.call(&self.argument_list, context);
             }
+            Symbol::None => {
+                // We don't do anything if the symbol is not found, because an error has been already raised before
+            }
             symbol => {
                 use crate::diag::PushDiag;
                 use anyhow::anyhow;
