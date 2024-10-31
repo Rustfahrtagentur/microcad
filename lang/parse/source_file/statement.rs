@@ -85,7 +85,8 @@ impl Eval for Statement {
                 context.add(module_definition.clone().into());
             }
             Self::NamespaceDefinition(namespace_definition) => {
-                context.add(namespace_definition.clone().into());
+                let namespace_symbol = namespace_definition.eval(context)?;
+                context.add(namespace_symbol);
             }
             Self::For(for_statement) => {
                 for_statement.eval(context)?;

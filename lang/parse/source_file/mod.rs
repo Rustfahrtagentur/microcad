@@ -126,8 +126,17 @@ impl SourceFile {
                     namespace.add(m.clone().into());
                 }
                 Statement::NamespaceDefinition(n) => {
-                    namespace.add(n.clone().into());
+                    let n = n.eval(context)?;
+                    namespace.add(n);
                 }
+                Statement::Use(u) => {
+                    if let Some(symbols) = u.eval(context)? {
+                        for (id, symbol) in symbols.iter() {
+                            namespace.add_alias(symbol.as_ref().clone(), id.clone());
+                        }
+                    }
+                }
+
                 _ => {}
             }
         }
