@@ -19,6 +19,19 @@ pub enum Symbol {
     BuiltinModule(BuiltinModule),
 }
 
+impl std::fmt::Display for Symbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Value(id, value) => write!(f, "{} = {}", id, value),
+            Self::Function(function) => write!(f, "function `{}`", function.name),
+            Self::Module(module) => write!(f, "module `{}`", module.name),
+            Self::Namespace(namespace) => write!(f, "namespace `{}`", namespace.name),
+            Self::BuiltinFunction(function) => write!(f, "{:?}", function),
+            Self::BuiltinModule(module) => write!(f, "{:?}", module),
+        }
+    }
+}
+
 impl From<std::rc::Rc<FunctionDefinition>> for Symbol {
     fn from(f: std::rc::Rc<FunctionDefinition>) -> Self {
         Self::Function(f)
