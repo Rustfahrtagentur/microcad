@@ -288,7 +288,7 @@ impl std::ops::Sub for Value {
             // Subtract two angles
             (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Angle(lhs - rhs)),
             // Subtract two lengths
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Angle(lhs - rhs)),
+            (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs - rhs)),
             // Subtract two Vec2
             (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(Value::Vec2(lhs - rhs)),
             // Subtract two Vec3
