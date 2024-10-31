@@ -345,11 +345,11 @@ method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 //`a::nested::f(a = 3.0mm, b = 2.0mm)`: ok
 call = { qualified_name ~ ws* ~ call_op }
 
-//`@foo`: ok
-//`@foo(x)`: ok
-attribute = { "@" ~ qualified_name ~ call_op? }
+//`#foo`: ok
+//`#foo(x)`: ok
+tag = { "#" ~ qualified_name ~ call_op? }
 
-attribute_list = _{ attribute ~ (ws+ ~ attribute)* }
+tag_list = _{ tag ~ (ws+ ~ tag)* }
 
 
 //`r: length = 5.0mm`: ok
@@ -437,7 +437,7 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { init(size: length) { rectangle(size); } }`: ok # Module with init function
 //`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
 //`module donut(radius) { }`: error # Module must have type annotations
-module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_definition_body }
+module_definition = { (tag_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_definition_body }
 
 //`{ translate() rotate(); }`: ok
 //`{ translate() }`: ok # Single expression block (no semicolon)

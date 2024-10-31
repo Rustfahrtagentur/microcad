@@ -8,8 +8,6 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 /// Module definition
 #[derive(Clone, Debug)]
 pub struct ModuleDefinition {
-    /// Module attributes
-    pub attributes: Vec<Attribute>,
     /// Module name
     pub name: Identifier,
     /// Module body
@@ -22,7 +20,6 @@ impl ModuleDefinition {
     /// Create new module definition
     pub fn new(name: Identifier) -> Self {
         ModuleDefinition {
-            attributes: Vec::new(),
             name,
             body: ModuleDefinitionBody::default(),
             src_ref: SrcRef(None),
@@ -84,7 +81,7 @@ impl CallTrait for ModuleDefinition {
                 return Ok(None);
             }
         }
-        
+
         // Now, copy the symbols of the node into the context
         node.copy(context);
 
@@ -123,16 +120,12 @@ impl Symbols for ModuleDefinition {
 
 impl Parse for std::rc::Rc<ModuleDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut attributes = Vec::new();
         let mut name = Identifier::default();
         let mut parameters = None;
         let mut body = ModuleDefinitionBody::default();
 
         for pair in pair.inner() {
             match pair.as_rule() {
-                Rule::attribute_list => {
-                    attributes.push(Attribute::parse(pair)?);
-                }
                 Rule::identifier => {
                     name = Identifier::parse(pair)?;
                 }
@@ -151,7 +144,6 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
         }
 
         Ok(std::rc::Rc::new(ModuleDefinition {
-            attributes,
             name,
             body,
             src_ref: pair.into(),
