@@ -60,19 +60,26 @@ impl std::fmt::Debug for ObjectNodeInner {
 /// Render node
 pub type ObjectNode = rctree::Node<ObjectNodeInner>;
 
-
 impl Symbols for ObjectNode {
     fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         match *self.borrow() {
             ObjectNodeInner::Group(ref table) => table.fetch(id),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
     fn add(&mut self, symbol: Symbol) -> &mut Self {
         match *self.borrow_mut() {
             ObjectNodeInner::Group(ref mut table) => table.add(symbol),
-            _ => unreachable!()
+            _ => unreachable!(),
+        };
+        self
+    }
+
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
+        match *self.borrow_mut() {
+            ObjectNodeInner::Group(ref mut table) => table.add_alias(symbol, alias),
+            _ => unreachable!(),
         };
         self
     }
@@ -80,7 +87,7 @@ impl Symbols for ObjectNode {
     fn copy<T: Symbols>(&self, into: &mut T) {
         match *self.borrow_mut() {
             ObjectNodeInner::Group(ref mut table) => table.copy(into),
-            _ => unreachable!()
+            _ => unreachable!(),
         };
     }
 }
@@ -124,8 +131,6 @@ pub fn dump(writer: &mut dyn std::io::Write, node: ObjectNode) -> std::io::Resul
         .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
 }
 
-
-
 fn into_group(node: ObjectNode) -> Option<ObjectNode> {
     node.first_child().and_then(|n| {
         if let ObjectNodeInner::Group(_) = *n.borrow() {
@@ -137,15 +142,23 @@ fn into_group(node: ObjectNode) -> Option<ObjectNode> {
 }
 
 /// This function bakes the object node tree into a 2D geometry tree
-pub fn bake2d(renderer: &mut Renderer2D, node: ObjectNode) -> core::result::Result<geo2d::Node, CoreError> {
+pub fn bake2d(
+    renderer: &mut Renderer2D,
+    node: ObjectNode,
+) -> core::result::Result<geo2d::Node, CoreError> {
     let node2d = {
-        match *node.borrow(){
+        match *node.borrow() {
             ObjectNodeInner::Group(_) => geo2d::tree::group(),
             ObjectNodeInner::Export(_) => geo2d::tree::group(),
-            ObjectNodeInner::Primitive2D(ref renderable) => return Ok(
-                    geo2d::tree::geometry(renderable.request_geometry(renderer)?)),
-            ObjectNodeInner::Algorithm(ref algorithm) => return algorithm.process_2d(renderer, node.clone()),
-            _ => return Err(CoreError::NotImplemented)
+            ObjectNodeInner::Primitive2D(ref renderable) => {
+                return Ok(geo2d::tree::geometry(
+                    renderable.request_geometry(renderer)?,
+                ))
+            }
+            ObjectNodeInner::Algorithm(ref algorithm) => {
+                return algorithm.process_2d(renderer, node.clone())
+            }
+            _ => return Err(CoreError::NotImplemented),
         }
     };
 
@@ -158,21 +171,27 @@ pub fn bake2d(renderer: &mut Renderer2D, node: ObjectNode) -> core::result::Resu
         }
     })?;
 
-
     Ok(node2d)
 }
 
-
 /// This function bakes the object node tree into a 3D geometry tree
-pub fn bake3d(renderer: &mut Renderer3D, node: ObjectNode) -> core::result::Result<geo3d::Node, CoreError> {
+pub fn bake3d(
+    renderer: &mut Renderer3D,
+    node: ObjectNode,
+) -> core::result::Result<geo3d::Node, CoreError> {
     let node3d = {
-        match *node.borrow(){
+        match *node.borrow() {
             ObjectNodeInner::Group(_) => geo3d::tree::group(),
             ObjectNodeInner::Export(_) => geo3d::tree::group(),
-            ObjectNodeInner::Primitive3D(ref renderable) => return Ok(
-                    geo3d::tree::geometry(renderable.request_geometry(renderer)?)),
-            ObjectNodeInner::Algorithm(ref algorithm) => return algorithm.process_3d(renderer, node.clone()),
-            _ => return Err(CoreError::NotImplemented)
+            ObjectNodeInner::Primitive3D(ref renderable) => {
+                return Ok(geo3d::tree::geometry(
+                    renderable.request_geometry(renderer)?,
+                ))
+            }
+            ObjectNodeInner::Algorithm(ref algorithm) => {
+                return algorithm.process_3d(renderer, node.clone())
+            }
+            _ => return Err(CoreError::NotImplemented),
         }
     };
 

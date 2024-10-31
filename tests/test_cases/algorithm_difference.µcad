@@ -1,4 +1,4 @@
-use * from std;
+use std::*;
 
 
 export("{OUTPUT_FILE}.stl") algorithm::difference() {

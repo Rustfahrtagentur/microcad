@@ -214,7 +214,7 @@ fn difference_stl() {
 fn test_context_builtin() {
     use core::panic;
     use microcad_lang::parse::*;
-    let source_file = match SourceFile::load_from_str("use * from __builtin;") {
+    let source_file = match SourceFile::load_from_str("use __builtin::*;") {
         Ok(doc) => doc,
         Err(err) => panic!("ERROR: {err:?}"),
     };
@@ -250,7 +250,7 @@ fn test_context_builtin() {
         vec!["__builtin".into(), "geo2d".into(), "circle".into()],
     ) {
         microcad_lang::eval::Symbol::BuiltinModule(_) => {}
-        _ => panic!("Expected circle symbol to be a BuildtinModule"),
+        _ => panic!("Expected circle symbol to be a BuiltinModule"),
     }
 
     let _ = context.eval().unwrap();
@@ -546,7 +546,7 @@ fn test_load_std() {
 
     let source_file = match SourceFile::load_from_str(
         "
-        use * from std;
+        use std::*;
         geo2d::circle(r = 2.0mm);
         geo2d::circle(d = 2.0mm);
         geo2d::circle(radius = 2.0mm);
