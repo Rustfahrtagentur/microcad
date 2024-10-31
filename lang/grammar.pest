@@ -188,7 +188,7 @@ list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
 
 // An expression for both named and unnamed tuple
 //`(1.0mm, 2.0mm)`: ok
-//`(1.0mm,)`: error # Trailing comma
+//`(1.0mm,)`: ok # Trailing comma
 //`(x = 1.0mm, y = 2.0mm)`: ok
 tuple_expression = { "(" ~ ws* ~ call_argument_list ~ ws* ~ ")" ~ unit? }
 
@@ -332,7 +332,8 @@ call_argument = _{
 //`a = 5.0mm, b = false`: ok
 //`4.0mm, a = false`: ok
 //`a = false, 4.0mm`: ok # Positional argument after named argument (Syntactically correct, semantically wrong) 
-call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* }
+//`a = false, 4.0mm,`: ok # Trailing comma
+call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* ~ ws* ~ ","? }
 
 call_op = _{ "(" ~ ws* ~ call_argument_list? ~ ws* ~ ")" }
 
@@ -390,7 +391,6 @@ parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression
 
 //`(r = 5.0mm, b = 4.0mm)`: ok
 //`(r = 5.0mm, b = 4.0mm, )`: ok
-//`(x, y, )`: ok
 parameter_list = { "(" ~ ws* ~ (parameter ~ (ws* ~ "," ~ ws* ~ parameter)* ~ ws*)? ~ ","? ~ ws* ~ ")" }
 
 
