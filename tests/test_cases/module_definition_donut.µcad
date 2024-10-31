@@ -1,6 +1,6 @@
 // Define a module `donut` with a radius as parameter
 module donut(radius: length) {
-    std::geo2d::circle(radius); 
+    std::geo2d::circle(r = radius); 
 }
 
 // Make two donuts with radius = 3.0 and 5.0, respectively
