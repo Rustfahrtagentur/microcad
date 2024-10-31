@@ -156,7 +156,10 @@ pub fn bake2d(
                 ))
             }
             ObjectNodeInner::Algorithm(ref algorithm) => {
-                return algorithm.process_2d(renderer, node.clone())
+                return algorithm.process_2d(
+                    renderer,
+                    crate::objecttree::into_group(node.clone()).unwrap(),
+                )
             }
             _ => return Err(CoreError::NotImplemented),
         }
@@ -189,7 +192,10 @@ pub fn bake3d(
                 ))
             }
             ObjectNodeInner::Algorithm(ref algorithm) => {
-                return algorithm.process_3d(renderer, node.clone())
+                return algorithm.process_3d(
+                    renderer,
+                    crate::objecttree::into_group(node.clone()).unwrap(),
+                )
             }
             _ => return Err(CoreError::NotImplemented),
         }

@@ -10,8 +10,8 @@ mod render;
 use crate::Scalar;
 use strum::IntoStaticStr;
 
-pub use tree::{Node, NodeInner};
 pub use render::*;
+pub use tree::{Node, NodeInner};
 
 /// Line string
 pub type LineString = geo::LineString<Scalar>;
@@ -68,11 +68,7 @@ impl Geometry {
     }
 
     /// Apply boolean operation
-    pub fn boolean_op(
-        &self,
-        other: &Self,
-        op: &crate::BooleanOp,
-    ) -> Option<Self> {
+    pub fn boolean_op(&self, other: &Self, op: &crate::BooleanOp) -> Option<Self> {
         let a = self.try_convert_to_multi_polygon()?;
         let b = other.try_convert_to_multi_polygon()?;
         use geo::BooleanOps;
@@ -114,4 +110,14 @@ impl Geometry {
 /// Shortcut to create a MultiPolygon
 pub fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
     MultiPolygon::new(vec![Polygon::new(line_string, vec![])])
+}
+
+/// Create a new geometry node
+pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
+    Node::new(NodeInner::Geometry(geometry))
+}
+
+/// Create a new transform node
+pub fn transform(transform: crate::Mat3) -> Node {
+    Node::new(NodeInner::Transform(transform))
 }
