@@ -8,7 +8,7 @@ Example which can generate a 2D donut of a given radius:
 
 ```µCAD,donut
 module donut(radius: length) {
-    use circle from std::geo2d;
+    use std::geo2d::circle;
 
     // calculate inner from radius in a method
     function inner() { radius/2 }
