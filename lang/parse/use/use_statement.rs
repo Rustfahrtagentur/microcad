@@ -3,6 +3,8 @@
 
 //! Use statement parser entity
 
+use std::ascii::escape_default;
+
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use strum::IntoStaticStr;
 
@@ -67,54 +69,63 @@ impl Parse for UseDeclaration {
 }
 
 impl Eval for UseDeclaration {
-    type Output = ();
+    type Output = SymbolTable;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         match self {
-            Self::UseAll(name, _) => {
-                match name.eval(context)? {
-                    Symbol::Namespace(namespace_definition) => {
-                        let symbols = &namespace_definition.body.symbols;
-                        for (_, symbol) in symbols.iter() {
-                            context.add(symbol.as_ref().clone());
-                        }
-                    }
-                    symbol => {
-                        use crate::diag::PushDiag;
-                        use anyhow::anyhow;
-                        context.error(self, anyhow!("Expected namespace definition, got {symbol}"));
-                    }
+            Self::UseAll(name, _) => match name.eval(context)? {
+                Symbol::Namespace(namespace_definition) => {
+                    Ok(namespace_definition.body.symbols.clone())
+                }
+                symbol => {
+                    use crate::diag::PushDiag;
+                    use anyhow::anyhow;
+                    context.error(self, anyhow!("Expected namespace definition, got {symbol}"))?;
+                    Ok(SymbolTable::default())
+                }
+            },
+            Self::Use(name, _) => {
+                let mut symbols = SymbolTable::default();
+
+                let symbol = name.eval(context)?;
+                if let Symbol::None = symbol {
+                } else {
+                    symbols.add(symbol);
                 }
 
-                Ok(())
-            }
-            Self::Use(name, _) => {
-                let symbol = name.eval(context)?;
-                context.add(symbol);
-                Ok(())
+                Ok(symbols)
             }
             Self::UseAlias(name, alias, _) => {
-                let symbol = name.eval(context)?;
-                context.add_alias(symbol, alias.id().expect("nameless alias"));
-                Ok(())
+                let mut symbols = SymbolTable::default();
+                symbols.add_alias(name.eval(context)?, alias.id().expect("nameless alias"));
+                Ok(symbols)
             }
         }
     }
 }
 
+/// Use statement:
+///
+/// ```ucad
+///
+/// use std::*;
+/// ```
 #[derive(Clone, Debug)]
-pub struct UseStatement(Vec<UseDeclaration>, SrcRef);
+pub struct UseStatement(Visibility, Vec<UseDeclaration>, SrcRef);
 
 impl SrcReferrer for UseStatement {
     fn src_ref(&self) -> SrcRef {
-        self.1.clone()
+        self.2.clone()
     }
 }
 
 impl std::fmt::Display for UseStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "use ")?;
-        for (i, decl) in self.0.iter().enumerate() {
+        match &self.0 {
+            Visibility::Private => write!(f, "use ")?,
+            Visibility::Public => write!(f, "pub use ")?,
+        }
+        for (i, decl) in self.1.iter().enumerate() {
             if i > 0 {
                 write!(f, ", ")?;
             }
@@ -124,26 +135,79 @@ impl std::fmt::Display for UseStatement {
     }
 }
 
+#[derive(Clone, Debug, Default)]
+pub enum Visibility {
+    /// Private visibility
+    #[default]
+    Private,
+    /// Public visibility
+    Public,
+}
+
+impl Parse for Visibility {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rule(&pair, Rule::visibility);
+
+        let s = pair.as_str();
+        match s {
+            "pub" => Ok(Self::Public),
+            _ => unreachable!("Invalid visibility"),
+        }
+    }
+}
+
 impl Parse for UseStatement {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::use_statement);
 
         let mut decls = Vec::new();
+        let mut visibility = Visibility::default();
+
         for pair in pair.inner() {
-            decls.push(UseDeclaration::parse(pair)?);
+            match pair.as_rule() {
+                Rule::use_declaration => {
+                    decls.push(UseDeclaration::parse(pair)?);
+                }
+                Rule::visibility => {
+                    visibility = Visibility::parse(pair)?;
+                }
+                _ => unreachable!("Invalid use declaration"),
+            }
         }
 
-        Ok(Self(decls, pair.into()))
+        Ok(Self(visibility, decls, pair.into()))
     }
 }
 
 impl Eval for UseStatement {
-    type Output = ();
+    type Output = Option<SymbolTable>;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        for decl in &self.0 {
-            decl.eval(context)?;
+        // Return a symbol table if the use statement is public
+        match self.0 {
+            Visibility::Public => {
+                let mut symbols = SymbolTable::default();
+                for decl in &self.1 {
+                    let mut symbol_table = decl.eval(context)?;
+                    for (name, symbol) in symbol_table.iter() {
+                        use crate::eval::Symbols;
+                        context.add_alias(symbol.as_ref().clone(), name.clone());
+                    }
+
+                    symbols.merge(&mut symbol_table);
+                }
+                Ok(Some(symbols))
+            }
+            Visibility::Private => {
+                for decl in &self.1 {
+                    let symbol_table = decl.eval(context)?;
+                    for (name, symbol) in symbol_table.iter() {
+                        use crate::eval::Symbols;
+                        context.add_alias(symbol.as_ref().clone(), name.clone());
+                    }
+                }
+                Ok(None)
+            }
         }
-        Ok(())
     }
 }
