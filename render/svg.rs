@@ -4,10 +4,7 @@
 //! Scalable Vector Graphics (SVG) file writer
 
 use geo::CoordsIter;
-use microcad_core::{
-    *,
-    CoreError, Scalar,
-};
+use microcad_core::{CoreError, Scalar, *};
 
 /// Write SVG
 pub struct SvgWriter {
@@ -20,7 +17,11 @@ impl SvgWriter {
     /// - `w`: Output writer
     /// - `bounds`: Clipping
     /// - `scale`: Scale of the output
-    pub fn new(mut w: Box<dyn std::io::Write>, bounds: geo2d::Rect, scale: f64) -> std::io::Result<Self> {
+    pub fn new(
+        mut w: Box<dyn std::io::Write>,
+        bounds: geo2d::Rect,
+        scale: f64,
+    ) -> std::io::Result<Self> {
         writeln!(&mut w, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
             &mut w,
@@ -50,7 +51,12 @@ impl SvgWriter {
     }
 
     /// Generate circle
-    pub fn circle(&mut self, center: &geo2d::Point, radius: f64, style: &str) -> std::io::Result<()> {
+    pub fn circle(
+        &mut self,
+        center: &geo2d::Point,
+        radius: f64,
+        style: &str,
+    ) -> std::io::Result<()> {
         let (cx, cy) = center.x_y();
         writeln!(
             self.writer,
@@ -213,7 +219,6 @@ impl geo2d::Renderer for SvgRenderer {
             }
             NodeInner::Geometry(geometry) => self.render_geometry(geometry)?,
             NodeInner::Transform(_) => unimplemented!(),
-            _ => return Err(CoreError::NotImplemented),
         };
 
         Ok(())

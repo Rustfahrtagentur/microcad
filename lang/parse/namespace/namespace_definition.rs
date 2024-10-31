@@ -93,8 +93,6 @@ impl Eval for std::rc::Rc<NamespaceDefinition> {
                         }
                     }
                 }
-
-                _ => {}
             }
         }
 

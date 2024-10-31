@@ -3,8 +3,6 @@
 
 //! Use statement parser entity
 
-use std::ascii::escape_default;
-
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 use strum::IntoStaticStr;
 
@@ -135,6 +133,7 @@ impl std::fmt::Display for UseStatement {
     }
 }
 
+/// Visibility of a use statement
 #[derive(Clone, Debug, Default)]
 pub enum Visibility {
     /// Private visibility

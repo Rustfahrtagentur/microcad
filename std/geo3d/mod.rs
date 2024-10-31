@@ -5,8 +5,10 @@ use microcad_builtin_proc_macro::DefineBuiltinPrimitive3D;
 use microcad_core::*;
 use microcad_lang::{eval::*, parse::*};
 
+/// The builtin sphere primitive, defined by its radius.
 #[derive(DefineBuiltinPrimitive3D, Debug)]
 pub struct Sphere {
+    /// Radius of the sphere in millimeters
     pub radius: Scalar,
 }
 
@@ -31,10 +33,14 @@ impl geo3d::Primitive for Sphere {
     }
 }
 
+/// The builtin cube primitive, defined by its size in the x, y, and z dimensions.
 #[derive(DefineBuiltinPrimitive3D, Debug)]
 pub struct Cube {
+    /// Size of the cube in the x dimension in millimeters
     pub size_x: Scalar,
+    /// Size of the cube in the y dimension in millimeters
     pub size_y: Scalar,
+    /// Size of the cube in the z dimension in millimeters
     pub size_z: Scalar,
 }
 
