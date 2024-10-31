@@ -109,14 +109,14 @@ impl QualifiedName {
     /// Get the symbol for the qualified name
     ///
     /// If there are multiple symbols with the same name, an error is returned
-    pub fn fetch_symbol(&self, context: &mut Context) -> Result<Symbol> {
+    pub fn fetch_symbol(&self, context: &mut Context) -> Result<Option<Symbol>> {
         let symbols = self.fetch_symbols(context)?;
         if symbols.len() > 1 {
             use crate::diag::PushDiag;
             context.error(self, anyhow::anyhow!("Ambiguous symbol: {}", self))?;
             // TODO Output all symbols
         }
-        Ok(symbols.into_iter().next().unwrap())
+        Ok(symbols.into_iter().next())
     }
 }
 
@@ -124,7 +124,11 @@ impl Eval for QualifiedName {
     type Output = Symbol;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        self.fetch_symbol(context)
+        if let Some(symbol) = self.fetch_symbol(context)? {
+            Ok(symbol)
+        } else {
+            Ok(Symbol::default())
+        }
     }
 }
 

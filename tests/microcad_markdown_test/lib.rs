@@ -209,8 +209,6 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
                                                 let mut w = std::io::stderr();
                                                 context.diag().pretty_print(&mut w, &context).unwrap();
                                                 panic!("ERROR: there were {error_count} errors", error_count = context.diag().error_count);
-                                            } else {
-                                                log::trace!("test succeeded");
                                             }
                                             log::trace!("test succeeded");
                                         }

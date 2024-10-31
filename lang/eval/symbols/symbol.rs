@@ -3,8 +3,11 @@ use crate::{eval::*, parse::*};
 /// A symbol is a named entity that is used in the
 /// symbol table and in the evaluation context to
 /// represent a value, a function, a module, etc.
-#[derive(Clone, Debug, strum::IntoStaticStr)]
+#[derive(Clone, Debug, Default, strum::IntoStaticStr)]
 pub enum Symbol {
+    /// An empty symbol (an error occurred)
+    #[default]
+    None,
     /// A value symbol, e.g. a result of an assignment
     Value(Id, Value),
     /// A function symbol, e.g. function a() {}
@@ -22,6 +25,7 @@ pub enum Symbol {
 impl std::fmt::Display for Symbol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::None => write!(f, "None"),
             Self::Value(id, value) => write!(f, "{} = {}", id, value),
             Self::Function(function) => write!(f, "function `{}`", function.name),
             Self::Module(module) => write!(f, "module `{}`", module.name),
@@ -65,6 +69,7 @@ impl From<BuiltinModule> for Symbol {
 impl Sym for Symbol {
     fn id(&self) -> Option<Id> {
         match self {
+            Self::None => None,
             Self::Value(id, _) => Some(id.clone()),
             Self::Function(f) => f.name.id(),
             Self::Module(m) => m.name.id(),
