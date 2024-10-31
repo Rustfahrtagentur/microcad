@@ -1,14 +1,5 @@
 /// µCAD standard library
 
-
-module export {
-    init(filename: string) {
-    }
-
-    __builtin::export(filename);
-}
-
-
 namespace geo2d {
     /// Circle module definition
     ///
@@ -33,16 +24,22 @@ namespace geo2d {
         __builtin::geo2d::circle(radius / 1mm);
     }
 
+    /// Rectangle module definition
+    /// 
+    /// Examples:
+    /// * centered rect with width `w` and height `h`: `rect(width = 10.0mm, height = 5.0mm);`
     module rect {
         init(width: length, height: length) {
-            x = -width/2;
-            y = -height/2;
+            x = -width/2; // center x
+            y = -height/2; // center y
         }
         
         __builtin::geo2d::rect(
-                width = width / 1mm,
-                height = height / 1mm,
-                x, y
+                width / 1mm,
+                height / 1mm,
+                x / 1mm,
+                y / 1mm
         );
     }
 }
+
