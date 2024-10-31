@@ -86,5 +86,7 @@ namespace algorithm {
     pub use __builtin::algorithm::intersection;
 }
 
+pub use __builtin::math; // Use the math module from the builtin library
+
 pub use __builtin::export;
 pub use __builtin::assert;
