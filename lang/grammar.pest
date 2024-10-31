@@ -199,7 +199,8 @@ tuple_element_access = { "." ~ (identifier | int) }
 
 element_access = _{ list_element_access | tuple_element_access }
 
-
+//`pub`: ok
+visibility = { "pub" }
 
 //`use a;`: ok # Import a single module
 //`use ;`: error # Must import at least one module
@@ -207,7 +208,8 @@ element_access = _{ list_element_access | tuple_element_access }
 //`use foo::*;`: ok # Import all modules from foo
 //`use foo::*, bar;`: ok # Import all from foo and bar
 //`use foo as bar;`: ok # Import foo as bar
-use_statement = { "use" ~ ws+ ~ use_declaration ~ ws* ~ ("," ~ ws* ~ use_declaration ~ ws*)* ~ ws* ~ ","? ~ ws* ~ ";" } 
+//`pub use foo;`: ok # Import and re-export foo
+use_statement = { visibility? ~ ws* ~ "use" ~ ws+ ~ use_declaration ~ ws* ~ ("," ~ ws* ~ use_declaration ~ ws*)* ~ ws* ~ ","? ~ ws* ~ ";" } 
 
 use_declaration = { use_all | use_alias | qualified_name } 
 
