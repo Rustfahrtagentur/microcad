@@ -32,6 +32,8 @@ impl ContextBuilder {
     }
 
     /// Add std library to context
+    ///
+    /// - `search_path`: path to search for the std library, usually the directory containing the std.µcad file
     pub fn with_std(mut self, search_path: impl AsRef<std::path::Path>) -> Self {
         self = self.with_builtin();
 
@@ -39,18 +41,16 @@ impl ContextBuilder {
             Ok(std_source_file) => std_source_file,
             Err(err) => panic!("ERROR: {err:?}"),
         };
+        let context = Self::new(std_source_file).with_builtin().build();
 
-        let namespace = self
-            .context
+        let namespace = context
             .current_source_file()
             .expect("std library missing")
             .eval_as_namespace(&mut self.context, "std".into())
             .expect("failure evaluating std library");
         use microcad_lang::eval::*;
 
-        self.context.add_source_file(std_source_file);
         self.context.add(Symbol::Namespace(namespace));
-
         self
     }
 
