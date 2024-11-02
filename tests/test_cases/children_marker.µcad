@@ -1,0 +1,11 @@
+// Define a module `donut` with a radius as parameter
+module circle_difference(radius: length) {
+    std::algorithm::difference() {
+        std::geo2d::circle(r = radius);
+        @children
+    }
+}
+
+circle_difference(radius = 3.0mm) {
+    std::geo2d::circle(r = 1.0mm);
+}

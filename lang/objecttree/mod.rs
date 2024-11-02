@@ -19,6 +19,9 @@ pub enum ObjectNodeInner {
     /// A group node that contains children
     Group(SymbolTable),
 
+    /// A special node after which children will be nested as siblings
+    ChildrenNodeMarker,
+
     /// A generated 2D geometry
     Primitive2D(Box<Primitive2D>),
 
@@ -51,7 +54,6 @@ impl std::fmt::Debug for ObjectNodeInner {
             ObjectNodeInner::Primitive3D(primitive3d) => {
                 write!(f, "({primitive3d:?})")
             }
-
             _ => Ok(()),
         }
     }

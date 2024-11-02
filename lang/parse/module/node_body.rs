@@ -42,7 +42,9 @@ impl Eval for NodeMarker {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         match self.name.to_string().as_str() {
-            "children" => Ok(Some(crate::objecttree::group())),
+            "children" => Ok(Some(crate::objecttree::ObjectNode::new(
+                crate::objecttree::ObjectNodeInner::ChildrenNodeMarker,
+            ))),
             name => {
                 use crate::diag::PushDiag;
                 context.error(self, anyhow::anyhow!("Invalid node marker: {name}"))?;
@@ -89,6 +91,7 @@ impl Parse for NodeBodyStatement {
             Rule::use_statement => NodeBodyStatement::Use(UseStatement::parse(first)?),
             Rule::expression => NodeBodyStatement::Expression(Expression::parse(first)?),
             Rule::assignment => NodeBodyStatement::Assignment(Assignment::parse(first)?),
+            Rule::node_marker => NodeBodyStatement::NodeMarker(NodeMarker::parse(first)?),
             rule => unreachable!("{rule:?}"),
         })
     }
