@@ -150,6 +150,15 @@ impl Geometry {
     }
 }
 
+/// Dumps the tree structure of a node.
+///
+/// The depth of a node is marked by the number of white spaces
+pub fn dump(writer: &mut dyn std::io::Write, node: Node) -> std::io::Result<()> {
+    use crate::Depth;
+    node.descendants()
+        .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
+}
+
 /// Shortcut to create a MultiPolygon
 pub fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
     MultiPolygon::new(vec![Polygon::new(line_string, vec![])])
