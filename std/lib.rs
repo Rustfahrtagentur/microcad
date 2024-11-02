@@ -70,6 +70,18 @@ pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
             .into(),
         )
         .add(
+            BuiltinFunction::new(
+                "print".into(),
+                function_signature!(parameter_list![parameter!(message: String)]),
+                &|args, _| {
+                    let message: String = args["message"].clone().try_into()?;
+                    println!("{message}");
+                    Ok(None)
+                },
+            )
+            .into(),
+        )
+        .add(
             builtin_module!(export(filename: String) {
                 let export_settings = ExportSettings::with_filename(filename.clone());
 
