@@ -8,20 +8,11 @@ std::geo3d::sphere(radius = 40.0mm);
 
 ## Simple `use` statement
 
-```µCAD,with_use#todo
-use std::geo3d::sphere, std::geo3d::torus;
+```µCAD,with_use
+use std::geo3d::sphere, std::geo3d::cube;
 
-sphere(4mm);
-torus(r1 = 10mm, r2 = 2mm);
-```
-
-## `use from` statement
-
-```µCAD,use_from#todo
-use sphere, torus from geo3d;
-
-sphere(4mm);
-torus(r1 = 10mm, r2 = 2mm);
+sphere(r = 4mm);
+cube(size = 40.0mm);
 ```
 
 ## `use *` statement
@@ -34,7 +25,7 @@ cube(size = 40.0mm);
 
 ## `use as` statement
 
-```µCAD,use_as#todo
+```µCAD,use_as
 use std::geo3d::sphere as ball;
 
 ball(r = 40mm);
