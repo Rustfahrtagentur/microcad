@@ -1,0 +1,15 @@
+use std::*;
+
+// A group with two rectangles
+export("{OUTPUT_FILE}_translate.stl") {
+    translate(x = 5.0mm) geo3d::cube(size = 10.0mm);
+}
+
+// Calculate the difference between two translated spheres
+export("{OUTPUT_FILE}_translate_difference.stl") {
+    algorithm::difference() {
+        translate(y = -3.0mm) geo3d::cube(size = 10.0mm);
+        translate(y = 3.0mm) geo3d::cube(size = 8.0mm);
+    }
+}
+

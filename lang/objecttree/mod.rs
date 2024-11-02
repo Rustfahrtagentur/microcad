@@ -237,7 +237,7 @@ pub fn bake3d(
                     crate::objecttree::into_group(node.clone()).unwrap(),
                 )
             }
-            ObjectNodeInner::Transform(ref transform) => return Ok(transform.into()),
+            ObjectNodeInner::Transform(ref transform) => transform.into(),
             _ => return Err(CoreError::NotImplemented),
         }
     };

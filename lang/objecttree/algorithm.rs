@@ -107,6 +107,9 @@ impl Algorithm for BooleanOp {
                 ObjectNodeInner::Primitive3D(renderable) => {
                     renderable.request_geometry(renderer).ok()
                 }
+                ObjectNodeInner::Transform(transform) => {
+                    transform.render_into_geometry3d(renderer, child.clone())
+                }
                 ObjectNodeInner::Algorithm(algorithm) => {
                     algorithm.process_geometry3d(renderer, child.clone())
                 }

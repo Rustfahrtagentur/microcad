@@ -66,9 +66,33 @@ impl TriangleMesh {
         )
     }
 
-    /// convert intro manifold
+    /// convert into manifold
     pub fn to_manifold(&self) -> Manifold {
-        Manifold::from_mesh(self.into())
+        let vertices = self
+            .vertices
+            .iter()
+            .flat_map(|v| {
+                vec![
+                    v.pos.x as f32,
+                    v.pos.y as f32,
+                    v.pos.z as f32,
+                    v.normal.x as f32,
+                    v.normal.y as f32,
+                    v.normal.z as f32,
+                ]
+            })
+            .collect::<Vec<_>>();
+
+        let triangle_indices = self
+            .triangle_indices
+            .iter()
+            .flat_map(|t| vec![t.0, t.1, t.2])
+            .collect::<Vec<_>>();
+
+        assert_eq!(vertices.len(), self.vertices.len() * 6);
+        assert_eq!(triangle_indices.len(), self.triangle_indices.len() * 3);
+
+        Manifold::from_mesh(Mesh::new(&vertices, &triangle_indices))
     }
 
     /// Transform the mesh
@@ -78,7 +102,7 @@ impl TriangleMesh {
     ///
     /// # Returns
     /// Transformed mesh
-    pub fn transform(&self, transform: crate::Mat4) -> Self {
+    pub fn transform(&self, transform: &crate::Mat4) -> Self {
         let rot_mat = crate::Mat3::from_cols(
             transform.x.truncate(),
             transform.y.truncate(),
@@ -132,9 +156,27 @@ impl From<Mesh> for TriangleMesh {
     }
 }
 
-impl From<&TriangleMesh> for Mesh {
-    fn from(mesh: &TriangleMesh) -> Self {
-        mesh.to_manifold().to_mesh()
+impl From<TriangleMesh> for Mesh {
+    fn from(mesh: TriangleMesh) -> Self {
+        let mut vertices = Vec::new();
+        let mut indices = Vec::new();
+
+        for v in &mesh.vertices {
+            vertices.push(v.pos.x as f32);
+            vertices.push(v.pos.y as f32);
+            vertices.push(v.pos.z as f32);
+            vertices.push(v.normal.x as f32);
+            vertices.push(v.normal.y as f32);
+            vertices.push(v.normal.z as f32);
+        }
+
+        for t in &mesh.triangle_indices {
+            indices.push(t.0);
+            indices.push(t.1);
+            indices.push(t.2);
+        }
+
+        Mesh::new(vertices.as_slice(), indices.as_slice())
     }
 }
 
@@ -164,7 +206,7 @@ fn test_triangle_mesh_transform() {
         triangle_indices: vec![Triangle(0, 1, 2)],
     };
 
-    let mesh = mesh.transform(crate::Mat4::from_translation(Vec3::new(1.0, 2.0, 3.0)));
+    let mesh = mesh.transform(&crate::Mat4::from_translation(Vec3::new(1.0, 2.0, 3.0)));
 
     assert_eq!(mesh.vertices[0].pos, Vec3::new(1.0, 2.0, 3.0));
     assert_eq!(mesh.vertices[0].normal, Vec3::new(0.0, 0.0, 1.0));

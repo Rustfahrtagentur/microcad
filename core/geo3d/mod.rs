@@ -91,12 +91,14 @@ impl Geometry {
     }
 
     /// Transform mesh geometry
-    pub fn transform(&self, transform: crate::Mat4) -> Self {
+    pub fn transform(&self, transform: &crate::Mat4) -> Self {
         match self {
             Geometry::Mesh(mesh) => Geometry::Mesh(mesh.transform(transform)),
+
             Geometry::Manifold(manifold) => {
                 // TODO: Implement transform for manifold instead of converting to mesh
-                Geometry::Mesh(TriangleMesh::from(manifold.to_mesh()).transform(transform))
+                let mesh = TriangleMesh::from(manifold.to_mesh()).transform(transform);
+                Geometry::Manifold(mesh.to_manifold())
             }
         }
     }
@@ -127,4 +129,30 @@ pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
 /// Create a new transform node
 pub fn transform(transform: crate::Mat4) -> Node {
     Node::new(NodeInner::Transform(transform))
+}
+
+#[test]
+fn test_boolean_op_multi() {
+    let a = std::rc::Rc::new(Geometry::Manifold(Manifold::sphere(2.0, 32)));
+    let b = std::rc::Rc::new(Geometry::Manifold(Manifold::sphere(1.0, 32)));
+
+    let result = Geometry::boolean_op_multi(vec![a, b], &BooleanOp::Difference);
+    assert!(result.is_some());
+
+    let result = result.unwrap();
+
+    if let Geometry::Manifold(manifold) = &*result {
+        assert!(manifold.to_mesh().vertices().len() > 1);
+    } else {
+        panic!("Expected manifold");
+    }
+
+    let transform = crate::Mat4::from_translation(crate::Vec3::new(5.0, 10.0, 0.0));
+    let result = result.transform(&transform);
+
+    if let Geometry::Manifold(manifold) = result {
+        assert!(manifold.to_mesh().vertices().len() > 1);
+    } else {
+        panic!("Expected manifold");
+    }
 }
