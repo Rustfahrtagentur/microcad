@@ -25,6 +25,21 @@ pub trait Algorithm: std::fmt::Debug {
         })
     }
 
+    /// Calculates the 2D geometry for node
+    fn render_into_geometry3d(
+        &self,
+        renderer: &mut Renderer3D,
+        parent: ObjectNode,
+    ) -> Option<std::rc::Rc<geo3d::Geometry>> {
+        self.process_3d(renderer, parent).ok().and_then(|new_node| {
+            if let geo3d::NodeInner::Geometry(g) = &*new_node.borrow() {
+                Some(g.clone())
+            } else {
+                None
+            }
+        })
+    }
+
     /// Calculates the 3D geometry for node
     fn process_geometry3d(
         &self,
@@ -98,16 +113,11 @@ impl Algorithm for BooleanOp {
                 _ => None,
             })
             .collect();
-        Ok(geo3d::geometry(geometries[1..].iter().fold(
-            geometries[0].clone(),
-            |acc, geo| {
-                if let Some(r) = acc.boolean_op(geo.as_ref(), self) {
-                    std::rc::Rc::new(r)
-                } else {
-                    acc
-                }
-            },
-        )))
+
+        match geo3d::Geometry::boolean_op_multi(geometries, self) {
+            Some(g) => Ok(geo3d::geometry(g)),
+            None => Ok(geo3d::group()),
+        }
     }
 }
 
