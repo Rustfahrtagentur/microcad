@@ -5,6 +5,69 @@ use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
 use crate::{diag::*, objecttree::*, parse::*, source_file_cache::*};
 
 use microcad_core::Id;
+use pest::Stack;
+
+#[derive(Debug, Clone)]
+pub enum StackFrame {
+    /// Initial state
+    Namespace(SymbolTable),
+    /// In a module definition
+    ModuleDefinition(SymbolTable, Option<ObjectNode>),
+    /// In a function definition
+    FunctionDefinition(SymbolTable),
+}
+
+impl StackFrame {
+    pub fn symbol_table(&self) -> &SymbolTable {
+        match self {
+            Self::Namespace(table) => table,
+            Self::ModuleDefinition(table, _) => table,
+            Self::FunctionDefinition(table) => table,
+        }
+    }
+}
+
+impl Default for StackFrame {
+    fn default() -> Self {
+        Self::Namespace(SymbolTable::default())
+    }
+}
+
+impl Symbols for StackFrame {
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+        match self {
+            Self::Namespace(table) => table.fetch(id),
+            Self::ModuleDefinition(table, _) => table.fetch(id),
+            Self::FunctionDefinition(table) => table.fetch(id),
+        }
+    }
+
+    fn add(&mut self, symbol: Symbol) -> &mut Self {
+        match self {
+            Self::Namespace(table) => table.add(symbol),
+            Self::ModuleDefinition(table, _) => table.add(symbol),
+            Self::FunctionDefinition(table) => table.add(symbol),
+        };
+        self
+    }
+
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
+        match self {
+            Self::Namespace(table) => table.add_alias(symbol, alias),
+            Self::ModuleDefinition(table, _) => table.add_alias(symbol, alias),
+            Self::FunctionDefinition(table) => table.add_alias(symbol, alias),
+        };
+        self
+    }
+
+    fn copy<T: Symbols>(&self, into: &mut T) {
+        match self {
+            Self::Namespace(table) => table.copy(into),
+            Self::ModuleDefinition(table, _) => table.copy(into),
+            Self::FunctionDefinition(table) => table.copy(into),
+        }
+    }
+}
 
 /// Context for evaluation
 ///
@@ -12,7 +75,7 @@ use microcad_core::Id;
 /// A context is essentially a stack of symbol tables
 pub struct Context {
     /// Stack of symbol tables
-    stack: Vec<SymbolTable>,
+    stack: Vec<StackFrame>,
 
     /// Current node in the tree where the evaluation is happening
     current_node: ObjectNode,
@@ -33,7 +96,7 @@ impl Context {
         let rc_source_file = std::rc::Rc::new(source_file);
 
         let mut ctx = Self {
-            stack: vec![SymbolTable::default()],
+            stack: vec![StackFrame::default()],
             current_node: group(),
             current_source_file: Some(rc_source_file.clone()),
             ..Default::default()
@@ -58,13 +121,34 @@ impl Context {
     }
 
     /// Push a new symbol table to the stack (enter a new scope)
-    pub fn push(&mut self) {
-        self.stack.push(SymbolTable::default());
+    fn push(&mut self, stack_frame: StackFrame) -> &mut StackFrame {
+        self.stack.push(stack_frame);
+        self.stack.last_mut().unwrap()
     }
 
     /// Pop the top symbol table from the stack (exit the current scope)
-    pub fn pop(&mut self) {
+    fn pop(&mut self) {
         self.stack.pop();
+    }
+
+    /// The top symbol table in the stack
+    pub fn top(&self) -> &StackFrame {
+        self.stack.last().unwrap()
+    }
+
+    /// The top symbol table in the stack (mutable)
+    pub fn top_mut(&mut self) -> &mut StackFrame {
+        self.stack.last_mut().unwrap()
+    }
+
+    pub fn scope(
+        &mut self,
+        stack_frame: StackFrame,
+        f: impl FnOnce(&mut Self) -> crate::eval::Result<()>,
+    ) {
+        self.push(stack_frame);
+        f(self);
+        self.pop();
     }
 
     /// Set new_node as current node, call function and set old node
@@ -77,16 +161,6 @@ impl Context {
         f(self)?;
         self.set_current_node(old_node);
         Ok(new_node)
-    }
-
-    /// Open a new scope and execute the given closure
-    pub fn scope<F>(&mut self, f: F)
-    where
-        F: FnOnce(&mut Self),
-    {
-        self.push();
-        f(self);
-        self.pop();
     }
 
     /// Read-only access to diagnostic handler
@@ -135,7 +209,7 @@ impl Symbols for Context {
         self.stack
             .iter()
             .rev()
-            .flat_map(|table| table.fetch(id))
+            .flat_map(|stack_frame| stack_frame.fetch(id))
             .next()
     }
 
@@ -150,7 +224,7 @@ impl Symbols for Context {
     }
 
     fn copy<T: Symbols>(&self, into: &mut T) {
-        self.stack.last().unwrap().iter().for_each(|(_, symbol)| {
+        self.top().symbol_table().iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());
         });
     }
@@ -167,7 +241,7 @@ impl GetSourceFileByHash for Context {
 impl Default for Context {
     fn default() -> Self {
         Self {
-            stack: vec![SymbolTable::default()],
+            stack: vec![StackFrame::default()],
             current_node: group(),
             current_source_file: None,
             source_files: SourceFileCache::default(),

@@ -49,19 +49,23 @@ impl CallTrait for FunctionDefinition {
             .eval(context)?
             .get_matching_arguments(&params.eval(context)?)?;
 
-        context.push();
-        for (name, value) in arg_map.iter() {
-            context.add(Symbol::Value(name.clone(), value.clone()));
-        }
+        let stack_frame = StackFrame::FunctionDefinition(context.top().symbol_table().clone());
 
-        for statement in self.body.0.iter() {
-            if let Some(result) = statement.eval(context)? {
-                context.pop();
-                return Ok(Some(result));
+        let mut result = None;
+        context.scope(stack_frame, |context| {
+            for (name, value) in arg_map.iter() {
+                context.add(Symbol::Value(name.clone(), value.clone()));
             }
-        }
-        context.pop();
-        Ok(None)
+
+            for statement in self.body.0.iter() {
+                if let Some(result_value) = statement.eval(context)? {
+                    result = Some(result_value);
+                    break;
+                }
+            }
+            Ok(())
+        });
+        Ok(result)
     }
 }
 

@@ -29,70 +29,84 @@ impl ModuleDefinition {
 
 impl CallTrait for ModuleDefinition {
     fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
-        context.push();
+        let stack_frame = StackFrame::ModuleDefinition(context.top().symbol_table().clone(), None);
 
-        let mut node = crate::objecttree::group();
-        context.set_current_node(node.clone());
+        let mut children_node = None;
 
-        // Let's evaluate the pre-init statements first
-        for statement in &self.body.pre_init_statements {
-            statement.eval(context)?;
-        }
+        context.scope(stack_frame, |context| {
+            let mut node = crate::objecttree::group();
+            context.set_current_node(node.clone());
 
-        let mut matching_init = Vec::new();
-        let arg_values = args.eval(context)?;
-
-        // Find all initializers that match the arguments and add it to the matching_init list
-        for init in &self.body.inits {
-            let param_values = init.parameters.eval(context)?;
-            if let Ok(arg_map) = arg_values.get_matching_arguments(&param_values) {
-                matching_init.push((init, arg_map));
+            // Let's evaluate the pre-init statements first
+            for statement in &self.body.pre_init_statements {
+                statement.eval(context)?;
             }
-        }
 
-        use crate::diag::PushDiag;
-        use anyhow::anyhow;
+            let mut matching_init = Vec::new();
+            let arg_values = args.eval(context)?;
 
-        // There should be only one matching initializer
-        match matching_init.len() {
-            0 => {
-                context.error(self, anyhow!("No matching initializer found"))?;
-            }
-            1 => {
-                let (init, arg_map) = matching_init.first().unwrap();
-                // Copy the arguments to the symbol table of the node
-                for (name, value) in arg_map.iter() {
-                    node.add(Symbol::Value(name.clone(), value.clone()));
+            // Find all initializers that match the arguments and add it to the matching_init list
+            for init in &self.body.inits {
+                let param_values = init.parameters.eval(context)?;
+                if let Ok(arg_map) = arg_values.get_matching_arguments(&param_values) {
+                    matching_init.push((init, arg_map));
                 }
-                let init_object = init.call(arg_map, context)?;
+            }
 
-                // Add the init object's children to the node
-                for child in init_object.children() {
-                    child.detach();
-                    node.append(child.clone());
+            use crate::diag::PushDiag;
+            use anyhow::anyhow;
+
+            // There should be only one matching initializer
+            match matching_init.len() {
+                0 => {
+                    context.error(self, anyhow!("No matching initializer found"))?;
                 }
+                1 => {
+                    let (init, arg_map) = matching_init.first().unwrap();
+                    // Copy the arguments to the symbol table of the node
+                    for (name, value) in arg_map.iter() {
+                        node.add(Symbol::Value(name.clone(), value.clone()));
+                    }
+                    let init_object = init.call(arg_map, context)?;
 
-                init_object.copy(&mut node);
+                    // Add the init object's children to the node
+                    for child in init_object.children() {
+                        child.detach();
+                        node.append(child.clone());
+                    }
+
+                    init_object.copy(&mut node);
+                }
+                _ => {
+                    context.error(self, anyhow!("Multiple matching initializers found"))?;
+                    // TODO Add diagnostics for multiple matching initializers
+                    return Ok(());
+                }
             }
-            _ => {
-                context.error(self, anyhow!("Multiple matching initializers found"))?;
-                // TODO Add diagnostics for multiple matching initializers
-                context.pop();
-                return Ok(None);
+
+            // Now, copy the symbols of the node into the context
+            node.copy(context);
+
+            // Evaluate the post-init statements
+            for statement in &self.body.post_init_statements {
+                statement.eval(context)?;
             }
-        }
 
-        // Now, copy the symbols of the node into the context
-        node.copy(context);
+            // Find the children node marker
+            node.descendants().for_each(|child| {
+                if let crate::ObjectNodeInner::ChildrenNodeMarker = *child.borrow() {
+                    children_node = Some(child.clone());
+                }
+            });
 
-        // Evaluate the post-init statements
-        for statement in &self.body.post_init_statements {
-            statement.eval(context)?;
-        }
+            if children_node.is_none() {
+                children_node = Some(node);
+            }
 
-        context.pop();
+            Ok(())
+        });
 
-        Ok(Some(Value::Node(node)))
+        Ok(Some(Value::Node(children_node.unwrap())))
     }
 }
 
