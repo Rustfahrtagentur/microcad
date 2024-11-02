@@ -57,7 +57,7 @@ impl Eval for Nested {
                             values.push(v.clone_with_src_ref(qualified_name.src_ref()));
                             break;
                         }
-                        Symbol::None => {
+                        Symbol::Invalid => {
                             use crate::diag::PushDiag;
                             context.error(
                                 self,

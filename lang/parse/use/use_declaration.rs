@@ -96,11 +96,9 @@ impl Eval for UseDeclaration {
                 let mut symbols = SymbolTable::default();
 
                 let symbol = name.eval(context)?;
-                if let Symbol::None = symbol {
-                } else {
+                if !matches!(symbol, Symbol::Invalid) {
                     symbols.add(symbol);
                 }
-
                 Ok(symbols)
             }
             Self::UseAlias(name, alias, _) => {

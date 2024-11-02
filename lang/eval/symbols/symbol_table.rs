@@ -27,7 +27,7 @@ impl Symbols for SymbolTable {
 
     fn add(&mut self, symbol: Symbol) -> &mut Self {
         match symbol {
-            Symbol::None => {}
+            Symbol::Invalid => {}
             _ => {
                 self.0
                     .insert(symbol.id().unwrap(), std::rc::Rc::new(symbol));
@@ -39,7 +39,7 @@ impl Symbols for SymbolTable {
 
     fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
         match symbol {
-            Symbol::None => {}
+            Symbol::Invalid => {}
             _ => {
                 self.0.insert(alias, std::rc::Rc::new(symbol));
             }

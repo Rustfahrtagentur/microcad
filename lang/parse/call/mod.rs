@@ -83,7 +83,7 @@ impl Eval for Call {
             Symbol::Module(m) => {
                 return m.call(&self.argument_list, context);
             }
-            Symbol::None => {
+            Symbol::Invalid => {
                 // We don't do anything if the symbol is not found, because an error has been already raised before
             }
             symbol => {
