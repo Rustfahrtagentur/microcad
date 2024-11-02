@@ -96,3 +96,13 @@ impl From<&Transform> for microcad_core::geo3d::Node {
         microcad_core::geo3d::tree::transform(transform.mat3d())
     }
 }
+
+impl Algorithm for Transform {
+    fn process_2d(&self, _renderer: &mut Renderer2D, _parent: ObjectNode) -> Result<geo2d::Node> {
+        Ok(self.into())
+    }
+
+    fn process_3d(&self, _renderer: &mut Renderer3D, _parent: ObjectNode) -> Result<geo3d::Node> {
+        Ok(self.into())
+    }
+}

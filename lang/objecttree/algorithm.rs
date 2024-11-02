@@ -10,6 +10,36 @@ pub use microcad_core::BooleanOp;
 
 /// Algorithm trait
 pub trait Algorithm: std::fmt::Debug {
+    /// Calculates the 2D geometry for node
+    fn process_geometry2d(
+        &self,
+        renderer: &mut Renderer2D,
+        parent: ObjectNode,
+    ) -> Option<std::rc::Rc<geo2d::Geometry>> {
+        self.process_2d(renderer, parent).ok().and_then(|new_node| {
+            if let geo2d::NodeInner::Geometry(g) = &*new_node.borrow() {
+                Some(g.clone())
+            } else {
+                None
+            }
+        })
+    }
+
+    /// Calculates the 3D geometry for node
+    fn process_geometry3d(
+        &self,
+        renderer: &mut Renderer3D,
+        parent: ObjectNode,
+    ) -> Option<std::rc::Rc<geo3d::Geometry>> {
+        self.process_3d(renderer, parent).ok().and_then(|new_node| {
+            if let geo3d::NodeInner::Geometry(g) = &*new_node.borrow() {
+                Some(g.clone())
+            } else {
+                None
+            }
+        })
+    }
+
     /// Processes geometry for a 2d renderer and returns a geometry
     fn process_2d(&self, _renderer: &mut Renderer2D, _parent: ObjectNode) -> Result<geo2d::Node> {
         unimplemented!()
@@ -28,29 +58,18 @@ impl Algorithm for BooleanOp {
         let geometries: Vec<_> = parent
             .children()
             .filter_map(|child| match &*child.borrow() {
-                ObjectNodeInner::Group(_) => BooleanOp::Union
-                    .process_2d(renderer, child.clone())
-                    .ok()
-                    .and_then(|new_node| {
-                        if let geo2d::NodeInner::Geometry(g) = &*new_node.borrow() {
-                            Some(g.clone())
-                        } else {
-                            None
-                        }
-                    }),
+                ObjectNodeInner::Group(_) => {
+                    BooleanOp::Union.process_geometry2d(renderer, child.clone())
+                }
                 ObjectNodeInner::Primitive2D(renderable) => {
                     renderable.request_geometry(renderer).ok()
                 }
-                ObjectNodeInner::Algorithm(algorithm) => algorithm
-                    .process_2d(renderer, child.clone())
-                    .ok()
-                    .and_then(|new_node| {
-                        if let geo2d::NodeInner::Geometry(g) = &*new_node.borrow() {
-                            Some(g.clone())
-                        } else {
-                            None
-                        }
-                    }),
+                ObjectNodeInner::Transform(transform) => {
+                    transform.process_geometry2d(renderer, child.clone())
+                }
+                ObjectNodeInner::Algorithm(algorithm) => {
+                    algorithm.process_geometry2d(renderer, child.clone())
+                }
                 _ => None,
             })
             .collect();
@@ -72,29 +91,15 @@ impl Algorithm for BooleanOp {
         let geometries: Vec<_> = parent
             .children()
             .filter_map(|child| match &*child.borrow() {
-                ObjectNodeInner::Group(_) => BooleanOp::Union
-                    .process_3d(renderer, child.clone())
-                    .ok()
-                    .and_then(|new_node| {
-                        if let geo3d::NodeInner::Geometry(g) = &*new_node.borrow() {
-                            Some(g.clone())
-                        } else {
-                            None
-                        }
-                    }),
+                ObjectNodeInner::Group(_) => {
+                    BooleanOp::Union.process_geometry3d(renderer, child.clone())
+                }
                 ObjectNodeInner::Primitive3D(renderable) => {
                     renderable.request_geometry(renderer).ok()
                 }
-                ObjectNodeInner::Algorithm(algorithm) => algorithm
-                    .process_3d(renderer, child.clone())
-                    .ok()
-                    .and_then(|new_node| {
-                        if let geo3d::NodeInner::Geometry(g) = &*new_node.borrow() {
-                            Some(g.clone())
-                        } else {
-                            None
-                        }
-                    }),
+                ObjectNodeInner::Algorithm(algorithm) => {
+                    algorithm.process_geometry3d(renderer, child.clone())
+                }
                 _ => None,
             })
             .collect();
