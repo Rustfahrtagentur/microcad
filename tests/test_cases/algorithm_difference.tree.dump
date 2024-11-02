@@ -5,7 +5,9 @@ Group
     Group
      Primitive3D(Sphere { radius: 3.0 })
     Group
-     Primitive3D(Cube { size_x: 3.0, size_y: 3.0, size_z: 3.0 })
+     Transform
+      Group
+       Primitive3D(Cube { size_x: 3.0, size_y: 3.0, size_z: 3.0 })
  Export
   Algorithm(Difference)
    Group
