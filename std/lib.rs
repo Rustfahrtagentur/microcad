@@ -15,6 +15,7 @@ mod export;
 pub mod geo2d;
 mod math;
 mod namespace_builder;
+mod transform;
 
 /// Module containing builtin 3D geometries like `sphere` or `cube`
 #[cfg(feature = "geo3d")]
@@ -42,6 +43,7 @@ pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
         .add(geo2d::builtin_module().into())
         .add(geo3d::builtin_module().into())
         .add(algorithm::builtin_module().into())
+        .add(transform::builtin_namespace().into())
         .add(
             BuiltinFunction::new(
                 "assert".into(),

@@ -158,10 +158,10 @@ impl Eval for Parameter {
 #[macro_export]
 macro_rules! parameter {
     ($name:ident) => {
-        Parameter::new(stringify!($name).into(), None, None, SrcRef(None))
+        microcad_lang::parse::Parameter::new(stringify!($name).into(), None, None, SrcRef(None))
     };
     ($name:ident: $ty:ident) => {
-        Parameter::new(
+        microcad_lang::parse::Parameter::new(
             stringify!($name).into(),
             Some(microcad_lang::r#type::Type::$ty.into()),
             None,
@@ -169,7 +169,7 @@ macro_rules! parameter {
         )
     };
     ($name:ident: $ty:ident = $value:expr) => {
-        Parameter::new(
+        microcad_lang::parse::Parameter::new(
             stringify!($name).into(),
             Some(microcad_lang::r#type::Type::$ty.into()),
             Some(Expression::literal_from_str(stringify!($value)).expect("Invalid literal")),
