@@ -25,6 +25,8 @@ mod ffi {
 
         fn mesh_from_manifold(manifold: &Manifold) -> UniquePtr<Mesh>;
         fn manifold_from_mesh(mesh: &Mesh) -> UniquePtr<Manifold>;
+
+        fn mesh_from_vertices(vertices: &[f32], indices: &[u32]) -> UniquePtr<Mesh>;
     }
 }
 
@@ -89,6 +91,11 @@ impl Manifold {
 pub struct Mesh(cxx::UniquePtr<ffi::Mesh>);
 
 impl Mesh {
+    pub fn new(vertices: &[f32], indices: &[u32]) -> Self {
+        let mesh = ffi::mesh_from_vertices(vertices, indices);
+        Self(mesh)
+    }
+
     pub fn vertices(&self) -> Vec<f32> {
         let vertices_binding = self.0.vertices();
         let vertices = vertices_binding.as_ref().unwrap().as_slice();
@@ -133,4 +140,3 @@ fn test_manifold_ffi() {
     let indices = indices_binding.as_ref().unwrap().as_slice();
     assert!(!indices.is_empty());
 }
-

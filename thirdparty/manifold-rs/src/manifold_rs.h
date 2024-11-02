@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rust/cxx.h"
+
 #include <memory>
 
 namespace manifold
@@ -43,4 +44,8 @@ namespace manifold_rs
 
     std::unique_ptr<Mesh> mesh_from_manifold(const Manifold &manifold);
     std::unique_ptr<Manifold> manifold_from_mesh(const Mesh &mesh);
+
+    std::unique_ptr<Mesh> mesh_from_vertices(
+        rust::Slice<const float> vertices, 
+        rust::Slice<const uint32_t> indices);
 }
