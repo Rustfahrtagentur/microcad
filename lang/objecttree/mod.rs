@@ -14,7 +14,7 @@ use microcad_core::*;
 use crate::eval::*;
 
 /// Inner of a node
-#[derive(IntoStaticStr)]
+#[derive(Clone, IntoStaticStr)]
 pub enum ObjectNodeInner {
     /// A group node that contains children
     Group(SymbolTable),
@@ -23,14 +23,14 @@ pub enum ObjectNodeInner {
     ChildrenNodeMarker,
 
     /// A generated 2D geometry
-    Primitive2D(Box<Primitive2D>),
+    Primitive2D(std::rc::Rc<Primitive2D>),
 
     /// Generated 3D geometry
     #[cfg(feature = "geo3d")]
-    Primitive3D(Box<Primitive3D>),
+    Primitive3D(std::rc::Rc<Primitive3D>),
 
     /// An algorithm trait that manipulates the node or its children
-    Algorithm(Box<dyn Algorithm>),
+    Algorithm(std::rc::Rc<dyn Algorithm>),
 
     /// An affine transformation of a geometry
     Transform(Transform),

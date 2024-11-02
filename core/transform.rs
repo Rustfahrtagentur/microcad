@@ -4,4 +4,5 @@
 //! Transformation matrix
 
 /// Transformation matrix
+#[derive(Debug, Clone)]
 pub struct Transform(crate::Mat4);

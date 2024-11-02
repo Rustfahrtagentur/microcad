@@ -113,30 +113,36 @@ impl Algorithm for BooleanOp {
 
 /// Short cut to generate a difference operator node
 pub fn difference() -> ObjectNode {
-    ObjectNode::new(ObjectNodeInner::Algorithm(Box::new(BooleanOp::Difference)))
+    ObjectNode::new(ObjectNodeInner::Algorithm(std::rc::Rc::new(
+        BooleanOp::Difference,
+    )))
 }
 
 /// Short cut to generate a union operator node
 pub fn union() -> ObjectNode {
-    ObjectNode::new(ObjectNodeInner::Algorithm(Box::new(BooleanOp::Union)))
+    ObjectNode::new(ObjectNodeInner::Algorithm(std::rc::Rc::new(
+        BooleanOp::Union,
+    )))
 }
 
 /// Short cut to generate an intersection operator node
 pub fn intersection() -> ObjectNode {
-    ObjectNode::new(ObjectNodeInner::Algorithm(Box::new(
+    ObjectNode::new(ObjectNodeInner::Algorithm(std::rc::Rc::new(
         BooleanOp::Intersection,
     )))
 }
 
 /// Short cut to generate a complement operator node
 pub fn complement() -> ObjectNode {
-    ObjectNode::new(ObjectNodeInner::Algorithm(Box::new(BooleanOp::Complement)))
+    ObjectNode::new(ObjectNodeInner::Algorithm(std::rc::Rc::new(
+        BooleanOp::Complement,
+    )))
 }
 
 /// Short cut to generate boolean operator as binary operation with two nodes
 pub fn binary_op(op: BooleanOp, lhs: ObjectNode, rhs: ObjectNode) -> ObjectNode {
     assert!(lhs != rhs, "lhs and rhs must be distinct.");
-    let root = ObjectNode::new(ObjectNodeInner::Algorithm(Box::new(op)));
+    let root = ObjectNode::new(ObjectNodeInner::Algorithm(std::rc::Rc::new(op)));
     root.append(lhs);
     root.append(rhs);
     root

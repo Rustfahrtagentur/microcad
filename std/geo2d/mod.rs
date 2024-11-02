@@ -7,7 +7,7 @@ use microcad_core::*;
 use microcad_lang::{eval::*, parse::*};
 
 /// Builtin definition for a 2D circle
-#[derive(DefineBuiltinPrimitive2D, Debug)]
+#[derive(DefineBuiltinPrimitive2D, Clone, Debug)]
 pub struct Circle {
     /// Radius of the circle in millimeters
     pub radius: Scalar,

@@ -53,8 +53,16 @@ impl Eval for Nested {
                 NestedItem::QualifiedName(qualified_name) => {
                     let symbol = qualified_name.eval(context)?;
                     match symbol {
-                        Symbol::Value(_, v) => {
-                            values.push(v.clone_with_src_ref(qualified_name.src_ref()));
+                        Symbol::Value(_, ref v) => {
+                            match v {
+                                Value::Node(node) => {
+                                    values.push(Value::Node(node.make_deep_copy()));
+                                }
+                                _ => {
+                                    values.push(v.clone_with_src_ref(qualified_name.src_ref()));
+                                }
+                            }
+
                             break;
                         }
                         Symbol::Invalid => {
