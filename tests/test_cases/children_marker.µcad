@@ -6,6 +6,14 @@ module circle_difference(radius: length) {
     }
 }
 
-circle_difference(radius = 3.0mm) {
-    std::geo2d::circle(r = 1.0mm);
+// Create a circle node with two children
+a = std::geo2d::circle(r = 1.0mm) {
+    std::geo2d::circle(r = 2.0mm);
+    std::geo2d::circle(r = 3.0mm);
+};
+
+circle_difference(radius = 4.0mm) {
+    std::geo2d::circle(r = 5.0mm);
+    std::geo2d::circle(r = 6.0mm);
+    a;
 }
