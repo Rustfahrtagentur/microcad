@@ -96,7 +96,10 @@ impl Eval for UseDeclaration {
                 let mut symbols = SymbolTable::default();
 
                 let symbol = name.eval(context)?;
-                if !matches!(symbol, Symbol::Invalid) {
+                if matches!(symbol, Symbol::Invalid) {
+                    use crate::diag::PushDiag;
+                    context.error(self, anyhow::anyhow!("Cannot use `{name}`"))?;
+                } else {
                     symbols.add(symbol);
                 }
                 Ok(symbols)
