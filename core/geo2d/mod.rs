@@ -132,13 +132,14 @@ impl Geometry {
     pub fn transform(&self, mat: crate::Mat3) -> Self {
         // Extract matrix components
         let a = mat.x.x;
-        let b = mat.x.y;
-        let e = mat.x.z;
-        let c = mat.y.x;
-        let d = mat.y.y;
-        let f = mat.y.z;
+        let b = mat.y.x;
+        let xoff = mat.z.x;
+        let d = mat.x.y;
+        let e = mat.y.y;
+        let yoff = mat.z.y;
+
         use geo::AffineOps;
-        let transform = geo::AffineTransform::new(a, b, c, d, e, f);
+        let transform = geo::AffineTransform::new(a, b, xoff, d, e, yoff);
 
         match &self {
             Self::LineString(l) => Self::LineString(l.affine_transform(&transform)),
@@ -177,4 +178,28 @@ pub fn group() -> Node {
 /// Create a new transform node
 pub fn transform(transform: crate::Mat3) -> Node {
     Node::new(NodeInner::Transform(transform))
+}
+
+#[test]
+fn test_transform() {
+    let geometry = Geometry::LineString(geo::LineString::from(vec![
+        geo::Point::new(0.0, 0.0),
+        geo::Point::new(2.0, 1.0),
+    ]));
+
+    let transform = crate::Mat3::from_translation(crate::Vec2::new(5.0, 10.0));
+
+    let transformed = geometry.transform(transform);
+
+    if let Geometry::LineString(l) = transformed {
+        let first = l.coords().next().unwrap();
+        assert_eq!(first.x, 5.0);
+        assert_eq!(first.y, 10.0);
+
+        let second = l.coords().nth(1).unwrap();
+        assert_eq!(second.x, 7.0);
+        assert_eq!(second.y, 11.0);
+    } else {
+        panic!("Expected LineString");
+    }
 }
