@@ -5,7 +5,7 @@ export("{OUTPUT_FILE}_translate.stl") {
     translate(x = 5.0mm) geo3d::cube(size = 10.0mm);
 }
 
-// Calculate the difference between two translated spheres
+// Calculate the difference between two translated cubes
 export("{OUTPUT_FILE}_translate_difference.stl") {
     algorithm::difference() {
         translate(y = -3.0mm) geo3d::cube(size = 10.0mm);
@@ -13,3 +13,13 @@ export("{OUTPUT_FILE}_translate_difference.stl") {
     }
 }
 
+// Calculate the difference between two translated cylinders
+export("{OUTPUT_FILE}_translate_cylinder_difference.stl") {
+    thickness = 1.0mm;
+    use geo3d::cylinder;
+
+    algorithm::difference() {
+        cylinder(d = 15.0cm, height = 20.0mm, bottom = 0.0mm);
+        translate(z = thickness) cylinder(d = 15.0cm - thickness*2.0, height = 20.0mm, bottom = thickness);
+    }
+}

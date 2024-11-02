@@ -18,6 +18,11 @@ namespace manifold_rs
         return std::make_unique<Manifold>(::manifold::Manifold::Cube({x_size, y_size, z_size}));
     }
 
+    std::unique_ptr<Manifold> cylinder(double radius_low, double radius_height, double height, uint32_t circular_segments)
+    {
+        return std::make_unique<Manifold>(::manifold::Manifold::Cylinder(height, radius_low, radius_height, circular_segments));
+    }
+
     std::unique_ptr<Manifold> union_(const Manifold &a, const Manifold &b)
     {
         return std::make_unique<Manifold>(a.manifold->Boolean(*b.manifold, ::manifold::OpType::Add));

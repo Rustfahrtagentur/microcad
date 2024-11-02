@@ -13,6 +13,12 @@ mod ffi {
 
         fn sphere(radius: f64, segments: u32) -> UniquePtr<Manifold>;
         fn cube(x_size: f64, y_size: f64, z_size: f64) -> UniquePtr<Manifold>;
+        fn cylinder(
+            radius_low: f64,
+            radius_high: f64,
+            height: f64,
+            segments: u32,
+        ) -> UniquePtr<Manifold>;
 
         fn union_(a: &Manifold, b: &Manifold) -> UniquePtr<Manifold>;
         fn intersection(a: &Manifold, b: &Manifold) -> UniquePtr<Manifold>;
@@ -48,6 +54,11 @@ impl Manifold {
     /// Create a cube manifold.
     pub fn cube(x_size: f64, y_size: f64, z_size: f64) -> Self {
         Self(ffi::cube(x_size, y_size, z_size))
+    }
+
+    /// Create a cylinder manifold.
+    pub fn cylinder(radius_low: f64, radius_high: f64, height: f64, segments: u32) -> Self {
+        Self(ffi::cylinder(radius_low, radius_high, height, segments))
     }
 
     /// Get the union of two manifolds.

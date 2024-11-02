@@ -91,6 +91,49 @@ namespace geo3d {
             );
         }
     }
+
+    /// Cylinder module definition
+    ///
+    /// Examples:
+    /// * with radius `r` and height `h`: `cylinder(r = 10.0mm, h = 5.0mm);`
+    module cylinder {
+        init(radius: length, height: length) {
+            top = height / 2.0;
+            bottom = -top;
+        }
+
+        init(r: length, h: length) {
+            radius = r;
+            height = h;
+            top = height / 2.0;
+            bottom = -top;
+        }
+
+        init(r: length, bottom: length, top: length) {
+            radius = r;
+            height = top - bottom;
+        }
+
+        init(d: length, bottom: length, height: length) {
+            radius = d / 2.0;
+            top = bottom + height;
+        }
+
+        init(d: length, h: length) {
+            radius = d / 2.0;
+            height = h;
+            top = height / 2.0;
+            bottom = -top;
+        }
+
+        __builtin::transform::translate(x = 0.0, y = 0.0, z = bottom / 1mm) {
+            __builtin::geo3d::cylinder(
+                radius_bottom = radius / 1mm,
+                radius_top = radius / 1mm,
+                height = height / 1mm
+            );
+        }
+    }
 }
 
 namespace algorithm {
