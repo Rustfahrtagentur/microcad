@@ -7,6 +7,7 @@ pub mod algorithm;
 pub mod transform;
 
 pub use algorithm::Algorithm;
+use rctree::Node;
 pub use transform::Transform;
 
 use strum::IntoStaticStr;
@@ -132,14 +133,22 @@ pub fn nest_nodes(nodes: Vec<ObjectNode>) -> ObjectNode {
 
         match children_marker_node {
             Some(children_marker_node) => {
-                node_window[1].detach();
-
                 // Add children to parent of children marker (a marker is always a child of a group)
                 let children_marker_parent = children_marker_node
                     .parent()
                     .expect("Children marker should have a parent");
-                children_marker_parent.append(node_window[1].clone());
 
+                let is_group =
+                    matches!(*children_marker_parent.borrow(), ObjectNodeInner::Group(_));
+
+                if is_group {
+                    // Add children to group
+                    for child in node_window[1].children() {
+                        children_marker_parent.append(child.clone());
+                    }
+                } else {
+                    children_marker_parent.append(node_window[1].clone());
+                }
                 // Remove children marker
                 children_marker_node.detach();
             }
