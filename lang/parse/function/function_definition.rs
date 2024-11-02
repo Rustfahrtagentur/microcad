@@ -49,7 +49,7 @@ impl CallTrait for FunctionDefinition {
             .eval(context)?
             .get_matching_arguments(&params.eval(context)?)?;
 
-        let stack_frame = StackFrame::FunctionDefinition(context.top().symbol_table().clone());
+        let stack_frame = StackFrame::FunctionCall(context.top().symbol_table().clone());
 
         let mut result = None;
         context.scope(stack_frame, |context| {
@@ -64,7 +64,7 @@ impl CallTrait for FunctionDefinition {
                 }
             }
             Ok(())
-        });
+        })?;
         Ok(result)
     }
 }

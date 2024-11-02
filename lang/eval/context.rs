@@ -5,24 +5,23 @@ use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
 use crate::{diag::*, objecttree::*, parse::*, source_file_cache::*};
 
 use microcad_core::Id;
-use pest::Stack;
 
 #[derive(Debug, Clone)]
 pub enum StackFrame {
     /// Initial state
     Namespace(SymbolTable),
     /// In a module definition
-    ModuleDefinition(SymbolTable, Option<ObjectNode>),
+    ModuleCall(SymbolTable, Option<ObjectNode>),
     /// In a function definition
-    FunctionDefinition(SymbolTable),
+    FunctionCall(SymbolTable),
 }
 
 impl StackFrame {
     pub fn symbol_table(&self) -> &SymbolTable {
         match self {
             Self::Namespace(table) => table,
-            Self::ModuleDefinition(table, _) => table,
-            Self::FunctionDefinition(table) => table,
+            Self::ModuleCall(table, _) => table,
+            Self::FunctionCall(table) => table,
         }
     }
 }
@@ -37,16 +36,16 @@ impl Symbols for StackFrame {
     fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         match self {
             Self::Namespace(table) => table.fetch(id),
-            Self::ModuleDefinition(table, _) => table.fetch(id),
-            Self::FunctionDefinition(table) => table.fetch(id),
+            Self::ModuleCall(table, _) => table.fetch(id),
+            Self::FunctionCall(table) => table.fetch(id),
         }
     }
 
     fn add(&mut self, symbol: Symbol) -> &mut Self {
         match self {
             Self::Namespace(table) => table.add(symbol),
-            Self::ModuleDefinition(table, _) => table.add(symbol),
-            Self::FunctionDefinition(table) => table.add(symbol),
+            Self::ModuleCall(table, _) => table.add(symbol),
+            Self::FunctionCall(table) => table.add(symbol),
         };
         self
     }
@@ -54,8 +53,8 @@ impl Symbols for StackFrame {
     fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
         match self {
             Self::Namespace(table) => table.add_alias(symbol, alias),
-            Self::ModuleDefinition(table, _) => table.add_alias(symbol, alias),
-            Self::FunctionDefinition(table) => table.add_alias(symbol, alias),
+            Self::ModuleCall(table, _) => table.add_alias(symbol, alias),
+            Self::FunctionCall(table) => table.add_alias(symbol, alias),
         };
         self
     }
@@ -63,8 +62,8 @@ impl Symbols for StackFrame {
     fn copy<T: Symbols>(&self, into: &mut T) {
         match self {
             Self::Namespace(table) => table.copy(into),
-            Self::ModuleDefinition(table, _) => table.copy(into),
-            Self::FunctionDefinition(table) => table.copy(into),
+            Self::ModuleCall(table, _) => table.copy(into),
+            Self::FunctionCall(table) => table.copy(into),
         }
     }
 }
@@ -141,14 +140,16 @@ impl Context {
         self.stack.last_mut().unwrap()
     }
 
+    /// Create a new symbol table and push it to the stack
     pub fn scope(
         &mut self,
         stack_frame: StackFrame,
         f: impl FnOnce(&mut Self) -> crate::eval::Result<()>,
-    ) {
+    ) -> crate::eval::Result<()> {
         self.push(stack_frame);
-        f(self);
+        f(self)?;
         self.pop();
+        Ok(())
     }
 
     /// Set new_node as current node, call function and set old node

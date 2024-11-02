@@ -29,7 +29,7 @@ impl ModuleDefinition {
 
 impl CallTrait for ModuleDefinition {
     fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
-        let stack_frame = StackFrame::ModuleDefinition(context.top().symbol_table().clone(), None);
+        let stack_frame = StackFrame::ModuleCall(context.top().symbol_table().clone(), None);
 
         let mut children_node = None;
 
@@ -104,7 +104,7 @@ impl CallTrait for ModuleDefinition {
             }
 
             Ok(())
-        });
+        })?;
 
         Ok(Some(Value::Node(children_node.unwrap())))
     }
