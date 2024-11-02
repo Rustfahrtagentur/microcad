@@ -132,8 +132,6 @@ pub fn nest_nodes(nodes: Vec<ObjectNode>) -> ObjectNode {
 
         match children_marker_node {
             Some(children_marker_node) => {
-                node_window[1].detach();
-
                 // Add children to parent of children marker (a marker is always a child of a group)
                 let children_marker_parent = children_marker_node
                     .parent()
