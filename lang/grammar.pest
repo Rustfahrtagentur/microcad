@@ -364,6 +364,8 @@ assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expressio
 
 assignment_statement = _{ assignment ~ ws* ~ ";" }
 
+//`@children`: ok
+node_marker = { "@" ~ identifier }
 
 //`{ a() }`: ok # Single expression
 //`{ a() b(); c(); }: ok # Nested multiexpression
@@ -375,6 +377,7 @@ node_body_inner = _{
 }
 
 node_body_statement = { 
+  node_marker |
   use_statement | 
   assignment_statement | 
   expression_statement |

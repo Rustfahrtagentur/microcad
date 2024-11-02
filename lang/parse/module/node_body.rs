@@ -5,20 +5,76 @@
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
+/// Node marker, e.g. `@children`
+#[derive(Clone, Debug)]
+pub struct NodeMarker {
+    /// Marker name, e.g. `children`
+    pub name: Identifier,
+    /// Source code reference
+    pub src_ref: SrcRef,
+}
+
+impl NodeMarker {
+    /// Returns true if the marker is a children marker
+    pub fn is_children_marker(&self) -> bool {
+        &self.name == "children"
+    }
+}
+
+impl SrcReferrer for NodeMarker {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        self.src_ref.clone()
+    }
+}
+
+impl Parse for NodeMarker {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rule(&pair, Rule::node_marker);
+        Ok(Self {
+            name: Identifier::parse(pair.inner().next().unwrap())?,
+            src_ref: pair.src_ref(),
+        })
+    }
+}
+
+impl Eval for NodeMarker {
+    type Output = Option<crate::ObjectNode>;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+        match self.name.to_string().as_str() {
+            "children" => Ok(Some(crate::objecttree::group())),
+            name => {
+                use crate::diag::PushDiag;
+                context.error(self, anyhow::anyhow!("Invalid node marker: {name}"))?;
+                Ok(None)
+            }
+        }
+    }
+}
+
+impl std::fmt::Display for NodeMarker {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "@{}", self.name)
+    }
+}
+
 /// Module initialization statement
 #[derive(Clone, Debug)]
 pub enum NodeBodyStatement {
-    /// Use statement
+    /// Node marker, e.g. @children
+    NodeMarker(NodeMarker),
+    /// Use statement, e.g. `use std::math::sin`
     Use(UseStatement),
-    /// Expresson
+    /// Expression, e.g. `a + b`
     Expression(Expression),
-    /// Assignment
+    /// Assignment, e.g. `a = 1`
     Assignment(Assignment),
 }
 
 impl SrcReferrer for NodeBodyStatement {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         match self {
+            Self::NodeMarker(marker) => marker.src_ref(),
             Self::Use(us) => us.src_ref(),
             Self::Expression(expression) => expression.src_ref(),
             Self::Assignment(assignment) => assignment.src_ref(),
@@ -43,6 +99,7 @@ impl Eval for NodeBodyStatement {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         match self {
+            Self::NodeMarker(marker) => Ok(marker.eval(context)?.map(Value::Node)),
             Self::Use(use_statement) => {
                 use_statement.eval(context)?;
                 Ok(None)
@@ -59,6 +116,7 @@ impl Eval for NodeBodyStatement {
 impl std::fmt::Display for NodeBodyStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::NodeMarker(marker) => write!(f, "{marker}"),
             Self::Assignment(assignment) => write!(f, "{assignment}"),
             Self::Expression(expression) => write!(f, "{expression}"),
             Self::Use(use_statement) => write!(f, "{use_statement}"),
