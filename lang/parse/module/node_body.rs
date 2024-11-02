@@ -176,21 +176,11 @@ impl Eval for NodeBody {
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let mut group = crate::objecttree::group();
-        let mut children_marker = None;
 
         for statement in &self.statements {
             match statement {
                 NodeBodyStatement::Assignment(assignment) => {
                     group.add(assignment.eval(context)?);
-                }
-                NodeBodyStatement::NodeMarker(marker) => {
-                    if let Some(ref node) = marker.eval(context)? {
-                        if let ObjectNodeInner::ChildrenNodeMarker = *node.borrow() {
-                            children_marker = Some(node.clone());
-                        }
-
-                        group.append(node.clone());
-                    }
                 }
                 statement => {
                     if let Some(Value::Node(node)) = statement.eval(context)? {
@@ -200,10 +190,7 @@ impl Eval for NodeBody {
             }
         }
 
-        match children_marker {
-            Some(children_marker) => Ok(children_marker),
-            None => Ok(group),
-        }
+        Ok(group)
     }
 }
 

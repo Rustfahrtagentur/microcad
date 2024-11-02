@@ -118,7 +118,20 @@ impl Depth for ObjectNode {
 /// Node `a` will be returned.
 pub fn nest_nodes(nodes: Vec<ObjectNode>) -> ObjectNode {
     for node_window in nodes.windows(2) {
-        node_window[0].append(node_window[1].clone());
+        // Find children node marker in children
+        let children_marker_node = node_window[0]
+            .descendants()
+            .find(|n| matches!(*n.borrow(), ObjectNodeInner::ChildrenNodeMarker));
+
+        match children_marker_node {
+            Some(children_marker_node) => {
+                node_window[1].detach();
+                children_marker_node.append(node_window[1].clone());
+            }
+            None => {
+                node_window[0].append(node_window[1].clone());
+            }
+        }
     }
 
     nodes[0].clone()

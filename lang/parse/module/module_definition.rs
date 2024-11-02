@@ -31,10 +31,9 @@ impl CallTrait for ModuleDefinition {
     fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
         let stack_frame = StackFrame::ModuleCall(context.top().symbol_table().clone(), None);
 
-        let mut children_node = None;
+        let mut node = crate::objecttree::group();
 
         context.scope(stack_frame, |context| {
-            let mut node = crate::objecttree::group();
             context.set_current_node(node.clone());
 
             // Let's evaluate the pre-init statements first
@@ -92,21 +91,10 @@ impl CallTrait for ModuleDefinition {
                 statement.eval(context)?;
             }
 
-            // Find the children node marker
-            node.descendants().for_each(|child| {
-                if let crate::ObjectNodeInner::ChildrenNodeMarker = *child.borrow() {
-                    children_node = Some(child.clone());
-                }
-            });
-
-            if children_node.is_none() {
-                children_node = Some(node);
-            }
-
             Ok(())
         })?;
 
-        Ok(Some(Value::Node(children_node.unwrap())))
+        Ok(Some(Value::Node(node)))
     }
 }
 
