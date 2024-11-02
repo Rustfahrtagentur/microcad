@@ -76,6 +76,28 @@ impl Geometry {
         Some(Geometry::MultiPolygon(result))
     }
 
+    /// Apply boolean operation to multiple geometries
+    pub fn boolean_op_multi(
+        geometries: Vec<std::rc::Rc<Self>>,
+        op: &crate::BooleanOp,
+    ) -> Option<std::rc::Rc<Self>> {
+        if geometries.is_empty() {
+            return None;
+        }
+
+        Some(
+            geometries[1..]
+                .iter()
+                .fold(geometries[0].clone(), |acc, geo| {
+                    if let Some(r) = acc.boolean_op(geo.as_ref(), op) {
+                        std::rc::Rc::new(r)
+                    } else {
+                        acc
+                    }
+                }),
+        )
+    }
+
     fn line_string_vertices(l: &LineString) -> Vec<crate::Vec2> {
         l.coords()
             .map(|c| crate::Vec2::new(c.x, c.y))
@@ -105,6 +127,27 @@ impl Geometry {
             ],
         }
     }
+
+    /// Return a new geometry with the given transform
+    pub fn transform(&self, mat: crate::Mat3) -> Self {
+        // Extract matrix components
+        let a = mat.x.x;
+        let b = mat.x.y;
+        let e = mat.x.z;
+        let c = mat.y.x;
+        let d = mat.y.y;
+        let f = mat.y.z;
+        use geo::AffineOps;
+        let transform = geo::AffineTransform::new(a, b, c, d, e, f);
+
+        match &self {
+            Self::LineString(l) => Self::LineString(l.affine_transform(&transform)),
+            Self::MultiLineString(ml) => Self::MultiLineString(ml.affine_transform(&transform)),
+            Self::Polygon(p) => Self::Polygon(p.affine_transform(&transform)),
+            Self::MultiPolygon(mp) => Self::MultiPolygon(mp.affine_transform(&transform)),
+            Self::Rect(r) => Self::Rect(r.affine_transform(&transform)),
+        }
+    }
 }
 
 /// Shortcut to create a MultiPolygon
@@ -115,6 +158,11 @@ pub fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
 /// Create a new geometry node
 pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
     Node::new(NodeInner::Geometry(geometry))
+}
+
+/// Create a new group node
+pub fn group() -> Node {
+    Node::new(NodeInner::Group)
 }
 
 /// Create a new transform node

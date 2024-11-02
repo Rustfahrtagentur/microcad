@@ -11,7 +11,7 @@ pub use microcad_core::BooleanOp;
 /// Algorithm trait
 pub trait Algorithm: std::fmt::Debug {
     /// Calculates the 2D geometry for node
-    fn process_geometry2d(
+    fn render_into_geometry2d(
         &self,
         renderer: &mut Renderer2D,
         parent: ObjectNode,
@@ -59,30 +59,25 @@ impl Algorithm for BooleanOp {
             .children()
             .filter_map(|child| match &*child.borrow() {
                 ObjectNodeInner::Group(_) => {
-                    BooleanOp::Union.process_geometry2d(renderer, child.clone())
+                    BooleanOp::Union.render_into_geometry2d(renderer, child.clone())
                 }
                 ObjectNodeInner::Primitive2D(renderable) => {
                     renderable.request_geometry(renderer).ok()
                 }
                 ObjectNodeInner::Transform(transform) => {
-                    transform.process_geometry2d(renderer, child.clone())
+                    transform.render_into_geometry2d(renderer, child.clone())
                 }
                 ObjectNodeInner::Algorithm(algorithm) => {
-                    algorithm.process_geometry2d(renderer, child.clone())
+                    algorithm.render_into_geometry2d(renderer, child.clone())
                 }
                 _ => None,
             })
             .collect();
-        Ok(geo2d::geometry(geometries[1..].iter().fold(
-            geometries[0].clone(),
-            |acc, geo| {
-                if let Some(r) = acc.boolean_op(geo.as_ref(), self) {
-                    std::rc::Rc::new(r)
-                } else {
-                    acc
-                }
-            },
-        )))
+
+        match geo2d::Geometry::boolean_op_multi(geometries, self) {
+            Some(g) => Ok(geo2d::geometry(g)),
+            None => Ok(geo2d::group()),
+        }
     }
 
     fn process_3d(&self, renderer: &mut Renderer3D, parent: ObjectNode) -> Result<geo3d::Node> {
