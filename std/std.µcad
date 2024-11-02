@@ -79,11 +79,17 @@ namespace geo3d {
 
         init(size_x: length, size_y: length, size_z: length) { }
 
-        __builtin::geo3d::cube(
+        __builtin::transform::translate(
+                -size_x / 2.0 / 1mm,
+                -size_y / 2.0 / 1mm,
+                -size_z / 2.0 / 1mm
+        ) {
+            __builtin::geo3d::cube(
                 size_x / 1mm,
                 size_y / 1mm,
                 size_z / 1mm
-        );
+            );
+        }
     }
 }
 
