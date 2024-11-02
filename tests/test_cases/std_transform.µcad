@@ -1,0 +1,26 @@
+use std::*;
+
+
+export("{OUTPUT_FILE}_translate_nested.svg") translate(y = 10.0mm) geo2d::rect(size = 10.0mm);
+
+// A group with two rectangles
+export("{OUTPUT_FILE}_translate.svg") translate(y = 10.0mm) {
+    translate(x = 5.0mm) {
+        geo2d::rect(size = 10.0mm);
+    }
+
+    translate(y = 5.0mm) {
+        geo2d::rect(size = 10.0mm);
+    }
+}
+
+// Calculate the difference between two translated rectangles
+export("{OUTPUT_FILE}_translate_difference.svg") translate(y = 10.0mm) algorithm::difference() {
+    translate(x = 5.0mm) {
+        geo2d::rect(size = 10.0mm);
+    }
+
+    translate(y = 5.0mm) {
+        geo2d::rect(size = 10.0mm);
+    }
+}
