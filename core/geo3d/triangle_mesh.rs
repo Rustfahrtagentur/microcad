@@ -70,6 +70,34 @@ impl TriangleMesh {
     pub fn to_manifold(&self) -> Manifold {
         Manifold::from_mesh(self.into())
     }
+
+    /// Transform the mesh
+    ///
+    /// # Arguments
+    /// - `transform`: Transformation matrix
+    ///
+    /// # Returns
+    /// Transformed mesh
+    pub fn transform(&self, transform: crate::Mat4) -> Self {
+        let rot_mat = crate::Mat3::from_cols(
+            transform.x.truncate(),
+            transform.y.truncate(),
+            transform.z.truncate(),
+        );
+        let vertices = self
+            .vertices
+            .iter()
+            .map(|v| Vertex {
+                pos: (transform * v.pos.extend(1.0)).truncate(),
+                normal: rot_mat * v.normal,
+            })
+            .collect();
+
+        TriangleMesh {
+            vertices,
+            triangle_indices: self.triangle_indices.clone(),
+        }
+    }
 }
 
 impl From<Mesh> for TriangleMesh {
@@ -114,4 +142,34 @@ impl From<Manifold> for TriangleMesh {
     fn from(manifold: Manifold) -> Self {
         TriangleMesh::from(manifold.to_mesh())
     }
+}
+
+#[test]
+fn test_triangle_mesh_transform() {
+    let mesh = TriangleMesh {
+        vertices: vec![
+            Vertex {
+                pos: Vec3::new(0.0, 0.0, 0.0),
+                normal: Vec3::new(0.0, 0.0, 1.0),
+            },
+            Vertex {
+                pos: Vec3::new(1.0, 0.0, 0.0),
+                normal: Vec3::new(0.0, 0.0, 1.0),
+            },
+            Vertex {
+                pos: Vec3::new(0.0, 1.0, 0.0),
+                normal: Vec3::new(0.0, 0.0, 1.0),
+            },
+        ],
+        triangle_indices: vec![Triangle(0, 1, 2)],
+    };
+
+    let mesh = mesh.transform(crate::Mat4::from_translation(Vec3::new(1.0, 2.0, 3.0)));
+
+    assert_eq!(mesh.vertices[0].pos, Vec3::new(1.0, 2.0, 3.0));
+    assert_eq!(mesh.vertices[0].normal, Vec3::new(0.0, 0.0, 1.0));
+    assert_eq!(mesh.vertices[1].pos, Vec3::new(2.0, 2.0, 3.0));
+    assert_eq!(mesh.vertices[1].normal, Vec3::new(0.0, 0.0, 1.0));
+    assert_eq!(mesh.vertices[2].pos, Vec3::new(1.0, 3.0, 3.0));
+    assert_eq!(mesh.vertices[2].normal, Vec3::new(0.0, 0.0, 1.0));
 }
