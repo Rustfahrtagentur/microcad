@@ -99,6 +99,11 @@ pub fn group() -> ObjectNode {
     ObjectNode::new(ObjectNodeInner::Group(SymbolTable::default()))
 }
 
+/// Create a new transform node
+pub fn transform(transform: Transform) -> ObjectNode {
+    ObjectNode::new(ObjectNodeInner::Transform(transform))
+}
+
 /// Trait to calculate depth for a node
 pub trait Depth {
     /// Calculate depth
@@ -186,6 +191,7 @@ pub fn bake2d(
                     crate::objecttree::into_group(node.clone()).unwrap(),
                 )
             }
+            ObjectNodeInner::Transform(ref transform) => return Ok(transform.into()),
             _ => return Err(CoreError::NotImplemented),
         }
     };
@@ -222,6 +228,7 @@ pub fn bake3d(
                     crate::objecttree::into_group(node.clone()).unwrap(),
                 )
             }
+            ObjectNodeInner::Transform(ref transform) => return Ok(transform.into()),
             _ => return Err(CoreError::NotImplemented),
         }
     };
