@@ -33,6 +33,13 @@ namespace geo2d {
             x = -width / 2.0; // center x
             y = -height / 2.0; // center y
         }
+
+        init(size: length) {
+            width = size;
+            height = size;
+            x = -size / 2.0; // center x
+            y = -size / 2.0; // center y
+        }
         
         __builtin::geo2d::rect(
                 width / 1mm,
