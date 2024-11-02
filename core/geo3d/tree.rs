@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! 3D Geometry Tree
- 
-use strum::IntoStaticStr;
+
 use super::Geometry;
+use strum::IntoStaticStr;
 
 /// Inner of a node
 #[derive(IntoStaticStr)]

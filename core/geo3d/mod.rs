@@ -3,18 +3,18 @@
 
 //! 3D Geometry
 
-mod triangle_mesh;
-pub mod tree;
 mod render;
+pub mod tree;
+mod triangle_mesh;
 
 pub use manifold_rs::Manifold;
 pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 
-pub use tree::{Node, NodeInner};
 pub use render::*;
+pub use tree::{Node, NodeInner};
 
-use strum::IntoStaticStr;
 use crate::BooleanOp;
+use strum::IntoStaticStr;
 
 /// 3D Geometry
 #[derive(IntoStaticStr)]
@@ -64,6 +64,39 @@ impl Geometry {
             (Geometry::Manifold(a), Geometry::Mesh(b)) => {
                 let result = a.boolean_op(&b.to_manifold(), op);
                 Some(Geometry::Manifold(result))
+            }
+        }
+    }
+
+    /// Execute multiple boolean operations
+    pub fn boolean_op_multi(
+        geometries: Vec<std::rc::Rc<Self>>,
+        op: &BooleanOp,
+    ) -> Option<std::rc::Rc<Self>> {
+        if geometries.is_empty() {
+            return None;
+        }
+
+        Some(
+            geometries[1..]
+                .iter()
+                .fold(geometries[0].clone(), |acc, geo| {
+                    if let Some(r) = acc.boolean_op(geo.as_ref(), op) {
+                        std::rc::Rc::new(r)
+                    } else {
+                        acc
+                    }
+                }),
+        )
+    }
+
+    /// Transform mesh geometry
+    pub fn transform(&self, transform: crate::Mat4) -> Self {
+        match self {
+            Geometry::Mesh(mesh) => Geometry::Mesh(mesh.transform(transform)),
+            Geometry::Manifold(manifold) => {
+                // TODO: Implement transform for manifold instead of converting to mesh
+                Geometry::Mesh(TriangleMesh::from(manifold.to_mesh()).transform(transform))
             }
         }
     }

@@ -79,15 +79,37 @@ impl Algorithm for Transform {
 
         match geo2d::Geometry::boolean_op_multi(geometries, &BooleanOp::Union) {
             // If there are geometries, return the union of them and apply the transform
-            Some(g) => Ok(geo2d::geometry(std::rc::Rc::new(
-                g.as_ref().transform(self.mat2d()),
-            ))),
+            Some(g) => Ok(geo2d::geometry(std::rc::Rc::new(g.transform(self.mat2d())))),
             // If there are no geometries, return an empty group
             None => Ok(geo2d::group()),
         }
     }
 
-    fn process_3d(&self, _renderer: &mut Renderer3D, _parent: ObjectNode) -> Result<geo3d::Node> {
-        Ok(self.into())
+    fn process_3d(&self, renderer: &mut Renderer3D, parent: ObjectNode) -> Result<geo3d::Node> {
+        let geometries: Vec<_> = parent
+            .children()
+            .filter_map(|child| match &*child.borrow() {
+                ObjectNodeInner::Group(_) => {
+                    BooleanOp::Union.render_into_geometry3d(renderer, child.clone())
+                }
+                ObjectNodeInner::Primitive3D(renderable) => {
+                    renderable.request_geometry(renderer).ok()
+                }
+                ObjectNodeInner::Transform(transform) => {
+                    transform.render_into_geometry3d(renderer, child.clone())
+                }
+                ObjectNodeInner::Algorithm(algorithm) => {
+                    algorithm.render_into_geometry3d(renderer, child.clone())
+                }
+                _ => None,
+            })
+            .collect();
+
+        match geo3d::Geometry::boolean_op_multi(geometries, &BooleanOp::Union) {
+            // If there are geometries, return the union of them and apply the transform
+            Some(g) => Ok(geo3d::geometry(std::rc::Rc::new(g.transform(self.mat3d())))),
+            // If there are no geometries, return an empty group
+            None => Ok(geo3d::group()),
+        }
     }
 }
