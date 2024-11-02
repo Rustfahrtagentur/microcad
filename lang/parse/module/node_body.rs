@@ -89,7 +89,9 @@ impl Parse for NodeBodyStatement {
         let first = pair.inner().next().unwrap();
         Ok(match first.as_rule() {
             Rule::use_statement => NodeBodyStatement::Use(UseStatement::parse(first)?),
-            Rule::expression => NodeBodyStatement::Expression(Expression::parse(first)?),
+            Rule::expression | Rule::expression_no_semicolon => {
+                NodeBodyStatement::Expression(Expression::parse(first)?)
+            }
             Rule::assignment => NodeBodyStatement::Assignment(Assignment::parse(first)?),
             Rule::node_marker => NodeBodyStatement::NodeMarker(NodeMarker::parse(first)?),
             rule => unreachable!("{rule:?}"),
