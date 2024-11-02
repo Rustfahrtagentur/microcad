@@ -10,7 +10,6 @@ pub mod error;
 pub mod geo2d;
 #[cfg(feature = "geo3d")]
 pub mod geo3d;
-pub mod transform;
 
 /// Primitive integer type
 pub type Integer = i64;
@@ -35,7 +34,6 @@ pub type Id = compact_str::CompactString;
 
 pub use boolean_op::BooleanOp;
 pub use error::CoreError;
-pub use transform::Transform;
 
 /// Core result type
 pub type Result<T> = std::result::Result<T, CoreError>;

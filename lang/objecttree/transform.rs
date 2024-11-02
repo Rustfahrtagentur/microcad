@@ -1,7 +1,9 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use super::Algorithm;
 use crate::*;
+use microcad_core::*;
 use strum::IntoStaticStr;
 
 /// Transformation matrix
@@ -83,14 +85,14 @@ impl Transform {
     }
 }
 
-impl From<&Transform> for crate::geo2d::Node {
+impl From<&Transform> for microcad_core::geo2d::Node {
     fn from(transform: &Transform) -> Self {
-        crate::geo2d::tree::transform(transform.mat2d())
+        microcad_core::geo2d::tree::transform(transform.mat2d())
     }
 }
 
-impl From<&Transform> for crate::geo3d::Node {
+impl From<&Transform> for microcad_core::geo3d::Node {
     fn from(transform: &Transform) -> Self {
-        crate::geo3d::tree::transform(transform.mat3d())
+        microcad_core::geo3d::tree::transform(transform.mat3d())
     }
 }
