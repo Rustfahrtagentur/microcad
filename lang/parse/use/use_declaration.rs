@@ -55,15 +55,15 @@ impl Parse for UseDeclaration {
         let first = inner.next().unwrap();
 
         match first.as_rule() {
+            Rule::qualified_name => {
+                Ok(Self::Use(QualifiedName::parse(first)?, pair.clone().into()))
+            }
             Rule::use_all => {
                 let inner = first.inner().next().unwrap();
                 Ok(Self::UseAll(
                     QualifiedName::parse(inner)?,
                     first.clone().into(),
                 ))
-            }
-            Rule::qualified_name => {
-                Ok(Self::Use(QualifiedName::parse(first)?, pair.clone().into()))
             }
             Rule::use_alias => {
                 let mut inner = first.inner();
