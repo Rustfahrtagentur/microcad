@@ -90,3 +90,4 @@ pub use __builtin::math; // Use the math module from the builtin library
 
 pub use __builtin::export;
 pub use __builtin::assert;
+pub use __builtin::print;
