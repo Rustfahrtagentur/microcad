@@ -6,17 +6,22 @@ use crate::{diag::*, objecttree::*, parse::*, source_file_cache::*};
 
 use microcad_core::Id;
 
+/// Stack frame in the context
+///
+/// It is used to store the current state of the evaluation.
+/// A stack frame defines which kind of symbol we are currently evaluating.
 #[derive(Debug, Clone)]
 pub enum StackFrame {
     /// Initial state
     Namespace(SymbolTable),
-    /// In a module definition
+    /// Currently evaluating a module definition
     ModuleCall(SymbolTable, Option<ObjectNode>),
-    /// In a function definition
+    /// Currently evaluating a function definition
     FunctionCall(SymbolTable),
 }
 
 impl StackFrame {
+    /// Get the symbol table of the stack frame
     pub fn symbol_table(&self) -> &SymbolTable {
         match self {
             Self::Namespace(table) => table,
