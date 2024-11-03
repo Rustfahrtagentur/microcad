@@ -86,8 +86,18 @@ impl CallTrait for ModuleDefinition {
 
             // Evaluate the post-init statements
             for statement in &self.body.post_init_statements {
-                if let Some(Value::Node(new_child)) = statement.eval(context)? {
-                    node.append(new_child);
+                match statement {
+                    ModuleDefinitionStatement::Assignment(assignment) => {
+                        // Evaluate the assignment and add the symbol to the node
+                        // E.g. `a = 1` will add the symbol `a` to the node
+                        let symbol = assignment.eval(context)?;
+                        node.add(symbol);
+                    }
+                    statement => {
+                        if let Some(Value::Node(new_child)) = statement.eval(context)? {
+                            node.append(new_child);
+                        }
+                    }
                 }
             }
 
