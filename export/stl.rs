@@ -6,7 +6,10 @@
 use std::path::PathBuf;
 
 use crate::*;
-use microcad_core::{geo3d::{Triangle, Vertex}, Scalar};
+use microcad_core::{
+    geo3d::{Triangle, Vertex},
+    Scalar,
+};
 use microcad_lang::objecttree;
 use objecttree::ObjectNode;
 
@@ -24,7 +27,7 @@ impl<'a> StlWriter<'a> {
     }
 
     /// Write triangle
-    pub fn write_triangle(&mut self, tri: &Triangle<Vertex>) -> std::io::Result<()> {
+    pub fn write_triangle(&mut self, tri: &Triangle<&Vertex>) -> std::io::Result<()> {
         let n = tri.normal();
         writeln!(&mut self.writer, "facet normal {} {} {}", n.x, n.y, n.z)?;
         writeln!(&mut self.writer, "\touter loop")?;
@@ -90,9 +93,8 @@ impl Exporter for StlExporter {
 
         renderer
             .triangle_mesh
-            .fetch_triangles()
-            .iter()
-            .try_for_each(|triangle| writer.write_triangle(triangle))?;
+            .triangles()
+            .try_for_each(|triangle| writer.write_triangle(&triangle))?;
 
         Ok(())
     }
