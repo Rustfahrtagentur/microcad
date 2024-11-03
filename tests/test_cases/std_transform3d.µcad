@@ -15,11 +15,17 @@ export("{OUTPUT_FILE}_translate_difference.stl") {
 
 // Calculate the difference between two translated cylinders
 export("{OUTPUT_FILE}_translate_cylinder_difference.stl") {
-    thickness = 1.0mm;
-    use geo3d::cylinder;
+    thickness = 1.6mm;
+    inner_diameter = 16.0cm;
+    two = 2.0;
+    outer_diameter = thickness * two + inner_diameter; // 2.0 * thickness + inner_diameter does not work
+    height = 20.0mm;
+    print("{thickness} {inner_diameter} {outer_diameter} {height}");
 
-    algorithm::difference() {
-        cylinder(d = 15.0cm, height = 20.0mm, bottom = 0.0mm);
-        translate(z = thickness) cylinder(d = 15.0cm - thickness*2.0, height = 20.0mm, bottom = thickness);
-    }
+    use geo3d::cylinder;
+    outer = cylinder(d = outer_diameter, h = height);
+    inner = translate(z = thickness) cylinder(d = inner_diameter, h = height);
+ 
+ 
+    outer - inner;
 }
