@@ -1,6 +1,8 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Builtin transformations
+
 use super::Algorithm;
 use crate::*;
 use microcad_core::*;
@@ -25,10 +27,9 @@ impl Transform {
     pub fn mat2d(&self) -> Mat3 {
         match self {
             Transform::Translation(v) => Mat3::from_translation(Vec2::new(v.x, v.y)),
-            Transform::Rotation(a, v) => Mat3::from_angle_z(*a),
+            Transform::Rotation(a, _) => Mat3::from_angle_z(*a),
             Transform::Scale(v) => Mat3::from_nonuniform_scale(v.x, v.y),
             Transform::UniformScale(s) => Mat3::from_scale(*s),
-            _ => panic!("Not a 2D transform"),
         }
     }
 
@@ -39,7 +40,6 @@ impl Transform {
             Transform::Rotation(a, v) => Mat3::from_axis_angle(*v, *a).into(),
             Transform::Scale(v) => Mat4::from_nonuniform_scale(v.x, v.y, v.z),
             Transform::UniformScale(s) => Mat4::from_scale(*s),
-            _ => panic!("Not a 3D transform"),
         }
     }
 }

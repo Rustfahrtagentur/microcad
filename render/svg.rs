@@ -50,6 +50,7 @@ impl SvgWriter {
         )
     }
 
+    /// Begin a SVG transformation <g>
     pub fn begin_transform(&mut self, transform: &microcad_core::Mat3) -> std::io::Result<()> {
         let (a, b, c, d, e, f) = (
             transform.x.x,
@@ -65,6 +66,7 @@ impl SvgWriter {
         )
     }
 
+    /// End a SVG transformation </g>
     pub fn end_transform(&mut self) -> std::io::Result<()> {
         writeln!(self.writer, "</g>")
     }

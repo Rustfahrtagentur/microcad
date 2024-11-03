@@ -3,7 +3,7 @@
 
 //! Node body parser entity
 
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*, ObjectNodeInner};
+use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Node marker, e.g. `@children`
 #[derive(Clone, Debug)]
