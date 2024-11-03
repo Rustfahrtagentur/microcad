@@ -156,3 +156,12 @@ fn test_boolean_op_multi() {
         panic!("Expected manifold");
     }
 }
+
+#[test]
+fn test_mesh_volume() {
+    let manifold = Manifold::sphere(1.0, 512);
+    let mesh = TriangleMesh::from(manifold.to_mesh());
+
+    let volume = mesh.volume();
+    assert!((volume - 4.0 / 3.0 * std::f64::consts::PI).abs() < 1e-3);
+}
