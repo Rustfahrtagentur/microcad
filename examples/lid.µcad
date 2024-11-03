@@ -17,8 +17,8 @@ module lid(
 
 l = lid();
 
-print("{l.outer_diameter}");
+print("Volume: {l.volume() / 1000.0}cm³");
 
-export("lid.stl") lid();
+export("lid.stl") l;
 
 
