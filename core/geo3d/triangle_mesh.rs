@@ -24,6 +24,29 @@ impl Triangle<Vertex> {
     }
 }
 
+impl Triangle<&Vertex> {
+    /// Get normal of triangle
+    pub fn normal(&self) -> Vec3 {
+        (self.2.pos - self.0.pos).cross(self.1.pos - self.0.pos)
+    }
+
+    /// Get signed volume of triangle
+
+    /// Get signed volume of triangle
+    ///
+    /// https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up
+    pub fn signed_volume(&self) -> f64 {
+        let v210 = self.2.pos.x * self.1.pos.y * self.0.pos.z;
+        let v120 = self.1.pos.x * self.2.pos.y * self.0.pos.z;
+        let v201 = self.2.pos.x * self.0.pos.y * self.1.pos.z;
+        let v021 = self.0.pos.x * self.2.pos.y * self.1.pos.z;
+        let v102 = self.1.pos.x * self.0.pos.y * self.2.pos.z;
+        let v012 = self.0.pos.x * self.1.pos.y * self.2.pos.z;
+
+        (1.0 / 6.0) * (-v210 + v120 + v201 - v021 - v102 + v012)
+    }
+}
+
 /// Triangle mesh
 #[derive(Default, Clone)]
 pub struct TriangleMesh {
@@ -31,6 +54,29 @@ pub struct TriangleMesh {
     pub vertices: Vec<Vertex>,
     /// Triangle indicies
     pub triangle_indices: Vec<Triangle<u32>>,
+}
+
+pub struct Triangles<'a> {
+    triangle_mesh: &'a TriangleMesh,
+    index: usize,
+}
+
+impl<'a> Iterator for Triangles<'a> {
+    type Item = Triangle<&'a Vertex>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.triangle_mesh.triangle_indices.len() {
+            let t = self.triangle_mesh.triangle_indices[self.index];
+            self.index += 1;
+            Some(Triangle(
+                &self.triangle_mesh.vertices[t.0 as usize],
+                &self.triangle_mesh.vertices[t.1 as usize],
+                &self.triangle_mesh.vertices[t.2 as usize],
+            ))
+        } else {
+            None
+        }
+    }
 }
 
 impl TriangleMesh {
@@ -64,6 +110,14 @@ impl TriangleMesh {
                 .iter()
                 .map(|t| Triangle(t.0 + offset, t.1 + offset, t.2 + offset)),
         )
+    }
+
+    /// Triangles iterator
+    pub fn triangles(&self) -> Triangles {
+        Triangles {
+            triangle_mesh: self,
+            index: 0,
+        }
     }
 
     /// convert into manifold
@@ -121,6 +175,14 @@ impl TriangleMesh {
             vertices,
             triangle_indices: self.triangle_indices.clone(),
         }
+    }
+
+    /// Calculate volume of mesh
+    pub fn volume(&self) -> f64 {
+        self.triangles()
+            .map(|t| t.signed_volume())
+            .sum::<f64>()
+            .abs()
     }
 }
 
