@@ -131,7 +131,7 @@ impl SrcRef {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => {
                 let source_file_hash = {
                     if lhs.source_file_hash != rhs.source_file_hash {
-                        0
+                        todo!("Implement SrcRef with different files")
                     } else {
                         lhs.source_file_hash
                     }

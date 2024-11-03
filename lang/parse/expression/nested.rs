@@ -42,22 +42,38 @@ impl Eval for Nested {
                         values.push(value);
                     }
                     None => {
-                        if index != 0 {
-                            return Err(EvalError::CannotNestFunctionCall);
-                        } else {
-                            return Ok(Value::Scalar(Refer::new(0.0, call.src_ref())));
-                            // TODO: This is a hack. Return a Option::None here
+                        use crate::diag::PushDiag;
+                        if index > 0 {
+                            context
+                                .error(self, anyhow::anyhow!("Cannot nest function call {item}"))?;
                         }
+                        return Ok(Value::Invalid);
                     }
                 },
                 NestedItem::QualifiedName(qualified_name) => {
-                    let symbols = qualified_name.eval(context)?;
+                    let symbol = qualified_name.eval(context)?;
+                    match symbol {
+                        Symbol::Value(_, ref v) => {
+                            match v {
+                                Value::Node(node) => {
+                                    values.push(Value::Node(node.make_deep_copy()));
+                                }
+                                _ => {
+                                    values.push(v.clone_with_src_ref(qualified_name.src_ref()));
+                                }
+                            }
 
-                    for symbol in symbols {
-                        if let Symbol::Value(_, v) = symbol {
-                            values.push(v.clone_with_src_ref(qualified_name.src_ref())); // Find first value only. @todo Back propagation of values
                             break;
                         }
+                        Symbol::Invalid => {
+                            use crate::diag::PushDiag;
+                            context.error(
+                                self,
+                                anyhow::anyhow!("Symbol not found: {}", qualified_name),
+                            )?;
+                            return Ok(Value::Invalid);
+                        }
+                        _ => {}
                     }
                 }
                 NestedItem::NodeBody(body) => {

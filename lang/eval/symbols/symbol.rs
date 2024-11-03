@@ -3,8 +3,11 @@ use crate::{eval::*, parse::*};
 /// A symbol is a named entity that is used in the
 /// symbol table and in the evaluation context to
 /// represent a value, a function, a module, etc.
-#[derive(Clone, Debug, strum::IntoStaticStr)]
+#[derive(Clone, Debug, Default, strum::IntoStaticStr)]
 pub enum Symbol {
+    /// An invalid symbol (an error occurred)
+    #[default]
+    Invalid,
     /// A value symbol, e.g. a result of an assignment
     Value(Id, Value),
     /// A function symbol, e.g. function a() {}
@@ -17,6 +20,20 @@ pub enum Symbol {
     BuiltinFunction(BuiltinFunction),
     /// A builtin module symbol, e.g. math::pi
     BuiltinModule(BuiltinModule),
+}
+
+impl std::fmt::Display for Symbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Invalid => write!(f, "Invalid"),
+            Self::Value(id, value) => write!(f, "{} = {}", id, value),
+            Self::Function(function) => write!(f, "function `{}`", function.name),
+            Self::Module(module) => write!(f, "module `{}`", module.name),
+            Self::Namespace(namespace) => write!(f, "namespace `{}`", namespace.name),
+            Self::BuiltinFunction(function) => write!(f, "{:?}", function),
+            Self::BuiltinModule(module) => write!(f, "{:?}", module),
+        }
+    }
 }
 
 impl From<std::rc::Rc<FunctionDefinition>> for Symbol {
@@ -52,6 +69,7 @@ impl From<BuiltinModule> for Symbol {
 impl Sym for Symbol {
     fn id(&self) -> Option<Id> {
         match self {
+            Self::Invalid => None,
             Self::Value(id, _) => Some(id.clone()),
             Self::Function(f) => f.name.id(),
             Self::Module(m) => m.name.id(),

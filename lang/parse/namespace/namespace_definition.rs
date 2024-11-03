@@ -43,6 +43,11 @@ impl Symbols for NamespaceDefinition {
         self
     }
 
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
+        self.body.add_alias(symbol, alias);
+        self
+    }
+
     fn copy<T: Symbols>(&self, into: &mut T) {
         self.body.symbols.iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());
@@ -58,5 +63,39 @@ impl Parse for std::rc::Rc<NamespaceDefinition> {
             body: NamespaceBody::parse(pairs.next().unwrap())?,
             src_ref: pair.clone().into(),
         }))
+    }
+}
+
+impl Eval for std::rc::Rc<NamespaceDefinition> {
+    type Output = Symbol;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+        let mut namespace = self.as_ref().clone();
+        for statement in &self.body.statements {
+            match &statement {
+                &NamespaceStatement::Assignment(a) => {
+                    namespace.add(Symbol::Value(a.name.id().unwrap(), a.value.eval(context)?));
+                }
+                NamespaceStatement::FunctionDefinition(f) => {
+                    namespace.add(f.clone().into());
+                }
+                NamespaceStatement::ModuleDefinition(m) => {
+                    namespace.add(m.clone().into());
+                }
+                NamespaceStatement::NamespaceDefinition(n) => {
+                    let n = n.eval(context)?;
+                    namespace.add(n);
+                }
+                NamespaceStatement::Use(u) => {
+                    if let Some(symbols) = u.eval(context)? {
+                        for (id, symbol) in symbols.iter() {
+                            namespace.add_alias(symbol.as_ref().clone(), id.clone());
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(Symbol::Namespace(std::rc::Rc::new(namespace)))
     }
 }

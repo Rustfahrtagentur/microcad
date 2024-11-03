@@ -18,6 +18,11 @@ namespace manifold_rs
         return std::make_unique<Manifold>(::manifold::Manifold::Cube({x_size, y_size, z_size}));
     }
 
+    std::unique_ptr<Manifold> cylinder(double radius_low, double radius_height, double height, uint32_t circular_segments)
+    {
+        return std::make_unique<Manifold>(::manifold::Manifold::Cylinder(height, radius_low, radius_height, circular_segments));
+    }
+
     std::unique_ptr<Manifold> union_(const Manifold &a, const Manifold &b)
     {
         return std::make_unique<Manifold>(a.manifold->Boolean(*b.manifold, ::manifold::OpType::Add));
@@ -77,6 +82,28 @@ namespace manifold_rs
     std::unique_ptr<Manifold> manifold_from_mesh(const Mesh &mesh)
     {
         return std::make_unique<Manifold>(::manifold::Manifold(*mesh.mesh));
+    }
+
+    std::unique_ptr<Mesh> mesh_from_vertices(
+        rust::Slice<const float> vertices, 
+        rust::Slice<const uint32_t> indices)
+    {
+        assert(vertices.size() % 6 == 0);
+        assert(indices.size() % 3 == 0);
+        ::manifold::Mesh mesh;
+        mesh.vertPos.reserve(vertices.size() / 6);
+        mesh.vertNormal.reserve(vertices.size() / 6);
+        for (size_t i = 0; i < vertices.size(); i += 6)
+        {
+            mesh.vertPos.push_back({vertices[i], vertices[i + 1], vertices[i + 2]});
+            mesh.vertNormal.push_back({vertices[i + 3], vertices[i + 4], vertices[i + 5]});
+        }
+        mesh.triVerts.reserve(indices.size() / 3);
+        for (size_t i = 0; i < indices.size(); i += 3)
+        {
+            mesh.triVerts.push_back({indices[i], indices[i + 1], indices[i + 2]});
+        }
+        return std::make_unique<Mesh>(std::move(mesh));
     }
 
 } // namespace manifold_rs

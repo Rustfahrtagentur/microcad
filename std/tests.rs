@@ -33,14 +33,14 @@ fn test_assert() {
 
     let source_file = match SourceFile::load_from_str(
         r#"
-            std::assert(std::math::abs(-1.0) == 1.0);
+            __builtin::assert(__builtin::math::abs(-1.0) == 1.0);
         "#,
     ) {
         Ok(source_file) => source_file,
         Err(err) => panic!("ERROR: {err}"),
     };
 
-    let mut context = ContextBuilder::new(source_file).with_std().build();
+    let mut context = ContextBuilder::new(source_file).with_builtin().build();
 
     match context.eval() {
         Ok(_) => {

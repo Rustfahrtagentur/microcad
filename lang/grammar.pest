@@ -130,8 +130,6 @@ literal = {
 //`a::b ::c`: error # No whitespace between identifiers
 //`a::b::c::`: error # No trailing ::
 qualified_name = { identifier ~ ("::" ~ identifier)* }
-qualified_name_all = { "*" }
-qualified_name_list = { qualified_name ~ ("," ~ ws* ~ qualified_name)* }
 
 //`int`: ok
 //`a::nested::typename`: ok
@@ -190,7 +188,7 @@ list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
 
 // An expression for both named and unnamed tuple
 //`(1.0mm, 2.0mm)`: ok
-//`(1.0mm,)`: error # Trailing comma
+//`(1.0mm,)`: ok # Trailing comma
 //`(x = 1.0mm, y = 2.0mm)`: ok
 tuple_expression = { "(" ~ ws* ~ call_argument_list ~ ws* ~ ")" ~ unit? }
 
@@ -201,20 +199,24 @@ tuple_element_access = { "." ~ (identifier | int) }
 
 element_access = _{ list_element_access | tuple_element_access }
 
+//`pub`: ok
+visibility = { "pub" }
+
 //`use a;`: ok # Import a single module
 //`use ;`: error # Must import at least one module
 //`use foo::bar, bar::foo;`: ok # Import multiple modules
-//`use bar, baz from a;`: ok # Import multiple sub modules from module a 
-//`use * from a;`: ok # Import everything from a and merge into current scope
-//`use * from a, b;`: ok # Import everything from a and b and merge into current scope
-//`use a as b;`: ok # Import as alias
-//`use a as b::a;`: error # Cannot use nested identifiers alias 
-//`use foo::bar, bar::foo as baz;`: error # Alias is not supported for multiple modules
-use_statement = { "use" ~ ws+ ~ qualified_name_list ~ ws* ~ ";" 
-    | "use" ~ ws+ ~ qualified_name_list ~ ws+ ~ "from" ~ ws+ ~ qualified_name ~ ws* ~ ";"
-    | "use" ~ ws+ ~ qualified_name_all ~ ws+ ~ "from" ~ ws+ ~ qualified_name_list ~ ws* ~ ";"
-    | "use" ~ ws+ ~ use_alias ~ ws* ~ ";"
-}
+//`use foo::*;`: ok # Import all modules from foo
+//`use foo::*, bar;`: ok # Import all from foo and bar
+//`use foo as bar;`: ok # Import foo as bar
+//`pub use foo;`: ok # Import and re-export foo
+use_statement = { visibility? ~ ws* ~ "use" ~ ws+ ~ use_declaration ~ ws* ~ ("," ~ ws* ~ use_declaration ~ ws*)* ~ ws* ~ ","? ~ ws* ~ ";" } 
+
+use_declaration = { use_all | use_alias | qualified_name } 
+
+//`std::*`: ok # Import everything from std
+use_all = { qualified_name ~ ws* ~ "::" ~ ws* ~ "*" }
+
+//`std::math as my_math`: ok # Import math from std as my_math
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 
 //`translate() rotate()`: ok
@@ -330,7 +332,8 @@ call_argument = _{
 //`a = 5.0mm, b = false`: ok
 //`4.0mm, a = false`: ok
 //`a = false, 4.0mm`: ok # Positional argument after named argument (Syntactically correct, semantically wrong) 
-call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* }
+//`a = false, 4.0mm,`: ok # Trailing comma
+call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* ~ ws* ~ ","? }
 
 call_op = _{ "(" ~ ws* ~ call_argument_list? ~ ws* ~ ")" }
 
@@ -345,11 +348,11 @@ method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 //`a::nested::f(a = 3.0mm, b = 2.0mm)`: ok
 call = { qualified_name ~ ws* ~ call_op }
 
-//`@foo`: ok
-//`@foo(x)`: ok
-attribute = { "@" ~ qualified_name ~ call_op? }
+//`#foo`: ok
+//`#foo(x)`: ok
+tag = { "#" ~ qualified_name ~ call_op? }
 
-attribute_list = _{ attribute ~ (ws+ ~ attribute)* }
+tag_list = _{ tag ~ (ws+ ~ tag)* }
 
 
 //`r: length = 5.0mm`: ok
@@ -361,6 +364,8 @@ assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expressio
 
 assignment_statement = _{ assignment ~ ws* ~ ";" }
 
+//`@children`: ok
+node_marker = { "@" ~ identifier }
 
 //`{ a() }`: ok # Single expression
 //`{ a() b(); c(); }: ok # Nested multiexpression
@@ -372,6 +377,7 @@ node_body_inner = _{
 }
 
 node_body_statement = { 
+  node_marker |
   use_statement | 
   assignment_statement | 
   expression_statement |
@@ -386,7 +392,9 @@ node_body_statement = {
 //`r`: error # neither type specifier or default value
 parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation  }
 
-parameter_list = { "(" ~ ws* ~ (parameter ~ (ws* ~ "," ~ ws* ~ parameter)* ~ ws*)? ~ ","? ~ ")" }
+//`(r = 5.0mm, b = 4.0mm)`: ok
+//`(r = 5.0mm, b = 4.0mm, )`: ok
+parameter_list = { "(" ~ ws* ~ (parameter ~ (ws* ~ "," ~ ws* ~ parameter)* ~ ws*)? ~ ","? ~ ws* ~ ")" }
 
 
 //`(a: scalar) -> scalar`: ok # Function signature with arguments
@@ -434,7 +442,7 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { init(size: length) { rectangle(size); } }`: ok # Module with init function
 //`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
 //`module donut(radius) { }`: error # Module must have type annotations
-module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_definition_body }
+module_definition = { (tag_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_definition_body }
 
 //`{ translate() rotate(); }`: ok
 //`{ translate() }`: ok # Single expression block (no semicolon)

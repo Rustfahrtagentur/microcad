@@ -3,18 +3,18 @@
 
 //! 3D Geometry
 
-mod triangle_mesh;
-pub mod tree;
 mod render;
+pub mod tree;
+mod triangle_mesh;
 
 pub use manifold_rs::Manifold;
 pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 
-pub use tree::{Node, NodeInner};
 pub use render::*;
+pub use tree::{Node, NodeInner};
 
-use strum::IntoStaticStr;
 use crate::BooleanOp;
+use strum::IntoStaticStr;
 
 /// 3D Geometry
 #[derive(IntoStaticStr)]
@@ -67,6 +67,41 @@ impl Geometry {
             }
         }
     }
+
+    /// Execute multiple boolean operations
+    pub fn boolean_op_multi(
+        geometries: Vec<std::rc::Rc<Self>>,
+        op: &BooleanOp,
+    ) -> Option<std::rc::Rc<Self>> {
+        if geometries.is_empty() {
+            return None;
+        }
+
+        Some(
+            geometries[1..]
+                .iter()
+                .fold(geometries[0].clone(), |acc, geo| {
+                    if let Some(r) = acc.boolean_op(geo.as_ref(), op) {
+                        std::rc::Rc::new(r)
+                    } else {
+                        acc
+                    }
+                }),
+        )
+    }
+
+    /// Transform mesh geometry
+    pub fn transform(&self, transform: &crate::Mat4) -> Self {
+        match self {
+            Geometry::Mesh(mesh) => Geometry::Mesh(mesh.transform(transform)),
+
+            Geometry::Manifold(manifold) => {
+                // TODO: Implement transform for manifold instead of converting to mesh
+                let mesh = TriangleMesh::from(manifold.to_mesh()).transform(transform);
+                Geometry::Manifold(mesh.to_manifold())
+            }
+        }
+    }
 }
 
 impl From<Manifold> for Geometry {
@@ -94,4 +129,30 @@ pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
 /// Create a new transform node
 pub fn transform(transform: crate::Mat4) -> Node {
     Node::new(NodeInner::Transform(transform))
+}
+
+#[test]
+fn test_boolean_op_multi() {
+    let a = std::rc::Rc::new(Geometry::Manifold(Manifold::sphere(2.0, 32)));
+    let b = std::rc::Rc::new(Geometry::Manifold(Manifold::sphere(1.0, 32)));
+
+    let result = Geometry::boolean_op_multi(vec![a, b], &BooleanOp::Difference);
+    assert!(result.is_some());
+
+    let result = result.unwrap();
+
+    if let Geometry::Manifold(manifold) = &*result {
+        assert!(manifold.to_mesh().vertices().len() > 1);
+    } else {
+        panic!("Expected manifold");
+    }
+
+    let transform = crate::Mat4::from_translation(crate::Vec3::new(5.0, 10.0, 0.0));
+    let result = result.transform(&transform);
+
+    if let Geometry::Manifold(manifold) = result {
+        assert!(manifold.to_mesh().vertices().len() > 1);
+    } else {
+        panic!("Expected manifold");
+    }
 }

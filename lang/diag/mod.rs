@@ -196,8 +196,8 @@ fn test_diag_list() {
         "info: This is an info
   ---> ../tests/test_cases/algorithm_difference.µcad:1:1
      |
-   1 | use * from std;
-     | ^^^^^^^^^^^^^^^
+   1 | use std::*;
+     | ^^^^^^^^^^^
      |
 warning: This is a warning
   ---> ../tests/test_cases/algorithm_difference.µcad:4:1

@@ -8,7 +8,7 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 /// µCAD source file statement
 #[derive(Clone, Debug)]
 pub enum Statement {
-    /// Use statement, e.g. `use * from std;`
+    /// Use statement, e.g. `use std::*;`
     Use(UseStatement),
     /// Module definition, e.g. `module foo(r: scalar) { info("Hello, world, {r}!"); }`
     ModuleDefinition(std::rc::Rc<ModuleDefinition>),
@@ -85,7 +85,8 @@ impl Eval for Statement {
                 context.add(module_definition.clone().into());
             }
             Self::NamespaceDefinition(namespace_definition) => {
-                context.add(namespace_definition.clone().into());
+                let namespace_symbol = namespace_definition.eval(context)?;
+                context.add(namespace_symbol);
             }
             Self::For(for_statement) => {
                 for_statement.eval(context)?;

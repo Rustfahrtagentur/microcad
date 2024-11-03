@@ -5,7 +5,7 @@ The builtin function `export()` is available for putting the result of your sour
 The following code writes a cube into an STL file called `cube.stl`:
 
 ```µCAD,export
-std::export("cube.stl") std::geo3d::cube(size_x = 4.0, size_y = 4.0, size_z = 4.0);
+std::export("cube.stl") std::geo3d::cube(size = 40.0mm);
 ```
 
 Because exporting in µCAD is in code one is able to export several different formats in one run or by conditional selecting.

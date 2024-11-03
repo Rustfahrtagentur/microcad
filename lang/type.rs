@@ -8,6 +8,8 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 /// µCAD Basic Types
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
+    /// Invalid type (used for error handling)
+    Invalid,
     /// A 64-bit integer number
     Integer,
     /// A 64-bit floating-point number
@@ -142,6 +144,7 @@ impl Parse for TypeAnnotation {
 impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
+            Self::Invalid => write!(f, "invalid"),
             Self::Integer => write!(f, "int"),
             Self::Scalar => write!(f, "scalar"),
             Self::String => write!(f, "string"),

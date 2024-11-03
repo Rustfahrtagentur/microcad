@@ -4,10 +4,7 @@
 //! Scalable Vector Graphics (SVG) file writer
 
 use geo::CoordsIter;
-use microcad_core::{
-    *,
-    CoreError, Scalar,
-};
+use microcad_core::{CoreError, Scalar, *};
 
 /// Write SVG
 pub struct SvgWriter {
@@ -20,7 +17,11 @@ impl SvgWriter {
     /// - `w`: Output writer
     /// - `bounds`: Clipping
     /// - `scale`: Scale of the output
-    pub fn new(mut w: Box<dyn std::io::Write>, bounds: geo2d::Rect, scale: f64) -> std::io::Result<Self> {
+    pub fn new(
+        mut w: Box<dyn std::io::Write>,
+        bounds: geo2d::Rect,
+        scale: f64,
+    ) -> std::io::Result<Self> {
         writeln!(&mut w, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
             &mut w,
@@ -49,8 +50,34 @@ impl SvgWriter {
         )
     }
 
+    /// Begin a SVG transformation <g>
+    pub fn begin_transform(&mut self, transform: &microcad_core::Mat3) -> std::io::Result<()> {
+        let (a, b, c, d, e, f) = (
+            transform.x.x,
+            transform.x.y,
+            transform.y.x,
+            transform.y.y,
+            transform.z.x,
+            transform.z.y,
+        );
+        writeln!(
+            self.writer,
+            "<g transform=\"matrix({a} {b} {c} {d} {e} {f})\">"
+        )
+    }
+
+    /// End a SVG transformation </g>
+    pub fn end_transform(&mut self) -> std::io::Result<()> {
+        writeln!(self.writer, "</g>")
+    }
+
     /// Generate circle
-    pub fn circle(&mut self, center: &geo2d::Point, radius: f64, style: &str) -> std::io::Result<()> {
+    pub fn circle(
+        &mut self,
+        center: &geo2d::Point,
+        radius: f64,
+        style: &str,
+    ) -> std::io::Result<()> {
         let (cx, cy) = center.x_y();
         writeln!(
             self.writer,
@@ -212,8 +239,13 @@ impl geo2d::Renderer for SvgRenderer {
                 }
             }
             NodeInner::Geometry(geometry) => self.render_geometry(geometry)?,
-            NodeInner::Transform(_) => unimplemented!(),
-            _ => return Err(CoreError::NotImplemented),
+            NodeInner::Transform(transform) => {
+                self.writer().begin_transform(transform)?;
+                for child in node.children() {
+                    self.render_node(child.clone())?;
+                }
+                self.writer().end_transform()?;
+            }
         };
 
         Ok(())

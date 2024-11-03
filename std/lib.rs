@@ -15,6 +15,7 @@ mod export;
 pub mod geo2d;
 mod math;
 mod namespace_builder;
+mod transform;
 
 /// Module containing builtin 3D geometries like `sphere` or `cube`
 #[cfg(feature = "geo3d")]
@@ -36,12 +37,13 @@ use namespace_builder::NamespaceBuilder;
 
 /// Build the standard module
 pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
-    NamespaceBuilder::new("std")
+    NamespaceBuilder::new("__builtin")
         // TODO: is this correct= Shouldn't this use add_builtin_module() =
         .add(math::builtin_module().into())
         .add(geo2d::builtin_module().into())
         .add(geo3d::builtin_module().into())
         .add(algorithm::builtin_module().into())
+        .add(transform::builtin_namespace().into())
         .add(
             BuiltinFunction::new(
                 "assert".into(),
@@ -64,6 +66,18 @@ pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
                             ctx.error(args.src_ref(), anyhow!("{message}"))?;
                         }
                     }
+                    Ok(None)
+                },
+            )
+            .into(),
+        )
+        .add(
+            BuiltinFunction::new(
+                "print".into(),
+                function_signature!(parameter_list![parameter!(message: String)]),
+                &|args, _| {
+                    let message: String = args["message"].clone().try_into()?;
+                    println!("{message}");
                     Ok(None)
                 },
             )

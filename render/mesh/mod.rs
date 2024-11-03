@@ -76,7 +76,16 @@ impl geo3d::Renderer for MeshRenderer {
             NodeInner::Geometry(geometry) => {
                 self.render_geometry(geometry)?;
             }
-            NodeInner::Transform(_) => unimplemented!(),
+            NodeInner::Transform(transform) => {
+                let mut renderer = MeshRenderer::new(self.precision);
+                println!("Transforming node {transform:?}");
+                println!("Children: {}", node.children().count());
+                for child in node.children() {
+                    renderer.render_node(child)?;
+                }
+
+                self.mesh(&renderer.triangle_mesh.transform(transform))?;
+            }
         }
 
         Ok(())

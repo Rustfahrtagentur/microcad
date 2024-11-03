@@ -19,16 +19,18 @@ pub use named_tuple::*;
 pub use unnamed_tuple::*;
 pub use value_list::*;
 
+use crate::objecttree::ObjectNode;
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
-use crate::objecttree::ObjectNode;
 
 pub(crate) type ValueResult = std::result::Result<Value, EvalError>;
 
 /// A variant value
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
+    /// Invalid value (used for error handling)
+    Invalid,
     /// An integer value
     Integer(Refer<Integer>),
     /// A scalar value
@@ -91,6 +93,7 @@ impl Value {
     /// Clone the value with a new source reference
     pub fn clone_with_src_ref(&self, src_ref: SrcRef) -> Self {
         match self {
+            Value::Invalid => Value::Invalid,
             Value::Integer(i) => Value::Integer(Refer::new(i.value, src_ref)),
             Value::Scalar(s) => Value::Scalar(Refer::new(s.value, src_ref)),
             Value::Length(l) => Value::Length(Refer::new(l.value, src_ref)),
@@ -105,18 +108,24 @@ impl Value {
             Value::String(s) => Value::String(Refer::new(s.value.clone(), src_ref)),
             Value::Color(c) => Value::Color(Refer::new(c.value, src_ref)),
             //Value::List(l) => Value::List(l.clone_with_src_ref(src_ref)),
-           // Value::Map(m) => Value::Map(m.clone_with_src_ref(src_ref)),
+            // Value::Map(m) => Value::Map(m.clone_with_src_ref(src_ref)),
             //Value::NamedTuple(t) => Value::NamedTuple(t.clone_with_src_ref(src_ref)),
             //Value::UnnamedTuple(t) => Value::UnnamedTuple(t.clone_with_src_ref(src_ref)),
             Value::Node(n) => Value::Node(n.clone()),
             _ => todo!("Implement Value::clone_with_src_ref for all variants"),
         }
     }
+
+    /// Check if the value is invalid
+    pub fn is_invalid(&self) -> bool {
+        matches!(self, Value::Invalid)
+    }
 }
 
 impl SrcReferrer for Value {
     fn src_ref(&self) -> SrcRef {
         match self {
+            Value::Invalid => SrcRef(None),
             Value::Integer(i) => i.src_ref(),
             Value::Scalar(s) => s.src_ref(),
             Value::Bool(b) => b.src_ref(),
@@ -162,6 +171,7 @@ impl PartialOrd for Value {
 impl Ty for Value {
     fn ty(&self) -> Type {
         match self {
+            Value::Invalid => Type::Invalid,
             Value::Integer(_) => Type::Integer,
             Value::Scalar(_) => Type::Scalar,
             Value::Length(_) => Type::Length,
@@ -225,7 +235,7 @@ impl std::ops::Add for Value {
             // Add two angles
             (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Angle(lhs + rhs)),
             // Add two lengths
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Angle(lhs + rhs)),
+            (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs + rhs)),
             // Add two Vec2
             (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(Value::Vec2(lhs + rhs)),
             // Add two Vec3
@@ -283,7 +293,7 @@ impl std::ops::Sub for Value {
             // Subtract two angles
             (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Angle(lhs - rhs)),
             // Subtract two lengths
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Angle(lhs - rhs)),
+            (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs - rhs)),
             // Subtract two Vec2
             (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(Value::Vec2(lhs - rhs)),
             // Subtract two Vec3
@@ -304,13 +314,13 @@ impl std::ops::Sub for Value {
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
                 Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
-            (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                crate::objecttree::algorithm::binary_op(
+            (Value::Node(lhs), Value::Node(rhs)) => {
+                Ok(Value::Node(crate::objecttree::algorithm::binary_op(
                     microcad_core::BooleanOp::Difference,
                     lhs,
                     rhs,
-                ),
-            )),
+                )))
+            }
             _ => Err(EvalError::InvalidOperator("-".into())),
         }
     }
@@ -401,11 +411,7 @@ impl std::ops::BitOr for Value {
     fn bitor(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                crate::objecttree::algorithm::binary_op(
-                    BooleanOp::Union,
-                    lhs,
-                    rhs,
-                ),
+                crate::objecttree::algorithm::binary_op(BooleanOp::Union, lhs, rhs),
             )),
             _ => Err(EvalError::InvalidOperator("|".into())),
         }
@@ -419,11 +425,7 @@ impl std::ops::BitAnd for Value {
     fn bitand(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                crate::objecttree::algorithm::binary_op(
-                    BooleanOp::Intersection,
-                    lhs,
-                    rhs,
-                ),
+                crate::objecttree::algorithm::binary_op(BooleanOp::Intersection, lhs, rhs),
             )),
             _ => Err(EvalError::InvalidOperator("&".into())),
         }
@@ -433,6 +435,7 @@ impl std::ops::BitAnd for Value {
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
+            Value::Invalid => write!(f, "<invalid>"),
             Value::Integer(n) => write!(f, "{n}"),
             Value::Scalar(n) => write!(f, "{n}"),
             Value::Length(n)

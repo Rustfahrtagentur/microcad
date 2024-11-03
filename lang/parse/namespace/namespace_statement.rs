@@ -63,7 +63,11 @@ impl Eval for NamespaceStatement {
     fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
         match self {
             Self::Use(use_statement) => {
-                use_statement.eval(context)?;
+                if let Some(symbols) = use_statement.eval(context)? {
+                    for (id, symbol) in symbols.iter() {
+                        context.add_alias(symbol.as_ref().clone(), id.clone());
+                    }
+                }
             }
             Self::Assignment(assignment) => {
                 assignment.eval(context)?;
@@ -75,7 +79,8 @@ impl Eval for NamespaceStatement {
                 context.add(module_definition.clone().into());
             }
             Self::NamespaceDefinition(namespace_definition) => {
-                context.add(namespace_definition.clone().into());
+                let namespace_definition = namespace_definition.eval(context)?;
+                context.add(namespace_definition);
             }
         }
 

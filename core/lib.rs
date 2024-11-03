@@ -10,7 +10,6 @@ pub mod error;
 pub mod geo2d;
 #[cfg(feature = "geo3d")]
 pub mod geo3d;
-pub mod transform;
 
 /// Primitive integer type
 pub type Integer = i64;
@@ -35,11 +34,9 @@ pub type Id = compact_str::CompactString;
 
 pub use boolean_op::BooleanOp;
 pub use error::CoreError;
-pub use transform::Transform;
 
 /// Core result type
 pub type Result<T> = std::result::Result<T, CoreError>;
-
 
 /// Trait to calculate depth for a node
 pub trait Depth {
@@ -78,10 +75,8 @@ pub type Primitive2D = dyn geo2d::Primitive;
 /// 3D Primitive type alias
 pub type Primitive3D = dyn geo3d::Primitive;
 
-
-
 /// Export settings, essentially a TOML table
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ExportSettings(toml::Table);
 
 impl std::ops::Deref for ExportSettings {
@@ -91,7 +86,6 @@ impl std::ops::Deref for ExportSettings {
         &self.0
     }
 }
-
 
 impl std::ops::DerefMut for ExportSettings {
     fn deref_mut(&mut self) -> &mut Self::Target {
@@ -109,8 +103,7 @@ impl ExportSettings {
 
     /// return file name
     pub fn filename(&self) -> Option<String> {
-        self
-            .get("filename")
+        self.get("filename")
             .map(|filename| filename.as_str().unwrap().to_string())
     }
 

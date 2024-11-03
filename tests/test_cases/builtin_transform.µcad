@@ -1,0 +1,24 @@
+
+// Test the built-in transform::translate function
+// Create two translated rectangles and export the result as an SVG file
+__builtin::export("{OUTPUT_FILE}_translate.svg") {
+    __builtin::transform::translate(x = 15.0, y = 0.0, z = 0.0) {
+        __builtin::geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
+    };
+
+    __builtin::transform::translate(x = 0.0, y = 15.0, z = 0.0) {
+        __builtin::geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
+    };
+};
+
+__builtin::export("{OUTPUT_FILE}_translate_nested.svg")
+    __builtin::transform::translate(x = 15.0, y = 0.0, z = 0.0)
+        __builtin::transform::translate(x = 0.0, y = 15.0, z = 0.0)
+            __builtin::geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
+
+__builtin::export("{OUTPUT_FILE}_translate_difference.svg")
+    __builtin::transform::translate(x = 15.0, y = 0.0, z = 0.0)
+        __builtin::algorithm::difference() {
+            __builtin::geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
+            __builtin::geo2d::rect(x = 0.0, y = 0.0, width = 5.0, height = 5.0);
+        };

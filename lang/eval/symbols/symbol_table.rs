@@ -6,16 +6,45 @@ use crate::eval::*;
 #[derive(Clone, Debug, Default)]
 pub struct SymbolTable(std::collections::HashMap<Id, std::rc::Rc<Symbol>>);
 
+impl SymbolTable {
+    /// Merge two symbol tables
+    ///
+    /// This function merges two symbol tables into one.
+    pub fn merge(&mut self, other: &mut Self) {
+        other.0.iter().for_each(|(id, symbol)| {
+            if self.0.contains_key(id) {
+                panic!("Symbol with id `{}` already exists", id); // TODO Better error handling on symbol name collision
+            }
+            self.0.insert(id.clone(), symbol.clone());
+        });
+    }
+}
+
 impl Symbols for SymbolTable {
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {        
-        match self.0.get(id) {
-            Some(symbol) => Some(symbol.clone()),
-            None => None,
-        }
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+        self.0.get(id).cloned()
     }
 
     fn add(&mut self, symbol: Symbol) -> &mut Self {
-        self.0.insert(symbol.id().unwrap(), std::rc::Rc::new(symbol));
+        match symbol {
+            Symbol::Invalid => {}
+            _ => {
+                self.0
+                    .insert(symbol.id().unwrap(), std::rc::Rc::new(symbol));
+            }
+        }
+
+        self
+    }
+
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
+        match symbol {
+            Symbol::Invalid => {}
+            _ => {
+                self.0.insert(alias, std::rc::Rc::new(symbol));
+            }
+        }
+
         self
     }
 

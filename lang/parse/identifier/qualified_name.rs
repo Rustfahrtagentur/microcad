@@ -90,7 +90,7 @@ impl QualifiedName {
     }
 
     /// Get all symbols for the qualified name
-    pub fn fetch_symbols(&self, context: &Context) -> Result<Vec<Symbol>> {
+    pub fn fetch_symbols(&self, context: &mut Context) -> Result<Vec<Symbol>> {
         let mut symbols = Vec::new();
         self.visit_symbols(context, &mut |symbol, depth| {
             // Only take symbols that match the full qualified name
@@ -100,19 +100,35 @@ impl QualifiedName {
         })?;
 
         if symbols.is_empty() {
-            return Err(EvalError::SymbolNotFound(
-                self.id().expect("unnamed symbol not found"),
-            ));
+            use crate::diag::PushDiag;
+            context.error(self, anyhow::anyhow!("Symbol not found: {}", self))?;
         }
         Ok(symbols)
+    }
+
+    /// Get the symbol for the qualified name
+    ///
+    /// If there are multiple symbols with the same name, an error is returned
+    pub fn fetch_symbol(&self, context: &mut Context) -> Result<Option<Symbol>> {
+        let symbols = self.fetch_symbols(context)?;
+        if symbols.len() > 1 {
+            use crate::diag::PushDiag;
+            context.error(self, anyhow::anyhow!("Ambiguous symbol: {}", self))?;
+            // TODO Output all symbols
+        }
+        Ok(symbols.into_iter().next())
     }
 }
 
 impl Eval for QualifiedName {
-    type Output = Vec<Symbol>;
+    type Output = Symbol;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        self.fetch_symbols(context)
+        if let Some(symbol) = self.fetch_symbol(context)? {
+            Ok(symbol)
+        } else {
+            Ok(Symbol::default())
+        }
     }
 }
 

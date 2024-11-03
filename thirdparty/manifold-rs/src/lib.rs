@@ -13,6 +13,12 @@ mod ffi {
 
         fn sphere(radius: f64, segments: u32) -> UniquePtr<Manifold>;
         fn cube(x_size: f64, y_size: f64, z_size: f64) -> UniquePtr<Manifold>;
+        fn cylinder(
+            radius_low: f64,
+            radius_high: f64,
+            height: f64,
+            segments: u32,
+        ) -> UniquePtr<Manifold>;
 
         fn union_(a: &Manifold, b: &Manifold) -> UniquePtr<Manifold>;
         fn intersection(a: &Manifold, b: &Manifold) -> UniquePtr<Manifold>;
@@ -25,6 +31,8 @@ mod ffi {
 
         fn mesh_from_manifold(manifold: &Manifold) -> UniquePtr<Mesh>;
         fn manifold_from_mesh(mesh: &Mesh) -> UniquePtr<Manifold>;
+
+        fn mesh_from_vertices(vertices: &[f32], indices: &[u32]) -> UniquePtr<Mesh>;
     }
 }
 
@@ -46,6 +54,11 @@ impl Manifold {
     /// Create a cube manifold.
     pub fn cube(x_size: f64, y_size: f64, z_size: f64) -> Self {
         Self(ffi::cube(x_size, y_size, z_size))
+    }
+
+    /// Create a cylinder manifold.
+    pub fn cylinder(radius_low: f64, radius_high: f64, height: f64, segments: u32) -> Self {
+        Self(ffi::cylinder(radius_low, radius_high, height, segments))
     }
 
     /// Get the union of two manifolds.
@@ -89,6 +102,11 @@ impl Manifold {
 pub struct Mesh(cxx::UniquePtr<ffi::Mesh>);
 
 impl Mesh {
+    pub fn new(vertices: &[f32], indices: &[u32]) -> Self {
+        let mesh = ffi::mesh_from_vertices(vertices, indices);
+        Self(mesh)
+    }
+
     pub fn vertices(&self) -> Vec<f32> {
         let vertices_binding = self.0.vertices();
         let vertices = vertices_binding.as_ref().unwrap().as_slice();
@@ -133,4 +151,3 @@ fn test_manifold_ffi() {
     let indices = indices_binding.as_ref().unwrap().as_slice();
     assert!(!indices.is_empty());
 }
-

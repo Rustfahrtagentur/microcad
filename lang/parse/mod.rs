@@ -18,6 +18,7 @@ pub mod parameter;
 pub mod source_file;
 pub mod units;
 pub mod r#use;
+pub mod visibility;
 
 pub use assignment::*;
 pub use call::*;
@@ -34,4 +35,4 @@ pub use parameter::*;
 pub use r#use::*;
 pub use source_file::*;
 pub use units::*;
-
+pub use visibility::*;

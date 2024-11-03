@@ -27,7 +27,7 @@ fn main() {
         Cli { input: Some(input) } => {
             let source_file = SourceFile::load(input).unwrap();
             let mut context = microcad_std::ContextBuilder::new(source_file)
-                .with_std()
+                .with_std("std")
                 .build();
 
             let node = context.eval().unwrap();

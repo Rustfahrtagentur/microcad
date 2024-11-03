@@ -8,7 +8,7 @@ module circle {
         radius = d / 2.0;
     }
 
-    std::geo2d::circle(radius);
+    __builtin::geo2d::circle(radius);
 }
 
 // Now, create two equal circles but with different initializations

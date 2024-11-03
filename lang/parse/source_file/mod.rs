@@ -61,6 +61,8 @@ impl SourceFile {
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)
             .context("Could not parse file")?;
 
+        assert_ne!(source_file.hash, 0);
+
         source_file.filename = Some(std::path::PathBuf::from(path.as_ref()));
         Ok(source_file)
     }
@@ -124,8 +126,17 @@ impl SourceFile {
                     namespace.add(m.clone().into());
                 }
                 Statement::NamespaceDefinition(n) => {
-                    namespace.add(n.clone().into());
+                    let n = n.eval(context)?;
+                    namespace.add(n);
                 }
+                Statement::Use(u) => {
+                    if let Some(symbols) = u.eval(context)? {
+                        for (id, symbol) in symbols.iter() {
+                            namespace.add_alias(symbol.as_ref().clone(), id.clone());
+                        }
+                    }
+                }
+
                 _ => {}
             }
         }
@@ -244,10 +255,7 @@ fn load_source_file() {
     match first_statement {
         Statement::Use(u) => {
             use crate::src_ref::SrcReferrer;
-            assert_eq!(
-                u.src_ref().source_slice(&source_file.source),
-                "use * from std;"
-            );
+            assert_eq!(u.src_ref().source_slice(&source_file.source), "use std::*;");
         }
         _ => panic!(),
     }

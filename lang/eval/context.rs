@@ -2,10 +2,76 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
-use crate::{diag::*, parse::*, source_file_cache::*, objecttree::*};
+use crate::{diag::*, objecttree::*, parse::*, source_file_cache::*};
 
 use microcad_core::Id;
 
+/// Stack frame in the context
+///
+/// It is used to store the current state of the evaluation.
+/// A stack frame defines which kind of symbol we are currently evaluating.
+#[derive(Debug, Clone)]
+pub enum StackFrame {
+    /// Initial state
+    Namespace(SymbolTable),
+    /// Currently evaluating a module definition
+    ModuleCall(SymbolTable, Option<ObjectNode>),
+    /// Currently evaluating a function definition
+    FunctionCall(SymbolTable),
+}
+
+impl StackFrame {
+    /// Get the symbol table of the stack frame
+    pub fn symbol_table(&self) -> &SymbolTable {
+        match self {
+            Self::Namespace(table) => table,
+            Self::ModuleCall(table, _) => table,
+            Self::FunctionCall(table) => table,
+        }
+    }
+}
+
+impl Default for StackFrame {
+    fn default() -> Self {
+        Self::Namespace(SymbolTable::default())
+    }
+}
+
+impl Symbols for StackFrame {
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+        match self {
+            Self::Namespace(table) => table.fetch(id),
+            Self::ModuleCall(table, _) => table.fetch(id),
+            Self::FunctionCall(table) => table.fetch(id),
+        }
+    }
+
+    fn add(&mut self, symbol: Symbol) -> &mut Self {
+        match self {
+            Self::Namespace(table) => table.add(symbol),
+            Self::ModuleCall(table, _) => table.add(symbol),
+            Self::FunctionCall(table) => table.add(symbol),
+        };
+        self
+    }
+
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
+        match self {
+            Self::Namespace(table) => table.add_alias(symbol, alias),
+            Self::ModuleCall(table, _) => table.add_alias(symbol, alias),
+            Self::FunctionCall(table) => table.add_alias(symbol, alias),
+        };
+        self
+    }
+
+    fn copy<T: Symbols>(&self, into: &mut T) {
+        match self {
+            Self::Namespace(table) => table.copy(into),
+            Self::ModuleCall(table, _) => table.copy(into),
+            Self::FunctionCall(table) => table.copy(into),
+        }
+    }
+}
 
 /// Context for evaluation
 ///
@@ -13,7 +79,7 @@ use microcad_core::Id;
 /// A context is essentially a stack of symbol tables
 pub struct Context {
     /// Stack of symbol tables
-    stack: Vec<SymbolTable>,
+    stack: Vec<StackFrame>,
 
     /// Current node in the tree where the evaluation is happening
     current_node: ObjectNode,
@@ -31,12 +97,17 @@ pub struct Context {
 impl Context {
     /// Create a new context from a source file
     pub fn from_source_file(source_file: SourceFile) -> Self {
-        Self {
-            stack: vec![SymbolTable::default()],
+        let rc_source_file = std::rc::Rc::new(source_file);
+
+        let mut ctx = Self {
+            stack: vec![StackFrame::default()],
             current_node: group(),
-            current_source_file: Some(std::rc::Rc::new(source_file)),
+            current_source_file: Some(rc_source_file.clone()),
             ..Default::default()
-        }
+        };
+
+        ctx.source_files.add(rc_source_file);
+        ctx
     }
 
     /// Evaluate the context with the current source file
@@ -54,21 +125,40 @@ impl Context {
     }
 
     /// Push a new symbol table to the stack (enter a new scope)
-    pub fn push(&mut self) {
-        self.stack.push(SymbolTable::default());
+    fn push(&mut self, stack_frame: StackFrame) -> &mut StackFrame {
+        self.stack.push(stack_frame);
+        self.stack.last_mut().unwrap()
     }
 
     /// Pop the top symbol table from the stack (exit the current scope)
-    pub fn pop(&mut self) {
+    fn pop(&mut self) {
         self.stack.pop();
     }
 
-    /// Set new_node as current node, call function and set old node
-    pub fn descend_node<F>(
+    /// The top symbol table in the stack
+    pub fn top(&self) -> &StackFrame {
+        self.stack.last().unwrap()
+    }
+
+    /// The top symbol table in the stack (mutable)
+    pub fn top_mut(&mut self) -> &mut StackFrame {
+        self.stack.last_mut().unwrap()
+    }
+
+    /// Create a new symbol table and push it to the stack
+    pub fn scope(
         &mut self,
-        new_node: ObjectNode,
-        f: F,
-    ) -> crate::eval::Result<ObjectNode>
+        stack_frame: StackFrame,
+        f: impl FnOnce(&mut Self) -> crate::eval::Result<()>,
+    ) -> crate::eval::Result<()> {
+        self.push(stack_frame);
+        f(self)?;
+        self.pop();
+        Ok(())
+    }
+
+    /// Set new_node as current node, call function and set old node
+    pub fn descend_node<F>(&mut self, new_node: ObjectNode, f: F) -> crate::eval::Result<ObjectNode>
     where
         F: FnOnce(&mut Self) -> crate::eval::Result<ObjectNode>,
     {
@@ -79,16 +169,6 @@ impl Context {
         Ok(new_node)
     }
 
-    /// Open a new scope and execute the given closure
-    pub fn scope<F>(&mut self, f: F)
-    where
-        F: FnOnce(&mut Self),
-    {
-        self.push();
-        f(self);
-        self.pop();
-    }
-
     /// Read-only access to diagnostic handler
     pub fn diag(&self) -> &DiagHandler {
         &self.diag_handler
@@ -96,7 +176,7 @@ impl Context {
 
     /// Fetch symbols by qualified name
     pub fn fetch_symbols_by_qualified_name(
-        &self,
+        &mut self,
         name: &QualifiedName,
     ) -> Result<Vec<Symbol>, EvalError> {
         name.fetch_symbols(self)
@@ -117,6 +197,11 @@ impl Context {
         self.current_node.append(node.clone());
         node.clone()
     }
+
+    /// Add source file to Context
+    pub fn add_source_file(&mut self, source_file: SourceFile) {
+        self.source_files.add(std::rc::Rc::new(source_file))
+    }
 }
 
 impl PushDiag for Context {
@@ -130,7 +215,7 @@ impl Symbols for Context {
         self.stack
             .iter()
             .rev()
-            .flat_map(|table| table.fetch(id))
+            .flat_map(|stack_frame| stack_frame.fetch(id))
             .next()
     }
 
@@ -139,8 +224,13 @@ impl Symbols for Context {
         self
     }
 
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
+        self.stack.last_mut().unwrap().add_alias(symbol, alias);
+        self
+    }
+
     fn copy<T: Symbols>(&self, into: &mut T) {
-        self.stack.last().unwrap().iter().for_each(|(_, symbol)| {
+        self.top().symbol_table().iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());
         });
     }
@@ -157,7 +247,7 @@ impl GetSourceFileByHash for Context {
 impl Default for Context {
     fn default() -> Self {
         Self {
-            stack: vec![SymbolTable::default()],
+            stack: vec![StackFrame::default()],
             current_node: group(),
             current_source_file: None,
             source_files: SourceFileCache::default(),
