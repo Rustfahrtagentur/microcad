@@ -82,8 +82,8 @@ impl Exporter for StlExporter {
     }
 
     fn export(&mut self, node: ObjectNode) -> microcad_core::Result<()> {
-        let mut renderer = microcad_render::mesh::MeshRenderer::new(self.precision);
-        use microcad_core::geo3d::Renderer;
+        use microcad_core::geo3d::*;
+        let mut renderer = MeshRenderer::new(self.precision);
         let node = objecttree::bake3d(&mut renderer, node)?;
         renderer.render_node(node)?;
 

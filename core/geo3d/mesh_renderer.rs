@@ -3,7 +3,7 @@
 
 //! Mesh renderer
 
-use microcad_core::{
+use crate::{
     geo3d::{self},
     Scalar,
 };
@@ -27,7 +27,7 @@ impl MeshRenderer {
     }
 }
 
-impl microcad_core::Renderer for MeshRenderer {
+impl crate::Renderer for MeshRenderer {
     fn precision(&self) -> Scalar {
         self.precision
     }
@@ -43,7 +43,7 @@ impl Default for MeshRenderer {
 }
 
 impl geo3d::Renderer for MeshRenderer {
-    fn mesh(&mut self, mesh: &geo3d::TriangleMesh) -> microcad_core::Result<()> {
+    fn mesh(&mut self, mesh: &geo3d::TriangleMesh) -> crate::Result<()> {
         self.triangle_mesh.append(mesh);
         Ok(())
     }
@@ -52,7 +52,7 @@ impl geo3d::Renderer for MeshRenderer {
         None
     }
 
-    fn render_geometry(&mut self, geometry: &geo3d::Geometry) -> microcad_core::Result<()> {
+    fn render_geometry(&mut self, geometry: &geo3d::Geometry) -> crate::Result<()> {
         match geometry {
             geo3d::Geometry::Mesh(mesh) => self.mesh(mesh),
             geo3d::Geometry::Manifold(manifold) => {
@@ -62,9 +62,9 @@ impl geo3d::Renderer for MeshRenderer {
         }
     }
 
-    fn render_node(&mut self, node: microcad_core::geo3d::Node) -> microcad_core::Result<()> {
+    fn render_node(&mut self, node: crate::geo3d::Node) -> crate::Result<()> {
         let inner = node.borrow();
-        use microcad_core::geo3d::NodeInner;
+        use crate::geo3d::NodeInner;
 
         match &*inner {
             NodeInner::Group => {
@@ -78,8 +78,7 @@ impl geo3d::Renderer for MeshRenderer {
             }
             NodeInner::Transform(transform) => {
                 let mut renderer = MeshRenderer::new(self.precision);
-                println!("Transforming node {transform:?}");
-                println!("Children: {}", node.children().count());
+
                 for child in node.children() {
                     renderer.render_node(child)?;
                 }

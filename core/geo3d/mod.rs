@@ -3,12 +3,15 @@
 
 //! 3D Geometry
 
+mod mesh_renderer;
 mod render;
 pub mod tree;
 mod triangle_mesh;
 
 pub use manifold_rs::Manifold;
 pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
+
+pub use mesh_renderer::MeshRenderer;
 
 pub use render::*;
 pub use tree::{Node, NodeInner};
@@ -37,11 +40,11 @@ impl From<&BooleanOp> for manifold_rs::BooleanOp {
 }
 
 impl Geometry {
-    /// Fetch mesh from geometry
-    pub fn fetch_mesh(&self) -> TriangleMesh {
+    /// Get the volume of the geometry
+    pub fn volume(&self) -> f64 {
         match self {
-            Geometry::Mesh(mesh) => mesh.clone(),
-            Geometry::Manifold(manifold) => TriangleMesh::from(manifold.to_mesh()),
+            Geometry::Mesh(mesh) => mesh.volume(),
+            Geometry::Manifold(manifold) => TriangleMesh::from(manifold.to_mesh()).volume(),
         }
     }
 
