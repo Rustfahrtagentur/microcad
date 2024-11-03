@@ -34,8 +34,6 @@ impl CallTrait for ModuleDefinition {
         let mut node = crate::objecttree::group();
 
         context.scope(stack_frame, |context| {
-            context.set_current_node(node.clone());
-
             // Let's evaluate the pre-init statements first
             for statement in &self.body.pre_init_statements {
                 statement.eval(context)?;
@@ -88,7 +86,9 @@ impl CallTrait for ModuleDefinition {
 
             // Evaluate the post-init statements
             for statement in &self.body.post_init_statements {
-                statement.eval(context)?;
+                if let Some(Value::Node(new_child)) = statement.eval(context)? {
+                    node.append(new_child);
+                }
             }
 
             Ok(())

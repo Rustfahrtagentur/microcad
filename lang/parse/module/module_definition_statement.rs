@@ -68,7 +68,7 @@ impl Parse for ModuleDefinitionStatement {
 }
 
 impl Eval for ModuleDefinitionStatement {
-    type Output = ();
+    type Output = Option<Value>;
 
     fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
         match self {
@@ -76,7 +76,7 @@ impl Eval for ModuleDefinitionStatement {
                 use_statement.eval(context)?;
             }
             Self::Expression(expr) => {
-                expr.eval(context)?;
+                return Ok(Some(expr.eval(context)?));
             }
             Self::For(for_statement) => {
                 for_statement.eval(context)?;
@@ -96,7 +96,7 @@ impl Eval for ModuleDefinitionStatement {
             }
         }
 
-        Ok(())
+        Ok(None)
     }
 }
 
