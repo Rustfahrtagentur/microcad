@@ -137,6 +137,12 @@ impl SrcRef {
                     }
                 };
 
+                // TODO Not sure if this is correct.
+                // Can we actually merge two ranges of SrcRef?
+                if lhs.range.end > rhs.range.start || lhs.range.start > rhs.range.end {
+                    return SrcRef(None);
+                }
+
                 SrcRef(Some(SrcRefInner {
                     range: {
                         // paranoia check
