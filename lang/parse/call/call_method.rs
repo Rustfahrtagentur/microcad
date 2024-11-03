@@ -3,7 +3,9 @@
 
 //! Call method
 
-use crate::{eval::*, parse::*, src_ref::*, objecttree::*};
+use microcad_core::geo3d::Renderer;
+
+use crate::{eval::*, objecttree::*, parse::*, src_ref::*};
 
 /// Trait to call method of something.
 /// This for example used to call `vertices()` on a `Node`.
@@ -11,6 +13,8 @@ use crate::{eval::*, parse::*, src_ref::*, objecttree::*};
 /// ```uCAD
 /// corners = std::geo2d::rect(size = 4mm).vertices();
 /// ```
+///
+/// TODO: Should this really be in mod `parse`?
 pub trait CallMethod {
     /// Call a method of a value
     ///
@@ -33,8 +37,19 @@ impl CallMethod for ObjectNode {
         _src_ref: SrcRef,
     ) -> Result<Value> {
         match name.into() {
-            // Return the vertices of a node
-            "vertices" => todo!(),
+            "volume" => {
+                // Bake the object tree into a geometry tree
+                let mut renderer = microcad_core::geo3d::MeshRenderer::new(0.1);
+                let geometry_node = bake3d(&mut renderer, self.clone()).expect("Failed to bake");
+
+                // Render the geometry tree into a triangle mesh
+                renderer
+                    .render_node(geometry_node)
+                    .expect("Failed to render");
+
+                // Return the volume of the triangle mesh
+                Ok(Value::Scalar(Refer::none(renderer.triangle_mesh.volume())))
+            }
             method_name => Err(EvalError::UnknownMethod(method_name.into())),
         }
     }
@@ -71,7 +86,6 @@ impl CallMethod for List {
         }
     }
 }
-
 
 #[test]
 fn call_list_method() {
