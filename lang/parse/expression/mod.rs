@@ -176,6 +176,11 @@ impl Eval for Expression {
             } => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
+                if lhs.is_invalid() || rhs.is_invalid() {
+                    use crate::diag::PushDiag;
+                    context.error(self, anyhow::anyhow!("Invalid operands: {lhs} {op} {rhs}"))?;
+                    return Ok(Value::Invalid);
+                }
 
                 match op.as_str() {
                     "+" => lhs + rhs,
