@@ -115,6 +115,11 @@ impl Value {
             _ => todo!("Implement Value::clone_with_src_ref for all variants"),
         }
     }
+
+    /// Check if the value is invalid
+    pub fn is_invalid(&self) -> bool {
+        matches!(self, Value::Invalid)
+    }
 }
 
 impl SrcReferrer for Value {
