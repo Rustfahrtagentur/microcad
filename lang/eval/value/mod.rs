@@ -230,7 +230,7 @@ impl std::ops::Add for Value {
             // Add two angles
             (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Angle(lhs + rhs)),
             // Add two lengths
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Angle(lhs + rhs)),
+            (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs + rhs)),
             // Add two Vec2
             (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(Value::Vec2(lhs + rhs)),
             // Add two Vec3
