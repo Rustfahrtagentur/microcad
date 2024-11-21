@@ -51,24 +51,14 @@ impl Geometry {
     /// Execute boolean operation
     pub fn boolean_op(&self, other: &Geometry, op: &BooleanOp) -> Option<Self> {
         let op: manifold_rs::BooleanOp = op.into();
-        match (self, other) {
+        Some(Geometry::Manifold(match (self, other) {
             (Geometry::Mesh(a), Geometry::Mesh(b)) => {
-                let result = a.to_manifold().boolean_op(&b.to_manifold(), op);
-                Some(Geometry::Manifold(result))
+                a.to_manifold().boolean_op(&b.to_manifold(), op)
             }
-            (Geometry::Manifold(a), Geometry::Manifold(b)) => {
-                let result: Manifold = a.boolean_op(b, op);
-                Some(Geometry::Manifold(result))
-            }
-            (Geometry::Mesh(a), Geometry::Manifold(b)) => {
-                let result = a.to_manifold().boolean_op(b, op);
-                Some(Geometry::Manifold(result))
-            }
-            (Geometry::Manifold(a), Geometry::Mesh(b)) => {
-                let result = a.boolean_op(&b.to_manifold(), op);
-                Some(Geometry::Manifold(result))
-            }
-        }
+            (Geometry::Manifold(a), Geometry::Manifold(b)) => a.boolean_op(b, op),
+            (Geometry::Mesh(a), Geometry::Manifold(b)) => a.to_manifold().boolean_op(b, op),
+            (Geometry::Manifold(a), Geometry::Mesh(b)) => a.boolean_op(&b.to_manifold(), op),
+        }))
     }
 
     /// Execute multiple boolean operations
