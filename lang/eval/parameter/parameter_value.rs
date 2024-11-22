@@ -44,6 +44,16 @@ impl ParameterValue {
         }
     }
 
+    /// Creates an invalid parameter value, in case an error occured during evaluation
+    pub fn invalid(name: Id, src_ref: SrcRef) -> Self {
+        Self {
+            name,
+            specified_type: None,
+            default_value: None,
+            src_ref,
+        }
+    }
+
     /// Check how the type of this parameter value relates to the given one
     /// # Return
     /// - `TypeCheckResult::Match`: Given type matches exactly
@@ -64,7 +74,7 @@ impl ParameterValue {
     }
 
     /// Check if type of this parameter value matches the given one
-    fn type_matches(&self, ty: &Type) -> bool {
+    pub fn type_matches(&self, ty: &Type) -> bool {
         match &self.specified_type {
             Some(t) => t == ty,
             None => true, // Accept any type if none is specified
