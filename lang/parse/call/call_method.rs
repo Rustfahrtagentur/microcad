@@ -24,7 +24,7 @@ pub trait CallMethod {
     fn call_method(
         &self,
         name: &Identifier,
-        args: &CallArgumentValueList,
+        args: &CallArgumentList,
         src_ref: SrcRef,
     ) -> Result<Value>;
 }
@@ -33,7 +33,7 @@ impl CallMethod for ObjectNode {
     fn call_method(
         &self,
         name: &Identifier,
-        _args: &CallArgumentValueList,
+        _args: &CallArgumentList,
         _src_ref: SrcRef,
     ) -> Result<Value> {
         match name.into() {
@@ -59,7 +59,7 @@ impl CallMethod for List {
     fn call_method(
         &self,
         name: &Identifier,
-        _: &CallArgumentValueList,
+        _: &CallArgumentList,
         src_ref: SrcRef,
     ) -> Result<Value> {
         match name.into() {
@@ -103,11 +103,7 @@ fn call_list_method() {
     );
 
     if let Value::Bool(result) = list
-        .call_method(
-            &"equal".into(),
-            &CallArgumentValueList::default(),
-            SrcRef(None),
-        )
+        .call_method(&"equal".into(), &CallArgumentList::default(), SrcRef(None))
         .unwrap()
     {
         assert!(result.value);
