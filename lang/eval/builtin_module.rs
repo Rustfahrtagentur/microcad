@@ -3,7 +3,7 @@
 
 //! Builtin module evaluation entity
 
-use crate::{eval::*, parse::*, objecttree::*};
+use crate::{eval::*, objecttree::*, parse::*};
 
 /// Builtin module initialization functor
 pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<ObjectNode>;
@@ -22,9 +22,7 @@ pub struct BuiltinModule {
 impl CallTrait for BuiltinModule {
     /// Call implicit initialization of this module
     fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
-        let arg_map = args
-            .eval(context)?
-            .get_matching_arguments(&self.parameters.eval(context)?)?;
+        let arg_map = args.get_matching_arguments(context, &self.parameters)?;
         Ok(Some(Value::Node((self.f)(&arg_map, context)?)))
     }
 }

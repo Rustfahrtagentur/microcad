@@ -40,12 +40,10 @@ impl CallTrait for ModuleDefinition {
             }
 
             let mut matching_init = Vec::new();
-            let arg_values = args.eval(context)?;
 
             // Find all initializers that match the arguments and add it to the matching_init list
             for init in &self.body.inits {
-                let param_values = init.parameters.eval(context)?;
-                if let Ok(arg_map) = arg_values.get_matching_arguments(&param_values) {
+                if let Ok(arg_map) = args.get_matching_arguments(context, &init.parameters) {
                     matching_init.push((init, arg_map));
                 }
             }

@@ -3,11 +3,74 @@
 
 //! Parse `call_argument_list` rule into CallArgumentList
 
-use crate::{errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
+use std::any::Any;
+
+use crate::{diag::PushDiag, errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
 
 /// List of call arguments
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentList(Refer<OrdMap<Identifier, CallArgument>>);
+
+impl CallArgumentList {
+    pub fn get_matching_arguments(
+        &self,
+        context: &mut Context,
+        parameters: &ParameterList,
+    ) -> Result<ArgumentMap> {
+        let mut arg_map = ArgumentMap::default();
+        todo!();
+        /*
+        for arg in self.iter() {
+            match &arg.name {
+                // Named call argument, e.g. `a = 5.0`
+                Some(name) => {
+                    let name = name.id().unwrap();
+                    if arg_map.contains_key(&name) {
+                        context.error(self, anyhow::anyhow!("Duplicated argument: {name}"))?;
+                        break;
+                    }
+                    // There must be a parameter in the parameter definition with the same name
+                    if let Some(parameter) = parameters.get(name) {
+                        let arg_value = arg.value.eval(context)?;
+                        let param_value = parameter.eval(context)?;
+                        if arg_value.ty() != param_value.ty() {
+                            use crate::diag::PushDiag;
+                            context.error(self, anyhow::anyhow!(""))
+                        }
+
+                        arg_map.insert(name, arg.value.eval(context)?);
+                    }
+
+                }
+                None => match &arg.value.single_identifier() {
+                    Some(name) => {
+                        if let Some(parameter) = parameters.get(name) {
+                            let name = name.id().unwrap();
+                            arg_map.insert(name, arg.value.eval(context)?);
+                        }
+                    }
+                    None => {
+                        context.error(
+                            self,
+                            anyhow::anyhow!("Positional argument: {value}", value = arg.value),
+                        )?;
+                        // TODO: Handle positional arguments
+                    }
+                },
+            }
+        }
+
+        Ok(arg_map)
+        */
+    }
+
+    /*pub fn get_match_multi(
+        &self,
+        context: &mut Context,
+        parameters: &ParameterList,
+    ) -> Result<Combinations<Value>> {
+    }*/
+}
 
 impl SrcReferrer for CallArgumentList {
     fn src_ref(&self) -> SrcRef {
@@ -26,22 +89,6 @@ impl std::ops::Deref for CallArgumentList {
 impl std::ops::DerefMut for CallArgumentList {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
-    }
-}
-
-impl Eval for CallArgumentList {
-    type Output = CallArgumentValueList;
-
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let mut call_argument_list = CallArgumentValueList::default();
-
-        for arg in self.iter() {
-            call_argument_list
-                .push(arg.eval(context)?)
-                .map_err(EvalError::DuplicateCallArgument)?;
-        }
-
-        Ok(call_argument_list)
     }
 }
 
