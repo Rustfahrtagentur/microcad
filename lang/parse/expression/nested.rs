@@ -9,6 +9,22 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 #[derive(Clone, Debug)]
 pub struct Nested(Vec<NestedItem>);
 
+impl Nested {
+    /// Returns an identifer if the nested item is a single qualified name
+    pub fn single_identifier(&self) -> Option<Identifier> {
+        match self.0.first() {
+            Some(NestedItem::QualifiedName(name)) => {
+                if name.len() == 1 {
+                    Some(name.first().unwrap().clone())
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        }
+    }
+}
+
 impl Parse for Nested {
     fn parse(pair: Pair) -> ParseResult<Self> {
         assert!(pair.as_rule() == Rule::nested || pair.as_rule() == Rule::expression_no_semicolon);

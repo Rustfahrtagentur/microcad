@@ -155,6 +155,14 @@ impl Expression {
         }
         Ok(Self::Literal(Literal::from_str(s)?))
     }
+
+    /// If the expression consists of a single identifier, e.g. `a`
+    pub fn single_identifier(&self) -> Option<Identifier> {
+        match &self {
+            Self::Nested(nested) => nested.single_identifier(),
+            _ => None,
+        }
+    }
 }
 
 impl Eval for Expression {
