@@ -39,25 +39,29 @@ impl CallTrait for ModuleDefinition {
                 statement.eval(context)?;
             }
 
-            let mut matching_init = Vec::new();
+            let mut inits = Vec::new();
 
             // Find all initializers that match the arguments and add it to the matching_init list
             for init in &self.body.inits {
-                if let Ok(arg_map) = args.get_matching_arguments(context, &init.parameters) {
-                    matching_init.push((init, arg_map));
-                }
+                inits.push((init, args.get_matching_arguments(context, &init.parameters)));
             }
 
             use crate::diag::PushDiag;
             use anyhow::anyhow;
 
+            let matching_inits = inits
+                .iter()
+                .filter(|(_, result)| result.is_ok())
+                .map(|(init, result)| (*init, result.as_ref().unwrap()))
+                .collect::<Vec<_>>();
+
             // There should be only one matching initializer
-            match matching_init.len() {
+            match matching_inits.len() {
                 0 => {
                     context.error(self, anyhow!("No matching initializer found"))?;
                 }
                 1 => {
-                    let (init, arg_map) = matching_init.first().unwrap();
+                    let (init, arg_map) = matching_inits.first().unwrap();
                     // Copy the arguments to the symbol table of the node
                     for (name, value) in arg_map.iter() {
                         node.add(Symbol::Value(name.clone(), value.clone()));

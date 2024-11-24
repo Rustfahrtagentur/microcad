@@ -3,21 +3,51 @@
 
 //! Parse `call_argument_list` rule into CallArgumentList
 
-use std::any::{self, Any};
-
-use crate::{diag::PushDiag, errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
+use crate::{
+    diag::PushDiag, errors::*, eval::*, ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*,
+};
 
 /// List of call arguments
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentList(Refer<OrdMap<Identifier, CallArgument>>);
 
+use strum::Display;
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum MatchError {
+    /// Duplicated argument
+    #[error("Duplicated argument: {0}")]
+    DuplicatedArgument(Id),
+    /// Occurs when a parameter was given in a call but not in the definition
+    #[error("Parameter `{0}` ist not defined.")]
+    ParameterNotDefined(Id),
+    /// Mismatching type
+    #[error("Type mismatch for parameter `{0}`: expected `{1}`, got {2}")]
+    PositionalArgumentTypeMismatch(Id, Type, Type),
+    /// Parameter required by definition but given in the call
+    #[error("Missing parameter: {0}")]
+    MissingParameter(Id),
+}
+
 impl CallArgumentList {
-    /// Get all matching arguments as an `ArgumentMap` from a parameter list definition
+    /// Get matching arguments from parameter list
     pub fn get_matching_arguments(
         &self,
         context: &mut Context,
         parameters: &ParameterList,
     ) -> Result<ArgumentMap> {
+        let parameter_values = parameters.eval(context)?;
+        self.eval(context)?
+            .get_matching_arguments(&parameter_values)
+    }
+
+    // Get all matching arguments as an `ArgumentMap` from a parameter list definition
+    /*pub fn get_matching_arguments(
+        &self,
+        context: &mut Context,
+        parameters: &ParameterList,
+    ) -> std::result::Result<ArgumentMap, MatchError> {
         let mut arg_map = ArgumentMap::default();
         let mut parameter_values = parameters.eval(context)?;
 
@@ -36,8 +66,7 @@ impl CallArgumentList {
                 Some(identifier) => {
                     let name = identifier.id().unwrap();
                     if arg_map.contains_key(&name) {
-                        context.error(self, anyhow::anyhow!("Duplicated argument: {name}"))?;
-                        break;
+                        return Err(MatchError::DuplicatedArgument(name));
                     }
 
                     // Check if parameter `a` was defined
@@ -47,10 +76,7 @@ impl CallArgumentList {
                             parameter_values.remove(&name);
                         }
                         None => {
-                            context.error(
-                                self,
-                                anyhow::anyhow!("Parameter `{name}` ist not defined."),
-                            )?;
+                            return Err(MatchError::ParameterNotDefined(name));
                         }
                     }
                 }
@@ -67,7 +93,11 @@ impl CallArgumentList {
                 if param.type_matches(&positional_arg.ty()) {
                     arg_map.insert(param.name.clone(), positional_arg);
                 } else {
-                    context.error(self, anyhow::anyhow!("Parameter type mismatch"))?;
+                    return Err(MatchError::PositionalArgumentTypeMismatch(
+                        param.name,
+                        param.specified_type.unwrap(),
+                        positional_arg.ty(),
+                    ));
                 }
             } else {
                 break;
@@ -76,15 +106,14 @@ impl CallArgumentList {
 
         for parameter in parameters.iter() {
             if arg_map.get(&parameter.name.id().unwrap()).is_none() {
-                context.error(
-                    self,
-                    anyhow::anyhow!("Parameter {name} is missing.", name = &parameter.name),
-                )?;
+                return Err(MatchError::MissingParameter(
+                    parameter.name.id().unwrap().clone(),
+                ));
             }
         }
 
         Ok(arg_map)
-    }
+    }*/
 
     /*pub fn get_match_multi(
         &self,
@@ -92,6 +121,18 @@ impl CallArgumentList {
         parameters: &ParameterList,
     ) -> Result<Combinations<Value>> {
     }*/
+}
+
+impl Eval for CallArgumentList {
+    type Output = CallArgumentValueList;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+        let mut args = CallArgumentValueList::default();
+        for arg in self.iter() {
+            args.push(arg.eval(context)?);
+        }
+        Ok(args)
+    }
 }
 
 impl SrcReferrer for CallArgumentList {
