@@ -56,6 +56,9 @@ impl std::fmt::Debug for ObjectNodeInner {
             ObjectNodeInner::Primitive3D(primitive3d) => {
                 write!(f, "({primitive3d:?})")
             }
+            ObjectNodeInner::Transform(transform) => {
+                write!(f, "({transform:?})")
+            }
             _ => Ok(()),
         }
     }
