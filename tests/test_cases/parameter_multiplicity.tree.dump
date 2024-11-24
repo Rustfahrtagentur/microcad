@@ -1,0 +1,4 @@
+Group
+ Group
+  Primitive3D(Sphere { radius: 10.0 })
+  Primitive3D(Sphere { radius: 20.0 })
