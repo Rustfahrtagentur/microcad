@@ -46,7 +46,7 @@ impl CallTrait for ModuleDefinition {
                 inits.push((
                     init,
                     args.eval(context)?
-                        .get_matching_arguments(&init.parameters.eval(context)?),
+                        .get_multi_matching_arguments(&init.parameters.eval(context)?),
                 ));
             }
 
@@ -65,20 +65,22 @@ impl CallTrait for ModuleDefinition {
                     context.error(self, anyhow!("No matching initializer found"))?;
                 }
                 1 => {
-                    let (init, arg_map) = matching_inits.first().unwrap();
-                    // Copy the arguments to the symbol table of the node
-                    for (name, value) in arg_map.iter() {
-                        node.add(Symbol::Value(name.clone(), value.clone()));
-                    }
-                    let init_object = init.call(arg_map, context)?;
+                    let (init, multi_arg_map) = matching_inits.first().unwrap();
 
-                    // Add the init object's children to the node
-                    for child in init_object.children() {
-                        child.detach();
-                        node.append(child.clone());
-                    }
+                    for arg_map in multi_arg_map.combinations() {
+                        // Copy the arguments to the symbol table of the node
+                        for (name, value) in arg_map.iter() {
+                            node.add(Symbol::Value(name.clone(), value.clone()));
+                        }
+                        let init_object = init.call(&arg_map, context)?;
 
-                    init_object.copy(&mut node);
+                        // Add the init object's children to the node
+                        for child in init_object.children() {
+                            child.detach();
+                            node.append(child.clone());
+                        }
+                        init_object.copy(&mut node);
+                    }
                 }
                 _ => {
                     context.error(self, anyhow!("Multiple matching initializers found"))?;
