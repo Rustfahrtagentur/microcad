@@ -38,8 +38,16 @@ impl CallArgumentList {
         parameters: &ParameterList,
     ) -> Result<ArgumentMap> {
         let parameter_values = parameters.eval(context)?;
-        self.eval(context)?
+        match self
+            .eval(context)?
             .get_matching_arguments(&parameter_values)
+        {
+            Ok(args) => Ok(args),
+            Err(err) => {
+                context.error(self, anyhow::anyhow!("{}", err))?;
+                Ok(ArgumentMap::default())
+            }
+        }
     }
 }
 

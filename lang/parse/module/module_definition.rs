@@ -43,7 +43,11 @@ impl CallTrait for ModuleDefinition {
 
             // Find all initializers that match the arguments and add it to the matching_init list
             for init in &self.body.inits {
-                inits.push((init, args.get_matching_arguments(context, &init.parameters)));
+                inits.push((
+                    init,
+                    args.eval(context)?
+                        .get_matching_arguments(&init.parameters.eval(context)?),
+                ));
             }
 
             use crate::diag::PushDiag;
