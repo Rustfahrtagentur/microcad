@@ -11,7 +11,7 @@ pub struct ParameterValueList {
     /// List of parameter values
     parameters: Vec<ParameterValue>,
     /// access map by name
-    by_name: std::collections::HashMap<Id, usize>,
+    pub by_name: std::collections::HashMap<Id, usize>,
     /// Source code reference
     src_ref: SrcRef,
 }
