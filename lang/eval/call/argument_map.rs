@@ -69,4 +69,9 @@ impl MultiArgumentMap {
     pub fn combinations(&self) -> Combinations<Value> {
         Combinations::new(&self.0)
     }
+
+    /// Check if the argument map contains a key
+    pub fn contains_key(&self, key: &Id) -> bool {
+        self.0.contains_key(key)
+    }
 }
