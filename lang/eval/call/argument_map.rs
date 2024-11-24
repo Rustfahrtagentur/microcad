@@ -49,6 +49,12 @@ impl std::ops::DerefMut for ArgumentMap {
     }
 }
 
+/// An argument map for parameter multiplicity.
+///
+/// In the combination map, every value can be a single or multi coefficient.
+/// Let's assume, you have a `module a(r: scalar) {}`:
+/// * If you call `a(4.0)`, `a` will be stored as a single coefficient, because we passed a single scalar.
+/// * If you call `a([2.0, 4.0])`, `a` will be stored as a multi coefficient, because we passed a list of scalars.
 #[derive(Default)]
 pub struct MultiArgumentMap(crate::parse::call::CombinationMap<Value>);
 

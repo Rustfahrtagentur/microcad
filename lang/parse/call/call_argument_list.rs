@@ -11,16 +11,16 @@ use crate::{
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentList(Refer<OrdMap<Identifier, CallArgument>>);
 
-use strum::Display;
 use thiserror::Error;
 
+/// An error that occured when looking for matching arguments between a call and a parameter definition
 #[derive(Error, Debug)]
 pub enum MatchError {
     /// Duplicated argument
     #[error("Duplicated argument: {0}")]
     DuplicatedArgument(Id),
     /// Occurs when a parameter was given in a call but not in the definition
-    #[error("Parameter `{0}` ist not defined.")]
+    #[error("Parameter `{0}` is not defined.")]
     ParameterNotDefined(Id),
     /// Mismatching type
     #[error("Type mismatch for parameter `{0}`: expected `{1}`, got {2}")]
@@ -57,7 +57,7 @@ impl Eval for CallArgumentList {
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let mut args = CallArgumentValueList::default();
         for arg in self.iter() {
-            args.push(arg.eval(context)?);
+            args.push(arg.eval(context)?).expect("Duplicated argument");
         }
         Ok(args)
     }

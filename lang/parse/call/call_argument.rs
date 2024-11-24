@@ -24,22 +24,6 @@ impl CallArgument {
             None => self.value.single_identifier(),
         }
     }
-
-    /// Evaluates the CallArgument and the parameter and return the matched value, if successful
-    pub fn get_named_match(
-        arg_value: Value,
-        param_value: &ParameterValue,
-    ) -> std::result::Result<Value, MatchError> {
-        if param_value.type_matches(&arg_value.ty()) {
-            Ok(arg_value)
-        } else {
-            Err(MatchError::PositionalArgumentTypeMismatch(
-                param_value.name.clone(),
-                arg_value.ty(),
-                param_value.specified_type.as_ref().unwrap().clone(),
-            ))
-        }
-    }
 }
 
 impl Eval for CallArgument {
@@ -107,54 +91,4 @@ impl std::fmt::Display for CallArgument {
             None => write!(f, "{}", self.value),
         }
     }
-}
-
-#[test]
-fn call_argument_match() {
-    use crate::r#type::TypeAnnotation;
-
-    // Make an argument: `name = i`
-    let arg = |name: &str, i| -> CallArgument {
-        CallArgument {
-            name: if name.is_empty() {
-                None
-            } else {
-                Some(name.into())
-            },
-            value: Expression::Literal(Literal::Integer(Refer::none(i))),
-            src_ref: SrcRef(None),
-        }
-    };
-
-    // Make a parameter value: `name: ty = i`
-    let param = |name: &str, ty: Option<Type>, i: Option<i64>| -> ParameterValue {
-        ParameterValue::new(
-            name.into(),
-            ty,
-            i.map(|i| Value::Integer(Refer::none(i))),
-            SrcRef(None),
-        )
-    };
-
-    use crate::r#type::Type;
-    /*
-    let mut context = Context::default();
-    // Check if argument `a = 10` matches parameter definition `a: int = 1`.
-    match arg("a", 10).get_named_match(&mut context, &param("a", Some(Type::Integer), Some(1))) {
-        Ok(Value::Integer(value)) => assert_eq!(value.value, 10, "Same value expected"),
-        Ok(value) => panic!("Value mismatch, expected integer: {value}"),
-        Err(err) => panic!("No match found: {err:?}"),
-    }
-
-    // Check if argument `a = 10` matches parameter definition `a: int`.
-    match arg("a", 10).get_named_match(&mut context, &param("a", Some(Type::Integer), None)) {
-        Ok(Value::Integer(value)) => assert_eq!(value.value, 10, "Same value expected"),
-        Ok(value) => panic!("Value mismatch, expected integer: {value}"),
-        Err(err) => panic!("No match found: {err:?}"),
-    }
-
-    match arg("a", 10).get_named_match(&mut context, &param("a", Some(Type::Angle), None)) {
-        Ok(value) => print!("Value mismatch, expected integer: {value}"),
-        Err(err) => panic!("No match found: {err:?}"),
-    }*/
 }
