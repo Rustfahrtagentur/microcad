@@ -3,7 +3,7 @@
 
 //! Module definition parser entity
 
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, objecttree, parse::*, parser::*, src_ref::*};
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -67,45 +67,48 @@ impl CallTrait for ModuleDefinition {
                 1 => {
                     let (init, multi_arg_map) = matching_inits.first().unwrap();
 
+                    let mut group = objecttree::group();
                     for arg_map in multi_arg_map.combinations() {
                         // Copy the arguments to the symbol table of the node
                         for (name, value) in arg_map.iter() {
-                            node.add(Symbol::Value(name.clone(), value.clone()));
+                            group.add(Symbol::Value(name.clone(), value.clone()));
                         }
                         let init_object = init.call(&arg_map, context)?;
 
                         // Add the init object's children to the node
                         for child in init_object.children() {
                             child.detach();
-                            node.append(child.clone());
+                            group.append(child.clone());
                         }
                         init_object.copy(&mut node);
+
+                        // Now, copy the symbols of the node into the context
+                        group.copy(context);
+
+                        // Evaluate the post-init statements
+                        for statement in &self.body.post_init_statements {
+                            match statement {
+                                ModuleDefinitionStatement::Assignment(assignment) => {
+                                    // Evaluate the assignment and add the symbol to the node
+                                    // E.g. `a = 1` will add the symbol `a` to the node
+                                    let symbol = assignment.eval(context)?;
+                                    group.add(symbol);
+                                }
+                                statement => {
+                                    if let Some(Value::Node(new_child)) = statement.eval(context)? {
+                                        group.append(new_child);
+                                    }
+                                }
+                            }
+                        }
                     }
+
+                    node.append(group);
                 }
                 _ => {
                     context.error(self, anyhow!("Multiple matching initializers found"))?;
                     // TODO Add diagnostics for multiple matching initializers
                     return Ok(());
-                }
-            }
-
-            // Now, copy the symbols of the node into the context
-            node.copy(context);
-
-            // Evaluate the post-init statements
-            for statement in &self.body.post_init_statements {
-                match statement {
-                    ModuleDefinitionStatement::Assignment(assignment) => {
-                        // Evaluate the assignment and add the symbol to the node
-                        // E.g. `a = 1` will add the symbol `a` to the node
-                        let symbol = assignment.eval(context)?;
-                        node.add(symbol);
-                    }
-                    statement => {
-                        if let Some(Value::Node(new_child)) = statement.eval(context)? {
-                            node.append(new_child);
-                        }
-                    }
                 }
             }
 
