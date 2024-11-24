@@ -3,20 +3,21 @@
 
 //! Parameter multiplicity implementation.
 
-use std::collections::HashMap;
-
-use crate::{eval::*, src_ref::Refer};
 use microcad_core::Id;
 
-use super::{ArgumentMap, Identifier};
+use super::ArgumentMap;
 
-#[derive(Clone)]
-enum Coefficient<T> {
+/// An enum to distinguish single-value and multi-value coefficients
+#[derive(Clone, Debug)]
+pub enum Coefficient<T> {
+    /// A single value
     Single(T),
+    /// A multi value
     Multi(Vec<T>),
 }
 
 impl<T> Coefficient<T> {
+    /// Number of items in the coefficient
     pub fn len(&self) -> usize {
         match self {
             Self::Single(_) => 1,
@@ -37,7 +38,7 @@ impl<T> std::ops::Index<usize> for Coefficient<T> {
 }
 
 /// Iterator over combinations
-struct Combinations<T> {
+pub struct Combinations<T> {
     /// The actual value data. Stored in a Vec instead of a HashMap
     data: Vec<Coefficient<T>>,
     /// The indices of the iterator. Stored in a Vec instead of a HashMap
@@ -48,11 +49,15 @@ struct Combinations<T> {
     done: bool,
 }
 
+/// A Map over combinations
+pub type CombinationMap<T> = std::collections::HashMap<Id, Coefficient<T>>;
+
 impl<T> Combinations<T>
 where
     T: Clone,
 {
-    fn new(data: std::collections::HashMap<Id, Coefficient<T>>) -> Self {
+    /// Create a new Combinations iterator
+    pub fn new(data: &CombinationMap<T>) -> Self {
         use itertools::Itertools;
         let ids_sorted: Vec<Id> = data.keys().sorted().cloned().collect();
         let keys_sorted: Vec<usize> = (0..ids_sorted.len()).collect();
@@ -81,6 +86,7 @@ where
         }
     }
 
+    /// Advance the index counters by one step
     fn advance_indices(&mut self) {
         for (_, index) in self.data_indices.iter() {
             self.indices[*index] = *self.indices.get(*index).unwrap() + 1;
@@ -114,7 +120,6 @@ impl Iterator for Combinations<crate::eval::Value> {
             .map(|(coeff, index)| coeff[*index].clone())
             .collect();
 
-        // Advance the indices
         self.advance_indices();
 
         let mut args = ArgumentMap::default();
@@ -128,6 +133,9 @@ impl Iterator for Combinations<crate::eval::Value> {
 
 #[test]
 fn call_parameter_multiplicity() {
+    use crate::eval::*;
+    use crate::src_ref::Refer;
+
     let data = std::collections::HashMap::from([
         (
             "0".into(),
@@ -162,7 +170,7 @@ fn call_parameter_multiplicity() {
         ),
     ]);
 
-    let combinations = Combinations::new(data.clone());
+    let combinations = Combinations::new(&data);
     assert!(!&combinations.done);
 
     let mut count = 0;

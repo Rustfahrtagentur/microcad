@@ -12,6 +12,7 @@ mod multiplicity;
 pub use call_argument::*;
 pub use call_argument_list::*;
 pub use method_call::*;
+pub use multiplicity::*;
 
 use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 

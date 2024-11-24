@@ -3,7 +3,7 @@
 
 //! Argument map evaluation entity
 
-use crate::{eval::*, src_ref::*};
+use crate::{eval::*, parse::Combinations, src_ref::*};
 
 /// Map of arguments
 #[derive(Clone, Debug, Default)]
@@ -49,3 +49,24 @@ impl std::ops::DerefMut for ArgumentMap {
     }
 }
 
+#[derive(Default)]
+pub struct MultiArgumentMap(crate::parse::call::CombinationMap<Value>);
+
+impl MultiArgumentMap {
+    /// Insert a multi-value coefficient
+    pub fn insert_multi(&mut self, name: Id, value: Vec<Value>) {
+        self.0
+            .insert(name, crate::parse::call::Coefficient::Multi(value));
+    }
+
+    /// Insert a single-value coefficient
+    pub fn insert_single(&mut self, name: Id, value: Value) {
+        self.0
+            .insert(name, crate::parse::call::Coefficient::Single(value));
+    }
+
+    /// Return an iterator over all combinations
+    pub fn combinations(&self) -> Combinations<Value> {
+        Combinations::new(&self.0)
+    }
+}
