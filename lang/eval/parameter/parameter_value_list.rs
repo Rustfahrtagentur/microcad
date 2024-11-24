@@ -11,7 +11,7 @@ pub struct ParameterValueList {
     /// List of parameter values
     parameters: Vec<ParameterValue>,
     /// access map by name
-    pub by_name: std::collections::HashMap<Id, usize>,
+    pub by_name: std::collections::BTreeMap<Id, usize>,
     /// Source code reference
     src_ref: SrcRef,
 }
@@ -20,7 +20,7 @@ impl ParameterValueList {
     /// Create new ParameterValueList
     #[cfg(test)]
     pub fn new(parameters: Vec<ParameterValue>) -> Self {
-        let mut by_name = std::collections::HashMap::new();
+        let mut by_name = std::collections::BTreeMap::new();
         for (i, parameter) in parameters.iter().enumerate() {
             by_name.insert(parameter.name.clone(), i);
         }
