@@ -193,7 +193,7 @@ fn call_parameter_multiplicity() {
     );
 
     // Test empty map
-    let data: std::collections::HashMap<Id, Coefficient<Value>> = HashMap::new();
+    let data: std::collections::HashMap<Id, Coefficient<Value>> = std::collections::HashMap::new();
 
     let combinations = Combinations::new(&data);
     let mut count = 0;

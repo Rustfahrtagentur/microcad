@@ -62,7 +62,7 @@ impl ParameterValue {
     pub fn type_check(&self, ty: &Type) -> TypeCheckResult {
         if self.type_matches(ty) {
             TypeCheckResult::SingleMatch
-        } else if ty.is_list_of(&self.specified_type.clone().unwrap()) {
+        } else if ty.is_list_of(self.specified_type.as_ref().unwrap()) {
             TypeCheckResult::MultiMatch
         } else {
             TypeCheckResult::NoMatch(
@@ -120,4 +120,11 @@ macro_rules! parameter_value {
         ParameterValue::new(stringify!($name).into(), None, Some($value), SrcRef(None))
     };
     () => {};
+}
+
+#[test]
+fn test_is_list_of() {
+    use crate::parse::ListType;
+
+    assert!(Type::List(ListType::new(Type::Scalar)).is_list_of(&Type::Scalar));
 }

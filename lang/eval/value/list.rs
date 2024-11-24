@@ -72,6 +72,6 @@ impl std::fmt::Display for List {
 
 impl Ty for List {
     fn ty(&self) -> Type {
-        self.ty.clone()
+        Type::List(crate::parse::ListType::new(self.ty.clone()))
     }
 }
