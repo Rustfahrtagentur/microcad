@@ -32,7 +32,7 @@ impl CallArgumentValueList {
             TypeCheckResult::MultiMatch => match &value {
                 Value::List(l) => {
                     parameter_values.remove(&parameter_value.name);
-                    arg_map.insert_multi(parameter_value.name.clone(), l.to_vec());
+                    arg_map.insert_multi(parameter_value.name.clone(), l.fetch());
                     result
                 }
                 value => panic!("Expected list type, got {}", value.ty()),

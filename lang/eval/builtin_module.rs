@@ -3,7 +3,11 @@
 
 //! Builtin module evaluation entity
 
-use crate::{eval::*, objecttree::*, parse::*};
+use crate::{
+    eval::*,
+    objecttree::{self, *},
+    parse::*,
+};
 
 /// Builtin module initialization functor
 pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<ObjectNode>;
@@ -22,8 +26,22 @@ pub struct BuiltinModule {
 impl CallTrait for BuiltinModule {
     /// Call implicit initialization of this module
     fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
-        let arg_map = args.get_matching_arguments(context, &self.parameters)?;
-        Ok(Some(Value::Node((self.f)(&arg_map, context)?)))
+        let multi_arg_map = args
+            .eval(context)?
+            .get_multi_matching_arguments(&self.parameters.eval(context)?)?;
+
+        let node = objecttree::group();
+
+        for arg_map in multi_arg_map.combinations() {
+            node.append((self.f)(&arg_map, context)?);
+        }
+
+        if node.children().count() == 1 {
+            // Skip group node and return child directly
+            Ok(Some(Value::Node(node.first_child().unwrap())))
+        } else {
+            Ok(Some(Value::Node(node)))
+        }
     }
 }
 

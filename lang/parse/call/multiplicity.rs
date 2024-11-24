@@ -62,8 +62,6 @@ where
         let ids_sorted: Vec<Id> = data.keys().sorted().cloned().collect();
         let keys_sorted: Vec<usize> = (0..ids_sorted.len()).collect();
 
-        println!("{ids_sorted:?} {keys_sorted:?}");
-
         let indices = ids_sorted.iter().map(|k| 0).collect();
 
         let data_indices: std::collections::BTreeMap<Id, usize> = ids_sorted
@@ -76,13 +74,12 @@ where
             .iter()
             .map(|id| data.get(id).unwrap().clone())
             .collect();
-        let done = data.is_empty();
 
         Combinations {
             data,
             indices,
             data_indices,
-            done,
+            done: false,
         }
     }
 
@@ -110,6 +107,10 @@ impl Iterator for Combinations<crate::eval::Value> {
     fn next(&mut self) -> Option<Self::Item> {
         if self.done {
             return None;
+        }
+        if self.data_indices.is_empty() {
+            self.done = true;
+            return Some(ArgumentMap::default());
         }
 
         // Create the current combination based on the current indices
@@ -189,5 +190,20 @@ fn call_parameter_multiplicity() {
         count,
         2 * 3 * 2,
         "There must be 12 combinations, but only {count} iterated."
+    );
+
+    // Test empty map
+    let data: std::collections::HashMap<Id, Coefficient<Value>> = HashMap::new();
+
+    let combinations = Combinations::new(&data);
+    let mut count = 0;
+
+    for _ in combinations {
+        count += 1;
+    }
+
+    assert_eq!(
+        count, 1,
+        "There must be 1 combination, but only {count} iterated."
     );
 }

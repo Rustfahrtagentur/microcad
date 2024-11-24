@@ -169,7 +169,8 @@ pub fn dump(writer: &mut dyn std::io::Write, node: ObjectNode) -> std::io::Resul
         .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
 }
 
-fn into_group(node: ObjectNode) -> Option<ObjectNode> {
+/// Return ObjectNode if we are in a Group
+pub fn into_group(node: ObjectNode) -> Option<ObjectNode> {
     node.first_child().and_then(|n| {
         if let ObjectNodeInner::Group(_) = *n.borrow() {
             Some(n.clone())

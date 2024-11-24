@@ -19,6 +19,11 @@ impl List {
     pub fn new(list: ValueList, ty: Type, src_ref: SrcRef) -> Self {
         Self { list, ty, src_ref }
     }
+
+    /// Fetch all values as Vec<Value>
+    pub fn fetch(&self) -> Vec<Value> {
+        self.list.iter().cloned().collect::<Vec<_>>()
+    }
 }
 
 impl SrcReferrer for List {
