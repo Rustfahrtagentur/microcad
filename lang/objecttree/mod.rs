@@ -148,12 +148,12 @@ pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {
                         // Add children to group
                         for node in &node_window[1] {
                             for child in node.children() {
-                                children_marker_parent.append(child.make_deep_copy());
+                                children_marker_parent.append(child.clone());
                             }
                         }
                     } else {
                         for node in &node_window[1] {
-                            children_marker_parent.append(node.make_deep_copy());
+                            children_marker_parent.append(node.clone());
                         }
                     }
                     // Remove children marker
@@ -161,7 +161,7 @@ pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {
                 }
                 None => {
                     for child in &node_window[1] {
-                        node.append(child.make_deep_copy());
+                        node.append(child.clone());
                     }
                 }
             }
@@ -216,10 +216,11 @@ pub fn bake2d(
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_2d(
                     renderer,
-                    crate::objecttree::into_group(node.clone()).unwrap(),
+                    crate::objecttree::into_group(node.clone()).unwrap_or(node.clone()),
                 )
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),
+            ObjectNodeInner::ChildrenNodeMarker => geo2d::tree::group(),
             _ => return Err(CoreError::NotImplemented),
         }
     };
@@ -253,10 +254,11 @@ pub fn bake3d(
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_3d(
                     renderer,
-                    crate::objecttree::into_group(node.clone()).unwrap(),
+                    crate::objecttree::into_group(node.clone()).unwrap_or(node.clone()),
                 )
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),
+            ObjectNodeInner::ChildrenNodeMarker => geo3d::tree::group(),
             _ => return Err(CoreError::NotImplemented),
         }
     };
