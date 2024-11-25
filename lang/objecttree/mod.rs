@@ -126,41 +126,57 @@ impl Depth for ObjectNode {
 /// Assume, our `Vec<Node` has three nodes `a`, `b`, `c`.
 /// Then `c` will have `b` as parent and `b` will have `a` as parent.
 /// Node `a` will be returned.
-pub fn nest_nodes(nodes: Vec<ObjectNode>) -> ObjectNode {
+pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {
     for node_window in nodes.windows(2) {
-        // Find children node marker in children
-        let children_marker_node = node_window[0]
-            .descendants()
-            .find(|n| matches!(*n.borrow(), ObjectNodeInner::ChildrenNodeMarker));
+        for node in &node_window[0] {
+            // Find children node marker in children
+            let children_marker_node = node
+                .descendants()
+                .find(|n| matches!(*n.borrow(), ObjectNodeInner::ChildrenNodeMarker));
 
-        match children_marker_node {
-            Some(children_marker_node) => {
-                // Add children to parent of children marker (a marker is always a child of a group)
-                let children_marker_parent = children_marker_node
-                    .parent()
-                    .expect("Children marker should have a parent");
+            match children_marker_node {
+                Some(children_marker_node) => {
+                    // Add children to parent of children marker (a marker is always a child of a group)
+                    let children_marker_parent = children_marker_node
+                        .parent()
+                        .expect("Children marker should have a parent");
 
-                let is_group =
-                    matches!(*children_marker_parent.borrow(), ObjectNodeInner::Group(_));
+                    let is_group =
+                        matches!(*children_marker_parent.borrow(), ObjectNodeInner::Group(_));
 
-                if is_group {
-                    // Add children to group
-                    for child in node_window[1].children() {
-                        children_marker_parent.append(child.clone());
+                    if is_group {
+                        // Add children to group
+                        for node in &node_window[1] {
+                            for child in node.children() {
+                                children_marker_parent.append(child.make_deep_copy());
+                            }
+                        }
+                    } else {
+                        for node in &node_window[1] {
+                            children_marker_parent.append(node.make_deep_copy());
+                        }
                     }
-                } else {
-                    children_marker_parent.append(node_window[1].clone());
+                    // Remove children marker
+                    children_marker_node.detach();
                 }
-                // Remove children marker
-                children_marker_node.detach();
-            }
-            None => {
-                node_window[0].append(node_window[1].clone());
+                None => {
+                    for child in &node_window[1] {
+                        node.append(child.make_deep_copy());
+                    }
+                }
             }
         }
     }
 
-    nodes[0].clone()
+    if nodes[0].len() == 1 {
+        nodes[0].first().unwrap().clone()
+    } else {
+        let group = group();
+        for node in &nodes[0] {
+            group.append(node.clone());
+        }
+        group
+    }
 }
 
 /// Dumps the tree structure of a node.
@@ -259,14 +275,14 @@ pub fn bake3d(
 
 #[test]
 fn node_nest() {
-    let nodes = vec![group(), group(), group()];
+    let nodes = vec![vec![group()], vec![group()], vec![group()]];
     let node = nest_nodes(nodes.clone());
 
-    nodes[0]
+    nodes[0][0]
         .descendants()
         .for_each(|n| println!("{}{:?}", "  ".repeat(n.depth()), n.borrow()));
 
-    assert_eq!(nodes[2].parent().unwrap(), nodes[1]);
-    assert_eq!(nodes[1].parent().unwrap(), node);
+    assert_eq!(nodes[2][0].parent().unwrap(), nodes[1][0]);
+    assert_eq!(nodes[1][0].parent().unwrap(), node);
     assert!(node.parent().is_none());
 }

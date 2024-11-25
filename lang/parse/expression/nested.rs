@@ -74,7 +74,7 @@ impl Eval for Nested {
             }
         }
 
-        Ok(Value::Node(crate::objecttree::nest_nodes(nodes)))
+        Ok(Some(Value::Node(crate::objecttree::nest_nodes(nodes))))
     }
 }
 
