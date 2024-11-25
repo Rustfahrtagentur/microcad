@@ -47,70 +47,32 @@ impl SrcReferrer for Nested {
 }
 
 impl Eval for Nested {
-    type Output = Value;
+    type Output = Option<Value>;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let mut values = Vec::new();
-        for (index, item) in self.0.iter().enumerate() {
-            match item {
-                NestedItem::Call(call) => match call.eval(context)? {
-                    Some(value) => {
-                        values.push(value);
-                    }
-                    None => {
-                        use crate::diag::PushDiag;
-                        if index > 0 {
-                            context
-                                .error(self, anyhow::anyhow!("Cannot nest function call {item}"))?;
-                        }
-                        return Ok(Value::Invalid);
-                    }
-                },
-                NestedItem::QualifiedName(qualified_name) => {
-                    let symbol = qualified_name.eval(context)?;
-                    match symbol {
-                        Symbol::Value(_, ref v) => {
-                            match v {
-                                Value::Node(node) => {
-                                    values.push(Value::Node(node.make_deep_copy()));
-                                }
-                                _ => {
-                                    values.push(v.clone_with_src_ref(qualified_name.src_ref()));
-                                }
-                            }
+        let mut nodes = Vec::new();
 
-                            break;
-                        }
-                        Symbol::Invalid => {
-                            use crate::diag::PushDiag;
-                            context.error(
-                                self,
-                                anyhow::anyhow!("Symbol not found: {}", qualified_name),
-                            )?;
-                            return Ok(Value::Invalid);
-                        }
-                        _ => {}
+        for item in &self.0 {
+            match item.eval(context)? {
+                CallResult::Nodes(n) => nodes.push(n),
+                CallResult::None => {
+                    if nodes.is_empty() && self.0.len() == 1 {
+                        return Ok(None);
+                    } else {
+                        use crate::diag::PushDiag;
+                        context.error(self, anyhow::anyhow!("`{item}` cannot be nested"))?;
                     }
                 }
-                NestedItem::NodeBody(body) => {
-                    values.push(Value::Node(body.eval(context)?));
+                CallResult::Value(value) => {
+                    if nodes.is_empty() && self.0.len() == 1 {
+                        return Ok(Some(value));
+                    } else {
+                        use crate::diag::PushDiag;
+                        context.error(self, anyhow::anyhow!("`{item}` cannot be nested"))?;
+                    }
                 }
             }
         }
-
-        assert!(!values.is_empty());
-
-        if values.len() == 1 {
-            return Ok(values[0].clone());
-        }
-
-        let nodes = values
-            .iter()
-            .filter_map(|v| match v {
-                Value::Node(node) => Some(node.clone()),
-                _ => None,
-            })
-            .collect::<Vec<_>>();
 
         Ok(Value::Node(crate::objecttree::nest_nodes(nodes)))
     }

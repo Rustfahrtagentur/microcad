@@ -24,24 +24,20 @@ pub struct BuiltinModule {
 }
 
 impl CallTrait for BuiltinModule {
+    type Output = Vec<ObjectNode>;
+
     /// Call implicit initialization of this module
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Self::Output> {
         let multi_arg_map = args
             .eval(context)?
             .get_multi_matching_arguments(&self.parameters.eval(context)?)?;
 
-        let node = objecttree::group();
-
+        let mut nodes = Vec::new();
         for arg_map in multi_arg_map.combinations() {
-            node.append((self.f)(&arg_map, context)?);
+            nodes.push((self.f)(&arg_map, context)?);
         }
 
-        if node.children().count() == 1 {
-            // Skip group node and return child directly
-            Ok(Some(Value::Node(node.first_child().unwrap())))
-        } else {
-            Ok(Some(Value::Node(node)))
-        }
+        Ok(nodes)
     }
 }
 

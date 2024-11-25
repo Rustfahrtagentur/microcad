@@ -37,6 +37,8 @@ impl BuiltinFunction {
 }
 
 impl CallTrait for BuiltinFunction {
+    type Output = Option<Value>;
+
     /// Call builtin function with given parameter
     /// # Arguments
     /// - `args`: Function arguments

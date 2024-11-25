@@ -18,8 +18,10 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// trait for calls of modules or functions with argument list
 pub trait CallTrait {
+    type Output;
+
     /// Evaluate call into value (if possible)
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>>;
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Self::Output>;
 }
 
 /// Call of a function or module initialization
@@ -68,34 +70,40 @@ impl std::fmt::Display for Call {
     }
 }
 
+pub enum CallResult {
+    Nodes(Vec<crate::ObjectNode>),
+    Value(crate::eval::Value),
+    None,
+}
+
 impl Eval for Call {
-    type Output = Option<Value>;
+    type Output = CallResult;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         match self.name.eval(context)? {
-            Symbol::Function(f) => {
-                return f.call(&self.argument_list, context);
-            }
-            Symbol::BuiltinFunction(f) => {
-                return f.call(&self.argument_list, context);
-            }
+            Symbol::Function(f) => match f.call(&self.argument_list, context)? {
+                Some(value) => Ok(CallResult::Value(value)),
+                None => Ok(CallResult::None),
+            },
+            Symbol::BuiltinFunction(f) => match f.call(&self.argument_list, context)? {
+                Some(value) => Ok(CallResult::Value(value)),
+                None => Ok(CallResult::None),
+            },
             Symbol::BuiltinModule(m) => {
-                return m.call(&self.argument_list, context);
+                Ok(CallResult::Nodes(m.call(&self.argument_list, context)?))
             }
-            Symbol::Module(m) => {
-                return m.call(&self.argument_list, context);
-            }
+            Symbol::Module(m) => Ok(CallResult::Nodes(m.call(&self.argument_list, context)?)),
             Symbol::Invalid => {
                 // We don't do anything if the symbol is not found, because an error has been already raised before
+                Ok(CallResult::None)
             }
             symbol => {
                 use crate::diag::PushDiag;
                 use anyhow::anyhow;
                 context.error(self, anyhow!("{} is not callable", symbol))?;
+                Ok(CallResult::None)
             }
         }
-
-        Ok(None)
     }
 }
 

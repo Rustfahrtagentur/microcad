@@ -42,7 +42,9 @@ impl FunctionDefinition {
 }
 
 impl CallTrait for FunctionDefinition {
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
+    type Output = Option<Value>;
+
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Self::Output> {
         let arg_map = args.get_matching_arguments(context, &self.signature.parameters)?;
 
         let stack_frame = StackFrame::FunctionCall(context.top().symbol_table().clone());

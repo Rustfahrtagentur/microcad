@@ -261,7 +261,10 @@ impl Eval for Expression {
                 }
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
-            Self::Nested(nested) => nested.eval(context),
+            Self::Nested(nested) => match nested.eval(context)? {
+                Some(value) => Ok(value),
+                None => Ok(Value::Invalid),
+            },
             _ => unimplemented!(),
         }
     }

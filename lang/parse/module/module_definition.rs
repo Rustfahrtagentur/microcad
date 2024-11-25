@@ -3,7 +3,7 @@
 
 //! Module definition parser entity
 
-use crate::{errors::*, eval::*, objecttree, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, objecttree, parse::*, parser::*, src_ref::*, ObjectNode};
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -28,10 +28,12 @@ impl ModuleDefinition {
 }
 
 impl CallTrait for ModuleDefinition {
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
+    type Output = Vec<ObjectNode>;
+
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Self::Output> {
         let stack_frame = StackFrame::ModuleCall(context.top().symbol_table().clone(), None);
 
-        let mut node = crate::objecttree::group();
+        let mut nodes = Vec::new();
 
         context.scope(stack_frame, |context| {
             // Let's evaluate the pre-init statements first
@@ -80,7 +82,7 @@ impl CallTrait for ModuleDefinition {
                             child.detach();
                             group.append(child.clone());
                         }
-                        init_object.copy(&mut node);
+                        init_object.copy(&mut group);
 
                         // Now, copy the symbols of the node into the context
                         group.copy(context);
@@ -103,7 +105,11 @@ impl CallTrait for ModuleDefinition {
                         }
                     }
 
-                    node.append(group);
+                    {
+                        crate::objecttree::dump(&mut std::io::stdout(), group.clone());
+                    }
+
+                    nodes.push(group);
                 }
                 _ => {
                     context.error(self, anyhow!("Multiple matching initializers found"))?;
@@ -115,7 +121,7 @@ impl CallTrait for ModuleDefinition {
             Ok(())
         })?;
 
-        Ok(Some(Value::Node(node)))
+        Ok(nodes)
     }
 }
 
