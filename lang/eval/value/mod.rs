@@ -367,7 +367,10 @@ impl std::ops::Mul for Value {
                     Vec3::new(l * r.x, l * r.y, l * r.z)
                 })))
             }
-            _ => Err(EvalError::InvalidOperator("*".into())),
+            (Value::List(list), value) | (value, Value::List(list)) => {
+                Ok(Value::List((list * value)?))
+            }
+            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
     }
 }

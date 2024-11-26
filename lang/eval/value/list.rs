@@ -75,3 +75,23 @@ impl Ty for List {
         Type::List(crate::parse::ListType::new(self.ty.clone()))
     }
 }
+
+impl std::ops::Mul<Value> for List {
+    type Output = Result<List>;
+
+    fn mul(self, rhs: Value) -> Self::Output {
+        let mut values = Vec::new();
+        for value in self.iter() {
+            values.push((value.clone() * rhs.clone())?);
+        }
+
+        match (self.ty, rhs) {
+            (Type::Scalar, rhs) => Ok(List::new(
+                ValueList::new(values, self.src_ref.clone()),
+                rhs.ty().clone(),
+                self.src_ref.clone(),
+            )),
+            _ => Err(EvalError::InvalidOperator("*".into())),
+        }
+    }
+}
