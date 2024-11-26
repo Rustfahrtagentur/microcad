@@ -7,7 +7,7 @@ use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Nested item list
 #[derive(Clone, Debug)]
-pub struct Nested(Vec<NestedItem>);
+pub struct Nested(Refer<Vec<NestedItem>>);
 
 impl Nested {
     /// Returns an identifer if the nested item is a single qualified name
@@ -29,20 +29,21 @@ impl Parse for Nested {
     fn parse(pair: Pair) -> ParseResult<Self> {
         assert!(pair.as_rule() == Rule::nested || pair.as_rule() == Rule::expression_no_semicolon);
 
-        Ok(Self(
+        Ok(Self(Refer::new(
             pair.inner()
                 .filter(|pair| {
                     [Rule::qualified_name, Rule::call, Rule::node_body].contains(&pair.as_rule())
                 })
                 .map(NestedItem::parse)
                 .collect::<ParseResult<_>>()?,
-        ))
+            pair.src_ref(),
+        )))
     }
 }
 
 impl SrcReferrer for Nested {
     fn src_ref(&self) -> expression::SrcRef {
-        SrcRef::from_vec(&self.0)
+        self.0.src_ref()
     }
 }
 

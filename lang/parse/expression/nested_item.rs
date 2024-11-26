@@ -44,7 +44,7 @@ impl SrcReferrer for NestedItem {
         match self {
             Self::Call(c) => c.src_ref(),
             Self::QualifiedName(qn) => qn.src_ref(),
-            Self::NodeBody(mb) => mb.src_ref(),
+            Self::NodeBody(nb) => nb.src_ref(),
         }
     }
 }
