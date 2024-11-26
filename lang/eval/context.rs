@@ -12,6 +12,7 @@ use microcad_core::Id;
 /// A stack frame defines which kind of symbol we are currently evaluating.
 #[derive(Debug, Clone)]
 pub enum StackFrame {
+    SourceFile(std::rc::Rc<SourceFile>, SymbolTable),
     /// Initial state
     Namespace(SymbolTable),
     /// Currently evaluating a module definition
@@ -24,6 +25,17 @@ impl StackFrame {
     /// Get the symbol table of the stack frame
     pub fn symbol_table(&self) -> &SymbolTable {
         match self {
+            Self::SourceFile(_, table) => table,
+            Self::Namespace(table) => table,
+            Self::ModuleCall(table, _) => table,
+            Self::FunctionCall(table) => table,
+        }
+    }
+
+    /// Get a mutual reference to the symbol table
+    pub fn symbol_table_mut(&mut self) -> &mut SymbolTable {
+        match self {
+            Self::SourceFile(_, table) => table,
             Self::Namespace(table) => table,
             Self::ModuleCall(table, _) => table,
             Self::FunctionCall(table) => table,
@@ -39,37 +51,21 @@ impl Default for StackFrame {
 
 impl Symbols for StackFrame {
     fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
-        match self {
-            Self::Namespace(table) => table.fetch(id),
-            Self::ModuleCall(table, _) => table.fetch(id),
-            Self::FunctionCall(table) => table.fetch(id),
-        }
+        self.symbol_table().fetch(id)
     }
 
     fn add(&mut self, symbol: Symbol) -> &mut Self {
-        match self {
-            Self::Namespace(table) => table.add(symbol),
-            Self::ModuleCall(table, _) => table.add(symbol),
-            Self::FunctionCall(table) => table.add(symbol),
-        };
+        self.symbol_table_mut().add(symbol);
         self
     }
 
     fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
-        match self {
-            Self::Namespace(table) => table.add_alias(symbol, alias),
-            Self::ModuleCall(table, _) => table.add_alias(symbol, alias),
-            Self::FunctionCall(table) => table.add_alias(symbol, alias),
-        };
+        self.symbol_table_mut().add_alias(symbol, alias);
         self
     }
 
     fn copy<T: Symbols>(&self, into: &mut T) {
-        match self {
-            Self::Namespace(table) => table.copy(into),
-            Self::ModuleCall(table, _) => table.copy(into),
-            Self::FunctionCall(table) => table.copy(into),
-        }
+        self.symbol_table().copy(into);
     }
 }
 
@@ -80,9 +76,6 @@ impl Symbols for StackFrame {
 pub struct Context {
     /// Stack of symbol tables
     stack: Vec<StackFrame>,
-
-    /// Current node in the tree where the evaluation is happening
-    current_node: ObjectNode,
 
     /// Current source file being evaluated
     current_source_file: Option<std::rc::Rc<SourceFile>>,
@@ -101,7 +94,6 @@ impl Context {
 
         let mut ctx = Self {
             stack: vec![StackFrame::default()],
-            current_node: group(),
             current_source_file: Some(rc_source_file.clone()),
             ..Default::default()
         };
@@ -157,18 +149,6 @@ impl Context {
         Ok(())
     }
 
-    /// Set new_node as current node, call function and set old node
-    pub fn descend_node<F>(&mut self, new_node: ObjectNode, f: F) -> crate::eval::Result<ObjectNode>
-    where
-        F: FnOnce(&mut Self) -> crate::eval::Result<ObjectNode>,
-    {
-        let old_node = self.current_node.clone();
-        self.set_current_node(new_node.clone());
-        f(self)?;
-        self.set_current_node(old_node);
-        Ok(new_node)
-    }
-
     /// Read-only access to diagnostic handler
     pub fn diag(&self) -> &DiagHandler {
         &self.diag_handler
@@ -180,22 +160,6 @@ impl Context {
         name: &QualifiedName,
     ) -> Result<Vec<Symbol>, EvalError> {
         name.fetch_symbols(self)
-    }
-
-    /// Get current evaluation node
-    pub fn current_node(&self) -> ObjectNode {
-        self.current_node.clone()
-    }
-
-    /// Set current evaluation node
-    pub fn set_current_node(&mut self, node: ObjectNode) {
-        self.current_node = node;
-    }
-
-    /// Append a node to the current node and return the new node
-    pub fn append_node(&mut self, node: ObjectNode) -> ObjectNode {
-        self.current_node.append(node.clone());
-        node.clone()
     }
 
     /// Add source file to Context
@@ -248,7 +212,6 @@ impl Default for Context {
     fn default() -> Self {
         Self {
             stack: vec![StackFrame::default()],
-            current_node: group(),
             current_source_file: None,
             source_files: SourceFileCache::default(),
             diag_handler: DiagHandler::default(),

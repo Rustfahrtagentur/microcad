@@ -57,7 +57,7 @@ pub trait BuiltinModuleDefinition {
     fn node(args: &ArgumentMap) -> Result<ObjectNode>;
     /// Implicit initialization functor
     fn function() -> &'static BuiltinModuleFn {
-        &|args, ctx| Ok(ctx.append_node(Self::node(args)?))
+        &|args, _ctx| Self::node(args)
     }
     /// Generate builtin module
     fn builtin_module() -> BuiltinModule {
@@ -92,7 +92,7 @@ macro_rules! builtin_module {
             name: stringify!($name).into(),
             parameters: microcad_lang::parameter_list![$(microcad_lang::parameter!($arg: $type)),*],
             f:&|args, ctx| {
-                let mut l = |$($arg: $type),*| Ok(ctx.append_node($name($($arg),*)?));
+                let mut l = |$($arg: $type),*| $name($($arg),*);
                 let ($($arg),*) = (
                     $(args.get_value(stringify!($arg))),*
                 );
