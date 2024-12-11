@@ -3,11 +3,7 @@
 
 //! Builtin module evaluation entity
 
-use crate::{
-    eval::*,
-    objecttree::{self, *},
-    parse::*,
-};
+use crate::{eval::*, objecttree::*, parse::*};
 
 /// Builtin module initialization functor
 pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<ObjectNode>;

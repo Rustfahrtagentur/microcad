@@ -12,6 +12,7 @@ use microcad_core::Id;
 /// A stack frame defines which kind of symbol we are currently evaluating.
 #[derive(Debug, Clone)]
 pub enum StackFrame {
+    /// Source File
     SourceFile(std::rc::Rc<SourceFile>, SymbolTable),
     /// Initial state
     Namespace(SymbolTable),

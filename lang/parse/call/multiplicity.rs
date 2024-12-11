@@ -18,7 +18,7 @@ pub enum Coefficient<T> {
 
 impl<T> Coefficient<T> {
     /// Number of items in the coefficient
-    pub fn len(&self) -> usize {
+    pub fn count(&self) -> usize {
         match self {
             Self::Single(_) => 1,
             Self::Multi(v) => v.len(),
@@ -62,7 +62,7 @@ where
         let ids_sorted: Vec<Id> = data.keys().sorted().cloned().collect();
         let keys_sorted: Vec<usize> = (0..ids_sorted.len()).collect();
 
-        let indices = ids_sorted.iter().map(|k| 0).collect();
+        let indices = ids_sorted.iter().map(|_| 0).collect();
 
         let data_indices: std::collections::BTreeMap<Id, usize> = ids_sorted
             .iter()
@@ -88,7 +88,7 @@ where
         for (_, index) in self.data_indices.iter() {
             self.indices[*index] = *self.indices.get(*index).unwrap() + 1;
 
-            let count = self.data[*index].len();
+            let count = self.data[*index].count();
             if self.indices[*index] < count {
                 break;
             }
