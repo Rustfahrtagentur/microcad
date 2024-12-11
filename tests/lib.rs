@@ -49,7 +49,7 @@ fn eval_context(context: &mut microcad_lang::eval::Context) -> ObjectNode {
             .pretty_print(&mut std::io::stderr(), context)
             .unwrap();
 
-        panic!("ERROR: {} errors found", context.diag().error_count);
+        eprintln!("ERROR: {} errors found", context.diag().error_count);
     }
 
     node
@@ -362,17 +362,17 @@ fn test_simple_module_definition() {
     assert_eq!(module_definition.body.post_init_statements.len(), 1);
 
     // Call the module definition of `donut` and verify it
-    let node = module_definition
+    let nodes = module_definition
         .call(&CallArgumentList::default(), &mut context)
         .unwrap();
 
-    if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
+    if let Some(node) = nodes.first() {
         match *node.borrow() {
             ObjectNodeInner::Group(_) => {}
             ref inner => panic!("Expected node to be a Group, got {:?}", inner),
         }
 
-        export_tree_dump_for_node(node, "output/simple_module_definition.tree.dump");
+        export_tree_dump_for_node(node.clone(), "output/simple_module_definition.tree.dump");
     } else {
         panic!("Resulting value is not a node");
     }
@@ -417,7 +417,7 @@ fn test_module_definition_with_parameters() {
     // Call the module definition of `donut` and verify it
     use crate::parser::*;
 
-    let node = module_definition
+    let nodes = module_definition
         .call(
             &Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list, "radius = 6.0", 0)
                 .unwrap(),
@@ -425,7 +425,7 @@ fn test_module_definition_with_parameters() {
         )
         .unwrap();
 
-    if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
+    if let Some(node) = nodes.first() {
         match *node.borrow() {
             ObjectNodeInner::Group(ref symbols) => {
                 use microcad_lang::eval::*;
@@ -440,7 +440,10 @@ fn test_module_definition_with_parameters() {
             ref inner => panic!("Expected node to be a Group, got {:?}", inner),
         }
 
-        export_tree_dump_for_node(node, "output/module_definition_with_parameters.tree.dump");
+        export_tree_dump_for_node(
+            node.clone(),
+            "output/module_definition_with_parameters.tree.dump",
+        );
     } else {
         panic!("Resulting value is not a node");
     }
@@ -489,7 +492,7 @@ fn module_definition_init() {
     // Call the module definition of `donut` and verify it
     use crate::parser::*;
 
-    let node = module_definition
+    let nodes = module_definition
         .call(
             &Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list, "r = 6.0", 0)
                 .unwrap(),
@@ -497,7 +500,7 @@ fn module_definition_init() {
         )
         .unwrap();
 
-    if let microcad_lang::eval::Value::Node(node) = node.unwrap() {
+    if let Some(node) = nodes.first() {
         match *node.borrow() {
             ObjectNodeInner::Group(ref symbols) => {
                 use microcad_lang::eval::*;
@@ -512,7 +515,10 @@ fn module_definition_init() {
             ref inner => panic!("Expected node to be a Group, got {:?}", inner),
         }
 
-        export_tree_dump_for_node(node, "output/module_definition_with_parameters.tree.dump");
+        export_tree_dump_for_node(
+            node.clone(),
+            "output/module_definition_with_parameters.tree.dump",
+        );
     } else {
         panic!("Resulting value is not a node");
     }

@@ -16,6 +16,28 @@ pub struct CallArgument {
     src_ref: SrcRef,
 }
 
+impl CallArgument {
+    /// Returns the name, if self.name is some. If self.name is None, try to extract the name from the expression
+    pub fn derived_name(&self) -> Option<Identifier> {
+        match &self.name {
+            Some(name) => Some(name.clone()),
+            None => self.value.single_identifier(),
+        }
+    }
+}
+
+impl Eval for CallArgument {
+    type Output = CallArgumentValue;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+        Ok(CallArgumentValue::new(
+            self.id(),
+            self.value.eval(context)?,
+            self.src_ref.clone(),
+        ))
+    }
+}
+
 impl SrcReferrer for CallArgument {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()
@@ -24,7 +46,7 @@ impl SrcReferrer for CallArgument {
 
 impl Sym for CallArgument {
     fn id(&self) -> Option<microcad_core::Id> {
-        if let Some(name) = &self.name {
+        if let Some(name) = &self.derived_name() {
             name.id()
         } else {
             None
@@ -59,18 +81,6 @@ impl Parse for CallArgument {
             }),
             rule => unreachable!("CallArgument::parse expected call argument, found {rule:?}"),
         }
-    }
-}
-
-impl Eval for CallArgument {
-    type Output = CallArgumentValue;
-
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        Ok(CallArgumentValue::new(
-            self.id(),
-            self.value.eval(context)?,
-            self.src_ref(),
-        ))
     }
 }
 

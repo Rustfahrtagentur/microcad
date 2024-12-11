@@ -3,7 +3,7 @@
 
 //! Nested item parser entity
 
-use crate::{errors::*, parse::*, parser::*, src_ref::*};
+use crate::{diag::PushDiag, errors::*, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Nested item
 #[derive(Clone, Debug)]
@@ -16,12 +16,35 @@ pub enum NestedItem {
     NodeBody(NodeBody),
 }
 
+impl Eval for NestedItem {
+    type Output = CallResult;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+        match &self {
+            NestedItem::Call(call) => call.eval(context),
+            NestedItem::QualifiedName(qualified_name) => match qualified_name.eval(context)? {
+                Symbol::Value(_, Value::Node(node)) => {
+                    Ok(CallResult::Nodes(vec![node.make_deep_copy()]))
+                }
+                Symbol::Value(_, value) => Ok(CallResult::Value(
+                    value.clone_with_src_ref(qualified_name.src_ref()),
+                )),
+                symbol => {
+                    context.error(self, anyhow::anyhow!("Symbol `{symbol}` cannot be nested."))?;
+                    Ok(CallResult::None)
+                }
+            },
+            NestedItem::NodeBody(body) => Ok(CallResult::Nodes(vec![body.eval(context)?])),
+        }
+    }
+}
+
 impl SrcReferrer for NestedItem {
     fn src_ref(&self) -> SrcRef {
         match self {
             Self::Call(c) => c.src_ref(),
             Self::QualifiedName(qn) => qn.src_ref(),
-            Self::NodeBody(mb) => mb.src_ref(),
+            Self::NodeBody(nb) => nb.src_ref(),
         }
     }
 }

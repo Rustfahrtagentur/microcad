@@ -103,43 +103,44 @@ impl SourceFile {
     /// This is used to evaluate the source file as a namespace, which can be used to import
     /// functions and values from the source file.
     /// This functionality is used for the `use` statement.
-    ///
-    /// TODOs:
-    /// - [ ] Test this function
-    /// - [ ] Use this function in the `use` statement evaluation
     pub fn eval_as_namespace(
         &self,
         context: &mut Context,
         namespace_name: Identifier,
     ) -> Result<std::rc::Rc<NamespaceDefinition>> {
         let mut namespace = NamespaceDefinition::new(namespace_name);
+        let stack_frame = StackFrame::Namespace(context.top().symbol_table().clone());
 
-        for statement in &self.body {
-            match statement {
-                Statement::Assignment(a) => {
-                    namespace.add(Symbol::Value(a.name.id().unwrap(), a.value.eval(context)?));
-                }
-                Statement::FunctionDefinition(f) => {
-                    namespace.add(f.clone().into());
-                }
-                Statement::ModuleDefinition(m) => {
-                    namespace.add(m.clone().into());
-                }
-                Statement::NamespaceDefinition(n) => {
-                    let n = n.eval(context)?;
-                    namespace.add(n);
-                }
-                Statement::Use(u) => {
-                    if let Some(symbols) = u.eval(context)? {
-                        for (id, symbol) in symbols.iter() {
-                            namespace.add_alias(symbol.as_ref().clone(), id.clone());
+        context.scope(stack_frame, |context| {
+            for statement in &self.body {
+                match statement {
+                    Statement::Assignment(a) => {
+                        namespace.add(Symbol::Value(a.name.id().unwrap(), a.value.eval(context)?));
+                    }
+                    Statement::FunctionDefinition(f) => {
+                        namespace.add(f.clone().into());
+                    }
+                    Statement::ModuleDefinition(m) => {
+                        namespace.add(m.clone().into());
+                    }
+                    Statement::NamespaceDefinition(n) => {
+                        let n = n.eval(context)?;
+                        namespace.add(n);
+                    }
+                    Statement::Use(u) => {
+                        if let Some(symbols) = u.eval(context)? {
+                            for (id, symbol) in symbols.iter() {
+                                namespace.add_alias(symbol.as_ref().clone(), id.clone());
+                            }
                         }
                     }
-                }
 
-                _ => {}
+                    _ => {}
+                }
             }
-        }
+
+            Ok(())
+        })?;
 
         Ok(std::rc::Rc::new(namespace))
     }
@@ -178,35 +179,23 @@ impl Eval for SourceFile {
     type Output = objecttree::ObjectNode;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let mut new_nodes = Vec::new();
-
-        // Descend into root node and find all child nodes
-        context.descend_node(crate::objecttree::group(), |context| {
-            for statement in &self.body {
-                match statement {
-                    Statement::Expression(expression) => {
-                        // This statement has been evaluated into a new child node.
-                        // Add it to our `new_nodes` list
-                        if let Value::Node(node) = expression.eval(context)? {
-                            new_nodes.push(node);
-                        }
-                    }
-                    statement => {
-                        statement.eval(context)?;
+        let group = objecttree::group();
+        for statement in &self.body {
+            match statement {
+                Statement::Expression(expression) => {
+                    // This statement has been evaluated into a new child node.
+                    // Add it to our `new_nodes` list
+                    if let Value::Node(node) = expression.eval(context)? {
+                        group.append(node);
                     }
                 }
+                statement => {
+                    statement.eval(context)?;
+                }
             }
-
-            Ok(context.current_node().clone())
-        })?;
-
-        // Append all child nodes to root node
-        for node in new_nodes {
-            context.append_node(node);
         }
-
         // Return root node
-        Ok(context.current_node().clone())
+        Ok(group)
     }
 }
 

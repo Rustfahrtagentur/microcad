@@ -19,6 +19,11 @@ impl List {
     pub fn new(list: ValueList, ty: Type, src_ref: SrcRef) -> Self {
         Self { list, ty, src_ref }
     }
+
+    /// Fetch all values as Vec<Value>
+    pub fn fetch(&self) -> Vec<Value> {
+        self.list.iter().cloned().collect::<Vec<_>>()
+    }
 }
 
 impl SrcReferrer for List {
@@ -67,6 +72,26 @@ impl std::fmt::Display for List {
 
 impl Ty for List {
     fn ty(&self) -> Type {
-        self.ty.clone()
+        Type::List(crate::parse::ListType::new(self.ty.clone()))
+    }
+}
+
+impl std::ops::Mul<Value> for List {
+    type Output = Result<List>;
+
+    fn mul(self, rhs: Value) -> Self::Output {
+        let mut values = Vec::new();
+        for value in self.iter() {
+            values.push((value.clone() * rhs.clone())?);
+        }
+
+        match (self.ty, rhs) {
+            (Type::Scalar, rhs) => Ok(List::new(
+                ValueList::new(values, self.src_ref.clone()),
+                rhs.ty().clone(),
+                self.src_ref.clone(),
+            )),
+            _ => Err(EvalError::InvalidOperator("*".into())),
+        }
     }
 }

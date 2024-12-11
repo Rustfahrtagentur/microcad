@@ -1,0 +1,11 @@
+std::export("parameter_multiplicity.svg") {
+    //  Pass radii as a list argument to radius and two circles will be generated!
+    __builtin::geo2d::circle(radius = [1.0, 2.0]);
+
+    // Multiply the radii by 3.0mm, and pass the resulting list as radii
+    std::geo2d::circle(radius = [3.0, 4.0]mm);
+
+    std::translate(x = [5.0, 6.0]mm)
+        std::geo2d::circle(radius = x);
+}
+

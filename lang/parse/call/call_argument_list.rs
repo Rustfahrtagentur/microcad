@@ -3,11 +3,65 @@
 
 //! Parse `call_argument_list` rule into CallArgumentList
 
-use crate::{errors::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
+use crate::{
+    diag::PushDiag, errors::*, eval::*, ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*,
+};
 
 /// List of call arguments
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentList(Refer<OrdMap<Identifier, CallArgument>>);
+
+use thiserror::Error;
+
+/// An error that occured when looking for matching arguments between a call and a parameter definition
+#[derive(Error, Debug)]
+pub enum MatchError {
+    /// Duplicated argument
+    #[error("Duplicated argument: {0}")]
+    DuplicatedArgument(Id),
+    /// Occurs when a parameter was given in a call but not in the definition
+    #[error("Parameter `{0}` is not defined.")]
+    ParameterNotDefined(Id),
+    /// Mismatching type
+    #[error("Type mismatch for parameter `{0}`: expected `{1}`, got {2}")]
+    PositionalArgumentTypeMismatch(Id, Type, Type),
+    /// Parameter required by definition but given in the call
+    #[error("Missing parameter: {0}")]
+    MissingParameter(Id),
+}
+
+impl CallArgumentList {
+    /// Get matching arguments from parameter list
+    pub fn get_matching_arguments(
+        &self,
+        context: &mut Context,
+        parameters: &ParameterList,
+    ) -> Result<ArgumentMap> {
+        let parameter_values = parameters.eval(context)?;
+        match self
+            .eval(context)?
+            .get_matching_arguments(&parameter_values)
+        {
+            Ok(args) => Ok(args),
+            Err(err) => {
+                context.error(self, anyhow::anyhow!("{}", err))?;
+                Ok(ArgumentMap::default())
+            }
+        }
+    }
+}
+
+impl Eval for CallArgumentList {
+    type Output = CallArgumentValueList;
+
+    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+        let mut args = CallArgumentValueList::default();
+        for arg in self.iter() {
+            args.push(arg.eval(context)?).expect("Duplicated argument");
+        }
+        Ok(args)
+    }
+}
 
 impl SrcReferrer for CallArgumentList {
     fn src_ref(&self) -> SrcRef {
@@ -26,22 +80,6 @@ impl std::ops::Deref for CallArgumentList {
 impl std::ops::DerefMut for CallArgumentList {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
-    }
-}
-
-impl Eval for CallArgumentList {
-    type Output = CallArgumentValueList;
-
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
-        let mut call_argument_list = CallArgumentValueList::default();
-
-        for arg in self.iter() {
-            call_argument_list
-                .push(arg.eval(context)?)
-                .map_err(EvalError::DuplicateCallArgument)?;
-        }
-
-        Ok(call_argument_list)
     }
 }
 

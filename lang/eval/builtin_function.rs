@@ -37,14 +37,14 @@ impl BuiltinFunction {
 }
 
 impl CallTrait for BuiltinFunction {
+    type Output = Option<Value>;
+
     /// Call builtin function with given parameter
     /// # Arguments
     /// - `args`: Function arguments
     /// - `context`: Execution context
     fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
-        let arg_map = args
-            .eval(context)?
-            .get_matching_arguments(&self.signature.parameters.eval(context)?)?;
+        let arg_map = args.get_matching_arguments(context, &self.signature.parameters)?;
         let result = (self.f)(&arg_map, context)?;
 
         match (&result, &self.signature.return_type) {

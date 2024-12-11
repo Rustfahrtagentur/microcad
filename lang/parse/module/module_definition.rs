@@ -3,7 +3,7 @@
 
 //! Module definition parser entity
 
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{errors::*, eval::*, objecttree, parse::*, parser::*, src_ref::*, ObjectNode};
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -28,10 +28,12 @@ impl ModuleDefinition {
 }
 
 impl CallTrait for ModuleDefinition {
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
+    type Output = Vec<ObjectNode>;
+
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Self::Output> {
         let stack_frame = StackFrame::ModuleCall(context.top().symbol_table().clone(), None);
 
-        let mut node = crate::objecttree::group();
+        let mut nodes = Vec::new();
 
         context.scope(stack_frame, |context| {
             // Let's evaluate the pre-init statements first
@@ -39,40 +41,71 @@ impl CallTrait for ModuleDefinition {
                 statement.eval(context)?;
             }
 
-            let mut matching_init = Vec::new();
-            let arg_values = args.eval(context)?;
+            let mut inits = Vec::new();
 
             // Find all initializers that match the arguments and add it to the matching_init list
             for init in &self.body.inits {
-                let param_values = init.parameters.eval(context)?;
-                if let Ok(arg_map) = arg_values.get_matching_arguments(&param_values) {
-                    matching_init.push((init, arg_map));
-                }
+                inits.push((
+                    init,
+                    args.eval(context)?
+                        .get_multi_matching_arguments(&init.parameters.eval(context)?),
+                ));
             }
 
             use crate::diag::PushDiag;
             use anyhow::anyhow;
 
+            let matching_inits = inits
+                .iter()
+                .filter(|(_, result)| result.is_ok())
+                .map(|(init, result)| (*init, result.as_ref().unwrap()))
+                .collect::<Vec<_>>();
+
             // There should be only one matching initializer
-            match matching_init.len() {
+            match matching_inits.len() {
                 0 => {
                     context.error(self, anyhow!("No matching initializer found"))?;
                 }
                 1 => {
-                    let (init, arg_map) = matching_init.first().unwrap();
-                    // Copy the arguments to the symbol table of the node
-                    for (name, value) in arg_map.iter() {
-                        node.add(Symbol::Value(name.clone(), value.clone()));
-                    }
-                    let init_object = init.call(arg_map, context)?;
+                    let (init, multi_arg_map) = matching_inits.first().unwrap();
 
-                    // Add the init object's children to the node
-                    for child in init_object.children() {
-                        child.detach();
-                        node.append(child.clone());
+                    let mut group = objecttree::group();
+                    for arg_map in multi_arg_map.combinations() {
+                        // Copy the arguments to the symbol table of the node
+                        for (name, value) in arg_map.iter() {
+                            group.add(Symbol::Value(name.clone(), value.clone()));
+                        }
+                        let init_object = init.call(&arg_map, context)?;
+
+                        // Add the init object's children to the node
+                        for child in init_object.children() {
+                            child.detach();
+                            group.append(child.clone());
+                        }
+                        init_object.copy(&mut group);
+
+                        // Now, copy the symbols of the node into the context
+                        group.copy(context);
+
+                        // Evaluate the post-init statements
+                        for statement in &self.body.post_init_statements {
+                            match statement {
+                                ModuleDefinitionStatement::Assignment(assignment) => {
+                                    // Evaluate the assignment and add the symbol to the node
+                                    // E.g. `a = 1` will add the symbol `a` to the node
+                                    let symbol = assignment.eval(context)?;
+                                    group.add(symbol);
+                                }
+                                statement => {
+                                    if let Some(Value::Node(new_child)) = statement.eval(context)? {
+                                        group.append(new_child);
+                                    }
+                                }
+                            }
+                        }
                     }
 
-                    init_object.copy(&mut node);
+                    nodes.push(group);
                 }
                 _ => {
                     context.error(self, anyhow!("Multiple matching initializers found"))?;
@@ -81,30 +114,10 @@ impl CallTrait for ModuleDefinition {
                 }
             }
 
-            // Now, copy the symbols of the node into the context
-            node.copy(context);
-
-            // Evaluate the post-init statements
-            for statement in &self.body.post_init_statements {
-                match statement {
-                    ModuleDefinitionStatement::Assignment(assignment) => {
-                        // Evaluate the assignment and add the symbol to the node
-                        // E.g. `a = 1` will add the symbol `a` to the node
-                        let symbol = assignment.eval(context)?;
-                        node.add(symbol);
-                    }
-                    statement => {
-                        if let Some(Value::Node(new_child)) = statement.eval(context)? {
-                            node.append(new_child);
-                        }
-                    }
-                }
-            }
-
             Ok(())
         })?;
 
-        Ok(Some(Value::Node(node)))
+        Ok(nodes)
     }
 }
 

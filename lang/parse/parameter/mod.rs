@@ -111,10 +111,20 @@ impl Eval for Parameter {
             (Some(specified_type), Some(expr)) => {
                 let default_value = expr.eval(context)?;
                 if specified_type.ty() != default_value.ty() {
-                    Err(EvalError::ParameterTypeMismatch(
-                        self.name.id().expect("unnamed parameter type mismatch"),
-                        specified_type.ty(),
-                        default_value.ty(),
+                    use crate::diag::PushDiag;
+                    context.error(
+                        self,
+                        anyhow::anyhow!(
+                            "Type mismatch for parameter `{name}`: expected {expected}, got {got}.",
+                            name = self.name,
+                            expected = specified_type.ty(),
+                            got = default_value.ty(),
+                        ),
+                    )?;
+                    // Return an invalid parameter value in case evaluation failed
+                    Ok(ParameterValue::invalid(
+                        self.name.id().unwrap(),
+                        self.src_ref(),
                     ))
                 } else {
                     Ok(ParameterValue::new(

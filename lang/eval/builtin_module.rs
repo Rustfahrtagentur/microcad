@@ -3,7 +3,7 @@
 
 //! Builtin module evaluation entity
 
-use crate::{eval::*, parse::*, objecttree::*};
+use crate::{eval::*, objecttree::*, parse::*};
 
 /// Builtin module initialization functor
 pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<ObjectNode>;
@@ -20,12 +20,20 @@ pub struct BuiltinModule {
 }
 
 impl CallTrait for BuiltinModule {
+    type Output = Vec<ObjectNode>;
+
     /// Call implicit initialization of this module
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Option<Value>> {
-        let arg_map = args
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Self::Output> {
+        let multi_arg_map = args
             .eval(context)?
-            .get_matching_arguments(&self.parameters.eval(context)?)?;
-        Ok(Some(Value::Node((self.f)(&arg_map, context)?)))
+            .get_multi_matching_arguments(&self.parameters.eval(context)?)?;
+
+        let mut nodes = Vec::new();
+        for arg_map in multi_arg_map.combinations() {
+            nodes.push((self.f)(&arg_map, context)?);
+        }
+
+        Ok(nodes)
     }
 }
 
@@ -45,7 +53,7 @@ pub trait BuiltinModuleDefinition {
     fn node(args: &ArgumentMap) -> Result<ObjectNode>;
     /// Implicit initialization functor
     fn function() -> &'static BuiltinModuleFn {
-        &|args, ctx| Ok(ctx.append_node(Self::node(args)?))
+        &|args, _ctx| Self::node(args)
     }
     /// Generate builtin module
     fn builtin_module() -> BuiltinModule {
@@ -80,7 +88,7 @@ macro_rules! builtin_module {
             name: stringify!($name).into(),
             parameters: microcad_lang::parameter_list![$(microcad_lang::parameter!($arg: $type)),*],
             f:&|args, ctx| {
-                let mut l = |$($arg: $type),*| Ok(ctx.append_node($name($($arg),*)?));
+                let mut l = |$($arg: $type),*| $name($($arg),*);
                 let ($($arg),*) = (
                     $(args.get_value(stringify!($arg))),*
                 );

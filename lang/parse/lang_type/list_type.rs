@@ -12,7 +12,7 @@ pub struct ListType(Box<Type>);
 
 impl ListType {
     /// Generate `ListType` from `Type`
-    fn new(t: Type) -> Self {
+    pub fn new(t: Type) -> Self {
         Self(Box::new(t))
     }
 }

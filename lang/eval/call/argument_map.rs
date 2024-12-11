@@ -3,7 +3,7 @@
 
 //! Argument map evaluation entity
 
-use crate::{eval::*, src_ref::*};
+use crate::{eval::*, parse::Combinations, src_ref::*};
 
 /// Map of arguments
 #[derive(Clone, Debug, Default)]
@@ -49,3 +49,35 @@ impl std::ops::DerefMut for ArgumentMap {
     }
 }
 
+/// An argument map for parameter multiplicity.
+///
+/// In the combination map, every value can be a single or multi coefficient.
+/// Let's assume, you have a `module a(r: scalar) {}`:
+/// * If you call `a(4.0)`, `a` will be stored as a single coefficient, because we passed a single scalar.
+/// * If you call `a([2.0, 4.0])`, `a` will be stored as a multi coefficient, because we passed a list of scalars.
+#[derive(Default)]
+pub struct MultiArgumentMap(crate::parse::call::CombinationMap<Value>);
+
+impl MultiArgumentMap {
+    /// Insert a multi-value coefficient
+    pub fn insert_multi(&mut self, name: Id, value: Vec<Value>) {
+        self.0
+            .insert(name, crate::parse::call::Coefficient::Multi(value));
+    }
+
+    /// Insert a single-value coefficient
+    pub fn insert_single(&mut self, name: Id, value: Value) {
+        self.0
+            .insert(name, crate::parse::call::Coefficient::Single(value));
+    }
+
+    /// Return an iterator over all combinations
+    pub fn combinations(&self) -> Combinations<Value> {
+        Combinations::new(&self.0)
+    }
+
+    /// Check if the argument map contains a key
+    pub fn contains_key(&self, key: &Id) -> bool {
+        self.0.contains_key(key)
+    }
+}

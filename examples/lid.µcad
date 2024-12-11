@@ -6,10 +6,11 @@ module lid(
     height = 20.0mm,
 ) {
     outer_diameter = 2.0 * thickness + inner_diameter;
+    h = height;
 
     use geo3d::cylinder;
-    outer = cylinder(d = outer_diameter, h = height);
-    inner = translate(z = thickness) cylinder(d = inner_diameter, h = height);
+    outer = cylinder(d = outer_diameter, h);
+    inner = translate(z = thickness) cylinder(d = inner_diameter, h);
 
     // Calculate the difference between two translated cylinders
     outer - inner;

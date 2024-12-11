@@ -21,9 +21,9 @@ pub struct ParameterValue {
 /// Result of a type check with `ParameterValue::type_check()`
 pub enum TypeCheckResult {
     /// Self's type matched given type
-    Match,
+    SingleMatch,
     /// Self is list of that type
-    List,
+    MultiMatch,
     /// An error occurred
     NoMatch(Id, Type, Type),
 }
@@ -44,6 +44,16 @@ impl ParameterValue {
         }
     }
 
+    /// Creates an invalid parameter value, in case an error occured during evaluation
+    pub fn invalid(name: Id, src_ref: SrcRef) -> Self {
+        Self {
+            name,
+            specified_type: None,
+            default_value: None,
+            src_ref,
+        }
+    }
+
     /// Check how the type of this parameter value relates to the given one
     /// # Return
     /// - `TypeCheckResult::Match`: Given type matches exactly
@@ -51,9 +61,9 @@ impl ParameterValue {
     /// - `TypeCheckResult::NoMatch(err)`: Types do not match (`err` describes both type
     pub fn type_check(&self, ty: &Type) -> TypeCheckResult {
         if self.type_matches(ty) {
-            TypeCheckResult::Match
-        } else if ty.is_list_of(&self.specified_type.clone().unwrap()) {
-            TypeCheckResult::List
+            TypeCheckResult::SingleMatch
+        } else if ty.is_list_of(self.specified_type.as_ref().unwrap()) {
+            TypeCheckResult::MultiMatch
         } else {
             TypeCheckResult::NoMatch(
                 self.name.clone(),
@@ -64,7 +74,7 @@ impl ParameterValue {
     }
 
     /// Check if type of this parameter value matches the given one
-    fn type_matches(&self, ty: &Type) -> bool {
+    pub fn type_matches(&self, ty: &Type) -> bool {
         match &self.specified_type {
             Some(t) => t == ty,
             None => true, // Accept any type if none is specified
@@ -110,4 +120,11 @@ macro_rules! parameter_value {
         ParameterValue::new(stringify!($name).into(), None, Some($value), SrcRef(None))
     };
     () => {};
+}
+
+#[test]
+fn test_is_list_of() {
+    use crate::parse::ListType;
+
+    assert!(Type::List(ListType::new(Type::Scalar)).is_list_of(&Type::Scalar));
 }

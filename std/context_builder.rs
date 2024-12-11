@@ -41,7 +41,7 @@ impl ContextBuilder {
             Ok(std_source_file) => std_source_file,
             Err(err) => panic!("ERROR: {err:?}"),
         };
-        let context = Self::new(std_source_file).with_builtin().build();
+        let context = Self::new(std_source_file.clone()).with_builtin().build();
 
         let namespace = context
             .current_source_file()
@@ -49,7 +49,7 @@ impl ContextBuilder {
             .eval_as_namespace(&mut self.context, "std".into())
             .expect("failure evaluating std library");
         use microcad_lang::eval::*;
-
+        self.context.add_source_file(std_source_file);
         self.context.add(Symbol::Namespace(namespace));
         self
     }

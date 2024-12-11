@@ -20,13 +20,11 @@ impl MethodCall {
     /// Evaluate the method call in a context
     pub fn eval(&self, context: &mut Context, lhs: &Expression) -> Result<Value> {
         let name: &str = &self.name.to_string();
-        let args = self.argument_list.eval(context)?;
-
         use call::call_method::CallMethod;
 
         match lhs.eval(context)? {
-            Value::Node(node) => node.call_method(&self.name, &args, self.src_ref()),
-            Value::List(list) => list.call_method(&self.name, &args, self.src_ref()),
+            Value::Node(node) => node.call_method(&self.name, &self.argument_list, self.src_ref()),
+            Value::List(list) => list.call_method(&self.name, &self.argument_list, self.src_ref()),
             _ => Err(EvalError::UnknownMethod(name.into())),
         }
     }
