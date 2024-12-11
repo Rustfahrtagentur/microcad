@@ -123,7 +123,7 @@ impl Depth for ObjectNode {
 
 /// Nest a Vec of nodes
 ///
-/// Assume, our `Vec<Node` has three nodes `a`, `b`, `c`.
+/// Assume, our `Vec<Node>` has three nodes `a`, `b`, `c`.
 /// Then `c` will have `b` as parent and `b` will have `a` as parent.
 /// Node `a` will be returned.
 pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {

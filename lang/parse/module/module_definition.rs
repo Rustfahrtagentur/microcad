@@ -105,10 +105,6 @@ impl CallTrait for ModuleDefinition {
                         }
                     }
 
-                    {
-                        crate::objecttree::dump(&mut std::io::stdout(), group.clone());
-                    }
-
                     nodes.push(group);
                 }
                 _ => {

@@ -1,8 +1,11 @@
-// Generate two sphere with radii 10.0 and 20.0 using parameter multiplicity
-radii = [10.0, 20.0];
-std::print("{radii}");
+std::export("parameter_multiplicity.svg") {
+    //  Pass radii as a list argument to radius and two circles will be generated!
+    __builtin::geo2d::circle(radius = [1.0, 2.0]);
 
-// Pass radii as a list argument to radius and two spheres will be generated!
-__builtin::geo2d::circle(radius = radii);
+    // Multiply the radii by 3.0mm, and pass the resulting list as radii
+    std::geo2d::circle(radius = [3.0, 4.0]mm);
 
-std::geo2d::circle(radius = radii * 1.0mm);
+    std::translate(x = [5.0, 6.0]mm)
+        std::geo2d::circle(radius = x);
+}
+

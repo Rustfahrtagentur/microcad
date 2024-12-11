@@ -53,7 +53,7 @@ impl Eval for Nested {
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
         let mut nodes = Vec::new();
 
-        for item in &self.0 {
+        for item in self.0.iter() {
             match item.eval(context)? {
                 CallResult::Nodes(n) => nodes.push(n),
                 CallResult::None => {
