@@ -12,6 +12,7 @@ extern crate microcad_lang;
 use clap::Parser;
 use microcad_lang::parse::SourceFile;
 
+/// µCAD cli
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
