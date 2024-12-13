@@ -71,7 +71,10 @@ module lid(
 l = lid();
 
 // Print out the volume of the model instance
-print("Volume: {l.volume() / 1000}cm³");
+std::print("Volume: {l.volume() / 1000}cm³");
+
+// Insert `l` into resulting object tree
+std::export("lid.stl") l;
 ```
 
 The program above will print out the following text and export the model to STL.
