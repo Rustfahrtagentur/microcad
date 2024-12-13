@@ -24,18 +24,19 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Parse the µCAD file
+    Parse {
+        /// Input µCAD file
+        input: String,
+    },
+
     /// Evaluates the µCAD file
     Eval {
         /// Input µCAD file
         input: String,
     },
 
-    ///
-    Parse {
-        /// Input µCAD file
-        input: String,
-    },
-
+    /// Exports the µCAD file
     Export {
         /// Input µCAD file
         input: String,

@@ -25,7 +25,11 @@ impl MethodCall {
         match lhs.eval(context)? {
             Value::Node(node) => node.call_method(&self.name, &self.argument_list, self.src_ref()),
             Value::List(list) => list.call_method(&self.name, &self.argument_list, self.src_ref()),
-            _ => Err(EvalError::UnknownMethod(name.into())),
+            _ => {
+                use crate::diag::PushDiag;
+                context.error(self, anyhow::anyhow!("Unknown method: {name}"))?;
+                Ok(Value::Invalid)
+            }
         }
     }
 }
