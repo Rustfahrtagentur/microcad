@@ -3,7 +3,7 @@
 
 //! Named tuple type parser entity
 
-use crate::{errors::*, parse::*, parser::*, r#type::*};
+use crate::{parse::*, parse::*, parser::*, r#type::*};
 
 /// Named tuple (e.g. `(n: scalar, m: string)`)
 #[derive(Debug, Clone, Default, PartialEq)]

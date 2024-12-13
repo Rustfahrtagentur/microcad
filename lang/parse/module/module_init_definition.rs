@@ -3,7 +3,7 @@
 
 //! Module initialization definition parser entity
 
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
 
 /// Module initialization definition
 ///
@@ -26,7 +26,11 @@ pub struct ModuleInitDefinition {
 
 impl ModuleInitDefinition {
     /// Call the initializer
-    pub fn call(&self, arg_map: &ArgumentMap, context: &mut Context) -> Result<crate::objecttree::ObjectNode> {
+    pub fn call(
+        &self,
+        arg_map: &ArgumentMap,
+        context: &mut Context,
+    ) -> Result<crate::objecttree::ObjectNode> {
         for (name, value) in arg_map.iter() {
             context.add(Symbol::Value(name.clone(), value.clone()));
         }

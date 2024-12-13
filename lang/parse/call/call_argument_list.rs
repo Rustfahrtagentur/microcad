@@ -3,9 +3,7 @@
 
 //! Parse `call_argument_list` rule into CallArgumentList
 
-use crate::{
-    diag::PushDiag, errors::*, eval::*, ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*,
-};
+use crate::{diag::PushDiag, eval::*, ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*};
 
 /// List of call arguments
 #[derive(Clone, Debug, Default)]

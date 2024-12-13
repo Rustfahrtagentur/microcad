@@ -4,7 +4,6 @@
 //! µCAD assignment parser entity
 
 use crate::{
-    errors::*,
     eval::*,
     parse::*,
     parser::*,

@@ -3,7 +3,7 @@
 
 //! µCAD color parser entity
 
-use crate::{errors::*, parser::*};
+use crate::{parse::*, parser::*};
 
 /// A color with RGBA channels
 #[derive(Copy, Clone, Debug, PartialEq)]

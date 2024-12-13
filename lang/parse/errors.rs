@@ -25,6 +25,17 @@ pub enum ParseError {
     #[error("Error parsing integer literal: {0}")]
     ParseIntError(#[from] std::num::ParseIntError),
 
+    #[error("Cannot parse rule: {0:?}")]
+    RuleError(crate::parser::Rule),
+
+    /// IO Error
+    #[error("IO Error: {0}")]
+    IoError(#[from] std::io::Error),
+
+    /// Error in pest parser
+    #[error("Parser error: {0}")]
+    Parser(#[from] pest::error::Error<crate::parser::Rule>),
+
     /// Error parsing color literal
     #[error("Error parsing color literal: {0}")]
     ParseColorError(String),

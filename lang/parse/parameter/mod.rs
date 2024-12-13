@@ -5,7 +5,7 @@
 
 mod parameter_list;
 
-use crate::{errors::*, eval::*, ord_map::OrdMapValue, parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{eval::*, ord_map::OrdMapValue, parse::*, parse::*, parser::*, r#type::*, src_ref::*};
 
 pub use parameter_list::*;
 

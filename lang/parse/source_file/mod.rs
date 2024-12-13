@@ -9,7 +9,7 @@ pub use statement::*;
 
 use std::io::Read;
 
-use crate::{errors::*, eval::*, objecttree, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, objecttree, parse::*, parser::*, src_ref::*};
 
 /// Trait to get a source file by its hash
 pub trait GetSourceFileByHash {
@@ -51,15 +51,13 @@ pub struct SourceFile {
 
 impl SourceFile {
     /// Load µCAD source file from given `path`
-    pub fn load(path: impl AsRef<std::path::Path>) -> anyhow::Result<Self> {
+    pub fn load(path: impl AsRef<std::path::Path>) -> ParseResult<Self> {
         let mut file = std::fs::File::open(&path)?;
         let mut buf = String::new();
-        use anyhow::Context;
-        file.read_to_string(&mut buf)
-            .context("Cannot load source file")?;
 
-        let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)
-            .context("Could not parse file")?;
+        file.read_to_string(&mut buf)?;
+
+        let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)?;
 
         assert_ne!(source_file.hash, 0);
 
@@ -69,7 +67,7 @@ impl SourceFile {
 
     /// Create `SourceFile` from string
     /// The hash of the result will be of `"<from_str>"`.
-    pub fn load_from_str(s: &str) -> anyhow::Result<Self> {
+    pub fn load_from_str(s: &str) -> ParseResult<Self> {
         use std::hash::{Hash, Hasher};
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         "<from_str>".hash(&mut hasher);

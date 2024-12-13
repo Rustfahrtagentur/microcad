@@ -4,7 +4,7 @@
 //! Function body parser entity
 
 use super::FunctionStatement;
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// Function body
 #[derive(Clone, Debug, Default)]
@@ -21,7 +21,7 @@ impl Parse for FunctionBody {
         Parser::ensure_rule(&pair, Rule::function_body);
 
         Ok(Self(pair.map_collect::<FunctionStatement>(
-            |pair| match pair.as_rule() {
+            |pair: crate::parser::Pair| match pair.as_rule() {
                 Rule::function_statement => FunctionStatement::parse(pair),
                 Rule::expression => Ok(FunctionStatement::Return(Expression::parse(pair)?)),
                 rule => unreachable!("Unexpected token in function body: {:?}", rule),

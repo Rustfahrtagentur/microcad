@@ -7,7 +7,7 @@ mod number_literal;
 
 pub use number_literal::NumberLiteral;
 
-use crate::{errors::*, eval::*, parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*};
 
 /// Literal entity
 #[derive(Debug, Clone, PartialEq)]
@@ -34,7 +34,7 @@ impl SrcReferrer for Literal {
 }
 
 impl std::str::FromStr for Literal {
-    type Err = anyhow::Error;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         Parser::parse_rule::<Self>(Rule::literal, s, 0)

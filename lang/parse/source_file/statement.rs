@@ -3,7 +3,7 @@
 
 //! µCAD statement
 
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
 
 /// µCAD source file statement
 #[derive(Clone, Debug)]

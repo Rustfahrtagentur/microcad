@@ -3,7 +3,7 @@
 
 //! Format Specification parser entity
 
-use crate::{errors::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Format specification
 #[derive(Clone, Debug, Default)]

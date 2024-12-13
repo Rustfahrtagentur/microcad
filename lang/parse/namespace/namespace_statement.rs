@@ -3,7 +3,7 @@
 
 //! Namespace statement parser entities
 
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
 
 /// Namespace statement
 #[derive(Debug, Clone)]

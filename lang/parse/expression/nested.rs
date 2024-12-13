@@ -3,7 +3,7 @@
 
 //! Nested item list parser entity
 
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// Nested item list
 #[derive(Clone, Debug)]

@@ -3,7 +3,7 @@
 
 //! Function signature parser entity
 
-use crate::{errors::*, parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{parse::*, parse::*, parser::*, r#type::*, src_ref::*};
 
 /// Parameters and return type of a function
 #[derive(Clone, Debug)]

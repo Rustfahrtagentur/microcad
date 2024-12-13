@@ -3,7 +3,7 @@
 
 //! For statement parser entity
 
-use crate::{diag::*, errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{diag::*, eval::*, parse::*, parse::*, parser::*, src_ref::*};
 
 /// For statement
 #[derive(Clone, Debug)]

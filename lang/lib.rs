@@ -6,16 +6,15 @@
 #![warn(missing_docs)]
 
 pub mod diag;
-pub mod errors;
 pub mod eval;
 pub mod map_key_type;
+pub mod objecttree;
 pub mod ord_map;
 pub mod parse;
 pub mod parser;
 pub mod source_file_cache;
 pub mod src_ref;
 pub mod r#type;
-pub mod objecttree;
 
 use std::sync::Once;
 

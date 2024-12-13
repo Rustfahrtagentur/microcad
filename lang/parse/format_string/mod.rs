@@ -9,7 +9,7 @@ mod format_spec;
 pub use format_expression::*;
 pub use format_spec::*;
 
-use crate::{errors::*, eval::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// Format string item
 #[derive(Clone, Debug)]
@@ -34,7 +34,7 @@ impl SrcReferrer for FormatStringInner {
 pub struct FormatString(Vec<FormatStringInner>);
 
 impl std::str::FromStr for FormatString {
-    type Err = anyhow::Error;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         Parser::parse_rule::<Self>(Rule::format_string, s, 0)

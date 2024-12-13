@@ -6,6 +6,7 @@
 pub mod assignment;
 pub mod call;
 pub mod color;
+pub mod errors;
 pub mod expression;
 pub mod format_string;
 pub mod function;
@@ -23,6 +24,7 @@ pub mod visibility;
 pub use assignment::*;
 pub use call::*;
 pub use color::*;
+pub use errors::*;
 pub use expression::*;
 pub use format_string::*;
 pub use function::*;

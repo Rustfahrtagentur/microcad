@@ -3,7 +3,7 @@
 
 //! Visibility of an entity
 
-use crate::{errors::*, parser::*};
+use crate::{parse::*, parser::*};
 
 /// Visibility of an entity
 ///

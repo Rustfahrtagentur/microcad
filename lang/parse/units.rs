@@ -3,7 +3,7 @@
 
 //! µCAD unit parser entity
 
-use crate::{errors::*, parser::*, r#type::*};
+use crate::{parse::*, parser::*, r#type::*};
 
 /// The units that can be used after numbers in the language"
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

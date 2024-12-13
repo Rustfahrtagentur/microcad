@@ -3,7 +3,7 @@
 
 //! Nested item parser entity
 
-use crate::{diag::PushDiag, errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{diag::PushDiag, eval::*, parse::*, parse::*, parser::*, src_ref::*};
 
 /// Nested item
 #[derive(Clone, Debug)]

@@ -3,7 +3,7 @@
 
 //! Use statement parser entity
 
-use crate::{errors::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
 use strum::IntoStaticStr;
 
 /// Use declaration

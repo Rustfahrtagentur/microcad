@@ -3,7 +3,7 @@
 
 //! Type of a key in a `MapType`
 
-use crate::{errors::*, r#type::*};
+use crate::{parse::*, r#type::*};
 
 /// Key type for use in a `MapType`
 #[derive(Debug, Default, Clone, PartialEq)]

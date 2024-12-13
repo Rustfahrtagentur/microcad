@@ -10,10 +10,8 @@
 #[grammar = "grammar.pest"]
 pub struct Parser;
 
-use crate::{
-    errors::*,
-    src_ref::{SrcRef, SrcReferrer},
-};
+use crate::parse::{self, ParseResult};
+use crate::src_ref::{SrcRef, SrcReferrer};
 
 #[derive(Debug, Clone)]
 pub struct Pair<'i>(pest::iterators::Pair<'i, Rule>, u64);
@@ -101,16 +99,15 @@ impl Parser {
     }
 
     /// Parse a rule for type `T`
-    pub fn parse_rule<T>(rule: Rule, input: &str, src_hash: u64) -> anyhow::Result<T>
+    pub fn parse_rule<T>(rule: Rule, input: &str, src_hash: u64) -> ParseResult<T>
     where
         T: Parse + Clone,
     {
         use pest::Parser as _;
 
-        if let Some(pair) = Parser::parse(rule, input.trim())?.next() {
-            Ok(T::parse(Pair(pair, src_hash))?)
-        } else {
-            Err(anyhow::Error::msg("could not parse"))
+        match Parser::parse(rule, input.trim())?.next() {
+            Some(pair) => Ok(T::parse(Pair(pair, src_hash))?),
+            None => Err(parse::ParseError::RuleError(rule)),
         }
     }
 

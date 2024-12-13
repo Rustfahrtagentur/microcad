@@ -3,7 +3,7 @@
 
 //! List of expressions
 
-use crate::{errors::*, parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parse::*, parser::*, src_ref::*};
 
 /// Expression list
 #[derive(Clone, Default, Debug)]

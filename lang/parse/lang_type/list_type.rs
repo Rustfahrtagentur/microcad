@@ -3,7 +3,7 @@
 
 //! List type parser entity
 
-use crate::{errors::*, eval::*, parser::*, r#type::*};
+use crate::{eval::*, parse::*, parser::*, r#type::*};
 
 #[allow(rustdoc::broken_intra_doc_links)]
 /// List type (e.g. '[scalar]')
