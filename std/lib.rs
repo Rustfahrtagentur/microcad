@@ -55,15 +55,23 @@ pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
                     let message: String = args["message"].clone().try_into()?;
                     let condition: bool = args["condition"].clone().try_into()?;
                     if !condition {
-                        use anyhow::anyhow;
                         use microcad_lang::diag::PushDiag;
 
                         if let Some(condition_src) =
                             ctx.get_source_string(args["condition"].src_ref())
                         {
-                            ctx.error(args.src_ref(), anyhow!("{message}: {condition_src}",))?;
+                            ctx.error(
+                                args.src_ref(),
+                                Box::new(EvalError::AssertionFailedWithCondition(
+                                    message,
+                                    condition_src.into(),
+                                )),
+                            )?;
                         } else {
-                            ctx.error(args.src_ref(), anyhow!("{message}"))?;
+                            ctx.error(
+                                args.src_ref(),
+                                Box::new(EvalError::AssertionFailed(message)),
+                            )?;
                         }
                     }
                     Ok(None)

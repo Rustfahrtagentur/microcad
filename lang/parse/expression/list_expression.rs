@@ -3,7 +3,7 @@
 
 //! List expression
 
-use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// List expression (expression list maybe with common unit)
 #[derive(Default, Clone, Debug)]

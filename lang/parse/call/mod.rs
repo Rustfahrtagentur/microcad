@@ -14,10 +14,11 @@ pub use call_argument_list::*;
 pub use method_call::*;
 pub use multiplicity::*;
 
-use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// trait for calls of modules or functions with argument list
 pub trait CallTrait {
+    /// Output call type
     type Output;
 
     /// Evaluate call into value (if possible)
@@ -70,9 +71,15 @@ impl std::fmt::Display for Call {
     }
 }
 
+/// Result of a call
 pub enum CallResult {
+    /// Call returned nodes
     Nodes(Vec<crate::ObjectNode>),
+
+    /// Call returned a single value
     Value(crate::eval::Value),
+
+    /// Call returned nothing
     None,
 }
 
@@ -99,8 +106,7 @@ impl Eval for Call {
             }
             symbol => {
                 use crate::diag::PushDiag;
-                use anyhow::anyhow;
-                context.error(self, anyhow!("{} is not callable", symbol))?;
+                context.error(self, Box::new(EvalError::SymbolNotCallable(symbol)))?;
                 Ok(CallResult::None)
             }
         }

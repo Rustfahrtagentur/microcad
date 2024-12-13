@@ -3,7 +3,7 @@
 
 //! Method call
 
-use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// Method call
 #[derive(Clone, Debug)]
@@ -19,7 +19,6 @@ pub struct MethodCall {
 impl MethodCall {
     /// Evaluate the method call in a context
     pub fn eval(&self, context: &mut Context, lhs: &Expression) -> Result<Value> {
-        let name: &str = &self.name.to_string();
         use call::call_method::CallMethod;
 
         match lhs.eval(context)? {
@@ -27,7 +26,7 @@ impl MethodCall {
             Value::List(list) => list.call_method(&self.name, &self.argument_list, self.src_ref()),
             _ => {
                 use crate::diag::PushDiag;
-                context.error(self, anyhow::anyhow!("Unknown method: {name}"))?;
+                context.error(self, Box::new(EvalError::UnknownMethod(self.name.clone())))?;
                 Ok(Value::Invalid)
             }
         }

@@ -3,7 +3,7 @@
 
 //! Module definition parser entity
 
-use crate::{eval::*, objecttree, parse::*, parse::*, parser::*, src_ref::*, ObjectNode};
+use crate::{eval::*, objecttree, parse::*, parser::*, src_ref::*, ObjectNode};
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -53,7 +53,6 @@ impl CallTrait for ModuleDefinition {
             }
 
             use crate::diag::PushDiag;
-            use anyhow::anyhow;
 
             let matching_inits = inits
                 .iter()
@@ -64,7 +63,10 @@ impl CallTrait for ModuleDefinition {
             // There should be only one matching initializer
             match matching_inits.len() {
                 0 => {
-                    context.error(self, anyhow!("No matching initializer found"))?;
+                    context.error(
+                        self,
+                        Box::new(EvalError::NoMatchingInitializer(self.name.clone())),
+                    )?;
                 }
                 1 => {
                     let (init, multi_arg_map) = matching_inits.first().unwrap();
@@ -108,7 +110,10 @@ impl CallTrait for ModuleDefinition {
                     nodes.push(group);
                 }
                 _ => {
-                    context.error(self, anyhow!("Multiple matching initializers found"))?;
+                    context.error(
+                        self,
+                        Box::new(EvalError::MultipleMatchingInitializer(self.name.clone())),
+                    )?;
                     // TODO Add diagnostics for multiple matching initializers
                     return Ok(());
                 }

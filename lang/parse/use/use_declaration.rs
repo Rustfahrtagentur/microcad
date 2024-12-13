@@ -3,7 +3,7 @@
 
 //! Use statement parser entity
 
-use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 use strum::IntoStaticStr;
 
 /// Use declaration
@@ -80,15 +80,15 @@ impl Eval for UseDeclaration {
     type Output = SymbolTable;
 
     fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+        use crate::diag::PushDiag;
+
         match self {
             Self::UseAll(name, _) => match name.eval(context)? {
                 Symbol::Namespace(namespace_definition) => {
                     Ok(namespace_definition.body.symbols.clone())
                 }
                 symbol => {
-                    use crate::diag::PushDiag;
-                    use anyhow::anyhow;
-                    context.error(self, anyhow!("Expected namespace definition, got {symbol}"))?;
+                    context.error(self, Box::new(EvalError::NamespaceSymbolExpected(symbol)))?;
                     Ok(SymbolTable::default())
                 }
             },
@@ -98,7 +98,7 @@ impl Eval for UseDeclaration {
                 let symbol = name.eval(context)?;
                 if matches!(symbol, Symbol::Invalid) {
                     use crate::diag::PushDiag;
-                    context.error(self, anyhow::anyhow!("Cannot use `{name}`"))?;
+                    context.error(self, Box::new(EvalError::CannotUse(symbol)))?;
                 } else {
                     symbols.add(symbol);
                 }

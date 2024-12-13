@@ -3,7 +3,7 @@
 
 //! Builtin function evaluation entity
 
-use crate::{eval::*, parse::*};
+use crate::{eval::*, parse::*, src_ref::SrcRef};
 
 /// Type of the functor which receives a call
 pub type BuiltinFunctionFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<Option<Value>>;
@@ -50,10 +50,16 @@ impl CallTrait for BuiltinFunction {
         match (&result, &self.signature.return_type) {
             (Some(result), Some(return_type)) => {
                 if result.ty() != return_type.ty() {
-                    Err(EvalError::TypeMismatch {
-                        expected: return_type.ty(),
-                        found: result.ty(),
-                    })
+                    use crate::diag::PushDiag;
+                    context.error(
+                        SrcRef(None),
+                        Box::new(EvalError::ReturnTypeMismatch {
+                            name: self.name.clone(),
+                            expected: return_type.ty(),
+                            found: result.ty(),
+                        }),
+                    )?;
+                    Ok(Some(Value::Invalid))
                 } else {
                     Ok(Some(result.clone()))
                 }

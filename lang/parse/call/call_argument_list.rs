@@ -42,7 +42,7 @@ impl CallArgumentList {
         {
             Ok(args) => Ok(args),
             Err(err) => {
-                context.error(self, anyhow::anyhow!("{}", err))?;
+                context.error(self, Box::new(err))?;
                 Ok(ArgumentMap::default())
             }
         }

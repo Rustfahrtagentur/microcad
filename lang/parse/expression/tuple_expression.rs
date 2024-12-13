@@ -3,7 +3,7 @@
 
 //! Tuple expression
 
-use crate::{eval::*, parse::*, parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*};
 
 /// TODO: maybe CallArgumentList should be `ArgumentList` and get independent of module `call`?
 type ArgumentList = CallArgumentList;

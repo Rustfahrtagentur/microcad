@@ -3,7 +3,7 @@
 
 //! Node body parser entity
 
-use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// Node marker, e.g. `@children`
 #[derive(Clone, Debug)]
@@ -45,9 +45,12 @@ impl Eval for NodeMarker {
             "children" => Ok(Some(crate::objecttree::ObjectNode::new(
                 crate::objecttree::ObjectNodeInner::ChildrenNodeMarker,
             ))),
-            name => {
+            _ => {
                 use crate::diag::PushDiag;
-                context.error(self, anyhow::anyhow!("Invalid node marker: {name}"))?;
+                context.error(
+                    self,
+                    Box::new(EvalError::InvalidNodeMarker(self.name.clone())),
+                )?;
                 Ok(None)
             }
         }

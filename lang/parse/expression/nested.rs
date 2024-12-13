@@ -61,7 +61,7 @@ impl Eval for Nested {
                         return Ok(None);
                     } else {
                         use crate::diag::PushDiag;
-                        context.error(self, anyhow::anyhow!("`{item}` cannot be nested"))?;
+                        context.error(self, Box::new(EvalError::CannotNestItem(item.clone())))?;
                     }
                 }
                 CallResult::Value(value) => {
@@ -69,7 +69,7 @@ impl Eval for Nested {
                         return Ok(Some(value));
                     } else {
                         use crate::diag::PushDiag;
-                        context.error(self, anyhow::anyhow!("`{item}` cannot be nested"))?;
+                        context.error(self, Box::new(EvalError::CannotNestItem(item.clone())))?;
                     }
                 }
             }

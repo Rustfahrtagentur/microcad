@@ -3,7 +3,7 @@
 
 //! Parameter list parser entity
 
-use crate::{eval::*, ord_map::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
 
 /// Parameter list
 #[derive(Clone, Debug, Default)]

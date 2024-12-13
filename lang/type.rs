@@ -3,7 +3,7 @@
 
 //! µCAD Basic Types
 
-use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// µCAD Basic Types
 #[derive(Debug, Clone, PartialEq)]

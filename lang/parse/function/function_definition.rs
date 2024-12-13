@@ -3,7 +3,7 @@
 
 //! Function definition parser entity
 
-use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// Function definition
 #[derive(Debug)]

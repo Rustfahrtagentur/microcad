@@ -1,4 +1,7 @@
-use crate::{diag::SrcRef, eval};
+use crate::{
+    diag::SrcRef,
+    eval::{self, EvalError},
+};
 
 use super::{DiagList, GetSourceFileByHash, PushDiag};
 
@@ -53,8 +56,10 @@ impl PushDiag for DiagHandler {
         self.diag_list.push_diag(diag)?;
 
         if self.error_limit > 0 && self.error_count > self.error_limit {
-            use anyhow::anyhow;
-            self.error(SrcRef(None), anyhow!("Error limit has been reached"))?;
+            self.error(
+                SrcRef(None),
+                Box::new(EvalError::ErrorLimitReached(self.error_limit)),
+            )?;
             Err(eval::EvalError::ErrorLimitReached(self.error_limit))
         } else {
             Ok(())

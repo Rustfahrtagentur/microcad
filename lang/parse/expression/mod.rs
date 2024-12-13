@@ -15,7 +15,7 @@ pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
 
-use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 lazy_static::lazy_static! {
     /// Expression parser
@@ -169,12 +169,14 @@ impl Eval for Expression {
     type Output = Value;
 
     fn eval(&self, context: &mut Context) -> Result<Value> {
-        match self {
+        use crate::diag::PushDiag;
+
+        return match self {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
             Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
             Self::TupleExpression(tuple_expression) => {
-                TupleExpression::eval(tuple_expression, context)
+                return TupleExpression::eval(tuple_expression, context)
             }
             Self::BinaryOp {
                 lhs,
@@ -185,12 +187,10 @@ impl Eval for Expression {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
                 if lhs.is_invalid() || rhs.is_invalid() {
-                    use crate::diag::PushDiag;
-                    context.error(self, anyhow::anyhow!("Invalid operands: {lhs} {op} {rhs}"))?;
                     return Ok(Value::Invalid);
                 }
 
-                match op.as_str() {
+                return match op.as_str() {
                     "+" => lhs + rhs,
                     "-" => lhs - rhs,
                     "*" => lhs * rhs,
@@ -206,7 +206,7 @@ impl Eval for Expression {
                     "=" => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
                     "!=" => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
                     _ => unimplemented!("{op:?}"),
-                }
+                };
             }
             Self::UnaryOp {
                 op,
@@ -214,36 +214,40 @@ impl Eval for Expression {
                 src_ref: _,
             } => {
                 let rhs = rhs.eval(context)?;
-                match op.as_str() {
+                return match op.as_str() {
                     "-" => -rhs.clone(),
                     _ => unimplemented!(),
-                }
+                };
             }
             Self::ListElementAccess(lhs, rhs, _) => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
 
-                match (lhs, rhs) {
+                return match (lhs, rhs) {
                     (Value::List(list), Value::Integer(index)) => {
                         let index = index.value as usize;
                         if index < list.len() {
                             Ok(list.get(index).unwrap().clone())
                         } else {
-                            Err(EvalError::ListIndexOutOfBounds {
-                                index,
-                                len: list.len(),
-                            })
+                            context.error(
+                                self,
+                                Box::new(EvalError::ListIndexOutOfBounds {
+                                    index,
+                                    len: list.len(),
+                                }),
+                            )?;
+                            Ok(Value::Invalid)
                         }
                     }
                     _ => unimplemented!(),
-                }
+                };
             }
             Self::NamedTupleElementAccess(lhs, rhs, _) => {
                 let lhs = lhs.eval(context)?;
-                match lhs {
+                return match lhs {
                     Value::NamedTuple(tuple) => {
                         let value = tuple.get(rhs).unwrap();
-                        Ok(value.clone())
+                        return Ok(value.clone());
                     }
                     Value::Node(node) => match node.fetch(&rhs.to_string().into()) {
                         Some(symbol) => match symbol.as_ref() {
@@ -251,14 +255,12 @@ impl Eval for Expression {
                             _ => unimplemented!(),
                         },
                         None => {
-                            use crate::diag::PushDiag;
-                            use anyhow::anyhow;
-                            context.error(self, anyhow!("Unknown field: {rhs}"))?;
-                            todo!("Return none value on unknown field error (field name = {rhs})")
+                            context.error(self, Box::new(EvalError::UnknownField(rhs.clone())))?;
+                            Ok(Value::Invalid)
                         }
                     },
                     _ => unimplemented!(),
-                }
+                };
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Nested(nested) => match nested.eval(context)? {
@@ -266,7 +268,7 @@ impl Eval for Expression {
                 None => Ok(Value::Invalid),
             },
             _ => unimplemented!(),
-        }
+        };
     }
 }
 

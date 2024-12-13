@@ -9,10 +9,8 @@ extern crate clap;
 
 extern crate microcad_lang;
 
-use std::any;
-
 use clap::{Parser, Subcommand};
-use microcad_lang::parse::{source_file, ParseResult, SourceFile};
+use microcad_lang::parse::SourceFile;
 
 /// µCAD cli
 #[derive(Parser)]

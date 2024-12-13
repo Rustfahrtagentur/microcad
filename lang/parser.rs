@@ -105,9 +105,9 @@ impl Parser {
     {
         use pest::Parser as _;
 
-        match Parser::parse(rule, input.trim())?.next() {
+        match Parser::parse(rule, input.trim()).map_err(Box::new)?.next() {
             Some(pair) => Ok(T::parse(Pair(pair, src_hash))?),
-            None => Err(parse::ParseError::RuleError(rule)),
+            None => Err(parse::ParseError::RuleError(Box::new(rule))),
         }
     }
 

@@ -3,7 +3,7 @@
 
 //! Namespace definition parser entity
 
-use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// Namespace definition
 #[derive(Debug, Clone)]

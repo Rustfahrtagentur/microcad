@@ -5,7 +5,7 @@
 
 mod parameter_list;
 
-use crate::{eval::*, ord_map::OrdMapValue, parse::*, parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{eval::*, ord_map::OrdMapValue, parse::*, parser::*, r#type::*, src_ref::*};
 
 pub use parameter_list::*;
 
@@ -114,12 +114,11 @@ impl Eval for Parameter {
                     use crate::diag::PushDiag;
                     context.error(
                         self,
-                        anyhow::anyhow!(
-                            "Type mismatch for parameter `{name}`: expected {expected}, got {got}.",
-                            name = self.name,
-                            expected = specified_type.ty(),
-                            got = default_value.ty(),
-                        ),
+                        Box::new(EvalError::ParameterTypeMismatch {
+                            name: self.name.clone(),
+                            expected: specified_type.ty(),
+                            found: default_value.ty(),
+                        }),
                     )?;
                     // Return an invalid parameter value in case evaluation failed
                     Ok(ParameterValue::invalid(

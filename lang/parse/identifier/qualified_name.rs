@@ -1,7 +1,7 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a.b.c`
@@ -101,7 +101,10 @@ impl QualifiedName {
 
         if symbols.is_empty() {
             use crate::diag::PushDiag;
-            context.error(self, anyhow::anyhow!("Symbol not found: {}", self))?;
+            context.error(
+                self,
+                Box::new(EvalError::SymbolNotFound(self.id().unwrap())),
+            )?;
         }
         Ok(symbols)
     }
@@ -113,7 +116,10 @@ impl QualifiedName {
         let symbols = self.fetch_symbols(context)?;
         if symbols.len() > 1 {
             use crate::diag::PushDiag;
-            context.error(self, anyhow::anyhow!("Ambiguous symbol: {}", self))?;
+            context.error(
+                self,
+                Box::new(EvalError::AmbiguousSymbol(symbols.first().unwrap().clone())),
+            )?;
             // TODO Output all symbols
         }
         Ok(symbols.into_iter().next())

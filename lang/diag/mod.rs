@@ -29,11 +29,19 @@ pub trait PushDiag {
             .unwrap();
     }
     /// Push new warning
-    fn warning(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> crate::eval::Result<()> {
+    fn warning(
+        &mut self,
+        src: impl SrcReferrer,
+        error: Box<dyn std::error::Error>,
+    ) -> crate::eval::Result<()> {
         self.push_diag(Diag::Warning(Refer::new(error, src.src_ref())))
     }
     /// Push new error
-    fn error(&mut self, src: impl SrcReferrer, error: anyhow::Error) -> crate::eval::Result<()> {
+    fn error(
+        &mut self,
+        src: impl SrcReferrer,
+        error: Box<dyn std::error::Error>,
+    ) -> crate::eval::Result<()> {
         self.push_diag(Diag::Error(Refer::new(error, src.src_ref())))
     }
 }
@@ -46,9 +54,9 @@ pub enum Diag {
     /// Informative message with source code reference attached
     Info(Refer<String>),
     /// Warning with source code reference attached
-    Warning(Refer<anyhow::Error>),
+    Warning(Refer<Box<dyn std::error::Error>>),
     /// Error  with source code reference attached
-    Error(Refer<anyhow::Error>),
+    Error(Refer<Box<dyn std::error::Error>>),
 }
 
 impl Diag {
@@ -172,10 +180,16 @@ fn test_diag_list() {
 
     diagnostics.info(body_iter.next().unwrap(), "This is an info".to_string());
     diagnostics
-        .warning(body_iter.next().unwrap(), anyhow!("This is a warning"))
+        .warning(
+            body_iter.next().unwrap(),
+            Box::new(EvalError::CustomError("This is a warning".into())),
+        )
         .unwrap();
     diagnostics
-        .error(body_iter.next().unwrap(), anyhow!("This is an error"))
+        .error(
+            body_iter.next().unwrap(),
+            Box::new(EvalError::CustomError("This is an error".into())),
+        )
         .unwrap();
 
     assert_eq!(diagnostics.len(), 3);

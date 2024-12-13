@@ -3,7 +3,7 @@
 
 //! Nested item parser entity
 
-use crate::{diag::PushDiag, eval::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{diag::PushDiag, eval::*, parse::*, parser::*, src_ref::*};
 
 /// Nested item
 #[derive(Clone, Debug)]
@@ -30,7 +30,7 @@ impl Eval for NestedItem {
                     value.clone_with_src_ref(qualified_name.src_ref()),
                 )),
                 symbol => {
-                    context.error(self, anyhow::anyhow!("Symbol `{symbol}` cannot be nested."))?;
+                    context.error(self, Box::new(EvalError::CannotNestSymbol(symbol)))?;
                     Ok(CallResult::None)
                 }
             },

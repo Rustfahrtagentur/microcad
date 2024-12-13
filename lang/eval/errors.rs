@@ -3,16 +3,16 @@
 
 //! Evaluation error
 
-use crate::{eval::*, r#type::*};
+use crate::{eval::*, parse::Identifier, r#type::*};
 use microcad_core::Id;
 use thiserror::Error;
 
 /// Evaluation error
 #[derive(Debug, Error)]
 pub enum EvalError {
-    /// Unknown error
-    #[error("Unknown error")]
-    Unknown,
+    /// Custom evaluation error
+    #[error("{0}")]
+    CustomError(String),
 
     /// Invalid operator
     #[error("Invalid operator: {0}")]
@@ -47,18 +47,39 @@ pub enum EvalError {
         len: usize,
     },
 
-    /// Type mismatch
-    #[error("Type mismatch: expected {expected}, got {found}")]
-    TypeMismatch {
+    /// Parameter type mismatch
+    #[error("Type mismatch for parameter: expected {expected}, got {found}")]
+    ParameterTypeMismatch {
+        /// Parameter name
+        name: Identifier,
         /// expected type
         expected: Type,
         /// found type
         found: Type,
     },
 
+    /// Return type mismatch
+    #[error("Return type mismatch: expected {expected}, got {found}")]
+    ReturnTypeMismatch {
+        /// Parameter name
+        name: Identifier,
+        /// expected type
+        expected: Type,
+        /// found type
+        found: Type,
+    },
+
+    /// Expected a namespace symbol
+    #[error("Namespace symbol expected, got {0}")]
+    NamespaceSymbolExpected(Symbol),
+
     /// Cannot evaluate to type
     #[error("Cannot evaluate to type: {0}")]
     EvaluateToTypeError(Type),
+
+    /// Cannot use symbol
+    #[error("Cannot use {0}")]
+    CannotUse(Symbol),
 
     /// Unknown qualified name
     #[error("Unknown qualified name: {0}")]
@@ -66,7 +87,7 @@ pub enum EvalError {
 
     /// Unknown method
     #[error("Unknown method: {0}")]
-    UnknownMethod(Id),
+    UnknownMethod(Identifier),
 
     /// Elements of list have different types
     #[error("Elements of list have different types")]
@@ -83,6 +104,18 @@ pub enum EvalError {
     /// Symbol not found
     #[error("Symbol not found: {0}")]
     SymbolNotFound(Id),
+
+    /// No matching initializer for module definition
+    #[error("No matching initializer for module definition `{0}`")]
+    NoMatchingInitializer(Identifier),
+
+    /// Multiple matching initializers for module definition
+    #[error("Multiple matching initializer for module definition `{0}`")]
+    MultipleMatchingInitializer(Identifier),
+
+    /// Expected range in for loop
+    #[error("Expected range in for loop, got {0}")]
+    ExpectedRangeInForLoop(Type),
 
     /// Argument count mismatch
     #[error("Argument count mismatch: expected {expected}, got {found}")]
@@ -101,17 +134,17 @@ pub enum EvalError {
     #[error("Expected module: {0}")]
     ExpectedModule(Id),
 
-    /// Cannot nest function call
-    #[error("Cannot nest function call")]
-    CannotNestFunctionCall,
+    /// Cannot nest symbol
+    #[error("Cannot nest symbol: {0}")]
+    CannotNestSymbol(Symbol),
+
+    /// Cannot nest item
+    #[error("Cannot nest item: {0}")]
+    CannotNestItem(crate::parse::NestedItem),
 
     /// Missing arguments
     #[error("Missing arguments: {0:?}")]
     MissingArguments(Vec<Id>),
-
-    /// Parameter type mismatch
-    #[error("Parameter type mismatch: {0} expected {1}, got {2}")]
-    ParameterTypeMismatch(Id, Type, Type),
 
     /// Parameter missing type or value
     #[error("Parameter missing type or value: {0}")]
@@ -133,6 +166,18 @@ pub enum EvalError {
     #[error("Assertion failed: {0}")]
     AssertionFailed(String),
 
+    /// Assertion failed
+    #[error("Assertion failed: {0} with ")]
+    AssertionFailedWithCondition(String, String),
+
+    /// Ambigous symbol
+    #[error("Ambiguous symbol: {0}")]
+    AmbiguousSymbol(Symbol),
+
+    /// Unknown field, e.g. node.field, where node.field
+    #[error("Unknown field: {0}")]
+    UnknownField(Identifier),
+
     /// Tuple length mismatch
     #[error("Tuple length mismatch for operator {operator}: lhs={lhs}, rhs={rhs}")]
     TupleLengthMismatchForOperator {
@@ -147,6 +192,10 @@ pub enum EvalError {
     /// Type cannot be a key in a map
     #[error("Type cannot be a key in a map: {0}")]
     InvalidMapKeyType(Type),
+
+    /// Invalid node marker
+    #[error("Invalid node marker: {0}")]
+    InvalidNodeMarker(Identifier),
 
     /// Cannot convert value
     #[error("Cannot convert value {0} to {1}")]
@@ -163,6 +212,10 @@ pub enum EvalError {
     /// Cannot concat two vec with different types
     #[error("Cannot concat two vec with different types {0} and {1}")]
     CannotCombineVecOfDifferentType(Type, Type),
+
+    /// Symbol is not callable
+    #[error("Symbol is not callable: {0}")]
+    SymbolNotCallable(Symbol),
 
     /// Cannot continue evaluation after error limit has been reached
     #[error("Error limit reached: Stopped evaluation after {0} errors.")]

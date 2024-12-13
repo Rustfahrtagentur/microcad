@@ -3,7 +3,7 @@
 
 //! A single call argument
 
-use crate::{eval::*, ord_map::*, parse::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
 
 /// Call argument
 #[derive(Clone, Debug)]
