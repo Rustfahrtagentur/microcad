@@ -105,8 +105,10 @@ impl Context {
 
     /// Evaluate the context with the current source file
     pub fn eval(&mut self) -> super::Result<ObjectNode> {
-        let node = self.current_source_file().unwrap().eval(self)?;
-        self.info(crate::src_ref::SrcRef(None), "Evaluation complete".into());
+        let node = self
+            .current_source_file()
+            .expect("No current source file")
+            .eval(self)?;
         Ok(node)
     }
 
