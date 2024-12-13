@@ -20,4 +20,3 @@ cxx = "1.0"
 [build-dependencies]
 cxx-build = "1.0"
 cmake = "0.1"
-
