@@ -39,7 +39,7 @@ The *evaluate* command will not export the output geometry. Instead, it will sim
 To generate an STL model file called, use the `export` command with an additional output file name:
 
 ```sh
-µcad export ./examples/lid.µcad lid.stl
+µcad export ./examples/lid.µcad
 ```
 
 The output file `lid.stl`, can be displayed e.g. with [MeshLab](https://www.meshlab.net/).
