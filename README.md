@@ -93,8 +93,8 @@ and [*Rust*](https://www.rust-lang.org/tools/install).
 ### Get Source Code
 
 ```sh
-git clone https://github.com/Rustfahrtagentur/mcad.git
-cd mcad
+git clone https://github.com/Rustfahrtagentur/microcad.git
+cd microcad
 ```
 
 ### Get External Libraries
