@@ -30,7 +30,7 @@ impl ModuleDefinition {
 impl CallTrait for ModuleDefinition {
     type Output = Vec<ObjectNode>;
 
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Self::Output> {
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Self::Output> {
         let stack_frame = StackFrame::ModuleCall(context.top()?.symbol_table().clone(), None);
 
         let mut nodes = Vec::new();

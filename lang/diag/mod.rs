@@ -16,7 +16,7 @@ use crate::{parse::*, src_ref::*};
 /// A trait to add diagnostics with different levels conveniently
 pub trait PushDiag {
     /// Push a diagnostic message (must be implemented)
-    fn push_diag(&mut self, diag: Diag) -> crate::eval::Result<()>;
+    fn push_diag(&mut self, diag: Diag) -> crate::eval::EvalResult<()>;
 
     /// Push new trace message
     fn trace(&mut self, src: impl SrcReferrer, message: String) {
@@ -33,7 +33,7 @@ pub trait PushDiag {
         &mut self,
         src: impl SrcReferrer,
         error: Box<dyn std::error::Error>,
-    ) -> crate::eval::Result<()> {
+    ) -> crate::eval::EvalResult<()> {
         self.push_diag(Diag::Warning(Refer::new(error, src.src_ref())))
     }
     /// Push new error
@@ -41,7 +41,7 @@ pub trait PushDiag {
         &mut self,
         src: impl SrcReferrer,
         error: Box<dyn std::error::Error>,
-    ) -> crate::eval::Result<()> {
+    ) -> crate::eval::EvalResult<()> {
         self.push_diag(Diag::Error(Refer::new(error, src.src_ref())))
     }
 }

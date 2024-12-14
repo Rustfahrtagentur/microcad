@@ -17,7 +17,7 @@ pub trait ArgumentMatch: Default {
         value: Value,
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
-    ) -> Result<TypeCheckResult>;
+    ) -> EvalResult<TypeCheckResult>;
 
     /// Find named arguments and insert them into the map.
     ///
@@ -28,7 +28,7 @@ pub trait ArgumentMatch: Default {
         &mut self,
         call_argument_values: &CallArgumentValueList,
         parameter_values: &mut ParameterValueList,
-    ) -> Result<&mut Self> {
+    ) -> EvalResult<&mut Self> {
         parameter_values
             // Clone the list of parameters because we want to remove elements from it while iterating
             .clone()
@@ -60,7 +60,7 @@ pub trait ArgumentMatch: Default {
         &mut self,
         call_argument_values: &CallArgumentValueList,
         parameter_values: &mut ParameterValueList,
-    ) -> Result<&mut Self> {
+    ) -> EvalResult<&mut Self> {
         if parameter_values.is_empty() {
             return Ok(self);
         }
@@ -99,7 +99,7 @@ pub trait ArgumentMatch: Default {
         &mut self,
         call_argument_values: &CallArgumentValueList,
         parameter_values: &mut ParameterValueList,
-    ) -> Result<&mut Self> {
+    ) -> EvalResult<&mut Self> {
         parameter_values
             // Clone the list of parameters because we want to remove elements from it while iterating
             .clone()
@@ -130,7 +130,7 @@ pub trait ArgumentMatch: Default {
     fn find_match(
         call_argument_values: &CallArgumentValueList,
         parameter_values: &ParameterValueList,
-    ) -> Result<Self> {
+    ) -> EvalResult<Self> {
         call_argument_values.check_for_unexpected_arguments(parameter_values)?;
 
         let mut missing_parameter_values = parameter_values.clone();
@@ -203,7 +203,7 @@ impl ArgumentMatch for ArgumentMap {
         value: Value,
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
-    ) -> Result<TypeCheckResult> {
+    ) -> EvalResult<TypeCheckResult> {
         let name = &parameter_value.name;
         parameter_values.remove(name);
         self.insert(name.clone(), value.clone());
@@ -246,7 +246,7 @@ impl ArgumentMatch for MultiArgumentMap {
         value: Value,
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
-    ) -> Result<TypeCheckResult> {
+    ) -> EvalResult<TypeCheckResult> {
         let result = parameter_value.type_check(&value.ty());
         let name = &parameter_value.name;
         match result {

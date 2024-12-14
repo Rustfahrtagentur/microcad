@@ -28,7 +28,7 @@ impl Deref for DiagList {
 }
 
 impl PushDiag for DiagList {
-    fn push_diag(&mut self, diag: Diag) -> crate::eval::Result<()> {
+    fn push_diag(&mut self, diag: Diag) -> crate::eval::EvalResult<()> {
         self.0.push(diag);
         Ok(())
     }

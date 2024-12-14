@@ -168,7 +168,7 @@ impl Expression {
 impl Eval for Expression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         use crate::diag::PushDiag;
 
         match self {
@@ -440,7 +440,7 @@ fn list_expression() {
 fn run_expression_test(
     expr: &str,
     context: &mut crate::eval::Context,
-    evaluator: impl FnOnce(Result<crate::eval::Value>),
+    evaluator: impl FnOnce(EvalResult<crate::eval::Value>),
 ) {
     use crate::parser::{Parser, Rule};
     use pest::Parser as _;

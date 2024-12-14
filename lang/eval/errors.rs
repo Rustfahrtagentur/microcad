@@ -229,3 +229,6 @@ pub enum EvalError {
     #[error("Unexpected empty stack")]
     UnexpectedEmptyStack,
 }
+
+/// Result type of any evaluation
+pub type EvalResult<T> = std::result::Result<T, EvalError>;

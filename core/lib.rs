@@ -37,9 +37,6 @@ pub type Id = compact_str::CompactString;
 pub use boolean_op::BooleanOp;
 pub use error::*;
 
-/// Core result type
-pub type Result<T> = std::result::Result<T, CoreError>;
-
 /// Trait to calculate depth for a node
 pub trait Depth {
     /// Calculate depth

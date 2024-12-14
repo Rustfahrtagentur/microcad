@@ -77,7 +77,7 @@ impl Ty for List {
 }
 
 impl std::ops::Mul<Value> for List {
-    type Output = Result<List>;
+    type Output = EvalResult<List>;
 
     fn mul(self, rhs: Value) -> Self::Output {
         let mut values = Vec::new();

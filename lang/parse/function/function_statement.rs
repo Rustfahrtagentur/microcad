@@ -92,7 +92,7 @@ impl Parse for FunctionStatement {
 impl Eval for FunctionStatement {
     type Output = Option<Value>;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         match self {
             FunctionStatement::Assignment(assignment) => {
                 assignment.eval(context)?;
