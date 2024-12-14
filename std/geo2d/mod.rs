@@ -23,7 +23,7 @@ impl geo2d::Primitive for Circle {
     fn render_geometry(
         &self,
         renderer: &mut dyn geo2d::Renderer,
-    ) -> microcad_core::Result<geo2d::Geometry> {
+    ) -> microcad_core::CoreResult<geo2d::Geometry> {
         use std::f64::consts::PI;
 
         let n = (self.radius / renderer.precision() * PI * 0.5).max(3.0) as u64;
@@ -60,7 +60,7 @@ impl geo2d::Primitive for Rect {
     fn render_geometry(
         &self,
         _renderer: &mut dyn geo2d::Renderer,
-    ) -> microcad_core::Result<geo2d::Geometry> {
+    ) -> microcad_core::CoreResult<geo2d::Geometry> {
         use geo::line_string;
 
         // Create a rectangle from the given width, height, x and y

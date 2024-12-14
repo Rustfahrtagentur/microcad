@@ -11,7 +11,7 @@ pub trait Primitive: RenderHash + std::fmt::Debug {
     fn request_geometry(
         &self,
         renderer: &mut dyn Renderer,
-    ) -> Result<std::rc::Rc<geo2d::Geometry>> {
+    ) -> CoreResult<std::rc::Rc<geo2d::Geometry>> {
         // Try to fetch the geometry from the render cache
         if let Some(hash) = self.render_hash() {
             if let Some(geometry) = renderer.fetch_geometry(hash) {
@@ -25,13 +25,13 @@ pub trait Primitive: RenderHash + std::fmt::Debug {
     }
 
     /// Render geometry
-    fn render_geometry(&self, renderer: &mut dyn Renderer) -> Result<geo2d::Geometry>;
+    fn render_geometry(&self, renderer: &mut dyn Renderer) -> CoreResult<geo2d::Geometry>;
 }
 
 /// 2D Renderer
 pub trait Renderer: crate::Renderer {
     /// Render multiple polygons
-    fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> Result<()>;
+    fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> CoreResult<()>;
 
     /// Get geometry
     fn fetch_geometry(&mut self, _hash: u64) -> Option<std::rc::Rc<geo2d::Geometry>> {
@@ -39,7 +39,7 @@ pub trait Renderer: crate::Renderer {
     }
 
     /// Render geometry
-    fn render_geometry(&mut self, geometry: &geo2d::Geometry) -> Result<()> {
+    fn render_geometry(&mut self, geometry: &geo2d::Geometry) -> CoreResult<()> {
         match geometry {
             geo2d::Geometry::MultiPolygon(p) => self.multi_polygon(p),
             _ => unimplemented!(),
@@ -47,5 +47,5 @@ pub trait Renderer: crate::Renderer {
     }
 
     /// Render node
-    fn render_node(&mut self, node: crate::geo2d::Node) -> Result<()>;
+    fn render_node(&mut self, node: crate::geo2d::Node) -> CoreResult<()>;
 }

@@ -208,7 +208,7 @@ impl microcad_core::Renderer for SvgRenderer {
         self.precision
     }
 
-    fn change_render_state(&mut self, key: &str, value: &str) -> microcad_core::Result<()> {
+    fn change_render_state(&mut self, key: &str, value: &str) -> microcad_core::CoreResult<()> {
         match key {
             "fill" => self.state.fill = Some(value.to_string()),
             "stroke" => self.state.stroke = Some(value.to_string()),
@@ -222,13 +222,16 @@ impl microcad_core::Renderer for SvgRenderer {
 }
 
 impl geo2d::Renderer for SvgRenderer {
-    fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> microcad_core::Result<()> {
+    fn multi_polygon(
+        &mut self,
+        multi_polygon: &geo2d::MultiPolygon,
+    ) -> microcad_core::CoreResult<()> {
         let style = self.render_state_to_style();
         self.writer().multi_polygon(multi_polygon, &style).unwrap();
         Ok(())
     }
 
-    fn render_node(&mut self, node: microcad_core::geo2d::Node) -> microcad_core::Result<()> {
+    fn render_node(&mut self, node: microcad_core::geo2d::Node) -> microcad_core::CoreResult<()> {
         let inner = node.borrow();
         use microcad_core::geo2d::NodeInner;
 

@@ -57,7 +57,7 @@ impl From<&Transform> for microcad_core::geo3d::Node {
 }
 
 impl Algorithm for Transform {
-    fn process_2d(&self, renderer: &mut Renderer2D, parent: ObjectNode) -> Result<geo2d::Node> {
+    fn process_2d(&self, renderer: &mut Renderer2D, parent: ObjectNode) -> CoreResult<geo2d::Node> {
         let geometries: Vec<_> = parent
             .children()
             .filter_map(|child| match &*child.borrow() {
@@ -85,7 +85,7 @@ impl Algorithm for Transform {
         }
     }
 
-    fn process_3d(&self, renderer: &mut Renderer3D, parent: ObjectNode) -> Result<geo3d::Node> {
+    fn process_3d(&self, renderer: &mut Renderer3D, parent: ObjectNode) -> CoreResult<geo3d::Node> {
         let geometries: Vec<_> = parent
             .children()
             .filter_map(|child| match &*child.borrow() {

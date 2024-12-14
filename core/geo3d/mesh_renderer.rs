@@ -5,7 +5,7 @@
 
 use crate::{
     geo3d::{self},
-    Result, Scalar,
+    CoreResult, Scalar,
 };
 
 /// Renders a mesh
@@ -43,7 +43,7 @@ impl Default for MeshRenderer {
 }
 
 impl geo3d::Renderer for MeshRenderer {
-    fn mesh(&mut self, mesh: &geo3d::TriangleMesh) -> Result<()> {
+    fn mesh(&mut self, mesh: &geo3d::TriangleMesh) -> CoreResult<()> {
         self.triangle_mesh.append(mesh);
         Ok(())
     }
@@ -52,7 +52,7 @@ impl geo3d::Renderer for MeshRenderer {
         None
     }
 
-    fn render_geometry(&mut self, geometry: &geo3d::Geometry) -> Result<()> {
+    fn render_geometry(&mut self, geometry: &geo3d::Geometry) -> CoreResult<()> {
         match geometry {
             geo3d::Geometry::Mesh(mesh) => self.mesh(mesh),
             geo3d::Geometry::Manifold(manifold) => {
@@ -62,7 +62,7 @@ impl geo3d::Renderer for MeshRenderer {
         }
     }
 
-    fn render_node(&mut self, node: crate::geo3d::Node) -> Result<()> {
+    fn render_node(&mut self, node: crate::geo3d::Node) -> CoreResult<()> {
         let inner = node.borrow();
         use crate::geo3d::NodeInner;
 
