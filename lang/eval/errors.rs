@@ -144,7 +144,7 @@ pub enum EvalError {
 
     /// Missing arguments
     #[error("Missing arguments: {0:?}")]
-    MissingArguments(Vec<Id>),
+    MissingArguments(ParameterValueList),
 
     /// Parameter missing type or value
     #[error("Parameter missing type or value: {0}")]
