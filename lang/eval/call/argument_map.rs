@@ -30,21 +30,25 @@ pub trait ArgumentMatch: Default {
         parameter_values: &mut ParameterValueList,
     ) -> Result<&mut Self> {
         parameter_values
+            // Clone the list of parameters because we want to remove elements from it while iterating
             .clone()
             .iter()
+            // Filter out parameters that have a name and are present in the call arguments
             .filter_map(|p| match call_argument_values.get(&p.name) {
                 Some(c) => Some((p, c)),
                 None => None,
             })
-            .try_for_each(|(parameter_value, call_argument_value)| -> Result<()> {
+            // Insert the call arguments into the map
+            .try_for_each(|(parameter_value, call_argument_value)| {
                 self.insert_and_remove_from_parameters(
                     call_argument_value.value.clone(),
                     parameter_value,
                     parameter_values,
                 )?;
                 Ok(())
-            })?;
-        Ok(self)
+            })
+            // Return self
+            .map(|_| self)
     }
 
     /// Find positional arguments and insert them into the map.
@@ -96,20 +100,28 @@ pub trait ArgumentMatch: Default {
         call_argument_values: &CallArgumentValueList,
         parameter_values: &mut ParameterValueList,
     ) -> Result<&mut Self> {
-        for parameter_value in parameter_values.clone().iter() {
-            if call_argument_values.get(&parameter_value.name).is_none() {
-                // If we have a default value, we can use it
-                if let Some(default) = &parameter_value.default_value {
-                    self.insert_and_remove_from_parameters(
-                        default.clone(),
-                        &parameter_value,
-                        parameter_values,
-                    )?;
-                }
-            }
-        }
-
-        Ok(self)
+        parameter_values
+            // Clone the list of parameters because we want to remove elements from it while iterating
+            .clone()
+            .iter()
+            // Filter out parameters that have a default value and are not present in the call arguments
+            .filter_map(
+                |p| match (call_argument_values.get(&p.name), &p.default_value) {
+                    (None, Some(_)) => Some(p),
+                    _ => None,
+                },
+            )
+            // Insert the default values into the map
+            .try_for_each(|parameter_value| {
+                self.insert_and_remove_from_parameters(
+                    parameter_value.default_value.clone().unwrap(),
+                    parameter_value,
+                    parameter_values,
+                )?;
+                Ok(())
+            })
+            // Return self
+            .map(|_| self)
     }
 
     /// Find a match between call arguments and parameters.
