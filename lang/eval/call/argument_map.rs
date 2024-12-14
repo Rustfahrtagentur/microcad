@@ -34,10 +34,7 @@ pub trait ArgumentMatch: Default {
             .clone()
             .iter()
             // Filter out parameters that have a name and are present in the call arguments
-            .filter_map(|p| match call_argument_values.get(&p.name) {
-                Some(c) => Some((p, c)),
-                None => None,
-            })
+            .filter_map(|p| call_argument_values.get(&p.name).map(|c| (p, c)))
             // Insert the call arguments into the map
             .try_for_each(|(parameter_value, call_argument_value)| {
                 self.insert_and_remove_from_parameters(
@@ -259,7 +256,7 @@ impl ArgumentMatch for MultiArgumentMap {
                 value => Err(EvalError::ExpectedIterable(value.ty().clone())),
             },
             TypeCheckResult::SingleMatch => {
-                parameter_values.remove(&name);
+                parameter_values.remove(name);
                 self.insert_single(name.clone(), value);
                 Ok(result)
             }
