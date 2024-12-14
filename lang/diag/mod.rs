@@ -170,13 +170,14 @@ impl std::fmt::Display for Diag {
 
 #[test]
 fn test_diag_list() {
+    use super::eval::EvalError;
+
     let source_file =
         crate::parse::SourceFile::load(r#"../tests/test_cases/algorithm_difference.µcad"#).unwrap();
 
     let mut diagnostics = DiagList::default();
 
     let mut body_iter = source_file.body.iter();
-    use anyhow::anyhow;
 
     diagnostics.info(body_iter.next().unwrap(), "This is an info".to_string());
     diagnostics
