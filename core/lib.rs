@@ -35,7 +35,7 @@ pub type Angle = cgmath::Rad<Scalar>;
 pub type Id = compact_str::CompactString;
 
 pub use boolean_op::BooleanOp;
-pub use error::CoreError;
+pub use error::*;
 
 /// Core result type
 pub type Result<T> = std::result::Result<T, CoreError>;
@@ -60,7 +60,7 @@ pub trait Renderer {
     fn precision(&self) -> crate::Scalar;
 
     /// Change the render state
-    fn change_render_state(&mut self, _: &str, _: &str) -> crate::Result<()> {
+    fn change_render_state(&mut self, _: &str, _: &str) -> CoreResult<()> {
         Ok(())
     }
 }
@@ -109,7 +109,7 @@ impl ExportSettings {
     }
 
     /// Return render precision
-    pub fn render_precision(&self) -> Result<f64> {
+    pub fn render_precision(&self) -> CoreResult<f64> {
         if let Some(precision) = self.0.get("render_precision") {
             if let Some(precision) = precision.as_float() {
                 Ok(precision)

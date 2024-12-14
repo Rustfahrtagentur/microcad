@@ -16,7 +16,7 @@ pub struct SvgExporter {
 }
 
 impl Exporter for SvgExporter {
-    fn from_settings(settings: &ExportSettings) -> microcad_core::Result<Self>
+    fn from_settings(settings: &ExportSettings) -> microcad_core::CoreResult<Self>
     where
         Self: Sized,
     {
@@ -35,7 +35,7 @@ impl Exporter for SvgExporter {
         vec!["svg"]
     }
 
-    fn export(&mut self, node: ObjectNode) -> microcad_core::Result<()> {
+    fn export(&mut self, node: ObjectNode) -> microcad_core::CoreResult<()> {
         let file = std::fs::File::create(&self.filename)?;
 
         use microcad_core::geo2d::Renderer;

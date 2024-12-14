@@ -56,18 +56,26 @@ pub trait Algorithm: std::fmt::Debug {
     }
 
     /// Processes geometry for a 2d renderer and returns a geometry
-    fn process_2d(&self, _renderer: &mut Renderer2D, _parent: ObjectNode) -> Result<geo2d::Node> {
+    fn process_2d(
+        &self,
+        _renderer: &mut Renderer2D,
+        _parent: ObjectNode,
+    ) -> CoreResult<geo2d::Node> {
         unimplemented!()
     }
 
     /// Processes geometry for a 3d renderer and returns a geometry
-    fn process_3d(&self, _renderer: &mut Renderer3D, _parent: ObjectNode) -> Result<geo3d::Node> {
+    fn process_3d(
+        &self,
+        _renderer: &mut Renderer3D,
+        _parent: ObjectNode,
+    ) -> CoreResult<geo3d::Node> {
         unimplemented!()
     }
 }
 
 impl Algorithm for BooleanOp {
-    fn process_2d(&self, renderer: &mut Renderer2D, parent: ObjectNode) -> Result<geo2d::Node> {
+    fn process_2d(&self, renderer: &mut Renderer2D, parent: ObjectNode) -> CoreResult<geo2d::Node> {
         // all algorithm nodes are nested in a group
 
         let geometries: Vec<_> = parent
@@ -95,7 +103,7 @@ impl Algorithm for BooleanOp {
         }
     }
 
-    fn process_3d(&self, renderer: &mut Renderer3D, parent: ObjectNode) -> Result<geo3d::Node> {
+    fn process_3d(&self, renderer: &mut Renderer3D, parent: ObjectNode) -> CoreResult<geo3d::Node> {
         // all algorithm nodes are nested in a group
 
         let geometries: Vec<_> = parent

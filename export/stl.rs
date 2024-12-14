@@ -65,7 +65,7 @@ pub struct StlExporter {
 }
 
 impl Exporter for StlExporter {
-    fn from_settings(settings: &ExportSettings) -> microcad_core::Result<Self>
+    fn from_settings(settings: &ExportSettings) -> microcad_core::CoreResult<Self>
     where
         Self: Sized,
     {
@@ -85,7 +85,7 @@ impl Exporter for StlExporter {
         vec!["stl"]
     }
 
-    fn export(&mut self, node: ObjectNode) -> microcad_core::Result<()> {
+    fn export(&mut self, node: ObjectNode) -> microcad_core::CoreResult<()> {
         use microcad_core::geo3d::*;
         let mut renderer = MeshRenderer::new(self.precision);
         let node = objecttree::bake3d(&mut renderer, node)?;
