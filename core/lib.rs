@@ -105,9 +105,7 @@ impl ExportSettings {
 
     /// return file name
     pub fn filename(&self) -> Option<&str> {
-        self.get("filename")
-            .map(|filename| filename.as_str())
-            .flatten()
+        self.get("filename").and_then(|filename| filename.as_str())
     }
 
     /// Return render precision
@@ -142,6 +140,6 @@ impl ExportSettings {
 fn export_settings() {
     let export_settings = ExportSettings::with_filename("test.stl".into());
 
-    assert_eq!(export_settings.filename(), Some("test.stl".into()));
+    assert_eq!(export_settings.filename(), Some("test.stl"));
     assert_eq!(export_settings.exporter_id(), Some("stl".into()))
 }

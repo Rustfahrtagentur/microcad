@@ -171,12 +171,12 @@ impl Eval for Expression {
     fn eval(&self, context: &mut Context) -> Result<Value> {
         use crate::diag::PushDiag;
 
-        return match self {
+        match self {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
             Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
             Self::TupleExpression(tuple_expression) => {
-                return TupleExpression::eval(tuple_expression, context)
+                TupleExpression::eval(tuple_expression, context)
             }
             Self::BinaryOp {
                 lhs,
@@ -190,7 +190,7 @@ impl Eval for Expression {
                     return Ok(Value::Invalid);
                 }
 
-                return match op.as_str() {
+                match op.as_str() {
                     "+" => lhs + rhs,
                     "-" => lhs - rhs,
                     "*" => lhs * rhs,
@@ -206,7 +206,7 @@ impl Eval for Expression {
                     "=" => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
                     "!=" => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
                     _ => unimplemented!("{op:?}"),
-                };
+                }
             }
             Self::UnaryOp {
                 op,
@@ -214,16 +214,16 @@ impl Eval for Expression {
                 src_ref: _,
             } => {
                 let rhs = rhs.eval(context)?;
-                return match op.as_str() {
+                match op.as_str() {
                     "-" => -rhs.clone(),
                     _ => unimplemented!(),
-                };
+                }
             }
             Self::ListElementAccess(lhs, rhs, _) => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
 
-                return match (lhs, rhs) {
+                match (lhs, rhs) {
                     (Value::List(list), Value::Integer(index)) => {
                         let index = index.value as usize;
                         if index < list.len() {
@@ -240,14 +240,14 @@ impl Eval for Expression {
                         }
                     }
                     _ => unimplemented!(),
-                };
+                }
             }
             Self::NamedTupleElementAccess(lhs, rhs, _) => {
                 let lhs = lhs.eval(context)?;
-                return match lhs {
+                match lhs {
                     Value::NamedTuple(tuple) => {
                         let value = tuple.get(rhs).unwrap();
-                        return Ok(value.clone());
+                        Ok(value.clone())
                     }
                     Value::Node(node) => match node.fetch(&rhs.to_string().into()) {
                         Some(symbol) => match symbol.as_ref() {
@@ -260,7 +260,7 @@ impl Eval for Expression {
                         }
                     },
                     _ => unimplemented!(),
-                };
+                }
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Nested(nested) => match nested.eval(context)? {
@@ -268,7 +268,7 @@ impl Eval for Expression {
                 None => Ok(Value::Invalid),
             },
             _ => unimplemented!(),
-        };
+        }
     }
 }
 
