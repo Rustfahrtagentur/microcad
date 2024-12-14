@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
-use crate::{diag::*, objecttree::*, parse::*, source_file_cache::*};
+use crate::{diag::*, eval::*, objecttree::*, parse::*, source_file_cache::*};
 
 use microcad_core::Id;
 
@@ -120,9 +120,8 @@ impl Context {
     }
 
     /// Push a new symbol table to the stack (enter a new scope)
-    fn push(&mut self, stack_frame: StackFrame) -> &mut StackFrame {
+    fn push(&mut self, stack_frame: StackFrame) {
         self.stack.push(stack_frame);
-        self.stack.last_mut().unwrap()
     }
 
     /// Pop the top symbol table from the stack (exit the current scope)
@@ -131,8 +130,12 @@ impl Context {
     }
 
     /// The top symbol table in the stack
-    pub fn top(&self) -> &StackFrame {
-        self.stack.last().unwrap()
+    pub fn top(&self) -> Result<&StackFrame> {
+        if let Some(last) = self.stack.last() {
+            Ok(last)
+        } else {
+            Err(EvalError::UnexpectedEmptyStack)
+        }
     }
 
     /// The top symbol table in the stack (mutable)
@@ -158,10 +161,7 @@ impl Context {
     }
 
     /// Fetch symbols by qualified name
-    pub fn fetch_symbols_by_qualified_name(
-        &mut self,
-        name: &QualifiedName,
-    ) -> Result<Vec<Symbol>, EvalError> {
+    pub fn fetch_symbols_by_qualified_name(&mut self, name: &QualifiedName) -> Result<Vec<Symbol>> {
         name.fetch_symbols(self)
     }
 
@@ -197,9 +197,11 @@ impl Symbols for Context {
     }
 
     fn copy<T: Symbols>(&self, into: &mut T) {
-        self.top().symbol_table().iter().for_each(|(_, symbol)| {
-            into.add(symbol.as_ref().clone());
-        });
+        if let Ok(top) = self.top() {
+            top.symbol_table().iter().for_each(|(_, symbol)| {
+                into.add(symbol.as_ref().clone());
+            });
+        }
     }
 }
 
