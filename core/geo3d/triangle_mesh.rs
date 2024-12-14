@@ -31,8 +31,6 @@ impl Triangle<&Vertex> {
     }
 
     /// Get signed volume of triangle
-
-    /// Get signed volume of triangle
     ///
     /// https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up
     pub fn signed_volume(&self) -> f64 {

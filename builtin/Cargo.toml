@@ -13,4 +13,3 @@ path = "lib.rs"
 [dependencies]
 syn = { version = "2.0.75", features = ["full", "fold"] }
 quote = "1.0.8"
-

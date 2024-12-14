@@ -3,7 +3,7 @@
 
 //! µCAD core
 
-#![warn(missing_docs)]
+#![warn(missing_docs, clippy::unwrap_used)]
 
 mod boolean_op;
 pub mod error;

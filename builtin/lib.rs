@@ -3,8 +3,6 @@
 
 //! Helper macros to instrument renderable builtin symbols
 
-#![warn(missing_docs)]
-
 extern crate proc_macro;
 extern crate quote;
 extern crate syn;
@@ -22,11 +20,11 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
             let mut parameter_impl = quote! {
                 let mut parameters = ParameterList::default();
             };
-            let field_identifiers = fields.iter().map(|item| item.ident.as_ref().unwrap()).collect::<Vec<_>>();
+            let field_identifiers = fields.iter().map(|item| item.ident.as_ref()).collect::<Vec<_>>();
             let node_type = Ident::new(node_type, struct_name.span());
 
             fields.iter().for_each(|field| {
-                let identifier = field.ident.as_ref().unwrap();
+                let identifier = field.ident.as_ref();
                 let ty = &field.ty;
                 parameter_impl.extend(quote! {
                     parameters.push(Parameter::new(
