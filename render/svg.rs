@@ -213,7 +213,7 @@ impl microcad_core::Renderer for SvgRenderer {
             "fill" => self.state.fill = Some(value.to_string()),
             "stroke" => self.state.stroke = Some(value.to_string()),
             "stroke-width" => {
-                self.state.stroke_width = Some(value.parse().unwrap());
+                self.state.stroke_width = Some(value.parse()?);
             }
             _ => return Err(CoreError::NotImplemented),
         }
