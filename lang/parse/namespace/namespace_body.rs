@@ -79,7 +79,7 @@ impl SrcReferrer for NamespaceBody {
 impl Eval for NamespaceBody {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         for statement in &self.statements {
             statement.eval(context)?;
         }

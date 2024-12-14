@@ -34,7 +34,7 @@ impl CallArgumentList {
         &self,
         context: &mut Context,
         parameters: &ParameterList,
-    ) -> Result<ArgumentMap> {
+    ) -> EvalResult<ArgumentMap> {
         let parameter_values = parameters.eval(context)?;
         match self
             .eval(context)?
@@ -52,7 +52,7 @@ impl CallArgumentList {
 impl Eval for CallArgumentList {
     type Output = CallArgumentValueList;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         let mut args = CallArgumentValueList::default();
         for arg in self.iter() {
             args.push(arg.eval(context)?).expect("Duplicated argument");

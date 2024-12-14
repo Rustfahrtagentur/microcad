@@ -39,7 +39,7 @@ impl DiagHandler {
 }
 
 impl PushDiag for DiagHandler {
-    fn push_diag(&mut self, diag: super::Diag) -> crate::eval::Result<()> {
+    fn push_diag(&mut self, diag: super::Diag) -> crate::eval::EvalResult<()> {
         use super::Diag;
         match &diag {
             Diag::Error(_) => {

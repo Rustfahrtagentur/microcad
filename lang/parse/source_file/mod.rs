@@ -105,7 +105,7 @@ impl SourceFile {
         &self,
         context: &mut Context,
         namespace_name: Identifier,
-    ) -> Result<std::rc::Rc<NamespaceDefinition>> {
+    ) -> EvalResult<std::rc::Rc<NamespaceDefinition>> {
         let mut namespace = NamespaceDefinition::new(namespace_name);
         let stack_frame = StackFrame::Namespace(context.top()?.symbol_table().clone());
 
@@ -176,7 +176,7 @@ impl Parse for SourceFile {
 impl Eval for SourceFile {
     type Output = objecttree::ObjectNode;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         let group = objecttree::group();
         for statement in &self.body {
             match statement {

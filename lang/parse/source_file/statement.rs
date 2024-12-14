@@ -70,7 +70,7 @@ impl Parse for Statement {
 impl Eval for Statement {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         match self {
             Self::Use(use_statement) => {
                 use_statement.eval(context)?;

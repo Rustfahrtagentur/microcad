@@ -30,7 +30,7 @@ impl ModuleInitDefinition {
         &self,
         arg_map: &ArgumentMap,
         context: &mut Context,
-    ) -> Result<crate::objecttree::ObjectNode> {
+    ) -> EvalResult<crate::objecttree::ObjectNode> {
         for (name, value) in arg_map.iter() {
             context.add(Symbol::Value(name.clone(), value.clone()));
         }

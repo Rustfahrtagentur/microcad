@@ -58,7 +58,7 @@ impl QualifiedName {
         &self,
         context: &Context,
         functor: &mut dyn FnMut(&Symbol, usize),
-    ) -> Result<()> {
+    ) -> EvalResult<()> {
         self._visit_symbols(None, 0, context, functor)
     }
 
@@ -69,7 +69,7 @@ impl QualifiedName {
         index: usize,
         context: &Context,
         functor: &mut dyn FnMut(&Symbol, usize),
-    ) -> Result<()> {
+    ) -> EvalResult<()> {
         if index >= self.0.len() {
             return Ok(());
         }
@@ -90,7 +90,7 @@ impl QualifiedName {
     }
 
     /// Get all symbols for the qualified name
-    pub fn fetch_symbols(&self, context: &mut Context) -> Result<Vec<Symbol>> {
+    pub fn fetch_symbols(&self, context: &mut Context) -> EvalResult<Vec<Symbol>> {
         let mut symbols = Vec::new();
         self.visit_symbols(context, &mut |symbol, depth| {
             // Only take symbols that match the full qualified name
@@ -112,7 +112,7 @@ impl QualifiedName {
     /// Get the symbol for the qualified name
     ///
     /// If there are multiple symbols with the same name, an error is returned
-    pub fn fetch_symbol(&self, context: &mut Context) -> Result<Option<Symbol>> {
+    pub fn fetch_symbol(&self, context: &mut Context) -> EvalResult<Option<Symbol>> {
         let symbols = self.fetch_symbols(context)?;
         if symbols.len() > 1 {
             use crate::diag::PushDiag;
@@ -129,7 +129,7 @@ impl QualifiedName {
 impl Eval for QualifiedName {
     type Output = Symbol;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         if let Some(symbol) = self.fetch_symbol(context)? {
             Ok(symbol)
         } else {

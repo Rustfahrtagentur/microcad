@@ -104,7 +104,7 @@ impl Context {
     }
 
     /// Evaluate the context with the current source file
-    pub fn eval(&mut self) -> super::Result<ObjectNode> {
+    pub fn eval(&mut self) -> super::EvalResult<ObjectNode> {
         let node = self
             .current_source_file()
             .expect("No current source file")
@@ -130,7 +130,7 @@ impl Context {
     }
 
     /// The top symbol table in the stack
-    pub fn top(&self) -> Result<&StackFrame> {
+    pub fn top(&self) -> EvalResult<&StackFrame> {
         if let Some(last) = self.stack.last() {
             Ok(last)
         } else {
@@ -147,8 +147,8 @@ impl Context {
     pub fn scope(
         &mut self,
         stack_frame: StackFrame,
-        f: impl FnOnce(&mut Self) -> crate::eval::Result<()>,
-    ) -> crate::eval::Result<()> {
+        f: impl FnOnce(&mut Self) -> crate::eval::EvalResult<()>,
+    ) -> crate::eval::EvalResult<()> {
         self.push(stack_frame);
         f(self)?;
         self.pop();
@@ -161,7 +161,10 @@ impl Context {
     }
 
     /// Fetch symbols by qualified name
-    pub fn fetch_symbols_by_qualified_name(&mut self, name: &QualifiedName) -> Result<Vec<Symbol>> {
+    pub fn fetch_symbols_by_qualified_name(
+        &mut self,
+        name: &QualifiedName,
+    ) -> EvalResult<Vec<Symbol>> {
         name.fetch_symbols(self)
     }
 
@@ -172,7 +175,7 @@ impl Context {
 }
 
 impl PushDiag for Context {
-    fn push_diag(&mut self, diag: Diag) -> crate::eval::Result<()> {
+    fn push_diag(&mut self, diag: Diag) -> crate::eval::EvalResult<()> {
         self.diag_handler.push_diag(diag)
     }
 }

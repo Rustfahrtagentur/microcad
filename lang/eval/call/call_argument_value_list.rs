@@ -50,7 +50,7 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut MultiArgumentMap,
-    ) -> Result<()> {
+    ) -> EvalResult<()> {
         let old_parameter_values = parameter_values.clone();
 
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
@@ -88,7 +88,7 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut ArgumentMap,
-    ) -> Result<()> {
+    ) -> EvalResult<()> {
         let old_parameter_values = parameter_values.clone();
 
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
@@ -130,7 +130,7 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut ArgumentMap,
-    ) -> Result<()> {
+    ) -> EvalResult<()> {
         if parameter_values.is_empty() {
             return Ok(());
         }
@@ -170,7 +170,7 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut MultiArgumentMap,
-    ) -> Result<()> {
+    ) -> EvalResult<()> {
         if parameter_values.is_empty() {
             return Ok(());
         }
@@ -211,7 +211,7 @@ impl CallArgumentValueList {
     pub fn get_matching_arguments(
         &self,
         parameter_values: &ParameterValueList,
-    ) -> Result<ArgumentMap> {
+    ) -> EvalResult<ArgumentMap> {
         let mut arg_map = ArgumentMap::new(self.src_ref());
 
         // Check for unexpected arguments.
@@ -244,7 +244,7 @@ impl CallArgumentValueList {
     pub fn get_multi_matching_arguments(
         &self,
         parameter_values: &ParameterValueList,
-    ) -> Result<MultiArgumentMap> {
+    ) -> EvalResult<MultiArgumentMap> {
         let mut multi_arg_map = MultiArgumentMap::default();
 
         // Check for unexpected arguments.

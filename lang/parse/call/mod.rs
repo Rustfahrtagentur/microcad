@@ -22,7 +22,7 @@ pub trait CallTrait {
     type Output;
 
     /// Evaluate call into value (if possible)
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Self::Output>;
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Self::Output>;
 }
 
 /// Call of a function or module initialization
@@ -86,7 +86,7 @@ pub enum CallResult {
 impl Eval for Call {
     type Output = CallResult;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         match self.name.eval(context)? {
             Symbol::Function(f) => match f.call(&self.argument_list, context)? {
                 Some(value) => Ok(CallResult::Value(value)),
