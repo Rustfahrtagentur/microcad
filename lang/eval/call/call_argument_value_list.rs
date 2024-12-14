@@ -52,7 +52,6 @@ impl CallArgumentValueList {
         arg_map: &mut MultiArgumentMap,
     ) -> Result<()> {
         let old_parameter_values = parameter_values.clone();
-        println!("{parameter_values:?}");
 
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
         old_parameter_values.iter().for_each(|parameter_value| {
@@ -69,19 +68,43 @@ impl CallArgumentValueList {
                 }
                 // No matching argument found, check if a default value is defined
                 None => {
-                    // If we have a default value, we can use it
-                    if let Some(default) = &parameter_value.default_value {
+                    // If we have a default value, we keep in the map and use it later via `get_multi_insert_default_parameters`
+                    /*if let Some(default) = &parameter_value.default_value {
                         Self::insert_into_multi_arg_map(
                             arg_map,
                             parameter_value.clone(),
                             parameter_values,
                             default.clone(),
                         );
-                    }
+                    }*/
                 }
             }
         });
-        println!("{parameter_values:?}");
+
+        Ok(())
+    }
+
+    fn get_multi_insert_default_parameters(
+        &self,
+        parameter_values: &mut ParameterValueList,
+        arg_map: &mut MultiArgumentMap,
+    ) -> Result<()> {
+        let old_parameter_values = parameter_values.clone();
+
+        // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
+        old_parameter_values.iter().for_each(|parameter_value| {
+            if self.get(&parameter_value.name).is_none() {
+                // If we have a default value, we can use it
+                if let Some(default) = &parameter_value.default_value {
+                    Self::insert_into_multi_arg_map(
+                        arg_map,
+                        parameter_value.clone(),
+                        parameter_values,
+                        default.clone(),
+                    );
+                }
+            }
+        });
 
         Ok(())
     }
@@ -190,26 +213,30 @@ impl CallArgumentValueList {
             .try_for_each(|arg| {
                 use std::ops::ControlFlow;
 
-                let param_name = parameter_values[positional_index].name.clone();
-                if !arg_map.contains_key(&param_name) {
-                    match Self::insert_into_multi_arg_map(
-                        arg_map,
-                        parameter_values[positional_index].clone(),
-                        parameter_values,
-                        arg.value.clone(),
-                    ) {
-                        TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
-                            if positional_index >= parameter_values.len() {
-                                return ControlFlow::Break(());
+                match parameter_values.get_by_index(positional_index) {
+                    Some(param_value) => {
+                        let param_name = param_value.name.clone();
+                        if !arg_map.contains_key(&param_name) {
+                            match Self::insert_into_multi_arg_map(
+                                arg_map,
+                                param_value.clone(),
+                                parameter_values,
+                                arg.value.clone(),
+                            ) {
+                                TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
+                                    if positional_index >= parameter_values.len() {
+                                        return ControlFlow::Break(());
+                                    }
+                                }
+                                _ => {}
                             }
+                        } else {
+                            positional_index += 1;
                         }
-                        _ => {}
+                        ControlFlow::Continue(())
                     }
-                } else {
-                    positional_index += 1;
+                    None => ControlFlow::Break(()),
                 }
-
-                ControlFlow::Continue(())
             });
 
         Ok(())
@@ -269,6 +296,10 @@ impl CallArgumentValueList {
 
         self.get_multi_matching_named_arguments(&mut missing_parameter_values, &mut multi_arg_map)?;
         self.get_multi_positional_arguments(&mut missing_parameter_values, &mut multi_arg_map)?;
+        self.get_multi_insert_default_parameters(
+            &mut missing_parameter_values,
+            &mut multi_arg_map,
+        )?;
 
         if !missing_parameter_values.is_empty() {
             return Err(EvalError::MissingArguments(
