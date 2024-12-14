@@ -52,6 +52,7 @@ impl CallArgumentValueList {
         arg_map: &mut MultiArgumentMap,
     ) -> Result<()> {
         let old_parameter_values = parameter_values.clone();
+        println!("{parameter_values:?}");
 
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
         old_parameter_values.iter().for_each(|parameter_value| {
@@ -80,6 +81,7 @@ impl CallArgumentValueList {
                 }
             }
         });
+        println!("{parameter_values:?}");
 
         Ok(())
     }
@@ -141,25 +143,32 @@ impl CallArgumentValueList {
             .try_for_each(|arg| {
                 use std::ops::ControlFlow;
 
-                let param_name = parameter_values[positional_index].name.clone();
-                if !arg_map.contains_key(&param_name) {
-                    // @todo: Check for tuple arguments and whether the tuple fields match the parameters
-                    if let TypeCheckResult::SingleMatch =
-                        parameter_values[positional_index].type_check(&arg.value.ty())
-                    {
-                        Self::insert_and_remove(
-                            arg_map,
-                            parameter_values,
-                            &param_name,
-                            arg.value.clone(),
-                        );
-                        if positional_index >= parameter_values.len() {
-                            return ControlFlow::Break(());
+                match parameter_values.get_by_index(positional_index) {
+                    Some(param_value) => {
+                        let param_name = param_value.name.clone();
+                        if !arg_map.contains_key(&param_name) {
+                            if let TypeCheckResult::SingleMatch =
+                                param_value.type_check(&arg.value.ty())
+                            {
+                                Self::insert_and_remove(
+                                    arg_map,
+                                    parameter_values,
+                                    &param_name,
+                                    arg.value.clone(),
+                                );
+                                if positional_index >= parameter_values.len() {
+                                    return ControlFlow::Break(());
+                                }
+                            }
+                        } else {
+                            positional_index += 1;
                         }
                     }
-                } else {
-                    positional_index += 1;
+                    None => {
+                        return ControlFlow::Break(());
+                    }
                 }
+
                 ControlFlow::Continue(())
             });
 
@@ -218,7 +227,7 @@ impl CallArgumentValueList {
         // We are looking for call arguments that are not in the parameter list
         if let Some(name) = self
             .keys()
-            .find(|name| parameter_values.get(name).is_none())
+            .find(|name| parameter_values.get_by_name(name).is_none())
         {
             return Err(EvalError::UnexpectedArgument(name.clone()));
         }
@@ -251,7 +260,7 @@ impl CallArgumentValueList {
         // We are looking for call arguments that are not in the parameter list
         if let Some(name) = self
             .keys()
-            .find(|name| parameter_values.get(name).is_none())
+            .find(|name| parameter_values.get_by_name(name).is_none())
         {
             return Err(EvalError::UnexpectedArgument(name.clone()));
         }
@@ -360,5 +369,34 @@ fn call_get_matching_arguments_missing() {
         assert_eq!(&missing[0], "bar");
     } else {
         panic!("Expected MissingArguments error");
+    }
+}
+
+#[test]
+fn get_multi_matching_arguments() {
+    use crate::{parameter_value, r#type::*};
+
+    let param_values = ParameterValueList::new(vec![
+        parameter_value!(thickness: Scalar = 2.0),
+        parameter_value!(inner_diameter: Scalar = 100.0),
+        parameter_value!(height: Scalar = 10.0),
+    ]);
+
+    let call_values = CallArgumentValueList::from(vec![
+        call_argument_value!(Scalar = 2.0),
+        call_argument_value!(Scalar = 100.0),
+        call_argument_value!(Scalar = 10.0),
+    ]);
+
+    let multi_argument_map = call_values
+        .get_multi_matching_arguments(&param_values)
+        .expect("MultiArgumentMap expected");
+
+    for argument_map in multi_argument_map.combinations() {
+        assert_eq_arg_map_value!(argument_map,
+            thickness: Scalar = 2.0,
+            inner_diameter: Scalar = 100.0,
+            height: Scalar = 10.0
+        );
     }
 }
