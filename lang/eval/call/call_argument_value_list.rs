@@ -26,31 +26,6 @@ impl CallArgumentValueList {
         parameter_values.remove(name);
     }
 
-    fn insert_into_multi_arg_map(
-        arg_map: &mut MultiArgumentMap,
-        parameter_value: ParameterValue,
-        parameter_values: &mut ParameterValueList,
-        value: Value,
-    ) -> TypeCheckResult {
-        let result = parameter_value.type_check(&value.ty());
-        match result {
-            TypeCheckResult::MultiMatch => match &value {
-                Value::List(l) => {
-                    parameter_values.remove(&parameter_value.name);
-                    arg_map.insert_multi(parameter_value.name.clone(), l.fetch());
-                    result
-                }
-                value => panic!("Expected list type, got {}", value.ty()),
-            },
-            TypeCheckResult::SingleMatch => {
-                parameter_values.remove(&parameter_value.name);
-                arg_map.insert_single(parameter_value.name.clone(), value);
-                result
-            }
-            _ => result,
-        }
-    }
-
     fn get_multi_matching_named_arguments(
         &self,
         parameter_values: &mut ParameterValueList,
@@ -60,11 +35,10 @@ impl CallArgumentValueList {
         parameter_values.clone().iter().for_each(|parameter_value| {
             // We have found a matching call argument with the same name as the parameter.
             if let Some(call_argument_value) = self.get(&parameter_value.name) {
-                Self::insert_into_multi_arg_map(
-                    arg_map,
-                    parameter_value.clone(),
-                    parameter_values,
+                arg_map.insert_and_remove_from_parameters(
                     call_argument_value.value.clone(),
+                    parameter_value,
+                    parameter_values,
                 );
             }
         });
@@ -79,11 +53,10 @@ impl CallArgumentValueList {
             if self.get(&parameter_value.name).is_none() {
                 // If we have a default value, we can use it
                 if let Some(default) = &parameter_value.default_value {
-                    Self::insert_into_multi_arg_map(
-                        arg_map,
-                        parameter_value.clone(),
-                        parameter_values,
+                    arg_map.insert_and_remove_from_parameters(
                         default.clone(),
+                        &parameter_value,
+                        parameter_values,
                     );
                 }
             }
@@ -187,30 +160,28 @@ impl CallArgumentValueList {
             .filter(|arg| arg.name.is_none())
             .try_for_each(|arg| {
                 use std::ops::ControlFlow;
-
-                match parameter_values.get_by_index(positional_index) {
-                    Some(param_value) => {
-                        let param_name = param_value.name.clone();
-                        if !arg_map.contains_key(&param_name) {
-                            match Self::insert_into_multi_arg_map(
-                                arg_map,
-                                param_value.clone(),
-                                parameter_values,
-                                arg.value.clone(),
-                            ) {
-                                TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
-                                    if positional_index >= parameter_values.len() {
-                                        return ControlFlow::Break(());
-                                    }
+                if parameter_values.get_by_index(positional_index).is_none() {
+                    ControlFlow::Break(())
+                } else {
+                    let parameter_value = parameter_values[positional_index].clone();
+                    let parameter_name = parameter_value.name.clone();
+                    if !arg_map.contains_key(&parameter_name) {
+                        match arg_map.insert_and_remove_from_parameters(
+                            arg.value.clone(),
+                            &parameter_value,
+                            parameter_values,
+                        ) {
+                            TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
+                                if positional_index >= parameter_values.len() {
+                                    return ControlFlow::Break(());
                                 }
-                                _ => {}
                             }
-                        } else {
-                            positional_index += 1;
+                            _ => {}
                         }
-                        ControlFlow::Continue(())
+                    } else {
+                        positional_index += 1;
                     }
-                    None => ControlFlow::Break(()),
+                    ControlFlow::Continue(())
                 }
             });
 

@@ -80,4 +80,31 @@ impl MultiArgumentMap {
     pub fn contains_key(&self, key: &Id) -> bool {
         self.0.contains_key(key)
     }
+
+    /// Insert a value into the map and remove `parameter_value` from the list
+    pub fn insert_and_remove_from_parameters(
+        &mut self,
+        value: Value,
+        parameter_value: &ParameterValue,
+        parameter_values: &mut ParameterValueList,
+    ) -> TypeCheckResult {
+        let result = parameter_value.type_check(&value.ty());
+        let name = &parameter_value.name;
+        match result {
+            TypeCheckResult::MultiMatch => match &value {
+                Value::List(l) => {
+                    parameter_values.remove(name);
+                    self.insert_multi(name.clone(), l.fetch());
+                    result
+                }
+                value => panic!("Expected list type, got {}", value.ty()),
+            },
+            TypeCheckResult::SingleMatch => {
+                parameter_values.remove(&name);
+                self.insert_single(name.clone(), value);
+                result
+            }
+            _ => result,
+        }
+    }
 }
