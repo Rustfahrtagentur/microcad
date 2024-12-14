@@ -18,7 +18,7 @@ pub struct MethodCall {
 
 impl MethodCall {
     /// Evaluate the method call in a context
-    pub fn eval(&self, context: &mut Context, lhs: &Expression) -> Result<Value> {
+    pub fn eval(&self, context: &mut Context, lhs: &Expression) -> EvalResult<Value> {
         use call::call_method::CallMethod;
 
         match lhs.eval(context)? {

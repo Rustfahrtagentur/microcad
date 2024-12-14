@@ -44,7 +44,7 @@ impl FunctionDefinition {
 impl CallTrait for FunctionDefinition {
     type Output = Option<Value>;
 
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Self::Output> {
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Self::Output> {
         let arg_map = args.get_matching_arguments(context, &self.signature.parameters)?;
 
         let stack_frame = StackFrame::FunctionCall(context.top()?.symbol_table().clone());
@@ -87,7 +87,7 @@ impl Parse for std::rc::Rc<FunctionDefinition> {
 impl Eval for std::rc::Rc<FunctionDefinition> {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         context.add(self.clone().into());
         Ok(())
     }

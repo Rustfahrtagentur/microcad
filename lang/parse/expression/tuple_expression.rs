@@ -82,7 +82,7 @@ impl std::fmt::Display for TupleExpression {
 impl Eval for TupleExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> crate::eval::Result<Value> {
+    fn eval(&self, context: &mut Context) -> crate::eval::EvalResult<Value> {
         if !self.is_named {
             // Unnamed tuple
             let mut value_list = ValueList::new(Vec::new(), self.args.src_ref());

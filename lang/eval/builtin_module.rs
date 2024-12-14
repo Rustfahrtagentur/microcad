@@ -6,7 +6,7 @@
 use crate::{eval::*, objecttree::*, parse::*};
 
 /// Builtin module initialization functor
-pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> Result<ObjectNode>;
+pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> EvalResult<ObjectNode>;
 
 /// Builtin module
 #[derive(Clone)]
@@ -23,7 +23,7 @@ impl CallTrait for BuiltinModule {
     type Output = Vec<ObjectNode>;
 
     /// Call implicit initialization of this module
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> Result<Self::Output> {
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Self::Output> {
         let multi_arg_map = args
             .eval(context)?
             .get_multi_matching_arguments(&self.parameters.eval(context)?)?;
@@ -50,7 +50,7 @@ pub trait BuiltinModuleDefinition {
     /// Get parameters of the builtin module (implicit init)
     fn parameters() -> ParameterList;
     /// Create node from argument map
-    fn node(args: &ArgumentMap) -> Result<ObjectNode>;
+    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode>;
     /// Implicit initialization functor
     fn function() -> &'static BuiltinModuleFn {
         &|args, _ctx| Self::node(args)

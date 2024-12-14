@@ -22,7 +22,7 @@ impl geo3d::Primitive for Sphere {
     fn render_geometry(
         &self,
         renderer: &mut dyn geo3d::Renderer,
-    ) -> microcad_core::Result<geo3d::Geometry> {
+    ) -> microcad_core::CoreResult<geo3d::Geometry> {
         use std::f64::consts::PI;
         let n = (self.radius / renderer.precision() * PI * 0.5).max(3.0) as u32;
 
@@ -54,7 +54,7 @@ impl geo3d::Primitive for Cube {
     fn render_geometry(
         &self,
         _renderer: &mut dyn geo3d::Renderer,
-    ) -> microcad_core::Result<geo3d::Geometry> {
+    ) -> microcad_core::CoreResult<geo3d::Geometry> {
         Ok(geo3d::Geometry::Manifold(geo3d::Manifold::cube(
             self.size_x,
             self.size_y,
@@ -85,7 +85,7 @@ impl geo3d::Primitive for Cylinder {
     fn render_geometry(
         &self,
         renderer: &mut dyn geo3d::Renderer,
-    ) -> microcad_core::Result<geo3d::Geometry> {
+    ) -> microcad_core::CoreResult<geo3d::Geometry> {
         use std::f64::consts::PI;
         let n = (self.radius_bottom / renderer.precision() * PI * 0.5).max(3.0) as u32;
 

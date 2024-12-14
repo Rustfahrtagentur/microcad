@@ -40,7 +40,7 @@ impl Parse for NodeMarker {
 impl Eval for NodeMarker {
     type Output = Option<crate::ObjectNode>;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         match self.name.to_string().as_str() {
             "children" => Ok(Some(crate::objecttree::ObjectNode::new(
                 crate::objecttree::ObjectNodeInner::ChildrenNodeMarker,
@@ -105,7 +105,7 @@ impl Parse for NodeBodyStatement {
 impl Eval for NodeBodyStatement {
     type Output = Option<Value>;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         match self {
             Self::NodeMarker(marker) => Ok(marker.eval(context)?.map(Value::Node)),
             Self::Use(use_statement) => {
@@ -179,7 +179,7 @@ impl Parse for NodeBody {
 impl Eval for NodeBody {
     type Output = crate::objecttree::ObjectNode;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         let mut group = crate::objecttree::group();
 
         for statement in &self.statements {

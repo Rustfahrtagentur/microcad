@@ -25,16 +25,13 @@ pub use symbols::*;
 pub use ty::*;
 pub use value::*;
 
-/// Result type of any evaluation
-pub type Result<T> = std::result::Result<T, EvalError>;
-
 /// Evaluation trait
 pub trait Eval {
     /// Implementor's ok result type
     type Output;
 
     /// Evaluate the type into an expression
-    fn eval(&self, context: &mut Context) -> Result<Self::Output>;
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output>;
 }
 
 pub use microcad_core::Id;

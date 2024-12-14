@@ -19,7 +19,7 @@ impl CallArgumentValueList {
     pub fn check_for_unexpected_arguments(
         &self,
         parameter_values: &ParameterValueList,
-    ) -> Result<()> {
+    ) -> EvalResult<()> {
         match self
             .keys()
             .find(|name| parameter_values.get_by_name(name).is_none())
@@ -34,7 +34,7 @@ impl CallArgumentValueList {
     pub fn get_matching_arguments(
         &self,
         parameter_values: &ParameterValueList,
-    ) -> Result<ArgumentMap> {
+    ) -> EvalResult<ArgumentMap> {
         use call::ArgumentMatch;
         ArgumentMap::find_match(self, parameter_values)
     }
@@ -43,7 +43,7 @@ impl CallArgumentValueList {
     pub fn get_multi_matching_arguments(
         &self,
         parameter_values: &ParameterValueList,
-    ) -> Result<MultiArgumentMap> {
+    ) -> EvalResult<MultiArgumentMap> {
         use call::ArgumentMatch;
         MultiArgumentMap::find_match(self, parameter_values)
     }

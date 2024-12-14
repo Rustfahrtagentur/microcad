@@ -79,7 +79,7 @@ impl std::fmt::Display for FormatString {
 impl Eval for FormatString {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> Result<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let mut result = String::new();
         for elem in &self.0 {
             match elem {

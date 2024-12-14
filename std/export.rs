@@ -12,7 +12,10 @@ impl ExporterRegistry {
     ///
     /// # Arguments
     /// settings - The settings to use for the exporter.
-    pub fn create(&self, settings: &ExportSettings) -> microcad_core::Result<Box<dyn Exporter>> {
+    pub fn create(
+        &self,
+        settings: &ExportSettings,
+    ) -> microcad_core::CoreResult<Box<dyn Exporter>> {
         let id = settings.exporter_id();
         if id.as_ref().is_none() {
             return Err(microcad_core::CoreError::NoFilenameSpecifiedForExport);
@@ -33,7 +36,7 @@ impl ExporterRegistry {
     /// Create a new exporter based on the type.
     fn make<T: Exporter + 'static>(
         settings: &ExportSettings,
-    ) -> microcad_core::Result<Box<dyn Exporter>> {
+    ) -> microcad_core::CoreResult<Box<dyn Exporter>> {
         Ok(Box::new(T::from_settings(settings)?))
     }
 }
@@ -43,6 +46,6 @@ lazy_static::lazy_static! {
 }
 
 /// Shortcut to export a node
-pub fn export(node: microcad_lang::objecttree::ObjectNode) -> microcad_core::Result<()> {
+pub fn export(node: microcad_lang::objecttree::ObjectNode) -> microcad_core::CoreResult<()> {
     export_tree(node.clone(), |settings| EXPORTERS.create(settings))
 }

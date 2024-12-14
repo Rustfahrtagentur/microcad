@@ -29,7 +29,7 @@ impl CallArgument {
 impl Eval for CallArgument {
     type Output = CallArgumentValue;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         Ok(CallArgumentValue::new(
             self.id(),
             self.value.eval(context)?,

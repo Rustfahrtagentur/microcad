@@ -117,7 +117,7 @@ pub struct PlyExporter {
 }
 
 impl Exporter for PlyExporter {
-    fn from_settings(settings: &microcad_core::ExportSettings) -> microcad_core::Result<Self>
+    fn from_settings(settings: &microcad_core::ExportSettings) -> microcad_core::CoreResult<Self>
     where
         Self: Sized,
     {

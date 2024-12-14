@@ -26,7 +26,7 @@ pub trait CallMethod {
         name: &Identifier,
         args: &CallArgumentList,
         src_ref: SrcRef,
-    ) -> Result<Value>;
+    ) -> EvalResult<Value>;
 }
 
 impl CallMethod for ObjectNode {
@@ -35,7 +35,7 @@ impl CallMethod for ObjectNode {
         name: &Identifier,
         _args: &CallArgumentList,
         _src_ref: SrcRef,
-    ) -> Result<Value> {
+    ) -> EvalResult<Value> {
         match name.into() {
             "volume" => {
                 // Bake the object tree into a geometry tree
@@ -61,7 +61,7 @@ impl CallMethod for List {
         name: &Identifier,
         _: &CallArgumentList,
         src_ref: SrcRef,
-    ) -> Result<Value> {
+    ) -> EvalResult<Value> {
         match name.into() {
             "count" => Ok(Value::Integer(Refer::new(
                 self.len() as i64,

@@ -19,7 +19,7 @@ pub enum NestedItem {
 impl Eval for NestedItem {
     type Output = CallResult;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         match &self {
             NestedItem::Call(call) => call.eval(context),
             NestedItem::QualifiedName(qualified_name) => match qualified_name.eval(context)? {

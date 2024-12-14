@@ -79,7 +79,7 @@ impl Parse for UseDeclaration {
 impl Eval for UseDeclaration {
     type Output = SymbolTable;
 
-    fn eval(&self, context: &mut Context) -> Result<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         use crate::diag::PushDiag;
 
         match self {

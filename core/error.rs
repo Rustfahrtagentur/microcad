@@ -36,3 +36,6 @@ pub enum CoreError {
     #[error("Invalid rendering precision: {0}")]
     InvalidRenderPrecision(String),
 }
+
+/// Core result type
+pub type CoreResult<T> = std::result::Result<T, CoreError>;
