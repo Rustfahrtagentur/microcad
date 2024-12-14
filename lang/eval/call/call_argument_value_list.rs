@@ -19,7 +19,7 @@ impl CallArgumentValueList {
     pub fn check_for_unexpected_arguments(
         &self,
         parameter_values: &ParameterValueList,
-    ) -> Result<()> {
+    ) -> EvalResult<()> {
         match self
             .keys()
             .find(|name| parameter_values.get_by_name(name).is_none())
@@ -35,16 +35,8 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<ArgumentMap> {
-        let mut arg_map = ArgumentMap::new(self.src_ref());
-
-        let mut missing_parameter_values = parameter_values.clone();
-
-        self.get_matching_named_arguments(&mut missing_parameter_values, &mut arg_map);
-        self.get_matching_positional_arguments(&mut missing_parameter_values, &mut arg_map);
-
-        missing_parameter_values.check_for_missing_arguments()?;
-
-        Ok(arg_map)
+        use call::ArgumentMatch;
+        ArgumentMap::find_match(self, parameter_values)
     }
 
     /// Get multiplicity of matching arguments
@@ -52,16 +44,8 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<MultiArgumentMap> {
-        let mut multi_arg_map = MultiArgumentMap::default();
-
-        let mut missing_parameter_values = parameter_values.clone();
-        self.get_multi_matching_named_arguments(&mut missing_parameter_values, &mut multi_arg_map);
-        self.get_multi_positional_arguments(&mut missing_parameter_values, &mut multi_arg_map);
-        self.get_multi_insert_default_parameters(&mut missing_parameter_values, &mut multi_arg_map);
-
-        missing_parameter_values.check_for_missing_arguments()?;
-
-        Ok(multi_arg_map)
+        use call::ArgumentMatch;
+        MultiArgumentMap::find_match(self, parameter_values)
     }
 }
 

@@ -73,7 +73,7 @@ impl ParameterValueList {
     /// Check for missing arguments.
     ///
     /// Checks if parameter value list is not empty and wraps the list into an error
-    pub fn check_for_missing_arguments(self) -> Result<()> {
+    pub fn check_for_missing_arguments(self) -> EvalResult<()> {
         if !self.is_empty() {
             Err(EvalError::MissingArguments(self))
         } else {
