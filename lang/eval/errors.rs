@@ -222,6 +222,10 @@ pub enum EvalError {
     SymbolNotCallable(Symbol),
 
     /// Cannot continue evaluation after error limit has been reached
-    #[error("Error limit reached: Stopped evaluation after {0} errors.")]
+    #[error("Error limit reached: Stopped evaluation after {0} errors")]
     ErrorLimitReached(u32),
+
+    /// Unexpected empty stack
+    #[error("Unexpected empty stack")]
+    UnexpectedEmptyStack,
 }
