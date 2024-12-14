@@ -227,7 +227,7 @@ impl geo2d::Renderer for SvgRenderer {
         multi_polygon: &geo2d::MultiPolygon,
     ) -> microcad_core::CoreResult<()> {
         let style = self.render_state_to_style();
-        self.writer().multi_polygon(multi_polygon, &style).unwrap();
+        self.writer().multi_polygon(multi_polygon, &style)?;
         Ok(())
     }
 
