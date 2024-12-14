@@ -3,19 +3,12 @@
 
 //! Argument map evaluation entity
 
-use call::call_argument_value;
-
 use crate::{eval::*, parse::Combinations, src_ref::*};
 
 /// The `ArgumentMatch` trait is used to match call arguments to parameters.
 ///
 /// It is implemented by `ArgumentMap` and `MultiArgumentMap`.
 pub trait ArgumentMatch: Default {
-    /// Check if we have an argument value with name
-    ///
-    /// This function must be implemented by the user.
-    fn contains_argument_value(&self, name: &Id) -> bool;
-
     /// Inserts a value into the map and removes it from the parameter list
     ///
     /// This function must be implemented by the user.
@@ -36,21 +29,21 @@ pub trait ArgumentMatch: Default {
         call_argument_values: &CallArgumentValueList,
         parameter_values: &mut ParameterValueList,
     ) -> Result<&mut Self> {
-        for (parameter_value, call_argument_value) in parameter_values
+        parameter_values
             .clone()
             .iter()
-            .map(|p| (p, call_argument_values.get(&p.name)))
-            .filter(|(_, call_argument_value)| call_argument_value.is_some())
-            .map(|(p, c)| (p, c.unwrap().value.clone()))
-        {
-            // We have found a matching call argument with the same name as the parameter.
-            self.insert_and_remove_from_parameters(
-                call_argument_value,
-                parameter_value,
-                parameter_values,
-            )?;
-        }
-
+            .filter_map(|p| match call_argument_values.get(&p.name) {
+                Some(c) => Some((p, c)),
+                None => None,
+            })
+            .try_for_each(|(parameter_value, call_argument_value)| -> Result<()> {
+                self.insert_and_remove_from_parameters(
+                    call_argument_value.value.clone(),
+                    parameter_value,
+                    parameter_values,
+                )?;
+                Ok(())
+            })?;
         Ok(self)
     }
 
@@ -75,21 +68,19 @@ pub trait ArgumentMatch: Default {
                 None => break,
             };
 
-            if !self.contains_argument_value(&parameter_value.name) {
-                match self.insert_and_remove_from_parameters(
-                    call_argument_value.value.clone(),
-                    &parameter_value,
-                    parameter_values,
-                )? {
-                    TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
-                        if positional_index >= parameter_values.len() {
-                            break;
-                        }
+            match self.insert_and_remove_from_parameters(
+                call_argument_value.value.clone(),
+                &parameter_value,
+                parameter_values,
+            )? {
+                TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
+                    if positional_index >= parameter_values.len() {
+                        break;
                     }
-                    _ => {}
                 }
-            } else {
-                positional_index += 1;
+                _ => {
+                    positional_index += 1;
+                }
             }
         }
 
@@ -195,10 +186,6 @@ impl std::ops::DerefMut for ArgumentMap {
 }
 
 impl ArgumentMatch for ArgumentMap {
-    fn contains_argument_value(&self, key: &Id) -> bool {
-        self.0.contains_key(key)
-    }
-
     fn insert_and_remove_from_parameters(
         &mut self,
         value: Value,
@@ -241,11 +228,6 @@ impl MultiArgumentMap {
 }
 
 impl ArgumentMatch for MultiArgumentMap {
-    /// Check if the argument map contains a key
-    fn contains_argument_value(&self, key: &Id) -> bool {
-        self.0.contains_key(key)
-    }
-
     /// Insert a value into the map and remove `parameter_value` from the list
     fn insert_and_remove_from_parameters(
         &mut self,
