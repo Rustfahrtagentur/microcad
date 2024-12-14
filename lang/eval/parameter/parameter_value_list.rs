@@ -44,9 +44,14 @@ impl ParameterValueList {
         Ok(())
     }
 
-    /// fetch parameter value by name
-    pub fn get(&self, name: &Id) -> Option<&ParameterValue> {
+    /// get ParameterValue by name
+    pub fn get_by_name(&self, name: &Id) -> Option<&ParameterValue> {
         self.by_name.get(name).map(|i| &self.parameters[*i])
+    }
+
+    /// get ParameterValue by index
+    pub fn get_by_index(&self, index: usize) -> Option<&ParameterValue> {
+        self.parameters.get(index)
     }
 
     /// remove parameter value by name
@@ -63,6 +68,17 @@ impl ParameterValueList {
     /// Return `true` if empty
     pub fn is_empty(&self) -> bool {
         self.by_name.is_empty()
+    }
+
+    /// Check for missing arguments.
+    ///
+    /// Checks if parameter value list is not empty and wraps the list into an error
+    pub fn check_for_missing_arguments(self) -> Result<()> {
+        if !self.is_empty() {
+            Err(EvalError::MissingArguments(self))
+        } else {
+            Ok(())
+        }
     }
 }
 

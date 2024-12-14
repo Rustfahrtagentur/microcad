@@ -117,6 +117,10 @@ pub enum EvalError {
     #[error("Expected range in for loop, got {0}")]
     ExpectedRangeInForLoop(Type),
 
+    /// Expected iterable, a list or a range
+    #[error("Expected iterable, got {0}")]
+    ExpectedIterable(Type),
+
     /// Argument count mismatch
     #[error("Argument count mismatch: expected {expected}, got {found}")]
     ArgumentCountMismatch {
@@ -144,7 +148,7 @@ pub enum EvalError {
 
     /// Missing arguments
     #[error("Missing arguments: {0:?}")]
-    MissingArguments(Vec<Id>),
+    MissingArguments(ParameterValueList),
 
     /// Parameter missing type or value
     #[error("Parameter missing type or value: {0}")]
@@ -218,6 +222,10 @@ pub enum EvalError {
     SymbolNotCallable(Symbol),
 
     /// Cannot continue evaluation after error limit has been reached
-    #[error("Error limit reached: Stopped evaluation after {0} errors.")]
+    #[error("Error limit reached: Stopped evaluation after {0} errors")]
     ErrorLimitReached(u32),
+
+    /// Unexpected empty stack
+    #[error("Unexpected empty stack")]
+    UnexpectedEmptyStack,
 }
