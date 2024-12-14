@@ -5,6 +5,8 @@
 
 #![warn(missing_docs, clippy::unwrap_used)]
 
+const DEFAULT_RENDERING_PRECISION: f64 = 0.1;
+
 mod boolean_op;
 pub mod error;
 pub mod geo2d;
@@ -103,16 +105,20 @@ impl ExportSettings {
 
     /// return file name
     pub fn filename(&self) -> Option<String> {
-        self.get("filename")
-            .map(|filename| filename.as_str().unwrap().to_string())
+        self.get("filename").map(|filename| filename.to_string())
     }
 
     /// Return render precision
-    pub fn render_precision(&self) -> f64 {
-        self.0
-            .get("render_precision")
-            .map(|precision| precision.as_float().unwrap())
-            .unwrap_or(0.1)
+    pub fn render_precision(&self) -> Result<f64> {
+        if let Some(precision) = self.0.get("render_precision") {
+            if let Some(precision) = precision.as_float() {
+                Ok(precision)
+            } else {
+                Err(CoreError::InvalidRenderPrecision(precision.to_string()))
+            }
+        } else {
+            Ok(DEFAULT_RENDERING_PRECISION)
+        }
     }
 
     /// Get exporter ID

@@ -31,4 +31,8 @@ pub enum CoreError {
     /// Directory does not exist
     #[error("Directory does not exist: {0}")]
     DirectoryDoesNotExist(std::path::PathBuf),
+
+    /// Invalid rendering precision
+    #[error("Invalid rendering precision: {0}")]
+    InvalidRenderPrecision(String),
 }

@@ -73,7 +73,7 @@ impl Exporter for StlExporter {
 
         Ok(Self {
             filename: PathBuf::from(settings.filename().unwrap()),
-            precision: settings.render_precision(),
+            precision: settings.render_precision()?,
         })
     }
 
