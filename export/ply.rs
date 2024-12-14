@@ -124,7 +124,11 @@ impl Exporter for PlyExporter {
         assert!(settings.filename().is_some());
 
         Ok(Self {
-            filename: PathBuf::from(settings.filename().unwrap()),
+            filename: PathBuf::from(if let Some(filename) = settings.filename() {
+                filename
+            } else {
+                return Err(CoreError::NoFilenameSpecifiedForExport);
+            }),
             precision: settings.render_precision()?,
         })
     }
