@@ -35,7 +35,7 @@ impl<T: SrcReferrer> SrcReferrer for &T {
 ///
 /// *Hint*: Source file is not part of `SrcRef` and must be provided from outside
 #[derive(Clone, Debug, Default)]
-pub struct SrcRef(pub Option<SrcRefInner>);
+pub struct SrcRef(pub Option<Box<SrcRefInner>>);
 
 impl SrcRef {
     /// Create new `SrcRef`
@@ -43,11 +43,11 @@ impl SrcRef {
     /// - `line`: Line number within file
     /// - `col`: Column number within file
     pub fn new(range: std::ops::Range<usize>, line: u32, col: u32, source_file_hash: u64) -> Self {
-        Self(Some(SrcRefInner {
+        Self(Some(Box::new(SrcRefInner {
             range,
             at: LineCol { line, col },
             source_file_hash,
-        }))
+        })))
     }
 
     /// return length of `SrcRef`
@@ -72,7 +72,7 @@ impl SrcRef {
 }
 
 impl std::ops::Deref for SrcRef {
-    type Target = Option<SrcRefInner>;
+    type Target = Option<Box<SrcRefInner>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -143,7 +143,7 @@ impl SrcRef {
                     return SrcRef(Some(lhs));
                 }
 
-                SrcRef(Some(SrcRefInner {
+                SrcRef(Some(Box::new(SrcRefInner {
                     range: {
                         // paranoia check
                         assert!(lhs.range.end <= rhs.range.end);
@@ -153,7 +153,7 @@ impl SrcRef {
                     },
                     at: lhs.at,
                     source_file_hash,
-                }))
+                })))
             }
             (SrcRef(Some(hs)), SrcRef(None)) | (SrcRef(None), SrcRef(Some(hs))) => SrcRef(Some(hs)),
             _ => SrcRef(None),
