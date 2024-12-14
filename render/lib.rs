@@ -3,7 +3,7 @@
 
 //! Render Meshes
 
-#![warn(missing_docs)]
+#![warn(missing_docs, clippy::unwrap_used)]
 
 pub mod svg;
 

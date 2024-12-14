@@ -3,7 +3,7 @@
 
 //! Evaluation of parsed content
 
-#![warn(missing_docs)]
+#![warn(missing_docs, clippy::unwrap_used)]
 
 mod builtin_function;
 mod builtin_module;

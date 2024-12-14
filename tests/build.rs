@@ -3,7 +3,7 @@
 
 //! µCAD pest test
 
-#![warn(missing_docs)]
+#![warn(missing_docs, clippy::unwrap_used)]
 
 /// pest test main
 fn main() {

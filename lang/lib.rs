@@ -3,7 +3,7 @@
 
 //! µCAD source code parser
 
-#![warn(missing_docs)]
+#![warn(missing_docs, clippy::unwrap_used)]
 
 pub mod diag;
 pub mod eval;

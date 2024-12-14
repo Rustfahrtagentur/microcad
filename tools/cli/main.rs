@@ -3,7 +3,7 @@
 
 //! µCAD command line interpreter
 
-#![warn(missing_docs)]
+#![warn(missing_docs, clippy::unwrap_used)]
 
 extern crate clap;
 
