@@ -13,14 +13,16 @@ pub enum Unit {
     /// Percents
     Percent,
 
+    /// Meters
+    M,
     /// Centimeters
     Cm,
     /// Millimeters
     Mm,
+    /// Micrometers
+    Micrometer,
     /// Inches
     In,
-    /// Meters
-    M,
 
     /// Degree
     Deg,
@@ -57,13 +59,16 @@ pub enum Unit {
     In3,
     /// Cubic Meters
     M3,
-    ///Milliliter
-    Milliliter,
-    /// Centiliter
-    Centiliter,
     /// Liters
     Liter,
+    /// Centiliter
+    Centiliter,
+    ///Milliliter
+    Milliliter,
+    /// Microliter
+    Microliter,
 }
+
 impl std::fmt::Display for Unit {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
@@ -72,9 +77,10 @@ impl std::fmt::Display for Unit {
             Self::Percent => write!(f, "%"),
 
             // Lengths
-            Self::Mm => write!(f, "mm"),
-            Self::Cm => write!(f, "cm"),
             Self::M => write!(f, "m"),
+            Self::Cm => write!(f, "cm"),
+            Self::Mm => write!(f, "mm"),
+            Self::Micrometer => write!(f, "µm"),
             Self::In => write!(f, "in"),
 
             // Angles
@@ -103,6 +109,7 @@ impl std::fmt::Display for Unit {
             Self::Milliliter => write!(f, "ml"),
             Self::Centiliter => write!(f, "cl"),
             Self::Liter => write!(f, "l"),
+            Self::Microliter => write!(f, "µl"),
         }
     }
 }
@@ -115,10 +122,11 @@ impl std::str::FromStr for Unit {
             "%" => Ok(Self::Percent),
 
             // Lengths
+            "m" => Ok(Self::M),
             "cm" => Ok(Self::Cm),
             "mm" => Ok(Self::Mm),
+            "µm" => Ok(Self::Micrometer),
             "in" => Ok(Self::In),
-            "m" => Ok(Self::M),
 
             // Angles
             "deg" => Ok(Self::Deg),
@@ -146,6 +154,7 @@ impl std::str::FromStr for Unit {
             "ml" => Ok(Self::Milliliter),
             "cl" => Ok(Self::Centiliter),
             "l" => Ok(Self::Liter),
+            "µl" => Ok(Self::Microliter),
 
             // Unknown
             _ => Err(ParseError::UnknownUnit(s.to_string())),
@@ -157,7 +166,7 @@ impl Unit {
     pub fn ty(self) -> Type {
         match self {
             Self::None | Self::Percent => Type::Scalar,
-            Self::Cm | Self::Mm | Self::In | Self::M => Type::Length,
+            Self::M | Self::Cm | Self::Mm | Self::Micrometer | Self::In => Type::Length,
             Self::Deg | Self::DegS | Self::Grad | Self::Turn | Self::Rad => Type::Angle,
             Self::G | Self::Kg | Self::Lb => Type::Weight,
             Self::Mm2 | Self::Cm2 | Self::M2 | Self::In2 => Type::Area,
@@ -165,9 +174,10 @@ impl Unit {
             | Self::Cm3
             | Self::M3
             | Self::In3
-            | Self::Milliliter
+            | Self::Liter
             | Self::Centiliter
-            | Self::Liter => Type::Volume,
+            | Self::Milliliter
+            | Self::Microliter => Type::Volume,
         }
     }
     /// Normalize value to mm, rad or gram
@@ -178,9 +188,10 @@ impl Unit {
             Self::Percent => x * 0.01_f64,
 
             // Lengths
-            Self::Mm => x,
+            Self::M => x * 1_000.0_f64,
             Self::Cm => x * 10.0_f64,
-            Self::M => x * 1000.0_f64,
+            Self::Mm => x,
+            Self::Micrometer => x / 1_000.0_f64,
             Self::In => x * 25.4_f64,
 
             // Angles
@@ -191,23 +202,24 @@ impl Unit {
 
             // Weights
             Self::G => x,
-            Self::Kg => x * 1000.0_f64,
+            Self::Kg => x * 1_000.0_f64,
             Self::Lb => x * 453.59237_f64,
 
             // Areas
             Self::Mm2 => x,
             Self::Cm2 => x * 100.0_f64,
-            Self::M2 => x * 1000000.0_f64,
+            Self::M2 => x * 1_000_000.0_f64,
             Self::In2 => x * 645.16_f64,
 
             // Volumes
             Self::Mm3 => x,
-            Self::Cm3 => x * 1000.0_f64,
-            Self::M3 => x * 1000000000.0_f64,
+            Self::Cm3 => x * 1_000.0_f64,
+            Self::M3 => x * 1_000_000_000.0_f64,
             Self::In3 => x * 16387.06_f64,
-            Self::Liter => x * 1000000.0_f64,
+            Self::Liter => x * 1_000_000.0_f64,
             Self::Centiliter => x * 100.0_f64,
-            Self::Milliliter => x * 1000.0_f64,
+            Self::Milliliter => x * 1_000.0_f64,
+            Self::Microliter => x * 1_000_000.0_f64,
         }
     }
 }
