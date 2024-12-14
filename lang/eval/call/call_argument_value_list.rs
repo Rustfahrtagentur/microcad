@@ -15,179 +15,6 @@ use crate::{eval::*, ord_map::*, src_ref::*};
 pub struct CallArgumentValueList(Refer<OrdMap<Id, CallArgumentValue>>);
 
 impl CallArgumentValueList {
-    /// Insert into the argument map and remove the parameter from the list of parameters
-    fn insert_and_remove(
-        arg_map: &mut ArgumentMap,
-        parameter_values: &mut ParameterValueList,
-        name: &Id,
-        value: Value,
-    ) {
-        arg_map.insert(name.clone(), value.clone());
-        parameter_values.remove(name);
-    }
-
-    fn get_multi_matching_named_arguments(
-        &self,
-        parameter_values: &mut ParameterValueList,
-        arg_map: &mut MultiArgumentMap,
-    ) {
-        // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
-        parameter_values.clone().iter().for_each(|parameter_value| {
-            // We have found a matching call argument with the same name as the parameter.
-            if let Some(call_argument_value) = self.get(&parameter_value.name) {
-                arg_map.insert_and_remove_from_parameters(
-                    call_argument_value.value.clone(),
-                    parameter_value,
-                    parameter_values,
-                );
-            }
-        });
-    }
-
-    fn get_multi_insert_default_parameters(
-        &self,
-        parameter_values: &mut ParameterValueList,
-        arg_map: &mut MultiArgumentMap,
-    ) {
-        parameter_values.clone().iter().for_each(|parameter_value| {
-            if self.get(&parameter_value.name).is_none() {
-                // If we have a default value, we can use it
-                if let Some(default) = &parameter_value.default_value {
-                    arg_map.insert_and_remove_from_parameters(
-                        default.clone(),
-                        &parameter_value,
-                        parameter_values,
-                    );
-                }
-            }
-        });
-    }
-
-    fn get_matching_named_arguments(
-        &self,
-        parameter_values: &mut ParameterValueList,
-        arg_map: &mut ArgumentMap,
-    ) {
-        // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
-        parameter_values.clone().iter().for_each(|parameter_value| {
-            match self.get(&parameter_value.name) {
-                // We have a matching argument with the same name as the parameter.
-                Some(arg) => {
-                    // Now we need to check if the argument type matches the parameter type
-                    if let TypeCheckResult::SingleMatch =
-                        parameter_value.type_check(&arg.value.ty())
-                    {
-                        Self::insert_and_remove(
-                            arg_map,
-                            parameter_values,
-                            &parameter_value.name,
-                            arg.value.clone(),
-                        );
-                    }
-                }
-                // No matching argument found, check if a default value is defined
-                None => {
-                    // If we have a default value, we can use it
-                    if let Some(default) = &parameter_value.default_value {
-                        Self::insert_and_remove(
-                            arg_map,
-                            parameter_values,
-                            &parameter_value.name,
-                            default.clone(),
-                        );
-                    }
-                }
-            }
-        });
-    }
-
-    fn get_matching_positional_arguments(
-        &self,
-        parameter_values: &mut ParameterValueList,
-        arg_map: &mut ArgumentMap,
-    ) {
-        if parameter_values.is_empty() {
-            return;
-        }
-        let mut positional_index = 0;
-
-        self.iter()
-            .filter(|arg| arg.name.is_none())
-            .try_for_each(|arg| {
-                use std::ops::ControlFlow;
-
-                match parameter_values.get_by_index(positional_index) {
-                    Some(param_value) => {
-                        let param_name = param_value.name.clone();
-                        if !arg_map.contains_key(&param_name) {
-                            if let TypeCheckResult::SingleMatch =
-                                param_value.type_check(&arg.value.ty())
-                            {
-                                Self::insert_and_remove(
-                                    arg_map,
-                                    parameter_values,
-                                    &param_name,
-                                    arg.value.clone(),
-                                );
-                                if positional_index >= parameter_values.len() {
-                                    return ControlFlow::Break(());
-                                }
-                            }
-                        } else {
-                            positional_index += 1;
-                        }
-                    }
-                    None => {
-                        return ControlFlow::Break(());
-                    }
-                }
-
-                ControlFlow::Continue(())
-            });
-    }
-
-    fn get_multi_positional_arguments(
-        &self,
-        parameter_values: &mut ParameterValueList,
-        arg_map: &mut MultiArgumentMap,
-    ) -> Result<()> {
-        if parameter_values.is_empty() {
-            return Ok(());
-        }
-        let mut positional_index = 0;
-
-        self.iter()
-            .filter(|arg| arg.name.is_none())
-            .try_for_each(|arg| {
-                use std::ops::ControlFlow;
-                if parameter_values.get_by_index(positional_index).is_none() {
-                    ControlFlow::Break(())
-                } else {
-                    let parameter_value = parameter_values[positional_index].clone();
-                    let parameter_name = parameter_value.name.clone();
-                    if !arg_map.contains_key(&parameter_name) {
-                        match arg_map.insert_and_remove_from_parameters(
-                            arg.value.clone(),
-                            &parameter_value,
-                            parameter_values,
-                        ) {
-                            TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
-                                if positional_index >= parameter_values.len() {
-                                    return ControlFlow::Break(());
-                                }
-                            }
-                            _ => {}
-                        }
-                    } else {
-                        positional_index += 1;
-                    }
-                    ControlFlow::Continue(())
-                }
-            });
-
-        Ok(())
-    }
-
     /// Check for unexpected arguments.
     ///
     /// This method will return an error if there is a call argument that is not in the parameter list
@@ -210,18 +37,8 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &ParameterValueList,
     ) -> Result<ArgumentMap> {
-        self.check_for_unexpected_arguments(parameter_values)?;
-
-        let mut arg_map = ArgumentMap::new(self.src_ref());
-
-        let mut missing_parameter_values = parameter_values.clone();
-
-        self.get_matching_named_arguments(&mut missing_parameter_values, &mut arg_map);
-        self.get_matching_positional_arguments(&mut missing_parameter_values, &mut arg_map);
-
-        missing_parameter_values.check_for_missing_arguments()?;
-
-        Ok(arg_map)
+        use call::ArgumentMatch;
+        ArgumentMap::find_match(self, parameter_values)
     }
 
     /// Get multiplicity of matching arguments
@@ -229,18 +46,8 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &ParameterValueList,
     ) -> Result<MultiArgumentMap> {
-        self.check_for_unexpected_arguments(parameter_values)?;
-
-        let mut multi_arg_map = MultiArgumentMap::default();
-
-        let mut missing_parameter_values = parameter_values.clone();
-        self.get_multi_matching_named_arguments(&mut missing_parameter_values, &mut multi_arg_map);
-        self.get_multi_positional_arguments(&mut missing_parameter_values, &mut multi_arg_map);
-        self.get_multi_insert_default_parameters(&mut missing_parameter_values, &mut multi_arg_map);
-
-        missing_parameter_values.check_for_missing_arguments()?;
-
-        Ok(multi_arg_map)
+        use call::ArgumentMatch;
+        MultiArgumentMap::find_match(self, parameter_values)
     }
 }
 
