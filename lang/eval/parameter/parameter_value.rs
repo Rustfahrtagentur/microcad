@@ -25,7 +25,7 @@ pub enum TypeCheckResult {
     /// Self is list of that type
     MultiMatch,
     /// An error occurred
-    NoMatch(Id, Type, Type),
+    NoMatch(Id, Option<Type>, Type),
 }
 
 impl ParameterValue {
@@ -61,15 +61,21 @@ impl ParameterValue {
     /// - `TypeCheckResult::NoMatch(err)`: Types do not match (`err` describes both type
     pub fn type_check(&self, ty: &Type) -> TypeCheckResult {
         if self.type_matches(ty) {
-            TypeCheckResult::SingleMatch
-        } else if ty.is_list_of(self.specified_type.as_ref().unwrap()) {
-            TypeCheckResult::MultiMatch
+            return TypeCheckResult::SingleMatch;
+        }
+
+        if let Some(specified_type) = self.specified_type.as_ref() {
+            if ty.is_list_of(specified_type) {
+                TypeCheckResult::MultiMatch
+            } else {
+                TypeCheckResult::NoMatch(
+                    self.name.clone(),
+                    Some(specified_type.clone()),
+                    ty.clone(),
+                )
+            }
         } else {
-            TypeCheckResult::NoMatch(
-                self.name.clone(),
-                self.specified_type.clone().unwrap(),
-                ty.clone(),
-            )
+            TypeCheckResult::NoMatch(self.name.clone(), None, ty.clone())
         }
     }
 
