@@ -3,6 +3,8 @@
 
 //! Argument map evaluation entity
 
+use call::call_argument_value;
+
 use crate::{eval::*, parse::Combinations, src_ref::*};
 
 /// The `ArgumentMatch` trait is used to match call arguments to parameters.
@@ -22,7 +24,7 @@ pub trait ArgumentMatch: Default {
         value: Value,
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
-    ) -> TypeCheckResult;
+    ) -> Result<TypeCheckResult>;
 
     /// Find named arguments and insert them into the map.
     ///
@@ -31,19 +33,23 @@ pub trait ArgumentMatch: Default {
     /// The parameter is then removed from the list of parameters.
     fn find_and_insert_named_arguments(
         &mut self,
-        call_values: &CallArgumentValueList,
+        call_argument_values: &CallArgumentValueList,
         parameter_values: &mut ParameterValueList,
     ) -> Result<&mut Self> {
-        parameter_values.clone().iter().for_each(|parameter_value| {
+        for (parameter_value, call_argument_value) in parameter_values
+            .clone()
+            .iter()
+            .map(|p| (p, call_argument_values.get(&p.name)))
+            .filter(|(_, call_argument_value)| call_argument_value.is_some())
+            .map(|(p, c)| (p, c.unwrap().value.clone()))
+        {
             // We have found a matching call argument with the same name as the parameter.
-            if let Some(call_argument_value) = call_values.get(&parameter_value.name) {
-                self.insert_and_remove_from_parameters(
-                    call_argument_value.value.clone(),
-                    parameter_value,
-                    parameter_values,
-                );
-            }
-        });
+            self.insert_and_remove_from_parameters(
+                call_argument_value,
+                parameter_value,
+                parameter_values,
+            )?;
+        }
 
         Ok(self)
     }
@@ -55,7 +61,7 @@ pub trait ArgumentMatch: Default {
     /// The parameter is then removed from the list of parameters.
     fn find_and_insert_positional_arguments(
         &mut self,
-        call_values: &CallArgumentValueList,
+        call_argument_values: &CallArgumentValueList,
         parameter_values: &mut ParameterValueList,
     ) -> Result<&mut Self> {
         if parameter_values.is_empty() {
@@ -63,35 +69,29 @@ pub trait ArgumentMatch: Default {
         }
         let mut positional_index = 0;
 
-        call_values
-            .iter()
-            .filter(|arg| arg.name.is_none())
-            .try_for_each(|arg| {
-                use std::ops::ControlFlow;
-                if parameter_values.get_by_index(positional_index).is_none() {
-                    ControlFlow::Break(())
-                } else {
-                    let parameter_value = parameter_values[positional_index].clone();
-                    let parameter_name = parameter_value.name.clone();
-                    if !self.contains_argument_value(&parameter_name) {
-                        match self.insert_and_remove_from_parameters(
-                            arg.value.clone(),
-                            &parameter_value,
-                            parameter_values,
-                        ) {
-                            TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
-                                if positional_index >= parameter_values.len() {
-                                    return ControlFlow::Break(());
-                                }
-                            }
-                            _ => {}
+        for call_argument_value in call_argument_values.iter().filter(|arg| arg.name.is_none()) {
+            let parameter_value = match parameter_values.get_by_index(positional_index) {
+                Some(p) => p.clone(),
+                None => break,
+            };
+
+            if !self.contains_argument_value(&parameter_value.name) {
+                match self.insert_and_remove_from_parameters(
+                    call_argument_value.value.clone(),
+                    &parameter_value,
+                    parameter_values,
+                )? {
+                    TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
+                        if positional_index >= parameter_values.len() {
+                            break;
                         }
-                    } else {
-                        positional_index += 1;
                     }
-                    ControlFlow::Continue(())
+                    _ => {}
                 }
-            });
+            } else {
+                positional_index += 1;
+            }
+        }
 
         Ok(self)
     }
@@ -102,21 +102,21 @@ pub trait ArgumentMatch: Default {
     /// The parameter is then removed from the list of parameters.
     fn find_and_insert_default_parameters(
         &mut self,
-        call_values: &CallArgumentValueList,
+        call_argument_values: &CallArgumentValueList,
         parameter_values: &mut ParameterValueList,
     ) -> Result<&mut Self> {
-        parameter_values.clone().iter().for_each(|parameter_value| {
-            if call_values.get(&parameter_value.name).is_none() {
+        for parameter_value in parameter_values.clone().iter() {
+            if call_argument_values.get(&parameter_value.name).is_none() {
                 // If we have a default value, we can use it
                 if let Some(default) = &parameter_value.default_value {
                     self.insert_and_remove_from_parameters(
                         default.clone(),
                         &parameter_value,
                         parameter_values,
-                    );
+                    )?;
                 }
             }
-        });
+        }
 
         Ok(self)
     }
@@ -125,18 +125,24 @@ pub trait ArgumentMatch: Default {
     ///
     /// This function tries to find a match between the call arguments and the parameters.
     fn find_match(
-        call_values: &CallArgumentValueList,
+        call_argument_values: &CallArgumentValueList,
         parameter_values: &ParameterValueList,
     ) -> Result<Self> {
-        call_values.check_for_unexpected_arguments(parameter_values)?;
+        call_argument_values.check_for_unexpected_arguments(parameter_values)?;
 
         let mut missing_parameter_values = parameter_values.clone();
         let mut result = Self::default();
 
         result
-            .find_and_insert_named_arguments(call_values, &mut missing_parameter_values)?
-            .find_and_insert_positional_arguments(call_values, &mut missing_parameter_values)?
-            .find_and_insert_default_parameters(call_values, &mut missing_parameter_values)?;
+            .find_and_insert_named_arguments(call_argument_values, &mut missing_parameter_values)?
+            .find_and_insert_positional_arguments(
+                call_argument_values,
+                &mut missing_parameter_values,
+            )?
+            .find_and_insert_default_parameters(
+                call_argument_values,
+                &mut missing_parameter_values,
+            )?;
 
         missing_parameter_values.check_for_missing_arguments()?;
 
@@ -198,11 +204,11 @@ impl ArgumentMatch for ArgumentMap {
         value: Value,
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
-    ) -> TypeCheckResult {
+    ) -> Result<TypeCheckResult> {
         let name = &parameter_value.name;
         parameter_values.remove(name);
         self.insert(name.clone(), value.clone());
-        TypeCheckResult::SingleMatch
+        Ok(TypeCheckResult::SingleMatch)
     }
 }
 
@@ -246,7 +252,7 @@ impl ArgumentMatch for MultiArgumentMap {
         value: Value,
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
-    ) -> TypeCheckResult {
+    ) -> Result<TypeCheckResult> {
         let result = parameter_value.type_check(&value.ty());
         let name = &parameter_value.name;
         match result {
@@ -254,16 +260,16 @@ impl ArgumentMatch for MultiArgumentMap {
                 Value::List(l) => {
                     parameter_values.remove(name);
                     self.insert_multi(name.clone(), l.fetch());
-                    result
+                    Ok(result)
                 }
-                value => panic!("Expected list type, got {}", value.ty()),
+                value => Err(EvalError::ExpectedIterable(value.ty().clone())),
             },
             TypeCheckResult::SingleMatch => {
                 parameter_values.remove(&name);
                 self.insert_single(name.clone(), value);
-                result
+                Ok(result)
             }
-            _ => result,
+            _ => Ok(result),
         }
     }
 }
