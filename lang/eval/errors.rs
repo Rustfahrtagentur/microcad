@@ -117,6 +117,10 @@ pub enum EvalError {
     #[error("Expected range in for loop, got {0}")]
     ExpectedRangeInForLoop(Type),
 
+    /// Expected iterable, a list or a range
+    #[error("Expected iterable, got {0}")]
+    ExpectedIterable(Type),
+
     /// Argument count mismatch
     #[error("Argument count mismatch: expected {expected}, got {found}")]
     ArgumentCountMismatch {
