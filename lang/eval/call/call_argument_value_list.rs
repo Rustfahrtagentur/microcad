@@ -55,34 +55,27 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut MultiArgumentMap,
-    ) -> Result<()> {
-        let old_parameter_values = parameter_values.clone();
-
+    ) {
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
-        old_parameter_values.iter().for_each(|parameter_value| {
+        parameter_values.clone().iter().for_each(|parameter_value| {
             // We have found a matching call argument with the same name as the parameter.
-
-            if let Some(call_argument_value) self.get(&parameter_value.name) {
-                    Self::insert_into_multi_arg_map(
-                        arg_map,
-                        parameter_value.clone(),
-                        parameter_values,
-                        call_argument_value.value.clone(),
-                    );
+            if let Some(call_argument_value) = self.get(&parameter_value.name) {
+                Self::insert_into_multi_arg_map(
+                    arg_map,
+                    parameter_value.clone(),
+                    parameter_values,
+                    call_argument_value.value.clone(),
+                );
             }
         });
-
-        Ok(())
     }
 
     fn get_multi_insert_default_parameters(
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut MultiArgumentMap,
-    ) -> Result<()> {
-        let old_parameter_values = parameter_values.clone();
-
-        old_parameter_values.iter().for_each(|parameter_value| {
+    ) {
+        parameter_values.clone().iter().for_each(|parameter_value| {
             if self.get(&parameter_value.name).is_none() {
                 // If we have a default value, we can use it
                 if let Some(default) = &parameter_value.default_value {
@@ -95,19 +88,15 @@ impl CallArgumentValueList {
                 }
             }
         });
-
-        Ok(())
     }
 
     fn get_matching_named_arguments(
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut ArgumentMap,
-    ) -> Result<()> {
-        let old_parameter_values = parameter_values.clone();
-
+    ) {
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
-        old_parameter_values.iter().for_each(|parameter_value| {
+        parameter_values.clone().iter().for_each(|parameter_value| {
             match self.get(&parameter_value.name) {
                 // We have a matching argument with the same name as the parameter.
                 Some(arg) => {
@@ -137,17 +126,15 @@ impl CallArgumentValueList {
                 }
             }
         });
-
-        Ok(())
     }
 
     fn get_matching_positional_arguments(
         &self,
         parameter_values: &mut ParameterValueList,
         arg_map: &mut ArgumentMap,
-    ) -> Result<()> {
+    ) {
         if parameter_values.is_empty() {
-            return Ok(());
+            return;
         }
         let mut positional_index = 0;
 
@@ -184,8 +171,6 @@ impl CallArgumentValueList {
 
                 ControlFlow::Continue(())
             });
-
-        Ok(())
     }
 
     fn get_multi_positional_arguments(
@@ -251,8 +236,8 @@ impl CallArgumentValueList {
 
         let mut missing_parameter_values = parameter_values.clone();
 
-        self.get_matching_named_arguments(&mut missing_parameter_values, &mut arg_map)?;
-        self.get_matching_positional_arguments(&mut missing_parameter_values, &mut arg_map)?;
+        self.get_matching_named_arguments(&mut missing_parameter_values, &mut arg_map);
+        self.get_matching_positional_arguments(&mut missing_parameter_values, &mut arg_map);
 
         if !missing_parameter_values.is_empty() {
             return Err(EvalError::MissingArguments(
@@ -284,12 +269,9 @@ impl CallArgumentValueList {
 
         let mut missing_parameter_values = parameter_values.clone();
 
-        self.get_multi_matching_named_arguments(&mut missing_parameter_values, &mut multi_arg_map)?;
-        self.get_multi_positional_arguments(&mut missing_parameter_values, &mut multi_arg_map)?;
-        self.get_multi_insert_default_parameters(
-            &mut missing_parameter_values,
-            &mut multi_arg_map,
-        )?;
+        self.get_multi_matching_named_arguments(&mut missing_parameter_values, &mut multi_arg_map);
+        self.get_multi_positional_arguments(&mut missing_parameter_values, &mut multi_arg_map);
+        self.get_multi_insert_default_parameters(&mut missing_parameter_values, &mut multi_arg_map);
 
         if !missing_parameter_values.is_empty() {
             return Err(EvalError::MissingArguments(
