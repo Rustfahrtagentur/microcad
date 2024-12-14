@@ -126,11 +126,10 @@ impl ExportSettings {
         if let Some(exporter) = self.0.get("exporter") {
             Some(exporter.to_string())
         } else if let Some(filename) = self.filename() {
-            let ext = std::path::Path::new(&filename)
+            std::path::Path::new(&filename)
                 .extension()
                 .and_then(std::ffi::OsStr::to_str)
-                .unwrap();
-            Some(ext.to_string())
+                .map(|f| f.to_string())
         } else {
             None
         }
