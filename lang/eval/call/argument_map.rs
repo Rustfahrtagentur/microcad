@@ -107,14 +107,14 @@ pub trait ArgumentMatch: Default {
             // Filter out parameters that have a default value and are not present in the call arguments
             .filter_map(
                 |p| match (call_argument_values.get(&p.name), &p.default_value) {
-                    (None, Some(_)) => Some(p),
+                    (None, Some(default_value)) => Some((p, default_value.clone())),
                     _ => None,
                 },
             )
             // Insert the default values into the map
-            .try_for_each(|parameter_value| {
+            .try_for_each(|(parameter_value, default_value)| {
                 self.insert_and_remove_from_parameters(
-                    parameter_value.default_value.clone().unwrap(),
+                    default_value,
                     parameter_value,
                     parameter_values,
                 )?;
