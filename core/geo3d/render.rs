@@ -7,7 +7,7 @@ use crate::*;
 
 /// A `Primitive3D` is a hashable renderable object that can be rendered by a Renderer3D
 pub trait Primitive: RenderHash + std::fmt::Debug {
-    /// Get geometry from cache via primtives hash
+    /// Get geometry from cache via primitives hash
     fn request_geometry(
         &self,
         renderer: &mut dyn Renderer,

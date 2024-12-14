@@ -58,7 +58,7 @@ impl Drop for StlWriter<'_> {
     }
 }
 
-/// STL exproter
+/// STL exporter
 pub struct StlExporter {
     filename: PathBuf,
     precision: Scalar,
