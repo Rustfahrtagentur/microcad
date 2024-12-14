@@ -1,0 +1,11 @@
+
+module sink_sieve(
+    diameter = 30.0cm,
+) {
+    holes = rotate([0..4] * 360° / 4.0)
+            rotate(20°)
+                translate(x = diameter / 2.0) cube(x = 10cm, w = 2.0);
+
+    cylinder(diameter) - holes;
+
+}
