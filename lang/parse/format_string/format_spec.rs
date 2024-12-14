@@ -29,10 +29,10 @@ impl Parse for FormatSpec {
         for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::format_spec_precision => {
-                    opt.precision = Some(pair.as_span().as_str()[1..].parse().unwrap())
+                    opt.precision = Some(pair.as_span().as_str()[1..].parse()?)
                 }
                 Rule::format_spec_leading_zeros => {
-                    opt.width = Some(pair.as_span().as_str()[1..].parse().unwrap())
+                    opt.width = Some(pair.as_span().as_str()[1..].parse()?)
                 }
                 _ => unreachable!(),
             }
