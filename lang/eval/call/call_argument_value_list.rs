@@ -194,6 +194,22 @@ impl CallArgumentValueList {
         Ok(())
     }
 
+    /// Check for unexpected arguments.
+    ///
+    /// This method will return an error if there is a call argument that is not in the parameter list
+    pub fn check_for_unexpected_arguments(
+        &self,
+        parameter_values: &ParameterValueList,
+    ) -> Result<()> {
+        match self
+            .keys()
+            .find(|name| parameter_values.get_by_name(name).is_none())
+        {
+            Some(name) => Err(EvalError::UnexpectedArgument(name.clone())),
+            None => Ok(()),
+        }
+    }
+
     /// This functions checks if the call arguments match the given parameter definitions
     /// It returns a map of arguments that match the parameters
     pub fn get_matching_arguments(
@@ -202,28 +218,12 @@ impl CallArgumentValueList {
     ) -> EvalResult<ArgumentMap> {
         let mut arg_map = ArgumentMap::new(self.src_ref());
 
-        // Check for unexpected arguments.
-        // We are looking for call arguments that are not in the parameter list
-        if let Some(name) = self
-            .keys()
-            .find(|name| parameter_values.get_by_name(name).is_none())
-        {
-            return Err(EvalError::UnexpectedArgument(name.clone()));
-        }
-
         let mut missing_parameter_values = parameter_values.clone();
 
         self.get_matching_named_arguments(&mut missing_parameter_values, &mut arg_map);
         self.get_matching_positional_arguments(&mut missing_parameter_values, &mut arg_map);
 
-        if !missing_parameter_values.is_empty() {
-            return Err(EvalError::MissingArguments(
-                missing_parameter_values
-                    .iter()
-                    .map(|parameter| parameter.name.clone())
-                    .collect::<Vec<_>>(),
-            ));
-        }
+        missing_parameter_values.check_for_missing_arguments()?;
 
         Ok(arg_map)
     }
@@ -235,29 +235,12 @@ impl CallArgumentValueList {
     ) -> EvalResult<MultiArgumentMap> {
         let mut multi_arg_map = MultiArgumentMap::default();
 
-        // Check for unexpected arguments.
-        // We are looking for call arguments that are not in the parameter list
-        if let Some(name) = self
-            .keys()
-            .find(|name| parameter_values.get_by_name(name).is_none())
-        {
-            return Err(EvalError::UnexpectedArgument(name.clone()));
-        }
-
         let mut missing_parameter_values = parameter_values.clone();
-
         self.get_multi_matching_named_arguments(&mut missing_parameter_values, &mut multi_arg_map);
         self.get_multi_positional_arguments(&mut missing_parameter_values, &mut multi_arg_map);
         self.get_multi_insert_default_parameters(&mut missing_parameter_values, &mut multi_arg_map);
 
-        if !missing_parameter_values.is_empty() {
-            return Err(EvalError::MissingArguments(
-                missing_parameter_values
-                    .iter()
-                    .map(|parameter| parameter.name.clone())
-                    .collect::<Vec<_>>(),
-            ));
-        }
+        missing_parameter_values.check_for_missing_arguments()?;
 
         Ok(multi_arg_map)
     }
@@ -346,7 +329,7 @@ fn call_get_matching_arguments_missing() {
 
     if let Err(EvalError::MissingArguments(missing)) = arg_map {
         assert_eq!(missing.len(), 1);
-        assert_eq!(&missing[0], "bar");
+        assert_eq!(&missing[0].name, "bar");
     } else {
         panic!("Expected MissingArguments error");
     }
