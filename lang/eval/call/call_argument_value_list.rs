@@ -5,7 +5,12 @@
 
 use crate::{eval::*, ord_map::*, src_ref::*};
 
-/// List of call argument values
+/// List of call argument values, (foo = 4.0, 3.0mm, bar)
+///
+/// This class also provides methods to find a matching call
+/// between between the call argument value list and a given parameter list.
+///
+///  
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentValueList(Refer<OrdMap<Id, CallArgumentValue>>);
 
@@ -55,29 +60,15 @@ impl CallArgumentValueList {
 
         // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
         old_parameter_values.iter().for_each(|parameter_value| {
-            match self.get(&parameter_value.name) {
-                // We have a matching argument with the same name as the parameter.
-                Some(arg) => {
-                    // Now we need to check if the argument type matches the parameter type
+            // We have found a matching call argument with the same name as the parameter.
+
+            if let Some(call_argument_value) self.get(&parameter_value.name) {
                     Self::insert_into_multi_arg_map(
                         arg_map,
                         parameter_value.clone(),
                         parameter_values,
-                        arg.value.clone(),
+                        call_argument_value.value.clone(),
                     );
-                }
-                // No matching argument found, check if a default value is defined
-                None => {
-                    // If we have a default value, we keep in the map and use it later via `get_multi_insert_default_parameters`
-                    /*if let Some(default) = &parameter_value.default_value {
-                        Self::insert_into_multi_arg_map(
-                            arg_map,
-                            parameter_value.clone(),
-                            parameter_values,
-                            default.clone(),
-                        );
-                    }*/
-                }
             }
         });
 
@@ -91,7 +82,6 @@ impl CallArgumentValueList {
     ) -> Result<()> {
         let old_parameter_values = parameter_values.clone();
 
-        // Iterate over defined parameters and check if the call arguments contains an argument with the same as the parameter
         old_parameter_values.iter().for_each(|parameter_value| {
             if self.get(&parameter_value.name).is_none() {
                 // If we have a default value, we can use it
