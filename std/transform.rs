@@ -14,7 +14,6 @@ use crate::namespace_builder::NamespaceBuilder;
 use microcad_core::Scalar;
 
 /// Built-in transformations
-
 fn translate(x: Scalar, y: Scalar, z: Scalar) -> Result<ObjectNode, EvalError> {
     Ok(ObjectNode::new(ObjectNodeInner::Transform(
         Transform::Translation(microcad_core::Vec3::new(x, y, z)),

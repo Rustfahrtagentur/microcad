@@ -11,7 +11,7 @@ pub struct CallArgumentList(Refer<OrdMap<Identifier, CallArgument>>);
 
 use thiserror::Error;
 
-/// An error that occured when looking for matching arguments between a call and a parameter definition
+/// An error that occurred when looking for matching arguments between a call and a parameter definition
 #[derive(Error, Debug)]
 pub enum MatchError {
     /// Duplicated argument

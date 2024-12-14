@@ -109,7 +109,7 @@ pub enum EvalError {
     #[error("No matching initializer for module definition `{0}`")]
     NoMatchingInitializer(Identifier),
 
-    /// Multiple matching initializers for module definition
+    /// Multiple matching Initializers for module definition
     #[error("Multiple matching initializer for module definition `{0}`")]
     MultipleMatchingInitializer(Identifier),
 
@@ -174,7 +174,7 @@ pub enum EvalError {
     #[error("Assertion failed: {0} with ")]
     AssertionFailedWithCondition(String, String),
 
-    /// Ambigous symbol
+    /// Ambiguous symbol
     #[error("Ambiguous symbol: {0}")]
     AmbiguousSymbol(Symbol),
 

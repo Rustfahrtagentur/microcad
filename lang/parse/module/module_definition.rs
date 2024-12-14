@@ -43,7 +43,7 @@ impl CallTrait for ModuleDefinition {
 
             let mut inits = Vec::new();
 
-            // Find all initializers that match the arguments and add it to the matching_init list
+            // Find all Initializers that match the arguments and add it to the matching_init list
             for init in &self.body.inits {
                 inits.push((
                     init,
@@ -114,7 +114,7 @@ impl CallTrait for ModuleDefinition {
                         self,
                         Box::new(EvalError::MultipleMatchingInitializer(self.name.clone())),
                     )?;
-                    // TODO Add diagnostics for multiple matching initializers
+                    // TODO Add diagnostics for multiple matching Initializers
                     return Ok(());
                 }
             }
