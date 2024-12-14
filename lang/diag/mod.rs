@@ -21,12 +21,12 @@ pub trait PushDiag {
     /// Push new trace message
     fn trace(&mut self, src: impl SrcReferrer, message: String) {
         self.push_diag(Diag::Trace(Refer::new(message, src.src_ref())))
-            .unwrap();
+            .expect("could not push diagnostic trace message");
     }
     /// Push new informative message
     fn info(&mut self, src: impl SrcReferrer, message: String) {
         self.push_diag(Diag::Info(Refer::new(message, src.src_ref())))
-            .unwrap();
+            .expect("could not push diagnostic info message");
     }
     /// Push new warning
     fn warning(
