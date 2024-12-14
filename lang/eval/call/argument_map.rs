@@ -107,4 +107,106 @@ impl MultiArgumentMap {
             _ => result,
         }
     }
+
+    fn find_and_insert_named_arguments(
+        &mut self,
+        call_values: &CallArgumentValueList,
+        parameter_values: &mut ParameterValueList,
+    ) -> Result<&mut Self> {
+        parameter_values.clone().iter().for_each(|parameter_value| {
+            // We have found a matching call argument with the same name as the parameter.
+            if let Some(call_argument_value) = call_values.get(&parameter_value.name) {
+                self.insert_and_remove_from_parameters(
+                    call_argument_value.value.clone(),
+                    parameter_value,
+                    parameter_values,
+                );
+            }
+        });
+
+        Ok(self)
+    }
+
+    fn find_and_insert_positional_arguments(
+        &mut self,
+        call_values: &CallArgumentValueList,
+        parameter_values: &mut ParameterValueList,
+    ) -> Result<&mut Self> {
+        if parameter_values.is_empty() {
+            return Ok(self);
+        }
+        let mut positional_index = 0;
+
+        call_values
+            .iter()
+            .filter(|arg| arg.name.is_none())
+            .try_for_each(|arg| {
+                use std::ops::ControlFlow;
+                if parameter_values.get_by_index(positional_index).is_none() {
+                    ControlFlow::Break(())
+                } else {
+                    let parameter_value = parameter_values[positional_index].clone();
+                    let parameter_name = parameter_value.name.clone();
+                    if !self.contains_key(&parameter_name) {
+                        match self.insert_and_remove_from_parameters(
+                            arg.value.clone(),
+                            &parameter_value,
+                            parameter_values,
+                        ) {
+                            TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
+                                if positional_index >= parameter_values.len() {
+                                    return ControlFlow::Break(());
+                                }
+                            }
+                            _ => {}
+                        }
+                    } else {
+                        positional_index += 1;
+                    }
+                    ControlFlow::Continue(())
+                }
+            });
+
+        Ok(self)
+    }
+
+    fn find_and_insert_default_parameters(
+        &mut self,
+        call_values: &CallArgumentValueList,
+        parameter_values: &mut ParameterValueList,
+    ) -> Result<&mut Self> {
+        parameter_values.clone().iter().for_each(|parameter_value| {
+            if call_values.get(&parameter_value.name).is_none() {
+                // If we have a default value, we can use it
+                if let Some(default) = &parameter_value.default_value {
+                    self.insert_and_remove_from_parameters(
+                        default.clone(),
+                        &parameter_value,
+                        parameter_values,
+                    );
+                }
+            }
+        });
+
+        Ok(self)
+    }
+
+    fn find_match(
+        call_values: &CallArgumentValueList,
+        parameter_values: &ParameterValueList,
+    ) -> Result<Self> {
+        call_values.check_for_unexpected_arguments(parameter_values)?;
+
+        let mut missing_parameter_values = parameter_values.clone();
+        let mut multi_arg_map = Self::default();
+
+        multi_arg_map
+            .find_and_insert_named_arguments(call_values, &mut missing_parameter_values)?
+            .find_and_insert_positional_arguments(call_values, &mut missing_parameter_values)?
+            .find_and_insert_default_parameters(call_values, &mut missing_parameter_values)?;
+
+        missing_parameter_values.check_for_missing_arguments()?;
+
+        Ok(multi_arg_map)
+    }
 }
