@@ -133,13 +133,13 @@ impl Geometry {
         // Extract matrix components
         let a = mat.x.x;
         let b = mat.y.x;
-        let xoff = mat.z.x;
+        let x_off = mat.z.x;
         let d = mat.x.y;
         let e = mat.y.y;
-        let yoff = mat.z.y;
+        let y_off = mat.z.y;
 
         use geo::AffineOps;
-        let transform = geo::AffineTransform::new(a, b, xoff, d, e, yoff);
+        let transform = geo::AffineTransform::new(a, b, x_off, d, e, y_off);
 
         match &self {
             Self::LineString(l) => Self::LineString(l.affine_transform(&transform)),
