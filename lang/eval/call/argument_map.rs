@@ -5,9 +5,18 @@
 
 use crate::{eval::*, parse::Combinations, src_ref::*};
 
+/// The `ArgumentMatch` trait is used to match call arguments to parameters.
+///
+/// It is implemented by `ArgumentMap` and `MultiArgumentMap`.
 pub trait ArgumentMatch: Default {
-    fn contains_key(&self, key: &Id) -> bool;
+    /// Check if we have an argument value with name
+    ///
+    /// This function must be implemented by the user.
+    fn contains_argument_value(&self, name: &Id) -> bool;
 
+    /// Inserts a value into the map and removes it from the parameter list
+    ///
+    /// This function must be implemented by the user.
     fn insert_and_remove_from_parameters(
         &mut self,
         value: Value,
@@ -15,6 +24,11 @@ pub trait ArgumentMatch: Default {
         parameter_values: &mut ParameterValueList,
     ) -> TypeCheckResult;
 
+    /// Find named arguments and insert them into the map.
+    ///
+    /// Finds all call arguments with the same name as the parameter and inserts them into the map.
+    /// Named arguments are call arguments with a name, e.g. `bar` in `foo(bar = 42)`.
+    /// The parameter is then removed from the list of parameters.
     fn find_and_insert_named_arguments(
         &mut self,
         call_values: &CallArgumentValueList,
@@ -34,6 +48,11 @@ pub trait ArgumentMatch: Default {
         Ok(self)
     }
 
+    /// Find positional arguments and insert them into the map.
+    ///
+    /// Try to match call arguments by their position and insert them into the map.
+    /// Positional arguments are call arguments without a name, e.g. `1, 2` in `foo(1, 2)`.
+    /// The parameter is then removed from the list of parameters.
     fn find_and_insert_positional_arguments(
         &mut self,
         call_values: &CallArgumentValueList,
@@ -54,7 +73,7 @@ pub trait ArgumentMatch: Default {
                 } else {
                     let parameter_value = parameter_values[positional_index].clone();
                     let parameter_name = parameter_value.name.clone();
-                    if !self.contains_key(&parameter_name) {
+                    if !self.contains_argument_value(&parameter_name) {
                         match self.insert_and_remove_from_parameters(
                             arg.value.clone(),
                             &parameter_value,
@@ -77,6 +96,10 @@ pub trait ArgumentMatch: Default {
         Ok(self)
     }
 
+    /// Find default parameters and insert them into the map.
+    ///
+    /// If a parameter has a default value and is not present in the call arguments, insert the default value.
+    /// The parameter is then removed from the list of parameters.
     fn find_and_insert_default_parameters(
         &mut self,
         call_values: &CallArgumentValueList,
@@ -98,6 +121,9 @@ pub trait ArgumentMatch: Default {
         Ok(self)
     }
 
+    /// Find a match between call arguments and parameters.
+    ///
+    /// This function tries to find a match between the call arguments and the parameters.
     fn find_match(
         call_values: &CallArgumentValueList,
         parameter_values: &ParameterValueList,
@@ -105,16 +131,16 @@ pub trait ArgumentMatch: Default {
         call_values.check_for_unexpected_arguments(parameter_values)?;
 
         let mut missing_parameter_values = parameter_values.clone();
-        let mut multi_arg_map = Self::default();
+        let mut result = Self::default();
 
-        multi_arg_map
+        result
             .find_and_insert_named_arguments(call_values, &mut missing_parameter_values)?
             .find_and_insert_positional_arguments(call_values, &mut missing_parameter_values)?
             .find_and_insert_default_parameters(call_values, &mut missing_parameter_values)?;
 
         missing_parameter_values.check_for_missing_arguments()?;
 
-        Ok(multi_arg_map)
+        Ok(result)
     }
 }
 
@@ -163,7 +189,7 @@ impl std::ops::DerefMut for ArgumentMap {
 }
 
 impl ArgumentMatch for ArgumentMap {
-    fn contains_key(&self, key: &Id) -> bool {
+    fn contains_argument_value(&self, key: &Id) -> bool {
         self.0.contains_key(key)
     }
 
@@ -210,7 +236,7 @@ impl MultiArgumentMap {
 
 impl ArgumentMatch for MultiArgumentMap {
     /// Check if the argument map contains a key
-    fn contains_key(&self, key: &Id) -> bool {
+    fn contains_argument_value(&self, key: &Id) -> bool {
         self.0.contains_key(key)
     }
 
