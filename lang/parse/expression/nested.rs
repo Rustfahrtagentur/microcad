@@ -5,7 +5,7 @@
 
 use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
-/// Nested item list
+/// Nested item list, e.g. an expression like `foo bar() {}`
 #[derive(Clone, Debug)]
 pub struct Nested(Refer<Vec<NestedItem>>);
 
@@ -75,7 +75,11 @@ impl Eval for Nested {
             }
         }
 
-        Ok(Some(Value::Node(crate::objecttree::nest_nodes(nodes))))
+        if nodes.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(Value::Node(crate::objecttree::nest_nodes(nodes))))
+        }
     }
 }
 
