@@ -19,106 +19,110 @@ pub struct ModuleDefinition {
 impl ModuleDefinition {
     /// Create new module definition
     pub fn new(name: Identifier) -> Self {
-        ModuleDefinition {
+        Self {
             name,
             body: ModuleDefinitionBody::default(),
             src_ref: SrcRef(None),
         }
+    }
+
+    /// Call the initializer with the given argument map
+    pub fn call_init(
+        &self,
+        init: std::rc::Rc<ModuleInitDefinition>,
+        multi_argument_map: &MultiArgumentMap,
+        context: &mut Context,
+    ) -> EvalResult<ObjectNode> {
+        let mut group = objecttree::group();
+
+        for arg_map in multi_argument_map.combinations() {
+            // Copy the arguments to the symbol table of the node
+            for (name, value) in arg_map.iter() {
+                group.add(Symbol::Value(name.clone(), value.clone()));
+            }
+            let init_object = init.call(&arg_map, context)?;
+
+            // Add the init object's children to the node
+            for child in init_object.children() {
+                child.detach();
+                group.append(child.clone());
+            }
+            init_object.copy(&mut group);
+
+            // Now, copy the symbols of the node into the context
+            group.copy(context);
+
+            // Evaluate the post-init statements
+            for statement in &self.body.post_init_statements {
+                match statement {
+                    ModuleDefinitionStatement::Assignment(assignment) => {
+                        // Evaluate the assignment and add the symbol to the node
+                        // E.g. `a = 1` will add the symbol `a` to the node
+                        let symbol = assignment.eval(context)?;
+                        group.add(symbol);
+                    }
+                    statement => {
+                        if let Some(Value::Node(new_child)) = statement.eval(context)? {
+                            group.append(new_child);
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(group)
+    }
+
+    /// Find the matching initializer for the given call argument value list
+    pub fn find_matching_initializer(
+        &self,
+        call_argument_list: &CallArgumentList,
+        context: &mut Context,
+    ) -> EvalResult<(std::rc::Rc<ModuleInitDefinition>, MultiArgumentMap)> {
+        let call_argument_value_list = call_argument_list.eval(context)?;
+
+        for init in &self.body.inits {
+            match call_argument_value_list
+                .get_multi_matching_arguments(&init.parameters.eval(context)?)
+            {
+                Ok(multi_argument_map) => return Ok((init.clone(), multi_argument_map)),
+                Err(err) => continue,
+            }
+        }
+
+        Err(EvalError::NoMatchingInitializer(self.name.clone()))
     }
 }
 
 impl CallTrait for ModuleDefinition {
     type Output = Vec<ObjectNode>;
 
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Self::Output> {
-        let stack_frame = StackFrame::ModuleCall(context.top()?.symbol_table().clone(), None);
+    fn call(
+        &self,
+        call_argument_list: &CallArgumentList,
+        context: &mut Context,
+    ) -> EvalResult<Self::Output> {
+        use crate::diag::PushDiag;
 
+        let stack_frame = StackFrame::ModuleCall(context.top().symbol_table().clone(), None);
         let mut nodes = Vec::new();
 
         context.scope(stack_frame, |context| {
-            // Let's evaluate the pre-init statements first
-            for statement in &self.body.pre_init_statements {
-                statement.eval(context)?;
-            }
-
-            let mut inits = Vec::new();
-
-            // Find all Initializers that match the arguments and add it to the matching_init list
-            for init in &self.body.inits {
-                inits.push((
-                    init,
-                    args.eval(context)?
-                        .get_multi_matching_arguments(&init.parameters.eval(context)?),
-                ));
-            }
-
-            use crate::diag::PushDiag;
-
-            let matching_inits = inits
-                .iter()
-                .filter(|(_, result)| result.is_ok())
-                .map(|(init, result)| (*init, result.as_ref().unwrap()))
-                .collect::<Vec<_>>();
-
-            // There should be only one matching initializer
-            match matching_inits.len() {
-                0 => {
-                    context.error(
-                        self,
-                        Box::new(EvalError::NoMatchingInitializer(self.name.clone())),
-                    )?;
-                }
-                1 => {
-                    let (init, multi_arg_map) = matching_inits.first().unwrap();
-
-                    let mut group = objecttree::group();
-                    for arg_map in multi_arg_map.combinations() {
-                        // Copy the arguments to the symbol table of the node
-                        for (name, value) in arg_map.iter() {
-                            group.add(Symbol::Value(name.clone(), value.clone()));
-                        }
-                        let init_object = init.call(&arg_map, context)?;
-
-                        // Add the init object's children to the node
-                        for child in init_object.children() {
-                            child.detach();
-                            group.append(child.clone());
-                        }
-                        init_object.copy(&mut group);
-
-                        // Now, copy the symbols of the node into the context
-                        group.copy(context);
-
-                        // Evaluate the post-init statements
-                        for statement in &self.body.post_init_statements {
-                            match statement {
-                                ModuleDefinitionStatement::Assignment(assignment) => {
-                                    // Evaluate the assignment and add the symbol to the node
-                                    // E.g. `a = 1` will add the symbol `a` to the node
-                                    let symbol = assignment.eval(context)?;
-                                    group.add(symbol);
-                                }
-                                statement => {
-                                    if let Some(Value::Node(new_child)) = statement.eval(context)? {
-                                        group.append(new_child);
-                                    }
-                                }
-                            }
-                        }
+            match self.find_matching_initializer(call_argument_list, context) {
+                Ok((init, multi_argument_map)) => {
+                    // Let's evaluate the pre-init statements first (they are evaluated before the initializer)
+                    for statement in &self.body.pre_init_statements {
+                        statement.eval(context)?;
                     }
 
-                    nodes.push(group);
+                    // Call the initializer
+                    let node = self.call_init(init, &multi_argument_map, context)?;
+                    nodes.push(node);
                 }
-                _ => {
-                    context.error(
-                        self,
-                        Box::new(EvalError::MultipleMatchingInitializer(self.name.clone())),
-                    )?;
-                    // TODO Add diagnostics for multiple matching Initializers
-                    return Ok(());
+                Err(err) => {
+                    context.error(self, Box::new(err))?;
                 }
             }
-
             Ok(())
         })?;
 

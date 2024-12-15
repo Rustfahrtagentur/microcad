@@ -173,7 +173,8 @@ fn test_diag_list() {
     use super::eval::EvalError;
 
     let source_file =
-        crate::parse::SourceFile::load(r#"../tests/test_cases/algorithm_difference.µcad"#).unwrap();
+        crate::parse::SourceFile::load(r#"../tests/test_cases/algorithm_difference.µcad"#)
+            .expect("Could not load source file");
 
     let mut diagnostics = DiagList::default();
 
