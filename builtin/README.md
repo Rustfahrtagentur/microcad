@@ -64,10 +64,10 @@ impl DefineBuiltinModule for Rectangle {
 
     fn node(args: &ArgumentMap) -> Result<Node, Error> {
         Ok(Node::new(NodeInner::Generator2D(Box::new(Rect {
-            width: args["width"].try_into().unwrap(),
-            height: args["height"].try_into().unwrap(),
-            x: args["x"].try_into().unwrap(),
-            y: args["y"].try_into().unwrap(),
+            width: args["width"].try_into()?,
+            height: args["height"].try_into()?,
+            x: args["x"].try_into()?,
+            y: args["y"].try_into()?,
         })))
     }
 }
