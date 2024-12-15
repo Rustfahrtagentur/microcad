@@ -59,8 +59,8 @@ impl Parse for std::rc::Rc<NamespaceDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut pairs = pair.inner();
         Ok(std::rc::Rc::new(NamespaceDefinition {
-            name: Identifier::parse(pairs.next().unwrap())?,
-            body: NamespaceBody::parse(pairs.next().unwrap())?,
+            name: Identifier::parse(pairs.next().expect("Identifier expected"))?,
+            body: NamespaceBody::parse(pairs.next().expect("NamespaceBody expected"))?,
             src_ref: pair.clone().into(),
         }))
     }
@@ -74,7 +74,7 @@ impl Eval for std::rc::Rc<NamespaceDefinition> {
         for statement in &self.body.statements {
             match &statement {
                 &NamespaceStatement::Assignment(a) => {
-                    namespace.add(Symbol::Value(a.name.id().unwrap(), a.value.eval(context)?));
+                    namespace.add(Symbol::Value(a.name.id().clone(), a.value.eval(context)?));
                 }
                 NamespaceStatement::FunctionDefinition(f) => {
                     namespace.add(f.clone().into());

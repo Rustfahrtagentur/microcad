@@ -106,7 +106,7 @@ impl Eval for UseDeclaration {
             }
             Self::UseAlias(name, alias, _) => {
                 let mut symbols = SymbolTable::default();
-                symbols.add_alias(name.eval(context)?, alias.id().expect("nameless alias"));
+                symbols.add_alias(name.eval(context)?, alias.id().clone());
                 Ok(symbols)
             }
         }

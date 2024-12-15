@@ -122,12 +122,12 @@ impl Eval for Parameter {
                     )?;
                     // Return an invalid parameter value in case evaluation failed
                     Ok(ParameterValue::invalid(
-                        self.name.id().unwrap(),
+                        self.name.id().clone(),
                         self.src_ref(),
                     ))
                 } else {
                     Ok(ParameterValue::new(
-                        self.name.id().expect("nameless parameter"),
+                        self.name.id().clone(),
                         Some(specified_type.ty()),
                         Some(default_value),
                         self.src_ref(),
@@ -136,7 +136,7 @@ impl Eval for Parameter {
             }
             // Only type is specified
             (Some(t), None) => Ok(ParameterValue::new(
-                self.name.id().expect("nameless parameter"),
+                self.name.id().clone(),
                 Some(t.ty()),
                 None,
                 self.src_ref(),
@@ -146,7 +146,7 @@ impl Eval for Parameter {
                 let default_value = expr.eval(context)?;
 
                 Ok(ParameterValue::new(
-                    self.name.id().expect("nameless parameter"),
+                    self.name.id().clone(),
                     Some(default_value.ty().clone()),
                     Some(default_value),
                     self.src_ref(),
@@ -154,7 +154,7 @@ impl Eval for Parameter {
             }
             // Neither type nor value is specified
             (None, None) => Ok(ParameterValue::new(
-                self.name.id().expect("nameless parameter"),
+                self.name.id().clone(),
                 None,
                 None,
                 self.src_ref(),

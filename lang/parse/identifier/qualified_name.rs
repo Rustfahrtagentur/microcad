@@ -17,7 +17,7 @@ impl SrcReferrer for QualifiedName {
 impl Sym for QualifiedName {
     fn id(&self) -> Option<microcad_core::Id> {
         // TODO: how to convert qualified name into one single id?
-        self.last().and_then(|i| i.id())
+        self.last().and_then(|i| Some(i.id().clone()))
     }
 }
 
@@ -73,12 +73,10 @@ impl QualifiedName {
         if index >= self.0.len() {
             return Ok(());
         }
-        let ident = &self.0[index];
 
-        let new_symbol = match (&root, ident.id()) {
-            (Some(ref root), Some(id)) => root.fetch_symbols(&id),
-            (None, Some(id)) => context.fetch(&id),
-            _ => unreachable!("can't search unnamed symbol"),
+        let new_symbol = match (&root, &self.0[index].id()) {
+            (Some(ref root), id) => root.fetch_symbols(&id),
+            (None, id) => context.fetch(&id),
         };
 
         if let Some(symbol) = new_symbol {

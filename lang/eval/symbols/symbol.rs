@@ -68,15 +68,18 @@ impl From<BuiltinModule> for Symbol {
 
 impl Sym for Symbol {
     fn id(&self) -> Option<Id> {
-        match self {
-            Self::Invalid => None,
-            Self::Value(id, _) => Some(id.clone()),
-            Self::Function(f) => f.name.id(),
-            Self::Module(m) => m.name.id(),
-            Self::Namespace(n) => n.name.id(),
-            Self::BuiltinFunction(f) => f.name.id(),
-            Self::BuiltinModule(m) => m.name.id(),
-        }
+        Some(
+            match self {
+                Self::Invalid => return None,
+                Self::Value(id, _) => id,
+                Self::Function(f) => f.name.id(),
+                Self::Module(m) => m.name.id(),
+                Self::Namespace(n) => n.name.id(),
+                Self::BuiltinFunction(f) => f.name.id(),
+                Self::BuiltinModule(m) => m.name.id(),
+            }
+            .clone(),
+        )
     }
 }
 

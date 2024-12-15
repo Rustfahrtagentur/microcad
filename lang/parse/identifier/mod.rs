@@ -9,11 +9,18 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{eval::Sym, parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// µCAD identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(Refer<microcad_core::Id>);
+
+impl Identifier {
+    /// Get the value of the identifier
+    pub fn id(&self) -> &microcad_core::Id {
+        &self.0.value
+    }
+}
 
 impl SrcReferrer for Identifier {
     fn src_ref(&self) -> SrcRef {
@@ -24,12 +31,6 @@ impl SrcReferrer for Identifier {
 impl std::hash::Hash for Identifier {
     fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
         self.0.hash(hasher)
-    }
-}
-
-impl Sym for Identifier {
-    fn id(&self) -> Option<microcad_core::Id> {
-        Some(self.0.value.clone())
     }
 }
 

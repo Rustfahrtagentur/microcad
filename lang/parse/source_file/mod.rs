@@ -113,7 +113,7 @@ impl SourceFile {
             for statement in &self.body {
                 match statement {
                     Statement::Assignment(a) => {
-                        namespace.add(Symbol::Value(a.name.id().unwrap(), a.value.eval(context)?));
+                        namespace.add(Symbol::Value(a.name.id().clone(), a.value.eval(context)?));
                     }
                     Statement::FunctionDefinition(f) => {
                         namespace.add(f.clone().into());
