@@ -13,14 +13,13 @@ path = "lib.rs"
 
 [dependencies]
 log = "0.4"
-geo = "0.28"
+geo = "0.29.3"
 cgmath = "0.18"
 strum = { version = "0.26", features = ["derive"] }
-thiserror = "1.0"
+thiserror = "2.0"
 
 microcad-core = { path = "../core" }
 
 [features]
 default = ["geo3d"]
 geo3d = []
-
