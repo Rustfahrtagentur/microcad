@@ -163,9 +163,10 @@ impl SrcRef {
     /// Return a `Src` from from `Vec`, by looking at first at and last element only.
     /// Assume that position of SrcRefs in v is sorted
     pub fn from_vec<T: SrcReferrer>(v: &[T]) -> SrcRef {
-        match v.is_empty() {
-            true => SrcRef(None),
-            false => Self::merge(v.first().unwrap().src_ref(), v.last().unwrap().src_ref()),
+        match (v.first(), v.last()) {
+            (None, None) => SrcRef(None),
+            (Some(first), Some(last)) => Self::merge(first.src_ref(), last.src_ref()),
+            _ => unreachable!(),
         }
     }
 

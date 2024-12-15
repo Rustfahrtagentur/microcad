@@ -35,6 +35,10 @@ pub enum CoreError {
     /// Invalid rendering precision
     #[error("Invalid rendering precision: {0}")]
     InvalidRenderPrecision(String),
+
+    /// Parse float error
+    #[error("Parse float error: {0}")]
+    Error(#[from] std::num::ParseFloatError),
 }
 
 /// Core result type

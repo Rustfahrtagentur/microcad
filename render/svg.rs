@@ -213,7 +213,7 @@ impl microcad_core::Renderer for SvgRenderer {
             "fill" => self.state.fill = Some(value.to_string()),
             "stroke" => self.state.stroke = Some(value.to_string()),
             "stroke-width" => {
-                self.state.stroke_width = Some(value.parse().unwrap());
+                self.state.stroke_width = Some(value.parse()?);
             }
             _ => return Err(CoreError::NotImplemented),
         }
@@ -227,7 +227,7 @@ impl geo2d::Renderer for SvgRenderer {
         multi_polygon: &geo2d::MultiPolygon,
     ) -> microcad_core::CoreResult<()> {
         let style = self.render_state_to_style();
-        self.writer().multi_polygon(multi_polygon, &style).unwrap();
+        self.writer().multi_polygon(multi_polygon, &style)?;
         Ok(())
     }
 

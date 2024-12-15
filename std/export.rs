@@ -16,20 +16,19 @@ impl ExporterRegistry {
         &self,
         settings: &ExportSettings,
     ) -> microcad_core::CoreResult<Box<dyn Exporter>> {
-        let id = settings.exporter_id();
-        if id.as_ref().is_none() {
-            return Err(microcad_core::CoreError::NoFilenameSpecifiedForExport);
-        }
-
-        use microcad_export::*;
-        match id.unwrap().as_str() {
-            "svg" => Self::make::<svg::SvgExporter>(settings),
-            "stl" => Self::make::<stl::StlExporter>(settings),
-            "ply" => Self::make::<ply::PlyExporter>(settings),
-            "tree.dump" => Self::make::<tree_dump::TreeDumpExporter>(settings),
-            id => Err(microcad_core::CoreError::NoSuitableExporterFound(
-                id.to_string(),
-            )),
+        if let Some(id) = settings.exporter_id() {
+            use microcad_export::*;
+            match id.as_str() {
+                "svg" => Self::make::<svg::SvgExporter>(settings),
+                "stl" => Self::make::<stl::StlExporter>(settings),
+                "ply" => Self::make::<ply::PlyExporter>(settings),
+                "tree.dump" => Self::make::<tree_dump::TreeDumpExporter>(settings),
+                id => Err(microcad_core::CoreError::NoSuitableExporterFound(
+                    id.to_string(),
+                )),
+            }
+        } else {
+            Err(microcad_core::CoreError::NoFilenameSpecifiedForExport)
         }
     }
 
