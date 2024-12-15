@@ -279,31 +279,24 @@ impl Parse for Expression {
             return Ok(Self::Nested(Nested::parse(pair)?));
         }
 
-        let mut error: Option<ParseError> = None;
-        let result = PRATT_PARSER
+        PRATT_PARSER
             .map_primary(|primary| {
                 match (
                     Pair::new(primary.clone(), pair.source_hash()),
                     primary.as_rule(),
                 ) {
-                    (primary, Rule::literal) => match Literal::parse(primary) {
-                        Ok(literal) => Self::Literal(literal),
-                        Err(e) => {
-                            error = Some(e);
-                            Self::Invalid
-                        }
-                    },
-                    (primary, Rule::expression) => Self::parse(primary).unwrap(),
+                    (primary, Rule::literal) => Ok(Self::Literal(Literal::parse(primary)?)),
+                    (primary, Rule::expression) => Ok(Self::parse(primary)?),
                     (primary, Rule::list_expression) => {
-                        Self::ListExpression(ListExpression::parse(primary).unwrap())
+                        Ok(Self::ListExpression(ListExpression::parse(primary)?))
                     }
                     (primary, Rule::tuple_expression) => {
-                        Self::TupleExpression(TupleExpression::parse(primary).unwrap())
+                        Ok(Self::TupleExpression(TupleExpression::parse(primary)?))
                     }
                     (primary, Rule::format_string) => {
-                        Self::FormatString(FormatString::parse(primary).unwrap())
+                        Ok(Self::FormatString(FormatString::parse(primary)?))
                     }
-                    (primary, Rule::nested) => Self::Nested(Nested::parse(primary).unwrap()),
+                    (primary, Rule::nested) => Ok(Self::Nested(Nested::parse(primary)?)),
                     rule => unreachable!(
                         "Expression::parse expected atom, found {:?} {:?}",
                         rule,
@@ -334,12 +327,12 @@ impl Parse for Expression {
                         rule
                     ),
                 };
-                Self::BinaryOp {
-                    lhs: Box::new(lhs),
+                Ok(Self::BinaryOp {
+                    lhs: Box::new(lhs?),
                     op: op.into(),
-                    rhs: Box::new(rhs),
+                    rhs: Box::new(rhs?),
                     src_ref: pair.clone().into(),
-                }
+                })
             })
             .map_prefix(|op, rhs| {
                 let op = match op.as_rule() {
@@ -349,51 +342,46 @@ impl Parse for Expression {
                     _ => unreachable!(),
                 };
 
-                Self::UnaryOp {
+                Ok(Self::UnaryOp {
                     op: op.into(),
-                    rhs: Box::new(rhs),
+                    rhs: Box::new(rhs?),
                     src_ref: pair.clone().into(),
-                }
+                })
             })
             .map_postfix(|lhs, op| {
                 match (Pair::new(op.clone(), pair.source_hash()), op.as_rule()) {
-                    (op, Rule::list_element_access) => Self::ListElementAccess(
-                        Box::new(lhs),
-                        Box::new(Self::parse(op).unwrap()),
+                    (op, Rule::list_element_access) => Ok(Self::ListElementAccess(
+                        Box::new(lhs?),
+                        Box::new(Self::parse(op)?),
                         pair.clone().into(),
-                    ),
+                    )),
                     (op, Rule::tuple_element_access) => {
                         let op = op.inner().next().unwrap();
                         match op.as_rule() {
-                            Rule::identifier => Self::NamedTupleElementAccess(
-                                Box::new(lhs),
-                                Identifier::parse(op).unwrap(),
+                            Rule::identifier => Ok(Self::NamedTupleElementAccess(
+                                Box::new(lhs?),
+                                Identifier::parse(op)?,
                                 pair.clone().into(),
-                            ),
-                            Rule::int => Self::UnnamedTupleElementAccess(
-                                Box::new(lhs),
-                                op.as_str().parse().unwrap(),
+                            )),
+                            Rule::int => Ok(Self::UnnamedTupleElementAccess(
+                                Box::new(lhs?),
+                                op.as_str().parse().expect("Integer expression expected"),
                                 pair.clone().into(),
-                            ),
+                            )),
                             rule => unreachable!("Expected identifier or int, found {:?}", rule),
                         }
                     }
-                    (op, Rule::method_call) => Self::MethodCall(
-                        Box::new(lhs),
-                        MethodCall::parse(op).unwrap(),
+                    (op, Rule::method_call) => Ok(Self::MethodCall(
+                        Box::new(lhs?),
+                        MethodCall::parse(op)?,
                         pair.clone().into(),
-                    ),
+                    )),
                     rule => {
                         unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
                     }
                 }
             })
-            .parse(pair.pest_pair().clone().into_inner());
-
-        match error {
-            Some(e) => Err(e),
-            None => Ok(result),
-        }
+            .parse(pair.pest_pair().clone().into_inner())
     }
 }
 

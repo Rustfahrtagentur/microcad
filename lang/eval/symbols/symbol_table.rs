@@ -29,8 +29,10 @@ impl Symbols for SymbolTable {
         match symbol {
             Symbol::Invalid => {}
             _ => {
-                self.0
-                    .insert(symbol.id().unwrap(), std::rc::Rc::new(symbol));
+                self.0.insert(
+                    symbol.id().expect("Symbol id is not set"),
+                    std::rc::Rc::new(symbol),
+                );
             }
         }
 

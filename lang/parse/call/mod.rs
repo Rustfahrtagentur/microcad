@@ -52,7 +52,7 @@ impl Parse for Call {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::call);
         let mut inner = pair.inner();
-        let first = inner.next().unwrap();
+        let first = inner.next().expect("Expected qualified name");
 
         Ok(Call {
             name: QualifiedName::parse(first)?,

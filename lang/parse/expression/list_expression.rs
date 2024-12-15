@@ -37,7 +37,7 @@ impl Parse for ListExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
         Ok(Self {
-            list: ExpressionList::parse(inner.next().unwrap())?,
+            list: ExpressionList::parse(inner.next().expect("list_expression expected"))?,
             unit: match inner.next() {
                 Some(pair) => Some(Unit::parse(pair)?),
                 None => None,
