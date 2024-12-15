@@ -10,7 +10,7 @@ edition = "2021"
 path = "lib.rs"
 
 [dependencies]
-regex = "1"
+regex = "1.11.1"
 rustfmt-wrapper = "0.2"
 anyhow = "1"
 walk_path = { path = "../walk_path" }
