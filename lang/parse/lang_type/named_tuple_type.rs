@@ -19,8 +19,8 @@ impl Parse for NamedTupleType {
 
         for pair in pair.inner() {
             let mut inner = pair.inner();
-            let name = Identifier::parse(inner.next().unwrap())?;
-            let ty = TypeAnnotation::parse(inner.next().unwrap())?.ty();
+            let name = Identifier::parse(inner.next().expect("Identifier expected"))?;
+            let ty = TypeAnnotation::parse(inner.next().expect("Type annotation expected"))?.ty();
             if types.contains_key(&name) {
                 return Err(ParseError::DuplicatedMapField(name.clone()));
             }

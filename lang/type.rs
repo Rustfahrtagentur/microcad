@@ -106,7 +106,7 @@ impl From<Type> for TypeAnnotation {
 impl Parse for TypeAnnotation {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::r#type);
-        let inner = pair.inner().next().unwrap();
+        let inner = pair.inner().next().expect("Expected type");
 
         let s = match inner.as_rule() {
             Rule::list_type => Self(Refer::new(Type::List(ListType::parse(inner)?), pair.into())),

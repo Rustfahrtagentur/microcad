@@ -51,7 +51,7 @@ impl Parse for NumberLiteral {
         Parser::ensure_rule(&pair, Rule::number_literal);
 
         let mut inner = pair.inner();
-        let number_token = inner.next().unwrap();
+        let number_token = inner.next().expect("Expected number token");
 
         assert!(
             number_token.as_rule() == Rule::number

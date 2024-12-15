@@ -27,7 +27,7 @@ impl Parse for ListType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
 
-        let pair = inner.next().unwrap();
+        let pair = inner.next().expect("Expected type");
         match pair.as_rule() {
             Rule::r#type => Ok(Self::new(TypeAnnotation::parse(pair.clone())?.ty())),
             _ => unreachable!("Expected type, found {:?}", pair.as_rule()),

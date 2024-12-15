@@ -31,9 +31,9 @@ impl Parse for ForStatement {
         let mut pairs = pair.inner();
 
         Ok(ForStatement {
-            loop_var: Identifier::parse(pairs.next().unwrap())?,
-            loop_expr: Expression::parse(pairs.next().unwrap())?,
-            body: NodeBody::parse(pairs.next().unwrap())?,
+            loop_var: Identifier::parse(pairs.next().expect("Identifier expected"))?,
+            loop_expr: Expression::parse(pairs.next().expect("Expression expected"))?,
+            body: NodeBody::parse(pairs.next().expect("Node body expected"))?,
             src_ref: pair.clone().into(),
         })
     }

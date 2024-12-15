@@ -52,14 +52,14 @@ impl Parse for UseDeclaration {
         Parser::ensure_rule(&pair, Rule::use_declaration);
 
         let mut inner = pair.inner();
-        let first = inner.next().unwrap();
+        let first = inner.next().expect("Expected use declaration element");
 
         match first.as_rule() {
             Rule::qualified_name => {
                 Ok(Self::Use(QualifiedName::parse(first)?, pair.clone().into()))
             }
             Rule::use_all => {
-                let inner = first.inner().next().unwrap();
+                let inner = first.inner().next().expect("Expected qualified name");
                 Ok(Self::UseAll(
                     QualifiedName::parse(inner)?,
                     first.clone().into(),
@@ -67,8 +67,8 @@ impl Parse for UseDeclaration {
             }
             Rule::use_alias => {
                 let mut inner = first.inner();
-                let name = QualifiedName::parse(inner.next().unwrap())?;
-                let alias = Identifier::parse(inner.next().unwrap())?;
+                let name = QualifiedName::parse(inner.next().expect("Expected qualified name"))?;
+                let alias = Identifier::parse(inner.next().expect("Expected identfier"))?;
                 Ok(Self::UseAlias(name, alias, pair.clone().into()))
             }
             _ => unreachable!("Invalid use declaration"),

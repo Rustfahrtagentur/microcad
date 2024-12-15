@@ -19,8 +19,8 @@ impl MapType {
 impl Parse for MapType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
-        let key = inner.next().unwrap();
-        let value = inner.next().unwrap();
+        let key = inner.next().expect("missing key expression");
+        let value = inner.next().expect("missing value expression");
 
         use crate::eval::Ty;
 

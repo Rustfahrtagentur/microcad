@@ -39,8 +39,7 @@ impl Parse for QualifiedName {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self(
             pair.inner()
-                .map(|pair| Identifier::parse(pair))
-                .map(|ident| ident.unwrap())
+                .map(|pair| Identifier::parse(pair).expect("Expected identifier"))
                 .collect(),
         ))
     }
