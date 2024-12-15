@@ -13,7 +13,7 @@ path = "lib.rs"
 
 [dependencies]
 log = "0.4"
-geo = "0.29.3"
+geo = "0.29"
 cgmath = "0.18"
 strum = { version = "0.26", features = ["derive"] }
 thiserror = "2.0"

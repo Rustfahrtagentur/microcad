@@ -16,7 +16,7 @@ path = "lib.rs"
 log = "0.4"
 lazy_static = "1.5"
 cgmath = "0.18"
-geo = "0.28"
+geo = "0.29"
 anyhow = "1.0"
 
 microcad-core = { path = "../core" }

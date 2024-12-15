@@ -86,7 +86,7 @@ impl ModuleDefinition {
                 .get_multi_matching_arguments(&init.parameters.eval(context)?)
             {
                 Ok(multi_argument_map) => return Ok((init.clone(), multi_argument_map)),
-                Err(err) => continue,
+                Err(_) => continue,
             }
         }
 
