@@ -148,12 +148,13 @@ impl std::fmt::Display for Expression {
 
 impl Expression {
     /// Generate literal from string
-    pub fn literal_from_str(s: &str) -> std::result::Result<Self, anyhow::Error> {
+    pub fn literal_from_str(s: &str) -> ParseResult<Self> {
         use std::str::FromStr;
-        if s.starts_with('"') && s.ends_with('"') {
-            return Ok(Self::FormatString(FormatString::from_str(s)?));
+        if s.len() > 1 && s.starts_with('"') && s.ends_with('"') {
+            Ok(Self::FormatString(FormatString::from_str(s)?))
+        } else {
+            Ok(Self::Literal(Literal::from_str(s)?))
         }
-        Ok(Self::Literal(Literal::from_str(s)?))
     }
 
     /// If the expression consists of a single identifier, e.g. `a`
