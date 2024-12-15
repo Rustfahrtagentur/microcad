@@ -31,9 +31,7 @@ jobs:
 
     steps:
     - name: Install dependencies
-      run: sudo apt-get install -y ninja-build
-    - name: Install libssl1.1
-      run: wget http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.22_amd64.deb && sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.23_amd64.deb
+      run: sudo apt-get install -y ninja-build libssl1.1
     - uses: actions/checkout@v4
       with:
         submodules: 'true'
