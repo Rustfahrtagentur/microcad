@@ -1,7 +1,6 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use super::{Eval, EvalError, Symbol, SymbolTable, Symbols};
 use crate::{diag::*, eval::*, objecttree::*, parse::*, source_file_cache::*};
 
 use microcad_core::Id;
@@ -130,17 +129,17 @@ impl Context {
     }
 
     /// The top symbol table in the stack
-    pub fn top(&self) -> EvalResult<&StackFrame> {
-        if let Some(last) = self.stack.last() {
-            Ok(last)
-        } else {
-            Err(EvalError::UnexpectedEmptyStack)
-        }
+    ///
+    /// This method guarantees that the stack is not empty
+    pub fn top(&self) -> &StackFrame {
+        self.stack.last().expect("Empty stack")
     }
 
     /// The top symbol table in the stack (mutable)
+    ///
+    /// This method guarantees that the stack is not empty
     pub fn top_mut(&mut self) -> &mut StackFrame {
-        self.stack.last_mut().unwrap()
+        self.stack.last_mut().expect("Empty stack")
     }
 
     /// Create a new symbol table and push it to the stack
@@ -190,21 +189,19 @@ impl Symbols for Context {
     }
 
     fn add(&mut self, symbol: Symbol) -> &mut Self {
-        self.stack.last_mut().unwrap().add(symbol);
+        self.top_mut().add(symbol);
         self
     }
 
     fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
-        self.stack.last_mut().unwrap().add_alias(symbol, alias);
+        self.top_mut().add_alias(symbol, alias);
         self
     }
 
     fn copy<T: Symbols>(&self, into: &mut T) {
-        if let Ok(top) = self.top() {
-            top.symbol_table().iter().for_each(|(_, symbol)| {
-                into.add(symbol.as_ref().clone());
-            });
-        }
+        self.top().symbol_table().iter().for_each(|(_, symbol)| {
+            into.add(symbol.as_ref().clone());
+        });
     }
 }
 

@@ -107,7 +107,7 @@ impl SourceFile {
         namespace_name: Identifier,
     ) -> EvalResult<std::rc::Rc<NamespaceDefinition>> {
         let mut namespace = NamespaceDefinition::new(namespace_name);
-        let stack_frame = StackFrame::Namespace(context.top()?.symbol_table().clone());
+        let stack_frame = StackFrame::Namespace(context.top().symbol_table().clone());
 
         context.scope(stack_frame, |context| {
             for statement in &self.body {
