@@ -81,7 +81,7 @@ impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
 macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
-            $arg_map.get(stringify!($name)).unwrap(),
+            $arg_map.get(stringify!($name)).expect(&format!("Argument `{}` expected",stringify!($name))),
             &Value::$ty(crate::src_ref::Refer::none($value))
         ));*
     };

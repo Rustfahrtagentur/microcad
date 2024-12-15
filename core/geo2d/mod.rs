@@ -192,11 +192,11 @@ fn test_transform() {
     let transformed = geometry.transform(transform);
 
     if let Geometry::LineString(l) = transformed {
-        let first = l.coords().next().unwrap();
+        let first = l.coords().next().expect("Expected first coordinate");
         assert_eq!(first.x, 5.0);
         assert_eq!(first.y, 10.0);
 
-        let second = l.coords().nth(1).unwrap();
+        let second = l.coords().nth(1).expect("Expected second coordinate");
         assert_eq!(second.x, 7.0);
         assert_eq!(second.y, 11.0);
     } else {

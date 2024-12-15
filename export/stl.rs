@@ -20,10 +20,10 @@ pub struct StlWriter<'a> {
 
 impl<'a> StlWriter<'a> {
     /// Create new STL writer
-    pub fn new(mut w: &'a mut dyn std::io::Write) -> Self {
-        writeln!(&mut w, "solid").unwrap();
+    pub fn new(mut w: &'a mut dyn std::io::Write) -> std::io::Result<Self> {
+        writeln!(&mut w, "solid")?;
 
-        Self { writer: w }
+        Ok(Self { writer: w })
     }
 
     /// Write triangle
@@ -93,7 +93,7 @@ impl Exporter for StlExporter {
 
         let file = std::fs::File::create(&self.filename)?;
         let mut file = std::io::BufWriter::new(file);
-        let mut writer = StlWriter::new(&mut file);
+        let mut writer = StlWriter::new(&mut file)?;
 
         renderer
             .triangle_mesh
