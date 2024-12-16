@@ -228,6 +228,10 @@ pub enum EvalError {
     /// Unexpected empty stack
     #[error("Unexpected empty stack")]
     UnexpectedEmptyStack,
+
+    /// Tuple item not found
+    #[error("Tuple item not found {0}")]
+    TupleItemNotFound(Identifier),
 }
 
 /// Result type of any evaluation

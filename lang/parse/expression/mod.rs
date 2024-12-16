@@ -228,7 +228,13 @@ impl Eval for Expression {
                     (Value::List(list), Value::Integer(index)) => {
                         let index = index.value as usize;
                         if index < list.len() {
-                            Ok(list.get(index).unwrap().clone())
+                            match list.get(index) {
+                                Some(value) => Ok(value.clone()),
+                                None => Err(EvalError::ListIndexOutOfBounds {
+                                    index,
+                                    len: list.len(),
+                                }),
+                            }
                         } else {
                             context.error(
                                 self,
@@ -246,10 +252,10 @@ impl Eval for Expression {
             Self::NamedTupleElementAccess(lhs, rhs, _) => {
                 let lhs = lhs.eval(context)?;
                 match lhs {
-                    Value::NamedTuple(tuple) => {
-                        let value = tuple.get(rhs).unwrap();
-                        Ok(value.clone())
-                    }
+                    Value::NamedTuple(tuple) => match tuple.get(rhs) {
+                        Some(value) => Ok(value.clone()),
+                        None => Err(EvalError::TupleItemNotFound(rhs.clone())),
+                    },
                     Value::Node(node) => match node.fetch(&rhs.to_string().into()) {
                         Some(symbol) => match symbol.as_ref() {
                             Symbol::Value(_, value) => Ok(value.clone()),
