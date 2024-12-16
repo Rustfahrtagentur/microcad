@@ -18,16 +18,22 @@ Install µCAD from [crates.io](https://crates.io) by using cargo:
 
 ### Installation
 
+*Note*: The microcad-cli binary crate is not yet available on crates.io, but you can install it from the source code.
+
+To install the latest version of µCAD via cargo, type:
+
 ```sh
-cargo install microcad
+cargo install microcad-cli
 ```
+
+You can also build µCAD from source by cloning the repository, see the `Contribute` section below.
 
 ### Basic example
 
 You can run a basic example by typing:
 
 ```sh
-µcad eval ./examples/lid.µcad
+microcad eval ./examples/lid.µcad
 ```
 
 This will *evaluate* the input file and will calculate the volume of the geometry:
@@ -41,7 +47,7 @@ The *evaluate* command will not export the output geometry. Instead, it will sim
 To generate an STL model file called, use the `export` command with an additional output file name:
 
 ```sh
-µcad export ./examples/lid.µcad
+microcad export ./examples/lid.µcad
 ```
 
 The output file `lid.stl`, can be displayed e.g. with [MeshLab](https://www.meshlab.net/).
