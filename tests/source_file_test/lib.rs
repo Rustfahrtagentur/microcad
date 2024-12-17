@@ -85,21 +85,26 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
     let mut wp = WalkPath::new();
     let mut code = String::new();
 
-    wp.scan(path.as_ref(), "µcad", &|tree, file_path| {
-        insert(
-            tree,
-            file_path.file_stem().unwrap().to_str().unwrap(),
-            format!(
-                r#"crate::test_source_file("{file_path}");"#,
-                file_path = file_path
-                    .to_str()
-                    .unwrap()
-                    .escape_default() // Escape characters correctly (e.g. backslashes in Windows paths)
-                    .collect::<String>()
-            ),
-        );
-        Ok(true)
-    })?;
+    wp.scan(
+        path.as_ref(),
+        "µcad",
+        &["target", "thirdparty"],
+        &|tree, file_path| {
+            insert(
+                tree,
+                file_path.file_stem().unwrap().to_str().unwrap(),
+                format!(
+                    r#"crate::test_source_file("{file_path}");"#,
+                    file_path = file_path
+                        .to_str()
+                        .unwrap()
+                        .escape_default() // Escape characters correctly (e.g. backslashes in Windows paths)
+                        .collect::<String>()
+                ),
+            );
+            Ok(true)
+        },
+    )?;
 
     write(&mut code, &wp);
 

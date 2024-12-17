@@ -14,6 +14,12 @@
 use anyhow::{Context, Result};
 use walk_path::*;
 
+macro_rules! print {
+    ($($tokens: tt)*) => {
+        println!("cargo:warning={}", format!($($tokens)*))
+    }
+}
+
 /// Generate tests from the *Markdown* files which are within the given `path`
 ///
 /// Path will be scanned recursively
@@ -26,7 +32,12 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
 
     // read all *Markdown files into a tree to reorder modules
     let mut wp = WalkPath::new();
-    wp.scan(path.as_ref(), "md", &scan_for_tests)?;
+    wp.scan(
+        path.as_ref(),
+        "md",
+        &["target", "thirdparty"],
+        &scan_for_tests,
+    )?;
 
     let mut code = String::new();
 
@@ -68,25 +79,26 @@ fn scan_for_tests(tree: &mut WalkPath<String>, file_path: &std::path::Path) -> R
     let reg = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#\w]+))?[\r\n]+(?<code>[^`]*)+```"#)
         .expect("bad regex");
 
-    let path = file_path
+    let module_path = file_path
         .iter()
-        .map(|f| f.to_str().unwrap())
-        .filter(|f| *f != "..")
-        .map(|f| *f.split('.').next().as_ref().unwrap())
+        .filter(|f| f.to_str() != Some(".."))
+        .map(|f| f.to_str().unwrap().trim_end_matches(".md"))
         .collect::<Vec<&str>>()
         .join(".");
+
+    print!("module_path: {module_path}");
 
     let mut result = true;
     for cap in reg.captures_iter(&md_content) {
         // check if code is named
 
         if let (Some(code), Some(name)) = (cap.name("code"), cap.name("name")) {
-            if path.is_empty() {
+            if module_path.is_empty() {
                 insert(tree, name.as_str(), code.as_str().to_string());
             } else {
                 insert(
                     tree,
-                    &format!("{path}.{}", name.as_str()),
+                    &format!("{module_path}.{}", name.as_str()),
                     code.as_str().to_string(),
                 );
             }
@@ -157,71 +169,72 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
             }
             f.push_str("}\n\n");
         }
-        WalkPath::File(name, code) => {
-            let name = name.to_str().unwrap();
-            let (name, suffix) = if let Some((name, suffix)) = name.split_once('#') {
-                (name, Some(suffix))
-            } else {
-                (name, None)
-            };
-            // Early exit for "#no_test" and "#todo" suffixes
-            if suffix == Some("no_test") || suffix == Some("todo") {
-                return;
-            }
-            f.push_str(
-                &format!(
-                    r##"#[test]
-                        fn r#{name}() {{
-                            microcad_lang::env_logger_init();
-                            use microcad_lang::parse::*;
-                            use microcad_std::*;
-                            use crate::SEARCH_PATH;
-                            match SourceFile::load_from_str(
-                                r#"
-                                {code}"#,
-                            ) {handling};
-                        }}"##,
-                    handling = match suffix {
-                        Some("fail") =>
-                            r##"{
-                                    Err(err) => log::debug!("{err}"),
-                                    Ok(source) => { 
-                                        let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
-                                        
-                                        if let Err(err) = context.eval() {
-                                            log::debug!("{err}");
-                                        } else {
-                                            if context.diag().error_count > 0 {
-                                                let mut w = std::io::stdout();
-                                                context.diag().pretty_print(&mut w, &context).unwrap();
-                                            } else {
-                                                panic!("ERROR: test is marked to fail but succeeded");
-                                            }
-
-                                        }
-                                    }
-                                }"##,
-                        _ =>
-                            r##"{
-                                    Ok(source) => {
-                                        let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
-                                        
-                                        if let Err(err) = context.eval() {
-                                            panic!("{err}");
-                                        } else {
-                                            if context.diag().error_count > 0 {
-                                                let mut w = std::io::stderr();
-                                                context.diag().pretty_print(&mut w, &context).unwrap();
-                                                panic!("ERROR: there were {error_count} errors", error_count = context.diag().error_count);
-                                            }
-                                            log::trace!("test succeeded");
-                                        }
-                                    },
-                                    Err(err) => panic!("ERROR: {err}"),
-                                }"##,
-                    }
-                )
-            );
-        }
+        WalkPath::File(name, code) => write_code(f, name.to_str().unwrap(), code),
     }
+}
+
+fn write_code(f: &mut String, name: &str, code: &str) {
+    let (name, suffix) = if let Some((name, suffix)) = name.split_once('#') {
+        (name, Some(suffix))
+    } else {
+        (name, None)
+    };
+    // Early exit for "#no_test" and "#todo" suffixes
+    if suffix == Some("no_test") || suffix == Some("todo") {
+        return;
+    }
+    f.push_str(
+    &format!(
+        r##"#[test]
+            fn r#{name}() {{
+                microcad_lang::env_logger_init();
+                use microcad_lang::parse::*;
+                use microcad_std::*;
+                use crate::SEARCH_PATH;
+                match SourceFile::load_from_str(
+                    r#"
+                    {code}"#,
+                ) {handling};
+            }}"##,
+        handling = match suffix {
+            Some("fail") =>
+                r##"{
+                        Err(err) => log::debug!("{err}"),
+                        Ok(source) => { 
+                            let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
+                            
+                            if let Err(err) = context.eval() {
+                                log::debug!("{err}");
+                            } else {
+                                if context.diag().error_count > 0 {
+                                    let mut w = std::io::stdout();
+                                    context.diag().pretty_print(&mut w, &context).unwrap();
+                                } else {
+                                    panic!("ERROR: test is marked to fail but succeeded");
+                                }
+
+                            }
+                        }
+                    }"##,
+            _ =>
+                r##"{
+                        Ok(source) => {
+                            let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
+                            
+                            if let Err(err) = context.eval() {
+                                panic!("{err}");
+                            } else {
+                                if context.diag().error_count > 0 {
+                                    let mut w = std::io::stderr();
+                                    context.diag().pretty_print(&mut w, &context).unwrap();
+                                    panic!("ERROR: there were {error_count} errors", error_count = context.diag().error_count);
+                                }
+                                log::trace!("test succeeded");
+                            }
+                        },
+                        Err(err) => panic!("ERROR: {err}"),
+                    }"##,
+        }
+    )
+);
 }

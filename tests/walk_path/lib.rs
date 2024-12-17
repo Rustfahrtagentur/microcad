@@ -47,6 +47,7 @@ impl<T> WalkPath<T> {
         &mut self,
         path: &std::path::Path,
         extension: &str,
+        exclude_dir: &[&str],
         f: &dyn Fn(&mut WalkPath<T>, &std::path::Path) -> Result<bool>,
     ) -> Result<bool> {
         // prepare return value
@@ -57,9 +58,9 @@ impl<T> WalkPath<T> {
             if let Ok(file_type) = entry.file_type() {
                 let file_name = entry.file_name().into_string().unwrap();
                 // check if directory or file
-                if file_type.is_dir() && ![".", ".."].contains(&file_name.as_str()) {
+                if file_type.is_dir() && !exclude_dir.contains(&file_name.as_str()) {
                     // scan deeper
-                    if self.scan(&entry.path(), extension, f)? {
+                    if self.scan(&entry.path(), extension, exclude_dir, f)? {
                         // found something
                         found = true;
                     }
