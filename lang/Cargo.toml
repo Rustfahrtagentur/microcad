@@ -23,14 +23,12 @@ thiserror = "2.0"
 env_logger = "0.11"
 strum = { version = "0.26", features = ["derive"] }
 
-manifold-rs = { path = "../thirdparty/manifold-rs", optional = true }
-
 microcad-core = { path = "../core" }
 microcad-render = { path = "../render" }
 
 [features]
 default = ["geo3d"]
-geo3d = ["dep:manifold-rs"]
+geo3d = []
 
 [lints.rust]
 missing_docs = "warn"
