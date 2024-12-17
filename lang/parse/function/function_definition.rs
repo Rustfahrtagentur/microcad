@@ -71,9 +71,9 @@ impl Parse for std::rc::Rc<FunctionDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_definition);
         let mut inner = pair.inner();
-        let name = Identifier::parse(inner.next().unwrap())?;
-        let signature = FunctionSignature::parse(inner.next().unwrap())?;
-        let body = FunctionBody::parse(inner.next().unwrap())?;
+        let name = Identifier::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
+        let signature = FunctionSignature::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
+        let body = FunctionBody::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
 
         Ok(std::rc::Rc::new(FunctionDefinition {
             name,

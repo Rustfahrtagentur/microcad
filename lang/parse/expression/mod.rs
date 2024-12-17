@@ -362,7 +362,7 @@ impl Parse for Expression {
                         pair.clone().into(),
                     )),
                     (op, Rule::tuple_element_access) => {
-                        let op = op.inner().next().unwrap();
+                        let op = op.inner().next().expect(INTERNAL_PARSE_ERROR);
                         match op.as_rule() {
                             Rule::identifier => Ok(Self::NamedTupleElementAccess(
                                 Box::new(lhs?),

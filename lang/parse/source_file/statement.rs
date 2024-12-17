@@ -41,7 +41,7 @@ impl SrcReferrer for Statement {
 impl Parse for Statement {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::source_file_statement);
-        let first = pair.inner().next().unwrap();
+        let first = pair.inner().next().expect(INTERNAL_PARSE_ERROR);
         Ok(match first.as_rule() {
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
             Rule::module_definition => {

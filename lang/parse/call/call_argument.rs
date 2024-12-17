@@ -65,8 +65,8 @@ impl Parse for CallArgument {
         match pair.clone().as_rule() {
             Rule::call_named_argument => {
                 let mut inner = pair.inner();
-                let first = inner.next().unwrap();
-                let second = inner.next().unwrap();
+                let first = inner.next().expect(INTERNAL_PARSE_ERROR);
+                let second = inner.next().expect(INTERNAL_PARSE_ERROR);
 
                 Ok(CallArgument {
                     name: Some(Identifier::parse(first)?),

@@ -56,7 +56,7 @@ impl Parse for Literal {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::literal);
 
-        let inner = pair.inner().next().unwrap();
+        let inner = pair.inner().next().expect(INTERNAL_PARSE_ERROR);
 
         let s = match inner.as_rule() {
             Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?),

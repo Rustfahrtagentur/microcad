@@ -31,7 +31,7 @@ impl Parse for NodeMarker {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::node_marker);
         Ok(Self {
-            name: Identifier::parse(pair.inner().next().unwrap())?,
+            name: Identifier::parse(pair.inner().next().expect(INTERNAL_PARSE_ERROR))?,
             src_ref: pair.src_ref(),
         })
     }
@@ -89,7 +89,7 @@ impl SrcReferrer for NodeBodyStatement {
 
 impl Parse for NodeBodyStatement {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let first = pair.inner().next().unwrap();
+        let first = pair.inner().next().expect(INTERNAL_PARSE_ERROR);
         Ok(match first.as_rule() {
             Rule::use_statement => NodeBodyStatement::Use(UseStatement::parse(first)?),
             Rule::expression | Rule::expression_no_semicolon => {

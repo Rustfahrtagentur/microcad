@@ -38,3 +38,5 @@ pub use r#use::*;
 pub use source_file::*;
 pub use units::*;
 pub use visibility::*;
+
+const INTERNAL_PARSE_ERROR: &str = "internal parse error";

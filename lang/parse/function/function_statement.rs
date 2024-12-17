@@ -51,7 +51,7 @@ impl Parse for FunctionStatement {
         Parser::ensure_rule(&pair, Rule::function_statement);
 
         let mut inner = pair.inner();
-        let first = inner.next().unwrap();
+        let first = inner.next().expect(INTERNAL_PARSE_ERROR);
         let s = match first.as_rule() {
             Rule::assignment => Self::Assignment(Assignment::parse(first)?),
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
@@ -61,8 +61,8 @@ impl Parse for FunctionStatement {
             Rule::function_return_statement => Self::Return(Expression::parse(first)?),
             Rule::function_if_statement => {
                 let mut pairs = first.inner();
-                let condition = Expression::parse(pairs.next().unwrap())?;
-                let if_body = FunctionBody::parse(pairs.next().unwrap())?;
+                let condition = Expression::parse(pairs.next().expect(INTERNAL_PARSE_ERROR))?;
+                let if_body = FunctionBody::parse(pairs.next().expect(INTERNAL_PARSE_ERROR))?;
 
                 match pairs.next() {
                     None => Self::If {

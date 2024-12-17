@@ -44,7 +44,7 @@ impl Parse for MethodCall {
         let mut inner = pair.inner();
 
         Ok(MethodCall {
-            name: Identifier::parse(inner.next().unwrap())?,
+            name: Identifier::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?,
             argument_list: if let Some(pair) = inner.next() {
                 CallArgumentList::parse(pair)?
             } else {
