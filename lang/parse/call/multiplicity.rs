@@ -180,7 +180,12 @@ fn call_parameter_multiplicity() {
         keys.sort();
         let items: Vec<(&Id, i64)> = keys
             .iter()
-            .map(|key| (key, combination[key].clone().try_into().unwrap()))
+            .map(|key| {
+                (
+                    key,
+                    combination[key].clone().try_into().expect("test error"),
+                )
+            })
             .collect::<Vec<_>>();
         println!("{:?}", items);
         count += 1;

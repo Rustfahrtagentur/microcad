@@ -22,9 +22,9 @@ fn context_namespace() {
 
     let symbols = context
         .fetch_symbols_by_qualified_name(&"math::pi".into())
-        .unwrap();
+        .expect("test error");
     assert_eq!(symbols.len(), 1);
-    assert_eq!(symbols[0].id().unwrap(), "pi");
+    assert_eq!(symbols[0].id().expect("test error"), "pi");
 }
 
 #[test]

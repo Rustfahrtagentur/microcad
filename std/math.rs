@@ -142,12 +142,12 @@ fn test_builtin_function(name: &str, input: &str, expected: &str) {
 
     let symbols = context
         .fetch_symbols_by_qualified_name(&"math::abs".into())
-        .unwrap();
+        .expect("test error");
     assert_eq!(symbols.len(), 1);
 
-    let expr = Parser::parse_rule::<Expression>(Rule::expression, input, 0).unwrap();
+    let expr = Parser::parse_rule::<Expression>(Rule::expression, input, 0).expect("test error");
 
-    let value = expr.eval(&mut context).unwrap();
+    let value = expr.eval(&mut context).expect("test error");
     assert_eq!(value.ty(), Type::Scalar);
     assert_eq!(value.to_string(), expected, "Failed for '{}'", name);
 }

@@ -442,13 +442,13 @@ fn run_expression_test(
 
     let pair = Pair::new(
         Parser::parse(Rule::expression, expr)
-            .unwrap()
+            .expect("test error")
             .next()
-            .unwrap(),
+            .expect("test error"),
         0,
     );
 
-    let expr = Expression::parse(pair).unwrap();
+    let expr = Expression::parse(pair).expect("test error");
     let new_expr = expr.eval(context);
 
     evaluator(new_expr);

@@ -170,7 +170,7 @@ impl std::fmt::Display for Type {
 
 #[test]
 fn builtin_type() {
-    let ty = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "int", 0).unwrap();
+    let ty = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "int", 0).expect("test error");
     assert_eq!(ty.0.to_string(), "int");
     assert_eq!(ty.0.value, Type::Integer);
 }

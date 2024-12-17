@@ -17,21 +17,30 @@ pub use function_statement::*;
 fn assignment() {
     use crate::{eval::*, parse::*, parser::*};
 
-    let assignment = Parser::parse_rule::<Assignment>(Rule::assignment, "a = 1", 0).unwrap();
+    let assignment =
+        Parser::parse_rule::<Assignment>(Rule::assignment, "a = 1", 0).expect("test error");
 
     let mut context = Context::default();
 
     assert_eq!(&assignment.name, "a");
     assert_eq!(
-        assignment.value.eval(&mut context).unwrap().to_string(),
+        assignment
+            .value
+            .eval(&mut context)
+            .expect("test error")
+            .to_string(),
         "1"
     );
     assert!(assignment.specified_type.is_none());
 
-    assignment.eval(&mut context).unwrap();
+    assignment.eval(&mut context).expect("test error");
 
     assert_eq!(
-        context.fetch(&"a".into()).unwrap().id().unwrap(),
+        context
+            .fetch(&"a".into())
+            .expect("test error")
+            .id()
+            .expect("test error"),
         "a"
     );
 }
@@ -44,10 +53,14 @@ fn function_signature() {
     let input = "(a: scalar, b: scalar) -> scalar";
 
     let function_signature =
-        Parser::parse_rule::<FunctionSignature>(Rule::function_signature, input, 0).unwrap();
+        Parser::parse_rule::<FunctionSignature>(Rule::function_signature, input, 0)
+            .expect("test error");
 
     assert_eq!(function_signature.parameters.len(), 2);
-    assert_eq!(function_signature.return_type.unwrap().ty(), Type::Scalar);
+    assert_eq!(
+        function_signature.return_type.expect("test error").ty(),
+        Type::Scalar
+    );
 }
 
 #[test]
@@ -59,7 +72,7 @@ fn function_definition() {
             return a + b + c;
         }";
     Parser::parse_rule::<std::rc::Rc<FunctionDefinition>>(Rule::function_definition, input, 0)
-        .unwrap();
+        .expect("test error");
 }
 
 #[test]
@@ -74,14 +87,14 @@ fn function_evaluate() {
 
     let function_def =
         Parser::parse_rule::<std::rc::Rc<FunctionDefinition>>(Rule::function_definition, input, 0)
-            .unwrap();
+            .expect("test error");
 
     let mut context = Context::default();
-    context.add( function_def.into());
+    context.add(function_def.into());
 
     let input = "test(a = 1.0, b = 2.0)";
-    let expr = Parser::parse_rule::<Expression>(Rule::expression, input, 0).unwrap();
+    let expr = Parser::parse_rule::<Expression>(Rule::expression, input, 0).expect("test error");
 
-    let value = expr.eval(&mut context).unwrap();
+    let value = expr.eval(&mut context).expect("test error");
     assert_eq!(value.to_string(), "4");
 }

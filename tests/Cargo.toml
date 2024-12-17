@@ -30,7 +30,7 @@ microcad_source_file_test = { path = "source_file_test", version = "0.1.0" }
 rustfmt-wrapper = "0.2"
 
 [lints.rust]
-missing_docs = "warn"
+#missing_docs = "warn"
 
 [lints.clippy]
 unwrap_used = "warn"

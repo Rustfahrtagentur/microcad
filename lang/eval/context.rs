@@ -234,10 +234,24 @@ fn context_basic() {
     context.add_value("a".into(), Value::Integer(Refer::none(1)));
     context.add_value("b".into(), Value::Integer(Refer::none(2)));
 
-    assert_eq!(context.fetch(&"a".into()).unwrap().id().unwrap(), "a");
-    assert_eq!(context.fetch(&"b".into()).unwrap().id().unwrap(), "b");
+    assert_eq!(
+        context
+            .fetch(&"a".into())
+            .expect("test error")
+            .id()
+            .expect("test error"),
+        "a"
+    );
+    assert_eq!(
+        context
+            .fetch(&"b".into())
+            .expect("test error")
+            .id()
+            .expect("test error"),
+        "b"
+    );
 
-    let c = Parser::parse_rule::<Assignment>(Rule::assignment, "c = a + b", 0).unwrap();
+    let c = Parser::parse_rule::<Assignment>(Rule::assignment, "c = a + b", 0).expect("test error");
 
-    c.eval(&mut context).unwrap();
+    c.eval(&mut context).expect("test error");
 }

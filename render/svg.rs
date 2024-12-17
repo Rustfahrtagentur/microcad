@@ -258,21 +258,22 @@ impl geo2d::Renderer for SvgRenderer {
 #[test]
 fn svg_write() {
     // Write to file test.svg
-    let file = std::fs::File::create("svg_write.svg").unwrap();
+    let file = std::fs::File::create("svg_write.svg").expect("test error");
 
     let mut svg = SvgWriter::new(
         Box::new(file),
         geo::Rect::new(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0)),
         1.0,
     )
-    .unwrap();
+    .expect("test error");
 
     let rect = geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0));
-    svg.rect(&rect, "fill:blue;").unwrap();
+    svg.rect(&rect, "fill:blue;").expect("test error");
 
     let circle = geo::Point::new(50.0, 50.0);
-    svg.circle(&circle, 10.0, "fill:red;").unwrap();
+    svg.circle(&circle, 10.0, "fill:red;").expect("test error");
 
     let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
-    svg.line(line.0, line.1, "stroke:black;").unwrap();
+    svg.line(line.0, line.1, "stroke:black;")
+        .expect("test error");
 }

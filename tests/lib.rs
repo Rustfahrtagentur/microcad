@@ -19,7 +19,7 @@ use microcad_lang::*;
 fn make_test_out_dir() -> std::path::PathBuf {
     let test_out_dir = std::path::PathBuf::from(TEST_OUT_DIR);
     if !test_out_dir.exists() {
-        std::fs::create_dir_all(&test_out_dir).unwrap();
+        std::fs::create_dir_all(&test_out_dir).expect("test error");
     }
     test_out_dir
 }
@@ -40,14 +40,14 @@ macro_rules! args {
 #[cfg(test)]
 fn eval_context(context: &mut microcad_lang::eval::Context) -> ObjectNode {
     let node = context.eval();
-    let node = node.unwrap();
+    let node = node.expect("test error");
     println!("{node:?}");
 
     if context.diag().has_errors() {
         context
             .diag()
             .pretty_print(&mut std::io::stderr(), context)
-            .unwrap();
+            .expect("test error");
 
         eprintln!("ERROR: {} errors found", context.diag().error_count);
     }
@@ -84,9 +84,9 @@ fn export_tree_dump_for_node(node: ObjectNode, tree_dump_file: &str) {
     let mut tree_dump_exporter = microcad_export::tree_dump::TreeDumpExporter::from_settings(
         &microcad_export::ExportSettings::with_filename(tree_dump_file.to_string()),
     )
-    .unwrap();
+    .expect("test error");
 
-    tree_dump_exporter.export(node).unwrap();
+    tree_dump_exporter.export(node).expect("test error");
 }
 
 #[cfg(test)]
@@ -98,13 +98,13 @@ fn test_source_file(file_name: &str) {
         Ok(source_file) => source_file,
         Err(err) => panic!("ERROR: {err}"),
     };
-    let in_file_name = &source_file.filename.clone().unwrap();
+    let in_file_name = &source_file.filename.clone().expect("test error");
 
     let out_file_name: std::path::PathBuf = [
         test_out_dir,
         in_file_name
-            .strip_prefix(in_file_name.parent().unwrap())
-            .unwrap()
+            .strip_prefix(in_file_name.parent().expect("test error"))
+            .expect("test error")
             .to_path_buf(),
     ]
     .iter()
@@ -116,7 +116,7 @@ fn test_source_file(file_name: &str) {
         .with_std("../std")
         .build();
 
-    let std_symbol = context.fetch(&"std".into()).unwrap();
+    let std_symbol = context.fetch(&"std".into()).expect("test error");
     match std_symbol.as_ref() {
         microcad_lang::eval::Symbol::Namespace(_) => {
             //println!("{namespace:#?}");
@@ -137,12 +137,12 @@ fn test_source_file(file_name: &str) {
 
     let node = eval_context(&mut context);
 
-    microcad_std::export(node.clone()).unwrap();
+    microcad_std::export(node.clone()).expect("test error");
 
     let mut tree_dump_file = out_file_name;
     tree_dump_file.set_extension("tree.dump");
 
-    export_tree_dump_for_node(node, tree_dump_file.to_str().unwrap());
+    export_tree_dump_for_node(node, tree_dump_file.to_str().expect("test error"));
 
     let mut ref_tree_dump_file = in_file_name.clone();
     ref_tree_dump_file.set_extension("tree.dump");
@@ -151,11 +151,11 @@ fn test_source_file(file_name: &str) {
     if ref_tree_dump_file.exists() {
         assert_eq!(
             std::fs::read_to_string(tree_dump_file)
-                .unwrap()
+                .expect("test error")
                 .replace("\r\n", "\n")
                 .trim(),
             std::fs::read_to_string(ref_tree_dump_file)
-                .unwrap()
+                .expect("test error")
                 .replace("\r\n", "\n")
                 .trim()
         );
@@ -168,22 +168,22 @@ fn difference_svg() {
     use microcad_render::svg::SvgRenderer;
     use microcad_std::{algorithm::*, geo2d::*};
 
-    let difference = difference().unwrap();
+    let difference = difference().expect("test error");
     let group = objecttree::group();
-    group.append(Circle::node(args!(radius: Scalar = 4.0)).unwrap());
-    group.append(Circle::node(args!(radius: Scalar = 2.0)).unwrap());
+    group.append(Circle::node(args!(radius: Scalar = 4.0)).expect("test error"));
+    group.append(Circle::node(args!(radius: Scalar = 2.0)).expect("test error"));
     difference.append(group);
 
     let test_out_dir = make_test_out_dir();
 
-    let file = std::fs::File::create(test_out_dir.join("difference.svg")).unwrap();
+    let file = std::fs::File::create(test_out_dir.join("difference.svg")).expect("test error");
     let mut renderer = SvgRenderer::default();
-    renderer.set_output(Box::new(file)).unwrap();
+    renderer.set_output(Box::new(file)).expect("test error");
 
-    let difference = objecttree::bake2d(&mut renderer, difference).unwrap();
+    let difference = objecttree::bake2d(&mut renderer, difference).expect("test error");
 
     use microcad_core::geo2d::Renderer;
-    renderer.render_node(difference).unwrap();
+    renderer.render_node(difference).expect("test error");
 }
 
 #[test]
@@ -192,15 +192,17 @@ fn difference_stl() {
     use microcad_lang::eval::BuiltinModuleDefinition;
     use microcad_std::algorithm;
 
-    let difference = algorithm::difference().unwrap();
+    let difference = algorithm::difference().expect("test error");
     let group = objecttree::group();
     group.append(
         microcad_std::geo3d::Cube::node(
             args!(size_x: Scalar = 4.0, size_y: Scalar = 4.0, size_z: Scalar = 4.0),
         )
-        .unwrap(),
+        .expect("test error"),
     );
-    group.append(microcad_std::geo3d::Sphere::node(args!(radius: Scalar = 2.0)).unwrap());
+    group.append(
+        microcad_std::geo3d::Sphere::node(args!(radius: Scalar = 2.0)).expect("test error"),
+    );
     difference.append(group);
 
     let test_out_dir = make_test_out_dir();
@@ -212,9 +214,9 @@ fn difference_stl() {
             .to_string_lossy()
             .to_string(),
     ))
-    .unwrap();
+    .expect("test error");
 
-    exporter.export(difference).unwrap();
+    exporter.export(difference).expect("test error");
 }
 
 #[test]
@@ -234,9 +236,9 @@ fn test_context_builtin() {
         use microcad_lang::parse::QualifiedName;
         let symbol = &context
             .fetch_symbols_by_qualified_name(&QualifiedName(names))
-            .unwrap();
+            .expect("test error");
         assert_eq!(symbol.len(), 1);
-        symbol.first().unwrap().clone()
+        symbol.first().expect("test error").clone()
     };
 
     // Check that the context has the assert symbol
@@ -260,7 +262,7 @@ fn test_context_builtin() {
         _ => panic!("Expected circle symbol to be a BuiltinModule"),
     }
 
-    let _ = context.eval().unwrap();
+    let _ = context.eval().expect("test error");
 
     // Now, after eval `use * from std` check again
 
@@ -286,7 +288,7 @@ fn test_context_builtin() {
 #[test]
 fn test_simple_module_statement() {
     let test_out_dir = make_test_out_dir();
-    let test_out_dir = test_out_dir.to_str().unwrap();
+    let test_out_dir = test_out_dir.to_str().expect("test error");
 
     export_tree_dump_for_node(
         eval_input("__builtin::geo2d::circle(radius = 3.0);"),
@@ -323,7 +325,7 @@ fn test_reexport_symbols_inside_namespace() {
     use microcad_lang::eval::Symbols;
     assert!(context.fetch(&"test".into()).is_some());
 
-    let test_namespace = context.fetch(&"test".into()).unwrap();
+    let test_namespace = context.fetch(&"test".into()).expect("test error");
     match test_namespace.as_ref() {
         microcad_lang::eval::Symbol::Namespace(namespace) => {
             assert!(namespace.fetch(&"assert".into()).is_some());
@@ -352,8 +354,8 @@ fn test_simple_module_definition() {
     // Check the module definition
     let module_definition = context
         .fetch_symbols_by_qualified_name(&QualifiedName(vec!["donut".into()]))
-        .unwrap();
-    let module_definition = match module_definition.first().unwrap() {
+        .expect("test error");
+    let module_definition = match module_definition.first().expect("test error") {
         microcad_lang::eval::Symbol::Module(m) => m,
         _ => panic!("Expected module definition"),
     };
@@ -364,7 +366,7 @@ fn test_simple_module_definition() {
     // Call the module definition of `donut` and verify it
     let nodes = module_definition
         .call(&CallArgumentList::default(), &mut context)
-        .unwrap();
+        .expect("test error");
 
     if let Some(node) = nodes.first() {
         match *node.borrow() {
@@ -405,8 +407,8 @@ fn test_module_definition_with_parameters() {
     // Check the module definition
     let module_definition = context
         .fetch_symbols_by_qualified_name(&QualifiedName(vec!["donut".into()]))
-        .unwrap();
-    let module_definition = match module_definition.first().unwrap() {
+        .expect("test error");
+    let module_definition = match module_definition.first().expect("test error") {
         microcad_lang::eval::Symbol::Module(m) => m,
         _ => panic!("Expected module definition"),
     };
@@ -420,16 +422,16 @@ fn test_module_definition_with_parameters() {
     let nodes = module_definition
         .call(
             &Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list, "radius = 6.0", 0)
-                .unwrap(),
+                .expect("test error"),
             &mut context,
         )
-        .unwrap();
+        .expect("test error");
 
     if let Some(node) = nodes.first() {
         match *node.borrow() {
             ObjectNodeInner::Group(ref symbols) => {
                 use microcad_lang::eval::*;
-                let symbol = symbols.fetch(&"radius".into()).unwrap();
+                let symbol = symbols.fetch(&"radius".into()).expect("test error");
                 match symbol.as_ref() {
                     Symbol::Value(_, value) => {
                         assert_eq!(value, &6.0.into());
@@ -480,8 +482,8 @@ fn module_definition_init() {
     // Check the module definition
     let module_definition = context
         .fetch_symbols_by_qualified_name(&QualifiedName(vec!["circle".into()]))
-        .unwrap();
-    let module_definition = match module_definition.first().unwrap() {
+        .expect("test error");
+    let module_definition = match module_definition.first().expect("test error") {
         microcad_lang::eval::Symbol::Module(m) => m,
         _ => panic!("Expected module definition"),
     };
@@ -495,16 +497,16 @@ fn module_definition_init() {
     let nodes = module_definition
         .call(
             &Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list, "r = 6.0", 0)
-                .unwrap(),
+                .expect("test error"),
             &mut context,
         )
-        .unwrap();
+        .expect("test error");
 
     if let Some(node) = nodes.first() {
         match *node.borrow() {
             ObjectNodeInner::Group(ref symbols) => {
                 use microcad_lang::eval::*;
-                let symbol = symbols.fetch(&"radius".into()).unwrap();
+                let symbol = symbols.fetch(&"radius".into()).expect("test error");
                 match symbol.as_ref() {
                     Symbol::Value(_, value) => {
                         assert_eq!(value, &6.0.into());
@@ -557,15 +559,15 @@ fn test_load_std() {
 
     let namespace = context
         .current_source_file()
-        .unwrap()
+        .expect("test error")
         .eval_as_namespace(&mut context, "std".into())
-        .unwrap();
+        .expect("test error");
 
     if context.diag().has_errors() {
         context
             .diag()
             .pretty_print(&mut std::io::stdout(), &context)
-            .unwrap();
+            .expect("test error");
         panic!("ERROR: {} errors found", context.diag().error_count);
     }
 
@@ -600,7 +602,7 @@ fn test_load_std() {
     use microcad_lang::eval::*;
     context.add(Symbol::Namespace(namespace));
 
-    let node = context.eval().unwrap();
+    let node = context.eval().expect("test error");
 
     export_tree_dump_for_node(node, "output/test_load_std.tree.dump");
 }
@@ -631,7 +633,7 @@ fn test_with_std() {
         .with_std("../std")
         .build();
 
-    let node = context.eval().unwrap();
+    let node = context.eval().expect("test error");
 
     export_tree_dump_for_node(node, "output/test_with_std.tree.dump");
 }

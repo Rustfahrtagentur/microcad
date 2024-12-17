@@ -180,19 +180,22 @@ fn test_diag_list() {
 
     let mut body_iter = source_file.body.iter();
 
-    diagnostics.info(body_iter.next().unwrap(), "This is an info".to_string());
+    diagnostics.info(
+        body_iter.next().expect("test error"),
+        "This is an info".to_string(),
+    );
     diagnostics
         .warning(
-            body_iter.next().unwrap(),
+            body_iter.next().expect("test error"),
             Box::new(EvalError::CustomError("This is a warning".into())),
         )
-        .unwrap();
+        .expect("test error");
     diagnostics
         .error(
-            body_iter.next().unwrap(),
+            body_iter.next().expect("test error"),
             Box::new(EvalError::CustomError("This is an error".into())),
         )
-        .unwrap();
+        .expect("test error");
 
     assert_eq!(diagnostics.len(), 3);
     let mut output = std::io::Cursor::new(Vec::new());
@@ -201,9 +204,9 @@ fn test_diag_list() {
             &mut output,
             source_file
                 .get_source_file_by_hash(source_file.hash())
-                .unwrap(),
+                .expect("test error"),
         )
-        .unwrap();
+        .expect("test error");
 
     // Hol den Inhalt des Puffers
     let result = String::from_utf8(output.into_inner()).expect("Invalid UTF-8");

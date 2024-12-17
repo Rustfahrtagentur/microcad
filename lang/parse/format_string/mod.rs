@@ -115,16 +115,16 @@ fn simple_string() {
     use pest::Parser as _;
     let pair = Pair::new(
         Parser::parse(Rule::format_string, "\"Hello, World!\"")
-            .unwrap()
+            .expect("test error")
             .next()
-            .unwrap(),
+            .expect("test error"),
         0,
     );
 
-    let s = FormatString::parse(pair).unwrap();
+    let s = FormatString::parse(pair).expect("test error");
     assert_eq!(s.section_count(), 1);
     let mut context = Context::default();
-    let value = s.eval(&mut context).unwrap();
+    let value = s.eval(&mut context).expect("test error");
 
     assert_eq!(value, Value::String(Refer::none("Hello, World!".into())));
 }
@@ -134,16 +134,16 @@ fn format_string() {
     use pest::Parser as _;
     let pair = Pair::new(
         Parser::parse(Rule::format_string, "\"A{2 + 4}B\"")
-            .unwrap()
+            .expect("test error")
             .next()
-            .unwrap(),
+            .expect("test error"),
         0,
     );
 
-    let s = FormatString::parse(pair).unwrap();
+    let s = FormatString::parse(pair).expect("test error");
     assert_eq!(s.section_count(), 3);
     let mut context = Context::default();
-    let value = s.eval(&mut context).unwrap();
+    let value = s.eval(&mut context).expect("test error");
 
     assert_eq!(value, Value::String(Refer::none("A6B".into())));
 }

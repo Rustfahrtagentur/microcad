@@ -41,7 +41,7 @@ fn unnamed_tuple_type() {
     use crate::parser::*;
 
     let type_annotation =
-        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(int, string)", 0).unwrap();
+        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(int, string)", 0).expect("test error");
     assert_eq!(type_annotation.ty().to_string(), "(int, string)");
     assert_eq!(
         type_annotation.ty(),

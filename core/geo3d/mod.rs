@@ -132,7 +132,7 @@ fn test_boolean_op_multi() {
     let result = Geometry::boolean_op_multi(vec![a, b], &BooleanOp::Difference);
     assert!(result.is_some());
 
-    let result = result.unwrap();
+    let result = result.expect("test error");
 
     if let Geometry::Manifold(manifold) = &*result {
         assert!(manifold.to_mesh().vertices().len() > 1);

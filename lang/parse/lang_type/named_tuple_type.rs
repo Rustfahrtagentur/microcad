@@ -50,7 +50,8 @@ fn named_tuple_type() {
     use crate::parser::*;
 
     let type_annotation =
-        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(x: int, y: string)", 0).unwrap();
+        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(x: int, y: string)", 0)
+            .expect("test error");
     assert_eq!(type_annotation.ty().to_string(), "(x: int, y: string)");
     assert_eq!(
         type_annotation.ty(),

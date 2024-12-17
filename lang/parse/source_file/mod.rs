@@ -220,7 +220,7 @@ fn parse_source_file() {
             "#,
         0,
     )
-    .unwrap();
+    .expect("test error");
 
     assert_eq!(source_file.body.len(), 3);
 }
@@ -236,9 +236,9 @@ fn load_source_file() {
         error!("{err}");
     }
 
-    let source_file = source_file.unwrap();
+    let source_file = source_file.expect("test error");
 
-    let first_statement = source_file.body.first().unwrap();
+    let first_statement = source_file.body.first().expect("test error");
     match first_statement {
         Statement::Use(u) => {
             use crate::src_ref::SrcReferrer;

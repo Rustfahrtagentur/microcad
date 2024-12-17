@@ -104,7 +104,7 @@ fn call_list_method() {
 
     if let Value::Bool(result) = list
         .call_method(&"equal".into(), &CallArgumentList::default(), SrcRef(None))
-        .unwrap()
+        .expect("test error")
     {
         assert!(result.value);
     } else {

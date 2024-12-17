@@ -118,13 +118,13 @@ fn call() {
     use pest::Parser as _;
     let pair = Pair::new(
         Parser::parse(Rule::call, "foo(1, 2, bar = 3, baz = 4)")
-            .unwrap()
+            .expect("test error")
             .next()
-            .unwrap(),
+            .expect("test error"),
         0,
     );
 
-    let call = Call::parse(pair).unwrap();
+    let call = Call::parse(pair).expect("test error");
 
     assert_eq!(call.name, QualifiedName::from("foo"));
     assert_eq!(call.argument_list.len(), 4);
