@@ -115,7 +115,9 @@ impl QualifiedName {
             use crate::diag::PushDiag;
             context.error(
                 self,
-                Box::new(EvalError::AmbiguousSymbol(symbols.first().unwrap().clone())),
+                Box::new(EvalError::AmbiguousSymbol(
+                    symbols.first().expect(INTERNAL_PARSE_ERROR).clone(),
+                )),
             )?;
             // TODO Output all symbols
         }
