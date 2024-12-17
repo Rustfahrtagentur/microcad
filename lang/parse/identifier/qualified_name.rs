@@ -100,7 +100,7 @@ impl QualifiedName {
             use crate::diag::PushDiag;
             context.error(
                 self,
-                Box::new(EvalError::SymbolNotFound(self.id().unwrap())),
+                Box::new(EvalError::SymbolNotFound(self.id().unwrap_or_default())),
             )?;
         }
         Ok(symbols)
