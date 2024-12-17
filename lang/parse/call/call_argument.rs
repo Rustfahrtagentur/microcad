@@ -46,11 +46,7 @@ impl SrcReferrer for CallArgument {
 
 impl Sym for CallArgument {
     fn id(&self) -> Option<microcad_core::Id> {
-        if let Some(name) = &self.derived_name() {
-            Some(name.id().clone())
-        } else {
-            None
-        }
+        self.derived_name().as_ref().map(|name| name.id().clone())
     }
 }
 
