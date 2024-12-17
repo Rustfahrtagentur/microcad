@@ -66,7 +66,7 @@ impl Parse for Assignment {
         Ok(Self {
             name,
             specified_type,
-            value: value.unwrap(),
+            value: value.expect(INTERNAL_PARSE_ERROR),
             src_ref: pair.into(),
         })
     }
