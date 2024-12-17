@@ -21,7 +21,6 @@ members = [
     "std",
     "tests",
     "builtin",
-    "thirdparty/manifold-rs",
     "tools/cli",
 ]
 resolver = "2"

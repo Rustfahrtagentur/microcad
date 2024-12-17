@@ -123,16 +123,7 @@ impl TriangleMesh {
         let vertices = self
             .vertices
             .iter()
-            .flat_map(|v| {
-                vec![
-                    v.pos.x as f32,
-                    v.pos.y as f32,
-                    v.pos.z as f32,
-                    v.normal.x as f32,
-                    v.normal.y as f32,
-                    v.normal.z as f32,
-                ]
-            })
+            .flat_map(|v| vec![v.pos.x as f32, v.pos.y as f32, v.pos.z as f32])
             .collect::<Vec<_>>();
 
         let triangle_indices = self
@@ -141,7 +132,7 @@ impl TriangleMesh {
             .flat_map(|t| vec![t.0, t.1, t.2])
             .collect::<Vec<_>>();
 
-        assert_eq!(vertices.len(), self.vertices.len() * 6);
+        assert_eq!(vertices.len(), self.vertices.len() * 3);
         assert_eq!(triangle_indices.len(), self.triangle_indices.len() * 3);
 
         Manifold::from_mesh(Mesh::new(&vertices, &triangle_indices))
@@ -194,18 +185,14 @@ impl From<Mesh> for TriangleMesh {
 
         TriangleMesh {
             vertices: (0..vertices.len())
-                .step_by(6)
+                .step_by(3)
                 .map(|i| Vertex {
                     pos: Vec3::new(
                         vertices[i] as f64,
                         vertices[i + 1] as f64,
                         vertices[i + 2] as f64,
                     ),
-                    normal: Vec3::new(
-                        vertices[i + 3] as f64,
-                        vertices[i + 4] as f64,
-                        vertices[i + 5] as f64,
-                    ),
+                    normal: Vec3::new(0.0, 0.0, 0.0),
                 })
                 .collect(),
             triangle_indices: (0..indices.len())
@@ -225,9 +212,6 @@ impl From<TriangleMesh> for Mesh {
             vertices.push(v.pos.x as f32);
             vertices.push(v.pos.y as f32);
             vertices.push(v.pos.z as f32);
-            vertices.push(v.normal.x as f32);
-            vertices.push(v.normal.y as f32);
-            vertices.push(v.normal.z as f32);
         }
 
         for t in &mesh.triangle_indices {
