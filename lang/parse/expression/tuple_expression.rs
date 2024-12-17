@@ -65,10 +65,14 @@ impl std::fmt::Display for TupleExpression {
             "({})",
             self.args
                 .iter()
-                .map(|c| if self.is_named {
-                    format!("{} = {}", c.name.clone().unwrap(), c.value)
+                .map(|arg| if self.is_named {
+                    format!(
+                        "{} = {}",
+                        arg.name.clone().expect(INTERNAL_PARSE_ERROR),
+                        arg.value
+                    )
                 } else {
-                    c.to_string()
+                    arg.to_string()
                 })
                 .collect::<Vec<String>>()
                 .join(", ")
@@ -84,23 +88,13 @@ impl Eval for TupleExpression {
     type Output = Value;
 
     fn eval(&self, context: &mut Context) -> crate::eval::EvalResult<Value> {
-        if !self.is_named {
-            // Unnamed tuple
-            let mut value_list = ValueList::new(Vec::new(), self.args.src_ref());
-            for arg in self.args.iter() {
-                value_list.push(arg.value.eval(context)?);
-            }
-            if let Some(unit) = self.unit {
-                value_list.add_unit_to_unitless(unit)?;
-            }
-            Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
-        } else {
+        if self.is_named {
             // Named tuple
             let mut map = std::collections::BTreeMap::new();
             for (ident, expr) in self
                 .args
                 .iter()
-                .map(|c| (c.name.clone().unwrap(), c.value.clone()))
+                .map(|c| (c.name.clone().expect(INTERNAL_PARSE_ERROR), c.value.clone()))
             {
                 let mut value = expr.clone().eval(context)?;
                 if let Some(unit) = self.unit {
@@ -136,6 +130,16 @@ impl Eval for TupleExpression {
             }
 
             Ok(Value::NamedTuple(NamedTuple::new(map, self.src_ref())))
+        } else {
+            // Unnamed tuple
+            let mut value_list = ValueList::new(Vec::new(), self.args.src_ref());
+            for arg in self.args.iter() {
+                value_list.push(arg.value.eval(context)?);
+            }
+            if let Some(unit) = self.unit {
+                value_list.add_unit_to_unitless(unit)?;
+            }
+            Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
         }
     }
 }
