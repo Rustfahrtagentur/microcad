@@ -64,7 +64,7 @@ impl Eval for ParameterList {
     fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         let mut values = ParameterValueList::default();
         for parameter in self.iter() {
-            values.push(parameter.eval(context)?).unwrap(); // Unwrap is safe here because we know the parameter is unique
+            values.push(parameter.eval(context)?)?;
         }
 
         Ok(values)
