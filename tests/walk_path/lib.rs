@@ -3,8 +3,6 @@
 
 //! Walk a path recursively
 
-#![warn(missing_docs, clippy::unwrap_used)]
-
 use anyhow::Result;
 
 /// Tree leaf node

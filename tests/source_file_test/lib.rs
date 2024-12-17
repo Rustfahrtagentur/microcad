@@ -3,8 +3,6 @@
 
 //! Generate tests for each µcad files in the `test_cases` folder
 
-#![warn(missing_docs, clippy::unwrap_used)]
-
 use anyhow::{Context, Result};
 use walk_path::*;
 

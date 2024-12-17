@@ -28,3 +28,10 @@ microcad-builtin-proc-macro = { path = "../builtin" }
 [features]
 default = ["geo3d"]
 geo3d = []
+
+[lints.rust]
+missing_docs = "warn"
+
+[lints.clippy]
+unwrap_used = "warn"
+allow_unwrap_in_tests = "allow"

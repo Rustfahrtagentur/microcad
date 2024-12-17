@@ -26,3 +26,9 @@ manifold-rs = { path = "../thirdparty/manifold-rs", optional = true, version = "
 [features]
 default = ["geo3d"]
 geo3d = ["dep:manifold-rs"]
+
+[lints.rust]
+missing_docs = "warn"
+
+[lints.clippy]
+unwrap_used = "warn"

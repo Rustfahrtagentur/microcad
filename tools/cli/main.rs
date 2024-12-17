@@ -3,8 +3,6 @@
 
 //! µCAD command line interpreter
 
-#![warn(missing_docs, clippy::unwrap_used)]
-
 extern crate clap;
 
 extern crate microcad_lang;

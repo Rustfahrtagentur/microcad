@@ -13,3 +13,5 @@ path = "lib.rs"
 pest = "2.7"
 pest_derive = "2.7"
 
+[lints.rust]
+missing_docs = "warn"

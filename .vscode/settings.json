@@ -4,6 +4,7 @@
         "CBIND",
         "cgmath",
         "Chun",
+        "clippy",
         "coeff",
         "consts",
         "cxxflag",

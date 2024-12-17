@@ -3,8 +3,6 @@
 
 //! Generate tests out of grammar.pest file which include µCAD code fragments
 
-#![warn(missing_docs, clippy::unwrap_used)]
-
 mod pest_file;
 mod pest_result;
 mod rust_writer;

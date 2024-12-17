@@ -1,8 +1,6 @@
 // Copyright © 2024 The µCAD authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-#![warn(missing_docs, clippy::unwrap_used)]
-
 //! Generate tests out of *Markdown* files which include µCAD code
 //!
 //! Path will be scanned recursively for *Markdown* files (`*.md`).

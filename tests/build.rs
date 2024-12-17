@@ -3,8 +3,6 @@
 
 //! µCAD pest test
 
-#![warn(missing_docs, clippy::unwrap_used)]
-
 /// pest test main
 fn main() {
     microcad_pest_test::generate(

@@ -23,3 +23,9 @@ microcad-core = { path = "../core" }
 [features]
 default = ["geo3d"]
 geo3d = []
+
+[lints.rust]
+missing_docs = "warn"
+
+[lints.clippy]
+unwrap_used = "warn"

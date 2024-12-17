@@ -3,8 +3,6 @@
 
 //! µCAD core
 
-#![warn(missing_docs, clippy::unwrap_used)]
-
 const DEFAULT_RENDERING_PRECISION: f64 = 0.1;
 
 mod boolean_op;

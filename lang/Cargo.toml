@@ -31,3 +31,9 @@ microcad-render = { path = "../render" }
 [features]
 default = ["geo3d"]
 geo3d = ["dep:manifold-rs"]
+
+[lints.rust]
+missing_docs = "warn"
+
+[lints.clippy]
+unwrap_used = "warn"
