@@ -10,16 +10,13 @@ use crate::{eval::*, parse::*, parser::*, src_ref::*};
 pub struct Nested(Refer<Vec<NestedItem>>);
 
 impl Nested {
-    /// Returns an identifer if the nested item is a single qualified name
+    /// Returns an identifier if the nested item is a single qualified name
     pub fn single_identifier(&self) -> Option<Identifier> {
         match self.0.first() {
-            Some(NestedItem::QualifiedName(name)) => {
-                if name.len() == 1 {
-                    Some(name.first().unwrap().clone())
-                } else {
-                    None
-                }
-            }
+            Some(NestedItem::QualifiedName(name)) => match name.as_slice() {
+                [single_id] => Some(single_id.clone()),
+                _ => None,
+            },
             _ => None,
         }
     }
