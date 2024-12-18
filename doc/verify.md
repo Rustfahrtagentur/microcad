@@ -1,6 +1,6 @@
 # Verification
 
-µCAD provides several builtin functions that help you to avoid bad input parameters.
+µcad provides several builtin functions that help you to avoid bad input parameters.
 
 ## Assert
 
@@ -10,17 +10,17 @@ one form of assertion is a function which gets an expression.
 If the expression computes to `false` a compile error will occur at
 that point.
 
-```µCAD,assert
+```µcad,assert
 std::assert(true, "You won't see this message");
 ```
 
-```µCAD,assert_fail#fail
+```µcad,assert_fail#fail
 std::assert(false, "this assertion fails");
 ```
 
 ## Panic
 
-```µCAD,panic#todo
+```µcad,panic#todo
 a = 0;
 
 if a != 0
@@ -31,7 +31,7 @@ if a != 0
 
 `todo()` is like `panic()` but aims on reminding you to finish code later.
 
-```µCAD,todo#todo
+```µcad,todo#todo
 a = 0;
 
 if a = 0 

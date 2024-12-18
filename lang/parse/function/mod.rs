@@ -1,7 +1,7 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µCAD function parser entities
+//! µcad function parser entities
 
 mod function_body;
 mod function_definition;

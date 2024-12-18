@@ -4,13 +4,13 @@ This proc macro generates built-in modules from structs.
 
 ## Example
 
-Let's look at µCAD's built-in module `rect`.
+Let's look at µcad's built-in module `rect`.
 It has the following parameter signature: `rect(width: scalar, height: scalar, x: scalar y: scalar)`.
 
 Notice that the parameters are all of type `scalar` and not `length`.
 This is because the built-in module is not aware of the unit system.
 The built-in modules are not meant to be used directly.
-Instead, they are wrapped in a module written µCAD language that provides units, asserts, default values and multiple initializers.
+Instead, they are wrapped in a module written µcad language that provides units, asserts, default values and multiple initializers.
 
 In Rust, a built-in module is defined by a struct that implements the `BuiltinModule` trait.
 For our `rect` module, the struct looks like this:

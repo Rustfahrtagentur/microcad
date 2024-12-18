@@ -1,4 +1,4 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #[cfg(test)]
@@ -129,7 +129,7 @@ fn test_source_file(file_name: &str) {
 
     use microcad_lang::eval::*;
 
-    // Inject `output_file` into the context as a µCAD string value `OUTPUT_FILE`
+    // Inject `output_file` into the context as a µcad string value `OUTPUT_FILE`
     context.add(Symbol::Value(
         "OUTPUT_FILE".into(),
         out_file_name.to_string_lossy().to_string().into(),

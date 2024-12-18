@@ -1,4 +1,4 @@
-// Grammar for the µCAD language
+// Grammar for the µcad language
 //
 // Comments starting with //` generate tests for the grammar
 // The strings inside the backticks (``) are the test input.
@@ -30,7 +30,7 @@ COMMENT = {
 //`/ err` error
 single_line_comment = ${ "//" ~ (!"\n" ~ ANY)* }
 
-// Documentation comments for µCAD language
+// Documentation comments for µcad language
 //`/// ok`: ok
 //`// err` error
 doc_comment = { "///" ~ (!"\n" ~ ANY)* }

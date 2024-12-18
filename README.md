@@ -1,4 +1,4 @@
-# µCAD
+# µcad
 
 [![Status](https://github.com/Rustfahrtagentur/mcad/actions/workflows/rust.yml/badge.svg)](https://github.com/Rustfahrtagentur/mcad/actions)
 [![Crates.io](https://img.shields.io/crates/v/mcad.svg)](https://crates.io/crates/mcad)
@@ -6,29 +6,29 @@
 [![Codecov](https://codecov.io/github/Rustfahrtagentur/mcad/coverage.svg?branch=main)](https://codecov.io/gh/Rustfahrtagentur/mcad)
 [![Dependency status](https://deps.rs/repo/github/Rustfahrtagentur/mcad/status.svg)](https://deps.rs/repo/github/Rustfahrtagentur/mcad)
 
-![µCAD Logo](logo.png)
+![µcad Logo](logo.png)
 
-µCAD (pronounced *microcad*) is a description language for modeling parameterizable geometric objects.
+µcad (pronounced *microcad*) is a description language for modeling parameterizable geometric objects.
 Simple basic shapes can be composed to create complex geometries which then can be rendered into STL or SVG files for 3D printing or CNC milling.
 
 **Note**: This project is in an early stage of development and is not yet feature complete. Feel free to contribute by opening issues or pull requests.
 
 ## Quick start
 
-You can try out µCAD with an example.
-Install µCAD from [crates.io](https://crates.io) by using cargo:
+You can try out µcad with an example.
+Install µcad from [crates.io](https://crates.io) by using cargo:
 
 ### Installation
 
 *Note*: The microcad-cli binary crate is not yet available on crates.io, but you can install it from the source code.
 
-To install the latest version of µCAD via cargo, type:
+To install the latest version of µcad via cargo, type:
 
 ```sh
 cargo install microcad-cli
 ```
 
-You can also build µCAD from source by cloning the repository, see the `Contribute` section below.
+You can also build µcad from source by cloning the repository, see the `Contribute` section below.
 
 ### Basic example
 
@@ -59,7 +59,7 @@ The resulting STL model looks like this: ![Lid](examples/lid.png)
 
 The source file defines a *module* called `lid`, which instantiates two cylinders with different diameters and subtract them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
 
-```µCAD
+```µcad
 // We have module called `lid` with three parameters
 module lid(
     thickness = 1.6mm,
@@ -97,7 +97,7 @@ We can now load the STL into a slicer program like [Cura](https://ultimaker.com/
 
 ## Contribute
 
-We welcome contributions to µCAD, whether it is a bug report, feature request, or a pull request.
+We welcome contributions to µcad, whether it is a bug report, feature request, or a pull request.
 
 First install [*Git*](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 and [*Rust*](https://www.rust-lang.org/tools/install).
@@ -116,13 +116,13 @@ git submodule init
 git submodule update
 ```
 
-### Build µCAD
+### Build µcad
 
 ```sh
 cargo build
 ```
 
-### Install µCAD locally from source
+### Install µcad locally from source
 
 ```sh
 cargo install --path tools/cli

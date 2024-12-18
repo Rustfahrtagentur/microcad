@@ -2,7 +2,7 @@
 
 ## Example
 
-```µCAD,initialization#todo
+```µcad,initialization#todo
 module donut(radius_outer: length, radius_inner: length) {
     use circle from std::geo2d;
 
@@ -27,7 +27,7 @@ donut( diameter_outer=4cm, diameter_inner=2cm );
 
 A module with arguments has one implicit init:
 
-```µCAD,implicit_init
+```µcad,implicit_init
 module box(size: length) {
     cube(size);
 }
@@ -35,7 +35,7 @@ module box(size: length) {
 
 ## Explicit init
 
-```µCAD,explicit_init
+```µcad,explicit_init
 module box {
     init(size: length) {
         rectangle(size);
@@ -45,7 +45,7 @@ module box {
 
 ## Explicit init overloading
 
-```µCAD,explicit_init_overloading
+```µcad,explicit_init_overloading
 module box {
     init(size: length) {
         rectangle(size);
@@ -60,7 +60,7 @@ module box {
 
 TODO: (Besseres Beispiel)
 
-```µCAD
+```µcad
 module box {
     y := 0mm; // If this field is missing then, an error "MissingField" is raised 
 

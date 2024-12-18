@@ -1,7 +1,7 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µCAD source file representation
+//! µcad source file representation
 
 mod statement;
 
@@ -31,7 +31,7 @@ pub trait GetSourceFileByHash {
     }
 }
 
-/// µCAD source file
+/// µcad source file
 #[derive(Clone, Debug)]
 pub struct SourceFile {
     /// Root code body
@@ -50,7 +50,7 @@ pub struct SourceFile {
 }
 
 impl SourceFile {
-    /// Load µCAD source file from given `path`
+    /// Load µcad source file from given `path`
     pub fn load(path: impl AsRef<std::path::Path>) -> ParseResult<Self> {
         let mut file = std::fs::File::open(&path)?;
         let mut buf = String::new();

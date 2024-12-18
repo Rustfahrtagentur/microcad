@@ -3,7 +3,7 @@
 * Provides function and modules
 * No parameter list
 
-```µCAD,namespaces#todo
+```µcad,namespaces#todo
 // namespace module std
 namespace std {
     

@@ -6,13 +6,13 @@
 
 Calculate absolute value:
 
-```µCAD,abs
+```µcad,abs
 std::assert(std::math::abs(-1.0) == 1.0);
 ```
 
 ### Trigonometric functions
 
-```µCAD,trigonometric#todo
+```µcad,trigonometric#todo
 use std::*;
 use std::math::*;
 

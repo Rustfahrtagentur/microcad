@@ -1,7 +1,7 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Generate tests out of grammar.pest file which include µCAD code fragments
+//! Generate tests out of grammar.pest file which include µcad code fragments
 
 mod pest_file;
 mod pest_result;

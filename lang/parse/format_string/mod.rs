@@ -1,7 +1,7 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µCAD format expression parser entities
+//! µcad format expression parser entities
 
 mod format_expression;
 mod format_spec;

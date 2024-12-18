@@ -3,44 +3,44 @@
 
 Tuples are lists of items which might be of different types.
 
-```µCAD,tuples
+```µcad,tuples
 (width=10cm, depth=10cm, volume=1l);
 ```
 
 ## Tuple as module parameters
 
-```µCAD,parameters.A#fail
+```µcad,parameters.A#fail
 module box((x,y,z) = 0mm) {}
 ```
 
-```µCAD,parameters.B
+```µcad,parameters.B
 module box(x = 0mm, y = 0mm, z = 0mm) {}
 ```
 
-```µCAD,parameters.C#fail
+```µcad,parameters.C#fail
 module box(x,y,z = 0mm) {}
 ```
 
 ## Field declaration for a module
 
-```µCAD,fields.A#fail
+```µcad,fields.A#fail
 (width, height) = (1,2)mm;
 ```
 
-```µCAD,fields.B
+```µcad,fields.B
 width = 1.2mm;
 height = 2mm;
 ```
 
-```µCAD,fields.C#fail
+```µcad,fields.C#fail
 (width, height) = (0mm,0mm);
 ```
 
-```µCAD,fields.D
+```µcad,fields.D
 width = (0.0, 0.0)mm;
 height = (0.0, 0.0)mm;
 ```
 
-```µCAD,fields.E#fail
+```µcad,fields.E#fail
 width, height = 0mm;
 ```

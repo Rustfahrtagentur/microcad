@@ -1,11 +1,11 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µCAD statement
+//! µcad statement
 
 use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
-/// µCAD source file statement
+/// µcad source file statement
 #[derive(Clone, Debug)]
 pub enum Statement {
     /// Use statement, e.g. `use std::*;`

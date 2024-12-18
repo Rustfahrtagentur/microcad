@@ -1,7 +1,7 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µCAD command line interpreter
+//! µcad command line interpreter
 
 extern crate clap;
 
@@ -10,7 +10,7 @@ extern crate microcad_lang;
 use clap::{Parser, Subcommand};
 use microcad_lang::parse::SourceFile;
 
-/// µCAD cli
+/// µcad cli
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
@@ -20,21 +20,21 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Parse the µCAD file
+    /// Parse the µcad file
     Parse {
-        /// Input µCAD file
+        /// Input µcad file
         input: String,
     },
 
-    /// Evaluates the µCAD file
+    /// Evaluates the µcad file
     Eval {
-        /// Input µCAD file
+        /// Input µcad file
         input: String,
     },
 
-    /// Exports the µCAD file
+    /// Exports the µcad file
     Export {
-        /// Input µCAD file
+        /// Input µcad file
         input: String,
     },
 }

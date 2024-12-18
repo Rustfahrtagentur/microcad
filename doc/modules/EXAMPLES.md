@@ -6,7 +6,7 @@
 
 ### Calculation in Function
 
-```µCAD,functions#todo
+```µcad,functions#todo
 module cube_with_volume(size: length) {
 
     function volume() {
@@ -27,7 +27,7 @@ info("Cube weight: {my_cube.weight(40g/mm^3)}");
 
 ### Calculation in Field Initialization
 
-```µCAD,fields#todo
+```µcad,fields#todo
 module cube_with_volume(size: length) {
 
     volume = size*size*size;

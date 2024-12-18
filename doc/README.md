@@ -1,4 +1,4 @@
-# µCAD
+# µcad
 
 ## Programming Elements
 

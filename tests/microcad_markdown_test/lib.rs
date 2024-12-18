@@ -1,10 +1,10 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Generate tests out of *Markdown* files which include µCAD code
+//! Generate tests out of *Markdown* files which include µcad code
 //!
 //! Path will be scanned recursively for *Markdown* files (`*.md`).
-//! Code must be marked by *Markdown* code markers (code type: `µCAD`) with a test ID attached.
+//! Code must be marked by *Markdown* code markers (code type: `µcad`) with a test ID attached.
 //! In case of a failing test `#fail` must be appended to the test ID.
 //!
 //! Relative path's of scanned folder names will be used to build a modules structure  
@@ -77,7 +77,7 @@ fn scan_for_tests(tree: &mut WalkPath<String>, file_path: &std::path::Path) -> R
         File::open(file_path)?.read_to_string(&mut md_content)?;
     }
 
-    // match markdown code markers for µCAD
+    // match markdown code markers for µcad
     let reg = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#\w]+))?[\r\n]+(?<code>[^`]*)+```"#)
         .expect("bad regex");
 
@@ -107,7 +107,7 @@ fn scan_for_tests(tree: &mut WalkPath<String>, file_path: &std::path::Path) -> R
 
 /// insert new test code by module path
 /// - `path`: list of nested rust module names separated by `.`
-/// - `code`: µCAD test code
+/// - `code`: µcad test code
 fn insert(wp: &mut WalkPath<String>, path: &str, code: String) {
     use std::{cell::RefCell, rc::Rc};
 

@@ -2,7 +2,7 @@
 
 A 2D donut as circle with a hole.
 
-```µCAD,parameters#todo
+```µcad,parameters#todo
 // declare two parameters
 module donut(outer: length, inner: length) {
     // parameters can be used anywhere within the module

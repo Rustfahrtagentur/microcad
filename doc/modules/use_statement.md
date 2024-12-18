@@ -1,6 +1,6 @@
 # Module Use
 
-```µCAD,use_statement#todo
+```µcad,use_statement#todo
 module donut(outer: length, inner: length) {
     // load circle from module geo2d
     use circle from std::geo2d;

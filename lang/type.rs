@@ -1,11 +1,11 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µCAD Basic Types
+//! µcad Basic Types
 
 use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
-/// µCAD Basic Types
+/// µcad Basic Types
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
     /// Invalid type (used for error handling)

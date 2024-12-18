@@ -1,4 +1,4 @@
-# µCAD Types
+# µcad Types
 
 ## Primitive Types
 
@@ -6,7 +6,7 @@
 
 The type `integer` contains a natural number.
 
-```µCAD,primitive.integer
+```µcad,primitive.integer
 i = 3;
 ```
 
@@ -14,7 +14,7 @@ i = 3;
 
 The type `scalar` contains a floating number and must be written with at least one decimal place (or in percent).
 
-```µCAD,primitive.scalar
+```µcad,primitive.scalar
 zero = 0.0;
 pi =  3.1415;
 percent = 55%;
@@ -24,7 +24,7 @@ percent = 55%;
 
 Length are used in describing dimensions and must be given with a unit.
 
-```µCAD,primitive.length
+```µcad,primitive.length
 millimeters = 1000mm;
 centimeters = 100cm;
 meters = 1m;
@@ -37,7 +37,7 @@ std::assert( [millimeters, centimeters, meters, inches].equal() );
 
 Angles are used with rotations and in constrains when proving measures.
 
-```µCAD,primitive.angle
+```µcad,primitive.angle
 pi = std::math::pi;
 radian = 1rad * pi;
 degree = 180°;
@@ -50,7 +50,7 @@ std::assert( [degree, degree_, gradian, turn, radian].equal() );
 
 ### Area
 
-```µCAD,primitive.area#todo
+```µcad,primitive.area#todo
 square_millimeter = 100000mm²;
 square_centimeter = 1000cm²;
 square_meter = 0.1m²;
@@ -63,7 +63,7 @@ std::assert(square_inch ~ 0.1m² +-1%);
 
 ### Volume
 
-```µCAD,primitive.volume#todo
+```µcad,primitive.volume#todo
 cubic_millimeter = 1000000mm³;
 cubic_centimeter = 100cl;
 cubic_meter = 0.001m³;
@@ -84,8 +84,8 @@ std::assert(milliliter = 1l);
 
 Text can be used to logging or to render text.
 
-```µCAD,primitive.string#todo
-text = "Hello µCAD!";
+```µcad,primitive.string#todo
+text = "Hello µcad!";
 std::assert(text.count(11));
 
 // logging
@@ -99,7 +99,7 @@ std::geo2d::text(text);
 
 Colors are defined by using hash mark (`#`) followed by hexadecimal digits for red, green and blue:
 
-```µCAD,primitive.color#todo
+```µcad,primitive.color#todo
 rgb_single_hex = #FFF;
 rgb_double_hex = #00FF00;
 rgba_single_hex = #FFFF;
@@ -111,7 +111,7 @@ std::assert( rgb_double_hex = rgba_double_hex );
 
 Illegal values for color:
 
-```µCAD,primitive.no_color#fail
+```µcad,primitive.no_color#fail
 no_color = #00FF0
 ```
 
@@ -119,7 +119,7 @@ no_color = #00FF0
 
 Weights can be calculated by applying volumes to materials.
 
-```µCAD,primitive.weight#todo
+```µcad,primitive.weight#todo
 gram = 1000g;
 kilogram = 1kg;
 pound = 2.204623lb;
@@ -132,7 +132,7 @@ std::assert(pound ~ 1kg +-1%);
 
 2D vectors are written as named tuples with builtin values `x` and `y`.
 
-```µCAD,primitive.vec2
+```µcad,primitive.vec2
 vec2 = (x=1, y=2)cm;
 ```
 
@@ -140,7 +140,7 @@ vec2 = (x=1, y=2)cm;
 
 3D vectors are written as named tuples with builtin values `x`, `y` and `z`.
 
-```µCAD,primitive.vec3
+```µcad,primitive.vec3
 vec3 = (x=1, y=2, z=3)cm;
 ```
 
@@ -152,6 +152,6 @@ TODO
 
 Boolean is the result type of boolean expressions which may just be `true` or `false`.
 
-```µCAD,primitive.bool
+```µcad,primitive.bool
 std::assert( true != false );
 ```

@@ -1,4 +1,4 @@
-/// µCAD standard library
+/// µcad standard library
 
 namespace geo2d {
     /// Circle module definition

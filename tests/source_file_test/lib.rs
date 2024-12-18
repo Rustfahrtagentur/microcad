@@ -1,4 +1,4 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Generate tests for each µcad files in the `test_cases` folder
@@ -52,7 +52,7 @@ fn write(f: &mut String, wp: &WalkPath<String>) {
 
 /// insert new test code by module path
 /// - `path`: list of nested rust module names separated by `.`
-/// - `code`: µCAD test code
+/// - `code`: µcad test code
 fn insert(wp: &mut WalkPath<String>, path: &str, code: String) {
     use std::{cell::RefCell, rc::Rc};
 
@@ -69,7 +69,7 @@ fn insert(wp: &mut WalkPath<String>, path: &str, code: String) {
 
 /// Generate a test from a directory
 ///
-/// - `path`: Path containing µCAD source file
+/// - `path`: Path containing µcad source file
 pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
     use std::{env::*, path::*};
 

@@ -1,7 +1,7 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µCAD identifier parser entities
+//! µcad identifier parser entities
 
 mod identifier_list;
 mod qualified_name;
@@ -11,7 +11,7 @@ pub use qualified_name::*;
 
 use crate::{parse::*, parser::*, src_ref::*};
 
-/// µCAD identifier
+/// µcad identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(Refer<microcad_core::Id>);
 

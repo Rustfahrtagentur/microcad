@@ -1,4 +1,4 @@
-// Copyright © 2024 The µCAD authors <info@ucad.xyz>
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Call method
@@ -9,7 +9,7 @@ use crate::{eval::*, objecttree::*, parse::*, src_ref::*};
 
 /// Trait to call method of something.
 /// This for example used to call `vertices()` on a `Node`.
-/// In µCAD, this is used to return vertices of a geometry, like a `rect` in this example:
+/// In µcad, this is used to return vertices of a geometry, like a `rect` in this example:
 /// ```uCAD
 /// corners = std::geo2d::rect(size = 4mm).vertices();
 /// ```

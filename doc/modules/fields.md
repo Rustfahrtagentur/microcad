@@ -2,7 +2,7 @@
 
 A field is defined by simply assigning an expression to an identifier.
 
-```µCAD,torus
+```µcad,torus
 // module `torus`
 module torus(radius: length) {
     use circle from std::geo2d;
@@ -23,6 +23,6 @@ info("{t.inner}");
 
 ## Failures
 
-```µCAD,fail.torus#fail
+```µcad,fail.torus#fail
 module torus(radius) {} // Missing radius' type
 ```
