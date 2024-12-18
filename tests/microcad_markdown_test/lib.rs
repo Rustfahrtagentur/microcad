@@ -14,7 +14,9 @@
 use anyhow::{Context, Result};
 use walk_path::*;
 
-macro_rules! print {
+/// for debugging purpose
+#[allow(unused)]
+macro_rules! trace {
     ($($tokens: tt)*) => {
         println!("cargo:warning={}", format!($($tokens)*))
     }
@@ -86,22 +88,16 @@ fn scan_for_tests(tree: &mut WalkPath<String>, file_path: &std::path::Path) -> R
         .collect::<Vec<&str>>()
         .join(".");
 
-    print!("module_path: {module_path}");
-
     let mut result = true;
     for cap in reg.captures_iter(&md_content) {
         // check if code is named
 
         if let (Some(code), Some(name)) = (cap.name("code"), cap.name("name")) {
-            if module_path.is_empty() {
-                insert(tree, name.as_str(), code.as_str().to_string());
-            } else {
-                insert(
-                    tree,
-                    &format!("{module_path}.{}", name.as_str()),
-                    code.as_str().to_string(),
-                );
-            }
+            insert(
+                tree,
+                &[&module_path, name.as_str()].join("."),
+                code.as_str().to_string(),
+            );
             result = false;
         }
     }
