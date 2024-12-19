@@ -44,7 +44,7 @@ std::geo3d::sphere(r = 40mm);
 
 ![test](.banner/use_statement_example_A.png)
 
-```µcad,use_statement_example_A
+```µcad,use_statement_example_A#todo
 // Use statement: sub-module `cube` from module `geo3d`.
 use std::geo3d::cube;
 use std::geo3d::sphere, std::geo3d::torus;
