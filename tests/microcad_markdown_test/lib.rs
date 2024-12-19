@@ -70,13 +70,12 @@ fn remove_banner(path: impl AsRef<std::path::Path>, exclude_dir: &[&str]) -> Res
         if let Ok(file_type) = entry.file_type() {
             // check if directory or file
             if file_type.is_dir()
-                && !exclude_dir.contains(&entry.file_name().to_string_lossy().to_string().as_str())
+                && !exclude_dir.contains(&entry.path().to_string_lossy().to_string().as_str())
             {
-                warning!("{:?} {:?}", entry.file_name(), exclude_dir);
                 if entry.file_name() == ".banner" {
-                    remove_dir(&path)?;
+                    remove_dir(entry.path())?;
                 } else {
-                    remove_banner(entry.file_name(), exclude_dir)?;
+                    remove_banner(entry.path(), exclude_dir)?;
                 }
             }
         }
@@ -86,11 +85,11 @@ fn remove_banner(path: impl AsRef<std::path::Path>, exclude_dir: &[&str]) -> Res
 }
 
 fn remove_dir(path: impl AsRef<std::path::Path>) -> Result<()> {
+    warning!("remove banners in: {:?}", path.as_ref());
     for entry in std::fs::read_dir(&path).unwrap().flatten() {
-        //std::fs::remove_file(entry.path())?;
-        warning!("{:?}", entry.path());
+        std::fs::remove_file(entry.path())?;
     }
-    //std::fs::remove_dir(path)?;
+    std::fs::remove_dir(path)?;
     Ok(())
 }
 
@@ -209,7 +208,7 @@ fn write_test_code(f: &mut String, file_path: &std::path::Path, name: &str, code
         .to_string_lossy()
         .to_string();
 
-    warning!("write_test_code: banner: {banner} {:?}", file_path,);
+    //warning!("write_test_code: banner: {banner} {:?}", file_path,);
 
     // maybe create .banner directory
     let _ = std::fs::create_dir(banner_path);
