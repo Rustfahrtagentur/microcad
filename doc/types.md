@@ -6,7 +6,9 @@
 
 The type `integer` contains a natural number.
 
-```µcad,primitive.integer
+![test](.banner/types_primitive_integer.png)
+
+```µcad,types_primitive_integer
 i = 3;
 ```
 
@@ -14,7 +16,9 @@ i = 3;
 
 The type `scalar` contains a floating number and must be written with at least one decimal place (or in percent).
 
-```µcad,primitive.scalar
+![test](.banner/types_primitive_scalar.png)
+
+```µcad,types_primitive_scalar
 zero = 0.0;
 pi =  3.1415;
 percent = 55%;
@@ -24,7 +28,9 @@ percent = 55%;
 
 Length are used in describing dimensions and must be given with a unit.
 
-```µcad,primitive.length
+![test](.banner/types_primitive_length.png)
+
+```µcad,types_primitive_length
 millimeters = 1000mm;
 centimeters = 100cm;
 meters = 1m;
@@ -37,20 +43,24 @@ std::assert( [millimeters, centimeters, meters, inches].equal() );
 
 Angles are used with rotations and in constrains when proving measures.
 
-```µcad,primitive.angle
+![test](.banner/types_primitive_angle.png)
+
+```µcad,types_primitive_angle
 pi = std::math::pi;
 radian = 1rad * pi;
 degree = 180°;
 degree_ = 180deg;
-gradian = 200grad;
+grad = 200grad;
 turn = 0.5turn;
 
-std::assert( [degree, degree_, gradian, turn, radian].equal() );
+std::assert( [degree, degree_, grad, turn, radian].equal() );
 ```
 
 ### Area
 
-```µcad,primitive.area#todo
+![test](.banner/types_primitive_area.png)
+
+```µcad,types_primitive_area#todo
 square_millimeter = 100000mm²;
 square_centimeter = 1000cm²;
 square_meter = 0.1m²;
@@ -63,7 +73,9 @@ std::assert(square_inch ~ 0.1m² +-1%);
 
 ### Volume
 
-```µcad,primitive.volume#todo
+![test](.banner/types_primitive_volume.png)
+
+```µcad,types_primitive_volume#todo
 cubic_millimeter = 1000000mm³;
 cubic_centimeter = 100cl;
 cubic_meter = 0.001m³;
@@ -84,7 +96,9 @@ std::assert(milliliter = 1l);
 
 Text can be used to logging or to render text.
 
-```µcad,primitive.string#todo
+![test](.banner/types_primitive_string.png)
+
+```µcad,types_primitive_string#todo
 text = "Hello µcad!";
 std::assert(text.count(11));
 
@@ -99,7 +113,9 @@ std::geo2d::text(text);
 
 Colors are defined by using hash mark (`#`) followed by hexadecimal digits for red, green and blue:
 
-```µcad,primitive.color#todo
+![test](.banner/types_primitive_color.png)
+
+```µcad,types_primitive_color#todo
 rgb_single_hex = #FFF;
 rgb_double_hex = #00FF00;
 rgba_single_hex = #FFFF;
@@ -111,7 +127,9 @@ std::assert( rgb_double_hex = rgba_double_hex );
 
 Illegal values for color:
 
-```µcad,primitive.no_color#fail
+![test](.banner/types_primitive_no_color.png)
+
+```µcad,types_primitive_no_color#fail
 no_color = #00FF0
 ```
 
@@ -119,7 +137,9 @@ no_color = #00FF0
 
 Weights can be calculated by applying volumes to materials.
 
-```µcad,primitive.weight#todo
+![test](.banner/types_primitive_weight.png)
+
+```µcad,types_primitive_weight#todo
 gram = 1000g;
 kilogram = 1kg;
 pound = 2.204623lb;
@@ -132,7 +152,9 @@ std::assert(pound ~ 1kg +-1%);
 
 2D vectors are written as named tuples with builtin values `x` and `y`.
 
-```µcad,primitive.vec2
+![test](.banner/types_primitive_vec2.png)
+
+```µcad,types_primitive_vec2
 vec2 = (x=1, y=2)cm;
 ```
 
@@ -140,7 +162,9 @@ vec2 = (x=1, y=2)cm;
 
 3D vectors are written as named tuples with builtin values `x`, `y` and `z`.
 
-```µcad,primitive.vec3
+![test](.banner/types_primitive_vec3.png)
+
+```µcad,types_primitive_vec3
 vec3 = (x=1, y=2, z=3)cm;
 ```
 
@@ -152,6 +176,8 @@ TODO
 
 Boolean is the result type of boolean expressions which may just be `true` or `false`.
 
-```µcad,primitive.bool
+![test](.banner/types_primitive_bool.png)
+
+```µcad,types_primitive_bool
 std::assert( true != false );
 ```
