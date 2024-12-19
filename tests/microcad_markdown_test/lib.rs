@@ -299,9 +299,10 @@ fn write_test_code(f: &mut String, file_path: &std::path::Path, name: &str, code
                             } else {
                                 if context.diag().error_count > 0 {
                                     let _ = std::fs::hard_link("images/failing.png", banner);
-                                    let mut w = std::io::stderr();
+                                    let mut w = Vec::new();
                                     context.diag().pretty_print(&mut w, &context).expect("internal error");
-                                    panic!("ERROR: there were {error_count} errors", error_count = context.diag().error_count);
+                                    panic!("ERROR: there were {error_count} errors:\n{w}", error_count = context.diag().error_count, 
+                                            w = String::from_utf8(w).unwrap());
                                 }
                                 log::trace!("test succeeded");
                                 let _ = std::fs::hard_link("images/success.png", banner);
