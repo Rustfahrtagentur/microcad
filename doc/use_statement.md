@@ -2,13 +2,17 @@
 
 ## No use statement
 
-```µcad,without_use
+![test](.banner/use_statement_without_use.png)
+
+```µcad,use_statement_without_use
 std::geo3d::sphere(radius = 40.0mm);
 ```
 
 ## Simple `use` statement
 
-```µcad,with_use
+![test](.banner/use_statement_with_use.png)
+
+```µcad,use_statement_with_use
 use std::geo3d::sphere, std::geo3d::cube;
 
 sphere(r = 4mm);
@@ -17,7 +21,9 @@ cube(size = 40.0mm);
 
 ## `use *` statement
 
-```µcad,use_all_from
+![test](.banner/use_statement_use_all_from.png)
+
+```µcad,use_statement_use_all_from
 use std::geo3d::*;
 
 cube(size = 40.0mm);
@@ -25,7 +31,9 @@ cube(size = 40.0mm);
 
 ## `use as` statement
 
-```µcad,use_as
+![test](.banner/use_statement_use_as.png)
+
+```µcad,use_statement_use_as
 use std::geo3d::sphere as ball;
 
 ball(r = 40mm);
@@ -34,7 +42,9 @@ std::geo3d::sphere(r = 40mm);
 
 ## example
 
-```µcad,example.A
+![test](.banner/use_statement_example_A.png)
+
+```µcad,use_statement_example_A#todo
 // Use statement: sub-module `cube` from module `geo3d`.
 use std::geo3d::cube;
 use std::geo3d::sphere, std::geo3d::torus;

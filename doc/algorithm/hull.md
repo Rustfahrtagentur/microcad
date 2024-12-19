@@ -2,13 +2,17 @@
 
 In the following examples the convex hull of circles is calculated.
 
-```µcad,module.single#todo
+![test](.banner/hull_single.png)
+
+```µcad,hull_single#todo
 hull()
     translate(x = [-10, 10]mm, y = [-10, 10]mm)
         circle(1mm);
 ```
 
-```µcad,module.multiple#todo
+![test](.banner/hull_multiple.png)
+
+```µcad,hull_multiple#todo
 hull() {
     union() {
         translate(x = [-10, 10]mm, y = [-10, 10]mm)

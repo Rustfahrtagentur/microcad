@@ -10,17 +10,23 @@ one form of assertion is a function which gets an expression.
 If the expression computes to `false` a compile error will occur at
 that point.
 
-```µcad,assert
+![test](.banner/verify_assert.png)
+
+```µcad,verify_assert
 std::assert(true, "You won't see this message");
 ```
 
-```µcad,assert_fail#fail
+![test](.banner/verify_assert_fail.png)
+
+```µcad,verify_assert_fail#fail
 std::assert(false, "this assertion fails");
 ```
 
 ## Panic
 
-```µcad,panic#todo
+![test](.banner/verify_panic.png)
+
+```µcad,verify_panic#todo
 a = 0;
 
 if a != 0
@@ -31,7 +37,9 @@ if a != 0
 
 `todo()` is like `panic()` but aims on reminding you to finish code later.
 
-```µcad,todo#todo
+![test](.banner/verify_todo.png)
+
+```µcad,verify_todo#todo
 a = 0;
 
 if a = 0 

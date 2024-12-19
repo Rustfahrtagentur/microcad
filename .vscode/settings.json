@@ -28,6 +28,7 @@
         "rctree",
         "renderable",
         "Renderable",
+        "rsplit",
         "rustc",
         "rustdoc",
         "rustfmt",
@@ -37,7 +38,6 @@
         "thirdparty",
         "thiserror",
         "unitless",
-        "µcad",
         "µcad"
     ],
     "[markdown]": {
