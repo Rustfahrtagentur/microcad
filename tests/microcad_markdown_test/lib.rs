@@ -24,6 +24,7 @@ macro_rules! warning {
 
 #[test]
 fn md_tests() {
+    std::env::set_var("OUT_DIR", "tests/microcad_markdown_test");
     generate("..").unwrap();
 }
 
