@@ -263,7 +263,7 @@ impl std::ops::Add for Value {
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
                 Ok(Value::UnnamedTuple((lhs + rhs)?))
             }
-            _ => Err(EvalError::InvalidOperator("+".into())),
+            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} + {rhs}"))),
         }
     }
 }
@@ -321,7 +321,7 @@ impl std::ops::Sub for Value {
                     rhs,
                 )))
             }
-            _ => Err(EvalError::InvalidOperator("-".into())),
+            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} - {rhs}"))),
         }
     }
 }
@@ -402,7 +402,7 @@ impl std::ops::Div for Value {
             | (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Scalar(lhs / rhs)),
             (Value::Length(lhs), Value::Scalar(rhs)) => Ok(Value::Length(lhs / rhs)),
             (Value::Angle(lhs), Value::Scalar(rhs)) => Ok(Value::Angle(lhs / rhs)),
-            _ => Err(EvalError::InvalidOperator("/".into())),
+            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} / {rhs}"))),
         }
     }
 }
@@ -416,7 +416,7 @@ impl std::ops::BitOr for Value {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
                 crate::objecttree::algorithm::binary_op(BooleanOp::Union, lhs, rhs),
             )),
-            _ => Err(EvalError::InvalidOperator("|".into())),
+            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} | {rhs}"))),
         }
     }
 }
@@ -430,7 +430,7 @@ impl std::ops::BitAnd for Value {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
                 crate::objecttree::algorithm::binary_op(BooleanOp::Intersection, lhs, rhs),
             )),
-            _ => Err(EvalError::InvalidOperator("&".into())),
+            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} & {rhs}"))),
         }
     }
 }

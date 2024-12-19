@@ -6,7 +6,9 @@ Functions consist of statements.
 
 Example which can generate a 2D donut of a given radius:
 
-```µcad,donut
+![test](.banner/functions_donut.png)
+
+```µcad,functions_donut
 module donut(radius: length) {
     use std::geo2d::circle;
 

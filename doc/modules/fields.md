@@ -2,27 +2,31 @@
 
 A field is defined by simply assigning an expression to an identifier.
 
-```µcad,torus
-// module `torus`
+![test](.banner/fields_torus.png)
+
+```µcad,fields_torus#todo
+// module torus
 module torus(radius: length) {
-    use circle from std::geo2d;
+    use std::geo2d::circle;
 
-    // calculate inner from radius into field `inner`
-    inner = radius/2;
+    // calculate inner from radius into field inner
+    inner = radius / 2.0;
 
-    // generate torus (and use field `inner`)
+    // generate torus (and use field inner)
     circle(radius) - circle(inner);
 }
 
-// evaluate `torus` to get access to `inner`
+// evaluate torus to get access to inner
 t = torus(1cm);
 
-// extract and display `inner` from generated module `t`
+// extract and display inner from generated module t
 info("{t.inner}");
 ```
 
 ## Failures
 
-```µcad,fail.torus#fail
+![test](.banner/fields_torus_fail.png)
+
+```µcad,fields_torus_fail#fail
 module torus(radius) {} // Missing radius' type
 ```

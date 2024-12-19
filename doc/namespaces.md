@@ -3,7 +3,9 @@
 * Provides function and modules
 * No parameter list
 
-```µcad,namespaces#todo
+![test](.banner/namespaces_example.png)
+
+```µcad,namespaces_example#todo
 // namespace module std
 namespace std {
     

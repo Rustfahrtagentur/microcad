@@ -1,5 +1,7 @@
 # Module Use
 
+![test](.banner/use_statement.png)
+
 ```µcad,use_statement#todo
 module donut(outer: length, inner: length) {
     // load circle from module geo2d
