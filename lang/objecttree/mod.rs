@@ -284,7 +284,7 @@ fn node_nest() {
         .descendants()
         .for_each(|n| println!("{}{:?}", "  ".repeat(n.depth()), n.borrow()));
 
-    assert_eq!(nodes[2][0].parent().unwrap(), nodes[1][0]);
-    assert_eq!(nodes[1][0].parent().unwrap(), node);
+    assert_eq!(nodes[2][0].parent().expect("test error"), nodes[1][0]);
+    assert_eq!(nodes[1][0].parent().expect("test error"), node);
     assert!(node.parent().is_none());
 }

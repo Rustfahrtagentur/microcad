@@ -302,7 +302,7 @@ fn write_test_code(f: &mut String, file_path: &std::path::Path, name: &str, code
                                     let mut w = Vec::new();
                                     context.diag().pretty_print(&mut w, &context).expect("internal error");
                                     panic!("ERROR: there were {error_count} errors:\n{w}", error_count = context.diag().error_count, 
-                                            w = String::from_utf8(w).unwrap());
+                                            w = String::from_utf8(w).expect("utf-8 error"));
                                 }
                                 log::trace!("test succeeded");
                                 let _ = std::fs::hard_link("images/success.png", banner);
