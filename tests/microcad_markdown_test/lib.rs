@@ -18,7 +18,8 @@ use anyhow::{Context, Result};
 #[allow(unused)]
 macro_rules! warning {
     ($($tokens: tt)*) => {
-        println!("cargo:warning={}", format!($($tokens)*))
+        // HINT: switch `note` -> `warning` to activate debug messages
+        println!("cargo:note={}", format!($($tokens)*))
     }
 }
 
@@ -197,12 +198,6 @@ fn scan_for_tests(output: &mut String, file_path: &std::path::Path) -> Result<bo
                 .next()
                 .is_some()
             {
-                warning!(
-                    "scan_write_test_code: {file_path:?}, {}, {}",
-                    test_name.as_str(),
-                    test_code.as_str(),
-                );
-
                 // generate test code
                 write_test_code(output, file_path, test_name.as_str(), test_code.as_str());
 
@@ -229,6 +224,15 @@ fn write_test_code(f: &mut String, file_path: &std::path::Path, name: &str, code
     } else {
         (name, None)
     };
+
+    warning!(
+        "create test: {name}\t{}\t{file_path:?}",
+        if let Some(mode) = mode {
+            format!("{mode} ")
+        } else {
+            "".to_string()
+        }
+    );
 
     // where to store images
     let banner_path = file_path.parent().unwrap().join(".banner");
