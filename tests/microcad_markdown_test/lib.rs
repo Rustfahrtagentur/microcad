@@ -235,6 +235,7 @@ fn write_test_code(f: &mut String, file_path: &std::path::Path, name: &str, code
     let banner = banner_path
         .join(format!("{name}.png"))
         .to_string_lossy()
+        .escape_default()
         .to_string();
 
     //warning!("write_test_code: banner: {banner} {:?}", file_path,);
