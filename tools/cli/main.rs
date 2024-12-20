@@ -58,15 +58,24 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
     match &cli.command {
         Commands::Parse { input } => {
             parse(&input)?;
+            eprintln!("Parsed successfully!");
         }
         Commands::Eval { input } => {
             eval(parse(&input)?, &cli.std)?;
+            eprintln!("Evaluated successfully!");
         }
         Commands::Export { input } => {
-            export(eval(parse(&input)?, &cli.std)?)?;
+            let exports = export(eval(parse(&input)?, &cli.std)?)?;
+            eprintln!(
+                "Exported {} successfully!",
+                exports
+                    .iter()
+                    .map(|f| f.to_string_lossy().to_string())
+                    .collect::<Vec<_>>()
+                    .join(",")
+            );
         }
     }
-    eprintln!("Success!");
 
     Ok(())
 }
@@ -90,6 +99,6 @@ fn eval(source_file: SourceFile, std: impl AsRef<Path>) -> anyhow::Result<Object
     Ok(node)
 }
 
-fn export(node: ObjectNode) -> anyhow::Result<()> {
+fn export(node: ObjectNode) -> anyhow::Result<Vec<std::path::PathBuf>> {
     Ok(microcad_std::export(node)?)
 }

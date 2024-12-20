@@ -301,7 +301,7 @@ fn write_test_code(
                             Ok(source) => { 
                                 let _ = std::fs::hard_link("images/ok_fail.png", banner);
 
-                                let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
+                                let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
                                 if let Err(err) = context.eval() {
                                     log::debug!("{err}");
                                 } else if context.diag().error_count > 0 {
@@ -315,7 +315,7 @@ fn write_test_code(
                 _ =>
                     r##"{
                             Ok(source) => {
-                                let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
+                                let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
                                 if let Err(err) = context.eval() {
                                     let _ = std::fs::hard_link("images/fail.png", banner);
                                     panic!("{err}");

@@ -16,7 +16,7 @@ impl ExporterRegistry {
         &self,
         settings: &ExportSettings,
     ) -> microcad_core::CoreResult<Box<dyn Exporter>> {
-        if let Some(id) = settings.exporter_id() {
+        if let Some(id) = settings.exporter_id()? {
             use microcad_export::*;
             match id.as_str() {
                 "svg" => Self::make::<svg::SvgExporter>(settings),
@@ -45,6 +45,8 @@ lazy_static::lazy_static! {
 }
 
 /// Shortcut to export a node
-pub fn export(node: microcad_lang::objecttree::ObjectNode) -> microcad_core::CoreResult<()> {
+pub fn export(
+    node: microcad_lang::objecttree::ObjectNode,
+) -> microcad_core::CoreResult<Vec<std::path::PathBuf>> {
     export_tree(node, |settings| EXPORTERS.create(settings))
 }
