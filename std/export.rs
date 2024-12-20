@@ -46,5 +46,5 @@ lazy_static::lazy_static! {
 
 /// Shortcut to export a node
 pub fn export(node: microcad_lang::objecttree::ObjectNode) -> microcad_core::CoreResult<()> {
-    export_tree(node.clone(), |settings| EXPORTERS.create(settings))
+    export_tree(node, |settings| EXPORTERS.create(settings))
 }

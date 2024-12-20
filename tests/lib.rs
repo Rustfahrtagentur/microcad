@@ -111,7 +111,7 @@ fn test_source_file(file_name: &str) {
     let hash = source_file.hash();
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_std("../std")
+        .with_std("../std")?
         .build();
 
     let std_symbol = context.fetch(&"std".into()).expect("test error");
@@ -628,7 +628,7 @@ fn test_with_std() {
     };
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_std("../std")
+        .with_std("../std")?
         .build();
 
     let node = context.eval().expect("test error");

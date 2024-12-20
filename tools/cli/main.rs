@@ -7,13 +7,19 @@ extern crate clap;
 
 extern crate microcad_lang;
 
+use std::path::Path;
+
 use clap::{Parser, Subcommand};
-use microcad_lang::parse::SourceFile;
+use microcad_lang::{parse::SourceFile, ObjectNode};
 
 /// µcad cli
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
+    /// Standard library search path
+    #[arg(long, default_value = "std")]
+    std: String,
+
     #[command(subcommand)]
     command: Commands,
 }
@@ -43,36 +49,35 @@ enum Commands {
 fn main() {
     let cli = Cli::parse();
 
-    if let Err(err) = run(cli.command) {
+    if let Err(err) = run(&cli) {
         eprintln!("{err}")
     }
 }
 
-fn run(command: Commands) -> anyhow::Result<()> {
-    match command {
+fn run(cli: &Cli) -> anyhow::Result<()> {
+    match &cli.command {
         Commands::Parse { input } => {
             parse(&input)?;
         }
         Commands::Eval { input } => {
-            eval(&input)?;
+            eval(parse(&input)?, &cli.std)?;
         }
-        Commands::Export { input } => export(&input)?,
+        Commands::Export { input } => {
+            export(eval(parse(&input)?, &cli.std)?)?;
+        }
     }
+    eprintln!("Success!");
 
     Ok(())
 }
 
-fn parse(input: &str) -> anyhow::Result<SourceFile> {
-    let source_file = SourceFile::load(input)?;
-
-    eprintln!("{input} parsed successfully");
-    Ok(source_file)
+fn parse(input: impl AsRef<Path>) -> anyhow::Result<SourceFile> {
+    Ok(SourceFile::load(input)?)
 }
 
-fn eval(input: &str) -> anyhow::Result<microcad_lang::ObjectNode> {
-    let source_file = parse(input)?;
+fn eval(source_file: SourceFile, std: impl AsRef<Path>) -> anyhow::Result<ObjectNode> {
     let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_std("std")
+        .with_std(std)?
         .build();
 
     let node = context.eval().map_err(|err| anyhow::anyhow!("{err}"))?;
@@ -80,15 +85,11 @@ fn eval(input: &str) -> anyhow::Result<microcad_lang::ObjectNode> {
     if context.diag().has_errors() {
         let mut w = std::io::stderr();
         context.diag().pretty_print(&mut w, &context)?;
-    } else {
-        eprintln!("{input} evaluated successfully");
     }
 
     Ok(node)
 }
 
-fn export(input: &str) -> anyhow::Result<()> {
-    let node = eval(input)?;
-    microcad_std::export(node)?;
-    Ok(())
+fn export(node: ObjectNode) -> anyhow::Result<()> {
+    Ok(microcad_std::export(node)?)
 }

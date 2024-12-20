@@ -3,7 +3,7 @@
 
 use microcad_lang::{
     eval::{Context, Symbols},
-    parse::{ModuleDefinition, SourceFile},
+    parse::{ModuleDefinition, ParseResult, SourceFile},
 };
 
 /// Builder for a context
@@ -34,24 +34,22 @@ impl ContextBuilder {
     /// Add std library to context
     ///
     /// - `search_path`: path to search for the std library, usually the directory containing the std.µcad file
-    pub fn with_std(mut self, search_path: impl AsRef<std::path::Path>) -> Self {
+    pub fn with_std(mut self, search_path: impl AsRef<std::path::Path>) -> ParseResult<Self> {
         self = self.with_builtin();
 
-        let std_source_file = match SourceFile::load(search_path.as_ref().join("std.µcad")) {
-            Ok(std_source_file) => std_source_file,
-            Err(err) => panic!("ERROR: {err:?}"),
-        };
+        let std_source_file = SourceFile::load(search_path.as_ref().join("std.µcad"))?;
         let context = Self::new(std_source_file.clone()).with_builtin().build();
-
         let namespace = context
             .current_source_file()
             .expect("std library missing")
             .eval_as_namespace(&mut self.context, "std".into())
             .expect("failure evaluating std library");
+
         use microcad_lang::eval::*;
         self.context.add_source_file(std_source_file);
         self.context.add(Symbol::Namespace(namespace));
-        self
+
+        Ok(self)
     }
 
     /// Add a module to the context
