@@ -1,8 +1,6 @@
-# µcad Types
+# Primitive Types
 
-## Primitive Types
-
-### Integer
+## Integer
 
 The type `integer` contains a natural number.
 
@@ -12,7 +10,7 @@ The type `integer` contains a natural number.
 i = 3;
 ```
 
-### Scalar
+## Scalar
 
 The type `scalar` contains a floating number and must be written with at least one decimal place (or in percent).
 
@@ -24,7 +22,7 @@ pi =  3.1415;
 percent = 55%;
 ```
 
-### Length
+## Length
 
 Length are used in describing dimensions and must be given with a unit.
 
@@ -39,7 +37,7 @@ inches = 39.37007874015748in;
 std::assert( [millimeters, centimeters, meters, inches].equal() );
 ```
 
-### Angle
+## Angle
 
 Angles are used with rotations and in constrains when proving measures.
 
@@ -56,7 +54,7 @@ turn = 0.5turn;
 std::assert( [degree, degree_, grad, turn, radian].equal() );
 ```
 
-### Area
+## Area
 
 ![test](.banner/types_primitive_area.png)
 
@@ -71,7 +69,7 @@ std::assert(square_centimeter = 0.1m²);
 std::assert(square_inch ~ 0.1m² +-1%);
 ```
 
-### Volume
+## Volume
 
 ![test](.banner/types_primitive_volume.png)
 
@@ -92,7 +90,7 @@ std::assert(centiliter = 1l);
 std::assert(milliliter = 1l);
 ```
 
-### String
+## String
 
 Text can be used to logging or to render text.
 
@@ -109,7 +107,7 @@ std::info(text);
 std::geo2d::text(text);
 ```
 
-### Color
+## Color
 
 Colors are defined by using hash mark (`#`) followed by hexadecimal digits for red, green and blue:
 
@@ -133,7 +131,7 @@ Illegal values for color:
 no_color = #00FF0
 ```
 
-### Weight
+## Weight
 
 Weights can be calculated by applying volumes to materials.
 
@@ -158,7 +156,7 @@ std::assert(pound ~ 1kg +-1%);
 vec2 = (x=1, y=2)cm;
 ```
 
-### Vec3
+## Vec3
 
 3D vectors are written as named tuples with builtin values `x`, `y` and `z`.
 
@@ -168,11 +166,11 @@ vec2 = (x=1, y=2)cm;
 vec3 = (x=1, y=2, z=3)cm;
 ```
 
-### Vec4
+## Vec4
 
 TODO
 
-### Bool
+## Bool
 
 Boolean is the result type of boolean expressions which may just be `true` or `false`.
 
