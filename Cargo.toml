@@ -36,5 +36,5 @@ microcad-core = { path = "core", version = "0.1.0" }
 microcad-export = { path = "export", version = "0.1.0" }
 microcad-lang = { path = "lang", version = "0.1.0" }
 microcad-std = { path = "std", version = "0.1.0" }
-microcad-builtin-proc-macro = { path = "builtin", version = "0.1.0" }
+microcad-builtin-proc-macro = { path = "builtin-proc-macro", version = "0.1.0" }
 microcad-cli = { path = "tools/cli", version = "0.1.0" }
