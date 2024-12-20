@@ -19,6 +19,11 @@ Simple basic shapes can be composed to create complex geometries which then can 
   - [Content](#content)
   - [Quick start](#quick-start)
     - [Installation](#installation)
+    - [Basic Concepts](#basic-concepts)
+      - [parse](#parse)
+      - [eval](#eval)
+      - [render](#render)
+      - [export](#export)
     - [Basic example](#basic-example)
   - [Source code explanation](#source-code-explanation)
   - [Contribute](#contribute)
@@ -43,6 +48,40 @@ cargo install microcad-cli
 ```
 
 You can also build µcad from source by cloning the repository (see section [Contribute](#contribute)).
+
+### Basic Concepts
+
+The µcad compiler does not generate a program like other compilers do.
+Instead it reads the code and processes at the same time into a resulting output amd without any runtime.
+
+The processing of µcad source code files into a output files is divided into four separate passes:
+
+![passes](doc/images/passes.svg)
+
+#### parse
+
+In this pass the source files are read and the [grammar](lang/grammar.pest) is interpreted into the symbol table.
+Any errors which occur here are related to basic syntax errors.
+
+#### eval
+
+In the eval*uation* pass things will be processed into an *object tree*.
+While this pass the following things will be done.
+
+- expressions will calculated
+- functions will be called
+- geometric object nodes will be generated
+- any console output will be done
+
+Any errors which occur here are related to semantic issues.
+
+#### render
+
+In the render pass 2D renderings and images of the object nodes are generated into SVG output.
+
+#### export
+
+In the export pass any 3D output will be generated.
 
 ### Basic example
 
