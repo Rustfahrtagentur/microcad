@@ -34,7 +34,7 @@ Install µcad from [crates.io](https://crates.io) by using cargo:
 
 ### Installation
 
-*Note*: The microcad-cli binary crate is not yet available on crates.io, but you can install it from the source code.
+*Note*: The `microcad-cli` binary crate is not yet available on crates.io, but you can install it from the source code.
 
 To install the latest version of µcad via cargo, type:
 
@@ -42,7 +42,7 @@ To install the latest version of µcad via cargo, type:
 cargo install microcad-cli
 ```
 
-You can also build µcad from source by cloning the repository, see the `Contribute` section below.
+You can also build µcad from source by cloning the repository (see section [Contribute](#contribute)).
 
 ### Basic example
 
