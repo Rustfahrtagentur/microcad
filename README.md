@@ -19,8 +19,13 @@ Simple basic shapes can be composed to create complex geometries which then can 
   - [Content](#content)
   - [Quick start](#quick-start)
     - [Installation](#installation)
+    - [Basic Concepts](#basic-concepts)
+      - [parse](#parse)
+      - [evaluate](#evaluate)
+      - [export](#export)
+      - [view](#view)
     - [Basic example](#basic-example)
-  - [Source code explanation](#source-code-explanation)
+      - [Source code explanation](#source-code-explanation)
   - [Contribute](#contribute)
     - [Get Source Code](#get-source-code)
     - [Get External Libraries](#get-external-libraries)
@@ -29,12 +34,10 @@ Simple basic shapes can be composed to create complex geometries which then can 
 
 ## Quick start
 
-You can try out µcad with an example.
-Install µcad from [crates.io](https://crates.io) by using cargo:
+You can try out µcad with an example using the command line tool (`microcad-cli`)
+which can be installed from [crates.io](https://crates.io) by using `cargo`:
 
 ### Installation
-
-*Note*: The `microcad-cli` binary crate is not yet available on crates.io, but you can install it from the source code.
 
 To install the latest version of µcad via cargo, type:
 
@@ -44,9 +47,49 @@ cargo install microcad-cli
 
 You can also build µcad from source by cloning the repository (see section [Contribute](#contribute)).
 
+### Basic Concepts
+
+The µcad interpreter runs programs which generate geometry files.
+The processing of µcad source code files into output files is divided into separate passes:
+
+![passes](doc/images/passes.svg)
+
+#### parse
+
+In the **parse** pass the source files are read with the [grammar](lang/grammar.pest) into the *syntax tree*.
+Any errors which occur here are related to file access or syntax.
+
+#### evaluate
+
+In the **evaluate** pass the *syntax tree*  will be processed into the *object node tree*
+which is an structured representation of the geometry.
+While this pass the following things will be done:
+
+- expressions will be calculated
+- functions will be called
+- modules will generate *object nodes*
+- user messages will be output on console
+
+Any errors which occur here are related to semantic issues.
+
+#### export
+
+In the **export** pass the *object nodes* will be taken to generate 2D or 3D output files
+(e.g. SVG or STL).
+While this pass the following things will be done:
+
+- geometric algorithms will be processed
+- geometries will be rendered
+- the output files will be written
+
+#### view
+
+The **view** pass generates images which can be shown to visualize *object nodes* (e.g. in an IDE).
+Any errors which occur here are related to geometrical processing or file access.
+
 ### Basic example
 
-You can run a basic example by typing:
+After installing, you can run a basic example by typing:
 
 ```sh
 microcad eval ./examples/lid.µcad
@@ -58,7 +101,8 @@ This will *evaluate* the input file and will calculate the volume of the geometr
 Volume: 48.415571412489506cm³
 ```
 
-The *evaluate* command will not export the output geometry. Instead, it will simply run the program, which prints out the volume.
+The *evaluate* command will not export the output geometry. Instead, it will simply run the program,
+which prints out the volume.
 
 To generate an STL model file called, use the `export` command with an additional output file name:
 
@@ -69,7 +113,7 @@ microcad export ./examples/lid.µcad
 The output file `lid.stl`, can be displayed e.g. with [MeshLab](https://www.meshlab.net/).
 The resulting STL model looks like this: ![Lid](examples/lid.png)
 
-## Source code explanation
+#### Source code explanation
 
 The source file defines a *module* called `lid`, which instantiates two cylinders with different diameters and subtract them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
 
