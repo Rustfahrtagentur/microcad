@@ -1,10 +1,10 @@
 # µcad
 
-[![Status](https://github.com/Rustfahrtagentur/mcad/actions/workflows/rust.yml/badge.svg)](https://github.com/Rustfahrtagentur/mcad/actions)
-[![Crates.io](https://img.shields.io/crates/v/mcad.svg)](https://crates.io/crates/mcad)
-[![Documentation](https://docs.rs/mcad/badge.svg)](https://docs.rs/mcad/)
-[![Codecov](https://codecov.io/github/Rustfahrtagentur/mcad/coverage.svg?branch=main)](https://codecov.io/gh/Rustfahrtagentur/mcad)
-[![Dependency status](https://deps.rs/repo/github/Rustfahrtagentur/mcad/status.svg)](https://deps.rs/repo/github/Rustfahrtagentur/mcad)
+[![Status](https://github.com/Rustfahrtagentur/mcad/actions/workflows/rust.yml/badge.svg)](https://github.com/Rustfahrtagentur/microcad/actions)
+[![Crates.io](https://img.shields.io/crates/v/mcad.svg)](https://crates.io/crates/microcad-cli)
+[![Documentation](https://docs.rs/mcad/badge.svg)](https://docs.rs/microcad-cli/)
+[![Codecov](https://codecov.io/github/Rustfahrtagentur/mcad/coverage.svg?branch=main)](https://codecov.io/gh/Rustfahrtagentur/microcad)
+[![Dependency status](https://deps.rs/repo/github/Rustfahrtagentur/mcad/status.svg)](https://deps.rs/repo/github/Rustfahrtagentur/microcad)
 
 ![µcad Logo](logo.png)
 
