@@ -1,4 +1,4 @@
-# µcad
+# µcad language
 
 ## Programming Elements
 
@@ -14,9 +14,9 @@
 
 ## Builtin Libraries
 
-* [`std`: Standard Library](std/README.md)
-* [`math`: Mathematical](math.md)
-* [`algorithm` :Geometric Algorithms](algorithm/README.md)
+* [Standard Library (`std`)](std/README.md)
+* [Mathematical (`math`)](math.md)
+* [Geometric Algorithms (`algorithm`)](algorithm/README.md)
 
 ## Debugging
 

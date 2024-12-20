@@ -155,6 +155,10 @@ Volume: 48.415571412489506cm³
 
 We can now load the STL into a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
 
+## Further Information
+
+- [µcad language](doc/README.md) - description of all language features
+
 ## Contribute
 
 We welcome contributions to µcad, whether it is a bug report, feature request, or a pull request.
