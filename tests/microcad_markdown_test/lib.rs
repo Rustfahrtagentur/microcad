@@ -19,7 +19,7 @@ use anyhow::{Context, Result};
 macro_rules! warning {
     ($($tokens: tt)*) => {
         // HINT: switch `note` -> `warning` to activate debug messages
-        println!("cargo:warning={}", format!($($tokens)*))
+        println!("cargo:note={}", format!($($tokens)*))
     }
 }
 
@@ -51,8 +51,13 @@ static SEARCH_PATH: &str = \"../std\";
     // directories to exclude
     let exclude_dirs = ["target", "thirdparty"];
 
+    let mut banners = Vec::new();
+
     // read all *Markdown files and write result into `code`
-    scan(&mut code, path.as_ref(), "md", &exclude_dirs)?;
+    scan(&mut code, path.as_ref(), "md", &exclude_dirs, &mut banners)?;
+
+    // remove any previous banners
+    remove_banners(path, &exclude_dirs, &banners)?;
 
     // reformat code and write into file
     match rustfmt_wrapper::rustfmt(code) {
@@ -76,7 +81,7 @@ fn remove_banners(
     exclude_dirs: &[&str],
     exclude_files: &Vec<String>,
 ) -> Result<()> {
-    warning!("remove_banners: {exclude_files:?}");
+    //warning!("remove_banners: {:?} {exclude_files:?}", path.as_ref());
     for entry in std::fs::read_dir(&path)?.flatten() {
         // get file type
         if let Ok(file_type) = entry.file_type() {
@@ -106,9 +111,9 @@ fn clean_dir(path: impl AsRef<std::path::Path>, exclude_files: &[String]) -> Res
         .flatten()
         .filter(|entry| entry.file_type().unwrap().is_file())
     {
-        if exclude_files.contains(&entry.path().to_string_lossy().to_string()) {
-            warning!("remove: {:?}", entry.path());
-            //std::fs::remove_file(entry.path())?;
+        if !exclude_files.contains(&entry.path().to_string_lossy().to_string()) {
+            // warning!("remove: {:?}", entry.path());
+            std::fs::remove_file(entry.path())?;
         }
     }
     Ok(())
@@ -120,10 +125,10 @@ fn scan(
     path: &std::path::Path,
     extension: &str,
     exclude_dirs: &[&str],
+    banners: &mut Vec<String>,
 ) -> Result<bool> {
     // prepare return value
     let mut found = false;
-    let mut banners = Vec::new();
     // read given directory
     for entry in std::fs::read_dir(path)?.flatten() {
         // get file type
@@ -133,7 +138,7 @@ fn scan(
             if file_type.is_dir() && !exclude_dirs.contains(&file_name.as_str()) {
                 let mut code = String::new();
                 // scan deeper
-                if scan(&mut code, &entry.path(), extension, exclude_dirs)? {
+                if scan(&mut code, &entry.path(), extension, exclude_dirs, banners)? {
                     if let Some(name) = entry.path().file_stem() {
                         let name = name.to_str().unwrap();
                         output.push_str(&format!(
@@ -151,7 +156,7 @@ fn scan(
                 }
             } else if file_type.is_file()
                 && file_name.ends_with(&format!(".{extension}"))
-                && !scan_for_tests(output, &entry.path(), &mut banners)?
+                && !scan_for_tests(output, &entry.path(), banners)?
             {
                 // tell cargo to watch this file
                 println!("cargo:rerun-if-changed={}", entry.path().display());
@@ -159,10 +164,6 @@ fn scan(
                 found = true;
             }
         }
-    }
-    if found {
-        // remove any previous banners
-        remove_banners(path, exclude_dirs, &banners)?;
     }
 
     Ok(found)
@@ -192,14 +193,13 @@ fn scan_for_tests(
     let mut test_name = String::new();
     let mut test_code = String::new();
 
+    let start = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#_\w]+))?"#).expect("bad regex");
+    let end = Regex::new(r#"```"#).expect("bad regex");
+
     // read all lines in the file
     for line in md_content.lines() {
         // match code starting marker
-        if let Some(start) = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#_\w]+))?"#)
-            .expect("bad regex")
-            .captures_iter(line)
-            .next()
-        {
+        if let Some(start) = start.captures_iter(line).next() {
             if let Some(name) = start.name("name") {
                 // remember test name
                 test_name = name.as_str().to_string();
@@ -207,12 +207,8 @@ fn scan_for_tests(
                 test_code.clear();
             }
         } else if !test_name.is_empty() {
-            if Regex::new(r#"```"#) // match code end marker
-                .expect("bad regex")
-                .captures_iter(line)
-                .next()
-                .is_some()
-            {
+            // match code end marker
+            if end.captures_iter(line).next().is_some() {
                 // generate test code
                 let banner =
                     write_test_code(output, file_path, test_name.as_str(), test_code.as_str());
