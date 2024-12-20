@@ -294,12 +294,12 @@ fn write_test_code(
                 Some("fail") =>
                     r##"{
                             Err(err) => {
-                                let _ = std::fs::hard_link("images/fails.png", banner);
+                                let _ = std::fs::hard_link("images/fail_ok.png", banner);
 
                                 log::debug!("{err}")
                             },
                             Ok(source) => { 
-                                let _ = std::fs::hard_link("images/succeeds.png", banner);
+                                let _ = std::fs::hard_link("images/ok_fail.png", banner);
 
                                 let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
                                 if let Err(err) = context.eval() {
@@ -317,22 +317,22 @@ fn write_test_code(
                             Ok(source) => {
                                 let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
                                 if let Err(err) = context.eval() {
-                                    let _ = std::fs::hard_link("images/failing.png", banner);
+                                    let _ = std::fs::hard_link("images/fail.png", banner);
                                     panic!("{err}");
                                 } else {
                                     if context.diag().error_count > 0 {
-                                        let _ = std::fs::hard_link("images/failing.png", banner);
+                                        let _ = std::fs::hard_link("images/fail.png", banner);
                                         let mut w = Vec::new();
                                         context.diag().pretty_print(&mut w, &context).expect("internal error");
                                         panic!("ERROR: there were {error_count} errors:\n{w}", error_count = context.diag().error_count, 
                                                 w = String::from_utf8(w).expect("utf-8 error"));
                                     }
                                     log::trace!("test succeeded");
-                                    let _ = std::fs::hard_link("images/success.png", banner);
+                                    let _ = std::fs::hard_link("images/ok.png", banner);
                                 }
                             },
                             Err(err) => {
-                                let _ = std::fs::hard_link("images/failing.png", banner);
+                                let _ = std::fs::hard_link("images/fail.png", banner);
 
                                 panic!("ERROR: {err}")
                             },
