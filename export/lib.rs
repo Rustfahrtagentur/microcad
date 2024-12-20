@@ -8,6 +8,7 @@ pub mod stl;
 pub mod svg;
 pub mod tree_dump;
 
+use microcad_core::CoreResult;
 pub use microcad_core::{CoreError, ExportSettings};
 use microcad_lang::objecttree::*;
 
@@ -31,16 +32,22 @@ pub fn export(export_settings: ExportSettings) -> ObjectNode {
 }
 
 /// The `ExporterFactory` creates a new exporter based on the file extension and the export settings
-type ExporterFactory = fn(&ExportSettings) -> Result<Box<dyn Exporter>, CoreError>;
+type ExporterFactory = fn(&ExportSettings) -> CoreResult<Box<dyn Exporter>>;
 
 /// Iterate over all descendent nodes and export the ones with an Export tag
-pub fn export_tree(node: ObjectNode, factory: ExporterFactory) -> Result<(), CoreError> {
+pub fn export_tree(
+    node: ObjectNode,
+    factory: ExporterFactory,
+) -> CoreResult<Vec<std::path::PathBuf>> {
+    let mut exports = Vec::new();
     node.descendants().try_for_each(|n| {
         let inner = n.borrow();
         if let ObjectNodeInner::Export(ref export_settings) = *inner {
+            exports.push(export_settings.file_path()?);
             factory(export_settings)?.export(n.clone())
         } else {
             Ok(())
         }
-    })
+    })?;
+    Ok(exports)
 }

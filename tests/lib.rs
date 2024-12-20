@@ -112,6 +112,7 @@ fn test_source_file(file_name: &str) {
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_std("../std")
+        .expect("no std found")
         .build();
 
     let std_symbol = context.fetch(&"std".into()).expect("test error");
@@ -629,6 +630,7 @@ fn test_with_std() {
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_std("../std")
+        .expect("no std found")
         .build();
 
     let node = context.eval().expect("test error");

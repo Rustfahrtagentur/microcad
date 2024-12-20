@@ -52,7 +52,10 @@ pub struct SourceFile {
 impl SourceFile {
     /// Load µcad source file from given `path`
     pub fn load(path: impl AsRef<std::path::Path>) -> ParseResult<Self> {
-        let mut file = std::fs::File::open(&path)?;
+        let mut file = match std::fs::File::open(&path) {
+            Ok(file) => file,
+            _ => return Err(ParseError::LoadSource(path.as_ref().into())),
+        };
         let mut buf = String::new();
 
         file.read_to_string(&mut buf)?;

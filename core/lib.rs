@@ -32,6 +32,8 @@ pub type Angle = cgmath::Rad<Scalar>;
 /// Id type (base of all identifiers)
 pub type Id = compact_str::CompactString;
 
+use std::str::FromStr;
+
 pub use boolean_op::BooleanOp;
 pub use error::*;
 
@@ -99,10 +101,14 @@ impl ExportSettings {
     }
 
     /// return file name
-    pub fn filename(&self) -> Option<&str> {
-        self.get("filename").and_then(|filename| filename.as_str())
+    pub fn file_path(&self) -> CoreResult<std::path::PathBuf> {
+        match self.get("filename") {
+            Some(filename) => Ok(std::path::PathBuf::from_str(
+                filename.as_str().expect("Filename must be a string"),
+            )?),
+            None => Err(CoreError::NoFilenameSpecifiedForExport),
+        }
     }
-
     /// Return render precision
     pub fn render_precision(&self) -> CoreResult<f64> {
         if let Some(precision) = self.0.get("render_precision") {
@@ -117,16 +123,14 @@ impl ExportSettings {
     }
 
     /// Get exporter ID
-    pub fn exporter_id(&self) -> Option<String> {
+    pub fn exporter_id(&self) -> CoreResult<Option<String>> {
         if let Some(exporter) = self.0.get("exporter") {
-            Some(exporter.to_string())
-        } else if let Some(filename) = self.filename() {
-            std::path::Path::new(&filename)
-                .extension()
-                .and_then(std::ffi::OsStr::to_str)
-                .map(|f| f.to_string())
+            Ok(Some(exporter.to_string()))
         } else {
-            None
+            Ok(self
+                .file_path()?
+                .extension()
+                .map(|p| p.to_string_lossy().to_string()))
         }
     }
 }
@@ -135,6 +139,9 @@ impl ExportSettings {
 fn export_settings() {
     let export_settings = ExportSettings::with_filename("test.stl".into());
 
-    assert_eq!(export_settings.filename(), Some("test.stl"));
-    assert_eq!(export_settings.exporter_id(), Some("stl".into()))
+    assert_eq!(
+        export_settings.file_path().unwrap(),
+        std::path::PathBuf::from_str("test.stl").unwrap()
+    );
+    assert_eq!(export_settings.exporter_id().unwrap(), Some("stl".into()));
 }
