@@ -14,7 +14,7 @@ std::geo2d::circle(radius = 3.0mm) & std::geo2d::rect(width = 3.0mm, height = 2.
 
 ![test](.banner/intersection_module.png)
 
-```µcad,module
+```µcad,intersection_module
 std::algorithm::intersection() {
     std::geo2d::circle(radius = 3.0mm);
     std::geo2d::rect(width = 3.0mm, height = 2.0mm);

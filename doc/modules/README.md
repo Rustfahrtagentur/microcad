@@ -4,7 +4,7 @@
 
 ![test](.banner/modules_declaration.png)
 
-```µcad,declaration#todo
+```µcad,modules_declaration#todo
 /// use builtin function circle from standard library
 use std::geo2d::circle;
 
