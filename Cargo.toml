@@ -8,14 +8,23 @@ default-members = [
     "lang",
     "std",
     "tests",
-    "builtin",
+    "builtin-proc-macro",
     "tools/cli",
 ]
 
-members = ["core", "export", "lang", "std", "tests", "builtin", "tools/cli"]
+members = [
+    "core",
+    "export",
+    "lang",
+    "std",
+    "tests",
+    "builtin-proc-macro",
+    "tools/cli",
+]
 resolver = "2"
 
 [workspace.package]
+description = "µcad: A CAD system for the 21st century"
 authors = [
     "Michael Winkelmann (michael@winkelmann.site)",
     "Patrick Hoffmann (p.hoffmann@berlin.de)",
