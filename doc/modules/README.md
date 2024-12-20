@@ -1,5 +1,14 @@
 # Modules
 
+Modules in µcad are similar to so-called *classes* in other programming languages
+but also they differ quite a bit.
+
+A module consist of an *identifier*, some *initializers*, *fields*  and *code* which can be run by calling the module like a function.
+If code in a module gets complex it can be separated into functions.
+
+The *parameters* of a module can be defined directly behind the module name (*implicitly*) as well as by several *init()* functions (*explicitly*) which are quite similar to *constructors* in other programming languages.
+
+
 ## Declaration
 
 ![test](.banner/modules_declaration.png)
@@ -18,12 +27,11 @@ module small_disc() {
 small_disc();
 ```
 
-## Elements
+## Module Elements
 
-* [Use Statements](use_statement.md)
 * [Functions](functions.md)
-* [Initialization](init.md)
-* [Parameter Lists](parameter_list.md)
+* [Explicit Initialization (`init`)](init.md)
+* [Implicit Initialization](parameter_list.md)
 * [Fields](fields.md)
 
 ## Examples
