@@ -6,23 +6,13 @@ default-members = [
     "core",
     "export",
     "lang",
-    "render",
     "std",
     "tests",
     "builtin",
     "tools/cli",
 ]
 
-members = [
-    "core",
-    "export",
-    "lang",
-    "render",
-    "std",
-    "tests",
-    "builtin",
-    "tools/cli",
-]
+members = ["core", "export", "lang", "std", "tests", "builtin", "tools/cli"]
 resolver = "2"
 
 [workspace.package]
@@ -39,3 +29,7 @@ license = "AGPL-3.0-or-later"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
+microcad-core = { path = "core" }
+microcad-export = { path = "export" }
+microcad-lang = { path = "lang" }
+microcad-std = { path = "std" }

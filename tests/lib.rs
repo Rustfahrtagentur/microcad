@@ -162,8 +162,8 @@ fn test_source_file(file_name: &str) {
 
 #[test]
 fn difference_svg() {
+    use microcad_export::svg::SvgRenderer;
     use microcad_lang::eval::BuiltinModuleDefinition;
-    use microcad_render::svg::SvgRenderer;
     use microcad_std::{algorithm::*, geo2d::*};
 
     let difference = difference().expect("test error");

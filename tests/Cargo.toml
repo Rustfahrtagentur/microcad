@@ -17,11 +17,10 @@ pest_derive = "2.7"
 anyhow = "1"
 log = "0.4"
 
-microcad-core = { path = "../core" }
-microcad-export = { path = "../export" }
-microcad-lang = { path = "../lang" }
-microcad-render = { path = "../render" }
-microcad-std = { path = "../std" }
+microcad-core = { workspace = true }
+microcad-export = { workspace = true }
+microcad-lang = { workspace = true }
+microcad-std = { workspace = true }
 
 [build-dependencies]
 microcad_markdown_test = { path = "microcad_markdown_test", version = "0.1.0" }

@@ -23,8 +23,7 @@ thiserror = "2.0"
 env_logger = "0.11"
 strum = { version = "0.26", features = ["derive"] }
 
-microcad-core = { path = "../core" }
-microcad-render = { path = "../render" }
+microcad-core = { workspace = true }
 
 [features]
 default = ["geo3d"]

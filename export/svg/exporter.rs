@@ -5,8 +5,8 @@
 
 use std::path::PathBuf;
 
+use crate::svg::renderer::SvgRenderer;
 use microcad_lang::objecttree::ObjectNode;
-use microcad_render::svg::SvgRenderer;
 
 use crate::*;
 

@@ -12,9 +12,9 @@ version.workspace = true
 path = "lib.rs"
 
 [dependencies]
-microcad-core = { path = "../core" }
-microcad-lang = { path = "../lang" }
-microcad-render = { path = "../render" }
+microcad-core = { workspace = true }
+microcad-lang = { workspace = true }
+geo = "0.29"
 
 [lints.rust]
 missing_docs = "warn"

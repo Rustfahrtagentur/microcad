@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Scalable Vector Graphics (SVG) file writer
+//! Scalable Vector Graphics (SVG) file writer and renderer
 
 use geo::CoordsIter;
 use microcad_core::{CoreError, Scalar, *};

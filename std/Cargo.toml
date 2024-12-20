@@ -21,7 +21,6 @@ anyhow = "1.0"
 
 microcad-core = { path = "../core" }
 microcad-lang = { path = "../lang" }
-microcad-render = { path = "../render" }
 microcad-export = { path = "../export" }
 microcad-builtin-proc-macro = { path = "../builtin" }
 

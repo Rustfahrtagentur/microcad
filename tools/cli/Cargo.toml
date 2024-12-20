@@ -14,8 +14,8 @@ path = "main.rs"
 clap = { version = "4", features = ["derive"] }
 anyhow = "1.0"
 
-microcad-std = { path = "../../std" }
-microcad-lang = { path = "../../lang" }
+microcad-std = { workspace = true }
+microcad-lang = { workspace = true }
 
 [lints.rust]
 missing_docs = "warn"
