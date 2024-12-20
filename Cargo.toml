@@ -29,9 +29,9 @@ license = "AGPL-3.0-or-later"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
-microcad-core = { path = "core" }
-microcad-export = { path = "export" }
-microcad-lang = { path = "lang" }
-microcad-std = { path = "std" }
-microcad-builtin-proc-macro = { path = "builtin" }
-microcad-cli = { path = "tools/cli" }
+microcad-core = { path = "core", version = "0.1.0" }
+microcad-export = { path = "export", version = "0.1.0" }
+microcad-lang = { path = "lang", version = "0.1.0" }
+microcad-std = { path = "std", version = "0.1.0" }
+microcad-builtin-proc-macro = { path = "builtin", version = "0.1.0" }
+microcad-cli = { path = "tools/cli", version = "0.1.0" }
