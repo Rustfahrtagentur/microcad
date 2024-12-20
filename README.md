@@ -21,7 +21,7 @@ Simple basic shapes can be composed to create complex geometries which then can 
     - [Installation](#installation)
     - [Basic Concepts](#basic-concepts)
       - [parse](#parse)
-      - [eval](#eval)
+      - [evaluate](#evaluate)
       - [render](#render)
       - [export](#export)
     - [Basic example](#basic-example)
@@ -60,28 +60,33 @@ The processing of µcad source code files into a output files is divided into fo
 
 #### parse
 
-In this pass the source files are read and the [grammar](lang/grammar.pest) is interpreted into the symbol table.
+In this pass the source files are read and the [grammar](lang/grammar.pest) is interpreted into the *symbol table*.
 Any errors which occur here are related to basic syntax errors.
 
-#### eval
+#### evaluate
 
 In the eval*uation* pass things will be processed into an *object tree*.
-While this pass the following things will be done.
 
-- expressions will calculated
+While this pass the following things will be done:
+
+- expressions will be calculated
 - functions will be called
-- geometric object nodes will be generated
+- geometric *object nodes* will be generated
 - any console output will be done
 
-Any errors which occur here are related to semantic issues.
+Any errors which occur here are related to semantic or geometry issues.
 
 #### render
 
-In the render pass 2D renderings and images of the object nodes are generated into SVG output.
+In the render pass 2D renderings or images of the *object nodes* are generated into SVG output.
+
+Any errors which occur here are related to file access errors.
 
 #### export
 
 In the export pass any 3D output will be generated.
+
+Any errors which occur here are related to file access errors.
 
 ### Basic example
 
