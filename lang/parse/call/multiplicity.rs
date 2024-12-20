@@ -58,8 +58,8 @@ where
 {
     /// Create a new Combinations iterator
     pub fn new(data: &CombinationMap<T>) -> Self {
-        use itertools::Itertools;
-        let ids_sorted: Vec<Id> = data.keys().sorted().cloned().collect();
+        let mut ids_sorted: Vec<Id> = data.keys().cloned().collect();
+        ids_sorted.sort();
         let keys_sorted: Vec<usize> = (0..ids_sorted.len()).collect();
 
         let indices = ids_sorted.iter().map(|_| 0).collect();
