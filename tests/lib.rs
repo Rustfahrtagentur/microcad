@@ -48,8 +48,6 @@ fn eval_context(context: &mut microcad_lang::eval::Context) -> ObjectNode {
             .diag()
             .pretty_print(&mut std::io::stderr(), context)
             .expect("test error");
-
-        eprintln!("ERROR: {} errors found", context.diag().error_count);
     }
 
     node
