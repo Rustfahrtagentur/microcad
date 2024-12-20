@@ -20,11 +20,14 @@ authors = [
     "Michael Winkelmann (michael@winkelmann.site)",
     "Patrick Hoffmann (p.hoffmann@berlin.de)",
 ]
-
 version = "0.1.0"
 edition = "2021"
+homepage = "https://ucad.xyz"
+repository = "https://github.com/rustfahrtagentur/microcad"
 rust-version = "1.79"
 license = "AGPL-3.0-or-later"
+keywords = ["cad", "geometry", "3d", "printing", "cnc", "openscad"]
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
