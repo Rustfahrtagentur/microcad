@@ -173,7 +173,7 @@ impl SvgRenderer {
 
     /// Return writer
     fn writer(&mut self) -> &mut SvgWriter {
-        self.writer.as_mut().unwrap()
+        self.writer.as_mut().expect("No writer")
     }
 
     fn render_state_to_style(&self) -> String {

@@ -19,10 +19,10 @@ cgmath = "0.18"
 geo = "0.29"
 anyhow = "1.0"
 
-microcad-core = { path = "../core" }
-microcad-lang = { path = "../lang" }
-microcad-export = { path = "../export" }
-microcad-builtin-proc-macro = { path = "../builtin" }
+microcad-core = { workspace = true }
+microcad-lang = { workspace = true }
+microcad-export = { workspace = true }
+microcad-builtin-proc-macro = { workspace = true }
 
 [features]
 default = ["geo3d"]
