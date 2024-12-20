@@ -51,11 +51,13 @@ static SEARCH_PATH: &str = \"../std\";
     // directories to exclude
     let exclude_dirs = ["target", "thirdparty"];
 
-    // remove any previous banners
-    remove_banner(path.as_ref(), &exclude_dirs)?;
+    let mut banners = Vec::new();
 
     // read all *Markdown files and write result into `code`
-    scan(&mut code, path.as_ref(), "md", &exclude_dirs)?;
+    scan(&mut code, path.as_ref(), "md", &exclude_dirs, &mut banners)?;
+
+    // remove any previous banners
+    remove_banners(path, &exclude_dirs, &banners)?;
 
     // reformat code and write into file
     match rustfmt_wrapper::rustfmt(code) {
@@ -74,7 +76,12 @@ static SEARCH_PATH: &str = \"../std\";
 
 /// Remove all banners in `path` and exclude folders whose names are contained
 /// in `exclude_dirs` from search.
-fn remove_banner(path: impl AsRef<std::path::Path>, exclude_dirs: &[&str]) -> Result<()> {
+fn remove_banners(
+    path: impl AsRef<std::path::Path>,
+    exclude_dirs: &[&str],
+    exclude_files: &Vec<String>,
+) -> Result<()> {
+    //warning!("remove_banners: {:?} {exclude_files:?}", path.as_ref());
     for entry in std::fs::read_dir(&path)?.flatten() {
         // get file type
         if let Ok(file_type) = entry.file_type() {
@@ -83,9 +90,9 @@ fn remove_banner(path: impl AsRef<std::path::Path>, exclude_dirs: &[&str]) -> Re
                 && !exclude_dirs.contains(&entry.file_name().to_string_lossy().to_string().as_str())
             {
                 if entry.file_name() == ".banner" {
-                    remove_dir(entry.path())?;
+                    clean_dir(entry.path(), exclude_files)?;
                 } else {
-                    remove_banner(entry.path(), exclude_dirs)?;
+                    remove_banners(entry.path(), exclude_dirs, exclude_files)?;
                 }
             }
         }
@@ -95,7 +102,7 @@ fn remove_banner(path: impl AsRef<std::path::Path>, exclude_dirs: &[&str]) -> Re
 }
 
 /// Remove all files within `.banner` directory
-fn remove_dir(path: impl AsRef<std::path::Path>) -> Result<()> {
+fn clean_dir(path: impl AsRef<std::path::Path>, exclude_files: &[String]) -> Result<()> {
     warning!("remove banners in: {:?}", path.as_ref());
 
     // list all files within `.banner` directory and remove them
@@ -104,7 +111,10 @@ fn remove_dir(path: impl AsRef<std::path::Path>) -> Result<()> {
         .flatten()
         .filter(|entry| entry.file_type().unwrap().is_file())
     {
-        std::fs::remove_file(entry.path())?;
+        if !exclude_files.contains(&entry.path().to_string_lossy().to_string()) {
+            // warning!("remove: {:?}", entry.path());
+            std::fs::remove_file(entry.path())?;
+        }
     }
     Ok(())
 }
@@ -114,7 +124,8 @@ fn scan(
     output: &mut String,
     path: &std::path::Path,
     extension: &str,
-    exclude_dir: &[&str],
+    exclude_dirs: &[&str],
+    banners: &mut Vec<String>,
 ) -> Result<bool> {
     // prepare return value
     let mut found = false;
@@ -124,10 +135,10 @@ fn scan(
         if let Ok(file_type) = entry.file_type() {
             let file_name = entry.file_name().into_string().unwrap();
             // check if directory or file
-            if file_type.is_dir() && !exclude_dir.contains(&file_name.as_str()) {
+            if file_type.is_dir() && !exclude_dirs.contains(&file_name.as_str()) {
                 let mut code = String::new();
                 // scan deeper
-                if scan(&mut code, &entry.path(), extension, exclude_dir)? {
+                if scan(&mut code, &entry.path(), extension, exclude_dirs, banners)? {
                     if let Some(name) = entry.path().file_stem() {
                         let name = name.to_str().unwrap();
                         output.push_str(&format!(
@@ -145,7 +156,7 @@ fn scan(
                 }
             } else if file_type.is_file()
                 && file_name.ends_with(&format!(".{extension}"))
-                && !scan_for_tests(output, &entry.path())?
+                && !scan_for_tests(output, &entry.path(), banners)?
             {
                 // tell cargo to watch this file
                 println!("cargo:rerun-if-changed={}", entry.path().display());
@@ -154,13 +165,18 @@ fn scan(
             }
         }
     }
+
     Ok(found)
 }
 
 /// Read single *Markdown* file and collect included tests in `tree`.
 ///
 /// Generates tree nodes if name can be split into several names which are separated by `.`.
-fn scan_for_tests(output: &mut String, file_path: &std::path::Path) -> Result<bool> {
+fn scan_for_tests(
+    output: &mut String,
+    file_path: &std::path::Path,
+    banners: &mut Vec<String>,
+) -> Result<bool> {
     use regex::*;
     use std::{fs::*, io::*};
 
@@ -177,14 +193,13 @@ fn scan_for_tests(output: &mut String, file_path: &std::path::Path) -> Result<bo
     let mut test_name = String::new();
     let mut test_code = String::new();
 
+    let start = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#_\w]+))?"#).expect("bad regex");
+    let end = Regex::new(r#"```"#).expect("bad regex");
+
     // read all lines in the file
     for line in md_content.lines() {
         // match code starting marker
-        if let Some(start) = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#_\w]+))?"#)
-            .expect("bad regex")
-            .captures_iter(line)
-            .next()
-        {
+        if let Some(start) = start.captures_iter(line).next() {
             if let Some(name) = start.name("name") {
                 // remember test name
                 test_name = name.as_str().to_string();
@@ -192,14 +207,14 @@ fn scan_for_tests(output: &mut String, file_path: &std::path::Path) -> Result<bo
                 test_code.clear();
             }
         } else if !test_name.is_empty() {
-            if Regex::new(r#"```"#) // match code end marker
-                .expect("bad regex")
-                .captures_iter(line)
-                .next()
-                .is_some()
-            {
+            // match code end marker
+            if end.captures_iter(line).next().is_some() {
                 // generate test code
-                write_test_code(output, file_path, test_name.as_str(), test_code.as_str());
+                let banner =
+                    write_test_code(output, file_path, test_name.as_str(), test_code.as_str());
+                if let Some(banner) = banner {
+                    banners.push(banner.to_string_lossy().to_string());
+                }
 
                 // clear name to signal new test awaited
                 test_name.clear();
@@ -217,7 +232,12 @@ fn scan_for_tests(output: &mut String, file_path: &std::path::Path) -> Result<bo
 }
 
 /// Generate code for one test
-fn write_test_code(f: &mut String, file_path: &std::path::Path, name: &str, code: &str) {
+fn write_test_code(
+    f: &mut String,
+    file_path: &std::path::Path,
+    name: &str,
+    code: &str,
+) -> Option<std::path::PathBuf> {
     // split name into `name` and `mode``
     let (name, mode) = if let Some((name, mode)) = name.split_once('#') {
         (name, Some(mode))
@@ -237,11 +257,8 @@ fn write_test_code(f: &mut String, file_path: &std::path::Path, name: &str, code
     // where to store images
     let banner_path = file_path.parent().unwrap().join(".banner");
     // banner image file of this test
-    let banner = banner_path
-        .join(format!("{name}.png"))
-        .to_string_lossy()
-        .escape_default()
-        .to_string();
+    let banner = banner_path.join(format!("{name}.png"));
+    let banner_esc = banner.to_string_lossy().escape_default().to_string();
 
     //warning!("write_test_code: banner: {banner} {:?}", file_path,);
 
@@ -250,77 +267,78 @@ fn write_test_code(f: &mut String, file_path: &std::path::Path, name: &str, code
 
     // Early exit for "#no_test" and "#todo" suffixes
     match mode {
-        Some("no_test") => return,
+        Some("no_test") => return None,
         Some("todo") => {
-            let _ = std::fs::hard_link("images/todo.png", banner);
-            return;
+            let _ = std::fs::hard_link("images/todo.png", &banner);
+            return Some(banner);
         }
         _ => (),
     };
 
     f.push_str(
-    &format!(
-        r##"#[test]
-            #[allow(non_snake_case)]
-            fn r#{name}() {{
-                microcad_lang::env_logger_init();
-                use microcad_lang::parse::*;
-                use microcad_std::*;
-                use crate::SEARCH_PATH;
-                let banner = "{banner}";
-                match SourceFile::load_from_str(
-                    r#"
-                    {code}"#,
-                ) {handling};
-            }}"##,
-        handling = match mode {
-            Some("fail") =>
-                r##"{
-                        Err(err) => {
-                            let _ = std::fs::hard_link("images/fails.png", banner);
+        &format!(
+            r##"#[test]
+                #[allow(non_snake_case)]
+                fn r#{name}() {{
+                    microcad_lang::env_logger_init();
+                    use microcad_lang::parse::*;
+                    use microcad_std::*;
+                    use crate::SEARCH_PATH;
+                    let banner = "{banner_esc}";
+                    match SourceFile::load_from_str(
+                        r#"
+                        {code}"#,
+                    ) {handling};
+                }}"##,
+            handling = match mode {
+                Some("fail") =>
+                    r##"{
+                            Err(err) => {
+                                let _ = std::fs::hard_link("images/fails.png", banner);
 
-                            log::debug!("{err}")
-                        },
-                        Ok(source) => { 
-                            let _ = std::fs::hard_link("images/succeeds.png", banner);
+                                log::debug!("{err}")
+                            },
+                            Ok(source) => { 
+                                let _ = std::fs::hard_link("images/succeeds.png", banner);
 
-                            let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
-                            if let Err(err) = context.eval() {
-                                log::debug!("{err}");
-                            } else if context.diag().error_count > 0 {
-                                let mut w = std::io::stdout();
-                                context.diag().pretty_print(&mut w, &context).expect("internal error");
-                            } else {
-                                panic!("ERROR: test is marked to fail but succeeded");
-                            }
-                        }
-                    }"##,
-            _ =>
-                r##"{
-                        Ok(source) => {
-                            let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
-                            if let Err(err) = context.eval() {
-                                let _ = std::fs::hard_link("images/failing.png", banner);
-                                panic!("{err}");
-                            } else {
-                                if context.diag().error_count > 0 {
-                                    let _ = std::fs::hard_link("images/failing.png", banner);
-                                    let mut w = Vec::new();
+                                let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
+                                if let Err(err) = context.eval() {
+                                    log::debug!("{err}");
+                                } else if context.diag().error_count > 0 {
+                                    let mut w = std::io::stdout();
                                     context.diag().pretty_print(&mut w, &context).expect("internal error");
-                                    panic!("ERROR: there were {error_count} errors:\n{w}", error_count = context.diag().error_count, 
-                                            w = String::from_utf8(w).expect("utf-8 error"));
+                                } else {
+                                    panic!("ERROR: test is marked to fail but succeeded");
                                 }
-                                log::trace!("test succeeded");
-                                let _ = std::fs::hard_link("images/success.png", banner);
                             }
-                        },
-                        Err(err) => {
-                            let _ = std::fs::hard_link("images/failing.png", banner);
+                        }"##,
+                _ =>
+                    r##"{
+                            Ok(source) => {
+                                let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).build();
+                                if let Err(err) = context.eval() {
+                                    let _ = std::fs::hard_link("images/failing.png", banner);
+                                    panic!("{err}");
+                                } else {
+                                    if context.diag().error_count > 0 {
+                                        let _ = std::fs::hard_link("images/failing.png", banner);
+                                        let mut w = Vec::new();
+                                        context.diag().pretty_print(&mut w, &context).expect("internal error");
+                                        panic!("ERROR: there were {error_count} errors:\n{w}", error_count = context.diag().error_count, 
+                                                w = String::from_utf8(w).expect("utf-8 error"));
+                                    }
+                                    log::trace!("test succeeded");
+                                    let _ = std::fs::hard_link("images/success.png", banner);
+                                }
+                            },
+                            Err(err) => {
+                                let _ = std::fs::hard_link("images/failing.png", banner);
 
-                            panic!("ERROR: {err}")
-                        },
-                    }"##,
-        }
-    )
-);
+                                panic!("ERROR: {err}")
+                            },
+                        }"##,
+            }
+        )
+    );
+    Some(banner)
 }
