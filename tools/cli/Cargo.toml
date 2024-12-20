@@ -3,6 +3,7 @@
 
 [package]
 name = "microcad-cli"
+description = "µcad Command Line Interface"
 authors.workspace = true
 edition.workspace = true
 homepage.workspace = true
