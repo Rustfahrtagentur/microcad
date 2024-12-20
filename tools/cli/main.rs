@@ -43,6 +43,15 @@ enum Commands {
         /// Input µcad file
         input: String,
     },
+
+    /// View the µcad file
+    View {
+        /// Input µcad file
+        input: String,
+
+        /// external viewer to execute
+        viewer: Option<String>,
+    },
 }
 
 /// Main of the command line interpreter
@@ -75,6 +84,10 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
                     .join(",")
             );
         }
+        Commands::View {
+            input: _,
+            viewer: _,
+        } => todo!(),
     }
 
     Ok(())
