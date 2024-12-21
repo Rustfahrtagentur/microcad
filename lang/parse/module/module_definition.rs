@@ -32,9 +32,8 @@ impl ModuleDefinition {
         init: std::rc::Rc<ModuleInitDefinition>,
         multi_argument_map: &MultiArgumentMap,
         context: &mut Context,
-    ) -> EvalResult<ObjectNode> {
-        let mut group = objecttree::group();
-
+        group: &mut crate::ObjectNode,
+    ) -> EvalResult<()> {
         for arg_map in multi_argument_map.combinations() {
             // Copy the arguments to the symbol table of the node
             for (name, value) in arg_map.iter() {
@@ -47,30 +46,13 @@ impl ModuleDefinition {
                 child.detach();
                 group.append(child.clone());
             }
-            init_object.copy(&mut group);
+            init_object.copy(group);
 
             // Now, copy the symbols of the node into the context
             group.copy(context);
-
-            // Evaluate the post-init statements
-            for statement in &self.body.post_init_statements {
-                match statement {
-                    ModuleDefinitionStatement::Assignment(assignment) => {
-                        // Evaluate the assignment and add the symbol to the node
-                        // E.g. `a = 1` will add the symbol `a` to the node
-                        let symbol = assignment.eval(context)?;
-                        group.add(symbol);
-                    }
-                    statement => {
-                        if let Some(Value::Node(new_child)) = statement.eval(context)? {
-                            group.append(new_child);
-                        }
-                    }
-                }
-            }
         }
 
-        Ok(group)
+        Ok(())
     }
 
     /// Find the matching initializer for the given call argument value list
@@ -120,24 +102,38 @@ impl CallTrait for ModuleDefinition {
         context.scope(stack_frame, |context| {
             match self.find_matching_initializer(call_argument_list, context) {
                 Ok((init, multi_argument_map, true)) => {
+                    let mut group: rctree::Node<crate::ObjectNodeInner> = objecttree::group();
+
                     // Call implicit initializer
-                    let node = self.call_init(init, &multi_argument_map, context)?;
-                    nodes.push(node);
+                    self.call_init(init, &multi_argument_map, context, &mut group)?;
 
                     // Let's evaluate the pre-init statements after the implicit initializer
                     for statement in &self.body.pre_init_statements {
-                        statement.eval(context)?;
+                        self.body.eval_statement(statement, context, &mut group)?;
                     }
+                    // Let's evaluate the post-init statements after the implicit initializer
+                    for statement in &self.body.post_init_statements {
+                        self.body.eval_statement(statement, context, &mut group)?;
+                    }
+                    nodes.push(group);
                 }
                 Ok((init, multi_argument_map, false)) => {
+                    let mut group: rctree::Node<crate::ObjectNodeInner> = objecttree::group();
+
                     // Let's evaluate the pre-init statements before the explicit initializer
                     for statement in &self.body.pre_init_statements {
-                        statement.eval(context)?;
+                        self.body.eval_statement(statement, context, &mut group)?;
                     }
 
                     // Call explicit initializer
-                    let node = self.call_init(init, &multi_argument_map, context)?;
-                    nodes.push(node);
+                    self.call_init(init, &multi_argument_map, context, &mut group)?;
+
+                    // Evaluate the post-init statements a
+                    for statement in &self.body.post_init_statements {
+                        self.body.eval_statement(statement, context, &mut group)?;
+                    }
+
+                    nodes.push(group);
                 }
                 Err(err) => {
                     context.error(self, Box::new(err))?;

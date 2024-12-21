@@ -89,6 +89,28 @@ impl ModuleDefinitionBody {
 
         Ok(())
     }
+
+    pub fn eval_statement(
+        &self,
+        statement: &ModuleDefinitionStatement,
+        context: &mut Context,
+        group: &mut crate::ObjectNode,
+    ) -> EvalResult<()> {
+        match statement {
+            ModuleDefinitionStatement::Assignment(assignment) => {
+                // Evaluate the assignment and add the symbol to the node
+                // E.g. `a = 1` will add the symbol `a` to the node
+                let symbol = assignment.eval(context)?;
+                group.add(symbol);
+            }
+            statement => {
+                if let Some(Value::Node(new_child)) = statement.eval(context)? {
+                    group.append(new_child);
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 impl SrcReferrer for ModuleDefinitionBody {
