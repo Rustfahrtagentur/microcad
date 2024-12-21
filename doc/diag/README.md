@@ -21,7 +21,7 @@ lib_test(l=1mm);
 ![test](.banner/lib_test1.png)
 
 ```µcad,lib_test1
-module f( area: area ) {
+module f( area: (width: length, height: length) ) {
   default_width = 2.0m;
   init( height: length) { area = ( width = default_width, height); }
 }
