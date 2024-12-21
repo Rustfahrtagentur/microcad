@@ -12,7 +12,7 @@ include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
 static TEST_OUT_DIR: &str = "output";
 
 #[cfg(test)]
-static DEFAULT_TEST_FILE: &str = "../tests/test_cases/std/algorithm/difference.µcad";
+static DEFAULT_TEST_FILE: &str = "../tests/test_cases/algorithm/difference.µcad";
 
 #[cfg(test)]
 use microcad_lang::*;
