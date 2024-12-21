@@ -65,6 +65,7 @@ fn eval_input_with_context(input: &str) -> (ObjectNode, microcad_lang::eval::Con
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_builtin()
+        .expect("builtin error")
         .build();
     let node = eval_context(&mut context);
 
@@ -229,6 +230,7 @@ fn test_context_builtin() {
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_builtin()
+        .expect("builtin error")
         .build();
 
     let verify_symbol = |context: &mut microcad_lang::eval::Context, names| {
@@ -554,6 +556,7 @@ fn test_load_std() {
 
     let mut context = microcad_std::ContextBuilder::new(std_source_file)
         .with_builtin()
+        .expect("builtin error")
         .build();
 
     let namespace = context
@@ -596,6 +599,7 @@ fn test_load_std() {
 
     let mut context = microcad_std::ContextBuilder::new(source_file)
         .with_builtin()
+        .expect("builtin error")
         .build();
 
     use microcad_lang::eval::*;

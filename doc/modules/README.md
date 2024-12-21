@@ -13,7 +13,7 @@ The *parameters* of a module can be defined directly behind the module name (*im
 
 ![test](.banner/modules_declaration.png)
 
-```µcad,modules_declaration#todo
+```µcad,modules_declaration
 /// use builtin function circle from standard library
 use std::geo2d::circle;
 

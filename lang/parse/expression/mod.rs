@@ -266,7 +266,7 @@ impl Eval for Expression {
                             Ok(Value::Invalid)
                         }
                     },
-                    _ => unimplemented!(),
+                    _ => Err(EvalError::NamedTupleElementAccess(lhs)),
                 }
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),

@@ -232,6 +232,18 @@ pub enum EvalError {
     /// Tuple item not found
     #[error("Tuple item not found {0}")]
     TupleItemNotFound(Identifier),
+
+    /// Cannot get argument
+    #[error("Cannot get argument {0}")]
+    CannotGetArgument(&'static str),
+
+    /// Grammar rule error
+    #[error("Grammar rule error")]
+    GrammarRuleError(String),
+
+    /// Named tuple element access error
+    #[error("Named tuple element access error")]
+    NamedTupleElementAccess(Value),
 }
 
 /// Result type of any evaluation

@@ -5,7 +5,7 @@
 
 ![test](.banner/namespaces_example.png)
 
-```µcad,namespaces_example#todo
+```µcad,namespaces_example
 // namespace module std
 namespace std {
     

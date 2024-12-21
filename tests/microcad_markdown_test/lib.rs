@@ -266,14 +266,13 @@ fn write_test_code(
     let _ = std::fs::create_dir(banner_path);
 
     // Early exit for "#no_test" and "#todo" suffixes
-    match mode {
+    let todo = match mode {
         Some("no_test") => return None,
-        Some("todo") => {
-            let _ = std::fs::hard_link("images/todo.png", &banner);
-            return Some(banner);
-        }
-        _ => (),
+        Some("todo") => true,
+        _ => false,
     };
+
+    let _ = std::fs::remove_file(&banner);
 
     f.push_str(
         &format!(
@@ -285,6 +284,8 @@ fn write_test_code(
                     use microcad_std::*;
                     use crate::SEARCH_PATH;
                     let banner = "{banner_esc}";
+                    #[allow(unused)]
+                    let todo = {todo};
                     match SourceFile::load_from_str(
                         r#"
                         {code}"#,
@@ -295,12 +296,10 @@ fn write_test_code(
                     r##"{
                             Err(err) => {
                                 let _ = std::fs::hard_link("images/fail_ok.png", banner);
-
                                 log::debug!("{err}")
                             },
                             Ok(source) => { 
                                 let _ = std::fs::hard_link("images/ok_fail.png", banner);
-
                                 let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
                                 if let Err(err) = context.eval() {
                                     log::debug!("{err}");
@@ -317,24 +316,39 @@ fn write_test_code(
                             Ok(source) => {
                                 let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
                                 if let Err(err) = context.eval() {
-                                    let _ = std::fs::hard_link("images/fail.png", banner);
-                                    panic!("{err}");
+                                    if todo { 
+                                        let _ = std::fs::hard_link("images/todo.png", banner);
+                                    } else { 
+                                        let _ = std::fs::hard_link("images/fail.png", banner);
+                                        panic!("{err}");
+                                    }
                                 } else {
                                     if context.diag().error_count > 0 {
-                                        let _ = std::fs::hard_link("images/fail.png", banner);
                                         let mut w = Vec::new();
                                         context.diag().pretty_print(&mut w, &context).expect("internal error");
-                                        panic!("ERROR: there were {error_count} errors:\n{w}", error_count = context.diag().error_count, 
-                                                w = String::from_utf8(w).expect("utf-8 error"));
+                                        if todo { 
+                                            let _ = std::fs::hard_link("images/todo.png", banner);
+                                        } else { 
+                                            let _ = std::fs::hard_link("images/fail.png", banner);
+                                            panic!("ERROR: there were {error_count} errors:\n{w}", error_count = context.diag().error_count, 
+                                                    w = String::from_utf8(w).expect("utf-8 error"));
+                                        }
                                     }
                                     log::trace!("test succeeded");
-                                    let _ = std::fs::hard_link("images/ok.png", banner);
+                                    if todo { 
+                                        let _ = std::fs::hard_link("images/not_todo.png", banner);
+                                    } else { 
+                                        let _ = std::fs::hard_link("images/ok.png", banner);
+                                    }
                                 }
                             },
                             Err(err) => {
-                                let _ = std::fs::hard_link("images/fail.png", banner);
-
-                                panic!("ERROR: {err}")
+                                if todo { 
+                                    let _ = std::fs::hard_link("images/todo.png", banner);
+                                } else { 
+                                    let _ = std::fs::hard_link("images/fail.png", banner);
+                                    panic!("ERROR: {err}")
+                                }
                             },
                         }"##,
             }

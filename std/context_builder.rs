@@ -26,19 +26,19 @@ impl ContextBuilder {
     }
 
     /// Add the standard library to the context
-    pub fn with_builtin(mut self) -> Self {
-        self.context.add(crate::builtin_module().into());
-        self
+    pub fn with_builtin(mut self) -> ParseResult<Self> {
+        self.context.add(crate::builtin_module()?.into());
+        Ok(self)
     }
 
     /// Add std library to context
     ///
     /// - `search_path`: path to search for the std library, usually the directory containing the std.µcad file
     pub fn with_std(mut self, search_path: impl AsRef<std::path::Path>) -> ParseResult<Self> {
-        self = self.with_builtin();
+        self = self.with_builtin()?;
 
         let std_source_file = SourceFile::load(search_path.as_ref().join("std.µcad"))?;
-        let context = Self::new(std_source_file.clone()).with_builtin().build();
+        let context = Self::new(std_source_file.clone()).with_builtin()?.build();
         let namespace = context
             .current_source_file()
             .expect("std library missing")

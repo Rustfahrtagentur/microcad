@@ -34,10 +34,10 @@ use microcad_core::ExportSettings;
 use namespace_builder::NamespaceBuilder;
 
 /// Build the standard module
-pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
-    NamespaceBuilder::new("__builtin")
+pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
+    Ok(NamespaceBuilder::new("__builtin")
         // TODO: is this correct= Shouldn't this use add_builtin_module() =
-        .add(math::builtin_module().into())
+        .add(math::builtin_module()?.into())
         .add(geo2d::builtin_module().into())
         .add(geo3d::builtin_module().into())
         .add(algorithm::builtin_module().into())
@@ -50,7 +50,12 @@ pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
                     parameter!(message: String = "Assertion failed")
                 ]),
                 &|args, ctx| {
-                    let message: String = args["message"].clone().try_into()?;
+                    let message: String = if let Some(m) = args.get("message") {
+                        m.clone().try_into()?
+                    } else {
+                        return Err(EvalError::GrammarRuleError("cannot fetch `message`".into()));
+                    };
+
                     let condition: bool = args["condition"].clone().try_into()?;
                     if !condition {
                         use microcad_lang::diag::PushDiag;
@@ -97,5 +102,5 @@ pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
             })
             .into(),
         )
-        .build()
+        .build())
 }

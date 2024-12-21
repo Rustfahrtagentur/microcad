@@ -40,7 +40,10 @@ fn test_assert() {
         Err(err) => panic!("ERROR: {err}"),
     };
 
-    let mut context = ContextBuilder::new(source_file).with_builtin().build();
+    let mut context = ContextBuilder::new(source_file)
+        .with_builtin()
+        .expect("builtin error")
+        .build();
 
     match context.eval() {
         Ok(_) => {
