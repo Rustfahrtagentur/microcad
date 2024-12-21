@@ -282,7 +282,7 @@ fn write_test_code(
                     use microcad_std::*;
                     use crate::SEARCH_PATH;
                     let banner = "{banner_esc}";
-                    let _ = std::fs::remove_file(&banner);
+                    let _ = std::fs::remove_file(banner);
                     #[allow(unused)]
                     let todo = {todo};
                     match SourceFile::load_from_str(
