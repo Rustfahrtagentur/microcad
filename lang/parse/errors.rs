@@ -104,6 +104,10 @@ pub enum ParseError {
     /// Loading of a source file failed
     #[error("Loading of source file {0:?} failed")]
     LoadSource(std::path::PathBuf),
+
+    // Grammar rule error
+    #[error("Grammar rule error")]
+    GrammarRuleError(String),
 }
 
 /// Result with parse error

@@ -97,7 +97,7 @@ impl Parse for NodeBodyStatement {
             }
             Rule::assignment => NodeBodyStatement::Assignment(Assignment::parse(first)?),
             Rule::node_marker => NodeBodyStatement::NodeMarker(NodeMarker::parse(first)?),
-            rule => unreachable!("{rule:?}"),
+            rule => return Err(ParseError::GrammarRuleError(format!("{rule:?}"))),
         })
     }
 }
