@@ -90,7 +90,8 @@ impl ModuleDefinitionBody {
         Ok(())
     }
 
-    pub fn eval_statement(
+    /// Evaluate a single statement of the module
+    fn eval_statement(
         &self,
         statement: &ModuleDefinitionStatement,
         context: &mut Context,
@@ -109,6 +110,34 @@ impl ModuleDefinitionBody {
                 }
             }
         }
+        Ok(())
+    }
+
+    /// Evaluate the pre-init statements, and copy the symbols to the node
+    pub fn eval_pre_init_statements(
+        &self,
+        context: &mut Context,
+        node: &mut crate::ObjectNode,
+    ) -> EvalResult<()> {
+        for statement in &self.pre_init_statements {
+            self.eval_statement(statement, context, node)?;
+        }
+        node.copy(context);
+
+        Ok(())
+    }
+
+    /// Evaluate the post-init statements, and copy the symbols to the node
+    pub fn eval_post_init_statements(
+        &self,
+        context: &mut Context,
+        node: &mut crate::ObjectNode,
+    ) -> EvalResult<()> {
+        for statement in &self.post_init_statements {
+            self.eval_statement(statement, context, node)?;
+        }
+        node.copy(context);
+
         Ok(())
     }
 }
