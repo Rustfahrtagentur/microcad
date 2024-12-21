@@ -6,8 +6,8 @@ use cgmath::InnerSpace;
 use microcad_core::Scalar;
 use microcad_lang::{builtin_function, eval::*, parse::*, src_ref::*};
 
-pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
-    NamespaceBuilder::new("math")
+pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
+    Ok(NamespaceBuilder::new("math")
         .add(Symbol::Value("pi".into(), Value::Scalar(Refer::none(std::f64::consts::PI))))
         // abs(x): Absolute value of x
         .add(builtin_function!(abs(x) for Scalar, Length, Angle, Integer).into())
@@ -124,7 +124,7 @@ pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
         }).into())
         // normalize(x): Normalize x
         .add(builtin_function!(normalize(x) for Vec2, Vec3, Vec4).into())
-        .build()
+        .build())
 }
 
 #[cfg(test)]
@@ -133,7 +133,7 @@ fn test_builtin_function(name: &str, input: &str, expected: &str) {
     use microcad_lang::parser::*;
     use microcad_lang::r#type::Type;
 
-    let module = builtin_module();
+    let module = builtin_module().expect("builtin error");
     assert_eq!(&module.name, "math");
 
     let mut context = Context::default();

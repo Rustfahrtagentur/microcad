@@ -232,6 +232,10 @@ pub enum EvalError {
     /// Tuple item not found
     #[error("Tuple item not found {0}")]
     TupleItemNotFound(Identifier),
+
+    /// Cannot get argument
+    #[error("Cannot get argument {0}")]
+    CannotGetArgument(&'static str),
 }
 
 /// Result type of any evaluation

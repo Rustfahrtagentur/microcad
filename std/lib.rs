@@ -34,10 +34,10 @@ use microcad_core::ExportSettings;
 use namespace_builder::NamespaceBuilder;
 
 /// Build the standard module
-pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
-    NamespaceBuilder::new("__builtin")
+pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
+    Ok(NamespaceBuilder::new("__builtin")
         // TODO: is this correct= Shouldn't this use add_builtin_module() =
-        .add(math::builtin_module().into())
+        .add(math::builtin_module()?.into())
         .add(geo2d::builtin_module().into())
         .add(geo3d::builtin_module().into())
         .add(algorithm::builtin_module().into())
@@ -97,5 +97,5 @@ pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
             })
             .into(),
         )
-        .build()
+        .build())
 }

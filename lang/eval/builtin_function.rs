@@ -78,23 +78,24 @@ macro_rules! builtin_function {
         stringify!($f).into(),
         microcad_lang::function_signature!(microcad_lang::parameter_list![microcad_lang::parameter!($name)]),
         &|args, _| {
-        match args.get(stringify!($name)).expect("Argument not found") {
-            $(Value::$ty($name) => Ok(Some(Value::$ty(Refer::none($name.$f())))),)*
-            Value::List(v) => {
-                // TODO: Don't use `mut``
-                let mut result = ValueList::new(Vec::new(),SrcRef(None));
-                v.iter().try_for_each(|x| {
-                    match x {
-                        $(Value::$ty(x) => result.push(Value::$ty(Refer::none(x.$f()))),)*
-                        _ => return Err(EvalError::InvalidArgumentType(x.ty())),
-                    }
-                    Ok(())
-                })?;
-                Ok(Some(Value::List(List::new(result, v.ty(),SrcRef(None)))))
+            match args.get(stringify!($name)) {
+                $(Some(Value::$ty($name)) => Ok(Some(Value::$ty(Refer::none($name.$f())))),)*
+                Some(Value::List(v)) => {
+                    // TODO: Don't use `mut``
+                    let mut result = ValueList::new(Vec::new(),SrcRef(None));
+                    v.iter().try_for_each(|x| {
+                        match x {
+                            $(Value::$ty(x) => result.push(Value::$ty(Refer::none(x.$f()))),)*
+                            _ => return Err(EvalError::InvalidArgumentType(x.ty())),
+                        }
+                        Ok(())
+                    })?;
+                    Ok(Some(Value::List(List::new(result, v.ty(),SrcRef(None)))))
+                }
+                Some(v) => Err(EvalError::InvalidArgumentType(v.ty())),
+                None => Err(EvalError::CannotGetArgument(stringify!($name)))
             }
-            v => Err(EvalError::InvalidArgumentType(v.ty())),
-        }
-    })
+        })
     };
     ($f:ident($name:ident) $inner:expr) => {
         BuiltinFunction::new(stringify!($f).into(),
