@@ -122,7 +122,7 @@ impl Ord for SrcRef {
 impl SrcRef {
     /// return slice to code base
     pub fn source_slice<'a>(&self, src: &'a str) -> &'a str {
-        &src[self.0.as_ref().unwrap().range.to_owned()]
+        &src[self.0.as_ref().expect("SrcRef").range.to_owned()]
     }
 
     /// merge two `SrcRef` into a single one by
