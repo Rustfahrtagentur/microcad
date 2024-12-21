@@ -277,12 +277,16 @@ fn write_test_code(
             r##"#[test]
                 #[allow(non_snake_case)]
                 fn r#{name}() {{
-                    microcad_lang::env_logger_init();
-                    use microcad_lang::parse::*;
-                    use microcad_std::*;
+                    use microcad_lang::parse::SourceFile;
+                    use microcad_std::ContextBuilder;
                     use crate::SEARCH_PATH;
+                    use ::std::fs;
+                    #[allow(unused)]
+                    use ::std::io;
+
+                    microcad_lang::env_logger_init();
                     let banner = "{banner_esc}";
-                    let _ = std::fs::remove_file(banner);
+                    let _ = fs::remove_file(&banner);
                     #[allow(unused)]
                     let todo = {todo};
                     match SourceFile::load_from_str(
@@ -294,16 +298,16 @@ fn write_test_code(
                 Some("fail") =>
                     r##"{
                             Err(err) => {
-                                let _ = std::fs::hard_link("images/fail_ok.png", banner);
+                                let _ = fs::hard_link("images/fail_ok.png", banner);
                                 log::debug!("{err}")
                             },
                             Ok(source) => { 
-                                let _ = std::fs::hard_link("images/ok_fail.png", banner);
+                                let _ = fs::hard_link("images/ok_fail.png", banner);
                                 let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
                                 if let Err(err) = context.eval() {
                                     log::debug!("{err}");
                                 } else if context.diag().error_count > 0 {
-                                    let mut w = std::io::stdout();
+                                    let mut w = io::stdout();
                                     context.diag().pretty_print(&mut w, &context).expect("internal error");
                                 } else {
                                     panic!("ERROR: test is marked to fail but succeeded");
@@ -316,9 +320,9 @@ fn write_test_code(
                                 let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
                                 if let Err(err) = context.eval() {
                                     if todo { 
-                                        let _ = std::fs::hard_link("images/todo.png", banner);
+                                        let _ = fs::hard_link("images/todo.png", banner);
                                     } else { 
-                                        let _ = std::fs::hard_link("images/fail.png", banner);
+                                        let _ = fs::hard_link("images/fail.png", banner);
                                         panic!("{err}");
                                     }
                                 } else {
@@ -326,26 +330,26 @@ fn write_test_code(
                                         let mut w = Vec::new();
                                         context.diag().pretty_print(&mut w, &context).expect("internal error");
                                         if todo { 
-                                            let _ = std::fs::hard_link("images/todo.png", banner);
+                                            let _ = fs::hard_link("images/todo.png", banner);
                                         } else { 
-                                            let _ = std::fs::hard_link("images/fail.png", banner);
+                                            let _ = fs::hard_link("images/fail.png", banner);
                                             panic!("ERROR: there were {error_count} errors:\n{w}", error_count = context.diag().error_count, 
                                                     w = String::from_utf8(w).expect("utf-8 error"));
                                         }
                                     }
                                     log::trace!("test succeeded");
                                     if todo { 
-                                        let _ = std::fs::hard_link("images/not_todo.png", banner);
+                                        let _ = fs::hard_link("images/not_todo.png", banner);
                                     } else { 
-                                        let _ = std::fs::hard_link("images/ok.png", banner);
+                                        let _ = fs::hard_link("images/ok.png", banner);
                                     }
                                 }
                             },
                             Err(err) => {
                                 if todo { 
-                                    let _ = std::fs::hard_link("images/todo.png", banner);
+                                    let _ = fs::hard_link("images/todo.png", banner);
                                 } else { 
-                                    let _ = std::fs::hard_link("images/fail.png", banner);
+                                    let _ = fs::hard_link("images/fail.png", banner);
                                     panic!("ERROR: {err}")
                                 }
                             },
