@@ -30,27 +30,25 @@ impl ModuleDefinition {
     pub fn call_init(
         &self,
         init: std::rc::Rc<ModuleInitDefinition>,
-        multi_argument_map: &MultiArgumentMap,
+        argument_map: &ArgumentMap,
         context: &mut Context,
         group: &mut crate::ObjectNode,
     ) -> EvalResult<()> {
-        for arg_map in multi_argument_map.combinations() {
-            // Copy the arguments to the symbol table of the node
-            for (name, value) in arg_map.iter() {
-                group.add(Symbol::Value(name.clone(), value.clone()));
-            }
-            let init_object = init.call(&arg_map, context)?;
-
-            // Add the init object's children to the node
-            for child in init_object.children() {
-                child.detach();
-                group.append(child.clone());
-            }
-            init_object.copy(group);
-
-            // Now, copy the symbols of the node into the context
-            group.copy(context);
+        // Copy the arguments to the symbol table of the node
+        for (name, value) in argument_map.iter() {
+            group.add(Symbol::Value(name.clone(), value.clone()));
         }
+        let init_object = init.call(&argument_map, context)?;
+
+        // Add the init object's children to the node
+        for child in init_object.children() {
+            child.detach();
+            group.append(child.clone());
+        }
+        init_object.copy(group);
+
+        // Now, copy the symbols of the node into the context
+        group.copy(context);
 
         Ok(())
     }
@@ -96,6 +94,86 @@ enum InitalizerMatch {
     Explicit(std::rc::Rc<ModuleInitDefinition>, MultiArgumentMap),
 }
 
+impl InitalizerMatch {
+    fn call(
+        &self,
+        context: &mut Context,
+        body: &ModuleDefinitionBody,
+    ) -> EvalResult<Vec<ObjectNode>> {
+        let mut nodes = Vec::new();
+
+        match self {
+            InitalizerMatch::Implicit(init, multi_argument_map) => {
+                for arg_map in multi_argument_map.combinations() {
+                    let mut group: rctree::Node<crate::ObjectNodeInner> = objecttree::group();
+
+                    // Copy the arguments to the symbol table of the node
+                    for (name, value) in arg_map.iter() {
+                        group.add(Symbol::Value(name.clone(), value.clone()));
+                    }
+                    let init_object = init.call(&arg_map, context)?;
+
+                    // Add the init object's children to the node
+                    for child in init_object.children() {
+                        child.detach();
+                        group.append(child.clone());
+                    }
+                    init_object.copy(&mut group);
+
+                    // Now, copy the symbols of the node into the context
+                    group.copy(context);
+
+                    // Let's evaluate the pre-init statements after the implicit initializer
+                    for statement in &body.pre_init_statements {
+                        body.eval_statement(statement, context, &mut group)?;
+                    }
+                    // Let's evaluate the post-init statements after the implicit initializer
+                    for statement in &body.post_init_statements {
+                        body.eval_statement(statement, context, &mut group)?;
+                    }
+                    nodes.push(group);
+                }
+            }
+            InitalizerMatch::Explicit(init, multi_argument_map) => {
+                for arg_map in multi_argument_map.combinations() {
+                    let mut group: rctree::Node<crate::ObjectNodeInner> = objecttree::group();
+
+                    // Let's evaluate the pre-init statements after the implicit initializer
+                    for statement in &body.pre_init_statements {
+                        body.eval_statement(statement, context, &mut group)?;
+                    }
+                    // Now, copy the symbols of the node into the context
+                    group.copy(context);
+
+                    // Copy the arguments to the symbol table of the node
+                    for (name, value) in arg_map.iter() {
+                        group.add(Symbol::Value(name.clone(), value.clone()));
+                    }
+                    let init_object = init.call(&arg_map, context)?;
+
+                    // Add the init object's children to the node
+                    for child in init_object.children() {
+                        child.detach();
+                        group.append(child.clone());
+                    }
+                    init_object.copy(&mut group);
+
+                    // Now, copy the symbols of the node into the context
+                    group.copy(context);
+
+                    // Let's evaluate the post-init statements after the implicit initializer
+                    for statement in &body.post_init_statements {
+                        body.eval_statement(statement, context, &mut group)?;
+                    }
+                    nodes.push(group);
+                }
+            }
+        }
+
+        Ok(nodes)
+    }
+}
+
 impl CallTrait for ModuleDefinition {
     type Output = Vec<ObjectNode>;
 
@@ -107,53 +185,16 @@ impl CallTrait for ModuleDefinition {
         use crate::diag::PushDiag;
 
         let stack_frame = StackFrame::ModuleCall(context.top().symbol_table().clone(), None);
-        let mut nodes = Vec::new();
 
         context.scope(stack_frame, |context| {
             match self.find_matching_initializer(call_argument_list, context) {
-                Ok(InitalizerMatch::Implicit(init, multi_argument_map)) => {
-                    let mut group: rctree::Node<crate::ObjectNodeInner> = objecttree::group();
-
-                    // Call implicit initializer
-                    self.call_init(init, &multi_argument_map, context, &mut group)?;
-
-                    // Let's evaluate the pre-init statements after the implicit initializer
-                    for statement in &self.body.pre_init_statements {
-                        self.body.eval_statement(statement, context, &mut group)?;
-                    }
-                    // Let's evaluate the post-init statements after the implicit initializer
-                    for statement in &self.body.post_init_statements {
-                        self.body.eval_statement(statement, context, &mut group)?;
-                    }
-                    nodes.push(group);
-                }
-                Ok(InitalizerMatch::Explicit(init, multi_argument_map)) => {
-                    let mut group: rctree::Node<crate::ObjectNodeInner> = objecttree::group();
-
-                    // Let's evaluate the pre-init statements before the explicit initializer
-                    for statement in &self.body.pre_init_statements {
-                        self.body.eval_statement(statement, context, &mut group)?;
-                    }
-
-                    // Call explicit initializer
-                    self.call_init(init, &multi_argument_map, context, &mut group)?;
-
-                    // Evaluate the post-init statements a
-                    for statement in &self.body.post_init_statements {
-                        self.body.eval_statement(statement, context, &mut group)?;
-                    }
-
-                    nodes.push(group);
-                }
+                Ok(matching_initializer) => Ok(matching_initializer.call(context, &self.body)?),
                 Err(err) => {
                     context.error(self, Box::new(err))?;
-                    return Err(EvalError::MissedCall);
+                    Ok(Vec::new())
                 }
             }
-            Ok(())
-        })?;
-
-        Ok(nodes)
+        })
     }
 }
 
