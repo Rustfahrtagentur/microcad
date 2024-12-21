@@ -6,9 +6,7 @@ namespace geo2d {
     /// Examples:
     /// * with radius `r`: `circle(r = 10.0mm);`
     /// * with diameter `d`: `circle(d = 5.0mm);`
-    module circle {
-        init(radius: length) {}
-
+    module circle(radius: length) {
         init(r: length) {
             radius = r;
         }

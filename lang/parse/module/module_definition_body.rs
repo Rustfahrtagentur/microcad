@@ -32,7 +32,9 @@ pub struct ModuleDefinitionBody {
     pub post_init_statements: Vec<ModuleDefinitionStatement>,
     /// Module's local symbol table
     pub symbols: SymbolTable,
-    /// Initializers
+    /// implicit Initializers
+    pub init: Option<std::rc::Rc<ModuleInitDefinition>>,
+    /// explicit Initializers
     pub inits: Vec<std::rc::Rc<ModuleInitDefinition>>,
     /// Source code reference
     src_ref: SrcRef,
@@ -77,23 +79,13 @@ impl ModuleDefinitionBody {
         &mut self,
         parameters: ParameterList,
     ) -> ParseResult<()> {
-        if !self.inits.is_empty() {
-            return Err(ParseError::BothParameterListAndInitializer);
-        }
-
         let src_ref = parameters.src_ref();
         let init = ModuleInitDefinition {
             parameters,
             body: NodeBody::default(),
             src_ref,
         };
-        self.inits.push(std::rc::Rc::new(init));
-
-        // Move pre-init statements to post-init statements
-        std::mem::swap(
-            &mut self.pre_init_statements,
-            &mut self.post_init_statements,
-        );
+        self.init = Some(std::rc::Rc::new(init));
 
         Ok(())
     }
@@ -153,6 +145,10 @@ impl Parse for ModuleDefinitionBody {
 impl std::fmt::Display for ModuleDefinitionBody {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, " {{")?;
+        if let Some(init) = &self.init {
+            writeln!(f, "{}", init)?;
+        }
+
         for statement in &self.pre_init_statements {
             writeln!(f, "{}", statement)?;
         }

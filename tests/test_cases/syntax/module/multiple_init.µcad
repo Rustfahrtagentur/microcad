@@ -1,4 +1,4 @@
-// Define a module `circle` with two initializers
+// Define a module `circle` with two Initializers
 module circle {
     init(r: scalar) {
         radius = r;
