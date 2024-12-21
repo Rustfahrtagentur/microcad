@@ -97,10 +97,6 @@ pub enum ParseError {
     #[error("Statement between two init statements")]
     StatementBetweenModuleInit,
 
-    /// A module has both a parameter list and initializer
-    #[error("Module has both a parameter list and initializer")]
-    BothParameterListAndInitializer,
-
     /// Loading of a source file failed
     #[error("Loading of source file {0:?} failed")]
     LoadSource(std::path::PathBuf),
