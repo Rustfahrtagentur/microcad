@@ -234,7 +234,7 @@ fn load_source_file() {
 
     crate::env_logger_init();
 
-    let source_file = SourceFile::load(r#"../tests/test_cases/algorithm_difference.µcad"#);
+    let source_file = SourceFile::load(r#"../tests/test_cases/algorithm/difference.µcad"#);
     if let Err(ref err) = source_file {
         error!("{err}");
     }

@@ -13,7 +13,6 @@ path = "lib.rs"
 regex = "1.11.1"
 rustfmt-wrapper = "0.2"
 anyhow = "1"
-walk_path = { path = "../walk_path" }
 
 [lints.rust]
 missing_docs = "warn"
