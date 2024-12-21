@@ -34,17 +34,15 @@ Simple basic shapes can be composed to create complex geometries which then can 
 You can try it out with an example by using the command line tool `microcad-cli`
 which can be installed from [crates.io](https://crates.io) by using `cargo`.
 
-**Note**: Currently µcad has no binary install packages so the only way to install it is from source with `cargo`!
+**Note**: Currently µcad has no binary install packages so the only ways to install it are with [`cargo install`](#installation) or from the source code (see section [Contribute](#contribute)).
 
 ### Installation
 
-To install the latest version of *µcad* via *cargo*, type:
+To install the latest release of *µcad* via *cargo*, type:
 
 ```sh
 cargo install microcad-cli
 ```
-
-You can also build *µcad* from source by cloning the repository (see section [Contribute](#contribute)).
 
 ### Basic Example
 
