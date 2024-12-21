@@ -73,7 +73,8 @@ impl PestFile {
                 r.writeln(&format!("let input = r#\"{}\"#;", test.source))?;
                 r.begin_scope(
                     std::format!(
-                        "match {parser_struct_name}::parse({rule_enum_name}::r#{}, input)",
+                        "#[allow(clippy::single_match)]
+                        match {parser_struct_name}::parse({rule_enum_name}::r#{}, input)",
                         rule.name
                     )
                     .as_str(),
