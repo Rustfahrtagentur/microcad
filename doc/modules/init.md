@@ -8,8 +8,6 @@
 // begin module and declare implicit initializer
 module donut(radius_outer: length, radius_inner: length) {
 
-    use std::geo2d::circle;
-
     // alternative initialization with diameters
     init( diameter_outer: length, diameter_inner: length ) {
         // calculate radiuses from diameters
@@ -18,13 +16,13 @@ module donut(radius_outer: length, radius_inner: length) {
     }
 
     // generate donut based on radiuses
-    circle(radius_outer) - circle(radius_inner);
+    std::geo2d::circle(radius_outer) - std::geo2d::circle(radius_inner);
 }
 
 // generate three equal donuts
 donut( 2.0cm, 1.0cm );
-donut( radius_outer = 2.0cm, radius_inner = 1.0cm );
-donut( diameter_outer = 4.0cm, diameter_inner = 2.0cm );
+//donut( radius_outer = 2.0cm, radius_inner = 1.0cm );
+//donut( diameter_outer = 4.0cm, diameter_inner = 2.0cm );
 ```
 
 ## Implicit init

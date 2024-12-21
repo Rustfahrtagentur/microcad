@@ -434,7 +434,8 @@ fn test_simple_module_definition() {
         _ => panic!("Expected module definition"),
     };
     assert_eq!(module_definition.body.pre_init_statements.len(), 1);
-    assert_eq!(module_definition.body.inits.len(), 1);
+    assert_eq!(module_definition.body.inits.len(), 0);
+    assert!(module_definition.body.init.is_some());
     assert_eq!(module_definition.body.post_init_statements.len(), 0);
 
     // Call the module definition of `donut` and verify it
@@ -486,9 +487,10 @@ fn test_module_definition_with_parameters() {
         microcad_lang::eval::Symbol::Module(m) => m,
         _ => panic!("Expected module definition"),
     };
-    assert_eq!(module_definition.body.pre_init_statements.len(), 0);
-    assert_eq!(module_definition.body.inits.len(), 1);
-    assert_eq!(module_definition.body.post_init_statements.len(), 1);
+    assert_eq!(module_definition.body.pre_init_statements.len(), 1);
+    assert_eq!(module_definition.body.inits.len(), 0);
+    assert!(module_definition.body.init.is_some());
+    assert_eq!(module_definition.body.post_init_statements.len(), 0);
 
     // Call the module definition of `donut` and verify it
     use crate::parser::*;
