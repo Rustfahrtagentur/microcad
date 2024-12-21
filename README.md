@@ -19,11 +19,6 @@ Simple basic shapes can be composed to create complex geometries which then can 
   - [Content](#content)
   - [Quick Start](#quick-start)
     - [Installation](#installation)
-    - [Basic Concepts](#basic-concepts)
-      - [Parsing Phase](#parsing-phase)
-      - [Evaluation Phase](#evaluation-phase)
-      - [Export Phase](#export-phase)
-      - [Viewing](#viewing)
     - [Basic Example](#basic-example)
       - [Source Code Explanation](#source-code-explanation)
   - [Documentation](#documentation)
@@ -50,50 +45,6 @@ cargo install microcad-cli
 ```
 
 You can also build *µcad* from source by cloning the repository (see section [Contribute](#contribute)).
-
-### Basic Concepts
-
-The *µcad* interpreter runs programs which generate geometry files.
-The processing of *µcad* source code files into output files can be divided into separate phases:
-
-![phases](doc/images/phases.svg)
-
-#### Parsing Phase
-
-In the parsing phase the source files are read into a *syntax tree* by using the [*µcad* grammar](lang/grammar.pest).
-Any errors which occur within the parsing phase are related to file access or syntax.
-
-#### Evaluation Phase
-
-In the evaluation phase the *syntax tree*  will be processed into the *object node tree*
-which is a structured representation of the geometry.
-While this phase the following things will be done:
-
-- expressions will be calculated
-- functions will be called
-- modules will generate *object nodes*
-- user messages will be output on console
-
-Any errors which occur within the evaluation phase are related to semantic issues.
-
-#### Export Phase
-
-In the export phase the *object nodes* will be taken to generate 2D or 3D output files
-(e.g. *SVG* or *STL*).
-While this phase the following things will be done:
-
-- geometric algorithms will be processed
-- geometries will be rendered
-- the output files will be written
-
-Any errors which occur within the export phase are related to geometrical processing or file access.
-
-#### Viewing
-
-**Note**: Currently *µcad* does not have any available viewer.
-
-The viewing phase generates images which can be shown to visualize *object nodes* (e.g. in an IDE).
-Any errors which occur here are related to geometrical processing.
 
 ### Basic Example
 
@@ -168,6 +119,7 @@ The STL file can now be loaded in a slicer program like [Cura](https://ultimaker
 ## Documentation
 
 - [Description of language features](doc/README.md)
+- [Basic concepts](doc/CONCEPTS.md)
 - Code documentation:
   - [`microcad-lang` module](https://docs.rs/microcad-lang)
   - [`microcad-core` module](https://docs.rs/microcad-core)
