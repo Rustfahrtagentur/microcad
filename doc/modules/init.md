@@ -16,13 +16,13 @@ module donut(radius_outer: length, radius_inner: length) {
     }
 
     // generate donut based on radiuses
-    std::geo2d::circle(radius_outer) - std::geo2d::circle(radius_inner);
+    std::geo2d::circle(r = radius_outer) - std::geo2d::circle(r = radius_inner);
 }
 
 // generate three equal donuts
 donut( 2.0cm, 1.0cm );
-//donut( radius_outer = 2.0cm, radius_inner = 1.0cm );
-//donut( diameter_outer = 4.0cm, diameter_inner = 2.0cm );
+donut( radius_outer = 2.0cm, radius_inner = 1.0cm );
+donut( diameter_outer = 4.0cm, diameter_inner = 2.0cm );
 ```
 
 ## Implicit init
