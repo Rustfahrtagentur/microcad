@@ -82,7 +82,7 @@ impl ModuleDefinition {
         let call_argument_value_list = call_argument_list.eval(context)?;
 
         // check for any implicit initializer
-        if let Some(init) = &self.body.init {
+        if let Some(init) = &self.body.implicit_init {
             if let Ok(multi_argument_map) = call_argument_value_list
                 .get_multi_matching_arguments(&init.parameters.eval(context)?)
             {
@@ -91,7 +91,7 @@ impl ModuleDefinition {
         }
 
         // find match in the explicit Initializers
-        for init in &self.body.inits {
+        for init in &self.body.explicit_inits {
             match call_argument_value_list
                 .get_multi_matching_arguments(&init.parameters.eval(context)?)
             {
@@ -141,6 +141,7 @@ impl CallTrait for ModuleDefinition {
                 }
                 Err(err) => {
                     context.error(self, Box::new(err))?;
+                    return Err(EvalError::MissedCall);
                 }
             }
             Ok(())

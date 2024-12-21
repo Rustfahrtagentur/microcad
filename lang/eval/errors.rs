@@ -3,7 +3,11 @@
 
 //! Evaluation error
 
-use crate::{eval::*, parse::Identifier, r#type::*};
+use crate::{
+    eval::*,
+    parse::{Identifier, QualifiedName},
+    r#type::*,
+};
 use microcad_core::Id;
 use thiserror::Error;
 
@@ -244,6 +248,14 @@ pub enum EvalError {
     /// Named tuple element access error
     #[error("Named tuple element access error")]
     NamedTupleElementAccess(Value),
+
+    /// Wrong parameters in call
+    #[error("Wrong parameters in call to module {0}")]
+    WrongModuleParameters(QualifiedName),
+
+    /// Missed call
+    #[error("missed call")]
+    MissedCall,
 }
 
 /// Result type of any evaluation

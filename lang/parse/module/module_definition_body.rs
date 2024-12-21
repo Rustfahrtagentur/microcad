@@ -33,9 +33,9 @@ pub struct ModuleDefinitionBody {
     /// Module's local symbol table
     pub symbols: SymbolTable,
     /// implicit Initializers
-    pub init: Option<std::rc::Rc<ModuleInitDefinition>>,
+    pub implicit_init: Option<std::rc::Rc<ModuleInitDefinition>>,
     /// explicit Initializers
-    pub inits: Vec<std::rc::Rc<ModuleInitDefinition>>,
+    pub explicit_inits: Vec<std::rc::Rc<ModuleInitDefinition>>,
     /// Source code reference
     src_ref: SrcRef,
 }
@@ -55,13 +55,13 @@ impl ModuleDefinitionBody {
                 // and before post-init statements.
                 // Other statements between pre-init and post-init are not allowed
                 if self.post_init_statements.is_empty() {
-                    self.inits.push(init.clone());
+                    self.explicit_inits.push(init.clone());
                 } else {
                     return Err(ParseError::StatementBetweenModuleInit);
                 }
             }
             statement => {
-                if self.inits.is_empty() {
+                if self.explicit_inits.is_empty() {
                     self.pre_init_statements.push(statement);
                 } else {
                     self.post_init_statements.push(statement);
@@ -85,7 +85,7 @@ impl ModuleDefinitionBody {
             body: NodeBody::default(),
             src_ref,
         };
-        self.init = Some(std::rc::Rc::new(init));
+        self.implicit_init = Some(std::rc::Rc::new(init));
 
         Ok(())
     }
@@ -145,7 +145,7 @@ impl Parse for ModuleDefinitionBody {
 impl std::fmt::Display for ModuleDefinitionBody {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, " {{")?;
-        if let Some(init) = &self.init {
+        if let Some(init) = &self.implicit_init {
             writeln!(f, "{}", init)?;
         }
 
@@ -153,7 +153,7 @@ impl std::fmt::Display for ModuleDefinitionBody {
             writeln!(f, "{}", statement)?;
         }
 
-        for init in &self.inits {
+        for init in &self.explicit_inits {
             writeln!(f, "{}", init)?;
         }
 

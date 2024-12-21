@@ -14,7 +14,7 @@ pub use call_argument_list::*;
 pub use method_call::*;
 pub use multiplicity::*;
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{diag::PushDiag, eval::*, parse::*, parser::*, src_ref::*};
 
 /// trait for calls of modules or functions with argument list
 pub trait CallTrait {
@@ -99,7 +99,19 @@ impl Eval for Call {
             Symbol::BuiltinModule(m) => {
                 Ok(CallResult::Nodes(m.call(&self.argument_list, context)?))
             }
-            Symbol::Module(m) => Ok(CallResult::Nodes(m.call(&self.argument_list, context)?)),
+            Symbol::Module(m) => Ok(CallResult::Nodes(
+                match m.call(&self.argument_list, context) {
+                    Err(EvalError::MissedCall) => {
+                        context.error(
+                            self,
+                            Box::new(EvalError::WrongModuleParameters(self.name.clone())),
+                        )?;
+                        return Err(EvalError::WrongModuleParameters(self.name.clone()));
+                    }
+                    Ok(result) => result,
+                    Err(err) => return Err(err),
+                },
+            )),
             Symbol::Invalid => {
                 // We don't do anything if the symbol is not found, because an error has been already raised before
                 Ok(CallResult::None)
