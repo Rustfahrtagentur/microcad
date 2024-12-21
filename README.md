@@ -26,11 +26,13 @@ Simple basic shapes can be composed to create complex geometries which then can 
       - [view](#view)
     - [Basic example](#basic-example)
       - [Source code explanation](#source-code-explanation)
+  - [Documentation](#documentation)
   - [Contribute](#contribute)
     - [Get Source Code](#get-source-code)
     - [Get External Libraries](#get-external-libraries)
     - [Build µcad](#build-µcad)
     - [Install µcad locally from source](#install-µcad-locally-from-source)
+
 
 ## Quick start
 
@@ -155,7 +157,7 @@ Volume: 48.415571412489506cm³
 
 We can now load the STL into a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
 
-## Further Information
+## Documentation
 
 - [µcad language](doc/README.md) - description of all language features
 
