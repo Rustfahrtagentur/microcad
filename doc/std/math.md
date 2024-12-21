@@ -1,6 +1,6 @@
-# Math
+# math
 
-## Builtin functions
+## Mathematical functions
 
 ### Absolute Value
 

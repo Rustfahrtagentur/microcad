@@ -15,7 +15,7 @@ Because exporting in µcad is in code one is able to export several different fo
 ![test](.banner/export_multiple.png)
 
 ```µcad,export_multiple#todo
-export(["cube.stl","cube.png"]) cube(40mm);
+std::export(["cube.stl","cube.png"]) cube(40mm);
 ```
 
 By using attributes the user can access the export methods your code is providing.
@@ -27,8 +27,8 @@ By using attributes the user can access the export methods your code is providin
 size = 40mm;
 
 #[export("Export cube as STL")]
-export("cube.stl") cube(40mm);
+std::export("cube.stl") cube(40mm);
 
 #[export("Export cube as PNG")]
-export("cube.png") cube(40mm);
+std::export("cube.png") cube(40mm);
 ```
