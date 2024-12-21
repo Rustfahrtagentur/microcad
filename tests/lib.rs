@@ -12,6 +12,9 @@ include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
 static TEST_OUT_DIR: &str = "output";
 
 #[cfg(test)]
+static DEFAULT_TEST_FILE: &str = "../tests/test_cases/std/algorithm/difference.µcad";
+
+#[cfg(test)]
 use microcad_lang::*;
 
 // Assure `TEST_OUT_DIR` exists
@@ -160,6 +163,76 @@ fn test_source_file(file_name: &str) {
                 .trim()
         );
     }
+}
+
+#[test]
+fn test_diag_list() {
+    use microcad_lang::diag::*;
+    use microcad_lang::eval::EvalError;
+    use microcad_lang::parse::GetSourceFileByHash;
+
+    let source_file =
+        crate::parse::SourceFile::load(DEFAULT_TEST_FILE).expect("Could not load source file");
+
+    let mut diagnostics = DiagList::default();
+
+    let mut body_iter = source_file.body.iter();
+
+    diagnostics.info(
+        body_iter.next().expect("test error"),
+        "This is an info".to_string(),
+    );
+    diagnostics
+        .warning(
+            body_iter.next().expect("test error"),
+            Box::new(EvalError::CustomError("This is a warning".into())),
+        )
+        .expect("test error");
+    diagnostics
+        .error(
+            body_iter.next().expect("test error"),
+            Box::new(EvalError::CustomError("This is an error".into())),
+        )
+        .expect("test error");
+
+    assert_eq!(diagnostics.len(), 3);
+    let mut output = std::io::Cursor::new(Vec::new());
+    diagnostics
+        .pretty_print(
+            &mut output,
+            source_file
+                .get_source_file_by_hash(source_file.hash())
+                .expect("test error"),
+        )
+        .expect("test error");
+
+    // Hol den Inhalt des Puffers
+    let result = String::from_utf8(output.into_inner()).expect("Invalid UTF-8");
+    assert_eq!(
+        result,
+        format!(
+            "info: This is an info
+  ---> {DEFAULT_TEST_FILE}:1:1
+     |
+   1 | use std::*;
+     | ^^^^^^^^^^^
+     |
+warning: This is a warning
+  ---> {DEFAULT_TEST_FILE}:4:1
+     |
+   4 | export(\"{{OUTPUT_FILE}}.stl\") algorithm::difference() {{
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: This is an error
+  ---> {DEFAULT_TEST_FILE}:10:1
+     |
+  10 | export(\"{{OUTPUT_FILE}}.svg\") algorithm::difference() {{
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+"
+        )
+        .to_string()
+    );
 }
 
 #[test]
