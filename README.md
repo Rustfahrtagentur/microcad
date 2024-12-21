@@ -17,13 +17,13 @@ Simple basic shapes can be composed to create complex geometries which then can 
 
 - [µcad](#µcad)
   - [Content](#content)
-  - [Quick start](#quick-start)
+  - [Quick Start](#quick-start)
     - [Installation](#installation)
     - [Basic Concepts](#basic-concepts)
-      - [parse](#parse)
-      - [evaluate](#evaluate)
-      - [export](#export)
-      - [view](#view)
+      - [Parsing Phase](#parsing-phase)
+      - [Evaluation Phase](#evaluation-phase)
+      - [Export Phase](#export-phase)
+      - [Viewing](#viewing)
     - [Basic example](#basic-example)
       - [Source code explanation](#source-code-explanation)
   - [Documentation](#documentation)
@@ -33,38 +33,41 @@ Simple basic shapes can be composed to create complex geometries which then can 
     - [Build µcad](#build-µcad)
     - [Install µcad locally from source](#install-µcad-locally-from-source)
 
-## Quick start
+## Quick Start
 
-You can try out µcad with an example using the command line tool (`microcad-cli`)
-which can be installed from [crates.io](https://crates.io) by using `cargo`:
+*µcad* is programmed in [Rust](https://www.rust-lang.org/) which easily can be [installed](https://www.rust-lang.org/tools/install) on several operating systems.
+You can try it out with an example by using the command line tool `microcad-cli`
+which can be installed from [crates.io](https://crates.io) by using `cargo`.
+
+**Note**: Currently µcad has no binary install packages so the only way to install it is from source with `cargo`!
 
 ### Installation
 
-To install the latest version of µcad via cargo, type:
+To install the latest version of *µcad* via *cargo*, type:
 
 ```sh
 cargo install microcad-cli
 ```
 
-You can also build µcad from source by cloning the repository (see section [Contribute](#contribute)).
+You can also build *µcad* from source by cloning the repository (see section [Contribute](#contribute)).
 
 ### Basic Concepts
 
-The µcad interpreter runs programs which generate geometry files.
-The processing of µcad source code files into output files can be divided into separate phases:
+The *µcad* interpreter runs programs which generate geometry files.
+The processing of *µcad* source code files into output files can be divided into separate phases:
 
 ![phases](doc/images/phases.svg)
 
-#### parse
+#### Parsing Phase
 
-In the **parse** phase the source files are read with the [grammar](lang/grammar.pest) into the *syntax tree*.
+In the parsing phase the source files are read into a *syntax tree* by using the [*µcad* grammar](lang/grammar.pest).
 Any errors which occur here are related to file access or syntax.
 
-#### evaluate
+#### Evaluation Phase
 
-In the **evaluate** phase the *syntax tree*  will be processed into the *object node tree*
+In the evaluation phase the *syntax tree*  will be processed into the *object node tree*
 which is an structured representation of the geometry.
-While this pasphases the following things will be done:
+While this phase the following things will be done:
 
 - expressions will be calculated
 - functions will be called
@@ -73,9 +76,9 @@ While this pasphases the following things will be done:
 
 Any errors which occur here are related to semantic issues.
 
-#### export
+#### Export Phase
 
-In the **export** phase the *object nodes* will be taken to generate 2D or 3D output files
+In the export phase the *object nodes* will be taken to generate 2D or 3D output files
 (e.g. SVG or STL).
 While this phase the following things will be done:
 
@@ -83,9 +86,11 @@ While this phase the following things will be done:
 - geometries will be rendered
 - the output files will be written
 
-#### view
+#### Viewing
 
-The **view** phase generates images which can be shown to visualize *object nodes* (e.g. in an IDE).
+**Note**: Currently *µcad* does not have any available viewer.
+
+The viewing phase generates images which can be shown to visualize *object nodes* (e.g. in an IDE).
 Any errors which occur here are related to geometrical processing or file access.
 
 ### Basic example
@@ -96,7 +101,7 @@ After installing, you can run a basic example by typing:
 microcad eval ./examples/lid.µcad
 ```
 
-This will *evaluate* the input file and will calculate the volume of the geometry:
+This will *evaluate* the input file and will calculate and output the volume of the geometry:
 
 ```console
 Volume: 48.415571412489506cm³
@@ -105,18 +110,18 @@ Volume: 48.415571412489506cm³
 The *evaluate* command will not export the output geometry. Instead, it will simply run the program,
 which prints out the volume.
 
-To generate an STL model file called, use the `export` command with an additional output file name:
+To generate an STL model file use the `export` command with an additional output file name:
 
 ```sh
 microcad export ./examples/lid.µcad
 ```
 
-The output file `lid.stl`, can be displayed e.g. with [MeshLab](https://www.meshlab.net/).
+The output file `lid.stl` can be displayed e.g. with [MeshLab](https://www.meshlab.net/).
 The resulting STL model looks like this: ![Lid](examples/lid.png)
 
 #### Source code explanation
 
-The source file defines a *module* called `lid`, which instantiates two cylinders with different diameters and subtract them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
+The source file defines a *module* called `lid`, which instantiates two cylinders with different diameters and geometrically subtracts them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
 
 ![test](.banner/first_example.png)
 
@@ -148,13 +153,15 @@ std::print("Volume: {l.volume() / 1000}cm³");
 std::export("lid.stl") l;
 ```
 
-The program above will print out the following text and export the model to STL.
+The above program prints out the following text and exports the model into a STL file called `lid.stl`.
 
 ```console
 Volume: 48.415571412489506cm³
 ```
 
-We can now load the STL into a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
+We can now load the STL file into a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
+
+![Cura](doc/images/cura.png)
 
 ## Documentation
 
