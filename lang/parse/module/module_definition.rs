@@ -60,7 +60,7 @@ impl ModuleDefinition {
         &self,
         call_argument_list: &CallArgumentList,
         context: &mut Context,
-    ) -> EvalResult<(std::rc::Rc<ModuleInitDefinition>, MultiArgumentMap, bool)> {
+    ) -> EvalResult<InitalizerMatch> {
         let call_argument_value_list = call_argument_list.eval(context)?;
 
         // check for any implicit initializer
@@ -68,7 +68,7 @@ impl ModuleDefinition {
             if let Ok(multi_argument_map) = call_argument_value_list
                 .get_multi_matching_arguments(&init.parameters.eval(context)?)
             {
-                return Ok((init.clone(), multi_argument_map, true));
+                return Ok(InitalizerMatch::Implicit(init.clone(), multi_argument_map));
             }
         }
 
@@ -77,13 +77,23 @@ impl ModuleDefinition {
             match call_argument_value_list
                 .get_multi_matching_arguments(&init.parameters.eval(context)?)
             {
-                Ok(multi_argument_map) => return Ok((init.clone(), multi_argument_map, false)),
+                Ok(multi_argument_map) => {
+                    return Ok(InitalizerMatch::Explicit(init.clone(), multi_argument_map))
+                }
                 Err(_) => continue,
             }
         }
 
         Err(EvalError::NoMatchingInitializer(self.name.clone()))
     }
+}
+
+enum InitalizerMatch {
+    /// Match of an implicit initializer
+    Implicit(std::rc::Rc<ModuleInitDefinition>, MultiArgumentMap),
+
+    /// Match of an explicit initializer
+    Explicit(std::rc::Rc<ModuleInitDefinition>, MultiArgumentMap),
 }
 
 impl CallTrait for ModuleDefinition {
@@ -101,7 +111,7 @@ impl CallTrait for ModuleDefinition {
 
         context.scope(stack_frame, |context| {
             match self.find_matching_initializer(call_argument_list, context) {
-                Ok((init, multi_argument_map, true)) => {
+                Ok(InitalizerMatch::Implicit(init, multi_argument_map)) => {
                     let mut group: rctree::Node<crate::ObjectNodeInner> = objecttree::group();
 
                     // Call implicit initializer
@@ -117,7 +127,7 @@ impl CallTrait for ModuleDefinition {
                     }
                     nodes.push(group);
                 }
-                Ok((init, multi_argument_map, false)) => {
+                Ok(InitalizerMatch::Explicit(init, multi_argument_map)) => {
                     let mut group: rctree::Node<crate::ObjectNodeInner> = objecttree::group();
 
                     // Let's evaluate the pre-init statements before the explicit initializer
