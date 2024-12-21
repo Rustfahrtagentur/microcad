@@ -4,6 +4,7 @@
 [package]
 name = "microcad-export"
 description = "µcad export"
+documentation = "https://docs.rs/microcad-export"
 edition.workspace = true
 rust-version.workspace = true
 version.workspace = true

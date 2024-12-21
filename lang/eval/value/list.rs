@@ -20,7 +20,7 @@ impl List {
         Self { list, ty, src_ref }
     }
 
-    /// Fetch all values as Vec<Value>
+    /// Fetch all values as `Vec<Value>`
     pub fn fetch(&self) -> Vec<Value> {
         self.list.iter().cloned().collect::<Vec<_>>()
     }

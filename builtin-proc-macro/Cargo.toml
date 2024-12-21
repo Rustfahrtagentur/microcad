@@ -4,7 +4,7 @@
 [package]
 name = "microcad-builtin-proc-macro"
 description = "µcad builtin proc-macro"
-
+documentation = "https://docs.rs/microcad-builtin-proc-macro"
 authors.workspace = true
 edition.workspace = true
 homepage.workspace = true

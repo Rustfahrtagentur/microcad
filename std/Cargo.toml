@@ -4,6 +4,7 @@
 [package]
 name = "microcad-std"
 description = "µcad Standard Library"
+documentation = "https://docs.rs/microcad-std"
 edition.workspace = true
 rust-version.workspace = true
 version.workspace = true

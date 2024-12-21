@@ -4,6 +4,7 @@
 [package]
 name = "microcad-core"
 description = "µcad core"
+documentation = "https://docs.rs/microcad-core"
 authors.workspace = true
 edition.workspace = true
 homepage.workspace = true

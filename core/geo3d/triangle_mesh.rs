@@ -32,7 +32,7 @@ impl Triangle<&Vertex> {
 
     /// Get signed volume of triangle
     ///
-    /// https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up
+    /// <https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up>
     pub fn signed_volume(&self) -> f64 {
         let v210 = self.2.pos.x * self.1.pos.y * self.0.pos.z;
         let v120 = self.1.pos.x * self.2.pos.y * self.0.pos.z;

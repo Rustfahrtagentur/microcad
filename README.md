@@ -24,8 +24,8 @@ Simple basic shapes can be composed to create complex geometries which then can 
       - [Evaluation Phase](#evaluation-phase)
       - [Export Phase](#export-phase)
       - [Viewing](#viewing)
-    - [Basic example](#basic-example)
-      - [Source code explanation](#source-code-explanation)
+    - [Basic Example](#basic-example)
+      - [Source Code Explanation](#source-code-explanation)
   - [Documentation](#documentation)
   - [Contribute](#contribute)
     - [Get Source Code](#get-source-code)
@@ -61,12 +61,12 @@ The processing of *µcad* source code files into output files can be divided int
 #### Parsing Phase
 
 In the parsing phase the source files are read into a *syntax tree* by using the [*µcad* grammar](lang/grammar.pest).
-Any errors which occur here are related to file access or syntax.
+Any errors which occur within the parsing phase are related to file access or syntax.
 
 #### Evaluation Phase
 
 In the evaluation phase the *syntax tree*  will be processed into the *object node tree*
-which is an structured representation of the geometry.
+which is a structured representation of the geometry.
 While this phase the following things will be done:
 
 - expressions will be calculated
@@ -74,26 +74,28 @@ While this phase the following things will be done:
 - modules will generate *object nodes*
 - user messages will be output on console
 
-Any errors which occur here are related to semantic issues.
+Any errors which occur within the evaluation phase are related to semantic issues.
 
 #### Export Phase
 
 In the export phase the *object nodes* will be taken to generate 2D or 3D output files
-(e.g. SVG or STL).
+(e.g. *SVG* or *STL*).
 While this phase the following things will be done:
 
 - geometric algorithms will be processed
 - geometries will be rendered
 - the output files will be written
 
+Any errors which occur within the export phase are related to geometrical processing or file access.
+
 #### Viewing
 
 **Note**: Currently *µcad* does not have any available viewer.
 
 The viewing phase generates images which can be shown to visualize *object nodes* (e.g. in an IDE).
-Any errors which occur here are related to geometrical processing or file access.
+Any errors which occur here are related to geometrical processing.
 
-### Basic example
+### Basic Example
 
 After installing, you can run a basic example by typing:
 
@@ -119,7 +121,7 @@ microcad export ./examples/lid.µcad
 The output file `lid.stl` can be displayed e.g. with [MeshLab](https://www.meshlab.net/).
 The resulting STL model looks like this: ![Lid](examples/lid.png)
 
-#### Source code explanation
+#### Source Code Explanation
 
 The source file defines a *module* called `lid`, which instantiates two cylinders with different diameters and geometrically subtracts them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
 
@@ -159,17 +161,21 @@ The above program prints out the following text and exports the model into a STL
 Volume: 48.415571412489506cm³
 ```
 
-We can now load the STL file into a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
+The STL file can now be loaded in a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
 
 ![Cura](doc/images/cura.png)
 
 ## Documentation
 
-- [µcad language](doc/README.md) - description of all language features
+- [Description of language features](doc/README.md)
+- Code documentation:
+  - [`microcad-lang` module](https://docs.rs/microcad-lang)
+  - [`microcad-core` module](https://docs.rs/microcad-core)
+  - [`microcad-export` module](https://docs.rs/microcad-export)
 
 ## Contribute
 
-We welcome contributions to µcad, whether it is a bug report, feature request, or a pull request.
+We welcome contributions to *µcad*, whether it is a bug report, feature request, or a pull request.
 
 First install [*Git*](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 and [*Rust*](https://www.rust-lang.org/tools/install).

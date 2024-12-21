@@ -4,6 +4,7 @@
 [package]
 name = "microcad-cli"
 description = "µcad Command Line Interface"
+documentation = "https://docs.rs/microcad-cli"
 authors.workspace = true
 edition.workspace = true
 homepage.workspace = true

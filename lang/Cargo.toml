@@ -4,6 +4,7 @@
 [package]
 name = "microcad-lang"
 description = "µcad language"
+documentation = "https://docs.rs/microcad-lang"
 authors.workspace = true
 edition.workspace = true
 homepage.workspace = true
