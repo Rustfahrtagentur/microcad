@@ -268,13 +268,11 @@ fn write_test_code(
     // Early exit for "#no_test" and "#todo" suffixes
     let todo = match mode {
         Some("no_test") => return None,
-        Some("todo") => {
-            let _ = std::fs::remove_file(&banner);
-            let _ = std::fs::hard_link("images/todo.png", &banner);
-            true
-        }
+        Some("todo") => true,
         _ => false,
     };
+
+    let _ = std::fs::remove_file(&banner);
 
     f.push_str(
         &format!(
