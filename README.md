@@ -6,7 +6,7 @@
 [![Codecov](https://codecov.io/github/Rustfahrtagentur/mcad/coverage.svg?branch=main)](https://codecov.io/gh/Rustfahrtagentur/microcad)
 [![Dependency status](https://deps.rs/repo/github/Rustfahrtagentur/mcad/status.svg)](https://deps.rs/repo/github/Rustfahrtagentur/microcad)
 
-![µcad Logo](logo.png)
+![µcad Logo](doc/images/logo.png)
 
 µcad (pronounced *microcad*) is a description language for modeling parameterizable geometric objects.
 Simple basic shapes can be composed to create complex geometries which then can be rendered into STL or SVG files for 3D printing or CNC milling.
