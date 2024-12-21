@@ -13,6 +13,8 @@ pub use level::*;
 
 use crate::{parse::*, src_ref::*};
 
+static DEFAULT_TEST_FILE: &str = "../tests/test_cases/std/algorithm/difference.µcad";
+
 /// A trait to add diagnostics with different levels conveniently
 pub trait PushDiag {
     /// Push a diagnostic message (must be implemented)
@@ -173,8 +175,7 @@ fn test_diag_list() {
     use super::eval::EvalError;
 
     let source_file =
-        crate::parse::SourceFile::load(r#"../tests/test_cases/algorithm_difference.µcad"#)
-            .expect("Could not load source file");
+        crate::parse::SourceFile::load(DEFAULT_TEST_FILE).expect("Could not load source file");
 
     let mut diagnostics = DiagList::default();
 
@@ -212,24 +213,27 @@ fn test_diag_list() {
     let result = String::from_utf8(output.into_inner()).expect("Invalid UTF-8");
     assert_eq!(
         result,
-        "info: This is an info
-  ---> ../tests/test_cases/algorithm_difference.µcad:1:1
+        format!(
+            "info: This is an info
+  ---> {DEFAULT_TEST_FILE}:1:1
      |
    1 | use std::*;
      | ^^^^^^^^^^^
      |
 warning: This is a warning
-  ---> ../tests/test_cases/algorithm_difference.µcad:4:1
+  ---> {DEFAULT_TEST_FILE}:4:1
      |
-   4 | export(\"{OUTPUT_FILE}.stl\") algorithm::difference() {
+   4 | export(\"{{OUTPUT_FILE}}.stl\") algorithm::difference() {{
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: This is an error
-  ---> ../tests/test_cases/algorithm_difference.µcad:10:1
+  ---> {DEFAULT_TEST_FILE}:10:1
      |
-  10 | export(\"{OUTPUT_FILE}.svg\") algorithm::difference() {
+  10 | export(\"{{OUTPUT_FILE}}.svg\") algorithm::difference() {{
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 "
+        )
+        .to_string()
     );
 }
