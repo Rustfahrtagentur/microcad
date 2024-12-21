@@ -66,15 +66,15 @@ fn main() {
 fn run(cli: &Cli) -> anyhow::Result<()> {
     match &cli.command {
         Commands::Parse { input } => {
-            parse(&input)?;
+            parse(input)?;
             eprintln!("Parsed successfully!");
         }
         Commands::Eval { input } => {
-            eval(parse(&input)?, &cli.std)?;
+            eval(parse(input)?, &cli.std)?;
             eprintln!("Evaluated successfully!");
         }
         Commands::Export { input } => {
-            let exports = export(eval(parse(&input)?, &cli.std)?)?;
+            let exports = export(eval(parse(input)?, &cli.std)?)?;
             eprintln!(
                 "Exported {} successfully!",
                 exports
