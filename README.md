@@ -11,7 +11,7 @@
 µcad (pronounced *microcad*) is a description language for modeling parameterizable geometric objects.
 Simple basic shapes can be composed to create complex geometries which then can be rendered into STL or SVG files for 3D printing or CNC milling.
 
-**Note**: This project is in an early stage of development and is not yet feature complete. Feel free to contribute by opening issues or pull requests.
+**Note**: This project is in an early stage of development and is not yet feature complete. Feel free to [contribute](#contribute) by opening issues or pull requests.
 
 ## Content
 
@@ -33,7 +33,6 @@ Simple basic shapes can be composed to create complex geometries which then can 
     - [Build µcad](#build-µcad)
     - [Install µcad locally from source](#install-µcad-locally-from-source)
 
-
 ## Quick start
 
 You can try out µcad with an example using the command line tool (`microcad-cli`)
@@ -52,20 +51,20 @@ You can also build µcad from source by cloning the repository (see section [Con
 ### Basic Concepts
 
 The µcad interpreter runs programs which generate geometry files.
-The processing of µcad source code files into output files is divided into separate passes:
+The processing of µcad source code files into output files can be divided into separate phases:
 
-![passes](doc/images/passes.svg)
+![phases](doc/images/phases.svg)
 
 #### parse
 
-In the **parse** pass the source files are read with the [grammar](lang/grammar.pest) into the *syntax tree*.
+In the **parse** phase the source files are read with the [grammar](lang/grammar.pest) into the *syntax tree*.
 Any errors which occur here are related to file access or syntax.
 
 #### evaluate
 
-In the **evaluate** pass the *syntax tree*  will be processed into the *object node tree*
+In the **evaluate** phase the *syntax tree*  will be processed into the *object node tree*
 which is an structured representation of the geometry.
-While this pass the following things will be done:
+While this pasphases the following things will be done:
 
 - expressions will be calculated
 - functions will be called
@@ -76,9 +75,9 @@ Any errors which occur here are related to semantic issues.
 
 #### export
 
-In the **export** pass the *object nodes* will be taken to generate 2D or 3D output files
+In the **export** phase the *object nodes* will be taken to generate 2D or 3D output files
 (e.g. SVG or STL).
-While this pass the following things will be done:
+While this phase the following things will be done:
 
 - geometric algorithms will be processed
 - geometries will be rendered
@@ -86,7 +85,7 @@ While this pass the following things will be done:
 
 #### view
 
-The **view** pass generates images which can be shown to visualize *object nodes* (e.g. in an IDE).
+The **view** phase generates images which can be shown to visualize *object nodes* (e.g. in an IDE).
 Any errors which occur here are related to geometrical processing or file access.
 
 ### Basic example
