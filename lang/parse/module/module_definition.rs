@@ -81,6 +81,7 @@ impl ModuleDefinition {
     ) -> EvalResult<(std::rc::Rc<ModuleInitDefinition>, MultiArgumentMap, bool)> {
         let call_argument_value_list = call_argument_list.eval(context)?;
 
+        // check for any implicit initializer
         if let Some(init) = &self.body.init {
             if let Ok(multi_argument_map) = call_argument_value_list
                 .get_multi_matching_arguments(&init.parameters.eval(context)?)
@@ -89,6 +90,7 @@ impl ModuleDefinition {
             }
         }
 
+        // find match in the explicit Initializers
         for init in &self.body.inits {
             match call_argument_value_list
                 .get_multi_matching_arguments(&init.parameters.eval(context)?)
@@ -117,26 +119,25 @@ impl CallTrait for ModuleDefinition {
 
         context.scope(stack_frame, |context| {
             match self.find_matching_initializer(call_argument_list, context) {
-                Ok((init, multi_argument_map, implicit)) => {
-                    if implicit {
-                        // Call implicit initializer
-                        let node = self.call_init(init, &multi_argument_map, context)?;
-                        nodes.push(node);
+                Ok((init, multi_argument_map, true)) => {
+                    // Call implicit initializer
+                    let node = self.call_init(init, &multi_argument_map, context)?;
+                    nodes.push(node);
 
-                        // Let's evaluate the pre-init statements first (they are evaluated before the initializer)
-                        for statement in &self.body.pre_init_statements {
-                            statement.eval(context)?;
-                        }
-                    } else {
-                        // Let's evaluate the pre-init statements first (they are evaluated before the initializer)
-                        for statement in &self.body.pre_init_statements {
-                            statement.eval(context)?;
-                        }
-
-                        // Call explicit initializer
-                        let node = self.call_init(init, &multi_argument_map, context)?;
-                        nodes.push(node);
+                    // Let's evaluate the pre-init statements after the implicit initializer
+                    for statement in &self.body.pre_init_statements {
+                        statement.eval(context)?;
                     }
+                }
+                Ok((init, multi_argument_map, false)) => {
+                    // Let's evaluate the pre-init statements before the explicit initializer
+                    for statement in &self.body.pre_init_statements {
+                        statement.eval(context)?;
+                    }
+
+                    // Call explicit initializer
+                    let node = self.call_init(init, &multi_argument_map, context)?;
+                    nodes.push(node);
                 }
                 Err(err) => {
                     context.error(self, Box::new(err))?;
