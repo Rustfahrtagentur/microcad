@@ -236,6 +236,14 @@ pub enum EvalError {
     /// Cannot get argument
     #[error("Cannot get argument {0}")]
     CannotGetArgument(&'static str),
+
+    /// Grammar rule error
+    #[error("Grammar rule error")]
+    GrammarRuleError(String),
+
+    /// Named tuple element access error
+    #[error("Named tuple element access error")]
+    NamedTupleElementAccess(Value),
 }
 
 /// Result type of any evaluation

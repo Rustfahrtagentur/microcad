@@ -50,7 +50,12 @@ pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
                     parameter!(message: String = "Assertion failed")
                 ]),
                 &|args, ctx| {
-                    let message: String = args["message"].clone().try_into()?;
+                    let message: String = if let Some(m) = args.get("message") {
+                        m.clone().try_into()?
+                    } else {
+                        return Err(EvalError::GrammarRuleError("cannot fetch `message`".into()));
+                    };
+
                     let condition: bool = args["condition"].clone().try_into()?;
                     if !condition {
                         use microcad_lang::diag::PushDiag;
