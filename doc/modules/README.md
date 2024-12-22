@@ -15,6 +15,7 @@ A *module declaration* consists of...
 - a header where one defines a name of the module and the parameters of the *implicit initializer*,
 - maybe some so-called *pre-initialization code*,
 - maybe some *explicit initializers*, and
+- maybe some functions which can be placed anywhere
 - some *post-initialization code* which sometimes is called just *code*.
 
 ![test](.test/modules_declaration.png)
@@ -29,14 +30,20 @@ module small_disc(diameter: Length) {
 
     // explicit initializers 
     init( half_diameter: Length ) {
-        diameter = half_diameter * factor;
+        diameter = half_diameter * 2.0;
     }
+
     init( double_diameter: Length ) {
-        diameter = double_diameter / factor;
+        diameter = double_diameter / 2.0;
+    }
+
+    // function
+    function draw_disc( diameter: Length ) {
+        std::geo2d::circle(diameter)
     }
 
     // post-initialization code
-    std::geo2d::circle(diameter);
+    draw_disk(diameter);
 }
 
 // call module
