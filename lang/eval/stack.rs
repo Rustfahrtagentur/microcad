@@ -35,7 +35,7 @@ impl StackFrame {
     ) -> Self {
         Self {
             source: std::rc::Rc::new(Symbol::Module(module.clone())),
-            symbol_table: context.top().symbol_table().clone(),
+            symbol_table: context.top().symbol_table.clone(),
         }
     }
 
@@ -46,38 +46,35 @@ impl StackFrame {
     ) -> Self {
         Self {
             source: std::rc::Rc::new(Symbol::Namespace(namespace.clone())),
-            symbol_table: context.top().symbol_table().clone(),
+            symbol_table: context.top().symbol_table.clone(),
         }
     }
 
-    /// Get the symbol table of the stack frame
-    pub fn symbol_table(&self) -> &SymbolTable {
-        &self.symbol_table
-    }
-
-    /// Get a mutual reference to the symbol table
-    pub fn symbol_table_mut(&mut self) -> &mut SymbolTable {
-        &mut self.symbol_table
+    /// copy symbols from another symbol table
+    pub fn copy<T: Symbols>(&self, into: &mut T) {
+        self.symbol_table.iter().for_each(|(_, symbol)| {
+            into.add(symbol.as_ref().clone());
+        });
     }
 }
 
 impl Symbols for StackFrame {
     fn fetch(&self, id: &microcad_core::Id) -> Option<std::rc::Rc<Symbol>> {
-        self.symbol_table().fetch(id)
+        self.symbol_table.fetch(id)
     }
 
     fn add(&mut self, symbol: Symbol) -> &mut Self {
-        self.symbol_table_mut().add(symbol);
+        self.symbol_table.add(symbol);
         self
     }
 
     fn add_alias(&mut self, symbol: Symbol, alias: microcad_core::Id) -> &mut Self {
-        self.symbol_table_mut().add_alias(symbol, alias);
+        self.symbol_table.add_alias(symbol, alias);
         self
     }
 
     fn copy<T: Symbols>(&self, into: &mut T) {
-        self.symbol_table().copy(into);
+        self.symbol_table.copy(into);
     }
 }
 

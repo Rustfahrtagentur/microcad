@@ -149,9 +149,7 @@ impl Symbols for Context {
     }
 
     fn copy<T: Symbols>(&self, into: &mut T) {
-        self.top().symbol_table().iter().for_each(|(_, symbol)| {
-            into.add(symbol.as_ref().clone());
-        });
+        self.top().copy(into)
     }
 }
 
