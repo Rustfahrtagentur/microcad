@@ -4,14 +4,14 @@
 //! Symbol table
 
 mod context;
-mod errors;
 mod stack;
+mod sym_error;
 mod symbol;
 mod symbol_table;
 
 pub use context::*;
-pub use errors::*;
 pub use stack::*;
+pub use sym_error::*;
 pub use symbol::*;
 pub use symbol_table::*;
 
