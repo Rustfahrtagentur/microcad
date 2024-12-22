@@ -6,16 +6,16 @@ namespace geo2d {
     /// Examples:
     /// * with radius `r`: `circle(r = 10.0mm);`
     /// * with diameter `d`: `circle(d = 5.0mm);`
-    module circle(radius: length) {
-        init(r: length) {
+    module circle(radius: Length) {
+        init(r: Length) {
             radius = r;
         }
 
-        init(diameter: length) {
+        init(diameter: Length) {
             radius = diameter / 2.0;
         }
 
-        init(d: length) {
+        init(d: Length) {
             radius = d / 2.0;
         }
 
@@ -27,12 +27,12 @@ namespace geo2d {
     /// Examples:
     /// * centered rect with width `w` and height `h`: `rect(width = 10.0mm, height = 5.0mm);`
     module rect {
-        init(width: length, height: length) {
+        init(width: Length, height: Length) {
             x = -width / 2.0; // center x
             y = -height / 2.0; // center y
         }
 
-        init(size: length) {
+        init(size: Length) {
             width = size;
             height = size;
             x = -size / 2.0; // center x
@@ -54,9 +54,9 @@ namespace geo3d {
     /// Examples:
     /// * with radius `r`: `sphere(r = 10.0mm);`
     module sphere {
-        init(radius: length) {}
+        init(radius: Length) {}
 
-        init(r: length) {
+        init(r: Length) {
             radius = r;
         }
 
@@ -69,13 +69,13 @@ namespace geo3d {
     /// * with size `s`: `cube(s = 10.0mm);`
     /// * with size `x`, `y`, and `z`: `cube(size_x = 10.0mm, size_y = 5.0mm, size_z = 3.0mm);`
     module cube {
-        init(size: length) {
+        init(size: Length) {
             size_x = size;
             size_y = size;
             size_z = size;
         }
 
-        init(size_x: length, size_y: length, size_z: length) { }
+        init(size_x: Length, size_y: Length, size_z: Length) { }
 
         __builtin::transform::translate(
                 -size_x / 2.0 / 1mm,
@@ -95,29 +95,29 @@ namespace geo3d {
     /// Examples:
     /// * with radius `r` and height `h`: `cylinder(r = 10.0mm, h = 5.0mm);`
     module cylinder {
-        init(radius: length, height: length) {
+        init(radius: Length, height: Length) {
             top = height / 2.0;
             bottom = -top;
         }
 
-        init(r: length, h: length) {
+        init(r: Length, h: Length) {
             radius = r;
             height = h;
             top = height / 2.0;
             bottom = -top;
         }
 
-        init(r: length, bottom: length, top: length) {
+        init(r: Length, bottom: Length, top: Length) {
             radius = r;
             height = top - bottom;
         }
 
-        init(d: length, bottom: length, height: length) {
+        init(d: Length, bottom: Length, height: Length) {
             radius = d / 2.0;
             top = bottom + height;
         }
 
-        init(d: length, h: length) {
+        init(d: Length, h: Length) {
             radius = d / 2.0;
             height = h;
             top = height / 2.0;
@@ -147,7 +147,7 @@ module translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
 }
 
 module rotate {
-    init(angle: angle) {
+    init(Angle: angle) {
         x = 0.0;
         y = 0.0;
         z = 1.0;

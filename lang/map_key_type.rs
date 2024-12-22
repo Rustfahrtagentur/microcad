@@ -33,9 +33,9 @@ impl TryFrom<Type> for MapKeyType {
 impl std::fmt::Display for MapKeyType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Integer => write!(f, "int"),
-            Self::Bool => write!(f, "bool"),
-            Self::String => write!(f, "string"),
+            Self::Integer => write!(f, "Int"),
+            Self::Bool => write!(f, "Bool"),
+            Self::String => write!(f, "String"),
         }
     }
 }

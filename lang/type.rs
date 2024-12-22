@@ -120,15 +120,15 @@ impl Parse for TypeAnnotation {
                 pair.into(),
             )),
             Rule::qualified_name => match inner.as_str() {
-                "int" => Self(Refer::new(Type::Integer, pair.into())),
-                "scalar" => Self(Refer::new(Type::Scalar, pair.into())),
-                "string" => Self(Refer::new(Type::String, pair.into())),
-                "color" => Self(Refer::new(Type::Color, pair.into())),
-                "length" => Self(Refer::new(Type::Length, pair.into())),
-                "angle" => Self(Refer::new(Type::Angle, pair.into())),
-                "vec2" => Self(Refer::new(Type::Vec2, pair.into())),
-                "vec3" => Self(Refer::new(Type::Vec3, pair.into())),
-                "bool" => Self(Refer::new(Type::Bool, pair.into())),
+                "Int" => Self(Refer::new(Type::Integer, pair.into())),
+                "Scalar" => Self(Refer::new(Type::Scalar, pair.into())),
+                "String" => Self(Refer::new(Type::String, pair.into())),
+                "Color" => Self(Refer::new(Type::Color, pair.into())),
+                "Length" => Self(Refer::new(Type::Length, pair.into())),
+                "Angle" => Self(Refer::new(Type::Angle, pair.into())),
+                "Vec2" => Self(Refer::new(Type::Vec2, pair.into())),
+                "Vec3" => Self(Refer::new(Type::Vec3, pair.into())),
+                "Bool" => Self(Refer::new(Type::Bool, pair.into())),
                 _ => Self(Refer::new(
                     Type::Custom(QualifiedName::parse(inner)?),
                     pair.into(),
@@ -144,20 +144,20 @@ impl Parse for TypeAnnotation {
 impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Invalid => write!(f, "invalid"),
-            Self::Integer => write!(f, "int"),
-            Self::Scalar => write!(f, "scalar"),
-            Self::String => write!(f, "string"),
-            Self::Color => write!(f, "color"),
-            Self::Length => write!(f, "length"),
-            Self::Area => write!(f, "area"),
-            Self::Volume => write!(f, "volume"),
-            Self::Angle => write!(f, "angle"),
-            Self::Weight => write!(f, "weight"),
-            Self::Vec2 => write!(f, "vec2"),
-            Self::Vec3 => write!(f, "vec3"),
-            Self::Vec4 => write!(f, "vec4"),
-            Self::Bool => write!(f, "bool"),
+            Self::Invalid => write!(f, "<invalid>"),
+            Self::Integer => write!(f, "Int"),
+            Self::Scalar => write!(f, "Scalar"),
+            Self::String => write!(f, "String"),
+            Self::Color => write!(f, "Color"),
+            Self::Length => write!(f, "Length"),
+            Self::Area => write!(f, "Area"),
+            Self::Volume => write!(f, "Volume"),
+            Self::Angle => write!(f, "Angle"),
+            Self::Weight => write!(f, "Weight"),
+            Self::Vec2 => write!(f, "Vec2"),
+            Self::Vec3 => write!(f, "Vec3"),
+            Self::Vec4 => write!(f, "Vec4"),
+            Self::Bool => write!(f, "Bool"),
             Self::List(t) => write!(f, "{}", t),
             Self::Map(t) => write!(f, "{}", t),
             Self::UnnamedTuple(t) => write!(f, "{}", t),
@@ -170,7 +170,7 @@ impl std::fmt::Display for Type {
 
 #[test]
 fn builtin_type() {
-    let ty = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "int", 0).expect("test error");
-    assert_eq!(ty.0.to_string(), "int");
+    let ty = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "Int", 0).expect("test error");
+    assert_eq!(ty.0.to_string(), "Int");
     assert_eq!(ty.0.value, Type::Integer);
 }

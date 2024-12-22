@@ -50,7 +50,7 @@ fn function_signature() {
     use crate::eval::Ty;
     use crate::{parser::*, r#type::Type};
 
-    let input = "(a: scalar, b: scalar) -> scalar";
+    let input = "(a: Scalar, b: Scalar) -> Scalar";
 
     let function_signature =
         Parser::parse_rule::<FunctionSignature>(Rule::function_signature, input, 0)
@@ -67,7 +67,7 @@ fn function_signature() {
 fn function_definition() {
     use crate::parser::*;
 
-    let input = "function test(a: scalar, b: scalar) -> scalar {
+    let input = "function test(a: Scalar, b: Scalar) -> Scalar {
             c = 1.0;
             return a + b + c;
         }";
@@ -80,7 +80,7 @@ fn function_evaluate() {
     use crate::{eval::*, parse::*, parser::*};
 
     let input = r#"
-        function test(a: scalar, b: scalar) -> scalar {
+        function test(a: Scalar, b: Scalar) -> Scalar {
             c = 1.0;
             return a + b + c;
         }"#;

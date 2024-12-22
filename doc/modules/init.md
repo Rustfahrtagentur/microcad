@@ -16,10 +16,10 @@
 
 ```µcad,init
 // begin module and declare implicit initializer
-module donut(radius_outer: length, radius_inner: length) {
+module donut(radius_outer: Length, radius_inner: Length) {
 
     // alternative initialization with diameters
-    init( diameter_outer: length, diameter_inner: length ) {
+    init( diameter_outer: Length, diameter_inner: Length ) {
         // calculate radiuses from diameters
         radius_inner = diameter_inner / 2.0;
         radius_outer = diameter_outer / 2.0;
@@ -37,25 +37,25 @@ donut( diameter_outer = 4.0cm, diameter_inner = 2.0cm );
 
 ## Implicit Initializer
 
-A module with an *implicit initializer* which takes a `size: length`:
+A module with an *implicit initializer* which takes a `size: Length`:
 
 ![test](.banner/init_implicit.png)
 
 ```µcad,init_implicit
-module box(size: length) {
+module box(size: Length) {
     rectangle(size);
 }
 ```
 
 ## Explicit Initializer
 
-A module with an *explicit initializer* which takes a `size: length`:
+A module with an *explicit initializer* which takes a `size: Length`:
 
 ![test](.banner/init_explicit.png)
 
 ```µcad,init_explicit
 module double_box {
-    init( half_the_size: length) { size = half_the_size * 2; }
+    init( half_the_size: Length) { size = half_the_size * 2; }
     rectangle(size);
 }
 ```
@@ -69,11 +69,11 @@ parameters:
 
 ```µcad,init_explicit_overloading
 module box {
-    init(size: length) {
+    init(size: Length) {
         rectangle(size);
     }
 
-    init(width: length, height: length) {
+    init(width: Length, height: Length) {
         rectangle(width, height);
     }
 }
@@ -89,9 +89,9 @@ Calling an explicit initializer of a module.
 
 ```µcad,init_call_implicit
 // module with implicit initializer
-module m(l: length) {
+module m(l: Length) {
     // explicit initializer
-    init(f: length) { r = f/2.0; }
+    init(f: Length) { r = f/2.0; }
 }
 
 // call implicit initializer
@@ -106,9 +106,9 @@ Calling an explicit initializer of a module.
 
 ```µcad,init_call_explicit
 // module with implicit initializer
-module m(l: length) {
+module m(l: Length) {
     // explicit initializer
-    init(f: length) { l = f/2.0; }
+    init(f: Length) { l = f/2.0; }
     std::geo2d::circle( r = l );
 }
 
@@ -125,12 +125,12 @@ parameters and some *pre-initialization code*:
 
 ```µcad,init_call_implicit_explicit
 // module with implicit initializer
-module m( area: (width: length, height: length) ) {
+module m( area: (width: Length, height: Length) ) {
   // pre-initialization code
   default_width = 2.0m;
 
   // explicit initializer
-  init( height: length) { area = ( width = default_width, height); }
+  init( height: Length) { area = ( width = default_width, height); }
 }
 
 // call implicit initializer

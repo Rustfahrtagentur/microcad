@@ -42,9 +42,9 @@ fn map_type() {
     use crate::eval::Ty;
     use crate::parser::{Parser, Rule};
 
-    let type_annotation = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[int => string]", 0)
+    let type_annotation = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[Int => String]", 0)
         .expect("test error");
-    assert_eq!(type_annotation.ty().to_string(), "[int => string]");
+    assert_eq!(type_annotation.ty().to_string(), "[Int => String]");
     assert_eq!(
         type_annotation.ty(),
         Type::Map(MapType::new(MapKeyType::Integer, Type::String))

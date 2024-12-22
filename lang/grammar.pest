@@ -113,8 +113,8 @@ unit = @{ ((alpha_lower)+ ~ ("²" | "³")?) | "°" | "%" }
 color_literal = { "#" ~ (ASCII_HEX_DIGIT{8} | ASCII_HEX_DIGIT{6} | ASCII_HEX_DIGIT{4} | ASCII_HEX_DIGIT{3}) }
 
 //`1`: ok # Integer
-//`1mm`: ok # Number (length)
-//`1.0mm`: ok # Number (length)
+//`1mm`: ok # Number (Length)
+//`1.0mm`: ok # Number (Length)
 //`1.0`: ok # Scalar
 //`true`: ok # Boolean
 //`#00CCFF`: ok # Color
@@ -160,21 +160,21 @@ type_annotation = _{ ":" ~ ws* ~ type }
 list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 
 // Associative list, behaves like a map
-//`[length => string]`: maps a length to a string
+//`[Length => string]`: maps a Length to a string
 map_type = { "[" ~ ws* ~ type ~ ws* ~ "=>" ~ ws* ~ type ~ ws* ~ "]" }
 
 // Generic type for modules
 module_type = { "{" ~ ws* ~ "}" }
 
-//`(length,scalar)`: ok # 2 unnamed fields
-//`(length, a: length)`: error # Cannot mix named and unnamed arguments
+//`(Length,scalar)`: ok # 2 unnamed fields
+//`(Length, a: Length)`: error # Cannot mix named and unnamed arguments
 unnamed_tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
-//`(a: length, b: scalar)`: ok
-//`(a: length, )`: ok # Trailing comma 
+//`(a: Length, b: scalar)`: ok
+//`(a: Length, )`: ok # Trailing comma 
 named_tuple_type = { "(" ~ ws* ~ named_tuple_type_element ~ (ws* ~ "," ~ ws* ~ named_tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
-//`a: length`: ok
+//`a: Length`: ok
 named_tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
 
 //`[1, 2, 3]`: ok
@@ -355,10 +355,10 @@ tag = { "#" ~ qualified_name ~ call_op? }
 tag_list = _{ tag ~ (ws+ ~ tag)* }
 
 
-//`r: length = 5.0mm`: ok
+//`r: Length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
-//`r: length`: error # Default value is required
-//`r: length = math::pi`: ok # Type specifier + Default value from constant
+//`r: Length`: error # Default value is required
+//`r: Length = math::pi`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
 assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
 
@@ -385,10 +385,10 @@ node_body_statement = {
 }
 
 // Rule for a single parameter of a definition
-//`r: length = 5.0mm`: ok
+//`r: Length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
-//`r: length`: ok # Default value is NOT required
-//`r: length = math::pi`: ok # Type specifier + Default value from constant
+//`r: Length`: ok # Default value is NOT required
+//`r: Length = math::pi`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
 parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation  }
 
@@ -439,7 +439,7 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { module bar() { } }`: ok # Nested module definition
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Module with module as argument
-//`module foo() { init(size: length) { rectangle(size); } }`: ok # Module with init function
+//`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function
 //`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
 //`module donut(radius) { }`: error # Module must have type annotations
 module_definition = { (tag_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_definition_body }
@@ -466,9 +466,9 @@ module_definition_statement = {
 
 
 
-//`init(d: length) { r = d / 2; }`: ok
-//`init(size: length) { size = size; }`: ok
-//`init(size: length) { rectangle(size); }: ok
+//`init(d: Length) { r = d / 2; }`: ok
+//`init(size: Length) { size = size; }`: ok
+//`init(size: Length) { rectangle(size); }: ok
 module_init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ node_body }
 
 //`for i in [0..10] { translate(x = i*5mm); }`: ok
@@ -504,5 +504,5 @@ source_file_statement = {
 source_file_inner = _{ ws* ~ (source_file_statement ~ ws*)+ }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-//`module foo { init(size: length) { rectangle(size); } }`: ok # Module with init function
+//`module foo { init(size: Length) { rectangle(size); } }`: ok # Module with init function
 source_file = { SOI ~ ws* ~ source_file_inner? ~ ws* ~ EOI }

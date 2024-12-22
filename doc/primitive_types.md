@@ -12,7 +12,7 @@ i = 3;
 
 ## Scalar
 
-The type `scalar` contains a floating number and must be written with at least one decimal place (or in percent).
+The type `Scalar` contains a floating number and must be written with at least one decimal place (or in percent).
 
 ![test](.banner/types_primitive_scalar.png)
 

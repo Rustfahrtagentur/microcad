@@ -46,13 +46,13 @@ for x in [-4.0mm, 4.0mm] {
 ![test](.banner/parameter_multiplicity_example_D.png)
 
 ```µcad,parameter_multiplicity_example_D#todo
-module rounded_rect(width: length, height: length, radius: length) {
+module rounded_rect(width: Length, height: Length, radius: Length) {
     hull()
         translate(x = [-width, width]/2, y = [-height, height]/2)
             circle(radius);
 }
 
-module mountable_plate(width: length, height: length, corner_radius: length, distance: length, hole_diameter = 5mm) {
+module mountable_plate(width: Length, height: Length, corner_radius: Length, distance: Length, hole_diameter = 5mm) {
     rounded_rect(width, height, radius = corner_radius) - {
         hor = (width - distance) / 2;
         ver = (height - distance) / 2;
@@ -62,10 +62,10 @@ module mountable_plate(width: length, height: length, corner_radius: length, dis
 }
 
 module mountable_plate(
-    width: length,
-    height: length,
-    corner_radius: length,
-    outer_distance: length, 
+    width: Length,
+    height: Length,
+    corner_radius: Length,
+    outer_distance: Length, 
     hole_diameter = 5mm)
 {
     plate = rounded_rect(width, height, radius = corner_radius);
@@ -79,10 +79,10 @@ module mountable_plate(
 
 
 module mountable_plate(
-    size: (length, length),
-    corner_radius: length,
-    outer_distance: length, 
-    rel_hole_positions: [(x: scalar, y: scalar)], 
+    size: (Length, Length),
+    corner_radius: Length,
+    outer_distance: Length, 
+    rel_hole_positions: [(x: Scalar, y: Scalar)], 
     hole_diameter = 5mm)
 {
     plate = rounded_rect(width, height, radius = corner_radius);
