@@ -2,7 +2,7 @@ use std::io::Write;
 
 fn generate_header(w: &mut impl Write) -> std::io::Result<()> {
     writeln!(w, "# Test Summary")?;
-    writeln!(w, "")?;
+    writeln!(w)?;
     Ok(())
 }
 
@@ -15,7 +15,36 @@ fn generate_table_header(w: &mut impl Write) -> std::io::Result<()> {
 fn generate_table_row(w: &mut impl Write, test_case: &str) -> std::io::Result<()> {
     let log_file = format!("../output/{test_case}.log");
     let svg_file = format!("../output/{test_case}.µcad.svg");
-    let tree_file = format!("../output/{test_case}.tree.dump");
+    let result_tree_file = format!("../tests/output/{test_case}.tree.dump");
+    let reference_tree_file = format!("../../tests/test_cases/{test_case}.tree.dump");
+
+    println!(
+        "Checking test case: {} {}",
+        reference_tree_file,
+        std::path::Path::new(&reference_tree_file).exists()
+    );
+
+    // Print current directory
+    println!("Current directory: {:?}", std::env::current_dir()?);
+
+    // Get absolute path of the reference tree file
+    println!("Reference tree file: {:?}", reference_tree_file);
+
+    let tree_column = if std::path::Path::new(&reference_tree_file).exists() {
+        // Check if result and reference tree files are the same
+        let result = if std::fs::read(&result_tree_file)? == std::fs::read(&reference_tree_file)? {
+            ":x:"
+        } else {
+            ":white_check_mark:"
+        };
+
+        let reference_tree_file = format!("../test_cases/{test_case}.tree.dump");
+        let result_tree_file = format!("..//output/{test_case}.tree.dump");
+        format!("{result} [Result]({result_tree_file}) [Reference]({reference_tree_file})")
+    } else {
+        let result_tree_file = format!("..//output/{test_case}.tree.dump");
+        format!(":heavy_exclamation_mark: [Result]({result_tree_file}) No reference")
+    };
 
     // Open the log file and check if it contains the string "error"
     // If it does, then we should mark the test as failed
@@ -25,7 +54,7 @@ fn generate_table_row(w: &mut impl Write, test_case: &str) -> std::io::Result<()
         ":white_check_mark:"
     };
 
-    writeln!(w, "| [{test_case}.µcad](../test_cases/{test_case}.µcad) | <img src=\"{svg_file}\" alt=\"{test_case}\" width=\"100\"/> | [Tree]({tree_file}) | [{result}]({log_file}) |")?;
+    writeln!(w, "| [{test_case}.µcad](../test_cases/{test_case}.µcad) | <img src=\"{svg_file}\" alt=\"{test_case}\" width=\"100\"/> | {tree_column} | [{result}]({log_file}) |")?;
     Ok(())
 }
 
@@ -56,7 +85,7 @@ fn generate_table(w: &mut impl Write, test_cases: &[std::path::PathBuf]) -> std:
     for test_case in test_cases {
         let test_case_stripped = test_case
             .strip_prefix("tests/test_cases")
-            .unwrap()
+            .expect("Failed to strip prefix")
             .to_string_lossy()
             .to_string()
             .replace("\\", "/")
