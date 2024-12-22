@@ -1,0 +1,6 @@
+module double_box {
+    init( half_the_size: length) { size = half_the_size * 2.0; }
+    rectangle(size);
+}
+
+double_box(10.0mm);
