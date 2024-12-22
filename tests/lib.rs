@@ -209,6 +209,7 @@ fn test_diag_list() {
         .error(
             body_iter.next().expect("test error"),
             Box::new(EvalError::CustomError("This is an error".into())),
+            None,
         )
         .expect("test error");
 

@@ -3,7 +3,11 @@
 
 //! Call stack for evaluation
 
-use crate::{eval::symbols::*, eval::*, parse::FunctionDefinition};
+use crate::{
+    eval::{symbols::*, *},
+    parse::FunctionDefinition,
+    src_ref::{self, SrcRef, SrcReferrer},
+};
 
 /// Stack frame in the context
 ///
@@ -13,18 +17,18 @@ use crate::{eval::symbols::*, eval::*, parse::FunctionDefinition};
 pub struct StackFrame {
     source: std::rc::Rc<Symbol>,
     symbol_table: SymbolTable,
-    source_file: Option<std::rc::Rc<crate::parse::SourceFile>>,
 }
 
 impl StackFrame {
+    /// Create a new stack frame for a function
     pub fn function(context: &mut Context, function: std::rc::Rc<FunctionDefinition>) -> Self {
         Self {
             source: std::rc::Rc::new(Symbol::Function(function.clone())),
             symbol_table: SymbolTable::default(),
-            source_file: context.current_source_file().clone(),
         }
     }
 
+    /// Create a new stack frame for a module
     pub fn module(
         context: &mut Context,
         module: std::rc::Rc<crate::parse::ModuleDefinition>,
@@ -32,10 +36,10 @@ impl StackFrame {
         Self {
             source: std::rc::Rc::new(Symbol::Module(module.clone())),
             symbol_table: context.top().symbol_table().clone(),
-            source_file: context.current_source_file().clone(),
         }
     }
 
+    /// Create a new stack frame for a namespace
     pub fn namespace(
         context: &mut Context,
         namespace: std::rc::Rc<crate::parse::NamespaceDefinition>,
@@ -43,7 +47,6 @@ impl StackFrame {
         Self {
             source: std::rc::Rc::new(Symbol::Namespace(namespace.clone())),
             symbol_table: context.top().symbol_table().clone(),
-            source_file: context.current_source_file().clone(),
         }
     }
 
@@ -84,6 +87,9 @@ impl std::fmt::Display for StackFrame {
     }
 }
 
+/// Call stack
+///
+/// By default, the stack contains a single stack frame with an empty symbol table.
 #[derive(Debug, Clone)]
 pub struct Stack(Vec<StackFrame>);
 
@@ -116,6 +122,21 @@ impl Stack {
     ) -> std::io::Result<()> {
         for (idx, stack_frame) in self.0.iter().rev().enumerate() {
             writeln!(w, "#{idx}\t{stack_frame}")?;
+            // Print source location
+            match stack_frame.source.src_ref() {
+                SrcRef(None) => {}
+                src_ref => {
+                    let source_file = source_file_by_hash
+                        .get_source_file_by_hash(src_ref.source_hash())
+                        .expect("Source file not found");
+                    writeln!(
+                        w,
+                        "\t{filename}:{at}",
+                        filename = source_file.filename_as_str(),
+                        at = src_ref.at().expect("No source location"),
+                    )?;
+                }
+            }
         }
         Ok(())
     }
