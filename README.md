@@ -166,16 +166,16 @@ The user manual consists of several *markdown* files stored in the `/doc` folder
 
  One may insert *µcad* code into the *markdown* files, which then will get tested automatically if you run `cargo test` and name them like:
 
- ```md
- ```µcad,my_test
- ```
+```md
+` ``µcad,my_test
+```
 
 The *markdown* will be searched for any *µcad* code and appropriate *rust* tests will be  [generated](https://github.com/Rustfahrtagentur/microcad/tree/master/tests/microcad_markdown_test).
 
 beside the name you may add a test mode (see table below):
 
  ```md
- ```µcad,my_test#fail
+ ` ``µcad,my_test#fail
  ```
 
 The tests will create `.banner` folders beside the *markdown* files.
