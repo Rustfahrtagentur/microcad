@@ -25,31 +25,22 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Parse the µcad file
+    /// Parse a µcad file
     Parse {
         /// Input µcad file
         input: String,
     },
 
-    /// Evaluates the µcad file
+    /// Parse and evaluate a µcad file
     Eval {
         /// Input µcad file
         input: String,
     },
 
-    /// Exports the µcad file
+    /// Parse and evaluate and export a µcad file
     Export {
         /// Input µcad file
         input: String,
-    },
-
-    /// View the µcad file
-    View {
-        /// Input µcad file
-        input: String,
-
-        /// external viewer to execute
-        viewer: Option<String>,
     },
 }
 
@@ -83,10 +74,6 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
                     .join(",")
             );
         }
-        Commands::View {
-            input: _,
-            viewer: _,
-        } => todo!(),
     }
 
     Ok(())
