@@ -27,6 +27,8 @@ Simple basic shapes can be composed to create complex geometries which then can 
     - [Get External Libraries](#get-external-libraries)
     - [Build µcad](#build-µcad)
     - [Install µcad locally from source](#install-µcad-locally-from-source)
+    - [Contribute Documentation](#contribute-documentation)
+      - [User Manual](#user-manual)
 
 ## Quick Start
 
@@ -155,3 +157,44 @@ cargo build
 ```sh
 cargo install --path tools/cli
 ```
+
+### Contribute Documentation
+
+#### User Manual
+
+The user manual consists of several *markdown* files stored in the `/doc` folder, starting with the inside [`README.md`](doc/README.md).
+
+ One may insert *µcad* code into the *markdown* files, which then will get tested automatically if you run `cargo test` and name them like:
+
+ ```md
+ ```µcad,my_test
+ ```
+
+The *markdown* will be searched for any *µcad* code and appropriate *rust* tests will be  [generated](../tests/microcad_markdown_test).
+
+beside the name you may add a test mode (see table below):
+
+ ```md
+ ```µcad,my_test#fail
+ ```
+
+The tests will create `.banner` folders beside the *markdown* files.
+The tests will then copy an [image file (`*.png`)](../tests/microcad_markdown_test/images) for every test which signals the test result into the `.banner` folder.
+They can be included in the *markdown*, if you use this code:
+
+```md
+![test](.banner/my_test.png)
+```µcad,my_test
+```
+
+| Image                                  | MD Code Type | Mark       | Code                            | What do do?            |
+| -------------------------------------- | ------------ | ---------- | ------------------------------- | ---------------------- |
+| ![ok](tests/images/ok.png)             | `µcad`       |            | succeeds                        | ok                     |
+| ![fail](tests/images/fail.png)         | `µcad`       |            | fails                           | fix test or code       |
+| ![ok_fail](tests/images/ok_fail.png)   | `µcad`       | `#fail`    | succeeds but should fail        | find out why           |
+| ![fail_ok](tests/images/fail_ok.png)   | `µcad`       | `#fail`    | fails intentionally             | ok                     |
+| ![todo](tests/images/todo.png)         | `µcad`       | `#todo`    | needs more work to succeed      | create issue/implement |
+| ![not_todo](tests/images/not_todo.png) | `µcad`       | `#todo`    | Succeeds but still marked to do | remove `#todo`         |
+| -                                      | `µcad`       | `#no-test` | Ignore completely               | yolo!                  |
+| -                                      | -            | `          | Ignore completely               | yolo!                  |
+| -                                      | *(other)*    | `          | Ignore completely               | yolo!                  |
