@@ -1,4 +1,14 @@
-# Module Initialization
+## Module Initializers
+
+- [Module Initializers](#module-initializers)
+- [Example](#example)
+- [Implicit Initializer](#implicit-initializer)
+- [Explicit Initializer](#explicit-initializer)
+  - [Explicit Initializer overloading](#explicit-initializer-overloading)
+- [Calling Module Initializers](#calling-module-initializers)
+  - [Call Implicit Initializer](#call-implicit-initializer)
+  - [Call Explicit Initializer](#call-explicit-initializer)
+  - [Call Implicit, Explicit Init \& Pre-Initialization Code](#call-implicit-explicit-init--pre-initialization-code)
 
 ## Example
 
@@ -25,19 +35,21 @@ donut( radius_outer = 2.0cm, radius_inner = 1.0cm );
 donut( diameter_outer = 4.0cm, diameter_inner = 2.0cm );
 ```
 
-## Implicit init
+## Implicit Initializer
 
-A module with arguments has one implicit init:
+A module with an *implicit initializer* which takes a `size: length`:
 
 ![test](.banner/init_implicit.png)
 
 ```µcad,init_implicit
 module box(size: length) {
-    cube(size);
+    rectangle(size);
 }
 ```
 
-## Explicit init
+## Explicit Initializer
+
+A module with an *explicit initializer* which takes a `size: length`:
 
 ![test](.banner/init_explicit.png)
 
@@ -51,38 +63,80 @@ module box {
 
 ![test](.banner/init_explicit_overloading.png)
 
-## Explicit init overloading
+### Explicit Initializer overloading
+
+A module with *multiple explicit initializers* which takes different
+parameters:
 
 ```µcad,init_explicit_overloading
 module box {
     init(size: length) {
         rectangle(size);
     }
+
     init(width: length, height: length) {
         rectangle(width, height);
     }
 }
 ```
 
-## Members with multiple inits
+## Calling Module Initializers
 
-TODO: (Besseres Beispiel)
+### Call Implicit Initializer
 
-![test](.banner/init_bad_example.png)
+Calling an explicit initializer of a module.
 
-```µcad,init_bad_example#fail
-module box {
-    y := 0mm; // If this field is missing then, an error "MissingField" is raised 
+![test](.banner/init_call_implicit.png)
 
-    init(size: length) {
-        x := 10mm;
-        ...
-    }
-
-    init(width: length, height: length) {
-        x := 10mm;
-        y := 10mm;
-        ...
-    }
+```µcad,init_call_implicit
+// module with implicit initializer
+module m(l: length) {
+    // explicit initializer
+    init(f: length) { r = f/2.0; }
 }
+
+// call implicit initializer
+m(l=1mm);
+```
+
+### Call Explicit Initializer
+
+Calling an explicit initializer of a module.
+
+![test](.banner/init_call_explicit.png)
+
+```µcad,init_call_explicit
+// module with implicit initializer
+module m(l: length) {
+    // explicit initializer
+    init(f: length) { l = f/2.0; }
+    std::geo2d::circle( r = l );
+}
+
+// call explicit initializer
+m(f=1mm);
+```
+
+### Call Implicit, Explicit Init & Pre-Initialization Code
+
+A module with both, *implicit and *explicit initializer* which takes different
+parameters and some *pre-initialization code*:
+
+![test](.banner/init_call_implicit_explicit.png)
+
+```µcad,init_call_implicit_explicit
+// module with implicit initializer
+module m( area: (width: length, height: length) ) {
+  // pre-initialization code
+  default_width = 2.0m;
+
+  // explicit initializer
+  init( height: length) { area = ( width = default_width, height); }
+}
+
+// call implicit initializer
+m( area = (width = 1.0m, height = 0.5m) );
+
+// use explicit initializer
+m( height = 0.5m );
 ```
