@@ -15,7 +15,7 @@ static TEST_OUT_DIR: &str = "output";
 static DEFAULT_TEST_FILE: &str = "../tests/test_cases/algorithm/difference.µcad";
 
 #[cfg(test)]
-use microcad_lang::{diag::*, eval::*, objecttree::*, parse::*, parser::*, sym::*};
+use microcad_lang::{diag::*, eval::*, objects::*, parse::*, parser::*, sym::*};
 
 // Assure `TEST_OUT_DIR` exists
 #[cfg(test)]

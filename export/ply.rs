@@ -131,11 +131,11 @@ impl Exporter for PlyExporter {
         vec!["ply"]
     }
 
-    fn export(&mut self, node: objecttree::ObjectNode) -> Result<(), microcad_core::CoreError> {
+    fn export(&mut self, node: objects::ObjectNode) -> Result<(), microcad_core::CoreError> {
         use microcad_core::geo3d::*;
 
         let mut renderer = MeshRenderer::new(self.precision);
-        let node = objecttree::bake3d(&mut renderer, node)?;
+        let node = objects::bake3d(&mut renderer, node)?;
         renderer.render_node(node)?;
 
         let file = std::fs::File::create(&self.filename)?;

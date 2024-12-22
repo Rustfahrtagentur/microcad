@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::NamespaceBuilder;
-use microcad_lang::{builtin_module, eval::*, objecttree::*, parse::*, sym::*};
+use microcad_lang::{builtin_module, eval::*, objects::*, parse::*, sym::*};
 
 /// Creates a node containing a difference algorithm
 pub fn difference() -> Result<ObjectNode, EvalError> {

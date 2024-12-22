@@ -9,7 +9,7 @@ pub use statement::*;
 
 use std::io::Read;
 
-use crate::{eval::*, objecttree, parse::*, parser::*, src_ref::*, sym::*};
+use crate::{eval::*, objects, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Trait to get a source file by its hash
 pub trait GetSourceFileByHash {
@@ -178,10 +178,10 @@ impl Parse for SourceFile {
 }
 
 impl Eval for SourceFile {
-    type Output = objecttree::ObjectNode;
+    type Output = objects::ObjectNode;
 
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        let group = objecttree::group();
+        let group = objects::group();
         for statement in &self.body {
             match statement {
                 Statement::Expression(expression) => {

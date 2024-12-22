@@ -215,7 +215,7 @@ pub fn bake2d(
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_2d(
                     renderer,
-                    crate::objecttree::into_group(node.clone()).unwrap_or(node.clone()),
+                    crate::objects::into_group(node.clone()).unwrap_or(node.clone()),
                 )
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),
@@ -253,7 +253,7 @@ pub fn bake3d(
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_3d(
                     renderer,
-                    crate::objecttree::into_group(node.clone()).unwrap_or(node.clone()),
+                    crate::objects::into_group(node.clone()).unwrap_or(node.clone()),
                 )
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),

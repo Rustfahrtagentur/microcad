@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, objecttree::*, parse::*, source_file_cache::*, sym::*};
+use crate::{diag::*, eval::*, objects::*, parse::*, source_file_cache::*, sym::*};
 
 /// Context for evaluation
 ///

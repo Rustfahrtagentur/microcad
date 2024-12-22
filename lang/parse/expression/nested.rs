@@ -79,7 +79,7 @@ impl Eval for Nested {
         if nodes.is_empty() {
             Ok(None)
         } else {
-            Ok(Some(Value::Node(crate::objecttree::nest_nodes(nodes))))
+            Ok(Some(Value::Node(crate::objects::nest_nodes(nodes))))
         }
     }
 }

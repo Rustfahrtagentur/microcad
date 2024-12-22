@@ -3,7 +3,7 @@
 
 //! Module definition parser entity
 
-use crate::{eval::*, objecttree::*, parse::*, parser::*, src_ref::*, sym::*};
+use crate::{eval::*, objects::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Module definition
 #[derive(Clone, Debug)]

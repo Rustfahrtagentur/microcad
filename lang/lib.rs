@@ -6,7 +6,7 @@
 pub mod diag;
 pub mod eval;
 pub mod map_key_type;
-pub mod objecttree;
+pub mod objects;
 pub mod ord_map;
 pub mod parse;
 pub mod parser;

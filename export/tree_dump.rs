@@ -6,7 +6,7 @@
 use std::{fs::File, path::PathBuf};
 
 use crate::*;
-use microcad_lang::objecttree::ObjectNode;
+use microcad_lang::objects::ObjectNode;
 
 /// Export a node into tree dump file
 pub struct TreeDumpExporter {
@@ -40,7 +40,7 @@ impl Exporter for TreeDumpExporter {
 
         let file = File::create(&path)?;
         let mut writer = std::io::BufWriter::new(&file);
-        microcad_lang::objecttree::dump(&mut writer, node)?;
+        microcad_lang::objects::dump(&mut writer, node)?;
         Ok(())
     }
 

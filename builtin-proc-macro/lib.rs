@@ -48,8 +48,8 @@ fn builtin_module_impl(node_type: &str, input: syn::DeriveInput) -> TokenStream 
                         parameters
                     }
 
-                    fn node(args: &microcad_lang::eval::ArgumentMap) -> microcad_lang::eval::EvalResult<microcad_lang::objecttree::ObjectNode> {
-                        use microcad_lang::objecttree::{ObjectNode, ObjectNodeInner};
+                    fn node(args: &microcad_lang::eval::ArgumentMap) -> microcad_lang::eval::EvalResult<microcad_lang::objects::ObjectNode> {
+                        use microcad_lang::objects::{ObjectNode, ObjectNodeInner};
                         Ok(ObjectNode::new(ObjectNodeInner::#node_type(std::rc::Rc::new(#struct_name {
                             #(
                                 #field_identifiers: args[stringify!(#field_identifiers)].clone().try_into()?,

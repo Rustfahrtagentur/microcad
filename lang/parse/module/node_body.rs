@@ -3,7 +3,7 @@
 
 //! Node body parser entity
 
-use crate::{eval::*, objecttree::*, parse::*, parser::*, src_ref::*, sym::*};
+use crate::{eval::*, objects::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Node marker, e.g. `@children`
 #[derive(Clone, Debug)]
@@ -42,8 +42,8 @@ impl Eval for NodeMarker {
 
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         match self.name.to_string().as_str() {
-            "children" => Ok(Some(crate::objecttree::ObjectNode::new(
-                crate::objecttree::ObjectNodeInner::ChildrenNodeMarker,
+            "children" => Ok(Some(crate::objects::ObjectNode::new(
+                crate::objects::ObjectNodeInner::ChildrenNodeMarker,
             ))),
             _ => {
                 context.error_with_stack_trace(
@@ -176,10 +176,10 @@ impl Parse for NodeBody {
 }
 
 impl Eval for NodeBody {
-    type Output = crate::objecttree::ObjectNode;
+    type Output = crate::objects::ObjectNode;
 
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        let mut group = crate::objecttree::group();
+        let mut group = crate::objects::group();
 
         for statement in &self.statements {
             match statement {
