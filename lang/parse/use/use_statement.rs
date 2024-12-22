@@ -3,7 +3,7 @@
 
 //! Use statement parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Use statement:
 ///
@@ -62,7 +62,7 @@ impl Parse for UseStatement {
 impl Eval for UseStatement {
     type Output = Option<SymbolTable>;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         // Return a symbol table if the use statement is public
         match self.0 {
             Visibility::Public => {
@@ -70,7 +70,7 @@ impl Eval for UseStatement {
                 for decl in &self.1 {
                     let mut symbol_table = decl.eval(context)?;
                     for (name, symbol) in symbol_table.iter() {
-                        use crate::eval::Symbols;
+                        use crate::sym::Symbols;
                         context.add_alias(symbol.as_ref().clone(), name.clone());
                     }
 
@@ -82,7 +82,7 @@ impl Eval for UseStatement {
                 for decl in &self.1 {
                     let symbol_table = decl.eval(context)?;
                     for (name, symbol) in symbol_table.iter() {
-                        use crate::eval::Symbols;
+                        use crate::sym::Symbols;
                         context.add_alias(symbol.as_ref().clone(), name.clone());
                     }
                 }

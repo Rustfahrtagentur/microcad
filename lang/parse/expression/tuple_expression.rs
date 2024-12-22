@@ -87,7 +87,7 @@ impl std::fmt::Display for TupleExpression {
 impl Eval for TupleExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> crate::eval::EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> crate::eval::EvalResult<Value> {
         if self.is_named {
             // Named tuple
             let mut map = std::collections::BTreeMap::new();
@@ -149,7 +149,7 @@ fn unnamed_tuple() {
     let input = "(1.0, 2.0, 3.0)mm";
     let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
         .expect("test error");
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
     let value = expr.eval(&mut context).expect("test error");
     assert_eq!(
         value.ty(),
@@ -166,7 +166,7 @@ fn test_named_tuple() {
     let input = "(a = 1.0, b = 2.0, c = 3.0)mm";
     let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
         .expect("test error");
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
     let value = expr.eval(&mut context).expect("test error");
     assert_eq!(
         value.ty(),
@@ -187,7 +187,7 @@ fn test_vec2() {
     let input = "(x = 1mm, y = 1mm)";
     let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
         .expect("test error");
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
     let value = expr.eval(&mut context).expect("test error");
     assert_eq!(value.ty(), Type::Vec2);
 }
@@ -197,7 +197,7 @@ fn test_vec3() {
     let input = "(x = 1, y = 2, z = 3)mm";
     let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
         .expect("test error");
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
     let value = expr.eval(&mut context).expect("test error");
     assert_eq!(value.ty(), Type::Vec3);
 }

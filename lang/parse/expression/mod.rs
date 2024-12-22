@@ -15,7 +15,7 @@ pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 lazy_static::lazy_static! {
     /// Expression parser
@@ -169,7 +169,7 @@ impl Expression {
 impl Eval for Expression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match self {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
@@ -396,7 +396,7 @@ impl Parse for Expression {
 fn list_expression() {
     use crate::eval::*;
 
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
 
     // Simple list expression with 3 elements
     run_expression_test("[1,2,3]", &mut context, |e| {
@@ -435,7 +435,7 @@ fn list_expression() {
 #[cfg(test)]
 fn run_expression_test(
     expr: &str,
-    context: &mut crate::eval::Context,
+    context: &mut crate::eval::EvalContext,
     evaluator: impl FnOnce(EvalResult<crate::eval::Value>),
 ) {
     use crate::parser::{Parser, Rule};
@@ -457,7 +457,7 @@ fn run_expression_test(
 
 #[test]
 fn operators() {
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
     run_expression_test("4", &mut context, |e| {
         if let Ok(Value::Scalar(num)) = e {
             assert_eq!(*num, 4.0);
@@ -482,7 +482,7 @@ fn operators() {
 
 #[test]
 fn conditions() {
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
 
     run_expression_test("4 < 5", &mut context, |e| {
         if let Ok(Value::Bool(b)) = e {

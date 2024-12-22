@@ -4,13 +4,12 @@
 //! µcad command line interpreter
 
 extern crate clap;
-
 extern crate microcad_lang;
 
 use std::path::Path;
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{parse::SourceFile, ObjectNode};
+use microcad_lang::{objecttree::*, parse::*, sym::*};
 
 /// µcad cli
 #[derive(Parser)]

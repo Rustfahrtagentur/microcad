@@ -277,7 +277,7 @@ fn write_test_code(
             r##"#[test]
                 #[allow(non_snake_case)]
                 fn r#{name}() {{
-                    use microcad_lang::parse::SourceFile;
+                    use microcad_lang::{{parse::SourceFile,sym::Context}};
                     use microcad_std::ContextBuilder;
                     use crate::SEARCH_PATH;
                     use ::std::fs;
@@ -286,7 +286,7 @@ fn write_test_code(
 
                     microcad_lang::env_logger_init();
                     let banner = "{banner_esc}";
-                    let _ = fs::remove_file(&banner);
+                    let _ = fs::remove_file(banner);
                     #[allow(unused)]
                     let todo = {todo};
                     match SourceFile::load_from_str(

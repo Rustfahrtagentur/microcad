@@ -7,8 +7,8 @@ use crate::{
     eval::*,
     parse::{Identifier, QualifiedName},
     r#type::*,
+    sym::*,
 };
-use microcad_core::Id;
 use thiserror::Error;
 
 /// Evaluation error
@@ -257,9 +257,9 @@ pub enum EvalError {
     #[error("Missed call")]
     MissedCall,
 
-    /// StackUnderflow
-    #[error("Stack underflow")]
-    StackUnderflow,
+    /// IO Error
+    #[error("Symbol Error: {0}")]
+    SymError(#[from] SymError),
 }
 
 /// Result type of any evaluation

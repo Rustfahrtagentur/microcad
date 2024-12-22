@@ -3,7 +3,7 @@
 
 //! Module statement parser entities
 //!
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Module statement
 #[derive(Clone, Debug, strum::IntoStaticStr)]
@@ -70,7 +70,7 @@ impl Parse for ModuleDefinitionStatement {
 impl Eval for ModuleDefinitionStatement {
     type Output = Option<Value>;
 
-    fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut EvalContext) -> std::result::Result<Self::Output, EvalError> {
         match self {
             Self::Use(use_statement) => {
                 use_statement.eval(context)?;

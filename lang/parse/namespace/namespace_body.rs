@@ -3,7 +3,7 @@
 
 //! Namespace body parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Namespace body
 #[derive(Debug, Default, Clone)]
@@ -50,7 +50,7 @@ impl Symbols for NamespaceBody {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
+    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         self.symbols.copy(into)
     }
 }
@@ -79,7 +79,7 @@ impl SrcReferrer for NamespaceBody {
 impl Eval for NamespaceBody {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         for statement in &self.statements {
             statement.eval(context)?;
         }

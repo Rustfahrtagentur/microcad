@@ -25,7 +25,7 @@ mod tests;
 use microcad_lang::parameter;
 use microcad_lang::parameter_list;
 use microcad_lang::src_ref::SrcReferrer;
-use microcad_lang::{builtin_module, eval::*, function_signature, parse::*};
+use microcad_lang::{builtin_module, eval::*, function_signature, parse::*, sym::*};
 
 pub use context_builder::ContextBuilder;
 pub use export::export;

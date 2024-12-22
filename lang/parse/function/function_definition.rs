@@ -3,7 +3,7 @@
 
 //! Function definition parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Function definition
 #[derive(Debug)]
@@ -44,7 +44,7 @@ impl FunctionDefinition {
 impl CallTrait for std::rc::Rc<FunctionDefinition> {
     type Output = Value;
 
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Self::Output> {
+    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Self::Output> {
         let stack_frame = StackFrame::function(context, self.clone());
 
         context.scope(stack_frame, |context| {
@@ -84,7 +84,7 @@ impl Parse for std::rc::Rc<FunctionDefinition> {
 impl Eval for std::rc::Rc<FunctionDefinition> {
     type Output = Symbol;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         context.add(self.clone().into());
         Ok(Symbol::Function(self.clone()))
     }

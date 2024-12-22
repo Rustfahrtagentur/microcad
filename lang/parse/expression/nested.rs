@@ -47,7 +47,7 @@ impl SrcReferrer for Nested {
 impl Eval for Nested {
     type Output = Option<Value>;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         let mut nodes = Vec::new();
 
         for item in self.0.iter() {

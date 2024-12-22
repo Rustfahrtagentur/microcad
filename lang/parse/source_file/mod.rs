@@ -9,7 +9,7 @@ pub use statement::*;
 
 use std::io::Read;
 
-use crate::{eval::*, objecttree, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, objecttree, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Trait to get a source file by its hash
 pub trait GetSourceFileByHash {
@@ -106,7 +106,7 @@ impl SourceFile {
     /// This functionality is used for the `use` statement.
     pub fn eval_as_namespace(
         &self,
-        context: &mut Context,
+        context: &mut EvalContext,
         namespace_name: Identifier,
     ) -> EvalResult<std::rc::Rc<NamespaceDefinition>> {
         let mut namespace = NamespaceDefinition::new(namespace_name);
@@ -180,7 +180,7 @@ impl Parse for SourceFile {
 impl Eval for SourceFile {
     type Output = objecttree::ObjectNode;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         let group = objecttree::group();
         for statement in &self.body {
             match statement {

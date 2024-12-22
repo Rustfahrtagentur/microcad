@@ -29,8 +29,6 @@ pub type Mat3 = cgmath::Matrix3<Scalar>;
 pub type Mat4 = cgmath::Matrix4<Scalar>;
 /// Primitive angle type
 pub type Angle = cgmath::Rad<Scalar>;
-/// Id type (base of all identifiers)
-pub type Id = compact_str::CompactString;
 
 use std::str::FromStr;
 
@@ -140,8 +138,11 @@ fn export_settings() {
     let export_settings = ExportSettings::with_filename("test.stl".into());
 
     assert_eq!(
-        export_settings.file_path().unwrap(),
+        export_settings.file_path().expect("test error"),
         std::path::PathBuf::from_str("test.stl").unwrap()
     );
-    assert_eq!(export_settings.exporter_id().unwrap(), Some("stl".into()));
+    assert_eq!(
+        export_settings.exporter_id().expect("test error"),
+        Some("stl".into())
+    );
 }

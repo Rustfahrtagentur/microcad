@@ -1,16 +1,14 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, objecttree::*, parse::*, source_file_cache::*};
-
-use microcad_core::Id;
+use crate::{diag::*, eval::*, objecttree::*, parse::*, source_file_cache::*, sym::*};
 
 /// Context for evaluation
 ///
 /// The context is used to store the current state of the evaluation.
 /// A context is essentially a stack of symbol tables
 #[derive(Default)]
-pub struct Context {
+pub struct EvalContext {
     /// Stack of symbol tables
     stack: Stack,
 
@@ -24,7 +22,7 @@ pub struct Context {
     diag_handler: DiagHandler,
 }
 
-impl Context {
+impl EvalContext {
     /// Create a new context from a source file
     pub fn from_source_file(source_file: SourceFile) -> Self {
         let rc_source_file = std::rc::Rc::new(source_file);
@@ -52,47 +50,6 @@ impl Context {
     /// Note: This should not be an optional value, as the context is always created with a source file
     pub fn current_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
         self.current_source_file.clone()
-    }
-
-    /// Push a new symbol table to the stack (enter a new scope)
-    fn push(&mut self, stack_frame: StackFrame) {
-        self.stack.push(stack_frame);
-    }
-
-    /// Pop the top symbol table from the stack (exit the current scope)
-    fn pop(&mut self) {
-        self.stack.pop();
-    }
-
-    /// The top symbol table in the stack
-    ///
-    /// This method guarantees that the stack is not empty
-    pub fn top(&self) -> EvalResult<&StackFrame> {
-        self.stack.top()
-    }
-
-    /// The top symbol table in the stack (mutable)
-    ///
-    /// This method guarantees that the stack is not empty
-    pub fn top_mut(&mut self) -> &mut StackFrame {
-        self.stack.top_mut()
-    }
-
-    /// Create a new symbol table and push it to the stack
-    pub fn scope<T>(
-        &mut self,
-        stack_frame: StackFrame,
-        f: impl FnOnce(&mut Self) -> crate::eval::EvalResult<T>,
-    ) -> crate::eval::EvalResult<T> {
-        self.push(stack_frame);
-        let t = f(self)?;
-        self.pop();
-        Ok(t)
-    }
-
-    /// Read-only access to diagnostic handler
-    pub fn diag(&self) -> &DiagHandler {
-        &self.diag_handler
     }
 
     /// Fetch symbols by qualified name
@@ -123,13 +80,56 @@ impl Context {
     }
 }
 
-impl PushDiag for Context {
+impl Context for EvalContext {
+    /// Push a new symbol table to the stack (enter a new scope)
+    fn push(&mut self, stack_frame: StackFrame) {
+        self.stack.push(stack_frame);
+    }
+
+    /// Pop the top symbol table from the stack (exit the current scope)
+    fn pop(&mut self) {
+        self.stack.pop();
+    }
+
+    /// The top symbol table in the stack
+    ///
+    /// This method guarantees that the stack is not empty
+    fn top(&self) -> SymResult<&StackFrame> {
+        self.stack.top()
+    }
+
+    /// The top symbol table in the stack (mutable)
+    ///
+    /// This method guarantees that the stack is not empty
+    fn top_mut(&mut self) -> &mut StackFrame {
+        self.stack.top_mut()
+    }
+
+    /// Create a new symbol table and push it to the stack
+    fn scope<T>(
+        &mut self,
+        stack_frame: StackFrame,
+        f: impl FnOnce(&mut Self) -> EvalResult<T>,
+    ) -> EvalResult<T> {
+        self.push(stack_frame);
+        let t = f(self)?;
+        self.pop();
+        Ok(t)
+    }
+
+    /// Read-only access to diagnostic handler
+    fn diag(&self) -> &DiagHandler {
+        &self.diag_handler
+    }
+}
+
+impl PushDiag for EvalContext {
     fn push_diag(&mut self, diag: Diag) -> crate::eval::EvalResult<()> {
         self.diag_handler.push_diag(diag)
     }
 }
 
-impl Symbols for Context {
+impl Symbols for EvalContext {
     fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         self.stack
             .iter()
@@ -148,13 +148,12 @@ impl Symbols for Context {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
-        self.top()?.copy(into);
-        Ok(())
+    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
+        self.top()?.copy(into)
     }
 }
 
-impl GetSourceFileByHash for Context {
+impl GetSourceFileByHash for EvalContext {
     fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile> {
         self.source_files.get_source_file_by_hash(hash)
     }
@@ -165,7 +164,7 @@ impl GetSourceFileByHash for Context {
 fn context_basic() {
     use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
 
     context.add_value("a".into(), Value::Integer(Refer::none(1)));
     context.add_value("b".into(), Value::Integer(Refer::none(2)));

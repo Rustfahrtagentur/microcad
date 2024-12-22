@@ -11,9 +11,8 @@ pub use transform::Transform;
 
 use strum::IntoStaticStr;
 
+use crate::sym::*;
 use microcad_core::*;
-
-use crate::eval::*;
 
 /// Inner of a node
 #[derive(Clone, IntoStaticStr)]
@@ -91,7 +90,7 @@ impl Symbols for ObjectNode {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
+    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         match *self.borrow_mut() {
             ObjectNodeInner::Group(ref mut table) => table.copy(into),
             _ => unreachable!(),

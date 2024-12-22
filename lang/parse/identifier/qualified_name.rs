@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a.b.c`
@@ -15,7 +15,7 @@ impl SrcReferrer for QualifiedName {
 }
 
 impl Sym for QualifiedName {
-    fn id(&self) -> Option<microcad_core::Id> {
+    fn id(&self) -> Option<Id> {
         // TODO: how to convert qualified name into one single id?
         self.last().map(|i| i.id().clone())
     }
@@ -55,7 +55,7 @@ impl QualifiedName {
     /// Visit all symbols in the qualified name recursively, starting from the root
     pub fn visit_symbols(
         &self,
-        context: &Context,
+        context: &EvalContext,
         functor: &mut dyn FnMut(&Symbol, usize),
     ) -> EvalResult<()> {
         self._visit_symbols(None, 0, context, functor)
@@ -66,7 +66,7 @@ impl QualifiedName {
         &self,
         root: Option<std::rc::Rc<Symbol>>,
         index: usize,
-        context: &Context,
+        context: &EvalContext,
         functor: &mut dyn FnMut(&Symbol, usize),
     ) -> EvalResult<()> {
         if index >= self.0.len() {
@@ -87,7 +87,7 @@ impl QualifiedName {
     }
 
     /// Get all symbols for the qualified name
-    pub fn fetch_symbols(&self, context: &mut Context) -> EvalResult<Vec<Symbol>> {
+    pub fn fetch_symbols(&self, context: &mut EvalContext) -> EvalResult<Vec<Symbol>> {
         let mut symbols = Vec::new();
         self.visit_symbols(context, &mut |symbol, depth| {
             // Only take symbols that match the full qualified name
@@ -108,7 +108,7 @@ impl QualifiedName {
     /// Get the symbol for the qualified name
     ///
     /// If there are multiple symbols with the same name, an error is returned
-    pub fn fetch_symbol(&self, context: &mut Context) -> EvalResult<Option<Symbol>> {
+    pub fn fetch_symbol(&self, context: &mut EvalContext) -> EvalResult<Option<Symbol>> {
         let symbols = self.fetch_symbols(context)?;
         if symbols.len() > 1 {
             context.error_with_stack_trace(
@@ -124,7 +124,7 @@ impl QualifiedName {
 impl Eval for QualifiedName {
     type Output = Symbol;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         if let Some(symbol) = self.fetch_symbol(context)? {
             Ok(symbol)
         } else {

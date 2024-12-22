@@ -105,7 +105,7 @@ impl Parse for Parameter {
 impl Eval for Parameter {
     type Output = ParameterValue;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         match (&self.specified_type, &self.default_value) {
             // Type and value are specified
             (Some(specified_type), Some(expr)) => {

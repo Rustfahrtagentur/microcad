@@ -4,7 +4,7 @@
 //! Scalable Vector Graphics (SVG) file writer and renderer
 
 use geo::CoordsIter;
-use microcad_core::{CoreError, Scalar, *};
+use microcad_core::{geo2d, CoreError, Scalar};
 
 /// Write SVG
 pub struct SvgWriter {

@@ -4,7 +4,7 @@
 use crate::NamespaceBuilder;
 use cgmath::InnerSpace;
 use microcad_core::Scalar;
-use microcad_lang::{builtin_function, eval::*, parse::*, src_ref::*};
+use microcad_lang::{builtin_function, eval::*, parse::*, src_ref::*, sym::*};
 
 pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
     Ok(NamespaceBuilder::new("math")
@@ -136,7 +136,7 @@ fn test_builtin_function(name: &str, input: &str, expected: &str) {
     let module = builtin_module().expect("builtin error");
     assert_eq!(&module.name, "math");
 
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
 
     context.add(module.into());
 

@@ -6,22 +6,18 @@
 mod builtin_function;
 mod builtin_module;
 mod call;
-mod context;
 mod errors;
+mod eval_context;
 mod parameter;
-mod stack;
-mod symbols;
 mod ty;
 mod value;
 
 pub use builtin_function::*;
 pub use builtin_module::*;
 pub use call::*;
-pub use context::*;
 pub use errors::*;
+pub use eval_context::*;
 pub use parameter::*;
-pub use stack::*;
-pub use symbols::*;
 pub use ty::*;
 pub use value::*;
 
@@ -31,7 +27,7 @@ pub trait Eval {
     type Output;
 
     /// Evaluate the type into an expression
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output>;
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output>;
 }
 
-pub use microcad_core::Id;
+pub use crate::sym::Id;

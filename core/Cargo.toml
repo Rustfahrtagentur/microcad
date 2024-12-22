@@ -20,7 +20,6 @@ path = "lib.rs"
 strum = { version = "0.26", features = ["derive"] }
 log = "0.4"
 cgmath = "0.18"
-compact_str = "0.8"
 thiserror = "2.0"
 geo = "0.29"
 rctree = "0.6"

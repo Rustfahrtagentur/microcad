@@ -3,13 +3,7 @@
 
 //! µcad assignment parser entity
 
-use crate::{
-    eval::*,
-    parse::*,
-    parser::*,
-    r#type::*,
-    src_ref::{SrcRef, SrcReferrer},
-};
+use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*, sym::*};
 
 /// Assignment specifying an identifier, type and value
 #[derive(Clone, Debug)]
@@ -26,7 +20,7 @@ pub struct Assignment {
 
 impl Assignment {
     /// Make a symbol from the assignment
-    pub fn make_symbol(&self, context: &mut Context) -> EvalResult<Symbol> {
+    pub fn make_symbol(&self, context: &mut EvalContext) -> EvalResult<Symbol> {
         Ok(Symbol::Value(
             self.name.id().clone(),
             self.value.eval(context)?,
@@ -75,7 +69,7 @@ impl Parse for Assignment {
 impl Eval for Assignment {
     type Output = Symbol;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         let symbol = self.make_symbol(context)?;
         context.add(symbol.clone());
         Ok(symbol)

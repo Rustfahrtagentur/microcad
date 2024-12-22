@@ -11,7 +11,7 @@ pub use diag_handler::*;
 pub use diag_list::*;
 pub use level::*;
 
-use crate::{parse::*, src_ref::*};
+use crate::{parse::*, src_ref::*, sym::*};
 
 /// A trait to add diagnostics with different levels conveniently
 pub trait PushDiag {
@@ -41,7 +41,7 @@ pub trait PushDiag {
         &mut self,
         src: impl SrcReferrer,
         error: Box<dyn std::error::Error>,
-        stack: Option<crate::eval::Stack>,
+        stack: Option<Stack>,
     ) -> crate::eval::EvalResult<()> {
         self.push_diag(Diag::Error(Refer::new(error, src.src_ref()), stack))
     }
@@ -57,10 +57,7 @@ pub enum Diag {
     /// Warning with source code reference attached
     Warning(Refer<Box<dyn std::error::Error>>),
     /// Error with source code reference and optional stack trace attached
-    Error(
-        Refer<Box<dyn std::error::Error>>,
-        Option<crate::eval::Stack>,
-    ),
+    Error(Refer<Box<dyn std::error::Error>>, Option<Stack>),
 }
 
 impl Diag {

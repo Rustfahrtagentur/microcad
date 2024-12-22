@@ -1,4 +1,4 @@
-use crate::eval::*;
+use super::*;
 
 /// Symbol table
 ///
@@ -50,7 +50,7 @@ impl Symbols for SymbolTable {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
+    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         self.0.iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());
         });

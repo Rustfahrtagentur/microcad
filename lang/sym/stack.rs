@@ -3,11 +3,7 @@
 
 //! Call stack for evaluation
 
-use crate::{
-    eval::{symbols::*, *},
-    parse::FunctionDefinition,
-    src_ref::{SrcRef, SrcReferrer},
-};
+use crate::{parse::*, src_ref::*, sym::*};
 
 /// Stack frame in the context
 ///
@@ -21,7 +17,7 @@ pub struct StackFrame {
 
 impl StackFrame {
     /// Create a new stack frame for a function
-    pub fn function(_: &mut Context, function: std::rc::Rc<FunctionDefinition>) -> Self {
+    pub fn function<C>(_: &mut C, function: std::rc::Rc<FunctionDefinition>) -> Self {
         Self {
             source: std::rc::Rc::new(Symbol::Function(function.clone())),
             symbol_table: SymbolTable::default(),
@@ -30,9 +26,9 @@ impl StackFrame {
 
     /// Create a new stack frame for a module
     pub fn module(
-        context: &mut Context,
+        context: &mut impl Context,
         module: std::rc::Rc<crate::parse::ModuleDefinition>,
-    ) -> EvalResult<Self> {
+    ) -> SymResult<Self> {
         Ok(Self {
             source: std::rc::Rc::new(Symbol::Module(module.clone())),
             symbol_table: context.top()?.symbol_table.clone(),
@@ -41,9 +37,9 @@ impl StackFrame {
 
     /// Create a new stack frame for a namespace
     pub fn namespace(
-        context: &mut Context,
+        context: &mut impl Context,
         namespace: std::rc::Rc<crate::parse::NamespaceDefinition>,
-    ) -> EvalResult<Self> {
+    ) -> SymResult<Self> {
         Ok(Self {
             source: std::rc::Rc::new(Symbol::Namespace(namespace.clone())),
             symbol_table: context.top()?.symbol_table.clone(),
@@ -51,15 +47,13 @@ impl StackFrame {
     }
 
     /// copy symbols from another symbol table
-    pub fn copy<T: Symbols>(&self, into: &mut T) {
-        self.symbol_table.iter().for_each(|(_, symbol)| {
-            into.add(symbol.as_ref().clone());
-        });
+    pub fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
+        self.symbol_table.copy(into)
     }
 }
 
 impl Symbols for StackFrame {
-    fn fetch(&self, id: &microcad_core::Id) -> Option<std::rc::Rc<Symbol>> {
+    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
         self.symbol_table.fetch(id)
     }
 
@@ -68,12 +62,12 @@ impl Symbols for StackFrame {
         self
     }
 
-    fn add_alias(&mut self, symbol: Symbol, alias: microcad_core::Id) -> &mut Self {
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
         self.symbol_table.add_alias(symbol, alias);
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
+    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         self.symbol_table.copy(into)
     }
 }
@@ -102,11 +96,11 @@ impl Stack {
     }
 
     /// Get the top stack frame
-    pub fn top(&self) -> EvalResult<&StackFrame> {
+    pub fn top(&self) -> SymResult<&StackFrame> {
         if let Some(last) = self.0.last() {
             Ok(last)
         } else {
-            Err(EvalError::StackUnderflow)
+            Err(SymError::StackUnderflow)
         }
     }
 
