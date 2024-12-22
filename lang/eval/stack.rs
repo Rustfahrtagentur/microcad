@@ -83,7 +83,7 @@ impl Symbols for StackFrame {
 
 impl std::fmt::Display for StackFrame {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{:?}", self.source.id())
+        write!(f, "{}", self.source.id().unwrap_or("root".into()))
     }
 }
 
@@ -131,7 +131,7 @@ impl Stack {
                         .expect("Source file not found");
                     writeln!(
                         w,
-                        "\t{filename}:{at}",
+                        "\tat {filename}:{at}",
                         filename = source_file.filename_as_str(),
                         at = src_ref.at().expect("No source location"),
                     )?;
