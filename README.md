@@ -27,7 +27,7 @@ Simple basic shapes can be composed to create complex geometries which then can 
     - [Get External Libraries](#get-external-libraries)
     - [Build µcad](#build-µcad)
     - [Install µcad locally from source](#install-µcad-locally-from-source)
-    - [Contribute Documentation](#contribute-documentation)
+    - [Contributing to Documentation](#contributing-to-documentation)
       - [User Manual](#user-manual)
 
 ## Quick Start
@@ -158,7 +158,7 @@ cargo build
 cargo install --path tools/cli
 ```
 
-### Contribute Documentation
+### Contributing to Documentation
 
 #### User Manual
 
@@ -170,7 +170,7 @@ The user manual consists of several *markdown* files stored in the `/doc` folder
  ```µcad,my_test
  ```
 
-The *markdown* will be searched for any *µcad* code and appropriate *rust* tests will be  [generated](../tests/microcad_markdown_test).
+The *markdown* will be searched for any *µcad* code and appropriate *rust* tests will be  [generated](https://github.com/Rustfahrtagentur/microcad/tree/master/tests/microcad_markdown_test).
 
 beside the name you may add a test mode (see table below):
 
@@ -179,7 +179,7 @@ beside the name you may add a test mode (see table below):
  ```
 
 The tests will create `.banner` folders beside the *markdown* files.
-The tests will then copy an [image file (`*.png`)](../tests/microcad_markdown_test/images) for every test which signals the test result into the `.banner` folder.
+The tests will then copy an [image file (`*.png`)](https://github.com/Rustfahrtagentur/microcad/tree/master/tests/images) for every test which signals the test result into the `.banner` folder.
 They can be included in the *markdown*, if you use this code:
 
 ```md
