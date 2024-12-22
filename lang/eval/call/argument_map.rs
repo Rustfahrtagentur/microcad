@@ -264,3 +264,28 @@ impl ArgumentMatch for MultiArgumentMap {
         }
     }
 }
+
+#[test]
+fn test_find_and_insert_named_arguments() {
+    use crate::r#type::Type;
+
+    let mut map = ArgumentMap::new(SrcRef::default());
+
+    let mut cal = CallArgumentValueList::default();
+    cal.push(call_argument_value!(a: Integer = 1))
+        .expect("test error");
+
+    let mut pvl = ParameterValueList::default();
+    pvl.push(ParameterValue::new(
+        "a".into(),
+        Some(Type::Integer),
+        None,
+        SrcRef::default(),
+    ))
+    .expect("test error");
+
+    map.find_and_insert_named_arguments(&cal, &mut pvl)
+        .expect("test error");
+
+    assert!(pvl.is_empty());
+}

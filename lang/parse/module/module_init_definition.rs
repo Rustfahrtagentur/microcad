@@ -30,12 +30,30 @@ impl ModuleInitDefinition {
         &self,
         arg_map: &ArgumentMap,
         context: &mut Context,
-    ) -> EvalResult<crate::objecttree::ObjectNode> {
+        node: &mut crate::ObjectNode,
+    ) -> EvalResult<()> {
+        // Copy the arguments to the symbol table of the node
+        for (name, value) in arg_map.iter() {
+            node.add(Symbol::Value(name.clone(), value.clone()));
+        }
+
         for (name, value) in arg_map.iter() {
             context.add(Symbol::Value(name.clone(), value.clone()));
         }
 
-        self.body.eval(context)
+        let node_body = self.body.eval(context)?;
+
+        // Add the init object's children to the node
+        for child in node_body.children() {
+            child.detach();
+            node.append(child.clone());
+        }
+        node_body.copy(node);
+
+        // Now, copy the symbols of the node into the context
+        node.copy(context);
+
+        Ok(())
     }
 }
 

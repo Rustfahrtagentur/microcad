@@ -143,15 +143,15 @@ impl Context {
     }
 
     /// Create a new symbol table and push it to the stack
-    pub fn scope(
+    pub fn scope<T>(
         &mut self,
         stack_frame: StackFrame,
-        f: impl FnOnce(&mut Self) -> crate::eval::EvalResult<()>,
-    ) -> crate::eval::EvalResult<()> {
+        f: impl FnOnce(&mut Self) -> crate::eval::EvalResult<T>,
+    ) -> crate::eval::EvalResult<T> {
         self.push(stack_frame);
-        f(self)?;
+        let t = f(self)?;
         self.pop();
-        Ok(())
+        Ok(t)
     }
 
     /// Read-only access to diagnostic handler

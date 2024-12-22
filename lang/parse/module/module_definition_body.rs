@@ -32,8 +32,10 @@ pub struct ModuleDefinitionBody {
     pub post_init_statements: Vec<ModuleDefinitionStatement>,
     /// Module's local symbol table
     pub symbols: SymbolTable,
-    /// Initializers
-    pub inits: Vec<std::rc::Rc<ModuleInitDefinition>>,
+    /// implicit Initializers
+    pub implicit_init: Option<std::rc::Rc<ModuleInitDefinition>>,
+    /// explicit Initializers
+    pub explicit_inits: Vec<std::rc::Rc<ModuleInitDefinition>>,
     /// Source code reference
     src_ref: SrcRef,
 }
@@ -53,13 +55,13 @@ impl ModuleDefinitionBody {
                 // and before post-init statements.
                 // Other statements between pre-init and post-init are not allowed
                 if self.post_init_statements.is_empty() {
-                    self.inits.push(init.clone());
+                    self.explicit_inits.push(init.clone());
                 } else {
                     return Err(ParseError::StatementBetweenModuleInit);
                 }
             }
             statement => {
-                if self.inits.is_empty() {
+                if self.explicit_inits.is_empty() {
                     self.pre_init_statements.push(statement);
                 } else {
                     self.post_init_statements.push(statement);
@@ -77,23 +79,64 @@ impl ModuleDefinitionBody {
         &mut self,
         parameters: ParameterList,
     ) -> ParseResult<()> {
-        if !self.inits.is_empty() {
-            return Err(ParseError::BothParameterListAndInitializer);
-        }
-
         let src_ref = parameters.src_ref();
         let init = ModuleInitDefinition {
             parameters,
             body: NodeBody::default(),
             src_ref,
         };
-        self.inits.push(std::rc::Rc::new(init));
+        self.implicit_init = Some(std::rc::Rc::new(init));
 
-        // Move pre-init statements to post-init statements
-        std::mem::swap(
-            &mut self.pre_init_statements,
-            &mut self.post_init_statements,
-        );
+        Ok(())
+    }
+
+    /// Evaluate a single statement of the module
+    fn eval_statement(
+        &self,
+        statement: &ModuleDefinitionStatement,
+        context: &mut Context,
+        group: &mut crate::ObjectNode,
+    ) -> EvalResult<()> {
+        match statement {
+            ModuleDefinitionStatement::Assignment(assignment) => {
+                // Evaluate the assignment and add the symbol to the node
+                // E.g. `a = 1` will add the symbol `a` to the node
+                let symbol = assignment.eval(context)?;
+                group.add(symbol);
+            }
+            statement => {
+                if let Some(Value::Node(new_child)) = statement.eval(context)? {
+                    group.append(new_child);
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Evaluate the pre-init statements, and copy the symbols to the node
+    pub fn eval_pre_init_statements(
+        &self,
+        context: &mut Context,
+        node: &mut crate::ObjectNode,
+    ) -> EvalResult<()> {
+        for statement in &self.pre_init_statements {
+            self.eval_statement(statement, context, node)?;
+        }
+        node.copy(context);
+
+        Ok(())
+    }
+
+    /// Evaluate the post-init statements, and copy the symbols to the node
+    pub fn eval_post_init_statements(
+        &self,
+        context: &mut Context,
+        node: &mut crate::ObjectNode,
+    ) -> EvalResult<()> {
+        for statement in &self.post_init_statements {
+            self.eval_statement(statement, context, node)?;
+        }
+        node.copy(context);
 
         Ok(())
     }
@@ -153,11 +196,15 @@ impl Parse for ModuleDefinitionBody {
 impl std::fmt::Display for ModuleDefinitionBody {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, " {{")?;
+        if let Some(init) = &self.implicit_init {
+            writeln!(f, "{}", init)?;
+        }
+
         for statement in &self.pre_init_statements {
             writeln!(f, "{}", statement)?;
         }
 
-        for init in &self.inits {
+        for init in &self.explicit_inits {
             writeln!(f, "{}", init)?;
         }
 
