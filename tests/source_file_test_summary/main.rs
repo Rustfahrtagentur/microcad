@@ -1,22 +1,37 @@
 use std::io::Write;
 
+/// Generate the header of the test summary
 fn generate_header(w: &mut impl Write) -> std::io::Result<()> {
     writeln!(w, "# Test Summary")?;
     writeln!(w)?;
     Ok(())
 }
 
+/// Generate the header of the table
 fn generate_table_header(w: &mut impl Write) -> std::io::Result<()> {
     writeln!(w, "| Test file | SVG | Tree dump | Result |")?;
     writeln!(w, "|-----------|-----|-----------|--------|")?;
     Ok(())
 }
 
+/// Compare two files and return true if they are equal
+fn file_equal(file1: impl AsRef<std::path::Path>, file2: impl AsRef<std::path::Path>) -> bool {
+    std::fs::read_to_string(file1)
+        .expect("error reading file2")
+        .replace("\r\n", "\n")
+        .trim()
+        == std::fs::read_to_string(file2)
+            .expect("error reading file2")
+            .replace("\r\n", "\n")
+            .trim()
+}
+
+/// Generate a row of the table
 fn generate_table_row(w: &mut impl Write, test_case: &str) -> std::io::Result<()> {
-    let log_file = format!("../output/{test_case}.log");
-    let svg_file = format!("../output/{test_case}.µcad.svg");
-    let result_tree_file = format!("../tests/output/{test_case}.tree.dump");
-    let reference_tree_file = format!("../../tests/test_cases/{test_case}.tree.dump");
+    let log_file = format!("tests/output/{test_case}.log");
+    let svg_file = format!("tests/output/{test_case}.µcad.svg");
+    let result_tree_file = format!("tests/output/{test_case}.tree.dump");
+    let reference_tree_file = format!("tests/test_cases/{test_case}.tree.dump");
 
     println!(
         "Checking test case: {} {}",
@@ -30,31 +45,42 @@ fn generate_table_row(w: &mut impl Write, test_case: &str) -> std::io::Result<()
     // Get absolute path of the reference tree file
     println!("Reference tree file: {:?}", reference_tree_file);
 
+    let test_case_column = format!("[{test_case}.µcad](tests/test_cases/{test_case}.µcad)",);
+
+    let svg_column = if std::path::Path::new(&svg_file).exists() {
+        format!("<img src=\"{svg_file}\" alt=\"{test_case}\" width=\"100\"/>")
+    } else {
+        String::from(":heavy_exclamation_mark: No SVG output")
+    };
+
     let tree_column = if std::path::Path::new(&reference_tree_file).exists() {
         // Check if result and reference tree files are the same
-        let result = if std::fs::read(&result_tree_file)? == std::fs::read(&reference_tree_file)? {
+        let result = if !file_equal(&result_tree_file, &reference_tree_file) {
             ":x:"
         } else {
             ":white_check_mark:"
         };
 
-        let reference_tree_file = format!("../test_cases/{test_case}.tree.dump");
-        let result_tree_file = format!("..//output/{test_case}.tree.dump");
         format!("{result} [Result]({result_tree_file}) [Reference]({reference_tree_file})")
     } else {
-        let result_tree_file = format!("..//output/{test_case}.tree.dump");
         format!(":heavy_exclamation_mark: [Result]({result_tree_file}) No reference")
     };
 
     // Open the log file and check if it contains the string "error"
     // If it does, then we should mark the test as failed
-    let result = if log_file.contains("error:") {
-        ":x:"
-    } else {
-        ":white_check_mark:"
-    };
+    let result_column = format!(
+        "[{result}]({log_file})",
+        result = if log_file.contains("error:") {
+            ":x:"
+        } else {
+            ":white_check_mark:"
+        },
+    );
 
-    writeln!(w, "| [{test_case}.µcad](../test_cases/{test_case}.µcad) | <img src=\"{svg_file}\" alt=\"{test_case}\" width=\"100\"/> | {tree_column} | [{result}]({log_file}) |")?;
+    writeln!(
+        w,
+        "| {test_case_column} | {svg_column} | {tree_column} | {result_column} |"
+    )?;
     Ok(())
 }
 
@@ -66,7 +92,10 @@ fn scan(path: &std::path::Path, extension: &str) -> std::io::Result<Vec<std::pat
     for entry in std::fs::read_dir(path)?.flatten() {
         // get file type
         if let Ok(file_type) = entry.file_type() {
-            let file_name = entry.file_name().into_string().unwrap();
+            let file_name = entry
+                .file_name()
+                .into_string()
+                .expect("Failed to convert file name");
             // check if directory or file
             if file_type.is_dir() {
                 test_cases.append(&mut scan(&entry.path(), extension)?);
@@ -99,9 +128,7 @@ fn generate_table(w: &mut impl Write, test_cases: &[std::path::PathBuf]) -> std:
 fn main() -> std::io::Result<()> {
     let test_cases = scan(std::path::Path::new("tests/test_cases"), "µcad")?;
 
-    let mut w = std::io::BufWriter::new(std::fs::File::create(
-        "tests/source_file_test_summary/README.md",
-    )?);
+    let mut w = std::io::BufWriter::new(std::fs::File::create("TEST_SUMMARY.md")?);
     generate_table(&mut w, &test_cases)?;
     w.flush()?;
 
