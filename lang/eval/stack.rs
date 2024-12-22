@@ -32,22 +32,22 @@ impl StackFrame {
     pub fn module(
         context: &mut Context,
         module: std::rc::Rc<crate::parse::ModuleDefinition>,
-    ) -> Self {
-        Self {
+    ) -> EvalResult<Self> {
+        Ok(Self {
             source: std::rc::Rc::new(Symbol::Module(module.clone())),
-            symbol_table: context.top().symbol_table.clone(),
-        }
+            symbol_table: context.top()?.symbol_table.clone(),
+        })
     }
 
     /// Create a new stack frame for a namespace
     pub fn namespace(
         context: &mut Context,
         namespace: std::rc::Rc<crate::parse::NamespaceDefinition>,
-    ) -> Self {
-        Self {
+    ) -> EvalResult<Self> {
+        Ok(Self {
             source: std::rc::Rc::new(Symbol::Namespace(namespace.clone())),
-            symbol_table: context.top().symbol_table.clone(),
-        }
+            symbol_table: context.top()?.symbol_table.clone(),
+        })
     }
 
     /// copy symbols from another symbol table
@@ -73,8 +73,8 @@ impl Symbols for StackFrame {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
-        self.symbol_table.copy(into);
+    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
+        self.symbol_table.copy(into)
     }
 }
 
@@ -102,8 +102,12 @@ impl Stack {
     }
 
     /// Get the top stack frame
-    pub fn top(&self) -> &StackFrame {
-        self.0.last().expect("Empty stack")
+    pub fn top(&self) -> EvalResult<&StackFrame> {
+        if let Some(last) = self.0.last() {
+            Ok(last)
+        } else {
+            Err(EvalError::StackUnderflow)
+        }
     }
 
     /// Get a mutual reference to the top stack frame

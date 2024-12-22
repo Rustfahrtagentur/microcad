@@ -50,10 +50,11 @@ impl Symbols for SymbolTable {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
         self.0.iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());
         });
+        Ok(())
     }
 }
 

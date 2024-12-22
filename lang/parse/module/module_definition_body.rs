@@ -128,9 +128,7 @@ impl ModuleDefinitionBody {
         for statement in &self.pre_init_statements {
             self.eval_statement(statement, context, node)?;
         }
-        node.copy(context);
-
-        Ok(())
+        node.copy(context)
     }
 
     /// Evaluate the post-init statements, and copy the symbols to the node
@@ -142,9 +140,7 @@ impl ModuleDefinitionBody {
         for statement in &self.post_init_statements {
             self.eval_statement(statement, context, node)?;
         }
-        node.copy(context);
-
-        Ok(())
+        node.copy(context)
     }
 }
 
@@ -169,7 +165,7 @@ impl Symbols for ModuleDefinitionBody {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
         self.symbols.copy(into)
     }
 }

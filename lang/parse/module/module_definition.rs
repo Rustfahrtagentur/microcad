@@ -116,7 +116,7 @@ impl CallTrait for std::rc::Rc<ModuleDefinition> {
         call_argument_list: &CallArgumentList,
         context: &mut Context,
     ) -> EvalResult<Self::Output> {
-        let stack_frame = StackFrame::module(context, self.clone());
+        let stack_frame = StackFrame::module(context, self.clone())?;
 
         context.scope(stack_frame, |context| {
             match self.find_matching_initializer(call_argument_list, context) {
@@ -152,10 +152,11 @@ impl Symbols for ModuleDefinition {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
         self.body.symbols.iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());
         });
+        Ok(())
     }
 }
 

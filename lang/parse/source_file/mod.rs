@@ -113,7 +113,7 @@ impl SourceFile {
 
         // The Rc is a lie, we are going to clone it anyway
         let rc = std::rc::Rc::new(namespace.clone());
-        let stack_frame = StackFrame::namespace(context, rc);
+        let stack_frame = StackFrame::namespace(context, rc)?;
 
         context.scope(stack_frame, |context| {
             for statement in &self.body {

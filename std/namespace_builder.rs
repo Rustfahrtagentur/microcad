@@ -38,7 +38,7 @@ impl Symbols for NamespaceBuilder {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
         self.namespace.copy(into)
     }
 }

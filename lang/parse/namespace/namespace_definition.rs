@@ -48,10 +48,11 @@ impl Symbols for NamespaceDefinition {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
         self.body.symbols.iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());
         });
+        Ok(())
     }
 }
 

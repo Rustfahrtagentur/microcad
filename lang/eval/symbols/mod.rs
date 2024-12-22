@@ -27,7 +27,7 @@ pub trait Symbols {
     fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self;
 
     /// Copy symbols into another Instance
-    fn copy<T: Symbols>(&self, into: &mut T);
+    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()>;
 
     /// Shortcut to add a value symbol which can't be done via `.into()`
     #[cfg(test)]

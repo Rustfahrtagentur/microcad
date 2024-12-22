@@ -254,8 +254,12 @@ pub enum EvalError {
     WrongModuleParameters(QualifiedName),
 
     /// Missed call
-    #[error("missed call")]
+    #[error("Missed call")]
     MissedCall,
+
+    /// StackUnderflow
+    #[error("Stack underflow")]
+    StackUnderflow,
 }
 
 /// Result type of any evaluation

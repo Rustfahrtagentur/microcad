@@ -48,10 +48,10 @@ impl ModuleInitDefinition {
             child.detach();
             node.append(child.clone());
         }
-        node_body.copy(node);
+        node_body.copy(node)?;
 
         // Now, copy the symbols of the node into the context
-        node.copy(context);
+        node.copy(context)?;
 
         Ok(())
     }

@@ -67,7 +67,7 @@ impl Context {
     /// The top symbol table in the stack
     ///
     /// This method guarantees that the stack is not empty
-    pub fn top(&self) -> &StackFrame {
+    pub fn top(&self) -> EvalResult<&StackFrame> {
         self.stack.top()
     }
 
@@ -148,8 +148,9 @@ impl Symbols for Context {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
-        self.top().copy(into)
+    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
+        self.top()?.copy(into);
+        Ok(())
     }
 }
 

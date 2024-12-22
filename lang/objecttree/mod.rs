@@ -91,11 +91,11 @@ impl Symbols for ObjectNode {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
         match *self.borrow_mut() {
             ObjectNodeInner::Group(ref mut table) => table.copy(into),
             _ => unreachable!(),
-        };
+        }
     }
 }
 

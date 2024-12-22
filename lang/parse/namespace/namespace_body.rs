@@ -50,7 +50,7 @@ impl Symbols for NamespaceBody {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> EvalResult<()> {
         self.symbols.copy(into)
     }
 }
