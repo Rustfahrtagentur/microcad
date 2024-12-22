@@ -170,8 +170,6 @@ impl Eval for Expression {
     type Output = Value;
 
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        use crate::diag::PushDiag;
-
         match self {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
@@ -236,12 +234,12 @@ impl Eval for Expression {
                                 }),
                             }
                         } else {
-                            context.error(
+                            context.error_with_stack_trace(
                                 self,
-                                Box::new(EvalError::ListIndexOutOfBounds {
+                                EvalError::ListIndexOutOfBounds {
                                     index,
                                     len: list.len(),
-                                }),
+                                },
                             )?;
                             Ok(Value::Invalid)
                         }
@@ -262,7 +260,10 @@ impl Eval for Expression {
                             _ => unimplemented!(),
                         },
                         None => {
-                            context.error(self, Box::new(EvalError::UnknownField(rhs.clone())))?;
+                            context.error_with_stack_trace(
+                                self,
+                                EvalError::UnknownField(rhs.clone()),
+                            )?;
                             Ok(Value::Invalid)
                         }
                     },

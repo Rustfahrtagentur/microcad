@@ -58,22 +58,20 @@ pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
 
                     let condition: bool = args["condition"].clone().try_into()?;
                     if !condition {
-                        use microcad_lang::diag::PushDiag;
-
                         if let Some(condition_src) =
                             ctx.get_source_string(args["condition"].src_ref())
                         {
-                            ctx.error(
+                            ctx.error_with_stack_trace(
                                 args.src_ref(),
-                                Box::new(EvalError::AssertionFailedWithCondition(
+                                EvalError::AssertionFailedWithCondition(
                                     message,
                                     condition_src.into(),
-                                )),
+                                ),
                             )?;
                         } else {
-                            ctx.error(
+                            ctx.error_with_stack_trace(
                                 args.src_ref(),
-                                Box::new(EvalError::AssertionFailed(message)),
+                                EvalError::AssertionFailed(message),
                             )?;
                         }
                     }

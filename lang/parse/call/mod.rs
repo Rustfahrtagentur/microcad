@@ -99,9 +99,9 @@ impl Eval for Call {
             Symbol::Module(m) => Ok(CallResult::Nodes(
                 match m.call(&self.argument_list, context) {
                     Err(EvalError::MissedCall) => {
-                        context.error(
+                        context.error_with_stack_trace(
                             self,
-                            Box::new(EvalError::WrongModuleParameters(self.name.clone())),
+                            EvalError::WrongModuleParameters(self.name.clone()),
                         )?;
                         return Err(EvalError::WrongModuleParameters(self.name.clone()));
                     }
@@ -114,8 +114,7 @@ impl Eval for Call {
                 Ok(CallResult::None)
             }
             symbol => {
-                use crate::diag::PushDiag;
-                context.error(self, Box::new(EvalError::SymbolNotCallable(symbol)))?;
+                context.error_with_stack_trace(self, EvalError::SymbolNotCallable(symbol))?;
                 Ok(CallResult::None)
             }
         }

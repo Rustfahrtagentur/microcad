@@ -110,6 +110,8 @@ impl SourceFile {
         namespace_name: Identifier,
     ) -> EvalResult<std::rc::Rc<NamespaceDefinition>> {
         let mut namespace = NamespaceDefinition::new(namespace_name);
+
+        // The Rc is a lie, we are going to clone it anyway
         let rc = std::rc::Rc::new(namespace.clone());
         let stack_frame = StackFrame::namespace(context, rc);
 

@@ -123,7 +123,7 @@ impl CallTrait for std::rc::Rc<ModuleDefinition> {
                 Ok(matching_initializer) => Ok(matching_initializer.call(context, &self.body)?),
                 Err(err) => {
                     use crate::diag::PushDiag;
-                    context.error(self.as_ref(), Box::new(err))?;
+                    context.error(self.as_ref(), Box::new(err), Some(context.stack_trace()))?;
                     Ok(Vec::new())
                 }
             }

@@ -58,6 +58,7 @@ impl CallTrait for BuiltinFunction {
                             expected: return_type.ty(),
                             found: result.ty(),
                         }),
+                        Some(context.stack_trace()),
                     )?;
                     Ok(Some(Value::Invalid))
                 } else {

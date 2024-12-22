@@ -46,10 +46,9 @@ impl Eval for NodeMarker {
                 crate::objecttree::ObjectNodeInner::ChildrenNodeMarker,
             ))),
             _ => {
-                use crate::diag::PushDiag;
-                context.error(
+                context.error_with_stack_trace(
                     self,
-                    Box::new(EvalError::InvalidNodeMarker(self.name.clone())),
+                    EvalError::InvalidNodeMarker(self.name.clone()),
                 )?;
                 Ok(None)
             }

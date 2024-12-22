@@ -107,6 +107,19 @@ impl Context {
     pub fn add_source_file(&mut self, source_file: SourceFile) {
         self.source_files.add(std::rc::Rc::new(source_file))
     }
+
+    /// Stack trace returns a copy of the current stack
+    pub fn stack_trace(&self) -> Stack {
+        self.stack.clone()
+    }
+
+    pub fn error_with_stack_trace(
+        &mut self,
+        src_ref: impl crate::src_ref::SrcReferrer,
+        error: impl std::error::Error + 'static,
+    ) -> crate::eval::EvalResult<()> {
+        self.error(src_ref, Box::new(error), Some(self.stack_trace()))
+    }
 }
 
 impl PushDiag for Context {

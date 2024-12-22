@@ -112,13 +112,13 @@ impl Eval for Parameter {
                 let default_value = expr.eval(context)?;
                 if specified_type.ty() != default_value.ty() {
                     use crate::diag::PushDiag;
-                    context.error(
+                    context.error_with_stack_trace(
                         self,
-                        Box::new(EvalError::ParameterTypeMismatch {
+                        EvalError::ParameterTypeMismatch {
                             name: self.name.clone(),
                             expected: specified_type.ty(),
                             found: default_value.ty(),
-                        }),
+                        },
                     )?;
                     // Return an invalid parameter value in case evaluation failed
                     Ok(ParameterValue::invalid(

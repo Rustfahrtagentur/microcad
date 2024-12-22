@@ -97,10 +97,9 @@ impl QualifiedName {
         })?;
 
         if symbols.is_empty() {
-            use crate::diag::PushDiag;
-            context.error(
+            context.error_with_stack_trace(
                 self,
-                Box::new(EvalError::SymbolNotFound(self.id().unwrap_or_default())),
+                EvalError::SymbolNotFound(self.id().unwrap_or_default()),
             )?;
         }
         Ok(symbols)
@@ -112,12 +111,9 @@ impl QualifiedName {
     pub fn fetch_symbol(&self, context: &mut Context) -> EvalResult<Option<Symbol>> {
         let symbols = self.fetch_symbols(context)?;
         if symbols.len() > 1 {
-            use crate::diag::PushDiag;
-            context.error(
+            context.error_with_stack_trace(
                 self,
-                Box::new(EvalError::AmbiguousSymbol(
-                    symbols.first().expect(INTERNAL_PARSE_ERROR).clone(),
-                )),
+                EvalError::AmbiguousSymbol(symbols.first().expect(INTERNAL_PARSE_ERROR).clone()),
             )?;
             // TODO Output all symbols
         }

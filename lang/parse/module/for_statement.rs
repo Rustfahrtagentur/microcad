@@ -3,7 +3,7 @@
 
 //! For statement parser entity
 
-use crate::{diag::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// For statement
 #[derive(Clone, Debug)]
@@ -51,10 +51,8 @@ impl Eval for ForStatement {
                 }
             }
             value => {
-                context.error(
-                    self,
-                    Box::new(EvalError::ExpectedRangeInForLoop(value.ty())),
-                )?;
+                context
+                    .error_with_stack_trace(self, EvalError::ExpectedRangeInForLoop(value.ty()))?;
             }
         }
 

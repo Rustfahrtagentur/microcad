@@ -84,25 +84,31 @@ impl std::fmt::Display for StackFrame {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Stack(Vec<StackFrame>);
 
 impl Stack {
+    /// Push a new stack frame to the stack
     pub fn push(&mut self, stack_frame: StackFrame) {
         self.0.push(stack_frame);
     }
 
+    /// Pop the top stack frame from the stack
     pub fn pop(&mut self) {
         self.0.pop();
     }
 
+    /// Get the top stack frame
     pub fn top(&self) -> &StackFrame {
         self.0.last().expect("Empty stack")
     }
 
+    /// Get a mutual reference to the top stack frame
     pub fn top_mut(&mut self) -> &mut StackFrame {
         self.0.last_mut().expect("Empty stack")
     }
 
+    /// Pretty print the stack
     pub fn pretty_print(
         &self,
         w: &mut dyn std::io::Write,

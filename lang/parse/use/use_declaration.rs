@@ -88,7 +88,8 @@ impl Eval for UseDeclaration {
                     Ok(namespace_definition.body.symbols.clone())
                 }
                 symbol => {
-                    context.error(self, Box::new(EvalError::NamespaceSymbolExpected(symbol)))?;
+                    context
+                        .error_with_stack_trace(self, EvalError::NamespaceSymbolExpected(symbol))?;
                     Ok(SymbolTable::default())
                 }
             },
@@ -97,8 +98,7 @@ impl Eval for UseDeclaration {
 
                 let symbol = name.eval(context)?;
                 if matches!(symbol, Symbol::Invalid) {
-                    use crate::diag::PushDiag;
-                    context.error(self, Box::new(EvalError::CannotUse(symbol)))?;
+                    context.error_with_stack_trace(self, EvalError::CannotUse(symbol))?;
                 } else {
                     symbols.add(symbol);
                 }
