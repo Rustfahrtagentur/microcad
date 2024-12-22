@@ -1,10 +1,10 @@
 // Define a module `circle` with two Initializers
 module circle {
-    init(r: scalar) {
+    init(r: Scalar) {
         radius = r;
     }
 
-    init(d: scalar) {
+    init(d: Scalar) {
         radius = d / 2.0;
     }
 

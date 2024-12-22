@@ -1,7 +1,7 @@
 // Define a module `circle_difference` with a radius as a parameter
 // If creates an algorithm node with a circle node as a child
 // The `@children` marker is used to display that all children of the module will be added to the algorithm node
-module circle_difference(radius: length) {
+module circle_difference(radius: Length) {
     std::algorithm::difference() {
         std::geo2d::circle(r = radius);
         @children

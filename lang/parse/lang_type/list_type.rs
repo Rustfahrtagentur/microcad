@@ -45,8 +45,8 @@ impl std::fmt::Display for ListType {
 fn list_type() {
     use crate::parser::{Parser, Rule};
     let type_annotation =
-        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[int]", 0).expect("test error");
-    assert_eq!(type_annotation.ty().to_string(), "[int]");
+        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[Int]", 0).expect("test error");
+    assert_eq!(type_annotation.ty().to_string(), "[Int]");
     assert_eq!(
         type_annotation.ty(),
         Type::List(ListType::new(Type::Integer))

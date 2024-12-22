@@ -3,15 +3,15 @@
 Units and types are somehow the same in *µcad*.
 This means that your will automatically get the following type if you use the beside units.
 
-| Type     | Metric Units                         | Imperial Units |
-| -------- | ------------------------------------ | -------------- |
-| `Length` | `m`, `cm`, `mm`, `µm`                | `in`           |
-| `Angle`  | `°`, `deg`, `grad`, `turn`,`rad`     |                |
-| `Weight` | `g`, `kg`                            | `lb`           |
-| `Area`   | `mm²`,`cm²`,`m³`                     | `in²`          |
-| `Volume` | `mm³`,`cm³`,`m³`,`ml`,`cl`,`l`, `µl` | `in³`          |
-| Integer  | -                                    | -              |
-| Scalar   | (none), `%`                          | -              |
+| Type      | Metric Units                         | Imperial Units |
+| --------- | ------------------------------------ | -------------- |
+| `Length`  | `m`, `cm`, `mm`, `µm`                | `in`           |
+| `Angle`   | `°`, `deg`, `grad`, `turn`,`rad`     |                |
+| `Weight`  | `g`, `kg`                            | `lb`           |
+| `Area`    | `mm²`,`cm²`,`m³`                     | `in²`          |
+| `Volume`  | `mm³`,`cm³`,`m³`,`ml`,`cl`,`l`, `µl` | `in³`          |
+| `Integer` | -                                    | -              |
+| `Scalar`  | (none), `%`                          | -              |
 
 **Note**: More units [will be implemented](https://github.com/Rustfahrtagentur/microcad/issues/76).
 

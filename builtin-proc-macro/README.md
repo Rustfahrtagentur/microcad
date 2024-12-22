@@ -5,9 +5,9 @@ This proc macro generates built-in modules from structs.
 ## Example
 
 Let's look at µcad's built-in module `rect`.
-It has the following parameter signature: `rect(width: scalar, height: scalar, x: scalar y: scalar)`.
+It has the following parameter signature: `rect(width: Scalar, height: Scalar, x: Scalar y: Scalar)`.
 
-Notice that the parameters are all of type `scalar` and not `length`.
+Notice that the parameters are all of type `Scalar` and not `Length`.
 This is because the built-in module is not aware of the unit system.
 The built-in modules are not meant to be used directly.
 Instead, they are wrapped in a module written µcad language that provides units, asserts, default values and multiple initializers.

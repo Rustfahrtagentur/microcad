@@ -462,7 +462,7 @@ fn test_module_definition_with_parameters() {
     // Define a module `donut` with an implicit initializer `()` and call it
     let (root, mut context) = eval_input_with_context(
         r#"
-        module donut(radius: scalar) { 
+        module donut(radius: Scalar) { 
             __builtin::geo2d::circle(radius); 
         }
 
@@ -537,11 +537,11 @@ fn module_definition_init() {
         module circle {
             pre_init_statement = 0;
 
-            init(r: scalar) {
+            init(r: Scalar) {
                 radius = r;
             }
 
-            init(d: scalar) {
+            init(d: Scalar) {
                 radius = d / 2.0;
             }
 
@@ -608,7 +608,7 @@ fn test_module_src_ref() {
     let (root, _) = eval_input_with_context(
         r#"
         module donut { 
-            init(d: scalar) {
+            init(d: Scalar) {
                 radius = d / 2.0;
                 __builtin::geo2d::circle(radius); 
             }

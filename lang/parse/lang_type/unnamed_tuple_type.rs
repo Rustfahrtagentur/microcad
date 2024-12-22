@@ -41,8 +41,8 @@ fn unnamed_tuple_type() {
     use crate::parser::*;
 
     let type_annotation =
-        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(int, string)", 0).expect("test error");
-    assert_eq!(type_annotation.ty().to_string(), "(int, string)");
+        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(Int, String)", 0).expect("test error");
+    assert_eq!(type_annotation.ty().to_string(), "(Int, String)");
     assert_eq!(
         type_annotation.ty(),
         Type::UnnamedTuple(UnnamedTupleType(vec![Type::Integer, Type::String]))
