@@ -5,77 +5,14 @@ use crate::{diag::*, eval::*, objecttree::*, parse::*, source_file_cache::*};
 
 use microcad_core::Id;
 
-/// Stack frame in the context
-///
-/// It is used to store the current state of the evaluation.
-/// A stack frame defines which kind of symbol we are currently evaluating.
-#[derive(Debug, Clone)]
-pub enum StackFrame {
-    /// Source File
-    SourceFile(std::rc::Rc<SourceFile>, SymbolTable),
-    /// Initial state
-    Namespace(SymbolTable),
-    /// Currently evaluating a module definition
-    ModuleCall(SymbolTable, Option<ObjectNode>),
-    /// Currently evaluating a function definition
-    FunctionCall(SymbolTable),
-}
-
-impl StackFrame {
-    /// Get the symbol table of the stack frame
-    pub fn symbol_table(&self) -> &SymbolTable {
-        match self {
-            Self::SourceFile(_, table) => table,
-            Self::Namespace(table) => table,
-            Self::ModuleCall(table, _) => table,
-            Self::FunctionCall(table) => table,
-        }
-    }
-
-    /// Get a mutual reference to the symbol table
-    pub fn symbol_table_mut(&mut self) -> &mut SymbolTable {
-        match self {
-            Self::SourceFile(_, table) => table,
-            Self::Namespace(table) => table,
-            Self::ModuleCall(table, _) => table,
-            Self::FunctionCall(table) => table,
-        }
-    }
-}
-
-impl Default for StackFrame {
-    fn default() -> Self {
-        Self::Namespace(SymbolTable::default())
-    }
-}
-
-impl Symbols for StackFrame {
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
-        self.symbol_table().fetch(id)
-    }
-
-    fn add(&mut self, symbol: Symbol) -> &mut Self {
-        self.symbol_table_mut().add(symbol);
-        self
-    }
-
-    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
-        self.symbol_table_mut().add_alias(symbol, alias);
-        self
-    }
-
-    fn copy<T: Symbols>(&self, into: &mut T) {
-        self.symbol_table().copy(into);
-    }
-}
-
 /// Context for evaluation
 ///
 /// The context is used to store the current state of the evaluation.
 /// A context is essentially a stack of symbol tables
+#[derive(Default)]
 pub struct Context {
     /// Stack of symbol tables
-    stack: Vec<StackFrame>,
+    stack: Stack,
 
     /// Current source file being evaluated
     current_source_file: Option<std::rc::Rc<SourceFile>>,
@@ -93,7 +30,6 @@ impl Context {
         let rc_source_file = std::rc::Rc::new(source_file);
 
         let mut ctx = Self {
-            stack: vec![StackFrame::default()],
             current_source_file: Some(rc_source_file.clone()),
             ..Default::default()
         };
@@ -132,14 +68,14 @@ impl Context {
     ///
     /// This method guarantees that the stack is not empty
     pub fn top(&self) -> &StackFrame {
-        self.stack.last().expect("Empty stack")
+        self.stack.top()
     }
 
     /// The top symbol table in the stack (mutable)
     ///
     /// This method guarantees that the stack is not empty
     pub fn top_mut(&mut self) -> &mut StackFrame {
-        self.stack.last_mut().expect("Empty stack")
+        self.stack.top_mut()
     }
 
     /// Create a new symbol table and push it to the stack
@@ -208,19 +144,6 @@ impl Symbols for Context {
 impl GetSourceFileByHash for Context {
     fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile> {
         self.source_files.get_source_file_by_hash(hash)
-    }
-}
-
-/// Default implementation for the context
-/// TODO: Remove this, it's just for testing
-impl Default for Context {
-    fn default() -> Self {
-        Self {
-            stack: vec![StackFrame::default()],
-            current_source_file: None,
-            source_files: SourceFileCache::default(),
-            diag_handler: DiagHandler::default(),
-        }
     }
 }
 

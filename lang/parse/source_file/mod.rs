@@ -110,7 +110,8 @@ impl SourceFile {
         namespace_name: Identifier,
     ) -> EvalResult<std::rc::Rc<NamespaceDefinition>> {
         let mut namespace = NamespaceDefinition::new(namespace_name);
-        let stack_frame = StackFrame::Namespace(context.top().symbol_table().clone());
+        let rc = std::rc::Rc::new(namespace.clone());
+        let stack_frame = StackFrame::namespace(context, rc);
 
         context.scope(stack_frame, |context| {
             for statement in &self.body {
@@ -140,10 +141,8 @@ impl SourceFile {
                 }
             }
 
-            Ok(())
-        })?;
-
-        Ok(std::rc::Rc::new(namespace))
+            Ok(std::rc::Rc::new(namespace))
+        })
     }
 }
 

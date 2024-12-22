@@ -88,10 +88,7 @@ impl Eval for Call {
 
     fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         match self.name.eval(context)? {
-            Symbol::Function(f) => match f.call(&self.argument_list, context)? {
-                Some(value) => Ok(CallResult::Value(value)),
-                None => Ok(CallResult::None),
-            },
+            Symbol::Function(f) => Ok(CallResult::Value(f.call(&self.argument_list, context)?)),
             Symbol::BuiltinFunction(f) => match f.call(&self.argument_list, context)? {
                 Some(value) => Ok(CallResult::Value(value)),
                 None => Ok(CallResult::None),

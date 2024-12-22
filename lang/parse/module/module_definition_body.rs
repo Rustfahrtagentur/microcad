@@ -104,6 +104,12 @@ impl ModuleDefinitionBody {
                 let symbol = assignment.eval(context)?;
                 group.add(symbol);
             }
+            ModuleDefinitionStatement::FunctionDefinition(function) => {
+                // Evaluate the function and add the symbol to the node
+                // E.g. `function a() {}` will add the symbol `a` to the node
+                let symbol = function.eval(context)?;
+                group.add(symbol);
+            }
             statement => {
                 if let Some(Value::Node(new_child)) = statement.eval(context)? {
                     group.append(new_child);

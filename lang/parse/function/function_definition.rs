@@ -41,29 +41,26 @@ impl FunctionDefinition {
     }
 }
 
-impl CallTrait for FunctionDefinition {
-    type Output = Option<Value>;
+impl CallTrait for std::rc::Rc<FunctionDefinition> {
+    type Output = Value;
 
     fn call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Self::Output> {
-        let arg_map = args.get_matching_arguments(context, &self.signature.parameters)?;
+        let stack_frame = StackFrame::function(context, self.clone());
 
-        let stack_frame = StackFrame::FunctionCall(context.top().symbol_table().clone());
-
-        let mut result = None;
         context.scope(stack_frame, |context| {
+            let arg_map = args.get_matching_arguments(context, &self.signature.parameters)?;
+
             for (name, value) in arg_map.iter() {
                 context.add(Symbol::Value(name.clone(), value.clone()));
             }
 
             for statement in self.body.0.iter() {
                 if let Some(result_value) = statement.eval(context)? {
-                    result = Some(result_value);
-                    break;
+                    return Ok(result_value);
                 }
             }
-            Ok(())
-        })?;
-        Ok(result)
+            Ok(Value::Invalid)
+        })
     }
 }
 
@@ -85,10 +82,10 @@ impl Parse for std::rc::Rc<FunctionDefinition> {
 }
 
 impl Eval for std::rc::Rc<FunctionDefinition> {
-    type Output = ();
+    type Output = Symbol;
 
     fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         context.add(self.clone().into());
-        Ok(())
+        Ok(Symbol::Function(self.clone()))
     }
 }
