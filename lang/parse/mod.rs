@@ -17,7 +17,6 @@ pub mod namespace;
 pub mod parameter;
 pub mod parse_error;
 pub mod source_file;
-pub mod units;
 pub mod r#use;
 pub mod visibility;
 
@@ -36,7 +35,6 @@ pub use parameter::*;
 pub use parse_error::*;
 pub use r#use::*;
 pub use source_file::*;
-pub use units::*;
 pub use visibility::*;
 
 const INTERNAL_PARSE_ERROR: &str = "internal parse error";
