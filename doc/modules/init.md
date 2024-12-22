@@ -1,4 +1,4 @@
-## Module Initializers
+# Module Initializers
 
 - [Module Initializers](#module-initializers)
 - [Example](#example)
@@ -54,10 +54,9 @@ A module with an *explicit initializer* which takes a `size: length`:
 ![test](.banner/init_explicit.png)
 
 ```µcad,init_explicit
-module box {
-    init(size: length) {
-        rectangle(size);
-    }
+module double_box {
+    init( half_the_size: length) { size = half_the_size * 2; }
+    rectangle(size);
 }
 ```
 
