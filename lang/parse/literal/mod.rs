@@ -3,9 +3,11 @@
 
 //! µcad literal parser entities
 
+mod color;
 mod number_literal;
 mod units;
 
+pub use color::*;
 pub use number_literal::*;
 pub use units::*;
 
