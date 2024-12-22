@@ -146,9 +146,9 @@ impl Diag {
             }
         }
 
-        match self {
-            Diag::Error(_, Some(stack)) => stack.pretty_print(w, source_file_by_hash)?,
-            _ => (),
+        // Print stack trace
+        if let Diag::Error(_, Some(stack)) = self {
+            stack.pretty_print(w, source_file_by_hash)?
         }
 
         Ok(())

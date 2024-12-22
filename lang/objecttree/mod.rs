@@ -169,7 +169,7 @@ pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {
     }
 
     if nodes[0].len() == 1 {
-        nodes[0].first().unwrap().clone()
+        nodes[0].first().expect("Node").clone()
     } else {
         let group = group();
         for node in &nodes[0] {

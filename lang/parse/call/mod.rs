@@ -14,7 +14,7 @@ pub use call_argument_list::*;
 pub use method_call::*;
 pub use multiplicity::*;
 
-use crate::{diag::PushDiag, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*};
 
 /// trait for calls of modules or functions with argument list
 pub trait CallTrait {

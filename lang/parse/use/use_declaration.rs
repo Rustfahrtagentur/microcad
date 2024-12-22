@@ -80,8 +80,6 @@ impl Eval for UseDeclaration {
     type Output = SymbolTable;
 
     fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
-        use crate::diag::PushDiag;
-
         match self {
             Self::UseAll(name, _) => match name.eval(context)? {
                 Symbol::Namespace(namespace_definition) => {

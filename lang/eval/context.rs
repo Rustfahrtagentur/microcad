@@ -113,6 +113,7 @@ impl Context {
         self.stack.clone()
     }
 
+    /// Error with stack trace
     pub fn error_with_stack_trace(
         &mut self,
         src_ref: impl crate::src_ref::SrcReferrer,

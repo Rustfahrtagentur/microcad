@@ -111,7 +111,6 @@ impl Eval for Parameter {
             (Some(specified_type), Some(expr)) => {
                 let default_value = expr.eval(context)?;
                 if specified_type.ty() != default_value.ty() {
-                    use crate::diag::PushDiag;
                     context.error_with_stack_trace(
                         self,
                         EvalError::ParameterTypeMismatch {

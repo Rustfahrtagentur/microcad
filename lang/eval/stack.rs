@@ -6,7 +6,7 @@
 use crate::{
     eval::{symbols::*, *},
     parse::FunctionDefinition,
-    src_ref::{self, SrcRef, SrcReferrer},
+    src_ref::{SrcRef, SrcReferrer},
 };
 
 /// Stack frame in the context
@@ -21,7 +21,7 @@ pub struct StackFrame {
 
 impl StackFrame {
     /// Create a new stack frame for a function
-    pub fn function(context: &mut Context, function: std::rc::Rc<FunctionDefinition>) -> Self {
+    pub fn function(_: &mut Context, function: std::rc::Rc<FunctionDefinition>) -> Self {
         Self {
             source: std::rc::Rc::new(Symbol::Function(function.clone())),
             symbol_table: SymbolTable::default(),
