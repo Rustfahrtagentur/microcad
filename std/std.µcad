@@ -147,13 +147,13 @@ module translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
 }
 
 module rotate {
-    init(Angle: Angle) {
+    init(Angle: angle) {
         x = 0.0;
         y = 0.0;
         z = 1.0;
     }
 
-    __builtin::transform::rotate(Angle / 1rad, x, y, z) {
+    __builtin::transform::rotate(angle / 1rad, x, y, z) {
         @children
     }
 }
