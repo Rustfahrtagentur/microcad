@@ -105,7 +105,9 @@ fn call_get_matching_arguments() {
         call_argument_value!(baz: Scalar = 3.0),
     ]);
 
-    let arg_map = call_values.get_matching_arguments(&param_values).unwrap();
+    let arg_map = call_values
+        .get_matching_arguments(&param_values)
+        .expect("test error");
 
     assert_eq_arg_map_value!(arg_map,
         foo: Integer = 2,

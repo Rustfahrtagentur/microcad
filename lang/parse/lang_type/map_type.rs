@@ -3,7 +3,7 @@
 
 //! Map type parser entity
 
-use crate::{map_key_type::*, parse::*, parser::*, r#type::*};
+use crate::{parse::*, parser::*, r#type::*};
 
 /// Map type (e.g. `[scalar => string]`)
 #[derive(Debug, Clone, PartialEq)]

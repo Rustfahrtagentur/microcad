@@ -15,7 +15,7 @@ static TEST_OUT_DIR: &str = "output";
 static DEFAULT_TEST_FILE: &str = "../tests/test_cases/algorithm/difference.µcad";
 
 #[cfg(test)]
-use microcad_lang::*;
+use microcad_lang::{diag::*, eval::*, objects::*, parse::*, parser::*, sym::*};
 
 // Assure `TEST_OUT_DIR` exists
 #[cfg(test)]
@@ -33,7 +33,7 @@ fn make_test_out_dir() -> std::path::PathBuf {
 macro_rules! args {
     ($($name:ident: $ty:ident = $value:expr),*) => {&{
         use microcad_lang::src_ref::*;
-        let mut map = microcad_lang::eval::ArgumentMap::new(SrcRef(None));
+        let mut map = ArgumentMap::new(SrcRef(None));
         $(map.insert(stringify!($name).into(), $value.into());)*
         map
     }};
@@ -41,7 +41,7 @@ macro_rules! args {
 }
 
 #[cfg(test)]
-fn eval_context(context: &mut microcad_lang::eval::Context) -> ObjectNode {
+fn eval_context(context: &mut EvalContext) -> ObjectNode {
     let node = context.eval();
     let node = node.expect("test error");
     println!("{node:?}");
@@ -58,7 +58,7 @@ fn eval_context(context: &mut microcad_lang::eval::Context) -> ObjectNode {
 
 /// Evaluate source input from `&str` and return the resulting node and context
 #[cfg(test)]
-fn eval_input_with_context(input: &str) -> (ObjectNode, microcad_lang::eval::Context) {
+fn eval_input_with_context(input: &str) -> (ObjectNode, EvalContext) {
     use core::panic;
     use microcad_lang::parse::source_file::SourceFile;
     let source_file = match SourceFile::load_from_str(input) {
@@ -128,16 +128,13 @@ fn test_source_file(file_name: &str) {
 
     let std_symbol = context.fetch(&"std".into()).expect("test error");
     match std_symbol.as_ref() {
-        microcad_lang::eval::Symbol::Namespace(_) => {
+        Symbol::Namespace(_) => {
             //println!("{namespace:#?}");
         }
         _ => panic!("Expected symbol to be a Namespace"),
     }
 
-    use parse::GetSourceFileByHash;
     assert!(context.get_source_file_by_hash(hash).is_some());
-
-    use microcad_lang::eval::*;
 
     // Inject `output_file` into the context as a µcad string value `OUTPUT_FILE`
     context.add(Symbol::Value(
@@ -184,12 +181,7 @@ fn test_source_file(file_name: &str) {
 
 #[test]
 fn test_diag_list() {
-    use microcad_lang::diag::*;
-    use microcad_lang::eval::EvalError;
-    use microcad_lang::parse::GetSourceFileByHash;
-
-    let source_file =
-        crate::parse::SourceFile::load(DEFAULT_TEST_FILE).expect("Could not load source file");
+    let source_file = SourceFile::load(DEFAULT_TEST_FILE).expect("Could not load source file");
 
     let mut diagnostics = DiagList::default();
 
@@ -209,6 +201,7 @@ fn test_diag_list() {
         .error(
             body_iter.next().expect("test error"),
             Box::new(EvalError::CustomError("This is an error".into())),
+            None,
         )
         .expect("test error");
 
@@ -255,11 +248,11 @@ error: This is an error
 #[test]
 fn difference_svg() {
     use microcad_export::svg::SvgRenderer;
-    use microcad_lang::eval::BuiltinModuleDefinition;
     use microcad_std::{algorithm::*, geo2d::*};
+    use BuiltinModuleDefinition;
 
     let difference = difference().expect("test error");
-    let group = objecttree::group();
+    let group = group();
     group.append(Circle::node(args!(radius: Scalar = 4.0)).expect("test error"));
     group.append(Circle::node(args!(radius: Scalar = 2.0)).expect("test error"));
     difference.append(group);
@@ -270,7 +263,7 @@ fn difference_svg() {
     let mut renderer = SvgRenderer::default();
     renderer.set_output(Box::new(file)).expect("test error");
 
-    let difference = objecttree::bake2d(&mut renderer, difference).expect("test error");
+    let difference = bake2d(&mut renderer, difference).expect("test error");
 
     use microcad_core::geo2d::Renderer;
     renderer.render_node(difference).expect("test error");
@@ -279,11 +272,11 @@ fn difference_svg() {
 #[test]
 fn difference_stl() {
     use microcad_export::stl::StlExporter;
-    use microcad_lang::eval::BuiltinModuleDefinition;
     use microcad_std::algorithm;
+    use BuiltinModuleDefinition;
 
     let difference = algorithm::difference().expect("test error");
-    let group = objecttree::group();
+    let group = group();
     group.append(
         microcad_std::geo3d::Cube::node(
             args!(size_x: Scalar = 4.0, size_y: Scalar = 4.0, size_z: Scalar = 4.0),
@@ -323,7 +316,7 @@ fn test_context_builtin() {
         .expect("builtin error")
         .build();
 
-    let verify_symbol = |context: &mut microcad_lang::eval::Context, names| {
+    let verify_symbol = |context: &mut EvalContext, names| {
         use microcad_lang::parse::QualifiedName;
         let symbol = &context
             .fetch_symbols_by_qualified_name(&QualifiedName(names))
@@ -334,13 +327,13 @@ fn test_context_builtin() {
 
     // Check that the context has the assert symbol
     match verify_symbol(&mut context, vec!["__builtin".into(), "assert".into()]) {
-        microcad_lang::eval::Symbol::BuiltinFunction(_) => {}
+        Symbol::BuiltinFunction(_) => {}
         _ => panic!("Expected assert symbol to be a BuiltinFunction"),
     }
 
     // Check that the context has the geo2d namespace
     match verify_symbol(&mut context, vec!["__builtin".into(), "geo2d".into()]) {
-        microcad_lang::eval::Symbol::Namespace(_) => {}
+        Symbol::Namespace(_) => {}
         symbol => panic!("Expected geo2d symbol to be a NamespaceDefinition {symbol:?}"),
     }
 
@@ -349,7 +342,7 @@ fn test_context_builtin() {
         &mut context,
         vec!["__builtin".into(), "geo2d".into(), "circle".into()],
     ) {
-        microcad_lang::eval::Symbol::BuiltinModule(_) => {}
+        Symbol::BuiltinModule(_) => {}
         _ => panic!("Expected circle symbol to be a BuiltinModule"),
     }
 
@@ -359,19 +352,19 @@ fn test_context_builtin() {
 
     // Assert symbol, now called `assert`.
     match verify_symbol(&mut context, vec!["assert".into()]) {
-        microcad_lang::eval::Symbol::BuiltinFunction(_) => {}
+        Symbol::BuiltinFunction(_) => {}
         _ => panic!("Expected assert symbol to be a BuiltinFunction"),
     }
 
     // geo2d namespace
     match verify_symbol(&mut context, vec!["geo2d".into()]) {
-        microcad_lang::eval::Symbol::Namespace(_) => {}
+        Symbol::Namespace(_) => {}
         _ => panic!("Expected geo2d symbol to be a NamespaceDefinition"),
     }
 
     // circle symbol
     match verify_symbol(&mut context, vec!["geo2d".into(), "circle".into()]) {
-        microcad_lang::eval::Symbol::BuiltinModule(_) => {}
+        Symbol::BuiltinModule(_) => {}
         _ => panic!("Expected circle symbol to be a BuildtinModule"),
     }
 }
@@ -395,9 +388,9 @@ fn test_reexport_symbols() {
         "#,
     );
 
-    let mut symbol_table = microcad_lang::eval::SymbolTable::default();
-    use microcad_lang::eval::Symbols;
-    context.copy(&mut symbol_table);
+    let mut symbol_table = microcad_lang::sym::SymbolTable::default();
+    use microcad_lang::sym::Symbols;
+    context.copy(&mut symbol_table).expect("test error");
 
     assert!(symbol_table.fetch(&"assert".into()).is_some());
 
@@ -413,12 +406,12 @@ fn test_reexport_symbols_inside_namespace() {
         }
         "#,
     );
-    use microcad_lang::eval::Symbols;
+    use microcad_lang::sym::Symbols;
     assert!(context.fetch(&"test".into()).is_some());
 
     let test_namespace = context.fetch(&"test".into()).expect("test error");
     match test_namespace.as_ref() {
-        microcad_lang::eval::Symbol::Namespace(namespace) => {
+        microcad_lang::sym::Symbol::Namespace(namespace) => {
             assert!(namespace.fetch(&"assert".into()).is_some());
         }
         _ => panic!("Expected symbol to be a Namespace"),
@@ -447,7 +440,7 @@ fn test_simple_module_definition() {
         .fetch_symbols_by_qualified_name(&QualifiedName(vec!["donut".into()]))
         .expect("test error");
     let module_definition = match module_definition.first().expect("test error") {
-        microcad_lang::eval::Symbol::Module(m) => m,
+        Symbol::Module(m) => m,
         _ => panic!("Expected module definition"),
     };
     assert_eq!(module_definition.body.pre_init_statements.len(), 1);
@@ -501,7 +494,7 @@ fn test_module_definition_with_parameters() {
         .fetch_symbols_by_qualified_name(&QualifiedName(vec!["donut".into()]))
         .expect("test error");
     let module_definition = match module_definition.first().expect("test error") {
-        microcad_lang::eval::Symbol::Module(m) => m,
+        Symbol::Module(m) => m,
         _ => panic!("Expected module definition"),
     };
     assert_eq!(module_definition.body.pre_init_statements.len(), 1);
@@ -510,8 +503,6 @@ fn test_module_definition_with_parameters() {
     assert_eq!(module_definition.body.post_init_statements.len(), 0);
 
     // Call the module definition of `donut` and verify it
-    use crate::parser::*;
-
     let nodes = module_definition
         .call(
             &Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list, "radius = 6.0", 0)
@@ -523,7 +514,6 @@ fn test_module_definition_with_parameters() {
     if let Some(node) = nodes.first() {
         match *node.borrow() {
             ObjectNodeInner::Group(ref symbols) => {
-                use microcad_lang::eval::*;
                 let symbol = symbols.fetch(&"radius".into()).expect("test error");
                 match symbol.as_ref() {
                     Symbol::Value(_, value) => {
@@ -577,7 +567,7 @@ fn module_definition_init() {
         .fetch_symbols_by_qualified_name(&QualifiedName(vec!["circle".into()]))
         .expect("test error");
     let module_definition = match module_definition.first().expect("test error") {
-        microcad_lang::eval::Symbol::Module(m) => m,
+        Symbol::Module(m) => m,
         _ => panic!("Expected module definition"),
     };
     assert_eq!(module_definition.body.pre_init_statements.len(), 1);
@@ -585,8 +575,6 @@ fn module_definition_init() {
     assert_eq!(module_definition.body.post_init_statements.len(), 1);
 
     // Call the module definition of `donut` and verify it
-    use crate::parser::*;
-
     let nodes = module_definition
         .call(
             &Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list, "r = 6.0", 0)
@@ -598,7 +586,6 @@ fn module_definition_init() {
     if let Some(node) = nodes.first() {
         match *node.borrow() {
             ObjectNodeInner::Group(ref symbols) => {
-                use microcad_lang::eval::*;
                 let symbol = symbols.fetch(&"radius".into()).expect("test error");
                 match symbol.as_ref() {
                     Symbol::Value(_, value) => {
@@ -694,7 +681,6 @@ fn test_load_std() {
         .expect("builtin error")
         .build();
 
-    use microcad_lang::eval::*;
     context.add(Symbol::Namespace(namespace));
 
     let node = context.eval().expect("test error");

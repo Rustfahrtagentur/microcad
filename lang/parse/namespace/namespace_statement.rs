@@ -3,7 +3,7 @@
 
 //! Namespace statement parser entities
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Namespace statement
 #[derive(Debug, Clone)]
@@ -60,7 +60,7 @@ impl Parse for NamespaceStatement {
 impl Eval for NamespaceStatement {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut EvalContext) -> std::result::Result<Self::Output, EvalError> {
         match self {
             Self::Use(use_statement) => {
                 if let Some(symbols) = use_statement.eval(context)? {

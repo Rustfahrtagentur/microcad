@@ -14,7 +14,7 @@ pub use call_argument_list::*;
 pub use method_call::*;
 pub use multiplicity::*;
 
-use crate::{diag::PushDiag, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, objects::ObjectNode, parse::*, parser::*, src_ref::*, sym::*};
 
 /// trait for calls of modules or functions with argument list
 pub trait CallTrait {
@@ -22,7 +22,7 @@ pub trait CallTrait {
     type Output;
 
     /// Evaluate call into value (if possible)
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Self::Output>;
+    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Self::Output>;
 }
 
 /// Call of a function or module initialization
@@ -43,7 +43,7 @@ impl SrcReferrer for Call {
 }
 
 impl Sym for Call {
-    fn id(&self) -> Option<microcad_core::Id> {
+    fn id(&self) -> Option<Id> {
         self.name.id()
     }
 }
@@ -74,10 +74,10 @@ impl std::fmt::Display for Call {
 /// Result of a call
 pub enum CallResult {
     /// Call returned nodes
-    Nodes(Vec<crate::ObjectNode>),
+    Nodes(Vec<ObjectNode>),
 
     /// Call returned a single value
-    Value(crate::eval::Value),
+    Value(Value),
 
     /// Call returned nothing
     None,
@@ -86,12 +86,9 @@ pub enum CallResult {
 impl Eval for Call {
     type Output = CallResult;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         match self.name.eval(context)? {
-            Symbol::Function(f) => match f.call(&self.argument_list, context)? {
-                Some(value) => Ok(CallResult::Value(value)),
-                None => Ok(CallResult::None),
-            },
+            Symbol::Function(f) => Ok(CallResult::Value(f.call(&self.argument_list, context)?)),
             Symbol::BuiltinFunction(f) => match f.call(&self.argument_list, context)? {
                 Some(value) => Ok(CallResult::Value(value)),
                 None => Ok(CallResult::None),
@@ -102,9 +99,9 @@ impl Eval for Call {
             Symbol::Module(m) => Ok(CallResult::Nodes(
                 match m.call(&self.argument_list, context) {
                     Err(EvalError::MissedCall) => {
-                        context.error(
+                        context.error_with_stack_trace(
                             self,
-                            Box::new(EvalError::WrongModuleParameters(self.name.clone())),
+                            EvalError::WrongModuleParameters(self.name.clone()),
                         )?;
                         return Err(EvalError::WrongModuleParameters(self.name.clone()));
                     }
@@ -117,8 +114,7 @@ impl Eval for Call {
                 Ok(CallResult::None)
             }
             symbol => {
-                use crate::diag::PushDiag;
-                context.error(self, Box::new(EvalError::SymbolNotCallable(symbol)))?;
+                context.error_with_stack_trace(self, EvalError::SymbolNotCallable(symbol))?;
                 Ok(CallResult::None)
             }
         }

@@ -9,7 +9,7 @@ pub use statement::*;
 
 use std::io::Read;
 
-use crate::{eval::*, objecttree, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, objects, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Trait to get a source file by its hash
 pub trait GetSourceFileByHash {
@@ -106,11 +106,14 @@ impl SourceFile {
     /// This functionality is used for the `use` statement.
     pub fn eval_as_namespace(
         &self,
-        context: &mut Context,
+        context: &mut EvalContext,
         namespace_name: Identifier,
     ) -> EvalResult<std::rc::Rc<NamespaceDefinition>> {
         let mut namespace = NamespaceDefinition::new(namespace_name);
-        let stack_frame = StackFrame::Namespace(context.top().symbol_table().clone());
+
+        // The Rc is a lie, we are going to clone it anyway
+        let rc = std::rc::Rc::new(namespace.clone());
+        let stack_frame = StackFrame::namespace(context, rc)?;
 
         context.scope(stack_frame, |context| {
             for statement in &self.body {
@@ -140,10 +143,8 @@ impl SourceFile {
                 }
             }
 
-            Ok(())
-        })?;
-
-        Ok(std::rc::Rc::new(namespace))
+            Ok(std::rc::Rc::new(namespace))
+        })
     }
 }
 
@@ -177,10 +178,10 @@ impl Parse for SourceFile {
 }
 
 impl Eval for SourceFile {
-    type Output = objecttree::ObjectNode;
+    type Output = objects::ObjectNode;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
-        let group = objecttree::group();
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
+        let group = objects::group();
         for statement in &self.body {
             match statement {
                 Statement::Expression(expression) => {

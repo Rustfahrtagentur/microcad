@@ -19,7 +19,7 @@ pub use named_tuple::*;
 pub use unnamed_tuple::*;
 pub use value_list::*;
 
-use crate::objecttree::ObjectNode;
+use crate::objects::ObjectNode;
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
@@ -315,7 +315,7 @@ impl std::ops::Sub for Value {
                 Ok(Value::UnnamedTuple((lhs - rhs)?))
             }
             (Value::Node(lhs), Value::Node(rhs)) => {
-                Ok(Value::Node(crate::objecttree::algorithm::binary_op(
+                Ok(Value::Node(crate::objects::algorithm::binary_op(
                     microcad_core::BooleanOp::Difference,
                     lhs,
                     rhs,
@@ -414,7 +414,7 @@ impl std::ops::BitOr for Value {
     fn bitor(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                crate::objecttree::algorithm::binary_op(BooleanOp::Union, lhs, rhs),
+                crate::objects::algorithm::binary_op(BooleanOp::Union, lhs, rhs),
             )),
             (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} | {rhs}"))),
         }
@@ -428,7 +428,7 @@ impl std::ops::BitAnd for Value {
     fn bitand(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                crate::objecttree::algorithm::binary_op(BooleanOp::Intersection, lhs, rhs),
+                crate::objects::algorithm::binary_op(BooleanOp::Intersection, lhs, rhs),
             )),
             (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} & {rhs}"))),
         }

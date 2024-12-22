@@ -3,10 +3,10 @@
 
 //! Builtin module evaluation entity
 
-use crate::{eval::*, objecttree::*, parse::*};
+use crate::{eval::*, objects::*, parse::*};
 
 /// Builtin module initialization functor
-pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut Context) -> EvalResult<ObjectNode>;
+pub type BuiltinModuleFn = dyn Fn(&ArgumentMap, &mut EvalContext) -> EvalResult<ObjectNode>;
 
 /// Builtin module
 #[derive(Clone)]
@@ -23,7 +23,7 @@ impl CallTrait for BuiltinModule {
     type Output = Vec<ObjectNode>;
 
     /// Call implicit initialization of this module
-    fn call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Self::Output> {
+    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Self::Output> {
         let multi_arg_map = args
             .eval(context)?
             .get_multi_matching_arguments(&self.parameters.eval(context)?)?;

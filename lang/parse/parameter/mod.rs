@@ -105,20 +105,19 @@ impl Parse for Parameter {
 impl Eval for Parameter {
     type Output = ParameterValue;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         match (&self.specified_type, &self.default_value) {
             // Type and value are specified
             (Some(specified_type), Some(expr)) => {
                 let default_value = expr.eval(context)?;
                 if specified_type.ty() != default_value.ty() {
-                    use crate::diag::PushDiag;
-                    context.error(
+                    context.error_with_stack_trace(
                         self,
-                        Box::new(EvalError::ParameterTypeMismatch {
+                        EvalError::ParameterTypeMismatch {
                             name: self.name.clone(),
                             expected: specified_type.ty(),
                             found: default_value.ty(),
-                        }),
+                        },
                     )?;
                     // Return an invalid parameter value in case evaluation failed
                     Ok(ParameterValue::invalid(

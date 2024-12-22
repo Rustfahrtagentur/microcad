@@ -9,15 +9,15 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*, sym::*};
 
 /// µcad identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Identifier(Refer<microcad_core::Id>);
+pub struct Identifier(Refer<Id>);
 
 impl Identifier {
     /// Get the value of the identifier
-    pub fn id(&self) -> &microcad_core::Id {
+    pub fn id(&self) -> &Id {
         &self.0.value
     }
 }

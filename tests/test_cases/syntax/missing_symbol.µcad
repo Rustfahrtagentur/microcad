@@ -1,5 +1,5 @@
 module double_box {
-    init( half_the_size: length) { size = half_the_size * 2.0; }
+    init(half_the_size: Length) { size = half_the_size * 2.0; }
     rectangle(size);
 }
 

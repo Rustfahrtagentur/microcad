@@ -3,7 +3,7 @@
 
 //! Node body parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, objects::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Node marker, e.g. `@children`
 #[derive(Clone, Debug)]
@@ -38,18 +38,17 @@ impl Parse for NodeMarker {
 }
 
 impl Eval for NodeMarker {
-    type Output = Option<crate::ObjectNode>;
+    type Output = Option<ObjectNode>;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         match self.name.to_string().as_str() {
-            "children" => Ok(Some(crate::objecttree::ObjectNode::new(
-                crate::objecttree::ObjectNodeInner::ChildrenNodeMarker,
+            "children" => Ok(Some(crate::objects::ObjectNode::new(
+                crate::objects::ObjectNodeInner::ChildrenNodeMarker,
             ))),
             _ => {
-                use crate::diag::PushDiag;
-                context.error(
+                context.error_with_stack_trace(
                     self,
-                    Box::new(EvalError::InvalidNodeMarker(self.name.clone())),
+                    EvalError::InvalidNodeMarker(self.name.clone()),
                 )?;
                 Ok(None)
             }
@@ -105,7 +104,7 @@ impl Parse for NodeBodyStatement {
 impl Eval for NodeBodyStatement {
     type Output = Option<Value>;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         match self {
             Self::NodeMarker(marker) => Ok(marker.eval(context)?.map(Value::Node)),
             Self::Use(use_statement) => {
@@ -177,10 +176,10 @@ impl Parse for NodeBody {
 }
 
 impl Eval for NodeBody {
-    type Output = crate::objecttree::ObjectNode;
+    type Output = crate::objects::ObjectNode;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
-        let mut group = crate::objecttree::group();
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
+        let mut group = crate::objects::group();
 
         for statement in &self.statements {
             match statement {

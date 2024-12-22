@@ -1,4 +1,9 @@
-use crate::{eval::*, parse::*};
+use super::*;
+use crate::{
+    eval::*,
+    parse::*,
+    src_ref::{SrcRef, SrcReferrer},
+};
 
 /// A symbol is a named entity that is used in the
 /// symbol table and in the evaluation context to
@@ -80,6 +85,20 @@ impl Sym for Symbol {
             }
             .clone(),
         )
+    }
+}
+
+impl SrcReferrer for Symbol {
+    fn src_ref(&self) -> SrcRef {
+        match self {
+            Self::Invalid => SrcRef::default(),
+            Self::Value(_, value) => value.src_ref(),
+            Self::Function(f) => f.src_ref(),
+            Self::Module(m) => m.src_ref(),
+            Self::Namespace(n) => n.src_ref(),
+            Self::BuiltinFunction(_) => SrcRef(None),
+            Self::BuiltinModule(_) => SrcRef(None),
+        }
     }
 }
 

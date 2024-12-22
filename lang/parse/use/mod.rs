@@ -5,6 +5,8 @@
 
 mod use_declaration;
 mod use_statement;
+mod visibility;
 
 pub use use_declaration::*;
 pub use use_statement::*;
+pub use visibility::*;

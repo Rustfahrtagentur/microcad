@@ -3,7 +3,7 @@
 
 //! Namespace definition parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Namespace definition
 #[derive(Debug, Clone)]
@@ -48,10 +48,11 @@ impl Symbols for NamespaceDefinition {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         self.body.symbols.iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());
         });
+        Ok(())
     }
 }
 
@@ -69,7 +70,7 @@ impl Parse for std::rc::Rc<NamespaceDefinition> {
 impl Eval for std::rc::Rc<NamespaceDefinition> {
     type Output = Symbol;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         let mut namespace = self.as_ref().clone();
         for statement in &self.body.statements {
             match &statement {

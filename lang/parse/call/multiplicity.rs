@@ -3,7 +3,7 @@
 
 //! Parameter multiplicity implementation.
 
-use microcad_core::Id;
+use crate::sym::Id;
 
 use super::ArgumentMap;
 

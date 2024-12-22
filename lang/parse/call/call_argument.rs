@@ -3,7 +3,7 @@
 
 //! A single call argument
 
-use crate::{eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, ord_map::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Call argument
 #[derive(Clone, Debug)]
@@ -29,7 +29,7 @@ impl CallArgument {
 impl Eval for CallArgument {
     type Output = CallArgumentValue;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         Ok(CallArgumentValue::new(
             self.id(),
             self.value.eval(context)?,
@@ -45,7 +45,7 @@ impl SrcReferrer for CallArgument {
 }
 
 impl Sym for CallArgument {
-    fn id(&self) -> Option<microcad_core::Id> {
+    fn id(&self) -> Option<Id> {
         self.derived_name().as_ref().map(|name| name.id().clone())
     }
 }

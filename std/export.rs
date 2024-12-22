@@ -46,7 +46,7 @@ lazy_static::lazy_static! {
 
 /// Shortcut to export a node
 pub fn export(
-    node: microcad_lang::objecttree::ObjectNode,
+    node: microcad_lang::objects::ObjectNode,
 ) -> microcad_core::CoreResult<Vec<std::path::PathBuf>> {
     export_tree(node, |settings| EXPORTERS.create(settings))
 }

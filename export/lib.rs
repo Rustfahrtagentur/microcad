@@ -10,7 +10,7 @@ pub mod tree_dump;
 
 use microcad_core::CoreResult;
 pub use microcad_core::{CoreError, ExportSettings};
-use microcad_lang::objecttree::*;
+use microcad_lang::objects::*;
 
 /// Exporter trait
 pub trait Exporter {

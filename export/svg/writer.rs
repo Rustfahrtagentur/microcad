@@ -11,6 +11,7 @@ pub struct SvgWriter {
     writer: Box<dyn std::io::Write>,
 }
 
+#[allow(dead_code)]
 impl SvgWriter {
     /// Create new SvgWriter
     /// # Arguments

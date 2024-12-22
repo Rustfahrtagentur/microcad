@@ -34,4 +34,3 @@ missing_docs = "warn"
 
 [lints.clippy]
 unwrap_used = "warn"
-allow_unwrap_in_tests = "allow"

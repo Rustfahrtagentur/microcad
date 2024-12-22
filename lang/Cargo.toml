@@ -19,6 +19,7 @@ path = "lib.rs"
 [dependencies]
 pest = "2.7"
 pest_derive = "2.7"
+compact_str = "0.8"
 log = "0.4"
 rctree = "0.6.0"
 lazy_static = "1.5"

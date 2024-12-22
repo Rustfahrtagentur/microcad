@@ -3,7 +3,7 @@
 
 use microcad_builtin_proc_macro::DefineBuiltinPrimitive3D;
 use microcad_core::*;
-use microcad_lang::{eval::*, parse::*};
+use microcad_lang::{eval::*, parse::*, sym::*};
 
 /// The builtin sphere primitive, defined by its radius.
 #[derive(DefineBuiltinPrimitive3D, Debug)]

@@ -3,7 +3,7 @@
 
 //! For statement parser entity
 
-use crate::{diag::*, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// For statement
 #[derive(Clone, Debug)]
@@ -42,7 +42,7 @@ impl Parse for ForStatement {
 impl Eval for ForStatement {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut EvalContext) -> std::result::Result<Self::Output, EvalError> {
         match self.loop_expr.eval(context)? {
             Value::List(list) => {
                 for value in list.iter() {
@@ -51,10 +51,8 @@ impl Eval for ForStatement {
                 }
             }
             value => {
-                context.error(
-                    self,
-                    Box::new(EvalError::ExpectedRangeInForLoop(value.ty())),
-                )?;
+                context
+                    .error_with_stack_trace(self, EvalError::ExpectedRangeInForLoop(value.ty()))?;
             }
         }
 

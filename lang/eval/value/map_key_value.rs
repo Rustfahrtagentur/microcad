@@ -3,7 +3,7 @@
 
 //! Map key type evaluation entity
 
-use crate::{eval::*, map_key_type::*, src_ref::*};
+use crate::{eval::*, parse::*, src_ref::*};
 use microcad_core::Integer;
 
 /// A value type that can be used as a key in a map

@@ -3,7 +3,7 @@
 
 //! Module definition parser entity
 
-use crate::{eval::*, objecttree, parse::*, parser::*, src_ref::*, ObjectNode};
+use crate::{eval::*, objects::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -30,8 +30,8 @@ impl ModuleDefinition {
     fn find_matching_initializer(
         &self,
         call_argument_list: &CallArgumentList,
-        context: &mut Context,
-    ) -> EvalResult<InitalizerMatch> {
+        context: &mut EvalContext,
+    ) -> EvalResult<InitializerMatch> {
         let call_argument_value_list = call_argument_list.eval(context)?;
 
         // check for any implicit initializer
@@ -39,7 +39,7 @@ impl ModuleDefinition {
             if let Ok(multi_argument_map) = call_argument_value_list
                 .get_multi_matching_arguments(&init.parameters.eval(context)?)
             {
-                return Ok(InitalizerMatch::Implicit(init.clone(), multi_argument_map));
+                return Ok(InitializerMatch::Implicit(init.clone(), multi_argument_map));
             }
         }
 
@@ -49,7 +49,7 @@ impl ModuleDefinition {
                 .get_multi_matching_arguments(&init.parameters.eval(context)?)
             {
                 Ok(multi_argument_map) => {
-                    return Ok(InitalizerMatch::Explicit(init.clone(), multi_argument_map))
+                    return Ok(InitializerMatch::Explicit(init.clone(), multi_argument_map))
                 }
                 Err(_) => continue,
             }
@@ -62,7 +62,7 @@ impl ModuleDefinition {
 /// Match of an initializer
 ///
 /// This enum represents a match of an initializer containing the initializer itself and the argument map
-enum InitalizerMatch {
+enum InitializerMatch {
     /// Match of an implicit initializer
     Implicit(std::rc::Rc<ModuleInitDefinition>, MultiArgumentMap),
 
@@ -70,19 +70,19 @@ enum InitalizerMatch {
     Explicit(std::rc::Rc<ModuleInitDefinition>, MultiArgumentMap),
 }
 
-impl InitalizerMatch {
+impl InitializerMatch {
     /// Call the initializer and the pre-init and post-init statements
     fn call(
         &self,
-        context: &mut Context,
+        context: &mut EvalContext,
         body: &ModuleDefinitionBody,
     ) -> EvalResult<Vec<ObjectNode>> {
         let mut nodes = Vec::new();
 
         match self {
-            InitalizerMatch::Implicit(init, multi_argument_map) => {
+            InitializerMatch::Implicit(init, multi_argument_map) => {
                 for arg_map in multi_argument_map.combinations() {
-                    let mut group: rctree::Node<crate::ObjectNodeInner> = objecttree::group();
+                    let mut group: rctree::Node<ObjectNodeInner> = group();
 
                     init.call(&arg_map, context, &mut group)?;
                     body.eval_pre_init_statements(context, &mut group)?;
@@ -91,9 +91,9 @@ impl InitalizerMatch {
                     nodes.push(group);
                 }
             }
-            InitalizerMatch::Explicit(init, multi_argument_map) => {
+            InitializerMatch::Explicit(init, multi_argument_map) => {
                 for arg_map in multi_argument_map.combinations() {
-                    let mut group: rctree::Node<crate::ObjectNodeInner> = objecttree::group();
+                    let mut group: rctree::Node<ObjectNodeInner> = group();
 
                     body.eval_pre_init_statements(context, &mut group)?;
                     init.call(&arg_map, context, &mut group)?;
@@ -108,23 +108,22 @@ impl InitalizerMatch {
     }
 }
 
-impl CallTrait for ModuleDefinition {
+impl CallTrait for std::rc::Rc<ModuleDefinition> {
     type Output = Vec<ObjectNode>;
 
     fn call(
         &self,
         call_argument_list: &CallArgumentList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Self::Output> {
-        use crate::diag::PushDiag;
-
-        let stack_frame = StackFrame::ModuleCall(context.top().symbol_table().clone(), None);
+        let stack_frame = StackFrame::module(context, self.clone())?;
 
         context.scope(stack_frame, |context| {
             match self.find_matching_initializer(call_argument_list, context) {
                 Ok(matching_initializer) => Ok(matching_initializer.call(context, &self.body)?),
                 Err(err) => {
-                    context.error(self, Box::new(err))?;
+                    use crate::diag::PushDiag;
+                    context.error(self.as_ref(), Box::new(err), Some(context.stack_trace()))?;
                     Ok(Vec::new())
                 }
             }
@@ -153,10 +152,11 @@ impl Symbols for ModuleDefinition {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         self.body.symbols.iter().for_each(|(_, symbol)| {
             into.add(symbol.as_ref().clone());
         });
+        Ok(())
     }
 }
 

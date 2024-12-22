@@ -15,12 +15,12 @@ pub use function_statement::*;
 
 #[test]
 fn assignment() {
-    use crate::{eval::*, parse::*, parser::*};
+    use crate::{eval::*, parse::*, parser::*, sym::*};
 
     let assignment =
         Parser::parse_rule::<Assignment>(Rule::assignment, "a = 1", 0).expect("test error");
 
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
 
     assert_eq!(&assignment.name, "a");
     assert_eq!(
@@ -77,7 +77,7 @@ fn function_definition() {
 
 #[test]
 fn function_evaluate() {
-    use crate::{eval::*, parse::*, parser::*};
+    use crate::{eval::*, parse::*, parser::*, sym::*};
 
     let input = r#"
         function test(a: Scalar, b: Scalar) -> Scalar {
@@ -89,7 +89,7 @@ fn function_evaluate() {
         Parser::parse_rule::<std::rc::Rc<FunctionDefinition>>(Rule::function_definition, input, 0)
             .expect("test error");
 
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
     context.add(function_def.into());
 
     let input = "test(a = 1.0, b = 2.0)";

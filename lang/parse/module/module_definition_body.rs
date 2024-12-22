@@ -3,7 +3,7 @@
 
 //! Module body parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, objects::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Module definition body
 ///
@@ -94,14 +94,20 @@ impl ModuleDefinitionBody {
     fn eval_statement(
         &self,
         statement: &ModuleDefinitionStatement,
-        context: &mut Context,
-        group: &mut crate::ObjectNode,
+        context: &mut EvalContext,
+        group: &mut ObjectNode,
     ) -> EvalResult<()> {
         match statement {
             ModuleDefinitionStatement::Assignment(assignment) => {
                 // Evaluate the assignment and add the symbol to the node
                 // E.g. `a = 1` will add the symbol `a` to the node
                 let symbol = assignment.eval(context)?;
+                group.add(symbol);
+            }
+            ModuleDefinitionStatement::FunctionDefinition(function) => {
+                // Evaluate the function and add the symbol to the node
+                // E.g. `function a() {}` will add the symbol `a` to the node
+                let symbol = function.eval(context)?;
                 group.add(symbol);
             }
             statement => {
@@ -116,28 +122,26 @@ impl ModuleDefinitionBody {
     /// Evaluate the pre-init statements, and copy the symbols to the node
     pub fn eval_pre_init_statements(
         &self,
-        context: &mut Context,
-        node: &mut crate::ObjectNode,
+        context: &mut EvalContext,
+        node: &mut ObjectNode,
     ) -> EvalResult<()> {
         for statement in &self.pre_init_statements {
             self.eval_statement(statement, context, node)?;
         }
-        node.copy(context);
-
+        node.copy(context)?;
         Ok(())
     }
 
     /// Evaluate the post-init statements, and copy the symbols to the node
     pub fn eval_post_init_statements(
         &self,
-        context: &mut Context,
-        node: &mut crate::ObjectNode,
+        context: &mut EvalContext,
+        node: &mut ObjectNode,
     ) -> EvalResult<()> {
         for statement in &self.post_init_statements {
             self.eval_statement(statement, context, node)?;
         }
-        node.copy(context);
-
+        node.copy(context)?;
         Ok(())
     }
 }
@@ -163,7 +167,7 @@ impl Symbols for ModuleDefinitionBody {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         self.symbols.copy(into)
     }
 }

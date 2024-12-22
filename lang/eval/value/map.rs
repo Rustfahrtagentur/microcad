@@ -5,7 +5,7 @@
 
 use value::{SrcRef, SrcReferrer};
 
-use crate::{eval::*, map_key_type::*, r#type::*};
+use crate::{eval::*, parse::*, r#type::*};
 
 /// Map evaluation entity
 #[derive(Debug, Clone, PartialEq)]

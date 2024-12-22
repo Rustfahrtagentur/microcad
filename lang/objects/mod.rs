@@ -11,9 +11,8 @@ pub use transform::Transform;
 
 use strum::IntoStaticStr;
 
+use crate::sym::*;
 use microcad_core::*;
-
-use crate::eval::*;
 
 /// Inner of a node
 #[derive(Clone, IntoStaticStr)]
@@ -91,11 +90,11 @@ impl Symbols for ObjectNode {
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         match *self.borrow_mut() {
             ObjectNodeInner::Group(ref mut table) => table.copy(into),
             _ => unreachable!(),
-        };
+        }
     }
 }
 
@@ -169,7 +168,7 @@ pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {
     }
 
     if nodes[0].len() == 1 {
-        nodes[0].first().unwrap().clone()
+        nodes[0].first().expect("Node").clone()
     } else {
         let group = group();
         for node in &nodes[0] {
@@ -216,7 +215,7 @@ pub fn bake2d(
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_2d(
                     renderer,
-                    crate::objecttree::into_group(node.clone()).unwrap_or(node.clone()),
+                    crate::objects::into_group(node.clone()).unwrap_or(node.clone()),
                 )
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),
@@ -254,7 +253,7 @@ pub fn bake3d(
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_3d(
                     renderer,
-                    crate::objecttree::into_group(node.clone()).unwrap_or(node.clone()),
+                    crate::objects::into_group(node.clone()).unwrap_or(node.clone()),
                 )
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),

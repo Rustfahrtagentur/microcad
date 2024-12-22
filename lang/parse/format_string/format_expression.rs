@@ -46,7 +46,7 @@ impl SrcReferrer for FormatExpression {
 impl Eval for FormatExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         Ok(Value::String(Refer::new(
             format!("{}", self.expression.eval(context)?),
             SrcRef(None),

@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{eval::*, parse::*};
+use microcad_lang::{eval::*, parse::*, sym::*};
 
 /// Module builder
 pub struct NamespaceBuilder {
@@ -24,7 +24,7 @@ impl NamespaceBuilder {
 }
 
 impl Symbols for NamespaceBuilder {
-    fn fetch(&self, name: &microcad_core::Id) -> Option<std::rc::Rc<Symbol>> {
+    fn fetch(&self, name: &Id) -> Option<std::rc::Rc<Symbol>> {
         self.namespace.fetch(name)
     }
 
@@ -33,12 +33,12 @@ impl Symbols for NamespaceBuilder {
         self
     }
 
-    fn add_alias(&mut self, symbol: Symbol, alias: microcad_core::Id) -> &mut Self {
+    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
         self.namespace.add_alias(symbol, alias);
         self
     }
 
-    fn copy<T: Symbols>(&self, into: &mut T) {
+    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         self.namespace.copy(into)
     }
 }

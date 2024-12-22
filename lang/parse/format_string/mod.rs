@@ -79,7 +79,7 @@ impl std::fmt::Display for FormatString {
 impl Eval for FormatString {
     type Output = Value;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         let mut result = String::new();
         for elem in &self.0 {
             match elem {
@@ -123,7 +123,7 @@ fn simple_string() {
 
     let s = FormatString::parse(pair).expect("test error");
     assert_eq!(s.section_count(), 1);
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
     let value = s.eval(&mut context).expect("test error");
 
     assert_eq!(value, Value::String(Refer::none("Hello, World!".into())));
@@ -142,7 +142,7 @@ fn format_string() {
 
     let s = FormatString::parse(pair).expect("test error");
     assert_eq!(s.section_count(), 3);
-    let mut context = Context::default();
+    let mut context = EvalContext::default();
     let value = s.eval(&mut context).expect("test error");
 
     assert_eq!(value, Value::String(Refer::none("A6B".into())));

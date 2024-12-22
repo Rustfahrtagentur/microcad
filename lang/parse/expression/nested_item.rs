@@ -3,7 +3,7 @@
 
 //! Nested item parser entity
 
-use crate::{diag::PushDiag, eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Nested item
 #[derive(Clone, Debug)]
@@ -19,7 +19,7 @@ pub enum NestedItem {
 impl Eval for NestedItem {
     type Output = CallResult;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         match &self {
             NestedItem::Call(call) => call.eval(context),
             NestedItem::QualifiedName(qualified_name) => match qualified_name.eval(context)? {
@@ -30,7 +30,7 @@ impl Eval for NestedItem {
                     value.clone_with_src_ref(qualified_name.src_ref()),
                 )),
                 symbol => {
-                    context.error(self, Box::new(EvalError::CannotNestSymbol(symbol)))?;
+                    context.error_with_stack_trace(self, EvalError::CannotNestSymbol(symbol))?;
                     Ok(CallResult::None)
                 }
             },

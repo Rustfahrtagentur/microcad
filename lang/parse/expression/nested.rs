@@ -47,7 +47,7 @@ impl SrcReferrer for Nested {
 impl Eval for Nested {
     type Output = Option<Value>;
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         let mut nodes = Vec::new();
 
         for item in self.0.iter() {
@@ -57,16 +57,20 @@ impl Eval for Nested {
                     if nodes.is_empty() && self.0.len() == 1 {
                         return Ok(None);
                     } else {
-                        use crate::diag::PushDiag;
-                        context.error(self, Box::new(EvalError::CannotNestItem(item.clone())))?;
+                        context.error_with_stack_trace(
+                            self,
+                            EvalError::CannotNestItem(item.clone()),
+                        )?;
                     }
                 }
                 CallResult::Value(value) => {
                     if nodes.is_empty() && self.0.len() == 1 {
                         return Ok(Some(value));
                     } else {
-                        use crate::diag::PushDiag;
-                        context.error(self, Box::new(EvalError::CannotNestItem(item.clone())))?;
+                        context.error_with_stack_trace(
+                            self,
+                            EvalError::CannotNestItem(item.clone()),
+                        )?;
                     }
                 }
             }
@@ -75,7 +79,7 @@ impl Eval for Nested {
         if nodes.is_empty() {
             Ok(None)
         } else {
-            Ok(Some(Value::Node(crate::objecttree::nest_nodes(nodes))))
+            Ok(Some(Value::Node(crate::objects::nest_nodes(nodes))))
         }
     }
 }

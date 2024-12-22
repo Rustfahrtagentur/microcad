@@ -18,15 +18,15 @@ pub struct MethodCall {
 
 impl MethodCall {
     /// Evaluate the method call in a context
-    pub fn eval(&self, context: &mut Context, lhs: &Expression) -> EvalResult<Value> {
+    pub fn eval(&self, context: &mut EvalContext, lhs: &Expression) -> EvalResult<Value> {
         use call::call_method::CallMethod;
 
         match lhs.eval(context)? {
             Value::Node(node) => node.call_method(&self.name, &self.argument_list, self.src_ref()),
             Value::List(list) => list.call_method(&self.name, &self.argument_list, self.src_ref()),
             _ => {
-                use crate::diag::PushDiag;
-                context.error(self, Box::new(EvalError::UnknownMethod(self.name.clone())))?;
+                context
+                    .error_with_stack_trace(self, EvalError::UnknownMethod(self.name.clone()))?;
                 Ok(Value::Invalid)
             }
         }

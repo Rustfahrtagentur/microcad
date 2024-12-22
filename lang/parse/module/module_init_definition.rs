@@ -3,7 +3,7 @@
 
 //! Module initialization definition parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, objects::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Module initialization definition
 ///
@@ -29,8 +29,8 @@ impl ModuleInitDefinition {
     pub fn call(
         &self,
         arg_map: &ArgumentMap,
-        context: &mut Context,
-        node: &mut crate::ObjectNode,
+        context: &mut EvalContext,
+        node: &mut ObjectNode,
     ) -> EvalResult<()> {
         // Copy the arguments to the symbol table of the node
         for (name, value) in arg_map.iter() {
@@ -48,10 +48,10 @@ impl ModuleInitDefinition {
             child.detach();
             node.append(child.clone());
         }
-        node_body.copy(node);
+        node_body.copy(node)?;
 
         // Now, copy the symbols of the node into the context
-        node.copy(context);
+        node.copy(context)?;
 
         Ok(())
     }

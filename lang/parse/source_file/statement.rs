@@ -3,7 +3,7 @@
 
 //! µcad statement
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// µcad source file statement
 #[derive(Clone, Debug)]
@@ -70,7 +70,7 @@ impl Parse for Statement {
 impl Eval for Statement {
     type Output = ();
 
-    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
         match self {
             Self::Use(use_statement) => {
                 use_statement.eval(context)?;
