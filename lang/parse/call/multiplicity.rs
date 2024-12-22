@@ -72,7 +72,7 @@ where
 
         let data: Vec<Coefficient<T>> = ids_sorted
             .iter()
-            .map(|id| data.get(id).unwrap().clone())
+            .map(|id| data.get(id).expect("Coeffifient with id").clone())
             .collect();
 
         Combinations {
@@ -86,7 +86,7 @@ where
     /// Advance the index counters by one step
     fn advance_indices(&mut self) {
         for (_, index) in self.data_indices.iter() {
-            self.indices[*index] = *self.indices.get(*index).unwrap() + 1;
+            self.indices[*index] = *self.indices.get(*index).expect("Index") + 1;
 
             let count = self.data[*index].count();
             if self.indices[*index] < count {

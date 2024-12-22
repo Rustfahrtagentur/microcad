@@ -105,12 +105,19 @@ fn test_source_file(file_name: &str) {
     let out_file_name: std::path::PathBuf = [
         test_out_dir,
         in_file_name
-            .strip_prefix(in_file_name.parent().expect("test error"))
+            .strip_prefix("test_cases")
             .expect("test error")
             .to_path_buf(),
     ]
     .iter()
     .collect();
+
+    let out_dir = out_file_name.parent().expect("test error");
+    if !out_dir.exists() {
+        std::fs::create_dir_all(out_dir).expect("test error");
+    }
+
+    eprintln!("Testing: {in_file_name:?} -> {out_file_name:?}");
 
     let hash = source_file.hash();
 
@@ -142,7 +149,7 @@ fn test_source_file(file_name: &str) {
 
     microcad_std::export(node.clone()).expect("test error");
 
-    let mut tree_dump_file = out_file_name;
+    let mut tree_dump_file = out_file_name.clone();
     tree_dump_file.set_extension("tree.dump");
 
     export_tree_dump_for_node(node, tree_dump_file.to_str().expect("test error"));
@@ -163,6 +170,16 @@ fn test_source_file(file_name: &str) {
                 .trim()
         );
     }
+
+    // Create log file containing the diagnostics
+    let mut log_file = out_file_name;
+    log_file.set_extension("log");
+    let mut log = std::fs::File::create(log_file).expect("test error");
+
+    context
+        .diag()
+        .pretty_print(&mut log, &context)
+        .expect("test error");
 }
 
 #[test]

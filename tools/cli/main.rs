@@ -107,9 +107,11 @@ fn eval(source_file: SourceFile, std: impl AsRef<Path>) -> anyhow::Result<Object
     if context.diag().has_errors() {
         let mut w = std::io::stderr();
         context.diag().pretty_print(&mut w, &context)?;
-    }
 
-    Ok(node)
+        Err(anyhow::anyhow!("Evaluation failed"))
+    } else {
+        Ok(node)
+    }
 }
 
 fn export(node: ObjectNode) -> anyhow::Result<Vec<std::path::PathBuf>> {

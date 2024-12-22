@@ -11,6 +11,11 @@ version.workspace = true
 [lib]
 path = "lib.rs"
 
+[[bin]]
+name = "source_file_test_summary"
+path = "source_file_test_summary/main.rs"
+
+
 [dependencies]
 pest = "2.7"
 pest_derive = "2.7"
