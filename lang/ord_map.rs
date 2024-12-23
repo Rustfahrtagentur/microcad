@@ -15,7 +15,7 @@ where
 }
 
 /// Map whose values cam be accessed in original insert order
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct OrdMap<K, V>
 where
     V: OrdMapValue<K>,
@@ -37,6 +37,16 @@ where
             vec: Default::default(),
             map: Default::default(),
         }
+    }
+}
+
+impl<K, V> std::fmt::Debug for OrdMap<K, V>
+where
+    V: OrdMapValue<K> + std::fmt::Debug,
+    K: std::cmp::Eq + std::hash::Hash + Clone,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("OrdMap").field("vec", &self.vec).finish()
     }
 }
 
@@ -100,4 +110,3 @@ where
         self.map.keys()
     }
 }
-

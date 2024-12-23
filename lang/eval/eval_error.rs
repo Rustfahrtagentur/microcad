@@ -147,7 +147,7 @@ pub enum EvalError {
     CannotNestSymbol(Symbol),
 
     /// Cannot nest item
-    #[error("Cannot nest item: {0}")]
+    #[error("Cannot nest item: {0:#?}")]
     CannotNestItem(crate::parse::NestedItem),
 
     /// Missing arguments
