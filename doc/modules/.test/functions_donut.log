@@ -1,0 +1,22 @@
+error: Symbol not found: inner
+  ---> <no file>:8:29
+     |
+   8 |     circle(radius) - circle(inner());
+     |                             ^^^^^
+     |
+#0	circle
+	at ../std/std.µcad:9:5
+#1	donut
+	at <no file>:1:1
+#2	root
+error: No matching initializer for module definition `circle`
+  ---> ../std/std.µcad:9:5
+     |
+   9 |     module circle(radius: Length) {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+#0	circle
+	at ../std/std.µcad:9:5
+#1	donut
+	at <no file>:1:1
+#2	root
