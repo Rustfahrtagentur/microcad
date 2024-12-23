@@ -3,18 +3,17 @@
 
 //! µcad Standard library
 
-/// Algorithm module, e.g. `std::algorithm::difference`
-pub mod algorithm;
-
+mod assert;
 mod context_builder;
 mod export;
-
-/// Module containing builtin 2D geometries like `circle` or `rect`
-pub mod geo2d;
 mod math;
 mod namespace_builder;
 mod transform;
 
+/// Algorithm module, e.g. `std::algorithm::difference`
+pub mod algorithm;
+/// Module containing builtin 2D geometries like `circle` or `rect`
+pub mod geo2d;
 /// Module containing builtin 3D geometries like `sphere` or `cube`
 #[cfg(feature = "geo3d")]
 pub mod geo3d;
@@ -24,7 +23,7 @@ mod tests;
 
 use microcad_lang::parameter;
 use microcad_lang::parameter_list;
-use microcad_lang::src_ref::SrcReferrer;
+
 use microcad_lang::{builtin_module, eval::*, function_signature, parse::*, sym::*};
 
 pub use context_builder::ContextBuilder;
@@ -42,44 +41,7 @@ pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
         .add(geo3d::builtin_module().into())
         .add(algorithm::builtin_module().into())
         .add(transform::builtin_namespace().into())
-        .add(
-            BuiltinFunction::new(
-                "assert".into(),
-                function_signature!(parameter_list![
-                    parameter!(condition: Bool),
-                    parameter!(message: String = "Assertion failed")
-                ]),
-                &|args, ctx| {
-                    let message: String = if let Some(m) = args.get("message") {
-                        m.clone().try_into()?
-                    } else {
-                        return Err(EvalError::GrammarRuleError("cannot fetch `message`".into()));
-                    };
-
-                    let condition: bool = args["condition"].clone().try_into()?;
-                    if !condition {
-                        if let Some(condition_src) =
-                            ctx.get_source_string(args["condition"].src_ref())
-                        {
-                            ctx.error_with_stack_trace(
-                                args.src_ref(),
-                                EvalError::AssertionFailedWithCondition(
-                                    message,
-                                    condition_src.into(),
-                                ),
-                            )?;
-                        } else {
-                            ctx.error_with_stack_trace(
-                                args.src_ref(),
-                                EvalError::AssertionFailed(message),
-                            )?;
-                        }
-                    }
-                    Ok(None)
-                },
-            )
-            .into(),
-        )
+        .add(assert::builtin_fn().into())
         .add(
             BuiltinFunction::new(
                 "print".into(),
