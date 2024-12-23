@@ -8,6 +8,7 @@ mod context_builder;
 mod export;
 mod math;
 mod namespace_builder;
+mod print;
 mod transform;
 
 /// Algorithm module, e.g. `std::algorithm::difference`
@@ -21,10 +22,7 @@ pub mod geo3d;
 #[cfg(test)]
 mod tests;
 
-use microcad_lang::parameter;
-use microcad_lang::parameter_list;
-
-use microcad_lang::{builtin_module, eval::*, function_signature, parse::*, sym::*};
+use microcad_lang::{builtin_module, eval::*, parse::*, sym::*};
 
 pub use context_builder::ContextBuilder;
 pub use export::export;
@@ -42,18 +40,7 @@ pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
         .add(algorithm::builtin_module().into())
         .add(transform::builtin_namespace().into())
         .add(assert::builtin_fn().into())
-        .add(
-            BuiltinFunction::new(
-                "print".into(),
-                function_signature!(parameter_list![parameter!(message: String)]),
-                &|args, _| {
-                    let message: String = args["message"].clone().try_into()?;
-                    println!("{message}");
-                    Ok(None)
-                },
-            )
-            .into(),
-        )
+        .add(print::builtin_fn().into())
         .add(
             builtin_module!(export(filename: String) {
                 let export_settings = ExportSettings::with_filename(filename.clone());
