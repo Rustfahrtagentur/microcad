@@ -1,5 +1,7 @@
 # Primitive Types
 
+(see also [this list of types and units](unit_types.md))
+
 ## Integer
 
 The type `integer` contains a natural number.
