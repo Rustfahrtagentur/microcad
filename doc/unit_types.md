@@ -3,15 +3,15 @@
 Units and types are somehow the same in *µcad*.
 This means that your will automatically get the following type if you use the beside units.
 
-| Type      | Value           | Metric Units                         | Imperial Units |
-| --------- | --------------- | ------------------------------------ | -------------- |
-| `Length`  | floating point  | `m`, `cm`, `mm`, `µm`                | `in`           |
-| `Angle`   | floating point  | `°`, `deg`, `grad`, `turn`,`rad`     |                |
-| `Weight`  | floating point  | `g`, `kg`                            | `lb`           |
-| `Area`    | floating point  | `mm²`,`cm²`,`m³`                     | `in²`          |
-| `Volume`  | floating point  | `mm³`,`cm³`,`m³`,`ml`,`cl`,`l`, `µl` | `in³`          |
-| `Integer` | signed  integer | -                                    | -              |
-| `Scalar`  | floating point  | -, `%`                               | -              |
+| Type      | Value           | Metric Units                                | Imperial Units                 |
+| --------- | --------------- | ------------------------------------------- | ------------------------------ |
+| `Length`  | floating point  | `µm`, `mm`, `cm`, `m`                       | `in` or `"`, `ft` or `'`, `yd` |
+| `Angle`   | floating point  | `°` or `deg`, `grad`, `turn`,`rad`          |                                |
+| `Weight`  | floating point  | `g`, `kg`                                   | `lb`, `oz`                     |
+| `Area`    | floating point  | `µm²`,`mm²`,`cm²`,`m³`                      | `in²`, `ft²` , `yd²`           |
+| `Volume`  | floating point  | `µm³`, `mm³`,`cm³`,`m³`,`ml`,`cl`,`l`, `µl` | `in³`, `ft³` , `yd³`           |
+| `Integer` | signed  integer | -                                           | -                              |
+| `Scalar`  | floating point  | -, `%`                                      | -                              |
 
 **Note**: More units [may be implemented](https://github.com/Rustfahrtagentur/microcad/issues/76).
 
