@@ -1,5 +1,7 @@
 # Primitive Types
 
+(see also [this list of types and units](unit_types.md))
+
 ## Integer
 
 The type `integer` contains a natural number.
@@ -36,6 +38,10 @@ millimeters = 1000mm;
 centimeters = 100cm;
 meters = 1m;
 inches = 39.37007874015748in;
+inches = 39.37007874015748";
+foot = 3.280839895ft;
+foot = 3.280839895';
+yard = 0.9144yd;
 
 std::assert( [millimeters, centimeters, meters, inches].equal() );
 ```
@@ -68,6 +74,8 @@ square_millimeter = 100000mm²;
 square_centimeter = 1000cm²;
 square_meter = 0.1m²;
 square_inch = 155in²;
+square_foot = 1.076391ft²;
+square_yard = 0.119599yd²;
 
 std::assert(square_millimeter == 0.1m²);
 std::assert(square_centimeter == 0.1m²);
@@ -84,8 +92,11 @@ cubic_centimeter = 100.0cl;
 cubic_meter = 0.001m³;
 cubic_inch = 61.0237in³;
 liter = 1.0l;
-centiliter = 100.0cl;
-milliliter = 1000.0ml;
+cubic_foot = 35.31467ft³;
+cubic_yard = 0.001307951yd³;
+liter = 1l;
+centiliter = 100cl;
+milliliter = 1000ml;
 
 std::assert(cubic_millimeter == 1.0l);
 std::assert(cubic_centimeter == 1.0l);

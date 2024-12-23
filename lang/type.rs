@@ -54,7 +54,7 @@ impl Type {
     /// Return default unit if primitive type or list of primitive types)
     pub fn default_unit(&self) -> Unit {
         match self {
-            Self::Length => Unit::Mm,
+            Self::Length => Unit::Millimeter,
             Self::Angle => Unit::Rad,
             Self::List(t) => t.ty().default_unit(),
             _ => Unit::None,
