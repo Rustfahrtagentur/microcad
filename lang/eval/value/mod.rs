@@ -220,8 +220,8 @@ impl std::ops::Add for Value {
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs + rhs)),
             // Add a scalar to an integer
             (Value::Integer(lhs), Value::Scalar(rhs)) => {
-                Ok(Value::Integer(Refer::merge(lhs, rhs, |l, r| {
-                    l + r as Integer
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l as Scalar + r
                 })))
             }
             // Add an integer to a scalar
@@ -284,8 +284,8 @@ impl std::ops::Sub for Value {
             }
             // Subtract an integer and a scalar
             (Value::Integer(lhs), Value::Scalar(rhs)) => {
-                Ok(Value::Integer(Refer::merge(lhs, rhs, |l, r| {
-                    l - r as Integer
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l as Scalar - r
                 })))
             }
             // Subtract two numbers
@@ -334,12 +334,13 @@ impl std::ops::Mul for Value {
         match (self, rhs) {
             // Multiply two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs * rhs)),
-            // Multiply an integer and a scalar
+            // Multiply an integer and a scalar, result is scalar
             (Value::Integer(lhs), Value::Scalar(rhs)) => {
-                Ok(Value::Integer(Refer::merge(lhs, rhs, |l, r| {
-                    l * r as Integer
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l as Scalar * r
                 })))
             }
+            // Multiply a scalar and an integer, result is scalar
             (Value::Scalar(lhs), Value::Integer(rhs)) => {
                 Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
                     l * r as Scalar
@@ -347,13 +348,37 @@ impl std::ops::Mul for Value {
             }
             // Multiply two scalars
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs * rhs)),
-            // Scale an angle
+            // Scale an angle with a scalar
             (Value::Angle(lhs), Value::Scalar(rhs)) | (Value::Scalar(rhs), Value::Angle(lhs)) => {
                 Ok(Value::Angle(lhs * rhs))
             }
-            // Scale a length
+            // Scale an angle with an integer
+            (Value::Angle(lhs), Value::Integer(rhs)) => {
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l * r as Scalar
+                })))
+            }
+            // Scale an integer with an angle
+            (Value::Integer(lhs), Value::Angle(rhs)) => {
+                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
+                    l as Scalar * r
+                })))
+            }
+            // Scale a length with a scalar
             (Value::Length(lhs), Value::Scalar(rhs)) | (Value::Scalar(rhs), Value::Length(lhs)) => {
                 Ok(Value::Length(lhs * rhs))
+            }
+            // Scale a length with an integer
+            (Value::Length(lhs), Value::Integer(rhs)) => {
+                Ok(Value::Length(Refer::merge(lhs, rhs, |l, r| {
+                    l * r as Scalar
+                })))
+            }
+            // Scale an integer with a length
+            (Value::Integer(lhs), Value::Length(rhs)) => {
+                Ok(Value::Length(Refer::merge(lhs, rhs, |l, r| {
+                    l as Scalar * r
+                })))
             }
             // Scale Vec2
             (Value::Scalar(lhs), Value::Vec2(rhs)) | (Value::Vec2(rhs), Value::Scalar(lhs)) => {
@@ -402,6 +427,15 @@ impl std::ops::Div for Value {
             | (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Scalar(lhs / rhs)),
             (Value::Length(lhs), Value::Scalar(rhs)) => Ok(Value::Length(lhs / rhs)),
             (Value::Angle(lhs), Value::Scalar(rhs)) => Ok(Value::Angle(lhs / rhs)),
+            (Value::Length(lhs), Value::Integer(rhs)) => {
+                Ok(Value::Length(Refer::merge(lhs, rhs, |l, r| {
+                    l / r as Scalar
+                })))
+            }
+            (Value::Angle(lhs), Value::Integer(rhs)) => {
+                Ok(Value::Angle(Refer::merge(lhs, rhs, |l, r| l / r as Scalar)))
+            }
+            (Value::List(list), value) => Ok(Value::List((list / value)?)),
             (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} / {rhs}"))),
         }
     }
