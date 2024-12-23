@@ -17,8 +17,7 @@ A *module declaration* consists of...
 - maybe some *explicit initializers*, and
 - some *post-initialization code* which sometimes is called just *code*.
 
-![test](.test/modules_declaration.png)
-[see build log](.test/modules_declaration.log)
+[![test](.test/modules_declaration.png)](.test/modules_declaration.log)
 
 ```µcad,modules_declaration
 // define custom module circle with an implicit initializer

@@ -6,8 +6,7 @@
 
 Calculate absolute value:
 
-![test](.test/math_abs.png)
-[see build log](.test/math_abs.log)
+[![test](.test/math_abs.png)](.test/math_abs.log)
 
 ```µcad,math_abs
 std::assert(std::math::abs(-1) == 1);
@@ -15,8 +14,7 @@ std::assert(std::math::abs(-1) == 1);
 
 ### Trigonometric functions
 
-![test](.test/math_trigonometric.png)
-[see build log](.test/math_trigonometric.log)
+[![test](.test/math_trigonometric.png)](.test/math_trigonometric.log)
 
 ```µcad,math_trigonometric#todo
 use std::*;
