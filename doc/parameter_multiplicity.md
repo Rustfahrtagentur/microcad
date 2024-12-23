@@ -8,44 +8,30 @@ The following example will produce 4 rectangles on different positions:
 
 ![test](.banner/parameter_multiplicity_example_A.png)
 
-```µcad,parameter_multiplicity_example_A#todo
-translate(x = [-4.0mm, 4.0mm], y = [-4.0mm, 4.0mm]) 
-  rectangle(2.0mm, 2.0mm);
+```µcad,parameter_multiplicity_example_A
+std::translate(x = [-4.0mm, 4.0mm], y = [-4.0mm, 4.0mm]) 
+    std::geo2d::rect(width = 2.0mm, height = 2.0mm);
 ```
 
 The example results in the following calls:
 
 ![test](.banner/parameter_multiplicity_example_B.png)
 
-```µcad,parameter_multiplicity_example_B#todo
-translate(x = -4.0mm, y = -4.0mm) rectangle(2.0mm, 2.0mm);
-translate(x = -4.0mm, y = 4.0mm) rectangle(2.0mm, 2.0mm);
-translate(x = 4.0mm, y = -4.0mm) rectangle(2.0mm, 2.0mm);
-translate(x = 4.0mm, y = 4.0mm) rectangle(2.0mm, 2.0mm);
+```µcad,parameter_multiplicity_example_B
+std::translate(x = -4.0mm, y = -4.0mm) std::geo2d::rect(width = 2.0mm, height = 2.0mm);
+std::translate(x = -4.0mm, y = 4.0mm) std::geo2d::rect(width = 2.0mm, height = 2.0mm);
+std::translate(x = 4.0mm, y = -4.0mm) std::geo2d::rect(width = 2.0mm, height = 2.0mm);
+std::translate(x = 4.0mm, y = 4.0mm) std::geo2d::rect(width = 2.0mm, height = 2.0mm);
 ```
 
-Normally, this would require 2 nested for loops:
-
-![test](.banner/parameter_multiplicity_example_C.png)
-
-```µcad,parameter_multiplicity_example_C#todo
-for x in [-4.0mm, 4.0mm] {
-    for y in [-4.0mm, 4.0mm] {
-        translate(x = x, y = y) 
-        rectangle(2.0mm, 2.0mm);
-    }
-}
-```
-
-* `translate(x = [-4.0, 4.0]mm)`
-
-* `translate(x = [-4.0, 4.0] * 1mm)`
-
-* `translate(x = [-1,1] * 4mm)`
+Normally, this would require 2 nested *for loops* which are not available in *µcad*.
 
 ![test](.banner/parameter_multiplicity_example_D.png)
 
 ```µcad,parameter_multiplicity_example_D#todo
+use std::geo2d::circle;
+use std::translate;
+
 module rounded_rect(width: Length, height: Length, radius: Length) {
     hull()
         translate(x = [-width, width]/2, y = [-height, height]/2)
@@ -77,7 +63,6 @@ module mountable_plate(
     plate - holes;
 }
 
-
 module mountable_plate(
     size: (Length, Length),
     corner_radius: Length,
@@ -93,9 +78,7 @@ module mountable_plate(
     plate - holes;
 }
 
-module directions {
-
-}
+module directions {}
 
 namespace hole_positions {
     top_left = (x = -100%, y =  100%);
@@ -122,9 +105,6 @@ mountable_plate(
     outer_distance = 1cm,
     hole_positions = hole_positions.edges - [hole_positions.bottom]
 );
-
-
-
 
 mountable_plate(size = (10cm, 10cm), corner_radius = 5mm, outer_distance = 1cm,
     [(x = [-100%, 100%], y = [-100%, 100%])]) {
