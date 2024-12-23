@@ -12,7 +12,7 @@
 
 ## Implicit Initializers from parameter list (also relates to module parameters)
 
-![test](.banner/README_implicit_init_by_parameter_A.png)
+![test](.test/README_implicit_init_by_parameter_A.png)
 
 ```µcad,README_implicit_init_by_parameter_A
 function f(a:Length, b:vec2) {}
@@ -22,7 +22,7 @@ f(1cm,b=(x=1cm,y=2cm));
 f(a=1cm,(x=1cm,y=2cm));
 ```
 
-![test](.banner/README_implicit_init_by_parameter_B.png)
+![test](.test/README_implicit_init_by_parameter_B.png)
 
 ```µcad,README_implicit_init_by_parameter_B
 function f(a:Length, b: Vec2 = (x=1cm,y=2cm)) {}
@@ -34,7 +34,7 @@ f(a=1cm,(x=1cm,y=2cm));
 f(a=1cm,b=(x=1cm,y=2cm));
 ```
 
-![test](.banner/README_implicit_init_by_parameter_C.png)
+![test](.test/README_implicit_init_by_parameter_C.png)
 
 ```µcad,README_implicit_init_by_parameter_C
 function f(a:Length=2cm, b = (x=1cm,y=2cm)) {}

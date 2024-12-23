@@ -12,7 +12,7 @@
 
 ## Example
 
-![test](.banner/init.png)
+![test](.test/init.png)
 
 ```µcad,init
 // begin module and declare implicit initializer
@@ -39,7 +39,7 @@ donut( diameter_outer = 4.0cm, diameter_inner = 2.0cm );
 
 A module with an *implicit initializer* which takes a `size: Length`:
 
-![test](.banner/init_implicit.png)
+![test](.test/init_implicit.png)
 
 ```µcad,init_implicit
 module box(size: Length) {
@@ -51,7 +51,7 @@ module box(size: Length) {
 
 A module with an *explicit initializer* which takes a `size: Length`:
 
-![test](.banner/init_explicit.png)
+![test](.test/init_explicit.png)
 
 ```µcad,init_explicit
 module double_box {
@@ -60,7 +60,7 @@ module double_box {
 }
 ```
 
-![test](.banner/init_explicit_overloading.png)
+![test](.test/init_explicit_overloading.png)
 
 ### Explicit Initializer overloading
 
@@ -85,7 +85,7 @@ module box {
 
 Calling an explicit initializer of a module.
 
-![test](.banner/init_call_implicit.png)
+![test](.test/init_call_implicit.png)
 
 ```µcad,init_call_implicit
 // module with implicit initializer
@@ -102,7 +102,7 @@ m(l=1mm);
 
 Calling an explicit initializer of a module.
 
-![test](.banner/init_call_explicit.png)
+![test](.test/init_call_explicit.png)
 
 ```µcad,init_call_explicit
 // module with implicit initializer
@@ -121,7 +121,7 @@ m(f=1mm);
 A module with both, *implicit and *explicit initializer* which takes different
 parameters and some *pre-initialization code*:
 
-![test](.banner/init_call_implicit_explicit.png)
+![test](.test/init_call_implicit_explicit.png)
 
 ```µcad,init_call_implicit_explicit
 // module with implicit initializer

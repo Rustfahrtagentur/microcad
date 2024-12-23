@@ -21,7 +21,7 @@ This means that your will automatically get the following type if you use the be
 
 ### Types
 
-![test](.banner/README_types.png)
+![test](.test/README_types.png)
 
 ```µcad,README_types
 // function parameter `height` declared to be a `Length`
@@ -30,7 +30,7 @@ function f( height: Length ) {}
 
 ### Units
 
-![test](.banner/README_number_literals.png)
+![test](.test/README_number_literals.png)
 
 ```µcad,README_number_literals
 // declare variable `height` of type `Length` to 1.4 Meters

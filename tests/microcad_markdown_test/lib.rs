@@ -89,7 +89,7 @@ fn remove_banners(
             if file_type.is_dir()
                 && !exclude_dirs.contains(&entry.file_name().to_string_lossy().to_string().as_str())
             {
-                if entry.file_name() == ".banner" {
+                if entry.file_name() == ".test" {
                     clean_dir(entry.path(), exclude_files)?;
                 } else {
                     remove_banners(entry.path(), exclude_dirs, exclude_files)?;
@@ -101,11 +101,11 @@ fn remove_banners(
     Ok(())
 }
 
-/// Remove all files within `.banner` directory
+/// Remove all files within `.test` directory
 fn clean_dir(path: impl AsRef<std::path::Path>, exclude_files: &[String]) -> Result<()> {
     warning!("remove banners in: {:?}", path.as_ref());
 
-    // list all files within `.banner` directory and remove them
+    // list all files within `.test` directory and remove them
     for entry in std::fs::read_dir(&path)
         .unwrap()
         .flatten()
@@ -264,14 +264,14 @@ fn create_test_code(
     );
 
     // where to store images
-    let banner_path = file_path.parent().unwrap().join(".banner");
+    let banner_path = file_path.parent().unwrap().join(".test");
     // banner image file of this test
     let banner = banner_path.join(format!("{name}.png"));
     let banner_esc = banner.to_string_lossy().escape_default().to_string();
 
     //warning!("write_test_code: banner: {banner} {:?}", file_path,);
 
-    // maybe create .banner directory
+    // maybe create .test directory
     let _ = std::fs::create_dir(banner_path);
 
     // Early exit for "#no_test" and "#todo" suffixes

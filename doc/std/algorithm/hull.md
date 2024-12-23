@@ -2,7 +2,7 @@
 
 In the following examples the convex hull of circles is calculated.
 
-![test](.banner/hull_single.png)
+![test](.test/hull_single.png)
 
 ```µcad,hull_single#todo
 hull()
@@ -10,7 +10,7 @@ hull()
         circle(1mm);
 ```
 
-![test](.banner/hull_multiple.png)
+![test](.test/hull_multiple.png)
 
 ```µcad,hull_multiple#todo
 hull() {

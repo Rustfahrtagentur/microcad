@@ -3,7 +3,7 @@
 * Provides function and modules
 * No parameter list
 
-![test](.banner/namespaces_example.png)
+![test](.test/namespaces_example.png)
 
 ```µcad,namespaces_example
 // namespace module std
