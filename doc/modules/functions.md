@@ -19,4 +19,6 @@ module donut(radius: length) {
     // generate donut
     circle(radius) - circle(inner());
 }
+
+donut(1cm);
 ```

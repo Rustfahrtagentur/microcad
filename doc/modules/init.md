@@ -66,7 +66,6 @@ module double_box {
 ![test](.test/init_explicit_overloading.png)
 [see build log](.test/init_explicit_overloading.log)
 
-
 ### Explicit Initializer overloading
 
 A module with *multiple explicit initializers* which takes different
