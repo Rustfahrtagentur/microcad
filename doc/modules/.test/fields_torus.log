@@ -1,0 +1,16 @@
+error: No matching initializer for module definition `torus`
+  ---> <no file>:2:1
+     |
+   2 | module torus(radius: length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+#0	torus
+	at <no file>:2:1
+#1	root
+error: Symbol not found: info
+  ---> <no file>:16:1
+     |
+  16 | info("{t.inner}");
+     | ^^^^
+     |
+#0	root

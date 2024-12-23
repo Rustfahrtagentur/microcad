@@ -1,0 +1,9 @@
+error: No matching initializer for module definition `donut`
+  ---> <no file>:2:1
+     |
+   2 | module donut(outer: length, inner: length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+#0	donut
+	at <no file>:2:1
+#1	root

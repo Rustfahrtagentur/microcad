@@ -1,0 +1,195 @@
+error: Symbol not found: top_left
+  ---> <no file>:54:13
+     |
+  54 |     north = top_left;
+     |             ^^^^^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:54:13
+     |
+  54 |     north = top_left;
+     |             ^^^^^^^^
+     |
+#0	root
+error: Symbol not found: top_left
+  ---> <no file>:64:16
+     |
+  64 |     corners = [top_left, bottom_left, top_right, bottom_right];
+     |                ^^^^^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:64:16
+     |
+  64 |     corners = [top_left, bottom_left, top_right, bottom_right];
+     |                ^^^^^^^^
+     |
+#0	root
+error: Symbol not found: bottom_left
+  ---> <no file>:64:26
+     |
+  64 |     corners = [top_left, bottom_left, top_right, bottom_right];
+     |                          ^^^^^^^^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:64:26
+     |
+  64 |     corners = [top_left, bottom_left, top_right, bottom_right];
+     |                          ^^^^^^^^^^^
+     |
+#0	root
+error: Symbol not found: top_right
+  ---> <no file>:64:39
+     |
+  64 |     corners = [top_left, bottom_left, top_right, bottom_right];
+     |                                       ^^^^^^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:64:39
+     |
+  64 |     corners = [top_left, bottom_left, top_right, bottom_right];
+     |                                       ^^^^^^^^^
+     |
+#0	root
+error: Symbol not found: bottom_right
+  ---> <no file>:64:50
+     |
+  64 |     corners = [top_left, bottom_left, top_right, bottom_right];
+     |                                                  ^^^^^^^^^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:64:50
+     |
+  64 |     corners = [top_left, bottom_left, top_right, bottom_right];
+     |                                                  ^^^^^^^^^^^^
+     |
+#0	root
+error: Symbol not found: top
+  ---> <no file>:66:14
+     |
+  66 |     edges = [top, bottom, left, right];
+     |              ^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:66:14
+     |
+  66 |     edges = [top, bottom, left, right];
+     |              ^^^
+     |
+#0	root
+error: Symbol not found: bottom
+  ---> <no file>:66:19
+     |
+  66 |     edges = [top, bottom, left, right];
+     |                   ^^^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:66:19
+     |
+  66 |     edges = [top, bottom, left, right];
+     |                   ^^^^^^
+     |
+#0	root
+error: Symbol not found: left
+  ---> <no file>:66:27
+     |
+  66 |     edges = [top, bottom, left, right];
+     |                           ^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:66:27
+     |
+  66 |     edges = [top, bottom, left, right];
+     |                           ^^^^
+     |
+#0	root
+error: Symbol not found: right
+  ---> <no file>:66:33
+     |
+  66 |     edges = [top, bottom, left, right];
+     |                                 ^^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:66:33
+     |
+  66 |     edges = [top, bottom, left, right];
+     |                                 ^^^^^
+     |
+#0	root
+error: Symbol not found: corners
+  ---> <no file>:68:11
+     |
+  68 |     all = corners + edges + [center];
+     |           ^^^^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:68:11
+     |
+  68 |     all = corners + edges + [center];
+     |           ^^^^^^^
+     |
+#0	root
+error: Symbol not found: edges
+  ---> <no file>:68:21
+     |
+  68 |     all = corners + edges + [center];
+     |                     ^^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:68:21
+     |
+  68 |     all = corners + edges + [center];
+     |                     ^^^^^
+     |
+#0	root
+error: Symbol not found: center
+  ---> <no file>:68:30
+     |
+  68 |     all = corners + edges + [center];
+     |                              ^^^^^^
+     |
+#0	root
+error: Cannot nest symbol: Invalid
+  ---> <no file>:68:30
+     |
+  68 |     all = corners + edges + [center];
+     |                              ^^^^^^
+     |
+#0	root
+error: Cannot nest symbol: namespace `hole_positions`
+  ---> <no file>:75:22
+     |
+  75 |     hole_positions = hole_positions.edges - [hole_positions.bottom]
+     |                      ^^^^^^^^^^^^^^
+     |
+#0	mountable_plate
+	at <no file>:35:1
+#1	root
+error: Named tuple element access error
+  ---> <no file>:35:1
+     |
+  35 | module mountable_plate(
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+     |
+#0	mountable_plate
+	at <no file>:35:1
+#1	root
+error: No matching initializer for module definition `mountable_plate`
+  ---> <no file>:35:1
+     |
+  35 | module mountable_plate(
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+     |
+#0	mountable_plate
+	at <no file>:35:1
+#1	root

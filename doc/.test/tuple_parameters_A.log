@@ -1,0 +1,6 @@
+Parser error:  --> 1:12
+  |
+1 | module box((x,y,z) = 0mm) {}
+  |            ^---
+  |
+  = expected COMMENT

@@ -2,7 +2,8 @@
 
 A 2D donut as circle with a hole.
 
-![test](.banner/parameter_list.png)
+![test](.test/parameter_list.png)
+[see build log](.test/parameter_list.log)
 
 ```µcad,parameter_list#todo
 // declare two parameters

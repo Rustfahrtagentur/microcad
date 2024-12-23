@@ -1,0 +1,21 @@
+error: Symbol not found: torus
+  ---> <no file>:3:25
+     |
+   3 | use std::geo3d::sphere, std::geo3d::torus;
+     |                         ^^^^^^^^^^^^^^^^^
+     |
+#0	root
+error: Cannot use Invalid
+  ---> <no file>:3:25
+     |
+   3 | use std::geo3d::sphere, std::geo3d::torus;
+     |                         ^^^^^^^^^^^^^^^^^
+     |
+#0	root
+error: Symbol not found: cone
+  ---> <no file>:7:1
+     |
+   7 | std::geo3d::cone(height = 2cm);
+     | ^^^^^^^^^^^^^^^^
+     |
+#0	root
