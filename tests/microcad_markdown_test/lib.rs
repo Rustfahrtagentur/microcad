@@ -193,38 +193,47 @@ fn scan_for_tests(
     let mut test_name = String::new();
     let mut test_code = String::new();
 
-    let start = Regex::new(r#"```µ[Cc][Aa][Dd](,(?<name>[\.#_\w]+))?"#).expect("bad regex");
+    let start = Regex::new(r#"```[mµ][Cc][Aa][Dd](,(?<name>[\.#_\w]+))?"#).expect("bad regex");
     let end = Regex::new(r#"```"#).expect("bad regex");
 
+    let mut ignore = false;
     // read all lines in the file
     for line in md_content.lines() {
-        // match code starting marker
-        if let Some(start) = start.captures_iter(line).next() {
-            if let Some(name) = start.name("name") {
-                // remember test name
-                test_name = name.as_str().to_string();
-                // clear code
-                test_code.clear();
-            }
-        } else if !test_name.is_empty() {
-            // match code end marker
-            if end.captures_iter(line).next().is_some() {
-                // generate test code
-                let banner =
-                    write_test_code(output, file_path, test_name.as_str(), test_code.as_str());
-                if let Some(banner) = banner {
-                    banners.push(banner.to_string_lossy().to_string());
+        // ignore deeper markdown code
+        if line.starts_with("````") {
+            ignore = !ignore;
+            warning!("ignoring: {ignore}");
+        }
+
+        if !ignore {
+            // match code starting marker
+            if let Some(start) = start.captures_iter(line).next() {
+                if let Some(name) = start.name("name") {
+                    // remember test name
+                    test_name = name.as_str().to_string();
+                    // clear code
+                    test_code.clear();
                 }
+            } else if !test_name.is_empty() {
+                // match code end marker
+                if end.captures_iter(line).next().is_some() {
+                    // generate test code
+                    let banner =
+                        create_test_code(output, file_path, test_name.as_str(), test_code.as_str());
+                    if let Some(banner) = banner {
+                        banners.push(banner.to_string_lossy().to_string());
+                    }
 
-                // clear name to signal new test awaited
-                test_name.clear();
+                    // clear name to signal new test awaited
+                    test_name.clear();
 
-                // found some test
-                result = false;
-            } else {
-                // add line to code
-                test_code.push_str(line);
-                test_code.push('\n');
+                    // found some test
+                    result = false;
+                } else {
+                    // add line to code
+                    test_code.push_str(line);
+                    test_code.push('\n');
+                }
             }
         }
     }
@@ -232,7 +241,7 @@ fn scan_for_tests(
 }
 
 /// Generate code for one test
-fn write_test_code(
+fn create_test_code(
     f: &mut String,
     file_path: &std::path::Path,
     name: &str,
