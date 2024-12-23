@@ -217,7 +217,7 @@ impl Unit {
             Self::M3 => x * 1_000_000_000.0_f64,
             Self::In3 => x * 16387.06_f64,
             Self::Liter => x * 1_000_000.0_f64,
-            Self::Centiliter => x * 100.0_f64,
+            Self::Centiliter => x * 10_000.0_f64,
             Self::Milliliter => x * 1_000.0_f64,
             Self::Microliter => x * 1_000_000.0_f64,
         }
