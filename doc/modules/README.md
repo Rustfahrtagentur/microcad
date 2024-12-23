@@ -25,7 +25,7 @@ A *module declaration* consists of...
 module small_disc(diameter: Length) {
 
     // pre-initialization code
-    factor = 2.0;
+    factor = 2;
 
     // explicit initializers 
     init( half_diameter: Length ) {
@@ -40,9 +40,9 @@ module small_disc(diameter: Length) {
 }
 
 // call module
-small_disc( diameter = 1.0cm);
-small_disc( half_diameter = 1.0cm);
-small_disc( double_diameter = 1.0cm);
+small_disc( diameter = 1cm);
+small_disc( half_diameter = 1cm);
+small_disc( double_diameter = 1cm);
 ```
 
 ### Pre-initialization code

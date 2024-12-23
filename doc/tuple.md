@@ -61,8 +61,8 @@ height = 2mm;
 [see build log](.test/tuple_fields_D.log)
 
 ```µcad,tuple_fields_D
-width = (0.0, 0.0)mm;
-height = (0.0, 0.0)mm;
+width = (0, 0)mm;
+height = (0, 0)mm;
 ```
 
 ![test](.test/tuple_fields_E.png)

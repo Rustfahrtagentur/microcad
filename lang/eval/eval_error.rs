@@ -94,8 +94,8 @@ pub enum EvalError {
     UnknownMethod(Identifier),
 
     /// Elements of list have different types
-    #[error("Elements of list have different types")]
-    ListElementsDifferentTypes,
+    #[error("Elements of list have different types: {0}")]
+    ListElementsDifferentTypes(crate::parse::TypeList),
 
     /// Function call missing argument
     #[error("Function call missing argument: {0}")]
@@ -175,7 +175,7 @@ pub enum EvalError {
     AssertionFailed(String),
 
     /// Assertion failed
-    #[error("Assertion failed: {0} with ")]
+    #[error("Assertion failed: {0} with {1}")]
     AssertionFailedWithCondition(String, String),
 
     /// Ambiguous symbol

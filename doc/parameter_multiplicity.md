@@ -10,8 +10,8 @@ The following example will produce 4 rectangles on different positions:
 [see build log](.test/parameter_multiplicity_example_A.log)
 
 ```µcad,parameter_multiplicity_example_A
-std::translate(x = [-4.0mm, 4.0mm], y = [-4.0mm, 4.0mm]) 
-    std::geo2d::rect(width = 2.0mm, height = 2.0mm);
+std::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]) 
+    std::geo2d::rect(width = 2mm, height = 2mm);
 ```
 
 The example results in the following calls:
@@ -20,10 +20,10 @@ The example results in the following calls:
 [see build log](.test/parameter_multiplicity_example_B.log)
 
 ```µcad,parameter_multiplicity_example_B
-std::translate(x = -4.0mm, y = -4.0mm) std::geo2d::rect(width = 2.0mm, height = 2.0mm);
-std::translate(x = -4.0mm, y = 4.0mm) std::geo2d::rect(width = 2.0mm, height = 2.0mm);
-std::translate(x = 4.0mm, y = -4.0mm) std::geo2d::rect(width = 2.0mm, height = 2.0mm);
-std::translate(x = 4.0mm, y = 4.0mm) std::geo2d::rect(width = 2.0mm, height = 2.0mm);
+std::translate(x = -4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
+std::translate(x = -4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
+std::translate(x = 4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
+std::translate(x = 4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
 ```
 
 Normally, this would require 2 nested *for loops* which are not available in *µcad*.

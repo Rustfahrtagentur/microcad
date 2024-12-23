@@ -6,7 +6,7 @@
 [see build log](.test/use_statement_without_use.log)
 
 ```µcad,use_statement_without_use
-std::geo3d::sphere(radius = 40.0mm);
+std::geo3d::sphere(radius = 40mm);
 ```
 
 ## Simple `use` statement
@@ -18,7 +18,7 @@ std::geo3d::sphere(radius = 40.0mm);
 use std::geo3d::sphere, std::geo3d::cube;
 
 sphere(r = 4mm);
-cube(size = 40.0mm);
+cube(size = 40mm);
 ```
 
 ## `use *` statement
@@ -29,7 +29,7 @@ cube(size = 40.0mm);
 ```µcad,use_statement_use_all_from
 use std::geo3d::*;
 
-cube(size = 40.0mm);
+cube(size = 40mm);
 ```
 
 ## `use as` statement

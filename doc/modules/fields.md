@@ -11,7 +11,7 @@ module torus(radius: length) {
     use std::geo2d::circle;
 
     // calculate inner from radius into field inner
-    inner = radius / 2.0;
+    inner = radius / 2;
 
     // generate torus (and use field inner)
     circle(radius) - circle(inner);

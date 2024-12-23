@@ -22,8 +22,8 @@ module donut(radius_outer: Length, radius_inner: Length) {
     // alternative initialization with diameters
     init( diameter_outer: Length, diameter_inner: Length ) {
         // calculate radiuses from diameters
-        radius_inner = diameter_inner / 2.0;
-        radius_outer = diameter_outer / 2.0;
+        radius_inner = diameter_inner / 2;
+        radius_outer = diameter_outer / 2;
     }
 
     // generate donut based on radiuses
@@ -31,9 +31,9 @@ module donut(radius_outer: Length, radius_inner: Length) {
 }
 
 // generate three equal donuts
-donut( 2.0cm, 1.0cm );
-donut( radius_outer = 2.0cm, radius_inner = 1.0cm );
-donut( diameter_outer = 4.0cm, diameter_inner = 2.0cm );
+donut( 2cm, 1cm );
+donut( radius_outer = 2cm, radius_inner = 1cm );
+donut( diameter_outer = 4cm, diameter_inner = 2cm );
 ```
 
 ## Implicit Initializer
@@ -97,7 +97,7 @@ Calling an explicit initializer of a module.
 // module with implicit initializer
 module m(l: Length) {
     // explicit initializer
-    init(f: Length) { r = f/2.0; }
+    init(f: Length) { r = f/2; }
 }
 
 // call implicit initializer
@@ -115,7 +115,7 @@ Calling an explicit initializer of a module.
 // module with implicit initializer
 module m(l: Length) {
     // explicit initializer
-    init(f: Length) { l = f/2.0; }
+    init(f: Length) { l = f/2; }
     std::geo2d::circle( r = l );
 }
 
@@ -135,14 +135,14 @@ parameters and some *pre-initialization code*:
 // module with implicit initializer
 module m( area: (width: Length, height: Length) ) {
   // pre-initialization code
-  default_width = 2.0m;
+  default_width = 2m;
 
   // explicit initializer
   init( height: Length) { area = ( width = default_width, height); }
 }
 
 // call implicit initializer
-m( area = (width = 1.0m, height = 0.5m) );
+m( area = (width = 1m, height = 0.5m) );
 
 // use explicit initializer
 m( height = 0.5m );

@@ -19,7 +19,7 @@ The type `Scalar` contains a floating number and must be written with at least o
 [see build log](.test/types_primitive_scalar.log)
 
 ```µcad,types_primitive_scalar
-zero = 0.0;
+zero = 0;
 pi =  3.1415;
 percent = 55%;
 ```
