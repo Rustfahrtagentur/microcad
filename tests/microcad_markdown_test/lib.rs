@@ -311,14 +311,16 @@ fn create_test_code(
                                 log::debug!("{err}")
                             },
                             Ok(source) => { 
-                                let _ = fs::hard_link("images/ok_fail.png", banner);
                                 let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
                                 if let Err(err) = context.eval() {
+                                    let _ = fs::hard_link("images/fail_ok.png", banner);
                                     log::debug!("{err}");
                                 } else if context.diag().error_count > 0 {
+                                    let _ = fs::hard_link("images/fail_ok.png", banner);
                                     let mut w = io::stdout();
                                     context.diag().pretty_print(&mut w, &context).expect("internal error");
                                 } else {
+                                    let _ = fs::hard_link("images/ok_fail.png", banner);
                                     panic!("ERROR: test is marked to fail but succeeded");
                                 }
                             }
