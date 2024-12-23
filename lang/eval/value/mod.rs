@@ -578,9 +578,9 @@ fn test_value_integer() {
     check(-u(), integer(-2, &r));
 
     // asymmetric operations
-    check(u() + w(), integer(2 + 5, &r));
-    check(u() - w(), integer(2 - 5, &r));
-    check(u() * w(), integer(2 * 5, &r));
+    check(u() + w(), scalar(2 as Scalar + 5.0, &r));
+    check(u() - w(), scalar(2 as Scalar - 5.0, &r));
+    check(u() * w(), scalar(2 as Scalar * 5.0, &r));
     check(u() / w(), scalar(2.0 / 5.0, &r));
 }
 
