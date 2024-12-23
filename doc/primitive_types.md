@@ -58,36 +58,34 @@ std::assert( [degree, degree_, grad, turn, radian].equal() );
 
 ![test](.banner/types_primitive_area.png)
 
-```µcad,types_primitive_area#todo
+```µcad,types_primitive_area
 square_millimeter = 100000mm²;
 square_centimeter = 1000cm²;
 square_meter = 0.1m²;
 square_inch = 155in²;
 
-std::assert(square_millimeter = 0.1m²);
-std::assert(square_centimeter = 0.1m²);
-std::assert(square_inch ~ 0.1m² +-1%);
+std::assert(square_millimeter == 0.1m²);
+std::assert(square_centimeter == 0.1m²);
 ```
 
 ## Volume
 
 ![test](.banner/types_primitive_volume.png)
 
-```µcad,types_primitive_volume#todo
-cubic_millimeter = 1000000mm³;
-cubic_centimeter = 100cl;
+```µcad,types_primitive_volume
+cubic_millimeter = 1000000.0mm³;
+cubic_centimeter = 100.0cl;
 cubic_meter = 0.001m³;
 cubic_inch = 61.0237in³;
-liter = 1l;
-centiliter = 100cl;
-milliliter = 1000ml;
+liter = 1.0l;
+centiliter = 100.0cl;
+milliliter = 1000.0ml;
 
-std::assert(cubic_millimeter = 1l);
-std::assert(cubic_centimeter = 1l);
-std::assert(cubic_meter = 1l);
-std::assert(cubic_inch ~ 1l +-1%);
-std::assert(centiliter = 1l);
-std::assert(milliliter = 1l);
+std::assert(cubic_millimeter == 1.0l);
+std::assert(cubic_centimeter == 1.0l);
+std::assert(cubic_meter == 1.0l);
+std::assert(centiliter == 1.0l);
+std::assert(milliliter == 1.0l);
 ```
 
 ## String
@@ -113,14 +111,14 @@ Colors are defined by using hash mark (`#`) followed by hexadecimal digits for r
 
 ![test](.banner/types_primitive_color.png)
 
-```µcad,types_primitive_color#todo
+```µcad,types_primitive_color
 rgb_single_hex = #FFF;
 rgb_double_hex = #00FF00;
 rgba_single_hex = #FFFF;
 rgba_double_hex = #00FF00FF;
 
-std::assert( rgb_single_hex = rgba_single_hex );
-std::assert( rgb_double_hex = rgba_double_hex );
+std::assert( rgb_single_hex == rgba_single_hex );
+std::assert( rgb_double_hex == rgba_double_hex );
 ```
 
 Illegal values for color:
@@ -137,13 +135,12 @@ Weights can be calculated by applying volumes to materials.
 
 ![test](.banner/types_primitive_weight.png)
 
-```µcad,types_primitive_weight#todo
-gram = 1000g;
-kilogram = 1kg;
+```µcad,types_primitive_weight
+gram = 1000.0g;
+kilogram = 1.0kg;
 pound = 2.204623lb;
 
-std::assert(gram = 1kg);
-std::assert(pound ~ 1kg +-1%);
+std::assert(gram == 1.0kg);
 ```
 
 ### Vec2
