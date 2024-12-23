@@ -86,7 +86,7 @@ impl Eval for ListExpression {
                 common_type,
                 self.src_ref(),
             ))),
-            None => Err(EvalError::ListElementsDifferentTypes),
+            None => Err(EvalError::ListElementsDifferentTypes(value_list.types())),
         }
     }
 }

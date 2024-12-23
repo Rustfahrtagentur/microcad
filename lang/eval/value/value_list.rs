@@ -6,7 +6,7 @@
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
 /// List of values
-#[derive(Clone, Debug, PartialEq, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct ValueList(Refer<Vec<Value>>);
 
 impl ValueList {
@@ -61,6 +61,12 @@ impl IntoIterator for ValueList {
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.value.into_iter()
+    }
+}
+
+impl PartialEq for ValueList {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
     }
 }
 

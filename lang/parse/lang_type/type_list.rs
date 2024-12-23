@@ -25,6 +25,26 @@ impl TypeList {
     }
 }
 
+impl std::fmt::Debug for TypeList {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self.0)
+    }
+}
+
+impl std::fmt::Display for TypeList {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "[{}]",
+            self.0
+                .iter()
+                .map(|t| t.to_string())
+                .collect::<Vec<String>>()
+                .join(", ")
+        )
+    }
+}
+
 #[test]
 fn test_common_type() {
     let list = TypeList::new(vec![Type::Integer, Type::Integer]);

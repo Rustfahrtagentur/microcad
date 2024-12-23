@@ -6,7 +6,7 @@
 use crate::{eval::*, r#type::*, src_ref::*};
 
 /// List of values of the same type
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 pub struct List {
     /// List of values
     list: ValueList,
@@ -23,6 +23,12 @@ impl List {
     /// Fetch all values as `Vec<Value>`
     pub fn fetch(&self) -> Vec<Value> {
         self.list.iter().cloned().collect::<Vec<_>>()
+    }
+}
+
+impl PartialEq for List {
+    fn eq(&self, other: &Self) -> bool {
+        self.ty == other.ty && self.list == other.list
     }
 }
 
@@ -85,13 +91,39 @@ impl std::ops::Mul<Value> for List {
             values.push((value.clone() * rhs.clone())?);
         }
 
-        match (self.ty, rhs) {
-            (Type::Scalar, rhs) => Ok(List::new(
-                ValueList::new(values, self.src_ref.clone()),
-                rhs.ty().clone(),
-                self.src_ref.clone(),
-            )),
+        match self.ty {
+            // List * Scalar or List * Integer
+            Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => {
+                Ok(List::new(
+                    ValueList::new(values, self.src_ref.clone()),
+                    rhs.ty().clone(),
+                    self.src_ref.clone(),
+                ))
+            }
             _ => Err(EvalError::InvalidOperator("*".into())),
+        }
+    }
+}
+
+impl std::ops::Div<Value> for List {
+    type Output = EvalResult<List>;
+
+    fn div(self, rhs: Value) -> Self::Output {
+        let mut values = Vec::new();
+        for value in self.iter() {
+            values.push((value.clone() / rhs.clone())?);
+        }
+
+        match self.ty {
+            // List / Scalar or List / Integer
+            Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => {
+                Ok(List::new(
+                    ValueList::new(values, self.src_ref.clone()),
+                    Type::Scalar,
+                    self.src_ref.clone(),
+                ))
+            }
+            _ => Err(EvalError::InvalidOperator("/".into())),
         }
     }
 }
