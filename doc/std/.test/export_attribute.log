@@ -1,0 +1,6 @@
+Parser error:  --> 1:2
+  |
+1 | #[slider("cube size")]
+  |  ^---
+  |
+  = expected COMMENT

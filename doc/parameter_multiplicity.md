@@ -7,6 +7,7 @@ This way, we can intuitively express a call that is called for each parameter va
 The following example will produce 4 rectangles on different positions:
 
 ![test](.test/parameter_multiplicity_example_A.png)
+[see build log](.test/parameter_multiplicity_example_A.log)
 
 ```µcad,parameter_multiplicity_example_A
 std::translate(x = [-4.0mm, 4.0mm], y = [-4.0mm, 4.0mm]) 
@@ -16,6 +17,7 @@ std::translate(x = [-4.0mm, 4.0mm], y = [-4.0mm, 4.0mm])
 The example results in the following calls:
 
 ![test](.test/parameter_multiplicity_example_B.png)
+[see build log](.test/parameter_multiplicity_example_B.log)
 
 ```µcad,parameter_multiplicity_example_B
 std::translate(x = -4.0mm, y = -4.0mm) std::geo2d::rect(width = 2.0mm, height = 2.0mm);
@@ -27,6 +29,7 @@ std::translate(x = 4.0mm, y = 4.0mm) std::geo2d::rect(width = 2.0mm, height = 2.
 Normally, this would require 2 nested *for loops* which are not available in *µcad*.
 
 ![test](.test/parameter_multiplicity_example_D.png)
+[see build log](.test/parameter_multiplicity_example_D.log)
 
 ```µcad,parameter_multiplicity_example_D#todo
 use std::geo2d::circle;

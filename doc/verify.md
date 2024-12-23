@@ -11,12 +11,14 @@ If the expression computes to `false` a compile error will occur at
 that point.
 
 ![test](.test/verify_assert.png)
+[see build log](.test/verify_assert.log)
 
 ```µcad,verify_assert
 std::assert(true, "You won't see this message");
 ```
 
 ![test](.test/verify_assert_fail.png)
+[see build log](.test/verify_assert_fail.log)
 
 ```µcad,verify_assert_fail#fail
 std::assert(false, "this assertion fails");
@@ -25,6 +27,7 @@ std::assert(false, "this assertion fails");
 ## Panic
 
 ![test](.test/verify_panic.png)
+[see build log](.test/verify_panic.log)
 
 ```µcad,verify_panic#todo
 a = 0;
@@ -38,6 +41,7 @@ if a != 0
 `todo()` is like `panic()` but aims on reminding you to finish code later.
 
 ![test](.test/verify_todo.png)
+[see build log](.test/verify_todo.log)
 
 ```µcad,verify_todo#todo
 a = 0;

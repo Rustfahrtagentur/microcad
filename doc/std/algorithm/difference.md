@@ -5,6 +5,7 @@
 In the following examples the difference of two circles is calculated.
 
 ![test](.test/difference_operator.png)
+[see build log](.test/difference_operator.log)
 
 ```µcad,difference_operator
 std::geo2d::circle(radius = 3.0mm) - std::geo2d::rect(width = 3.0mm, height = 2.0mm);
@@ -13,6 +14,7 @@ std::geo2d::circle(radius = 3.0mm) - std::geo2d::rect(width = 3.0mm, height = 2.
 ## Difference module
 
 ![test](.test/difference_module.png)
+[see build log](.test/difference_module.log)
 
 ```µcad,difference_module
 use std::*;

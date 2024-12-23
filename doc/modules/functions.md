@@ -7,6 +7,7 @@ Functions consist of statements.
 Example which can generate a 2D donut of a given radius:
 
 ![test](.test/functions_donut.png)
+[see build log](.test/functions_donut.log)
 
 ```µcad,functions_donut
 module donut(radius: length) {

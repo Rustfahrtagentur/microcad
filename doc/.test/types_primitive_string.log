@@ -1,0 +1,7 @@
+error: Unknown method: count
+  ---> <no file>:2:17
+     |
+   2 | std::assert(text.count(11));
+     |                 ^^^^^^^^^^
+     |
+#0	root

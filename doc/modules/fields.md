@@ -3,6 +3,7 @@
 A field is defined by simply assigning an expression to an identifier.
 
 ![test](.test/fields_torus.png)
+[see build log](.test/fields_torus.log)
 
 ```µcad,fields_torus#todo
 // module torus
@@ -26,6 +27,7 @@ info("{t.inner}");
 ## Failures
 
 ![test](.test/fields_torus_fail.png)
+[see build log](.test/fields_torus_fail.log)
 
 ```µcad,fields_torus_fail#fail
 module torus(radius) {} // Missing radius' type

@@ -76,7 +76,8 @@ The resulting STL model looks like this: ![Lid](examples/lid.png)
 
 The source file defines a *module* called `lid`, which instantiates two cylinders with different diameters and geometrically subtracts them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
 
-![test](.banner/first_example.png)
+![test](.test/first_example.png)
+![see build log](.test/first_example.log)
 
 ```µcad,first_example
 // We have module called `lid` with three parameters
@@ -178,12 +179,12 @@ beside the name you may add a test mode (see table below):
 ```µcad,my_test#fail
 ````
 
-The tests will create `.banner` folders beside the *markdown* files.
-The tests will then copy an [image file (`*.png`)](https://github.com/Rustfahrtagentur/microcad/tree/master/tests/images) for every test which signals the test result into the `.banner` folder.
+The tests will create `.test` folders beside the *markdown* files.
+The tests will then copy an [image file (`*.png`)](https://github.com/Rustfahrtagentur/microcad/tree/master/tests/images) for every test which signals the test result into the `.test` folder.
 They can be included in the *markdown*, if you use this code:
 
 ````md
-![test](.banner/my_test.png)
+![test](.test/my_test.png)
 ```µcad,my_test
 ````
 
@@ -198,3 +199,11 @@ They can be included in the *markdown*, if you use this code:
 | -                                      | `µcad`       | `#no-test` | Ignore completely               | yolo!                  |
 | -                                      | -            | `          | Ignore completely               | yolo!                  |
 | -                                      | *(other)*    | `          | Ignore completely               | yolo!                  |
+
+You may also give the reader access to the logs:
+
+````md
+![test](.test/my_test.png)
+![see build log](.test/my_test.log)
+```µcad,my_test
+````

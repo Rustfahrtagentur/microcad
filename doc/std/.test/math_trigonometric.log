@@ -1,0 +1,7 @@
+error: Unexpected argument: pi
+  ---> <no file>:4:12
+     |
+   4 | assert(cos(pi) == -1.0);
+     |            ^^
+     |
+#0	root

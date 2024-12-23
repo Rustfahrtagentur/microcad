@@ -51,13 +51,19 @@ static SEARCH_PATH: &str = \"../std\";
     // directories to exclude
     let exclude_dirs = ["target", "thirdparty"];
 
-    let mut banners = Vec::new();
+    let mut test_outputs = Vec::new();
 
     // read all *Markdown files and write result into `code`
-    scan(&mut code, path.as_ref(), "md", &exclude_dirs, &mut banners)?;
+    scan(
+        &mut code,
+        path.as_ref(),
+        "md",
+        &exclude_dirs,
+        &mut test_outputs,
+    )?;
 
     // remove any previous banners
-    remove_banners(path, &exclude_dirs, &banners)?;
+    remove_banners(path, &exclude_dirs, &test_outputs)?;
 
     // reformat code and write into file
     match rustfmt_wrapper::rustfmt(code) {
@@ -125,7 +131,7 @@ fn scan(
     path: &std::path::Path,
     extension: &str,
     exclude_dirs: &[&str],
-    banners: &mut Vec<String>,
+    test_outputs: &mut Vec<String>,
 ) -> Result<bool> {
     // prepare return value
     let mut found = false;
@@ -138,7 +144,13 @@ fn scan(
             if file_type.is_dir() && !exclude_dirs.contains(&file_name.as_str()) {
                 let mut code = String::new();
                 // scan deeper
-                if scan(&mut code, &entry.path(), extension, exclude_dirs, banners)? {
+                if scan(
+                    &mut code,
+                    &entry.path(),
+                    extension,
+                    exclude_dirs,
+                    test_outputs,
+                )? {
                     if let Some(name) = entry.path().file_stem() {
                         let name = name.to_str().unwrap();
                         output.push_str(&format!(
@@ -156,7 +168,7 @@ fn scan(
                 }
             } else if file_type.is_file()
                 && file_name.ends_with(&format!(".{extension}"))
-                && !scan_for_tests(output, &entry.path(), banners)?
+                && !scan_for_tests(output, &entry.path(), test_outputs)?
             {
                 // tell cargo to watch this file
                 println!("cargo:rerun-if-changed={}", entry.path().display());
@@ -175,7 +187,7 @@ fn scan(
 fn scan_for_tests(
     output: &mut String,
     file_path: &std::path::Path,
-    banners: &mut Vec<String>,
+    test_outputs: &mut Vec<String>,
 ) -> Result<bool> {
     use regex::*;
     use std::{fs::*, io::*};
@@ -218,11 +230,14 @@ fn scan_for_tests(
                 // match code end marker
                 if end.captures_iter(line).next().is_some() {
                     // generate test code
-                    let banner =
+                    let test_output =
                         create_test_code(output, file_path, test_name.as_str(), test_code.as_str());
-                    if let Some(banner) = banner {
-                        banners.push(banner.to_string_lossy().to_string());
-                    }
+                    test_outputs.append(
+                        &mut test_output
+                            .iter()
+                            .map(|to| to.to_string_lossy().to_string())
+                            .collect(),
+                    );
 
                     // clear name to signal new test awaited
                     test_name.clear();
@@ -246,7 +261,7 @@ fn create_test_code(
     file_path: &std::path::Path,
     name: &str,
     code: &str,
-) -> Option<std::path::PathBuf> {
+) -> Vec<std::path::PathBuf> {
     // split name into `name` and `mode``
     let (name, mode) = if let Some((name, mode)) = name.split_once('#') {
         (name, Some(mode))
@@ -264,19 +279,22 @@ fn create_test_code(
     );
 
     // where to store images
-    let banner_path = file_path.parent().unwrap().join(".test");
+    let test_path = file_path.parent().unwrap().join(".test");
     // banner image file of this test
-    let banner = banner_path.join(format!("{name}.png"));
+    let banner = test_path.join(format!("{name}.png"));
     let banner_esc = banner.to_string_lossy().escape_default().to_string();
+    // log file of this test
+    let log = test_path.join(format!("{name}.log"));
+    let log_esc = log.to_string_lossy().escape_default().to_string();
 
     //warning!("write_test_code: banner: {banner} {:?}", file_path,);
 
     // maybe create .test directory
-    let _ = std::fs::create_dir(banner_path);
+    let _ = std::fs::create_dir(test_path);
 
     // Early exit for "#no_test" and "#todo" suffixes
     let todo = match mode {
-        Some("no_test") => return None,
+        Some("no_test") => return Vec::new(),
         Some("todo") => true,
         _ => false,
     };
@@ -292,12 +310,17 @@ fn create_test_code(
                     use ::std::fs;
                     #[allow(unused)]
                     use ::std::io;
+                    use ::std::io::Write;
 
                     microcad_lang::env_logger_init();
                     let banner = "{banner_esc}";
+                    let logs = "{log_esc}";
                     let _ = fs::remove_file(banner);
+                    let _ = fs::remove_file(logs);
                     #[allow(unused)]
                     let todo = {todo};
+                    let logs = &mut fs::File::create(logs).unwrap();
+                    let logs = &mut io::BufWriter::new(logs);
                     match SourceFile::load_from_str(
                         r#"
                         {code}"#,
@@ -308,11 +331,15 @@ fn create_test_code(
                     r##"{
                             Err(err) => {
                                 let _ = fs::hard_link("images/fail_ok.png", banner);
+                                logs.write_all(format!("{err}").as_bytes()).unwrap();
                                 log::debug!("{err}")
                             },
                             Ok(source) => { 
                                 let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
-                                if let Err(err) = context.eval() {
+                                let eval = context.eval();
+                                context.diag().pretty_print( logs, &context).expect("internal error");
+
+                                if let Err(err) = eval {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
                                     log::debug!("{err}");
                                 } else if context.diag().error_count > 0 {
@@ -329,7 +356,10 @@ fn create_test_code(
                     r##"{
                             Ok(source) => {
                                 let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
-                                if let Err(err) = context.eval() {
+                                let eval = context.eval();
+                                context.diag().pretty_print( logs, &context).expect("internal error");
+
+                                if let Err(err) = eval {
                                     if todo { 
                                         let _ = fs::hard_link("images/todo.png", banner);
                                     } else { 
@@ -357,6 +387,7 @@ fn create_test_code(
                                 }
                             },
                             Err(err) => {
+                                logs.write_all(format!("{err}").as_bytes()).unwrap();
                                 if todo { 
                                     let _ = fs::hard_link("images/todo.png", banner);
                                 } else { 
@@ -368,5 +399,5 @@ fn create_test_code(
             }
         )
     );
-    Some(banner)
+    vec![banner, log]
 }

@@ -4,6 +4,7 @@
 * No parameter list
 
 ![test](.test/namespaces_example.png)
+[see build log](.test/namespaces_example.log)
 
 ```µcad,namespaces_example
 // namespace module std

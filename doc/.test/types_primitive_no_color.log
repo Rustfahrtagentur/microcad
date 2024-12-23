@@ -1,0 +1,6 @@
+Parser error:  --> 1:18
+  |
+1 | no_color = #00FF0
+  |                  ^---
+  |
+  = expected COMMENT
