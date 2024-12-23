@@ -53,8 +53,8 @@ height = 2mm;
 ![test](.banner/tuple_fields_D.png)
 
 ```µcad,tuple_fields_D
-width = (0.0, 0.0)mm;
-height = (0.0, 0.0)mm;
+width = (0, 0)mm;
+height = (0, 0)mm;
 ```
 
 ![test](.banner/tuple_fields_E.png)

@@ -37,9 +37,9 @@ function f( height: Length ) {}
 height = 1.4m;
 
 // use as *default* value in parameter list
-function f( height = 1.0m ) {}
+function f( height = 1m ) {}
 
 // calculate a `Length` called `width` by multiplying the
-// `height` with `Scalar` `2.0` and add ten centimeters
-width = height * 2.0 + 10cm;
+// `height` with `Scalar` `2` and add ten centimeters
+width = height * 2 + 10cm;
 ```

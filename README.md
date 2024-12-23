@@ -82,11 +82,11 @@ The source file defines a *module* called `lid`, which instantiates two cylinder
 // We have module called `lid` with three parameters
 module lid(
     thickness = 1.6mm,
-    inner_diameter = 16.0cm,
-    height = 20.0mm,
+    inner_diameter = 16cm,
+    height = 20mm,
 ) {
     // Calculate the outer diameter
-    outer_diameter = 2.0 * thickness + inner_diameter;
+    outer_diameter = 2 * thickness + inner_diameter;
 
     // Create two cylinders, one for the outer and one for the inner
     outer = std::geo3d::cylinder(d = outer_diameter, h = height);

@@ -17,7 +17,7 @@ The type `Scalar` contains a floating number and must be written with at least o
 ![test](.banner/types_primitive_scalar.png)
 
 ```µcad,types_primitive_scalar
-zero = 0.0;
+zero = 0;
 pi =  3.1415;
 percent = 55%;
 ```

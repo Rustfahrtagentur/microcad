@@ -7,7 +7,7 @@ The following code writes a cube into an STL file called `cube.stl`:
 ![test](.banner/export_single.png)
 
 ```µcad,export_single
-std::export("cube.stl") std::geo3d::cube(size = 40.0mm);
+std::export("cube.stl") std::geo3d::cube(size = 40mm);
 ```
 
 Because exporting in µcad is in code one is able to export several different formats in one run or by conditional selecting.

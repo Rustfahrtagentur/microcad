@@ -23,5 +23,5 @@ namespace std {
 }
 
 // call both
-x = std::math::abs(-1.0) * std::math::pi;
+x = std::math::abs(-1) * std::math::pi;
 ```
