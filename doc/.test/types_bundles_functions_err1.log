@@ -1,0 +1,6 @@
+Parser error:  --> 1:15
+  |
+1 | function f( x ) {}          // error
+  |               ^---
+  |
+  = expected COMMENT
