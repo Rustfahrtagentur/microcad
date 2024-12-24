@@ -199,7 +199,7 @@ They can be included in the *markdown*, if you use this code:
 | -                                      | -            | `          | Ignore completely               | yolo!                  |
 | -                                      | *(other)*    | `          | Ignore completely               | yolo!                  |
 
-You may also give the reader access to the logs:
+You may also give the reader access to the logs by clicking on the banner with:
 
 ````md
 ![![test](.test/my_test.png)](.test/my_test.log)
