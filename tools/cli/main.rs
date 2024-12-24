@@ -84,7 +84,7 @@ fn parse(input: impl AsRef<Path>) -> anyhow::Result<SourceFile> {
 }
 
 fn eval(source_file: SourceFile, std: impl AsRef<Path>) -> anyhow::Result<ObjectNode> {
-    let mut context = microcad_std::ContextBuilder::new(source_file)
+    let mut context = microcad_builtin::ContextBuilder::new(source_file)
         .with_std(std)?
         .build();
 
@@ -101,5 +101,5 @@ fn eval(source_file: SourceFile, std: impl AsRef<Path>) -> anyhow::Result<Object
 }
 
 fn export(node: ObjectNode) -> anyhow::Result<Vec<std::path::PathBuf>> {
-    Ok(microcad_std::export(node)?)
+    Ok(microcad_builtin::export(node)?)
 }

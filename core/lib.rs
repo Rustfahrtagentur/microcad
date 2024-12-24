@@ -5,6 +5,9 @@
 
 const DEFAULT_RENDERING_PRECISION: f64 = 0.1;
 
+/// library search path
+pub const SEARCH_PATH: &str = "../lib";
+
 mod boolean_op;
 pub mod core_error;
 pub mod geo2d;

@@ -66,7 +66,7 @@ fn eval_input_with_context(input: &str) -> (ObjectNode, EvalContext) {
         Err(err) => panic!("ERROR: {err}"),
     };
 
-    let mut context = microcad_std::ContextBuilder::new(source_file)
+    let mut context = microcad_builtin::ContextBuilder::new(source_file)
         .with_builtin()
         .expect("builtin error")
         .build();
@@ -121,8 +121,8 @@ fn test_source_file(file_name: &str) {
 
     let hash = source_file.hash();
 
-    let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_std("../std")
+    let mut context = microcad_builtin::ContextBuilder::new(source_file)
+        .with_std("../lib")
         .expect("no std found")
         .build();
 
@@ -144,7 +144,7 @@ fn test_source_file(file_name: &str) {
 
     let node = eval_context(&mut context);
 
-    microcad_std::export(node.clone()).expect("test error");
+    microcad_builtin::export(node.clone()).expect("test error");
 
     let mut tree_dump_file = out_file_name.clone();
     tree_dump_file.set_extension("tree.dump");
@@ -247,8 +247,8 @@ error: This is an error
 
 #[test]
 fn difference_svg() {
+    use microcad_builtin::{algorithm::*, geo2d::*};
     use microcad_export::svg::SvgRenderer;
-    use microcad_std::{algorithm::*, geo2d::*};
     use BuiltinModuleDefinition;
 
     let difference = difference().expect("test error");
@@ -271,20 +271,20 @@ fn difference_svg() {
 
 #[test]
 fn difference_stl() {
+    use microcad_builtin::algorithm;
     use microcad_export::stl::StlExporter;
-    use microcad_std::algorithm;
     use BuiltinModuleDefinition;
 
     let difference = algorithm::difference().expect("test error");
     let group = group();
     group.append(
-        microcad_std::geo3d::Cube::node(
+        microcad_builtin::geo3d::Cube::node(
             args!(size_x: Scalar = 4.0, size_y: Scalar = 4.0, size_z: Scalar = 4.0),
         )
         .expect("test error"),
     );
     group.append(
-        microcad_std::geo3d::Sphere::node(args!(radius: Scalar = 2.0)).expect("test error"),
+        microcad_builtin::geo3d::Sphere::node(args!(radius: Scalar = 2.0)).expect("test error"),
     );
     difference.append(group);
 
@@ -311,7 +311,7 @@ fn test_context_builtin() {
         Err(err) => panic!("ERROR: {err:?}"),
     };
 
-    let mut context = microcad_std::ContextBuilder::new(source_file)
+    let mut context = microcad_builtin::ContextBuilder::new(source_file)
         .with_builtin()
         .expect("builtin error")
         .build();
@@ -628,12 +628,12 @@ fn test_module_src_ref() {
 fn test_load_std() {
     use microcad_lang::parse::*;
 
-    let std_source_file = match SourceFile::load("../std/std.µcad") {
+    let std_source_file = match SourceFile::load("../lib/std.µcad") {
         Ok(std_source_file) => std_source_file,
         Err(err) => panic!("ERROR: {err:?}"),
     };
 
-    let mut context = microcad_std::ContextBuilder::new(std_source_file)
+    let mut context = microcad_builtin::ContextBuilder::new(std_source_file)
         .with_builtin()
         .expect("builtin error")
         .build();
@@ -676,7 +676,7 @@ fn test_load_std() {
         Err(err) => panic!("ERROR: {err:?}"),
     };
 
-    let mut context = microcad_std::ContextBuilder::new(source_file)
+    let mut context = microcad_builtin::ContextBuilder::new(source_file)
         .with_builtin()
         .expect("builtin error")
         .build();
@@ -710,8 +710,8 @@ fn test_with_std() {
         Err(err) => panic!("ERROR: {err:?}"),
     };
 
-    let mut context = microcad_std::ContextBuilder::new(source_file)
-        .with_std("../std")
+    let mut context = microcad_builtin::ContextBuilder::new(source_file)
+        .with_std("../lib")
         .expect("no std found")
         .build();
 

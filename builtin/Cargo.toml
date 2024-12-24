@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [package]
-name = "microcad-std"
-description = "µcad Standard Library"
+name = "microcad-builtin"
+description = "µcad Builtin Library"
 documentation = "https://docs.rs/microcad-std"
 edition.workspace = true
 rust-version.workspace = true
