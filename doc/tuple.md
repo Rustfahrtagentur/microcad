@@ -7,21 +7,13 @@ You can say they are a combination of *structs* and *tuples* like known from oth
 [![test](.test/tuple_named_tuple.png)](.test/tuple_named_tuple.log)
 
 ```µcad,tuple_named_tuple
-(width=10cm, depth=10cm, volume=1l);
+module box(x = 0mm, y = 0mm, z = 0mm) {}
 ```
-
-## Tuple as module parameters
 
 [![test](.test/tuple_parameters_A.png)](.test/tuple_parameters_A.log)
 
 ```µcad,tuple_parameters_A#fail
 module box((x,y,z) = 0mm) {}
-```
-
-[![test](.test/tuple_parameters_B.png)](.test/tuple_parameters_B.log)
-
-```µcad,tuple_parameters_B
-module box(x = 0mm, y = 0mm, z = 0mm) {}
 ```
 
 [![test](.test/tuple_parameters_C.png)](.test/tuple_parameters_C.log)
@@ -30,7 +22,7 @@ module box(x = 0mm, y = 0mm, z = 0mm) {}
 module box(x,y,z = 0mm) {}
 ```
 
-## Field declaration for a module
+## Tuple as module parameters
 
 [![test](.test/tuple_fields_A.png)](.test/tuple_fields_A.log)
 
