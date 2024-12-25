@@ -1,6 +1,0 @@
-Parser error:  --> 1:20
-  |
-1 | function f( Length ) {}     // error
-  |                    ^---
-  |
-  = expected COMMENT
