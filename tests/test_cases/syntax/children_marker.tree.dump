@@ -2,23 +2,14 @@ Group
  Group
   Algorithm(Difference)
    Group
-    Group
-     Primitive2D(Circle { radius: 4.0 })
-    Group
-     Primitive2D(Circle { radius: 5.0 })
-    Group
-     Primitive2D(Circle { radius: 6.0 })
-    Group
-     Primitive2D(Circle { radius: 1.0 })
+    Primitive2D(Circle { radius: 4.0 })
+    Primitive2D(Circle { radius: 5.0 })
+    Primitive2D(Circle { radius: 6.0 })
+    Primitive2D(Circle { radius: 1.0 })
      Group
-      Group
-       Primitive2D(Circle { radius: 2.0 })
-      Group
-       Primitive2D(Circle { radius: 3.0 })
- Group
-  Primitive2D(Circle { radius: 1.0 })
+      Primitive2D(Circle { radius: 2.0 })
+      Primitive2D(Circle { radius: 3.0 })
+ Primitive2D(Circle { radius: 1.0 })
   Group
-   Group
-    Primitive2D(Circle { radius: 2.0 })
-   Group
-    Primitive2D(Circle { radius: 3.0 })
+   Primitive2D(Circle { radius: 2.0 })
+   Primitive2D(Circle { radius: 3.0 })
