@@ -1,0 +1,9 @@
+error: Missing arguments: ParameterValueList { parameters: [ParameterValue { name: "w", specified_type: Some(Scalar), default_value: None, src_ref: SrcRef(Some(SrcRefInner { range: 42..51, at: LineCol { line: 1, col: 43 }, source_file_hash: 18032274962563248800 })) }, ParameterValue { name: "h", specified_type: Some(Scalar), default_value: None, src_ref: SrcRef(Some(SrcRefInner { range: 53..62, at: LineCol { line: 1, col: 54 }, source_file_hash: 18032274962563248800 })) }], by_name: {"h": 1, "w": 0}, src_ref: SrcRef(None) }
+  ---> <no file>:2:12
+     |
+   2 | rectangle( (x=1, y=2), (x=2, w=3, h=4));
+     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+#0	rectangle
+	at <no file>:1:1
+#1	root
