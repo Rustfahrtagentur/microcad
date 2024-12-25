@@ -91,6 +91,23 @@ fn export_tree_dump_for_node(node: ObjectNode, tree_dump_file: &str) {
     tree_dump_exporter.export(node).expect("test error");
 }
 
+/// Parses and evaluates a µcad file `file_name` and compares the resulting tree dump with the reference tree dump.
+///
+/// The µcad file is expected to be located in the `test_cases` directory.
+/// A test µcad source file must only use builtin functions and modules and must not use any external modules, like `std`.
+///
+/// The reference tree dump is expected to be located in the same directory
+/// as the source file and have the same name as the source file with the extension `.tree.dump`.
+///
+/// The resulting tree dump is written to the `output` directory.
+///
+/// # Arguments
+///
+/// * `file_name` - The name of the source file to parse and evaluate
+///
+/// # Panics
+///
+/// Panics if the resulting tree dump differs from the reference tree dump
 #[cfg(test)]
 fn test_source_file(file_name: &str) {
     use microcad_lang::parse::SourceFile;
