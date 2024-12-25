@@ -224,8 +224,8 @@ fn test_diag_list() {
             "info: This is an info
   ---> {DEFAULT_TEST_FILE}:1:1
      |
-   1 | use std::*;
-     | ^^^^^^^^^^^
+   1 | use __builtin::*;
+     | ^^^^^^^^^^^^^^^^^
      |
 warning: This is a warning
   ---> {DEFAULT_TEST_FILE}:4:1
