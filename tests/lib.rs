@@ -122,17 +122,9 @@ fn test_source_file(file_name: &str) {
     let hash = source_file.hash();
 
     let mut context = microcad_builtin::ContextBuilder::new(source_file)
-        .with_std("../lib")
-        .expect("no std found")
+        .with_builtin()
+        .expect("builtin error")
         .build();
-
-    let std_symbol = context.fetch(&"std".into()).expect("test error");
-    match std_symbol.as_ref() {
-        Symbol::Namespace(_) => {
-            //println!("{namespace:#?}");
-        }
-        _ => panic!("Expected symbol to be a Namespace"),
-    }
 
     assert!(context.get_source_file_by_hash(hash).is_some());
 
