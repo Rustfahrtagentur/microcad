@@ -157,14 +157,15 @@ fn test_source_file(file_name: &str) {
     // Compare tree dump files
     if ref_tree_dump_file.exists() {
         assert_eq!(
-            std::fs::read_to_string(tree_dump_file)
+            std::fs::read_to_string(&tree_dump_file)
                 .expect("test error")
                 .replace("\r\n", "\n")
                 .trim(),
-            std::fs::read_to_string(ref_tree_dump_file)
+            std::fs::read_to_string(&ref_tree_dump_file)
                 .expect("test error")
                 .replace("\r\n", "\n")
-                .trim()
+                .trim(),
+            "Tree dump files {tree_dump_file:?} and {ref_tree_dump_file:?} differ"
         );
     }
 
