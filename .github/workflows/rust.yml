@@ -13,10 +13,12 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Install dependencies
+    - name: Install ninja-build
       run: sudo apt-get install -y ninja-build
+    - name: Install lychee
+      run: cargo install lychee
     - uses: actions/checkout@v4
       with:
         submodules: 'true'
@@ -24,9 +26,10 @@ jobs:
       run: cargo build --verbose
     - name: Run clippy
       run: cargo clippy --verbose
+    - name: Run lychee
+      run: lychee --exclude-path target --exclude-path thirdparty .
 
   test:
-
     runs-on: ubuntu-latest
 
     steps:
