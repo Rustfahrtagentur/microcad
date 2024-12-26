@@ -1,0 +1,27 @@
+error: Symbol not found: draw_disk
+  ---> <no file>:22:5
+     |
+  22 |     draw_disk(diameter);
+     |     ^^^^^^^^^
+     |
+#0	small_disc
+	at <no file>:2:1
+#1	root
+error: Symbol not found: draw_disk
+  ---> <no file>:22:5
+     |
+  22 |     draw_disk(diameter);
+     |     ^^^^^^^^^
+     |
+#0	small_disc
+	at <no file>:2:1
+#1	root
+error: Symbol not found: draw_disk
+  ---> <no file>:22:5
+     |
+  22 |     draw_disk(diameter);
+     |     ^^^^^^^^^
+     |
+#0	small_disc
+	at <no file>:2:1
+#1	root
