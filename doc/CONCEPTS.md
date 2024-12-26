@@ -9,7 +9,7 @@ The processing of *µcad* source code files into output files can be divided int
 
 ### Parsing Phase
 
-In the parsing phase the source files are read into a *syntax tree* by using the [*µcad* grammar](lang/grammar.pest).
+In the parsing phase the source files are read into a *syntax tree* by using the [*µcad* grammar](../lang/grammar.pest).
 Any errors which occur within the parsing phase are related to file access or syntax.
 
 ### Evaluation Phase
