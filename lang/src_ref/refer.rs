@@ -4,7 +4,7 @@
 use super::{SrcRef, SrcReferrer};
 
 /// Packs any value together with a source reference
-#[derive(Clone, Default, Ord, Debug, PartialEq, PartialOrd)]
+#[derive(Clone, Default, Ord, PartialEq, PartialOrd)]
 pub struct Refer<T> {
     /// Value
     pub value: T,
@@ -135,5 +135,18 @@ impl<T: std::iter::IntoIterator> std::iter::IntoIterator for Refer<T> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.value.into_iter()
+    }
+}
+
+impl<T> std::fmt::Debug for Refer<T>
+where
+    T: std::fmt::Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.src_ref.is_some() {
+            write!(f, "Refer: {}: {:?}", self.src_ref, self.value)
+        } else {
+            write!(f, "Refer: <no ref>")
+        }
     }
 }

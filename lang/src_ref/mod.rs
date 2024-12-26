@@ -34,7 +34,7 @@ impl<T: SrcReferrer> SrcReferrer for &T {
 /// Reference into a source file
 ///
 /// *Hint*: Source file is not part of `SrcRef` and must be provided from outside
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct SrcRef(pub Option<Box<SrcRefInner>>);
 
 impl SrcRef {
@@ -79,6 +79,15 @@ impl std::ops::Deref for SrcRef {
     }
 }
 
+impl std::fmt::Debug for SrcRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.0 {
+            Some(s) => write!(f, "{}", s.at),
+            _ => write!(f, "<no_ref>"),
+        }
+    }
+}
+
 /// A reference in the source code
 #[derive(Clone, Debug, Default)]
 pub struct SrcRefInner {
@@ -93,8 +102,8 @@ pub struct SrcRefInner {
 impl std::fmt::Display for SrcRef {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.0 {
-            Some(s) => write!(f, "{}", s.at),
-            _ => write!(f, "<no_ref>"),
+            Some(s) => write!(f, "SrcRef: {}", s.at),
+            _ => write!(f, "SrcRef: <no_ref>"),
         }
     }
 }
