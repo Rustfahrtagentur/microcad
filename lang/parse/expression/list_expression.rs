@@ -3,7 +3,7 @@
 
 //! List expression
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// List expression (expression list maybe with common unit)
 #[derive(Default, Clone, Debug)]
@@ -71,7 +71,7 @@ impl std::fmt::Display for ListExpression {
 impl Eval for ListExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let mut value_list = ValueList::new(Vec::new(), self.src_ref());
         for expr in self.list.clone() {
             value_list.push(expr.eval(context)?);

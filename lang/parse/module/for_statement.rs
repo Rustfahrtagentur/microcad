@@ -42,7 +42,7 @@ impl Parse for ForStatement {
 impl Eval for ForStatement {
     type Output = ();
 
-    fn eval(&self, context: &mut EvalContext) -> std::result::Result<Self::Output, EvalError> {
+    fn eval(&self, context: &mut Context) -> std::result::Result<Self::Output, EvalError> {
         match self.loop_expr.eval(context)? {
             Value::List(list) => {
                 for value in list.iter() {

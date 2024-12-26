@@ -62,7 +62,7 @@ impl Parse for UseStatement {
 impl Eval for UseStatement {
     type Output = Option<SymbolTable>;
 
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         // Return a symbol table if the use statement is public
         match self.0 {
             Visibility::Public => {

@@ -3,7 +3,7 @@
 
 //! Record expression
 
-use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*, sym::*};
 
 /// TODO: maybe CallArgumentList should be `ArgumentList` and get independent of module `call`?
 type ArgumentList = CallArgumentList;
@@ -87,7 +87,7 @@ impl std::fmt::Display for RecordExpression {
 impl Eval for RecordExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut EvalContext) -> crate::eval::EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> crate::eval::EvalResult<Value> {
         if self.is_named {
             // Named record
             let mut map = std::collections::BTreeMap::new();
@@ -149,7 +149,7 @@ fn unnamed_record() {
     let input = "(1.0, 2.0, 3.0)mm";
     let expr = Parser::parse_rule::<RecordExpression>(Rule::record_expression, input, 0)
         .expect("test error");
-    let mut context = EvalContext::default();
+    let mut context = Context::default();
     let value = expr.eval(&mut context).expect("test error");
     assert_eq!(
         value.ty(),
@@ -166,7 +166,7 @@ fn test_named_record() {
     let input = "(a = 1.0, b = 2.0, c = 3.0)mm";
     let expr = Parser::parse_rule::<RecordExpression>(Rule::record_expression, input, 0)
         .expect("test error");
-    let mut context = EvalContext::default();
+    let mut context = Context::default();
     let value = expr.eval(&mut context).expect("test error");
     assert_eq!(
         value.ty(),
@@ -187,7 +187,7 @@ fn test_vec2() {
     let input = "(x = 1mm, y = 1mm)";
     let expr = Parser::parse_rule::<RecordExpression>(Rule::record_expression, input, 0)
         .expect("test error");
-    let mut context = EvalContext::default();
+    let mut context = Context::default();
     let value = expr.eval(&mut context).expect("test error");
     assert_eq!(value.ty(), Type::Vec2);
 }
@@ -197,7 +197,7 @@ fn test_vec3() {
     let input = "(x = 1, y = 2, z = 3)mm";
     let expr = Parser::parse_rule::<RecordExpression>(Rule::record_expression, input, 0)
         .expect("test error");
-    let mut context = EvalContext::default();
+    let mut context = Context::default();
     let value = expr.eval(&mut context).expect("test error");
     assert_eq!(value.ty(), Type::Vec3);
 }
