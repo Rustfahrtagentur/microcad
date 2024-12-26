@@ -303,7 +303,7 @@ fn create_test_code(
             r##"#[test]
                 #[allow(non_snake_case)]
                 fn r#{name}() {{
-                    use microcad_lang::{{parse::SourceFile,sym::Context}};
+                    use microcad_lang::{{parse::SourceFile}};
                     use microcad_builtin::ContextBuilder;
                     use microcad_core::SEARCH_PATH;
                     use ::std::fs;
