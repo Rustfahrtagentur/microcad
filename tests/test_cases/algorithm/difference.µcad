@@ -1,13 +1,13 @@
-use std::*;
+use __builtin::*;
 
 
 export("{OUTPUT_FILE}.stl") algorithm::difference() {
-    geo3d::sphere(radius = 3.0mm);
-    geo3d::cube(size_x = 3.0mm, size_y = 3.0mm, size_z = 3.0mm);
+    geo3d::sphere(radius = 3.0);
+    geo3d::cube(size_x = 3.0, size_y = 3.0, size_z = 3.0);
 }
 
 
 export("{OUTPUT_FILE}.svg") algorithm::difference() {
-    geo2d::circle(radius = 3.0mm);
-    geo2d::rect(width = 3.0mm, height = 2.0mm);
+    geo2d::circle(radius = 3.0);
+    geo2d::rect(width = 3.0, height = 2.0, x = -1.5, y = -1.0);
 }

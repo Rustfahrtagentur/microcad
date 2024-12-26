@@ -246,7 +246,10 @@ fn load_source_file() {
     match first_statement {
         Statement::Use(u) => {
             use crate::src_ref::SrcReferrer;
-            assert_eq!(u.src_ref().source_slice(&source_file.source), "use std::*;");
+            assert_eq!(
+                u.src_ref().source_slice(&source_file.source),
+                "use __builtin::*;"
+            );
         }
         _ => panic!(),
     }

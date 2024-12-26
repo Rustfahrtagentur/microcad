@@ -91,6 +91,23 @@ fn export_tree_dump_for_node(node: ObjectNode, tree_dump_file: &str) {
     tree_dump_exporter.export(node).expect("test error");
 }
 
+/// Parses and evaluates a µcad file `file_name` and compares the resulting tree dump with the reference tree dump.
+///
+/// The µcad file is expected to be located in the `test_cases` directory.
+/// A test µcad source file must only use builtin functions and modules and must not use any external modules, like `std`.
+///
+/// The reference tree dump is expected to be located in the same directory
+/// as the source file and have the same name as the source file with the extension `.tree.dump`.
+///
+/// The resulting tree dump is written to the `output` directory.
+///
+/// # Arguments
+///
+/// * `file_name` - The name of the source file to parse and evaluate
+///
+/// # Panics
+///
+/// Panics if the resulting tree dump differs from the reference tree dump
 #[cfg(test)]
 fn test_source_file(file_name: &str) {
     use microcad_lang::parse::SourceFile;
@@ -122,17 +139,9 @@ fn test_source_file(file_name: &str) {
     let hash = source_file.hash();
 
     let mut context = microcad_builtin::ContextBuilder::new(source_file)
-        .with_std("../lib")
-        .expect("no std found")
+        .with_builtin()
+        .expect("builtin error")
         .build();
-
-    let std_symbol = context.fetch(&"std".into()).expect("test error");
-    match std_symbol.as_ref() {
-        Symbol::Namespace(_) => {
-            //println!("{namespace:#?}");
-        }
-        _ => panic!("Expected symbol to be a Namespace"),
-    }
 
     assert!(context.get_source_file_by_hash(hash).is_some());
 
@@ -157,14 +166,15 @@ fn test_source_file(file_name: &str) {
     // Compare tree dump files
     if ref_tree_dump_file.exists() {
         assert_eq!(
-            std::fs::read_to_string(tree_dump_file)
+            std::fs::read_to_string(&tree_dump_file)
                 .expect("test error")
                 .replace("\r\n", "\n")
                 .trim(),
-            std::fs::read_to_string(ref_tree_dump_file)
+            std::fs::read_to_string(&ref_tree_dump_file)
                 .expect("test error")
                 .replace("\r\n", "\n")
-                .trim()
+                .trim(),
+            "Tree dump files {tree_dump_file:?} and {ref_tree_dump_file:?} differ"
         );
     }
 
@@ -224,8 +234,8 @@ fn test_diag_list() {
             "info: This is an info
   ---> {DEFAULT_TEST_FILE}:1:1
      |
-   1 | use std::*;
-     | ^^^^^^^^^^^
+   1 | use __builtin::*;
+     | ^^^^^^^^^^^^^^^^^
      |
 warning: This is a warning
   ---> {DEFAULT_TEST_FILE}:4:1
