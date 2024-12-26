@@ -1,37 +1,37 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Named tuple evaluation entity
+//! Named record evaluation entity
 
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
-/// Short cut to create a NamedTuple
+/// Short cut to create a NamedRecord
 #[cfg(test)]
 #[macro_export]
 macro_rules! named_tuple {
     ($($name:ident: $ty:ident = $value:expr),*) => {
-        NamedTuple::from_vec(vec![$((stringify!($name).into(), Value::$ty($value)),)*])
+        NamedRecord::from_vec(vec![$((stringify!($name).into(), Value::$ty($value)),)*])
     };
 }
 
-/// Tuple with named values
+/// Record with named values
 #[derive(Clone, Debug, PartialEq)]
-pub struct NamedTuple(Refer<std::collections::BTreeMap<Identifier, Value>>);
+pub struct NamedRecord(Refer<std::collections::BTreeMap<Identifier, Value>>);
 
-impl NamedTuple {
-    /// Create new named tuple instance
+impl NamedRecord {
+    /// Create new named record instance
     pub fn new(map: std::collections::BTreeMap<Identifier, Value>, src_ref: SrcRef) -> Self {
         Self(Refer::new(map, src_ref))
     }
 }
 
-impl SrcReferrer for NamedTuple {
+impl SrcReferrer for NamedRecord {
     fn src_ref(&self) -> SrcRef {
         self.0.src_ref()
     }
 }
 
-impl std::ops::Deref for NamedTuple {
+impl std::ops::Deref for NamedRecord {
     type Target = std::collections::BTreeMap<Identifier, Value>;
 
     fn deref(&self) -> &Self::Target {
@@ -39,13 +39,13 @@ impl std::ops::Deref for NamedTuple {
     }
 }
 
-impl std::ops::DerefMut for NamedTuple {
+impl std::ops::DerefMut for NamedRecord {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
 }
 
-impl std::fmt::Display for NamedTuple {
+impl std::fmt::Display for NamedRecord {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
@@ -60,9 +60,9 @@ impl std::fmt::Display for NamedTuple {
     }
 }
 
-impl Ty for NamedTuple {
+impl Ty for NamedRecord {
     fn ty(&self) -> Type {
-        Type::NamedTuple(NamedTupleType(
+        Type::NamedRecord(NamedRecordType(
             self.0
                 .iter()
                 .map(|(name, v)| (name.clone(), v.ty().clone()))

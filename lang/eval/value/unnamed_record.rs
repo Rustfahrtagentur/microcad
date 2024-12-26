@@ -1,16 +1,16 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Unnamed tuple evaluation entity
+//! Unnamed record evaluation entity
 
 use crate::{eval::*, parse::*, r#type::*, src_ref::*};
 
 /// Unnamed tuple
 #[derive(Clone, Debug, PartialEq)]
-pub struct UnnamedTuple(ValueList);
+pub struct UnnamedRecord(ValueList);
 
-impl UnnamedTuple {
-    /// create a new unnamed tuple
+impl UnnamedRecord {
+    /// create a new unnamed record
     pub fn new(list: ValueList) -> Self {
         Self(list)
     }
@@ -23,7 +23,7 @@ impl UnnamedTuple {
         f: impl Fn(Value, Value) -> ValueResult,
     ) -> std::result::Result<Self, EvalError> {
         if self.0.len() != rhs.0.len() {
-            return Err(EvalError::TupleLengthMismatchForOperator {
+            return Err(EvalError::RecordLengthMismatchForOperator {
                 operator: op,
                 lhs: self.0.len(),
                 rhs: rhs.0.len(),
@@ -35,26 +35,26 @@ impl UnnamedTuple {
             result.push(add_result);
         }
 
-        Ok(UnnamedTuple(ValueList::new(
+        Ok(UnnamedRecord(ValueList::new(
             result,
             SrcRef::merge(&self, &rhs),
         )))
     }
 }
 
-impl SrcReferrer for UnnamedTuple {
+impl SrcReferrer for UnnamedRecord {
     fn src_ref(&self) -> SrcRef {
         self.0.src_ref()
     }
 }
 
-impl From<ValueList> for UnnamedTuple {
+impl From<ValueList> for UnnamedRecord {
     fn from(value: ValueList) -> Self {
         Self(value)
     }
 }
 
-impl std::fmt::Display for UnnamedTuple {
+impl std::fmt::Display for UnnamedRecord {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
@@ -68,24 +68,24 @@ impl std::fmt::Display for UnnamedTuple {
     }
 }
 
-impl Ty for UnnamedTuple {
+impl Ty for UnnamedRecord {
     fn ty(&self) -> Type {
-        Type::UnnamedTuple(UnnamedTupleType(
+        Type::UnnamedRecord(UnnamedRecordType(
             self.0.iter().map(|v| v.ty().clone()).collect(),
         ))
     }
 }
 
-impl std::ops::Add for UnnamedTuple {
-    type Output = std::result::Result<UnnamedTuple, EvalError>;
+impl std::ops::Add for UnnamedRecord {
+    type Output = std::result::Result<UnnamedRecord, EvalError>;
 
     fn add(self, rhs: Self) -> Self::Output {
         self.binary_op(rhs, '+', |lhs, rhs| lhs + rhs)
     }
 }
 
-impl std::ops::Sub for UnnamedTuple {
-    type Output = std::result::Result<UnnamedTuple, EvalError>;
+impl std::ops::Sub for UnnamedRecord {
+    type Output = std::result::Result<UnnamedRecord, EvalError>;
 
     fn sub(self, rhs: Self) -> Self::Output {
         self.binary_op(rhs, '-', |lhs, rhs| lhs - rhs)

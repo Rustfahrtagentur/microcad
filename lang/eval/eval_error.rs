@@ -186,9 +186,9 @@ pub enum EvalError {
     #[error("Unknown field: {0}")]
     UnknownField(Identifier),
 
-    /// Tuple length mismatch
-    #[error("Tuple length mismatch for operator {operator}: lhs={lhs}, rhs={rhs}")]
-    TupleLengthMismatchForOperator {
+    /// Record length mismatch
+    #[error("Record length mismatch for operator {operator}: lhs={lhs}, rhs={rhs}")]
+    RecordLengthMismatchForOperator {
         /// Operator
         operator: char,
         /// Left hand operand
@@ -233,9 +233,9 @@ pub enum EvalError {
     #[error("Unexpected empty stack")]
     UnexpectedEmptyStack,
 
-    /// Tuple item not found
-    #[error("Tuple item not found {0}")]
-    TupleItemNotFound(Identifier),
+    /// Record item not found
+    #[error("Record item not found {0}")]
+    RecordItemNotFound(Identifier),
 
     /// Cannot get argument
     #[error("Cannot get argument {0}")]
@@ -245,9 +245,9 @@ pub enum EvalError {
     #[error("Grammar rule error")]
     GrammarRuleError(String),
 
-    /// Named tuple element access error
-    #[error("Named tuple element access error")]
-    NamedTupleElementAccess(Value),
+    /// Named record element access error
+    #[error("Named record element access error")]
+    NamedRecordElementAccess(Value),
 
     /// Wrong parameters in call
     #[error("Wrong parameters in call to module {0}")]
