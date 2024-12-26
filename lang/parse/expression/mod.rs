@@ -7,13 +7,13 @@ mod expression_list;
 mod list_expression;
 mod nested;
 mod nested_item;
-mod tuple_expression;
+mod record_expression;
 
 pub use expression_list::*;
 pub use list_expression::*;
 pub use nested::*;
 pub use nested_item::*;
-pub use tuple_expression::*;
+pub use record_expression::*;
 
 use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
@@ -40,7 +40,7 @@ lazy_static::lazy_static! {
             .op(Op::prefix(unary_not))
             .op(Op::postfix(method_call))
             .op(Op::postfix(list_element_access))
-            .op(Op::postfix(tuple_element_access))
+            .op(Op::postfix(record_element_access))
     };
 }
 
@@ -55,8 +55,8 @@ pub enum Expression {
     FormatString(FormatString),
     /// A list: [a, b, c]
     ListExpression(ListExpression),
-    /// A tuple: (a, b, c)
-    TupleExpression(TupleExpression),
+    /// A record: (a, b, c)
+    RecordExpression(RecordExpression),
     /// A list whitespace separated of nested items: `translate() rotate()`, `b c`, `a b() {}`
     Nested(Nested),
     /// A binary operation: a + b
@@ -79,12 +79,12 @@ pub enum Expression {
         /// Source code reference
         src_ref: SrcRef,
     },
-    /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
+    /// Access an element of a list (`a[0]`) or a record (`a.0` or `a.b`)
     ListElementAccess(Box<Expression>, Box<Expression>, SrcRef),
-    /// Access an element of a named tuple: `a.b`
-    NamedTupleElementAccess(Box<Expression>, Identifier, SrcRef),
-    /// Access an element of an unnamed tuple: `a.0`
-    UnnamedTupleElementAccess(Box<Expression>, u32, SrcRef),
+    /// Access an element of a named record: `a.b`
+    NamedRecordElementAccess(Box<Expression>, Identifier, SrcRef),
+    /// Access an element of an unnamed record: `a.0`
+    UnnamedRecordElementAccess(Box<Expression>, u32, SrcRef),
     /// Call to a method: `[2,3].len()`
     /// First expression must evaluate to a value
     MethodCall(Box<Expression>, MethodCall, SrcRef),
@@ -97,7 +97,7 @@ impl SrcReferrer for Expression {
             Self::Literal(l) => l.src_ref(),
             Self::FormatString(fs) => fs.src_ref(),
             Self::ListExpression(le) => le.src_ref(),
-            Self::TupleExpression(te) => te.src_ref(),
+            Self::RecordExpression(te) => te.src_ref(),
             Self::Nested(n) => n.src_ref().clone(),
             Self::BinaryOp {
                 lhs: _,
@@ -111,8 +111,8 @@ impl SrcReferrer for Expression {
                 src_ref,
             } => src_ref.clone(),
             Self::ListElementAccess(_, _, src_ref) => src_ref.clone(),
-            Self::NamedTupleElementAccess(_, _, src_ref) => src_ref.clone(),
-            Self::UnnamedTupleElementAccess(_, _, src_ref) => src_ref.clone(),
+            Self::NamedRecordElementAccess(_, _, src_ref) => src_ref.clone(),
+            Self::UnnamedRecordElementAccess(_, _, src_ref) => src_ref.clone(),
             Self::MethodCall(_, _, src_ref) => src_ref.clone(),
         }
     }
@@ -124,7 +124,7 @@ impl std::fmt::Display for Expression {
             Self::Literal(literal) => write!(f, "{literal}"),
             Self::FormatString(format_string) => write!(f, "{format_string}"),
             Self::ListExpression(list_expression) => write!(f, "{list_expression}"),
-            Self::TupleExpression(tuple_expression) => write!(f, "{tuple_expression}"),
+            Self::RecordExpression(record_expression) => write!(f, "{record_expression}"),
             Self::BinaryOp {
                 lhs,
                 op,
@@ -137,8 +137,8 @@ impl std::fmt::Display for Expression {
                 src_ref: _,
             } => write!(f, "({op}{rhs})"),
             Self::ListElementAccess(lhs, rhs, _) => write!(f, "{lhs}[{rhs}]"),
-            Self::NamedTupleElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
-            Self::UnnamedTupleElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
+            Self::NamedRecordElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
+            Self::UnnamedRecordElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
             Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs}.{method_call}"),
             Self::Nested(nested) => write!(f, "{nested}"),
             _ => unimplemented!(),
@@ -174,8 +174,8 @@ impl Eval for Expression {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
             Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
-            Self::TupleExpression(tuple_expression) => {
-                TupleExpression::eval(tuple_expression, context)
+            Self::RecordExpression(record_expression) => {
+                RecordExpression::eval(record_expression, context)
             }
             Self::BinaryOp {
                 lhs,
@@ -247,12 +247,12 @@ impl Eval for Expression {
                     _ => unimplemented!(),
                 }
             }
-            Self::NamedTupleElementAccess(lhs, rhs, _) => {
+            Self::NamedRecordElementAccess(lhs, rhs, _) => {
                 let lhs = lhs.eval(context)?;
                 match lhs {
-                    Value::NamedTuple(tuple) => match tuple.get(rhs) {
+                    Value::NamedRecord(record) => match record.get(rhs) {
                         Some(value) => Ok(value.clone()),
-                        None => Err(EvalError::TupleItemNotFound(rhs.clone())),
+                        None => Err(EvalError::RecordItemNotFound(rhs.clone())),
                     },
                     Value::Node(node) => match node.fetch(&rhs.to_string().into()) {
                         Some(symbol) => match symbol.as_ref() {
@@ -267,7 +267,7 @@ impl Eval for Expression {
                             Ok(Value::Invalid)
                         }
                     },
-                    _ => Err(EvalError::NamedTupleElementAccess(lhs)),
+                    _ => Err(EvalError::NamedRecordElementAccess(lhs)),
                 }
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
@@ -297,8 +297,8 @@ impl Parse for Expression {
                     (primary, Rule::list_expression) => {
                         Ok(Self::ListExpression(ListExpression::parse(primary)?))
                     }
-                    (primary, Rule::tuple_expression) => {
-                        Ok(Self::TupleExpression(TupleExpression::parse(primary)?))
+                    (primary, Rule::record_expression) => {
+                        Ok(Self::RecordExpression(RecordExpression::parse(primary)?))
                     }
                     (primary, Rule::format_string) => {
                         Ok(Self::FormatString(FormatString::parse(primary)?))
@@ -362,15 +362,15 @@ impl Parse for Expression {
                         Box::new(Self::parse(op)?),
                         pair.clone().into(),
                     )),
-                    (op, Rule::tuple_element_access) => {
+                    (op, Rule::record_element_access) => {
                         let op = op.inner().next().expect(INTERNAL_PARSE_ERROR);
                         match op.as_rule() {
-                            Rule::identifier => Ok(Self::NamedTupleElementAccess(
+                            Rule::identifier => Ok(Self::NamedRecordElementAccess(
                                 Box::new(lhs?),
                                 Identifier::parse(op)?,
                                 pair.clone().into(),
                             )),
-                            Rule::int => Ok(Self::UnnamedTupleElementAccess(
+                            Rule::int => Ok(Self::UnnamedRecordElementAccess(
                                 Box::new(lhs?),
                                 op.as_str().parse().expect("Integer expression expected"),
                                 pair.clone().into(),
