@@ -124,6 +124,7 @@ The STL file can now be loaded in a slicer program like [Cura](https://ultimaker
   - [`microcad-lang` module](https://docs.rs/microcad-lang)
   - [`microcad-core` module](https://docs.rs/microcad-core)
   - [`microcad-export` module](https://docs.rs/microcad-export)
+- [Glossary](doc/GLOSSARY.md)
 
 ## Contribute
 
