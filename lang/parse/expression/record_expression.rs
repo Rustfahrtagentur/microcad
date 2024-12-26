@@ -1,39 +1,39 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Tuple expression
+//! Record expression
 
 use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*};
 
 /// TODO: maybe CallArgumentList should be `ArgumentList` and get independent of module `call`?
 type ArgumentList = CallArgumentList;
 
-/// Tuple expression
+/// Record expression
 #[derive(Clone, Debug, Default)]
-pub struct TupleExpression {
-    /// List of tuple members
+pub struct RecordExpression {
+    /// List of record members
     pub args: ArgumentList,
     /// Common unit
     pub unit: Option<Unit>,
-    /// `true` if this is a named tuple
+    /// `true` if this is a named record
     pub is_named: bool,
     /// Source code reference
     src_ref: SrcRef,
 }
 
-impl SrcReferrer for TupleExpression {
+impl SrcReferrer for RecordExpression {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         self.src_ref.clone()
     }
 }
 
-impl Parse for TupleExpression {
+impl Parse for RecordExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
         let call_argument_list =
             CallArgumentList::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
         if call_argument_list.is_empty() {
-            return Err(ParseError::EmptyTupleExpression);
+            return Err(ParseError::EmptyRecordExpression);
         }
 
         // Count number of positional and named arguments
@@ -43,10 +43,10 @@ impl Parse for TupleExpression {
             .sum();
 
         if named_count > 0 && named_count < call_argument_list.len() {
-            return Err(ParseError::MixedTupleArguments);
+            return Err(ParseError::MixedRecordArguments);
         }
 
-        Ok(TupleExpression {
+        Ok(RecordExpression {
             is_named: named_count == call_argument_list.len(),
             args: call_argument_list,
             unit: match inner.next() {
@@ -58,7 +58,7 @@ impl Parse for TupleExpression {
     }
 }
 
-impl std::fmt::Display for TupleExpression {
+impl std::fmt::Display for RecordExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
@@ -84,12 +84,12 @@ impl std::fmt::Display for TupleExpression {
     }
 }
 
-impl Eval for TupleExpression {
+impl Eval for RecordExpression {
     type Output = Value;
 
     fn eval(&self, context: &mut EvalContext) -> crate::eval::EvalResult<Value> {
         if self.is_named {
-            // Named tuple
+            // Named record
             let mut map = std::collections::BTreeMap::new();
             for (ident, expr) in self
                 .args
@@ -129,9 +129,9 @@ impl Eval for TupleExpression {
                 _ => {}
             }
 
-            Ok(Value::NamedTuple(NamedTuple::new(map, self.src_ref())))
+            Ok(Value::NamedRecord(NamedRecord::new(map, self.src_ref())))
         } else {
-            // Unnamed tuple
+            // Unnamed record
             let mut value_list = ValueList::new(Vec::new(), self.args.src_ref());
             for arg in self.args.iter() {
                 value_list.push(arg.value.eval(context)?);
@@ -139,21 +139,21 @@ impl Eval for TupleExpression {
             if let Some(unit) = self.unit {
                 value_list.add_unit_to_unitless(unit)?;
             }
-            Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
+            Ok(Value::UnnamedRecord(UnnamedRecord::new(value_list)))
         }
     }
 }
 
 #[test]
-fn unnamed_tuple() {
+fn unnamed_record() {
     let input = "(1.0, 2.0, 3.0)mm";
-    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
+    let expr = Parser::parse_rule::<RecordExpression>(Rule::record_expression, input, 0)
         .expect("test error");
     let mut context = EvalContext::default();
     let value = expr.eval(&mut context).expect("test error");
     assert_eq!(
         value.ty(),
-        Type::UnnamedTuple(UnnamedTupleType(vec![
+        Type::UnnamedRecord(UnnamedRecordType(vec![
             Type::Length,
             Type::Length,
             Type::Length
@@ -162,15 +162,15 @@ fn unnamed_tuple() {
 }
 
 #[test]
-fn test_named_tuple() {
+fn test_named_record() {
     let input = "(a = 1.0, b = 2.0, c = 3.0)mm";
-    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
+    let expr = Parser::parse_rule::<RecordExpression>(Rule::record_expression, input, 0)
         .expect("test error");
     let mut context = EvalContext::default();
     let value = expr.eval(&mut context).expect("test error");
     assert_eq!(
         value.ty(),
-        Type::NamedTuple(NamedTupleType(
+        Type::NamedRecord(NamedRecordType(
             vec![
                 ("a".into(), Type::Length),
                 ("b".into(), Type::Length),
@@ -185,7 +185,7 @@ fn test_named_tuple() {
 #[test]
 fn test_vec2() {
     let input = "(x = 1mm, y = 1mm)";
-    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
+    let expr = Parser::parse_rule::<RecordExpression>(Rule::record_expression, input, 0)
         .expect("test error");
     let mut context = EvalContext::default();
     let value = expr.eval(&mut context).expect("test error");
@@ -195,7 +195,7 @@ fn test_vec2() {
 #[test]
 fn test_vec3() {
     let input = "(x = 1, y = 2, z = 3)mm";
-    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
+    let expr = Parser::parse_rule::<RecordExpression>(Rule::record_expression, input, 0)
         .expect("test error");
     let mut context = EvalContext::default();
     let value = expr.eval(&mut context).expect("test error");

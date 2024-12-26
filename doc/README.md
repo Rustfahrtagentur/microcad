@@ -19,10 +19,10 @@ separate **modules** and **functions** which may depend on each other via **use 
 There are several **primitive types** which are always linked to a unit (like `Length` in `mm` or an `Angle` in `°`)
 and some which just represent factors or counts (like `Scalar` and `Integer`).
 
-**Collection types** (like `Tuple` or `Array`) can bundle other types into structured parameter sets.
+**Collection types** (like records or arrays) can bundle other types into structured parameter sets.
 
 * [Primitive Types](primitive_types.md)
-* [Tuples](tuple.md)
+* [Records](record.md)
 * [Arrays](arrays.md)
 
 ## Obscure Features

@@ -49,9 +49,9 @@ pub enum ParseError {
     #[error("Unexpected token")]
     UnexpectedToken,
 
-    /// Tuple expression contains both named and positional arguments
-    #[error("Tuple expression contains both named and positional arguments")]
-    MixedTupleArguments,
+    /// Record expression contains both named and positional arguments
+    #[error("Record expression contains both named and positional arguments")]
+    MixedRecordArguments,
 
     /// Duplicate named argument
     #[error("Duplicate named argument: {0}")]
@@ -61,9 +61,9 @@ pub enum ParseError {
     #[error("Positional argument after named argument")]
     PositionalArgumentAfterNamed,
 
-    /// Empty tuple expression
-    #[error("Empty tuple expression")]
-    EmptyTupleExpression,
+    /// Empty record expression
+    #[error("Empty record expression")]
+    EmptyRecordExpression,
 
     /// Missing type or value for definition parameter
     #[error("Missing type or value for definition parameter: {0}")]

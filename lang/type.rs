@@ -28,11 +28,11 @@ pub enum Type {
     Angle,
     /// A physical weight, e.g. 4.0kg
     Weight,
-    /// A two-dimensional vector, maps from named tuple (x: length, y: length)    
+    /// A two-dimensional vector, maps from named record (x: length, y: length)    
     Vec2,
-    /// A three-dimensional vector, maps from named tuple (x: length, y: length, z: length)
+    /// A three-dimensional vector, maps from named record (x: length, y: length, z: length)
     Vec3,
-    /// A three-dimensional vector, maps from named tuple (x: length, y: length, z: length, w: length)
+    /// A three-dimensional vector, maps from named record (x: length, y: length, z: length, w: length)
     Vec4,
     /// A boolean: true, false
     Bool,
@@ -40,10 +40,10 @@ pub enum Type {
     List(ListType),
     /// A map of elements: `[string => scalar]`
     Map(MapType),
-    /// An unnamed tuple of elements: `(scalar, string)`
-    UnnamedTuple(UnnamedTupleType),
-    /// A named tuple of elements: `(x: scalar, y: string)`
-    NamedTuple(NamedTupleType),
+    /// An unnamed record of elements: `(scalar, string)`
+    UnnamedRecord(UnnamedRecordType),
+    /// A named record of elements: `(x: scalar, y: string)`
+    NamedRecord(NamedRecordType),
     /// A custom type or a module node in the syntax tree
     Custom(QualifiedName),
     /// Node
@@ -61,9 +61,9 @@ impl Type {
         }
     }
 
-    /// Check if the type is a named tuple
-    pub fn is_named_tuple(&self) -> bool {
-        matches!(self, Self::NamedTuple(_))
+    /// Check if the type is a named record
+    pub fn is_named_record(&self) -> bool {
+        matches!(self, Self::NamedRecord(_))
     }
 
     /// Check if the type is a list of the given type `ty`
@@ -111,12 +111,12 @@ impl Parse for TypeAnnotation {
         let s = match inner.as_rule() {
             Rule::list_type => Self(Refer::new(Type::List(ListType::parse(inner)?), pair.into())),
             Rule::map_type => Self(Refer::new(Type::Map(MapType::parse(inner)?), pair.into())),
-            Rule::unnamed_tuple_type => Self(Refer::new(
-                Type::UnnamedTuple(UnnamedTupleType::parse(inner)?),
+            Rule::unnamed_record_type => Self(Refer::new(
+                Type::UnnamedRecord(UnnamedRecordType::parse(inner)?),
                 pair.into(),
             )),
-            Rule::named_tuple_type => Self(Refer::new(
-                Type::NamedTuple(NamedTupleType::parse(inner)?),
+            Rule::named_record_type => Self(Refer::new(
+                Type::NamedRecord(NamedRecordType::parse(inner)?),
                 pair.into(),
             )),
             Rule::qualified_name => match inner.as_str() {
@@ -160,8 +160,8 @@ impl std::fmt::Display for Type {
             Self::Bool => write!(f, "Bool"),
             Self::List(t) => write!(f, "{}", t),
             Self::Map(t) => write!(f, "{}", t),
-            Self::UnnamedTuple(t) => write!(f, "{}", t),
-            Self::NamedTuple(t) => write!(f, "{}", t),
+            Self::UnnamedRecord(t) => write!(f, "{}", t),
+            Self::NamedRecord(t) => write!(f, "{}", t),
             Self::Custom(qn) => write!(f, "{}", qn),
             Self::Node => write!(f, "{{}}"),
         }

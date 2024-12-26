@@ -7,16 +7,16 @@ mod into_value;
 mod list;
 mod map;
 mod map_key_value;
-mod named_tuple;
-mod unnamed_tuple;
+mod named_record;
+mod unnamed_record;
 mod value_list;
 
 pub use into_value::IntoValue;
 pub use list::*;
 pub use map::*;
 pub use map_key_value::*;
-pub use named_tuple::*;
-pub use unnamed_tuple::*;
+pub use named_record::*;
+pub use unnamed_record::*;
 pub use value_list::*;
 
 use crate::objects::ObjectNode;
@@ -61,10 +61,10 @@ pub enum Value {
     List(List),
     /// Hash Map
     Map(Map),
-    /// Tuple of named items
-    NamedTuple(NamedTuple),
-    /// Tuple of unnamed items
-    UnnamedTuple(UnnamedTuple),
+    /// Record of named items
+    NamedRecord(NamedRecord),
+    /// Record of unnamed items
+    UnnamedRecord(UnnamedRecord),
     /// A node in the render tree
     Node(ObjectNode),
 }
@@ -109,8 +109,8 @@ impl Value {
             Value::Color(c) => Value::Color(Refer::new(c.value, src_ref)),
             Value::List(l) => Value::List(l.clone()),
             // Value::Map(m) => Value::Map(m.clone_with_src_ref(src_ref)),
-            //Value::NamedTuple(t) => Value::NamedTuple(t.clone_with_src_ref(src_ref)),
-            //Value::UnnamedTuple(t) => Value::UnnamedTuple(t.clone_with_src_ref(src_ref)),
+            //Value::NamedRecord(t) => Value::NamedRecord(t.clone_with_src_ref(src_ref)),
+            //Value::UnnamedRecord(t) => Value::UnnamedRecord(t.clone_with_src_ref(src_ref)),
             Value::Node(n) => Value::Node(n.clone()),
             _ => todo!("Implement Value::clone_with_src_ref for all variants"),
         }
@@ -143,8 +143,8 @@ impl SrcReferrer for Value {
             Value::Color(c) => c.src_ref(),
             Value::List(list) => list.src_ref(),
             Value::Map(map) => map.src_ref(),
-            Value::NamedTuple(named_tuple) => named_tuple.src_ref(),
-            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.src_ref(),
+            Value::NamedRecord(named_record) => named_record.src_ref(),
+            Value::UnnamedRecord(unnamed_record) => unnamed_record.src_ref(),
             Value::Node(_) => SrcRef(None),
         }
     }
@@ -187,8 +187,8 @@ impl Ty for Value {
             Value::Color(_) => Type::Color,
             Value::List(list) => list.ty(),
             Value::Map(map) => map.ty(),
-            Value::NamedTuple(named_tuple) => named_tuple.ty(),
-            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
+            Value::NamedRecord(named_record) => named_record.ty(),
+            Value::UnnamedRecord(unnamed_record) => unnamed_record.ty(),
             Value::Node(_) => Type::Node,
         }
     }
@@ -259,9 +259,9 @@ impl std::ops::Add for Value {
                     SrcRef::merge(lhs, rhs),
                 )))
             }
-            // Add values of two tuples of the same length
-            (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple((lhs + rhs)?))
+            // Add values of two records of the same length
+            (Value::UnnamedRecord(lhs), Value::UnnamedRecord(rhs)) => {
+                Ok(Value::UnnamedRecord((lhs + rhs)?))
             }
             (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} + {rhs}"))),
         }
@@ -311,8 +311,8 @@ impl std::ops::Sub for Value {
                 }
             }
             // Subtract values of two arrays of the same length
-            (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple((lhs - rhs)?))
+            (Value::UnnamedRecord(lhs), Value::UnnamedRecord(rhs)) => {
+                Ok(Value::UnnamedRecord((lhs - rhs)?))
             }
             (Value::Node(lhs), Value::Node(rhs)) => {
                 Ok(Value::Node(crate::objects::algorithm::binary_op(
@@ -490,8 +490,8 @@ impl std::fmt::Display for Value {
             Value::Color(c) => write!(f, "{c}"),
             Value::List(l) => write!(f, "{l}"),
             Value::Map(m) => write!(f, "{m}"),
-            Value::NamedTuple(t) => write!(f, "{t}"),
-            Value::UnnamedTuple(t) => write!(f, "{t}"),
+            Value::NamedRecord(t) => write!(f, "{t}"),
+            Value::UnnamedRecord(t) => write!(f, "{t}"),
             Value::Node(n) => write!(f, "{n:?}"),
         }
     }

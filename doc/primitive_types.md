@@ -145,7 +145,7 @@ std::assert(gram == 1.0kg);
 
 ### Vec2
 
-2D vectors are written as named tuples with builtin values `x` and `y`.
+2D vectors are written as named records with builtin values `x` and `y`.
 
 [![test](.test/types_primitive_vec2.png)](.test/types_primitive_vec2.log)
 
@@ -155,7 +155,7 @@ vec2 = (x=1, y=2)cm;
 
 ## Vec3
 
-3D vectors are written as named tuples with builtin values `x`, `y` and `z`.
+3D vectors are written as named records with builtin values `x`, `y` and `z`.
 
 [![test](.test/types_primitive_vec3.png)](.test/types_primitive_vec3.log)
 
