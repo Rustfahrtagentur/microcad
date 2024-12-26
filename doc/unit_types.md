@@ -21,18 +21,18 @@ This means that your will automatically get the following type if you use the be
 
 ### Types
 
-[![test](.test/README_types.png)](.test/README_types.log)
+[![test](.test/unit_types.png)](.test/unit_types.log)
 
-```µcad,README_types
+```µcad,unit_types
 // function parameter `height` declared to be a `Length`
 function f( height: Length ) {}
 ```
 
 ### Units
 
-[![test](.test/README_number_literals.png)](.test/README_number_literals.log)
+[![test](.test/unit_types_number_literals.png)](.test/unit_types_number_literals.log)
 
-```µcad,README_number_literals
+```µcad,unit_types_number_literals
 // declare variable `height` of type `Length` to 1.4 Meters
 height = 1.4m;
 
@@ -42,4 +42,34 @@ function f( height = 1m ) {}
 // calculate a `Length` called `width` by multiplying the
 // `height` with `Scalar` `2` and add ten centimeters
 width = height * 2 + 10cm;
+```
+
+### Unit Bundle
+
+Units can be *bundled* in tuples or arrays:
+
+[![test](.test/unit_types_bundling_tuple.png)](.test/unit_types_bundling_tuple.log)
+
+```µcad,unit_types_bundling_tuple
+// without bundling
+p1 = (x=1mm, y=2mm, z=3mm);
+
+// with bundling
+p2 = (x=1, y=2, z=3)mm;
+
+// are the same
+std::assert( p1 == p2 );
+```
+
+[![test](.test/unit_types_bundling_array.png)](.test/unit_types_bundling_array.log)
+
+```µcad,unit_types_bundling_array
+// without bundling
+l1 = [1mm, 2mm, 3mm];
+
+// with bundling
+l2 = [1, 2, 3]mm;
+
+// are the same
+std::assert( l1 == l2 );
 ```
