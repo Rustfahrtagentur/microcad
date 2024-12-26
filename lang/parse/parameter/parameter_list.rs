@@ -3,7 +3,7 @@
 
 //! Parameter list parser entity
 
-use crate::{eval::*, ord_map::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, ord_map::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Parameter list
 #[derive(Clone, Debug, Default)]
@@ -61,7 +61,7 @@ impl Parse for ParameterList {
 impl Eval for ParameterList {
     type Output = ParameterValueList;
 
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         let mut values = ParameterValueList::default();
         for parameter in self.iter() {
             values.push(parameter.eval(context)?)?;

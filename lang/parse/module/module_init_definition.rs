@@ -29,7 +29,7 @@ impl ModuleInitDefinition {
     pub fn call(
         &self,
         arg_map: &ArgumentMap,
-        context: &mut EvalContext,
+        context: &mut Context,
         node: &mut ObjectNode,
     ) -> EvalResult<()> {
         // Copy the arguments to the symbol table of the node

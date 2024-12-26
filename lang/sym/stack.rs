@@ -26,7 +26,7 @@ impl StackFrame {
 
     /// Create a new stack frame for a module
     pub fn module(
-        context: &mut impl Context,
+        context: &mut Context,
         module: std::rc::Rc<crate::parse::ModuleDefinition>,
     ) -> SymResult<Self> {
         Ok(Self {
@@ -37,7 +37,7 @@ impl StackFrame {
 
     /// Create a new stack frame for a namespace
     pub fn namespace(
-        context: &mut impl Context,
+        context: &mut Context,
         namespace: std::rc::Rc<crate::parse::NamespaceDefinition>,
     ) -> SymResult<Self> {
         Ok(Self {

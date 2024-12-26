@@ -3,7 +3,7 @@
 
 //! Format expression parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Format expression including format specification
 #[allow(dead_code)]
@@ -46,7 +46,7 @@ impl SrcReferrer for FormatExpression {
 impl Eval for FormatExpression {
     type Output = Value;
 
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         Ok(Value::String(Refer::new(
             format!("{}", self.expression.eval(context)?),
             SrcRef(None),

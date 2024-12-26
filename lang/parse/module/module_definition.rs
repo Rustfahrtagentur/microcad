@@ -30,7 +30,7 @@ impl ModuleDefinition {
     fn find_matching_initializer(
         &self,
         call_argument_list: &CallArgumentList,
-        context: &mut EvalContext,
+        context: &mut Context,
     ) -> EvalResult<InitializerMatch> {
         let call_argument_value_list = call_argument_list.eval(context)?;
 
@@ -74,7 +74,7 @@ impl InitializerMatch {
     /// Call the initializer and the pre-init and post-init statements
     fn call(
         &self,
-        context: &mut EvalContext,
+        context: &mut Context,
         body: &ModuleDefinitionBody,
     ) -> EvalResult<Vec<ObjectNode>> {
         let mut nodes = Vec::new();
@@ -114,7 +114,7 @@ impl CallTrait for std::rc::Rc<ModuleDefinition> {
     fn call(
         &self,
         call_argument_list: &CallArgumentList,
-        context: &mut EvalContext,
+        context: &mut Context,
     ) -> EvalResult<Self::Output> {
         let stack_frame = StackFrame::module(context, self.clone())?;
 

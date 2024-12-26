@@ -11,7 +11,7 @@ pub use color::*;
 pub use number_literal::*;
 pub use units::*;
 
-use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*, sym::*};
 
 /// Literal entity
 #[derive(Debug, Clone, PartialEq)]
@@ -83,7 +83,7 @@ impl Parse for Literal {
 impl Eval for Literal {
     type Output = Value;
 
-    fn eval(&self, context: &mut EvalContext) -> std::result::Result<Value, EvalError> {
+    fn eval(&self, context: &mut Context) -> std::result::Result<Value, EvalError> {
         match self {
             Literal::Integer(i) => Ok(Value::Integer(i.clone().map(|i| i))),
             Literal::Number(n) => n.eval(context),

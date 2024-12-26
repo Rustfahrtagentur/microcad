@@ -94,7 +94,7 @@ impl ModuleDefinitionBody {
     fn eval_statement(
         &self,
         statement: &ModuleDefinitionStatement,
-        context: &mut EvalContext,
+        context: &mut Context,
         group: &mut ObjectNode,
     ) -> EvalResult<()> {
         match statement {
@@ -122,7 +122,7 @@ impl ModuleDefinitionBody {
     /// Evaluate the pre-init statements, and copy the symbols to the node
     pub fn eval_pre_init_statements(
         &self,
-        context: &mut EvalContext,
+        context: &mut Context,
         node: &mut ObjectNode,
     ) -> EvalResult<()> {
         for statement in &self.pre_init_statements {
@@ -135,7 +135,7 @@ impl ModuleDefinitionBody {
     /// Evaluate the post-init statements, and copy the symbols to the node
     pub fn eval_post_init_statements(
         &self,
-        context: &mut EvalContext,
+        context: &mut Context,
         node: &mut ObjectNode,
     ) -> EvalResult<()> {
         for statement in &self.post_init_statements {

@@ -136,7 +136,7 @@ fn test_builtin_function(name: &str, input: &str, expected: &str) {
     let module = builtin_module().expect("builtin error");
     assert_eq!(&module.name, "math");
 
-    let mut context = EvalContext::default();
+    let mut context = Context::default();
 
     context.add(module.into());
 

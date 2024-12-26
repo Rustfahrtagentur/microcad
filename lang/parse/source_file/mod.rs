@@ -106,7 +106,7 @@ impl SourceFile {
     /// This functionality is used for the `use` statement.
     pub fn eval_as_namespace(
         &self,
-        context: &mut EvalContext,
+        context: &mut Context,
         namespace_name: Identifier,
     ) -> EvalResult<std::rc::Rc<NamespaceDefinition>> {
         let mut namespace = NamespaceDefinition::new(namespace_name);
@@ -180,7 +180,7 @@ impl Parse for SourceFile {
 impl Eval for SourceFile {
     type Output = objects::ObjectNode;
 
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         let group = objects::group();
         for statement in &self.body {
             match statement {

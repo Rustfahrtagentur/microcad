@@ -4,7 +4,7 @@
 //! Function body parser entity
 
 use super::FunctionStatement;
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
 
 /// Function body
 #[derive(Clone, Debug, Default)]
@@ -33,7 +33,7 @@ impl Parse for FunctionBody {
 impl Eval for FunctionBody {
     type Output = Option<Value>;
 
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         for statement in self.0.iter() {
             if let Some(result) = statement.eval(context)? {
                 return Ok(Some(result));

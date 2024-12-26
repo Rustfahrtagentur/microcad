@@ -72,7 +72,7 @@ impl Parse for NumberLiteral {
 impl Eval for NumberLiteral {
     type Output = Value;
 
-    fn eval(&self, _: &mut EvalContext) -> std::result::Result<Value, EvalError> {
+    fn eval(&self, _: &mut Context) -> std::result::Result<Value, EvalError> {
         match self.1.ty() {
             Type::Scalar => Ok(Value::Scalar(Refer::new(
                 self.normalized_value(),

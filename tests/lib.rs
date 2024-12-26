@@ -41,7 +41,7 @@ macro_rules! args {
 }
 
 #[cfg(test)]
-fn eval_context(context: &mut EvalContext) -> ObjectNode {
+fn eval_context(context: &mut Context) -> ObjectNode {
     let node = context.eval();
     let node = node.expect("test error");
     println!("{node:?}");
@@ -58,7 +58,7 @@ fn eval_context(context: &mut EvalContext) -> ObjectNode {
 
 /// Evaluate source input from `&str` and return the resulting node and context
 #[cfg(test)]
-fn eval_input_with_context(input: &str) -> (ObjectNode, EvalContext) {
+fn eval_input_with_context(input: &str) -> (ObjectNode, Context) {
     use core::panic;
     use microcad_lang::parse::source_file::SourceFile;
     let source_file = match SourceFile::load_from_str(input) {
@@ -326,7 +326,7 @@ fn test_context_builtin() {
         .expect("builtin error")
         .build();
 
-    let verify_symbol = |context: &mut EvalContext, names| {
+    let verify_symbol = |context: &mut Context, names| {
         use microcad_lang::parse::QualifiedName;
         let symbol = &context
             .fetch_symbols_by_qualified_name(&QualifiedName(names))

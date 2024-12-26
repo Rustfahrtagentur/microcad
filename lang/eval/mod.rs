@@ -6,7 +6,6 @@
 mod builtin_function;
 mod builtin_module;
 mod call;
-mod eval_context;
 mod eval_error;
 mod parameter;
 mod ty;
@@ -15,7 +14,6 @@ mod value;
 pub use builtin_function::*;
 pub use builtin_module::*;
 pub use call::*;
-pub use eval_context::*;
 pub use eval_error::*;
 pub use parameter::*;
 pub use ty::*;
@@ -27,7 +25,7 @@ pub trait Eval {
     type Output;
 
     /// Evaluate the type into an expression
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output>;
+    fn eval(&self, context: &mut crate::sym::Context) -> EvalResult<Self::Output>;
 }
 
 pub use crate::sym::Id;

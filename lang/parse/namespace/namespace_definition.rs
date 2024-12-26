@@ -70,7 +70,7 @@ impl Parse for std::rc::Rc<NamespaceDefinition> {
 impl Eval for std::rc::Rc<NamespaceDefinition> {
     type Output = Symbol;
 
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Self::Output> {
         let mut namespace = self.as_ref().clone();
         for statement in &self.body.statements {
             match &statement {
