@@ -22,8 +22,24 @@ impl MethodCall {
         use call::call_method::CallMethod;
 
         match lhs.eval(context)? {
-            Value::Node(node) => node.call_method(&self.name, &self.argument_list, self.src_ref()),
-            Value::List(list) => list.call_method(&self.name, &self.argument_list, self.src_ref()),
+            Value::Node(node) => {
+                match node.call_method(&self.name, &self.argument_list, self.src_ref()) {
+                    Err(err) => {
+                        context.error_with_stack_trace(self, err)?;
+                        Ok(Value::Invalid)
+                    }
+                    ok => ok,
+                }
+            }
+            Value::List(list) => {
+                match list.call_method(&self.name, &self.argument_list, self.src_ref()) {
+                    Err(err) => {
+                        context.error_with_stack_trace(self, err)?;
+                        Ok(Value::Invalid)
+                    }
+                    ok => ok,
+                }
+            }
             _ => {
                 context
                     .error_with_stack_trace(self, EvalError::UnknownMethod(self.name.clone()))?;
