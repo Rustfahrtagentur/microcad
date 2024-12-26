@@ -1,5 +1,14 @@
 # Modules
 
+- [Modules](#modules)
+  - [Declaration](#declaration)
+    - [Pre-initialization code](#pre-initialization-code)
+    - [Explicit Initializers](#explicit-initializers)
+    - [Post-initialization code](#post-initialization-code)
+  - [Module Elements](#module-elements)
+  - [Examples](#examples)
+
+
 Modules in µcad are similar to so-called *classes* in other programming languages
 but also they differ quite a bit.
 
