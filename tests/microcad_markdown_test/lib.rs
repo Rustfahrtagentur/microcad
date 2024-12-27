@@ -343,8 +343,7 @@ fn create_test_code(
                                     log::debug!("{err}");
                                 } else if context.diag().error_count > 0 {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
-                                    let mut w = io::stdout();
-                                    context.diag().pretty_print(&mut w, &context).expect("internal error");
+                                    context.diag().pretty_print( logs, &context).expect("internal error");
                                 } else {
                                     let _ = fs::hard_link("images/ok_fail.png", banner);
                                     panic!("ERROR: test is marked to fail but succeeded");
@@ -367,8 +366,7 @@ fn create_test_code(
                                     }
                                 } else {
                                     if context.diag().error_count > 0 {
-                                        let mut w = Vec::new();
-                                        context.diag().pretty_print(&mut w, &context).expect("internal error");
+                                        context.diag().pretty_print(logs, &context).expect("internal error");
                                         if todo { 
                                             let _ = fs::hard_link("images/todo.png", banner);
                                         } else { 
