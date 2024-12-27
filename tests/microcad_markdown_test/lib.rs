@@ -318,7 +318,7 @@ fn create_test_code(
                     let _ = fs::remove_file(logs);
                     #[allow(unused)]
                     let todo = {todo};
-                    let logs = &mut fs::File::create(logs).unwrap();
+                    let logs = &mut fs::File::create(logs).expect("cannot create log file");
                     let logs = &mut io::BufWriter::new(logs);
                     match SourceFile::load_from_str(
                         r#"
@@ -378,6 +378,9 @@ fn create_test_code(
                                         }
                                     }
                                     log::trace!("test succeeded");
+                                    logs.write_all(
+                                        format!("{}",
+                                            microcad_builtin::print::output.lock().expect("sync error")).as_bytes()).expect("terminal error");
                                     if todo { 
                                         let _ = fs::hard_link("images/not_todo.png", banner);
                                     } else { 

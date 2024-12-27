@@ -8,7 +8,7 @@ mod context_builder;
 mod export;
 mod math;
 mod namespace_builder;
-mod print;
+pub mod print;
 mod transform;
 
 /// Algorithm module, e.g. `std::algorithm::difference`

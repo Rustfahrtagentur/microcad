@@ -6,7 +6,7 @@
 extern crate clap;
 extern crate microcad_lang;
 
-use std::path::Path;
+use std::{io::Write, path::Path};
 
 use clap::{Parser, Subcommand};
 use microcad_lang::{objects::*, parse::*, sym::*};
@@ -42,6 +42,9 @@ enum Commands {
         /// Input µcad file
         input: String,
     },
+
+    /// Create a new source file with µcad extension
+    Create { path: String },
 }
 
 /// Main of the command line interpreter
@@ -73,6 +76,33 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
                     .collect::<Vec<_>>()
                     .join(",")
             );
+        }
+        Commands::Create { path } => {
+            use std::{fs::*, path::*};
+            let mut path = PathBuf::from(path);
+            if path.extension().is_none() {
+                path.set_extension("µcad");
+            }
+
+            if path.exists() {
+                eprintln!("Error: File {path:?} already exists.")
+            } else {
+                // create demo program
+                let mut f = File::create(path.clone())?;
+                f.write_all(
+                    r#"// µcad generated file
+use std::*;
+
+module main() {
+  print( "Hello µcad" );
+}
+
+main();
+"#
+                    .as_bytes(),
+                )?;
+                eprintln!("File {path:?} generated.")
+            }
         }
     }
 
