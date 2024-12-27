@@ -45,7 +45,7 @@ multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 //`_`: ok
 //`1`: error
 //`.test`: error
-identifier = { !("module" | "function" | "if" | "else" | "use" | "return") ~ ((alpha | "_") ~ (alpha | digit | "_")*) }
+identifier = { !("namespace" | "module" | "function" | "if" | "else" | "use" | "return") ~ ((alpha | "_") ~ (alpha | digit | "_")*) }
 
 //`a,b`: ok # A comma-separated list of identifier
 identifier_list = { identifier ~ (ws* ~ "," ~ ws* ~ identifier)*}
