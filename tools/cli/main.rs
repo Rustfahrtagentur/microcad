@@ -16,7 +16,7 @@ use microcad_lang::{objects::*, parse::*, sym::*};
 #[command(version, about, long_about = None)]
 struct Cli {
     /// Standard library search path
-    #[arg(long, default_value = "std")]
+    #[arg(long, default_value = "lib")]
     std: String,
 
     #[command(subcommand)]
