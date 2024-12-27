@@ -8,7 +8,6 @@
   - [Module Elements](#module-elements)
   - [Examples](#examples)
 
-
 Modules in µcad are similar to so-called *classes* in other programming languages
 but also they differ quite a bit.
 
