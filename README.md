@@ -203,6 +203,6 @@ They can be included in the *markdown*, if you use this code:
 You may also give the reader access to the logs by clicking on the banner with:
 
 ````md
-![![test](.test/my_test.png)](.test/my_test.log)
+[![test](.test/my_test.png)](.test/my_test.log)
 ```µcad,my_test
 ````
