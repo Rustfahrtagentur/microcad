@@ -370,7 +370,7 @@ error: Cannot nest symbol: namespace `hole_positions`
 #0	mountable_plate
 	at <no file>:35:1
 #1	root
-error: Named tuple element access error
+error: Named record element access error
   ---> <no file>:35:1
      |
   35 | module mountable_plate(
