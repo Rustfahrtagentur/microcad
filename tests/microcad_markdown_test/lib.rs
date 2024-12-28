@@ -40,6 +40,29 @@ struct Output {
     log: PathBuf,
 }
 
+impl Eq for Output {}
+
+impl PartialEq for Output {
+    fn eq(&self, other: &Self) -> bool {
+        self.name.to_lowercase().eq(&other.name.to_lowercase())
+    }
+}
+
+#[allow(clippy::non_canonical_partial_ord_impl)]
+impl PartialOrd for Output {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.name
+            .to_lowercase()
+            .partial_cmp(&other.name.to_lowercase())
+    }
+}
+
+impl Ord for Output {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.name.to_lowercase().cmp(&other.name.to_lowercase())
+    }
+}
+
 /// Generate tests from the *Markdown* files which are within the given `path`
 ///
 /// Path will be scanned recursively
@@ -106,6 +129,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 |-------:|------|
 "
     .to_string();
+    let mut tests = tests.iter().collect::<Vec<_>>().clone();
+    tests.sort();
     tests.iter().for_each(|test| {
         result.push_str(&format!(
             "| [![test]({banner})]({log}) | [{name}]({path}) |\n",
