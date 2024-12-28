@@ -20,7 +20,7 @@ fn assignment() {
     let assignment =
         Parser::parse_rule::<Assignment>(Rule::assignment, "a = 1", 0).expect("test error");
 
-    let mut context = EvalContext::default();
+    let mut context = Context::default();
 
     assert_eq!(&assignment.name, "a");
     assert_eq!(
@@ -89,7 +89,7 @@ fn function_evaluate() {
         Parser::parse_rule::<std::rc::Rc<FunctionDefinition>>(Rule::function_definition, input, 0)
             .expect("test error");
 
-    let mut context = EvalContext::default();
+    let mut context = Context::default();
     context.add(function_def.into());
 
     let input = "test(a = 1.0, b = 2.0)";

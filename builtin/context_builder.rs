@@ -1,11 +1,11 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{eval::*, parse::*, sym::*};
+use microcad_lang::{parse::*, sym::*};
 
 /// Builder for a context
 pub struct ContextBuilder {
-    context: EvalContext,
+    context: Context,
 }
 
 impl ContextBuilder {
@@ -18,7 +18,7 @@ impl ContextBuilder {
     /// A new context builder
     pub fn new(source_file: SourceFile) -> Self {
         Self {
-            context: EvalContext::from_source_file(source_file),
+            context: Context::from_source_file(source_file),
         }
     }
 
@@ -55,7 +55,7 @@ impl ContextBuilder {
     }
 
     /// Build the context
-    pub fn build(self) -> EvalContext {
+    pub fn build(self) -> Context {
         self.context
     }
 }
