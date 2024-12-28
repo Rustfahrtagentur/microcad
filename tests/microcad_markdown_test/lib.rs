@@ -415,7 +415,6 @@ fn create_test_code<'a>(
                                     log::debug!("{err}");
                                 } else if context.diag().error_count > 0 {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
-                                    context.diag().pretty_print( logs, &context).expect("internal error");
                                 } else {
                                     let _ = fs::hard_link("images/ok_fail.png", banner);
                                     panic!("ERROR: test is marked to fail but succeeded");
@@ -438,7 +437,6 @@ fn create_test_code<'a>(
                                     }
                                 } else {
                                     if context.diag().error_count > 0 {
-                                        context.diag().pretty_print(logs, &context).expect("internal error");
                                         if todo { 
                                             let _ = fs::hard_link("images/todo.png", banner);
                                         } else { 
