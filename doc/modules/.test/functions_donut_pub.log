@@ -5,3 +5,10 @@ error: Unknown method: inner
      |                        ^^^^^^^^
      |
 #0	root
+error: Unknown method: inner
+  ---> <no file>:6:24
+     |
+   6 | d = donut(radius = 1cm).inner();
+     |                        ^^^^^^^^
+     |
+#0	root
