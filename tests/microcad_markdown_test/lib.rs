@@ -412,6 +412,7 @@ fn create_test_code<'a>(
 
                                 if let Err(err) = eval {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
+                                    logs.write_all(format!("{err}").as_bytes()).unwrap();
                                     log::debug!("{err}");
                                 } else if context.diag().error_count > 0 {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
@@ -434,6 +435,7 @@ fn create_test_code<'a>(
                                         let _ = fs::hard_link("images/todo.png", banner);
                                     } else { 
                                         let _ = fs::hard_link("images/fail.png", banner);
+                                        logs.write_all(format!("{err}").as_bytes()).unwrap();
                                         panic!("{err}");
                                     }
                                 } else {
