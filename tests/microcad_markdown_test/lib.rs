@@ -120,26 +120,34 @@ pub fn generate(path: impl AsRef<Path>) -> Result<()> {
 
 fn make_test_list(tests: &[Output]) -> String {
     const M: &str = "make test list error";
-    let mut result = "# Test List
+    let count = tests.len();
+    let mut result = format!(
+        "# Test List
 
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
+**{count}** tests from markdown.
+
 | Result | Name |
 |-------:|------|
 "
-    .to_string();
-    let mut tests = tests.iter().collect::<Vec<_>>().clone();
-    tests.sort();
-    tests.iter().for_each(|test| {
-        result.push_str(&format!(
-            "| [![test]({banner})]({log}) | [{name}]({path}) |\n",
-            name = test.name,
-            banner = test.banner.as_os_str().to_str().expect(M),
-            path = test.input.as_os_str().to_str().expect(M),
-            log = test.log.as_os_str().to_str().expect(M)
-        ));
-    });
+    );
+
+    {
+        let mut tests = tests.iter().collect::<Vec<_>>().clone();
+        tests.sort();
+        tests.iter().for_each(|test| {
+            result.push_str(&format!(
+                "| [![test]({banner})]({log}) | [{name}]({path}) |\n",
+                name = test.name,
+                banner = test.banner.as_os_str().to_str().expect(M),
+                path = test.input.as_os_str().to_str().expect(M),
+                log = test.log.as_os_str().to_str().expect(M)
+            ));
+        });
+    }
+
     result
 }
 

@@ -3,6 +3,8 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
+**73** tests from markdown.
+
 | Result | Name |
 |-------:|------|
 | [![test](../doc/std/algorithm/.test/difference_module.png)](../doc/std/algorithm/.test/difference_module.log) | [difference_module](../doc/std/algorithm/difference.md) |
