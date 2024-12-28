@@ -34,7 +34,7 @@ impl SrcReferrer for NamespaceDefinition {
 }
 
 impl Symbols for NamespaceDefinition {
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+    fn fetch(&self, id: &Id) -> Option<Symbol> {
         self.body.fetch(id)
     }
 
@@ -50,7 +50,7 @@ impl Symbols for NamespaceDefinition {
 
     fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         self.body.symbols.iter().for_each(|(_, symbol)| {
-            into.add(symbol.as_ref().clone());
+            into.add(symbol.clone());
         });
         Ok(())
     }
@@ -75,7 +75,10 @@ impl Eval for std::rc::Rc<NamespaceDefinition> {
         for statement in &self.body.statements {
             match &statement {
                 &NamespaceStatement::Assignment(a) => {
-                    namespace.add(Symbol::Value(a.name.id().clone(), a.value.eval(context)?));
+                    namespace.add(Symbol::Value(
+                        a.name.id().clone(),
+                        std::rc::Rc::new(a.value.eval(context)?),
+                    ));
                 }
                 NamespaceStatement::FunctionDefinition(f) => {
                     namespace.add(f.clone().into());
@@ -90,7 +93,7 @@ impl Eval for std::rc::Rc<NamespaceDefinition> {
                 NamespaceStatement::Use(u) => {
                     if let Some(symbols) = u.eval(context)? {
                         for (id, symbol) in symbols.iter() {
-                            namespace.add_alias(symbol.as_ref().clone(), id.clone());
+                            namespace.add_alias(symbol.clone(), id.clone());
                         }
                     }
                 }

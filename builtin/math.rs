@@ -8,7 +8,7 @@ use microcad_lang::{builtin_function, eval::*, parse::*, src_ref::*, sym::*};
 
 pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
     Ok(NamespaceBuilder::new("math")
-        .add(Symbol::Value("pi".into(), Value::Scalar(Refer::none(std::f64::consts::PI))))
+        .add(Symbol::Value("pi".into(), std::rc::Rc::new(Value::Scalar(Refer::none(std::f64::consts::PI)))))
         // abs(x): Absolute value of x
         .add(builtin_function!(abs(x) for Scalar, Length, Angle, Integer).into())
         // sign(x): Sign of x

@@ -27,7 +27,7 @@ pub trait Sym {
 /// Trait of an element which contains other symbols
 pub trait Symbols {
     /// fetch symbol with id
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>>;
+    fn fetch(&self, id: &Id) -> Option<Symbol>;
 
     /// Add a symbol
     fn add(&mut self, symbol: Symbol) -> &mut Self;
@@ -41,7 +41,7 @@ pub trait Symbols {
     /// Shortcut to add a value symbol which can't be done via `.into()`
     #[cfg(test)]
     fn add_value(&mut self, id: Id, value: crate::eval::Value) -> &mut Self {
-        self.add(Symbol::Value(id, value));
+        self.add(Symbol::Value(id, std::rc::Rc::new(value)));
         self
     }
 }

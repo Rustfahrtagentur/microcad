@@ -65,7 +65,7 @@ impl Eval for NamespaceStatement {
             Self::Use(use_statement) => {
                 if let Some(symbols) = use_statement.eval(context)? {
                     for (id, symbol) in symbols.iter() {
-                        context.add_alias(symbol.as_ref().clone(), id.clone());
+                        context.add_alias(symbol.clone(), id.clone());
                     }
                 }
             }

@@ -67,7 +67,7 @@ impl std::fmt::Debug for ObjectNodeInner {
 pub type ObjectNode = rctree::Node<ObjectNodeInner>;
 
 impl Symbols for ObjectNode {
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+    fn fetch(&self, id: &Id) -> Option<Symbol> {
         match *self.borrow() {
             ObjectNodeInner::Group(ref table) => table.fetch(id),
             _ => unreachable!(),

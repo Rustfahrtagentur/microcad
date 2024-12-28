@@ -51,7 +51,7 @@ impl CallTrait for std::rc::Rc<FunctionDefinition> {
             let arg_map = args.get_matching_arguments(context, &self.signature.parameters)?;
 
             for (name, value) in arg_map.iter() {
-                context.add(Symbol::Value(name.clone(), value.clone()));
+                context.add(Symbol::Value(name.clone(), std::rc::Rc::new(value.clone())));
             }
 
             for statement in self.body.0.iter() {

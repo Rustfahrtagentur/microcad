@@ -34,11 +34,11 @@ impl ModuleInitDefinition {
     ) -> EvalResult<()> {
         // Copy the arguments to the symbol table of the node
         for (name, value) in arg_map.iter() {
-            node.add(Symbol::Value(name.clone(), value.clone()));
+            node.add(Symbol::Value(name.clone(), std::rc::Rc::new(value.clone())));
         }
 
         for (name, value) in arg_map.iter() {
-            context.add(Symbol::Value(name.clone(), value.clone()));
+            context.add(Symbol::Value(name.clone(), std::rc::Rc::new(value.clone())));
         }
 
         let node_body = self.body.eval(context)?;

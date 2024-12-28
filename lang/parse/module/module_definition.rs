@@ -138,7 +138,7 @@ impl SrcReferrer for ModuleDefinition {
 }
 
 impl Symbols for ModuleDefinition {
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+    fn fetch(&self, id: &Id) -> Option<Symbol> {
         self.body.fetch(id)
     }
 
@@ -154,7 +154,7 @@ impl Symbols for ModuleDefinition {
 
     fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
         self.body.symbols.iter().for_each(|(_, symbol)| {
-            into.add(symbol.as_ref().clone());
+            into.add(symbol.clone());
         });
         Ok(())
     }

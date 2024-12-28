@@ -130,7 +130,7 @@ impl PushDiag for EvalContext {
 }
 
 impl Symbols for EvalContext {
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+    fn fetch(&self, id: &Id) -> Option<Symbol> {
         self.stack
             .iter()
             .rev()

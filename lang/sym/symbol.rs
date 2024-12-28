@@ -14,7 +14,7 @@ pub enum Symbol {
     #[default]
     Invalid,
     /// A value symbol, e.g. a result of an assignment
-    Value(Id, Value),
+    Value(Id, std::rc::Rc<Value>),
     /// A function symbol, e.g. function a() {}
     Function(std::rc::Rc<FunctionDefinition>),
     /// A module symbol, e.g. module a() {}
@@ -22,9 +22,9 @@ pub enum Symbol {
     /// A namespace  symbol, e.g. namespace foo {}
     Namespace(std::rc::Rc<NamespaceDefinition>),
     /// A builtin function symbol, e.g. assert()
-    BuiltinFunction(BuiltinFunction),
+    BuiltinFunction(std::rc::Rc<BuiltinFunction>),
     /// A builtin module symbol, e.g. math::pi
-    BuiltinModule(BuiltinModule),
+    BuiltinModule(std::rc::Rc<BuiltinModule>),
 }
 
 impl std::fmt::Display for Symbol {
@@ -61,13 +61,13 @@ impl From<std::rc::Rc<NamespaceDefinition>> for Symbol {
 
 impl From<BuiltinFunction> for Symbol {
     fn from(f: BuiltinFunction) -> Self {
-        Self::BuiltinFunction(f)
+        Self::BuiltinFunction(std::rc::Rc::new(f))
     }
 }
 
 impl From<BuiltinModule> for Symbol {
     fn from(m: BuiltinModule) -> Self {
-        Self::BuiltinModule(m)
+        Self::BuiltinModule(std::rc::Rc::new(m))
     }
 }
 
@@ -104,7 +104,7 @@ impl SrcReferrer for Symbol {
 
 impl Symbol {
     /// fetch all symbols which match id
-    pub fn fetch_symbols(&self, name: &Id) -> Option<std::rc::Rc<Symbol>> {
+    pub fn fetch_symbols(&self, name: &Id) -> Option<Symbol> {
         match self {
             Self::Module(module) => module.fetch(name),
             Self::Namespace(namespace) => namespace.fetch(name),

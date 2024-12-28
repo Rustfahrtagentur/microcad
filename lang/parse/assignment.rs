@@ -23,7 +23,7 @@ impl Assignment {
     pub fn make_symbol(&self, context: &mut EvalContext) -> EvalResult<Symbol> {
         Ok(Symbol::Value(
             self.name.id().clone(),
-            self.value.eval(context)?,
+            std::rc::Rc::new(self.value.eval(context)?),
         ))
     }
 }

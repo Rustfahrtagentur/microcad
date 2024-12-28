@@ -14,7 +14,7 @@ fn context_namespace() {
     let module = NamespaceBuilder::new("math")
         .add(Symbol::Value(
             "pi".into(),
-            Value::Scalar(Refer::none(std::f64::consts::PI)),
+            std::rc::Rc::new(Value::Scalar(Refer::none(std::f64::consts::PI))),
         ))
         .build();
 

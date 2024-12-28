@@ -119,7 +119,10 @@ impl SourceFile {
             for statement in &self.body {
                 match statement {
                     Statement::Assignment(a) => {
-                        namespace.add(Symbol::Value(a.name.id().clone(), a.value.eval(context)?));
+                        namespace.add(Symbol::Value(
+                            a.name.id().clone(),
+                            std::rc::Rc::new(a.value.eval(context)?),
+                        ));
                     }
                     Statement::FunctionDefinition(f) => {
                         namespace.add(f.clone().into());
@@ -134,7 +137,7 @@ impl SourceFile {
                     Statement::Use(u) => {
                         if let Some(symbols) = u.eval(context)? {
                             for (id, symbol) in symbols.iter() {
-                                namespace.add_alias(symbol.as_ref().clone(), id.clone());
+                                namespace.add_alias(symbol.clone(), id.clone());
                             }
                         }
                     }

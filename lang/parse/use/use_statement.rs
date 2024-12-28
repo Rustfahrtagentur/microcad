@@ -71,7 +71,7 @@ impl Eval for UseStatement {
                     let mut symbol_table = decl.eval(context)?;
                     for (name, symbol) in symbol_table.iter() {
                         use crate::sym::Symbols;
-                        context.add_alias(symbol.as_ref().clone(), name.clone());
+                        context.add_alias(symbol.clone(), name.clone());
                     }
 
                     symbols.merge(&mut symbol_table);
@@ -83,7 +83,7 @@ impl Eval for UseStatement {
                     let symbol_table = decl.eval(context)?;
                     for (name, symbol) in symbol_table.iter() {
                         use crate::sym::Symbols;
-                        context.add_alias(symbol.as_ref().clone(), name.clone());
+                        context.add_alias(symbol.clone(), name.clone());
                     }
                 }
                 Ok(None)

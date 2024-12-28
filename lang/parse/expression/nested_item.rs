@@ -23,12 +23,12 @@ impl Eval for NestedItem {
         match &self {
             NestedItem::Call(call) => call.eval(context),
             NestedItem::QualifiedName(qualified_name) => match qualified_name.eval(context)? {
-                Symbol::Value(_, Value::Node(node)) => {
-                    Ok(CallResult::Nodes(vec![node.make_deep_copy()]))
-                }
-                Symbol::Value(_, value) => Ok(CallResult::Value(
-                    value.clone_with_src_ref(qualified_name.src_ref()),
-                )),
+                Symbol::Value(_, value) => match value.as_ref() {
+                    Value::Node(node) => Ok(CallResult::Nodes(vec![node.make_deep_copy()])),
+                    value => Ok(CallResult::Value(
+                        value.clone_with_src_ref(qualified_name.src_ref()),
+                    )),
+                },
                 symbol => {
                     context.error_with_stack_trace(self, EvalError::CannotNestSymbol(symbol))?;
                     Ok(CallResult::None)

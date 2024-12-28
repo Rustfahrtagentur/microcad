@@ -255,8 +255,8 @@ impl Eval for Expression {
                         None => Err(EvalError::TupleItemNotFound(rhs.clone())),
                     },
                     Value::Node(node) => match node.fetch(&rhs.to_string().into()) {
-                        Some(symbol) => match symbol.as_ref() {
-                            Symbol::Value(_, value) => Ok(value.clone()),
+                        Some(symbol) => match symbol {
+                            Symbol::Value(_, value) => Ok(value.as_ref().clone()),
                             _ => unimplemented!(),
                         },
                         None => {

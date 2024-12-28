@@ -24,7 +24,7 @@ impl NamespaceBuilder {
 }
 
 impl Symbols for NamespaceBuilder {
-    fn fetch(&self, name: &Id) -> Option<std::rc::Rc<Symbol>> {
+    fn fetch(&self, name: &Id) -> Option<Symbol> {
         self.namespace.fetch(name)
     }
 

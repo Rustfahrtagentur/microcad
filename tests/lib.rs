@@ -148,7 +148,7 @@ fn test_source_file(file_name: &str) {
     // Inject `output_file` into the context as a µcad string value `OUTPUT_FILE`
     context.add(Symbol::Value(
         "OUTPUT_FILE".into(),
-        out_file_name.to_string_lossy().to_string().into(),
+        std::rc::Rc::new(out_file_name.to_string_lossy().to_string().into()),
     ));
 
     let node = eval_context(&mut context);
@@ -420,7 +420,7 @@ fn test_reexport_symbols_inside_namespace() {
     assert!(context.fetch(&"test".into()).is_some());
 
     let test_namespace = context.fetch(&"test".into()).expect("test error");
-    match test_namespace.as_ref() {
+    match test_namespace {
         microcad_lang::sym::Symbol::Namespace(namespace) => {
             assert!(namespace.fetch(&"assert".into()).is_some());
         }
@@ -525,9 +525,9 @@ fn test_module_definition_with_parameters() {
         match *node.borrow() {
             ObjectNodeInner::Group(ref symbols) => {
                 let symbol = symbols.fetch(&"radius".into()).expect("test error");
-                match symbol.as_ref() {
+                match symbol {
                     Symbol::Value(_, value) => {
-                        assert_eq!(value, &6.0.into());
+                        assert_eq!(value.as_ref(), &6.0.into());
                     }
                     _ => panic!("Expected symbol to be a Value"),
                 }
@@ -597,9 +597,9 @@ fn module_definition_init() {
         match *node.borrow() {
             ObjectNodeInner::Group(ref symbols) => {
                 let symbol = symbols.fetch(&"radius".into()).expect("test error");
-                match symbol.as_ref() {
+                match symbol {
                     Symbol::Value(_, value) => {
-                        assert_eq!(value, &6.0.into());
+                        assert_eq!(value.as_ref(), &6.0.into());
                     }
                     _ => panic!("Expected symbol to be a Value"),
                 }
