@@ -19,6 +19,10 @@ struct Cli {
     #[arg(long, default_value = "lib")]
     std: String,
 
+    /// display processing time
+    #[arg(short, long, default_value = "false")]
+    time: bool,
+
     #[command(subcommand)]
     command: Commands,
 }
@@ -51,9 +55,13 @@ enum Commands {
 fn main() {
     let cli = Cli::parse();
 
+    let start = std::time::Instant::now();
+
     if let Err(err) = run(&cli) {
         eprintln!("{err}")
     }
+
+    println!("Processing Time: {:?}", start.elapsed());
 }
 
 fn run(cli: &Cli) -> anyhow::Result<()> {
