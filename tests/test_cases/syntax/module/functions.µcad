@@ -1,0 +1,11 @@
+module m() {
+  function f(){}
+  f();
+}
+
+
+
+m();
+
+a = m();
+//a.f();
