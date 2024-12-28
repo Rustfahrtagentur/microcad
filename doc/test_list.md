@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**73** tests from markdown.
+**78** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -40,15 +40,20 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/function/.test/README_implicit_init_by_parameter_A.png)](../doc/function/.test/README_implicit_init_by_parameter_A.log) | [README_implicit_init_by_parameter_A](../doc/function/README.md) |
 | [![test](../doc/function/.test/README_implicit_init_by_parameter_B.png)](../doc/function/.test/README_implicit_init_by_parameter_B.log) | [README_implicit_init_by_parameter_B](../doc/function/README.md) |
 | [![test](../doc/function/.test/README_implicit_init_by_parameter_C.png)](../doc/function/.test/README_implicit_init_by_parameter_C.log) | [README_implicit_init_by_parameter_C](../doc/function/README.md) |
-| [![test](../doc/.test/tuple_fields_A.png)](../doc/.test/tuple_fields_A.log) | [tuple_fields_A](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_fields_B.png)](../doc/.test/tuple_fields_B.log) | [tuple_fields_B](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_fields_C.png)](../doc/.test/tuple_fields_C.log) | [tuple_fields_C](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_fields_D.png)](../doc/.test/tuple_fields_D.log) | [tuple_fields_D](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_fields_E.png)](../doc/.test/tuple_fields_E.log) | [tuple_fields_E](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_named_tuple.png)](../doc/.test/tuple_named_tuple.log) | [tuple_named_tuple](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_parameters_A.png)](../doc/.test/tuple_parameters_A.log) | [tuple_parameters_A](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_parameters_B.png)](../doc/.test/tuple_parameters_B.log) | [tuple_parameters_B](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_parameters_C.png)](../doc/.test/tuple_parameters_C.log) | [tuple_parameters_C](../doc/tuple.md) |
+| [![test](../doc/.test/record_fields_A.png)](../doc/.test/record_fields_A.log) | [record_fields_A](../doc/record.md) |
+| [![test](../doc/.test/record_fields_B.png)](../doc/.test/record_fields_B.log) | [record_fields_B](../doc/record.md) |
+| [![test](../doc/.test/record_fields_C.png)](../doc/.test/record_fields_C.log) | [record_fields_C](../doc/record.md) |
+| [![test](../doc/.test/record_fields_D.png)](../doc/.test/record_fields_D.log) | [record_fields_D](../doc/record.md) |
+| [![test](../doc/.test/record_fields_E.png)](../doc/.test/record_fields_E.log) | [record_fields_E](../doc/record.md) |
+| [![test](../doc/.test/record_matching.png)](../doc/.test/record_matching.log) | [record_matching](../doc/record.md) |
+| [![test](../doc/.test/record_matching_err1.png)](../doc/.test/record_matching_err1.log) | [record_matching_err1](../doc/record.md) |
+| [![test](../doc/.test/record_matching_err2.png)](../doc/.test/record_matching_err2.log) | [record_matching_err2](../doc/record.md) |
+| [![test](../doc/.test/record_matching_err3.png)](../doc/.test/record_matching_err3.log) | [record_matching_err3](../doc/record.md) |
+| [![test](../doc/.test/record_matching_err4.png)](../doc/.test/record_matching_err4.log) | [record_matching_err4](../doc/record.md) |
+| [![test](../doc/.test/record_matching_err5.png)](../doc/.test/record_matching_err5.log) | [record_matching_err5](../doc/record.md) |
+| [![test](../doc/.test/record_named_record.png)](../doc/.test/record_named_record.log) | [record_named_record](../doc/record.md) |
+| [![test](../doc/.test/record_parameters_A.png)](../doc/.test/record_parameters_A.log) | [record_parameters_A](../doc/record.md) |
+| [![test](../doc/.test/record_parameters_C.png)](../doc/.test/record_parameters_C.log) | [record_parameters_C](../doc/record.md) |
 | [![test](../doc/.test/types_bundles_functions.png)](../doc/.test/types_bundles_functions.log) | [types_bundles_functions](../doc/types.md) |
 | [![test](../doc/.test/types_def_vs_decl.png)](../doc/.test/types_def_vs_decl.log) | [types_def_vs_decl](../doc/types.md) |
 | [![test](../doc/.test/types_no_declaration.png)](../doc/.test/types_no_declaration.log) | [types_no_declaration](../doc/types.md) |

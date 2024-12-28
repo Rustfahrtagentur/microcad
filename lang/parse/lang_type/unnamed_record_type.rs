@@ -1,15 +1,15 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Unnamed tuple parser entity
+//! Unnamed record parser entity
 
 use crate::{parse::*, parser::*, r#type::*};
 
-/// Unnamed tuple type (e.g. `(scalar,string)`
+/// Unnamed record type (e.g. `(scalar,string)`
 #[derive(Debug, Clone, Default, PartialEq)]
-pub struct UnnamedTupleType(pub Vec<Type>);
+pub struct UnnamedRecordType(pub Vec<Type>);
 
-impl Parse for UnnamedTupleType {
+impl Parse for UnnamedRecordType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let inner = pair.inner();
         let mut types = Vec::new();
@@ -22,7 +22,7 @@ impl Parse for UnnamedTupleType {
     }
 }
 
-impl std::fmt::Display for UnnamedTupleType {
+impl std::fmt::Display for UnnamedRecordType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "(")?;
         for (i, t) in self.0.iter().enumerate() {
@@ -36,7 +36,7 @@ impl std::fmt::Display for UnnamedTupleType {
 }
 
 #[test]
-fn unnamed_tuple_type() {
+fn unnamed_record_type() {
     use crate::eval::Ty;
     use crate::parser::*;
 
@@ -45,6 +45,6 @@ fn unnamed_tuple_type() {
     assert_eq!(type_annotation.ty().to_string(), "(Int, String)");
     assert_eq!(
         type_annotation.ty(),
-        Type::UnnamedTuple(UnnamedTupleType(vec![Type::Integer, Type::String]))
+        Type::UnnamedRecord(UnnamedRecordType(vec![Type::Integer, Type::String]))
     );
 }

@@ -6,13 +6,13 @@
 mod list_type;
 mod map_key_type;
 mod map_type;
-mod named_tuple_type;
+mod named_record_type;
 mod type_list;
-mod unnamed_tuple_type;
+mod unnamed_record_type;
 
 pub use list_type::*;
 pub use map_key_type::*;
 pub use map_type::*;
-pub use named_tuple_type::*;
+pub use named_record_type::*;
 pub use type_list::*;
-pub use unnamed_tuple_type::*;
+pub use unnamed_record_type::*;

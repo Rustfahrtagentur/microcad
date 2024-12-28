@@ -16,7 +16,7 @@
 | [primitive types](primitive_types.md)                             |                    | Builtin µcad types                                                                        |
 | public                                                            | `pub`              | Outside visibility of namespaces, modules, functions and fields                           |
 | statement                                                         |                    | Command to evaluate                                                                       |
-| [tuple](tuple.md)                                                 |                    | List of named values                                                                      |
+| [record](record.md)                                               |                    | List of named values                                                                      |
 | `union`                                                           |                    | Merge of two geometrical object into one                                                  |
 | unit bundle                                                       |                    | Using one unit for an array of values                                                     |
 | [unit types](unit_types.md)                                       |                    | Data types defined by type names or units                                                 |

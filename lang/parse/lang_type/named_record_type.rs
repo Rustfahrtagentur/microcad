@@ -1,17 +1,17 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Named tuple type parser entity
+//! Named record type parser entity
 
 use crate::{parse::*, parser::*, r#type::*};
 
-/// Named tuple (e.g. `(n: scalar, m: string)`)
+/// Named record (e.g. `(n: scalar, m: string)`)
 #[derive(Debug, Clone, Default, PartialEq)]
-pub struct NamedTupleType(pub std::collections::BTreeMap<Identifier, Type>);
+pub struct NamedRecordType(pub std::collections::BTreeMap<Identifier, Type>);
 
-impl Parse for NamedTupleType {
+impl Parse for NamedRecordType {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::named_tuple_type);
+        Parser::ensure_rule(&pair, Rule::named_record_type);
 
         let mut types = std::collections::BTreeMap::new();
 
@@ -31,7 +31,7 @@ impl Parse for NamedTupleType {
     }
 }
 
-impl std::fmt::Display for NamedTupleType {
+impl std::fmt::Display for NamedRecordType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "(")?;
         for (i, (identifier, ty)) in self.0.iter().enumerate() {
@@ -45,7 +45,7 @@ impl std::fmt::Display for NamedTupleType {
 }
 
 #[test]
-fn named_tuple_type() {
+fn named_record_type() {
     use crate::eval::Ty;
     use crate::parser::*;
 
@@ -55,7 +55,7 @@ fn named_tuple_type() {
     assert_eq!(type_annotation.ty().to_string(), "(x: Int, y: String)");
     assert_eq!(
         type_annotation.ty(),
-        Type::NamedTuple(NamedTupleType(
+        Type::NamedRecord(NamedRecordType(
             vec![
                 (Identifier::from("x"), Type::Integer),
                 (Identifier::from("y"), Type::String)
