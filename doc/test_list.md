@@ -3,10 +3,11 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**73** tests from markdown.
+**74** tests from markdown.
 
 | Result | Name |
 |-------:|------|
+| [![test](../doc/challenges/.test/challenges_foot_pad.png)](../doc/challenges/.test/challenges_foot_pad.log) | [challenges_foot_pad](../doc/challenges/foot_pad.md) |
 | [![test](../doc/std/algorithm/.test/difference_module.png)](../doc/std/algorithm/.test/difference_module.log) | [difference_module](../doc/std/algorithm/difference.md) |
 | [![test](../doc/std/algorithm/.test/difference_operator.png)](../doc/std/algorithm/.test/difference_operator.log) | [difference_operator](../doc/std/algorithm/difference.md) |
 | [![test](../doc/modules/.test/EXAMPLES_fields.png)](../doc/modules/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/modules/EXAMPLES.md) |
