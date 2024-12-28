@@ -13,6 +13,11 @@
 //! used to crates sub modules.
 
 use anyhow::{Context, Result};
+use std::{
+    ffi::OsStr,
+    io::Write,
+    path::{Path, PathBuf},
+};
 
 /// for debugging purpose
 #[allow(unused)]
@@ -32,7 +37,7 @@ fn md_tests() {
 /// Generate tests from the *Markdown* files which are within the given `path`
 ///
 /// Path will be scanned recursively
-pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
+pub fn generate(path: impl AsRef<Path>) -> Result<()> {
     use std::*;
 
     // get target path
@@ -61,6 +66,11 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
         &mut test_outputs,
     )?;
 
+    std::fs::File::create("../doc/test_list.md")
+        .expect("file access error")
+        .write_all(make_test_list(&test_outputs).as_bytes())
+        .expect("write error");
+
     // remove any previous banners
     remove_banners(path, &exclude_dirs, &test_outputs)?;
 
@@ -79,12 +89,37 @@ pub fn generate(path: impl AsRef<std::path::Path>) -> Result<()> {
     }
 }
 
+fn make_test_list(tests: &[PathBuf]) -> String {
+    const M: &str = "make test list error";
+    let mut result = "# Test List
+
+The following table lists all tests included in this documentation.
+Click on the buttons to get the logs.
+
+| Name | Result |
+|------|--------|
+"
+    .to_string();
+    tests
+        .iter()
+        .filter(|t| t.extension() == Some(OsStr::new("png")))
+        .for_each(|test| {
+            result.push_str(&format!(
+                "| {name} | [![test]({path})]({log}) |\n",
+                name = test.file_stem().expect(M).to_str().expect(M),
+                path = test.as_os_str().to_str().expect(M),
+                log = test.with_extension("log").as_os_str().to_str().expect(M)
+            ));
+        });
+    result
+}
+
 /// Remove all banners in `path` and exclude folders whose names are contained
 /// in `exclude_dirs` from search.
 fn remove_banners(
-    path: impl AsRef<std::path::Path>,
+    path: impl AsRef<Path>,
     exclude_dirs: &[&str],
-    exclude_files: &Vec<String>,
+    exclude_files: &[PathBuf],
 ) -> Result<()> {
     //warning!("remove_banners: {:?} {exclude_files:?}", path.as_ref());
     for entry in std::fs::read_dir(&path)?.flatten() {
@@ -107,7 +142,7 @@ fn remove_banners(
 }
 
 /// Remove all files within `.test` directory
-fn clean_dir(path: impl AsRef<std::path::Path>, exclude_files: &[String]) -> Result<()> {
+fn clean_dir(path: impl AsRef<Path>, exclude_files: &[PathBuf]) -> Result<()> {
     warning!("remove banners in: {:?}", path.as_ref());
 
     // list all files within `.test` directory and remove them
@@ -116,7 +151,7 @@ fn clean_dir(path: impl AsRef<std::path::Path>, exclude_files: &[String]) -> Res
         .flatten()
         .filter(|entry| entry.file_type().unwrap().is_file())
     {
-        if !exclude_files.contains(&entry.path().to_string_lossy().to_string()) {
+        if !exclude_files.contains(&entry.path()) {
             // warning!("remove: {:?}", entry.path());
             std::fs::remove_file(entry.path())?;
         }
@@ -127,10 +162,10 @@ fn clean_dir(path: impl AsRef<std::path::Path>, exclude_files: &[String]) -> Res
 /// scan folder
 fn scan(
     output: &mut String,
-    path: &std::path::Path,
+    path: &Path,
     extension: &str,
     exclude_dirs: &[&str],
-    test_outputs: &mut Vec<String>,
+    test_outputs: &mut Vec<PathBuf>,
 ) -> Result<bool> {
     // prepare return value
     let mut found = false;
@@ -185,8 +220,8 @@ fn scan(
 /// Generates tree nodes if name can be split into several names which are separated by `.`.
 fn scan_for_tests(
     output: &mut String,
-    file_path: &std::path::Path,
-    test_outputs: &mut Vec<String>,
+    file_path: &Path,
+    test_outputs: &mut Vec<PathBuf>,
 ) -> Result<bool> {
     use regex::*;
     use std::{fs::*, io::*};
@@ -228,15 +263,12 @@ fn scan_for_tests(
             } else if !test_name.is_empty() {
                 // match code end marker
                 if end.captures_iter(line).next().is_some() {
-                    // generate test code
-                    let test_output =
-                        create_test_code(output, file_path, test_name.as_str(), test_code.as_str());
-                    test_outputs.append(
-                        &mut test_output
-                            .iter()
-                            .map(|to| to.to_string_lossy().to_string())
-                            .collect(),
-                    );
+                    test_outputs.append(&mut create_test_code(
+                        output,
+                        file_path,
+                        test_name.as_str(),
+                        test_code.as_str(),
+                    ));
 
                     // clear name to signal new test awaited
                     test_name.clear();
@@ -255,12 +287,7 @@ fn scan_for_tests(
 }
 
 /// Generate code for one test
-fn create_test_code(
-    f: &mut String,
-    file_path: &std::path::Path,
-    name: &str,
-    code: &str,
-) -> Vec<std::path::PathBuf> {
+fn create_test_code(f: &mut String, file_path: &Path, name: &str, code: &str) -> Vec<PathBuf> {
     // split name into `name` and `mode``
     let (name, mode) = if let Some((name, mode)) = name.split_once('#') {
         (name, Some(mode))
@@ -371,8 +398,7 @@ fn create_test_code(
                                             let _ = fs::hard_link("images/todo.png", banner);
                                         } else { 
                                             let _ = fs::hard_link("images/fail.png", banner);
-                                            panic!("ERROR: there were {error_count} errors:\n{w}", error_count = context.diag().error_count, 
-                                                    w = String::from_utf8(w).expect("utf-8 error"));
+                                            panic!("ERROR: there were {error_count} errors", error_count = context.diag().error_count);
                                         }
                                     }
                                     log::trace!("test succeeded");

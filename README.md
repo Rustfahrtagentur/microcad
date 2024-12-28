@@ -29,6 +29,8 @@ Simple basic shapes can be composed to create complex geometries which then can 
     - [Install µcad locally from source](#install-µcad-locally-from-source)
     - [Contributing to Documentation](#contributing-to-documentation)
       - [User Manual](#user-manual)
+  - [Test List](#test-list)
+
 
 ## Quick Start
 
@@ -206,3 +208,7 @@ You may also give the reader access to the logs by clicking on the banner with:
 [![test](.test/my_test.png)](.test/my_test.log)
 ```µcad,my_test
 ````
+
+## Test List
+
+There is a [list of all tests](doc/test_list.md) included in this documentation.
