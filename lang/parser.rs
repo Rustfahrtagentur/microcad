@@ -83,21 +83,6 @@ pub trait Parse: Sized {
 }
 
 impl Parser {
-    /// Helper function to parse a vector of pairs into a vector of T
-    ///
-    /// # Arguments
-    ///
-    /// - `pairs`: The pairs to parse
-    /// - `f`: The function to parse the pair into `T`
-    ///
-    /// Returns a vector of `T`
-    pub fn vec<'a, T>(pair: Pair<'a>, f: impl Fn(Pair<'a>) -> ParseResult<T>) -> ParseResult<Vec<T>>
-    where
-        T: Clone,
-    {
-        pair.0.into_inner().map(|p| f(Pair(p, pair.1))).collect()
-    }
-
     /// Parse a rule for type `T`
     pub fn parse_rule<T>(rule: Rule, input: &str, src_hash: u64) -> ParseResult<T>
     where
