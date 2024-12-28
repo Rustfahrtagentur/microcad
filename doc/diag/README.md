@@ -6,6 +6,7 @@
   - [Contents](#contents)
   - [Helpful error messages](#helpful-error-messages)
     - [Module name without parameter list](#module-name-without-parameter-list)
+    - [Calling a module like a function](#calling-a-module-like-a-function)
 
 ## Helpful error messages
 
@@ -13,20 +14,18 @@ This section lists some examples which all are failing with a specific error mes
 
 ### Module name without parameter list
 
-The following example is missing a parameter list beside the module name:
-
 [![test](.test/diag_module_name_without_parameter_list.png)](.test/diag_module_name_without_parameter_list.log)
 
 ```µcad,diag_module_name_without_parameter_list#fail
-module f {
-}
+module f {}
 ```
 
-Correct would be:
+### Calling a module like a function
 
-[![test](.test/diag_module_name_without_parameter_list_fix.png)](.test/diag_module_name_without_parameter_list_fix.log)
+[![test](.test/diag_calling_a_module_like_a_function.png)](.test/diag_calling_a_module_like_a_function.log)
 
-```µcad,diag_module_name_without_parameter_list_fix#ok
-module f() {
-}
+```µcad,diag_calling_a_module_like_a_function#fail
+module f() {}
+
+x = f() * 2;
 ```
