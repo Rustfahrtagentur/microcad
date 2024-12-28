@@ -14,7 +14,6 @@
 
 use anyhow::{Context, Result};
 use std::{
-    ffi::OsStr,
     io::Write,
     path::{Path, PathBuf},
 };
@@ -32,6 +31,13 @@ macro_rules! warning {
 fn md_tests() {
     std::env::set_var("OUT_DIR", "../../target");
     generate("..").unwrap();
+}
+
+struct Output {
+    name: String,
+    input: PathBuf,
+    banner: PathBuf,
+    log: PathBuf,
 }
 
 /// Generate tests from the *Markdown* files which are within the given `path`
@@ -89,28 +95,26 @@ pub fn generate(path: impl AsRef<Path>) -> Result<()> {
     }
 }
 
-fn make_test_list(tests: &[PathBuf]) -> String {
+fn make_test_list(tests: &[Output]) -> String {
     const M: &str = "make test list error";
     let mut result = "# Test List
 
 The following table lists all tests included in this documentation.
-Click on the buttons to get the logs.
+Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-| Name | Result |
-|------|--------|
+| Result | Name |
+|-------:|------|
 "
     .to_string();
-    tests
-        .iter()
-        .filter(|t| t.extension() == Some(OsStr::new("png")))
-        .for_each(|test| {
-            result.push_str(&format!(
-                "| {name} | [![test]({path})]({log}) |\n",
-                name = test.file_stem().expect(M).to_str().expect(M),
-                path = test.as_os_str().to_str().expect(M),
-                log = test.with_extension("log").as_os_str().to_str().expect(M)
-            ));
-        });
+    tests.iter().for_each(|test| {
+        result.push_str(&format!(
+            "| [![test]({banner})]({log}) | [{name}]({path}) |\n",
+            name = test.name,
+            banner = test.banner.as_os_str().to_str().expect(M),
+            path = test.input.as_os_str().to_str().expect(M),
+            log = test.log.as_os_str().to_str().expect(M)
+        ));
+    });
     result
 }
 
@@ -119,7 +123,7 @@ Click on the buttons to get the logs.
 fn remove_banners(
     path: impl AsRef<Path>,
     exclude_dirs: &[&str],
-    exclude_files: &[PathBuf],
+    exclude_outputs: &[Output],
 ) -> Result<()> {
     //warning!("remove_banners: {:?} {exclude_files:?}", path.as_ref());
     for entry in std::fs::read_dir(&path)?.flatten() {
@@ -130,9 +134,9 @@ fn remove_banners(
                 && !exclude_dirs.contains(&entry.file_name().to_string_lossy().to_string().as_str())
             {
                 if entry.file_name() == ".test" {
-                    clean_dir(entry.path(), exclude_files)?;
+                    clean_dir(entry.path(), exclude_outputs)?;
                 } else {
-                    remove_banners(entry.path(), exclude_dirs, exclude_files)?;
+                    remove_banners(entry.path(), exclude_dirs, exclude_outputs)?;
                 }
             }
         }
@@ -142,7 +146,7 @@ fn remove_banners(
 }
 
 /// Remove all files within `.test` directory
-fn clean_dir(path: impl AsRef<Path>, exclude_files: &[PathBuf]) -> Result<()> {
+fn clean_dir(path: impl AsRef<Path>, exclude_files: &[Output]) -> Result<()> {
     warning!("remove banners in: {:?}", path.as_ref());
 
     // list all files within `.test` directory and remove them
@@ -151,7 +155,11 @@ fn clean_dir(path: impl AsRef<Path>, exclude_files: &[PathBuf]) -> Result<()> {
         .flatten()
         .filter(|entry| entry.file_type().unwrap().is_file())
     {
-        if !exclude_files.contains(&entry.path()) {
+        if 0 == exclude_files
+            .iter()
+            .filter(|f| f.banner == entry.path() || f.log == entry.path())
+            .count()
+        {
             // warning!("remove: {:?}", entry.path());
             std::fs::remove_file(entry.path())?;
         }
@@ -165,7 +173,7 @@ fn scan(
     path: &Path,
     extension: &str,
     exclude_dirs: &[&str],
-    test_outputs: &mut Vec<PathBuf>,
+    test_outputs: &mut Vec<Output>,
 ) -> Result<bool> {
     // prepare return value
     let mut found = false;
@@ -221,7 +229,7 @@ fn scan(
 fn scan_for_tests(
     output: &mut String,
     file_path: &Path,
-    test_outputs: &mut Vec<PathBuf>,
+    test_outputs: &mut Vec<Output>,
 ) -> Result<bool> {
     use regex::*;
     use std::{fs::*, io::*};
@@ -263,12 +271,11 @@ fn scan_for_tests(
             } else if !test_name.is_empty() {
                 // match code end marker
                 if end.captures_iter(line).next().is_some() {
-                    test_outputs.append(&mut create_test_code(
-                        output,
-                        file_path,
-                        test_name.as_str(),
-                        test_code.as_str(),
-                    ));
+                    if let Some(output) =
+                        create_test_code(output, file_path, test_name.as_str(), test_code.as_str())
+                    {
+                        test_outputs.push(output);
+                    }
 
                     // clear name to signal new test awaited
                     test_name.clear();
@@ -287,7 +294,12 @@ fn scan_for_tests(
 }
 
 /// Generate code for one test
-fn create_test_code(f: &mut String, file_path: &Path, name: &str, code: &str) -> Vec<PathBuf> {
+fn create_test_code<'a>(
+    f: &mut String,
+    file_path: &'a Path,
+    name: &'a str,
+    code: &str,
+) -> Option<Output> {
     // split name into `name` and `mode``
     let (name, mode) = if let Some((name, mode)) = name.split_once('#') {
         (name, Some(mode))
@@ -320,7 +332,7 @@ fn create_test_code(f: &mut String, file_path: &Path, name: &str, code: &str) ->
 
     // Early exit for "#no_test" and "#todo" suffixes
     let todo = match mode {
-        Some("no_test") => return Vec::new(),
+        Some("no_test") => return None,
         Some("todo") => true,
         _ => false,
     };
@@ -425,5 +437,10 @@ fn create_test_code(f: &mut String, file_path: &Path, name: &str, code: &str) ->
             }
         )
     );
-    vec![banner, log]
+    Some(Output {
+        banner,
+        log,
+        name: name.into(),
+        input: file_path.into(),
+    })
 }
