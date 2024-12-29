@@ -3,13 +3,12 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**76** tests from markdown.
+**75** tests from markdown.
 
 | Result | Name |
 |-------:|------|
 | [![test](../doc/diag/.test/diag_calling_a_module_like_a_function.png)](../doc/diag/.test/diag_calling_a_module_like_a_function.log) | [diag_calling_a_module_like_a_function](../doc/diag/README.md) |
 | [![test](../doc/diag/.test/diag_module_name_without_parameter_list.png)](../doc/diag/.test/diag_module_name_without_parameter_list.log) | [diag_module_name_without_parameter_list](../doc/diag/README.md) |
-| [![test](../doc/diag/.test/diag_module_name_without_parameter_list_fix.png)](../doc/diag/.test/diag_module_name_without_parameter_list_fix.log) | [diag_module_name_without_parameter_list_fix](../doc/diag/README.md) |
 | [![test](../doc/std/algorithm/.test/difference_module.png)](../doc/std/algorithm/.test/difference_module.log) | [difference_module](../doc/std/algorithm/difference.md) |
 | [![test](../doc/std/algorithm/.test/difference_operator.png)](../doc/std/algorithm/.test/difference_operator.log) | [difference_operator](../doc/std/algorithm/difference.md) |
 | [![test](../doc/modules/.test/EXAMPLES_fields.png)](../doc/modules/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/modules/EXAMPLES.md) |

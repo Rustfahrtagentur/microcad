@@ -20,6 +20,20 @@ This section lists some examples which all are failing with a specific error mes
 module f {}
 ```
 
+<details>
+<summary>Error message should be like:</summary>
+
+```µcad_err
+error: module `f` is missing a parameter list.
+  ---> <no file>:1:1
+     |
+   1 | x = f() * 2;
+     |     ^^^^^^^
+     |
+```
+
+</details>
+
 ### Calling a module like a function
 
 [![test](.test/diag_calling_a_module_like_a_function.png)](.test/diag_calling_a_module_like_a_function.log)
@@ -29,3 +43,17 @@ module f() {}
 
 x = f() * 2;
 ```
+
+<details>
+<summary>Error message should be like:</summary>
+
+```µcad_err
+error: Cannot multiply module `f()` with value `2`
+  ---> <no file>:1:1
+     |
+   1 | x = f() * 2;
+     |     ^^^^^^^
+     |
+```
+
+</details>
