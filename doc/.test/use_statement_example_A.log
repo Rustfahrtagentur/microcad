@@ -1,42 +1,42 @@
-error: Symbol not found: torus
-  ---> <no file>:3:25
+error: Symbol not found: cone
+  ---> <no file>:3:5
      |
-   3 | use std::geo3d::sphere, std::geo3d::torus;
-     |                         ^^^^^^^^^^^^^^^^^
+   3 | use std::geo3d::cone;
+     |     ^^^^^^^^^^^^^^^^
      |
 #0	root
 error: Cannot use Invalid
-  ---> <no file>:3:25
+  ---> <no file>:3:5
      |
-   3 | use std::geo3d::sphere, std::geo3d::torus;
-     |                         ^^^^^^^^^^^^^^^^^
+   3 | use std::geo3d::cone;
+     |     ^^^^^^^^^^^^^^^^
      |
 #0	root
 error: Symbol not found: cone
   ---> <no file>:7:1
      |
-   7 | std::geo3d::cone(height = 2cm);
-     | ^^^^^^^^^^^^^^^^
+   7 | cone(height = 2cm);
+     | ^^^^
      |
 #0	root
-error: Symbol not found: torus
-  ---> <no file>:3:25
+error: Symbol not found: cone
+  ---> <no file>:3:5
      |
-   3 | use std::geo3d::sphere, std::geo3d::torus;
-     |                         ^^^^^^^^^^^^^^^^^
+   3 | use std::geo3d::cone;
+     |     ^^^^^^^^^^^^^^^^
      |
 #0	root
 error: Cannot use Invalid
-  ---> <no file>:3:25
+  ---> <no file>:3:5
      |
-   3 | use std::geo3d::sphere, std::geo3d::torus;
-     |                         ^^^^^^^^^^^^^^^^^
+   3 | use std::geo3d::cone;
+     |     ^^^^^^^^^^^^^^^^
      |
 #0	root
 error: Symbol not found: cone
   ---> <no file>:7:1
      |
-   7 | std::geo3d::cone(height = 2cm);
-     | ^^^^^^^^^^^^^^^^
+   7 | cone(height = 2cm);
+     | ^^^^
      |
 #0	root
