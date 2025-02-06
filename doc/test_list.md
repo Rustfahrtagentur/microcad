@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**73** tests from markdown.
+**74** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -18,6 +18,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/modules/.test/fields_torus_fail.png)](../doc/modules/.test/fields_torus_fail.log) | [fields_torus_fail](../doc/modules/fields.md) |
 | [![test](../.test/first_example.png)](../.test/first_example.log) | [first_example](../README.md) |
 | [![test](../doc/modules/.test/functions_donut.png)](../doc/modules/.test/functions_donut.log) | [functions_donut](../doc/modules/functions.md) |
+| [![test](../doc/modules/.test/functions_donut_pub.png)](../doc/modules/.test/functions_donut_pub.log) | [functions_donut_pub](../doc/modules/functions.md) |
 | [![test](../doc/std/algorithm/.test/hull_multiple.png)](../doc/std/algorithm/.test/hull_multiple.log) | [hull_multiple](../doc/std/algorithm/hull.md) |
 | [![test](../doc/std/algorithm/.test/hull_single.png)](../doc/std/algorithm/.test/hull_single.log) | [hull_single](../doc/std/algorithm/hull.md) |
 | [![test](../doc/modules/.test/init.png)](../doc/modules/.test/init.log) | [init](../doc/modules/init.md) |
