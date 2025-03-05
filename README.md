@@ -108,13 +108,7 @@ std::print("Volume: {l.volume() / 1000}cm³");
 std::export("lid.stl") l;
 ```
 
-The above program prints out the following text and exports the model into a STL file called `lid.stl`.
-
-```console
-Volume: 48.415571412489506cm³
-```
-
-The STL file can now be loaded in a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
+The STL file can now also be loaded into a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
 
 ![Cura](doc/images/cura.png)
 
