@@ -6,8 +6,6 @@
 use crate::objects::{ObjectNode, ObjectNodeInner};
 use microcad_core::*;
 
-pub use microcad_core::BooleanOp;
-
 /// Algorithm trait
 pub trait Algorithm: std::fmt::Debug {
     /// Calculates the 2D geometry for node
@@ -73,65 +71,6 @@ pub trait Algorithm: std::fmt::Debug {
         unimplemented!()
     }
 }
-
-impl Algorithm for BooleanOp {
-    fn process_2d(&self, renderer: &mut Renderer2D, parent: ObjectNode) -> CoreResult<geo2d::Node> {
-        // all algorithm nodes are nested in a group
-
-        let geometries: Vec<_> = parent
-            .children()
-            .filter_map(|child| match &*child.borrow() {
-                ObjectNodeInner::Group(_) => {
-                    BooleanOp::Union.render_into_geometry2d(renderer, child.clone())
-                }
-                ObjectNodeInner::Primitive2D(renderable) => {
-                    renderable.request_geometry(renderer).ok()
-                }
-                ObjectNodeInner::Transform(transform) => {
-                    transform.render_into_geometry2d(renderer, child.clone())
-                }
-                ObjectNodeInner::Algorithm(algorithm) => {
-                    algorithm.render_into_geometry2d(renderer, child.clone())
-                }
-                _ => None,
-            })
-            .collect();
-
-        match geo2d::Geometry::boolean_op_multi(geometries, self) {
-            Some(g) => Ok(geo2d::geometry(g)),
-            None => Ok(geo2d::group()),
-        }
-    }
-
-    fn process_3d(&self, renderer: &mut Renderer3D, parent: ObjectNode) -> CoreResult<geo3d::Node> {
-        // all algorithm nodes are nested in a group
-
-        let geometries: Vec<_> = parent
-            .children()
-            .filter_map(|child| match &*child.borrow() {
-                ObjectNodeInner::Group(_) => {
-                    BooleanOp::Union.process_geometry3d(renderer, child.clone())
-                }
-                ObjectNodeInner::Primitive3D(renderable) => {
-                    renderable.request_geometry(renderer).ok()
-                }
-                ObjectNodeInner::Transform(transform) => {
-                    transform.render_into_geometry3d(renderer, child.clone())
-                }
-                ObjectNodeInner::Algorithm(algorithm) => {
-                    algorithm.process_geometry3d(renderer, child.clone())
-                }
-                _ => None,
-            })
-            .collect();
-
-        match geo3d::Geometry::boolean_op_multi(geometries, self) {
-            Some(g) => Ok(geo3d::geometry(g)),
-            None => Ok(geo3d::group()),
-        }
-    }
-}
-
 /// Short cut to generate a difference operator node
 pub fn difference() -> ObjectNode {
     ObjectNode::new(ObjectNodeInner::Algorithm(std::rc::Rc::new(
