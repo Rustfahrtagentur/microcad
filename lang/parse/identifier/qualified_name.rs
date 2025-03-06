@@ -74,7 +74,7 @@ impl QualifiedName {
         }
 
         let new_symbol = match (&root, &self.0[index].id()) {
-            (Some(ref root), id) => root.fetch_symbols(id),
+            (Some(root), id) => root.fetch_symbols(id),
             (None, id) => context.fetch(id),
         };
 
