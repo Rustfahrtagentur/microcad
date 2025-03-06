@@ -4,10 +4,11 @@
 //! Render tree
 
 pub mod algorithm;
+pub mod boolean_op;
 pub mod transform;
 
-pub use algorithm::Algorithm;
-pub use transform::Transform;
+pub use algorithm::*;
+pub use transform::*;
 
 use strum::IntoStaticStr;
 
