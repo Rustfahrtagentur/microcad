@@ -7,8 +7,12 @@
 mod call_argument_value;
 
 mod argument_map;
+mod argument_match;
 mod call_argument_value_list;
+mod multi_argument_map;
 
 pub use argument_map::*;
+pub use argument_match::*;
 pub use call_argument_value::*;
 pub use call_argument_value_list::*;
+pub use multi_argument_map::*;
