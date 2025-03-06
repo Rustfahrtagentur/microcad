@@ -109,7 +109,7 @@ impl Diag {
 
         match &src_ref {
             SrcRef(None) => writeln!(w, "{}: {}", self.level(), self.message())?,
-            SrcRef(Some(ref src_ref)) => {
+            SrcRef(Some(src_ref)) => {
                 writeln!(w, "{}: {}", self.level(), self.message())?;
                 writeln!(
                     w,
