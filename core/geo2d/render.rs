@@ -4,6 +4,7 @@
 //! 2D Primitive
 
 use crate::*;
+pub use geo2d::tree::{Node, NodeInner};
 
 /// A Primitive is a hashable renderable object that can be rendered by a Renderer2D
 pub trait Primitive: RenderHash + std::fmt::Debug {
