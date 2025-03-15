@@ -268,7 +268,7 @@ fn scan_for_tests(
                 // match code end marker
                 if end.captures_iter(line).next().is_some() {
                     if let Some(output) =
-                        create_test_code(output, file_path, test_name.as_str(), test_code.as_str())
+                        create_test(output, file_path, test_name.as_str(), test_code.as_str())
                     {
                         test_outputs.push(output);
                     }
@@ -290,13 +290,13 @@ fn scan_for_tests(
 }
 
 /// Generate code for one test
-fn create_test_code<'a>(
+fn create_test<'a>(
     f: &mut String,
     file_path: &'a Path,
     name: &'a str,
     code: &str,
 ) -> Option<Output> {
-    // split name into `name` and `mode``
+    // split name into `name` and optional `mode`
     let (name, mode) = if let Some((name, mode)) = name.split_once('#') {
         (name, Some(mode))
     } else {
@@ -312,16 +312,12 @@ fn create_test_code<'a>(
         }
     );
 
-    // where to store images
+    // where to store generated output
     let test_path = file_path.parent().unwrap().join(".test");
     // banner image file of this test
     let banner = test_path.join(format!("{name}.png"));
-    let banner_esc = banner.to_string_lossy().escape_default().to_string();
     // log file of this test
     let log = test_path.join(format!("{name}.log"));
-    let log_esc = log.to_string_lossy().escape_default().to_string();
-
-    //warning!("write_test_code: banner: {banner} {:?}", file_path,);
 
     // maybe create .test directory
     let _ = std::fs::create_dir(test_path);
@@ -333,9 +329,23 @@ fn create_test_code<'a>(
         _ => false,
     };
 
-    f.push_str(
-        &format!(
-            r##"#[test]
+    f.push_str(&create_test_code(name, mode, code, &banner, &log, todo));
+
+    Some(Output::new(name.into(), file_path.into(), banner, log))
+}
+
+fn create_test_code(
+    name: &str,
+    mode: Option<&str>,
+    code: &str,
+    banner: &std::path::Path,
+    log: &std::path::Path,
+    todo: bool,
+) -> String {
+    let banner = banner.to_string_lossy().escape_default().to_string();
+    let log = log.to_string_lossy().escape_default().to_string();
+    format!(
+        r##"#[test]
                 #[allow(non_snake_case)]
                 fn r#{name}() {{
                     use microcad_lang::{{parse::SourceFile,sym::Context}};
@@ -347,22 +357,24 @@ fn create_test_code<'a>(
                     use ::std::io::Write;
 
                     microcad_lang::env_logger_init();
-                    let banner = "{banner_esc}";
-                    let logs = "{log_esc}";
+                    
+                    let banner = "{banner}";
+                    let logs = "{log}";
                     let _ = fs::remove_file(banner);
                     let _ = fs::remove_file(logs);
                     #[allow(unused)]
                     let todo = {todo};
                     let logs = &mut fs::File::create(logs).expect("cannot create log file");
                     let logs = &mut io::BufWriter::new(logs);
+
                     match SourceFile::load_from_str(
                         r#"
                         {code}"#,
                     ) {handling};
                 }}"##,
-            handling = match mode {
-                Some("fail") =>
-                    r##"{
+        handling = match mode {
+            Some("fail") =>
+                r##"{
                             Err(err) => {
                                 let _ = fs::hard_link("images/fail_ok.png", banner);
                                 logs.write_all(format!("{err}").as_bytes()).unwrap();
@@ -385,8 +397,8 @@ fn create_test_code<'a>(
                                 }
                             }
                         }"##,
-                _ =>
-                    r##"{
+            _ =>
+                r##"{
                             Ok(source) => {
                                 let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
                                 let eval = context.eval();
@@ -430,8 +442,6 @@ fn create_test_code<'a>(
                                 }
                             },
                         }"##,
-            }
-        )
-    );
-    Some(Output::new(name.into(), file_path.into(), banner, log))
+        }
+    )
 }
