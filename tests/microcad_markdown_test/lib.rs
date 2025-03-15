@@ -12,11 +12,11 @@
 //! If test IDs include `.` name will be split into several names which will be
 //! used to crates sub modules.
 
+mod output;
+
 use anyhow::{Context, Result};
-use std::{
-    io::Write,
-    path::{Path, PathBuf},
-};
+use output::Output;
+use std::{io::Write, path::Path};
 
 /// for debugging purpose
 #[allow(unused)]
@@ -31,36 +31,6 @@ macro_rules! warning {
 fn md_tests() {
     std::env::set_var("OUT_DIR", "../../target");
     generate("..").unwrap();
-}
-
-struct Output {
-    name: String,
-    input: PathBuf,
-    banner: PathBuf,
-    log: PathBuf,
-}
-
-impl Eq for Output {}
-
-impl PartialEq for Output {
-    fn eq(&self, other: &Self) -> bool {
-        self.name.to_lowercase().eq(&other.name.to_lowercase())
-    }
-}
-
-#[allow(clippy::non_canonical_partial_ord_impl)]
-impl PartialOrd for Output {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.name
-            .to_lowercase()
-            .partial_cmp(&other.name.to_lowercase())
-    }
-}
-
-impl Ord for Output {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.name.to_lowercase().cmp(&other.name.to_lowercase())
-    }
 }
 
 /// Generate tests from the *Markdown* files which are within the given `path`
@@ -119,7 +89,6 @@ pub fn generate(path: impl AsRef<Path>) -> Result<()> {
 }
 
 fn make_test_list(tests: &[Output]) -> String {
-    const M: &str = "make test list error";
     let count = tests.len();
     let mut result = format!(
         "# Test List
@@ -138,13 +107,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
         let mut tests = tests.iter().collect::<Vec<_>>().clone();
         tests.sort();
         tests.iter().for_each(|test| {
-            result.push_str(&format!(
-                "| [![test]({banner})]({log}) | [{name}]({path}) |\n",
-                name = test.name,
-                banner = test.banner.as_os_str().to_str().expect(M),
-                path = test.input.as_os_str().to_str().expect(M),
-                log = test.log.as_os_str().to_str().expect(M)
-            ));
+            result.push_str(&test.to_string());
         });
     }
 
@@ -190,7 +153,7 @@ fn clean_dir(path: impl AsRef<Path>, exclude_files: &[Output]) -> Result<()> {
     {
         if 0 == exclude_files
             .iter()
-            .filter(|f| f.banner == entry.path() || f.log == entry.path())
+            .filter(|f| f.has_path(&entry.path()))
             .count()
         {
             // warning!("remove: {:?}", entry.path());
@@ -470,10 +433,5 @@ fn create_test_code<'a>(
             }
         )
     );
-    Some(Output {
-        banner,
-        log,
-        name: name.into(),
-        input: file_path.into(),
-    })
+    Some(Output::new(name.into(), file_path.into(), banner, log))
 }
