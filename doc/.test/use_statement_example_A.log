@@ -19,24 +19,3 @@ error: Symbol not found: cone
      | ^^^^
      |
 #0	root
-error: Symbol not found: cone
-  ---> <no file>:3:5
-     |
-   3 | use std::geo3d::cone;
-     |     ^^^^^^^^^^^^^^^^
-     |
-#0	root
-error: Cannot use Invalid
-  ---> <no file>:3:5
-     |
-   3 | use std::geo3d::cone;
-     |     ^^^^^^^^^^^^^^^^
-     |
-#0	root
-error: Symbol not found: cone
-  ---> <no file>:7:1
-     |
-   7 | cone(height = 2cm);
-     | ^^^^
-     |
-#0	root

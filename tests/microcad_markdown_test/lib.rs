@@ -323,125 +323,153 @@ fn create_test<'a>(
     let _ = std::fs::create_dir(test_path);
 
     // Early exit for "#no_test" and "#todo" suffixes
-    let todo = match mode {
-        Some("no_test") => return None,
-        Some("todo") => true,
-        _ => false,
-    };
+    if mode == Some("no_test") {
+        return None;
+    }
 
-    f.push_str(&create_test_code(name, mode, code, &banner, &log, todo));
+    f.push_str(&create_test_code(name, mode, code, &banner, &log));
 
     Some(Output::new(name.into(), file_path.into(), banner, log))
 }
 
+/// create test code
+/// - `name`: name of the test
+/// - `mode`: test result expectation
+/// - `code`: µcad code to test
+/// - `banner`: file for banner link
+/// - `log`: file for log output
+/// - `todo`:
 fn create_test_code(
     name: &str,
     mode: Option<&str>,
     code: &str,
     banner: &std::path::Path,
-    log: &std::path::Path,
-    todo: bool,
+    out: &std::path::Path,
 ) -> String {
     let banner = banner.to_string_lossy().escape_default().to_string();
-    let log = log.to_string_lossy().escape_default().to_string();
+    let out = out.to_string_lossy().escape_default().to_string();
+    let todo = mode == Some("todo");
     format!(
         r##"#[test]
                 #[allow(non_snake_case)]
                 fn r#{name}() {{
-                    use microcad_lang::{{parse::SourceFile,sym::Context}};
                     use microcad_builtin::ContextBuilder;
                     use microcad_core::SEARCH_PATH;
-                    use ::std::fs;
+                    use microcad_lang::{{parse::SourceFile,sym::Context}};
+                    use ::std::{{fs,io::Write}};
                     #[allow(unused)]
                     use ::std::io;
-                    use ::std::io::Write;
 
                     microcad_lang::env_logger_init();
                     
+                    // get parameters from outside code
                     let banner = "{banner}";
-                    let logs = "{log}";
-                    let _ = fs::remove_file(banner);
-                    let _ = fs::remove_file(logs);
+                    let out = "{out}";
                     #[allow(unused)]
                     let todo = {todo};
-                    let logs = &mut fs::File::create(logs).expect("cannot create log file");
-                    let logs = &mut io::BufWriter::new(logs);
 
+                    // remove generated files before updating
+                    let _ = fs::remove_file(banner);
+                    let _ = fs::remove_file(out);
+
+                    // create log file
+                    let out = &mut fs::File::create(out).expect("cannot create log file");
+                    let out = &mut io::BufWriter::new(out);
+
+                    // load and handle µcad source file
                     match SourceFile::load_from_str(
                         r#"
                         {code}"#,
                     ) {handling};
                 }}"##,
+        // generate handling code dependant of what result we are awaiting
         handling = match mode {
+            // test is expected to fail?
             Some("fail") =>
                 r##"{
-                            Err(err) => {
-                                let _ = fs::hard_link("images/fail_ok.png", banner);
-                                logs.write_all(format!("{err}").as_bytes()).unwrap();
-                                log::debug!("{err}")
-                            },
-                            Ok(source) => { 
-                                let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
-                                let eval = context.eval();
-                                context.diag().pretty_print( logs, &context).expect("internal error");
+                        // test expected to fail failed at parsing?
+                        Err(err) => {
+                            out.write_all(format!("{err}").as_bytes()).unwrap();
+                            let _ = fs::hard_link("images/fail_ok.png", banner);
+                            log::debug!("{err}")
+                        },
+                        // test expected to fail succeeded at parsing?
+                        Ok(source) => { 
+                            // evaluate the code including µcad std library
+                            let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
+                            let eval = context.eval();
 
-                                if let Err(err) = eval {
+                            // print any error
+                            context.diag().pretty_print( out, &context).expect("internal error");
+
+                            // check if test expected to fail failed at evaluation
+                            match (eval, context.diag().error_count > 0) {
+                                // evaluation had been aborted?
+                                (Err(err),_) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
                                     log::debug!("{err}");
-                                } else if context.diag().error_count > 0 {
+                                }
+                                // evaluation produced errors?
+                                (_,true) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
-                                    context.diag().pretty_print( logs, &context).expect("internal error");
-                                } else {
+                                }
+                                // test expected to fail but succeeds?
+                                (_,_) => {
                                     let _ = fs::hard_link("images/ok_fail.png", banner);
                                     panic!("ERROR: test is marked to fail but succeeded");
                                 }
                             }
-                        }"##,
+                        }
+                    }"##,
+            // test is expected to succeed?
             _ =>
                 r##"{
-                            Ok(source) => {
-                                let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
-                                let eval = context.eval();
-                                context.diag().pretty_print( logs, &context).expect("internal error");
+                        // test awaited to succeed and parsing failed?
+                        Err(err) => {
+                            out.write_all(format!("{err}").as_bytes()).unwrap();
+                            if todo { 
+                                let _ = fs::hard_link("images/todo.png", banner);
+                            } else { 
+                                let _ = fs::hard_link("images/fail.png", banner);
+                                panic!("ERROR: {err}")
+                            }
+                        },
+                        // test awaited to succeed and parsing succeeds?
+                        Ok(source) => {
+                            // evaluate the code including µcad std library
+                            let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
+                            let eval = context.eval();
 
-                                if let Err(err) = eval {
-                                    if todo { 
-                                        let _ = fs::hard_link("images/todo.png", banner);
-                                    } else { 
-                                        let _ = fs::hard_link("images/fail.png", banner);
-                                        panic!("{err}");
-                                    }
-                                } else {
-                                    if context.diag().error_count > 0 {
-                                        context.diag().pretty_print(logs, &context).expect("internal error");
-                                        if todo { 
-                                            let _ = fs::hard_link("images/todo.png", banner);
-                                        } else { 
-                                            let _ = fs::hard_link("images/fail.png", banner);
-                                            panic!("ERROR: there were {error_count} errors", error_count = context.diag().error_count);
-                                        }
-                                    }
-                                    log::trace!("test succeeded");
-                                    logs.write_all(
-                                        format!("{}",
-                                            microcad_builtin::print::output.lock().expect("sync error")).as_bytes()).expect("terminal error");
-                                    if todo { 
-                                        let _ = fs::hard_link("images/not_todo.png", banner);
-                                    } else { 
-                                        let _ = fs::hard_link("images/ok.png", banner);
-                                    }
-                                }
-                            },
-                            Err(err) => {
-                                logs.write_all(format!("{err}").as_bytes()).unwrap();
-                                if todo { 
+                            // print any error
+                            context.diag().pretty_print( out, &context).expect("internal error");
+
+                            out.write_all(format!("{}",microcad_builtin::print::output.lock().expect("sync error")).as_bytes())
+                                .expect("terminal error");
+
+                            // check if test awaited to succeed but failed at evaluation
+                            match (eval, context.diag().error_count > 0, todo) {
+                                // test expected to succeed and succeeds with no errors
+                                (Ok(_),false,false) => { let _ = fs::hard_link("images/ok.png", banner); }
+                                // test is todo but succeeds with no errors
+                                (Ok(_),false,true) => { let _ = fs::hard_link("images/not_todo.png", banner); }
+                                // Any error but todo
+                                (_,_,true) => {
                                     let _ = fs::hard_link("images/todo.png", banner);
-                                } else { 
+                                }
+                                // evaluation had been aborted?
+                                (Err(err),_,_) => {
                                     let _ = fs::hard_link("images/fail.png", banner);
+                                    out.write_all(format!("{err}").as_bytes()).unwrap();
                                     panic!("ERROR: {err}")
                                 }
-                            },
-                        }"##,
+                                // evaluation produced errors?
+                                (_,true,_) => {
+                                    let _ = fs::hard_link("images/fail.png", banner);
+                                    panic!("ERROR: there were {error_count} errors", error_count = context.diag().error_count);
+                                }
+                            }
+                        },
+                    }"##,
         }
     )
 }

@@ -21,26 +21,3 @@ error: Symbol not found: info
      | ^^^^
      |
 #0	root
-error: No matching initializer for module definition `cube_with_volume`
-  ---> <no file>:1:1
-     |
-   1 | module cube_with_volume(size: length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-#0	cube_with_volume
-	at <no file>:1:1
-#1	root
-error: Symbol not found: info
-  ---> <no file>:13:1
-     |
-  13 | info("Cube volume: {my_cube.volume}");
-     | ^^^^
-     |
-#0	root
-error: Symbol not found: info
-  ---> <no file>:14:1
-     |
-  14 | info("Cube weight: {my_cube.weight(40g/mm^3)}");
-     | ^^^^
-     |
-#0	root
