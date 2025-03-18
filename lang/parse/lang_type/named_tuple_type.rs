@@ -11,6 +11,7 @@ pub struct NamedTupleType(pub std::collections::BTreeMap<Identifier, Type>);
 
 impl Parse for NamedTupleType {
     fn parse(pair: Pair) -> ParseResult<Self> {
+        use crate::ty::Ty;
         Parser::ensure_rule(&pair, Rule::named_tuple_type);
 
         let mut types = std::collections::BTreeMap::new();

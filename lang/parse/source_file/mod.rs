@@ -108,7 +108,7 @@ impl Parse for SourceFile {
 
         for pair in pair.inner() {
             match pair.as_rule() {
-                Rule::source_file_statement => {
+                Rule::statement => {
                     body.push(Statement::parse(pair)?);
                 }
                 Rule::EOI => break,

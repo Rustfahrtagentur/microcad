@@ -31,7 +31,7 @@ impl Parse for NestedItem {
         match pair.clone().as_rule() {
             Rule::call => Ok(Self::Call(Call::parse(pair.clone())?)),
             Rule::qualified_name => Ok(Self::QualifiedName(QualifiedName::parse(pair.clone())?)),
-            Rule::node_body => Ok(Self::Body(Body::parse(pair.clone())?)),
+            Rule::body => Ok(Self::Body(Body::parse(pair.clone())?)),
             rule => unreachable!(
                 "NestedItem::parse expected call or qualified name, found {:?}",
                 rule

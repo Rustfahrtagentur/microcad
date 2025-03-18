@@ -4,7 +4,7 @@
 use crate::NamespaceBuilder;
 use cgmath::InnerSpace;
 use microcad_core::Scalar;
-use microcad_lang::{builtin_function, eval::*, parse::*, src_ref::*, sym::*};
+use microcad_lang::{builtin_function, eval::*, parse::*, src_ref::*};
 
 pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
     Ok(NamespaceBuilder::new("math")

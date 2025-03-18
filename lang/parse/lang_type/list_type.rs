@@ -26,6 +26,7 @@ impl crate::ty::Ty for ListType {
 impl Parse for ListType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
+        use crate::ty::Ty;
 
         let pair = inner.next().expect("Expected type");
         match pair.as_rule() {
@@ -44,6 +45,7 @@ impl std::fmt::Display for ListType {
 #[test]
 fn list_type() {
     use crate::parser::{Parser, Rule};
+    use crate::ty::Ty;
     let type_annotation =
         Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[Int]", 0).expect("test error");
     assert_eq!(type_annotation.ty().to_string(), "[Int]");

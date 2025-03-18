@@ -18,7 +18,7 @@ use microcad_core::*;
 #[derive(Clone, IntoStaticStr)]
 pub enum ObjectNodeInner {
     /// A group node that contains children
-    Group(SymbolTable),
+    Group,
 
     /// A special node after which children will be nested as siblings
     ChildrenNodeMarker,
@@ -66,41 +66,9 @@ impl std::fmt::Debug for ObjectNodeInner {
 /// Render node
 pub type ObjectNode = rctree::Node<ObjectNodeInner>;
 
-impl Symbols for ObjectNode {
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
-        match *self.borrow() {
-            ObjectNodeInner::Group(ref table) => table.fetch(id),
-            _ => unreachable!(),
-        }
-    }
-
-    fn add(&mut self, symbol: Symbol) -> &mut Self {
-        match *self.borrow_mut() {
-            ObjectNodeInner::Group(ref mut table) => table.add(symbol),
-            _ => unreachable!(),
-        };
-        self
-    }
-
-    fn add_alias(&mut self, symbol: Symbol, alias: Id) -> &mut Self {
-        match *self.borrow_mut() {
-            ObjectNodeInner::Group(ref mut table) => table.add_alias(symbol, alias),
-            _ => unreachable!(),
-        };
-        self
-    }
-
-    fn copy<T: Symbols>(&self, into: &mut T) -> SymResult<()> {
-        match *self.borrow_mut() {
-            ObjectNodeInner::Group(ref mut table) => table.copy(into),
-            _ => unreachable!(),
-        }
-    }
-}
-
 /// Create new group node
 pub fn group() -> ObjectNode {
-    ObjectNode::new(ObjectNodeInner::Group(SymbolTable::default()))
+    ObjectNode::new(ObjectNodeInner::Group)
 }
 
 /// Create a new transform node
@@ -141,7 +109,7 @@ pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {
                         .expect("Children marker should have a parent");
 
                     let is_group =
-                        matches!(*children_marker_parent.borrow(), ObjectNodeInner::Group(_));
+                        matches!(*children_marker_parent.borrow(), ObjectNodeInner::Group);
 
                     if is_group {
                         // Add children to group
@@ -190,7 +158,7 @@ pub fn dump(writer: &mut dyn std::io::Write, node: ObjectNode) -> std::io::Resul
 /// Return ObjectNode if we are in a Group
 pub fn into_group(node: ObjectNode) -> Option<ObjectNode> {
     node.first_child().and_then(|n| {
-        if let ObjectNodeInner::Group(_) = *n.borrow() {
+        if let ObjectNodeInner::Group = *n.borrow() {
             Some(n.clone())
         } else {
             None
@@ -205,7 +173,7 @@ pub fn bake2d(
 ) -> core::result::Result<geo2d::Node, CoreError> {
     let node2d = {
         match *node.borrow() {
-            ObjectNodeInner::Group(_) => geo2d::tree::group(),
+            ObjectNodeInner::Group => geo2d::tree::group(),
             ObjectNodeInner::Export(_) => geo2d::tree::group(),
             ObjectNodeInner::Primitive2D(ref renderable) => {
                 return Ok(geo2d::tree::geometry(
@@ -243,7 +211,7 @@ pub fn bake3d(
 ) -> core::result::Result<geo3d::Node, CoreError> {
     let node3d = {
         match *node.borrow() {
-            ObjectNodeInner::Group(_) => geo3d::tree::group(),
+            ObjectNodeInner::Group => geo3d::tree::group(),
             ObjectNodeInner::Export(_) => geo3d::tree::group(),
             ObjectNodeInner::Primitive3D(ref renderable) => {
                 return Ok(geo3d::tree::geometry(

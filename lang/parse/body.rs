@@ -40,7 +40,7 @@ impl SrcReferrer for Body {
 
 impl Parse for Body {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::module_body);
+        Parser::ensure_rule(&pair, Rule::body);
         let mut body = Self::default();
         for pair in pair.inner() {
             body.statements.push(Statement::parse(pair.clone())?);

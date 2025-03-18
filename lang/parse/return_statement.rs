@@ -16,7 +16,7 @@ pub struct ReturnStatement {
 
 impl SrcReferrer for ReturnStatement {
     fn src_ref(&self) -> SrcRef {
-        self.src_ref
+        self.src_ref.clone()
     }
 }
 
@@ -31,36 +31,15 @@ impl Parse for ReturnStatement {
             }
         }
 
-        Ok(std::rc::Rc::new(ReturnStatement {
+        Ok(ReturnStatement {
             result,
             src_ref: pair.into(),
-        }))
+        })
     }
 }
 
 impl std::fmt::Display for ReturnStatement {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            Self::Module(m) => {
-                write!(f, "{}", m.name)
-            }
-            Self::Namespace(ns) => {
-                write!(f, "{}", ns.name)
-            }
-            Self::Function(f) => {
-                write!(f, "{}", f.name)
-            }
-            Self::ModuleInit(mi) => {
-                write!(f, "{mi}")
-            }
-
-            Self::Use(u) => write!(f, "{u}"),
-            Self::Return(r) => write!(f, "{r}"),
-            Self::If(i) => write!(f, "{i}"),
-            Self::Marker(m) => write!(f, "{m}"),
-
-            Self::Assignment(a) => write!(f, "{a}"),
-            Self::Expression(e) => write!(f, "{e}"),
-        }
+    fn fmt(&self, _f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        todo!()
     }
 }

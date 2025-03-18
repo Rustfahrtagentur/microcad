@@ -58,6 +58,7 @@ impl Parse for Assignment {
 
 impl std::fmt::Display for Assignment {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        use crate::ty::Ty;
         match &self.specified_type {
             Some(t) => write!(f, "{}: {} = {}", self.name, t.ty(), self.value),
             None => write!(f, "{} = {}", self.name, self.value),

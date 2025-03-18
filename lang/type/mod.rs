@@ -7,7 +7,7 @@ mod type_annotation;
 
 pub use type_annotation::*;
 
-use crate::parse::*;
+use crate::{parse::*, ty::*};
 
 /// µcad Basic Types
 #[derive(Debug, Clone, PartialEq)]

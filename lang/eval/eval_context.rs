@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, objects::*, parse::*, source_file_cache::*};
+use crate::{diag::*, parse::*, source_file_cache::*};
 
 /// Context for evaluation
 ///
@@ -31,15 +31,6 @@ impl EvalContext {
 
         ctx.source_files.add(rc_source_file);
         ctx
-    }
-
-    /// Evaluate the context with the current source file
-    pub fn eval(&mut self) -> super::EvalResult<ObjectNode> {
-        let node = self
-            .current_source_file()
-            .expect("No current source file")
-            .eval(self)?;
-        Ok(node)
     }
 
     /// Return the current source file

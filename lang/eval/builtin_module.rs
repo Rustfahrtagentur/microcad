@@ -19,24 +19,6 @@ pub struct BuiltinModule {
     pub f: &'static BuiltinModuleFn,
 }
 
-impl CallTrait for BuiltinModule {
-    type Output = Vec<ObjectNode>;
-
-    /// Call implicit initialization of this module
-    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        let multi_arg_map = args
-            .eval(context)?
-            .get_multi_matching_arguments(&self.parameters.eval(context)?)?;
-
-        let mut nodes = Vec::new();
-        for arg_map in multi_arg_map.combinations() {
-            nodes.push((self.f)(&arg_map, context)?);
-        }
-
-        Ok(nodes)
-    }
-}
-
 impl std::fmt::Debug for BuiltinModule {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "BUILTIN_MOD({})", &self.name)

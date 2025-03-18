@@ -26,7 +26,7 @@ pub use value_error::*;
 pub use value_list::*;
 
 use crate::objects::ObjectNode;
-use crate::{parse::*, r#type::*, src_ref::*};
+use crate::{parse::*, r#type::*, src_ref::*, ty::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
 
@@ -398,9 +398,7 @@ impl std::ops::Mul for Value {
                     Vec3::new(l * r.x, l * r.y, l * r.z)
                 })))
             }
-            (Value::List(list), value) | (value, Value::List(list)) => {
-                Ok(Value::List((list * value)?))
-            }
+            (Value::List(list), value) | (value, Value::List(list)) => Ok(list * value)?,
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
     }
@@ -441,7 +439,7 @@ impl std::ops::Div for Value {
             (Value::Angle(lhs), Value::Integer(rhs)) => {
                 Ok(Value::Angle(Refer::merge(lhs, rhs, |l, r| l / r as Scalar)))
             }
-            (Value::List(list), value) => Ok(Value::List((list / value)?)),
+            (Value::List(list), value) => Ok(list / value)?,
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} / {rhs}"))),
         }
     }

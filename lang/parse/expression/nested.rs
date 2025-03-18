@@ -29,7 +29,7 @@ impl Parse for Nested {
         Ok(Self(Refer::new(
             pair.inner()
                 .filter(|pair| {
-                    [Rule::qualified_name, Rule::call, Rule::node_body].contains(&pair.as_rule())
+                    [Rule::qualified_name, Rule::call, Rule::body].contains(&pair.as_rule())
                 })
                 .map(NestedItem::parse)
                 .collect::<ParseResult<_>>()?,

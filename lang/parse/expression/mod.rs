@@ -45,9 +45,10 @@ lazy_static::lazy_static! {
 }
 
 /// Expressions
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub enum Expression {
     /// Something went wrong (and an error will be reported)
+    #[default]
     Invalid,
     /// An integer, float, color or bool literal: 1, 1.0, #00FF00, false
     Literal(Literal),

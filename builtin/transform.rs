@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use cgmath::Vector3;
-use microcad_lang::{builtin_module, eval::*, objects::*, parse::*, sym::*};
+use microcad_lang::{builtin_module, eval::*, objects::*, parse::*};
 
 use crate::namespace_builder::NamespaceBuilder;
 use microcad_core::Scalar;

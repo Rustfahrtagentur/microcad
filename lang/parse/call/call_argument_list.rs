@@ -3,13 +3,26 @@
 
 //! Parse `call_argument_list` rule into CallArgumentList
 
-use crate::{ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*, Id};
+use crate::{
+    argument_map::*, eval::*, ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*, Id,
+};
 
 /// List of call arguments
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentList(Refer<OrdMap<Identifier, CallArgument>>);
 
 use thiserror::Error;
+
+impl CallArgumentList {
+    /// Get matching arguments from parameter list
+    pub fn get_matching_arguments(
+        &self,
+        _context: &mut EvalContext,
+        _parameters: &ParameterList,
+    ) -> EvalResult<ArgumentMap> {
+        todo!()
+    }
+}
 
 /// An error that occurred when looking for matching arguments between a call and a parameter definition
 #[derive(Error, Debug)]

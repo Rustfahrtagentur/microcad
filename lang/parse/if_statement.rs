@@ -20,20 +20,20 @@ pub struct IfStatement {
 
 impl SrcReferrer for IfStatement {
     fn src_ref(&self) -> SrcRef {
-        self.src_ref
+        self.src_ref.clone()
     }
 }
 
 impl Parse for IfStatement {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut cond = None;
+        let mut cond = Default::default();
         let mut body = Body::default();
         let mut body_else = None;
 
         for pair in pair.inner() {
             match pair.as_rule() {
-                Rule::expression => cond = Some(Expression::parse(pair)?),
-                Rule::body => Some(ParameterList::parse(pair)?),
+                Rule::expression => cond = Expression::parse(pair)?,
+                Rule::body => body = Body::parse(pair)?,
                 Rule::body_else => {
                     body_else = Some(Body::parse(pair.clone())?);
                 }
@@ -41,17 +41,17 @@ impl Parse for IfStatement {
             }
         }
 
-        Ok(std::rc::Rc::new(IfStatement {
+        Ok(IfStatement {
             cond,
             body,
             body_else,
             src_ref: pair.into(),
-        }))
+        })
     }
 }
 
 impl std::fmt::Display for IfStatement {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, _f: &mut std::fmt::Formatter) -> std::fmt::Result {
         todo!()
     }
 }

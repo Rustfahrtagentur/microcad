@@ -69,7 +69,7 @@ impl Parse for Statement {
 
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
             Rule::return_statement => Self::Return(ReturnStatement::parse(first)?),
-            Rule::if_statement => Self::Return(IfStatement::parse(first)?),
+            Rule::if_statement => Self::If(IfStatement::parse(first)?),
             Rule::marker_statement => Self::Marker(Marker::parse(first)?),
 
             Rule::assignment => Self::Assignment(Assignment::parse(first)?),
@@ -94,8 +94,9 @@ impl std::fmt::Display for Statement {
             Self::Namespace(ns) => {
                 write!(f, "{}", ns.name)
             }
-            Self::Function(f) => {
-                write!(f, "{}", f.name)
+            Self::Function(_f) => {
+                todo!()
+                //write!(f, "{}", f.name)
             }
             Self::ModuleInit(mi) => {
                 write!(f, "{mi}")

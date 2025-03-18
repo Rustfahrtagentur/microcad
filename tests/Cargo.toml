@@ -23,9 +23,7 @@ anyhow = "1"
 log = "0.4"
 
 microcad-core = { workspace = true }
-microcad-export = { workspace = true }
 microcad-lang = { workspace = true }
-microcad-builtin = { workspace = true }
 
 [build-dependencies]
 microcad_markdown_test = { path = "microcad_markdown_test", version = "0.1.0" }

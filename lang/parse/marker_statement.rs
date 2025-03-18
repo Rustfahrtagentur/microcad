@@ -29,7 +29,7 @@ impl SrcReferrer for Marker {
 
 impl Parse for Marker {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::node_marker);
+        Parser::ensure_rule(&pair, Rule::marker_statement);
         Ok(Self {
             name: Identifier::parse(pair.inner().next().expect(INTERNAL_PARSE_ERROR))?,
             src_ref: pair.src_ref(),

@@ -42,7 +42,7 @@ impl PushDiag for DiagHandler {
     fn push_diag(&mut self, diag: super::Diag) -> crate::eval::EvalResult<()> {
         use super::Diag;
         match &diag {
-            Diag::Error(_, _) => {
+            Diag::Error(_) => {
                 self.error_count += 1;
             }
             Diag::Warning(_) => {
@@ -59,10 +59,6 @@ impl PushDiag for DiagHandler {
             self.error(
                 SrcRef(None),
                 Box::new(EvalError::ErrorLimitReached(self.error_limit)),
-                match self.diag_list.last() {
-                    Some(Diag::Error(_, s)) => s.clone(),
-                    _ => None,
-                },
             )?;
             Err(eval::EvalError::ErrorLimitReached(self.error_limit))
         } else {

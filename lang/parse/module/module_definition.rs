@@ -38,7 +38,7 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
                 Rule::parameter_list => {
                     parameters = Some(ParameterList::parse(pair)?);
                 }
-                Rule::module_body => {
+                Rule::body => {
                     body = Body::parse(pair.clone())?;
                 }
                 rule => unreachable!("Unexpected rule for module definition, got {:?}", rule),

@@ -22,7 +22,7 @@ pub mod geo3d;
 #[cfg(test)]
 mod tests;
 
-use microcad_lang::{builtin_module, eval::*, parse::*, sym::*};
+use microcad_lang::{builtin_module, eval::*, parse::*};
 
 pub use context_builder::ContextBuilder;
 pub use export::export;

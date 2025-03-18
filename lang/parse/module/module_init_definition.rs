@@ -36,7 +36,7 @@ impl Parse for ModuleInitDefinition {
 
         Ok(ModuleInitDefinition {
             parameters: pair.find(Rule::parameter_list).unwrap_or_default(),
-            body: pair.find(Rule::node_body).unwrap_or_default(),
+            body: pair.find(Rule::body).unwrap_or_default(),
             src_ref: pair.into(),
         })
     }

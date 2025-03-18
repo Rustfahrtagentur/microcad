@@ -3,7 +3,7 @@
 
 use microcad_builtin_proc_macro::DefineBuiltinPrimitive2D;
 use microcad_core::*;
-use microcad_lang::{eval::*, parse::*, sym::*};
+use microcad_lang::{eval::*, parse::*};
 
 /// Builtin definition for a 2D circle
 #[derive(DefineBuiltinPrimitive2D, Clone, Debug)]

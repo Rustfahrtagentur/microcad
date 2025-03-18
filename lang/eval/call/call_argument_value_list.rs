@@ -35,7 +35,7 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<ArgumentMap> {
-        use ArgumentMatch;
+        use crate::argument_map::ArgumentMatch;
         ArgumentMap::find_match(self, parameter_values)
     }
 
@@ -130,14 +130,16 @@ fn call_get_matching_arguments_missing() {
         call_argument_value!(baz: Scalar = 3.0),
     ]);
 
-    let arg_map = call_values.get_matching_arguments(&param_values);
+    let _arg_map = call_values.get_matching_arguments(&param_values);
 
-    if let Err(EvalError::MissingArguments(missing)) = arg_map {
+    todo!()
+    /*
+    if let Err(Value::MissingArguments(missing)) = arg_map {
         assert_eq!(missing.len(), 1);
         assert_eq!(&missing[0].name, "bar");
     } else {
         panic!("Expected MissingArguments error");
-    }
+    }*/
 }
 
 #[test]
