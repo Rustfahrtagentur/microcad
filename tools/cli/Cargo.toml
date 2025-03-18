@@ -22,7 +22,6 @@ path = "main.rs"
 clap = { version = "4", features = ["derive"] }
 anyhow = "1.0"
 
-microcad-builtin = { workspace = true }
 microcad-lang = { workspace = true }
 microcad-core = { workspace = true }
 

@@ -9,7 +9,7 @@ extern crate microcad_lang;
 use std::{io::Write, path::Path};
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{objects::*, parse::*, sym::*};
+use microcad_lang::{objects::*, parse::*};
 
 /// µcad cli
 #[derive(Parser)]
@@ -70,6 +70,7 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
             parse(input)?;
             eprintln!("Parsed successfully!");
         }
+        /*
         Commands::Eval { input } => {
             eval(parse(input)?, &cli.std)?;
             eprintln!("Evaluated successfully!");
@@ -84,7 +85,7 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
                     .collect::<Vec<_>>()
                     .join(",")
             );
-        }
+        }*/
         Commands::Create { path } => {
             use std::{fs::*, path::*};
             let mut path = PathBuf::from(path);
@@ -112,6 +113,7 @@ main();
                 eprintln!("File {path:?} generated.")
             }
         }
+        _ => todo!(),
     }
 
     Ok(())
@@ -120,7 +122,7 @@ main();
 fn parse(input: impl AsRef<Path>) -> anyhow::Result<SourceFile> {
     Ok(SourceFile::load(input)?)
 }
-
+/*
 fn eval(source_file: SourceFile, std: impl AsRef<Path>) -> anyhow::Result<ObjectNode> {
     let mut context = microcad_builtin::ContextBuilder::new(source_file)
         .with_std(std)?
@@ -141,3 +143,4 @@ fn eval(source_file: SourceFile, std: impl AsRef<Path>) -> anyhow::Result<Object
 fn export(node: ObjectNode) -> anyhow::Result<Vec<std::path::PathBuf>> {
     Ok(microcad_builtin::export(node)?)
 }
+*/

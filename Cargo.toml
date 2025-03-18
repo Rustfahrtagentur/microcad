@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [workspace]
-default-members = ["core", "lang", "tests", "builtin-proc-macro"]
+default-members = ["core", "lang", "tests", "builtin-proc-macro", "tools/cli"]
 
-members = ["core", "lang", "tests", "builtin-proc-macro"]
+members = ["core", "lang", "tests", "builtin-proc-macro", "tools/cli"]
 resolver = "2"
 
 [workspace.package]
