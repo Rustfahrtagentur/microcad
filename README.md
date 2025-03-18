@@ -42,6 +42,13 @@ which can be installed from [crates.io](https://crates.io) by using `cargo`.
 
 ### Installation
 
+First, install [Ninja Build](https://github.com/ninja-build/ninja) which is needed to compile the [manifold geometry library](https://github.com/elalish/manifold).
+For example, *Debian* based *Linux* distributions use the following line:
+
+```sh
+sudo apt install ninja-build
+```
+
 To install the latest release of *µcad* via *cargo*, type:
 
 ```sh
