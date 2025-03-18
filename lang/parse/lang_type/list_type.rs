@@ -17,7 +17,7 @@ impl ListType {
     }
 }
 
-impl Ty for ListType {
+impl crate::ty::Ty for ListType {
     fn ty(&self) -> Type {
         self.0.as_ref().clone()
     }

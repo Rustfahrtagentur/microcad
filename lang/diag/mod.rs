@@ -41,9 +41,8 @@ pub trait PushDiag {
         &mut self,
         src: impl SrcReferrer,
         error: Box<dyn std::error::Error>,
-        stack: Option<Stack>,
     ) -> crate::eval::EvalResult<()> {
-        self.push_diag(Diag::Error(Refer::new(error, src.src_ref()), stack))
+        self.push_diag(Diag::Error(Refer::new(error, src.src_ref())))
     }
 }
 
@@ -57,7 +56,7 @@ pub enum Diag {
     /// Warning with source code reference attached
     Warning(Refer<Box<dyn std::error::Error>>),
     /// Error with source code reference and optional stack trace attached
-    Error(Refer<Box<dyn std::error::Error>>, Option<Stack>),
+    Error(Refer<Box<dyn std::error::Error>>),
 }
 
 impl Diag {
@@ -67,7 +66,7 @@ impl Diag {
             Diag::Trace(_) => Level::Trace,
             Diag::Info(_) => Level::Info,
             Diag::Warning(_) => Level::Warning,
-            Diag::Error(_, _) => Level::Error,
+            Diag::Error(_) => Level::Error,
         }
     }
 
@@ -77,7 +76,7 @@ impl Diag {
             Diag::Trace(message) => message.to_string(),
             Diag::Info(message) => message.to_string(),
             Diag::Warning(error) => error.to_string(),
-            Diag::Error(error, _) => error.to_string(),
+            Diag::Error(error) => error.to_string(),
         }
     }
 
@@ -144,8 +143,8 @@ impl Diag {
         }
 
         // Print stack trace
-        if let Diag::Error(_, Some(stack)) = self {
-            stack.pretty_print(w, source_file_by_hash)?
+        if let Diag::Error(_) = self {
+            //stack.pretty_print(w, source_file_by_hash)?
         }
 
         Ok(())
@@ -158,7 +157,7 @@ impl SrcReferrer for Diag {
             Diag::Trace(message) => message.src_ref(),
             Diag::Info(message) => message.src_ref(),
             Diag::Warning(error) => error.src_ref(),
-            Diag::Error(error, _) => error.src_ref(),
+            Diag::Error(error) => error.src_ref(),
         }
     }
 }
@@ -169,7 +168,7 @@ impl std::fmt::Display for Diag {
             Diag::Trace(message) => write!(f, "trace: {}: {message}", self.src_ref()),
             Diag::Info(message) => write!(f, "info: {}: {message}", self.src_ref()),
             Diag::Warning(error) => write!(f, "warning: {}: {error}", self.src_ref()),
-            Diag::Error(error, _) => write!(f, "error: {}: {error}", self.src_ref()),
+            Diag::Error(error) => write!(f, "error: {}: {error}", self.src_ref()),
         }
     }
 }

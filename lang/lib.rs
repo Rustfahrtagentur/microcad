@@ -4,6 +4,7 @@
 //! µcad source code parser
 
 pub mod diag;
+pub mod eval;
 pub mod objects;
 pub mod ord_map;
 pub mod parse;
@@ -17,6 +18,8 @@ pub mod ty;
 pub mod value;
 
 use std::sync::Once;
+
+pub use value::*;
 
 /// Id type (base of all identifiers)
 pub type Id = compact_str::CompactString;

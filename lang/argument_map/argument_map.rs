@@ -3,7 +3,7 @@
 
 //! Argument map evaluation entity
 
-use crate::{src_ref::*, value::*, Id};
+use crate::{argument_map::ArgumentMatch, src_ref::*, value::*, Id};
 
 /// Map of arguments
 #[derive(Clone, Debug, Default)]
@@ -55,7 +55,7 @@ impl ArgumentMatch for ArgumentMap {
         value: Value,
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
-    ) -> EvalResult<TypeCheckResult> {
+    ) -> crate::eval::EvalResult<TypeCheckResult> {
         let name = &parameter_value.name;
         parameter_values.remove(name);
         self.insert(name.clone(), value.clone());

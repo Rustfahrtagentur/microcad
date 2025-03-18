@@ -58,34 +58,3 @@ impl Parse for UseStatement {
         Ok(Self(visibility, decls, pair.into()))
     }
 }
-
-impl Eval for UseStatement {
-    type Output = Option<SymbolTable>;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        // Return a symbol table if the use statement is public
-        match self.0 {
-            Visibility::Public => {
-                let mut symbols = SymbolTable::default();
-                for decl in &self.1 {
-                    let mut symbol_table = decl.eval(context)?;
-                    for (name, symbol) in symbol_table.iter() {
-                        context.add_alias(symbol.as_ref().clone(), name.clone());
-                    }
-
-                    symbols.merge(&mut symbol_table);
-                }
-                Ok(Some(symbols))
-            }
-            Visibility::Private => {
-                for decl in &self.1 {
-                    let symbol_table = decl.eval(context)?;
-                    for (name, symbol) in symbol_table.iter() {
-                        context.add_alias(symbol.as_ref().clone(), name.clone());
-                    }
-                }
-                Ok(None)
-            }
-        }
-    }
-}

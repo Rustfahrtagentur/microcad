@@ -45,7 +45,7 @@ impl std::str::FromStr for Literal {
     }
 }
 
-impl Ty for Literal {
+impl crate::ty::Ty for Literal {
     fn ty(&self) -> Type {
         match self {
             Literal::Integer(_) => Type::Integer,
@@ -77,19 +77,6 @@ impl Parse for Literal {
         };
 
         Ok(s)
-    }
-}
-
-impl Eval for Literal {
-    type Output = Value;
-
-    fn eval(&self, context: &mut EvalContext) -> std::result::Result<Value, EvalError> {
-        match self {
-            Literal::Integer(i) => Ok(Value::Integer(i.clone().map(|i| i))),
-            Literal::Number(n) => n.eval(context),
-            Literal::Bool(b) => Ok(Value::Bool(b.clone().map(|b| b))),
-            Literal::Color(c) => Ok(Value::Color(c.clone().map(|c| c))),
-        }
     }
 }
 

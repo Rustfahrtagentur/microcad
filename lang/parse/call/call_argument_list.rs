@@ -3,7 +3,7 @@
 
 //! Parse `call_argument_list` rule into CallArgumentList
 
-use crate::{ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*};
+use crate::{ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*, Id};
 
 /// List of call arguments
 #[derive(Clone, Debug, Default)]
@@ -26,27 +26,6 @@ pub enum MatchError {
     /// Parameter required by definition but given in the call
     #[error("Missing parameter: {0}")]
     MissingParameter(Id),
-}
-
-impl CallArgumentList {
-    /// Get matching arguments from parameter list
-    pub fn get_matching_arguments(
-        &self,
-        context: &mut EvalContext,
-        parameters: &ParameterList,
-    ) -> EvalResult<ArgumentMap> {
-        let parameter_values = parameters.eval(context)?;
-        match self
-            .eval(context)?
-            .get_matching_arguments(&parameter_values)
-        {
-            Ok(args) => Ok(args),
-            Err(err) => {
-                context.error_with_stack_trace(self, err)?;
-                Ok(ArgumentMap::default())
-            }
-        }
-    }
 }
 
 impl SrcReferrer for CallArgumentList {

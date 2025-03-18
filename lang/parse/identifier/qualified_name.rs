@@ -14,13 +14,6 @@ impl SrcReferrer for QualifiedName {
     }
 }
 
-impl Sym for QualifiedName {
-    fn id(&self) -> Option<Id> {
-        // TODO: how to convert qualified name into one single id?
-        self.last().map(|i| i.id().clone())
-    }
-}
-
 impl std::ops::Deref for QualifiedName {
     type Target = Vec<Identifier>;
 
@@ -48,88 +41,6 @@ impl Parse for QualifiedName {
 impl std::fmt::Display for QualifiedName {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", join_identifiers(&self.0, "::"))
-    }
-}
-
-impl QualifiedName {
-    /// Visit all symbols in the qualified name recursively, starting from the root
-    pub fn visit_symbols(
-        &self,
-        context: &EvalContext,
-        functor: &mut dyn FnMut(&Symbol, usize),
-    ) -> EvalResult<()> {
-        self._visit_symbols(None, 0, context, functor)
-    }
-
-    /// Visit all symbols in the qualified name recursively
-    fn _visit_symbols(
-        &self,
-        root: Option<std::rc::Rc<Symbol>>,
-        index: usize,
-        context: &EvalContext,
-        functor: &mut dyn FnMut(&Symbol, usize),
-    ) -> EvalResult<()> {
-        if index >= self.0.len() {
-            return Ok(());
-        }
-
-        let new_symbol = match (&root, &self.0[index].id()) {
-            (Some(root), id) => root.fetch_symbols(id),
-            (None, id) => context.fetch(id),
-        };
-
-        if let Some(symbol) = new_symbol {
-            functor(&symbol, index);
-            self._visit_symbols(Some(symbol.clone()), index + 1, context, functor)?;
-        }
-
-        Ok(())
-    }
-
-    /// Get all symbols for the qualified name
-    pub fn fetch_symbols(&self, context: &mut EvalContext) -> EvalResult<Vec<Symbol>> {
-        let mut symbols = Vec::new();
-        self.visit_symbols(context, &mut |symbol, depth| {
-            // Only take symbols that match the full qualified name
-            if depth == self.0.len() - 1 {
-                symbols.push(symbol.clone());
-            }
-        })?;
-
-        if symbols.is_empty() {
-            context.error_with_stack_trace(
-                self,
-                EvalError::SymbolNotFound(self.id().unwrap_or_default()),
-            )?;
-        }
-        Ok(symbols)
-    }
-
-    /// Get the symbol for the qualified name
-    ///
-    /// If there are multiple symbols with the same name, an error is returned
-    pub fn fetch_symbol(&self, context: &mut EvalContext) -> EvalResult<Option<Symbol>> {
-        let symbols = self.fetch_symbols(context)?;
-        if symbols.len() > 1 {
-            context.error_with_stack_trace(
-                self,
-                EvalError::AmbiguousSymbol(symbols.first().expect(INTERNAL_PARSE_ERROR).clone()),
-            )?;
-            // TODO Output all symbols
-        }
-        Ok(symbols.into_iter().next())
-    }
-}
-
-impl Eval for QualifiedName {
-    type Output = Symbol;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        if let Some(symbol) = self.fetch_symbol(context)? {
-            Ok(symbol)
-        } else {
-            Ok(Symbol::default())
-        }
     }
 }
 

@@ -3,7 +3,7 @@
 
 //! Module initialization definition parser entity
 
-use crate::{objects::*, parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Module initialization definition
 ///
@@ -22,39 +22,6 @@ pub struct ModuleInitDefinition {
     pub body: Body,
     /// Source reference
     pub src_ref: SrcRef,
-}
-
-impl ModuleInitDefinition {
-    /// Call the initializer
-    pub fn call(
-        &self,
-        arg_map: &ArgumentMap,
-        context: &mut EvalContext,
-        node: &mut ObjectNode,
-    ) -> EvalResult<()> {
-        // Copy the arguments to the symbol table of the node
-        for (name, value) in arg_map.iter() {
-            node.add(Symbol::Value(name.clone(), value.clone()));
-        }
-
-        for (name, value) in arg_map.iter() {
-            context.add(Symbol::Value(name.clone(), value.clone()));
-        }
-
-        let node_body = self.body.eval(context)?;
-
-        // Add the init object's children to the node
-        for child in node_body.children() {
-            child.detach();
-            node.append(child.clone());
-        }
-        node_body.copy(node)?;
-
-        // Now, copy the symbols of the node into the context
-        node.copy(context)?;
-
-        Ok(())
-    }
 }
 
 impl SrcReferrer for ModuleInitDefinition {

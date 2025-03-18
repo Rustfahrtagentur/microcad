@@ -18,16 +18,6 @@ pub struct Assignment {
     src_ref: SrcRef,
 }
 
-impl Assignment {
-    /// Make a symbol from the assignment
-    pub fn make_symbol(&self, context: &mut EvalContext) -> EvalResult<Symbol> {
-        Ok(Symbol::Value(
-            self.name.id().clone(),
-            self.value.eval(context)?,
-        ))
-    }
-}
-
 impl SrcReferrer for Assignment {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()
@@ -63,16 +53,6 @@ impl Parse for Assignment {
             value: value.expect(INTERNAL_PARSE_ERROR),
             src_ref: pair.into(),
         })
-    }
-}
-
-impl Eval for Assignment {
-    type Output = Symbol;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        let symbol = self.make_symbol(context)?;
-        context.add(symbol.clone());
-        Ok(symbol)
     }
 }
 

@@ -7,7 +7,7 @@ use crate::{parse::*, parser::*, src_ref::*};
 
 /// If statement
 #[derive(Clone, Debug)]
-pub struct If {
+pub struct IfStatement {
     /// if condition
     pub cond: Expression,
     /// body if true
@@ -18,13 +18,13 @@ pub struct If {
     src_ref: SrcRef,
 }
 
-impl SrcReferrer for If {
+impl SrcReferrer for IfStatement {
     fn src_ref(&self) -> SrcRef {
         self.src_ref
     }
 }
 
-impl Parse for If {
+impl Parse for IfStatement {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut cond = None;
         let mut body = Body::default();
@@ -35,13 +35,13 @@ impl Parse for If {
                 Rule::expression => cond = Some(Expression::parse(pair)?),
                 Rule::body => Some(ParameterList::parse(pair)?),
                 Rule::body_else => {
-                    body_else = Body::parse(pair.clone())?;
+                    body_else = Some(Body::parse(pair.clone())?);
                 }
                 rule => unreachable!("Unexpected rule in if, got {:?}", rule),
             }
         }
 
-        Ok(std::rc::Rc::new(If {
+        Ok(std::rc::Rc::new(IfStatement {
             cond,
             body,
             body_else,
@@ -50,15 +50,7 @@ impl Parse for If {
     }
 }
 
-impl Eval for If {
-    type Output = Option<Value>;
-
-    fn eval(&self, context: &mut EvalContext) -> std::result::Result<Self::Output, EvalError> {
-        todo!()
-    }
-}
-
-impl std::fmt::Display for If {
+impl std::fmt::Display for IfStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         todo!()
     }

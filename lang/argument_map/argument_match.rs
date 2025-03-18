@@ -1,9 +1,9 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Argument match evaluation trait
+//! Argument match trait
 
-use crate::eval::*;
+use crate::{eval::*, *};
 
 /// The `ArgumentMatch` trait is used to match call arguments to parameters.
 ///

@@ -67,26 +67,3 @@ impl std::fmt::Display for ListExpression {
         Ok(())
     }
 }
-
-impl Eval for ListExpression {
-    type Output = Value;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        let mut value_list = ValueList::new(Vec::new(), self.src_ref());
-        for expr in self.list.clone() {
-            value_list.push(expr.eval(context)?);
-        }
-        if let Some(unit) = self.unit {
-            value_list.add_unit_to_unitless(unit)?;
-        }
-
-        match value_list.types().common_type() {
-            Some(common_type) => Ok(Value::List(List::new(
-                value_list,
-                common_type,
-                self.src_ref(),
-            ))),
-            None => Err(EvalError::ListElementsDifferentTypes(value_list.types())),
-        }
-    }
-}

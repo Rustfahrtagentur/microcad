@@ -44,46 +44,6 @@ impl SrcReferrer for Nested {
     }
 }
 
-impl Eval for Nested {
-    type Output = Option<Value>;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        let mut nodes = Vec::new();
-
-        for item in self.0.iter() {
-            match item.eval(context)? {
-                CallResult::Nodes(n) => nodes.push(n),
-                CallResult::None => {
-                    if nodes.is_empty() && self.0.len() == 1 {
-                        return Ok(None);
-                    } else {
-                        context.error_with_stack_trace(
-                            self,
-                            EvalError::CannotNestItem(item.clone()),
-                        )?;
-                    }
-                }
-                CallResult::Value(value) => {
-                    if nodes.is_empty() && self.0.len() == 1 {
-                        return Ok(Some(value));
-                    } else {
-                        context.error_with_stack_trace(
-                            self,
-                            EvalError::CannotNestItem(item.clone()),
-                        )?;
-                    }
-                }
-            }
-        }
-
-        if nodes.is_empty() {
-            Ok(None)
-        } else {
-            Ok(Some(Value::Node(crate::objects::nest_nodes(nodes))))
-        }
-    }
-}
-
 impl std::fmt::Display for Nested {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(

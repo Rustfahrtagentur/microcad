@@ -24,6 +24,7 @@ pub mod statement;
 pub mod r#use;
 
 pub use assignment::*;
+pub use body::*;
 pub use call::*;
 pub use expression::*;
 pub use format_string::*;
@@ -40,5 +41,6 @@ pub use parse_error::*;
 pub use r#use::*;
 pub use return_statement::*;
 pub use source_file::*;
+pub use statement::*;
 
 const INTERNAL_PARSE_ERROR: &str = "internal parse error";

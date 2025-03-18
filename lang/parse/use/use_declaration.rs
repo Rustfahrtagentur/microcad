@@ -75,38 +75,3 @@ impl Parse for UseDeclaration {
         }
     }
 }
-
-impl Eval for UseDeclaration {
-    type Output = SymbolTable;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        match self {
-            Self::UseAll(name, _) => match name.eval(context)? {
-                Symbol::Namespace(namespace_definition) => {
-                    Ok(namespace_definition.body.symbols.clone())
-                }
-                symbol => {
-                    context
-                        .error_with_stack_trace(self, EvalError::NamespaceSymbolExpected(symbol))?;
-                    Ok(SymbolTable::default())
-                }
-            },
-            Self::Use(name, _) => {
-                let mut symbols = SymbolTable::default();
-
-                let symbol = name.eval(context)?;
-                if matches!(symbol, Symbol::Invalid) {
-                    context.error_with_stack_trace(self, EvalError::CannotUse(symbol))?;
-                } else {
-                    symbols.add(symbol);
-                }
-                Ok(symbols)
-            }
-            Self::UseAlias(name, alias, _) => {
-                let mut symbols = SymbolTable::default();
-                symbols.add_alias(name.eval(context)?, alias.id().clone());
-                Ok(symbols)
-            }
-        }
-    }
-}

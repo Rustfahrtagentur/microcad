@@ -76,25 +76,6 @@ impl std::fmt::Display for FormatString {
     }
 }
 
-impl Eval for FormatString {
-    type Output = Value;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        let mut result = String::new();
-        for elem in &self.0 {
-            match elem {
-                FormatStringInner::String(s) => result += &s.value,
-                FormatStringInner::FormatExpression(expr) => match expr.eval(context) {
-                    Ok(Value::String(s)) => result += &s,
-                    Err(e) => return Err(e),
-                    _ => unreachable!("FormatExpression must always evaluate to a string"),
-                },
-            }
-        }
-        Ok(Value::String(Refer::new(result, SrcRef::from_vec(&self.0))))
-    }
-}
-
 impl Parse for FormatString {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut fs = Self::default();
@@ -108,42 +89,4 @@ impl Parse for FormatString {
 
         Ok(fs)
     }
-}
-
-#[test]
-fn simple_string() {
-    use pest::Parser as _;
-    let pair = Pair::new(
-        Parser::parse(Rule::format_string, "\"Hello, World!\"")
-            .expect("test error")
-            .next()
-            .expect("test error"),
-        0,
-    );
-
-    let s = FormatString::parse(pair).expect("test error");
-    assert_eq!(s.section_count(), 1);
-    let mut context = EvalContext::default();
-    let value = s.eval(&mut context).expect("test error");
-
-    assert_eq!(value, Value::String(Refer::none("Hello, World!".into())));
-}
-
-#[test]
-fn format_string() {
-    use pest::Parser as _;
-    let pair = Pair::new(
-        Parser::parse(Rule::format_string, "\"A{2 + 4}B\"")
-            .expect("test error")
-            .next()
-            .expect("test error"),
-        0,
-    );
-
-    let s = FormatString::parse(pair).expect("test error");
-    assert_eq!(s.section_count(), 3);
-    let mut context = EvalContext::default();
-    let value = s.eval(&mut context).expect("test error");
-
-    assert_eq!(value, Value::String(Refer::none("A6B".into())));
 }

@@ -13,7 +13,7 @@ impl Parse for UnnamedTupleType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let inner = pair.inner();
         let mut types = Vec::new();
-        use crate::eval::Ty;
+        use crate::ty::Ty;
         for pair in inner {
             types.push(TypeAnnotation::parse(pair)?.ty());
         }
@@ -37,8 +37,8 @@ impl std::fmt::Display for UnnamedTupleType {
 
 #[test]
 fn unnamed_tuple_type() {
-    use crate::eval::Ty;
     use crate::parser::*;
+    use crate::ty::Ty;
 
     let type_annotation =
         Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(Int, String)", 0).expect("test error");

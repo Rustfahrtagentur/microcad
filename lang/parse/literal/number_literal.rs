@@ -34,7 +34,7 @@ impl NumberLiteral {
     }
 }
 
-impl Ty for NumberLiteral {
+impl crate::ty::Ty for NumberLiteral {
     fn ty(&self) -> Type {
         self.1.ty()
     }
@@ -66,40 +66,6 @@ impl Parse for NumberLiteral {
             unit = Unit::parse(unit_token)?;
         }
         Ok(NumberLiteral(value, unit, pair.clone().into()))
-    }
-}
-
-impl Eval for NumberLiteral {
-    type Output = Value;
-
-    fn eval(&self, _: &mut EvalContext) -> std::result::Result<Value, EvalError> {
-        match self.1.ty() {
-            Type::Scalar => Ok(Value::Scalar(Refer::new(
-                self.normalized_value(),
-                self.src_ref(),
-            ))),
-            Type::Angle => Ok(Value::Angle(Refer::new(
-                self.normalized_value(),
-                self.src_ref(),
-            ))),
-            Type::Length => Ok(Value::Length(Refer::new(
-                self.normalized_value(),
-                self.src_ref(),
-            ))),
-            Type::Weight => Ok(Value::Weight(Refer::new(
-                self.normalized_value(),
-                self.src_ref(),
-            ))),
-            Type::Area => Ok(Value::Area(Refer::new(
-                self.normalized_value(),
-                self.src_ref(),
-            ))),
-            Type::Volume => Ok(Value::Volume(Refer::new(
-                self.normalized_value(),
-                self.src_ref(),
-            ))),
-            _ => unreachable!(),
-        }
     }
 }
 

@@ -22,7 +22,7 @@ impl Parse for MapType {
         let key = inner.next().expect("missing key expression");
         let value = inner.next().expect("missing value expression");
 
-        use crate::Ty;
+        use crate::ty::Ty;
 
         Ok(Self::new(
             (TypeAnnotation::parse(key)?.ty()).try_into()?,

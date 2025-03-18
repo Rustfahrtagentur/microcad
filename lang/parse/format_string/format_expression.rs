@@ -42,20 +42,3 @@ impl SrcReferrer for FormatExpression {
         SrcRef::merge(&self.spec, &self.expression)
     }
 }
-
-impl Eval for FormatExpression {
-    type Output = Value;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        Ok(Value::String(Refer::new(
-            format!("{}", self.expression.eval(context)?),
-            SrcRef(None),
-        )))
-    }
-}
-
-impl std::fmt::Display for FormatExpression {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{{{}}}", self.expression)
-    }
-}

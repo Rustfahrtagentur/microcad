@@ -13,7 +13,7 @@ pub struct FunctionDefinition {
     /// Function signature
     pub signature: FunctionSignature,
     /// Function body
-    pub body: FunctionBody,
+    pub body: Body,
     /// Source code reference
     src_ref: SrcRef,
 }
@@ -29,7 +29,7 @@ impl FunctionDefinition {
     pub fn new(
         name: Identifier,
         signature: FunctionSignature,
-        body: FunctionBody,
+        body: Body,
         src_ref: SrcRef,
     ) -> Self {
         Self {
@@ -41,36 +41,13 @@ impl FunctionDefinition {
     }
 }
 
-impl CallTrait for std::rc::Rc<FunctionDefinition> {
-    type Output = Value;
-
-    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        let stack_frame = StackFrame::function(context, self.clone());
-
-        context.scope(stack_frame, |context| {
-            let arg_map = args.get_matching_arguments(context, &self.signature.parameters)?;
-
-            for (name, value) in arg_map.iter() {
-                context.add(Symbol::Value(name.clone(), value.clone()));
-            }
-
-            for statement in self.body.0.iter() {
-                if let Some(result_value) = statement.eval(context)? {
-                    return Ok(result_value);
-                }
-            }
-            Ok(Value::Invalid)
-        })
-    }
-}
-
 impl Parse for std::rc::Rc<FunctionDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_definition);
         let mut inner = pair.inner();
         let name = Identifier::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
         let signature = FunctionSignature::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
-        let body = FunctionBody::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
+        let body = Body::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
 
         Ok(std::rc::Rc::new(FunctionDefinition {
             name,

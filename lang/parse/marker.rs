@@ -3,7 +3,7 @@
 
 //! Node marker parser entity
 
-use crate::{objects::*, parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Node marker, e.g. `@children`
 #[derive(Clone, Debug)]
@@ -34,25 +34,6 @@ impl Parse for Marker {
             name: Identifier::parse(pair.inner().next().expect(INTERNAL_PARSE_ERROR))?,
             src_ref: pair.src_ref(),
         })
-    }
-}
-
-impl Eval for Marker {
-    type Output = Option<ObjectNode>;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        match self.name.to_string().as_str() {
-            "children" => Ok(Some(crate::objects::ObjectNode::new(
-                crate::objects::ObjectNodeInner::ChildrenNodeMarker,
-            ))),
-            _ => {
-                context.error_with_stack_trace(
-                    self,
-                    EvalError::InvalidNodeMarker(self.name.clone()),
-                )?;
-                Ok(None)
-            }
-        }
     }
 }
 

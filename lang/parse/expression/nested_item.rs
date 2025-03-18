@@ -13,30 +13,7 @@ pub enum NestedItem {
     /// Qualified Name
     QualifiedName(QualifiedName),
     /// Module body
-    NodeBody(NodeBody),
-}
-
-impl Eval for NestedItem {
-    type Output = CallResult;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        match &self {
-            NestedItem::Call(call) => call.eval(context),
-            NestedItem::QualifiedName(qualified_name) => match qualified_name.eval(context)? {
-                Symbol::Value(_, Value::Node(node)) => {
-                    Ok(CallResult::Nodes(vec![node.make_deep_copy()]))
-                }
-                Symbol::Value(_, value) => Ok(CallResult::Value(
-                    value.clone_with_src_ref(qualified_name.src_ref()),
-                )),
-                symbol => {
-                    context.error_with_stack_trace(self, EvalError::CannotNestSymbol(symbol))?;
-                    Ok(CallResult::None)
-                }
-            },
-            NestedItem::NodeBody(body) => Ok(CallResult::Nodes(vec![body.eval(context)?])),
-        }
-    }
+    Body(Body),
 }
 
 impl SrcReferrer for NestedItem {
@@ -44,7 +21,7 @@ impl SrcReferrer for NestedItem {
         match self {
             Self::Call(c) => c.src_ref(),
             Self::QualifiedName(qn) => qn.src_ref(),
-            Self::NodeBody(nb) => nb.src_ref(),
+            Self::Body(nb) => nb.src_ref(),
         }
     }
 }
@@ -54,7 +31,7 @@ impl Parse for NestedItem {
         match pair.clone().as_rule() {
             Rule::call => Ok(Self::Call(Call::parse(pair.clone())?)),
             Rule::qualified_name => Ok(Self::QualifiedName(QualifiedName::parse(pair.clone())?)),
-            Rule::node_body => Ok(Self::NodeBody(NodeBody::parse(pair.clone())?)),
+            Rule::node_body => Ok(Self::Body(Body::parse(pair.clone())?)),
             rule => unreachable!(
                 "NestedItem::parse expected call or qualified name, found {:?}",
                 rule
@@ -68,7 +45,7 @@ impl std::fmt::Display for NestedItem {
         match self {
             Self::Call(call) => write!(f, "{}", call),
             Self::QualifiedName(qualified_name) => write!(f, "{}", qualified_name),
-            Self::NodeBody(body) => write!(f, "{}", body),
+            Self::Body(body) => write!(f, "{}", body),
         }
     }
 }

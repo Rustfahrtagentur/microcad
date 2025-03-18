@@ -26,27 +26,9 @@ impl CallArgument {
     }
 }
 
-impl Eval for CallArgument {
-    type Output = CallArgumentValue;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        Ok(CallArgumentValue::new(
-            self.id(),
-            self.value.eval(context)?,
-            self.src_ref.clone(),
-        ))
-    }
-}
-
 impl SrcReferrer for CallArgument {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()
-    }
-}
-
-impl Sym for CallArgument {
-    fn id(&self) -> Option<Id> {
-        self.derived_name().as_ref().map(|name| name.id().clone())
     }
 }
 

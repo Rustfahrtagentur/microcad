@@ -16,23 +16,6 @@ pub struct MethodCall {
     src_ref: SrcRef,
 }
 
-impl MethodCall {
-    /// Evaluate the method call in a context
-    pub fn eval(&self, context: &mut EvalContext, lhs: &Expression) -> EvalResult<Value> {
-        use call::call_method::CallMethod;
-
-        match lhs.eval(context)? {
-            Value::Node(node) => node.call_method(&self.name, &self.argument_list, self.src_ref()),
-            Value::List(list) => list.call_method(&self.name, &self.argument_list, self.src_ref()),
-            _ => {
-                context
-                    .error_with_stack_trace(self, EvalError::UnknownMethod(self.name.clone()))?;
-                Ok(Value::Invalid)
-            }
-        }
-    }
-}
-
 impl SrcReferrer for MethodCall {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()

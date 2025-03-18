@@ -58,19 +58,6 @@ impl Parse for ParameterList {
     }
 }
 
-impl Eval for ParameterList {
-    type Output = ParameterValueList;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        let mut values = ParameterValueList::default();
-        for parameter in self.iter() {
-            values.push(parameter.eval(context)?)?;
-        }
-
-        Ok(values)
-    }
-}
-
 impl std::fmt::Display for ParameterList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for parameter in self.0.value.iter() {

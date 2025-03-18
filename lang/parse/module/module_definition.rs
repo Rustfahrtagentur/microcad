@@ -18,17 +18,6 @@ pub struct ModuleDefinition {
     src_ref: SrcRef,
 }
 
-/// Match of an initializer
-///
-/// This enum represents a match of an initializer containing the initializer itself and the argument map
-enum InitializerMatch {
-    /// Match of an implicit initializer
-    Implicit(std::rc::Rc<ModuleInitDefinition>, MultiArgumentMap),
-
-    /// Match of an explicit initializer
-    Explicit(std::rc::Rc<ModuleInitDefinition>, MultiArgumentMap),
-}
-
 impl SrcReferrer for ModuleDefinition {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()

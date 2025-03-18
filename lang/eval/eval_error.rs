@@ -4,9 +4,9 @@
 //! Evaluation error
 
 use crate::{
-    eval::*,
     parse::{Identifier, QualifiedName},
     r#type::*,
+    Id,
 };
 use thiserror::Error;
 
@@ -72,17 +72,9 @@ pub enum EvalError {
         found: Type,
     },
 
-    /// Expected a namespace symbol
-    #[error("Namespace symbol expected, got {0}")]
-    NamespaceSymbolExpected(Symbol),
-
     /// Cannot evaluate to type
     #[error("Cannot evaluate to type: {0}")]
     EvaluateToTypeError(Type),
-
-    /// Cannot use symbol
-    #[error("Cannot use {0}")]
-    CannotUse(Symbol),
 
     /// Unknown qualified name
     #[error("Unknown qualified name: {0}")]
@@ -141,10 +133,6 @@ pub enum EvalError {
     #[error("Expected module: {0}")]
     ExpectedModule(Id),
 
-    /// Cannot nest symbol
-    #[error("Cannot nest symbol: {0}")]
-    CannotNestSymbol(Symbol),
-
     /// Cannot nest item
     #[error("Cannot nest item: {0:#?}")]
     CannotNestItem(crate::parse::NestedItem),
@@ -169,10 +157,6 @@ pub enum EvalError {
     #[error("Assertion failed: {0} with {1}")]
     AssertionFailedWithCondition(String, String),
 
-    /// Ambiguous symbol
-    #[error("Ambiguous symbol: {0}")]
-    AmbiguousSymbol(Symbol),
-
     /// Unknown field, e.g. node.field, where node.field
     #[error("Unknown field: {0}")]
     UnknownField(Identifier),
@@ -180,10 +164,6 @@ pub enum EvalError {
     /// Invalid node marker
     #[error("Invalid node marker: {0}")]
     InvalidNodeMarker(Identifier),
-
-    /// Symbol is not callable
-    #[error("Symbol is not callable: {0}")]
-    SymbolNotCallable(Symbol),
 
     /// Cannot continue evaluation after error limit has been reached
     #[error("Error limit reached: Stopped evaluation after {0} errors")]
@@ -205,10 +185,6 @@ pub enum EvalError {
     #[error("Grammar rule error")]
     GrammarRuleError(String),
 
-    /// Named tuple element access error
-    #[error("Named tuple element access error")]
-    NamedTupleElementAccess(Value),
-
     /// Wrong parameters in call
     #[error("Wrong parameters in call to module {0}")]
     WrongModuleParameters(QualifiedName),
@@ -216,10 +192,6 @@ pub enum EvalError {
     /// Missed call
     #[error("Missed call")]
     MissedCall,
-
-    /// IO Error
-    #[error("Symbol Error: {0}")]
-    SymError(#[from] SymError),
 }
 
 /// Result type of any evaluation

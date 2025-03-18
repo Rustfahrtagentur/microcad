@@ -6,23 +6,12 @@
 mod call_argument;
 mod call_argument_list;
 mod method_call;
-mod multiplicity;
 
 pub use call_argument::*;
 pub use call_argument_list::*;
 pub use method_call::*;
-pub use multiplicity::*;
 
 use crate::{objects::ObjectNode, parse::*, parser::*, src_ref::*};
-
-/// trait for calls of modules or functions with argument list
-pub trait CallTrait {
-    /// Output call type
-    type Output;
-
-    /// Evaluate call into value (if possible)
-    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Self::Output>;
-}
 
 /// Call of a function or module initialization
 #[derive(Clone, Debug, Default)]
@@ -38,12 +27,6 @@ pub struct Call {
 impl SrcReferrer for Call {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()
-    }
-}
-
-impl Sym for Call {
-    fn id(&self) -> Option<Id> {
-        self.name.id()
     }
 }
 
@@ -76,48 +59,10 @@ pub enum CallResult {
     Nodes(Vec<ObjectNode>),
 
     /// Call returned a single value
-    Value(Value),
+    Value(crate::Value),
 
     /// Call returned nothing
     None,
-}
-
-impl Eval for Call {
-    type Output = CallResult;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        match self.name.eval(context)? {
-            Symbol::Function(f) => Ok(CallResult::Value(f.call(&self.argument_list, context)?)),
-            Symbol::BuiltinFunction(f) => match f.call(&self.argument_list, context)? {
-                Some(value) => Ok(CallResult::Value(value)),
-                None => Ok(CallResult::None),
-            },
-            Symbol::BuiltinModule(m) => {
-                Ok(CallResult::Nodes(m.call(&self.argument_list, context)?))
-            }
-            Symbol::Module(m) => Ok(CallResult::Nodes(
-                match m.call(&self.argument_list, context) {
-                    Err(EvalError::MissedCall) => {
-                        context.error_with_stack_trace(
-                            self,
-                            EvalError::WrongModuleParameters(self.name.clone()),
-                        )?;
-                        return Err(EvalError::WrongModuleParameters(self.name.clone()));
-                    }
-                    Ok(result) => result,
-                    Err(err) => return Err(err),
-                },
-            )),
-            Symbol::Invalid => {
-                // We don't do anything if the symbol is not found, because an error has been already raised before
-                Ok(CallResult::None)
-            }
-            symbol => {
-                context.error_with_stack_trace(self, EvalError::SymbolNotCallable(symbol))?;
-                Ok(CallResult::None)
-            }
-        }
-    }
 }
 
 #[test]

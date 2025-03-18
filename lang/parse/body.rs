@@ -3,7 +3,7 @@
 
 //! Module body parser entity
 
-use crate::{objects::*, parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Module definition body
 ///
@@ -30,37 +30,6 @@ pub struct Body {
     pub statements: Vec<Statement>,
     /// Source code reference
     src_ref: SrcRef,
-}
-
-impl Body {
-    /// Evaluate a single statement of the module
-    fn eval_statement(
-        &self,
-        statement: &Statement,
-        context: &mut EvalContext,
-        group: &mut ObjectNode,
-    ) -> EvalResult<()> {
-        match statement {
-            Statement::Assignment(assignment) => {
-                // Evaluate the assignment and add the symbol to the node
-                // E.g. `a = 1` will add the symbol `a` to the node
-                let symbol = assignment.eval(context)?;
-                group.add(symbol);
-            }
-            Statement::FunctionDefinition(function) => {
-                // Evaluate the function and add the symbol to the node
-                // E.g. `function a() {}` will add the symbol `a` to the node
-                let symbol = function.eval(context)?;
-                group.add(symbol);
-            }
-            statement => {
-                if let Some(Value::Node(new_child)) = statement.eval(context)? {
-                    group.append(new_child);
-                }
-            }
-        }
-        Ok(())
-    }
 }
 
 impl SrcReferrer for Body {

@@ -102,66 +102,6 @@ impl Parse for Parameter {
     }
 }
 
-impl Eval for Parameter {
-    type Output = ParameterValue;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        match (&self.specified_type, &self.default_value) {
-            // Type and value are specified
-            (Some(specified_type), Some(expr)) => {
-                let default_value = expr.eval(context)?;
-                if specified_type.ty() != default_value.ty() {
-                    context.error_with_stack_trace(
-                        self,
-                        EvalError::ParameterTypeMismatch {
-                            name: self.name.clone(),
-                            expected: specified_type.ty(),
-                            found: default_value.ty(),
-                        },
-                    )?;
-                    // Return an invalid parameter value in case evaluation failed
-                    Ok(ParameterValue::invalid(
-                        self.name.id().clone(),
-                        self.src_ref(),
-                    ))
-                } else {
-                    Ok(ParameterValue::new(
-                        self.name.id().clone(),
-                        Some(specified_type.ty()),
-                        Some(default_value),
-                        self.src_ref(),
-                    ))
-                }
-            }
-            // Only type is specified
-            (Some(t), None) => Ok(ParameterValue::new(
-                self.name.id().clone(),
-                Some(t.ty()),
-                None,
-                self.src_ref(),
-            )),
-            // Only value is specified
-            (None, Some(expr)) => {
-                let default_value = expr.eval(context)?;
-
-                Ok(ParameterValue::new(
-                    self.name.id().clone(),
-                    Some(default_value.ty().clone()),
-                    Some(default_value),
-                    self.src_ref(),
-                ))
-            }
-            // Neither type nor value is specified
-            (None, None) => Ok(ParameterValue::new(
-                self.name.id().clone(),
-                None,
-                None,
-                self.src_ref(),
-            )),
-        }
-    }
-}
-
 /// Short cut to create a `Parameter` instance
 #[macro_export]
 macro_rules! parameter {

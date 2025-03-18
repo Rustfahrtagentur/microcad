@@ -3,7 +3,7 @@
 
 //! Tuple expression
 
-use crate::{parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// TODO: maybe CallArgumentList should be `ArgumentList` and get independent of module `call`?
 type ArgumentList = CallArgumentList;
@@ -82,62 +82,4 @@ impl std::fmt::Display for TupleExpression {
         }
         Ok(())
     }
-}
-
-#[test]
-fn unnamed_tuple() {
-    let input = "(1.0, 2.0, 3.0)mm";
-    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
-        .expect("test error");
-    let mut context = EvalContext::default();
-    let value = expr.eval(&mut context).expect("test error");
-    assert_eq!(
-        value.ty(),
-        Type::UnnamedTuple(UnnamedTupleType(vec![
-            Type::Length,
-            Type::Length,
-            Type::Length
-        ]))
-    );
-}
-
-#[test]
-fn test_named_tuple() {
-    let input = "(a = 1.0, b = 2.0, c = 3.0)mm";
-    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
-        .expect("test error");
-    let mut context = EvalContext::default();
-    let value = expr.eval(&mut context).expect("test error");
-    assert_eq!(
-        value.ty(),
-        Type::NamedTuple(NamedTupleType(
-            vec![
-                ("a".into(), Type::Length),
-                ("b".into(), Type::Length),
-                ("c".into(), Type::Length),
-            ]
-            .into_iter()
-            .collect()
-        ))
-    );
-}
-
-#[test]
-fn test_vec2() {
-    let input = "(x = 1mm, y = 1mm)";
-    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
-        .expect("test error");
-    let mut context = EvalContext::default();
-    let value = expr.eval(&mut context).expect("test error");
-    assert_eq!(value.ty(), Type::Vec2);
-}
-
-#[test]
-fn test_vec3() {
-    let input = "(x = 1, y = 2, z = 3)mm";
-    let expr = Parser::parse_rule::<TupleExpression>(Rule::tuple_expression, input, 0)
-        .expect("test error");
-    let mut context = EvalContext::default();
-    let value = expr.eval(&mut context).expect("test error");
-    assert_eq!(value.ty(), Type::Vec3);
 }

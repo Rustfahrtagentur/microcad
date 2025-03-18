@@ -3,7 +3,7 @@
 
 //! Multi argument map evaluation entity
 
-use crate::{eval::*, parse::Combinations};
+use crate::{argument_map::*, *};
 
 /// An argument map for parameter multiplicity.
 ///
@@ -12,19 +12,17 @@ use crate::{eval::*, parse::Combinations};
 /// * If you call `a(4.0)`, `a` will be stored as a single coefficient, because we passed a single scalar.
 /// * If you call `a([2.0, 4.0])`, `a` will be stored as a multi coefficient, because we passed a list of scalars.
 #[derive(Default)]
-pub struct MultiArgumentMap(crate::parse::call::CombinationMap<Value>);
+pub struct MultiArgumentMap(CombinationMap<Value>);
 
 impl MultiArgumentMap {
     /// Insert a multi-value coefficient
     pub fn insert_multi(&mut self, name: Id, value: Vec<Value>) {
-        self.0
-            .insert(name, crate::parse::call::Coefficient::Multi(value));
+        self.0.insert(name, Coefficient::Multi(value));
     }
 
     /// Insert a single-value coefficient
     pub fn insert_single(&mut self, name: Id, value: Value) {
-        self.0
-            .insert(name, crate::parse::call::Coefficient::Single(value));
+        self.0.insert(name, Coefficient::Single(value));
     }
 
     /// Return an iterator over all combinations
@@ -40,7 +38,7 @@ impl ArgumentMatch for MultiArgumentMap {
         value: Value,
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
-    ) -> EvalResult<TypeCheckResult> {
+    ) -> crate::eval::EvalResult<TypeCheckResult> {
         let result = parameter_value.type_check(&value.ty());
         let name = &parameter_value.name;
         match result {
@@ -50,7 +48,7 @@ impl ArgumentMatch for MultiArgumentMap {
                     self.insert_multi(name.clone(), l.fetch());
                     Ok(result)
                 }
-                value => Err(EvalError::ExpectedIterable(value.ty().clone())),
+                value => Err(crate::eval::EvalError::ExpectedIterable(value.ty().clone())),
             },
             TypeCheckResult::SingleMatch => {
                 parameter_values.remove(name);

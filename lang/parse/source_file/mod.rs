@@ -5,7 +5,7 @@
 
 use std::io::Read;
 
-use crate::{objects, parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Trait to get a source file by its hash
 pub trait GetSourceFileByHash {
@@ -31,7 +31,7 @@ pub trait GetSourceFileByHash {
 #[derive(Clone, Debug)]
 pub struct SourceFile {
     /// Root code body
-    pub body: Vec<SourceStatement>,
+    pub body: Vec<Statement>,
     /// Name of loaded file or `None`
     pub filename: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
@@ -94,54 +94,6 @@ impl SourceFile {
     pub fn get_line(&self, line: usize) -> Option<&str> {
         self.source.lines().nth(line)
     }
-
-    /// Evaluate the source file as a namespace
-    ///
-    /// This is used to evaluate the source file as a namespace, which can be used to import
-    /// functions and values from the source file.
-    /// This functionality is used for the `use` statement.
-    pub fn eval_as_namespace(
-        &self,
-        context: &mut EvalContext,
-        namespace_name: Identifier,
-    ) -> EvalResult<std::rc::Rc<NamespaceDefinition>> {
-        let mut namespace = NamespaceDefinition::new(namespace_name);
-
-        // The Rc is a lie, we are going to clone it anyway
-        let rc = std::rc::Rc::new(namespace.clone());
-        let stack_frame = StackFrame::namespace(context, rc)?;
-
-        context.scope(stack_frame, |context| {
-            for statement in &self.body {
-                match statement {
-                    SourceStatement::Assignment(a) => {
-                        namespace.add(Symbol::Value(a.name.id().clone(), a.value.eval(context)?));
-                    }
-                    SourceStatement::FunctionDefinition(f) => {
-                        namespace.add(f.clone().into());
-                    }
-                    SourceStatement::ModuleDefinition(m) => {
-                        namespace.add(m.clone().into());
-                    }
-                    SourceStatement::NamespaceDefinition(n) => {
-                        let n = n.eval(context)?;
-                        namespace.add(n);
-                    }
-                    SourceStatement::Use(u) => {
-                        if let Some(symbols) = u.eval(context)? {
-                            for (id, symbol) in symbols.iter() {
-                                namespace.add_alias(symbol.as_ref().clone(), id.clone());
-                            }
-                        }
-                    }
-
-                    _ => {}
-                }
-            }
-
-            Ok(std::rc::Rc::new(namespace))
-        })
-    }
 }
 
 impl Parse for SourceFile {
@@ -157,7 +109,7 @@ impl Parse for SourceFile {
         for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::source_file_statement => {
-                    body.push(SourceStatement::parse(pair)?);
+                    body.push(Statement::parse(pair)?);
                 }
                 Rule::EOI => break,
                 _ => {}
@@ -170,30 +122,6 @@ impl Parse for SourceFile {
             source: pair.as_span().as_str().to_string(),
             hash,
         })
-    }
-}
-
-impl Eval for SourceFile {
-    type Output = objects::ObjectNode;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        let group = objects::group();
-        for statement in &self.body {
-            match statement {
-                SourceStatement::Expression(expression) => {
-                    // This statement has been evaluated into a new child node.
-                    // Add it to our `new_nodes` list
-                    if let Value::Node(node) = expression.eval(context)? {
-                        group.append(node);
-                    }
-                }
-                statement => {
-                    statement.eval(context)?;
-                }
-            }
-        }
-        // Return root node
-        Ok(group)
     }
 }
 
@@ -240,7 +168,7 @@ fn load_source_file() {
 
     let first_statement = source_file.body.first().expect("test error");
     match first_statement {
-        SourceStatement::Use(u) => {
+        Statement::Use(u) => {
             use crate::src_ref::SrcReferrer;
             assert_eq!(
                 u.src_ref().source_slice(&source_file.source),

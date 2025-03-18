@@ -44,8 +44,8 @@ impl std::fmt::Display for NamedTupleType {
 
 #[test]
 fn named_tuple_type() {
-    use crate::eval::Ty;
     use crate::parser::*;
+    use crate::ty::Ty;
 
     let type_annotation =
         Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(x: Int, y: String)", 0)
