@@ -40,6 +40,6 @@ impl Parse for MethodCall {
 
 impl std::fmt::Display for MethodCall {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}({:?})", self.name, self.argument_list)
+        write!(f, "{}({})", self.name, self.argument_list)
     }
 }

@@ -53,3 +53,19 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
         }))
     }
 }
+
+impl std::fmt::Display for ModuleDefinition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "module {name}({parameters}) {body}",
+            name = self.name,
+            parameters = if let Some(parameters) = &self.parameters {
+                format!("{parameters}")
+            } else {
+                "".into()
+            },
+            body = self.body
+        )
+    }
+}

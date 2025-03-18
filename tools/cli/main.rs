@@ -33,6 +33,9 @@ enum Commands {
     Parse {
         /// Input µcad file
         input: String,
+        /// print parse tree
+        #[clap(short, long)]
+        tree: bool,
     },
 
     /// Parse and evaluate a µcad file
@@ -66,8 +69,11 @@ fn main() {
 
 fn run(cli: &Cli) -> anyhow::Result<()> {
     match &cli.command {
-        Commands::Parse { input } => {
-            parse(input)?;
+        Commands::Parse { input, tree } => {
+            let source_file = parse(input)?;
+            if *tree {
+                println!("{source_file}");
+            }
             eprintln!("Parsed successfully!");
         }
         /*

@@ -31,9 +31,7 @@ impl Parse for FormatSpec {
                 Rule::format_spec_precision => {
                     opt.precision = Some(pair.as_span().as_str()[1..].parse()?)
                 }
-                Rule::format_spec_leading_zeros => {
-                    opt.width = Some(pair.as_span().as_str()[1..].parse()?)
-                }
+                Rule::format_spec_width => opt.width = Some(pair.as_span().as_str()[1..].parse()?),
                 _ => unreachable!(),
             }
         }
@@ -41,5 +39,16 @@ impl Parse for FormatSpec {
         opt.src_ref = pair.into();
 
         Ok(opt)
+    }
+}
+
+impl std::fmt::Display for FormatSpec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match (self.width, self.precision) {
+            (Some(width), Some(precision)) => write!(f, "0{width}.{precision}"),
+            (None, Some(precision)) => write!(f, ".{precision}"),
+            (Some(width), None) => write!(f, "0{width}"),
+            _ => Ok(()),
+        }
     }
 }

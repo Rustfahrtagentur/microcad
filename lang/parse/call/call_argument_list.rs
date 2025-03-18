@@ -4,7 +4,7 @@
 //! Parse `call_argument_list` rule into CallArgumentList
 
 use crate::{
-    argument_map::*, eval::*, ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*, Id,
+    Id, argument_map::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*, r#type::Type,
 };
 
 /// List of call arguments
@@ -80,5 +80,20 @@ impl Parse for CallArgumentList {
                 unreachable!("CallArgumentList::parse expected call argument list, found {rule:?}")
             }
         }
+    }
+}
+
+impl std::fmt::Display for CallArgumentList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.0
+                .value
+                .iter()
+                .map(|p| p.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
     }
 }

@@ -128,11 +128,13 @@ impl Parse for SourceFile {
 /// We can get a source file by its hash
 impl GetSourceFileByHash for SourceFile {
     fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile> {
-        if self.hash == hash {
-            Some(self)
-        } else {
-            None
-        }
+        if self.hash == hash { Some(self) } else { None }
+    }
+}
+
+impl std::fmt::Display for SourceFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.body.iter().try_for_each(|s| writeln!(f, "{s}"))
     }
 }
 

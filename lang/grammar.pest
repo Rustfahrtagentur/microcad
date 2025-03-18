@@ -86,8 +86,8 @@ format_expression = { "{" ~ ws* ~ (format_spec ~ ws* ~ ":" )? ~ ws* ~ expression
 
 ///`05.5`: ok # Five leading zeros with 5 precision
 format_spec = { 
-  format_spec_leading_zeros ~ format_spec_precision | 
-  format_spec_leading_zeros | 
+  format_spec_width ~ format_spec_precision | 
+  format_spec_width | 
   format_spec_precision 
 }
 
@@ -95,7 +95,7 @@ format_spec = {
 format_spec_precision = { "." ~ int }
 
 //`05`: print with 5 leading zeros and precision = 0
-format_spec_leading_zeros = { "0" ~ int }
+format_spec_width = { "0" ~ int }
 
 //`true`: ok
 //`false`: ok

@@ -48,7 +48,7 @@ impl std::fmt::Display for Nested {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
-            " {}",
+            "{}",
             self.0
                 .iter()
                 .map(|item| item.to_string())

@@ -49,7 +49,7 @@ impl Parse for Call {
 
 impl std::fmt::Display for Call {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}({:?})", self.name, self.argument_list)
+        write!(f, "{}({})", self.name, self.argument_list)
     }
 }
 

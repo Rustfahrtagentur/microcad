@@ -10,7 +10,7 @@ use crate::{parse::*, parser::*, src_ref::*};
 #[derive(Clone, Debug)]
 pub struct FormatExpression {
     /// Format specifier
-    pub spec: FormatSpec,
+    pub spec: Option<FormatSpec>,
     /// Expression to format
     pub expression: Expression,
     /// Source code reference
@@ -19,9 +19,12 @@ pub struct FormatExpression {
 
 impl FormatExpression {
     /// Create new format expression
-    pub fn new(spec: FormatSpec, expression: Expression) -> Self {
+    pub fn new(spec: Option<FormatSpec>, expression: Expression) -> Self {
         Self {
-            src_ref: SrcRef::merge(spec.src_ref(), expression.src_ref()),
+            src_ref: match &spec {
+                Some(spec) => SrcRef::merge(spec.src_ref(), expression.src_ref()),
+                None => expression.src_ref(),
+            },
             spec,
             expression,
         }
@@ -31,14 +34,28 @@ impl FormatExpression {
 impl Parse for FormatExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self::new(
-            pair.find(Rule::format_spec).unwrap_or_default(),
+            pair.find(Rule::format_spec),
             pair.find(Rule::expression).expect("Missing expression"),
         ))
     }
 }
 
+impl std::fmt::Display for FormatExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if let Some(spec) = &self.spec {
+            write!(f, "{{{}:{}}}", spec, self.expression)
+        } else {
+            write!(f, "{{{}}}", self.expression)
+        }
+    }
+}
+
 impl SrcReferrer for FormatExpression {
     fn src_ref(&self) -> SrcRef {
-        SrcRef::merge(&self.spec, &self.expression)
+        if let Some(spec) = &self.spec {
+            SrcRef::merge(spec, &self.expression)
+        } else {
+            self.expression.src_ref()
+        }
     }
 }

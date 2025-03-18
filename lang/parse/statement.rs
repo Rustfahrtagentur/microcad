@@ -89,26 +89,26 @@ impl std::fmt::Display for Statement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Module(m) => {
-                write!(f, "{}", m.name)
+                write!(f, "{m}")
             }
             Self::Namespace(ns) => {
                 write!(f, "{}", ns.name)
             }
             Self::Function(_f) => {
                 todo!()
-                //write!(f, "{}", f.name)
+                //write!(f, "{}", f.name)<
             }
             Self::ModuleInit(mi) => {
                 write!(f, "{mi}")
             }
 
-            Self::Use(u) => write!(f, "{u}"),
-            Self::Return(r) => write!(f, "{r}"),
+            Self::Use(u) => write!(f, "{u};"),
+            Self::Return(r) => write!(f, "{r};"),
             Self::If(i) => write!(f, "{i}"),
-            Self::Marker(m) => write!(f, "{m}"),
+            Self::Marker(m) => write!(f, "{m};"),
 
-            Self::Assignment(a) => write!(f, "{a}"),
-            Self::Expression(e) => write!(f, "{e}"),
+            Self::Assignment(a) => write!(f, "{a};"),
+            Self::Expression(e) => write!(f, "{e};"),
         }
     }
 }

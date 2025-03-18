@@ -66,12 +66,14 @@ impl SrcReferrer for FormatString {
 
 impl std::fmt::Display for FormatString {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, r#"""#)?;
         for elem in &self.0 {
             match elem {
                 FormatStringInner::String(s) => write!(f, "{}", s.value)?,
-                FormatStringInner::FormatExpression(expr) => write!(f, "{:?}", expr)?,
+                FormatStringInner::FormatExpression(expr) => write!(f, "{}", expr)?,
             }
         }
+        write!(f, r#"""#)?;
         Ok(())
     }
 }
