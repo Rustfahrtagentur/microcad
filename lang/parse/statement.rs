@@ -53,7 +53,7 @@ impl SrcReferrer for Statement {
 
 impl Parse for Statement {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::module_definition);
+        Parser::ensure_rule(&pair, Rule::statement);
         let first = pair.inner().next().expect(INTERNAL_PARSE_ERROR);
         Ok(match first.as_rule() {
             Rule::module_definition => Self::Module(std::rc::Rc::<ModuleDefinition>::parse(first)?),

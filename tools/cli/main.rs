@@ -9,7 +9,7 @@ extern crate microcad_lang;
 use std::{io::Write, path::Path};
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{objects::*, parse::*};
+use microcad_lang::parse::*;
 
 /// µcad cli
 #[derive(Parser)]

@@ -43,7 +43,9 @@ impl Parse for Body {
         Parser::ensure_rule(&pair, Rule::body);
         let mut body = Self::default();
         for pair in pair.inner() {
-            body.statements.push(Statement::parse(pair.clone())?);
+            if pair.as_rule() == Rule::statement {
+                body.statements.push(Statement::parse(pair.clone())?)
+            }
         }
         body.src_ref = pair.into();
 
