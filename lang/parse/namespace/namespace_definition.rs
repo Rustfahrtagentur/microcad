@@ -3,7 +3,7 @@
 
 //! Namespace definition parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Namespace definition
 #[derive(Debug, Clone)]
@@ -11,7 +11,7 @@ pub struct NamespaceDefinition {
     /// Name of the namespace
     pub name: Identifier,
     /// Namespace body
-    pub body: NamespaceBody,
+    pub body: Body,
     /// Source code reference
     src_ref: SrcRef,
 }

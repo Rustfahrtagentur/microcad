@@ -3,7 +3,7 @@
 
 //! Tuple expression
 
-use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{parse::*, parser::*, r#type::*, src_ref::*};
 
 /// TODO: maybe CallArgumentList should be `ArgumentList` and get independent of module `call`?
 type ArgumentList = CallArgumentList;
@@ -81,66 +81,6 @@ impl std::fmt::Display for TupleExpression {
             write!(f, "{}", unit)?;
         }
         Ok(())
-    }
-}
-
-impl Eval for TupleExpression {
-    type Output = Value;
-
-    fn eval(&self, context: &mut EvalContext) -> crate::eval::EvalResult<Value> {
-        if self.is_named {
-            // Named tuple
-            let mut map = std::collections::BTreeMap::new();
-            for (ident, expr) in self
-                .args
-                .iter()
-                .map(|c| (c.name.clone().expect(INTERNAL_PARSE_ERROR), c.value.clone()))
-            {
-                let mut value = expr.clone().eval(context)?;
-                if let Some(unit) = self.unit {
-                    value.add_unit_to_unitless(unit)?;
-                }
-                map.insert(ident.clone(), value);
-            }
-
-            let (x, y, z) = (&"x".into(), &"y".into(), &"z".into());
-
-            use microcad_core::{Vec2, Vec3};
-
-            match (map.len(), map.values().all(|v| v.ty() == Type::Length)) {
-                // Special case for Vec2: if we have exactly two lengths with names "x" and "y", we can create a Vec2
-                (2, true) => {
-                    if let (Some(x), Some(y)) = (map.get(x), map.get(y)) {
-                        return Ok(Value::Vec2(Refer::new(
-                            Vec2::new(x.try_into()?, y.try_into()?),
-                            SrcRef::merge(x, y),
-                        )));
-                    }
-                }
-                // Special case for Vec3: if we have exactly three lengths with names "x", "y" and "z", we can create a Vec3
-                (3, true) => {
-                    if let (Some(x), Some(y), Some(z)) = (map.get(x), map.get(y), map.get(z)) {
-                        return Ok(Value::Vec3(Refer::new(
-                            Vec3::new(x.try_into()?, y.try_into()?, z.try_into()?),
-                            SrcRef::merge(x, z),
-                        )));
-                    }
-                }
-                _ => {}
-            }
-
-            Ok(Value::NamedTuple(NamedTuple::new(map, self.src_ref())))
-        } else {
-            // Unnamed tuple
-            let mut value_list = ValueList::new(Vec::new(), self.args.src_ref());
-            for arg in self.args.iter() {
-                value_list.push(arg.value.eval(context)?);
-            }
-            if let Some(unit) = self.unit {
-                value_list.add_unit_to_unitless(unit)?;
-            }
-            Ok(Value::UnnamedTuple(UnnamedTuple::new(value_list)))
-        }
     }
 }
 

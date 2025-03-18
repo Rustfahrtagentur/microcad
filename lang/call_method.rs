@@ -5,7 +5,7 @@
 
 use microcad_core::geo3d::Renderer;
 
-use crate::{eval::*, objects::*, parse::*, src_ref::*};
+use crate::{objects::*, parse::*, src_ref::*};
 
 /// Trait to call method of something.
 /// This for example used to call `vertices()` on a `Node`.

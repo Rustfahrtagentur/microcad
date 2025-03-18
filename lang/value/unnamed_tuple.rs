@@ -3,7 +3,7 @@
 
 //! Unnamed tuple evaluation entity
 
-use crate::{eval::*, parse::*, r#type::*, src_ref::*};
+use crate::{parse::*, r#type::*, src_ref::*, value::*};
 
 /// Unnamed tuple
 #[derive(Clone, Debug, PartialEq)]
@@ -21,9 +21,9 @@ impl UnnamedTuple {
         rhs: Self,
         op: char,
         f: impl Fn(Value, Value) -> ValueResult,
-    ) -> std::result::Result<Self, EvalError> {
+    ) -> std::result::Result<Self, ValueError> {
         if self.0.len() != rhs.0.len() {
-            return Err(EvalError::TupleLengthMismatchForOperator {
+            return Err(ValueError::TupleLengthMismatchForOperator {
                 operator: op,
                 lhs: self.0.len(),
                 rhs: rhs.0.len(),
@@ -68,7 +68,7 @@ impl std::fmt::Display for UnnamedTuple {
     }
 }
 
-impl Ty for UnnamedTuple {
+impl crate::ty::Ty for UnnamedTuple {
     fn ty(&self) -> Type {
         Type::UnnamedTuple(UnnamedTupleType(
             self.0.iter().map(|v| v.ty().clone()).collect(),
@@ -77,7 +77,7 @@ impl Ty for UnnamedTuple {
 }
 
 impl std::ops::Add for UnnamedTuple {
-    type Output = std::result::Result<UnnamedTuple, EvalError>;
+    type Output = std::result::Result<UnnamedTuple, ValueError>;
 
     fn add(self, rhs: Self) -> Self::Output {
         self.binary_op(rhs, '+', |lhs, rhs| lhs + rhs)
@@ -85,7 +85,7 @@ impl std::ops::Add for UnnamedTuple {
 }
 
 impl std::ops::Sub for UnnamedTuple {
-    type Output = std::result::Result<UnnamedTuple, EvalError>;
+    type Output = std::result::Result<UnnamedTuple, ValueError>;
 
     fn sub(self, rhs: Self) -> Self::Output {
         self.binary_op(rhs, '-', |lhs, rhs| lhs - rhs)

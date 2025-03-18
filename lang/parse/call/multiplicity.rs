@@ -3,8 +3,6 @@
 
 //! Parameter multiplicity implementation.
 
-use crate::sym::Id;
-
 use super::ArgumentMap;
 
 /// An enum to distinguish single-value and multi-value coefficients
@@ -134,7 +132,6 @@ impl Iterator for Combinations<crate::eval::Value> {
 
 #[test]
 fn call_parameter_multiplicity() {
-    use crate::eval::*;
     use crate::src_ref::Refer;
 
     let data = std::collections::HashMap::from([

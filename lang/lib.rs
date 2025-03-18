@@ -4,17 +4,22 @@
 //! µcad source code parser
 
 pub mod diag;
-pub mod eval;
 pub mod objects;
 pub mod ord_map;
 pub mod parse;
 pub mod parser;
 pub mod source_file_cache;
 pub mod src_ref;
-pub mod sym;
 pub mod r#type;
 
+pub mod argument_map;
+pub mod ty;
+pub mod value;
+
 use std::sync::Once;
+
+/// Id type (base of all identifiers)
+pub type Id = compact_str::CompactString;
 
 static INIT_EVENT_LOGGER: Once = Once::new();
 

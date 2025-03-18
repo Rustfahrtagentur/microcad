@@ -3,7 +3,7 @@
 
 //! Named tuple evaluation entity
 
-use crate::{eval::*, parse::*, r#type::*, src_ref::*};
+use crate::{r#type::*, src_ref::*, value::*};
 
 /// Short cut to create a NamedTuple
 #[cfg(test)]
@@ -60,7 +60,7 @@ impl std::fmt::Display for NamedTuple {
     }
 }
 
-impl Ty for NamedTuple {
+impl crate::ty::Ty for NamedTuple {
     fn ty(&self) -> Type {
         Type::NamedTuple(NamedTupleType(
             self.0

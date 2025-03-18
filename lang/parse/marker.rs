@@ -3,31 +3,31 @@
 
 //! Node marker parser entity
 
-use crate::{eval::*, objects::*, parse::*, parser::*, src_ref::*};
+use crate::{objects::*, parse::*, parser::*, src_ref::*};
 
 /// Node marker, e.g. `@children`
 #[derive(Clone, Debug)]
-pub struct NodeMarker {
+pub struct Marker {
     /// Marker name, e.g. `children`
     pub name: Identifier,
     /// Source code reference
     pub src_ref: SrcRef,
 }
 
-impl NodeMarker {
+impl Marker {
     /// Returns true if the marker is a children marker
     pub fn is_children_marker(&self) -> bool {
         &self.name == "children"
     }
 }
 
-impl SrcReferrer for NodeMarker {
+impl SrcReferrer for Marker {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         self.src_ref.clone()
     }
 }
 
-impl Parse for NodeMarker {
+impl Parse for Marker {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::node_marker);
         Ok(Self {
@@ -37,7 +37,7 @@ impl Parse for NodeMarker {
     }
 }
 
-impl Eval for NodeMarker {
+impl Eval for Marker {
     type Output = Option<ObjectNode>;
 
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
@@ -56,7 +56,7 @@ impl Eval for NodeMarker {
     }
 }
 
-impl std::fmt::Display for NodeMarker {
+impl std::fmt::Display for Marker {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "@{}", self.name)
     }

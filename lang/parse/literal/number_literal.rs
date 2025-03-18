@@ -3,7 +3,7 @@
 
 //! Number literal parser entity
 
-use crate::{eval::*, parse::*, parser::*, r#type::*};
+use crate::{parse::*, parser::*, r#type::*};
 use literal::*;
 
 /// Number literal

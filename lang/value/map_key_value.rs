@@ -3,7 +3,7 @@
 
 //! Map key type evaluation entity
 
-use crate::{eval::*, parse::*, src_ref::*};
+use crate::{src_ref::*, value::*};
 use microcad_core::Integer;
 
 /// A value type that can be used as a key in a map
@@ -31,14 +31,14 @@ impl MapKeyValue {
 }
 
 impl TryFrom<Value> for MapKeyValue {
-    type Error = EvalError;
+    type Error = ValueError;
 
     fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
         match value {
             Value::Integer(n) => Ok(MapKeyValue::Integer(n)),
             Value::Bool(b) => Ok(MapKeyValue::Bool(b)),
             Value::String(s) => Ok(MapKeyValue::String(s)),
-            value => Err(EvalError::InvalidMapKeyType(value.ty())),
+            value => Err(ValueError::InvalidMapKeyType(value.ty())),
         }
     }
 }

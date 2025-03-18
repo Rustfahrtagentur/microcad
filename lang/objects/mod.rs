@@ -12,7 +12,6 @@ pub use transform::*;
 
 use strum::IntoStaticStr;
 
-use crate::sym::*;
 use microcad_core::*;
 
 /// Inner of a node

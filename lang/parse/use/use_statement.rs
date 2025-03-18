@@ -3,7 +3,7 @@
 
 //! Use statement parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Use statement:
 ///
@@ -70,7 +70,6 @@ impl Eval for UseStatement {
                 for decl in &self.1 {
                     let mut symbol_table = decl.eval(context)?;
                     for (name, symbol) in symbol_table.iter() {
-                        use crate::sym::Symbols;
                         context.add_alias(symbol.as_ref().clone(), name.clone());
                     }
 
@@ -82,7 +81,6 @@ impl Eval for UseStatement {
                 for decl in &self.1 {
                     let symbol_table = decl.eval(context)?;
                     for (name, symbol) in symbol_table.iter() {
-                        use crate::sym::Symbols;
                         context.add_alias(symbol.as_ref().clone(), name.clone());
                     }
                 }

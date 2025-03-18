@@ -3,7 +3,7 @@
 
 //! Typed list of values evaluation entity
 
-use crate::{eval::*, r#type::*, src_ref::*};
+use crate::{r#type::*, src_ref::*, value::*};
 
 /// List of values of the same type
 #[derive(Clone, Debug)]
@@ -76,14 +76,14 @@ impl std::fmt::Display for List {
     }
 }
 
-impl Ty for List {
+impl crate::ty::Ty for List {
     fn ty(&self) -> Type {
         Type::List(crate::parse::ListType::new(self.ty.clone()))
     }
 }
 
 impl std::ops::Mul<Value> for List {
-    type Output = EvalResult<List>;
+    type Output = ValueResult;
 
     fn mul(self, rhs: Value) -> Self::Output {
         let mut values = Vec::new();
@@ -94,19 +94,19 @@ impl std::ops::Mul<Value> for List {
         match self.ty {
             // List * Scalar or List * Integer
             Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => {
-                Ok(List::new(
+                Ok(Value::List(List::new(
                     ValueList::new(values, self.src_ref.clone()),
                     rhs.ty().clone(),
                     self.src_ref.clone(),
-                ))
+                )))
             }
-            _ => Err(EvalError::InvalidOperator("*".into())),
+            _ => Err(ValueError::InvalidOperator("*".into())),
         }
     }
 }
 
 impl std::ops::Div<Value> for List {
-    type Output = EvalResult<List>;
+    type Output = ValueResult;
 
     fn div(self, rhs: Value) -> Self::Output {
         let mut values = Vec::new();
@@ -117,13 +117,13 @@ impl std::ops::Div<Value> for List {
         match self.ty {
             // List / Scalar or List / Integer
             Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => {
-                Ok(List::new(
+                Ok(Value::List(List::new(
                     ValueList::new(values, self.src_ref.clone()),
                     Type::Scalar,
                     self.src_ref.clone(),
-                ))
+                )))
             }
-            _ => Err(EvalError::InvalidOperator("/".into())),
+            _ => Err(ValueError::InvalidOperator("/".into())),
         }
     }
 }

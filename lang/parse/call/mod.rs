@@ -5,7 +5,6 @@
 
 mod call_argument;
 mod call_argument_list;
-mod call_method;
 mod method_call;
 mod multiplicity;
 
@@ -14,7 +13,7 @@ pub use call_argument_list::*;
 pub use method_call::*;
 pub use multiplicity::*;
 
-use crate::{eval::*, objects::ObjectNode, parse::*, parser::*, src_ref::*, sym::*};
+use crate::{objects::ObjectNode, parse::*, parser::*, src_ref::*};
 
 /// trait for calls of modules or functions with argument list
 pub trait CallTrait {

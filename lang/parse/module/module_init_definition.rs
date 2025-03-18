@@ -3,7 +3,7 @@
 
 //! Module initialization definition parser entity
 
-use crate::{eval::*, objects::*, parse::*, parser::*, src_ref::*, sym::*};
+use crate::{objects::*, parse::*, parser::*, src_ref::*};
 
 /// Module initialization definition
 ///
@@ -19,7 +19,7 @@ pub struct ModuleInitDefinition {
     /// Parameter list for this init definition
     pub parameters: ParameterList,
     /// Body if the init definition
-    pub body: NodeBody,
+    pub body: Body,
     /// Source reference
     pub src_ref: SrcRef,
 }

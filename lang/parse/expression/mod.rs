@@ -15,7 +15,7 @@ pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 lazy_static::lazy_static! {
     /// Expression parser
@@ -394,8 +394,6 @@ impl Parse for Expression {
 
 #[test]
 fn list_expression() {
-    use crate::eval::*;
-
     let mut context = EvalContext::default();
 
     // Simple list expression with 3 elements

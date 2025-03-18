@@ -3,7 +3,7 @@
 
 //! Parse `call_argument_list` rule into CallArgumentList
 
-use crate::{eval::*, ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*};
+use crate::{ord_map::*, parse::*, parser::*, r#type::Type, src_ref::*};
 
 /// List of call arguments
 #[derive(Clone, Debug, Default)]
@@ -46,18 +46,6 @@ impl CallArgumentList {
                 Ok(ArgumentMap::default())
             }
         }
-    }
-}
-
-impl Eval for CallArgumentList {
-    type Output = CallArgumentValueList;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        let mut args = CallArgumentValueList::default();
-        for arg in self.iter() {
-            args.push(arg.eval(context)?).expect("Duplicated argument");
-        }
-        Ok(args)
     }
 }
 

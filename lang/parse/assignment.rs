@@ -3,7 +3,7 @@
 
 //! µcad assignment parser entity
 
-use crate::{eval::*, parse::*, parser::*, r#type::*, src_ref::*, sym::*};
+use crate::{parse::*, parser::*, r#type::*, src_ref::*};
 
 /// Assignment specifying an identifier, type and value
 #[derive(Clone, Debug)]

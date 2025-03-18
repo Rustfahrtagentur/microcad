@@ -3,7 +3,7 @@
 
 //! Convert into value
 
-use crate::{eval::*, src_ref::*};
+use crate::{src_ref::*, value::*};
 
 /// Trait to convert something into a value, with an optional origin source reference
 pub trait IntoValue {

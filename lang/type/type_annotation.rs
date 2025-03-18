@@ -3,7 +3,7 @@
 
 //! µcad Basic Types
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 use super::Type;
 
@@ -23,7 +23,7 @@ impl std::fmt::Display for TypeAnnotation {
     }
 }
 
-impl Ty for TypeAnnotation {
+impl crate::ty::Ty for TypeAnnotation {
     fn ty(&self) -> Type {
         self.0.value.clone()
     }

@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, objects::*, parse::*, source_file_cache::*, sym::*};
+use crate::{diag::*, eval::*, objects::*, parse::*, source_file_cache::*};
 
 /// Context for evaluation
 ///
@@ -50,14 +50,6 @@ impl EvalContext {
     /// Note: This should not be an optional value, as the context is always created with a source file
     pub fn current_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
         self.current_source_file.clone()
-    }
-
-    /// Fetch symbols by qualified name
-    pub fn fetch_symbols_by_qualified_name(
-        &mut self,
-        name: &QualifiedName,
-    ) -> EvalResult<Vec<Symbol>> {
-        name.fetch_symbols(self)
     }
 
     /// Add source file to Context

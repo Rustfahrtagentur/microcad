@@ -15,8 +15,6 @@ impl Parse for NamedTupleType {
 
         let mut types = std::collections::BTreeMap::new();
 
-        use crate::eval::Ty;
-
         for pair in pair.inner() {
             let mut inner = pair.inner();
             let name = Identifier::parse(inner.next().expect("Identifier expected"))?;

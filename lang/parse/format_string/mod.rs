@@ -9,7 +9,7 @@ mod format_spec;
 pub use format_expression::*;
 pub use format_spec::*;
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Format string item
 #[derive(Clone, Debug)]

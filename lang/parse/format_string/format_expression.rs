@@ -3,7 +3,7 @@
 
 //! Format expression parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Format expression including format specification
 #[allow(dead_code)]

@@ -222,13 +222,13 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 //`translate() rotate()`: ok
 //`translate() rotate() { translate() rotate() {} }`: ok
 //`rotate() {}`: ok
-//`{}`: ok # Empty block
+//`{}`: ok # Empty body
 //`{ translate() rotate(); }`: ok
-//`{} {}`: error # Cannot nest module bodies
+//`{} {}`: error # Cannot nest bodies
 //`holes.edges`: error # No tuple access in nested module
-nested = { nested_with_node_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
+nested = { nested_with_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
 
-nested_with_node_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ node_body }
+nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ body }
 
 //`-5.0mm`: ok # Negate
 //`(a+b)*(c-a)`: ok 
@@ -257,8 +257,8 @@ nested_with_node_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_n
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); }`: ok
 //`translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
 //`translate(r = 5.0mm) circle(r = 5.0mm)`: ok
-//`{}`: ok # Empty block
-//`{ rectangle(width = 5.0mm); }`: ok # Single statement block
+//`{}`: ok # Empty body
+//`{ rectangle(width = 5.0mm); }`: ok # Single statement body
 //`translate(x = 5mm)`: ok
 //`ring_array(30mm, 8, {circle(5mm)})`: ok # Pass a module as function parameter
 //`[hole_positions.bottom]`: ok # List access with tuple access
@@ -299,11 +299,11 @@ primary          =  _{ literal | nested | format_string | "(" ~ ws* ~ expression
 //`,,`: error # No expression 
 expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
-// A nested expression that does end with a module body
-//`a {}`: ok # Module body at the end
-//`b c`: error # No module body at the end
-//`a b()`: error # No module body at the end
-expression_no_semicolon = { nested_with_node_body }
+// A nested expression that does end with a body
+//`a {}`: ok # Body at the end
+//`b c`: error # No body at the end
+//`a b()`: error # No body at the end
+expression_no_semicolon = { nested_with_body }
 
 // A statement that is an single expression
 expression_statement = _{ expression_no_semicolon ~ (ws* ~ ";")? | expression ~ ws* ~ ";" }
@@ -354,7 +354,6 @@ tag = { "#" ~ qualified_name ~ call_op? }
 
 tag_list = _{ tag ~ (ws+ ~ tag)* }
 
-
 //`r: Length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
 //`r: Length`: error # Default value is required
@@ -365,24 +364,7 @@ assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expressio
 assignment_statement = _{ assignment ~ ws* ~ ";" }
 
 //`@children`: ok
-node_marker = { "@" ~ identifier }
-
-//`{ a() }`: ok # Single expression
-//`{ a() b(); c(); }: ok # Nested multiexpression
-node_body = { "{" ~ ws* ~ node_body_inner? ~ ws* ~ "}" }
-
-node_body_inner = _{ 
-  ws* ~ (node_body_statement ~ ws*)+ |
-  ws* ~ (node_body_statement ~ ws*)* ~ expression 
-}
-
-node_body_statement = { 
-  node_marker |
-  use_statement | 
-  assignment_statement | 
-  expression_statement |
-  module_for_statement
-}
+marker_statement = { "@" ~ identifier }
 
 // Rule for a single parameter of a definition
 //`r: Length = 5.0mm`: ok
@@ -413,24 +395,16 @@ function_signature = { parameter_list ~ (ws* ~ "->" ~ ws* ~ type)? }
 //`function test(a: scalar, b: scalar) -> scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
 //`function weight(density: density = 20g/1mm^3) -> weight {}` ok # Function with default value
 //`function bar(a: scalar) -> scalar { a }`: ok # Function with no return type
-function_definition = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ function_body }
-
-function_body = { "{" ~ ((ws* ~ function_statement)+ | ws* ~ expression)? ~ ws* ~ "}" }
-
-function_statement = { 
-  assignment_statement | 
-  use_statement | 
-  function_definition | 
-  function_return_statement | 
-  function_if_statement 
-}
+function_definition = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ body }
 
 //`return 5.0mm;`: ok
-function_return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
+return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 
 //`if a > 5.0mm { return 5.0mm; }`: ok
 //`if a > 5.0mm { return 5.0mm; } else { return 4.0mm; }`: ok
-function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ ("else" ~ ws* ~ function_body)? }
+if_statement = { "if" ~ ws* ~ expression ~ ws* ~ body ~ ws* ~ ("else" ~ ws* ~ body_else)? }
+
+body_else = { body }
 
 //`module foo() { }`: ok # Module with no arguments
 //`module foo(a: scalar) { }`: ok # Module with arguments
@@ -442,67 +416,36 @@ function_if_statement = { "if" ~ ws* ~ expression ~ ws* ~ function_body ~ ws* ~ 
 //`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function
 //`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
 //`module donut(radius) { }`: error # Module must have type annotations
-module_definition = { (tag_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ module_definition_body }
+module_definition = { "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ body }
 
 //`{ translate() rotate(); }`: ok
-//`{ translate() }`: ok # Single expression block (no semicolon)
-//`{}`: ok # Empty block
-module_definition_body = { "{" ~ ws* ~ module_definition_inner? ~ ws* ~ "}" }
-
-module_definition_inner = _{ 
-  ws* ~ (module_definition_statement ~ ws*)+ | 
-  ws* ~ (module_definition_statement ~ ws*)* ~ (function_definition | expression) 
-}
-
-module_definition_statement = { 
-  use_statement |
-  module_definition |
-  function_definition |
-  module_init_definition |
-  module_for_statement |
-  assignment_statement |
-  expression_statement
-}
-
-
+//`{}`: ok # Empty body
+body = { "{" ~ ws* ~ (statement ~ ws*)* ~ "}" }
 
 //`init(d: Length) { r = d / 2; }`: ok
 //`init(size: Length) { size = size; }`: ok
 //`init(size: Length) { rectangle(size); }: ok
-module_init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ node_body }
-
-//`for i in [0..10] { translate(x = i*5mm); }`: ok
-module_for_statement = { "for" ~ ws* ~ identifier ~ ws* ~ "in" ~ ws* ~ expression ~ ws* ~ node_body }
-
+module_init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 
 //`namespace math { }`: ok # namespace (like module with no arguments)
 //`namespace math { function pi() -> scalar { return 3.14159; } }`: ok # namespace with function
-namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ namespace_body }
+namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ body }
 
-namespace_body = { "{" ~ ws* ~ namespace_inner? ~ ws* ~ "}" }
-
-namespace_inner = _{ ws* ~ (namespace_statement ~ ws*)+ }
-
-namespace_statement = { 
-  use_statement | 
+statement = {
   module_definition | 
   namespace_definition | 
-  function_definition | 
-  assignment_statement 
-}
+  function_definition |
+  module_init_definition |
 
-source_file_statement = { 
-  use_statement | 
-  module_definition | 
-  namespace_definition | 
-  function_definition | 
-  assignment_statement |
-  module_for_statement |
+  use_statement |
+  return_statement | 
+  if_statement |
+  marker_statement | 
+
+  assignment_statement | 
   expression_statement
 }
 
-source_file_inner = _{ ws* ~ (source_file_statement ~ ws*)+ }
-
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 //`module foo { init(size: Length) { rectangle(size); } }`: ok # Module with init function
-source_file = { SOI ~ ws* ~ source_file_inner? ~ ws* ~ EOI }
+source_file = { SOI ~ ws* ~ (statement ~ ws*)* ~ EOI }

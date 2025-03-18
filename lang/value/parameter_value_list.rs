@@ -3,7 +3,7 @@
 
 //! Parameter value list evaluation entity
 
-use crate::{eval::*, src_ref::*};
+use crate::{src_ref::*, value::*, Id};
 
 /// List of parameter values
 #[derive(Clone, Debug, Default)]
@@ -33,9 +33,9 @@ impl ParameterValueList {
     }
 
     /// Push parameter value
-    pub fn push(&mut self, parameter: ParameterValue) -> std::result::Result<(), EvalError> {
+    pub fn push(&mut self, parameter: ParameterValue) -> std::result::Result<(), ValueError> {
         if self.by_name.contains_key(&parameter.name) {
-            return Err(EvalError::DuplicateParameter(parameter.name.clone()));
+            return Err(ValueError::DuplicateParameter(parameter.name.clone()));
         }
 
         self.by_name
@@ -73,9 +73,9 @@ impl ParameterValueList {
     /// Check for missing arguments.
     ///
     /// Checks if parameter value list is not empty and wraps the list into an error
-    pub fn check_for_missing_arguments(self) -> EvalResult<()> {
+    pub fn check_for_missing_arguments(self) -> Result<(), ValueError> {
         if !self.is_empty() {
-            Err(EvalError::MissingArguments(self))
+            Err(ValueError::MissingArguments(self))
         } else {
             Ok(())
         }

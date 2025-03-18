@@ -3,12 +3,12 @@
 
 //! Function definition parser entity
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*, sym::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Function definition
 #[derive(Debug)]
 pub struct FunctionDefinition {
-    /// NAme of the function
+    /// Name of the function
     pub name: Identifier,
     /// Function signature
     pub signature: FunctionSignature,
@@ -78,14 +78,5 @@ impl Parse for std::rc::Rc<FunctionDefinition> {
             body,
             src_ref: pair.clone().into(),
         }))
-    }
-}
-
-impl Eval for std::rc::Rc<FunctionDefinition> {
-    type Output = Symbol;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
-        context.add(self.clone().into());
-        Ok(Symbol::Function(self.clone()))
     }
 }

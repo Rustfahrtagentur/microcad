@@ -3,9 +3,9 @@
 
 //! Map type evaluation entity
 
-use value::{SrcRef, SrcReferrer};
+use crate::value::{SrcRef, SrcReferrer};
 
-use crate::{eval::*, parse::*, r#type::*};
+use crate::{parse::*, r#type::*, value::*};
 
 /// Map evaluation entity
 #[derive(Debug, Clone, PartialEq)]
@@ -32,7 +32,7 @@ impl From<Map> for std::collections::HashMap<MapKeyValue, Value> {
     }
 }
 
-impl Ty for Map {
+impl crate::ty::Ty for Map {
     fn ty(&self) -> Type {
         self.ty.clone()
     }

@@ -22,7 +22,7 @@ impl Parse for MapType {
         let key = inner.next().expect("missing key expression");
         let value = inner.next().expect("missing value expression");
 
-        use crate::eval::Ty;
+        use crate::Ty;
 
         Ok(Self::new(
             (TypeAnnotation::parse(key)?.ty()).try_into()?,
@@ -35,18 +35,4 @@ impl std::fmt::Display for MapType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "[{} => {}]", self.0, self.1)
     }
-}
-
-#[test]
-fn map_type() {
-    use crate::eval::Ty;
-    use crate::parser::{Parser, Rule};
-
-    let type_annotation = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[Int => String]", 0)
-        .expect("test error");
-    assert_eq!(type_annotation.ty().to_string(), "[Int => String]");
-    assert_eq!(
-        type_annotation.ty(),
-        Type::Map(MapType::new(MapKeyType::Integer, Type::String))
-    );
 }

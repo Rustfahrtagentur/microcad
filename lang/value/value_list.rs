@@ -3,7 +3,7 @@
 
 //! Value list evaluation entity
 
-use crate::{eval::*, parse::*, r#type::*, src_ref::*};
+use crate::{parse::*, r#type::*, src_ref::*, value::*};
 
 /// List of values
 #[derive(Clone, Debug, Default)]
@@ -16,7 +16,7 @@ impl ValueList {
     }
 
     /// add unit to values of primitive types (Scalar or Integer)
-    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), EvalError> {
+    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
         self.0
             .iter_mut()
             .try_for_each(|value| value.add_unit_to_unitless(unit))

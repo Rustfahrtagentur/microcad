@@ -3,7 +3,7 @@
 
 //! Method call
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Method call
 #[derive(Clone, Debug)]

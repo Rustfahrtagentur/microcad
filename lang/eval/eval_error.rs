@@ -7,7 +7,6 @@ use crate::{
     eval::*,
     parse::{Identifier, QualifiedName},
     r#type::*,
-    sym::*,
 };
 use thiserror::Error;
 
@@ -150,10 +149,6 @@ pub enum EvalError {
     #[error("Cannot nest item: {0:#?}")]
     CannotNestItem(crate::parse::NestedItem),
 
-    /// Missing arguments
-    #[error("Missing arguments: {0:?}")]
-    MissingArguments(ParameterValueList),
-
     /// Parameter missing type or value
     #[error("Parameter missing type or value: {0}")]
     ParameterMissingTypeOrValue(Id),
@@ -165,10 +160,6 @@ pub enum EvalError {
     /// Duplicate call argument
     #[error("Duplicate call argument: {0}")]
     DuplicateCallArgument(Id),
-
-    /// Duplicate parameter
-    #[error("Duplicate parameter: {0}")]
-    DuplicateParameter(Id),
 
     /// Assertion failed
     #[error("Assertion failed: {0}")]
@@ -186,40 +177,9 @@ pub enum EvalError {
     #[error("Unknown field: {0}")]
     UnknownField(Identifier),
 
-    /// Tuple length mismatch
-    #[error("Tuple length mismatch for operator {operator}: lhs={lhs}, rhs={rhs}")]
-    TupleLengthMismatchForOperator {
-        /// Operator
-        operator: char,
-        /// Left hand operand
-        lhs: usize,
-        /// Right hand operand
-        rhs: usize,
-    },
-
-    /// Type cannot be a key in a map
-    #[error("Type cannot be a key in a map: {0}")]
-    InvalidMapKeyType(Type),
-
     /// Invalid node marker
     #[error("Invalid node marker: {0}")]
     InvalidNodeMarker(Identifier),
-
-    /// Cannot convert value
-    #[error("Cannot convert value {0} to {1}")]
-    CannotConvert(Value, String),
-
-    /// Cannot convert value into boolean
-    #[error("Cannot convert value into boolean: {0}")]
-    CannotConvertToBool(Value),
-
-    /// Cannot add unit to a value that has already a unit
-    #[error("Cannot add unit to a value that has already a unit: {0}")]
-    CannotAddUnitToValueWithUnit(Value),
-
-    /// Cannot concat two vec with different types
-    #[error("Cannot concat two vec with different types {0} and {1}")]
-    CannotCombineVecOfDifferentType(Type, Type),
 
     /// Symbol is not callable
     #[error("Symbol is not callable: {0}")]

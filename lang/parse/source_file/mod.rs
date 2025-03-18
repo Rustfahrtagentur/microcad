@@ -3,13 +3,9 @@
 
 //! µcad source file representation
 
-mod statement;
-
-pub use statement::*;
-
 use std::io::Read;
 
-use crate::{eval::*, objects, parse::*, parser::*, src_ref::*, sym::*};
+use crate::{objects, parse::*, parser::*, src_ref::*};
 
 /// Trait to get a source file by its hash
 pub trait GetSourceFileByHash {
@@ -35,7 +31,7 @@ pub trait GetSourceFileByHash {
 #[derive(Clone, Debug)]
 pub struct SourceFile {
     /// Root code body
-    pub body: Vec<Statement>,
+    pub body: Vec<SourceStatement>,
     /// Name of loaded file or `None`
     pub filename: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
@@ -118,20 +114,20 @@ impl SourceFile {
         context.scope(stack_frame, |context| {
             for statement in &self.body {
                 match statement {
-                    Statement::Assignment(a) => {
+                    SourceStatement::Assignment(a) => {
                         namespace.add(Symbol::Value(a.name.id().clone(), a.value.eval(context)?));
                     }
-                    Statement::FunctionDefinition(f) => {
+                    SourceStatement::FunctionDefinition(f) => {
                         namespace.add(f.clone().into());
                     }
-                    Statement::ModuleDefinition(m) => {
+                    SourceStatement::ModuleDefinition(m) => {
                         namespace.add(m.clone().into());
                     }
-                    Statement::NamespaceDefinition(n) => {
+                    SourceStatement::NamespaceDefinition(n) => {
                         let n = n.eval(context)?;
                         namespace.add(n);
                     }
-                    Statement::Use(u) => {
+                    SourceStatement::Use(u) => {
                         if let Some(symbols) = u.eval(context)? {
                             for (id, symbol) in symbols.iter() {
                                 namespace.add_alias(symbol.as_ref().clone(), id.clone());
@@ -161,7 +157,7 @@ impl Parse for SourceFile {
         for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::source_file_statement => {
-                    body.push(Statement::parse(pair)?);
+                    body.push(SourceStatement::parse(pair)?);
                 }
                 Rule::EOI => break,
                 _ => {}
@@ -184,7 +180,7 @@ impl Eval for SourceFile {
         let group = objects::group();
         for statement in &self.body {
             match statement {
-                Statement::Expression(expression) => {
+                SourceStatement::Expression(expression) => {
                     // This statement has been evaluated into a new child node.
                     // Add it to our `new_nodes` list
                     if let Value::Node(node) = expression.eval(context)? {
@@ -244,7 +240,7 @@ fn load_source_file() {
 
     let first_statement = source_file.body.first().expect("test error");
     match first_statement {
-        Statement::Use(u) => {
+        SourceStatement::Use(u) => {
             use crate::src_ref::SrcReferrer;
             assert_eq!(
                 u.src_ref().source_slice(&source_file.source),

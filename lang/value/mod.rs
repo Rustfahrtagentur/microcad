@@ -8,7 +8,10 @@ mod list;
 mod map;
 mod map_key_value;
 mod named_tuple;
+mod parameter_value;
+mod parameter_value_list;
 mod unnamed_tuple;
+mod value_error;
 mod value_list;
 
 pub use into_value::IntoValue;
@@ -16,15 +19,18 @@ pub use list::*;
 pub use map::*;
 pub use map_key_value::*;
 pub use named_tuple::*;
+pub use parameter_value::*;
+pub use parameter_value_list::*;
 pub use unnamed_tuple::*;
+pub use value_error::*;
 pub use value_list::*;
 
 use crate::objects::ObjectNode;
-use crate::{eval::*, parse::*, r#type::*, src_ref::*};
+use crate::{parse::*, r#type::*, src_ref::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
 
-pub(crate) type ValueResult = std::result::Result<Value, EvalError>;
+pub(crate) type ValueResult = std::result::Result<Value, ValueError>;
 
 /// A variant value
 #[derive(Clone, Debug, PartialEq)]
@@ -71,7 +77,7 @@ pub enum Value {
 
 impl Value {
     /// Add a unit to a primitive value (Scalar or Integer)
-    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), EvalError> {
+    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
         match (self.clone(), unit.ty()) {
             (Value::Integer(i), Type::Length) => {
                 *self = Value::Length(Refer::new(unit.normalize(*i as Scalar), i.src_ref))
@@ -85,7 +91,7 @@ impl Value {
             (Value::Scalar(s), Type::Angle) => {
                 *self = Value::Angle(Refer::new(unit.normalize(*s), s.src_ref))
             }
-            (value, _) => return Err(EvalError::CannotAddUnitToValueWithUnit(value.clone())),
+            (value, _) => return Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
         }
         Ok(())
     }
@@ -168,7 +174,7 @@ impl PartialOrd for Value {
     }
 }
 
-impl Ty for Value {
+impl crate::ty::Ty for Value {
     fn ty(&self) -> Type {
         match self {
             Value::Invalid => Type::Invalid,
@@ -205,7 +211,7 @@ impl std::ops::Neg for Value {
             Value::Vec2(v) => Ok(Value::Vec2(-v.clone())),
             Value::Vec3(v) => Ok(Value::Vec3(-v.clone())),
             Value::Angle(n) => Ok(Value::Angle(-n.clone())),
-            _ => Err(EvalError::InvalidOperator("-".into())),
+            _ => Err(ValueError::InvalidOperator("-".into())),
         }
     }
 }
@@ -247,7 +253,7 @@ impl std::ops::Add for Value {
             // Concatenate two lists
             (Value::List(lhs), Value::List(rhs)) => {
                 if lhs.ty() != rhs.ty() {
-                    return Err(EvalError::CannotCombineVecOfDifferentType(
+                    return Err(ValueError::CannotCombineVecOfDifferentType(
                         lhs.ty(),
                         rhs.ty(),
                     ));
@@ -263,7 +269,7 @@ impl std::ops::Add for Value {
             (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
                 Ok(Value::UnnamedTuple((lhs + rhs)?))
             }
-            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} + {rhs}"))),
+            (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} + {rhs}"))),
         }
     }
 }
@@ -304,7 +310,7 @@ impl std::ops::Sub for Value {
                     lhs.retain(|x| !rhs.contains(x));
                     Ok(Value::List(lhs))
                 } else {
-                    Err(EvalError::CannotCombineVecOfDifferentType(
+                    Err(ValueError::CannotCombineVecOfDifferentType(
                         lhs.ty(),
                         rhs.ty(),
                     ))
@@ -321,7 +327,7 @@ impl std::ops::Sub for Value {
                     rhs,
                 )))
             }
-            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} - {rhs}"))),
+            (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} - {rhs}"))),
         }
     }
 }
@@ -395,7 +401,7 @@ impl std::ops::Mul for Value {
             (Value::List(list), value) | (value, Value::List(list)) => {
                 Ok(Value::List((list * value)?))
             }
-            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} * {rhs}"))),
+            (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
     }
 }
@@ -436,7 +442,7 @@ impl std::ops::Div for Value {
                 Ok(Value::Angle(Refer::merge(lhs, rhs, |l, r| l / r as Scalar)))
             }
             (Value::List(list), value) => Ok(Value::List((list / value)?)),
-            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} / {rhs}"))),
+            (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} / {rhs}"))),
         }
     }
 }
@@ -450,7 +456,7 @@ impl std::ops::BitOr for Value {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
                 crate::objects::algorithm::binary_op(BooleanOp::Union, lhs, rhs),
             )),
-            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} | {rhs}"))),
+            (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} | {rhs}"))),
         }
     }
 }
@@ -464,7 +470,7 @@ impl std::ops::BitAnd for Value {
             (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
                 crate::objects::algorithm::binary_op(BooleanOp::Intersection, lhs, rhs),
             )),
-            (lhs, rhs) => Err(EvalError::InvalidOperator(format!("{lhs} & {rhs}"))),
+            (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} & {rhs}"))),
         }
     }
 }
@@ -500,23 +506,23 @@ impl std::fmt::Display for Value {
 macro_rules! impl_try_from {
     ($($variant:ident),+ => $ty:ty ) => {
         impl TryFrom<Value> for $ty {
-            type Error = EvalError;
+            type Error = ValueError;
 
             fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
                 match value {
                     $(Value::$variant(v) => Ok(v.value.into()),)*
-                    value => Err(EvalError::CannotConvert(value, stringify!($ty).into())),
+                    value => Err(ValueError::CannotConvert(value, stringify!($ty).into())),
                 }
             }
         }
 
         impl TryFrom<&Value> for $ty {
-            type Error = EvalError;
+            type Error = ValueError;
 
             fn try_from(value: &Value) -> std::result::Result<Self, Self::Error> {
                 match value {
                     $(Value::$variant(v) => Ok(v.value.clone().into()),)*
-                    value => Err(EvalError::CannotConvert(value.clone(), stringify!($ty).into())),
+                    value => Err(ValueError::CannotConvert(value.clone(), stringify!($ty).into())),
                 }
             }
         }

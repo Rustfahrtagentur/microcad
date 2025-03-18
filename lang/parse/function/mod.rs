@@ -3,19 +3,15 @@
 
 //! µcad function parser entities
 
-mod function_body;
 mod function_definition;
 mod function_signature;
-mod function_statement;
 
-pub use function_body::*;
 pub use function_definition::*;
 pub use function_signature::*;
-pub use function_statement::*;
 
 #[test]
 fn assignment() {
-    use crate::{eval::*, parse::*, parser::*, sym::*};
+    use crate::{parse::*, parser::*};
 
     let assignment =
         Parser::parse_rule::<Assignment>(Rule::assignment, "a = 1", 0).expect("test error");
@@ -47,7 +43,7 @@ fn assignment() {
 
 #[test]
 fn function_signature() {
-    use crate::eval::Ty;
+    use crate::Ty;
     use crate::{parser::*, r#type::Type};
 
     let input = "(a: Scalar, b: Scalar) -> Scalar";
@@ -73,28 +69,4 @@ fn function_definition() {
         }";
     Parser::parse_rule::<std::rc::Rc<FunctionDefinition>>(Rule::function_definition, input, 0)
         .expect("test error");
-}
-
-#[test]
-fn function_evaluate() {
-    use crate::{eval::*, parse::*, parser::*, sym::*};
-
-    let input = r#"
-        function test(a: Scalar, b: Scalar) -> Scalar {
-            c = 1.0;
-            return a + b + c;
-        }"#;
-
-    let function_def =
-        Parser::parse_rule::<std::rc::Rc<FunctionDefinition>>(Rule::function_definition, input, 0)
-            .expect("test error");
-
-    let mut context = EvalContext::default();
-    context.add(function_def.into());
-
-    let input = "test(a = 1.0, b = 2.0)";
-    let expr = Parser::parse_rule::<Expression>(Rule::expression, input, 0).expect("test error");
-
-    let value = expr.eval(&mut context).expect("test error");
-    assert_eq!(value.to_string(), "4");
 }
