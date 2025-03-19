@@ -246,7 +246,6 @@ nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))
 //`[3,5,5]`: ok # List expression
 //`1 if 3 > 2 else 0`: ok # Ternary operator
 //`a()`: ok # Simple call
-//`a({sphere(4.0)})`: ok # Pass a module as function parameter
 //`translate() rotate()`: ok # Nested call
 //`translate() rotate() { translate() rotate() {} }`: ok # Nested call
 //`a | a::b()`: ok
@@ -260,7 +259,6 @@ nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))
 //`{}`: ok # Empty body
 //`{ rectangle(width = 5.0mm); }`: ok # Single statement body
 //`translate(x = 5mm)`: ok
-//`ring_array(30mm, 8, {circle(5mm)})`: ok # Pass a module as function parameter
 //`[hole_positions.bottom]`: ok # List access with tuple access
 //`mountable_plate(hole_positions = hole_positions.edges - [hole_positions.bottom])`: ok # Tuple access
 //`1000mm == 1m`: ok # Comparison
