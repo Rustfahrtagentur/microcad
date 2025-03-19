@@ -62,8 +62,19 @@ impl std::fmt::Display for ListExpression {
             } else {
                 String::new()
             }
-        )?;
+        )
+    }
+}
 
-        Ok(())
+impl Syntax for ListExpression {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        if let Some(unit) = self.unit {
+            writeln!(f, "{:depth$}ListExpression {unit}", "")?
+        } else {
+            writeln!(f, "{:depth$}ListExpression", "")?
+        }
+        self.list
+            .iter()
+            .try_for_each(|e| e.print_syntax(f, depth + 1))
     }
 }

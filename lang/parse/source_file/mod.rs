@@ -138,6 +138,15 @@ impl std::fmt::Display for SourceFile {
     }
 }
 
+impl Syntax for SourceFile {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}SourceFile '{}'", "", self.filename_as_str())?;
+        self.body
+            .iter()
+            .try_for_each(|s| s.print_syntax(f, depth + 1))
+    }
+}
+
 #[test]
 fn parse_source_file() {
     let source_file = Parser::parse_rule::<SourceFile>(

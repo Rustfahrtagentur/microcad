@@ -57,3 +57,12 @@ impl std::fmt::Display for Nested {
         )
     }
 }
+
+impl Syntax for Nested {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}Nested:", "")?;
+        self.0
+            .iter()
+            .try_for_each(|ni| ni.print_syntax(f, depth + 1))
+    }
+}

@@ -5,7 +5,7 @@
 
 mod parameter_list;
 
-use crate::{ord_map::OrdMapValue, parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{ord_map::OrdMapValue, parse::*, parser::*, src_ref::*, r#type::*};
 
 pub use parameter_list::*;
 
@@ -62,6 +62,13 @@ impl std::fmt::Display for Parameter {
     }
 }
 
+impl Syntax for Parameter {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}Parameter '{}'", "", self.name)
+    }
+}
+
+/// Short cut to create a `ParameterList` instance
 impl Parse for Parameter {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut name = Identifier::default();

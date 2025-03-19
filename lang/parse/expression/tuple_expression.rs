@@ -83,3 +83,9 @@ impl std::fmt::Display for TupleExpression {
         Ok(())
     }
 }
+
+impl Syntax for TupleExpression {
+    fn print_syntax(&self, _f: &mut std::fmt::Formatter, _depth: usize) -> std::fmt::Result {
+        todo!()
+    }
+}

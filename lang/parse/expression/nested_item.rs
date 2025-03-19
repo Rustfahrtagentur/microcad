@@ -49,3 +49,14 @@ impl std::fmt::Display for NestedItem {
         }
     }
 }
+
+impl Syntax for NestedItem {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}NestedItem:", "")?;
+        match self {
+            Self::Call(call) => call.print_syntax(f, depth + 1),
+            Self::QualifiedName(qualified_name) => qualified_name.print_syntax(f, depth + 1),
+            Self::Body(body) => body.print_syntax(f, depth + 1),
+        }
+    }
+}

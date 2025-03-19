@@ -147,6 +147,58 @@ impl std::fmt::Display for Expression {
     }
 }
 
+impl Syntax for Expression {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        match self {
+            Self::Literal(literal) => literal.print_syntax(f, depth + 1),
+            Self::FormatString(format_string) => format_string.print_syntax(f, depth + 1),
+            Self::ListExpression(list_expression) => list_expression.print_syntax(f, depth + 1),
+            Self::TupleExpression(tuple_expression) => tuple_expression.print_syntax(f, depth + 1),
+            Self::BinaryOp {
+                lhs,
+                op,
+                rhs,
+                src_ref: _,
+            } => {
+                writeln!(f, "{:depth$}BinaryOp '{op}'", "")?;
+                lhs.print_syntax(f, depth + 1)?;
+                rhs.print_syntax(f, depth + 1)
+            }
+            Self::UnaryOp {
+                op,
+                rhs,
+                src_ref: _,
+            } => {
+                writeln!(f, "{:depth$}UnaryOp '{op}':", "")?;
+                rhs.print_syntax(f, depth + 1)
+            }
+            Self::ListElementAccess(lhs, rhs, _) => {
+                writeln!(f, "{:depth$}ListElementAccess:", "")?;
+                lhs.print_syntax(f, depth + 1)?;
+                rhs.print_syntax(f, depth + 1)
+            }
+            Self::NamedTupleElementAccess(lhs, rhs, _) => {
+                writeln!(f, "{:depth$}NamedTupleElementAccess:", "")?;
+                lhs.print_syntax(f, depth + 1)?;
+                rhs.print_syntax(f, depth + 1)
+            }
+            Self::UnnamedTupleElementAccess(lhs, rhs, _) => {
+                writeln!(f, "{:depth$}UnnamedTupleElementAccess:", "")?;
+                lhs.print_syntax(f, depth + 1)?;
+                let depth = depth + 1;
+                writeln!(f, "{:depth$}{rhs}", "")
+            }
+            Self::MethodCall(lhs, method_call, _) => {
+                writeln!(f, "{:depth$}MethodCall:", "")?;
+                lhs.print_syntax(f, depth + 1)?;
+                method_call.print_syntax(f, depth + 1)
+            }
+            Self::Nested(nested) => nested.print_syntax(f, depth + 1),
+            _ => unimplemented!(),
+        }
+    }
+}
+
 impl Expression {
     /// Generate literal from string
     pub fn literal_from_str(s: &str) -> ParseResult<Self> {

@@ -72,3 +72,9 @@ impl Parse for TypeAnnotation {
         Ok(s)
     }
 }
+
+impl Syntax for TypeAnnotation {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}  TypeAnnotation: {}", "", self.0.value)
+    }
+}

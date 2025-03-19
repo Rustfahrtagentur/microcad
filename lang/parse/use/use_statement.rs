@@ -12,21 +12,25 @@ use crate::{parse::*, parser::*, src_ref::*};
 /// use std::*;
 /// ```
 #[derive(Clone, Debug)]
-pub struct UseStatement(Visibility, Vec<UseDeclaration>, SrcRef);
+pub struct UseStatement {
+    visibility: Visibility,
+    decls: Vec<UseDeclaration>,
+    src_ref: SrcRef,
+}
 
 impl SrcReferrer for UseStatement {
     fn src_ref(&self) -> SrcRef {
-        self.2.clone()
+        self.src_ref.clone()
     }
 }
 
 impl std::fmt::Display for UseStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match &self.0 {
+        match &self.visibility {
             Visibility::Private => write!(f, "use ")?,
             Visibility::Public => write!(f, "pub use ")?,
         }
-        for (i, decl) in self.1.iter().enumerate() {
+        for (i, decl) in self.decls.iter().enumerate() {
             if i > 0 {
                 write!(f, ", ")?;
             }
@@ -55,6 +59,19 @@ impl Parse for UseStatement {
             }
         }
 
-        Ok(Self(visibility, decls, pair.into()))
+        Ok(Self {
+            visibility,
+            decls,
+            src_ref: pair.into(),
+        })
+    }
+}
+
+impl Syntax for UseStatement {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}UseStatement", "")?;
+        self.decls
+            .iter()
+            .try_for_each(|d| d.print_syntax(f, depth + 1))
     }
 }

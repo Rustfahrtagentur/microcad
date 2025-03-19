@@ -43,3 +43,10 @@ impl Parse for std::rc::Rc<NamespaceDefinition> {
         }))
     }
 }
+
+impl Syntax for NamespaceDefinition {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}NamespaceDefinition '{}'", "", self.name)?;
+        self.body.print_syntax(f, depth + 1)
+    }
+}

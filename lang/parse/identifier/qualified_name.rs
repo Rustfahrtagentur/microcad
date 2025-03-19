@@ -55,3 +55,14 @@ impl From<QualifiedName> for String {
         join_identifiers(&value.0, "::")
     }
 }
+
+impl Syntax for QualifiedName {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(
+            f,
+            "{:depth$}QualifiedName `{}`",
+            "",
+            join_identifiers(&self.0, "::")
+        )
+    }
+}

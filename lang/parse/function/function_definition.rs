@@ -57,3 +57,13 @@ impl Parse for std::rc::Rc<FunctionDefinition> {
         }))
     }
 }
+
+impl Syntax for FunctionDefinition {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}FunctionDefinition '{}'", "", self.name)?;
+        writeln!(f, "{:depth$}  Signature:", "")?;
+        self.signature.print_syntax(f, depth + 1)?;
+        writeln!(f, "{:depth$}  Body:", "")?;
+        self.body.print_syntax(f, depth + 1)
+    }
+}

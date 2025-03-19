@@ -48,3 +48,13 @@ impl std::fmt::Display for ModuleInitDefinition {
         write!(f, "{body}", body = self.body)
     }
 }
+
+impl Syntax for ModuleInitDefinition {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}ModuleDefinition", "")?;
+        writeln!(f, "{:depth$}  Parameters:", "")?;
+        self.parameters.print_syntax(f, depth + 1)?;
+        writeln!(f, "{:depth$}  Body:", "")?;
+        self.body.print_syntax(f, depth + 1)
+    }
+}

@@ -70,3 +70,13 @@ impl std::fmt::Display for CallArgument {
         }
     }
 }
+
+impl Syntax for CallArgument {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        match self.name {
+            Some(ref name) => writeln!(f, "{:depth$}CallArgument '{}'", "", name)?,
+            None => writeln!(f, "{:depth$}CallArgument:", "")?,
+        };
+        self.value.print_syntax(f, depth)
+    }
+}

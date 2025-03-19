@@ -11,7 +11,7 @@ pub use color::*;
 pub use number_literal::*;
 pub use units::*;
 
-use crate::{parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*, r#type::*};
 
 /// Literal entity
 #[derive(Debug, Clone, PartialEq)]
@@ -87,6 +87,18 @@ impl std::fmt::Display for Literal {
             Literal::Number(n) => write!(f, "{}", n),
             Literal::Bool(b) => write!(f, "{}", b),
             Literal::Color(c) => write!(f, "{}", c),
+        }
+    }
+}
+
+impl Syntax for Literal {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        write!(f, "{:depth$}Literal: ", "")?;
+        match self {
+            Literal::Integer(i) => writeln!(f, "{}", i),
+            Literal::Number(n) => writeln!(f, "{}", n),
+            Literal::Bool(b) => writeln!(f, "{}", b),
+            Literal::Color(c) => writeln!(f, "{}", c),
         }
     }
 }

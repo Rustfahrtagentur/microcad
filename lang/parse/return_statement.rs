@@ -43,3 +43,13 @@ impl std::fmt::Display for ReturnStatement {
         todo!()
     }
 }
+
+impl Syntax for ReturnStatement {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}ReturnStatement:", "")?;
+        if let Some(result) = &self.result {
+            result.print_syntax(f, depth + 1)?;
+        }
+        Ok(())
+    }
+}

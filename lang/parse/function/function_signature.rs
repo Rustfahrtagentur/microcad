@@ -3,7 +3,7 @@
 
 //! Function signature parser entity
 
-use crate::{parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*, r#type::*};
 
 /// Parameters and return type of a function
 #[derive(Clone, Debug)]
@@ -58,6 +58,18 @@ impl Parse for FunctionSignature {
             return_type,
             src_ref: pair.into(),
         })
+    }
+}
+
+impl Syntax for FunctionSignature {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}  Parameters:", "")?;
+        self.parameters.print_syntax(f, depth + 1)?;
+        if let Some(return_type) = &self.return_type {
+            writeln!(f, "{:depth$}  Return:", "")?;
+            return_type.print_syntax(f, depth + 1)?;
+        };
+        Ok(())
     }
 }
 

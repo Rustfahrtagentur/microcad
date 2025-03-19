@@ -67,12 +67,21 @@ fn main() {
     println!("Processing Time: {:?}", start.elapsed());
 }
 
+struct S<'a>(&'a SourceFile);
+
+impl std::fmt::Display for S<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.print_syntax(f, 0)
+    }
+}
+
 fn run(cli: &Cli) -> anyhow::Result<()> {
     match &cli.command {
         Commands::Parse { input, tree } => {
             let source_file = parse(input)?;
             if *tree {
-                println!("{source_file}");
+                let s = S(&source_file);
+                println!("{s}");
             }
             eprintln!("Parsed successfully!");
         }

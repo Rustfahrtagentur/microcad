@@ -112,3 +112,23 @@ impl std::fmt::Display for Statement {
         }
     }
 }
+
+impl Syntax for Statement {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}Statement:", "")?;
+        match self {
+            Self::Module(m) => m.print_syntax(f, depth + 1),
+            Self::Namespace(ns) => ns.print_syntax(f, depth + 1),
+            Self::Function(func) => func.print_syntax(f, depth + 1),
+            Self::ModuleInit(mi) => mi.print_syntax(f, depth + 1),
+
+            Self::Use(u) => u.print_syntax(f, depth + 1),
+            Self::Return(r) => r.print_syntax(f, depth + 1),
+            Self::If(i) => i.print_syntax(f, depth + 1),
+            Self::Marker(m) => m.print_syntax(f, depth + 1),
+
+            Self::Assignment(a) => a.print_syntax(f, depth + 1),
+            Self::Expression(e) => e.print_syntax(f, depth + 1),
+        }
+    }
+}

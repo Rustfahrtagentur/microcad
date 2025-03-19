@@ -97,3 +97,13 @@ impl std::fmt::Display for CallArgumentList {
         )
     }
 }
+
+impl Syntax for CallArgumentList {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}CallArgumentList:", "")?;
+        self.0
+            .value
+            .iter()
+            .try_for_each(|p| p.print_syntax(f, depth + 1))
+    }
+}

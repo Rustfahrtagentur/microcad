@@ -9,7 +9,7 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{parse::*, parser::*, src_ref::*, Id};
+use crate::{Id, parse::*, parser::*, src_ref::*};
 
 /// µcad identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -65,6 +65,11 @@ impl PartialEq<str> for Identifier {
     }
 }
 
+impl Syntax for Identifier {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}Identifier {}", "", self.id())
+    }
+}
 /// join several identifiers with `::` and return as string
 pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
     identifiers

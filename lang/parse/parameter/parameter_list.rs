@@ -73,6 +73,16 @@ impl std::fmt::Display for ParameterList {
     }
 }
 
+impl Syntax for ParameterList {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}ParameterList:", "")?;
+        self.0
+            .value
+            .iter()
+            .try_for_each(|p| p.print_syntax(f, depth + 1))
+    }
+}
+
 /// Short cut to create a `ParameterList` instance
 #[macro_export]
 macro_rules! parameter_list {

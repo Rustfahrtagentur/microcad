@@ -3,7 +3,7 @@
 
 //! µcad assignment parser entity
 
-use crate::{parse::*, parser::*, r#type::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*, ty::*, r#type::*};
 
 /// Assignment specifying an identifier, type and value
 #[derive(Clone, Debug)]
@@ -58,10 +58,19 @@ impl Parse for Assignment {
 
 impl std::fmt::Display for Assignment {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        use crate::ty::Ty;
         match &self.specified_type {
             Some(t) => write!(f, "{}: {} = {}", self.name, t.ty(), self.value),
             None => write!(f, "{} = {}", self.name, self.value),
         }
+    }
+}
+
+impl Syntax for Assignment {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}Assignment {}:", "", self.name)?;
+        if let Some(specified_type) = &self.specified_type {
+            specified_type.print_syntax(f, depth + 1)?;
+        }
+        self.value.print_syntax(f, depth + 1)
     }
 }
