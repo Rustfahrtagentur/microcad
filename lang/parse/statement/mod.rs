@@ -3,7 +3,7 @@
 
 //! Module statement parser entities
 //!
-use crate::{parse::*, parser::*, src_ref::*};
+use crate::{eval::*, objects::*, parse::*, parser::*, src_ref::*};
 
 mod assignment;
 mod if_statement;
@@ -92,6 +92,14 @@ impl Parse for Statement {
                 first.clone()
             ),
         })
+    }
+}
+
+impl Eval for Statement {
+    type Output = ObjectNode;
+
+    fn eval(&self, _context: &mut EvalContext) -> EvalResult<Self::Output> {
+        todo!()
     }
 }
 

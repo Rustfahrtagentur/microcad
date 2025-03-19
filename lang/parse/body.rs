@@ -3,12 +3,7 @@
 
 //! Module body parser entity
 
-use crate::{
-    parse::*,
-    parser::*,
-    resolve::{SymbolMap, SymbolNodeRc},
-    src_ref::*,
-};
+use crate::{eval::*, objects::*, parse::*, parser::*, resolve::*, src_ref::*};
 
 /// Module definition body
 ///
@@ -68,6 +63,25 @@ impl Body {
     /// fetches all symbols from the statements in the body
     pub fn fetch_symbol_map(&self, parent: Option<SymbolNodeRc>) -> SymbolMap {
         Self::fetch_symbol_map_from(&self.statements, parent)
+    }
+
+    /// Evaluate a vector of statements
+    pub fn evaluate_vec(
+        statements: &Vec<Statement>,
+        context: &mut EvalContext,
+    ) -> EvalResult<ObjectNode> {
+        for s in statements {
+            s.eval(context)?;
+        }
+        todo!()
+    }
+}
+
+impl Eval for Body {
+    type Output = ObjectNode;
+
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
+        Body::evaluate_vec(&self.statements, context)
     }
 }
 
