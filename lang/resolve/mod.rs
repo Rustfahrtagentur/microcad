@@ -63,19 +63,18 @@ impl SymbolDefinition {
 
 impl std::fmt::Display for SymbolDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let id = self.id();
         match self {
-            Self::Module(m) => write!(f, "module {}", m.name.id()),
-            Self::Namespace(ns) => write!(f, "namespace {}", ns.name.id()),
-            Self::Function(func) => write!(f, "function {}", func.name.id()),
-            Self::SourceFile(s) => write!(f, "file {}", s.filename_as_str()),
+            Self::Module(_) => write!(f, "module {}", id),
+            Self::Namespace(_) => write!(f, "namespace {}", id),
+            Self::Function(_) => write!(f, "function {}", id),
+            Self::SourceFile(_) => write!(f, "file {}", id),
         }
     }
 }
 
 /// Map Id to SymbolNode reference
 pub type SymbolMap = std::collections::btree_map::BTreeMap<Id, SymbolNodeRc>;
-
-const SUPER: &str = "super";
 
 /// Symbol node
 pub struct SymbolNode {
@@ -107,6 +106,41 @@ impl SymbolNode {
 
     fn add_child_with_id(&mut self, id: Id, child: SymbolNodeRc) {
         self.children.insert(id, child);
+    }
+
+    /// Fetch child node with an id
+    pub fn fetch(&self, id: &Id) -> Option<&SymbolNodeRc> {
+        self.children.get(id)
+    }
+
+    /// Search in symbol tree by a path, e.g. a::b::c
+    pub fn search_top_down(&self, path: &[Id]) -> Option<SymbolNodeRc> {
+        if let Some(first) = path.first() {
+            if let Some(child) = self.fetch(first) {
+                let path = &path[1..];
+                if path.is_empty() {
+                    Some(child.clone())
+                } else {
+                    child.borrow().search_top_down(path)
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn search_bottom_up(&self, path: &[Id]) -> Option<SymbolNodeRc> {
+        if let Some(parent) = &self.parent {
+            if let Some(child) = parent.borrow().search_top_down(path) {
+                Some(child.clone())
+            } else {
+                parent.borrow().search_bottom_up(path)
+            }
+        } else {
+            None
+        }
     }
 }
 
@@ -187,6 +221,29 @@ fn resolve_source_file() {
     // file <no file>
     //  module a
     //   module b
+    let symbol_node = symbol_node.borrow();
+    assert!(symbol_node.fetch(&"a".into()).is_some());
+    assert!(symbol_node.fetch(&"c".into()).is_none());
 
-    println!("{node}");
+    assert!(symbol_node.search_top_down(&["a".into()]).is_some());
+    assert!(symbol_node
+        .search_top_down(&["a".into(), "b".into()])
+        .is_some());
+    assert!(symbol_node
+        .search_top_down(&["a".into(), "b".into(), "c".into()])
+        .is_none());
+
+    // use std::print; // Add symbol "print" to current symbol node
+    // module m() {
+    //      print("test"); // Use symbol node from parent
+    // }
+
+    let b = symbol_node.search_top_down(&["a".into(), "b".into()]);
+    assert!(b.is_some());
+    let b = b.unwrap();
+    assert!(b.borrow().search_bottom_up(&["a".into()]).is_some());
+
+    //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
+
+    println!("{symbol_node}");
 }
