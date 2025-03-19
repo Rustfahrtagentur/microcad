@@ -3,6 +3,8 @@
 
 use crate::{diag::*, parse::*, resolve::*, source_file_cache::*};
 
+use super::EvalResult;
+
 /// Context for evaluation
 ///
 /// The context is used to store the current state of the evaluation.
@@ -49,13 +51,29 @@ impl EvalContext {
         &mut self,
         src_ref: impl crate::src_ref::SrcReferrer,
         error: impl std::error::Error + 'static,
-    ) -> crate::eval::EvalResult<()> {
+    ) -> EvalResult<()> {
         self.error(src_ref, Box::new(error))
+    }
+
+    pub fn current_node_mut(&mut self) -> SymbolNodeRc {
+        self.symbols.clone()
+    }
+
+    pub fn use_symbol(&mut self, qualified_name: &QualifiedName) -> EvalResult<()> {
+        let current_node = self.current_node_mut();
+        if let Some(child) =
+            SymbolNode::search_bottom_up(&current_node.borrow(), &qualified_name.clone().into())
+        {
+            SymbolNode::insert_child(self.current_node_mut(), child);
+            Ok(())
+        } else {
+            Err(super::EvalError::SymbolNotFound(qualified_name.clone()))
+        }
     }
 }
 
 impl PushDiag for EvalContext {
-    fn push_diag(&mut self, diag: Diag) -> crate::eval::EvalResult<()> {
+    fn push_diag(&mut self, diag: Diag) -> EvalResult<()> {
         self.diag_handler.push_diag(diag)
     }
 }

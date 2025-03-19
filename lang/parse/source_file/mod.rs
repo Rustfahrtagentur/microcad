@@ -5,7 +5,13 @@
 
 use std::io::Read;
 
-use crate::{eval::Eval, objects::ObjectNode, parse::*, parser::*, src_ref::*};
+use crate::{
+    eval::{Eval, EvalReturn},
+    objects::ObjectNode,
+    parse::*,
+    parser::*,
+    src_ref::*,
+};
 
 /// Trait to get a source file by its hash
 pub trait GetSourceFileByHash {
@@ -126,12 +132,7 @@ impl Parse for SourceFile {
 }
 
 impl Eval for SourceFile {
-    type Output = ObjectNode;
-
-    fn eval(
-        &self,
-        context: &mut crate::eval::EvalContext,
-    ) -> crate::eval::EvalResult<Self::Output> {
+    fn eval(&self, context: &mut crate::eval::EvalContext) -> crate::eval::EvalResult<EvalReturn> {
         Body::evaluate_vec(&self.body, context)
     }
 }
@@ -139,7 +140,11 @@ impl Eval for SourceFile {
 /// We can get a source file by its hash
 impl GetSourceFileByHash for SourceFile {
     fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile> {
-        if self.hash == hash { Some(self) } else { None }
+        if self.hash == hash {
+            Some(self)
+        } else {
+            None
+        }
     }
 }
 

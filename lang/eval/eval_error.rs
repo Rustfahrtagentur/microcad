@@ -98,7 +98,7 @@ pub enum EvalError {
 
     /// Symbol not found
     #[error("Symbol not found: {0}")]
-    SymbolNotFound(Id),
+    SymbolNotFound(QualifiedName),
 
     /// No matching initializer for module definition
     #[error("No matching initializer for module definition `{0}`")]

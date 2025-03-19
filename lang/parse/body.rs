@@ -69,7 +69,7 @@ impl Body {
     pub fn evaluate_vec(
         statements: &Vec<Statement>,
         context: &mut EvalContext,
-    ) -> EvalResult<ObjectNode> {
+    ) -> EvalResult<EvalReturn> {
         for s in statements {
             s.eval(context)?;
         }
@@ -78,9 +78,7 @@ impl Body {
 }
 
 impl Eval for Body {
-    type Output = ObjectNode;
-
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<EvalReturn> {
         Body::evaluate_vec(&self.statements, context)
     }
 }

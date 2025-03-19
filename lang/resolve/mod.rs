@@ -28,9 +28,10 @@ use std::{cell::*, ops::Deref};
 /// print("{foo.b}"); // 42.0
 ///
 /// v = c::d();
-use crate::{Id, parse::*};
+use crate::{parse::*, Id};
 
 /// Symbol definition
+#[derive(Debug)]
 pub enum SymbolDefinition {
     /// Source file symbol
     SourceFile(std::rc::Rc<SourceFile>),
@@ -99,6 +100,7 @@ impl Deref for SymbolPath {
 pub type SymbolMap = std::collections::btree_map::BTreeMap<Id, SymbolNodeRc>;
 
 /// Symbol node
+#[derive(Debug)]
 pub struct SymbolNode {
     /// Symbol definition
     pub def: SymbolDefinition,
@@ -126,9 +128,11 @@ impl SymbolNode {
             .try_for_each(|(_, child)| child.borrow().print_symbol(f, depth + 1))
     }
 
-    /// .add child to SymbolNode
-    fn add_child(&mut self, id: Id, child: SymbolNodeRc) {
-        self.children.insert(id, child);
+    /// Insert child and change parent of child to new parent
+    pub fn insert_child(parent: SymbolNodeRc, child: SymbolNodeRc) {
+        child.borrow_mut().parent = Some(parent.clone());
+        let id = child.borrow().def.id();
+        parent.borrow_mut().children.insert(id, child);
     }
 
     /// Fetch child node with an id

@@ -15,11 +15,16 @@ pub use call::*;
 pub use eval_context::*;
 pub use eval_error::*;
 
+use crate::{objects::ObjectNode, Value};
+
+pub enum EvalReturn {
+    None,
+    ObjectNode(ObjectNode),
+    Value(Value),
+}
+
 /// Evaluation trait
 pub trait Eval {
-    /// Implementor's ok result type
-    type Output;
-
     /// Evaluate the type into an expression
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Self::Output>;
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<EvalReturn>;
 }

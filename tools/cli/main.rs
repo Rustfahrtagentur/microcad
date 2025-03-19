@@ -161,11 +161,14 @@ fn eval(source_file: SourceFile, _std: impl AsRef<Path>) -> anyhow::Result<Objec
     let source_file = std::rc::Rc::new(source_file);
     let mut context = EvalContext::from_source_file(source_file.clone());
 
-    let node = source_file
+    let result = source_file
         .eval(&mut context)
         .map_err(|err| anyhow::anyhow!("{err}"))?;
 
-    Ok(node)
+    match result {
+        EvalReturn::ObjectNode(node) => Ok(node),
+        _ => unreachable!("Return value must be a node"),
+    }
 }
 
 /*
