@@ -36,6 +36,9 @@ enum Commands {
         /// print parse tree
         #[clap(short, long)]
         tree: bool,
+        /// print formatted code
+        #[clap(short, long)]
+        fmt: bool,
     },
 
     /// Parse and evaluate a µcad file
@@ -77,11 +80,14 @@ impl std::fmt::Display for S<'_> {
 
 fn run(cli: &Cli) -> anyhow::Result<()> {
     match &cli.command {
-        Commands::Parse { input, tree } => {
+        Commands::Parse { input, tree, fmt } => {
             let source_file = parse(input)?;
             if *tree {
                 let s = S(&source_file);
                 println!("{s}");
+            }
+            if *fmt {
+                println!("{source_file}");
             }
             eprintln!("Parsed successfully!");
         }
