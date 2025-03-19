@@ -3,7 +3,7 @@
 
 //! µcad symbol tree resolve
 
-use std::cell::*;
+use std::{cell::*, ops::Deref};
 
 /// Source File `foo.µcad`
 ///
@@ -28,7 +28,7 @@ use std::cell::*;
 /// print("{foo.b}"); // 42.0
 ///
 /// v = c::d();
-use crate::{parse::*, Id};
+use crate::{Id, parse::*};
 
 /// Symbol definition
 pub enum SymbolDefinition {
@@ -40,14 +40,6 @@ pub enum SymbolDefinition {
     Module(std::rc::Rc<ModuleDefinition>),
     /// Function symbol
     Function(std::rc::Rc<FunctionDefinition>),
-}
-
-struct S<'a>(&'a SymbolNodeRc);
-
-impl std::fmt::Display for S<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.borrow().print_symbol(f, 0)
-    }
 }
 
 impl SymbolDefinition {
@@ -70,6 +62,36 @@ impl std::fmt::Display for SymbolDefinition {
             Self::Function(_) => write!(f, "function {}", id),
             Self::SourceFile(_) => write!(f, "file {}", id),
         }
+    }
+}
+
+/// Qualified name of a symbol
+pub struct SymbolPath(Vec<Id>);
+
+impl SymbolPath {
+    fn pop_top(&self) -> Self {
+        Self(self.0[1..].to_vec())
+    }
+}
+
+impl From<QualifiedName> for SymbolPath {
+    fn from(name: QualifiedName) -> Self {
+        Self(name.0.iter().map(|n| n.id().clone()).collect::<Vec<_>>())
+    }
+}
+
+#[cfg(test)]
+impl From<&str> for SymbolPath {
+    fn from(name: &str) -> Self {
+        Self(name.split("::").map(|n| Id::new(n)).collect::<Vec<_>>())
+    }
+}
+
+impl Deref for SymbolPath {
+    type Target = Vec<Id>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
@@ -104,7 +126,8 @@ impl SymbolNode {
             .try_for_each(|(_, child)| child.borrow().print_symbol(f, depth + 1))
     }
 
-    fn add_child_with_id(&mut self, id: Id, child: SymbolNodeRc) {
+    /// .add child to SymbolNode
+    fn add_child(&mut self, id: Id, child: SymbolNodeRc) {
         self.children.insert(id, child);
     }
 
@@ -114,10 +137,10 @@ impl SymbolNode {
     }
 
     /// Search in symbol tree by a path, e.g. a::b::c
-    pub fn search_top_down(&self, path: &[Id]) -> Option<SymbolNodeRc> {
+    pub fn search_top_down(&self, path: &SymbolPath) -> Option<SymbolNodeRc> {
         if let Some(first) = path.first() {
             if let Some(child) = self.fetch(first) {
-                let path = &path[1..];
+                let path = &path.pop_top();
                 if path.is_empty() {
                     Some(child.clone())
                 } else {
@@ -131,7 +154,8 @@ impl SymbolNode {
         }
     }
 
-    pub fn search_bottom_up(&self, path: &[Id]) -> Option<SymbolNodeRc> {
+    /// Search for first symbol in parents
+    pub fn search_bottom_up(&self, path: &SymbolPath) -> Option<SymbolNodeRc> {
         if let Some(parent) = &self.parent {
             if let Some(child) = parent.borrow().search_top_down(path) {
                 Some(child.clone())
@@ -216,7 +240,6 @@ fn resolve_source_file() {
     );
 
     let symbol_node = source_file.resolve(None);
-    let node = S(&symbol_node);
 
     // file <no file>
     //  module a
@@ -225,23 +248,19 @@ fn resolve_source_file() {
     assert!(symbol_node.fetch(&"a".into()).is_some());
     assert!(symbol_node.fetch(&"c".into()).is_none());
 
-    assert!(symbol_node.search_top_down(&["a".into()]).is_some());
-    assert!(symbol_node
-        .search_top_down(&["a".into(), "b".into()])
-        .is_some());
-    assert!(symbol_node
-        .search_top_down(&["a".into(), "b".into(), "c".into()])
-        .is_none());
+    assert!(symbol_node.search_top_down(&"a".into()).is_some());
+    assert!(symbol_node.search_top_down(&"a::b".into()).is_some());
+    assert!(symbol_node.search_top_down(&"a::b::c".into()).is_none());
 
     // use std::print; // Add symbol "print" to current symbol node
     // module m() {
     //      print("test"); // Use symbol node from parent
     // }
 
-    let b = symbol_node.search_top_down(&["a".into(), "b".into()]);
-    assert!(b.is_some());
-    let b = b.unwrap();
-    assert!(b.borrow().search_bottom_up(&["a".into()]).is_some());
+    let b = symbol_node
+        .search_top_down(&"a::b".into())
+        .expect("cant find node");
+    assert!(b.borrow().search_bottom_up(&"a".into()).is_some());
 
     //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
 

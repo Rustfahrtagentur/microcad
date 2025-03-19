@@ -4,7 +4,7 @@
 use crate::{parse::*, parser::*, src_ref::*};
 
 /// A qualifier name consists of a . separated list of identifiers
-/// e.g. `a.b.c`
+/// e.g. `a::b::c`
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct QualifiedName(pub Vec<Identifier>);
 
