@@ -46,7 +46,7 @@ impl std::fmt::Display for MethodCall {
 
 impl Syntax for MethodCall {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}MethodCall '{}'", "", self.name)?;
+        writeln!(f, "{:depth$}MethodCall '{}':", "", self.name)?;
         self.argument_list.print_syntax(f, depth + 1)
     }
 }

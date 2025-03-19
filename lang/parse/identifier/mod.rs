@@ -67,7 +67,7 @@ impl PartialEq<str> for Identifier {
 
 impl Syntax for Identifier {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}Identifier {}", "", self.id())
+        writeln!(f, "{:depth$}Identifier: {}", "", self.id())
     }
 }
 /// join several identifiers with `::` and return as string

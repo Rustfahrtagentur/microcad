@@ -64,7 +64,24 @@ impl std::fmt::Display for Parameter {
 
 impl Syntax for Parameter {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}Parameter '{}'", "", self.name)
+        match (&self.specified_type, &self.default_value) {
+            (Some(specified_type), Some(default_value)) => writeln!(
+                f,
+                "{:depth$}Parameter: '{}: {} = {}'",
+                "", self.name, specified_type, default_value
+            ),
+            (Some(specified_type), None) => writeln!(
+                f,
+                "{:depth$}Parameter: '{}: {}'",
+                "", self.name, specified_type
+            ),
+            (None, Some(default_value)) => writeln!(
+                f,
+                "{:depth$}Parameter: '{} = {}'",
+                "", self.name, default_value
+            ),
+            _ => unreachable!("impossible parameter declaration"),
+        }
     }
 }
 

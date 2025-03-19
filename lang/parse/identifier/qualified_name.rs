@@ -60,7 +60,7 @@ impl Syntax for QualifiedName {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(
             f,
-            "{:depth$}QualifiedName `{}`",
+            "{:depth$}QualifiedName: '{}'",
             "",
             join_identifiers(&self.0, "::")
         )

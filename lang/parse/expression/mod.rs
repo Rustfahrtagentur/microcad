@@ -160,7 +160,7 @@ impl Syntax for Expression {
                 rhs,
                 src_ref: _,
             } => {
-                writeln!(f, "{:depth$}BinaryOp '{op}'", "")?;
+                writeln!(f, "{:depth$}BinaryOp '{op}':", "")?;
                 lhs.print_syntax(f, depth + 1)?;
                 rhs.print_syntax(f, depth + 1)
             }
