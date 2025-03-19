@@ -3,7 +3,7 @@
 
 //! µcad symbol tree resolve
 
-use std::cell::{Ref, RefCell};
+use std::cell::*;
 
 /// Source File `foo.µcad`
 ///
@@ -28,7 +28,7 @@ use std::cell::{Ref, RefCell};
 /// print("{foo.b}"); // 42.0
 ///
 /// v = c::d();
-use crate::{parse::*, Id};
+use crate::{Id, parse::*};
 
 enum SymbolDefinition {
     SourceFile(std::rc::Rc<SourceFile>),
@@ -68,9 +68,12 @@ impl std::fmt::Display for SymbolDefinition {
 
 pub type SymbolMap = std::collections::btree_map::BTreeMap<Id, SymbolNodeRc>;
 
+const SUPER: &str = "super";
+
 //pub type SymbolNode = rctree::Node<SymbolNodeInner>;
 pub struct SymbolNode {
     def: SymbolDefinition,
+    parent: Option<SymbolNodeRc>,
     children: SymbolMap,
 }
 
@@ -116,15 +119,12 @@ impl Resolve for std::rc::Rc<ModuleDefinition> {
     fn resolve(&self, parent: Option<SymbolNodeRc>) -> SymbolNodeRc {
         let node = SymbolNode {
             def: SymbolDefinition::Module(self.clone()),
+            parent,
             children: Default::default(),
         };
         let rc = SymbolNodeRc::new(RefCell::new(node));
 
         rc.borrow_mut().children = self.body.fetch_symbol_map(Some(rc.clone()));
-
-        if let Some(parent) = parent {
-            rc.borrow_mut().add_child_with_id("super".into(), parent);
-        }
 
         rc
     }
@@ -134,6 +134,7 @@ impl Resolve for std::rc::Rc<NamespaceDefinition> {
     fn resolve(&self, parent: Option<SymbolNodeRc>) -> SymbolNodeRc {
         SymbolNodeRc::new(RefCell::new(SymbolNode {
             def: SymbolDefinition::Namespace(self.clone()),
+            parent: parent.clone(),
             children: self.body.fetch_symbol_map(parent),
         }))
     }
@@ -143,6 +144,7 @@ impl Resolve for std::rc::Rc<FunctionDefinition> {
     fn resolve(&self, parent: Option<SymbolNodeRc>) -> SymbolNodeRc {
         SymbolNodeRc::new(RefCell::new(SymbolNode {
             def: SymbolDefinition::Function(self.clone()),
+            parent: parent.clone(),
             children: self.body.fetch_symbol_map(parent),
         }))
     }
@@ -153,6 +155,8 @@ impl Resolve for SymbolDefinition {
         match &self {
             Self::Module(m) => m.resolve(parent),
             Self::Namespace(n) => n.resolve(parent),
+            Self::Function(f) => f.resolve(parent),
+            Self::SourceFile(s) => s.resolve(parent),
             _ => unimplemented!(),
         }
     }
@@ -162,6 +166,7 @@ impl Resolve for std::rc::Rc<SourceFile> {
     fn resolve(&self, parent: Option<SymbolNodeRc>) -> SymbolNodeRc {
         let node = SymbolNode {
             def: SymbolDefinition::SourceFile(self.clone()),
+            parent: parent.clone(),
             children: Default::default(),
         };
         let rc = SymbolNodeRc::new(RefCell::new(node));
@@ -169,7 +174,7 @@ impl Resolve for std::rc::Rc<SourceFile> {
         rc.borrow_mut().children = Body::fetch_symbol_map_from(&self.body, Some(rc.clone()));
 
         if let Some(parent) = parent {
-            rc.borrow_mut().add_child_with_id("super".into(), parent);
+            rc.borrow_mut().add_child_with_id(SUPER.into(), parent);
         }
         rc
     }
