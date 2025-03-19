@@ -5,6 +5,16 @@
 //!
 use crate::{parse::*, parser::*, src_ref::*};
 
+mod assignment;
+mod if_statement;
+mod marker_statement;
+mod return_statement;
+
+pub use assignment::*;
+pub use if_statement::*;
+pub use marker_statement::*;
+pub use return_statement::*;
+
 /// Module statement
 #[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum Statement {
