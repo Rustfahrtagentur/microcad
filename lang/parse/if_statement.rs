@@ -59,13 +59,13 @@ impl std::fmt::Display for IfStatement {
 impl Syntax for IfStatement {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ReturnStatement:", "")?;
-        writeln!(f, "{:depth$}  Condition:", "")?;
-        self.cond.print_syntax(f, depth + 1)?;
-        writeln!(f, "{:depth$}  Body:", "")?;
-        self.body.print_syntax(f, depth + 1)?;
+        writeln!(f, "{:depth$} Condition:", "")?;
+        self.cond.print_syntax(f, depth + 2)?;
+        writeln!(f, "{:depth$} Body:", "")?;
+        self.body.print_syntax(f, depth + 2)?;
         if let Some(body_else) = &self.body_else {
-            writeln!(f, "{:depth$}  BodyElse:", "")?;
-            body_else.print_syntax(f, depth + 1)?;
+            writeln!(f, "{:depth$} BodyElse:", "")?;
+            body_else.print_syntax(f, depth + 2)?;
         }
         Ok(())
     }

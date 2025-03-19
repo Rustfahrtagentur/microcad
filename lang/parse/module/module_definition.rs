@@ -74,10 +74,10 @@ impl Syntax for ModuleDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ModuleDefinition '{}'", "", self.name)?;
         if let Some(parameters) = &self.parameters {
-            writeln!(f, "{:depth$}  Parameters:", "")?;
-            parameters.print_syntax(f, depth + 1)?;
+            writeln!(f, "{:depth$} Parameters:", "")?;
+            parameters.print_syntax(f, depth + 2)?;
         }
-        writeln!(f, "{:depth$}  Body:", "")?;
-        self.body.print_syntax(f, depth + 1)
+        writeln!(f, "{:depth$} Body:", "")?;
+        self.body.print_syntax(f, depth + 2)
     }
 }

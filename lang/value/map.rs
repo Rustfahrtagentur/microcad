@@ -3,8 +3,6 @@
 
 //! Map type evaluation entity
 
-use crate::value::{SrcRef, SrcReferrer};
-
 use crate::{parse::*, r#type::*, value::*};
 
 /// Map evaluation entity

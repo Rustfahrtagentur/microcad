@@ -1,9 +1,5 @@
 use super::*;
-use crate::{
-    eval::*,
-    parse::*,
-    src_ref::{SrcRef, SrcReferrer},
-};
+use crate::{eval::*, parse::*, src_ref::*};
 
 /// A symbol is a named entity that is used in the
 /// symbol table and in the evaluation context to

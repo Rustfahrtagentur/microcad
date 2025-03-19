@@ -3,9 +3,8 @@
 
 //! µcad Basic Types
 
-use crate::{parse::*, parser::*, src_ref::*};
-
 use super::Type;
+use crate::{parse::*, parser::*, src_ref::*};
 
 /// Type within source code
 #[derive(Debug, Clone, PartialEq)]
@@ -75,6 +74,6 @@ impl Parse for TypeAnnotation {
 
 impl Syntax for TypeAnnotation {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}  TypeAnnotation: {}", "", self.0.value)
+        writeln!(f, "{:depth$} TypeAnnotation: {}", "", self.0.value)
     }
 }

@@ -3,15 +3,12 @@
 
 //! Parse `call_argument_list` rule into CallArgumentList
 
-use crate::{
-    Id, argument_map::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*, r#type::Type,
-};
+use crate::{Id, argument_map::*, eval::*, ord_map::*, parse::*, parser::*, src_ref::*, r#type::*};
+use thiserror::Error;
 
 /// List of call arguments
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentList(Refer<OrdMap<Identifier, CallArgument>>);
-
-use thiserror::Error;
 
 impl CallArgumentList {
     /// Get matching arguments from parameter list
