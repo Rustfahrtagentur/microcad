@@ -147,7 +147,7 @@ impl std::fmt::Display for Expression {
     }
 }
 
-impl Syntax for Expression {
+impl PrintSyntax for Expression {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         match self {
             Self::Literal(literal) => literal.print_syntax(f, depth + 1),

@@ -93,7 +93,7 @@ impl Parse for FormatString {
     }
 }
 
-impl Syntax for FormatString {
+impl PrintSyntax for FormatString {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}FormatString:", "")?;
         self.0.iter().try_for_each(|fs| match fs {

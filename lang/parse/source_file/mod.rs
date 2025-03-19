@@ -138,7 +138,7 @@ impl std::fmt::Display for SourceFile {
     }
 }
 
-impl Syntax for SourceFile {
+impl PrintSyntax for SourceFile {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}SourceFile '{}'", "", self.filename_as_str())?;
         self.body

@@ -113,7 +113,7 @@ impl std::fmt::Display for Statement {
     }
 }
 
-impl Syntax for Statement {
+impl PrintSyntax for Statement {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}Statement:", "")?;
         match self {

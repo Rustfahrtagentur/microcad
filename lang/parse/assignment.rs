@@ -65,7 +65,7 @@ impl std::fmt::Display for Assignment {
     }
 }
 
-impl Syntax for Assignment {
+impl PrintSyntax for Assignment {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}Assignment {}:", "", self.name)?;
         if let Some(specified_type) = &self.specified_type {

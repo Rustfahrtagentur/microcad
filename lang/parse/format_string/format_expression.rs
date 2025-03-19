@@ -60,7 +60,7 @@ impl SrcReferrer for FormatExpression {
     }
 }
 
-impl Syntax for FormatExpression {
+impl PrintSyntax for FormatExpression {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}FormatExpression:", "")?;
         if let Some(spec) = &self.spec {

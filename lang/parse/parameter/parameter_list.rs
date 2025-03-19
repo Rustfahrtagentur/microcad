@@ -73,7 +73,7 @@ impl std::fmt::Display for ParameterList {
     }
 }
 
-impl Syntax for ParameterList {
+impl PrintSyntax for ParameterList {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ParameterList:", "")?;
         self.0

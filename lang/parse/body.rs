@@ -66,7 +66,7 @@ impl std::fmt::Display for Body {
     }
 }
 
-impl Syntax for Body {
+impl PrintSyntax for Body {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}Body:", "")?;
         self.statements

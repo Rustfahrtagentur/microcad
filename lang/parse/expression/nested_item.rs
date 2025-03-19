@@ -50,7 +50,7 @@ impl std::fmt::Display for NestedItem {
     }
 }
 
-impl Syntax for NestedItem {
+impl PrintSyntax for NestedItem {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}NestedItem:", "")?;
         match self {

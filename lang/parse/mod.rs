@@ -46,7 +46,7 @@ pub use r#use::*;
 const INTERNAL_PARSE_ERROR: &str = "internal parse error";
 
 /// Trait for printing a syntax tree
-pub trait Syntax {
+pub trait PrintSyntax {
     /// Print a syntax tree
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result;
 }

@@ -56,7 +56,7 @@ impl From<QualifiedName> for String {
     }
 }
 
-impl Syntax for QualifiedName {
+impl PrintSyntax for QualifiedName {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(
             f,

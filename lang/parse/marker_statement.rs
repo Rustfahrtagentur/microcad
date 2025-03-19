@@ -43,7 +43,7 @@ impl std::fmt::Display for Marker {
     }
 }
 
-impl Syntax for Marker {
+impl PrintSyntax for Marker {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}Marker '{}'", "", self.name)
     }

@@ -56,7 +56,7 @@ impl std::fmt::Display for IfStatement {
     }
 }
 
-impl Syntax for IfStatement {
+impl PrintSyntax for IfStatement {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ReturnStatement:", "")?;
         writeln!(f, "{:depth$} Condition:", "")?;

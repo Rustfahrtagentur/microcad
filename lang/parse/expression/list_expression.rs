@@ -66,7 +66,7 @@ impl std::fmt::Display for ListExpression {
     }
 }
 
-impl Syntax for ListExpression {
+impl PrintSyntax for ListExpression {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         if let Some(unit) = self.unit {
             writeln!(f, "{:depth$}ListExpression {unit}:", "")?

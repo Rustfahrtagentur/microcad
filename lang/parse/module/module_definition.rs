@@ -70,7 +70,7 @@ impl std::fmt::Display for ModuleDefinition {
     }
 }
 
-impl Syntax for ModuleDefinition {
+impl PrintSyntax for ModuleDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.name)?;
         if let Some(parameters) = &self.parameters {

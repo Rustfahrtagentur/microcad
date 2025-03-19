@@ -61,7 +61,7 @@ impl Parse for FunctionSignature {
     }
 }
 
-impl Syntax for FunctionSignature {
+impl PrintSyntax for FunctionSignature {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$} Parameters:", "")?;
         self.parameters.print_syntax(f, depth + 2)?;

@@ -76,7 +76,7 @@ impl Parse for UseDeclaration {
     }
 }
 
-impl Syntax for UseDeclaration {
+impl PrintSyntax for UseDeclaration {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         match self {
             UseDeclaration::Use(name, _) => writeln!(f, "{:depth$}Use {name}", ""),

@@ -67,7 +67,7 @@ impl Parse for UseStatement {
     }
 }
 
-impl Syntax for UseStatement {
+impl PrintSyntax for UseStatement {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}UseStatement", "")?;
         self.decls

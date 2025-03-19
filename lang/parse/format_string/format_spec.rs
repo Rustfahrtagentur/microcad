@@ -53,7 +53,7 @@ impl std::fmt::Display for FormatSpec {
     }
 }
 
-impl Syntax for FormatSpec {
+impl PrintSyntax for FormatSpec {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         match (self.width, self.precision) {
             (Some(width), Some(precision)) => {

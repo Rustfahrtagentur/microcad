@@ -58,7 +58,7 @@ impl std::fmt::Display for Nested {
     }
 }
 
-impl Syntax for Nested {
+impl PrintSyntax for Nested {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}Nested:", "")?;
         self.0

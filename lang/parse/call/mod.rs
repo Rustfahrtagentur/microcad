@@ -53,7 +53,7 @@ impl std::fmt::Display for Call {
     }
 }
 
-impl Syntax for Call {
+impl PrintSyntax for Call {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}Call '{}':", "", self.name)?;
         self.argument_list

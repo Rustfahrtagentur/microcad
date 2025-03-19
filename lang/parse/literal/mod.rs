@@ -91,7 +91,7 @@ impl std::fmt::Display for Literal {
     }
 }
 
-impl Syntax for Literal {
+impl PrintSyntax for Literal {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         write!(f, "{:depth$}Literal: ", "")?;
         match self {
