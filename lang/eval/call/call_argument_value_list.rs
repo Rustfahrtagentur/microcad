@@ -120,26 +120,27 @@ fn call_get_matching_arguments() {
 fn call_get_matching_arguments_missing() {
     use crate::{parameter_value, r#type::*};
 
+    // function f(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = ParameterValueList::new(vec![
         parameter_value!(foo: Integer),
         parameter_value!(bar: Integer),
         parameter_value!(baz: Scalar = 4.0),
     ]);
+
+    // f(1, baz = 3.0)
     let call_values = CallArgumentValueList::from(vec![
         call_argument_value!(Integer = 1),
         call_argument_value!(baz: Scalar = 3.0),
     ]);
 
-    let _arg_map = call_values.get_matching_arguments(&param_values);
+    let arg_map = call_values.get_matching_arguments(&param_values);
 
-    todo!()
-    /*
-    if let Err(Value::MissingArguments(missing)) = arg_map {
+    if let Err(EvalError::ValueError(ValueError::MissingArguments(missing))) = arg_map {
         assert_eq!(missing.len(), 1);
         assert_eq!(&missing[0].name, "bar");
     } else {
         panic!("Expected MissingArguments error");
-    }*/
+    }
 }
 
 #[test]

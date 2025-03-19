@@ -144,9 +144,7 @@ pub trait ArgumentMatch: Default {
                 &mut missing_parameter_values,
             )?;
 
-        missing_parameter_values
-            .check_for_missing_arguments()
-            .expect("Check for missing argument");
+        missing_parameter_values.check_for_missing_arguments()?;
 
         Ok(result)
     }

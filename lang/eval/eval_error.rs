@@ -6,7 +6,7 @@
 use crate::{
     parse::{Identifier, QualifiedName},
     r#type::*,
-    Id,
+    Id, ValueError,
 };
 use thiserror::Error;
 
@@ -192,6 +192,10 @@ pub enum EvalError {
     /// Missed call
     #[error("Missed call")]
     MissedCall,
+
+    /// Value Error
+    #[error("Value Error: {0}")]
+    ValueError(#[from] ValueError),
 }
 
 /// Result type of any evaluation
