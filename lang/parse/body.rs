@@ -44,30 +44,18 @@ impl Body {
     ) -> SymbolMap {
         let mut symbol_map = SymbolMap::default();
         use crate::resolve::Resolve;
-        if let Some(parent) = &parent {
-            symbol_map.insert("super".into(), parent.clone());
-        }
 
         // Iterate over all statement fetch definitions
         for statement in statements {
             match statement {
                 Statement::Module(m) => {
-                    symbol_map.insert(
-                        m.name.id().clone(),
-                        std::rc::Rc::new(m.resolve(parent.clone())),
-                    );
+                    symbol_map.insert(m.name.id().clone(), m.resolve(parent.clone()));
                 }
                 Statement::Namespace(n) => {
-                    symbol_map.insert(
-                        n.name.id().clone(),
-                        std::rc::Rc::new(n.resolve(parent.clone())),
-                    );
+                    symbol_map.insert(n.name.id().clone(), n.resolve(parent.clone()));
                 }
                 Statement::Function(f) => {
-                    symbol_map.insert(
-                        f.name.id().clone(),
-                        std::rc::Rc::new(f.resolve(parent.clone())),
-                    );
+                    symbol_map.insert(f.name.id().clone(), f.resolve(parent.clone()));
                 }
                 _ => {}
             }
@@ -89,7 +77,7 @@ impl SrcReferrer for Body {
 
 impl Parse for Body {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::body);
+        Parser::ensure_rules(&pair, &[Rule::body, Rule::body_else]);
         let mut body = Self::default();
         for pair in pair.inner() {
             if pair.as_rule() == Rule::statement {

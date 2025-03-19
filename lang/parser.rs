@@ -115,4 +115,14 @@ impl Parser {
         let rule = pair.as_rule();
         assert_eq!(rule, expected, "Unexpected rule: {rule:?}");
     }
+
+    pub fn ensure_rules(pair: &Pair, rules: &[Rule]) {
+        for rule in rules {
+            if *rule == pair.as_rule() {
+                return;
+            }
+        }
+
+        panic!("Unexpected rules: {rules:?}");
+    }
 }
