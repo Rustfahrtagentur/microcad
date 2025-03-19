@@ -38,8 +38,9 @@ pub struct Body {
 }
 
 impl Body {
+    /// fetches all symbols from a slice of statements
     pub fn fetch_symbol_map_from(
-        statements: &Vec<Statement>,
+        statements: &[Statement],
         parent: Option<SymbolNodeRc>,
     ) -> SymbolMap {
         let mut symbol_map = SymbolMap::default();
@@ -64,6 +65,7 @@ impl Body {
         symbol_map
     }
 
+    /// fetches all symbols from the statements in the body
     pub fn fetch_symbol_map(&self, parent: Option<SymbolNodeRc>) -> SymbolMap {
         Self::fetch_symbol_map_from(&self.statements, parent)
     }

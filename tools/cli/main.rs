@@ -9,7 +9,10 @@ extern crate microcad_lang;
 use std::{io::Write, path::Path};
 
 use clap::{Parser, Subcommand};
-use microcad_lang::parse::*;
+use microcad_lang::{
+    parse::*,
+    resolve::{Resolve, SymbolNodeRc},
+};
 
 /// µcad cli
 #[derive(Parser)]
@@ -39,6 +42,12 @@ enum Commands {
         /// print formatted code
         #[clap(short, long)]
         fmt: bool,
+    },
+
+    /// Parse and resolve a µcad file
+    Resolve {
+        /// Input µcad file
+        input: String,
     },
 
     /// Parse and evaluate a µcad file
@@ -89,8 +98,13 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
             if *fmt {
                 println!("{source_file}");
             }
-            eprintln!("Parsed successfully!");
         }
+        Commands::Resolve { input } => {
+            let symbol_table = resolve(parse(input)?)?;
+            println!("{}", symbol_table.borrow());
+            eprintln!("Resolved successfully!");
+        }
+
         /*
         Commands::Eval { input } => {
             eval(parse(input)?, &cli.std)?;
@@ -142,6 +156,9 @@ main();
 
 fn parse(input: impl AsRef<Path>) -> anyhow::Result<SourceFile> {
     Ok(SourceFile::load(input)?)
+}
+fn resolve(source_file: SourceFile) -> anyhow::Result<SymbolNodeRc> {
+    Ok(source_file.resolve(None))
 }
 /*
 fn eval(source_file: SourceFile, std: impl AsRef<Path>) -> anyhow::Result<ObjectNode> {

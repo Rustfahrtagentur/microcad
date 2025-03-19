@@ -30,10 +30,15 @@ use std::cell::*;
 /// v = c::d();
 use crate::{Id, parse::*};
 
-enum SymbolDefinition {
+/// Symbol definition
+pub enum SymbolDefinition {
+    /// Source file symbol
     SourceFile(std::rc::Rc<SourceFile>),
+    /// Namespace symbol
     Namespace(std::rc::Rc<NamespaceDefinition>),
+    /// Module symbol
     Module(std::rc::Rc<ModuleDefinition>),
+    /// Function symbol
     Function(std::rc::Rc<FunctionDefinition>),
 }
 
@@ -50,7 +55,8 @@ impl SymbolDefinition {
         match &self {
             Self::Namespace(n) => n.name.id().clone(),
             Self::Module(m) => m.name.id().clone(),
-            _ => unimplemented!(),
+            Self::Function(f) => f.name.id().clone(),
+            Self::SourceFile(s) => s.filename_as_str().into(),
         }
     }
 }
@@ -66,32 +72,28 @@ impl std::fmt::Display for SymbolDefinition {
     }
 }
 
+/// Map Id to SymbolNode reference
 pub type SymbolMap = std::collections::btree_map::BTreeMap<Id, SymbolNodeRc>;
 
 const SUPER: &str = "super";
 
-//pub type SymbolNode = rctree::Node<SymbolNodeInner>;
+/// Symbol node
 pub struct SymbolNode {
-    def: SymbolDefinition,
-    parent: Option<SymbolNodeRc>,
-    children: SymbolMap,
+    /// Symbol definition
+    pub def: SymbolDefinition,
+    /// Symbol's parent node
+    pub parent: Option<SymbolNodeRc>,
+    /// Symbol's children nodes
+    pub children: SymbolMap,
 }
 
 impl SymbolNode {
-    fn id(&self) -> Id {
-        self.def.id()
-    }
-
-    fn print_symbol(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+    /// Print out symbols from that point
+    pub fn print_symbol(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}{}", "", self.def)?;
         self.children
             .iter()
             .try_for_each(|(_, child)| child.borrow().print_symbol(f, depth + 1))
-    }
-
-    fn add_child(&mut self, child: SymbolNodeRc) {
-        let id = child.borrow().id();
-        self.add_child_with_id(id, child);
     }
 
     fn add_child_with_id(&mut self, id: Id, child: SymbolNodeRc) {
@@ -99,20 +101,19 @@ impl SymbolNode {
     }
 }
 
-pub type SymbolNodeRc = std::rc::Rc<std::cell::RefCell<SymbolNode>>;
-
-pub trait Resolve {
-    fn resolve(&self, parent: Option<SymbolNodeRc>) -> SymbolNodeRc;
+impl std::fmt::Display for SymbolNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.print_symbol(f, 0)
+    }
 }
 
-impl Statement {
-    fn definition(&self) -> Option<SymbolDefinition> {
-        match &self {
-            Statement::Namespace(n) => Some(SymbolDefinition::Namespace(n.clone())),
-            Statement::Module(m) => Some(SymbolDefinition::Module(m.clone())),
-            _ => None,
-        }
-    }
+/// Reference to SymbolNode
+pub type SymbolNodeRc = std::rc::Rc<std::cell::RefCell<SymbolNode>>;
+
+/// Trait which resolves to SymbolNode reference
+pub trait Resolve {
+    /// Resolve self into SymbolNode reference
+    fn resolve(&self, parent: Option<SymbolNodeRc>) -> SymbolNodeRc;
 }
 
 impl Resolve for std::rc::Rc<ModuleDefinition> {
@@ -157,7 +158,6 @@ impl Resolve for SymbolDefinition {
             Self::Namespace(n) => n.resolve(parent),
             Self::Function(f) => f.resolve(parent),
             Self::SourceFile(s) => s.resolve(parent),
-            _ => unimplemented!(),
         }
     }
 }
@@ -166,6 +166,19 @@ impl Resolve for std::rc::Rc<SourceFile> {
     fn resolve(&self, parent: Option<SymbolNodeRc>) -> SymbolNodeRc {
         let node = SymbolNode {
             def: SymbolDefinition::SourceFile(self.clone()),
+            parent: parent.clone(),
+            children: Default::default(),
+        };
+        let rc = SymbolNodeRc::new(RefCell::new(node));
+        rc.borrow_mut().children = Body::fetch_symbol_map_from(&self.body, Some(rc.clone()));
+        rc
+    }
+}
+
+impl Resolve for SourceFile {
+    fn resolve(&self, parent: Option<SymbolNodeRc>) -> SymbolNodeRc {
+        let node = SymbolNode {
+            def: SymbolDefinition::SourceFile(std::rc::Rc::new(self.clone())),
             parent: parent.clone(),
             children: Default::default(),
         };
