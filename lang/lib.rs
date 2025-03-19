@@ -9,6 +9,7 @@ pub mod objects;
 pub mod ord_map;
 pub mod parse;
 pub mod parser;
+pub mod resolve;
 pub mod source_file_cache;
 pub mod src_ref;
 pub mod r#type;

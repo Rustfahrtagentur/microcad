@@ -3,7 +3,12 @@
 
 //! Module body parser entity
 
-use crate::{parse::*, parser::*, src_ref::*};
+use crate::{
+    parse::*,
+    parser::*,
+    resolve::{SymbolMap, SymbolNodeRc},
+    src_ref::*,
+};
 
 /// Module definition body
 ///
@@ -30,6 +35,50 @@ pub struct Body {
     pub statements: Vec<Statement>,
     /// Source code reference
     src_ref: SrcRef,
+}
+
+impl Body {
+    pub fn fetch_symbol_map_from(
+        statements: &Vec<Statement>,
+        parent: Option<SymbolNodeRc>,
+    ) -> SymbolMap {
+        let mut symbol_map = SymbolMap::default();
+        use crate::resolve::Resolve;
+        if let Some(parent) = &parent {
+            symbol_map.insert("super".into(), parent.clone());
+        }
+
+        // Iterate over all statement fetch definitions
+        for statement in statements {
+            match statement {
+                Statement::Module(m) => {
+                    symbol_map.insert(
+                        m.name.id().clone(),
+                        std::rc::Rc::new(m.resolve(parent.clone())),
+                    );
+                }
+                Statement::Namespace(n) => {
+                    symbol_map.insert(
+                        n.name.id().clone(),
+                        std::rc::Rc::new(n.resolve(parent.clone())),
+                    );
+                }
+                Statement::Function(f) => {
+                    symbol_map.insert(
+                        f.name.id().clone(),
+                        std::rc::Rc::new(f.resolve(parent.clone())),
+                    );
+                }
+                _ => {}
+            }
+        }
+
+        symbol_map
+    }
+
+    pub fn fetch_symbol_map(&self, parent: Option<SymbolNodeRc>) -> SymbolMap {
+        Self::fetch_symbol_map_from(&self.statements, parent)
+    }
 }
 
 impl SrcReferrer for Body {
