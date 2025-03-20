@@ -22,6 +22,7 @@ impl SymbolNode {
         })
     }
 
+    /// Create a symbol node of a build in function
     pub fn new_builtin_fn(name: Id, f: &'static BuiltinFunctionFn) -> RcMut<SymbolNode> {
         SymbolNode::new(
             SymbolDefinition::BuiltinFunction(BuiltinFunction::new(name, f)),

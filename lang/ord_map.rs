@@ -110,6 +110,7 @@ where
         self.map.keys()
     }
 
+    /// get first element
     pub fn first(&self) -> Option<&V> {
         self.vec.first()
     }

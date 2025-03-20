@@ -13,8 +13,6 @@ pub struct EvalContext {
     symbols: RcMut<SymbolNode>,
     /// Stack of currently opened scopes with local symbols while evaluation
     scope_stack: ScopeStack,
-    /// Symbol node which is currently evaluated
-    current_symbol_node: Option<RcMut<SymbolNode>>,
     /// Current source file being evaluated
     current_source_file: Option<Rc<SourceFile>>,
     /// Source file cache containing all source files loaded in the context
@@ -42,7 +40,6 @@ impl EvalContext {
             source_files: Default::default(),
             diag_handler: Default::default(),
             scope_stack: Default::default(),
-            current_symbol_node: Default::default(),
         };
 
         ctx.source_files.add(source_file);
