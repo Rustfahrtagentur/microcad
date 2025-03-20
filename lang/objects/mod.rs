@@ -179,13 +179,13 @@ pub fn bake2d(
             ObjectNodeInner::Primitive2D(ref renderable) => {
                 return Ok(geo2d::tree::geometry(
                     renderable.request_geometry(renderer)?,
-                ))
+                ));
             }
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_2d(
                     renderer,
                     crate::objects::into_group(node.clone()).unwrap_or(node.clone()),
-                )
+                );
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),
             ObjectNodeInner::ChildrenNodeMarker => geo2d::tree::group(),

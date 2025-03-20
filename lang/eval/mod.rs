@@ -8,6 +8,7 @@ mod builtin_module;
 mod call;
 mod eval_context;
 mod eval_error;
+mod scope_stack;
 
 pub use builtin_function::*;
 pub use builtin_module::*;
@@ -17,6 +18,7 @@ pub use eval_error::*;
 
 use super::*;
 use crate::objects::ObjectNode;
+use scope_stack::*;
 
 pub enum EvalReturn {
     None,

@@ -134,11 +134,7 @@ impl Eval for SourceFile {
 /// We can get a source file by its hash
 impl GetSourceFileByHash for SourceFile {
     fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile> {
-        if self.hash == hash {
-            Some(self)
-        } else {
-            None
-        }
+        if self.hash == hash { Some(self) } else { None }
     }
 }
 

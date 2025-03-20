@@ -1,19 +1,22 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, parse::*, resolve::*, source_file_cache::*, *};
-
-use super::EvalResult;
+use super::*;
+use crate::{diag::*, parse::*, resolve::*, source_file_cache::*};
 
 /// Context for evaluation
 ///
 /// The context is used to store the current state of the evaluation.
 /// A context is essentially a stack of symbol tables
 pub struct EvalContext {
-    /// Symbol table
+    /// Tree of all evaluated symbols
     symbols: RcMut<SymbolNode>,
+    /// Stack of currently opened scopes with local symbols while evaluation
+    scope_stack: ScopeStack,
+    /// Symbol node which is currently evaluated
+    current_symbol_node: Option<RcMut<SymbolNode>>,
     /// Current source file being evaluated
-    current_source_file: Option<std::rc::Rc<SourceFile>>,
+    current_source_file: Option<Rc<SourceFile>>,
     /// Source file cache containing all source files loaded in the context
     source_files: SourceFileCache,
     /// Source file diagnostics
@@ -28,6 +31,8 @@ impl EvalContext {
             symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
             source_files: Default::default(),
             diag_handler: Default::default(),
+            scope_stack: todo!(),
+            current_symbol_node: todo!(),
         };
 
         ctx.source_files.add(source_file);
@@ -55,10 +60,12 @@ impl EvalContext {
         self.error(src_ref, Box::new(error))
     }
 
+    /// Return a mutable reference to the symbols node which is currently processed
     pub fn current_node_mut(&mut self) -> RcMut<SymbolNode> {
         self.symbols.clone()
     }
 
+    /// Find a symbol in the symbol table and add it at the currently processed node
     pub fn use_symbol(&mut self, qualified_name: &QualifiedName) -> EvalResult<()> {
         let current_node = self.current_node_mut();
         if let Some(child) =
