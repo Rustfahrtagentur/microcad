@@ -62,7 +62,7 @@ impl EvalContext {
     pub fn use_symbol(&mut self, qualified_name: &QualifiedName) -> EvalResult<()> {
         let current_node = self.current_node_mut();
         if let Some(child) =
-            SymbolNode::search_bottom_up(&current_node.borrow(), &qualified_name.clone().into())
+            SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone().into())
         {
             SymbolNode::insert_child(self.current_node_mut(), child);
             Ok(())
