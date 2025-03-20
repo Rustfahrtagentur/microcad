@@ -3,7 +3,7 @@
 
 //! Module statement parser entities
 //!
-use crate::{eval::*, parse::*, parser::*, src_ref::*, *};
+use crate::{parse::*, parser::*, src_ref::*, *};
 
 mod assignment;
 mod if_statement;

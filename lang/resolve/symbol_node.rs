@@ -1,5 +1,5 @@
 use super::*;
-use crate::*;
+use crate::{eval::*, *};
 
 /// Symbol node
 #[derive(Debug)]
@@ -20,6 +20,13 @@ impl SymbolNode {
             parent,
             children: Default::default(),
         })
+    }
+
+    pub fn new_builtin_fn(name: Id, f: &'static BuiltinFunctionFn) -> RcMut<SymbolNode> {
+        SymbolNode::new(
+            SymbolDefinition::BuiltinFunction(BuiltinFunction::new(name, f)),
+            None,
+        )
     }
 
     /// Print out symbols from that point

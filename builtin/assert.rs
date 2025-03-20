@@ -1,42 +1,64 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{
-    eval::{BuiltinFunction, EvalError},
-    function_signature, parameter, parameter_list,
-    parse::{Expression, GetSourceFileByHash},
-    src_ref::SrcReferrer,
-};
+use microcad_lang::{eval::*, parse::*, *};
 
-pub fn builtin_fn() -> BuiltinFunction {
-    BuiltinFunction::new(
-        "assert".into(),
-        function_signature!(parameter_list![
-            parameter!(condition: Bool),
-            parameter!(message: String = "Assertion failed")
-        ]),
-        &|args, ctx| {
-            let message: String = if let Some(m) = args.get("message") {
-                m.clone().try_into()?
-            } else {
-                return Err(EvalError::GrammarRuleError("cannot fetch `message`".into()));
-            };
+/// Build builtin assert symbols
+pub fn build(builtin_symbol: &mut RcMut<SymbolNode>) {
+    SymbolNode::insert_child(builtin_symbol, assert_valid());
+    SymbolNode::insert_child(builtin_symbol, assert_invalid());
+}
 
-            let condition: bool = args["condition"].clone().try_into()?;
-            if !condition {
-                if let Some(condition_src) = ctx.get_source_string(args["condition"].src_ref()) {
-                    ctx.error_with_stack_trace(
-                        args.src_ref(),
-                        EvalError::AssertionFailedWithCondition(message, condition_src.into()),
-                    )?;
-                } else {
-                    ctx.error_with_stack_trace(
-                        args.src_ref(),
-                        EvalError::AssertionFailed(message),
-                    )?;
-                }
+fn assert_valid() -> RcMut<SymbolNode> {
+    SymbolNode::new_builtin_fn(
+        "assert_valid".into(),
+        &|args, context| match look_up(args, context) {
+            Ok(LookUp::Local(_)) | Ok(LookUp::Symbol(_)) => Ok(Value::None),
+            Ok(LookUp::NotFound(no_name)) => {
+                panic!("Symbol {} invalid in {}", no_name, context.ref_str(&args))
             }
-            Ok(None)
+            Err(err) => Err(err),
         },
     )
+}
+
+fn assert_invalid() -> RcMut<SymbolNode> {
+    SymbolNode::new_builtin_fn("assert_invalid".into(), &|args, context| match look_up(
+        args, context,
+    ) {
+        Ok(LookUp::Local(name)) => {
+            panic!("Symbol {} valid in {}", name, context.ref_str(&args))
+        }
+        Ok(LookUp::Symbol(name)) => {
+            panic!("Symbol {} valid in {}", name, context.ref_str(&args))
+        }
+        _ => Ok(Value::None),
+    })
+}
+
+fn look_up(args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<LookUp> {
+    if args.len() != 1 {
+        return Err(EvalError::ArgumentCountMismatch {
+            args: args.clone(),
+            expected: 1,
+            found: args.len(),
+        });
+    }
+    if let Some(first) = args.first() {
+        if let Expression::Nested(nested) = &first.value {
+            if let Some(name) = nested.single_qualified_name() {
+                match context.look_up(&name) {
+                    LookUp::Symbol(name) => return Ok(LookUp::Symbol(name)),
+                    LookUp::Local(id) => return Ok(LookUp::Local(id)),
+                    _ => (),
+                }
+            } else {
+                return Err(EvalError::NotAName(first.value.clone()));
+            }
+        } else {
+            return Err(EvalError::NotAName(first.value.clone()));
+        }
+        return Err(EvalError::LookUpFailed(first.value.clone()));
+    }
+    unreachable!()
 }

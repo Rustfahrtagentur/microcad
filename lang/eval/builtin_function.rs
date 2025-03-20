@@ -12,21 +12,21 @@ pub type BuiltinFunctionFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> Eval
 #[derive(Clone)]
 pub struct BuiltinFunction {
     /// Name of the builtin function
-    pub name: Identifier,
+    pub id: Id,
     /// Functor to evaluate this function
     pub f: &'static BuiltinFunctionFn,
 }
 
 impl std::fmt::Debug for BuiltinFunction {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "BUILTIN({})", &self.name)
+        write!(f, "BUILTIN({})", &self.id)
     }
 }
 
 impl BuiltinFunction {
     /// Create new builtin function
-    pub fn new(name: Identifier, f: &'static BuiltinFunctionFn) -> Rc<Self> {
-        Rc::new(Self { name, f })
+    pub fn new(id: Id, f: &'static BuiltinFunctionFn) -> Rc<Self> {
+        Rc::new(Self { id, f })
     }
 }
 

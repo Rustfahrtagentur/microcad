@@ -26,6 +26,7 @@ pub trait GetSourceFileByHash {
         }
     }
 
+    /// return a string describing the given source code position
     fn ref_str(&self, src_ref: &impl SrcReferrer) -> String {
         format!(
             "{}:{}",

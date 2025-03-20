@@ -73,7 +73,7 @@ impl Body {
         for s in statements {
             s.eval(context)?;
         }
-        Ok(Value::Invalid)
+        Ok(Value::None)
     }
 }
 

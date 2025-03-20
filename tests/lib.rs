@@ -1,8 +1,6 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_builtin::builtin_module;
-
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
 /*
@@ -18,7 +16,7 @@ static TEST_OUT_DIR: &str = "output";
 #[cfg(test)]
 static DEFAULT_TEST_FILE: &str = "../tests/test_cases/algorithm/difference.µcad";
 
-// Assure `TEST_OUT_DIR` exists
+/// Assure `TEST_OUT_DIR` exists
 #[cfg(test)]
 fn make_test_out_dir() -> std::path::PathBuf {
     let test_out_dir = std::path::PathBuf::from(TEST_OUT_DIR);
@@ -42,6 +40,7 @@ fn namespaces() {
 
 #[test]
 fn scopes() {
+    use microcad_builtin::*;
     use microcad_lang::*;
     let source_file = SourceFile::load("../tests/test_cases/syntax/scopes.µcad").expect("");
 
@@ -53,6 +52,7 @@ fn scopes() {
 
 #[test]
 fn context_with_symbols() {
+    use microcad_builtin::*;
     use microcad_lang::*;
     let source_file = SourceFile::load("../tests/test_cases/syntax/call.µcad").expect("");
     let mut context = EvalContext::from_source_file(source_file.clone());
@@ -60,6 +60,9 @@ fn context_with_symbols() {
     context.add_symbol(builtin_module());
     context
         .fetch_symbol(&"__builtin::assert_valid".into())
+        .expect("symbol not found");
+    context
+        .fetch_symbol(&"__builtin::assert_invalid".into())
         .expect("symbol not found");
     source_file.eval(&mut context).expect("Valid source");
 }

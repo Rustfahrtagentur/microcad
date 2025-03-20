@@ -25,7 +25,7 @@ pub use unnamed_tuple::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{objects::*, parse::*, src_ref::*, ty::*, r#type::*};
+use crate::{objects::*, parse::*, r#type::*, src_ref::*, ty::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
 
@@ -35,7 +35,7 @@ pub(crate) type ValueResult = std::result::Result<Value, ValueError>;
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
     /// Invalid value (used for error handling)
-    Invalid,
+    None,
     /// An integer value
     Integer(Refer<Integer>),
     /// A scalar value
@@ -98,7 +98,7 @@ impl Value {
     /// Clone the value with a new source reference
     pub fn clone_with_src_ref(&self, src_ref: SrcRef) -> Self {
         match self {
-            Value::Invalid => Value::Invalid,
+            Value::None => Value::None,
             Value::Integer(i) => Value::Integer(Refer::new(i.value, src_ref)),
             Value::Scalar(s) => Value::Scalar(Refer::new(s.value, src_ref)),
             Value::Length(l) => Value::Length(Refer::new(l.value, src_ref)),
@@ -123,14 +123,14 @@ impl Value {
 
     /// Check if the value is invalid
     pub fn is_invalid(&self) -> bool {
-        matches!(self, Value::Invalid)
+        matches!(self, Value::None)
     }
 }
 
 impl SrcReferrer for Value {
     fn src_ref(&self) -> SrcRef {
         match self {
-            Value::Invalid => SrcRef(None),
+            Value::None => SrcRef(None),
             Value::Integer(i) => i.src_ref(),
             Value::Scalar(s) => s.src_ref(),
             Value::Bool(b) => b.src_ref(),
@@ -176,7 +176,7 @@ impl PartialOrd for Value {
 impl crate::ty::Ty for Value {
     fn ty(&self) -> Type {
         match self {
-            Value::Invalid => Type::Invalid,
+            Value::None => Type::Invalid,
             Value::Integer(_) => Type::Integer,
             Value::Scalar(_) => Type::Scalar,
             Value::Length(_) => Type::Length,
@@ -475,7 +475,7 @@ impl std::ops::BitAnd for Value {
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Value::Invalid => write!(f, "<invalid>"),
+            Value::None => write!(f, "<invalid>"),
             Value::Integer(n) => write!(f, "{n}"),
             Value::Scalar(n) => write!(f, "{n}"),
             Value::Length(n)

@@ -36,7 +36,10 @@ impl Eval for Assignment {
 
 impl Eval for Body {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        Body::evaluate_vec(&self.statements, context)
+        context.open_scope();
+        let result = Body::evaluate_vec(&self.statements, context);
+        context.close_scope();
+        result
     }
 }
 
@@ -90,9 +93,9 @@ impl Eval for Nested {
         for item in self.iter() {
             match item.eval(context)? {
                 Value::Node(n) => nodes.push(n),
-                Value::Invalid => {
+                Value::None => {
                     if nodes.is_empty() && self.len() == 1 {
-                        return Ok(Value::Invalid);
+                        return Ok(Value::None);
                     } else {
                         context.error_with_stack_trace(
                             self,
@@ -114,7 +117,7 @@ impl Eval for Nested {
         }
 
         if nodes.is_empty() {
-            Ok(Value::Invalid)
+            Ok(Value::None)
         } else {
             todo!("Nest nodes is WIP")
             //Ok(Value::Node(crate::objects::nest_nodes(nodes)))
@@ -159,7 +162,7 @@ impl Eval for Expression {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
                 if lhs.is_invalid() || rhs.is_invalid() {
-                    return Ok(Value::Invalid);
+                    return Ok(Value::None);
                 }
 
                 match op.as_str() {
@@ -216,7 +219,7 @@ impl Eval for Expression {
                                     len: list.len(),
                                 },
                             )?;
-                            Ok(Value::Invalid)
+                            Ok(Value::None)
                         }
                     }
                     _ => unimplemented!(),
@@ -237,7 +240,7 @@ impl Eval for Statement {
             statement => todo!("{statement:#?}"),
         };
 
-        Ok(Value::Invalid)
+        Ok(Value::None)
     }
 }
 
@@ -246,7 +249,7 @@ impl Eval for UseStatement {
         for decl in &self.decls {
             decl.eval(context)?;
         }
-        Ok(Value::Invalid)
+        Ok(Value::None)
     }
 }
 
@@ -257,6 +260,6 @@ impl Eval for UseDeclaration {
             UseDeclaration::UseAll(qualified_name, src_ref) => todo!(),
             UseDeclaration::UseAlias(qualified_name, identifier, src_ref) => todo!(),
         };
-        Ok(Value::Invalid)
+        Ok(Value::None)
     }
 }

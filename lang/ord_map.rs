@@ -109,4 +109,8 @@ where
     pub fn keys(&self) -> std::collections::hash_map::Keys<'_, K, usize> {
         self.map.keys()
     }
+
+    pub fn first(&self) -> Option<&V> {
+        self.vec.first()
+    }
 }

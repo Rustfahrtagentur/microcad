@@ -14,6 +14,7 @@ use crate::{parse::*, parser::*, src_ref::*};
 #[derive(Clone, Debug)]
 pub struct UseStatement {
     visibility: Visibility,
+    /// Use declarations
     pub decls: Vec<UseDeclaration>,
     src_ref: SrcRef,
 }

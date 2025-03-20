@@ -3,11 +3,7 @@
 
 //! Evaluation error
 
-use crate::{
-    Id, ValueError,
-    parse::{Identifier, QualifiedName},
-    r#type::*,
-};
+use crate::{parse::*, r#type::*, *};
 use thiserror::Error;
 
 /// Evaluation error
@@ -104,9 +100,17 @@ pub enum EvalError {
     #[error("Local symbol not found: {0}")]
     LocalNotFound(Id),
 
+    /// Expression is neither a valid name for a symbol nor local variable
+    #[error("Expression '{0}' is neither a valid name for a symbol nor local variable")]
+    NotAName(Expression),
+
     /// Qualified name cannot be converted into an Id
     #[error("Qualified name {0} cannot be converted into an Id")]
     QualifiedNameIsNoId(QualifiedName),
+
+    /// Lookup of a name failed
+    #[error("Lookup of name {0} failed")]
+    LookUpFailed(Expression),
 
     /// No matching initializer for module definition
     #[error("No matching initializer for module definition `{0}`")]
@@ -125,8 +129,10 @@ pub enum EvalError {
     ExpectedIterable(Type),
 
     /// Argument count mismatch
-    #[error("Argument count mismatch: expected {expected}, got {found}")]
+    #[error("Argument count mismatch: expected {expected}, got {found} in {args}")]
     ArgumentCountMismatch {
+        /// Argument list including the error
+        args: CallArgumentList,
         /// Expected number of arguments
         expected: usize,
         /// Found number of arguments

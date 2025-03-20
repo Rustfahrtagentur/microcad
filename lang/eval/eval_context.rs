@@ -23,6 +23,16 @@ pub struct EvalContext {
     diag_handler: DiagHandler,
 }
 
+/// Look up result
+pub enum LookUp {
+    /// Look up failed
+    NotFound(QualifiedName),
+    /// found local variable with given Id
+    Local(Id),
+    /// found global symbol with given qualified name
+    Symbol(QualifiedName),
+}
+
 impl EvalContext {
     /// Create a new context from a source file
     pub fn from_source_file(source_file: Rc<SourceFile>) -> Self {
@@ -79,6 +89,16 @@ impl EvalContext {
         SymbolNode::insert_child(&mut self.symbols, symbol);
     }
 
+    /// Open a new scope
+    pub fn open_scope(&mut self) {
+        self.scope_stack.open_scope();
+    }
+
+    /// Remove all local variables in the current scope and close it
+    pub fn close_scope(&mut self) {
+        self.scope_stack.close_scope();
+    }
+
     /// fetch symbol from symbol table
     pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
         let current_node = self.current_node();
@@ -111,6 +131,20 @@ impl EvalContext {
         } else {
             Err(super::EvalError::SymbolNotFound(qualified_name.clone()))
         }
+    }
+
+    /// look up a symbol name in either local variables or symbol table
+    pub fn look_up(&self, name: &QualifiedName) -> LookUp {
+        let id: Result<Id, _> = name.clone().try_into();
+        if let Ok(id) = id {
+            if self.fetch_local(&id).is_ok() {
+                return LookUp::Local(id);
+            }
+        }
+        if self.fetch_symbol(name).is_ok() {
+            return LookUp::Symbol(name.clone());
+        }
+        LookUp::NotFound(name.clone())
     }
 }
 

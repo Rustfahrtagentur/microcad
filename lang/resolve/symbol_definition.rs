@@ -23,7 +23,7 @@ impl SymbolDefinition {
             Self::Module(m) => m.name.id().clone(),
             Self::Function(f) => f.name.id().clone(),
             Self::SourceFile(s) => s.filename_as_str().into(),
-            Self::BuiltinFunction(f) => f.name.id().clone(),
+            Self::BuiltinFunction(f) => f.id.clone(),
         }
     }
 }
