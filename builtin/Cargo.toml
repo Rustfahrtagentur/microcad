@@ -22,7 +22,7 @@ anyhow = "1.0"
 
 microcad-core = { workspace = true }
 microcad-lang = { workspace = true }
-microcad-export = { workspace = true }
+#microcad-export = { workspace = true }
 microcad-builtin-proc-macro = { workspace = true }
 
 [features]

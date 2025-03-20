@@ -13,17 +13,27 @@ pub trait GetSourceFileByHash {
     fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile>;
 
     /// Convenience function to get a source file by from a `SrcRef`
-    fn get_source_file_by_src_ref(&self, src_ref: impl SrcReferrer) -> Option<&SourceFile> {
+    fn get_source_file_by_src_ref(&self, src_ref: &impl SrcReferrer) -> Option<&SourceFile> {
         self.get_source_file_by_hash(src_ref.src_ref().source_hash())
     }
 
     /// Convenience function to get source slice by `SrcRef`
-    fn get_source_string(&self, src_ref: impl SrcReferrer) -> Option<&str> {
+    fn get_source_string(&self, src_ref: &impl SrcReferrer) -> Option<&str> {
         if let Some(source_file) = self.get_source_file_by_src_ref(&src_ref) {
             Some(src_ref.src_ref().source_slice(&source_file.source))
         } else {
             None
         }
+    }
+
+    fn ref_str(&self, src_ref: &impl SrcReferrer) -> String {
+        format!(
+            "{}:{}",
+            self.get_source_file_by_src_ref(src_ref)
+                .expect("Source file not found")
+                .filename_as_str(),
+            src_ref.src_ref(),
+        )
     }
 }
 

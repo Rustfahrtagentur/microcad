@@ -4,9 +4,9 @@
 //! Evaluation error
 
 use crate::{
+    Id, ValueError,
     parse::{Identifier, QualifiedName},
     r#type::*,
-    Id, ValueError,
 };
 use thiserror::Error;
 
@@ -99,6 +99,14 @@ pub enum EvalError {
     /// Symbol not found
     #[error("Symbol not found: {0}")]
     SymbolNotFound(QualifiedName),
+
+    /// Local symbol not found
+    #[error("Local symbol not found: {0}")]
+    LocalNotFound(Id),
+
+    /// Qualified name cannot be converted into an Id
+    #[error("Qualified name {0} cannot be converted into an Id")]
+    QualifiedNameIsNoId(QualifiedName),
 
     /// No matching initializer for module definition
     #[error("No matching initializer for module definition `{0}`")]

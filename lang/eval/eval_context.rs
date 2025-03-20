@@ -91,6 +91,15 @@ impl EvalContext {
         }
     }
 
+    /// fetch local variable
+    pub fn fetch_local<'a>(&'a self, id: &Id) -> EvalResult<&'a LocalDefinition> {
+        if let Some(def) = self.scope_stack.fetch(id) {
+            Ok(def)
+        } else {
+            Err(super::EvalError::LocalNotFound(id.clone()))
+        }
+    }
+
     /// Find a symbol in the symbol table and add it at the currently processed node
     pub fn use_symbol(&mut self, qualified_name: &QualifiedName) -> EvalResult<()> {
         let current_node = self.current_node_mut();

@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{parse::*, parser::*, src_ref::*};
+use crate::{EvalError, parse::*, parser::*, src_ref::*, *};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
@@ -64,5 +64,16 @@ impl PrintSyntax for QualifiedName {
             "",
             join_identifiers(&self.0, "::")
         )
+    }
+}
+
+impl TryFrom<QualifiedName> for Id {
+    type Error = EvalError;
+
+    fn try_from(qualified_name: QualifiedName) -> Result<Self, Self::Error> {
+        match qualified_name.as_slice() {
+            [identifier] => Ok(identifier.id().clone()),
+            _ => Err(EvalError::QualifiedNameIsNoId(qualified_name)),
+        }
     }
 }

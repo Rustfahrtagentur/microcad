@@ -1,5 +1,3 @@
-use pest::Stack;
-
 use crate::{parse::Expression, *};
 use std::collections::BTreeMap;
 

@@ -2,9 +2,23 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [workspace]
-default-members = ["core", "lang", "tests", "builtin-proc-macro", "tools/cli"]
+default-members = [
+    "builtin",
+    "core",
+    "lang",
+    "tests",
+    "builtin-proc-macro",
+    "tools/cli",
+]
 
-members = ["core", "lang", "tests", "builtin-proc-macro", "tools/cli"]
+members = [
+    "builtin",
+    "core",
+    "lang",
+    "tests",
+    "builtin-proc-macro",
+    "tools/cli",
+]
 resolver = "2"
 
 [workspace.package]
@@ -28,4 +42,5 @@ keywords = ["cad", "geometry", "3d", "printing", "cnc", "openscad"]
 microcad-core = { path = "core", version = "0.1.0" }
 microcad-export = { path = "export", version = "0.1.0" }
 microcad-lang = { path = "lang", version = "0.1.0" }
+microcad-builtin = { path = "builtin", version = "0.1.0" }
 microcad-builtin-proc-macro = { path = "builtin-proc-macro", version = "0.1.0" }
