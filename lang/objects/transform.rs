@@ -78,7 +78,7 @@ impl Algorithm for Transform {
 
         match geo2d::Geometry::boolean_op_multi(geometries, &BooleanOp::Union) {
             // If there are geometries, return the union of them and apply the transform
-            Some(g) => Ok(geo2d::geometry(std::rc::Rc::new(g.transform(self.mat2d())))),
+            Some(g) => Ok(geo2d::geometry(Rc::new(g.transform(self.mat2d())))),
             // If there are no geometries, return an empty group
             None => Ok(geo2d::group()),
         }
@@ -106,9 +106,7 @@ impl Algorithm for Transform {
 
         match geo3d::Geometry::boolean_op_multi(geometries, &BooleanOp::Union) {
             // If there are geometries, return the union of them and apply the transform
-            Some(g) => Ok(geo3d::geometry(std::rc::Rc::new(
-                g.transform(&self.mat3d()),
-            ))),
+            Some(g) => Ok(geo3d::geometry(Rc::new(g.transform(&self.mat3d())))),
             // If there are no geometries, return an empty group
             None => Ok(geo3d::group()),
         }

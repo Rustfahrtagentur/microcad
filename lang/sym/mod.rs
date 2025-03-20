@@ -27,7 +27,7 @@ pub trait Sym {
 /// Trait of an element which contains other symbols
 pub trait Symbols {
     /// fetch symbol with id
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>>;
+    fn fetch(&self, id: &Id) -> Option<Rc<Symbol>>;
 
     /// Add a symbol
     fn add(&mut self, symbol: Symbol) -> &mut Self;

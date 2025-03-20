@@ -3,7 +3,7 @@
 
 //! Module definition parser entity
 
-use crate::{parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*, *};
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -24,7 +24,7 @@ impl SrcReferrer for ModuleDefinition {
     }
 }
 
-impl Parse for std::rc::Rc<ModuleDefinition> {
+impl Parse for Rc<ModuleDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut name = Identifier::default();
         let mut parameters = None;
@@ -45,7 +45,7 @@ impl Parse for std::rc::Rc<ModuleDefinition> {
             }
         }
 
-        Ok(std::rc::Rc::new(ModuleDefinition {
+        Ok(Rc::new(ModuleDefinition {
             name,
             parameters,
             body,

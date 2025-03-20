@@ -12,11 +12,11 @@ pub enum Symbol {
     /// A value symbol, e.g. a result of an assignment
     Value(Id, Value),
     /// A function symbol, e.g. function a() {}
-    Function(std::rc::Rc<FunctionDefinition>),
+    Function(Rc<FunctionDefinition>),
     /// A module symbol, e.g. module a() {}
-    Module(std::rc::Rc<ModuleDefinition>),
+    Module(Rc<ModuleDefinition>),
     /// A namespace  symbol, e.g. namespace foo {}
-    Namespace(std::rc::Rc<NamespaceDefinition>),
+    Namespace(Rc<NamespaceDefinition>),
     /// A builtin function symbol, e.g. assert()
     BuiltinFunction(BuiltinFunction),
     /// A builtin module symbol, e.g. math::pi
@@ -37,20 +37,20 @@ impl std::fmt::Display for Symbol {
     }
 }
 
-impl From<std::rc::Rc<FunctionDefinition>> for Symbol {
-    fn from(f: std::rc::Rc<FunctionDefinition>) -> Self {
+impl From<Rc<FunctionDefinition>> for Symbol {
+    fn from(f: Rc<FunctionDefinition>) -> Self {
         Self::Function(f)
     }
 }
 
-impl From<std::rc::Rc<ModuleDefinition>> for Symbol {
-    fn from(f: std::rc::Rc<ModuleDefinition>) -> Self {
+impl From<Rc<ModuleDefinition>> for Symbol {
+    fn from(f: Rc<ModuleDefinition>) -> Self {
         Self::Module(f)
     }
 }
 
-impl From<std::rc::Rc<NamespaceDefinition>> for Symbol {
-    fn from(f: std::rc::Rc<NamespaceDefinition>) -> Self {
+impl From<Rc<NamespaceDefinition>> for Symbol {
+    fn from(f: Rc<NamespaceDefinition>) -> Self {
         Self::Namespace(f)
     }
 }

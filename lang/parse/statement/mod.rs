@@ -3,7 +3,7 @@
 
 //! Module statement parser entities
 //!
-use crate::{eval::*, objects::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, *};
 
 mod assignment;
 mod if_statement;
@@ -19,13 +19,13 @@ pub use return_statement::*;
 #[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum Statement {
     /// Module definition
-    Module(std::rc::Rc<ModuleDefinition>),
+    Module(Rc<ModuleDefinition>),
     /// Namespace definition
-    Namespace(std::rc::Rc<NamespaceDefinition>),
+    Namespace(Rc<NamespaceDefinition>),
     /// Function definition
-    Function(std::rc::Rc<FunctionDefinition>),
+    Function(Rc<FunctionDefinition>),
     /// Module init definition
-    ModuleInit(std::rc::Rc<ModuleInitDefinition>),
+    ModuleInit(Rc<ModuleInitDefinition>),
 
     /// Use statement
     Use(UseStatement),
@@ -66,15 +66,11 @@ impl Parse for Statement {
         Parser::ensure_rule(&pair, Rule::statement);
         let first = pair.inner().next().expect(INTERNAL_PARSE_ERROR);
         Ok(match first.as_rule() {
-            Rule::module_definition => Self::Module(std::rc::Rc::<ModuleDefinition>::parse(first)?),
-            Rule::namespace_definition => {
-                Self::Namespace(std::rc::Rc::<NamespaceDefinition>::parse(first)?)
-            }
-            Rule::function_definition => {
-                Self::Function(std::rc::Rc::<FunctionDefinition>::parse(first)?)
-            }
+            Rule::module_definition => Self::Module(Rc::<ModuleDefinition>::parse(first)?),
+            Rule::namespace_definition => Self::Namespace(Rc::<NamespaceDefinition>::parse(first)?),
+            Rule::function_definition => Self::Function(Rc::<FunctionDefinition>::parse(first)?),
             Rule::module_init_definition => {
-                Self::ModuleInit(std::rc::Rc::new(ModuleInitDefinition::parse(first)?))
+                Self::ModuleInit(Rc::new(ModuleInitDefinition::parse(first)?))
             }
 
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),

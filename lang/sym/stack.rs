@@ -11,15 +11,15 @@ use crate::{parse::*, src_ref::*, sym::*};
 /// A stack frame defines which kind of symbol we are currently evaluating.
 #[derive(Debug, Clone, Default)]
 pub struct StackFrame {
-    source: std::rc::Rc<Symbol>,
+    source: Rc<Symbol>,
     symbol_table: SymbolTable,
 }
 
 impl StackFrame {
     /// Create a new stack frame for a function
-    pub fn function<C>(_: &mut C, function: std::rc::Rc<FunctionDefinition>) -> Self {
+    pub fn function<C>(_: &mut C, function: Rc<FunctionDefinition>) -> Self {
         Self {
-            source: std::rc::Rc::new(Symbol::Function(function.clone())),
+            source: Rc::new(Symbol::Function(function.clone())),
             symbol_table: SymbolTable::default(),
         }
     }
@@ -27,10 +27,10 @@ impl StackFrame {
     /// Create a new stack frame for a module
     pub fn module(
         context: &mut impl Context,
-        module: std::rc::Rc<crate::parse::ModuleDefinition>,
+        module: Rc<crate::parse::ModuleDefinition>,
     ) -> SymResult<Self> {
         Ok(Self {
-            source: std::rc::Rc::new(Symbol::Module(module.clone())),
+            source: Rc::new(Symbol::Module(module.clone())),
             symbol_table: context.top()?.symbol_table.clone(),
         })
     }
@@ -38,10 +38,10 @@ impl StackFrame {
     /// Create a new stack frame for a namespace
     pub fn namespace(
         context: &mut impl Context,
-        namespace: std::rc::Rc<crate::parse::NamespaceDefinition>,
+        namespace: Rc<crate::parse::NamespaceDefinition>,
     ) -> SymResult<Self> {
         Ok(Self {
-            source: std::rc::Rc::new(Symbol::Namespace(namespace.clone())),
+            source: Rc::new(Symbol::Namespace(namespace.clone())),
             symbol_table: context.top()?.symbol_table.clone(),
         })
     }
@@ -53,7 +53,7 @@ impl StackFrame {
 }
 
 impl Symbols for StackFrame {
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+    fn fetch(&self, id: &Id) -> Option<Rc<Symbol>> {
         self.symbol_table.fetch(id)
     }
 

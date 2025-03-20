@@ -15,7 +15,8 @@ pub use call::*;
 pub use eval_context::*;
 pub use eval_error::*;
 
-use crate::{objects::ObjectNode, Value};
+use super::*;
+use crate::objects::ObjectNode;
 
 pub enum EvalReturn {
     None,

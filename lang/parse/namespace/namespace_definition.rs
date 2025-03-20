@@ -3,7 +3,7 @@
 
 //! Namespace definition parser entity
 
-use crate::{parse::*, parser::*, src_ref::*};
+use crate::{parse::*, parser::*, src_ref::*, *};
 
 /// Namespace definition
 #[derive(Debug, Clone)]
@@ -33,10 +33,10 @@ impl SrcReferrer for NamespaceDefinition {
     }
 }
 
-impl Parse for std::rc::Rc<NamespaceDefinition> {
+impl Parse for Rc<NamespaceDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut pairs = pair.inner();
-        Ok(std::rc::Rc::new(NamespaceDefinition {
+        Ok(Rc::new(NamespaceDefinition {
             name: Identifier::parse(pairs.next().expect("Identifier expected"))?,
             body: Body::parse(pairs.next().expect("NamespaceBody expected"))?,
             src_ref: pair.clone().into(),

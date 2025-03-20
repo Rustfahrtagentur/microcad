@@ -12,6 +12,7 @@ pub use transform::*;
 
 use strum::IntoStaticStr;
 
+use super::*;
 use microcad_core::*;
 
 /// Inner of a node
@@ -24,14 +25,14 @@ pub enum ObjectNodeInner {
     ChildrenNodeMarker,
 
     /// A generated 2D geometry
-    Primitive2D(std::rc::Rc<Primitive2D>),
+    Primitive2D(Rc<Primitive2D>),
 
     /// Generated 3D geometry
     #[cfg(feature = "geo3d")]
-    Primitive3D(std::rc::Rc<Primitive3D>),
+    Primitive3D(Rc<Primitive3D>),
 
     /// An algorithm trait that manipulates the node or its children
-    Algorithm(std::rc::Rc<dyn Algorithm>),
+    Algorithm(Rc<dyn Algorithm>),
 
     /// An affine transformation of a geometry
     Transform(Transform),
@@ -216,13 +217,13 @@ pub fn bake3d(
             ObjectNodeInner::Primitive3D(ref renderable) => {
                 return Ok(geo3d::tree::geometry(
                     renderable.request_geometry(renderer)?,
-                ))
+                ));
             }
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_3d(
                     renderer,
                     crate::objects::into_group(node.clone()).unwrap_or(node.clone()),
-                )
+                );
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),
             ObjectNodeInner::ChildrenNodeMarker => geo3d::tree::group(),

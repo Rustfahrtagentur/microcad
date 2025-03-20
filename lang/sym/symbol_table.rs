@@ -4,7 +4,7 @@ use super::*;
 ///
 /// A symbol table is a mapping of symbol
 #[derive(Clone, Debug, Default)]
-pub struct SymbolTable(std::collections::HashMap<Id, std::rc::Rc<Symbol>>);
+pub struct SymbolTable(std::collections::HashMap<Id, Rc<Symbol>>);
 
 impl SymbolTable {
     /// Merge two symbol tables
@@ -21,7 +21,7 @@ impl SymbolTable {
 }
 
 impl Symbols for SymbolTable {
-    fn fetch(&self, id: &Id) -> Option<std::rc::Rc<Symbol>> {
+    fn fetch(&self, id: &Id) -> Option<Rc<Symbol>> {
         self.0.get(id).cloned()
     }
 
@@ -29,10 +29,8 @@ impl Symbols for SymbolTable {
         match symbol {
             Symbol::Invalid => {}
             _ => {
-                self.0.insert(
-                    symbol.id().expect("Symbol id is not set"),
-                    std::rc::Rc::new(symbol),
-                );
+                self.0
+                    .insert(symbol.id().expect("Symbol id is not set"), Rc::new(symbol));
             }
         }
 
@@ -43,7 +41,7 @@ impl Symbols for SymbolTable {
         match symbol {
             Symbol::Invalid => {}
             _ => {
-                self.0.insert(alias, std::rc::Rc::new(symbol));
+                self.0.insert(alias, Rc::new(symbol));
             }
         }
 
@@ -59,7 +57,7 @@ impl Symbols for SymbolTable {
 }
 
 impl std::ops::Deref for SymbolTable {
-    type Target = std::collections::HashMap<Id, std::rc::Rc<Symbol>>;
+    type Target = std::collections::HashMap<Id, Rc<Symbol>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

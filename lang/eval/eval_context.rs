@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, parse::*, resolve::*, source_file_cache::*};
+use crate::{diag::*, parse::*, resolve::*, source_file_cache::*, *};
 
 use super::EvalResult;
 
@@ -11,7 +11,7 @@ use super::EvalResult;
 /// A context is essentially a stack of symbol tables
 pub struct EvalContext {
     /// Symbol table
-    symbols: SymbolNodeRc,
+    symbols: RcMut<SymbolNode>,
     /// Current source file being evaluated
     current_source_file: Option<std::rc::Rc<SourceFile>>,
     /// Source file cache containing all source files loaded in the context
@@ -22,7 +22,7 @@ pub struct EvalContext {
 
 impl EvalContext {
     /// Create a new context from a source file
-    pub fn from_source_file(source_file: std::rc::Rc<SourceFile>) -> Self {
+    pub fn from_source_file(source_file: Rc<SourceFile>) -> Self {
         let mut ctx = Self {
             current_source_file: Some(source_file.clone()),
             symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
@@ -37,13 +37,13 @@ impl EvalContext {
     /// Return the current source file
     ///
     /// Note: This should not be an optional value, as the context is always created with a source file
-    pub fn current_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
+    pub fn current_source_file(&self) -> Option<Rc<SourceFile>> {
         self.current_source_file.clone()
     }
 
     /// Add source file to Context
     pub fn add_source_file(&mut self, source_file: SourceFile) {
-        self.source_files.add(std::rc::Rc::new(source_file))
+        self.source_files.add(Rc::new(source_file))
     }
 
     /// Error with stack trace
@@ -55,7 +55,7 @@ impl EvalContext {
         self.error(src_ref, Box::new(error))
     }
 
-    pub fn current_node_mut(&mut self) -> SymbolNodeRc {
+    pub fn current_node_mut(&mut self) -> RcMut<SymbolNode> {
         self.symbols.clone()
     }
 
