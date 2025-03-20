@@ -91,37 +91,6 @@ impl Parse for Statement {
     }
 }
 
-impl Eval for Statement {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<EvalReturn> {
-        match self {
-            Self::Use(u) => u.eval(context)?,
-            _ => todo!(),
-        };
-
-        Ok(EvalReturn::None)
-    }
-}
-
-impl Eval for UseStatement {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<EvalReturn> {
-        for decl in &self.decls {
-            decl.eval(context)?;
-        }
-        Ok(EvalReturn::None)
-    }
-}
-
-impl Eval for UseDeclaration {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<EvalReturn> {
-        match &self {
-            UseDeclaration::Use(qualified_name, src_ref) => context.use_symbol(qualified_name),
-            UseDeclaration::UseAll(qualified_name, src_ref) => todo!(),
-            UseDeclaration::UseAlias(qualified_name, identifier, src_ref) => todo!(),
-        };
-        Ok(EvalReturn::None)
-    }
-}
-
 impl std::fmt::Display for Statement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {

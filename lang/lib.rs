@@ -21,6 +21,9 @@ pub mod value;
 use rc_mut::RcMut;
 use std::{rc::Rc, sync::Once};
 
+pub use eval::*;
+pub use parse::*;
+pub use resolve::*;
 pub use value::*;
 
 /// Id type (base of all identifiers)

@@ -69,17 +69,11 @@ impl Body {
     pub fn evaluate_vec(
         statements: &Vec<Statement>,
         context: &mut EvalContext,
-    ) -> EvalResult<EvalReturn> {
+    ) -> EvalResult<Value> {
         for s in statements {
             s.eval(context)?;
         }
-        todo!()
-    }
-}
-
-impl Eval for Body {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<EvalReturn> {
-        Body::evaluate_vec(&self.statements, context)
+        Ok(Value::Invalid)
     }
 }
 

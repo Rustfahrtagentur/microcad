@@ -5,7 +5,7 @@
 
 use std::io::Read;
 
-use crate::{eval::*, parse::*, parser::*, src_ref::*};
+use crate::{eval::*, parse::*, parser::*, src_ref::*, *};
 
 /// Trait to get a source file by its hash
 pub trait GetSourceFileByHash {
@@ -126,7 +126,7 @@ impl Parse for SourceFile {
 }
 
 impl Eval for SourceFile {
-    fn eval(&self, context: &mut crate::eval::EvalContext) -> crate::eval::EvalResult<EvalReturn> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         Body::evaluate_vec(&self.body, context)
     }
 }

@@ -22,6 +22,14 @@ impl Nested {
     }
 }
 
+impl std::ops::Deref for Nested {
+    type Target = Refer<Vec<NestedItem>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 impl Parse for Nested {
     fn parse(pair: Pair) -> ParseResult<Self> {
         assert!(pair.as_rule() == Rule::nested || pair.as_rule() == Rule::expression_no_semicolon);

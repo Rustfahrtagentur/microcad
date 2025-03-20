@@ -31,8 +31,8 @@ impl EvalContext {
             symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
             source_files: Default::default(),
             diag_handler: Default::default(),
-            scope_stack: todo!(),
-            current_symbol_node: todo!(),
+            scope_stack: Default::default(),
+            current_symbol_node: Default::default(),
         };
 
         ctx.source_files.add(source_file);
@@ -49,6 +49,11 @@ impl EvalContext {
     /// Add source file to Context
     pub fn add_source_file(&mut self, source_file: SourceFile) {
         self.source_files.add(Rc::new(source_file))
+    }
+
+    /// Add a local value
+    pub fn add_local_value(&mut self, id: Id, value: Value) {
+        self.scope_stack.add(id, LocalDefinition::Value(value));
     }
 
     /// Error with stack trace

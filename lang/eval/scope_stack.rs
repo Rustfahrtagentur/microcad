@@ -17,16 +17,11 @@ pub struct ScopeStack(Vec<StackFrame>);
 
 impl Default for ScopeStack {
     fn default() -> Self {
-        Self::new()
+        Self(vec![BTreeMap::new()])
     }
 }
 
 impl ScopeStack {
-    /// Create new stack one stack frame
-    pub fn new() -> Self {
-        Self(vec![BTreeMap::new()])
-    }
-
     /// Open a new scope (stack push)
     pub fn open_scope(&mut self) {
         self.0.push(BTreeMap::new());
@@ -60,7 +55,7 @@ impl ScopeStack {
 #[allow(clippy::unwrap_used)]
 fn scope_stack() {
     use crate::src_ref::{Refer, SrcRef};
-    let mut stack = ScopeStack::new();
+    let mut stack = ScopeStack::default();
 
     let make_int = |value| LocalDefinition::Value(Value::Integer(Refer::new(value, SrcRef(None))));
 
@@ -73,14 +68,24 @@ fn scope_stack() {
 
     stack.add("a".into(), make_int(1));
     assert!(fetch_int(&stack, "a").unwrap() == 1);
+    assert!(fetch_int(&stack, "b").is_none());
+    assert!(fetch_int(&stack, "c").is_none());
 
     stack.open_scope();
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
+    assert!(fetch_int(&stack, "b").is_none());
+    assert!(fetch_int(&stack, "c").is_none());
 
     stack.add("b".into(), make_int(2));
+
+    assert!(fetch_int(&stack, "a").unwrap() == 1);
+    assert!(fetch_int(&stack, "b").unwrap() == 2);
+    assert!(fetch_int(&stack, "c").is_none());
+
     stack.add("c".into(), make_int(3));
 
+    assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);
     assert!(fetch_int(&stack, "c").unwrap() == 3);
 

@@ -149,26 +149,26 @@ main();
     Ok(())
 }
 
-fn parse(input: impl AsRef<Path>) -> anyhow::Result<SourceFile> {
+fn parse(input: impl AsRef<Path>) -> anyhow::Result<Rc<SourceFile>> {
     Ok(SourceFile::load(input)?)
 }
 
-fn resolve(source_file: SourceFile) -> anyhow::Result<RcMut<SymbolNode>> {
+fn resolve(source_file: Rc<SourceFile>) -> anyhow::Result<RcMut<SymbolNode>> {
     Ok(source_file.resolve(None))
 }
 
-fn eval(source_file: SourceFile, _std: impl AsRef<Path>) -> anyhow::Result<ObjectNode> {
-    let source_file = Rc::new(source_file);
+fn eval(source_file: Rc<SourceFile>, _std: impl AsRef<Path>) -> anyhow::Result<ObjectNode> {
     let mut context = EvalContext::from_source_file(source_file.clone());
 
     let result = source_file
         .eval(&mut context)
         .map_err(|err| anyhow::anyhow!("{err}"))?;
 
-    match result {
+    /*match result {
         EvalReturn::ObjectNode(node) => Ok(node),
         _ => unreachable!("Return value must be a node"),
-    }
+    }*/
+    todo!()
 }
 
 /*
