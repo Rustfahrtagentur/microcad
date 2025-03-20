@@ -125,9 +125,18 @@ impl Eval for Nested {
 impl Eval for NestedItem {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match &self {
-            NestedItem::Call(call) => todo!("{call:#?}"),
+            NestedItem::Call(call) => Ok(call.eval(context)?),
             NestedItem::QualifiedName(qualified_name) => todo!("{qualified_name:#?}"),
             NestedItem::Body(body) => Ok(body.eval(context)?),
+        }
+    }
+}
+
+impl Eval for Call {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+        match &context.fetch_symbol(&self.name)?.borrow().def {
+            SymbolDefinition::BuiltinFunction(f) => f.call(&self.argument_list, context),
+            _ => todo!(),
         }
     }
 }

@@ -62,7 +62,9 @@ impl SymbolNode {
 
     /// Search for first symbol in parents
     pub fn search_up(&self, path: &SymbolPath) -> Option<RcMut<SymbolNode>> {
-        if let Some(parent) = &self.parent {
+        if let Some(child) = self.search_down(path) {
+            Some(child)
+        } else if let Some(parent) = &self.parent {
             if let Some(child) = parent.borrow().search_down(path) {
                 Some(child.clone())
             } else {

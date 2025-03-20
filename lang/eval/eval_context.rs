@@ -65,6 +65,10 @@ impl EvalContext {
         self.error(src_ref, Box::new(error))
     }
 
+    /// Return reference to the symbols node which is currently processed
+    pub fn current_node(&self) -> RcMut<SymbolNode> {
+        self.symbols.clone()
+    }
     /// Return a mutable reference to the symbols node which is currently processed
     pub fn current_node_mut(&mut self) -> RcMut<SymbolNode> {
         self.symbols.clone()
@@ -73,6 +77,18 @@ impl EvalContext {
     /// Add symbol to current symbol table
     pub fn add_symbol(&mut self, symbol: RcMut<SymbolNode>) {
         SymbolNode::insert_child(&mut self.symbols, symbol);
+    }
+
+    /// fetch symbol from symbol table
+    pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+        let current_node = self.current_node();
+        if let Some(child) =
+            SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone().into())
+        {
+            Ok(child)
+        } else {
+            Err(super::EvalError::SymbolNotFound(qualified_name.clone()))
+        }
     }
 
     /// Find a symbol in the symbol table and add it at the currently processed node

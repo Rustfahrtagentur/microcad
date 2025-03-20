@@ -17,7 +17,6 @@ impl From<QualifiedName> for SymbolPath {
     }
 }
 
-#[cfg(test)]
 impl From<&str> for SymbolPath {
     fn from(name: &str) -> Self {
         Self(name.split("::").map(|n| Id::new(n)).collect::<Vec<_>>())

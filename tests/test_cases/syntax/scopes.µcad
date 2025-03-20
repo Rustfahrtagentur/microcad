@@ -25,3 +25,6 @@ __builtin::assert_invalid(c);
 __builtin::assert_valid(a);
 __builtin::assert_invalid(b);
 __builtin::assert_invalid(c);
+
+// remove me
+__builtin::assert_valid(x);

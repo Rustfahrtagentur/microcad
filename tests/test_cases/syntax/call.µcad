@@ -1,1 +1,3 @@
 
+__builtin::assert_valid();
+__builtin::assert_invalid();

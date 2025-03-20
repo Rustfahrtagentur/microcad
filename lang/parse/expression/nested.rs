@@ -6,18 +6,36 @@
 use crate::{parse::*, parser::*, src_ref::*};
 
 /// Nested item list, e.g. an expression like `foo bar() {}`
+///
+/// More examples for a nested item
+/// * translate() rotate() a
+/// * a::b
 #[derive(Clone, Debug)]
 pub struct Nested(Refer<Vec<NestedItem>>);
 
 impl Nested {
-    /// Returns an identifier if the nested item is a single qualified name
+    /// Returns an identifier if the nested item is a single identifier, e.g. "foo"
     pub fn single_identifier(&self) -> Option<Identifier> {
-        match self.0.first() {
-            Some(NestedItem::QualifiedName(name)) => match name.as_slice() {
+        if let Some(qualified_name) = self.single_qualified_name() {
+            // Check if the qualified only contains one identifier, e.g. "foo"
+            match qualified_name.as_slice() {
                 [single_id] => Some(single_id.clone()),
                 _ => None,
-            },
-            _ => None,
+            }
+        } else {
+            None
+        }
+    }
+
+    /// Returns a qualified name if the nested item is a single qualified name, e.g. "foo::bar"
+    pub fn single_qualified_name(&self) -> Option<QualifiedName> {
+        if self.0.len() == 1 {
+            match self.0.first() {
+                Some(NestedItem::QualifiedName(name)) => Some(name.clone()),
+                _ => None,
+            }
+        } else {
+            None
         }
     }
 }
