@@ -1,22 +1,6 @@
-error: Symbol not found: inner
-  ---> <no file>:8:29
-     |
-   8 |     circle(radius) - circle(inner());
-     |                             ^^^^^
-     |
-#0	circle
-	at ../lib/std.µcad:9:5
-#1	donut
-	at <no file>:1:1
-#2	root
-error: No matching initializer for module definition `circle`
-  ---> ../lib/std.µcad:9:5
-     |
-   9 |     module circle(radius: Length) {
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-#0	circle
-	at ../lib/std.µcad:9:5
-#1	donut
-	at <no file>:1:1
-#2	root
+Parser error:  --> 5:33
+  |
+5 |     function inner() { radius/2 }
+  |                                 ^---
+  |
+  = expected COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
