@@ -47,7 +47,7 @@ pub struct SourceFile {
 
 impl SourceFile {
     /// Load µcad source file from given `path`
-    pub fn load(path: impl AsRef<std::path::Path>) -> ParseResult<Self> {
+    pub fn load(path: impl AsRef<std::path::Path>) -> ParseResult<std::rc::Rc<Self>> {
         let mut file = match std::fs::File::open(&path) {
             Ok(file) => file,
             _ => return Err(ParseError::LoadSource(path.as_ref().into())),
@@ -61,7 +61,7 @@ impl SourceFile {
         assert_ne!(source_file.hash, 0);
 
         source_file.filename = Some(std::path::PathBuf::from(path.as_ref()));
-        Ok(source_file)
+        Ok(std::rc::Rc::new(source_file))
     }
 
     /// Create `SourceFile` from string
