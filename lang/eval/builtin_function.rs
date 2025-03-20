@@ -6,15 +6,13 @@
 use crate::{argument_map::*, eval::*, parse::*, src_ref::*, ty::Ty, *};
 
 /// Type of the functor which receives a call
-pub type BuiltinFunctionFn = dyn Fn(&ArgumentMap, &mut EvalContext) -> EvalResult<Option<Value>>;
+pub type BuiltinFunctionFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> EvalResult<Value>;
 
 /// Builtin function
 #[derive(Clone)]
 pub struct BuiltinFunction {
     /// Name of the builtin function
     pub name: Identifier,
-    /// Signature of the builtin function
-    pub signature: FunctionSignature,
     /// Functor to evaluate this function
     pub f: &'static BuiltinFunctionFn,
 }
@@ -27,51 +25,18 @@ impl std::fmt::Debug for BuiltinFunction {
 
 impl BuiltinFunction {
     /// Create new builtin function
-    pub fn new(
-        name: Identifier,
-        signature: FunctionSignature,
-        f: &'static BuiltinFunctionFn,
-    ) -> Self {
-        Self { name, signature, f }
+    pub fn new(name: Identifier, f: &'static BuiltinFunctionFn) -> Rc<Self> {
+        Rc::new(Self { name, f })
     }
 }
 
 impl CallTrait for BuiltinFunction {
-    type Output = Option<Value>;
-
     /// Call builtin function with given parameter
     /// # Arguments
     /// - `args`: Function arguments
     /// - `context`: Execution context
-    fn call(
-        &self,
-        args: &CallArgumentList,
-        context: &mut EvalContext,
-    ) -> EvalResult<Option<Value>> {
-        let arg_map = args.get_matching_arguments(context, &self.signature.parameters)?;
-        let result = (self.f)(&arg_map, context)?;
-
-        match (&result, &self.signature.return_type) {
-            (Some(result), Some(return_type)) => {
-                if result.ty() != return_type.ty() {
-                    use crate::diag::PushDiag;
-                    context.error(
-                        SrcRef(None),
-                        Box::new(EvalError::ReturnTypeMismatch {
-                            name: self.name.clone(),
-                            expected: return_type.ty(),
-                            found: result.ty(),
-                        }),
-                    )?;
-                    Ok(Some(Value::Invalid))
-                } else {
-                    Ok(Some(result.clone()))
-                }
-            }
-            (Some(result), None) => Ok(Some(result.clone())),
-            (None, Some(_)) => Err(EvalError::FunctionCallMissingReturn),
-            _ => Ok(None),
-        }
+    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Value> {
+        (self.f)(args, context)
     }
 }
 

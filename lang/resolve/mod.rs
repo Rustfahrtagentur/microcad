@@ -73,6 +73,11 @@ impl Resolve for SymbolDefinition {
             Self::Namespace(n) => n.resolve(parent),
             Self::Function(f) => f.resolve(parent),
             Self::SourceFile(s) => s.resolve(parent),
+            Self::BuiltinFunction(f) => {
+                // A builtin function cannot have child symbols,
+                // hence the resolve trait does not need to be implemented
+                SymbolNode::new(SymbolDefinition::BuiltinFunction(f.clone()), parent)
+            }
         }
     }
 }

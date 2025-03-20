@@ -18,12 +18,12 @@ pub struct NamespaceDefinition {
 
 impl NamespaceDefinition {
     /// Create a new namespace definition
-    pub fn new(name: Identifier) -> Self {
-        Self {
+    pub fn new(name: Identifier) -> Rc<Self> {
+        Rc::new(Self {
             name,
             body: Body::default(),
             src_ref: SrcRef(None),
-        }
+        })
     }
 }
 

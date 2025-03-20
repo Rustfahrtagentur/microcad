@@ -31,7 +31,7 @@ impl SymbolNode {
     }
 
     /// Insert child and change parent of child to new parent
-    pub fn insert_child(parent: RcMut<SymbolNode>, child: RcMut<SymbolNode>) {
+    pub fn insert_child(parent: &mut RcMut<SymbolNode>, child: RcMut<SymbolNode>) {
         child.borrow_mut().parent = Some(parent.clone());
         let id = child.borrow().def.id();
         parent.borrow_mut().children.insert(id, child);

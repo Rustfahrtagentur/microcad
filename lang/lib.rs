@@ -18,7 +18,6 @@ pub mod ty;
 pub mod r#type;
 pub mod value;
 
-use rc_mut::RcMut;
 use std::{rc::Rc, sync::Once};
 
 pub use eval::*;
@@ -28,6 +27,7 @@ pub use value::*;
 
 /// Id type (base of all identifiers)
 pub type Id = compact_str::CompactString;
+pub use rc_mut::RcMut;
 
 static INIT_EVENT_LOGGER: Once = Once::new();
 

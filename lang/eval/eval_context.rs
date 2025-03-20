@@ -70,13 +70,18 @@ impl EvalContext {
         self.symbols.clone()
     }
 
+    /// Add symbol to current symbol table
+    pub fn add_symbol(&mut self, symbol: RcMut<SymbolNode>) {
+        SymbolNode::insert_child(&mut self.symbols, symbol);
+    }
+
     /// Find a symbol in the symbol table and add it at the currently processed node
     pub fn use_symbol(&mut self, qualified_name: &QualifiedName) -> EvalResult<()> {
         let current_node = self.current_node_mut();
         if let Some(child) =
             SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone().into())
         {
-            SymbolNode::insert_child(self.current_node_mut(), child);
+            SymbolNode::insert_child(&mut self.current_node_mut(), child);
             Ok(())
         } else {
             Err(super::EvalError::SymbolNotFound(qualified_name.clone()))

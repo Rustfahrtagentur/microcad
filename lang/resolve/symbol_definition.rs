@@ -11,6 +11,8 @@ pub enum SymbolDefinition {
     Module(Rc<ModuleDefinition>),
     /// Function symbol
     Function(Rc<FunctionDefinition>),
+    /// Builtin function symbol
+    BuiltinFunction(Rc<BuiltinFunction>),
 }
 
 impl SymbolDefinition {
@@ -21,6 +23,7 @@ impl SymbolDefinition {
             Self::Module(m) => m.name.id().clone(),
             Self::Function(f) => f.name.id().clone(),
             Self::SourceFile(s) => s.filename_as_str().into(),
+            Self::BuiltinFunction(f) => f.name.id().clone(),
         }
     }
 }
@@ -33,6 +36,7 @@ impl std::fmt::Display for SymbolDefinition {
             Self::Namespace(_) => write!(f, "namespace {}", id),
             Self::Function(_) => write!(f, "function {}", id),
             Self::SourceFile(_) => write!(f, "file {}", id),
+            Self::BuiltinFunction(_) => write!(f, "builtin_fn {}", id),
         }
     }
 }
