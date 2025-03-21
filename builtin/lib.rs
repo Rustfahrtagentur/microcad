@@ -5,6 +5,7 @@
 
 mod algorithm;
 mod assert;
+mod math;
 mod print;
 
 mod namespace_builder;
@@ -14,6 +15,7 @@ pub use namespace_builder::NamespaceBuilder;
 
 pub(crate) use algorithm::*;
 pub(crate) use assert::*;
+pub(crate) use math::math;
 pub(crate) use print::print;
 
 /// Build the standard module
@@ -24,5 +26,6 @@ pub fn builtin_namespace() -> RcMut<SymbolNode> {
         .symbol(assert_invalid())
         .symbol(print())
         .symbol(algorithm())
+        .symbol(math())
         .build()
 }

@@ -1,14 +1,14 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Builtin module evaluation entity
+//! Built-in module entity
 
 use crate::{eval::*, objects::*, syntax::*};
 
-/// Builtin module initialization functor
+/// Built-in module initialization functor
 pub type BuiltinModuleFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> EvalResult<ObjectNode>;
 
-/// Builtin module
+/// Built-in module
 #[derive(Clone)]
 pub struct BuiltinModule {
     /// Name of the module
@@ -18,14 +18,9 @@ pub struct BuiltinModule {
 }
 
 impl BuiltinModule {
+    /// Create new built-in module
     pub fn new(id: Id, m: &'static BuiltinModuleFn) -> std::rc::Rc<Self> {
         std::rc::Rc::new(Self { id, m })
-    }
-}
-
-impl std::fmt::Debug for BuiltinModule {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "BUILTIN_MOD({})", &self.id)
     }
 }
 
