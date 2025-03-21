@@ -3,6 +3,7 @@
 
 //! µcad builtin library
 
+mod algorithm;
 mod assert;
 mod print;
 
