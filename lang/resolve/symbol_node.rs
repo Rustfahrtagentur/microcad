@@ -30,10 +30,18 @@ impl SymbolNode {
         )
     }
 
-    /// Create a symbol node
-    pub fn new_builtin_module(id: Id, m: &'static BuiltinModuleFn) -> RcMut<SymbolNode> {
+    /// Create a symbol node for a built-in module
+    pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> RcMut<SymbolNode> {
         SymbolNode::new(
-            SymbolDefinition::BuiltinModule(BuiltinModule::new(id, m)),
+            SymbolDefinition::BuiltinModule(BuiltinModule::new(id.into(), m)),
+            None,
+        )
+    }
+
+    /// Create a symbol node for namespace
+    pub fn new_builtin_namespace(id: &str) -> RcMut<SymbolNode> {
+        SymbolNode::new(
+            SymbolDefinition::Namespace(NamespaceDefinition::new(id.into())),
             None,
         )
     }

@@ -11,11 +11,9 @@ use microcad_lang::*;
 
 /// Build the standard module
 pub fn builtin_module() -> RcMut<SymbolNode> {
-    let builtin_namespace = NamespaceDefinition::new("__builtin".into());
-    let mut builtin_symbol = SymbolNode::new(SymbolDefinition::Namespace(builtin_namespace), None);
-
-    assert::build(&mut builtin_symbol);
-    print::build(&mut builtin_symbol);
-
-    builtin_symbol
+    let mut builtin_namespace = SymbolNode::new_builtin_namespace("__builtin");
+    assert::build(&mut builtin_namespace);
+    print::build(&mut builtin_namespace);
+    SymbolNode::insert_child(&mut builtin_namespace, algorithm::build());
+    builtin_namespace
 }
