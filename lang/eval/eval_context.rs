@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, resolve::*, source_file_cache::*, syntax::*, Id, Rc, RcMut};
+use crate::{Id, Rc, RcMut, diag::*, eval::*, resolve::*, source_file_cache::*, syntax::*};
 
 /// Context for evaluation
 ///
@@ -18,6 +18,8 @@ pub struct EvalContext {
     source_files: SourceFileCache,
     /// Source file diagnostics
     diag_handler: DiagHandler,
+    /// Output channel for __builtin::print
+    output: Option<Output>,
 }
 
 /// Look up result
@@ -39,6 +41,7 @@ impl EvalContext {
             source_files: Default::default(),
             diag_handler: Default::default(),
             scope_stack: Default::default(),
+            output: Default::default(),
         };
 
         ctx.source_files.add(source_file);
@@ -153,6 +156,15 @@ impl EvalContext {
     /// Access diagnostic handler
     pub fn diag_handler(&self) -> &DiagHandler {
         &self.diag_handler
+    }
+
+    /// Print for __builtin::print
+    pub fn print(&mut self, what: String) {
+        if let Some(output) = &mut self.output {
+            output.print(what).expect("could not write to output");
+        } else {
+            println!("{what}");
+        }
     }
 }
 

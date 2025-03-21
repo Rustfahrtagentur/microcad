@@ -9,7 +9,7 @@ pub fn print() -> RcMut<SymbolNode> {
     SymbolNode::new_builtin_fn("print".into(), &|args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
             let value = arg.value.eval(context)?;
-            println!("{value}");
+            context.print(format!("{value}"));
             Ok(())
         })?;
         Ok(Value::None)

@@ -9,6 +9,7 @@ mod builtin_module;
 mod call;
 mod eval_context;
 mod eval_error;
+mod output;
 mod scope_stack;
 
 pub use argument_map::*;
@@ -17,8 +18,9 @@ pub use builtin_module::*;
 pub use call::*;
 pub use eval_context::*;
 pub use eval_error::*;
+pub use output::*;
 
-use crate::{diag::*, r#type::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{diag::*, resolve::*, src_ref::*, syntax::*, r#type::*, value::*};
 use scope_stack::*;
 
 /// Evaluation trait
