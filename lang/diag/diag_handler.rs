@@ -28,6 +28,18 @@ impl DiagHandler {
         self.diag_list.pretty_print(w, source_file_by_hash)
     }
 
+    /// Pretty print all errors into a string
+    pub fn pretty_print_to_string(
+        &self,
+        source_file_by_hash: &impl GetSourceFileByHash,
+    ) -> std::io::Result<String> {
+        let mut s = Vec::new();
+        let mut w = std::io::BufWriter::new(&mut s);
+        self.diag_list.pretty_print(&mut w, source_file_by_hash)?;
+        let w = w.into_inner().expect("could not pretty print errors");
+        Ok(String::from_utf8(w.to_vec()).expect("could not pretty print errors"))
+    }
+
     /// Returns true if there are errors
     pub fn has_errors(&self) -> bool {
         self.error_count > 0

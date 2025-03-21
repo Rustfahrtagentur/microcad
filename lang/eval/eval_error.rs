@@ -101,7 +101,7 @@ pub enum EvalError {
     LocalNotFound(Id),
 
     /// Expression is neither a valid name for a symbol nor local variable
-    #[error("Expression '{0}' is neither a valid name for a symbol nor local variable")]
+    #[error("Expression at line {0} is neither a valid name for a symbol nor local variable")]
     NotAName(SrcRef),
 
     /// Qualified name cannot be converted into an Id
@@ -166,10 +166,6 @@ pub enum EvalError {
     /// Assertion failed
     #[error("Assertion failed: {0}")]
     AssertionFailed(String),
-
-    /// Assertion failed
-    #[error("Assertion failed: {0} with {1}")]
-    AssertionFailedWithCondition(String, String),
 
     /// Unknown field, e.g. node.field, where node.field
     #[error("Unknown field: {0}")]

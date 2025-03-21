@@ -40,9 +40,9 @@ pub trait PushDiag {
     fn error(
         &mut self,
         src: impl SrcReferrer,
-        error: Box<dyn std::error::Error>,
+        error: impl std::error::Error + 'static,
     ) -> crate::eval::EvalResult<()> {
-        self.push_diag(Diag::Error(Refer::new(error, src.src_ref())))
+        self.push_diag(Diag::Error(Refer::new(Box::new(error), src.src_ref())))
     }
 }
 

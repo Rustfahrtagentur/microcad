@@ -63,15 +63,6 @@ impl EvalContext {
         self.scope_stack.add(id, LocalDefinition::Value(value));
     }
 
-    /// Error with stack trace
-    pub fn error_with_stack_trace(
-        &mut self,
-        src_ref: impl crate::src_ref::SrcReferrer,
-        error: impl std::error::Error + 'static,
-    ) -> EvalResult<()> {
-        self.error(src_ref, Box::new(error))
-    }
-
     /// Return reference to the symbols node which is currently processed
     pub fn current_node(&self) -> RcMut<SymbolNode> {
         self.symbols.clone()
@@ -142,6 +133,11 @@ impl EvalContext {
             return LookUp::Symbol(name.clone());
         }
         LookUp::NotFound(name.src_ref())
+    }
+
+    /// Access diagnostic handler
+    pub fn diag_handler(&self) -> &DiagHandler {
+        &self.diag_handler
     }
 }
 

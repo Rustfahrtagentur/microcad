@@ -35,7 +35,7 @@ fn namespaces() {
     println!("{}", symbol_node.borrow());
 
     let mut context = EvalContext::from_source_file(source_file.clone());
-    let _ = source_file.eval(&mut context);
+    assert!(source_file.eval(&mut context).is_ok());
 }
 
 #[test]
@@ -47,7 +47,7 @@ fn scopes() {
     let mut context = EvalContext::from_source_file(source_file.clone());
     context.add_symbol(builtin_module());
 
-    let _ = source_file.eval(&mut context);
+    assert!(source_file.eval(&mut context).is_ok());
 }
 
 #[test]
@@ -64,5 +64,5 @@ fn context_with_symbols() {
     context
         .fetch_symbol(&"__builtin::assert_invalid".into())
         .expect("symbol not found");
-    source_file.eval(&mut context).expect("Valid source");
+    assert!(source_file.eval(&mut context).is_ok());
 }

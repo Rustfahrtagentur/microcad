@@ -19,7 +19,7 @@ pub use eval_context::*;
 pub use eval_error::*;
 
 use super::*;
-use crate::{src_ref::*, r#type::*};
+use crate::{diag::*, src_ref::*, r#type::*};
 use scope_stack::*;
 
 /// Evaluation trait
@@ -99,20 +99,14 @@ impl Eval for Nested {
                     if nodes.is_empty() && self.len() == 1 {
                         return Ok(Value::None);
                     } else {
-                        context.error_with_stack_trace(
-                            self,
-                            EvalError::CannotNestItem(item.clone()),
-                        )?;
+                        context.error(self, EvalError::CannotNestItem(item.clone()))?;
                     }
                 }
                 value => {
                     if nodes.is_empty() && self.len() == 1 {
                         return Ok(value);
                     } else {
-                        context.error_with_stack_trace(
-                            self,
-                            EvalError::CannotNestItem(item.clone()),
-                        )?;
+                        context.error(self, EvalError::CannotNestItem(item.clone()))?;
                     }
                 }
             }
@@ -214,7 +208,7 @@ impl Eval for Expression {
                                 }),
                             }
                         } else {
-                            context.error_with_stack_trace(
+                            context.error(
                                 self,
                                 EvalError::ListIndexOutOfBounds {
                                     index,
