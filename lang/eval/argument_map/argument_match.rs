@@ -3,7 +3,7 @@
 
 //! Argument match trait
 
-use crate::eval::*;
+use crate::{eval::*, value::*};
 
 /// The `ArgumentMatch` trait is used to match call arguments to parameters.
 ///

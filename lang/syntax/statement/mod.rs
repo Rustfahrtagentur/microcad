@@ -3,7 +3,7 @@
 
 //! Module statement syntax elements
 //!
-use crate::{src_ref::*, syntax::*, *};
+use crate::{Rc, src_ref::*, syntax::*};
 
 mod assignment;
 mod if_statement;

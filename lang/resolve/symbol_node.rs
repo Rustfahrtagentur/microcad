@@ -1,5 +1,4 @@
-use super::*;
-use crate::{eval::*, *};
+use crate::{Id, RcMut, eval::*, resolve::*, syntax::*};
 
 /// Symbol node
 #[derive(Debug)]

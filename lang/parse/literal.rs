@@ -1,5 +1,4 @@
-use super::*;
-use crate::parser::*;
+use crate::{parse::*, parser::*, syntax::*};
 
 impl Parse for Color {
     fn parse(pair: Pair) -> ParseResult<Self> {

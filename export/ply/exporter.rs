@@ -1,8 +1,6 @@
-use super::*;
 use crate::Exporter;
 use microcad_core::*;
 use microcad_lang::*;
-use std::path::PathBuf;
 
 /// PLY exporter
 pub struct PlyExporter {

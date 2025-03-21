@@ -23,6 +23,6 @@ pub mod parse_error;
 
 pub use parse_error::*;
 
-use crate::{ord_map::*, src_ref::*, syntax::*, r#type::*};
+use crate::{src_ref::*, syntax::*, r#type::*};
 
 const INTERNAL_PARSE_ERROR: &str = "internal parse error";

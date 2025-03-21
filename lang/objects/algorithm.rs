@@ -3,8 +3,7 @@
 
 //! Algorithm
 
-use super::*;
-use crate::objects::{ObjectNode, ObjectNodeInner};
+use crate::{Rc, objects::*};
 use microcad_core::*;
 
 /// Algorithm trait

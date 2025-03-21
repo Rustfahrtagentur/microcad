@@ -10,10 +10,9 @@ pub mod transform;
 pub use algorithm::*;
 pub use transform::*;
 
-use strum::IntoStaticStr;
-
-use super::*;
+use crate::Rc;
 use microcad_core::*;
+use strum::IntoStaticStr;
 
 /// Inner of a node
 #[derive(Clone, IntoStaticStr)]

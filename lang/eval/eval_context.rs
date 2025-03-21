@@ -1,8 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use super::*;
-use crate::{diag::*, resolve::*, source_file_cache::*, syntax::*};
+use crate::{Id, Rc, RcMut, diag::*, eval::*, resolve::*, source_file_cache::*, syntax::*};
 
 /// Context for evaluation
 ///

@@ -3,7 +3,7 @@
 
 //! Built-in module entity
 
-use crate::{eval::*, objects::*, syntax::*};
+use crate::{Id, eval::*, objects::*, syntax::*};
 
 /// Built-in module initialization functor
 pub type BuiltinModuleFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> EvalResult<ObjectNode>;

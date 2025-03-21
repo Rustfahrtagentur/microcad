@@ -3,7 +3,7 @@
 
 //! Builtin transformations
 
-use super::*;
+use crate::objects::*;
 use microcad_core::*;
 use strum::IntoStaticStr;
 

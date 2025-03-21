@@ -3,9 +3,7 @@
 
 //! Pest rule
 
-use std::ops::Deref;
-
-use crate::*;
+use crate::{PestResult, PestTest, RustWriter};
 
 /// Single pest rule with several tests
 pub struct PestRule {
@@ -20,7 +18,7 @@ pub struct PestRule {
 /// Pest grammar file
 pub struct PestFile(Vec<PestRule>);
 
-impl Deref for PestFile {
+impl std::ops::Deref for PestFile {
     type Target = Vec<PestRule>;
 
     fn deref(&self) -> &Self::Target {

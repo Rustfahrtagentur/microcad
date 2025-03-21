@@ -3,7 +3,7 @@
 
 //! Multi argument map evaluation entity
 
-use crate::{eval::*, ty::*, *};
+use crate::{Id, eval::*, ty::*, value::*};
 
 /// An argument map for parameter multiplicity.
 ///

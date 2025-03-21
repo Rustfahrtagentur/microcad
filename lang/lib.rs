@@ -21,7 +21,7 @@ pub mod ty;
 pub mod r#type;
 pub mod value;
 
-use std::{rc::Rc, sync::Once};
+use std::rc::Rc;
 
 use syntax::{GetSourceFileByHash, SourceFile};
 
@@ -29,7 +29,7 @@ use syntax::{GetSourceFileByHash, SourceFile};
 pub type Id = compact_str::CompactString;
 pub use rc_mut::RcMut;
 
-static INIT_EVENT_LOGGER: Once = Once::new();
+static INIT_EVENT_LOGGER: std::sync::Once = std::sync::Once::new();
 
 /// Initialize env_logger
 pub fn env_logger_init() {

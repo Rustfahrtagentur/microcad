@@ -1,5 +1,4 @@
-use super::*;
-use crate::eval::*;
+use crate::{GetSourceFileByHash, diag::*, eval::*};
 
 /// Handler for diagnostics
 #[derive(Default)]

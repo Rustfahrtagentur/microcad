@@ -4,9 +4,9 @@
 //! Boolean Op
 
 pub use microcad_core::BooleanOp;
-use microcad_core::*;
 
-use super::*;
+use crate::objects::*;
+use microcad_core::*;
 
 impl Algorithm for BooleanOp {
     fn process_2d(&self, renderer: &mut Renderer2D, parent: ObjectNode) -> CoreResult<geo2d::Node> {

@@ -1,5 +1,4 @@
 use crate::{diag::*, syntax::*};
-use std::ops::Deref;
 
 /// We have a vec of source file diagnostics because we want to keep track of diagnostics for each source file separately
 #[derive(Debug, Default)]
@@ -18,7 +17,7 @@ impl DiagList {
     }
 }
 
-impl Deref for DiagList {
+impl std::ops::Deref for DiagList {
     type Target = Vec<Diag>;
 
     fn deref(&self) -> &Self::Target {
