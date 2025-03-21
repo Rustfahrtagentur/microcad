@@ -1,4 +1,4 @@
-use crate::{Id, parse::*};
+use crate::{Id, syntax::*};
 use std::ops::Deref;
 
 /// Qualified name of a symbol

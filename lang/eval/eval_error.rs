@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{parse::*, r#type::*, *};
+use crate::{syntax::*, r#type::*, *};
 use thiserror::Error;
 
 /// Evaluation error
@@ -82,7 +82,7 @@ pub enum EvalError {
 
     /// Elements of list have different types
     #[error("Elements of list have different types: {0}")]
-    ListElementsDifferentTypes(crate::parse::TypeList),
+    ListElementsDifferentTypes(TypeList),
 
     /// Function call missing argument
     #[error("Function call missing argument: {0}")]
@@ -149,7 +149,7 @@ pub enum EvalError {
 
     /// Cannot nest item
     #[error("Cannot nest item: {0:#?}")]
-    CannotNestItem(crate::parse::NestedItem),
+    CannotNestItem(NestedItem),
 
     /// Parameter missing type or value
     #[error("Parameter missing type or value: {0}")]

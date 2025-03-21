@@ -3,6 +3,7 @@
 
 //! Evaluation of parsed content
 
+mod argument_map;
 mod builtin_function;
 mod builtin_module;
 mod call;
@@ -10,6 +11,7 @@ mod eval_context;
 mod eval_error;
 mod scope_stack;
 
+pub use argument_map::*;
 pub use builtin_function::*;
 pub use builtin_module::*;
 pub use call::*;
@@ -257,8 +259,8 @@ impl Eval for UseDeclaration {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match &self {
             UseDeclaration::Use(qualified_name, _) => context.use_symbol(qualified_name)?,
-            UseDeclaration::UseAll(qualified_name, _) => todo!(),
-            UseDeclaration::UseAlias(qualified_name, identifier, _) => todo!(),
+            UseDeclaration::UseAll(_qualified_name, _) => todo!(),
+            UseDeclaration::UseAlias(_qualified_name, _identifier, _) => todo!(),
         };
         Ok(Value::None)
     }

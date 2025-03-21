@@ -25,7 +25,7 @@ pub use unnamed_tuple::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{objects::*, parse::*, r#type::*, src_ref::*, ty::*};
+use crate::{objects::*, src_ref::*, ty::*, r#type::*, *};
 use cgmath::InnerSpace;
 use microcad_core::*;
 

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use super::*;
-use crate::{diag::*, parse::*, resolve::*, source_file_cache::*};
+use crate::{diag::*, resolve::*, source_file_cache::*, syntax::*};
 
 /// Context for evaluation
 ///

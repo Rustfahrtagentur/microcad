@@ -358,7 +358,7 @@ fn create_test_code(
                 fn r#{name}() {{
                     // use microcad_builtin::ContextBuilder;
                     // use microcad_core::SEARCH_PATH;
-                    use microcad_lang::parse::SourceFile;
+                    use microcad_lang::syntax::SourceFile;
                     // use microcad_lang::sym::Context;
                     use crate::rust_std::fs;
                     use crate::rust_std::io;

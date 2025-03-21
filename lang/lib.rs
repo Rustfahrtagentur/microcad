@@ -3,7 +3,6 @@
 
 //! µcad source code parser
 
-pub mod argument_map;
 pub mod diag;
 pub mod eval;
 pub mod objects;
@@ -14,6 +13,7 @@ pub mod rc_mut;
 pub mod resolve;
 pub mod source_file_cache;
 pub mod src_ref;
+pub mod syntax;
 pub mod ty;
 pub mod r#type;
 pub mod value;
@@ -23,6 +23,7 @@ use std::{rc::Rc, sync::Once};
 pub use eval::*;
 pub use parse::*;
 pub use resolve::*;
+pub use syntax::*;
 pub use value::*;
 
 /// Id type (base of all identifiers)

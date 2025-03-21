@@ -11,7 +11,7 @@ pub use diag_handler::*;
 pub use diag_list::*;
 pub use level::*;
 
-use crate::{parse::*, src_ref::*};
+use crate::{src_ref::*, syntax::*};
 
 /// A trait to add diagnostics with different levels conveniently
 pub trait PushDiag {

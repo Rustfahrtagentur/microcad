@@ -7,7 +7,7 @@ extern crate clap;
 extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{eval::*, objects::*, parse::*, rc_mut::RcMut, resolve::*};
+use microcad_lang::{eval::*, objects::*, rc_mut::RcMut, resolve::*, syntax::*};
 use std::{io::Write, path::Path, rc::Rc};
 
 /// µcad cli
@@ -160,7 +160,7 @@ fn resolve(source_file: Rc<SourceFile>) -> anyhow::Result<RcMut<SymbolNode>> {
 fn eval(source_file: Rc<SourceFile>, _std: impl AsRef<Path>) -> anyhow::Result<ObjectNode> {
     let mut context = EvalContext::from_source_file(source_file.clone());
 
-    let result = source_file
+    let _result = source_file
         .eval(&mut context)
         .map_err(|err| anyhow::anyhow!("{err}"))?;
 

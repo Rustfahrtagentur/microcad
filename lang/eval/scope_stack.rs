@@ -1,4 +1,4 @@
-use crate::{parse::Expression, *};
+use crate::{syntax::*, *};
 use std::collections::BTreeMap;
 
 /// A local variable

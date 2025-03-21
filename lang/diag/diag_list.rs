@@ -1,4 +1,4 @@
-use crate::{diag::*, parse::*};
+use crate::{diag::*, syntax::*};
 use std::ops::Deref;
 
 /// We have a vec of source file diagnostics because we want to keep track of diagnostics for each source file separately

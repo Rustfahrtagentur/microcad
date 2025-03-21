@@ -3,7 +3,7 @@
 
 //! Call argument value list evaluation entity
 
-use crate::{argument_map::*, eval::*, ord_map::*, src_ref::*, *};
+use crate::{eval::*, ord_map::*, src_ref::*, *};
 
 /// List of call argument values, (foo = 4.0, 3.0mm, bar)
 ///
@@ -35,7 +35,6 @@ impl CallArgumentValueList {
         &self,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<ArgumentMap> {
-        use crate::argument_map::ArgumentMatch;
         ArgumentMap::find_match(self, parameter_values)
     }
 

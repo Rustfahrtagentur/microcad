@@ -3,7 +3,7 @@
 
 //! Source file cache
 
-use crate::{parse::*, *};
+use crate::*;
 
 /// Source file cache, used to keep track of loaded source files
 #[derive(Clone, Debug, Default)]

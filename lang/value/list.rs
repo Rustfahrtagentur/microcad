@@ -3,7 +3,7 @@
 
 //! Typed list of values evaluation entity
 
-use crate::{r#type::*, src_ref::*, value::*};
+use crate::{src_ref::*, r#type::*, value::*};
 
 /// List of values of the same type
 #[derive(Clone, Debug)]
@@ -78,7 +78,7 @@ impl std::fmt::Display for List {
 
 impl crate::ty::Ty for List {
     fn ty(&self) -> Type {
-        Type::List(crate::parse::ListType::new(self.ty.clone()))
+        Type::List(ListType::new(self.ty.clone()))
     }
 }
 

@@ -3,7 +3,7 @@
 
 //! Call argument value evaluation entity
 
-use crate::{eval::*, parse::*};
+use crate::{eval::*, syntax::*};
 
 /// trait for calls of modules or functions with argument list
 pub trait CallTrait {

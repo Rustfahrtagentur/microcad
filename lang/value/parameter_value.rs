@@ -3,7 +3,7 @@
 
 //! Parameter value evaluation entity
 
-use crate::{r#type::*, src_ref::*, value::*, Id};
+use crate::{Id, src_ref::*, r#type::*, value::*};
 
 /// Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
@@ -130,7 +130,7 @@ macro_rules! parameter_value {
 
 #[test]
 fn test_is_list_of() {
-    use crate::parse::ListType;
+    use crate::syntax::*;
 
     assert!(Type::List(ListType::new(Type::Scalar)).is_list_of(&Type::Scalar));
 }
