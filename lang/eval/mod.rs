@@ -18,7 +18,8 @@ pub use call::*;
 pub use eval_context::*;
 pub use eval_error::*;
 
-use crate::{diag::*, resolve::*, src_ref::*, syntax::*, r#type::*, value::*};
+use super::*;
+use crate::{diag::*, r#type::*, resolve::*, src_ref::*, syntax::*, value::*};
 use scope_stack::*;
 
 /// Evaluation trait
@@ -150,9 +151,15 @@ impl Eval for NestedItem {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match &self {
             NestedItem::Call(call) => Ok(call.eval(context)?),
-            NestedItem::QualifiedName(qualified_name) => todo!("{qualified_name:#?}"),
+            NestedItem::QualifiedName(qualified_name) => Ok(qualified_name.eval(context)?),
             NestedItem::Body(body) => Ok(body.eval(context)?),
         }
+    }
+}
+
+impl Eval for QualifiedName {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+        context.fetch_value(self)
     }
 }
 

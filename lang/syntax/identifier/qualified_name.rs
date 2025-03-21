@@ -1,12 +1,23 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, eval::*, src_ref::*, syntax::*};
+use crate::{eval::*, src_ref::*, syntax::*, Id};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct QualifiedName(pub Vec<Identifier>);
+
+impl QualifiedName {
+    /// If the QualifiedName only consists of a single identifier, return it
+    pub fn single_identifier(&self) -> Option<&Identifier> {
+        if self.0.len() == 1 {
+            self.0.first()
+        } else {
+            None
+        }
+    }
+}
 
 impl SrcReferrer for QualifiedName {
     fn src_ref(&self) -> SrcRef {

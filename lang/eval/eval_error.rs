@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{Id, src_ref::SrcRef, syntax::*, r#type::*, value::*};
+use crate::{r#type::*, src_ref::SrcRef, syntax::*, value::*, Id};
 use thiserror::Error;
 
 /// Evaluation error
@@ -95,6 +95,10 @@ pub enum EvalError {
     /// Symbol not found
     #[error("Symbol not found: {0}")]
     SymbolNotFound(QualifiedName),
+
+    /// Symbol is not a value
+    #[error("Symbol does not contain a value: {0}")]
+    SymbolIsNotAValue(QualifiedName),
 
     /// Local symbol not found
     #[error("Local symbol not found: {0}")]

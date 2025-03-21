@@ -107,6 +107,21 @@ impl EvalContext {
         }
     }
 
+    /// fetch a value from a local variable or symbol table
+    pub fn fetch_value(&self, qualified_name: &QualifiedName) -> EvalResult<Value> {
+        if let Some(identifier) = qualified_name.single_identifier() {
+            if let Ok(LocalDefinition::Value(value)) = self.fetch_local(identifier.id()) {
+                return Ok(value.clone());
+            }
+        }
+
+        let symbol = self.fetch_symbol(qualified_name)?;
+
+        match symbol.borrow().def {
+            _ => Err(EvalError::SymbolIsNotAValue(qualified_name.clone())),
+        }
+    }
+
     /// Find a symbol in the symbol table and add it at the currently processed node
     pub fn use_symbol(&mut self, qualified_name: &QualifiedName) -> EvalResult<()> {
         let current_node = self.current_node_mut();
