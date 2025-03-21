@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, Rc, RcMut, diag::*, eval::*, resolve::*, source_file_cache::*, syntax::*};
+use crate::{diag::*, eval::*, resolve::*, source_file_cache::*, syntax::*, Id, Rc, RcMut};
 
 /// Context for evaluation
 ///
@@ -117,7 +117,8 @@ impl EvalContext {
 
         let symbol = self.fetch_symbol(qualified_name)?;
 
-        match symbol.borrow().def {
+        match &symbol.borrow().def {
+            SymbolDefinition::Constant(_, value) => Ok(value.clone()),
             _ => Err(EvalError::SymbolIsNotAValue(qualified_name.clone())),
         }
     }

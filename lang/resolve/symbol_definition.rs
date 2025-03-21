@@ -1,7 +1,7 @@
-use crate::{Id, Rc, eval::*, syntax::*};
+use crate::{eval::*, syntax::*, value::Value, Id, Rc};
 
 /// Symbol definition
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SymbolDefinition {
     /// Source file symbol
     SourceFile(Rc<SourceFile>),
@@ -15,6 +15,8 @@ pub enum SymbolDefinition {
     BuiltinFunction(Rc<BuiltinFunction>),
     /// Builtin module symbol
     BuiltinModule(Rc<BuiltinModule>),
+    /// Builtin constant
+    Constant(Id, Value),
 }
 
 impl SymbolDefinition {
@@ -27,6 +29,7 @@ impl SymbolDefinition {
             Self::SourceFile(s) => s.filename_as_str().into(),
             Self::BuiltinFunction(f) => f.id.clone(),
             Self::BuiltinModule(m) => m.id.clone(),
+            Self::Constant(id, _) => id.clone(),
         }
     }
 }
@@ -41,6 +44,7 @@ impl std::fmt::Display for SymbolDefinition {
             Self::SourceFile(_) => write!(f, "file {}", id),
             Self::BuiltinFunction(_) => write!(f, "builtin_fn {}", id),
             Self::BuiltinModule(_) => write!(f, "builtin_mod {}", id),
+            Self::Constant(id, value) => writeln!(f, "const {} = {}", id, value),
         }
     }
 }

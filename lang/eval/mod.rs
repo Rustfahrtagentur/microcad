@@ -18,7 +18,6 @@ pub use call::*;
 pub use eval_context::*;
 pub use eval_error::*;
 
-use super::*;
 use crate::{diag::*, r#type::*, resolve::*, src_ref::*, syntax::*, value::*};
 use scope_stack::*;
 

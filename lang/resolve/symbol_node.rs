@@ -1,4 +1,4 @@
-use crate::{Id, RcMut, eval::*, resolve::*, syntax::*};
+use crate::{eval::*, resolve::*, syntax::*, value::*, Id, RcMut};
 
 /// Symbol node
 #[derive(Debug)]
@@ -43,6 +43,11 @@ impl SymbolNode {
             SymbolDefinition::Namespace(NamespaceDefinition::new(id.into())),
             None,
         )
+    }
+
+    /// Create a new build constant
+    pub fn new_builtin_constant(id: &str, value: Value) -> RcMut<SymbolNode> {
+        SymbolNode::new(SymbolDefinition::Constant(id.into(), value), None)
     }
 
     /// Print out symbols from that point

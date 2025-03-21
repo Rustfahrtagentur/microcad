@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{RcMut, diag::*, eval::*, resolve::*, src_ref::*, ty::*, value::*};
+use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, ty::*, value::*, RcMut};
 
 // Absolute value abs(x)
 fn abs() -> RcMut<SymbolNode> {
@@ -18,5 +18,11 @@ fn abs() -> RcMut<SymbolNode> {
 }
 
 pub fn math() -> RcMut<SymbolNode> {
-    crate::NamespaceBuilder::new("math").symbol(abs()).build()
+    crate::NamespaceBuilder::new("math")
+        .symbol(SymbolNode::new_builtin_constant(
+            "pi",
+            Value::Scalar(Refer::none(std::f64::consts::PI)),
+        ))
+        .symbol(abs())
+        .build()
 }

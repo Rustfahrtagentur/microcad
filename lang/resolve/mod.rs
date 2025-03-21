@@ -34,7 +34,7 @@ pub use symbol_path::*;
 /// print("{foo.b}"); // 42.0
 ///
 /// v = c::d();
-use crate::{Rc, RcMut, syntax::*};
+use crate::{syntax::*, Rc, RcMut};
 
 /// Trait which resolves to SymbolNode reference
 pub trait Resolve {
@@ -68,19 +68,14 @@ impl Resolve for Rc<FunctionDefinition> {
 
 impl Resolve for SymbolDefinition {
     fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        match &self {
+        match self {
             Self::Module(m) => m.resolve(parent),
             Self::Namespace(n) => n.resolve(parent),
             Self::Function(f) => f.resolve(parent),
             Self::SourceFile(s) => s.resolve(parent),
-            // A builtin symbols cannot have child symbols,
+            // A builtin symbols and constants cannot have child symbols,
             // hence the resolve trait does not need to be implemented
-            Self::BuiltinFunction(f) => {
-                SymbolNode::new(SymbolDefinition::BuiltinFunction(f.clone()), parent)
-            }
-            Self::BuiltinModule(m) => {
-                SymbolNode::new(SymbolDefinition::BuiltinModule(m.clone()), parent)
-            }
+            symbol_definition => SymbolNode::new(symbol_definition.clone(), parent),
         }
     }
 }
