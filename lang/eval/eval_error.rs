@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{syntax::*, r#type::*, *};
+use crate::{src_ref::SrcRef, syntax::*, r#type::*, *};
 use thiserror::Error;
 
 /// Evaluation error
@@ -102,7 +102,7 @@ pub enum EvalError {
 
     /// Expression is neither a valid name for a symbol nor local variable
     #[error("Expression '{0}' is neither a valid name for a symbol nor local variable")]
-    NotAName(Expression),
+    NotAName(SrcRef),
 
     /// Qualified name cannot be converted into an Id
     #[error("Qualified name {0} cannot be converted into an Id")]

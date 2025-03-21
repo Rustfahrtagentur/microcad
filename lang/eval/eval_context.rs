@@ -24,7 +24,7 @@ pub struct EvalContext {
 /// Look up result
 pub enum LookUp {
     /// Look up failed
-    NotFound(QualifiedName),
+    NotFound(SrcRef),
     /// found local variable with given Id
     Local(Id),
     /// found global symbol with given qualified name
@@ -141,7 +141,7 @@ impl EvalContext {
         if self.fetch_symbol(name).is_ok() {
             return LookUp::Symbol(name.clone());
         }
-        LookUp::NotFound(name.clone())
+        LookUp::NotFound(name.src_ref())
     }
 }
 

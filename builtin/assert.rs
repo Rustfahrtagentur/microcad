@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{eval::*, *};
+use microcad_lang::{eval::*, src_ref::*, *};
 
 /// Build builtin assert symbols
 pub fn build(builtin_symbol: &mut RcMut<SymbolNode>) {
@@ -15,7 +15,9 @@ fn assert_valid() -> RcMut<SymbolNode> {
         &|args, context| match look_up(args, context) {
             Ok(LookUp::Local(_)) | Ok(LookUp::Symbol(_)) => Ok(Value::None),
             Ok(LookUp::NotFound(no_name)) => {
-                panic!("Symbol {} invalid in {}", no_name, context.ref_str(&args))
+                context
+                    .error_with_stack_trace(SrcRef(None), EvalError::NotAName(no_name.src_ref()))?;
+                Ok(Value::None)
             }
             Err(err) => Err(err),
         },
@@ -23,16 +25,18 @@ fn assert_valid() -> RcMut<SymbolNode> {
 }
 
 fn assert_invalid() -> RcMut<SymbolNode> {
-    SymbolNode::new_builtin_fn("assert_invalid".into(), &|args, context| match look_up(
-        args, context,
-    ) {
-        Ok(LookUp::Local(name)) => {
-            panic!("Symbol {} valid in {}", name, context.ref_str(&args))
-        }
-        Ok(LookUp::Symbol(name)) => {
-            panic!("Symbol {} valid in {}", name, context.ref_str(&args))
-        }
-        _ => Ok(Value::None),
+    SymbolNode::new_builtin_fn("assert_invalid".into(), &|args, context| {
+        match look_up(args, context) {
+            Ok(LookUp::Local(name)) => {
+                context.error_with_stack_trace(SrcRef(None), EvalError::LocalNotFound(name))?;
+            }
+            Ok(LookUp::Symbol(name)) => {
+                context.error_with_stack_trace(SrcRef(None), EvalError::SymbolNotFound(name))?;
+            }
+            _ => (),
+        };
+
+        Ok(Value::None)
     })
 }
 
@@ -53,10 +57,10 @@ fn look_up(args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Loo
                     _ => (),
                 }
             } else {
-                return Err(EvalError::NotAName(first.value.clone()));
+                return Err(EvalError::NotAName(first.value.src_ref()));
             }
         } else {
-            return Err(EvalError::NotAName(first.value.clone()));
+            return Err(EvalError::NotAName(first.value.src_ref()));
         }
         return Err(EvalError::LookUpFailed(first.value.clone()));
     }
