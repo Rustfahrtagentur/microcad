@@ -33,8 +33,6 @@ impl std::fmt::Debug for BuiltinModule {
 pub trait BuiltinModuleDefinition {
     /// Get name of the builtin module
     fn name() -> &'static str;
-    /// Get parameters of the builtin module (implicit init)
-    fn parameters() -> ParameterList;
     /// Create node from argument map
     fn node(args: &CallArgumentList, context: &EvalContext) -> EvalResult<ObjectNode>;
     /// Module function
