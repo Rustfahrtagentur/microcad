@@ -14,6 +14,6 @@ pub fn builtin_namespace() -> RcMut<SymbolNode> {
     let mut builtin_namespace = SymbolNode::new_builtin_namespace("__builtin");
     assert::build(&mut builtin_namespace);
     print::build(&mut builtin_namespace);
-    SymbolNode::insert_child(&mut builtin_namespace, algorithm::build());
+    algorithm::build(&mut builtin_namespace);
     builtin_namespace
 }

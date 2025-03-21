@@ -24,11 +24,12 @@ pub fn complement() -> RcMut<SymbolNode> {
 }
 
 /// Creates the builtin `algorithm` module
-pub fn build() -> RcMut<SymbolNode> {
+pub fn build(parent: &mut RcMut<SymbolNode>) {
     let mut ns = SymbolNode::new_builtin_namespace("algorithm");
     SymbolNode::insert_child(&mut ns, difference());
     SymbolNode::insert_child(&mut ns, union());
     SymbolNode::insert_child(&mut ns, intersection());
     SymbolNode::insert_child(&mut ns, complement());
-    ns
+
+    SymbolNode::insert_child(parent, ns);
 }
