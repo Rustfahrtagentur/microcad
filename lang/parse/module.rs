@@ -1,4 +1,4 @@
-use crate::{Rc, parse::*, parser::*, syntax::*};
+use crate::{parse::*, parser::*, rc_mut::*, syntax::*};
 
 impl Parse for Rc<ModuleDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {

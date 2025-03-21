@@ -1,4 +1,4 @@
-use crate::{GetSourceFileByHash, diag::*, eval::*};
+use crate::{diag::*, eval::*, syntax::*};
 
 /// Handler for diagnostics
 #[derive(Default)]

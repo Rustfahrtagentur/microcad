@@ -34,7 +34,7 @@ pub use symbol_path::*;
 /// print("{foo.b}"); // 42.0
 ///
 /// v = c::d();
-use crate::{syntax::*, Rc, RcMut};
+use crate::{rc_mut::*, syntax::*};
 
 /// Trait which resolves to SymbolNode reference
 pub trait Resolve {

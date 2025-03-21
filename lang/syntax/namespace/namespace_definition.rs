@@ -3,7 +3,7 @@
 
 //! Namespace definition syntax element
 
-use crate::{Rc, src_ref::*, syntax::*};
+use crate::{rc_mut::*, src_ref::*, syntax::*};
 
 /// Namespace definition
 #[derive(Debug, Clone)]

@@ -1,4 +1,4 @@
-use crate::{eval::*, resolve::*, syntax::*, value::*, Id, RcMut};
+use crate::{Id, eval::*, rc_mut::*, resolve::*, syntax::*, value::*};
 
 /// Symbol node
 #[derive(Debug)]

@@ -10,7 +10,7 @@ pub mod transform;
 pub use algorithm::*;
 pub use transform::*;
 
-use crate::Rc;
+use crate::rc_mut::*;
 use microcad_core::*;
 use strum::IntoStaticStr;
 

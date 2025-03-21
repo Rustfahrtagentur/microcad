@@ -3,7 +3,7 @@
 
 //! Builtin print method
 
-use microcad_lang::{RcMut, eval::*, resolve::*, value::*};
+use microcad_lang::{eval::*, rc_mut::*, resolve::*, value::*};
 
 pub fn print() -> RcMut<SymbolNode> {
     SymbolNode::new_builtin_fn("print".into(), &|args, context| {

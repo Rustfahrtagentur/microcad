@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, ty::*, value::*, RcMut};
+use microcad_lang::{diag::*, eval::*, rc_mut::*, resolve::*, src_ref::*, ty::*, value::*};
 
 // Absolute value abs(x)
 fn abs() -> RcMut<SymbolNode> {

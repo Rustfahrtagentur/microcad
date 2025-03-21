@@ -21,13 +21,8 @@ pub mod ty;
 pub mod r#type;
 pub mod value;
 
-use std::rc::Rc;
-
-use syntax::{GetSourceFileByHash, SourceFile};
-
 /// Id type (base of all identifiers)
-pub type Id = compact_str::CompactString;
-pub use rc_mut::RcMut;
+type Id = compact_str::CompactString;
 
 static INIT_EVENT_LOGGER: std::sync::Once = std::sync::Once::new();
 

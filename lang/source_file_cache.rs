@@ -3,7 +3,7 @@
 
 //! Source file cache
 
-use crate::*;
+use crate::{rc_mut::*, syntax::*};
 
 /// Source file cache, used to keep track of loaded source files
 #[derive(Clone, Debug, Default)]

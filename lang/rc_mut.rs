@@ -3,7 +3,7 @@
 
 //! Short-cut definition of Rc<RefCell<T>>
 
-use std::rc::Rc;
+pub use std::rc::Rc;
 
 /// Just a short cut definition
 #[derive(Debug)]

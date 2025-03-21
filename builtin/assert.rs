@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{RcMut, diag::*, eval::*, resolve::*, src_ref::*, syntax::*, value::*};
+use microcad_lang::{diag::*, eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 pub fn assert() -> RcMut<SymbolNode> {
     SymbolNode::new_builtin_fn("assert".into(), &|args, context| {
