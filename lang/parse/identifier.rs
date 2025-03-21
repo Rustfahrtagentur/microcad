@@ -1,4 +1,4 @@
-use crate::{parser::*, src_ref::*, *};
+use crate::{parse::*, parser::*, src_ref::*, syntax::*};
 
 impl Parse for IdentifierList {
     fn parse(pair: Pair) -> ParseResult<Self> {

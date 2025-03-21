@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{EvalError, src_ref::*, syntax::*, *};
+use crate::{Id, eval::*, src_ref::*, syntax::*};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`

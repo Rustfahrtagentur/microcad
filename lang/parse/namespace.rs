@@ -1,4 +1,4 @@
-use crate::{parser::*, *};
+use crate::{Rc, parse::*, parser::*, syntax::*};
 
 impl Parse for Rc<NamespaceDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {

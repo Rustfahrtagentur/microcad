@@ -19,7 +19,7 @@ pub use eval_context::*;
 pub use eval_error::*;
 
 use super::*;
-use crate::{diag::*, src_ref::*, r#type::*};
+use crate::{diag::*, resolve::*, src_ref::*, syntax::*, r#type::*, value::*};
 use scope_stack::*;
 
 /// Evaluation trait

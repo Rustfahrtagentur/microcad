@@ -1,5 +1,5 @@
 use super::*;
-use crate::{parser::*, *};
+use crate::{Rc, parser::*, syntax::*};
 
 impl Parse for Rc<FunctionDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {

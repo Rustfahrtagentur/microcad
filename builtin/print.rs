@@ -3,7 +3,7 @@
 
 //! Builtin print method
 
-use microcad_lang::*;
+use microcad_lang::{RcMut, eval::*, resolve::*, value::*};
 
 pub fn print() -> RcMut<SymbolNode> {
     SymbolNode::new_builtin_fn("print".into(), &|args, context| {
@@ -18,6 +18,8 @@ pub fn print() -> RcMut<SymbolNode> {
 
 #[test]
 fn assert_ok() {
+    use microcad_lang::syntax::*;
+
     let source_file =
         SourceFile::load("../tests/test_cases/print.µcad").expect("cannot load test file");
 

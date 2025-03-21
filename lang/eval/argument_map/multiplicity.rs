@@ -3,7 +3,7 @@
 
 //! Parameter multiplicity implementation.
 
-use crate::{Id, eval::*};
+use crate::{Id, eval::*, value::*};
 
 /// An enum to distinguish single-value and multi-value coefficients
 #[derive(Clone, Debug)]
@@ -99,7 +99,7 @@ where
     }
 }
 
-impl Iterator for Combinations<crate::Value> {
+impl Iterator for Combinations<Value> {
     type Item = ArgumentMap;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -112,7 +112,7 @@ impl Iterator for Combinations<crate::Value> {
         }
 
         // Create the current combination based on the current indices
-        let values: Vec<crate::Value> = self
+        let values: Vec<Value> = self
             .data
             .iter()
             .zip(&self.indices)
@@ -132,7 +132,6 @@ impl Iterator for Combinations<crate::Value> {
 
 #[test]
 fn call_parameter_multiplicity() {
-    use crate::Value;
     use crate::src_ref::Refer;
 
     let data = std::collections::HashMap::from([

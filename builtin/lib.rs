@@ -10,7 +10,7 @@ mod print;
 
 mod namespace_builder;
 
-use microcad_lang::*;
+use microcad_lang::{RcMut, resolve::*};
 pub use namespace_builder::NamespaceBuilder;
 
 pub(crate) use algorithm::*;

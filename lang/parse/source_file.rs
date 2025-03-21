@@ -1,4 +1,4 @@
-use crate::{parser::*, *};
+use crate::{parse::*, parser::*};
 use std::io::Read;
 
 impl SourceFile {

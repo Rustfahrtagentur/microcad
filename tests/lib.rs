@@ -28,7 +28,7 @@ fn make_test_out_dir() -> std::path::PathBuf {
 
 #[test]
 fn namespaces() {
-    use microcad_lang::*;
+    use microcad_lang::{eval::*, resolve::*, syntax::*};
     let source_file = SourceFile::load("../tests/test_cases/syntax/namespace.µcad")
         .expect("cannot load test file");
     let symbol_node = source_file.resolve(None);
@@ -42,7 +42,7 @@ fn namespaces() {
 #[test]
 fn scopes() {
     use microcad_builtin::*;
-    use microcad_lang::*;
+    use microcad_lang::{eval::*, syntax::*};
     let source_file =
         SourceFile::load("../tests/test_cases/syntax/scopes.µcad").expect("cannot load test file");
 
@@ -55,7 +55,7 @@ fn scopes() {
 #[test]
 fn context_with_symbols() {
     use microcad_builtin::*;
-    use microcad_lang::*;
+    use microcad_lang::{eval::*, syntax::*};
     let source_file =
         SourceFile::load("../tests/test_cases/syntax/call.µcad").expect("cannot load test file");
     let mut context = EvalContext::from_source_file(source_file.clone());

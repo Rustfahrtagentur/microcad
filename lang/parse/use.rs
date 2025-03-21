@@ -1,4 +1,4 @@
-use crate::{parser::*, *};
+use crate::{parse::*, parser::*, syntax::*};
 
 impl Parse for UseDeclaration {
     fn parse(pair: Pair) -> ParseResult<Self> {

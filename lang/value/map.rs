@@ -3,7 +3,7 @@
 
 //! Map type evaluation entity
 
-use crate::{r#type::*, value::*, *};
+use crate::{syntax::*, r#type::*, value::*};
 
 /// Map evaluation entity
 #[derive(Debug, Clone, PartialEq)]

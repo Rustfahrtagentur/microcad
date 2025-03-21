@@ -19,7 +19,7 @@ pub struct BuiltinFunction {
 
 impl std::fmt::Debug for BuiltinFunction {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "BUILTIN({})", &self.id)
+        write!(f, "__builtin::{}", &self.id)
     }
 }
 

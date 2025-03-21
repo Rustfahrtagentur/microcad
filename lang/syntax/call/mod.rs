@@ -11,7 +11,7 @@ pub use call_argument::*;
 pub use call_argument_list::*;
 pub use method_call::*;
 
-use crate::{objects::*, src_ref::*, syntax::*};
+use crate::{objects::*, src_ref::*, syntax::*, value::*};
 
 /// Call of a function or module initialization
 #[derive(Clone, Debug, Default)]
@@ -51,7 +51,7 @@ pub enum CallResult {
     Nodes(Vec<ObjectNode>),
 
     /// Call returned a single value
-    Value(crate::Value),
+    Value(Value),
 
     /// Call returned nothing
     None,

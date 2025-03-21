@@ -3,7 +3,7 @@
 
 //! Module definition syntax element
 
-use crate::{src_ref::*, *};
+use crate::{src_ref::*, syntax::*};
 
 /// Module definition
 #[derive(Clone, Debug)]

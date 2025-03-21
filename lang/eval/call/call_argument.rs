@@ -1,4 +1,4 @@
-use crate::{EvalResult, eval::*, syntax::*, ty::*};
+use crate::{eval::*, syntax::*, ty::*};
 
 impl CallArgument {
     /// Evaluate argument as boolean value

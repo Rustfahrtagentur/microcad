@@ -3,7 +3,7 @@
 
 //! µcad source file representation
 
-use crate::{eval::*, src_ref::*, *};
+use crate::{eval::*, src_ref::*, syntax::*, value::*};
 
 /// Trait to get a source file by its hash
 pub trait GetSourceFileByHash {

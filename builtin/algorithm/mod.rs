@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{objects::*, SymbolNode, *};
+use microcad_lang::{RcMut, objects::*, resolve::*};
 
 /// Creates a node containing a difference algorithm
 fn difference() -> RcMut<SymbolNode> {

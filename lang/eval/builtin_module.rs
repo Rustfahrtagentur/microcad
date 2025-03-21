@@ -24,6 +24,12 @@ impl BuiltinModule {
     }
 }
 
+impl std::fmt::Debug for BuiltinModule {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "__builtin::{}", &self.id)
+    }
+}
+
 /// Builtin module definition
 pub trait BuiltinModuleDefinition {
     /// Get name of the builtin module

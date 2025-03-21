@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! µcad source code parser
+//!
+//! This module includes all components to parse, resolve and evaluate µcad code.and diagnose errors.
+//!
 
 pub mod diag;
 pub mod eval;
@@ -20,11 +23,7 @@ pub mod value;
 
 use std::{rc::Rc, sync::Once};
 
-pub use eval::*;
-pub use parse::*;
-pub use resolve::*;
-pub use syntax::*;
-pub use value::*;
+use syntax::{GetSourceFileByHash, SourceFile};
 
 /// Id type (base of all identifiers)
 pub type Id = compact_str::CompactString;

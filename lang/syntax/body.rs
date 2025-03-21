@@ -3,7 +3,7 @@
 
 //! Module body syntax element
 
-use crate::{eval::*, resolve::*, src_ref::*, syntax::*, *};
+use crate::{RcMut, eval::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 /// Module definition body
 ///
