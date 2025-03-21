@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{diag::*, eval::*, src_ref::*, ty::*, *};
+use microcad_lang::{diag::*, eval::*, src_ref::*, *};
 
 /// Build builtin assert symbols
 pub fn build(builtin_symbol: &mut RcMut<SymbolNode>) {
@@ -13,20 +13,11 @@ pub fn build(builtin_symbol: &mut RcMut<SymbolNode>) {
 fn assert() -> RcMut<SymbolNode> {
     SymbolNode::new_builtin_fn("assert".into(), &|args, context| {
         if let Ok(arg) = args.get_single() {
-            match arg.value.eval(context) {
-                Ok(Value::Bool(cond)) => {
-                    if !cond.value {
-                        context.error(
-                            arg.src_ref(),
-                            Box::new(EvalError::AssertionFailed(format!("{arg}"))),
-                        )?;
-                    }
-                }
-                Ok(value) => context.error(
+            if !arg.eval_bool(context)? {
+                context.error(
                     arg.src_ref(),
-                    Box::new(EvalError::InvalidArgumentType(value.ty().clone())),
-                )?,
-                Err(err) => return Err(err),
+                    Box::new(EvalError::AssertionFailed(format!("{arg}"))),
+                )?;
             }
         } else {
             context.error(args.src_ref(), EvalError::NotAName(args.src_ref()))?;
@@ -82,8 +73,8 @@ fn look_up(arg: &CallArgument, context: &mut EvalContext) -> EvalResult<LookUp> 
 
 #[test]
 fn assert_ok() {
-    use microcad_lang::*;
-    let source_file = SourceFile::load("../tests/test_cases/syntax/assert_ok.µcad").expect("");
+    let source_file = SourceFile::load("../tests/test_cases/syntax/assert_ok.µcad")
+        .expect("cannot load test file");
 
     let mut context = EvalContext::from_source_file(source_file.clone());
     context.add_symbol(super::builtin_module());
@@ -93,8 +84,8 @@ fn assert_ok() {
 
 #[test]
 fn assert_fail() {
-    use microcad_lang::*;
-    let source_file = SourceFile::load("../tests/test_cases/syntax/assert_fail.µcad").expect("");
+    let source_file = SourceFile::load("../tests/test_cases/syntax/assert_fail.µcad")
+        .expect("cannot load test file");
 
     let mut context = EvalContext::from_source_file(source_file.clone());
     context.add_symbol(super::builtin_module());

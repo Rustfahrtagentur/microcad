@@ -4,6 +4,7 @@
 //! µcad builtin library
 
 mod assert;
+mod print;
 
 use microcad_lang::*;
 
@@ -13,6 +14,7 @@ pub fn builtin_module() -> RcMut<SymbolNode> {
     let mut builtin_symbol = SymbolNode::new(SymbolDefinition::Namespace(builtin_namespace), None);
 
     assert::build(&mut builtin_symbol);
+    print::build(&mut builtin_symbol);
 
     builtin_symbol
 }

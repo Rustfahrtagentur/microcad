@@ -3,6 +3,8 @@
 
 //! Ordered Map
 
+use std::ops::Index;
+
 /// trait of an value in an `OrdMap`
 /// # Types
 /// `K`: key type
@@ -113,5 +115,29 @@ where
     /// get first element
     pub fn first(&self) -> Option<&V> {
         self.vec.first()
+    }
+}
+
+impl<K, V> Index<usize> for OrdMap<K, V>
+where
+    V: OrdMapValue<K>,
+    K: std::cmp::Eq + std::hash::Hash + Clone,
+{
+    type Output = V;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.vec[index]
+    }
+}
+
+impl<K, V> Index<&K> for OrdMap<K, V>
+where
+    V: OrdMapValue<K>,
+    K: std::cmp::Eq + std::hash::Hash + Clone,
+{
+    type Output = V;
+
+    fn index(&self, key: &K) -> &Self::Output {
+        &self.vec[*self.map.get(key).expect("key not found")]
     }
 }

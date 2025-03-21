@@ -5,6 +5,7 @@
 
 #[macro_use]
 mod call_argument_value;
+mod call_argument;
 mod call_argument_list;
 mod call_argument_value_list;
 mod call_trait;

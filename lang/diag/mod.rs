@@ -11,12 +11,12 @@ pub use diag_handler::*;
 pub use diag_list::*;
 pub use level::*;
 
-use crate::{src_ref::*, syntax::*};
+use crate::{eval::*, src_ref::*, syntax::*};
 
 /// A trait to add diagnostics with different levels conveniently
 pub trait PushDiag {
     /// Push a diagnostic message (must be implemented)
-    fn push_diag(&mut self, diag: Diag) -> crate::eval::EvalResult<()>;
+    fn push_diag(&mut self, diag: Diag) -> EvalResult<()>;
 
     /// Push new trace message
     fn trace(&mut self, src: impl SrcReferrer, message: String) {
@@ -33,7 +33,7 @@ pub trait PushDiag {
         &mut self,
         src: impl SrcReferrer,
         error: Box<dyn std::error::Error>,
-    ) -> crate::eval::EvalResult<()> {
+    ) -> EvalResult<()> {
         self.push_diag(Diag::Warning(Refer::new(error, src.src_ref())))
     }
     /// Push new error
@@ -41,7 +41,7 @@ pub trait PushDiag {
         &mut self,
         src: impl SrcReferrer,
         error: impl std::error::Error + 'static,
-    ) -> crate::eval::EvalResult<()> {
+    ) -> EvalResult<()> {
         self.push_diag(Diag::Error(Refer::new(Box::new(error), src.src_ref())))
     }
 }

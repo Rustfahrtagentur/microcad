@@ -45,6 +45,32 @@ impl Eval for Body {
     }
 }
 
+impl Eval for FormatExpression {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+        Ok(Value::String(Refer::new(
+            format!("{}", self.expression.eval(context)?),
+            SrcRef(None),
+        )))
+    }
+}
+
+impl Eval for FormatString {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+        let mut result = String::new();
+        for elem in &self.0 {
+            match elem {
+                FormatStringInner::String(s) => result += &s.value,
+                FormatStringInner::FormatExpression(expr) => match expr.eval(context) {
+                    Ok(Value::String(s)) => result += &s,
+                    Err(e) => return Err(e),
+                    _ => unreachable!("FormatExpression must always evaluate to a string"),
+                },
+            }
+        }
+        Ok(Value::String(Refer::new(result, SrcRef::from_vec(&self.0))))
+    }
+}
+
 impl Eval for NumberLiteral {
     fn eval(&self, _: &mut EvalContext) -> EvalResult<Value> {
         match self.1.ty() {
@@ -144,8 +170,8 @@ impl Eval for Expression {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match self {
             Self::Literal(literal) => Literal::eval(literal, context),
-            /*Self::FormatString(format_string) => FormatString::eval(format_string, context),
-            Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
+            Self::FormatString(format_string) => FormatString::eval(format_string, context),
+            /*Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
             Self::TupleExpression(tuple_expression) => {
                 TupleExpression::eval(tuple_expression, context)
             }*/

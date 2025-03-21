@@ -13,7 +13,7 @@ use crate::{src_ref::*, syntax::*};
 
 /// Format string item
 #[derive(Clone, Debug)]
-enum FormatStringInner {
+pub enum FormatStringInner {
     /// String literal
     String(Refer<String>),
     /// Format expression
@@ -31,7 +31,7 @@ impl SrcReferrer for FormatStringInner {
 
 /// Format string
 #[derive(Default, Clone, Debug)]
-pub struct FormatString(Vec<FormatStringInner>);
+pub struct FormatString(pub Vec<FormatStringInner>);
 
 impl FormatString {
     /// Insert a string to this module

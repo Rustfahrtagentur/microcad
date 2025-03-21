@@ -3,6 +3,8 @@
 
 //! List of CallArgument syntax entities
 
+use std::ops::Index;
+
 use crate::{ord_map::*, src_ref::*, syntax::*};
 
 /// List of call arguments
@@ -51,5 +53,21 @@ impl PrintSyntax for CallArgumentList {
             .value
             .iter()
             .try_for_each(|p| p.print_syntax(f, depth + 1))
+    }
+}
+
+impl Index<&str> for CallArgumentList {
+    type Output = CallArgument;
+
+    fn index(&self, name: &str) -> &Self::Output {
+        self.0.get(&Identifier::from(name)).expect("key not found")
+    }
+}
+
+impl Index<usize> for CallArgumentList {
+    type Output = CallArgument;
+
+    fn index(&self, idx: usize) -> &Self::Output {
+        &self.0.value[idx]
     }
 }
