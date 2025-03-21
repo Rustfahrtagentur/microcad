@@ -7,13 +7,22 @@ mod algorithm;
 mod assert;
 mod print;
 
+mod namespace_builder;
+
 use microcad_lang::*;
+pub use namespace_builder::NamespaceBuilder;
+
+pub(crate) use algorithm::*;
+pub(crate) use assert::*;
+pub(crate) use print::print;
 
 /// Build the standard module
 pub fn builtin_namespace() -> RcMut<SymbolNode> {
-    let mut builtin_namespace = SymbolNode::new_builtin_namespace("__builtin");
-    assert::build(&mut builtin_namespace);
-    print::build(&mut builtin_namespace);
-    algorithm::build(&mut builtin_namespace);
-    builtin_namespace
+    NamespaceBuilder::new("__builtin")
+        .symbol(assert())
+        .symbol(assert_valid())
+        .symbol(assert_invalid())
+        .symbol(print())
+        .symbol(algorithm())
+        .build()
 }

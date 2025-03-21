@@ -3,22 +3,9 @@
 
 //! Builtin print method
 
-use std::sync::Mutex;
-
-use lazy_static::lazy_static;
 use microcad_lang::*;
 
-lazy_static! {
-    /// Alternate print output buffer
-    pub static ref output: Mutex<String> = Mutex::new(String::new());
-}
-
-/// Build builtin assert symbols
-pub fn build(builtin_symbol: &mut RcMut<SymbolNode>) {
-    SymbolNode::insert_child(builtin_symbol, print());
-}
-
-fn print() -> RcMut<SymbolNode> {
+pub fn print() -> RcMut<SymbolNode> {
     SymbolNode::new_builtin_fn("print".into(), &|args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
             let value = arg.value.eval(context)?;

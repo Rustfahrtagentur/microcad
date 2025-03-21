@@ -3,14 +3,7 @@
 
 use microcad_lang::{diag::*, eval::*, src_ref::*, *};
 
-/// Build builtin assert symbols
-pub fn build(builtin_symbol: &mut RcMut<SymbolNode>) {
-    SymbolNode::insert_child(builtin_symbol, assert());
-    SymbolNode::insert_child(builtin_symbol, assert_valid());
-    SymbolNode::insert_child(builtin_symbol, assert_invalid());
-}
-
-fn assert() -> RcMut<SymbolNode> {
+pub fn assert() -> RcMut<SymbolNode> {
     SymbolNode::new_builtin_fn("assert".into(), &|args, context| {
         if let Ok(arg) = args.get_single() {
             if !arg.eval_bool(context)? {
@@ -26,7 +19,7 @@ fn assert() -> RcMut<SymbolNode> {
     })
 }
 
-fn assert_valid() -> RcMut<SymbolNode> {
+pub fn assert_valid() -> RcMut<SymbolNode> {
     SymbolNode::new_builtin_fn("assert_valid".into(), &|args, context| match look_up(
         args.get_single()?,
         context,
@@ -40,7 +33,7 @@ fn assert_valid() -> RcMut<SymbolNode> {
     })
 }
 
-fn assert_invalid() -> RcMut<SymbolNode> {
+pub fn assert_invalid() -> RcMut<SymbolNode> {
     SymbolNode::new_builtin_fn("assert_invalid".into(), &|args, context| {
         match look_up(args.get_single()?, context) {
             Ok(LookUp::Local(name)) => {
