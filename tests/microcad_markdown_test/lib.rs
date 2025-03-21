@@ -352,14 +352,14 @@ fn create_test_code(
     let banner = banner.to_string_lossy().escape_default().to_string();
     let out = out.to_string_lossy().escape_default().to_string();
     let todo = mode == Some("todo");
+
     format!(
         r##"#[test]
                 #[allow(non_snake_case)]
                 fn r#{name}() {{
-                    // use microcad_builtin::ContextBuilder;
-                    // use microcad_core::SEARCH_PATH;
-                    use microcad_lang::syntax::SourceFile;
-                    // use microcad_lang::sym::Context;
+                    use microcad_core::SEARCH_PATH;
+                    use microcad_lang::eval::*;
+                    use microcad_lang::syntax::*;
                     use crate::rust_std::fs;
                     use crate::rust_std::io;
                     use crate::rust_std::io::Write;
@@ -398,17 +398,20 @@ fn create_test_code(
                             log::debug!("{err}")
                         },
                         // test expected to fail succeeded at parsing?
-                        Ok(_source) => { 
-                            /*
+                        Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
-                            let eval = context.eval();
+                            let mut context = EvalContext::from_source_file_capture_output(source.clone());
+                            let eval = source.eval(&mut context);                        
+                            let diag = context.diag_handler();
+
+                            // get print output
+                            write!(out, "{}", context.output().expect("capture error")).expect("output error");
 
                             // print any error
-                            context.diag().pretty_print( out, &context).expect("internal error");
+                            diag.pretty_print( out, &context).expect("internal error");
 
                             // check if test expected to fail failed at evaluation
-                            match (eval, context.diag().error_count > 0) {
+                            match (eval, diag.error_count > 0) {
                                 // evaluation had been aborted?
                                 (Err(err),_) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
@@ -424,7 +427,6 @@ fn create_test_code(
                                     panic!("ERROR: test is marked to fail but succeeded");
                                 }
                             }
-                            */
                         }
                     }"##,
             // test is expected to succeed?
@@ -441,20 +443,20 @@ fn create_test_code(
                             }
                         },
                         // test awaited to succeed and parsing succeeds?
-                        Ok(_source) => {
-                        /*
+                        Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = ContextBuilder::new(source).with_std(SEARCH_PATH).expect("no std found").build();
-                            let eval = context.eval();
+                            let mut context = EvalContext::from_source_file_capture_output(source.clone());
+                            let eval = source.eval(&mut context);                        
+                            let diag = context.diag_handler();
+
+                            // get print output
+                            write!(out, "{}", context.output().expect("capture error")).expect("output error");
 
                             // print any error
-                            context.diag().pretty_print( out, &context).expect("internal error");
-
-                            out.write_all(format!("{}",microcad_builtin::print::output.lock().expect("sync error")).as_bytes())
-                                .expect("terminal error");
+                            diag.pretty_print( out, &context).expect("internal error");
 
                             // check if test awaited to succeed but failed at evaluation
-                            match (eval, context.diag().error_count > 0, todo) {
+                            match (eval, diag.error_count > 0, todo) {
                                 // test expected to succeed and succeeds with no errors
                                 (Ok(_),false,false) => { let _ = fs::hard_link("images/ok.png", banner); }
                                 // test is todo but succeeds with no errors
@@ -472,10 +474,9 @@ fn create_test_code(
                                 // evaluation produced errors?
                                 (_,true,_) => {
                                     let _ = fs::hard_link("images/fail.png", banner);
-                                    panic!("ERROR: there were {error_count} errors", error_count = context.diag().error_count);
+                                    panic!("ERROR: there were {error_count} errors", error_count = diag.error_count);
                                 }
                             }
-                            */
                         },
                     }"##,
         }

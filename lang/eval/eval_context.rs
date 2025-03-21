@@ -48,6 +48,21 @@ impl EvalContext {
         ctx
     }
 
+    /// Create a new context from a source file
+    pub fn from_source_file_capture_output(source_file: Rc<SourceFile>) -> Self {
+        let mut ctx = Self {
+            current_source_file: Some(source_file.clone()),
+            symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
+            source_files: Default::default(),
+            diag_handler: Default::default(),
+            scope_stack: Default::default(),
+            output: Some(Default::default()),
+        };
+
+        ctx.source_files.add(source_file);
+        ctx
+    }
+
     /// Return the current source file
     ///
     /// Note: This should not be an optional value, as the context is always created with a source file
@@ -156,6 +171,13 @@ impl EvalContext {
     /// Access diagnostic handler
     pub fn diag_handler(&self) -> &DiagHandler {
         &self.diag_handler
+    }
+
+    /// Access captured output
+    pub fn output(&self) -> Option<String> {
+        self.output
+            .as_ref()
+            .map(|output| output.get().expect("UTF8 error"))
     }
 
     /// Print for __builtin::print

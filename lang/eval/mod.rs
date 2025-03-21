@@ -166,9 +166,15 @@ impl Eval for QualifiedName {
 
 impl Eval for Call {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        match &context.fetch_symbol(&self.name)?.borrow().def {
-            SymbolDefinition::BuiltinFunction(f) => f.call(&self.argument_list, context),
-            _ => todo!(),
+        match context.fetch_symbol(&self.name) {
+            Ok(symbol) => match &symbol.borrow().def {
+                SymbolDefinition::BuiltinFunction(f) => f.call(&self.argument_list, context),
+                _ => todo!(),
+            },
+            Err(err) => {
+                context.error(self.src_ref(), err)?;
+                Ok(Value::None)
+            }
         }
     }
 }
@@ -255,7 +261,7 @@ impl Eval for Expression {
                 }
             }
             Self::Nested(nested) => nested.eval(context),
-            expr => todo!("{expr:#?}"),
+            expr => todo!("{expr}"),
         }
     }
 }
@@ -266,7 +272,7 @@ impl Eval for Statement {
             Self::Use(u) => u.eval(context)?,
             Self::Assignment(a) => a.eval(context)?,
             Self::Expression(e) => e.eval(context)?,
-            statement => todo!("{statement:#?}"),
+            statement => todo!("{statement}"),
         };
 
         Ok(Value::None)

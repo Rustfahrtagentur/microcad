@@ -13,9 +13,8 @@ impl Default for Output {
 
 impl Output {
     /// return output buffer as String
-    pub fn get(&mut self) -> Result<String, std::string::FromUtf8Error> {
-        let bytes = self.buf.buffer();
-        String::from_utf8(bytes.into())
+    pub fn get(&self) -> Result<String, std::string::FromUtf8Error> {
+        String::from_utf8(self.buf.buffer().into())
     }
 
     /// Print into output buffer

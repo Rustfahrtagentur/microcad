@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{r#type::*, src_ref::SrcRef, syntax::*, value::*, Id};
+use crate::{Id, src_ref::SrcRef, syntax::*, r#type::*, value::*};
 use thiserror::Error;
 
 /// Evaluation error
@@ -152,7 +152,7 @@ pub enum EvalError {
     ExpectedModule(Id),
 
     /// Cannot nest item
-    #[error("Cannot nest item: {0:#?}")]
+    #[error("Cannot nest item: {0}")]
     CannotNestItem(NestedItem),
 
     /// Parameter missing type or value

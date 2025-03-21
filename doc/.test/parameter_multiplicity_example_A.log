@@ -1,0 +1,24 @@
+error: Symbol not found: std::translate
+  ---> <from_str>:1:1
+     |
+   1 | std::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]) 
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item: std::translate(x = [-4mm, 4mm], y = [-4mm, 4mm])
+  ---> <from_str>:1:1
+     |
+   1 | std::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]) 
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol not found: std::geo2d::rect
+  ---> <from_str>:2:5
+     |
+   2 |     std::geo2d::rect(width = 2mm, height = 2mm);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item: std::geo2d::rect(width = 2mm, height = 2mm)
+  ---> <from_str>:1:1
+     |
+   1 | std::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]) 
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

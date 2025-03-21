@@ -1,0 +1,95 @@
+error: Symbol not found: hull
+  ---> <from_str>:1:1
+     |
+   1 | hull() {
+     | ^^^^^^
+     |
+error: Cannot nest item: hull()
+  ---> <from_str>:1:1
+     |
+   1 | hull() {
+     | ^^^^^^^^
+     |
+error: Symbol not found: union
+  ---> <from_str>:2:5
+     |
+   2 |     union() {
+     |     ^^^^^^^
+     |
+error: Cannot nest item: union()
+  ---> <from_str>:2:5
+     |
+   2 |     union() {
+     |     ^^^^^^^^^^^^^
+     |
+error: Symbol not found: translate
+  ---> <from_str>:3:9
+     |
+   3 |         translate(x = [-10, 10]mm, y = [-10, 10]mm)
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item: translate(x = [-10, 10]mm, y = [-10, 10]mm)
+  ---> <from_str>:3:9
+     |
+   3 |         translate(x = [-10, 10]mm, y = [-10, 10]mm)
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol not found: circle
+  ---> <from_str>:4:13
+     |
+   4 |             circle(1mm);
+     |             ^^^^^^^^^^^
+     |
+error: Cannot nest item: circle(1mm)
+  ---> <from_str>:3:9
+     |
+   3 |         translate(x = [-10, 10]mm, y = [-10, 10]mm)
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol not found: translate
+  ---> <from_str>:5:9
+     |
+   5 |         translate(x = [-20, 20]mm, y = 0mm)
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item: translate(x = [-20, 20]mm, y = 0mm)
+  ---> <from_str>:5:9
+     |
+   5 |         translate(x = [-20, 20]mm, y = 0mm)
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol not found: circle
+  ---> <from_str>:6:13
+     |
+   6 |             circle(1mm);
+     |             ^^^^^^^^^^^
+     |
+error: Cannot nest item: circle(1mm)
+  ---> <from_str>:5:9
+     |
+   5 |         translate(x = [-20, 20]mm, y = 0mm)
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item:  {
+translate(x = [-10, 10]mm, y = [-10, 10]mm) circle(1mm);
+translate(x = [-20, 20]mm, y = 0mm) circle(1mm);
+}
+
+  ---> <from_str>:2:5
+     |
+   2 |     union() {
+     |     ^^^^^^^^^^^^^
+     |
+error: Cannot nest item:  {
+union()  {
+translate(x = [-10, 10]mm, y = [-10, 10]mm) circle(1mm);
+translate(x = [-20, 20]mm, y = 0mm) circle(1mm);
+}
+;
+}
+
+  ---> <from_str>:1:1
+     |
+   1 | hull() {
+     | ^^^^^^^^
+     |

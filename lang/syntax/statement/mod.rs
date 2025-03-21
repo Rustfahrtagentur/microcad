@@ -3,6 +3,8 @@
 
 //! Module statement syntax elements
 //!
+use std::process::id;
+
 use crate::{Rc, src_ref::*, syntax::*};
 
 mod assignment;
@@ -71,8 +73,7 @@ impl std::fmt::Display for Statement {
                 write!(f, "{}", ns.name)
             }
             Self::Function(_f) => {
-                todo!()
-                //write!(f, "{}", f.name)<
+                write!(f, "{}", _f.name)
             }
             Self::ModuleInit(mi) => {
                 write!(f, "{mi}")

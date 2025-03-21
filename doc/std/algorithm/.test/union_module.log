@@ -1,0 +1,34 @@
+error: Symbol not found: std::algorithm::union
+  ---> <from_str>:1:1
+     |
+   1 | std::algorithm::union() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item: std::algorithm::union()
+  ---> <from_str>:1:1
+     |
+   1 | std::algorithm::union() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol not found: std::geo2d::circle
+  ---> <from_str>:2:5
+     |
+   2 |     std::geo2d::circle(radius = 3mm);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol not found: std::geo2d::rect
+  ---> <from_str>:3:5
+     |
+   3 |     std::geo2d::rect(width = 3mm, height = 2mm);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item:  {
+std::geo2d::circle(radius = 3mm);
+std::geo2d::rect(width = 3mm, height = 2mm);
+}
+
+  ---> <from_str>:1:1
+     |
+   1 | std::algorithm::union() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

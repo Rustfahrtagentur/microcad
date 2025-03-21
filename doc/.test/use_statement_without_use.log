@@ -1,0 +1,6 @@
+error: Symbol not found: std::geo3d::sphere
+  ---> <from_str>:1:1
+     |
+   1 | std::geo3d::sphere(radius = 40mm);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

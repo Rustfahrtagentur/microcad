@@ -1,0 +1,12 @@
+error: Symbol not found: std::geo2d::circle
+  ---> <from_str>:1:1
+     |
+   1 | std::geo2d::circle(radius = 3mm) & std::geo2d::rect(width = 3mm, height = 2mm);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol not found: std::geo2d::rect
+  ---> <from_str>:1:36
+     |
+   1 | std::geo2d::circle(radius = 3mm) & std::geo2d::rect(width = 3mm, height = 2mm);
+     |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
