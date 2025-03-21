@@ -10,7 +10,7 @@ mod print;
 use microcad_lang::*;
 
 /// Build the standard module
-pub fn builtin_module() -> RcMut<SymbolNode> {
+pub fn builtin_namespace() -> RcMut<SymbolNode> {
     let mut builtin_namespace = SymbolNode::new_builtin_namespace("__builtin");
     assert::build(&mut builtin_namespace);
     print::build(&mut builtin_namespace);

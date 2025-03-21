@@ -77,7 +77,7 @@ fn assert_ok() {
         .expect("cannot load test file");
 
     let mut context = EvalContext::from_source_file(source_file.clone());
-    context.add_symbol(super::builtin_module());
+    context.add_symbol(super::builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());
 }
@@ -88,7 +88,7 @@ fn assert_fail() {
         .expect("cannot load test file");
 
     let mut context = EvalContext::from_source_file(source_file.clone());
-    context.add_symbol(super::builtin_module());
+    context.add_symbol(super::builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());
     assert!(context.diag_handler().error_count > 0);

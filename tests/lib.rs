@@ -47,7 +47,7 @@ fn scopes() {
         SourceFile::load("../tests/test_cases/syntax/scopes.µcad").expect("cannot load test file");
 
     let mut context = EvalContext::from_source_file(source_file.clone());
-    context.add_symbol(builtin_module());
+    context.add_symbol(builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());
 }
@@ -60,7 +60,7 @@ fn context_with_symbols() {
         SourceFile::load("../tests/test_cases/syntax/call.µcad").expect("cannot load test file");
     let mut context = EvalContext::from_source_file(source_file.clone());
 
-    context.add_symbol(builtin_module());
+    context.add_symbol(builtin_namespace());
     context
         .fetch_symbol(&"__builtin::assert_valid".into())
         .expect("symbol not found");
