@@ -14,18 +14,22 @@ pub use call_argument_value::*;
 pub use call_argument_value_list::*;
 pub use call_trait::*;
 
-use crate::{Id, eval::*, syntax::*};
+use crate::{eval::*, syntax::*, Id};
 
 use thiserror::Error;
 
-impl CallArgumentList {
-    /// Get matching arguments from parameter list
-    pub fn get_matching_arguments(
-        &self,
-        _context: &mut EvalContext,
-        _parameters: &ParameterList,
-    ) -> EvalResult<ArgumentMap> {
-        todo!()
+impl Eval for Call {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+        match context.fetch_symbol(&self.name) {
+            Ok(symbol) => match &symbol.borrow().def {
+                SymbolDefinition::BuiltinFunction(f) => f.call(&self.argument_list, context),
+                _ => todo!(),
+            },
+            Err(err) => {
+                context.error(self.src_ref(), err)?;
+                Ok(Value::None)
+            }
+        }
     }
 }
 
