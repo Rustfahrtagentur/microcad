@@ -124,7 +124,7 @@ impl Diag {
 
                 let line = if let Some(source_file) = source_file {
                     source_file
-                        .get_line(src_ref.at.line as usize - 1)
+                        .get_line(src_ref.at.line - 1)
                         .unwrap_or("<no line>")
                 } else {
                     "<no file>"
@@ -135,7 +135,7 @@ impl Diag {
                     w,
                     "{: >4} | {}",
                     "",
-                    " ".repeat(src_ref.at.col as usize - 1)
+                    " ".repeat(src_ref.at.col - 1)
                         + &"^".repeat(src_ref.range.len().min(line.len())),
                 )?;
                 writeln!(w, "     |",)?;

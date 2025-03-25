@@ -61,8 +61,8 @@ impl SrcReferrer for Pair<'_> {
         let (line, col) = pair.line_col();
         SrcRef::new(
             pair.as_span().start()..pair.as_span().end(),
-            line as u32,
-            col as u32,
+            line,
+            col,
             self.1,
         )
     }
