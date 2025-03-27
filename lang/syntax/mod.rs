@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! µcad syntax elements
+//!
+//! Every element in the µcad language are parsed into definitions in this module.
 
 pub mod body;
 pub mod call;
@@ -29,9 +31,9 @@ pub use literal::*;
 pub use module::*;
 pub use namespace::*;
 pub use parameter::*;
+pub use r#use::*;
 pub use source_file::*;
 pub use statement::*;
-pub use r#use::*;
 
 /// Trait for printing a syntax tree
 pub trait PrintSyntax {

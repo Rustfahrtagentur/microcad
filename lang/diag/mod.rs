@@ -73,10 +73,8 @@ impl Diag {
     /// get message (errors will be serialized)
     pub fn message(&self) -> String {
         match self {
-            Diag::Trace(message) => message.to_string(),
-            Diag::Info(message) => message.to_string(),
-            Diag::Warning(error) => error.to_string(),
-            Diag::Error(error) => error.to_string(),
+            Diag::Trace(msg) | Diag::Info(msg) => msg.to_string(),
+            Diag::Warning(err) | Diag::Error(err) => err.to_string(),
         }
     }
 
@@ -113,24 +111,18 @@ impl Diag {
                 writeln!(
                     w,
                     "  ---> {}:{}",
-                    if let Some(source_file) = source_file {
-                        source_file.filename_as_str()
-                    } else {
-                        "<no file>"
-                    },
+                    source_file
+                        .map(|sf| sf.filename_as_str())
+                        .unwrap_or(SourceFile::NO_FILE),
                     src_ref.at
                 )?;
                 writeln!(w, "     |",)?;
 
-                let line = if let Some(source_file) = source_file {
-                    source_file
-                        .get_line(src_ref.at.line - 1)
-                        .unwrap_or("<no line>")
-                } else {
-                    "<no file>"
-                };
-                writeln!(w, "{: >4} | {}", src_ref.at.line, line)?;
+                let line = source_file
+                    .map(|sf| sf.get_line(src_ref.at.line - 1).unwrap_or("<no line>"))
+                    .unwrap_or(SourceFile::NO_FILE);
 
+                writeln!(w, "{: >4} | {}", src_ref.at.line, line)?;
                 writeln!(
                     w,
                     "{: >4} | {}",

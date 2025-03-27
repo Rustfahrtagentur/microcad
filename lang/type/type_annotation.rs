@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad Basic Types
+//! µcad Type annotation
 
 use super::Type;
 use crate::{src_ref::*, syntax::*};

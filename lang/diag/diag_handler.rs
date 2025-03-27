@@ -5,13 +5,10 @@ use crate::{diag::*, eval::*, syntax::*};
 pub struct DiagHandler {
     /// The list of diagnostics
     diag_list: DiagList,
-
     /// The current number of errors in the evaluation process
     pub error_count: u32,
-
     /// The maximum number of errors. `0` means unlimited number of errors.
     error_limit: u32,
-
     /// Treat warnings as errors
     warnings_as_errors: bool,
 }
@@ -35,8 +32,10 @@ impl DiagHandler {
         let mut s = Vec::new();
         let mut w = std::io::BufWriter::new(&mut s);
         self.diag_list.pretty_print(&mut w, source_file_by_hash)?;
-        let w = w.into_inner().expect("could not pretty print errors");
-        Ok(String::from_utf8(w.to_vec()).expect("could not pretty print errors"))
+        let w = w
+            .into_inner()
+            .expect("write error while pretty printing errors");
+        Ok(String::from_utf8(w.to_vec()).expect("UTF-8 error while pretty printing errors"))
     }
 
     /// Returns true if there are errors

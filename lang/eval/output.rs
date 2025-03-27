@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-/// Output buffer to catch what __builtin::print is printing
+/// Output buffer to catch what `__builtin::print` is printing
 pub struct Output {
     buf: std::io::BufWriter<Vec<u8>>,
 }

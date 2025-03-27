@@ -3,7 +3,7 @@
 
 //! Parameter multiplicity implementation.
 
-use crate::{Id, eval::*, value::*};
+use crate::{eval::*, value::*, Id};
 
 /// An enum to distinguish single-value and multi-value coefficients
 #[derive(Clone, Debug)]
@@ -47,7 +47,7 @@ pub struct Combinations<T> {
     done: bool,
 }
 
-/// A Map over combinations
+/// A map over combinations
 pub type CombinationMap<T> = std::collections::HashMap<Id, Coefficient<T>>;
 
 impl<T> Combinations<T>

@@ -3,9 +3,9 @@
 
 //! Call argument value list evaluation entity
 
-use crate::{Id, eval::*, ord_map::*, src_ref::*, value::*};
+use crate::{eval::*, ord_map::*, src_ref::*, value::*, Id};
 
-/// List of call argument values, (foo = 4.0, 3.0mm, bar)
+/// List of call argument values
 ///
 /// This class also provides methods to find a matching call
 /// between between the call argument value list and a given parameter list.

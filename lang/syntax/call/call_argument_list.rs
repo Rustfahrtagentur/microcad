@@ -3,8 +3,6 @@
 
 //! List of CallArgument syntax entities
 
-use std::ops::Index;
-
 use crate::{ord_map::*, src_ref::*, syntax::*};
 
 /// List of call arguments
@@ -56,7 +54,7 @@ impl PrintSyntax for CallArgumentList {
     }
 }
 
-impl Index<&str> for CallArgumentList {
+impl std::ops::Index<&str> for CallArgumentList {
     type Output = CallArgument;
 
     fn index(&self, name: &str) -> &Self::Output {
@@ -64,7 +62,7 @@ impl Index<&str> for CallArgumentList {
     }
 }
 
-impl Index<usize> for CallArgumentList {
+impl std::ops::Index<usize> for CallArgumentList {
     type Output = CallArgument;
 
     fn index(&self, idx: usize) -> &Self::Output {

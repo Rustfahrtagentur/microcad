@@ -37,7 +37,7 @@ pub trait GetSourceFileByHash {
 }
 
 /// µcad source file
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct SourceFile {
     /// Root code body
     pub body: Vec<Statement>,
@@ -54,12 +54,15 @@ pub struct SourceFile {
 }
 
 impl SourceFile {
+    /// Printed instead of a file name if file name could not be retrieved
+    pub const NO_FILE: &str = "<no file>";
+
     /// Return filename of loaded file or `<no file>`
     pub fn filename_as_str(&self) -> &str {
         self.filename
             .as_ref()
-            .map(|path| path.to_str().unwrap_or("<no file>"))
-            .unwrap_or("<no file>")
+            .map(|path| path.to_str().unwrap_or(Self::NO_FILE))
+            .unwrap_or(Self::NO_FILE)
     }
 
     /// Return source file hash
@@ -84,7 +87,11 @@ impl Eval for SourceFile {
 /// We can get a source file by its hash
 impl GetSourceFileByHash for SourceFile {
     fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile> {
-        if self.hash == hash { Some(self) } else { None }
+        if self.hash == hash {
+            Some(self)
+        } else {
+            None
+        }
     }
 }
 
@@ -96,7 +103,7 @@ impl std::fmt::Display for SourceFile {
 
 impl PrintSyntax for SourceFile {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}SourceFile '{}'", "", self.filename_as_str())?;
+        writeln!(f, "{:depth$}SourceFile '{}':", "", self.filename_as_str())?;
         self.body
             .iter()
             .try_for_each(|s| s.print_syntax(f, depth + 1))
