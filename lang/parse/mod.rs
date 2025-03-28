@@ -23,6 +23,5 @@ pub mod parse_error;
 
 pub use parse_error::*;
 
-use crate::{src_ref::*, syntax::*, r#type::*};
-
+use crate::{src_ref::*, syntax::*, ty::*};
 const INTERNAL_PARSE_ERROR: &str = "internal parse error";

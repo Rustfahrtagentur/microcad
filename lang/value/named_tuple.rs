@@ -3,7 +3,7 @@
 
 //! Named tuple evaluation entity
 
-use crate::{r#type::*, src_ref::*, value::*};
+use crate::{src_ref::*, ty::*, value::*};
 
 /// Short cut to create a NamedTuple
 #[cfg(test)]

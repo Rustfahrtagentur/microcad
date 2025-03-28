@@ -3,7 +3,7 @@
 
 //! µcad unit syntax element
 
-use crate::r#type::*;
+use crate::ty::*;
 
 /// The units that can be used after numbers in the language"
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

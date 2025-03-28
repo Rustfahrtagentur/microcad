@@ -3,7 +3,7 @@
 
 //! Value list evaluation entity
 
-use crate::{src_ref::*, ty::*, r#type::*, value::*};
+use crate::{src_ref::*, ty::*, value::*};
 
 /// List of values
 #[derive(Clone, Debug, Default)]

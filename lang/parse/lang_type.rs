@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, syntax::*, r#type::*};
+use crate::{parse::*, parser::*, syntax::*, ty::*};
 
 impl Parse for ListType {
     fn parse(pair: Pair) -> ParseResult<Self> {

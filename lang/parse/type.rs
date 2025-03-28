@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, src_ref::*, r#type::*};
+use crate::{parse::*, parser::*, src_ref::*, ty::*};
 
 impl Parse for TypeAnnotation {
     fn parse(pair: Pair) -> ParseResult<Self> {

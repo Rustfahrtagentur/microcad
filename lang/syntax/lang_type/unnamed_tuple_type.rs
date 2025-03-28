@@ -3,7 +3,7 @@
 
 //! Unnamed tuple syntax element
 
-use crate::r#type::*;
+use crate::ty::*;
 
 /// Unnamed tuple type (e.g. `(scalar,string)`
 #[derive(Debug, Clone, Default, PartialEq)]

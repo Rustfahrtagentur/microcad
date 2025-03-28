@@ -3,7 +3,7 @@
 
 //! Unnamed tuple evaluation entity
 
-use crate::{src_ref::*, r#type::*, value::*};
+use crate::{src_ref::*, ty::*, value::*};
 
 /// Unnamed tuple
 #[derive(Clone, Debug, PartialEq)]

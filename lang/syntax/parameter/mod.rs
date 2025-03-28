@@ -5,7 +5,7 @@
 
 mod parameter_list;
 
-use crate::{ord_map::*, src_ref::*, syntax::*, r#type::*};
+use crate::{ord_map::*, src_ref::*, syntax::*, ty::*};
 
 pub use parameter_list::*;
 

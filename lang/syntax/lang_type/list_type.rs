@@ -3,7 +3,7 @@
 
 //! List type syntax element
 
-use crate::r#type::*;
+use crate::ty::*;
 
 #[allow(rustdoc::broken_intra_doc_links)]
 /// List type (e.g. '[scalar]')

@@ -21,6 +21,6 @@ impl IntoValue for Vec<microcad_core::Vec2> {
             src_ref.clone(),
         );
 
-        Value::List(List::new(value_list, crate::r#type::Type::Vec2, src_ref))
+        Value::List(List::new(value_list, crate::ty::Type::Vec2, src_ref))
     }
 }

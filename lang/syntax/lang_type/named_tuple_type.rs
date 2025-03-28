@@ -3,7 +3,7 @@
 
 //! Named tuple type syntax element
 
-use crate::{syntax::*, r#type::*};
+use crate::{syntax::*, ty::*};
 
 /// Named tuple (e.g. `(n: scalar, m: string)`)
 #[derive(Debug, Clone, Default, PartialEq)]

@@ -3,7 +3,7 @@
 
 //! Parameter value evaluation entity
 
-use crate::{Id, src_ref::*, r#type::*, value::*};
+use crate::{src_ref::*, ty::*, value::*, Id};
 
 /// Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]

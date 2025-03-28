@@ -3,7 +3,7 @@
 
 //! µcad assignment syntax element
 
-use crate::{src_ref::*, syntax::*, ty::*, r#type::*};
+use crate::{src_ref::*, syntax::*, ty::*};
 
 /// Assignment specifying an identifier, type and value
 #[derive(Clone, Debug)]

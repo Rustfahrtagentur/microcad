@@ -27,7 +27,7 @@ pub use eval_context::*;
 pub use eval_error::*;
 pub use output::*;
 
-use crate::{diag::*, r#type::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 use scope_stack::*;
 
 /// Evaluation trait

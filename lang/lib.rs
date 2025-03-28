@@ -18,7 +18,6 @@ pub mod source_file_cache;
 pub mod src_ref;
 pub mod syntax;
 pub mod ty;
-pub mod r#type;
 pub mod value;
 
 /// Id type (base of all identifiers)

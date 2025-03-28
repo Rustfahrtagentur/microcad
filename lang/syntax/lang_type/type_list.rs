@@ -3,7 +3,7 @@
 
 //! Type list type syntax element
 
-use crate::r#type::*;
+use crate::ty::*;
 
 /// List of types
 pub struct TypeList(Vec<Type>);

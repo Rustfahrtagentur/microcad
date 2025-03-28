@@ -3,7 +3,7 @@
 
 //! Function signature syntax element
 
-use crate::{src_ref::*, syntax::*, r#type::*};
+use crate::{src_ref::*, syntax::*, ty::*};
 
 /// Parameters and return type of a function
 #[derive(Clone, Debug)]

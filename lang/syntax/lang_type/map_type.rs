@@ -3,7 +3,7 @@
 
 //! Map type syntax element
 
-use crate::{syntax::*, r#type::*};
+use crate::{syntax::*, ty::*};
 
 /// Map type (e.g. `[scalar => string]`)
 #[derive(Debug, Clone, PartialEq)]

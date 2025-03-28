@@ -1,4 +1,4 @@
-use crate::{parse::*, parser::*, r#type::*};
+use crate::{parse::*, parser::*, ty::*};
 
 /// Short cut to create a `ParameterList` instance
 impl Parse for Parameter {
