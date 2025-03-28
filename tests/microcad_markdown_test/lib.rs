@@ -357,7 +357,6 @@ fn create_test_code(
         r##"#[test]
                 #[allow(non_snake_case)]
                 fn r#{name}() {{
-                    use microcad_core::SEARCH_PATH;
                     use microcad_lang::eval::*;
                     use microcad_lang::syntax::*;
                     use crate::rust_std::fs;
