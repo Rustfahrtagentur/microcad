@@ -44,6 +44,12 @@ enum Commands {
     Resolve {
         /// Input µcad file
         input: String,
+        /// print parse tree
+        #[clap(short, long)]
+        tree: bool,
+        /// print formatted code
+        #[clap(short, long)]
+        fmt: bool,
     },
 
     /// Parse and evaluate a µcad file
@@ -75,29 +81,25 @@ fn main() {
     println!("Processing Time: {:?}", start.elapsed());
 }
 
-struct S<'a>(&'a SourceFile);
-
-impl std::fmt::Display for S<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.print_syntax(f, 0)
-    }
-}
-
 fn run(cli: &Cli) -> anyhow::Result<()> {
     match &cli.command {
         Commands::Parse { input, tree, fmt } => {
             let source_file = parse(input)?;
             if *tree {
-                let s = S(&source_file);
-                println!("{s}");
+                println!("{}", FormatSyntax(source_file.as_ref()));
             }
             if *fmt {
                 println!("{source_file}");
             }
         }
-        Commands::Resolve { input } => {
+        Commands::Resolve { input, tree, fmt } => {
             let symbol_table = resolve(parse(input)?)?;
-            println!("{}", symbol_table.borrow());
+            if *tree {
+                println!("{}", FormatSymbol(&symbol_table.borrow()));
+            }
+            if *fmt {
+                println!("{}", symbol_table.borrow());
+            }
             eprintln!("Resolved successfully!");
         }
         Commands::Eval { input } => {

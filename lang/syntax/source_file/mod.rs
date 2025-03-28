@@ -110,6 +110,15 @@ impl PrintSyntax for SourceFile {
     }
 }
 
+/// print syntax via std::fmt::Display
+pub struct FormatSyntax<'a, T: PrintSyntax>(pub &'a T);
+
+impl<T: PrintSyntax> std::fmt::Display for FormatSyntax<'_, T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.print_syntax(f, 0)
+    }
+}
+
 #[test]
 fn load_source_file() {
     use log::*;

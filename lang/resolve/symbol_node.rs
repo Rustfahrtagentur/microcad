@@ -1,4 +1,4 @@
-use crate::{Id, eval::*, rc_mut::*, resolve::*, syntax::*, value::*};
+use crate::{eval::*, rc_mut::*, resolve::*, syntax::*, value::*, Id};
 
 /// Symbol node
 #[derive(Debug)]
@@ -107,6 +107,15 @@ impl SymbolNode {
 impl std::fmt::Display for SymbolNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.print_symbol(f, 0)
+    }
+}
+
+/// print symbols via std::fmt::Display
+pub struct FormatSymbol<'a>(pub &'a SymbolNode);
+
+impl std::fmt::Display for FormatSymbol<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.print_symbol(f, 0)
     }
 }
 
