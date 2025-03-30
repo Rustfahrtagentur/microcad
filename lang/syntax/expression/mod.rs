@@ -15,7 +15,7 @@ pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
 
-use crate::{src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*, value::Value};
 
 /// Expressions
 #[derive(Clone, Debug, Default)]
@@ -23,6 +23,8 @@ pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
     Invalid,
+    /// A processed value, a result from calling lower()
+    Value(Value),
     /// An integer, float, color or bool literal: 1, 1.0, #00FF00, false
     Literal(Literal),
     /// A string that contains format expressions: "value = {a}"
@@ -68,6 +70,7 @@ impl SrcReferrer for Expression {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         match self {
             Self::Invalid => SrcRef(None),
+            Self::Value(value) => value.src_ref(),
             Self::Literal(l) => l.src_ref(),
             Self::FormatString(fs) => fs.src_ref(),
             Self::ListExpression(le) => le.src_ref(),
@@ -95,6 +98,7 @@ impl SrcReferrer for Expression {
 impl std::fmt::Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
+            Self::Value(value) => write!(f, "{value}"),
             Self::Literal(literal) => write!(f, "{literal}"),
             Self::FormatString(format_string) => write!(f, "{format_string}"),
             Self::ListExpression(list_expression) => write!(f, "{list_expression}"),
@@ -120,13 +124,21 @@ impl std::fmt::Display for Expression {
     }
 }
 
+impl PrintSyntax for Value {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        write!(f, "{:depth$}Value: {value}", "", value = self)
+    }
+}
+
 impl PrintSyntax for Expression {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        let depth = depth + 1;
         match self {
-            Self::Literal(literal) => literal.print_syntax(f, depth + 1),
-            Self::FormatString(format_string) => format_string.print_syntax(f, depth + 1),
-            Self::ListExpression(list_expression) => list_expression.print_syntax(f, depth + 1),
-            Self::TupleExpression(tuple_expression) => tuple_expression.print_syntax(f, depth + 1),
+            Self::Value(value) => value.print_syntax(f, depth),
+            Self::Literal(literal) => literal.print_syntax(f, depth),
+            Self::FormatString(format_string) => format_string.print_syntax(f, depth),
+            Self::ListExpression(list_expression) => list_expression.print_syntax(f, depth),
+            Self::TupleExpression(tuple_expression) => tuple_expression.print_syntax(f, depth),
             Self::BinaryOp {
                 lhs,
                 op,
@@ -134,8 +146,8 @@ impl PrintSyntax for Expression {
                 src_ref: _,
             } => {
                 writeln!(f, "{:depth$}BinaryOp '{op}':", "")?;
-                lhs.print_syntax(f, depth + 1)?;
-                rhs.print_syntax(f, depth + 1)
+                lhs.print_syntax(f, depth)?;
+                rhs.print_syntax(f, depth)
             }
             Self::UnaryOp {
                 op,
@@ -143,30 +155,30 @@ impl PrintSyntax for Expression {
                 src_ref: _,
             } => {
                 writeln!(f, "{:depth$}UnaryOp '{op}':", "")?;
-                rhs.print_syntax(f, depth + 1)
+                rhs.print_syntax(f, depth)
             }
             Self::ListElementAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}ListElementAccess:", "")?;
-                lhs.print_syntax(f, depth + 1)?;
-                rhs.print_syntax(f, depth + 1)
+                lhs.print_syntax(f, depth)?;
+                rhs.print_syntax(f, depth)
             }
             Self::NamedTupleElementAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}NamedTupleElementAccess:", "")?;
-                lhs.print_syntax(f, depth + 1)?;
-                rhs.print_syntax(f, depth + 1)
+                lhs.print_syntax(f, depth)?;
+                rhs.print_syntax(f, depth)
             }
             Self::UnnamedTupleElementAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}UnnamedTupleElementAccess:", "")?;
-                lhs.print_syntax(f, depth + 1)?;
-                let depth = depth + 1;
+                lhs.print_syntax(f, depth)?;
+                let depth = depth;
                 writeln!(f, "{:depth$}{rhs}", "")
             }
             Self::MethodCall(lhs, method_call, _) => {
                 writeln!(f, "{:depth$}MethodCall:", "")?;
-                lhs.print_syntax(f, depth + 1)?;
-                method_call.print_syntax(f, depth + 1)
+                lhs.print_syntax(f, depth)?;
+                method_call.print_syntax(f, depth)
             }
-            Self::Nested(nested) => nested.print_syntax(f, depth + 1),
+            Self::Nested(nested) => nested.print_syntax(f, depth),
             _ => unimplemented!(),
         }
     }
