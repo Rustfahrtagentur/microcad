@@ -11,7 +11,7 @@ pub use color::*;
 pub use number_literal::*;
 pub use units::*;
 
-use crate::{r#type::*, src_ref::*, syntax::*, value::Value};
+use crate::{src_ref::*, syntax::*, ty::*, value::Value};
 
 /// Literal entity
 #[derive(Debug, Clone, PartialEq)]
