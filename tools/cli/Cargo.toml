@@ -24,6 +24,7 @@ anyhow = "1.0"
 
 microcad-lang = { workspace = true }
 microcad-core = { workspace = true }
+microcad-builtin = { workspace = true }
 
 [lints.rust]
 missing_docs = "warn"

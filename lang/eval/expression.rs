@@ -24,37 +24,16 @@ impl Eval for Expression {
                     return Ok(Value::None);
                 }
 
-                match op.as_str() {
-                    "+" => lhs + rhs,
-                    "-" => lhs - rhs,
-                    "*" => lhs * rhs,
-                    "/" => lhs / rhs,
-                    "^" => unimplemented!(), // lhs.pow(&rhs),
-                    "&" => lhs & rhs,
-                    "|" => lhs | rhs,
-                    ">" => Ok(Value::Bool(Refer::new(lhs > rhs, SrcRef::merge(lhs, rhs)))),
-                    "<" => Ok(Value::Bool(Refer::new(lhs < rhs, SrcRef::merge(lhs, rhs)))),
-                    "≤" => Ok(Value::Bool(Refer::new(lhs <= rhs, SrcRef::merge(lhs, rhs)))),
-                    "≥" => Ok(Value::Bool(Refer::new(lhs >= rhs, SrcRef::merge(lhs, rhs)))),
-                    "~" => todo!("implement near ~="),
-                    "=" => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
-                    "!=" => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
-                    _ => unimplemented!("{op:?}"),
-                }
-                .map_err(EvalError::ValueError)
+                Value::binary_op(lhs, rhs, op.as_str()).map_err(EvalError::ValueError)
             }
             Self::UnaryOp {
                 op,
                 rhs,
                 src_ref: _,
-            } => {
-                let rhs = rhs.eval(context)?;
-                match op.as_str() {
-                    "-" => -rhs.clone(),
-                    _ => unimplemented!(),
-                }
-                .map_err(EvalError::ValueError)
-            }
+            } => rhs
+                .eval(context)?
+                .unary_op(op.as_str())
+                .map_err(EvalError::ValueError),
             Self::ListElementAccess(lhs, rhs, _) => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;

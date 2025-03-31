@@ -125,6 +125,35 @@ impl Value {
     pub fn is_invalid(&self) -> bool {
         matches!(self, Value::None)
     }
+
+    /// Binary operation
+    pub fn binary_op(lhs: Value, rhs: Value, op: &str) -> ValueResult {
+        match op {
+            "+" => lhs + rhs,
+            "-" => lhs - rhs,
+            "*" => lhs * rhs,
+            "/" => lhs / rhs,
+            "^" => unimplemented!(), // lhs.pow(&rhs),
+            "&" => lhs & rhs,
+            "|" => lhs | rhs,
+            ">" => Ok(Value::Bool(Refer::new(lhs > rhs, SrcRef::merge(lhs, rhs)))),
+            "<" => Ok(Value::Bool(Refer::new(lhs < rhs, SrcRef::merge(lhs, rhs)))),
+            "≤" => Ok(Value::Bool(Refer::new(lhs <= rhs, SrcRef::merge(lhs, rhs)))),
+            "≥" => Ok(Value::Bool(Refer::new(lhs >= rhs, SrcRef::merge(lhs, rhs)))),
+            "~" => todo!("implement near ~="),
+            "=" => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
+            "!=" => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
+            _ => unimplemented!("{op:?}"),
+        }
+    }
+
+    /// Unary operation
+    pub fn unary_op(self, op: &str) -> ValueResult {
+        match op {
+            "-" => -self,
+            _ => unimplemented!(),
+        }
+    }
 }
 
 impl SrcReferrer for Value {

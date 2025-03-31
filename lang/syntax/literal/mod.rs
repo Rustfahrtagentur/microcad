@@ -11,7 +11,7 @@ pub use color::*;
 pub use number_literal::*;
 pub use units::*;
 
-use crate::{src_ref::*, syntax::*, ty::*};
+use crate::{r#type::*, src_ref::*, syntax::*, value::Value};
 
 /// Literal entity
 #[derive(Debug, Clone, PartialEq)]
@@ -24,6 +24,18 @@ pub enum Literal {
     Bool(Refer<bool>),
     /// Color literal
     Color(Refer<Color>),
+}
+
+impl Literal {
+    /// Return value of literal
+    pub fn value(&self) -> Value {
+        match self {
+            Self::Integer(refer) => Value::Integer(refer.clone()),
+            Self::Number(number_literal) => number_literal.value(),
+            Self::Bool(refer) => Value::Bool(refer.clone()),
+            Self::Color(refer) => Value::Color(refer.clone()),
+        }
+    }
 }
 
 impl SrcReferrer for Literal {
@@ -56,6 +68,12 @@ impl std::fmt::Display for Literal {
             Literal::Bool(b) => write!(f, "{}", b),
             Literal::Color(c) => write!(f, "{}", c),
         }
+    }
+}
+
+impl From<Literal> for Value {
+    fn from(literal: Literal) -> Self {
+        literal.value()
     }
 }
 

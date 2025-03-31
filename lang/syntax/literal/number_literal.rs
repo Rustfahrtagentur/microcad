@@ -3,7 +3,7 @@
 
 //! Number literal syntax element
 
-use crate::{src_ref::*, syntax::*, ty::*};
+use crate::{src_ref::*, syntax::*, ty::*, value::Value};
 
 /// Number literal
 #[derive(Debug, Clone, PartialEq)]
@@ -31,6 +31,19 @@ impl NumberLiteral {
     pub fn unit(&self) -> Unit {
         self.1
     }
+
+    /// Return value for number literal
+    pub fn value(&self) -> Value {
+        match self.1.ty() {
+            Type::Scalar => Value::Scalar(Refer::new(self.normalized_value(), self.src_ref())),
+            Type::Angle => Value::Angle(Refer::new(self.normalized_value(), self.src_ref())),
+            Type::Length => Value::Length(Refer::new(self.normalized_value(), self.src_ref())),
+            Type::Weight => Value::Weight(Refer::new(self.normalized_value(), self.src_ref())),
+            Type::Area => Value::Area(Refer::new(self.normalized_value(), self.src_ref())),
+            Type::Volume => Value::Volume(Refer::new(self.normalized_value(), self.src_ref())),
+            _ => unreachable!(),
+        }
+    }
 }
 
 impl crate::ty::Ty for NumberLiteral {
@@ -48,5 +61,11 @@ impl SrcReferrer for NumberLiteral {
 impl std::fmt::Display for NumberLiteral {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}{}", self.0, self.1)
+    }
+}
+
+impl From<NumberLiteral> for Value {
+    fn from(literal: NumberLiteral) -> Self {
+        literal.value()
     }
 }
