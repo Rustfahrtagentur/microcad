@@ -10,19 +10,21 @@ impl ResolveContext {
     /// Create new resolve context
     pub fn new(search_paths: Vec<std::path::PathBuf>) -> Self {
         let mut externals = std::collections::HashMap::new();
-        for search_path in search_paths {
-            for file in Self::scan_path(search_path.clone(), crate::MICROCAD_EXTENSIONS) {
-                externals.insert(
-                    Self::into_qualified_name(
-                        &file
-                            .strip_prefix(search_path.clone())
-                            .expect("cannot strip search path from file name")
-                            .with_extension(""),
-                    ),
-                    file.canonicalize().expect("path not found"),
-                );
-            }
-        }
+        search_paths.iter().for_each(|search_path| {
+            Self::scan_path(search_path.clone(), crate::MICROCAD_EXTENSIONS)
+                .iter()
+                .for_each(|file| {
+                    externals.insert(
+                        Self::into_qualified_name(
+                            &file
+                                .strip_prefix(search_path.clone())
+                                .expect("cannot strip search path from file name")
+                                .with_extension(""),
+                        ),
+                        file.canonicalize().expect("path not found"),
+                    );
+                });
+        });
         Self { externals }
     }
 
