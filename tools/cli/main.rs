@@ -7,7 +7,7 @@ extern crate clap;
 extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{eval::*, objects::*, rc_mut::RcMut, resolve::*, syntax::*};
+use microcad_lang::{eval::*, objects::*, resolve::*, syntax::*};
 use std::{io::Write, path::Path, rc::Rc};
 
 /// µcad cli
@@ -84,16 +84,28 @@ fn main() {
 fn run(cli: &Cli) -> anyhow::Result<()> {
     match &cli.command {
         Commands::Parse { input, tree, fmt } => {
-            let source_file = parse(input)?;
+            let source_file = SourceFile::load(input)?;
+            println!("Parse Output:\n");
             if *tree {
                 println!("{}", FormatSyntax(source_file.as_ref()));
             }
             if *fmt {
-                println!("{source_file}");
+                println!("Parse Output:\n{source_file}");
             }
+            eprintln!("Parsed successfully!");
         }
         Commands::Resolve { input, tree, fmt } => {
-            let symbol_table = resolve(parse(input)?)?;
+            let mut context = ResolveContext::new(vec!["lib".into()]);
+
+            println!("Context:\n\n{context}");
+
+            let source_file = SourceFile::load(input)?;
+            eprintln!("Parsed successfully!");
+
+            let symbol_table = source_file.resolve(None, &mut context)?;
+
+            println!("Symbols:\n");
+
             if *tree {
                 println!("{}", FormatSymbol(&symbol_table.borrow()));
             }
@@ -103,7 +115,7 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
             eprintln!("Resolved successfully!");
         }
         Commands::Eval { input } => {
-            eval(parse(input)?, &cli.std)?;
+            eval(SourceFile::load(input)?, &cli.std)?;
             eprintln!("Evaluated successfully!");
         }
         /*
@@ -149,15 +161,6 @@ main();
     }
 
     Ok(())
-}
-
-fn parse(input: impl AsRef<Path>) -> anyhow::Result<Rc<SourceFile>> {
-    Ok(SourceFile::load(input)?)
-}
-
-fn resolve(source_file: Rc<SourceFile>) -> anyhow::Result<RcMut<SymbolNode>> {
-    let mut context = ResolveContext::new(vec![]);
-    Ok(source_file.resolve(None, &mut context)?)
 }
 
 fn eval(source_file: Rc<SourceFile>, _std: impl AsRef<Path>) -> anyhow::Result<ObjectNode> {

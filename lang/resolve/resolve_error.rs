@@ -10,7 +10,7 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum ResolveError {
     /// Custom evaluation error
-    #[error("{0}")]
+    #[error("External symbol {0} not found")]
     ExternalSymbolNotFound(QualifiedName),
 }
 

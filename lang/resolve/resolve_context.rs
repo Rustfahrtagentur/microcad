@@ -20,7 +20,7 @@ impl ResolveContext {
                             .expect("cannot strip search path from file name")
                             .with_extension(""),
                     ),
-                    file,
+                    file.canonicalize().expect("path not found"),
                 );
             }
         }
@@ -74,7 +74,7 @@ impl std::fmt::Display for ResolveContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.externals
             .iter()
-            .try_for_each(|file| writeln!(f, "{}\t{}", file.0, file.1.to_string_lossy()))
+            .try_for_each(|file| writeln!(f, "{} => {}", file.0, file.1.to_string_lossy()))
     }
 }
 
