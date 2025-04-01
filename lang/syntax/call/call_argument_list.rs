@@ -54,11 +54,11 @@ impl PrintSyntax for CallArgumentList {
     }
 }
 
-impl std::ops::Index<&str> for CallArgumentList {
+impl std::ops::Index<&Identifier> for CallArgumentList {
     type Output = CallArgument;
 
-    fn index(&self, name: &str) -> &Self::Output {
-        self.0.get(&Identifier::from(name)).expect("key not found")
+    fn index(&self, name: &Identifier) -> &Self::Output {
+        self.0.get(name).expect("key not found")
     }
 }
 

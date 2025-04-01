@@ -9,7 +9,9 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{Id, src_ref::*, syntax::*};
+#[cfg(not(test))]
+use crate::parse::*;
+use crate::{src_ref::*, syntax::*, Id};
 
 /// µcad identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -34,9 +36,24 @@ impl std::hash::Hash for Identifier {
     }
 }
 
+#[cfg(test)]
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {
         Self(Refer::none(value.into()))
+    }
+}
+
+#[cfg(not(test))]
+impl TryFrom<&str> for Identifier {
+    type Error = ParseError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let id = Self(Refer::none(value.into()));
+        if id.0.chars().all(|c| c.is_ascii_alphabetic() || c == '_') {
+            Ok(id)
+        } else {
+            Err(ParseError::InvalidIdentifier(value.into()))
+        }
     }
 }
 
@@ -63,6 +80,7 @@ impl PrintSyntax for Identifier {
         writeln!(f, "{:depth$}Identifier: {}", "", self.id())
     }
 }
+
 /// join several identifiers with `::` and return as string
 pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
     identifiers

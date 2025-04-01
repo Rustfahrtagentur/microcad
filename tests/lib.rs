@@ -62,10 +62,18 @@ fn context_with_symbols() {
 
     context.add_symbol(builtin_namespace());
     context
-        .fetch_symbol(&"__builtin::assert_valid".into())
+        .fetch_symbol(
+            &"__builtin::assert_valid"
+                .try_into()
+                .expect("unexpected name error"),
+        )
         .expect("symbol not found");
     context
-        .fetch_symbol(&"__builtin::assert_invalid".into())
+        .fetch_symbol(
+            &"__builtin::assert_invalid"
+                .try_into()
+                .expect("unexpected name error"),
+        )
         .expect("symbol not found");
     assert!(source_file.eval(&mut context).is_ok());
 }

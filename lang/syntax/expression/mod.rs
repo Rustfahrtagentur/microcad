@@ -170,7 +170,6 @@ impl PrintSyntax for Expression {
             Self::UnnamedTupleElementAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}UnnamedTupleElementAccess:", "")?;
                 lhs.print_syntax(f, depth)?;
-                let depth = depth;
                 writeln!(f, "{:depth$}{rhs}", "")
             }
             Self::MethodCall(lhs, method_call, _) => {

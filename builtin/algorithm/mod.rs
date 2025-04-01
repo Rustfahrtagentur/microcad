@@ -25,7 +25,7 @@ fn complement() -> RcMut<SymbolNode> {
 
 /// Creates the builtin `algorithm` module
 pub fn algorithm() -> RcMut<SymbolNode> {
-    crate::NamespaceBuilder::new("algorithm")
+    crate::NamespaceBuilder::new("algorithm".try_into().expect("unexpected name error"))
         .symbol(difference())
         .symbol(union())
         .symbol(intersection())

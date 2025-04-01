@@ -38,9 +38,9 @@ impl SymbolNode {
     }
 
     /// Create a symbol node for namespace
-    pub fn new_builtin_namespace(id: &str) -> RcMut<SymbolNode> {
+    pub fn new_builtin_namespace(id: Identifier) -> RcMut<SymbolNode> {
         SymbolNode::new(
-            SymbolDefinition::Namespace(NamespaceDefinition::new(id.into())),
+            SymbolDefinition::Namespace(NamespaceDefinition::new(id)),
             None,
         )
     }

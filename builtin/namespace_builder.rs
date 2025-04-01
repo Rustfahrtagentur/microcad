@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{rc_mut::*, resolve::*};
+use microcad_lang::{rc_mut::*, resolve::*, syntax::Identifier};
 
 /// Builder pattern to build builtin namespaces
 pub struct NamespaceBuilder {
@@ -11,7 +11,7 @@ pub struct NamespaceBuilder {
 
 impl NamespaceBuilder {
     /// Create new namespace symbol with a name
-    pub fn new(id: &str) -> Self {
+    pub fn new(id: Identifier) -> Self {
         Self {
             namespace: SymbolNode::new_builtin_namespace(id),
         }

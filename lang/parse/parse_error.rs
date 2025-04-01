@@ -102,8 +102,20 @@ pub enum ParseError {
     LoadSource(std::path::PathBuf),
 
     /// Grammar rule error
-    #[error("Grammar rule error")]
+    #[error("Grammar rule error {0}")]
     GrammarRuleError(String),
+
+    /// Grammar rule error
+    #[error("Invalid qualified name '{0}'")]
+    InvalidQualifiedName(String),
+
+    /// Grammar rule error
+    #[error("Invalid identifier '{0}'")]
+    InvalidIdentifier(String),
+
+    /// Qualified name cannot be converted into an Id
+    #[error("Qualified name {0} cannot be converted into an Id")]
+    QualifiedNameIsNoId(QualifiedName),
 }
 
 /// Result with parse error

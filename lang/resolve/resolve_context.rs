@@ -79,7 +79,7 @@ impl std::fmt::Display for ResolveContext {
 }
 
 #[test]
-fn resolve_use() {
+fn resolve_external_file() {
     let context = ResolveContext::new(vec!["../lib".into()]);
 
     assert!(!context.externals.is_empty());

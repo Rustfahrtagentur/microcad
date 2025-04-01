@@ -18,7 +18,7 @@ fn abs() -> RcMut<SymbolNode> {
 }
 
 pub fn math() -> RcMut<SymbolNode> {
-    crate::NamespaceBuilder::new("math")
+    crate::NamespaceBuilder::new("math".try_into().expect("unexpected name error"))
         .symbol(SymbolNode::new_builtin_constant(
             "pi",
             Value::Scalar(Refer::none(std::f64::consts::PI)),

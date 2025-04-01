@@ -37,6 +37,10 @@ pub enum EvalError {
     #[error("Invalid type: {0}")]
     InvalidType(Type),
 
+    /// Invalid type
+    #[error("Invalid type: {0}")]
+    InvalidI(Type),
+
     /// List index out of bounds
     #[error("List index out of bounds: {index} >= {len}")]
     ListIndexOutOfBounds {
@@ -107,10 +111,6 @@ pub enum EvalError {
     /// Expression is neither a valid name for a symbol nor local variable
     #[error("Expression at line {0} is neither a valid name for a symbol nor local variable")]
     NotAName(SrcRef),
-
-    /// Qualified name cannot be converted into an Id
-    #[error("Qualified name {0} cannot be converted into an Id")]
-    QualifiedNameIsNoId(QualifiedName),
 
     /// Lookup of a name failed
     #[error("Lookup of name {0} failed")]
