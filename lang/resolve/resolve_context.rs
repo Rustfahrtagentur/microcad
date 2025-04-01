@@ -9,10 +9,9 @@ pub struct ResolveContext {
 impl ResolveContext {
     /// Create new resolve context
     pub fn new(search_paths: Vec<std::path::PathBuf>) -> Self {
-        const EXTENSIONS: &[&str] = &[".µcad", ".mcad"];
         let mut externals = std::collections::HashMap::new();
         for search_path in search_paths {
-            for file in Self::scan_path(search_path.clone(), EXTENSIONS) {
+            for file in Self::scan_path(search_path.clone(), crate::MICROCAD_EXTENSIONS) {
                 externals.insert(
                     Self::into_qualified_name(
                         &file
