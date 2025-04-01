@@ -31,7 +31,10 @@ fn namespaces() {
     use microcad_lang::{eval::*, resolve::*, syntax::*};
     let source_file = SourceFile::load("../tests/test_cases/syntax/namespace.µcad")
         .expect("cannot load test file");
-    let symbol_node = source_file.resolve(None);
+    let mut context = ResolveContext::new(vec![]);
+    let symbol_node = source_file
+        .resolve(None, &mut context)
+        .expect("unexpected resolve error");
 
     println!("{}", symbol_node.borrow());
 
