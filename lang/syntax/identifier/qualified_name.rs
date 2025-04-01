@@ -5,7 +5,7 @@ use crate::{eval::*, src_ref::*, syntax::*, Id};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq, Hash, Eq)]
 pub struct QualifiedName(pub Vec<Identifier>);
 
 impl QualifiedName {
@@ -16,6 +16,10 @@ impl QualifiedName {
         } else {
             None
         }
+    }
+    /// Tells if self is in a specified namespace
+    pub fn is_sub_of(&self, namespace: &QualifiedName) -> bool {
+        self.starts_with(namespace)
     }
 }
 

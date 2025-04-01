@@ -3,10 +3,12 @@
 
 //! µcad symbol tree resolve
 
+mod resolve_context;
 mod symbol_definition;
 mod symbol_node;
 mod symbol_path;
 
+pub use resolve_context::*;
 pub use symbol_definition::*;
 pub use symbol_node::*;
 pub use symbol_path::*;
