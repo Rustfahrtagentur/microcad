@@ -71,9 +71,9 @@ impl SymbolNode {
     }
 
     /// Search in symbol tree by a path, e.g. a::b::c
-    pub fn search_down(&self, path: &SymbolPath) -> Option<RcMut<SymbolNode>> {
+    pub fn search_down(&self, path: &QualifiedName) -> Option<RcMut<SymbolNode>> {
         if let Some(first) = path.first() {
-            if let Some(child) = self.fetch(first) {
+            if let Some(child) = self.fetch(first.id()) {
                 let path = &path.remove_first();
                 if path.is_empty() {
                     Some(child.clone())
@@ -89,7 +89,7 @@ impl SymbolNode {
     }
 
     /// Search for first symbol in parents
-    pub fn search_up(&self, path: &SymbolPath) -> Option<RcMut<SymbolNode>> {
+    pub fn search_up(&self, path: &QualifiedName) -> Option<RcMut<SymbolNode>> {
         if let Some(child) = self.search_down(path) {
             Some(child)
         } else if let Some(parent) = &self.parent {

@@ -7,13 +7,11 @@ mod resolve_context;
 mod resolve_error;
 mod symbol_definition;
 mod symbol_node;
-mod symbol_path;
 
 pub use resolve_context::*;
 pub use resolve_error::*;
 pub use symbol_definition::*;
 pub use symbol_node::*;
-pub use symbol_path::*;
 
 /// Source File `foo.µcad`
 ///

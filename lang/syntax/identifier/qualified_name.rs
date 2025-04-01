@@ -30,6 +30,10 @@ impl QualifiedName {
             false
         }
     }
+    /// remove the first name from path
+    pub fn remove_first(&self) -> Self {
+        Self(self.0[1..].to_vec())
+    }
 }
 
 impl SrcReferrer for QualifiedName {
