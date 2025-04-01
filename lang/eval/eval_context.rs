@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, diag::*, eval::*, rc_mut::*, resolve::*, source_file_cache::*, syntax::*};
+use crate::{diag::*, eval::*, rc_mut::*, resolve::*, source_file_cache::*, syntax::*, Id};
 
 /// Context for evaluation
 ///
@@ -107,8 +107,7 @@ impl EvalContext {
     /// fetch symbol from symbol table
     pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
         let current_node = self.current_node();
-        if let Some(child) =
-            SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone().into())
+        if let Some(child) = SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone())
         {
             Ok(child)
         } else {
@@ -144,8 +143,7 @@ impl EvalContext {
     /// Find a symbol in the symbol table and add it at the currently processed node
     pub fn use_symbol(&mut self, qualified_name: &QualifiedName) -> EvalResult<()> {
         let current_node = self.current_node_mut();
-        if let Some(child) =
-            SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone().into())
+        if let Some(child) = SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone())
         {
             SymbolNode::insert_child(&mut self.current_node_mut(), child);
             Ok(())
