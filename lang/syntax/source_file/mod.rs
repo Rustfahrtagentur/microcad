@@ -65,6 +65,19 @@ impl SourceFile {
             .unwrap_or(Self::NO_FILE)
     }
 
+    /// Return the namespace name from the file name
+    pub fn namespace_name_as_str(&self) -> &str {
+        self.filename
+            .as_ref()
+            .map(|path| {
+                path.file_stem()
+                    .expect("cannot get file stem")
+                    .to_str()
+                    .unwrap_or(Self::NO_FILE)
+            })
+            .unwrap_or(Self::NO_FILE)
+    }
+
     /// Return source file hash
     pub fn hash(&self) -> u64 {
         self.hash

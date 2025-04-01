@@ -26,7 +26,7 @@ impl SymbolDefinition {
             Self::Namespace(n) => n.name.id().clone(),
             Self::Module(m) => m.name.id().clone(),
             Self::Function(f) => f.name.id().clone(),
-            Self::SourceFile(s) => s.filename_as_str().into(),
+            Self::SourceFile(s) => s.namespace_name_as_str().into(),
             Self::BuiltinFunction(f) => f.id.clone(),
             Self::BuiltinModule(m) => m.id.clone(),
             Self::Constant(id, _) => id.clone(),
