@@ -21,6 +21,15 @@ impl QualifiedName {
     pub fn is_sub_of(&self, namespace: &QualifiedName) -> bool {
         self.starts_with(namespace)
     }
+
+    /// Returns `true` if this name is in builtin namespace
+    pub fn is_builtin(&self) -> bool {
+        if let Some(first) = self.first() {
+            first == "__builtin"
+        } else {
+            false
+        }
+    }
 }
 
 impl SrcReferrer for QualifiedName {
