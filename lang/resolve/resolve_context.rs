@@ -30,6 +30,7 @@ impl ResolveContext {
     pub fn fetch_external(&self, name: QualifiedName) -> ResolveResult<&std::path::PathBuf> {
         for (namespace, path) in self.externals.iter() {
             if name.is_sub_of(namespace) {
+                eprintln!("found {name} in {namespace}");
                 return Ok(path);
             }
         }
@@ -88,4 +89,8 @@ fn resolve_external_file() {
     assert!(context
         .fetch_external(QualifiedName::from("std::geo2d::circle"))
         .is_ok());
+
+    assert!(context
+        .fetch_external(QualifiedName::from("non_std::geo2d::circle"))
+        .is_err());
 }
