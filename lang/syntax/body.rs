@@ -37,7 +37,8 @@ impl Body {
     pub fn fetch_symbol_map_from(
         statements: &[Statement],
         parent: Option<RcMut<SymbolNode>>,
-    ) -> SymbolMap {
+        context: &mut ResolveContext,
+    ) -> ResolveResult<SymbolMap> {
         let mut symbol_map = SymbolMap::default();
         use crate::resolve::Resolve;
 
@@ -45,24 +46,39 @@ impl Body {
         for statement in statements {
             match statement {
                 Statement::Module(m) => {
-                    symbol_map.insert(m.name.id().clone(), m.resolve(parent.clone()));
+                    symbol_map.insert(m.name.id().clone(), m.resolve(parent.clone(), context)?);
                 }
                 Statement::Namespace(n) => {
-                    symbol_map.insert(n.name.id().clone(), n.resolve(parent.clone()));
+                    symbol_map.insert(n.name.id().clone(), n.resolve(parent.clone(), context)?);
                 }
                 Statement::Function(f) => {
-                    symbol_map.insert(f.name.id().clone(), f.resolve(parent.clone()));
+                    symbol_map.insert(f.name.id().clone(), f.resolve(parent.clone(), context)?);
+                }
+                Statement::Use(u) => {
+                    for decl in &u.decls {
+                        match decl {
+                            UseDeclaration::Use(qualified_name, _)
+                            | UseDeclaration::UseAll(qualified_name, _)
+                            | UseDeclaration::UseAlias(qualified_name, _, _) => {
+                                context.fetch_external(qualified_name.clone())?;
+                            }
+                        }
+                    }
                 }
                 _ => {}
             }
         }
 
-        symbol_map
+        Ok(symbol_map)
     }
 
     /// fetches all symbols from the statements in the body
-    pub fn fetch_symbol_map(&self, parent: Option<RcMut<SymbolNode>>) -> SymbolMap {
-        Self::fetch_symbol_map_from(&self.statements, parent)
+    pub fn fetch_symbol_map(
+        &self,
+        parent: Option<RcMut<SymbolNode>>,
+        context: &mut ResolveContext,
+    ) -> ResolveResult<SymbolMap> {
+        Self::fetch_symbol_map_from(&self.statements, parent, context)
     }
 
     /// Evaluate a vector of statements

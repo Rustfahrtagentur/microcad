@@ -1,4 +1,4 @@
-use crate::syntax::*;
+use crate::{resolve::*, syntax::*};
 
 /// Context while resolving a source file
 #[derive(Debug)]
@@ -28,13 +28,13 @@ impl ResolveContext {
     }
 
     /// search for an external file which may include a given qualified name
-    pub fn fetch_external(&self, name: QualifiedName) -> Option<&std::path::PathBuf> {
+    pub fn fetch_external(&self, name: QualifiedName) -> ResolveResult<&std::path::PathBuf> {
         for (namespace, path) in self.externals.iter() {
             if name.is_sub_of(namespace) {
-                return Some(path);
+                return Ok(path);
             }
         }
-        None
+        Err(ResolveError::ExternalSymbolNotFound(name))
     }
 
     fn into_qualified_name(path: &std::path::Path) -> QualifiedName {
@@ -88,5 +88,5 @@ fn resolve_external_file() {
 
     assert!(context
         .fetch_external(QualifiedName::from("std::geo2d::circle"))
-        .is_some());
+        .is_ok());
 }

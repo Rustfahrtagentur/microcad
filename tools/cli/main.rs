@@ -156,7 +156,8 @@ fn parse(input: impl AsRef<Path>) -> anyhow::Result<Rc<SourceFile>> {
 }
 
 fn resolve(source_file: Rc<SourceFile>) -> anyhow::Result<RcMut<SymbolNode>> {
-    Ok(source_file.resolve(None))
+    let mut context = ResolveContext::new(vec![]);
+    Ok(source_file.resolve(None, &mut context)?)
 }
 
 fn eval(source_file: Rc<SourceFile>, _std: impl AsRef<Path>) -> anyhow::Result<ObjectNode> {
