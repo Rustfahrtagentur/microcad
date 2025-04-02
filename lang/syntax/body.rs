@@ -61,7 +61,7 @@ impl Body {
                             | UseDeclaration::UseAll(qualified_name, _)
                             | UseDeclaration::UseAlias(qualified_name, _, _) => {
                                 if !qualified_name.is_builtin() {
-                                    context.fetch_external(qualified_name.clone())?;
+                                    context.check_external(qualified_name.clone())?;
                                 }
                             }
                         }

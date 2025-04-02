@@ -3,11 +3,13 @@
 
 //! µcad symbol tree resolve
 
+mod externals;
 mod resolve_context;
 mod resolve_error;
 mod symbol_definition;
 mod symbol_node;
 
+pub use externals::*;
 pub use resolve_context::*;
 pub use resolve_error::*;
 pub use symbol_definition::*;
@@ -132,7 +134,8 @@ fn resolve_source_file() {
         SourceFile::load_from_str(r#"module a() { module b() {} } "#).expect("Valid source"),
     );
 
-    let mut context = ResolveContext::new(vec![]);
+    let externals = Externals::new(vec![]);
+    let mut context = ResolveContext::new(externals);
 
     let symbol_node = source_file
         .resolve(None, &mut context)
