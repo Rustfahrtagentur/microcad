@@ -3,7 +3,7 @@ use crate::{parse::*, parser::*, rc_mut::*, syntax::*};
 impl Parse for Rc<ModuleDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut name = Identifier::default();
-        let mut parameters = None;
+        let mut parameters = ParameterList::default();
         let mut body = Body::default();
 
         for pair in pair.inner() {
@@ -12,7 +12,7 @@ impl Parse for Rc<ModuleDefinition> {
                     name = Identifier::parse(pair)?;
                 }
                 Rule::parameter_list => {
-                    parameters = Some(ParameterList::parse(pair)?);
+                    parameters = ParameterList::parse(pair)?;
                 }
                 Rule::body => {
                     body = Body::parse(pair.clone())?;

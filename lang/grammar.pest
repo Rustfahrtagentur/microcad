@@ -20,10 +20,10 @@ alpha_upper = _{ 'A'..'Z' }
 alpha = _{ alpha_lower | alpha_upper }
 digit = _{ '0'..'9' }
 
-COMMENT = { 
-  doc_comment | 
-  single_line_comment | 
-  multi_line_comment 
+COMMENT = {
+  doc_comment |
+  single_line_comment |
+  multi_line_comment
 }
 
 //`// ok`: ok
@@ -85,10 +85,10 @@ unicode = @{ "u" ~ ASCII_HEX_DIGIT{4} }
 format_expression = { "{" ~ ws* ~ (format_spec ~ ws* ~ ":" )? ~ ws* ~ expression ~ ws* ~ "}" }
 
 ///`05.5`: ok # Five leading zeros with 5 precision
-format_spec = { 
-  format_spec_width ~ format_spec_precision | 
-  format_spec_width | 
-  format_spec_precision 
+format_spec = {
+  format_spec_width ~ format_spec_precision |
+  format_spec_width |
+  format_spec_precision
 }
 
 //`.5`: print with precision = 5
@@ -118,11 +118,11 @@ color_literal = { "#" ~ (ASCII_HEX_DIGIT{8} | ASCII_HEX_DIGIT{6} | ASCII_HEX_DIG
 //`1.0`: ok # Scalar
 //`true`: ok # Boolean
 //`#00CCFF`: ok # Color
-literal = { 
-  number_literal | 
-  integer_literal | 
-  bool_literal | 
-  color_literal 
+literal = {
+  number_literal |
+  integer_literal |
+  bool_literal |
+  color_literal
 }
 
 //`a`: ok # Single identifier
@@ -139,11 +139,11 @@ qualified_name = { identifier ~ ("::" ~ identifier)* }
 //`(a: scalar, b: scalar)`: Named tuple type
 //`{}`: ok # Module type
 type = {
-  qualified_name | 
-  list_type | 
-  map_type | 
-  named_tuple_type | 
-  unnamed_tuple_type | 
+  qualified_name |
+  list_type |
+  map_type |
+  named_tuple_type |
+  unnamed_tuple_type |
   module_type |
   unit
 }
@@ -171,7 +171,7 @@ module_type = { "{" ~ ws* ~ "}" }
 unnamed_tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
 //`(a: Length, b: scalar)`: ok
-//`(a: Length, )`: ok # Trailing comma 
+//`(a: Length, )`: ok # Trailing comma
 named_tuple_type = { "(" ~ ws* ~ named_tuple_type_element ~ (ws* ~ "," ~ ws* ~ named_tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
 //`a: Length`: ok
@@ -184,7 +184,7 @@ list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" ~ unit? }
 
 //`[0]`: ok # Access first element
 //`["test"]`: ok # Associative lists, access value of `\"test\"`
-list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" } 
+list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
 
 // An expression for both named and unnamed tuple
 //`(1.0mm, 2.0mm)`: ok
@@ -209,9 +209,9 @@ visibility = { "pub" }
 //`use foo::*, bar;`: ok # Import all from foo and bar
 //`use foo as bar;`: ok # Import foo as bar
 //`pub use foo;`: ok # Import and re-export foo
-use_statement = { visibility? ~ ws* ~ "use" ~ ws+ ~ use_declaration ~ ws* ~ ("," ~ ws* ~ use_declaration ~ ws*)* ~ ws* ~ ","? ~ ws* ~ ";" } 
+use_statement = { visibility? ~ ws* ~ "use" ~ ws+ ~ use_declaration ~ ws* ~ ("," ~ ws* ~ use_declaration ~ ws*)* ~ ws* ~ ","? ~ ws* ~ ";" }
 
-use_declaration = { use_all | use_alias | qualified_name } 
+use_declaration = { use_all | use_alias | qualified_name }
 
 //`std::*`: ok # Import everything from std
 use_all = { qualified_name ~ ws* ~ "::" ~ ws* ~ "*" }
@@ -231,10 +231,10 @@ nested = { nested_with_body | (call | qualified_name) ~ (ws+ ~ (call | qualified
 nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ body }
 
 //`-5.0mm`: ok # Negate
-//`(a+b)*(c-a)`: ok 
-//`a + b + c`: ok 
+//`(a+b)*(c-a)`: ok
+//`a + b + c`: ok
 //`math::pi`: ok # Singleton access with qualified name or namespace access
-//`! a`: ok # Unary operator with whitespace 
+//`! a`: ok # Unary operator with whitespace
 //`a-`: error # Unknown postfix operator `-`
 //`a[2]`: ok # List access
 //`a.b`: ok # Tuple access
@@ -294,7 +294,7 @@ primary          =  _{ literal | nested | format_string | "(" ~ ws* ~ expression
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok
-//`,,`: error # No expression 
+//`,,`: error # No expression
 expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
 // A nested expression that does end with a body
@@ -323,13 +323,13 @@ call_named_argument = { identifier ~ ws* ~ "=" ~ ws* ~ expression }
 call_positional_argument = _{ expression }
 
 call_argument = _{
-  call_named_argument | 
-  call_positional_argument 
+  call_named_argument |
+  call_positional_argument
 }
 
 //`a = 5.0mm, b = false`: ok
 //`4.0mm, a = false`: ok
-//`a = false, 4.0mm`: ok # Positional argument after named argument (Syntactically correct, semantically wrong) 
+//`a = false, 4.0mm`: ok # Positional argument after named argument (Syntactically correct, semantically wrong)
 //`a = false, 4.0mm,`: ok # Trailing comma
 call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* ~ ws* ~ ","? }
 
@@ -404,17 +404,17 @@ if_statement = { "if" ~ ws* ~ expression ~ ws* ~ body ~ ws* ~ ("else" ~ ws* ~ bo
 
 body_else = { body }
 
-//`module foo() { }`: ok # Module with no arguments
-//`module foo(a: scalar) { }`: ok # Module with arguments
-//`module foo(a: scalar, b: scalar) { }`: ok # Module with multiple arguments
+//`module foo() { }`: ok # Module with no properties
+//`module foo(a: scalar) { }`: ok # Module with properties
+//`module foo(a: scalar, b: scalar) { }`: ok # Module with multiple properties
 //`module foo() { return 5.0mm; }`: error # Module cannot have return statement
 //`module foo() { module bar() { } }`: ok # Nested module definition
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
-//`module list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Module with module as argument
+//`module list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Module with module as properties
 //`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function
 //`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
-//`module donut(radius) { }`: error # Module must have type annotations
-module_definition = { "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list? ~ ws* ~ body }
+//`module donut(radius) { }`: error # Module property must have type annotations
+module_definition = { "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
 //`{ translate() rotate(); }`: ok
 //`{}`: ok # Empty body
@@ -430,17 +430,17 @@ module_init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ body }
 
 statement = {
-  module_definition | 
-  namespace_definition | 
+  module_definition |
+  namespace_definition |
   function_definition |
   module_init_definition |
 
   use_statement |
-  return_statement | 
+  return_statement |
   if_statement |
-  marker_statement | 
+  marker_statement |
 
-  assignment_statement | 
+  assignment_statement |
   expression_statement
 }
 
