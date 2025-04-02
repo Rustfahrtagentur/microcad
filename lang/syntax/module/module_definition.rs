@@ -26,7 +26,8 @@ impl ModuleDefinition {
 }
 
 impl ModuleInitDefinition {
-    pub fn call(&self, _args: &CallArgumentList, _context: &mut EvalContext) {}
+    /// evaluate a call of a ModuleInitDefintion
+    pub fn eval_call(&self, _args: &CallArgumentList, _context: &mut EvalContext) {}
 }
 
 impl CallTrait for ModuleDefinition {
@@ -49,7 +50,7 @@ impl<'a> Iterator for Inits<'a> {
     type Item = &'a ModuleInitDefinition;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(statement) = self.0.next() {
+        for statement in self.0.by_ref() {
             match statement {
                 Statement::ModuleInit(module_init_definition) => {
                     return Some(module_init_definition);
