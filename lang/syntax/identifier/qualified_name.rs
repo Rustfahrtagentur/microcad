@@ -9,6 +9,10 @@ use crate::{parse::*, src_ref::*, syntax::*, Id};
 pub struct QualifiedName(pub Vec<Identifier>);
 
 impl QualifiedName {
+    pub fn new() -> Self {
+        Self(vec![])
+    }
+
     /// If the QualifiedName only consists of a single identifier, return it
     pub fn single_identifier(&self) -> Option<&Identifier> {
         if self.0.len() == 1 {

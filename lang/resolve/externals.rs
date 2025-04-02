@@ -5,9 +5,23 @@
 
 use crate::{resolve::*, syntax::*};
 
+/// File reference including path an flag about usage
+#[derive(Debug)]
+pub struct FileRef {
+    path: std::path::PathBuf,
+    used: bool,
+}
+
+impl FileRef {
+    /// create new file reference
+    pub fn new(path: std::path::PathBuf) -> Self {
+        Self { path, used: false }
+    }
+}
+
 /// External files register
 #[derive(Debug)]
-pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf>);
+pub struct Externals(std::collections::HashMap<QualifiedName, FileRef>);
 
 impl Externals {
     /// Create new resolve context
@@ -17,19 +31,39 @@ impl Externals {
 
     /// search for an external file which may include a given qualified name
     pub fn fetch_external(&self, name: QualifiedName) -> ResolveResult<&std::path::PathBuf> {
-        for (namespace, path) in self.0.iter() {
+        for (namespace, file_ref) in self.0.iter() {
             if name.is_sub_of(namespace) {
                 eprintln!("found {name} in {namespace}");
-                return Ok(path);
+                return Ok(&file_ref.path);
             }
         }
         Err(ResolveError::ExternalSymbolNotFound(name))
     }
 
+    /// get qualified name by path
+    pub fn get_name(&self, path: &std::path::Path) -> ResolveResult<&QualifiedName> {
+        match self
+            .0
+            .iter()
+            .find(|(_, file_ref)| file_ref.path.as_path() == path)
+        {
+            Some((name, _)) => Ok(name),
+            None => Err(ResolveError::ExternalPathNotFound(path.to_path_buf())),
+        }
+    }
+
+    pub fn get_used_files(&self) -> Vec<&std::path::PathBuf> {
+        self.0
+            .iter()
+            .filter(|file| file.1.used)
+            .map(|file| &file.1.path)
+            .collect()
+    }
+
     /// searches for external source code files (external modules) in some search paths
     fn search_externals(
         search_paths: Vec<std::path::PathBuf>,
-    ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {
+    ) -> std::collections::HashMap<QualifiedName, FileRef> {
         let mut externals = std::collections::HashMap::new();
         search_paths.iter().for_each(|search_path| {
             Self::scan_path(search_path.clone(), crate::MICROCAD_EXTENSIONS)
@@ -42,7 +76,7 @@ impl Externals {
                                 .expect("cannot strip search path from file name")
                                 .with_extension(""),
                         ),
-                        file.canonicalize().expect("path not found"),
+                        FileRef::new(file.canonicalize().expect("path not found")),
                     );
                 });
         });
@@ -88,12 +122,12 @@ impl std::fmt::Display for Externals {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0
             .iter()
-            .try_for_each(|file| writeln!(f, "{} => {}", file.0, file.1.to_string_lossy()))
+            .try_for_each(|file| writeln!(f, "{} => {}", file.0, file.1.path.to_string_lossy()))
     }
 }
 
 impl std::ops::Deref for Externals {
-    type Target = std::collections::HashMap<QualifiedName, std::path::PathBuf>;
+    type Target = std::collections::HashMap<QualifiedName, FileRef>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

@@ -9,9 +9,13 @@ use thiserror::Error;
 /// Resolve error
 #[derive(Debug, Error)]
 pub enum ResolveError {
-    /// Custom evaluation error
+    /// Name of external symbol is unknown
     #[error("External symbol {0} not found")]
     ExternalSymbolNotFound(QualifiedName),
+
+    /// Path of external file is unknown
+    #[error("External path '{0}' not found")]
+    ExternalPathNotFound(std::path::PathBuf),
 }
 
 /// Result type of resolve
