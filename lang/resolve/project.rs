@@ -1,68 +1,41 @@
-use crate::{parse::*, resolve::*};
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
-use thiserror::*;
+//! µcad project
 
-/// Resolve error
-#[derive(Debug, Error)]
-enum BuildError {
-    #[error("Parse Error: {0}")]
-    ParseError(#[from] ParseError),
+use crate::resolve::*;
 
-    #[error("Resolve Error: {0}")]
-    ResolveError(#[from] ResolveError),
-}
-
-/// Result type of a build
-pub type BuildResult<T> = std::result::Result<T, BuildError>;
-
-struct Project {
-    search_paths: Vec<std::path::PathBuf>,
-    externals: RcMut<Externals>,
+/// A project bundling all dependant files of a root source file to a project which can be evaluated
+pub struct Project {
     files: SourceFileCache,
 }
 
-#[derive(Default)]
-struct SourceFileCache {
-    by_hash: std::collections::HashMap<u64, usize>,
-    by_path: std::collections::HashMap<Option<std::path::PathBuf>, usize>,
-    by_name: std::collections::HashMap<QualifiedName, usize>,
-    source_files: Vec<Rc<SourceFile>>,
-}
-
-impl SourceFileCache {
-    pub fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
-    }
-    pub fn insert(&mut self, name: QualifiedName, source_file: Rc<SourceFile>) {
-        let hash = source_file.hash();
-        let filename = source_file.filename.clone();
-        self.source_files.push(source_file);
-        let index = self.source_files.len();
-        self.by_hash.insert(hash, index);
-        self.by_path.insert(filename, index);
-        self.by_name.insert(name, index);
-    }
-}
-
 impl Project {
+    /// Load and parse a root source file and all it's externals it dependents from
+    /// - `root_file`: The root source file path
+    /// - `search_paths`: Paths to search for external source files
+    ///                   (see [crate::MICROCAD_EXTENSIONS] for accepted file extensions)
     pub fn load(
-        path: &std::path::Path,
+        root_file: &std::path::Path,
         search_paths: Vec<std::path::PathBuf>,
     ) -> BuildResult<Self> {
-        let source_file = SourceFile::load(path)?;
-        let externals = Externals::new(search_paths.clone());
-        let context = &mut ResolveContext::new(externals.clone());
-        source_file.resolve(None, context)?;
+        // load root file from path
+        let root_file = SourceFile::load(root_file)?;
+        let mut externals = Externals::new(search_paths.clone());
+        let context = &mut ResolveContext::new(&mut externals);
+        root_file.resolve(None, context)?;
 
         let mut files = SourceFileCache::new();
-        files.insert(QualifiedName::new(), source_file);
+        files.insert(QualifiedName::new(), root_file);
 
-        Ok(Self {
-            files,
-            search_paths,
-            externals,
-        })
+        externals
+            .iter()
+            .try_for_each(|(_, path)| Self::load_sub_file(path, &mut files))?;
+
+        Ok(Self { files })
+    }
+
+    fn load_sub_file(file: &std::path::Path, files: &mut SourceFileCache) -> BuildResult<()> {
+        Ok(())
     }
 }

@@ -19,22 +19,40 @@ impl FileRef {
     }
 }
 
+impl std::ops::Deref for FileRef {
+    type Target = std::path::PathBuf;
+
+    fn deref(&self) -> &Self::Target {
+        &self.path
+    }
+}
+
 /// External files register
 #[derive(Debug)]
 pub struct Externals(std::collections::HashMap<QualifiedName, FileRef>);
 
 impl Externals {
     /// Create new resolve context
-    pub fn new(search_paths: Vec<std::path::PathBuf>) -> RcMut<Self> {
-        RcMut::new(Self(Self::search_externals(search_paths)))
+    pub fn new(search_paths: Vec<std::path::PathBuf>) -> Self {
+        Self(Self::search_externals(search_paths))
     }
 
     /// search for an external file which may include a given qualified name
     pub fn fetch_external(&self, name: QualifiedName) -> ResolveResult<&std::path::PathBuf> {
         for (namespace, file_ref) in self.0.iter() {
             if name.is_sub_of(namespace) {
-                eprintln!("found {name} in {namespace}");
                 return Ok(&file_ref.path);
+            }
+        }
+        Err(ResolveError::ExternalSymbolNotFound(name))
+    }
+
+    /// search for an external file which may include a given qualified name and mark it as used
+    pub fn use_external(&mut self, name: QualifiedName) -> ResolveResult<()> {
+        for (namespace, file_ref) in self.0.iter_mut() {
+            if name.is_sub_of(namespace) {
+                file_ref.used = true;
+                return Ok(());
             }
         }
         Err(ResolveError::ExternalSymbolNotFound(name))
@@ -52,6 +70,7 @@ impl Externals {
         }
     }
 
+    /// return a list of used files (files which got touched by `Self::use_external()`)
     pub fn get_used_files(&self) -> Vec<&std::path::PathBuf> {
         self.0
             .iter()
@@ -137,7 +156,6 @@ impl std::ops::Deref for Externals {
 #[test]
 fn resolve_external_file() {
     let externals = Externals::new(vec!["../lib".into()]);
-    let externals = externals.borrow();
 
     assert!(!externals.is_empty());
 
