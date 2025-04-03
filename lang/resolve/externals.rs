@@ -5,31 +5,9 @@
 
 use crate::{resolve::*, syntax::*};
 
-/// File reference including path an flag about usage
-#[derive(Debug)]
-pub struct FileRef {
-    path: std::path::PathBuf,
-    used: bool,
-}
-
-impl FileRef {
-    /// create new file reference
-    pub fn new(path: std::path::PathBuf) -> Self {
-        Self { path, used: false }
-    }
-}
-
-impl std::ops::Deref for FileRef {
-    type Target = std::path::PathBuf;
-
-    fn deref(&self) -> &Self::Target {
-        &self.path
-    }
-}
-
 /// External files register
 #[derive(Debug)]
-pub struct Externals(std::collections::HashMap<QualifiedName, FileRef>);
+pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf>);
 
 impl Externals {
     /// Create new resolve context
@@ -39,20 +17,9 @@ impl Externals {
 
     /// search for an external file which may include a given qualified name
     pub fn fetch_external(&self, name: QualifiedName) -> ResolveResult<&std::path::PathBuf> {
-        for (namespace, file_ref) in self.0.iter() {
+        for (namespace, path) in self.0.iter() {
             if name.is_sub_of(namespace) {
-                return Ok(&file_ref.path);
-            }
-        }
-        Err(ResolveError::ExternalSymbolNotFound(name))
-    }
-
-    /// search for an external file which may include a given qualified name and mark it as used
-    pub fn use_external(&mut self, name: QualifiedName) -> ResolveResult<()> {
-        for (namespace, file_ref) in self.0.iter_mut() {
-            if name.is_sub_of(namespace) {
-                file_ref.used = true;
-                return Ok(());
+                return Ok(path);
             }
         }
         Err(ResolveError::ExternalSymbolNotFound(name))
@@ -60,29 +27,16 @@ impl Externals {
 
     /// get qualified name by path
     pub fn get_name(&self, path: &std::path::Path) -> ResolveResult<&QualifiedName> {
-        match self
-            .0
-            .iter()
-            .find(|(_, file_ref)| file_ref.path.as_path() == path)
-        {
+        match self.0.iter().find(|(_, p)| p.as_path() == path) {
             Some((name, _)) => Ok(name),
             None => Err(ResolveError::ExternalPathNotFound(path.to_path_buf())),
         }
     }
 
-    /// return a list of used files (files which got touched by `Self::use_external()`)
-    pub fn get_used_files(&self) -> Vec<&std::path::PathBuf> {
-        self.0
-            .iter()
-            .filter(|file| file.1.used)
-            .map(|file| &file.1.path)
-            .collect()
-    }
-
     /// searches for external source code files (external modules) in some search paths
     fn search_externals(
         search_paths: Vec<std::path::PathBuf>,
-    ) -> std::collections::HashMap<QualifiedName, FileRef> {
+    ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {
         let mut externals = std::collections::HashMap::new();
         search_paths.iter().for_each(|search_path| {
             Self::scan_path(search_path.clone(), crate::MICROCAD_EXTENSIONS)
@@ -95,7 +49,7 @@ impl Externals {
                                 .expect("cannot strip search path from file name")
                                 .with_extension(""),
                         ),
-                        FileRef::new(file.canonicalize().expect("path not found")),
+                        file.canonicalize().expect("path not found"),
                     );
                 });
         });
@@ -141,12 +95,12 @@ impl std::fmt::Display for Externals {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0
             .iter()
-            .try_for_each(|file| writeln!(f, "{} => {}", file.0, file.1.path.to_string_lossy()))
+            .try_for_each(|file| writeln!(f, "{} => {}", file.0, file.1.to_string_lossy()))
     }
 }
 
 impl std::ops::Deref for Externals {
-    type Target = std::collections::HashMap<QualifiedName, FileRef>;
+    type Target = std::collections::HashMap<QualifiedName, std::path::PathBuf>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -161,11 +115,15 @@ fn resolve_external_file() {
 
     println!("{externals}");
 
-    assert!(externals
-        .fetch_external(QualifiedName::from("std::geo2d::circle"))
-        .is_ok());
+    assert!(
+        externals
+            .fetch_external(QualifiedName::from("std::geo2d::circle"))
+            .is_ok()
+    );
 
-    assert!(externals
-        .fetch_external(QualifiedName::from("non_std::geo2d::circle"))
-        .is_err());
+    assert!(
+        externals
+            .fetch_external(QualifiedName::from("non_std::geo2d::circle"))
+            .is_err()
+    );
 }

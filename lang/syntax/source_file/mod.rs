@@ -3,38 +3,7 @@
 
 //! µcad source file representation
 
-use crate::{eval::*, src_ref::*, syntax::*, value::*};
-
-/// Trait to get a source file by its hash
-pub trait GetSourceFileByHash {
-    /// Get a source file by its hash
-    fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile>;
-
-    /// Convenience function to get a source file by from a `SrcRef`
-    fn get_source_file_by_src_ref(&self, src_ref: &impl SrcReferrer) -> Option<&SourceFile> {
-        self.get_source_file_by_hash(src_ref.src_ref().source_hash())
-    }
-
-    /// Convenience function to get source slice by `SrcRef`
-    fn get_source_string(&self, src_ref: &impl SrcReferrer) -> Option<&str> {
-        if let Some(source_file) = self.get_source_file_by_src_ref(&src_ref) {
-            Some(src_ref.src_ref().source_slice(&source_file.source))
-        } else {
-            None
-        }
-    }
-
-    /// return a string describing the given source code position
-    fn ref_str(&self, src_ref: &impl SrcReferrer) -> String {
-        format!(
-            "{}:{}",
-            self.get_source_file_by_src_ref(src_ref)
-                .expect("Source file not found")
-                .filename_as_str(),
-            src_ref.src_ref(),
-        )
-    }
-}
+use crate::{eval::*, syntax::*, value::*};
 
 /// µcad source file
 #[derive(Clone, Debug, Default)]
@@ -94,17 +63,6 @@ impl SourceFile {
 impl Eval for SourceFile {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         Body::evaluate_vec(&self.body, context)
-    }
-}
-
-/// We can get a source file by its hash
-impl GetSourceFileByHash for SourceFile {
-    fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile> {
-        if self.hash == hash {
-            Some(self)
-        } else {
-            None
-        }
     }
 }
 

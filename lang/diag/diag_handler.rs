@@ -1,4 +1,4 @@
-use crate::{diag::*, eval::*, syntax::*};
+use crate::{diag::*, eval::*, resolve::*};
 
 /// Handler for diagnostics
 #[derive(Default)]
@@ -19,19 +19,19 @@ impl DiagHandler {
     pub fn pretty_print(
         &self,
         w: &mut dyn std::io::Write,
-        source_file_by_hash: &impl GetSourceFileByHash,
+        source_by_hash: &impl GetSourceByHash,
     ) -> std::io::Result<()> {
-        self.diag_list.pretty_print(w, source_file_by_hash)
+        self.diag_list.pretty_print(w, source_by_hash)
     }
 
     /// Pretty print all errors into a string
     pub fn pretty_print_to_string(
         &self,
-        source_file_by_hash: &impl GetSourceFileByHash,
+        source_by_hash: &impl GetSourceByHash,
     ) -> std::io::Result<String> {
         let mut s = Vec::new();
         let mut w = std::io::BufWriter::new(&mut s);
-        self.diag_list.pretty_print(&mut w, source_file_by_hash)?;
+        self.diag_list.pretty_print(&mut w, source_by_hash)?;
         let w = w
             .into_inner()
             .expect("write error while pretty printing errors");

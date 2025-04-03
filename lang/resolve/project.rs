@@ -7,16 +7,16 @@ use crate::resolve::*;
 
 /// A project bundling all dependant files of a root source file to a project which can be evaluated
 pub struct Project {
-    files: SourceFileCache,
+    files: SourceCache,
 }
 
 impl Project {
     /// Load and parse a root source file and all it's externals it dependents from
     /// - `root_file`: The root source file path
     /// - `search_paths`: Paths to search for external source files
-    ///                   (see [crate::MICROCAD_EXTENSIONS] for accepted file extensions)
+    ///   (see [crate::MICROCAD_EXTENSIONS] for accepted file extensions)
     pub fn load(
-        root_file: &std::path::Path,
+        root_file: impl AsRef<std::path::Path>,
         search_paths: Vec<std::path::PathBuf>,
     ) -> BuildResult<Self> {
         // load root file from path
@@ -25,8 +25,7 @@ impl Project {
         let context = &mut ResolveContext::new(&mut externals);
         root_file.resolve(None, context)?;
 
-        let mut files = SourceFileCache::new();
-        files.insert(QualifiedName::new(), root_file);
+        let mut files = SourceCache::new(root_file);
 
         externals
             .iter()
@@ -35,7 +34,7 @@ impl Project {
         Ok(Self { files })
     }
 
-    fn load_sub_file(file: &std::path::Path, files: &mut SourceFileCache) -> BuildResult<()> {
+    fn load_sub_file(file: &std::path::Path, files: &mut SourceCache) -> BuildResult<()> {
         Ok(())
     }
 }

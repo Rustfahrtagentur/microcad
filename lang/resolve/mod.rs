@@ -1,14 +1,14 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad symbol tree resolve
+//! external file loading and symbol tree resolving
 
 mod build_error;
 mod externals;
 mod project;
 mod resolve_context;
 mod resolve_error;
-mod source_file_cache;
+mod source_cache;
 mod symbol_definition;
 mod symbol_node;
 
@@ -17,33 +17,10 @@ pub use externals::*;
 pub use project::*;
 pub use resolve_context::*;
 pub use resolve_error::*;
-pub use source_file_cache::*;
+pub use source_cache::*;
 pub use symbol_definition::*;
 pub use symbol_node::*;
 
-/// Source File `foo.µcad`
-///
-/// module a() {
-///     b = 42.0;
-///     function bar() { 13 }
-/// }
-/// namespace c { function d() { 23 } }
-///
-/// Symbol Tree example:
-/// foo.µcad
-///     ModuleDefinition(a)
-///         FunctionDefinition(bar)
-///         Statements
-///             b
-///     NamespaceDefinition(c)
-///         d
-///
-/// Usage:
-///
-/// foo = a();
-/// print("{foo.b}"); // 42.0
-///
-/// v = c::d();
 use crate::{rc_mut::*, syntax::*};
 
 /// Trait which resolves to SymbolNode reference

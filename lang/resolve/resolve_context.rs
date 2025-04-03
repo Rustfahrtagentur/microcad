@@ -11,8 +11,10 @@ impl<'a> ResolveContext<'a> {
     pub fn new(externals: &'a mut Externals) -> Self {
         Self { externals }
     }
-    /// return true if a qualified name  can be located in an external use reference
-    pub fn check_external(&mut self, name: QualifiedName) -> ResolveResult<()> {
-        self.externals.use_external(name)
+}
+
+impl std::fmt::Display for ResolveContext<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.externals)
     }
 }
