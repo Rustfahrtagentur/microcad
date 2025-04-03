@@ -26,7 +26,7 @@ impl ModuleDefinition {
 }
 
 impl ModuleInitDefinition {
-    /// evaluate a call of a ModuleInitDefintion
+    /// evaluate a call of a ModuleInitDefinition
     pub fn eval_call(&self, _args: &CallArgumentList, _context: &mut EvalContext) {}
 }
 

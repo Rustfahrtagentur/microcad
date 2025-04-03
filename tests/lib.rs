@@ -26,20 +26,34 @@ fn make_test_out_dir() -> std::path::PathBuf {
     test_out_dir
 }
 
-#[test]
-fn namespaces() {
-    use microcad_lang::{eval::*, resolve::*, syntax::*};
-    let source_file = SourceFile::load("../tests/test_cases/syntax/namespace.µcad")
-        .expect("cannot load test file");
-    let mut externals = Externals::new(vec![]);
-    let mut context = ResolveContext::new(&mut externals);
-    let symbol_node = source_file
-        .resolve(None, &mut context)
-        .expect("unexpected resolve error");
-
-    println!("{}", symbol_node.borrow());
+#[cfg(test)]
+fn load_source_file(
+    filename: &str,
+) -> (
+    std::rc::Rc<microcad_lang::syntax::SourceFile>,
+    microcad_lang::eval::EvalContext,
+) {
+    use microcad_builtin::*;
+    use microcad_lang::{eval::*, syntax::*};
+    let source_file = SourceFile::load(format!("../tests/test_cases/{filename}"))
+        .expect("cannot load test file: {filename}");
 
     let mut context = EvalContext::from_source_file(source_file.clone());
+    context.add_symbol(builtin_namespace());
+
+    assert!(source_file.eval(&mut context).is_ok());
+
+    (source_file, context)
+}
+
+#[test]
+fn namespaces() {
+    use microcad_lang::eval::*;
+
+    let (source_file, mut context) = load_source_file("syntax/namespace.µcad");
+
+    //println!("{}", symbol_node.borrow());
+
     assert!(source_file.eval(&mut context).is_ok());
 }
 
@@ -47,6 +61,7 @@ fn namespaces() {
 fn scopes() {
     use microcad_builtin::*;
     use microcad_lang::{eval::*, syntax::*};
+
     let source_file =
         SourceFile::load("../tests/test_cases/syntax/scopes.µcad").expect("cannot load test file");
 
@@ -80,4 +95,9 @@ fn context_with_symbols() {
         )
         .expect("symbol not found");
     assert!(source_file.eval(&mut context).is_ok());
+}
+
+#[test]
+fn module_implicit_init() {
+    let (source_file, context) = load_source_file("syntax/module/implicit_init.µcad");
 }
