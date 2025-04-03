@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{src_ref::SrcRef, syntax::*, ty::*, value::*, Id};
+use crate::{Id, src_ref::SrcRef, syntax::*, ty::*, value::*};
 use thiserror::Error;
 
 /// Evaluation error
@@ -60,6 +60,9 @@ pub enum EvalError {
         /// found type
         found: Type,
     },
+
+    #[error("Duplicated parameter: {0}")]
+    DuplicatedParameter(Id),
 
     /// Return type mismatch
     #[error("Return type mismatch: expected {expected}, got {found}")]

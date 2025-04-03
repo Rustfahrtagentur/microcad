@@ -3,7 +3,7 @@
 
 //! Call argument value list evaluation entity
 
-use crate::{eval::*, ord_map::*, src_ref::*, value::*, Id};
+use crate::{Id, eval::*, ord_map::*, src_ref::*, value::*};
 
 /// List of call argument values
 ///
@@ -13,6 +13,19 @@ use crate::{eval::*, ord_map::*, src_ref::*, value::*, Id};
 pub struct CallArgumentValueList(Refer<OrdMap<Id, CallArgumentValue>>);
 
 impl CallArgumentValueList {
+    /// Create a `CallArgumentValueList` from a `CallArgumentList`
+    pub fn from_call_argument_list(
+        call_argument_list: &CallArgumentList,
+        context: &mut EvalContext,
+    ) -> EvalResult<Self> {
+        let mut v = CallArgumentValueList::default();
+        for call_arg in call_argument_list.iter() {
+            v.push(call_arg.eval_value(context)?)
+                .expect("Could not insert call argument value");
+        }
+        Ok(v)
+    }
+
     /// Check for unexpected arguments.
     ///
     /// This method will return an error if there is a call argument that is not in the parameter list

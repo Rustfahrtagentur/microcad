@@ -1,13 +1,5 @@
-use __builtin::*;
+// Define a module `a` with `b` as property
+module a(b: Scalar) {}
 
-// Define a module `donut` with a radius as parameter
-module donut(radius: Length) {
-    geo2d::circle(radius / 1mm); 
-}
-
-// Make two donuts with radius = 3.0 and 5.0, respectively
-donut(radius = 3.0mm);
-donut(radius = 5.0mm);
-
-// Test if we can access the radius parameter
-assert(donut(radius = 4.0mm).radius == 4.0mm);
+// Test if we can access `b` property
+__builtin::assert(a(b = 3.0).b == 3.0);

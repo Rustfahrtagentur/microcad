@@ -15,6 +15,7 @@ mod format_string;
 mod identifier;
 mod literal;
 mod output;
+mod parameter;
 mod scope_stack;
 mod statement;
 mod r#use;
@@ -34,4 +35,11 @@ use scope_stack::*;
 pub trait Eval {
     /// Evaluate the type into an expression
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value>;
+}
+
+impl MethodCall {
+    /// Evaluate method call
+    fn eval(&self, _context: &mut EvalContext, _lhs: &Box<Expression>) -> EvalResult<Value> {
+        todo!()
+    }
 }
