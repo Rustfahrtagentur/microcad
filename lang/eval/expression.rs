@@ -63,8 +63,9 @@ impl Eval for Expression {
                     _ => unimplemented!(),
                 }
             }
+            Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Nested(nested) => nested.eval(context),
-            expr => todo!("{expr}"),
+            expr => todo!("{expr:?}"),
         }
     }
 }

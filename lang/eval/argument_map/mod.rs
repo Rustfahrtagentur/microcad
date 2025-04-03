@@ -70,3 +70,20 @@ impl ArgumentMatch for ArgumentMap {
         Ok(TypeCheckResult::SingleMatch)
     }
 }
+
+#[test]
+fn argument_match_single() {
+    let parameter_values = ParameterValueList::new(vec![crate::parameter_value!(a: Scalar)]);
+
+    let call_argument_value_list =
+        CallArgumentValueList::from(vec![crate::call_argument_value!(a: Scalar = 5.0)]);
+
+    let arg_map = call_argument_value_list
+        .get_matching_arguments(&parameter_values)
+        .expect("Matching arguments failed");
+
+    let a = arg_map.get("a");
+    assert!(a.is_some());
+    let a = a.unwrap();
+    assert!(a == &Value::Scalar(Refer::none(5.0)));
+}

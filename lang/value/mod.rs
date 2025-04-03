@@ -8,6 +8,8 @@ mod list;
 mod map;
 mod map_key_value;
 mod named_tuple;
+
+#[macro_use]
 mod parameter_value;
 mod parameter_value_list;
 mod unnamed_tuple;

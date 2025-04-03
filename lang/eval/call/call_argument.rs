@@ -1,6 +1,15 @@
 use crate::{diag::*, eval::*, src_ref::*, syntax::*, ty::*, value::*};
 
 impl CallArgument {
+    /// Evaluate `CallArgument` and return `CallArgumentValue`
+    pub fn eval_value(&self, context: &mut EvalContext) -> EvalResult<CallArgumentValue> {
+        Ok(CallArgumentValue::new(
+            self.name.as_ref().map(|i| i.id().clone()),
+            self.value.eval(context)?,
+            self.src_ref.clone(),
+        ))
+    }
+
     /// Evaluate argument as boolean value
     pub fn eval_bool(&self, context: &mut EvalContext) -> EvalResult<bool> {
         match self.value.eval(context) {
