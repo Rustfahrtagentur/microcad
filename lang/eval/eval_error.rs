@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{Id, src_ref::SrcRef, syntax::*, ty::*, value::*};
+use crate::{src_ref::SrcRef, syntax::*, ty::*, value::*, Id};
 use thiserror::Error;
 
 /// Evaluation error
@@ -61,6 +61,7 @@ pub enum EvalError {
         found: Type,
     },
 
+    /// Parameter names must be unique
     #[error("Duplicated parameter: {0}")]
     DuplicatedParameter(Id),
 

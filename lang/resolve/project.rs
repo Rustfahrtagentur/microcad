@@ -6,6 +6,7 @@
 use crate::resolve::*;
 
 /// A project bundling all dependant files of a root source file to a project which can be evaluated
+#[allow(unused)]
 pub struct Project {
     files: SourceCache,
 }
