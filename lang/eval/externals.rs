@@ -3,7 +3,7 @@
 
 //! External files register
 
-use crate::{resolve::*, syntax::*};
+use crate::{eval::*, syntax::*};
 
 /// External files register
 #[derive(Debug, Default)]
@@ -16,20 +16,25 @@ impl Externals {
     }
 
     /// search for an external file which may include a given qualified name
-    pub fn fetch_external(&self, name: QualifiedName) -> ResolveResult<&std::path::PathBuf> {
+    pub fn fetch_external(&self, name: &QualifiedName) -> EvalResult<&std::path::PathBuf> {
+        let mut result: EvalResult<&std::path::PathBuf> =
+            Err(EvalError::ExternalSymbolNotFound(name.clone()));
         for (namespace, path) in self.0.iter() {
             if name.is_sub_of(namespace) {
-                return Ok(path);
+                if let Ok(alt_path) = result {
+                    return Err(EvalError::AmbiguousExternal(alt_path.clone(), path.clone()));
+                }
+                result = Ok(path);
             }
         }
-        Err(ResolveError::ExternalSymbolNotFound(name))
+        result
     }
 
     /// get qualified name by path
-    pub fn get_name(&self, path: &std::path::Path) -> ResolveResult<&QualifiedName> {
+    pub fn get_name(&self, path: &std::path::Path) -> EvalResult<&QualifiedName> {
         match self.0.iter().find(|(_, p)| p.as_path() == path) {
             Some((name, _)) => Ok(name),
-            None => Err(ResolveError::ExternalPathNotFound(path.to_path_buf())),
+            None => Err(EvalError::ExternalPathNotFound(path.to_path_buf())),
         }
     }
 
@@ -116,10 +121,10 @@ fn resolve_external_file() {
     println!("{externals}");
 
     assert!(externals
-        .fetch_external(QualifiedName::from("std::geo2d::circle"))
+        .fetch_external(&"std::geo2d::circle".into())
         .is_ok());
 
     assert!(externals
-        .fetch_external(QualifiedName::from("non_std::geo2d::circle"))
+        .fetch_external(&"non_std::geo2d::circle".into())
         .is_err());
 }

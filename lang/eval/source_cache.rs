@@ -3,7 +3,7 @@
 
 //! Source file cache
 
-use crate::{rc_mut::*, resolve::*, src_ref::*, syntax::*};
+use crate::{eval::*, rc_mut::*, src_ref::*, syntax::*};
 
 /// Register of loaded source files
 #[derive(Default)]
@@ -40,7 +40,7 @@ impl SourceCache {
     }
 
     /// Convenience function to get a source file by from a `SrcReferrer`
-    pub fn get_by_src_ref(&self, src_ref: &impl SrcReferrer) -> ResolveResult<Rc<SourceFile>> {
+    pub fn get_by_src_ref(&self, src_ref: &impl SrcReferrer) -> EvalResult<Rc<SourceFile>> {
         self.get_by_hash(src_ref.src_ref().source_hash())
     }
 
@@ -56,21 +56,21 @@ impl SourceCache {
     }
 
     /// Find a project file by it's file path
-    pub fn get_by_path(&self, path: &std::path::Path) -> ResolveResult<Rc<SourceFile>> {
+    pub fn get_by_path(&self, path: &std::path::Path) -> EvalResult<Rc<SourceFile>> {
         let path = path.to_path_buf();
         if let Some(index) = self.by_path.get(&Some(path.clone())) {
             Ok(self.source_files[*index].clone())
         } else {
-            Err(ResolveError::UnknownPath(path))
+            Err(EvalError::UnknownPath(path))
         }
     }
 
     /// Find a project file by the qualified name which represents the file path
-    pub fn get_by_name(&self, name: &QualifiedName) -> ResolveResult<Rc<SourceFile>> {
+    pub fn get_by_name(&self, name: &QualifiedName) -> EvalResult<Rc<SourceFile>> {
         if let Some(index) = self.by_name.get(name) {
             Ok(self.source_files[*index].clone())
         } else {
-            Err(ResolveError::UnknownName(name.clone()))
+            Err(EvalError::UnknownName(name.clone()))
         }
     }
 }
@@ -78,16 +78,16 @@ impl SourceCache {
 /// Trait that can fetch for a file by it's hash value
 pub trait GetSourceByHash {
     /// Find a project file by it's hash value
-    fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>>;
+    fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>>;
 }
 
 impl GetSourceByHash for SourceCache {
     /// Find a project file by it's hash value
-    fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>> {
+    fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
         if let Some(index) = self.by_hash.get(&hash) {
             Ok(self.source_files[*index].clone())
         } else {
-            Err(ResolveError::UnknownHash(hash))
+            Err(EvalError::UnknownHash(hash))
         }
     }
 }

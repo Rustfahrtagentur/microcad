@@ -145,11 +145,11 @@ fn parse(input: impl AsRef<std::path::Path>, tree: bool, fmt: bool) -> ParseResu
     Ok(())
 }
 
-fn resolve(input: impl AsRef<std::path::Path>, tree: bool, fmt: bool) -> ResolveResult<()> {
+fn resolve(input: impl AsRef<std::path::Path>, tree: bool, fmt: bool) -> ParseResult<()> {
     let source_file = SourceFile::load(input)?;
     eprintln!("Parsed successfully!");
 
-    let symbol_table = source_file.resolve(None)?;
+    let symbol_table = source_file.resolve(None);
 
     println!("Symbols:\n");
 

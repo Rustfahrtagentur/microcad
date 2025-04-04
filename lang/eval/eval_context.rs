@@ -126,14 +126,29 @@ impl EvalContext {
     }
 
     /// Find a symbol in the symbol table and add it at the currently processed node
-    pub fn use_symbol(&mut self, qualified_name: &QualifiedName) -> EvalResult<()> {
+    pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<()> {
         let current_node = self.current_node_mut();
-        if let Some(child) = SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone())
-        {
+        if let Some(child) = SymbolNode::search_up(&current_node.borrow(), &name.clone()) {
             SymbolNode::insert_child(&mut self.current_node_mut(), child);
             Ok(())
         } else {
-            Err(EvalError::SymbolNotFound(qualified_name.clone()))
+            // if not found in symbol tree we try to find an external file to load
+            let external = self.externals.fetch_external(name)?;
+            // check if we already tried to load that file
+            match self.source_cache.get_by_path(external) {
+                Ok(_) => {
+                    todo!("error)")
+                }
+                Err(EvalError::UnknownPath(path)) => {
+                    println!("loading {name} -> {path:?}");
+                    println!("{}", self.externals);
+                    let source_file = SourceFile::load(path);
+                    //self.source_cache.insert(name, SourceFile::load(path));
+                }
+                _ => unreachable!(),
+            }
+            todo!("load matching external files");
+            Err(EvalError::SymbolNotFound(name.clone()))
         }
     }
 
@@ -180,7 +195,7 @@ impl PushDiag for EvalContext {
 }
 
 impl GetSourceByHash for EvalContext {
-    fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>> {
+    fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
         self.source_cache.get_by_hash(hash)
     }
 }

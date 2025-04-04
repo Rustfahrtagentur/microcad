@@ -214,6 +214,30 @@ pub enum EvalError {
     /// Value Error
     #[error("Value Error: {0}")]
     ValueError(#[from] ValueError),
+
+    /// Name of external symbol is unknown
+    #[error("External symbol {0} not found")]
+    ExternalSymbolNotFound(QualifiedName),
+
+    /// Path of external file is unknown
+    #[error("External path '{0}' not found")]
+    ExternalPathNotFound(std::path::PathBuf),
+
+    /// Can't find a project file by hash
+    #[error("Could not find a file with hash {0}")]
+    UnknownHash(u64),
+
+    /// Can't find a project file by it's path
+    #[error("Could not find a file with path {0}")]
+    UnknownPath(std::path::PathBuf),
+
+    /// Can't find a project file by it's qualified name
+    #[error("Could not find a file with name {0}")]
+    UnknownName(QualifiedName),
+
+    /// Found two external source files which point to the same namespace
+    #[error("Ambiguous external files {0} and {1}")]
+    AmbiguousExternal(std::path::PathBuf, std::path::PathBuf),
 }
 
 /// Result type of any evaluation

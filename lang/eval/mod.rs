@@ -18,6 +18,7 @@ mod literal;
 mod output;
 mod parameter;
 mod scope_stack;
+mod source_cache;
 mod statement;
 mod r#use;
 
@@ -29,6 +30,7 @@ pub use eval_context::*;
 pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
+pub use source_cache::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 use scope_stack::*;
@@ -41,7 +43,7 @@ pub trait Eval {
 
 impl MethodCall {
     /// Evaluate method call
-    fn eval(&self, _context: &mut EvalContext, _lhs: &Box<Expression>) -> EvalResult<Value> {
+    fn eval(&self, _context: &mut EvalContext, _lhs: &Expression) -> EvalResult<Value> {
         todo!()
     }
 }
