@@ -95,15 +95,10 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
             eprintln!("Parsed successfully!");
         }
         Commands::Resolve { input, tree, fmt } => {
-            let mut externals = Externals::new(vec!["lib".into()]);
-            let mut context = ResolveContext::new(&mut externals);
-
-            println!("Context:\n\n{context}");
-
             let source_file = SourceFile::load(input)?;
             eprintln!("Parsed successfully!");
 
-            let symbol_table = source_file.resolve(None, &mut context)?;
+            let symbol_table = source_file.resolve(None)?;
 
             println!("Symbols:\n");
 

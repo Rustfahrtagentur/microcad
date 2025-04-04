@@ -77,13 +77,10 @@ fn assert_ok() {
 
 #[test]
 fn assert_fail() {
-    let project = Project::load("../tests/test_cases/syntax/assert_fail.µcad", vec![]);
     let source_file = SourceFile::load("../tests/test_cases/syntax/assert_fail.µcad")
         .expect("cannot load test file");
-    let mut externals = Externals::new(vec![]);
-    let mut context = ResolveContext::new(&mut externals);
     source_file
-        .resolve(None, &mut context)
+        .resolve(None, &mut ResolveContext)
         .expect("cannot resolve file");
     let mut context = EvalContext::from_source_file(source_file.clone());
     context.add_symbol(super::builtin_namespace());

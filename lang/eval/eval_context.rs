@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, diag::*, eval::*, rc_mut::*, resolve::*, syntax::*};
+use crate::{diag::*, eval::*, rc_mut::*, resolve::*, syntax::*, Id};
 
 /// Context for evaluation
 ///
@@ -126,7 +126,7 @@ impl EvalContext {
             SymbolNode::insert_child(&mut self.current_node_mut(), child);
             Ok(())
         } else {
-            Err(super::EvalError::SymbolNotFound(qualified_name.clone()))
+            Err(EvalError::SymbolNotFound(qualified_name.clone()))
         }
     }
 

@@ -37,7 +37,6 @@ impl Body {
     pub fn fetch_symbol_map_from(
         statements: &[Statement],
         parent: Option<RcMut<SymbolNode>>,
-        context: &mut ResolveContext,
     ) -> ResolveResult<SymbolMap> {
         let mut symbol_map = SymbolMap::default();
         use crate::resolve::Resolve;
@@ -46,13 +45,13 @@ impl Body {
         for statement in statements {
             match statement {
                 Statement::Module(m) => {
-                    symbol_map.insert(m.name.id().clone(), m.resolve(parent.clone(), context)?);
+                    symbol_map.insert(m.name.id().clone(), m.resolve(parent.clone())?);
                 }
                 Statement::Namespace(n) => {
-                    symbol_map.insert(n.name.id().clone(), n.resolve(parent.clone(), context)?);
+                    symbol_map.insert(n.name.id().clone(), n.resolve(parent.clone())?);
                 }
                 Statement::Function(f) => {
-                    symbol_map.insert(f.name.id().clone(), f.resolve(parent.clone(), context)?);
+                    symbol_map.insert(f.name.id().clone(), f.resolve(parent.clone())?);
                 }
                 _ => {}
             }
@@ -62,12 +61,8 @@ impl Body {
     }
 
     /// fetches all symbols from the statements in the body
-    pub fn fetch_symbol_map(
-        &self,
-        parent: Option<RcMut<SymbolNode>>,
-        context: &mut ResolveContext,
-    ) -> ResolveResult<SymbolMap> {
-        Self::fetch_symbol_map_from(&self.statements, parent, context)
+    pub fn fetch_symbol_map(&self, parent: Option<RcMut<SymbolNode>>) -> ResolveResult<SymbolMap> {
+        Self::fetch_symbol_map_from(&self.statements, parent)
     }
 
     /// Evaluate a vector of statements

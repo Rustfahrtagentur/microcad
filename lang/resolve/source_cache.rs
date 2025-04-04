@@ -84,7 +84,6 @@ pub trait GetSourceByHash {
 impl GetSourceByHash for SourceCache {
     /// Find a project file by it's hash value
     fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>> {
-        println!("{hash}: {:?}", self.by_hash);
         if let Some(index) = self.by_hash.get(&hash) {
             Ok(self.source_files[*index].clone())
         } else {

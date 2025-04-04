@@ -15,7 +15,7 @@ pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
 
-use crate::{rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{src_ref::*, syntax::*, value::*};
 
 /// Expressions
 #[derive(Clone, Debug, Default)]
@@ -190,15 +190,5 @@ impl Expression {
             Self::Nested(nested) => nested.single_identifier(),
             _ => None,
         }
-    }
-}
-
-impl Resolve for Expression {
-    fn resolve(
-        &self,
-        parent: Option<RcMut<SymbolNode>>,
-        context: &mut ResolveContext,
-    ) -> ResolveResult<RcMut<SymbolNode>> {
-        todo!()
     }
 }
