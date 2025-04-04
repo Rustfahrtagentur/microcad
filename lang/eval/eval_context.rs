@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, rc_mut::*, resolve::*, source_file_cache::*, syntax::*, Id};
+use crate::{Id, diag::*, eval::*, rc_mut::*, resolve::*, syntax::*};
 
 /// Context for evaluation
 ///
@@ -12,10 +12,8 @@ pub struct EvalContext {
     symbols: RcMut<SymbolNode>,
     /// Stack of currently opened scopes with local symbols while evaluation
     scope_stack: ScopeStack,
-    /// Current source file being evaluated
-    current_source_file: Option<Rc<SourceFile>>,
     /// Source file cache containing all source files loaded in the context
-    source_files: SourceFileCache,
+    source_cache: SourceCache,
     /// Source file diagnostics
     diag_handler: DiagHandler,
     /// Output channel for __builtin::print
@@ -35,44 +33,24 @@ pub enum LookUp {
 impl EvalContext {
     /// Create a new context from a source file
     pub fn from_source_file(source_file: Rc<SourceFile>) -> Self {
-        let mut ctx = Self {
-            current_source_file: Some(source_file.clone()),
+        Self {
             symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
-            source_files: Default::default(),
+            source_cache: SourceCache::new(source_file),
             diag_handler: Default::default(),
             scope_stack: Default::default(),
             output: Default::default(),
-        };
-
-        ctx.source_files.add(source_file);
-        ctx
+        }
     }
 
     /// Create a new context from a source file
     pub fn from_source_file_capture_output(source_file: Rc<SourceFile>) -> Self {
-        let mut ctx = Self {
-            current_source_file: Some(source_file.clone()),
+        Self {
             symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
-            source_files: Default::default(),
+            source_cache: SourceCache::new(source_file),
             diag_handler: Default::default(),
             scope_stack: Default::default(),
             output: Some(Default::default()),
-        };
-
-        ctx.source_files.add(source_file);
-        ctx
-    }
-
-    /// Return the current source file
-    ///
-    /// Note: This should not be an optional value, as the context is always created with a source file
-    pub fn current_source_file(&self) -> Option<Rc<SourceFile>> {
-        self.current_source_file.clone()
-    }
-
-    /// Add source file to Context
-    pub fn add_source_file(&mut self, source_file: SourceFile) {
-        self.source_files.add(Rc::new(source_file))
+        }
     }
 
     /// Add a local value
@@ -194,8 +172,8 @@ impl PushDiag for EvalContext {
     }
 }
 
-impl GetSourceFileByHash for EvalContext {
-    fn get_source_file_by_hash(&self, hash: u64) -> Option<&SourceFile> {
-        self.source_files.get_source_file_by_hash(hash)
+impl GetSourceByHash for EvalContext {
+    fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>> {
+        self.source_cache.get_by_hash(hash)
     }
 }

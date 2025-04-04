@@ -11,7 +11,7 @@ pub use diag_handler::*;
 pub use diag_list::*;
 pub use level::*;
 
-use crate::{eval::*, src_ref::*, syntax::*};
+use crate::{eval::*, resolve::*, src_ref::*, syntax::*};
 
 /// A trait to add diagnostics with different levels conveniently
 pub trait PushDiag {
@@ -99,10 +99,10 @@ impl Diag {
     pub fn pretty_print(
         &self,
         w: &mut dyn std::io::Write,
-        source_file_by_hash: &impl GetSourceFileByHash,
+        source_by_hash: &impl GetSourceByHash,
     ) -> std::io::Result<()> {
         let src_ref = self.src_ref();
-        let source_file = source_file_by_hash.get_source_file_by_src_ref(&src_ref);
+        let source_file = source_by_hash.get_by_hash(src_ref.source_hash());
 
         match &src_ref {
             SrcRef(None) => writeln!(w, "{}: {}", self.level(), self.message())?,
@@ -112,6 +112,7 @@ impl Diag {
                     w,
                     "  ---> {}:{}",
                     source_file
+                        .as_ref()
                         .map(|sf| sf.filename_as_str())
                         .unwrap_or(SourceFile::NO_FILE),
                     src_ref.at
@@ -119,6 +120,7 @@ impl Diag {
                 writeln!(w, "     |",)?;
 
                 let line = source_file
+                    .as_ref()
                     .map(|sf| sf.get_line(src_ref.at.line - 1).unwrap_or("<no line>"))
                     .unwrap_or(SourceFile::NO_FILE);
 

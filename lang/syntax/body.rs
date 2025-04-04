@@ -54,19 +54,6 @@ impl Body {
                 Statement::Function(f) => {
                     symbol_map.insert(f.name.id().clone(), f.resolve(parent.clone(), context)?);
                 }
-                Statement::Use(u) => {
-                    for decl in &u.decls {
-                        match decl {
-                            UseDeclaration::Use(qualified_name, _)
-                            | UseDeclaration::UseAll(qualified_name, _)
-                            | UseDeclaration::UseAlias(qualified_name, _, _) => {
-                                if !qualified_name.is_builtin() {
-                                    context.check_external(qualified_name.clone())?;
-                                }
-                            }
-                        }
-                    }
-                }
                 _ => {}
             }
         }

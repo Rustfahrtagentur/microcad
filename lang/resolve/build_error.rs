@@ -1,25 +1,22 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Resolve error
+//! µcad project
 
-use crate::{parse::*, syntax::*};
-use thiserror::Error;
+use crate::{parse::*, resolve::*};
+
+use thiserror::*;
 
 /// Resolve error
 #[derive(Debug, Error)]
-pub enum ResolveError {
-    /// Name of external symbol is unknown
-    #[error("External symbol {0} not found")]
-    ExternalSymbolNotFound(QualifiedName),
-
-    /// Path of external file is unknown
-    #[error("External path '{0}' not found")]
-    ExternalPathNotFound(std::path::PathBuf),
-
+pub enum BuildError {
     /// Error while parsing a file
     #[error("Parse Error: {0}")]
     ParseError(#[from] ParseError),
+
+    /// Error while resolving symbols
+    #[error("Resolve Error: {0}")]
+    ResolveError(#[from] ResolveError),
 
     /// Can't find a project file by hash
     #[error("Could not find a file with hash {0}")]
@@ -34,5 +31,5 @@ pub enum ResolveError {
     UnknownName(QualifiedName),
 }
 
-/// Result type of resolve
-pub type ResolveResult<T> = std::result::Result<T, ResolveError>;
+/// Result type of a build
+pub type BuildResult<T> = std::result::Result<T, BuildError>;

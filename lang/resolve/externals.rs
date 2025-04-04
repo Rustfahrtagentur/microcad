@@ -11,19 +11,26 @@ pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf
 
 impl Externals {
     /// Create new resolve context
-    pub fn new(search_paths: Vec<std::path::PathBuf>) -> RcMut<Self> {
-        RcMut::new(Self(Self::search_externals(search_paths)))
+    pub fn new(search_paths: Vec<std::path::PathBuf>) -> Self {
+        Self(Self::search_externals(search_paths))
     }
 
     /// search for an external file which may include a given qualified name
     pub fn fetch_external(&self, name: QualifiedName) -> ResolveResult<&std::path::PathBuf> {
         for (namespace, path) in self.0.iter() {
             if name.is_sub_of(namespace) {
-                eprintln!("found {name} in {namespace}");
                 return Ok(path);
             }
         }
         Err(ResolveError::ExternalSymbolNotFound(name))
+    }
+
+    /// get qualified name by path
+    pub fn get_name(&self, path: &std::path::Path) -> ResolveResult<&QualifiedName> {
+        match self.0.iter().find(|(_, p)| p.as_path() == path) {
+            Some((name, _)) => Ok(name),
+            None => Err(ResolveError::ExternalPathNotFound(path.to_path_buf())),
+        }
     }
 
     /// searches for external source code files (external modules) in some search paths
@@ -103,17 +110,20 @@ impl std::ops::Deref for Externals {
 #[test]
 fn resolve_external_file() {
     let externals = Externals::new(vec!["../lib".into()]);
-    let externals = externals.borrow();
 
     assert!(!externals.is_empty());
 
     println!("{externals}");
 
-    assert!(externals
-        .fetch_external(QualifiedName::from("std::geo2d::circle"))
-        .is_ok());
+    assert!(
+        externals
+            .fetch_external(QualifiedName::from("std::geo2d::circle"))
+            .is_ok()
+    );
 
-    assert!(externals
-        .fetch_external(QualifiedName::from("non_std::geo2d::circle"))
-        .is_err());
+    assert!(
+        externals
+            .fetch_external(QualifiedName::from("non_std::geo2d::circle"))
+            .is_err()
+    );
 }

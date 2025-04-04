@@ -77,9 +77,14 @@ fn assert_ok() {
 
 #[test]
 fn assert_fail() {
+    let project = Project::load("../tests/test_cases/syntax/assert_fail.µcad", vec![]);
     let source_file = SourceFile::load("../tests/test_cases/syntax/assert_fail.µcad")
         .expect("cannot load test file");
-
+    let mut externals = Externals::new(vec![]);
+    let mut context = ResolveContext::new(&mut externals);
+    source_file
+        .resolve(None, &mut context)
+        .expect("cannot resolve file");
     let mut context = EvalContext::from_source_file(source_file.clone());
     context.add_symbol(super::builtin_namespace());
 
@@ -90,13 +95,13 @@ fn assert_fail() {
         "{}",
         context
             .diag_handler()
-            .pretty_print_to_string(source_file.as_ref())
+            .pretty_print_to_string(&context)
             .expect("internal test error")
     );
     assert_eq!(
         context
             .diag_handler()
-            .pretty_print_to_string(source_file.as_ref())
+            .pretty_print_to_string(&context)
             .expect("internal test error"),
         "error: Assertion failed: false
   ---> ../tests/test_cases/syntax/assert_fail.µcad:1:19

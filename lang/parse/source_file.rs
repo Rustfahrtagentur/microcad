@@ -35,16 +35,21 @@ impl SourceFile {
 
         Ok(std::rc::Rc::new(source_file))
     }
+
+    fn calculate_hash(value: &str) -> u64 {
+        use std::hash::{Hash, Hasher};
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        value.hash(&mut hasher);
+        hasher.finish()
+    }
 }
 
 impl Parse for SourceFile {
     fn parse(mut pair: Pair) -> ParseResult<Self> {
         let mut body = Vec::new();
 
-        use std::hash::{Hash, Hasher};
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        pair.as_str().hash(&mut hasher);
-        let hash = hasher.finish();
+        // calculate hash over complete file content
+        let hash = Self::calculate_hash(pair.as_str());
         pair.set_source_hash(hash);
 
         for pair in pair.inner() {

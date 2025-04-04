@@ -9,12 +9,21 @@ The processing of *µcad* source code files into output files can be divided int
 
 ### Parsing Phase
 
-In the parsing phase the source files are read into a *syntax tree* by using the [*µcad* grammar](../lang/grammar.pest).
+In the parsing phase one source file is read into a *syntax tree* by using the [*µcad* grammar](../lang/grammar.pest).
 Any errors which occur within the parsing phase are related to file access or syntax.
+
+### Resolving Phase
+
+In the resolving phase, the following steps are done:
+
+1. the search paths will be recursively scanned for any external µcad files
+2. all symbols (modules, functions, constants and namespaces) in the source file will be put into a symbol tree
+
+At the end all dependent files are loaded and syntax definitions are placed in the symbol tree and everything can be found by it's qualified name.
 
 ### Evaluation Phase
 
-In the evaluation phase the *syntax tree*  will be processed into the *object node tree*
+In the evaluation phase, the *syntax tree*  will be processed into the *object node tree*
 which is a structured representation of the geometry.
 While this phase the following things will be done:
 

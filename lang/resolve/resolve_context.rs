@@ -2,18 +2,19 @@ use crate::resolve::*;
 
 /// Context while resolving a source file
 #[derive(Debug)]
-pub struct ResolveContext {
-    externals: RcMut<Externals>,
+pub struct ResolveContext<'a> {
+    externals: &'a mut Externals,
 }
 
-impl ResolveContext {
+impl<'a> ResolveContext<'a> {
     /// Create new resolve context
-    pub fn new(externals: RcMut<Externals>) -> Self {
+    pub fn new(externals: &'a mut Externals) -> Self {
         Self { externals }
     }
-    /// return true if a qualified name  can be located in an external use reference
-    pub fn check_external(&self, name: QualifiedName) -> ResolveResult<()> {
-        self.externals.borrow().fetch_external(name)?;
-        Ok(())
+}
+
+impl std::fmt::Display for ResolveContext<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.externals)
     }
 }

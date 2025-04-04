@@ -1,4 +1,4 @@
-use crate::{diag::*, syntax::*};
+use crate::{diag::*, resolve::*};
 
 /// We have a vec of source file diagnostics because we want to keep track of diagnostics for each source file separately
 #[derive(Debug, Default)]
@@ -9,11 +9,11 @@ impl DiagList {
     pub fn pretty_print(
         &self,
         w: &mut dyn std::io::Write,
-        source_file_by_hash: &impl GetSourceFileByHash,
+        source_by_hash: &impl GetSourceByHash,
     ) -> std::io::Result<()> {
         self.0
             .iter()
-            .try_for_each(|diag| diag.pretty_print(w, source_file_by_hash))
+            .try_for_each(|diag| diag.pretty_print(w, source_by_hash))
     }
 }
 
