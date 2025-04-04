@@ -3,14 +3,12 @@
 
 //! external file loading and symbol tree resolving
 
-mod externals;
 mod project;
 mod resolve_error;
 mod source_cache;
 mod symbol_definition;
 mod symbol_node;
 
-pub use externals::*;
 pub use project::*;
 pub use resolve_error::*;
 pub use source_cache::*;

@@ -6,7 +6,7 @@
 use crate::{resolve::*, syntax::*};
 
 /// External files register
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf>);
 
 impl Externals {
@@ -115,15 +115,11 @@ fn resolve_external_file() {
 
     println!("{externals}");
 
-    assert!(
-        externals
-            .fetch_external(QualifiedName::from("std::geo2d::circle"))
-            .is_ok()
-    );
+    assert!(externals
+        .fetch_external(QualifiedName::from("std::geo2d::circle"))
+        .is_ok());
 
-    assert!(
-        externals
-            .fetch_external(QualifiedName::from("non_std::geo2d::circle"))
-            .is_err()
-    );
+    assert!(externals
+        .fetch_external(QualifiedName::from("non_std::geo2d::circle"))
+        .is_err());
 }

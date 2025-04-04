@@ -11,6 +11,7 @@ mod call;
 mod eval_context;
 mod eval_error;
 mod expression;
+mod externals;
 mod format_string;
 mod identifier;
 mod literal;
@@ -26,6 +27,7 @@ pub use builtin_module::*;
 pub use call::*;
 pub use eval_context::*;
 pub use eval_error::*;
+pub use externals::*;
 pub use output::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};

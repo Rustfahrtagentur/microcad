@@ -18,6 +18,8 @@ pub struct EvalContext {
     diag_handler: DiagHandler,
     /// Output channel for __builtin::print
     output: Option<Output>,
+    /// External files
+    externals: Externals,
 }
 
 /// Look up result
@@ -32,24 +34,29 @@ pub enum LookUp {
 
 impl EvalContext {
     /// Create a new context from a source file
-    pub fn from_source_file(source_file: Rc<SourceFile>) -> Self {
+    pub fn from_source_file(source_file: Rc<SourceFile>, externals: Externals) -> Self {
         Self {
             symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
             source_cache: SourceCache::new(source_file),
             diag_handler: Default::default(),
             scope_stack: Default::default(),
             output: Default::default(),
+            externals,
         }
     }
 
     /// Create a new context from a source file
-    pub fn from_source_file_capture_output(source_file: Rc<SourceFile>) -> Self {
+    pub fn from_source_file_capture_output(
+        source_file: Rc<SourceFile>,
+        externals: Externals,
+    ) -> Self {
         Self {
             symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
             source_cache: SourceCache::new(source_file),
             diag_handler: Default::default(),
             scope_stack: Default::default(),
             output: Some(Default::default()),
+            externals,
         }
     }
 
