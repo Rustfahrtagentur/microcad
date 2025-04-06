@@ -38,7 +38,7 @@ fn load_source_file(
     let source_file = SourceFile::load(format!("../tests/test_cases/{filename}"))
         .expect("cannot load test file: {filename}");
 
-    let mut context = EvalContext::from_source_file(source_file.clone(), Externals::default());
+    let mut context = EvalContext::from_source_file(source_file.clone(), vec![]);
     context.add_symbol(builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());
@@ -65,7 +65,7 @@ fn scopes() {
     let source_file =
         SourceFile::load("../tests/test_cases/syntax/scopes.µcad").expect("cannot load test file");
 
-    let mut context = EvalContext::from_source_file(source_file.clone(), Externals::default());
+    let mut context = EvalContext::from_source_file(source_file.clone(), vec![]);
     context.add_symbol(builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());
@@ -77,7 +77,7 @@ fn context_with_symbols() {
     use microcad_lang::{eval::*, syntax::*};
     let source_file =
         SourceFile::load("../tests/test_cases/syntax/call.µcad").expect("cannot load test file");
-    let mut context = EvalContext::from_source_file(source_file.clone(), Externals::default());
+    let mut context = EvalContext::from_source_file(source_file.clone(), vec![]);
 
     context.add_symbol(builtin_namespace());
     context

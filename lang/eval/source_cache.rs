@@ -8,18 +8,24 @@ use crate::{eval::*, rc_mut::*, src_ref::*, syntax::*};
 /// Register of loaded source files
 #[derive(Default)]
 pub struct SourceCache {
+    /// External files read from searcg path
+    externals: Externals,
+
     by_hash: std::collections::HashMap<u64, usize>,
-    by_path: std::collections::HashMap<Option<std::path::PathBuf>, usize>,
+    by_path: std::collections::HashMap<std::path::PathBuf, usize>,
     by_name: std::collections::HashMap<QualifiedName, usize>,
+
+    /// Loaded, parsed and resolved source files
     source_files: Vec<Rc<SourceFile>>,
 }
 
 impl SourceCache {
     /// Create new source register
-    pub fn new(root: Rc<SourceFile>) -> Self {
+    pub fn new(root: Rc<SourceFile>, search_paths: Vec<std::path::PathBuf>) -> Self {
         let mut by_hash = std::collections::HashMap::new();
         by_hash.insert(root.hash(), 0);
         Self {
+            externals: Externals::new(search_paths),
             source_files: vec![root.clone()],
             by_hash,
             ..Default::default()
@@ -29,14 +35,17 @@ impl SourceCache {
     /// Insert a new source file into source register
     /// - `name`: Qualified name which represents the file
     /// - `source_file`: The loaded source file to store
-    pub fn insert(&mut self, name: QualifiedName, source_file: Rc<SourceFile>) {
+    pub fn insert(&mut self, source_file: Rc<SourceFile>) -> EvalResult<()> {
+        let name = self.externals.get_name(&source_file.filename)?;
         let hash = source_file.hash();
         let filename = source_file.filename.clone();
-        self.source_files.push(source_file);
         let index = self.source_files.len();
+        eprintln!("caching [{index}] {name} {hash:#x} {filename:?}");
+        self.source_files.push(source_file);
         self.by_hash.insert(hash, index);
         self.by_path.insert(filename, index);
-        self.by_name.insert(name, index);
+        self.by_name.insert(name.clone(), index);
+        Ok(())
     }
 
     /// Convenience function to get a source file by from a `SrcReferrer`
@@ -58,7 +67,7 @@ impl SourceCache {
     /// Find a project file by it's file path
     pub fn get_by_path(&self, path: &std::path::Path) -> EvalResult<Rc<SourceFile>> {
         let path = path.to_path_buf();
-        if let Some(index) = self.by_path.get(&Some(path.clone())) {
+        if let Some(index) = self.by_path.get(&path) {
             Ok(self.source_files[*index].clone())
         } else {
             Err(EvalError::UnknownPath(path))
@@ -70,7 +79,12 @@ impl SourceCache {
         if let Some(index) = self.by_name.get(name) {
             Ok(self.source_files[*index].clone())
         } else {
-            Err(EvalError::UnknownName(name.clone()))
+            // if not found in symbol tree we try to find an external file to load
+            let external = self.externals.fetch_external(name)?;
+            Err(EvalError::SymbolMustBeLoaded(
+                name.clone(),
+                external.clone(),
+            ))
         }
     }
 }

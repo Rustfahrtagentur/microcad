@@ -38,13 +38,13 @@ impl std::fmt::Display for SymbolDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let id = self.id();
         match self {
-            Self::Module(_) => write!(f, "module {}", id),
-            Self::Namespace(_) => write!(f, "namespace {}", id),
-            Self::Function(_) => write!(f, "function {}", id),
-            Self::SourceFile(_) => write!(f, "file {}", id),
-            Self::BuiltinFunction(_) => write!(f, "builtin_fn {}", id),
-            Self::BuiltinModule(_) => write!(f, "builtin_mod {}", id),
-            Self::Constant(id, value) => writeln!(f, "const {} = {}", id, value),
+            Self::Module(_) => write!(f, "module: {}", id),
+            Self::Namespace(_) => write!(f, "namespace: {}", id),
+            Self::Function(_) => write!(f, "function: {}", id),
+            Self::SourceFile(_) => write!(f, "file: {}", id),
+            Self::BuiltinFunction(_) => write!(f, "builtin_fn: {}", id),
+            Self::BuiltinModule(_) => write!(f, "builtin_mod: {}", id),
+            Self::Constant(id, value) => writeln!(f, "const: {} = {}", id, value),
         }
     }
 }

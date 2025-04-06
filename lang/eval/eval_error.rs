@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{src_ref::SrcRef, syntax::*, ty::*, value::*, Id};
+use crate::{parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*, Id};
 use thiserror::Error;
 
 /// Evaluation error
@@ -103,6 +103,10 @@ pub enum EvalError {
     /// Symbol not found
     #[error("Symbol not found: {0}")]
     SymbolNotFound(QualifiedName),
+
+    /// Symbol not found (retry to load from external)
+    #[error("Symbol {0} must be loaded from {1:?}")]
+    SymbolMustBeLoaded(QualifiedName, std::path::PathBuf),
 
     /// Symbol is not a value
     #[error("Symbol does not contain a value: {0}")]
@@ -238,6 +242,10 @@ pub enum EvalError {
     /// Found two external source files which point to the same namespace
     #[error("Ambiguous external files {0} and {1}")]
     AmbiguousExternal(std::path::PathBuf, std::path::PathBuf),
+
+    /// Can't find a project file by it's qualified name
+    #[error("Parsing error {0}")]
+    ParseError(#[from] ParseError),
 }
 
 /// Result type of any evaluation

@@ -57,6 +57,7 @@ impl Resolve for SymbolDefinition {
 
 impl Resolve for Rc<SourceFile> {
     fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+        eprintln!("resolving {}", self.filename_as_str());
         let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);
         node.borrow_mut().children = Body::fetch_symbol_map_from(&self.body, Some(node.clone()));
         node
@@ -65,8 +66,9 @@ impl Resolve for Rc<SourceFile> {
 
 impl Resolve for SourceFile {
     fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        let rc = Rc::new(self.clone());
-        rc.resolve(parent)
+        let node = Rc::new(self.clone()).resolve(parent);
+        eprintln!("Symbol:\n{}", FormatSymbol(&node.borrow()));
+        node
     }
 }
 

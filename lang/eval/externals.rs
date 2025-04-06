@@ -33,7 +33,11 @@ impl Externals {
     /// get qualified name by path
     pub fn get_name(&self, path: &std::path::Path) -> EvalResult<&QualifiedName> {
         match self.0.iter().find(|(_, p)| p.as_path() == path) {
-            Some((name, _)) => Ok(name),
+            Some((name, _)) => {
+                eprintln!("get_name({path:?}) = {name}");
+
+                Ok(name)
+            }
             None => Err(EvalError::ExternalPathNotFound(path.to_path_buf())),
         }
     }

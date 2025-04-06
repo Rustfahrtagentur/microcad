@@ -18,8 +18,8 @@ impl NamespaceBuilder {
     }
 
     /// Add a symbol to the namespace
-    pub fn symbol(mut self, symbol: RcMut<SymbolNode>) -> Self {
-        SymbolNode::insert_child(&mut self.namespace, symbol);
+    pub fn symbol(self, symbol: RcMut<SymbolNode>) -> Self {
+        SymbolNode::insert_child(&self.namespace, symbol);
         self
     }
 

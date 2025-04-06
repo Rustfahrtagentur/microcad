@@ -18,8 +18,6 @@ pub struct EvalContext {
     diag_handler: DiagHandler,
     /// Output channel for __builtin::print
     output: Option<Output>,
-    /// External files
-    externals: Externals,
 }
 
 /// Look up result
@@ -34,29 +32,57 @@ pub enum LookUp {
 
 impl EvalContext {
     /// Create a new context from a source file
-    pub fn from_source_file(source_file: Rc<SourceFile>, externals: Externals) -> Self {
+    pub fn new(node: RcMut<SymbolNode>, search_paths: Vec<std::path::PathBuf>) -> Self {
+        println!(
+            "Creating Context (search paths: {})",
+            search_paths
+                .iter()
+                .map(|p| p.to_string_lossy())
+                .collect::<Vec<_>>()
+                .join(",")
+        );
+
+        // if node owns a source file store this in the file cache
+        let source_cache = match &node.borrow().def {
+            SymbolDefinition::SourceFile(source_file) => {
+                SourceCache::new(source_file.clone(), search_paths)
+            }
+            _ => Default::default(),
+        };
         Self {
-            symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
-            source_cache: SourceCache::new(source_file),
+            source_cache,
+            symbols: node,
             diag_handler: Default::default(),
             scope_stack: Default::default(),
             output: Default::default(),
-            externals,
+        }
+    }
+
+    /// Create a new context from a source file
+    pub fn from_source_file(
+        source_file: Rc<SourceFile>,
+        search_paths: Vec<std::path::PathBuf>,
+    ) -> Self {
+        Self {
+            symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
+            source_cache: SourceCache::new(source_file, search_paths),
+            diag_handler: Default::default(),
+            scope_stack: Default::default(),
+            output: Default::default(),
         }
     }
 
     /// Create a new context from a source file
     pub fn from_source_file_capture_output(
         source_file: Rc<SourceFile>,
-        externals: Externals,
+        search_paths: Vec<std::path::PathBuf>,
     ) -> Self {
         Self {
             symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
-            source_cache: SourceCache::new(source_file),
+            source_cache: SourceCache::new(source_file, search_paths),
             diag_handler: Default::default(),
             scope_stack: Default::default(),
             output: Some(Default::default()),
-            externals,
         }
     }
 
@@ -76,7 +102,7 @@ impl EvalContext {
 
     /// Add symbol to current symbol table
     pub fn add_symbol(&mut self, symbol: RcMut<SymbolNode>) {
-        SymbolNode::insert_child(&mut self.symbols, symbol);
+        SymbolNode::insert_child(&self.symbols, symbol);
     }
 
     /// Open a new scope
@@ -127,29 +153,32 @@ impl EvalContext {
 
     /// Find a symbol in the symbol table and add it at the currently processed node
     pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<()> {
-        let current_node = self.current_node_mut();
-        if let Some(child) = SymbolNode::search_up(&current_node.borrow(), &name.clone()) {
-            SymbolNode::insert_child(&mut self.current_node_mut(), child);
-            Ok(())
-        } else {
-            // if not found in symbol tree we try to find an external file to load
-            let external = self.externals.fetch_external(name)?;
-            // check if we already tried to load that file
-            match self.source_cache.get_by_path(external) {
-                Ok(_) => {
-                    todo!("error)")
-                }
-                Err(EvalError::UnknownPath(path)) => {
-                    println!("loading {name} -> {path:?}");
-                    println!("{}", self.externals);
-                    let source_file = SourceFile::load(path);
-                    //self.source_cache.insert(name, SourceFile::load(path));
-                }
-                _ => unreachable!(),
-            }
-            todo!("load matching external files");
-            Err(EvalError::SymbolNotFound(name.clone()))
+        // search for name upwards in symbol tree
+        if let Some(child) = self.symbols.borrow().search_up(name) {
+            SymbolNode::insert_child(&self.symbols, child);
+            return Ok(());
         }
+        // if symbol could not be found in symbol tree, try to load it from external file
+        match self.source_cache.get_by_name(name) {
+            Err(EvalError::SymbolMustBeLoaded(_, path)) => {
+                // load source file
+                let source_file = SourceFile::load(path.clone())?;
+                // resolve source file
+                let node = source_file.resolve(Some(self.symbols.clone()));
+                // add to source cache
+                self.source_cache.insert(source_file.clone())?;
+                // search for the symbol in the new file node
+                match node.borrow().search_down(name) {
+                    Some(node) => match name.last() {
+                        Some(id) => self.symbols.borrow_mut().insert(id, node),
+                        None => todo!(),
+                    },
+                    None => unreachable!(),
+                }
+            }
+            _ => todo!(),
+        }
+        Err(EvalError::SymbolNotFound(name.clone()))
     }
 
     /// look up a symbol name in either local variables or symbol table

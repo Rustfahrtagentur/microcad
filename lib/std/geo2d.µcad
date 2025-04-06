@@ -23,7 +23,7 @@ module circle(radius: Length) {
 /// 
 /// Examples:
 /// * centered rect with width `w` and height `h`: `rect(width = 10.0mm, height = 5.0mm);`
-module rect {
+module rect() {
     init(width: Length, height: Length) {
         x = -width / 2.0; // center x
         y = -height / 2.0; // center y

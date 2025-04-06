@@ -16,7 +16,14 @@ impl SourceFile {
 
         assert_ne!(source_file.hash, 0);
 
-        source_file.filename = Some(std::path::PathBuf::from(path.as_ref()));
+        source_file.filename = path.as_ref().to_path_buf();
+
+        println!(
+            "loaded file {} successfully",
+            path.as_ref().to_string_lossy()
+        );
+        eprintln!("Syntax:\n{}", FormatSyntax(&source_file));
+
         Ok(std::rc::Rc::new(source_file))
     }
 
@@ -30,8 +37,9 @@ impl SourceFile {
 
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, hash)?;
 
-        source_file.filename =
-            Some(std::path::PathBuf::from_str("<from_str>").expect("filename error"));
+        source_file.filename = std::path::PathBuf::from_str("<from_str>").expect("filename error");
+
+        println!("loaded string successfully",);
 
         Ok(std::rc::Rc::new(source_file))
     }
@@ -64,7 +72,7 @@ impl Parse for SourceFile {
 
         Ok(SourceFile {
             body,
-            filename: None,
+            filename: Default::default(),
             source: pair.as_span().as_str().to_string(),
             hash,
         })

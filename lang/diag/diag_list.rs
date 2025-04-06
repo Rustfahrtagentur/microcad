@@ -1,4 +1,4 @@
-use crate::{diag::*, resolve::*};
+use crate::diag::*;
 
 /// We have a vec of source file diagnostics because we want to keep track of diagnostics for each source file separately
 #[derive(Debug, Default)]

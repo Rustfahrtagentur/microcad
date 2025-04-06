@@ -1,4 +1,4 @@
-use crate::{eval::*, rc_mut::*, resolve::*, syntax::*, value::*, Id};
+use crate::{eval::*, rc_mut::*, resolve::*, src_ref::Refer, syntax::*, value::*, Id};
 
 /// Symbol node
 #[derive(Debug)]
@@ -59,10 +59,14 @@ impl SymbolNode {
     }
 
     /// Insert child and change parent of child to new parent
-    pub fn insert_child(parent: &mut RcMut<SymbolNode>, child: RcMut<SymbolNode>) {
+    pub fn insert_child(parent: &RcMut<SymbolNode>, child: RcMut<SymbolNode>) {
         child.borrow_mut().parent = Some(parent.clone());
         let id = child.borrow().def.id();
         parent.borrow_mut().children.insert(id, child);
+    }
+
+    pub fn insert(&mut self, id: &Identifier, node: RcMut<SymbolNode>) {
+        self.children.insert(id.id().clone(), node);
     }
 
     /// Fetch child node with an id
@@ -70,15 +74,26 @@ impl SymbolNode {
         self.children.get(id)
     }
 
+    fn get_name(&self) -> QualifiedName {
+        if let Some(parent) = &self.parent {
+            let mut name = parent.borrow().get_name();
+            name.push(Identifier(Refer::none(self.def.id())));
+            name
+        } else {
+            QualifiedName(vec![Identifier(Refer::none(self.def.id()))])
+        }
+    }
+
     /// Search in symbol tree by a path, e.g. a::b::c
-    pub fn search_down(&self, path: &QualifiedName) -> Option<RcMut<SymbolNode>> {
-        if let Some(first) = path.first() {
+    pub fn search_down(&self, name: &QualifiedName) -> Option<RcMut<SymbolNode>> {
+        eprintln!("searching {name} in {}", self.get_name());
+        if let Some(first) = name.first() {
             if let Some(child) = self.fetch(first.id()) {
-                let path = &path.remove_first();
-                if path.is_empty() {
+                let name = &name.remove_first();
+                if name.is_empty() {
                     Some(child.clone())
                 } else {
-                    child.borrow().search_down(path)
+                    child.borrow().search_down(name)
                 }
             } else {
                 None
