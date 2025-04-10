@@ -155,25 +155,17 @@ impl EvalContext {
         }
         // if symbol could not be found in symbol tree, try to load it from external file
         match self.source_cache.get_by_name(name) {
-            Err(EvalError::SymbolMustBeLoaded(_, path)) => {
+            Err(EvalError::SymbolMustBeLoaded(name, path)) => {
                 // load source file
                 let source_file = SourceFile::load(path.clone())?;
                 // resolve source file
                 let node = source_file.resolve(None);
-
                 // add to source cache
                 self.source_cache.insert(source_file.clone())?;
+                // insert node into symbols
+                self.symbols.borrow_mut().insert(&name, node);
 
                 eprintln!("{}", self.symbols.borrow());
-
-                // search for the symbol in the new file node
-                match node.borrow().search_down(name) {
-                    Some(node) => match name.last() {
-                        Some(id) => self.symbols.borrow_mut().insert(name, node),
-                        None => todo!(),
-                    },
-                    None => unreachable!("{name}"),
-                }
             }
             _ => todo!(),
         }

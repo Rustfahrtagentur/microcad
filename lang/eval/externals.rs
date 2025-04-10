@@ -17,37 +17,22 @@ impl Externals {
 
     /// Create namespace tree from externals
     pub fn create_namespaces(&self) -> SymbolMap {
-        println!("{self}");
-
         let mut map = SymbolMap::new();
-
-        let basenames = self
-            .iter()
-            .filter_map(|(name, _)| name.basename())
-            .collect::<Vec<_>>();
-
-        basenames.iter().for_each(|basename| {
-            let node_id = basename.first().expect("Non-empty qualified name");
-
-            let parent_symbol = if let Some(symbol) = map.get(node_id.id()) {
-                symbol.clone()
-            } else {
-                SymbolNode::new_namespace(node_id.clone())
+        self.iter().for_each(|(basename, _)| {
+            let (id, name) = basename.split_first();
+            let parent_symbol = match map.get(id.id()) {
+                Some(symbol) => symbol.clone(),
+                _ => SymbolNode::new_namespace(id.clone()),
             };
-
-            let basename = basename.remove_first();
-            self._create_namespaces(basename, parent_symbol.clone());
-
-            map.insert(node_id.id().clone(), parent_symbol);
+            Self::recursive_create_namespaces(parent_symbol.clone(), name);
+            map.insert(id.id().clone(), parent_symbol);
         });
-
         map
     }
 
-    fn _create_namespaces(
-        &self,
-        name: QualifiedName,
+    fn recursive_create_namespaces(
         parent: RcMut<SymbolNode>,
+        name: QualifiedName,
     ) -> Option<RcMut<SymbolNode>> {
         if name.is_empty() {
             return None;
@@ -64,7 +49,7 @@ impl Externals {
         let child = SymbolNode::new_namespace(node_id.clone());
         SymbolNode::insert_child(&parent, child.clone());
 
-        self._create_namespaces(name.remove_first(), child.clone());
+        Self::recursive_create_namespaces(child.clone(), name.remove_first());
         Some(child)
     }
 

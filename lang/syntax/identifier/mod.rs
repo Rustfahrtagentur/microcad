@@ -11,7 +11,7 @@ pub use qualified_name::*;
 
 #[cfg(not(test))]
 use crate::parse::*;
-use crate::{src_ref::*, syntax::*, Id};
+use crate::{Id, src_ref::*, syntax::*};
 
 /// µcad identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]

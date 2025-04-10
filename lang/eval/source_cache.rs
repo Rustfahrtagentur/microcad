@@ -87,7 +87,7 @@ impl SourceCache {
             // if not found in symbol tree we try to find an external file to load
             let external = self.externals.fetch_external(name)?;
             Err(EvalError::SymbolMustBeLoaded(
-                name.clone(),
+                self.externals.get_name(external)?.clone(),
                 external.clone(),
             ))
         }

@@ -68,9 +68,17 @@ impl SymbolNode {
         parent.borrow_mut().children.insert(id, child);
     }
 
+    /// Insert a child at the correct sub node
     pub fn insert(&mut self, name: &QualifiedName, node: RcMut<SymbolNode>) {
         eprintln!("SymbolNode: Insert {name} into {}", self.def.id());
-        todo!()
+        let (first, name) = name.split_first();
+        if !name.is_empty() {
+            if let Some(child) = self.children.get(first.id()) {
+                child.borrow_mut().insert(&name, node);
+                return;
+            }
+        }
+        self.children.insert(first.id().clone(), node);
     }
 
     /// Fetch child node with an id

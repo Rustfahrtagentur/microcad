@@ -40,6 +40,15 @@ impl QualifiedName {
         Self(self.0[1..].to_vec())
     }
 
+    /// Split name into first id and the rest
+    pub fn split_first(&self) -> (Identifier, QualifiedName) {
+        match self.len() {
+            0 => todo!("return None or error?"),
+            1 => (self.0[0].clone(), Self::new()),
+            _ => (self.0[0].clone(), Self(self.0[1..].into())),
+        }
+    }
+
     /// return basename, `std::geo2d` returns `std`
     pub fn basename(&self) -> Option<Self> {
         let mut s = self.clone();
