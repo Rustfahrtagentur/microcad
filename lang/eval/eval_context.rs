@@ -12,6 +12,8 @@ pub struct EvalContext {
     symbols: RcMut<SymbolNode>,
     /// Stack of currently opened scopes with local symbols while evaluation
     scope_stack: ScopeStack,
+    /// current node while evaluation
+    current: RcMut<SymbolNode>,
     /// Source file cache containing all source files loaded in the context
     source_cache: SourceCache,
     /// Source file diagnostics
@@ -47,11 +49,12 @@ impl EvalContext {
         );
 
         // if node owns a source file store this in the file cache
-        let source_cache = match &symbols.borrow().def {
-            SymbolDefinition::SourceFile(source_file) => {
-                SourceCache::new(source_file.clone(), search_paths)
-            }
-            _ => Default::default(),
+        let (source_cache, current) = match &symbols.borrow().def {
+            SymbolDefinition::SourceFile(source_file) => (
+                SourceCache::new(source_file.clone(), search_paths),
+                SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
+            ),
+            _ => unreachable!(),
         };
 
         let namespaces = source_cache.create_namespaces();
@@ -62,6 +65,7 @@ impl EvalContext {
         Self {
             source_cache,
             symbols,
+            current,
             diag_handler: Default::default(),
             scope_stack: Default::default(),
             output,
@@ -70,6 +74,14 @@ impl EvalContext {
 
     /// Create a new context from a source file
     pub fn from_source_file(
+        source_file: Rc<SourceFile>,
+        search_paths: Vec<std::path::PathBuf>,
+    ) -> Self {
+        Self::from_source_file_with_output(source_file, search_paths, None)
+    }
+
+    /// Create a new context from a source file
+    pub fn from_source_file_with_output(
         source_file: Rc<SourceFile>,
         search_paths: Vec<std::path::PathBuf>,
         output: Option<Output>,
@@ -111,13 +123,11 @@ impl EvalContext {
     }
 
     /// fetch symbol from symbol table
-    pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
-        let current_node = self.current_node();
-        if let Some(child) = SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone())
-        {
+    pub fn fetch_symbol(&self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+        if let Some(child) = SymbolNode::search_up(&self.current_node().borrow(), &name.clone()) {
             Ok(child)
         } else {
-            Err(super::EvalError::SymbolNotFound(qualified_name.clone()))
+            Err(super::EvalError::SymbolNotFound(name.clone()))
         }
     }
 
@@ -131,25 +141,26 @@ impl EvalContext {
     }
 
     /// fetch a value from a local variable or symbol table
-    pub fn fetch_value(&self, qualified_name: &QualifiedName) -> EvalResult<Value> {
-        if let Some(identifier) = qualified_name.single_identifier() {
+    pub fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
+        if let Some(identifier) = name.single_identifier() {
             if let Ok(LocalDefinition::Value(value)) = self.fetch_local(identifier.id()) {
                 return Ok(value.clone());
             }
         }
 
-        let symbol = self.fetch_symbol(qualified_name)?;
+        let symbol = self.fetch_symbol(name)?;
 
         match &symbol.borrow().def {
             SymbolDefinition::Constant(_, value) => Ok(value.clone()),
-            _ => Err(EvalError::SymbolIsNotAValue(qualified_name.clone())),
+            _ => Err(EvalError::SymbolIsNotAValue(name.clone())),
         }
     }
 
     /// Find a symbol in the symbol table and add it at the currently processed node
     pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<()> {
+        eprintln!("using symbol {name} in {}", self.current.borrow().def.id());
         // search for name upwards in symbol tree
-        if let Some(child) = self.symbols.borrow().search_up(name) {
+        if let Some(child) = self.current.borrow().search_up(name) {
             SymbolNode::insert_child(&self.symbols, child);
             return Ok(());
         }

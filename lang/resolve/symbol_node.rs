@@ -58,7 +58,7 @@ impl SymbolNode {
         writeln!(f, "{:depth$}{}", "", self.def)?;
         self.children
             .iter()
-            .try_for_each(|(_, child)| child.borrow().print_symbol(f, depth + 1))
+            .try_for_each(|(_, child)| child.borrow().print_symbol(f, depth + self.def.id().len()))
     }
 
     /// Insert child and change parent of child to new parent
@@ -82,41 +82,49 @@ impl SymbolNode {
     }
 
     /// Fetch child node with an id
-    pub fn fetch(&self, id: &Id) -> Option<&RcMut<SymbolNode>> {
+    pub fn get(&self, id: &Id) -> Option<&RcMut<SymbolNode>> {
         self.children.get(id)
     }
 
     /// Search in symbol tree by a path, e.g. a::b::c
-    pub fn search_down(&self, path: &QualifiedName) -> Option<RcMut<SymbolNode>> {
-        if let Some(first) = path.first() {
-            if let Some(child) = self.fetch(first.id()) {
-                let path = &path.remove_first();
-                if path.is_empty() {
+    pub fn search_down(&self, name: &QualifiedName) -> Option<RcMut<SymbolNode>> {
+        eprintln!("search_down {name} in {}", self.id());
+        if let Some(first) = name.first() {
+            if let Some(child) = self.get(first.id()) {
+                let name = &name.remove_first();
+                if name.is_empty() {
                     Some(child.clone())
                 } else {
-                    child.borrow().search_down(path)
+                    child.borrow().search_down(name)
                 }
             } else {
+                eprintln!("search_down no child in {}", self.id());
                 None
             }
         } else {
+            eprintln!("search_down no first in {name}");
             None
         }
     }
 
     /// Search for first symbol in parents
-    pub fn search_up(&self, path: &QualifiedName) -> Option<RcMut<SymbolNode>> {
-        if let Some(child) = self.search_down(path) {
-            Some(child)
+    pub fn search_up(&self, name: &QualifiedName) -> Option<RcMut<SymbolNode>> {
+        if let Some(result) = self.search_down(name) {
+            Some(result)
         } else if let Some(parent) = &self.parent {
-            if let Some(child) = parent.borrow().search_down(path) {
-                Some(child.clone())
+            if let Some(result) = parent.borrow().search_down(name) {
+                Some(result.clone())
             } else {
-                parent.borrow().search_up(path)
+                parent.borrow().search_up(name)
             }
         } else {
             None
         }
+    }
+
+    /// Get id of the definition in this node
+    pub fn id(&self) -> Id {
+        self.def.id()
     }
 }
 

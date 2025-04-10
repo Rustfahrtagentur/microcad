@@ -84,8 +84,8 @@ fn resolve_source_file() {
     //  module a
     //   module b
     let symbol_node = symbol_node.borrow();
-    assert!(symbol_node.fetch(&"a".into()).is_some());
-    assert!(symbol_node.fetch(&"c".into()).is_none());
+    assert!(symbol_node.get(&"a".into()).is_some());
+    assert!(symbol_node.get(&"c".into()).is_none());
 
     assert!(symbol_node.search_down(&"a".into()).is_some());
     assert!(symbol_node.search_down(&"a::b".into()).is_some());

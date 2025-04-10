@@ -42,7 +42,7 @@ impl Externals {
 
         let node_id = name.first().expect("Non-empty qualified name");
 
-        if let Some(child) = parent.borrow().fetch(node_id.id()) {
+        if let Some(child) = parent.borrow().get(node_id.id()) {
             return Some(child.clone());
         }
 

@@ -8,7 +8,7 @@ use crate::{eval::*, rc_mut::*, src_ref::*, syntax::*};
 /// Register of loaded source files
 #[derive(Default)]
 pub struct SourceCache {
-    /// External files read from searcg path
+    /// External files read from search path
     externals: Externals,
 
     by_hash: std::collections::HashMap<u64, usize>,
