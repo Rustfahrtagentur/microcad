@@ -15,6 +15,7 @@ impl Externals {
         Self(Self::search_externals(search_paths))
     }
 
+    /// Create namespace tree from externals
     pub fn create_namespaces(&self) -> SymbolMap {
         println!("{self}");
 

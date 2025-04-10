@@ -32,6 +32,11 @@ impl SourceCache {
         }
     }
 
+    /// Create initial namespace tree from externals
+    pub fn create_namespaces(&self) -> SymbolMap {
+        self.externals.create_namespaces()
+    }
+
     /// Insert a new source file into source register
     /// - `name`: Qualified name which represents the file
     /// - `source_file`: The loaded source file to store

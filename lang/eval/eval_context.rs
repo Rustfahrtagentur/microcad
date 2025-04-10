@@ -32,7 +32,11 @@ pub enum LookUp {
 
 impl EvalContext {
     /// Create a new context from a source file
-    pub fn new(node: RcMut<SymbolNode>, search_paths: Vec<std::path::PathBuf>) -> Self {
+    pub fn new(
+        symbols: RcMut<SymbolNode>,
+        search_paths: Vec<std::path::PathBuf>,
+        output: Option<Output>,
+    ) -> Self {
         println!(
             "Creating Context (search paths: {})",
             search_paths
@@ -43,18 +47,24 @@ impl EvalContext {
         );
 
         // if node owns a source file store this in the file cache
-        let source_cache = match &node.borrow().def {
+        let source_cache = match &symbols.borrow().def {
             SymbolDefinition::SourceFile(source_file) => {
                 SourceCache::new(source_file.clone(), search_paths)
             }
             _ => Default::default(),
         };
+
+        let namespaces = source_cache.create_namespaces();
+        namespaces.iter().for_each(|(_, namespace)| {
+            SymbolNode::insert_child(&symbols, namespace.clone());
+        });
+
         Self {
             source_cache,
-            symbols: node,
+            symbols,
             diag_handler: Default::default(),
             scope_stack: Default::default(),
-            output: Default::default(),
+            output,
         }
     }
 
@@ -62,28 +72,13 @@ impl EvalContext {
     pub fn from_source_file(
         source_file: Rc<SourceFile>,
         search_paths: Vec<std::path::PathBuf>,
+        output: Option<Output>,
     ) -> Self {
-        Self {
-            symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
-            source_cache: SourceCache::new(source_file, search_paths),
-            diag_handler: Default::default(),
-            scope_stack: Default::default(),
-            output: Default::default(),
-        }
-    }
-
-    /// Create a new context from a source file
-    pub fn from_source_file_capture_output(
-        source_file: Rc<SourceFile>,
-        search_paths: Vec<std::path::PathBuf>,
-    ) -> Self {
-        Self {
-            symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
-            source_cache: SourceCache::new(source_file, search_paths),
-            diag_handler: Default::default(),
-            scope_stack: Default::default(),
-            output: Some(Default::default()),
-        }
+        Self::new(
+            SymbolNode::new(SymbolDefinition::SourceFile(source_file), None),
+            search_paths,
+            output,
+        )
     }
 
     /// Add a local value
@@ -165,8 +160,12 @@ impl EvalContext {
                 let source_file = SourceFile::load(path.clone())?;
                 // resolve source file
                 let node = source_file.resolve(None);
+
                 // add to source cache
                 self.source_cache.insert(source_file.clone())?;
+
+                eprintln!("{}", self.symbols.borrow());
+
                 // search for the symbol in the new file node
                 match node.borrow().search_down(name) {
                     Some(node) => match name.last() {
