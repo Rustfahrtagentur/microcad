@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{parse::*, src_ref::*, syntax::*, Id};
+use crate::{Id, parse::*, src_ref::*, syntax::*};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
@@ -38,6 +38,17 @@ impl QualifiedName {
     /// remove the first name from path
     pub fn remove_first(&self) -> Self {
         Self(self.0[1..].to_vec())
+    }
+
+    /// return basename, `std::geo2d` returns `std`
+    pub fn basename(&self) -> Option<Self> {
+        let mut s = self.clone();
+        if s.len() >= 2 {
+            s.pop();
+            Some(s)
+        } else {
+            None
+        }
     }
 }
 

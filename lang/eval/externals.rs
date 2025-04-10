@@ -3,7 +3,7 @@
 
 //! External files register
 
-use crate::{eval::*, syntax::*};
+use crate::{eval::*, rc_mut::RcMut, syntax::*};
 
 /// External files register
 #[derive(Debug, Default)]
@@ -13,6 +13,58 @@ impl Externals {
     /// Create new resolve context
     pub fn new(search_paths: Vec<std::path::PathBuf>) -> Self {
         Self(Self::search_externals(search_paths))
+    }
+
+    pub fn create_namespaces(&self) -> SymbolMap {
+        println!("{self}");
+
+        let mut map = SymbolMap::new();
+
+        let basenames = self
+            .iter()
+            .filter_map(|(name, _)| name.basename())
+            .collect::<Vec<_>>();
+
+        basenames.iter().for_each(|basename| {
+            let node_id = basename.first().expect("Non-empty qualified name");
+
+            let parent_symbol = if let Some(symbol) = map.get(node_id.id()) {
+                symbol.clone()
+            } else {
+                SymbolNode::new_namespace(node_id.clone())
+            };
+
+            let basename = basename.remove_first();
+            self._create_namespaces(basename, parent_symbol.clone());
+
+            map.insert(node_id.id().clone(), parent_symbol);
+        });
+
+        map
+    }
+
+    fn _create_namespaces(
+        &self,
+        name: QualifiedName,
+        parent: RcMut<SymbolNode>,
+    ) -> Option<RcMut<SymbolNode>> {
+        if name.is_empty() {
+            return None;
+        }
+
+        println!("Name: {name}");
+
+        let node_id = name.first().expect("Non-empty qualified name");
+
+        if let Some(child) = parent.borrow().fetch(node_id.id()) {
+            return Some(child.clone());
+        }
+
+        let child = SymbolNode::new_namespace(node_id.clone());
+        SymbolNode::insert_child(&parent, child.clone());
+
+        self._create_namespaces(name.remove_first(), child.clone());
+        Some(child)
     }
 
     /// search for an external file which may include a given qualified name
@@ -62,6 +114,7 @@ impl Externals {
                     );
                 });
         });
+
         externals
     }
 
@@ -124,11 +177,26 @@ fn resolve_external_file() {
 
     println!("{externals}");
 
-    assert!(externals
-        .fetch_external(&"std::geo2d::circle".into())
-        .is_ok());
+    assert!(
+        externals
+            .fetch_external(&"std::geo2d::circle".into())
+            .is_ok()
+    );
 
-    assert!(externals
-        .fetch_external(&"non_std::geo2d::circle".into())
-        .is_err());
+    assert!(
+        externals
+            .fetch_external(&"non_std::geo2d::circle".into())
+            .is_err()
+    );
+}
+
+#[test]
+fn create_namespaces() {
+    let externals = Externals::new(vec!["../lib".into()]);
+
+    assert!(!externals.is_empty());
+
+    let namespaces = externals.create_namespaces();
+
+    println!("{namespaces:#?}");
 }

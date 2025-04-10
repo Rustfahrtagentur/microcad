@@ -7,7 +7,7 @@
 //! Code must be marked by *Markdown* code markers (code type: `µcad`) with a test ID attached.
 //! In case of a failing test `#fail` must be appended to the test ID.
 //!
-//! Relative path's of scanned folder names will be used to build a modules structure  
+//! Relative path's of scanned folder names will be used to build a modules structure
 //! in the resulting code.
 //! If test IDs include `.` name will be split into several names which will be
 //! used to crates sub modules.
@@ -364,7 +364,7 @@ fn create_test_code(
                     use crate::rust_std::io::Write;
 
                     microcad_lang::env_logger_init();
-                    
+
                     // get parameters from outside code
                     let banner = "{banner}";
                     let out = "{out}";
@@ -399,8 +399,8 @@ fn create_test_code(
                         // test expected to fail succeeded at parsing?
                         Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = EvalContext::from_source_file_capture_output(source.clone());
-                            let eval = source.eval(&mut context);                        
+                            let mut context = EvalContext::from_source_file_capture_output(source.clone(), vec![]);
+                            let eval = source.eval(&mut context);
                             let diag = context.diag_handler();
 
                             // get print output
@@ -434,9 +434,9 @@ fn create_test_code(
                         // test awaited to succeed and parsing failed?
                         Err(err) => {
                             out.write_all(format!("{err}").as_bytes()).unwrap();
-                            if todo { 
+                            if todo {
                                 let _ = fs::hard_link("images/todo.png", banner);
-                            } else { 
+                            } else {
                                 let _ = fs::hard_link("images/fail.png", banner);
                                 panic!("ERROR: {err}")
                             }
@@ -444,8 +444,8 @@ fn create_test_code(
                         // test awaited to succeed and parsing succeeds?
                         Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = EvalContext::from_source_file_capture_output(source.clone());
-                            let eval = source.eval(&mut context);                        
+                            let mut context = EvalContext::from_source_file_capture_output(source.clone(), vec![]);
+                            let eval = source.eval(&mut context);
                             let diag = context.diag_handler();
 
                             // get print output

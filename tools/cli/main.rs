@@ -41,7 +41,7 @@ enum Commands {
         /// Input µcad file
         input: std::path::PathBuf,
         /// Paths to search for files
-        #[arg(short = 'I', long = "input", action = clap::ArgAction::Append)]
+        #[arg(short = 'I', long = "input", action = clap::ArgAction::Append, default_value = "./lib")]
         input_path: Vec<std::path::PathBuf>,
     },
 

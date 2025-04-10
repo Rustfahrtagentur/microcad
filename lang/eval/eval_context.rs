@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, rc_mut::*, resolve::*, syntax::*, Id};
+use crate::{Id, diag::*, eval::*, rc_mut::*, resolve::*, syntax::*};
 
 /// Context for evaluation
 ///
@@ -164,16 +164,16 @@ impl EvalContext {
                 // load source file
                 let source_file = SourceFile::load(path.clone())?;
                 // resolve source file
-                let node = source_file.resolve(Some(self.symbols.clone()));
+                let node = source_file.resolve(None);
                 // add to source cache
                 self.source_cache.insert(source_file.clone())?;
                 // search for the symbol in the new file node
                 match node.borrow().search_down(name) {
                     Some(node) => match name.last() {
-                        Some(id) => self.symbols.borrow_mut().insert(id, node),
+                        Some(id) => self.symbols.borrow_mut().insert(name, node),
                         None => todo!(),
                     },
-                    None => unreachable!(),
+                    None => unreachable!("{name}"),
                 }
             }
             _ => todo!(),

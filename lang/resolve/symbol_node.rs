@@ -1,4 +1,6 @@
-use crate::{eval::*, rc_mut::*, resolve::*, src_ref::Refer, syntax::*, value::*, Id};
+use crate::{Id, eval::*, rc_mut::*, resolve::*, syntax::*, value::*};
+
+use custom_debug::Debug;
 
 /// Symbol node
 #[derive(Debug)]
@@ -6,6 +8,7 @@ pub struct SymbolNode {
     /// Symbol definition
     pub def: SymbolDefinition,
     /// Symbol's parent node
+    #[debug(skip)]
     pub parent: Option<RcMut<SymbolNode>>,
     /// Symbol's children nodes
     pub children: SymbolMap,
@@ -38,7 +41,7 @@ impl SymbolNode {
     }
 
     /// Create a symbol node for namespace
-    pub fn new_builtin_namespace(id: Identifier) -> RcMut<SymbolNode> {
+    pub fn new_namespace(id: Identifier) -> RcMut<SymbolNode> {
         SymbolNode::new(
             SymbolDefinition::Namespace(NamespaceDefinition::new(id)),
             None,
@@ -65,8 +68,9 @@ impl SymbolNode {
         parent.borrow_mut().children.insert(id, child);
     }
 
-    pub fn insert(&mut self, id: &Identifier, node: RcMut<SymbolNode>) {
-        self.children.insert(id.id().clone(), node);
+    pub fn insert(&mut self, name: &QualifiedName, node: RcMut<SymbolNode>) {
+        eprintln!("SymbolNode: Insert {name} into {}", self.def.id());
+        todo!()
     }
 
     /// Fetch child node with an id
@@ -74,26 +78,15 @@ impl SymbolNode {
         self.children.get(id)
     }
 
-    fn get_name(&self) -> QualifiedName {
-        if let Some(parent) = &self.parent {
-            let mut name = parent.borrow().get_name();
-            name.push(Identifier(Refer::none(self.def.id())));
-            name
-        } else {
-            QualifiedName(vec![Identifier(Refer::none(self.def.id()))])
-        }
-    }
-
     /// Search in symbol tree by a path, e.g. a::b::c
-    pub fn search_down(&self, name: &QualifiedName) -> Option<RcMut<SymbolNode>> {
-        eprintln!("searching {name} in {}", self.get_name());
-        if let Some(first) = name.first() {
+    pub fn search_down(&self, path: &QualifiedName) -> Option<RcMut<SymbolNode>> {
+        if let Some(first) = path.first() {
             if let Some(child) = self.fetch(first.id()) {
-                let name = &name.remove_first();
-                if name.is_empty() {
+                let path = &path.remove_first();
+                if path.is_empty() {
                     Some(child.clone())
                 } else {
-                    child.borrow().search_down(name)
+                    child.borrow().search_down(path)
                 }
             } else {
                 None
@@ -115,6 +108,15 @@ impl SymbolNode {
             }
         } else {
             None
+        }
+    }
+}
+
+impl Eval for SymbolNode {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+        match &self.def {
+            SymbolDefinition::SourceFile(s) => s.eval(context),
+            _ => todo!(),
         }
     }
 }

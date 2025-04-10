@@ -1,3 +1,4 @@
+
 /// Circle module definition
 ///
 /// Examples:
@@ -20,7 +21,7 @@ module circle(radius: Length) {
 }
 
 /// Rectangle module definition
-/// 
+///
 /// Examples:
 /// * centered rect with width `w` and height `h`: `rect(width = 10.0mm, height = 5.0mm);`
 module rect() {
@@ -35,7 +36,7 @@ module rect() {
         x = -size / 2.0; // center x
         y = -size / 2.0; // center y
     }
-    
+
     __builtin::geo2d::rect(
             width / 1mm,
             height / 1mm,

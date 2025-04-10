@@ -13,7 +13,7 @@ impl NamespaceBuilder {
     /// Create new namespace symbol with a name
     pub fn new(id: Identifier) -> Self {
         Self {
-            namespace: SymbolNode::new_builtin_namespace(id),
+            namespace: SymbolNode::new_namespace(id),
         }
     }
 
