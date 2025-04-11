@@ -101,8 +101,8 @@ pub enum EvalError {
     FunctionCallMissingReturn,
 
     /// Symbol not found
-    #[error("Symbol not found: {0}")]
-    SymbolNotFound(QualifiedName),
+    #[error("Symbol not found: {0} in {1}")]
+    SymbolNotFound(QualifiedName, QualifiedName),
 
     /// Symbol not found (retry to load from external)
     #[error("Symbol {0} must be loaded from {1:?}")]

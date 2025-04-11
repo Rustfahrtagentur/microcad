@@ -23,9 +23,9 @@ impl SymbolDefinition {
     /// Returns ID of this definition
     pub fn id(&self) -> Id {
         match &self {
-            Self::Namespace(n) => n.name.id().clone(),
-            Self::Module(m) => m.name.id().clone(),
-            Self::Function(f) => f.name.id().clone(),
+            Self::Namespace(n) => n.id.id().clone(),
+            Self::Module(m) => m.id.id().clone(),
+            Self::Function(f) => f.id.id().clone(),
             Self::SourceFile(s) => s.namespace_name_as_str().into(),
             Self::BuiltinFunction(f) => f.id.clone(),
             Self::BuiltinModule(m) => m.id.clone(),

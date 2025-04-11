@@ -45,13 +45,13 @@ impl Body {
         for statement in statements {
             match statement {
                 Statement::Module(m) => {
-                    symbol_map.insert(m.name.id().clone(), m.resolve(parent.clone()));
+                    symbol_map.insert(m.id.id().clone(), m.resolve(parent.clone()));
                 }
                 Statement::Namespace(n) => {
-                    symbol_map.insert(n.name.id().clone(), n.resolve(parent.clone()));
+                    symbol_map.insert(n.id.id().clone(), n.resolve(parent.clone()));
                 }
                 Statement::Function(f) => {
-                    symbol_map.insert(f.name.id().clone(), f.resolve(parent.clone()));
+                    symbol_map.insert(f.id.id().clone(), f.resolve(parent.clone()));
                 }
                 _ => {}
             }

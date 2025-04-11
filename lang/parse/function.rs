@@ -9,7 +9,7 @@ impl Parse for Rc<FunctionDefinition> {
         let body = Body::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
 
         Ok(Rc::new(FunctionDefinition {
-            name,
+            id: name,
             signature,
             body,
             src_ref: pair.clone().into(),

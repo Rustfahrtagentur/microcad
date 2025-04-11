@@ -68,10 +68,10 @@ impl std::fmt::Display for Statement {
                 write!(f, "{m}")
             }
             Self::Namespace(ns) => {
-                write!(f, "{}", ns.name)
+                write!(f, "{}", ns.id)
             }
             Self::Function(_f) => {
-                write!(f, "{}", _f.name)
+                write!(f, "{}", _f.id)
             }
             Self::ModuleInit(mi) => {
                 write!(f, "{mi}")

@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, parse::*, src_ref::*, syntax::*};
+use crate::{parse::*, src_ref::*, syntax::*, Id};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
@@ -35,9 +35,15 @@ impl QualifiedName {
             false
         }
     }
+
     /// remove the first name from path
     pub fn remove_first(&self) -> Self {
         Self(self.0[1..].to_vec())
+    }
+
+    /// Append identifier to name
+    pub fn push(&mut self, id: Identifier) {
+        self.0.push(id)
     }
 
     /// Split name into first id and the rest

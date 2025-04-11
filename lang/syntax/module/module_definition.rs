@@ -9,7 +9,7 @@ use crate::{eval::*, src_ref::*, syntax::*, value::Value};
 #[derive(Clone, Debug)]
 pub struct ModuleDefinition {
     /// Module name
-    pub name: Identifier,
+    pub id: Identifier,
     /// Module parameters (implicit initialization)
     pub parameters: ParameterList,
     /// Module body
@@ -74,7 +74,7 @@ impl std::fmt::Display for ModuleDefinition {
         write!(
             f,
             "module {name}({parameters}) {body}",
-            name = self.name,
+            name = self.id,
             parameters = self.parameters,
             body = self.body
         )
@@ -83,7 +83,7 @@ impl std::fmt::Display for ModuleDefinition {
 
 impl PrintSyntax for ModuleDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.name)?;
+        writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
         self.parameters.print_syntax(f, depth + 1)?;
         self.body.print_syntax(f, depth + 1)
     }

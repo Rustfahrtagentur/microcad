@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, diag::*, eval::*, rc_mut::*, resolve::*, syntax::*};
+use crate::{diag::*, eval::*, rc_mut::*, resolve::*, syntax::*, Id};
 
 /// Context for evaluation
 ///
@@ -10,10 +10,10 @@ use crate::{Id, diag::*, eval::*, rc_mut::*, resolve::*, syntax::*};
 pub struct EvalContext {
     /// Tree of all evaluated symbols
     symbols: RcMut<SymbolNode>,
+    /// Current node while evaluation
+    pub current: RcMut<SymbolNode>,
     /// Stack of currently opened scopes with local symbols while evaluation
     scope_stack: ScopeStack,
-    /// current node while evaluation
-    current: RcMut<SymbolNode>,
     /// Source file cache containing all source files loaded in the context
     source_cache: SourceCache,
     /// Source file diagnostics
@@ -54,7 +54,7 @@ impl EvalContext {
                 SourceCache::new(source_file.clone(), search_paths),
                 SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
             ),
-            _ => unreachable!(),
+            _ => unreachable!("missing root source file"),
         };
 
         let namespaces = source_cache.create_namespaces();
@@ -98,15 +98,6 @@ impl EvalContext {
         self.scope_stack.add(id, LocalDefinition::Value(value));
     }
 
-    /// Return reference to the symbols node which is currently processed
-    pub fn current_node(&self) -> RcMut<SymbolNode> {
-        self.symbols.clone()
-    }
-    /// Return a mutable reference to the symbols node which is currently processed
-    pub fn current_node_mut(&mut self) -> RcMut<SymbolNode> {
-        self.symbols.clone()
-    }
-
     /// Add symbol to current symbol table
     pub fn add_symbol(&mut self, symbol: RcMut<SymbolNode>) {
         SymbolNode::insert_child(&self.symbols, symbol);
@@ -123,11 +114,14 @@ impl EvalContext {
     }
 
     /// fetch symbol from symbol table
-    pub fn fetch_symbol(&self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
-        if let Some(child) = SymbolNode::search_up(&self.current_node().borrow(), &name.clone()) {
+    pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+        if let Some(child) = self.current.borrow().search_up(&qualified_name.clone()) {
             Ok(child)
         } else {
-            Err(super::EvalError::SymbolNotFound(name.clone()))
+            Err(super::EvalError::SymbolNotFound(
+                qualified_name.clone(),
+                self.current.borrow().name()?,
+            ))
         }
     }
 
@@ -161,7 +155,7 @@ impl EvalContext {
         eprintln!("using symbol {name} in {}", self.current.borrow().def.id());
         // search for name upwards in symbol tree
         if let Some(child) = self.current.borrow().search_up(name) {
-            SymbolNode::insert_child(&self.symbols, child);
+            SymbolNode::insert_child(&self.current, child);
             return Ok(());
         }
         // if symbol could not be found in symbol tree, try to load it from external file
@@ -180,7 +174,10 @@ impl EvalContext {
             }
             _ => todo!(),
         }
-        Err(EvalError::SymbolNotFound(name.clone()))
+        Err(EvalError::SymbolNotFound(
+            name.clone(),
+            self.current.borrow().name()?,
+        ))
     }
 
     /// look up a symbol name in either local variables or symbol table

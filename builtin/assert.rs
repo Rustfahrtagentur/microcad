@@ -40,7 +40,8 @@ pub fn assert_invalid() -> RcMut<SymbolNode> {
                 context.error(SrcRef(None), EvalError::LocalNotFound(name))?;
             }
             Ok(LookUp::Symbol(name)) => {
-                context.error(SrcRef(None), EvalError::SymbolNotFound(name))?;
+                let within = context.current.borrow().name()?;
+                context.error(SrcRef(None), EvalError::SymbolNotFound(name, within))?;
             }
             _ => (),
         };

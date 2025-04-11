@@ -9,7 +9,7 @@ use crate::{src_ref::*, syntax::*};
 #[derive(Debug)]
 pub struct FunctionDefinition {
     /// Name of the function
-    pub name: Identifier,
+    pub id: Identifier,
     /// Function signature
     pub signature: FunctionSignature,
     /// Function body
@@ -33,7 +33,7 @@ impl FunctionDefinition {
         src_ref: SrcRef,
     ) -> Self {
         Self {
-            name,
+            id: name,
             signature,
             body,
             src_ref,
@@ -43,7 +43,7 @@ impl FunctionDefinition {
 
 impl PrintSyntax for FunctionDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}FunctionDefinition '{}':", "", self.name)?;
+        writeln!(f, "{:depth$}FunctionDefinition '{}':", "", self.id)?;
         writeln!(f, "{:depth$} Signature:", "")?;
         self.signature.print_syntax(f, depth + 2)?;
         writeln!(f, "{:depth$} Body:", "")?;

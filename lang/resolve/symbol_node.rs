@@ -1,4 +1,4 @@
-use crate::{Id, eval::*, rc_mut::*, resolve::*, syntax::*, value::*};
+use crate::{eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*, Id};
 
 use custom_debug::Debug;
 
@@ -68,6 +68,24 @@ impl SymbolNode {
         parent.borrow_mut().children.insert(id, child);
     }
 
+    /// Get id of the definition in this node
+    pub fn id(&self) -> Id {
+        self.def.id()
+    }
+
+    /// Get fully qualified name
+    pub fn name(&self) -> EvalResult<QualifiedName> {
+        let id = Identifier(Refer::none(self.id()));
+        match &self.parent {
+            Some(parent) => {
+                let mut name = parent.borrow().name()?.clone();
+                name.push(id);
+                Ok(name)
+            }
+            None => Ok(QualifiedName(vec![id])),
+        }
+    }
+
     /// Insert a child at the correct sub node
     pub fn insert(&mut self, name: &QualifiedName, node: RcMut<SymbolNode>) {
         eprintln!("SymbolNode: Insert {name} into {}", self.def.id());
@@ -120,11 +138,6 @@ impl SymbolNode {
         } else {
             None
         }
-    }
-
-    /// Get id of the definition in this node
-    pub fn id(&self) -> Id {
-        self.def.id()
     }
 }
 

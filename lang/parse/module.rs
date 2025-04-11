@@ -22,7 +22,7 @@ impl Parse for Rc<ModuleDefinition> {
         }
 
         Ok(Rc::new(ModuleDefinition {
-            name,
+            id: name,
             parameters,
             body,
             src_ref: pair.into(),
