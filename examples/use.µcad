@@ -1,1 +1,3 @@
 use std::geo2d::circle;
+
+circle(radius=1);

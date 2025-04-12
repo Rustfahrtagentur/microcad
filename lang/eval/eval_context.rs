@@ -170,15 +170,15 @@ impl EvalContext {
                 self.source_cache.insert(source_file.clone())?;
                 // insert node into symbols
                 self.symbols.borrow_mut().insert(&name, node);
-
-                debug!("\n{}", self.symbols.borrow());
+                debug!("loaded {name} successfully");
+                Ok(())
             }
-            _ => todo!(),
+            Ok(_) => Ok(()),
+            _ => Err(EvalError::SymbolNotFound(
+                name.clone(),
+                self.current.borrow().name()?,
+            )),
         }
-        Err(EvalError::SymbolNotFound(
-            name.clone(),
-            self.current.borrow().name()?,
-        ))
     }
 
     /// look up a symbol name in either local variables or symbol table
