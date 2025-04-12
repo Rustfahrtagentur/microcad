@@ -7,7 +7,10 @@ extern crate clap;
 extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{eval::*, objects::*, parse::ParseResult, rc_mut::*, resolve::*, syntax::*};
+use log::*;
+use microcad_lang::{
+    env_logger_init, eval::*, objects::*, parse::ParseResult, rc_mut::*, resolve::*, syntax::*,
+};
 use std::io::Write;
 
 /// µcad cli
@@ -57,6 +60,8 @@ enum Commands {
 
 /// Main of the command line interpreter
 fn main() {
+    env_logger_init();
+
     let cli = Cli::parse();
 
     let start = std::time::Instant::now();
@@ -65,7 +70,7 @@ fn main() {
         eprintln!("{err}")
     }
 
-    println!("Processing Time: {:?}", start.elapsed());
+    info!("Processing Time: {:?}", start.elapsed());
 }
 
 fn run(cli: &Cli) -> anyhow::Result<()> {
@@ -126,13 +131,13 @@ main();
 
 fn parse(input: impl AsRef<std::path::Path>) -> ParseResult<Rc<SourceFile>> {
     let source_file = SourceFile::load(input)?;
-    eprintln!("Parsed successfully!");
+    info!("Parsed successfully!");
     Ok(source_file)
 }
 
 fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<RcMut<SymbolNode>> {
     let symbol_node = parse(input)?.resolve(None);
-    eprintln!("Resolved successfully!");
+    info!("Resolved successfully!");
     Ok(symbol_node)
 }
 
@@ -153,7 +158,7 @@ fn eval(
 
     println!("{result}");
 
-    eprintln!("Evaluated successfully!");
+    info!("Evaluated successfully!");
     todo!();
 }
 

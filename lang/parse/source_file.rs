@@ -1,4 +1,5 @@
 use crate::{parse::*, parser::*};
+use log::*;
 use std::{io::Read, str::FromStr};
 
 impl SourceFile {
@@ -18,11 +19,11 @@ impl SourceFile {
 
         source_file.filename = path.as_ref().to_path_buf();
 
-        println!(
+        info!(
             "loaded file {} successfully",
             path.as_ref().to_string_lossy()
         );
-        eprintln!("Syntax:\n{}", FormatSyntax(&source_file));
+        debug!("Syntax:\n{}", FormatSyntax(&source_file));
 
         Ok(std::rc::Rc::new(source_file))
     }
@@ -39,7 +40,7 @@ impl SourceFile {
 
         source_file.filename = std::path::PathBuf::from_str("<from_str>").expect("filename error");
 
-        println!("loaded string successfully",);
+        debug!("loaded string successfully",);
 
         Ok(std::rc::Rc::new(source_file))
     }

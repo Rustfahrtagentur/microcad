@@ -1,6 +1,6 @@
 use crate::{eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*, Id};
-
 use custom_debug::Debug;
+use log::*;
 
 /// Symbol node
 #[derive(Debug)]
@@ -88,7 +88,7 @@ impl SymbolNode {
 
     /// Insert a child at the correct sub node
     pub fn insert(&mut self, name: &QualifiedName, node: RcMut<SymbolNode>) {
-        eprintln!("SymbolNode: Insert {name} into {}", self.def.id());
+        debug!("SymbolNode: Insert {name} into {}", self.def.id());
         let (first, name) = name.split_first();
         if !name.is_empty() {
             if let Some(child) = self.children.get(first.id()) {
@@ -106,7 +106,7 @@ impl SymbolNode {
 
     /// Search in symbol tree by a path, e.g. a::b::c
     pub fn search_down(&self, name: &QualifiedName) -> Option<RcMut<SymbolNode>> {
-        eprintln!("search_down {name} in {}", self.id());
+        debug!("search_down {name} in {}", self.id());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first.id()) {
                 let name = &name.remove_first();
@@ -116,11 +116,11 @@ impl SymbolNode {
                     child.borrow().search_down(name)
                 }
             } else {
-                eprintln!("search_down no child in {}", self.id());
+                debug!("search_down no child in {}", self.id());
                 None
             }
         } else {
-            eprintln!("search_down no first in {name}");
+            debug!("search_down no first in {name}");
             None
         }
     }

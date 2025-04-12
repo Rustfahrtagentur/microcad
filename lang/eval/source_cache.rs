@@ -4,6 +4,7 @@
 //! Source file cache
 
 use crate::{eval::*, rc_mut::*, src_ref::*, syntax::*};
+use log::*;
 
 /// Register of loaded source files
 #[derive(Default)]
@@ -45,7 +46,7 @@ impl SourceCache {
         let hash = source_file.hash();
         let filename = source_file.filename.clone();
         let index = self.source_files.len();
-        eprintln!("caching [{index}] {name} {hash:#x} {filename:?}");
+        debug!("caching [{index}] {name} {hash:#x} {filename:?}");
         self.source_files.push(source_file);
         self.by_hash.insert(hash, index);
         self.by_path.insert(filename, index);

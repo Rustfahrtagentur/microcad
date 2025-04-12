@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{diag::*, eval::*, rc_mut::*, resolve::*, syntax::*, Id};
+use log::*;
 
 /// Context for evaluation
 ///
@@ -39,7 +40,7 @@ impl EvalContext {
         search_paths: Vec<std::path::PathBuf>,
         output: Option<Output>,
     ) -> Self {
-        println!(
+        debug!(
             "Creating Context (search paths: {})",
             search_paths
                 .iter()
@@ -152,7 +153,7 @@ impl EvalContext {
 
     /// Find a symbol in the symbol table and add it at the currently processed node
     pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<()> {
-        eprintln!("using symbol {name} in {}", self.current.borrow().def.id());
+        debug!("using symbol {name} in {}", self.current.borrow().def.id());
         // search for name upwards in symbol tree
         if let Some(child) = self.current.borrow().search_up(name) {
             SymbolNode::insert_child(&self.current, child);
@@ -170,7 +171,7 @@ impl EvalContext {
                 // insert node into symbols
                 self.symbols.borrow_mut().insert(&name, node);
 
-                eprintln!("{}", self.symbols.borrow());
+                debug!("\n{}", self.symbols.borrow());
             }
             _ => todo!(),
         }

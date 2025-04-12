@@ -4,6 +4,7 @@
 //! External files register
 
 use crate::{eval::*, rc_mut::RcMut, syntax::*};
+use log::*;
 
 /// External files register
 #[derive(Debug, Default)]
@@ -38,7 +39,7 @@ impl Externals {
             return None;
         }
 
-        println!("Name: {name}");
+        debug!("Name: {name}");
 
         let node_id = name.first().expect("Non-empty qualified name");
 
@@ -72,7 +73,7 @@ impl Externals {
     pub fn get_name(&self, path: &std::path::Path) -> EvalResult<&QualifiedName> {
         match self.0.iter().find(|(_, p)| p.as_path() == path) {
             Some((name, _)) => {
-                eprintln!("get_name({path:?}) = {name}");
+                debug!("get_name({path:?}) = {name}");
 
                 Ok(name)
             }
@@ -163,17 +164,13 @@ fn resolve_external_file() {
 
     println!("{externals}");
 
-    assert!(
-        externals
-            .fetch_external(&"std::geo2d::circle".into())
-            .is_ok()
-    );
+    assert!(externals
+        .fetch_external(&"std::geo2d::circle".into())
+        .is_ok());
 
-    assert!(
-        externals
-            .fetch_external(&"non_std::geo2d::circle".into())
-            .is_err()
-    );
+    assert!(externals
+        .fetch_external(&"non_std::geo2d::circle".into())
+        .is_err());
 }
 
 #[test]
