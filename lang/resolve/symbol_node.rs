@@ -1,4 +1,4 @@
-use crate::{eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*, Id};
+use crate::{Id, eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
 use log::*;
 

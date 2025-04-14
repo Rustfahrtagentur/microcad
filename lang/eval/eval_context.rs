@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, rc_mut::*, resolve::*, syntax::*, Id};
+use crate::{Id, diag::*, eval::*, rc_mut::*, resolve::*, syntax::*};
 use log::*;
 
 /// Context for evaluation
@@ -10,7 +10,7 @@ use log::*;
 /// A context is essentially a stack of symbol tables
 pub struct EvalContext {
     /// Tree of all evaluated symbols
-    symbols: RcMut<SymbolNode>,
+    symbols: SymbolMap,
     /// Current node while evaluation
     pub current: RcMut<SymbolNode>,
     /// Stack of currently opened scopes with local symbols while evaluation
@@ -36,7 +36,7 @@ pub enum LookUp {
 impl EvalContext {
     /// Create a new context from a source file
     pub fn new(
-        symbols: RcMut<SymbolNode>,
+        symbol: RcMut<SymbolNode>,
         search_paths: Vec<std::path::PathBuf>,
         output: Option<Output>,
     ) -> Self {
@@ -50,7 +50,7 @@ impl EvalContext {
         );
 
         // if node owns a source file store this in the file cache
-        let (source_cache, current) = match &symbols.borrow().def {
+        let (source_cache, current) = match &symbol.borrow().def {
             SymbolDefinition::SourceFile(source_file) => (
                 SourceCache::new(source_file.clone(), search_paths),
                 SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
@@ -58,10 +58,15 @@ impl EvalContext {
             _ => unreachable!("missing root source file"),
         };
 
+        let mut symbols = SymbolMap::new();
         let namespaces = source_cache.create_namespaces();
         namespaces.iter().for_each(|(_, namespace)| {
-            SymbolNode::insert_child(&symbols, namespace.clone());
+            symbols.insert(namespace.borrow().id(), namespace.clone());
         });
+
+        symbols.insert(current.borrow().id(), current.clone());
+
+        trace!("Symbols:\n{symbols:#?}");
 
         Self {
             source_cache,
@@ -101,7 +106,7 @@ impl EvalContext {
 
     /// Add symbol to current symbol table
     pub fn add_symbol(&mut self, symbol: RcMut<SymbolNode>) {
-        SymbolNode::insert_child(&self.symbols, symbol);
+        self.symbols.insert(symbol.borrow().id(), symbol.clone());
     }
 
     /// Open a new scope
@@ -169,7 +174,7 @@ impl EvalContext {
                 // add to source cache
                 self.source_cache.insert(source_file.clone())?;
                 // insert node into symbols
-                self.symbols.borrow_mut().insert(&name, node);
+                //self.symbols.insert(name, node);
                 debug!("loaded {name} successfully");
                 Ok(())
             }
