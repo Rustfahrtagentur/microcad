@@ -6,7 +6,7 @@
 use crate::{eval::*, rc_mut::*, src_ref::*, syntax::*};
 use log::*;
 
-/// Register of loaded source files
+/// Register of loaded source files and their syntax trees
 #[derive(Default)]
 pub struct SourceCache {
     /// External files read from search path

@@ -19,28 +19,30 @@ impl std::ops::DerefMut for SymbolMap {
 }
 
 impl SymbolMap {
+    /// Create symbol new map
     pub fn new() -> Self {
         Self(Default::default())
     }
 
+    /// search for a symbol in symbol map
     pub fn search(&self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
         let (id, name) = name.split_first();
 
         if let Some(symbol) = self.get(id.id()) {
             if let Some(symbol) = symbol.borrow().search_down(&name) {
-                return Ok(symbol.clone());
+                Ok(symbol.clone())
             } else {
-                todo!("error")
+                Err(EvalError::SymbolNotFound(name, id.into()))
             }
+        } else {
+            todo!("error")
         }
-
-        todo!("error")
     }
 }
 
 impl std::fmt::Display for SymbolMap {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for (id, symbol) in self.0.iter() {
+        for (_, symbol) in self.0.iter() {
             write!(f, "{symbol}")?;
         }
 

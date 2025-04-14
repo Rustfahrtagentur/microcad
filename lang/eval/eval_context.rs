@@ -1,21 +1,21 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, diag::*, eval::*, rc_mut::*, resolve::*, syntax::*};
+use crate::{diag::*, eval::*, rc_mut::*, resolve::*, syntax::*, Id};
 use log::*;
 
 /// Context for evaluation
 ///
 /// The context is used to store the current state of the evaluation.
-/// A context is essentially a stack of symbol tables
+/// A context is essentially a pile of symbol tables
 pub struct EvalContext {
-    /// Tree of all evaluated symbols
+    /// List of all global symbols
     symbols: SymbolMap,
     /// Current node while evaluation
     pub current: RcMut<SymbolNode>,
     /// Stack of currently opened scopes with local symbols while evaluation
     scope_stack: ScopeStack,
-    /// Source file cache containing all source files loaded in the context
+    /// Source file cache containing all source files loaded in the context and their syntax trees
     source_cache: SourceCache,
     /// Source file diagnostics
     diag_handler: DiagHandler,
@@ -58,16 +58,20 @@ impl EvalContext {
             _ => unreachable!("missing root source file"),
         };
 
+        // prepare symbol map
         let mut symbols = SymbolMap::new();
+
+        // create namespaces for all files in search paths into symbol map
         let namespaces = source_cache.create_namespaces();
         namespaces.iter().for_each(|(_, namespace)| {
             symbols.insert(namespace.borrow().id(), namespace.clone());
         });
 
+        // insert root file into symbol map
         symbols.insert(current.borrow().id(), current.clone());
-
         trace!("Symbols:\n{symbols}");
 
+        // put all together
         Self {
             source_cache,
             symbols,
@@ -99,12 +103,12 @@ impl EvalContext {
         )
     }
 
-    /// Add a local value
+    /// Add a local value to scope stack
     pub fn add_local_value(&mut self, id: Id, value: Value) {
         self.scope_stack.add(id, LocalDefinition::Value(value));
     }
 
-    /// Add symbol to current symbol table
+    /// Add symbol to symbol map
     pub fn add_symbol(&mut self, symbol: RcMut<SymbolNode>) {
         self.symbols.insert(symbol.borrow().id(), symbol.clone());
     }
@@ -157,15 +161,18 @@ impl EvalContext {
     }
 
     /// Find a symbol in the symbol table and add it at the currently processed node
+    /// (also loads an external symbol if not already loaded)
     pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
         let symbol = self.current.borrow().search_up(name);
         match symbol {
             Some(symbol) => Ok(symbol.clone()),
-            _ => self.lookup_name(name),
+            _ => self.load_symbol(name),
         }
     }
 
-    pub fn lookup_name(&mut self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+    /// lookup a symbol from a qualified name
+    /// (also loads an external symbol if not already loaded)
+    pub fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
         debug!("using symbol {name} in {}", self.current.borrow().def.id());
 
         // if symbol could not be found in symbol tree, try to load it from external file
@@ -191,17 +198,17 @@ impl EvalContext {
             }
         }
 
+        // get symbol from symbol map
         let symbol = self.symbols.search(name)?;
         // insert node into symbols
         self.current.borrow_mut().insert(name, symbol.clone());
 
         trace!("Symbols:\n{}", self.symbols);
-
         Ok(symbol)
     }
 
     /// look up a symbol name in either local variables or symbol table
-    pub fn look_up(&self, name: &QualifiedName) -> LookUp {
+    pub fn lookup(&self, name: &QualifiedName) -> LookUp {
         let id: Result<Id, _> = name.clone().try_into();
         if let Ok(id) = id {
             if self.fetch_local(&id).is_ok() {

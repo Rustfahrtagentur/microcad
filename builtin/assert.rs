@@ -52,7 +52,7 @@ pub fn assert_invalid() -> RcMut<SymbolNode> {
 fn look_up(arg: &CallArgument, context: &mut EvalContext) -> EvalResult<LookUp> {
     if let Expression::Nested(nested) = &arg.value {
         if let Some(name) = nested.single_qualified_name() {
-            match context.look_up(&name) {
+            match context.lookup(&name) {
                 LookUp::Symbol(name) => Ok(LookUp::Symbol(name)),
                 LookUp::Local(id) => Ok(LookUp::Local(id)),
                 _ => Err(EvalError::LookUpFailed(arg.value.clone())),

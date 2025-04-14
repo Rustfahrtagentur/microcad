@@ -68,6 +68,7 @@ impl SymbolNode {
         parent.borrow_mut().children.insert(id, child);
     }
 
+    /// copy (clone) all children of the other into self
     pub fn copy_children(&mut self, other: RcMut<SymbolNode>) {
         other.borrow().children.iter().for_each(|(id, child)| {
             self.children.insert(id.clone(), child.clone());

@@ -122,6 +122,12 @@ impl TryFrom<&str> for QualifiedName {
     }
 }
 
+impl From<Identifier> for QualifiedName {
+    fn from(id: Identifier) -> Self {
+        QualifiedName(vec![id])
+    }
+}
+
 impl From<QualifiedName> for String {
     fn from(value: QualifiedName) -> Self {
         join_identifiers(&value.0, "::")
