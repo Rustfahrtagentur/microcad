@@ -66,7 +66,7 @@ impl EvalContext {
 
         symbols.insert(current.borrow().id(), current.clone());
 
-        trace!("Symbols:\n{symbols:#?}");
+        trace!("Symbols:\n{symbols}");
 
         Self {
             source_cache,
@@ -157,13 +157,17 @@ impl EvalContext {
     }
 
     /// Find a symbol in the symbol table and add it at the currently processed node
-    pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<()> {
-        debug!("using symbol {name} in {}", self.current.borrow().def.id());
-        // search for name upwards in symbol tree
-        if let Some(child) = self.current.borrow().search_up(name) {
-            SymbolNode::insert_child(&self.current, child);
-            return Ok(());
+    pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+        let symbol = self.current.borrow().search_up(name);
+        match symbol {
+            Some(symbol) => Ok(symbol.clone()),
+            _ => self.lookup_name(name),
         }
+    }
+
+    pub fn lookup_name(&mut self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+        debug!("using symbol {name} in {}", self.current.borrow().def.id());
+
         // if symbol could not be found in symbol tree, try to load it from external file
         match self.source_cache.get_by_name(name) {
             Err(EvalError::SymbolMustBeLoaded(_, path)) => {
@@ -193,7 +197,7 @@ impl EvalContext {
 
         trace!("Symbols:\n{}", self.symbols);
 
-        Ok(())
+        Ok(symbol)
     }
 
     /// look up a symbol name in either local variables or symbol table
