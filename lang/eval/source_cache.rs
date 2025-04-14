@@ -41,7 +41,7 @@ impl SourceCache {
     /// Insert a new source file into source register
     /// - `name`: Qualified name which represents the file
     /// - `source_file`: The loaded source file to store
-    pub fn insert(&mut self, source_file: Rc<SourceFile>) -> EvalResult<()> {
+    pub fn insert(&mut self, source_file: Rc<SourceFile>) -> EvalResult<QualifiedName> {
         let name = self.externals.get_name(&source_file.filename)?;
         let hash = source_file.hash();
         let filename = source_file.filename.clone();
@@ -51,7 +51,7 @@ impl SourceCache {
         self.by_hash.insert(hash, index);
         self.by_path.insert(filename, index);
         self.by_name.insert(name.clone(), index);
-        Ok(())
+        Ok(name.clone())
     }
 
     /// Convenience function to get a source file by from a `SrcReferrer`

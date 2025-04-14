@@ -166,13 +166,19 @@ impl EvalContext {
         }
         // if symbol could not be found in symbol tree, try to load it from external file
         match self.source_cache.get_by_name(name) {
-            Err(EvalError::SymbolMustBeLoaded(name, path)) => {
+            Err(EvalError::SymbolMustBeLoaded(_, path)) => {
                 // load source file
                 let source_file = SourceFile::load(path.clone())?;
+                // add to source cache
+                let source_name = self.source_cache.insert(source_file.clone())?;
                 // resolve source file
                 let node = source_file.resolve(None);
-                // add to source cache
-                self.source_cache.insert(source_file.clone())?;
+                debug!("source_name: {source_name}");
+                let geo2d = self.symbols.search(&source_name)?;
+                geo2d.borrow_mut().copy_children(node);
+                trace!("root:\n{:#?}", self.symbols);
+
+                //let circle = self.symbols.borrow().search_down(name)?;
                 // insert node into symbols
                 //self.symbols.insert(name, node);
                 debug!("loaded {name} successfully");
