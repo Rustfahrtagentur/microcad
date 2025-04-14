@@ -4,9 +4,11 @@
 //! external file loading and symbol tree resolving
 
 mod symbol_definition;
+mod symbol_map;
 mod symbol_node;
 
 pub use symbol_definition::*;
+pub use symbol_map::*;
 pub use symbol_node::*;
 
 use crate::{rc_mut::*, syntax::*};

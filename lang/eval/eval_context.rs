@@ -173,23 +173,27 @@ impl EvalContext {
                 let source_name = self.source_cache.insert(source_file.clone())?;
                 // resolve source file
                 let node = source_file.resolve(None);
-                debug!("source_name: {source_name}");
-                let geo2d = self.symbols.search(&source_name)?;
-                geo2d.borrow_mut().copy_children(node);
-                trace!("root:\n{:#?}", self.symbols);
-
-                //let circle = self.symbols.borrow().search_down(name)?;
-                // insert node into symbols
-                //self.symbols.insert(name, node);
-                debug!("loaded {name} successfully");
-                Ok(())
+                // search namespace to place loaded source file into
+                let target = self.symbols.search(&source_name)?;
+                // copy children into target namespace
+                target.borrow_mut().copy_children(node);
             }
-            Ok(_) => Ok(()),
-            _ => Err(EvalError::SymbolNotFound(
-                name.clone(),
-                self.current.borrow().name()?,
-            )),
+            Ok(_) => (),
+            _ => {
+                return Err(EvalError::SymbolNotFound(
+                    name.clone(),
+                    self.current.borrow().name()?,
+                ));
+            }
         }
+
+        let symbol = self.symbols.search(name)?;
+        // insert node into symbols
+        self.current.borrow_mut().insert(name, symbol.clone());
+
+        trace!("Symbols:\n{}", self.symbols);
+
+        Ok(())
     }
 
     /// look up a symbol name in either local variables or symbol table

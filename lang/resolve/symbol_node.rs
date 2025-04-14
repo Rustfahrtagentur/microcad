@@ -1,5 +1,3 @@
-use std::ops::{Deref, DerefMut};
-
 use crate::{Id, eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
 use log::*;
@@ -164,49 +162,17 @@ impl std::fmt::Display for SymbolNode {
     }
 }
 
+impl std::fmt::Display for RcMut<SymbolNode> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.borrow().print_symbol(f, 0)
+    }
+}
+
 /// print symbols via std::fmt::Display
 pub struct FormatSymbol<'a>(pub &'a SymbolNode);
 
 impl std::fmt::Display for FormatSymbol<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.print_symbol(f, 0)
-    }
-}
-
-/// Map Id to SymbolNode reference
-#[derive(Debug, Default)]
-pub struct SymbolMap(std::collections::btree_map::BTreeMap<Id, RcMut<SymbolNode>>);
-
-impl Deref for SymbolMap {
-    type Target = std::collections::btree_map::BTreeMap<Id, RcMut<SymbolNode>>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl DerefMut for SymbolMap {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl SymbolMap {
-    pub fn new() -> Self {
-        Self(Default::default())
-    }
-
-    pub fn search(&self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
-        let (id, name) = name.split_first();
-
-        if let Some(symbol) = self.get(id.id()) {
-            if let Some(symbol) = symbol.borrow().search_down(&name) {
-                return Ok(symbol.clone());
-            } else {
-                todo!("error")
-            }
-        }
-
-        todo!("error")
     }
 }
