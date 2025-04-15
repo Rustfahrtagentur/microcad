@@ -1,6 +1,6 @@
 use crate::{parse::*, parser::*, rc_mut::*, syntax::*};
 
-impl Parse for Rc<NamespaceDefinition> {
+impl Parse for std::rc::Rc<NamespaceDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut pairs = pair.inner();
         Ok(Rc::new(NamespaceDefinition {

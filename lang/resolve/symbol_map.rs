@@ -2,10 +2,10 @@ use crate::{eval::*, resolve::*, syntax::*, Id};
 
 /// Map Id to SymbolNode reference
 #[derive(Debug, Default)]
-pub struct SymbolMap(std::collections::btree_map::BTreeMap<Id, RcMut<SymbolNode>>);
+pub struct SymbolMap(std::collections::btree_map::BTreeMap<Id, SymbolNodeRcMut>);
 
 impl std::ops::Deref for SymbolMap {
-    type Target = std::collections::btree_map::BTreeMap<Id, RcMut<SymbolNode>>;
+    type Target = std::collections::btree_map::BTreeMap<Id, SymbolNodeRcMut>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -25,7 +25,7 @@ impl SymbolMap {
     }
 
     /// search for a symbol in symbol map
-    pub fn search(&self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+    pub fn search(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         trace!("Searching {name} in symbol map");
         let (id, name) = name.split_first();
 

@@ -3,7 +3,7 @@
 
 //! Module body syntax element
 
-use crate::{eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 /// Module definition body
 ///
@@ -36,7 +36,7 @@ impl Body {
     /// fetches all symbols from a slice of statements
     pub fn fetch_symbol_map_from(
         statements: &[Statement],
-        parent: Option<RcMut<SymbolNode>>,
+        parent: Option<SymbolNodeRcMut>,
     ) -> SymbolMap {
         let mut symbol_map = SymbolMap::default();
         use crate::resolve::Resolve;
@@ -61,7 +61,7 @@ impl Body {
     }
 
     /// fetches all symbols from the statements in the body
-    pub fn fetch_symbol_map(&self, parent: Option<RcMut<SymbolNode>>) -> SymbolMap {
+    pub fn fetch_symbol_map(&self, parent: Option<SymbolNodeRcMut>) -> SymbolMap {
         Self::fetch_symbol_map_from(&self.statements, parent)
     }
 

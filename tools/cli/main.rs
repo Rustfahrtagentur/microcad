@@ -135,7 +135,7 @@ fn parse(input: impl AsRef<std::path::Path>) -> ParseResult<Rc<SourceFile>> {
     Ok(source_file)
 }
 
-fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<RcMut<SymbolNode>> {
+fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<SymbolNodeRcMut> {
     let symbol_node = parse(input)?.resolve(None);
     info!("Resolved successfully!");
     Ok(symbol_node)

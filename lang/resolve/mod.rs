@@ -17,27 +17,27 @@ use log::*;
 /// Trait which resolves to SymbolNode reference
 pub trait Resolve {
     /// Resolve self into SymbolNode reference
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode>;
+    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut;
 }
 
-impl Resolve for Rc<ModuleDefinition> {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+impl Resolve for std::rc::Rc<ModuleDefinition> {
+    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
         let node = SymbolNode::new(SymbolDefinition::Module(self.clone()), parent);
         node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
         node
     }
 }
 
-impl Resolve for Rc<NamespaceDefinition> {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+impl Resolve for std::rc::Rc<NamespaceDefinition> {
+    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
         let node = SymbolNode::new(SymbolDefinition::Namespace(self.clone()), parent);
         node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
         node
     }
 }
 
-impl Resolve for Rc<FunctionDefinition> {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+impl Resolve for std::rc::Rc<FunctionDefinition> {
+    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
         let node = SymbolNode::new(SymbolDefinition::Function(self.clone()), parent);
         node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
         node
@@ -45,7 +45,7 @@ impl Resolve for Rc<FunctionDefinition> {
 }
 
 impl Resolve for SymbolDefinition {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
         match self {
             Self::Module(m) => m.resolve(parent),
             Self::Namespace(n) => n.resolve(parent),
@@ -58,8 +58,8 @@ impl Resolve for SymbolDefinition {
     }
 }
 
-impl Resolve for Rc<SourceFile> {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+impl Resolve for std::rc::Rc<SourceFile> {
+    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
         debug!("resolving {}", self.filename_as_str());
         let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);
         node.borrow_mut().children = Body::fetch_symbol_map_from(&self.body, Some(node.clone()));
@@ -68,7 +68,7 @@ impl Resolve for Rc<SourceFile> {
 }
 
 impl Resolve for SourceFile {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
         let node = Rc::new(self.clone()).resolve(parent);
         debug!("Symbol:\n{}", FormatSymbol(&node.borrow()));
         node

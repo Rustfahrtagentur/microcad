@@ -9,14 +9,17 @@ pub struct SymbolNode {
     pub def: SymbolDefinition,
     /// Symbol's parent node
     #[debug(skip)]
-    pub parent: Option<RcMut<SymbolNode>>,
+    pub parent: Option<SymbolNodeRcMut>,
     /// Symbol's children nodes
     pub children: SymbolMap,
 }
 
+/// Shortcut of Rc<Cell<SymbolNode>>
+pub type SymbolNodeRcMut = RcMut<SymbolNode>;
+
 impl SymbolNode {
     /// Create new reference counted symbol node
-    pub fn new(def: SymbolDefinition, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+    pub fn new(def: SymbolDefinition, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
         RcMut::new(SymbolNode {
             def,
             parent,
@@ -25,7 +28,7 @@ impl SymbolNode {
     }
 
     /// Create a symbol node of a built-in function
-    pub fn new_builtin_fn(id: Id, f: &'static BuiltinFunctionFn) -> RcMut<SymbolNode> {
+    pub fn new_builtin_fn(id: Id, f: &'static BuiltinFunctionFn) -> SymbolNodeRcMut {
         SymbolNode::new(
             SymbolDefinition::BuiltinFunction(BuiltinFunction::new(id, f)),
             None,
@@ -33,7 +36,7 @@ impl SymbolNode {
     }
 
     /// Create a symbol node for a built-in module
-    pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> RcMut<SymbolNode> {
+    pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> SymbolNodeRcMut {
         SymbolNode::new(
             SymbolDefinition::BuiltinModule(BuiltinModule::new(id.into(), m)),
             None,
@@ -41,7 +44,7 @@ impl SymbolNode {
     }
 
     /// Create a symbol node for namespace
-    pub fn new_namespace(id: Identifier) -> RcMut<SymbolNode> {
+    pub fn new_namespace(id: Identifier) -> SymbolNodeRcMut {
         SymbolNode::new(
             SymbolDefinition::Namespace(NamespaceDefinition::new(id)),
             None,
@@ -49,7 +52,7 @@ impl SymbolNode {
     }
 
     /// Create a new build constant
-    pub fn new_builtin_constant(id: &str, value: Value) -> RcMut<SymbolNode> {
+    pub fn new_builtin_constant(id: &str, value: Value) -> SymbolNodeRcMut {
         SymbolNode::new(
             SymbolDefinition::Constant(Identifier(Refer::none(id.into())), value),
             None,
@@ -71,14 +74,14 @@ impl SymbolNode {
     }
 
     /// Insert child and change parent of child to new parent
-    pub fn insert_child(parent: &RcMut<SymbolNode>, child: RcMut<SymbolNode>) {
+    pub fn insert_child(parent: &SymbolNodeRcMut, child: SymbolNodeRcMut) {
         child.borrow_mut().parent = Some(parent.clone());
         let id = child.borrow().def.id();
         parent.borrow_mut().children.insert(id, child);
     }
 
     /// copy (clone) all children of the other into self without setting new parent
-    pub fn copy_children(&mut self, other: RcMut<SymbolNode>) {
+    pub fn copy_children(&mut self, other: SymbolNodeRcMut) {
         other.borrow().children.iter().for_each(|(id, child)| {
             self.children.insert(id.clone(), child.clone());
         });
@@ -103,12 +106,12 @@ impl SymbolNode {
     }
 
     /// Fetch child node with an id
-    pub fn get(&self, id: &Id) -> Option<&RcMut<SymbolNode>> {
+    pub fn get(&self, id: &Id) -> Option<&SymbolNodeRcMut> {
         self.children.get(id)
     }
 
     /// Search down the symbol tree for a qualified name
-    pub fn search(&self, name: &QualifiedName) -> Option<RcMut<SymbolNode>> {
+    pub fn search(&self, name: &QualifiedName) -> Option<SymbolNodeRcMut> {
         debug!("Searching {name} in {}", self.id());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first.id()) {
@@ -144,7 +147,7 @@ impl std::fmt::Display for SymbolNode {
     }
 }
 
-impl std::fmt::Display for RcMut<SymbolNode> {
+impl std::fmt::Display for SymbolNodeRcMut {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.borrow().print_symbol(f, 0)
     }

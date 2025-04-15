@@ -18,7 +18,7 @@ pub struct NamespaceDefinition {
 
 impl NamespaceDefinition {
     /// Create a new namespace definition
-    pub fn new(name: Identifier) -> Rc<Self> {
+    pub fn new(name: Identifier) -> std::rc::Rc<Self> {
         Rc::new(Self {
             id: name,
             body: Body::default(),

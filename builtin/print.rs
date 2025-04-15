@@ -3,9 +3,9 @@
 
 //! Builtin print method
 
-use microcad_lang::{eval::*, rc_mut::*, resolve::*, value::*};
+use microcad_lang::{eval::*, resolve::*, value::*};
 
-pub fn print() -> RcMut<SymbolNode> {
+pub fn print() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("print".into(), &|args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
             let value = arg.value.eval(context)?;

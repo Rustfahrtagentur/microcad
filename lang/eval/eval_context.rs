@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, rc_mut::*, resolve::*, syntax::*, Id};
+use crate::{diag::*, eval::*, resolve::*, syntax::*, Id};
 use log::*;
 
 /// Context for evaluation
@@ -12,7 +12,7 @@ pub struct EvalContext {
     /// List of all global symbols
     symbols: SymbolMap,
     /// Current node while evaluation
-    pub current: RcMut<SymbolNode>,
+    pub current: SymbolNodeRcMut,
     /// Stack of currently opened scopes with local symbols while evaluation
     scope_stack: ScopeStack,
     /// Source file cache containing all source files loaded in the context and their syntax trees
@@ -36,7 +36,7 @@ pub enum LookUp {
 impl EvalContext {
     /// Create a new context from a source file
     pub fn new(
-        symbol: RcMut<SymbolNode>,
+        symbol: SymbolNodeRcMut,
         search_paths: Vec<std::path::PathBuf>,
         output: Option<Output>,
     ) -> Self {
@@ -84,7 +84,7 @@ impl EvalContext {
 
     /// Create a new context from a source file
     pub fn from_source_file(
-        source_file: Rc<SourceFile>,
+        source_file: std::rc::Rc<SourceFile>,
         search_paths: Vec<std::path::PathBuf>,
     ) -> Self {
         Self::from_source_file_with_output(source_file, search_paths, None)
@@ -92,7 +92,7 @@ impl EvalContext {
 
     /// Create a new context from a source file
     pub fn from_source_file_with_output(
-        source_file: Rc<SourceFile>,
+        source_file: std::rc::Rc<SourceFile>,
         search_paths: Vec<std::path::PathBuf>,
         output: Option<Output>,
     ) -> Self {
@@ -109,7 +109,7 @@ impl EvalContext {
     }
 
     /// Add symbol to symbol map
-    pub fn add_symbol(&mut self, symbol: RcMut<SymbolNode>) {
+    pub fn add_symbol(&mut self, symbol: SymbolNodeRcMut) {
         self.symbols.insert(symbol.borrow().id(), symbol.clone());
     }
 
@@ -124,7 +124,7 @@ impl EvalContext {
     }
 
     /// fetch symbol from symbol table
-    pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+    pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         self.symbols.search(&qualified_name.clone())
     }
 
@@ -155,7 +155,7 @@ impl EvalContext {
 
     /// Find a symbol in the symbol table and add it at the currently processed node
     /// (also loads an external symbol if not already loaded)
-    pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+    pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         debug!("using symbol {name} in symbols");
         let symbol = self.symbols.search(name);
         match symbol {
@@ -166,7 +166,7 @@ impl EvalContext {
 
     /// lookup a symbol from a qualified name
     /// (also loads an external symbol if not already loaded)
-    pub fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+    pub fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         debug!("load symbol {name} in {}", self.current.borrow().def.id());
 
         // if symbol could not be found in symbol tree, try to load it from external file
@@ -257,7 +257,7 @@ impl PushDiag for EvalContext {
 }
 
 impl GetSourceByHash for EvalContext {
-    fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
+    fn get_by_hash(&self, hash: u64) -> EvalResult<std::rc::Rc<SourceFile>> {
         self.source_cache.get_by_hash(hash)
     }
 }

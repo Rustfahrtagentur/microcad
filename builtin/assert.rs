@@ -1,9 +1,9 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{diag::*, eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
+use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, syntax::*, value::*};
 
-pub fn assert() -> RcMut<SymbolNode> {
+pub fn assert() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert".into(), &|args, context| {
         if let Ok(arg) = args.get_single() {
             if !arg.eval_bool(context)? {
@@ -19,7 +19,7 @@ pub fn assert() -> RcMut<SymbolNode> {
     })
 }
 
-pub fn assert_valid() -> RcMut<SymbolNode> {
+pub fn assert_valid() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert_valid".into(), &|args, context| match look_up(
         args.get_single()?,
         context,
@@ -33,7 +33,7 @@ pub fn assert_valid() -> RcMut<SymbolNode> {
     })
 }
 
-pub fn assert_invalid() -> RcMut<SymbolNode> {
+pub fn assert_invalid() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert_invalid".into(), &|args, context| {
         match look_up(args.get_single()?, context) {
             Ok(LookUp::Local(name)) => {

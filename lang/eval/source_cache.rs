@@ -22,7 +22,7 @@ pub struct SourceCache {
 
 impl SourceCache {
     /// Create new source register
-    pub fn new(root: Rc<SourceFile>, search_paths: Vec<std::path::PathBuf>) -> Self {
+    pub fn new(root: std::rc::Rc<SourceFile>, search_paths: Vec<std::path::PathBuf>) -> Self {
         let mut by_hash = std::collections::HashMap::new();
         by_hash.insert(root.hash(), 0);
         Self {
@@ -41,7 +41,7 @@ impl SourceCache {
     /// Insert a new source file into source register
     /// - `name`: Qualified name which represents the file
     /// - `source_file`: The loaded source file to store
-    pub fn insert(&mut self, source_file: Rc<SourceFile>) -> EvalResult<QualifiedName> {
+    pub fn insert(&mut self, source_file: std::rc::Rc<SourceFile>) -> EvalResult<QualifiedName> {
         let name = self.externals.get_name(&source_file.filename)?;
         let hash = source_file.hash();
         let filename = source_file.filename.clone();

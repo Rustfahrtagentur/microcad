@@ -3,7 +3,7 @@
 
 //! External files register
 
-use crate::{eval::*, rc_mut::RcMut, syntax::*};
+use crate::{eval::*, syntax::*};
 use log::*;
 
 /// External files register
@@ -42,9 +42,9 @@ impl Externals {
     }
 
     fn recursive_create_namespaces(
-        parent: RcMut<SymbolNode>,
+        parent: SymbolNodeRcMut,
         name: QualifiedName,
-    ) -> Option<RcMut<SymbolNode>> {
+    ) -> Option<SymbolNodeRcMut> {
         if name.is_empty() {
             return None;
         }
