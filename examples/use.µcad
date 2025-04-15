@@ -1,3 +1,5 @@
 use std::geo2d::circle;
+use std::geo3d::sphere;
 
 circle(radius=1);
+sphere(radius=1);
