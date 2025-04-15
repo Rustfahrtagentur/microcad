@@ -1,4 +1,4 @@
-use crate::{Id, eval::*, rc_mut::*, syntax::*, value::Value};
+use crate::{eval::*, rc_mut::*, syntax::*, value::Value, Id};
 
 /// Symbol definition
 #[derive(Debug, Clone)]
@@ -16,7 +16,7 @@ pub enum SymbolDefinition {
     /// Builtin module symbol
     BuiltinModule(Rc<BuiltinModule>),
     /// Builtin constant
-    Constant(Id, Value),
+    Constant(Identifier, Value),
 }
 
 impl SymbolDefinition {
@@ -29,7 +29,7 @@ impl SymbolDefinition {
             Self::SourceFile(s) => s.namespace_name_as_str().into(),
             Self::BuiltinFunction(f) => f.id.clone(),
             Self::BuiltinModule(m) => m.id.clone(),
-            Self::Constant(id, _) => id.clone(),
+            Self::Constant(id, _) => id.id().clone(),
         }
     }
 }

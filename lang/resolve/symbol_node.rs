@@ -50,7 +50,10 @@ impl SymbolNode {
 
     /// Create a new build constant
     pub fn new_builtin_constant(id: &str, value: Value) -> RcMut<SymbolNode> {
-        SymbolNode::new(SymbolDefinition::Constant(id.into(), value), None)
+        SymbolNode::new(
+            SymbolDefinition::Constant(Identifier(Refer::none(id.into())), value),
+            None,
+        )
     }
 
     /// Print out symbols from that point
@@ -181,7 +184,9 @@ impl SrcReferrer for SymbolNode {
             SymbolDefinition::BuiltinFunction(_) | SymbolDefinition::BuiltinModule(_) => {
                 unreachable!("builtin has no source code reference")
             }
-            SymbolDefinition::Constant(compact_string, value) => value.src_ref(), // TODO: fix src ref
+            SymbolDefinition::Constant(compact_string, value) => {
+                SrcRef::merge(compact_string, value)
+            }
         }
     }
 }
