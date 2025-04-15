@@ -8,6 +8,7 @@
 
 pub mod diag;
 pub mod eval;
+pub mod module;
 pub mod objects;
 pub mod ord_map;
 pub mod parse;
