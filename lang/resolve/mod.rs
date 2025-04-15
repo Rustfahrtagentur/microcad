@@ -14,6 +14,12 @@ pub use symbol_node::*;
 use crate::{rc_mut::*, syntax::*};
 use log::*;
 
+/// Trait for items which can be fully qualified
+pub trait FullyQualify {
+    /// get a fully (up to root of symbol map) qualified name
+    fn full_name(&self) -> Option<QualifiedName>;
+}
+
 /// Trait which resolves to SymbolNode reference
 pub trait Resolve {
     /// Resolve self into SymbolNode reference

@@ -61,13 +61,11 @@ impl SymbolNode {
 
     /// Print out symbols from that point
     pub fn print_symbol(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(
-            f,
-            "{:depth$}{} [{}]",
-            "",
-            self.def,
-            self.name().expect("corrupt name?")
-        )?;
+        if let Some(name) = self.full_name() {
+            writeln!(f, "{:depth$}{} [{}]", "", self.def, name)?;
+        } else {
+            writeln!(f, "{:depth$}{}", "", self.def)?;
+        }
         self.children
             .iter()
             .try_for_each(|(_, child)| child.borrow().print_symbol(f, depth + self.def.id().len()))
@@ -92,19 +90,6 @@ impl SymbolNode {
         self.def.id()
     }
 
-    /// Get fully qualified name
-    pub fn name(&self) -> EvalResult<QualifiedName> {
-        let id = Identifier(Refer::none(self.id()));
-        match &self.parent {
-            Some(parent) => {
-                let mut name = parent.borrow().name()?;
-                name.push(id);
-                Ok(name)
-            }
-            None => Ok(QualifiedName(vec![id])),
-        }
-    }
-
     /// Fetch child node with an id
     pub fn get(&self, id: &Id) -> Option<&SymbolNodeRcMut> {
         self.children.get(id)
@@ -112,7 +97,7 @@ impl SymbolNode {
 
     /// Search down the symbol tree for a qualified name
     pub fn search(&self, name: &QualifiedName) -> Option<SymbolNodeRcMut> {
-        debug!("Searching {name} in {}", self.id());
+        trace!("Searching {name} in {}", self.id());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first.id()) {
                 let name = &name.remove_first();
@@ -122,12 +107,30 @@ impl SymbolNode {
                     child.borrow().search(name)
                 }
             } else {
-                debug!("search_down no child in {}", self.id());
+                debug!("No child in {} while searching for {name}", self.id());
                 None
             }
         } else {
-            debug!("search_down no first in {name}");
+            warn!("Cannot search for an anonymous name");
             None
+        }
+    }
+}
+
+impl FullyQualify for SymbolNode {
+    /// Get fully qualified name
+    fn full_name(&self) -> Option<QualifiedName> {
+        let id = Identifier(Refer::none(self.id()));
+        match &self.parent {
+            Some(parent) => {
+                if let Some(mut name) = parent.borrow().full_name() {
+                    name.push(id);
+                    Some(name)
+                } else {
+                    unreachable!("symbol without name?")
+                }
+            }
+            None => Some(QualifiedName(vec![id])),
         }
     }
 }

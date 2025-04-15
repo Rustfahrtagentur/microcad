@@ -9,11 +9,6 @@ use crate::{parse::*, src_ref::*, syntax::*, Id};
 pub struct QualifiedName(pub Vec<Identifier>);
 
 impl QualifiedName {
-    /// Create empty name
-    pub fn new() -> Self {
-        Self(vec![])
-    }
-
     /// If the QualifiedName only consists of a single identifier, return it
     pub fn single_identifier(&self) -> Option<&Identifier> {
         if self.0.len() == 1 {
@@ -55,7 +50,7 @@ impl QualifiedName {
     pub fn split_first(&self) -> (Identifier, QualifiedName) {
         match self.len() {
             0 => todo!("return None or error?"),
-            1 => (self.0[0].clone(), Self::new()),
+            1 => (self.0[0].clone(), Self::default()),
             _ => (self.0[0].clone(), Self(self.0[1..].into())),
         }
     }

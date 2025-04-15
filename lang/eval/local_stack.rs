@@ -12,14 +12,36 @@ pub enum LocalDefinition {
     Symbol(SymbolNodeRcMut),
 }
 
+impl FullyQualify for LocalDefinition {
+    fn full_name(&self) -> Option<QualifiedName> {
+        match self {
+            LocalDefinition::Value(_) | LocalDefinition::Expression(_) => None,
+            LocalDefinition::Symbol(rc_mut) => rc_mut.borrow().full_name(),
+        }
+    }
+}
+
+impl SrcReferrer for LocalDefinition {
+    fn src_ref(&self) -> SrcRef {
+        match self {
+            LocalDefinition::Value(value) => value.src_ref(),
+            LocalDefinition::Expression(expression) => expression.src_ref(),
+            LocalDefinition::Symbol(node) => node.borrow().src_ref(),
+        }
+    }
+}
+
 /// A stack frame is map of local variables
 #[derive(Default)]
 struct Locals(BTreeMap<Id, LocalDefinition>);
 
 impl Locals {
     fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
-        for (id, _) in self.iter() {
-            writeln!(f, "{:depth$} {id}", "")?;
+        for (id, def) in self.iter() {
+            match def.full_name() {
+                Some(name) => writeln!(f, "{:depth$} {id} [{name}]", "")?,
+                None => writeln!(f, "{:depth$} {id}", "")?,
+            }
         }
         Ok(())
     }
@@ -56,6 +78,11 @@ impl LocalStack {
 
     /// Add a new variable to current stack frame
     pub fn add(&mut self, id: Id, local: LocalDefinition) {
+        if let Some(name) = local.full_name() {
+            debug!("Adding {name} as {id} to local stack");
+        } else {
+            debug!("Adding {id} to local stack");
+        }
         if let Some(last) = self.0.last_mut() {
             last
         } else {
@@ -69,7 +96,7 @@ impl LocalStack {
 
     /// Fetch a local variable from current stack frame
     pub fn fetch<'a>(&'a self, id: &Id) -> EvalResult<&'a LocalDefinition> {
-        debug!("fetching  {id} in locals");
+        debug!("Fetching {id} from locals");
         for map in self.0.iter().rev() {
             if let Some(local) = map.get(id) {
                 return Ok(local);
