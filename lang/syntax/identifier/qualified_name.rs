@@ -128,6 +128,22 @@ impl TryFrom<&str> for QualifiedName {
     }
 }
 
+impl TryFrom<String> for QualifiedName {
+    type Error = crate::parse::ParseError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        let mut name = Vec::new();
+        for id in value.split("::").map(Identifier::try_from) {
+            if id.is_err() {
+                return Err(crate::parse::ParseError::InvalidQualifiedName(value));
+            }
+            name.push(id.expect("unexpected error"));
+        }
+
+        Ok(Self(name))
+    }
+}
+
 impl From<Identifier> for QualifiedName {
     fn from(id: Identifier) -> Self {
         QualifiedName(vec![id])

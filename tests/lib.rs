@@ -102,7 +102,8 @@ fn context_with_symbols() {
                 .expect("unexpected name error"),
         )
         .expect("symbol not found");
-    assert!(source_file.eval(&mut context).is_ok());
+    let eval = source_file.eval(&mut context);
+    assert!(eval.is_ok());
 }
 
 #[test]

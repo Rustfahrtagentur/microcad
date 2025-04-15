@@ -14,7 +14,7 @@ pub struct SymbolNode {
     pub children: SymbolMap,
 }
 
-/// Shortcut of Rc<Cell<SymbolNode>>
+/// Shortcut of `Rc<Cell<SymbolNode>>`
 pub type SymbolNodeRcMut = RcMut<SymbolNode>;
 
 impl SymbolNode {

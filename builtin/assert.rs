@@ -3,8 +3,6 @@
 
 #[cfg(test)]
 use crate::builtin_namespace;
-use log::*;
-#[cfg(test)]
 use microcad_lang::syntax::*;
 use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, value::*};
 
@@ -25,18 +23,26 @@ pub fn assert() -> SymbolNodeRcMut {
 }
 
 pub fn assert_valid() -> SymbolNodeRcMut {
-    assert_invalid()
+    SymbolNode::new_builtin_fn("assert_valid".into(), &|args, context| {
+        if let Ok(name) = args.get_single() {
+            let name = QualifiedName::try_from(name.value.to_string())?;
+            if context.lookup(&name).is_err() {
+                return Err(EvalError::SymbolNotFound(name));
+            }
+        }
+        Ok(Value::None)
+    })
 }
 
 pub fn assert_invalid() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert_invalid".into(), &|args, context| {
         if let Ok(name) = args.get_single() {
-            warn!("{}", name.value);
-            //context.lookup()?;
-            Ok(Value::None)
-        } else {
-            Err(EvalError::NotAName(args.src_ref()))
+            let name = QualifiedName::try_from(name.value.to_string())?;
+            if context.lookup(&name).is_ok() {
+                return Err(EvalError::SymbolFound(name));
+            }
         }
+        Ok(Value::None)
     })
 }
 

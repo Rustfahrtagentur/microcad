@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{Id, parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*};
+use crate::{parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*, Id};
 use thiserror::Error;
 
 /// Evaluation error
@@ -111,6 +111,10 @@ pub enum EvalError {
     /// Symbol is not a value
     #[error("Symbol does not contain a value: {0}")]
     SymbolIsNotAValue(QualifiedName),
+
+    /// Symbol was not expected to be found (e.g. assert_invalid)
+    #[error("Symbol {0} found unexpected")]
+    SymbolFound(QualifiedName),
 
     /// Local symbol not found
     #[error("Local symbol not found: {0}")]

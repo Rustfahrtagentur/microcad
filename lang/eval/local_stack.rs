@@ -54,9 +54,11 @@ impl LocalStack {
     pub fn add(&mut self, local: SymbolNodeRcMut) {
         let id = local.borrow().id();
         if let Some(name) = local.borrow().full_name() {
-            debug!("Adding {name} as {id} to local stack");
-        } else {
-            debug!("Adding {id} to local stack");
+            if name.is_qualified() {
+                debug!("Adding {name} as {id} to local stack");
+            } else {
+                debug!("Adding {id} to local stack");
+            }
         }
         if let Some(last) = self.0.last_mut() {
             last
