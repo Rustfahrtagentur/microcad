@@ -63,9 +63,11 @@ macro_rules! parameter {
         microcad_lang::parse::Parameter::new(stringify!($name).into(), None, None, SrcRef(None))
     };
     ($name:ident: $ty:ident) => {
-        microcad_lang::parse::Parameter::new(
-            stringify!($name).into(),
-            Some(microcad_lang::r#type::Type::$ty.into()),
+        microcad_lang::syntax::Parameter::new(
+            Identifier(microcad_lang::src_ref::Refer::none(
+                stringify!($name).into(),
+            )),
+            Some(microcad_lang::ty::Type::$ty.into()),
             None,
             microcad_lang::src_ref::SrcRef(None),
         )

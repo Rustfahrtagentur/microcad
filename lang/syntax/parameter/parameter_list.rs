@@ -7,7 +7,7 @@ use crate::{ord_map::*, src_ref::*, syntax::*};
 
 /// Parameter list
 #[derive(Clone, Debug, Default)]
-pub struct ParameterList(Refer<OrdMap<Identifier, Parameter>>);
+pub struct ParameterList(pub Refer<OrdMap<Identifier, Parameter>>);
 
 impl std::ops::Deref for ParameterList {
     type Target = OrdMap<Identifier, Parameter>;

@@ -7,18 +7,23 @@ pub mod algorithm;
 pub mod boolean_op;
 pub mod transform;
 
+use std::collections::BTreeMap;
+
 pub use algorithm::*;
 pub use transform::*;
 
-use crate::rc_mut::*;
+use crate::{Id, rc_mut::*, value::Value};
 use microcad_core::*;
 use strum::IntoStaticStr;
+
+/// Properties for a group node
+pub type ObjectNodeProperties = BTreeMap<Id, Value>;
 
 /// Inner of a node
 #[derive(Clone, IntoStaticStr)]
 pub enum ObjectNodeInner {
-    /// A group node that contains children
-    Group,
+    /// A group node that contains children and holds properties
+    Group(ObjectNodeProperties),
 
     /// A special node after which children will be nested as siblings
     ChildrenNodeMarker,
@@ -38,6 +43,18 @@ pub enum ObjectNodeInner {
 
     /// An export node that exports the geometry to a file
     Export(ExportSettings),
+}
+
+impl ObjectNodeInner {
+    /// Get a property from an object node
+    ///
+    /// Only Group nodes can have properties.
+    pub fn get_property_value(&self, id: &Id) -> Option<&Value> {
+        match self {
+            Self::Group(properties) => properties.get(id),
+            _ => None,
+        }
+    }
 }
 
 impl std::fmt::Debug for ObjectNodeInner {
@@ -66,9 +83,14 @@ impl std::fmt::Debug for ObjectNodeInner {
 /// Render node
 pub type ObjectNode = rctree::Node<ObjectNodeInner>;
 
-/// Create new group node
-pub fn group() -> ObjectNode {
-    ObjectNode::new(ObjectNodeInner::Group)
+/// Create new group node with properties
+pub fn group(properties: ObjectNodeProperties) -> ObjectNode {
+    ObjectNode::new(ObjectNodeInner::Group(properties))
+}
+
+/// Create new group node without properties
+pub fn empty_group() -> ObjectNode {
+    group(ObjectNodeProperties::default())
 }
 
 /// Create a new transform node
@@ -109,7 +131,7 @@ pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {
                         .expect("Children marker should have a parent");
 
                     let is_group =
-                        matches!(*children_marker_parent.borrow(), ObjectNodeInner::Group);
+                        matches!(*children_marker_parent.borrow(), ObjectNodeInner::Group(_));
 
                     if is_group {
                         // Add children to group
@@ -138,7 +160,7 @@ pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {
     if nodes[0].len() == 1 {
         nodes[0].first().expect("Node").clone()
     } else {
-        let group = group();
+        let group = group(ObjectNodeProperties::default());
         for node in &nodes[0] {
             group.append(node.clone());
         }
@@ -158,7 +180,7 @@ pub fn dump(writer: &mut dyn std::io::Write, node: ObjectNode) -> std::io::Resul
 /// Return ObjectNode if we are in a Group
 pub fn into_group(node: ObjectNode) -> Option<ObjectNode> {
     node.first_child().and_then(|n| {
-        if let ObjectNodeInner::Group = *n.borrow() {
+        if let ObjectNodeInner::Group(_) = *n.borrow() {
             Some(n.clone())
         } else {
             None
@@ -173,7 +195,7 @@ pub fn bake2d(
 ) -> core::result::Result<geo2d::Node, CoreError> {
     let node2d = {
         match *node.borrow() {
-            ObjectNodeInner::Group => geo2d::tree::group(),
+            ObjectNodeInner::Group(_) => geo2d::tree::group(),
             ObjectNodeInner::Export(_) => geo2d::tree::group(),
             ObjectNodeInner::Primitive2D(ref renderable) => {
                 return Ok(geo2d::tree::geometry(
@@ -211,7 +233,7 @@ pub fn bake3d(
 ) -> core::result::Result<geo3d::Node, CoreError> {
     let node3d = {
         match *node.borrow() {
-            ObjectNodeInner::Group => geo3d::tree::group(),
+            ObjectNodeInner::Group(_) => geo3d::tree::group(),
             ObjectNodeInner::Export(_) => geo3d::tree::group(),
             ObjectNodeInner::Primitive3D(ref renderable) => {
                 return Ok(geo3d::tree::geometry(
@@ -244,7 +266,11 @@ pub fn bake3d(
 
 #[test]
 fn node_nest() {
-    let nodes = vec![vec![group()], vec![group()], vec![group()]];
+    let nodes = vec![
+        vec![empty_group()],
+        vec![empty_group()],
+        vec![empty_group()],
+    ];
     let node = nest_nodes(nodes.clone());
 
     nodes[0][0]

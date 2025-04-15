@@ -123,6 +123,46 @@ impl Value {
         }
     }
 
+    /// Get property value for a value
+    ///
+    /// - `identifier`: Identifier of the property
+    ///
+    /// This function is used when accessing a property `p` of a value `v` with `p.v`.
+    pub fn get_property_value(&self, identifier: &Identifier) -> Option<Value> {
+        let get = |value| Some(Value::Scalar(Refer::none(value as f64)));
+        let id = identifier.id().as_str();
+        match self {
+            Value::Vec2(r) => match id {
+                "x" => get(r.value.x),
+                "y" => get(r.value.y),
+                _ => None,
+            },
+            Value::Vec3(r) => match id {
+                "x" => get(r.value.x),
+                "y" => get(r.value.y),
+                "z" => get(r.value.z),
+                _ => None,
+            },
+            Value::Vec4(r) => match id {
+                "x" => get(r.value.x),
+                "y" => get(r.value.y),
+                "z" => get(r.value.z),
+                "w" => get(r.value.w),
+                _ => None,
+            },
+            Value::Color(r) => match id {
+                "r" => get(r.value.r as f64),
+                "g" => get(r.value.g as f64),
+                "b" => get(r.value.b as f64),
+                "a" => get(r.value.a as f64),
+                _ => None,
+            },
+            Value::NamedTuple(named_tuple) => named_tuple.get(identifier).cloned(),
+            Value::Node(node) => node.borrow().get_property_value(identifier.id()).cloned(),
+            _ => None,
+        }
+    }
+
     /// Check if the value is invalid
     pub fn is_invalid(&self) -> bool {
         matches!(self, Value::None)

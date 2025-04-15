@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*, Id};
+use crate::{Id, parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*};
 use thiserror::Error;
 
 /// Evaluation error
@@ -131,6 +131,10 @@ pub enum EvalError {
     /// Multiple matching Initializers for module definition
     #[error("Multiple matching initializer for module definition `{0}`")]
     MultipleMatchingInitializer(Identifier),
+
+    /// A property of a value was not found
+    #[error("Property not found: {0}")]
+    PropertyNotFound(Identifier),
 
     /// Expected range in for loop
     #[error("Expected range in for loop, got {0}")]
