@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{parse::*, src_ref::*, syntax::*, Id};
+use crate::{src_ref::*, syntax::*};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
@@ -17,6 +17,17 @@ impl QualifiedName {
             None
         }
     }
+
+    /// Returns true if self is a qualified name with multiple ids in it
+    pub fn is_qualified(&self) -> bool {
+        self.0.len() > 1
+    }
+
+    /// Returns true if name contains exactly one id
+    pub fn is_id(&self) -> bool {
+        self.0.len() == 1
+    }
+
     /// Tells if self is in a specified namespace
     pub fn is_sub_of(&self, namespace: &QualifiedName) -> bool {
         self.starts_with(namespace)
@@ -102,13 +113,13 @@ impl From<&str> for QualifiedName {
 
 #[cfg(not(test))]
 impl TryFrom<&str> for QualifiedName {
-    type Error = ParseError;
+    type Error = crate::parse::ParseError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let mut name = Vec::new();
         for id in value.split("::").map(Identifier::try_from) {
             if id.is_err() {
-                return Err(ParseError::InvalidQualifiedName(value.into()));
+                return Err(crate::parse::ParseError::InvalidQualifiedName(value.into()));
             }
             name.push(id.expect("unexpected error"));
         }
@@ -137,16 +148,5 @@ impl PrintSyntax for QualifiedName {
             "",
             join_identifiers(&self.0, "::")
         )
-    }
-}
-
-impl TryFrom<QualifiedName> for Id {
-    type Error = ParseError;
-
-    fn try_from(qualified_name: QualifiedName) -> Result<Self, Self::Error> {
-        match qualified_name.as_slice() {
-            [identifier] => Ok(identifier.id().clone()),
-            _ => Err(ParseError::QualifiedNameIsNoId(qualified_name)),
-        }
     }
 }

@@ -24,7 +24,7 @@ pub struct EvalContext {
 /// Look up result
 pub enum LookUp {
     /// Look up failed
-    NotFound(SrcRef),
+    NotFound(QualifiedName),
     /// found local variable with given Id
     Local(Id),
     /// found global symbol with given qualified name
@@ -100,7 +100,7 @@ impl EvalContext {
         )
     }
 
-    /// Add a local value to local stack
+    /// Add a named local value to current locals
     pub fn add_local_value(&mut self, id: Id, value: Value) {
         self.local_stack.add(id, LocalDefinition::Value(value));
     }
@@ -120,7 +120,7 @@ impl EvalContext {
         self.local_stack.close_scope();
     }
 
-    /// fetch symbol from symbol table
+    /// fetch symbol from symbol map
     pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         if let Some(id) = qualified_name.single_identifier() {
             if let Ok(LocalDefinition::Symbol(symbol)) = self.fetch_local(id.id()) {
@@ -131,12 +131,12 @@ impl EvalContext {
         self.symbols.search(&qualified_name.clone())
     }
 
-    /// fetch local variable
+    /// fetch local variable from local stack
     pub fn fetch_local<'a>(&'a self, id: &Id) -> EvalResult<&'a LocalDefinition> {
         self.local_stack.fetch(id)
     }
 
-    /// fetch a value from a local variable or symbol table
+    /// fetch a value from local stack
     pub fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
         if let Some(identifier) = name.single_identifier() {
             if let Ok(LocalDefinition::Value(value)) = self.fetch_local(identifier.id()) {
@@ -144,28 +144,34 @@ impl EvalContext {
             }
         }
 
-        let symbol = self.fetch_symbol(name)?;
-
-        match &symbol.borrow().def {
+        match &self.fetch_symbol(name)?.borrow().def {
             SymbolDefinition::Constant(_, value) => Ok(value.clone()),
             _ => Err(EvalError::SymbolIsNotAValue(name.clone())),
         }
     }
 
-    /// Find a symbol in the symbol table and add it at the currently processed node
-    /// (also loads an external symbol if not already loaded)
+    /// Find a symbol in the symbol table and copy it to the locals
+    /// (might load any related external file if not already loaded)
     pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
-        debug!("using symbol {name} in symbols");
+        debug!("Using symbol {name} in symbols");
         let symbol = self.symbols.search(name);
         match symbol {
             Ok(symbol) => Ok(symbol.clone()),
-            _ => self.load_symbol(name),
+            _ => {
+                let symbol = self.load_symbol(name)?;
+                self.local_stack.add(
+                    symbol.borrow().id(),
+                    LocalDefinition::Symbol(symbol.clone()),
+                );
+                trace!("Local Stack:\n{}", self.local_stack);
+                Ok(symbol)
+            }
         }
     }
 
     /// lookup a symbol from a qualified name
-    /// (also loads an external symbol if not already loaded)
-    pub fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+    /// (might load any related external file if not already loaded)
+    fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         debug!("loading symbol {name}");
 
         // if symbol could not be found in symbol tree, try to load it from external file
@@ -189,29 +195,22 @@ impl EvalContext {
         }
 
         // get symbol from symbol map
-        let symbol = self.symbols.search(name)?;
-
-        self.local_stack.add(
-            symbol.borrow().id(),
-            LocalDefinition::Symbol(symbol.clone()),
-        );
-
-        trace!("Local Stack:\n{}", self.local_stack);
-        Ok(symbol)
+        self.symbols.search(name)
     }
 
-    /// look up a symbol name in either local variables or symbol table
+    /// Look up for local or global symbol
+    ///
+    /// If name is a single id it will be searched in the local stack or
+    /// if name is qualified searches in symbol map.
     pub fn lookup(&self, name: &QualifiedName) -> LookUp {
-        let id: Result<Id, _> = name.clone().try_into();
-        if let Ok(id) = id {
-            if self.fetch_local(&id).is_ok() {
-                return LookUp::Local(id);
+        if let Some(id) = name.single_identifier() {
+            if self.fetch_local(id.id()).is_ok() {
+                return LookUp::Local(id.id().clone());
             }
-        }
-        if self.fetch_symbol(name).is_ok() {
+        } else if self.fetch_symbol(name).is_ok() {
             return LookUp::Symbol(name.clone());
         }
-        LookUp::NotFound(name.src_ref())
+        LookUp::NotFound(name.clone())
     }
 
     /// Access diagnostic handler

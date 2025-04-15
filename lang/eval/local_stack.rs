@@ -97,6 +97,7 @@ impl LocalStack {
     /// Fetch a local variable from current stack frame
     pub fn fetch<'a>(&'a self, id: &Id) -> EvalResult<&'a LocalDefinition> {
         debug!("Fetching {id} from locals");
+        // search from inner scope to root scope to shadow outside locals
         for map in self.0.iter().rev() {
             if let Some(local) = map.get(id) {
                 return Ok(local);
