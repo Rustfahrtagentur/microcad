@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, resolve::*, syntax::*, Id};
+use crate::{Id, diag::*, eval::*, resolve::*, syntax::*};
 use log::*;
 
 /// Context for evaluation
@@ -124,13 +124,12 @@ impl EvalContext {
     pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         if let Some(id) = qualified_name.single_identifier() {
             match self.fetch_local(id.id()) {
-                Ok(LocalDefinition::Symbol(symbol)) => Ok(symbol.clone()),
-                Ok(_) => todo!(),
-                Err(_) => todo!(),
+                Ok(LocalDefinition::Symbol(symbol)) => return Ok(symbol.clone()),
+                _ => {}
             }
-        } else {
-            self.symbols.search(&qualified_name.clone())
         }
+
+        self.symbols.search(&qualified_name.clone())
     }
 
     /// fetch local variable
