@@ -44,7 +44,7 @@ impl std::fmt::Display for SymbolDefinition {
             Self::SourceFile(_) => write!(f, "{} (file)", id),
             Self::BuiltinFunction(_) => write!(f, "{} (builtin function)", id),
             Self::BuiltinModule(_) => write!(f, "{} (builtin module)", id),
-            Self::Constant(id, value) => writeln!(f, "{} (= {})", id, value),
+            Self::Constant(id, value) => write!(f, "{} (= {})", id, value),
         }
     }
 }
