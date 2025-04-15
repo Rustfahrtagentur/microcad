@@ -163,6 +163,7 @@ impl EvalContext {
     /// Find a symbol in the symbol table and add it at the currently processed node
     /// (also loads an external symbol if not already loaded)
     pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
+        debug!("using symbol {name} in {}", self.current.borrow().def.id());
         let symbol = self.current.borrow().search_up(name);
         match symbol {
             Some(symbol) => Ok(symbol.clone()),
@@ -173,7 +174,7 @@ impl EvalContext {
     /// lookup a symbol from a qualified name
     /// (also loads an external symbol if not already loaded)
     pub fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
-        debug!("using symbol {name} in {}", self.current.borrow().def.id());
+        debug!("load symbol {name} in {}", self.current.borrow().def.id());
 
         // if symbol could not be found in symbol tree, try to load it from external file
         match self.source_cache.get_by_name(name) {
