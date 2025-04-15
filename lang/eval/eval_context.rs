@@ -51,7 +51,7 @@ impl EvalContext {
         let (source_cache, source_node) = match &symbol.borrow().def {
             SymbolDefinition::SourceFile(source_file) => (
                 SourceCache::new(source_file.clone(), search_paths),
-                SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
+                symbol.clone(),
             ),
             _ => unreachable!("missing root source file"),
         };
