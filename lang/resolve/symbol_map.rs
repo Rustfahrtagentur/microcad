@@ -24,6 +24,7 @@ impl SymbolMap {
         Self(Default::default())
     }
 
+    /// insert a not by it's own id
     pub fn insert_node(&mut self, symbol: SymbolNodeRcMut) {
         let id = symbol.borrow().id();
         self.0.insert(id, symbol);
