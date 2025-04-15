@@ -368,16 +368,16 @@ fn create_test_code(
 
                     // get parameters from outside code
                     let banner = "{banner}";
-                    let out = "{out}";
+                    let out_name = "{out}";
                     #[allow(unused)]
                     let todo = {todo};
 
                     // remove generated files before updating
                     let _ = fs::remove_file(banner);
-                    let _ = fs::remove_file(out);
+                    let _ = fs::remove_file(out_name);
 
                     // create log file
-                    let out = &mut fs::File::create(out).expect("cannot create log file");
+                    let out = &mut fs::File::create(out_name).expect("cannot create log file");
                     let out = &mut io::BufWriter::new(out);
 
                     // load and handle µcad source file
@@ -420,7 +420,8 @@ fn create_test_code(
                                 // evaluation produced errors?
                                 (_,true) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
-                                }
+                                   log::debug!("there were {error_count} errors (see {out_name})", error_count = diag.error_count);
+                                 }
                                 // test expected to fail but succeeds?
                                 (_,_) => {
                                     let _ = fs::hard_link("images/ok_fail.png", banner);
@@ -474,7 +475,7 @@ fn create_test_code(
                                 // evaluation produced errors?
                                 (_,true,_) => {
                                     let _ = fs::hard_link("images/fail.png", banner);
-                                    panic!("ERROR: there were {error_count} errors", error_count = diag.error_count);
+                                    panic!("ERROR: there were {error_count} errors (see {out_name})", error_count = diag.error_count);
                                 }
                             }
                         },
