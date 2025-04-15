@@ -202,7 +202,10 @@ impl EvalContext {
         // get symbol from symbol map
         let symbol = self.symbols.search(name)?;
         // insert node into symbols
-        self.current.borrow_mut().insert(name, symbol.clone());
+        self.current.borrow_mut().children.insert(
+            name.last().expect("empty name?").id().clone(),
+            symbol.clone(),
+        );
 
         trace!("Symbols:\n{}", self.symbols);
         Ok(symbol)

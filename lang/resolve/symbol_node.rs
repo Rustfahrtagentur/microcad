@@ -74,20 +74,6 @@ impl SymbolNode {
         parent.borrow_mut().children.insert(id, child);
     }
 
-    /// Insert a child at the correct sub node
-    pub fn insert(&mut self, name: &QualifiedName, node: RcMut<SymbolNode>) {
-        debug!("SymbolNode: Insert {name} into {}", self.def.id());
-        let (first, name) = name.split_first();
-        if !name.is_empty() {
-            if let Some(child) = self.children.get(first.id()) {
-                //                node.borrow_mut().parent = Some(child.clone());
-                child.borrow_mut().insert(&name, node);
-                return;
-            }
-        }
-        self.children.insert(first.id().clone(), node);
-    }
-
     /// copy (clone) all children of the other into self without setting new parent
     pub fn copy_children(&mut self, other: RcMut<SymbolNode>) {
         other.borrow().children.iter().for_each(|(id, child)| {
