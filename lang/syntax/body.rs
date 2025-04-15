@@ -26,7 +26,7 @@ use crate::{eval::*, resolve::*, src_ref::*, syntax::*, value::*};
 /// ```
 #[derive(Clone, Debug, Default)]
 pub struct Body {
-    /// Module statements before init
+    /// Module statements
     pub statements: Vec<Statement>,
     /// Source code reference
     pub src_ref: SrcRef,
