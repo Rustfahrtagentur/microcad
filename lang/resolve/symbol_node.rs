@@ -105,7 +105,7 @@ impl SymbolNode {
         let id = Identifier(Refer::none(self.id()));
         match &self.parent {
             Some(parent) => {
-                let mut name = parent.borrow().name()?.clone();
+                let mut name = parent.borrow().name()?;
                 name.push(id);
                 Ok(name)
             }
