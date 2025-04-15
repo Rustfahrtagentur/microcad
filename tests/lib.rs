@@ -1,14 +1,17 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::thread::panicking;
-
+#[cfg(test)]
 use log::debug;
+
+
+#[cfg(test)]
 use microcad_lang::{
+    parameter,
     parser::Parser,
     resolve::SymbolDefinition,
-    src_ref::Refer,
-    syntax::{CallArgumentList, Identifier, ModuleDefinition, QualifiedName},
+    src_ref::{Refer, SrcRef},
+    syntax::{CallArgumentList, Identifier, ModuleDefinition, ParameterList},
 };
 
 #[cfg(test)]
@@ -112,9 +115,20 @@ fn context_with_symbols() {
 fn module_implicit_init() {
     microcad_lang::env_logger_init();
 
+    let module_definition = std::rc::Rc::new(ModuleDefinition {
+        id: Identifier(Refer::none("a".into())),
+        parameters: ParameterList(Refer::none(vec![parameter!(b: Scalar)].into())),
+        body: microcad_lang::syntax::Body::default(),
+        src_ref: SrcRef(None),
+    });
+}
+
+#[test]
+fn syntax_module_implicit_init() {
+    microcad_lang::env_logger_init();
+
     let (source_file, mut context) = load_source_file("syntax/module/implicit_init.µcad");
     debug!("Source File:\n{}", source_file);
-    use microcad_lang::resolve::Resolve;
 
     if let Ok(node) = context.fetch_symbol(&Identifier(Refer::none("a".into())).into()) {
         let id = node.borrow().id();

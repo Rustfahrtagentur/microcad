@@ -12,7 +12,6 @@ pub use symbol_map::*;
 pub use symbol_node::*;
 
 use crate::{rc_mut::*, syntax::*};
-use log::*;
 
 /// Trait for items which can be fully qualified
 pub trait FullyQualify {
@@ -23,27 +22,27 @@ pub trait FullyQualify {
 /// Trait which resolves to SymbolNode reference
 pub trait Resolve {
     /// Resolve self into SymbolNode reference
-    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut;
+    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode>;
 }
 
-impl Resolve for std::rc::Rc<ModuleDefinition> {
-    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
+impl Resolve for Rc<ModuleDefinition> {
+    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
         let node = SymbolNode::new(SymbolDefinition::Module(self.clone()), parent);
         node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
         node
     }
 }
 
-impl Resolve for std::rc::Rc<NamespaceDefinition> {
-    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
+impl Resolve for Rc<NamespaceDefinition> {
+    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
         let node = SymbolNode::new(SymbolDefinition::Namespace(self.clone()), parent);
         node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
         node
     }
 }
 
-impl Resolve for std::rc::Rc<FunctionDefinition> {
-    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
+impl Resolve for Rc<FunctionDefinition> {
+    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
         let node = SymbolNode::new(SymbolDefinition::Function(self.clone()), parent);
         node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
         node
@@ -51,7 +50,7 @@ impl Resolve for std::rc::Rc<FunctionDefinition> {
 }
 
 impl Resolve for SymbolDefinition {
-    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
+    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
         match self {
             Self::Module(m) => m.resolve(parent),
             Self::Namespace(n) => n.resolve(parent),
@@ -64,20 +63,20 @@ impl Resolve for SymbolDefinition {
     }
 }
 
-impl Resolve for std::rc::Rc<SourceFile> {
-    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
-        debug!("resolving {}", self.filename_as_str());
+impl Resolve for Rc<SourceFile> {
+    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+        eprintln!("resolving {}", self.filename_as_str());
         let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);
         node.borrow_mut().children = Body::fetch_symbol_map_from(&self.body, Some(node.clone()));
-        trace!("Resolved symbol node:\n{node}");
+        log::trace!("Resolved symbol node:\n{node}");
         node
     }
 }
 
 impl Resolve for SourceFile {
-    fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
+    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
         let node = Rc::new(self.clone()).resolve(parent);
-        debug!("Symbol:\n{}", FormatSymbol(&node.borrow()));
+        eprintln!("Symbol:\n{}", FormatSymbol(&node.borrow()));
         node
     }
 }
@@ -106,7 +105,8 @@ fn resolve_source_file() {
     //      print("test"); // Use symbol node from parent
     // }
 
-    assert!(symbol_node.search(&"a::b".into()).is_some());
+    let b = symbol_node.search(&"a::b".into()).expect("cant find node");
+    assert!(b.borrow().search(&"a".into()).is_some());
 
     //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
 

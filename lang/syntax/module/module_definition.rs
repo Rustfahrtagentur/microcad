@@ -28,7 +28,7 @@ impl ModuleDefinition {
 impl ModuleInitDefinition {}
 
 impl CallTrait for std::rc::Rc<ModuleDefinition> {
-    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Value> {
+    fn call(&self, _args: &CallArgumentList, _context: &mut EvalContext) -> EvalResult<Value> {
         todo!();
         /*match self.inits().find_map(|init| {
             if let Ok(arg_map) = args.get_matching_arguments(context, &init.parameters) {

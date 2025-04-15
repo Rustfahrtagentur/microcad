@@ -129,7 +129,7 @@ impl Value {
     ///
     /// This function is used when accessing a property `p` of a value `v` with `p.v`.
     pub fn get_property_value(&self, identifier: &Identifier) -> Option<Value> {
-        let get = |value| Some(Value::Scalar(Refer::none(value as f64)));
+        let get = |value| Some(Value::Scalar(Refer::none(value)));
         let id = identifier.id().as_str();
         match self {
             Value::Vec2(r) => match id {
