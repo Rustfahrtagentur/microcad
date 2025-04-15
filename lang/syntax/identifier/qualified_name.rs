@@ -1,11 +1,11 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, parse::*, src_ref::*, syntax::*};
+use crate::{parse::*, src_ref::*, syntax::*, Id};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
-#[derive(Debug, Default, Clone, PartialEq, Hash, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Hash, Eq, Ord, PartialOrd)]
 pub struct QualifiedName(pub Vec<Identifier>);
 
 impl QualifiedName {

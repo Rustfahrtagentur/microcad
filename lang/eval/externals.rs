@@ -13,7 +13,9 @@ pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf
 impl Externals {
     /// Create new resolve context
     pub fn new(search_paths: Vec<std::path::PathBuf>) -> Self {
-        Self(Self::search_externals(search_paths))
+        let new = Self(Self::search_externals(search_paths));
+        trace!("Found externals:\n{new}");
+        new
     }
 
     /// Create namespace tree from externals
@@ -142,8 +144,10 @@ impl Externals {
 
 impl std::fmt::Display for Externals {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0
-            .iter()
+        let mut v = self.0.iter().collect::<Vec<_>>();
+        // sort for better readability
+        v.sort();
+        v.iter()
             .try_for_each(|file| writeln!(f, "{} => {}", file.0, file.1.to_string_lossy()))
     }
 }

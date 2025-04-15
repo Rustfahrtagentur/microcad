@@ -1,4 +1,4 @@
-use crate::{Id, eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*, Id};
 use custom_debug::Debug;
 use log::*;
 
@@ -55,7 +55,13 @@ impl SymbolNode {
 
     /// Print out symbols from that point
     pub fn print_symbol(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}{}", "", self.def)?;
+        writeln!(
+            f,
+            "{:depth$}{} [{}]",
+            "",
+            self.def,
+            self.name().expect("corrupt name?")
+        )?;
         self.children
             .iter()
             .try_for_each(|(_, child)| child.borrow().print_symbol(f, depth + self.def.id().len()))
@@ -68,7 +74,21 @@ impl SymbolNode {
         parent.borrow_mut().children.insert(id, child);
     }
 
-    /// copy (clone) all children of the other into self
+    /// Insert a child at the correct sub node
+    pub fn insert(&mut self, name: &QualifiedName, node: RcMut<SymbolNode>) {
+        debug!("SymbolNode: Insert {name} into {}", self.def.id());
+        let (first, name) = name.split_first();
+        if !name.is_empty() {
+            if let Some(child) = self.children.get(first.id()) {
+                //                node.borrow_mut().parent = Some(child.clone());
+                child.borrow_mut().insert(&name, node);
+                return;
+            }
+        }
+        self.children.insert(first.id().clone(), node);
+    }
+
+    /// copy (clone) all children of the other into self without setting new parent
     pub fn copy_children(&mut self, other: RcMut<SymbolNode>) {
         other.borrow().children.iter().for_each(|(id, child)| {
             self.children.insert(id.clone(), child.clone());
@@ -91,19 +111,6 @@ impl SymbolNode {
             }
             None => Ok(QualifiedName(vec![id])),
         }
-    }
-
-    /// Insert a child at the correct sub node
-    pub fn insert(&mut self, name: &QualifiedName, node: RcMut<SymbolNode>) {
-        debug!("SymbolNode: Insert {name} into {}", self.def.id());
-        let (first, name) = name.split_first();
-        if !name.is_empty() {
-            if let Some(child) = self.children.get(first.id()) {
-                child.borrow_mut().insert(&name, node);
-                return;
-            }
-        }
-        self.children.insert(first.id().clone(), node);
     }
 
     /// Fetch child node with an id
