@@ -49,10 +49,7 @@ impl Externals {
             return None;
         }
 
-        debug!("Name: {name}");
-
         let node_id = name.first().expect("Non-empty qualified name");
-
         if let Some(child) = parent.borrow().get(node_id.id()) {
             return Some(child.clone());
         }
