@@ -13,8 +13,16 @@ pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf
 impl Externals {
     /// Create new resolve context
     pub fn new(search_paths: Vec<std::path::PathBuf>) -> Self {
+        let no_search_paths = search_paths.is_empty();
         let new = Self(Self::search_externals(search_paths));
-        trace!("Found externals:\n{new}");
+        if no_search_paths {
+            info!("No external search paths were given");
+        } else if new.is_empty() {
+            warn!("Did not find any externals in any search path");
+        } else {
+            info!("Found {} external modules", new.len());
+            trace!("Externals:\n{new}");
+        }
         new
     }
 
