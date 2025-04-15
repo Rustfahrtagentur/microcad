@@ -125,14 +125,7 @@ impl EvalContext {
 
     /// fetch symbol from symbol table
     pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
-        if let Some(child) = self.current.borrow().search_up(&qualified_name.clone()) {
-            Ok(child)
-        } else {
-            Err(super::EvalError::SymbolNotFound(
-                qualified_name.clone(),
-                self.current.borrow().name()?,
-            ))
-        }
+        self.symbols.search(&qualified_name.clone())
     }
 
     /// fetch local variable
@@ -163,10 +156,10 @@ impl EvalContext {
     /// Find a symbol in the symbol table and add it at the currently processed node
     /// (also loads an external symbol if not already loaded)
     pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
-        debug!("using symbol {name} in {}", self.current.borrow().def.id());
-        let symbol = self.current.borrow().search_up(name);
+        debug!("using symbol {name} in symbols");
+        let symbol = self.symbols.search(name);
         match symbol {
-            Some(symbol) => Ok(symbol.clone()),
+            Ok(symbol) => Ok(symbol.clone()),
             _ => self.load_symbol(name),
         }
     }

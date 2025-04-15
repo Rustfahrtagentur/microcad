@@ -90,19 +90,16 @@ fn resolve_source_file() {
     assert!(symbol_node.get(&"a".into()).is_some());
     assert!(symbol_node.get(&"c".into()).is_none());
 
-    assert!(symbol_node.search_down(&"a".into()).is_some());
-    assert!(symbol_node.search_down(&"a::b".into()).is_some());
-    assert!(symbol_node.search_down(&"a::b::c".into()).is_none());
+    assert!(symbol_node.search(&"a".into()).is_some());
+    assert!(symbol_node.search(&"a::b".into()).is_some());
+    assert!(symbol_node.search(&"a::b::c".into()).is_none());
 
     // use std::print; // Add symbol "print" to current symbol node
     // module m() {
     //      print("test"); // Use symbol node from parent
     // }
 
-    let b = symbol_node
-        .search_down(&"a::b".into())
-        .expect("cant find node");
-    assert!(b.borrow().search_up(&"a".into()).is_some());
+    assert!(symbol_node.search(&"a::b".into()).is_some());
 
     //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
 

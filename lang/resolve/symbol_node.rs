@@ -107,16 +107,16 @@ impl SymbolNode {
         self.children.get(id)
     }
 
-    /// Search in symbol tree by a path, e.g. a::b::c
-    pub fn search_down(&self, name: &QualifiedName) -> Option<RcMut<SymbolNode>> {
-        debug!("search_down {name} in {}", self.id());
+    /// Search down the symbol tree for a qualified name
+    pub fn search(&self, name: &QualifiedName) -> Option<RcMut<SymbolNode>> {
+        debug!("Searching {name} in {}", self.id());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first.id()) {
                 let name = &name.remove_first();
                 if name.is_empty() {
                     Some(child.clone())
                 } else {
-                    child.borrow().search_down(name)
+                    child.borrow().search(name)
                 }
             } else {
                 debug!("search_down no child in {}", self.id());
@@ -124,21 +124,6 @@ impl SymbolNode {
             }
         } else {
             debug!("search_down no first in {name}");
-            None
-        }
-    }
-
-    /// Search for first symbol in parents
-    pub fn search_up(&self, name: &QualifiedName) -> Option<RcMut<SymbolNode>> {
-        if let Some(result) = self.search_down(name) {
-            Some(result)
-        } else if let Some(parent) = &self.parent {
-            if let Some(result) = parent.borrow().search_down(name) {
-                Some(result.clone())
-            } else {
-                parent.borrow().search_up(name)
-            }
-        } else {
             None
         }
     }
