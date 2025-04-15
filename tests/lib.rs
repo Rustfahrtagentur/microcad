@@ -1,6 +1,16 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use std::thread::panicking;
+
+use log::debug;
+use microcad_lang::{
+    parser::Parser,
+    resolve::SymbolDefinition,
+    src_ref::Refer,
+    syntax::{CallArgumentList, Identifier, ModuleDefinition, QualifiedName},
+};
+
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
 /*
@@ -34,11 +44,12 @@ fn load_source_file(
     microcad_lang::eval::EvalContext,
 ) {
     use microcad_builtin::*;
-    use microcad_lang::{eval::*, syntax::*};
+    use microcad_lang::{eval::*, resolve::Resolve, syntax::*};
     let source_file = SourceFile::load(format!("../tests/test_cases/{filename}"))
         .expect("cannot load test file: {filename}");
+    let symbols = source_file.resolve(None);
 
-    let mut context = EvalContext::from_source_file(source_file.clone(), vec![]);
+    let mut context = EvalContext::new(symbols.clone(), vec![], None);
     context.add_symbol(builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());
@@ -99,5 +110,35 @@ fn context_with_symbols() {
 
 #[test]
 fn module_implicit_init() {
-    let (source_file, context) = load_source_file("syntax/module/implicit_init.µcad");
+    microcad_lang::env_logger_init();
+
+    let (source_file, mut context) = load_source_file("syntax/module/implicit_init.µcad");
+    debug!("Source File:\n{}", source_file);
+    use microcad_lang::resolve::Resolve;
+
+    if let Ok(node) = context.fetch_symbol(&Identifier(Refer::none("a".into())).into()) {
+        let id = node.borrow().id();
+        assert_eq!(id, "a");
+
+        if let SymbolDefinition::Module(module_definition) = &node.borrow().def {
+            use microcad_lang::eval::CallTrait;
+            let value = module_definition
+                .call(
+                    &Parser::parse_rule::<CallArgumentList>(
+                        microcad_lang::parser::Rule::call_argument_list,
+                        "b = 3.0",
+                        0,
+                    )
+                    .expect("Valid CallArgumentList"),
+                    &mut context,
+                )
+                .expect("Valid value");
+        } else {
+            panic!("Symbol is not a module")
+        }
+
+        debug!("{}", id);
+    } else {
+        panic!("Symbol not found");
+    }
 }
