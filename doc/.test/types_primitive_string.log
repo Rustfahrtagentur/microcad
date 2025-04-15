@@ -1,16 +1,16 @@
-error: Symbol not found: std::assert
+error: Symbol assert not found.
   ---> <from_str>:2:1
      |
    2 | std::assert(text.count(11));
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol not found: std::info
+error: Symbol info not found.
   ---> <from_str>:5:1
      |
    5 | std::info(text);
      | ^^^^^^^^^^^^^^^
      |
-error: Symbol not found: std::geo2d::text
+error: Symbol geo2d::text not found.
   ---> <from_str>:8:1
      |
    8 | std::geo2d::text(text);

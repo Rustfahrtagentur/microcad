@@ -1,0 +1,6 @@
+error: Local symbol not found: m
+  ---> <from_str>:9:1
+     |
+   9 | m(f=1mm);
+     | ^^^^^^^^
+     |

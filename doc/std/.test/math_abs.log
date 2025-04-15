@@ -1,4 +1,4 @@
-error: Symbol not found: std::assert
+error: Symbol assert not found.
   ---> <from_str>:1:1
      |
    1 | std::assert(std::math::abs(-1) == 1);
