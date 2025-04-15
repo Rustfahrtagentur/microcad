@@ -197,7 +197,7 @@ impl EvalContext {
             LocalDefinition::Symbol(symbol.clone()),
         );
 
-        trace!("Symbols:\n{}", self.symbols);
+        trace!("Local Stack:\n{}", self.local_stack);
         Ok(symbol)
     }
 

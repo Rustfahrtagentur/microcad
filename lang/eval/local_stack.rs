@@ -13,21 +13,40 @@ pub enum LocalDefinition {
 }
 
 /// A stack frame is map of local variables
-type Locals = BTreeMap<Id, LocalDefinition>;
+#[derive(Default)]
+struct Locals(BTreeMap<Id, LocalDefinition>);
 
-/// A stack with a list of local variables for each stack frame
-pub struct LocalStack(Vec<Locals>);
-
-impl Default for LocalStack {
-    fn default() -> Self {
-        Self(vec![BTreeMap::new()])
+impl Locals {
+    fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
+        for (id, _) in self.iter() {
+            writeln!(f, "{:depth$}Local '{id}':", "")?;
+        }
+        Ok(())
     }
 }
+
+impl std::ops::Deref for Locals {
+    type Target = BTreeMap<Id, LocalDefinition>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for Locals {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+/// A stack with a list of local variables for each stack frame
+#[derive(Default)]
+pub struct LocalStack(Vec<Locals>);
 
 impl LocalStack {
     /// Open a new scope (stack push)
     pub fn open_scope(&mut self) {
-        self.0.push(BTreeMap::new());
+        self.0.push(Default::default());
     }
 
     /// Close scope (stack pop)
@@ -52,6 +71,15 @@ impl LocalStack {
             }
         }
         Err(super::EvalError::LocalNotFound(id.clone()))
+    }
+}
+
+impl std::fmt::Display for LocalStack {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (n, locals) in self.0.iter().enumerate() {
+            locals.print(f, n)?;
+        }
+        Ok(())
     }
 }
 
