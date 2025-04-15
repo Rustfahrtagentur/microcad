@@ -25,15 +25,27 @@ impl ModuleDefinition {
     }
 }
 
-impl ModuleInitDefinition {
-    /// evaluate a call of a ModuleInitDefinition
-    pub fn eval_call(&self, _args: &CallArgumentList, _context: &mut EvalContext) {}
-}
+impl ModuleInitDefinition {}
 
-impl CallTrait for ModuleDefinition {
+impl CallTrait for std::rc::Rc<ModuleDefinition> {
     fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Value> {
-        let _arg_map = args.get_matching_arguments(context, &self.parameters);
-        todo!()
+        todo!();
+        /*match self.inits().find_map(|init| {
+            if let Ok(arg_map) = args.get_matching_arguments(context, &init.parameters) {
+                Some((init, arg_map))
+            } else {
+                None
+            }
+        }) {
+            // We have found a matching initializer
+            Some((init, arg_map)) => {
+                init.body.statements.iter().for_each(|statement| {});
+            }
+            // We have not found a matching initializer, test if call arguments match parameter list
+            None => {
+                let _arg_map = args.get_matching_arguments(context, &self.parameters);
+            }
+        }*/
     }
 }
 

@@ -8,15 +8,8 @@ impl CallArgumentList {
         parameters: &ParameterList,
     ) -> EvalResult<ArgumentMap> {
         let parameter_values = ParameterValueList::from_parameter_list(parameters, context)?;
-        match CallArgumentValueList::from_call_argument_list(self, context)?
+        CallArgumentValueList::from_call_argument_list(self, context)?
             .get_matching_arguments(&parameter_values)
-        {
-            Ok(args) => Ok(args),
-            Err(err) => {
-                context.error(self, err)?;
-                Ok(ArgumentMap::default())
-            }
-        }
     }
 
     /// return a single argument
