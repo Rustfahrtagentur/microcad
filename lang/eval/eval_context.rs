@@ -21,16 +21,6 @@ pub struct EvalContext {
     output: Option<Output>,
 }
 
-/// Look up result
-pub enum LookUp {
-    /// Look up failed
-    NotFound(QualifiedName),
-    /// found local variable with given Id
-    Local(Id),
-    /// found global symbol with given qualified name
-    Symbol(QualifiedName),
-}
-
 impl EvalContext {
     /// Create a new context from a source file
     pub fn new(
@@ -102,7 +92,7 @@ impl EvalContext {
 
     /// Add a named local value to current locals
     pub fn add_local_value(&mut self, id: Id, value: Value) {
-        self.local_stack.add(id, LocalDefinition::Value(value));
+        self.local_stack.add(SymbolNode::new_constant(id, value));
     }
 
     /// Add symbol to symbol map
@@ -120,31 +110,27 @@ impl EvalContext {
         self.local_stack.close_scope();
     }
 
-    /// fetch symbol from symbol map
-    pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
-        if let Some(id) = qualified_name.single_identifier() {
-            if let Ok(LocalDefinition::Symbol(symbol)) = self.fetch_local(id.id()) {
-                return Ok(symbol.clone());
-            }
-        }
-
+    /// fetch global symbol from symbol map
+    pub fn fetch_global(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         self.symbols.search(&qualified_name.clone())
     }
 
     /// fetch local variable from local stack
-    pub fn fetch_local<'a>(&'a self, id: &Id) -> EvalResult<&'a LocalDefinition> {
+    pub fn fetch_local(&self, id: &Id) -> EvalResult<SymbolNodeRcMut> {
         self.local_stack.fetch(id)
     }
 
     /// fetch a value from local stack
     pub fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
         if let Some(identifier) = name.single_identifier() {
-            if let Ok(LocalDefinition::Value(value)) = self.fetch_local(identifier.id()) {
-                return Ok(value.clone());
+            if let Ok(symbol) = self.fetch_local(identifier.id()) {
+                if let SymbolDefinition::Constant(_, value) = &symbol.borrow().def {
+                    return Ok(value.clone());
+                }
             }
         }
 
-        match &self.fetch_symbol(name)?.borrow().def {
+        match &self.fetch_global(name)?.borrow().def {
             SymbolDefinition::Constant(_, value) => Ok(value.clone()),
             _ => Err(EvalError::SymbolIsNotAValue(name.clone())),
         }
@@ -159,10 +145,7 @@ impl EvalContext {
             Ok(symbol) => Ok(symbol.clone()),
             _ => {
                 let symbol = self.load_symbol(name)?;
-                self.local_stack.add(
-                    symbol.borrow().id(),
-                    LocalDefinition::Symbol(symbol.clone()),
-                );
+                self.local_stack.add(symbol.clone());
                 trace!("Local Stack:\n{}", self.local_stack);
                 Ok(symbol)
             }
@@ -202,15 +185,12 @@ impl EvalContext {
     ///
     /// If name is a single id it will be searched in the local stack or
     /// if name is qualified searches in symbol map.
-    pub fn lookup(&self, name: &QualifiedName) -> LookUp {
+    pub fn lookup(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         if let Some(id) = name.single_identifier() {
-            if self.fetch_local(id.id()).is_ok() {
-                return LookUp::Local(id.id().clone());
-            }
-        } else if self.fetch_symbol(name).is_ok() {
-            return LookUp::Symbol(name.clone());
+            self.fetch_local(id.id())
+        } else {
+            self.fetch_global(name)
         }
-        LookUp::NotFound(name.clone())
     }
 
     /// Access diagnostic handler

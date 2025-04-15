@@ -15,7 +15,7 @@ pub enum SymbolDefinition {
     BuiltinFunction(Rc<BuiltinFunction>),
     /// Builtin module symbol
     BuiltinModule(Rc<BuiltinModule>),
-    /// Builtin constant
+    /// Constant
     Constant(Identifier, Value),
 }
 

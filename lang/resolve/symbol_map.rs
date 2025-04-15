@@ -1,4 +1,4 @@
-use crate::{Id, eval::*, resolve::*, syntax::*};
+use crate::{eval::*, resolve::*, syntax::*, Id};
 
 /// Map Id to SymbolNode reference
 #[derive(Debug, Default, Clone)]

@@ -4,7 +4,6 @@
 #[cfg(test)]
 use log::debug;
 
-
 #[cfg(test)]
 use microcad_lang::{
     parser::Parser,
@@ -77,14 +76,14 @@ fn context_with_symbols() {
 
     context.add_symbol(builtin_namespace());
     context
-        .fetch_symbol(
+        .fetch_global(
             &"__builtin::assert_valid"
                 .try_into()
                 .expect("unexpected name error"),
         )
         .expect("symbol not found");
     context
-        .fetch_symbol(
+        .fetch_global(
             &"__builtin::assert_invalid"
                 .try_into()
                 .expect("unexpected name error"),
@@ -100,7 +99,9 @@ fn module_implicit_init() {
     let (source_file, mut context) = load_source_file("syntax/module/implicit_init.µcad");
     debug!("Source File:\n{}", source_file);
 
-    if let Ok(node) = context.fetch_symbol(&Identifier(microcad_lang::src_ref::Refer::none("a".into())).into()) {
+    if let Ok(node) =
+        context.fetch_global(&Identifier(microcad_lang::src_ref::Refer::none("a".into())).into())
+    {
         let id = node.borrow().id();
         assert_eq!(id, "a");
 

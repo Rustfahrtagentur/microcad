@@ -52,9 +52,9 @@ impl SymbolNode {
     }
 
     /// Create a new build constant
-    pub fn new_builtin_constant(id: &str, value: Value) -> SymbolNodeRcMut {
+    pub fn new_constant(id: Id, value: Value) -> SymbolNodeRcMut {
         SymbolNode::new(
-            SymbolDefinition::Constant(Identifier(Refer::none(id.into())), value),
+            SymbolDefinition::Constant(Identifier(Refer::none(id)), value),
             None,
         )
     }

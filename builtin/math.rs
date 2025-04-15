@@ -19,8 +19,8 @@ fn abs() -> SymbolNodeRcMut {
 
 pub fn math() -> SymbolNodeRcMut {
     crate::NamespaceBuilder::new("math".try_into().expect("unexpected name error"))
-        .symbol(SymbolNode::new_builtin_constant(
-            "pi",
+        .symbol(SymbolNode::new_constant(
+            "pi".into(),
             Value::Scalar(Refer::none(std::f64::consts::PI)),
         ))
         .symbol(abs())
