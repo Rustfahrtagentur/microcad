@@ -7,11 +7,9 @@ use log::debug;
 
 #[cfg(test)]
 use microcad_lang::{
-    parameter,
     parser::Parser,
     resolve::SymbolDefinition,
-    src_ref::{Refer, SrcRef},
-    syntax::{CallArgumentList, Identifier, ModuleDefinition, ParameterList},
+    syntax::{CallArgumentList, Identifier},
 };
 
 #[cfg(test)]
@@ -22,22 +20,6 @@ include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
 */
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
-
-#[cfg(test)]
-static TEST_OUT_DIR: &str = "output";
-
-#[cfg(test)]
-static DEFAULT_TEST_FILE: &str = "../tests/test_cases/algorithm/difference.µcad";
-
-/// Assure `TEST_OUT_DIR` exists
-#[cfg(test)]
-fn make_test_out_dir() -> std::path::PathBuf {
-    let test_out_dir = std::path::PathBuf::from(TEST_OUT_DIR);
-    if !test_out_dir.exists() {
-        std::fs::create_dir_all(&test_out_dir).expect("test error");
-    }
-    test_out_dir
-}
 
 #[cfg(test)]
 fn load_source_file(
@@ -115,28 +97,16 @@ fn context_with_symbols() {
 fn module_implicit_init() {
     microcad_lang::env_logger_init();
 
-    let module_definition = std::rc::Rc::new(ModuleDefinition {
-        id: Identifier(Refer::none("a".into())),
-        parameters: ParameterList(Refer::none(vec![parameter!(b: Scalar)].into())),
-        body: microcad_lang::syntax::Body::default(),
-        src_ref: SrcRef(None),
-    });
-}
-
-#[test]
-fn syntax_module_implicit_init() {
-    microcad_lang::env_logger_init();
-
     let (source_file, mut context) = load_source_file("syntax/module/implicit_init.µcad");
     debug!("Source File:\n{}", source_file);
 
-    if let Ok(node) = context.fetch_symbol(&Identifier(Refer::none("a".into())).into()) {
+    if let Ok(node) = context.fetch_symbol(&Identifier(microcad_lang::src_ref::Refer::none("a".into())).into()) {
         let id = node.borrow().id();
         assert_eq!(id, "a");
 
         if let SymbolDefinition::Module(module_definition) = &node.borrow().def {
             use microcad_lang::eval::CallTrait;
-            let value = module_definition
+            let _value = module_definition
                 .call(
                     &Parser::parse_rule::<CallArgumentList>(
                         microcad_lang::parser::Rule::call_argument_list,
