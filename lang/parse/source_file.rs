@@ -23,7 +23,7 @@ impl SourceFile {
             "loaded file {} successfully",
             path.as_ref().to_string_lossy()
         );
-        trace!("Syntax:\n{}", FormatSyntax(&source_file));
+        trace!("Syntax tree:\n{}", FormatSyntax(&source_file));
 
         Ok(std::rc::Rc::new(source_file))
     }
