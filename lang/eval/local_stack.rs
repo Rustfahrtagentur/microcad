@@ -19,7 +19,7 @@ struct Locals(BTreeMap<Id, LocalDefinition>);
 impl Locals {
     fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
         for (id, _) in self.iter() {
-            writeln!(f, "{:depth$}Local '{id}':", "")?;
+            writeln!(f, "{:depth$} {id}", "")?;
         }
         Ok(())
     }
@@ -56,10 +56,15 @@ impl LocalStack {
 
     /// Add a new variable to current stack frame
     pub fn add(&mut self, id: Id, local: LocalDefinition) {
-        self.0
-            .last_mut()
-            .expect("cannot push symbol onto an empty local stack")
-            .insert(id, local);
+        if let Some(last) = self.0.last_mut() {
+            last
+        } else {
+            self.0.push(Locals::default());
+            self.0
+                .last_mut()
+                .expect("cannot push symbol onto an empty local stack")
+        }
+        .insert(id, local);
     }
 
     /// Fetch a local variable from current stack frame
