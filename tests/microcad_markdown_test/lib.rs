@@ -359,6 +359,7 @@ fn create_test_code(
                 fn r#{name}() {{
                     use microcad_lang::eval::*;
                     use microcad_lang::syntax::*;
+                    use microcad_builtin::*;
                     use crate::rust_std::fs;
                     use crate::rust_std::io;
                     use crate::rust_std::io::Write;
@@ -399,7 +400,7 @@ fn create_test_code(
                         // test expected to fail succeeded at parsing?
                         Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = EvalContext::from_source_file(source.clone(), vec![]);
+                            let mut context = EvalContext::from_source_file_with_output(source.clone(), builtin_namespace(), vec![], Some(Default::default()));
                             let eval = source.eval(&mut context);
                             let diag = context.diag_handler();
 
@@ -444,7 +445,7 @@ fn create_test_code(
                         // test awaited to succeed and parsing succeeds?
                         Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = EvalContext::from_source_file(source.clone(), vec![]);
+                            let mut context = EvalContext::from_source_file_with_output(source.clone(), builtin_namespace(), vec![], Some(Default::default()));
                             let eval = source.eval(&mut context);
                             let diag = context.diag_handler();
 

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{diag::*, eval::*, resolve::*, syntax::*, Id};
+
 use log::*;
 
 /// Context for evaluation
@@ -25,6 +26,7 @@ impl EvalContext {
     /// Create a new context from a source file
     pub fn new(
         symbol: SymbolNodeRcMut,
+        builtin: SymbolNodeRcMut,
         search_paths: Vec<std::path::PathBuf>,
         output: Option<Output>,
     ) -> Self {
@@ -49,14 +51,16 @@ impl EvalContext {
         // prepare symbol map
         let mut symbols = SymbolMap::new();
 
+        symbols.insert_node(builtin);
+
         // create namespaces for all files in search paths into symbol map
         let namespaces = source_cache.create_namespaces();
         namespaces.iter().for_each(|(_, namespace)| {
-            symbols.insert(namespace.borrow().id(), namespace.clone());
+            symbols.insert_node(namespace.clone());
         });
 
         // insert root file into symbol map
-        symbols.insert(source_node.borrow().id(), source_node.clone());
+        symbols.insert_node(source_node);
         trace!("Symbols:\n{symbols}");
 
         // put all together
@@ -72,19 +76,22 @@ impl EvalContext {
     /// Create a new context from a source file
     pub fn from_source_file(
         source_file: std::rc::Rc<SourceFile>,
+        builtin: SymbolNodeRcMut,
         search_paths: Vec<std::path::PathBuf>,
     ) -> Self {
-        Self::from_source_file_with_output(source_file, search_paths, None)
+        Self::from_source_file_with_output(source_file, builtin, search_paths, None)
     }
 
     /// Create a new context from a source file
     pub fn from_source_file_with_output(
         source_file: std::rc::Rc<SourceFile>,
+        builtin: SymbolNodeRcMut,
         search_paths: Vec<std::path::PathBuf>,
         output: Option<Output>,
     ) -> Self {
         Self::new(
             SymbolNode::new(SymbolDefinition::SourceFile(source_file), None),
+            builtin,
             search_paths,
             output,
         )

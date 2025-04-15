@@ -151,7 +151,12 @@ fn eval(
         _ => todo!(),
     };
 
-    let mut context = EvalContext::new(symbols.clone(), search_paths, None);
+    let mut context = EvalContext::new(
+        symbols.clone(),
+        microcad_builtin::builtin_namespace(),
+        search_paths,
+        None,
+    );
     let result = source_file
         .eval(&mut context)
         .map_err(|err| anyhow::anyhow!("{err}"))?;

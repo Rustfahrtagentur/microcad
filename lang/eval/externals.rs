@@ -31,12 +31,12 @@ impl Externals {
         let mut map = SymbolMap::new();
         self.iter().for_each(|(basename, _)| {
             let (id, name) = basename.split_first();
-            let parent_symbol = match map.get(id.id()) {
+            let namespace = match map.get(id.id()) {
                 Some(symbol) => symbol.clone(),
                 _ => SymbolNode::new_namespace(id.clone()),
             };
-            Self::recursive_create_namespaces(parent_symbol.clone(), name);
-            map.insert(id.id().clone(), parent_symbol);
+            Self::recursive_create_namespaces(namespace.clone(), name);
+            map.insert(id.id().clone(), namespace);
         });
         map
     }

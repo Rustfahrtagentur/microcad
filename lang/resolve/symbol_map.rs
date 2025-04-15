@@ -24,6 +24,11 @@ impl SymbolMap {
         Self(Default::default())
     }
 
+    pub fn insert_node(&mut self, symbol: SymbolNodeRcMut) {
+        let id = symbol.borrow().id();
+        self.0.insert(id, symbol);
+    }
+
     /// search for a symbol in symbol map
     pub fn search(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         log::trace!("Searching {name} in symbol map");
@@ -36,7 +41,7 @@ impl SymbolMap {
                 Err(EvalError::SymbolNotFound(name))
             }
         } else {
-            todo!("error")
+            Err(EvalError::SymbolNotFound(name))
         }
     }
 }

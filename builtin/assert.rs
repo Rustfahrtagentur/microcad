@@ -1,7 +1,12 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, syntax::*, value::*};
+#[cfg(test)]
+use crate::builtin_namespace;
+use log::*;
+#[cfg(test)]
+use microcad_lang::syntax::*;
+use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, value::*};
 
 pub fn assert() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert".into(), &|args, context| {
@@ -20,48 +25,19 @@ pub fn assert() -> SymbolNodeRcMut {
 }
 
 pub fn assert_valid() -> SymbolNodeRcMut {
-    SymbolNode::new_builtin_fn("assert_valid".into(), &|args, context| match look_up(
-        args.get_single()?,
-        context,
-    ) {
-        Ok(LookUp::Local(_)) | Ok(LookUp::Symbol(_)) => Ok(Value::None),
-        Ok(LookUp::NotFound(no_name)) => {
-            context.error(SrcRef(None), EvalError::NotAName(no_name.src_ref()))?;
-            Ok(Value::None)
-        }
-        Err(err) => Err(err),
-    })
+    assert_invalid()
 }
 
 pub fn assert_invalid() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert_invalid".into(), &|args, context| {
-        match look_up(args.get_single()?, context) {
-            Ok(LookUp::Local(name)) => {
-                context.error(SrcRef(None), EvalError::LocalNotFound(name))?;
-            }
-            Ok(LookUp::Symbol(name)) => {
-                context.error(SrcRef(None), EvalError::SymbolNotFound(name))?;
-            }
-            _ => (),
-        };
-        Ok(Value::None)
-    })
-}
-
-fn look_up(arg: &CallArgument, context: &mut EvalContext) -> EvalResult<LookUp> {
-    if let Expression::Nested(nested) = &arg.value {
-        if let Some(name) = nested.single_qualified_name() {
-            match context.lookup(&name) {
-                LookUp::Symbol(name) => Ok(LookUp::Symbol(name)),
-                LookUp::Local(id) => Ok(LookUp::Local(id)),
-                _ => Err(EvalError::LookUpFailed(arg.value.clone())),
-            }
+        if let Ok(name) = args.get_single() {
+            warn!("{}", name.value);
+            //context.lookup()?;
+            Ok(Value::None)
         } else {
-            Err(EvalError::NotAName(arg.value.src_ref()))
+            Err(EvalError::NotAName(args.src_ref()))
         }
-    } else {
-        Err(EvalError::NotAName(arg.value.src_ref()))
-    }
+    })
 }
 
 #[test]
@@ -69,7 +45,8 @@ fn assert_ok() {
     let source_file = SourceFile::load("../tests/test_cases/syntax/assert_ok.µcad")
         .expect("cannot load test file");
 
-    let mut context = EvalContext::from_source_file(source_file.clone(), vec![]);
+    let mut context =
+        EvalContext::from_source_file(source_file.clone(), builtin_namespace(), vec![]);
     context.add_symbol(super::builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());
@@ -82,7 +59,8 @@ fn assert_fail() {
 
     let source_file = SourceFile::load("../tests/test_cases/syntax/assert_fail.µcad")
         .expect("cannot load test file");
-    let mut context = EvalContext::from_source_file(source_file.clone(), vec![]);
+    let mut context =
+        EvalContext::from_source_file(source_file.clone(), builtin_namespace(), vec![]);
     context.add_symbol(super::builtin_namespace());
     let node = source_file.resolve(None);
     trace!("Source File Node:\n{node}");
