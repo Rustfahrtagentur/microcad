@@ -1,5 +1,6 @@
 use std::geo2d::circle;
 use std::geo3d::sphere;
+use std::test::foo::bar;
 
 circle(radius=1);
 sphere(radius=1);
