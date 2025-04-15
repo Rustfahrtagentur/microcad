@@ -242,6 +242,16 @@ impl EvalContext {
             println!("{what}");
         }
     }
+
+    /// get source code location of a src referrer
+    pub fn locate(&self, referrer: &impl SrcReferrer) -> EvalResult<String> {
+        Ok(format!(
+            "{}:{}",
+            self.get_by_hash(referrer.src_ref().source_hash())?
+                .filename_as_str(),
+            referrer.src_ref()
+        ))
+    }
 }
 
 impl PushDiag for EvalContext {

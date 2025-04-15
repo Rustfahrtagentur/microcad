@@ -3,7 +3,7 @@
 
 //! µcad source file representation
 
-use crate::{eval::*, syntax::*, value::*};
+use crate::{eval::*, src_ref::*, syntax::*, value::*};
 
 /// µcad source file
 #[derive(Clone, Debug, Default)]
@@ -53,6 +53,11 @@ impl SourceFile {
     pub fn get_line(&self, line: usize) -> Option<&str> {
         self.source.lines().nth(line)
     }
+
+    /// return number of source code lines
+    pub fn num_lines(&self) -> usize {
+        self.source.lines().count()
+    }
 }
 
 impl Eval for SourceFile {
@@ -79,6 +84,12 @@ impl PrintSyntax for SourceFile {
         self.body
             .iter()
             .try_for_each(|s| s.print_syntax(f, depth + 1))
+    }
+}
+
+impl SrcReferrer for SourceFile {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        SrcRef::new(0..self.num_lines(), 0, 0, self.hash)
     }
 }
 

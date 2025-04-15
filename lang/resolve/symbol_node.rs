@@ -184,3 +184,18 @@ impl std::fmt::Display for FormatSymbol<'_> {
         self.0.print_symbol(f, 0)
     }
 }
+
+impl SrcReferrer for SymbolNode {
+    fn src_ref(&self) -> SrcRef {
+        match &self.def {
+            SymbolDefinition::SourceFile(source_file) => source_file.src_ref(),
+            SymbolDefinition::Namespace(namespace_definition) => namespace_definition.src_ref(),
+            SymbolDefinition::Module(module_definition) => module_definition.src_ref(),
+            SymbolDefinition::Function(function_definition) => function_definition.src_ref(),
+            SymbolDefinition::BuiltinFunction(_) | SymbolDefinition::BuiltinModule(_) => {
+                unreachable!("builtin has no source code reference")
+            }
+            SymbolDefinition::Constant(compact_string, value) => value.src_ref(), // TODO: fix src ref
+        }
+    }
+}
