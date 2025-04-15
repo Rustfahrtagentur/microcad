@@ -7,12 +7,11 @@ mod symbol_definition;
 mod symbol_map;
 mod symbol_node;
 
-use log::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
 pub use symbol_node::*;
 
-use crate::{env_logger_init, rc_mut::*, syntax::*};
+use crate::{rc_mut::*, syntax::*};
 
 /// Trait for items which can be fully qualified
 pub trait FullyQualify {
@@ -84,7 +83,7 @@ impl Resolve for SourceFile {
 
 #[test]
 fn resolve_source_file() {
-    env_logger_init();
+    crate::env_logger_init();
 
     let source_file = Rc::new(
         SourceFile::load_from_str(r#"module a() { module b() {} } "#).expect("Valid source"),
@@ -108,7 +107,7 @@ fn resolve_source_file() {
     //      print("test"); // Use symbol node from parent
     // }
 
-    trace!("Symbol node:\n{symbol_node}");
+    log::trace!("Symbol node:\n{symbol_node}");
 
     let b = symbol_node.search(&"a::b".into()).expect("cant find node");
     assert!(b.borrow().search(&"a".into()).is_none());
