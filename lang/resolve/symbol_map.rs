@@ -33,7 +33,7 @@ impl SymbolMap {
             if let Some(symbol) = symbol.borrow().search(&name) {
                 Ok(symbol.clone())
             } else {
-                Err(EvalError::SymbolNotFound(name, id.into()))
+                Err(EvalError::SymbolNotFound(name))
             }
         } else {
             todo!("error")

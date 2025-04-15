@@ -1,28 +1,30 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{syntax::*, value::*, Id};
+use crate::{eval::*, resolve::SymbolNodeRcMut, syntax::*, value::*, Id};
+use log::debug;
 use std::collections::BTreeMap;
 
 /// A local variable
 pub enum LocalDefinition {
     Value(Value),
     Expression(Expression),
+    Symbol(SymbolNodeRcMut),
 }
 
 /// A stack frame is map of local variables
-type StackFrame = BTreeMap<Id, LocalDefinition>;
+type Locals = BTreeMap<Id, LocalDefinition>;
 
 /// A stack with a list of local variables for each stack frame
-pub struct ScopeStack(Vec<StackFrame>);
+pub struct LocalStack(Vec<Locals>);
 
-impl Default for ScopeStack {
+impl Default for LocalStack {
     fn default() -> Self {
         Self(vec![BTreeMap::new()])
     }
 }
 
-impl ScopeStack {
+impl LocalStack {
     /// Open a new scope (stack push)
     pub fn open_scope(&mut self) {
         self.0.push(BTreeMap::new());
@@ -34,37 +36,38 @@ impl ScopeStack {
     }
 
     /// Add a new variable to current stack frame
-    pub fn add(&mut self, id: Id, symbol: LocalDefinition) {
+    pub fn add(&mut self, id: Id, local: LocalDefinition) {
         self.0
             .last_mut()
-            .expect("cannot push symbol onto empty scope stack")
-            .insert(id, symbol);
+            .expect("cannot push symbol onto an empty local stack")
+            .insert(id, local);
     }
 
     /// Fetch a local variable from current stack frame
-    pub fn fetch<'a>(&'a self, id: &Id) -> Option<&'a LocalDefinition> {
+    pub fn fetch<'a>(&'a self, id: &Id) -> EvalResult<&'a LocalDefinition> {
+        debug!("fetching  {id} in locals");
         for map in self.0.iter().rev() {
-            if let Some(symbol) = map.get(id) {
-                return Some(symbol);
+            if let Some(local) = map.get(id) {
+                return Ok(local);
             }
         }
-        None
+        Err(super::EvalError::LocalNotFound(id.clone()))
     }
 }
 
 #[test]
 #[allow(clippy::unwrap_used)]
-fn scope_stack() {
+fn local_stack() {
     use crate::src_ref::{Refer, SrcRef};
-    let mut stack = ScopeStack::default();
+    let mut stack = LocalStack::default();
 
     let make_int = |value| LocalDefinition::Value(Value::Integer(Refer::new(value, SrcRef(None))));
 
-    let fetch_int = |stack: &ScopeStack, id: &str| -> Option<i64> {
-        stack.fetch(&id.into()).and_then(|v| match v {
-            LocalDefinition::Value(Value::Integer(i)) => Some(i.value),
+    let fetch_int = |stack: &LocalStack, id: &str| -> Option<i64> {
+        match stack.fetch(&id.into()) {
+            Ok(LocalDefinition::Value(Value::Integer(i))) => Some(i.value),
             _ => None,
-        })
+        }
     };
 
     stack.add("a".into(), make_int(1));

@@ -40,8 +40,7 @@ pub fn assert_invalid() -> SymbolNodeRcMut {
                 context.error(SrcRef(None), EvalError::LocalNotFound(name))?;
             }
             Ok(LookUp::Symbol(name)) => {
-                let within = context.current.borrow().name()?;
-                context.error(SrcRef(None), EvalError::SymbolNotFound(name, within))?;
+                context.error(SrcRef(None), EvalError::SymbolNotFound(name))?;
             }
             _ => (),
         };
@@ -78,11 +77,16 @@ fn assert_ok() {
 
 #[test]
 fn assert_fail() {
+    use log::trace;
+    microcad_lang::env_logger_init();
+
     let source_file = SourceFile::load("../tests/test_cases/syntax/assert_fail.µcad")
         .expect("cannot load test file");
-    source_file.resolve(None);
     let mut context = EvalContext::from_source_file(source_file.clone(), vec![]);
     context.add_symbol(super::builtin_namespace());
+    let node = source_file.resolve(None);
+    trace!("Source File Node:\n{node}");
+    //trace!("Symbol Map:\n{}", context.symbols);
 
     assert!(source_file.eval(&mut context).is_ok());
     assert!(context.diag_handler().error_count > 0);

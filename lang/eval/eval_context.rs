@@ -11,10 +11,8 @@ use log::*;
 pub struct EvalContext {
     /// List of all global symbols
     symbols: SymbolMap,
-    /// Current node while evaluation
-    pub current: SymbolNodeRcMut,
     /// Stack of currently opened scopes with local symbols while evaluation
-    scope_stack: ScopeStack,
+    local_stack: LocalStack,
     /// Source file cache containing all source files loaded in the context and their syntax trees
     source_cache: SourceCache,
     /// Source file diagnostics
@@ -50,7 +48,7 @@ impl EvalContext {
         );
 
         // if node owns a source file store this in the file cache
-        let (source_cache, current) = match &symbol.borrow().def {
+        let (source_cache, source_node) = match &symbol.borrow().def {
             SymbolDefinition::SourceFile(source_file) => (
                 SourceCache::new(source_file.clone(), search_paths),
                 SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
@@ -68,16 +66,15 @@ impl EvalContext {
         });
 
         // insert root file into symbol map
-        symbols.insert(current.borrow().id(), current.clone());
+        symbols.insert(source_node.borrow().id(), source_node.clone());
         trace!("Symbols:\n{symbols}");
 
         // put all together
         Self {
             source_cache,
             symbols,
-            current,
             diag_handler: Default::default(),
-            scope_stack: Default::default(),
+            local_stack: Default::default(),
             output,
         }
     }
@@ -103,9 +100,9 @@ impl EvalContext {
         )
     }
 
-    /// Add a local value to scope stack
+    /// Add a local value to local stack
     pub fn add_local_value(&mut self, id: Id, value: Value) {
-        self.scope_stack.add(id, LocalDefinition::Value(value));
+        self.local_stack.add(id, LocalDefinition::Value(value));
     }
 
     /// Add symbol to symbol map
@@ -115,26 +112,30 @@ impl EvalContext {
 
     /// Open a new scope
     pub fn open_scope(&mut self) {
-        self.scope_stack.open_scope();
+        self.local_stack.open_scope();
     }
 
     /// Remove all local variables in the current scope and close it
     pub fn close_scope(&mut self) {
-        self.scope_stack.close_scope();
+        self.local_stack.close_scope();
     }
 
     /// fetch symbol from symbol table
     pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
-        self.symbols.search(&qualified_name.clone())
+        if let Some(id) = qualified_name.single_identifier() {
+            match self.fetch_local(id.id()) {
+                Ok(LocalDefinition::Symbol(symbol)) => Ok(symbol.clone()),
+                Ok(_) => todo!(),
+                Err(_) => todo!(),
+            }
+        } else {
+            self.symbols.search(&qualified_name.clone())
+        }
     }
 
     /// fetch local variable
     pub fn fetch_local<'a>(&'a self, id: &Id) -> EvalResult<&'a LocalDefinition> {
-        if let Some(def) = self.scope_stack.fetch(id) {
-            Ok(def)
-        } else {
-            Err(super::EvalError::LocalNotFound(id.clone()))
-        }
+        self.local_stack.fetch(id)
     }
 
     /// fetch a value from a local variable or symbol table
@@ -167,7 +168,7 @@ impl EvalContext {
     /// lookup a symbol from a qualified name
     /// (also loads an external symbol if not already loaded)
     pub fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
-        debug!("load symbol {name} in {}", self.current.borrow().def.id());
+        debug!("loading symbol {name}");
 
         // if symbol could not be found in symbol tree, try to load it from external file
         match self.source_cache.get_by_name(name) {
@@ -185,19 +186,16 @@ impl EvalContext {
             }
             Ok(_) => (),
             _ => {
-                return Err(EvalError::SymbolNotFound(
-                    name.clone(),
-                    self.current.borrow().name()?,
-                ));
+                return Err(EvalError::SymbolNotFound(name.clone()));
             }
         }
 
         // get symbol from symbol map
         let symbol = self.symbols.search(name)?;
-        // insert node into symbols
-        self.current.borrow_mut().children.insert(
-            name.last().expect("empty name?").id().clone(),
-            symbol.clone(),
+
+        self.local_stack.add(
+            symbol.borrow().id(),
+            LocalDefinition::Symbol(symbol.clone()),
         );
 
         trace!("Symbols:\n{}", self.symbols);

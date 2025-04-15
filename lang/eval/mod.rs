@@ -15,9 +15,9 @@ mod externals;
 mod format_string;
 mod identifier;
 mod literal;
+mod local_stack;
 mod output;
 mod parameter;
-mod scope_stack;
 mod source_cache;
 mod statement;
 mod r#use;
@@ -33,7 +33,7 @@ pub use output::*;
 pub use source_cache::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
-use scope_stack::*;
+use local_stack::*;
 
 /// Evaluation trait
 pub trait Eval {
