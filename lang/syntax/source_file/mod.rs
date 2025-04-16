@@ -4,6 +4,7 @@
 //! µcad source file representation
 
 use crate::{eval::*, src_ref::*, syntax::*, value::*};
+use log::*;
 
 /// µcad source file
 #[derive(Clone, Debug, Default)]
@@ -42,11 +43,6 @@ impl SourceFile {
             .expect("File name error {filename:?}")
     }
 
-    /// Return source file hash
-    pub fn hash(&self) -> u64 {
-        self.hash
-    }
-
     /// get a specific line
     ///
     /// - `line`: line number beginning at `0`
@@ -62,7 +58,9 @@ impl SourceFile {
 
 impl Eval for SourceFile {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        Body::evaluate_vec(&self.body, context)
+        let result = Body::evaluate_vec(&self.body, context);
+        trace!("Evaluated context:\n{context}");
+        result
     }
 }
 

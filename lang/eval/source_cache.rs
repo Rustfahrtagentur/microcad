@@ -23,13 +23,29 @@ pub struct SourceCache {
 impl SourceCache {
     /// Create new source register
     pub fn new(root: std::rc::Rc<SourceFile>, search_paths: Vec<std::path::PathBuf>) -> Self {
+        let externals = Externals::new(search_paths);
         let mut by_hash = std::collections::HashMap::new();
-        by_hash.insert(root.hash(), 0);
+        by_hash.insert(root.hash, 0);
+        let mut by_name = std::collections::HashMap::new();
+        by_name.insert(
+            QualifiedName::try_from(
+                root.filename
+                    .file_stem()
+                    .expect("missing file stem")
+                    .to_string_lossy()
+                    .to_string(),
+            )
+            .expect("cannot convert file name into qualified name"),
+            0,
+        );
+        let mut by_path = std::collections::HashMap::new();
+        by_path.insert(root.filename.clone(), 0);
         Self {
-            externals: Externals::new(search_paths),
+            externals,
             source_files: vec![root.clone()],
             by_hash,
-            ..Default::default()
+            by_path,
+            by_name,
         }
     }
 
@@ -38,13 +54,14 @@ impl SourceCache {
         self.externals.create_namespaces()
     }
 
-    /// Insert a new source file into source register
+    /// Insert a new source file (from externals) into source register.
+    /// The file must lay in one of the search paths given to externals.
     /// - `name`: Qualified name which represents the file
     /// - `source_file`: The loaded source file to store
     pub fn insert(&mut self, source_file: std::rc::Rc<SourceFile>) -> EvalResult<QualifiedName> {
-        let name = self.externals.get_name(&source_file.filename)?;
-        let hash = source_file.hash();
         let filename = source_file.filename.clone();
+        let name = self.externals.get_name(&filename)?;
+        let hash = source_file.hash;
         let index = self.source_files.len();
         debug!("caching [{index}] {name} {hash:#x} {filename:?}");
         self.source_files.push(source_file);
@@ -87,11 +104,22 @@ impl SourceCache {
         } else {
             // if not found in symbol tree we try to find an external file to load
             let external = self.externals.fetch_external(name)?;
-            Err(EvalError::SymbolMustBeLoaded(
-                self.externals.get_name(external)?.clone(),
-                external.clone(),
-            ))
+            if self.get_by_path(external).is_ok() {
+                Err(EvalError::SymbolNotFound(name.clone()))
+            } else {
+                Err(EvalError::SymbolMustBeLoaded(
+                    self.externals.get_name(external)?.clone(),
+                    external.clone(),
+                ))
+            }
         }
+    }
+
+    fn name_from_index(&self, index: usize) -> Option<QualifiedName> {
+        self.by_name
+            .iter()
+            .find(|(_, i)| **i == index)
+            .map(|(name, _)| name.clone())
     }
 }
 
@@ -109,5 +137,17 @@ impl GetSourceByHash for SourceCache {
         } else {
             Err(EvalError::UnknownHash(hash))
         }
+    }
+}
+
+impl std::fmt::Display for SourceCache {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (index, source_file) in self.source_files.iter().enumerate() {
+            let filename = source_file.filename.clone();
+            let name = self.name_from_index(index).unwrap_or(QualifiedName(vec![]));
+            let hash = source_file.hash;
+            writeln!(f, "[{index}] {name} {hash:#x} {filename:?}")?;
+        }
+        Ok(())
     }
 }

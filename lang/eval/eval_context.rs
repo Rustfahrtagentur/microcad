@@ -243,3 +243,13 @@ impl GetSourceByHash for EvalContext {
         self.source_cache.get_by_hash(hash)
     }
 }
+
+impl std::fmt::Display for EvalContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Source Cache:\n{}\nSymbols:\n{}",
+            self.source_cache, self.symbols
+        )
+    }
+}
