@@ -1,4 +1,4 @@
-use crate::{eval::*, resolve::*, syntax::*, Id};
+use crate::{eval::*, resolve::*, src_ref::SrcReferrer, syntax::*, Id};
 
 /// Map Id to SymbolNode reference
 #[derive(Debug, Default, Clone)]
@@ -32,18 +32,21 @@ impl SymbolMap {
 
     /// search for a symbol in symbol map
     pub fn search(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
-        log::trace!("Searching {name} in symbol map");
-        let (id, name) = name.split_first();
-
-        if let Some(symbol) = self.get(id.id()) {
-            if let Some(symbol) = symbol.borrow().search(&name) {
-                Ok(symbol.clone())
-            } else {
-                Err(EvalError::SymbolNotFound(name))
-            }
-        } else {
-            Err(EvalError::SymbolNotFound(name))
+        if name.is_empty() {
+            return Err(EvalError::NotAName(name.src_ref()));
         }
+
+        log::trace!("Searching {name} in symbol map");
+        let (id, leftover) = name.split_first();
+        if let Some(symbol) = self.get(id.id()) {
+            if leftover.is_empty() {
+                return Ok(symbol.clone());
+            } else if let Some(symbol) = symbol.borrow().search(&leftover) {
+                return Ok(symbol.clone());
+            }
+        }
+
+        Err(EvalError::SymbolNotFound(name.clone()))
     }
 }
 

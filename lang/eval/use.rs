@@ -15,7 +15,11 @@ impl Eval for UseStatement {
 impl Eval for UseDeclaration {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match &self {
-            UseDeclaration::Use(qualified_name, _) => context.use_symbol(qualified_name)?,
+            UseDeclaration::Use(qualified_name, _) => {
+                if let Err(err) = context.use_symbol(qualified_name) {
+                    context.error(qualified_name, err)?;
+                }
+            }
             UseDeclaration::UseAll(_qualified_name, _) => todo!(),
             UseDeclaration::UseAlias(_qualified_name, _identifier, _) => todo!(),
         };

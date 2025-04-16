@@ -121,7 +121,7 @@ pub enum EvalError {
     LocalNotFound(Id),
 
     /// Expression is neither a valid name for a symbol nor local variable
-    #[error("Expression at line {0} is neither a valid name for a symbol nor local variable")]
+    #[error("'{0}' is neither a valid name for a symbol nor local variable")]
     NotAName(SrcRef),
 
     /// Lookup of a name failed

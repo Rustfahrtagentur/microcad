@@ -3,6 +3,8 @@
 
 //! External files register
 
+use std::ffi::OsStr;
+
 use crate::{eval::*, syntax::*};
 use log::*;
 
@@ -63,17 +65,30 @@ impl Externals {
 
     /// search for an external file which may include a given qualified name
     pub fn fetch_external(&self, name: &QualifiedName) -> EvalResult<&std::path::PathBuf> {
-        let mut result: EvalResult<&std::path::PathBuf> =
-            Err(EvalError::ExternalSymbolNotFound(name.clone()));
+        trace!("fetching {name} from externals");
+
+        let mut found: Vec<&std::path::PathBuf> = vec![];
         for (namespace, path) in self.0.iter() {
             if name.is_sub_of(namespace) {
-                if let Ok(alt_path) = result {
-                    return Err(EvalError::AmbiguousExternal(alt_path.clone(), path.clone()));
-                }
-                result = Ok(path);
+                found.push(path);
             }
         }
-        result
+        if found.is_empty() {
+            Err(EvalError::ExternalSymbolNotFound(name.clone()))
+        } else {
+            trace!(
+                "{name} might be found in the following files:\n{}",
+                found
+                    .iter()
+                    .map(|p| p.to_string_lossy())
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            );
+            Ok(found
+                .iter()
+                .max_by_key(|p| p.as_os_str().len())
+                .expect("cannot find the longest path"))
+        }
     }
 
     /// get qualified name by path
@@ -99,7 +114,7 @@ impl Externals {
                     externals.insert(
                         Self::into_qualified_name(
                             &file
-                                .strip_prefix(search_path.clone())
+                                .strip_prefix(search_path)
                                 .expect("cannot strip search path from file name")
                                 .with_extension(""),
                         ),
@@ -112,11 +127,19 @@ impl Externals {
     }
 
     /// convert a path (of an external source code file) into a qualified name
-    fn into_qualified_name(path: &std::path::Path) -> QualifiedName {
+    fn into_qualified_name(file: &std::path::Path) -> QualifiedName {
         use crate::src_ref::*;
 
+        // check if this is a module file and remove doublet namespace generation
+        let file = if file.file_stem() == Some(OsStr::new("module")) {
+            file.parent()
+                .expect("module file in root path is not allowed")
+        } else {
+            file
+        };
+
         QualifiedName(
-            path.iter()
+            file.iter()
                 .map(|id| {
                     Identifier(Refer {
                         value: id.to_string_lossy().into_owned().into(),
