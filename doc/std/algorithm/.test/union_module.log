@@ -1,4 +1,4 @@
-error: Symbol algorithm::union not found.
+error: Symbol std::algorithm::union not found.
   ---> <from_str>:1:1
      |
    1 | std::algorithm::union() {
@@ -10,13 +10,13 @@ error: Cannot nest item: std::algorithm::union()
    1 | std::algorithm::union() {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol geo2d::circle not found.
+error: Symbol std::geo2d::circle not found.
   ---> <from_str>:2:5
      |
    2 |     std::geo2d::circle(radius = 3mm);
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol geo2d::rect not found.
+error: Symbol std::geo2d::rect not found.
   ---> <from_str>:3:5
      |
    3 |     std::geo2d::rect(width = 3mm, height = 2mm);
