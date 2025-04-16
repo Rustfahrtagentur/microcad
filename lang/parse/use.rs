@@ -21,7 +21,7 @@ impl Parse for UseDeclaration {
             Rule::use_alias => {
                 let mut inner = first.inner();
                 let name = QualifiedName::parse(inner.next().expect("Expected qualified name"))?;
-                let alias = Identifier::parse(inner.next().expect("Expected identfier"))?;
+                let alias = Identifier::parse(inner.next().expect("Expected identifier"))?;
                 Ok(Self::UseAlias(name, alias, pair.clone().into()))
             }
             _ => unreachable!("Invalid use declaration"),
