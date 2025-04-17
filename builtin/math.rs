@@ -1,10 +1,10 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{diag::*, eval::*, rc_mut::*, resolve::*, src_ref::*, ty::*, value::*};
+use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, ty::*, value::*};
 
 // Absolute value abs(x)
-fn abs() -> RcMut<SymbolNode> {
+fn abs() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("abs".into(), &|args, ctx| {
         let arg = args.get_single()?;
         Ok(match arg.value.eval(ctx)? {
@@ -17,10 +17,10 @@ fn abs() -> RcMut<SymbolNode> {
     })
 }
 
-pub fn math() -> RcMut<SymbolNode> {
+pub fn math() -> SymbolNodeRcMut {
     crate::NamespaceBuilder::new("math".try_into().expect("unexpected name error"))
-        .symbol(SymbolNode::new_builtin_constant(
-            "pi",
+        .symbol(SymbolNode::new_constant(
+            "pi".into(),
             Value::Scalar(Refer::none(std::f64::consts::PI)),
         ))
         .symbol(abs())

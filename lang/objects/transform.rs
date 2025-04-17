@@ -60,7 +60,7 @@ impl Algorithm for Transform {
         let geometries: Vec<_> = parent
             .children()
             .filter_map(|child| match &*child.borrow() {
-                ObjectNodeInner::Group => {
+                ObjectNodeInner::Group(_) => {
                     BooleanOp::Union.render_into_geometry2d(renderer, child.clone())
                 }
                 ObjectNodeInner::Primitive2D(renderable) => {
@@ -88,7 +88,7 @@ impl Algorithm for Transform {
         let geometries: Vec<_> = parent
             .children()
             .filter_map(|child| match &*child.borrow() {
-                ObjectNodeInner::Group => {
+                ObjectNodeInner::Group(_) => {
                     BooleanOp::Union.render_into_geometry3d(renderer, child.clone())
                 }
                 ObjectNodeInner::Primitive3D(renderable) => {

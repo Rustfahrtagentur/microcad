@@ -10,7 +10,7 @@ mod print;
 
 mod namespace_builder;
 
-use microcad_lang::{rc_mut::*, resolve::*};
+use microcad_lang::resolve::*;
 pub use namespace_builder::NamespaceBuilder;
 
 pub(crate) use algorithm::*;
@@ -19,7 +19,7 @@ pub(crate) use math::math;
 pub(crate) use print::print;
 
 /// Build the standard module
-pub fn builtin_namespace() -> RcMut<SymbolNode> {
+pub fn builtin_namespace() -> SymbolNodeRcMut {
     NamespaceBuilder::new("__builtin".try_into().expect("unexpected name error"))
         .symbol(assert())
         .symbol(assert_valid())

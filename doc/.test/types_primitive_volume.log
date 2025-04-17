@@ -1,28 +1,28 @@
-error: Symbol not found: std::assert
+error: Symbol std::assert not found.
   ---> <from_str>:9:1
      |
    9 | std::assert(cubic_millimeter == 1.0l);
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol not found: std::assert
+error: Symbol std::assert not found.
   ---> <from_str>:10:1
      |
   10 | std::assert(cubic_centimeter == 1.0l);
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol not found: std::assert
+error: Symbol std::assert not found.
   ---> <from_str>:11:1
      |
   11 | std::assert(cubic_meter == 1.0l);
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol not found: std::assert
+error: Symbol std::assert not found.
   ---> <from_str>:12:1
      |
   12 | std::assert(centiliter == 1.0l);
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol not found: std::assert
+error: Symbol std::assert not found.
   ---> <from_str>:13:1
      |
   13 | std::assert(milliliter == 1.0l);

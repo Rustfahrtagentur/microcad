@@ -7,13 +7,13 @@
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Color {
     /// red value
-    r: f32,
+    pub r: f32,
     /// green value
-    g: f32,
+    pub g: f32,
     /// blue value
-    b: f32,
+    pub b: f32,
     /// alpha value
-    a: f32,
+    pub a: f32,
 }
 
 impl Color {

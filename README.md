@@ -31,7 +31,6 @@ Simple basic shapes can be composed to create complex geometries which then can 
       - [User Manual](#user-manual)
   - [Test List](#test-list)
 
-
 ## Quick Start
 
 *µcad* is programmed in [Rust](https://www.rust-lang.org/) which easily can be [installed](https://www.rust-lang.org/tools/install) on several operating systems.
@@ -102,10 +101,10 @@ module lid(
 l = lid();
 
 // Print out the volume of the model instance
-std::print("Volume: {l.volume() / 1000}cm³");
+__builtin::print("Volume: {l.volume() / 1000}cm³");
 
 // Insert `l` into resulting object tree
-std::export("lid.stl") l;
+__builtin::export("lid.stl") l;
 ```
 
 The STL file can now also be loaded into a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.

@@ -3,9 +3,9 @@
 
 //! Builtin print method
 
-use microcad_lang::{eval::*, rc_mut::*, resolve::*, value::*};
+use microcad_lang::{eval::*, resolve::*, value::*};
 
-pub fn print() -> RcMut<SymbolNode> {
+pub fn print() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("print".into(), &|args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
             let value = arg.value.eval(context)?;
@@ -23,7 +23,8 @@ fn assert_ok() {
     let source_file =
         SourceFile::load("../tests/test_cases/print.µcad").expect("cannot load test file");
 
-    let mut context = EvalContext::from_source_file(source_file.clone());
+    let mut context =
+        EvalContext::from_source_file(source_file.clone(), crate::builtin_namespace(), vec![]);
     context.add_symbol(super::builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());

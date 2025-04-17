@@ -3,15 +3,16 @@
 
 //! µcad source file representation
 
-use crate::{eval::*, syntax::*, value::*};
+use crate::{eval::*, src_ref::*, syntax::*, value::*};
+use log::*;
 
 /// µcad source file
 #[derive(Clone, Debug, Default)]
 pub struct SourceFile {
     /// Root code body
     pub body: Vec<Statement>,
-    /// Name of loaded file or `None`
-    pub filename: Option<std::path::PathBuf>,
+    /// Name of loaded file
+    pub filename: std::path::PathBuf,
     /// Source file string, TODO: might be a &'a str in the future
     pub source: String,
 
@@ -28,28 +29,18 @@ impl SourceFile {
 
     /// Return filename of loaded file or `<no file>`
     pub fn filename_as_str(&self) -> &str {
-        self.filename
-            .as_ref()
-            .map(|path| path.to_str().unwrap_or(Self::NO_FILE))
-            .unwrap_or(Self::NO_FILE)
+        let filename = &self.filename;
+        filename.to_str().expect("File name error {filename:?}")
     }
 
     /// Return the namespace name from the file name
     pub fn namespace_name_as_str(&self) -> &str {
-        self.filename
-            .as_ref()
-            .map(|path| {
-                path.file_stem()
-                    .expect("cannot get file stem")
-                    .to_str()
-                    .unwrap_or(Self::NO_FILE)
-            })
-            .unwrap_or(Self::NO_FILE)
-    }
-
-    /// Return source file hash
-    pub fn hash(&self) -> u64 {
-        self.hash
+        let filename = &self.filename;
+        filename
+            .file_stem()
+            .expect("cannot get file stem")
+            .to_str()
+            .expect("File name error {filename:?}")
     }
 
     /// get a specific line
@@ -58,11 +49,18 @@ impl SourceFile {
     pub fn get_line(&self, line: usize) -> Option<&str> {
         self.source.lines().nth(line)
     }
+
+    /// return number of source code lines
+    pub fn num_lines(&self) -> usize {
+        self.source.lines().count()
+    }
 }
 
 impl Eval for SourceFile {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        Body::evaluate_vec(&self.body, context)
+        let result = Body::evaluate_vec(&self.body, context);
+        trace!("Evaluated context:\n{context}");
+        result
     }
 }
 
@@ -74,10 +72,22 @@ impl std::fmt::Display for SourceFile {
 
 impl PrintSyntax for SourceFile {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}SourceFile '{}':", "", self.filename_as_str())?;
+        writeln!(
+            f,
+            "{:depth$}SourceFile '{}' ({}):",
+            "",
+            self.namespace_name_as_str(),
+            self.filename_as_str()
+        )?;
         self.body
             .iter()
             .try_for_each(|s| s.print_syntax(f, depth + 1))
+    }
+}
+
+impl SrcReferrer for SourceFile {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        SrcRef::new(0..self.num_lines(), 0, 0, self.hash)
     }
 }
 
@@ -86,7 +96,7 @@ pub struct FormatSyntax<'a, T: PrintSyntax>(pub &'a T);
 
 impl<T: PrintSyntax> std::fmt::Display for FormatSyntax<'_, T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.print_syntax(f, 0)
+        self.0.print_syntax(f, 2)
     }
 }
 

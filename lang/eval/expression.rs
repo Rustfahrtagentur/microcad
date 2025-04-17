@@ -65,6 +65,16 @@ impl Eval for Expression {
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Nested(nested) => nested.eval(context),
+            Self::PropertyAccess(lhs, identifier, src_ref) => {
+                let value = lhs.eval(context)?;
+
+                if let Some(property_value) = value.get_property_value(identifier) {
+                    Ok(property_value)
+                } else {
+                    context.error(src_ref, EvalError::PropertyNotFound(identifier.clone()))?;
+                    Ok(Value::None)
+                }
+            }
             expr => todo!("{expr:?}"),
         }
     }

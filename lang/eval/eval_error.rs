@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{Id, src_ref::SrcRef, syntax::*, ty::*, value::*};
+use crate::{parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*, Id};
 use thiserror::Error;
 
 /// Evaluation error
@@ -61,6 +61,7 @@ pub enum EvalError {
         found: Type,
     },
 
+    /// Parameter names must be unique
     #[error("Duplicated parameter: {0}")]
     DuplicatedParameter(Id),
 
@@ -100,19 +101,27 @@ pub enum EvalError {
     FunctionCallMissingReturn,
 
     /// Symbol not found
-    #[error("Symbol not found: {0}")]
+    #[error("Symbol {0} not found.")]
     SymbolNotFound(QualifiedName),
+
+    /// Symbol not found (retry to load from external)
+    #[error("Symbol {0} must be loaded from {1:?}")]
+    SymbolMustBeLoaded(QualifiedName, std::path::PathBuf),
 
     /// Symbol is not a value
     #[error("Symbol does not contain a value: {0}")]
     SymbolIsNotAValue(QualifiedName),
+
+    /// Symbol was not expected to be found (e.g. assert_invalid)
+    #[error("Symbol {0} found unexpected")]
+    SymbolFound(QualifiedName),
 
     /// Local symbol not found
     #[error("Local symbol not found: {0}")]
     LocalNotFound(Id),
 
     /// Expression is neither a valid name for a symbol nor local variable
-    #[error("Expression at line {0} is neither a valid name for a symbol nor local variable")]
+    #[error("'{0}' is neither a valid name for a symbol nor local variable")]
     NotAName(SrcRef),
 
     /// Lookup of a name failed
@@ -126,6 +135,10 @@ pub enum EvalError {
     /// Multiple matching Initializers for module definition
     #[error("Multiple matching initializer for module definition `{0}`")]
     MultipleMatchingInitializer(Identifier),
+
+    /// A property of a value was not found
+    #[error("Property not found: {0}")]
+    PropertyNotFound(Identifier),
 
     /// Expected range in for loop
     #[error("Expected range in for loop, got {0}")]
@@ -213,6 +226,34 @@ pub enum EvalError {
     /// Value Error
     #[error("Value Error: {0}")]
     ValueError(#[from] ValueError),
+
+    /// Name of external symbol is unknown
+    #[error("External symbol {0} not found")]
+    ExternalSymbolNotFound(QualifiedName),
+
+    /// Path of external file is unknown
+    #[error("External path '{0}' not found")]
+    ExternalPathNotFound(std::path::PathBuf),
+
+    /// Can't find a project file by hash
+    #[error("Could not find a file with hash {0}")]
+    UnknownHash(u64),
+
+    /// Can't find a project file by it's path
+    #[error("Could not find a file with path {0}")]
+    UnknownPath(std::path::PathBuf),
+
+    /// Can't find a project file by it's qualified name
+    #[error("Could not find a file with name {0}")]
+    UnknownName(QualifiedName),
+
+    /// Found two external source files which point to the same namespace
+    #[error("Ambiguous external files {0} and {1}")]
+    AmbiguousExternal(std::path::PathBuf, std::path::PathBuf),
+
+    /// Can't find a project file by it's qualified name
+    #[error("Parsing error {0}")]
+    ParseError(#[from] ParseError),
 }
 
 /// Result type of any evaluation

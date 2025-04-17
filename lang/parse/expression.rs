@@ -148,7 +148,7 @@ impl Parse for Expression {
                     (op, Rule::tuple_element_access) => {
                         let op = op.inner().next().expect(INTERNAL_PARSE_ERROR);
                         match op.as_rule() {
-                            Rule::identifier => Ok(Self::NamedTupleElementAccess(
+                            Rule::identifier => Ok(Self::PropertyAccess(
                                 Box::new(lhs?),
                                 Identifier::parse(op)?,
                                 pair.clone().into(),

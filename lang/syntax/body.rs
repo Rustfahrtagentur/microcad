@@ -3,7 +3,7 @@
 
 //! Module body syntax element
 
-use crate::{eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 /// Module definition body
 ///
@@ -26,7 +26,7 @@ use crate::{eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
 /// ```
 #[derive(Clone, Debug, Default)]
 pub struct Body {
-    /// Module statements before init
+    /// Module statements
     pub statements: Vec<Statement>,
     /// Source code reference
     pub src_ref: SrcRef,
@@ -36,9 +36,8 @@ impl Body {
     /// fetches all symbols from a slice of statements
     pub fn fetch_symbol_map_from(
         statements: &[Statement],
-        parent: Option<RcMut<SymbolNode>>,
-        context: &mut ResolveContext,
-    ) -> ResolveResult<SymbolMap> {
+        parent: Option<SymbolNodeRcMut>,
+    ) -> SymbolMap {
         let mut symbol_map = SymbolMap::default();
         use crate::resolve::Resolve;
 
@@ -46,28 +45,24 @@ impl Body {
         for statement in statements {
             match statement {
                 Statement::Module(m) => {
-                    symbol_map.insert(m.name.id().clone(), m.resolve(parent.clone(), context)?);
+                    symbol_map.insert(m.id.id().clone(), m.resolve(parent.clone()));
                 }
                 Statement::Namespace(n) => {
-                    symbol_map.insert(n.name.id().clone(), n.resolve(parent.clone(), context)?);
+                    symbol_map.insert(n.id.id().clone(), n.resolve(parent.clone()));
                 }
                 Statement::Function(f) => {
-                    symbol_map.insert(f.name.id().clone(), f.resolve(parent.clone(), context)?);
+                    symbol_map.insert(f.id.id().clone(), f.resolve(parent.clone()));
                 }
                 _ => {}
             }
         }
 
-        Ok(symbol_map)
+        symbol_map
     }
 
     /// fetches all symbols from the statements in the body
-    pub fn fetch_symbol_map(
-        &self,
-        parent: Option<RcMut<SymbolNode>>,
-        context: &mut ResolveContext,
-    ) -> ResolveResult<SymbolMap> {
-        Self::fetch_symbol_map_from(&self.statements, parent, context)
+    pub fn fetch_symbol_map(&self, parent: Option<SymbolNodeRcMut>) -> SymbolMap {
+        Self::fetch_symbol_map_from(&self.statements, parent)
     }
 
     /// Evaluate a vector of statements

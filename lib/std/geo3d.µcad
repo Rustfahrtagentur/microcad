@@ -2,9 +2,7 @@
 ///
 /// Examples:
 /// * with radius `r`: `sphere(r = 10.0mm);`
-module sphere {
-    init(radius: Length) {}
-
+module sphere(radius: Length) {
     init(r: Length) {
         radius = r;
     }
@@ -17,14 +15,12 @@ module sphere {
 /// Examples:
 /// * with size `s`: `cube(s = 10.0mm);`
 /// * with size `x`, `y`, and `z`: `cube(size_x = 10.0mm, size_y = 5.0mm, size_z = 3.0mm);`
-module cube {
+module cube(size_x: Length, size_y: Length, size_z: Length) {
     init(size: Length) {
         size_x = size;
         size_y = size;
         size_z = size;
     }
-
-    init(size_x: Length, size_y: Length, size_z: Length) { }
 
     __builtin::transform::translate(
             -size_x / 2.0 / 1mm,
@@ -43,41 +39,41 @@ module cube {
 ///
 /// Examples:
 /// * with radius `r` and height `h`: `cylinder(r = 10.0mm, h = 5.0mm);`
-module cylinder {
-    init(radius: Length, height: Length) {
-        top = height / 2.0;
-        bottom = -top;
-    }
-
-    init(r: Length, h: Length) {
-        radius = r;
-        height = h;
-        top = height / 2.0;
-        bottom = -top;
-    }
-
-    init(r: Length, bottom: Length, top: Length) {
-        radius = r;
-        height = top - bottom;
-    }
-
-    init(d: Length, bottom: Length, height: Length) {
-        radius = d / 2.0;
-        top = bottom + height;
-    }
-
-    init(d: Length, h: Length) {
-        radius = d / 2.0;
-        height = h;
-        top = height / 2.0;
-        bottom = -top;
-    }
-
-    __builtin::transform::translate(x = 0.0, y = 0.0, z = bottom / 1mm) {
-        __builtin::geo3d::cylinder(
-            radius_bottom = radius / 1mm,
-            radius_top = radius / 1mm,
-            height = height / 1mm
-        );
-    }
-}
+///module cylinder {
+///    init(radius: Length, height: Length) {
+///        top = height / 2.0;
+///        bottom = -top;
+///    }
+///
+///    init(r: Length, h: Length) {
+///        radius = r;
+///        height = h;
+///        top = height / 2.0;
+///        bottom = -top;
+///    }
+///
+///    init(r: Length, bottom: Length, top: Length) {
+///        radius = r;
+///        height = top - bottom;
+///    }
+///
+///    init(d: Length, bottom: Length, height: Length) {
+///        radius = d / 2.0;
+///        top = bottom + height;
+///    }
+///
+///    init(d: Length, h: Length) {
+///        radius = d / 2.0;
+///        height = h;
+///        top = height / 2.0;
+///        bottom = -top;
+///    }
+///
+///    __builtin::transform::translate(x = 0.0, y = 0.0, z = bottom / 1mm) {
+///        __builtin::geo3d::cylinder(
+///            radius_bottom = radius / 1mm,
+///            radius_top = radius / 1mm,
+///            height = height / 1mm
+///        );
+///    }
+///}

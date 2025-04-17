@@ -1,18 +1,20 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, diag::*, eval::*, rc_mut::*, resolve::*, syntax::*};
+use crate::{diag::*, eval::*, resolve::*, syntax::*, Id};
+
+use log::*;
 
 /// Context for evaluation
 ///
 /// The context is used to store the current state of the evaluation.
-/// A context is essentially a stack of symbol tables
+/// A context is essentially a pile of symbol tables
 pub struct EvalContext {
-    /// Tree of all evaluated symbols
-    symbols: RcMut<SymbolNode>,
+    /// List of all global symbols
+    symbols: SymbolMap,
     /// Stack of currently opened scopes with local symbols while evaluation
-    scope_stack: ScopeStack,
-    /// Source file cache containing all source files loaded in the context
+    local_stack: LocalStack,
+    /// Source file cache containing all source files loaded in the context and their syntax trees
     source_cache: SourceCache,
     /// Source file diagnostics
     diag_handler: DiagHandler,
@@ -20,128 +22,182 @@ pub struct EvalContext {
     output: Option<Output>,
 }
 
-/// Look up result
-pub enum LookUp {
-    /// Look up failed
-    NotFound(SrcRef),
-    /// found local variable with given Id
-    Local(Id),
-    /// found global symbol with given qualified name
-    Symbol(QualifiedName),
-}
-
 impl EvalContext {
     /// Create a new context from a source file
-    pub fn from_source_file(source_file: Rc<SourceFile>) -> Self {
+    pub fn new(
+        symbol: SymbolNodeRcMut,
+        builtin: SymbolNodeRcMut,
+        search_paths: Vec<std::path::PathBuf>,
+        output: Option<Output>,
+    ) -> Self {
+        debug!(
+            "Creating Context (search paths: {})",
+            search_paths
+                .iter()
+                .map(|p| p.to_string_lossy())
+                .collect::<Vec<_>>()
+                .join(",")
+        );
+
+        // if node owns a source file store this in the file cache
+        let (source_cache, source_node) = match &symbol.borrow().def {
+            SymbolDefinition::SourceFile(source_file) => (
+                SourceCache::new(source_file.clone(), search_paths),
+                symbol.clone(),
+            ),
+            _ => unreachable!("missing root source file"),
+        };
+
+        // prepare symbol map
+        let mut symbols = SymbolMap::new();
+
+        symbols.insert_node(builtin);
+
+        // create namespaces for all files in search paths into symbol map
+        let namespaces = source_cache.create_namespaces();
+        namespaces.iter().for_each(|(_, namespace)| {
+            symbols.insert_node(namespace.clone());
+        });
+
+        // insert root file into symbol map
+        symbols.insert_node(source_node);
+        trace!("Symbols:\n{symbols}");
+
+        // put all together
         Self {
-            symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
-            source_cache: SourceCache::new(source_file),
+            source_cache,
+            symbols,
             diag_handler: Default::default(),
-            scope_stack: Default::default(),
-            output: Default::default(),
+            local_stack: Default::default(),
+            output,
         }
     }
 
     /// Create a new context from a source file
-    pub fn from_source_file_capture_output(source_file: Rc<SourceFile>) -> Self {
-        Self {
-            symbols: SymbolNode::new(SymbolDefinition::SourceFile(source_file.clone()), None),
-            source_cache: SourceCache::new(source_file),
-            diag_handler: Default::default(),
-            scope_stack: Default::default(),
-            output: Some(Default::default()),
-        }
+    pub fn from_source_file(
+        source_file: std::rc::Rc<SourceFile>,
+        builtin: SymbolNodeRcMut,
+        search_paths: Vec<std::path::PathBuf>,
+    ) -> Self {
+        Self::from_source_file_with_output(source_file, builtin, search_paths, None)
     }
 
-    /// Add a local value
+    /// Create a new context from a source file
+    pub fn from_source_file_with_output(
+        source_file: std::rc::Rc<SourceFile>,
+        builtin: SymbolNodeRcMut,
+        search_paths: Vec<std::path::PathBuf>,
+        output: Option<Output>,
+    ) -> Self {
+        Self::new(
+            SymbolNode::new(SymbolDefinition::SourceFile(source_file), None),
+            builtin,
+            search_paths,
+            output,
+        )
+    }
+
+    /// Add a named local value to current locals
     pub fn add_local_value(&mut self, id: Id, value: Value) {
-        self.scope_stack.add(id, LocalDefinition::Value(value));
+        self.local_stack.add(SymbolNode::new_constant(id, value));
     }
 
-    /// Return reference to the symbols node which is currently processed
-    pub fn current_node(&self) -> RcMut<SymbolNode> {
-        self.symbols.clone()
-    }
-    /// Return a mutable reference to the symbols node which is currently processed
-    pub fn current_node_mut(&mut self) -> RcMut<SymbolNode> {
-        self.symbols.clone()
-    }
-
-    /// Add symbol to current symbol table
-    pub fn add_symbol(&mut self, symbol: RcMut<SymbolNode>) {
-        SymbolNode::insert_child(&mut self.symbols, symbol);
+    /// Add symbol to symbol map
+    pub fn add_symbol(&mut self, symbol: SymbolNodeRcMut) {
+        self.symbols.insert(symbol.borrow().id(), symbol.clone());
     }
 
     /// Open a new scope
     pub fn open_scope(&mut self) {
-        self.scope_stack.open_scope();
+        self.local_stack.open_scope();
     }
 
     /// Remove all local variables in the current scope and close it
     pub fn close_scope(&mut self) {
-        self.scope_stack.close_scope();
+        self.local_stack.close_scope();
     }
 
-    /// fetch symbol from symbol table
-    pub fn fetch_symbol(&self, qualified_name: &QualifiedName) -> EvalResult<RcMut<SymbolNode>> {
-        let current_node = self.current_node();
-        if let Some(child) = SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone())
-        {
-            Ok(child)
-        } else {
-            Err(super::EvalError::SymbolNotFound(qualified_name.clone()))
-        }
+    /// fetch global symbol from symbol map
+    pub fn fetch_global(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+        self.symbols.search(&qualified_name.clone())
     }
 
-    /// fetch local variable
-    pub fn fetch_local<'a>(&'a self, id: &Id) -> EvalResult<&'a LocalDefinition> {
-        if let Some(def) = self.scope_stack.fetch(id) {
-            Ok(def)
-        } else {
-            Err(super::EvalError::LocalNotFound(id.clone()))
-        }
+    /// fetch local variable from local stack
+    pub fn fetch_local(&self, id: &Id) -> EvalResult<SymbolNodeRcMut> {
+        self.local_stack.fetch(id)
     }
 
-    /// fetch a value from a local variable or symbol table
-    pub fn fetch_value(&self, qualified_name: &QualifiedName) -> EvalResult<Value> {
-        if let Some(identifier) = qualified_name.single_identifier() {
-            if let Ok(LocalDefinition::Value(value)) = self.fetch_local(identifier.id()) {
-                return Ok(value.clone());
+    /// fetch a value from local stack
+    pub fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
+        if let Some(identifier) = name.single_identifier() {
+            if let Ok(symbol) = self.fetch_local(identifier.id()) {
+                if let SymbolDefinition::Constant(_, value) = &symbol.borrow().def {
+                    return Ok(value.clone());
+                }
             }
         }
 
-        let symbol = self.fetch_symbol(qualified_name)?;
-
-        match &symbol.borrow().def {
+        match &self.fetch_global(name)?.borrow().def {
             SymbolDefinition::Constant(_, value) => Ok(value.clone()),
-            _ => Err(EvalError::SymbolIsNotAValue(qualified_name.clone())),
+            _ => Err(EvalError::SymbolIsNotAValue(name.clone())),
         }
     }
 
-    /// Find a symbol in the symbol table and add it at the currently processed node
-    pub fn use_symbol(&mut self, qualified_name: &QualifiedName) -> EvalResult<()> {
-        let current_node = self.current_node_mut();
-        if let Some(child) = SymbolNode::search_up(&current_node.borrow(), &qualified_name.clone())
-        {
-            SymbolNode::insert_child(&mut self.current_node_mut(), child);
-            Ok(())
-        } else {
-            Err(super::EvalError::SymbolNotFound(qualified_name.clone()))
-        }
-    }
-
-    /// look up a symbol name in either local variables or symbol table
-    pub fn look_up(&self, name: &QualifiedName) -> LookUp {
-        let id: Result<Id, _> = name.clone().try_into();
-        if let Ok(id) = id {
-            if self.fetch_local(&id).is_ok() {
-                return LookUp::Local(id);
+    /// Find a symbol in the symbol table and copy it to the locals
+    /// (might load any related external file if not already loaded)
+    pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+        debug!("Using symbol {name} in symbols");
+        let symbol = self.symbols.search(name);
+        match symbol {
+            Ok(symbol) => Ok(symbol.clone()),
+            _ => {
+                let symbol = self.load_symbol(name)?;
+                self.local_stack.add(symbol.clone());
+                trace!("Local Stack:\n{}", self.local_stack);
+                Ok(symbol)
             }
         }
-        if self.fetch_symbol(name).is_ok() {
-            return LookUp::Symbol(name.clone());
+    }
+
+    /// lookup a symbol from a qualified name
+    /// (might load any related external file if not already loaded)
+    fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+        debug!("loading symbol {name}");
+
+        // if symbol could not be found in symbol tree, try to load it from external file
+        match self.source_cache.get_by_name(name) {
+            Err(EvalError::SymbolMustBeLoaded(_, path)) => {
+                // load source file
+                let source_file = SourceFile::load(path.clone())?;
+                // add to source cache
+                let source_name = self.source_cache.insert(source_file.clone())?;
+                // resolve source file
+                let node = source_file.resolve(None);
+                // search namespace to place loaded source file into
+                let target = self.symbols.search(&source_name)?;
+                // copy children into target namespace
+                target.borrow_mut().copy_children(node);
+            }
+            Ok(_) => (),
+            _ => {
+                return Err(EvalError::SymbolNotFound(name.clone()));
+            }
         }
-        LookUp::NotFound(name.src_ref())
+
+        // get symbol from symbol map
+        self.symbols.search(name)
+    }
+
+    /// Look up for local or global symbol
+    ///
+    /// If name is a single id it will be searched in the local stack or
+    /// if name is qualified searches in symbol map.
+    pub fn lookup(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+        if let Some(id) = name.single_identifier() {
+            self.fetch_local(id.id())
+        } else {
+            self.fetch_global(name)
+        }
     }
 
     /// Access diagnostic handler
@@ -164,6 +220,16 @@ impl EvalContext {
             println!("{what}");
         }
     }
+
+    /// get source code location of a src referrer
+    pub fn locate(&self, referrer: &impl SrcReferrer) -> EvalResult<String> {
+        Ok(format!(
+            "{}:{}",
+            self.get_by_hash(referrer.src_ref().source_hash())?
+                .filename_as_str(),
+            referrer.src_ref()
+        ))
+    }
 }
 
 impl PushDiag for EvalContext {
@@ -173,7 +239,17 @@ impl PushDiag for EvalContext {
 }
 
 impl GetSourceByHash for EvalContext {
-    fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>> {
+    fn get_by_hash(&self, hash: u64) -> EvalResult<std::rc::Rc<SourceFile>> {
         self.source_cache.get_by_hash(hash)
+    }
+}
+
+impl std::fmt::Display for EvalContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Source Cache:\n{}\nSymbols:\n{}",
+            self.source_cache, self.symbols
+        )
     }
 }

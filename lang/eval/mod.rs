@@ -11,12 +11,14 @@ mod call;
 mod eval_context;
 mod eval_error;
 mod expression;
+mod externals;
 mod format_string;
 mod identifier;
 mod literal;
+mod local_stack;
 mod output;
 mod parameter;
-mod scope_stack;
+mod source_cache;
 mod statement;
 mod r#use;
 
@@ -26,10 +28,12 @@ pub use builtin_module::*;
 pub use call::*;
 pub use eval_context::*;
 pub use eval_error::*;
+pub use externals::*;
 pub use output::*;
+pub use source_cache::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
-use scope_stack::*;
+use local_stack::*;
 
 /// Evaluation trait
 pub trait Eval {
@@ -39,7 +43,7 @@ pub trait Eval {
 
 impl MethodCall {
     /// Evaluate method call
-    fn eval(&self, _context: &mut EvalContext, _lhs: &Box<Expression>) -> EvalResult<Value> {
+    fn eval(&self, _context: &mut EvalContext, _lhs: &Expression) -> EvalResult<Value> {
         todo!()
     }
 }

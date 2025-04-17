@@ -17,19 +17,20 @@ version.workspace = true
 path = "lib.rs"
 
 [dependencies]
-pest = "2.7"
-pest_derive = "2.7"
-compact_str = "0.8"
+pest = "2.8"
+pest_derive = "2.8"
+compact_str = "0.9"
 log = "0.4"
 rctree = "0.6.0"
 lazy_static = "1.5"
 cgmath = "0.18"
 thiserror = "2.0"
 env_logger = "0.11"
-strum = { version = "0.26", features = ["derive"] }
+strum = { version = "0.27", features = ["derive"] }
 scan_dir = "0.3"
 
 microcad-core = { workspace = true }
+custom_debug = "0.6.2"
 
 [features]
 default = ["geo3d"]

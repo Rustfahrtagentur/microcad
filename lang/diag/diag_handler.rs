@@ -1,4 +1,4 @@
-use crate::{diag::*, eval::*, resolve::*};
+use crate::{diag::*, eval::*};
 
 /// Handler for diagnostics
 #[derive(Default)]

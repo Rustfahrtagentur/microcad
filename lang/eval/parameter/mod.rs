@@ -16,7 +16,7 @@ impl ParameterValue {
                 let default_value = default_value.eval(context)?;
                 if specified_type.ty() != default_value.ty() {
                     context.error(
-                        &parameter,
+                        parameter,
                         EvalError::ParameterTypeMismatch {
                             name: parameter.name.clone(),
                             expected: specified_type.ty(),
@@ -65,6 +65,7 @@ impl ParameterValue {
 }
 
 impl ParameterValueList {
+    /// Create ParameterValueList from ParameterList
     pub fn from_parameter_list(
         parameters: &ParameterList,
         context: &mut EvalContext,

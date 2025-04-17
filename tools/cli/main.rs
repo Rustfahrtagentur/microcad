@@ -7,17 +7,16 @@ extern crate clap;
 extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{eval::*, objects::*, resolve::*, syntax::*};
-use std::{io::Write, path::Path, rc::Rc};
+use log::*;
+use microcad_lang::{
+    env_logger_init, eval::*, objects::*, parse::ParseResult, rc_mut::*, resolve::*, syntax::*,
+};
+use std::io::Write;
 
 /// µcad cli
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
-    /// Standard library search path
-    #[arg(long, default_value = "lib")]
-    std: String,
-
     /// display processing time
     #[arg(short, long, default_value = "false")]
     time: bool,
@@ -31,31 +30,22 @@ enum Commands {
     /// Parse a µcad file
     Parse {
         /// Input µcad file
-        input: String,
-        /// print parse tree
-        #[clap(short, long)]
-        tree: bool,
-        /// print formatted code
-        #[clap(short, long)]
-        fmt: bool,
+        input: std::path::PathBuf,
     },
 
     /// Parse and resolve a µcad file
     Resolve {
         /// Input µcad file
-        input: String,
-        /// print parse tree
-        #[clap(short, long)]
-        tree: bool,
-        /// print formatted code
-        #[clap(short, long)]
-        fmt: bool,
+        input: std::path::PathBuf,
     },
 
     /// Parse and evaluate a µcad file
     Eval {
         /// Input µcad file
-        input: String,
+        input: std::path::PathBuf,
+        /// Paths to search for files
+        #[arg(short = 'I', long = "input", action = clap::ArgAction::Append, default_value = "./lib")]
+        input_path: Vec<std::path::PathBuf>,
     },
 
     /// Parse and evaluate and export a µcad file
@@ -70,6 +60,8 @@ enum Commands {
 
 /// Main of the command line interpreter
 fn main() {
+    env_logger_init();
+
     let cli = Cli::parse();
 
     let start = std::time::Instant::now();
@@ -78,46 +70,19 @@ fn main() {
         eprintln!("{err}")
     }
 
-    println!("Processing Time: {:?}", start.elapsed());
+    info!("Processing Time: {:?}", start.elapsed());
 }
 
 fn run(cli: &Cli) -> anyhow::Result<()> {
     match &cli.command {
-        Commands::Parse { input, tree, fmt } => {
-            let source_file = SourceFile::load(input)?;
-            println!("Parse Output:\n");
-            if *tree {
-                println!("{}", FormatSyntax(source_file.as_ref()));
-            }
-            if *fmt {
-                println!("Parse Output:\n{source_file}");
-            }
-            eprintln!("Parsed successfully!");
+        Commands::Parse { input } => {
+            parse(input)?;
         }
-        Commands::Resolve { input, tree, fmt } => {
-            let mut externals = Externals::new(vec!["lib".into()]);
-            let mut context = ResolveContext::new(&mut externals);
-
-            println!("Context:\n\n{context}");
-
-            let source_file = SourceFile::load(input)?;
-            eprintln!("Parsed successfully!");
-
-            let symbol_table = source_file.resolve(None, &mut context)?;
-
-            println!("Symbols:\n");
-
-            if *tree {
-                println!("{}", FormatSymbol(&symbol_table.borrow()));
-            }
-            if *fmt {
-                println!("{}", symbol_table.borrow());
-            }
-            eprintln!("Resolved successfully!");
+        Commands::Resolve { input } => {
+            resolve(input)?;
         }
-        Commands::Eval { input } => {
-            eval(SourceFile::load(input)?, &cli.std)?;
-            eprintln!("Evaluated successfully!");
+        Commands::Eval { input, input_path } => {
+            eval(input, input_path.clone())?;
         }
         /*
         Commands::Export { input } => {
@@ -164,18 +129,42 @@ main();
     Ok(())
 }
 
-fn eval(source_file: Rc<SourceFile>, _std: impl AsRef<Path>) -> anyhow::Result<ObjectNode> {
-    let mut context = EvalContext::from_source_file(source_file.clone());
+fn parse(input: impl AsRef<std::path::Path>) -> ParseResult<Rc<SourceFile>> {
+    let source_file = SourceFile::load(input)?;
+    info!("Parsed successfully!");
+    Ok(source_file)
+}
 
-    let _result = source_file
+fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<SymbolNodeRcMut> {
+    let symbol_node = parse(input)?.resolve(None);
+    info!("Resolved successfully!");
+    Ok(symbol_node)
+}
+
+fn eval(
+    input: impl AsRef<std::path::Path>,
+    search_paths: Vec<std::path::PathBuf>,
+) -> anyhow::Result<ObjectNode> {
+    let symbols = resolve(input)?;
+    let source_file = match symbols.borrow().def.clone() {
+        SymbolDefinition::SourceFile(source_file) => source_file,
+        _ => todo!(),
+    };
+
+    let mut context = EvalContext::new(
+        symbols.clone(),
+        microcad_builtin::builtin_namespace(),
+        search_paths,
+        None,
+    );
+    let result = source_file
         .eval(&mut context)
         .map_err(|err| anyhow::anyhow!("{err}"))?;
 
-    /*match result {
-        EvalReturn::ObjectNode(node) => Ok(node),
-        _ => unreachable!("Return value must be a node"),
-    }*/
-    todo!()
+    println!("{result}");
+
+    info!("Evaluated successfully!");
+    todo!();
 }
 
 /*

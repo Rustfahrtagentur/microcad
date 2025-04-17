@@ -1,6 +1,6 @@
 use crate::{parse::*, parser::*, rc_mut::*, syntax::*};
 
-impl Parse for Rc<ModuleDefinition> {
+impl Parse for std::rc::Rc<ModuleDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut name = Identifier::default();
         let mut parameters = ParameterList::default();
@@ -22,7 +22,7 @@ impl Parse for Rc<ModuleDefinition> {
         }
 
         Ok(Rc::new(ModuleDefinition {
-            name,
+            id: name,
             parameters,
             body,
             src_ref: pair.into(),

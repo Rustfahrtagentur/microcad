@@ -17,8 +17,8 @@ path = "source_file_test_summary/main.rs"
 
 
 [dependencies]
-pest = "2.7"
-pest_derive = "2.7"
+pest = "2.8"
+pest_derive = "2.8"
 anyhow = "1"
 log = "0.4"
 

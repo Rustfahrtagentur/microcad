@@ -9,7 +9,7 @@ use crate::{rc_mut::*, src_ref::*, syntax::*};
 #[derive(Debug, Clone)]
 pub struct NamespaceDefinition {
     /// Name of the namespace
-    pub name: Identifier,
+    pub id: Identifier,
     /// Namespace body
     pub body: Body,
     /// Source code reference
@@ -18,9 +18,9 @@ pub struct NamespaceDefinition {
 
 impl NamespaceDefinition {
     /// Create a new namespace definition
-    pub fn new(name: Identifier) -> Rc<Self> {
+    pub fn new(name: Identifier) -> std::rc::Rc<Self> {
         Rc::new(Self {
-            name,
+            id: name,
             body: Body::default(),
             src_ref: SrcRef(None),
         })
@@ -35,7 +35,7 @@ impl SrcReferrer for NamespaceDefinition {
 
 impl PrintSyntax for NamespaceDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}NamespaceDefinition '{}':", "", self.name)?;
+        writeln!(f, "{:depth$}NamespaceDefinition '{}':", "", self.id)?;
         self.body.print_syntax(f, depth + 1)
     }
 }

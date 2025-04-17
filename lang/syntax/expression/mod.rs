@@ -15,7 +15,7 @@ pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
 
-use crate::{rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{src_ref::*, syntax::*, value::*};
 
 /// Expressions
 #[derive(Clone, Debug, Default)]
@@ -58,7 +58,7 @@ pub enum Expression {
     /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
     ListElementAccess(Box<Expression>, Box<Expression>, SrcRef),
     /// Access an element of a named tuple: `a.b`
-    NamedTupleElementAccess(Box<Expression>, Identifier, SrcRef),
+    PropertyAccess(Box<Expression>, Identifier, SrcRef),
     /// Access an element of an unnamed tuple: `a.0`
     UnnamedTupleElementAccess(Box<Expression>, u32, SrcRef),
     /// Call to a method: `[2,3].len()`
@@ -88,7 +88,7 @@ impl SrcReferrer for Expression {
                 src_ref,
             } => src_ref.clone(),
             Self::ListElementAccess(_, _, src_ref) => src_ref.clone(),
-            Self::NamedTupleElementAccess(_, _, src_ref) => src_ref.clone(),
+            Self::PropertyAccess(_, _, src_ref) => src_ref.clone(),
             Self::UnnamedTupleElementAccess(_, _, src_ref) => src_ref.clone(),
             Self::MethodCall(_, _, src_ref) => src_ref.clone(),
         }
@@ -115,7 +115,7 @@ impl std::fmt::Display for Expression {
                 src_ref: _,
             } => write!(f, "{op}{rhs}"),
             Self::ListElementAccess(lhs, rhs, _) => write!(f, "{lhs}[{rhs}]"),
-            Self::NamedTupleElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
+            Self::PropertyAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
             Self::UnnamedTupleElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
             Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs}.{method_call}"),
             Self::Nested(nested) => write!(f, "{nested}"),
@@ -162,7 +162,7 @@ impl PrintSyntax for Expression {
                 lhs.print_syntax(f, depth)?;
                 rhs.print_syntax(f, depth)
             }
-            Self::NamedTupleElementAccess(lhs, rhs, _) => {
+            Self::PropertyAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}NamedTupleElementAccess:", "")?;
                 lhs.print_syntax(f, depth)?;
                 rhs.print_syntax(f, depth)
@@ -190,15 +190,5 @@ impl Expression {
             Self::Nested(nested) => nested.single_identifier(),
             _ => None,
         }
-    }
-}
-
-impl Resolve for Expression {
-    fn resolve(
-        &self,
-        parent: Option<RcMut<SymbolNode>>,
-        context: &mut ResolveContext,
-    ) -> ResolveResult<RcMut<SymbolNode>> {
-        todo!()
     }
 }

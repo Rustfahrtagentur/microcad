@@ -9,7 +9,7 @@ use crate::{eval::*, src_ref::*, syntax::*, value::Value};
 #[derive(Clone, Debug)]
 pub struct ModuleDefinition {
     /// Module name
-    pub name: Identifier,
+    pub id: Identifier,
     /// Module parameters (implicit initialization)
     pub parameters: ParameterList,
     /// Module body
@@ -25,14 +25,27 @@ impl ModuleDefinition {
     }
 }
 
-impl ModuleInitDefinition {
-    pub fn call(&self, _args: &CallArgumentList, _context: &mut EvalContext) {}
-}
+impl ModuleInitDefinition {}
 
-impl CallTrait for ModuleDefinition {
-    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Value> {
-        let _arg_map = args.get_matching_arguments(context, &self.parameters);
-        todo!()
+impl CallTrait for std::rc::Rc<ModuleDefinition> {
+    fn call(&self, _args: &CallArgumentList, _context: &mut EvalContext) -> EvalResult<Value> {
+        todo!();
+        /*match self.inits().find_map(|init| {
+            if let Ok(arg_map) = args.get_matching_arguments(context, &init.parameters) {
+                Some((init, arg_map))
+            } else {
+                None
+            }
+        }) {
+            // We have found a matching initializer
+            Some((init, arg_map)) => {
+                init.body.statements.iter().for_each(|statement| {});
+            }
+            // We have not found a matching initializer, test if call arguments match parameter list
+            None => {
+                let _arg_map = args.get_matching_arguments(context, &self.parameters);
+            }
+        }*/
     }
 }
 
@@ -49,7 +62,7 @@ impl<'a> Iterator for Inits<'a> {
     type Item = &'a ModuleInitDefinition;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(statement) = self.0.next() {
+        for statement in self.0.by_ref() {
             match statement {
                 Statement::ModuleInit(module_init_definition) => {
                     return Some(module_init_definition);
@@ -73,7 +86,7 @@ impl std::fmt::Display for ModuleDefinition {
         write!(
             f,
             "module {name}({parameters}) {body}",
-            name = self.name,
+            name = self.id,
             parameters = self.parameters,
             body = self.body
         )
@@ -82,7 +95,7 @@ impl std::fmt::Display for ModuleDefinition {
 
 impl PrintSyntax for ModuleDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.name)?;
+        writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
         self.parameters.print_syntax(f, depth + 1)?;
         self.body.print_syntax(f, depth + 1)
     }

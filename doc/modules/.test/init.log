@@ -1,0 +1,18 @@
+error: Local symbol not found: donut
+  ---> <from_str>:16:1
+     |
+  16 | donut( 2cm, 1cm );
+     | ^^^^^^^^^^^^^^^^^
+     |
+error: Local symbol not found: donut
+  ---> <from_str>:17:1
+     |
+  17 | donut( radius_outer = 2cm, radius_inner = 1cm );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Local symbol not found: donut
+  ---> <from_str>:18:1
+     |
+  18 | donut( diameter_outer = 4cm, diameter_inner = 2cm );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

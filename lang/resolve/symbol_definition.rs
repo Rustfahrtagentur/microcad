@@ -15,21 +15,21 @@ pub enum SymbolDefinition {
     BuiltinFunction(Rc<BuiltinFunction>),
     /// Builtin module symbol
     BuiltinModule(Rc<BuiltinModule>),
-    /// Builtin constant
-    Constant(Id, Value),
+    /// Constant
+    Constant(Identifier, Value),
 }
 
 impl SymbolDefinition {
     /// Returns ID of this definition
     pub fn id(&self) -> Id {
         match &self {
-            Self::Namespace(n) => n.name.id().clone(),
-            Self::Module(m) => m.name.id().clone(),
-            Self::Function(f) => f.name.id().clone(),
+            Self::Namespace(n) => n.id.id().clone(),
+            Self::Module(m) => m.id.id().clone(),
+            Self::Function(f) => f.id.id().clone(),
             Self::SourceFile(s) => s.namespace_name_as_str().into(),
             Self::BuiltinFunction(f) => f.id.clone(),
             Self::BuiltinModule(m) => m.id.clone(),
-            Self::Constant(id, _) => id.clone(),
+            Self::Constant(id, _) => id.id().clone(),
         }
     }
 }
@@ -38,13 +38,13 @@ impl std::fmt::Display for SymbolDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let id = self.id();
         match self {
-            Self::Module(_) => write!(f, "module {}", id),
-            Self::Namespace(_) => write!(f, "namespace {}", id),
-            Self::Function(_) => write!(f, "function {}", id),
-            Self::SourceFile(_) => write!(f, "file {}", id),
-            Self::BuiltinFunction(_) => write!(f, "builtin_fn {}", id),
-            Self::BuiltinModule(_) => write!(f, "builtin_mod {}", id),
-            Self::Constant(id, value) => writeln!(f, "const {} = {}", id, value),
+            Self::Module(_) => write!(f, "{} (module)", id),
+            Self::Namespace(_) => write!(f, "{} (namespace)", id),
+            Self::Function(_) => write!(f, "{} (function)", id),
+            Self::SourceFile(_) => write!(f, "{} (file)", id),
+            Self::BuiltinFunction(_) => write!(f, "{} (builtin function)", id),
+            Self::BuiltinModule(_) => write!(f, "{} (builtin module)", id),
+            Self::Constant(id, value) => write!(f, "{} (= {})", id, value),
         }
     }
 }

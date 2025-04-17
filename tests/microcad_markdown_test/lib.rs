@@ -7,7 +7,7 @@
 //! Code must be marked by *Markdown* code markers (code type: `µcad`) with a test ID attached.
 //! In case of a failing test `#fail` must be appended to the test ID.
 //!
-//! Relative path's of scanned folder names will be used to build a modules structure  
+//! Relative path's of scanned folder names will be used to build a modules structure
 //! in the resulting code.
 //! If test IDs include `.` name will be split into several names which will be
 //! used to crates sub modules.
@@ -359,24 +359,25 @@ fn create_test_code(
                 fn r#{name}() {{
                     use microcad_lang::eval::*;
                     use microcad_lang::syntax::*;
+                    use microcad_builtin::*;
                     use crate::rust_std::fs;
                     use crate::rust_std::io;
                     use crate::rust_std::io::Write;
 
                     microcad_lang::env_logger_init();
-                    
+
                     // get parameters from outside code
                     let banner = "{banner}";
-                    let out = "{out}";
+                    let out_name = "{out}";
                     #[allow(unused)]
                     let todo = {todo};
 
                     // remove generated files before updating
                     let _ = fs::remove_file(banner);
-                    let _ = fs::remove_file(out);
+                    let _ = fs::remove_file(out_name);
 
                     // create log file
-                    let out = &mut fs::File::create(out).expect("cannot create log file");
+                    let out = &mut fs::File::create(out_name).expect("cannot create log file");
                     let out = &mut io::BufWriter::new(out);
 
                     // load and handle µcad source file
@@ -399,8 +400,8 @@ fn create_test_code(
                         // test expected to fail succeeded at parsing?
                         Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = EvalContext::from_source_file_capture_output(source.clone());
-                            let eval = source.eval(&mut context);                        
+                            let mut context = EvalContext::from_source_file_with_output(source.clone(), builtin_namespace(), vec![], Some(Default::default()));
+                            let eval = source.eval(&mut context);
                             let diag = context.diag_handler();
 
                             // get print output
@@ -419,7 +420,8 @@ fn create_test_code(
                                 // evaluation produced errors?
                                 (_,true) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
-                                }
+                                   log::debug!("there were {error_count} errors (see {out_name})", error_count = diag.error_count);
+                                 }
                                 // test expected to fail but succeeds?
                                 (_,_) => {
                                     let _ = fs::hard_link("images/ok_fail.png", banner);
@@ -434,9 +436,9 @@ fn create_test_code(
                         // test awaited to succeed and parsing failed?
                         Err(err) => {
                             out.write_all(format!("{err}").as_bytes()).unwrap();
-                            if todo { 
+                            if todo {
                                 let _ = fs::hard_link("images/todo.png", banner);
-                            } else { 
+                            } else {
                                 let _ = fs::hard_link("images/fail.png", banner);
                                 panic!("ERROR: {err}")
                             }
@@ -444,8 +446,8 @@ fn create_test_code(
                         // test awaited to succeed and parsing succeeds?
                         Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = EvalContext::from_source_file_capture_output(source.clone());
-                            let eval = source.eval(&mut context);                        
+                            let mut context = EvalContext::from_source_file_with_output(source.clone(), builtin_namespace(), vec![], Some(Default::default()));
+                            let eval = source.eval(&mut context);
                             let diag = context.diag_handler();
 
                             // get print output
@@ -473,7 +475,7 @@ fn create_test_code(
                                 // evaluation produced errors?
                                 (_,true,_) => {
                                     let _ = fs::hard_link("images/fail.png", banner);
-                                    panic!("ERROR: there were {error_count} errors", error_count = diag.error_count);
+                                    panic!("ERROR: there were {error_count} errors (see {out_name})", error_count = diag.error_count);
                                 }
                             }
                         },

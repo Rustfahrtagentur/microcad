@@ -1,0 +1,6 @@
+error: Local symbol not found: donut
+  ---> <from_str>:8:1
+     |
+   8 | donut(2cm,1cm);
+     | ^^^^^^^^^^^^^^
+     |

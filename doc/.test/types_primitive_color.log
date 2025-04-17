@@ -1,10 +1,10 @@
-error: Symbol not found: std::assert
+error: Symbol std::assert not found.
   ---> <from_str>:6:1
      |
    6 | std::assert( rgb_single_hex == rgba_single_hex );
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol not found: std::assert
+error: Symbol std::assert not found.
   ---> <from_str>:7:1
      |
    7 | std::assert( rgb_double_hex == rgba_double_hex );
