@@ -3,7 +3,14 @@
 
 //! Module definition syntax element
 
-use crate::{eval::*, src_ref::*, syntax::*, value::Value};
+use crate::{
+    eval::*,
+    rc_mut::RcMut,
+    resolve::{SymbolDefinition, SymbolNode},
+    src_ref::*,
+    syntax::*,
+    value::Value,
+};
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -23,9 +30,17 @@ impl ModuleDefinition {
     pub fn inits(&self) -> Inits {
         Inits::new(self)
     }
-}
 
-impl ModuleInitDefinition {}
+    /// Resolve into SymbolNode
+    pub fn resolve(
+        self: &std::rc::Rc<Self>,
+        parent: Option<RcMut<SymbolNode>>,
+    ) -> RcMut<SymbolNode> {
+        let node = SymbolNode::new(SymbolDefinition::Module(self.clone()), parent);
+        node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
+        node
+    }
+}
 
 impl CallTrait for std::rc::Rc<ModuleDefinition> {
     fn call(&self, _args: &CallArgumentList, _context: &mut EvalContext) -> EvalResult<Value> {

@@ -39,7 +39,6 @@ impl Body {
         parent: Option<SymbolNodeRcMut>,
     ) -> SymbolMap {
         let mut symbol_map = SymbolMap::default();
-        use crate::resolve::Resolve;
 
         // Iterate over all statement fetch definitions
         for statement in statements {

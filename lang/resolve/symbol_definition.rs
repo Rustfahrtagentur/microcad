@@ -1,4 +1,4 @@
-use crate::{eval::*, rc_mut::*, syntax::*, value::Value, Id};
+use crate::{Id, eval::*, rc_mut::*, resolve::*, syntax::*, value::*};
 
 /// Symbol definition
 #[derive(Debug, Clone)]
@@ -30,6 +30,19 @@ impl SymbolDefinition {
             Self::BuiltinFunction(f) => f.id.clone(),
             Self::BuiltinModule(m) => m.id.clone(),
             Self::Constant(id, _) => id.id().clone(),
+        }
+    }
+
+    /// Resolve into SymbolNode
+    pub fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+        match self {
+            Self::Module(m) => m.resolve(parent),
+            Self::Namespace(n) => n.resolve(parent),
+            Self::Function(f) => f.resolve(parent),
+            Self::SourceFile(s) => s.resolve(parent),
+            // A builtin symbols and constants cannot have child symbols,
+            // hence the resolve trait does not need to be implemented
+            symbol_definition => SymbolNode::new(symbol_definition.clone(), parent),
         }
     }
 }

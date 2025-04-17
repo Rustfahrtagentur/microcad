@@ -11,7 +11,7 @@ pub use symbol_definition::*;
 pub use symbol_map::*;
 pub use symbol_node::*;
 
-use crate::{rc_mut::*, syntax::*};
+use crate::syntax::*;
 
 /// Trait for items which can be fully qualified
 pub trait FullyQualify {
@@ -19,73 +19,11 @@ pub trait FullyQualify {
     fn full_name(&self) -> Option<QualifiedName>;
 }
 
-/// Trait which resolves to SymbolNode reference
-pub trait Resolve {
-    /// Resolve self into SymbolNode reference
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode>;
-}
-
-impl Resolve for Rc<ModuleDefinition> {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        let node = SymbolNode::new(SymbolDefinition::Module(self.clone()), parent);
-        node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
-        node
-    }
-}
-
-impl Resolve for Rc<NamespaceDefinition> {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        let node = SymbolNode::new(SymbolDefinition::Namespace(self.clone()), parent);
-        node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
-        node
-    }
-}
-
-impl Resolve for Rc<FunctionDefinition> {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        let node = SymbolNode::new(SymbolDefinition::Function(self.clone()), parent);
-        node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
-        node
-    }
-}
-
-impl Resolve for SymbolDefinition {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        match self {
-            Self::Module(m) => m.resolve(parent),
-            Self::Namespace(n) => n.resolve(parent),
-            Self::Function(f) => f.resolve(parent),
-            Self::SourceFile(s) => s.resolve(parent),
-            // A builtin symbols and constants cannot have child symbols,
-            // hence the resolve trait does not need to be implemented
-            symbol_definition => SymbolNode::new(symbol_definition.clone(), parent),
-        }
-    }
-}
-
-impl Resolve for Rc<SourceFile> {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        eprintln!("resolving {}", self.filename_as_str());
-        let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);
-        node.borrow_mut().children = Body::fetch_symbol_map_from(&self.body, Some(node.clone()));
-        log::trace!("Resolved symbol node:\n{node}");
-        node
-    }
-}
-
-impl Resolve for SourceFile {
-    fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        let node = Rc::new(self.clone()).resolve(parent);
-        eprintln!("Symbol:\n{}", FormatSymbol(&node.borrow()));
-        node
-    }
-}
-
 #[test]
 fn resolve_source_file() {
     crate::env_logger_init();
 
-    let source_file = Rc::new(
+    let source_file = std::rc::Rc::new(
         SourceFile::load_from_str(r#"module a() { module b() {} } "#).expect("Valid source"),
     );
 

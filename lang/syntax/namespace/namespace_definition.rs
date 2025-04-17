@@ -3,7 +3,7 @@
 
 //! Namespace definition syntax element
 
-use crate::{rc_mut::*, src_ref::*, syntax::*};
+use crate::{rc_mut::*, resolve::*, src_ref::*, syntax::*};
 
 /// Namespace definition
 #[derive(Debug, Clone)]
@@ -24,6 +24,13 @@ impl NamespaceDefinition {
             body: Body::default(),
             src_ref: SrcRef(None),
         })
+    }
+
+    /// Resolve into SymbolNode
+    pub fn resolve(self: &Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+        let node = SymbolNode::new(SymbolDefinition::Namespace(self.clone()), parent);
+        node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
+        node
     }
 }
 
