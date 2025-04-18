@@ -38,9 +38,9 @@ impl ContextBuilder {
         let context = Self::new(std_source_file.clone()).with_builtin()?.build();
         let namespace = context
             .current_source_file()
-            .expect("std library missing")
+            .expect("std library")
             .eval_as_namespace(&mut self.context, "std".into())
-            .expect("failure evaluating std library");
+            .expect("valid std library");
 
         self.context.add_source_file(std_source_file);
         self.context.add(Symbol::Namespace(namespace));
