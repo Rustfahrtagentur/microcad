@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, resolve::*, syntax::*, Id};
+use crate::{diag::*, eval::*, resolve::*, syntax::*, eval::call_stack::CallStack, Id};
 
 use log::*;
 
@@ -14,6 +14,8 @@ pub struct EvalContext {
     symbols: SymbolMap,
     /// Stack of currently opened scopes with local symbols while evaluation
     local_stack: LocalStack,
+    /// Call stack
+    call_stack: CallStack,
     /// Source file cache containing all source files loaded in the context and their syntax trees
     source_cache: SourceCache,
     /// Source file diagnostics
@@ -69,6 +71,7 @@ impl EvalContext {
             symbols,
             diag_handler: Default::default(),
             local_stack: Default::default(),
+            call_stack: Default::default(),
             output,
         }
     }
@@ -115,6 +118,16 @@ impl EvalContext {
     /// Remove all local variables in the current scope and close it
     pub fn close_scope(&mut self) {
         self.local_stack.close_scope();
+    }
+
+    /// Push a call to stack
+    pub fn push_call(&mut self, symbol_node: SymbolNode, args: ArgumentMap, src_ref: impl SrcReferrer) {
+        self.call_stack.push(symbol_node, args, src_ref)
+    }
+
+    /// Pop a call from stack
+    pub fn pop_call(&mut self) {
+        self.call_stack.pop();
     }
 
     /// fetch global symbol from symbol map
