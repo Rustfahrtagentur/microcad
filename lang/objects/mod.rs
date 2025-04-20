@@ -1,32 +1,20 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Render tree
+//! Object tree
 
 pub mod algorithm;
 pub mod boolean_op;
+pub mod object;
 pub mod transform;
+
 pub use algorithm::*;
 pub use transform::*;
+pub use object::*;
 
-use crate::{rc_mut::*, syntax::SortedValueList, value::Value, Id};
+use crate::{rc_mut::*, value::Value, Id};
 use microcad_core::*;
 use strum::IntoStaticStr;
-
-
-/// An object with properties
-#[derive(Clone, Default)]
-pub struct Object {
-    /// Properties
-    pub props: SortedValueList,
-}
-
-impl Object {
-    /// Get object property value
-    pub fn get_property_value(&self, id: &Id) -> Option<&Value> {
-        self.props.get_value(id)
-    }
-}
 
 
 /// Inner of a node

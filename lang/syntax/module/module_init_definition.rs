@@ -3,7 +3,7 @@
 
 //! Module initialization definition syntax element
 
-use crate::{diag::PushDiag, eval::{ArgumentMap, EvalContext, EvalError, EvalResult}, objects::ObjectNode, src_ref::*, syntax::*, value::Value};
+use crate::{diag::PushDiag, eval::{ArgumentMap, EvalContext, EvalError, EvalResult}, objects::ObjectNode, src_ref::*, syntax::*, value::{SortedValueList, Value}};
 
 /// Module initialization definition
 ///
