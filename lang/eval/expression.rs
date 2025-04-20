@@ -3,13 +3,37 @@
 
 use crate::eval::*;
 
+impl Eval for ListExpression {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+        let mut value_list = ValueList::new(Vec::new(), self.src_ref());
+        for expr in self.list.clone() {
+            value_list.push(expr.eval(context)?);
+        }
+        if let Some(unit) = self.unit {
+            value_list.add_unit_to_unitless(unit)?;
+        }
+
+        match value_list.types().common_type() {
+            Some(common_type) => Ok(Value::List(List::new(
+                value_list,
+                common_type,
+                self.src_ref(),
+            ))),
+            None => {
+                context.error(self, EvalError::ListElementsDifferentTypes(value_list.types()))?;
+                Ok(Value::None)
+            }
+        }
+    }
+}
+
 impl Eval for Expression {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match self {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
-            /*Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
-            Self::TupleExpression(tuple_expression) => {
+            Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
+            /*Self::TupleExpression(tuple_expression) => {
                 TupleExpression::eval(tuple_expression, context)
             }*/
             Self::BinaryOp {
