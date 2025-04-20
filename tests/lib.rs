@@ -150,11 +150,25 @@ fn module_implicit_init_call() {
 
     assert_eq!(nodes.len(), 1, "There should be one node");
 
+    fn check_node_property_b(node: &objects::ObjectNode, value: f64) {
+        if let objects::ObjectNodeInner::Object(ref object) = *node.borrow() {
+            assert_eq!(object.get_property_value(&"b".into()).expect("Property `b`"), &value::Value::Scalar(src_ref::Refer::none(value)));
+        } else {
+            panic!("Object node expected")
+        }
+    }
+
     // Test if resulting object node has property `b` with value `3.0`
     use microcad_lang::*;
-    if let objects::ObjectNodeInner::Object(ref object) = *nodes.first().expect("Node expected").borrow() {
-        assert_eq!(object.get_property_value(&"b".into()).expect("Property `b`"), &value::Value::Scalar(src_ref::Refer::none(3.0)));
-    } else {
-        panic!("Object node expected")
-    }
+    check_node_property_b(nodes.first().expect("Node expected"), 3.0);
+
+    // Call module `a` with `b = [1.0, 2.0]` (multiplicity)
+    let nodes = module_definition
+        .eval_call(&call_argument_list("b = [1.0, 2.0]"), &mut context)
+        .expect("Valid nodes");
+
+    assert_eq!(nodes.len(), 2, "There should be two nodes");
+
+    check_node_property_b(nodes.first().expect("Node expected"), 1.0);
+    check_node_property_b(nodes.get(1).expect("Node expected"), 2.0);
 }
