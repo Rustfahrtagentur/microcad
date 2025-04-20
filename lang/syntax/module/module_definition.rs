@@ -24,6 +24,7 @@ impl ModuleDefinition {
         Inits::new(self)
     }
 
+    /// Find a matching initializer for call argument list
     fn find_matching_initializer(&self, args: &CallArgumentList, context: &mut EvalContext) -> Option<(&ModuleInitDefinition, MultiArgumentMap)> {
         self.inits().find_map(|init| {
             if let Ok(arg_map) = args.get_multi_matching_arguments(context, &init.parameters) {
@@ -34,9 +35,9 @@ impl ModuleDefinition {
         })
     }
 
+    /// Try to evaluate a single call to an object
     fn eval_to_node<'a>(&'a self, args: &ArgumentMap, init: Option<&'a ModuleInitDefinition>, context: &mut EvalContext) -> EvalResult<ObjectNode> {
         let mut props = SortedValueList::from_parameter_list(&self.parameters, context)?;
-
 
         use crate::objects::*;
 
@@ -61,7 +62,6 @@ impl ModuleDefinition {
         };
 
         // At this point, all properties must have a value 
-    
         let mut nodes = Vec::new();
 
         for statement in &self.body.statements {
@@ -72,10 +72,7 @@ impl ModuleDefinition {
                     context.add_local_value(id.clone(), value);
                 }
                 Statement::Expression(expression) => {
-                    match expression.eval(context)? {
-                        Value::Node(node) => nodes.push(node),
-                        _ => {}
-                    }
+                    if let Value::Node(node) = expression.eval(context)? { nodes.push(node) }
                 }
                 _ => {}
             }
@@ -86,7 +83,6 @@ impl ModuleDefinition {
         for node in nodes {
             object.append(node);
         }
-
 
         Ok(object)
     }
