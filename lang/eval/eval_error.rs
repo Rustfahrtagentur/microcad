@@ -105,7 +105,7 @@ pub enum EvalError {
     SymbolNotFound(QualifiedName),
 
     /// Symbol not found (retry to load from external)
-    #[error("Symbol {0} must be loaded from {1:?}")]
+    #[error("Symbol {0} must be loaded from {1}")]
     SymbolMustBeLoaded(QualifiedName, std::path::PathBuf),
 
     /// Symbol is not a value
@@ -254,6 +254,14 @@ pub enum EvalError {
     /// Can't find a project file by it's qualified name
     #[error("Parsing error {0}")]
     ParseError(#[from] ParseError),
+
+    /// Statement is not supported in this context
+    #[error("Statement not supported: {0}")]
+    StatementNotSupported(Statement),
+
+    /// Properties are not initialized
+    #[error("Properties have not been initialized: {0:?}")]
+    UninitializedProperties(Vec<Id>),
 }
 
 /// Result type of any evaluation

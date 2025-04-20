@@ -3,15 +3,15 @@
 
 //! Module initialization definition syntax element
 
-use crate::{src_ref::*, syntax::*};
+use crate::{diag::PushDiag, eval::{ArgumentMap, EvalContext, EvalError, EvalResult}, objects::ObjectNode, src_ref::*, syntax::*, value::Value};
 
 /// Module initialization definition
 ///
 /// Example:
 ///
 /// ```uCAD
-/// module a {
-///     init(b: length) {} // The init definition
+/// module a(a: Length) {
+///     init(b: Length) { a = 2.0*b; } // The init definition
 /// }
 /// ```
 #[derive(Clone, Debug)]
@@ -23,6 +23,60 @@ pub struct ModuleInitDefinition {
     /// Source reference
     pub src_ref: SrcRef,
 }
+
+
+impl ModuleInitDefinition {
+    /// Evaluate a call to the module init definition
+    pub fn eval_to_node(&self, args: &ArgumentMap, mut props: SortedValueList, context: &mut EvalContext) -> EvalResult<ObjectNode> {
+        context.open_scope();
+
+        // Add values from argument map as local values
+        for (id, value) in args.iter() {
+            props.assign_and_add_local_value(id, value.clone(), context);
+        }
+
+        use crate::eval::Eval;
+
+        let mut nodes = Vec::new();
+        for statement in &self.body.statements {
+            match statement {
+                Statement::Assignment(assignment) => {
+                    let id = assignment.name.id();
+                    let value = assignment.value.eval(context)?;
+
+                    props.assign_and_add_local_value(id, value, context);
+                }
+                Statement::Expression(expression) => {
+                    match expression.eval(context)? {
+                        Value::Node(node) => nodes.push(node),
+                        _ => {}
+                    }
+                }
+                _ => {
+                    context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
+                }
+            }
+        }
+
+        context.close_scope();
+
+        if !props.is_complete() {
+            use crate::diag::PushDiag;
+            context.error(self, EvalError::UninitializedProperties(props.get_incomplete_ids()))?;
+            return Ok(crate::objects::empty_object());
+        } 
+
+        use crate::objects::*;
+
+        // Make a new object node
+        let object = object(Object{ props });
+        for node in nodes {
+            object.append(node);
+        }
+        Ok(object)
+    }
+}
+
 
 impl SrcReferrer for ModuleInitDefinition {
     fn src_ref(&self) -> SrcRef {
