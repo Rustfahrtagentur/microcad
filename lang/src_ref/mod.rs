@@ -115,13 +115,7 @@ impl SrcRef {
     pub fn merge(lhs: impl SrcReferrer, rhs: impl SrcReferrer) -> SrcRef {
         match (lhs.src_ref(), rhs.src_ref()) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => {
-                let source_file_hash = {
-                    if lhs.source_file_hash != rhs.source_file_hash {
-                        todo!("Implement SrcRef with different files")
-                    } else {
-                        lhs.source_file_hash
-                    }
-                };
+                let source_file_hash = lhs.source_file_hash;
 
                 // TODO Not sure if this is correct.
                 // Can we actually merge two ranges of SrcRef?
