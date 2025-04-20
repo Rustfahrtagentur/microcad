@@ -20,7 +20,7 @@ use strum::IntoStaticStr;
 /// Inner of a node
 #[derive(Clone, IntoStaticStr)]
 pub enum ObjectNodeInner {
-    /// A group node that contains children and holds properties
+    /// An object that contains children and holds properties
     Object(Object),
 
     /// A special node after which children will be nested as siblings
