@@ -3,6 +3,8 @@
 
 //! Parameter value list evaluation entity
 
+use compact_str::CompactStringExt;
+
 use crate::{src_ref::*, value::*, Id};
 
 /// List of parameter values
@@ -93,5 +95,11 @@ impl std::ops::Deref for ParameterValueList {
 
     fn deref(&self) -> &Self::Target {
         &self.parameters
+    }
+}
+
+impl std::fmt::Display for ParameterValueList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "{}", self.parameters.iter().map(|p| p.name.to_string()).join_compact(", "))
     }
 }

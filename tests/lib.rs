@@ -199,7 +199,7 @@ fn module_explicit_init_call() {
         }
     }
     
-    // Call module `circle` with `radius = 3.0`
+    // Call module `circle(radius = 3.0)`
     {
         let nodes = module_definition
             .eval_call(&call_argument_list("radius = 3.0"), &mut context)
@@ -208,7 +208,7 @@ fn module_explicit_init_call() {
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
 
-    // Call module `circle` with `r = 3.0`
+    // Call module `circle(r = 3.0)`
     {
         let nodes = module_definition
             .eval_call(&call_argument_list("r = 3.0"), &mut context)
@@ -217,7 +217,7 @@ fn module_explicit_init_call() {
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
         
-    // Call module `circle` with `d = 6.0`
+    // Call module `circle(d = 6.0)`
     {
         let nodes = module_definition
             .eval_call(&call_argument_list("d = 6.0"), &mut context)
@@ -226,13 +226,23 @@ fn module_explicit_init_call() {
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
     
-    // Call module `circle` with `d = [1.0, 2.0]` (multiplicity)
+    // Call module `circle(d = [1.0, 2.0])` (multiplicity)
     {
         let nodes = module_definition
             .eval_call(&call_argument_list("d = [1.0, 2.0]"), &mut context)
             .expect("Valid nodes");
-        assert_eq!(nodes.len(), 2, "There should be one node");
+        assert_eq!(nodes.len(), 2, "There should be two nodes");
         check_node_property_radius(nodes.first().expect("Node expected"), 0.5);
         check_node_property_radius(nodes.get(1).expect("Node expected"), 1.0);
     }
+
+    // Call module `circle()` (missing arguments)
+    {
+        let nodes = module_definition
+            .eval_call(&CallArgumentList::default(), &mut context)
+            .expect("Valid nodes");
+        assert_eq!(nodes.len(), 0, "There should no nodes");
+        context.diag_handler().pretty_print(&mut std::io::stdout(), &context).expect("Valid formatter");
+    }
+
 }
