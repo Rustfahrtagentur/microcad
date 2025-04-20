@@ -7,6 +7,7 @@ use log::debug;
 #[cfg(test)]
 use microcad_lang::{
     parser::Parser,
+    syntax::QualifiedName,
     resolve::SymbolDefinition,
     syntax::{CallArgumentList, Identifier},
 };
@@ -106,38 +107,54 @@ fn context_with_symbols() {
     assert!(eval.is_ok());
 }
 
+#[cfg(test)]
+fn qualified_name(s: &str) -> QualifiedName {
+    QualifiedName(s.split("::").map(|x| Identifier(microcad_lang::src_ref::Refer::none(x.into()))).collect())
+}
+
+#[cfg(test)]
+fn call_argument_list(s: &str) -> CallArgumentList {
+    Parser::parse_rule::<CallArgumentList>(
+        microcad_lang::parser::Rule::call_argument_list,
+        s,
+        0,
+    )
+    .expect("Valid CallArgumentList")
+}
+
 #[test]
-fn module_implicit_init() {
+fn module_implicit_init_call() {
     microcad_lang::env_logger_init();
 
     let (source_file, mut context) = load_source_file("syntax/module/implicit_init.µcad");
     debug!("Source File:\n{}", source_file);
 
-    if let Ok(node) =
-        context.fetch_global(&Identifier(microcad_lang::src_ref::Refer::none("a".into())).into())
+    let node = context.fetch_global(&qualified_name("implicit_init::a")).expect("Node expected");
+
+    // Check node id
     {
         let id = node.borrow().id();
-        assert_eq!(id, "a");
+        assert_eq!(id, "a");    
+    }
 
-        if let SymbolDefinition::Module(module_definition) = &node.borrow().def {
-            use microcad_lang::eval::CallTrait;
-            let _value = module_definition
-                .call(
-                    &Parser::parse_rule::<CallArgumentList>(
-                        microcad_lang::parser::Rule::call_argument_list,
-                        "b = 3.0",
-                        0,
-                    )
-                    .expect("Valid CallArgumentList"),
-                    &mut context,
-                )
-                .expect("Valid value");
-        } else {
-            panic!("Symbol is not a module")
-        }
+    // Get module definition for symbol `a`
+    let module_definition = match &node.borrow().def {
+        SymbolDefinition::Module(module_definition) => module_definition.clone(),
+        _ => panic!("Symbol is not a module")
+    };
 
-        debug!("{}", id);
+    // Call module `a` with `b = 3.0`
+    let nodes = module_definition
+        .eval_call(&call_argument_list("b = 3.0"), &mut context)
+        .expect("Valid nodes");
+
+    assert_eq!(nodes.len(), 1, "There should be one node");
+
+    // Test if resulting object node has property `b` with value `3.0`
+    use microcad_lang::*;
+    if let objects::ObjectNodeInner::Object(ref object) = *nodes.first().expect("Node expected").borrow() {
+        assert_eq!(object.get_property_value(&"b".into()).expect("Property `b`"), &value::Value::Scalar(src_ref::Refer::none(3.0)));
     } else {
-        panic!("Symbol not found");
+        panic!("Object node expected")
     }
 }
