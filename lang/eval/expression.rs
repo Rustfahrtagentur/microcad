@@ -20,7 +20,10 @@ impl Eval for ListExpression {
                 self.src_ref(),
             ))),
             None => {
-                context.error(self, EvalError::ListElementsDifferentTypes(value_list.types()))?;
+                context.error(
+                    self,
+                    EvalError::ListElementsDifferentTypes(value_list.types()),
+                )?;
                 Ok(Value::None)
             }
         }
@@ -118,8 +121,8 @@ impl Eval for Nested {
                     } else {
                         context.error(item, EvalError::CannotNestItem(item.clone()))?;
                         break;
-                    }    
-                }     
+                    }
+                }
             };
             node_stack.push(nodes);
         }
@@ -127,7 +130,9 @@ impl Eval for Nested {
         if node_stack.is_empty() {
             Ok(Value::None)
         } else {
-            Ok(Value::NodeMultiplicity(crate::objects::nest_nodes(node_stack)))
+            Ok(Value::NodeMultiplicity(crate::objects::nest_nodes(
+                node_stack,
+            )))
         }
     }
 }
@@ -137,7 +142,7 @@ impl Eval for NestedItem {
         match &self {
             NestedItem::Call(call) => Ok(call.eval(context)?),
             NestedItem::QualifiedName(qualified_name) => Ok(qualified_name.eval(context)?),
-            NestedItem::Body(body) => Ok(body.eval(context)?),
+            NestedItem::Body(body) => Ok(Value::Node(body.eval_to_node(context)?)),
         }
     }
 }
