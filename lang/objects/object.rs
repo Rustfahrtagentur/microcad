@@ -5,6 +5,7 @@
 
 use std::collections::BTreeMap;
 
+
 use crate::{value::Value, Id};
 use crate::{eval::{EvalContext, EvalResult}, syntax::ParameterList};
 
@@ -61,8 +62,11 @@ impl ObjectProperties {
 
 
 /// An object with properties
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct Object {
+    /// Name of the object
+    pub name: Id,
+
     /// Properties
     pub props: ObjectProperties,
 }

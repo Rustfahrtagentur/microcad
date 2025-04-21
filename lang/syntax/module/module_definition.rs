@@ -57,7 +57,7 @@ impl ModuleDefinition {
                     return Ok(crate::objects::empty_object());
                 } 
         
-                object(Object { props })
+                object(Object { name: crate::Id::default(), props })
             }
         };
 
@@ -72,7 +72,8 @@ impl ModuleDefinition {
                     context.add_local_value(id.clone(), value);
                 }
                 Statement::Expression(expression) => {
-                    if let Value::Node(node) = expression.eval(context)? { nodes.push(node) }
+                    let value = expression.eval(context)?;
+                    nodes.append(&mut value.fetch_nodes());
                 }
                 _ => {}
             }

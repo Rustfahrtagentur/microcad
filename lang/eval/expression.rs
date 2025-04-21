@@ -106,33 +106,28 @@ impl Eval for Expression {
 
 impl Eval for Nested {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        let mut nodes = Vec::new();
+        let mut node_stack = Vec::new();
 
-        for item in self.iter() {
-            match item.eval(context)? {
-                Value::Node(n) => nodes.push(n),
-                Value::None => {
-                    if nodes.is_empty() && self.len() == 1 {
-                        return Ok(Value::None);
-                    } else {
-                        context.error(self, EvalError::CannotNestItem(item.clone()))?;
-                    }
-                }
+        for (index, item) in self.iter().enumerate() {
+            let value = item.eval(context)?;
+            let nodes = match value {
+                Value::Node(_) | Value::NodeMultiplicity(_) => value.fetch_nodes(),
                 value => {
-                    if nodes.is_empty() && self.len() == 1 {
+                    if index == 0 && self.len() == 1 {
                         return Ok(value);
                     } else {
-                        context.error(self, EvalError::CannotNestItem(item.clone()))?;
-                    }
-                }
-            }
+                        context.error(item, EvalError::CannotNestItem(item.clone()))?;
+                        break;
+                    }    
+                }     
+            };
+            node_stack.push(nodes);
         }
 
-        if nodes.is_empty() {
+        if node_stack.is_empty() {
             Ok(Value::None)
         } else {
-            todo!("Nest nodes is WIP")
-            //Ok(Value::Node(crate::objects::nest_nodes(nodes)))
+            Ok(Value::NodeMultiplicity(crate::objects::nest_nodes(node_stack)))
         }
     }
 }

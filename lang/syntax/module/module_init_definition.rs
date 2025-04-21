@@ -66,7 +66,7 @@ impl ModuleInitDefinition {
         use crate::objects::*;
 
         // Make a new object node
-        let object = object(Object{ props });
+        let object = object(Object{ name: crate::Id::default(), props });
         for node in nodes {
             object.append(node);
         }
