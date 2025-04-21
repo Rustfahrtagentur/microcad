@@ -12,7 +12,6 @@ mod named_tuple;
 #[macro_use]
 mod parameter_value;
 mod parameter_value_list;
-mod sorted_value_list;
 mod unnamed_tuple;
 mod value_error;
 mod value_list;
@@ -27,7 +26,6 @@ pub use parameter_value_list::*;
 pub use unnamed_tuple::*;
 pub use value_error::*;
 pub use value_list::*;
-pub use sorted_value_list::*;
 
 use crate::{objects::*, src_ref::*, syntax::*, ty::*};
 use cgmath::InnerSpace;

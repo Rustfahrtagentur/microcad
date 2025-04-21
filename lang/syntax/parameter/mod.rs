@@ -39,6 +39,8 @@ impl Parameter {
     }
 
     /// Evaluate default value considering specified type
+    /// 
+    /// If there is no default value, returns `Value::None` without raising an error. 
     pub fn eval_default_value(&self, context: &mut EvalContext) -> crate::eval::EvalResult<Value>  {
         use crate::eval::Eval;
 

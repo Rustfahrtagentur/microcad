@@ -3,7 +3,7 @@
 
 //! Module initialization definition syntax element
 
-use crate::{diag::PushDiag, eval::{ArgumentMap, EvalContext, EvalError, EvalResult}, objects::ObjectNode, src_ref::*, syntax::*, value::{SortedValueList, Value}};
+use crate::{diag::PushDiag, eval::{ArgumentMap, EvalContext, EvalError, EvalResult}, objects::{ObjectNode, ObjectProperties}, src_ref::*, syntax::*, value::Value};
 
 /// Module initialization definition
 ///
@@ -27,7 +27,7 @@ pub struct ModuleInitDefinition {
 
 impl ModuleInitDefinition {
     /// Evaluate a call to the module init definition
-    pub fn eval_to_node(&self, args: &ArgumentMap, mut props: SortedValueList, context: &mut EvalContext) -> EvalResult<ObjectNode> {
+    pub fn eval_to_node(&self, args: &ArgumentMap, mut props: ObjectProperties, context: &mut EvalContext) -> EvalResult<ObjectNode> {
         context.open_scope();
 
         // Add values from argument map as local values

@@ -3,7 +3,7 @@
 
 //! Module definition syntax element
 
-use crate::{diag::PushDiag, eval::*, objects::ObjectNode, src_ref::*, syntax::*, value::{SortedValueList, Value}};
+use crate::{diag::PushDiag, eval::*, objects::ObjectNode, src_ref::*, syntax::*, value::Value};
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -37,7 +37,7 @@ impl ModuleDefinition {
 
     /// Try to evaluate a single call to an object
     fn eval_to_node<'a>(&'a self, args: &ArgumentMap, init: Option<&'a ModuleInitDefinition>, context: &mut EvalContext) -> EvalResult<ObjectNode> {
-        let mut props = SortedValueList::from_parameter_list(&self.parameters, context)?;
+        let mut props = ObjectProperties::from_parameter_list(&self.parameters, context)?;
 
         use crate::objects::*;
 
