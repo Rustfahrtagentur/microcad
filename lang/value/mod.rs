@@ -74,6 +74,8 @@ pub enum Value {
     UnnamedTuple(UnnamedTuple),
     /// A node in the render tree
     Node(ObjectNode),
+    /// A node list in the render tree, result from multiplicity
+    NodeMultiplicity(Vec<ObjectNode>)
 }
 
 impl Value {
@@ -95,6 +97,15 @@ impl Value {
             (value, _) => return Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
         }
         Ok(())
+    }
+
+    /// Fetch nodes from this value
+    pub fn fetch_nodes(self) -> Vec<ObjectNode> {
+        match self {
+            Self::Node(n) => vec![n],
+            Self::NodeMultiplicity(n) => n,
+            _ => vec![]
+        }
     }
 
     /// Clone the value with a new source reference
@@ -221,7 +232,7 @@ impl SrcReferrer for Value {
             Value::Map(map) => map.src_ref(),
             Value::NamedTuple(named_tuple) => named_tuple.src_ref(),
             Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.src_ref(),
-            Value::Node(_) => SrcRef(None),
+            Value::Node(_) | Value::NodeMultiplicity(_) => SrcRef(None),
         }
     }
 }
@@ -266,6 +277,7 @@ impl crate::ty::Ty for Value {
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
             Value::Node(_) => Type::Node,
+            Value::NodeMultiplicity(_) => Type::NodeMultiplicity,
         }
     }
 }
@@ -566,7 +578,15 @@ impl std::fmt::Display for Value {
             Value::Map(m) => write!(f, "{m}"),
             Value::NamedTuple(t) => write!(f, "{t}"),
             Value::UnnamedTuple(t) => write!(f, "{t}"),
-            Value::Node(n) => write!(f, "{n:?}"),
+            Value::Node(n) => dump(f, n.clone()),
+            Value::NodeMultiplicity(nm) => {
+                writeln!(f, "Multiplicity [")?;
+                for n in nm {
+                    dump(f, n.clone())?;
+                    write!(f, ",")?;
+                }
+                writeln!(f, "[")
+            }
         }
     }
 }

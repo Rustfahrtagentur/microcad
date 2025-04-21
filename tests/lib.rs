@@ -150,7 +150,7 @@ fn module_implicit_init_call() {
     // Call module `a` with `b = 3.0`
     let nodes = module_definition
         .eval_call(&call_argument_list("b = 3.0"), &mut context)
-        .expect("Valid nodes");
+        .expect("Valid nodes").fetch_nodes();
 
     assert_eq!(nodes.len(), 1, "There should be one node");
 
@@ -168,7 +168,7 @@ fn module_implicit_init_call() {
     // Call module `a` with `b = [1.0, 2.0]` (multiplicity)
     let nodes = module_definition
         .eval_call(&call_argument_list("b = [1.0, 2.0]"), &mut context)
-        .expect("Valid nodes");
+        .expect("Valid nodes").fetch_nodes();
 
     assert_eq!(nodes.len(), 2, "There should be two nodes");
 
@@ -203,7 +203,7 @@ fn module_explicit_init_call() {
     {
         let nodes = module_definition
             .eval_call(&call_argument_list("radius = 3.0"), &mut context)
-            .expect("Valid nodes");
+            .expect("A valid value").fetch_nodes();
         assert_eq!(nodes.len(), 1, "There should be one node");
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
@@ -212,7 +212,7 @@ fn module_explicit_init_call() {
     {
         let nodes = module_definition
             .eval_call(&call_argument_list("r = 3.0"), &mut context)
-            .expect("Valid nodes");
+            .expect("Valid nodes").fetch_nodes();
         assert_eq!(nodes.len(), 1, "There should be one node");
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
@@ -221,7 +221,7 @@ fn module_explicit_init_call() {
     {
         let nodes = module_definition
             .eval_call(&call_argument_list("d = 6.0"), &mut context)
-            .expect("Valid nodes");
+            .expect("Valid nodes").fetch_nodes();
         assert_eq!(nodes.len(), 1, "There should be one node");
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
@@ -230,7 +230,7 @@ fn module_explicit_init_call() {
     {
         let nodes = module_definition
             .eval_call(&call_argument_list("d = [1.0, 2.0]"), &mut context)
-            .expect("Valid nodes");
+            .expect("Valid nodes").fetch_nodes();
         assert_eq!(nodes.len(), 2, "There should be two nodes");
         check_node_property_radius(nodes.first().expect("Node expected"), 0.5);
         check_node_property_radius(nodes.get(1).expect("Node expected"), 1.0);
@@ -240,7 +240,7 @@ fn module_explicit_init_call() {
     {
         let nodes = module_definition
             .eval_call(&CallArgumentList::default(), &mut context)
-            .expect("Valid nodes");
+            .expect("Valid nodes").fetch_nodes();
         assert_eq!(nodes.len(), 0, "There should no nodes");
         context.diag_handler().pretty_print(&mut std::io::stdout(), &context).expect("Valid formatter");
     }

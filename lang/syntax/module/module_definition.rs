@@ -94,7 +94,7 @@ impl ModuleDefinition {
     /// Example:
     /// Consider the `module a(b: Scalar) { }`.
     /// Calling the module `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
-    pub fn eval_call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Vec<ObjectNode>> {
+    pub fn eval_call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Value> {
         let mut nodes = Vec::new();
 
         match self.find_matching_initializer(args, context) {
@@ -119,7 +119,7 @@ impl ModuleDefinition {
         }
 
 
-        Ok(nodes)
+        Ok(Value::NodeMultiplicity(nodes))
     }
 }
 
