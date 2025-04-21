@@ -169,10 +169,10 @@ pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {
 /// Dumps the tree structure of a node.
 ///
 /// The depth of a node is marked by the number of white spaces
-pub fn dump(writer: &mut dyn std::io::Write, node: ObjectNode) -> std::io::Result<()> {
+pub fn dump(f: &mut std::fmt::Formatter, node: ObjectNode) -> std::fmt::Result {
     use Depth;
     node.descendants()
-        .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
+        .try_for_each(|child| writeln!(f, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
 }
 
 /// Return ObjectNode if we are in a Group
