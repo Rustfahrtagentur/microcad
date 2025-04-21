@@ -23,6 +23,7 @@ impl Eval for Call {
         match context.lookup(&self.name) {
             Ok(symbol) => match &symbol.borrow().def {
                 SymbolDefinition::BuiltinFunction(f) => f.call(&self.argument_list, context),
+                SymbolDefinition::Module(m) => m.eval_call(&self.argument_list, context),
                 symbol => todo!("cannot evaluate {} at {}", symbol, context.locate(self)?),
             },
             Err(err) => {
