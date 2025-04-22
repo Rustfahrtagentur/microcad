@@ -9,13 +9,12 @@ pub mod object;
 pub mod transform;
 
 pub use algorithm::*;
-pub use transform::*;
 pub use object::*;
+pub use transform::*;
 
-use crate::{rc_mut::*, value::Value, Id};
+use crate::{Id, rc_mut::*, value::Value};
 use microcad_core::*;
 use strum::IntoStaticStr;
-
 
 /// Inner of a node
 #[derive(Clone, IntoStaticStr, Debug)]
@@ -110,12 +109,13 @@ impl Depth for ObjectNode {
 
 /// Find children node marker in node descendants
 fn find_children_marker(node: &ObjectNode) -> Option<ObjectNode> {
-    node.descendants().find(|n| matches!(*n.borrow(), ObjectNodeInner::ChildrenNodeMarker))
+    node.descendants()
+        .find(|n| matches!(*n.borrow(), ObjectNodeInner::ChildrenNodeMarker))
 }
 
 /// Nest a Vec of node multiplicities
 ///
-/// Assume, our node stack `Vec<Vec<Node>>` has for groups `a`, `b`, `c`, `d`:
+/// Assume, our node stack `Vec<Vec<Node>>` has for lists `a`, `b`, `c`, `d`:
 /// ```
 /// let nodes = vec![
 ///     vec![obj("a0"), obj("a1")],
@@ -124,7 +124,7 @@ fn find_children_marker(node: &ObjectNode) -> Option<ObjectNode> {
 ///     vec![obj("d0")],
 /// ];
 /// ```
-/// 
+///
 /// This should result in following node multiplicity:
 /// a0
 ///   b0
@@ -142,42 +142,44 @@ fn find_children_marker(node: &ObjectNode) -> Option<ObjectNode> {
 ///       d0
 ///     c2
 ///       d0
-pub fn nest_nodes(node_stack: Vec<Vec<ObjectNode>>) -> Vec<ObjectNode> {
+pub fn nest_nodes(node_stack: &Vec<Vec<ObjectNode>>) -> Vec<ObjectNode> {
     assert!(!node_stack.is_empty());
-    
+
     if node_stack.len() >= 2 {
         let mut index = node_stack.len() - 1;
 
         loop {
-            let next_group = node_stack.get(index).expect("Group expected");
+            let prev_list = node_stack.get(index).expect("Node list expected");
             index -= 1;
-            let group = node_stack.get(index).expect("Node group expected");
-            for root in group.iter() {
-                for node in next_group.iter() {
+            let next_list = node_stack.get(index).expect("Node list expected");
+
+            // Insert a copy of each element `node` from `prev_list` as child to each element `new_parent` in `next_list` 
+            next_list.iter().for_each(|new_parent_node| {
+                prev_list.iter().for_each(|node| {
                     node.detach();
-                    
-                    let new_parent_node = match find_children_marker(root)  {
+
+                    // Handle children marker.
+                    // If we have found a children marker node, use it's parent as new parent node.
+                    let new_parent_node = match find_children_marker(new_parent_node) {
                         Some(children_marker) => {
                             let parent = children_marker.parent().expect("Must have a parent");
-                            children_marker.detach(); // Remove children marker
+                            children_marker.detach(); // Remove children marker from tree
                             parent
                         }
-                        None => {
-                            root.clone()
-                        }
+                        None => new_parent_node.clone(),
                     };
 
                     new_parent_node.append(node.make_deep_copy());
-                }
-            }
+                });
+            });
 
             if index == 0 {
-                return group.clone();
+                break;
             }
         }
-    } 
+    }
 
-    node_stack[0].clone()
+    node_stack.first().expect("Non empty node stack").clone()
 }
 
 /// Dumps the tree structure of a node.
@@ -279,7 +281,10 @@ pub fn bake3d(
 #[test]
 fn node_nest() {
     fn obj(name: &str) -> ObjectNode {
-        object(Object{name: name.into(), ..Default::default()})
+        object(Object {
+            name: name.into(),
+            ..Default::default()
+        })
     }
 
     let nodes = vec![
@@ -306,16 +311,19 @@ fn node_nest() {
     //     c2
     //       d0
 
-
     let nodes = nest_nodes(nodes.clone());
     assert_eq!(nodes.len(), 2); // Contains a0 and a1 as root
 
     for node in nodes {
-        node
-            .descendants()
-            .for_each(|n| println!("{}{}", "  ".repeat(n.depth()), match *n.borrow() {
-                ObjectNodeInner::Object(ref obj) => obj.name.clone(),
-                _ => panic!("Object with name expected")
-            }));
+        node.descendants().for_each(|n| {
+            println!(
+                "{}{}",
+                "  ".repeat(n.depth()),
+                match *n.borrow() {
+                    ObjectNodeInner::Object(ref obj) => obj.name.clone(),
+                    _ => panic!("Object with name expected"),
+                }
+            )
+        });
     }
 }
