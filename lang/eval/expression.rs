@@ -132,7 +132,7 @@ impl Eval for Nested {
         } else {
             Ok(Value::NodeMultiplicity(crate::objects::nest_nodes(
                 &node_stack,
-            )))
+            ).clone()))
         }
     }
 }

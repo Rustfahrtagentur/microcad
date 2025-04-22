@@ -115,6 +115,10 @@ fn find_children_marker(node: &ObjectNode) -> Option<ObjectNode> {
 
 /// Nest a Vec of node multiplicities
 ///
+/// * `node_stack`: A list of node lists.
+/// 
+/// The reference to the first stack element will be returned.
+/// 
 /// Assume, our node stack `Vec<Vec<Node>>` has for lists `a`, `b`, `c`, `d`:
 /// ```
 /// let nodes = vec![
@@ -142,15 +146,12 @@ fn find_children_marker(node: &ObjectNode) -> Option<ObjectNode> {
 ///       d0
 ///     c2
 ///       d0
-pub fn nest_nodes(node_stack: &[Vec<ObjectNode>]) -> Vec<ObjectNode> {
+pub fn nest_nodes(node_stack: &[Vec<ObjectNode>]) -> &Vec<ObjectNode> {
     match node_stack.len() {
         0 => panic!("Node stack must not be empty"),
         1 => {}
         n => {
-            (1..n).rev().for_each(|index| {
-                let prev_list = node_stack.get(index).expect("Node list expected");
-                let next_list = node_stack.get(index - 1).expect("Node list expected");
-
+            (1..n).rev().map(|i| (&node_stack[i], &node_stack[i-1])).for_each(|(prev_list, next_list)| {
                 // Insert a copy of each element `node` from `prev_list` as child to each element `new_parent` in `next_list`
                 next_list.iter().for_each(|new_parent_node| {
                     prev_list.iter().for_each(|node| {
@@ -174,7 +175,7 @@ pub fn nest_nodes(node_stack: &[Vec<ObjectNode>]) -> Vec<ObjectNode> {
         }
     }
 
-    node_stack[0].clone()
+    &node_stack[0]
 }
 
 /// Dumps the tree structure of a node.
