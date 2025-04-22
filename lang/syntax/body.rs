@@ -85,6 +85,7 @@ impl Body {
         for statement in &self.statements {
             let value = match statement {
                 Statement::Use(_) => continue, // Use statements have been resolved at this point
+                Statement::Assignment(assignment) => assignment.eval(context)?,
                 Statement::Expression(expression) => expression.eval(context)?,
                 Statement::Marker(marker) => marker.eval(context)?,
                 Statement::If(_) => todo!("if statement not implemented"),

@@ -47,7 +47,7 @@ impl ModuleInitDefinition {
                     props.assign_and_add_local_value(id, value, context);
                 }
                 Statement::Expression(expression) => {
-                    if let Value::Node(node) = expression.eval(context)? { nodes.push(node) }
+                    nodes.append(&mut expression.eval(context)?.fetch_nodes())
                 }
                 _ => {
                     context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
