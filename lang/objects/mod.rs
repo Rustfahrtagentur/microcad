@@ -142,44 +142,39 @@ fn find_children_marker(node: &ObjectNode) -> Option<ObjectNode> {
 ///       d0
 ///     c2
 ///       d0
-pub fn nest_nodes(node_stack: &Vec<Vec<ObjectNode>>) -> Vec<ObjectNode> {
-    assert!(!node_stack.is_empty());
+pub fn nest_nodes(node_stack: &[Vec<ObjectNode>]) -> Vec<ObjectNode> {
+    match node_stack.len() {
+        0 => panic!("Node stack must not be empty"),
+        1 => {}
+        n => {
+            (1..n).rev().for_each(|index| {
+                let prev_list = node_stack.get(index).expect("Node list expected");
+                let next_list = node_stack.get(index - 1).expect("Node list expected");
 
-    if node_stack.len() >= 2 {
-        let mut index = node_stack.len() - 1;
+                // Insert a copy of each element `node` from `prev_list` as child to each element `new_parent` in `next_list`
+                next_list.iter().for_each(|new_parent_node| {
+                    prev_list.iter().for_each(|node| {
+                        node.detach();
 
-        loop {
-            let prev_list = node_stack.get(index).expect("Node list expected");
-            index -= 1;
-            let next_list = node_stack.get(index).expect("Node list expected");
+                        // Handle children marker.
+                        // If we have found a children marker node, use it's parent as new parent node.
+                        let new_parent_node = match find_children_marker(new_parent_node) {
+                            Some(children_marker) => {
+                                let parent = children_marker.parent().expect("Must have a parent");
+                                children_marker.detach(); // Remove children marker from tree
+                                parent
+                            }
+                            None => new_parent_node.clone(),
+                        };
 
-            // Insert a copy of each element `node` from `prev_list` as child to each element `new_parent` in `next_list` 
-            next_list.iter().for_each(|new_parent_node| {
-                prev_list.iter().for_each(|node| {
-                    node.detach();
-
-                    // Handle children marker.
-                    // If we have found a children marker node, use it's parent as new parent node.
-                    let new_parent_node = match find_children_marker(new_parent_node) {
-                        Some(children_marker) => {
-                            let parent = children_marker.parent().expect("Must have a parent");
-                            children_marker.detach(); // Remove children marker from tree
-                            parent
-                        }
-                        None => new_parent_node.clone(),
-                    };
-
-                    new_parent_node.append(node.make_deep_copy());
+                        new_parent_node.append(node.make_deep_copy());
+                    });
                 });
             });
-
-            if index == 0 {
-                break;
-            }
         }
     }
 
-    node_stack.first().expect("Non empty node stack").clone()
+    node_stack[0].clone()
 }
 
 /// Dumps the tree structure of a node.
@@ -311,7 +306,7 @@ fn node_nest() {
     //     c2
     //       d0
 
-    let nodes = nest_nodes(nodes.clone());
+    let nodes = nest_nodes(&nodes);
     assert_eq!(nodes.len(), 2); // Contains a0 and a1 as root
 
     for node in nodes {

@@ -131,7 +131,7 @@ impl Eval for Nested {
             Ok(Value::None)
         } else {
             Ok(Value::NodeMultiplicity(crate::objects::nest_nodes(
-                node_stack,
+                &node_stack,
             )))
         }
     }
