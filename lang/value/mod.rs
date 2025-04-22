@@ -585,7 +585,7 @@ impl std::fmt::Display for Value {
                     dump(f, n.clone())?;
                     write!(f, ",")?;
                 }
-                writeln!(f, "[")
+                writeln!(f, "]")
             }
         }
     }
