@@ -6,7 +6,7 @@ use crate::eval::*;
 impl Eval for ListExpression {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         let mut value_list = ValueList::new(Vec::new(), self.src_ref());
-        for expr in self.list.clone() {
+        for expr in self.list.iter() {
             value_list.push(expr.eval(context)?);
         }
         if let Some(unit) = self.unit {
