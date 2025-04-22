@@ -57,9 +57,9 @@ impl ModuleInitDefinition {
 
         context.close_scope();
 
-        if !props.is_complete() {
+        if !props.all_initialized() {
             use crate::diag::PushDiag;
-            context.error(self, EvalError::UninitializedProperties(props.get_incomplete_ids()))?;
+            context.error(self, EvalError::UninitializedProperties(props.get_ids_of_uninitialized()))?;
             return Ok(crate::objects::empty_object());
         } 
 
