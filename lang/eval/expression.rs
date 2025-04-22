@@ -5,7 +5,7 @@ use crate::eval::*;
 
 impl Eval for ListExpression {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        let mut value_list = ValueList::new(Vec::new(), self.src_ref());
+        let mut value_list = ValueList::new(vec![], self.src_ref());
         for expr in self.list.iter() {
             value_list.push(expr.eval(context)?);
         }
