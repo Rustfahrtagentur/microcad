@@ -98,8 +98,10 @@ impl EvalContext {
     }
 
     /// Add a named local value to current locals
+    /// TODO: Is this special function really needed?
     pub fn add_local_value(&mut self, id: Id, value: Value) {
-        self.local_stack.add(SymbolNode::new_constant(id, value));
+        self.local_stack
+            .add(None, SymbolNode::new_constant(id, value));
     }
 
     /// Add symbol to symbol map
@@ -143,16 +145,22 @@ impl EvalContext {
         }
     }
 
-    /// Find a symbol in the symbol table and copy it to the locals
-    /// (might load any related external file if not already loaded)
-    pub fn use_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+    /// Find a symbol in the symbol table and copy it to the locals.
+    /// Might load any related external file if not already loaded.
+    /// - `id`: if given overwrites the ID from qualified name (alias)
+    /// - `name`: Name of the symbol to search for
+    pub fn use_symbol(
+        &mut self,
+        id: Option<Id>,
+        name: &QualifiedName,
+    ) -> EvalResult<SymbolNodeRcMut> {
         debug!("Using symbol {name} in symbols");
         let symbol = self.symbols.search(name);
         match symbol {
             Ok(symbol) => Ok(symbol.clone()),
             _ => {
                 let symbol = self.load_symbol(name)?;
-                self.local_stack.add(symbol.clone());
+                self.local_stack.add(id, symbol.clone());
                 trace!("Local Stack:\n{}", self.local_stack);
                 Ok(symbol)
             }

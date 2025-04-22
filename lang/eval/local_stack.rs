@@ -51,8 +51,12 @@ impl LocalStack {
     }
 
     /// Add a new variable to current stack frame
-    pub fn add(&mut self, local: SymbolNodeRcMut) {
-        let id = local.borrow().id();
+    pub fn add(&mut self, id: Option<Id>, local: SymbolNodeRcMut) {
+        let id = if let Some(id) = id {
+            id
+        } else {
+            local.borrow().id()
+        };
         if let Some(name) = local.borrow().full_name() {
             if name.is_qualified() {
                 debug!("Adding {name} as {id} to local stack");
@@ -113,7 +117,7 @@ fn local_stack() {
         }
     };
 
-    stack.add(make_int("a".into(), 1));
+    stack.add(None, make_int("a".into(), 1));
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
@@ -124,17 +128,18 @@ fn local_stack() {
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
 
-    stack.add(make_int("b".into(), 2));
+    stack.add(None, make_int("b".into(), 2));
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);
     assert!(fetch_int(&stack, "c").is_none());
 
-    stack.add(make_int("c".into(), 3));
+    // test alias
+    stack.add(Some("x".into()), make_int("x".into(), 3));
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);
-    assert!(fetch_int(&stack, "c").unwrap() == 3);
+    assert!(fetch_int(&stack, "x").unwrap() == 3);
 
     stack.close_scope();
 
