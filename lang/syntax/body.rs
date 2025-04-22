@@ -34,7 +34,7 @@ pub struct Body {
 
 impl Body {
     /// fetches all symbols from a slice of statements
-    pub fn fetch_symbol_map_from(
+    pub fn fetch_symbol_map(
         statements: &[Statement],
         parent: Option<SymbolNodeRcMut>,
     ) -> SymbolMap {
@@ -52,6 +52,7 @@ impl Body {
                 Statement::Function(f) => {
                     symbol_map.insert(f.id.id().clone(), f.resolve(parent.clone()));
                 }
+                Statement::Use(u) => symbol_map.append(&mut u.resolve(parent.clone())),
                 _ => {}
             }
         }
@@ -60,8 +61,8 @@ impl Body {
     }
 
     /// fetches all symbols from the statements in the body
-    pub fn fetch_symbol_map(&self, parent: Option<SymbolNodeRcMut>) -> SymbolMap {
-        Self::fetch_symbol_map_from(&self.statements, parent)
+    pub fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolMap {
+        Self::fetch_symbol_map(&self.statements, parent)
     }
 
     /// Evaluate a vector of statements

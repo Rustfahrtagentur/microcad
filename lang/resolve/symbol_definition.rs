@@ -1,4 +1,4 @@
-use crate::{Id, eval::*, rc_mut::*, resolve::*, syntax::*, value::*};
+use crate::{eval::*, rc_mut::*, resolve::*, syntax::*, value::*, Id};
 
 /// Symbol definition
 #[derive(Debug, Clone)]
@@ -17,6 +17,8 @@ pub enum SymbolDefinition {
     BuiltinModule(Rc<BuiltinModule>),
     /// Constant
     Constant(Identifier, Value),
+    /// Alias of a pub use statement
+    Alias(Identifier, QualifiedName),
 }
 
 impl SymbolDefinition {
@@ -30,6 +32,7 @@ impl SymbolDefinition {
             Self::BuiltinFunction(f) => f.id.clone(),
             Self::BuiltinModule(m) => m.id.clone(),
             Self::Constant(id, _) => id.id().clone(),
+            Self::Alias(id, _) => id.id().clone(),
         }
     }
 
@@ -58,6 +61,7 @@ impl std::fmt::Display for SymbolDefinition {
             Self::BuiltinFunction(_) => write!(f, "{} (builtin function)", id),
             Self::BuiltinModule(_) => write!(f, "{} (builtin module)", id),
             Self::Constant(id, value) => write!(f, "{} (= {})", id, value),
+            Self::Alias(id, name) => write!(f, "{} => {}", id, name),
         }
     }
 }

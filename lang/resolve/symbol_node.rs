@@ -175,9 +175,8 @@ impl SrcReferrer for SymbolNode {
             SymbolDefinition::BuiltinFunction(_) | SymbolDefinition::BuiltinModule(_) => {
                 unreachable!("builtin has no source code reference")
             }
-            SymbolDefinition::Constant(compact_string, value) => {
-                SrcRef::merge(compact_string, value)
-            }
+            SymbolDefinition::Constant(identifier, value) => SrcRef::merge(identifier, value),
+            SymbolDefinition::Alias(identifier, name) => SrcRef::merge(identifier, name),
         }
     }
 }

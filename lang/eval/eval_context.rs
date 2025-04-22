@@ -248,7 +248,7 @@ impl std::fmt::Display for EvalContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Source Cache:\n{}\nSymbols:\n{}",
+            "Loaded files:\n{}\nSymbols:\n{}",
             self.source_cache, self.symbols
         )
     }

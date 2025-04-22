@@ -5,10 +5,7 @@ use crate::eval::*;
 
 impl Eval for UseStatement {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        for decl in &self.decls {
-            decl.eval(context)?;
-        }
-        Ok(Value::None)
+        self.decl.eval(context)
     }
 }
 

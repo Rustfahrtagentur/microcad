@@ -31,11 +31,11 @@ impl SourceCache {
             QualifiedName::try_from(
                 root.filename
                     .file_stem()
-                    .expect("missing file stem")
+                    .expect("file stem")
                     .to_string_lossy()
                     .to_string(),
             )
-            .expect("cannot convert file name into qualified name"),
+            .unwrap_or(Identifier::default().into()),
             0,
         );
         let mut by_path = std::collections::HashMap::new();

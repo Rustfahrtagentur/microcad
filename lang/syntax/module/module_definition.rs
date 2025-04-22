@@ -6,7 +6,7 @@
 use crate::{
     eval::*,
     rc_mut::RcMut,
-    resolve::{SymbolDefinition, SymbolNode},
+    resolve::{SymbolDefinition, SymbolNode, SymbolNodeRcMut},
     src_ref::*,
     syntax::*,
     value::Value,
@@ -32,12 +32,9 @@ impl ModuleDefinition {
     }
 
     /// Resolve into SymbolNode
-    pub fn resolve(
-        self: &std::rc::Rc<Self>,
-        parent: Option<RcMut<SymbolNode>>,
-    ) -> RcMut<SymbolNode> {
+    pub fn resolve(self: &std::rc::Rc<Self>, parent: Option<SymbolNodeRcMut>) -> RcMut<SymbolNode> {
         let node = SymbolNode::new(SymbolDefinition::Module(self.clone()), parent);
-        node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
+        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
         node
     }
 }

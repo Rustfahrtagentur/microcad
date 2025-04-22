@@ -1,6 +1,6 @@
 use crate::{parse::*, parser::*};
 use log::*;
-use std::{io::Read, str::FromStr};
+use std::io::Read;
 
 impl SourceFile {
     /// Load µcad source file from given `path`
@@ -9,16 +9,13 @@ impl SourceFile {
             Ok(file) => file,
             _ => return Err(ParseError::LoadSource(path.as_ref().into())),
         };
-        let mut buf = String::new();
 
+        let mut buf = String::new();
         file.read_to_string(&mut buf)?;
 
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)?;
-
         assert_ne!(source_file.hash, 0);
-
         source_file.filename = path.as_ref().to_path_buf();
-
         info!(
             "loaded file {} successfully",
             path.as_ref().to_string_lossy()
@@ -31,17 +28,19 @@ impl SourceFile {
     /// Create `SourceFile` from string
     /// The hash of the result will be of `"<from_str>"`.
     pub fn load_from_str(s: &str) -> ParseResult<std::rc::Rc<Self>> {
-        use std::hash::{Hash, Hasher};
+        use std::{
+            hash::{Hash, Hasher},
+            str::FromStr,
+        };
+
+        // TODO: Would not the hash be calculated in SourceFile::parse anyway?
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         "<from_str>".hash(&mut hasher);
         let hash = hasher.finish();
 
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, hash)?;
-
         source_file.filename = std::path::PathBuf::from_str("<from_str>").expect("filename error");
-
         debug!("loaded string successfully",);
-
         Ok(std::rc::Rc::new(source_file))
     }
 

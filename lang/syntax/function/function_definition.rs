@@ -43,7 +43,7 @@ impl FunctionDefinition {
     /// Resolve into SymbolNode
     pub fn resolve(self: &Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
         let node = SymbolNode::new(SymbolDefinition::Function(self.clone()), parent);
-        node.borrow_mut().children = self.body.fetch_symbol_map(Some(node.clone()));
+        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
         node
     }
 }

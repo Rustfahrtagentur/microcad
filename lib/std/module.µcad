@@ -1,0 +1,9 @@
+pub use __builtin::print;
+pub use __builtin::algorithm;
+pub use __builtin::math;
+
+namespace debug {
+    pub use __builtin::assert;
+    pub use __builtin::assert_invalid;
+    pub use __builtin::assert_valid;
+}

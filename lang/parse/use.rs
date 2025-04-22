@@ -34,12 +34,12 @@ impl Parse for UseStatement {
         Parser::ensure_rule(&pair, Rule::use_statement);
 
         let mut visibility = Visibility::default();
-        let mut decls = Vec::new();
+        let mut decl = None;
 
         for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::use_declaration => {
-                    decls.push(UseDeclaration::parse(pair)?);
+                    decl = Some(UseDeclaration::parse(pair)?);
                 }
                 Rule::visibility => {
                     visibility = Visibility::parse(pair)?;
@@ -50,7 +50,7 @@ impl Parse for UseStatement {
 
         Ok(Self {
             visibility,
-            decls,
+            decl: decl.expect("proper use declaration"),
             src_ref: pair.into(),
         })
     }

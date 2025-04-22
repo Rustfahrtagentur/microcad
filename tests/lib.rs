@@ -28,7 +28,7 @@ fn load_source_file(
     microcad_lang::eval::EvalContext,
 ) {
     use microcad_builtin::*;
-    use microcad_lang::{eval::*, resolve::Resolve, syntax::*};
+    use microcad_lang::{eval::*, syntax::*};
     let source_file = SourceFile::load(format!("../tests/test_cases/{filename}"))
         .expect("cannot load test file: {filename}");
     let symbols = source_file.resolve(None);

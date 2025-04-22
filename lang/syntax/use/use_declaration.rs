@@ -3,7 +3,7 @@
 
 //! Use statement syntax element
 
-use crate::{src_ref::*, syntax::*};
+use crate::{resolve::*, src_ref::*, syntax::*, Id};
 use strum::IntoStaticStr;
 
 /// Use declaration
@@ -25,6 +25,34 @@ pub enum UseDeclaration {
     UseAll(QualifiedName, SrcRef),
     /// Import as alias: `use a as b`
     UseAlias(QualifiedName, Identifier, SrcRef),
+}
+
+impl UseDeclaration {
+    /// resolve public use declaration (shall not be called with private use statements)
+    pub fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> (Id, SymbolNodeRcMut) {
+        match self {
+            UseDeclaration::Use(qualified_name, _) => {
+                let identifier = qualified_name.last().expect("Identifier");
+                (
+                    identifier.id().clone(),
+                    SymbolNodeRcMut::new(SymbolNode {
+                        def: SymbolDefinition::Alias(identifier.clone(), qualified_name.clone()),
+                        parent,
+                        children: Default::default(),
+                    }),
+                )
+            }
+            UseDeclaration::UseAll(_qualified_name, _src_ref) => todo!(),
+            UseDeclaration::UseAlias(qualified_name, identifier, _) => (
+                identifier.id().clone(),
+                SymbolNodeRcMut::new(SymbolNode {
+                    def: SymbolDefinition::Alias(identifier.clone(), qualified_name.clone()),
+                    parent,
+                    children: Default::default(),
+                }),
+            ),
+        }
+    }
 }
 
 impl SrcReferrer for UseDeclaration {

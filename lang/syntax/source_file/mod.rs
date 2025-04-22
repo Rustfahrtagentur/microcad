@@ -69,7 +69,7 @@ impl SourceFile {
     ) -> RcMut<SymbolNode> {
         eprintln!("resolving {}", self.filename_as_str());
         let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);
-        node.borrow_mut().children = Body::fetch_symbol_map_from(&self.body, Some(node.clone()));
+        node.borrow_mut().children = Body::fetch_symbol_map(&self.body, Some(node.clone()));
         log::trace!("Resolved symbol node:\n{node}");
         node
     }

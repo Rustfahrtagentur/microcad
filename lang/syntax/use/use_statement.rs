@@ -3,7 +3,11 @@
 
 //! Use statement syntax element
 
-use crate::{src_ref::*, syntax::*};
+use crate::{
+    resolve::{SymbolMap, SymbolNodeRcMut},
+    src_ref::*,
+    syntax::*,
+};
 
 /// Use statement:
 ///
@@ -15,10 +19,25 @@ use crate::{src_ref::*, syntax::*};
 pub struct UseStatement {
     /// export of use
     pub visibility: Visibility,
-    /// Use declarations
-    pub decls: Vec<UseDeclaration>,
+    /// Use declaration
+    pub decl: UseDeclaration,
     /// source code reference
     pub src_ref: SrcRef,
+}
+
+impl UseStatement {
+    /// Resolve use statement to multiple symbols
+    pub fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolMap {
+        match self.visibility {
+            Visibility::Private => SymbolMap::new(),
+            Visibility::Public => {
+                let mut symbols = SymbolMap::new();
+                let (id, symbol) = self.decl.resolve(parent.clone());
+                symbols.insert(id, symbol);
+                symbols
+            }
+        }
+    }
 }
 
 impl SrcReferrer for UseStatement {
@@ -33,12 +52,7 @@ impl std::fmt::Display for UseStatement {
             Visibility::Private => write!(f, "use ")?,
             Visibility::Public => write!(f, "pub use ")?,
         }
-        for (i, decl) in self.decls.iter().enumerate() {
-            if i > 0 {
-                write!(f, ", ")?;
-            }
-            write!(f, "{decl}")?;
-        }
+        write!(f, "{}", self.decl)?;
         Ok(())
     }
 }
@@ -46,8 +60,6 @@ impl std::fmt::Display for UseStatement {
 impl PrintSyntax for UseStatement {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}UseStatement", "")?;
-        self.decls
-            .iter()
-            .try_for_each(|d| d.print_syntax(f, depth + 1))
+        self.decl.print_syntax(f, depth + 1)
     }
 }
