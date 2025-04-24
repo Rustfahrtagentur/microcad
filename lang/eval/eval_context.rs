@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, resolve::*, syntax::*, eval::call_stack::CallStack, Id};
+use crate::{diag::*, eval::*, resolve::*, syntax::*, Id};
 
 use log::*;
 
@@ -121,7 +121,12 @@ impl EvalContext {
     }
 
     /// Push a call to stack
-    pub fn push_call(&mut self, symbol_node: SymbolNode, args: ArgumentMap, src_ref: impl SrcReferrer) {
+    pub fn push_call(
+        &mut self,
+        symbol_node: SymbolNode,
+        args: ArgumentMap,
+        src_ref: impl SrcReferrer,
+    ) {
         self.call_stack.push(symbol_node, args, src_ref)
     }
 

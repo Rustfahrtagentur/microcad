@@ -3,13 +3,10 @@
 
 //! Call stack
 
-use crate::{resolve::{FullyQualify, SymbolNode}, src_ref::{SrcRef, SrcReferrer}};
-
-use super::ArgumentMap;
-
+use crate::{eval::*, resolve::*, src_ref::*, syntax::*};
 
 /// Stack frame for a single call
-/// 
+///
 /// Multiplicity calls are separate into single calls
 #[derive(Debug, Clone)]
 pub struct CallStackFrame {
@@ -29,12 +26,17 @@ impl CallStackFrame {
         Self {
             symbol_node,
             args,
-            src_ref: src_ref.src_ref()
+            src_ref: src_ref.src_ref(),
         }
     }
 
     /// Pretty print single call stack frame
-    fn pretty_print(&self, f: &mut std::fmt::Formatter<'_>, source_by_hash: &impl super::GetSourceByHash, idx: usize) -> std::fmt::Result {
+    fn pretty_print(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+        source_by_hash: &impl GetSourceByHash,
+        idx: usize,
+    ) -> std::fmt::Result {
         match self.symbol_node.full_name() {
             Some(name) => writeln!(f, "{:>4}: {name}", idx)?,
             None => writeln!(f, "{:>4}: {id}", idx, id = self.symbol_node.id())?,
@@ -42,18 +44,19 @@ impl CallStackFrame {
 
         if let Some(line_col) = self.src_ref.at() {
             let source_file = source_by_hash.get_by_hash(self.src_ref.source_hash());
-            writeln!(f, "            at {filename}:{line_col}", 
+            writeln!(
+                f,
+                "            at {filename}:{line_col}",
                 filename = source_file
                     .as_ref()
                     .map(|sf| sf.filename_as_str())
-                    .unwrap_or(crate::syntax::SourceFile::NO_FILE), 
+                    .unwrap_or(SourceFile::NO_FILE),
             )?;
         }
 
         Ok(())
     }
 }
-
 
 /// Call stack
 #[derive(Default, Debug, Clone)]
@@ -71,11 +74,14 @@ impl CallStack {
     }
 
     /// Pretty print stack
-    pub fn pretty_print(&self, f: &mut std::fmt::Formatter<'_>, source_by_hash: &impl super::GetSourceByHash) -> std::fmt::Result {
+    pub fn pretty_print(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+        source_by_hash: &impl super::GetSourceByHash,
+    ) -> std::fmt::Result {
         for (idx, call_stack_frame) in self.0.iter().enumerate() {
             call_stack_frame.pretty_print(f, source_by_hash, idx)?;
         }
         Ok(())
     }
 }
-

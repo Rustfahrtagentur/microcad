@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*, Id};
+use crate::{parse::*, src_ref::*, syntax::*, ty::*, value::*, Id};
 use thiserror::Error;
 
 /// Evaluation error

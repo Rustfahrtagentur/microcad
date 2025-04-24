@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::eval::*;
+use crate::{eval::*, objects::*};
 
 impl Eval for ListExpression {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
@@ -130,9 +130,7 @@ impl Eval for Nested {
         if node_stack.is_empty() {
             Ok(Value::None)
         } else {
-            Ok(Value::NodeMultiplicity(crate::objects::nest_nodes(
-                &node_stack,
-            ).clone()))
+            Ok(Value::NodeMultiplicity(nest_nodes(&node_stack).clone()))
         }
     }
 }

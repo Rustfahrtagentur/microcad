@@ -3,9 +3,7 @@
 
 //! External files register
 
-use std::ffi::OsStr;
-
-use crate::{eval::*, syntax::*};
+use crate::{eval::*, src_ref::*, syntax::*, MICROCAD_EXTENSIONS};
 use log::*;
 
 /// External files register
@@ -108,7 +106,7 @@ impl Externals {
     ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {
         let mut externals = std::collections::HashMap::new();
         search_paths.iter().for_each(|search_path| {
-            Self::scan_path(search_path.clone(), crate::MICROCAD_EXTENSIONS)
+            Self::scan_path(search_path.clone(), MICROCAD_EXTENSIONS)
                 .iter()
                 .for_each(|file| {
                     externals.insert(
@@ -128,10 +126,8 @@ impl Externals {
 
     /// convert a path (of an external source code file) into a qualified name
     fn into_qualified_name(file: &std::path::Path) -> QualifiedName {
-        use crate::src_ref::*;
-
         // check if this is a module file and remove doublet namespace generation
-        let file = if file.file_stem() == Some(OsStr::new("module")) {
+        let file = if file.file_stem() == Some(std::ffi::OsStr::new("module")) {
             file.parent()
                 .expect("module file in root path is not allowed")
         } else {

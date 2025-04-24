@@ -1,13 +1,12 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, resolve::SymbolNodeRcMut, Id};
+use crate::{eval::*, resolve::*, Id};
 use log::debug;
-use std::collections::BTreeMap;
 
 /// A stack frame is map of local variables
 #[derive(Default)]
-struct Locals(BTreeMap<Id, SymbolNodeRcMut>);
+struct Locals(std::collections::BTreeMap<Id, SymbolNodeRcMut>);
 
 impl Locals {
     fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
@@ -22,7 +21,7 @@ impl Locals {
 }
 
 impl std::ops::Deref for Locals {
-    type Target = BTreeMap<Id, SymbolNodeRcMut>;
+    type Target = std::collections::BTreeMap<Id, SymbolNodeRcMut>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

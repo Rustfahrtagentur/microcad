@@ -27,6 +27,7 @@ pub use argument_map::*;
 pub use builtin_function::*;
 pub use builtin_module::*;
 pub use call::*;
+pub use call_stack::*;
 pub use eval_context::*;
 pub use eval_error::*;
 pub use externals::*;
