@@ -184,7 +184,7 @@ impl EvalContext {
                 // search namespace to place loaded source file into
                 let target = self.symbols.search(&source_name)?;
                 // copy children into target namespace
-                target.borrow_mut().copy_children(node);
+                SymbolNode::move_children(&target, &node);
             }
             Ok(_) => (),
             _ => {

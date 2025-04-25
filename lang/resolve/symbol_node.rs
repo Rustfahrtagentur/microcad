@@ -78,10 +78,12 @@ impl SymbolNode {
         parent.borrow_mut().children.insert(id, child);
     }
 
-    /// copy (clone) all children of the other into self without setting new parent
-    pub fn copy_children(&mut self, other: SymbolNodeRcMut) {
-        other.borrow().children.iter().for_each(|(id, child)| {
-            self.children.insert(id.clone(), child.clone());
+    /// move all children from one node to another (resets the parent of the children)
+    pub fn move_children(to: &SymbolNodeRcMut, from: &SymbolNodeRcMut) {
+        // copy children
+        from.borrow().children.iter().for_each(|(id, child)| {
+            child.borrow_mut().parent = Some(to.clone());
+            to.borrow_mut().children.insert(id.clone(), child.clone());
         });
     }
 
