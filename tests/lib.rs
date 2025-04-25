@@ -5,11 +5,7 @@
 use log::debug;
 
 #[cfg(test)]
-use microcad_lang::{
-    parser::Parser,
-    resolve::SymbolDefinition,
-    syntax::{CallArgumentList, Identifier},
-};
+use microcad_lang::{parser::*, rc::*, resolve::*, syntax::*};
 
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
@@ -24,7 +20,7 @@ include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 fn load_source_file(
     filename: &str,
 ) -> (
-    std::rc::Rc<microcad_lang::syntax::SourceFile>,
+    Rc<microcad_lang::syntax::SourceFile>,
     microcad_lang::eval::EvalContext,
 ) {
     use microcad_builtin::*;

@@ -12,7 +12,7 @@ pub mod objects;
 pub mod ord_map;
 pub mod parse;
 pub mod parser;
-pub mod rc_mut;
+pub mod rc;
 pub mod resolve;
 pub mod src_ref;
 pub mod syntax;

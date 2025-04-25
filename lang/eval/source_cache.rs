@@ -3,7 +3,7 @@
 
 //! Source file cache
 
-use crate::{eval::*, rc_mut::*, src_ref::*, syntax::*};
+use crate::{eval::*, rc::*, src_ref::*, syntax::*};
 use log::*;
 
 /// Register of loaded source files and their syntax trees
@@ -22,7 +22,7 @@ pub struct SourceCache {
 
 impl SourceCache {
     /// Create new source register
-    pub fn new(root: std::rc::Rc<SourceFile>, search_paths: Vec<std::path::PathBuf>) -> Self {
+    pub fn new(root: Rc<SourceFile>, search_paths: Vec<std::path::PathBuf>) -> Self {
         let externals = Externals::new(search_paths);
         let mut by_hash = std::collections::HashMap::new();
         by_hash.insert(root.hash, 0);
@@ -58,7 +58,7 @@ impl SourceCache {
     /// The file must lay in one of the search paths given to externals.
     /// - `name`: Qualified name which represents the file
     /// - `source_file`: The loaded source file to store
-    pub fn insert(&mut self, source_file: std::rc::Rc<SourceFile>) -> EvalResult<QualifiedName> {
+    pub fn insert(&mut self, source_file: Rc<SourceFile>) -> EvalResult<QualifiedName> {
         let filename = source_file.filename.clone();
         let name = self.externals.get_name(&filename)?;
         let hash = source_file.hash;

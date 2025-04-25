@@ -1,10 +1,10 @@
-use crate::{parse::*, parser::*};
+use crate::{parse::*, parser::*, rc::*};
 use log::*;
 use std::io::Read;
 
 impl SourceFile {
     /// Load µcad source file from given `path`
-    pub fn load(path: impl AsRef<std::path::Path>) -> ParseResult<std::rc::Rc<Self>> {
+    pub fn load(path: impl AsRef<std::path::Path>) -> ParseResult<Rc<Self>> {
         let mut file = match std::fs::File::open(&path) {
             Ok(file) => file,
             _ => return Err(ParseError::LoadSource(path.as_ref().into())),
@@ -22,12 +22,12 @@ impl SourceFile {
         );
         trace!("Syntax tree:\n{}", FormatSyntax(&source_file));
 
-        Ok(std::rc::Rc::new(source_file))
+        Ok(Rc::new(source_file))
     }
 
     /// Create `SourceFile` from string
     /// The hash of the result will be of `"<from_str>"`.
-    pub fn load_from_str(s: &str) -> ParseResult<std::rc::Rc<Self>> {
+    pub fn load_from_str(s: &str) -> ParseResult<Rc<Self>> {
         use std::{
             hash::{Hash, Hasher},
             str::FromStr,
@@ -41,7 +41,7 @@ impl SourceFile {
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, hash)?;
         source_file.filename = std::path::PathBuf::from_str("<from_str>").expect("filename error");
         debug!("loaded string successfully",);
-        Ok(std::rc::Rc::new(source_file))
+        Ok(Rc::new(source_file))
     }
 
     fn calculate_hash(value: &str) -> u64 {

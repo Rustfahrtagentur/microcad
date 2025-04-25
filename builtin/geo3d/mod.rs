@@ -3,7 +3,7 @@
 
 use microcad_builtin_proc_macro::DefineBuiltinPrimitive3D;
 use microcad_core::*;
-use microcad_lang::{eval::*, parse::*};
+use microcad_lang::{eval::*, parse::*, rc::*};
 
 /// The builtin sphere primitive, defined by its radius.
 #[derive(DefineBuiltinPrimitive3D, Debug)]
@@ -101,7 +101,7 @@ impl geo3d::Primitive for Cylinder {
 use crate::NamespaceBuilder;
 
 /// geo3d Builtin module
-pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
+pub fn builtin_module() -> Rc<NamespaceDefinition> {
     NamespaceBuilder::new("geo3d")
         .add(Sphere::builtin_module().into())
         .add(Cube::builtin_module().into())

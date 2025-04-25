@@ -3,7 +3,7 @@
 
 //! Namespace definition syntax element
 
-use crate::{rc_mut::*, resolve::*, src_ref::*, syntax::*};
+use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 
 /// Namespace definition
 #[derive(Debug, Clone)]
@@ -18,7 +18,7 @@ pub struct NamespaceDefinition {
 
 impl NamespaceDefinition {
     /// Create a new namespace definition
-    pub fn new(name: Identifier) -> std::rc::Rc<Self> {
+    pub fn new(name: Identifier) -> Rc<Self> {
         Rc::new(Self {
             id: name,
             body: Body::default(),

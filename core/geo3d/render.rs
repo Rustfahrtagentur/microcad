@@ -4,14 +4,12 @@
 //! 3D renderable
 
 use crate::*;
+use std::rc::Rc;
 
 /// A `Primitive3D` is a hashable renderable object that can be rendered by a Renderer3D
 pub trait Primitive: RenderHash + std::fmt::Debug {
     /// Get geometry from cache via primitives hash
-    fn request_geometry(
-        &self,
-        renderer: &mut dyn Renderer,
-    ) -> CoreResult<std::rc::Rc<geo3d::Geometry>> {
+    fn request_geometry(&self, renderer: &mut dyn Renderer) -> CoreResult<Rc<geo3d::Geometry>> {
         // Try to fetch the geometry from the render cache
         if let Some(hash) = self.render_hash() {
             if let Some(geometry) = renderer.fetch_geometry(hash) {
@@ -21,7 +19,7 @@ pub trait Primitive: RenderHash + std::fmt::Debug {
 
         // If the geometry is not in the render cache, render it
         let geometry = self.render_geometry(renderer)?;
-        Ok(std::rc::Rc::new(geometry))
+        Ok(Rc::new(geometry))
     }
 
     /// Render geometry
@@ -34,7 +32,7 @@ pub trait Renderer: crate::Renderer {
     fn mesh(&mut self, mesh: &geo3d::TriangleMesh) -> CoreResult<()>;
 
     /// Get geometry
-    fn fetch_geometry(&mut self, _hash: u64) -> Option<std::rc::Rc<geo3d::Geometry>> {
+    fn fetch_geometry(&mut self, _hash: u64) -> Option<Rc<geo3d::Geometry>> {
         None
     }
 

@@ -9,7 +9,7 @@ extern crate microcad_lang;
 use clap::{Parser, Subcommand};
 use log::*;
 use microcad_lang::{
-    env_logger_init, eval::*, objects::*, parse::ParseResult, rc_mut::*, resolve::*, syntax::*,
+    env_logger_init, eval::*, objects::*, parse::ParseResult, rc::*, resolve::*, syntax::*,
 };
 use std::io::Write;
 

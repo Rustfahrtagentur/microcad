@@ -1,4 +1,4 @@
-use crate::{eval::*, rc_mut::*, resolve::*, syntax::*, value::*, Id};
+use crate::{Id, eval::*, rc::*, resolve::*, syntax::*, value::*};
 
 /// Symbol definition
 #[derive(Debug, Clone)]

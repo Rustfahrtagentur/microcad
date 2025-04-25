@@ -12,7 +12,7 @@ use std::collections::BTreeMap;
 pub use algorithm::*;
 pub use transform::*;
 
-use crate::{Id, rc_mut::*, value::Value};
+use crate::{Id, rc::*, value::Value};
 use microcad_core::*;
 use strum::IntoStaticStr;
 

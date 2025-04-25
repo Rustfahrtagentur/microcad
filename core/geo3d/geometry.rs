@@ -1,4 +1,5 @@
 pub use super::*;
+use std::rc::Rc;
 use strum::IntoStaticStr;
 
 /// 3D Geometry
@@ -33,10 +34,7 @@ impl Geometry {
     }
 
     /// Execute multiple boolean operations
-    pub fn boolean_op_multi(
-        geometries: Vec<std::rc::Rc<Self>>,
-        op: &BooleanOp,
-    ) -> Option<std::rc::Rc<Self>> {
+    pub fn boolean_op_multi(geometries: Vec<Rc<Self>>, op: &BooleanOp) -> Option<Rc<Self>> {
         if geometries.is_empty() {
             return None;
         }
@@ -46,7 +44,7 @@ impl Geometry {
                 .iter()
                 .fold(geometries[0].clone(), |acc, geo| {
                     if let Some(r) = acc.boolean_op(geo.as_ref(), op) {
-                        std::rc::Rc::new(r)
+                        Rc::new(r)
                     } else {
                         acc
                     }
@@ -81,6 +79,6 @@ impl From<TriangleMesh> for Geometry {
 }
 
 /// Create a new geometry node
-pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
+pub fn geometry(geometry: Rc<Geometry>) -> Node {
     Node::new(NodeInner::Geometry(geometry))
 }

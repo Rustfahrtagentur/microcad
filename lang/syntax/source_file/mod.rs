@@ -3,7 +3,7 @@
 
 //! µcad source file representation
 
-use crate::{eval::*, rc_mut::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use log::*;
 
 /// µcad source file
@@ -57,14 +57,14 @@ impl SourceFile {
 
     /// Resolve into SymbolNode
     pub fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        let node = std::rc::Rc::new(self.clone()).resolve_rc(parent);
+        let node = Rc::new(self.clone()).resolve_rc(parent);
         eprintln!("Symbol:\n{}", FormatSymbol(&node.borrow()));
         node
     }
 
     /// Like resolve but with Rc<SourceFile>
     pub fn resolve_rc(
-        self: std::rc::Rc<Self>,
+        self: Rc<Self>,
         parent: Option<RcMut<SymbolNode>>,
     ) -> RcMut<SymbolNode> {
         eprintln!("resolving {}", self.filename_as_str());

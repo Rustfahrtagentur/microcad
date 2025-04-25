@@ -1,6 +1,6 @@
-use crate::{parse::*, parser::*, rc_mut::*, syntax::*};
+use crate::{parse::*, parser::*, rc::*, syntax::*};
 
-impl Parse for std::rc::Rc<ModuleDefinition> {
+impl Parse for Rc<ModuleDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut name = Identifier::default();
         let mut parameters = ParameterList::default();

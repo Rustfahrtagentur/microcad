@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, resolve::*, syntax::*, Id};
+use crate::{Id, diag::*, eval::*, rc::*, resolve::*, syntax::*};
 
 use log::*;
 
@@ -75,7 +75,7 @@ impl EvalContext {
 
     /// Create a new context from a source file
     pub fn from_source_file(
-        source_file: std::rc::Rc<SourceFile>,
+        source_file: Rc<SourceFile>,
         builtin: SymbolNodeRcMut,
         search_paths: Vec<std::path::PathBuf>,
     ) -> Self {
@@ -84,7 +84,7 @@ impl EvalContext {
 
     /// Create a new context from a source file
     pub fn from_source_file_with_output(
-        source_file: std::rc::Rc<SourceFile>,
+        source_file: Rc<SourceFile>,
         builtin: SymbolNodeRcMut,
         search_paths: Vec<std::path::PathBuf>,
         output: Option<Output>,
@@ -247,7 +247,7 @@ impl PushDiag for EvalContext {
 }
 
 impl GetSourceByHash for EvalContext {
-    fn get_by_hash(&self, hash: u64) -> EvalResult<std::rc::Rc<SourceFile>> {
+    fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
         self.source_cache.get_by_hash(hash)
     }
 }

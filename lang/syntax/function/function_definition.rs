@@ -3,7 +3,7 @@
 
 //! Function definition syntax element
 
-use crate::{rc_mut::*, resolve::*, src_ref::*, syntax::*};
+use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 
 /// Function definition
 #[derive(Debug)]
