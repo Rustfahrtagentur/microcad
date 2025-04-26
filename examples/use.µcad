@@ -1,7 +1,13 @@
+// use symbol `circle` in file `geo2d.µcad`
 use std::geo2d::circle;
-use std::geo3d::sphere;
-use std::test::foo::bar;
+// use all symbols in file `geo3d.µcad`
+use std::geo3d::*;
+// alias `bar` in `std/text/foo.µcad` into `baz`
+use std::test::foo::bar as baz;
+// use print from `std/module.µcad`
 use std::print;
 
-circle(radius=1);
-sphere(radius=1);
+module my_module() {
+    circle(radius=1);
+    sphere(radius=1);
+}
