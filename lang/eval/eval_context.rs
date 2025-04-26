@@ -164,6 +164,22 @@ impl EvalContext {
         Ok(symbol)
     }
 
+    /// Find a symbol in the symbol table and copy all it's children to the locals.
+    /// Might load any related external file if not already loaded.
+    /// - `name`: Name of the symbol to search for
+    pub fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+        debug!("Using all symbols in {name}");
+        let symbol = match self.symbols.search(name) {
+            Ok(symbol) => symbol.clone(),
+            _ => self.load_symbol(name)?,
+        };
+        for (id, symbol) in symbol.borrow().children.iter() {
+            self.local_stack.add(Some(id.clone()), symbol.clone());
+        }
+        trace!("Local Stack:\n{}", self.local_stack);
+        Ok(symbol)
+    }
+
     /// lookup a symbol from a qualified name
     /// (might load any related external file if not already loaded)
     fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {

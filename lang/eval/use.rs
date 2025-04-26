@@ -17,7 +17,11 @@ impl Eval for UseDeclaration {
                     context.error(name, err)?;
                 }
             }
-            UseDeclaration::UseAll(_name) => todo!(),
+            UseDeclaration::UseAll(name) => {
+                if let Err(err) = context.use_symbols_of(name) {
+                    context.error(name, err)?
+                }
+            }
             UseDeclaration::UseAlias(name, alias) => {
                 if let Err(err) = context.use_symbol(name, Some(alias.id().clone())) {
                     context.error(name, err)?;
