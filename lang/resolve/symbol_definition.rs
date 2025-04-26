@@ -7,6 +7,8 @@ pub enum SymbolDefinition {
     SourceFile(Rc<SourceFile>),
     /// Namespace symbol
     Namespace(Rc<NamespaceDefinition>),
+    /// External namespace symbol (not already loaded)
+    External(Rc<NamespaceDefinition>),
     /// Module symbol
     Module(Rc<ModuleDefinition>),
     /// Function symbol
@@ -25,7 +27,7 @@ impl SymbolDefinition {
     /// Returns ID of this definition
     pub fn id(&self) -> Id {
         match &self {
-            Self::Namespace(n) => n.id.id().clone(),
+            Self::Namespace(n) | Self::External(n) => n.id.id().clone(),
             Self::Module(m) => m.id.id().clone(),
             Self::Function(f) => f.id.id().clone(),
             Self::SourceFile(s) => s.namespace_name_as_str().into(),
@@ -43,6 +45,7 @@ impl SymbolDefinition {
             Self::Namespace(n) => n.resolve(parent),
             Self::Function(f) => f.resolve(parent),
             Self::SourceFile(s) => s.resolve(parent),
+            Self::External(e) => unreachable!("external {} must be loaded first", e.id),
             // A builtin symbols and constants cannot have child symbols,
             // hence the resolve trait does not need to be implemented
             symbol_definition => SymbolNode::new(symbol_definition.clone(), parent),
@@ -56,6 +59,7 @@ impl std::fmt::Display for SymbolDefinition {
         match self {
             Self::Module(_) => write!(f, "{} (module)", id),
             Self::Namespace(_) => write!(f, "{} (namespace)", id),
+            Self::External(_) => write!(f, "{} (external)", id),
             Self::Function(_) => write!(f, "{} (function)", id),
             Self::SourceFile(_) => write!(f, "{} (file)", id),
             Self::BuiltinFunction(_) => write!(f, "{} (builtin function)", id),

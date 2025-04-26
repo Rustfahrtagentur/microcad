@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*, Id};
-
 use log::*;
 
 /// Context for evaluation
@@ -202,6 +201,7 @@ impl EvalContext {
                 let target = self.symbols.search(&source_name)?;
                 // copy children into target namespace
                 SymbolNode::move_children(&target, &node);
+                target.borrow_mut().external_to_namespace();
             }
             Ok(_) => (),
             _ => {

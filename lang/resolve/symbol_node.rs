@@ -51,6 +51,14 @@ impl SymbolNode {
         )
     }
 
+    /// Create a symbol node for an external namespace
+    pub fn new_external(id: Identifier) -> SymbolNodeRcMut {
+        SymbolNode::new(
+            SymbolDefinition::External(NamespaceDefinition::new(id)),
+            None,
+        )
+    }
+
     /// Create a new build constant
     pub fn new_constant(id: Id, value: Value) -> SymbolNodeRcMut {
         SymbolNode::new(
@@ -82,6 +90,14 @@ impl SymbolNode {
             child.borrow_mut().parent = Some(to.clone());
             to.borrow_mut().children.insert(id.clone(), child.clone());
         });
+    }
+
+    /// convert the symbol definition from external to namespace
+    pub fn external_to_namespace(&mut self) {
+        self.def = match &self.def {
+            SymbolDefinition::External(e) => SymbolDefinition::Namespace(e.clone()),
+            _ => unreachable!("must be external"),
+        }
     }
 
     /// Get id of the definition in this node
@@ -165,9 +181,11 @@ impl SrcReferrer for SymbolNode {
     fn src_ref(&self) -> SrcRef {
         match &self.def {
             SymbolDefinition::SourceFile(source_file) => source_file.src_ref(),
-            SymbolDefinition::Namespace(namespace_definition) => namespace_definition.src_ref(),
-            SymbolDefinition::Module(module_definition) => module_definition.src_ref(),
-            SymbolDefinition::Function(function_definition) => function_definition.src_ref(),
+            SymbolDefinition::Namespace(namespace) | SymbolDefinition::External(namespace) => {
+                namespace.src_ref()
+            }
+            SymbolDefinition::Module(module) => module.src_ref(),
+            SymbolDefinition::Function(function) => function.src_ref(),
             SymbolDefinition::BuiltinFunction(_) | SymbolDefinition::BuiltinModule(_) => {
                 unreachable!("builtin has no source code reference")
             }
