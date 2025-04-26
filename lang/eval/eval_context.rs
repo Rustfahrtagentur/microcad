@@ -173,11 +173,15 @@ impl EvalContext {
             Ok(symbol) => symbol.clone(),
             _ => self.load_symbol(name)?,
         };
-        for (id, symbol) in symbol.borrow().children.iter() {
-            self.local_stack.add(Some(id.clone()), symbol.clone());
+        if symbol.borrow().children.is_empty() {
+            Err(EvalError::NoSymbolFound(symbol.borrow().full_name()))
+        } else {
+            for (id, symbol) in symbol.borrow().children.iter() {
+                self.local_stack.add(Some(id.clone()), symbol.clone());
+            }
+            trace!("Local Stack:\n{}", self.local_stack);
+            Ok(symbol)
         }
-        trace!("Local Stack:\n{}", self.local_stack);
-        Ok(symbol)
     }
 
     /// lookup a symbol from a qualified name
@@ -231,6 +235,19 @@ impl EvalContext {
         self.output
             .as_ref()
             .map(|output| output.get().expect("UTF8 error"))
+    }
+
+    /// return all occurred errors as string
+    pub fn errors_as_str(&self) -> Option<String> {
+        if self.diag_handler().has_errors() {
+            Some(
+                self.diag_handler()
+                    .pretty_print_to_string(self)
+                    .expect("cannot write into string"),
+            )
+        } else {
+            None
+        }
     }
 
     /// Print for __builtin::print

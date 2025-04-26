@@ -162,9 +162,15 @@ fn eval(
         .map_err(|err| anyhow::anyhow!("{err}"))?;
 
     println!("{result}");
+    match context.errors_as_str() {
+        Some(errors) => {
+            warn!("Evaluated with errors:");
+            error!("{}", errors);
+        }
+        None => info!("Evaluated successfully!"),
+    }
 
-    info!("Evaluated successfully!");
-    todo!();
+    todo!("object node output")
 }
 
 /*

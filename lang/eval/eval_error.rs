@@ -112,6 +112,10 @@ pub enum EvalError {
     #[error("Symbol does not contain a value: {0}")]
     SymbolIsNotAValue(QualifiedName),
 
+    /// Given symbol has not children which can be used
+    #[error("No symbol found to use in {0}")]
+    NoSymbolFound(QualifiedName),
+
     /// Symbol was not expected to be found (e.g. assert_invalid)
     #[error("Symbol {0} found unexpected")]
     SymbolFound(QualifiedName),
