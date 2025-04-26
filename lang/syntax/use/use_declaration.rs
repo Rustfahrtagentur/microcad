@@ -20,33 +20,33 @@ use strum::IntoStaticStr;
 #[derive(Clone, Debug, IntoStaticStr)]
 pub enum UseDeclaration {
     /// Import symbols given as qualified names: `use a, b`
-    Use(QualifiedName, SrcRef),
+    Use(QualifiedName),
     /// Import all symbols from a module: `use std::*`
-    UseAll(QualifiedName, SrcRef),
+    UseAll(QualifiedName),
     /// Import as alias: `use a as b`
-    UseAlias(QualifiedName, Identifier, SrcRef),
+    UseAlias(QualifiedName, Identifier),
 }
 
 impl UseDeclaration {
     /// resolve public use declaration (shall not be called with private use statements)
     pub fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> (Id, SymbolNodeRcMut) {
         match self {
-            UseDeclaration::Use(qualified_name, _) => {
-                let identifier = qualified_name.last().expect("Identifier");
+            UseDeclaration::Use(name) => {
+                let identifier = name.last().expect("Identifier");
                 (
                     identifier.id().clone(),
                     SymbolNodeRcMut::new(SymbolNode {
-                        def: SymbolDefinition::Alias(identifier.clone(), qualified_name.clone()),
+                        def: SymbolDefinition::Alias(identifier.clone(), name.clone()),
                         parent,
                         children: Default::default(),
                     }),
                 )
             }
-            UseDeclaration::UseAll(_qualified_name, _src_ref) => todo!(),
-            UseDeclaration::UseAlias(qualified_name, identifier, _) => (
-                identifier.id().clone(),
+            UseDeclaration::UseAll(_name) => todo!(),
+            UseDeclaration::UseAlias(name, alias) => (
+                alias.id().clone(),
                 SymbolNodeRcMut::new(SymbolNode {
-                    def: SymbolDefinition::Alias(identifier.clone(), qualified_name.clone()),
+                    def: SymbolDefinition::Alias(alias.clone(), name.clone()),
                     parent,
                     children: Default::default(),
                 }),
@@ -58,9 +58,9 @@ impl UseDeclaration {
 impl SrcReferrer for UseDeclaration {
     fn src_ref(&self) -> SrcRef {
         match self {
-            Self::Use(_, src_ref) => src_ref.clone(),
-            Self::UseAll(_, src_ref) => src_ref.clone(),
-            Self::UseAlias(_, _, src_ref) => src_ref.clone(),
+            Self::Use(name) => name.src_ref(),
+            Self::UseAll(name) => name.src_ref(),
+            Self::UseAlias(name, alias) => SrcRef::merge(name.src_ref(), alias.src_ref()),
         }
     }
 }
@@ -68,9 +68,9 @@ impl SrcReferrer for UseDeclaration {
 impl std::fmt::Display for UseDeclaration {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            UseDeclaration::Use(name, _) => write!(f, "{name}"),
-            UseDeclaration::UseAll(name, _) => write!(f, "{name}::*"),
-            UseDeclaration::UseAlias(name, alias, _) => write!(f, "{name} as {alias}"),
+            UseDeclaration::Use(name) => write!(f, "{name}"),
+            UseDeclaration::UseAll(name) => write!(f, "{name}::*"),
+            UseDeclaration::UseAlias(name, alias) => write!(f, "{name} as {alias}"),
         }
     }
 }
@@ -78,9 +78,9 @@ impl std::fmt::Display for UseDeclaration {
 impl PrintSyntax for UseDeclaration {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         match self {
-            UseDeclaration::Use(name, _) => writeln!(f, "{:depth$}Use {name}", ""),
-            UseDeclaration::UseAll(name, _) => writeln!(f, "{:depth$}Use {name}::*", ""),
-            UseDeclaration::UseAlias(name, alias, _) => {
+            UseDeclaration::Use(name) => writeln!(f, "{:depth$}Use {name}", ""),
+            UseDeclaration::UseAll(name) => writeln!(f, "{:depth$}Use {name}::*", ""),
+            UseDeclaration::UseAlias(name, alias) => {
                 writeln!(f, "{:depth$}Use {name} as {alias}", "")
             }
         }

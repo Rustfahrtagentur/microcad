@@ -8,21 +8,16 @@ impl Parse for UseDeclaration {
         let first = inner.next().expect("Expected use declaration element");
 
         match first.as_rule() {
-            Rule::qualified_name => {
-                Ok(Self::Use(QualifiedName::parse(first)?, pair.clone().into()))
-            }
+            Rule::qualified_name => Ok(Self::Use(QualifiedName::parse(first)?)),
             Rule::use_all => {
                 let inner = first.inner().next().expect("Expected qualified name");
-                Ok(Self::UseAll(
-                    QualifiedName::parse(inner)?,
-                    first.clone().into(),
-                ))
+                Ok(Self::UseAll(QualifiedName::parse(inner)?))
             }
             Rule::use_alias => {
                 let mut inner = first.inner();
                 let name = QualifiedName::parse(inner.next().expect("Expected qualified name"))?;
                 let alias = Identifier::parse(inner.next().expect("Expected identifier"))?;
-                Ok(Self::UseAlias(name, alias, pair.clone().into()))
+                Ok(Self::UseAlias(name, alias))
             }
             _ => unreachable!("Invalid use declaration"),
         }

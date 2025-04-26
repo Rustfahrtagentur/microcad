@@ -12,16 +12,15 @@ impl Eval for UseStatement {
 impl Eval for UseDeclaration {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match &self {
-            UseDeclaration::Use(qualified_name, _) => {
-                if let Err(err) = context.use_symbol(None, qualified_name) {
-                    context.error(qualified_name, err)?;
+            UseDeclaration::Use(name) => {
+                if let Err(err) = context.use_symbol(None, name) {
+                    context.error(name, err)?;
                 }
             }
-            UseDeclaration::UseAll(_qualified_name, _) => todo!(),
-            UseDeclaration::UseAlias(qualified_name, identifier, _) => {
-                if let Err(err) = context.use_symbol(Some(identifier.id().clone()), qualified_name)
-                {
-                    context.error(qualified_name, err)?;
+            UseDeclaration::UseAll(_name) => todo!(),
+            UseDeclaration::UseAlias(name, alias) => {
+                if let Err(err) = context.use_symbol(Some(alias.id().clone()), name) {
+                    context.error(name, err)?;
                 }
             }
         };
