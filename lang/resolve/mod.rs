@@ -16,7 +16,7 @@ use crate::syntax::*;
 /// Trait for items which can be fully qualified
 pub trait FullyQualify {
     /// get a fully (up to root of symbol map) qualified name
-    fn full_name(&self) -> Option<QualifiedName>;
+    fn full_name(&self) -> QualifiedName;
 }
 
 #[test]

@@ -1,4 +1,4 @@
-use crate::{Id, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*, Id};
 use custom_debug::Debug;
 use log::*;
 
@@ -61,11 +61,8 @@ impl SymbolNode {
 
     /// Print out symbols from that point
     pub fn print_symbol(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        if let Some(name) = self.full_name() {
-            writeln!(f, "{:depth$}{} [{}]", "", self.def, name)?;
-        } else {
-            writeln!(f, "{:depth$}{}", "", self.def)?;
-        }
+        writeln!(f, "{:depth$}{} [{}]", "", self.def, self.full_name())?;
+
         self.children
             .iter()
             .try_for_each(|(_, child)| child.borrow().print_symbol(f, depth + self.def.id().len()))
@@ -121,18 +118,15 @@ impl SymbolNode {
 
 impl FullyQualify for SymbolNode {
     /// Get fully qualified name
-    fn full_name(&self) -> Option<QualifiedName> {
+    fn full_name(&self) -> QualifiedName {
         let id = Identifier(Refer::none(self.id()));
         match &self.parent {
             Some(parent) => {
-                if let Some(mut name) = parent.borrow().full_name() {
-                    name.push(id);
-                    Some(name)
-                } else {
-                    unreachable!("symbol without name?")
-                }
+                let mut name = parent.borrow().full_name();
+                name.push(id);
+                name
             }
-            None => Some(QualifiedName(vec![id])),
+            None => QualifiedName(vec![id]),
         }
     }
 }

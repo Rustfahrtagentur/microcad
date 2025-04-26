@@ -103,15 +103,8 @@ impl SourceCache {
             Ok(self.source_files[*index].clone())
         } else {
             // if not found in symbol tree we try to find an external file to load
-            let external = self.externals.fetch_external(name)?;
-            if self.get_by_path(external).is_ok() {
-                Err(EvalError::SymbolNotFound(name.clone()))
-            } else {
-                Err(EvalError::SymbolMustBeLoaded(
-                    self.externals.get_name(external)?.clone(),
-                    external.clone(),
-                ))
-            }
+            let (name, path) = self.externals.fetch_external(name)?;
+            Err(EvalError::SymbolMustBeLoaded(name, path))
         }
     }
 

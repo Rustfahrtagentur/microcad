@@ -64,31 +64,26 @@ impl Externals {
     }
 
     /// search for an external file which may include a given qualified name
-    pub fn fetch_external(&self, name: &QualifiedName) -> EvalResult<&std::path::PathBuf> {
+    pub fn fetch_external(
+        &self,
+        name: &QualifiedName,
+    ) -> EvalResult<(QualifiedName, std::path::PathBuf)> {
         trace!("fetching {name} from externals");
 
-        let mut found: Vec<&std::path::PathBuf> = vec![];
-        for (namespace, path) in self.0.iter() {
-            if name.is_sub_of(namespace) {
-                found.push(path);
-            }
+        if let Some(found) = self
+            .0
+            .iter()
+            // filter all files which might include name
+            .filter(|(n, _)| name.is_sub_of(n))
+            // find the file which has the longest name match
+            .max_by_key(|(name, _)| name.len())
+            // clone the references
+            .map(|(name, path)| ((*name).clone(), (*path).clone()))
+        {
+            return Ok(found);
         }
-        if found.is_empty() {
-            Err(EvalError::ExternalSymbolNotFound(name.clone()))
-        } else {
-            trace!(
-                "{name} might be found in the following files:\n{}",
-                found
-                    .iter()
-                    .map(|p| p.to_string_lossy())
-                    .collect::<Vec<_>>()
-                    .join("\n")
-            );
-            Ok(found
-                .iter()
-                .max_by_key(|p| p.as_os_str().len())
-                .expect("cannot find the longest path"))
-        }
+
+        Err(EvalError::ExternalSymbolNotFound(name.clone()))
     }
 
     /// get qualified name by path

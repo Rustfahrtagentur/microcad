@@ -12,10 +12,7 @@ struct Locals(BTreeMap<Id, SymbolNodeRcMut>);
 impl Locals {
     fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
         for (id, local) in self.iter() {
-            match local.borrow().full_name() {
-                Some(name) => writeln!(f, "{:depth$} {id} [{name}]", "")?,
-                None => writeln!(f, "{:depth$} {id}", "")?,
-            }
+            writeln!(f, "{:depth$} {id} [{}]", "", local.borrow().full_name())?
         }
         Ok(())
     }
@@ -57,13 +54,13 @@ impl LocalStack {
         } else {
             local.borrow().id()
         };
-        if let Some(name) = local.borrow().full_name() {
-            if name.is_qualified() {
-                debug!("Adding {name} as {id} to local stack");
-            } else {
-                debug!("Adding {id} to local stack");
-            }
+        let name = local.borrow().full_name();
+        if name.is_qualified() {
+            debug!("Adding {name} as {id} to local stack");
+        } else {
+            debug!("Adding {id} to local stack");
         }
+
         if let Some(last) = self.0.last_mut() {
             last
         } else {

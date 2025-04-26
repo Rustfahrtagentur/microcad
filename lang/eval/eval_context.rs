@@ -154,17 +154,14 @@ impl EvalContext {
         name: &QualifiedName,
         id: Option<Id>,
     ) -> EvalResult<SymbolNodeRcMut> {
-        debug!("Using symbol {name} in symbols");
-        let symbol = self.symbols.search(name);
-        match symbol {
-            Ok(symbol) => Ok(symbol.clone()),
-            _ => {
-                let symbol = self.load_symbol(name)?;
-                self.local_stack.add(id, symbol.clone());
-                trace!("Local Stack:\n{}", self.local_stack);
-                Ok(symbol)
-            }
-        }
+        debug!("Using symbol {name}");
+        let symbol = match self.symbols.search(name) {
+            Ok(symbol) => symbol.clone(),
+            _ => self.load_symbol(name)?,
+        };
+        self.local_stack.add(id, symbol.clone());
+        trace!("Local Stack:\n{}", self.local_stack);
+        Ok(symbol)
     }
 
     /// lookup a symbol from a qualified name
@@ -256,8 +253,8 @@ impl std::fmt::Display for EvalContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Loaded files:\n{}\nSymbols:\n{}",
-            self.source_cache, self.symbols
+            "Loaded files:\n{}\nLocals:\n{}\nSymbols:\n{}",
+            self.source_cache, self.local_stack, self.symbols
         )
     }
 }
