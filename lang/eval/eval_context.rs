@@ -169,7 +169,14 @@ impl EvalContext {
     pub fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         debug!("Using all symbols in {name}");
         let symbol = match self.symbols.search(name) {
-            Ok(symbol) => symbol.clone(),
+            Ok(symbol) => {
+                //  load external file if symbol was not loaded before
+                let ext = symbol.borrow().is_external();
+                match ext {
+                    true => self.load_symbol(name)?,
+                    false => symbol.clone(),
+                }
+            }
             _ => self.load_symbol(name)?,
         };
         if symbol.borrow().children.is_empty() {

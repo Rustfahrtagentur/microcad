@@ -130,6 +130,11 @@ impl SymbolNode {
             None
         }
     }
+
+    /// returns if symbol is an external namespace which must be loaded before using
+    pub fn is_external(&self) -> bool {
+        matches!(&self.def, SymbolDefinition::External(_))
+    }
 }
 
 impl FullyQualify for SymbolNode {
