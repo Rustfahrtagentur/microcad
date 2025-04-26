@@ -37,15 +37,15 @@ impl Externals {
                 Some(symbol) => symbol.clone(),
                 _ => SymbolNode::new_namespace(id.clone()),
             };
-            Self::recursive_create_namespaces(namespace.clone(), name);
+            Self::recursive_create_namespaces(&namespace, &name);
             map.insert(id.id().clone(), namespace);
         });
         map
     }
 
     fn recursive_create_namespaces(
-        parent: SymbolNodeRcMut,
-        name: QualifiedName,
+        parent: &SymbolNodeRcMut,
+        name: &QualifiedName,
     ) -> Option<SymbolNodeRcMut> {
         if name.is_empty() {
             return None;
@@ -57,9 +57,9 @@ impl Externals {
         }
 
         let child = SymbolNode::new_namespace(node_id.clone());
-        SymbolNode::insert_child(&parent, child.clone());
+        SymbolNode::insert_child(parent, child.clone());
 
-        Self::recursive_create_namespaces(child.clone(), name.remove_first());
+        Self::recursive_create_namespaces(&child, &name.remove_first());
         Some(child)
     }
 
