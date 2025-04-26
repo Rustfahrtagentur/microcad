@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, diag::*, eval::*, rc::*, resolve::*, syntax::*};
+use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*, Id};
 
 use log::*;
 
@@ -147,12 +147,12 @@ impl EvalContext {
 
     /// Find a symbol in the symbol table and copy it to the locals.
     /// Might load any related external file if not already loaded.
-    /// - `id`: if given overwrites the ID from qualified name (alias)
     /// - `name`: Name of the symbol to search for
+    /// - `id`: if given overwrites the ID from qualified name (use as)
     pub fn use_symbol(
         &mut self,
-        id: Option<Id>,
         name: &QualifiedName,
+        id: Option<Id>,
     ) -> EvalResult<SymbolNodeRcMut> {
         debug!("Using symbol {name} in symbols");
         let symbol = self.symbols.search(name);

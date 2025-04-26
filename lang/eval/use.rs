@@ -13,13 +13,13 @@ impl Eval for UseDeclaration {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match &self {
             UseDeclaration::Use(name) => {
-                if let Err(err) = context.use_symbol(None, name) {
+                if let Err(err) = context.use_symbol(name, None) {
                     context.error(name, err)?;
                 }
             }
             UseDeclaration::UseAll(_name) => todo!(),
             UseDeclaration::UseAlias(name, alias) => {
-                if let Err(err) = context.use_symbol(Some(alias.id().clone()), name) {
+                if let Err(err) = context.use_symbol(name, Some(alias.id().clone())) {
                     context.error(name, err)?;
                 }
             }
