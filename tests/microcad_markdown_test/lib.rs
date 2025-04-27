@@ -401,7 +401,7 @@ fn create_test_code(
                         Ok(source) => {
                             // evaluate the code including µcad std library
                             let mut context = EvalContext::from_source_file_with_output(source.clone(), builtin_namespace(), &["../lib".into()], Some(Default::default()));
-                            let eval = source.eval(&mut context);
+                            let eval = context.eval();
                             let diag = context.diag_handler();
 
                             // get print output
@@ -447,7 +447,7 @@ fn create_test_code(
                         Ok(source) => {
                             // evaluate the code including µcad std library
                             let mut context = EvalContext::from_source_file_with_output(source.clone(), builtin_namespace(), &["../lib".into()], Some(Default::default()));
-                            let eval = source.eval(&mut context);
+                            let eval = context.eval();
                             let diag = context.diag_handler();
 
                             // get print output

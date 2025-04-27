@@ -6,10 +6,16 @@ use std::geo3d::*;
 use std::test::foo::bar as baz;
 // use print from `std/module.µcad`
 use std::print;
-// public use export from `std/module.µcad`
-pub use std::export;
+// public use algorithm from `std/module.µcad`
+pub use std::algorithm;
+
+// use debug from `std/module.µcad`
+use std::debug;
+debug::assert();
 
 module my_module() {
     circle(radius=1);
     sphere(radius=1);
 }
+
+my_module();
