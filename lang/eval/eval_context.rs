@@ -122,11 +122,13 @@ impl EvalContext {
     }
 
     /// fetch global symbol from symbol map
+    #[cfg(test)]
     pub fn fetch_global(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         self.symbols.search(&qualified_name.clone())
     }
 
     /// fetch local variable from local stack
+    #[cfg(test)]
     pub fn fetch_local(&self, id: &Id) -> EvalResult<SymbolNodeRcMut> {
         self.local_stack.fetch(id)
     }
@@ -134,15 +136,19 @@ impl EvalContext {
     /// fetch a value from local stack
     pub fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
         if let Some(identifier) = name.single_identifier() {
-            if let Ok(symbol) = self.fetch_local(identifier.id()) {
+            if let Ok(symbol) = self.local_stack.fetch(identifier.id()) {
                 if let SymbolDefinition::Constant(_, value) = &symbol.borrow().def {
+                    debug!("Fetching local value {name}");
                     return Ok(value.clone());
                 }
             }
         }
+        match &self.symbols.search(name)?.borrow().def {
+            SymbolDefinition::Constant(_, value) => {
+                debug!("Fetching global value {name}");
+                Ok(value.clone())
+            }
 
-        match &self.fetch_global(name)?.borrow().def {
-            SymbolDefinition::Constant(_, value) => Ok(value.clone()),
             _ => Err(EvalError::SymbolIsNotAValue(name.clone())),
         }
     }
@@ -211,6 +217,7 @@ impl EvalContext {
                 let target = self.symbols.search(&source_name)?;
                 // copy children into target namespace
                 SymbolNode::move_children(&target, &node);
+                // mark target as "loaded" by changing the SymbolDefinition type
                 target.borrow_mut().external_to_namespace();
             }
             Ok(_) => (),
@@ -223,35 +230,50 @@ impl EvalContext {
         self.symbols.search(name)
     }
 
-    /// Look up for local or global symbol
+    /// Lookup for local or global symbol
     ///
-    /// If name is a single id it will be searched in the local stack or
-    /// if name is qualified searches in symbol map.
+    /// - looks in local stack
+    /// - looks inm symbol map
+    /// - follows aliases (use statements)
+    /// - detect any ambiguity
     pub fn lookup(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         debug!("Lookup {name}");
-        let symbol = if let Some(id) = name.single_identifier() {
-            self.fetch_local(id.id())
+        let local = if let Some(id) = name.single_identifier() {
+            self.local_stack.fetch(id.id())
         } else {
             // split name
-            let (id, mut name) = name.split_first();
+            let (id, mut name_rest) = name.split_first();
             // find a local by split id
-            let local = self.fetch_local(id.id())?;
-            // get original name from the local symbol
-            let mut alias_name = local.borrow().full_name();
-            // concat split name rest to new namespace name
-            alias_name.append(&mut name);
-            // lookup this new name
-            self.lookup(&alias_name)
-        };
-        // resolve any alias
-        if let Ok(symbol) = &symbol {
-            let def = &symbol.borrow().def;
-            if let SymbolDefinition::Alias(_, name) = def {
-                trace!("Found alias => {name}");
-                return self.lookup(name);
+            if let Ok(local) = self.local_stack.fetch(id.id()) {
+                // get original name from the local symbol
+                let mut alias_name = local.borrow().full_name();
+                // concat split name rest to new namespace name
+                alias_name.append(&mut name_rest);
+                // lookup this new name
+                self.lookup(&alias_name)
+            } else {
+                Err(EvalError::SymbolNotFound(name.clone()))
             }
+        };
+        // search for global symbol too
+        let global = self.symbols.search(name);
+
+        match (local, global) {
+            (Ok(local), Ok(global)) => Err(EvalError::AmbiguousSymbol {
+                ambiguous: name.clone(),
+                local: local.borrow().full_name(),
+                global: global.borrow().full_name(),
+            }),
+            (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => {
+                let def = &symbol.borrow().def;
+                if let SymbolDefinition::Alias(_, name) = def {
+                    trace!("Found alias => {name}");
+                    return self.lookup(name);
+                }
+                Ok(symbol.clone())
+            }
+            (Err(_), Err(_)) => Err(EvalError::SymbolNotFound(name.clone())),
         }
-        symbol
     }
 
     /// Access diagnostic handler

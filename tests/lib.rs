@@ -88,14 +88,14 @@ fn context_with_symbols() {
 
     context.add_symbol(builtin_namespace());
     context
-        .fetch_global(
+        .lookup(
             &"__builtin::assert_valid"
                 .try_into()
                 .expect("unexpected name error"),
         )
         .expect("symbol not found");
     context
-        .fetch_global(
+        .lookup(
             &"__builtin::assert_invalid"
                 .try_into()
                 .expect("unexpected name error"),
@@ -113,7 +113,7 @@ fn module_implicit_init() {
     debug!("Source File:\n{}", source_file);
 
     if let Ok(node) =
-        context.fetch_global(&Identifier(microcad_lang::src_ref::Refer::none("a".into())).into())
+        context.lookup(&Identifier(microcad_lang::src_ref::Refer::none("a".into())).into())
     {
         let id = node.borrow().id();
         assert_eq!(id, "a");

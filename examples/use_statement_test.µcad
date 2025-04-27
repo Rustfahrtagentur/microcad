@@ -11,7 +11,7 @@ pub use std::algorithm;
 
 // use debug from `std/module.µcad`
 use std::debug;
-debug::assert();
+debug::assert(true);
 
 module my_module() {
     circle(radius=1);

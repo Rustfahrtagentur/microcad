@@ -163,6 +163,17 @@ pub enum EvalError {
         found: usize,
     },
 
+    /// Found ambiguous symbol
+    #[error("Ambiguous symbol {ambiguous} might be {local} (local) or {global} (global)")]
+    AmbiguousSymbol {
+        /// ambiguous symbol
+        ambiguous: QualifiedName,
+        /// local symbol that matches
+        local: QualifiedName,
+        /// global symbol that matches
+        global: QualifiedName,
+    },
+
     /// Invalid argument type
     #[error("Invalid argument type: {0}")]
     InvalidArgumentType(Type),

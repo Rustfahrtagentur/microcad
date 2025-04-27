@@ -12,22 +12,22 @@ fn use_statements() {
     context.eval().expect("successful evaluation");
 
     // test::foo::bar alias baz
-    assert!(context.fetch_local(&"baz".into()).is_ok());
+    assert!(context.lookup(&"baz".try_into().expect("name")).is_ok());
     // std::geo2d::circle
-    assert!(context.fetch_local(&"circle".into()).is_ok());
+    assert!(context.lookup(&"circle".try_into().expect("name")).is_ok());
     // std::print from std/module.µcad
-    assert!(context.fetch_local(&"print".into()).is_ok());
+    assert!(context.lookup(&"print".try_into().expect("name")).is_ok());
     // nodes from std::geo3d::*
-    assert!(context.fetch_local(&"cube".into()).is_ok());
-    assert!(context.fetch_local(&"sphere".into()).is_ok());
+    assert!(context.lookup(&"cube".try_into().expect("name")).is_ok());
+    assert!(context.lookup(&"sphere".try_into().expect("name")).is_ok());
 
     // global node pub use std::export
     assert!(context
-        .fetch_global(&"use::export".try_into().expect("valid name"))
+        .lookup(&"use::export".try_into().expect("valid name"))
         .is_ok());
 
     // global node from module
     assert!(context
-        .fetch_global(&"use::my_module".try_into().expect("valid name"))
+        .lookup(&"use::my_module".try_into().expect("valid name"))
         .is_ok());
 }
