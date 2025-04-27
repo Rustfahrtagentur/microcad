@@ -10,13 +10,17 @@ pub fn assert() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert".into(), &|args, context| {
         if let Ok(arg) = args.get_single() {
             if !arg.eval_bool(context)? {
-                context.error(
-                    arg.src_ref(),
-                    Box::new(EvalError::AssertionFailed(format!("{arg}"))),
-                )?;
+                context.error(arg.src_ref(), EvalError::AssertionFailed(format!("{arg}")))?;
             }
         } else {
-            context.error(args.src_ref(), EvalError::NotAName(args.src_ref()))?;
+            context.error(
+                args.src_ref(),
+                EvalError::ArgumentCountMismatch {
+                    args: args.clone(),
+                    expected: 1,
+                    found: args.len(),
+                },
+            )?;
         }
         Ok(Value::None)
     })
