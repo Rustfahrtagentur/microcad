@@ -228,11 +228,30 @@ impl EvalContext {
     /// If name is a single id it will be searched in the local stack or
     /// if name is qualified searches in symbol map.
     pub fn lookup(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
-        if let Some(id) = name.single_identifier() {
+        debug!("Lookup {name}");
+        let symbol = if let Some(id) = name.single_identifier() {
             self.fetch_local(id.id())
         } else {
-            self.fetch_global(name)
+            // split name
+            let (id, mut name) = name.split_first();
+            // find a local by split id
+            let local = self.fetch_local(id.id())?;
+            // get original name from the local symbol
+            let mut alias_name = local.borrow().full_name();
+            // concat split name rest to new namespace name
+            alias_name.append(&mut name);
+            // lookup this new name
+            self.lookup(&alias_name)
+        };
+        // resolve any alias
+        if let Ok(symbol) = &symbol {
+            let def = &symbol.borrow().def;
+            if let SymbolDefinition::Alias(_, name) = def {
+                trace!("Found alias => {name}");
+                return self.lookup(name);
+            }
         }
+        symbol
     }
 
     /// Access diagnostic handler
