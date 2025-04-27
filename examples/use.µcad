@@ -6,6 +6,8 @@ use std::geo3d::*;
 use std::test::foo::bar as baz;
 // use print from `std/module.µcad`
 use std::print;
+// public use export from `std/module.µcad`
+pub use std::export;
 
 module my_module() {
     circle(radius=1);

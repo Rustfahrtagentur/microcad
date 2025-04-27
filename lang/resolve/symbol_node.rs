@@ -96,7 +96,7 @@ impl SymbolNode {
     pub fn external_to_namespace(&mut self) {
         self.def = match &self.def {
             SymbolDefinition::External(e) => SymbolDefinition::Namespace(e.clone()),
-            _ => unreachable!("must be external"),
+            def => def.clone(),
         }
     }
 

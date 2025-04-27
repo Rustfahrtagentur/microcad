@@ -20,4 +20,14 @@ fn use_statements() {
     // nodes from std::geo3d::*
     assert!(context.fetch_local(&"cube".into()).is_ok());
     assert!(context.fetch_local(&"sphere".into()).is_ok());
+
+    // global node pub use std::export
+    assert!(context
+        .fetch_global(&"use::export".try_into().expect("valid name"))
+        .is_ok());
+
+    // global node from module
+    assert!(context
+        .fetch_global(&"use::my_module".try_into().expect("valid name"))
+        .is_ok());
 }
