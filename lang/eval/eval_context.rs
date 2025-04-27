@@ -9,6 +9,8 @@ use log::*;
 /// The context is used to store the current state of the evaluation.
 /// A context is essentially a pile of symbol tables
 pub struct EvalContext {
+    /// root symbol
+    root: SymbolNodeRcMut,
     /// List of all global symbols
     symbols: SymbolMap,
     /// Stack of currently opened scopes with local symbols while evaluation
@@ -39,7 +41,7 @@ impl EvalContext {
         );
 
         // if node owns a source file store this in the file cache
-        let (source_cache, source_node) = match &symbol.borrow().def {
+        let (source_cache, root) = match &symbol.borrow().def {
             SymbolDefinition::SourceFile(source_file) => (
                 SourceCache::new(source_file.clone(), search_paths),
                 symbol.clone(),
@@ -59,11 +61,12 @@ impl EvalContext {
         });
 
         // insert root file into symbol map
-        symbols.insert_node(source_node);
+        symbols.insert_node(root.clone());
         trace!("Symbols:\n{symbols}");
 
         // put all together
         Self {
+            root,
             source_cache,
             symbols,
             diag_handler: Default::default(),
@@ -274,6 +277,16 @@ impl EvalContext {
                 .filename_as_str(),
             referrer.src_ref()
         ))
+    }
+
+    /// evaluate context to a value
+    pub fn eval(&mut self) -> EvalResult<Value> {
+        let source_file = match &self.root.borrow().def {
+            SymbolDefinition::SourceFile(source_file) => source_file.clone(),
+            _ => todo!(),
+        };
+
+        source_file.eval(self)
     }
 }
 

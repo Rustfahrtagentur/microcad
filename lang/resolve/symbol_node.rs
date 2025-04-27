@@ -152,15 +152,6 @@ impl FullyQualify for SymbolNode {
     }
 }
 
-impl Eval for SymbolNode {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        match &self.def {
-            SymbolDefinition::SourceFile(s) => s.eval(context),
-            _ => todo!(),
-        }
-    }
-}
-
 impl std::fmt::Display for SymbolNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.print_symbol(f, 0)
