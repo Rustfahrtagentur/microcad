@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #[cfg(test)]
+mod use_test;
+
+#[cfg(test)]
 use log::debug;
 
 #[cfg(test)]
@@ -32,7 +35,7 @@ fn load_source_file(
     let mut context = EvalContext::new(
         symbols.clone(),
         microcad_builtin::builtin_namespace(),
-        vec![],
+        &[],
         None,
     );
     context.add_symbol(builtin_namespace());
@@ -64,7 +67,7 @@ fn scopes() {
     let mut context = EvalContext::from_source_file(
         source_file.clone(),
         microcad_builtin::builtin_namespace(),
-        vec![],
+        &[],
     );
     context.add_symbol(builtin_namespace());
 
@@ -80,7 +83,7 @@ fn context_with_symbols() {
     let mut context = EvalContext::from_source_file(
         source_file.clone(),
         microcad_builtin::builtin_namespace(),
-        vec![],
+        &[],
     );
 
     context.add_symbol(builtin_namespace());
