@@ -82,7 +82,7 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
             resolve(input)?;
         }
         Commands::Eval { input, input_path } => {
-            eval(input, input_path.clone())?;
+            eval(input, input_path)?;
         }
         /*
         Commands::Export { input } => {
@@ -143,7 +143,7 @@ fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<SymbolNodeRcMut> {
 
 fn eval(
     input: impl AsRef<std::path::Path>,
-    search_paths: Vec<std::path::PathBuf>,
+    search_paths: &[std::path::PathBuf],
 ) -> anyhow::Result<ObjectNode> {
     let symbols = resolve(input)?;
     let source_file = match symbols.borrow().def.clone() {

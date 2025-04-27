@@ -51,8 +51,7 @@ fn assert_ok() {
     let source_file = SourceFile::load("../tests/test_cases/syntax/assert_ok.µcad")
         .expect("cannot load test file");
 
-    let mut context =
-        EvalContext::from_source_file(source_file.clone(), builtin_namespace(), vec![]);
+    let mut context = EvalContext::from_source_file(source_file.clone(), builtin_namespace(), &[]);
     context.add_symbol(super::builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());
@@ -65,8 +64,7 @@ fn assert_fail() {
 
     let source_file = SourceFile::load("../tests/test_cases/syntax/assert_fail.µcad")
         .expect("cannot load test file");
-    let mut context =
-        EvalContext::from_source_file(source_file.clone(), builtin_namespace(), vec![]);
+    let mut context = EvalContext::from_source_file(source_file.clone(), builtin_namespace(), &[]);
     context.add_symbol(super::builtin_namespace());
     let node = source_file.resolve(None);
     trace!("Source File Node:\n{node}");

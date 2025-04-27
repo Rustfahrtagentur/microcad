@@ -14,7 +14,7 @@ pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf
 
 impl Externals {
     /// Create new resolve context
-    pub fn new(search_paths: Vec<std::path::PathBuf>) -> Self {
+    pub fn new(search_paths: &[std::path::PathBuf]) -> Self {
         let no_search_paths = search_paths.is_empty();
         let new = Self(Self::search_externals(search_paths));
         if no_search_paths {
@@ -103,7 +103,7 @@ impl Externals {
 
     /// searches for external source code files (external modules) in some search paths
     fn search_externals(
-        search_paths: Vec<std::path::PathBuf>,
+        search_paths: &[std::path::PathBuf],
     ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {
         let mut externals = std::collections::HashMap::new();
         search_paths.iter().for_each(|search_path| {
@@ -188,7 +188,7 @@ impl std::ops::Deref for Externals {
 
 #[test]
 fn resolve_external_file() {
-    let externals = Externals::new(vec!["../lib".into()]);
+    let externals = Externals::new(&["../lib".into()]);
 
     assert!(!externals.is_empty());
 
@@ -205,7 +205,7 @@ fn resolve_external_file() {
 
 #[test]
 fn create_namespaces() {
-    let externals = Externals::new(vec!["../lib".into()]);
+    let externals = Externals::new(&["../lib".into()]);
 
     assert!(!externals.is_empty());
 

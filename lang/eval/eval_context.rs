@@ -26,7 +26,7 @@ impl EvalContext {
     pub fn new(
         symbol: SymbolNodeRcMut,
         builtin: SymbolNodeRcMut,
-        search_paths: Vec<std::path::PathBuf>,
+        search_paths: &[std::path::PathBuf],
         output: Option<Output>,
     ) -> Self {
         debug!(
@@ -76,7 +76,7 @@ impl EvalContext {
     pub fn from_source_file(
         source_file: Rc<SourceFile>,
         builtin: SymbolNodeRcMut,
-        search_paths: Vec<std::path::PathBuf>,
+        search_paths: &[std::path::PathBuf],
     ) -> Self {
         Self::from_source_file_with_output(source_file, builtin, search_paths, None)
     }
@@ -85,7 +85,7 @@ impl EvalContext {
     pub fn from_source_file_with_output(
         source_file: Rc<SourceFile>,
         builtin: SymbolNodeRcMut,
-        search_paths: Vec<std::path::PathBuf>,
+        search_paths: &[std::path::PathBuf],
         output: Option<Output>,
     ) -> Self {
         Self::new(
