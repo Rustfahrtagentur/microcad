@@ -164,12 +164,12 @@ pub enum EvalError {
     },
 
     /// Found ambiguous symbol
-    #[error("Ambiguous symbol {ambiguous} might be one of {others:?}")]
+    #[error("Ambiguous symbol {ambiguous} might be one of the following: {others}")]
     AmbiguousSymbol {
         /// ambiguous symbol
         ambiguous: QualifiedName,
         /// local symbol that matches
-        others: Vec<QualifiedName>,
+        others: QualifiedNames,
     },
 
     /// Invalid argument type

@@ -8,6 +8,38 @@ use crate::{src_ref::*, syntax::*};
 #[derive(Debug, Default, Clone, PartialEq, Hash, Eq, Ord, PartialOrd)]
 pub struct QualifiedName(pub Vec<Identifier>);
 
+/// List of qualified names which can pe displayed
+#[derive(Debug)]
+pub struct QualifiedNames(Vec<QualifiedName>);
+
+impl std::fmt::Display for QualifiedNames {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.0
+                .iter()
+                .map(|name| name.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+}
+
+impl std::ops::Deref for QualifiedNames {
+    type Target = Vec<QualifiedName>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl FromIterator<QualifiedName> for QualifiedNames {
+    fn from_iter<T: IntoIterator<Item = QualifiedName>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
+    }
+}
+
 impl QualifiedName {
     /// If the QualifiedName only consists of a single identifier, return it
     pub fn single_identifier(&self) -> Option<&Identifier> {
