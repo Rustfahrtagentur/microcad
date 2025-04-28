@@ -1,0 +1,18 @@
+error: No symbol found to use in std::math
+  ---> <from_str>:2:5
+     |
+   2 | use std::math::*;
+     |     ^^^^^^^^^
+     |
+error: Symbol assert not found.
+  ---> <from_str>:4:1
+     |
+   4 | assert(cos(pi) == -1);
+     | ^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol assert not found.
+  ---> <from_str>:5:1
+     |
+   5 | assert(tan(0) == 0);
+     | ^^^^^^^^^^^^^^^^^^^
+     |

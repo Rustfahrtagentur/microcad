@@ -1,4 +1,4 @@
-error: Local symbol not found: hull
+error: Symbol hull not found.
   ---> <from_str>:1:1
      |
    1 | hull()
@@ -10,7 +10,7 @@ error: Cannot nest item: hull()
    1 | hull()
      | ^^^^^^
      |
-error: Local symbol not found: translate
+error: Symbol translate not found.
   ---> <from_str>:2:5
      |
    2 |     translate(x = [-10, 10]mm, y = [-10, 10]mm)
@@ -22,7 +22,7 @@ error: Cannot nest item: translate(x = [-10, 10]mm, y = [-10, 10]mm)
    1 | hull()
      | ^^^^^^
      |
-error: Local symbol not found: circle
+error: Symbol circle not found.
   ---> <from_str>:3:9
      |
    3 |         circle(1mm);

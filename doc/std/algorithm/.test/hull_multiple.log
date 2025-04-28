@@ -1,4 +1,4 @@
-error: Local symbol not found: hull
+error: Symbol hull not found.
   ---> <from_str>:1:1
      |
    1 | hull() {
@@ -10,7 +10,7 @@ error: Cannot nest item: hull()
    1 | hull() {
      | ^^^^^^^^
      |
-error: Local symbol not found: union
+error: Symbol union not found.
   ---> <from_str>:2:5
      |
    2 |     union() {
@@ -22,7 +22,7 @@ error: Cannot nest item: union()
    2 |     union() {
      |     ^^^^^^^^^^^^^
      |
-error: Local symbol not found: translate
+error: Symbol translate not found.
   ---> <from_str>:3:9
      |
    3 |         translate(x = [-10, 10]mm, y = [-10, 10]mm)
@@ -34,7 +34,7 @@ error: Cannot nest item: translate(x = [-10, 10]mm, y = [-10, 10]mm)
    3 |         translate(x = [-10, 10]mm, y = [-10, 10]mm)
      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Local symbol not found: circle
+error: Symbol circle not found.
   ---> <from_str>:4:13
      |
    4 |             circle(1mm);
@@ -46,7 +46,7 @@ error: Cannot nest item: circle(1mm)
    3 |         translate(x = [-10, 10]mm, y = [-10, 10]mm)
      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Local symbol not found: translate
+error: Symbol translate not found.
   ---> <from_str>:5:9
      |
    5 |         translate(x = [-20, 20]mm, y = 0mm)
@@ -58,7 +58,7 @@ error: Cannot nest item: translate(x = [-20, 20]mm, y = 0mm)
    5 |         translate(x = [-20, 20]mm, y = 0mm)
      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Local symbol not found: circle
+error: Symbol circle not found.
   ---> <from_str>:6:13
      |
    6 |             circle(1mm);

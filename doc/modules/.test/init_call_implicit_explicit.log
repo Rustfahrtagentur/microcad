@@ -1,10 +1,10 @@
-error: Local symbol not found: m
+error: Symbol m not found.
   ---> <from_str>:11:1
      |
   11 | m( area = (width = 1m, height = 0.5m) );
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Local symbol not found: m
+error: Symbol m not found.
   ---> <from_str>:14:1
      |
   14 | m( height = 0.5m );
