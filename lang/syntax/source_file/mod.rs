@@ -29,14 +29,14 @@ impl SourceFile {
 
     /// Return filename of loaded file or `<no file>`
     pub fn filename_as_str(&self) -> &str {
-        let filename = &self.filename;
-        filename.to_str().expect("File name error {filename:?}")
+        self.filename
+            .to_str()
+            .expect("File name error {filename:?}")
     }
 
     /// Return the namespace name from the file name
     pub fn namespace_name_as_str(&self) -> &str {
-        let filename = &self.filename;
-        filename
+        self.filename
             .file_stem()
             .expect("cannot get file stem")
             .to_str()
