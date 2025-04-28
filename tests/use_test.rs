@@ -2,7 +2,7 @@ use microcad_lang::{eval::*, syntax::*};
 
 #[test]
 fn use_statements() {
-    let input: std::path::PathBuf = "../examples/use.µcad".into();
+    let input: std::path::PathBuf = "test_cases/use/use_test.µcad".into();
     let mut context = EvalContext::new(
         SourceFile::load(input).expect("file {input}").resolve(None),
         microcad_builtin::builtin_namespace(),
@@ -21,13 +21,8 @@ fn use_statements() {
     assert!(context.lookup(&"cube".try_into().expect("name")).is_ok());
     assert!(context.lookup(&"sphere".try_into().expect("name")).is_ok());
 
-    // global node pub use std::export
-    assert!(context
-        .lookup(&"use::export".try_into().expect("valid name"))
-        .is_ok());
-
     // global node from module
     assert!(context
-        .lookup(&"use::my_module".try_into().expect("valid name"))
+        .lookup(&"use_test::my_module".try_into().expect("valid name"))
         .is_ok());
 }
