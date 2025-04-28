@@ -76,6 +76,13 @@ impl QualifiedName {
             None
         }
     }
+
+    /// Add given prefix to name
+    pub fn with_prefix(&self, prefix: &QualifiedName) -> Self {
+        let mut full_name = prefix.clone();
+        full_name.append(&mut self.clone());
+        full_name
+    }
 }
 
 impl SrcReferrer for QualifiedName {

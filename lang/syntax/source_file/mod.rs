@@ -35,12 +35,15 @@ impl SourceFile {
     }
 
     /// Return the namespace name from the file name
-    pub fn namespace_name_as_str(&self) -> &str {
-        self.filename
-            .file_stem()
-            .expect("cannot get file stem")
-            .to_str()
-            .expect("File name error {filename:?}")
+    pub fn id(&self) -> Identifier {
+        Identifier(Refer::none(
+            self.filename
+                .file_stem()
+                .expect("cannot get file stem")
+                .to_str()
+                .expect("File name error {filename:?}")
+                .into(),
+        ))
     }
 
     /// get a specific line
@@ -72,6 +75,7 @@ impl SourceFile {
 
 impl Eval for SourceFile {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+        context.open_namespace(self.id());
         let result = Body::evaluate_vec(&self.body, context);
         trace!("Evaluated context:\n{context}");
         result
@@ -90,7 +94,7 @@ impl PrintSyntax for SourceFile {
             f,
             "{:depth$}SourceFile '{}' ({}):",
             "",
-            self.namespace_name_as_str(),
+            self.id(),
             self.filename_as_str()
         )?;
         self.body

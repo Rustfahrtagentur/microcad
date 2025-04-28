@@ -15,6 +15,8 @@ pub struct EvalContext {
     symbols: SymbolMap,
     /// Stack of currently opened scopes with local symbols while evaluation
     local_stack: LocalStack,
+    /// Current namespace while evaluation
+    current_namespace: QualifiedName,
     /// Source file cache containing all source files loaded in the context and their syntax trees
     source_cache: SourceCache,
     /// Source file diagnostics
@@ -71,6 +73,7 @@ impl EvalContext {
             symbols,
             diag_handler: Default::default(),
             local_stack: Default::default(),
+            current_namespace: Default::default(),
             output,
         }
     }
@@ -114,6 +117,18 @@ impl EvalContext {
     /// Remove all local variables in the current scope and close it
     pub fn close_scope(&mut self) {
         self.local_stack.close_scope();
+    }
+
+    /// Open a new namespace which then will be the current namespace in the context
+    pub fn open_namespace(&mut self, id: Identifier) {
+        self.current_namespace.push(id);
+        trace!("open namespace -> {}", self.current_namespace);
+    }
+
+    /// Close current namespace
+    pub fn close_namespace(&mut self) {
+        self.current_namespace.pop();
+        trace!("closed namespace -> {}", self.current_namespace);
     }
 
     /// fetch global symbol from symbol map
@@ -253,22 +268,41 @@ impl EvalContext {
         // search for global symbol too
         let global = self.symbols.search(name);
 
-        match (local, global) {
-            (Ok(local), Ok(global)) => Err(EvalError::AmbiguousSymbol {
+        // search for global symbol with prefixing current namespace
+        let current = {
+            self.symbols
+                .search(&name.with_prefix(&self.current_namespace))
+        };
+
+        // collect all found nodes
+        let found = [local, global, current];
+        let found: Vec<_> = found.into_iter().filter_map(Result::ok).collect();
+
+        // Check for ambiguity
+        if found.len() > 1 {
+            return Err(EvalError::AmbiguousSymbol {
                 ambiguous: name.clone(),
-                local: local.borrow().full_name(),
-                global: global.borrow().full_name(),
-            }),
-            (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => {
-                let def = &symbol.borrow().def;
-                if let SymbolDefinition::Alias(_, name) = def {
-                    trace!("Found alias => {name}");
-                    return self.lookup(name);
-                }
-                Ok(symbol.clone())
-            }
-            (Err(_), Err(_)) => Err(EvalError::SymbolNotFound(name.clone())),
+                others: found
+                    .iter()
+                    .map(|symbol| symbol.borrow().full_name().clone())
+                    .collect(),
+            });
+        };
+
+        // check if we found any node
+        let symbol = match found.first() {
+            Some(symbol) => symbol,
+            _ => return Err(EvalError::SymbolNotFound(name.clone())),
+        };
+
+        // execute alias from any use statement
+        let def = &symbol.borrow().def;
+        if let SymbolDefinition::Alias(_, name) = def {
+            trace!("Found alias => {name}");
+            return self.lookup(name);
         }
+
+        Ok(symbol.clone())
     }
 
     /// Access diagnostic handler
@@ -321,14 +355,15 @@ impl EvalContext {
             SymbolDefinition::SourceFile(source_file) => source_file.clone(),
             _ => todo!(),
         };
-
         source_file.eval(self)
     }
 }
 
 impl PushDiag for EvalContext {
     fn push_diag(&mut self, diag: Diag) -> EvalResult<()> {
-        self.diag_handler.push_diag(diag)
+        let result = self.diag_handler.push_diag(diag);
+        trace!("Context:\n{self}");
+        result
     }
 }
 
@@ -342,8 +377,11 @@ impl std::fmt::Display for EvalContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Loaded files:\n{}\nLocals:\n{}\nSymbols:\n{}",
-            self.source_cache, self.local_stack, self.symbols
+            "Loaded files:\n{files}\nLocals:\n{locals}\nCurrent Namespace:\n  {namespace}\n\nSymbols:\n{symbols}",
+            files = self.source_cache,
+            locals = self.local_stack,
+            namespace = self.current_namespace,
+            symbols = self.symbols
         )
     }
 }
