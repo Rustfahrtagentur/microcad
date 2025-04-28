@@ -7,7 +7,7 @@ fn use_statements() {
         SourceFile::load(input).expect("file {input}").resolve(None),
         microcad_builtin::builtin_namespace(),
         &["../lib".into()],
-        None,
+        Box::new(Stdout),
     );
     context.eval().expect("successful evaluation");
 

@@ -150,7 +150,7 @@ fn eval(
         symbols.clone(),
         microcad_builtin::builtin_namespace(),
         search_paths,
-        None,
+        Box::new(Stdout),
     );
     let result = context.eval().map_err(|err| anyhow::anyhow!("{err}"))?;
 

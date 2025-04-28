@@ -22,7 +22,7 @@ pub struct EvalContext {
     /// Source file diagnostics
     diag_handler: DiagHandler,
     /// Output channel for __builtin::print
-    output: Option<Output>,
+    output: Box<dyn Output>,
 }
 
 impl EvalContext {
@@ -31,7 +31,7 @@ impl EvalContext {
         symbol: SymbolNodeRcMut,
         builtin: SymbolNodeRcMut,
         search_paths: &[std::path::PathBuf],
-        output: Option<Output>,
+        output: Box<dyn Output>,
     ) -> Self {
         debug!(
             "Creating Context (search paths: {})",
@@ -79,26 +79,30 @@ impl EvalContext {
     }
 
     /// Create a new context from a source file
-    pub fn from_source_file(
+    pub fn from_source(
         source_file: Rc<SourceFile>,
         builtin: SymbolNodeRcMut,
         search_paths: &[std::path::PathBuf],
-    ) -> Self {
-        Self::from_source_file_with_output(source_file, builtin, search_paths, None)
-    }
-
-    /// Create a new context from a source file
-    pub fn from_source_file_with_output(
-        source_file: Rc<SourceFile>,
-        builtin: SymbolNodeRcMut,
-        search_paths: &[std::path::PathBuf],
-        output: Option<Output>,
     ) -> Self {
         Self::new(
             SymbolNode::new(SymbolDefinition::SourceFile(source_file), None),
             builtin,
             search_paths,
-            output,
+            Box::new(Stdout),
+        )
+    }
+
+    /// Create a new context from a source file and capture output (see Self::output())
+    pub fn from_source_captured(
+        source_file: Rc<SourceFile>,
+        builtin: SymbolNodeRcMut,
+        search_paths: &[std::path::PathBuf],
+    ) -> Self {
+        Self::new(
+            SymbolNode::new(SymbolDefinition::SourceFile(source_file), None),
+            builtin,
+            search_paths,
+            Box::new(Capture::new()),
         )
     }
 
@@ -312,9 +316,7 @@ impl EvalContext {
 
     /// Access captured output
     pub fn output(&self) -> Option<String> {
-        self.output
-            .as_ref()
-            .map(|output| output.get().expect("UTF8 error"))
+        self.output.output()
     }
 
     /// return all occurred errors as string
@@ -332,11 +334,7 @@ impl EvalContext {
 
     /// Print for __builtin::print
     pub fn print(&mut self, what: String) {
-        if let Some(output) = &mut self.output {
-            output.print(what).expect("could not write to output");
-        } else {
-            println!("{what}");
-        }
+        self.output.print(what).expect("could not write to output");
     }
 
     /// get source code location of a src referrer
