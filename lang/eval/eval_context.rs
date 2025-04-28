@@ -4,31 +4,38 @@
 use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*, Id};
 use log::*;
 
-/// Context for evaluation
+/// Context for evaluation of a resolved µcad file.
 ///
 /// The context is used to store the current state of the evaluation.
-/// A context is essentially a pile of symbol tables
+/// A context is essentially a pile of symbol tables and a file cache.
+/// It also provides an output channel.
 pub struct EvalContext {
-    /// root symbol
+    /// Root symbol (symbol node of initially read source file)
     root: SymbolNodeRcMut,
-    /// List of all global symbols
+    /// List of all global symbols.
     symbols: SymbolMap,
-    /// Stack of currently opened scopes with local symbols while evaluation
+    /// Stack of currently opened scopes with local symbols while evaluation.
     local_stack: LocalStack,
-    /// Current namespace while evaluation
+    /// Current namespace while evaluation.
     current_namespace: QualifiedName,
-    /// Source file cache containing all source files loaded in the context and their syntax trees
+    /// Source file cache containing all source files loaded in the context and their syntax trees.
     source_cache: SourceCache,
-    /// Source file diagnostics
+    /// Source file diagnostics-
     diag_handler: DiagHandler,
-    /// Output channel for __builtin::print
+    /// Output channel for [__builtin::print].
     output: Box<dyn Output>,
 }
 
 impl EvalContext {
-    /// Create a new context from a source file
+    /// Create a new context from a source file.
+    ///
+    /// # Arguments
+    /// - `root`: Root symbol
+    /// - `builtin`: The builtin library
+    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
+    /// - `output`: Output channel to use
     pub fn new(
-        symbol: SymbolNodeRcMut,
+        root: SymbolNodeRcMut,
         builtin: SymbolNodeRcMut,
         search_paths: &[std::path::PathBuf],
         output: Box<dyn Output>,
@@ -43,10 +50,10 @@ impl EvalContext {
         );
 
         // if node owns a source file store this in the file cache
-        let (source_cache, root) = match &symbol.borrow().def {
+        let (source_cache, root) = match &root.borrow().def {
             SymbolDefinition::SourceFile(source_file) => (
                 SourceCache::new(source_file.clone(), search_paths),
-                symbol.clone(),
+                root.clone(),
             ),
             _ => unreachable!("missing root source file"),
         };
@@ -78,7 +85,12 @@ impl EvalContext {
         }
     }
 
-    /// Create a new context from a source file
+    /// Create a new context from a source file.
+    ///
+    /// # Arguments
+    /// - `source_file`: Resolved root source file.
+    /// - `builtin`: The builtin library
+    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
     pub fn from_source(
         source_file: Rc<SourceFile>,
         builtin: SymbolNodeRcMut,
@@ -92,7 +104,12 @@ impl EvalContext {
         )
     }
 
-    /// Create a new context from a source file and capture output (see Self::output())
+    /// Create a new context from a source file and capture output (see [Self::output]).
+    ///
+    /// # Arguments
+    /// - `source_file`: Resolved root source file.
+    /// - `builtin`: The builtin library
+    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
     pub fn from_source_captured(
         source_file: Rc<SourceFile>,
         builtin: SymbolNodeRcMut,
@@ -106,48 +123,57 @@ impl EvalContext {
         )
     }
 
-    /// Add a named local value to current locals
+    /// Add a named local value to current locals.
+    ///
     /// TODO: Is this special function really needed?
     pub fn add_local_value(&mut self, id: Id, value: Value) {
         self.local_stack
             .add(None, SymbolNode::new_constant(id, value));
     }
 
-    /// Open a new scope
+    /// Open a new scope.
+    ///
+    /// Adds a fresh table for locals to the stack.
+    /// Scope does not mean namespace! Namespaces have to be open with [Self::open_namespace].
     pub fn open_scope(&mut self) {
         self.local_stack.open_scope();
     }
 
-    /// Remove all local variables in the current scope and close it
+    /// Close current scope.
+    ///
+    /// Remove all locals in the current scope and close it.
+    /// Scope does not mean namespace! Namespaces have to be closed with [Self::close_namespace].
     pub fn close_scope(&mut self) {
         self.local_stack.close_scope();
     }
 
-    /// Open a new namespace which then will be the current namespace in the context
+    /// Open a new namespace which then will be the current namespace in the context.
     pub fn open_namespace(&mut self, id: Identifier) {
         self.current_namespace.push(id);
         trace!("open namespace -> {}", self.current_namespace);
     }
 
-    /// Close current namespace
+    /// Close current namespace.
     pub fn close_namespace(&mut self) {
         self.current_namespace.pop();
         trace!("closed namespace -> {}", self.current_namespace);
     }
 
-    /// fetch global symbol from symbol map
+    /// Fetch global symbol from symbol map (for testing only).
     #[cfg(test)]
     pub fn fetch_global(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         self.symbols.search(&qualified_name.clone())
     }
 
-    /// fetch local variable from local stack
+    /// Fetch local variable from local stack (for testing only).
     #[cfg(test)]
     pub fn fetch_local(&self, id: &Id) -> EvalResult<SymbolNodeRcMut> {
         self.local_stack.fetch(id)
     }
 
-    /// fetch a value from local stack
+    /// Fetch a value from locals.
+    ///
+    /// TODO: look up the stack for know locals?
     pub fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
         if let Some(identifier) = name.single_identifier() {
             if let Ok(symbol) = self.local_stack.fetch(identifier.id()) {
@@ -168,7 +194,10 @@ impl EvalContext {
     }
 
     /// Find a symbol in the symbol table and copy it to the locals.
+    ///
     /// Might load any related external file if not already loaded.
+    ///
+    /// # Arguments
     /// - `name`: Name of the symbol to search for
     /// - `id`: if given overwrites the ID from qualified name (use as)
     pub fn use_symbol(
@@ -187,7 +216,10 @@ impl EvalContext {
     }
 
     /// Find a symbol in the symbol table and copy all it's children to the locals.
+    ///
     /// Might load any related external file if not already loaded.
+    ///
+    /// # Arguments
     /// - `name`: Name of the symbol to search for
     pub fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         debug!("Using all symbols in {name}");
@@ -213,8 +245,12 @@ impl EvalContext {
         }
     }
 
-    /// lookup a symbol from a qualified name
-    /// (might load any related external file if not already loaded)
+    /// Lookup a symbol from a qualified name.
+    ///
+    /// Might load any related external file if not already loaded.
+    ///
+    /// # Arguments
+    /// - `name`: Name of the symbol to load
     fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         debug!("loading symbol {name}");
 
@@ -244,12 +280,15 @@ impl EvalContext {
         self.symbols.search(name)
     }
 
-    /// Lookup for local or global symbol
+    /// Lookup for local or global symbol.
     ///
     /// - looks in local stack
-    /// - looks inm symbol map
+    /// - looks in symbol map
     /// - follows aliases (use statements)
     /// - detect any ambiguity
+    ///
+    /// # Arguments
+    /// - `name`: Name of the symbol to look for
     pub fn lookup(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         debug!("Lookup {name}");
         let local = if let Some(id) = name.single_identifier() {
@@ -309,17 +348,17 @@ impl EvalContext {
         Ok(symbol.clone())
     }
 
-    /// Access diagnostic handler
+    /// Access diagnostic handler.
     pub fn diag_handler(&self) -> &DiagHandler {
         &self.diag_handler
     }
 
-    /// Access captured output
+    /// Access captured output.
     pub fn output(&self) -> Option<String> {
         self.output.output()
     }
 
-    /// return all occurred errors as string
+    /// Return all occurred errors as string.
     pub fn errors_as_str(&self) -> Option<String> {
         if self.diag_handler().has_errors() {
             Some(
@@ -332,12 +371,12 @@ impl EvalContext {
         }
     }
 
-    /// Print for __builtin::print
+    /// Print for `__builtin::print`.
     pub fn print(&mut self, what: String) {
         self.output.print(what).expect("could not write to output");
     }
 
-    /// get source code location of a src referrer
+    /// Get source code location of a src referrer.
     pub fn locate(&self, referrer: &impl SrcReferrer) -> EvalResult<String> {
         Ok(format!(
             "{}:{}",
@@ -347,7 +386,7 @@ impl EvalContext {
         ))
     }
 
-    /// evaluate context to a value
+    /// Evaluate context to a value.
     pub fn eval(&mut self) -> EvalResult<Value> {
         let source_file = match &self.root.borrow().def {
             SymbolDefinition::SourceFile(source_file) => source_file.clone(),

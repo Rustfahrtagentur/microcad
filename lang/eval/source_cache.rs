@@ -6,22 +6,22 @@
 use crate::{eval::*, rc::*, src_ref::*, syntax::*};
 use log::*;
 
-/// Register of loaded source files and their syntax trees
+/// Register of loaded source files and their syntax trees.
 #[derive(Default)]
 pub struct SourceCache {
-    /// External files read from search path
+    /// External files read from search path.
     externals: Externals,
 
     by_hash: std::collections::HashMap<u64, usize>,
     by_path: std::collections::HashMap<std::path::PathBuf, usize>,
     by_name: std::collections::HashMap<QualifiedName, usize>,
 
-    /// Loaded, parsed and resolved source files
+    /// Loaded, parsed and resolved source files.
     source_files: Vec<Rc<SourceFile>>,
 }
 
 impl SourceCache {
-    /// Create new source register
+    /// Create new source register.
     pub fn new(root: Rc<SourceFile>, search_paths: &[std::path::PathBuf]) -> Self {
         let externals = Externals::new(search_paths);
         let mut by_hash = std::collections::HashMap::new();
@@ -49,15 +49,17 @@ impl SourceCache {
         }
     }
 
-    /// Create initial namespace tree from externals
+    /// Create initial namespace tree from externals.
     pub fn create_namespaces(&self) -> SymbolMap {
         self.externals.create_namespaces()
     }
 
     /// Insert a new source file (from externals) into source register.
+    ///
     /// The file must lay in one of the search paths given to externals.
-    /// - `name`: Qualified name which represents the file
-    /// - `source_file`: The loaded source file to store
+    ///
+    /// # Arguments
+    /// - `source_file`: The loaded source file to store.
     pub fn insert(&mut self, source_file: Rc<SourceFile>) -> EvalResult<QualifiedName> {
         let filename = source_file.filename.clone();
         let name = self.externals.get_name(&filename)?;
@@ -71,12 +73,12 @@ impl SourceCache {
         Ok(name.clone())
     }
 
-    /// Convenience function to get a source file by from a `SrcReferrer`
+    /// Convenience function to get a source file by from a `SrcReferrer`.
     pub fn get_by_src_ref(&self, src_ref: &impl SrcReferrer) -> EvalResult<Rc<SourceFile>> {
         self.get_by_hash(src_ref.src_ref().source_hash())
     }
 
-    /// return a string describing the given source code position
+    /// Return a string describing the given source code position.
     pub fn ref_str(&self, src_ref: &impl SrcReferrer) -> String {
         format!(
             "{}:{}",
@@ -87,7 +89,7 @@ impl SourceCache {
         )
     }
 
-    /// Find a project file by it's file path
+    /// Find a project file by it's file path.
     pub fn get_by_path(&self, path: &std::path::Path) -> EvalResult<Rc<SourceFile>> {
         let path = path.to_path_buf();
         if let Some(index) = self.by_path.get(&path) {
@@ -97,7 +99,7 @@ impl SourceCache {
         }
     }
 
-    /// Find a project file by the qualified name which represents the file path
+    /// Find a project file by the qualified name which represents the file path.
     pub fn get_by_name(&self, name: &QualifiedName) -> EvalResult<Rc<SourceFile>> {
         if let Some(index) = self.by_name.get(name) {
             Ok(self.source_files[*index].clone())
@@ -116,14 +118,14 @@ impl SourceCache {
     }
 }
 
-/// Trait that can fetch for a file by it's hash value
+/// Trait that can fetch for a file by it's hash value.
 pub trait GetSourceByHash {
-    /// Find a project file by it's hash value
+    /// Find a project file by it's hash value.
     fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>>;
 }
 
 impl GetSourceByHash for SourceCache {
-    /// Find a project file by it's hash value
+    /// Find a project file by it's hash value.
     fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
         if let Some(index) = self.by_hash.get(&hash) {
             Ok(self.source_files[*index].clone())

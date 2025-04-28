@@ -24,7 +24,7 @@ pub enum SymbolDefinition {
 }
 
 impl SymbolDefinition {
-    /// Returns ID of this definition
+    /// Returns ID of this definition.
     pub fn id(&self) -> Id {
         match &self {
             Self::Namespace(n) | Self::External(n) => n.id.id().clone(),
@@ -38,7 +38,7 @@ impl SymbolDefinition {
         }
     }
 
-    /// Resolve into SymbolNode
+    /// Resolve into SymbolNode.
     pub fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
         match self {
             Self::Module(m) => m.resolve(parent),

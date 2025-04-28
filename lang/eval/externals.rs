@@ -13,7 +13,7 @@ use log::*;
 pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf>);
 
 impl Externals {
-    /// Create new resolve context
+    /// Create new resolve context.
     pub fn new(search_paths: &[std::path::PathBuf]) -> Self {
         let no_search_paths = search_paths.is_empty();
         let new = Self(Self::search_externals(search_paths));
@@ -28,7 +28,7 @@ impl Externals {
         new
     }
 
-    /// Create namespace tree from externals
+    /// Create namespace tree from externals.
     pub fn create_namespaces(&self) -> SymbolMap {
         let mut map = SymbolMap::new();
         self.iter().for_each(|(basename, _)| {
@@ -67,7 +67,7 @@ impl Externals {
         Some(child)
     }
 
-    /// search for an external file which may include a given qualified name
+    /// Search for an external file which may include a given qualified name.
     pub fn fetch_external(
         &self,
         name: &QualifiedName,
@@ -101,7 +101,7 @@ impl Externals {
         }
     }
 
-    /// searches for external source code files (external modules) in some search paths
+    /// Searches for external source code files (external modules) in some search paths.
     fn search_externals(
         search_paths: &[std::path::PathBuf],
     ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {
@@ -125,7 +125,7 @@ impl Externals {
         externals
     }
 
-    /// convert a path (of an external source code file) into a qualified name
+    /// Convert a path (of an external source code file) into a qualified name.
     fn into_qualified_name(file: &std::path::Path) -> QualifiedName {
         use crate::src_ref::*;
 
@@ -149,7 +149,7 @@ impl Externals {
         )
     }
 
-    /// scan in a specified path for all available files with one of the given extensions
+    /// Scan in a specified path for all available files with one of the given extensions.
     fn scan_path(
         search_path: std::path::PathBuf,
         extensions: &[&str],

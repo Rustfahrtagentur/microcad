@@ -5,7 +5,7 @@ use crate::{eval::*, resolve::SymbolNodeRcMut, Id};
 use log::debug;
 use std::collections::BTreeMap;
 
-/// A stack frame is map of local variables
+/// A stack frame is map of local variables.
 #[derive(Default)]
 struct Locals(BTreeMap<Id, SymbolNodeRcMut>);
 
@@ -32,22 +32,22 @@ impl std::ops::DerefMut for Locals {
     }
 }
 
-/// A stack with a list of local variables for each stack frame
+/// A stack with a list of local variables for each stack frame.
 #[derive(Default)]
 pub struct LocalStack(Vec<Locals>);
 
 impl LocalStack {
-    /// Open a new scope (stack push)
+    /// Open a new scope (stack push).
     pub fn open_scope(&mut self) {
         self.0.push(Default::default());
     }
 
-    /// Close scope (stack pop)
+    /// Close scope (stack pop).
     pub fn close_scope(&mut self) {
         self.0.pop();
     }
 
-    /// Add a new variable to current stack frame
+    /// Add a new variable to current stack frame.
     pub fn add(&mut self, id: Option<Id>, local: SymbolNodeRcMut) {
         let id = if let Some(id) = id {
             id
@@ -72,7 +72,7 @@ impl LocalStack {
         .insert(id, local);
     }
 
-    /// Fetch a local variable from current stack frame
+    /// Fetch a local variable from current stack frame.
     pub fn fetch(&self, id: &Id) -> EvalResult<SymbolNodeRcMut> {
         debug!("Fetching {id} from locals");
         // search from inner scope to root scope to shadow outside locals

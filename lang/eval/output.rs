@@ -1,19 +1,19 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-/// trait which EvalContext is using to access or redirect the µcad code's console output
+/// Trait which EvalContext is using to access or redirect the µcad code's console output.
 pub trait Output {
-    /// Print into output buffer
+    /// Print into output buffer.
     fn print(&mut self, what: String) -> std::io::Result<()>;
-    /// Access captured output
+    /// Access captured output.
     fn output(&self) -> Option<String>;
 }
 
-/// Output what `__builtin::print` is printing to stdout
+/// Output what `__builtin::print` is printing to stdout.
 pub struct Stdout;
 
 impl Output for Stdout {
-    /// Print into output buffer
+    /// Print into output buffer.
     fn print(&mut self, what: String) -> std::io::Result<()> {
         println!("{what}");
         Ok(())
@@ -23,13 +23,13 @@ impl Output for Stdout {
     }
 }
 
-/// Output buffer to catch what `__builtin::print` is printing
+/// Output buffer to catch what `__builtin::print` is printing.
 pub struct Capture {
     buf: std::io::BufWriter<Vec<u8>>,
 }
 
 impl Capture {
-    /// create new capture buffer
+    /// Create new capture buffer.
     pub fn new() -> Self {
         Self {
             buf: std::io::BufWriter::new(Vec::new()),
@@ -44,7 +44,6 @@ impl Default for Capture {
 }
 
 impl Output for Capture {
-    /// Print into output buffer
     fn print(&mut self, what: String) -> std::io::Result<()> {
         use std::io::Write;
         writeln!(self.buf, "{what}")

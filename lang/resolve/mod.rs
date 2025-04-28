@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! external file loading and symbol tree resolving
+//! External file loading and symbol tree resolving
 
 mod symbol_definition;
 mod symbol_map;
@@ -13,9 +13,9 @@ pub use symbol_node::*;
 
 use crate::syntax::*;
 
-/// Trait for items which can be fully qualified
+/// Trait for items which can be fully qualified.
 pub trait FullyQualify {
-    /// get a fully (up to root of symbol map) qualified name
+    /// Get a fully (up to root of symbol map) qualified name.
     fn full_name(&self) -> QualifiedName;
 }
 

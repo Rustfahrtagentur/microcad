@@ -63,7 +63,7 @@ impl SourceFile {
         Rc::new(self.clone()).resolve_rc(parent)
     }
 
-    /// Like resolve but with Rc<SourceFile>
+    /// Like resolve but with `Rc<SourceFile>`
     pub fn resolve_rc(self: Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
         eprintln!("resolving {}", self.filename_as_str());
         let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);

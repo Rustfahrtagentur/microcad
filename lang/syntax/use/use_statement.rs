@@ -29,7 +29,9 @@ impl UseStatement {
     /// Resolve use statement to multiple symbols
     pub fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolMap {
         match self.visibility {
+            // Private symbols are processed later in `EvalContext::use_symbol`
             Visibility::Private => SymbolMap::new(),
+            // Public symbols are put into resolving symbol map
             Visibility::Public => {
                 let mut symbols = SymbolMap::new();
                 let (id, symbol) = self.decl.resolve(parent.clone());

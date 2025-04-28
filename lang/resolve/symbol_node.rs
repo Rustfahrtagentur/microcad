@@ -18,7 +18,7 @@ pub struct SymbolNode {
 pub type SymbolNodeRcMut = RcMut<SymbolNode>;
 
 impl SymbolNode {
-    /// Create new reference counted symbol node
+    /// Create new reference counted symbol node.
     pub fn new(def: SymbolDefinition, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
         RcMut::new(SymbolNode {
             def,
@@ -27,7 +27,7 @@ impl SymbolNode {
         })
     }
 
-    /// Create a symbol node of a built-in function
+    /// Create a symbol node of a built-in function.
     pub fn new_builtin_fn(id: Id, f: &'static BuiltinFunctionFn) -> SymbolNodeRcMut {
         SymbolNode::new(
             SymbolDefinition::BuiltinFunction(BuiltinFunction::new(id, f)),
@@ -35,7 +35,7 @@ impl SymbolNode {
         )
     }
 
-    /// Create a symbol node for a built-in module
+    /// Create a symbol node for a built-in module.
     pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> SymbolNodeRcMut {
         SymbolNode::new(
             SymbolDefinition::BuiltinModule(BuiltinModule::new(id.into(), m)),
@@ -43,7 +43,7 @@ impl SymbolNode {
         )
     }
 
-    /// Create a symbol node for namespace
+    /// Create a symbol node for namespace.
     pub fn new_namespace(id: Identifier) -> SymbolNodeRcMut {
         SymbolNode::new(
             SymbolDefinition::Namespace(NamespaceDefinition::new(id)),
@@ -51,7 +51,7 @@ impl SymbolNode {
         )
     }
 
-    /// Create a symbol node for an external namespace
+    /// Create a symbol node for an external namespace.
     pub fn new_external(id: Identifier) -> SymbolNodeRcMut {
         SymbolNode::new(
             SymbolDefinition::External(NamespaceDefinition::new(id)),
@@ -59,7 +59,7 @@ impl SymbolNode {
         )
     }
 
-    /// Create a new build constant
+    /// Create a new build constant.
     pub fn new_constant(id: Id, value: Value) -> SymbolNodeRcMut {
         SymbolNode::new(
             SymbolDefinition::Constant(Identifier(Refer::none(id)), value),
@@ -67,7 +67,7 @@ impl SymbolNode {
         )
     }
 
-    /// Print out symbols from that point
+    /// Print out symbols from that point.
     pub fn print_symbol(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}{} [{}]", "", self.def, self.full_name())?;
 
@@ -76,14 +76,14 @@ impl SymbolNode {
             .try_for_each(|(_, child)| child.borrow().print_symbol(f, depth + self.def.id().len()))
     }
 
-    /// Insert child and change parent of child to new parent
+    /// Insert child and change parent of child to new parent.
     pub fn insert_child(parent: &SymbolNodeRcMut, child: SymbolNodeRcMut) {
         child.borrow_mut().parent = Some(parent.clone());
         let id = child.borrow().id();
         parent.borrow_mut().children.insert(id, child);
     }
 
-    /// move all children from one node to another (resets the parent of the children)
+    /// Move all children from one node to another (resets the parent of the children).
     pub fn move_children(to: &SymbolNodeRcMut, from: &SymbolNodeRcMut) {
         // copy children
         from.borrow().children.iter().for_each(|(id, child)| {
@@ -92,7 +92,7 @@ impl SymbolNode {
         });
     }
 
-    /// convert the symbol definition from external to namespace
+    /// Convert the symbol definition from external to namespace
     pub fn external_to_namespace(&mut self) {
         self.def = match &self.def {
             SymbolDefinition::External(e) => SymbolDefinition::Namespace(e.clone()),
@@ -100,17 +100,17 @@ impl SymbolNode {
         }
     }
 
-    /// Get id of the definition in this node
+    /// Get id of the definition in this node.
     pub fn id(&self) -> Id {
         self.def.id()
     }
 
-    /// Fetch child node with an id
+    /// Fetch child node with an id.
     pub fn get(&self, id: &Id) -> Option<&SymbolNodeRcMut> {
         self.children.get(id)
     }
 
-    /// Search down the symbol tree for a qualified name
+    /// Search down the symbol tree for a qualified name.
     pub fn search(&self, name: &QualifiedName) -> Option<SymbolNodeRcMut> {
         trace!("Searching {name} in {}", self.id());
         if let Some(first) = name.first() {
@@ -131,14 +131,14 @@ impl SymbolNode {
         }
     }
 
-    /// returns if symbol is an external namespace which must be loaded before using
+    /// Returns if symbol is an external namespace which must be loaded before using.
     pub fn is_external(&self) -> bool {
         matches!(&self.def, SymbolDefinition::External(_))
     }
 }
 
 impl FullyQualify for SymbolNode {
-    /// Get fully qualified name
+    /// Get fully qualified name.
     fn full_name(&self) -> QualifiedName {
         let id = Identifier(Refer::none(self.id()));
         match &self.parent {
@@ -164,7 +164,7 @@ impl std::fmt::Display for SymbolNodeRcMut {
     }
 }
 
-/// print symbols via std::fmt::Display
+/// Print symbols via [std::fmt::Display]
 pub struct FormatSymbol<'a>(pub &'a SymbolNode);
 
 impl std::fmt::Display for FormatSymbol<'_> {
