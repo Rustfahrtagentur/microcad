@@ -106,11 +106,6 @@ impl EvalContext {
             .add(None, SymbolNode::new_constant(id, value));
     }
 
-    /// Add symbol to symbol map
-    pub fn add_symbol(&mut self, symbol: SymbolNodeRcMut) {
-        self.symbols.insert(symbol.borrow().id(), symbol.clone());
-    }
-
     /// Open a new scope
     pub fn open_scope(&mut self) {
         self.local_stack.open_scope();

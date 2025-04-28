@@ -26,7 +26,6 @@ fn load_source_file(
     Rc<microcad_lang::syntax::SourceFile>,
     microcad_lang::eval::EvalContext,
 ) {
-    use microcad_builtin::*;
     use microcad_lang::{eval::*, syntax::*};
     let source_file = SourceFile::load(format!("../tests/test_cases/{filename}"))
         .expect("cannot load test file: {filename}");
@@ -38,7 +37,6 @@ fn load_source_file(
         &[],
         None,
     );
-    context.add_symbol(builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());
 
@@ -58,7 +56,6 @@ fn namespaces() {
 
 #[test]
 fn scopes() {
-    use microcad_builtin::*;
     use microcad_lang::{eval::*, syntax::*};
 
     let source_file =
@@ -69,14 +66,12 @@ fn scopes() {
         microcad_builtin::builtin_namespace(),
         &[],
     );
-    context.add_symbol(builtin_namespace());
 
     assert!(source_file.eval(&mut context).is_ok());
 }
 
 #[test]
 fn context_with_symbols() {
-    use microcad_builtin::*;
     use microcad_lang::{eval::*, syntax::*};
     let source_file =
         SourceFile::load("../tests/test_cases/syntax/call.µcad").expect("cannot load test file");
@@ -86,7 +81,6 @@ fn context_with_symbols() {
         &[],
     );
 
-    context.add_symbol(builtin_namespace());
     context
         .lookup(
             &"__builtin::assert_valid"

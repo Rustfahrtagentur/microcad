@@ -146,20 +146,13 @@ fn eval(
     search_paths: &[std::path::PathBuf],
 ) -> anyhow::Result<ObjectNode> {
     let symbols = resolve(input)?;
-    let source_file = match symbols.borrow().def.clone() {
-        SymbolDefinition::SourceFile(source_file) => source_file,
-        _ => todo!(),
-    };
-
     let mut context = EvalContext::new(
         symbols.clone(),
         microcad_builtin::builtin_namespace(),
         search_paths,
         None,
     );
-    let result = source_file
-        .eval(&mut context)
-        .map_err(|err| anyhow::anyhow!("{err}"))?;
+    let result = context.eval().map_err(|err| anyhow::anyhow!("{err}"))?;
 
     println!("{result}");
     match context.errors_as_str() {
