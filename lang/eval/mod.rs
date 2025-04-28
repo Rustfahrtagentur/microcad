@@ -44,6 +44,6 @@ pub trait Eval {
 impl MethodCall {
     /// Evaluate method call
     fn eval(&self, _context: &mut EvalContext, _lhs: &Expression) -> EvalResult<Value> {
-        todo!()
+        todo!("method call not implemented")
     }
 }
