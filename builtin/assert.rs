@@ -30,8 +30,8 @@ pub fn assert_valid() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert_valid".into(), &|args, context| {
         if let Ok(name) = args.get_single() {
             let name = QualifiedName::try_from(name.value.to_string())?;
-            if context.lookup(&name).is_err() {
-                return Err(EvalError::SymbolNotFound(name));
+            if let Err(err) = context.lookup(&name) {
+                context.error(name.clone(), err)?;
             }
         }
         Ok(Value::None)
@@ -42,8 +42,8 @@ pub fn assert_invalid() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert_invalid".into(), &|args, context| {
         if let Ok(name) = args.get_single() {
             let name = QualifiedName::try_from(name.value.to_string())?;
-            if context.lookup(&name).is_ok() {
-                return Err(EvalError::SymbolFound(name));
+            if let Err(err) = context.lookup(&name) {
+                context.error(name.clone(), err)?;
             }
         }
         Ok(Value::None)
