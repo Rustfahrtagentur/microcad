@@ -7,8 +7,17 @@ use log::*;
 /// Context for evaluation of a resolved µcad file.
 ///
 /// The context is used to store the current state of the evaluation.
-/// A context is essentially a pile of symbol tables and a file cache.
-/// It also provides an output channel.
+///
+/// A context is consists of the following structures:
+///
+/// - One *root symbol* resolved from the initially read source file.
+/// - A map of all *global symbols* accessible by fully [`QualifiedName`].
+/// - A stack of local scope frames that store *local values* and *local symbol aliases*
+///   (e.g. use statements) accessible by [`Identifier`].
+/// - A *current namespace* while evaluation.
+/// - A map of all *loaded source files* (accessible by name, path and hash).
+/// - A diagnostic handler that accumulates *evaluation errors* for later output.
+/// - One *output channel* where `__builtin::print` writes it's output to while evaluation.
 pub struct EvalContext {
     /// Root symbol (symbol node of initially read source file)
     root: SymbolNodeRcMut,
@@ -88,23 +97,23 @@ impl EvalContext {
     /// Create a new context from a source file.
     ///
     /// # Arguments
-    /// - `source_file`: Resolved root source file.
+    /// - `root`: Path to the root file to load
     /// - `builtin`: The builtin library
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
     pub fn from_source(
-        source_file: Rc<SourceFile>,
+        root: impl AsRef<std::path::Path>,
         builtin: SymbolNodeRcMut,
         search_paths: &[std::path::PathBuf],
-    ) -> Self {
-        Self::new(
-            SymbolNode::new(SymbolDefinition::SourceFile(source_file), None),
+    ) -> EvalResult<Self> {
+        Ok(Self::new(
+            SymbolNode::new(SymbolDefinition::SourceFile(SourceFile::load(root)?), None),
             builtin,
             search_paths,
             Box::new(Stdout),
-        )
+        ))
     }
 
-    /// Create a new context from a source file and capture output (see [Self::output]).
+    /// Create a new context from a source file and capture output (see [`Self::output`]).
     ///
     /// # Arguments
     /// - `source_file`: Resolved root source file.
@@ -134,7 +143,7 @@ impl EvalContext {
     /// Open a new scope.
     ///
     /// Adds a fresh table for locals to the stack.
-    /// Scope does not mean namespace! Namespaces have to be open with [Self::open_namespace].
+    /// Scope does not mean namespace! Namespaces have to be open with [`Self::open_namespace`].
     pub fn open_scope(&mut self) {
         self.local_stack.open_scope();
     }
@@ -142,7 +151,7 @@ impl EvalContext {
     /// Close current scope.
     ///
     /// Remove all locals in the current scope and close it.
-    /// Scope does not mean namespace! Namespaces have to be closed with [Self::close_namespace].
+    /// Scope does not mean namespace! Namespaces have to be closed with [`Self::close_namespace`].
     pub fn close_scope(&mut self) {
         self.local_stack.close_scope();
     }
@@ -393,6 +402,11 @@ impl EvalContext {
             _ => todo!(),
         };
         source_file.eval(self)
+    }
+
+    /// Peek into root node for testing
+    pub fn get_root(&self) -> &SymbolNodeRcMut {
+        &self.root
     }
 }
 

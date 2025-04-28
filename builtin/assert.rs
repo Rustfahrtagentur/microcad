@@ -52,27 +52,28 @@ pub fn assert_invalid() -> SymbolNodeRcMut {
 
 #[test]
 fn assert_ok() {
-    let source_file = SourceFile::load("../tests/test_cases/syntax/assert_ok.µcad")
-        .expect("cannot load test file");
+    let mut context = EvalContext::from_source(
+        "../tests/test_cases/syntax/assert_ok.µcad",
+        builtin_namespace(),
+        &[],
+    )
+    .expect("resolvable file ../tests/test_cases/syntax/assert_ok.µcad");
 
-    let mut context = EvalContext::from_source(source_file.clone(), builtin_namespace(), &[]);
-
-    assert!(source_file.eval(&mut context).is_ok());
+    assert!(context.eval().is_ok());
 }
 
 #[test]
 fn assert_fail() {
-    use log::trace;
     microcad_lang::env_logger_init();
 
-    let source_file = SourceFile::load("../tests/test_cases/syntax/assert_fail.µcad")
-        .expect("cannot load test file");
-    let mut context = EvalContext::from_source(source_file.clone(), builtin_namespace(), &[]);
-    let node = source_file.resolve(None);
-    trace!("Source File Node:\n{node}");
-    //trace!("Symbol Map:\n{}", context.symbols);
+    let mut context = EvalContext::from_source(
+        "../tests/test_cases/syntax/assert_fail.µcad",
+        builtin_namespace(),
+        &[],
+    )
+    .expect("resolvable file ../tests/test_cases/syntax/assert_fail.µcad");
 
-    assert!(source_file.eval(&mut context).is_ok());
+    assert!(context.eval().is_ok());
     assert!(context.diag_handler().error_count > 0);
 
     println!(
