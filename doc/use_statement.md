@@ -13,7 +13,8 @@ std::geo3d::sphere(radius = 40mm);
 [![test](.test/use_statement_with_use.png)](.test/use_statement_with_use.log)
 
 ```µcad,use_statement_with_use
-use std::geo3d::sphere, std::geo3d::cube;
+use std::geo3d::sphere;
+use std::geo3d::cube;
 
 sphere(r = 4mm);
 cube(size = 40mm);

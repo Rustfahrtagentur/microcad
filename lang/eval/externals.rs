@@ -13,8 +13,8 @@ use log::*;
 pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf>);
 
 impl Externals {
-    /// Create new resolve context
-    pub fn new(search_paths: Vec<std::path::PathBuf>) -> Self {
+    /// Create new resolve context.
+    pub fn new(search_paths: &[std::path::PathBuf]) -> Self {
         let no_search_paths = search_paths.is_empty();
         let new = Self(Self::search_externals(search_paths));
         if no_search_paths {
@@ -28,24 +28,24 @@ impl Externals {
         new
     }
 
-    /// Create namespace tree from externals
+    /// Create namespace tree from externals.
     pub fn create_namespaces(&self) -> SymbolMap {
         let mut map = SymbolMap::new();
         self.iter().for_each(|(basename, _)| {
             let (id, name) = basename.split_first();
             let namespace = match map.get(id.id()) {
                 Some(symbol) => symbol.clone(),
-                _ => SymbolNode::new_namespace(id.clone()),
+                _ => SymbolNode::new_external(id.clone()),
             };
-            Self::recursive_create_namespaces(namespace.clone(), name);
+            Self::recursive_create_namespaces(&namespace, &name);
             map.insert(id.id().clone(), namespace);
         });
         map
     }
 
     fn recursive_create_namespaces(
-        parent: SymbolNodeRcMut,
-        name: QualifiedName,
+        parent: &SymbolNodeRcMut,
+        name: &QualifiedName,
     ) -> Option<SymbolNodeRcMut> {
         if name.is_empty() {
             return None;
@@ -56,39 +56,38 @@ impl Externals {
             return Some(child.clone());
         }
 
-        let child = SymbolNode::new_namespace(node_id.clone());
-        SymbolNode::insert_child(&parent, child.clone());
+        let child = if name.is_id() {
+            SymbolNode::new_external(node_id.clone())
+        } else {
+            SymbolNode::new_namespace(node_id.clone())
+        };
+        SymbolNode::insert_child(parent, child.clone());
 
-        Self::recursive_create_namespaces(child.clone(), name.remove_first());
+        Self::recursive_create_namespaces(&child, &name.remove_first());
         Some(child)
     }
 
-    /// search for an external file which may include a given qualified name
-    pub fn fetch_external(&self, name: &QualifiedName) -> EvalResult<&std::path::PathBuf> {
+    /// Search for an external file which may include a given qualified name.
+    pub fn fetch_external(
+        &self,
+        name: &QualifiedName,
+    ) -> EvalResult<(QualifiedName, std::path::PathBuf)> {
         trace!("fetching {name} from externals");
 
-        let mut found: Vec<&std::path::PathBuf> = vec![];
-        for (namespace, path) in self.0.iter() {
-            if name.is_sub_of(namespace) {
-                found.push(path);
-            }
+        if let Some(found) = self
+            .0
+            .iter()
+            // filter all files which might include name
+            .filter(|(n, _)| name.is_sub_of(n))
+            // find the file which has the longest name match
+            .max_by_key(|(name, _)| name.len())
+            // clone the references
+            .map(|(name, path)| ((*name).clone(), (*path).clone()))
+        {
+            return Ok(found);
         }
-        if found.is_empty() {
-            Err(EvalError::ExternalSymbolNotFound(name.clone()))
-        } else {
-            trace!(
-                "{name} might be found in the following files:\n{}",
-                found
-                    .iter()
-                    .map(|p| p.to_string_lossy())
-                    .collect::<Vec<_>>()
-                    .join("\n")
-            );
-            Ok(found
-                .iter()
-                .max_by_key(|p| p.as_os_str().len())
-                .expect("cannot find the longest path"))
-        }
+
+        Err(EvalError::ExternalSymbolNotFound(name.clone()))
     }
 
     /// get qualified name by path
@@ -102,9 +101,9 @@ impl Externals {
         }
     }
 
-    /// searches for external source code files (external modules) in some search paths
+    /// Searches for external source code files (external modules) in some search paths.
     fn search_externals(
-        search_paths: Vec<std::path::PathBuf>,
+        search_paths: &[std::path::PathBuf],
     ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {
         let mut externals = std::collections::HashMap::new();
         search_paths.iter().for_each(|search_path| {
@@ -126,7 +125,7 @@ impl Externals {
         externals
     }
 
-    /// convert a path (of an external source code file) into a qualified name
+    /// Convert a path (of an external source code file) into a qualified name.
     fn into_qualified_name(file: &std::path::Path) -> QualifiedName {
         use crate::src_ref::*;
 
@@ -150,7 +149,7 @@ impl Externals {
         )
     }
 
-    /// scan in a specified path for all available files with one of the given extensions
+    /// Scan in a specified path for all available files with one of the given extensions.
     fn scan_path(
         search_path: std::path::PathBuf,
         extensions: &[&str],
@@ -189,7 +188,7 @@ impl std::ops::Deref for Externals {
 
 #[test]
 fn resolve_external_file() {
-    let externals = Externals::new(vec!["../lib".into()]);
+    let externals = Externals::new(&["../lib".into()]);
 
     assert!(!externals.is_empty());
 
@@ -206,7 +205,7 @@ fn resolve_external_file() {
 
 #[test]
 fn create_namespaces() {
-    let externals = Externals::new(vec!["../lib".into()]);
+    let externals = Externals::new(&["../lib".into()]);
 
     assert!(!externals.is_empty());
 

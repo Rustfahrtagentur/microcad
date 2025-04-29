@@ -4,8 +4,8 @@
 //! 3D Geometry Tree
 
 use super::Geometry;
+use std::rc::Rc;
 use strum::IntoStaticStr;
-
 /// Inner of a node
 #[derive(IntoStaticStr)]
 pub enum NodeInner {
@@ -13,7 +13,7 @@ pub enum NodeInner {
     Group,
 
     /// The geometry
-    Geometry(std::rc::Rc<Geometry>),
+    Geometry(Rc<Geometry>),
 
     /// An affine transformation of a geometry
     Transform(crate::Mat3),
@@ -52,7 +52,7 @@ pub fn group() -> Node {
 }
 
 /// Create new geometry node
-pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
+pub fn geometry(geometry: Rc<Geometry>) -> Node {
     Node::new(NodeInner::Geometry(geometry))
 }
 

@@ -1,10 +1,10 @@
-error: Local symbol not found: torus
+error: Symbol torus not found.
   ---> <from_str>:13:5
      |
   13 | t = torus(1cm);
      |     ^^^^^^^^^^
      |
-error: Local symbol not found: info
+error: Symbol info not found.
   ---> <from_str>:16:1
      |
   16 | info("{t.inner}");

@@ -3,8 +3,7 @@
 
 //! µcad source file representation
 
-use crate::{eval::*, src_ref::*, syntax::*, value::*};
-use log::*;
+use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 
 /// µcad source file
 #[derive(Clone, Debug, Default)]
@@ -29,18 +28,21 @@ impl SourceFile {
 
     /// Return filename of loaded file or `<no file>`
     pub fn filename_as_str(&self) -> &str {
-        let filename = &self.filename;
-        filename.to_str().expect("File name error {filename:?}")
+        self.filename
+            .to_str()
+            .expect("File name error {filename:?}")
     }
 
     /// Return the namespace name from the file name
-    pub fn namespace_name_as_str(&self) -> &str {
-        let filename = &self.filename;
-        filename
-            .file_stem()
-            .expect("cannot get file stem")
-            .to_str()
-            .expect("File name error {filename:?}")
+    pub fn id(&self) -> Identifier {
+        Identifier(Refer::none(
+            self.filename
+                .file_stem()
+                .expect("cannot get file stem")
+                .to_str()
+                .expect("File name error {filename:?}")
+                .into(),
+        ))
     }
 
     /// get a specific line
@@ -54,16 +56,21 @@ impl SourceFile {
     pub fn num_lines(&self) -> usize {
         self.source.lines().count()
     }
-}
 
-impl Eval for SourceFile {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        let result = Body::evaluate_vec(&self.body, context);
-        trace!("Evaluated context:\n{context}");
-        result
+    /// Resolve into SymbolNode
+    pub fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+        Rc::new(self.clone()).resolve_rc(parent)
+    }
+
+    /// Like resolve but with `Rc<SourceFile>`
+    pub fn resolve_rc(self: Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+        eprintln!("resolving {}", self.filename_as_str());
+        let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);
+        node.borrow_mut().children = Body::fetch_symbol_map(&self.body, Some(node.clone()));
+        log::trace!("Resolved symbol node:\n{node}");
+        node
     }
 }
-
 impl std::fmt::Display for SourceFile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.body.iter().try_for_each(|s| writeln!(f, "{s}"))
@@ -76,7 +83,7 @@ impl PrintSyntax for SourceFile {
             f,
             "{:depth$}SourceFile '{}' ({}):",
             "",
-            self.namespace_name_as_str(),
+            self.id(),
             self.filename_as_str()
         )?;
         self.body

@@ -5,6 +5,13 @@
 //!
 //! This module includes all components to parse, resolve and evaluate µcad code.and diagnose errors.
 //!
+//! - Load and parse source files: [`parse`]
+//! - Parsed syntax: [`syntax`]
+//! - Resolve parsed sources: [`resolve`]
+//! - Evaluate resolved sources: [`eval`]
+//! - Diagnose any evaluation errors: [`diag`]
+//!
+//! The grammar of µcad can be found [here](../../../lang/grammar.pest).
 
 pub mod diag;
 pub mod eval;
@@ -12,7 +19,7 @@ pub mod objects;
 pub mod ord_map;
 pub mod parse;
 pub mod parser;
-pub mod rc_mut;
+pub mod rc;
 pub mod resolve;
 pub mod src_ref;
 pub mod syntax;

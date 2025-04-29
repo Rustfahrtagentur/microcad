@@ -10,13 +10,17 @@ pub fn assert() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert".into(), &|args, context| {
         if let Ok(arg) = args.get_single() {
             if !arg.eval_bool(context)? {
-                context.error(
-                    arg.src_ref(),
-                    Box::new(EvalError::AssertionFailed(format!("{arg}"))),
-                )?;
+                context.error(arg.src_ref(), EvalError::AssertionFailed(format!("{arg}")))?;
             }
         } else {
-            context.error(args.src_ref(), EvalError::NotAName(args.src_ref()))?;
+            context.error(
+                args.src_ref(),
+                EvalError::ArgumentCountMismatch {
+                    args: args.clone(),
+                    expected: 1,
+                    found: args.len(),
+                },
+            )?;
         }
         Ok(Value::None)
     })
@@ -26,8 +30,8 @@ pub fn assert_valid() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert_valid".into(), &|args, context| {
         if let Ok(name) = args.get_single() {
             let name = QualifiedName::try_from(name.value.to_string())?;
-            if context.lookup(&name).is_err() {
-                return Err(EvalError::SymbolNotFound(name));
+            if let Err(err) = context.lookup(&name) {
+                context.error(name.clone(), err)?;
             }
         }
         Ok(Value::None)
@@ -38,8 +42,8 @@ pub fn assert_invalid() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert_invalid".into(), &|args, context| {
         if let Ok(name) = args.get_single() {
             let name = QualifiedName::try_from(name.value.to_string())?;
-            if context.lookup(&name).is_ok() {
-                return Err(EvalError::SymbolFound(name));
+            if let Err(err) = context.lookup(&name) {
+                context.error(name.clone(), err)?;
             }
         }
         Ok(Value::None)
@@ -48,31 +52,28 @@ pub fn assert_invalid() -> SymbolNodeRcMut {
 
 #[test]
 fn assert_ok() {
-    let source_file = SourceFile::load("../tests/test_cases/syntax/assert_ok.µcad")
-        .expect("cannot load test file");
+    let mut context = EvalContext::from_source(
+        "../tests/test_cases/syntax/assert_ok.µcad",
+        builtin_namespace(),
+        &[],
+    )
+    .expect("resolvable file ../tests/test_cases/syntax/assert_ok.µcad");
 
-    let mut context =
-        EvalContext::from_source_file(source_file.clone(), builtin_namespace(), vec![]);
-    context.add_symbol(super::builtin_namespace());
-
-    assert!(source_file.eval(&mut context).is_ok());
+    assert!(context.eval().is_ok());
 }
 
 #[test]
 fn assert_fail() {
-    use log::trace;
     microcad_lang::env_logger_init();
 
-    let source_file = SourceFile::load("../tests/test_cases/syntax/assert_fail.µcad")
-        .expect("cannot load test file");
-    let mut context =
-        EvalContext::from_source_file(source_file.clone(), builtin_namespace(), vec![]);
-    context.add_symbol(super::builtin_namespace());
-    let node = source_file.resolve(None);
-    trace!("Source File Node:\n{node}");
-    //trace!("Symbol Map:\n{}", context.symbols);
+    let mut context = EvalContext::from_source(
+        "../tests/test_cases/syntax/assert_fail.µcad",
+        builtin_namespace(),
+        &[],
+    )
+    .expect("resolvable file ../tests/test_cases/syntax/assert_fail.µcad");
 
-    assert!(source_file.eval(&mut context).is_ok());
+    assert!(context.eval().is_ok());
     assert!(context.diag_handler().error_count > 0);
 
     println!(

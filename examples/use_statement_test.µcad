@@ -1,0 +1,21 @@
+// use symbol `circle` in file `geo2d.µcad`
+use std::geo2d::circle;
+// use all symbols in file `geo3d.µcad`
+use std::geo3d::*;
+// alias `bar` in `std/text/foo.µcad` into `baz`
+use std::test::foo::bar as baz;
+// use print from `std/module.µcad`
+use std::print;
+// public use algorithm from `std/module.µcad`
+pub use std::algorithm;
+
+// use debug from `std/module.µcad`
+use std::debug;
+debug::assert(true);
+
+module my_module() {
+    circle(radius=1);
+    sphere(radius=1);
+}
+
+my_module();

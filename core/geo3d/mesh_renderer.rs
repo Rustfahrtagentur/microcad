@@ -4,9 +4,10 @@
 //! Mesh renderer
 
 use crate::{
-    geo3d::{self},
     CoreResult, Scalar,
+    geo3d::{self},
 };
+use std::rc::Rc;
 
 /// Renders a mesh
 pub struct MeshRenderer {
@@ -48,7 +49,7 @@ impl geo3d::Renderer for MeshRenderer {
         Ok(())
     }
 
-    fn fetch_geometry(&mut self, _hash: u64) -> Option<std::rc::Rc<geo3d::Geometry>> {
+    fn fetch_geometry(&mut self, _hash: u64) -> Option<Rc<geo3d::Geometry>> {
         None
     }
 

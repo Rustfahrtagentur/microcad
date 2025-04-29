@@ -1,7 +1,15 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Source code reference
+//! Source code references.
+//!
+//! All errors which occur when parsing or evaluating µcad code need to address a point within the code where they appeared.
+//! To do so, a bunch of structs provide this functionality:
+//!
+//! - [`SrcRef`] boxes [`SrcRefInner`] which includes all necessary reference information like *line*/*column* and a
+//!   hash to identify the source file.
+//! - [`Refer`] encapsulates any syntax element and puts a [`SrcRef`] beside it.
+//! - [`SrcReferrer`] is a trait which provides unified access to the [`SrcRef`] (e.g. implemented by [`Refer`].
 
 mod line_col;
 mod refer;

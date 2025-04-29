@@ -38,6 +38,10 @@ doc_comment = { "///" ~ (!"\n" ~ ANY)* }
 //`/* ok */`: ok
 multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
+identifier_part = { alpha | "_" }
+identifier_body = { (alpha | "_") ~ (alpha | digit | "_")* }
+keywords = {"namespace" | "module" | "function" | "if" | "else" | "use" | "return"}
+
 //`a`: ok
 //`a1`: ok
 //`a_`: ok
@@ -45,7 +49,7 @@ multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 //`_`: ok
 //`1`: error
 //`.test`: error
-identifier = { !("namespace" | "module" | "function" | "if" | "else" | "use" | "return") ~ ((alpha | "_") ~ (alpha | digit | "_")*) }
+identifier = { !(keywords ~ !identifier_part) ~ identifier_body }
 
 //`a,b`: ok # A comma-separated list of identifier
 identifier_list = { identifier ~ (ws* ~ "," ~ ws* ~ identifier)*}
@@ -204,12 +208,10 @@ visibility = { "pub" }
 
 //`use a;`: ok # Import a single module
 //`use ;`: error # Must import at least one module
-//`use foo::bar, bar::foo;`: ok # Import multiple modules
 //`use foo::*;`: ok # Import all modules from foo
-//`use foo::*, bar;`: ok # Import all from foo and bar
 //`use foo as bar;`: ok # Import foo as bar
 //`pub use foo;`: ok # Import and re-export foo
-use_statement = { visibility? ~ ws* ~ "use" ~ ws+ ~ use_declaration ~ ws* ~ ("," ~ ws* ~ use_declaration ~ ws*)* ~ ws* ~ ","? ~ ws* ~ ";" }
+use_statement = { visibility? ~ ws* ~ "use" ~ ws+ ~ use_declaration ~ ws* ~ ";" }
 
 use_declaration = { use_all | use_alias | qualified_name }
 
