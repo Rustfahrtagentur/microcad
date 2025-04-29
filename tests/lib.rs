@@ -146,7 +146,7 @@ fn module_explicit_init_call() {
     use microcad_lang::*;
     env_logger_init();
 
-    let (_, mut context) = load_source_file("syntax/module/explicit_init.µcad");
+    let mut context = evaluate_file("syntax/module/explicit_init.µcad");
     let node = context
         .fetch_global(&qualified_name("explicit_init::circle"))
         .expect("Node expected");

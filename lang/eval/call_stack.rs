@@ -37,10 +37,7 @@ impl CallStackFrame {
         source_by_hash: &impl GetSourceByHash,
         idx: usize,
     ) -> std::fmt::Result {
-        match self.symbol_node.full_name() {
-            Some(name) => writeln!(f, "{:>4}: {name}", idx)?,
-            None => writeln!(f, "{:>4}: {id}", idx, id = self.symbol_node.id())?,
-        };
+        writeln!(f, "{:>4}: {name}", idx, name = self.symbol_node.full_name())?;
 
         if let Some(line_col) = self.src_ref.at() {
             let source_file = source_by_hash.get_by_hash(self.src_ref.source_hash());

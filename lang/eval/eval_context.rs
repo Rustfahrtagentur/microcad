@@ -188,7 +188,6 @@ impl EvalContext {
     }
 
     /// Fetch global symbol from symbol map (for testing only).
-    #[cfg(test)]
     pub fn fetch_global(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         self.symbols.search(&qualified_name.clone())
     }

@@ -3,7 +3,7 @@
 
 //! Module definition syntax element
 
-use crate::{diag::*, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{diag::*, eval::*, objects::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -31,6 +31,12 @@ impl ModuleDefinition {
     ) -> Option<(&ModuleInitDefinition, MultiArgumentMap)> {
         self.inits().find_map(|init| {
             if let Ok(arg_map) = args.get_multi_matching_arguments(context, &init.parameters) {
+                Some((init, arg_map))
+            } else {
+                None
+            }
+        })
+    }
 
     /// Resolve into SymbolNode
     pub fn resolve(self: &Rc<Self>, parent: Option<SymbolNodeRcMut>) -> RcMut<SymbolNode> {
@@ -38,9 +44,7 @@ impl ModuleDefinition {
         node.borrow_mut().children = self.body.resolve(Some(node.clone()));
         node
     }
-}
 
-impl CallTrait for Rc<ModuleDefinition> {
     /// Try to evaluate a single call to an object
     fn eval_to_node<'a>(
         &'a self,
