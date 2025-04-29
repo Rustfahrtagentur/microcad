@@ -139,7 +139,11 @@ impl std::ops::DerefMut for QualifiedName {
 
 impl std::fmt::Display for QualifiedName {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", join_identifiers(&self.0, "::"))
+        if self.is_empty() {
+            write!(f, "<root>")
+        } else {
+            write!(f, "{}", join_identifiers(&self.0, "::"))
+        }
     }
 }
 
