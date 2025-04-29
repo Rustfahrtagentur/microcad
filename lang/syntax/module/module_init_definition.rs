@@ -3,7 +3,7 @@
 
 //! Module initialization definition syntax element
 
-use crate::{diag::PushDiag, eval::{ArgumentMap, EvalContext, EvalError, EvalResult}, objects::{ObjectNode, ObjectProperties}, src_ref::*, syntax::*, value::Value};
+use crate::{diag::*, eval::*, objects::*, src_ref::*, syntax::*};
 
 /// Module initialization definition
 ///
@@ -24,18 +24,20 @@ pub struct ModuleInitDefinition {
     pub src_ref: SrcRef,
 }
 
-
 impl ModuleInitDefinition {
     /// Evaluate a call to the module init definition
-    pub fn eval_to_node(&self, args: &ArgumentMap, mut props: ObjectProperties, context: &mut EvalContext) -> EvalResult<ObjectNode> {
+    pub fn eval_to_node(
+        &self,
+        args: &ArgumentMap,
+        mut props: ObjectProperties,
+        context: &mut EvalContext,
+    ) -> EvalResult<ObjectNode> {
         context.open_scope();
 
         // Add values from argument map as local values
         for (id, value) in args.iter() {
             props.assign_and_add_local_value(id, value.clone(), context);
         }
-
-        use crate::eval::Eval;
 
         let mut nodes = Vec::new();
         for statement in &self.body.statements {
@@ -58,22 +60,24 @@ impl ModuleInitDefinition {
         context.close_scope();
 
         if !props.all_initialized() {
-            use crate::diag::PushDiag;
-            context.error(self, EvalError::UninitializedProperties(props.get_ids_of_uninitialized()))?;
-            return Ok(crate::objects::empty_object());
-        } 
-
-        use crate::objects::*;
+            context.error(
+                self,
+                EvalError::UninitializedProperties(props.get_ids_of_uninitialized()),
+            )?;
+            return Ok(empty_object());
+        }
 
         // Make a new object node
-        let object = object(Object{ name: crate::Id::default(), props });
+        let object = object(Object {
+            name: crate::Id::default(),
+            props,
+        });
         for node in nodes {
             object.append(node);
         }
         Ok(object)
     }
 }
-
 
 impl SrcReferrer for ModuleInitDefinition {
     fn src_ref(&self) -> SrcRef {

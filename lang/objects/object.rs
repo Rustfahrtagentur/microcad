@@ -5,17 +5,13 @@
 
 use std::collections::BTreeMap;
 
-use crate::{Id, value::Value};
-use crate::{
-    eval::{EvalContext, EvalResult},
-    syntax::ParameterList,
-};
+use crate::{eval::*, syntax::*, value::*, Id};
 
 /// A list of values sorted by id
 ///
 /// It is required that properties are always sorted by their id.
 #[derive(Clone, Default, Debug)]
-pub struct ObjectProperties(BTreeMap<crate::Id, super::Value>);
+pub struct ObjectProperties(BTreeMap<Id, Value>);
 
 impl ObjectProperties {
     /// Create initial property list by evaluating parameter list
@@ -40,17 +36,17 @@ impl ObjectProperties {
     }
 
     /// Get value at id
-    pub fn get_value(&self, id: &crate::Id) -> Option<&Value> {
+    pub fn get_value(&self, id: &Id) -> Option<&Value> {
         self.0.get(id)
     }
 
     /// Get mutable value at id
-    pub fn get_value_mut(&mut self, id: &crate::Id) -> Option<&mut Value> {
+    pub fn get_value_mut(&mut self, id: &Id) -> Option<&mut Value> {
         self.0.get_mut(id)
     }
 
     /// Get all ids where `value == Value::None`
-    pub fn get_ids_of_uninitialized(&self) -> Vec<crate::Id> {
+    pub fn get_ids_of_uninitialized(&self) -> Vec<Id> {
         self.0
             .iter()
             .filter_map(|(id, value)| {
@@ -66,7 +62,7 @@ impl ObjectProperties {
     /// If the propery with `id` exists, assign the new value and add as local value to the context
     pub fn assign_and_add_local_value(
         &mut self,
-        id: &crate::Id,
+        id: &Id,
         value: Value,
         context: &mut EvalContext,
     ) {

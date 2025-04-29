@@ -3,7 +3,7 @@
 
 //! Module body syntax element
 
-use crate::{eval::*, objects::{self, ObjectNode}, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, objects::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 /// Module definition body
 ///
@@ -101,7 +101,7 @@ impl Body {
 
         context.close_scope();
 
-        let object = objects::empty_object();
+        let object = empty_object();
         for node in nodes {
             object.append(node);
         }
