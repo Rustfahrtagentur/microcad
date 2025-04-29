@@ -5,6 +5,11 @@
 //!
 //! This module includes all components to parse, resolve and evaluate µcad code.and diagnose errors.
 //!
+//! - Load and parse source files: [crate::parse]
+//! - Parsed syntax: [crate::syntax]
+//! - Resolve parsed sources: [crate::resolve]
+//! - Evaluate resolved sources: [crate::eval]
+//! - Diagnose any evaluation errors: [crate::diag]
 
 pub mod diag;
 pub mod eval;
