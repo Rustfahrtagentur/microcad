@@ -5,10 +5,14 @@ use crate::{eval::*, objects::*};
 
 impl Eval for ListExpression {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        let mut value_list = ValueList::new(vec![], self.src_ref());
-        for expr in self.list.iter() {
-            value_list.push(expr.eval(context)?);
-        }
+        let mut value_list = ValueList::new(
+            self.list
+                .iter()
+                .map(|expr| expr.eval(context))
+                .collect::<Result<_, _>>()?,
+            self.src_ref(),
+        );
+
         if let Some(unit) = self.unit {
             value_list.add_unit_to_unitless(unit)?;
         }
@@ -36,9 +40,7 @@ impl Eval for Expression {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
             Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
-            /*Self::TupleExpression(tuple_expression) => {
-                TupleExpression::eval(tuple_expression, context)
-            }*/
+            Self::TupleExpression(_) => todo!("Implement tuple expression"),
             Self::BinaryOp {
                 lhs,
                 op,
