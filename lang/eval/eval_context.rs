@@ -428,7 +428,7 @@ impl std::fmt::Display for EvalContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Loaded files:\n{files}\nLocals:\n{locals}\nCurrent Namespace:\n  {namespace}\n\nSymbols:\n{symbols}",
+            "Loaded files:\n{files}\nLocals:\n{locals}\nCurrent Namespace:\n{namespace}\n\nSymbols:\n{symbols}",
             files = self.source_cache,
             locals = self.local_stack,
             namespace = self.current_namespace,

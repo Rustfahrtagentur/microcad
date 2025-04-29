@@ -12,7 +12,7 @@ struct Locals(BTreeMap<Id, SymbolNodeRcMut>);
 impl Locals {
     fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
         for (id, local) in self.iter() {
-            writeln!(f, "{:depth$} {id} [{}]", "", local.borrow().full_name())?
+            writeln!(f, "{:depth$}{id} [{}]", "", local.borrow().full_name())?
         }
         Ok(())
     }
