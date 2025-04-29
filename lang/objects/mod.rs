@@ -1,29 +1,26 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Render tree
+//! Object tree
 
 pub mod algorithm;
 pub mod boolean_op;
+pub mod object;
 pub mod transform;
 
-use std::collections::BTreeMap;
-
 pub use algorithm::*;
+pub use object::*;
 pub use transform::*;
 
 use crate::{Id, rc::*, value::Value};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
-/// Properties for a group node
-pub type ObjectNodeProperties = BTreeMap<Id, Value>;
-
 /// Inner of a node
-#[derive(Clone, IntoStaticStr)]
+#[derive(Clone, IntoStaticStr, Debug)]
 pub enum ObjectNodeInner {
-    /// A group node that contains children and holds properties
-    Group(ObjectNodeProperties),
+    /// An object that contains children and holds properties
+    Object(Object),
 
     /// A special node after which children will be nested as siblings
     ChildrenNodeMarker,
@@ -48,16 +45,16 @@ pub enum ObjectNodeInner {
 impl ObjectNodeInner {
     /// Get a property from an object node
     ///
-    /// Only Group nodes can have properties.
+    /// Only object nodes can have properties.
     pub fn get_property_value(&self, id: &Id) -> Option<&Value> {
         match self {
-            Self::Group(properties) => properties.get(id),
+            Self::Object(object) => object.get_property_value(id),
             _ => None,
         }
     }
 }
 
-impl std::fmt::Debug for ObjectNodeInner {
+impl std::fmt::Display for ObjectNodeInner {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name: &'static str = self.into();
         write!(f, "{name}")?;
@@ -83,14 +80,14 @@ impl std::fmt::Debug for ObjectNodeInner {
 /// Render node
 pub type ObjectNode = rctree::Node<ObjectNodeInner>;
 
-/// Create new group node with properties
-pub fn group(properties: ObjectNodeProperties) -> ObjectNode {
-    ObjectNode::new(ObjectNodeInner::Group(properties))
+/// Create new object node with properties
+pub fn object(object: Object) -> ObjectNode {
+    ObjectNode::new(ObjectNodeInner::Object(object))
 }
 
-/// Create new group node without properties
-pub fn empty_group() -> ObjectNode {
-    group(ObjectNodeProperties::default())
+/// Create new object node without properties
+pub fn empty_object() -> ObjectNode {
+    object(Object::default())
 }
 
 /// Create a new transform node
@@ -110,77 +107,90 @@ impl Depth for ObjectNode {
     }
 }
 
-/// Nest a Vec of nodes
+/// Find children node marker in node descendants
+fn find_children_marker(node: &ObjectNode) -> Option<ObjectNode> {
+    node.descendants()
+        .find(|n| matches!(*n.borrow(), ObjectNodeInner::ChildrenNodeMarker))
+}
+
+/// Nest a Vec of node multiplicities
 ///
-/// Assume, our `Vec<Node>` has three nodes `a`, `b`, `c`.
-/// Then `c` will have `b` as parent and `b` will have `a` as parent.
-/// Node `a` will be returned.
-pub fn nest_nodes(nodes: Vec<Vec<ObjectNode>>) -> ObjectNode {
-    for node_window in nodes.windows(2) {
-        for node in &node_window[0] {
-            // Find children node marker in children
-            let children_marker_node = node
-                .descendants()
-                .find(|n| matches!(*n.borrow(), ObjectNodeInner::ChildrenNodeMarker));
+/// * `node_stack`: A list of node lists.
+/// 
+/// The reference to the first stack element will be returned.
+/// 
+/// Assume, our node stack `Vec<Vec<Node>>` has for lists `a`, `b`, `c`, `d`:
+/// ```
+/// let nodes = vec![
+///     vec![obj("a0"), obj("a1")],
+///     vec![obj("b0")],
+///     vec![obj("c0"), obj("c1"), obj("c2")],
+///     vec![obj("d0")],
+/// ];
+/// ```
+///
+/// This should result in following node multiplicity:
+/// a0
+///   b0
+///     c0
+///       d0
+///     c1
+///       d0
+///     c2
+///       d0
+/// a1
+///   b0
+///     c0
+///       d0
+///     c1
+///       d0
+///     c2
+///       d0
+pub fn nest_nodes(node_stack: &[Vec<ObjectNode>]) -> &Vec<ObjectNode> {
+    match node_stack.len() {
+        0 => panic!("Node stack must not be empty"),
+        1 => {}
+        n => {
+            (1..n).rev().map(|i| (&node_stack[i], &node_stack[i-1])).for_each(|(prev_list, next_list)| {
+                // Insert a copy of each element `node` from `prev_list` as child to each element `new_parent` in `next_list`
+                next_list.iter().for_each(|new_parent_node| {
+                    prev_list.iter().for_each(|node| {
+                        node.detach();
 
-            match children_marker_node {
-                Some(children_marker_node) => {
-                    // Add children to parent of children marker (a marker is always a child of a group)
-                    let children_marker_parent = children_marker_node
-                        .parent()
-                        .expect("Children marker should have a parent");
-
-                    let is_group =
-                        matches!(*children_marker_parent.borrow(), ObjectNodeInner::Group(_));
-
-                    if is_group {
-                        // Add children to group
-                        for node in &node_window[1] {
-                            for child in node.children() {
-                                children_marker_parent.append(child.clone());
+                        // Handle children marker.
+                        // If we have found a children marker node, use it's parent as new parent node.
+                        let new_parent_node = match find_children_marker(new_parent_node) {
+                            Some(children_marker) => {
+                                let parent = children_marker.parent().expect("Must have a parent");
+                                children_marker.detach(); // Remove children marker from tree
+                                parent
                             }
-                        }
-                    } else {
-                        for node in &node_window[1] {
-                            children_marker_parent.append(node.clone());
-                        }
-                    }
-                    // Remove children marker
-                    children_marker_node.detach();
-                }
-                None => {
-                    for child in &node_window[1] {
-                        node.append(child.clone());
-                    }
-                }
-            }
+                            None => new_parent_node.clone(),
+                        };
+
+                        new_parent_node.append(node.make_deep_copy());
+                    });
+                });
+            });
         }
     }
 
-    if nodes[0].len() == 1 {
-        nodes[0].first().expect("Node").clone()
-    } else {
-        let group = group(ObjectNodeProperties::default());
-        for node in &nodes[0] {
-            group.append(node.clone());
-        }
-        group
-    }
+    &node_stack[0]
 }
 
 /// Dumps the tree structure of a node.
 ///
 /// The depth of a node is marked by the number of white spaces
-pub fn dump(writer: &mut dyn std::io::Write, node: ObjectNode) -> std::io::Result<()> {
+pub fn dump(f: &mut std::fmt::Formatter, node: ObjectNode) -> std::fmt::Result {
     use Depth;
     node.descendants()
-        .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
+        .try_for_each(|child| writeln!(f, "{}{}", " ".repeat(child.depth()), child.borrow()))
 }
 
-/// Return ObjectNode if we are in a Group
-pub fn into_group(node: ObjectNode) -> Option<ObjectNode> {
+/// Return inner ObjectNode if we are in an object node
+pub fn into_inner_object(node: ObjectNode) -> Option<ObjectNode> {
     node.first_child().and_then(|n| {
-        if let ObjectNodeInner::Group(_) = *n.borrow() {
+        if let ObjectNodeInner::Object(_) = *n.borrow() {
             Some(n.clone())
         } else {
             None
@@ -195,7 +205,7 @@ pub fn bake2d(
 ) -> core::result::Result<geo2d::Node, CoreError> {
     let node2d = {
         match *node.borrow() {
-            ObjectNodeInner::Group(_) => geo2d::tree::group(),
+            ObjectNodeInner::Object(_) => geo2d::tree::group(),
             ObjectNodeInner::Export(_) => geo2d::tree::group(),
             ObjectNodeInner::Primitive2D(ref renderable) => {
                 return Ok(geo2d::tree::geometry(
@@ -205,7 +215,7 @@ pub fn bake2d(
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_2d(
                     renderer,
-                    crate::objects::into_group(node.clone()).unwrap_or(node.clone()),
+                    crate::objects::into_inner_object(node.clone()).unwrap_or(node.clone()),
                 );
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),
@@ -233,7 +243,7 @@ pub fn bake3d(
 ) -> core::result::Result<geo3d::Node, CoreError> {
     let node3d = {
         match *node.borrow() {
-            ObjectNodeInner::Group(_) => geo3d::tree::group(),
+            ObjectNodeInner::Object(_) => geo3d::tree::group(),
             ObjectNodeInner::Export(_) => geo3d::tree::group(),
             ObjectNodeInner::Primitive3D(ref renderable) => {
                 return Ok(geo3d::tree::geometry(
@@ -243,7 +253,7 @@ pub fn bake3d(
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_3d(
                     renderer,
-                    crate::objects::into_group(node.clone()).unwrap_or(node.clone()),
+                    crate::objects::into_inner_object(node.clone()).unwrap_or(node.clone()),
                 );
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),
@@ -266,18 +276,50 @@ pub fn bake3d(
 
 #[test]
 fn node_nest() {
+    fn obj(name: &str) -> ObjectNode {
+        object(Object {
+            name: name.into(),
+            ..Default::default()
+        })
+    }
+
     let nodes = vec![
-        vec![empty_group()],
-        vec![empty_group()],
-        vec![empty_group()],
+        vec![obj("a0"), obj("a1")],
+        vec![obj("b0")],
+        vec![obj("c0"), obj("c1"), obj("c2")],
+        vec![obj("d0")],
     ];
-    let node = nest_nodes(nodes.clone());
+    // This should result in following node multiplicity:
+    // a0
+    //   b0
+    //     c0
+    //       d0
+    //     c1
+    //       d0
+    //     c2
+    //       d0
+    // a1
+    //   b0
+    //     c0
+    //       d0
+    //     c1
+    //       d0
+    //     c2
+    //       d0
 
-    nodes[0][0]
-        .descendants()
-        .for_each(|n| println!("{}{:?}", "  ".repeat(n.depth()), n.borrow()));
+    let nodes = nest_nodes(&nodes);
+    assert_eq!(nodes.len(), 2); // Contains a0 and a1 as root
 
-    assert_eq!(nodes[2][0].parent().expect("test error"), nodes[1][0]);
-    assert_eq!(nodes[1][0].parent().expect("test error"), node);
-    assert!(node.parent().is_none());
+    for node in nodes {
+        node.descendants().for_each(|n| {
+            println!(
+                "{}{}",
+                "  ".repeat(n.depth()),
+                match *n.borrow() {
+                    ObjectNodeInner::Object(ref obj) => obj.name.clone(),
+                    _ => panic!("Object with name expected"),
+                }
+            )
+        });
+    }
 }

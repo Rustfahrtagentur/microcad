@@ -93,7 +93,7 @@ fn call() {
 
     let call = Call::parse(pair).expect("test error");
 
-    assert_eq!(call.name, QualifiedName::from("foo"));
+    assert_eq!(call.name, "foo".into());
     assert_eq!(call.argument_list.len(), 4);
 
     // Count named arguments

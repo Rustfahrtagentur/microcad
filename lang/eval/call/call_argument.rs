@@ -14,6 +14,7 @@ impl CallArgument {
     pub fn eval_bool(&self, context: &mut EvalContext) -> EvalResult<bool> {
         match self.value.eval(context) {
             Ok(Value::Bool(cond)) => Ok(*cond),
+            Ok(Value::None) => Ok(false),
             Ok(value) => {
                 context.error(
                     self.src_ref(),

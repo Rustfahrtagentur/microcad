@@ -51,8 +51,8 @@ fn named_tuple_type() {
         type_annotation.ty(),
         Type::NamedTuple(NamedTupleType(
             vec![
-                (Identifier::from("x"), Type::Integer),
-                (Identifier::from("y"), Type::String)
+                ("x".into(), Type::Integer),
+                ("y".into(), Type::String)
             ]
             .into_iter()
             .collect()

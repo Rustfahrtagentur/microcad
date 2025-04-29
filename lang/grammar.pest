@@ -359,7 +359,8 @@ tag_list = _{ tag ~ (ws+ ~ tag)* }
 //`r: Length`: error # Default value is required
 //`r: Length = math::pi`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
-assignment = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
+//`pub r = 5.0mm`: Make value of assignment public
+assignment = { (visibility ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
 
 assignment_statement = _{ assignment ~ ws* ~ ";" }
 

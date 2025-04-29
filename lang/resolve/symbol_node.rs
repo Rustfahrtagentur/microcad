@@ -3,7 +3,7 @@ use custom_debug::Debug;
 use log::*;
 
 /// Symbol node
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SymbolNode {
     /// Symbol definition
     pub def: SymbolDefinition,

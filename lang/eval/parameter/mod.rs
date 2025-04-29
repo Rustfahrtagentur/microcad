@@ -5,8 +5,6 @@
 
 use crate::{eval::*, syntax::*, ty::*, value::*};
 
-use super::{EvalContext, EvalError, EvalResult};
-
 impl ParameterValue {
     fn from_parameter(parameter: &Parameter, context: &mut EvalContext) -> EvalResult<Self> {
         use crate::diag::PushDiag;

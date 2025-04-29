@@ -5,7 +5,7 @@
 
 mod parameter_list;
 
-use crate::{ord_map::*, src_ref::*, syntax::*, ty::*};
+use crate::{diag::PushDiag, eval::{EvalContext, EvalError}, ord_map::*, src_ref::*, syntax::*, ty::*, value::Value};
 
 pub use parameter_list::*;
 
@@ -36,6 +36,29 @@ impl Parameter {
             default_value,
             src_ref,
         }
+    }
+
+    /// Evaluate default value considering specified type
+    /// 
+    /// If there is no default value, returns `Value::None` without raising an error. 
+    pub fn eval_default_value(&self, context: &mut EvalContext) -> crate::eval::EvalResult<Value>  {
+        use crate::eval::Eval;
+
+        match (&self.specified_type, &self.default_value) {
+            (Some(specified_type), Some(default_value)) => {
+                let value = default_value.eval(context)?;
+                if specified_type.ty() != value.ty() {
+                    context.error(self.src_ref.clone(), EvalError::ParameterTypeMismatch { name: self.name.clone(), expected: specified_type.ty(), found: value.ty() })?;
+                    Ok(Value::None)
+                } else {
+                    Ok(value)
+                }
+            }
+            (None, Some(default_value)) => Ok(default_value.eval(context)?),
+            _ => Ok(Value::None)
+        }
+
+
     }
 }
 

@@ -48,6 +48,8 @@ pub enum Type {
     Custom(QualifiedName),
     /// Node
     Node,
+    /// Node multiplicity
+    NodeMultiplicity,
 }
 
 impl Type {
@@ -97,7 +99,8 @@ impl std::fmt::Display for Type {
             Self::UnnamedTuple(t) => write!(f, "{}", t),
             Self::NamedTuple(t) => write!(f, "{}", t),
             Self::Custom(qn) => write!(f, "{}", qn),
-            Self::Node => write!(f, "{{}}"),
+            Self::Node => write!(f, "Node"),
+            Self::NodeMultiplicity => write!(f, "[Node]"),
         }
     }
 }

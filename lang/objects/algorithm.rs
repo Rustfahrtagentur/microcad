@@ -95,10 +95,11 @@ pub fn complement() -> ObjectNode {
 pub fn binary_op(op: BooleanOp, lhs: ObjectNode, rhs: ObjectNode) -> ObjectNode {
     assert!(lhs != rhs, "lhs and rhs must be distinct.");
     let root = ObjectNode::new(ObjectNodeInner::Algorithm(Rc::new(op)));
-    let group = crate::objects::empty_group();
-    group.append(lhs);
-    group.append(rhs);
+    // Algorithms object nodes need to be nested in another object
+    let object = crate::objects::empty_object();
+    object.append(lhs);
+    object.append(rhs);
 
-    root.append(group);
+    root.append(object);
     root
 }

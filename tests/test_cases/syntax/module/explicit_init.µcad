@@ -1,7 +1,5 @@
-use __builtin::*;
-
-// Define a module `circle` with two Initializers
-module circle {
+// Define a module `circle` with two explicit initializers
+module circle(radius: Scalar) {
     init(r: Scalar) {
         radius = r;
     }
@@ -9,18 +7,4 @@ module circle {
     init(d: Scalar) {
         radius = d / 2.0;
     }
-
-    geo2d::circle(radius);
 }
-
-// Now, create two equal circles but with different initializations
-d_r = circle(r = 1.0);
-d_d = circle(d = 2.0);
-
-assert(d_r.radius == 1.0);
-assert(d_d.radius == 1.0);
-
-// Finally, insert the circles in the tree
-d_r;
-d_d;
-

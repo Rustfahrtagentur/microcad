@@ -40,7 +40,7 @@ pub enum ValueError {
     },
 
     /// Missing arguments
-    #[error("Missing arguments: {0:?}")]
+    #[error("Missing arguments: {0}")]
     MissingArguments(ParameterValueList),
 
     /// Duplicate parameter

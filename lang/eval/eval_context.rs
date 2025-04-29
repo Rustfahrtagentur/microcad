@@ -25,6 +25,8 @@ pub struct EvalContext {
     symbols: SymbolMap,
     /// Stack of currently opened scopes with local symbols while evaluation.
     local_stack: LocalStack,
+    /// Call stack
+    call_stack: CallStack,
     /// Current namespace while evaluation.
     current_namespace: QualifiedName,
     /// Source file cache containing all source files loaded in the context and their syntax trees.
@@ -89,6 +91,7 @@ impl EvalContext {
             symbols,
             diag_handler: Default::default(),
             local_stack: Default::default(),
+            call_stack: Default::default(),
             current_namespace: Default::default(),
             output,
         }
@@ -156,6 +159,22 @@ impl EvalContext {
         self.local_stack.close_scope();
     }
 
+    /// Push a call to stack
+    pub fn push_call(
+        &mut self,
+        symbol_node: SymbolNode,
+        args: ArgumentMap,
+        src_ref: impl SrcReferrer,
+    ) {
+        self.call_stack.push(symbol_node, args, src_ref)
+    }
+
+    /// Pop a call from stack
+    pub fn pop_call(&mut self) {
+        self.call_stack.pop();
+    }
+
+    /// fetch global symbol from symbol map
     /// Open a new namespace which then will be the current namespace in the context.
     pub fn open_namespace(&mut self, id: Identifier) {
         self.current_namespace.push(id);

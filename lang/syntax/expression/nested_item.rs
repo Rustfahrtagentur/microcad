@@ -12,7 +12,7 @@ pub enum NestedItem {
     Call(Call),
     /// Qualified Name
     QualifiedName(QualifiedName),
-    /// Module body
+    /// Object body
     Body(Body),
 }
 
