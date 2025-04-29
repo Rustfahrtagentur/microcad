@@ -45,7 +45,7 @@ pub enum ObjectNodeInner {
 impl ObjectNodeInner {
     /// Get a property from an object node
     ///
-    /// Only Group nodes can have properties.
+    /// Only object nodes can have properties.
     pub fn get_property_value(&self, id: &Id) -> Option<&Value> {
         match self {
             Self::Object(object) => object.get_property_value(id),
@@ -80,12 +80,12 @@ impl std::fmt::Display for ObjectNodeInner {
 /// Render node
 pub type ObjectNode = rctree::Node<ObjectNodeInner>;
 
-/// Create new group node with properties
+/// Create new object node with properties
 pub fn object(object: Object) -> ObjectNode {
     ObjectNode::new(ObjectNodeInner::Object(object))
 }
 
-/// Create new group node without properties
+/// Create new object node without properties
 pub fn empty_object() -> ObjectNode {
     object(Object::default())
 }
@@ -187,8 +187,8 @@ pub fn dump(f: &mut std::fmt::Formatter, node: ObjectNode) -> std::fmt::Result {
         .try_for_each(|child| writeln!(f, "{}{}", " ".repeat(child.depth()), child.borrow()))
 }
 
-/// Return ObjectNode if we are in a Group
-pub fn into_group(node: ObjectNode) -> Option<ObjectNode> {
+/// Return inner ObjectNode if we are in an object node
+pub fn into_inner_object(node: ObjectNode) -> Option<ObjectNode> {
     node.first_child().and_then(|n| {
         if let ObjectNodeInner::Object(_) = *n.borrow() {
             Some(n.clone())
@@ -215,7 +215,7 @@ pub fn bake2d(
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_2d(
                     renderer,
-                    crate::objects::into_group(node.clone()).unwrap_or(node.clone()),
+                    crate::objects::into_inner_object(node.clone()).unwrap_or(node.clone()),
                 );
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),
@@ -253,7 +253,7 @@ pub fn bake3d(
             ObjectNodeInner::Algorithm(ref algorithm) => {
                 return algorithm.process_3d(
                     renderer,
-                    crate::objects::into_group(node.clone()).unwrap_or(node.clone()),
+                    crate::objects::into_inner_object(node.clone()).unwrap_or(node.clone()),
                 );
             }
             ObjectNodeInner::Transform(ref transform) => transform.into(),
