@@ -3,7 +3,7 @@
 
 //! Algorithm
 
-use crate::{objects::*, rc_mut::*};
+use crate::{objects::*, rc::*};
 use microcad_core::*;
 
 /// Algorithm trait

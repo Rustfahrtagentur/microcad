@@ -9,7 +9,7 @@ extern crate microcad_lang;
 use clap::{Parser, Subcommand};
 use log::*;
 use microcad_lang::{
-    env_logger_init, eval::*, objects::*, parse::ParseResult, rc_mut::*, resolve::*, syntax::*,
+    env_logger_init, eval::*, objects::*, parse::ParseResult, rc::*, resolve::*, syntax::*,
 };
 use std::io::Write;
 
@@ -82,7 +82,7 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
             resolve(input)?;
         }
         Commands::Eval { input, input_path } => {
-            eval(input, input_path.clone())?;
+            eval(input, input_path)?;
         }
         /*
         Commands::Export { input } => {
@@ -143,28 +143,27 @@ fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<SymbolNodeRcMut> {
 
 fn eval(
     input: impl AsRef<std::path::Path>,
-    search_paths: Vec<std::path::PathBuf>,
+    search_paths: &[std::path::PathBuf],
 ) -> anyhow::Result<ObjectNode> {
     let symbols = resolve(input)?;
-    let source_file = match symbols.borrow().def.clone() {
-        SymbolDefinition::SourceFile(source_file) => source_file,
-        _ => todo!(),
-    };
-
     let mut context = EvalContext::new(
         symbols.clone(),
         microcad_builtin::builtin_namespace(),
         search_paths,
-        None,
+        Box::new(Stdout),
     );
-    let result = source_file
-        .eval(&mut context)
-        .map_err(|err| anyhow::anyhow!("{err}"))?;
+    let result = context.eval().map_err(|err| anyhow::anyhow!("{err}"))?;
 
     println!("{result}");
+    match context.errors_as_str() {
+        Some(errors) => {
+            warn!("Evaluated with errors:");
+            error!("{}", errors);
+        }
+        None => info!("Evaluated successfully!"),
+    }
 
-    info!("Evaluated successfully!");
-    todo!();
+    todo!("object node output")
 }
 
 /*

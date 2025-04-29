@@ -1,7 +1,31 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Evaluation of parsed content
+//! Evaluation of parsed content.
+//!
+//! To be able to evaluate (run) a source file, it must be loaded, parsed and resolved.
+//! To do so an [`EvalContext`] can be created with [`EvalContext::new()`] based on a already resolved symbol or
+//! by using [`EvalContext::from_source()`] or [`EvalContext::from_source_captured()`] which automatically
+//! load and resolve the source file and build a context around it which then can be evaluated with [`EvalContext::eval()`]:
+//!
+//! ```
+//! use microcad_builtin::builtin_namespace;
+//! use microcad_lang::eval::EvalContext;
+//! use std::io::stdout;
+//!
+//! // create a context for evaluation of the source file
+//! let mut context = EvalContext::from_source(
+//!     "my.µcad",              // root file name
+//!     builtin_namespace(),    // `__builtin` library
+//!     &["./lib".into()]       // list of library paths
+//! );
+//!
+//! // evaluate the source file in it's context
+//! let value = context.eval().expect("evaluation success");
+//!
+//! // print any error
+//! context.diag_handler().pretty_print( stdout(), &context).expect("UTF-8 compatible output");
+//! ```
 
 mod argument_map;
 mod body;
@@ -20,6 +44,7 @@ mod local_stack;
 mod output;
 mod parameter;
 mod source_cache;
+mod source_file;
 mod statement;
 mod r#use;
 
@@ -46,6 +71,6 @@ pub trait Eval {
 impl MethodCall {
     /// Evaluate method call
     fn eval(&self, _context: &mut EvalContext, _lhs: &Expression) -> EvalResult<Value> {
-        todo!()
+        todo!("method call not implemented")
     }
 }

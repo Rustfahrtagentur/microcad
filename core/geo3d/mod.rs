@@ -43,8 +43,9 @@ pub fn transform(transform: crate::Mat4) -> Node {
 
 #[test]
 fn test_boolean_op_multi() {
-    let a = std::rc::Rc::new(Geometry::Manifold(Manifold::sphere(2.0, 32)));
-    let b = std::rc::Rc::new(Geometry::Manifold(Manifold::sphere(1.0, 32)));
+    use std::rc::Rc;
+    let a = Rc::new(Geometry::Manifold(Manifold::sphere(2.0, 32)));
+    let b = Rc::new(Geometry::Manifold(Manifold::sphere(1.0, 32)));
 
     let result = Geometry::boolean_op_multi(vec![a, b], &BooleanOp::Difference);
     assert!(result.is_some());

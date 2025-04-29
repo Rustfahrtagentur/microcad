@@ -3,7 +3,7 @@
 
 //! Builtin function evaluation entity
 
-use crate::{eval::*, rc_mut::*, syntax::*, Id};
+use crate::{Id, eval::*, rc::*, syntax::*};
 
 /// Type of the functor which receives a call
 pub type BuiltinFunctionFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> EvalResult<Value>;
@@ -25,7 +25,7 @@ impl std::fmt::Debug for BuiltinFunction {
 
 impl BuiltinFunction {
     /// Create new builtin function
-    pub fn new(id: Id, f: &'static BuiltinFunctionFn) -> std::rc::Rc<Self> {
+    pub fn new(id: Id, f: &'static BuiltinFunctionFn) -> Rc<Self> {
         Rc::new(Self { id, f })
     }
 }

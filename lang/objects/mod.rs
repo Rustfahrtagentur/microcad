@@ -12,7 +12,7 @@ pub use algorithm::*;
 pub use object::*;
 pub use transform::*;
 
-use crate::{Id, rc_mut::*, value::Value};
+use crate::{Id, rc::*, value::Value};
 use microcad_core::*;
 use strum::IntoStaticStr;
 

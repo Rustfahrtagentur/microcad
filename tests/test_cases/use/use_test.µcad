@@ -1,0 +1,37 @@
+// use assert_valid for test checks
+use std::debug::assert_valid;
+
+// use debug from `std/module.µcad`
+use std::debug;
+debug::assert(true);
+
+// use symbol `circle` in file `geo2d.µcad`
+use std::geo2d::circle;
+assert_valid(circle);
+
+// use all symbols in file `geo3d.µcad`
+use std::geo3d::*;
+assert_valid(sphere);
+assert_valid(cube);
+
+// alias `bar` in `std/text/foo.µcad` into `baz`
+use std::test::foo::bar as baz;
+assert_valid(baz);
+
+// use print from `std/module.µcad`
+use std::print;
+assert_valid(print);
+print("Hello");
+
+// public use algorithm from `std/module.µcad`
+pub use std::algorithm;
+assert_valid(algorithm);
+assert_valid(use_statement_test::algorithm);
+
+module my_module() {
+    circle(radius=1);
+    sphere(radius=1);
+}
+
+assert_valid(my_module);
+my_module();

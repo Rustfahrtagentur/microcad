@@ -5,14 +5,12 @@
 
 use crate::*;
 pub use geo2d::tree::{Node, NodeInner};
+use std::rc::Rc;
 
 /// A Primitive is a hashable renderable object that can be rendered by a Renderer2D
 pub trait Primitive: RenderHash + std::fmt::Debug {
     /// Get geometry
-    fn request_geometry(
-        &self,
-        renderer: &mut dyn Renderer,
-    ) -> CoreResult<std::rc::Rc<geo2d::Geometry>> {
+    fn request_geometry(&self, renderer: &mut dyn Renderer) -> CoreResult<Rc<geo2d::Geometry>> {
         // Try to fetch the geometry from the render cache
         if let Some(hash) = self.render_hash() {
             if let Some(geometry) = renderer.fetch_geometry(hash) {
@@ -22,7 +20,7 @@ pub trait Primitive: RenderHash + std::fmt::Debug {
 
         // If the geometry is not in the render cache, render it
         let geometry = self.render_geometry(renderer)?;
-        Ok(std::rc::Rc::new(geometry))
+        Ok(Rc::new(geometry))
     }
 
     /// Render geometry
@@ -35,7 +33,7 @@ pub trait Renderer: crate::Renderer {
     fn multi_polygon(&mut self, multi_polygon: &geo2d::MultiPolygon) -> CoreResult<()>;
 
     /// Get geometry
-    fn fetch_geometry(&mut self, _hash: u64) -> Option<std::rc::Rc<geo2d::Geometry>> {
+    fn fetch_geometry(&mut self, _hash: u64) -> Option<Rc<geo2d::Geometry>> {
         None
     }
 

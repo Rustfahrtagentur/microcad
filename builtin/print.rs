@@ -18,14 +18,12 @@ pub fn print() -> SymbolNodeRcMut {
 
 #[test]
 fn assert_ok() {
-    use microcad_lang::syntax::*;
+    let mut context = EvalContext::from_source(
+        "../tests/test_cases/print.µcad",
+        crate::builtin_namespace(),
+        &[],
+    )
+    .expect("resolvable file ../tests/test_cases/print.µcad");
 
-    let source_file =
-        SourceFile::load("../tests/test_cases/print.µcad").expect("cannot load test file");
-
-    let mut context =
-        EvalContext::from_source_file(source_file.clone(), crate::builtin_namespace(), vec![]);
-    context.add_symbol(super::builtin_namespace());
-
-    assert!(source_file.eval(&mut context).is_ok());
+    assert!(context.eval().is_ok());
 }

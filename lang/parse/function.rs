@@ -1,6 +1,6 @@
-use crate::{parse::*, parser::*, syntax::*};
+use crate::{parse::*, parser::*, rc::*, syntax::*};
 
-impl Parse for std::rc::Rc<FunctionDefinition> {
+impl Parse for Rc<FunctionDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_definition);
         let mut inner = pair.inner();
@@ -8,7 +8,7 @@ impl Parse for std::rc::Rc<FunctionDefinition> {
         let signature = FunctionSignature::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
         let body = Body::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
 
-        Ok(std::rc::Rc::new(FunctionDefinition {
+        Ok(Rc::new(FunctionDefinition {
             id: name,
             signature,
             body,

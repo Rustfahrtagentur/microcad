@@ -1,4 +1,4 @@
-error: Local symbol not found: donut
+error: Symbol donut not found.
   ---> <from_str>:8:1
      |
    8 | donut(2cm,1cm);

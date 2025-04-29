@@ -3,7 +3,7 @@
 
 //! Namespace definition syntax element
 
-use crate::{rc_mut::*, src_ref::*, syntax::*};
+use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 
 /// Namespace definition
 #[derive(Debug, Clone)]
@@ -18,12 +18,19 @@ pub struct NamespaceDefinition {
 
 impl NamespaceDefinition {
     /// Create a new namespace definition
-    pub fn new(name: Identifier) -> std::rc::Rc<Self> {
+    pub fn new(name: Identifier) -> Rc<Self> {
         Rc::new(Self {
             id: name,
             body: Body::default(),
             src_ref: SrcRef(None),
         })
+    }
+
+    /// Resolve into SymbolNode
+    pub fn resolve(self: &Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+        let node = SymbolNode::new(SymbolDefinition::Namespace(self.clone()), parent);
+        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
+        node
     }
 }
 

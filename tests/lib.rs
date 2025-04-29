@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #[cfg(test)]
+mod use_test;
+
+#[cfg(test)]
 use log::debug;
 
 #[cfg(test)]
@@ -17,89 +20,46 @@ include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
 include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 
 #[cfg(test)]
-fn load_source_file(
-    filename: &str,
-) -> (
-    std::rc::Rc<microcad_lang::syntax::SourceFile>,
-    microcad_lang::eval::EvalContext,
-) {
-    use microcad_builtin::*;
-    use microcad_lang::{eval::*, resolve::Resolve, syntax::*};
-    let source_file = SourceFile::load(format!("../tests/test_cases/{filename}"))
-        .expect("cannot load test file: {filename}");
-    let symbols = source_file.resolve(None);
+fn evaluate_file(filename: &str) -> microcad_lang::eval::EvalContext {
+    use microcad_lang::eval::*;
 
-    let mut context = EvalContext::new(
-        symbols.clone(),
-        microcad_builtin::builtin_namespace(),
-        vec![],
-        None,
-    );
-    context.add_symbol(builtin_namespace());
-
-    assert!(source_file.eval(&mut context).is_ok());
-
-    (source_file, context)
+    let filename = format!("../tests/test_cases/{filename}");
+    EvalContext::from_source(&filename, microcad_builtin::builtin_namespace(), &[])
+        .expect(&filename)
 }
 
 #[test]
 fn namespaces() {
-    use microcad_lang::eval::*;
-
-    let (source_file, mut context) = load_source_file("syntax/namespace.µcad");
-
-    //println!("{}", symbol_node.borrow());
-
-    assert!(source_file.eval(&mut context).is_ok());
+    assert!(evaluate_file("syntax/namespace.µcad").eval().is_ok());
 }
 
 #[test]
 fn scopes() {
-    use microcad_builtin::*;
-    use microcad_lang::{eval::*, syntax::*};
-
-    let source_file =
-        SourceFile::load("../tests/test_cases/syntax/scopes.µcad").expect("cannot load test file");
-
-    let mut context = EvalContext::from_source_file(
-        source_file.clone(),
-        microcad_builtin::builtin_namespace(),
-        vec![],
-    );
-    context.add_symbol(builtin_namespace());
-
-    assert!(source_file.eval(&mut context).is_ok());
+    assert!(evaluate_file("../tests/test_cases/syntax/scopes.µcad")
+        .eval()
+        .is_ok());
 }
 
 #[test]
 fn context_with_symbols() {
-    use microcad_builtin::*;
-    use microcad_lang::{eval::*, syntax::*};
-    let source_file =
-        SourceFile::load("../tests/test_cases/syntax/call.µcad").expect("cannot load test file");
-    let mut context = EvalContext::from_source_file(
-        source_file.clone(),
-        microcad_builtin::builtin_namespace(),
-        vec![],
-    );
+    let mut context = evaluate_file("../tests/test_cases/syntax/call.µcad");
 
-    context.add_symbol(builtin_namespace());
     context
-        .fetch_global(
+        .lookup(
             &"__builtin::assert_valid"
                 .try_into()
                 .expect("unexpected name error"),
         )
         .expect("symbol not found");
     context
-        .fetch_global(
+        .lookup(
             &"__builtin::assert_invalid"
                 .try_into()
                 .expect("unexpected name error"),
         )
         .expect("symbol not found");
-    let eval = source_file.eval(&mut context);
-    assert!(eval.is_ok());
+
+    assert!(context.eval().is_ok());
 }
 
 /// Helper function to create a qualified name from &str
@@ -124,14 +84,16 @@ fn module_implicit_init_call() {
     use microcad_lang::*;
     env_logger_init();
 
-    let (source_file, mut context) = load_source_file("syntax/module/implicit_init.µcad");
-    debug!("Source File:\n{}", source_file);
+    let mut context = evaluate_file("syntax/module/implicit_init.µcad");
+    debug!("Source File:\n{}", context.get_root());
 
     let node = context
         .fetch_global(&qualified_name("implicit_init::a"))
         .expect("Node expected");
 
     // Check node id
+    if let Ok(node) =
+        context.lookup(&Identifier(microcad_lang::src_ref::Refer::none("a".into())).into())
     {
         let id = node.borrow().id();
         assert_eq!(id, "a");

@@ -3,7 +3,7 @@
 
 use microcad_builtin_proc_macro::DefineBuiltinPrimitive2D;
 use microcad_core::*;
-use microcad_lang::{eval::*, parse::*};
+use microcad_lang::{eval::*, parse::*, rc::*};
 
 /// Builtin definition for a 2D circle
 #[derive(DefineBuiltinPrimitive2D, Clone, Debug)]
@@ -80,7 +80,7 @@ impl geo2d::Primitive for Rect {
 use crate::NamespaceBuilder;
 
 /// Builtin module for 2D geometry
-pub fn builtin_module() -> std::rc::Rc<NamespaceDefinition> {
+pub fn builtin_module() -> Rc<NamespaceDefinition> {
     NamespaceBuilder::new("geo2d")
         .add(Circle::builtin_module().into())
         .add(Rect::builtin_module().into())

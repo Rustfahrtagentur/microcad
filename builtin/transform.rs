@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use cgmath::Vector3;
-use microcad_lang::{builtin_module, eval::*, objects::*, parse::*};
+use microcad_lang::{builtin_module, eval::*, objects::*, parse::*, rc::*};
 
 use crate::namespace_builder::NamespaceBuilder;
 use microcad_core::Scalar;
@@ -20,7 +20,7 @@ fn rotate(angle: Scalar, x: Scalar, y: Scalar, z: Scalar) -> Result<ObjectNode, 
     )))
 }
 
-pub fn builtin_namespace() -> std::rc::Rc<NamespaceDefinition> {
+pub fn builtin_namespace() -> Rc<NamespaceDefinition> {
     NamespaceBuilder::new("transform")
         .add(builtin_module!(rotate(angle: Scalar, x: Scalar, y: Scalar, z: Scalar)).into())
         .add(builtin_module!(translate(x: Scalar, y: Scalar, z: Scalar)).into())

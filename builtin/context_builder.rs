@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{eval::*, parse::*};
+use microcad_lang::{eval::*, parse::*, rc::*};
 
 /// Builder for a context
 pub struct ContextBuilder {
@@ -49,7 +49,7 @@ impl ContextBuilder {
     }
 
     /// Add a module to the context
-    pub fn with_module(mut self, module: std::rc::Rc<ModuleDefinition>) -> Self {
+    pub fn with_module(mut self, module: Rc<ModuleDefinition>) -> Self {
         self.context.add(module.into());
         self
     }

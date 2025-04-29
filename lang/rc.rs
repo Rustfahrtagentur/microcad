@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Short-cut definition of Rc<RefCell<T>>
+//! Short-cut definition of `Rc<std::cell::RefCell<T>>` and `Rc<T>`
 
 pub use std::rc::Rc;
 

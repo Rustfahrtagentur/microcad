@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use super::*;
 /// Macro crate a 2d coordinate
 use strum::IntoStaticStr;
@@ -7,7 +9,7 @@ use strum::IntoStaticStr;
 pub enum Geometry {
     /// Line string
     LineString(LineString),
-    /// Multiple line string
+    /// Multiple lirc::*ne string
     MultiLineString(MultiLineString),
     /// Polygon
     Polygon(Polygon),
@@ -50,10 +52,7 @@ impl Geometry {
     }
 
     /// Apply boolean operation to multiple geometries
-    pub fn boolean_op_multi(
-        geometries: Vec<std::rc::Rc<Self>>,
-        op: &crate::BooleanOp,
-    ) -> Option<std::rc::Rc<Self>> {
+    pub fn boolean_op_multi(geometries: Vec<Rc<Self>>, op: &crate::BooleanOp) -> Option<Rc<Self>> {
         if geometries.is_empty() {
             return None;
         }
@@ -63,7 +62,7 @@ impl Geometry {
                 .iter()
                 .fold(geometries[0].clone(), |acc, geo| {
                     if let Some(r) = acc.boolean_op(geo.as_ref(), op) {
-                        std::rc::Rc::new(r)
+                        Rc::new(r)
                     } else {
                         acc
                     }
@@ -139,7 +138,7 @@ pub fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
 }
 
 /// Create a new geometry node
-pub fn geometry(geometry: std::rc::Rc<Geometry>) -> Node {
+pub fn geometry(geometry: Rc<Geometry>) -> Node {
     Node::new(NodeInner::Geometry(geometry))
 }
 

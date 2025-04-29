@@ -3,7 +3,7 @@
 
 //! Builtin module entity
 
-use crate::{eval::*, objects::*, syntax::*, Id};
+use crate::{Id, eval::*, objects::*, rc::*, syntax::*};
 
 /// Builtin module initialization functor
 pub type BuiltinModuleFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> EvalResult<ObjectNode>;
@@ -19,8 +19,8 @@ pub struct BuiltinModule {
 
 impl BuiltinModule {
     /// Create new builtin module
-    pub fn new(id: Id, m: &'static BuiltinModuleFn) -> std::rc::Rc<Self> {
-        std::rc::Rc::new(Self { id, m })
+    pub fn new(id: Id, m: &'static BuiltinModuleFn) -> Rc<Self> {
+        Rc::new(Self { id, m })
     }
 }
 

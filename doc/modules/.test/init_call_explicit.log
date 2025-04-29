@@ -1,4 +1,4 @@
-error: Local symbol not found: m
+error: Symbol m not found.
   ---> <from_str>:9:1
      |
    9 | m(f=1mm);

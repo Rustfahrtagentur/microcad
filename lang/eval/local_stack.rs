@@ -4,17 +4,14 @@
 use crate::{eval::*, resolve::*, Id};
 use log::debug;
 
-/// A stack frame is map of local variables
+/// A stack frame is map of local variables.
 #[derive(Default)]
 struct Locals(std::collections::BTreeMap<Id, SymbolNodeRcMut>);
 
 impl Locals {
     fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
         for (id, local) in self.iter() {
-            match local.borrow().full_name() {
-                Some(name) => writeln!(f, "{:depth$} {id} [{name}]", "")?,
-                None => writeln!(f, "{:depth$} {id}", "")?,
-            }
+            writeln!(f, "{:depth$}{id} [{}]", "", local.borrow().full_name())?
         }
         Ok(())
     }
@@ -34,31 +31,35 @@ impl std::ops::DerefMut for Locals {
     }
 }
 
-/// A stack with a list of local variables for each stack frame
+/// A stack with a list of local variables for each stack frame.
 #[derive(Default)]
 pub struct LocalStack(Vec<Locals>);
 
 impl LocalStack {
-    /// Open a new scope (stack push)
+    /// Open a new scope (stack push).
     pub fn open_scope(&mut self) {
         self.0.push(Default::default());
     }
 
-    /// Close scope (stack pop)
+    /// Close scope (stack pop).
     pub fn close_scope(&mut self) {
         self.0.pop();
     }
 
-    /// Add a new variable to current stack frame
-    pub fn add(&mut self, local: SymbolNodeRcMut) {
-        let id = local.borrow().id();
-        if let Some(name) = local.borrow().full_name() {
-            if name.is_qualified() {
-                debug!("Adding {name} as {id} to local stack");
-            } else {
-                debug!("Adding {id} to local stack");
-            }
+    /// Add a new variable to current stack frame.
+    pub fn add(&mut self, id: Option<Id>, local: SymbolNodeRcMut) {
+        let id = if let Some(id) = id {
+            id
+        } else {
+            local.borrow().id()
+        };
+        let name = local.borrow().full_name();
+        if name.is_qualified() {
+            debug!("Adding {name} as {id} to local stack");
+        } else {
+            debug!("Adding {id} to local stack");
         }
+
         if let Some(last) = self.0.last_mut() {
             last
         } else {
@@ -70,7 +71,7 @@ impl LocalStack {
         .insert(id, local);
     }
 
-    /// Fetch a local variable from current stack frame
+    /// Fetch a local variable from current stack frame.
     pub fn fetch(&self, id: &Id) -> EvalResult<SymbolNodeRcMut> {
         debug!("Fetching {id} from locals");
         // search from inner scope to root scope to shadow outside locals
@@ -112,7 +113,7 @@ fn local_stack() {
         }
     };
 
-    stack.add(make_int("a".into(), 1));
+    stack.add(None, make_int("a".into(), 1));
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
@@ -123,17 +124,18 @@ fn local_stack() {
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
 
-    stack.add(make_int("b".into(), 2));
+    stack.add(None, make_int("b".into(), 2));
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);
     assert!(fetch_int(&stack, "c").is_none());
 
-    stack.add(make_int("c".into(), 3));
+    // test alias
+    stack.add(Some("x".into()), make_int("x".into(), 3));
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);
-    assert!(fetch_int(&stack, "c").unwrap() == 3);
+    assert!(fetch_int(&stack, "x").unwrap() == 3);
 
     stack.close_scope();
 
