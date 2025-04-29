@@ -1,7 +1,19 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! External file loading and symbol tree resolving
+//! Single symbol resolving
+//!
+//! After parsing a source file (see `crate::parse`) it must be resolved to get a symbol out of it:
+//!
+//! ```
+//! use microcad_lang::{syntax::*, parse::*, resolve::*}
+//!
+//! let source_file = SourceFile::load("my.µcad").expect("parsing success");
+//!
+//! let source_symbol = source_file.resolve(None);
+//! ```
+//!
+//! To "run" the source file (and get the expected output) it must now be evaluated (see [crate::eval])  .
 
 mod symbol_definition;
 mod symbol_map;

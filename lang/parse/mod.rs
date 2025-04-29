@@ -1,7 +1,24 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad source code parse entities
+//! Source code parsing
+//!
+//! A source file on disc is just a bunch of UTF-8 encoded text which must be parsed
+//! before any processing:
+//!
+//! ```
+//! use microcad_lang::{syntax::*, parse::*}
+//!
+//! let source_file = SourceFile::load("my.µcad").expect("parsing success");
+//! ```
+//!
+//! To read a source file from an already loaded string use:
+//!
+//! ```
+//! let source_file = SourceFile::load_from_str(r#"std::print("hello world!");"#).expect("parsing success");
+//! ```
+//!
+//! To "run" the source file (and get the expected output) it must now be resolved and evaluated (see [crate::resolve] and [crate::eval])  .
 
 mod body;
 mod call;
