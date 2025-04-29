@@ -3,8 +3,7 @@
 
 //! µcad source file representation
 
-use crate::{eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
-use log::*;
+use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 
 /// µcad source file
 #[derive(Clone, Debug, Default)]
@@ -72,16 +71,6 @@ impl SourceFile {
         node
     }
 }
-
-impl Eval for SourceFile {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        context.open_namespace(self.id());
-        let result = Body::evaluate_vec(&self.body, context);
-        trace!("Evaluated context:\n{context}");
-        result
-    }
-}
-
 impl std::fmt::Display for SourceFile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.body.iter().try_for_each(|s| writeln!(f, "{s}"))

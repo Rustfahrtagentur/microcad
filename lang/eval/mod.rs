@@ -43,6 +43,7 @@ mod local_stack;
 mod output;
 mod parameter;
 mod source_cache;
+mod source_file;
 mod statement;
 mod r#use;
 
