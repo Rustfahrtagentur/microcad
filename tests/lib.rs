@@ -96,7 +96,7 @@ fn module_implicit_init_call() {
         context.lookup(&Identifier(microcad_lang::src_ref::Refer::none("a".into())).into())
     {
         let id = node.borrow().id();
-        assert_eq!(id, "a");
+        assert_eq!(id.id(), "a");
     }
 
     // Get module definition for symbol `a`

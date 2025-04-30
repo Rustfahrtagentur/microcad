@@ -1,11 +1,11 @@
-use crate::{eval::*, resolve::*, src_ref::SrcReferrer, syntax::*, Id};
+use crate::{eval::*, resolve::*, src_ref::SrcReferrer, syntax::*};
 
 /// Map Id to SymbolNode reference
 #[derive(Debug, Default, Clone)]
-pub struct SymbolMap(std::collections::btree_map::BTreeMap<Id, SymbolNodeRcMut>);
+pub struct SymbolMap(std::collections::btree_map::BTreeMap<Identifier, SymbolNodeRcMut>);
 
 impl std::ops::Deref for SymbolMap {
-    type Target = std::collections::btree_map::BTreeMap<Id, SymbolNodeRcMut>;
+    type Target = std::collections::btree_map::BTreeMap<Identifier, SymbolNodeRcMut>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -38,7 +38,7 @@ impl SymbolMap {
 
         log::trace!("Searching {name} in symbol map");
         let (id, leftover) = name.split_first();
-        if let Some(symbol) = self.get(id.id()) {
+        if let Some(symbol) = self.get(&id) {
             if leftover.is_empty() {
                 return Ok(symbol.clone());
             } else if let Some(symbol) = symbol.borrow().search(&leftover) {

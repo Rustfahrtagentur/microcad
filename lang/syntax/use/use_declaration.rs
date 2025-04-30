@@ -3,7 +3,7 @@
 
 //! Use statement syntax element
 
-use crate::{resolve::*, src_ref::*, syntax::*, Id};
+use crate::{resolve::*, src_ref::*, syntax::*};
 use strum::IntoStaticStr;
 
 /// Use declaration
@@ -29,12 +29,12 @@ pub enum UseDeclaration {
 
 impl UseDeclaration {
     /// resolve public use declaration (shall not be called with private use statements)
-    pub fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> (Id, SymbolNodeRcMut) {
+    pub fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> (Identifier, SymbolNodeRcMut) {
         match self {
             UseDeclaration::Use(name) => {
                 let identifier = name.last().expect("Identifier");
                 (
-                    identifier.id().clone(),
+                    identifier.clone(),
                     SymbolNodeRcMut::new(SymbolNode {
                         def: SymbolDefinition::Alias(identifier.clone(), name.clone()),
                         parent,
@@ -44,7 +44,7 @@ impl UseDeclaration {
             }
             UseDeclaration::UseAll(_name) => todo!(),
             UseDeclaration::UseAlias(name, alias) => (
-                alias.id().clone(),
+                alias.clone(),
                 SymbolNodeRcMut::new(SymbolNode {
                     def: SymbolDefinition::Alias(alias.clone(), name.clone()),
                     parent,

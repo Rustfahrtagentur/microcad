@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*, Id};
+use crate::{Id, diag::*, eval::*, rc::*, resolve::*, syntax::*};
 use log::*;
 
 /// Context for evaluation of a resolved µcad file.
@@ -194,7 +194,7 @@ impl EvalContext {
 
     /// Fetch local variable from local stack (for testing only).
     #[cfg(test)]
-    pub fn fetch_local(&self, id: &Id) -> EvalResult<SymbolNodeRcMut> {
+    pub fn fetch_local(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut> {
         self.local_stack.fetch(id)
     }
 
@@ -202,8 +202,8 @@ impl EvalContext {
     ///
     /// TODO: look up the stack for know locals?
     pub fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
-        if let Some(identifier) = name.single_identifier() {
-            if let Ok(symbol) = self.local_stack.fetch(identifier.id()) {
+        if let Some(id) = name.single_identifier() {
+            if let Ok(symbol) = self.local_stack.fetch(id) {
                 if let SymbolDefinition::Constant(_, value) = &symbol.borrow().def {
                     debug!("Fetching local value {name}");
                     return Ok(value.clone());
@@ -230,7 +230,7 @@ impl EvalContext {
     pub fn use_symbol(
         &mut self,
         name: &QualifiedName,
-        id: Option<Id>,
+        id: Option<Identifier>,
     ) -> EvalResult<SymbolNodeRcMut> {
         debug!("Using symbol {name}");
         let symbol = match self.symbols.search(name) {
@@ -319,12 +319,12 @@ impl EvalContext {
     pub fn lookup(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         debug!("Lookup {name}");
         let local = if let Some(id) = name.single_identifier() {
-            self.local_stack.fetch(id.id())
+            self.local_stack.fetch(id)
         } else {
             // split name
             let (id, mut name_rest) = name.split_first();
             // find a local by split id
-            if let Ok(local) = self.local_stack.fetch(id.id()) {
+            if let Ok(local) = self.local_stack.fetch(&id) {
                 // get original name from the local symbol
                 let mut alias_name = local.borrow().full_name();
                 // concat split name rest to new namespace name

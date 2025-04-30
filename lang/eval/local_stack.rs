@@ -1,12 +1,13 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, resolve::*, Id};
+use crate::{eval::*, resolve::*};
 use log::debug;
+use std::collections::BTreeMap;
 
 /// A stack frame is map of local variables.
 #[derive(Default)]
-struct Locals(std::collections::BTreeMap<Id, SymbolNodeRcMut>);
+struct Locals(BTreeMap<Identifier, SymbolNodeRcMut>);
 
 impl Locals {
     fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
@@ -18,7 +19,7 @@ impl Locals {
 }
 
 impl std::ops::Deref for Locals {
-    type Target = std::collections::BTreeMap<Id, SymbolNodeRcMut>;
+    type Target = BTreeMap<Identifier, SymbolNodeRcMut>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -47,7 +48,7 @@ impl LocalStack {
     }
 
     /// Add a new variable to current stack frame.
-    pub fn add(&mut self, id: Option<Id>, local: SymbolNodeRcMut) {
+    pub fn add(&mut self, id: Option<Identifier>, local: SymbolNodeRcMut) {
         let id = if let Some(id) = id {
             id
         } else {
@@ -72,7 +73,7 @@ impl LocalStack {
     }
 
     /// Fetch a local variable from current stack frame.
-    pub fn fetch(&self, id: &Id) -> EvalResult<SymbolNodeRcMut> {
+    pub fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut> {
         debug!("Fetching {id} from locals");
         // search from inner scope to root scope to shadow outside locals
         for map in self.0.iter().rev() {

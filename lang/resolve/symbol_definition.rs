@@ -1,4 +1,4 @@
-use crate::{eval::*, rc::*, resolve::*, syntax::*, value::*, Id};
+use crate::{eval::*, rc::*, resolve::*, syntax::*, value::*};
 
 /// Symbol definition
 #[derive(Debug, Clone)]
@@ -25,16 +25,16 @@ pub enum SymbolDefinition {
 
 impl SymbolDefinition {
     /// Returns ID of this definition.
-    pub fn id(&self) -> Id {
+    pub fn id(&self) -> Identifier {
         match &self {
-            Self::Namespace(n) | Self::External(n) => n.id.id().clone(),
-            Self::Module(m) => m.id.id().clone(),
-            Self::Function(f) => f.id.id().clone(),
-            Self::SourceFile(s) => s.id().id().clone(),
+            Self::Namespace(n) | Self::External(n) => n.id.clone(),
+            Self::Module(m) => m.id.clone(),
+            Self::Function(f) => f.id.clone(),
+            Self::SourceFile(s) => s.id().clone(),
             Self::BuiltinFunction(f) => f.id.clone(),
             Self::BuiltinModule(m) => m.id.clone(),
-            Self::Constant(id, _) => id.id().clone(),
-            Self::Alias(id, _) => id.id().clone(),
+            Self::Constant(id, _) => id.clone(),
+            Self::Alias(id, _) => id.clone(),
         }
     }
 

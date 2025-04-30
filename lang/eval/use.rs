@@ -23,7 +23,7 @@ impl Eval for UseDeclaration {
                 }
             }
             UseDeclaration::UseAlias(name, alias) => {
-                if let Err(err) = context.use_symbol(name, Some(alias.id().clone())) {
+                if let Err(err) = context.use_symbol(name, Some(alias.clone())) {
                     context.error(name, err)?;
                 }
             }

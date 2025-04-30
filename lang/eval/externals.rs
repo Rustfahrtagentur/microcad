@@ -31,12 +31,12 @@ impl Externals {
         let mut map = SymbolMap::new();
         self.iter().for_each(|(basename, _)| {
             let (id, name) = basename.split_first();
-            let namespace = match map.get(id.id()) {
+            let namespace = match map.get(&id) {
                 Some(symbol) => symbol.clone(),
                 _ => SymbolNode::new_external(id.clone()),
             };
             Self::recursive_create_namespaces(&namespace, &name);
-            map.insert(id.id().clone(), namespace);
+            map.insert(id.clone(), namespace);
         });
         map
     }
@@ -50,7 +50,7 @@ impl Externals {
         }
 
         let node_id = name.first().expect("Non-empty qualified name");
-        if let Some(child) = parent.borrow().get(node_id.id()) {
+        if let Some(child) = parent.borrow().get(node_id) {
             return Some(child.clone());
         }
 
@@ -190,13 +190,17 @@ fn resolve_external_file() {
 
     log::trace!("{externals}");
 
-    assert!(externals
-        .fetch_external(&"std::geo2d::circle".into())
-        .is_ok());
+    assert!(
+        externals
+            .fetch_external(&"std::geo2d::circle".into())
+            .is_ok()
+    );
 
-    assert!(externals
-        .fetch_external(&"non_std::geo2d::circle".into())
-        .is_err());
+    assert!(
+        externals
+            .fetch_external(&"non_std::geo2d::circle".into())
+            .is_err()
+    );
 }
 
 #[test]

@@ -1,4 +1,4 @@
-use crate::{eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*, Id};
+use crate::{Id, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
 use log::*;
 
@@ -38,7 +38,10 @@ impl SymbolNode {
     /// Create a symbol node for a built-in module.
     pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> SymbolNodeRcMut {
         SymbolNode::new(
-            SymbolDefinition::BuiltinModule(BuiltinModule::new(id.into(), m)),
+            SymbolDefinition::BuiltinModule(BuiltinModule::new(
+                Identifier(Refer::none(id.into())),
+                m,
+            )),
             None,
         )
     }
@@ -101,12 +104,12 @@ impl SymbolNode {
     }
 
     /// Get id of the definition in this node.
-    pub fn id(&self) -> Id {
+    pub fn id(&self) -> Identifier {
         self.def.id()
     }
 
     /// Fetch child node with an id.
-    pub fn get(&self, id: &Id) -> Option<&SymbolNodeRcMut> {
+    pub fn get(&self, id: &Identifier) -> Option<&SymbolNodeRcMut> {
         self.children.get(id)
     }
 
@@ -114,7 +117,7 @@ impl SymbolNode {
     pub fn search(&self, name: &QualifiedName) -> Option<SymbolNodeRcMut> {
         trace!("Searching {name} in {}", self.id());
         if let Some(first) = name.first() {
-            if let Some(child) = self.get(first.id()) {
+            if let Some(child) = self.get(first) {
                 let name = &name.remove_first();
                 if name.is_empty() {
                     Some(child.clone())
@@ -140,7 +143,7 @@ impl SymbolNode {
 impl FullyQualify for SymbolNode {
     /// Get fully qualified name.
     fn full_name(&self) -> QualifiedName {
-        let id = Identifier(Refer::none(self.id()));
+        let id = self.id();
         match &self.parent {
             Some(parent) => {
                 let mut name = parent.borrow().full_name();

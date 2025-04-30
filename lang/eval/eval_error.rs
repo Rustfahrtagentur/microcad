@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{parse::*, src_ref::*, syntax::*, ty::*, value::*, Id};
+use crate::{parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*, Id};
 use thiserror::Error;
 
 /// Evaluation error
@@ -122,7 +122,7 @@ pub enum EvalError {
 
     /// Local symbol not found
     #[error("Local symbol not found: {0}")]
-    LocalNotFound(Id),
+    LocalNotFound(Identifier),
 
     /// Expression is neither a valid name for a symbol nor local variable
     #[error("'{0}' is neither a valid name for a symbol nor local variable")]

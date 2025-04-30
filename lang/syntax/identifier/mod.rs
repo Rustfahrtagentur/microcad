@@ -11,7 +11,7 @@ pub use qualified_name::*;
 
 #[cfg(not(test))]
 use crate::parse::*;
-use crate::{src_ref::*, syntax::*, Id};
+use crate::{Id, src_ref::*, syntax::*};
 
 /// µcad identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -21,6 +21,16 @@ impl Identifier {
     /// Get the value of the identifier
     pub fn id(&self) -> &Id {
         &self.0.value
+    }
+
+    /// Return number of identifiers in name
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    /// Return if name is empty
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
     }
 }
 

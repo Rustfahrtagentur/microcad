@@ -3,7 +3,7 @@
 
 //! Builtin module entity
 
-use crate::{Id, eval::*, objects::*, rc::*, syntax::*};
+use crate::{eval::*, objects::*, rc::*, syntax::*};
 
 /// Builtin module initialization functor
 pub type BuiltinModuleFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> EvalResult<ObjectNode>;
@@ -12,14 +12,14 @@ pub type BuiltinModuleFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> EvalRe
 #[derive(Clone)]
 pub struct BuiltinModule {
     /// Name of the module
-    pub id: Id,
+    pub id: Identifier,
     /// Module's static builtin function
     pub m: &'static BuiltinModuleFn,
 }
 
 impl BuiltinModule {
     /// Create new builtin module
-    pub fn new(id: Id, m: &'static BuiltinModuleFn) -> Rc<Self> {
+    pub fn new(id: Identifier, m: &'static BuiltinModuleFn) -> Rc<Self> {
         Rc::new(Self { id, m })
     }
 }
@@ -44,7 +44,7 @@ pub trait BuiltinModuleDefinition {
     /// Generate builtin module
     fn builtin_module() -> BuiltinModule {
         BuiltinModule {
-            id: Self::name().into(),
+            id: Identifier(Refer::none(Self::name().into())),
             m: Self::module(),
         }
     }
