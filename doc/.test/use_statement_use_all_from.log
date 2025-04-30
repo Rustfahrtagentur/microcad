@@ -1,0 +1,12 @@
+error: Symbol __builtin::transform::translate not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo3d.µcad:25:5
+     |
+  25 |     __builtin::transform::translate(
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item: __builtin::transform::translate(-size_x / 2 / 1mm, -size_y / 2 / 1mm, -size_z / 2 / 1mm)
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo3d.µcad:25:5
+     |
+  25 |     __builtin::transform::translate(
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

@@ -8,27 +8,5 @@ error: Cannot nest item: algorithm::difference()
   ---> <from_str>:3:1
      |
    3 | algorithm::difference() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol geo2d::circle not found.
-  ---> <from_str>:4:5
-     |
-   4 |     geo2d::circle(radius = 3mm);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol geo2d::rect not found.
-  ---> <from_str>:5:5
-     |
-   5 |     geo2d::rect(width = 3mm, height = 2mm);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Cannot nest item:  {
-geo2d::circle(radius = 3mm);
-geo2d::rect(width = 3mm, height = 2mm);
-}
-
-  ---> <from_str>:3:1
-     |
-   3 | algorithm::difference() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+     | ^^^^^^^^^^^^^^^^^^^^^^^
      |

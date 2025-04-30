@@ -8,19 +8,7 @@ error: Cannot nest item: std::translate(x = -4mm, y = -4mm)
   ---> <from_str>:1:1
      |
    1 | std::translate(x = -4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol std::geo2d::rect not found.
-  ---> <from_str>:1:36
-     |
-   1 | std::translate(x = -4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Cannot nest item: std::geo2d::rect(width = 2mm, height = 2mm)
-  ---> <from_str>:1:1
-     |
-   1 | std::translate(x = -4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Symbol std::translate not found.
   ---> <from_str>:2:1
@@ -32,19 +20,7 @@ error: Cannot nest item: std::translate(x = -4mm, y = 4mm)
   ---> <from_str>:2:1
      |
    2 | std::translate(x = -4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol std::geo2d::rect not found.
-  ---> <from_str>:2:35
-     |
-   2 | std::translate(x = -4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Cannot nest item: std::geo2d::rect(width = 2mm, height = 2mm)
-  ---> <from_str>:2:1
-     |
-   2 | std::translate(x = -4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Symbol std::translate not found.
   ---> <from_str>:3:1
@@ -56,19 +32,7 @@ error: Cannot nest item: std::translate(x = 4mm, y = -4mm)
   ---> <from_str>:3:1
      |
    3 | std::translate(x = 4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol std::geo2d::rect not found.
-  ---> <from_str>:3:35
-     |
-   3 | std::translate(x = 4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Cannot nest item: std::geo2d::rect(width = 2mm, height = 2mm)
-  ---> <from_str>:3:1
-     |
-   3 | std::translate(x = 4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Symbol std::translate not found.
   ---> <from_str>:4:1
@@ -80,17 +44,5 @@ error: Cannot nest item: std::translate(x = 4mm, y = 4mm)
   ---> <from_str>:4:1
      |
    4 | std::translate(x = 4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol std::geo2d::rect not found.
-  ---> <from_str>:4:34
-     |
-   4 | std::translate(x = 4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Cannot nest item: std::geo2d::rect(width = 2mm, height = 2mm)
-  ---> <from_str>:4:1
-     |
-   4 | std::translate(x = 4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |

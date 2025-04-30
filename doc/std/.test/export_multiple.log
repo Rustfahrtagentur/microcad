@@ -8,17 +8,5 @@ error: Cannot nest item: std::export(["cube.stl", "cube.png"])
   ---> <from_str>:1:1
      |
    1 | std::export(["cube.stl","cube.png"]) std::geo3d::cube(40.0mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol std::geo3d::cube not found.
-  ---> <from_str>:1:38
-     |
-   1 | std::export(["cube.stl","cube.png"]) std::geo3d::cube(40.0mm);
-     |                                      ^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Cannot nest item: std::geo3d::cube(40mm)
-  ---> <from_str>:1:1
-     |
-   1 | std::export(["cube.stl","cube.png"]) std::geo3d::cube(40.0mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |

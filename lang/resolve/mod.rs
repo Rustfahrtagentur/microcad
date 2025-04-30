@@ -66,5 +66,5 @@ fn resolve_source_file() {
 
     //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
 
-    println!("{symbol_node}");
+    log::trace!("{symbol_node}");
 }

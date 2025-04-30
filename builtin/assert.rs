@@ -76,13 +76,6 @@ fn assert_fail() {
     assert!(context.eval().is_ok());
     assert!(context.diag_handler().error_count > 0);
 
-    println!(
-        "{}",
-        context
-            .diag_handler()
-            .pretty_print_to_string(&context)
-            .expect("internal test error")
-    );
     assert_eq!(
         context
             .diag_handler()

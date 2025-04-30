@@ -10,27 +10,3 @@ error: Cannot nest item: hull()
    1 | hull()
      | ^^^^^^
      |
-error: Symbol translate not found.
-  ---> <from_str>:2:5
-     |
-   2 |     translate(x = [-10, 10]mm, y = [-10, 10]mm)
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Cannot nest item: translate(x = [-10, 10]mm, y = [-10, 10]mm)
-  ---> <from_str>:1:1
-     |
-   1 | hull()
-     | ^^^^^^
-     |
-error: Symbol circle not found.
-  ---> <from_str>:3:9
-     |
-   3 |         circle(1mm);
-     |         ^^^^^^^^^^^
-     |
-error: Cannot nest item: circle(1mm)
-  ---> <from_str>:1:1
-     |
-   1 | hull()
-     | ^^^^^^
-     |

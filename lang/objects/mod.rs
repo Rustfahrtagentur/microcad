@@ -12,7 +12,7 @@ pub use algorithm::*;
 pub use object::*;
 pub use transform::*;
 
-use crate::{Id, rc::*, value::Value};
+use crate::{rc::*, value::Value, Id};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -116,9 +116,9 @@ fn find_children_marker(node: &ObjectNode) -> Option<ObjectNode> {
 /// Nest a Vec of node multiplicities
 ///
 /// * `node_stack`: A list of node lists.
-/// 
+///
 /// The reference to the first stack element will be returned.
-/// 
+///
 /// Assume, our node stack `Vec<Vec<Node>>` has for lists `a`, `b`, `c`, `d`:
 /// ```
 /// let nodes = vec![
@@ -151,27 +151,31 @@ pub fn nest_nodes(node_stack: &[Vec<ObjectNode>]) -> &Vec<ObjectNode> {
         0 => panic!("Node stack must not be empty"),
         1 => {}
         n => {
-            (1..n).rev().map(|i| (&node_stack[i], &node_stack[i-1])).for_each(|(prev_list, next_list)| {
-                // Insert a copy of each element `node` from `prev_list` as child to each element `new_parent` in `next_list`
-                next_list.iter().for_each(|new_parent_node| {
-                    prev_list.iter().for_each(|node| {
-                        node.detach();
+            (1..n)
+                .rev()
+                .map(|i| (&node_stack[i], &node_stack[i - 1]))
+                .for_each(|(prev_list, next_list)| {
+                    // Insert a copy of each element `node` from `prev_list` as child to each element `new_parent` in `next_list`
+                    next_list.iter().for_each(|new_parent_node| {
+                        prev_list.iter().for_each(|node| {
+                            node.detach();
 
-                        // Handle children marker.
-                        // If we have found a children marker node, use it's parent as new parent node.
-                        let new_parent_node = match find_children_marker(new_parent_node) {
-                            Some(children_marker) => {
-                                let parent = children_marker.parent().expect("Must have a parent");
-                                children_marker.detach(); // Remove children marker from tree
-                                parent
-                            }
-                            None => new_parent_node.clone(),
-                        };
+                            // Handle children marker.
+                            // If we have found a children marker node, use it's parent as new parent node.
+                            let new_parent_node = match find_children_marker(new_parent_node) {
+                                Some(children_marker) => {
+                                    let parent =
+                                        children_marker.parent().expect("Must have a parent");
+                                    children_marker.detach(); // Remove children marker from tree
+                                    parent
+                                }
+                                None => new_parent_node.clone(),
+                            };
 
-                        new_parent_node.append(node.make_deep_copy());
+                            new_parent_node.append(node.make_deep_copy());
+                        });
                     });
                 });
-            });
         }
     }
 
@@ -312,7 +316,7 @@ fn node_nest() {
 
     for node in nodes {
         node.descendants().for_each(|n| {
-            println!(
+            log::trace!(
                 "{}{}",
                 "  ".repeat(n.depth()),
                 match *n.borrow() {

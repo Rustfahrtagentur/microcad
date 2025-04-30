@@ -188,7 +188,7 @@ fn resolve_external_file() {
 
     assert!(!externals.is_empty());
 
-    println!("{externals}");
+    log::trace!("{externals}");
 
     assert!(externals
         .fetch_external(&"std::geo2d::circle".into())
@@ -207,5 +207,5 @@ fn create_namespaces() {
 
     let namespaces = externals.create_namespaces();
 
-    println!("{namespaces:#?}");
+    log::trace!("{namespaces:#?}");
 }

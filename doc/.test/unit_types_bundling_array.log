@@ -1,0 +1,6 @@
+error: Symbol std::assert not found.
+  ---> <from_str>:8:1
+     |
+   8 | std::assert( l1 == l2 );
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+     |
