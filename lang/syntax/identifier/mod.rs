@@ -99,3 +99,36 @@ pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
         .collect::<Vec<_>>()
         .join(separator)
 }
+
+#[test]
+fn identifier_comparison() {
+    use crate::syntax::*;
+
+    // same id but different src refs
+    let id1 = Identifier(Refer::none("x".into()));
+    let id2 = Identifier(Refer::new("x".into(), SrcRef::new(0..5, 0, 1, 1)));
+
+    // shall be equal
+    assert!(id1 == id2);
+}
+
+#[test]
+fn identifier_hash() {
+    use crate::syntax::*;
+    use std::hash::{Hash, Hasher};
+
+    // same id but different src refs
+    let id1 = Identifier(Refer::none("x".into()));
+    let id2 = Identifier(Refer::new("x".into(), SrcRef::new(0..5, 0, 1, 1)));
+
+    let mut hasher = std::hash::DefaultHasher::new();
+    id1.hash(&mut hasher);
+    let hash1 = hasher.finish();
+    let mut hasher = std::hash::DefaultHasher::new();
+    id2.hash(&mut hasher);
+
+    let hash2 = hasher.finish();
+
+    // shall be equal
+    assert_eq!(hash1, hash2);
+}
