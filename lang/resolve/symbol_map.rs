@@ -36,13 +36,13 @@ impl SymbolMap {
             return Err(EvalError::NotAName(name.src_ref()));
         }
 
-        log::trace!("Searching {name} in symbol map");
         let (id, leftover) = name.split_first();
         if let Some(symbol) = self.get(&id) {
             if leftover.is_empty() {
+                log::trace!("Fetched {name} from globals (symbol map)");
                 return Ok(symbol.clone());
             } else if let Some(symbol) = symbol.borrow().search(&leftover) {
-                return Ok(symbol.clone());
+                return Ok(symbol);
             }
         }
 

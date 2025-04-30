@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Id, diag::*, eval::*, rc::*, resolve::*, syntax::*};
+use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*, Id};
 use log::*;
 
 /// Context for evaluation of a resolved µcad file.
@@ -27,8 +27,6 @@ pub struct EvalContext {
     local_stack: LocalStack,
     /// Call stack
     call_stack: CallStack,
-    /// Current namespace while evaluation.
-    current_namespace: QualifiedName,
     /// Source file cache containing all source files loaded in the context and their syntax trees.
     source_cache: SourceCache,
     /// Source file diagnostics-
@@ -92,7 +90,6 @@ impl EvalContext {
             diag_handler: Default::default(),
             local_stack: Default::default(),
             call_stack: Default::default(),
-            current_namespace: Default::default(),
             output,
         }
     }
@@ -138,25 +135,43 @@ impl EvalContext {
     /// Add a named local value to current locals.
     ///
     /// TODO: Is this special function really needed?
-    pub fn add_local_value(&mut self, id: Id, value: Value) {
+    pub fn add_local_value(&mut self, id: Id, value: Value) -> EvalResult<()> {
         self.local_stack
-            .add(None, SymbolNode::new_constant(id, value));
+            .add(None, SymbolNode::new_constant(id, value))
+    }
+
+    /// Open a new source scope.
+    ///
+    /// Adds a fresh table for locals to the stack.
+    pub fn open_source(&mut self, id: Identifier) {
+        self.local_stack.open_source(id);
+    }
+
+    /// Open a new namespace which then will be the current namespace in the context.
+    pub fn open_namespace(&mut self, id: Identifier) {
+        self.local_stack.open_namespace(id);
+        trace!("open namespace -> {}", self.current_namespace());
+    }
+
+    /// Open a new module which then will be the current namespace in the context.
+    pub fn open_module(&mut self, id: Identifier) {
+        self.local_stack.open_module(id);
+        trace!("closed namespace -> {}", self.current_namespace());
     }
 
     /// Open a new scope.
     ///
     /// Adds a fresh table for locals to the stack.
-    /// Scope does not mean namespace! Namespaces have to be open with [`Self::open_namespace`].
     pub fn open_scope(&mut self) {
         self.local_stack.open_scope();
     }
 
     /// Close current scope.
     ///
-    /// Remove all locals in the current scope and close it.
-    /// Scope does not mean namespace! Namespaces have to be closed with [`Self::close_namespace`].
-    pub fn close_scope(&mut self) {
-        self.local_stack.close_scope();
+    /// Remove any locals in the current scope and close it.
+    pub fn close(&mut self) {
+        self.local_stack.close();
+        trace!("closed -> {}", self.current_namespace());
     }
 
     /// Push a call to stack
@@ -174,17 +189,9 @@ impl EvalContext {
         self.call_stack.pop();
     }
 
-    /// fetch global symbol from symbol map
-    /// Open a new namespace which then will be the current namespace in the context.
-    pub fn open_namespace(&mut self, id: Identifier) {
-        self.current_namespace.push(id);
-        trace!("open namespace -> {}", self.current_namespace);
-    }
-
-    /// Close current namespace.
-    pub fn close_namespace(&mut self) {
-        self.current_namespace.pop();
-        trace!("closed namespace -> {}", self.current_namespace);
+    /// Return current namespace.
+    pub fn current_namespace(&self) -> QualifiedName {
+        self.local_stack.get_name()
     }
 
     /// Fetch global symbol from symbol map (for testing only).
@@ -233,11 +240,14 @@ impl EvalContext {
         id: Option<Identifier>,
     ) -> EvalResult<SymbolNodeRcMut> {
         debug!("Using symbol {name}");
+        // check if symbol is already available
         let symbol = match self.symbols.search(name) {
             Ok(symbol) => symbol.clone(),
+            // load symbol
             _ => self.load_symbol(name)?,
         };
-        self.local_stack.add(id, symbol.clone());
+        // add found/load symbol to locals
+        self.local_stack.add(id, symbol.clone())?;
         trace!("Local Stack:\n{}", self.local_stack);
         Ok(symbol)
     }
@@ -250,6 +260,7 @@ impl EvalContext {
     /// - `name`: Name of the symbol to search for
     pub fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         debug!("Using all symbols in {name}");
+        // search symbol
         let symbol = match self.symbols.search(name) {
             Ok(symbol) => {
                 //  load external file if symbol was not loaded before
@@ -265,7 +276,7 @@ impl EvalContext {
             Err(EvalError::NoSymbolFound(symbol.borrow().full_name()))
         } else {
             for (id, symbol) in symbol.borrow().children.iter() {
-                self.local_stack.add(Some(id.clone()), symbol.clone());
+                self.local_stack.add(Some(id.clone()), symbol.clone())?;
             }
             trace!("Local Stack:\n{}", self.local_stack);
             Ok(symbol)
@@ -329,6 +340,7 @@ impl EvalContext {
                 let mut alias_name = local.borrow().full_name();
                 // concat split name rest to new namespace name
                 alias_name.append(&mut name_rest);
+                log::trace!("Following alias {alias_name}");
                 // lookup this new name
                 self.lookup(&alias_name)
             } else {
@@ -341,7 +353,7 @@ impl EvalContext {
         // search for global symbol with prefixing current namespace
         let current = {
             self.symbols
-                .search(&name.with_prefix(&self.current_namespace))
+                .search(&name.with_prefix(&self.current_namespace()))
         };
 
         // collect all found nodes
@@ -446,10 +458,10 @@ impl std::fmt::Display for EvalContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Loaded files:\n{files}\nLocals:\n{locals}\nCurrent Namespace:\n{namespace}\n\nSymbols:\n{symbols}",
+            "Loaded files:\n{files}\nLocals [{name}]:\n{locals}\nSymbols:\n{symbols}",
             files = self.source_cache,
+            name = self.local_stack.get_name(),
             locals = self.local_stack,
-            namespace = self.current_namespace,
             symbols = self.symbols
         )
     }

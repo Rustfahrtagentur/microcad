@@ -30,9 +30,9 @@ impl SymbolDefinition {
             Self::Namespace(n) | Self::External(n) => n.id.clone(),
             Self::Module(m) => m.id.clone(),
             Self::Function(f) => f.id.clone(),
-            Self::SourceFile(s) => s.id().clone(),
-            Self::BuiltinFunction(f) => f.id.clone(),
-            Self::BuiltinModule(m) => m.id.clone(),
+            Self::SourceFile(s) => s.id(),
+            Self::BuiltinFunction(f) => f.id(),
+            Self::BuiltinModule(m) => m.id(),
             Self::Constant(id, _) => id.clone(),
             Self::Alias(id, _) => id.clone(),
         }

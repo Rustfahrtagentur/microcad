@@ -60,12 +60,7 @@ impl ObjectProperties {
     }
 
     /// If the propery with `id` exists, assign the new value and add as local value to the context
-    pub fn assign_and_add_local_value(
-        &mut self,
-        id: &Id,
-        value: Value,
-        context: &mut EvalContext,
-    ) {
+    pub fn assign_and_add_local_value(&mut self, id: &Id, value: Value, context: &mut EvalContext) {
         if let Some(prop_value) = self.get_value_mut(id) {
             *prop_value = value.clone();
         }

@@ -212,9 +212,9 @@ pub enum EvalError {
     #[error("Error limit reached: Stopped evaluation after {0} errors")]
     ErrorLimitReached(u32),
 
-    /// Unexpected empty stack
-    #[error("Unexpected empty stack")]
-    UnexpectedEmptyStack,
+    /// No locals  available on stack
+    #[error("Local stack needed to store {0}")]
+    NoLocalStack(Identifier),
 
     /// Tuple item not found
     #[error("Tuple item not found {0}")]

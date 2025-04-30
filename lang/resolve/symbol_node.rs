@@ -74,9 +74,11 @@ impl SymbolNode {
     pub fn print_symbol(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}{} [{}]", "", self.def, self.full_name())?;
 
-        self.children
-            .iter()
-            .try_for_each(|(_, child)| child.borrow().print_symbol(f, depth + self.def.id().len()))
+        self.children.iter().try_for_each(|(_, child)| {
+            child
+                .borrow()
+                .print_symbol(f, depth + self.def.id().id().len())
+        })
     }
 
     /// Insert child and change parent of child to new parent.

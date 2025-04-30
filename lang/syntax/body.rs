@@ -99,7 +99,7 @@ impl Body {
             nodes.append(&mut value.fetch_nodes());
         }
 
-        context.close_scope();
+        context.close();
 
         let object = empty_object();
         for node in nodes {
@@ -109,8 +109,6 @@ impl Body {
         Ok(object)
     }
 }
-
-
 
 impl SrcReferrer for Body {
     fn src_ref(&self) -> SrcRef {

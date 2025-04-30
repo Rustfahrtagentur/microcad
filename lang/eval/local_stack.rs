@@ -6,29 +6,38 @@ use log::debug;
 use std::collections::BTreeMap;
 
 /// A stack frame is map of local variables.
-#[derive(Default)]
-struct Locals(BTreeMap<Identifier, SymbolNodeRcMut>);
+enum Locals {
+    Source(Identifier, BTreeMap<Identifier, SymbolNodeRcMut>),
+    Namespace(Identifier),
+    Module(Identifier),
+    Scope(BTreeMap<Identifier, SymbolNodeRcMut>),
+}
 
 impl Locals {
+    /// Get identifier if available or panic.
+    pub fn id(&self) -> Option<Identifier> {
+        match self {
+            Locals::Source(id, _) | Locals::Namespace(id) | Locals::Module(id) => Some(id.clone()),
+            _ => None,
+        }
+    }
+
     fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
-        for (id, local) in self.iter() {
+        let (map, depth) = match self {
+            Locals::Source(id, map) => {
+                writeln!(f, "{:depth$}{id} (source):", "")?;
+                (map, depth + 2)
+            }
+            Locals::Namespace(id) => return write!(f, "{:depth$}{id} (namespace)", ""),
+            Locals::Module(id) => return write!(f, "{:depth$}{id} (module)", ""),
+            Locals::Scope(map) => (map, depth),
+        };
+
+        for (id, local) in map.iter() {
             writeln!(f, "{:depth$}{id} [{}]", "", local.borrow().full_name())?
         }
+
         Ok(())
-    }
-}
-
-impl std::ops::Deref for Locals {
-    type Target = BTreeMap<Identifier, SymbolNodeRcMut>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for Locals {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 
@@ -37,18 +46,33 @@ impl std::ops::DerefMut for Locals {
 pub struct LocalStack(Vec<Locals>);
 
 impl LocalStack {
+    /// Open a new source (stack push).
+    pub fn open_source(&mut self, id: Identifier) {
+        self.0.push(Locals::Source(id, BTreeMap::new()));
+    }
+
     /// Open a new scope (stack push).
     pub fn open_scope(&mut self) {
-        self.0.push(Default::default());
+        self.0.push(Locals::Scope(BTreeMap::new()));
+    }
+
+    /// Open a new scope (stack push).
+    pub fn open_namespace(&mut self, id: Identifier) {
+        self.0.push(Locals::Namespace(id));
+    }
+
+    /// Open a new scope (stack push).
+    pub fn open_module(&mut self, id: Identifier) {
+        self.0.push(Locals::Module(id));
     }
 
     /// Close scope (stack pop).
-    pub fn close_scope(&mut self) {
+    pub fn close(&mut self) {
         self.0.pop();
     }
 
     /// Add a new variable to current stack frame.
-    pub fn add(&mut self, id: Option<Identifier>, local: SymbolNodeRcMut) {
+    pub fn add(&mut self, id: Option<Identifier>, local: SymbolNodeRcMut) -> EvalResult<()> {
         let id = if let Some(id) = id {
             id
         } else {
@@ -61,36 +85,47 @@ impl LocalStack {
             debug!("Adding {id} to local stack");
         }
 
-        if let Some(last) = self.0.last_mut() {
-            last
-        } else {
-            self.0.push(Locals::default());
-            self.0
-                .last_mut()
-                .expect("cannot push symbol onto an empty local stack")
+        match self.0.last_mut() {
+            Some(Locals::Source(_, last)) | Some(Locals::Scope(last)) => {
+                last.insert(id.clone(), local);
+                Ok(())
+            }
+            _ => Err(EvalError::NoLocalStack(id)),
         }
-        .insert(id, local);
     }
 
     /// Fetch a local variable from current stack frame.
     pub fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut> {
-        debug!("Fetching {id} from locals");
         // search from inner scope to root scope to shadow outside locals
-        for map in self.0.iter().rev() {
-            if let Some(local) = map.get(id) {
-                return Ok(local.clone());
+        for locals in self.0.iter().rev() {
+            match locals {
+                Locals::Source(_, locals) | Locals::Scope(locals) => {
+                    if let Some(local) = locals.get(id) {
+                        debug!("Fetched {id} from locals");
+                        return Ok(local.clone());
+                    }
+                }
+                _ => (),
             }
         }
         Err(super::EvalError::LocalNotFound(id.clone()))
+    }
+
+    pub fn get_name(&self) -> QualifiedName {
+        QualifiedName(self.0.iter().filter_map(|locals| locals.id()).collect())
     }
 }
 
 impl std::fmt::Display for LocalStack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for (n, locals) in self.0.iter().enumerate() {
-            locals.print(f, n)?;
+        if self.0.is_empty() {
+            writeln!(f, "<empty stack>")
+        } else {
+            for (n, locals) in self.0.iter().enumerate() {
+                locals.print(f, n)?;
+            }
+            Ok(())
         }
-        Ok(())
     }
 }
 
@@ -98,6 +133,8 @@ impl std::fmt::Display for LocalStack {
 #[allow(clippy::unwrap_used)]
 fn local_stack() {
     use std::ops::Deref;
+
+    crate::env_logger_init();
 
     let mut stack = LocalStack::default();
 
@@ -114,33 +151,44 @@ fn local_stack() {
         }
     };
 
-    stack.add(None, make_int("a".into(), 1));
+    stack.open_source("test".into());
+    assert!(stack.get_name() == "test".into());
+
+    assert!(stack.add(None, make_int("a".into(), 1)).is_ok());
+
+    println!("{stack}");
+
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
 
     stack.open_scope();
+    assert!(stack.get_name() == "test".into());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
 
-    stack.add(None, make_int("b".into(), 2));
+    assert!(stack.add(None, make_int("b".into(), 2)).is_ok());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);
     assert!(fetch_int(&stack, "c").is_none());
 
     // test alias
-    stack.add(Some("x".into()), make_int("x".into(), 3));
+    assert!(stack.add(Some("x".into()), make_int("x".into(), 3)).is_ok());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);
     assert!(fetch_int(&stack, "x").unwrap() == 3);
 
-    stack.close_scope();
+    stack.close();
+    assert!(stack.get_name() == "test".into());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
+
+    stack.close();
+    assert!(stack.get_name().is_empty());
 }

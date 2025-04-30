@@ -57,7 +57,7 @@ impl ModuleInitDefinition {
             }
         }
 
-        context.close_scope();
+        context.close();
 
         if !props.all_initialized() {
             context.error(

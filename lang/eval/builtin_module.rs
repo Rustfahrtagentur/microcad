@@ -22,6 +22,11 @@ impl BuiltinModule {
     pub fn new(id: Identifier, m: &'static BuiltinModuleFn) -> Rc<Self> {
         Rc::new(Self { id, m })
     }
+
+    /// Return identifier
+    pub fn id(&self) -> Identifier {
+        self.id.clone()
+    }
 }
 
 impl std::fmt::Debug for BuiltinModule {

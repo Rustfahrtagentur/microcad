@@ -86,7 +86,7 @@ impl ModuleDefinition {
                 Statement::Assignment(assignment) => {
                     let id = assignment.name.id();
                     let value = assignment.value.eval(context)?;
-                    context.add_local_value(id.clone(), value);
+                    context.add_local_value(id.clone(), value)?;
                 }
                 Statement::Expression(expression) => {
                     let value = expression.eval(context)?;
@@ -96,7 +96,7 @@ impl ModuleDefinition {
             }
         }
 
-        context.close_scope();
+        context.close();
 
         for node in nodes {
             object.append(node);

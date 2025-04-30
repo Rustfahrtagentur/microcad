@@ -31,6 +31,11 @@ impl BuiltinFunction {
             f,
         })
     }
+
+    /// Return identifier
+    pub fn id(&self) -> Identifier {
+        self.id.clone()
+    }
 }
 
 impl CallTrait for BuiltinFunction {
