@@ -24,7 +24,7 @@
 //! let value = context.eval().expect("evaluation success");
 //!
 //! // print any error
-//! context.diag_handler.pretty_print( stdout(), &context).expect("UTF-8 compatible output");
+//! context.pretty_print( stdout(), &context).expect("UTF-8 compatible output");
 //! ```
 
 mod argument_map;
