@@ -241,11 +241,7 @@ impl EvalContext {
     ) -> EvalResult<SymbolNodeRcMut> {
         debug!("Using symbol {name}");
         // check if symbol is already available
-        let symbol = match self.symbols.search(name) {
-            Ok(symbol) => symbol.clone(),
-            // load symbol
-            _ => self.load_symbol(name)?,
-        };
+        let symbol = self.lookup(name)?;
         // add found/load symbol to locals
         self.local_stack.add(id, symbol.clone())?;
         trace!("Local Stack:\n{}", self.local_stack);
@@ -273,7 +269,7 @@ impl EvalContext {
             _ => self.load_symbol(name)?,
         };
         if symbol.borrow().children.is_empty() {
-            Err(EvalError::NoSymbolFound(symbol.borrow().full_name()))
+            Err(EvalError::NoSymbolsFound(symbol.borrow().full_name()))
         } else {
             for (id, symbol) in symbol.borrow().children.iter() {
                 self.local_stack.add(Some(id.clone()), symbol.clone())?;
@@ -281,6 +277,88 @@ impl EvalContext {
             trace!("Local Stack:\n{}", self.local_stack);
             Ok(symbol)
         }
+    }
+
+    /// Lookup for local or global symbol.
+    ///
+    /// - looks in local stack
+    /// - looks in symbol map
+    /// - follows aliases (use statements)
+    /// - detect any ambiguity
+    ///
+    /// # Arguments
+    /// - `name`: Name of the symbol to look for
+    pub fn lookup(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+        debug!("Lookup {name}");
+
+        // collect all symbols that can be found
+        let found: Vec<_> = [
+            self.lookup_local(name),
+            self.lookup_global(name),
+            self.lookup_global(&name.with_prefix(&self.current_namespace())),
+        ]
+        .into_iter()
+        .filter_map(Result::ok)
+        .collect();
+
+        // Check for ambiguity
+        if found.len() > 1 {
+            return Err(EvalError::AmbiguousSymbol {
+                ambiguous: name.clone(),
+                others: found
+                    .iter()
+                    .map(|symbol| symbol.borrow().full_name().clone())
+                    .collect(),
+            });
+        };
+
+        // check if we found any node
+        let symbol = match found.first() {
+            Some(symbol) => symbol,
+            _ => return Err(EvalError::SymbolNotFound(name.clone())),
+        };
+
+        // execute alias from any use statement
+        let def = &symbol.borrow().def;
+        if let SymbolDefinition::Alias(_, name) = def {
+            trace!("Found alias => {name}");
+            return self.lookup(name);
+        }
+
+        Ok(symbol.clone())
+    }
+
+    /// lookup a symbol from local stack
+    fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+        if let Some(id) = name.single_identifier() {
+            self.local_stack.fetch(id)
+        } else {
+            // split name
+            let (id, mut tail) = name.split_first();
+            // find a local by split id
+            if let Ok(local) = self.local_stack.fetch(&id) {
+                // get original name from the local symbol
+                let mut alias = local.borrow().full_name();
+                // concat split name rest to new namespace name
+                alias.append(&mut tail);
+                log::trace!("Following alias {alias}");
+                // lookup this new name
+                self.lookup(&alias)
+            } else {
+                Err(EvalError::SymbolNotFound(name.clone()))
+            }
+        }
+    }
+
+    /// lookup a symbol from global symbols
+    fn lookup_global(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+        // check if symbol is already available
+        let symbol = match self.symbols.search(name) {
+            Ok(symbol) => symbol.clone(),
+            // load symbol
+            _ => self.load_symbol(name)?,
+        };
+        Ok(symbol)
     }
 
     /// Lookup a symbol from a qualified name.
@@ -316,75 +394,6 @@ impl EvalContext {
 
         // get symbol from symbol map
         self.symbols.search(name)
-    }
-
-    /// Lookup for local or global symbol.
-    ///
-    /// - looks in local stack
-    /// - looks in symbol map
-    /// - follows aliases (use statements)
-    /// - detect any ambiguity
-    ///
-    /// # Arguments
-    /// - `name`: Name of the symbol to look for
-    pub fn lookup(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
-        debug!("Lookup {name}");
-        let local = if let Some(id) = name.single_identifier() {
-            self.local_stack.fetch(id)
-        } else {
-            // split name
-            let (id, mut name_rest) = name.split_first();
-            // find a local by split id
-            if let Ok(local) = self.local_stack.fetch(&id) {
-                // get original name from the local symbol
-                let mut alias_name = local.borrow().full_name();
-                // concat split name rest to new namespace name
-                alias_name.append(&mut name_rest);
-                log::trace!("Following alias {alias_name}");
-                // lookup this new name
-                self.lookup(&alias_name)
-            } else {
-                Err(EvalError::SymbolNotFound(name.clone()))
-            }
-        };
-        // search for global symbol too
-        let global = self.symbols.search(name);
-
-        // search for global symbol with prefixing current namespace
-        let current = {
-            self.symbols
-                .search(&name.with_prefix(&self.current_namespace()))
-        };
-
-        // collect all found nodes
-        let found = [local, global, current];
-        let found: Vec<_> = found.into_iter().filter_map(Result::ok).collect();
-
-        // Check for ambiguity
-        if found.len() > 1 {
-            return Err(EvalError::AmbiguousSymbol {
-                ambiguous: name.clone(),
-                others: found
-                    .iter()
-                    .map(|symbol| symbol.borrow().full_name().clone())
-                    .collect(),
-            });
-        };
-
-        // check if we found any node
-        let symbol = match found.first() {
-            Some(symbol) => symbol,
-            _ => return Err(EvalError::SymbolNotFound(name.clone())),
-        };
-
-        // execute alias from any use statement
-        let def = &symbol.borrow().def;
-        if let SymbolDefinition::Alias(_, name) = def {
-            trace!("Found alias => {name}");
-            return self.lookup(name);
-        }
-
-        Ok(symbol.clone())
     }
 
     /// Access diagnostic handler.
