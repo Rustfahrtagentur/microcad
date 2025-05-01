@@ -24,8 +24,10 @@ impl SourceCache {
     /// Create new source register.
     pub fn new(root: Rc<SourceFile>, search_paths: &[std::path::PathBuf]) -> Self {
         let externals = Externals::new(search_paths);
+
         let mut by_hash = std::collections::HashMap::new();
         by_hash.insert(root.hash, 0);
+
         let mut by_name = std::collections::HashMap::new();
         by_name.insert(
             QualifiedName::try_from(
@@ -38,6 +40,7 @@ impl SourceCache {
             .unwrap_or(Identifier::default().into()),
             0,
         );
+
         let mut by_path = std::collections::HashMap::new();
         by_path.insert(root.filename.clone(), 0);
         Self {

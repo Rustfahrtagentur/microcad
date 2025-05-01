@@ -1,7 +1,9 @@
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 mod local_frame;
 mod local_stack;
 mod source_cache;
-mod source_file;
 mod symbol_table;
 
 pub use local_frame::*;
