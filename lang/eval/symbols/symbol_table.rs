@@ -210,6 +210,7 @@ impl Symbols for SymbolTable {
     }
 
     fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
+        // TODO: look up the stack for known locals?
         if let Some(id) = name.single_identifier() {
             if let Ok(symbol) = self.local_stack.fetch(id) {
                 if let SymbolDefinition::Constant(_, value) = &symbol.borrow().def {

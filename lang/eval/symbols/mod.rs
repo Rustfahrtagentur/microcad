@@ -11,15 +11,13 @@ use crate::{eval::*, syntax::*};
 
 /// Trait to handle symbol table
 pub trait Symbols {
-    /// Lookup for local or global symbol.
+    /// Lookup for local or global symbol by qualified name.
     ///
     /// - looks in local stack
     /// - looks in symbol map
     /// - follows aliases (use statements)
     /// - detect any ambiguity
-    ///
-    /// # Arguments
-    /// - `name`: Name of the symbol to look for
+    /// - loads external files
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut>;
 
     /// Add a named local value to current locals.
@@ -49,7 +47,5 @@ pub trait Symbols {
     fn close(&mut self);
 
     /// Fetch a value from locals.
-    ///
-    /// TODO: look up the stack for know locals?
     fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value>;
 }
