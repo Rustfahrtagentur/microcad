@@ -3,10 +3,12 @@
 
 //! Builtin print method
 
-use microcad_lang::{eval::*, resolve::*, value::*};
+use microcad_lang::{eval::*, resolve::*, syntax::*, value::*};
+use std::str::FromStr;
 
 pub fn print() -> SymbolNodeRcMut {
-    SymbolNode::new_builtin_fn("print".into(), &|args, context| {
+    let id = Identifier::from_str("print").expect("valid id");
+    SymbolNode::new_builtin_fn(id, &|args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
             let value = arg.value.eval(context)?;
             context.print(format!("{value}"));

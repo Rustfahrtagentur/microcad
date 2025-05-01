@@ -6,7 +6,8 @@ use std::str::FromStr;
 
 // Absolute value abs(x)
 fn abs() -> SymbolNodeRcMut {
-    SymbolNode::new_builtin_fn("abs".into(), &|args, ctx| {
+    let id = Identifier::from_str("abs").expect("valid id");
+    SymbolNode::new_builtin_fn(id, &|args, ctx| {
         let arg = args.get_single()?;
         Ok(match arg.value.eval(ctx)? {
             Value::Integer(i) => Value::Integer(Refer::new(i.abs(), arg.src_ref())),

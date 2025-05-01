@@ -1,4 +1,4 @@
-use crate::{eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*, Id};
+use crate::{eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
 use log::*;
 
@@ -28,7 +28,7 @@ impl SymbolNode {
     }
 
     /// Create a symbol node of a built-in function.
-    pub fn new_builtin_fn(id: Id, f: &'static BuiltinFunctionFn) -> SymbolNodeRcMut {
+    pub fn new_builtin_fn(id: Identifier, f: &'static BuiltinFunctionFn) -> SymbolNodeRcMut {
         SymbolNode::new(
             SymbolDefinition::BuiltinFunction(BuiltinFunction::new(id, f)),
             None,

@@ -1,12 +1,15 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use std::str::FromStr;
+
 #[cfg(test)]
 use crate::builtin_namespace;
 use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 pub fn assert() -> SymbolNodeRcMut {
-    SymbolNode::new_builtin_fn("assert".into(), &|args, context| {
+    let id = Identifier::from_str("assert").expect("valid id");
+    SymbolNode::new_builtin_fn(id, &|args, context| {
         if let Ok(arg) = args.get_single() {
             if !arg.eval_bool(context)? {
                 context.error(arg.src_ref(), EvalError::AssertionFailed(format!("{arg}")))?;
@@ -26,7 +29,8 @@ pub fn assert() -> SymbolNodeRcMut {
 }
 
 pub fn assert_valid() -> SymbolNodeRcMut {
-    SymbolNode::new_builtin_fn("assert_valid".into(), &|args, context| {
+    let id = Identifier::from_str("assert_valid").expect("valid id");
+    SymbolNode::new_builtin_fn(id, &|args, context| {
         if let Ok(name) = args.get_single() {
             let name = QualifiedName::try_from(name.value.to_string())?;
             if let Err(err) = context.lookup(&name) {
@@ -38,7 +42,8 @@ pub fn assert_valid() -> SymbolNodeRcMut {
 }
 
 pub fn assert_invalid() -> SymbolNodeRcMut {
-    SymbolNode::new_builtin_fn("assert_invalid".into(), &|args, context| {
+    let id = Identifier::from_str("assert_invalid").expect("valid id");
+    SymbolNode::new_builtin_fn(id, &|args, context| {
         if let Ok(name) = args.get_single() {
             let name = QualifiedName::try_from(name.value.to_string())?;
             if let Err(err) = context.lookup(&name) {
