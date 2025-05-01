@@ -18,6 +18,8 @@ pub fn print() -> SymbolNodeRcMut {
 
 #[test]
 fn assert_ok() {
+    microcad_lang::env_logger_init();
+
     let mut context = EvalContext::from_source(
         "../tests/test_cases/print.µcad",
         crate::builtin_namespace(),

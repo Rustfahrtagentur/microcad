@@ -43,6 +43,8 @@ fn named_tuple_type() {
     use crate::parser::*;
     use crate::ty::Ty;
 
+    crate::env_logger_init();
+
     let type_annotation =
         Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(x: Int, y: String)", 0)
             .expect("test error");

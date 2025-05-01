@@ -7,6 +7,8 @@ use microcad_lang::{eval::*, sym::*};
 
 #[test]
 fn context_namespace() {
+    microcad_lang::env_logger_init();
+
     use microcad_lang::src_ref::*;
 
     let mut context = EvalContext::default();
@@ -29,6 +31,8 @@ fn context_namespace() {
 
 #[test]
 fn test_assert() {
+    microcad_lang::env_logger_init();
+
     use microcad_lang::parse::source_file::SourceFile;
 
     let source_file = match SourceFile::load_from_str(

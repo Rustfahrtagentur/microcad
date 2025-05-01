@@ -2,6 +2,8 @@ use microcad_lang::{eval::*, syntax::*};
 
 #[test]
 fn use_statements() {
+    microcad_lang::env_logger_init();
+
     let input: std::path::PathBuf = "test_cases/use/use_test.µcad".into();
     let mut context = EvalContext::new(
         SourceFile::load(input).expect("file {input}").resolve(None),

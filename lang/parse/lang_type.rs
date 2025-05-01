@@ -79,6 +79,9 @@ impl TryFrom<Type> for MapKeyType {
 fn list_type() {
     use crate::parser::{Parser, Rule};
     use crate::ty::Ty;
+
+    crate::env_logger_init();
+
     let type_annotation =
         Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[Int]", 0).expect("test error");
     assert_eq!(type_annotation.ty().to_string(), "[Int]");
@@ -92,6 +95,8 @@ fn list_type() {
 fn unnamed_tuple_type() {
     use crate::parser::*;
     use crate::ty::Ty;
+
+    crate::env_logger_init();
 
     let type_annotation =
         Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(Int, String)", 0).expect("test error");

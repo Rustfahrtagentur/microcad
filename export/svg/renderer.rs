@@ -257,6 +257,8 @@ impl geo2d::Renderer for SvgRenderer {
 
 #[test]
 fn svg_write() {
+    microcad_lang::env_logger_init();
+
     // Write to file test.svg
     let file = std::fs::File::create("svg_write.svg").expect("test error");
 

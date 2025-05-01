@@ -184,27 +184,27 @@ impl std::ops::Deref for Externals {
 
 #[test]
 fn resolve_external_file() {
+    crate::env_logger_init();
+
     let externals = Externals::new(&["../lib".into()]);
 
     assert!(!externals.is_empty());
 
     log::trace!("{externals}");
 
-    assert!(
-        externals
-            .fetch_external(&"std::geo2d::circle".into())
-            .is_ok()
-    );
+    assert!(externals
+        .fetch_external(&"std::geo2d::circle".into())
+        .is_ok());
 
-    assert!(
-        externals
-            .fetch_external(&"non_std::geo2d::circle".into())
-            .is_err()
-    );
+    assert!(externals
+        .fetch_external(&"non_std::geo2d::circle".into())
+        .is_err());
 }
 
 #[test]
 fn create_namespaces() {
+    crate::env_logger_init();
+
     let externals = Externals::new(&["../lib".into()]);
 
     assert!(!externals.is_empty());

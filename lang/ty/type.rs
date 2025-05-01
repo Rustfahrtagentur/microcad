@@ -109,6 +109,8 @@ impl std::fmt::Display for Type {
 fn builtin_type() {
     use crate::parser::*;
 
+    crate::env_logger_init();
+
     let ty = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "Int", 0).expect("test error");
     assert_eq!(ty.0.to_string(), "Int");
     assert_eq!(ty.0.value, Type::Integer);

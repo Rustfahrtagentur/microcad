@@ -11,7 +11,7 @@ pub use qualified_name::*;
 
 #[cfg(not(test))]
 use crate::parse::*;
-use crate::{Id, src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*, Id};
 
 /// µcad identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -104,6 +104,8 @@ pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
 fn identifier_comparison() {
     use crate::syntax::*;
 
+    crate::env_logger_init();
+
     // same id but different src refs
     let id1 = Identifier(Refer::none("x".into()));
     let id2 = Identifier(Refer::new("x".into(), SrcRef::new(0..5, 0, 1, 1)));
@@ -116,6 +118,8 @@ fn identifier_comparison() {
 fn identifier_hash() {
     use crate::syntax::*;
     use std::hash::{Hash, Hasher};
+
+    crate::env_logger_init();
 
     // same id but different src refs
     let id1 = Identifier(Refer::none("x".into()));

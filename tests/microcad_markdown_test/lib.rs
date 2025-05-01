@@ -29,6 +29,8 @@ macro_rules! warning {
 
 #[test]
 fn md_tests() {
+    env_logger::init();
+
     println!("Generating Markdown Tests...");
     std::env::set_var("OUT_DIR", "../../target");
     generate("..").unwrap();

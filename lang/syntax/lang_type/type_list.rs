@@ -47,6 +47,8 @@ impl std::fmt::Display for TypeList {
 
 #[test]
 fn test_common_type() {
+    crate::env_logger_init();
+
     let list = TypeList::new(vec![Type::Integer, Type::Integer]);
     assert_eq!(Some(Type::Integer), list.common_type());
 

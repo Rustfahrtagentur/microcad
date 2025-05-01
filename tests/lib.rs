@@ -30,11 +30,13 @@ fn evaluate_file(filename: &str) -> microcad_lang::eval::EvalContext {
 
 #[test]
 fn namespaces() {
+    microcad_lang::env_logger_init();
     assert!(evaluate_file("syntax/namespace.µcad").eval().is_ok());
 }
 
 #[test]
 fn scopes() {
+    microcad_lang::env_logger_init();
     assert!(evaluate_file("../tests/test_cases/syntax/scopes.µcad")
         .eval()
         .is_ok());
@@ -42,6 +44,7 @@ fn scopes() {
 
 #[test]
 fn context_with_symbols() {
+    microcad_lang::env_logger_init();
     let mut context = evaluate_file("../tests/test_cases/syntax/call.µcad");
 
     context

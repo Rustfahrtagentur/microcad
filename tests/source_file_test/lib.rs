@@ -109,6 +109,7 @@ fn generate_source_file_test_code(output: &mut String, file_path: &std::path::Pa
 
 #[test]
 fn generate_source_file_tests() {
+    env_logger::init();
     std::env::set_var("OUT_DIR", "../../target");
     generate("../test_cases").unwrap();
 }

@@ -178,6 +178,8 @@ impl From<Pair<'_>> for SrcRef {
 
 #[test]
 fn test_src_ref() {
+    crate::env_logger_init();
+
     let input = "geo3d::cube(size_x = 3.0, size_y = 3.0, size_z = 3.0);";
 
     let cube = 7..11;

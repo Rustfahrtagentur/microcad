@@ -3,8 +3,7 @@
 
 #[cfg(test)]
 use crate::builtin_namespace;
-use microcad_lang::syntax::*;
-use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, value::*};
+use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 pub fn assert() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn("assert".into(), &|args, context| {
@@ -52,6 +51,8 @@ pub fn assert_invalid() -> SymbolNodeRcMut {
 
 #[test]
 fn assert_ok() {
+    microcad_lang::env_logger_init();
+
     let mut context = EvalContext::from_source(
         "../tests/test_cases/syntax/assert_ok.µcad",
         builtin_namespace(),
