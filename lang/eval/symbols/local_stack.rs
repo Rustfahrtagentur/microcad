@@ -112,7 +112,7 @@ impl LocalStack {
     }
 
     /// get name of current namespace
-    pub fn current_namspace(&self) -> QualifiedName {
+    pub fn current_namespace(&self) -> QualifiedName {
         QualifiedName(self.0.iter().filter_map(|locals| locals.id()).collect())
     }
 }
@@ -153,7 +153,7 @@ fn local_stack() {
     };
 
     stack.open_source("test".into());
-    assert!(stack.current_namspace() == "test".into());
+    assert!(stack.current_namespace() == "test".into());
 
     assert!(stack.add(None, make_int("a".into(), 1)).is_ok());
 
@@ -164,7 +164,7 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     stack.open_scope();
-    assert!(stack.current_namspace() == "test".into());
+    assert!(stack.current_namespace() == "test".into());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
@@ -184,12 +184,12 @@ fn local_stack() {
     assert!(fetch_int(&stack, "x").unwrap() == 3);
 
     stack.close();
-    assert!(stack.current_namspace() == "test".into());
+    assert!(stack.current_namespace() == "test".into());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
 
     stack.close();
-    assert!(stack.current_namspace().is_empty());
+    assert!(stack.current_namespace().is_empty());
 }

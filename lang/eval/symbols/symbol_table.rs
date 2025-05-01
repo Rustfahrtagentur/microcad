@@ -145,7 +145,7 @@ impl Symbols for SymbolTable {
         let found: Vec<_> = [
             self.lookup_local(name),
             self.lookup_global(name),
-            self.lookup_global(&name.with_prefix(&self.local_stack.current_namspace())),
+            self.lookup_global(&name.with_prefix(&self.local_stack.current_namespace())),
         ]
         .into_iter()
         .filter_map(Result::ok)
@@ -189,14 +189,14 @@ impl Symbols for SymbolTable {
 
     fn open_namespace(&mut self, id: Identifier) {
         self.local_stack.open_namespace(id);
-        log::trace!("open namespace -> {}", self.local_stack.current_namspace());
+        log::trace!("open namespace -> {}", self.local_stack.current_namespace());
     }
 
     fn open_module(&mut self, id: Identifier) {
         self.local_stack.open_module(id);
         log::trace!(
             "closed namespace -> {}",
-            self.local_stack.current_namspace()
+            self.local_stack.current_namespace()
         );
     }
 
@@ -206,7 +206,7 @@ impl Symbols for SymbolTable {
 
     fn close(&mut self) {
         self.local_stack.close();
-        log::trace!("closed -> {}", self.local_stack.current_namspace());
+        log::trace!("closed -> {}", self.local_stack.current_namespace());
     }
 
     fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
@@ -277,7 +277,7 @@ impl std::fmt::Display for SymbolTable {
             f,
             "Loaded files:\n{files}\nLocals [{name}]:\n{locals}\nSymbols:\n{symbols}",
             files = self.source_cache,
-            name = self.local_stack.current_namspace(),
+            name = self.local_stack.current_namespace(),
             locals = self.local_stack,
             symbols = self.global_map
         )
