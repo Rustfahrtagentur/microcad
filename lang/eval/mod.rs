@@ -42,6 +42,7 @@ mod identifier;
 mod literal;
 mod output;
 mod parameter;
+mod source_file;
 mod statement;
 mod symbols;
 mod r#use;
