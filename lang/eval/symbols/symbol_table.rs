@@ -8,11 +8,11 @@ pub struct SymbolTable {
     /// Root symbol (symbol node of initially read source file)
     pub root: SymbolNodeRcMut,
     /// List of all global symbols.
-    global_map: SymbolMap,
+    globals: SymbolMap,
     /// Stack of currently opened scopes with local symbols while evaluation.
-    local_stack: LocalStack,
+    locals: LocalStack,
     /// Source file cache containing all source files loaded in the context and their syntax trees.
-    pub source_cache: SourceCache,
+    cache: SourceCache,
 }
 
 impl SymbolTable {
@@ -35,48 +35,49 @@ impl SymbolTable {
         };
 
         // prepare symbol map
-        let mut symbols = SymbolMap::new();
-
-        symbols.insert_node(builtin);
+        let mut globals = SymbolMap::new();
+        globals.insert_node(root.clone());
+        globals.insert_node(builtin);
 
         // create namespaces for all files in search paths into symbol map
-        let namespaces = source_cache.create_namespaces();
-        namespaces.iter().for_each(|(_, namespace)| {
-            symbols.insert_node(namespace.clone());
-        });
+        source_cache
+            .create_namespaces()
+            .iter()
+            .for_each(|(_, namespace)| {
+                globals.insert_node(namespace.clone());
+            });
 
-        // insert root file into symbol map
-        symbols.insert_node(root.clone());
-        log::trace!("Symbols:\n{symbols}");
-        Self {
+        let context = Self {
             root,
-            global_map: symbols,
-            local_stack: Default::default(),
-            source_cache,
-        }
+            globals,
+            locals: Default::default(),
+            cache: source_cache,
+        };
+        log::trace!("Initial context:\n{context}");
+        context
     }
 
     /// Fetch global symbol from symbol map (for testing only).
     #[cfg(test)]
     pub fn fetch_global(&self, qualified_name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
-        self.global_map.search(&qualified_name.clone())
+        self.globals.search(&qualified_name.clone())
     }
 
     /// Fetch local variable from local stack (for testing only).
     #[cfg(test)]
     pub fn fetch_local(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut> {
-        self.local_stack.fetch(id)
+        self.locals.fetch(id)
     }
 
     /// lookup a symbol from local stack
     fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         if let Some(id) = name.single_identifier() {
-            self.local_stack.fetch(id)
+            self.locals.fetch(id)
         } else {
             // split name
             let (id, mut tail) = name.split_first();
             // find a local by split id
-            if let Ok(local) = self.local_stack.fetch(&id) {
+            if let Ok(local) = self.locals.fetch(&id) {
                 // get original name from the local symbol
                 let mut alias = local.borrow().full_name();
                 // concat split name rest to new namespace name
@@ -93,7 +94,7 @@ impl SymbolTable {
     /// lookup a symbol from global symbols
     fn lookup_global(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         // check if symbol is already available
-        let symbol = match self.global_map.search(name) {
+        let symbol = match self.globals.search(name) {
             Ok(symbol) => symbol.clone(),
             // load symbol
             _ => self.load_symbol(name)?,
@@ -111,16 +112,16 @@ impl SymbolTable {
         log::debug!("loading symbol {name}");
 
         // if symbol could not be found in symbol tree, try to load it from external file
-        match self.source_cache.get_by_name(name) {
+        match self.cache.get_by_name(name) {
             Err(EvalError::SymbolMustBeLoaded(_, path)) => {
                 // load source file
                 let source_file = SourceFile::load(path.clone())?;
                 // add to source cache
-                let source_name = self.source_cache.insert(source_file.clone())?;
+                let source_name = self.cache.insert(source_file.clone())?;
                 // resolve source file
                 let node = source_file.resolve(None);
                 // search namespace to place loaded source file into
-                let target = self.global_map.search(&source_name)?;
+                let target = self.globals.search(&source_name)?;
                 // copy children into target namespace
                 SymbolNode::move_children(&target, &node);
                 // mark target as "loaded" by changing the SymbolDefinition type
@@ -133,7 +134,7 @@ impl SymbolTable {
         }
 
         // get symbol from symbol map
-        self.global_map.search(name)
+        self.globals.search(name)
     }
 }
 
@@ -145,7 +146,7 @@ impl Symbols for SymbolTable {
         let found: Vec<_> = [
             self.lookup_local(name),
             self.lookup_global(name),
-            self.lookup_global(&name.with_prefix(&self.local_stack.current_namespace())),
+            self.lookup_global(&name.with_prefix(&self.locals.current_namespace())),
         ]
         .into_iter()
         .filter_map(Result::ok)
@@ -179,47 +180,43 @@ impl Symbols for SymbolTable {
     }
 
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        self.local_stack
-            .add(None, SymbolNode::new_constant(id, value))
+        self.locals.add(None, SymbolNode::new_constant(id, value))
     }
 
     fn open_source(&mut self, id: Identifier) {
-        self.local_stack.open_source(id);
+        self.locals.open_source(id);
     }
 
     fn open_namespace(&mut self, id: Identifier) {
-        self.local_stack.open_namespace(id);
-        log::trace!("open namespace -> {}", self.local_stack.current_namespace());
+        self.locals.open_namespace(id);
+        log::trace!("open namespace -> {}", self.locals.current_namespace());
     }
 
     fn open_module(&mut self, id: Identifier) {
-        self.local_stack.open_module(id);
-        log::trace!(
-            "closed namespace -> {}",
-            self.local_stack.current_namespace()
-        );
+        self.locals.open_module(id);
+        log::trace!("closed namespace -> {}", self.locals.current_namespace());
     }
 
     fn open_scope(&mut self) {
-        self.local_stack.open_scope();
+        self.locals.open_scope();
     }
 
     fn close(&mut self) {
-        self.local_stack.close();
-        log::trace!("closed -> {}", self.local_stack.current_namespace());
+        self.locals.close();
+        log::trace!("closed -> {}", self.locals.current_namespace());
     }
 
     fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
         // TODO: look up the stack for known locals?
         if let Some(id) = name.single_identifier() {
-            if let Ok(symbol) = self.local_stack.fetch(id) {
+            if let Ok(symbol) = self.locals.fetch(id) {
                 if let SymbolDefinition::Constant(_, value) = &symbol.borrow().def {
                     log::debug!("Fetching local value {name}");
                     return Ok(value.clone());
                 }
             }
         }
-        match &self.global_map.search(name)?.borrow().def {
+        match &self.globals.search(name)?.borrow().def {
             SymbolDefinition::Constant(_, value) => {
                 log::debug!("Fetching global value {name}");
                 Ok(value.clone())
@@ -240,15 +237,15 @@ impl UseSymbol for SymbolTable {
         // check if symbol is already available
         let symbol = self.lookup(name)?;
         // add found/load symbol to locals
-        self.local_stack.add(id, symbol.clone())?;
-        log::trace!("Local Stack:\n{}", self.local_stack);
+        self.locals.add(id, symbol.clone())?;
+        log::trace!("Local Stack:\n{}", self.locals);
         Ok(symbol)
     }
 
     fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         log::debug!("Using all symbols in {name}");
         // search symbol
-        let symbol = match self.global_map.search(name) {
+        let symbol = match self.globals.search(name) {
             Ok(symbol) => {
                 //  load external file if symbol was not loaded before
                 let ext = symbol.borrow().is_external();
@@ -263,9 +260,9 @@ impl UseSymbol for SymbolTable {
             Err(EvalError::NoSymbolsFound(symbol.borrow().full_name()))
         } else {
             for (id, symbol) in symbol.borrow().children.iter() {
-                self.local_stack.add(Some(id.clone()), symbol.clone())?;
+                self.locals.add(Some(id.clone()), symbol.clone())?;
             }
-            log::trace!("Local Stack:\n{}", self.local_stack);
+            log::trace!("Local Stack:\n{}", self.locals);
             Ok(symbol)
         }
     }
@@ -276,16 +273,16 @@ impl std::fmt::Display for SymbolTable {
         write!(
             f,
             "Loaded files:\n{files}\nLocals [{name}]:\n{locals}\nSymbols:\n{symbols}",
-            files = self.source_cache,
-            name = self.local_stack.current_namespace(),
-            locals = self.local_stack,
-            symbols = self.global_map
+            files = self.cache,
+            name = self.locals.current_namespace(),
+            locals = self.locals,
+            symbols = self.globals
         )
     }
 }
 
 impl GetSourceByHash for SymbolTable {
     fn get_by_hash(&self, hash: u64) -> EvalResult<std::rc::Rc<SourceFile>> {
-        self.source_cache.get_by_hash(hash)
+        self.cache.get_by_hash(hash)
     }
 }

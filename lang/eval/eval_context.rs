@@ -72,7 +72,7 @@ impl EvalContext {
         search_paths: &[std::path::PathBuf],
     ) -> EvalResult<Self> {
         Ok(Self::new(
-            SymbolNode::new(SymbolDefinition::SourceFile(SourceFile::load(root)?), None),
+            SymbolNode::new_source(SourceFile::load(root)?),
             builtin,
             search_paths,
             Box::new(Stdout),
@@ -82,16 +82,16 @@ impl EvalContext {
     /// Create a new context from a source file and capture output (see [`Self::output`]).
     ///
     /// # Arguments
-    /// - `source_file`: Resolved root source file.
+    /// - `root`: Resolved root source file.
     /// - `builtin`: The builtin library
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
     pub fn from_source_captured(
-        source_file: Rc<SourceFile>,
+        root: Rc<SourceFile>,
         builtin: SymbolNodeRcMut,
         search_paths: &[std::path::PathBuf],
     ) -> Self {
         Self::new(
-            SymbolNode::new(SymbolDefinition::SourceFile(source_file), None),
+            SymbolNode::new(SymbolDefinition::SourceFile(root), None),
             builtin,
             search_paths,
             Box::new(Capture::new()),
@@ -250,7 +250,7 @@ impl PushDiag for EvalContext {
 
 impl GetSourceByHash for EvalContext {
     fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
-        self.symbol_table.source_cache.get_by_hash(hash)
+        self.symbol_table.get_by_hash(hash)
     }
 }
 

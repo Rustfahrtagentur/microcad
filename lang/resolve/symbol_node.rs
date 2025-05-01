@@ -18,6 +18,14 @@ pub struct SymbolNode {
 pub type SymbolNodeRcMut = RcMut<SymbolNode>;
 
 impl SymbolNode {
+    /// Create a symbol node for a source file.
+    ///
+    /// # Arguments
+    /// - `source_file`: Resolved source file.
+    pub fn new_source(source_file: Rc<SourceFile>) -> SymbolNodeRcMut {
+        SymbolNode::new(SymbolDefinition::SourceFile(source_file), None)
+    }
+
     /// Create new reference counted symbol node.
     pub fn new(def: SymbolDefinition, parent: Option<SymbolNodeRcMut>) -> SymbolNodeRcMut {
         RcMut::new(SymbolNode {
