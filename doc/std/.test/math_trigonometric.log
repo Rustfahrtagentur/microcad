@@ -1,4 +1,4 @@
-error: No symbol found to use in std::math
+error: No symbols found to use in std::math
   ---> <from_str>:2:5
      |
    2 | use std::math::*;

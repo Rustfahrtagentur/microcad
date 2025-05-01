@@ -1,7 +1,1 @@
-error: Symbol std::math::abs not found.
-  ---> <from_str>:18:5
-     |
-  18 | x = std::math::abs(-1) * std::math::pi;
-     |     ^^^^^^^^^^^^^^^^^^
-     |
-Symbol std::math::pi not found.
+Symbol does not contain a value: std::math::pi

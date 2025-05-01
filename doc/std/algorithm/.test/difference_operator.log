@@ -1,12 +1,18 @@
-error: Symbol std::geo2d::circle not found.
-  ---> <from_str>:1:1
+error: Symbol __builtin::geo2d::circle not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:19:5
      |
-   1 | std::geo2d::circle(radius = 3mm) - std::geo2d::rect(width = 3mm, height = 2mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  19 |     __builtin::geo2d::circle(radius / 1mm);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol std::geo2d::rect not found.
-  ---> <from_str>:1:36
+error: Symbol __builtin::geo2d::rect not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:39:5
      |
-   1 | std::geo2d::circle(radius = 3mm) - std::geo2d::rect(width = 3mm, height = 2mm);
-     |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  39 |     __builtin::geo2d::rect(
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
+Value Error: Invalid operator: Multiplicity [
+Object
+,]
+ - Multiplicity [
+Object
+,]
