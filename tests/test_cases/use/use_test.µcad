@@ -26,7 +26,7 @@ print("Hello");
 // public use algorithm from `std/module.µcad`
 pub use std::algorithm;
 assert_valid(algorithm);
-assert_valid(use_statement_test::algorithm);
+assert_valid(use_test::algorithm);
 
 module my_module() {
     circle(radius=1);
