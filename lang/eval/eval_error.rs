@@ -37,10 +37,6 @@ pub enum EvalError {
     #[error("Invalid type: {0}")]
     InvalidType(Type),
 
-    /// Invalid type
-    #[error("Invalid type: {0}")]
-    InvalidI(Type),
-
     /// List index out of bounds
     #[error("List index out of bounds: {index} >= {len}")]
     ListIndexOutOfBounds {

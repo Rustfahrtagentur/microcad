@@ -9,9 +9,7 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-#[cfg(not(test))]
-use crate::parse::*;
-use crate::{src_ref::*, syntax::*, Id};
+use crate::{parse::*, src_ref::*, syntax::*, Id};
 
 /// µcad identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -32,6 +30,15 @@ impl Identifier {
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
+
+    /// check if this is a valid identifier (contains only `A`-`Z`, `a`-`z` or `_`)
+    pub fn validate(self) -> ParseResult<Self> {
+        if self.0.chars().all(|c| c.is_ascii_alphabetic() || c == '_') {
+            Ok(self)
+        } else {
+            Err(ParseError::InvalidIdentifier(self.to_string()))
+        }
+    }
 }
 
 impl SrcReferrer for Identifier {
@@ -43,6 +50,14 @@ impl SrcReferrer for Identifier {
 impl std::hash::Hash for Identifier {
     fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
         self.0.hash(hasher)
+    }
+}
+
+impl std::str::FromStr for Identifier {
+    type Err = crate::eval::EvalError;
+
+    fn from_str(id: &str) -> Result<Self, Self::Err> {
+        Ok(Identifier(Refer::none(id.into())).validate()?)
     }
 }
 
