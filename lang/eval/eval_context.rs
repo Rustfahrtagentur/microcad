@@ -167,11 +167,7 @@ impl EvalContext {
     }
 }
 
-impl Symbols for EvalContext {
-    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
-        self.symbol_table.lookup(name)
-    }
-
+impl Locals for EvalContext {
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
         self.symbol_table.add_local_value(id, value)
     }
@@ -194,6 +190,12 @@ impl Symbols for EvalContext {
 
     fn close(&mut self) {
         self.symbol_table.close();
+    }
+}
+
+impl Symbols for EvalContext {
+    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+        self.symbol_table.lookup(name)
     }
 
     fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {

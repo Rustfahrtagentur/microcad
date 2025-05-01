@@ -74,16 +74,11 @@ impl SymbolTable {
         if let Some(id) = name.single_identifier() {
             self.locals.fetch(id)
         } else {
-            // split name
             let (id, mut tail) = name.split_first();
-            // find a local by split id
             if let Ok(local) = self.locals.fetch(&id) {
-                // get original name from the local symbol
                 let mut alias = local.borrow().full_name();
-                // concat split name rest to new namespace name
                 alias.append(&mut tail);
                 log::trace!("Following alias {alias}");
-                // lookup this new name
                 self.lookup(&alias)
             } else {
                 Err(EvalError::SymbolNotFound(name.clone()))
@@ -93,10 +88,8 @@ impl SymbolTable {
 
     /// lookup a symbol from global symbols
     fn lookup_global(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
-        // check if symbol is already available
         let symbol = match self.globals.search(name) {
             Ok(symbol) => symbol.clone(),
-            // load symbol
             _ => self.load_symbol(name)?,
         };
         Ok(symbol)
@@ -114,15 +107,11 @@ impl SymbolTable {
         // if symbol could not be found in symbol tree, try to load it from external file
         match self.cache.get_by_name(name) {
             Err(EvalError::SymbolMustBeLoaded(_, path)) => {
-                // load source file
                 let source_file = SourceFile::load(path.clone())?;
-                // add to source cache
                 let source_name = self.cache.insert(source_file.clone())?;
-                // resolve source file
                 let node = source_file.resolve(None);
                 // search namespace to place loaded source file into
                 let target = self.globals.search(&source_name)?;
-                // copy children into target namespace
                 SymbolNode::move_children(&target, &node);
                 // mark target as "loaded" by changing the SymbolDefinition type
                 target.borrow_mut().external_to_namespace();
@@ -179,10 +168,28 @@ impl Symbols for SymbolTable {
         Ok(symbol.clone())
     }
 
-    fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        self.locals.add(None, SymbolNode::new_constant(id, value))
-    }
+    fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
+        // TODO: look up the stack for known locals?
+        if let Some(id) = name.single_identifier() {
+            if let Ok(symbol) = self.locals.fetch(id) {
+                if let SymbolDefinition::Constant(_, value) = &symbol.borrow().def {
+                    log::debug!("Fetching local value {name}");
+                    return Ok(value.clone());
+                }
+            }
+        }
+        match &self.globals.search(name)?.borrow().def {
+            SymbolDefinition::Constant(_, value) => {
+                log::debug!("Fetching global value {name}");
+                Ok(value.clone())
+            }
 
+            _ => Err(EvalError::SymbolIsNotAValue(name.clone())),
+        }
+    }
+}
+
+impl Locals for SymbolTable {
     fn open_source(&mut self, id: Identifier) {
         self.locals.open_source(id);
     }
@@ -206,24 +213,8 @@ impl Symbols for SymbolTable {
         log::trace!("closed -> {}", self.locals.current_namespace());
     }
 
-    fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
-        // TODO: look up the stack for known locals?
-        if let Some(id) = name.single_identifier() {
-            if let Ok(symbol) = self.locals.fetch(id) {
-                if let SymbolDefinition::Constant(_, value) = &symbol.borrow().def {
-                    log::debug!("Fetching local value {name}");
-                    return Ok(value.clone());
-                }
-            }
-        }
-        match &self.globals.search(name)?.borrow().def {
-            SymbolDefinition::Constant(_, value) => {
-                log::debug!("Fetching global value {name}");
-                Ok(value.clone())
-            }
-
-            _ => Err(EvalError::SymbolIsNotAValue(name.clone())),
-        }
+    fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
+        self.locals.add_local_value(id, value)
     }
 }
 
@@ -234,17 +225,17 @@ impl UseSymbol for SymbolTable {
         id: Option<Identifier>,
     ) -> EvalResult<SymbolNodeRcMut> {
         log::debug!("Using symbol {name}");
-        // check if symbol is already available
+
         let symbol = self.lookup(name)?;
-        // add found/load symbol to locals
         self.locals.add(id, symbol.clone())?;
         log::trace!("Local Stack:\n{}", self.locals);
+
         Ok(symbol)
     }
 
     fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         log::debug!("Using all symbols in {name}");
-        // search symbol
+
         let symbol = match self.globals.search(name) {
             Ok(symbol) => {
                 //  load external file if symbol was not loaded before
@@ -256,6 +247,7 @@ impl UseSymbol for SymbolTable {
             }
             _ => self.load_symbol(name)?,
         };
+
         if symbol.borrow().children.is_empty() {
             Err(EvalError::NoSymbolsFound(symbol.borrow().full_name()))
         } else {

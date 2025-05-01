@@ -2,75 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{eval::*, resolve::*};
-use log::debug;
 use std::collections::BTreeMap;
-
-/// A stack frame is map of local variables.
-enum Locals {
-    Source(Identifier, BTreeMap<Identifier, SymbolNodeRcMut>),
-    Namespace(Identifier),
-    Module(Identifier),
-    Scope(BTreeMap<Identifier, SymbolNodeRcMut>),
-}
-
-impl Locals {
-    /// Get identifier if available or panic.
-    pub fn id(&self) -> Option<Identifier> {
-        match self {
-            Locals::Source(id, _) | Locals::Namespace(id) | Locals::Module(id) => Some(id.clone()),
-            _ => None,
-        }
-    }
-
-    fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
-        let (map, depth) = match self {
-            Locals::Source(id, map) => {
-                writeln!(f, "{:depth$}{id} (source):", "")?;
-                (map, depth + 2)
-            }
-            Locals::Namespace(id) => return write!(f, "{:depth$}{id} (namespace)", ""),
-            Locals::Module(id) => return write!(f, "{:depth$}{id} (module)", ""),
-            Locals::Scope(map) => (map, depth),
-        };
-
-        for (id, local) in map.iter() {
-            writeln!(f, "{:depth$}{id} [{}]", "", local.borrow().full_name())?
-        }
-
-        Ok(())
-    }
-}
 
 /// A stack with a list of local variables for each stack frame.
 #[derive(Default)]
-pub struct LocalStack(Vec<Locals>);
+pub struct LocalStack(Vec<LocalFrame>);
 
 impl LocalStack {
-    /// Open a new source (stack push).
-    pub fn open_source(&mut self, id: Identifier) {
-        self.0.push(Locals::Source(id, BTreeMap::new()));
-    }
-
-    /// Open a new scope (stack push).
-    pub fn open_scope(&mut self) {
-        self.0.push(Locals::Scope(BTreeMap::new()));
-    }
-
-    /// Open a new scope (stack push).
-    pub fn open_namespace(&mut self, id: Identifier) {
-        self.0.push(Locals::Namespace(id));
-    }
-
-    /// Open a new scope (stack push).
-    pub fn open_module(&mut self, id: Identifier) {
-        self.0.push(Locals::Module(id));
-    }
-
-    /// Close scope (stack pop).
-    pub fn close(&mut self) {
-        self.0.pop();
-    }
-
     /// Add a new variable to current stack frame.
     pub fn add(&mut self, id: Option<Identifier>, local: SymbolNodeRcMut) -> EvalResult<()> {
         let id = if let Some(id) = id {
@@ -80,13 +18,13 @@ impl LocalStack {
         };
         let name = local.borrow().full_name();
         if name.is_qualified() {
-            debug!("Adding {name} as {id} to local stack");
+            log::debug!("Adding {name} as {id} to local stack");
         } else {
-            debug!("Adding {id} to local stack");
+            log::debug!("Adding {id} to local stack");
         }
 
         match self.0.last_mut() {
-            Some(Locals::Source(_, last)) | Some(Locals::Scope(last)) => {
+            Some(LocalFrame::Source(_, last)) | Some(LocalFrame::Scope(last)) => {
                 last.insert(id.clone(), local);
                 Ok(())
             }
@@ -99,9 +37,9 @@ impl LocalStack {
         // search from inner scope to root scope to shadow outside locals
         for locals in self.0.iter().rev() {
             match locals {
-                Locals::Source(_, locals) | Locals::Scope(locals) => {
+                LocalFrame::Source(_, locals) | LocalFrame::Scope(locals) => {
                     if let Some(local) = locals.get(id) {
-                        debug!("Fetched {id} from locals");
+                        log::debug!("Fetched {id} from locals");
                         return Ok(local.clone());
                     }
                 }
@@ -114,6 +52,37 @@ impl LocalStack {
     /// get name of current namespace
     pub fn current_namespace(&self) -> QualifiedName {
         QualifiedName(self.0.iter().filter_map(|locals| locals.id()).collect())
+    }
+}
+
+impl Locals for LocalStack {
+    /// Open a new source (stack push).
+    fn open_source(&mut self, id: Identifier) {
+        self.0.push(LocalFrame::Source(id, BTreeMap::new()));
+    }
+
+    /// Open a new scope (stack push).
+    fn open_scope(&mut self) {
+        self.0.push(LocalFrame::Scope(BTreeMap::new()));
+    }
+
+    /// Open a new scope (stack push).
+    fn open_namespace(&mut self, id: Identifier) {
+        self.0.push(LocalFrame::Namespace(id));
+    }
+
+    /// Open a new scope (stack push).
+    fn open_module(&mut self, id: Identifier) {
+        self.0.push(LocalFrame::Module(id));
+    }
+
+    /// Close scope (stack pop).
+    fn close(&mut self) {
+        self.0.pop();
+    }
+
+    fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
+        self.add(None, SymbolNode::new_constant(id, value))
     }
 }
 
