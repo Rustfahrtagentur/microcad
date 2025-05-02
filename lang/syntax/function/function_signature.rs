@@ -23,15 +23,6 @@ impl SrcReferrer for FunctionSignature {
 }
 
 impl FunctionSignature {
-    /// Create new function signature
-    pub fn new(parameters: ParameterList, return_type: Option<Type>, src_ref: SrcRef) -> Self {
-        Self {
-            parameters,
-            return_type: return_type.map(|r| TypeAnnotation(Refer::none(r))),
-            src_ref,
-        }
-    }
-
     /// Get parameter by name
     pub fn parameter_by_name(&self, name: &Identifier) -> Option<&Parameter> {
         self.parameters.iter().find(|arg| arg.name == *name)
