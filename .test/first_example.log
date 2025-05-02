@@ -1,0 +1,31 @@
+Volume: <invalid>cm³
+error: Symbol lid not found.
+  ---> <from_str>:19:5
+     |
+  19 | l = lid();
+     |     ^^^^^
+     |
+error: Not implemented: cannot evaluate volume() at <from_str>:22:29
+  ---> <from_str>:22:29
+     |
+  22 | __builtin::print("Volume: {l.volume() / 1000}cm³");
+     |                             ^^^^^^^^^
+     |
+error: Symbol __builtin::export not found.
+  ---> <from_str>:25:1
+     |
+  25 | __builtin::export("lid.stl") l;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item: __builtin::export("lid.stl")
+  ---> <from_str>:25:1
+     |
+  25 | __builtin::export("lid.stl") l;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item: l
+  ---> <from_str>:25:1
+     |
+  25 | __builtin::export("lid.stl") l;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

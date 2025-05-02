@@ -20,8 +20,8 @@ std::debug::assert(std::math::abs(-1) == 1);
 use std::debug::*;
 use std::math::*;
 
-assert(cos(pi) == -1);
-assert(tan(0) == 0);
-//assert(cot(pi/2) == 0);
-//assert(sin(x)^2 + cos(x)^2 == 1);
+assert(cos(pi) == -1.);
+assert(tan(0) == 0.);
+//assert(cot(pi/2) == 0.);
+//assert(sin(x)^2. + cos(x)^2. == 1.);
 ```
