@@ -37,6 +37,6 @@ assert(i == 3);
 
 p = std::math::pi;
 
-q = p > 3;
+q = p > 3.;
 
 assert(q);
