@@ -1,0 +1,12 @@
+error: Not implemented: cannot evaluate difference (builtin module) at <from_str>:3:1
+  ---> <from_str>:3:1
+     |
+   3 | algorithm::difference() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item: algorithm::difference()
+  ---> <from_str>:3:1
+     |
+   3 | algorithm::difference() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+     |

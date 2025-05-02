@@ -85,7 +85,7 @@ impl ModuleDefinition {
             match statement {
                 Statement::Assignment(assignment) => {
                     let id = &assignment.id;
-                    let value = assignment.value.eval(context)?;
+                    let value = assignment.expression.eval(context)?;
                     context.add_local_value(id.clone(), value)?;
                 }
                 Statement::Expression(expression) => {

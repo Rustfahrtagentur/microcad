@@ -44,7 +44,7 @@ impl ModuleInitDefinition {
             match statement {
                 Statement::Assignment(assignment) => {
                     let id = &assignment.id;
-                    let value = assignment.value.eval(context)?;
+                    let value = assignment.expression.eval(context)?;
 
                     props.assign_and_add_local_value(id, value, context);
                 }

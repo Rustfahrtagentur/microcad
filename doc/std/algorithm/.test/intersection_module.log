@@ -1,0 +1,12 @@
+error: Not implemented: cannot evaluate intersection (builtin module) at <from_str>:1:1
+  ---> <from_str>:1:1
+     |
+   1 | std::algorithm::intersection() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot nest item: std::algorithm::intersection()
+  ---> <from_str>:1:1
+     |
+   1 | std::algorithm::intersection() {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

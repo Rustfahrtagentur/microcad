@@ -271,6 +271,9 @@ pub enum EvalError {
     /// Properties are not initialized
     #[error("Properties have not been initialized: {0:?}")]
     UninitializedProperties(Vec<Identifier>),
+    /// Can't find a project file by it's qualified name
+    #[error("Not implemented: {0}")]
+    Todo(String),
 }
 
 /// Result type of any evaluation
