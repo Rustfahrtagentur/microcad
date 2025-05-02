@@ -23,9 +23,6 @@ pub trait Symbols {
     /// - detect any ambiguity
     /// - loads external files
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut>;
-
-    /// Fetch a value from locals.
-    fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value>;
 }
 
 /// Trait to manage local stack
@@ -44,6 +41,9 @@ pub trait Locals {
 
     /// Close scope (stack pop).
     fn close(&mut self);
+
+    /// Fetch a local variable from current stack frame.
+    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut>;
 
     /// Add a named local value to current locals.
     ///

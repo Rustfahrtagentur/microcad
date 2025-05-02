@@ -10,13 +10,13 @@ pub struct LocalStack(Vec<LocalFrame>);
 
 impl LocalStack {
     /// Add a new variable to current stack frame.
-    pub fn add(&mut self, id: Option<Identifier>, local: SymbolNodeRcMut) -> EvalResult<()> {
+    pub fn add(&mut self, id: Option<Identifier>, local_frame: SymbolNodeRcMut) -> EvalResult<()> {
         let id = if let Some(id) = id {
             id
         } else {
-            local.borrow().id()
+            local_frame.borrow().id()
         };
-        let name = local.borrow().full_name();
+        let name = local_frame.borrow().full_name();
         if name.is_qualified() {
             log::debug!("Adding {name} as {id} to local stack");
         } else {
@@ -25,28 +25,11 @@ impl LocalStack {
 
         match self.0.last_mut() {
             Some(LocalFrame::Source(_, last)) | Some(LocalFrame::Scope(last)) => {
-                last.insert(id.clone(), local);
+                last.insert(id.clone(), local_frame);
                 Ok(())
             }
             _ => Err(EvalError::NoLocalStack(id)),
         }
-    }
-
-    /// Fetch a local variable from current stack frame.
-    pub fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut> {
-        // search from inner scope to root scope to shadow outside locals
-        for locals in self.0.iter().rev() {
-            match locals {
-                LocalFrame::Source(_, locals) | LocalFrame::Scope(locals) => {
-                    if let Some(local) = locals.get(id) {
-                        log::debug!("Fetched {id} from locals");
-                        return Ok(local.clone());
-                    }
-                }
-                _ => (),
-            }
-        }
-        Err(EvalError::LocalNotFound(id.clone()))
     }
 
     /// get name of current namespace
@@ -83,6 +66,23 @@ impl Locals for LocalStack {
 
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
         self.add(None, SymbolNode::new_constant(id, value))
+    }
+
+    /// Fetch a local variable from current stack frame.
+    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut> {
+        // search from inner scope to root scope to shadow outside locals
+        for local_frame in self.0.iter().rev() {
+            match local_frame {
+                LocalFrame::Source(_, locals) | LocalFrame::Scope(locals) => {
+                    if let Some(local) = locals.get(id) {
+                        log::debug!("Fetched {id} from locals");
+                        return Ok(local.clone());
+                    }
+                }
+                _ => (),
+            }
+        }
+        Err(EvalError::LocalNotFound(id.clone()))
     }
 }
 

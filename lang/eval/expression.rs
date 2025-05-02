@@ -141,7 +141,10 @@ impl Eval for NestedItem {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match &self {
             NestedItem::Call(call) => Ok(call.eval(context)?),
-            NestedItem::QualifiedName(qualified_name) => Ok(qualified_name.eval(context)?),
+            NestedItem::QualifiedName(name) => match &context.lookup(name)?.borrow().def {
+                SymbolDefinition::Constant(_, value) => Ok(value.clone()),
+                _ => unreachable!(),
+            },
             NestedItem::Body(body) => Ok(Value::Node(body.eval_to_node(context)?)),
         }
     }

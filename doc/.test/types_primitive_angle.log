@@ -1,1 +1,6 @@
-Symbol std::math::pi not found.
+error: Symbol std::assert not found.
+  ---> <from_str>:8:1
+     |
+   8 | std::assert( [degree, degree_, grad, turn, radian].equal() );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

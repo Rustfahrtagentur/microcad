@@ -167,26 +167,6 @@ impl Symbols for SymbolTable {
 
         Ok(symbol.clone())
     }
-
-    fn fetch_value(&self, name: &QualifiedName) -> EvalResult<Value> {
-        // TODO: look up the stack for known locals?
-        if let Some(id) = name.single_identifier() {
-            if let Ok(symbol) = self.locals.fetch(id) {
-                if let SymbolDefinition::Constant(_, value) = &symbol.borrow().def {
-                    log::debug!("Fetching local value {name}");
-                    return Ok(value.clone());
-                }
-            }
-        }
-        match &self.globals.search(name)?.borrow().def {
-            SymbolDefinition::Constant(_, value) => {
-                log::debug!("Fetching global value {name}");
-                Ok(value.clone())
-            }
-
-            _ => Err(EvalError::SymbolIsNotAValue(name.clone())),
-        }
-    }
 }
 
 impl Locals for SymbolTable {
@@ -215,6 +195,10 @@ impl Locals for SymbolTable {
 
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
         self.locals.add_local_value(id, value)
+    }
+
+    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut> {
+        self.locals.fetch(id)
     }
 }
 

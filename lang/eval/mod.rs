@@ -38,7 +38,6 @@ mod eval_error;
 mod expression;
 mod externals;
 mod format_string;
-mod identifier;
 mod literal;
 mod output;
 mod parameter;
