@@ -68,7 +68,15 @@ pub trait Eval {
 
 impl MethodCall {
     /// Evaluate method call
-    fn eval(&self, _context: &mut EvalContext, _lhs: &Expression) -> EvalResult<Value> {
-        todo!("method call not implemented")
+    fn eval(&self, context: &mut EvalContext, _lhs: &Expression) -> EvalResult<Value> {
+        context.error(
+            self,
+            EvalError::Todo(format!(
+                "cannot evaluate {} at {}",
+                self,
+                context.locate(self)?
+            )),
+        )?;
+        Ok(Value::None)
     }
 }
