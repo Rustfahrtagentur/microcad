@@ -226,7 +226,7 @@ impl UseSymbol for SymbolTable {
     fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
         log::debug!("Using all symbols in {name}");
 
-        let symbol = match self.globals.search(name) {
+        let symbol = match self.lookup(name) {
             Ok(symbol) => {
                 //  load external file if symbol was not loaded before
                 let ext = symbol.borrow().is_external();
