@@ -179,8 +179,20 @@ impl Value {
         matches!(self, Value::None)
     }
 
+    /// Return if both types may be compared with precision
+    fn compatible_with(lhs: &Value, rhs: &Value, _op: &str) -> bool {
+        // TODO: Maybe depend handling on `op``
+        match lhs.ty() {
+            Type::Node => todo!(),
+            _ => lhs.ty() == rhs.ty(),
+        }
+    }
+
     /// Binary operation
     pub fn binary_op(lhs: Value, rhs: Value, op: &str) -> ValueResult {
+        if !Self::compatible_with(&lhs, &rhs, op) {
+            return Err(ValueError::CannotCompare(rhs, lhs));
+        }
         match op {
             "+" => lhs + rhs,
             "-" => lhs - rhs,
@@ -240,7 +252,10 @@ impl SrcReferrer for Value {
 impl PartialOrd for Value {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         match (self, other) {
+            // integer type
             (Value::Integer(lhs), Value::Integer(rhs)) => lhs.partial_cmp(rhs),
+
+            // floating point types
             (Value::Scalar(lhs), Value::Scalar(rhs))
             | (Value::Length(lhs), Value::Length(rhs))
             | (Value::Area(lhs), Value::Area(rhs))
@@ -248,9 +263,15 @@ impl PartialOrd for Value {
             | (Value::Angle(lhs), Value::Angle(rhs))
             | (Value::Angle(lhs), Value::Scalar(rhs))
             | (Value::Scalar(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
+
+            // vector types
             (Value::Vec2(lhs), Value::Vec2(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
             (Value::Vec3(lhs), Value::Vec3(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
-            _ => None,
+
+            _ => {
+                log::warn!("unhandled type mismatch between {self} and {other}");
+                None
+            }
         }
     }
 }

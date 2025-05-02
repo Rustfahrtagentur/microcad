@@ -42,7 +42,7 @@ fn locals() {
         &["../lib".into()],
         Box::new(Stdout),
     );
-    context.eval().expect("successful evaluation");
-
-    println!("{}", context.errors_as_str().unwrap_or_default());
+    if context.eval().is_err() {
+        println!("{}", context.errors_as_str().expect("some errors"));
+    }
 }

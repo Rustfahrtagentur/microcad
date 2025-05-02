@@ -53,7 +53,13 @@ impl Eval for Expression {
                     return Ok(Value::None);
                 }
 
-                Value::binary_op(lhs, rhs, op.as_str()).map_err(EvalError::ValueError)
+                match Value::binary_op(lhs, rhs, op.as_str()) {
+                    Err(err) => {
+                        context.error(self, err)?;
+                        Ok(Value::None)
+                    }
+                    Ok(value) => Ok(value),
+                }
             }
             Self::UnaryOp {
                 op,

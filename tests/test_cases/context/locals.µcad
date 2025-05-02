@@ -34,3 +34,9 @@ i = 3;
 
 // access #1
 assert(i == 3);
+
+p = std::math::pi;
+
+q = p > 3;
+
+assert(q);
