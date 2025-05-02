@@ -5,7 +5,7 @@ fn use_statements() {
     microcad_lang::env_logger_init();
 
     let mut context = EvalContext::from_source(
-        "test_cases/context/locals.µcad",
+        "test_cases/context/use_test.µcad",
         microcad_builtin::builtin_namespace(),
         &["../lib".into()],
     )
