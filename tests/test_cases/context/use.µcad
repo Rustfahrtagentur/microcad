@@ -34,4 +34,3 @@ module my_module() {
 }
 
 assert_valid(my_module);
-my_module();
