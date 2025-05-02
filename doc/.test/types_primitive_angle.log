@@ -4,12 +4,6 @@ error: Not implemented: cannot evaluate equal() at <from_str>:8:58
    8 | std::debug::assert( [degree, degree_, grad, turn, radian].equal() );
      |                                                          ^^^^^^^^
      |
-error: Invalid argument type: <invalid>
-  ---> <from_str>:8:21
-     |
-   8 | std::debug::assert( [degree, degree_, grad, turn, radian].equal() );
-     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 error: Assertion failed: [degree, degree_, grad, turn, radian].equal()
   ---> <from_str>:8:21
      |

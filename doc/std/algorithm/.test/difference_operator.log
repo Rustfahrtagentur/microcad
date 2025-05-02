@@ -4,18 +4,6 @@ error: Symbol __builtin::geo2d::circle not found.
   19 |     __builtin::geo2d::circle(radius / 1mm);
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Incompatible types of 2 and -3mm for operation /
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:28:13
-     |
-  28 |         x = -width / 2.0; // center x
-     |             ^^^^^^^^^^^^
-     |
-error: Incompatible types of 2 and -2mm for operation /
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:29:13
-     |
-  29 |         y = -height / 2.0; // center y
-     |             ^^^^^^^^^^^^^
-     |
 error: Symbol __builtin::geo2d::rect not found.
   ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:39:5
      |

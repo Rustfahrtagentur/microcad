@@ -4,12 +4,6 @@ error: Not implemented: cannot evaluate equal() at <from_str>:6:63
    6 | std::debug::assert( [millimeters, centimeters, meters, inches].equal() );
      |                                                               ^^^^^^^^
      |
-error: Invalid argument type: <invalid>
-  ---> <from_str>:6:21
-     |
-   6 | std::debug::assert( [millimeters, centimeters, meters, inches].equal() );
-     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 error: Assertion failed: [millimeters, centimeters, meters, inches].equal()
   ---> <from_str>:6:21
      |

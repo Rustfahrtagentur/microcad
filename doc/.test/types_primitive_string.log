@@ -4,12 +4,6 @@ error: Not implemented: cannot evaluate count(11) at <from_str>:2:24
    2 | std::debug::assert(text.count(11));
      |                        ^^^^^^^^^^
      |
-error: Invalid argument type: <invalid>
-  ---> <from_str>:2:20
-     |
-   2 | std::debug::assert(text.count(11));
-     |                    ^^^^^^^^^^^^^^
-     |
 error: Assertion failed: text.count(11)
   ---> <from_str>:2:20
      |
