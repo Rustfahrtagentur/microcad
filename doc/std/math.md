@@ -9,7 +9,7 @@ Calculate absolute value:
 [![test](.test/math_abs.png)](.test/math_abs.log)
 
 ```µcad,math_abs
-std::assert(std::math::abs(-1) == 1);
+std::debug::assert(std::math::abs(-1) == 1);
 ```
 
 ### Trigonometric functions
@@ -17,7 +17,7 @@ std::assert(std::math::abs(-1) == 1);
 [![test](.test/math_trigonometric.png)](.test/math_trigonometric.log)
 
 ```µcad,math_trigonometric#todo
-use std::*;
+use std::debug::*;
 use std::math::*;
 
 assert(cos(pi) == -1);
