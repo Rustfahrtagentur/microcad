@@ -27,6 +27,8 @@ fn use_statements() {
     assert!(context
         .lookup(&"use_test::my_module".try_into().expect("valid name"))
         .is_ok());
+
+    println!("{}", context.errors_as_str().unwrap_or_default());
 }
 
 #[test]
@@ -41,4 +43,6 @@ fn locals() {
         Box::new(Stdout),
     );
     context.eval().expect("successful evaluation");
+
+    println!("{}", context.errors_as_str().unwrap_or_default());
 }
