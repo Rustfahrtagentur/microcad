@@ -58,7 +58,7 @@ p1 = (x=1mm, y=2mm, z=3mm);
 p2 = (x=1, y=2, z=3)mm;
 
 // are the same
-std::assert( p1 == p2 );
+std::debug::assert( p1 == p2 );
 ```
 
 [![test](.test/unit_types_bundling_array.png)](.test/unit_types_bundling_array.log)
@@ -71,5 +71,5 @@ l1 = [1mm, 2mm, 3mm];
 l2 = [1, 2, 3]mm;
 
 // are the same
-std::assert( l1 == l2 );
+std::debug::assert( l1 == l2 );
 ```
