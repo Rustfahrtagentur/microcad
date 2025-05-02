@@ -4,7 +4,6 @@
 //! Source file cache
 
 use crate::{eval::*, rc::*, src_ref::*, syntax::*};
-use log::*;
 
 /// Register of loaded source files and their syntax trees.
 #[derive(Default)]
@@ -68,7 +67,7 @@ impl SourceCache {
         let name = self.externals.get_name(&filename)?;
         let hash = source_file.hash;
         let index = self.source_files.len();
-        debug!("caching [{index}] {name} {hash:#x} {filename:?}");
+        log::debug!("caching [{index}] {name} {hash:#x} {filename:?}");
         self.source_files.push(source_file);
         self.by_hash.insert(hash, index);
         self.by_path.insert(filename, index);
