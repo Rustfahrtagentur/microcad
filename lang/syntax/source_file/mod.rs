@@ -35,13 +35,14 @@ impl SourceFile {
 
     /// Return the namespace name from the file name
     pub fn id(&self) -> Identifier {
-        Identifier(Refer::none(
+        Identifier(Refer::new(
             self.filename
                 .file_stem()
                 .expect("cannot get file stem")
                 .to_str()
                 .expect("File name error {filename:?}")
                 .into(),
+            SrcRef::new(0..0, 0, 0, self.hash),
         ))
     }
 
