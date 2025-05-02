@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #[cfg(test)]
-mod use_test;
+mod context;
 
 #[cfg(test)]
 use microcad_lang::{eval::*, parser::*, resolve::*, src_ref::*, syntax::*};
@@ -34,9 +34,7 @@ fn namespaces() {
 #[test]
 fn scopes() {
     microcad_lang::env_logger_init();
-    assert!(evaluate_file("../tests/test_cases/syntax/scopes.µcad")
-        .eval()
-        .is_ok());
+    assert!(evaluate_file("syntax/scopes.µcad").eval().is_ok());
 }
 
 #[test]
