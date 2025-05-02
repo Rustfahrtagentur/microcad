@@ -20,7 +20,7 @@ impl CallArgument {
                     self.src_ref(),
                     Box::new(EvalError::InvalidArgumentType(value.ty().clone())),
                 )?;
-                unreachable!()
+                unreachable!("{context}")
             }
             Err(err) => Err(err),
         }
