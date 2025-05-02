@@ -191,7 +191,7 @@ impl Value {
     /// Binary operation
     pub fn binary_op(lhs: Value, rhs: Value, op: &str) -> ValueResult {
         if !Self::compatible_with(&lhs, &rhs, op) {
-            return Err(ValueError::CannotCompare(rhs, lhs));
+            return Err(ValueError::BinaryOpNotAvailable(rhs, lhs, op.to_string()));
         }
         match op {
             "+" => lhs + rhs,
