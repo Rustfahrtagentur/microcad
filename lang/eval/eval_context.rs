@@ -238,15 +238,15 @@ impl GetSourceByHash for EvalContext {
 
 impl std::fmt::Display for EvalContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.symbol_table)?;
-        write!(
-            f,
-            "Errors:\n{}",
-            if self.diag_handler.has_errors() {
+        if self.diag_handler.has_errors() {
+            write!(
+                f,
+                "{}\nErrors:\n{}",
+                self.symbol_table,
                 self.diag_handler.pretty_print_to_string(&self.symbol_table)
-            } else {
-                "no errors".to_string()
-            }
-        )
+            )
+        } else {
+            write!(f, "{}", self.symbol_table)
+        }
     }
 }

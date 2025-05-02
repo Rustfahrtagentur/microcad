@@ -66,7 +66,7 @@ impl Locals for LocalStack {
     }
 
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        self.add(None, SymbolNode::new_constant(id, value))
+        self.add(Some(id.clone()), SymbolNode::new_constant(id, value))
     }
 
     /// Fetch a local variable from current stack frame.
