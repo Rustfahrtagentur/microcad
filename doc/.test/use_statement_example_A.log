@@ -1,9 +1,3 @@
-error: Symbol std::geo3d::cone not found.
-  ---> <from_str>:3:5
-     |
-   3 | use std::geo3d::cone;
-     |     ^^^^^^^^^^^^^^^^
-     |
 error: Symbol __builtin::transform::translate not found.
   ---> /home/pat/git/rustfahrt/mcad/lib/std/geo3d.µcad:25:5
      |
@@ -16,9 +10,9 @@ error: Cannot nest item: __builtin::transform::translate(-size_x / 2 / 1mm, -siz
   25 |     __builtin::transform::translate(
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol cone not found.
-  ---> <from_str>:7:1
+error: Symbol __builtin::geo3d::sphere not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo3d.µcad:10:5
      |
-   7 | cone(height = 2cm);
-     | ^^^^^^^^^^^^^^^^^^
+  10 |     __builtin::geo3d::sphere(radius / 1mm);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |

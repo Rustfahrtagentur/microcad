@@ -46,13 +46,13 @@ std::geo3d::sphere(r = 40mm);
 [![test](.test/use_statement_example_A.png)](.test/use_statement_example_A.log)
 
 ```µcad,use_statement_example_A#todo
-// Use statement: sub-module `cube` and `cone` from module `geo3d`.
+// Use statement: sub-module `cube` and `sphere` from module `geo3d`.
 use std::geo3d::cube;
-use std::geo3d::cone;
+use std::geo3d::sphere;
 
 cube(size = 40mm); // calls geo3d.cube(size = 40mm);
 
-cone(height = 2cm);
+sphere(radius = 2cm);
 ```
 
 Notice that the `size` parameter name is optional an can be omitted.
