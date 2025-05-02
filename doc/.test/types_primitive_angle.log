@@ -1,3 +1,9 @@
+error: Incompatible types of 3.141592653589793 and 1rad for operation *
+  ---> <from_str>:2:10
+     |
+   2 | radian = 1rad * pi;
+     |          ^^^^^^^^^
+     |
 error: Symbol std::assert not found.
   ---> <from_str>:8:1
      |

@@ -1,0 +1,6 @@
+error: Incompatible types of 2 and 1400mm for operation *
+  ---> <from_str>:9:9
+     |
+   9 | width = height * 2 + 10cm;
+     |         ^^^^^^^^^^^^^^^^^
+     |

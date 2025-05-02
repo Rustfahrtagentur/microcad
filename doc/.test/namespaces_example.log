@@ -1,0 +1,6 @@
+error: Incompatible types of 3.141592653589793 and 1 for operation *
+  ---> <from_str>:18:5
+     |
+  18 | x = std::math::abs(-1) * std::math::pi;
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
