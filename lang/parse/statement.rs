@@ -4,7 +4,7 @@ impl Parse for Assignment {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut id = Identifier::default();
         let mut specified_type = None;
-        let mut value = None;
+        let mut expression = None;
 
         for pair in pair.inner() {
             match pair.as_rule() {
@@ -15,7 +15,7 @@ impl Parse for Assignment {
                     specified_type = Some(TypeAnnotation::parse(pair)?);
                 }
                 Rule::expression => {
-                    value = Some(Expression::parse(pair)?);
+                    expression = Some(Expression::parse(pair)?);
                 }
                 rule => {
                     unreachable!("Unexpected token in assignment: {:?}", rule);
@@ -26,7 +26,7 @@ impl Parse for Assignment {
         Ok(Self {
             id,
             specified_type,
-            value: value.expect(INTERNAL_PARSE_ERROR),
+            expression: expression.expect(INTERNAL_PARSE_ERROR),
             src_ref: pair.into(),
         })
     }

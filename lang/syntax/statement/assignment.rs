@@ -13,7 +13,7 @@ pub struct Assignment {
     /// Type of the assignee
     pub specified_type: Option<TypeAnnotation>,
     /// Value to assign
-    pub value: Expression,
+    pub expression: Expression,
     /// Source code reference
     pub src_ref: SrcRef,
 }
@@ -27,8 +27,8 @@ impl SrcReferrer for Assignment {
 impl std::fmt::Display for Assignment {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.specified_type {
-            Some(t) => write!(f, "{}: {} = {}", self.id, t.ty(), self.value),
-            None => write!(f, "{} = {}", self.id, self.value),
+            Some(t) => write!(f, "{}: {} = {}", self.id, t.ty(), self.expression),
+            None => write!(f, "{} = {}", self.id, self.expression),
         }
     }
 }
@@ -39,6 +39,6 @@ impl PrintSyntax for Assignment {
         if let Some(specified_type) = &self.specified_type {
             specified_type.print_syntax(f, depth + 1)?;
         }
-        self.value.print_syntax(f, depth + 1)
+        self.expression.print_syntax(f, depth + 1)
     }
 }
