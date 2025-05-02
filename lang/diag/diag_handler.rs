@@ -6,7 +6,7 @@ pub trait Diag {
     fn pretty_print(&self, w: &mut dyn std::io::Write) -> std::io::Result<()>;
 
     /// Pretty print all errors into a string
-    fn pretty_print_to_string(&self) -> std::io::Result<String>;
+    fn errors_as_string(&self) -> String;
 
     /// Returns true if there are errors
     fn has_errors(&self) -> bool;
@@ -40,17 +40,14 @@ impl DiagHandler {
     }
 
     /// Pretty print all errors into a string
-    pub fn pretty_print_to_string(
-        &self,
-        source_by_hash: &impl GetSourceByHash,
-    ) -> std::io::Result<String> {
+    pub fn pretty_print_to_string(&self, source_by_hash: &impl GetSourceByHash) -> String {
         let mut s = Vec::new();
         let mut w = std::io::BufWriter::new(&mut s);
-        self.diag_list.pretty_print(&mut w, source_by_hash)?;
-        let w = w
-            .into_inner()
-            .expect("write error while pretty printing errors");
-        Ok(String::from_utf8(w.to_vec()).expect("UTF-8 error while pretty printing errors"))
+        self.diag_list
+            .pretty_print(&mut w, source_by_hash)
+            .expect("no error");
+        let w = w.into_inner().expect("no error");
+        String::from_utf8(w.to_vec()).expect("UTF-8 error while pretty printing errors")
     }
 
     /// Returns true if there are errors

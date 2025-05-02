@@ -8,7 +8,8 @@ extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
 use microcad_lang::{
-    env_logger_init, eval::*, objects::*, parse::ParseResult, rc::*, resolve::*, syntax::*,
+    diag::Diag, env_logger_init, eval::*, objects::*, parse::ParseResult, rc::*, resolve::*,
+    syntax::*,
 };
 use std::io::Write;
 
@@ -154,11 +155,11 @@ fn eval(
     let result = context.eval().map_err(|err| anyhow::anyhow!("{err}"))?;
 
     println!("{result}");
-    match context.errors_as_str() {
-        Some(errors) => {
-            eprintln!("Evaluated with errors:\n{errors}");
+    match context.has_errors() {
+        true => {
+            eprintln!("Evaluated with errors:\n{}", context.errors_as_string());
         }
-        None => eprintln!("Evaluated successfully!"),
+        false => eprintln!("Evaluated successfully!"),
     }
 
     todo!("object node output")

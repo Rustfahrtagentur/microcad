@@ -1,4 +1,4 @@
-use microcad_lang::{eval::*, syntax::*};
+use microcad_lang::{diag::Diag, eval::*, syntax::*};
 
 #[test]
 fn use_statements() {
@@ -28,7 +28,7 @@ fn use_statements() {
         .lookup(&"use_test::my_module".try_into().expect("valid name"))
         .is_ok());
 
-    println!("{}", context.errors_as_str().unwrap_or_default());
+    println!("{}", context.errors_as_string());
 }
 
 #[test]
@@ -43,6 +43,6 @@ fn locals() {
         Box::new(Stdout),
     );
     if context.eval().is_err() {
-        println!("{}", context.errors_as_str().expect("some errors"));
+        println!("{}", context.errors_as_string());
     }
 }

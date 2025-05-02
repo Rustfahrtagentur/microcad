@@ -123,19 +123,6 @@ impl EvalContext {
         self.output.output()
     }
 
-    /// Return all occurred errors as string.
-    pub fn errors_as_str(&self) -> Option<String> {
-        if self.diag_handler.has_errors() {
-            Some(
-                self.diag_handler
-                    .pretty_print_to_string(self)
-                    .expect("cannot write into string"),
-            )
-        } else {
-            None
-        }
-    }
-
     /// Print for `__builtin::print`.
     pub fn print(&mut self, what: String) {
         self.output.print(what).expect("could not write to output");
@@ -208,7 +195,7 @@ impl Diag for EvalContext {
         self.diag_handler.pretty_print(w, &self.symbol_table)
     }
 
-    fn pretty_print_to_string(&self) -> std::io::Result<String> {
+    fn errors_as_string(&self) -> String {
         self.diag_handler.pretty_print_to_string(&self.symbol_table)
     }
 
@@ -251,6 +238,15 @@ impl GetSourceByHash for EvalContext {
 
 impl std::fmt::Display for EvalContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.symbol_table)
+        write!(f, "{}", self.symbol_table)?;
+        write!(
+            f,
+            "Errors:\n{}",
+            if self.diag_handler.has_errors() {
+                self.diag_handler.pretty_print_to_string(&self.symbol_table)
+            } else {
+                "no errors".to_string()
+            }
+        )
     }
 }
