@@ -1,6 +1,5 @@
 use crate::{eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
-use log::*;
 
 /// Symbol node
 #[derive(Debug, Clone)]
@@ -122,7 +121,7 @@ impl SymbolNode {
 
     /// Search down the symbol tree for a qualified name.
     pub fn search(&self, name: &QualifiedName) -> Option<SymbolNodeRcMut> {
-        trace!("Searching {name} in {}", self.id());
+        log::trace!("Searching {name} in {}", self.id());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
                 let name = &name.remove_first();
@@ -132,11 +131,11 @@ impl SymbolNode {
                     child.borrow().search(name)
                 }
             } else {
-                debug!("No child in {} while searching for {name}", self.id());
+                log::debug!("No child in {} while searching for {name}", self.id());
                 None
             }
         } else {
-            warn!("Cannot search for an anonymous name");
+            log::warn!("Cannot search for an anonymous name");
             None
         }
     }

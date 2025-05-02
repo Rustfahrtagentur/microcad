@@ -7,7 +7,6 @@ extern crate clap;
 extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
-use log::*;
 use microcad_lang::{
     env_logger_init, eval::*, objects::*, parse::ParseResult, rc::*, resolve::*, syntax::*,
 };
@@ -70,7 +69,7 @@ fn main() {
         eprintln!("{err}")
     }
 
-    info!("Processing Time: {:?}", start.elapsed());
+    log::info!("Processing Time: {:?}", start.elapsed());
 }
 
 fn run(cli: &Cli) -> anyhow::Result<()> {
@@ -131,13 +130,13 @@ main();
 
 fn parse(input: impl AsRef<std::path::Path>) -> ParseResult<Rc<SourceFile>> {
     let source_file = SourceFile::load(input)?;
-    info!("Parsed successfully!");
+    log::info!("Parsed successfully!");
     Ok(source_file)
 }
 
 fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<SymbolNodeRcMut> {
     let symbol_node = parse(input)?.resolve(None);
-    info!("Resolved successfully!");
+    log::info!("Resolved successfully!");
     Ok(symbol_node)
 }
 
@@ -157,10 +156,9 @@ fn eval(
     println!("{result}");
     match context.errors_as_str() {
         Some(errors) => {
-            warn!("Evaluated with errors:");
-            error!("{}", errors);
+            eprintln!("Evaluated with errors:\n{errors}");
         }
-        None => info!("Evaluated successfully!"),
+        None => eprintln!("Evaluated successfully!"),
     }
 
     todo!("object node output")

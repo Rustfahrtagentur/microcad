@@ -4,7 +4,6 @@
 //! External files register
 
 use crate::{eval::*, src_ref::*, syntax::*, MICROCAD_EXTENSIONS};
-use log::*;
 
 /// External files register
 #[derive(Debug, Default)]
@@ -16,12 +15,12 @@ impl Externals {
         let no_search_paths = search_paths.is_empty();
         let new = Self(Self::search_externals(search_paths));
         if no_search_paths {
-            info!("No external search paths were given");
+            log::info!("No external search paths were given");
         } else if new.is_empty() {
-            warn!("Did not find any externals in any search path");
+            log::warn!("Did not find any externals in any search path");
         } else {
-            info!("Found {} external modules", new.len());
-            trace!("Externals:\n{new}");
+            log::info!("Found {} external modules", new.len());
+            log::trace!("Externals:\n{new}");
         }
         new
     }
@@ -70,7 +69,7 @@ impl Externals {
         &self,
         name: &QualifiedName,
     ) -> EvalResult<(QualifiedName, std::path::PathBuf)> {
-        trace!("fetching {name} from externals");
+        log::trace!("fetching {name} from externals");
 
         if let Some(found) = self
             .0
@@ -92,7 +91,7 @@ impl Externals {
     pub fn get_name(&self, path: &std::path::Path) -> EvalResult<&QualifiedName> {
         match self.0.iter().find(|(_, p)| p.as_path() == path) {
             Some((name, _)) => {
-                trace!("got name of {path:?} => {name}");
+                log::trace!("got name of {path:?} => {name}");
                 Ok(name)
             }
             None => Err(EvalError::ExternalPathNotFound(path.to_path_buf())),

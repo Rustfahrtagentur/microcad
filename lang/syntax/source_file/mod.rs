@@ -65,7 +65,7 @@ impl SourceFile {
     /// Like resolve but with `Rc<SourceFile>`
     pub fn resolve_rc(self: Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
         let name = self.filename_as_str();
-        eprintln!("Resolving source file {name}");
+        log::info!("Resolving source file {name}");
         let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);
         node.borrow_mut().children = Body::fetch_symbol_map(&self.body, Some(node.clone()));
         log::trace!("Resolved source file {name}:\n{node}");
@@ -110,13 +110,11 @@ impl<T: PrintSyntax> std::fmt::Display for FormatSyntax<'_, T> {
 
 #[test]
 fn load_source_file() {
-    use log::*;
-
     crate::env_logger_init();
 
     let source_file = SourceFile::load(r#"../tests/test_cases/algorithm/difference.µcad"#);
     if let Err(ref err) = source_file {
-        error!("{err}");
+        log::error!("{err}");
     }
 
     let source_file = source_file.expect("test error");
@@ -136,13 +134,11 @@ fn load_source_file() {
 
 #[test]
 fn load_source_file_wrong_location() {
-    use log::*;
-
     crate::env_logger_init();
 
     let source_file = SourceFile::load("I do not exist.µcad");
     if let Err(err) = source_file {
-        info!("{err}");
+        log::info!("{err}");
         //assert_eq!(format!("{err}"), "Cannot load source file");
     } else {
         panic!("Does file exist?");
