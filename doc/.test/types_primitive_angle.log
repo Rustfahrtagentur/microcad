@@ -1,12 +1,18 @@
-error: Incompatible types of 3.141592653589793 and 1rad for operation *
-  ---> <from_str>:2:10
+error: Not implemented: cannot evaluate equal() at <from_str>:8:58
+  ---> <from_str>:8:58
      |
-   2 | radian = 1rad * pi;
-     |          ^^^^^^^^^
+   8 | std::debug::assert( [degree, degree_, grad, turn, radian].equal() );
+     |                                                          ^^^^^^^^
      |
-error: Symbol std::assert not found.
-  ---> <from_str>:8:1
+error: Invalid argument type: <invalid>
+  ---> <from_str>:8:21
      |
-   8 | std::assert( [degree, degree_, grad, turn, radian].equal() );
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | std::debug::assert( [degree, degree_, grad, turn, radian].equal() );
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Assertion failed: [degree, degree_, grad, turn, radian].equal()
+  ---> <from_str>:8:21
+     |
+   8 | std::debug::assert( [degree, degree_, grad, turn, radian].equal() );
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
