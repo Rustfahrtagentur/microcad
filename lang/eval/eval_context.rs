@@ -204,19 +204,12 @@ impl Symbols for EvalContext {
 }
 
 impl Diag for EvalContext {
-    fn pretty_print(
-        &self,
-        w: &mut dyn std::io::Write,
-        source_by_hash: &impl GetSourceByHash,
-    ) -> std::io::Result<()> {
-        self.diag_handler.pretty_print(w, source_by_hash)
+    fn pretty_print(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
+        self.diag_handler.pretty_print(w, &self.symbol_table)
     }
 
-    fn pretty_print_to_string(
-        &self,
-        source_by_hash: &impl GetSourceByHash,
-    ) -> std::io::Result<String> {
-        self.diag_handler.pretty_print_to_string(source_by_hash)
+    fn pretty_print_to_string(&self) -> std::io::Result<String> {
+        self.diag_handler.pretty_print_to_string(&self.symbol_table)
     }
 
     fn has_errors(&self) -> bool {

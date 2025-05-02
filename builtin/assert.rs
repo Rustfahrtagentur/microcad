@@ -83,9 +83,7 @@ fn assert_fail() {
     assert!(context.error_count() > 0);
 
     assert_eq!(
-        context
-            .pretty_print_to_string(&context)
-            .expect("internal test error"),
+        context.errors_as_str().expect("internal test error"),
         "error: Assertion failed: false
   ---> ../tests/test_cases/syntax/assert_fail.µcad:1:19
      |
