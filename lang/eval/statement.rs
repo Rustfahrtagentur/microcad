@@ -6,8 +6,8 @@ use crate::{eval::*, objects::*};
 impl Eval for Assignment {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         let value = self.expression.eval(context)?;
-        context.add_local_value(self.id.clone(), value.clone())?;
-        Ok(value)
+        context.add_local_value(self.id.clone(), value)?;
+        Ok(Value::None)
     }
 }
 
