@@ -24,10 +24,6 @@ pub enum ValueError {
     #[error("Cannot convert value into boolean: {0}")]
     CannotConvertToBool(Value),
 
-    /// Cannot compare two values
-    #[error("Incompatible types of {0} and {1} for operation {2}")]
-    BinaryOpNotAvailable(Value, Value, String),
-
     /// Cannot concat two vec with different types
     #[error("Cannot concat two vec with different types {0} and {1}")]
     CannotCombineVecOfDifferentType(Type, Type),

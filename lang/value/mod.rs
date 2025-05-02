@@ -179,21 +179,9 @@ impl Value {
         matches!(self, Value::None)
     }
 
-    /// Return if both types may be compared with precision
-    fn compatible_with(lhs: &Value, rhs: &Value, _op: &str) -> bool {
-        // TODO: Maybe depend handling on `op``
-        match lhs.ty() {
-            Type::Node => todo!(),
-            _ => lhs.ty() == rhs.ty(),
-        }
-    }
-
     /// Binary operation
     pub fn binary_op(lhs: Value, rhs: Value, op: &str) -> ValueResult {
-        if !Self::compatible_with(&lhs, &rhs, op) {
-            return Err(ValueError::BinaryOpNotAvailable(rhs, lhs, op.to_string()));
-        }
-        match op {
+        match match op {
             "+" => lhs + rhs,
             "-" => lhs - rhs,
             "*" => lhs * rhs,
@@ -209,6 +197,9 @@ impl Value {
             "=" => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
             "!=" => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
             _ => unimplemented!("{op:?}"),
+        } {
+            Err(err) => Err(err),
+            result => result,
         }
     }
 
