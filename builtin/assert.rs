@@ -31,10 +31,10 @@ pub fn assert() -> SymbolNodeRcMut {
 pub fn assert_valid() -> SymbolNodeRcMut {
     let id = Identifier::from_str("assert_valid").expect("valid id");
     SymbolNode::new_builtin_fn(id, &|args, context| {
-        if let Ok(name) = args.get_single() {
-            let name = QualifiedName::try_from(name.value.to_string())?;
+        if let Ok(arg) = args.get_single() {
+            let name = QualifiedName::try_from(arg.value.to_string())?;
             if let Err(err) = context.lookup(&name) {
-                context.error(name.clone(), err)?;
+                context.error(arg, err)?;
             }
         }
         Ok(Value::None)
@@ -45,9 +45,9 @@ pub fn assert_invalid() -> SymbolNodeRcMut {
     let id = Identifier::from_str("assert_invalid").expect("valid id");
     SymbolNode::new_builtin_fn(id, &|args, context| {
         if let Ok(name) = args.get_single() {
-            let name = QualifiedName::try_from(name.value.to_string())?;
-            if let Err(err) = context.lookup(&name) {
-                context.error(name.clone(), err)?;
+            let n = QualifiedName::try_from(name.value.to_string())?;
+            if let Err(err) = context.lookup(&n) {
+                context.error(name, err)?;
             }
         }
         Ok(Value::None)
