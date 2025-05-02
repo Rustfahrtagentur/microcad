@@ -64,10 +64,11 @@ impl SourceFile {
 
     /// Like resolve but with `Rc<SourceFile>`
     pub fn resolve_rc(self: Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        eprintln!("resolving {}", self.filename_as_str());
+        let name = self.filename_as_str();
+        eprintln!("Resolving source file {name}");
         let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);
         node.borrow_mut().children = Body::fetch_symbol_map(&self.body, Some(node.clone()));
-        log::trace!("Resolved symbol node:\n{node}");
+        log::trace!("Resolved source file {name}:\n{node}");
         node
     }
 }

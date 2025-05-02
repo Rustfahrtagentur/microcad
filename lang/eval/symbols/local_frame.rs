@@ -39,8 +39,15 @@ impl LocalFrame {
             LocalFrame::Scope(map) => (map, depth),
         };
 
-        for (id, local) in map.iter() {
-            writeln!(f, "{:depth$}{id} [{}]", "", local.borrow().full_name())?
+        for (id, symbol) in map.iter() {
+            let full_name = symbol.borrow().full_name();
+            match &symbol.borrow().def {
+                SymbolDefinition::Constant(id, value) => {
+                    writeln!(f, "{:depth$}{id} = {value} [{full_name}]", "")?
+                }
+
+                _ => writeln!(f, "{:depth$}{id} [{full_name}]", "")?,
+            }
         }
 
         Ok(())

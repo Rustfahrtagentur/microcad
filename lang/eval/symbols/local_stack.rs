@@ -26,6 +26,7 @@ impl LocalStack {
         match self.0.last_mut() {
             Some(LocalFrame::Source(_, last)) | Some(LocalFrame::Scope(last)) => {
                 last.insert(id.clone(), frame);
+                log::trace!("Local Stack:\n{self}");
                 Ok(())
             }
             _ => Err(EvalError::NoLocalStack(id)),
