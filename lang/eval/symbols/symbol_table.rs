@@ -125,6 +125,17 @@ impl SymbolTable {
         // get symbol from symbol map
         self.globals.search(name)
     }
+
+    fn follow_alias(&mut self, symbol: SymbolNodeRcMut) -> EvalResult<SymbolNodeRcMut> {
+        // execute alias from any use statement
+        let def = &symbol.borrow().def;
+        if let SymbolDefinition::Alias(_, name) = def {
+            log::trace!("Found alias => {name}");
+            self.lookup(name)
+        } else {
+            Ok(symbol.clone())
+        }
+    }
 }
 
 impl Symbols for SymbolTable {
@@ -139,33 +150,28 @@ impl Symbols for SymbolTable {
         ]
         .into_iter()
         .filter_map(Result::ok)
+        .map(|symbol| self.follow_alias(symbol))
+        .filter_map(Result::ok)
         .collect();
 
         // Check for ambiguity
-        if found.len() > 1 {
-            return Err(EvalError::AmbiguousSymbol {
-                ambiguous: name.clone(),
-                others: found
-                    .iter()
-                    .map(|symbol| symbol.borrow().full_name().clone())
-                    .collect(),
-            });
-        };
-
-        // check if we found any node
-        let symbol = match found.first() {
-            Some(symbol) => symbol,
-            _ => return Err(EvalError::SymbolNotFound(name.clone())),
-        };
-
-        // execute alias from any use statement
-        let def = &symbol.borrow().def;
-        if let SymbolDefinition::Alias(_, name) = def {
-            log::trace!("Found alias => {name}");
-            return self.lookup(name);
+        match found.first() {
+            Some(first) => {
+                // check if all findings point to the same symbol
+                if !found.iter().all(|x| std::rc::Rc::ptr_eq(x, first)) {
+                    Err(EvalError::AmbiguousSymbol {
+                        ambiguous: name.clone(),
+                        others: found
+                            .iter()
+                            .map(|symbol| symbol.borrow().full_name().clone())
+                            .collect(),
+                    })
+                } else {
+                    Ok(first.clone())
+                }
+            }
+            None => Err(EvalError::SymbolNotFound(name.clone())),
         }
-
-        Ok(symbol.clone())
     }
 }
 
