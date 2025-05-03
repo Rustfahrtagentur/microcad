@@ -93,7 +93,7 @@ impl std::fmt::Display for LocalStack {
             writeln!(f, "<empty stack>")
         } else {
             for (n, locals) in self.0.iter().enumerate() {
-                locals.print(f, n)?;
+                locals.print(f, n * 4)?;
             }
             Ok(())
         }

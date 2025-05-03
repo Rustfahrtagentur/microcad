@@ -28,16 +28,18 @@ impl LocalFrame {
     }
 
     /// Print local stack frame
-    pub fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
-        let (map, depth) = match self {
+    pub fn print(&self, f: &mut std::fmt::Formatter<'_>, mut depth: usize) -> std::fmt::Result {
+        let map = match self {
             LocalFrame::Source(id, map) => {
                 writeln!(f, "{:depth$}{id} (source):", "")?;
-                (map, depth + 2)
+                map
             }
             LocalFrame::Namespace(id) => return write!(f, "{:depth$}{id} (namespace)", ""),
             LocalFrame::Module(id) => return write!(f, "{:depth$}{id} (module)", ""),
-            LocalFrame::Scope(map) => (map, depth),
+            LocalFrame::Scope(map) => map,
         };
+
+        depth += 4;
 
         for (id, symbol) in map.iter() {
             let full_name = symbol.borrow().full_name();
@@ -45,7 +47,6 @@ impl LocalFrame {
                 SymbolDefinition::Constant(id, value) => {
                     writeln!(f, "{:depth$}{id} = {value} [{full_name}]", "")?
                 }
-
                 _ => writeln!(f, "{:depth$}{id} [{full_name}]", "")?,
             }
         }

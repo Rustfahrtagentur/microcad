@@ -63,8 +63,8 @@ impl std::fmt::Display for SymbolDefinition {
             Self::SourceFile(_) => write!(f, "(file)"),
             Self::BuiltinFunction(_) => write!(f, "(builtin function)"),
             Self::BuiltinModule(_) => write!(f, "(builtin module)"),
-            Self::Constant(id, value) => write!(f, "{} (constant) = {}", id, value),
-            Self::Alias(id, name) => write!(f, "{} (alias) => {}", id, name),
+            Self::Constant(id, value) => write!(f, "(constant) = {value} [{id}]"),
+            Self::Alias(id, name) => write!(f, "(alias) => {name} [{id}]"),
         }
     }
 }
