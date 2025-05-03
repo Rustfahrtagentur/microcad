@@ -35,8 +35,7 @@ impl SymbolTable {
         };
 
         // prepare symbol map
-        let mut globals = SymbolMap::new();
-        globals.insert_node(root.clone());
+        let mut globals = root.borrow().children.clone();
         globals.insert_node(builtin);
 
         // create namespaces for all files in search paths into symbol map
