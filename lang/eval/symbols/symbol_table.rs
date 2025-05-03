@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, resolve::*, syntax::*};
+use crate::{eval::*, rc::*, resolve::*, syntax::*};
 
 /// Symbol table holding global and local symbols
 pub struct SymbolTable {
@@ -142,12 +142,7 @@ impl Symbols for SymbolTable {
         log::debug!("Lookup {name}");
 
         // collect all symbols that can be found
-        let result = [
-            self.lookup_local(name),
-            self.lookup_global(name),
-            self.lookup_global(&name.with_prefix(&self.locals.current_namespace())),
-        ]
-        .into_iter();
+        let result = [self.lookup_local(name), self.lookup_global(name)].into_iter();
 
         // collect ok-results and ambiguity errors
         let (found, mut ambiguous) =
@@ -179,10 +174,10 @@ impl Symbols for SymbolTable {
         match found.first() {
             Some(first) => {
                 // check if all findings point to the same symbol
-                if !found.iter().all(|x| std::rc::Rc::ptr_eq(x, first)) {
+                if !found.iter().all(|x| Rc::ptr_eq(x, first)) {
                     Err(EvalError::AmbiguousSymbol {
                         ambiguous: name.clone(),
-                        others: found.iter().cloned().collect::<SymbolNodes>(),
+                        others: found.into(),
                     })
                 } else {
                     Ok(first.clone())

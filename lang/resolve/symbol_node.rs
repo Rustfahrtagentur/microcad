@@ -20,6 +20,12 @@ pub type SymbolNodeRcMut = RcMut<SymbolNode>;
 #[derive(Debug)]
 pub struct SymbolNodes(Vec<SymbolNodeRcMut>);
 
+impl From<Vec<RcMut<SymbolNode>>> for SymbolNodes {
+    fn from(value: Vec<RcMut<SymbolNode>>) -> Self {
+        Self(value)
+    }
+}
+
 impl std::fmt::Display for SymbolNodes {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
