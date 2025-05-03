@@ -217,8 +217,6 @@ fn module_explicit_init_call() {
             .expect("Valid nodes")
             .fetch_nodes();
         assert_eq!(nodes.len(), 0, "There should no nodes");
-        context
-            .print_diagnosis(&mut std::io::stdout())
-            .expect("Valid formatter");
+        log::trace!("{}", context.diagnosis());
     }
 }

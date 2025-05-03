@@ -100,18 +100,18 @@ impl Diagnostic {
     /// ```
     pub fn pretty_print(
         &self,
-        w: &mut dyn std::io::Write,
+        f: &mut dyn std::fmt::Write,
         source_by_hash: &impl GetSourceByHash,
-    ) -> std::io::Result<()> {
+    ) -> std::fmt::Result {
         let src_ref = self.src_ref();
         let source_file = source_by_hash.get_by_hash(src_ref.source_hash());
 
         match &src_ref {
-            SrcRef(None) => writeln!(w, "{}: {}", self.level(), self.message())?,
+            SrcRef(None) => writeln!(f, "{}: {}", self.level(), self.message())?,
             SrcRef(Some(src_ref)) => {
-                writeln!(w, "{}: {}", self.level(), self.message())?;
+                writeln!(f, "{}: {}", self.level(), self.message())?;
                 writeln!(
-                    w,
+                    f,
                     "  ---> {}:{}",
                     source_file
                         .as_ref()
@@ -119,22 +119,22 @@ impl Diagnostic {
                         .unwrap_or(SourceFile::NO_FILE),
                     src_ref.at
                 )?;
-                writeln!(w, "     |",)?;
+                writeln!(f, "     |",)?;
 
                 let line = source_file
                     .as_ref()
                     .map(|sf| sf.get_line(src_ref.at.line - 1).unwrap_or("<no line>"))
                     .unwrap_or(SourceFile::NO_FILE);
 
-                writeln!(w, "{: >4} | {}", src_ref.at.line, line)?;
+                writeln!(f, "{: >4} | {}", src_ref.at.line, line)?;
                 writeln!(
-                    w,
+                    f,
                     "{: >4} | {}",
                     "",
                     " ".repeat(src_ref.at.col - 1)
                         + &"^".repeat(src_ref.range.len().min(line.len())),
                 )?;
-                writeln!(w, "     |",)?;
+                writeln!(f, "     |",)?;
             }
         }
 

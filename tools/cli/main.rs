@@ -157,7 +157,7 @@ fn eval(
     println!("{result}");
     match context.has_errors() {
         true => {
-            eprintln!("Evaluated with errors:\n{}", context.diagnosis_as_string());
+            eprintln!("Evaluated with errors:\n{}", context);
         }
         false => eprintln!("Evaluated successfully!"),
     }

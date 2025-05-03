@@ -191,12 +191,8 @@ impl Symbols for EvalContext {
 }
 
 impl Diag for EvalContext {
-    fn print_diagnosis(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
-        self.diag_handler.pretty_print(w, &self.symbol_table)
-    }
-
-    fn diagnosis_as_string(&self) -> String {
-        self.diag_handler.pretty_print_to_string(&self.symbol_table)
+    fn fmt_diagnosis(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
+        self.diag_handler.pretty_print(f, &self.symbol_table)
     }
 
     fn has_errors(&self) -> bool {
@@ -239,12 +235,8 @@ impl GetSourceByHash for EvalContext {
 impl std::fmt::Display for EvalContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.diag_handler.has_errors() {
-            write!(
-                f,
-                "{}\nErrors:\n{}",
-                self.symbol_table,
-                self.diag_handler.pretty_print_to_string(&self.symbol_table)
-            )
+            write!(f, "{}\nErrors:\n", self.symbol_table,)?;
+            self.diag_handler.pretty_print(f, &self.symbol_table)
         } else {
             write!(f, "{}", self.symbol_table)
         }

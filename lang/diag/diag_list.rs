@@ -8,12 +8,12 @@ impl DiagList {
     /// Pretty print this list of diagnostics
     pub fn pretty_print(
         &self,
-        w: &mut dyn std::io::Write,
+        f: &mut dyn std::fmt::Write,
         source_by_hash: &impl GetSourceByHash,
-    ) -> std::io::Result<()> {
+    ) -> std::fmt::Result {
         self.0
             .iter()
-            .try_for_each(|diag| diag.pretty_print(w, source_by_hash))
+            .try_for_each(|diag| diag.pretty_print(f, source_by_hash))
     }
 }
 

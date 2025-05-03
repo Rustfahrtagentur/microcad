@@ -3,10 +3,19 @@ use crate::{diag::*, eval::*};
 /// Diagnosis trait gives access about collected errors
 pub trait Diag {
     /// Pretty print all errors
-    fn print_diagnosis(&self, w: &mut dyn std::io::Write) -> std::io::Result<()>;
+    fn fmt_diagnosis(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result;
 
-    /// Pretty print all errors into a string
-    fn diagnosis_as_string(&self) -> String;
+    /// Pretty write all errors into a file
+    fn write_diagnosis(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
+        write!(w, "{}", self.diagnosis())
+    }
+
+    /// Get pretty printed errors as string
+    fn diagnosis(&self) -> String {
+        let mut str = String::new();
+        self.fmt_diagnosis(&mut str).expect("displayable diagnosis");
+        str
+    }
 
     /// Returns true if there are errors
     fn has_errors(&self) -> bool;
@@ -33,21 +42,10 @@ impl DiagHandler {
     /// Pretty print all errors
     pub fn pretty_print(
         &self,
-        w: &mut dyn std::io::Write,
+        f: &mut dyn std::fmt::Write,
         source_by_hash: &impl GetSourceByHash,
-    ) -> std::io::Result<()> {
-        self.diag_list.pretty_print(w, source_by_hash)
-    }
-
-    /// Pretty print all errors into a string
-    pub fn pretty_print_to_string(&self, source_by_hash: &impl GetSourceByHash) -> String {
-        let mut s = Vec::new();
-        let mut w = std::io::BufWriter::new(&mut s);
-        self.diag_list
-            .pretty_print(&mut w, source_by_hash)
-            .expect("no error");
-        let w = w.into_inner().expect("no error");
-        String::from_utf8(w.to_vec()).expect("UTF-8 error while pretty printing errors")
+    ) -> std::fmt::Result {
+        self.diag_list.pretty_print(f, source_by_hash)
     }
 
     /// Returns true if there are errors

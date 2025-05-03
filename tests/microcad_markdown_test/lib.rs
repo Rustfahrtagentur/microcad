@@ -411,7 +411,7 @@ fn create_test_code(
                             write!(out, "{}", context.output().expect("capture error")).expect("output error");
 
                             // print any error
-                            context.pretty_print(out).expect("internal error");
+                            context.write_diagnosis(out).expect("internal error");
 
                             // check if test expected to fail failed at evaluation
                             match (eval, context.has_errors()) {
@@ -456,7 +456,7 @@ fn create_test_code(
                             write!(out, "{}", context.output().expect("capture error")).expect("output error");
 
                             // print any error
-                            context.pretty_print(out).expect("internal error");
+                            context.write_diagnosis(out).expect("internal error");
 
                             // check if test awaited to succeed but failed at evaluation
                             match (eval, context.has_errors(), todo) {
