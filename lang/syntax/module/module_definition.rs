@@ -61,7 +61,7 @@ impl ModuleDefinition {
             None => {
                 // Add values from argument map as local values
                 for (id, value) in args.iter() {
-                    props.assign_and_add_local_value(id, value.clone(), context);
+                    props.assign_and_add_local_value(id, value.clone(), context)?;
                 }
                 if !props.all_initialized() {
                     context.error(

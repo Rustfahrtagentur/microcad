@@ -14,7 +14,7 @@ pub use call_argument_value::*;
 pub use call_argument_value_list::*;
 pub use call_trait::*;
 
-use crate::{eval::*, syntax::*, Id};
+use crate::{eval::*, syntax::*};
 
 use thiserror::Error;
 
@@ -49,14 +49,14 @@ impl Eval for Call {
 pub enum MatchError {
     /// Duplicated argument
     #[error("Duplicated argument: {0}")]
-    DuplicatedArgument(Id),
+    DuplicatedArgument(Identifier),
     /// Occurs when a parameter was given in a call but not in the definition
     #[error("Parameter `{0}` is not defined.")]
-    ParameterNotDefined(Id),
+    ParameterNotDefined(Identifier),
     /// Mismatching type
     #[error("Type mismatch for parameter `{0}`: expected `{1}`, got {2}")]
-    PositionalArgumentTypeMismatch(Id, Type, Type),
+    PositionalArgumentTypeMismatch(Identifier, Type, Type),
     /// Parameter required by definition but given in the call
     #[error("Missing parameter: {0}")]
-    MissingParameter(Id),
+    MissingParameter(Identifier),
 }

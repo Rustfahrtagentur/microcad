@@ -36,7 +36,7 @@ impl ModuleInitDefinition {
 
         // Add values from argument map as local values
         for (id, value) in args.iter() {
-            props.assign_and_add_local_value(id, value.clone(), context);
+            props.assign_and_add_local_value(id, value.clone(), context)?;
         }
 
         let mut nodes = Vec::new();
@@ -46,7 +46,7 @@ impl ModuleInitDefinition {
                     let id = &assignment.id;
                     let value = assignment.expression.eval(context)?;
 
-                    props.assign_and_add_local_value(id, value, context);
+                    props.assign_and_add_local_value(id, value, context)?;
                 }
                 Statement::Expression(expression) => {
                     nodes.append(&mut expression.eval(context)?.fetch_nodes())

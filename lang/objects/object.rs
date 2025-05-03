@@ -3,9 +3,8 @@
 
 //! Object an object tree
 
+use crate::{diag::*, eval::*, syntax::*, value::*, Id};
 use std::collections::BTreeMap;
-
-use crate::{eval::*, syntax::*, value::*, Id};
 
 /// A list of values sorted by id
 ///
@@ -59,19 +58,23 @@ impl ObjectProperties {
             .collect()
     }
 
-    /// If the propery with `id` exists, assign the new value and add as local value to the context
+    /// If the property with `id` exists, assign the new value and add as local value to the context
     pub fn assign_and_add_local_value(
         &mut self,
         id: &Identifier,
         value: Value,
         context: &mut EvalContext,
-    ) {
+    ) -> EvalResult<()> {
         if let Some(prop_value) = self.get_value_mut(id) {
             *prop_value = value.clone();
         }
 
         // The result of the assignment becomes a local value, too
-        context.add_local_value(id.clone(), value);
+        if let Err(err) = context.add_local_value(id.clone(), value) {
+            context.error(id, err)
+        } else {
+            Ok(())
+        }
     }
 }
 
