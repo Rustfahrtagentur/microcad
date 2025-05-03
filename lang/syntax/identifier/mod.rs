@@ -90,7 +90,11 @@ impl<'a> From<&'a Identifier> for &'a str {
 
 impl std::fmt::Display for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", self.0)
+        if self.is_empty() {
+            write!(f, "<none>")
+        } else {
+            write!(f, "{}", self.0)
+        }
     }
 }
 
