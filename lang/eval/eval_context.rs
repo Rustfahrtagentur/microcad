@@ -191,11 +191,11 @@ impl Symbols for EvalContext {
 }
 
 impl Diag for EvalContext {
-    fn pretty_print(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
+    fn print_diagnosis(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
         self.diag_handler.pretty_print(w, &self.symbol_table)
     }
 
-    fn errors_as_string(&self) -> String {
+    fn diagnosis_as_string(&self) -> String {
         self.diag_handler.pretty_print_to_string(&self.symbol_table)
     }
 

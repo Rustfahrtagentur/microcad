@@ -3,10 +3,10 @@ use crate::{diag::*, eval::*};
 /// Diagnosis trait gives access about collected errors
 pub trait Diag {
     /// Pretty print all errors
-    fn pretty_print(&self, w: &mut dyn std::io::Write) -> std::io::Result<()>;
+    fn print_diagnosis(&self, w: &mut dyn std::io::Write) -> std::io::Result<()>;
 
     /// Pretty print all errors into a string
-    fn errors_as_string(&self) -> String;
+    fn diagnosis_as_string(&self) -> String;
 
     /// Returns true if there are errors
     fn has_errors(&self) -> bool;
