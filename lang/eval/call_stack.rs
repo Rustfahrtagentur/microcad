@@ -33,7 +33,7 @@ impl CallStackFrame {
     /// Pretty print single call stack frame
     fn pretty_print(
         &self,
-        f: &mut std::fmt::Formatter<'_>,
+        f: &mut dyn std::fmt::Write,
         source_by_hash: &impl GetSourceByHash,
         idx: usize,
     ) -> std::fmt::Result {
@@ -59,6 +59,29 @@ impl CallStackFrame {
 #[derive(Default, Debug, Clone)]
 pub struct CallStack(Vec<CallStackFrame>);
 
+/// Diagnosis trait gives access about collected errors
+pub trait Calls {
+    /// Pretty print all calls
+    fn fmt_calls(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result;
+
+    /// Pretty write all calls into a file
+    fn write_calls(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
+        write!(w, "{}", self.calls())
+    }
+
+    /// Get pretty printed calls as string
+    fn calls(&self) -> String {
+        let mut str = String::new();
+        self.fmt_calls(&mut str).expect("displayable diagnosis");
+        str
+    }
+    /// Push to stack
+    fn push(&mut self, symbol_node: SymbolNode, args: ArgumentMap, src_ref: impl SrcReferrer);
+
+    /// Pop from stack
+    fn pop(&mut self);
+}
+
 impl CallStack {
     /// Push to stack
     pub fn push(&mut self, symbol_node: SymbolNode, args: ArgumentMap, src_ref: impl SrcReferrer) {
@@ -73,7 +96,7 @@ impl CallStack {
     /// Pretty print stack
     pub fn pretty_print(
         &self,
-        f: &mut std::fmt::Formatter<'_>,
+        f: &mut dyn std::fmt::Write,
         source_by_hash: &impl super::GetSourceByHash,
     ) -> std::fmt::Result {
         for (idx, call_stack_frame) in self.0.iter().enumerate() {

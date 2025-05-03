@@ -204,6 +204,20 @@ impl Diag for EvalContext {
     }
 }
 
+impl Calls for EvalContext {
+    fn fmt_calls(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
+        self.call_stack.pretty_print(f, &self.symbol_table)
+    }
+
+    fn push(&mut self, symbol_node: SymbolNode, args: ArgumentMap, src_ref: impl SrcReferrer) {
+        self.call_stack.push(symbol_node, args, src_ref);
+    }
+
+    fn pop(&mut self) {
+        self.call_stack.pop();
+    }
+}
+
 impl UseSymbol for EvalContext {
     fn use_symbol(
         &mut self,
