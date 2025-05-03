@@ -40,7 +40,17 @@ impl Eval for Expression {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
             Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
-            Self::TupleExpression(_) => todo!("Implement tuple expression"),
+            Self::TupleExpression(_) => {
+                context.error(
+                    self,
+                    EvalError::Todo(format!(
+                        "cannot evaluate tuple expression of {} at {}",
+                        self,
+                        context.locate(self)?
+                    )),
+                )?;
+                Ok(Value::None)
+            }
             Self::BinaryOp {
                 lhs,
                 op,
