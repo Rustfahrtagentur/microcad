@@ -72,7 +72,7 @@ impl MethodCall {
         context.error(
             self,
             EvalError::Todo(format!(
-                "cannot evaluate {} at {}",
+                "cannot evaluate method call of {} at {}",
                 self,
                 context.locate(self)?
             )),

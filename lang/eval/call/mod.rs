@@ -24,12 +24,12 @@ impl Eval for Call {
             Ok(symbol) => match &symbol.borrow().def {
                 SymbolDefinition::BuiltinFunction(f) => f.call(&self.argument_list, context),
                 SymbolDefinition::Module(m) => m.eval_call(&self.argument_list, context),
-                symbol => {
+                _ => {
                     context.error(
                         self,
                         EvalError::Todo(format!(
-                            "cannot evaluate {} at {}",
-                            symbol,
+                            "cannot evaluate call of {} at {}",
+                            self.name,
                             context.locate(self)?
                         )),
                     )?;
