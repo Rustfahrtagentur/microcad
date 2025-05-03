@@ -1,11 +1,12 @@
 use crate::{eval::*, resolve::*, src_ref::SrcReferrer, syntax::*};
+use std::collections::btree_map::BTreeMap;
 
 /// Map Id to SymbolNode reference
 #[derive(Debug, Default, Clone)]
-pub struct SymbolMap(std::collections::btree_map::BTreeMap<Identifier, SymbolNodeRcMut>);
+pub struct SymbolMap(BTreeMap<Identifier, SymbolNodeRcMut>);
 
 impl std::ops::Deref for SymbolMap {
-    type Target = std::collections::btree_map::BTreeMap<Identifier, SymbolNodeRcMut>;
+    type Target = BTreeMap<Identifier, SymbolNodeRcMut>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
