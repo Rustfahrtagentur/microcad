@@ -72,7 +72,7 @@ impl EvalContext {
         search_paths: &[std::path::PathBuf],
     ) -> EvalResult<Self> {
         Ok(Self::new(
-            SymbolNode::new_source(SourceFile::load(root)?),
+            SourceFile::load(root)?.resolve(None),
             builtin,
             search_paths,
             Box::new(Stdout),
@@ -91,7 +91,7 @@ impl EvalContext {
         search_paths: &[std::path::PathBuf],
     ) -> Self {
         Self::new(
-            SymbolNode::new(SymbolDefinition::SourceFile(root), None),
+            root.resolve(None),
             builtin,
             search_paths,
             Box::new(Capture::new()),
