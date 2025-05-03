@@ -9,7 +9,7 @@ use crate::{src_ref::*, syntax::*};
 #[derive(Clone, Debug)]
 pub struct MethodCall {
     /// Name of the method
-    pub name: Identifier,
+    pub id: Identifier,
     /// List of arguments
     pub argument_list: CallArgumentList,
     /// Source code reference
@@ -24,13 +24,13 @@ impl SrcReferrer for MethodCall {
 
 impl std::fmt::Display for MethodCall {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}({})", self.name, self.argument_list)
+        write!(f, "{}({})", self.id, self.argument_list)
     }
 }
 
 impl PrintSyntax for MethodCall {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}MethodCall '{}':", "", self.name)?;
+        writeln!(f, "{:depth$}MethodCall '{}':", "", self.id)?;
         self.argument_list.print_syntax(f, depth + 1)
     }
 }
