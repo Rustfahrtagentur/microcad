@@ -3,6 +3,30 @@
 
 use crate::eval::*;
 
+/// trait used by UseDeclaration and implemented by SymbolTable and passed through by EvalContext
+pub trait UseSymbol {
+    /// Find a symbol in the symbol table and copy it to the locals.
+    ///
+    /// Might load any related external file if not already loaded.
+    ///
+    /// # Arguments
+    /// - `name`: Name of the symbol to search for
+    /// - `id`: if given overwrites the ID from qualified name (use as)
+    fn use_symbol(
+        &mut self,
+        name: &QualifiedName,
+        id: Option<Identifier>,
+    ) -> EvalResult<SymbolNodeRcMut>;
+
+    /// Find a symbol in the symbol table and copy all it's children to the locals.
+    ///
+    /// Might load any related external file if not already loaded.
+    ///
+    /// # Arguments
+    /// - `name`: Name of the symbol to search for
+    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut>;
+}
+
 impl Eval for UseStatement {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         self.decl.eval(context)

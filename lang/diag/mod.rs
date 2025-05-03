@@ -16,16 +16,16 @@ use crate::{eval::*, src_ref::*, syntax::*};
 /// A trait to add diagnostics with different levels conveniently
 pub trait PushDiag {
     /// Push a diagnostic message (must be implemented)
-    fn push_diag(&mut self, diag: Diag) -> EvalResult<()>;
+    fn push_diag(&mut self, diag: Diagnostic) -> EvalResult<()>;
 
     /// Push new trace message
     fn trace(&mut self, src: impl SrcReferrer, message: String) {
-        self.push_diag(Diag::Trace(Refer::new(message, src.src_ref())))
+        self.push_diag(Diagnostic::Trace(Refer::new(message, src.src_ref())))
             .expect("could not push diagnostic trace message");
     }
     /// Push new informative message
     fn info(&mut self, src: impl SrcReferrer, message: String) {
-        self.push_diag(Diag::Info(Refer::new(message, src.src_ref())))
+        self.push_diag(Diagnostic::Info(Refer::new(message, src.src_ref())))
             .expect("could not push diagnostic info message");
     }
     /// Push new warning
@@ -34,7 +34,7 @@ pub trait PushDiag {
         src: impl SrcReferrer,
         error: Box<dyn std::error::Error>,
     ) -> EvalResult<()> {
-        self.push_diag(Diag::Warning(Refer::new(error, src.src_ref())))
+        self.push_diag(Diagnostic::Warning(Refer::new(error, src.src_ref())))
     }
     /// Push new error
     fn error(
@@ -42,7 +42,7 @@ pub trait PushDiag {
         src: impl SrcReferrer,
         error: impl std::error::Error + 'static,
     ) -> EvalResult<()> {
-        let err = Diag::Error(Refer::new(Box::new(error), src.src_ref()));
+        let err = Diagnostic::Error(Refer::new(Box::new(error), src.src_ref()));
         log::error!("{err}");
         self.push_diag(err)
     }
@@ -50,7 +50,7 @@ pub trait PushDiag {
 
 /// Diagnostic message with source code reference
 #[derive(Debug)]
-pub enum Diag {
+pub enum Diagnostic {
     /// Trace message with source code reference attached
     Trace(Refer<String>),
     /// Informative message with source code reference attached
@@ -61,22 +61,22 @@ pub enum Diag {
     Error(Refer<Box<dyn std::error::Error>>),
 }
 
-impl Diag {
+impl Diagnostic {
     /// Get diagnostic level
     pub fn level(&self) -> Level {
         match self {
-            Diag::Trace(_) => Level::Trace,
-            Diag::Info(_) => Level::Info,
-            Diag::Warning(_) => Level::Warning,
-            Diag::Error(_) => Level::Error,
+            Diagnostic::Trace(_) => Level::Trace,
+            Diagnostic::Info(_) => Level::Info,
+            Diagnostic::Warning(_) => Level::Warning,
+            Diagnostic::Error(_) => Level::Error,
         }
     }
 
     /// get message (errors will be serialized)
     pub fn message(&self) -> String {
         match self {
-            Diag::Trace(msg) | Diag::Info(msg) => msg.to_string(),
-            Diag::Warning(err) | Diag::Error(err) => err.to_string(),
+            Diagnostic::Trace(msg) | Diagnostic::Info(msg) => msg.to_string(),
+            Diagnostic::Warning(err) | Diagnostic::Error(err) => err.to_string(),
         }
     }
 
@@ -139,7 +139,7 @@ impl Diag {
         }
 
         // Print stack trace
-        if let Diag::Error(_) = self {
+        if let Diagnostic::Error(_) = self {
             //stack.pretty_print(w, source_file_by_hash)?
         }
 
@@ -147,24 +147,24 @@ impl Diag {
     }
 }
 
-impl SrcReferrer for Diag {
+impl SrcReferrer for Diagnostic {
     fn src_ref(&self) -> SrcRef {
         match self {
-            Diag::Trace(message) => message.src_ref(),
-            Diag::Info(message) => message.src_ref(),
-            Diag::Warning(error) => error.src_ref(),
-            Diag::Error(error) => error.src_ref(),
+            Diagnostic::Trace(message) => message.src_ref(),
+            Diagnostic::Info(message) => message.src_ref(),
+            Diagnostic::Warning(error) => error.src_ref(),
+            Diagnostic::Error(error) => error.src_ref(),
         }
     }
 }
 
-impl std::fmt::Display for Diag {
+impl std::fmt::Display for Diagnostic {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Diag::Trace(message) => write!(f, "trace: {}: {message}", self.src_ref()),
-            Diag::Info(message) => write!(f, "info: {}: {message}", self.src_ref()),
-            Diag::Warning(error) => write!(f, "warning: {}: {error}", self.src_ref()),
-            Diag::Error(error) => write!(f, "error: {}: {error}", self.src_ref()),
+            Diagnostic::Trace(message) => write!(f, "trace: {}: {message}", self.src_ref()),
+            Diagnostic::Info(message) => write!(f, "info: {}: {message}", self.src_ref()),
+            Diagnostic::Warning(error) => write!(f, "warning: {}: {error}", self.src_ref()),
+            Diagnostic::Error(error) => write!(f, "error: {}: {error}", self.src_ref()),
         }
     }
 }

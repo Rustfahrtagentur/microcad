@@ -84,7 +84,7 @@ impl ModuleDefinition {
         for statement in &self.body.statements {
             match statement {
                 Statement::Assignment(assignment) => {
-                    let id = assignment.name.id();
+                    let id = &assignment.id;
                     let value = assignment.value.eval(context)?;
                     context.add_local_value(id.clone(), value)?;
                 }

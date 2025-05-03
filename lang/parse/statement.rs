@@ -2,14 +2,14 @@ use crate::{parse::*, parser::*, rc::*, syntax::*};
 
 impl Parse for Assignment {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut name = Identifier::default();
+        let mut id = Identifier::default();
         let mut specified_type = None;
         let mut value = None;
 
         for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::identifier => {
-                    name = Identifier::parse(pair)?;
+                    id = Identifier::parse(pair)?;
                 }
                 Rule::r#type => {
                     specified_type = Some(TypeAnnotation::parse(pair)?);
@@ -24,7 +24,7 @@ impl Parse for Assignment {
         }
 
         Ok(Self {
-            name,
+            id,
             specified_type,
             value: value.expect(INTERNAL_PARSE_ERROR),
             src_ref: pair.into(),

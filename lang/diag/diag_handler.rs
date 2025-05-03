@@ -1,5 +1,27 @@
 use crate::{diag::*, eval::*};
 
+/// Diagnosis trait gives access about collected errors
+pub trait Diag {
+    /// Pretty print all errors
+    fn pretty_print(
+        &self,
+        w: &mut dyn std::io::Write,
+        source_by_hash: &impl GetSourceByHash,
+    ) -> std::io::Result<()>;
+
+    /// Pretty print all errors into a string
+    fn pretty_print_to_string(
+        &self,
+        source_by_hash: &impl GetSourceByHash,
+    ) -> std::io::Result<String>;
+
+    /// Returns true if there are errors
+    fn has_errors(&self) -> bool;
+
+    /// Return number of occurred errors
+    fn error_count(&self) -> u32;
+}
+
 /// Handler for diagnostics
 #[derive(Default)]
 pub struct DiagHandler {
@@ -14,9 +36,8 @@ pub struct DiagHandler {
 }
 
 /// Handler for diagnostics
-impl DiagHandler {
-    /// Pretty print all errors
-    pub fn pretty_print(
+impl Diag for DiagHandler {
+    fn pretty_print(
         &self,
         w: &mut dyn std::io::Write,
         source_by_hash: &impl GetSourceByHash,
@@ -24,8 +45,7 @@ impl DiagHandler {
         self.diag_list.pretty_print(w, source_by_hash)
     }
 
-    /// Pretty print all errors into a string
-    pub fn pretty_print_to_string(
+    fn pretty_print_to_string(
         &self,
         source_by_hash: &impl GetSourceByHash,
     ) -> std::io::Result<String> {
@@ -38,20 +58,23 @@ impl DiagHandler {
         Ok(String::from_utf8(w.to_vec()).expect("UTF-8 error while pretty printing errors"))
     }
 
-    /// Returns true if there are errors
-    pub fn has_errors(&self) -> bool {
+    fn has_errors(&self) -> bool {
         self.error_count > 0
+    }
+
+    fn error_count(&self) -> u32 {
+        self.error_count
     }
 }
 
 impl PushDiag for DiagHandler {
-    fn push_diag(&mut self, diag: super::Diag) -> crate::eval::EvalResult<()> {
-        use super::Diag;
+    fn push_diag(&mut self, diag: super::Diagnostic) -> crate::eval::EvalResult<()> {
+        use super::Diagnostic;
         match &diag {
-            Diag::Error(_) => {
+            Diagnostic::Error(_) => {
                 self.error_count += 1;
             }
-            Diag::Warning(_) => {
+            Diagnostic::Warning(_) => {
                 if self.warnings_as_errors {
                     self.error_count += 1;
                 }

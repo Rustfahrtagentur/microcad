@@ -75,7 +75,7 @@ pub enum Value {
     /// A node in the render tree
     Node(ObjectNode),
     /// A node list in the render tree, result from multiplicity
-    NodeMultiplicity(Vec<ObjectNode>)
+    NodeMultiplicity(Vec<ObjectNode>),
 }
 
 impl Value {
@@ -104,7 +104,7 @@ impl Value {
         match self {
             Self::Node(n) => vec![n],
             Self::NodeMultiplicity(n) => n,
-            _ => vec![]
+            _ => vec![],
         }
     }
 
@@ -169,7 +169,7 @@ impl Value {
                 _ => None,
             },
             Value::NamedTuple(named_tuple) => named_tuple.get(identifier).cloned(),
-            Value::Node(node) => node.borrow().get_property_value(identifier.id()).cloned(),
+            Value::Node(node) => node.borrow().get_property_value(identifier).cloned(),
             _ => None,
         }
     }

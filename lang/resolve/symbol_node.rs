@@ -1,4 +1,4 @@
-use crate::{Id, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*, Id};
 use custom_debug::Debug;
 use log::*;
 
@@ -63,11 +63,8 @@ impl SymbolNode {
     }
 
     /// Create a new build constant.
-    pub fn new_constant(id: Id, value: Value) -> SymbolNodeRcMut {
-        SymbolNode::new(
-            SymbolDefinition::Constant(Identifier(Refer::none(id)), value),
-            None,
-        )
+    pub fn new_constant(id: Identifier, value: Value) -> SymbolNodeRcMut {
+        SymbolNode::new(SymbolDefinition::Constant(id, value), None)
     }
 
     /// Print out symbols from that point.

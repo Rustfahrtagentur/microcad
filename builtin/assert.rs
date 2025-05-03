@@ -75,11 +75,10 @@ fn assert_fail() {
     .expect("resolvable file ../tests/test_cases/syntax/assert_fail.µcad");
 
     assert!(context.eval().is_ok());
-    assert!(context.diag_handler().error_count > 0);
+    assert!(context.error_count() > 0);
 
     assert_eq!(
         context
-            .diag_handler()
             .pretty_print_to_string(&context)
             .expect("internal test error"),
         "error: Assertion failed: false

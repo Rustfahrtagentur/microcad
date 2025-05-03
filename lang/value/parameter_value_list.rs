@@ -5,7 +5,7 @@
 
 use compact_str::CompactStringExt;
 
-use crate::{src_ref::*, value::*, Id};
+use crate::{src_ref::*, value::*};
 
 /// List of parameter values
 #[derive(Clone, Debug, Default)]
@@ -13,7 +13,7 @@ pub struct ParameterValueList {
     /// List of parameter values
     parameters: Vec<ParameterValue>,
     /// access map by name
-    pub by_name: std::collections::BTreeMap<Id, usize>,
+    pub by_name: std::collections::BTreeMap<Identifier, usize>,
     /// Source code reference
     src_ref: SrcRef,
 }
@@ -24,7 +24,7 @@ impl ParameterValueList {
     pub fn new(parameters: Vec<ParameterValue>) -> Self {
         let mut by_name = std::collections::BTreeMap::new();
         for (i, parameter) in parameters.iter().enumerate() {
-            by_name.insert(parameter.name.clone(), i);
+            by_name.insert(parameter.id.clone(), i);
         }
 
         Self {
@@ -36,18 +36,18 @@ impl ParameterValueList {
 
     /// Push parameter value
     pub fn push(&mut self, parameter: ParameterValue) -> std::result::Result<(), ValueError> {
-        if self.by_name.contains_key(&parameter.name) {
-            return Err(ValueError::DuplicateParameter(parameter.name.clone()));
+        if self.by_name.contains_key(&parameter.id) {
+            return Err(ValueError::DuplicateParameter(parameter.id.clone()));
         }
 
         self.by_name
-            .insert(parameter.name.clone(), self.parameters.len());
+            .insert(parameter.id.clone(), self.parameters.len());
         self.parameters.push(parameter);
         Ok(())
     }
 
     /// get ParameterValue by name
-    pub fn get_by_name(&self, name: &Id) -> Option<&ParameterValue> {
+    pub fn get_by_name(&self, name: &Identifier) -> Option<&ParameterValue> {
         self.by_name.get(name).map(|i| &self.parameters[*i])
     }
 
@@ -57,7 +57,7 @@ impl ParameterValueList {
     }
 
     /// remove parameter value by name
-    pub fn remove(&mut self, name: &Id) {
+    pub fn remove(&mut self, name: &Identifier) {
         if let Some(new_index) = self.by_name.remove(name) {
             self.parameters.remove(new_index);
             self.by_name
@@ -100,6 +100,13 @@ impl std::ops::Deref for ParameterValueList {
 
 impl std::fmt::Display for ParameterValueList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{}", self.parameters.iter().map(|p| p.name.to_string()).join_compact(", "))
+        writeln!(
+            f,
+            "{}",
+            self.parameters
+                .iter()
+                .map(|p| p.id.to_string())
+                .join_compact(", ")
+        )
     }
 }

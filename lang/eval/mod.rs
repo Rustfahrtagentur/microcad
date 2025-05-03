@@ -24,7 +24,7 @@
 //! let value = context.eval().expect("evaluation success");
 //!
 //! // print any error
-//! context.diag_handler().pretty_print( stdout(), &context).expect("UTF-8 compatible output");
+//! context.diag_handler.pretty_print( stdout(), &context).expect("UTF-8 compatible output");
 //! ```
 
 mod argument_map;
@@ -40,12 +40,10 @@ mod externals;
 mod format_string;
 mod identifier;
 mod literal;
-mod local_stack;
 mod output;
 mod parameter;
-mod source_cache;
-mod source_file;
 mod statement;
+mod symbols;
 mod r#use;
 
 pub use argument_map::*;
@@ -57,10 +55,10 @@ pub use eval_context::*;
 pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
-pub use source_cache::*;
+pub use r#use::*;
+pub use symbols::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
-use local_stack::*;
 
 /// Evaluation trait
 pub trait Eval {

@@ -45,5 +45,5 @@ pub enum ValueError {
 
     /// Duplicate parameter
     #[error("Duplicate parameter: {0}")]
-    DuplicateParameter(crate::Id),
+    DuplicateParameter(Identifier),
 }

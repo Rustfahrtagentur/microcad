@@ -3,14 +3,14 @@
 
 //! Call argument value list evaluation entity
 
-use crate::{eval::*, ord_map::*, src_ref::*, value::*, Id};
+use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 
 /// List of call argument values
 ///
 /// This class also provides methods to find a matching call
 /// between between the call argument value list and a given parameter list.
 #[derive(Clone, Debug, Default)]
-pub struct CallArgumentValueList(Refer<OrdMap<Id, CallArgumentValue>>);
+pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
 
 impl CallArgumentValueList {
     /// Create a `CallArgumentValueList` from a `CallArgumentList`
@@ -35,9 +35,9 @@ impl CallArgumentValueList {
     ) -> EvalResult<()> {
         match self
             .keys()
-            .find(|name| parameter_values.get_by_name(name).is_none())
+            .find(|id| parameter_values.get_by_name(id).is_none())
         {
-            Some(name) => Err(EvalError::UnexpectedArgument(name.clone())),
+            Some(id) => Err(EvalError::UnexpectedArgument(id.clone())),
             None => Ok(()),
         }
     }
@@ -68,7 +68,7 @@ impl SrcReferrer for CallArgumentValueList {
 }
 
 impl std::ops::Deref for CallArgumentValueList {
-    type Target = OrdMap<Id, CallArgumentValue>;
+    type Target = OrdMap<Identifier, CallArgumentValue>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -93,7 +93,7 @@ impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
 macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
-            $arg_map.get(stringify!($name)).expect(&format!("Argument `{}` expected",stringify!($name))),
+            $arg_map.get(&Identifier(Refer::none(stringify!($name).into()))).expect(&format!("Argument `{}` expected",stringify!($name))),
             &Value::$ty(crate::src_ref::Refer::none($value))
         ));*
     };
@@ -152,7 +152,7 @@ fn call_get_matching_arguments_missing() {
 
     if let Err(EvalError::ValueError(ValueError::MissingArguments(missing))) = arg_map {
         assert_eq!(missing.len(), 1);
-        assert_eq!(&missing[0].name, "bar");
+        assert_eq!(&missing[0].id, "bar");
     } else {
         panic!("Expected MissingArguments error");
     }

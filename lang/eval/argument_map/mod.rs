@@ -11,11 +11,11 @@ pub use argument_match::*;
 pub use multi_argument_map::*;
 pub use multiplicity::*;
 
-use crate::{eval::*, src_ref::*, value::*, Id};
+use crate::{eval::*, src_ref::*, value::*};
 
 /// Map of named call arguments
 #[derive(Clone, Debug, Default)]
-pub struct ArgumentMap(Refer<std::collections::HashMap<Id, Value>>);
+pub struct ArgumentMap(Refer<std::collections::HashMap<Identifier, Value>>);
 
 impl ArgumentMap {
     /// Create empty argument map
@@ -24,13 +24,13 @@ impl ArgumentMap {
     }
 
     /// Fetch an argument by name
-    pub fn get_value<'a, T>(&'a self, name: &str) -> T
+    pub fn get_value<'a, T>(&'a self, id: &Identifier) -> T
     where
         T: std::convert::TryFrom<&'a Value>,
         T::Error: std::fmt::Debug,
     {
         self.0
-            .get(name)
+            .get(id)
             .expect("no name found")
             .try_into()
             .expect("cannot convert argument value")
@@ -44,7 +44,7 @@ impl SrcReferrer for ArgumentMap {
 }
 
 impl std::ops::Deref for ArgumentMap {
-    type Target = std::collections::HashMap<Id, Value>;
+    type Target = std::collections::HashMap<Identifier, Value>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -64,9 +64,9 @@ impl ArgumentMatch for ArgumentMap {
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
     ) -> EvalResult<TypeCheckResult> {
-        let name = &parameter_value.name;
-        parameter_values.remove(name);
-        self.insert(name.clone(), value.clone());
+        let id = &parameter_value.id;
+        parameter_values.remove(id);
+        self.insert(id.clone(), value.clone());
         Ok(TypeCheckResult::SingleMatch)
     }
 }
@@ -84,7 +84,7 @@ fn argument_match_single() {
         .get_matching_arguments(&parameter_values)
         .expect("Matching arguments failed");
 
-    let a = arg_map.get("a");
+    let a = arg_map.get(&Identifier(Refer::none("a".into())));
     assert!(a.is_some());
     let a = a.expect("internal test error");
     assert!(a == &Value::Scalar(Refer::none(5.0)));

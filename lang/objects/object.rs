@@ -11,7 +11,7 @@ use crate::{eval::*, syntax::*, value::*, Id};
 ///
 /// It is required that properties are always sorted by their id.
 #[derive(Clone, Default, Debug)]
-pub struct ObjectProperties(BTreeMap<Id, Value>);
+pub struct ObjectProperties(BTreeMap<Identifier, Value>);
 
 impl ObjectProperties {
     /// Create initial property list by evaluating parameter list
@@ -22,7 +22,7 @@ impl ObjectProperties {
         let mut props = BTreeMap::new();
         for parameter in parameter_list.iter() {
             props.insert(
-                parameter.name.id().clone(),
+                parameter.name.clone(),
                 parameter.eval_default_value(context)?,
             );
         }
@@ -36,17 +36,17 @@ impl ObjectProperties {
     }
 
     /// Get value at id
-    pub fn get_value(&self, id: &Id) -> Option<&Value> {
+    pub fn get_value(&self, id: &Identifier) -> Option<&Value> {
         self.0.get(id)
     }
 
     /// Get mutable value at id
-    pub fn get_value_mut(&mut self, id: &Id) -> Option<&mut Value> {
+    pub fn get_value_mut(&mut self, id: &Identifier) -> Option<&mut Value> {
         self.0.get_mut(id)
     }
 
     /// Get all ids where `value == Value::None`
-    pub fn get_ids_of_uninitialized(&self) -> Vec<Id> {
+    pub fn get_ids_of_uninitialized(&self) -> Vec<Identifier> {
         self.0
             .iter()
             .filter_map(|(id, value)| {
@@ -60,7 +60,12 @@ impl ObjectProperties {
     }
 
     /// If the propery with `id` exists, assign the new value and add as local value to the context
-    pub fn assign_and_add_local_value(&mut self, id: &Id, value: Value, context: &mut EvalContext) {
+    pub fn assign_and_add_local_value(
+        &mut self,
+        id: &Identifier,
+        value: Value,
+        context: &mut EvalContext,
+    ) {
         if let Some(prop_value) = self.get_value_mut(id) {
             *prop_value = value.clone();
         }
@@ -82,7 +87,7 @@ pub struct Object {
 
 impl Object {
     /// Get object property value
-    pub fn get_property_value(&self, id: &Id) -> Option<&Value> {
+    pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
         self.props.get_value(id)
     }
 }

@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*, Id};
+use crate::{parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*};
 use thiserror::Error;
 
 /// Evaluation error
@@ -63,7 +63,7 @@ pub enum EvalError {
 
     /// Parameter names must be unique
     #[error("Duplicated parameter: {0}")]
-    DuplicatedParameter(Id),
+    DuplicatedParameter(Identifier),
 
     /// Return type mismatch
     #[error("Return type mismatch: expected {expected}, got {found}")]
@@ -82,7 +82,7 @@ pub enum EvalError {
 
     /// Unknown qualified name
     #[error("Unknown qualified name: {0}")]
-    UnknownQualifiedName(Id),
+    UnknownQualifiedName(Identifier),
 
     /// Unknown method
     #[error("Unknown method: {0}")]
@@ -94,7 +94,7 @@ pub enum EvalError {
 
     /// Function call missing argument
     #[error("Function call missing argument: {0}")]
-    FunctionCallMissingArgument(Id),
+    FunctionCallMissingArgument(Identifier),
 
     /// Function must return a value
     #[error("Function must return a value")]
@@ -178,7 +178,7 @@ pub enum EvalError {
 
     /// Expected module
     #[error("Expected module: {0}")]
-    ExpectedModule(Id),
+    ExpectedModule(Identifier),
 
     /// Cannot nest item
     #[error("Cannot nest item: {0}")]
@@ -186,15 +186,15 @@ pub enum EvalError {
 
     /// Parameter missing type or value
     #[error("Parameter missing type or value: {0}")]
-    ParameterMissingTypeOrValue(Id),
+    ParameterMissingTypeOrValue(Identifier),
 
     /// Unexpected argument
     #[error("Unexpected argument: {0}")]
-    UnexpectedArgument(Id),
+    UnexpectedArgument(Identifier),
 
     /// Duplicate call argument
     #[error("Duplicate call argument: {0}")]
-    DuplicateCallArgument(Id),
+    DuplicateCallArgument(Identifier),
 
     /// Assertion failed
     #[error("Assertion failed: {0}")]
@@ -274,7 +274,7 @@ pub enum EvalError {
 
     /// Properties are not initialized
     #[error("Properties have not been initialized: {0:?}")]
-    UninitializedProperties(Vec<Id>),
+    UninitializedProperties(Vec<Identifier>),
 }
 
 /// Result type of any evaluation

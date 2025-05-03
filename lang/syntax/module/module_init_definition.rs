@@ -43,7 +43,7 @@ impl ModuleInitDefinition {
         for statement in &self.body.statements {
             match statement {
                 Statement::Assignment(assignment) => {
-                    let id = assignment.name.id();
+                    let id = &assignment.id;
                     let value = assignment.value.eval(context)?;
 
                     props.assign_and_add_local_value(id, value, context);

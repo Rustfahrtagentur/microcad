@@ -2,7 +2,7 @@ use crate::diag::*;
 
 /// We have a vec of source file diagnostics because we want to keep track of diagnostics for each source file separately
 #[derive(Debug, Default)]
-pub struct DiagList(Vec<Diag>);
+pub struct DiagList(Vec<Diagnostic>);
 
 impl DiagList {
     /// Pretty print this list of diagnostics
@@ -18,7 +18,7 @@ impl DiagList {
 }
 
 impl std::ops::Deref for DiagList {
-    type Target = Vec<Diag>;
+    type Target = Vec<Diagnostic>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -26,7 +26,7 @@ impl std::ops::Deref for DiagList {
 }
 
 impl PushDiag for DiagList {
-    fn push_diag(&mut self, diag: Diag) -> crate::eval::EvalResult<()> {
+    fn push_diag(&mut self, diag: Diagnostic) -> crate::eval::EvalResult<()> {
         self.0.push(diag);
         Ok(())
     }

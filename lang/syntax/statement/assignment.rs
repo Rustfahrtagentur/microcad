@@ -9,7 +9,7 @@ use crate::{src_ref::*, syntax::*, ty::*};
 #[derive(Clone, Debug)]
 pub struct Assignment {
     /// Assignee
-    pub name: Identifier,
+    pub id: Identifier,
     /// Type of the assignee
     pub specified_type: Option<TypeAnnotation>,
     /// Value to assign
@@ -27,15 +27,15 @@ impl SrcReferrer for Assignment {
 impl std::fmt::Display for Assignment {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.specified_type {
-            Some(t) => write!(f, "{}: {} = {}", self.name, t.ty(), self.value),
-            None => write!(f, "{} = {}", self.name, self.value),
+            Some(t) => write!(f, "{}: {} = {}", self.id, t.ty(), self.value),
+            None => write!(f, "{} = {}", self.id, self.value),
         }
     }
 }
 
 impl PrintSyntax for Assignment {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}Assignment {}:", "", self.name)?;
+        writeln!(f, "{:depth$}Assignment {}:", "", self.id)?;
         if let Some(specified_type) = &self.specified_type {
             specified_type.print_syntax(f, depth + 1)?;
         }

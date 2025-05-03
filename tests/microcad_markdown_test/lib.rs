@@ -359,12 +359,14 @@ fn create_test_code(
         r##"#[test]
                 #[allow(non_snake_case)]
                 fn r#{name}() {{
-                    use microcad_lang::eval::*;
-                    use microcad_lang::syntax::*;
-                    use microcad_builtin::*;
                     use crate::rust_std::fs;
                     use crate::rust_std::io;
                     use crate::rust_std::io::Write;
+
+                    use microcad_builtin::*;
+                    use microcad_lang::diag::*;
+                    use microcad_lang::eval::*;
+                    use microcad_lang::syntax::*;
 
                     microcad_lang::env_logger_init();
 
@@ -404,16 +406,15 @@ fn create_test_code(
                             // evaluate the code including µcad std library
                             let mut context = EvalContext::from_source_captured(source.clone(), builtin_namespace(), &["../lib".into()]);
                             let eval = context.eval();
-                            let diag = context.diag_handler();
 
                             // get print output
                             write!(out, "{}", context.output().expect("capture error")).expect("output error");
 
                             // print any error
-                            diag.pretty_print( out, &context).expect("internal error");
+                            context.pretty_print( out, &context).expect("internal error");
 
                             // check if test expected to fail failed at evaluation
-                            match (eval, diag.error_count > 0) {
+                            match (eval, context.has_errors()) {
                                 // evaluation had been aborted?
                                 (Err(err),_) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
@@ -422,7 +423,7 @@ fn create_test_code(
                                 // evaluation produced errors?
                                 (_,true) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
-                                   log::debug!("there were {error_count} errors (see {out_name})", error_count = diag.error_count);
+                                   log::debug!("there were {error_count} errors (see {out_name})", error_count = context.error_count());
                                  }
                                 // test expected to fail but succeeds?
                                 (_,_) => {
@@ -450,16 +451,15 @@ fn create_test_code(
                             // evaluate the code including µcad std library
                             let mut context = EvalContext::from_source_captured(source.clone(), builtin_namespace(), &["../lib".into()]);
                             let eval = context.eval();
-                            let diag = context.diag_handler();
-
+                            
                             // get print output
                             write!(out, "{}", context.output().expect("capture error")).expect("output error");
 
                             // print any error
-                            diag.pretty_print( out, &context).expect("internal error");
+                            context.pretty_print( out, &context).expect("internal error");
 
                             // check if test awaited to succeed but failed at evaluation
-                            match (eval, diag.error_count > 0, todo) {
+                            match (eval, context.has_errors(), todo) {
                                 // test expected to succeed and succeeds with no errors
                                 (Ok(_),false,false) => { let _ = fs::hard_link("images/ok.png", banner); }
                                 // test is todo but succeeds with no errors
@@ -477,7 +477,7 @@ fn create_test_code(
                                 // evaluation produced errors?
                                 (_,true,_) => {
                                     let _ = fs::hard_link("images/fail.png", banner);
-                                    panic!("ERROR: there were {error_count} errors (see {out_name})", error_count = diag.error_count);
+                                    panic!("ERROR: there were {error_count} errors (see {out_name})", error_count = context.error_count());
                                 }
                             }
                         },

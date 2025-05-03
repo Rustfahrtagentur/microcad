@@ -12,7 +12,7 @@ pub use algorithm::*;
 pub use object::*;
 pub use transform::*;
 
-use crate::{rc::*, value::Value, Id};
+use crate::{rc::*, syntax::Identifier, value::Value};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -46,7 +46,7 @@ impl ObjectNodeInner {
     /// Get a property from an object node
     ///
     /// Only object nodes can have properties.
-    pub fn get_property_value(&self, id: &Id) -> Option<&Value> {
+    pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
         match self {
             Self::Object(object) => object.get_property_value(id),
             _ => None,

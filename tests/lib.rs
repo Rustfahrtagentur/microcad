@@ -5,10 +5,7 @@
 mod use_test;
 
 #[cfg(test)]
-use log::debug;
-
-#[cfg(test)]
-use microcad_lang::{parser::*, resolve::*, syntax::*};
+use microcad_lang::{eval::*, parser::*, resolve::*, src_ref::*, syntax::*};
 
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
@@ -88,10 +85,9 @@ fn module_implicit_init_call() {
     env_logger_init();
 
     let mut context = evaluate_file("syntax/module/implicit_init.µcad");
-    debug!("Source File:\n{}", context.get_root());
 
     let node = context
-        .fetch_global(&qualified_name("implicit_init::a"))
+        .lookup(&qualified_name("implicit_init::a"))
         .expect("Node expected");
 
     // Check node id
@@ -120,7 +116,7 @@ fn module_implicit_init_call() {
         if let objects::ObjectNodeInner::Object(ref object) = *node.borrow() {
             assert_eq!(
                 object
-                    .get_property_value(&"b".into())
+                    .get_property_value(&Identifier(Refer::none("b".into())))
                     .expect("Property `b`"),
                 &value::Value::Scalar(src_ref::Refer::none(value))
             );
@@ -146,12 +142,13 @@ fn module_implicit_init_call() {
 
 #[test]
 fn module_explicit_init_call() {
+    use microcad_lang::diag::Diag;
     use microcad_lang::*;
     env_logger_init();
 
     let mut context = evaluate_file("syntax/module/explicit_init.µcad");
     let node = context
-        .fetch_global(&qualified_name("explicit_init::circle"))
+        .lookup(&qualified_name("explicit_init::circle"))
         .expect("Node expected");
 
     // Get module definition for symbol `a`
@@ -165,7 +162,7 @@ fn module_explicit_init_call() {
         if let objects::ObjectNodeInner::Object(ref object) = *node.borrow() {
             assert_eq!(
                 object
-                    .get_property_value(&"radius".into())
+                    .get_property_value(&Identifier(Refer::none("radius".into())))
                     .expect("Property `radius`"),
                 &value::Value::Scalar(src_ref::Refer::none(value))
             );
@@ -223,7 +220,6 @@ fn module_explicit_init_call() {
             .fetch_nodes();
         assert_eq!(nodes.len(), 0, "There should no nodes");
         context
-            .diag_handler()
             .pretty_print(&mut std::io::stdout(), &context)
             .expect("Valid formatter");
     }
