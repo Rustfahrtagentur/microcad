@@ -1,0 +1,6 @@
+error: Symbol __builtin::geo2d::rect not found.
+  ---> ../lib/std/geo2d.µcad:39:5
+     |
+  39 |     __builtin::geo2d::rect(
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

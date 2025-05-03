@@ -1,11 +1,11 @@
 error: Symbol radius_outer not found.
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:6:1
+  ---> ../lib/std/geo2d.µcad:6:1
      |
    6 | module circle(radius: Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Symbol radius_inner not found.
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:6:1
+  ---> ../lib/std/geo2d.µcad:6:1
      |
    6 | module circle(radius: Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -21,13 +21,13 @@ error: Invalid operator: Multiplicity [
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Symbol __builtin::geo2d::circle not found.
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:19:5
+  ---> ../lib/std/geo2d.µcad:19:5
      |
   19 |     __builtin::geo2d::circle(radius / 1mm);
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Symbol __builtin::geo2d::circle not found.
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:19:5
+  ---> ../lib/std/geo2d.µcad:19:5
      |
   19 |     __builtin::geo2d::circle(radius / 1mm);
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -45,13 +45,13 @@ Object
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Symbol radius_outer not found.
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:6:1
+  ---> ../lib/std/geo2d.µcad:6:1
      |
    6 | module circle(radius: Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Symbol radius_inner not found.
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:6:1
+  ---> ../lib/std/geo2d.µcad:6:1
      |
    6 | module circle(radius: Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

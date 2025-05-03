@@ -1,11 +1,11 @@
 error: Symbol __builtin::geo2d::circle not found.
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:19:5
+  ---> ../lib/std/geo2d.µcad:19:5
      |
   19 |     __builtin::geo2d::circle(radius / 1mm);
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Symbol __builtin::geo2d::rect not found.
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:39:5
+  ---> ../lib/std/geo2d.µcad:39:5
      |
   39 |     __builtin::geo2d::rect(
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^

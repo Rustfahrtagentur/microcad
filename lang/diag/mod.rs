@@ -7,6 +7,8 @@ mod diag_handler;
 mod diag_list;
 mod level;
 
+use std::io::Cursor;
+
 pub use diag_handler::*;
 pub use diag_list::*;
 pub use level::*;
@@ -106,6 +108,17 @@ impl Diagnostic {
         let src_ref = self.src_ref();
         let source_file = source_by_hash.get_by_hash(src_ref.source_hash());
 
+        fn make_relative(path: &std::path::Path) -> String {
+            let current_dir = std::env::current_dir().expect("current dir");
+            if let Ok(path) = path.canonicalize() {
+                log::trace!("{path:?} {current_dir:?}");
+                pathdiff::diff_paths(path, current_dir).expect("paths are not related")
+            } else {
+                path.to_path_buf()
+            }
+            .to_string_lossy()
+            .to_string()
+        }
         match &src_ref {
             SrcRef(None) => writeln!(f, "{}: {}", self.level(), self.message())?,
             SrcRef(Some(src_ref)) => {
@@ -115,8 +128,8 @@ impl Diagnostic {
                     "  ---> {}:{}",
                     source_file
                         .as_ref()
-                        .map(|sf| sf.filename_as_str())
-                        .unwrap_or(SourceFile::NO_FILE),
+                        .map(|sf| make_relative(&sf.filename))
+                        .unwrap_or(SourceFile::NO_FILE.to_string()),
                     src_ref.at
                 )?;
                 writeln!(f, "     |",)?;

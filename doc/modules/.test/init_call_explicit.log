@@ -1,5 +1,5 @@
 error: Symbol l not found.
-  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:6:1
+  ---> ../lib/std/geo2d.µcad:6:1
      |
    6 | module circle(radius: Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
