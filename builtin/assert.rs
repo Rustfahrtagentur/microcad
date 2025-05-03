@@ -46,8 +46,8 @@ pub fn assert_invalid() -> SymbolNodeRcMut {
     SymbolNode::new_builtin_fn(id, &|args, context| {
         if let Ok(name) = args.get_single() {
             let n = QualifiedName::try_from(name.value.to_string())?;
-            if let Err(err) = context.lookup(&n) {
-                context.error(name, err)?;
+            if let Ok(symbol) = context.lookup(&n) {
+                context.error(name, EvalError::SymbolFound(symbol.borrow().full_name()))?;
             }
         }
         Ok(Value::None)

@@ -1,9 +1,9 @@
-// use assert_valid for test checks
-use std::debug::assert_valid;
+// use all symbols from std::debug for test checks
+use std::debug::*;
 
 // use debug from `std/module.µcad`
 use std::debug;
-debug::assert(true);
+assert(true);
 
 // use symbol `circle` in file `geo2d.µcad`
 use std::geo2d::circle;
@@ -26,7 +26,7 @@ print("Hello");
 // public use algorithm from `std/module.µcad`
 pub use std::algorithm;
 assert_valid(algorithm);
-assert_valid(use_test::algorithm);
+assert_invalid(use_test::algorithm);
 
 module my_module() {
     circle(radius=1);

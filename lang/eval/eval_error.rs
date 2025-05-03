@@ -113,7 +113,7 @@ pub enum EvalError {
     NoSymbolsFound(QualifiedName),
 
     /// Symbol was not expected to be found (e.g. assert_invalid)
-    #[error("Symbol {0} found unexpected")]
+    #[error("Unexpectedly found symbol {0}")]
     SymbolFound(QualifiedName),
 
     /// Local symbol not found
