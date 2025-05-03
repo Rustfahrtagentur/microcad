@@ -29,7 +29,7 @@ impl Eval for Call {
                         self,
                         EvalError::Todo(format!(
                             "cannot evaluate call of {} at {}",
-                            self.name,
+                            self,
                             context.locate(self)?
                         )),
                     )?;
