@@ -143,28 +143,47 @@ impl Symbols for SymbolTable {
         log::debug!("Lookup {name}");
 
         // collect all symbols that can be found
-        let found: Vec<_> = [
+        let result = [
             self.lookup_local(name),
             self.lookup_global(name),
             self.lookup_global(&name.with_prefix(&self.locals.current_namespace())),
         ]
-        .into_iter()
-        .filter_map(Result::ok)
-        .map(|symbol| self.follow_alias(symbol))
-        .filter_map(Result::ok)
-        .collect();
+        .into_iter();
 
-        // Check for ambiguity
+        // collect ok-results and ambiguity errors
+        let (found, mut ambiguous) =
+            result.fold((Vec::new(), Vec::new()), |(mut oks, mut ambiguity), r| {
+                match r {
+                    Ok(symbol) => oks.push(symbol),
+                    Err(EvalError::AmbiguousSymbol { ambiguous, others }) => {
+                        ambiguity.push(EvalError::AmbiguousSymbol { ambiguous, others })
+                    }
+
+                    Err(_) => (),
+                }
+                (oks, ambiguity)
+            });
+
+        // early emit any ambiguity error
+        if !ambiguous.is_empty() {
+            return Err(ambiguous.remove(0));
+        }
+
+        // follow aliases
+        let found: Vec<SymbolNodeRcMut> = found
+            .into_iter()
+            .map(|symbol| self.follow_alias(symbol))
+            .filter_map(Result::ok)
+            .collect();
+
+        // check for ambiguity in what's left
         match found.first() {
             Some(first) => {
                 // check if all findings point to the same symbol
                 if !found.iter().all(|x| std::rc::Rc::ptr_eq(x, first)) {
                     Err(EvalError::AmbiguousSymbol {
                         ambiguous: name.clone(),
-                        others: found
-                            .iter()
-                            .map(|symbol| symbol.borrow().full_name().clone())
-                            .collect(),
+                        others: found.iter().cloned().collect::<SymbolNodes>(),
                     })
                 } else {
                     Ok(first.clone())

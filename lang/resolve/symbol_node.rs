@@ -16,6 +16,38 @@ pub struct SymbolNode {
 /// Shortcut of `Rc<Cell<SymbolNode>>`
 pub type SymbolNodeRcMut = RcMut<SymbolNode>;
 
+/// List of qualified names which can pe displayed
+#[derive(Debug)]
+pub struct SymbolNodes(Vec<SymbolNodeRcMut>);
+
+impl std::fmt::Display for SymbolNodes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.0
+                .iter()
+                .map(|name| name.to_string())
+                .collect::<Vec<_>>()
+                .join("")
+        )
+    }
+}
+
+impl std::ops::Deref for SymbolNodes {
+    type Target = Vec<SymbolNodeRcMut>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl FromIterator<SymbolNodeRcMut> for SymbolNodes {
+    fn from_iter<T: IntoIterator<Item = SymbolNodeRcMut>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
+    }
+}
+
 impl SymbolNode {
     /// Create a symbol node for a source file.
     ///

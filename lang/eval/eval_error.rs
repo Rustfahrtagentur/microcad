@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{parse::*, src_ref::SrcRef, syntax::*, ty::*, value::*};
+use crate::{parse::*, resolve::*, src_ref::SrcRef, syntax::*, ty::*, value::*};
 use thiserror::Error;
 
 /// Evaluation error
@@ -160,12 +160,12 @@ pub enum EvalError {
     },
 
     /// Found ambiguous symbol
-    #[error("Ambiguous symbol {ambiguous} might be one of the following: {others}")]
+    #[error("Ambiguous symbol {ambiguous} might be one of the following:\n{others}")]
     AmbiguousSymbol {
         /// ambiguous symbol
         ambiguous: QualifiedName,
         /// local symbol that matches
-        others: QualifiedNames,
+        others: SymbolNodes,
     },
 
     /// Invalid argument type
