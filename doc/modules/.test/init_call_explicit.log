@@ -1,6 +1,6 @@
-error: Symbol m not found.
-  ---> <from_str>:9:1
+error: Symbol l not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:6:1
      |
-   9 | m(f=1mm);
-     | ^^^^^^^^
+   6 | module circle(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |

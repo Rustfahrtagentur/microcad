@@ -1,4 +1,4 @@
-error: Not implemented: cannot evaluate union (builtin module) at <from_str>:1:1
+error: Not implemented: cannot evaluate call of std::algorithm::union() at <from_str>:1:1
   ---> <from_str>:1:1
      |
    1 | std::algorithm::union() {

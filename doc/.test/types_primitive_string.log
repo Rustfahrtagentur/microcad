@@ -1,4 +1,4 @@
-error: Not implemented: cannot evaluate count(11) at <from_str>:2:24
+error: Not implemented: cannot evaluate method call of count(11) at <from_str>:2:24
   ---> <from_str>:2:24
      |
    2 | std::debug::assert(text.count(11));

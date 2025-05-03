@@ -1,6 +1,7 @@
-error: Symbol donut not found.
-  ---> <from_str>:8:1
+error: Value Error: Missing arguments: outer, inner
+
+  ---> <from_str>:2:1
      |
-   8 | donut(2cm,1cm);
-     | ^^^^^^^^^^^^^^
+   2 | module donut(outer: length, inner: length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |

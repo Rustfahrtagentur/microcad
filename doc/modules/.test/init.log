@@ -1,18 +1,68 @@
-error: Symbol donut not found.
-  ---> <from_str>:16:1
+error: Symbol radius_outer not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:6:1
      |
-  16 | donut( 2cm, 1cm );
-     | ^^^^^^^^^^^^^^^^^
+   6 | module circle(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol donut not found.
-  ---> <from_str>:17:1
+error: Symbol radius_inner not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:6:1
      |
-  17 | donut( radius_outer = 2cm, radius_inner = 1cm );
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   6 | module circle(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol donut not found.
-  ---> <from_str>:18:1
+error: Invalid operator: Multiplicity [
+]
+ - Multiplicity [
+]
+
+  ---> <from_str>:12:5
      |
-  18 | donut( diameter_outer = 4cm, diameter_inner = 2cm );
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  12 |     std::geo2d::circle(r = radius_outer) - std::geo2d::circle(r = radius_inner);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol __builtin::geo2d::circle not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:19:5
+     |
+  19 |     __builtin::geo2d::circle(radius / 1mm);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol __builtin::geo2d::circle not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:19:5
+     |
+  19 |     __builtin::geo2d::circle(radius / 1mm);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Invalid operator: Multiplicity [
+Object
+,]
+ - Multiplicity [
+Object
+,]
+
+  ---> <from_str>:12:5
+     |
+  12 |     std::geo2d::circle(r = radius_outer) - std::geo2d::circle(r = radius_inner);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol radius_outer not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:6:1
+     |
+   6 | module circle(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol radius_inner not found.
+  ---> /home/pat/git/rustfahrt/mcad/lib/std/geo2d.µcad:6:1
+     |
+   6 | module circle(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Invalid operator: Multiplicity [
+]
+ - Multiplicity [
+]
+
+  ---> <from_str>:12:5
+     |
+  12 |     std::geo2d::circle(r = radius_outer) - std::geo2d::circle(r = radius_inner);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
