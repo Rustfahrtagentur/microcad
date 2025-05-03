@@ -55,15 +55,14 @@ impl SymbolDefinition {
 
 impl std::fmt::Display for SymbolDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let id = self.id();
         match self {
-            Self::Module(_) => write!(f, "{} (module)", id),
-            Self::Namespace(_) => write!(f, "{} (namespace)", id),
-            Self::External(_) => write!(f, "{} (external)", id),
-            Self::Function(_) => write!(f, "{} (function)", id),
-            Self::SourceFile(_) => write!(f, "{} (file)", id),
-            Self::BuiltinFunction(_) => write!(f, "{} (builtin function)", id),
-            Self::BuiltinModule(_) => write!(f, "{} (builtin module)", id),
+            Self::Module(_) => write!(f, "(module)"),
+            Self::Namespace(_) => write!(f, "(namespace)"),
+            Self::External(_) => write!(f, "(external)"),
+            Self::Function(_) => write!(f, "(function)"),
+            Self::SourceFile(_) => write!(f, "(file)"),
+            Self::BuiltinFunction(_) => write!(f, "(builtin function)"),
+            Self::BuiltinModule(_) => write!(f, "(builtin module)"),
             Self::Constant(id, value) => write!(f, "{} (constant) = {}", id, value),
             Self::Alias(id, name) => write!(f, "{} (alias) => {}", id, name),
         }

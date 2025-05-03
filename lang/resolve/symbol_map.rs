@@ -52,8 +52,8 @@ impl SymbolMap {
 
 impl std::fmt::Display for SymbolMap {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for (_, symbol) in self.0.iter() {
-            write!(f, "{symbol}")?;
+        for (id, symbol) in self.0.iter() {
+            symbol.borrow().print_symbol(f, Some(id), 0)?;
         }
 
         Ok(())

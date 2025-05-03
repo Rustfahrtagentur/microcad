@@ -27,7 +27,7 @@ impl std::fmt::Display for SymbolNodes {
             "{}",
             self.0
                 .iter()
-                .map(|name| name.to_string())
+                .map(|symbol| symbol.to_string())
                 .collect::<Vec<_>>()
                 .join("")
         )
@@ -107,14 +107,20 @@ impl SymbolNode {
     }
 
     /// Print out symbols from that point.
-    pub fn print_symbol(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}{} [{}]", "", self.def, self.full_name())?;
+    pub fn print_symbol(
+        &self,
+        f: &mut std::fmt::Formatter,
+        id: Option<&Identifier>,
+        depth: usize,
+    ) -> std::fmt::Result {
+        let self_id = &self.def.id();
+        let id = id.unwrap_or(self_id);
+        writeln!(f, "{:depth$}{id} {} [{}]", "", self.def, self.full_name())?;
+        let indent = format!("{id}").len();
 
-        self.children.iter().try_for_each(|(_, child)| {
-            child
-                .borrow()
-                .print_symbol(f, depth + self.def.id().id().len())
-        })
+        self.children
+            .iter()
+            .try_for_each(|(id, child)| child.borrow().print_symbol(f, Some(id), depth + indent))
     }
 
     /// Insert child and change parent of child to new parent.
@@ -195,13 +201,13 @@ impl FullyQualify for SymbolNode {
 
 impl std::fmt::Display for SymbolNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.print_symbol(f, 0)
+        self.print_symbol(f, None, 0)
     }
 }
 
 impl std::fmt::Display for SymbolNodeRcMut {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.borrow().print_symbol(f, 0)
+        self.borrow().print_symbol(f, None, 0)
     }
 }
 
@@ -210,7 +216,7 @@ pub struct FormatSymbol<'a>(pub &'a SymbolNode);
 
 impl std::fmt::Display for FormatSymbol<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.print_symbol(f, 0)
+        self.0.print_symbol(f, Some(&self.0.id()), 0)
     }
 }
 
