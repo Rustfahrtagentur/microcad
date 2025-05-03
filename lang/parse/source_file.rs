@@ -15,8 +15,8 @@ impl SourceFile {
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)?;
         assert_ne!(source_file.hash, 0);
         source_file.filename = path.as_ref().to_path_buf();
-        log::info!(
-            "loaded file {} successfully",
+        log::debug!(
+            "Successfully loaded file {}",
             path.as_ref().to_string_lossy()
         );
         log::trace!("Syntax tree:\n{}", FormatSyntax(&source_file));

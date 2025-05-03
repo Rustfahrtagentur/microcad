@@ -154,12 +154,14 @@ fn eval(
     );
     let result = context.eval().map_err(|err| anyhow::anyhow!("{err}"))?;
 
+    log::info!("Result:");
     println!("{result}");
     match context.has_errors() {
         true => {
-            eprintln!("Evaluated with errors:\n{}", context);
+            log::warn!("Evaluated with errors:");
+            eprintln!("{}", context.diagnosis());
         }
-        false => eprintln!("Evaluated successfully!"),
+        false => log::info!("Evaluated successfully!"),
     }
 
     todo!("object node output")

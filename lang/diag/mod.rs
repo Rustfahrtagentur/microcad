@@ -109,8 +109,8 @@ impl Diagnostic {
         fn make_relative(path: &std::path::Path) -> String {
             let current_dir = std::env::current_dir().expect("current dir");
             if let Ok(path) = path.canonicalize() {
-                log::trace!("{path:?} {current_dir:?}");
-                pathdiff::diff_paths(path, current_dir).expect("paths are not related")
+                pathdiff::diff_paths(path, current_dir)
+                    .expect("related paths:\n  {path:?}\n  {current_dir:?}")
             } else {
                 path.to_path_buf()
             }

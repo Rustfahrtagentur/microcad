@@ -272,7 +272,7 @@ impl std::fmt::Display for SymbolTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Loaded files:\n{files}\nLocals [{name}]:\n{locals}\nSymbols:\n{symbols}",
+            "Loaded files:\n{files}\nNamespace: {name}\n\nLocals:\n{locals}\nSymbols:\n{symbols}",
             files = self.cache,
             name = self.locals.current_namespace(),
             locals = self.locals,

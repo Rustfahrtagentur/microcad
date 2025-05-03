@@ -116,7 +116,7 @@ impl SymbolNode {
         let self_id = &self.def.id();
         let id = id.unwrap_or(self_id);
         writeln!(f, "{:depth$}{id} {} [{}]", "", self.def, self.full_name())?;
-        let indent = format!("{id}").len();
+        let indent = 4; //format!("{id}").len();
 
         self.children
             .iter()
