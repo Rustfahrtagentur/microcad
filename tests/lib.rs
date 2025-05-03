@@ -85,7 +85,7 @@ fn module_implicit_init_call() {
     let mut context = evaluate_file("syntax/module/implicit_init.µcad");
 
     let node = context
-        .lookup(&qualified_name("implicit_init::a"))
+        .lookup(&qualified_name("a"))
         .expect("Node expected");
 
     // Check node id
@@ -146,7 +146,7 @@ fn module_explicit_init_call() {
 
     let mut context = evaluate_file("syntax/module/explicit_init.µcad");
     let node = context
-        .lookup(&qualified_name("explicit_init::circle"))
+        .lookup(&qualified_name("circle"))
         .expect("Node expected");
 
     // Get module definition for symbol `a`
