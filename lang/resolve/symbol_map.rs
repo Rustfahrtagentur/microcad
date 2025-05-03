@@ -25,8 +25,13 @@ impl SymbolMap {
     }
 
     /// Insert a not by it's own id.
-    pub fn insert_node(&mut self, symbol: SymbolNodeRcMut) {
+    pub fn add_node(&mut self, symbol: SymbolNodeRcMut) {
         let id = symbol.borrow().id();
+        self.0.insert(id, symbol);
+    }
+
+    /// Insert a not by it's own id.
+    pub fn insert_node(&mut self, id: Identifier, symbol: SymbolNodeRcMut) {
         self.0.insert(id, symbol);
     }
 
@@ -47,6 +52,14 @@ impl SymbolMap {
         }
 
         Err(EvalError::SymbolNotFound(name.clone()))
+    }
+
+    /// detach children from their parent
+    pub fn detach_from_parent(mut self) -> Self {
+        for child in self.iter_mut() {
+            child.1.borrow_mut().parent = None;
+        }
+        self
     }
 }
 

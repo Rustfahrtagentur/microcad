@@ -35,15 +35,15 @@ impl SymbolTable {
         };
 
         // prepare symbol map
-        let mut globals = root.borrow().children.clone();
-        globals.insert_node(builtin);
+        let mut globals = root.borrow().children.clone().detach_from_parent();
+        globals.add_node(builtin);
 
         // create namespaces for all files in search paths into symbol map
         source_cache
             .create_namespaces()
             .iter()
-            .for_each(|(_, namespace)| {
-                globals.insert_node(namespace.clone());
+            .for_each(|(id, namespace)| {
+                globals.insert_node(id.clone(), namespace.clone());
             });
 
         let context = Self {

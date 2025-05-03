@@ -27,19 +27,6 @@ impl SourceCache {
         let mut by_hash = std::collections::HashMap::new();
         by_hash.insert(root.hash, 0);
 
-        let mut by_name = std::collections::HashMap::new();
-        by_name.insert(
-            QualifiedName::try_from(
-                root.filename
-                    .file_stem()
-                    .expect("file stem")
-                    .to_string_lossy()
-                    .to_string(),
-            )
-            .unwrap_or(Identifier::default().into()),
-            0,
-        );
-
         let mut by_path = std::collections::HashMap::new();
         by_path.insert(root.filename.clone(), 0);
         Self {
@@ -47,7 +34,8 @@ impl SourceCache {
             source_files: vec![root.clone()],
             by_hash,
             by_path,
-            by_name,
+            // root shall be found by name
+            by_name: std::collections::HashMap::new(),
         }
     }
 
