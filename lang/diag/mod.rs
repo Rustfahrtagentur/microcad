@@ -7,8 +7,6 @@ mod diag_handler;
 mod diag_list;
 mod level;
 
-use std::io::Cursor;
-
 pub use diag_handler::*;
 pub use diag_list::*;
 pub use level::*;
