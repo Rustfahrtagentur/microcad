@@ -10,7 +10,7 @@ pub struct LocalStack(Vec<LocalFrame>);
 
 impl LocalStack {
     /// Add a new variable to current stack frame.
-    pub fn add(&mut self, id: Option<Identifier>, frame: SymbolNode) -> EvalResult<()> {
+    pub fn add(&mut self, id: Option<Identifier>, frame: Symbol) -> EvalResult<()> {
         let id = if let Some(id) = id { id } else { frame.id() };
         let name = frame.full_name();
         if name.is_qualified() {
@@ -62,11 +62,11 @@ impl Locals for LocalStack {
     }
 
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        self.add(Some(id.clone()), SymbolNode::new_constant(id, value))
+        self.add(Some(id.clone()), Symbol::new_constant(id, value))
     }
 
     /// Fetch a local variable from current stack frame.
-    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNode> {
+    fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         // search from inner scope to root scope to shadow outside locals
         for frame in self.0.iter().rev() {
             match frame {
@@ -106,7 +106,7 @@ fn local_stack() {
     let mut stack = LocalStack::default();
 
     let make_int =
-        |id, value| SymbolNode::new_constant(id, Value::Integer(Refer::new(value, SrcRef(None))));
+        |id, value| Symbol::new_constant(id, Value::Integer(Refer::new(value, SrcRef(None))));
 
     let fetch_int = |stack: &LocalStack, id: &str| -> Option<i64> {
         match stack.fetch(&id.into()) {

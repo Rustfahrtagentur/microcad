@@ -11,7 +11,7 @@ use crate::{eval::*, resolve::*, src_ref::*, syntax::*};
 #[derive(Debug, Clone)]
 pub struct CallStackFrame {
     /// Symbol that was call
-    symbol_node: SymbolNode,
+    symbol_node: Symbol,
 
     /// Call arguments
     args: ArgumentMap,
@@ -22,7 +22,7 @@ pub struct CallStackFrame {
 
 impl CallStackFrame {
     /// Construct a new stack frame
-    pub fn new(symbol_node: SymbolNode, args: ArgumentMap, src_ref: impl SrcReferrer) -> Self {
+    pub fn new(symbol_node: Symbol, args: ArgumentMap, src_ref: impl SrcReferrer) -> Self {
         Self {
             symbol_node,
             args,
@@ -76,7 +76,7 @@ pub trait CallTrace {
         str
     }
     /// Push to stack
-    fn push(&mut self, symbol_node: SymbolNode, args: ArgumentMap, src_ref: impl SrcReferrer);
+    fn push(&mut self, symbol_node: Symbol, args: ArgumentMap, src_ref: impl SrcReferrer);
 
     /// Pop from stack
     fn pop(&mut self);
@@ -84,7 +84,7 @@ pub trait CallTrace {
 
 impl CallStack {
     /// Push to stack
-    pub fn push(&mut self, symbol_node: SymbolNode, args: ArgumentMap, src_ref: impl SrcReferrer) {
+    pub fn push(&mut self, symbol_node: Symbol, args: ArgumentMap, src_ref: impl SrcReferrer) {
         self.0.push(CallStackFrame::new(symbol_node, args, src_ref))
     }
 

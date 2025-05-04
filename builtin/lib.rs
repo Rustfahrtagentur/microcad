@@ -19,7 +19,7 @@ pub(crate) use math::math;
 pub(crate) use print::print;
 
 /// Build the standard module
-pub fn builtin_namespace() -> SymbolNode {
+pub fn builtin_namespace() -> Symbol {
     NamespaceBuilder::new("__builtin".try_into().expect("unexpected name error"))
         .symbol(assert())
         .symbol(assert_valid())

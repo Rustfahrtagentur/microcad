@@ -3,19 +3,19 @@ use custom_debug::Debug;
 
 /// Symbol node
 #[derive(Debug, Clone)]
-pub struct SymbolNodeInner {
+pub struct SymbolInner {
     /// Symbol definition
     pub def: SymbolDefinition,
     /// Symbol's parent node
     #[debug(skip)]
-    pub parent: Option<SymbolNode>,
+    pub parent: Option<Symbol>,
     /// Symbol's children nodes
     pub children: SymbolMap,
 }
 
 /// Shortcut of `Rc<Cell<SymbolNode>>`
 #[derive(Debug, Clone)]
-pub struct SymbolNode(RcMut<SymbolNodeInner>);
+pub struct Symbol(RcMut<SymbolInner>);
 
 impl std::ops::Deref for Symbol {
     type Target = RcMut<SymbolInner>;
@@ -33,15 +33,15 @@ impl std::ops::DerefMut for Symbol {
 
 /// List of qualified names which can pe displayed
 #[derive(Debug)]
-pub struct SymbolNodes(Vec<SymbolNode>);
+pub struct Symbols(Vec<Symbol>);
 
-impl From<Vec<SymbolNode>> for SymbolNodes {
-    fn from(value: Vec<SymbolNode>) -> Self {
+impl From<Vec<Symbol>> for Symbols {
+    fn from(value: Vec<Symbol>) -> Self {
         Self(value)
     }
 }
 
-impl std::fmt::Display for SymbolNodes {
+impl std::fmt::Display for Symbols {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -55,24 +55,24 @@ impl std::fmt::Display for SymbolNodes {
     }
 }
 
-impl std::ops::Deref for SymbolNodes {
-    type Target = Vec<SymbolNode>;
+impl std::ops::Deref for Symbols {
+    type Target = Vec<Symbol>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl FromIterator<SymbolNode> for SymbolNodes {
-    fn from_iter<T: IntoIterator<Item = SymbolNode>>(iter: T) -> Self {
+impl FromIterator<Symbol> for Symbols {
+    fn from_iter<T: IntoIterator<Item = Symbol>>(iter: T) -> Self {
         Self(iter.into_iter().collect())
     }
 }
 
-impl SymbolNode {
+impl Symbol {
     /// Create new symbol node without children
-    pub fn new(def: SymbolDefinition, parent: Option<SymbolNode>) -> Self {
-        SymbolNode(RcMut::new(SymbolNodeInner {
+    pub fn new(def: SymbolDefinition, parent: Option<Symbol>) -> Self {
+        Symbol(RcMut::new(SymbolInner {
             def,
             parent,
             children: Default::default(),
@@ -82,44 +82,44 @@ impl SymbolNode {
     ///
     /// # Arguments
     /// - `source_file`: Resolved source file.
-    pub fn new_source(source_file: Rc<SourceFile>) -> SymbolNode {
-        SymbolNode::new(SymbolDefinition::SourceFile(source_file), None)
+    pub fn new_source(source_file: Rc<SourceFile>) -> Symbol {
+        Symbol::new(SymbolDefinition::SourceFile(source_file), None)
     }
 
     /// Create a symbol node of a built-in function.
-    pub fn new_builtin_fn(id: Identifier, f: &'static BuiltinFunctionFn) -> SymbolNode {
-        SymbolNode::new(
+    pub fn new_builtin_fn(id: Identifier, f: &'static BuiltinFunctionFn) -> Symbol {
+        Symbol::new(
             SymbolDefinition::BuiltinFunction(BuiltinFunction::new(id, f)),
             None,
         )
     }
 
     /// Create a symbol node for a built-in module.
-    pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> SymbolNode {
-        SymbolNode::new(
+    pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> Symbol {
+        Symbol::new(
             SymbolDefinition::BuiltinModule(BuiltinModule::new(Identifier::no_ref(id), m)),
             None,
         )
     }
     /// Create a symbol node for namespace.
-    pub fn new_namespace(id: Identifier) -> SymbolNode {
-        SymbolNode::new(
+    pub fn new_namespace(id: Identifier) -> Symbol {
+        Symbol::new(
             SymbolDefinition::Namespace(NamespaceDefinition::new(id)),
             None,
         )
     }
 
     /// Create a symbol node for an external namespace.
-    pub fn new_external(id: Identifier) -> SymbolNode {
-        SymbolNode::new(
+    pub fn new_external(id: Identifier) -> Symbol {
+        Symbol::new(
             SymbolDefinition::External(NamespaceDefinition::new(id)),
             None,
         )
     }
 
     /// Create a new build constant.
-    pub fn new_constant(id: Identifier, value: Value) -> SymbolNode {
-        SymbolNode::new(SymbolDefinition::Constant(id, value), None)
+    pub fn new_constant(id: Identifier, value: Value) -> Symbol {
+        Symbol::new(SymbolDefinition::Constant(id, value), None)
     }
 
     /// Print out symbols from that point.
@@ -147,14 +147,14 @@ impl SymbolNode {
     }
 
     /// Insert child and change parent of child to new parent.
-    pub fn insert_child(parent: &SymbolNode, child: SymbolNode) {
+    pub fn insert_child(parent: &Symbol, child: Symbol) {
         child.borrow_mut().parent = Some(parent.clone());
         let id = child.id();
         parent.borrow_mut().children.insert(id, child);
     }
 
     /// Move all children from one node to another (resets the parent of the children).
-    pub fn move_children(to: &SymbolNode, from: &SymbolNode) {
+    pub fn move_children(to: &Symbol, from: &Symbol) {
         // copy children
         from.borrow().children.iter().for_each(|(id, child)| {
             child.borrow_mut().parent = Some(to.clone());
@@ -177,12 +177,12 @@ impl SymbolNode {
     }
 
     /// Fetch child node with an id.
-    pub fn get(&self, id: &Identifier) -> Option<SymbolNode> {
+    pub fn get(&self, id: &Identifier) -> Option<Symbol> {
         self.borrow().children.get(id).cloned()
     }
 
     /// Search down the symbol tree for a qualified name.
-    pub fn search(&self, name: &QualifiedName) -> Option<SymbolNode> {
+    pub fn search(&self, name: &QualifiedName) -> Option<Symbol> {
         log::trace!("Searching {name} in {}", self.id());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
@@ -213,7 +213,7 @@ impl SymbolNode {
     }
 }
 
-impl FullyQualify for SymbolNode {
+impl FullyQualify for Symbol {
     /// Get fully qualified name.
     fn full_name(&self) -> QualifiedName {
         let id = self.id();
@@ -228,14 +228,14 @@ impl FullyQualify for SymbolNode {
     }
 }
 
-impl std::fmt::Display for SymbolNode {
+impl std::fmt::Display for Symbol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.print_symbol(f, None, 0)
     }
 }
 
 /// Print symbols via [std::fmt::Display]
-pub struct FormatSymbol<'a>(pub &'a SymbolNode);
+pub struct FormatSymbol<'a>(pub &'a Symbol);
 
 impl std::fmt::Display for FormatSymbol<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -243,7 +243,7 @@ impl std::fmt::Display for FormatSymbol<'_> {
     }
 }
 
-impl SrcReferrer for SymbolNodeInner {
+impl SrcReferrer for SymbolInner {
     fn src_ref(&self) -> SrcRef {
         match &self.def {
             SymbolDefinition::SourceFile(source_file) => source_file.src_ref(),

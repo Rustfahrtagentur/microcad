@@ -37,8 +37,8 @@ impl EvalContext {
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
     /// - `output`: Output channel to use
     pub fn new(
-        root: SymbolNode,
-        builtin: SymbolNode,
+        root: Symbol,
+        builtin: Symbol,
         search_paths: &[std::path::PathBuf],
         output: Box<dyn Output>,
     ) -> Self {
@@ -68,7 +68,7 @@ impl EvalContext {
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
     pub fn from_source(
         root: impl AsRef<std::path::Path>,
-        builtin: SymbolNode,
+        builtin: Symbol,
         search_paths: &[std::path::PathBuf],
     ) -> EvalResult<Self> {
         Ok(Self::new(
@@ -87,7 +87,7 @@ impl EvalContext {
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
     pub fn from_source_captured(
         root: Rc<SourceFile>,
-        builtin: SymbolNode,
+        builtin: Symbol,
         search_paths: &[std::path::PathBuf],
     ) -> Self {
         Self::new(
@@ -99,12 +99,7 @@ impl EvalContext {
     }
 
     /// Push a call to stack
-    pub fn push_call(
-        &mut self,
-        symbol_node: SymbolNode,
-        args: ArgumentMap,
-        src_ref: impl SrcReferrer,
-    ) {
+    pub fn push_call(&mut self, symbol_node: Symbol, args: ArgumentMap, src_ref: impl SrcReferrer) {
         self.call_stack.push(symbol_node, args, src_ref)
     }
 
@@ -149,7 +144,7 @@ impl EvalContext {
 
     /// Peek into root node for testing
     #[cfg(test)]
-    pub fn root(&self) -> &SymbolNode {
+    pub fn root(&self) -> &Symbol {
         &self.symbol_table.root
     }
 }
@@ -179,13 +174,13 @@ impl Locals for EvalContext {
         self.symbol_table.close();
     }
 
-    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNode> {
+    fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         self.symbol_table.fetch(id)
     }
 }
 
-impl Symbols for EvalContext {
-    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<SymbolNode> {
+impl Lookup for EvalContext {
+    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         self.symbol_table.lookup(name)
     }
 }
@@ -205,7 +200,7 @@ impl CallTrace for EvalContext {
         self.call_stack.pretty_print(f, &self.symbol_table)
     }
 
-    fn push(&mut self, symbol_node: SymbolNode, args: ArgumentMap, src_ref: impl SrcReferrer) {
+    fn push(&mut self, symbol_node: Symbol, args: ArgumentMap, src_ref: impl SrcReferrer) {
         self.call_stack.push(symbol_node, args, src_ref);
     }
 
@@ -215,15 +210,11 @@ impl CallTrace for EvalContext {
 }
 
 impl UseSymbol for EvalContext {
-    fn use_symbol(
-        &mut self,
-        name: &QualifiedName,
-        id: Option<Identifier>,
-    ) -> EvalResult<SymbolNode> {
+    fn use_symbol(&mut self, name: &QualifiedName, id: Option<Identifier>) -> EvalResult<Symbol> {
         self.symbol_table.use_symbol(name, id)
     }
 
-    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNode> {
+    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         self.symbol_table.use_symbols_of(name)
     }
 }

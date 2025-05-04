@@ -165,7 +165,7 @@ pub enum EvalError {
         /// ambiguous symbol
         ambiguous: QualifiedName,
         /// local symbol that matches
-        others: SymbolNodes,
+        others: Symbols,
     },
 
     /// Invalid argument type

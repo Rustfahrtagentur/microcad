@@ -12,11 +12,7 @@ pub trait UseSymbol {
     /// # Arguments
     /// - `name`: Name of the symbol to search for
     /// - `id`: if given overwrites the ID from qualified name (use as)
-    fn use_symbol(
-        &mut self,
-        name: &QualifiedName,
-        id: Option<Identifier>,
-    ) -> EvalResult<SymbolNode>;
+    fn use_symbol(&mut self, name: &QualifiedName, id: Option<Identifier>) -> EvalResult<Symbol>;
 
     /// Find a symbol in the symbol table and copy all it's children to the locals.
     ///
@@ -24,7 +20,7 @@ pub trait UseSymbol {
     ///
     /// # Arguments
     /// - `name`: Name of the symbol to search for
-    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNode>;
+    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<Symbol>;
 }
 
 impl Eval for UseStatement {

@@ -32,7 +32,7 @@ impl Externals {
             let (id, name) = basename.split_first();
             let namespace = match map.get(&id) {
                 Some(symbol) => symbol.clone(),
-                _ => SymbolNode::new_external(id.clone()),
+                _ => Symbol::new_external(id.clone()),
             };
             Self::recursive_create_namespaces(&namespace, &name);
             map.insert(id.clone(), namespace);
@@ -40,10 +40,7 @@ impl Externals {
         map
     }
 
-    fn recursive_create_namespaces(
-        parent: &SymbolNode,
-        name: &QualifiedName,
-    ) -> Option<SymbolNode> {
+    fn recursive_create_namespaces(parent: &Symbol, name: &QualifiedName) -> Option<Symbol> {
         if name.is_empty() {
             return None;
         }
@@ -54,11 +51,11 @@ impl Externals {
         }
 
         let child = if name.is_id() {
-            SymbolNode::new_external(node_id.clone())
+            Symbol::new_external(node_id.clone())
         } else {
-            SymbolNode::new_namespace(node_id.clone())
+            Symbol::new_namespace(node_id.clone())
         };
-        SymbolNode::insert_child(parent, child.clone());
+        Symbol::insert_child(parent, child.clone());
 
         Self::recursive_create_namespaces(&child, &name.remove_first());
         Some(child)

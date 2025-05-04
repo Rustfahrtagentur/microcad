@@ -6,25 +6,25 @@ use microcad_lang::{resolve::*, syntax::Identifier};
 /// Builder pattern to build builtin namespaces
 pub struct NamespaceBuilder {
     // Namespace symbol
-    namespace: SymbolNode,
+    namespace: Symbol,
 }
 
 impl NamespaceBuilder {
     /// Create new namespace symbol with a name
     pub fn new(id: Identifier) -> Self {
         Self {
-            namespace: SymbolNode::new_namespace(id),
+            namespace: Symbol::new_namespace(id),
         }
     }
 
     /// Add a symbol to the namespace
-    pub fn symbol(self, symbol: SymbolNode) -> Self {
-        SymbolNode::insert_child(&self.namespace, symbol);
+    pub fn symbol(self, symbol: Symbol) -> Self {
+        Symbol::insert_child(&self.namespace, symbol);
         self
     }
 
     /// Return our namespace symbol
-    pub fn build(self) -> SymbolNode {
+    pub fn build(self) -> Symbol {
         self.namespace
     }
 }

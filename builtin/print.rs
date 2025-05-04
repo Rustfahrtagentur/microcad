@@ -6,9 +6,9 @@
 use microcad_lang::{eval::*, resolve::*, syntax::*, value::*};
 use std::str::FromStr;
 
-pub fn print() -> SymbolNode {
+pub fn print() -> Symbol {
     let id = Identifier::from_str("print").expect("valid id");
-    SymbolNode::new_builtin_fn(id, &|args, context| {
+    Symbol::new_builtin_fn(id, &|args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
             let value = arg.value.eval(context)?;
             context.print(format!("{value}"));

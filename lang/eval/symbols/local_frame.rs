@@ -1,19 +1,19 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, resolve::SymbolNode};
+use crate::{eval::*, resolve::Symbol};
 use std::collections::BTreeMap;
 
 /// A stack frame is map of local variables.
 pub enum LocalFrame {
     /// Source file with locals.
-    Source(Identifier, BTreeMap<Identifier, SymbolNode>),
+    Source(Identifier, BTreeMap<Identifier, Symbol>),
     /// Namespace scope without locals
     Namespace(Identifier),
     /// Module scope without locals
     Module(Identifier),
     /// Standard (unnamed) scope with locals
-    Scope(BTreeMap<Identifier, SymbolNode>),
+    Scope(BTreeMap<Identifier, Symbol>),
 }
 
 impl LocalFrame {

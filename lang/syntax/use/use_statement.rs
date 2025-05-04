@@ -4,7 +4,7 @@
 //! Use statement syntax element
 
 use crate::{
-    resolve::{SymbolMap, SymbolNode},
+    resolve::{Symbol, SymbolMap},
     src_ref::*,
     syntax::*,
 };
@@ -27,7 +27,7 @@ pub struct UseStatement {
 
 impl UseStatement {
     /// Resolve use statement to multiple symbols
-    pub fn resolve(&self, parent: Option<SymbolNode>) -> SymbolMap {
+    pub fn resolve(&self, parent: Option<Symbol>) -> SymbolMap {
         match self.visibility {
             // Private symbols are processed later in `EvalContext::use_symbol`
             Visibility::Private => SymbolMap::new(),

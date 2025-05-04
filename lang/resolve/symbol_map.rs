@@ -3,10 +3,10 @@ use std::collections::btree_map::BTreeMap;
 
 /// Map Id to SymbolNode reference
 #[derive(Debug, Default, Clone)]
-pub struct SymbolMap(BTreeMap<Identifier, SymbolNode>);
+pub struct SymbolMap(BTreeMap<Identifier, Symbol>);
 
 impl std::ops::Deref for SymbolMap {
-    type Target = BTreeMap<Identifier, SymbolNode>;
+    type Target = BTreeMap<Identifier, Symbol>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -26,18 +26,18 @@ impl SymbolMap {
     }
 
     /// Insert a not by it's own id.
-    pub fn add_node(&mut self, symbol: SymbolNode) {
+    pub fn add_node(&mut self, symbol: Symbol) {
         let id = symbol.id();
         self.0.insert(id, symbol);
     }
 
     /// Insert a not by it's own id.
-    pub fn insert_node(&mut self, id: Identifier, symbol: SymbolNode) {
+    pub fn insert_node(&mut self, id: Identifier, symbol: Symbol) {
         self.0.insert(id, symbol);
     }
 
     /// Search for a symbol in symbol map.
-    pub fn search(&self, name: &QualifiedName) -> EvalResult<SymbolNode> {
+    pub fn search(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         if name.is_empty() {
             return Err(EvalError::NotAName(name.src_ref()));
         }

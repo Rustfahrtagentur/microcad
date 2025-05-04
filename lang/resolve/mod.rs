@@ -15,13 +15,13 @@
 //!
 //! To "run" the source file (and get the expected output) it must now be evaluated (see [crate::eval])  .
 
+mod symbol;
 mod symbol_definition;
 mod symbol_map;
-mod symbol_node;
 
+pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
-pub use symbol_node::*;
 
 use crate::syntax::*;
 

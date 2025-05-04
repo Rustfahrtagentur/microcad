@@ -29,13 +29,13 @@ pub enum UseDeclaration {
 
 impl UseDeclaration {
     /// resolve public use declaration (shall not be called with private use statements)
-    pub fn resolve(&self, parent: Option<SymbolNode>) -> (Identifier, SymbolNode) {
+    pub fn resolve(&self, parent: Option<Symbol>) -> (Identifier, Symbol) {
         match self {
             UseDeclaration::Use(name) => {
                 let identifier = name.last().expect("Identifier");
                 (
                     identifier.clone(),
-                    SymbolNode::new(
+                    Symbol::new(
                         SymbolDefinition::Alias(identifier.clone(), name.clone()),
                         parent,
                     ),
@@ -44,7 +44,7 @@ impl UseDeclaration {
             UseDeclaration::UseAll(_name) => todo!(),
             UseDeclaration::UseAlias(name, alias) => (
                 alias.clone(),
-                SymbolNode::new(SymbolDefinition::Alias(alias.clone(), name.clone()), parent),
+                Symbol::new(SymbolDefinition::Alias(alias.clone(), name.clone()), parent),
             ),
         }
     }

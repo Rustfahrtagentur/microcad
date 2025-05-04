@@ -39,7 +39,7 @@ impl SymbolDefinition {
     }
 
     /// Resolve into SymbolNode.
-    pub fn resolve(&self, parent: Option<SymbolNode>) -> SymbolNode {
+    pub fn resolve(&self, parent: Option<Symbol>) -> Symbol {
         match self {
             Self::Module(m) => m.resolve(parent),
             Self::Namespace(n) => n.resolve(parent),
@@ -48,7 +48,7 @@ impl SymbolDefinition {
             Self::External(e) => unreachable!("external {} must be loaded first", e.id),
             // A builtin symbols and constants cannot have child symbols,
             // hence the resolve trait does not need to be implemented
-            symbol_definition => SymbolNode::new(symbol_definition.clone(), parent),
+            symbol_definition => Symbol::new(symbol_definition.clone(), parent),
         }
     }
 }
