@@ -9,7 +9,7 @@ use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, syntax::*, value::
 
 pub fn assert() -> Symbol {
     let id = Identifier::from_str("assert").expect("valid id");
-    Symbol::new_builtin_fn(id, &|args, context| {
+    Symbol::new_builtin(Builtin::new(id, &|args, context| {
         if let Ok(arg) = args.get_single() {
             if !arg.eval_bool(context)? {
                 context.error(arg.src_ref(), EvalError::AssertionFailed(format!("{arg}")))?;
@@ -25,12 +25,12 @@ pub fn assert() -> Symbol {
             )?;
         }
         Ok(Value::None)
-    })
+    }))
 }
 
 pub fn assert_valid() -> Symbol {
     let id = Identifier::from_str("assert_valid").expect("valid id");
-    Symbol::new_builtin_fn(id, &|args, context| {
+    Symbol::new_builtin(Builtin::new(id, &|args, context| {
         if let Ok(arg) = args.get_single() {
             let name = QualifiedName::try_from(arg.value.to_string())?;
             if let Err(err) = context.lookup(&name) {
@@ -38,12 +38,12 @@ pub fn assert_valid() -> Symbol {
             }
         }
         Ok(Value::None)
-    })
+    }))
 }
 
 pub fn assert_invalid() -> Symbol {
     let id = Identifier::from_str("assert_invalid").expect("valid id");
-    Symbol::new_builtin_fn(id, &|args, context| {
+    Symbol::new_builtin(Builtin::new(id, &|args, context| {
         if let Ok(name) = args.get_single() {
             let n = QualifiedName::try_from(name.value.to_string())?;
             if let Ok(symbol) = context.lookup(&n) {
@@ -51,7 +51,7 @@ pub fn assert_invalid() -> Symbol {
             }
         }
         Ok(Value::None)
-    })
+    }))
 }
 
 #[test]

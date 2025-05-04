@@ -89,21 +89,14 @@ impl Symbol {
         Symbol::new(SymbolDefinition::SourceFile(source_file), None)
     }
 
-    /// Create a symbol node of a built-in function.
-    pub fn new_builtin_fn(id: Identifier, f: &'static BuiltinFunctionFn) -> Symbol {
+    /// Create a symbol node for a built-in.
+    pub fn new_builtin(builtin: Rc<Builtin>) -> Symbol {
         Symbol::new(
-            SymbolDefinition::BuiltinFunction(BuiltinFunction::new(id, f)),
+            SymbolDefinition::Builtin(builtin),
             None,
         )
     }
 
-    /// Create a symbol node for a built-in module.
-    pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> Symbol {
-        Symbol::new(
-            SymbolDefinition::BuiltinModule(BuiltinModule::new(Identifier::no_ref(id), m)),
-            None,
-        )
-    }
     /// Create a symbol node for namespace.
     pub fn new_namespace(id: Identifier) -> Symbol {
         Symbol::new(
@@ -255,7 +248,7 @@ impl SrcReferrer for SymbolInner {
             }
             SymbolDefinition::Module(module) => module.src_ref(),
             SymbolDefinition::Function(function) => function.src_ref(),
-            SymbolDefinition::BuiltinFunction(_) | SymbolDefinition::BuiltinModule(_) => {
+            SymbolDefinition::Builtin(_) => {
                 unreachable!("builtin has no source code reference")
             }
             SymbolDefinition::Constant(identifier, value) => SrcRef::merge(identifier, value),

@@ -22,7 +22,7 @@ impl Eval for Call {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match context.lookup(&self.name) {
             Ok(symbol) => match &symbol.borrow().def {
-                SymbolDefinition::BuiltinFunction(f) => f.call(&self.argument_list, context),
+                SymbolDefinition::Builtin(f) => f.call(&self.argument_list, context),
                 SymbolDefinition::Module(m) => m.eval_call(&self.argument_list, context),
                 _ => {
                     context.error(

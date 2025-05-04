@@ -169,13 +169,8 @@ impl Eval for NestedItem {
                 SymbolDefinition::Function(f) => {
                     Err(EvalError::UnexpectedNested("function", f.id.clone()))
                 }
-                SymbolDefinition::BuiltinFunction(bf) => Err(EvalError::UnexpectedNested(
-                    "builtin function",
-                    bf.id.clone(),
-                )),
-
-                SymbolDefinition::BuiltinModule(bm) => {
-                    Err(EvalError::UnexpectedNested("builtin module", bm.id.clone()))
+                SymbolDefinition::Builtin(bm) => {
+                    Err(EvalError::UnexpectedNested("builtin", bm.id.clone()))
                 }
                 SymbolDefinition::Alias(id, _) => {
                     unreachable!("Unexpected alias {id} in expression")
