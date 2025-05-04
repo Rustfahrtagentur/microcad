@@ -5,12 +5,19 @@
 
 use crate::{eval::*, src_ref::*, syntax::*, MICROCAD_EXTENSIONS};
 
-/// External files register
+/// External files register.
+///
+/// A map of *qualified name* -> *source file path* which is generated at creation
+/// by scanning in the given `search_paths`.
 #[derive(Debug, Default)]
 pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf>);
 
 impl Externals {
-    /// Create new resolve context.
+    /// Creates externals list.
+    ///
+    /// Recursively scans given `search_paths` for µcad files but files will not be loaded.
+    /// # Arguments
+    /// - `search_paths`: Paths to search for any external files.
     pub fn new(search_paths: &[std::path::PathBuf]) -> Self {
         let no_search_paths = search_paths.is_empty();
         let new = Self(Self::search_externals(search_paths));
@@ -25,7 +32,7 @@ impl Externals {
         new
     }
 
-    /// Create namespace tree from externals.
+    /// Creates namespace map from externals.
     pub fn create_namespaces(&self) -> SymbolMap {
         let mut map = SymbolMap::new();
         self.iter().for_each(|(basename, _)| {
@@ -62,6 +69,9 @@ impl Externals {
     }
 
     /// Search for an external file which may include a given qualified name.
+    ///
+    /// # Arguments
+    /// - `name`: Qualified name expected to find.
     pub fn fetch_external(
         &self,
         name: &QualifiedName,
@@ -84,7 +94,7 @@ impl Externals {
         Err(EvalError::ExternalSymbolNotFound(name.clone()))
     }
 
-    /// get qualified name by path
+    /// Get qualified name by path
     pub fn get_name(&self, path: &std::path::Path) -> EvalResult<&QualifiedName> {
         match self.0.iter().find(|(_, p)| p.as_path() == path) {
             Some((name, _)) => {
@@ -95,7 +105,7 @@ impl Externals {
         }
     }
 
-    /// Searches for external source code files (external modules) in some search paths.
+    /// Searches for external source code files (*external namespaces*) in given *search paths*.
     fn search_externals(
         search_paths: &[std::path::PathBuf],
     ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {

@@ -146,7 +146,7 @@ fn eval(
     search_paths: &[std::path::PathBuf],
 ) -> anyhow::Result<ObjectNode> {
     let symbols = resolve(input)?;
-    let mut context = EvalContext::new(
+    let mut context = Context::new(
         symbols.clone(),
         microcad_builtin::builtin_namespace(),
         search_paths,

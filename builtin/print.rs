@@ -22,7 +22,7 @@ pub fn print() -> Symbol {
 fn assert_ok() {
     microcad_lang::env_logger_init();
 
-    let mut context = EvalContext::from_source(
+    let mut context = Context::from_source(
         "../tests/test_cases/print.µcad",
         crate::builtin_namespace(),
         &[],

@@ -3,21 +3,18 @@
 
 use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*};
 
-/// Context for evaluation of a resolved µcad file.
+/// *Context* for *evaluation* of a resolved µcad file.
 ///
 /// The context is used to store the current state of the evaluation.
 ///
-/// A context is consists of the following structures:
+/// A context consists of the following members:
 ///
-/// - One *root symbol* resolved from the initially read source file.
-/// - A map of all *global symbols* accessible by fully [`QualifiedName`].
-/// - A stack of local scope frames that store *local values* and *local symbol aliases*
-///   (e.g. use statements) accessible by [`Identifier`].
-/// - A *current namespace* while evaluation.
-/// - A map of all *loaded source files* (accessible by name, path and hash).
-/// - A diagnostic handler that accumulates *evaluation errors* for later output.
-/// - One *output channel* where `__builtin::print` writes it's output to while evaluation.
-pub struct EvalContext {
+/// - A *symbol table* ([`SymbolTable`]) with symbols stored by [`QualifiedName`].
+/// - A *diagnostic handler* ([`DiagHandler`]) that accumulates *evaluation errors* for later output.
+/// - One *output channel* ([`Output`]) where `__builtin::print` writes it's output to while evaluation.
+///
+/// All these internal structures can be accessed by several implemented traits.
+pub struct Context {
     /// Symbol table
     symbol_table: SymbolTable,
     /// Call stack
@@ -28,7 +25,7 @@ pub struct EvalContext {
     output: Box<dyn Output>,
 }
 
-impl EvalContext {
+impl Context {
     /// Create a new context from a source file.
     ///
     /// # Arguments
@@ -149,7 +146,7 @@ impl EvalContext {
     }
 }
 
-impl Locals for EvalContext {
+impl Locals for Context {
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
         self.symbol_table.add_local_value(id, value)
     }
@@ -179,13 +176,13 @@ impl Locals for EvalContext {
     }
 }
 
-impl Lookup for EvalContext {
+impl Lookup for Context {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         self.symbol_table.lookup(name)
     }
 }
 
-impl Diag for EvalContext {
+impl Diag for Context {
     fn fmt_diagnosis(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
         self.diag_handler.pretty_print(f, &self.symbol_table)
     }
@@ -195,7 +192,7 @@ impl Diag for EvalContext {
     }
 }
 
-impl CallTrace for EvalContext {
+impl CallTrace for Context {
     fn fmt_calls(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
         self.call_stack.pretty_print(f, &self.symbol_table)
     }
@@ -209,7 +206,7 @@ impl CallTrace for EvalContext {
     }
 }
 
-impl UseSymbol for EvalContext {
+impl UseSymbol for Context {
     fn use_symbol(&mut self, name: &QualifiedName, id: Option<Identifier>) -> EvalResult<Symbol> {
         self.symbol_table.use_symbol(name, id)
     }
@@ -219,7 +216,7 @@ impl UseSymbol for EvalContext {
     }
 }
 
-impl PushDiag for EvalContext {
+impl PushDiag for Context {
     fn push_diag(&mut self, diag: Diagnostic) -> EvalResult<()> {
         let result = self.diag_handler.push_diag(diag);
         log::trace!("Context:\n{self}");
@@ -227,13 +224,13 @@ impl PushDiag for EvalContext {
     }
 }
 
-impl GetSourceByHash for EvalContext {
+impl GetSourceByHash for Context {
     fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
         self.symbol_table.get_by_hash(hash)
     }
 }
 
-impl std::fmt::Display for EvalContext {
+impl std::fmt::Display for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.has_errors() {
             write!(f, "{}\nErrors:\n", self.symbol_table)?;

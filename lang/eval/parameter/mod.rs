@@ -6,7 +6,7 @@
 use crate::{eval::*, syntax::*, ty::*, value::*};
 
 impl ParameterValue {
-    fn from_parameter(parameter: &Parameter, context: &mut EvalContext) -> EvalResult<Self> {
+    fn from_parameter(parameter: &Parameter, context: &mut Context) -> EvalResult<Self> {
         use crate::diag::PushDiag;
         match (&parameter.specified_type, &parameter.default_value) {
             // Type and value are specified
@@ -66,7 +66,7 @@ impl ParameterValueList {
     /// Create ParameterValueList from ParameterList
     pub fn from_parameter_list(
         parameters: &ParameterList,
-        context: &mut EvalContext,
+        context: &mut Context,
     ) -> EvalResult<Self> {
         let mut values = ParameterValueList::default();
         for parameter in parameters.iter() {

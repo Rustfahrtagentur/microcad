@@ -4,7 +4,7 @@
 use crate::eval::*;
 
 impl Eval for FormatExpression {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         Ok(Value::String(Refer::new(
             format!("{}", self.expression.eval(context)?),
             SrcRef(None),
@@ -13,7 +13,7 @@ impl Eval for FormatExpression {
 }
 
 impl Eval for FormatString {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let mut result = String::new();
         for elem in &self.0 {
             match elem {

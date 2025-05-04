@@ -4,7 +4,7 @@ impl CallArgumentList {
     /// Get matching arguments from parameter list
     pub fn get_matching_arguments(
         &self,
-        context: &mut EvalContext,
+        context: &mut Context,
         parameters: &ParameterList,
     ) -> EvalResult<ArgumentMap> {
         let parameter_values = ParameterValueList::from_parameter_list(parameters, context)?;
@@ -15,11 +15,12 @@ impl CallArgumentList {
     /// Get multiplicty of matching arguments from a parameter list
     pub fn get_multi_matching_arguments(
         &self,
-        context: &mut EvalContext,
-        parameters: &ParameterList) -> EvalResult<MultiArgumentMap> {
-            let parameter_values = ParameterValueList::from_parameter_list(parameters, context)?;
-            CallArgumentValueList::from_call_argument_list(self, context)?
-                .get_multi_matching_arguments(&parameter_values)    
+        context: &mut Context,
+        parameters: &ParameterList,
+    ) -> EvalResult<MultiArgumentMap> {
+        let parameter_values = ParameterValueList::from_parameter_list(parameters, context)?;
+        CallArgumentValueList::from_call_argument_list(self, context)?
+            .get_multi_matching_arguments(&parameter_values)
     }
 
     /// return a single argument

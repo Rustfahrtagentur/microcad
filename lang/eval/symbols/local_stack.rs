@@ -36,27 +36,22 @@ impl LocalStack {
 }
 
 impl Locals for LocalStack {
-    /// Open a new source (stack push).
     fn open_source(&mut self, id: Identifier) {
         self.0.push(LocalFrame::Source(id, BTreeMap::new()));
     }
 
-    /// Open a new scope (stack push).
     fn open_scope(&mut self) {
         self.0.push(LocalFrame::Scope(BTreeMap::new()));
     }
 
-    /// Open a new scope (stack push).
     fn open_namespace(&mut self, id: Identifier) {
         self.0.push(LocalFrame::Namespace(id));
     }
 
-    /// Open a new scope (stack push).
     fn open_module(&mut self, id: Identifier) {
         self.0.push(LocalFrame::Module(id));
     }
 
-    /// Close scope (stack pop).
     fn close(&mut self) {
         self.0.pop();
     }
@@ -65,7 +60,6 @@ impl Locals for LocalStack {
         self.add(Some(id.clone()), Symbol::new_constant(id, value))
     }
 
-    /// Fetch a local variable from current stack frame.
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         // search from inner scope to root scope to shadow outside locals
         for frame in self.0.iter().rev() {

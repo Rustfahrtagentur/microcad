@@ -4,6 +4,7 @@
 //! Source file cache
 
 use crate::{eval::*, rc::*, src_ref::*, syntax::*};
+use std::collections::HashMap;
 
 /// Register of loaded source files and their syntax trees.
 #[derive(Default)]
@@ -11,9 +12,9 @@ pub struct SourceCache {
     /// External files read from search path.
     externals: Externals,
 
-    by_hash: std::collections::HashMap<u64, usize>,
-    by_path: std::collections::HashMap<std::path::PathBuf, usize>,
-    by_name: std::collections::HashMap<QualifiedName, usize>,
+    by_hash: HashMap<u64, usize>,
+    by_path: HashMap<std::path::PathBuf, usize>,
+    by_name: HashMap<QualifiedName, usize>,
 
     /// Loaded, parsed and resolved source files.
     source_files: Vec<Rc<SourceFile>>,
@@ -22,20 +23,19 @@ pub struct SourceCache {
 impl SourceCache {
     /// Create new source register.
     pub fn new(root: Rc<SourceFile>, search_paths: &[std::path::PathBuf]) -> Self {
-        let externals = Externals::new(search_paths);
-
-        let mut by_hash = std::collections::HashMap::new();
+        let mut by_hash = HashMap::new();
         by_hash.insert(root.hash, 0);
 
-        let mut by_path = std::collections::HashMap::new();
+        let mut by_path = HashMap::new();
         by_path.insert(root.filename.clone(), 0);
+
         Self {
-            externals,
+            externals: Externals::new(search_paths),
             source_files: vec![root.clone()],
             by_hash,
             by_path,
-            // root shall be found by name
-            by_name: std::collections::HashMap::new(),
+            // root shall not be found by name
+            by_name: HashMap::new(),
         }
     }
 

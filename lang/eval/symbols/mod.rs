@@ -13,7 +13,7 @@ pub use symbol_table::*;
 
 use crate::{eval::*, syntax::*};
 
-/// Trait to handle symbol table
+/// Trait to handle symbol table.
 pub trait Lookup {
     /// Lookup for local or global symbol by qualified name.
     ///
@@ -25,18 +25,28 @@ pub trait Lookup {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol>;
 }
 
-/// Trait to manage local stack
+/// Trait to manage the *local stack*.
+///
+/// The *local stack* holds a state about where evaluation is currently processing the source code.
+///
+/// Items on the local stack can be of different types:
+/// - a *source file* with an own local stack frame,
+/// - a *scope* (surrounded by curly brackets `{}`) within the source file,
+/// - a *namespace* without local variables, or
+/// - a *module* without local variables.
+///
+/// Each one may have different items it stores (see [`LocalFrame`]).
 pub trait Locals {
-    /// Open a new source (stack push).
+    /// Open a new source scope with a new [local stack frame](LocalFrame).
     fn open_source(&mut self, id: Identifier);
 
-    /// Open a new scope (stack push).
+    /// Open a new [local stack frame](LocalFrame).
     fn open_scope(&mut self);
 
-    /// Open a new scope (stack push).
+    /// Open a namespace.
     fn open_namespace(&mut self, id: Identifier);
 
-    /// Open a new scope (stack push).
+    /// Open a new module
     fn open_module(&mut self, id: Identifier);
 
     /// Close scope (stack pop).
