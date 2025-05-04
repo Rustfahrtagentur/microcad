@@ -107,7 +107,7 @@ pub enum EvalError {
 
     /// No locals  available on stack.
     #[error("Local stack needed to store {0}")]
-    NoLocalStack(Identifier),
+    LocalStackEmpty(Identifier),
 
     /// Value Error.
     #[error("Value Error: {0}")]
