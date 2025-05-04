@@ -40,7 +40,7 @@ fn scopes() {
 #[test]
 fn context_with_symbols() {
     microcad_lang::env_logger_init();
-    let mut context = evaluate_file("../tests/test_cases/syntax/call.µcad");
+    let mut context = evaluate_file("syntax/call.µcad");
 
     context
         .lookup(
