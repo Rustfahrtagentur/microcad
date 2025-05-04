@@ -6,7 +6,7 @@
 use crate::{eval::*, objects::*, rc::*, syntax::*};
 
 /// Builtin module initialization functor
-pub type BuiltinModuleFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> EvalResult<ObjectNode>;
+pub type BuiltinModuleFn = dyn Fn(&CallArgumentList, &mut Context) -> EvalResult<ObjectNode>;
 
 /// Builtin module
 #[derive(Clone)]
@@ -40,7 +40,7 @@ pub trait BuiltinModuleDefinition {
     /// Get name of the builtin module
     fn name() -> &'static str;
     /// Create node from argument map
-    fn node(args: &CallArgumentList, context: &EvalContext) -> EvalResult<ObjectNode>;
+    fn node(args: &CallArgumentList, context: &Context) -> EvalResult<ObjectNode>;
     /// Module function
     fn module() -> &'static BuiltinModuleFn {
         &|args, context| Self::node(args, context)

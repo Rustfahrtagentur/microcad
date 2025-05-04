@@ -30,7 +30,7 @@ impl ModuleInitDefinition {
         &self,
         args: &ArgumentMap,
         mut props: ObjectProperties,
-        context: &mut EvalContext,
+        context: &mut Context,
     ) -> EvalResult<ObjectNode> {
         context.open_scope();
 

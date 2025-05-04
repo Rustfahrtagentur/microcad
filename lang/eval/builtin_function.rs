@@ -6,7 +6,7 @@
 use crate::{eval::*, rc::*, syntax::*};
 
 /// Type of the functor which receives a call
-pub type BuiltinFunctionFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> EvalResult<Value>;
+pub type BuiltinFunctionFn = dyn Fn(&CallArgumentList, &mut Context) -> EvalResult<Value>;
 
 /// Builtin function
 #[derive(Clone)]
@@ -40,7 +40,7 @@ impl CallTrait for BuiltinFunction {
     /// # Arguments
     /// - `args`: Function arguments
     /// - `context`: Execution context
-    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Value> {
+    fn call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Value> {
         (self.f)(args, context)
     }
 }

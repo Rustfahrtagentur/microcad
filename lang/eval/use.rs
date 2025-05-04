@@ -3,7 +3,7 @@
 
 use crate::eval::*;
 
-/// trait used by UseDeclaration and implemented by SymbolTable and passed through by EvalContext
+/// trait used by UseDeclaration and implemented by SymbolTable and passed through by Context
 pub trait UseSymbol {
     /// Find a symbol in the symbol table and copy it to the locals.
     ///
@@ -24,13 +24,13 @@ pub trait UseSymbol {
 }
 
 impl Eval for UseStatement {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         self.decl.eval(context)
     }
 }
 
 impl Eval for UseDeclaration {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match &self {
             UseDeclaration::Use(name) => {
                 if let Err(err) = context.use_symbol(name, None) {

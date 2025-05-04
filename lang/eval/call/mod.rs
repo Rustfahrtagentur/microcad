@@ -19,7 +19,7 @@ use crate::{eval::*, syntax::*};
 use thiserror::Error;
 
 impl Eval for Call {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match context.lookup(&self.name) {
             Ok(symbol) => match &symbol.borrow().def {
                 SymbolDefinition::BuiltinFunction(f) => f.call(&self.argument_list, context),

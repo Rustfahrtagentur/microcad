@@ -11,7 +11,7 @@ fn context_namespace() {
 
     use microcad_lang::src_ref::*;
 
-    let mut context = EvalContext::default();
+    let mut context = Context::default();
 
     let module = NamespaceBuilder::new("math")
         .add(Symbol::Value(

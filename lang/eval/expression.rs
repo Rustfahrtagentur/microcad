@@ -4,7 +4,7 @@
 use crate::{eval::*, objects::*};
 
 impl Eval for ListExpression {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let mut value_list = ValueList::new(
             self.list
                 .iter()
@@ -35,7 +35,7 @@ impl Eval for ListExpression {
 }
 
 impl Eval for Expression {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match self {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
@@ -126,7 +126,7 @@ impl Eval for Expression {
 }
 
 impl Eval for Nested {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let mut node_stack = Vec::new();
 
         for (index, item) in self.iter().enumerate() {
@@ -154,7 +154,7 @@ impl Eval for Nested {
 }
 
 impl Eval for NestedItem {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match &self {
             NestedItem::Call(call) => Ok(call.eval(context)?),
             NestedItem::QualifiedName(name) => match &context.lookup(name)?.borrow().def {

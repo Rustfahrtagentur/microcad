@@ -16,7 +16,7 @@ impl CallArgumentValueList {
     /// Create a `CallArgumentValueList` from a `CallArgumentList`
     pub fn from_call_argument_list(
         call_argument_list: &CallArgumentList,
-        context: &mut EvalContext,
+        context: &mut Context,
     ) -> EvalResult<Self> {
         let mut v = CallArgumentValueList::default();
         for call_arg in call_argument_list.iter() {

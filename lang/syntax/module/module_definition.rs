@@ -27,7 +27,7 @@ impl ModuleDefinition {
     fn find_matching_initializer(
         &self,
         args: &CallArgumentList,
-        context: &mut EvalContext,
+        context: &mut Context,
     ) -> Option<(&ModuleInitDefinition, MultiArgumentMap)> {
         self.inits().find_map(|init| {
             if let Ok(arg_map) = args.get_multi_matching_arguments(context, &init.parameters) {
@@ -50,7 +50,7 @@ impl ModuleDefinition {
         &'a self,
         args: &ArgumentMap,
         init: Option<&'a ModuleInitDefinition>,
-        context: &mut EvalContext,
+        context: &mut Context,
     ) -> EvalResult<ObjectNode> {
         let mut props = ObjectProperties::from_parameter_list(&self.parameters, context)?;
         context.open_scope();
@@ -112,11 +112,7 @@ impl ModuleDefinition {
     /// Example:
     /// Consider the `module a(b: Scalar) { }`.
     /// Calling the module `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
-    pub fn eval_call(
-        &self,
-        args: &CallArgumentList,
-        context: &mut EvalContext,
-    ) -> EvalResult<Value> {
+    pub fn eval_call(&self, args: &CallArgumentList, context: &mut Context) -> EvalResult<Value> {
         let mut nodes = Vec::new();
 
         match self.find_matching_initializer(args, context) {

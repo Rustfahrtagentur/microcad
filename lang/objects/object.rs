@@ -16,7 +16,7 @@ impl ObjectProperties {
     /// Create initial property list by evaluating parameter list
     pub fn from_parameter_list(
         parameter_list: &ParameterList,
-        context: &mut EvalContext,
+        context: &mut Context,
     ) -> EvalResult<Self> {
         let mut props = BTreeMap::new();
         for parameter in parameter_list.iter() {
@@ -60,7 +60,7 @@ impl ObjectProperties {
         &mut self,
         id: &Identifier,
         value: Value,
-        context: &mut EvalContext,
+        context: &mut Context,
     ) -> EvalResult<()> {
         if let Some(prop_value) = self.get_value_mut(id) {
             *prop_value = value.clone();

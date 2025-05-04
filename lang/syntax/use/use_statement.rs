@@ -29,7 +29,7 @@ impl UseStatement {
     /// Resolve use statement to multiple symbols
     pub fn resolve(&self, parent: Option<Symbol>) -> SymbolMap {
         match self.visibility {
-            // Private symbols are processed later in `EvalContext::use_symbol`
+            // Private symbols are processed later in `Context::use_symbol`
             Visibility::Private => SymbolMap::new(),
             // Public symbols are put into resolving symbol map
             Visibility::Public => {

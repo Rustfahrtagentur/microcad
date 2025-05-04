@@ -63,10 +63,7 @@ impl Body {
     }
 
     /// Evaluate a vector of statements
-    pub fn evaluate_vec(
-        statements: &Vec<Statement>,
-        context: &mut EvalContext,
-    ) -> EvalResult<Value> {
+    pub fn evaluate_vec(statements: &Vec<Statement>, context: &mut Context) -> EvalResult<Value> {
         for s in statements {
             s.eval(context)?;
         }
@@ -74,7 +71,7 @@ impl Body {
     }
 
     /// Evaluate the statement of this body into an ObjectNode
-    pub fn eval_to_node(&self, context: &mut EvalContext) -> EvalResult<ObjectNode> {
+    pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ObjectNode> {
         context.open_scope();
 
         let mut nodes = Vec::new();

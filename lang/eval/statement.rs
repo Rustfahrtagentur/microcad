@@ -4,7 +4,7 @@
 use crate::{eval::*, objects::*};
 
 impl Eval for Assignment {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let value = self.expression.eval(context)?;
         context.add_local_value(self.id.clone(), value)?;
         Ok(Value::None)
@@ -12,7 +12,7 @@ impl Eval for Assignment {
 }
 
 impl Eval for Marker {
-    fn eval(&self, _: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, _: &mut Context) -> EvalResult<Value> {
         if self.is_children_marker() {
             Ok(Value::Node(ObjectNode::new(
                 ObjectNodeInner::ChildrenNodeMarker,
@@ -24,7 +24,7 @@ impl Eval for Marker {
 }
 
 impl Eval for Statement {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match self {
             Self::Use(u) => u.eval(context)?,
             Self::Assignment(a) => a.eval(context)?,

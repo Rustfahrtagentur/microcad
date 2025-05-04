@@ -17,12 +17,11 @@ include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
 include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 
 #[cfg(test)]
-fn evaluate_file(filename: &str) -> microcad_lang::eval::EvalContext {
+fn evaluate_file(filename: &str) -> microcad_lang::eval::Context {
     use microcad_lang::eval::*;
 
     let filename = format!("../tests/test_cases/{filename}");
-    EvalContext::from_source(&filename, microcad_builtin::builtin_namespace(), &[])
-        .expect(&filename)
+    Context::from_source(&filename, microcad_builtin::builtin_namespace(), &[]).expect(&filename)
 }
 
 #[test]

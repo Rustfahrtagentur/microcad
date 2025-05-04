@@ -4,17 +4,17 @@
 //! Evaluation of parsed content.
 //!
 //! To be able to evaluate (run) a source file, it must be loaded, parsed and resolved.
-//! To do so an [`EvalContext`] can be created with [`EvalContext::new()`] based on a already resolved symbol or
-//! by using [`EvalContext::from_source()`] or [`EvalContext::from_source_captured()`] which automatically
-//! load and resolve the source file and build a context around it which then can be evaluated with [`EvalContext::eval()`]:
+//! To do so an [`Context`] can be created with [`Context::new()`] based on a already resolved symbol or
+//! by using [`Context::from_source()`] or [`Context::from_source_captured()`] which automatically
+//! load and resolve the source file and build a context around it which then can be evaluated with [`Context::eval()`]:
 //!
 //! ```
 //! use microcad_builtin::builtin_namespace;
-//! use microcad_lang::eval::EvalContext;
+//! use microcad_lang::eval::Context;
 //! use std::io::stdout;
 //!
 //! // create a context for evaluation of the source file
-//! let mut context = EvalContext::from_source(
+//! let mut context = Context::from_source(
 //!     "my.µcad",              // root file name
 //!     builtin_namespace(),    // `__builtin` library
 //!     &["./lib".into()]       // list of library paths
@@ -33,7 +33,7 @@ mod builtin_function;
 mod builtin_module;
 mod call;
 mod call_stack;
-mod eval_context;
+mod context;
 mod eval_error;
 mod expression;
 mod externals;
@@ -51,7 +51,7 @@ pub use builtin_function::*;
 pub use builtin_module::*;
 pub use call::*;
 pub use call_stack::*;
-pub use eval_context::*;
+pub use context::*;
 pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
@@ -63,12 +63,12 @@ use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 /// Evaluation trait
 pub trait Eval {
     /// Evaluate the type into an expression
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value>;
+    fn eval(&self, context: &mut Context) -> EvalResult<Value>;
 }
 
 impl MethodCall {
     /// Evaluate method call
-    fn eval(&self, context: &mut EvalContext, _lhs: &Expression) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context, _lhs: &Expression) -> EvalResult<Value> {
         context.error(
             self,
             EvalError::Todo(format!(
