@@ -200,7 +200,7 @@ impl Diag for EvalContext {
     }
 }
 
-impl Calls for EvalContext {
+impl CallTrace for EvalContext {
     fn fmt_calls(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
         self.call_stack.pretty_print(f, &self.symbol_table)
     }

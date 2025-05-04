@@ -60,7 +60,7 @@ impl CallStackFrame {
 pub struct CallStack(Vec<CallStackFrame>);
 
 /// Diagnosis trait gives access about collected errors
-pub trait Calls {
+pub trait CallTrace {
     /// Pretty print all calls
     fn fmt_calls(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result;
 
