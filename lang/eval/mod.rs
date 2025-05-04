@@ -18,13 +18,13 @@
 //!     "my.µcad",              // root file name
 //!     builtin_namespace(),    // `__builtin` library
 //!     &["./lib".into()]       // list of library paths
-//! );
+//! ).expect("successful load, parse and resolve");
 //!
 //! // evaluate the source file in it's context
-//! let value = context.eval().expect("evaluation success");
+//! let value = context.eval().expect("successful evaluation");
 //!
 //! // print any error
-//! context.pretty_print( stdout(), &context).expect("UTF-8 compatible output");
+//! context.write_diagnosis(stdout()).expect("stdout should be available");
 //! ```
 
 mod argument_map;

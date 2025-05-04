@@ -9,14 +9,20 @@ use custom_debug::Debug;
 pub struct SymbolInner {
     /// Symbol definition
     pub def: SymbolDefinition,
-    /// Symbol's parent node
+    /// Symbol's parent
     #[debug(skip)]
     pub parent: Option<Symbol>,
-    /// Symbol's children nodes
+    /// Symbol's children
     pub children: SymbolMap,
 }
 
-/// Shortcut of `Rc<Cell<SymbolNode>>`
+/// Symbol
+///
+/// Every `symbol` has a [`SymbolDefinition`], a *parent* and *children* stored within a `Rc<RefCell<`[`SymbolInner`]`>`.
+/// So `symbol` is meant as a tree which is used by [`SymbolTable`] to store
+/// the resolved symbols by it's original structure in the source code and by it's *id*.
+///
+/// `SymbolNode` can be shared as mutable.
 #[derive(Debug, Clone)]
 pub struct Symbol(RcMut<SymbolInner>);
 
@@ -73,7 +79,10 @@ impl FromIterator<Symbol> for Symbols {
 }
 
 impl Symbol {
-    /// Create new symbol node without children
+    /// Create new symbol without children.
+    /// # Arguments
+    /// - `def`: Symbol definition
+    /// - `parent`: Symbol's parent symbol or none for root
     pub fn new(def: SymbolDefinition, parent: Option<Symbol>) -> Self {
         Symbol(RcMut::new(SymbolInner {
             def,
@@ -81,15 +90,17 @@ impl Symbol {
             children: Default::default(),
         }))
     }
-    /// Create a symbol node for a source file.
-    ///
+    /// Create a symbol of a source file ([`SymbolDefinition::SourceFile`]).
     /// # Arguments
     /// - `source_file`: Resolved source file.
     pub fn new_source(source_file: Rc<SourceFile>) -> Symbol {
         Symbol::new(SymbolDefinition::SourceFile(source_file), None)
     }
 
-    /// Create a symbol node of a built-in function.
+    /// Create a symbol of a built-in function ([`SymbolDefinition::BuiltinFunction`]).
+    /// # Arguments
+    /// - `id`: Name of the symbol
+    /// - `f`: The builtin function
     pub fn new_builtin_fn(id: Identifier, f: &'static BuiltinFunctionFn) -> Symbol {
         Symbol::new(
             SymbolDefinition::BuiltinFunction(BuiltinFunction::new(id, f)),
@@ -97,14 +108,19 @@ impl Symbol {
         )
     }
 
-    /// Create a symbol node for a built-in module.
+    /// Create a symbol for a built-in module ([`SymbolDefinition::BuiltinModule`]).
+    /// # Arguments
+    /// - `id`: Name of the symbol
+    /// - `f`: The builtin module
     pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> Symbol {
         Symbol::new(
             SymbolDefinition::BuiltinModule(BuiltinModule::new(Identifier::no_ref(id), m)),
             None,
         )
     }
-    /// Create a symbol node for namespace.
+    /// Create a symbol for namespace ([`SymbolDefinition::Namespace`]).
+    /// # Arguments
+    /// - `id`: Name of the symbol
     pub fn new_namespace(id: Identifier) -> Symbol {
         Symbol::new(
             SymbolDefinition::Namespace(NamespaceDefinition::new(id)),
@@ -112,7 +128,9 @@ impl Symbol {
         )
     }
 
-    /// Create a symbol node for an external namespace.
+    /// Create a symbol for an external  ([`SymbolDefinition::External`])..
+    /// # Arguments
+    /// - `id`: Name of the symbol
     pub fn new_external(id: Identifier) -> Symbol {
         Symbol::new(
             SymbolDefinition::External(NamespaceDefinition::new(id)),
@@ -120,15 +138,22 @@ impl Symbol {
         )
     }
 
-    /// Create a new build constant.
+    /// Create a new build constant ([`SymbolDefinition::Constant`]).
+    /// # Arguments
+    /// - `id`: Name of the symbol
+    /// - `value`: The value to store
     pub fn new_constant(id: Identifier, value: Value) -> Symbol {
         Symbol::new(SymbolDefinition::Constant(id, value), None)
     }
 
     /// Print out symbols from that point.
+    /// # Arguments
+    /// - `f`: Output formatter
+    /// - `id`: Overwrite symbol's internal `id` with this one if given (e.g. when using in a map).
+    /// - `depth`: Indention depth to use
     pub fn print_symbol(
         &self,
-        f: &mut std::fmt::Formatter,
+        f: &mut impl std::fmt::Write,
         id: Option<&Identifier>,
         depth: usize,
     ) -> std::fmt::Result {
@@ -150,41 +175,50 @@ impl Symbol {
     }
 
     /// Insert child and change parent of child to new parent.
-    pub fn insert_child(parent: &Symbol, child: Symbol) {
+    /// # Arguments
+    /// - `parent`: New parent symbol (will be changed in child!).
+    /// - `child`: Child to insert
+    pub fn add_child(parent: &Symbol, child: Symbol) {
         child.borrow_mut().parent = Some(parent.clone());
         let id = child.id();
         parent.borrow_mut().children.insert(id, child);
     }
 
-    /// Move all children from one node to another (resets the parent of the children).
-    pub fn move_children(to: &Symbol, from: &Symbol) {
+    /// Move all children from another symbol into this one.
+    /// # Arguments
+    /// - `from`: Append this symbol's children
+    ///
+    /// Technically, nothing will be moved here because of the `Rc<RefCell<>>`,
+    /// but by resetting the parent of all moved  children, those will see
+    /// themselves as child of `self` (e.g when providing fully qualified name).
+    pub fn move_children(&self, from: &Symbol) {
         // copy children
         from.borrow().children.iter().for_each(|(id, child)| {
-            child.borrow_mut().parent = Some(to.clone());
-            to.borrow_mut().children.insert(id.clone(), child.clone());
+            child.borrow_mut().parent = Some(self.clone());
+            self.borrow_mut().children.insert(id.clone(), child.clone());
         });
     }
 
-    /// Convert the symbol definition from external to namespace
-    pub fn external_to_namespace(&self) {
-        let def = match &self.borrow().def {
-            SymbolDefinition::External(e) => SymbolDefinition::Namespace(e.clone()),
-            def => def.clone(),
-        };
-        self.borrow_mut().def = def
-    }
-
-    /// Get id of the definition in this node.
+    /// Return the internal *id* of this symbol.
     pub fn id(&self) -> Identifier {
         self.borrow().def.id()
     }
 
-    /// Fetch child node with an id.
+    /// Get any child with the given `id`.
+    /// # Arguments
+    /// - `id`: Anticipated *id* of the possible child.
     pub fn get(&self, id: &Identifier) -> Option<Symbol> {
         self.borrow().children.get(id).cloned()
     }
 
+    /// True if symbol has any children
+    pub fn is_empty(&self) -> bool {
+        self.borrow().children.is_empty()
+    }
+
     /// Search down the symbol tree for a qualified name.
+    /// # Arguments
+    /// - `name`: Name to search for.
     pub fn search(&self, name: &QualifiedName) -> Option<Symbol> {
         log::trace!("Searching {name} in {}", self.id());
         if let Some(first) = name.first() {
@@ -205,14 +239,22 @@ impl Symbol {
         }
     }
 
+    /// Converts the *symbol definition* from [`SymbolDefinition::External`] into [`SymbolDefinition::Namespace`]
+    /// without changing the inner [`NamespaceDefinition`].
+    ///
+    /// Symbols which have not already been loaded from [`Externals`] into [`SourceCache`] will remain
+    /// of type [`SymbolDefinition::External`] until they get loaded.
+    pub fn external_to_namespace(&self) {
+        let def = match &self.borrow().def {
+            SymbolDefinition::External(e) => SymbolDefinition::Namespace(e.clone()),
+            def => def.clone(),
+        };
+        self.borrow_mut().def = def
+    }
+
     /// Returns if symbol is an external namespace which must be loaded before using.
     pub fn is_external(&self) -> bool {
         matches!(&self.borrow().def, SymbolDefinition::External(_))
-    }
-
-    /// True if symbol has any children
-    pub fn is_empty(&self) -> bool {
-        self.borrow().children.is_empty()
     }
 }
 

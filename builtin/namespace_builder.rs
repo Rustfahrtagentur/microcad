@@ -19,7 +19,7 @@ impl NamespaceBuilder {
 
     /// Add a symbol to the namespace
     pub fn symbol(self, symbol: Symbol) -> Self {
-        Symbol::insert_child(&self.namespace, symbol);
+        Symbol::add_child(&self.namespace, symbol);
         self
     }
 
