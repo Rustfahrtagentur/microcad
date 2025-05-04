@@ -16,19 +16,19 @@ impl ParameterValue {
                     context.error(
                         parameter,
                         EvalError::ParameterTypeMismatch {
-                            name: parameter.name.clone(),
+                            id: parameter.id.clone(),
                             expected: specified_type.ty(),
                             found: default_value.ty(),
                         },
                     )?;
                     // Return an invalid parameter value in case evaluation failed
                     Ok(ParameterValue::invalid(
-                        parameter.name.clone(),
+                        parameter.id.clone(),
                         parameter.src_ref(),
                     ))
                 } else {
                     Ok(ParameterValue::new(
-                        parameter.name.clone(),
+                        parameter.id.clone(),
                         Some(specified_type.ty()),
                         Some(default_value),
                         parameter.src_ref(),
@@ -37,7 +37,7 @@ impl ParameterValue {
             }
             // Only type is specified
             (Some(t), None) => Ok(ParameterValue::new(
-                parameter.name.clone(),
+                parameter.id.clone(),
                 Some(t.ty()),
                 None,
                 parameter.src_ref(),
@@ -47,7 +47,7 @@ impl ParameterValue {
                 let default_value = expr.eval(context)?;
 
                 Ok(ParameterValue::new(
-                    parameter.name.clone(),
+                    parameter.id.clone(),
                     Some(default_value.ty().clone()),
                     Some(default_value),
                     parameter.src_ref(),
@@ -55,7 +55,7 @@ impl ParameterValue {
             }
             // Neither type nor value is specified
             (None, None) => Ok(ParameterValue::invalid(
-                parameter.name.clone(),
+                parameter.id.clone(),
                 parameter.src_ref(),
             )),
         }

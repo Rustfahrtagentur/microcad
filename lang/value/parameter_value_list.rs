@@ -12,8 +12,8 @@ use crate::{src_ref::*, value::*};
 pub struct ParameterValueList {
     /// List of parameter values
     parameters: Vec<ParameterValue>,
-    /// access map by name
-    pub by_name: std::collections::BTreeMap<Identifier, usize>,
+    /// access map by id
+    pub by_id: std::collections::BTreeMap<Identifier, usize>,
     /// Source code reference
     src_ref: SrcRef,
 }
@@ -22,13 +22,13 @@ impl ParameterValueList {
     /// Create new ParameterValueList
     #[cfg(test)]
     pub fn new(parameters: Vec<ParameterValue>) -> Self {
-        let mut by_name = std::collections::BTreeMap::new();
+        let mut by_id = std::collections::BTreeMap::new();
         for (i, parameter) in parameters.iter().enumerate() {
-            by_name.insert(parameter.id.clone(), i);
+            by_id.insert(parameter.id.clone(), i);
         }
 
         Self {
-            by_name,
+            by_id,
             src_ref: SrcRef::from_vec(&parameters),
             parameters,
         }
@@ -36,19 +36,19 @@ impl ParameterValueList {
 
     /// Push parameter value
     pub fn push(&mut self, parameter: ParameterValue) -> std::result::Result<(), ValueError> {
-        if self.by_name.contains_key(&parameter.id) {
+        if self.by_id.contains_key(&parameter.id) {
             return Err(ValueError::DuplicateParameter(parameter.id.clone()));
         }
 
-        self.by_name
+        self.by_id
             .insert(parameter.id.clone(), self.parameters.len());
         self.parameters.push(parameter);
         Ok(())
     }
 
-    /// get ParameterValue by name
-    pub fn get_by_name(&self, name: &Identifier) -> Option<&ParameterValue> {
-        self.by_name.get(name).map(|i| &self.parameters[*i])
+    /// get ParameterValue by id
+    pub fn get_by_id(&self, id: &Identifier) -> Option<&ParameterValue> {
+        self.by_id.get(id).map(|i| &self.parameters[*i])
     }
 
     /// get ParameterValue by index
@@ -56,11 +56,11 @@ impl ParameterValueList {
         self.parameters.get(index)
     }
 
-    /// remove parameter value by name
-    pub fn remove(&mut self, name: &Identifier) {
-        if let Some(new_index) = self.by_name.remove(name) {
+    /// remove parameter value by id
+    pub fn remove(&mut self, id: &Identifier) {
+        if let Some(new_index) = self.by_id.remove(id) {
             self.parameters.remove(new_index);
-            self.by_name
+            self.by_id
                 .values_mut()
                 .skip(new_index)
                 .for_each(|index| *index -= 1);
@@ -69,7 +69,7 @@ impl ParameterValueList {
 
     /// Return `true` if empty
     pub fn is_empty(&self) -> bool {
-        self.by_name.is_empty()
+        self.by_id.is_empty()
     }
 
     /// Check for missing arguments.

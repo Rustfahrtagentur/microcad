@@ -26,14 +26,9 @@ impl SrcReferrer for FunctionDefinition {
 
 impl FunctionDefinition {
     /// Create new function definition
-    pub fn new(
-        name: Identifier,
-        signature: FunctionSignature,
-        body: Body,
-        src_ref: SrcRef,
-    ) -> Self {
+    pub fn new(id: Identifier, signature: FunctionSignature, body: Body, src_ref: SrcRef) -> Self {
         Self {
-            id: name,
+            id,
             signature,
             body,
             src_ref,

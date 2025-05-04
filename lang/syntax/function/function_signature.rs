@@ -25,7 +25,7 @@ impl SrcReferrer for FunctionSignature {
 impl FunctionSignature {
     /// Get parameter by name
     pub fn parameter_by_name(&self, name: &Identifier) -> Option<&Parameter> {
-        self.parameters.iter().find(|arg| arg.name == *name)
+        self.parameters.iter().find(|arg| arg.id == *name)
     }
 }
 

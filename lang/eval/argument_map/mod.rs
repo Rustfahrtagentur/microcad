@@ -84,7 +84,7 @@ fn argument_match_single() {
         .get_matching_arguments(&parameter_values)
         .expect("Matching arguments failed");
 
-    let a = arg_map.get(&Identifier(Refer::none("a".into())));
+    let a = arg_map.get(&Identifier::no_ref("a"));
     assert!(a.is_some());
     let a = a.expect("internal test error");
     assert!(a == &Value::Scalar(Refer::none(5.0)));

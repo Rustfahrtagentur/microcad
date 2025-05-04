@@ -35,7 +35,7 @@ impl CallArgumentValueList {
     ) -> EvalResult<()> {
         match self
             .keys()
-            .find(|id| parameter_values.get_by_name(id).is_none())
+            .find(|id| parameter_values.get_by_id(id).is_none())
         {
             Some(id) => Err(EvalError::UnexpectedArgument(id.clone())),
             None => Ok(()),
@@ -93,7 +93,7 @@ impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
 macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
-            $arg_map.get(&Identifier(Refer::none(stringify!($name).into()))).expect(&format!("Argument `{}` expected",stringify!($name))),
+            $arg_map.get(&Identifier::no_ref(stringify!($name).into())).expect(&format!("Argument `{}` expected",stringify!($name))),
             &Value::$ty(crate::src_ref::Refer::none($value))
         ));*
     };

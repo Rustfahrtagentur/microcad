@@ -84,9 +84,7 @@ fn module_implicit_init_call() {
 
     let mut context = evaluate_file("syntax/module/implicit_init.µcad");
 
-    let node = context
-        .lookup(&qualified_name("a"))
-        .expect("Node expected");
+    let node = context.lookup(&qualified_name("a")).expect("Node expected");
 
     // Check node id
     if let Ok(node) =
@@ -160,7 +158,7 @@ fn module_explicit_init_call() {
         if let objects::ObjectNodeInner::Object(ref object) = *node.borrow() {
             assert_eq!(
                 object
-                    .get_property_value(&Identifier(Refer::none("radius".into())))
+                    .get_property_value(&Identifier::no_ref("radius"))
                     .expect("Property `radius`"),
                 &value::Value::Scalar(src_ref::Refer::none(value))
             );

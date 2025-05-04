@@ -83,10 +83,7 @@ impl SymbolNode {
     /// Create a symbol node for a built-in module.
     pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> SymbolNodeRcMut {
         SymbolNode::new(
-            SymbolDefinition::BuiltinModule(BuiltinModule::new(
-                Identifier(Refer::none(id.into())),
-                m,
-            )),
+            SymbolDefinition::BuiltinModule(BuiltinModule::new(Identifier::no_ref(id.into()), m)),
             None,
         )
     }

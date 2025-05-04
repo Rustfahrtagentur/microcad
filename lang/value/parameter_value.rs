@@ -94,32 +94,32 @@ impl SrcReferrer for ParameterValue {
 #[cfg(test)]
 #[macro_export]
 macro_rules! parameter_value {
-    ($name:ident) => {
+    ($id:ident) => {
         $crate::value::ParameterValue {
-            name: stringify!($name).into(),
+            name: stringify!($id).into(),
             specified_type: None,
             default_value: None,
             SrcRef(None),
         }
     };
-    ($name:ident: $ty:ident) => {
+    ($id:ident: $ty:ident) => {
         $crate::value::ParameterValue::new(
-            stringify!($name).into(),
+            stringify!($id).into(),
             Some(Type::$ty),
             None,
             SrcRef(None),
         )
     };
-    ($name:ident: $ty:ident = $value:expr) => {
+    ($id:ident: $ty:ident = $value:expr) => {
         $crate::value::ParameterValue::new(
-            stringify!($name).into(),
+            stringify!($id).into(),
             Some(Type::$ty),
             Some($crate::value::Value::$ty(Refer::none($value))),
             SrcRef(None),
         )
     };
-    ($name:ident = $value:expr) => {
-        value::ParameterValue::new(stringify!($name).into(), None, Some($value), SrcRef(None))
+    ($id:ident = $value:expr) => {
+        value::ParameterValue::new(stringify!($id).into(), None, Some($value), SrcRef(None))
     };
     () => {};
 }

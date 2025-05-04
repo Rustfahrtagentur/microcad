@@ -50,7 +50,7 @@ pub enum EvalError {
     #[error("Type mismatch for parameter: expected {expected}, got {found}")]
     ParameterTypeMismatch {
         /// Parameter name
-        name: Identifier,
+        id: Identifier,
         /// expected type
         expected: Type,
         /// found type
@@ -65,7 +65,7 @@ pub enum EvalError {
     #[error("Return type mismatch: expected {expected}, got {found}")]
     ReturnTypeMismatch {
         /// Parameter name
-        name: Identifier,
+        id: Identifier,
         /// expected type
         expected: Type,
         /// found type

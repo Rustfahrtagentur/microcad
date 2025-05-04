@@ -284,7 +284,7 @@ fn node_nest() {
 
     fn obj(name: &str) -> ObjectNode {
         object(Object {
-            name: name.into(),
+            id: name.into(),
             ..Default::default()
         })
     }
@@ -322,7 +322,7 @@ fn node_nest() {
                 "{}{}",
                 "  ".repeat(n.depth()),
                 match *n.borrow() {
-                    ObjectNodeInner::Object(ref obj) => obj.name.clone(),
+                    ObjectNodeInner::Object(ref obj) => obj.id.clone(),
                     _ => panic!("Object with name expected"),
                 }
             )

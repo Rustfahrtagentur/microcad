@@ -33,7 +33,7 @@ impl Parse for Parameter {
         }
 
         Ok(Self {
-            name,
+            id: name,
             specified_type,
             default_value,
             src_ref: pair.into(),

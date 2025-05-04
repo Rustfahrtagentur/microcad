@@ -69,7 +69,7 @@ impl ModuleInitDefinition {
 
         // Make a new object node
         let object = object(Object {
-            name: crate::Id::default(),
+            id: Identifier::none(),
             props,
         });
         for node in nodes {

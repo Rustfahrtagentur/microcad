@@ -16,6 +16,16 @@ use crate::{parse::*, src_ref::*, syntax::*, Id};
 pub struct Identifier(pub Refer<Id>);
 
 impl Identifier {
+    /// Make empty (invalid) id
+    pub fn none() -> Self {
+        Self(Refer::none("".into()))
+    }
+
+    /// Make empty (invalid) id
+    pub fn no_ref(id: &str) -> Self {
+        Self(Refer::none(id.into()))
+    }
+
     /// Get the value of the identifier
     pub fn id(&self) -> &Id {
         &self.0.value
@@ -126,7 +136,7 @@ fn identifier_comparison() {
     crate::env_logger_init();
 
     // same id but different src refs
-    let id1 = Identifier(Refer::none("x".into()));
+    let id1 = Identifier::no_ref("x");
     let id2 = Identifier(Refer::new("x".into(), SrcRef::new(0..5, 0, 1, 1)));
 
     // shall be equal

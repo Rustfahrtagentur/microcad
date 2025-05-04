@@ -3,7 +3,7 @@
 
 //! Object an object tree
 
-use crate::{diag::*, eval::*, syntax::*, value::*, Id};
+use crate::{diag::*, eval::*, syntax::*, value::*};
 use std::collections::BTreeMap;
 
 /// A list of values sorted by id
@@ -20,10 +20,7 @@ impl ObjectProperties {
     ) -> EvalResult<Self> {
         let mut props = BTreeMap::new();
         for parameter in parameter_list.iter() {
-            props.insert(
-                parameter.name.clone(),
-                parameter.eval_default_value(context)?,
-            );
+            props.insert(parameter.id.clone(), parameter.eval_default_value(context)?);
         }
 
         Ok(Self(props))
@@ -82,7 +79,7 @@ impl ObjectProperties {
 #[derive(Clone, Default, Debug)]
 pub struct Object {
     /// Name of the object
-    pub name: Id,
+    pub id: Identifier,
 
     /// Properties
     pub props: ObjectProperties,
