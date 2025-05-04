@@ -12,7 +12,14 @@ fn abs() -> Symbol {
         Ok(match arg.value.eval(ctx)? {
             Value::Integer(i) => Value::Integer(Refer::new(i.abs(), arg.src_ref())),
             value => {
-                ctx.error(arg, EvalError::InvalidType(value.ty()))?;
+                ctx.error(
+                    arg,
+                    EvalError::ParameterTypeMismatch {
+                        id: id.clone(),
+                        expected: Type::Integer,
+                        found: value.ty(),
+                    },
+                )?;
                 Value::None
             }
         })
