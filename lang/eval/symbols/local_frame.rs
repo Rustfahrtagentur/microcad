@@ -4,7 +4,12 @@
 use crate::{eval::*, resolve::Symbol};
 use std::collections::BTreeMap;
 
-/// A stack frame is map of local variables.
+/// Storage for *local variables* and *aliases* (for *use statements*).
+///
+/// A *stack frame* can have different types and some provide a storage for *local variables*
+/// (like [`LocalFrame::Source`] and [`LocalFrame::Scope`]) and some do not, some are named
+/// (like [`LocalFrame::Source`], [`LocalFrame::Namespace`] and [`LocalFrame::Module`])
+/// and some do not.
 pub enum LocalFrame {
     /// Source file with locals.
     Source(Identifier, BTreeMap<Identifier, Symbol>),

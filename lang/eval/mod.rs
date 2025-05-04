@@ -4,8 +4,8 @@
 //! Evaluation of parsed content.
 //!
 //! To be able to evaluate (run) a source file, it must be loaded, parsed and resolved.
-//! To do so an [`Context`] can be created with [`Context::new()`] based on a already resolved symbol or
-//! by using [`Context::from_source()`] or [`Context::from_source_captured()`] which automatically
+//! To do so a [`Context`] can be created with [`Context::new()`] based on an already resolved symbol or
+//! by using [`Context::from_source()`] or [`Context::from_source_captured()`] which both automatically
 //! load and resolve the source file and build a context around it which then can be evaluated with [`Context::eval()`]:
 //!
 //! ```

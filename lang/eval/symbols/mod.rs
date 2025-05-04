@@ -25,18 +25,17 @@ pub trait Lookup {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol>;
 }
 
-/// Trait to manage local stack
+/// Trait to manage the *local stack*.
 ///
-/// The local stack holds a state about where evaluation is currently processing the source code.
-/// This includes...
-/// - the current namespace, which may be fetched to a qualified name and
-/// - the current (local) stack frame where local variables are stored while evaluation.
+/// The *local stack* holds a state about where evaluation is currently processing the source code.
 ///
 /// Items on the local stack can be of different types:
-/// - *source file*: A source file with an own local stack frame.
-/// - *scope*: A scope within the source file (opened by `{`).
-/// - *namespace*: A namespace without local variables.
-/// - *module*: A module without local variables.
+/// - a *source file* with an own local stack frame,
+/// - a *scope* (surrounded by curly brackets `{}`) within the source file,
+/// - a *namespace* without local variables, or
+/// - a *module* without local variables.
+///
+/// Each one may have different items it stores (see [`LocalFrame`]).
 pub trait Locals {
     /// Open a new source scope with a new [local stack frame](LocalFrame).
     fn open_source(&mut self, id: Identifier);

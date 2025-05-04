@@ -3,20 +3,17 @@
 
 use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*};
 
-/// Context for evaluation of a resolved µcad file.
+/// *Context* for *evaluation* of a resolved µcad file.
 ///
 /// The context is used to store the current state of the evaluation.
 ///
-/// A context is consists of the following structures:
+/// A context consists of the following members:
 ///
-/// - One *root symbol* resolved from the initially read source file.
-/// - A map of all *global symbols* accessible by fully [`QualifiedName`].
-/// - A stack of local scope frames that store *local values* and *local symbol aliases*
-///   (e.g. use statements) accessible by [`Identifier`].
-/// - A *current namespace* while evaluation.
-/// - A map of all *loaded source files* (accessible by name, path and hash).
-/// - A diagnostic handler that accumulates *evaluation errors* for later output.
-/// - One *output channel* where `__builtin::print` writes it's output to while evaluation.
+/// - A *symbol table* ([`SymbolTable`]) with symbols stored by [`QualifiedName`].
+/// - A *diagnostic handler* ([`DiagHandler`]) that accumulates *evaluation errors* for later output.
+/// - One *output channel* ([`Output`]) where `__builtin::print` writes it's output to while evaluation.
+///
+/// All these internal structures can be accessed by several implemented traits.
 pub struct Context {
     /// Symbol table
     symbol_table: SymbolTable,

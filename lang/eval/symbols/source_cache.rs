@@ -34,7 +34,7 @@ impl SourceCache {
             source_files: vec![root.clone()],
             by_hash,
             by_path,
-            // root shall be found by name
+            // root shall not be found by name
             by_name: std::collections::HashMap::new(),
         }
     }
