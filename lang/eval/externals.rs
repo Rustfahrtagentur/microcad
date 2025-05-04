@@ -55,7 +55,7 @@ impl Externals {
         } else {
             Symbol::new_namespace(node_id.clone())
         };
-        Symbol::insert_child(parent, child.clone());
+        Symbol::add_child(parent, child.clone());
 
         Self::recursive_create_namespaces(&child, &name.remove_first());
         Some(child)
