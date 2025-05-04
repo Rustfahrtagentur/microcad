@@ -25,7 +25,7 @@ impl LocalStack {
                 log::trace!("Local Stack:\n{self}");
                 Ok(())
             }
-            _ => Err(EvalError::NoLocalStack(id)),
+            _ => Err(EvalError::LocalStackEmpty(id)),
         }
     }
 
