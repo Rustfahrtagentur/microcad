@@ -159,7 +159,36 @@ impl Eval for NestedItem {
             NestedItem::Call(call) => Ok(call.eval(context)?),
             NestedItem::QualifiedName(name) => match &context.lookup(name)?.borrow().def {
                 SymbolDefinition::Constant(_, value) => Ok(value.clone()),
-                _ => unreachable!(),
+
+                SymbolDefinition::Namespace(ns) => {
+                    Err(EvalError::UnexpectedNested("namespace", ns.id.clone()))
+                }
+                SymbolDefinition::Module(md) => {
+                    Err(EvalError::UnexpectedNested("module", md.id.clone()))
+                }
+                SymbolDefinition::Function(f) => {
+                    Err(EvalError::UnexpectedNested("function", f.id.clone()))
+                }
+                SymbolDefinition::BuiltinFunction(bf) => Err(EvalError::UnexpectedNested(
+                    "builtin function",
+                    bf.id.clone(),
+                )),
+
+                SymbolDefinition::BuiltinModule(bm) => {
+                    Err(EvalError::UnexpectedNested("builtin module", bm.id.clone()))
+                }
+                SymbolDefinition::Alias(id, _) => {
+                    unreachable!("Unexpected alias {id} in expression")
+                }
+                SymbolDefinition::SourceFile(sf) => {
+                    unreachable!(
+                        "Unexpected source file {} in expression",
+                        sf.filename_as_str()
+                    )
+                }
+                SymbolDefinition::External(ns) => {
+                    unreachable!("Unexpected unload source file {} in expression", ns.id)
+                }
             },
             NestedItem::Body(body) => Ok(Value::Node(body.eval_to_node(context)?)),
         }
