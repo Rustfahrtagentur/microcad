@@ -280,8 +280,6 @@ pub fn bake3d(
 
 #[test]
 fn node_nest() {
-    crate::env_logger_init();
-
     fn obj(name: &str) -> ObjectNode {
         object(Object {
             id: name.into(),

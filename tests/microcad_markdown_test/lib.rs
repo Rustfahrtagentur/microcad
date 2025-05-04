@@ -368,8 +368,6 @@ fn create_test_code(
                     use microcad_lang::eval::*;
                     use microcad_lang::syntax::*;
 
-                    microcad_lang::env_logger_init();
-
                     // get parameters from outside code
                     let banner = "{banner}";
                     let out_name = "{out}";

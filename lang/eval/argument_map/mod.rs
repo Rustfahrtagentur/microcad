@@ -73,8 +73,6 @@ impl ArgumentMatch for ArgumentMap {
 
 #[test]
 fn argument_match_single() {
-    crate::env_logger_init();
-
     let parameter_values = ParameterValueList::new(vec![crate::parameter_value!(a: Scalar)]);
 
     let call_argument_value_list =

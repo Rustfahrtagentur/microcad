@@ -95,8 +95,6 @@ impl std::fmt::Display for LocalStack {
 fn local_stack() {
     use std::ops::Deref;
 
-    crate::env_logger_init();
-
     let mut stack = LocalStack::default();
 
     let make_int =

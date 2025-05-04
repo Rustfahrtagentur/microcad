@@ -56,8 +56,6 @@ pub fn assert_invalid() -> Symbol {
 
 #[test]
 fn assert_ok() {
-    microcad_lang::env_logger_init();
-
     let mut context = Context::from_source(
         "../tests/test_cases/syntax/assert_ok.µcad",
         builtin_namespace(),
@@ -70,8 +68,6 @@ fn assert_ok() {
 
 #[test]
 fn assert_fail() {
-    microcad_lang::env_logger_init();
-
     let mut context = Context::from_source(
         "../tests/test_cases/syntax/assert_fail.µcad",
         builtin_namespace(),

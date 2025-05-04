@@ -84,8 +84,6 @@ fn call() {
     use crate::{parser::*, syntax::*};
     use pest::Parser as _;
 
-    crate::env_logger_init();
-
     let pair = Pair::new(
         Parser::parse(Rule::call, "foo(1, 2, bar = 3, baz = 4)")
             .expect("test error")

@@ -111,8 +111,6 @@ impl<T: PrintSyntax> std::fmt::Display for FormatSyntax<'_, T> {
 
 #[test]
 fn load_source_file() {
-    crate::env_logger_init();
-
     let source_file = SourceFile::load(r#"../tests/test_cases/algorithm/difference.µcad"#);
     if let Err(ref err) = source_file {
         log::error!("{err}");
@@ -135,8 +133,6 @@ fn load_source_file() {
 
 #[test]
 fn load_source_file_wrong_location() {
-    crate::env_logger_init();
-
     let source_file = SourceFile::load("I do not exist.µcad");
     if let Err(err) = source_file {
         log::info!("{err}");

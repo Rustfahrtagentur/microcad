@@ -190,8 +190,6 @@ impl std::ops::Deref for Externals {
 
 #[test]
 fn resolve_external_file() {
-    crate::env_logger_init();
-
     let externals = Externals::new(&["../lib".into()]);
 
     assert!(!externals.is_empty());
@@ -209,8 +207,6 @@ fn resolve_external_file() {
 
 #[test]
 fn create_namespaces() {
-    crate::env_logger_init();
-
     let externals = Externals::new(&["../lib".into()]);
 
     assert!(!externals.is_empty());

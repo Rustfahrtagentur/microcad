@@ -43,8 +43,6 @@ fn named_tuple_type() {
     use crate::parser::*;
     use crate::ty::Ty;
 
-    crate::env_logger_init();
-
     let type_annotation =
         Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(x: Int, y: String)", 0)
             .expect("test error");
@@ -52,12 +50,9 @@ fn named_tuple_type() {
     assert_eq!(
         type_annotation.ty(),
         Type::NamedTuple(NamedTupleType(
-            vec![
-                ("x".into(), Type::Integer),
-                ("y".into(), Type::String)
-            ]
-            .into_iter()
-            .collect()
+            vec![("x".into(), Type::Integer), ("y".into(), Type::String)]
+                .into_iter()
+                .collect()
         ))
     );
 }

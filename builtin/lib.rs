@@ -10,6 +10,13 @@ mod print;
 
 mod namespace_builder;
 
+/// Global test initialization.
+#[cfg(test)]
+#[ctor::ctor]
+fn init() {
+    env_logger::init();
+}
+
 use microcad_lang::resolve::*;
 pub use namespace_builder::NamespaceBuilder;
 
