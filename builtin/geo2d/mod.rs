@@ -1,15 +1,39 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_builtin_proc_macro::DefineBuiltinPrimitive2D;
 use microcad_core::*;
-use microcad_lang::{eval::*, parse::*, rc::*};
+use microcad_lang::{
+    eval::*,
+    objects::*,
+    rc::*,
+    resolve::Symbol,
+    syntax::*,
+    ty::Type,
+};
 
 /// Builtin definition for a 2D circle
-#[derive(DefineBuiltinPrimitive2D, Clone, Debug)]
+#[derive(Debug)]
 pub struct Circle {
     /// Radius of the circle in millimeters
     pub radius: Scalar,
+}
+
+impl BuiltinModuleDefinition for Circle {
+    fn name() -> &'static str {
+        "circle"
+    }
+
+    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
+        Ok(ObjectNode::new(ObjectNodeInner::Primitive2D(Rc::new(
+            Circle {
+                radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),
+            },
+        ))))
+    }
+
+    fn parameters() -> ParameterList {
+        vec![Parameter::no_ref("radius", Type::Scalar)].into()
+    }
 }
 
 impl microcad_core::RenderHash for Circle {
@@ -41,12 +65,39 @@ impl geo2d::Primitive for Circle {
     }
 }
 
-#[derive(DefineBuiltinPrimitive2D, Debug)]
+#[derive(Debug)]
 struct Rect {
     width: Scalar,
     height: Scalar,
     x: Scalar,
     y: Scalar,
+}
+
+impl BuiltinModuleDefinition for Rect {
+    fn name() -> &'static str {
+        "rect"
+    }
+
+    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
+        Ok(ObjectNode::new(ObjectNodeInner::Primitive2D(Rc::new(
+            Rect {
+                width: args.get_value::<Scalar>(&Identifier::no_ref("width")),
+                height: args.get_value::<Scalar>(&Identifier::no_ref("height")),
+                x: args.get_value::<Scalar>(&Identifier::no_ref("x")),
+                y: args.get_value::<Scalar>(&Identifier::no_ref("y")),
+            },
+        ))))
+    }
+
+    fn parameters() -> ParameterList {
+        vec![
+            Parameter::no_ref("width", Type::Scalar),
+            Parameter::no_ref("height", Type::Scalar),
+            Parameter::no_ref("x", Type::Scalar),
+            Parameter::no_ref("y", Type::Scalar),
+        ]
+        .into()
+    }
 }
 
 impl microcad_core::RenderHash for Rect {
@@ -77,12 +128,10 @@ impl geo2d::Primitive for Rect {
     }
 }
 
-use crate::NamespaceBuilder;
-
 /// Builtin module for 2D geometry
-pub fn builtin_module() -> Rc<NamespaceDefinition> {
-    NamespaceBuilder::new("geo2d")
-        .add(Circle::builtin_module().into())
-        .add(Rect::builtin_module().into())
+pub fn geo2d() -> Symbol {
+    crate::NamespaceBuilder::new("geo2d".try_into().expect("valid id"))
+        .symbol(Circle::symbol())
+        .symbol(Rect::symbol())
         .build()
 }

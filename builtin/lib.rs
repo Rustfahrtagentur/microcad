@@ -7,6 +7,7 @@ mod algorithm;
 mod assert;
 mod math;
 mod print;
+mod geo2d;
 
 mod namespace_builder;
 
@@ -17,6 +18,7 @@ pub(crate) use algorithm::*;
 pub(crate) use assert::*;
 pub(crate) use math::math;
 pub(crate) use print::print;
+pub(crate) use geo2d::geo2d;
 
 /// Build the standard module
 pub fn builtin_namespace() -> Symbol {
@@ -27,5 +29,6 @@ pub fn builtin_namespace() -> Symbol {
         .symbol(print())
         .symbol(algorithm())
         .symbol(math())
+        .symbol(geo2d())
         .build()
 }
