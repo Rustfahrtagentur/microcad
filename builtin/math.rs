@@ -5,7 +5,7 @@ use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, syntax::*, ty::*, 
 use std::str::FromStr;
 
 // Absolute value abs(x)
-fn abs() -> SymbolNodeRcMut {
+fn abs() -> SymbolNode {
     let id = Identifier::from_str("abs").expect("valid id");
     SymbolNode::new_builtin_fn(id, &|args, ctx| {
         let arg = args.get_single()?;
@@ -19,7 +19,7 @@ fn abs() -> SymbolNodeRcMut {
     })
 }
 
-pub fn math() -> SymbolNodeRcMut {
+pub fn math() -> SymbolNode {
     crate::NamespaceBuilder::new("math".try_into().expect("unexpected name error"))
         .symbol(SymbolNode::new_constant(
             Identifier::from_str("pi").expect("valid id"),

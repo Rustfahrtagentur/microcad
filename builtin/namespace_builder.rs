@@ -6,7 +6,7 @@ use microcad_lang::{resolve::*, syntax::Identifier};
 /// Builder pattern to build builtin namespaces
 pub struct NamespaceBuilder {
     // Namespace symbol
-    namespace: SymbolNodeRcMut,
+    namespace: SymbolNode,
 }
 
 impl NamespaceBuilder {
@@ -18,13 +18,13 @@ impl NamespaceBuilder {
     }
 
     /// Add a symbol to the namespace
-    pub fn symbol(self, symbol: SymbolNodeRcMut) -> Self {
+    pub fn symbol(self, symbol: SymbolNode) -> Self {
         SymbolNode::insert_child(&self.namespace, symbol);
         self
     }
 
     /// Return our namespace symbol
-    pub fn build(self) -> SymbolNodeRcMut {
+    pub fn build(self) -> SymbolNode {
         self.namespace
     }
 }

@@ -41,15 +41,15 @@ impl Externals {
     }
 
     fn recursive_create_namespaces(
-        parent: &SymbolNodeRcMut,
+        parent: &SymbolNode,
         name: &QualifiedName,
-    ) -> Option<SymbolNodeRcMut> {
+    ) -> Option<SymbolNode> {
         if name.is_empty() {
             return None;
         }
 
         let node_id = name.first().expect("Non-empty qualified name");
-        if let Some(child) = parent.borrow().get(node_id) {
+        if let Some(child) = parent.get(node_id) {
             return Some(child.clone());
         }
 

@@ -46,7 +46,6 @@ fn resolve_source_file() {
     // file <no file>
     //  module a
     //   module b
-    let symbol_node = symbol_node.borrow();
     assert!(symbol_node.get(&"a".into()).is_some());
     assert!(symbol_node.get(&"c".into()).is_none());
 
@@ -62,7 +61,7 @@ fn resolve_source_file() {
     log::trace!("Symbol node:\n{symbol_node}");
 
     let b = symbol_node.search(&"a::b".into()).expect("cant find node");
-    assert!(b.borrow().search(&"a".into()).is_none());
+    assert!(b.search(&"a".into()).is_none());
 
     //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
 

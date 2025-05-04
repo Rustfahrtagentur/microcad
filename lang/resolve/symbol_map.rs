@@ -3,10 +3,10 @@ use std::collections::btree_map::BTreeMap;
 
 /// Map Id to SymbolNode reference
 #[derive(Debug, Default, Clone)]
-pub struct SymbolMap(BTreeMap<Identifier, SymbolNodeRcMut>);
+pub struct SymbolMap(BTreeMap<Identifier, SymbolNode>);
 
 impl std::ops::Deref for SymbolMap {
-    type Target = BTreeMap<Identifier, SymbolNodeRcMut>;
+    type Target = BTreeMap<Identifier, SymbolNode>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -26,18 +26,18 @@ impl SymbolMap {
     }
 
     /// Insert a not by it's own id.
-    pub fn add_node(&mut self, symbol: SymbolNodeRcMut) {
-        let id = symbol.borrow().id();
+    pub fn add_node(&mut self, symbol: SymbolNode) {
+        let id = symbol.id();
         self.0.insert(id, symbol);
     }
 
     /// Insert a not by it's own id.
-    pub fn insert_node(&mut self, id: Identifier, symbol: SymbolNodeRcMut) {
+    pub fn insert_node(&mut self, id: Identifier, symbol: SymbolNode) {
         self.0.insert(id, symbol);
     }
 
     /// Search for a symbol in symbol map.
-    pub fn search(&self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+    pub fn search(&self, name: &QualifiedName) -> EvalResult<SymbolNode> {
         if name.is_empty() {
             return Err(EvalError::NotAName(name.src_ref()));
         }
@@ -47,7 +47,7 @@ impl SymbolMap {
             if leftover.is_empty() {
                 log::trace!("Fetched {name} from globals (symbol map)");
                 return Ok(symbol.clone());
-            } else if let Some(symbol) = symbol.borrow().search(&leftover) {
+            } else if let Some(symbol) = symbol.search(&leftover) {
                 return Ok(symbol);
             }
         }
@@ -67,7 +67,7 @@ impl SymbolMap {
 impl std::fmt::Display for SymbolMap {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (id, symbol) in self.0.iter() {
-            symbol.borrow().print_symbol(f, Some(id), 0)?;
+            symbol.print_symbol(f, Some(id), 0)?;
         }
 
         Ok(())

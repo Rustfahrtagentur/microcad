@@ -22,7 +22,7 @@ pub trait Symbols {
     /// - follows aliases (use statements)
     /// - detect any ambiguity
     /// - loads external files
-    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut>;
+    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<SymbolNode>;
 }
 
 /// Trait to manage local stack
@@ -43,7 +43,7 @@ pub trait Locals {
     fn close(&mut self);
 
     /// Fetch a local variable from current stack frame.
-    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut>;
+    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNode>;
 
     /// Add a named local value to current locals.
     ///

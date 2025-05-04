@@ -37,8 +37,8 @@ impl EvalContext {
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
     /// - `output`: Output channel to use
     pub fn new(
-        root: SymbolNodeRcMut,
-        builtin: SymbolNodeRcMut,
+        root: SymbolNode,
+        builtin: SymbolNode,
         search_paths: &[std::path::PathBuf],
         output: Box<dyn Output>,
     ) -> Self {
@@ -68,7 +68,7 @@ impl EvalContext {
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
     pub fn from_source(
         root: impl AsRef<std::path::Path>,
-        builtin: SymbolNodeRcMut,
+        builtin: SymbolNode,
         search_paths: &[std::path::PathBuf],
     ) -> EvalResult<Self> {
         Ok(Self::new(
@@ -87,7 +87,7 @@ impl EvalContext {
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
     pub fn from_source_captured(
         root: Rc<SourceFile>,
-        builtin: SymbolNodeRcMut,
+        builtin: SymbolNode,
         search_paths: &[std::path::PathBuf],
     ) -> Self {
         Self::new(
@@ -149,7 +149,7 @@ impl EvalContext {
 
     /// Peek into root node for testing
     #[cfg(test)]
-    pub fn root(&self) -> &SymbolNodeRcMut {
+    pub fn root(&self) -> &SymbolNode {
         &self.symbol_table.root
     }
 }
@@ -179,13 +179,13 @@ impl Locals for EvalContext {
         self.symbol_table.close();
     }
 
-    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut> {
+    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNode> {
         self.symbol_table.fetch(id)
     }
 }
 
 impl Symbols for EvalContext {
-    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<SymbolNode> {
         self.symbol_table.lookup(name)
     }
 }
@@ -219,11 +219,11 @@ impl UseSymbol for EvalContext {
         &mut self,
         name: &QualifiedName,
         id: Option<Identifier>,
-    ) -> EvalResult<SymbolNodeRcMut> {
+    ) -> EvalResult<SymbolNode> {
         self.symbol_table.use_symbol(name, id)
     }
 
-    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut> {
+    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNode> {
         self.symbol_table.use_symbols_of(name)
     }
 }

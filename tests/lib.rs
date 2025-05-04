@@ -90,7 +90,7 @@ fn module_implicit_init_call() {
     if let Ok(node) =
         context.lookup(&Identifier(microcad_lang::src_ref::Refer::none("a".into())).into())
     {
-        let id = node.borrow().id();
+        let id = node.id();
         assert_eq!(id.id(), "a");
     }
 

@@ -7,7 +7,7 @@ use std::str::FromStr;
 use crate::builtin_namespace;
 use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, syntax::*, value::*};
 
-pub fn assert() -> SymbolNodeRcMut {
+pub fn assert() -> SymbolNode {
     let id = Identifier::from_str("assert").expect("valid id");
     SymbolNode::new_builtin_fn(id, &|args, context| {
         if let Ok(arg) = args.get_single() {
@@ -28,7 +28,7 @@ pub fn assert() -> SymbolNodeRcMut {
     })
 }
 
-pub fn assert_valid() -> SymbolNodeRcMut {
+pub fn assert_valid() -> SymbolNode {
     let id = Identifier::from_str("assert_valid").expect("valid id");
     SymbolNode::new_builtin_fn(id, &|args, context| {
         if let Ok(arg) = args.get_single() {
@@ -41,13 +41,13 @@ pub fn assert_valid() -> SymbolNodeRcMut {
     })
 }
 
-pub fn assert_invalid() -> SymbolNodeRcMut {
+pub fn assert_invalid() -> SymbolNode {
     let id = Identifier::from_str("assert_invalid").expect("valid id");
     SymbolNode::new_builtin_fn(id, &|args, context| {
         if let Ok(name) = args.get_single() {
             let n = QualifiedName::try_from(name.value.to_string())?;
             if let Ok(symbol) = context.lookup(&n) {
-                context.error(name, EvalError::SymbolFound(symbol.borrow().full_name()))?;
+                context.error(name, EvalError::SymbolFound(symbol.full_name()))?;
             }
         }
         Ok(Value::None)

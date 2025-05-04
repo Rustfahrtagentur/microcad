@@ -10,13 +10,9 @@ pub struct LocalStack(Vec<LocalFrame>);
 
 impl LocalStack {
     /// Add a new variable to current stack frame.
-    pub fn add(&mut self, id: Option<Identifier>, frame: SymbolNodeRcMut) -> EvalResult<()> {
-        let id = if let Some(id) = id {
-            id
-        } else {
-            frame.borrow().id()
-        };
-        let name = frame.borrow().full_name();
+    pub fn add(&mut self, id: Option<Identifier>, frame: SymbolNode) -> EvalResult<()> {
+        let id = if let Some(id) = id { id } else { frame.id() };
+        let name = frame.full_name();
         if name.is_qualified() {
             log::debug!("Adding {name} as {id} to local stack");
         } else {
@@ -70,7 +66,7 @@ impl Locals for LocalStack {
     }
 
     /// Fetch a local variable from current stack frame.
-    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNodeRcMut> {
+    fn fetch(&self, id: &Identifier) -> EvalResult<SymbolNode> {
         // search from inner scope to root scope to shadow outside locals
         for frame in self.0.iter().rev() {
             match frame {

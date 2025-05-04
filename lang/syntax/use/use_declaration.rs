@@ -29,27 +29,22 @@ pub enum UseDeclaration {
 
 impl UseDeclaration {
     /// resolve public use declaration (shall not be called with private use statements)
-    pub fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> (Identifier, SymbolNodeRcMut) {
+    pub fn resolve(&self, parent: Option<SymbolNode>) -> (Identifier, SymbolNode) {
         match self {
             UseDeclaration::Use(name) => {
                 let identifier = name.last().expect("Identifier");
                 (
                     identifier.clone(),
-                    SymbolNodeRcMut::new(SymbolNode {
-                        def: SymbolDefinition::Alias(identifier.clone(), name.clone()),
+                    SymbolNode::new(
+                        SymbolDefinition::Alias(identifier.clone(), name.clone()),
                         parent,
-                        children: Default::default(),
-                    }),
+                    ),
                 )
             }
             UseDeclaration::UseAll(_name) => todo!(),
             UseDeclaration::UseAlias(name, alias) => (
                 alias.clone(),
-                SymbolNodeRcMut::new(SymbolNode {
-                    def: SymbolDefinition::Alias(alias.clone(), name.clone()),
-                    parent,
-                    children: Default::default(),
-                }),
+                SymbolNode::new(SymbolDefinition::Alias(alias.clone(), name.clone()), parent),
             ),
         }
     }

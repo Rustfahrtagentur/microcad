@@ -59,12 +59,12 @@ impl SourceFile {
     }
 
     /// Resolve into SymbolNode
-    pub fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+    pub fn resolve(&self, parent: Option<SymbolNode>) -> SymbolNode {
         Rc::new(self.clone()).resolve_rc(parent)
     }
 
     /// Like resolve but with `Rc<SourceFile>`
-    pub fn resolve_rc(self: Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+    pub fn resolve_rc(self: Rc<Self>, parent: Option<SymbolNode>) -> SymbolNode {
         let name = self.filename_as_str();
         log::debug!("Resolving source file {name}");
         let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);

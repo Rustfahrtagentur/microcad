@@ -34,10 +34,7 @@ pub struct Body {
 
 impl Body {
     /// fetches all symbols from a slice of statements
-    pub fn fetch_symbol_map(
-        statements: &[Statement],
-        parent: Option<SymbolNodeRcMut>,
-    ) -> SymbolMap {
+    pub fn fetch_symbol_map(statements: &[Statement], parent: Option<SymbolNode>) -> SymbolMap {
         let mut symbol_map = SymbolMap::default();
 
         // Iterate over all statement fetch definitions
@@ -61,7 +58,7 @@ impl Body {
     }
 
     /// fetches all symbols from the statements in the body
-    pub fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> SymbolMap {
+    pub fn resolve(&self, parent: Option<SymbolNode>) -> SymbolMap {
         Self::fetch_symbol_map(&self.statements, parent)
     }
 

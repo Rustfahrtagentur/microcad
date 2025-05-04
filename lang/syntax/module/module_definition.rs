@@ -39,7 +39,7 @@ impl ModuleDefinition {
     }
 
     /// Resolve into SymbolNode
-    pub fn resolve(self: &Rc<Self>, parent: Option<SymbolNodeRcMut>) -> RcMut<SymbolNode> {
+    pub fn resolve(self: &Rc<Self>, parent: Option<SymbolNode>) -> SymbolNode {
         let node = SymbolNode::new(SymbolDefinition::Module(self.clone()), parent);
         node.borrow_mut().children = self.body.resolve(Some(node.clone()));
         node

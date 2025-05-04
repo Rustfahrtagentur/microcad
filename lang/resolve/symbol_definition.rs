@@ -39,7 +39,7 @@ impl SymbolDefinition {
     }
 
     /// Resolve into SymbolNode.
-    pub fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+    pub fn resolve(&self, parent: Option<SymbolNode>) -> SymbolNode {
         match self {
             Self::Module(m) => m.resolve(parent),
             Self::Namespace(n) => n.resolve(parent),

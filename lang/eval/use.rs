@@ -16,7 +16,7 @@ pub trait UseSymbol {
         &mut self,
         name: &QualifiedName,
         id: Option<Identifier>,
-    ) -> EvalResult<SymbolNodeRcMut>;
+    ) -> EvalResult<SymbolNode>;
 
     /// Find a symbol in the symbol table and copy all it's children to the locals.
     ///
@@ -24,7 +24,7 @@ pub trait UseSymbol {
     ///
     /// # Arguments
     /// - `name`: Name of the symbol to search for
-    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNodeRcMut>;
+    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<SymbolNode>;
 }
 
 impl Eval for UseStatement {
