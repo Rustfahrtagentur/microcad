@@ -17,8 +17,6 @@ pub use namespace_builder::NamespaceBuilder;
 
 pub(crate) use algorithm::*;
 pub(crate) use assert::*;
-pub(crate) use geo2d::geo2d;
-pub(crate) use geo3d::geo3d;
 pub(crate) use math::math;
 pub(crate) use print::print;
 
@@ -31,7 +29,7 @@ pub fn builtin_namespace() -> Symbol {
         .symbol(print())
         .symbol(algorithm())
         .symbol(math())
-        .symbol(geo2d())
-        .symbol(geo3d())
+        .symbol(geo2d::geo2d())
+        .symbol(geo3d::geo3d())
         .build()
 }
