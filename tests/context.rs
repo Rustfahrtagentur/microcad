@@ -2,8 +2,6 @@ use microcad_lang::eval::*;
 
 #[test]
 fn use_statements() {
-    microcad_lang::env_logger_init();
-
     let mut context = Context::from_source(
         "test_cases/context/use_test.µcad",
         microcad_builtin::builtin_namespace(),
@@ -15,8 +13,6 @@ fn use_statements() {
 
 #[test]
 fn locals() {
-    microcad_lang::env_logger_init();
-
     let mut context = Context::from_source(
         "test_cases/context/locals.µcad",
         microcad_builtin::builtin_namespace(),

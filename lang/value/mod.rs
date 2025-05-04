@@ -658,8 +658,6 @@ fn check(result: ValueResult, value: Value) {
 
 #[test]
 fn test_value_integer() {
-    crate::env_logger_init();
-
     let u = || integer(2, &SrcRef::new(3..4, 5, 6, 0));
     let v = || integer(5, &SrcRef::new(6..7, 8, 9, 0));
     let w = || scalar(5.0, &SrcRef::new(6..7, 8, 9, 0));
@@ -682,8 +680,6 @@ fn test_value_integer() {
 
 #[test]
 fn test_value_scalar() {
-    crate::env_logger_init();
-
     let u = || scalar(2.0, &SrcRef::new(3..4, 5, 6, 0));
     let v = || scalar(5.0, &SrcRef::new(6..7, 8, 9, 0));
     let w = || integer(5, &SrcRef::new(6..7, 8, 9, 0));

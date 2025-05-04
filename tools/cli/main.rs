@@ -7,10 +7,7 @@ extern crate clap;
 extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{
-    diag::Diag, env_logger_init, eval::*, objects::*, parse::ParseResult, rc::*, resolve::*,
-    syntax::*,
-};
+use microcad_lang::{diag::*, eval::*, objects::*, parse::*, rc::*, resolve::*, syntax::*};
 use std::io::Write;
 
 /// µcad cli
@@ -60,7 +57,7 @@ enum Commands {
 
 /// Main of the command line interpreter
 fn main() {
-    env_logger_init();
+    env_logger::init();
 
     let cli = Cli::parse();
 

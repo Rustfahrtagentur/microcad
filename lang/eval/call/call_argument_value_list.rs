@@ -103,8 +103,6 @@ macro_rules! assert_eq_arg_map_value {
 fn call_get_matching_arguments() {
     use crate::{parameter_value, ty::*};
 
-    crate::env_logger_init();
-
     // module my_module(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = ParameterValueList::new(vec![
         parameter_value!(foo: Integer),
@@ -133,7 +131,6 @@ fn call_get_matching_arguments() {
 #[test]
 fn call_get_matching_arguments_missing() {
     use crate::{parameter_value, ty::*};
-    crate::env_logger_init();
 
     // function f(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = ParameterValueList::new(vec![
@@ -161,7 +158,6 @@ fn call_get_matching_arguments_missing() {
 #[test]
 fn get_multi_matching_arguments() {
     use crate::{parameter_value, ty::*};
-    crate::env_logger_init();
 
     let param_values = ParameterValueList::new(vec![
         parameter_value!(thickness: Scalar = 2.0),

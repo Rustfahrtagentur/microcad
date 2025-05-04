@@ -35,8 +35,6 @@ pub trait FullyQualify {
 fn resolve_source_file() {
     use std::rc::Rc;
 
-    crate::env_logger_init();
-
     let source_file = Rc::new(
         SourceFile::load_from_str(r#"module a() { module b() {} } "#).expect("Valid source"),
     );

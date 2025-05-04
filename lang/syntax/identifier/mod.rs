@@ -124,8 +124,6 @@ pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
 fn identifier_comparison() {
     use crate::syntax::*;
 
-    crate::env_logger_init();
-
     // same id but different src refs
     let id1 = Identifier::no_ref("x");
     let id2 = Identifier(Refer::new("x".into(), SrcRef::new(0..5, 0, 1, 1)));
@@ -138,8 +136,6 @@ fn identifier_comparison() {
 fn identifier_hash() {
     use crate::syntax::*;
     use std::hash::{Hash, Hasher};
-
-    crate::env_logger_init();
 
     // same id but different src refs
     let id1 = Identifier(Refer::none("x".into()));

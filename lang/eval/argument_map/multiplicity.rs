@@ -133,7 +133,6 @@ impl Iterator for Combinations<Value> {
 #[test]
 fn call_parameter_multiplicity() {
     use crate::src_ref::Refer;
-    crate::env_logger_init();
 
     let data = std::collections::HashMap::from([
         (

@@ -80,8 +80,6 @@ impl Parse for SourceFile {
 
 #[test]
 fn parse_source_file() {
-    crate::env_logger_init();
-
     let source_file = Parser::parse_rule::<SourceFile>(
         Rule::source_file,
         r#"use std::io::println;

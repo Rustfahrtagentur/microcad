@@ -29,11 +29,11 @@ pub mod value;
 /// Id type (base of all identifiers)
 type Id = compact_str::CompactString;
 
-static INIT_EVENT_LOGGER: std::sync::Once = std::sync::Once::new();
-
-/// Initialize env_logger
-pub fn env_logger_init() {
-    INIT_EVENT_LOGGER.call_once(env_logger::init);
+/// Global test initialization.
+#[cfg(test)]
+#[ctor::ctor]
+fn init() {
+    env_logger::init();
 }
 
 const MICROCAD_EXTENSIONS: &[&str] = &[".µcad", ".mcad"];

@@ -1,6 +1,13 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+/// Global test initialization.
+#[cfg(test)]
+#[ctor::ctor]
+fn init() {
+    env_logger::init();
+}
+
 #[cfg(test)]
 mod context;
 
@@ -26,19 +33,16 @@ fn evaluate_file(filename: &str) -> microcad_lang::eval::Context {
 
 #[test]
 fn namespaces() {
-    microcad_lang::env_logger_init();
     assert!(evaluate_file("syntax/namespace.µcad").eval().is_ok());
 }
 
 #[test]
 fn scopes() {
-    microcad_lang::env_logger_init();
     assert!(evaluate_file("syntax/scopes.µcad").eval().is_ok());
 }
 
 #[test]
 fn context_with_symbols() {
-    microcad_lang::env_logger_init();
     let mut context = evaluate_file("syntax/call.µcad");
 
     context
@@ -79,7 +83,6 @@ fn call_argument_list(s: &str) -> CallArgumentList {
 #[test]
 fn module_implicit_init_call() {
     use microcad_lang::*;
-    env_logger_init();
 
     let mut context = evaluate_file("syntax/module/implicit_init.µcad");
 
@@ -139,7 +142,6 @@ fn module_implicit_init_call() {
 fn module_explicit_init_call() {
     use microcad_lang::diag::Diag;
     use microcad_lang::*;
-    env_logger_init();
 
     let mut context = evaluate_file("syntax/module/explicit_init.µcad");
     let node = context
