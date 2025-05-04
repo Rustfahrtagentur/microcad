@@ -253,7 +253,7 @@ impl UseSymbol for SymbolTable {
         };
 
         if symbol.is_empty() {
-            Err(EvalError::NoSymbolsFound(symbol.full_name()))
+            Err(EvalError::NoSymbolsToUse(symbol.full_name()))
         } else {
             for (id, symbol) in symbol.borrow().children.iter() {
                 self.locals.add(Some(id.clone()), symbol.clone())?;
