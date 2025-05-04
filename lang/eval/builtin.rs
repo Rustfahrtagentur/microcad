@@ -3,7 +3,7 @@
 
 //! Builtin function evaluation entity
 
-use crate::{eval::*, objects::*, rc::*, syntax::*};
+use crate::{eval::*, objects::*, syntax::*};
 
 /// Builtin function type
 pub type BuiltinFn = dyn Fn(&CallArgumentList, &mut EvalContext) -> EvalResult<Value>;
@@ -24,11 +24,6 @@ impl std::fmt::Debug for Builtin {
 }
 
 impl Builtin {
-    /// Create new builtin function
-    pub fn new(id: Identifier, f: &'static BuiltinFn) -> Rc<Self> {
-        Rc::new(Self { id, f })
-    }
-
     /// Return identifier
     pub fn id(&self) -> Identifier {
         self.id.clone()
@@ -47,8 +42,8 @@ impl CallTrait for Builtin {
 
 /// Builtin module definition
 pub trait BuiltinModuleDefinition {
-    /// Get name of the builtin module
-    fn name() -> &'static str;
+    /// Get id of the builtin module
+    fn id() -> &'static str;
     /// Create node from argument map
     fn node(args: &ArgumentMap) -> EvalResult<ObjectNode>;
     /// Module function
@@ -69,9 +64,6 @@ pub trait BuiltinModuleDefinition {
 
     /// Create builtin symbol
     fn symbol() -> Symbol {
-        Symbol::new_builtin(Builtin::new(
-            Identifier::no_ref(Self::name()),
-            Self::function(),
-        ))
+        Symbol::new_builtin(Identifier::no_ref(Self::id()), Self::function())
     }
 }

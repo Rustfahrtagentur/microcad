@@ -90,9 +90,9 @@ impl Symbol {
     }
 
     /// Create a symbol node for a built-in.
-    pub fn new_builtin(builtin: Rc<Builtin>) -> Symbol {
+    pub fn new_builtin(id: Identifier, f: &'static BuiltinFn) -> Symbol {
         Symbol::new(
-            SymbolDefinition::Builtin(builtin),
+            SymbolDefinition::Builtin(Rc::new(Builtin { id, f })),
             None,
         )
     }

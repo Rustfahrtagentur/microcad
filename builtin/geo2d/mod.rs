@@ -19,7 +19,7 @@ pub struct Circle {
 }
 
 impl BuiltinModuleDefinition for Circle {
-    fn name() -> &'static str {
+    fn id() -> &'static str {
         "circle"
     }
 
@@ -74,7 +74,7 @@ struct Rect {
 }
 
 impl BuiltinModuleDefinition for Rect {
-    fn name() -> &'static str {
+    fn id() -> &'static str {
         "rect"
     }
 

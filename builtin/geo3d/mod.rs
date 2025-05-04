@@ -12,7 +12,7 @@ pub struct Sphere {
 }
 
 impl BuiltinModuleDefinition for Sphere {
-    fn name() -> &'static str {
+    fn id() -> &'static str {
         "sphere"
     }
 
@@ -63,7 +63,7 @@ pub struct Cube {
 
 
 impl BuiltinModuleDefinition for Cube {
-    fn name() -> &'static str {
+    fn id() -> &'static str {
         "cube"
     }
 
@@ -119,7 +119,7 @@ pub struct Cylinder {
 }
 
 impl BuiltinModuleDefinition for Cylinder {
-    fn name() -> &'static str {
+    fn id() -> &'static str {
         "cylinder"
     }
 

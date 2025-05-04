@@ -7,7 +7,7 @@ use std::str::FromStr;
 /// Absolute value abs(x)
 fn abs() -> Symbol {
     let id = Identifier::no_ref("abs");
-    Symbol::new_builtin(Builtin::new(id, &|args, ctx| {
+    Symbol::new_builtin(id, &|args, ctx| {
         let arg = args.get_single()?;
         Ok(match arg.value.eval(ctx)? {
             Value::Integer(i) => Value::Integer(Refer::new(i.abs(), arg.src_ref())),
@@ -16,7 +16,7 @@ fn abs() -> Symbol {
                 Value::None
             }
         })
-    }))
+    })
 }
 
 pub fn math() -> Symbol {
