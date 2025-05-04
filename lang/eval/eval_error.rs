@@ -6,75 +6,75 @@
 use crate::{parse::*, resolve::*, src_ref::SrcRef, syntax::*, ty::*, value::*};
 use thiserror::Error;
 
-/// Evaluation error
+/// Evaluation error.
 #[derive(Debug, Error)]
 pub enum EvalError {
-    /// List index out of bounds
+    /// List index out of bounds.
     #[error("List index out of bounds: {index} >= {len}")]
     ListIndexOutOfBounds {
-        /// wrong index
+        /// Wrong index
         index: usize,
-        /// length of list
+        /// Length of list
         len: usize,
     },
 
-    /// Parameter type mismatch
+    /// Parameter type mismatch.
     #[error("Type mismatch for parameter: expected {expected}, got {found}")]
     ParameterTypeMismatch {
         /// Parameter name
         id: Identifier,
-        /// expected type
+        /// Expected type
         expected: Type,
-        /// found type
+        /// Found type
         found: Type,
     },
 
-    /// Elements of list have different types
+    /// Elements of list have different types.
     #[error("Elements of list have different types: {0}")]
     ListElementsDifferentTypes(TypeList),
 
-    /// Symbol not found
+    /// Symbol not found.
     #[error("Symbol {0} not found.")]
     SymbolNotFound(QualifiedName),
 
-    /// Symbol not found (retry to load from external)
+    /// Symbol not found (retry to load from external).
     #[error("Symbol {0} must be loaded from {1}")]
     SymbolMustBeLoaded(QualifiedName, std::path::PathBuf),
 
-    /// Given symbol has not children which can be used
+    /// Given symbol has not children which can be used.
     #[error("No symbols found to use in {0}")]
     NoSymbolsToUse(QualifiedName),
 
-    /// Symbol was not expected to be found (e.g. assert_invalid)
+    /// Symbol was not expected to be found (e.g. `assert_invalid`).
     #[error("Unexpectedly found symbol {0}")]
     SymbolFound(QualifiedName),
 
-    /// Found ambiguous symbol
+    /// Found ambiguous symbols.
     #[error("Ambiguous symbol {ambiguous} might be one of the following:\n{others}")]
     AmbiguousSymbol {
-        /// ambiguous symbol
+        /// Searched name
         ambiguous: QualifiedName,
-        /// local symbol that matches
+        /// Symbols which matches the name
         others: Symbols,
     },
 
-    /// Local symbol not found
+    /// Local Symbol not found.
     #[error("Local symbol not found: {0}")]
     LocalNotFound(Identifier),
 
-    /// Expression is neither a valid name for a symbol nor local variable
+    /// Expression is neither a valid name for a symbol nor local variable.
     #[error("'{0}' is neither a valid name for a symbol nor local variable")]
     NotAName(SrcRef),
 
-    /// A property of a value was not found
+    /// A property of a value was not found.
     #[error("Property not found: {0}")]
     PropertyNotFound(Identifier),
 
-    /// Expected iterable, a list or a range
+    /// Expected iterable, a list or a range.
     #[error("Expected iterable, got {0}")]
     ExpectedIterable(Type),
 
-    /// Argument count mismatch
+    /// Argument count mismatch.
     #[error("Argument count mismatch: expected {expected}, got {found} in {args}")]
     ArgumentCountMismatch {
         /// Argument list including the error
@@ -85,70 +85,70 @@ pub enum EvalError {
         found: usize,
     },
 
-    /// Invalid argument type
+    /// Invalid argument type.
     #[error("Invalid argument type: {0}")]
     InvalidArgumentType(Type),
 
-    /// Cannot nest item
+    /// Cannot nest item.
     #[error("Cannot nest item: {0}")]
     CannotNestItem(NestedItem),
 
-    /// Unexpected argument
+    /// Unexpected argument.
     #[error("Unexpected argument: {0}")]
     UnexpectedArgument(Identifier),
 
-    /// Assertion failed
+    /// Assertion failed.
     #[error("Assertion failed: {0}")]
     AssertionFailed(String),
 
-    /// Cannot continue evaluation after error limit has been reached
+    /// Cannot continue evaluation after error limit has been reached.
     #[error("Error limit reached: Stopped evaluation after {0} errors")]
     ErrorLimitReached(u32),
 
-    /// No locals  available on stack
+    /// No locals  available on stack.
     #[error("Local stack needed to store {0}")]
     NoLocalStack(Identifier),
 
-    /// Value Error
-    #[error(transparent)]
+    /// Value Error.
+    #[error("Value Error: {0}")]
     ValueError(#[from] ValueError),
 
-    /// Name of external symbol is unknown
+    /// Name of external symbol is unknown.
     #[error("External symbol {0} not found")]
     ExternalSymbolNotFound(QualifiedName),
 
-    /// Path of external file is unknown
+    /// Path of external file is unknown.
     #[error("External path '{0}' not found")]
     ExternalPathNotFound(std::path::PathBuf),
 
-    /// Can't find a project file by hash
+    /// Can't find a project file by hash.
     #[error("Could not find a file with hash {0}")]
     UnknownHash(u64),
 
-    /// Can't find a project file by it's path
+    /// Can't find a project file by it's path.
     #[error("Could not find a file with path {0}")]
     UnknownPath(std::path::PathBuf),
 
-    /// Can't find a project file by it's qualified name
+    /// Can't find a project file by it's qualified name.
     #[error("Parsing error {0}")]
     ParseError(#[from] ParseError),
 
-    /// Statement is not supported in this context
+    /// Statement is not supported in this context.
     #[error("Statement not supported: {0}")]
     StatementNotSupported(Statement),
 
-    /// Properties are not initialized
+    /// Properties are not initialized.
     #[error("Properties have not been initialized: {0:?}")]
     UninitializedProperties(Vec<Identifier>),
 
-    /// Unexpected element within expression
+    /// Unexpected element within expression.
     #[error("Unexpected {0} {1} within expression")]
     UnexpectedNested(&'static str, Identifier),
 
-    /// Can't find a project file by it's qualified name
+    /// Can't find a project file by it's qualified name.
     #[error("Not implemented: {0}")]
     Todo(String),
 }
 
-/// Result type of any evaluation
+/// Result type of any evaluation.
 pub type EvalResult<T> = std::result::Result<T, EvalError>;
