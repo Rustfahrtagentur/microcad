@@ -195,10 +195,6 @@ impl Diag for EvalContext {
         self.diag_handler.pretty_print(f, &self.symbol_table)
     }
 
-    fn has_errors(&self) -> bool {
-        self.diag_handler.has_errors()
-    }
-
     fn error_count(&self) -> u32 {
         self.diag_handler.error_count()
     }
@@ -248,7 +244,7 @@ impl GetSourceByHash for EvalContext {
 
 impl std::fmt::Display for EvalContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.diag_handler.has_errors() {
+        if self.has_errors() {
             write!(f, "{}\nErrors:\n", self.symbol_table)?;
             self.diag_handler.pretty_print(f, &self.symbol_table)
         } else {

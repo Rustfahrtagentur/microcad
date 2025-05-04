@@ -18,7 +18,9 @@ pub trait Diag {
     }
 
     /// Returns true if there are errors
-    fn has_errors(&self) -> bool;
+    fn has_errors(&self) -> bool {
+        self.error_count() > 0
+    }
 
     /// Return number of occurred errors
     fn error_count(&self) -> u32;
@@ -46,11 +48,6 @@ impl DiagHandler {
         source_by_hash: &impl GetSourceByHash,
     ) -> std::fmt::Result {
         self.diag_list.pretty_print(f, source_by_hash)
-    }
-
-    /// Returns true if there are errors
-    pub fn has_errors(&self) -> bool {
-        self.error_count > 0
     }
 
     /// Return number of occurred errors
