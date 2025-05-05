@@ -17,8 +17,6 @@ use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*};
 pub struct Context {
     /// Symbol table
     symbol_table: SymbolTable,
-    /// Call stack
-    call_stack: CallStack,
     /// Source file diagnostics-
     diag_handler: DiagHandler,
     /// Output channel for [__builtin::print].
@@ -52,7 +50,6 @@ impl Context {
         Self {
             symbol_table: SymbolTable::new(root, builtin, search_paths),
             diag_handler: Default::default(),
-            call_stack: Default::default(),
             output,
         }
     }
@@ -93,16 +90,6 @@ impl Context {
             search_paths,
             Box::new(Capture::new()),
         )
-    }
-
-    /// Push a call to stack
-    pub fn push_call(&mut self, symbol_node: Symbol, args: ArgumentMap, src_ref: impl SrcReferrer) {
-        self.call_stack.push(symbol_node, args, src_ref)
-    }
-
-    /// Pop a call from stack
-    pub fn pop_call(&mut self) {
-        self.call_stack.pop();
     }
 
     /// Access diagnostic handler.
@@ -151,6 +138,10 @@ impl Locals for Context {
         self.symbol_table.add_local_value(id, value)
     }
 
+    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer) {
+        self.symbol_table.open_call(symbol, args, src_ref.src_ref());
+    }
+
     fn open_source(&mut self, id: Identifier) {
         self.symbol_table.open_source(id);
     }
@@ -159,12 +150,8 @@ impl Locals for Context {
         self.symbol_table.open_namespace(id);
     }
 
-    fn open_module(&mut self, id: Identifier) {
-        self.symbol_table.open_module(id);
-    }
-
-    fn open_scope(&mut self) {
-        self.symbol_table.open_scope();
+    fn open_body(&mut self) {
+        self.symbol_table.open_body();
     }
 
     fn close(&mut self) {
@@ -189,20 +176,6 @@ impl Diag for Context {
 
     fn error_count(&self) -> u32 {
         self.diag_handler.error_count()
-    }
-}
-
-impl CallTrace for Context {
-    fn fmt_calls(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
-        self.call_stack.pretty_print(f, &self.symbol_table)
-    }
-
-    fn push(&mut self, symbol_node: Symbol, args: ArgumentMap, src_ref: impl SrcReferrer) {
-        self.call_stack.push(symbol_node, args, src_ref);
-    }
-
-    fn pop(&mut self) {
-        self.call_stack.pop();
     }
 }
 

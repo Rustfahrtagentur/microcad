@@ -9,7 +9,7 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{parse::*, src_ref::*, syntax::*, Id};
+use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 
 /// µcad identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -43,11 +43,7 @@ impl Identifier {
 
     /// check if this is a valid identifier (contains only `A`-`Z`, `a`-`z` or `_`)
     pub fn validate(self) -> ParseResult<Self> {
-        if self.0.chars().all(|c| c.is_ascii_alphabetic() || c == '_') {
-            Ok(self)
-        } else {
-            Err(ParseError::InvalidIdentifier(self.to_string()))
-        }
+        Parser::parse_rule(crate::parser::Rule::identifier, self.id().as_str(), 0)
     }
 }
 
@@ -67,7 +63,7 @@ impl std::str::FromStr for Identifier {
     type Err = crate::eval::EvalError;
 
     fn from_str(id: &str) -> Result<Self, Self::Err> {
-        Ok(Identifier(Refer::none(id.into())).validate()?)
+        Ok(Identifier::no_ref(id).validate()?)
     }
 }
 
@@ -83,12 +79,7 @@ impl TryFrom<&str> for Identifier {
     type Error = ParseError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let id = Self(Refer::none(value.into()));
-        if id.0.chars().all(|c| c.is_ascii_alphabetic() || c == '_') {
-            Ok(id)
-        } else {
-            Err(ParseError::InvalidIdentifier(value.into()))
-        }
+        Parser::parse_rule(crate::parser::Rule::identifier, value, 0)
     }
 }
 

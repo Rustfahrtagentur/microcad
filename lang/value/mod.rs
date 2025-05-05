@@ -638,6 +638,17 @@ impl_try_from!(Bool => bool);
 impl_try_from!(String => String);
 impl_try_from!(Color => Color);
 
+
+impl From<Vec<ObjectNode>> for Value {
+    fn from(nodes: Vec<ObjectNode>) -> Self {
+        match nodes.len() {
+            0 => Value::None,
+            1 => Value::Node(nodes.first().expect("Node").clone()),
+            _ => Value::NodeMultiplicity(nodes)
+        }
+    }
+}
+
 #[cfg(test)]
 fn integer(value: i64, src_ref: &SrcRef) -> Value {
     Value::Integer(Refer::new(value, src_ref.clone()))

@@ -3,11 +3,11 @@
 
 use crate::{eval::*, resolve::*};
 
-/// A stack with a list of local variables for each stack frame.
+/// A stack with a list of stack frames.
 #[derive(Default)]
-pub struct LocalStack(Vec<LocalFrame>);
+pub struct Stack(Vec<StackFrame>);
 
-impl LocalStack {
+impl Stack {
     /// Add a new variable to current stack frame.
     pub fn add(&mut self, id: Option<Identifier>, symbol: Symbol) -> EvalResult<()> {
         let id = if let Some(id) = id { id } else { symbol.id() };
@@ -19,8 +19,8 @@ impl LocalStack {
         }
 
         match self.0.last_mut() {
-            Some(LocalFrame::Source(_, last)) | Some(LocalFrame::Scope(last)) => {
-                last.insert(id.clone(), symbol);
+            Some(StackFrame::Source(_, last)) | Some(StackFrame::Body(last)) => {
+                last.insert(id.clone(), frame);
                 log::trace!("Local Stack:\n{self}");
                 Ok(())
             }
@@ -28,7 +28,7 @@ impl LocalStack {
         }
     }
 
-    /// get name of current namespace
+    /// Get name of current namespace.
     pub fn current_namespace(&self) -> QualifiedName {
         QualifiedName(self.0.iter().filter_map(|locals| locals.id()).collect())
     }
@@ -37,6 +37,26 @@ impl LocalStack {
     pub fn current_frame(&self) -> Option<&LocalFrame> {
         self.0.last()
     }
+
+    /// Pretty print call trace.
+    pub fn pretty_print_call_trace(
+        &self,
+        f: &mut dyn std::fmt::Write,
+        source_by_hash: &impl super::GetSourceByHash,
+    ) -> std::fmt::Result {
+        for (idx, call_stack_frame) in self
+            .0
+            .iter()
+            .filter_map(|frame| match frame {
+                StackFrame::Call(call) => Some(call),
+                _ => None,
+            })
+            .enumerate()
+        {
+            call_stack_frame.pretty_print(f, source_by_hash, idx)?;
+        }
+        Ok(())
+    }
 }
 
 impl Locals for LocalStack {
@@ -44,16 +64,17 @@ impl Locals for LocalStack {
         self.0.push(LocalFrame::Source(id, SymbolMap::new()));
     }
 
-    fn open_scope(&mut self) {
-        self.0.push(LocalFrame::Scope(SymbolMap::new()));
+    fn open_body(&mut self) {
+        self.0.push(StackFrame::Body(SymbolMap::new()));
     }
 
     fn open_namespace(&mut self, id: Identifier) {
         self.0.push(LocalFrame::Namespace(id, SymbolMap::new()));
     }
 
-    fn open_module(&mut self, id: Identifier) {
-        self.0.push(LocalFrame::Module(id));
+    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer) {
+        self.0
+            .push(StackFrame::Call(CallStackFrame::new(symbol, args, src_ref)))
     }
 
     fn close(&mut self) {
@@ -72,7 +93,7 @@ impl Locals for LocalStack {
         // search from inner scope to root scope to shadow outside locals
         for frame in self.0.iter().rev() {
             match frame {
-                LocalFrame::Source(_, locals) | LocalFrame::Scope(locals) => {
+                StackFrame::Source(_, locals) | StackFrame::Body(locals) => {
                     if let Some(local) = locals.get(id) {
                         log::debug!("Fetched {id} from locals");
                         return Ok(local.clone());
@@ -85,7 +106,7 @@ impl Locals for LocalStack {
     }
 }
 
-impl std::fmt::Display for LocalStack {
+impl std::fmt::Display for Stack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.0.is_empty() {
             writeln!(f, "<empty stack>")
@@ -103,12 +124,12 @@ impl std::fmt::Display for LocalStack {
 fn local_stack() {
     use std::ops::Deref;
 
-    let mut stack = LocalStack::default();
+    let mut stack = Stack::default();
 
     let make_int =
         |id, value| Symbol::new_constant(id, Value::Integer(Refer::new(value, SrcRef(None))));
 
-    let fetch_int = |stack: &LocalStack, id: &str| -> Option<i64> {
+    let fetch_int = |stack: &Stack, id: &str| -> Option<i64> {
         match stack.fetch(&id.into()) {
             Ok(node) => match &node.borrow().def {
                 SymbolDefinition::Constant(_, Value::Integer(value)) => Some(*value.deref()),
@@ -129,7 +150,7 @@ fn local_stack() {
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
 
-    stack.open_scope();
+    stack.open_body();
     assert!(stack.current_namespace() == "test".into());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);

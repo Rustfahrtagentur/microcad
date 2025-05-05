@@ -32,7 +32,7 @@ impl ModuleInitDefinition {
         mut props: ObjectProperties,
         context: &mut Context,
     ) -> EvalResult<ObjectNode> {
-        context.open_scope();
+        context.open_body();
 
         // Add values from argument map as local values
         for (id, value) in args.iter() {

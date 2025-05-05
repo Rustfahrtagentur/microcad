@@ -97,27 +97,17 @@ impl Symbol {
         Symbol::new(SymbolDefinition::SourceFile(source_file), None)
     }
 
-    /// Create a symbol of a built-in function ([`SymbolDefinition::BuiltinFunction`]).
+    /// Create a symbol node for a built-in.
     /// # Arguments
     /// - `id`: Name of the symbol
     /// - `f`: The builtin function
-    pub fn new_builtin_fn(id: Identifier, f: &'static BuiltinFunctionFn) -> Symbol {
+    pub fn new_builtin(id: Identifier, f: &'static BuiltinFn) -> Symbol {
         Symbol::new(
-            SymbolDefinition::BuiltinFunction(BuiltinFunction::new(id, f)),
+            SymbolDefinition::Builtin(Rc::new(Builtin { id, f })),
             None,
         )
     }
 
-    /// Create a symbol for a built-in module ([`SymbolDefinition::BuiltinModule`]).
-    /// # Arguments
-    /// - `id`: Name of the symbol
-    /// - `f`: The builtin module
-    pub fn new_builtin_module(id: &str, m: &'static BuiltinModuleFn) -> Symbol {
-        Symbol::new(
-            SymbolDefinition::BuiltinModule(BuiltinModule::new(Identifier::no_ref(id), m)),
-            None,
-        )
-    }
     /// Create a symbol for namespace ([`SymbolDefinition::Namespace`]).
     /// # Arguments
     /// - `id`: Name of the symbol
@@ -297,7 +287,7 @@ impl SrcReferrer for SymbolInner {
             }
             SymbolDefinition::Module(module) => module.src_ref(),
             SymbolDefinition::Function(function) => function.src_ref(),
-            SymbolDefinition::BuiltinFunction(_) | SymbolDefinition::BuiltinModule(_) => {
+            SymbolDefinition::Builtin(_) => {
                 unreachable!("builtin has no source code reference")
             }
             SymbolDefinition::Constant(identifier, value) => SrcRef::merge(identifier, value),

@@ -16,10 +16,8 @@ pub enum SymbolDefinition {
     Module(Rc<ModuleDefinition>),
     /// Function symbol
     Function(Rc<FunctionDefinition>),
-    /// Builtin function symbol
-    BuiltinFunction(Rc<BuiltinFunction>),
-    /// Builtin module symbol
-    BuiltinModule(Rc<BuiltinModule>),
+    /// Builtin symbol
+    Builtin(Rc<Builtin>),
     /// Constant
     Constant(Identifier, Value),
     /// Alias of a pub use statement
@@ -34,8 +32,7 @@ impl SymbolDefinition {
             Self::Module(m) => m.id.clone(),
             Self::Function(f) => f.id.clone(),
             Self::SourceFile(s) => s.id(),
-            Self::BuiltinFunction(f) => f.id(),
-            Self::BuiltinModule(m) => m.id(),
+            Self::Builtin(m) => m.id(),
             Self::Constant(id, _) => id.clone(),
             Self::Alias(id, _) => id.clone(),
         }
@@ -64,8 +61,7 @@ impl std::fmt::Display for SymbolDefinition {
             Self::External(_) => write!(f, "(external)"),
             Self::Function(_) => write!(f, "(function)"),
             Self::SourceFile(_) => write!(f, "(file)"),
-            Self::BuiltinFunction(_) => write!(f, "(builtin function)"),
-            Self::BuiltinModule(_) => write!(f, "(builtin module)"),
+            Self::Builtin(_) => write!(f, "(builtin)"),
             Self::Constant(_, value) => write!(f, "(constant) = {value}"),
             Self::Alias(_, name) => write!(f, "(alias) => {name}"),
         }

@@ -43,7 +43,7 @@ fn scopes() {
 
 #[test]
 fn context_with_symbols() {
-    let mut context = evaluate_file("../tests/test_cases/syntax/call.µcad");
+    let mut context = evaluate_file("syntax/call.µcad");
 
     context
         .lookup(

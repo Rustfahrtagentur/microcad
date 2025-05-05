@@ -18,8 +18,8 @@ pub struct SymbolTable {
     pub root: Symbol,
     /// List of all global symbols.
     globals: SymbolMap,
-    /// Stack of currently opened scopes with local symbols while evaluation.
-    locals: LocalStack,
+    /// Stack of currently opened scopes with symbols while evaluation.
+    stack: Stack,
     /// Source file cache containing all source files loaded in the context and their syntax trees.
     cache: SourceCache,
 }
@@ -54,7 +54,7 @@ impl SymbolTable {
         let context = Self {
             root,
             globals,
-            locals: Default::default(),
+            stack: Default::default(),
             cache: source_cache,
         };
         log::trace!("Initial context:\n{context}");
@@ -70,16 +70,16 @@ impl SymbolTable {
     /// Fetch local variable from local stack (for testing only).
     #[cfg(test)]
     pub fn fetch_local(&self, id: &Identifier) -> EvalResult<Symbol> {
-        self.locals.fetch(id)
+        self.stack.fetch(id)
     }
 
     /// lookup a symbol from local stack
     fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         if let Some(id) = name.single_identifier() {
-            self.locals.fetch(id)
+            self.stack.fetch(id)
         } else {
             let (id, mut tail) = name.split_first();
-            if let Ok(local) = self.locals.fetch(&id) {
+            if let Ok(local) = self.stack.fetch(&id) {
                 let mut alias = local.full_name();
                 alias.append(&mut tail);
                 log::trace!("Following alias {alias}");
@@ -195,34 +195,33 @@ impl Lookup for SymbolTable {
 
 impl Locals for SymbolTable {
     fn open_source(&mut self, id: Identifier) {
-        self.locals.open_source(id);
+        self.stack.open_source(id);
     }
 
     fn open_namespace(&mut self, id: Identifier) {
-        self.locals.open_namespace(id);
-        log::trace!("open namespace -> {}", self.locals.current_namespace());
+        self.stack.open_namespace(id);
+        log::trace!("open namespace -> {}", self.stack.current_namespace());
     }
 
-    fn open_module(&mut self, id: Identifier) {
-        self.locals.open_module(id);
-        log::trace!("closed namespace -> {}", self.locals.current_namespace());
+    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer) {
+        self.stack.open_call(symbol, args, src_ref);
     }
 
-    fn open_scope(&mut self) {
-        self.locals.open_scope();
+    fn open_body(&mut self) {
+        self.stack.open_body();
     }
 
     fn close(&mut self) {
-        self.locals.close();
-        log::trace!("closed -> {}", self.locals.current_namespace());
+        self.stack.close();
+        log::trace!("closed -> {}", self.stack.current_namespace());
     }
 
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        self.locals.add_local_value(id, value)
+        self.stack.add_local_value(id, value)
     }
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
-        self.locals.fetch(id)
+        self.stack.fetch(id)
     }
 }
 
@@ -231,8 +230,8 @@ impl UseSymbol for SymbolTable {
         log::debug!("Using symbol {name}");
 
         let symbol = self.lookup(name)?;
-        self.locals.add(id, symbol.clone())?;
-        log::trace!("Local Stack:\n{}", self.locals);
+        self.stack.add(id, symbol.clone())?;
+        log::trace!("Local Stack:\n{}", self.stack);
 
         Ok(symbol)
     }
@@ -256,9 +255,9 @@ impl UseSymbol for SymbolTable {
             Err(EvalError::NoSymbolsToUse(symbol.full_name()))
         } else {
             for (id, symbol) in symbol.borrow().children.iter() {
-                self.locals.add(Some(id.clone()), symbol.clone())?;
+                self.stack.add(Some(id.clone()), symbol.clone())?;
             }
-            log::trace!("Local Stack:\n{}", self.locals);
+            log::trace!("Local Stack:\n{}", self.stack);
             Ok(symbol)
         }
     }
@@ -270,8 +269,8 @@ impl std::fmt::Display for SymbolTable {
             f,
             "Loaded files:\n{files}\nNamespace: {name}\n\nLocals:\n{locals}\nSymbols:\n{symbols}",
             files = self.cache,
-            name = self.locals.current_namespace(),
-            locals = self.locals,
+            name = self.stack.current_namespace(),
+            locals = self.stack,
             symbols = self.globals
         )
     }

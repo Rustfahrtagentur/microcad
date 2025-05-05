@@ -38,6 +38,16 @@ impl Parameter {
         }
     }
 
+    /// Create a new parameter without any SrcRef's
+    pub fn no_ref(id: &str, ty: Type) -> Self {
+        Self {
+            id: Identifier::no_ref(id),
+            specified_type: Some(TypeAnnotation(Refer::none(ty))),
+            default_value: None,
+            src_ref: SrcRef(None)
+        }
+    }
+
     /// Evaluate default value considering specified type
     ///
     /// If there is no default value, returns `Value::None` without raising an error.

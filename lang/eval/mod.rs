@@ -29,10 +29,8 @@
 
 mod argument_map;
 mod body;
-mod builtin_function;
-mod builtin_module;
+mod builtin;
 mod call;
-mod call_stack;
 mod context;
 mod eval_error;
 mod expression;
@@ -47,10 +45,8 @@ mod symbols;
 mod r#use;
 
 pub use argument_map::*;
-pub use builtin_function::*;
-pub use builtin_module::*;
+pub use builtin::*;
 pub use call::*;
-pub use call_stack::*;
 pub use context::*;
 pub use eval_error::*;
 pub use externals::*;

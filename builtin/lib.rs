@@ -5,6 +5,8 @@
 
 mod algorithm;
 mod assert;
+mod geo2d;
+mod geo3d;
 mod math;
 mod print;
 
@@ -34,5 +36,7 @@ pub fn builtin_namespace() -> Symbol {
         .symbol(print())
         .symbol(algorithm())
         .symbol(math())
+        .symbol(geo2d::geo2d())
+        .symbol(geo3d::geo3d())
         .build()
 }
