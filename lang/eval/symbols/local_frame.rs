@@ -10,11 +10,11 @@ use crate::{eval::*, resolve::*};
 /// (like [`LocalFrame::Source`], [`LocalFrame::Namespace`] and [`LocalFrame::Module`])
 /// and some do not.
 pub enum LocalFrame {
-    /// Source file with locals.
+    /// Source file with local variables and aliases
     Source(Identifier, SymbolMap),
-    /// Namespace scope without locals
-    Namespace(Identifier),
-    /// Module scope without locals
+    /// Namespace scope without local aliases (but without variables)
+    Namespace(Identifier, SymbolMap),
+    /// Module scope without any locals
     Module(Identifier),
     /// Standard (unnamed) scope with locals
     Scope(SymbolMap),
@@ -24,7 +24,7 @@ impl LocalFrame {
     /// Get identifier if available or panic.
     pub fn id(&self) -> Option<Identifier> {
         match self {
-            LocalFrame::Source(id, _) | LocalFrame::Namespace(id) | LocalFrame::Module(id) => {
+            LocalFrame::Source(id, _) | LocalFrame::Namespace(id, _) | LocalFrame::Module(id) => {
                 Some(id.clone())
             }
             _ => None,
@@ -38,7 +38,10 @@ impl LocalFrame {
                 writeln!(f, "{:depth$}{id} (source):", "")?;
                 map
             }
-            LocalFrame::Namespace(id) => return write!(f, "{:depth$}{id} (namespace)", ""),
+            LocalFrame::Namespace(id, map) => {
+                write!(f, "{:depth$}{id} (namespace):", "")?;
+                map
+            }
             LocalFrame::Module(id) => return write!(f, "{:depth$}{id} (module)", ""),
             LocalFrame::Scope(map) => map,
         };

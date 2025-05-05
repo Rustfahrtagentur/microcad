@@ -32,6 +32,11 @@ impl LocalStack {
     pub fn current_namespace(&self) -> QualifiedName {
         QualifiedName(self.0.iter().filter_map(|locals| locals.id()).collect())
     }
+
+    /// Return the current *stack frame* if there is any.
+    pub fn current_frame(&self) -> Option<&LocalFrame> {
+        self.0.last()
+    }
 }
 
 impl Locals for LocalStack {
@@ -44,7 +49,7 @@ impl Locals for LocalStack {
     }
 
     fn open_namespace(&mut self, id: Identifier) {
-        self.0.push(LocalFrame::Namespace(id));
+        self.0.push(LocalFrame::Namespace(id, SymbolMap::new()));
     }
 
     fn open_module(&mut self, id: Identifier) {
@@ -56,7 +61,11 @@ impl Locals for LocalStack {
     }
 
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        self.add(Some(id.clone()), Symbol::new_constant(id, value))
+        // exception
+        match &self.current_frame() {
+            Some(LocalFrame::Namespace(_, _)) => Err(EvalError::NoVariablesInNamespaces(id)),
+            _ => self.add(Some(id.clone()), Symbol::new_constant(id, value)),
+        }
     }
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
