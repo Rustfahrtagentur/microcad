@@ -17,17 +17,17 @@ use crate::{eval::*, syntax::*};
 pub trait Lookup {
     /// Lookup for local or global symbol by qualified name.
     ///
-    /// - looks in local stack
-    /// - looks in symbol map
-    /// - follows aliases (use statements)
+    /// - looks on *stack*
+    /// - looks in *symbol map*
+    /// - follows *aliases* (use statements)
     /// - detect any ambiguity
-    /// - loads external files
+    /// - loads *external files*
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol>;
 }
 
-/// Trait to manage the *local stack*.
+/// Trait to manage the *locals*.
 ///
-/// The *local stack* holds a state about where evaluation is currently processing the source code.
+/// The *locals* manage the state about where evaluation is currently processing the source code.
 ///
 /// Items on the local stack can be of different types:
 /// - a *source file* with an own local stack frame,
@@ -35,9 +35,9 @@ pub trait Lookup {
 /// - a *namespace* without local variables but aliases (use statements), or
 /// - a *call* without local variables.
 ///
-/// Each one may have different items it stores (see [`LocalFrame`]).
+/// Each one may have different items it stores (see [`StackFrame`]).
 pub trait Locals {
-    /// Open a new source scope with a new [local stack frame](LocalFrame).
+    /// Open a new source scope with a new [local stack frame](StackFrame).
     fn open_source(&mut self, id: Identifier);
 
     /// Open a new [object body](Body).

@@ -3,7 +3,7 @@
 
 use crate::eval::*;
 
-/// Storage for *local variables* and *aliases* (for *use statements*).
+/// Stack for *local variables*, *aliases* (for *use statements*) and *calls*.
 ///
 /// A *stack frame* can have different types and some provide a storage for *local variables*
 /// like [`StackFrame::Source`] and [`StackFrame::Body`]) and some do not, some are named
