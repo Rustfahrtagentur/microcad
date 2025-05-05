@@ -72,7 +72,7 @@ impl Body {
 
     /// Evaluate the statement of this body into an ObjectNode
     pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ObjectNode> {
-        context.open_scope();
+        context.open_body();
 
         let mut nodes = Vec::new();
 

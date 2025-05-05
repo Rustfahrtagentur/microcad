@@ -20,27 +20,35 @@ use thiserror::Error;
 
 impl Eval for Call {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        match context.lookup(&self.name) {
-            Ok(symbol) => match &symbol.borrow().def {
-                SymbolDefinition::Builtin(f) => f.call(&self.argument_list, context),
-                SymbolDefinition::Module(m) => m.eval_call(&self.argument_list, context),
-                _ => {
-                    context.error(
-                        self,
-                        EvalError::Todo(format!(
-                            "cannot evaluate call of {} at {}",
-                            self,
-                            context.locate(self)?
-                        )),
-                    )?;
-                    Ok(Value::None)
-                }
-            },
+        let symbol = match context.lookup(&self.name) {
+            Ok(symbol) => symbol,
             Err(err) => {
                 context.error(self.src_ref(), err)?;
+                return Ok(Value::None)
+            }
+        };
+
+        context.open_call(symbol.clone(), self.argument_list.clone(), self.src_ref());
+
+        let value = match &symbol.borrow().def {
+            SymbolDefinition::Builtin(f) => f.call(&self.argument_list, context),
+            SymbolDefinition::Module(m) => m.eval_call(&self.argument_list, context),
+            _ => {
+                context.error(
+                    self,
+                    EvalError::Todo(format!(
+                        "cannot evaluate call of {} at {}",
+                        self,
+                        context.locate(self)?
+                    )),
+                )?;
                 Ok(Value::None)
             }
-        }
+        };
+
+        context.close();
+
+        value
     }
 }
 

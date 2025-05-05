@@ -53,7 +53,6 @@ impl ModuleDefinition {
         context: &mut Context,
     ) -> EvalResult<ObjectNode> {
         let mut props = ObjectProperties::from_parameter_list(&self.parameters, context)?;
-        context.open_scope();
 
         // Create the object node from initializer if present
         let object = match init {
@@ -96,8 +95,6 @@ impl ModuleDefinition {
             }
         }
 
-        context.close();
-
         for node in nodes {
             object.append(node);
         }
@@ -134,7 +131,7 @@ impl ModuleDefinition {
             },
         }
 
-        Ok(Value::NodeMultiplicity(nodes))
+        Ok(nodes.into())
     }
 }
 
