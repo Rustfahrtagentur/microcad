@@ -9,9 +9,9 @@ pub struct LocalStack(Vec<LocalFrame>);
 
 impl LocalStack {
     /// Add a new variable to current stack frame.
-    pub fn add(&mut self, id: Option<Identifier>, frame: Symbol) -> EvalResult<()> {
-        let id = if let Some(id) = id { id } else { frame.id() };
-        let name = frame.full_name();
+    pub fn add(&mut self, id: Option<Identifier>, symbol: Symbol) -> EvalResult<()> {
+        let id = if let Some(id) = id { id } else { symbol.id() };
+        let name = symbol.full_name();
         if name.is_qualified() {
             log::debug!("Adding {name} as {id} to local stack");
         } else {
@@ -20,7 +20,7 @@ impl LocalStack {
 
         match self.0.last_mut() {
             Some(LocalFrame::Source(_, last)) | Some(LocalFrame::Scope(last)) => {
-                last.insert(id.clone(), frame);
+                last.insert(id.clone(), symbol);
                 log::trace!("Local Stack:\n{self}");
                 Ok(())
             }
