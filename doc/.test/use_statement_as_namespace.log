@@ -4,9 +4,3 @@ error: Symbol __builtin::geo3d::sphere not found.
   10 |     __builtin::geo3d::sphere(radius / 1mm);
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol __builtin::geo3d::sphere not found.
-  ---> ../lib/std/geo3d.µcad:10:5
-     |
-  10 |     __builtin::geo3d::sphere(radius / 1mm);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
