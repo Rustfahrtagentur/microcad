@@ -9,6 +9,10 @@ use thiserror::Error;
 /// Evaluation error.
 #[derive(Debug, Error)]
 pub enum EvalError {
+    /// Can't find a project file by it's qualified name.
+    #[error("Not implemented: {0}")]
+    Todo(String),
+
     /// List index out of bounds.
     #[error("List index out of bounds: {index} >= {len}")]
     ListIndexOutOfBounds {
