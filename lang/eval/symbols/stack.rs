@@ -77,7 +77,7 @@ impl Locals for Stack {
         self.0.push(StackFrame::Namespace(id, SymbolMap::new()));
     }
 
-    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer) {
+    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: SrcRef) {
         self.0
             .push(StackFrame::Call(CallStackFrame::new(symbol, args, src_ref)))
     }

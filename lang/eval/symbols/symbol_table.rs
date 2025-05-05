@@ -211,7 +211,7 @@ impl Locals for SymbolTable {
         log::trace!("open namespace -> {}", self.stack.current_namespace());
     }
 
-    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer) {
+    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: SrcRef) {
         self.stack.open_call(symbol, args, src_ref);
     }
 

@@ -23,8 +23,8 @@ impl Eval for Call {
         let symbol = match context.lookup(&self.name) {
             Ok(symbol) => symbol,
             Err(err) => {
-                context.error(self.src_ref(), err)?;
-                return Ok(Value::None)
+                context.error(self, err)?;
+                return Ok(Value::None);
             }
         };
 

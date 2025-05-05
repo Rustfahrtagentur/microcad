@@ -1,14 +1,14 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-mod stack_frame;
-mod stack;
 mod source_cache;
+mod stack;
+mod stack_frame;
 mod symbol_table;
 
-pub use stack_frame::*;
-pub use stack::*;
 pub use source_cache::*;
+pub use stack::*;
+pub use stack_frame::*;
 pub use symbol_table::*;
 
 use crate::{eval::*, syntax::*};
@@ -31,9 +31,9 @@ pub trait Lookup {
 ///
 /// Items on the local stack can be of different types:
 /// - a *source file* with an own local stack frame,
-/// - a *scope* (surrounded by curly brackets `{}`) within the source file,
-/// - a *namespace* without local variables, or
-/// - a *module* without local variables.
+/// - a *body* (surrounded by curly brackets `{}`),
+/// - a *namespace* without local variables but aliases (use statements), or
+/// - a *call* without local variables.
 ///
 /// Each one may have different items it stores (see [`LocalFrame`]).
 pub trait Locals {
@@ -44,7 +44,7 @@ pub trait Locals {
     fn open_body(&mut self);
 
     /// Open call.
-    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer);
+    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: SrcRef);
 
     /// Open a namespace.
     fn open_namespace(&mut self, id: Identifier);
