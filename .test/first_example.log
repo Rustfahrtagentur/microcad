@@ -1,37 +1,19 @@
-Volume: <invalid>cm³
-error: Symbol std::geo3d::cylinder not found.
-  ---> <from_str>:11:13
+error: Local stack needed to store height
+  ---> <from_str>:5:5
      |
-  11 |     outer = std::geo3d::cylinder(d = outer_diameter, h = height);
-     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   5 |     height = 20mm,
+     |     ^^^^^^
      |
-error: Symbol std::translate not found.
-  ---> <from_str>:12:13
+error: Local stack needed to store inner_diameter
+  ---> <from_str>:4:5
      |
-  12 |     inner = std::translate(z = thickness) std::geo3d::cylinder(d = inner_diameter, h = height);
-     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 |     inner_diameter = 16cm,
+     |     ^^^^^^^^^^^^^^
      |
-error: Cannot nest item: std::translate(z = thickness)
-  ---> <from_str>:12:13
+error: Local stack needed to store thickness
+  ---> <from_str>:3:5
      |
-  12 |     inner = std::translate(z = thickness) std::geo3d::cylinder(d = inner_diameter, h = height);
-     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   3 |     thickness = 1.6mm,
+     |     ^^^^^^^^^
      |
-error: Not implemented: cannot evaluate method call of volume() at <from_str>:22:29
-  ---> <from_str>:22:29
-     |
-  22 | __builtin::print("Volume: {l.volume() / 1000}cm³");
-     |                             ^^^^^^^^^
-     |
-error: Symbol __builtin::export not found.
-  ---> <from_str>:25:1
-     |
-  25 | __builtin::export("lid.stl") l;
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Cannot nest item: __builtin::export("lid.stl")
-  ---> <from_str>:25:1
-     |
-  25 | __builtin::export("lid.stl") l;
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+Symbol thickness not found.

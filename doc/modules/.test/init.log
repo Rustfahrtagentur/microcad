@@ -10,39 +10,17 @@ error: Symbol radius_inner not found.
    6 | module circle(radius: Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Invalid operator: Multiplicity [
-]
- - Multiplicity [
-]
-
-  ---> <from_str>:12:5
+error: Local stack needed to store radius_inner
+  ---> <from_str>:2:36
      |
-  12 |     std::geo2d::circle(r = radius_outer) - std::geo2d::circle(r = radius_inner);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   2 | module donut(radius_outer: Length, radius_inner: Length) {
+     |                                    ^^^^^^^^^^^^
      |
-error: Symbol __builtin::geo2d::circle not found.
-  ---> ../lib/std/geo2d.µcad:19:5
+error: Local stack needed to store radius_outer
+  ---> <from_str>:2:14
      |
-  19 |     __builtin::geo2d::circle(radius / 1mm);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol __builtin::geo2d::circle not found.
-  ---> ../lib/std/geo2d.µcad:19:5
-     |
-  19 |     __builtin::geo2d::circle(radius / 1mm);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Invalid operator: Multiplicity [
-Object
-,]
- - Multiplicity [
-Object
-,]
-
-  ---> <from_str>:12:5
-     |
-  12 |     std::geo2d::circle(r = radius_outer) - std::geo2d::circle(r = radius_inner);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   2 | module donut(radius_outer: Length, radius_inner: Length) {
+     |              ^^^^^^^^^^^^
      |
 error: Symbol radius_outer not found.
   ---> ../lib/std/geo2d.µcad:6:1
@@ -56,13 +34,15 @@ error: Symbol radius_inner not found.
    6 | module circle(radius: Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Invalid operator: Multiplicity [
-]
- - Multiplicity [
-]
-
-  ---> <from_str>:12:5
+error: Symbol radius_outer not found.
+  ---> ../lib/std/geo2d.µcad:6:1
      |
-  12 |     std::geo2d::circle(r = radius_outer) - std::geo2d::circle(r = radius_inner);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   6 | module circle(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol radius_inner not found.
+  ---> ../lib/std/geo2d.µcad:6:1
+     |
+   6 | module circle(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |

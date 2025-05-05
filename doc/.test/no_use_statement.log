@@ -1,18 +1,7 @@
-error: Symbol __builtin::geo3d::sphere not found.
-  ---> ../lib/std/geo3d.µcad:10:5
+error: Local stack needed to store radius
+  ---> ../lib/std/geo3d.µcad:5:15
      |
-  10 |     __builtin::geo3d::sphere(radius / 1mm);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   5 | module sphere(radius: Length) {
+     |               ^^^^^^
      |
-error: Symbol __builtin::transform::translate not found.
-  ---> ../lib/std/geo3d.µcad:25:5
-     |
-  25 |     __builtin::transform::translate(
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Cannot nest item: __builtin::transform::translate(-size_x / 2 / 1mm, -size_y / 2 / 1mm, -size_z / 2 / 1mm)
-  ---> ../lib/std/geo3d.µcad:25:5
-     |
-  25 |     __builtin::transform::translate(
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+Symbol radius not found.

@@ -1,12 +1,7 @@
-error: Not implemented: cannot evaluate call of algorithm::difference() at <from_str>:3:1
-  ---> <from_str>:3:1
+error: Local stack needed to store radius
+  ---> ../lib/std/geo2d.µcad:6:15
      |
-   3 | algorithm::difference() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^
+   6 | module circle(radius: Length) {
+     |               ^^^^^^
      |
-error: Cannot nest item: algorithm::difference()
-  ---> <from_str>:3:1
-     |
-   3 | algorithm::difference() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^
-     |
+Symbol radius not found.

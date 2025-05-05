@@ -1,6 +1,12 @@
-error: Symbol __builtin::geo2d::rect not found.
-  ---> ../lib/std/geo2d.µcad:39:5
+error: Local stack needed to store size
+  ---> <from_str>:1:12
      |
-  39 |     __builtin::geo2d::rect(
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   1 | module box(size: Length) {
+     |            ^^^^
+     |
+error: Symbol size not found.
+  ---> ../lib/std/geo2d.µcad:26:1
+     |
+  26 | module rect() {
+     | ^^^^^^^^^^^^^^^
      |

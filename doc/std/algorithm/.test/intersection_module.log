@@ -1,12 +1,7 @@
-error: Not implemented: cannot evaluate call of std::algorithm::intersection() at <from_str>:1:1
-  ---> <from_str>:1:1
+error: Local stack needed to store radius
+  ---> ../lib/std/geo2d.µcad:6:15
      |
-   1 | std::algorithm::intersection() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   6 | module circle(radius: Length) {
+     |               ^^^^^^
      |
-error: Cannot nest item: std::algorithm::intersection()
-  ---> <from_str>:1:1
-     |
-   1 | std::algorithm::intersection() {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+Symbol radius not found.
