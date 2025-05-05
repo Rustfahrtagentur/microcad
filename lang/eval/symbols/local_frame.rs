@@ -1,8 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, resolve::Symbol};
-use std::collections::BTreeMap;
+use crate::{eval::*, resolve::*};
 
 /// Storage for *local variables* and *aliases* (for *use statements*).
 ///
@@ -12,13 +11,13 @@ use std::collections::BTreeMap;
 /// and some do not.
 pub enum LocalFrame {
     /// Source file with locals.
-    Source(Identifier, BTreeMap<Identifier, Symbol>),
+    Source(Identifier, SymbolMap),
     /// Namespace scope without locals
     Namespace(Identifier),
     /// Module scope without locals
     Module(Identifier),
     /// Standard (unnamed) scope with locals
-    Scope(BTreeMap<Identifier, Symbol>),
+    Scope(SymbolMap),
 }
 
 impl LocalFrame {
