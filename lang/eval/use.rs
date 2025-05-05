@@ -3,7 +3,7 @@
 
 use crate::eval::*;
 
-/// trait used by UseDeclaration and implemented by SymbolTable and passed through by Context
+/// Trait used by [UseDeclaration] and implemented by [SymbolTable] and passed through by [Context].
 pub trait UseSymbol {
     /// Find a symbol in the symbol table and copy it to the locals.
     ///

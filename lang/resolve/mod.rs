@@ -3,7 +3,7 @@
 
 //! Single symbol resolving
 //!
-//! After parsing a source file (see `crate::parse`) it must be resolved to get a symbol out of it:
+//! After parsing a source file (see [`crate::parse`]) it must be resolved to get a symbol out of it:
 //!
 //! ```
 //! use microcad_lang::{syntax::*, parse::*, resolve::*}
@@ -13,7 +13,7 @@
 //! let source_symbol = source_file.resolve(None);
 //! ```
 //!
-//! To "run" the source file (and get the expected output) it must now be evaluated (see [crate::eval])  .
+//! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .
 
 mod symbol;
 mod symbol_definition;
