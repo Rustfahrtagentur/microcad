@@ -1,0 +1,6 @@
+error: Local stack needed to store l
+  ---> <from_str>:2:10
+     |
+   2 | module m(l: Length) {
+     |          ^
+     |
