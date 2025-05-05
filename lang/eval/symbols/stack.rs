@@ -49,16 +49,22 @@ impl Stack {
         f: &mut dyn std::fmt::Write,
         source_by_hash: &impl super::GetSourceByHash,
     ) -> std::fmt::Result {
-        for (idx, call_stack_frame) in self
+        for (idx, frame) in self
             .0
             .iter()
-            .filter_map(|frame| match frame {
-                StackFrame::Call(call) => Some(call),
-                _ => None,
+            .filter(|frame| {
+                matches!(
+                    frame,
+                    StackFrame::Call {
+                        symbol: _,
+                        args: _,
+                        src_ref: _
+                    }
+                )
             })
             .enumerate()
         {
-            call_stack_frame.pretty_print(f, source_by_hash, idx)?;
+            frame.pretty_print(f, source_by_hash, idx)?;
         }
         Ok(())
     }
@@ -78,8 +84,11 @@ impl Locals for Stack {
     }
 
     fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: SrcRef) {
-        self.0
-            .push(StackFrame::Call(CallStackFrame::new(symbol, args, src_ref)))
+        self.0.push(StackFrame::Call {
+            symbol,
+            args,
+            src_ref,
+        })
     }
 
     fn close(&mut self) {
