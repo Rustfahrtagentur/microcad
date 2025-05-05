@@ -1,1 +1,7 @@
-Symbol radius not found.
+error: No variables allowed in modules
+  ---> ../lib/std/geo3d.µcad:6:10
+     |
+   6 |     init(r: Length) {
+     |          ^
+     |
+Symbol r not found.

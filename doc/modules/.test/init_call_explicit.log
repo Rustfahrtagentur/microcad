@@ -1,6 +1,7 @@
-error: Symbol l not found.
-  ---> ../lib/std/geo2d.µcad:6:1
+error: No variables allowed in modules
+  ---> <from_str>:4:10
      |
-   6 | module circle(radius: Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 |     init(f: Length) { l = f/2; }
+     |          ^
      |
+Symbol f not found.
