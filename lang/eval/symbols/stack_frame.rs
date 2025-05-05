@@ -22,7 +22,7 @@ impl CallStackFrame {
         Self {
             symbol,
             args,
-            src_ref: src_ref.src_ref()
+            src_ref: src_ref.src_ref(),
         }
     }
 
@@ -51,7 +51,6 @@ impl CallStackFrame {
     }
 }
 
-
 /// Storage for *local variables* and *aliases* (for *use statements*).
 ///
 /// A *stack frame* can have different types and some provide a storage for *local variables*
@@ -62,7 +61,7 @@ pub enum StackFrame {
     /// Source file with locals.
     Source(Identifier, SymbolMap),
     /// Namespace scope without locals
-    Namespace(Identifier),
+    Namespace(Identifier, SymbolMap),
     /// A call of a built-in, function or module.
     Call(CallStackFrame),
     /// Body (unnamed) scope with locals
@@ -73,9 +72,7 @@ impl StackFrame {
     /// Get identifier if available or panic.
     pub fn id(&self) -> Option<Identifier> {
         match self {
-            StackFrame::Source(id, _) | StackFrame::Namespace(id) => {
-                Some(id.clone())
-            }
+            StackFrame::Source(id, _) | StackFrame::Namespace(id, _) => Some(id.clone()),
             _ => None,
         }
     }
@@ -87,8 +84,18 @@ impl StackFrame {
                 writeln!(f, "{:depth$}{id} (source):", "")?;
                 map
             }
-            StackFrame::Namespace(id) => return write!(f, "{:depth$}{id} (namespace)", ""),
-            StackFrame::Call(call) => return write!(f, "{:depth$}{name}({args}) (call)", "", args = call.args, name = call.symbol.full_name()),
+            StackFrame::Namespace(id, symbol) => {
+                return write!(f, "{:depth$}{id} = {symbol} (namespace)", "")
+            }
+            StackFrame::Call(call) => {
+                return write!(
+                    f,
+                    "{:depth$}{name}({args}) (call)",
+                    "",
+                    args = call.args,
+                    name = call.symbol.full_name()
+                )
+            }
             StackFrame::Body(map) => map,
         };
 

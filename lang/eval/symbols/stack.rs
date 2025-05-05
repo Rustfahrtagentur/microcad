@@ -20,7 +20,7 @@ impl Stack {
 
         match self.0.last_mut() {
             Some(StackFrame::Source(_, last)) | Some(StackFrame::Body(last)) => {
-                last.insert(id.clone(), frame);
+                last.insert(id.clone(), symbol);
                 log::trace!("Local Stack:\n{self}");
                 Ok(())
             }
@@ -34,7 +34,7 @@ impl Stack {
     }
 
     /// Return the current *stack frame* if there is any.
-    pub fn current_frame(&self) -> Option<&LocalFrame> {
+    pub fn current_frame(&self) -> Option<&StackFrame> {
         self.0.last()
     }
 
@@ -59,9 +59,9 @@ impl Stack {
     }
 }
 
-impl Locals for LocalStack {
+impl Locals for Stack {
     fn open_source(&mut self, id: Identifier) {
-        self.0.push(LocalFrame::Source(id, SymbolMap::new()));
+        self.0.push(StackFrame::Source(id, SymbolMap::new()));
     }
 
     fn open_body(&mut self) {
@@ -69,7 +69,7 @@ impl Locals for LocalStack {
     }
 
     fn open_namespace(&mut self, id: Identifier) {
-        self.0.push(LocalFrame::Namespace(id, SymbolMap::new()));
+        self.0.push(StackFrame::Namespace(id, SymbolMap::new()));
     }
 
     fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer) {
@@ -84,7 +84,7 @@ impl Locals for LocalStack {
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
         // exception
         match &self.current_frame() {
-            Some(LocalFrame::Namespace(_, _)) => Err(EvalError::NoVariablesInNamespaces(id)),
+            Some(StackFrame::Namespace(_, _)) => Err(EvalError::NoVariablesInNamespaces(id)),
             _ => self.add(Some(id.clone()), Symbol::new_constant(id, value)),
         }
     }
