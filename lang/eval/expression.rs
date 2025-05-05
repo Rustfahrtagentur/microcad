@@ -145,11 +145,7 @@ impl Eval for Nested {
             node_stack.push(nodes);
         }
 
-        if node_stack.is_empty() {
-            Ok(Value::None)
-        } else {
-            Ok(Value::NodeMultiplicity(nest_nodes(&node_stack).clone()))
-        }
+        Ok(nest_nodes(&node_stack).clone().into())
     }
 }
 
