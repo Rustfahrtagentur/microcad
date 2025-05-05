@@ -9,9 +9,10 @@ use std::collections::HashMap;
 /// Register of loaded source files and their syntax trees.
 ///
 /// Source file definitions ([`SourceFile`]) are stored in a vector (`Vec<Rc<SourceFile>>`)
-/// and mapped by *hash*, *path* and *name* by index of this vector.
+/// and mapped by *hash*, *path* and *name* via index to this vector.
 ///
-/// The root node (given at creation) will not be accessible by it's name.
+/// The *root node* (given at creation) will be stored but will only be accessible by hash and path
+/// but not by it's qualified name.
 #[derive(Default)]
 pub struct SourceCache {
     /// External files read from search path.
