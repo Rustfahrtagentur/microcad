@@ -150,8 +150,8 @@ pub enum EvalError {
     UnexpectedNested(&'static str, Identifier),
 
     /// No variables allowed in namespaces
-    #[error("No variables allowed in namespace {0}")]
-    NoVariablesInNamespaces(Identifier),
+    #[error("No variables allowed in {0}")]
+    NoVariablesAllowedIn(&'static str),
 }
 
 /// Result type of any evaluation.

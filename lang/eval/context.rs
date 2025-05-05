@@ -134,8 +134,12 @@ impl Context {
 }
 
 impl Locals for Context {
-    fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        self.symbol_table.add_local_value(id, value)
+    fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
+        self.symbol_table.set_local_value(id, value)
+    }
+
+    fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value> {
+        self.symbol_table.get_local_value(id)
     }
 
     fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer) {

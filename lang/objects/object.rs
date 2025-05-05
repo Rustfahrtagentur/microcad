@@ -67,7 +67,7 @@ impl ObjectProperties {
         }
 
         // The result of the assignment becomes a local value, too
-        if let Err(err) = context.add_local_value(id.clone(), value) {
+        if let Err(err) = context.set_local_value(id.clone(), value) {
             context.error(id, err)
         } else {
             Ok(())

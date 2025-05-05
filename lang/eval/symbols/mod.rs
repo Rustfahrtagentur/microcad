@@ -55,8 +55,9 @@ pub trait Locals {
     /// Fetch a local variable from current stack frame.
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol>;
 
-    /// Add a named local value to current locals.
-    ///
-    /// TODO: Is this special function really needed?
-    fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()>;
+    /// Set/add a named local value to current locals.
+    fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()>;
+
+    /// Get a named local value from locals.
+    fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value>;
 }

@@ -8,19 +8,24 @@ use crate::{eval::*, resolve::*};
 pub struct Stack(Vec<StackFrame>);
 
 impl Stack {
-    /// Add a new variable to current stack frame.
-    pub fn add(&mut self, id: Option<Identifier>, symbol: Symbol) -> EvalResult<()> {
+    /// Put (or overwrite any existing) a *symbol* into the current stack frame.
+    /// - `id`: *identifier* of the symbol to add/set. The *symbol's* internal *identifier* is used when `None`.
+    pub fn put_local(&mut self, id: Option<Identifier>, symbol: Symbol) -> EvalResult<()> {
         let id = if let Some(id) = id { id } else { symbol.id() };
         let name = symbol.full_name();
-        if name.is_qualified() {
-            log::debug!("Adding {name} as {id} to local stack");
-        } else {
-            log::debug!("Adding {id} to local stack");
-        }
-
         match self.0.last_mut() {
             Some(StackFrame::Source(_, last)) | Some(StackFrame::Body(last)) => {
-                last.insert(id.clone(), symbol);
+                let op = if last.insert(id.clone(), symbol).is_some() {
+                    "Added"
+                } else {
+                    "Set"
+                };
+                if name.is_qualified() {
+                    log::debug!("{op} {name} as {id} to local stack");
+                } else {
+                    log::debug!("{op} {id} to local stack");
+                }
+
                 log::trace!("Local Stack:\n{self}");
                 Ok(())
             }
@@ -81,11 +86,21 @@ impl Locals for Stack {
         self.0.pop();
     }
 
-    fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        // exception
+    fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
         match &self.current_frame() {
-            Some(StackFrame::Namespace(_, _)) => Err(EvalError::NoVariablesInNamespaces(id)),
-            _ => self.add(Some(id.clone()), Symbol::new_constant(id, value)),
+            Some(StackFrame::Namespace(_, _)) => Err(EvalError::NoVariablesAllowedIn("namespaces")),
+            Some(StackFrame::Body(_)) => Err(EvalError::NoVariablesAllowedIn("modules")),
+            _ => self.put_local(Some(id.clone()), Symbol::new_constant(id, value)),
+        }
+    }
+
+    fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value> {
+        match self.fetch(id) {
+            Ok(symbol) => match &symbol.borrow().def {
+                SymbolDefinition::Constant(_, value) => Ok(value.clone()),
+                _ => Err(EvalError::LocalNotFound(id.clone())),
+            },
+            Err(_) => Err(EvalError::LocalNotFound(id.clone())),
         }
     }
 
@@ -142,7 +157,7 @@ fn local_stack() {
     stack.open_source("test".into());
     assert!(stack.current_namespace() == "test".into());
 
-    assert!(stack.add(None, make_int("a".into(), 1)).is_ok());
+    assert!(stack.put_local(None, make_int("a".into(), 1)).is_ok());
 
     println!("{stack}");
 
@@ -157,14 +172,16 @@ fn local_stack() {
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
 
-    assert!(stack.add(None, make_int("b".into(), 2)).is_ok());
+    assert!(stack.put_local(None, make_int("b".into(), 2)).is_ok());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);
     assert!(fetch_int(&stack, "c").is_none());
 
     // test alias
-    assert!(stack.add(Some("x".into()), make_int("x".into(), 3)).is_ok());
+    assert!(stack
+        .put_local(Some("x".into()), make_int("x".into(), 3))
+        .is_ok());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);
