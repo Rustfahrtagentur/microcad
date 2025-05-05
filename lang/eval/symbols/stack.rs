@@ -89,7 +89,6 @@ impl Locals for Stack {
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
         match &self.current_frame() {
             Some(StackFrame::Namespace(_, _)) => Err(EvalError::NoVariablesAllowedIn("namespaces")),
-            Some(StackFrame::Body(_)) => Err(EvalError::NoVariablesAllowedIn("modules")),
             _ => self.put_local(Some(id.clone()), Symbol::new_constant(id, value)),
         }
     }
