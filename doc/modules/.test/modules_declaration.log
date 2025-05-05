@@ -1,7 +1,7 @@
-error: Symbol __builtin::geo2d::circle not found.
-  ---> ../lib/std/geo2d.µcad:19:5
+error: Local stack needed to store diameter
+  ---> <from_str>:2:19
      |
-  19 |     __builtin::geo2d::circle(radius / 1mm);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   2 | module small_disc(diameter: Length) {
+     |                   ^^^^^^^^
      |
-Symbol factor not found.
+Local stack needed to store factor

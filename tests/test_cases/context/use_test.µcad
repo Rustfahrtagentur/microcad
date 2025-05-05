@@ -1,9 +1,9 @@
-// use all symbols from std::debug for test checks
-use std::debug::*;
-
 // use debug from `std/module.µcad`
 use std::debug;
 assert(true);
+
+// use all symbols from std::debug for test checks
+use std::debug::*;
 
 // use symbol `circle` in file `geo2d.µcad`
 use std::geo2d::circle;

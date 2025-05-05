@@ -33,11 +33,8 @@ pub trait FullyQualify {
 
 #[test]
 fn resolve_source_file() {
-    use std::rc::Rc;
-
-    let source_file = Rc::new(
-        SourceFile::load_from_str(r#"module a() { module b() {} } "#).expect("Valid source"),
-    );
+    let source_file =
+        SourceFile::load_from_str(r#"module a() { module b() {} } "#).expect("Valid source");
 
     let symbol_node = source_file.resolve(None);
 

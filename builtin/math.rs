@@ -9,6 +9,7 @@ fn abs() -> Symbol {
     let id = Identifier::no_ref("abs");
     Symbol::new_builtin(id, &|args, ctx| {
         let arg = args.get_single()?;
+        let id = Identifier::no_ref("abs");
         Ok(match arg.value.eval(ctx)? {
             Value::Integer(i) => Value::Integer(Refer::new(i.abs(), arg.src_ref())),
             value => {

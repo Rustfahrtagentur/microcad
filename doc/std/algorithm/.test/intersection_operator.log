@@ -1,24 +1,7 @@
-error: Symbol __builtin::geo2d::circle not found.
-  ---> ../lib/std/geo2d.µcad:19:5
+error: Local stack needed to store radius
+  ---> ../lib/std/geo2d.µcad:6:15
      |
-  19 |     __builtin::geo2d::circle(radius / 1mm);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   6 | module circle(radius: Length) {
+     |               ^^^^^^
      |
-error: Symbol __builtin::geo2d::rect not found.
-  ---> ../lib/std/geo2d.µcad:39:5
-     |
-  39 |     __builtin::geo2d::rect(
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Invalid operator: Multiplicity [
-Object
-,]
- & Multiplicity [
-Object
-,]
-
-  ---> <from_str>:1:1
-     |
-   1 | std::geo2d::circle(radius = 3mm) & std::geo2d::rect(width = 3mm, height = 2mm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+Symbol radius not found.

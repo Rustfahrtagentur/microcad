@@ -23,3 +23,4 @@ error: Properties have not been initialized: [Identifier(Refer { value: "area", 
    7 |   init( height: Length) { area = ( width = default_width, height); }
      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
+Local stack needed to store default_width

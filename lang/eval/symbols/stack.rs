@@ -9,9 +9,9 @@ pub struct Stack(Vec<StackFrame>);
 
 impl Stack {
     /// Add a new variable to current stack frame.
-    pub fn add(&mut self, id: Option<Identifier>, frame: Symbol) -> EvalResult<()> {
-        let id = if let Some(id) = id { id } else { frame.id() };
-        let name = frame.full_name();
+    pub fn add(&mut self, id: Option<Identifier>, symbol: Symbol) -> EvalResult<()> {
+        let id = if let Some(id) = id { id } else { symbol.id() };
+        let name = symbol.full_name();
         if name.is_qualified() {
             log::debug!("Adding {name} as {id} to local stack");
         } else {
@@ -20,7 +20,7 @@ impl Stack {
 
         match self.0.last_mut() {
             Some(StackFrame::Source(_, last)) | Some(StackFrame::Body(last)) => {
-                last.insert(id.clone(), frame);
+                last.insert(id.clone(), symbol);
                 log::trace!("Local Stack:\n{self}");
                 Ok(())
             }
@@ -33,6 +33,10 @@ impl Stack {
         QualifiedName(self.0.iter().filter_map(|locals| locals.id()).collect())
     }
 
+    /// Return the current *stack frame* if there is any.
+    pub fn current_frame(&self) -> Option<&StackFrame> {
+        self.0.last()
+    }
 
     /// Pretty print call trace.
     pub fn pretty_print_call_trace(
@@ -40,15 +44,19 @@ impl Stack {
         f: &mut dyn std::fmt::Write,
         source_by_hash: &impl super::GetSourceByHash,
     ) -> std::fmt::Result {
-        for (idx, call_stack_frame) in self.0.iter().filter_map(|frame| match frame {
-            StackFrame::Call(call) => Some(call),
-            _ => None 
-        }).enumerate() {
+        for (idx, call_stack_frame) in self
+            .0
+            .iter()
+            .filter_map(|frame| match frame {
+                StackFrame::Call(call) => Some(call),
+                _ => None,
+            })
+            .enumerate()
+        {
             call_stack_frame.pretty_print(f, source_by_hash, idx)?;
         }
         Ok(())
     }
-
 }
 
 impl Locals for Stack {
@@ -61,11 +69,12 @@ impl Locals for Stack {
     }
 
     fn open_namespace(&mut self, id: Identifier) {
-        self.0.push(StackFrame::Namespace(id));
+        self.0.push(StackFrame::Namespace(id, SymbolMap::new()));
     }
 
     fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer) {
-        self.0.push(StackFrame::Call(CallStackFrame::new(symbol, args, src_ref)))
+        self.0
+            .push(StackFrame::Call(CallStackFrame::new(symbol, args, src_ref)))
     }
 
     fn close(&mut self) {
@@ -73,7 +82,11 @@ impl Locals for Stack {
     }
 
     fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        self.add(Some(id.clone()), Symbol::new_constant(id, value))
+        // exception
+        match &self.current_frame() {
+            Some(StackFrame::Namespace(_, _)) => Err(EvalError::NoVariablesInNamespaces(id)),
+            _ => self.add(Some(id.clone()), Symbol::new_constant(id, value)),
+        }
     }
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
