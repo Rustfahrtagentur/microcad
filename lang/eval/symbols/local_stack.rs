@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{eval::*, resolve::*};
-use std::collections::BTreeMap;
 
 /// A stack with a list of local variables for each stack frame.
 #[derive(Default)]
@@ -37,11 +36,11 @@ impl LocalStack {
 
 impl Locals for LocalStack {
     fn open_source(&mut self, id: Identifier) {
-        self.0.push(LocalFrame::Source(id, BTreeMap::new()));
+        self.0.push(LocalFrame::Source(id, SymbolMap::new()));
     }
 
     fn open_scope(&mut self) {
-        self.0.push(LocalFrame::Scope(BTreeMap::new()));
+        self.0.push(LocalFrame::Scope(SymbolMap::new()));
     }
 
     fn open_namespace(&mut self, id: Identifier) {
