@@ -233,7 +233,7 @@ pub enum EvalError {
     MissedCall,
 
     /// Value Error
-    #[error("Value Error: {0}")]
+    #[error(transparent)]
     ValueError(#[from] ValueError),
 
     /// Name of external symbol is unknown
@@ -261,7 +261,7 @@ pub enum EvalError {
     AmbiguousExternal(std::path::PathBuf, std::path::PathBuf),
 
     /// Can't find a project file by it's qualified name
-    #[error("Parsing error {0}")]
+    #[error(transparent)]
     ParseError(#[from] ParseError),
 
     /// Statement is not supported in this context
