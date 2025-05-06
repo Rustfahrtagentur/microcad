@@ -113,6 +113,10 @@ pub enum EvalError {
     #[error("Local stack needed to store {0}")]
     LocalStackEmpty(Identifier),
 
+    /// Unexpected stack frame type
+    #[error("Unexpected stack frame of type {1} cannot store {0}")]
+    WrongStackFrame(Identifier, &'static str),
+
     /// Value Error.
     #[error("Value Error: {0}")]
     ValueError(#[from] ValueError),

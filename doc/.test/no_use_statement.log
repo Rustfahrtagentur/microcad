@@ -1,7 +1,7 @@
-error: Local stack needed to store radius
+error: Unexpected stack frame of type call frame cannot store radius
   ---> ../lib/std/geo3d.µcad:5:15
      |
    5 | module sphere(radius: Length) {
      |               ^^^^^^
      |
-Symbol radius not found.
+Value Error: Missing arguments: radius

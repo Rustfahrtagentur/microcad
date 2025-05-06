@@ -29,8 +29,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/modules/.test/init_implicit.png)](../doc/modules/.test/init_implicit.log) | [init_implicit](../doc/modules/init.md) |
 | [![test](../doc/std/algorithm/.test/intersection_module.png)](../doc/std/algorithm/.test/intersection_module.log) | [intersection_module](../doc/std/algorithm/intersection.md) |
 | [![test](../doc/std/algorithm/.test/intersection_operator.png)](../doc/std/algorithm/.test/intersection_operator.log) | [intersection_operator](../doc/std/algorithm/intersection.md) |
-| [![test](../doc/std/.test/math_abs.png)](../doc/std/.test/math_abs.log) | [math_abs](../doc/std/math.md) |
-| [![test](../doc/std/.test/math_trigonometric.png)](../doc/std/.test/math_trigonometric.log) | [math_trigonometric](../doc/std/math.md) |
+| [![test](../doc/std/math/.test/math_abs.png)](../doc/std/math/.test/math_abs.log) | [math_abs](../doc/std/math/README.md) |
+| [![test](../doc/std/math/.test/math_trigonometric.png)](../doc/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/std/math/README.md) |
 | [![test](../doc/modules/.test/modules_declaration.png)](../doc/modules/.test/modules_declaration.log) | [modules_declaration](../doc/modules/README.md) |
 | [![test](../doc/.test/namespaces_example.png)](../doc/.test/namespaces_example.log) | [namespaces_example](../doc/namespaces.md) |
 | [![test](../doc/.test/no_use_statement.png)](../doc/.test/no_use_statement.log) | [no_use_statement](../doc/use_statement.md) |

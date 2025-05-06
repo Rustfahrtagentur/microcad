@@ -56,7 +56,7 @@ impl StackFrame {
                 return write!(f, "{:depth$} = {symbol} (module)", "");
             }
             StackFrame::Namespace(id, symbol) => {
-                return write!(f, "{:depth$}{id} = {symbol} (namespace)", "");
+                return writeln!(f, "{:depth$}{id} = {symbol} (namespace)", "");
             }
             StackFrame::Body(map) => map,
             StackFrame::Call {
@@ -64,7 +64,7 @@ impl StackFrame {
                 args,
                 src_ref: _,
             } => {
-                return write!(
+                return writeln!(
                     f,
                     "{:depth$}{name}({args}) (call)",
                     "",
