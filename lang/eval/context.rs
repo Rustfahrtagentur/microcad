@@ -192,7 +192,7 @@ impl UseSymbol for Context {
 impl PushDiag for Context {
     fn push_diag(&mut self, diag: Diagnostic) -> EvalResult<()> {
         let result = self.diag_handler.push_diag(diag);
-        log::trace!("Context:\n{self}");
+        log::trace!("Error Context:\n{self}");
         result
     }
 }
