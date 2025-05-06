@@ -29,6 +29,12 @@ impl Stack {
                 log::trace!("Local Stack:\n{self}");
                 Ok(())
             }
+            Some(StackFrame::Namespace(_, _))
+            | Some(StackFrame::Call {
+                symbol: _,
+                args: _,
+                src_ref: _,
+            }) => Err(EvalError::WrongStackFrame(id, "call frame")),
             _ => Err(EvalError::LocalStackEmpty(id)),
         }
     }
