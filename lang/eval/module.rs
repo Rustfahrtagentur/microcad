@@ -1,10 +1,9 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Module definition evaluation
-use std::rc::Rc;
+//! Module definition syntax element evaluation
 
-use crate::{eval::*, objects::*};
+use crate::{eval::*, objects::*, rc::*, syntax::*};
 
 impl ModuleDefinition {
     /// Find a matching initializer for call argument list
@@ -36,41 +35,16 @@ impl ModuleDefinition {
         init: Option<&'a ModuleInitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ObjectNode> {
-        let symbol_map = self.parameters.try_to_symbol_map(context)?;
-        context.open_module(self.id.clone(), symbol_map)?;
-
-        let mut object_builder = ObjectBuilder::new();
+        let mut props = ObjectProperties::from_parameter_list(&self.parameters, context)?;
 
         // Create the object node from initializer if present
-        match init {
-            Some(init) => init.eval_to_node(args, context)?,
-
-            // No matching initializer has been found
+        let object = match init {
+            Some(init) => init.eval_to_node(args, props, context)?,
             None => {
                 // Add values from argument map as local values
                 for (id, value) in args.iter() {
-                    match context.get_local(id) {
-                        Ok(symbol) => match &symbol.borrow().def {
-                            // Overwrite the property value if the local already exists
-                            SymbolDefinition::Property(_, value) => {
-                                context.set_local(
-                                    id,
-                                    Symbol::new_property(id.clone(), value.clone()),
-                                )?;
-                            }
-                            _ => {}
-                        },
-                        Err(_) => {
-                            context.set_local(
-                                id,
-                                Symbol::new_call_argument(id.clone(), value.clone()),
-                            )?;
-                        }
-                    }
+                    props.assign_and_add_local_value(id, value.clone(), context)?;
                 }
-
-                let props: ObjectProperties = context.top().symbol_map().into();
-
                 if !props.all_initialized() {
                     context.error(
                         self,
@@ -87,6 +61,7 @@ impl ModuleDefinition {
         };
 
         // At this point, all properties must have a value
+        let mut nodes = Vec::new();
 
         for statement in &self.body.statements {
             match statement {
@@ -97,18 +72,22 @@ impl ModuleDefinition {
                 }
                 Statement::Expression(expression) => {
                     let value = expression.eval(context)?;
-                    object_builder.append_children(&mut value.fetch_nodes());
+                    nodes.append(&mut value.fetch_nodes());
                 }
                 _ => {}
             }
         }
 
-        Ok(object_builder.build_node())
+        for node in nodes {
+            object.append(node);
+        }
+
+        Ok(object)
     }
 
     /// Evaluate the call of a module
     ///
-    /// The evaluation considers multiplicity, which means that multiple nodes may be created.
+    /// The evaluation considers multiplicity, which means that multiple nodes maybe created.
     ///
     /// Example:
     /// Consider the `module a(b: Scalar) { }`.
@@ -140,39 +119,5 @@ impl ModuleDefinition {
         }
 
         Ok(nodes.into())
-    }
-}
-
-impl ModuleInitDefinition {
-    /// Evaluate a call to the module init definition
-    pub fn eval_to_node(
-        &self,
-        args: &ArgumentMap,
-        object_builder: &mut ObjectBuilder,
-        context: &mut Context,
-    ) -> EvalResult<()> {
-        assert!(matches!(context.top(), StackFrame::Module(_, _)));
-
-        context.open_module_init(args.into());
-
-        let mut nodes = Vec::new();
-
-        for statement in &self.body.statements {
-            match statement {
-                Statement::Assignment(assignment) => {
-                    let id = &assignment.id;
-                    let value = assignment.expression.eval(context)?;
-
-                    todo!()
-                }
-                Statement::Expression(expression) => {
-                    object_builder.append_children(&mut expression.eval(context)?.fetch_nodes());
-                }
-                _ => {
-                    context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
-                }
-            }
-        }
-        context.close();
     }
 }

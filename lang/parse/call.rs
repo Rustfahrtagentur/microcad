@@ -48,13 +48,13 @@ impl Parse for CallArgument {
                 let second = inner.next().expect(INTERNAL_PARSE_ERROR);
 
                 Ok(CallArgument {
-                    name: Some(Identifier::parse(first)?),
+                    id: Some(Identifier::parse(first)?),
                     value: Expression::parse(second)?,
                     src_ref: pair.src_ref(),
                 })
             }
             Rule::expression => Ok(CallArgument {
-                name: None,
+                id: None,
                 value: Expression::parse(pair.clone())?,
                 src_ref: pair.into(),
             }),
@@ -101,7 +101,7 @@ fn call() {
     let named = call
         .argument_list
         .iter()
-        .filter(|arg| arg.name.is_some())
+        .filter(|arg| arg.id.is_some())
         .count();
     assert_eq!(named, 2);
 }

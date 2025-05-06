@@ -112,3 +112,9 @@ impl StackFrame {
         Ok(())
     }
 }
+
+impl std::fmt::Display for StackFrame {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.print(f, 0)
+    }
+}

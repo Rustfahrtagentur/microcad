@@ -13,6 +13,26 @@ use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
 
 impl CallArgumentValueList {
+    /// Create a `CallArgumentValueList` which transports code to builtin in `impl Eval for Call`.
+    pub fn from_code(code: String, src_ref: impl SrcReferrer) -> Self {
+        let code = Refer {
+            value: code,
+            src_ref: src_ref.src_ref(),
+        };
+        let mut value = OrdMap::default();
+        value
+            .push(CallArgumentValue::new(
+                None,
+                Value::String(code),
+                src_ref.src_ref(),
+            ))
+            .expect("map with one element");
+        Self(Refer {
+            value,
+            src_ref: src_ref.src_ref(),
+        })
+    }
+
     /// return a single argument
     pub fn get_single(&self) -> EvalResult<&CallArgumentValue> {
         if self.len() == 1 {

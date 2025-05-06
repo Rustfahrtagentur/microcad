@@ -1,4 +1,4 @@
-# math
+# `std::math`
 
 ## Mathematical functions
 

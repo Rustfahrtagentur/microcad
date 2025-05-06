@@ -98,7 +98,7 @@ impl Locals for Stack {
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         // search from inner scope to root scope to shadow outside locals
-        for frame in self.0.iter().rev() {
+        for (pos, frame) in self.0.iter().rev().enumerate() {
             match frame {
                 StackFrame::Source(_, locals) | StackFrame::Body(locals) => {
                     if let Some(local) = locals.get(id) {
@@ -107,14 +107,19 @@ impl Locals for Stack {
                     }
                 }
                 // stop stack lookup at calls
-                StackFrame::Namespace(_, _)
-                | StackFrame::Call {
+                StackFrame::Namespace(_, _) => {
+                    log::trace!("stop at call frame");
+                    break;
+                }
+                StackFrame::Call {
                     symbol: _,
                     args: _,
                     src_ref: _,
                 } => {
-                    log::trace!("stop at call frame");
-                    break;
+                    if pos > 0 {
+                        log::trace!("stop at call frame");
+                        break;
+                    }
                 }
             }
         }

@@ -35,7 +35,7 @@ impl std::fmt::Display for TupleExpression {
             self.args
                 .iter()
                 .map(|arg| if self.is_named {
-                    if let Some(name) = &arg.name {
+                    if let Some(name) = &arg.id {
                         format!("{} = {}", &name, arg.value)
                     } else {
                         format!("{}", arg.value)

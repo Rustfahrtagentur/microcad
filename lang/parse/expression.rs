@@ -217,7 +217,7 @@ impl Parse for TupleExpression {
         // Count number of positional and named arguments
         let named_count: usize = call_argument_list
             .iter()
-            .map(|c| if c.name.is_some() { 1 } else { 0 })
+            .map(|c| if c.id.is_some() { 1 } else { 0 })
             .sum();
 
         if named_count > 0 && named_count < call_argument_list.len() {

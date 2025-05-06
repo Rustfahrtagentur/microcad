@@ -36,6 +36,7 @@
         "rustfmt",
         "rustmod",
         "signum",
+        "suffisticated",
         "tendloop",
         "thirdparty",
         "thiserror",
