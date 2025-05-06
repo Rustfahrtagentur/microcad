@@ -10,8 +10,7 @@ pub fn print() -> Symbol {
     let id = Identifier::from_str("print").expect("valid id");
     Symbol::new_builtin(id, &|args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
-            let value = arg.value.eval(context)?;
-            context.print(format!("{value}"));
+            context.print(format!("{value}", value = arg.value));
             Ok(())
         })?;
         Ok(Value::None)

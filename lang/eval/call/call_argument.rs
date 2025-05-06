@@ -1,4 +1,9 @@
-use crate::{diag::*, eval::*, src_ref::*, syntax::*, ty::*, value::*};
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+//! µcad value related evaluation entities
+
+use crate::{eval::*, syntax::*};
 
 impl CallArgument {
     /// Evaluate `CallArgument` and return `CallArgumentValue`
@@ -8,21 +13,5 @@ impl CallArgument {
             self.value.eval(context)?,
             self.src_ref.clone(),
         ))
-    }
-
-    /// Evaluate argument as boolean value
-    pub fn eval_bool(&self, context: &mut Context) -> EvalResult<bool> {
-        match self.value.eval(context) {
-            Ok(Value::Bool(cond)) => Ok(*cond),
-            Ok(Value::None) => Ok(false),
-            Ok(value) => {
-                context.error(
-                    self.src_ref(),
-                    Box::new(EvalError::InvalidArgumentType(value.ty().clone())),
-                )?;
-                Ok(false)
-            }
-            Err(err) => Err(err),
-        }
     }
 }

@@ -9,14 +9,13 @@ fn abs() -> Symbol {
     let id = Identifier::no_ref("abs");
     Symbol::new_builtin(id, &|args, ctx| {
         let arg = args.get_single()?;
-        let id = Identifier::no_ref("abs");
-        Ok(match arg.value.eval(ctx)? {
+        Ok(match &arg.value {
             Value::Integer(i) => Value::Integer(Refer::new(i.abs(), arg.src_ref())),
             value => {
                 ctx.error(
                     arg,
                     EvalError::ParameterTypeMismatch {
-                        id: arg.name.clone().unwrap_or(Identifier::no_ref("x")),
+                        id: arg.id.clone().unwrap_or(Identifier::no_ref("x")),
                         expected: Type::Integer,
                         found: value.ty(),
                     },

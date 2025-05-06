@@ -6,7 +6,6 @@
 #[macro_use]
 mod call_argument_value;
 mod call_argument;
-mod call_argument_list;
 mod call_argument_value_list;
 mod call_trait;
 
@@ -28,11 +27,13 @@ impl Eval for Call {
             }
         };
 
-        context.open_call(symbol.clone(), self.argument_list.clone(), self.src_ref());
+        let args = CallArgumentValueList::from_call_argument_list(&self.argument_list, context)?;
+
+        context.open_call(symbol.clone(), args.clone(), self.src_ref());
 
         let value = match &symbol.borrow().def {
-            SymbolDefinition::Builtin(f) => f.call(&self.argument_list, context),
-            SymbolDefinition::Module(m) => m.eval_call(&self.argument_list, context),
+            SymbolDefinition::Builtin(f) => f.call(&args, context),
+            SymbolDefinition::Module(m) => m.eval_call(&args, context),
             _ => {
                 context.error(
                     self,

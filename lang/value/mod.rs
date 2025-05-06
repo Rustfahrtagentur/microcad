@@ -210,6 +210,17 @@ impl Value {
             _ => unimplemented!(),
         }
     }
+
+    /// Try to get boolean value.
+    ///
+    /// A `Value::None` will return false.
+    pub fn try_bool(&self) -> Result<bool, ValueError> {
+        match self {
+            Value::Bool(b) => Ok(**b),
+            Value::None => Ok(false),
+            value => Err(ValueError::CannotConvertToBool(value.clone())),
+        }
+    }
 }
 
 impl SrcReferrer for Value {
@@ -638,13 +649,12 @@ impl_try_from!(Bool => bool);
 impl_try_from!(String => String);
 impl_try_from!(Color => Color);
 
-
 impl From<Vec<ObjectNode>> for Value {
     fn from(nodes: Vec<ObjectNode>) -> Self {
         match nodes.len() {
             0 => Value::None,
             1 => Value::Node(nodes.first().expect("Node").clone()),
-            _ => Value::NodeMultiplicity(nodes)
+            _ => Value::NodeMultiplicity(nodes),
         }
     }
 }

@@ -78,9 +78,8 @@ fn argument_match_single() {
     let call_argument_value_list =
         CallArgumentValueList::from(vec![crate::call_argument_value!(a: Scalar = 5.0)]);
 
-    let arg_map = call_argument_value_list
-        .get_matching_arguments(&parameter_values)
-        .expect("Matching arguments failed");
+    let arg_map =
+        ArgumentMap::find_match(&call_argument_value_list, &parameter_values).expect("Valid match");
 
     let a = arg_map.get(&Identifier::no_ref("a"));
     assert!(a.is_some());

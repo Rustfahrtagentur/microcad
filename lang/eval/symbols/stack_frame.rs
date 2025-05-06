@@ -20,8 +20,8 @@ pub enum StackFrame {
     Call {
         /// Symbol that was called.
         symbol: Symbol,
-        /// Call arguments.
-        args: CallArgumentList,
+        /// Evaluated call arguments.
+        args: CallArgumentValueList,
         /// Source code reference.
         src_ref: SrcRef,
     },
@@ -44,7 +44,7 @@ impl StackFrame {
                 map
             }
             StackFrame::Namespace(id, symbol) => {
-                return write!(f, "{:depth$}{id} = {symbol} (namespace)", "")
+                return write!(f, "{:depth$}{id} = {symbol} (namespace)", "");
             }
             StackFrame::Body(map) => map,
             StackFrame::Call {
@@ -58,7 +58,7 @@ impl StackFrame {
                     "",
                     args = args,
                     name = symbol.full_name()
-                )
+                );
             }
         };
 
