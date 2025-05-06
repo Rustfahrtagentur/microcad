@@ -38,6 +38,7 @@ mod externals;
 mod format_string;
 mod literal;
 mod module;
+mod module_init;
 mod output;
 mod parameter;
 mod source_file;
