@@ -1,7 +1,1 @@
-error: Local stack needed to store radius
-  ---> ../lib/std/geo2d.µcad:6:15
-     |
-   6 | module circle(radius: Length) {
-     |               ^^^^^^
-     |
-Symbol radius not found.
+Value Error: Missing arguments: width, height, x, y

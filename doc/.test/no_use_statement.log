@@ -1,7 +1,0 @@
-error: Local stack needed to store radius
-  ---> ../lib/std/geo3d.µcad:5:15
-     |
-   5 | module sphere(radius: Length) {
-     |               ^^^^^^
-     |
-Symbol radius not found.

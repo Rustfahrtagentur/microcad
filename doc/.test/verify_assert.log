@@ -1,6 +1,1 @@
-error: Argument count mismatch: expected 1, got 2 in true, "You won't see this message"
-  ---> <from_str>:1:20
-     |
-   1 | std::debug::assert(true, "You won't see this message");
-     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+error: Argument count mismatch: expected 1, got 2 in true, You won't see this message

@@ -4,7 +4,7 @@ error: Not implemented: cannot evaluate method call of equal() at <from_str>:8:5
    8 | std::debug::assert( [degree, degree_, grad, turn, radian].equal() );
      |                                                          ^^^^^^^^
      |
-error: Assertion failed: [degree, degree_, grad, turn, radian].equal()
+error: Assertion failed: <invalid>
   ---> <from_str>:8:21
      |
    8 | std::debug::assert( [degree, degree_, grad, turn, radian].equal() );

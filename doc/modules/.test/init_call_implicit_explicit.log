@@ -4,12 +4,6 @@ error: Not implemented: cannot evaluate tuple expression of (width = 1m, height 
   11 | m( area = (width = 1m, height = 0.5m) );
      |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Not implemented: cannot evaluate tuple expression of (width = 1m, height = 0.5m) at <from_str>:11:11
-  ---> <from_str>:11:11
-     |
-  11 | m( area = (width = 1m, height = 0.5m) );
-     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 error: Value Error: Missing arguments: area
 
   ---> <from_str>:2:1
@@ -23,4 +17,3 @@ error: Properties have not been initialized: [Identifier(Refer { value: "area", 
    7 |   init( height: Length) { area = ( width = default_width, height); }
      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-Local stack needed to store default_width

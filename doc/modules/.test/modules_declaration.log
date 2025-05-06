@@ -1,7 +1,1 @@
-error: Local stack needed to store diameter
-  ---> <from_str>:2:19
-     |
-   2 | module small_disc(diameter: Length) {
-     |                   ^^^^^^^^
-     |
-Local stack needed to store factor
+Value Error: Missing arguments: radius

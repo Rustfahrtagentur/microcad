@@ -4,7 +4,7 @@ error: Symbol cos not found.
    4 | assert(cos(pi) == -1.);
      |        ^^^^^^^
      |
-error: Assertion failed: cos(pi) = -1
+error: Assertion failed: <invalid>
   ---> <from_str>:4:8
      |
    4 | assert(cos(pi) == -1.);
@@ -16,7 +16,7 @@ error: Symbol tan not found.
    5 | assert(tan(0) == 0.);
      |        ^^^^^^
      |
-error: Assertion failed: tan(0) = 0
+error: Assertion failed: <invalid>
   ---> <from_str>:5:8
      |
    5 | assert(tan(0) == 0.);
