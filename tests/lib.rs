@@ -83,7 +83,8 @@ fn call_argument_value_list(s: &str, context: &mut Context) -> CallArgumentValue
     )
     .expect("Valid CallArgumentList");
 
-    CallArgumentValueList::from_call_argument_list(&call_argument_list, context)
+    call_argument_list
+        .eval(context)
         .expect("Valid call argument list")
 }
 
