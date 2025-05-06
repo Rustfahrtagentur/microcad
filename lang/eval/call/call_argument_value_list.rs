@@ -13,6 +13,21 @@ use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
 
 impl CallArgumentValueList {
+    /// return a single argument
+    pub fn get_single(&self) -> EvalResult<&CallArgumentValue> {
+        if self.len() == 1 {
+            if let Some(a) = self.0.first() {
+                return Ok(a);
+            }
+        }
+
+        Err(EvalError::ArgumentCountMismatch {
+            args: self.clone(),
+            expected: 1,
+            found: self.len(),
+        })
+    }
+
     /// Create a `CallArgumentValueList` from a `CallArgumentList`
     pub fn from_call_argument_list(
         call_argument_list: &CallArgumentList,
@@ -46,18 +61,21 @@ impl CallArgumentValueList {
     /// It returns a map of arguments that match the parameters
     pub fn get_matching_arguments(
         &self,
-        parameter_values: &ParameterValueList,
+        context: &mut Context,
+        parameters: &ParameterList,
     ) -> EvalResult<ArgumentMap> {
-        ArgumentMap::find_match(self, parameter_values)
+        let parameters = ParameterValueList::from_parameter_list(parameters, context)?;
+        ArgumentMap::find_match(self, &parameters)
     }
 
     /// Get multiplicity of matching arguments
     pub fn get_multi_matching_arguments(
         &self,
-        parameter_values: &ParameterValueList,
+        context: &mut Context,
+        parameters: &ParameterList,
     ) -> EvalResult<MultiArgumentMap> {
-        use ArgumentMatch;
-        MultiArgumentMap::find_match(self, parameter_values)
+        let parameters = ParameterValueList::from_parameter_list(parameters, context)?;
+        MultiArgumentMap::find_match(self, &parameters)
     }
 }
 
@@ -78,6 +96,21 @@ impl std::ops::Deref for CallArgumentValueList {
 impl std::ops::DerefMut for CallArgumentValueList {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+impl std::fmt::Display for CallArgumentValueList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.0
+                .value
+                .iter()
+                .map(|p| p.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
     }
 }
 
@@ -117,9 +150,7 @@ fn call_get_matching_arguments() {
         call_argument_value!(baz: Scalar = 3.0),
     ]);
 
-    let arg_map = call_values
-        .get_matching_arguments(&param_values)
-        .expect("test error");
+    let arg_map = ArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
 
     assert_eq_arg_map_value!(arg_map,
         foo: Integer = 2,
@@ -145,7 +176,7 @@ fn call_get_matching_arguments_missing() {
         call_argument_value!(baz: Scalar = 3.0),
     ]);
 
-    let arg_map = call_values.get_matching_arguments(&param_values);
+    let arg_map = ArgumentMap::find_match(&call_values, &param_values);
 
     if let Err(EvalError::ValueError(ValueError::MissingArguments(missing))) = arg_map {
         assert_eq!(missing.len(), 1);
@@ -171,9 +202,8 @@ fn get_multi_matching_arguments() {
         call_argument_value!(Scalar = 10.0),
     ]);
 
-    let multi_argument_map = call_values
-        .get_multi_matching_arguments(&param_values)
-        .expect("MultiArgumentMap expected");
+    let multi_argument_map =
+        MultiArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
 
     for argument_map in multi_argument_map.combinations() {
         assert_eq_arg_map_value!(argument_map,

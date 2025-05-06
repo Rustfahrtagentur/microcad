@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{parse::*, resolve::*, src_ref::SrcRef, syntax::*, ty::*, value::*};
+use crate::{eval::*, parse::*, resolve::*, src_ref::SrcRef, syntax::*, ty::*, value::*};
 use thiserror::Error;
 
 /// Evaluation error.
@@ -82,7 +82,7 @@ pub enum EvalError {
     #[error("Argument count mismatch: expected {expected}, got {found} in {args}")]
     ArgumentCountMismatch {
         /// Argument list including the error
-        args: CallArgumentList,
+        args: CallArgumentValueList,
         /// Expected number of arguments
         expected: usize,
         /// Found number of arguments

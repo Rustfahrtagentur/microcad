@@ -75,9 +75,16 @@ fn qualified_name(s: &str) -> QualifiedName {
 
 /// Helper function to create a call argument list from &str
 #[cfg(test)]
-fn call_argument_list(s: &str) -> CallArgumentList {
-    Parser::parse_rule::<CallArgumentList>(microcad_lang::parser::Rule::call_argument_list, s, 0)
-        .expect("Valid CallArgumentList")
+fn call_argument_value_list(s: &str, context: &mut Context) -> CallArgumentValueList {
+    let call_argument_list = Parser::parse_rule::<CallArgumentList>(
+        microcad_lang::parser::Rule::call_argument_list,
+        s,
+        0,
+    )
+    .expect("Valid CallArgumentList");
+
+    CallArgumentValueList::from_call_argument_list(&call_argument_list, context)
+        .expect("Valid call argument list")
 }
 
 #[test]
@@ -104,7 +111,10 @@ fn module_implicit_init_call() {
 
     // Call module `a` with `b = 3.0`
     let nodes = module_definition
-        .eval_call(&call_argument_list("b = 3.0"), &mut context)
+        .eval_call(
+            &call_argument_value_list("b = 3.0", &mut context),
+            &mut context,
+        )
         .expect("Valid nodes")
         .fetch_nodes();
 
@@ -128,7 +138,10 @@ fn module_implicit_init_call() {
 
     // Call module `a` with `b = [1.0, 2.0]` (multiplicity)
     let nodes = module_definition
-        .eval_call(&call_argument_list("b = [1.0, 2.0]"), &mut context)
+        .eval_call(
+            &call_argument_value_list("b = [1.0, 2.0]", &mut context),
+            &mut context,
+        )
         .expect("Valid nodes")
         .fetch_nodes();
 
@@ -171,7 +184,10 @@ fn module_explicit_init_call() {
     // Call module `circle(radius = 3.0)`
     {
         let nodes = module_definition
-            .eval_call(&call_argument_list("radius = 3.0"), &mut context)
+            .eval_call(
+                &call_argument_value_list("radius = 3.0", &mut context),
+                &mut context,
+            )
             .expect("A valid value")
             .fetch_nodes();
         assert_eq!(nodes.len(), 1, "There should be one node");
@@ -181,7 +197,10 @@ fn module_explicit_init_call() {
     // Call module `circle(r = 3.0)`
     {
         let nodes = module_definition
-            .eval_call(&call_argument_list("r = 3.0"), &mut context)
+            .eval_call(
+                &call_argument_value_list("r = 3.0", &mut context),
+                &mut context,
+            )
             .expect("Valid nodes")
             .fetch_nodes();
         assert_eq!(nodes.len(), 1, "There should be one node");
@@ -191,7 +210,10 @@ fn module_explicit_init_call() {
     // Call module `circle(d = 6.0)`
     {
         let nodes = module_definition
-            .eval_call(&call_argument_list("d = 6.0"), &mut context)
+            .eval_call(
+                &call_argument_value_list("d = 6.0", &mut context),
+                &mut context,
+            )
             .expect("Valid nodes")
             .fetch_nodes();
         assert_eq!(nodes.len(), 1, "There should be one node");
@@ -201,7 +223,10 @@ fn module_explicit_init_call() {
     // Call module `circle(d = [1.0, 2.0])` (multiplicity)
     {
         let nodes = module_definition
-            .eval_call(&call_argument_list("d = [1.0, 2.0]"), &mut context)
+            .eval_call(
+                &call_argument_value_list("d = [1.0, 2.0]", &mut context),
+                &mut context,
+            )
             .expect("Valid nodes")
             .fetch_nodes();
         assert_eq!(nodes.len(), 2, "There should be two nodes");
@@ -212,7 +237,7 @@ fn module_explicit_init_call() {
     // Call module `circle()` (missing arguments)
     {
         let nodes = module_definition
-            .eval_call(&CallArgumentList::default(), &mut context)
+            .eval_call(&CallArgumentValueList::default(), &mut context)
             .expect("Valid nodes")
             .fetch_nodes();
         assert_eq!(nodes.len(), 0, "There should no nodes");

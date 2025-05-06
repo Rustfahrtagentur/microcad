@@ -11,7 +11,7 @@ pub fn assert() -> Symbol {
     let id = Identifier::from_str("assert").expect("valid id");
     Symbol::new_builtin(id, &|args, context| {
         if let Ok(arg) = args.get_single() {
-            if !arg.eval_bool(context)? {
+            if !arg.value.try_bool()? {
                 context.error(arg.src_ref(), EvalError::AssertionFailed(format!("{arg}")))?;
             }
         } else {

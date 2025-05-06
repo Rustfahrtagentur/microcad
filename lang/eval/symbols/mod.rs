@@ -56,7 +56,7 @@ pub trait Locals {
     }
 
     /// Open call.
-    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: SrcRef) {
+    fn open_call(&mut self, symbol: Symbol, args: CallArgumentValueList, src_ref: SrcRef) {
         self.open(StackFrame::Call {
             symbol,
             args,

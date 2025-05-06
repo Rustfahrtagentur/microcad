@@ -3,7 +3,7 @@
 
 //! Call argument value evaluation entity
 
-use crate::{ord_map::*, src_ref::*, syntax::Identifier, value::*};
+use crate::{ord_map::*, src_ref::*, syntax::*, value::*};
 
 /// Call argument value
 #[derive(Clone, Debug)]
@@ -25,6 +25,15 @@ impl OrdMapValue<Identifier> for CallArgumentValue {
 impl SrcReferrer for CallArgumentValue {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()
+    }
+}
+
+impl std::fmt::Display for CallArgumentValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.id {
+            Some(ref id) => write!(f, "{} = {}", id, self.value),
+            None => write!(f, "{}", self.value),
+        }
     }
 }
 
