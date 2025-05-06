@@ -32,9 +32,10 @@ pub fn assert_valid() -> Symbol {
     let id = Identifier::from_str("assert_valid").expect("valid id");
     Symbol::new_builtin(id, &|args, context| {
         if let Ok(arg) = args.get_single() {
-            let name = QualifiedName::try_from(arg.value.to_string())?;
-            if let Err(err) = context.lookup(&name) {
-                context.error(arg, err)?;
+            if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
+                if let Err(err) = context.lookup(&name) {
+                    context.error(arg, err)?;
+                }
             }
         }
         Ok(Value::None)
@@ -44,10 +45,11 @@ pub fn assert_valid() -> Symbol {
 pub fn assert_invalid() -> Symbol {
     let id = Identifier::from_str("assert_invalid").expect("valid id");
     Symbol::new_builtin(id, &|args, context| {
-        if let Ok(name) = args.get_single() {
-            let n = QualifiedName::try_from(name.value.to_string())?;
-            if let Ok(symbol) = context.lookup(&n) {
-                context.error(name, EvalError::SymbolFound(symbol.full_name()))?;
+        if let Ok(arg) = args.get_single() {
+            if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
+                if let Ok(symbol) = context.lookup(&name) {
+                    context.error(name, EvalError::SymbolFound(symbol.full_name()))?;
+                }
             }
         }
         Ok(Value::None)

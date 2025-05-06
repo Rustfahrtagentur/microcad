@@ -31,6 +31,7 @@ impl CallArgumentList {
 
 impl Eval for Call {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        // find self in symbol table by own name
         let symbol = match context.lookup(&self.name) {
             Ok(symbol) => symbol,
             Err(err) => {
@@ -39,7 +40,21 @@ impl Eval for Call {
             }
         };
 
-        let args = self.argument_list.eval(context)?;
+        // evaluate arguments
+        let args = match self.argument_list.eval(context) {
+            Ok(args) => args,
+            Err(err) => {
+                // builtin functions get their argument list as string if it can't be evaluated
+                if let SymbolDefinition::Builtin(_) = &symbol.borrow().def {
+                    CallArgumentValueList::from_code(
+                        context.source_code(&self.argument_list)?,
+                        &self.argument_list,
+                    )
+                } else {
+                    return Err(err);
+                }
+            }
+        };
 
         context.open_call(symbol.clone(), args.clone(), self.src_ref());
 
