@@ -117,6 +117,14 @@ impl Context {
         ))
     }
 
+    /// Get source code at the given *source code reference*
+    pub fn source_code(&self, referrer: &impl SrcReferrer) -> EvalResult<String> {
+        Ok(referrer
+            .src_ref()
+            .source_slice(&self.get_by_hash(referrer.src_ref().source_hash())?.source)
+            .to_string())
+    }
+
     /// Evaluate context to a value.
     pub fn eval(&mut self) -> EvalResult<Value> {
         let source_file = match &self.symbol_table.root.borrow().def {
