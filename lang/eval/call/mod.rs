@@ -27,7 +27,7 @@ impl Eval for Call {
             }
         };
 
-        let args = CallArgumentValueList::from_call_argument_list(&self.argument_list, context)?;
+        let args = self.argument_list.eval(context)?;
 
         context.open_call(symbol.clone(), args.clone(), self.src_ref());
 
