@@ -9,7 +9,7 @@ impl CallArgument {
     /// Evaluate `CallArgument` and return `CallArgumentValue`
     pub fn eval_value(&self, context: &mut Context) -> EvalResult<CallArgumentValue> {
         Ok(CallArgumentValue::new(
-            self.name.clone(),
+            self.id.clone(),
             self.value.eval(context)?,
             self.src_ref.clone(),
         ))
