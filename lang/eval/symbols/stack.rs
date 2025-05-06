@@ -122,7 +122,13 @@ impl Locals for Stack {
                         return Ok(local.clone());
                     }
                 }
-                _ => (),
+                // stop stack lookup at calls
+                StackFrame::Namespace(_, _)
+                | StackFrame::Call {
+                    symbol: _,
+                    args: _,
+                    src_ref: _,
+                } => break,
             }
         }
         Err(EvalError::LocalNotFound(id.clone()))
