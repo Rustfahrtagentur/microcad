@@ -12,9 +12,15 @@ use crate::eval::*;
 pub enum StackFrame {
     /// Source file with locals.
     Source(Identifier, SymbolMap),
-    /// Namespace scope without locals
+    /// Namespace scope with locals.
     Namespace(Identifier, SymbolMap),
-    /// Body (unnamed) scope with locals
+    /// Module scope with locals.
+    ///
+    /// Symbol map is built from `ParamterList`.
+    Module(Identifier, SymbolMap),
+    /// Module initializer scope with locals.
+    ModuleInit(SymbolMap),
+    /// Body (unnamed) scope with locals.
     Body(SymbolMap),
     /// A call of a built-in, function or module.
     Call {
@@ -42,6 +48,12 @@ impl StackFrame {
             StackFrame::Source(id, map) => {
                 writeln!(f, "{:depth$}{id} (source):", "")?;
                 map
+            }
+            StackFrame::Module(id, symbol) => {
+                return write!(f, "{:depth$}{id} = {symbol} (module)", "");
+            }
+            StackFrame::ModuleInit(symbol) => {
+                return write!(f, "{:depth$} = {symbol} (module)", "");
             }
             StackFrame::Namespace(id, symbol) => {
                 return write!(f, "{:depth$}{id} = {symbol} (namespace)", "");
@@ -87,6 +99,8 @@ impl StackFrame {
         match self {
             StackFrame::Source(_identifier, _symbol_map) => todo!(),
             StackFrame::Namespace(_identifier, _symbol_map) => todo!(),
+            StackFrame::Module(_identifier, _symbol_map) => todo!(),
+            StackFrame::ModuleInit(_symbol_map) => todo!(),
             StackFrame::Body(_symbol_map) => todo!(),
             StackFrame::Call {
                 symbol,
@@ -110,11 +124,5 @@ impl StackFrame {
         }
 
         Ok(())
-    }
-}
-
-impl std::fmt::Display for StackFrame {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.print(f, 0)
     }
 }
