@@ -202,26 +202,12 @@ impl Locals for SymbolTable {
         self.stack.get_local_value(id)
     }
 
-    fn open_source(&mut self, id: Identifier) {
-        self.stack.open_source(id);
-    }
-
-    fn open_namespace(&mut self, id: Identifier) {
-        self.stack.open_namespace(id);
-        log::trace!("open namespace -> {}", self.stack.current_namespace());
-    }
-
-    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: SrcRef) {
-        self.stack.open_call(symbol, args, src_ref);
-    }
-
-    fn open_body(&mut self) {
-        self.stack.open_body();
+    fn open(&mut self, frame: StackFrame) {
+        self.stack.open(frame);
     }
 
     fn close(&mut self) {
         self.stack.close();
-        log::trace!("closed -> {}", self.stack.current_namespace());
     }
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {

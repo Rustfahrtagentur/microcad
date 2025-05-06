@@ -142,20 +142,8 @@ impl Locals for Context {
         self.symbol_table.get_local_value(id)
     }
 
-    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: SrcRef) {
-        self.symbol_table.open_call(symbol, args, src_ref);
-    }
-
-    fn open_source(&mut self, id: Identifier) {
-        self.symbol_table.open_source(id);
-    }
-
-    fn open_namespace(&mut self, id: Identifier) {
-        self.symbol_table.open_namespace(id);
-    }
-
-    fn open_body(&mut self) {
-        self.symbol_table.open_body();
+    fn open(&mut self, frame: StackFrame) {
+        self.symbol_table.open(frame);
     }
 
     fn close(&mut self) {
