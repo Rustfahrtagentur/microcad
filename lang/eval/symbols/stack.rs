@@ -106,7 +106,10 @@ impl Locals for Stack {
         // search from inner scope to root scope to shadow outside locals
         for (pos, frame) in self.0.iter().rev().enumerate() {
             match frame {
-                StackFrame::Source(_, locals) | StackFrame::Body(locals) => {
+                StackFrame::Source(_, locals)
+                | StackFrame::Body(locals)
+                | StackFrame::Module(_, locals)
+                | StackFrame::ModuleInit(locals) => {
                     if let Some(local) = locals.get(id) {
                         log::debug!("Fetched {id} from locals");
                         return Ok(local.clone());
