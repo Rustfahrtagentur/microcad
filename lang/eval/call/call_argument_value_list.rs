@@ -71,7 +71,7 @@ impl CallArgumentValueList {
         context: &mut Context,
         parameters: &ParameterList,
     ) -> EvalResult<ArgumentMap> {
-        let parameters = ParameterValueList::from_parameter_list(parameters, context)?;
+        let parameters = parameters.eval(context)?;
         ArgumentMap::find_match(self, &parameters)
     }
 
@@ -81,7 +81,7 @@ impl CallArgumentValueList {
         context: &mut Context,
         parameters: &ParameterList,
     ) -> EvalResult<MultiArgumentMap> {
-        let parameters = ParameterValueList::from_parameter_list(parameters, context)?;
+        let parameters = parameters.eval(context)?;
         MultiArgumentMap::find_match(self, &parameters)
     }
 }
