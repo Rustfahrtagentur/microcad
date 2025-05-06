@@ -12,6 +12,18 @@ use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
 
+impl CallArgumentList {
+    /// Create a `CallArgumentValueList` from a `CallArgumentList`
+    pub fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
+        let mut v = CallArgumentValueList::default();
+        for call_arg in self.iter() {
+            v.push(call_arg.eval_value(context)?)
+                .expect("Could not insert call argument value");
+        }
+        Ok(v)
+    }
+}
+
 impl CallArgumentValueList {
     /// return a single argument
     pub fn get_single(&self) -> EvalResult<&CallArgumentValue> {
@@ -26,19 +38,6 @@ impl CallArgumentValueList {
             expected: 1,
             found: self.len(),
         })
-    }
-
-    /// Create a `CallArgumentValueList` from a `CallArgumentList`
-    pub fn from_call_argument_list(
-        call_argument_list: &CallArgumentList,
-        context: &mut Context,
-    ) -> EvalResult<Self> {
-        let mut v = CallArgumentValueList::default();
-        for call_arg in call_argument_list.iter() {
-            v.push(call_arg.eval_value(context)?)
-                .expect("Could not insert call argument value");
-        }
-        Ok(v)
     }
 
     /// Check for unexpected arguments.
