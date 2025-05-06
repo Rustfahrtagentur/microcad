@@ -10,17 +10,17 @@ error: Symbol radius_inner not found.
    6 | module circle(radius: Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Local stack needed to store radius_inner
-  ---> <from_str>:2:36
-     |
-   2 | module donut(radius_outer: Length, radius_inner: Length) {
-     |                                    ^^^^^^^^^^^^
-     |
 error: Local stack needed to store radius_outer
   ---> <from_str>:2:14
      |
    2 | module donut(radius_outer: Length, radius_inner: Length) {
      |              ^^^^^^^^^^^^
+     |
+error: Local stack needed to store radius_inner
+  ---> <from_str>:2:36
+     |
+   2 | module donut(radius_outer: Length, radius_inner: Length) {
+     |                                    ^^^^^^^^^^^^
      |
 error: Symbol radius_outer not found.
   ---> ../lib/std/geo2d.µcad:6:1

@@ -3,69 +3,28 @@
 
 use crate::eval::*;
 
-/// Stack frame for a single call.
-#[derive(Debug, Clone)]
-pub struct CallStackFrame {
-    /// Symbol that was called.
-    symbol: Symbol,
-
-    /// Call arguments.
-    args: CallArgumentList,
-
-    /// Source code reference.
-    src_ref: SrcRef,
-}
-
-impl CallStackFrame {
-    /// Create new call stack frame.
-    pub fn new(symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer) -> Self {
-        Self {
-            symbol,
-            args,
-            src_ref: src_ref.src_ref(),
-        }
-    }
-
-    /// Pretty print single call stack frame.
-    pub fn pretty_print(
-        &self,
-        f: &mut dyn std::fmt::Write,
-        source_by_hash: &impl GetSourceByHash,
-        idx: usize,
-    ) -> std::fmt::Result {
-        writeln!(f, "{:>4}: {name}", idx, name = self.symbol.full_name())?;
-
-        if let Some(line_col) = self.src_ref.at() {
-            let source_file = source_by_hash.get_by_hash(self.src_ref.source_hash());
-            writeln!(
-                f,
-                "            at {filename}:{line_col}",
-                filename = source_file
-                    .as_ref()
-                    .map(|sf| sf.filename_as_str())
-                    .unwrap_or(SourceFile::NO_FILE),
-            )?;
-        }
-
-        Ok(())
-    }
-}
-
-/// Storage for *local variables* and *aliases* (for *use statements*).
+/// Frame in [Stack] for *local variables*, *aliases* (*use statements*) and *calls*.
 ///
 /// A *stack frame* can have different types and some provide a storage for *local variables*
-/// (like [`LocalFrame::Source`] and [`LocalFrame::Scope`]) and some do not, some are named
-/// (like [`LocalFrame::Source`], [`LocalFrame::Namespace`] and [`LocalFrame::Module`])
-/// and some do not.
+/// like [`StackFrame::Source`] and [`StackFrame::Body`]) and some do not, some are named
+/// like [`StackFrame::Source`] amd [`StackFrame::Namespace`]) and some do not.
+/// [Call] is used for procedural calls.
 pub enum StackFrame {
     /// Source file with locals.
     Source(Identifier, SymbolMap),
     /// Namespace scope without locals
     Namespace(Identifier, SymbolMap),
-    /// A call of a built-in, function or module.
-    Call(CallStackFrame),
     /// Body (unnamed) scope with locals
     Body(SymbolMap),
+    /// A call of a built-in, function or module.
+    Call {
+        /// Symbol that was called.
+        symbol: Symbol,
+        /// Call arguments.
+        args: CallArgumentList,
+        /// Source code reference.
+        src_ref: SrcRef,
+    },
 }
 
 impl StackFrame {
@@ -87,16 +46,20 @@ impl StackFrame {
             StackFrame::Namespace(id, symbol) => {
                 return write!(f, "{:depth$}{id} = {symbol} (namespace)", "")
             }
-            StackFrame::Call(call) => {
+            StackFrame::Body(map) => map,
+            StackFrame::Call {
+                symbol,
+                args,
+                src_ref: _,
+            } => {
                 return write!(
                     f,
                     "{:depth$}{name}({args}) (call)",
                     "",
-                    args = call.args,
-                    name = call.symbol.full_name()
+                    args = args,
+                    name = symbol.full_name()
                 )
             }
-            StackFrame::Body(map) => map,
         };
 
         depth += 4;
@@ -108,6 +71,41 @@ impl StackFrame {
                     writeln!(f, "{:depth$}{id} = {value} [{full_name}]", "")?
                 }
                 _ => writeln!(f, "{:depth$}{id} [{full_name}]", "")?,
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Pretty print single call stack frame.
+    pub fn pretty_print(
+        &self,
+        f: &mut dyn std::fmt::Write,
+        source_by_hash: &impl GetSourceByHash,
+        idx: usize,
+    ) -> std::fmt::Result {
+        match self {
+            StackFrame::Source(_identifier, _symbol_map) => todo!(),
+            StackFrame::Namespace(_identifier, _symbol_map) => todo!(),
+            StackFrame::Body(_symbol_map) => todo!(),
+            StackFrame::Call {
+                symbol,
+                args: _,
+                src_ref,
+            } => {
+                writeln!(f, "{:>4}: {name}", idx, name = symbol.full_name())?;
+
+                if let Some(line_col) = src_ref.at() {
+                    let source_file = source_by_hash.get_by_hash(src_ref.source_hash());
+                    writeln!(
+                        f,
+                        "            at {filename}:{line_col}",
+                        filename = source_file
+                            .as_ref()
+                            .map(|sf| sf.filename_as_str())
+                            .unwrap_or(SourceFile::NO_FILE),
+                    )?;
+                }
             }
         }
 

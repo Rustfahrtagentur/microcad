@@ -194,6 +194,14 @@ impl Lookup for SymbolTable {
 }
 
 impl Locals for SymbolTable {
+    fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
+        self.stack.set_local_value(id, value)
+    }
+
+    fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value> {
+        self.stack.get_local_value(id)
+    }
+
     fn open_source(&mut self, id: Identifier) {
         self.stack.open_source(id);
     }
@@ -203,7 +211,7 @@ impl Locals for SymbolTable {
         log::trace!("open namespace -> {}", self.stack.current_namespace());
     }
 
-    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: impl SrcReferrer) {
+    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: SrcRef) {
         self.stack.open_call(symbol, args, src_ref);
     }
 
@@ -216,10 +224,6 @@ impl Locals for SymbolTable {
         log::trace!("closed -> {}", self.stack.current_namespace());
     }
 
-    fn add_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        self.stack.add_local_value(id, value)
-    }
-
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         self.stack.fetch(id)
     }
@@ -230,7 +234,7 @@ impl UseSymbol for SymbolTable {
         log::debug!("Using symbol {name}");
 
         let symbol = self.lookup(name)?;
-        self.stack.add(id, symbol.clone())?;
+        self.stack.put_local(id, symbol.clone())?;
         log::trace!("Local Stack:\n{}", self.stack);
 
         Ok(symbol)
@@ -255,7 +259,7 @@ impl UseSymbol for SymbolTable {
             Err(EvalError::NoSymbolsToUse(symbol.full_name()))
         } else {
             for (id, symbol) in symbol.borrow().children.iter() {
-                self.stack.add(Some(id.clone()), symbol.clone())?;
+                self.stack.put_local(Some(id.clone()), symbol.clone())?;
             }
             log::trace!("Local Stack:\n{}", self.stack);
             Ok(symbol)
