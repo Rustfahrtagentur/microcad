@@ -16,4 +16,10 @@ error: Local stack needed to store height
    5 |     height = 20mm,
      |     ^^^^^^
      |
+error: Local stack needed to store inner_diameter
+  ---> <from_str>:4:5
+     |
+   4 |     inner_diameter = 16cm,
+     |     ^^^^^^^^^^^^^^
+     |
 Symbol thickness not found.

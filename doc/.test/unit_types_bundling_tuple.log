@@ -10,9 +10,4 @@ error: Not implemented: cannot evaluate tuple expression of (x = 1, y = 2, z = 3
    5 | p2 = (x=1, y=2, z=3)mm;
      |      ^^^^^^^^^^^^^^^^^
      |
-error: Assertion failed: p1 = p2
-  ---> <from_str>:8:21
-     |
-   8 | std::debug::assert( p1 == p2 );
-     |                     ^^^^^^^^^
-     |
+Symbol p1 not found.

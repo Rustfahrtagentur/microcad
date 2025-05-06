@@ -71,24 +71,8 @@ impl Stack {
 }
 
 impl Locals for Stack {
-    fn open_source(&mut self, id: Identifier) {
-        self.0.push(StackFrame::Source(id, SymbolMap::new()));
-    }
-
-    fn open_body(&mut self) {
-        self.0.push(StackFrame::Body(SymbolMap::new()));
-    }
-
-    fn open_namespace(&mut self, id: Identifier) {
-        self.0.push(StackFrame::Namespace(id, SymbolMap::new()));
-    }
-
-    fn open_call(&mut self, symbol: Symbol, args: CallArgumentList, src_ref: SrcRef) {
-        self.0.push(StackFrame::Call {
-            symbol,
-            args,
-            src_ref,
-        })
+    fn open(&mut self, frame: StackFrame) {
+        self.0.push(frame);
     }
 
     fn close(&mut self) {
@@ -122,7 +106,16 @@ impl Locals for Stack {
                         return Ok(local.clone());
                     }
                 }
-                _ => (),
+                // stop stack lookup at calls
+                StackFrame::Namespace(_, _)
+                | StackFrame::Call {
+                    symbol: _,
+                    args: _,
+                    src_ref: _,
+                } => {
+                    log::trace!("stop at call frame");
+                    break;
+                }
             }
         }
         Err(EvalError::LocalNotFound(id.clone()))
