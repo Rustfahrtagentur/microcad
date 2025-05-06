@@ -1,12 +1,7 @@
-error: Local stack needed to store size
+error: Unexpected stack frame of type call frame cannot store size
   ---> <from_str>:1:12
      |
    1 | module box(size: Length) {
      |            ^^^^
      |
-error: Symbol size not found.
-  ---> ../lib/std/geo2d.µcad:26:1
-     |
-  26 | module rect() {
-     | ^^^^^^^^^^^^^^^
-     |
+Symbol size not found.

@@ -1,7 +1,7 @@
-error: Local stack needed to store diameter
+error: Unexpected stack frame of type call frame cannot store diameter
   ---> <from_str>:2:19
      |
    2 | module small_disc(diameter: Length) {
      |                   ^^^^^^^^
      |
-Local stack needed to store factor
+Unexpected stack frame of type call frame cannot store factor
