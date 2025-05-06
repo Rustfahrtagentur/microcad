@@ -13,24 +13,35 @@ impl Stack {
     pub fn put_local(&mut self, id: Option<Identifier>, symbol: Symbol) -> EvalResult<()> {
         let id = if let Some(id) = id { id } else { symbol.id() };
         let name = symbol.full_name();
-        match self.0.last_mut() {
-            Some(StackFrame::Source(_, last)) | Some(StackFrame::Body(last)) => {
-                let op = if last.insert(id.clone(), symbol).is_some() {
-                    "Added"
-                } else {
-                    "Set"
-                };
-                if name.is_qualified() {
-                    log::debug!("{op} {name} as {id} to local stack");
-                } else {
-                    log::debug!("{op} {id} to local stack");
-                }
+        for frame in self.0.iter_mut().rev() {
+            match frame {
+                StackFrame::Source(_, last) | StackFrame::Body(last) => {
+                    let op = if last.insert(id.clone(), symbol).is_some() {
+                        "Added"
+                    } else {
+                        "Set"
+                    };
+                    if name.is_qualified() {
+                        log::debug!("{op} {name} as {id} to local stack");
+                    } else {
+                        log::debug!("{op} {id} to local stack");
+                    }
 
-                log::trace!("Local Stack:\n{self}");
-                Ok(())
+                    log::trace!("Local Stack:\n{self}");
+                    return Ok(());
+                }
+                StackFrame::Namespace(_, _) => {
+                    return Err(EvalError::WrongStackFrame(id, "namespace"))
+                }
+                // skip any call frame
+                StackFrame::Call {
+                    symbol: _,
+                    args: _,
+                    src_ref: _,
+                } => (),
             }
-            _ => Err(EvalError::LocalStackEmpty(id)),
         }
+        Err(EvalError::LocalStackEmpty(id))
     }
 
     /// Get name of current namespace.
@@ -98,7 +109,7 @@ impl Locals for Stack {
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         // search from inner scope to root scope to shadow outside locals
-        for (pos, frame) in self.0.iter().rev().enumerate() {
+        for frame in self.0.iter().rev() {
             match frame {
                 StackFrame::Source(_, locals) | StackFrame::Body(locals) => {
                     if let Some(local) = locals.get(id) {
@@ -111,16 +122,12 @@ impl Locals for Stack {
                     log::trace!("stop at call frame");
                     break;
                 }
+                // skip any call frame
                 StackFrame::Call {
                     symbol: _,
                     args: _,
                     src_ref: _,
-                } => {
-                    if pos > 0 {
-                        log::trace!("stop at call frame");
-                        break;
-                    }
-                }
+                } => (),
             }
         }
         Err(EvalError::LocalNotFound(id.clone()))
