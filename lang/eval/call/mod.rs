@@ -17,6 +17,18 @@ use crate::{eval::*, syntax::*};
 
 use thiserror::Error;
 
+impl CallArgumentList {
+    /// Create a `CallArgumentValueList` from a `CallArgumentList`
+    pub fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
+        let mut v = CallArgumentValueList::default();
+        for call_arg in self.iter() {
+            v.push(call_arg.eval_value(context)?)
+                .expect("Could not insert call argument value");
+        }
+        Ok(v)
+    }
+}
+
 impl Eval for Call {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let symbol = match context.lookup(&self.name) {
