@@ -37,6 +37,7 @@ mod expression;
 mod externals;
 mod format_string;
 mod literal;
+mod module;
 mod output;
 mod parameter;
 mod source_file;
