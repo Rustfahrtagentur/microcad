@@ -14,22 +14,22 @@ pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
 
 impl CallArgumentValueList {
     /// create an *call argument value list* which transports code to builtin in `impl Eval for Call``
-    pub fn from_code(code: String, src_ref: impl SrcReferrer) -> Self {
+    pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
         let code = Refer {
             value: code,
-            src_ref: src_ref.src_ref(),
+            src_ref: referrer.src_ref(),
         };
         let mut value = OrdMap::default();
         value
             .push(CallArgumentValue::new(
                 None,
                 Value::String(code),
-                src_ref.src_ref(),
+                referrer.src_ref(),
             ))
             .expect("map with one element");
         Self(Refer {
             value,
-            src_ref: src_ref.src_ref(),
+            src_ref: referrer.src_ref(),
         })
     }
 

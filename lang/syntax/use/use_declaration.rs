@@ -55,7 +55,7 @@ impl SrcReferrer for UseDeclaration {
         match self {
             Self::Use(name) => name.src_ref(),
             Self::UseAll(name) => name.src_ref(),
-            Self::UseAlias(name, alias) => SrcRef::merge(name.src_ref(), alias.src_ref()),
+            Self::UseAlias(name, alias) => SrcRef::merge(name, alias),
         }
     }
 }

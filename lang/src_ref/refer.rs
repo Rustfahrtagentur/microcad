@@ -28,7 +28,7 @@ impl<T> Refer<T> {
     pub fn merge<U, V>(left: Refer<U>, right: Refer<V>, f: fn(U, V) -> T) -> Self {
         Self {
             value: f(left.value, right.value),
-            src_ref: SrcRef::merge(left.src_ref, right.src_ref),
+            src_ref: SrcRef::merge(&left.src_ref, &right.src_ref),
         }
     }
     /// Map a `Refer` instance to a new one
@@ -79,7 +79,7 @@ impl<T: std::ops::Add<Output = T>> std::ops::Add for Refer<T> {
     fn add(self, other: Self) -> Self::Output {
         Self {
             value: self.value.add(other.value),
-            src_ref: SrcRef::merge(self.src_ref, other.src_ref),
+            src_ref: SrcRef::merge(&self.src_ref, &other.src_ref),
         }
     }
 }
@@ -90,7 +90,7 @@ impl<T: std::ops::Sub<Output = T>> std::ops::Sub for Refer<T> {
     fn sub(self, other: Self) -> Self::Output {
         Self {
             value: self.value.sub(other.value),
-            src_ref: SrcRef::merge(self.src_ref, other.src_ref),
+            src_ref: SrcRef::merge(&self.src_ref, &other.src_ref),
         }
     }
 }
@@ -101,7 +101,7 @@ impl<T: std::ops::Mul<Output = T>> std::ops::Mul for Refer<T> {
     fn mul(self, other: Self) -> Self::Output {
         Self {
             value: self.value.mul(other.value),
-            src_ref: SrcRef::merge(self.src_ref, other.src_ref),
+            src_ref: SrcRef::merge(&self.src_ref, &other.src_ref),
         }
     }
 }
@@ -112,7 +112,7 @@ impl<T: std::ops::Div<Output = T>> std::ops::Div for Refer<T> {
     fn div(self, other: Self) -> Self::Output {
         Self {
             value: self.value.div(other.value),
-            src_ref: SrcRef::merge(self.src_ref, other.src_ref),
+            src_ref: SrcRef::merge(&self.src_ref, &other.src_ref),
         }
     }
 }

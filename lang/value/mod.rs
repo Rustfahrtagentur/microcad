@@ -189,13 +189,31 @@ impl Value {
             "^" => unimplemented!(), // lhs.pow(&rhs),
             "&" => lhs & rhs,
             "|" => lhs | rhs,
-            ">" => Ok(Value::Bool(Refer::new(lhs > rhs, SrcRef::merge(lhs, rhs)))),
-            "<" => Ok(Value::Bool(Refer::new(lhs < rhs, SrcRef::merge(lhs, rhs)))),
-            "≤" => Ok(Value::Bool(Refer::new(lhs <= rhs, SrcRef::merge(lhs, rhs)))),
-            "≥" => Ok(Value::Bool(Refer::new(lhs >= rhs, SrcRef::merge(lhs, rhs)))),
+            ">" => Ok(Value::Bool(Refer::new(
+                lhs > rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
+            "<" => Ok(Value::Bool(Refer::new(
+                lhs < rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
+            "≤" => Ok(Value::Bool(Refer::new(
+                lhs <= rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
+            "≥" => Ok(Value::Bool(Refer::new(
+                lhs >= rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
             "~" => todo!("implement near ~="),
-            "=" => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
-            "!=" => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
+            "=" => Ok(Value::Bool(Refer::new(
+                lhs == rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
+            "!=" => Ok(Value::Bool(Refer::new(
+                lhs != rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
             _ => unimplemented!("{op:?}"),
         } {
             Err(err) => Err(err),
@@ -367,7 +385,7 @@ impl std::ops::Add for Value {
                 Ok(Value::List(List::new(
                     lhs.iter().chain(rhs.iter()).cloned().collect(),
                     lhs.ty(),
-                    SrcRef::merge(lhs, rhs),
+                    SrcRef::merge(&lhs, &rhs),
                 )))
             }
             // Add values of two tuples of the same length

@@ -120,7 +120,7 @@ impl SrcRef {
     }
 
     /// merge two `SrcRef` into a single one by
-    pub fn merge(lhs: impl SrcReferrer, rhs: impl SrcReferrer) -> SrcRef {
+    pub fn merge(lhs: &impl SrcReferrer, rhs: &impl SrcReferrer) -> SrcRef {
         match (lhs.src_ref(), rhs.src_ref()) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => {
                 let source_file_hash = lhs.source_file_hash;
@@ -153,7 +153,7 @@ impl SrcRef {
     pub fn from_vec<T: SrcReferrer>(v: &[T]) -> SrcRef {
         match (v.first(), v.last()) {
             (None, None) => SrcRef(None),
-            (Some(first), Some(last)) => Self::merge(first.src_ref(), last.src_ref()),
+            (Some(first), Some(last)) => Self::merge(&first, &last),
             _ => unreachable!(),
         }
     }

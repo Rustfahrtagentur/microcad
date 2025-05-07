@@ -70,18 +70,18 @@ impl SourceCache {
     }
 
     /// Convenience function to get a source file by from a `SrcReferrer`.
-    pub fn get_by_src_ref(&self, src_ref: &impl SrcReferrer) -> EvalResult<Rc<SourceFile>> {
-        self.get_by_hash(src_ref.src_ref().source_hash())
+    pub fn get_by_src_ref(&self, referrer: &impl SrcReferrer) -> EvalResult<Rc<SourceFile>> {
+        self.get_by_hash(referrer.src_ref().source_hash())
     }
 
     /// Return a string describing the given source code position.
-    pub fn ref_str(&self, src_ref: &impl SrcReferrer) -> String {
+    pub fn ref_str(&self, referrer: &impl SrcReferrer) -> String {
         format!(
             "{}:{}",
-            self.get_by_src_ref(src_ref)
+            self.get_by_src_ref(referrer)
                 .expect("Source file not found")
                 .filename_as_str(),
-            src_ref.src_ref(),
+            referrer.src_ref(),
         )
     }
 

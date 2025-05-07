@@ -34,9 +34,7 @@ impl From<Vec<Parameter>> for ParameterList {
         Self(Refer::new(
             OrdMap::<Identifier, Parameter>::from(value.clone()),
             match (value.first(), value.last()) {
-                (Some(first), Some(last)) => {
-                    SrcRef::merge(first.src_ref.clone(), last.src_ref.clone())
-                }
+                (Some(first), Some(last)) => SrcRef::merge(first, last),
                 _ => SrcRef(None),
             },
         ))

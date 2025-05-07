@@ -5,18 +5,18 @@ use std::str::FromStr;
 
 #[cfg(test)]
 use crate::builtin_namespace;
-use microcad_lang::{diag::*, eval::*, resolve::*, src_ref::*, syntax::*, value::*};
+use microcad_lang::{diag::*, eval::*, resolve::*, syntax::*, value::*};
 
 pub fn assert() -> Symbol {
     let id = Identifier::from_str("assert").expect("valid id");
     Symbol::new_builtin(id, &|args, context| {
         if let Ok(arg) = args.get_single() {
             if !arg.value.try_bool()? {
-                context.error(arg.src_ref(), EvalError::AssertionFailed(format!("{arg}")))?;
+                context.error(arg, EvalError::AssertionFailed(format!("{arg}")))?;
             }
         } else {
             context.error(
-                args.src_ref(),
+                args,
                 EvalError::ArgumentCountMismatch {
                     args: args.clone(),
                     expected: 1,
