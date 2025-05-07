@@ -5,7 +5,7 @@ use crate::{eval::*, objects::*, syntax::*};
 
 impl ModuleInitDefinition {
     /// Evaluate a call to the module init definition
-    pub fn eval_to_node(
+    pub fn eval(
         &self,
         args: &ArgumentMap,
         object_builder: &mut ObjectBuilder,
@@ -15,9 +15,14 @@ impl ModuleInitDefinition {
             for statement in &self.body.statements {
                 match statement {
                     Statement::Assignment(assignment) => {
-                        let _id = &assignment.id;
-                        let _value = assignment.expression.eval(context)?;
-                        todo!();
+                        let id = &assignment.id;
+                        let value = assignment.expression.eval(context)?;
+
+                        // Only change the property value, do not add new properties
+                        if object_builder.has_property(id) {
+                            object_builder.set_property(id.clone(), value.clone());
+                        }
+                        context.set_local_value(id.clone(), value)?;
                     }
                     Statement::Expression(expression) => {
                         object_builder

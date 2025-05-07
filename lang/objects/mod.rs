@@ -13,7 +13,7 @@ pub use object::*;
 pub use transform::*;
 
 use crate::{
-    eval::ArgumentMap,
+    eval::*,
     rc::*,
     syntax::Identifier,
     value::{ParameterValueList, Value},
@@ -330,6 +330,26 @@ impl ObjectBuilder {
     pub fn set_property(&mut self, id: Identifier, value: Value) -> &mut Self {
         self.object.props.insert(id, value);
         self
+    }
+
+    /// Return true if the object has a property with `id`.
+    pub fn has_property(&mut self, id: &Identifier) -> bool {
+        self.object.props.contains_key(id)
+    }
+
+    /// Add all object properties to scope
+    pub fn properties_to_scope(&mut self, context: &mut Context) -> EvalResult<()> {
+        if self.object.props.all_initialized() {
+            for (id, value) in self.object.props.iter() {
+                context.set_local_value(id.clone(), value.clone())?;
+            }
+
+            Ok(())
+        } else {
+            Err(EvalError::UninitializedProperties(
+                self.object.props.get_ids_of_uninitialized(),
+            ))
+        }
     }
 
     /// Build the [ObjectNode].

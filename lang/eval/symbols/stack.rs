@@ -14,7 +14,10 @@ impl Stack {
         let id = if let Some(id) = id { id } else { symbol.id() };
         let name = symbol.full_name();
         match self.0.last_mut() {
-            Some(StackFrame::Source(_, last)) | Some(StackFrame::Body(last)) => {
+            Some(StackFrame::Source(_, last))
+            | Some(StackFrame::Body(last))
+            | Some(StackFrame::Module(_, last))
+            | Some(StackFrame::ModuleInit(last)) => {
                 let op = if last.insert(id.clone(), symbol).is_some() {
                     "Added"
                 } else {

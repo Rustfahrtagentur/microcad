@@ -40,13 +40,14 @@ impl ModuleDefinition {
         context.scope(
             StackFrame::Module(self.id.clone(), args.into()),
             |context| {
+                object_builder.init_properties(&self.parameters.eval(context)?, args);
+
                 // Create the object node from initializer if present
-                match init {
-                    Some(init) => init.eval_to_node(args, &mut object_builder, context)?,
-                    None => {
-                        object_builder.init_properties(&self.parameters.eval(context)?, args);
-                    }
-                };
+                if let Some(init) = init {
+                    init.eval(args, &mut object_builder, context)?;
+                }
+
+                object_builder.properties_to_scope(context)?;
 
                 // At this point, all properties must have a value
                 for statement in &self.body.statements {
@@ -55,7 +56,6 @@ impl ModuleDefinition {
                             let id = &assignment.id;
                             let value = assignment.expression.eval(context)?;
                             context.set_local_value(id.clone(), value.clone())?;
-                            object_builder.set_property(id.clone(), value);
                         }
                         Statement::Expression(expression) => {
                             let value = expression.eval(context)?;
@@ -98,7 +98,7 @@ impl ModuleDefinition {
                     }
                 }
                 Err(err) => {
-                    context.error(self, err)?;
+                    //context.error(self, err)?;
                 }
             },
         }
