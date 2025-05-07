@@ -1,18 +1,18 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Method call
+//! Method call syntax elements.
 
 use crate::{src_ref::*, syntax::*};
 
-/// Method call
+/// Method call syntax entity.
 #[derive(Clone, Debug)]
 pub struct MethodCall {
-    /// Name of the method
+    /// Name of the method.
     pub id: Identifier,
-    /// List of arguments
+    /// List of arguments.
     pub argument_list: CallArgumentList,
-    /// Source code reference
+    /// Source code reference.
     pub src_ref: SrcRef,
 }
 

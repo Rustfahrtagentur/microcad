@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Module body syntax element
+//! Module body syntax element.
 
 use crate::{eval::*, objects::*, resolve::*, src_ref::*, syntax::*, value::*};
 
@@ -26,14 +26,14 @@ use crate::{eval::*, objects::*, resolve::*, src_ref::*, syntax::*, value::*};
 /// ```
 #[derive(Clone, Debug, Default)]
 pub struct Body {
-    /// Module statements
+    /// Module statements.
     pub statements: Vec<Statement>,
-    /// Source code reference
+    /// Source code reference.
     pub src_ref: SrcRef,
 }
 
 impl Body {
-    /// fetches all symbols from a slice of statements
+    /// fetches all symbols from a slice of statements.
     pub fn fetch_symbol_map(statements: &[Statement], parent: Option<Symbol>) -> SymbolMap {
         let mut symbol_map = SymbolMap::default();
 
@@ -57,12 +57,12 @@ impl Body {
         symbol_map
     }
 
-    /// fetches all symbols from the statements in the body
+    /// fetches all symbols from the statements in the body.
     pub fn resolve(&self, parent: Option<Symbol>) -> SymbolMap {
         Self::fetch_symbol_map(&self.statements, parent)
     }
 
-    /// Evaluate a vector of statements
+    /// Evaluate a vector of statements.
     pub fn evaluate_vec(statements: &Vec<Statement>, context: &mut Context) -> EvalResult<Value> {
         for s in statements {
             s.eval(context)?;
@@ -70,7 +70,7 @@ impl Body {
         Ok(Value::None)
     }
 
-    /// Evaluate the statement of this body into an ObjectNode
+    /// Evaluate the statement of this body into an ObjectNode.
     pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ObjectNode> {
         context.open_body();
 

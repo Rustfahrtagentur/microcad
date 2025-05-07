@@ -1,19 +1,24 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Call argument value list evaluation entity
+//! *Call argument value list* evaluation entity.
 
 use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 
-/// List of call argument values
+/// Collection of *call argument values*.
 ///
-/// This class also provides methods to find a matching call
-/// between between the call argument value list and a given parameter list.
+/// [`CallArgumentValueList`] also provides methods to find a matching call
+/// between it and a given *parameter list*.
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
 
 impl CallArgumentValueList {
-    /// create an *call argument value list* which transports code to builtin in `impl Eval for Call``
+    /// Create a *call argument value list*.
+    ///
+    /// Transports code into builtin in `impl` [`Eval`] for [`Call`].
+    ///
+    /// **RULE**: Shall only be used for builtin symbols.
+    /// # Arguments
     pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
         let code = Refer {
             value: code,
@@ -33,7 +38,9 @@ impl CallArgumentValueList {
         })
     }
 
-    /// return a single argument
+    /// Return a single argument.
+    ///
+    /// Returns error if there is no or more than one argument available.
     pub fn get_single(&self) -> EvalResult<&CallArgumentValue> {
         if self.len() == 1 {
             if let Some(a) = self.0.first() {
@@ -50,7 +57,8 @@ impl CallArgumentValueList {
 
     /// Check for unexpected arguments.
     ///
-    /// This method will return an error if there is a call argument that is not in the parameter list
+    /// This method will return an error if there is a call argument that
+    /// is not in the parameter list.
     pub fn check_for_unexpected_arguments(
         &self,
         parameter_values: &ParameterValueList,
@@ -64,8 +72,9 @@ impl CallArgumentValueList {
         }
     }
 
-    /// This functions checks if the call arguments match the given parameter definitions
-    /// It returns a map of arguments that match the parameters
+    /// This functions checks if the call arguments match the given parameter definitions.
+    ///
+    /// Returns a map of arguments that match the parameters.
     pub fn get_matching_arguments(
         &self,
         context: &mut Context,
@@ -75,7 +84,7 @@ impl CallArgumentValueList {
         ArgumentMap::find_match(self, &parameters)
     }
 
-    /// Get multiplicity of matching arguments
+    /// Get multiplicity of matching arguments.
     pub fn get_multi_matching_arguments(
         &self,
         context: &mut Context,

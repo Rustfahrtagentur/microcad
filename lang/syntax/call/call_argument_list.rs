@@ -1,11 +1,11 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! List of CallArgument syntax entities
+//! List of call arguments syntax entities.
 
 use crate::{ord_map::*, src_ref::*, syntax::*};
 
-/// List of call arguments
+/// List (ordered map) of call arguments.
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentList(pub Refer<OrdMap<Identifier, CallArgument>>);
 
