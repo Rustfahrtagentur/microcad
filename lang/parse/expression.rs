@@ -2,11 +2,9 @@ use crate::{parse::*, parser::*, syntax::*};
 
 impl Parse for ExpressionList {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Ok(Self(
-            pair.inner()
-                .map(Expression::parse)
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+        pair.inner()
+            .map(Expression::parse)
+            .collect::<Result<Vec<_>, _>>()
     }
 }
 

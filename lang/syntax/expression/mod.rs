@@ -3,19 +3,20 @@
 
 //! µcad syntax elements related to expressions
 
-mod expression_list;
 mod list_expression;
 mod nested;
 mod nested_item;
 mod tuple_expression;
 
-pub use expression_list::*;
 pub use list_expression::*;
 pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
 
 use crate::{src_ref::*, syntax::*, value::*};
+
+/// List of expression
+pub type ExpressionList = Vec<Expression>;
 
 /// Expressions
 #[derive(Clone, Debug, Default)]
