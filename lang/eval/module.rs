@@ -98,7 +98,7 @@ impl ModuleDefinition {
                     }
                 }
                 Err(err) => {
-                    //context.error(self, err)?;
+                    context.error(self, err)?;
                 }
             },
         }
