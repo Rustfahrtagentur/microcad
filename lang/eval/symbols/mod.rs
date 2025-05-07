@@ -37,7 +37,7 @@ pub trait Lookup {
 ///
 /// Each one may have different items it stores (see [`StackFrame`]).
 pub trait Locals {
-    /// Don't use this function directly
+    /// Don't use this function directly.
     fn open(&mut self, frame: StackFrame);
 
     /// Open a new source scope with a new [local stack frame](StackFrame).
@@ -62,6 +62,16 @@ pub trait Locals {
             args,
             src_ref,
         })
+    }
+
+    /// Open module call.
+    fn open_module(&mut self, id: Identifier, symbols: SymbolMap) {
+        self.open(StackFrame::Module(id, symbols));
+    }
+
+    /// Open module init call.
+    fn open_module_init(&mut self, symbols: SymbolMap) {
+        self.open(StackFrame::ModuleInit(symbols));
     }
 
     /// Close scope (stack pop).

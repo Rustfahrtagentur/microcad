@@ -283,6 +283,7 @@ pub fn bake3d(
     Ok(node3d)
 }
 
+/// Object builder to build up object nodes.
 #[derive(Default)]
 pub struct ObjectBuilder {
     object: Object,
@@ -290,12 +291,14 @@ pub struct ObjectBuilder {
 }
 
 impl ObjectBuilder {
+    /// Make new [ObjectBuilder].
     pub fn new() -> Self {
         Self {
             ..Default::default()
         }
     }
 
+    /// Initialize the properties by parameters and arguments.
     pub fn init_properties(
         &mut self,
         parameters: &ParameterValueList,
@@ -323,11 +326,13 @@ impl ObjectBuilder {
         self
     }
 
+    /// Set property value for object.
     pub fn set_property(&mut self, id: Identifier, value: Value) -> &mut Self {
         self.object.props.insert(id, value);
         self
     }
 
+    /// Build the [ObjectNode].
     pub fn build_node(self) -> ObjectNode {
         let node = ObjectNode::new(ObjectNodeInner::Object(self.object));
         for child in self.children {

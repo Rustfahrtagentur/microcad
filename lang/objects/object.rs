@@ -32,6 +32,7 @@ impl ObjectProperties {
         self.0.get_mut(id)
     }
 
+    /// Insert property
     pub fn insert(&mut self, id: Identifier, value: Value) {
         self.0.insert(id, value);
     }
@@ -55,11 +56,8 @@ impl From<&SymbolMap> for ObjectProperties {
     fn from(symbol_map: &SymbolMap) -> Self {
         let mut props = ObjectProperties::default();
         for (id, symbol) in symbol_map.iter() {
-            match &symbol.borrow().def {
-                SymbolDefinition::Property(_, value) => {
-                    props.0.insert(id.clone(), value.clone());
-                }
-                _ => {}
+            if let SymbolDefinition::Property(_, value) = &symbol.borrow().def {
+                props.0.insert(id.clone(), value.clone());
             }
         }
         props

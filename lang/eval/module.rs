@@ -36,6 +36,7 @@ impl ModuleDefinition {
         context: &mut Context,
     ) -> EvalResult<ObjectNode> {
         let mut object_builder = ObjectBuilder::new();
+
         context.open_module(self.id.clone(), args.into());
 
         // Create the object node from initializer if present

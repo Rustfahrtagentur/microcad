@@ -6,6 +6,7 @@
 use crate::{eval::*, syntax::*, ty::*, value::*};
 
 impl Parameter {
+    /// Evaluate [Parameter] into [ParameterValue].
     pub fn eval(&self, context: &mut Context) -> EvalResult<ParameterValue> {
         match (&self.specified_type, &self.default_value) {
             // Type and value are specified
@@ -56,6 +57,7 @@ impl Parameter {
 }
 
 impl ParameterList {
+    /// Evaluate [ParameterList] into [ParameterValueList].
     pub fn eval(&self, context: &mut Context) -> EvalResult<ParameterValueList> {
         let mut values = ParameterValueList::default();
         for parameter in self.iter() {
