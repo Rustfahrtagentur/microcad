@@ -1,6 +1,0 @@
-Parser error:  --> 1:19
-  |
-1 | module double_box {
-  |                   ^---
-  |
-  = expected COMMENT or parameter_list

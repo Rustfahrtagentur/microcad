@@ -1,6 +1,0 @@
-Parser error:  --> 1:12
-  |
-1 | module box {
-  |            ^---
-  |
-  = expected COMMENT or parameter_list
