@@ -1,11 +1,14 @@
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::diag::*;
 
-/// We have a vec of source file diagnostics because we want to keep track of diagnostics for each source file separately
+/// Source file diagnostics.
 #[derive(Debug, Default)]
 pub struct DiagList(Vec<Diagnostic>);
 
 impl DiagList {
-    /// Pretty print this list of diagnostics
+    /// Pretty print this list of diagnostics.
     pub fn pretty_print(
         &self,
         f: &mut dyn std::fmt::Write,

@@ -1,15 +1,18 @@
-/// The level of the diagnostic
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+/// The level of the diagnostic.
 ///
-/// Levels have a priority in order
+/// Levels have a priority in order.
 #[derive(Debug, Clone)]
 pub enum Level {
-    /// Trace message (highest diagnosis level)
+    /// Trace message (highest diagnosis level).
     Trace,
-    /// Informative message
+    /// Informative message.
     Info,
-    /// Warning
+    /// Warning message.
     Warning,
-    /// Error (lowest diagnosis level)
+    /// Error (lowest diagnosis level).
     Error,
 }
 

@@ -1,47 +1,25 @@
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{diag::*, eval::*};
 
-/// Diagnosis trait gives access about collected errors
-pub trait Diag {
-    /// Pretty print all errors
-    fn fmt_diagnosis(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result;
-
-    /// Pretty write all errors into a file
-    fn write_diagnosis(&self, w: &mut dyn std::io::Write) -> std::io::Result<()> {
-        write!(w, "{}", self.diagnosis())
-    }
-
-    /// Get pretty printed errors as string
-    fn diagnosis(&self) -> String {
-        let mut str = String::new();
-        self.fmt_diagnosis(&mut str).expect("displayable diagnosis");
-        str
-    }
-
-    /// Returns true if there are errors
-    fn has_errors(&self) -> bool {
-        self.error_count() > 0
-    }
-
-    /// Return number of occurred errors
-    fn error_count(&self) -> u32;
-}
-
-/// Handler for diagnostics
+/// Handler for diagnostics.
 #[derive(Default)]
 pub struct DiagHandler {
-    /// The list of diagnostics
+    /// The list of diagnostics per source file.
     diag_list: DiagList,
-    /// The current number of errors in the evaluation process
+    /// The current number of overall errors in the evaluation process.
     error_count: u32,
-    /// The maximum number of errors. `0` means unlimited number of errors.
+    /// The maximum number of collected errors until abort
+    /// (`0` means unlimited number of errors).
     error_limit: u32,
-    /// Treat warnings as errors
+    /// Treat warnings as errors if `true`.
     warnings_as_errors: bool,
 }
 
-/// Handler for diagnostics
+/// Handler for diagnostics.
 impl DiagHandler {
-    /// Pretty print all errors
+    /// Pretty print all errors of all files.
     pub fn pretty_print(
         &self,
         f: &mut dyn std::fmt::Write,
@@ -50,7 +28,7 @@ impl DiagHandler {
         self.diag_list.pretty_print(f, source_by_hash)
     }
 
-    /// Return number of occurred errors
+    /// Return overall number of occurred errors.
     pub fn error_count(&self) -> u32 {
         self.error_count
     }
