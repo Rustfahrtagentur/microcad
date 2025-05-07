@@ -79,6 +79,7 @@ impl TryFrom<Type> for MapKeyType {
 fn list_type() {
     use crate::parser::{Parser, Rule};
     use crate::ty::Ty;
+
     let type_annotation =
         Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[Int]", 0).expect("test error");
     assert_eq!(type_annotation.ty().to_string(), "[Int]");

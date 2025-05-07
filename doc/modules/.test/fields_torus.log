@@ -1,8 +1,9 @@
-error: Symbol torus not found.
-  ---> <from_str>:13:5
+error: Value Error: Missing arguments: radius
+
+  ---> <from_str>:2:1
      |
-  13 | t = torus(1cm);
-     |     ^^^^^^^^^^
+   2 | module torus(radius: length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Symbol info not found.
   ---> <from_str>:16:1

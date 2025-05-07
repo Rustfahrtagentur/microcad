@@ -3,7 +3,7 @@
 
 //! Use statement syntax element
 
-use crate::{resolve::*, src_ref::*, syntax::*, Id};
+use crate::{resolve::*, src_ref::*, syntax::*};
 use strum::IntoStaticStr;
 
 /// Use declaration
@@ -29,27 +29,22 @@ pub enum UseDeclaration {
 
 impl UseDeclaration {
     /// resolve public use declaration (shall not be called with private use statements)
-    pub fn resolve(&self, parent: Option<SymbolNodeRcMut>) -> (Id, SymbolNodeRcMut) {
+    pub fn resolve(&self, parent: Option<Symbol>) -> (Identifier, Symbol) {
         match self {
             UseDeclaration::Use(name) => {
                 let identifier = name.last().expect("Identifier");
                 (
-                    identifier.id().clone(),
-                    SymbolNodeRcMut::new(SymbolNode {
-                        def: SymbolDefinition::Alias(identifier.clone(), name.clone()),
+                    identifier.clone(),
+                    Symbol::new(
+                        SymbolDefinition::Alias(identifier.clone(), name.clone()),
                         parent,
-                        children: Default::default(),
-                    }),
+                    ),
                 )
             }
             UseDeclaration::UseAll(_name) => todo!(),
             UseDeclaration::UseAlias(name, alias) => (
-                alias.id().clone(),
-                SymbolNodeRcMut::new(SymbolNode {
-                    def: SymbolDefinition::Alias(alias.clone(), name.clone()),
-                    parent,
-                    children: Default::default(),
-                }),
+                alias.clone(),
+                Symbol::new(SymbolDefinition::Alias(alias.clone(), name.clone()), parent),
             ),
         }
     }
@@ -60,7 +55,7 @@ impl SrcReferrer for UseDeclaration {
         match self {
             Self::Use(name) => name.src_ref(),
             Self::UseAll(name) => name.src_ref(),
-            Self::UseAlias(name, alias) => SrcRef::merge(name.src_ref(), alias.src_ref()),
+            Self::UseAlias(name, alias) => SrcRef::merge(name, alias),
         }
     }
 }

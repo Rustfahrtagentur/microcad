@@ -2,11 +2,9 @@ use crate::{parse::*, parser::*, syntax::*};
 
 impl Parse for ExpressionList {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Ok(Self(
-            pair.inner()
-                .map(Expression::parse)
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+        pair.inner()
+            .map(Expression::parse)
+            .collect::<Result<Vec<_>, _>>()
     }
 }
 
@@ -217,7 +215,7 @@ impl Parse for TupleExpression {
         // Count number of positional and named arguments
         let named_count: usize = call_argument_list
             .iter()
-            .map(|c| if c.name.is_some() { 1 } else { 0 })
+            .map(|c| if c.id.is_some() { 1 } else { 0 })
             .sum();
 
         if named_count > 0 && named_count < call_argument_list.len() {

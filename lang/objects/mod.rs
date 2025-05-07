@@ -12,7 +12,12 @@ pub use algorithm::*;
 pub use object::*;
 pub use transform::*;
 
-use crate::{Id, rc::*, value::Value};
+use crate::{
+    eval::*,
+    rc::*,
+    syntax::Identifier,
+    value::{ParameterValueList, Value},
+};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -46,7 +51,7 @@ impl ObjectNodeInner {
     /// Get a property from an object node
     ///
     /// Only object nodes can have properties.
-    pub fn get_property_value(&self, id: &Id) -> Option<&Value> {
+    pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
         match self {
             Self::Object(object) => object.get_property_value(id),
             _ => None,
@@ -116,9 +121,9 @@ fn find_children_marker(node: &ObjectNode) -> Option<ObjectNode> {
 /// Nest a Vec of node multiplicities
 ///
 /// * `node_stack`: A list of node lists.
-/// 
+///
 /// The reference to the first stack element will be returned.
-/// 
+///
 /// Assume, our node stack `Vec<Vec<Node>>` has for lists `a`, `b`, `c`, `d`:
 /// ```
 /// let nodes = vec![
@@ -151,27 +156,31 @@ pub fn nest_nodes(node_stack: &[Vec<ObjectNode>]) -> &Vec<ObjectNode> {
         0 => panic!("Node stack must not be empty"),
         1 => {}
         n => {
-            (1..n).rev().map(|i| (&node_stack[i], &node_stack[i-1])).for_each(|(prev_list, next_list)| {
-                // Insert a copy of each element `node` from `prev_list` as child to each element `new_parent` in `next_list`
-                next_list.iter().for_each(|new_parent_node| {
-                    prev_list.iter().for_each(|node| {
-                        node.detach();
+            (1..n)
+                .rev()
+                .map(|i| (&node_stack[i], &node_stack[i - 1]))
+                .for_each(|(prev_list, next_list)| {
+                    // Insert a copy of each element `node` from `prev_list` as child to each element `new_parent` in `next_list`
+                    next_list.iter().for_each(|new_parent_node| {
+                        prev_list.iter().for_each(|node| {
+                            node.detach();
 
-                        // Handle children marker.
-                        // If we have found a children marker node, use it's parent as new parent node.
-                        let new_parent_node = match find_children_marker(new_parent_node) {
-                            Some(children_marker) => {
-                                let parent = children_marker.parent().expect("Must have a parent");
-                                children_marker.detach(); // Remove children marker from tree
-                                parent
-                            }
-                            None => new_parent_node.clone(),
-                        };
+                            // Handle children marker.
+                            // If we have found a children marker node, use it's parent as new parent node.
+                            let new_parent_node = match find_children_marker(new_parent_node) {
+                                Some(children_marker) => {
+                                    let parent =
+                                        children_marker.parent().expect("Must have a parent");
+                                    children_marker.detach(); // Remove children marker from tree
+                                    parent
+                                }
+                                None => new_parent_node.clone(),
+                            };
 
-                        new_parent_node.append(node.make_deep_copy());
+                            new_parent_node.append(node.make_deep_copy());
+                        });
                     });
                 });
-            });
         }
     }
 
@@ -274,11 +283,90 @@ pub fn bake3d(
     Ok(node3d)
 }
 
+/// Object builder to build up object nodes.
+#[derive(Default)]
+pub struct ObjectBuilder {
+    object: Object,
+    children: Vec<ObjectNode>,
+}
+
+impl ObjectBuilder {
+    /// Make new [ObjectBuilder].
+    pub fn new() -> Self {
+        Self {
+            ..Default::default()
+        }
+    }
+
+    /// Initialize the properties by parameters and arguments.
+    pub fn init_properties(
+        &mut self,
+        parameters: &ParameterValueList,
+        arguments: &ArgumentMap,
+    ) -> &mut Self {
+        let mut props = ObjectProperties::default();
+
+        for parameter in parameters.iter() {
+            props.insert(
+                parameter.id.clone(),
+                match &parameter.default_value {
+                    Some(value) => value.clone(),
+                    None => arguments.get(&parameter.id).unwrap_or(&Value::None).clone(),
+                },
+            );
+        }
+
+        self.object.props = props;
+        self
+    }
+
+    /// Append child nodes to this object node.
+    pub fn append_children(&mut self, nodes: &mut Vec<ObjectNode>) -> &mut Self {
+        self.children.append(nodes);
+        self
+    }
+
+    /// Set property value for object.
+    pub fn set_property(&mut self, id: Identifier, value: Value) -> &mut Self {
+        self.object.props.insert(id, value);
+        self
+    }
+
+    /// Return true if the object has a property with `id`.
+    pub fn has_property(&mut self, id: &Identifier) -> bool {
+        self.object.props.contains_key(id)
+    }
+
+    /// Add all object properties to scope
+    pub fn properties_to_scope(&mut self, context: &mut Context) -> EvalResult<()> {
+        if self.object.props.all_initialized() {
+            for (id, value) in self.object.props.iter() {
+                context.set_local_value(id.clone(), value.clone())?;
+            }
+
+            Ok(())
+        } else {
+            Err(EvalError::UninitializedProperties(
+                self.object.props.get_ids_of_uninitialized(),
+            ))
+        }
+    }
+
+    /// Build the [ObjectNode].
+    pub fn build_node(self) -> ObjectNode {
+        let node = ObjectNode::new(ObjectNodeInner::Object(self.object));
+        for child in self.children {
+            node.append(child);
+        }
+        node
+    }
+}
+
 #[test]
 fn node_nest() {
     fn obj(name: &str) -> ObjectNode {
         object(Object {
-            name: name.into(),
+            id: name.into(),
             ..Default::default()
         })
     }
@@ -312,11 +400,11 @@ fn node_nest() {
 
     for node in nodes {
         node.descendants().for_each(|n| {
-            println!(
+            log::trace!(
                 "{}{}",
                 "  ".repeat(n.depth()),
                 match *n.borrow() {
-                    ObjectNodeInner::Object(ref obj) => obj.name.clone(),
+                    ObjectNodeInner::Object(ref obj) => obj.id.clone(),
                     _ => panic!("Object with name expected"),
                 }
             )

@@ -13,6 +13,9 @@ hull()
 [![test](.test/hull_multiple.png)](.test/hull_multiple.log)
 
 ```µcad,hull_multiple#todo
+use std::geo2d::*;
+use std::algorithm::*;
+
 hull() {
     union() {
         translate(x = [-10, 10]mm, y = [-10, 10]mm)

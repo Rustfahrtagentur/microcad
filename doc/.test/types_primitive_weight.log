@@ -1,6 +1,0 @@
-error: Symbol std::assert not found.
-  ---> <from_str>:5:1
-     |
-   5 | std::assert(gram == 1.0kg);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |

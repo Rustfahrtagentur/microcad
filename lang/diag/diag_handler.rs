@@ -1,57 +1,47 @@
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{diag::*, eval::*};
 
-/// Handler for diagnostics
+/// Handler for diagnostics.
 #[derive(Default)]
 pub struct DiagHandler {
-    /// The list of diagnostics
+    /// The list of diagnostics per source file.
     diag_list: DiagList,
-    /// The current number of errors in the evaluation process
-    pub error_count: u32,
-    /// The maximum number of errors. `0` means unlimited number of errors.
+    /// The current number of overall errors in the evaluation process.
+    error_count: u32,
+    /// The maximum number of collected errors until abort
+    /// (`0` means unlimited number of errors).
     error_limit: u32,
-    /// Treat warnings as errors
+    /// Treat warnings as errors if `true`.
     warnings_as_errors: bool,
 }
 
-/// Handler for diagnostics
+/// Handler for diagnostics.
 impl DiagHandler {
-    /// Pretty print all errors
+    /// Pretty print all errors of all files.
     pub fn pretty_print(
         &self,
-        w: &mut dyn std::io::Write,
+        f: &mut dyn std::fmt::Write,
         source_by_hash: &impl GetSourceByHash,
-    ) -> std::io::Result<()> {
-        self.diag_list.pretty_print(w, source_by_hash)
+    ) -> std::fmt::Result {
+        self.diag_list.pretty_print(f, source_by_hash)
     }
 
-    /// Pretty print all errors into a string
-    pub fn pretty_print_to_string(
-        &self,
-        source_by_hash: &impl GetSourceByHash,
-    ) -> std::io::Result<String> {
-        let mut s = Vec::new();
-        let mut w = std::io::BufWriter::new(&mut s);
-        self.diag_list.pretty_print(&mut w, source_by_hash)?;
-        let w = w
-            .into_inner()
-            .expect("write error while pretty printing errors");
-        Ok(String::from_utf8(w.to_vec()).expect("UTF-8 error while pretty printing errors"))
-    }
-
-    /// Returns true if there are errors
-    pub fn has_errors(&self) -> bool {
-        self.error_count > 0
+    /// Return overall number of occurred errors.
+    pub fn error_count(&self) -> u32 {
+        self.error_count
     }
 }
 
 impl PushDiag for DiagHandler {
-    fn push_diag(&mut self, diag: super::Diag) -> crate::eval::EvalResult<()> {
-        use super::Diag;
+    fn push_diag(&mut self, diag: super::Diagnostic) -> crate::eval::EvalResult<()> {
+        use super::Diagnostic;
         match &diag {
-            Diag::Error(_) => {
+            Diagnostic::Error(_) => {
                 self.error_count += 1;
             }
-            Diag::Warning(_) => {
+            Diagnostic::Warning(_) => {
                 if self.warnings_as_errors {
                     self.error_count += 1;
                 }

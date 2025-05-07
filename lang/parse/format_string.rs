@@ -34,7 +34,9 @@ impl Parse for FormatString {
         let mut fs = Self::default();
         for pair in pair.inner() {
             match pair.as_rule() {
-                Rule::string_literal_inner => fs.push_string(pair.as_span().as_str().to_string()),
+                Rule::string_literal_inner => {
+                    fs.push_string(pair.as_span().as_str().to_string(), pair.into())
+                }
                 Rule::format_expression => fs.push_format_expr(FormatExpression::parse(pair)?),
                 _ => unreachable!(),
             }

@@ -18,7 +18,7 @@
 //! let source_file = SourceFile::load_from_str(r#"std::print("hello world!");"#).expect("parsing success");
 //! ```
 //!
-//! To "run" the source file (and get the expected output) it must now be resolved and evaluated (see [crate::resolve] and [crate::eval])  .
+//! To "run" the source file (and get the expected output) it must now be resolved and evaluated (see [`crate::resolve`] and [`crate::eval`])  .
 
 mod body;
 mod call;

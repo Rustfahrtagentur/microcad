@@ -45,6 +45,8 @@ pub fn generate(
 
 #[test]
 fn test_comment() {
+    env_logger::init();
+
     let test = r#"//`test`: ok # Test"#;
     let test = test.parse::<PestTest>().unwrap();
     assert_eq!(test.source, "test");
@@ -53,6 +55,8 @@ fn test_comment() {
 
 #[test]
 fn parse_pest_file() {
+    env_logger::init();
+
     let test = r#"
             //`test1`: ok # Ok Test
             //`test2`: error # Error Test

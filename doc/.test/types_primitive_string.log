@@ -1,8 +1,14 @@
-error: Symbol std::assert not found.
-  ---> <from_str>:2:1
+error: Not implemented: cannot evaluate method call of count(11) at <from_str>:2:24
+  ---> <from_str>:2:24
      |
-   2 | std::assert(text.count(11));
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   2 | std::debug::assert(text.count(11));
+     |                        ^^^^^^^^^^
+     |
+error: Assertion failed: <invalid>
+  ---> <from_str>:2:20
+     |
+   2 | std::debug::assert(text.count(11));
+     |                    ^^^^^^^^^^^^^^
      |
 error: Symbol std::info not found.
   ---> <from_str>:5:1

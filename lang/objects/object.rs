@@ -3,50 +3,55 @@
 
 //! Object an object tree
 
-use std::collections::BTreeMap;
-
-use crate::{eval::*, syntax::*, value::*, Id};
+use crate::{
+    resolve::{SymbolDefinition, SymbolMap},
+    syntax::*,
+    value::*,
+};
 
 /// A list of values sorted by id
 ///
 /// It is required that properties are always sorted by their id.
 #[derive(Clone, Default, Debug)]
-pub struct ObjectProperties(BTreeMap<Id, Value>);
+pub struct ObjectProperties(std::collections::HashMap<Identifier, Value>);
+
+impl std::ops::Deref for ObjectProperties {
+    type Target = std::collections::HashMap<Identifier, Value>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for ObjectProperties {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
 
 impl ObjectProperties {
-    /// Create initial property list by evaluating parameter list
-    pub fn from_parameter_list(
-        parameter_list: &ParameterList,
-        context: &mut EvalContext,
-    ) -> EvalResult<Self> {
-        let mut props = BTreeMap::new();
-        for parameter in parameter_list.iter() {
-            props.insert(
-                parameter.name.id().clone(),
-                parameter.eval_default_value(context)?,
-            );
-        }
-
-        Ok(Self(props))
-    }
-
     /// Test if each property has a value
     pub fn all_initialized(&self) -> bool {
         self.0.iter().all(|(_, value)| !value.is_invalid())
     }
 
     /// Get value at id
-    pub fn get_value(&self, id: &Id) -> Option<&Value> {
+    pub fn get_value(&self, id: &Identifier) -> Option<&Value> {
         self.0.get(id)
     }
 
     /// Get mutable value at id
-    pub fn get_value_mut(&mut self, id: &Id) -> Option<&mut Value> {
+    pub fn get_value_mut(&mut self, id: &Identifier) -> Option<&mut Value> {
         self.0.get_mut(id)
     }
 
+    /// Insert property
+    pub fn insert(&mut self, id: Identifier, value: Value) {
+        self.0.insert(id, value);
+    }
+
     /// Get all ids where `value == Value::None`
-    pub fn get_ids_of_uninitialized(&self) -> Vec<Id> {
+    pub fn get_ids_of_uninitialized(&self) -> Vec<Identifier> {
         self.0
             .iter()
             .filter_map(|(id, value)| {
@@ -58,20 +63,17 @@ impl ObjectProperties {
             })
             .collect()
     }
+}
 
-    /// If the propery with `id` exists, assign the new value and add as local value to the context
-    pub fn assign_and_add_local_value(
-        &mut self,
-        id: &Id,
-        value: Value,
-        context: &mut EvalContext,
-    ) {
-        if let Some(prop_value) = self.get_value_mut(id) {
-            *prop_value = value.clone();
+impl From<&SymbolMap> for ObjectProperties {
+    fn from(symbol_map: &SymbolMap) -> Self {
+        let mut props = ObjectProperties::default();
+        for (id, symbol) in symbol_map.iter() {
+            if let SymbolDefinition::Property(_, value) = &symbol.borrow().def {
+                props.0.insert(id.clone(), value.clone());
+            }
         }
-
-        // The result of the assignment becomes a local value, too
-        context.add_local_value(id.clone(), value);
+        props
     }
 }
 
@@ -79,7 +81,7 @@ impl ObjectProperties {
 #[derive(Clone, Default, Debug)]
 pub struct Object {
     /// Name of the object
-    pub name: Id,
+    pub id: Identifier,
 
     /// Properties
     pub props: ObjectProperties,
@@ -87,7 +89,18 @@ pub struct Object {
 
 impl Object {
     /// Get object property value
-    pub fn get_property_value(&self, id: &Id) -> Option<&Value> {
+    pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
         self.props.get_value(id)
+    }
+}
+
+impl std::fmt::Display for Object {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "{}:", self.id)?;
+        for (id, value) in self.props.iter() {
+            writeln!(f, "\t{id} = {value}")?;
+        }
+
+        Ok(())
     }
 }

@@ -6,7 +6,6 @@
 #[macro_use]
 mod call_argument_value;
 mod call_argument;
-mod call_argument_list;
 mod call_argument_value_list;
 mod call_trait;
 
@@ -14,23 +13,71 @@ pub use call_argument_value::*;
 pub use call_argument_value_list::*;
 pub use call_trait::*;
 
-use crate::{eval::*, syntax::*, Id};
+use crate::{eval::*, syntax::*};
 
 use thiserror::Error;
 
-impl Eval for Call {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        match context.lookup(&self.name) {
-            Ok(symbol) => match &symbol.borrow().def {
-                SymbolDefinition::BuiltinFunction(f) => f.call(&self.argument_list, context),
-                SymbolDefinition::Module(m) => m.eval_call(&self.argument_list, context),
-                symbol => todo!("cannot evaluate {} at {}", symbol, context.locate(self)?),
-            },
-            Err(err) => {
-                context.error(self.src_ref(), err)?;
-                Ok(Value::None)
-            }
+impl CallArgumentList {
+    /// Create a `CallArgumentValueList` from a `CallArgumentList`
+    pub fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
+        let mut v = CallArgumentValueList::default();
+        for call_arg in self.iter() {
+            v.push(call_arg.eval_value(context)?)
+                .expect("Could not insert call argument value");
         }
+        Ok(v)
+    }
+}
+
+impl Eval for Call {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        // find self in symbol table by own name
+        let symbol = match context.lookup(&self.name) {
+            Ok(symbol) => symbol,
+            Err(err) => {
+                context.error(self, err)?;
+                return Ok(Value::None);
+            }
+        };
+
+        // evaluate arguments
+        let args = match self.argument_list.eval(context) {
+            Ok(args) => args,
+            Err(err) => {
+                // builtin functions get their argument list as string if it can't be evaluated
+                if let SymbolDefinition::Builtin(_) = &symbol.borrow().def {
+                    CallArgumentValueList::from_code(
+                        context.source_code(&self.argument_list)?,
+                        &self.argument_list,
+                    )
+                } else {
+                    return Err(err);
+                }
+            }
+        };
+
+        context.scope(
+            StackFrame::Call {
+                symbol: symbol.clone(),
+                args: args.clone(),
+                src_ref: self.src_ref(),
+            },
+            |context| match &symbol.borrow().def {
+                SymbolDefinition::Builtin(f) => f.call(&args, context),
+                SymbolDefinition::Module(m) => m.eval_call(&args, context),
+                _ => {
+                    context.error(
+                        self,
+                        EvalError::Todo(format!(
+                            "cannot evaluate call of {} at {}",
+                            self,
+                            context.locate(self)?
+                        )),
+                    )?;
+                    Ok(Value::None)
+                }
+            },
+        )
     }
 }
 
@@ -39,14 +86,14 @@ impl Eval for Call {
 pub enum MatchError {
     /// Duplicated argument
     #[error("Duplicated argument: {0}")]
-    DuplicatedArgument(Id),
+    DuplicatedArgument(Identifier),
     /// Occurs when a parameter was given in a call but not in the definition
     #[error("Parameter `{0}` is not defined.")]
-    ParameterNotDefined(Id),
+    ParameterNotDefined(Identifier),
     /// Mismatching type
     #[error("Type mismatch for parameter `{0}`: expected `{1}`, got {2}")]
-    PositionalArgumentTypeMismatch(Id, Type, Type),
+    PositionalArgumentTypeMismatch(Identifier, Type, Type),
     /// Parameter required by definition but given in the call
     #[error("Missing parameter: {0}")]
-    MissingParameter(Id),
+    MissingParameter(Identifier),
 }

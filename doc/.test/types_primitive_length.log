@@ -1,6 +1,12 @@
-error: Symbol std::assert not found.
-  ---> <from_str>:6:1
+error: Not implemented: cannot evaluate method call of equal() at <from_str>:6:63
+  ---> <from_str>:6:63
      |
-   6 | std::assert( [millimeters, centimeters, meters, inches].equal() );
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   6 | std::debug::assert( [millimeters, centimeters, meters, inches].equal() );
+     |                                                               ^^^^^^^^
+     |
+error: Assertion failed: <invalid>
+  ---> <from_str>:6:21
+     |
+   6 | std::debug::assert( [millimeters, centimeters, meters, inches].equal() );
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |

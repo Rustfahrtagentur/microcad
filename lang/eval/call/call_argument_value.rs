@@ -3,22 +3,22 @@
 
 //! Call argument value evaluation entity
 
-use crate::{Id, ord_map::*, src_ref::*, value::*};
+use crate::{ord_map::*, src_ref::*, syntax::*, value::*};
 
 /// Call argument value
 #[derive(Clone, Debug)]
 pub struct CallArgumentValue {
     /// Argument name
-    pub name: Option<Id>,
+    pub id: Option<Identifier>,
     /// Argument value
     pub value: Value,
     /// Source code reference
     src_ref: SrcRef,
 }
 
-impl OrdMapValue<Id> for CallArgumentValue {
-    fn key(&self) -> Option<Id> {
-        self.name.clone()
+impl OrdMapValue<Identifier> for CallArgumentValue {
+    fn key(&self) -> Option<Identifier> {
+        self.id.clone()
     }
 }
 
@@ -28,14 +28,19 @@ impl SrcReferrer for CallArgumentValue {
     }
 }
 
+impl std::fmt::Display for CallArgumentValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.id {
+            Some(ref id) => write!(f, "{} = {}", id, self.value),
+            None => write!(f, "{}", self.value),
+        }
+    }
+}
+
 impl CallArgumentValue {
     /// Create new call argument value
-    pub fn new(name: Option<Id>, value: Value, src_ref: SrcRef) -> Self {
-        Self {
-            name,
-            value,
-            src_ref,
-        }
+    pub fn new(id: Option<Identifier>, value: Value, src_ref: SrcRef) -> Self {
+        Self { id, value, src_ref }
     }
 }
 

@@ -5,7 +5,7 @@
 
 mod parameter_list;
 
-use crate::{diag::PushDiag, eval::{EvalContext, EvalError}, ord_map::*, src_ref::*, syntax::*, ty::*, value::Value};
+use crate::{diag::*, eval::*, ord_map::*, src_ref::*, syntax::*, ty::*, value::*};
 
 pub use parameter_list::*;
 
@@ -13,7 +13,7 @@ pub use parameter_list::*;
 #[derive(Clone, Debug, Default)]
 pub struct Parameter {
     /// Name of the parameter
-    pub name: Identifier,
+    pub id: Identifier,
     /// Type of the parameter or `None`
     pub specified_type: Option<TypeAnnotation>,
     /// default value of the parameter or `None`
@@ -25,40 +25,55 @@ pub struct Parameter {
 impl Parameter {
     /// Create new parameter
     pub fn new(
-        name: Identifier,
+        id: Identifier,
         specified_type: Option<TypeAnnotation>,
         default_value: Option<Expression>,
         src_ref: SrcRef,
     ) -> Self {
         Self {
-            name,
+            id,
             specified_type,
             default_value,
             src_ref,
         }
     }
 
+    /// Create a new parameter without any SrcRef's
+    pub fn no_ref(id: &str, ty: Type) -> Self {
+        Self {
+            id: Identifier::no_ref(id),
+            specified_type: Some(TypeAnnotation(Refer::none(ty))),
+            default_value: None,
+            src_ref: SrcRef(None)
+        }
+    }
+
     /// Evaluate default value considering specified type
-    /// 
-    /// If there is no default value, returns `Value::None` without raising an error. 
-    pub fn eval_default_value(&self, context: &mut EvalContext) -> crate::eval::EvalResult<Value>  {
+    ///
+    /// If there is no default value, returns `Value::None` without raising an error.
+    pub fn eval_default_value(&self, context: &mut Context) -> crate::eval::EvalResult<Value> {
         use crate::eval::Eval;
 
         match (&self.specified_type, &self.default_value) {
             (Some(specified_type), Some(default_value)) => {
                 let value = default_value.eval(context)?;
                 if specified_type.ty() != value.ty() {
-                    context.error(self.src_ref.clone(), EvalError::ParameterTypeMismatch { name: self.name.clone(), expected: specified_type.ty(), found: value.ty() })?;
+                    context.error(
+                        self.src_ref.clone(),
+                        EvalError::ParameterTypeMismatch {
+                            id: self.id.clone(),
+                            expected: specified_type.ty(),
+                            found: value.ty(),
+                        },
+                    )?;
                     Ok(Value::None)
                 } else {
                     Ok(value)
                 }
             }
             (None, Some(default_value)) => Ok(default_value.eval(context)?),
-            _ => Ok(Value::None)
+            _ => Ok(Value::None),
         }
-
-
     }
 }
 
@@ -70,16 +85,16 @@ impl SrcReferrer for Parameter {
 
 impl OrdMapValue<Identifier> for Parameter {
     fn key(&self) -> Option<Identifier> {
-        Some(self.name.clone())
+        Some(self.id.clone())
     }
 }
 
 impl std::fmt::Display for Parameter {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match (&self.specified_type, &self.default_value) {
-            (Some(t), Some(v)) => write!(f, "{}: {t} = {v}", self.name),
-            (Some(t), None) => write!(f, "{}: {t}", self.name),
-            (None, Some(v)) => write!(f, "{} = {v}", self.name),
+            (Some(t), Some(v)) => write!(f, "{}: {t} = {v}", self.id),
+            (Some(t), None) => write!(f, "{}: {t}", self.id),
+            (None, Some(v)) => write!(f, "{} = {v}", self.id),
             _ => Ok(()),
         }
     }
@@ -91,17 +106,17 @@ impl PrintSyntax for Parameter {
             (Some(specified_type), Some(default_value)) => writeln!(
                 f,
                 "{:depth$}Parameter: '{}: {} = {}'",
-                "", self.name, specified_type, default_value
+                "", self.id, specified_type, default_value
             ),
             (Some(specified_type), None) => writeln!(
                 f,
                 "{:depth$}Parameter: '{}: {}'",
-                "", self.name, specified_type
+                "", self.id, specified_type
             ),
             (None, Some(default_value)) => writeln!(
                 f,
                 "{:depth$}Parameter: '{} = {}'",
-                "", self.name, default_value
+                "", self.id, default_value
             ),
             _ => unreachable!("impossible parameter declaration"),
         }

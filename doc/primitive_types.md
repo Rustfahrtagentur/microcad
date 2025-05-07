@@ -34,7 +34,7 @@ centimeters = 100cm;
 meters = 1m;
 inches = 39.37007874015748in;
 
-std::assert( [millimeters, centimeters, meters, inches].equal() );
+std::debug::assert( [millimeters, centimeters, meters, inches].equal() );
 ```
 
 ## Angle
@@ -51,7 +51,7 @@ degree_ = 180deg;
 grad = 200grad;
 turn = 0.5turn;
 
-std::assert( [degree, degree_, grad, turn, radian].equal() );
+std::debug::assert( [degree, degree_, grad, turn, radian].equal() );
 ```
 
 ## Area
@@ -64,8 +64,8 @@ square_centimeter = 1000cm²;
 square_meter = 0.1m²;
 square_inch = 155in²;
 
-std::assert(square_millimeter == 0.1m²);
-std::assert(square_centimeter == 0.1m²);
+std::debug::assert(square_millimeter == 0.1m²);
+std::debug::assert(square_centimeter == 0.1m²);
 ```
 
 ## Volume
@@ -81,11 +81,11 @@ liter = 1.0l;
 centiliter = 100.0cl;
 milliliter = 1000.0ml;
 
-std::assert(cubic_millimeter == 1.0l);
-std::assert(cubic_centimeter == 1.0l);
-std::assert(cubic_meter == 1.0l);
-std::assert(centiliter == 1.0l);
-std::assert(milliliter == 1.0l);
+std::debug::assert(cubic_millimeter == 1.0l);
+std::debug::assert(cubic_centimeter == 1.0l);
+std::debug::assert(cubic_meter == 1.0l);
+std::debug::assert(centiliter == 1.0l);
+std::debug::assert(milliliter == 1.0l);
 ```
 
 ## String
@@ -96,7 +96,7 @@ Text can be used to logging or to render text.
 
 ```µcad,types_primitive_string#todo
 text = "Hello µcad!";
-std::assert(text.count(11));
+std::debug::assert(text.count(11));
 
 // logging
 std::info(text);
@@ -117,8 +117,8 @@ rgb_double_hex = #00FF00;
 rgba_single_hex = #FFFF;
 rgba_double_hex = #00FF00FF;
 
-std::assert( rgb_single_hex == rgba_single_hex );
-std::assert( rgb_double_hex == rgba_double_hex );
+std::debug::assert( rgb_single_hex == rgba_single_hex );
+std::debug::assert( rgb_double_hex == rgba_double_hex );
 ```
 
 Illegal values for color:
@@ -140,7 +140,7 @@ gram = 1000.0g;
 kilogram = 1.0kg;
 pound = 2.204623lb;
 
-std::assert(gram == 1.0kg);
+std::debug::assert(gram == 1.0kg);
 ```
 
 ### Vec2
@@ -174,5 +174,5 @@ Boolean is the result type of boolean expressions which may just be `true` or `f
 [![test](.test/types_primitive_bool.png)](.test/types_primitive_bool.log)
 
 ```µcad,types_primitive_bool
-std::assert( true != false );
+std::debug::assert( true != false );
 ```

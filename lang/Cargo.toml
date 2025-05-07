@@ -28,6 +28,9 @@ thiserror = "2.0"
 env_logger = "0.11"
 strum = { version = "0.27", features = ["derive"] }
 scan_dir = "0.3"
+delegate = "0.13"
+pathdiff = "0.2"
+ctor = "0.4"
 
 microcad-core = { workspace = true }
 custom_debug = "0.6.2"

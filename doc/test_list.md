@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**73** tests from markdown.
+**75** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -29,10 +29,11 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/modules/.test/init_implicit.png)](../doc/modules/.test/init_implicit.log) | [init_implicit](../doc/modules/init.md) |
 | [![test](../doc/std/algorithm/.test/intersection_module.png)](../doc/std/algorithm/.test/intersection_module.log) | [intersection_module](../doc/std/algorithm/intersection.md) |
 | [![test](../doc/std/algorithm/.test/intersection_operator.png)](../doc/std/algorithm/.test/intersection_operator.log) | [intersection_operator](../doc/std/algorithm/intersection.md) |
-| [![test](../doc/std/.test/math_abs.png)](../doc/std/.test/math_abs.log) | [math_abs](../doc/std/math.md) |
-| [![test](../doc/std/.test/math_trigonometric.png)](../doc/std/.test/math_trigonometric.log) | [math_trigonometric](../doc/std/math.md) |
+| [![test](../doc/std/math/.test/math_abs.png)](../doc/std/math/.test/math_abs.log) | [math_abs](../doc/std/math/README.md) |
+| [![test](../doc/std/math/.test/math_trigonometric.png)](../doc/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/std/math/README.md) |
 | [![test](../doc/modules/.test/modules_declaration.png)](../doc/modules/.test/modules_declaration.log) | [modules_declaration](../doc/modules/README.md) |
 | [![test](../doc/.test/namespaces_example.png)](../doc/.test/namespaces_example.log) | [namespaces_example](../doc/namespaces.md) |
+| [![test](../doc/.test/no_use_statement.png)](../doc/.test/no_use_statement.log) | [no_use_statement](../doc/use_statement.md) |
 | [![test](../doc/modules/.test/parameter_list.png)](../doc/modules/.test/parameter_list.log) | [parameter_list](../doc/modules/parameter_list.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_A.png)](../doc/.test/parameter_multiplicity_example_A.log) | [parameter_multiplicity_example_A](../doc/parameter_multiplicity.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_B.png)](../doc/.test/parameter_multiplicity_example_B.log) | [parameter_multiplicity_example_B](../doc/parameter_multiplicity.md) |
@@ -71,11 +72,12 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/.test/unit_types_bundling_array.png)](../doc/.test/unit_types_bundling_array.log) | [unit_types_bundling_array](../doc/unit_types.md) |
 | [![test](../doc/.test/unit_types_bundling_tuple.png)](../doc/.test/unit_types_bundling_tuple.log) | [unit_types_bundling_tuple](../doc/unit_types.md) |
 | [![test](../doc/.test/unit_types_number_literals.png)](../doc/.test/unit_types_number_literals.log) | [unit_types_number_literals](../doc/unit_types.md) |
-| [![test](../doc/.test/use_statement_example_A.png)](../doc/.test/use_statement_example_A.log) | [use_statement_example_A](../doc/use_statement.md) |
-| [![test](../doc/.test/use_statement_use_all_from.png)](../doc/.test/use_statement_use_all_from.log) | [use_statement_use_all_from](../doc/use_statement.md) |
-| [![test](../doc/.test/use_statement_use_as.png)](../doc/.test/use_statement_use_as.log) | [use_statement_use_as](../doc/use_statement.md) |
-| [![test](../doc/.test/use_statement_with_use.png)](../doc/.test/use_statement_with_use.log) | [use_statement_with_use](../doc/use_statement.md) |
-| [![test](../doc/.test/use_statement_without_use.png)](../doc/.test/use_statement_without_use.log) | [use_statement_without_use](../doc/use_statement.md) |
+| [![test](../doc/.test/use_statement.png)](../doc/.test/use_statement.log) | [use_statement](../doc/use_statement.md) |
+| [![test](../doc/.test/use_statement_all.png)](../doc/.test/use_statement_all.log) | [use_statement_all](../doc/use_statement.md) |
+| [![test](../doc/.test/use_statement_as.png)](../doc/.test/use_statement_as.log) | [use_statement_as](../doc/use_statement.md) |
+| [![test](../doc/.test/use_statement_as_namespace.png)](../doc/.test/use_statement_as_namespace.log) | [use_statement_as_namespace](../doc/use_statement.md) |
+| [![test](../doc/.test/use_statement_namespace.png)](../doc/.test/use_statement_namespace.log) | [use_statement_namespace](../doc/use_statement.md) |
+| [![test](../doc/.test/use_statement_pub.png)](../doc/.test/use_statement_pub.log) | [use_statement_pub](../doc/use_statement.md) |
 | [![test](../doc/.test/verify_assert.png)](../doc/.test/verify_assert.log) | [verify_assert](../doc/verify.md) |
 | [![test](../doc/.test/verify_assert_fail.png)](../doc/.test/verify_assert_fail.log) | [verify_assert_fail](../doc/verify.md) |
 | [![test](../doc/.test/verify_panic.png)](../doc/.test/verify_panic.log) | [verify_panic](../doc/verify.md) |

@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad syntax elements related to function or module calls
+//! Syntax elements related to function or module calls.
 
 mod call_argument;
 mod call_argument_list;
@@ -13,14 +13,14 @@ pub use method_call::*;
 
 use crate::{objects::*, src_ref::*, syntax::*, value::*};
 
-/// Call of a function or module initialization
+/// Call of a function or module initialization.
 #[derive(Clone, Debug, Default)]
 pub struct Call {
-    /// Qualified name of the call
+    /// Qualified name of the call.
     pub name: QualifiedName,
-    /// Argument list of the call
+    /// Argument list of the call.
     pub argument_list: CallArgumentList,
-    /// Source code reference
+    /// Source code reference.
     pub src_ref: SrcRef,
 }
 
@@ -45,14 +45,14 @@ impl PrintSyntax for Call {
     }
 }
 
-/// Result of a call
+/// Result of a call.
 pub enum CallResult {
-    /// Call returned nodes
+    /// Call returned nodes.
     Nodes(Vec<ObjectNode>),
 
-    /// Call returned a single value
+    /// Call returned a single value.
     Value(Value),
 
-    /// Call returned nothing
+    /// Call returned nothing.
     None,
 }

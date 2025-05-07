@@ -35,13 +35,14 @@ impl SourceFile {
 
     /// Return the namespace name from the file name
     pub fn id(&self) -> Identifier {
-        Identifier(Refer::none(
+        Identifier(Refer::new(
             self.filename
                 .file_stem()
                 .expect("cannot get file stem")
                 .to_str()
                 .expect("File name error {filename:?}")
                 .into(),
+            SrcRef::new(0..0, 0, 0, self.hash),
         ))
     }
 
@@ -58,16 +59,17 @@ impl SourceFile {
     }
 
     /// Resolve into SymbolNode
-    pub fn resolve(&self, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
+    pub fn resolve(&self, parent: Option<Symbol>) -> Symbol {
         Rc::new(self.clone()).resolve_rc(parent)
     }
 
     /// Like resolve but with `Rc<SourceFile>`
-    pub fn resolve_rc(self: Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        eprintln!("resolving {}", self.filename_as_str());
-        let node = SymbolNode::new(SymbolDefinition::SourceFile(self.clone()), parent);
+    pub fn resolve_rc(self: Rc<Self>, parent: Option<Symbol>) -> Symbol {
+        let name = self.filename_as_str();
+        log::debug!("Resolving source file {name}");
+        let node = Symbol::new(SymbolDefinition::SourceFile(self.clone()), parent);
         node.borrow_mut().children = Body::fetch_symbol_map(&self.body, Some(node.clone()));
-        log::trace!("Resolved symbol node:\n{node}");
+        log::trace!("Resolved source file {name}:\n{node}");
         node
     }
 }
@@ -109,13 +111,9 @@ impl<T: PrintSyntax> std::fmt::Display for FormatSyntax<'_, T> {
 
 #[test]
 fn load_source_file() {
-    use log::*;
-
-    crate::env_logger_init();
-
     let source_file = SourceFile::load(r#"../tests/test_cases/algorithm/difference.µcad"#);
     if let Err(ref err) = source_file {
-        error!("{err}");
+        log::error!("{err}");
     }
 
     let source_file = source_file.expect("test error");
@@ -135,13 +133,9 @@ fn load_source_file() {
 
 #[test]
 fn load_source_file_wrong_location() {
-    use log::*;
-
-    crate::env_logger_init();
-
     let source_file = SourceFile::load("I do not exist.µcad");
     if let Err(err) = source_file {
-        info!("{err}");
+        log::info!("{err}");
         //assert_eq!(format!("{err}"), "Cannot load source file");
     } else {
         panic!("Does file exist?");

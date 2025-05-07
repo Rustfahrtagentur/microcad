@@ -1,31 +1,39 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{objects::*, resolve::*};
+use microcad_lang::{objects::*, resolve::*, syntax::*, value::*};
 
 /// Creates a node containing a difference algorithm
-fn difference() -> SymbolNodeRcMut {
-    SymbolNode::new_builtin_module("difference", &|_, _| Ok(algorithm::difference()))
+fn difference() -> Symbol {
+    Symbol::new_builtin(Identifier::no_ref("difference"), &|_, _| {
+        Ok(Value::Node(algorithm::difference()))
+    })
 }
 
 /// Creates a node containing a union algorithm
-fn union() -> SymbolNodeRcMut {
-    SymbolNode::new_builtin_module("union", &|_, _| Ok(algorithm::union()))
+fn union() -> Symbol {
+    Symbol::new_builtin(Identifier::no_ref("union"), &|_, _| {
+        Ok(Value::Node(algorithm::union()))
+    })
 }
 
 /// Creates a node containing an intersection algorithm
-fn intersection() -> SymbolNodeRcMut {
-    SymbolNode::new_builtin_module("intersection", &|_, _| Ok(algorithm::intersection()))
+fn intersection() -> Symbol {
+    Symbol::new_builtin(Identifier::no_ref("intersection"), &|_, _| {
+        Ok(Value::Node(algorithm::intersection()))
+    })
 }
 
 /// Creates a node containing a complement algorithm
-fn complement() -> SymbolNodeRcMut {
-    SymbolNode::new_builtin_module("complement", &|_, _| Ok(algorithm::complement()))
+fn complement() -> Symbol {
+    Symbol::new_builtin(Identifier::no_ref("complement"), &|_, _| {
+        Ok(Value::Node(algorithm::complement()))
+    })
 }
 
 /// Creates the builtin `algorithm` module
-pub fn algorithm() -> SymbolNodeRcMut {
-    crate::NamespaceBuilder::new("algorithm".try_into().expect("unexpected name error"))
+pub fn algorithm() -> Symbol {
+    crate::NamespaceBuilder::new("algorithm".try_into().expect("valid id"))
         .symbol(difference())
         .symbol(union())
         .symbol(intersection())

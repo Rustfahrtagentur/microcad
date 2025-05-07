@@ -3,14 +3,35 @@
 
 use crate::eval::*;
 
+/// Trait used by [UseDeclaration] and implemented by [SymbolTable] and passed through by [Context]
+/// to put symbols on the [Stack] (for `use statements`).
+pub trait UseSymbol {
+    /// Find a symbol in the symbol table and copy it to the locals.
+    ///
+    /// Might load any related external file if not already loaded.
+    ///
+    /// # Arguments
+    /// - `name`: Name of the symbol to search for
+    /// - `id`: if given overwrites the ID from qualified name (use as)
+    fn use_symbol(&mut self, name: &QualifiedName, id: Option<Identifier>) -> EvalResult<Symbol>;
+
+    /// Find a symbol in the symbol table and copy all it's children to the locals.
+    ///
+    /// Might load any related external file if not already loaded.
+    ///
+    /// # Arguments
+    /// - `name`: Name of the symbol to search for
+    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<Symbol>;
+}
+
 impl Eval for UseStatement {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         self.decl.eval(context)
     }
 }
 
 impl Eval for UseDeclaration {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match &self {
             UseDeclaration::Use(name) => {
                 if let Err(err) = context.use_symbol(name, None) {
@@ -23,7 +44,7 @@ impl Eval for UseDeclaration {
                 }
             }
             UseDeclaration::UseAlias(name, alias) => {
-                if let Err(err) = context.use_symbol(name, Some(alias.id().clone())) {
+                if let Err(err) = context.use_symbol(name, Some(alias.clone())) {
                     context.error(name, err)?;
                 }
             }

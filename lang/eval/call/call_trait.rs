@@ -3,10 +3,10 @@
 
 //! Call argument value evaluation entity
 
-use crate::{eval::*, syntax::*};
+use crate::eval::*;
 
 /// trait for calls of modules or functions with argument list
 pub trait CallTrait {
     /// Evaluate call into value (if possible)
-    fn call(&self, args: &CallArgumentList, context: &mut EvalContext) -> EvalResult<Value>;
+    fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value>;
 }

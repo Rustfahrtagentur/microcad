@@ -9,18 +9,41 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-#[cfg(not(test))]
-use crate::parse::*;
-use crate::{src_ref::*, syntax::*, Id};
+use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 
 /// µcad identifier
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(pub Refer<Id>);
 
 impl Identifier {
+    /// Make empty (invalid) id
+    pub fn none() -> Self {
+        Self(Refer::none("".into()))
+    }
+
+    /// Make empty (invalid) id
+    pub fn no_ref(id: &str) -> Self {
+        Self(Refer::none(id.into()))
+    }
+
     /// Get the value of the identifier
     pub fn id(&self) -> &Id {
         &self.0.value
+    }
+
+    /// Return number of identifiers in name
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    /// Return if name is empty
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    /// check if this is a valid identifier (contains only `A`-`Z`, `a`-`z` or `_`)
+    pub fn validate(self) -> ParseResult<Self> {
+        Parser::parse_rule(crate::parser::Rule::identifier, self.id().as_str(), 0)
     }
 }
 
@@ -36,6 +59,14 @@ impl std::hash::Hash for Identifier {
     }
 }
 
+impl std::str::FromStr for Identifier {
+    type Err = crate::eval::EvalError;
+
+    fn from_str(id: &str) -> Result<Self, Self::Err> {
+        Ok(Identifier::no_ref(id).validate()?)
+    }
+}
+
 #[cfg(test)]
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {
@@ -48,12 +79,7 @@ impl TryFrom<&str> for Identifier {
     type Error = ParseError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let id = Self(Refer::none(value.into()));
-        if id.0.chars().all(|c| c.is_ascii_alphabetic() || c == '_') {
-            Ok(id)
-        } else {
-            Err(ParseError::InvalidIdentifier(value.into()))
-        }
+        Parser::parse_rule(crate::parser::Rule::identifier, value, 0)
     }
 }
 
@@ -65,7 +91,11 @@ impl<'a> From<&'a Identifier> for &'a str {
 
 impl std::fmt::Display for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", self.0)
+        if self.is_empty() {
+            write!(f, "<none>")
+        } else {
+            write!(f, "{}", self.0)
+        }
     }
 }
 
@@ -88,4 +118,37 @@ pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
         .map(|ident| ident.to_string())
         .collect::<Vec<_>>()
         .join(separator)
+}
+
+#[test]
+fn identifier_comparison() {
+    use crate::syntax::*;
+
+    // same id but different src refs
+    let id1 = Identifier::no_ref("x");
+    let id2 = Identifier(Refer::new("x".into(), SrcRef::new(0..5, 0, 1, 1)));
+
+    // shall be equal
+    assert!(id1 == id2);
+}
+
+#[test]
+fn identifier_hash() {
+    use crate::syntax::*;
+    use std::hash::{Hash, Hasher};
+
+    // same id but different src refs
+    let id1 = Identifier(Refer::none("x".into()));
+    let id2 = Identifier(Refer::new("x".into(), SrcRef::new(0..5, 0, 1, 1)));
+
+    let mut hasher = std::hash::DefaultHasher::new();
+    id1.hash(&mut hasher);
+    let hash1 = hasher.finish();
+    let mut hasher = std::hash::DefaultHasher::new();
+    id2.hash(&mut hasher);
+
+    let hash2 = hasher.finish();
+
+    // shall be equal
+    assert_eq!(hash1, hash2);
 }

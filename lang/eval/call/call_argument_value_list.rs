@@ -1,63 +1,97 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Call argument value list evaluation entity
+//! *Call argument value list* evaluation entity.
 
-use crate::{eval::*, ord_map::*, src_ref::*, value::*, Id};
+use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 
-/// List of call argument values
+/// Collection of *call argument values*.
 ///
-/// This class also provides methods to find a matching call
-/// between between the call argument value list and a given parameter list.
+/// [`CallArgumentValueList`] also provides methods to find a matching call
+/// between it and a given *parameter list*.
 #[derive(Clone, Debug, Default)]
-pub struct CallArgumentValueList(Refer<OrdMap<Id, CallArgumentValue>>);
+pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
 
 impl CallArgumentValueList {
-    /// Create a `CallArgumentValueList` from a `CallArgumentList`
-    pub fn from_call_argument_list(
-        call_argument_list: &CallArgumentList,
-        context: &mut EvalContext,
-    ) -> EvalResult<Self> {
-        let mut v = CallArgumentValueList::default();
-        for call_arg in call_argument_list.iter() {
-            v.push(call_arg.eval_value(context)?)
-                .expect("Could not insert call argument value");
+    /// Create a *call argument value list*.
+    ///
+    /// Transports code into builtin in `impl` [`Eval`] for [`Call`].
+    ///
+    /// **RULE**: Shall only be used for builtin symbols.
+    /// # Arguments
+    pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
+        let code = Refer {
+            value: code,
+            src_ref: referrer.src_ref(),
+        };
+        let mut value = OrdMap::default();
+        value
+            .push(CallArgumentValue::new(
+                None,
+                Value::String(code),
+                referrer.src_ref(),
+            ))
+            .expect("map with one element");
+        Self(Refer {
+            value,
+            src_ref: referrer.src_ref(),
+        })
+    }
+
+    /// Return a single argument.
+    ///
+    /// Returns error if there is no or more than one argument available.
+    pub fn get_single(&self) -> EvalResult<&CallArgumentValue> {
+        if self.len() == 1 {
+            if let Some(a) = self.0.first() {
+                return Ok(a);
+            }
         }
-        Ok(v)
+
+        Err(EvalError::ArgumentCountMismatch {
+            args: self.clone(),
+            expected: 1,
+            found: self.len(),
+        })
     }
 
     /// Check for unexpected arguments.
     ///
-    /// This method will return an error if there is a call argument that is not in the parameter list
+    /// This method will return an error if there is a call argument that
+    /// is not in the parameter list.
     pub fn check_for_unexpected_arguments(
         &self,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<()> {
         match self
             .keys()
-            .find(|name| parameter_values.get_by_name(name).is_none())
+            .find(|id| parameter_values.get_by_id(id).is_none())
         {
-            Some(name) => Err(EvalError::UnexpectedArgument(name.clone())),
+            Some(id) => Err(EvalError::UnexpectedArgument(id.clone())),
             None => Ok(()),
         }
     }
 
-    /// This functions checks if the call arguments match the given parameter definitions
-    /// It returns a map of arguments that match the parameters
+    /// This functions checks if the call arguments match the given parameter definitions.
+    ///
+    /// Returns a map of arguments that match the parameters.
     pub fn get_matching_arguments(
         &self,
-        parameter_values: &ParameterValueList,
+        context: &mut Context,
+        parameters: &ParameterList,
     ) -> EvalResult<ArgumentMap> {
-        ArgumentMap::find_match(self, parameter_values)
+        let parameters = parameters.eval(context)?;
+        ArgumentMap::find_match(self, &parameters)
     }
 
-    /// Get multiplicity of matching arguments
+    /// Get multiplicity of matching arguments.
     pub fn get_multi_matching_arguments(
         &self,
-        parameter_values: &ParameterValueList,
+        context: &mut Context,
+        parameters: &ParameterList,
     ) -> EvalResult<MultiArgumentMap> {
-        use ArgumentMatch;
-        MultiArgumentMap::find_match(self, parameter_values)
+        let parameters = parameters.eval(context)?;
+        MultiArgumentMap::find_match(self, &parameters)
     }
 }
 
@@ -68,7 +102,7 @@ impl SrcReferrer for CallArgumentValueList {
 }
 
 impl std::ops::Deref for CallArgumentValueList {
-    type Target = OrdMap<Id, CallArgumentValue>;
+    type Target = OrdMap<Identifier, CallArgumentValue>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -78,6 +112,21 @@ impl std::ops::Deref for CallArgumentValueList {
 impl std::ops::DerefMut for CallArgumentValueList {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+impl std::fmt::Display for CallArgumentValueList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.0
+                .value
+                .iter()
+                .map(|p| p.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
     }
 }
 
@@ -93,7 +142,7 @@ impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
 macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
-            $arg_map.get(stringify!($name)).expect(&format!("Argument `{}` expected",stringify!($name))),
+            $arg_map.get(&Identifier::no_ref(stringify!($name).into())).expect(&format!("Argument `{}` expected",stringify!($name))),
             &Value::$ty(crate::src_ref::Refer::none($value))
         ));*
     };
@@ -117,9 +166,7 @@ fn call_get_matching_arguments() {
         call_argument_value!(baz: Scalar = 3.0),
     ]);
 
-    let arg_map = call_values
-        .get_matching_arguments(&param_values)
-        .expect("test error");
+    let arg_map = ArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
 
     assert_eq_arg_map_value!(arg_map,
         foo: Integer = 2,
@@ -145,11 +192,11 @@ fn call_get_matching_arguments_missing() {
         call_argument_value!(baz: Scalar = 3.0),
     ]);
 
-    let arg_map = call_values.get_matching_arguments(&param_values);
+    let arg_map = ArgumentMap::find_match(&call_values, &param_values);
 
     if let Err(EvalError::ValueError(ValueError::MissingArguments(missing))) = arg_map {
         assert_eq!(missing.len(), 1);
-        assert_eq!(&missing[0].name, "bar");
+        assert_eq!(&missing[0].id, "bar");
     } else {
         panic!("Expected MissingArguments error");
     }
@@ -171,9 +218,8 @@ fn get_multi_matching_arguments() {
         call_argument_value!(Scalar = 10.0),
     ]);
 
-    let multi_argument_map = call_values
-        .get_multi_matching_arguments(&param_values)
-        .expect("MultiArgumentMap expected");
+    let multi_argument_map =
+        MultiArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
 
     for argument_map in multi_argument_map.combinations() {
         assert_eq_arg_map_value!(argument_map,

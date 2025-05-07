@@ -35,8 +35,9 @@ pub struct FormatString(pub Vec<FormatStringInner>);
 
 impl FormatString {
     /// Insert a string to this module
-    pub fn push_string(&mut self, s: String) {
-        self.0.push(FormatStringInner::String(Refer::none(s)));
+    pub fn push_string(&mut self, s: String, src_ref: SrcRef) {
+        self.0
+            .push(FormatStringInner::String(Refer::new(s, src_ref)));
     }
 
     /// Insert a format expression to this module

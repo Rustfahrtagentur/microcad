@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! List expression
+//! List of expression
 
 use crate::{src_ref::*, syntax::*};
 

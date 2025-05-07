@@ -13,13 +13,13 @@ that point.
 [![test](.test/verify_assert.png)](.test/verify_assert.log)
 
 ```µcad,verify_assert
-std::assert(true, "You won't see this message");
+std::debug::assert(true, "You won't see this message");
 ```
 
 [![test](.test/verify_assert_fail.png)](.test/verify_assert_fail.log)
 
 ```µcad,verify_assert_fail#fail
-std::assert(false, "this assertion fails");
+std::debug::assert(false, "this assertion fails");
 ```
 
 ## Panic

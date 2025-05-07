@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-/// Trait which EvalContext is using to access or redirect the µcad code's console output.
+/// Trait which Context is using to access or redirect the µcad code's console output.
 pub trait Output {
     /// Print into output buffer.
     fn print(&mut self, what: String) -> std::io::Result<()>;

@@ -2,20 +2,20 @@ use crate::{parse::*, parser::*, rc::*, syntax::*};
 
 impl Parse for Assignment {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut name = Identifier::default();
+        let mut id = Identifier::default();
         let mut specified_type = None;
-        let mut value = None;
+        let mut expression = None;
 
         for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::identifier => {
-                    name = Identifier::parse(pair)?;
+                    id = Identifier::parse(pair)?;
                 }
                 Rule::r#type => {
                     specified_type = Some(TypeAnnotation::parse(pair)?);
                 }
                 Rule::expression => {
-                    value = Some(Expression::parse(pair)?);
+                    expression = Some(Expression::parse(pair)?);
                 }
                 rule => {
                     unreachable!("Unexpected token in assignment: {:?}", rule);
@@ -24,9 +24,9 @@ impl Parse for Assignment {
         }
 
         Ok(Self {
-            name,
+            id,
             specified_type,
-            value: value.expect(INTERNAL_PARSE_ERROR),
+            expression: expression.expect(INTERNAL_PARSE_ERROR),
             src_ref: pair.into(),
         })
     }
@@ -62,7 +62,7 @@ impl Parse for Marker {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::marker_statement);
         Ok(Self {
-            name: Identifier::parse(pair.inner().next().expect(INTERNAL_PARSE_ERROR))?,
+            id: Identifier::parse(pair.inner().next().expect(INTERNAL_PARSE_ERROR))?,
             src_ref: pair.src_ref(),
         })
     }

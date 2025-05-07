@@ -22,7 +22,7 @@ impl FormatExpression {
     pub fn new(spec: Option<FormatSpec>, expression: Expression) -> Self {
         Self {
             src_ref: match &spec {
-                Some(spec) => SrcRef::merge(spec.src_ref(), expression.src_ref()),
+                Some(spec) => SrcRef::merge(spec, &expression),
                 None => expression.src_ref(),
             },
             spec,

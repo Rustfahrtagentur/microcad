@@ -1,7 +1,10 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad value related evaluation entities
+//! Evaluation entities.
+//!
+//! Every evaluation of any *symbol* leads to a [`Value`] which then might continued
+//! to process or ends up as the overall evaluation result.
 
 mod into_value;
 mod list;
@@ -33,53 +36,53 @@ use microcad_core::*;
 
 pub(crate) type ValueResult = std::result::Result<Value, ValueError>;
 
-/// A variant value
+/// A variant value with attached source code reference.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
-    /// Invalid value (used for error handling)
+    /// Invalid value (used for error handling).
     None,
-    /// An integer value
+    /// An integer value.
     Integer(Refer<Integer>),
-    /// A scalar value
+    /// A scalar value.
     Scalar(Refer<Scalar>),
-    /// Length in mm
+    /// Length in mm.
     Length(Refer<Scalar>),
-    /// Area in mm²
+    /// Area in mm².
     Area(Refer<Scalar>),
-    /// Volume in mm³
+    /// Volume in mm³.
     Volume(Refer<Scalar>),
-    /// A 2D vector with length
+    /// A 2D vector with length.
     Vec2(Refer<Vec2>),
-    /// A 3D vector with length
+    /// A 3D vector with length.
     Vec3(Refer<Vec3>),
-    /// A 4D vector with length
+    /// A 4D vector with length.
     Vec4(Refer<Vec4>),
-    /// An angle in radians
+    /// An angle in radians.
     Angle(Refer<Scalar>),
-    /// Weight of a specific volume of material
+    /// Weight of a specific volume of material.
     Weight(Refer<Scalar>),
-    /// Boolean value
+    /// A boolean value.
     Bool(Refer<bool>),
-    /// String value
+    /// A string value.
     String(Refer<String>),
-    /// Color value
+    /// A color value.
     Color(Refer<Color>),
-    /// List
+    /// A list of values.
     List(List),
-    /// Hash Map
+    /// A map of values.
     Map(Map),
-    /// Tuple of named items
+    /// A tuple of named items.
     NamedTuple(NamedTuple),
-    /// Tuple of unnamed items
+    /// A tuple of unnamed items.
     UnnamedTuple(UnnamedTuple),
-    /// A node in the render tree
+    /// A node in the render tree.
     Node(ObjectNode),
-    /// A node list in the render tree, result from multiplicity
-    NodeMultiplicity(Vec<ObjectNode>)
+    /// A node list in the render tree, result from multiplicity.
+    NodeMultiplicity(Vec<ObjectNode>),
 }
 
 impl Value {
-    /// Add a unit to a primitive value (Scalar or Integer)
+    /// Add a unit to a primitive value (Scalar or Integer).
     pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
         match (self.clone(), unit.ty()) {
             (Value::Integer(i), Type::Length) => {
@@ -99,16 +102,16 @@ impl Value {
         Ok(())
     }
 
-    /// Fetch nodes from this value
+    /// Fetch nodes from this value.
     pub fn fetch_nodes(self) -> Vec<ObjectNode> {
         match self {
             Self::Node(n) => vec![n],
             Self::NodeMultiplicity(n) => n,
-            _ => vec![]
+            _ => vec![],
         }
     }
 
-    /// Clone the value with a new source reference
+    /// Clone the value with a new source reference.
     pub fn clone_with_src_ref(&self, src_ref: SrcRef) -> Self {
         match self {
             Value::None => Value::None,
@@ -134,7 +137,7 @@ impl Value {
         }
     }
 
-    /// Get property value for a value
+    /// Get property value for a value.
     ///
     /// - `identifier`: Identifier of the property
     ///
@@ -169,19 +172,19 @@ impl Value {
                 _ => None,
             },
             Value::NamedTuple(named_tuple) => named_tuple.get(identifier).cloned(),
-            Value::Node(node) => node.borrow().get_property_value(identifier.id()).cloned(),
+            Value::Node(node) => node.borrow().get_property_value(identifier).cloned(),
             _ => None,
         }
     }
 
-    /// Check if the value is invalid
+    /// Check if the value is invalid.
     pub fn is_invalid(&self) -> bool {
         matches!(self, Value::None)
     }
 
     /// Binary operation
     pub fn binary_op(lhs: Value, rhs: Value, op: &str) -> ValueResult {
-        match op {
+        match match op {
             "+" => lhs + rhs,
             "-" => lhs - rhs,
             "*" => lhs * rhs,
@@ -189,22 +192,54 @@ impl Value {
             "^" => unimplemented!(), // lhs.pow(&rhs),
             "&" => lhs & rhs,
             "|" => lhs | rhs,
-            ">" => Ok(Value::Bool(Refer::new(lhs > rhs, SrcRef::merge(lhs, rhs)))),
-            "<" => Ok(Value::Bool(Refer::new(lhs < rhs, SrcRef::merge(lhs, rhs)))),
-            "≤" => Ok(Value::Bool(Refer::new(lhs <= rhs, SrcRef::merge(lhs, rhs)))),
-            "≥" => Ok(Value::Bool(Refer::new(lhs >= rhs, SrcRef::merge(lhs, rhs)))),
+            ">" => Ok(Value::Bool(Refer::new(
+                lhs > rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
+            "<" => Ok(Value::Bool(Refer::new(
+                lhs < rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
+            "≤" => Ok(Value::Bool(Refer::new(
+                lhs <= rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
+            "≥" => Ok(Value::Bool(Refer::new(
+                lhs >= rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
             "~" => todo!("implement near ~="),
-            "=" => Ok(Value::Bool(Refer::new(lhs == rhs, SrcRef::merge(lhs, rhs)))),
-            "!=" => Ok(Value::Bool(Refer::new(lhs != rhs, SrcRef::merge(lhs, rhs)))),
+            "=" => Ok(Value::Bool(Refer::new(
+                lhs == rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
+            "!=" => Ok(Value::Bool(Refer::new(
+                lhs != rhs,
+                SrcRef::merge(&lhs, &rhs),
+            ))),
             _ => unimplemented!("{op:?}"),
+        } {
+            Err(err) => Err(err),
+            result => result,
         }
     }
 
-    /// Unary operation
+    /// Unary operation.
     pub fn unary_op(self, op: &str) -> ValueResult {
         match op {
             "-" => -self,
             _ => unimplemented!(),
+        }
+    }
+
+    /// Try to get boolean value.
+    ///
+    /// A `Value::None` will return false.
+    pub fn try_bool(&self) -> Result<bool, ValueError> {
+        match self {
+            Value::Bool(b) => Ok(**b),
+            Value::None => Ok(false),
+            value => Err(ValueError::CannotConvertToBool(value.clone())),
         }
     }
 }
@@ -240,7 +275,10 @@ impl SrcReferrer for Value {
 impl PartialOrd for Value {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         match (self, other) {
+            // integer type
             (Value::Integer(lhs), Value::Integer(rhs)) => lhs.partial_cmp(rhs),
+
+            // floating point types
             (Value::Scalar(lhs), Value::Scalar(rhs))
             | (Value::Length(lhs), Value::Length(rhs))
             | (Value::Area(lhs), Value::Area(rhs))
@@ -248,9 +286,15 @@ impl PartialOrd for Value {
             | (Value::Angle(lhs), Value::Angle(rhs))
             | (Value::Angle(lhs), Value::Scalar(rhs))
             | (Value::Scalar(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
+
+            // vector types
             (Value::Vec2(lhs), Value::Vec2(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
             (Value::Vec3(lhs), Value::Vec3(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
-            _ => None,
+
+            _ => {
+                log::warn!("unhandled type mismatch between {self} and {other}");
+                None
+            }
         }
     }
 }
@@ -298,7 +342,7 @@ impl std::ops::Neg for Value {
     }
 }
 
-/// Rules for operator +
+/// Rules for operator `+`.
 impl std::ops::Add for Value {
     type Output = ValueResult;
 
@@ -344,7 +388,7 @@ impl std::ops::Add for Value {
                 Ok(Value::List(List::new(
                     lhs.iter().chain(rhs.iter()).cloned().collect(),
                     lhs.ty(),
-                    SrcRef::merge(lhs, rhs),
+                    SrcRef::merge(&lhs, &rhs),
                 )))
             }
             // Add values of two tuples of the same length
@@ -356,7 +400,7 @@ impl std::ops::Add for Value {
     }
 }
 
-/// Rules for operator -
+/// Rules for operator `-`.
 impl std::ops::Sub for Value {
     type Output = ValueResult;
 
@@ -414,7 +458,7 @@ impl std::ops::Sub for Value {
     }
 }
 
-/// Rules for operator *
+/// Rules for operator `*`.
 impl std::ops::Mul for Value {
     type Output = ValueResult;
 
@@ -486,7 +530,7 @@ impl std::ops::Mul for Value {
     }
 }
 
-/// Rules for operator /
+/// Rules for operator `/`.
 impl std::ops::Div for Value {
     type Output = ValueResult;
 
@@ -527,7 +571,7 @@ impl std::ops::Div for Value {
     }
 }
 
-/// Rules for operator | (union operator)
+/// Rules for operator `|`` (union).
 impl std::ops::BitOr for Value {
     type Output = ValueResult;
 
@@ -541,7 +585,7 @@ impl std::ops::BitOr for Value {
     }
 }
 
-/// Rules for operator & (intersection operator)
+/// Rules for operator `&`` (intersection).
 impl std::ops::BitAnd for Value {
     type Output = ValueResult;
 
@@ -617,18 +661,6 @@ macro_rules! impl_try_from {
     };
 }
 
-impl From<String> for Value {
-    fn from(s: String) -> Self {
-        Value::String(Refer::none(s))
-    }
-}
-
-impl From<Scalar> for Value {
-    fn from(value: Scalar) -> Self {
-        Value::Scalar(Refer::none(value))
-    }
-}
-
 impl_try_from!(Integer => i64);
 impl_try_from!(Scalar, Length, Angle => Scalar);
 impl_try_from!(Vec2 => Vec2);
@@ -637,6 +669,16 @@ impl_try_from!(Vec4 => Vec4);
 impl_try_from!(Bool => bool);
 impl_try_from!(String => String);
 impl_try_from!(Color => Color);
+
+impl From<Vec<ObjectNode>> for Value {
+    fn from(nodes: Vec<ObjectNode>) -> Self {
+        match nodes.len() {
+            0 => Value::None,
+            1 => Value::Node(nodes.first().expect("Node").clone()),
+            _ => Value::NodeMultiplicity(nodes),
+        }
+    }
+}
 
 #[cfg(test)]
 fn integer(value: i64, src_ref: &SrcRef) -> Value {

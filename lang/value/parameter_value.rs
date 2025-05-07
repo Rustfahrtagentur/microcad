@@ -3,13 +3,13 @@
 
 //! Parameter value evaluation entity
 
-use crate::{src_ref::*, ty::*, value::*, Id};
+use crate::{src_ref::*, ty::*, value::*};
 
 /// Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
 pub struct ParameterValue {
     /// Parameter name
-    pub name: Id,
+    pub id: Identifier,
     /// Parameter type
     pub specified_type: Option<Type>,
     /// Parameter default
@@ -25,19 +25,19 @@ pub enum TypeCheckResult {
     /// Self is list of that type
     MultiMatch,
     /// An error occurred
-    NoMatch(Id, Option<Type>, Type),
+    NoMatch(Identifier, Option<Type>, Type),
 }
 
 impl ParameterValue {
     /// Create new parameter value
     pub fn new(
-        name: Id,
+        id: Identifier,
         specified_type: Option<Type>,
         default_value: Option<Value>,
         src_ref: SrcRef,
     ) -> Self {
         Self {
-            name,
+            id,
             specified_type,
             default_value,
             src_ref,
@@ -45,9 +45,9 @@ impl ParameterValue {
     }
 
     /// Creates an invalid parameter value, in case an error occured during evaluation
-    pub fn invalid(name: Id, src_ref: SrcRef) -> Self {
+    pub fn invalid(id: Identifier, src_ref: SrcRef) -> Self {
         Self {
-            name,
+            id,
             specified_type: None,
             default_value: None,
             src_ref,
@@ -68,14 +68,10 @@ impl ParameterValue {
             if ty.is_list_of(specified_type) {
                 TypeCheckResult::MultiMatch
             } else {
-                TypeCheckResult::NoMatch(
-                    self.name.clone(),
-                    Some(specified_type.clone()),
-                    ty.clone(),
-                )
+                TypeCheckResult::NoMatch(self.id.clone(), Some(specified_type.clone()), ty.clone())
             }
         } else {
-            TypeCheckResult::NoMatch(self.name.clone(), None, ty.clone())
+            TypeCheckResult::NoMatch(self.id.clone(), None, ty.clone())
         }
     }
 
@@ -98,32 +94,32 @@ impl SrcReferrer for ParameterValue {
 #[cfg(test)]
 #[macro_export]
 macro_rules! parameter_value {
-    ($name:ident) => {
+    ($id:ident) => {
         $crate::value::ParameterValue {
-            name: stringify!($name).into(),
+            name: stringify!($id).into(),
             specified_type: None,
             default_value: None,
             SrcRef(None),
         }
     };
-    ($name:ident: $ty:ident) => {
+    ($id:ident: $ty:ident) => {
         $crate::value::ParameterValue::new(
-            stringify!($name).into(),
+            stringify!($id).into(),
             Some(Type::$ty),
             None,
             SrcRef(None),
         )
     };
-    ($name:ident: $ty:ident = $value:expr) => {
+    ($id:ident: $ty:ident = $value:expr) => {
         $crate::value::ParameterValue::new(
-            stringify!($name).into(),
+            stringify!($id).into(),
             Some(Type::$ty),
             Some($crate::value::Value::$ty(Refer::none($value))),
             SrcRef(None),
         )
     };
-    ($name:ident = $value:expr) => {
-        value::ParameterValue::new(stringify!($name).into(), None, Some($value), SrcRef(None))
+    ($id:ident = $value:expr) => {
+        value::ParameterValue::new(stringify!($id).into(), None, Some($value), SrcRef(None))
     };
     () => {};
 }

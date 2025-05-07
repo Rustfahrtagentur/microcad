@@ -1,0 +1,42 @@
+// This tests the local stack
+
+use std::debug::*;
+
+// new local variable #1
+i = 1;
+
+{
+    // accessing #1
+    assert(i == 1);
+
+    // new local variable #2 with same name
+    i = 2;
+
+    // accessing #2
+    assert(i == 2);
+}
+
+// accessing #1
+assert(i == 1);
+
+// concentric namespaces
+{
+    {
+        {
+            // accessing #1
+            assert(i == 1);
+        }
+    }
+}
+
+// overwrite #1
+i = 3;
+
+// access #1
+assert(i == 3);
+
+p = std::math::pi;
+
+q = p > 3.;
+
+assert(q);

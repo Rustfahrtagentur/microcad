@@ -1,15 +1,32 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_builtin_proc_macro::DefineBuiltinPrimitive3D;
 use microcad_core::*;
-use microcad_lang::{eval::*, parse::*, rc::*};
+use microcad_lang::{eval::*, objects::*, rc::*, resolve::Symbol, syntax::*, ty::Type};
 
 /// The builtin sphere primitive, defined by its radius.
-#[derive(DefineBuiltinPrimitive3D, Debug)]
+#[derive(Debug)]
 pub struct Sphere {
     /// Radius of the sphere in millimeters
     pub radius: Scalar,
+}
+
+impl BuiltinModuleDefinition for Sphere {
+    fn id() -> &'static str {
+        "sphere"
+    }
+
+    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
+        Ok(ObjectNode::new(ObjectNodeInner::Primitive3D(Rc::new(
+            Sphere {
+                radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),
+            },
+        ))))
+    }
+
+    fn parameters() -> ParameterList {
+        vec![Parameter::no_ref("radius", Type::Scalar)].into()
+    }
 }
 
 impl RenderHash for Sphere {
@@ -34,7 +51,7 @@ impl geo3d::Primitive for Sphere {
 }
 
 /// The builtin cube primitive, defined by its size in the x, y, and z dimensions.
-#[derive(DefineBuiltinPrimitive3D, Debug)]
+#[derive(Debug)]
 pub struct Cube {
     /// Size of the cube in the x dimension in millimeters
     pub size_x: Scalar,
@@ -43,6 +60,32 @@ pub struct Cube {
     /// Size of the cube in the z dimension in millimeters
     pub size_z: Scalar,
 }
+
+
+impl BuiltinModuleDefinition for Cube {
+    fn id() -> &'static str {
+        "cube"
+    }
+
+    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
+        Ok(ObjectNode::new(ObjectNodeInner::Primitive3D(Rc::new(
+            Cube {
+                size_x: args.get_value::<Scalar>(&Identifier::no_ref("size_x")),
+                size_y: args.get_value::<Scalar>(&Identifier::no_ref("size_y")),
+                size_z: args.get_value::<Scalar>(&Identifier::no_ref("size_z")),
+            },
+        ))))
+    }
+
+    fn parameters() -> ParameterList {
+        vec![
+            Parameter::no_ref("size_x", Type::Scalar),
+            Parameter::no_ref("size_y", Type::Scalar),
+            Parameter::no_ref("size_z", Type::Scalar),
+        ].into()
+    }
+}
+
 
 impl RenderHash for Cube {
     fn render_hash(&self) -> Option<u64> {
@@ -65,7 +108,7 @@ impl geo3d::Primitive for Cube {
 
 /// The built-in cylinder primitive, defined by an bottom radius, top radius and height.
 /// The cylinder is oriented along the z-axis.
-#[derive(DefineBuiltinPrimitive3D, Debug)]
+#[derive(Debug)]
 pub struct Cylinder {
     /// Bottom radius of the cylinder in millimeters
     pub radius_bottom: Scalar,
@@ -74,6 +117,31 @@ pub struct Cylinder {
     /// Height of the cylinder in millimeters
     pub height: Scalar,
 }
+
+impl BuiltinModuleDefinition for Cylinder {
+    fn id() -> &'static str {
+        "cylinder"
+    }
+
+    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
+        Ok(ObjectNode::new(ObjectNodeInner::Primitive3D(Rc::new(
+            Cylinder {
+                radius_bottom: args.get_value::<Scalar>(&Identifier::no_ref("radius_bottom")),
+                radius_top: args.get_value::<Scalar>(&Identifier::no_ref("radius_top")),
+                height: args.get_value::<Scalar>(&Identifier::no_ref("height")),
+            },
+        ))))
+    }
+
+    fn parameters() -> ParameterList {
+        vec![
+            Parameter::no_ref("radius_bottom", Type::Scalar),
+            Parameter::no_ref("radius_top", Type::Scalar),
+            Parameter::no_ref("height", Type::Scalar),
+        ].into()
+    }
+}
+
 
 impl RenderHash for Cylinder {
     fn render_hash(&self) -> Option<u64> {
@@ -98,13 +166,11 @@ impl geo3d::Primitive for Cylinder {
     }
 }
 
-use crate::NamespaceBuilder;
-
 /// geo3d Builtin module
-pub fn builtin_module() -> Rc<NamespaceDefinition> {
-    NamespaceBuilder::new("geo3d")
-        .add(Sphere::builtin_module().into())
-        .add(Cube::builtin_module().into())
-        .add(Cylinder::builtin_module().into())
+pub fn geo3d() -> Symbol {
+    crate::NamespaceBuilder::new("geo3d".try_into().expect("valid id"))
+        .symbol(Sphere::symbol())
+        .symbol(Cube::symbol())
+        .symbol(Cylinder::symbol())
         .build()
 }

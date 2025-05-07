@@ -1,18 +1,1 @@
-error: Symbol small_disc not found.
-  ---> <from_str>:20:1
-     |
-  20 | small_disc( diameter = 1cm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol small_disc not found.
-  ---> <from_str>:21:1
-     |
-  21 | small_disc( half_diameter = 1cm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol small_disc not found.
-  ---> <from_str>:22:1
-     |
-  22 | small_disc( double_diameter = 1cm);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+Symbol factor not found.

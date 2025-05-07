@@ -1,9 +1,9 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Module initialization definition syntax element
 
-use crate::{diag::*, eval::*, objects::*, src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*};
 
 /// Module initialization definition
 ///
@@ -22,61 +22,6 @@ pub struct ModuleInitDefinition {
     pub body: Body,
     /// Source reference
     pub src_ref: SrcRef,
-}
-
-impl ModuleInitDefinition {
-    /// Evaluate a call to the module init definition
-    pub fn eval_to_node(
-        &self,
-        args: &ArgumentMap,
-        mut props: ObjectProperties,
-        context: &mut EvalContext,
-    ) -> EvalResult<ObjectNode> {
-        context.open_scope();
-
-        // Add values from argument map as local values
-        for (id, value) in args.iter() {
-            props.assign_and_add_local_value(id, value.clone(), context);
-        }
-
-        let mut nodes = Vec::new();
-        for statement in &self.body.statements {
-            match statement {
-                Statement::Assignment(assignment) => {
-                    let id = assignment.name.id();
-                    let value = assignment.value.eval(context)?;
-
-                    props.assign_and_add_local_value(id, value, context);
-                }
-                Statement::Expression(expression) => {
-                    nodes.append(&mut expression.eval(context)?.fetch_nodes())
-                }
-                _ => {
-                    context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
-                }
-            }
-        }
-
-        context.close_scope();
-
-        if !props.all_initialized() {
-            context.error(
-                self,
-                EvalError::UninitializedProperties(props.get_ids_of_uninitialized()),
-            )?;
-            return Ok(empty_object());
-        }
-
-        // Make a new object node
-        let object = object(Object {
-            name: crate::Id::default(),
-            props,
-        });
-        for node in nodes {
-            object.append(node);
-        }
-        Ok(object)
-    }
 }
 
 impl SrcReferrer for ModuleInitDefinition {

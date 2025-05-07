@@ -3,7 +3,7 @@
 
 //! Parameter multiplicity implementation.
 
-use crate::{eval::*, value::*, Id};
+use crate::{eval::*, value::*};
 
 /// An enum to distinguish single-value and multi-value coefficients
 #[derive(Clone, Debug)]
@@ -42,13 +42,13 @@ pub struct Combinations<T> {
     /// The indices of the iterator. Stored in a Vec instead of a HashMap
     indices: Vec<usize>,
     /// Used to map Id to data indices
-    data_indices: std::collections::BTreeMap<Id, usize>,
+    data_indices: std::collections::BTreeMap<Identifier, usize>,
     /// Flag to tell if the iterator is finished
     done: bool,
 }
 
 /// A map over combinations
-pub type CombinationMap<T> = std::collections::HashMap<Id, Coefficient<T>>;
+pub type CombinationMap<T> = std::collections::HashMap<Identifier, Coefficient<T>>;
 
 impl<T> Combinations<T>
 where
@@ -56,13 +56,13 @@ where
 {
     /// Create a new Combinations iterator
     pub fn new(data: &CombinationMap<T>) -> Self {
-        let mut ids_sorted: Vec<Id> = data.keys().cloned().collect();
+        let mut ids_sorted: Vec<Identifier> = data.keys().cloned().collect();
         ids_sorted.sort();
         let keys_sorted: Vec<usize> = (0..ids_sorted.len()).collect();
 
         let indices = ids_sorted.iter().map(|_| 0).collect();
 
-        let data_indices: std::collections::BTreeMap<Id, usize> = ids_sorted
+        let data_indices: std::collections::BTreeMap<Identifier, usize> = ids_sorted
             .iter()
             .zip(keys_sorted)
             .map(|(id, key)| (id.clone(), key))
@@ -70,7 +70,7 @@ where
 
         let data: Vec<Coefficient<T>> = ids_sorted
             .iter()
-            .map(|id| data.get(id).expect("Coeffifient with id").clone())
+            .map(|id| data.get(id).expect("Coefficient with id").clone())
             .collect();
 
         Combinations {
@@ -173,9 +173,9 @@ fn call_parameter_multiplicity() {
 
     let mut count = 0;
     for combination in combinations {
-        let mut keys: Vec<Id> = combination.keys().cloned().collect();
+        let mut keys: Vec<Identifier> = combination.keys().cloned().collect();
         keys.sort();
-        let items: Vec<(&Id, i64)> = keys
+        let items: Vec<(&Identifier, i64)> = keys
             .iter()
             .map(|key| {
                 (
@@ -184,7 +184,7 @@ fn call_parameter_multiplicity() {
                 )
             })
             .collect::<Vec<_>>();
-        println!("{:?}", items);
+        log::trace!("{:?}", items);
         count += 1;
     }
 
@@ -195,7 +195,8 @@ fn call_parameter_multiplicity() {
     );
 
     // Test empty map
-    let data: std::collections::HashMap<Id, Coefficient<Value>> = std::collections::HashMap::new();
+    let data: std::collections::HashMap<Identifier, Coefficient<Value>> =
+        std::collections::HashMap::new();
 
     let combinations = Combinations::new(&data);
     let mut count = 0;

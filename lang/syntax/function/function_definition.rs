@@ -26,14 +26,9 @@ impl SrcReferrer for FunctionDefinition {
 
 impl FunctionDefinition {
     /// Create new function definition
-    pub fn new(
-        name: Identifier,
-        signature: FunctionSignature,
-        body: Body,
-        src_ref: SrcRef,
-    ) -> Self {
+    pub fn new(id: Identifier, signature: FunctionSignature, body: Body, src_ref: SrcRef) -> Self {
         Self {
-            id: name,
+            id,
             signature,
             body,
             src_ref,
@@ -41,8 +36,8 @@ impl FunctionDefinition {
     }
 
     /// Resolve into SymbolNode
-    pub fn resolve(self: &Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        let node = SymbolNode::new(SymbolDefinition::Function(self.clone()), parent);
+    pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
+        let node = Symbol::new(SymbolDefinition::Function(self.clone()), parent);
         node.borrow_mut().children = self.body.resolve(Some(node.clone()));
         node
     }

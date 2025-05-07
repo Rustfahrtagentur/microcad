@@ -4,7 +4,7 @@
 use crate::{eval::*, objects::*};
 
 impl Eval for ListExpression {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let mut value_list = ValueList::new(
             self.list
                 .iter()
@@ -35,12 +35,22 @@ impl Eval for ListExpression {
 }
 
 impl Eval for Expression {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match self {
             Self::Literal(literal) => Literal::eval(literal, context),
             Self::FormatString(format_string) => FormatString::eval(format_string, context),
             Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
-            Self::TupleExpression(_) => todo!("Implement tuple expression"),
+            Self::TupleExpression(_) => {
+                context.error(
+                    self,
+                    EvalError::Todo(format!(
+                        "cannot evaluate tuple expression of {} at {}",
+                        self,
+                        context.locate(self)?
+                    )),
+                )?;
+                Ok(Value::None)
+            }
             Self::BinaryOp {
                 lhs,
                 op,
@@ -53,7 +63,13 @@ impl Eval for Expression {
                     return Ok(Value::None);
                 }
 
-                Value::binary_op(lhs, rhs, op.as_str()).map_err(EvalError::ValueError)
+                match Value::binary_op(lhs, rhs, op.as_str()) {
+                    Err(err) => {
+                        context.error(self, err)?;
+                        Ok(Value::None)
+                    }
+                    Ok(value) => Ok(value),
+                }
             }
             Self::UnaryOp {
                 op,
@@ -110,7 +126,7 @@ impl Eval for Expression {
 }
 
 impl Eval for Nested {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let mut node_stack = Vec::new();
 
         for (index, item) in self.iter().enumerate() {
@@ -129,19 +145,43 @@ impl Eval for Nested {
             node_stack.push(nodes);
         }
 
-        if node_stack.is_empty() {
-            Ok(Value::None)
-        } else {
-            Ok(Value::NodeMultiplicity(nest_nodes(&node_stack).clone()))
-        }
+        Ok(nest_nodes(&node_stack).clone().into())
     }
 }
 
 impl Eval for NestedItem {
-    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match &self {
             NestedItem::Call(call) => Ok(call.eval(context)?),
-            NestedItem::QualifiedName(qualified_name) => Ok(qualified_name.eval(context)?),
+            NestedItem::QualifiedName(name) => match &context.lookup(name)?.borrow().def {
+                SymbolDefinition::Constant(_, value)
+                | SymbolDefinition::CallArgument(_, value)
+                | SymbolDefinition::Property(_, value) => Ok(value.clone()),
+                SymbolDefinition::Namespace(ns) => {
+                    Err(EvalError::UnexpectedNested("namespace", ns.id.clone()))
+                }
+                SymbolDefinition::Module(md) => {
+                    Err(EvalError::UnexpectedNested("module", md.id.clone()))
+                }
+                SymbolDefinition::Function(f) => {
+                    Err(EvalError::UnexpectedNested("function", f.id.clone()))
+                }
+                SymbolDefinition::Builtin(bm) => {
+                    Err(EvalError::UnexpectedNested("builtin", bm.id.clone()))
+                }
+                SymbolDefinition::Alias(id, _) => {
+                    unreachable!("Unexpected alias {id} in expression")
+                }
+                SymbolDefinition::SourceFile(sf) => {
+                    unreachable!(
+                        "Unexpected source file {} in expression",
+                        sf.filename_as_str()
+                    )
+                }
+                SymbolDefinition::External(ns) => {
+                    unreachable!("Unexpected unload source file {} in expression", ns.id)
+                }
+            },
             NestedItem::Body(body) => Ok(Value::Node(body.eval_to_node(context)?)),
         }
     }

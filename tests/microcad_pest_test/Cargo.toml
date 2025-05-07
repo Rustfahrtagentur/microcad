@@ -12,6 +12,8 @@ path = "lib.rs"
 [dependencies]
 pest = "2.7"
 pest_derive = "2.7"
+log = "0.4"
+env_logger = "0.11"
 
 [lints.rust]
 missing_docs = "warn"

@@ -18,17 +18,17 @@ pub struct NamespaceDefinition {
 
 impl NamespaceDefinition {
     /// Create a new namespace definition
-    pub fn new(name: Identifier) -> Rc<Self> {
+    pub fn new(id: Identifier) -> Rc<Self> {
         Rc::new(Self {
-            id: name,
+            id,
             body: Body::default(),
             src_ref: SrcRef(None),
         })
     }
 
     /// Resolve into SymbolNode
-    pub fn resolve(self: &Rc<Self>, parent: Option<RcMut<SymbolNode>>) -> RcMut<SymbolNode> {
-        let node = SymbolNode::new(SymbolDefinition::Namespace(self.clone()), parent);
+    pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
+        let node = Symbol::new(SymbolDefinition::Namespace(self.clone()), parent);
         node.borrow_mut().children = self.body.resolve(Some(node.clone()));
         node
     }

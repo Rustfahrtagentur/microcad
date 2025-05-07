@@ -1,6 +1,0 @@
-error: Symbol std::assert not found.
-  ---> <from_str>:1:1
-     |
-   1 | std::assert( true != false );
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |

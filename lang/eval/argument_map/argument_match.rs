@@ -34,7 +34,7 @@ pub trait ArgumentMatch: Default {
             .clone()
             .iter()
             // Filter out parameters that have a name and are present in the call arguments
-            .filter_map(|p| call_argument_values.get(&p.name).map(|c| (p, c)))
+            .filter_map(|p| call_argument_values.get(&p.id).map(|c| (p, c)))
             // Insert the call arguments into the map
             .try_for_each(|(parameter_value, call_argument_value)| {
                 self.insert_and_remove_from_parameters(
@@ -63,7 +63,7 @@ pub trait ArgumentMatch: Default {
         }
         let mut positional_index = 0;
 
-        for call_argument_value in call_argument_values.iter().filter(|arg| arg.name.is_none()) {
+        for call_argument_value in call_argument_values.iter().filter(|arg| arg.id.is_none()) {
             let parameter_value = match parameter_values.get_by_index(positional_index) {
                 Some(p) => p.clone(),
                 None => break,
@@ -103,7 +103,7 @@ pub trait ArgumentMatch: Default {
             .iter()
             // Filter out parameters that have a default value and are not present in the call arguments
             .filter_map(
-                |p| match (call_argument_values.get(&p.name), &p.default_value) {
+                |p| match (call_argument_values.get(&p.id), &p.default_value) {
                     (None, Some(default_value)) => Some((p, default_value.clone())),
                     _ => None,
                 },

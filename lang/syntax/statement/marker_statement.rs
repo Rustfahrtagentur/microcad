@@ -9,7 +9,7 @@ use crate::{src_ref::*, syntax::*};
 #[derive(Clone, Debug)]
 pub struct Marker {
     /// Marker name, e.g. `children`
-    pub name: Identifier,
+    pub id: Identifier,
     /// Source code reference
     pub src_ref: SrcRef,
 }
@@ -17,7 +17,7 @@ pub struct Marker {
 impl Marker {
     /// Returns true if the marker is a children marker
     pub fn is_children_marker(&self) -> bool {
-        &self.name == "children"
+        &self.id == "children"
     }
 }
 
@@ -29,12 +29,12 @@ impl SrcReferrer for Marker {
 
 impl std::fmt::Display for Marker {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "@{}", self.name)
+        write!(f, "@{}", self.id)
     }
 }
 
 impl PrintSyntax for Marker {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}Marker '{}'", "", self.name)
+        writeln!(f, "{:depth$}Marker '{}'", "", self.id)
     }
 }

@@ -1,0 +1,18 @@
+error: Not implemented: cannot evaluate tuple expression of (x = 1mm, y = 2mm, z = 3mm) at <from_str>:2:6
+  ---> <from_str>:2:6
+     |
+   2 | p1 = (x=1mm, y=2mm, z=3mm);
+     |      ^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Not implemented: cannot evaluate tuple expression of (x = 1, y = 2, z = 3)mm at <from_str>:5:6
+  ---> <from_str>:5:6
+     |
+   5 | p2 = (x=1, y=2, z=3)mm;
+     |      ^^^^^^^^^^^^^^^^^
+     |
+error: Assertion failed: <invalid>
+  ---> <from_str>:8:21
+     |
+   8 | std::debug::assert( p1 == p2 );
+     |                     ^^^^^^^^^
+     |

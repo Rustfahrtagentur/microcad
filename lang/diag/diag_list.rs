@@ -1,24 +1,27 @@
+// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::diag::*;
 
-/// We have a vec of source file diagnostics because we want to keep track of diagnostics for each source file separately
+/// Source file diagnostics.
 #[derive(Debug, Default)]
-pub struct DiagList(Vec<Diag>);
+pub struct DiagList(Vec<Diagnostic>);
 
 impl DiagList {
-    /// Pretty print this list of diagnostics
+    /// Pretty print this list of diagnostics.
     pub fn pretty_print(
         &self,
-        w: &mut dyn std::io::Write,
+        f: &mut dyn std::fmt::Write,
         source_by_hash: &impl GetSourceByHash,
-    ) -> std::io::Result<()> {
+    ) -> std::fmt::Result {
         self.0
             .iter()
-            .try_for_each(|diag| diag.pretty_print(w, source_by_hash))
+            .try_for_each(|diag| diag.pretty_print(f, source_by_hash))
     }
 }
 
 impl std::ops::Deref for DiagList {
-    type Target = Vec<Diag>;
+    type Target = Vec<Diagnostic>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -26,7 +29,7 @@ impl std::ops::Deref for DiagList {
 }
 
 impl PushDiag for DiagList {
-    fn push_diag(&mut self, diag: Diag) -> crate::eval::EvalResult<()> {
+    fn push_diag(&mut self, diag: Diagnostic) -> crate::eval::EvalResult<()> {
         self.0.push(diag);
         Ok(())
     }

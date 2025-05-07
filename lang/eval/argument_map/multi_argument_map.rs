@@ -3,7 +3,7 @@
 
 //! Multi argument map evaluation entity
 
-use crate::{eval::*, ty::*, value::*, Id};
+use crate::{eval::*, ty::*, value::*};
 
 /// An argument map for parameter multiplicity.
 ///
@@ -16,13 +16,13 @@ pub struct MultiArgumentMap(CombinationMap<Value>);
 
 impl MultiArgumentMap {
     /// Insert a multi-value coefficient
-    pub fn insert_multi(&mut self, name: Id, value: Vec<Value>) {
-        self.0.insert(name, Coefficient::Multi(value));
+    pub fn insert_multi(&mut self, id: Identifier, value: Vec<Value>) {
+        self.0.insert(id, Coefficient::Multi(value));
     }
 
     /// Insert a single-value coefficient
-    pub fn insert_single(&mut self, name: Id, value: Value) {
-        self.0.insert(name, Coefficient::Single(value));
+    pub fn insert_single(&mut self, id: Identifier, value: Value) {
+        self.0.insert(id, Coefficient::Single(value));
     }
 
     /// Return an iterator over all combinations
@@ -40,19 +40,19 @@ impl ArgumentMatch for MultiArgumentMap {
         parameter_values: &mut ParameterValueList,
     ) -> EvalResult<TypeCheckResult> {
         let result = parameter_value.type_check(&value.ty());
-        let name = &parameter_value.name;
+        let id = &parameter_value.id;
         match result {
             TypeCheckResult::MultiMatch => match &value {
                 Value::List(l) => {
-                    parameter_values.remove(name);
-                    self.insert_multi(name.clone(), l.fetch());
+                    parameter_values.remove(id);
+                    self.insert_multi(id.clone(), l.fetch());
                     Ok(result)
                 }
                 value => Err(EvalError::ExpectedIterable(value.ty().clone())),
             },
             TypeCheckResult::SingleMatch => {
-                parameter_values.remove(name);
-                self.insert_single(name.clone(), value);
+                parameter_values.remove(id);
+                self.insert_single(id.clone(), value);
                 Ok(result)
             }
             _ => Ok(result),

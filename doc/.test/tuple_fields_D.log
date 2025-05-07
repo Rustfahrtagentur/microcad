@@ -1,0 +1,12 @@
+error: Not implemented: cannot evaluate tuple expression of (0, 0)mm at <from_str>:1:9
+  ---> <from_str>:1:9
+     |
+   1 | width = (0, 0)mm;
+     |         ^^^^^^^^
+     |
+error: Not implemented: cannot evaluate tuple expression of (0, 0)mm at <from_str>:2:10
+  ---> <from_str>:2:10
+     |
+   2 | height = (0, 0)mm;
+     |          ^^^^^^^^
+     |

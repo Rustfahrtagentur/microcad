@@ -1,14 +1,18 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+/// Global test initialization.
 #[cfg(test)]
-mod use_test;
+#[ctor::ctor]
+fn init() {
+    env_logger::init();
+}
 
 #[cfg(test)]
-use log::debug;
+mod context;
 
 #[cfg(test)]
-use microcad_lang::{parser::*, resolve::*, syntax::*};
+use microcad_lang::{eval::*, parser::*, resolve::*, src_ref::*, syntax::*};
 
 #[cfg(test)]
 include!(concat!(env!("OUT_DIR"), "/microcad_pest_test.rs"));
@@ -20,12 +24,11 @@ include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
 include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 
 #[cfg(test)]
-fn evaluate_file(filename: &str) -> microcad_lang::eval::EvalContext {
+fn evaluate_file(filename: &str) -> microcad_lang::eval::Context {
     use microcad_lang::eval::*;
 
     let filename = format!("../tests/test_cases/{filename}");
-    EvalContext::from_source(&filename, microcad_builtin::builtin_namespace(), &[])
-        .expect(&filename)
+    Context::from_source(&filename, microcad_builtin::builtin_namespace(), &[]).expect(&filename)
 }
 
 #[test]
@@ -35,14 +38,12 @@ fn namespaces() {
 
 #[test]
 fn scopes() {
-    assert!(evaluate_file("../tests/test_cases/syntax/scopes.µcad")
-        .eval()
-        .is_ok());
+    assert!(evaluate_file("syntax/scopes.µcad").eval().is_ok());
 }
 
 #[test]
 fn context_with_symbols() {
-    let mut context = evaluate_file("../tests/test_cases/syntax/call.µcad");
+    let mut context = evaluate_file("syntax/call.µcad");
 
     context
         .lookup(
@@ -74,29 +75,33 @@ fn qualified_name(s: &str) -> QualifiedName {
 
 /// Helper function to create a call argument list from &str
 #[cfg(test)]
-fn call_argument_list(s: &str) -> CallArgumentList {
-    Parser::parse_rule::<CallArgumentList>(microcad_lang::parser::Rule::call_argument_list, s, 0)
-        .expect("Valid CallArgumentList")
+fn call_argument_value_list(s: &str, context: &mut Context) -> CallArgumentValueList {
+    let call_argument_list = Parser::parse_rule::<CallArgumentList>(
+        microcad_lang::parser::Rule::call_argument_list,
+        s,
+        0,
+    )
+    .expect("Valid CallArgumentList");
+
+    call_argument_list
+        .eval(context)
+        .expect("Valid call argument list")
 }
 
 #[test]
 fn module_implicit_init_call() {
     use microcad_lang::*;
-    env_logger_init();
 
     let mut context = evaluate_file("syntax/module/implicit_init.µcad");
-    debug!("Source File:\n{}", context.get_root());
 
-    let node = context
-        .fetch_global(&qualified_name("implicit_init::a"))
-        .expect("Node expected");
+    let node = context.lookup(&qualified_name("a")).expect("Node expected");
 
     // Check node id
     if let Ok(node) =
         context.lookup(&Identifier(microcad_lang::src_ref::Refer::none("a".into())).into())
     {
-        let id = node.borrow().id();
-        assert_eq!(id, "a");
+        let id = node.id();
+        assert_eq!(id.id(), "a");
     }
 
     // Get module definition for symbol `a`
@@ -107,7 +112,10 @@ fn module_implicit_init_call() {
 
     // Call module `a` with `b = 3.0`
     let nodes = module_definition
-        .eval_call(&call_argument_list("b = 3.0"), &mut context)
+        .eval_call(
+            &call_argument_value_list("b = 3.0", &mut context),
+            &mut context,
+        )
         .expect("Valid nodes")
         .fetch_nodes();
 
@@ -117,7 +125,7 @@ fn module_implicit_init_call() {
         if let objects::ObjectNodeInner::Object(ref object) = *node.borrow() {
             assert_eq!(
                 object
-                    .get_property_value(&"b".into())
+                    .get_property_value(&Identifier(Refer::none("b".into())))
                     .expect("Property `b`"),
                 &value::Value::Scalar(src_ref::Refer::none(value))
             );
@@ -131,7 +139,10 @@ fn module_implicit_init_call() {
 
     // Call module `a` with `b = [1.0, 2.0]` (multiplicity)
     let nodes = module_definition
-        .eval_call(&call_argument_list("b = [1.0, 2.0]"), &mut context)
+        .eval_call(
+            &call_argument_value_list("b = [1.0, 2.0]", &mut context),
+            &mut context,
+        )
         .expect("Valid nodes")
         .fetch_nodes();
 
@@ -143,12 +154,12 @@ fn module_implicit_init_call() {
 
 #[test]
 fn module_explicit_init_call() {
+    use microcad_lang::diag::Diag;
     use microcad_lang::*;
-    env_logger_init();
 
     let mut context = evaluate_file("syntax/module/explicit_init.µcad");
     let node = context
-        .fetch_global(&qualified_name("explicit_init::circle"))
+        .lookup(&qualified_name("circle"))
         .expect("Node expected");
 
     // Get module definition for symbol `a`
@@ -160,9 +171,10 @@ fn module_explicit_init_call() {
     // Helper function to check if the object node contains a property radius with specified value
     fn check_node_property_radius(node: &objects::ObjectNode, value: f64) {
         if let objects::ObjectNodeInner::Object(ref object) = *node.borrow() {
+            log::trace!("Object: {object}");
             assert_eq!(
                 object
-                    .get_property_value(&"radius".into())
+                    .get_property_value(&Identifier::no_ref("radius"))
                     .expect("Property `radius`"),
                 &value::Value::Scalar(src_ref::Refer::none(value))
             );
@@ -174,7 +186,10 @@ fn module_explicit_init_call() {
     // Call module `circle(radius = 3.0)`
     {
         let nodes = module_definition
-            .eval_call(&call_argument_list("radius = 3.0"), &mut context)
+            .eval_call(
+                &call_argument_value_list("radius = 3.0", &mut context),
+                &mut context,
+            )
             .expect("A valid value")
             .fetch_nodes();
         assert_eq!(nodes.len(), 1, "There should be one node");
@@ -184,7 +199,10 @@ fn module_explicit_init_call() {
     // Call module `circle(r = 3.0)`
     {
         let nodes = module_definition
-            .eval_call(&call_argument_list("r = 3.0"), &mut context)
+            .eval_call(
+                &call_argument_value_list("r = 3.0", &mut context),
+                &mut context,
+            )
             .expect("Valid nodes")
             .fetch_nodes();
         assert_eq!(nodes.len(), 1, "There should be one node");
@@ -194,7 +212,10 @@ fn module_explicit_init_call() {
     // Call module `circle(d = 6.0)`
     {
         let nodes = module_definition
-            .eval_call(&call_argument_list("d = 6.0"), &mut context)
+            .eval_call(
+                &call_argument_value_list("d = 6.0", &mut context),
+                &mut context,
+            )
             .expect("Valid nodes")
             .fetch_nodes();
         assert_eq!(nodes.len(), 1, "There should be one node");
@@ -204,7 +225,10 @@ fn module_explicit_init_call() {
     // Call module `circle(d = [1.0, 2.0])` (multiplicity)
     {
         let nodes = module_definition
-            .eval_call(&call_argument_list("d = [1.0, 2.0]"), &mut context)
+            .eval_call(
+                &call_argument_value_list("d = [1.0, 2.0]", &mut context),
+                &mut context,
+            )
             .expect("Valid nodes")
             .fetch_nodes();
         assert_eq!(nodes.len(), 2, "There should be two nodes");
@@ -215,13 +239,10 @@ fn module_explicit_init_call() {
     // Call module `circle()` (missing arguments)
     {
         let nodes = module_definition
-            .eval_call(&CallArgumentList::default(), &mut context)
+            .eval_call(&CallArgumentValueList::default(), &mut context)
             .expect("Valid nodes")
             .fetch_nodes();
         assert_eq!(nodes.len(), 0, "There should no nodes");
-        context
-            .diag_handler()
-            .pretty_print(&mut std::io::stdout(), &context)
-            .expect("Valid formatter");
+        log::trace!("{}", context.diagnosis());
     }
 }

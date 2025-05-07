@@ -28,12 +28,6 @@ impl crate::ty::Ty for TypeAnnotation {
     }
 }
 
-impl From<Type> for TypeAnnotation {
-    fn from(value: Type) -> Self {
-        TypeAnnotation(Refer::none(value))
-    }
-}
-
 impl PrintSyntax for TypeAnnotation {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$} TypeAnnotation: {}", "", self.0.value)

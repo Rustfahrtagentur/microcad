@@ -7,10 +7,7 @@ extern crate clap;
 extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
-use log::*;
-use microcad_lang::{
-    env_logger_init, eval::*, objects::*, parse::ParseResult, rc::*, resolve::*, syntax::*,
-};
+use microcad_lang::{diag::*, eval::*, objects::*, parse::*, rc::*, resolve::*, syntax::*};
 use std::io::Write;
 
 /// µcad cli
@@ -60,7 +57,7 @@ enum Commands {
 
 /// Main of the command line interpreter
 fn main() {
-    env_logger_init();
+    env_logger::init();
 
     let cli = Cli::parse();
 
@@ -70,7 +67,7 @@ fn main() {
         eprintln!("{err}")
     }
 
-    info!("Processing Time: {:?}", start.elapsed());
+    log::info!("Processing Time: {:?}", start.elapsed());
 }
 
 fn run(cli: &Cli) -> anyhow::Result<()> {
@@ -131,13 +128,13 @@ main();
 
 fn parse(input: impl AsRef<std::path::Path>) -> ParseResult<Rc<SourceFile>> {
     let source_file = SourceFile::load(input)?;
-    info!("Parsed successfully!");
+    log::info!("Parsed successfully!");
     Ok(source_file)
 }
 
-fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<SymbolNodeRcMut> {
+fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<Symbol> {
     let symbol_node = parse(input)?.resolve(None);
-    info!("Resolved successfully!");
+    log::info!("Resolved successfully!");
     Ok(symbol_node)
 }
 
@@ -146,7 +143,7 @@ fn eval(
     search_paths: &[std::path::PathBuf],
 ) -> anyhow::Result<ObjectNode> {
     let symbols = resolve(input)?;
-    let mut context = EvalContext::new(
+    let mut context = Context::new(
         symbols.clone(),
         microcad_builtin::builtin_namespace(),
         search_paths,
@@ -154,13 +151,14 @@ fn eval(
     );
     let result = context.eval().map_err(|err| anyhow::anyhow!("{err}"))?;
 
+    log::info!("Result:");
     println!("{result}");
-    match context.errors_as_str() {
-        Some(errors) => {
-            warn!("Evaluated with errors:");
-            error!("{}", errors);
+    match context.has_errors() {
+        true => {
+            log::warn!("Evaluated with errors:");
+            eprintln!("{}", context.diagnosis());
         }
-        None => info!("Evaluated successfully!"),
+        false => log::info!("Evaluated successfully!"),
     }
 
     todo!("object node output")

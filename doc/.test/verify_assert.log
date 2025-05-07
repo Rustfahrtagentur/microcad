@@ -1,6 +1,1 @@
-error: Symbol std::assert not found.
-  ---> <from_str>:1:1
-     |
-   1 | std::assert(true, "You won't see this message");
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+error: Argument count mismatch: expected 1, got 2 in true, You won't see this message

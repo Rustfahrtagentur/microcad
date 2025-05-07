@@ -4,73 +4,79 @@
 //! External files register
 
 use crate::{eval::*, src_ref::*, syntax::*, MICROCAD_EXTENSIONS};
-use log::*;
 
-/// External files register
+/// External files register.
+///
+/// A map of *qualified name* -> *source file path* which is generated at creation
+/// by scanning in the given `search_paths`.
 #[derive(Debug, Default)]
 pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf>);
 
 impl Externals {
-    /// Create new resolve context.
+    /// Creates externals list.
+    ///
+    /// Recursively scans given `search_paths` for µcad files but files will not be loaded.
+    /// # Arguments
+    /// - `search_paths`: Paths to search for any external files.
     pub fn new(search_paths: &[std::path::PathBuf]) -> Self {
         let no_search_paths = search_paths.is_empty();
         let new = Self(Self::search_externals(search_paths));
         if no_search_paths {
-            info!("No external search paths were given");
+            log::info!("No external search paths were given");
         } else if new.is_empty() {
-            warn!("Did not find any externals in any search path");
+            log::warn!("Did not find any externals in any search path");
         } else {
-            info!("Found {} external modules", new.len());
-            trace!("Externals:\n{new}");
+            log::info!("Found {} external modules", new.len());
+            log::trace!("Externals:\n{new}");
         }
         new
     }
 
-    /// Create namespace tree from externals.
+    /// Creates namespace map from externals.
     pub fn create_namespaces(&self) -> SymbolMap {
         let mut map = SymbolMap::new();
         self.iter().for_each(|(basename, _)| {
             let (id, name) = basename.split_first();
-            let namespace = match map.get(id.id()) {
+            let namespace = match map.get(&id) {
                 Some(symbol) => symbol.clone(),
-                _ => SymbolNode::new_external(id.clone()),
+                _ => Symbol::new_external(id.clone()),
             };
             Self::recursive_create_namespaces(&namespace, &name);
-            map.insert(id.id().clone(), namespace);
+            map.insert(id.clone(), namespace);
         });
         map
     }
 
-    fn recursive_create_namespaces(
-        parent: &SymbolNodeRcMut,
-        name: &QualifiedName,
-    ) -> Option<SymbolNodeRcMut> {
+    fn recursive_create_namespaces(parent: &Symbol, name: &QualifiedName) -> Option<Symbol> {
         if name.is_empty() {
             return None;
         }
 
         let node_id = name.first().expect("Non-empty qualified name");
-        if let Some(child) = parent.borrow().get(node_id.id()) {
+        if let Some(child) = parent.get(node_id) {
             return Some(child.clone());
         }
 
         let child = if name.is_id() {
-            SymbolNode::new_external(node_id.clone())
+            Symbol::new_external(node_id.clone())
         } else {
-            SymbolNode::new_namespace(node_id.clone())
+            Symbol::new_namespace(node_id.clone())
         };
-        SymbolNode::insert_child(parent, child.clone());
+        Symbol::add_child(parent, child.clone());
 
         Self::recursive_create_namespaces(&child, &name.remove_first());
         Some(child)
     }
 
     /// Search for an external file which may include a given qualified name.
+    ///
+    /// # Arguments
+    /// - `name`: Qualified name expected to find.
     pub fn fetch_external(
         &self,
         name: &QualifiedName,
     ) -> EvalResult<(QualifiedName, std::path::PathBuf)> {
-        trace!("fetching {name} from externals");
+        log::trace!("fetching {name} from externals");
 
         if let Some(found) = self
             .0
@@ -88,18 +94,18 @@ impl Externals {
         Err(EvalError::ExternalSymbolNotFound(name.clone()))
     }
 
-    /// get qualified name by path
+    /// Get qualified name by path
     pub fn get_name(&self, path: &std::path::Path) -> EvalResult<&QualifiedName> {
         match self.0.iter().find(|(_, p)| p.as_path() == path) {
             Some((name, _)) => {
-                trace!("got name of {path:?} => {name}");
+                log::trace!("got name of {path:?} => {name}");
                 Ok(name)
             }
             None => Err(EvalError::ExternalPathNotFound(path.to_path_buf())),
         }
     }
 
-    /// Searches for external source code files (external modules) in some search paths.
+    /// Searches for external source code files (*external namespaces*) in given *search paths*.
     fn search_externals(
         search_paths: &[std::path::PathBuf],
     ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {
@@ -188,7 +194,7 @@ fn resolve_external_file() {
 
     assert!(!externals.is_empty());
 
-    println!("{externals}");
+    log::trace!("{externals}");
 
     assert!(externals
         .fetch_external(&"std::geo2d::circle".into())
@@ -207,5 +213,5 @@ fn create_namespaces() {
 
     let namespaces = externals.create_namespaces();
 
-    println!("{namespaces:#?}");
+    log::trace!("{namespaces:#?}");
 }

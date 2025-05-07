@@ -3,7 +3,7 @@
 
 //! Single symbol resolving
 //!
-//! After parsing a source file (see `crate::parse`) it must be resolved to get a symbol out of it:
+//! After parsing a source file (see [`crate::parse`]) it must be resolved to get a symbol out of it:
 //!
 //! ```
 //! use microcad_lang::{syntax::*, parse::*, resolve::*}
@@ -13,15 +13,15 @@
 //! let source_symbol = source_file.resolve(None);
 //! ```
 //!
-//! To "run" the source file (and get the expected output) it must now be evaluated (see [crate::eval])  .
+//! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .
 
+mod symbol;
 mod symbol_definition;
 mod symbol_map;
-mod symbol_node;
 
+pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
-pub use symbol_node::*;
 
 use crate::syntax::*;
 
@@ -33,20 +33,14 @@ pub trait FullyQualify {
 
 #[test]
 fn resolve_source_file() {
-    use std::rc::Rc;
-
-    crate::env_logger_init();
-
-    let source_file = Rc::new(
-        SourceFile::load_from_str(r#"module a() { module b() {} } "#).expect("Valid source"),
-    );
+    let source_file =
+        SourceFile::load_from_str(r#"module a() { module b() {} } "#).expect("Valid source");
 
     let symbol_node = source_file.resolve(None);
 
     // file <no file>
     //  module a
     //   module b
-    let symbol_node = symbol_node.borrow();
     assert!(symbol_node.get(&"a".into()).is_some());
     assert!(symbol_node.get(&"c".into()).is_none());
 
@@ -62,9 +56,9 @@ fn resolve_source_file() {
     log::trace!("Symbol node:\n{symbol_node}");
 
     let b = symbol_node.search(&"a::b".into()).expect("cant find node");
-    assert!(b.borrow().search(&"a".into()).is_none());
+    assert!(b.search(&"a".into()).is_none());
 
     //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
 
-    println!("{symbol_node}");
+    log::trace!("{symbol_node}");
 }

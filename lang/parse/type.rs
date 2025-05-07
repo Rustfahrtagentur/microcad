@@ -50,12 +50,9 @@ fn named_tuple_type() {
     assert_eq!(
         type_annotation.ty(),
         Type::NamedTuple(NamedTupleType(
-            vec![
-                ("x".into(), Type::Integer),
-                ("y".into(), Type::String)
-            ]
-            .into_iter()
-            .collect()
+            vec![("x".into(), Type::Integer), ("y".into(), Type::String)]
+                .into_iter()
+                .collect()
         ))
     );
 }

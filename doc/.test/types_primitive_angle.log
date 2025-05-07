@@ -1,1 +1,12 @@
-Symbol std::math::pi not found.
+error: Not implemented: cannot evaluate method call of equal() at <from_str>:8:58
+  ---> <from_str>:8:58
+     |
+   8 | std::debug::assert( [degree, degree_, grad, turn, radian].equal() );
+     |                                                          ^^^^^^^^
+     |
+error: Assertion failed: <invalid>
+  ---> <from_str>:8:21
+     |
+   8 | std::debug::assert( [degree, degree_, grad, turn, radian].equal() );
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
