@@ -169,7 +169,7 @@ fn local_stack() {
         }
     };
 
-    stack.open_source("test".into());
+    stack.open(StackFrame::Source("test".into(), SymbolMap::default()));
     assert!(stack.current_namespace() == "test".into());
 
     assert!(stack.put_local(None, make_int("a".into(), 1)).is_ok());
@@ -180,7 +180,7 @@ fn local_stack() {
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
 
-    stack.open_body();
+    stack.open(StackFrame::Body(SymbolMap::default()));
     assert!(stack.current_namespace() == "test".into());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);

@@ -11,24 +11,25 @@ impl ModuleInitDefinition {
         object_builder: &mut ObjectBuilder,
         context: &mut Context,
     ) -> EvalResult<()> {
-        context.open_module_init(args.into());
-
-        for statement in &self.body.statements {
-            match statement {
-                Statement::Assignment(assignment) => {
-                    let _id = &assignment.id;
-                    let _value = assignment.expression.eval(context)?;
-                    todo!();
-                }
-                Statement::Expression(expression) => {
-                    object_builder.append_children(&mut expression.eval(context)?.fetch_nodes());
-                }
-                _ => {
-                    context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
+        context.scope(StackFrame::ModuleInit(args.into()), |context| {
+            for statement in &self.body.statements {
+                match statement {
+                    Statement::Assignment(assignment) => {
+                        let _id = &assignment.id;
+                        let _value = assignment.expression.eval(context)?;
+                        todo!();
+                    }
+                    Statement::Expression(expression) => {
+                        object_builder
+                            .append_children(&mut expression.eval(context)?.fetch_nodes());
+                    }
+                    _ => {
+                        context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
+                    }
                 }
             }
-        }
 
-        Ok(())
+            Ok(())
+        })
     }
 }

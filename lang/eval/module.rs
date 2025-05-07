@@ -37,34 +37,37 @@ impl ModuleDefinition {
     ) -> EvalResult<ObjectNode> {
         let mut object_builder = ObjectBuilder::new();
 
-        context.open_module(self.id.clone(), args.into());
+        context.scope(
+            StackFrame::Module(self.id.clone(), args.into()),
+            |context| {
+                // Create the object node from initializer if present
+                match init {
+                    Some(init) => init.eval_to_node(args, &mut object_builder, context)?,
+                    None => {
+                        object_builder.init_properties(&self.parameters.eval(context)?, args);
+                    }
+                };
 
-        // Create the object node from initializer if present
-        match init {
-            Some(init) => init.eval_to_node(args, &mut object_builder, context)?,
-            None => {
-                object_builder.init_properties(&self.parameters.eval(context)?, args);
-            }
-        };
-
-        // At this point, all properties must have a value
-        for statement in &self.body.statements {
-            match statement {
-                Statement::Assignment(assignment) => {
-                    let id = &assignment.id;
-                    let value = assignment.expression.eval(context)?;
-                    context.set_local_value(id.clone(), value.clone())?;
-                    object_builder.set_property(id.clone(), value);
+                // At this point, all properties must have a value
+                for statement in &self.body.statements {
+                    match statement {
+                        Statement::Assignment(assignment) => {
+                            let id = &assignment.id;
+                            let value = assignment.expression.eval(context)?;
+                            context.set_local_value(id.clone(), value.clone())?;
+                            object_builder.set_property(id.clone(), value);
+                        }
+                        Statement::Expression(expression) => {
+                            let value = expression.eval(context)?;
+                            object_builder.append_children(&mut value.fetch_nodes());
+                        }
+                        _ => {}
+                    }
                 }
-                Statement::Expression(expression) => {
-                    let value = expression.eval(context)?;
-                    object_builder.append_children(&mut value.fetch_nodes());
-                }
-                _ => {}
-            }
-        }
 
-        Ok(object_builder.build_node())
+                Ok(object_builder.build_node())
+            },
+        )
     }
 
     /// Evaluate the call of a module

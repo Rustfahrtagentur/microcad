@@ -56,27 +56,28 @@ impl Eval for Call {
             }
         };
 
-        context.open_call(symbol.clone(), args.clone(), self.src_ref());
-
-        let value = match &symbol.borrow().def {
-            SymbolDefinition::Builtin(f) => f.call(&args, context),
-            SymbolDefinition::Module(m) => m.eval_call(&args, context),
-            _ => {
-                context.error(
-                    self,
-                    EvalError::Todo(format!(
-                        "cannot evaluate call of {} at {}",
+        context.scope(
+            StackFrame::Call {
+                symbol: symbol.clone(),
+                args: args.clone(),
+                src_ref: self.src_ref(),
+            },
+            |context| match &symbol.borrow().def {
+                SymbolDefinition::Builtin(f) => f.call(&args, context),
+                SymbolDefinition::Module(m) => m.eval_call(&args, context),
+                _ => {
+                    context.error(
                         self,
-                        context.locate(self)?
-                    )),
-                )?;
-                Ok(Value::None)
-            }
-        };
-
-        context.close();
-
-        value
+                        EvalError::Todo(format!(
+                            "cannot evaluate call of {} at {}",
+                            self,
+                            context.locate(self)?
+                        )),
+                    )?;
+                    Ok(Value::None)
+                }
+            },
+        )
     }
 }
 

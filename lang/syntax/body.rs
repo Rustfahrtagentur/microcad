@@ -72,35 +72,33 @@ impl Body {
 
     /// Evaluate the statement of this body into an ObjectNode
     pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ObjectNode> {
-        context.open_body();
+        context.scope(StackFrame::Body(SymbolMap::default()), |context| {
+            let mut nodes = Vec::new();
 
-        let mut nodes = Vec::new();
+            for statement in &self.statements {
+                let value = match statement {
+                    Statement::Use(_) => continue, // Use statements have been resolved at this point
+                    Statement::Assignment(assignment) => assignment.eval(context)?,
+                    Statement::Expression(expression) => expression.eval(context)?,
+                    Statement::Marker(marker) => marker.eval(context)?,
+                    Statement::If(_) => todo!("if statement not implemented"),
+                    statement => {
+                        use crate::diag::PushDiag;
+                        context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
+                        Value::None
+                    }
+                };
 
-        for statement in &self.statements {
-            let value = match statement {
-                Statement::Use(_) => continue, // Use statements have been resolved at this point
-                Statement::Assignment(assignment) => assignment.eval(context)?,
-                Statement::Expression(expression) => expression.eval(context)?,
-                Statement::Marker(marker) => marker.eval(context)?,
-                Statement::If(_) => todo!("if statement not implemented"),
-                statement => {
-                    use crate::diag::PushDiag;
-                    context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
-                    Value::None
-                }
-            };
+                nodes.append(&mut value.fetch_nodes());
+            }
 
-            nodes.append(&mut value.fetch_nodes());
-        }
+            let object = empty_object();
+            for node in nodes {
+                object.append(node);
+            }
 
-        context.close();
-
-        let object = empty_object();
-        for node in nodes {
-            object.append(node);
-        }
-
-        Ok(object)
+            Ok(object)
+        })
     }
 }
 
