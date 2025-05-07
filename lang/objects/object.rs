@@ -3,7 +3,11 @@
 
 //! Object an object tree
 
-use crate::{diag::*, eval::*, syntax::*, value::*};
+use crate::{
+    resolve::{SymbolDefinition, SymbolMap},
+    syntax::*,
+    value::*,
+};
 use std::collections::BTreeMap;
 
 /// A list of values sorted by id
@@ -13,19 +17,6 @@ use std::collections::BTreeMap;
 pub struct ObjectProperties(BTreeMap<Identifier, Value>);
 
 impl ObjectProperties {
-    /// Create initial property list by evaluating parameter list
-    pub fn from_parameter_list(
-        parameter_list: &ParameterList,
-        context: &mut Context,
-    ) -> EvalResult<Self> {
-        let mut props = BTreeMap::new();
-        for parameter in parameter_list.iter() {
-            props.insert(parameter.id.clone(), parameter.eval_default_value(context)?);
-        }
-
-        Ok(Self(props))
-    }
-
     /// Test if each property has a value
     pub fn all_initialized(&self) -> bool {
         self.0.iter().all(|(_, value)| !value.is_invalid())
@@ -41,6 +32,10 @@ impl ObjectProperties {
         self.0.get_mut(id)
     }
 
+    pub fn insert(&mut self, id: Identifier, value: Value) {
+        self.0.insert(id, value);
+    }
+
     /// Get all ids where `value == Value::None`
     pub fn get_ids_of_uninitialized(&self) -> Vec<Identifier> {
         self.0
@@ -54,24 +49,20 @@ impl ObjectProperties {
             })
             .collect()
     }
+}
 
-    /// If the property with `id` exists, assign the new value and add as local value to the context
-    pub fn assign_and_add_local_value(
-        &mut self,
-        id: &Identifier,
-        value: Value,
-        context: &mut Context,
-    ) -> EvalResult<()> {
-        if let Some(prop_value) = self.get_value_mut(id) {
-            *prop_value = value.clone();
+impl From<&SymbolMap> for ObjectProperties {
+    fn from(symbol_map: &SymbolMap) -> Self {
+        let mut props = ObjectProperties::default();
+        for (id, symbol) in symbol_map.iter() {
+            match &symbol.borrow().def {
+                SymbolDefinition::Property(_, value) => {
+                    props.0.insert(id.clone(), value.clone());
+                }
+                _ => {}
+            }
         }
-
-        // The result of the assignment becomes a local value, too
-        if let Err(err) = context.set_local_value(id.clone(), value) {
-            context.error(id, err)
-        } else {
-            Ok(())
-        }
+        props
     }
 }
 

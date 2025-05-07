@@ -12,7 +12,12 @@ pub use algorithm::*;
 pub use object::*;
 pub use transform::*;
 
-use crate::{rc::*, syntax::Identifier, value::Value};
+use crate::{
+    eval::ArgumentMap,
+    rc::*,
+    syntax::Identifier,
+    value::{ParameterValueList, Value},
+};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -276,6 +281,60 @@ pub fn bake3d(
     })?;
 
     Ok(node3d)
+}
+
+#[derive(Default)]
+pub struct ObjectBuilder {
+    object: Object,
+    children: Vec<ObjectNode>,
+}
+
+impl ObjectBuilder {
+    pub fn new() -> Self {
+        Self {
+            ..Default::default()
+        }
+    }
+
+    pub fn init_properties(
+        &mut self,
+        parameters: &ParameterValueList,
+        arguments: &ArgumentMap,
+    ) -> &mut Self {
+        let mut props = ObjectProperties::default();
+
+        for parameter in parameters.iter() {
+            props.insert(
+                parameter.id.clone(),
+                match &parameter.default_value {
+                    Some(value) => value.clone(),
+                    None => arguments.get(&parameter.id).unwrap_or(&Value::None).clone(),
+                },
+            );
+        }
+
+        self.object.props = props;
+        self
+    }
+
+    /// Append child nodes to this object node.
+    pub fn append_children(&mut self, nodes: &mut Vec<ObjectNode>) -> &mut Self {
+        self.children.append(nodes);
+        self
+    }
+
+    pub fn set_property(&mut self, id: Identifier, value: Value) -> &mut Self {
+        self.object.props.insert(id, value);
+        self
+    }
+
+    pub fn build_node(self) -> ObjectNode {
+        let node = ObjectNode::new(ObjectNodeInner::Object(self.object));
+        for child in self.children {
+            node.append(child);
+        }
+        node
+    }
 }
 
 #[test]

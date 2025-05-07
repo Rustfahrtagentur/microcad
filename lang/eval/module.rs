@@ -35,54 +35,35 @@ impl ModuleDefinition {
         init: Option<&'a ModuleInitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ObjectNode> {
-        let mut props = ObjectProperties::from_parameter_list(&self.parameters, context)?;
+        let mut object_builder = ObjectBuilder::new();
+        context.open_module(self.id.clone(), args.into());
 
         // Create the object node from initializer if present
-        let object = match init {
-            Some(init) => init.eval_to_node(args, props, context)?,
+        match init {
+            Some(init) => init.eval_to_node(args, &mut object_builder, context)?,
             None => {
-                // Add values from argument map as local values
-                for (id, value) in args.iter() {
-                    props.assign_and_add_local_value(id, value.clone(), context)?;
-                }
-                if !props.all_initialized() {
-                    context.error(
-                        self,
-                        EvalError::UninitializedProperties(props.get_ids_of_uninitialized()),
-                    )?;
-                    return Ok(empty_object());
-                }
-
-                object(Object {
-                    props,
-                    ..Default::default()
-                })
+                object_builder.init_properties(&self.parameters.eval(context)?, args);
             }
         };
 
         // At this point, all properties must have a value
-        let mut nodes = Vec::new();
-
         for statement in &self.body.statements {
             match statement {
                 Statement::Assignment(assignment) => {
                     let id = &assignment.id;
                     let value = assignment.expression.eval(context)?;
-                    context.set_local_value(id.clone(), value)?;
+                    context.set_local_value(id.clone(), value.clone())?;
+                    object_builder.set_property(id.clone(), value);
                 }
                 Statement::Expression(expression) => {
                     let value = expression.eval(context)?;
-                    nodes.append(&mut value.fetch_nodes());
+                    object_builder.append_children(&mut value.fetch_nodes());
                 }
                 _ => {}
             }
         }
 
-        for node in nodes {
-            object.append(node);
-        }
-
-        Ok(object)
+        Ok(object_builder.build_node())
     }
 
     /// Evaluate the call of a module
