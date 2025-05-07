@@ -214,7 +214,7 @@ impl GetSourceByHash for Context {
 impl std::fmt::Display for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.has_errors() {
-            write!(f, "{}\nErrors:\n", self.symbol_table)?;
+            writeln!(f, "{}Errors:", self.symbol_table)?;
             self.diag_handler.pretty_print(f, &self.symbol_table)
         } else {
             write!(f, "{}", self.symbol_table)

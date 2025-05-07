@@ -43,20 +43,24 @@ impl StackFrame {
     }
 
     /// Print local stack frame
-    pub fn print(&self, f: &mut std::fmt::Formatter<'_>, mut depth: usize) -> std::fmt::Result {
+    pub fn print_locals(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+        mut depth: usize,
+    ) -> std::fmt::Result {
         let map = match self {
             StackFrame::Source(id, map) => {
                 writeln!(f, "{:depth$}{id} (source):", "")?;
                 map
             }
-            StackFrame::Module(id, symbol) => {
-                return write!(f, "{:depth$}{id} = {symbol} (module)", "");
+            StackFrame::Module(id, symbols) => {
+                return write!(f, "{:depth$}{id} (module) = {symbols}", "");
             }
-            StackFrame::ModuleInit(symbol) => {
-                return write!(f, "{:depth$} = {symbol} (module)", "");
+            StackFrame::ModuleInit(symbols) => {
+                return write!(f, "{:depth$} (module init) = {symbols}", "");
             }
-            StackFrame::Namespace(id, symbol) => {
-                return writeln!(f, "{:depth$}{id} = {symbol} (namespace)", "");
+            StackFrame::Namespace(id, symbols) => {
+                return writeln!(f, "{:depth$}{id} (namespace) = {symbols}", "");
             }
             StackFrame::Body(map) => map,
             StackFrame::Call {
@@ -90,7 +94,7 @@ impl StackFrame {
     }
 
     /// Pretty print single call stack frame.
-    pub fn pretty_print(
+    pub fn print_stack(
         &self,
         f: &mut dyn std::fmt::Write,
         source_by_hash: &impl GetSourceByHash,

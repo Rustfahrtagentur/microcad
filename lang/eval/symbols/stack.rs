@@ -68,6 +68,7 @@ impl Stack {
         f: &mut dyn std::fmt::Write,
         source_by_hash: &impl super::GetSourceByHash,
     ) -> std::fmt::Result {
+        let mut none: bool = true;
         for (idx, frame) in self
             .0
             .iter()
@@ -83,7 +84,11 @@ impl Stack {
             })
             .enumerate()
         {
-            frame.pretty_print(f, source_by_hash, idx)?;
+            none = false;
+            frame.print_stack(f, source_by_hash, idx)?;
+        }
+        if none {
+            writeln!(f, "<empty>")?
         }
         Ok(())
     }
@@ -151,7 +156,7 @@ impl std::fmt::Display for Stack {
             writeln!(f, "<empty stack>")
         } else {
             for (n, locals) in self.0.iter().enumerate() {
-                locals.print(f, n * 4)?;
+                locals.print_locals(f, n * 4)?;
             }
             Ok(())
         }

@@ -255,14 +255,12 @@ impl UseSymbol for SymbolTable {
 
 impl std::fmt::Display for SymbolTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Loaded files:\n{files}\nNamespace: {name}\n\nLocals:\n{locals}\nSymbols:\n{symbols}",
-            files = self.cache,
-            name = self.stack.current_namespace(),
-            locals = self.stack,
-            symbols = self.globals
-        )
+        write!(f, "\nLoaded files:\n{}", self.cache)?;
+        writeln!(f, "\nNamespace: {}", self.stack.current_namespace())?;
+        write!(f, "\nLocals Stack:\n{}", self.stack)?;
+        writeln!(f, "\nCall Stack:")?;
+        self.stack.pretty_print_call_trace(f, &self.cache)?;
+        writeln!(f, "\nSymbols:\n{}", self.globals)
     }
 }
 
