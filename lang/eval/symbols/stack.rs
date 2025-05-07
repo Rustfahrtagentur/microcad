@@ -8,12 +8,12 @@ use crate::{eval::*, resolve::*};
 pub struct Stack(Vec<StackFrame>);
 
 impl Stack {
-    /// Put (or overwrite any existing) a *symbol* into the current stack frame.
+    /// Put (or overwrite any existing) *symbol* into the current stack frame.
     /// - `id`: *identifier* of the symbol to add/set. The *symbol's* internal *identifier* is used when `None`.
     pub fn put_local(&mut self, id: Option<Identifier>, symbol: Symbol) -> EvalResult<()> {
         let id = if let Some(id) = id { id } else { symbol.id() };
         let name = symbol.full_name();
-        for frame in self.0.iter_mut().rev() {
+        for (pos, frame) in self.0.iter_mut().rev().enumerate() {
             match frame {
                 StackFrame::Source(_, last) | StackFrame::Body(last) => {
                     let op = if last.insert(id.clone(), symbol).is_some() {
@@ -30,15 +30,20 @@ impl Stack {
                     log::trace!("Local Stack:\n{self}");
                     return Ok(());
                 }
+                // RULE: no locals available on namespace frame
                 StackFrame::Namespace(_, _) => {
                     return Err(EvalError::WrongStackFrame(id, "namespace"))
                 }
-                // skip any call frame
                 StackFrame::Call {
                     symbol: _,
                     args: _,
                     src_ref: _,
-                } => (),
+                } => {
+                    // RULE: top call frame is transparent on stack
+                    if pos > 0 {
+                        return Err(EvalError::WrongStackFrame(id, "namespace"));
+                    }
+                }
             }
         }
         Err(EvalError::LocalStackEmpty(id))
