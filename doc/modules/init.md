@@ -43,7 +43,7 @@ A module with an *implicit initializer* which takes a `size: Length`:
 
 ```µcad,init_implicit
 module box(size: Length) {
-    std::geo2d::rect(size);
+    std::geo2d::rect(width = size, height = size, x = 0mm, y = 0mm);
 }
 
 box(size=2cm);
