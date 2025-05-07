@@ -5,9 +5,8 @@ use crate::eval::*;
 
 impl Eval for Body {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        context.open_body();
-        let result = Body::evaluate_vec(&self.statements, context);
-        context.close();
-        result
+        context.scope(StackFrame::Body(SymbolMap::default()), |context| {
+            Body::evaluate_vec(&self.statements, context)
+        })
     }
 }

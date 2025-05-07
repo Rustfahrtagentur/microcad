@@ -139,6 +139,14 @@ impl Context {
     pub fn root(&self) -> &Symbol {
         &self.symbol_table.root
     }
+
+    /// Open a new scope with a stack frame.
+    pub fn scope<T>(&mut self, stack_frame: StackFrame, f: impl FnOnce(&mut Context) -> T) -> T {
+        self.open(stack_frame);
+        let result = f(self);
+        self.close();
+        result
+    }
 }
 
 impl Locals for Context {

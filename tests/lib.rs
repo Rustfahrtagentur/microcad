@@ -171,6 +171,7 @@ fn module_explicit_init_call() {
     // Helper function to check if the object node contains a property radius with specified value
     fn check_node_property_radius(node: &objects::ObjectNode, value: f64) {
         if let objects::ObjectNodeInner::Object(ref object) = *node.borrow() {
+            log::trace!("Object: {object}");
             assert_eq!(
                 object
                     .get_property_value(&Identifier::no_ref("radius"))

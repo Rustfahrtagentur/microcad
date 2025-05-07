@@ -11,9 +11,4 @@ error: Value Error: Missing arguments: area
    2 | module m( area: (width: Length, height: Length) ) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Properties have not been initialized: [Identifier(Refer { value: "area", src_ref: SrcRef(Some(SrcRefInner { range: 46..50, at: LineCol { line: 2, col: 11 }, source_file_hash: 11925557556495962306 })) })]
-  ---> <from_str>:7:3
-     |
-   7 |   init( height: Length) { area = ( width = default_width, height); }
-     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+Properties have not been initialized: [Identifier(Refer { value: "area", src_ref: SrcRef(Some(SrcRefInner { range: 46..50, at: LineCol { line: 2, col: 11 }, source_file_hash: 11925557556495962306 })) })]

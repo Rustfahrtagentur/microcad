@@ -37,32 +37,8 @@ pub trait Lookup {
 ///
 /// Each one may have different items it stores (see [`StackFrame`]).
 pub trait Locals {
-    /// Don't use this function directly
+    /// Don't use this function directly.
     fn open(&mut self, frame: StackFrame);
-
-    /// Open a new source scope with a new [local stack frame](StackFrame).
-    fn open_source(&mut self, id: Identifier) {
-        self.open(StackFrame::Source(id, SymbolMap::new()))
-    }
-
-    /// Open a new [object body](Body).
-    fn open_body(&mut self) {
-        self.open(StackFrame::Body(SymbolMap::new()));
-    }
-
-    /// Open a namespace.
-    fn open_namespace(&mut self, id: Identifier) {
-        self.open(StackFrame::Namespace(id, SymbolMap::new()));
-    }
-
-    /// Open call.
-    fn open_call(&mut self, symbol: Symbol, args: CallArgumentValueList, src_ref: SrcRef) {
-        self.open(StackFrame::Call {
-            symbol,
-            args,
-            src_ref,
-        })
-    }
 
     /// Close scope (stack pop).
     fn close(&mut self);

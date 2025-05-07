@@ -102,10 +102,7 @@ impl Symbol {
     /// - `id`: Name of the symbol
     /// - `f`: The builtin function
     pub fn new_builtin(id: Identifier, f: &'static BuiltinFn) -> Symbol {
-        Symbol::new(
-            SymbolDefinition::Builtin(Rc::new(Builtin { id, f })),
-            None,
-        )
+        Symbol::new(SymbolDefinition::Builtin(Rc::new(Builtin { id, f })), None)
     }
 
     /// Create a symbol for namespace ([`SymbolDefinition::Namespace`]).
@@ -128,12 +125,22 @@ impl Symbol {
         )
     }
 
-    /// Create a new build constant ([`SymbolDefinition::Constant`]).
+    /// Create a new constant ([`SymbolDefinition::Constant`]).
     /// # Arguments
     /// - `id`: Name of the symbol
     /// - `value`: The value to store
     pub fn new_constant(id: Identifier, value: Value) -> Symbol {
         Symbol::new(SymbolDefinition::Constant(id, value), None)
+    }
+
+    /// Create a new call argument ([`SymbolDefinition::CallArgument`]).
+    pub fn new_call_argument(id: Identifier, value: Value) -> Symbol {
+        Symbol::new(SymbolDefinition::CallArgument(id, value), None)
+    }
+
+    /// Create a new property ([`SymbolDefinition::Property`]).
+    pub fn new_property(id: Identifier, value: Value) -> Symbol {
+        Symbol::new(SymbolDefinition::Property(id, value), None)
     }
 
     /// Print out symbols from that point.
@@ -290,7 +297,9 @@ impl SrcReferrer for SymbolInner {
             SymbolDefinition::Builtin(_) => {
                 unreachable!("builtin has no source code reference")
             }
-            SymbolDefinition::Constant(identifier, value) => SrcRef::merge(identifier, value),
+            SymbolDefinition::Constant(identifier, value)
+            | SymbolDefinition::CallArgument(identifier, value)
+            | SymbolDefinition::Property(identifier, value) => SrcRef::merge(identifier, value),
             SymbolDefinition::Alias(identifier, name) => SrcRef::merge(identifier, name),
         }
     }

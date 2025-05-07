@@ -6,21 +6,25 @@ use crate::{eval::*, rc::*, resolve::*, syntax::*, value::*};
 /// Symbol definition
 #[derive(Debug, Clone)]
 pub enum SymbolDefinition {
-    /// Source file symbol
+    /// Source file symbol.
     SourceFile(Rc<SourceFile>),
-    /// Namespace symbol
+    /// Namespace symbol.
     Namespace(Rc<NamespaceDefinition>),
-    /// External namespace symbol (not already loaded)
+    /// External namespace symbol (not already loaded).
     External(Rc<NamespaceDefinition>),
-    /// Module symbol
+    /// Module symbol.
     Module(Rc<ModuleDefinition>),
-    /// Function symbol
+    /// Function symbol.
     Function(Rc<FunctionDefinition>),
-    /// Builtin symbol
+    /// Builtin symbol.
     Builtin(Rc<Builtin>),
-    /// Constant
+    /// Constant.
     Constant(Identifier, Value),
-    /// Alias of a pub use statement
+    /// Call argument value.
+    CallArgument(Identifier, Value),
+    /// Property.
+    Property(Identifier, Value),
+    /// Alias of a pub use statement.
     Alias(Identifier, QualifiedName),
 }
 
@@ -33,8 +37,10 @@ impl SymbolDefinition {
             Self::Function(f) => f.id.clone(),
             Self::SourceFile(s) => s.id(),
             Self::Builtin(m) => m.id(),
-            Self::Constant(id, _) => id.clone(),
-            Self::Alias(id, _) => id.clone(),
+            Self::Constant(id, _)
+            | Self::CallArgument(id, _)
+            | Self::Property(id, _)
+            | Self::Alias(id, _) => id.clone(),
         }
     }
 
@@ -63,6 +69,8 @@ impl std::fmt::Display for SymbolDefinition {
             Self::SourceFile(_) => write!(f, "(file)"),
             Self::Builtin(_) => write!(f, "(builtin)"),
             Self::Constant(_, value) => write!(f, "(constant) = {value}"),
+            Self::CallArgument(_, value) => write!(f, "(call_argument) = {value}"),
+            Self::Property(_, value) => write!(f, "(object_property) = {value}"),
             Self::Alias(_, name) => write!(f, "(alias) => {name}"),
         }
     }

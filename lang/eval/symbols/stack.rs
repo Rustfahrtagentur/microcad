@@ -15,7 +15,10 @@ impl Stack {
         let name = symbol.full_name();
         for (pos, frame) in self.0.iter_mut().rev().enumerate() {
             match frame {
-                StackFrame::Source(_, last) | StackFrame::Body(last) => {
+                StackFrame::Source(_, last)
+                | StackFrame::Body(last)
+                | StackFrame::Module(_, last)
+                | StackFrame::ModuleInit(last) => {
                     let op = if last.insert(id.clone(), symbol).is_some() {
                         "Added"
                     } else {
@@ -41,7 +44,7 @@ impl Stack {
                 } => {
                     // RULE: top call frame is transparent on stack
                     if pos > 0 {
-                        return Err(EvalError::WrongStackFrame(id, "namespace"));
+                        return Err(EvalError::WrongStackFrame(id, "call"));
                     }
                 }
             }
@@ -116,7 +119,10 @@ impl Locals for Stack {
         // search from inner scope to root scope to shadow outside locals
         for frame in self.0.iter().rev() {
             match frame {
-                StackFrame::Source(_, locals) | StackFrame::Body(locals) => {
+                StackFrame::Source(_, locals)
+                | StackFrame::Body(locals)
+                | StackFrame::Module(_, locals)
+                | StackFrame::ModuleInit(locals) => {
                     if let Some(local) = locals.get(id) {
                         log::debug!("Fetched {id} from locals");
                         return Ok(local.clone());
@@ -172,7 +178,7 @@ fn local_stack() {
         }
     };
 
-    stack.open_source("test".into());
+    stack.open(StackFrame::Source("test".into(), SymbolMap::default()));
     assert!(stack.current_namespace() == "test".into());
 
     assert!(stack.put_local(None, make_int("a".into(), 1)).is_ok());
@@ -183,7 +189,7 @@ fn local_stack() {
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
 
-    stack.open_body();
+    stack.open(StackFrame::Body(SymbolMap::default()));
     assert!(stack.current_namespace() == "test".into());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);

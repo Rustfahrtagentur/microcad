@@ -43,7 +43,7 @@ A module with an *implicit initializer* which takes a `size: Length`:
 
 ```µcad,init_implicit
 module box(size: Length) {
-    std::geo2d::rect(size);
+    std::geo2d::rect(width = size, height = size, x = 0mm, y = 0mm);
 }
 
 box(size=2cm);
@@ -56,8 +56,8 @@ A module with an *explicit initializer* which takes a `size: Length`:
 [![test](.test/init_explicit.png)](.test/init_explicit.log)
 
 ```µcad,init_explicit
-module double_box {
-    init( half_the_size: Length) { size = half_the_size * 2; }
+module double_box(size: Length) {
+    init(half_the_size: Length) { size = half_the_size * 2; }
     rectangle(size);
 }
 ```
@@ -70,7 +70,7 @@ A module with *multiple explicit initializers* which takes different
 parameters:
 
 ```µcad,init_explicit_overloading
-module box {
+module box(width: Length, height: Length) {
     init(size: Length) {
         rectangle(size);
     }

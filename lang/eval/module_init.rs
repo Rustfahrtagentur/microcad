@@ -5,55 +5,36 @@ use crate::{eval::*, objects::*, syntax::*};
 
 impl ModuleInitDefinition {
     /// Evaluate a call to the module init definition
-    pub fn eval_to_node(
+    pub fn eval(
         &self,
         args: &ArgumentMap,
-        mut props: ObjectProperties,
+        object_builder: &mut ObjectBuilder,
         context: &mut Context,
-    ) -> EvalResult<ObjectNode> {
-        context.open_body();
+    ) -> EvalResult<()> {
+        context.scope(StackFrame::ModuleInit(args.into()), |context| {
+            for statement in &self.body.statements {
+                match statement {
+                    Statement::Assignment(assignment) => {
+                        let id = &assignment.id;
+                        let value = assignment.expression.eval(context)?;
 
-        // Add values from argument map as local values
-        for (id, value) in args.iter() {
-            props.assign_and_add_local_value(id, value.clone(), context)?;
-        }
-
-        let mut nodes = Vec::new();
-        for statement in &self.body.statements {
-            match statement {
-                Statement::Assignment(assignment) => {
-                    let id = &assignment.id;
-                    let value = assignment.expression.eval(context)?;
-
-                    props.assign_and_add_local_value(id, value, context)?;
-                }
-                Statement::Expression(expression) => {
-                    nodes.append(&mut expression.eval(context)?.fetch_nodes())
-                }
-                _ => {
-                    context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
+                        // Only change the property value, do not add new properties
+                        if object_builder.has_property(id) {
+                            object_builder.set_property(id.clone(), value.clone());
+                        }
+                        context.set_local_value(id.clone(), value)?;
+                    }
+                    Statement::Expression(expression) => {
+                        object_builder
+                            .append_children(&mut expression.eval(context)?.fetch_nodes());
+                    }
+                    _ => {
+                        context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
+                    }
                 }
             }
-        }
 
-        context.close();
-
-        if !props.all_initialized() {
-            context.error(
-                self,
-                EvalError::UninitializedProperties(props.get_ids_of_uninitialized()),
-            )?;
-            return Ok(empty_object());
-        }
-
-        // Make a new object node
-        let object = object(Object {
-            id: Identifier::none(),
-            props,
-        });
-        for node in nodes {
-            object.append(node);
-        }
-        Ok(object)
+            Ok(())
+        })
     }
 }

@@ -154,8 +154,9 @@ impl Eval for NestedItem {
         match &self {
             NestedItem::Call(call) => Ok(call.eval(context)?),
             NestedItem::QualifiedName(name) => match &context.lookup(name)?.borrow().def {
-                SymbolDefinition::Constant(_, value) => Ok(value.clone()),
-
+                SymbolDefinition::Constant(_, value)
+                | SymbolDefinition::CallArgument(_, value)
+                | SymbolDefinition::Property(_, value) => Ok(value.clone()),
                 SymbolDefinition::Namespace(ns) => {
                     Err(EvalError::UnexpectedNested("namespace", ns.id.clone()))
                 }
