@@ -1,7 +1,10 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad value related evaluation entities
+//! Evaluation entities.
+//!
+//! Every evaluation of any *symbol* leads to a [`Value`] which then might continued
+//! to process or ends up as the overall evaluation result.
 
 mod into_value;
 mod list;
@@ -33,53 +36,53 @@ use microcad_core::*;
 
 pub(crate) type ValueResult = std::result::Result<Value, ValueError>;
 
-/// A variant value
+/// A variant value with attached source code reference.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
-    /// Invalid value (used for error handling)
+    /// Invalid value (used for error handling).
     None,
-    /// An integer value
+    /// An integer value.
     Integer(Refer<Integer>),
-    /// A scalar value
+    /// A scalar value.
     Scalar(Refer<Scalar>),
-    /// Length in mm
+    /// Length in mm.
     Length(Refer<Scalar>),
-    /// Area in mm²
+    /// Area in mm².
     Area(Refer<Scalar>),
-    /// Volume in mm³
+    /// Volume in mm³.
     Volume(Refer<Scalar>),
-    /// A 2D vector with length
+    /// A 2D vector with length.
     Vec2(Refer<Vec2>),
-    /// A 3D vector with length
+    /// A 3D vector with length.
     Vec3(Refer<Vec3>),
-    /// A 4D vector with length
+    /// A 4D vector with length.
     Vec4(Refer<Vec4>),
-    /// An angle in radians
+    /// An angle in radians.
     Angle(Refer<Scalar>),
-    /// Weight of a specific volume of material
+    /// Weight of a specific volume of material.
     Weight(Refer<Scalar>),
-    /// Boolean value
+    /// A boolean value.
     Bool(Refer<bool>),
-    /// String value
+    /// A string value.
     String(Refer<String>),
-    /// Color value
+    /// A color value.
     Color(Refer<Color>),
-    /// List
+    /// A list of values.
     List(List),
-    /// Hash Map
+    /// A map of values.
     Map(Map),
-    /// Tuple of named items
+    /// A tuple of named items.
     NamedTuple(NamedTuple),
-    /// Tuple of unnamed items
+    /// A tuple of unnamed items.
     UnnamedTuple(UnnamedTuple),
-    /// A node in the render tree
+    /// A node in the render tree.
     Node(ObjectNode),
-    /// A node list in the render tree, result from multiplicity
+    /// A node list in the render tree, result from multiplicity.
     NodeMultiplicity(Vec<ObjectNode>),
 }
 
 impl Value {
-    /// Add a unit to a primitive value (Scalar or Integer)
+    /// Add a unit to a primitive value (Scalar or Integer).
     pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
         match (self.clone(), unit.ty()) {
             (Value::Integer(i), Type::Length) => {
@@ -99,7 +102,7 @@ impl Value {
         Ok(())
     }
 
-    /// Fetch nodes from this value
+    /// Fetch nodes from this value.
     pub fn fetch_nodes(self) -> Vec<ObjectNode> {
         match self {
             Self::Node(n) => vec![n],
@@ -108,7 +111,7 @@ impl Value {
         }
     }
 
-    /// Clone the value with a new source reference
+    /// Clone the value with a new source reference.
     pub fn clone_with_src_ref(&self, src_ref: SrcRef) -> Self {
         match self {
             Value::None => Value::None,
@@ -134,7 +137,7 @@ impl Value {
         }
     }
 
-    /// Get property value for a value
+    /// Get property value for a value.
     ///
     /// - `identifier`: Identifier of the property
     ///
@@ -174,7 +177,7 @@ impl Value {
         }
     }
 
-    /// Check if the value is invalid
+    /// Check if the value is invalid.
     pub fn is_invalid(&self) -> bool {
         matches!(self, Value::None)
     }
@@ -221,7 +224,7 @@ impl Value {
         }
     }
 
-    /// Unary operation
+    /// Unary operation.
     pub fn unary_op(self, op: &str) -> ValueResult {
         match op {
             "-" => -self,
@@ -339,7 +342,7 @@ impl std::ops::Neg for Value {
     }
 }
 
-/// Rules for operator +
+/// Rules for operator `+`.
 impl std::ops::Add for Value {
     type Output = ValueResult;
 
@@ -397,7 +400,7 @@ impl std::ops::Add for Value {
     }
 }
 
-/// Rules for operator -
+/// Rules for operator `-`.
 impl std::ops::Sub for Value {
     type Output = ValueResult;
 
@@ -455,7 +458,7 @@ impl std::ops::Sub for Value {
     }
 }
 
-/// Rules for operator *
+/// Rules for operator `*`.
 impl std::ops::Mul for Value {
     type Output = ValueResult;
 
@@ -527,7 +530,7 @@ impl std::ops::Mul for Value {
     }
 }
 
-/// Rules for operator /
+/// Rules for operator `/`.
 impl std::ops::Div for Value {
     type Output = ValueResult;
 
@@ -568,7 +571,7 @@ impl std::ops::Div for Value {
     }
 }
 
-/// Rules for operator | (union operator)
+/// Rules for operator `|`` (union).
 impl std::ops::BitOr for Value {
     type Output = ValueResult;
 
@@ -582,7 +585,7 @@ impl std::ops::BitOr for Value {
     }
 }
 
-/// Rules for operator & (intersection operator)
+/// Rules for operator `&`` (intersection).
 impl std::ops::BitAnd for Value {
     type Output = ValueResult;
 

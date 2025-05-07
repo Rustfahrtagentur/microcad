@@ -1,15 +1,14 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad source code parser
+//! Processing of µcad source code.
 //!
 //! This module includes all components to parse, resolve and evaluate µcad code.and diagnose errors.
 //!
-//! - Load and parse source files: [`parse`]
-//! - Parsed syntax: [`syntax`]
-//! - Resolve parsed sources: [`resolve`]
-//! - Evaluate resolved sources: [`eval`]
-//! - Diagnose any evaluation errors: [`diag`]
+//! - Load and parse source files in [`parse`] and [`syntax`]
+//! - Resolve parsed sources in [`resolve`]
+//! - Evaluate resolved sources in [`eval`]
+//! - Diagnose any evaluation errors in [`diag`]
 //!
 //! The grammar of µcad can be found [here](../../../lang/grammar.pest).
 
