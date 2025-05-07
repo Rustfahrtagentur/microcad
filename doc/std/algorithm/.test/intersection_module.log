@@ -1,7 +1,1 @@
-error: Unexpected stack frame of type call frame cannot store radius
-  ---> ../lib/std/geo2d.µcad:6:15
-     |
-   6 | module circle(radius: Length) {
-     |               ^^^^^^
-     |
-Value Error: Missing arguments: radius
+Value Error: Missing arguments: width, height, x, y
