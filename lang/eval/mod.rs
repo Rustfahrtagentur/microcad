@@ -44,6 +44,7 @@ mod parameter;
 mod source_file;
 mod statement;
 mod symbols;
+mod tuple;
 mod r#use;
 
 pub use argument_map::*;
@@ -53,8 +54,8 @@ pub use context::*;
 pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
-pub use symbols::*;
 pub use r#use::*;
+pub use symbols::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
