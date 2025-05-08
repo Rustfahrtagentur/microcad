@@ -3,13 +3,15 @@
 
 //! Source code references.
 //!
-//! All errors which occur when parsing or evaluating µcad code need to address a point within the code where they appeared.
-//! To do so, a bunch of structs provide this functionality:
+//! All errors which occur while *parsing* or *evaluating* µcad code need to be reported and
+//! therefore need to address a place in the code where they did appear.
+//! A bunch of structs from this module provide this functionality:
 //!
-//! - [`SrcRef`] boxes [`SrcRefInner`] which includes all necessary reference information like *line*/*column* and a
-//!   hash to identify the source file.
+//! - [`SrcRef`] boxes a [`SrcRefInner`] which itself includes all necessary reference
+//!   information like *line*/*column* and a hash to identify the source file.
 //! - [`Refer`] encapsulates any syntax element and puts a [`SrcRef`] beside it.
-//! - [`SrcReferrer`] is a trait which provides unified access to the [`SrcRef`] (e.g. implemented by [`Refer`].
+//! - [`SrcReferrer`] is a trait which provides unified access to the [`SrcRef`]
+//!   (e.g. implemented by [`Refer`]).
 
 mod line_col;
 mod refer;
@@ -21,7 +23,7 @@ pub use src_referrer::*;
 
 use crate::parser::*;
 
-/// Reference into a source file
+/// Reference into a source file.
 ///
 /// *Hint*: Source file is not part of `SrcRef` and must be provided from outside
 #[derive(Clone, Debug, Default)]
@@ -45,7 +47,7 @@ impl SrcRef {
         })))
     }
 }
-/// A reference in the source code
+/// A reference into the source code
 #[derive(Clone, Debug, Default)]
 pub struct SrcRefInner {
     /// Range in bytes
@@ -114,12 +116,17 @@ impl SrcRef {
         self.0.as_ref().map(|s| s.source_file_hash).unwrap_or(0)
     }
 
-    /// return slice to code base
+    /// Return slice to code base.
     pub fn source_slice<'a>(&self, src: &'a str) -> &'a str {
         &src[self.0.as_ref().expect("SrcRef").range.to_owned()]
     }
 
-    /// merge two `SrcRef` into a single one by
+    /// Merge two `SrcRef` into a single one.
+    ///
+    /// `SrcRef(None)` is returned if:
+    /// - ranges not in correct order (warning in log),
+    /// - references are not in the same file (warning in log),
+    /// - or `lhs` and `rhs` are both `None`.
     pub fn merge(lhs: &impl SrcReferrer, rhs: &impl SrcReferrer) -> SrcRef {
         match (lhs.src_ref(), rhs.src_ref()) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => {
@@ -148,8 +155,11 @@ impl SrcRef {
         }
     }
 
-    /// Return a `Src` from from `Vec`, by looking at first at and last element only.
-    /// Assume that position of SrcRefs in v is sorted
+    /// Return a `SrcRef` from a vector of `SrcReferrer`s.
+    ///
+    /// The resulting reference will be a merge of the reference of the first and the last element only!
+    ///
+    /// Assumes that all in between references fit between first and last element!
     pub fn from_vec<T: SrcReferrer>(v: &[T]) -> SrcRef {
         match (v.first(), v.last()) {
             (None, None) => SrcRef(None),
@@ -158,7 +168,7 @@ impl SrcRef {
         }
     }
 
-    /// Return line (0..) and column (0..) in source code or `None` if not available
+    /// Return line and column in source code or `None` if not available.
     pub fn at(&self) -> Option<LineCol> {
         self.0.as_ref().map(|s| s.at.clone())
     }
