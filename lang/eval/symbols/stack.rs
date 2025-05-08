@@ -61,7 +61,7 @@ impl Stack {
 
     /// Get name of current namespace.
     pub fn current_namespace(&self) -> QualifiedName {
-        QualifiedName(self.0.iter().filter_map(|locals| locals.id()).collect())
+        QualifiedName::no_ref(self.0.iter().filter_map(|locals| locals.id()).collect())
     }
 
     /// Return the current *stack frame* if there is any.

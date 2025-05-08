@@ -8,6 +8,7 @@ impl Parse for FormatExpression {
         Ok(Self::new(
             pair.find(Rule::format_spec),
             pair.find(Rule::expression).expect("Missing expression"),
+            pair.into(),
         ))
     }
 }

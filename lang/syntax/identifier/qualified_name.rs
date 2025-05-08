@@ -6,7 +6,7 @@ use crate::{src_ref::*, syntax::*};
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
 #[derive(Debug, Default, Clone, PartialEq, Hash, Eq, Ord, PartialOrd)]
-pub struct QualifiedName(pub Vec<Identifier>);
+pub struct QualifiedName(Refer<Vec<Identifier>>);
 
 /// List of qualified names which can pe displayed
 #[derive(Debug)]
@@ -41,6 +41,21 @@ impl FromIterator<QualifiedName> for QualifiedNames {
 }
 
 impl QualifiedName {
+    /// Create [`QualifiedName`] from [`identifier`]s.
+    ///
+    /// - `ids`: *Identifiers* that concatenate to the *qualified name*.
+    /// - `src_ref`: Reference for the whole name.
+    pub fn new(ids: Vec<Identifier>, src_ref: SrcRef) -> Self {
+        Self(Refer::new(ids, src_ref))
+    }
+
+    /// Create *qualified name* from [`identifier`]s without source code reference.
+    ///
+    /// - `ids`: *Identifiers* that concatenate to the *qualified name*.
+    pub fn no_ref(ids: Vec<Identifier>) -> Self {
+        Self(Refer::none(ids))
+    }
+
     /// If the QualifiedName only consists of a single identifier, return it
     pub fn single_identifier(&self) -> Option<&Identifier> {
         if self.0.len() == 1 {
@@ -76,12 +91,15 @@ impl QualifiedName {
 
     /// remove the first name from path
     pub fn remove_first(&self) -> Self {
-        Self(self.0[1..].to_vec())
+        Self(Refer::new(self.0[1..].to_vec(), self.0.src_ref.clone()))
     }
 
     /// remove the first name from path
     pub fn remove_last(&self) -> Self {
-        Self(self.0[..self.0.len() - 1].to_vec())
+        Self(Refer::new(
+            self.0[..self.0.len() - 1].to_vec(),
+            self.0.src_ref.clone(),
+        ))
     }
 
     /// Append identifier to name
@@ -94,7 +112,7 @@ impl QualifiedName {
         match self.len() {
             0 => todo!("return None or error?"),
             1 => (self.0[0].clone(), Self::default()),
-            _ => (self.0[0].clone(), Self(self.0[1..].into())),
+            _ => (self.0[0].clone(), Self(Refer::none(self.0[1..].into()))),
         }
     }
 
@@ -114,12 +132,6 @@ impl QualifiedName {
         let mut full_name = prefix.clone();
         full_name.append(&mut self.clone());
         full_name
-    }
-}
-
-impl SrcReferrer for QualifiedName {
-    fn src_ref(&self) -> SrcRef {
-        SrcRef::from_vec(&self.0)
     }
 }
 
@@ -147,10 +159,24 @@ impl std::fmt::Display for QualifiedName {
     }
 }
 
+impl SrcReferrer for QualifiedName {
+    fn src_ref(&self) -> SrcRef {
+        self.0.src_ref()
+    }
+}
+
+impl From<Refer<Vec<Identifier>>> for QualifiedName {
+    fn from(value: Refer<Vec<Identifier>>) -> Self {
+        Self(value)
+    }
+}
+
 #[cfg(test)]
 impl From<&str> for QualifiedName {
     fn from(value: &str) -> Self {
-        Self(value.split("::").map(Identifier::from).collect())
+        Self(Refer::none(
+            value.split("::").map(Identifier::from).collect(),
+        ))
     }
 }
 
@@ -167,7 +193,7 @@ impl TryFrom<&str> for QualifiedName {
             name.push(id.expect("unexpected error"));
         }
 
-        Ok(Self(name))
+        Ok(Self(Refer::none(name)))
     }
 }
 
@@ -183,13 +209,14 @@ impl TryFrom<String> for QualifiedName {
             name.push(id.expect("unexpected error"));
         }
 
-        Ok(Self(name))
+        Ok(Self(Refer::none(name)))
     }
 }
 
 impl From<Identifier> for QualifiedName {
     fn from(id: Identifier) -> Self {
-        QualifiedName(vec![id])
+        let src_ref = id.src_ref();
+        QualifiedName(Refer::new(vec![id], src_ref))
     }
 }
 

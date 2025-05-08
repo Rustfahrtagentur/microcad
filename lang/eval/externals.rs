@@ -139,7 +139,7 @@ impl Externals {
             file
         };
 
-        QualifiedName(
+        QualifiedName::no_ref(
             file.iter()
                 .map(|id| {
                     Identifier(Refer {

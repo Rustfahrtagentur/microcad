@@ -12,7 +12,7 @@ impl Eval for FormatExpression {
 impl Eval for FormatString {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let mut result = String::new();
-        for elem in &self.0 {
+        for elem in &*self.0 {
             match elem {
                 FormatStringInner::String(s) => result += &s.value,
                 FormatStringInner::FormatExpression(expr) => match expr.eval(context) {

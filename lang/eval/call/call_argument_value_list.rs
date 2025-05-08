@@ -129,8 +129,7 @@ impl std::fmt::Display for CallArgumentValueList {
 #[cfg(test)]
 impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
     fn from(value: Vec<CallArgumentValue>) -> Self {
-        let src_ref = SrcRef::from_vec(&value);
-        Self(Refer::new(value.into(), src_ref))
+        Self(Refer::none(value.into()))
     }
 }
 

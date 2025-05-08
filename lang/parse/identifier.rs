@@ -24,10 +24,11 @@ impl Parse for Identifier {
 
 impl Parse for QualifiedName {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Ok(Self(
+        Ok(Self::new(
             pair.inner()
                 .map(|pair| Identifier::parse(pair).expect("Expected identifier"))
                 .collect(),
+            pair.into(),
         ))
     }
 }

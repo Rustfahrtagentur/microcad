@@ -19,12 +19,9 @@ pub struct FormatExpression {
 
 impl FormatExpression {
     /// Create new format expression
-    pub fn new(spec: Option<FormatSpec>, expression: Expression) -> Self {
+    pub fn new(spec: Option<FormatSpec>, expression: Expression, src_ref: SrcRef) -> Self {
         Self {
-            src_ref: match &spec {
-                Some(spec) => SrcRef::merge(spec, &expression),
-                None => expression.src_ref(),
-            },
+            src_ref,
             spec,
             expression,
         }
@@ -43,11 +40,7 @@ impl std::fmt::Display for FormatExpression {
 
 impl SrcReferrer for FormatExpression {
     fn src_ref(&self) -> SrcRef {
-        if let Some(spec) = &self.spec {
-            SrcRef::merge(spec, &self.expression)
-        } else {
-            self.expression.src_ref()
-        }
+        self.src_ref.clone()
     }
 }
 

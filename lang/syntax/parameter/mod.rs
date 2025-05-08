@@ -44,7 +44,7 @@ impl Parameter {
             id: Identifier::no_ref(id),
             specified_type: Some(TypeAnnotation(Refer::none(ty))),
             default_value: None,
-            src_ref: SrcRef(None)
+            src_ref: SrcRef(None),
         }
     }
 

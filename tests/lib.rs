@@ -66,7 +66,7 @@ fn context_with_symbols() {
 /// Helper function to create a qualified name from &str
 #[cfg(test)]
 fn qualified_name(s: &str) -> QualifiedName {
-    QualifiedName(
+    QualifiedName::no_ref(
         s.split("::")
             .map(|x| Identifier(microcad_lang::src_ref::Refer::none(x.into())))
             .collect(),

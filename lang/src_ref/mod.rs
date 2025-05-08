@@ -127,6 +127,7 @@ impl SrcRef {
     /// - ranges not in correct order (warning in log),
     /// - references are not in the same file (warning in log),
     /// - or `lhs` and `rhs` are both `None`.
+    #[cfg(test)]
     pub fn merge(lhs: &impl SrcReferrer, rhs: &impl SrcReferrer) -> SrcRef {
         match (lhs.src_ref(), rhs.src_ref()) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => {
@@ -156,19 +157,6 @@ impl SrcRef {
             }
             (SrcRef(Some(hs)), SrcRef(None)) | (SrcRef(None), SrcRef(Some(hs))) => SrcRef(Some(hs)),
             _ => SrcRef(None),
-        }
-    }
-
-    /// Return a `SrcRef` from a vector of `SrcReferrer`s.
-    ///
-    /// The resulting reference will be a merge of the reference of the first and the last element only!
-    ///
-    /// Assumes that all in between references fit between first and last element!
-    pub fn from_vec<T: SrcReferrer>(v: &[T]) -> SrcRef {
-        match (v.first(), v.last()) {
-            (None, None) => SrcRef(None),
-            (Some(first), Some(last)) => Self::merge(&first, &last),
-            _ => unreachable!(),
         }
     }
 

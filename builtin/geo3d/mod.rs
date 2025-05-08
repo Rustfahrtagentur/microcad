@@ -25,7 +25,7 @@ impl BuiltinModuleDefinition for Sphere {
     }
 
     fn parameters() -> ParameterList {
-        vec![Parameter::no_ref("radius", Type::Scalar)].into()
+        ParameterList::new(vec![Parameter::no_ref("radius", Type::Scalar)].into())
     }
 }
 
@@ -61,7 +61,6 @@ pub struct Cube {
     pub size_z: Scalar,
 }
 
-
 impl BuiltinModuleDefinition for Cube {
     fn id() -> &'static str {
         "cube"
@@ -78,14 +77,16 @@ impl BuiltinModuleDefinition for Cube {
     }
 
     fn parameters() -> ParameterList {
-        vec![
-            Parameter::no_ref("size_x", Type::Scalar),
-            Parameter::no_ref("size_y", Type::Scalar),
-            Parameter::no_ref("size_z", Type::Scalar),
-        ].into()
+        ParameterList::new(
+            vec![
+                Parameter::no_ref("size_x", Type::Scalar),
+                Parameter::no_ref("size_y", Type::Scalar),
+                Parameter::no_ref("size_z", Type::Scalar),
+            ]
+            .into(),
+        )
     }
 }
-
 
 impl RenderHash for Cube {
     fn render_hash(&self) -> Option<u64> {
@@ -134,14 +135,16 @@ impl BuiltinModuleDefinition for Cylinder {
     }
 
     fn parameters() -> ParameterList {
-        vec![
-            Parameter::no_ref("radius_bottom", Type::Scalar),
-            Parameter::no_ref("radius_top", Type::Scalar),
-            Parameter::no_ref("height", Type::Scalar),
-        ].into()
+        ParameterList::new(
+            vec![
+                Parameter::no_ref("radius_bottom", Type::Scalar),
+                Parameter::no_ref("radius_top", Type::Scalar),
+                Parameter::no_ref("height", Type::Scalar),
+            ]
+            .into(),
+        )
     }
 }
-
 
 impl RenderHash for Cylinder {
     fn render_hash(&self) -> Option<u64> {

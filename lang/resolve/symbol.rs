@@ -265,7 +265,11 @@ impl FullyQualify for Symbol {
                 name.push(id);
                 name
             }
-            None => QualifiedName(vec![id]),
+
+            None => {
+                let src_ref = id.src_ref();
+                QualifiedName::new(vec![id], src_ref)
+            }
         }
     }
 }
