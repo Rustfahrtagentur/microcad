@@ -39,41 +39,41 @@ module cube(size_x: Length, size_y: Length, size_z: Length) {
 ///
 /// Examples:
 /// * with radius `r` and height `h`: `cylinder(r = 10.0mm, h = 5.0mm);`
-///module cylinder {
-///    init(radius: Length, height: Length) {
-///        top = height / 2.0;
-///        bottom = -top;
-///    }
-///
-///    init(r: Length, h: Length) {
-///        radius = r;
-///        height = h;
-///        top = height / 2.0;
-///        bottom = -top;
-///    }
-///
-///    init(r: Length, bottom: Length, top: Length) {
-///        radius = r;
-///        height = top - bottom;
-///    }
-///
-///    init(d: Length, bottom: Length, height: Length) {
-///        radius = d / 2.0;
-///        top = bottom + height;
-///    }
-///
-///    init(d: Length, h: Length) {
-///        radius = d / 2.0;
-///        height = h;
-///        top = height / 2.0;
-///        bottom = -top;
-///    }
-///
-///    __builtin::transform::translate(x = 0.0, y = 0.0, z = bottom / 1mm) {
-///        __builtin::geo3d::cylinder(
-///            radius_bottom = radius / 1mm,
-///            radius_top = radius / 1mm,
-///            height = height / 1mm
-///        );
-///    }
-///}
+module cylinder( radius_bottom: Length, radius_top: Length, height: Length) {
+    init(radius: Length, height: Length) {
+        top = height / 2.0;
+        bottom = -top;
+    }
+
+    init(r: Length, h: Length) {
+        radius = r;
+        height = h;
+        top = height / 2.0;
+        bottom = -top;
+    }
+
+    init(r: Length, bottom: Length, top: Length) {
+        radius = r;
+        height = top - bottom;
+    }
+
+    init(d: Length, bottom: Length, height: Length) {
+        radius = d / 2.0;
+        top = bottom + height;
+    }
+
+    init(d: Length, h: Length) {
+        radius = d / 2.0;
+        height = h;
+        top = height / 2.0;
+        bottom = -top;
+    }
+
+    __builtin::transform::translate(x = 0.0, y = 0.0, z = bottom / 1mm) {
+        __builtin::geo3d::cylinder(
+            radius_bottom = radius / 1mm,
+            radius_top = radius / 1mm,
+            height = height / 1mm
+        );
+    }
+}
