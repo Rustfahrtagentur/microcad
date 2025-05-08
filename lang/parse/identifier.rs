@@ -1,3 +1,6 @@
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{parse::*, parser::*, src_ref::*, syntax::*};
 
 impl Parse for IdentifierList {
@@ -21,10 +24,11 @@ impl Parse for Identifier {
 
 impl Parse for QualifiedName {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Ok(Self(
+        Ok(Self::new(
             pair.inner()
                 .map(|pair| Identifier::parse(pair).expect("Expected identifier"))
                 .collect(),
+            pair.into(),
         ))
     }
 }

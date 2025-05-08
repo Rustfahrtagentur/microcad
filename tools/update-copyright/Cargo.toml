@@ -1,0 +1,18 @@
+# Copyright © 2025 The µcad authors <info@ucad.xyz>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[package]
+name = "update_copyright"
+description.workspace = true
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+homepage.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+license.workspace = true
+keywords.workspace = true
+
+[dependencies]
+regex = "1"
+scan_dir = "0.3"

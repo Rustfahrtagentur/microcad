@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! External files register
@@ -139,7 +139,7 @@ impl Externals {
             file
         };
 
-        QualifiedName(
+        QualifiedName::no_ref(
             file.iter()
                 .map(|id| {
                     Identifier(Refer {

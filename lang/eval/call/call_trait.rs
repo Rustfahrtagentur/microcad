@@ -1,12 +1,12 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Call argument value evaluation entity
 
 use crate::eval::*;
 
-/// trait for calls of modules or functions with argument list
+/// Trait for calls of modules or functions with argument list.
 pub trait CallTrait {
-    /// Evaluate call into value (if possible)
+    /// Evaluate call into value (if possible).
     fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value>;
 }

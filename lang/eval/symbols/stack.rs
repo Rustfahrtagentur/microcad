@@ -1,9 +1,16 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{eval::*, resolve::*};
 
 /// A stack with a list of stack frames.
+///
+/// [`StackFrame`]s can have the following different types:
+/// - source file (bottom of stack)
+/// - namespaces ( e.g. `namespace my_lib { ... }`)
+/// - module calls (e.g. `std::geo2d::circle(radius = 1m)`)
+/// - function calls (e.g. `std::print("µcad")`)
+/// - bodies (e.g. `{ ... }`)
 #[derive(Default)]
 pub struct Stack(Vec<StackFrame>);
 
@@ -54,7 +61,7 @@ impl Stack {
 
     /// Get name of current namespace.
     pub fn current_namespace(&self) -> QualifiedName {
-        QualifiedName(self.0.iter().filter_map(|locals| locals.id()).collect())
+        QualifiedName::no_ref(self.0.iter().filter_map(|locals| locals.id()).collect())
     }
 
     /// Return the current *stack frame* if there is any.
@@ -166,17 +173,14 @@ impl std::fmt::Display for Stack {
 #[test]
 #[allow(clippy::unwrap_used)]
 fn local_stack() {
-    use std::ops::Deref;
-
     let mut stack = Stack::default();
 
-    let make_int =
-        |id, value| Symbol::new_constant(id, Value::Integer(Refer::new(value, SrcRef(None))));
+    let make_int = |id, value| Symbol::new_constant(id, Value::Integer(value));
 
     let fetch_int = |stack: &Stack, id: &str| -> Option<i64> {
         match stack.fetch(&id.into()) {
             Ok(node) => match &node.borrow().def {
-                SymbolDefinition::Constant(_, Value::Integer(value)) => Some(*value.deref()),
+                SymbolDefinition::Constant(_, Value::Integer(value)) => Some(*value),
                 _ => todo!("error"),
             },
             _ => None,

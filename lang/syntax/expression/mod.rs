@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! µcad syntax elements related to expressions
@@ -71,7 +71,7 @@ impl SrcReferrer for Expression {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         match self {
             Self::Invalid => SrcRef(None),
-            Self::Value(value) => value.src_ref(),
+            Self::Value(_) => SrcRef(None),
             Self::Literal(l) => l.src_ref(),
             Self::FormatString(fs) => fs.src_ref(),
             Self::ListExpression(le) => le.src_ref(),

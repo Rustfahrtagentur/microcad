@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Use statement syntax element
@@ -55,7 +55,7 @@ impl SrcReferrer for UseDeclaration {
         match self {
             Self::Use(name) => name.src_ref(),
             Self::UseAll(name) => name.src_ref(),
-            Self::UseAlias(name, alias) => SrcRef::merge(name, alias),
+            Self::UseAlias(name, _) => name.src_ref(),
         }
     }
 }

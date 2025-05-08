@@ -1,11 +1,11 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Parameter value list evaluation entity
 
 use compact_str::CompactStringExt;
 
-use crate::{src_ref::*, value::*};
+use crate::value::*;
 
 /// List of parameter values
 #[derive(Clone, Debug, Default)]
@@ -14,8 +14,6 @@ pub struct ParameterValueList {
     parameters: Vec<ParameterValue>,
     /// access map by id
     pub by_id: std::collections::BTreeMap<Identifier, usize>,
-    /// Source code reference
-    src_ref: SrcRef,
 }
 
 impl ParameterValueList {
@@ -27,11 +25,7 @@ impl ParameterValueList {
             by_id.insert(parameter.id.clone(), i);
         }
 
-        Self {
-            by_id,
-            src_ref: SrcRef::from_vec(&parameters),
-            parameters,
-        }
+        Self { by_id, parameters }
     }
 
     /// Push parameter value
@@ -81,12 +75,6 @@ impl ParameterValueList {
         } else {
             Ok(())
         }
-    }
-}
-
-impl SrcReferrer for ParameterValueList {
-    fn src_ref(&self) -> SrcRef {
-        self.src_ref.clone()
     }
 }
 

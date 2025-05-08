@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Global test initialization.
@@ -66,7 +66,7 @@ fn context_with_symbols() {
 /// Helper function to create a qualified name from &str
 #[cfg(test)]
 fn qualified_name(s: &str) -> QualifiedName {
-    QualifiedName(
+    QualifiedName::no_ref(
         s.split("::")
             .map(|x| Identifier(microcad_lang::src_ref::Refer::none(x.into())))
             .collect(),
@@ -127,7 +127,7 @@ fn module_implicit_init_call() {
                 object
                     .get_property_value(&Identifier(Refer::none("b".into())))
                     .expect("Property `b`"),
-                &value::Value::Scalar(src_ref::Refer::none(value))
+                &value::Value::Scalar(value)
             );
         } else {
             panic!("Object node expected")
@@ -176,7 +176,7 @@ fn module_explicit_init_call() {
                 object
                     .get_property_value(&Identifier::no_ref("radius"))
                     .expect("Property `radius`"),
-                &value::Value::Scalar(src_ref::Refer::none(value))
+                &value::Value::Scalar(value)
             );
         } else {
             panic!("Object node expected")

@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! µcad Call related evaluation entities
@@ -18,7 +18,7 @@ use crate::{eval::*, syntax::*};
 use thiserror::Error;
 
 impl CallArgumentList {
-    /// Create a `CallArgumentValueList` from a `CallArgumentList`
+    /// Evaluate into a [`CallArgumentValueList`].
     pub fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
         let mut v = CallArgumentValueList::default();
         for call_arg in self.iter() {
@@ -81,19 +81,19 @@ impl Eval for Call {
     }
 }
 
-/// An error that occurred when looking for matching arguments between a call and a parameter definition
+/// An error that occurred when looking for matching arguments between a call and a parameter definition.
 #[derive(Error, Debug)]
 pub enum MatchError {
-    /// Duplicated argument
+    /// Duplicated argument.
     #[error("Duplicated argument: {0}")]
     DuplicatedArgument(Identifier),
-    /// Occurs when a parameter was given in a call but not in the definition
+    /// Occurs when a parameter was given in a call but not in the definition.
     #[error("Parameter `{0}` is not defined.")]
     ParameterNotDefined(Identifier),
-    /// Mismatching type
+    /// Mismatching type.
     #[error("Type mismatch for parameter `{0}`: expected `{1}`, got {2}")]
     PositionalArgumentTypeMismatch(Identifier, Type, Type),
-    /// Parameter required by definition but given in the call
+    /// Parameter required by definition but given in the call.
     #[error("Missing parameter: {0}")]
     MissingParameter(Identifier),
 }

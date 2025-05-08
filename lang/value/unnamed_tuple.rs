@@ -1,9 +1,9 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Unnamed tuple evaluation entity
 
-use crate::{src_ref::*, ty::*, value::*};
+use crate::{ty::*, value::*};
 
 /// Unnamed tuple
 #[derive(Clone, Debug, PartialEq)]
@@ -35,16 +35,7 @@ impl UnnamedTuple {
             result.push(add_result);
         }
 
-        Ok(UnnamedTuple(ValueList::new(
-            result,
-            SrcRef::merge(&self, &rhs),
-        )))
-    }
-}
-
-impl SrcReferrer for UnnamedTuple {
-    fn src_ref(&self) -> SrcRef {
-        self.0.src_ref()
+        Ok(UnnamedTuple(ValueList::new(result)))
     }
 }
 

@@ -1,4 +1,4 @@
-# Copyright © 2024 The µcad authors <info@ucad.xyz>
+# Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [workspace]
@@ -9,6 +9,7 @@ default-members = [
     "tests",
     "builtin-proc-macro",
     "tools/cli",
+    "tools/update-copyright",
 ]
 
 members = [
@@ -18,6 +19,7 @@ members = [
     "tests",
     "builtin-proc-macro",
     "tools/cli",
+    "tools/update-copyright",
 ]
 resolver = "2"
 

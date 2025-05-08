@@ -1,13 +1,13 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! *Call argument value list* evaluation entity.
 
 use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 
-/// Collection of *call argument values*.
+/// Collection of *call argument values* (e.g. `( x=1, y=2 )`).
 ///
-/// [`CallArgumentValueList`] also provides methods to find a matching call
+/// Also provides methods to find a matching call
 /// between it and a given *parameter list*.
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
@@ -17,13 +17,9 @@ impl CallArgumentValueList {
     ///
     /// Transports code into builtin in `impl` [`Eval`] for [`Call`].
     ///
-    /// **RULE**: Shall only be used for builtin symbols.
+    /// Shall only be used for builtin symbols.
     /// # Arguments
     pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
-        let code = Refer {
-            value: code,
-            src_ref: referrer.src_ref(),
-        };
         let mut value = OrdMap::default();
         value
             .push(CallArgumentValue::new(
@@ -133,8 +129,7 @@ impl std::fmt::Display for CallArgumentValueList {
 #[cfg(test)]
 impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
     fn from(value: Vec<CallArgumentValue>) -> Self {
-        let src_ref = SrcRef::from_vec(&value);
-        Self(Refer::new(value.into(), src_ref))
+        Self(Refer::none(value.into()))
     }
 }
 
@@ -143,7 +138,7 @@ macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
             $arg_map.get(&Identifier::no_ref(stringify!($name).into())).expect(&format!("Argument `{}` expected",stringify!($name))),
-            &Value::$ty(crate::src_ref::Refer::none($value))
+            &Value::$ty($value)
         ));*
     };
 }

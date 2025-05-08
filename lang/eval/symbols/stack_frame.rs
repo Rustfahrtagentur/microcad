@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::eval::*;
@@ -6,9 +6,15 @@ use crate::eval::*;
 /// Frame in [Stack] for *local variables*, *aliases* (*use statements*) and *calls*.
 ///
 /// A *stack frame* can have different types and some provide a storage for *local variables*
-/// like [`StackFrame::Source`] and [`StackFrame::Body`]) and some do not, some are named
-/// like [`StackFrame::Source`] amd [`StackFrame::Namespace`]) and some do not.
-/// [Call] is used for procedural calls.
+/// like [`StackFrame::Source`] and [`StackFrame::Body`]) and some do not, some have a *id*
+/// like [`StackFrame::Source`] amd [`StackFrame::Namespace`]) and some do not and
+/// [`Call`] is used for procedural calls.
+///
+/// Each frame store some of these information:
+///   - an [`Identifier`]
+///   - local variables in a [`SymbolMap`] (e.g. `i = 5;`)
+///   - local aliases in a [`SymbolMap`] (e.g. `use std::print;`)
+///   - call argument value list (e.g. `f(x = 0, y = 1);`
 pub enum StackFrame {
     /// Source file with locals.
     Source(Identifier, SymbolMap),
@@ -16,11 +22,13 @@ pub enum StackFrame {
     Namespace(Identifier, SymbolMap),
     /// Module scope with locals.
     ///
-    /// Symbol map is built from `ParamterList`.
+    /// Symbol map is built from [`ParameterList`].
     Module(Identifier, SymbolMap),
     /// Module initializer scope with locals.
+    ///
+    /// Symbol map is built from [`ParameterList`].
     ModuleInit(SymbolMap),
-    /// Body (unnamed) scope with locals.
+    /// Body (scope)  with locals.
     Body(SymbolMap),
     /// A call of a built-in, function or module.
     Call {
@@ -42,7 +50,7 @@ impl StackFrame {
         }
     }
 
-    /// Print local stack frame
+    /// Print stack frame.
     pub fn print_locals(
         &self,
         f: &mut std::fmt::Formatter<'_>,

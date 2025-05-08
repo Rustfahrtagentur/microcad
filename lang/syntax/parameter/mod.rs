@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! µcad parameter syntax elements
@@ -44,7 +44,7 @@ impl Parameter {
             id: Identifier::no_ref(id),
             specified_type: Some(TypeAnnotation(Refer::none(ty))),
             default_value: None,
-            src_ref: SrcRef(None)
+            src_ref: SrcRef(None),
         }
     }
 

@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{eval::*, objects::*};
@@ -10,7 +10,6 @@ impl Eval for ListExpression {
                 .iter()
                 .map(|expr| expr.eval(context))
                 .collect::<Result<_, _>>()?,
-            self.src_ref(),
         );
 
         if let Some(unit) = self.unit {
@@ -18,11 +17,7 @@ impl Eval for ListExpression {
         }
 
         match value_list.types().common_type() {
-            Some(common_type) => Ok(Value::List(List::new(
-                value_list,
-                common_type,
-                self.src_ref(),
-            ))),
+            Some(common_type) => Ok(Value::List(List::new(value_list, common_type))),
             None => {
                 context.error(
                     self,
@@ -85,7 +80,7 @@ impl Eval for Expression {
 
                 match (lhs, rhs) {
                     (Value::List(list), Value::Integer(index)) => {
-                        let index = index.value as usize;
+                        let index = index as usize;
                         if index < list.len() {
                             match list.get(index) {
                                 Some(value) => Ok(value.clone()),

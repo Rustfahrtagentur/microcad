@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
@@ -25,7 +25,7 @@ impl BuiltinModuleDefinition for Circle {
     }
 
     fn parameters() -> ParameterList {
-        vec![Parameter::no_ref("radius", Type::Scalar)].into()
+        ParameterList::new(vec![Parameter::no_ref("radius", Type::Scalar)].into())
     }
 }
 
@@ -83,13 +83,15 @@ impl BuiltinModuleDefinition for Rect {
     }
 
     fn parameters() -> ParameterList {
-        vec![
-            Parameter::no_ref("width", Type::Scalar),
-            Parameter::no_ref("height", Type::Scalar),
-            Parameter::no_ref("x", Type::Scalar),
-            Parameter::no_ref("y", Type::Scalar),
-        ]
-        .into()
+        ParameterList::new(
+            vec![
+                Parameter::no_ref("width", Type::Scalar),
+                Parameter::no_ref("height", Type::Scalar),
+                Parameter::no_ref("x", Type::Scalar),
+                Parameter::no_ref("y", Type::Scalar),
+            ]
+            .into(),
+        )
     }
 }
 

@@ -1,21 +1,18 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::eval::*;
 
 impl Eval for FormatExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        Ok(Value::String(Refer::new(
-            format!("{}", self.expression.eval(context)?),
-            SrcRef(None),
-        )))
+        Ok(Value::String(format!("{}", self.expression.eval(context)?)))
     }
 }
 
 impl Eval for FormatString {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let mut result = String::new();
-        for elem in &self.0 {
+        for elem in &*self.0 {
             match elem {
                 FormatStringInner::String(s) => result += &s.value,
                 FormatStringInner::FormatExpression(expr) => match expr.eval(context) {
@@ -25,6 +22,6 @@ impl Eval for FormatString {
                 },
             }
         }
-        Ok(Value::String(Refer::new(result, SrcRef::from_vec(&self.0))))
+        Ok(Value::String(result))
     }
 }

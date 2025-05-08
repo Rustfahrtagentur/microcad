@@ -1,3 +1,6 @@
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use crate::{parse::*, parser::*, syntax::*};
 
 impl Parse for FormatExpression {
@@ -5,6 +8,7 @@ impl Parse for FormatExpression {
         Ok(Self::new(
             pair.find(Rule::format_spec),
             pair.find(Rule::expression).expect("Missing expression"),
+            pair.into(),
         ))
     }
 }

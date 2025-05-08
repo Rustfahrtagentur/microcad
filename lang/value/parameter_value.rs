@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Parameter value evaluation entity
@@ -114,7 +114,7 @@ macro_rules! parameter_value {
         $crate::value::ParameterValue::new(
             stringify!($id).into(),
             Some(Type::$ty),
-            Some($crate::value::Value::$ty(Refer::none($value))),
+            Some($crate::value::Value::$ty($value)),
             SrcRef(None),
         )
     };

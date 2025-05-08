@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Source file cache
@@ -135,7 +135,9 @@ impl std::fmt::Display for SourceCache {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (index, source_file) in self.source_files.iter().enumerate() {
             let filename = source_file.filename.clone();
-            let name = self.name_from_index(index).unwrap_or(QualifiedName(vec![]));
+            let name = self
+                .name_from_index(index)
+                .unwrap_or(QualifiedName::no_ref(vec![]));
             let hash = source_file.hash;
             writeln!(f, "[{index}] {name} {hash:#x} {filename:?}")?;
         }
