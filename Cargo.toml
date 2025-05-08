@@ -9,6 +9,7 @@ default-members = [
     "tests",
     "builtin-proc-macro",
     "tools/cli",
+    "tools/update-copyright",
 ]
 
 members = [
@@ -18,6 +19,7 @@ members = [
     "tests",
     "builtin-proc-macro",
     "tools/cli",
+    "tools/update-copyright",
 ]
 resolver = "2"
 
