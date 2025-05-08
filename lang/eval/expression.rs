@@ -128,6 +128,7 @@ impl Eval for Nested {
             let value = item.eval(context)?;
             let nodes = match value {
                 Value::Node(_) | Value::NodeMultiplicity(_) => value.fetch_nodes(),
+                Value::None => return Ok(Value::None),
                 value => {
                     if index == 0 && self.len() == 1 {
                         return Ok(value);
