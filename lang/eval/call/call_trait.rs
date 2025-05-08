@@ -5,8 +5,8 @@
 
 use crate::eval::*;
 
-/// trait for calls of modules or functions with argument list
+/// Trait for calls of modules or functions with argument list.
 pub trait CallTrait {
-    /// Evaluate call into value (if possible)
+    /// Evaluate call into value (if possible).
     fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value>;
 }

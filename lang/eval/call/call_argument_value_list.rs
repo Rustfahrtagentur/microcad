@@ -5,9 +5,9 @@
 
 use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 
-/// Collection of *call argument values*.
+/// Collection of *call argument values* (e.g. `( x=1, y=2 )`).
 ///
-/// [`CallArgumentValueList`] also provides methods to find a matching call
+/// Also provides methods to find a matching call
 /// between it and a given *parameter list*.
 #[derive(Clone, Debug, Default)]
 pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
@@ -17,7 +17,7 @@ impl CallArgumentValueList {
     ///
     /// Transports code into builtin in `impl` [`Eval`] for [`Call`].
     ///
-    /// **RULE**: Shall only be used for builtin symbols.
+    /// Shall only be used for builtin symbols.
     /// # Arguments
     pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
         let code = Refer {

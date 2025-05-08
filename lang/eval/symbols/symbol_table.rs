@@ -5,16 +5,16 @@ use crate::{eval::*, rc::*, resolve::*, syntax::*};
 
 /// *Symbol table* holding global and local symbols.
 ///
-/// A the symbol table consists of the following members:
+/// The symbol table consists of the following members:
 ///
-/// - One *root symbol* resolved from the initially read source file.
-/// - A map of all *global symbols*.
-/// - A stack of local scope frames that store *local values* and *local aliases* from use statements.
-/// - A map of all *loaded source files* (accessible by name, path and hash).
+/// - One *root [`Symbol`]* resolved from the *initial source file*.
+/// - A [`SourceCache`] of all *loaded source files* (accessible by *qualified name*, *file path* and *source hash*).
+/// - A [`Stack`] of [`StackFrame`]s.
+/// - A [`SymbolMap`] of all *global symbols*.
 ///
 /// All these internal structures can be accessed by several implemented traits.
 pub struct SymbolTable {
-    /// Root symbol (symbol node of initially read source file)
+    /// Symbol of the initial source file.
     pub root: Symbol,
     /// List of all global symbols.
     globals: SymbolMap,

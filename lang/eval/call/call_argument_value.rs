@@ -5,14 +5,14 @@
 
 use crate::{ord_map::*, src_ref::*, syntax::*, value::*};
 
-/// Call argument value
+/// Call argument value.
 #[derive(Clone, Debug)]
 pub struct CallArgumentValue {
-    /// Argument name
+    /// *id* of the argument.
     pub id: Option<Identifier>,
-    /// Argument value
+    /// *value* of the argument.
     pub value: Value,
-    /// Source code reference
+    /// Source code reference.
     src_ref: SrcRef,
 }
 

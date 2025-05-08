@@ -4,6 +4,13 @@
 use crate::{eval::*, resolve::*};
 
 /// A stack with a list of stack frames.
+///
+/// [`StackFrame`]s can have the following different types:
+/// - source file (bottom of stack)
+/// - namespaces ( e.g. `namespace my_lib { ... }`)
+/// - module calls (e.g. `std::geo2d::circle(radius = 1m)`)
+/// - function calls (e.g. `std::print("µcad")`)
+/// - bodies (e.g. `{ ... }`)
 #[derive(Default)]
 pub struct Stack(Vec<StackFrame>);
 

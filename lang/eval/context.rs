@@ -8,8 +8,7 @@ use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*};
 /// The context is used to store the current state of the evaluation.
 ///
 /// A context consists of the following members:
-///
-/// - A *symbol table* ([`SymbolTable`]) with symbols stored by [`QualifiedName`].
+/// - A *symbol table* ([`SymbolTable`]) with symbols stored by [`QualifiedName`] and a [`Stack`].
 /// - A *diagnostic handler* ([`DiagHandler`]) that accumulates *evaluation errors* for later output.
 /// - One *output channel* ([`Output`]) where `__builtin::print` writes it's output to while evaluation.
 ///
@@ -17,7 +16,7 @@ use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*};
 pub struct Context {
     /// Symbol table
     symbol_table: SymbolTable,
-    /// Source file diagnostics-
+    /// Source file diagnostics.
     diag_handler: DiagHandler,
     /// Output channel for [__builtin::print].
     output: Box<dyn Output>,
@@ -27,10 +26,10 @@ impl Context {
     /// Create a new context from a source file.
     ///
     /// # Arguments
-    /// - `root`: Root symbol
-    /// - `builtin`: The builtin library
-    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
-    /// - `output`: Output channel to use
+    /// - `root`: Root symbol.
+    /// - `builtin`: The builtin library.
+    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
+    /// - `output`: Output channel to use.
     pub fn new(
         root: Symbol,
         builtin: Symbol,
@@ -57,9 +56,9 @@ impl Context {
     /// Create a new context from a source file.
     ///
     /// # Arguments
-    /// - `root`: Path to the root file to load
-    /// - `builtin`: The builtin library
-    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
+    /// - `root`: Path to the root file to load.
+    /// - `builtin`: The builtin library.
+    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
     pub fn from_source(
         root: impl AsRef<std::path::Path>,
         builtin: Symbol,
@@ -77,8 +76,8 @@ impl Context {
     ///
     /// # Arguments
     /// - `root`: Resolved root source file.
-    /// - `builtin`: The builtin library
-    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library)
+    /// - `builtin`: The builtin library.
+    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
     pub fn from_source_captured(
         root: Rc<SourceFile>,
         builtin: Symbol,
@@ -92,11 +91,6 @@ impl Context {
         )
     }
 
-    /// Access diagnostic handler.
-    pub fn diag_handler(&self) -> &DiagHandler {
-        &self.diag_handler
-    }
-
     /// Access captured output.
     pub fn output(&self) -> Option<String> {
         self.output.output()
@@ -107,7 +101,7 @@ impl Context {
         self.output.print(what).expect("could not write to output");
     }
 
-    /// Get source code location of a src referrer.
+    /// Get the source code location of the given referrer as string (e.g. `/path/to/file.µcad:52:1`).
     pub fn locate(&self, referrer: &impl SrcReferrer) -> EvalResult<String> {
         Ok(format!(
             "{}:{}",
@@ -117,7 +111,7 @@ impl Context {
         ))
     }
 
-    /// Get source code at the given *source code reference*
+    /// Get the original source code of the given referrer.
     pub fn source_code(&self, referrer: &impl SrcReferrer) -> EvalResult<String> {
         Ok(referrer
             .src_ref()
@@ -125,7 +119,7 @@ impl Context {
             .to_string())
     }
 
-    /// Evaluate context to a value.
+    /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Value> {
         let source_file = match &self.symbol_table.root.borrow().def {
             SymbolDefinition::SourceFile(source_file) => source_file.clone(),
@@ -134,13 +128,13 @@ impl Context {
         source_file.eval(self)
     }
 
-    /// Peek into root node for testing
+    /// Peek into root node for testing.
     #[cfg(test)]
     pub fn root(&self) -> &Symbol {
         &self.symbol_table.root
     }
 
-    /// Open a new scope with a stack frame.
+    /// Run the closure `f` within the given `stack_frame`.
     pub fn scope<T>(&mut self, stack_frame: StackFrame, f: impl FnOnce(&mut Context) -> T) -> T {
         self.open(stack_frame);
         let result = f(self);
