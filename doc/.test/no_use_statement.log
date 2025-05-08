@@ -1,0 +1,6 @@
+error: Symbol __builtin::transform::translate not found.
+  ---> ../lib/std/geo3d.µcad:25:5
+     |
+  25 |     __builtin::transform::translate(
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

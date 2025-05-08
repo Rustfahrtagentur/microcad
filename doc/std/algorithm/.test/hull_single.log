@@ -1,0 +1,6 @@
+error: Symbol hull not found.
+  ---> <from_str>:1:1
+     |
+   1 | hull()
+     | ^^^^^^
+     |

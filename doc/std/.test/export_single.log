@@ -1,0 +1,6 @@
+error: Symbol std::export not found.
+  ---> <from_str>:1:1
+     |
+   1 | std::export("cube.stl") std::geo3d::cube(size = 40mm);
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+     |
