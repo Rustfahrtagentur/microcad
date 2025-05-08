@@ -51,14 +51,14 @@ macro_rules! call_argument_value {
     ($name:ident: $ty:ident = $value:expr) => {
         CallArgumentValue::new(
             Some(stringify!($name).into()),
-            $crate::value::Value::$ty($crate::src_ref::Refer::none($value)),
+            $crate::value::Value::$ty($value),
             $crate::src_ref::SrcRef(None),
         )
     };
     ($ty:ident = $value:expr) => {
         CallArgumentValue::new(
             None,
-            $crate::value::Value::$ty($crate::src_ref::Refer::none($value)),
+            $crate::value::Value::$ty($value),
             $crate::src_ref::SrcRef(None),
         )
     };

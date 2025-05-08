@@ -30,10 +30,10 @@ impl Literal {
     /// Return value of literal
     pub fn value(&self) -> Value {
         match self {
-            Self::Integer(refer) => Value::Integer(refer.clone()),
-            Self::Number(number_literal) => number_literal.value(),
-            Self::Bool(refer) => Value::Bool(refer.clone()),
-            Self::Color(refer) => Value::Color(refer.clone()),
+            Self::Integer(value) => Value::Integer(*value.clone()),
+            Self::Number(value) => value.value(),
+            Self::Bool(value) => Value::Bool(*value.clone()),
+            Self::Color(value) => Value::Color(*value.clone()),
         }
     }
 }

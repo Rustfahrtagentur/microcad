@@ -35,12 +35,12 @@ impl NumberLiteral {
     /// Return value for number literal
     pub fn value(&self) -> Value {
         match self.1.ty() {
-            Type::Scalar => Value::Scalar(Refer::new(self.normalized_value(), self.src_ref())),
-            Type::Angle => Value::Angle(Refer::new(self.normalized_value(), self.src_ref())),
-            Type::Length => Value::Length(Refer::new(self.normalized_value(), self.src_ref())),
-            Type::Weight => Value::Weight(Refer::new(self.normalized_value(), self.src_ref())),
-            Type::Area => Value::Area(Refer::new(self.normalized_value(), self.src_ref())),
-            Type::Volume => Value::Volume(Refer::new(self.normalized_value(), self.src_ref())),
+            Type::Scalar => Value::Scalar(self.normalized_value()),
+            Type::Angle => Value::Angle(self.normalized_value()),
+            Type::Length => Value::Length(self.normalized_value()),
+            Type::Weight => Value::Weight(self.normalized_value()),
+            Type::Area => Value::Area(self.normalized_value()),
+            Type::Volume => Value::Volume(self.normalized_value()),
             _ => unreachable!(),
         }
     }

@@ -84,5 +84,5 @@ fn argument_match_single() {
     let a = arg_map.get(&Identifier::no_ref("a"));
     assert!(a.is_some());
     let a = a.expect("internal test error");
-    assert!(a == &Value::Scalar(Refer::none(5.0)));
+    assert!(a == &Value::Scalar(5.0));
 }

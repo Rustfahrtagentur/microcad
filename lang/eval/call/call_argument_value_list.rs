@@ -20,10 +20,6 @@ impl CallArgumentValueList {
     /// Shall only be used for builtin symbols.
     /// # Arguments
     pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
-        let code = Refer {
-            value: code,
-            src_ref: referrer.src_ref(),
-        };
         let mut value = OrdMap::default();
         value
             .push(CallArgumentValue::new(
@@ -143,7 +139,7 @@ macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
             $arg_map.get(&Identifier::no_ref(stringify!($name).into())).expect(&format!("Argument `{}` expected",stringify!($name))),
-            &Value::$ty(crate::src_ref::Refer::none($value))
+            &Value::$ty($value)
         ));*
     };
 }

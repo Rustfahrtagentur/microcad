@@ -127,7 +127,7 @@ fn module_implicit_init_call() {
                 object
                     .get_property_value(&Identifier(Refer::none("b".into())))
                     .expect("Property `b`"),
-                &value::Value::Scalar(src_ref::Refer::none(value))
+                &value::Value::Scalar(value)
             );
         } else {
             panic!("Object node expected")
@@ -176,7 +176,7 @@ fn module_explicit_init_call() {
                 object
                     .get_property_value(&Identifier::no_ref("radius"))
                     .expect("Property `radius`"),
-                &value::Value::Scalar(src_ref::Refer::none(value))
+                &value::Value::Scalar(value)
             );
         } else {
             panic!("Object node expected")

@@ -297,10 +297,10 @@ impl SrcReferrer for SymbolInner {
             SymbolDefinition::Builtin(_) => {
                 unreachable!("builtin has no source code reference")
             }
-            SymbolDefinition::Constant(identifier, value)
-            | SymbolDefinition::CallArgument(identifier, value)
-            | SymbolDefinition::Property(identifier, value) => SrcRef::merge(identifier, value),
-            SymbolDefinition::Alias(identifier, name) => SrcRef::merge(identifier, name),
+            SymbolDefinition::Constant(identifier, _)
+            | SymbolDefinition::CallArgument(identifier, _)
+            | SymbolDefinition::Property(identifier, _) => identifier.src_ref(),
+            SymbolDefinition::Alias(identifier, _) => identifier.src_ref(),
         }
     }
 }

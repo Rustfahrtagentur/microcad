@@ -5,10 +5,7 @@ use crate::eval::*;
 
 impl Eval for FormatExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        Ok(Value::String(Refer::new(
-            format!("{}", self.expression.eval(context)?),
-            SrcRef(None),
-        )))
+        Ok(Value::String(format!("{}", self.expression.eval(context)?)))
     }
 }
 
@@ -25,6 +22,6 @@ impl Eval for FormatString {
                 },
             }
         }
-        Ok(Value::String(Refer::new(result, SrcRef::from_vec(&self.0))))
+        Ok(Value::String(result))
     }
 }

@@ -3,18 +3,18 @@
 
 //! Map key type evaluation entity
 
-use crate::{src_ref::*, syntax::*, value::*};
+use crate::{syntax::*, value::*};
 use microcad_core::Integer;
 
 /// A value type that can be used as a key in a map
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum MapKeyValue {
     /// Integer map key type
-    Integer(Refer<Integer>),
+    Integer(Integer),
     /// Boolean map key type
-    Bool(Refer<bool>),
+    Bool(bool),
     /// String map key type
-    String(Refer<String>),
+    String(String),
 }
 
 impl MapKeyValue {

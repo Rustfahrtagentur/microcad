@@ -3,7 +3,7 @@
 
 //! Unnamed tuple evaluation entity
 
-use crate::{src_ref::*, ty::*, value::*};
+use crate::{ty::*, value::*};
 
 /// Unnamed tuple
 #[derive(Clone, Debug, PartialEq)]
@@ -35,16 +35,7 @@ impl UnnamedTuple {
             result.push(add_result);
         }
 
-        Ok(UnnamedTuple(ValueList::new(
-            result,
-            SrcRef::merge(&self, &rhs),
-        )))
-    }
-}
-
-impl SrcReferrer for UnnamedTuple {
-    fn src_ref(&self) -> SrcRef {
-        self.0.src_ref()
+        Ok(UnnamedTuple(ValueList::new(result)))
     }
 }
 

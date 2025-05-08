@@ -3,7 +3,7 @@
 
 //! Typed list of values evaluation entity
 
-use crate::{src_ref::*, syntax::*, ty::*, value::*};
+use crate::{syntax::*, ty::*, value::*};
 
 /// List of values of the same type
 #[derive(Clone, Debug)]
@@ -11,13 +11,12 @@ pub struct List {
     /// List of values
     list: ValueList,
     ty: Type,
-    src_ref: SrcRef,
 }
 
 impl List {
     /// Create new list
-    pub fn new(list: ValueList, ty: Type, src_ref: SrcRef) -> Self {
-        Self { list, ty, src_ref }
+    pub fn new(list: ValueList, ty: Type) -> Self {
+        Self { list, ty }
     }
 
     /// Fetch all values as `Vec<Value>`
@@ -29,12 +28,6 @@ impl List {
 impl PartialEq for List {
     fn eq(&self, other: &Self) -> bool {
         self.ty == other.ty && self.list == other.list
-    }
-}
-
-impl SrcReferrer for List {
-    fn src_ref(&self) -> SrcRef {
-        self.src_ref.clone()
     }
 }
 
@@ -93,13 +86,9 @@ impl std::ops::Mul<Value> for List {
 
         match self.ty {
             // List * Scalar or List * Integer
-            Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => {
-                Ok(Value::List(List::new(
-                    ValueList::new(values, self.src_ref.clone()),
-                    rhs.ty().clone(),
-                    self.src_ref.clone(),
-                )))
-            }
+            Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => Ok(
+                Value::List(List::new(ValueList::new(values), rhs.ty().clone())),
+            ),
             _ => Err(ValueError::InvalidOperator("*".into())),
         }
     }
@@ -117,11 +106,7 @@ impl std::ops::Div<Value> for List {
         match self.ty {
             // List / Scalar or List / Integer
             Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => {
-                Ok(Value::List(List::new(
-                    ValueList::new(values, self.src_ref.clone()),
-                    Type::Scalar,
-                    self.src_ref.clone(),
-                )))
+                Ok(Value::List(List::new(ValueList::new(values), Type::Scalar)))
             }
             _ => Err(ValueError::InvalidOperator("/".into())),
         }

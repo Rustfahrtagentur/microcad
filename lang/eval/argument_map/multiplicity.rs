@@ -132,40 +132,20 @@ impl Iterator for Combinations<Value> {
 
 #[test]
 fn call_parameter_multiplicity() {
-    use crate::src_ref::Refer;
-
     let data = std::collections::HashMap::from([
         (
             "0".into(),
-            Coefficient::Multi(
-                [1, 2]
-                    .iter()
-                    .map(|i| Value::Integer(Refer::none(*i)))
-                    .collect(),
-            ),
+            Coefficient::Multi([1, 2].iter().map(|i| Value::Integer(*i)).collect()),
         ),
         (
             "1".into(),
-            Coefficient::Multi(
-                [10, 20, 30]
-                    .iter()
-                    .map(|i| Value::Integer(Refer::none(*i)))
-                    .collect(),
-            ),
+            Coefficient::Multi([10, 20, 30].iter().map(|i| Value::Integer(*i)).collect()),
         ),
         (
             "2".into(),
-            Coefficient::Multi(
-                [100, 200]
-                    .iter()
-                    .map(|i| Value::Integer(Refer::none(*i)))
-                    .collect(),
-            ),
+            Coefficient::Multi([100, 200].iter().map(|i| Value::Integer(*i)).collect()),
         ),
-        (
-            "3".into(),
-            Coefficient::Single(Value::Integer(Refer::none(20))),
-        ),
+        ("3".into(), Coefficient::Single(Value::Integer(20))),
     ]);
 
     let combinations = Combinations::new(&data);

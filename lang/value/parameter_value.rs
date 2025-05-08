@@ -114,7 +114,7 @@ macro_rules! parameter_value {
         $crate::value::ParameterValue::new(
             stringify!($id).into(),
             Some(Type::$ty),
-            Some($crate::value::Value::$ty(Refer::none($value))),
+            Some($crate::value::Value::$ty($value)),
             SrcRef(None),
         )
     };

@@ -71,7 +71,7 @@ impl SrcReferrer for Expression {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         match self {
             Self::Invalid => SrcRef(None),
-            Self::Value(value) => value.src_ref(),
+            Self::Value(_) => SrcRef(None),
             Self::Literal(l) => l.src_ref(),
             Self::FormatString(fs) => fs.src_ref(),
             Self::ListExpression(le) => le.src_ref(),

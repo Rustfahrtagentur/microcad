@@ -173,17 +173,14 @@ impl std::fmt::Display for Stack {
 #[test]
 #[allow(clippy::unwrap_used)]
 fn local_stack() {
-    use std::ops::Deref;
-
     let mut stack = Stack::default();
 
-    let make_int =
-        |id, value| Symbol::new_constant(id, Value::Integer(Refer::new(value, SrcRef(None))));
+    let make_int = |id, value| Symbol::new_constant(id, Value::Integer(value));
 
     let fetch_int = |stack: &Stack, id: &str| -> Option<i64> {
         match stack.fetch(&id.into()) {
             Ok(node) => match &node.borrow().def {
-                SymbolDefinition::Constant(_, Value::Integer(value)) => Some(*value.deref()),
+                SymbolDefinition::Constant(_, Value::Integer(value)) => Some(*value),
                 _ => todo!("error"),
             },
             _ => None,

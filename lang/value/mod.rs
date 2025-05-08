@@ -42,31 +42,31 @@ pub enum Value {
     /// Invalid value (used for error handling).
     None,
     /// An integer value.
-    Integer(Refer<Integer>),
+    Integer(Integer),
     /// A scalar value.
-    Scalar(Refer<Scalar>),
+    Scalar(Scalar),
     /// Length in mm.
-    Length(Refer<Scalar>),
+    Length(Scalar),
     /// Area in mm².
-    Area(Refer<Scalar>),
+    Area(Scalar),
     /// Volume in mm³.
-    Volume(Refer<Scalar>),
+    Volume(Scalar),
     /// A 2D vector with length.
-    Vec2(Refer<Vec2>),
+    Vec2(Vec2),
     /// A 3D vector with length.
-    Vec3(Refer<Vec3>),
+    Vec3(Vec3),
     /// A 4D vector with length.
-    Vec4(Refer<Vec4>),
+    Vec4(Vec4),
     /// An angle in radians.
-    Angle(Refer<Scalar>),
+    Angle(Scalar),
     /// Weight of a specific volume of material.
-    Weight(Refer<Scalar>),
+    Weight(Scalar),
     /// A boolean value.
-    Bool(Refer<bool>),
+    Bool(bool),
     /// A string value.
-    String(Refer<String>),
+    String(String),
     /// A color value.
-    Color(Refer<Color>),
+    Color(Color),
     /// A list of values.
     List(List),
     /// A map of values.
@@ -85,18 +85,10 @@ impl Value {
     /// Add a unit to a primitive value (Scalar or Integer).
     pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
         match (self.clone(), unit.ty()) {
-            (Value::Integer(i), Type::Length) => {
-                *self = Value::Length(Refer::new(unit.normalize(*i as Scalar), i.src_ref))
-            }
-            (Value::Integer(i), Type::Angle) => {
-                *self = Value::Angle(Refer::new(unit.normalize(*i as Scalar), i.src_ref))
-            }
-            (Value::Scalar(s), Type::Length) => {
-                *self = Value::Length(Refer::new(unit.normalize(*s), s.src_ref))
-            }
-            (Value::Scalar(s), Type::Angle) => {
-                *self = Value::Angle(Refer::new(unit.normalize(*s), s.src_ref))
-            }
+            (Value::Integer(i), Type::Length) => *self = Value::Length(unit.normalize(i as Scalar)),
+            (Value::Integer(i), Type::Angle) => *self = Value::Angle(unit.normalize(i as Scalar)),
+            (Value::Scalar(s), Type::Length) => *self = Value::Length(unit.normalize(s)),
+            (Value::Scalar(s), Type::Angle) => *self = Value::Angle(unit.normalize(s)),
             (value, _) => return Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
         }
         Ok(())
@@ -111,64 +103,38 @@ impl Value {
         }
     }
 
-    /// Clone the value with a new source reference.
-    pub fn clone_with_src_ref(&self, src_ref: SrcRef) -> Self {
-        match self {
-            Value::None => Value::None,
-            Value::Integer(i) => Value::Integer(Refer::new(i.value, src_ref)),
-            Value::Scalar(s) => Value::Scalar(Refer::new(s.value, src_ref)),
-            Value::Length(l) => Value::Length(Refer::new(l.value, src_ref)),
-            Value::Area(a) => Value::Area(Refer::new(a.value, src_ref)),
-            Value::Volume(v) => Value::Volume(Refer::new(v.value, src_ref)),
-            Value::Vec2(v) => Value::Vec2(Refer::new(v.value, src_ref)),
-            Value::Vec3(v) => Value::Vec3(Refer::new(v.value, src_ref)),
-            Value::Vec4(v) => Value::Vec4(Refer::new(v.value, src_ref)),
-            Value::Angle(a) => Value::Angle(Refer::new(a.value, src_ref)),
-            Value::Weight(w) => Value::Weight(Refer::new(w.value, src_ref)),
-            Value::Bool(b) => Value::Bool(Refer::new(b.value, src_ref)),
-            Value::String(s) => Value::String(Refer::new(s.value.clone(), src_ref)),
-            Value::Color(c) => Value::Color(Refer::new(c.value, src_ref)),
-            Value::List(l) => Value::List(l.clone()),
-            // Value::Map(m) => Value::Map(m.clone_with_src_ref(src_ref)),
-            //Value::NamedTuple(t) => Value::NamedTuple(t.clone_with_src_ref(src_ref)),
-            //Value::UnnamedTuple(t) => Value::UnnamedTuple(t.clone_with_src_ref(src_ref)),
-            Value::Node(n) => Value::Node(n.clone()),
-            _ => todo!("Implement Value::clone_with_src_ref for all variants"),
-        }
-    }
-
     /// Get property value for a value.
     ///
     /// - `identifier`: Identifier of the property
     ///
     /// This function is used when accessing a property `p` of a value `v` with `p.v`.
     pub fn get_property_value(&self, identifier: &Identifier) -> Option<Value> {
-        let get = |value| Some(Value::Scalar(Refer::none(value)));
+        let get = |value| Some(Value::Scalar(value));
         let id = identifier.id().as_str();
         match self {
             Value::Vec2(r) => match id {
-                "x" => get(r.value.x),
-                "y" => get(r.value.y),
+                "x" => get(r.x),
+                "y" => get(r.y),
                 _ => None,
             },
             Value::Vec3(r) => match id {
-                "x" => get(r.value.x),
-                "y" => get(r.value.y),
-                "z" => get(r.value.z),
+                "x" => get(r.x),
+                "y" => get(r.y),
+                "z" => get(r.z),
                 _ => None,
             },
             Value::Vec4(r) => match id {
-                "x" => get(r.value.x),
-                "y" => get(r.value.y),
-                "z" => get(r.value.z),
-                "w" => get(r.value.w),
+                "x" => get(r.x),
+                "y" => get(r.y),
+                "z" => get(r.z),
+                "w" => get(r.w),
                 _ => None,
             },
             Value::Color(r) => match id {
-                "r" => get(r.value.r as f64),
-                "g" => get(r.value.g as f64),
-                "b" => get(r.value.b as f64),
-                "a" => get(r.value.a as f64),
+                "r" => get(r.r as f64),
+                "g" => get(r.g as f64),
+                "b" => get(r.b as f64),
+                "a" => get(r.a as f64),
                 _ => None,
             },
             Value::NamedTuple(named_tuple) => named_tuple.get(identifier).cloned(),
@@ -192,31 +158,13 @@ impl Value {
             "^" => unimplemented!(), // lhs.pow(&rhs),
             "&" => lhs & rhs,
             "|" => lhs | rhs,
-            ">" => Ok(Value::Bool(Refer::new(
-                lhs > rhs,
-                SrcRef::merge(&lhs, &rhs),
-            ))),
-            "<" => Ok(Value::Bool(Refer::new(
-                lhs < rhs,
-                SrcRef::merge(&lhs, &rhs),
-            ))),
-            "≤" => Ok(Value::Bool(Refer::new(
-                lhs <= rhs,
-                SrcRef::merge(&lhs, &rhs),
-            ))),
-            "≥" => Ok(Value::Bool(Refer::new(
-                lhs >= rhs,
-                SrcRef::merge(&lhs, &rhs),
-            ))),
+            ">" => Ok(Value::Bool(lhs > rhs)),
+            "<" => Ok(Value::Bool(lhs < rhs)),
+            "≤" => Ok(Value::Bool(lhs <= rhs)),
+            "≥" => Ok(Value::Bool(lhs >= rhs)),
             "~" => todo!("implement near ~="),
-            "=" => Ok(Value::Bool(Refer::new(
-                lhs == rhs,
-                SrcRef::merge(&lhs, &rhs),
-            ))),
-            "!=" => Ok(Value::Bool(Refer::new(
-                lhs != rhs,
-                SrcRef::merge(&lhs, &rhs),
-            ))),
+            "=" => Ok(Value::Bool(lhs == rhs)),
+            "!=" => Ok(Value::Bool(lhs != rhs)),
             _ => unimplemented!("{op:?}"),
         } {
             Err(err) => Err(err),
@@ -237,37 +185,9 @@ impl Value {
     /// A `Value::None` will return false.
     pub fn try_bool(&self) -> Result<bool, ValueError> {
         match self {
-            Value::Bool(b) => Ok(**b),
+            Value::Bool(b) => Ok(*b),
             Value::None => Ok(false),
             value => Err(ValueError::CannotConvertToBool(value.clone())),
-        }
-    }
-}
-
-impl SrcReferrer for Value {
-    fn src_ref(&self) -> SrcRef {
-        match self {
-            Value::None => SrcRef(None),
-            Value::Integer(i) => i.src_ref(),
-            Value::Scalar(s) => s.src_ref(),
-            Value::Bool(b) => b.src_ref(),
-
-            Value::Length(l) => l.src_ref(),
-            Value::Angle(a) => a.src_ref(),
-            Value::Weight(w) => w.src_ref(),
-
-            Value::Area(a) => a.src_ref(),
-            Value::Volume(v) => v.src_ref(),
-            Value::Vec2(v) => v.src_ref(),
-            Value::Vec3(v) => v.src_ref(),
-            Value::Vec4(v) => v.src_ref(),
-            Value::String(s) => s.src_ref(),
-            Value::Color(c) => c.src_ref(),
-            Value::List(list) => list.src_ref(),
-            Value::Map(map) => map.src_ref(),
-            Value::NamedTuple(named_tuple) => named_tuple.src_ref(),
-            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.src_ref(),
-            Value::Node(_) | Value::NodeMultiplicity(_) => SrcRef(None),
         }
     }
 }
@@ -331,12 +251,12 @@ impl std::ops::Neg for Value {
 
     fn neg(self) -> Self::Output {
         match self {
-            Value::Integer(n) => Ok(Value::Integer(-n.clone())),
-            Value::Scalar(n) => Ok(Value::Scalar(-n.clone())),
-            Value::Length(n) => Ok(Value::Length(-n.clone())),
-            Value::Vec2(v) => Ok(Value::Vec2(-v.clone())),
-            Value::Vec3(v) => Ok(Value::Vec3(-v.clone())),
-            Value::Angle(n) => Ok(Value::Angle(-n.clone())),
+            Value::Integer(n) => Ok(Value::Integer(-n)),
+            Value::Scalar(n) => Ok(Value::Scalar(-n)),
+            Value::Length(n) => Ok(Value::Length(-n)),
+            Value::Vec2(v) => Ok(Value::Vec2(-v)),
+            Value::Vec3(v) => Ok(Value::Vec3(-v)),
+            Value::Angle(n) => Ok(Value::Angle(-n)),
             _ => Err(ValueError::InvalidOperator("-".into())),
         }
     }
@@ -351,17 +271,9 @@ impl std::ops::Add for Value {
             // Add two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs + rhs)),
             // Add a scalar to an integer
-            (Value::Integer(lhs), Value::Scalar(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l as Scalar + r
-                })))
-            }
+            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar + rhs)),
             // Add an integer to a scalar
-            (Value::Scalar(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l + r as Scalar
-                })))
-            }
+            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs + rhs as Scalar)),
             // Add two scalars
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs + rhs)),
             // Add two angles
@@ -373,9 +285,7 @@ impl std::ops::Add for Value {
             // Add two Vec3
             (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(Value::Vec3(lhs + rhs)),
             // Concatenate two strings
-            (Value::String(lhs), Value::String(rhs)) => {
-                Ok(Value::String(Refer::merge(lhs, rhs, |l, r| l + &r)))
-            }
+            (Value::String(lhs), Value::String(rhs)) => Ok(Value::String(lhs + &rhs)),
             // Concatenate two lists
             (Value::List(lhs), Value::List(rhs)) => {
                 if lhs.ty() != rhs.ty() {
@@ -388,7 +298,6 @@ impl std::ops::Add for Value {
                 Ok(Value::List(List::new(
                     lhs.iter().chain(rhs.iter()).cloned().collect(),
                     lhs.ty(),
-                    SrcRef::merge(&lhs, &rhs),
                 )))
             }
             // Add values of two tuples of the same length
@@ -409,17 +318,9 @@ impl std::ops::Sub for Value {
             // Subtract two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs - rhs)),
             // Subtract an scalar and an integer
-            (Value::Scalar(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l - r as Scalar
-                })))
-            }
+            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs - rhs as Scalar)),
             // Subtract an integer and a scalar
-            (Value::Integer(lhs), Value::Scalar(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l as Scalar - r
-                })))
-            }
+            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar - rhs)),
             // Subtract two numbers
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs - rhs)),
             // Subtract two angles
@@ -467,17 +368,9 @@ impl std::ops::Mul for Value {
             // Multiply two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs * rhs)),
             // Multiply an integer and a scalar, result is scalar
-            (Value::Integer(lhs), Value::Scalar(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l as Scalar * r
-                })))
-            }
+            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar * rhs)),
             // Multiply a scalar and an integer, result is scalar
-            (Value::Scalar(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l * r as Scalar
-                })))
-            }
+            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs * rhs as Scalar)),
             // Multiply two scalars
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs * rhs)),
             // Scale an angle with a scalar
@@ -485,45 +378,25 @@ impl std::ops::Mul for Value {
                 Ok(Value::Angle(lhs * rhs))
             }
             // Scale an angle with an integer
-            (Value::Angle(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l * r as Scalar
-                })))
-            }
+            (Value::Angle(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs * rhs as Scalar)),
             // Scale an integer with an angle
-            (Value::Integer(lhs), Value::Angle(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l as Scalar * r
-                })))
-            }
+            (Value::Integer(lhs), Value::Angle(rhs)) => Ok(Value::Scalar(lhs as Scalar * rhs)),
             // Scale a length with a scalar
             (Value::Length(lhs), Value::Scalar(rhs)) | (Value::Scalar(rhs), Value::Length(lhs)) => {
                 Ok(Value::Length(lhs * rhs))
             }
             // Scale a length with an integer
-            (Value::Length(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Length(Refer::merge(lhs, rhs, |l, r| {
-                    l * r as Scalar
-                })))
-            }
+            (Value::Length(lhs), Value::Integer(rhs)) => Ok(Value::Length(lhs * rhs as Scalar)),
             // Scale an integer with a length
-            (Value::Integer(lhs), Value::Length(rhs)) => {
-                Ok(Value::Length(Refer::merge(lhs, rhs, |l, r| {
-                    l as Scalar * r
-                })))
-            }
+            (Value::Integer(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs as Scalar * rhs)),
             // Scale Vec2
             (Value::Scalar(lhs), Value::Vec2(rhs)) | (Value::Vec2(rhs), Value::Scalar(lhs)) => {
-                Ok(Value::Vec2(Refer::merge(lhs, rhs, |l, r| {
-                    Vec2::new(l * r.x, l * r.y)
-                })))
+                Ok(Value::Vec2(Vec2::new(lhs * rhs.x, lhs * rhs.y)))
             }
             // Scale Vec3
-            (Value::Scalar(lhs), Value::Vec3(rhs)) | (Value::Vec3(rhs), Value::Scalar(lhs)) => {
-                Ok(Value::Vec3(Refer::merge(lhs, rhs, |l, r| {
-                    Vec3::new(l * r.x, l * r.y, l * r.z)
-                })))
-            }
+            (Value::Scalar(lhs), Value::Vec3(rhs)) | (Value::Vec3(rhs), Value::Scalar(lhs)) => Ok(
+                Value::Vec3(Vec3::new(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z)),
+            ),
             (Value::List(list), value) | (value, Value::List(list)) => Ok(list * value)?,
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
@@ -538,33 +411,17 @@ impl std::ops::Div for Value {
         match (self, rhs) {
             // Division with scalar result
             (Value::Integer(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l as Scalar / r as Scalar
-                })))
+                Ok(Value::Scalar(lhs as Scalar / rhs as Scalar))
             }
-            (Value::Scalar(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l / r as Scalar
-                })))
-            }
-            (Value::Integer(lhs), Value::Scalar(rhs)) => {
-                Ok(Value::Scalar(Refer::merge(lhs, rhs, |l, r| {
-                    l as Scalar / r
-                })))
-            }
+            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs / rhs as Scalar)),
+            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar / rhs)),
             (Value::Scalar(lhs), Value::Scalar(rhs))
             | (Value::Length(lhs), Value::Length(rhs))
             | (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Scalar(lhs / rhs)),
             (Value::Length(lhs), Value::Scalar(rhs)) => Ok(Value::Length(lhs / rhs)),
             (Value::Angle(lhs), Value::Scalar(rhs)) => Ok(Value::Angle(lhs / rhs)),
-            (Value::Length(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Length(Refer::merge(lhs, rhs, |l, r| {
-                    l / r as Scalar
-                })))
-            }
-            (Value::Angle(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Angle(Refer::merge(lhs, rhs, |l, r| l / r as Scalar)))
-            }
+            (Value::Length(lhs), Value::Integer(rhs)) => Ok(Value::Length(lhs / rhs as Scalar)),
+            (Value::Angle(lhs), Value::Integer(rhs)) => Ok(Value::Angle(lhs / rhs as Scalar)),
             (Value::List(list), value) => Ok(list / value)?,
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} / {rhs}"))),
         }
@@ -642,7 +499,7 @@ macro_rules! impl_try_from {
 
             fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
                 match value {
-                    $(Value::$variant(v) => Ok(v.value.into()),)*
+                    $(Value::$variant(v) => Ok(v),)*
                     value => Err(ValueError::CannotConvert(value, stringify!($ty).into())),
                 }
             }
@@ -653,7 +510,7 @@ macro_rules! impl_try_from {
 
             fn try_from(value: &Value) -> std::result::Result<Self, Self::Error> {
                 match value {
-                    $(Value::$variant(v) => Ok(v.value.clone().into()),)*
+                    $(Value::$variant(v) => Ok(v.clone().into()),)*
                     value => Err(ValueError::CannotConvert(value.clone(), stringify!($ty).into())),
                 }
             }
@@ -681,63 +538,57 @@ impl From<Vec<ObjectNode>> for Value {
 }
 
 #[cfg(test)]
-fn integer(value: i64, src_ref: &SrcRef) -> Value {
-    Value::Integer(Refer::new(value, src_ref.clone()))
+fn integer(value: i64) -> Value {
+    Value::Integer(value)
 }
 
 #[cfg(test)]
-fn scalar(value: f64, src_ref: &SrcRef) -> Value {
-    Value::Scalar(Refer::new(value, src_ref.clone()))
+fn scalar(value: f64) -> Value {
+    Value::Scalar(value)
 }
 
 #[cfg(test)]
 fn check(result: ValueResult, value: Value) {
     let result = result.expect("error result");
     assert_eq!(result, value);
-    // SrcRef cannot be compared with PartialEq
-    assert_eq!(result.src_ref().to_string(), value.src_ref().to_string());
 }
 
 #[test]
 fn test_value_integer() {
-    let u = || integer(2, &SrcRef::new(3..4, 5, 6, 0));
-    let v = || integer(5, &SrcRef::new(6..7, 8, 9, 0));
-    let w = || scalar(5.0, &SrcRef::new(6..7, 8, 9, 0));
-
-    let r = SrcRef::new(3..7, 5, 6, 0);
+    let u = || integer(2);
+    let v = || integer(5);
+    let w = || scalar(5.0);
 
     // symmetric operations
-    check(u() + v(), integer(2 + 5, &r));
-    check(u() - v(), integer(2 - 5, &r));
-    check(u() * v(), integer(2 * 5, &r));
-    check(u() / v(), scalar(2.0 / 5.0, &r));
-    check(-u(), integer(-2, &r));
+    check(u() + v(), integer(2 + 5));
+    check(u() - v(), integer(2 - 5));
+    check(u() * v(), integer(2 * 5));
+    check(u() / v(), scalar(2.0 / 5.0));
+    check(-u(), integer(-2));
 
     // asymmetric operations
-    check(u() + w(), scalar(2 as Scalar + 5.0, &r));
-    check(u() - w(), scalar(2 as Scalar - 5.0, &r));
-    check(u() * w(), scalar(2 as Scalar * 5.0, &r));
-    check(u() / w(), scalar(2.0 / 5.0, &r));
+    check(u() + w(), scalar(2 as Scalar + 5.0));
+    check(u() - w(), scalar(2 as Scalar - 5.0));
+    check(u() * w(), scalar(2 as Scalar * 5.0));
+    check(u() / w(), scalar(2.0 / 5.0));
 }
 
 #[test]
 fn test_value_scalar() {
-    let u = || scalar(2.0, &SrcRef::new(3..4, 5, 6, 0));
-    let v = || scalar(5.0, &SrcRef::new(6..7, 8, 9, 0));
-    let w = || integer(5, &SrcRef::new(6..7, 8, 9, 0));
-
-    let r = SrcRef::new(3..7, 5, 6, 0);
+    let u = || scalar(2.0);
+    let v = || scalar(5.0);
+    let w = || integer(5);
 
     // symmetric operations
-    check(u() + v(), scalar(2.0 + 5.0, &r));
-    check(u() - v(), scalar(2.0 - 5.0, &r));
-    check(u() * v(), scalar(2.0 * 5.0, &r));
-    check(u() / v(), scalar(2.0 / 5.0, &r));
-    check(-u(), scalar(-2.0, &r));
+    check(u() + v(), scalar(2.0 + 5.0));
+    check(u() - v(), scalar(2.0 - 5.0));
+    check(u() * v(), scalar(2.0 * 5.0));
+    check(u() / v(), scalar(2.0 / 5.0));
+    check(-u(), scalar(-2.0));
 
     // asymmetric operations
-    check(u() + w(), scalar(2.0 + 5.0, &r));
-    check(u() - w(), scalar(2.0 - 5.0, &r));
-    check(u() * w(), scalar(2.0 * 5.0, &r));
-    check(u() / w(), scalar(2.0 / 5.0, &r));
+    check(u() + w(), scalar(2.0 + 5.0));
+    check(u() - w(), scalar(2.0 - 5.0));
+    check(u() * w(), scalar(2.0 * 5.0));
+    check(u() / w(), scalar(2.0 / 5.0));
 }
