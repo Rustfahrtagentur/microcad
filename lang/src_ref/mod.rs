@@ -130,25 +130,29 @@ impl SrcRef {
     pub fn merge(lhs: &impl SrcReferrer, rhs: &impl SrcReferrer) -> SrcRef {
         match (lhs.src_ref(), rhs.src_ref()) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => {
-                let source_file_hash = lhs.source_file_hash;
+                if lhs.source_file_hash == rhs.source_file_hash {
+                    let source_file_hash = lhs.source_file_hash;
 
-                // TODO Not sure if this is correct.
-                // Can we actually merge two ranges of SrcRef?
-                if lhs.range.end > rhs.range.start || lhs.range.start > rhs.range.end {
-                    return SrcRef(Some(lhs));
+                    if lhs.range.end > rhs.range.start || lhs.range.start > rhs.range.end {
+                        log::warn!("ranges not in correct order");
+                        SrcRef(None)
+                    } else {
+                        SrcRef(Some(Box::new(SrcRefInner {
+                            range: {
+                                // paranoia check
+                                assert!(lhs.range.end <= rhs.range.end);
+                                assert!(lhs.range.start <= rhs.range.start);
+
+                                lhs.range.start..rhs.range.end
+                            },
+                            at: lhs.at,
+                            source_file_hash,
+                        })))
+                    }
+                } else {
+                    log::warn!("references are not in the same file");
+                    SrcRef(None)
                 }
-
-                SrcRef(Some(Box::new(SrcRefInner {
-                    range: {
-                        // paranoia check
-                        assert!(lhs.range.end <= rhs.range.end);
-                        assert!(lhs.range.start <= rhs.range.start);
-
-                        lhs.range.start..rhs.range.end
-                    },
-                    at: lhs.at,
-                    source_file_hash,
-                })))
             }
             (SrcRef(Some(hs)), SrcRef(None)) | (SrcRef(None), SrcRef(Some(hs))) => SrcRef(Some(hs)),
             _ => SrcRef(None),
