@@ -61,6 +61,17 @@ impl ObjectProperties {
     }
 }
 
+impl std::fmt::Display for ObjectProperties {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "ObjectProperties:")?;
+        for (id, value) in self.0.iter() {
+            writeln!(f, "\t{id:?} = {value:?}")?;
+        }
+
+        Ok(())
+    }
+}
+
 impl From<&SymbolMap> for ObjectProperties {
     fn from(symbol_map: &SymbolMap) -> Self {
         let mut props = ObjectProperties::default();

@@ -147,7 +147,7 @@ pub enum EvalError {
 
     /// Properties are not initialized.
     #[error("Properties have not been initialized: {0:?}")]
-    UninitializedProperties(Vec<Identifier>),
+    UninitializedProperties(IdentifierList),
 
     /// Unexpected element within expression.
     #[error("Unexpected {0} {1} within expression")]

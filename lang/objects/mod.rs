@@ -343,7 +343,6 @@ impl ObjectBuilder {
 
             Ok(())
         } else {
-            panic!("{:#?}", self.object.props);
             Err(EvalError::UninitializedProperties(IdentifierList(
                 Refer::none(self.object.props.get_ids_of_uninitialized()),
             )))

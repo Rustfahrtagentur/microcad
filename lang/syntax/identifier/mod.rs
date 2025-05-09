@@ -12,7 +12,7 @@ pub use qualified_name::*;
 use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 
 /// µcad identifier
-#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(pub Refer<Id>);
 
 impl Identifier {
@@ -96,6 +96,12 @@ impl std::fmt::Display for Identifier {
         } else {
             write!(f, "{}", self.0)
         }
+    }
+}
+
+impl std::fmt::Debug for Identifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Identifier: {:?}", self.0)
     }
 }
 
