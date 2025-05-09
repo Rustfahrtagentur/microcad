@@ -66,7 +66,7 @@ impl StackFrame {
                 return symbols.print(f, depth + 4);
             }
             StackFrame::ModuleInit(symbols) => {
-                writeln!(f, "{:depth$} (module init):", "")?;
+                writeln!(f, "{:depth$}(module init):", "")?;
                 return symbols.print(f, depth + 4);
             }
             StackFrame::Namespace(id, symbols) => {
