@@ -62,13 +62,16 @@ impl StackFrame {
                 map
             }
             StackFrame::Module(id, symbols) => {
-                return write!(f, "{:depth$}{id} (module) = {symbols}", "");
+                writeln!(f, "{:depth$}{id} (module)", "")?;
+                return symbols.print(f, depth + 4);
             }
             StackFrame::ModuleInit(symbols) => {
-                return write!(f, "{:depth$} (module init) = {symbols}", "");
+                writeln!(f, "{:depth$} (module init):", "")?;
+                return symbols.print(f, depth + 4);
             }
             StackFrame::Namespace(id, symbols) => {
-                return writeln!(f, "{:depth$}{id} (namespace) = {symbols}", "");
+                writeln!(f, "{:depth$}{id} (namespace):", "")?;
+                return symbols.print(f, depth + 4);
             }
             StackFrame::Body(map) => map,
             StackFrame::Call {

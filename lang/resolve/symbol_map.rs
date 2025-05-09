@@ -76,6 +76,14 @@ impl SymbolMap {
         }
         self
     }
+
+    pub fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
+        for (id, symbol) in self.0.iter() {
+            symbol.print_symbol(f, Some(id), depth)?;
+        }
+
+        Ok(())
+    }
 }
 
 impl std::fmt::Display for SymbolMap {
