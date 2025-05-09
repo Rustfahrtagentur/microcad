@@ -26,7 +26,7 @@ use crate::parser::*;
 /// Reference into a source file.
 ///
 /// *Hint*: Source file is not part of `SrcRef` and must be provided from outside
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct SrcRef(pub Option<Box<SrcRefInner>>);
 
 impl SrcRef {
@@ -48,7 +48,7 @@ impl SrcRef {
     }
 }
 /// A reference into the source code
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct SrcRefInner {
     /// Range in bytes
     pub range: std::ops::Range<usize>,
@@ -70,6 +70,19 @@ impl std::fmt::Display for SrcRef {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.0 {
             Some(s) => write!(f, "{}", s.at),
+            _ => write!(f, "<no_ref>"),
+        }
+    }
+}
+
+impl std::fmt::Debug for SrcRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.0 {
+            Some(s) => write!(
+                f,
+                "{} ({}..{}) in {:#x}",
+                s.at, s.range.start, s.range.end, s.source_file_hash
+            ),
             _ => write!(f, "<no_ref>"),
         }
     }

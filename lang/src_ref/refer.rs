@@ -4,7 +4,7 @@
 use crate::src_ref::*;
 
 /// Packs any value together with a source reference
-#[derive(Clone, Default, Ord, Debug, PartialEq, PartialOrd)]
+#[derive(Clone, Default, Ord, PartialEq, PartialOrd)]
 pub struct Refer<T> {
     /// Value
     pub value: T,
@@ -66,6 +66,11 @@ impl<T: Eq> Eq for Refer<T> {}
 impl<T: std::fmt::Display> std::fmt::Display for Refer<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         self.value.fmt(f)
+    }
+}
+impl<T: std::fmt::Debug> std::fmt::Debug for Refer<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}, Refer: {:?}", self.value, self.src_ref)
     }
 }
 
