@@ -74,7 +74,7 @@ pub trait ArgumentMatch: Default {
                 &parameter_value,
                 parameter_values,
             )? {
-                TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
+                TypeCheckResult::List | TypeCheckResult::Match => {
                     if positional_index >= parameter_values.len() {
                         break;
                     }

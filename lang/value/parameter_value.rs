@@ -21,9 +21,9 @@ pub struct ParameterValue {
 /// Result of a type check with `ParameterValue::type_check()`
 pub enum TypeCheckResult {
     /// Self's type matched given type
-    SingleMatch,
+    Match,
     /// Self is list of that type
-    MultiMatch,
+    List,
     /// An error occurred
     NoMatch(Identifier, Option<Type>, Type),
 }
@@ -61,12 +61,12 @@ impl ParameterValue {
     /// - `TypeCheckResult::NoMatch(err)`: Types do not match (`err` describes both type
     pub fn type_check(&self, ty: &Type) -> TypeCheckResult {
         if self.type_matches(ty) {
-            return TypeCheckResult::SingleMatch;
+            return TypeCheckResult::Match;
         }
 
         if let Some(specified_type) = self.specified_type.as_ref() {
             if ty.is_list_of(specified_type) {
-                TypeCheckResult::MultiMatch
+                TypeCheckResult::List
             } else {
                 TypeCheckResult::NoMatch(self.id.clone(), Some(specified_type.clone()), ty.clone())
             }

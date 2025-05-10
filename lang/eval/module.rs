@@ -12,7 +12,7 @@ impl ModuleDefinition {
         args: &CallArgumentValueList,
         context: &mut Context,
     ) -> Option<(&ModuleInitDefinition, MultiArgumentMap)> {
-        self.inits().find_map(|init| {
+        self.init_iter().find_map(|init| {
             if let Ok(arg_map) = args.get_multi_matching_arguments(context, &init.parameters) {
                 Some((init, arg_map))
             } else {

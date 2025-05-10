@@ -20,21 +20,21 @@ pub struct ModuleDefinition {
 
 impl ModuleDefinition {
     /// Return iterator over all initializers
-    pub fn inits(&self) -> Inits {
-        Inits::new(self)
+    pub fn init_iter(&self) -> ModuleInitIterator {
+        ModuleInitIterator::new(self)
     }
 }
 
 /// Iterator over modules init statements
-pub struct Inits<'a>(std::slice::Iter<'a, Statement>);
+pub struct ModuleInitIterator<'a>(std::slice::Iter<'a, Statement>);
 
-impl<'a> Inits<'a> {
+impl<'a> ModuleInitIterator<'a> {
     fn new(def: &'a ModuleDefinition) -> Self {
         Self(def.body.statements.iter())
     }
 }
 
-impl<'a> Iterator for Inits<'a> {
+impl<'a> Iterator for ModuleInitIterator<'a> {
     type Item = &'a ModuleInitDefinition;
 
     fn next(&mut self) -> Option<Self::Item> {

@@ -42,7 +42,7 @@ impl ArgumentMatch for MultiArgumentMap {
         let result = parameter_value.type_check(&value.ty());
         let id = &parameter_value.id;
         match result {
-            TypeCheckResult::MultiMatch => match &value {
+            TypeCheckResult::List => match &value {
                 Value::List(l) => {
                     parameter_values.remove(id);
                     self.insert_multi(id.clone(), l.fetch());
@@ -50,7 +50,7 @@ impl ArgumentMatch for MultiArgumentMap {
                 }
                 value => Err(EvalError::ExpectedIterable(value.ty().clone())),
             },
-            TypeCheckResult::SingleMatch => {
+            TypeCheckResult::Match => {
                 parameter_values.remove(id);
                 self.insert_single(id.clone(), value);
                 Ok(result)

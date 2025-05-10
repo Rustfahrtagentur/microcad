@@ -67,7 +67,7 @@ impl ArgumentMatch for ArgumentMap {
         let id = &parameter_value.id;
         parameter_values.remove(id);
         self.insert(id.clone(), value.clone());
-        Ok(TypeCheckResult::SingleMatch)
+        Ok(TypeCheckResult::Match)
     }
 }
 
