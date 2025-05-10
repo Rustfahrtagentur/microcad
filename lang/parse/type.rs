@@ -19,25 +19,39 @@ impl Parse for TypeAnnotation {
                 Type::NamedTuple(NamedTupleType::parse(inner)?),
                 pair.into(),
             )),
-            Rule::qualified_name => match inner.as_str() {
-                "Int" => Self(Refer::new(Type::Integer, pair.into())),
-                "Scalar" => Self(Refer::new(Type::Scalar, pair.into())),
-                "String" => Self(Refer::new(Type::String, pair.into())),
-                "Color" => Self(Refer::new(Type::Color, pair.into())),
-                "Length" => Self(Refer::new(Type::Length, pair.into())),
-                "Angle" => Self(Refer::new(Type::Angle, pair.into())),
-                "Vec2" => Self(Refer::new(Type::Vec2, pair.into())),
-                "Vec3" => Self(Refer::new(Type::Vec3, pair.into())),
-                "Bool" => Self(Refer::new(Type::Bool, pair.into())),
-                _ => Self(Refer::new(
-                    Type::Custom(QualifiedName::parse(inner)?),
-                    pair.into(),
-                )),
-            },
+            Rule::identifier => Self::from_str(inner.as_str(), pair.src_ref()),
             _ => unreachable!("Expected type, found {:?}", inner.as_rule()),
         };
 
         Ok(s)
+    }
+}
+
+impl TypeAnnotation {
+    /// Create `TypeAnnotation` from type name.
+    pub fn from_str(type_name: &str, src_ref: SrcRef) -> TypeAnnotation {
+        Self(Refer::new(Type::from_str(type_name), src_ref))
+    }
+}
+
+impl Type {
+    /// Create a type from  type name string.
+    ///
+    /// Returns a valid type or `Type::Unknown`.
+    #[allow(clippy::should_implement_trait)]
+    pub fn from_str(type_name: &str) -> Self {
+        match type_name {
+            "Int" => Type::Integer,
+            "Scalar" => Type::Scalar,
+            "String" => Type::String,
+            "Color" => Type::Color,
+            "Length" => Type::Length,
+            "Angle" => Type::Angle,
+            "Vec2" => Type::Vec2,
+            "Vec3" => Type::Vec3,
+            "Bool" => Type::Bool,
+            unknown => Type::Unknown(unknown.to_string()),
+        }
     }
 }
 

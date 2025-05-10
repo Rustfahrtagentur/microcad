@@ -10,6 +10,8 @@ use crate::{syntax::*, ty::*};
 pub enum Type {
     /// Invalid type (used for error handling)
     Invalid,
+    /// Unknown type (there are not custom types)
+    Unknown(String),
     /// A 64-bit integer number
     Integer,
     /// A 64-bit floating-point number
@@ -44,8 +46,6 @@ pub enum Type {
     UnnamedTuple(UnnamedTupleType),
     /// A named tuple of elements: `(x: scalar, y: string)`
     NamedTuple(NamedTupleType),
-    /// A custom type or a module node in the syntax tree
-    Custom(QualifiedName),
     /// Node
     Node,
     /// Node multiplicity
@@ -81,6 +81,7 @@ impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Invalid => write!(f, "<invalid>"),
+            Self::Unknown(unknown) => write!(f, "<unknown:{unknown}>"),
             Self::Integer => write!(f, "Int"),
             Self::Scalar => write!(f, "Scalar"),
             Self::String => write!(f, "String"),
@@ -98,7 +99,6 @@ impl std::fmt::Display for Type {
             Self::Map(t) => write!(f, "{}", t),
             Self::UnnamedTuple(t) => write!(f, "{}", t),
             Self::NamedTuple(t) => write!(f, "{}", t),
-            Self::Custom(qn) => write!(f, "{}", qn),
             Self::Node => write!(f, "Node"),
             Self::NodeMultiplicity => write!(f, "[Node]"),
         }

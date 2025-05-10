@@ -116,6 +116,10 @@ pub enum ParseError {
     /// Qualified name cannot be converted into an Id
     #[error("Qualified name {0} cannot be converted into an Id")]
     QualifiedNameIsNoId(QualifiedName),
+
+    /// Invalid type
+    #[error("Invalid type '{0}'")]
+    InvalidType(String),
 }
 
 /// Result with parse error

@@ -138,15 +138,14 @@ literal = {
 //`a::b::c::`: error # No trailing ::
 qualified_name = { identifier ~ ("::" ~ identifier)* }
 
-//`int`: ok
-//`a::nested::typename`: ok
-//`[scalar]`: ok # List type
-//`[scalar => scalar]`: ok # Map type
-//`(scalar, scalar)`: Unnamed tuple type
-//`(a: scalar, b: scalar)`: Named tuple type
+//`Int`: ok
+//`[Scalar]`: ok # List type
+//`[Scalar => scalar]`: ok # Map type
+//`(Scalar, Scalar)`: Unnamed tuple type
+//`(a: Scalar, b: Scalar)`: Named tuple type
 //`{}`: ok # Module type
 type = {
-  qualified_name |
+  identifier |
   list_type |
   map_type |
   named_tuple_type |
