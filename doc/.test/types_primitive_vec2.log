@@ -1,6 +1,0 @@
-error: Not implemented: cannot evaluate tuple expression of (x = 1, y = 2)cm at <from_str>:1:8
-  ---> <from_str>:1:8
-     |
-   1 | vec2 = (x=1, y=2)cm;
-     |        ^^^^^^^^^^^^
-     |

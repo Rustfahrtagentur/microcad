@@ -3,7 +3,7 @@
 
 //! Named tuple evaluation entity
 
-use crate::{src_ref::*, ty::*, value::*};
+use crate::{ty::*, value::*};
 
 /// Short cut to create a NamedTuple
 #[cfg(test)]
@@ -16,18 +16,12 @@ macro_rules! named_tuple {
 
 /// Tuple with named values
 #[derive(Clone, Debug, PartialEq)]
-pub struct NamedTuple(Refer<std::collections::BTreeMap<Identifier, Value>>);
+pub struct NamedTuple(std::collections::BTreeMap<Identifier, Value>);
 
 impl NamedTuple {
     /// Create new named tuple instance
-    pub fn new(map: std::collections::BTreeMap<Identifier, Value>, src_ref: SrcRef) -> Self {
-        Self(Refer::new(map, src_ref))
-    }
-}
-
-impl SrcReferrer for NamedTuple {
-    fn src_ref(&self) -> SrcRef {
-        self.0.src_ref()
+    pub fn new(map: std::collections::BTreeMap<Identifier, Value>) -> Self {
+        Self(map)
     }
 }
 

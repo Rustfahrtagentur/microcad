@@ -32,20 +32,10 @@ impl Eval for ListExpression {
 impl Eval for Expression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match self {
-            Self::Literal(literal) => Literal::eval(literal, context),
-            Self::FormatString(format_string) => FormatString::eval(format_string, context),
-            Self::ListExpression(list_expression) => ListExpression::eval(list_expression, context),
-            Self::TupleExpression(_) => {
-                context.error(
-                    self,
-                    EvalError::Todo(format!(
-                        "cannot evaluate tuple expression of {} at {}",
-                        self,
-                        context.locate(self)?
-                    )),
-                )?;
-                Ok(Value::None)
-            }
+            Self::Literal(literal) => literal.eval(context),
+            Self::FormatString(format_string) => format_string.eval(context),
+            Self::ListExpression(list_expression) => list_expression.eval(context),
+            Self::TupleExpression(tuple_expression) => tuple_expression.eval(context),
             Self::BinaryOp {
                 lhs,
                 op,

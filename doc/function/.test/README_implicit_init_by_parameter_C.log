@@ -10,23 +10,11 @@ error: Not implemented: cannot evaluate call of f(1cm) at <from_str>:4:1
    4 | f(1cm);
      | ^^^^^^
      |
-error: Not implemented: cannot evaluate tuple expression of (x = 1cm, y = 2cm) at <from_str>:5:7
-  ---> <from_str>:5:7
-     |
-   5 | f(1cm,(x=1cm,y=2cm));
-     |       ^^^^^^^^^^^^^
-     |
 error: Not implemented: cannot evaluate call of f(1cm, (x = 1cm, y = 2cm)) at <from_str>:5:1
   ---> <from_str>:5:1
      |
    5 | f(1cm,(x=1cm,y=2cm));
      | ^^^^^^^^^^^^^^^^^^^^
-     |
-error: Not implemented: cannot evaluate tuple expression of (x = 1cm, y = 2cm) at <from_str>:6:3
-  ---> <from_str>:6:3
-     |
-   6 | f((x=1cm,y=2cm));
-     |   ^^^^^^^^^^^^^
      |
 error: Not implemented: cannot evaluate call of f((x = 1cm, y = 2cm)) at <from_str>:6:1
   ---> <from_str>:6:1
@@ -34,35 +22,17 @@ error: Not implemented: cannot evaluate call of f((x = 1cm, y = 2cm)) at <from_s
    6 | f((x=1cm,y=2cm));
      | ^^^^^^^^^^^^^^^^
      |
-error: Not implemented: cannot evaluate tuple expression of (x = 1cm, y = 2cm) at <from_str>:7:11
-  ---> <from_str>:7:11
-     |
-   7 | f(a=1cm,b=(x=1cm,y=2cm));
-     |           ^^^^^^^^^^^^^
-     |
 error: Not implemented: cannot evaluate call of f(a = 1cm, b = (x = 1cm, y = 2cm)) at <from_str>:7:1
   ---> <from_str>:7:1
      |
    7 | f(a=1cm,b=(x=1cm,y=2cm));
      | ^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Not implemented: cannot evaluate tuple expression of (x = 1cm, y = 2cm) at <from_str>:8:9
-  ---> <from_str>:8:9
-     |
-   8 | f(1cm,b=(x=1cm,y=2cm));
-     |         ^^^^^^^^^^^^^
-     |
 error: Not implemented: cannot evaluate call of f(1cm, b = (x = 1cm, y = 2cm)) at <from_str>:8:1
   ---> <from_str>:8:1
      |
    8 | f(1cm,b=(x=1cm,y=2cm));
      | ^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Not implemented: cannot evaluate tuple expression of (x = 1cm, y = 2cm) at <from_str>:9:9
-  ---> <from_str>:9:9
-     |
-   9 | f(a=1cm,(x=1cm,y=2cm));
-     |         ^^^^^^^^^^^^^
      |
 error: Not implemented: cannot evaluate call of f(a = 1cm, (x = 1cm, y = 2cm)) at <from_str>:9:1
   ---> <from_str>:9:1
