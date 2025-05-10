@@ -4,12 +4,12 @@
 //! Argument map
 
 mod argument_match;
+mod combinations;
 mod multi_argument_map;
-mod multiplicity;
 
 pub use argument_match::*;
+pub use combinations::*;
 pub use multi_argument_map::*;
-pub use multiplicity::*;
 
 use crate::{eval::*, src_ref::*, value::*};
 
