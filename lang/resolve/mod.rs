@@ -15,6 +15,7 @@
 //!
 //! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .
 
+mod module_definition;
 mod symbol;
 mod symbol_definition;
 mod symbol_map;

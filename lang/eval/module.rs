@@ -3,7 +3,7 @@
 
 //! Module definition syntax element evaluation
 
-use crate::{eval::*, objects::*, rc::*, syntax::*};
+use crate::{eval::*, objects::*, syntax::*};
 
 impl ModuleDefinition {
     /// Find a matching initializer for call argument list
@@ -19,13 +19,6 @@ impl ModuleDefinition {
                 None
             }
         })
-    }
-
-    /// Resolve into SymbolNode
-    pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
-        let node = Symbol::new(SymbolDefinition::Module(self.clone()), parent);
-        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
-        node
     }
 
     /// Try to evaluate a single call to an object
