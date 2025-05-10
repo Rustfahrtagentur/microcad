@@ -56,19 +56,19 @@ where
 {
     /// Create a new Combinations iterator
     pub fn new(data: &CombinationMap<T>) -> Self {
-        let mut ids_sorted: Vec<Identifier> = data.keys().cloned().collect();
+        let mut ids_sorted: Vec<_> = data.keys().cloned().collect();
         ids_sorted.sort();
-        let keys_sorted: Vec<usize> = (0..ids_sorted.len()).collect();
+        let keys_sorted: Vec<_> = (0..ids_sorted.len()).collect();
 
         let indices = ids_sorted.iter().map(|_| 0).collect();
 
-        let data_indices: std::collections::BTreeMap<Identifier, usize> = ids_sorted
+        let data_indices = ids_sorted
             .iter()
             .zip(keys_sorted)
             .map(|(id, key)| (id.clone(), key))
             .collect();
 
-        let data: Vec<Coefficient<T>> = ids_sorted
+        let data = ids_sorted
             .iter()
             .map(|id| data.get(id).expect("Coefficient with id").clone())
             .collect();
@@ -112,7 +112,7 @@ impl Iterator for Combinations<Value> {
         }
 
         // Create the current combination based on the current indices
-        let values: Vec<Value> = self
+        let values: Vec<_> = self
             .data
             .iter()
             .zip(&self.indices)
@@ -153,7 +153,7 @@ fn call_parameter_multiplicity() {
 
     let mut count = 0;
     for combination in combinations {
-        let mut keys: Vec<Identifier> = combination.keys().cloned().collect();
+        let mut keys = combination.keys().cloned().collect::<Vec<_>>();
         keys.sort();
         let items: Vec<(&Identifier, i64)> = keys
             .iter()
@@ -163,7 +163,7 @@ fn call_parameter_multiplicity() {
                     combination[key].clone().try_into().expect("test error"),
                 )
             })
-            .collect::<Vec<_>>();
+            .collect();
         log::trace!("{:?}", items);
         count += 1;
     }
@@ -175,8 +175,7 @@ fn call_parameter_multiplicity() {
     );
 
     // Test empty map
-    let data: std::collections::HashMap<Identifier, Coefficient<Value>> =
-        std::collections::HashMap::new();
+    let data = std::collections::HashMap::new();
 
     let combinations = Combinations::new(&data);
     let mut count = 0;
