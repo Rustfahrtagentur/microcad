@@ -67,3 +67,9 @@ pub trait BuiltinModuleDefinition {
         Symbol::new_builtin(Identifier::no_ref(Self::id()), Self::function())
     }
 }
+
+/// Build the standard module
+pub fn builtin_namespace() -> Symbol {
+    // return empty namespace
+    Symbol::new_namespace("__no_builtin".try_into().expect("unexpected name error"))
+}
