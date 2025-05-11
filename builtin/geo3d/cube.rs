@@ -31,14 +31,10 @@ impl BuiltinModuleDefinition for Cube {
     }
 
     fn parameters() -> ParameterList {
-        ParameterList::new(
-            vec![
-                Parameter::no_ref("size_x", Type::Scalar),
-                Parameter::no_ref("size_y", Type::Scalar),
-                Parameter::no_ref("size_z", Type::Scalar),
-            ]
-            .into(),
-        )
+        ParameterList::new()
+            .add_builtin("size_x", Type::Scalar)
+            .add_builtin("size_y", Type::Scalar)
+            .add_builtin("size_z", Type::Scalar)
     }
 }
 

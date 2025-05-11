@@ -60,7 +60,7 @@ impl ParameterList {
     /// Evaluate [ParameterList] into [ParameterValueList].
     pub fn eval(&self, context: &mut Context) -> EvalResult<ParameterValueList> {
         let mut values = ParameterValueList::default();
-        for parameter in self.iter() {
+        for parameter in self.0.iter() {
             values.push(parameter.eval(context)?)?;
         }
 

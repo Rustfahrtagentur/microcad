@@ -6,7 +6,7 @@
 use crate::{syntax::*, ty::*};
 
 /// Map type (e.g. `[scalar => string]`)
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct MapType(MapKeyType, Box<Type>);
 
 impl MapType {

@@ -90,6 +90,34 @@ impl SrcReferrer for ParameterValue {
     }
 }
 
+impl Ty for ParameterValue {
+    fn ty(&self) -> Type {
+        match (&self.specified_type, &self.default_value) {
+            (None, None) => Type::Invalid,
+            (Some(ty), None) => ty.clone(),
+            (None, Some(value)) => value.ty(),
+            (Some(ty), Some(value)) => {
+                if *ty == value.ty() {
+                    ty.clone()
+                } else {
+                    Type::Invalid
+                }
+            }
+        }
+    }
+}
+
+impl std::fmt::Display for ParameterValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.id)?;
+        write!(f, ":{}", self.ty())?;
+        if let Some(default_value) = &self.default_value {
+            write!(f, "={default_value}")?;
+        }
+        Ok(())
+    }
+}
+
 /// Shortcut to create a `ParameterValue`
 #[cfg(test)]
 #[macro_export]

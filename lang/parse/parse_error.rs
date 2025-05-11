@@ -85,10 +85,6 @@ pub enum ParseError {
     #[error("Duplicated field name in map: {0}")]
     DuplicatedMapField(Identifier),
 
-    /// Duplicate identifier
-    #[error("Duplicate identifier: {0}")]
-    DuplicateIdentifier(Identifier),
-
     /// Missing format expression
     #[error("Missing format expression")]
     MissingFormatExpression,

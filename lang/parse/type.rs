@@ -46,6 +46,8 @@ impl Type {
             "String" => Type::String,
             "Color" => Type::Color,
             "Length" => Type::Length,
+            "Area" => Type::Area,
+            "Volume" => Type::Volume,
             "Angle" => Type::Angle,
             "Vec2" => Type::Vec2,
             "Vec3" => Type::Vec3,

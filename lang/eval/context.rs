@@ -91,6 +91,26 @@ impl Context {
         )
     }
 
+    /// Create a new context from a source file.
+    ///
+    /// # Arguments
+    /// - `root`: Path to the root file to load.
+    /// - `builtin`: The builtin library.
+    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
+    #[cfg(test)]
+    pub fn from_str(
+        root: &str,
+        builtin: Symbol,
+        search_paths: &[std::path::PathBuf],
+    ) -> EvalResult<Self> {
+        Ok(Self::new(
+            SourceFile::load_from_str(root)?.resolve(None),
+            builtin,
+            search_paths,
+            Box::new(Stdout),
+        ))
+    }
+
     /// Access captured output.
     pub fn output(&self) -> Option<String> {
         self.output.output()

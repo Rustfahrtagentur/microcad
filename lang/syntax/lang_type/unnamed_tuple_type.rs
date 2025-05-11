@@ -6,7 +6,7 @@
 use crate::ty::*;
 
 /// Unnamed tuple type (e.g. `(scalar,string)`
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq, PartialOrd, Eq, Ord)]
 pub struct UnnamedTupleType(pub Vec<Type>);
 
 impl std::fmt::Display for UnnamedTupleType {

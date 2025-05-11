@@ -5,23 +5,33 @@
 
 use crate::{syntax::*, ty::*, value::*};
 
-/// List of values of the same type
+/// List of values of the same type.
 #[derive(Clone, Debug)]
 pub struct List {
-    /// List of values
+    /// List of values.
     list: ValueList,
     ty: Type,
 }
 
 impl List {
-    /// Create new list
+    /// Create new list.
     pub fn new(list: ValueList, ty: Type) -> Self {
         Self { list, ty }
     }
 
-    /// Fetch all values as `Vec<Value>`
+    /// Fetch all values as `Vec<Value>`.
     pub fn fetch(&self) -> Vec<Value> {
         self.list.iter().cloned().collect::<Vec<_>>()
+    }
+
+    /// Fetch all values as `Vec<Value>`.
+    pub fn list(&self) -> Vec<&Value> {
+        self.list.iter().collect::<Vec<_>>()
+    }
+
+    /// Return type of elements in list.
+    pub fn inner_ty(&self) -> Type {
+        self.ty.clone()
     }
 }
 

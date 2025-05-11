@@ -16,6 +16,7 @@
         "gltf",
         "hasher",
         "Hasher",
+        "indizes",
         "initializers",
         "itertools",
         "jscadui",

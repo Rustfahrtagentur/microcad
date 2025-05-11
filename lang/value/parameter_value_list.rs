@@ -5,15 +5,17 @@
 
 use compact_str::CompactStringExt;
 
-use crate::value::*;
+use crate::{rc::*, value::*};
 
 /// List of parameter values
 #[derive(Clone, Debug, Default)]
 pub struct ParameterValueList {
     /// List of parameter values
-    parameters: Vec<ParameterValue>,
+    parameters: Vec<Rc<ParameterValue>>,
     /// access map by id
-    pub by_id: std::collections::BTreeMap<Identifier, usize>,
+    by_id: std::collections::BTreeMap<Identifier, usize>,
+    /// access map by type
+    by_type: std::collections::BTreeMap<Type, Vec<usize>>,
 }
 
 impl ParameterValueList {
@@ -21,11 +23,22 @@ impl ParameterValueList {
     #[cfg(test)]
     pub fn new(parameters: Vec<ParameterValue>) -> Self {
         let mut by_id = std::collections::BTreeMap::new();
+        let mut by_type: std::collections::BTreeMap<Type, Vec<usize>> =
+            std::collections::BTreeMap::new();
         for (i, parameter) in parameters.iter().enumerate() {
             by_id.insert(parameter.id.clone(), i);
+            if let Some((_, v)) = by_type.iter_mut().find(|(ty, _)| **ty == parameter.ty()) {
+                v.push(i);
+            } else {
+                by_type.insert(parameter.ty(), vec![i]);
+            }
         }
 
-        Self { by_id, parameters }
+        Self {
+            by_id,
+            by_type,
+            parameters: parameters.into_iter().map(Rc::new).collect(),
+        }
     }
 
     /// Push parameter value
@@ -34,30 +47,67 @@ impl ParameterValueList {
             return Err(ValueError::DuplicateParameter(parameter.id.clone()));
         }
 
-        self.by_id
-            .insert(parameter.id.clone(), self.parameters.len());
-        self.parameters.push(parameter);
+        let pos = self.parameters.len();
+        self.by_id.insert(parameter.id.clone(), pos);
+        if let Some((_, v)) = self
+            .by_type
+            .iter_mut()
+            .find(|(ty, _)| **ty == parameter.ty())
+        {
+            v.push(pos);
+        } else {
+            log::trace!("pos = {pos}");
+            self.by_type.insert(parameter.ty(), vec![pos]);
+        }
+        self.parameters.push(Rc::new(parameter));
         Ok(())
     }
 
     /// get ParameterValue by id
-    pub fn get_by_id(&self, id: &Identifier) -> Option<&ParameterValue> {
-        self.by_id.get(id).map(|i| &self.parameters[*i])
+    pub fn get_by_id(&self, id: &Identifier) -> Option<Rc<ParameterValue>> {
+        self.by_id.get(id).map(|i| self.parameters[*i].clone())
+    }
+
+    /// get ParameterValue by id
+    pub fn get_by_type(&self, ty: &Type) -> Vec<Rc<ParameterValue>> {
+        self.by_type
+            .iter()
+            .find_map(|(t, indizes)| {
+                if ty.can_convert_into(t) {
+                    Some(
+                        indizes
+                            .iter()
+                            .map(|i| self.parameters[*i].clone())
+                            .collect::<Vec<_>>(),
+                    )
+                } else {
+                    None
+                }
+            })
+            .unwrap_or(vec![])
     }
 
     /// get ParameterValue by index
-    pub fn get_by_index(&self, index: usize) -> Option<&ParameterValue> {
+    pub fn get_by_index(&self, index: usize) -> Option<&Rc<ParameterValue>> {
         self.parameters.get(index)
     }
 
     /// remove parameter value by id
     pub fn remove(&mut self, id: &Identifier) {
-        if let Some(new_index) = self.by_id.remove(id) {
-            self.parameters.remove(new_index);
+        if let Some(index) = self.by_id.remove(id) {
+            self.parameters.remove(index);
             self.by_id
                 .values_mut()
-                .skip(new_index)
+                .skip(index)
                 .for_each(|index| *index -= 1);
+            self.by_type.values_mut().for_each(|v| {
+                if let Some(idx) = v.iter().position(|idx| *idx == index) {
+                    v.remove(idx);
+                }
+                v.iter_mut()
+                    .filter(|idx| **idx > index)
+                    .for_each(|idx| *idx -= 1);
+            });
         }
     }
 
@@ -79,7 +129,7 @@ impl ParameterValueList {
 }
 
 impl std::ops::Deref for ParameterValueList {
-    type Target = Vec<ParameterValue>;
+    type Target = Vec<Rc<ParameterValue>>;
 
     fn deref(&self) -> &Self::Target {
         &self.parameters
@@ -96,5 +146,27 @@ impl std::fmt::Display for ParameterValueList {
                 .map(|p| p.id.to_string())
                 .join_compact(", ")
         )
+    }
+}
+
+impl From<Vec<Rc<ParameterValue>>> for ParameterValueList {
+    fn from(parameters: Vec<Rc<ParameterValue>>) -> Self {
+        let mut by_id = std::collections::BTreeMap::new();
+        let mut by_type: std::collections::BTreeMap<Type, Vec<usize>> =
+            std::collections::BTreeMap::new();
+        for (i, parameter) in parameters.iter().enumerate() {
+            by_id.insert(parameter.id.clone(), i);
+            if let Some((_, v)) = by_type.iter_mut().find(|(ty, _)| **ty == parameter.ty()) {
+                v.push(i);
+            } else {
+                by_type.insert(parameter.ty(), vec![i]);
+            }
+        }
+
+        Self {
+            by_id,
+            by_type,
+            parameters: parameters.into_iter().collect(),
+        }
     }
 }

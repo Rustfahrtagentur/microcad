@@ -13,6 +13,10 @@ use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
 
 impl CallArgumentValueList {
+    /// Create  new call argument value list.
+    pub fn new(referrer: &impl SrcReferrer) -> Self {
+        Self(Refer::new(OrdMap::default(), referrer.src_ref()))
+    }
     /// Create a *call argument value list*.
     ///
     /// Transports code into builtin in `impl` [`Eval`] for [`Call`].

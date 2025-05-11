@@ -23,7 +23,7 @@ pub enum EvalError {
     },
 
     /// Parameter type mismatch.
-    #[error("Type mismatch for parameter: expected {expected}, got {found}")]
+    #[error("Type mismatch for parameter `{id}`: expected {expected}, got {found}")]
     ParameterTypeMismatch {
         /// Parameter name
         id: Identifier,
@@ -91,7 +91,7 @@ pub enum EvalError {
 
     /// Invalid argument type.
     #[error("Invalid argument type: {0}")]
-    InvalidArgumentType(Type),
+    InvalidArgumentType(CallArgumentValue),
 
     /// Cannot nest item.
     #[error("Cannot nest item: {0}")]
@@ -156,6 +156,18 @@ pub enum EvalError {
     /// No variables allowed in namespaces
     #[error("No variables allowed in {0}")]
     NoVariablesAllowedIn(&'static str),
+
+    /// Parameter with that id could not be found in function signature
+    #[error("Parameter '{0}' could not be found in function signature.")]
+    ParameterNotFound(Identifier),
+
+    /// Parameter is function signature but not given
+    #[error("Missing parameter(s) {0}")]
+    MissingParameter(ParameterValueList),
+
+    /// Parameter is function signature but not given
+    #[error("Missing parameter(s) {0}")]
+    AmbiguousArgument(ParameterValueList),
 }
 
 /// Result type of any evaluation.

@@ -103,11 +103,16 @@ impl Stack {
 
 impl Locals for Stack {
     fn open(&mut self, frame: StackFrame) {
+        log::trace!("Opening stack frame:\n{frame}");
         self.0.push(frame);
     }
 
     fn close(&mut self) {
-        self.0.pop();
+        if let Some(frame) = self.0.pop() {
+            log::trace!("Closing stack frame:\n{frame}");
+        } else {
+            todo!("error: stack underflow");
+        }
     }
 
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {

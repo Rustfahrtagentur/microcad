@@ -3,30 +3,32 @@
 
 //! Parameter list syntax element
 
-use crate::{ord_map::*, syntax::*};
+use crate::{syntax::*, ty::Type};
 
-/// Parameter list
+/// Parameter list (always sorted by Parameter::id).
 #[derive(Clone, Debug, Default)]
-pub struct ParameterList(OrdMap<Identifier, Parameter>);
+pub struct ParameterList(pub Vec<Parameter>);
 
 impl ParameterList {
     /// Create new *parameter list* from a map of [`Parameter`]s.
-    pub fn new(value: OrdMap<Identifier, Parameter>) -> Self {
-        Self(value)
+    pub fn new() -> Self {
+        Self(Vec::new())
     }
-}
 
-impl std::ops::Deref for ParameterList {
-    type Target = OrdMap<Identifier, Parameter>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    /// Insert parameter to list.
+    pub fn push(&mut self, parameter: Parameter) {
+        self.0.push(parameter);
     }
-}
 
-impl std::ops::DerefMut for ParameterList {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+    /// Add a builtin parameter.
+    pub fn add_builtin(mut self, id: &str, ty: Type) -> Self {
+        self.push(Parameter::no_ref(id, ty));
+        self
+    }
+
+    /// Find parameter by id.
+    pub fn find(&self, id: &Identifier) -> Option<&Parameter> {
+        self.0.iter().find(|parameter| parameter.id == *id)
     }
 }
 

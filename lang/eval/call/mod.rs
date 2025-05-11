@@ -20,7 +20,7 @@ use thiserror::Error;
 impl CallArgumentList {
     /// Evaluate into a [`CallArgumentValueList`].
     pub fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
-        let mut v = CallArgumentValueList::default();
+        let mut v = CallArgumentValueList::new(self);
         for call_arg in self.iter() {
             v.push(call_arg.eval_value(context)?)
                 .expect("Could not insert call argument value");
@@ -65,6 +65,7 @@ impl Eval for Call {
             |context| match &symbol.borrow().def {
                 SymbolDefinition::Builtin(f) => f.call(&args, context),
                 SymbolDefinition::Module(m) => m.call(&args, context),
+                SymbolDefinition::Function(f) => f.call(&args, context),
                 _ => {
                     context.error(
                         self,

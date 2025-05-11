@@ -31,14 +31,10 @@ impl BuiltinModuleDefinition for Cylinder {
     }
 
     fn parameters() -> ParameterList {
-        ParameterList::new(
-            vec![
-                Parameter::no_ref("radius_bottom", Type::Scalar),
-                Parameter::no_ref("radius_top", Type::Scalar),
-                Parameter::no_ref("height", Type::Scalar),
-            ]
-            .into(),
-        )
+        ParameterList::new()
+            .add_builtin("radius_bottom", Type::Scalar)
+            .add_builtin("radius_top", Type::Scalar)
+            .add_builtin("height", Type::Scalar)
     }
 }
 

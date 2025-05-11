@@ -29,15 +29,11 @@ impl BuiltinModuleDefinition for Rect {
     }
 
     fn parameters() -> ParameterList {
-        ParameterList::new(
-            vec![
-                Parameter::no_ref("width", Type::Scalar),
-                Parameter::no_ref("height", Type::Scalar),
-                Parameter::no_ref("x", Type::Scalar),
-                Parameter::no_ref("y", Type::Scalar),
-            ]
-            .into(),
-        )
+        ParameterList::new()
+            .add_builtin("width", Type::Scalar)
+            .add_builtin("height", Type::Scalar)
+            .add_builtin("x", Type::Scalar)
+            .add_builtin("y", Type::Scalar)
     }
 }
 

@@ -123,7 +123,7 @@ impl std::fmt::Display for Unit {
             Self::Ounce => write!(f, "oz"),
 
             // Areas
-            Self::Meter2 => write!(f, "m³"),
+            Self::Meter2 => write!(f, "m²"),
             Self::Centimeter2 => write!(f, "cm²"),
             Self::Millimeter2 => write!(f, "mm²"),
             Self::Micrometer2 => write!(f, "µm²"),

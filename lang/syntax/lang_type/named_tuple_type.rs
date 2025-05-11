@@ -6,7 +6,7 @@
 use crate::{syntax::*, ty::*};
 
 /// Named tuple (e.g. `(n: scalar, m: string)`)
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq, PartialOrd, Eq, Ord)]
 pub struct NamedTupleType(pub std::collections::BTreeMap<Identifier, Type>);
 
 impl std::fmt::Display for NamedTupleType {

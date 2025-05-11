@@ -25,7 +25,7 @@ impl BuiltinModuleDefinition for Sphere {
     }
 
     fn parameters() -> ParameterList {
-        ParameterList::new(vec![Parameter::no_ref("radius", Type::Scalar)].into())
+        ParameterList::new().add_builtin("radius", Type::Scalar)
     }
 }
 

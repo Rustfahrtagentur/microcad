@@ -1,0 +1,29 @@
+// function f with all different parameters
+function f(a: Scalar, b: Length, c: Area) {}
+ 
+// all named
+f(a=0., b=1.m, c=2.m²);
+ 
+// some named
+f(a=0., b=1.m, 2.m²);
+ 
+// all named, alternative order: c,b,a
+f(2.m², b=1.m, a=0.);
+ 
+// one named
+f(0., b=1.m, 2.m²);
+ 
+// none named, alternative order:  c,a,b
+f(2.m², 0., 1.m);
+ 
+// function g with all different parameters but a and d
+function g(a: Scalar, b: Length, c: Area, d: Scalar) {}
+ 
+// all named
+g(a=0., b=1.m, c=2.m², d=3.);
+ 
+// some named
+g(a=1., 2.cm³, 1.m, d=3.);
+ 
+// only a and d named, alternative order: d,b,c,a
+g(d=3., 1.m, 2.cm³, a=0.);

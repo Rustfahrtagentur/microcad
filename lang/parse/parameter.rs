@@ -48,11 +48,8 @@ impl Parse for ParameterList {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::parameter_list);
         let mut parameters = ParameterList::default();
-
         for pair in pair.inner() {
-            parameters
-                .push(Parameter::parse(pair)?)
-                .map_err(ParseError::DuplicateIdentifier)?;
+            parameters.push(Parameter::parse(pair)?);
         }
 
         Ok(parameters)

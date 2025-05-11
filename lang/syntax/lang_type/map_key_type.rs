@@ -4,7 +4,7 @@
 //! Type of a key in a `MapType`
 
 /// Key type for use in a `MapType`
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum MapKeyType {
     #[default]
     /// Integer value as key

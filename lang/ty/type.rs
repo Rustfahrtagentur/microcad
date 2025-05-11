@@ -6,7 +6,7 @@
 use crate::{syntax::*, ty::*};
 
 /// µcad Basic Types
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum Type {
     /// Invalid type (used for error handling)
     Invalid,
@@ -73,6 +73,14 @@ impl Type {
         match self {
             Self::List(list_type) => &list_type.ty() == ty,
             _ => false,
+        }
+    }
+
+    /// Return `true` if self may be converted lossless into `into`.
+    pub fn can_convert_into(&self, into: &Type) -> bool {
+        match self {
+            Type::Integer => *into == Type::Scalar || *into == Type::Integer,
+            from => from == into,
         }
     }
 }
