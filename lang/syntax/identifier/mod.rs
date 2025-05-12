@@ -45,6 +45,11 @@ impl Identifier {
     pub fn validate(self) -> ParseResult<Self> {
         Parser::parse_rule(crate::parser::Rule::identifier, self.id().as_str(), 0)
     }
+
+    /// Add given `prefix` to identifier to get `qualified name`.
+    pub fn with_prefix(&self, prefix: &QualifiedName) -> QualifiedName {
+        QualifiedName::from(self).with_prefix(prefix)
+    }
 }
 
 impl SrcReferrer for Identifier {

@@ -171,6 +171,12 @@ impl From<Refer<Vec<Identifier>>> for QualifiedName {
     }
 }
 
+impl From<&Identifier> for QualifiedName {
+    fn from(id: &Identifier) -> Self {
+        Self(Refer::none(vec![id.clone()]))
+    }
+}
+
 #[cfg(test)]
 impl From<&str> for QualifiedName {
     fn from(value: &str) -> Self {
