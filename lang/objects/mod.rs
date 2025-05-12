@@ -299,7 +299,7 @@ impl ObjectBuilder {
     pub fn init_properties(
         &mut self,
         parameters: &ParameterValueList,
-        arguments: &ArgumentMap,
+        arguments: &CallArgumentValueList,
     ) -> &mut Self {
         let mut props = ObjectProperties::default();
 
@@ -308,7 +308,11 @@ impl ObjectBuilder {
                 parameter.id.clone(),
                 match &parameter.default_value {
                     Some(value) => value.clone(),
-                    None => arguments.get(&parameter.id).unwrap_or(&Value::None).clone(),
+                    None => arguments
+                        .get(&parameter.id)
+                        .expect("found parameter")
+                        .clone()
+                        .into(),
                 },
             );
         }

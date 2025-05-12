@@ -27,3 +27,14 @@ g(a=1., 2.cm², 1.m, d=3.);
  
 // only a and d named, alternative order: d,b,c,a
 g(d=3., 1.m, 2.cm², a=0.);
+
+
+module m(a:Int=0) {
+    init(b:Int) {
+        a = b;
+    }
+}
+
+m(b=2);
+m(a=1);
+m();

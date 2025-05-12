@@ -3,7 +3,7 @@
 
 //! Module definition syntax element
 
-use crate::{src_ref::*, syntax::*};
+use crate::{rc::*, src_ref::*, syntax::*};
 
 /// Module definition
 #[derive(Clone, Debug)]
@@ -11,7 +11,7 @@ pub struct ModuleDefinition {
     /// Module name
     pub id: Identifier,
     /// Module parameters (implicit initialization)
-    pub parameters: ParameterList,
+    pub explicit: Rc<ModuleInitDefinition>,
     /// Module body
     pub body: Body,
     /// Source code reference
@@ -26,28 +26,41 @@ impl ModuleDefinition {
 }
 
 /// Iterator over modules init statements
-pub struct ModuleInitIterator<'a>(std::slice::Iter<'a, Statement>);
+pub struct ModuleInitIterator {
+    defs: Vec<Rc<ModuleInitDefinition>>,
+    index: usize,
+}
 
-impl<'a> ModuleInitIterator<'a> {
-    fn new(def: &'a ModuleDefinition) -> Self {
-        Self(def.body.statements.iter())
+impl ModuleInitIterator {
+    fn new(def: &ModuleDefinition) -> Self {
+        Self {
+            defs: std::iter::once(def.explicit.clone())
+                .chain(
+                    def.body
+                        .statements
+                        .iter()
+                        .filter_map(|statement| match statement {
+                            Statement::ModuleInit(def) => Some(def.clone()),
+                            _ => None,
+                        }),
+                )
+                .collect(),
+            index: 0,
+        }
     }
 }
 
-impl<'a> Iterator for ModuleInitIterator<'a> {
-    type Item = &'a ModuleInitDefinition;
+impl Iterator for ModuleInitIterator {
+    type Item = Rc<ModuleInitDefinition>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        for statement in self.0.by_ref() {
-            match statement {
-                Statement::ModuleInit(module_init_definition) => {
-                    return Some(module_init_definition);
-                }
-                _ => continue,
-            }
+        if self.index == self.defs.len() {
+            None
+        } else {
+            let next = self.defs[self.index].clone();
+            self.index += 1;
+            Some(next)
         }
-
-        None
     }
 }
 
@@ -63,7 +76,7 @@ impl std::fmt::Display for ModuleDefinition {
             f,
             "module {name}({parameters}) {body}",
             name = self.id,
-            parameters = self.parameters,
+            parameters = self.explicit,
             body = self.body
         )
     }
@@ -72,7 +85,7 @@ impl std::fmt::Display for ModuleDefinition {
 impl PrintSyntax for ModuleDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
-        self.parameters.print_syntax(f, depth + 1)?;
+        self.explicit.print_syntax(f, depth + 1)?;
         self.body.print_syntax(f, depth + 1)
     }
 }

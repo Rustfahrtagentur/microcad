@@ -86,6 +86,7 @@ impl Body {
                     Statement::Expression(expression) => expression.eval(context)?,
                     Statement::Marker(marker) => marker.eval(context)?,
                     Statement::If(_) => todo!("if statement not implemented"),
+                    Statement::ModuleInit(_) => Value::None,
                     statement => {
                         use crate::diag::PushDiag;
                         context.error(self, EvalError::StatementNotSupported(statement.clone()))?;

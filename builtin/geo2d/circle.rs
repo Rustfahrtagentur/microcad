@@ -16,7 +16,7 @@ impl BuiltinModuleDefinition for Circle {
         "circle"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
+    fn node(args: &CallArgumentValueList) -> EvalResult<ObjectNode> {
         Ok(ObjectNode::new(ObjectNodeInner::Primitive2D(Rc::new(
             Circle {
                 radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),

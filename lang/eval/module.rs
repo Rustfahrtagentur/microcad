@@ -15,20 +15,18 @@ impl CallTrait for ModuleDefinition {
     /// Calling the module `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
     fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value> {
         for init in self.init_iter() {
-            log::trace!("Calling function '{}'", self.id);
-            match Multiplicity::new(&init.parameters.eval(context)?, args) {
-                Ok(multiplicity) => {
-                    multiplicity.call(|symbols| {
-                        self.body.eval_to_node(symbols, context).map(|x| x.into())
-                    })?;
-                }
-                Err(err) => {
-                    context.error(args, err)?;
-                    return Ok(Value::None);
-                }
+            log::trace!("trying init: {init}");
+            if let Ok(multiplicity) = Multiplicity::new(&init.parameters.eval(context)?, args) {
+                log::trace!("Calling init: {init}");
+                return multiplicity
+                    .call(|symbols| self.body.eval_to_node(symbols, context).map(|x| x.into()));
             }
         }
 
-        Err(EvalError::NoMatchingInit(self.id.clone(), args.clone()))
+        context.error(
+            args,
+            EvalError::NoMatchingInit(self.id.clone(), args.clone()),
+        )?;
+        Ok(Value::None)
     }
 }

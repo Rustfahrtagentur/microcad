@@ -7,6 +7,7 @@ impl Parse for Rc<ModuleDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut name = Identifier::default();
         let mut parameters = ParameterList::default();
+        let mut parameters_src_ref = SrcRef(None);
         let mut body = Body::default();
 
         for pair in pair.inner() {
@@ -15,7 +16,8 @@ impl Parse for Rc<ModuleDefinition> {
                     name = Identifier::parse(pair)?;
                 }
                 Rule::parameter_list => {
-                    parameters = ParameterList::parse(pair)?;
+                    parameters = ParameterList::parse(pair.clone())?;
+                    parameters_src_ref = pair.into();
                 }
                 Rule::body => {
                     body = Body::parse(pair.clone())?;
@@ -26,7 +28,11 @@ impl Parse for Rc<ModuleDefinition> {
 
         Ok(Rc::new(ModuleDefinition {
             id: name,
-            parameters,
+            explicit: Rc::new(ModuleInitDefinition {
+                parameters,
+                body: Body::default(),
+                src_ref: parameters_src_ref,
+            }),
             body,
             src_ref: pair.into(),
         }))

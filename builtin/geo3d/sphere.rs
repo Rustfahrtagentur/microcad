@@ -16,7 +16,7 @@ impl BuiltinModuleDefinition for Sphere {
         "sphere"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
+    fn node(args: &CallArgumentValueList) -> EvalResult<ObjectNode> {
         Ok(ObjectNode::new(ObjectNodeInner::Primitive3D(Rc::new(
             Sphere {
                 radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),

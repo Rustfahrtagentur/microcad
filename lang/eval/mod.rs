@@ -27,7 +27,6 @@
 //! context.write_diagnosis(stdout()).expect("stdout should be available");
 //! ```
 
-mod argument_map;
 mod body;
 mod builtin;
 mod call;
@@ -39,7 +38,6 @@ mod format_string;
 mod function;
 mod literal;
 mod module;
-mod module_init;
 mod multiplicity;
 mod output;
 mod parameter;
@@ -49,7 +47,6 @@ mod symbols;
 mod tuple;
 mod r#use;
 
-pub use argument_map::*;
 pub use builtin::*;
 pub use call::*;
 pub use context::*;

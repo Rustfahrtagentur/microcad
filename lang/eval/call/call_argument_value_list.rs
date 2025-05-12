@@ -55,43 +55,14 @@ impl CallArgumentValueList {
         })
     }
 
-    /// Check for unexpected arguments.
-    ///
-    /// This method will return an error if there is a call argument that
-    /// is not in the parameter list.
-    pub fn check_for_unexpected_arguments(
-        &self,
-        parameter_values: &ParameterValueList,
-    ) -> EvalResult<()> {
-        match self
-            .keys()
-            .find(|id| parameter_values.get_by_id(id).is_none())
-        {
-            Some(id) => Err(EvalError::UnexpectedArgument(id.clone())),
-            None => Ok(()),
-        }
-    }
-
-    /// This functions checks if the call arguments match the given parameter definitions.
-    ///
-    /// Returns a map of arguments that match the parameters.
-    pub fn get_matching_arguments(
-        &self,
-        context: &mut Context,
-        parameters: &ParameterList,
-    ) -> EvalResult<ArgumentMap> {
-        let parameters = parameters.eval(context)?;
-        ArgumentMap::find_match(self, &parameters)
-    }
-
-    /// Get multiplicity of matching arguments.
-    pub fn get_multi_matching_arguments(
-        &self,
-        context: &mut Context,
-        parameters: &ParameterList,
-    ) -> EvalResult<MultiArgumentMap> {
-        let parameters = parameters.eval(context)?;
-        MultiArgumentMap::find_match(self, &parameters)
+    /// Fetch an argument by name
+    pub fn get_value<'a, T>(&'a self, id: &Identifier) -> T
+    where
+        T: std::convert::TryFrom<&'a Value>,
+        T::Error: std::fmt::Debug,
+    {
+        let value = &self.0.get(id).expect("no name found").value;
+        value.try_into().expect("cannot convert argument value")
     }
 }
 
@@ -134,97 +105,5 @@ impl std::fmt::Display for CallArgumentValueList {
 impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
     fn from(value: Vec<CallArgumentValue>) -> Self {
         Self(Refer::none(value.into()))
-    }
-}
-
-#[cfg(test)]
-macro_rules! assert_eq_arg_map_value {
-    ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
-        $(assert_eq!(
-            $arg_map.get(&Identifier::no_ref(stringify!($name).into())).expect(&format!("Argument `{}` expected",stringify!($name))),
-            &Value::$ty($value)
-        ));*
-    };
-}
-
-#[test]
-fn call_get_matching_arguments() {
-    use crate::{parameter_value, ty::*};
-
-    // module my_module(foo: Integer, bar: Integer, baz: Scalar = 4.0)
-    let param_values = ParameterValueList::new(vec![
-        parameter_value!(foo: Integer),
-        parameter_value!(bar: Integer),
-        parameter_value!(baz: Scalar = 4.0),
-    ]);
-
-    // my_module(1, bar = 2, baz = 3.0)
-    let call_values = CallArgumentValueList::from(vec![
-        call_argument_value!(Integer = 1),
-        call_argument_value!(foo: Integer = 2),
-        call_argument_value!(baz: Scalar = 3.0),
-    ]);
-
-    let arg_map = ArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
-
-    assert_eq_arg_map_value!(arg_map,
-        foo: Integer = 2,
-        bar: Integer = 1,
-        baz: Scalar = 3.0
-    );
-}
-
-#[test]
-fn call_get_matching_arguments_missing() {
-    use crate::{parameter_value, ty::*};
-
-    // function f(foo: Integer, bar: Integer, baz: Scalar = 4.0)
-    let param_values = ParameterValueList::new(vec![
-        parameter_value!(foo: Integer),
-        parameter_value!(bar: Integer),
-        parameter_value!(baz: Scalar = 4.0),
-    ]);
-
-    // f(1, baz = 3.0)
-    let call_values = CallArgumentValueList::from(vec![
-        call_argument_value!(Integer = 1),
-        call_argument_value!(baz: Scalar = 3.0),
-    ]);
-
-    let arg_map = ArgumentMap::find_match(&call_values, &param_values);
-
-    if let Err(EvalError::ValueError(ValueError::MissingArguments(missing))) = arg_map {
-        assert_eq!(missing.len(), 1);
-        assert_eq!(&missing[0].id, "bar");
-    } else {
-        panic!("Expected MissingArguments error");
-    }
-}
-
-#[test]
-fn get_multi_matching_arguments() {
-    use crate::{parameter_value, ty::*};
-
-    let param_values = ParameterValueList::new(vec![
-        parameter_value!(thickness: Scalar = 2.0),
-        parameter_value!(inner_diameter: Scalar = 100.0),
-        parameter_value!(height: Scalar = 10.0),
-    ]);
-
-    let call_values = CallArgumentValueList::from(vec![
-        call_argument_value!(Scalar = 2.0),
-        call_argument_value!(Scalar = 100.0),
-        call_argument_value!(Scalar = 10.0),
-    ]);
-
-    let multi_argument_map =
-        MultiArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
-
-    for argument_map in multi_argument_map.combinations() {
-        assert_eq_arg_map_value!(argument_map,
-            thickness: Scalar = 2.0,
-            inner_diameter: Scalar = 100.0,
-            height: Scalar = 10.0
-        );
     }
 }

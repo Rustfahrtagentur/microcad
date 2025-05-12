@@ -22,16 +22,19 @@ impl std::ops::DerefMut for SymbolMap {
     }
 }
 
-impl From<&ArgumentMap> for SymbolMap {
-    fn from(arg_map: &ArgumentMap) -> Self {
-        let mut symbol_map = SymbolMap::default();
-        for (id, value) in arg_map.iter() {
-            symbol_map.add_node(Symbol::new_call_argument(id.clone(), value.clone()))
-        }
-
-        symbol_map
-    }
-}
+//impl From<&CallArgumentValueList> for SymbolMap {
+//    fn from(arg_map: &CallArgumentValueList) -> Self {
+//        let mut symbol_map = SymbolMap::default();
+//        for value in arg_map.iter() {
+//            symbol_map.add_node(Symbol::new_call_argument(
+//                value.id.clone(),
+//                value.value.clone(),
+//            ))
+//        }
+//
+//        symbol_map
+//    }
+//}
 
 impl SymbolMap {
     /// Create symbol new map

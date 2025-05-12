@@ -45,17 +45,28 @@ pub trait BuiltinModuleDefinition {
     /// Get id of the builtin module
     fn id() -> &'static str;
     /// Create node from argument map
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode>;
+    fn node(args: &CallArgumentValueList) -> EvalResult<ObjectNode>;
     /// Module function
     fn function() -> &'static BuiltinFn {
         &|args, context| {
-            let multi_args = args.get_multi_matching_arguments(context, &Self::parameters())?;
-            let mut nodes = Vec::new();
-            for args in multi_args.combinations() {
-                nodes.push(Self::node(&args)?);
+            log::trace!("Calling builtin function '{}'", Self::id());
+            match Multiplicity::new(&Self::parameters().eval(context)?, args) {
+                Ok(multiplicity) => multiplicity.call(|_| Self::node(args).map(|x| x.into())),
+                Err(err) => {
+                    context.error(args, err)?;
+                    Ok(Value::None)
+                }
             }
 
-            Ok(Value::NodeMultiplicity(nodes))
+            // old code
+
+            //            let multi_args = args.get_multi_matching_arguments(context, &Self::parameters())?;
+            //            let mut nodes = Vec::new();
+            //            for args in multi_args.combinations() {
+            //                nodes.push(Self::node(&args)?);
+            //            }
+            //
+            //            Ok(Value::NodeMultiplicity(nodes))
         }
     }
 

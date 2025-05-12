@@ -44,6 +44,22 @@ impl CallArgumentValue {
     }
 }
 
+impl From<CallArgumentValue> for Value {
+    fn from(value: CallArgumentValue) -> Self {
+        value.value.clone()
+    }
+}
+
+impl From<Vec<CallArgumentValue>> for Value {
+    fn from(values: Vec<CallArgumentValue>) -> Self {
+        match values.len() {
+            0 => Value::None,
+            1 => values.first().expect("Node").clone().into(),
+            _ => values.clone().into(),
+        }
+    }
+}
+
 /// Shortcut to create a argument value
 #[macro_export]
 #[cfg(test)]

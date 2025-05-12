@@ -1,13 +1,13 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, syntax::*, value::*};
+use crate::{eval::*, rc::*, syntax::*, value::*};
 use std::collections::HashMap;
 
 /// Iterator over all combinations of given [`Multiplicity`].
 pub struct MultiplicityIterator<'a> {
     /// Iterator target.
-    multiplicity: &'a Multiplicity<'a>,
+    multiplicity: &'a Multiplicity,
     /// Current combination (indizes of all parameters).
     indizes: HashMap<Identifier, usize>,
     /// `true` if there are no more combinations`.
@@ -16,7 +16,7 @@ pub struct MultiplicityIterator<'a> {
 
 impl<'a> MultiplicityIterator<'a> {
     /// Return iterator over all combinations  of `multiplicity`.
-    fn new(multiplicity: &'a Multiplicity<'a>) -> Self {
+    fn new(multiplicity: &'a Multiplicity) -> Self {
         let mut indizes = HashMap::new();
         multiplicity.args.iter().for_each(|(id, _)| {
             indizes.insert(id.clone(), 0);
@@ -81,11 +81,11 @@ impl Iterator for MultiplicityIterator<'_> {
 ///
 /// Set of one or maybe multiple arguments combinations which can be iterated with [`MultiplicityIterator`].
 #[derive(Default, Debug)]
-pub struct Multiplicity<'a> {
-    args: HashMap<Identifier, Vec<&'a Value>>,
+pub struct Multiplicity {
+    args: HashMap<Identifier, Vec<Value>>,
 }
 
-impl<'a> Multiplicity<'a> {
+impl Multiplicity {
     /// Create new multiplicity from *parameters* and *arguments*.
     ///
     /// Will search for every argument:
@@ -99,10 +99,7 @@ impl<'a> Multiplicity<'a> {
     /// - [`EvalError::AmbiguousArgument`]: if multiple *parameters* match an *argument*
     /// - [`EvalError::MissingParameter`]: if a *parameter* does not match any *argument*
     /// - [`EvalError::ParameterNotFound`]: if an *argument* does not match any *parameter*
-    pub fn new(
-        parameters: &ParameterValueList,
-        args: &'a CallArgumentValueList,
-    ) -> EvalResult<Self> {
+    pub fn new(parameters: &ParameterValueList, args: &CallArgumentValueList) -> EvalResult<Self> {
         // resulting multiplicity
         let mut result = Self::default();
         // we remove found parameters form this to see if any are left
@@ -125,7 +122,9 @@ impl<'a> Multiplicity<'a> {
                             arg.value
                         );
                         // insert single value
-                        result.args.insert(parameter.id.clone(), vec![&arg.value]);
+                        result
+                            .args
+                            .insert(parameter.id.clone(), vec![arg.value.clone()]);
                         // remove from missing parameters
                         missing.remove(id);
                         // continue with next argument
@@ -139,7 +138,7 @@ impl<'a> Multiplicity<'a> {
                                 parameter.ty()
                             );
                             // insert multiple values
-                            result.args.insert(parameter.id.clone(), list.list());
+                            result.args.insert(parameter.id.clone(), list.fetch());
                             // remove from missing parameters
                             missing.remove(&parameter.id);
                             // continue with next argument
@@ -177,7 +176,9 @@ impl<'a> Multiplicity<'a> {
                         arg.value
                     );
                     // insert single value
-                    result.args.insert(value.id.clone(), vec![&arg.value]);
+                    result
+                        .args
+                        .insert(value.id.clone(), vec![arg.value.clone()]);
                     // remove from missing parameters
                     missing.remove(&value.id);
                     // continue with next argument
@@ -207,7 +208,7 @@ impl<'a> Multiplicity<'a> {
                             arg.value
                         );
                         // insert multiple values
-                        result.args.insert(value.id.clone(), list.list());
+                        result.args.insert(value.id.clone(), list.fetch());
                         // remove from missing parameters
                         missing.remove(&value.id);
                         // continue with next argument
@@ -219,8 +220,23 @@ impl<'a> Multiplicity<'a> {
                 }
             }
         }
+        let missing: Vec<Rc<ParameterValue>> = missing
+            .iter()
+            .filter(|parameter| {
+                if let Some(value) = &parameter.default_value {
+                    result
+                        .args
+                        .insert(parameter.id.clone(), vec![value.clone()]);
+                    false
+                } else {
+                    true
+                }
+            })
+            .cloned()
+            .collect();
+
         if !missing.is_empty() {
-            return Err(EvalError::MissingParameter(missing));
+            return Err(EvalError::MissingParameter(missing.into()));
         }
         Ok(result)
     }
@@ -244,7 +260,7 @@ impl<'a> Multiplicity<'a> {
     }
 
     /// Return iterator over all combinations.
-    pub fn iter(&'a self) -> MultiplicityIterator<'a> {
+    pub fn iter(&self) -> MultiplicityIterator {
         MultiplicityIterator::new(self)
     }
 

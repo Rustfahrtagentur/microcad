@@ -20,7 +20,7 @@ impl BuiltinModuleDefinition for Cube {
         "cube"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
+    fn node(args: &CallArgumentValueList) -> EvalResult<ObjectNode> {
         Ok(ObjectNode::new(ObjectNodeInner::Primitive3D(Rc::new(
             Cube {
                 size_x: args.get_value::<Scalar>(&Identifier::no_ref("size_x")),

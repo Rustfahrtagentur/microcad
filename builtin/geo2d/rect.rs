@@ -17,7 +17,7 @@ impl BuiltinModuleDefinition for Rect {
         "rect"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
+    fn node(args: &CallArgumentValueList) -> EvalResult<ObjectNode> {
         Ok(ObjectNode::new(ObjectNodeInner::Primitive2D(Rc::new(
             Rect {
                 width: args.get_value::<Scalar>(&Identifier::no_ref("width")),

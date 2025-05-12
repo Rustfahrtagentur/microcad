@@ -20,7 +20,7 @@ impl BuiltinModuleDefinition for Cylinder {
         "cylinder"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
+    fn node(args: &CallArgumentValueList) -> EvalResult<ObjectNode> {
         Ok(ObjectNode::new(ObjectNodeInner::Primitive3D(Rc::new(
             Cylinder {
                 radius_bottom: args.get_value::<Scalar>(&Identifier::no_ref("radius_bottom")),
