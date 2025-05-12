@@ -146,7 +146,7 @@ pub enum EvalError {
     StatementNotSupported(Statement),
 
     /// Properties are not initialized.
-    #[error("Properties have not been initialized: {0:?}")]
+    #[error("Properties have not been initialized: {0}")]
     UninitializedProperties(IdentifierList),
 
     /// Unexpected element within expression.
