@@ -564,6 +564,25 @@ impl From<Vec<ObjectNode>> for Value {
     }
 }
 
+impl From<ObjectNode> for Value {
+    fn from(node: ObjectNode) -> Self {
+        Value::Node(node)
+    }
+}
+
+impl From<Vec<Value>> for Value {
+    fn from(values: Vec<Value>) -> Self {
+        match values.len() {
+            0 => Value::None,
+            1 => values.first().expect("Node").clone(),
+            _ => {
+                let ty = values.first().expect("Node").ty();
+                Value::List(List::new(ValueList::new(values), ty))
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 fn integer(value: i64) -> Value {
     Value::Integer(value)

@@ -3,7 +3,7 @@
 
 //! Module definition syntax element evaluation
 
-use crate::{eval::*, syntax::*};
+use crate::{eval::*, syntax::*, value::*};
 
 impl CallTrait for ModuleDefinition {
     /// Evaluate the call of a module
@@ -17,21 +17,11 @@ impl CallTrait for ModuleDefinition {
         for init in self.init_iter() {
             log::trace!("Calling function '{}'", self.id);
             match Multiplicity::new(&init.parameters.eval(context)?, args) {
-                Ok(multiplicity) => match multiplicity.len() {
-                    0 => todo!("multiplicity error"),
-                    1 => {
-                        let symbols = multiplicity.iter().next().expect("exact one value");
-                        let result = self.body.eval_to_node(symbols, context)?;
-                        return Ok(vec![result].into());
-                    }
-                    _ => {
-                        let mut result = Vec::new();
-                        for symbols in multiplicity.iter() {
-                            result.push(self.body.eval_to_node(symbols, context)?);
-                        }
-                        return Ok(result.to_vec().into());
-                    }
-                },
+                Ok(multiplicity) => {
+                    multiplicity.call(|symbols| {
+                        self.body.eval_to_node(symbols, context).map(|x| x.into())
+                    })?;
+                }
                 Err(err) => {
                     context.error(args, err)?;
                     return Ok(Value::None);

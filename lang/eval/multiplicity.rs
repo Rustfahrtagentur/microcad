@@ -238,12 +238,7 @@ impl<'a> Multiplicity<'a> {
                 for symbols in self.iter() {
                     result.push(single_f(symbols)?);
                 }
-                let ty = if let Some(first) = &result.first() {
-                    first.ty()
-                } else {
-                    Type::Invalid
-                };
-                Ok(Value::List(List::new(ValueList::new(result), ty)))
+                Ok(result.into())
             }
         }
     }
