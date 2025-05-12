@@ -10,7 +10,7 @@ pub struct Rotate;
 
 impl BuiltinModuleDefinition for Rotate {
     fn id() -> &'static str {
-        "translate"
+        "rotate"
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {

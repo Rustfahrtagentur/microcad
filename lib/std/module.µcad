@@ -7,3 +7,6 @@ namespace debug {
     pub use __builtin::assert_invalid;
     pub use __builtin::assert_valid;
 }
+
+pub use transform::translate;
+pub use transform::rotate;
