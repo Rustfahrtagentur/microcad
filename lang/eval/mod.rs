@@ -36,6 +36,7 @@ mod eval_error;
 mod expression;
 mod externals;
 mod format_string;
+mod function;
 mod literal;
 mod module;
 mod module_init;

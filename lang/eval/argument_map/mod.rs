@@ -35,6 +35,21 @@ impl ArgumentMap {
             .try_into()
             .expect("cannot convert argument value")
     }
+
+    /// Convert ArgumentMap into symbol map.
+    pub fn into_symbols(self) -> SymbolMap {
+        let mut symbols = SymbolMap::new();
+        for (id, arg) in self.0.iter() {
+            symbols.insert_node(
+                id.clone(),
+                Symbol::new(
+                    SymbolDefinition::CallArgument(id.clone(), arg.clone()),
+                    None,
+                ),
+            )
+        }
+        symbols
+    }
 }
 
 impl SrcReferrer for ArgumentMap {

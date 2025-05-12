@@ -119,10 +119,10 @@ impl StackFrame {
             StackFrame::Body(_symbol_map) => todo!(),
             StackFrame::Call {
                 symbol,
-                args: _,
+                args,
                 src_ref,
             } => {
-                writeln!(f, "{:>4}: {name}", idx, name = symbol.full_name())?;
+                writeln!(f, "{:>4}: {name}({args})", idx, name = symbol.full_name())?;
 
                 if let Some(line_col) = src_ref.at() {
                     let source_file = source_by_hash.get_by_hash(src_ref.source_hash());

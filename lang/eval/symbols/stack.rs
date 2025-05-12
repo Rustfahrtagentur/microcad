@@ -59,9 +59,39 @@ impl Stack {
         Err(EvalError::LocalStackEmpty(id))
     }
 
+    /// Return most top stack frame of type module
+    fn current_module_id(&self) -> Option<&Identifier> {
+        self.0.iter().rev().find_map(|frame| {
+            if let StackFrame::Module(id, _) = frame {
+                Some(id)
+            } else {
+                None
+            }
+        })
+    }
+
     /// Get name of current namespace.
     pub fn current_namespace(&self) -> QualifiedName {
-        QualifiedName::no_ref(self.0.iter().filter_map(|locals| locals.id()).collect())
+        if self.0.len() > 1 {
+            QualifiedName::no_ref(
+                self.0[1..]
+                    .iter()
+                    .filter_map(|locals| locals.id())
+                    .collect(),
+            )
+        } else {
+            QualifiedName::default()
+        }
+    }
+
+    /// Get name of current namespace.
+    pub fn current_module(&self) -> Option<QualifiedName> {
+        if let Some(id) = self.current_module_id() {
+            let name: QualifiedName = QualifiedName::new(vec![id.clone()], id.src_ref());
+            Some(name.with_prefix(&self.current_namespace()))
+        } else {
+            None
+        }
     }
 
     /// Return the current *stack frame* if there is any.
@@ -188,7 +218,7 @@ fn local_stack() {
     };
 
     stack.open(StackFrame::Source("test".into(), SymbolMap::default()));
-    assert!(stack.current_namespace() == "test".into());
+    assert!(stack.current_namespace() == QualifiedName::default());
 
     assert!(stack.put_local(None, make_int("a".into(), 1)).is_ok());
 
@@ -199,7 +229,7 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     stack.open(StackFrame::Body(SymbolMap::default()));
-    assert!(stack.current_namespace() == "test".into());
+    assert!(stack.current_namespace() == QualifiedName::default());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
@@ -221,7 +251,7 @@ fn local_stack() {
     assert!(fetch_int(&stack, "x").unwrap() == 3);
 
     stack.close();
-    assert!(stack.current_namespace() == "test".into());
+    assert!(stack.current_namespace() == QualifiedName::default());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());

@@ -147,7 +147,16 @@ impl Lookup for SymbolTable {
         log::debug!("Lookup {name}");
 
         // collect all symbols that can be found
-        let result = [self.lookup_local(name), self.lookup_global(name)].into_iter();
+        let result = [
+            self.lookup_local(name),
+            self.lookup_global(name),
+            if let Some(module) = self.stack.current_module() {
+                self.lookup_global(&name.with_prefix(&module))
+            } else {
+                Err(EvalError::SymbolNotFound(name.clone()))
+            },
+        ]
+        .into_iter();
 
         // collect ok-results and ambiguity errors
         let (found, mut ambiguous) =
