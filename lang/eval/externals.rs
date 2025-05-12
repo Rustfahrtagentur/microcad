@@ -130,7 +130,7 @@ impl Externals {
     }
 
     /// Convert a path (of an external source code file) into a qualified name.
-    fn into_qualified_name(file: &std::path::Path) -> QualifiedName {
+    pub fn into_qualified_name(file: &std::path::Path) -> QualifiedName {
         // check if this is a module file and remove doublet namespace generation
         let file = if file.file_stem() == Some(std::ffi::OsStr::new("module")) {
             file.parent()

@@ -166,7 +166,7 @@ impl Locals for Stack {
                 | StackFrame::Module(_, locals)
                 | StackFrame::ModuleInit(locals) => {
                     if let Some(local) = locals.get(id) {
-                        log::debug!("Fetched {id} from locals");
+                        log::trace!("fetched {id} from locals");
                         return Ok(local.clone());
                     }
                 }

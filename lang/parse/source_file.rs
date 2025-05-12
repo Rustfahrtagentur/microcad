@@ -7,6 +7,14 @@ use std::io::Read;
 impl SourceFile {
     /// Load µcad source file from given `path`
     pub fn load(path: impl AsRef<std::path::Path>) -> ParseResult<Rc<Self>> {
+        Self::load_with_name(path, QualifiedName::default())
+    }
+
+    /// Load µcad source file from given `path`
+    pub fn load_with_name(
+        path: impl AsRef<std::path::Path>,
+        name: QualifiedName,
+    ) -> ParseResult<Rc<Self>> {
         let mut file = match std::fs::File::open(&path) {
             Ok(file) => file,
             _ => return Err(ParseError::LoadSource(path.as_ref().into())),
@@ -18,9 +26,10 @@ impl SourceFile {
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)?;
         assert_ne!(source_file.hash, 0);
         source_file.filename = path.as_ref().to_path_buf();
+        source_file.name = name;
         log::debug!(
             "Successfully loaded file {}",
-            path.as_ref().to_string_lossy()
+            path.as_ref().to_string_lossy(),
         );
         log::trace!("Syntax tree:\n{}", FormatSyntax(&source_file));
 
@@ -77,6 +86,7 @@ impl Parse for SourceFile {
             filename: Default::default(),
             source: pair.as_span().as_str().to_string(),
             hash,
+            name: QualifiedName::default(),
         })
     }
 }
