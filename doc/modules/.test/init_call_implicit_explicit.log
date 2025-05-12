@@ -1,1 +1,6 @@
-Properties have not been initialized: [Identifier(Refer { value: "area", src_ref: SrcRef(Some(SrcRefInner { range: 46..50, at: LineCol { line: 2, col: 11 }, source_file_hash: 11925557556495962306 })) })]
+error: Properties have not been initialized: area
+  ---> <from_str>:14:1
+     |
+  14 | m( height = 0.5m );
+     | ^^^^^^^^^^^^^^^^^^
+     |
