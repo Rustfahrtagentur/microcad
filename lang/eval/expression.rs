@@ -168,7 +168,9 @@ impl Eval for NestedItem {
                     unreachable!("Unexpected unload source file {} in expression", ns.id)
                 }
             },
-            NestedItem::Body(body) => Ok(Value::Node(body.eval_to_node(context)?)),
+            NestedItem::Body(body) => {
+                Ok(Value::Node(body.eval_to_node(SymbolMap::new(), context)?))
+            }
         }
     }
 }

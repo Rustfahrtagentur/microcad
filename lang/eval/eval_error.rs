@@ -168,6 +168,10 @@ pub enum EvalError {
     /// Parameter is function signature but not given
     #[error("Missing parameter(s) {0}")]
     AmbiguousArgument(ParameterValueList),
+
+    /// Parameter is function signature but not given
+    #[error("No matching init found in {0} for call {1}")]
+    NoMatchingInit(Identifier, CallArgumentValueList),
 }
 
 /// Result type of any evaluation.

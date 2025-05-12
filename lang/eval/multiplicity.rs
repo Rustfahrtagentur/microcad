@@ -225,6 +225,29 @@ impl<'a> Multiplicity<'a> {
         Ok(result)
     }
 
+    /// Process a (maybe multiple) call.
+    pub fn call(
+        &self,
+        mut single_f: impl FnMut(SymbolMap) -> EvalResult<Value>,
+    ) -> EvalResult<Value> {
+        match self.len() {
+            0 => todo!("multiplicity error"),
+            1 => single_f(self.iter().next().expect("exact one value")),
+            _ => {
+                let mut result = Vec::new();
+                for symbols in self.iter() {
+                    result.push(single_f(symbols)?);
+                }
+                let ty = if let Some(first) = &result.first() {
+                    first.ty()
+                } else {
+                    Type::Invalid
+                };
+                Ok(Value::List(List::new(ValueList::new(result), ty)))
+            }
+        }
+    }
+
     /// Return iterator over all combinations.
     pub fn iter(&'a self) -> MultiplicityIterator<'a> {
         MultiplicityIterator::new(self)

@@ -23,7 +23,7 @@ function g(a: Scalar, b: Length, c: Area, d: Scalar) {}
 g(a=0., b=1.m, c=2.m², d=3.);
  
 // some named
-g(a=1., 2.cm³, 1.m, d=3.);
+g(a=1., 2.cm², 1.m, d=3.);
  
 // only a and d named, alternative order: d,b,c,a
-g(d=3., 1.m, 2.cm³, a=0.);
+g(d=3., 1.m, 2.cm², a=0.);

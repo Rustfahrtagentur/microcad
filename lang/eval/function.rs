@@ -2,35 +2,11 @@ use crate::{eval::*, syntax::*};
 
 impl CallTrait for FunctionDefinition {
     fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value> {
-        let parameters = self.signature.parameters.eval(context)?;
         log::trace!("Calling function '{}'", self.id);
-        match Multiplicity::new(&parameters, args) {
-            Ok(multiplicity) => match multiplicity.len() {
-                0 => todo!("multiplicity error"),
-                1 => {
-                    let symbols = multiplicity.iter().next().expect("exact one value");
-                    let result = self.body.eval_with_locals(symbols, context)?;
-                    if let Some(return_type) = &self.signature.return_type {
-                        assert!(result.ty() == return_type.ty())
-                    }
-                    Ok(result)
-                }
-                _ => {
-                    let mut result = Vec::new();
-                    for symbols in multiplicity.iter() {
-                        result.push(self.body.eval_with_locals(symbols, context)?);
-                    }
-                    let ty = if let Some(first) = &result.first() {
-                        first.ty()
-                    } else {
-                        Type::Invalid
-                    };
-                    if let Some(return_type) = &self.signature.return_type {
-                        assert!(ty == return_type.ty())
-                    }
-                    Ok(Value::List(List::new(ValueList::new(result), ty)))
-                }
-            },
+        match Multiplicity::new(&self.signature.parameters.eval(context)?, args) {
+            Ok(multiplicity) => {
+                multiplicity.call(|symbols| self.body.eval_with_locals(symbols, context))
+            }
             Err(err) => {
                 context.error(args, err)?;
                 Ok(Value::None)

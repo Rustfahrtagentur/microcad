@@ -71,8 +71,12 @@ impl Body {
     }
 
     /// Evaluate the statement of this body into an ObjectNode.
-    pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ObjectNode> {
-        context.scope(StackFrame::Body(SymbolMap::default()), |context| {
+    pub fn eval_to_node(
+        &self,
+        symbols: SymbolMap,
+        context: &mut Context,
+    ) -> EvalResult<ObjectNode> {
+        context.scope(StackFrame::Body(symbols), |context| {
             let mut nodes = Vec::new();
 
             for statement in &self.statements {
