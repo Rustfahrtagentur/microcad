@@ -11,7 +11,7 @@ pub struct ModuleDefinition {
     /// Module name
     pub id: Identifier,
     /// Module parameters (implicit initialization)
-    pub explicit: Rc<ModuleInitDefinition>,
+    pub implicit: Rc<ModuleInitDefinition>,
     /// Module body
     pub body: Body,
     /// Source code reference
@@ -34,7 +34,7 @@ pub struct ModuleInitIterator {
 impl ModuleInitIterator {
     fn new(def: &ModuleDefinition) -> Self {
         Self {
-            defs: std::iter::once(def.explicit.clone())
+            defs: std::iter::once(def.implicit.clone())
                 .chain(
                     def.body
                         .statements
@@ -76,7 +76,7 @@ impl std::fmt::Display for ModuleDefinition {
             f,
             "module {name}({parameters}) {body}",
             name = self.id,
-            parameters = self.explicit,
+            parameters = self.implicit,
             body = self.body
         )
     }
@@ -85,7 +85,7 @@ impl std::fmt::Display for ModuleDefinition {
 impl PrintSyntax for ModuleDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
-        self.explicit.print_syntax(f, depth + 1)?;
+        self.implicit.print_syntax(f, depth + 1)?;
         self.body.print_syntax(f, depth + 1)
     }
 }

@@ -1,0 +1,7 @@
+module m(a:Int=0) {
+    init(b:Int) {
+        a = b;
+    }
+}
+
+m();

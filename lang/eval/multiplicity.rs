@@ -224,6 +224,7 @@ impl Multiplicity {
             .iter()
             .filter(|parameter| {
                 if let Some(value) = &parameter.default_value {
+                    log::trace!("using default {value} for {parameter}");
                     result
                         .args
                         .insert(parameter.id.clone(), vec![value.clone()]);

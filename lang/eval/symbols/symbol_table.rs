@@ -213,6 +213,10 @@ impl Locals for SymbolTable {
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         self.stack.fetch(id)
     }
+
+    fn set_module_symbols(&mut self, symbols: SymbolMap) -> EvalResult<()> {
+        self.stack.set_module_symbols(symbols)
+    }
 }
 
 impl UseSymbol for SymbolTable {

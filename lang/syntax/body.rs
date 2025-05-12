@@ -78,7 +78,6 @@ impl Body {
     ) -> EvalResult<ObjectNode> {
         context.scope(StackFrame::Body(symbols), |context| {
             let mut nodes = Vec::new();
-
             for statement in &self.statements {
                 let value = match statement {
                     Statement::Use(_) => continue, // Use statements have been resolved at this point

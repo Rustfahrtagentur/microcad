@@ -160,6 +160,19 @@ impl Locals for Stack {
         }
         Err(EvalError::LocalNotFound(id.clone()))
     }
+
+    fn set_module_symbols(&mut self, symbols: SymbolMap) -> EvalResult<()> {
+        self.0.iter_mut().for_each(|frame| {
+            if let StackFrame::Module(_, map) = frame {
+                for (id, symbol) in symbols.iter() {
+                    if map.insert(id.clone(), symbol.clone()).is_some() {
+                        todo!("error: symbol already exists in module stack frame");
+                    }
+                }
+            }
+        });
+        Ok(())
+    }
 }
 
 impl std::fmt::Display for Stack {

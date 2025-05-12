@@ -22,6 +22,8 @@ pub struct ModuleInitDefinition {
     pub body: Body,
     /// Source reference
     pub src_ref: SrcRef,
+    /// `true` if this is an explicit init
+    pub implicit: bool,
 }
 
 impl SrcReferrer for ModuleInitDefinition {

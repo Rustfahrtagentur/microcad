@@ -51,4 +51,7 @@ pub trait Locals {
 
     /// Get a named local value from locals.
     fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value>;
+
+    /// Set a bunch of locals
+    fn set_module_symbols(&mut self, symbols: SymbolMap) -> EvalResult<()>;
 }

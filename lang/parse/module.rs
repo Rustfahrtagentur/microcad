@@ -28,10 +28,11 @@ impl Parse for Rc<ModuleDefinition> {
 
         Ok(Rc::new(ModuleDefinition {
             id: name,
-            explicit: Rc::new(ModuleInitDefinition {
+            implicit: Rc::new(ModuleInitDefinition {
                 parameters,
                 body: Body::default(),
                 src_ref: parameters_src_ref,
+                implicit: true,
             }),
             body,
             src_ref: pair.into(),
@@ -47,6 +48,7 @@ impl Parse for ModuleInitDefinition {
             parameters: pair.find(Rule::parameter_list).unwrap_or_default(),
             body: pair.find(Rule::body).unwrap_or_default(),
             src_ref: pair.into(),
+            implicit: false,
         })
     }
 }

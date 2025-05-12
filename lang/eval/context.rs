@@ -183,6 +183,10 @@ impl Locals for Context {
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         self.symbol_table.fetch(id)
     }
+
+    fn set_module_symbols(&mut self, symbols: SymbolMap) -> EvalResult<()> {
+        self.symbol_table.set_module_symbols(symbols)
+    }
 }
 
 impl Lookup for Context {
