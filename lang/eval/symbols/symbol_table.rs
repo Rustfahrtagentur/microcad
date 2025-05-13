@@ -73,7 +73,7 @@ impl SymbolTable {
         self.stack.fetch(id)
     }
 
-    /// lookup a symbol from local stack
+    /// Lookup a symbol from local stack.
     fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::trace!("lookup local for '{name}'");
         let symbol = if let Some(id) = name.single_identifier() {
@@ -99,7 +99,7 @@ impl SymbolTable {
         }
     }
 
-    /// lookup a symbol from global symbols
+    /// Lookup a symbol from global symbols.
     fn lookup_global(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::trace!("lookup global for '{name}'");
         let symbol = match self.globals.search(name) {
@@ -110,18 +110,23 @@ impl SymbolTable {
         Ok(symbol)
     }
 
-    /// lookup a symbol from global symbols
+    /// Lookup a symbol from global symbols but relatively to the file the given `name` came from.
+    ///
+    /// - `name`: *Qualified`name* to search for (must have a proper *source code reference*.
+    ///
+    /// Returns found symbol or error if `name` does not have a *source code reference* or symbol could not be found.
     fn lookup_relatively(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        if let Ok(namespace) = self.cache.get_name_by_hash(name.src_ref().source_hash()) {
-            let name = &name.with_prefix(namespace);
-            log::trace!("lookup relatively for '{name}'");
-            if let Ok(symbol) = self.lookup_global(name) {
-                // RULE: first relative found matches (no ambiguity check with symbols in higher namespaces)
-                log::debug!(
-                    "lookup relatively found '{name}' = '{}'",
-                    symbol.full_name()
-                );
-                return self.follow_alias(symbol);
+        if name.src_ref().is_some() {
+            if let Ok(namespace) = self.cache.get_name_by_hash(name.src_ref().source_hash()) {
+                let name = &name.with_prefix(namespace);
+                log::trace!("lookup relatively for '{name}'");
+                if let Ok(symbol) = self.lookup_global(name) {
+                    log::debug!(
+                        "lookup relatively found '{name}' = '{}'",
+                        symbol.full_name()
+                    );
+                    return self.follow_alias(symbol);
+                }
             }
         }
         Err(EvalError::SymbolNotFound(name.clone()))

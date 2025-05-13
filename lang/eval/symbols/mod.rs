@@ -18,7 +18,7 @@ pub trait Lookup {
     /// Lookup for local or global symbol by qualified name.
     ///
     /// - looks on *stack*
-    /// - looks in *symbol map*
+    /// - looks in *symbol table*
     /// - follows *aliases* (use statements)
     /// - detect any ambiguity
     /// - loads *external files*
