@@ -39,40 +39,49 @@ module cube(size_x: Length, size_y: Length, size_z: Length) {
 ///
 /// Examples:
 /// * with radius `r` and height `h`: `cylinder(r = 10.0mm, h = 5.0mm);`
-module cylinder( radius_bottom: Length, radius_top: Length, height: Length) {
+module cylinder(radius_bottom: Length, radius_top: Length, height: Length, offset: Length = 0.0mm) {
+    /// Initialize by `radius` and `height`. Cylinder will be centered.
     init(radius: Length, height: Length) {
-        top = height / 2.0;
-        bottom = -top;
+        radius_bottom = radius;
+        radius_top = radius;
+        offset = -height / 2;
     }
 
-    init(r: Length, h: Length) {
-        radius = r;
-        height = h;
-        top = height / 2.0;
-        bottom = -top;
+    /// Initialize by `radius`, `height` and `offset`.
+    init(radius: Length, height: Length, offset: Length) {
+        radius_bottom = radius;
+        radius_top = radius;
     }
 
-    init(r: Length, bottom: Length, top: Length) {
-        radius = r;
+    /// Initialize by `radius`, `bottom` and `top`.
+    init(radius: Length, bottom: Length, top: Length) {
+        radius_bottom = radius;
+        radius_top = radius;
         height = top - bottom;
+        offset = bottom;
     }
 
-    init(d: Length, bottom: Length, height: Length) {
-        radius = d / 2.0;
-        top = bottom + height;
+    /// Initialize by `diameter` and `height`. Cylinder will be centered.
+    init(diameter: Length, height: Length) {
+        r = diameter / 2.0;
+        radius_bottom = r;
+        radius_top = r;
+        offset = -height / 2;
     }
 
+    /// Initialize by `diameter` and `height`. Cylinder will be centered.
     init(d: Length, h: Length) {
-        radius = d / 2.0;
+        r = d / 2.0;
+        radius_bottom = r;
+        radius_top = r;
+        offset = -h / 2;
         height = h;
-        top = height / 2.0;
-        bottom = -top;
     }
 
-    __builtin::transform::translate(x = 0.0, y = 0.0, z = bottom / 1mm) {
+    __builtin::transform::translate(x = 0.0, y = 0.0, z = offset / 1mm) {
         __builtin::geo3d::cylinder(
-            radius_bottom = radius / 1mm,
-            radius_top = radius / 1mm,
+            radius_bottom = radius_bottom / 1mm,
+            radius_top = radius_top / 1mm,
             height = height / 1mm
         );
     }
