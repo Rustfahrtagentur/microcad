@@ -177,6 +177,29 @@ impl From<&Identifier> for QualifiedName {
     }
 }
 
+impl From<&std::path::Path> for QualifiedName {
+    fn from(path: &std::path::Path) -> Self {
+        // check if this is a module file and remove doublet namespace generation
+        let path = if path.file_stem() == Some(std::ffi::OsStr::new("module")) {
+            path.parent()
+                .expect("module file in root path is not allowed")
+        } else {
+            path
+        };
+
+        QualifiedName::no_ref(
+            path.iter()
+                .map(|id| {
+                    Identifier(Refer {
+                        value: id.to_string_lossy().into_owned().into(),
+                        src_ref: SrcRef(None),
+                    })
+                })
+                .collect(),
+        )
+    }
+}
+
 #[cfg(test)]
 impl From<&str> for QualifiedName {
     fn from(value: &str) -> Self {

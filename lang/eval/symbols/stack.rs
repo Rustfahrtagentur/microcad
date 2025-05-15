@@ -87,7 +87,7 @@ impl Stack {
     /// Get name of current namespace.
     pub fn current_module(&self) -> Option<QualifiedName> {
         if let Some(id) = self.current_module_id() {
-            let name: QualifiedName = QualifiedName::new(vec![id.clone()], id.src_ref());
+            let name = QualifiedName::new(vec![id.clone()], id.src_ref());
             Some(name.with_prefix(&self.current_namespace()))
         } else {
             None
