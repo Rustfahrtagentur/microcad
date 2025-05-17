@@ -13,6 +13,8 @@ pub struct DiagHandler {
     /// The maximum number of collected errors until abort
     /// (`0` means unlimited number of errors).
     error_limit: Option<u32>,
+    /// `true` after the first time error limit was reached
+    error_limit_reached: bool,
     /// Treat warnings as errors if `true`.
     warnings_as_errors: bool,
 }
@@ -46,11 +48,12 @@ impl DiagHandler {
 impl PushDiag for DiagHandler {
     fn push_diag(&mut self, diag: super::Diagnostic) -> crate::eval::EvalResult<()> {
         if let Some(error_limit) = self.error_limit {
-            if self.error_count >= error_limit {
+            if self.error_count >= error_limit && !self.error_limit_reached {
                 self.error(
                     SrcRef(None),
                     Box::new(EvalError::ErrorLimitReached(error_limit)),
                 )?;
+                self.error_limit_reached = true;
             }
             return Err(EvalError::ErrorLimitReached(error_limit));
         }
