@@ -12,13 +12,22 @@ pub struct DiagHandler {
     error_count: u32,
     /// The maximum number of collected errors until abort
     /// (`0` means unlimited number of errors).
-    error_limit: u32,
+    error_limit: Option<u32>,
     /// Treat warnings as errors if `true`.
     warnings_as_errors: bool,
 }
 
 /// Handler for diagnostics.
 impl DiagHandler {
+    /// Create new diag handler.
+    pub fn new(error_limit: Option<u32>, warnings_as_errors: bool) -> Self {
+        Self {
+            error_limit,
+            warnings_as_errors,
+            ..Default::default()
+        }
+    }
+
     /// Pretty print all errors of all files.
     pub fn pretty_print(
         &self,
@@ -36,6 +45,16 @@ impl DiagHandler {
 
 impl PushDiag for DiagHandler {
     fn push_diag(&mut self, diag: super::Diagnostic) -> crate::eval::EvalResult<()> {
+        if let Some(error_limit) = self.error_limit {
+            if self.error_count >= error_limit {
+                self.error(
+                    SrcRef(None),
+                    Box::new(EvalError::ErrorLimitReached(error_limit)),
+                )?;
+            }
+            return Err(EvalError::ErrorLimitReached(error_limit));
+        }
+
         use super::Diagnostic;
         match &diag {
             Diagnostic::Error(_) => {
@@ -49,16 +68,6 @@ impl PushDiag for DiagHandler {
             _ => (),
         }
 
-        self.diag_list.push_diag(diag)?;
-
-        if self.error_limit > 0 && self.error_count > self.error_limit {
-            self.error(
-                SrcRef(None),
-                Box::new(EvalError::ErrorLimitReached(self.error_limit)),
-            )?;
-            Err(EvalError::ErrorLimitReached(self.error_limit))
-        } else {
-            Ok(())
-        }
+        self.diag_list.push_diag(diag)
     }
 }
