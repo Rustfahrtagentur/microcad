@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_lang::eval::*;
+use microcad_proc_macros::microcad;
 
 #[test]
 fn use_statements() {
@@ -23,4 +24,9 @@ fn locals() {
     )
     .expect("context");
     context.eval().expect("successful evaluation");
+}
+
+#[microcad]
+fn microcad_test() {
+    std::print("ok");
 }

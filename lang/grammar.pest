@@ -136,7 +136,7 @@ literal = {
 //`a::b`: ok # Nested identifiers
 //`a::b ::c`: error # No whitespace between identifiers
 //`a::b::c::`: error # No trailing ::
-qualified_name = { identifier ~ ("::" ~ identifier)* }
+qualified_name = { identifier ~ (ws* ~ "::" ~ ws* ~ identifier)* }
 
 //`int`: ok
 //`a::nested::typename`: ok

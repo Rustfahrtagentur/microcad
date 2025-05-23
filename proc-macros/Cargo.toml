@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [package]
-name = "microcad-builtin-proc-macro"
-description = "µcad builtin proc-macro"
-documentation = "https://docs.rs/microcad-builtin-proc-macro"
+name = "microcad-proc-macros"
+description = "µcad proc-macros"
+documentation = "https://docs.rs/microcad-proc-macros"
 authors.workspace = true
 edition.workspace = true
 homepage.workspace = true
