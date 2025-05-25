@@ -25,6 +25,9 @@ pub mod syntax;
 pub mod ty;
 pub mod value;
 
+#[macro_use]
+pub mod macros;
+
 /// Id type (base of all identifiers)
 type Id = compact_str::CompactString;
 
