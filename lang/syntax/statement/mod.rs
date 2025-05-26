@@ -28,18 +28,18 @@ pub enum Statement {
     ModuleInit(Rc<ModuleInitDefinition>),
 
     /// Use statement
-    Use(UseStatement),
+    Use(Rc<UseStatement>),
     /// Return statement
-    Return(ReturnStatement),
+    Return(Rc<ReturnStatement>),
     /// If statement
-    If(IfStatement),
+    If(Rc<IfStatement>),
     /// Marker statement
-    Marker(Marker),
+    Marker(Rc<Marker>),
 
     /// Assignment
-    Assignment(Assignment),
+    Assignment(Rc<Assignment>),
     /// Expression
-    Expression(Expression),
+    Expression(Rc<Expression>),
 }
 
 impl SrcReferrer for Statement {

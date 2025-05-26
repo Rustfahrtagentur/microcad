@@ -83,14 +83,14 @@ impl Parse for Statement {
                 Self::ModuleInit(Rc::new(ModuleInitDefinition::parse(first)?))
             }
 
-            Rule::use_statement => Self::Use(UseStatement::parse(first)?),
-            Rule::return_statement => Self::Return(ReturnStatement::parse(first)?),
-            Rule::if_statement => Self::If(IfStatement::parse(first)?),
-            Rule::marker_statement => Self::Marker(Marker::parse(first)?),
+            Rule::use_statement => Self::Use(UseStatement::parse(first)?.into()),
+            Rule::return_statement => Self::Return(ReturnStatement::parse(first)?.into()),
+            Rule::if_statement => Self::If(IfStatement::parse(first)?.into()),
+            Rule::marker_statement => Self::Marker(Marker::parse(first)?.into()),
 
-            Rule::assignment => Self::Assignment(Assignment::parse(first)?),
+            Rule::assignment => Self::Assignment(Assignment::parse(first)?.into()),
             Rule::expression | Rule::expression_no_semicolon => {
-                Self::Expression(Expression::parse(first)?)
+                Self::Expression(Expression::parse(first)?.into())
             }
             rule => unreachable!(
                 "Unexpected module statement, got {:?} {:?}",
