@@ -1,10 +1,11 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-#[test]
+use microcad_proc_macros::microcad;
+
+#[microcad]
 fn use_test() {
-    microcad_lang::microcad_test!(
-        r#"
+    r#"
         // use debug from `std/module.µcad`
         use std::debug;
         debug::assert(true);
@@ -42,13 +43,11 @@ fn use_test() {
 
         assert_valid(my_module);
     "#
-    );
 }
 
-#[test]
+#[microcad]
 fn locals_test() {
-    microcad_lang::microcad_test!(
-        r#"
+    r#"
         // This tests the local stack
         use std::debug::*;
         // new local variable #1
@@ -80,5 +79,4 @@ fn locals_test() {
         q = p > 3.;
         assert(q);
     "#
-    );
 }
