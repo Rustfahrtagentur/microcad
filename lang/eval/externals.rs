@@ -3,7 +3,7 @@
 
 //! External files register
 
-use crate::{eval::*, src_ref::*, syntax::*, MICROCAD_EXTENSIONS};
+use crate::{eval::*, syntax::*, MICROCAD_EXTENSIONS};
 
 /// External files register.
 ///
@@ -115,40 +115,17 @@ impl Externals {
                 .iter()
                 .for_each(|file| {
                     externals.insert(
-                        Self::into_qualified_name(
-                            &file
-                                .strip_prefix(search_path)
-                                .expect("cannot strip search path from file name")
-                                .with_extension(""),
-                        ),
+                        (*file
+                            .strip_prefix(search_path)
+                            .expect("cannot strip search path from file name")
+                            .with_extension(""))
+                        .into(),
                         file.canonicalize().expect("path not found"),
                     );
                 });
         });
 
         externals
-    }
-
-    /// Convert a path (of an external source code file) into a qualified name.
-    fn into_qualified_name(file: &std::path::Path) -> QualifiedName {
-        // check if this is a module file and remove doublet namespace generation
-        let file = if file.file_stem() == Some(std::ffi::OsStr::new("module")) {
-            file.parent()
-                .expect("module file in root path is not allowed")
-        } else {
-            file
-        };
-
-        QualifiedName::no_ref(
-            file.iter()
-                .map(|id| {
-                    Identifier(Refer {
-                        value: id.to_string_lossy().into_owned().into(),
-                        src_ref: SrcRef(None),
-                    })
-                })
-                .collect(),
-        )
     }
 
     /// Scan in a specified path for all available files with one of the given extensions.

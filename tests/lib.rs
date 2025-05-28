@@ -112,7 +112,7 @@ fn module_implicit_init_call() {
 
     // Call module `a` with `b = 3.0`
     let nodes = module_definition
-        .eval_call(
+        .call(
             &call_argument_value_list("b = 3.0", &mut context),
             &mut context,
         )
@@ -139,7 +139,7 @@ fn module_implicit_init_call() {
 
     // Call module `a` with `b = [1.0, 2.0]` (multiplicity)
     let nodes = module_definition
-        .eval_call(
+        .call(
             &call_argument_value_list("b = [1.0, 2.0]", &mut context),
             &mut context,
         )
@@ -186,7 +186,7 @@ fn module_explicit_init_call() {
     // Call module `circle(radius = 3.0)`
     {
         let nodes = module_definition
-            .eval_call(
+            .call(
                 &call_argument_value_list("radius = 3.0", &mut context),
                 &mut context,
             )
@@ -199,7 +199,7 @@ fn module_explicit_init_call() {
     // Call module `circle(r = 3.0)`
     {
         let nodes = module_definition
-            .eval_call(
+            .call(
                 &call_argument_value_list("r = 3.0", &mut context),
                 &mut context,
             )
@@ -212,7 +212,7 @@ fn module_explicit_init_call() {
     // Call module `circle(d = 6.0)`
     {
         let nodes = module_definition
-            .eval_call(
+            .call(
                 &call_argument_value_list("d = 6.0", &mut context),
                 &mut context,
             )
@@ -225,7 +225,7 @@ fn module_explicit_init_call() {
     // Call module `circle(d = [1.0, 2.0])` (multiplicity)
     {
         let nodes = module_definition
-            .eval_call(
+            .call(
                 &call_argument_value_list("d = [1.0, 2.0]", &mut context),
                 &mut context,
             )
@@ -239,7 +239,7 @@ fn module_explicit_init_call() {
     // Call module `circle()` (missing arguments)
     {
         let nodes = module_definition
-            .eval_call(&CallArgumentValueList::default(), &mut context)
+            .call(&CallArgumentValueList::default(), &mut context)
             .expect("Valid nodes")
             .fetch_nodes();
         assert_eq!(nodes.len(), 0, "There should no nodes");

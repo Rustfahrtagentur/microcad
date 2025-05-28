@@ -73,9 +73,10 @@ impl SymbolTable {
         self.stack.fetch(id)
     }
 
-    /// lookup a symbol from local stack
+    /// Lookup a symbol from local stack.
     fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        if let Some(id) = name.single_identifier() {
+        log::trace!("lookup local for '{name}'");
+        let symbol = if let Some(id) = name.single_identifier() {
             self.stack.fetch(id)
         } else {
             let (id, mut tail) = name.split_first();
@@ -87,31 +88,65 @@ impl SymbolTable {
             } else {
                 Err(EvalError::SymbolNotFound(name.clone()))
             }
+        };
+
+        match symbol {
+            Ok(symbol) => {
+                log::debug!("lookup local found '{name}' = '{}'", symbol.full_name());
+                Ok(symbol)
+            }
+            Err(err) => Err(err),
         }
     }
 
-    /// lookup a symbol from global symbols
+    /// Lookup a symbol from global symbols.
     fn lookup_global(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+        log::trace!("lookup global for '{name}'");
         let symbol = match self.globals.search(name) {
             Ok(symbol) => symbol.clone(),
             _ => self.load_symbol(name)?,
         };
+        log::debug!("lookup global found '{name}' = '{}'", symbol.full_name());
         Ok(symbol)
     }
 
-    /// Lookup a symbol from a qualified name.
+    /// Lookup a symbol from global symbols but relatively to the file the given `name` came from.
+    ///
+    /// - `name`: *Qualified`name* to search for (must have a proper *source code reference*.
+    ///
+    /// Returns found symbol or error if `name` does not have a *source code reference* or symbol could not be found.
+    fn lookup_relatively(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+        if name.src_ref().is_some() {
+            if let Ok(namespace) = self.cache.get_name_by_hash(name.src_ref().source_hash()) {
+                let name = &name.with_prefix(namespace);
+                log::trace!("lookup relatively for '{name}'");
+                if let Ok(symbol) = self.lookup_global(name) {
+                    log::debug!(
+                        "lookup relatively found '{name}' = '{}'",
+                        symbol.full_name()
+                    );
+                    return self.follow_alias(symbol);
+                }
+            }
+        }
+        Err(EvalError::SymbolNotFound(name.clone()))
+    }
+
+    /// Load a symbol from a qualified name.
     ///
     /// Might load any related external file if not already loaded.
     ///
     /// # Arguments
     /// - `name`: Name of the symbol to load
     fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::debug!("loading symbol {name}");
+        log::trace!("trying to load symbol {name}");
 
         // if symbol could not be found in symbol tree, try to load it from external file
         match self.cache.get_by_name(name) {
             Err(EvalError::SymbolMustBeLoaded(_, path)) => {
-                let source_file = SourceFile::load(path.clone())?;
+                log::debug!("loading symbol {name} from {path:?}");
+                let source_file =
+                    SourceFile::load_with_name(path.clone(), self.cache.name_by_path(&path)?)?;
                 let source_name = self.cache.insert(source_file.clone())?;
                 let node = source_file.resolve(None);
                 // search namespace to place loaded source file into
@@ -135,7 +170,7 @@ impl SymbolTable {
         let def = &symbol.borrow().def;
         if let SymbolDefinition::Alias(_, name) = def {
             log::trace!("Found alias => {name}");
-            self.lookup(name)
+            Ok(self.lookup(name)?)
         } else {
             Ok(symbol.clone())
         }
@@ -147,7 +182,12 @@ impl Lookup for SymbolTable {
         log::debug!("Lookup {name}");
 
         // collect all symbols that can be found
-        let result = [self.lookup_local(name), self.lookup_global(name)].into_iter();
+        let result = [
+            self.lookup_local(name),
+            self.lookup_global(name),
+            self.lookup_relatively(name),
+        ]
+        .into_iter();
 
         // collect ok-results and ambiguity errors
         let (found, mut ambiguous) =

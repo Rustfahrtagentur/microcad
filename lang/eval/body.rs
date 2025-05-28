@@ -3,9 +3,11 @@
 
 use crate::eval::*;
 
-impl Eval for Body {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        context.scope(StackFrame::Body(SymbolMap::default()), |context| {
+impl Body {
+    /// Evaluate body
+    pub fn eval(&self, symbols: SymbolMap, context: &mut Context) -> EvalResult<Value> {
+        context.scope(StackFrame::Body(symbols), |context| {
+            log::trace!("body eval:\n{context}");
             Body::evaluate_vec(&self.statements, context)
         })
     }

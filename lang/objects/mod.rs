@@ -6,18 +6,15 @@
 pub mod algorithm;
 pub mod boolean_op;
 pub mod object;
+pub mod object_properties;
 pub mod transform;
 
 pub use algorithm::*;
 pub use object::*;
+pub use object_properties::*;
 pub use transform::*;
 
-use crate::{
-    eval::*,
-    rc::*,
-    syntax::Identifier,
-    value::{ParameterValueList, Value},
-};
+use crate::{eval::*, rc::*, src_ref::*, syntax::*, value::*};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -346,9 +343,9 @@ impl ObjectBuilder {
 
             Ok(())
         } else {
-            Err(EvalError::UninitializedProperties(
-                self.object.props.get_ids_of_uninitialized(),
-            ))
+            Err(EvalError::UninitializedProperties(IdentifierList(
+                Refer::none(self.object.props.get_ids_of_uninitialized()),
+            )))
         }
     }
 

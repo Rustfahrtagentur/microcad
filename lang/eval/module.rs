@@ -69,7 +69,9 @@ impl ModuleDefinition {
             },
         )
     }
+}
 
+impl CallTrait for ModuleDefinition {
     /// Evaluate the call of a module
     ///
     /// The evaluation considers multiplicity, which means that multiple nodes maybe created.
@@ -77,11 +79,7 @@ impl ModuleDefinition {
     /// Example:
     /// Consider the `module a(b: Scalar) { }`.
     /// Calling the module `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
-    pub fn eval_call(
-        &self,
-        args: &CallArgumentValueList,
-        context: &mut Context,
-    ) -> EvalResult<Value> {
+    fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value> {
         let mut nodes = Vec::new();
 
         match self.find_matching_initializer(args, context) {

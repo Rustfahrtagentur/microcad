@@ -39,7 +39,10 @@ impl std::ops::Deref for IdentifierList {
 
 impl std::fmt::Display for IdentifierList {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", join_identifiers(&self.0, ", "))
+        // sort display to prevent random order which changes logs without any real change
+        let mut sorted = self.0.clone();
+        sorted.sort();
+        write!(f, "{}", join_identifiers(&sorted, ", "))
     }
 }
 

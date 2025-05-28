@@ -69,6 +69,11 @@ impl SourceCache {
         Ok(name.clone())
     }
 
+    /// Return the qualified name of a file by it's path
+    pub fn name_by_path(&mut self, filename: &std::path::Path) -> EvalResult<QualifiedName> {
+        Ok(self.externals.get_name(filename)?.clone())
+    }
+
     /// Convenience function to get a source file by from a `SrcReferrer`.
     pub fn get_by_src_ref(&self, referrer: &impl SrcReferrer) -> EvalResult<Rc<SourceFile>> {
         self.get_by_hash(referrer.src_ref().source_hash())
@@ -95,6 +100,14 @@ impl SourceCache {
         }
     }
 
+    /// Get *qualified name* of a file by *hash value*.
+    pub fn get_name_by_hash(&self, hash: u64) -> EvalResult<&QualifiedName> {
+        match self.get_by_hash(hash) {
+            Ok(file) => self.externals.get_name(&file.filename),
+            Err(err) => Err(err),
+        }
+    }
+
     /// Find a project file by the qualified name which represents the file path.
     pub fn get_by_name(&self, name: &QualifiedName) -> EvalResult<Rc<SourceFile>> {
         if let Some(index) = self.by_name.get(name) {
@@ -102,7 +115,11 @@ impl SourceCache {
         } else {
             // if not found in symbol tree we try to find an external file to load
             let (name, path) = self.externals.fetch_external(name)?;
-            Err(EvalError::SymbolMustBeLoaded(name, path))
+            if self.get_by_path(&path).is_err() {
+                Err(EvalError::SymbolMustBeLoaded(name, path))
+            } else {
+                Err(EvalError::SymbolNotFound(name))
+            }
         }
     }
 

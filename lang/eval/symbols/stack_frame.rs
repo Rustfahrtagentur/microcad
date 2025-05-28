@@ -62,13 +62,16 @@ impl StackFrame {
                 map
             }
             StackFrame::Module(id, symbols) => {
-                return write!(f, "{:depth$}{id} (module) = {symbols}", "");
+                writeln!(f, "{:depth$}{id} (module)", "")?;
+                return symbols.print(f, depth + 4);
             }
             StackFrame::ModuleInit(symbols) => {
-                return write!(f, "{:depth$} (module init) = {symbols}", "");
+                writeln!(f, "{:depth$}(module init):", "")?;
+                return symbols.print(f, depth + 4);
             }
             StackFrame::Namespace(id, symbols) => {
-                return writeln!(f, "{:depth$}{id} (namespace) = {symbols}", "");
+                writeln!(f, "{:depth$}{id} (namespace):", "")?;
+                return symbols.print(f, depth + 4);
             }
             StackFrame::Body(map) => map,
             StackFrame::Call {
@@ -116,10 +119,10 @@ impl StackFrame {
             StackFrame::Body(_symbol_map) => todo!(),
             StackFrame::Call {
                 symbol,
-                args: _,
+                args,
                 src_ref,
             } => {
-                writeln!(f, "{:>4}: {name}", idx, name = symbol.full_name())?;
+                writeln!(f, "{:>4}: {name}({args})", idx, name = symbol.full_name())?;
 
                 if let Some(line_col) = src_ref.at() {
                     let source_file = source_by_hash.get_by_hash(src_ref.source_hash());

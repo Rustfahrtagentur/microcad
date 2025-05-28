@@ -37,7 +37,7 @@ use microcad_core::*;
 pub(crate) type ValueResult = std::result::Result<Value, ValueError>;
 
 /// A variant value with attached source code reference.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum Value {
     /// Invalid value (used for error handling).
     None,
@@ -488,6 +488,33 @@ impl std::fmt::Display for Value {
                 }
                 writeln!(f, "]")
             }
+        }
+    }
+}
+
+impl std::fmt::Debug for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::None => write!(f, "None"),
+            Self::Integer(arg0) => write!(f, "Integer: {arg0}"),
+            Self::Scalar(arg0) => write!(f, "Scalar: {arg0}"),
+            Self::Length(arg0) => write!(f, "Length: {arg0}"),
+            Self::Area(arg0) => write!(f, "Area: {arg0}"),
+            Self::Volume(arg0) => write!(f, "Volume: {arg0}"),
+            Self::Vec2(arg0) => write!(f, "Vec2: {arg0:?}"),
+            Self::Vec3(arg0) => write!(f, "Vec3: {arg0:?}"),
+            Self::Vec4(arg0) => write!(f, "Vec4: {arg0:?}"),
+            Self::Angle(arg0) => write!(f, "Angle: {arg0}"),
+            Self::Weight(arg0) => write!(f, "Weight: {arg0}"),
+            Self::Bool(arg0) => write!(f, "Bool: {arg0}"),
+            Self::String(arg0) => write!(f, "String: {arg0}"),
+            Self::Color(arg0) => write!(f, "Color: {arg0}"),
+            Self::List(arg0) => write!(f, "List: {arg0}"),
+            Self::Map(arg0) => write!(f, "Map: {arg0}"),
+            Self::NamedTuple(arg0) => write!(f, "NamedTuple: {arg0}"),
+            Self::UnnamedTuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
+            Self::Node(arg0) => write!(f, "Node: {arg0}"),
+            Self::NodeMultiplicity(arg0) => write!(f, "NodeMultiplicity: {arg0:?}"),
         }
     }
 }

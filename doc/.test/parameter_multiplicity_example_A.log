@@ -1,6 +1,0 @@
-error: Symbol std::translate not found.
-  ---> <from_str>:1:1
-     |
-   1 | std::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]) 
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |

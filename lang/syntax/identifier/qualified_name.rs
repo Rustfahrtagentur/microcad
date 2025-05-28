@@ -95,7 +95,7 @@ impl QualifiedName {
     }
 
     /// remove the first name from path
-    pub fn remove_last(&self) -> Self {
+    pub fn remove_last(self) -> Self {
         Self(Refer::new(
             self.0[..self.0.len() - 1].to_vec(),
             self.0.src_ref.clone(),
@@ -168,6 +168,35 @@ impl SrcReferrer for QualifiedName {
 impl From<Refer<Vec<Identifier>>> for QualifiedName {
     fn from(value: Refer<Vec<Identifier>>) -> Self {
         Self(value)
+    }
+}
+
+impl From<&Identifier> for QualifiedName {
+    fn from(id: &Identifier) -> Self {
+        Self(Refer::none(vec![id.clone()]))
+    }
+}
+
+impl From<&std::path::Path> for QualifiedName {
+    fn from(path: &std::path::Path) -> Self {
+        // check if this is a module file and remove doublet namespace generation
+        let path = if path.file_stem() == Some(std::ffi::OsStr::new("module")) {
+            path.parent()
+                .expect("module file in root path is not allowed")
+        } else {
+            path
+        };
+
+        QualifiedName::no_ref(
+            path.iter()
+                .map(|id| {
+                    Identifier(Refer {
+                        value: id.to_string_lossy().into_owned().into(),
+                        src_ref: SrcRef(None),
+                    })
+                })
+                .collect(),
+        )
     }
 }
 

@@ -53,7 +53,7 @@ pub trait ArgumentMatch: Default {
     /// Try to match call arguments by their position and insert them into the map.
     /// Positional arguments are call arguments without a name, e.g. `1, 2` in `foo(1, 2)`.
     /// The parameter is then removed from the list of parameters.
-    fn find_and_insert_positional_arguments(
+    fn find_and_insert_unnamed_arguments(
         &mut self,
         call_argument_values: &CallArgumentValueList,
         parameter_values: &mut ParameterValueList,
@@ -135,10 +135,7 @@ pub trait ArgumentMatch: Default {
 
         result
             .find_and_insert_named_arguments(call_argument_values, &mut missing_parameter_values)?
-            .find_and_insert_positional_arguments(
-                call_argument_values,
-                &mut missing_parameter_values,
-            )?
+            .find_and_insert_unnamed_arguments(call_argument_values, &mut missing_parameter_values)?
             .find_and_insert_default_parameters(
                 call_argument_values,
                 &mut missing_parameter_values,

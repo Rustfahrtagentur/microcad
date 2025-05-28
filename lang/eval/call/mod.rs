@@ -56,7 +56,7 @@ impl Eval for Call {
             }
         };
 
-        context.scope(
+        match context.scope(
             StackFrame::Call {
                 symbol: symbol.clone(),
                 args: args.clone(),
@@ -64,7 +64,8 @@ impl Eval for Call {
             },
             |context| match &symbol.borrow().def {
                 SymbolDefinition::Builtin(f) => f.call(&args, context),
-                SymbolDefinition::Module(m) => m.eval_call(&args, context),
+                SymbolDefinition::Module(m) => m.call(&args, context),
+                SymbolDefinition::Function(f) => f.call(&args, context),
                 _ => {
                     context.error(
                         self,
@@ -77,7 +78,13 @@ impl Eval for Call {
                     Ok(Value::None)
                 }
             },
-        )
+        ) {
+            Err(err) => {
+                context.error(self.src_ref(), err)?;
+                Ok(Value::None)
+            }
+            Ok(value) => Ok(value),
+        }
     }
 }
 

@@ -8,6 +8,8 @@ use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 /// µcad source file
 #[derive(Clone, Debug, Default)]
 pub struct SourceFile {
+    /// Qualified name of the file if loaded from externals
+    pub name: QualifiedName,
     /// Root code body
     pub body: Vec<Statement>,
     /// Name of loaded file

@@ -12,7 +12,7 @@ pub use qualified_name::*;
 use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 
 /// µcad identifier
-#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(pub Refer<Id>);
 
 impl Identifier {
@@ -44,6 +44,11 @@ impl Identifier {
     /// check if this is a valid identifier (contains only `A`-`Z`, `a`-`z` or `_`)
     pub fn validate(self) -> ParseResult<Self> {
         Parser::parse_rule(crate::parser::Rule::identifier, self.id().as_str(), 0)
+    }
+
+    /// Add given `prefix` to identifier to get `qualified name`.
+    pub fn with_prefix(&self, prefix: &QualifiedName) -> QualifiedName {
+        QualifiedName::from(self).with_prefix(prefix)
     }
 }
 
@@ -96,6 +101,12 @@ impl std::fmt::Display for Identifier {
         } else {
             write!(f, "{}", self.0)
         }
+    }
+}
+
+impl std::fmt::Debug for Identifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Identifier: {:?}", self.0)
     }
 }
 
