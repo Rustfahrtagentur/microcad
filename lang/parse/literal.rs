@@ -3,35 +3,6 @@
 
 use crate::{parse::*, parser::*, syntax::*};
 
-impl Parse for Color {
-    fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::color_literal);
-        let values = &pair;
-        let values = &values.as_str()[1..];
-
-        let hex4bit = |pos| u8::from_str_radix(&values[pos..pos + 1], 16).map(|v| v as f32 / 15.0);
-        let hex8bit = |pos| u8::from_str_radix(&values[pos..pos + 2], 16).map(|v| v as f32 / 255.0);
-
-        match values.len() {
-            // #RGB or #RGBA single digit hex
-            3 | 4 => Ok(Color::new(
-                hex4bit(0)?,
-                hex4bit(1)?,
-                hex4bit(2)?,
-                if values.len() == 4 { hex4bit(3)? } else { 1.0 },
-            )),
-            // #RRGGBB or #RRGGBBAA double digit hex
-            6 | 8 => Ok(Color::new(
-                hex8bit(0)?,
-                hex8bit(2)?,
-                hex8bit(4)?,
-                if values.len() == 8 { hex8bit(6)? } else { 1.0 },
-            )),
-            _ => Err(ParseError::ParseColorError(values.to_string())),
-        }
-    }
-}
-
 impl Parse for Literal {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::literal);
@@ -48,7 +19,6 @@ impl Parse for Literal {
                 "false" => Literal::Bool(Refer::new(false, pair.into())),
                 _ => unreachable!(),
             },
-            Rule::color_literal => Literal::Color(Refer::new(Color::parse(inner)?, pair.into())),
             _ => unreachable!(),
         };
 

@@ -112,24 +112,15 @@ bool_literal = @{ "true" | "false" }
 
 unit = @{ ((alpha_lower)+ ~ ("²" | "³")?) | "°" | "%" | "\"" | "'" }
 
-//`#FFF`: ok # RGB, single hex
-//`#00FF00`: ok # RGB, double hex
-//`#FFFF`: ok # RGBA, single hex
-//`#00FF00FF`: ok # RGBA, double hex
-//`#00FF0`: error # No valid color
-color_literal = { "#" ~ (ASCII_HEX_DIGIT{8} | ASCII_HEX_DIGIT{6} | ASCII_HEX_DIGIT{4} | ASCII_HEX_DIGIT{3}) }
-
 //`1`: ok # Integer
 //`1mm`: ok # Number (Length)
 //`1.0mm`: ok # Number (Length)
 //`1.0`: ok # Scalar
 //`true`: ok # Boolean
-//`#00CCFF`: ok # Color
 literal = {
   number_literal |
   integer_literal |
-  bool_literal |
-  color_literal
+  bool_literal
 }
 
 //`a`: ok # Single identifier
