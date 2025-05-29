@@ -1,16 +1,20 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Object tree
+//! Object tree module
 
 pub mod algorithm;
 pub mod boolean_op;
 pub mod object;
+pub mod object_attributes;
+pub mod object_builder;
 pub mod object_properties;
 pub mod transform;
 
 pub use algorithm::*;
 pub use object::*;
+pub use object_attributes::*;
+pub use object_builder::*;
 pub use object_properties::*;
 pub use transform::*;
 

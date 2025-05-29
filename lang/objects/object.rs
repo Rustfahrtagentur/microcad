@@ -13,6 +13,9 @@ pub struct Object {
 
     /// Properties
     pub props: ObjectProperties,
+
+    /// Attributes
+    pub attributes: ObjectAttributes,
 }
 
 impl Object {
