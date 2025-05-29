@@ -1,6 +1,0 @@
-error: Properties have not been initialized: area
-  ---> <from_str>:14:1
-     |
-  14 | m( height = 0.5m );
-     | ^^^^^^^^^^^^^^^^^^
-     |
