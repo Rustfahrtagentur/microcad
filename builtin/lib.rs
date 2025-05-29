@@ -11,8 +11,6 @@ mod math;
 mod print;
 mod transform;
 
-mod namespace_builder;
-
 /// Global test initialization.
 #[cfg(test)]
 #[ctor::ctor]
@@ -20,8 +18,8 @@ fn init() {
     env_logger::init();
 }
 
+pub use microcad_lang::builtin::namespace_builder::NamespaceBuilder;
 use microcad_lang::resolve::*;
-pub use namespace_builder::NamespaceBuilder;
 
 pub(crate) use algorithm::*;
 pub(crate) use assert::*;
