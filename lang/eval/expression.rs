@@ -5,16 +5,13 @@ use crate::{eval::*, objects::*};
 
 impl Eval for ListExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        let mut value_list = ValueList::new(
+        let value_list = ValueList::new(
             self.list
                 .iter()
                 .map(|expr| expr.eval(context))
                 .collect::<Result<_, _>>()?,
         );
-
-        if let Some(unit) = self.unit {
-            value_list.add_unit_to_unitless(unit)?;
-        }
+        let value_list = value_list.bundle_unit(self.unit)?;
 
         match value_list.types().common_type() {
             Some(common_type) => Ok(Value::List(List::new(value_list, common_type))),

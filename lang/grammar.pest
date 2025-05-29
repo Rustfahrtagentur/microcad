@@ -348,7 +348,7 @@ attribute_item = { qualified_name ~ ws* ~ "=" ~ ws* ~ expression | call | qualif
 
 attribute_single = _{ "#" ~ attribute_item }
 
-attribute_multi = _{ "#[" ~ attribute_item ~ ws* ~ ("," ~ attribute_item ~ ws*)* ~ "]" }
+attribute_multi = _{ "#[" ~ attribute_item ~ ws* ~ ("," ~ ws* ~ attribute_item ~ ws*)* ~ "]" }
 
 //`#foo`: ok # Simple tag
 //`#foo(x)`: ok # Single call attribute

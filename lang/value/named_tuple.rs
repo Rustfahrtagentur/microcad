@@ -19,7 +19,7 @@ macro_rules! named_tuple {
 pub struct NamedTuple(std::collections::BTreeMap<Identifier, Value>);
 
 impl NamedTuple {
-    /// Create new named tuple instance
+    /// Create new named tuple instance.
     pub fn new(map: std::collections::BTreeMap<Identifier, Value>) -> Self {
         Self(map)
     }

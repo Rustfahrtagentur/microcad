@@ -1,6 +1,0 @@
-error: Assertion failed: false
-  ---> <from_str>:8:21
-     |
-   8 | std::debug::assert( p1 == p2 );
-     |                     ^^^^^^^^^
-     |

@@ -48,22 +48,22 @@ width = height * 2 + 10cm;
 
 Units can be *bundled* in tuples or arrays:
 
-[![test](.test/unit_types_bundling_tuple.png)](.test/unit_types_bundling_tuple.log)
+[![test](.test/unit_bundle_tuple.png)](.test/unit_bundle_tuple.log)
 
-```µcad,unit_types_bundling_tuple
-// without bundling
+```µcad,unit_bundle_tuple
+// without unit bundling
 p1 = (x=1mm, y=2mm, z=3mm);
 
 // with bundling
 p2 = (x=1, y=2, z=3)mm;
 
 // are the same
-std::debug::assert( p1 == p2 );
+std::debug::assert(p1 == p2, "Tuples should be equal");
 ```
 
-[![test](.test/unit_types_bundling_array.png)](.test/unit_types_bundling_array.log)
+[![test](.test/unit_bundle_list.png)](.test/unit_bundle_list.log)
 
-```µcad,unit_types_bundling_array
+```µcad,unit_bundle_list
 // without bundling
 l1 = [1mm, 2mm, 3mm];
 
@@ -71,5 +71,5 @@ l1 = [1mm, 2mm, 3mm];
 l2 = [1, 2, 3]mm;
 
 // are the same
-std::debug::assert( l1 == l2 );
+std::debug::assert(l1 == l2);
 ```

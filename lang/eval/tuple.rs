@@ -14,6 +14,15 @@ impl Eval for TupleExpression {
                     arg.clone().value,
                 )
             }) {
+                // Bundle unit: (x=1,y=2)mm = (x=1mm, y=2mm)
+                let value = match value.bundle_unit(self.unit) {
+                    Ok(value) => value,
+                    Err(err) => {
+                        context.error(self, err)?;
+                        Value::None
+                    }
+                };
+
                 values.insert(key, value);
             }
 
@@ -23,7 +32,7 @@ impl Eval for TupleExpression {
                 self.args
                     .eval(context)?
                     .iter()
-                    .map(|arg| arg.value.clone())
+                    .map(|arg| arg.value.clone().bundle_unit(self.unit).unwrap_or_default())
                     .collect(),
             );
 

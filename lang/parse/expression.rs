@@ -17,8 +17,8 @@ impl Parse for ListExpression {
         Ok(Self {
             list: ExpressionList::parse(inner.next().expect("list_expression expected"))?,
             unit: match inner.next() {
-                Some(pair) => Some(Unit::parse(pair)?),
-                None => None,
+                Some(pair) => Unit::parse(pair)?,
+                None => Unit::None,
             },
             src_ref: pair.clone().into(),
         })
@@ -229,8 +229,8 @@ impl Parse for TupleExpression {
             is_named: named_count == call_argument_list.len(),
             args: call_argument_list,
             unit: match inner.next() {
-                Some(pair) => Some(Unit::parse(pair)?),
-                None => None,
+                Some(pair) => Unit::parse(pair)?,
+                None => Unit::None,
             },
             src_ref: pair.clone().into(),
         })

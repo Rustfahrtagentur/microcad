@@ -10,19 +10,21 @@ use crate::{ty::*, value::*};
 pub struct ValueList(Vec<Value>);
 
 impl ValueList {
-    /// Create new value list
+    /// Create new value list.
     pub fn new(list: Vec<Value>) -> Self {
         Self(list)
     }
 
-    /// add unit to values of primitive types (Scalar or Integer)
-    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
-        self.0
-            .iter_mut()
-            .try_for_each(|value| value.add_unit_to_unitless(unit))
+    /// add unit to values of primitive types ([Scalar] or [Integer]).
+    pub fn bundle_unit(self, unit: Unit) -> ValueResult<Self> {
+        let mut values = Vec::new();
+        for value in self.0 {
+            values.push(value.bundle_unit(unit)?);
+        }
+        Ok(Self(values))
     }
 
-    /// Return list with types of values
+    /// Return list with types of values.
     pub fn types(&self) -> TypeList {
         TypeList::new(
             self.0

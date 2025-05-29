@@ -15,7 +15,7 @@
 [![test](.test/README_implicit_init_by_parameter_A.png)](.test/README_implicit_init_by_parameter_A.log)
 
 ```µcad,README_implicit_init_by_parameter_A
-function f(a:Length, b:vec2) {}
+function f(a:Length, b:Vec2) {}
 
 f(a=1cm,b=(x=1cm,y=2cm));
 f(1cm,b=(x=1cm,y=2cm));

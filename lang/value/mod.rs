@@ -34,12 +34,13 @@ use crate::{objects::*, src_ref::*, syntax::*, ty::*};
 use cgmath::InnerSpace;
 use microcad_core::*;
 
-pub(crate) type ValueResult = std::result::Result<Value, ValueError>;
+pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
 
 /// A variant value with attached source code reference.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Default, PartialEq)]
 pub enum Value {
     /// Invalid value (used for error handling).
+    #[default]
     None,
     /// An integer value.
     Integer(Integer),
@@ -83,15 +84,15 @@ pub enum Value {
 
 impl Value {
     /// Add a unit to a primitive value (Scalar or Integer).
-    pub fn add_unit_to_unitless(&mut self, unit: Unit) -> std::result::Result<(), ValueError> {
-        match (self.clone(), unit.ty()) {
-            (Value::Integer(i), Type::Length) => *self = Value::Length(unit.normalize(i as Scalar)),
-            (Value::Integer(i), Type::Angle) => *self = Value::Angle(unit.normalize(i as Scalar)),
-            (Value::Scalar(s), Type::Length) => *self = Value::Length(unit.normalize(s)),
-            (Value::Scalar(s), Type::Angle) => *self = Value::Angle(unit.normalize(s)),
-            (value, _) => return Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
+    pub fn bundle_unit(self, unit: Unit) -> ValueResult {
+        match (self, unit.ty()) {
+            (Value::Integer(i), Type::Length) => Ok(Value::Length(unit.normalize(i as Scalar))),
+            (Value::Integer(i), Type::Angle) => Ok(Value::Angle(unit.normalize(i as Scalar))),
+            (Value::Scalar(s), Type::Length) => Ok(Value::Length(unit.normalize(s))),
+            (Value::Scalar(s), Type::Angle) => Ok(Value::Angle(unit.normalize(s))),
+            (value, Type::Scalar) | (value, Type::Integer) => Ok(value),
+            (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
         }
-        Ok(())
     }
 
     /// Fetch nodes from this value.
@@ -457,7 +458,7 @@ impl std::ops::BitOr for Value {
     }
 }
 
-/// Rules for operator `&`` (intersection).
+/// Rules for operator `&` (intersection).
 impl std::ops::BitAnd for Value {
     type Output = ValueResult;
 

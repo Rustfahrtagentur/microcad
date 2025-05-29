@@ -65,9 +65,9 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/.test/types_primitive_weight.png)](../doc/.test/types_primitive_weight.log) | [types_primitive_weight](../doc/primitive_types.md) |
 | [![test](../doc/std/algorithm/.test/union_module.png)](../doc/std/algorithm/.test/union_module.log) | [union_module](../doc/std/algorithm/union.md) |
 | [![test](../doc/std/algorithm/.test/union_operator.png)](../doc/std/algorithm/.test/union_operator.log) | [union_operator](../doc/std/algorithm/union.md) |
+| [![test](../doc/.test/unit_bundle_list.png)](../doc/.test/unit_bundle_list.log) | [unit_bundle_list](../doc/unit_types.md) |
+| [![test](../doc/.test/unit_bundle_tuple.png)](../doc/.test/unit_bundle_tuple.log) | [unit_bundle_tuple](../doc/unit_types.md) |
 | [![test](../doc/.test/unit_types.png)](../doc/.test/unit_types.log) | [unit_types](../doc/unit_types.md) |
-| [![test](../doc/.test/unit_types_bundling_array.png)](../doc/.test/unit_types_bundling_array.log) | [unit_types_bundling_array](../doc/unit_types.md) |
-| [![test](../doc/.test/unit_types_bundling_tuple.png)](../doc/.test/unit_types_bundling_tuple.log) | [unit_types_bundling_tuple](../doc/unit_types.md) |
 | [![test](../doc/.test/unit_types_number_literals.png)](../doc/.test/unit_types_number_literals.log) | [unit_types_number_literals](../doc/unit_types.md) |
 | [![test](../doc/.test/use_statement.png)](../doc/.test/use_statement.log) | [use_statement](../doc/use_statement.md) |
 | [![test](../doc/.test/use_statement_all.png)](../doc/.test/use_statement_all.log) | [use_statement_all](../doc/use_statement.md) |
