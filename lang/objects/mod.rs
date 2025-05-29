@@ -14,7 +14,7 @@ pub use object::*;
 pub use object_properties::*;
 pub use transform::*;
 
-use crate::{eval::*, rc::*, src_ref::*, syntax::*, value::*};
+use crate::{rc::*, syntax::*, value::*};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -39,9 +39,6 @@ pub enum ObjectNodeInner {
 
     /// An affine transformation of a geometry
     Transform(Transform),
-
-    /// An export node that exports the geometry to a file
-    Export(ExportSettings),
 }
 
 impl ObjectNodeInner {
@@ -202,161 +199,6 @@ pub fn into_inner_object(node: ObjectNode) -> Option<ObjectNode> {
             None
         }
     })
-}
-
-/// This function bakes the object node tree into a 2D geometry tree
-pub fn bake2d(
-    renderer: &mut Renderer2D,
-    node: ObjectNode,
-) -> core::result::Result<geo2d::Node, CoreError> {
-    let node2d = {
-        match *node.borrow() {
-            ObjectNodeInner::Object(_) => geo2d::tree::group(),
-            ObjectNodeInner::Export(_) => geo2d::tree::group(),
-            ObjectNodeInner::Primitive2D(ref renderable) => {
-                return Ok(geo2d::tree::geometry(
-                    renderable.request_geometry(renderer)?,
-                ));
-            }
-            ObjectNodeInner::Algorithm(ref algorithm) => {
-                return algorithm.process_2d(
-                    renderer,
-                    crate::objects::into_inner_object(node.clone()).unwrap_or(node.clone()),
-                );
-            }
-            ObjectNodeInner::Transform(ref transform) => transform.into(),
-            ObjectNodeInner::ChildrenNodeMarker => geo2d::tree::group(),
-            _ => return Err(CoreError::NotImplemented),
-        }
-    };
-
-    node.children().try_for_each(|child| {
-        if let Ok(child) = bake2d(renderer, child) {
-            node2d.append(child);
-            Ok(())
-        } else {
-            Err(CoreError::NotImplemented)
-        }
-    })?;
-
-    Ok(node2d)
-}
-
-/// This function bakes the object node tree into a 3D geometry tree
-pub fn bake3d(
-    renderer: &mut Renderer3D,
-    node: ObjectNode,
-) -> core::result::Result<geo3d::Node, CoreError> {
-    let node3d = {
-        match *node.borrow() {
-            ObjectNodeInner::Object(_) => geo3d::tree::group(),
-            ObjectNodeInner::Export(_) => geo3d::tree::group(),
-            ObjectNodeInner::Primitive3D(ref renderable) => {
-                return Ok(geo3d::tree::geometry(
-                    renderable.request_geometry(renderer)?,
-                ));
-            }
-            ObjectNodeInner::Algorithm(ref algorithm) => {
-                return algorithm.process_3d(
-                    renderer,
-                    crate::objects::into_inner_object(node.clone()).unwrap_or(node.clone()),
-                );
-            }
-            ObjectNodeInner::Transform(ref transform) => transform.into(),
-            ObjectNodeInner::ChildrenNodeMarker => geo3d::tree::group(),
-            _ => return Err(CoreError::NotImplemented),
-        }
-    };
-
-    node.children().try_for_each(|child| {
-        if let Ok(child) = bake3d(renderer, child) {
-            node3d.append(child);
-            Ok(())
-        } else {
-            Err(CoreError::NotImplemented)
-        }
-    })?;
-
-    Ok(node3d)
-}
-
-/// Object builder to build up object nodes.
-#[derive(Default)]
-pub struct ObjectBuilder {
-    object: Object,
-    children: Vec<ObjectNode>,
-}
-
-impl ObjectBuilder {
-    /// Make new [ObjectBuilder].
-    pub fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
-    }
-
-    /// Initialize the properties by parameters and arguments.
-    pub fn init_properties(
-        &mut self,
-        parameters: &ParameterValueList,
-        arguments: &ArgumentMap,
-    ) -> &mut Self {
-        let mut props = ObjectProperties::default();
-
-        for parameter in parameters.iter() {
-            props.insert(
-                parameter.id.clone(),
-                match &parameter.default_value {
-                    Some(value) => value.clone(),
-                    None => arguments.get(&parameter.id).unwrap_or(&Value::None).clone(),
-                },
-            );
-        }
-
-        self.object.props = props;
-        self
-    }
-
-    /// Append child nodes to this object node.
-    pub fn append_children(&mut self, nodes: &mut Vec<ObjectNode>) -> &mut Self {
-        self.children.append(nodes);
-        self
-    }
-
-    /// Set property value for object.
-    pub fn set_property(&mut self, id: Identifier, value: Value) -> &mut Self {
-        self.object.props.insert(id, value);
-        self
-    }
-
-    /// Return true if the object has a property with `id`.
-    pub fn has_property(&mut self, id: &Identifier) -> bool {
-        self.object.props.contains_key(id)
-    }
-
-    /// Add all object properties to scope
-    pub fn properties_to_scope(&mut self, context: &mut Context) -> EvalResult<()> {
-        if self.object.props.all_initialized() {
-            for (id, value) in self.object.props.iter() {
-                context.set_local_value(id.clone(), value.clone())?;
-            }
-
-            Ok(())
-        } else {
-            Err(EvalError::UninitializedProperties(IdentifierList(
-                Refer::none(self.object.props.get_ids_of_uninitialized()),
-            )))
-        }
-    }
-
-    /// Build the [ObjectNode].
-    pub fn build_node(self) -> ObjectNode {
-        let node = ObjectNode::new(ObjectNodeInner::Object(self.object));
-        for child in self.children {
-            node.append(child);
-        }
-        node
-    }
 }
 
 #[test]
