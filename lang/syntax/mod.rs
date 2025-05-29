@@ -5,6 +5,7 @@
 //!
 //! Every element in the µcad language are parsed into definitions in this module.
 
+pub mod attribute;
 pub mod body;
 pub mod call;
 pub mod expression;
@@ -20,6 +21,7 @@ pub mod source_file;
 pub mod statement;
 pub mod r#use;
 
+pub use attribute::*;
 pub use body::*;
 pub use call::*;
 pub use expression::*;
@@ -31,9 +33,9 @@ pub use literal::*;
 pub use module::*;
 pub use namespace::*;
 pub use parameter::*;
-pub use r#use::*;
 pub use source_file::*;
 pub use statement::*;
+pub use r#use::*;
 
 /// Trait for printing a syntax tree
 pub trait PrintSyntax {

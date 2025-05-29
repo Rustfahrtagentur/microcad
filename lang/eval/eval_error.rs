@@ -156,6 +156,10 @@ pub enum EvalError {
     /// No variables allowed in namespaces
     #[error("No variables allowed in {0}")]
     NoVariablesAllowedIn(&'static str),
+
+    /// Error when evaluating attributes.
+    #[error("Attribute error: {0}")]
+    AttributeError(#[from] crate::eval::attribute::AttributeError),
 }
 
 /// Result type of any evaluation.

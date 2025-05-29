@@ -28,6 +28,7 @@
 //! ```
 
 mod argument_map;
+mod attribute;
 mod body;
 mod builtin;
 mod call;
@@ -55,8 +56,8 @@ pub use context::*;
 pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
-pub use r#use::*;
 pub use symbols::*;
+pub use r#use::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
