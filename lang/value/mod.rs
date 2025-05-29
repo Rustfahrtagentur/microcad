@@ -190,6 +190,21 @@ impl Value {
             value => Err(ValueError::CannotConvertToBool(value.clone())),
         }
     }
+
+    /// Try to convert into [Color].
+    pub fn try_color(&self) -> Result<Color, ValueError> {
+        match self {
+            Value::String(s) => {
+                if let Ok(color) = std::str::FromStr::from_str(s) {
+                    return Ok(color);
+                }
+            }
+            Value::Color(color) => return Ok(*color),
+            _ => {}
+        }
+
+        Err(ValueError::CannotConvert(self.clone(), "Color".into()))
+    }
 }
 
 impl PartialOrd for Value {
