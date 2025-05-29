@@ -331,9 +331,6 @@ call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* ~ ws* 
 
 call_op = _{ "(" ~ ws* ~ call_argument_list? ~ ws* ~ ")" }
 
-//`translate() rotate()`: ok
-nested_call = { call ~ (ws+ ~ call)* }
-
 //`.sum()`: ok
 method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 
