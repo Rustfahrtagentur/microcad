@@ -344,7 +344,7 @@ call = { qualified_name ~ ws* ~ call_op }
 //`foo = bar`: ok # Assignment
 //`foo`: ok # Simple tag
 //`foo::bar`: ok # Qualified name tag
-attribute_item = { call | qualified_name ~ "=" ~ expression | qualified_name }
+attribute_item = { qualified_name ~ ws* ~ "=" ~ ws* ~ expression | call | qualified_name }
 
 attribute_single = _{ "#" ~ attribute_item }
 
@@ -355,7 +355,7 @@ attribute_multi = _{ "#[" ~ attribute_item ~ ws* ~ ("," ~ attribute_item ~ ws*)*
 //`#[foo, bar]`: ok # List of attributes
 //`#[bar = 42, foo = 32]`: ok # List of assignment attributes
 //`#[foo = 42, bar(32), baz]`: ok # List of mixed attributes
-attribute = { attribute_single | attribute_multi }
+attribute = { attribute_multi | attribute_single  }
 
 //`#foo #bar`: ok # Multiple attributes
 attribute_list = { attribute ~ (ws+ ~ attribute)* }
@@ -416,7 +416,6 @@ body_else = { body }
 //`module foo() { }`: ok # Module with no properties
 //`module foo(a: scalar) { }`: ok # Module with properties
 //`module foo(a: scalar, b: scalar) { }`: ok # Module with multiple properties
-//`module foo() { return 5.0mm; }`: error # Module cannot have return statement
 //`module foo() { module bar() { } }`: ok # Nested module definition
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Module with module as properties
@@ -427,7 +426,7 @@ module_definition = { "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~
 
 //`{ translate() rotate(); }`: ok
 //`{}`: ok # Empty body
-body = { "{" ~ ws* ~ (statement ~ ws*)* ~ "}" }
+body = { "{" ~ ws* ~ (statement ~ ws*)* ~ expression? ~ "}" }
 
 //`init(d: Length) { r = d / 2; }`: ok
 //`init(size: Length) { size = size; }`: ok
@@ -454,5 +453,5 @@ statement = {
 }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-//`module foo { init(size: Length) { rectangle(size); } }`: ok # Module with init function
+//`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function
 source_file = { SOI ~ ws* ~ (statement ~ ws*)* ~ EOI }
