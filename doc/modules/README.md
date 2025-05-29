@@ -30,16 +30,13 @@ A *module declaration* consists of...
 ```µcad,modules_declaration
 // define custom module circle with an implicit initializer
 module small_disc(diameter: Length) {
-
-    // pre-initialization code
-    factor = 2;
-
     // explicit initializers 
-    init( half_diameter: Length ) {
-        diameter = half_diameter * factor;
+    init(half_diameter: Length) {
+        diameter = half_diameter * 2.0;
     }
-    init( double_diameter: Length ) {
-        diameter = double_diameter / factor;
+
+    init(double_diameter: Length) {
+        diameter = double_diameter / 2.0;
     }
 
     // post-initialization code
