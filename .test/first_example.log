@@ -2,8 +2,8 @@ Volume: <invalid>cm³
 error: Properties have not been initialized: radius_bottom, radius_top
   ---> <from_str>:11:13
      |
-  11 |     outer = std::geo3d::cylinder(d = outer_diameter, h = height);
-     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  81 |     __builtin::transform::translate(x = 0.0, y = 0.0, z = offset / 1mm) {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Properties have not been initialized: radius_bottom, radius_top
   ---> <from_str>:12:43
