@@ -38,8 +38,12 @@ pub enum ParseError {
     Parser(#[from] Box<pest::error::Error<crate::parser::Rule>>),
 
     /// Error parsing color literal
-    #[error("Error parsing color literal: {0}")]
-    ParseColorError(String),
+    #[error("Error parsing color from hex: {0}")]
+    ParseColorFromHex(String),
+
+    /// Unknown color name
+    #[error("Unknown color: {0}")]
+    UnknownColorName(String),
 
     /// Unknown unit
     #[error("Unknown unit: {0}")]
