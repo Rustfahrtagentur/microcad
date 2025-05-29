@@ -17,18 +17,3 @@ Because exporting in µcad is in code one is able to export several different fo
 ```µcad,export_multiple
 std::export(["cube.stl","cube.png"]) std::geo3d::cube(40.0mm);
 ```
-
-By using attributes the user can access the export methods your code is providing.
-
-[![test](.test/export_attribute.png)](.test/export_attribute.log)
-
-```µcad,export_attribute#todo
-#[slider("cube size")]
-size = 40mm;
-
-#[export("Export cube as STL")]
-std::export("cube.stl") cube(40mm);
-
-#[export("Export cube as PNG")]
-std::export("cube.png") cube(40mm);
-```

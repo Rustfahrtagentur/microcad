@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**75** tests from markdown.
+**72** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -11,7 +11,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/std/algorithm/.test/difference_operator.png)](../doc/std/algorithm/.test/difference_operator.log) | [difference_operator](../doc/std/algorithm/difference.md) |
 | [![test](../doc/modules/.test/EXAMPLES_fields.png)](../doc/modules/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/modules/EXAMPLES.md) |
 | [![test](../doc/modules/.test/EXAMPLES_functions.png)](../doc/modules/.test/EXAMPLES_functions.log) | [EXAMPLES_functions](../doc/modules/EXAMPLES.md) |
-| [![test](../doc/std/.test/export_attribute.png)](../doc/std/.test/export_attribute.log) | [export_attribute](../doc/std/export.md) |
 | [![test](../doc/std/.test/export_multiple.png)](../doc/std/.test/export_multiple.log) | [export_multiple](../doc/std/export.md) |
 | [![test](../doc/std/.test/export_single.png)](../doc/std/.test/export_single.log) | [export_single](../doc/std/export.md) |
 | [![test](../doc/modules/.test/fields_torus.png)](../doc/modules/.test/fields_torus.log) | [fields_torus](../doc/modules/fields.md) |
@@ -56,10 +55,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/.test/types_primitive_angle.png)](../doc/.test/types_primitive_angle.log) | [types_primitive_angle](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_area.png)](../doc/.test/types_primitive_area.log) | [types_primitive_area](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_bool.png)](../doc/.test/types_primitive_bool.log) | [types_primitive_bool](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_color.png)](../doc/.test/types_primitive_color.log) | [types_primitive_color](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_integer.png)](../doc/.test/types_primitive_integer.log) | [types_primitive_integer](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_length.png)](../doc/.test/types_primitive_length.log) | [types_primitive_length](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_no_color.png)](../doc/.test/types_primitive_no_color.log) | [types_primitive_no_color](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_scalar.png)](../doc/.test/types_primitive_scalar.log) | [types_primitive_scalar](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_string.png)](../doc/.test/types_primitive_string.log) | [types_primitive_string](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_vec2.png)](../doc/.test/types_primitive_vec2.log) | [types_primitive_vec2](../doc/primitive_types.md) |
