@@ -46,7 +46,7 @@ impl std::fmt::Display for ListExpression {
                 .map(|c| c.to_string())
                 .collect::<Vec<String>>()
                 .join(", "),
-            self.unit.to_string()
+            self.unit
         )
     }
 }
