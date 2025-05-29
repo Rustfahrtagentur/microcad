@@ -3,7 +3,6 @@
 
 use crate::{eval::*, objects::*, syntax::*};
 
-use microcad_core::ExportSettings;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
