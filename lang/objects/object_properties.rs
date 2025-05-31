@@ -3,7 +3,7 @@
 
 //! Object properties.
 
-use crate::{resolve::*, syntax::*, value::*};
+use crate::{syntax::*, value::*};
 
 /// A list of values sorted by id
 ///
@@ -69,17 +69,5 @@ impl std::fmt::Display for ObjectProperties {
         }
 
         Ok(())
-    }
-}
-
-impl From<&SymbolMap> for ObjectProperties {
-    fn from(symbol_map: &SymbolMap) -> Self {
-        let mut props = ObjectProperties::default();
-        for (id, symbol) in symbol_map.iter() {
-            if let SymbolDefinition::Property(_, value) = &symbol.borrow().def {
-                props.0.insert(id.clone(), value.clone());
-            }
-        }
-        props
     }
 }
