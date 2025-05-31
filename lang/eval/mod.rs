@@ -68,16 +68,14 @@ pub trait Eval {
 }
 
 impl MethodCall {
-    /// Evaluate method call
-    fn eval(&self, context: &mut Context, _lhs: &Expression) -> EvalResult<Value> {
-        context.error(
-            self,
-            EvalError::Todo(format!(
-                "cannot evaluate method call of {} at {}",
-                self,
-                context.locate(self)?
-            )),
-        )?;
-        Ok(Value::None)
+    /// Evaluate method call.
+    ///
+    /// Examples:
+    /// ```microcad
+    /// assert([2.0, 2.0].all_equal(), "All elements in this list must be equal.");
+    /// ```
+    fn eval(&self, context: &mut Context, lhs: &Expression) -> EvalResult<Value> {
+        let value = lhs.eval(context)?;
+        value.call_method(&self.id, &self.argument_list, context)
     }
 }

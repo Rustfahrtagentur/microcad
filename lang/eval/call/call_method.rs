@@ -3,7 +3,7 @@
 
 //! Call argument value evaluation entity
 
-use crate::{Id, eval::*, objects::ObjectNode, syntax::*};
+use crate::{eval::*, syntax::*};
 
 /// Trait for calling methods of values
 pub trait CallMethod {
@@ -11,138 +11,99 @@ pub trait CallMethod {
     ///
     /// - `name`: Name of the method
     /// - `args`: Arguments for the method
-    /// - `context`: Evaluation context (TODO: It should not be optional)
+    /// - `context`: Evaluation context
     fn call_method(
         &self,
-        name: &Id,
+        id: &Identifier,
         args: &CallArgumentList,
-        context: Option<&mut EvalContext>,
+        context: &mut Context,
     ) -> EvalResult<Value>;
 }
 
-impl CallMethod for ObjectNode {
+impl CallMethod for List {
     fn call_method(
         &self,
-        name: &Id,
+        id: &Identifier,
         _: &CallArgumentList,
-        _: Option<&mut EvalContext>,
+        context: &mut Context,
     ) -> EvalResult<Value> {
-        use crate::objects::bake3d;
-
-        match name.as_str() {
-            // Calculate volume from a 3D geometry
-            "volume" => {
-                // Bake the object tree into a geometry tree
-                let precision = 0.1; // TODO get precision from context
-                let mut renderer = microcad_core::geo3d::MeshRenderer::new(precision);
-                
-                if let Some(node3d) = bake3d(&mut renderer, self.clone()).expect("") {
-                    use microcad_core::geo3d::Renderer;
-
-                    // Render the geometry tree into a triangle mesh
-                    renderer
-                        .render_node(node3d)
-                        .expect("Failed to render");
-    
-                    // Return the volume of the triangle mesh
-                    Ok(Value::Scalar(Refer::none(renderer.triangle_mesh.volume())))
-                } else {
-
-                    Ok(Value::None)
-                }
-
-            }
-            // Calculate area from a geometry
-            // TODO Calculate surface area from a 3D geometry
-            "area" => {
-                todo!()
-            }
-            method_name => Err(EvalError::UnknownMethod(method_name.into())),
-        }
-    }
-}
-
-impl CallMethod for List {
-    fn call_method(&self, name: &Id, _: &CallArgumentList, _: Option<&mut EvalContext>) -> EvalResult<Value> {
-        match name.as_str() {
-            "count" => Ok(Value::Integer(Refer::new(
-                self.len() as i64,
-                self.src_ref(),
-            ))),
+        match id.id().as_str() {
+            "count" => Ok(Value::Integer(self.len() as i64)),
             "all_equal" => {
                 let is_equal = match self.first() {
                     Some(first) => self[1..].iter().all(|x| x == first),
                     None => true,
                 };
-                Ok(Value::Bool(Refer::none(is_equal)))
+                Ok(Value::Bool(is_equal))
             }
             "is_ascending" => {
                 let is_ascending = self.as_slice().windows(2).all(|w| w[0] <= w[1]);
-                Ok(Value::Bool(Refer::none(is_ascending)))
+                Ok(Value::Bool(is_ascending))
             }
             "is_descending" => {
                 let is_descending = self.as_slice().windows(2).all(|w| w[0] >= w[1]);
-                Ok(Value::Bool(Refer::none(is_descending)))
+                Ok(Value::Bool(is_descending))
             }
-            method => Err(EvalError::UnknownMethod(method.into())),
+            _ => {
+                context.error(id, EvalError::UnknownMethod(id.clone()))?;
+                Ok(Value::None)
+            }
         }
     }
 }
 
 impl CallMethod for Value {
     fn call_method(
-            &self,
-            name: &Id,
-            args: &CallArgumentList,
-            context: Option<&mut EvalContext>,
-        ) -> EvalResult<Value> {
+        &self,
+        id: &Identifier,
+        args: &CallArgumentList,
+        context: &mut Context,
+    ) -> EvalResult<Value> {
         match &self {
             Value::None => todo!(),
-            Value::Integer(refer) => todo!(),
-            Value::Scalar(refer) => todo!(),
-            Value::Length(refer) => todo!(),
-            Value::Area(refer) => todo!(),
-            Value::Volume(refer) => todo!(),
-            Value::Vec2(refer) => todo!(),
-            Value::Vec3(refer) => todo!(),
-            Value::Vec4(refer) => todo!(),
-            Value::Angle(refer) => todo!(),
-            Value::Weight(refer) => todo!(),
-            Value::Bool(refer) => todo!(),
-            Value::String(refer) => todo!(),
-            Value::Color(refer) => todo!(),
-            Value::List(list) => todo!(),
-            Value::Map(map) => todo!(),
-            Value::NamedTuple(named_tuple) => todo!(),
-            Value::UnnamedTuple(unnamed_tuple) => todo!(),
-            Value::Node(node) => node.call_method(name, args, context),
-            Value::NodeMultiplicity(nodes) => object_with_children(nodes).call_method(name, args, context),
-            _ => todo!()
+            Value::Integer(_) => todo!(),
+            Value::Scalar(_) => todo!(),
+            Value::Length(_) => todo!(),
+            Value::Area(_) => todo!(),
+            Value::Volume(_) => todo!(),
+            Value::Vec2(_) => todo!(),
+            Value::Vec3(_) => todo!(),
+            Value::Vec4(_) => todo!(),
+            Value::Angle(_) => todo!(),
+            Value::Weight(_) => todo!(),
+            Value::Bool(_) => todo!(),
+            Value::String(_) => todo!(),
+            Value::Color(_) => todo!(),
+            Value::List(list) => list.call_method(id, args, context),
+            Value::Map(_) => todo!(),
+            Value::NamedTuple(_) => todo!(),
+            Value::UnnamedTuple(_) => todo!(),
+            Value::Node(_) => todo!(),
+            Value::NodeMultiplicity(_) => todo!(),
         }
     }
 }
 
-
 #[test]
 fn call_list_method() {
     let list = List::new(
-        ValueList::new(
-            vec![
-                Value::Scalar(Refer::none(3.0)),
-                Value::Scalar(Refer::none(3.0)),
-                Value::Scalar(Refer::none(3.0)),
-            ],
-            SrcRef(None),
-        ),
+        ValueList::new(vec![
+            Value::Scalar(3.0),
+            Value::Scalar(3.0),
+            Value::Scalar(3.0),
+        ]),
         crate::ty::Type::Scalar,
-        SrcRef(None),
     );
 
     if let Value::Bool(result) = list
-        .call_method(&"all_equal".into(), &CallArgumentList::default(), None)
+        .call_method(
+            &"all_equal".into(),
+            &CallArgumentList::default(),
+            &mut Context::default(),
+        )
         .expect("test error")
     {
-        assert!(result.value);
+        assert!(result);
     } else {
         panic!("Test failed");
     }

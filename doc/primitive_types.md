@@ -34,7 +34,7 @@ centimeters = 100cm;
 meters = 1m;
 inches = 39.37007874015748in;
 
-std::debug::assert( [millimeters, centimeters, meters, inches].equal() );
+std::debug::assert( [millimeters, centimeters, meters, inches].all_equal() );
 ```
 
 ## Angle
@@ -51,7 +51,7 @@ degree_ = 180deg;
 grad = 200grad;
 turn = 0.5turn;
 
-std::debug::assert( [degree, degree_, grad, turn, radian].equal() );
+std::debug::assert( [degree, degree_, grad, turn, radian].all_equal() );
 ```
 
 ## Area

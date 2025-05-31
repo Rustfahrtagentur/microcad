@@ -122,16 +122,20 @@ pub enum EvalError {
     ValueError(#[from] ValueError),
 
     /// Name of external symbol is unknown.
-    #[error("External symbol {0} not found")]
+    #[error("External symbol `{0}` not found")]
     ExternalSymbolNotFound(QualifiedName),
 
     /// Path of external file is unknown.
-    #[error("External path '{0}' not found")]
+    #[error("External path `{0}` not found")]
     ExternalPathNotFound(std::path::PathBuf),
 
     /// Can't find a project file by hash.
     #[error("Could not find a file with hash {0}")]
     UnknownHash(u64),
+
+    /// Unknown method.
+    #[error("Unknown method `{0}`")]
+    UnknownMethod(Identifier),
 
     /// Can't find a project file by it's path.
     #[error("Could not find a file with path {0}")]
