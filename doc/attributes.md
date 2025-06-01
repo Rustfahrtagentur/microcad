@@ -96,6 +96,8 @@ The following statements can have attributes:
   module my_part() { 
     std::geo2d::rect(2mm); 
   }
+
+  std::debug::assert(my_part().part_id == "MYPART");
   ```
 
 ### Variable capture

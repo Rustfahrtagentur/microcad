@@ -41,6 +41,8 @@ impl ModuleDefinition {
             StackFrame::Module(self.id.clone(), args.into()),
             |context| {
                 object_builder.init_properties(&self.parameters.eval(context)?, args);
+                object_builder
+                    .add_attributes(self.attribute_list.eval_to_object_attributes(context)?);
 
                 // Create the object node from initializer if present
                 if let Some(init) = init {
