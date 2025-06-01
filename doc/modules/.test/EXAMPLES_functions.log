@@ -1,19 +1,6 @@
-error: Value Error: Missing arguments: size
-
-  ---> <from_str>:1:1
-     |
-   1 | module cube_with_volume(size: length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol info not found.
-  ---> <from_str>:15:1
-     |
-  15 | info("Cube volume: {my_cube.volume()}");
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol info not found.
-  ---> <from_str>:16:1
-     |
-  16 | info("Cube weight: {my_cube.weight(40g/mm^3)}");
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+Parser error:  --> 5:5
+  |
+5 |     }
+  |     ^---
+  |
+  = expected COMMENT, identifier, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
