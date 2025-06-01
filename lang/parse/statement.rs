@@ -88,15 +88,11 @@ impl Parse for Statement {
             Rule::if_statement => Self::If(IfStatement::parse(first)?),
             Rule::marker_statement => Self::Marker(Marker::parse(first)?),
 
-            Rule::assignment => Self::Assignment(Assignment::parse(first)?),
-            Rule::expression | Rule::expression_no_semicolon => {
-                Self::Expression(Expression::parse(first)?)
+            Rule::assignment_statement => Self::Assignment(AssignmentStatement::parse(first)?),
+            Rule::expression_statement | Rule::final_expression_statement => {
+                Self::Expression(ExpressionStatement::parse(first)?)
             }
-            rule => unreachable!(
-                "Unexpected module statement, got {:?} {:?}",
-                rule,
-                first.clone()
-            ),
+            rule => unreachable!("Unexpected statement, got {:?} {:?}", rule, first.clone()),
         })
     }
 }
@@ -116,5 +112,22 @@ impl Parse for ReturnStatement {
             result,
             src_ref: pair.into(),
         })
+    }
+}
+
+impl Parse for StatementList {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        let mut statements = Vec::new();
+
+        for pair in pair.inner() {
+            match pair.as_rule() {
+                Rule::final_expression_statement | Rule::statement => {
+                    statements.push(Statement::parse(pair)?);
+                }
+                _ => {}
+            }
+        }
+
+        Ok(Self(statements))
     }
 }

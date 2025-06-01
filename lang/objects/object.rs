@@ -19,9 +19,14 @@ pub struct Object {
 }
 
 impl Object {
-    /// Get object property value
+    /// Get object property value.
     pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
         self.props.get_value(id)
+    }
+
+    /// Assign new object attributes.
+    pub fn assign_object_attributes(&mut self, attributes: &mut ObjectAttributes) {
+        self.attributes.merge(attributes);
     }
 }
 

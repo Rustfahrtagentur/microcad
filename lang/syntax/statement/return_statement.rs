@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Module statement syntax elements
-//!
+
 use crate::{src_ref::*, syntax::*};
 
 /// Module statement

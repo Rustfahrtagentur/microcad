@@ -50,12 +50,10 @@ impl ModuleDefinition {
                 object_builder.properties_to_scope(context)?;
 
                 // At this point, all properties must have a value
-                for statement in &self.body.statements {
+                for statement in self.body.statements.iter() {
                     match statement {
                         Statement::Assignment(assignment) => {
-                            let id = &assignment.id;
-                            let value = assignment.expression.eval(context)?;
-                            context.set_local_value(id.clone(), value.clone())?;
+                            assignment.eval(context)?;
                         }
                         Statement::Expression(expression) => {
                             let value = expression.eval(context)?;

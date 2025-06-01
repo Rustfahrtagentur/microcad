@@ -65,24 +65,14 @@ impl SourceFile {
 
 impl Parse for SourceFile {
     fn parse(mut pair: Pair) -> ParseResult<Self> {
-        let mut body = Vec::new();
-
         // calculate hash over complete file content
         let hash = Self::calculate_hash(pair.as_str());
         pair.set_source_hash(hash);
 
-        for pair in pair.inner() {
-            match pair.as_rule() {
-                Rule::statement => {
-                    body.push(Statement::parse(pair)?);
-                }
-                Rule::EOI => break,
-                _ => {}
-            }
-        }
-
         Ok(SourceFile {
-            body,
+            statements: pair
+                .find(Rule::statement_list)
+                .expect("A source file with a statement list"),
             filename: Default::default(),
             source: pair.as_span().as_str().to_string(),
             hash,
@@ -105,5 +95,5 @@ fn parse_source_file() {
     )
     .expect("test error");
 
-    assert_eq!(source_file.body.len(), 3);
+    assert_eq!(source_file.statements.len(), 3);
 }

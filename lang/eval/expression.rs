@@ -3,6 +3,8 @@
 
 use crate::{eval::*, objects::*};
 
+use super::attribute::AttributeError;
+
 impl Eval for ListExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let value_list = ValueList::new(
@@ -21,6 +23,40 @@ impl Eval for ListExpression {
                     EvalError::ListElementsDifferentTypes(value_list.types()),
                 )?;
                 Ok(Value::None)
+            }
+        }
+    }
+}
+
+impl Expression {
+    /// Evaluate an expression together with an attribute list.
+    ///
+    /// The attribute list will be also evaluated and the resulting attributes
+    /// will be assigned to the resulting value.
+    pub fn eval_with_attribute_list(
+        &self,
+        attribute_list: &AttributeList,
+        context: &mut Context,
+    ) -> EvalResult<Value> {
+        let value = self.eval(context)?;
+        match &value {
+            Value::Node(_) | Value::NodeMultiplicity(_) => {
+                let nodes = value.fetch_nodes();
+                let object_attributes = attribute_list.eval_to_object_attributes(context)?;
+                for node in &nodes {
+                    node.borrow_mut()
+                        .assign_object_attributes(&mut object_attributes.clone())
+                }
+                Ok(Value::NodeMultiplicity(nodes))
+            }
+            _ => {
+                if !attribute_list.is_empty() {
+                    context.error(
+                        attribute_list,
+                        AttributeError::CannotAssignToExpression(self.clone()),
+                    )?;
+                }
+                Ok(value)
             }
         }
     }

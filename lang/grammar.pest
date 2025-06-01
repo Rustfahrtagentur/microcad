@@ -299,8 +299,12 @@ expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 //`a b()`: error # No body at the end
 expression_no_semicolon = { nested_with_body }
 
-// A statement that is an single expression
-expression_statement = _{ expression_no_semicolon ~ (ws* ~ ";")? | expression ~ ws* ~ ";" }
+// A statement that is a single expression
+expression_statement = { (attribute_list ~ ws+)? ~ (expression ~ ws* ~ ";" | expression_no_semicolon ~ (ws* ~ ";")? ) }
+
+// A statement that is a single expression, with optional semicolon
+final_expression_statement = { (attribute_list ~ ws+)? ~ nested_with_body ~ (ws* ~ ";")? }
+
 
 //`1..4`: ok
 //`a..b`: ok
@@ -346,16 +350,11 @@ call = { qualified_name ~ ws* ~ call_op }
 //`foo::bar`: ok # Qualified name tag
 attribute_item = { qualified_name ~ ws* ~ "=" ~ ws* ~ expression | call | qualified_name }
 
-attribute_single = _{ "#" ~ attribute_item }
-
-attribute_multi = _{ "#[" ~ attribute_item ~ ws* ~ ("," ~ ws* ~ attribute_item ~ ws*)* ~ "]" }
-
 //`#foo`: ok # Simple tag
-//`#foo(x)`: ok # Single call attribute
 //`#[foo, bar]`: ok # List of attributes
 //`#[bar = 42, foo = 32]`: ok # List of assignment attributes
 //`#[foo = 42, bar(32), baz]`: ok # List of mixed attributes
-attribute = { attribute_multi | attribute_single  }
+attribute = { "#[" ~ attribute_item ~ ws* ~ ("," ~ ws* ~ attribute_item ~ ws*)* ~ "]" }
 
 //`#foo #bar`: ok # Multiple attributes
 attribute_list = { attribute ~ (ws+ ~ attribute)* }
@@ -368,7 +367,7 @@ attribute_list = { attribute ~ (ws+ ~ attribute)* }
 //`pub r = 5.0mm`: Make value of assignment public
 assignment = { (visibility ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
 
-assignment_statement = _{ assignment ~ ws* ~ ";" }
+assignment_statement = { (attribute_list ~ ws+)? ~ assignment ~ ws* ~ ";" }
 
 //`@children`: ok
 marker_statement = { "@" ~ identifier }
@@ -426,7 +425,7 @@ module_definition = { "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~
 
 //`{ translate() rotate(); }`: ok
 //`{}`: ok # Empty body
-body = { "{" ~ ws* ~ (statement ~ ws*)* ~ expression? ~ "}" }
+body = { "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
 
 //`init(d: Length) { r = d / 2; }`: ok
 //`init(size: Length) { size = size; }`: ok
@@ -452,6 +451,8 @@ statement = {
   expression_statement
 }
 
+statement_list = { (statement ~ ws*)* ~ final_expression_statement? }
+
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 //`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function
-source_file = { SOI ~ ws* ~ (statement ~ ws*)* ~ EOI }
+source_file = { SOI ~ ws* ~ statement_list ~ ws* ~ EOI }

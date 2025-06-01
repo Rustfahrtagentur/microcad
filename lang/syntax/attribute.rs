@@ -3,9 +3,10 @@
 
 //! Attribute syntax entities.
 
-use crate::{src_ref::SrcReferrer, syntax::*};
+use crate::{src_ref::*, syntax::*};
 
 /// An attribute item.
+#[derive(Debug, Clone)]
 pub enum Attribute {
     /// A tag attribute `foo::bar`
     Tag(QualifiedName),
@@ -26,6 +27,18 @@ impl Attribute {
     }
 }
 
+impl std::fmt::Display for Attribute {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Attribute::Tag(qualified_name) => writeln!(f, "#[{qualified_name}]"),
+            Attribute::Call(call) => writeln!(f, "#[{call}]"),
+            Attribute::NameValue(qualified_name, expression) => {
+                writeln!(f, "#[{qualified_name} = {expression}]")
+            }
+        }
+    }
+}
+
 impl SrcReferrer for Attribute {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         match self {
@@ -40,6 +53,7 @@ impl SrcReferrer for Attribute {
 }
 
 /// A list of attributes, e.g. `#foo #[bar, baz = 42]`
+#[derive(Debug, Clone, Default)]
 pub struct AttributeList(Vec<Attribute>);
 
 impl std::ops::Deref for AttributeList {
@@ -53,5 +67,27 @@ impl std::ops::Deref for AttributeList {
 impl std::ops::DerefMut for AttributeList {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+impl std::fmt::Display for AttributeList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for attribute in &self.0 {
+            writeln!(f, "{attribute}")?;
+        }
+        Ok(())
+    }
+}
+
+impl SrcReferrer for AttributeList {
+    fn src_ref(&self) -> SrcRef {
+        if self.0.is_empty() {
+            SrcRef(None)
+        } else {
+            SrcRef::merge(
+                &self.0.first().expect("One element").src_ref(),
+                &self.0.last().expect("Second element").src_ref(),
+            )
+        }
     }
 }

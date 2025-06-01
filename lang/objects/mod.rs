@@ -46,13 +46,20 @@ pub enum ObjectNodeInner {
 }
 
 impl ObjectNodeInner {
-    /// Get a property from an object node
+    /// Get a property from an object node.
     ///
     /// Only object nodes can have properties.
     pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
         match self {
             Self::Object(object) => object.get_property_value(id),
             _ => None,
+        }
+    }
+
+    /// Assign object attributes.
+    pub fn assign_object_attributes(&mut self, attributes: &mut ObjectAttributes) {
+        if let Self::Object(object) = self {
+            object.assign_object_attributes(attributes)
         }
     }
 }

@@ -12,9 +12,10 @@ impl ModuleInitDefinition {
         context: &mut Context,
     ) -> EvalResult<()> {
         context.scope(StackFrame::ModuleInit(args.into()), |context| {
-            for statement in &self.body.statements {
+            for statement in self.body.statements.iter() {
                 match statement {
                     Statement::Assignment(assignment) => {
+                        let assignment = &assignment.assignment;
                         let id = &assignment.id;
                         let value = assignment.expression.eval(context)?;
 

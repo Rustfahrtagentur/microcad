@@ -13,6 +13,9 @@ pub enum AttributeError {
 
     #[error("Type `{0}` expected for attribute `{1}`")]
     TypeExpected(Type, QualifiedName),
+
+    #[error("Cannot assign attribute to expression `{0}`")]
+    CannotAssignToExpression(Expression),
 }
 
 impl Attribute {

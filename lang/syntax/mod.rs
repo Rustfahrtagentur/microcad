@@ -5,6 +5,7 @@
 //!
 //! Every element in the µcad language are parsed into definitions in this module.
 
+pub mod assignment;
 pub mod attribute;
 pub mod body;
 pub mod call;
@@ -21,6 +22,7 @@ pub mod source_file;
 pub mod statement;
 pub mod r#use;
 
+pub use assignment::*;
 pub use attribute::*;
 pub use body::*;
 pub use call::*;

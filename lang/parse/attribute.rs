@@ -25,17 +25,17 @@ impl Parse for Attribute {
 
 impl Parse for AttributeList {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut attribute_list = AttributeList(vec![]);
+        let mut attribute_list = AttributeList::default();
 
         match pair.as_rule() {
             Rule::attribute_item => {
                 for pair in pair.inner() {
                     attribute_list.push(Attribute::parse(pair)?);
                 }
-
-                Ok(attribute_list)
             }
             _ => unreachable!("No attribute list"),
         }
+
+        Ok(attribute_list)
     }
 }

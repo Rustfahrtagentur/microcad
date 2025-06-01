@@ -20,6 +20,7 @@
 //!
 //! To "run" the source file (and get the expected output) it must now be resolved and evaluated (see [`crate::resolve`] and [`crate::eval`])  .
 
+mod attribute;
 mod body;
 mod call;
 mod expression;
