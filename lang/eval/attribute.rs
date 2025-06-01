@@ -36,6 +36,11 @@ impl Attribute {
             use crate::builtin::*;
 
             match self {
+                Attribute::Tag(tag) => {
+                    if let Some(id) = tag.single_identifier() {
+                        return attributes::tag(id);
+                    }
+                }
                 Attribute::Call(call) => {
                     let arguments = call.argument_list.eval(context)?;
 
@@ -52,7 +57,6 @@ impl Attribute {
                     }
                     _ => {}
                 },
-                _ => {}
             }
         }
 

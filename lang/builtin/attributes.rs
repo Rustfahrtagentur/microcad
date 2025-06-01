@@ -5,6 +5,14 @@
 
 use crate::{diag::*, eval::*, objects::*, syntax::*, ty::*, value::*};
 
+/// Create built-in tag attribute.
+pub fn tag(id: &Identifier) -> EvalResult<Option<ObjectAttribute>> {
+    match id.id().as_str() {
+        "aux" => Ok(Some(ObjectAttribute::Aux)),
+        _ => Ok(None),
+    }
+}
+
 /// Built-in export attribute: `#export("filename.svg")`.
 pub fn export(
     arguments: &CallArgumentValueList,
