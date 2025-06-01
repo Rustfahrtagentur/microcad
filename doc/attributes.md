@@ -85,6 +85,10 @@ The following statements can have attributes:
   ```µcad,attributes_assignment
   #[color = "blue"] 
   rect = std::geo2d::rect(2mm);
+
+  // Assign color of `rect` to `circle`
+  #[color = rect.color]
+  circle = std::geo2d::circle(2mm);
   ```
 
 * *module definition*: Add an attribute to all nodes created by this module definition. 
