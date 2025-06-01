@@ -106,8 +106,10 @@ Attributes can capture variables that are part of the current scope:
 
 ```µcad,attributes_capture
 id = 32;
-#[layer_id = id]
+#[layer = id]
 rect = std::geo2d::rect(3.0mm);
+
+std::debug::assert(rect.layer == id);
 ```
 
 The means you can parametrise attributes in modules:

@@ -1,6 +1,0 @@
-warning: Unknown attribute: layer_id
-  ---> <from_str>:2:3
-     |
-   2 | #[layer_id = id]
-     |   ^^^^^^^^
-     |
