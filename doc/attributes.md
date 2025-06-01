@@ -1,6 +1,6 @@
 # Attributes
 
-Attributes are built-in syntax elements to enrich statements with additional information or act as instructions to the µcad interpreter.
+Attributes are built-in syntax elements to enrich statements with additional information or to pass instructions to the µcad interpreter.
 For example, you can attach metadata like a part id to an object node:
 
 ```µcad,attributes_part_id
@@ -12,6 +12,7 @@ std::debug::assert(cube.part_id == 42);
 ```
 
 In the example above, we attach the part id `42` to the cube and access the part id value.
+For example, the part id can later used to identify instances of the same object or to generate a bill of materials.
 
 Syntactically, an attribute consists of `#` prefix and an attribute item.
 An attribute item can be a *tag*, a *name-value* pair or a *call*.
@@ -20,7 +21,7 @@ This results in three types of attributes: *tag attributes*, *name-value attribu
 ## Tag attributes
 
 Tag attributes assign a tag to a statement.
-The following example with assign a tag `aux` to a circle:
+The following example will assign a tag with name `aux` to a circle:
 
 ```µcad,attributes_tag
 #[aux]
@@ -34,8 +35,7 @@ Currently, only `aux` is available as built-in tag attribute.
 ## Name-value attributes
 
 Name-value attributes attach an object node with metadata as a key value list. 
-There can be multiple attributes:
-attribute = { "#[" ~ attribute_item ~ ws* ~ ("," ~ ws* ~ attribute_item ~ ws*)* ~ "]" }
+There can be multiple attributes.
 
 ```µcad,attributes_name_value
 // Assign the sphere to `layer_a` and assign blue as color 
