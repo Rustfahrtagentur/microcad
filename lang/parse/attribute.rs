@@ -25,15 +25,19 @@ impl Parse for Attribute {
 
 impl Parse for AttributeList {
     fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rule(&pair, Rule::attribute_list);
+
         let mut attribute_list = AttributeList::default();
 
-        match pair.as_rule() {
-            Rule::attribute_item => {
-                for pair in pair.inner() {
-                    attribute_list.push(Attribute::parse(pair)?);
+        for pair in pair.inner() {
+            match pair.as_rule() {
+                Rule::attribute => {
+                    for pair in pair.inner() {
+                        attribute_list.push(Attribute::parse(pair)?);
+                    }
                 }
+                rule => unreachable!("Unexpected element {rule:?}"),
             }
-            _ => unreachable!("No attribute list"),
         }
 
         Ok(attribute_list)
