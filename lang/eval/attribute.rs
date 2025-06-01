@@ -5,15 +5,18 @@ use crate::{eval::*, objects::*, syntax::*};
 
 use thiserror::Error;
 
+/// Error type for attributes.
 #[derive(Debug, Error)]
-
 pub enum AttributeError {
+    /// Unknown attribute.
     #[error("Unknown attribute: {0}")]
     Unknown(QualifiedName),
 
-    #[error("Type `{0}` expected for attribute `{1}`")]
-    TypeExpected(Type, QualifiedName),
+    /// The attribute expected a different type.
+    #[error("Expected one of types `{0}` for attribute `{1}`, got {2}")]
+    ExpectedType(TypeList, QualifiedName, Type),
 
+    /// Attribute cannot be assigned to an expression.
     #[error("Cannot assign attribute to expression `{0}`")]
     CannotAssignToExpression(Expression),
 }
@@ -30,17 +33,22 @@ impl Attribute {
         if let Some(id) = qualified_name.single_identifier() {
             let str = id.id().as_str();
 
+            use crate::builtin::*;
+
             match self {
                 Attribute::Call(call) => {
                     let arguments = call.argument_list.eval(context)?;
 
                     if str == "export" {
-                        return crate::builtin::attributes::export(&arguments, context);
+                        return attributes::export(&arguments, context);
                     }
                 }
                 Attribute::NameValue(_, expression) => match str {
                     "color" | "stroke_color" | "fill_color" => {
-                        return crate::builtin::attributes::color(id, expression, context);
+                        return attributes::color(id, expression, context);
+                    }
+                    "part_id" | "layer" => {
+                        return attributes::name_id(id, expression, context);
                     }
                     _ => {}
                 },

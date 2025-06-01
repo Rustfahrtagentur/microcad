@@ -50,6 +50,7 @@ mod tuple;
 mod r#use;
 
 pub use argument_map::*;
+pub use attribute::*;
 pub use builtin::*;
 pub use call::*;
 pub use context::*;

@@ -3,8 +3,6 @@
 
 use crate::{eval::*, objects::*};
 
-use super::attribute::AttributeError;
-
 impl Eval for ListExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let value_list = ValueList::new(
@@ -49,6 +47,7 @@ impl Expression {
                 }
                 Ok(Value::NodeMultiplicity(nodes))
             }
+            Value::None => Ok(Value::None),
             _ => {
                 if !attribute_list.is_empty() {
                     context.error(

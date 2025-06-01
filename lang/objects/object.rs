@@ -28,6 +28,13 @@ impl Object {
     pub fn assign_object_attributes(&mut self, attributes: &mut ObjectAttributes) {
         self.attributes.merge(attributes);
     }
+
+    /// Get value for name-value attribute with `id`.
+    pub(crate) fn get_attribute_value(&self, id: &Identifier) -> Option<Value> {
+        self.attributes
+            .get_by_id(id)
+            .map(|attribute| attribute.value())
+    }
 }
 
 impl std::fmt::Display for Object {

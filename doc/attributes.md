@@ -41,7 +41,7 @@ attribute = { "#[" ~ attribute_item ~ ws* ~ ("," ~ ws* ~ attribute_item ~ ws*)* 
 // Assign the sphere to `layer_a` and assign blue as color 
 #[layer = "layer_a"]
 #[color = "blue"]
-std::geo2d::sphere(r = 4.0mm);
+std::geo3d::sphere(r = 4.0mm);
 ```
 
 The following built-in name-value attributes are available:

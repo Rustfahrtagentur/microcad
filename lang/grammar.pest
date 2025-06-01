@@ -421,7 +421,7 @@ body_else = { body }
 //`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function
 //`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
 //`module donut(radius) { }`: error # Module property must have type annotations
-module_definition = { "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
+module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
 //`{ translate() rotate(); }`: ok
 //`{}`: ok # Empty body

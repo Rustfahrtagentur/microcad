@@ -3,7 +3,7 @@
 
 //! Object attributes module
 //!
-use crate::syntax::*;
+use crate::{syntax::*, value::*};
 use microcad_core::ExportSettings;
 
 /// A single object attribute.
@@ -15,15 +15,32 @@ pub enum ObjectAttribute {
     Color(Identifier, Color),
     /// An export attribute, e.g. from `#export("filename.svg")` or `node.export("filename.svg")`.
     Export(ExportSettings),
+    /// Part id
+    PartId(Value),
+    /// Layer id
+    Layer(Value),
 }
 
 impl ObjectAttribute {
-    /// Return id of this object attribute.
+    /// Return id (name) of this object attribute.
     pub fn id(&self) -> Identifier {
         match self {
             ObjectAttribute::Aux => Identifier::no_ref("aux"),
             ObjectAttribute::Color(identifier, _) => identifier.clone(),
             ObjectAttribute::Export(_) => Identifier::no_ref("export"),
+            ObjectAttribute::Layer(_) => Identifier::no_ref("layer"),
+            ObjectAttribute::PartId(_) => Identifier::no_ref("part_id"),
+        }
+    }
+
+    /// Return the value of this object attribute.
+    ///
+    /// Tag and call attributes like [ObjectAttribute::Aux] will return [Value::None].
+    pub fn value(&self) -> Value {
+        match self {
+            ObjectAttribute::Color(_, color) => Value::Color(*color),
+            ObjectAttribute::PartId(value) | ObjectAttribute::Layer(value) => value.clone(),
+            _ => Value::None,
         }
     }
 }
@@ -40,6 +57,11 @@ impl ObjectAttributes {
     /// * Decide whether attributes from `self` are updated by `other` or kept.
     pub fn merge(&mut self, other: &mut ObjectAttributes) {
         self.0.append(&mut other.0);
+    }
+
+    /// Get attribute by id
+    pub fn get_by_id(&self, id: &Identifier) -> Option<&ObjectAttribute> {
+        self.0.iter().find(|attr| &attr.id() == id)
     }
 }
 

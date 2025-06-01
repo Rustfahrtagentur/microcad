@@ -3,14 +3,7 @@
 
 //! Export builtin attribute.
 
-use crate::{
-    diag::*,
-    eval::*,
-    objects::*,
-    syntax::{Expression, Identifier},
-    ty::*,
-    value::*,
-};
+use crate::{diag::*, eval::*, objects::*, syntax::*, ty::*, value::*};
 
 /// Built-in export attribute: `#export("filename.svg")`.
 pub fn export(
@@ -30,7 +23,7 @@ pub fn export(
     }
 }
 
-/// Built-in color attribute: #[color = "blue", fill_color = "#00FF00"]
+/// Built-in color attribute: `#[color = "blue", fill_color = "#00FF00"]`.
 pub fn color(
     id: &Identifier,
     expression: &Expression,
@@ -42,5 +35,37 @@ pub fn color(
             context.error(expression, err)?;
             Ok(None)
         }
+    }
+}
+
+/// A name value attribute, like `#[part_id = 2]`, `#[layer = "layer"]`.
+pub fn name_id(
+    id: &Identifier,
+    expression: &Expression,
+    context: &mut Context,
+) -> EvalResult<Option<ObjectAttribute>> {
+    let value = expression.eval(context)?;
+    let id_str = id.id().as_str();
+
+    match id_str {
+        "layer" | "part_id" => match value {
+            Value::Integer(_) | Value::String(_) => match id_str {
+                "part_id" => Ok(Some(ObjectAttribute::PartId(value))),
+                "layer" => Ok(Some(ObjectAttribute::Layer(value))),
+                _ => Ok(None),
+            },
+            _ => {
+                context.error(
+                    expression,
+                    AttributeError::ExpectedType(
+                        TypeList::new(vec![Type::Integer, Type::String]),
+                        QualifiedName::from_id(id.clone()),
+                        value.ty(),
+                    ),
+                )?;
+                Ok(None)
+            }
+        },
+        _ => Ok(None),
     }
 }

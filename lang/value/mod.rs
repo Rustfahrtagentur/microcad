@@ -139,7 +139,7 @@ impl Value {
                 _ => None,
             },
             Value::NamedTuple(named_tuple) => named_tuple.get(identifier).cloned(),
-            Value::Node(node) => node.borrow().get_property_value(identifier).cloned(),
+            Value::Node(node) => node.borrow().get_property_value(identifier),
             _ => None,
         }
     }
@@ -205,6 +205,17 @@ impl Value {
         }
 
         Err(ValueError::CannotConvert(self.clone(), "Color".into()))
+    }
+
+    /// Try to convert to [String].
+    pub fn try_string(&self) -> Result<String, ValueError> {
+        match self {
+            Value::String(s) => return Ok(s.clone()),
+            Value::Integer(i) => return Ok(i.to_string()),
+            _ => {}
+        }
+
+        Err(ValueError::CannotConvert(self.clone(), "String".into()))
     }
 }
 

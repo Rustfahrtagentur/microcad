@@ -49,9 +49,12 @@ impl ObjectNodeInner {
     /// Get a property from an object node.
     ///
     /// Only object nodes can have properties.
-    pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
+    pub fn get_property_value(&self, id: &Identifier) -> Option<Value> {
         match self {
-            Self::Object(object) => object.get_property_value(id),
+            Self::Object(object) => object
+                .get_property_value(id)
+                .cloned()
+                .or(object.get_attribute_value(id)),
             _ => None,
         }
     }
