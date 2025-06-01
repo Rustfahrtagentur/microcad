@@ -303,7 +303,7 @@ expression_no_semicolon = { nested_with_body }
 expression_statement = { (attribute_list ~ ws+)? ~ (expression ~ ws* ~ ";" | expression_no_semicolon ~ (ws* ~ ";")? ) }
 
 // A statement that is a single expression, with optional semicolon
-final_expression_statement = { (attribute_list ~ ws+)? ~ nested_with_body ~ (ws* ~ ";")? }
+final_expression_statement = { (attribute_list ~ ws+)? ~ expression_no_semicolon ~ (ws* ~ ";")? }
 
 
 //`1..4`: ok
@@ -451,7 +451,7 @@ statement = {
   expression_statement
 }
 
-statement_list = { (statement ~ ws*)* ~ final_expression_statement? }
+statement_list = { final_expression_statement | (statement ~ ws*)* ~ final_expression_statement? }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 //`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function

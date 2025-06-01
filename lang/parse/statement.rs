@@ -121,7 +121,10 @@ impl Parse for StatementList {
 
         for pair in pair.inner() {
             match pair.as_rule() {
-                Rule::final_expression_statement | Rule::statement => {
+                Rule::final_expression_statement => {
+                    statements.push(Statement::Expression(ExpressionStatement::parse(pair)?));
+                }
+                Rule::statement => {
                     statements.push(Statement::parse(pair)?);
                 }
                 _ => {}
