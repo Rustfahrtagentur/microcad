@@ -1,6 +1,0 @@
-Parser error:  --> 2:9
-  |
-2 |   module my_part() { 
-  |         ^---
-  |
-  = expected identifier_part
