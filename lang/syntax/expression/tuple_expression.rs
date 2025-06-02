@@ -14,7 +14,7 @@ pub struct TupleExpression {
     /// List of tuple members
     pub args: ArgumentList,
     /// Common unit
-    pub unit: Option<Unit>,
+    pub unit: Unit,
     /// `true` if this is a named tuple
     pub is_named: bool,
     /// Source code reference
@@ -46,8 +46,8 @@ impl std::fmt::Display for TupleExpression {
                 .collect::<Vec<String>>()
                 .join(", ")
         )?;
-        if let Some(unit) = self.unit {
-            write!(f, "{}", unit)?;
+        if !matches!(self.unit, Unit::None) {
+            write!(f, "{}", self.unit)?;
         }
         Ok(())
     }

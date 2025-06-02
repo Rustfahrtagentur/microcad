@@ -8,21 +8,29 @@ use crate::builtin_namespace;
 use microcad_lang::{diag::*, eval::*, resolve::*, syntax::*, value::*};
 
 pub fn assert() -> Symbol {
-    let id = Identifier::from_str("assert").expect("valid id");
+    let id = Identifier::no_ref("assert");
     Symbol::new_builtin(id, &|args, context| {
-        if let Ok(arg) = args.get_single() {
-            if !arg.value.try_bool()? {
-                context.error(arg, EvalError::AssertionFailed(format!("{arg}")))?;
+        match args.len() {
+            // assert(false)
+            1 => {
+                if let Ok(arg) = args.get_single() {
+                    if !arg.value.try_bool()? {
+                        context.error(arg, EvalError::AssertionFailed(format!("{arg}")))?;
+                    }
+                }
             }
-        } else {
-            context.error(
-                args,
-                EvalError::ArgumentCountMismatch {
-                    args: args.clone(),
-                    expected: 1,
-                    found: args.len(),
-                },
-            )?;
+            // assert(false, "A message that is shown when assertion failed")
+            2 => {
+                let (assertion, message) = (&args[0], &args[1].value);
+                if !assertion.value.try_bool()? {
+                    context.error(
+                        args,
+                        EvalError::AssertionFailed(format!("{assertion}: {message}")),
+                    )?;
+                }
+            }
+            // Called `assert` with no or more than 2 parameters
+            _ => context.error(args, EvalError::AssertWrongSignature(args.clone()))?,
         }
         Ok(Value::None)
     })

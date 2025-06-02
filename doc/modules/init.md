@@ -127,12 +127,9 @@ parameters and some *pre-initialization code*:
 
 ```µcad,init_call_implicit_explicit
 // module with implicit initializer
-module m( area: (width: Length, height: Length) ) {
-  // pre-initialization code
-  default_width = 2m;
-
-  // explicit initializer
-  init( height: Length) { area = ( width = default_width, height); }
+module m(area: (width: Length, height: Length) ) {
+  // explicit initializer by height
+  init(height: Length) { area = (width = 2m, height = height); }
 }
 
 // call implicit initializer

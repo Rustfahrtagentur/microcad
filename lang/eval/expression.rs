@@ -5,16 +5,13 @@ use crate::{eval::*, objects::*};
 
 impl Eval for ListExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        let mut value_list = ValueList::new(
+        let value_list = ValueList::new(
             self.list
                 .iter()
                 .map(|expr| expr.eval(context))
                 .collect::<Result<_, _>>()?,
-        );
-
-        if let Some(unit) = self.unit {
-            value_list.add_unit_to_unitless(unit)?;
-        }
+        )
+        .bundle_unit(self.unit)?;
 
         match value_list.types().common_type() {
             Some(common_type) => Ok(Value::List(List::new(value_list, common_type))),
@@ -24,6 +21,41 @@ impl Eval for ListExpression {
                     EvalError::ListElementsDifferentTypes(value_list.types()),
                 )?;
                 Ok(Value::None)
+            }
+        }
+    }
+}
+
+impl Expression {
+    /// Evaluate an expression together with an attribute list.
+    ///
+    /// The attribute list will be also evaluated and the resulting attributes
+    /// will be assigned to the resulting value.
+    pub fn eval_with_attribute_list(
+        &self,
+        attribute_list: &AttributeList,
+        context: &mut Context,
+    ) -> EvalResult<Value> {
+        let value = self.eval(context)?;
+        match &value {
+            Value::Node(_) | Value::NodeMultiplicity(_) => {
+                let nodes = value.fetch_nodes();
+                let object_attributes = attribute_list.eval_to_object_attributes(context)?;
+                for node in &nodes {
+                    node.borrow_mut()
+                        .assign_object_attributes(&mut object_attributes.clone())
+                }
+                Ok(Value::NodeMultiplicity(nodes))
+            }
+            Value::None => Ok(Value::None),
+            _ => {
+                if !attribute_list.is_empty() {
+                    context.error(
+                        attribute_list,
+                        AttributeError::CannotAssignToExpression(self.clone()),
+                    )?;
+                }
+                Ok(value)
             }
         }
     }
@@ -140,9 +172,9 @@ impl Eval for NestedItem {
         match &self {
             NestedItem::Call(call) => Ok(call.eval(context)?),
             NestedItem::QualifiedName(name) => match &context.lookup(name)?.borrow().def {
-                SymbolDefinition::Constant(_, value)
-                | SymbolDefinition::CallArgument(_, value)
-                | SymbolDefinition::Property(_, value) => Ok(value.clone()),
+                SymbolDefinition::Constant(_, value) | SymbolDefinition::CallArgument(_, value) => {
+                    Ok(value.clone())
+                }
                 SymbolDefinition::Namespace(ns) => {
                     Err(EvalError::UnexpectedNested("namespace", ns.id.clone()))
                 }

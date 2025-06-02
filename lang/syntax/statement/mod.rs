@@ -5,15 +5,19 @@
 
 use crate::{rc::*, src_ref::*, syntax::*};
 
-mod assignment;
+mod assignment_statement;
+mod expression_statement;
 mod if_statement;
 mod marker_statement;
 mod return_statement;
+mod statement_list;
 
-pub use assignment::*;
+pub use assignment_statement::*;
+pub use expression_statement::*;
 pub use if_statement::*;
 pub use marker_statement::*;
 pub use return_statement::*;
+pub use statement_list::*;
 
 /// Module statement
 #[derive(Clone, Debug, strum::IntoStaticStr)]
@@ -36,10 +40,10 @@ pub enum Statement {
     /// Marker statement
     Marker(Marker),
 
-    /// Assignment
-    Assignment(Assignment),
-    /// Expression
-    Expression(Expression),
+    /// Assignment statement.
+    Assignment(AssignmentStatement),
+    /// Expression statement.
+    Expression(ExpressionStatement),
 }
 
 impl SrcReferrer for Statement {
@@ -82,8 +86,8 @@ impl std::fmt::Display for Statement {
             Self::If(i) => write!(f, "{i}"),
             Self::Marker(m) => write!(f, "{m};"),
 
-            Self::Assignment(a) => write!(f, "{a};"),
-            Self::Expression(e) => write!(f, "{e};"),
+            Self::Assignment(a) => write!(f, "{a}"),
+            Self::Expression(e) => write!(f, "{e}"),
         }
     }
 }

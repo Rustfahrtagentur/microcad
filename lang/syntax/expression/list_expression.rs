@@ -10,8 +10,8 @@ use crate::{src_ref::*, syntax::*};
 pub struct ListExpression {
     /// Expression list
     pub list: ExpressionList,
-    /// Optional unit
-    pub unit: Option<Unit>,
+    /// Unit
+    pub unit: Unit,
     /// Source code reference
     pub src_ref: SrcRef,
 }
@@ -46,19 +46,15 @@ impl std::fmt::Display for ListExpression {
                 .map(|c| c.to_string())
                 .collect::<Vec<String>>()
                 .join(", "),
-            if let Some(unit) = self.unit {
-                unit.to_string()
-            } else {
-                String::new()
-            }
+            self.unit
         )
     }
 }
 
 impl PrintSyntax for ListExpression {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        if let Some(unit) = self.unit {
-            writeln!(f, "{:depth$}ListExpression {unit}:", "")?
+        if !matches!(self.unit, Unit::None) {
+            writeln!(f, "{:depth$}ListExpression {unit}:", "", unit = self.unit)?
         } else {
             writeln!(f, "{:depth$}ListExpression:", "")?
         }

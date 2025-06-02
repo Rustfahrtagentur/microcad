@@ -1,1 +1,1 @@
-error: Argument count mismatch: expected 1, got 2 in false, this assertion fails
+error: Assertion failed: false: this assertion fails

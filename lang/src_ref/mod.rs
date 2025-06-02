@@ -140,7 +140,6 @@ impl SrcRef {
     /// - ranges not in correct order (warning in log),
     /// - references are not in the same file (warning in log),
     /// - or `lhs` and `rhs` are both `None`.
-    #[cfg(test)]
     pub fn merge(lhs: &impl SrcReferrer, rhs: &impl SrcReferrer) -> SrcRef {
         match (lhs.src_ref(), rhs.src_ref()) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => {

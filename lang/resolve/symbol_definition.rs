@@ -22,8 +22,6 @@ pub enum SymbolDefinition {
     Constant(Identifier, Value),
     /// Call argument value.
     CallArgument(Identifier, Value),
-    /// Property.
-    Property(Identifier, Value),
     /// Alias of a pub use statement.
     Alias(Identifier, QualifiedName),
 }
@@ -37,10 +35,7 @@ impl SymbolDefinition {
             Self::Function(f) => f.id.clone(),
             Self::SourceFile(s) => s.id(),
             Self::Builtin(m) => m.id(),
-            Self::Constant(id, _)
-            | Self::CallArgument(id, _)
-            | Self::Property(id, _)
-            | Self::Alias(id, _) => id.clone(),
+            Self::Constant(id, _) | Self::CallArgument(id, _) | Self::Alias(id, _) => id.clone(),
         }
     }
 
@@ -70,7 +65,6 @@ impl std::fmt::Display for SymbolDefinition {
             Self::Builtin(_) => write!(f, "(builtin)"),
             Self::Constant(_, value) => write!(f, "(constant) = {value}"),
             Self::CallArgument(_, value) => write!(f, "(call_argument) = {value}"),
-            Self::Property(_, value) => write!(f, "(object_property) = {value}"),
             Self::Alias(_, name) => write!(f, "(alias) => {name}"),
         }
     }

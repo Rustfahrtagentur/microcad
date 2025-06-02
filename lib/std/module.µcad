@@ -10,3 +10,10 @@ namespace debug {
 
 pub use transform::translate;
 pub use transform::rotate;
+
+/// Export helper module.
+module export(filename: String) {
+    #[export(filename)] {
+        @children
+    }
+}

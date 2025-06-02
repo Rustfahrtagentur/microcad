@@ -12,6 +12,7 @@
 //!
 //! The grammar of µcad can be found [here](../../../lang/grammar.pest).
 
+pub mod builtin;
 pub mod diag;
 pub mod eval;
 pub mod objects;

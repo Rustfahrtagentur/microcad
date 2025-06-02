@@ -26,11 +26,6 @@ pub trait Exporter {
     fn export(&mut self, node: ObjectNode) -> Result<(), CoreError>;
 }
 
-/// Short cut to create an export node
-pub fn export(export_settings: ExportSettings) -> ObjectNode {
-    ObjectNode::new(ObjectNodeInner::Export(export_settings))
-}
-
 /// The `ExporterFactory` creates a new exporter based on the file extension and the export settings
 type ExporterFactory = fn(&ExportSettings) -> CoreResult<Box<dyn Exporter>>;
 

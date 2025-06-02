@@ -10,9 +10,9 @@ use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 pub struct SourceFile {
     /// Qualified name of the file if loaded from externals
     pub name: QualifiedName,
-    /// Root code body
-    pub body: Vec<Statement>,
-    /// Name of loaded file
+    /// Root code body.
+    pub statements: StatementList,
+    /// Name of loaded file.
     pub filename: std::path::PathBuf,
     /// Source file string, TODO: might be a &'a str in the future
     pub source: String,
@@ -70,14 +70,14 @@ impl SourceFile {
         let name = self.filename_as_str();
         log::debug!("Resolving source file {name}");
         let node = Symbol::new(SymbolDefinition::SourceFile(self.clone()), parent);
-        node.borrow_mut().children = Body::fetch_symbol_map(&self.body, Some(node.clone()));
+        node.borrow_mut().children = self.statements.fetch_symbol_map(Some(node.clone()));
         log::trace!("Resolved source file {name}:\n{node}");
         node
     }
 }
 impl std::fmt::Display for SourceFile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.body.iter().try_for_each(|s| writeln!(f, "{s}"))
+        self.statements.iter().try_for_each(|s| writeln!(f, "{s}"))
     }
 }
 
@@ -90,7 +90,7 @@ impl PrintSyntax for SourceFile {
             self.id(),
             self.filename_as_str()
         )?;
-        self.body
+        self.statements
             .iter()
             .try_for_each(|s| s.print_syntax(f, depth + 1))
     }
@@ -120,7 +120,7 @@ fn load_source_file() {
 
     let source_file = source_file.expect("test error");
 
-    let first_statement = source_file.body.first().expect("test error");
+    let first_statement = source_file.statements.first().expect("test error");
     match first_statement {
         Statement::Use(u) => {
             use crate::src_ref::SrcReferrer;

@@ -35,12 +35,14 @@ impl ModuleDefinition {
         init: Option<&'a ModuleInitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ObjectNode> {
-        let mut object_builder = ObjectBuilder::new();
+        let mut object_builder = ObjectBuilder::default();
 
         context.scope(
             StackFrame::Module(self.id.clone(), args.into()),
             |context| {
                 object_builder.init_properties(&self.parameters.eval(context)?, args);
+                object_builder
+                    .add_attributes(self.attribute_list.eval_to_object_attributes(context)?);
 
                 // Create the object node from initializer if present
                 if let Some(init) = init {
@@ -50,12 +52,10 @@ impl ModuleDefinition {
                 object_builder.properties_to_scope(context)?;
 
                 // At this point, all properties must have a value
-                for statement in &self.body.statements {
+                for statement in self.body.statements.iter() {
                     match statement {
                         Statement::Assignment(assignment) => {
-                            let id = &assignment.id;
-                            let value = assignment.expression.eval(context)?;
-                            context.set_local_value(id.clone(), value.clone())?;
+                            assignment.eval(context)?;
                         }
                         Statement::Expression(expression) => {
                             let value = expression.eval(context)?;

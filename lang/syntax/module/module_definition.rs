@@ -8,9 +8,11 @@ use crate::{src_ref::*, syntax::*};
 /// Module definition
 #[derive(Clone, Debug)]
 pub struct ModuleDefinition {
-    /// Module name
+    /// Module attributes.
+    pub attribute_list: AttributeList,
+    /// Module name.
     pub id: Identifier,
-    /// Module parameters (implicit initialization)
+    /// Module parameters (implicit initialization).
     pub parameters: ParameterList,
     /// Module body
     pub body: Body,

@@ -112,24 +112,15 @@ bool_literal = @{ "true" | "false" }
 
 unit = @{ ((alpha_lower)+ ~ ("²" | "³")?) | "°" | "%" | "\"" | "'" }
 
-//`#FFF`: ok # RGB, single hex
-//`#00FF00`: ok # RGB, double hex
-//`#FFFF`: ok # RGBA, single hex
-//`#00FF00FF`: ok # RGBA, double hex
-//`#00FF0`: error # No valid color
-color_literal = { "#" ~ (ASCII_HEX_DIGIT{8} | ASCII_HEX_DIGIT{6} | ASCII_HEX_DIGIT{4} | ASCII_HEX_DIGIT{3}) }
-
 //`1`: ok # Integer
 //`1mm`: ok # Number (Length)
 //`1.0mm`: ok # Number (Length)
 //`1.0`: ok # Scalar
 //`true`: ok # Boolean
-//`#00CCFF`: ok # Color
 literal = {
   number_literal |
   integer_literal |
-  bool_literal |
-  color_literal
+  bool_literal
 }
 
 //`a`: ok # Single identifier
@@ -308,8 +299,12 @@ expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 //`a b()`: error # No body at the end
 expression_no_semicolon = { nested_with_body }
 
-// A statement that is an single expression
-expression_statement = _{ expression_no_semicolon ~ (ws* ~ ";")? | expression ~ ws* ~ ";" }
+// A statement that is a single expression
+expression_statement = { (attribute_list ~ ws+)? ~ (expression ~ ws* ~ ";" | expression_no_semicolon ~ (ws* ~ ";")? ) }
+
+// A statement that is a single expression, with optional semicolon
+final_expression_statement = { (attribute_list ~ ws+)? ~ expression_no_semicolon ~ (ws* ~ ";")? }
+
 
 //`1..4`: ok
 //`a..b`: ok
@@ -340,9 +335,6 @@ call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* ~ ws* 
 
 call_op = _{ "(" ~ ws* ~ call_argument_list? ~ ws* ~ ")" }
 
-//`translate() rotate()`: ok
-nested_call = { call ~ (ws+ ~ call)* }
-
 //`.sum()`: ok
 method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 
@@ -351,11 +343,21 @@ method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 //`a::nested::f(a = 3.0mm, b = 2.0mm)`: ok
 call = { qualified_name ~ ws* ~ call_op }
 
-//`#foo`: ok
-//`#foo(x)`: ok
-tag = { "#" ~ qualified_name ~ call_op? }
+//`foo::bar()`: ok # Empty call 
+//`foo::bar(baz = 42)`: ok # Call
+//`foo = bar`: ok # Assignment
+//`foo`: ok # Simple tag
+//`foo::bar`: ok # Qualified name tag
+attribute_item = { qualified_name ~ ws* ~ "=" ~ ws* ~ expression | call | qualified_name }
 
-tag_list = _{ tag ~ (ws+ ~ tag)* }
+//`#foo`: ok # Simple tag
+//`#[foo, bar]`: ok # List of attributes
+//`#[bar = 42, foo = 32]`: ok # List of assignment attributes
+//`#[foo = 42, bar(32), baz]`: ok # List of mixed attributes
+attribute = { "#[" ~ attribute_item ~ ws* ~ ("," ~ ws* ~ attribute_item ~ ws*)* ~ "]" }
+
+//`#foo #bar`: ok # Multiple attributes
+attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
 //`r: Length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
@@ -365,7 +367,7 @@ tag_list = _{ tag ~ (ws+ ~ tag)* }
 //`pub r = 5.0mm`: Make value of assignment public
 assignment = { (visibility ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
 
-assignment_statement = _{ assignment ~ ws* ~ ";" }
+assignment_statement = { (attribute_list ~ ws+)? ~ assignment ~ ws* ~ ";" }
 
 //`@children`: ok
 marker_statement = { "@" ~ identifier }
@@ -413,18 +415,17 @@ body_else = { body }
 //`module foo() { }`: ok # Module with no properties
 //`module foo(a: scalar) { }`: ok # Module with properties
 //`module foo(a: scalar, b: scalar) { }`: ok # Module with multiple properties
-//`module foo() { return 5.0mm; }`: error # Module cannot have return statement
 //`module foo() { module bar() { } }`: ok # Nested module definition
 //`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`module list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Module with module as properties
 //`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function
 //`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
 //`module donut(radius) { }`: error # Module property must have type annotations
-module_definition = { "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
+module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
 //`{ translate() rotate(); }`: ok
 //`{}`: ok # Empty body
-body = { "{" ~ ws* ~ (statement ~ ws*)* ~ "}" }
+body = { "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
 
 //`init(d: Length) { r = d / 2; }`: ok
 //`init(size: Length) { size = size; }`: ok
@@ -450,6 +451,8 @@ statement = {
   expression_statement
 }
 
+statement_list = { final_expression_statement | (statement ~ ws*)* ~ final_expression_statement? }
+
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-//`module foo { init(size: Length) { rectangle(size); } }`: ok # Module with init function
-source_file = { SOI ~ ws* ~ (statement ~ ws*)* ~ EOI }
+//`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function
+source_file = { SOI ~ ws* ~ statement_list ~ ws* ~ EOI }

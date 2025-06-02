@@ -5,29 +5,11 @@ use crate::{parse::*, parser::*, rc::*, syntax::*};
 
 impl Parse for Rc<ModuleDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut name = Identifier::default();
-        let mut parameters = ParameterList::default();
-        let mut body = Body::default();
-
-        for pair in pair.inner() {
-            match pair.as_rule() {
-                Rule::identifier => {
-                    name = Identifier::parse(pair)?;
-                }
-                Rule::parameter_list => {
-                    parameters = ParameterList::parse(pair)?;
-                }
-                Rule::body => {
-                    body = Body::parse(pair.clone())?;
-                }
-                rule => unreachable!("Unexpected rule for module definition, got {:?}", rule),
-            }
-        }
-
         Ok(Rc::new(ModuleDefinition {
-            id: name,
-            parameters,
-            body,
+            attribute_list: pair.find(Rule::attribute_list).unwrap_or_default(),
+            id: pair.find(Rule::identifier).expect("Module id"),
+            parameters: pair.find(Rule::parameter_list).expect("Parameters"),
+            body: pair.find(Rule::body).expect("Module body"),
             src_ref: pair.into(),
         }))
     }

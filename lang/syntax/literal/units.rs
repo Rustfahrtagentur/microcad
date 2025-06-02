@@ -6,10 +6,11 @@
 use crate::ty::*;
 
 /// The units that can be used after numbers in the language"
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Unit {
     // Scalar
     /// No unit was given
+    #[default]
     None,
     /// Percents
     Percent,

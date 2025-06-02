@@ -138,11 +138,6 @@ impl Symbol {
         Symbol::new(SymbolDefinition::CallArgument(id, value), None)
     }
 
-    /// Create a new property ([`SymbolDefinition::Property`]).
-    pub fn new_property(id: Identifier, value: Value) -> Symbol {
-        Symbol::new(SymbolDefinition::Property(id, value), None)
-    }
-
     /// Print out symbols from that point.
     /// # Arguments
     /// - `f`: Output formatter
@@ -302,8 +297,7 @@ impl SrcReferrer for SymbolInner {
                 unreachable!("builtin has no source code reference")
             }
             SymbolDefinition::Constant(identifier, _)
-            | SymbolDefinition::CallArgument(identifier, _)
-            | SymbolDefinition::Property(identifier, _) => identifier.src_ref(),
+            | SymbolDefinition::CallArgument(identifier, _) => identifier.src_ref(),
             SymbolDefinition::Alias(identifier, _) => identifier.src_ref(),
         }
     }

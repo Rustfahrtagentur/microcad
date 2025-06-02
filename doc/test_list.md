@@ -3,15 +3,23 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**75** tests from markdown.
+**81** tests from markdown.
 
 | Result | Name |
 |-------:|------|
+| [![test](../doc/.test/attributes_assignment.png)](../doc/.test/attributes_assignment.log) | [attributes_assignment](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_call.png)](../doc/.test/attributes_call.log) | [attributes_call](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_capture.png)](../doc/.test/attributes_capture.log) | [attributes_capture](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_expression.png)](../doc/.test/attributes_expression.log) | [attributes_expression](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_module_definition.png)](../doc/.test/attributes_module_definition.log) | [attributes_module_definition](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_module_export.png)](../doc/.test/attributes_module_export.log) | [attributes_module_export](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_name_value.png)](../doc/.test/attributes_name_value.log) | [attributes_name_value](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_part.png)](../doc/.test/attributes_part.log) | [attributes_part](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_tag.png)](../doc/.test/attributes_tag.log) | [attributes_tag](../doc/attributes.md) |
 | [![test](../doc/std/algorithm/.test/difference_module.png)](../doc/std/algorithm/.test/difference_module.log) | [difference_module](../doc/std/algorithm/difference.md) |
 | [![test](../doc/std/algorithm/.test/difference_operator.png)](../doc/std/algorithm/.test/difference_operator.log) | [difference_operator](../doc/std/algorithm/difference.md) |
 | [![test](../doc/modules/.test/EXAMPLES_fields.png)](../doc/modules/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/modules/EXAMPLES.md) |
 | [![test](../doc/modules/.test/EXAMPLES_functions.png)](../doc/modules/.test/EXAMPLES_functions.log) | [EXAMPLES_functions](../doc/modules/EXAMPLES.md) |
-| [![test](../doc/std/.test/export_attribute.png)](../doc/std/.test/export_attribute.log) | [export_attribute](../doc/std/export.md) |
 | [![test](../doc/std/.test/export_multiple.png)](../doc/std/.test/export_multiple.log) | [export_multiple](../doc/std/export.md) |
 | [![test](../doc/std/.test/export_single.png)](../doc/std/.test/export_single.log) | [export_single](../doc/std/export.md) |
 | [![test](../doc/modules/.test/fields_torus.png)](../doc/modules/.test/fields_torus.log) | [fields_torus](../doc/modules/fields.md) |
@@ -56,10 +64,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/.test/types_primitive_angle.png)](../doc/.test/types_primitive_angle.log) | [types_primitive_angle](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_area.png)](../doc/.test/types_primitive_area.log) | [types_primitive_area](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_bool.png)](../doc/.test/types_primitive_bool.log) | [types_primitive_bool](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_color.png)](../doc/.test/types_primitive_color.log) | [types_primitive_color](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_integer.png)](../doc/.test/types_primitive_integer.log) | [types_primitive_integer](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_length.png)](../doc/.test/types_primitive_length.log) | [types_primitive_length](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_no_color.png)](../doc/.test/types_primitive_no_color.log) | [types_primitive_no_color](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_scalar.png)](../doc/.test/types_primitive_scalar.log) | [types_primitive_scalar](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_string.png)](../doc/.test/types_primitive_string.log) | [types_primitive_string](../doc/primitive_types.md) |
 | [![test](../doc/.test/types_primitive_vec2.png)](../doc/.test/types_primitive_vec2.log) | [types_primitive_vec2](../doc/primitive_types.md) |
@@ -68,9 +74,9 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/.test/types_primitive_weight.png)](../doc/.test/types_primitive_weight.log) | [types_primitive_weight](../doc/primitive_types.md) |
 | [![test](../doc/std/algorithm/.test/union_module.png)](../doc/std/algorithm/.test/union_module.log) | [union_module](../doc/std/algorithm/union.md) |
 | [![test](../doc/std/algorithm/.test/union_operator.png)](../doc/std/algorithm/.test/union_operator.log) | [union_operator](../doc/std/algorithm/union.md) |
+| [![test](../doc/.test/unit_bundle_list.png)](../doc/.test/unit_bundle_list.log) | [unit_bundle_list](../doc/unit_types.md) |
+| [![test](../doc/.test/unit_bundle_tuple.png)](../doc/.test/unit_bundle_tuple.log) | [unit_bundle_tuple](../doc/unit_types.md) |
 | [![test](../doc/.test/unit_types.png)](../doc/.test/unit_types.log) | [unit_types](../doc/unit_types.md) |
-| [![test](../doc/.test/unit_types_bundling_array.png)](../doc/.test/unit_types_bundling_array.log) | [unit_types_bundling_array](../doc/unit_types.md) |
-| [![test](../doc/.test/unit_types_bundling_tuple.png)](../doc/.test/unit_types_bundling_tuple.log) | [unit_types_bundling_tuple](../doc/unit_types.md) |
 | [![test](../doc/.test/unit_types_number_literals.png)](../doc/.test/unit_types_number_literals.log) | [unit_types_number_literals](../doc/unit_types.md) |
 | [![test](../doc/.test/use_statement.png)](../doc/.test/use_statement.log) | [use_statement](../doc/use_statement.md) |
 | [![test](../doc/.test/use_statement_all.png)](../doc/.test/use_statement_all.log) | [use_statement_all](../doc/use_statement.md) |

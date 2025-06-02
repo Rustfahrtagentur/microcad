@@ -7,10 +7,12 @@
 mod call_argument_value;
 mod call_argument;
 mod call_argument_value_list;
+mod call_method;
 mod call_trait;
 
 pub use call_argument_value::*;
 pub use call_argument_value_list::*;
+pub use call_method::*;
 pub use call_trait::*;
 
 use crate::{eval::*, syntax::*};

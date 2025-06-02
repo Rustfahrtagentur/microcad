@@ -28,6 +28,7 @@
 //! ```
 
 mod argument_map;
+mod attribute;
 mod body;
 mod builtin;
 mod call;
@@ -49,14 +50,15 @@ mod tuple;
 mod r#use;
 
 pub use argument_map::*;
+pub use attribute::*;
 pub use builtin::*;
 pub use call::*;
 pub use context::*;
 pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
-pub use r#use::*;
 pub use symbols::*;
+pub use r#use::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
@@ -67,16 +69,14 @@ pub trait Eval {
 }
 
 impl MethodCall {
-    /// Evaluate method call
-    fn eval(&self, context: &mut Context, _lhs: &Expression) -> EvalResult<Value> {
-        context.error(
-            self,
-            EvalError::Todo(format!(
-                "cannot evaluate method call of {} at {}",
-                self,
-                context.locate(self)?
-            )),
-        )?;
-        Ok(Value::None)
+    /// Evaluate method call.
+    ///
+    /// Examples:
+    /// ```microcad
+    /// assert([2.0, 2.0].all_equal(), "All elements in this list must be equal.");
+    /// ```
+    fn eval(&self, context: &mut Context, lhs: &Expression) -> EvalResult<Value> {
+        lhs.eval(context)?
+            .call_method(&self.id, &self.argument_list, context)
     }
 }

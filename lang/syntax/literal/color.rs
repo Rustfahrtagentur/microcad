@@ -17,9 +17,19 @@ pub struct Color {
 }
 
 impl Color {
-    /// Create new color
+    /// Create new color.
     pub fn new(r: f32, g: f32, b: f32, a: f32) -> Self {
         Self { r, g, b, a }
+    }
+
+    /// Create new color from RGBA values.
+    pub fn rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
+        Self::new(r, g, b, a)
+    }
+
+    /// Create new color from RGB values. Alpha is 1.0.
+    pub fn rgb(r: f32, g: f32, b: f32) -> Self {
+        Self::rgba(r, g, b, 1.0_f32)
     }
 }
 

@@ -199,6 +199,18 @@ impl PushDiag for Context {
     }
 }
 
+#[cfg(test)]
+impl Default for Context {
+    fn default() -> Self {
+        Context::new(
+            Symbol::new_source(SourceFile::load_from_str("").expect("Valid source file")),
+            Symbol::new_namespace("__builtin".into()),
+            &[],
+            Box::new(Stdout),
+        )
+    }
+}
+
 impl GetSourceByHash for Context {
     fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
         self.symbol_table.get_by_hash(hash)
