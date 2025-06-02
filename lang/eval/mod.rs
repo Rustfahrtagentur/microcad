@@ -76,7 +76,7 @@ impl MethodCall {
     /// assert([2.0, 2.0].all_equal(), "All elements in this list must be equal.");
     /// ```
     fn eval(&self, context: &mut Context, lhs: &Expression) -> EvalResult<Value> {
-        let value = lhs.eval(context)?;
-        value.call_method(&self.id, &self.argument_list, context)
+        lhs.eval(context)?
+            .call_method(&self.id, &self.argument_list, context)
     }
 }
