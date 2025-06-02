@@ -18,7 +18,7 @@ fn init() {
     env_logger::init();
 }
 
-pub use microcad_lang::builtin::namespace_builder::NamespaceBuilder;
+pub use microcad_lang::builtin::*;
 use microcad_lang::resolve::*;
 
 pub(crate) use algorithm::*;

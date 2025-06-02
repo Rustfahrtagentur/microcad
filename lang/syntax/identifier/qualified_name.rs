@@ -41,7 +41,7 @@ impl FromIterator<QualifiedName> for QualifiedNames {
 }
 
 impl QualifiedName {
-    /// Create [`QualifiedName`] from [Identifier]s.
+    /// Create [`QualifiedName`] from [`Identifier`]s.
     ///
     /// - `ids`: *Identifiers* that concatenate to the *qualified name*.
     /// - `src_ref`: Reference for the whole name.
@@ -49,7 +49,7 @@ impl QualifiedName {
         Self(Refer::new(ids, src_ref))
     }
 
-    /// Create [QualifiedName] from single [Identifier].
+    /// Create [`QualifiedName`] from single [`Identifier`].
     pub fn from_id(id: Identifier) -> Self {
         let src_ref = id.src_ref();
         Self(Refer::new(vec![id], src_ref))

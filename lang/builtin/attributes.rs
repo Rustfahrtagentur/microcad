@@ -46,7 +46,7 @@ pub fn color(
     }
 }
 
-/// A name value attribute, like `#[part_id = 2]`, `#[layer = "layer"]`.
+/// A name value attribute, like `#[part = 2]`, `#[layer = "layer"]`.
 pub fn name_id(
     id: &Identifier,
     expression: &Expression,
@@ -56,9 +56,9 @@ pub fn name_id(
     let id_str = id.id().as_str();
 
     match id_str {
-        "layer" | "part_id" => match value {
+        "layer" | "part" => match value {
             Value::Integer(_) | Value::String(_) => match id_str {
-                "part_id" => Ok(Some(ObjectAttribute::PartId(value))),
+                "part" => Ok(Some(ObjectAttribute::Part(value))),
                 "layer" => Ok(Some(ObjectAttribute::Layer(value))),
                 _ => Ok(None),
             },

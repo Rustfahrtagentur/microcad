@@ -52,7 +52,7 @@ impl Attribute {
                     "color" | "stroke_color" | "fill_color" => {
                         return attributes::color(id, expression, context);
                     }
-                    "part_id" | "layer" => {
+                    "part" | "layer" => {
                         return attributes::name_id(id, expression, context);
                     }
                     _ => {}

@@ -3,8 +3,7 @@
 
 //! Expression statement syntax elements
 
-use crate::src_ref::*;
-use crate::syntax::*;
+use crate::{src_ref::*, syntax::*};
 
 /// An assignment statement, e.g. `#[aux] s = sphere(3.0mm);`.
 #[derive(Debug, Clone)]

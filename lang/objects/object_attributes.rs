@@ -16,7 +16,7 @@ pub enum ObjectAttribute {
     /// An export attribute, e.g. from `#export("filename.svg")` or `node.export("filename.svg")`.
     Export(ExportSettings),
     /// Part id
-    PartId(Value),
+    Part(Value),
     /// Layer id
     Layer(Value),
 }
@@ -29,7 +29,7 @@ impl ObjectAttribute {
             ObjectAttribute::Color(identifier, _) => identifier.clone(),
             ObjectAttribute::Export(_) => Identifier::no_ref("export"),
             ObjectAttribute::Layer(_) => Identifier::no_ref("layer"),
-            ObjectAttribute::PartId(_) => Identifier::no_ref("part_id"),
+            ObjectAttribute::Part(_) => Identifier::no_ref("part"),
         }
     }
 
@@ -39,7 +39,7 @@ impl ObjectAttribute {
     pub fn value(&self) -> Value {
         match self {
             ObjectAttribute::Color(_, color) => Value::Color(*color),
-            ObjectAttribute::PartId(value) | ObjectAttribute::Layer(value) => value.clone(),
+            ObjectAttribute::Part(value) | ObjectAttribute::Layer(value) => value.clone(),
             _ => Value::None,
         }
     }

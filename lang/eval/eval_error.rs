@@ -89,6 +89,10 @@ pub enum EvalError {
         found: usize,
     },
 
+    /// Called assertion
+    #[error("assert called with wrong number of arguments.")]
+    AssertWrongSignature(CallArgumentValueList),
+
     /// Invalid argument type.
     #[error("Invalid argument type: {0}")]
     InvalidArgumentType(Type),
@@ -163,7 +167,7 @@ pub enum EvalError {
 
     /// Error when evaluating attributes.
     #[error("Attribute error: {0}")]
-    AttributeError(#[from] crate::eval::attribute::AttributeError),
+    AttributeError(#[from] AttributeError),
 }
 
 /// Result type of any evaluation.

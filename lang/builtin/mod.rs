@@ -6,3 +6,5 @@
 pub mod attributes;
 pub mod color;
 pub mod namespace_builder;
+
+pub use namespace_builder::*;

@@ -10,8 +10,8 @@ impl Eval for ListExpression {
                 .iter()
                 .map(|expr| expr.eval(context))
                 .collect::<Result<_, _>>()?,
-        );
-        let value_list = value_list.bundle_unit(self.unit)?;
+        )
+        .bundle_unit(self.unit)?;
 
         match value_list.types().common_type() {
             Some(common_type) => Ok(Value::List(List::new(value_list, common_type))),

@@ -21,6 +21,7 @@ impl ValueList {
         for value in self.0 {
             values.push(value.bundle_unit(unit)?);
         }
+
         Ok(Self(values))
     }
 

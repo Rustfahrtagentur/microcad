@@ -3,7 +3,7 @@
 
 //! Object builder module
 
-use {super::*, crate::eval::*};
+use crate::{eval::*, objects::*};
 
 /// Object builder to build up object nodes.
 #[derive(Default)]
@@ -13,13 +13,6 @@ pub struct ObjectBuilder {
 }
 
 impl ObjectBuilder {
-    /// Make new [ObjectBuilder].
-    pub fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
-    }
-
     /// Initialize the properties by parameters and arguments.
     pub fn init_properties(
         &mut self,
@@ -67,7 +60,7 @@ impl ObjectBuilder {
 
     /// Add all object properties to scope
     pub fn properties_to_scope(&mut self, context: &mut Context) -> EvalResult<()> {
-        if self.object.props.all_initialized() {
+        if self.object.props.is_valid() {
             for (id, value) in self.object.props.iter() {
                 context.set_local_value(id.clone(), value.clone())?;
             }

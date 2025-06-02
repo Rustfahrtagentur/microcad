@@ -35,7 +35,7 @@ impl ModuleDefinition {
         init: Option<&'a ModuleInitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ObjectNode> {
-        let mut object_builder = ObjectBuilder::new();
+        let mut object_builder = ObjectBuilder::default();
 
         context.scope(
             StackFrame::Module(self.id.clone(), args.into()),

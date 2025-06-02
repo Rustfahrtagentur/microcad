@@ -3,12 +3,12 @@
 Attributes are built-in syntax elements to enrich statements with additional information or to pass instructions to the µcad interpreter.
 For example, you can attach metadata like a part id to an object node:
 
-```µcad,attributes_part_id
-#[part_id = 42]
+```µcad,attributes_part
+#[part = 42]
 cube = std::geo3d::cube(4.0mm);
 
-// Access the part_id attribute like a property
-std::debug::assert(cube.part_id == 42);
+// Access the part id attribute like a property
+std::debug::assert(cube.part == 42);
 ```
 
 In the example above, we attach the part id `42` to the cube and access the part id value.
@@ -47,7 +47,7 @@ std::geo3d::sphere(r = 4.0mm);
 The following built-in name-value attributes are available:
 
 * `layer`: Assign the object and its children to a layer. This is useful to distinguish object nodes by layer.
-* `part_id`: Assign a part id to the object node. This is useful to map build a bill-of-materials.
+* `part`: Assign a part id to the object node. This is useful to map build a bill-of-materials.
 * `color`: Assign a color to the object, displayed in the viewer.
 
 ## Call attributes
@@ -96,12 +96,14 @@ The following statements can have attributes:
   For example, all instances created by this module have the part ID `MYPART`:
   
   ```µcad,attributes_module_definition
-  #[part_id = "MYPART"] 
+  PART = "A_CUSTOM_PART";
+
+  #[part = PART] 
   module my_part() { 
     std::geo2d::rect(2mm); 
   }
 
-  std::debug::assert(my_part().part_id == "MYPART");
+  std::debug::assert(my_part().part == PART);
   ```
 
 ### Variable capture

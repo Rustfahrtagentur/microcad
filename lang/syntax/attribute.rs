@@ -44,9 +44,8 @@ impl SrcReferrer for Attribute {
         match self {
             Attribute::Tag(qualified_name) => qualified_name.src_ref(),
             Attribute::Call(call) => call.src_ref(),
-            Attribute::NameValue(qualified_name, _expression) => {
-                // FIXME: This should return a merged src_ref of `qualified_name` and `expression`
-                qualified_name.src_ref()
+            Attribute::NameValue(qualified_name, expression) => {
+                SrcRef::merge(qualified_name, expression)
             }
         }
     }

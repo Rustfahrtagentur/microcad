@@ -31,12 +31,8 @@ A *module declaration* consists of...
 // define custom module circle with an implicit initializer
 module small_disc(diameter: Length) {
     // explicit initializers 
-    init(half_diameter: Length) {
-        diameter = half_diameter * 2.0;
-    }
-
-    init(double_diameter: Length) {
-        diameter = double_diameter / 2.0;
+    init(radius: Length) {
+        diameter = radius * 2.0;
     }
 
     // post-initialization code
@@ -44,9 +40,8 @@ module small_disc(diameter: Length) {
 }
 
 // call module
-small_disc( diameter = 1cm);
-small_disc( half_diameter = 1cm);
-small_disc( double_diameter = 1cm);
+std::debug::assert(small_disc(diameter = 1cm).diameter == 1cm);
+std::debug::assert(small_disc(radius = 1cm).diameter == 2cm);
 ```
 
 ### Pre-initialization code

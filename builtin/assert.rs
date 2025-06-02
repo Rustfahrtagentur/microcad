@@ -11,7 +11,7 @@ pub fn assert() -> Symbol {
     let id = Identifier::no_ref("assert");
     Symbol::new_builtin(id, &|args, context| {
         match args.len() {
-            // `assert(false)`
+            // assert(false)
             1 => {
                 if let Ok(arg) = args.get_single() {
                     if !arg.value.try_bool()? {
@@ -19,7 +19,7 @@ pub fn assert() -> Symbol {
                     }
                 }
             }
-            // `assert(false, "A message that is shown when assertion failed")`
+            // assert(false, "A message that is shown when assertion failed")
             2 => {
                 let (assertion, message) = (&args[0], &args[1].value);
                 if !assertion.value.try_bool()? {
@@ -30,16 +30,7 @@ pub fn assert() -> Symbol {
                 }
             }
             // Called `assert` with no or more than 2 parameters
-            _ => {
-                context.error(
-                    args,
-                    EvalError::ArgumentCountMismatch {
-                        args: args.clone(),
-                        expected: 1, // FIXME: The error should display
-                        found: args.len(),
-                    },
-                )?;
-            }
+            _ => context.error(args, EvalError::AssertWrongSignature(args.clone()))?,
         }
         Ok(Value::None)
     })
