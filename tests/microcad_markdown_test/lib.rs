@@ -325,7 +325,7 @@ fn create_test<'a>(
     let log = test_path.join(format!("{name}.log"));
 
     // maybe create .test directory
-    let _ = std::fs::create_dir(test_path);
+    let _ = std::fs::create_dir_all(test_path);
 
     // Early exit for "#no_test" and "#todo" suffixes
     if mode == Some("no_test") {
