@@ -10,9 +10,10 @@ A **µcad program** can be just a sequence of instructions or a more complex con
 separate **parts** and **functions** which may depend on each other via **use statements**.
 **Modules** help to bundle things into packages and solve naming collisions.
 
-* [Parts](parts/README.md)
-* [Use Statement](use_statement.md)
-* [Modules](modules.md)
+* [Modules](modules.md) bundle together parts, (sub)modules or use statements
+* [Parts](parts/README.md) create 2D or 3D objects
+* [Materials](materials.md) describe materials of objects
+* [Statements](statements.md) actual running code
 
 ## Data Types
 
