@@ -22,8 +22,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/parts/.test/EXAMPLES_functions.png)](../doc/parts/.test/EXAMPLES_functions.log) | [EXAMPLES_functions](../doc/parts/EXAMPLES.md) |
 | [![test](../doc/std/.test/export_multiple.png)](../doc/std/.test/export_multiple.log) | [export_multiple](../doc/std/export.md) |
 | [![test](../doc/std/.test/export_single.png)](../doc/std/.test/export_single.log) | [export_single](../doc/std/export.md) |
-| [![test](../doc/parts/.test/fields_torus.png)](../doc/parts/.test/fields_torus.log) | [fields_torus](../doc/parts/fields.md) |
-| [![test](../doc/parts/.test/fields_torus_fail.png)](../doc/parts/.test/fields_torus_fail.log) | [fields_torus_fail](../doc/parts/fields.md) |
 | [![test](../.test/first_example.png)](../.test/first_example.log) | [first_example](../README.md) |
 | [![test](../doc/parts/.test/functions_donut.png)](../doc/parts/.test/functions_donut.log) | [functions_donut](../doc/parts/functions.md) |
 | [![test](../doc/std/algorithm/.test/hull_multiple.png)](../doc/std/algorithm/.test/hull_multiple.log) | [hull_multiple](../doc/std/algorithm/hull.md) |
@@ -45,7 +43,9 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/.test/parameter_multiplicity_example_A.png)](../doc/.test/parameter_multiplicity_example_A.log) | [parameter_multiplicity_example_A](../doc/parameter_multiplicity.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_B.png)](../doc/.test/parameter_multiplicity_example_B.log) | [parameter_multiplicity_example_B](../doc/parameter_multiplicity.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_D.png)](../doc/.test/parameter_multiplicity_example_D.log) | [parameter_multiplicity_example_D](../doc/parameter_multiplicity.md) |
-| [![test](../doc/parts/.test/parts_declaration.png)](../doc/parts/.test/parts_declaration.log) | [parts_declaration](../doc/parts/README.md) |
+| [![test](../doc/parts/.test/part_declaration.png)](../doc/parts/.test/part_declaration.log) | [part_declaration](../doc/parts/README.md) |
+| [![test](../doc/parts/.test/property_torus.png)](../doc/parts/.test/property_torus.log) | [property_torus](../doc/parts/property.md) |
+| [![test](../doc/parts/.test/property_torus_fail.png)](../doc/parts/.test/property_torus_fail.log) | [property_torus_fail](../doc/parts/property.md) |
 | [![test](../doc/function/.test/README_implicit_init_by_parameter_A.png)](../doc/function/.test/README_implicit_init_by_parameter_A.log) | [README_implicit_init_by_parameter_A](../doc/function/README.md) |
 | [![test](../doc/function/.test/README_implicit_init_by_parameter_B.png)](../doc/function/.test/README_implicit_init_by_parameter_B.log) | [README_implicit_init_by_parameter_B](../doc/function/README.md) |
 | [![test](../doc/function/.test/README_implicit_init_by_parameter_C.png)](../doc/function/.test/README_implicit_init_by_parameter_C.log) | [README_implicit_init_by_parameter_C](../doc/function/README.md) |

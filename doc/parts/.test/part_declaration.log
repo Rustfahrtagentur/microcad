@@ -1,0 +1,12 @@
+error: Symbol circle not found.
+  ---> <from_str>:20:5
+     |
+  20 |     circle(half(diameter));
+     |     ^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol circle not found.
+  ---> <from_str>:20:5
+     |
+  20 |     circle(half(diameter));
+     |     ^^^^^^^^^^^^^^^^^^^^^^
+     |

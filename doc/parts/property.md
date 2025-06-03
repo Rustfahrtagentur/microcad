@@ -11,7 +11,7 @@ part torus(radius: length) {
     // calculate inner from outer radius into property `inner`
     inner = radius / 2;
 
-    // generate torus (and use field inner)
+    // generate torus (and use property inner)
     circle(radius) - circle(inner);
 }
 

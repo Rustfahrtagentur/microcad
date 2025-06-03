@@ -5,7 +5,7 @@
 ```µcad,module_example
 mod std {
     mod math {
-        // define PI as field
+        // define PI as property
         pi = 3.14159;
 
         // define calculation function

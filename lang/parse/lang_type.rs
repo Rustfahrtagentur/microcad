@@ -43,7 +43,7 @@ impl Parse for NamedTupleType {
             let name = Identifier::parse(inner.next().expect("Identifier expected"))?;
             let ty = TypeAnnotation::parse(inner.next().expect("Type annotation expected"))?.ty();
             if types.contains_key(&name) {
-                return Err(ParseError::DuplicatedMapField(name.clone()));
+                return Err(ParseError::DuplicatedMapType(name.clone()));
             }
             types.insert(name, ty);
         }

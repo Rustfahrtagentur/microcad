@@ -85,9 +85,9 @@ pub enum ParseError {
     #[error("Invalid map key type: {0}")]
     InvalidMapKeyType(String),
 
-    /// Duplicated field name in map
-    #[error("Duplicated field name in map: {0}")]
-    DuplicatedMapField(Identifier),
+    /// Duplicated type name in map
+    #[error("Duplicated type name in map: {0}")]
+    DuplicatedMapType(Identifier),
 
     /// Duplicate identifier
     #[error("Duplicate identifier: {0}")]
