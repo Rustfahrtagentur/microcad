@@ -9,7 +9,7 @@ mod std {
         pi = 3.14159;
 
         // define calculation function
-        function abs(x: Scalar) -> Scalar {
+        fn abs(x: Scalar) -> Scalar {
             if x < 0 { return -x; } else { return x; }
         }
     }

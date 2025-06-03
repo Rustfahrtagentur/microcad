@@ -13,7 +13,7 @@ part donut(radius: Length) {
     use std::geo2d::circle;
 
     // calculate inner from radius in a method
-    function inner() { radius/2 }
+    fn inner() { radius/2 }
 
     // generate donut
     circle(radius) - circle(inner());

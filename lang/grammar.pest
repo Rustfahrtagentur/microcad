@@ -43,7 +43,7 @@ multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
 identifier_part = { alpha | "_" }
 identifier_body = { (alpha | "_") ~ (alpha | digit | "_")* }
-keywords = {"mod" | "part" | "function" | "if" | "else" | "use" | "return"}
+keywords = {"mod" | "part" | "fn" | "if" | "else" | "use" | "return"}
 
 //`a`: ok
 //`a1`: ok
@@ -396,7 +396,7 @@ function_signature = { parameter_list ~ (ws* ~ "->" ~ ws* ~ type)? }
 //`function test(a: scalar, b: scalar) -> scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
 //`function weight(density: density = 20g/1mm^3) -> weight {}` ok # Function with default value
 //`function bar(a: scalar) -> scalar { a }`: ok # Function with no return type
-function_definition = { "function" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ body }
+function_definition = { "fn" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ body }
 
 //`return 5.0mm;`: ok
 return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }

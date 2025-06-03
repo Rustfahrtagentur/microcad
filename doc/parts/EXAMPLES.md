@@ -11,11 +11,11 @@
 ```µcad,EXAMPLES_functions#todo
 part cube_with_volume(size: length) {
 
-    function volume() {
+    fn volume() {
         size*size*size
     }
 
-    function weight(density: density = 20g/1mm^3) {
+    fn weight(density: density = 20g/1mm^3) {
         volume() * density
     }
 
@@ -36,7 +36,7 @@ part cube_with_volume(size: length) {
 
     volume = size*size*size;
 
-    function weight(density: density = 20g/1mm^3) {
+    fn weight(density: density = 20g/1mm^3) {
         volume * density
     }
 
