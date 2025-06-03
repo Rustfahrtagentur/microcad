@@ -1,14 +1,14 @@
-# Part Fields
+# Part Properties
 
-A field is defined by simply assigning an expression to an identifier.
+A property is defined by simply assigning an expression to an identifier.
 
-[![test](.test/fields_torus.png)](.test/fields_torus.log)
+[![test](.test/property_torus.png)](.test/property_torus.log)
 
-```µcad,fields_torus#todo
+```µcad,property_torus#todo
 part torus(radius: length) {
     use std::geo2d::circle;
 
-    // calculate inner from radius into field inner
+    // calculate inner from outer radius into property `inner`
     inner = radius / 2;
 
     // generate torus (and use field inner)
@@ -24,8 +24,8 @@ info("{t.inner}");
 
 ## Failures
 
-[![test](.test/fields_torus_fail.png)](.test/fields_torus_fail.log)
+[![test](.test/property_torus_fail.png)](.test/property_torus_fail.log)
 
-```µcad,fields_torus_fail#fail
+```µcad,property_torus_fail#fail
 part torus(radius) {} // Missing radius' type
 ```

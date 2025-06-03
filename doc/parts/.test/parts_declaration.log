@@ -1,0 +1,26 @@
+error: Symbol double not found.
+  ---> <from_str>:17:24
+     |
+  17 |     std::geo2d::circle(double(diameter));
+     |                        ^^^^^^^^^^^^^^^^
+     |
+error: Value Error: Missing arguments: radius
+
+  ---> ../lib/std/geo2d.µcad:6:1
+     |
+   6 | part circle(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol double not found.
+  ---> <from_str>:17:24
+     |
+  17 |     std::geo2d::circle(double(diameter));
+     |                        ^^^^^^^^^^^^^^^^
+     |
+error: Value Error: Missing arguments: radius
+
+  ---> ../lib/std/geo2d.µcad:6:1
+     |
+   6 | part circle(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
