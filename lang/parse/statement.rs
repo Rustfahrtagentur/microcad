@@ -77,7 +77,7 @@ impl Parse for Statement {
         let first = pair.inner().next().expect(INTERNAL_PARSE_ERROR);
         Ok(match first.as_rule() {
             Rule::part_definition => Self::Part(Rc::<PartDefinition>::parse(first)?),
-            Rule::namespace_definition => Self::Namespace(Rc::<NamespaceDefinition>::parse(first)?),
+            Rule::module_definition => Self::Module(Rc::<ModuleDefinition>::parse(first)?),
             Rule::function_definition => Self::Function(Rc::<FunctionDefinition>::parse(first)?),
             Rule::init_definition => Self::Init(Rc::new(InitDefinition::parse(first)?)),
 

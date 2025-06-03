@@ -10,7 +10,7 @@ It has the following parameter signature: `rect(width: Scalar, height: Scalar, x
 Notice that the parameters are all of type `Scalar` and not `Length`.
 This is because the built-in library is not aware of the unit system.
 The built-in modules are not meant to be used directly.
-Instead, they are wrapped in a part or namespace written in µcad language that provides units, asserts, default values and multiple initializers.
+Instead, they are wrapped in a part or module written in µcad language that provides units, asserts, default values and multiple initializers.
 
 In Rust, a built-in library is defined by a struct that implements the `Builtin` trait.
 For our `rect` part, the struct looks like this:

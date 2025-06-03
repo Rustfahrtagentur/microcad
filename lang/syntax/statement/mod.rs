@@ -24,8 +24,8 @@ pub use statement_list::*;
 pub enum Statement {
     /// Part definition
     Part(Rc<PartDefinition>),
-    /// Namespace definition
-    Namespace(Rc<NamespaceDefinition>),
+    /// Module definition
+    Module(Rc<ModuleDefinition>),
     /// Function definition
     Function(Rc<FunctionDefinition>),
     /// Init definition
@@ -50,7 +50,7 @@ impl SrcReferrer for Statement {
     fn src_ref(&self) -> SrcRef {
         match self {
             Self::Part(md) => md.src_ref(),
-            Self::Namespace(ns) => ns.src_ref(),
+            Self::Module(ns) => ns.src_ref(),
             Self::Function(fd) => fd.src_ref(),
             Self::Init(mid) => mid.src_ref(),
 
@@ -71,7 +71,7 @@ impl std::fmt::Display for Statement {
             Self::Part(m) => {
                 write!(f, "{m}")
             }
-            Self::Namespace(ns) => {
+            Self::Module(ns) => {
                 write!(f, "{}", ns.id)
             }
             Self::Function(_f) => {
@@ -97,7 +97,7 @@ impl PrintSyntax for Statement {
         writeln!(f, "{:depth$}Statement:", "")?;
         match self {
             Self::Part(m) => m.print_syntax(f, depth + 1),
-            Self::Namespace(ns) => ns.print_syntax(f, depth + 1),
+            Self::Module(ns) => ns.print_syntax(f, depth + 1),
             Self::Function(func) => func.print_syntax(f, depth + 1),
             Self::Init(mi) => mi.print_syntax(f, depth + 1),
 

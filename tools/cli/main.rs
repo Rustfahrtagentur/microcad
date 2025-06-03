@@ -145,7 +145,7 @@ fn eval(
     let symbols = resolve(input)?;
     let mut context = Context::new(
         symbols.clone(),
-        microcad_builtin::builtin_namespace(),
+        microcad_builtin::builtin_module(),
         search_paths,
         Box::new(Stdout),
     );

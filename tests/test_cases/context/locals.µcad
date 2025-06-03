@@ -19,7 +19,7 @@ i = 1;
 // accessing #1
 assert(i == 1);
 
-// concentric namespaces
+// concentric scopes
 {
     {
         {

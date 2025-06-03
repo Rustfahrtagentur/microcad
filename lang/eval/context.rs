@@ -204,7 +204,7 @@ impl Default for Context {
     fn default() -> Self {
         Context::new(
             Symbol::new_source(SourceFile::load_from_str("").expect("Valid source file")),
-            Symbol::new_namespace("__builtin".into()),
+            Symbol::new_module("__builtin".into()),
             &[],
             Box::new(Stdout),
         )

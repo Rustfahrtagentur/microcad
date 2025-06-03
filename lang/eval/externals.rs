@@ -32,22 +32,22 @@ impl Externals {
         new
     }
 
-    /// Creates namespace map from externals.
-    pub fn create_namespaces(&self) -> SymbolMap {
+    /// Creates symbol map from externals.
+    pub fn create_modules(&self) -> SymbolMap {
         let mut map = SymbolMap::new();
         self.iter().for_each(|(basename, _)| {
             let (id, name) = basename.split_first();
-            let namespace = match map.get(&id) {
+            let module = match map.get(&id) {
                 Some(symbol) => symbol.clone(),
                 _ => Symbol::new_external(id.clone()),
             };
-            Self::recursive_create_namespaces(&namespace, &name);
-            map.insert(id.clone(), namespace);
+            Self::recursive_create_modules(&module, &name);
+            map.insert(id.clone(), module);
         });
         map
     }
 
-    fn recursive_create_namespaces(parent: &Symbol, name: &QualifiedName) -> Option<Symbol> {
+    fn recursive_create_modules(parent: &Symbol, name: &QualifiedName) -> Option<Symbol> {
         if name.is_empty() {
             return None;
         }
@@ -60,11 +60,11 @@ impl Externals {
         let child = if name.is_id() {
             Symbol::new_external(node_id.clone())
         } else {
-            Symbol::new_namespace(node_id.clone())
+            Symbol::new_module(node_id.clone())
         };
         Symbol::add_child(parent, child.clone());
 
-        Self::recursive_create_namespaces(&child, &name.remove_first());
+        Self::recursive_create_modules(&child, &name.remove_first());
         Some(child)
     }
 
@@ -105,7 +105,7 @@ impl Externals {
         }
     }
 
-    /// Searches for external source code files (*external namespaces*) in given *search paths*.
+    /// Searches for external source code files (*external modules*) in given *search paths*.
     fn search_externals(
         search_paths: &[std::path::PathBuf],
     ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {
@@ -183,12 +183,12 @@ fn resolve_external_file() {
 }
 
 #[test]
-fn create_namespaces() {
+fn create_modules() {
     let externals = Externals::new(&["../lib".into()]);
 
     assert!(!externals.is_empty());
 
-    let namespaces = externals.create_namespaces();
+    let modules = externals.create_modules();
 
-    log::trace!("{namespaces:#?}");
+    log::trace!("{modules:#?}");
 }

@@ -11,9 +11,9 @@ pub use sphere::*;
 
 use microcad_lang::{eval::*, resolve::*};
 
-/// geo3d Builtin namespace
+/// geo3d Builtin module
 pub fn geo3d() -> Symbol {
-    crate::NamespaceBuilder::new("geo3d".try_into().expect("valid id"))
+    crate::ModuleBuilder::new("geo3d".try_into().expect("valid id"))
         .symbol(Sphere::symbol())
         .symbol(Cube::symbol())
         .symbol(Cylinder::symbol())

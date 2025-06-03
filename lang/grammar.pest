@@ -43,7 +43,7 @@ multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
 identifier_part = { alpha | "_" }
 identifier_body = { (alpha | "_") ~ (alpha | digit | "_")* }
-keywords = {"namespace" | "part" | "function" | "if" | "else" | "use" | "return"}
+keywords = {"mod" | "part" | "function" | "if" | "else" | "use" | "return"}
 
 //`a`: ok
 //`a1`: ok
@@ -224,7 +224,7 @@ nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))
 //`-5.0mm`: ok # Negate
 //`(a+b)*(c-a)`: ok
 //`a + b + c`: ok
-//`math::pi`: ok # Singleton access with qualified name or namespace access
+//`math::pi`: ok # Singleton access with qualified name or module access
 //`! a`: ok # Unary operator with whitespace
 //`a-`: error # Unknown postfix operator `-`
 //`a[2]`: ok # List access
@@ -427,13 +427,13 @@ body = { "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
 //`init(size: Length) { rectangle(size); }: ok
 init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 
-//`namespace math { }`: ok # namespace
-//`namespace math { function pi() -> scalar { return 3.14159; } }`: ok # namespace with function
-namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ body }
+//`module math { }`: ok # module
+//`module math { function pi() -> scalar { return 3.14159; } }`: ok # module with function
+module_definition = { "mod" ~ ws+ ~ identifier ~ ws* ~ body }
 
 statement = {
   part_definition |
-  namespace_definition |
+  module_definition |
   function_definition |
   init_definition |
 

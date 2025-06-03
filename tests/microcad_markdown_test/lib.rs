@@ -402,7 +402,7 @@ fn create_test_code(
                         // test expected to fail succeeded at parsing?
                         Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = Context::from_source_captured(source.clone(), builtin_namespace(), &["../lib".into()]);
+                            let mut context = Context::from_source_captured(source.clone(), builtin_module(), &["../lib".into()]);
                             let eval = context.eval();
 
                             // get print output
@@ -447,7 +447,7 @@ fn create_test_code(
                         // test awaited to succeed and parsing succeeds?
                         Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = Context::from_source_captured(source.clone(), builtin_namespace(), &["../lib".into()]);
+                            let mut context = Context::from_source_captured(source.clone(), builtin_module(), &["../lib".into()]);
                             let eval = context.eval();
                             
                             // get print output

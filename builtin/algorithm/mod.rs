@@ -31,9 +31,9 @@ fn complement() -> Symbol {
     })
 }
 
-/// Creates the builtin `algorithm` namespace
+/// Creates the builtin `algorithm` module
 pub fn algorithm() -> Symbol {
-    crate::NamespaceBuilder::new("algorithm".try_into().expect("valid id"))
+    crate::ModuleBuilder::new("algorithm".try_into().expect("valid id"))
         .symbol(difference())
         .symbol(union())
         .symbol(intersection())

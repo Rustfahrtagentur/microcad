@@ -28,12 +28,12 @@ fn evaluate_file(filename: &str) -> microcad_lang::eval::Context {
     use microcad_lang::eval::*;
 
     let filename = format!("../tests/test_cases/{filename}");
-    Context::from_source(&filename, microcad_builtin::builtin_namespace(), &[]).expect(&filename)
+    Context::from_source(&filename, microcad_builtin::builtin_module(), &[]).expect(&filename)
 }
 
 #[test]
-fn namespaces() {
-    assert!(evaluate_file("syntax/namespace.µcad").eval().is_ok());
+fn modules() {
+    assert!(evaluate_file("syntax/module.µcad").eval().is_ok());
 }
 
 #[test]

@@ -9,14 +9,14 @@
 //! load and resolve the source file and build a context around it which then can be evaluated with [`Context::eval()`]:
 //!
 //! ```
-//! use microcad_builtin::builtin_namespace;
+//! use microcad_builtin::builtin_module;
 //! use microcad_lang::eval::Context;
 //! use std::io::stdout;
 //!
 //! // create a context for evaluation of the source file
 //! let mut context = Context::from_source(
 //!     "my.µcad",              // root file name
-//!     builtin_namespace(),    // `__builtin` library
+//!     builtin_module(),    // `__builtin` library
 //!     &["./lib".into()]       // list of library paths
 //! ).expect("successful load, parse and resolve");
 //!

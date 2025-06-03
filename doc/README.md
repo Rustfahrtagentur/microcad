@@ -8,7 +8,7 @@ One just need to know all values of all the variables.
 
 A **µcad program** can be just a sequence of instructions or a more complex construct of
 separate **parts** and **functions** which may depend on each other via **use statements**.
-**Namespaces** help to bundle things into packages and solve naming collisions.
+**Modules** help to bundle things into packages and solve naming collisions.
 
 * [Parts](parts/README.md)
 * [Use Statement](use_statement.md)

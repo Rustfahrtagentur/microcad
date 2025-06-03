@@ -1,7 +1,7 @@
 
-namespace a {
-    namespace b {
-        namespace c {
+mod a {
+    mod b {
+        mod c {
             part m1() {}
         }
     }
@@ -9,7 +9,7 @@ namespace a {
     part m2() {}
 }
 
-namespace d {
+mod d {
     a::b::c::m1();
 
     a::m2();

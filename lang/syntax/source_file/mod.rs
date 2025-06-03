@@ -35,7 +35,7 @@ impl SourceFile {
             .expect("File name error {filename:?}")
     }
 
-    /// Return the namespace name from the file name
+    /// Return the module name from the file name
     pub fn id(&self) -> Identifier {
         Identifier(Refer::new(
             self.filename

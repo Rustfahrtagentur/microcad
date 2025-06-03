@@ -36,14 +36,14 @@ impl ContextBuilder {
 
         let std_source_file = SourceFile::load(search_path.as_ref().join("std.µcad"))?;
         let context = Self::new(std_source_file.clone()).with_builtin()?.build();
-        let namespace = context
+        let module = context
             .current_source_file()
             .expect("std library")
-            .eval_as_namespace(&mut self.context, "std".into())
+            .eval_as_module(&mut self.context, "std".into())
             .expect("valid std library");
 
         self.context.add_source_file(std_source_file);
-        self.context.add(Symbol::Namespace(namespace));
+        self.context.add(Symbol::Module(module));
 
         Ok(self)
     }

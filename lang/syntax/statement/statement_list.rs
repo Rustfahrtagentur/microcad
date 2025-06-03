@@ -20,7 +20,7 @@ impl StatementList {
                 Statement::Part(m) => {
                     symbol_map.insert(m.id.clone(), m.resolve(parent.clone()));
                 }
-                Statement::Namespace(n) => {
+                Statement::Module(n) => {
                     symbol_map.insert(n.id.clone(), n.resolve(parent.clone()));
                 }
                 Statement::Function(f) => {

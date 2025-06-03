@@ -7,7 +7,7 @@ use crate::{eval::*, resolve::*};
 ///
 /// [`StackFrame`]s can have the following different types:
 /// - source file (bottom of stack)
-/// - namespaces ( e.g. `namespace my_lib { ... }`)
+/// - modules ( e.g. `mod my_lib { ... }`)
 /// - init calls (e.g. `std::geo2d::circle(radius = 1m)`)
 /// - function calls (e.g. `std::print("µcad")`)
 /// - bodies (e.g. `{ ... }`)
@@ -40,10 +40,8 @@ impl Stack {
                     log::trace!("Local Stack:\n{self}");
                     return Ok(());
                 }
-                // RULE: no locals available on namespace frame
-                StackFrame::Namespace(_, _) => {
-                    return Err(EvalError::WrongStackFrame(id, "namespace"))
-                }
+                // RULE: no locals available on module frame
+                StackFrame::Module(_, _) => return Err(EvalError::WrongStackFrame(id, "module")),
                 StackFrame::Call {
                     symbol: _,
                     args: _,
@@ -70,8 +68,8 @@ impl Stack {
         })
     }
 
-    /// Get name of current namespace.
-    pub fn current_namespace(&self) -> QualifiedName {
+    /// Get name of current module.
+    pub fn current_module_name(&self) -> QualifiedName {
         if self.0.len() > 1 {
             QualifiedName::no_ref(
                 self.0[1..]
@@ -84,11 +82,11 @@ impl Stack {
         }
     }
 
-    /// Get name of current namespace.
-    pub fn current_part(&self) -> Option<QualifiedName> {
+    /// Get name of current part.
+    pub fn current_part_name(&self) -> Option<QualifiedName> {
         if let Some(id) = self.current_part_id() {
             let name = QualifiedName::new(vec![id.clone()], id.src_ref());
-            Some(name.with_prefix(&self.current_namespace()))
+            Some(name.with_prefix(&self.current_module_name()))
         } else {
             None
         }
@@ -142,7 +140,7 @@ impl Locals for Stack {
 
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
         match &self.current_frame() {
-            Some(StackFrame::Namespace(_, _)) => Err(EvalError::NoVariablesAllowedIn("namespaces")),
+            Some(StackFrame::Module(_, _)) => Err(EvalError::NoVariablesAllowedIn("modules")),
             _ => self.put_local(Some(id.clone()), Symbol::new_constant(id, value)),
         }
     }
@@ -171,7 +169,7 @@ impl Locals for Stack {
                     }
                 }
                 // stop stack lookup at calls
-                StackFrame::Namespace(_, _) => {
+                StackFrame::Module(_, _) => {
                     log::trace!("stop at call frame");
                     break;
                 }
@@ -218,7 +216,7 @@ fn local_stack() {
     };
 
     stack.open(StackFrame::Source("test".into(), SymbolMap::default()));
-    assert!(stack.current_namespace() == QualifiedName::default());
+    assert!(stack.current_module_name() == QualifiedName::default());
 
     assert!(stack.put_local(None, make_int("a".into(), 1)).is_ok());
 
@@ -229,7 +227,7 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     stack.open(StackFrame::Body(SymbolMap::default()));
-    assert!(stack.current_namespace() == QualifiedName::default());
+    assert!(stack.current_module_name() == QualifiedName::default());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
@@ -251,12 +249,12 @@ fn local_stack() {
     assert!(fetch_int(&stack, "x").unwrap() == 3);
 
     stack.close();
-    assert!(stack.current_namespace() == QualifiedName::default());
+    assert!(stack.current_module_name() == QualifiedName::default());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
     assert!(fetch_int(&stack, "c").is_none());
 
     stack.close();
-    assert!(stack.current_namespace().is_empty());
+    assert!(stack.current_module_name().is_empty());
 }

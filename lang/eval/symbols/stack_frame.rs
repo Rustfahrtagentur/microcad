@@ -7,7 +7,7 @@ use crate::eval::*;
 ///
 /// A *stack frame* can have different types and some provide a storage for *local variables*
 /// like [`StackFrame::Source`] and [`StackFrame::Body`]) and some do not, some have a *id*
-/// like [`StackFrame::Source`] amd [`StackFrame::Namespace`]) and some do not and
+/// like [`StackFrame::Source`] amd [`StackFrame::Module`]) and some do not and
 /// [`Call`] is used for procedural calls.
 ///
 /// Each frame store some of these information:
@@ -18,8 +18,8 @@ use crate::eval::*;
 pub enum StackFrame {
     /// Source file with locals.
     Source(Identifier, SymbolMap),
-    /// Namespace scope with locals.
-    Namespace(Identifier, SymbolMap),
+    /// Module scope with locals.
+    Module(Identifier, SymbolMap),
     /// Part scope with locals.
     Part(Identifier, SymbolMap),
     /// initializer scope with locals.
@@ -41,7 +41,7 @@ impl StackFrame {
     /// Get identifier if available or panic.
     pub fn id(&self) -> Option<Identifier> {
         match self {
-            StackFrame::Source(id, _) | StackFrame::Namespace(id, _) => Some(id.clone()),
+            StackFrame::Source(id, _) | StackFrame::Module(id, _) => Some(id.clone()),
             _ => None,
         }
     }
@@ -65,8 +65,8 @@ impl StackFrame {
                 writeln!(f, "{:depth$}(init):", "")?;
                 return symbols.print(f, depth + 4);
             }
-            StackFrame::Namespace(id, symbols) => {
-                writeln!(f, "{:depth$}{id} (namespace):", "")?;
+            StackFrame::Module(id, symbols) => {
+                writeln!(f, "{:depth$}{id} (module):", "")?;
                 return symbols.print(f, depth + 4);
             }
             StackFrame::Body(map) => map,
@@ -109,7 +109,7 @@ impl StackFrame {
     ) -> std::fmt::Result {
         match self {
             StackFrame::Source(_identifier, _symbol_map) => todo!(),
-            StackFrame::Namespace(_identifier, _symbol_map) => todo!(),
+            StackFrame::Module(_identifier, _symbol_map) => todo!(),
             StackFrame::Part(_identifier, _symbol_map) => todo!(),
             StackFrame::Init(_symbol_map) => todo!(),
             StackFrame::Body(_symbol_map) => todo!(),

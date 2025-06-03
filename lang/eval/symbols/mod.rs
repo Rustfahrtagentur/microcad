@@ -32,7 +32,7 @@ pub trait Lookup {
 /// Items on the local stack can be of different types:
 /// - a *source file* with an own local stack frame,
 /// - a *body* (surrounded by curly brackets `{}`),
-/// - a *namespace* without local variables but aliases (use statements), or
+/// - a *module* without local variables but aliases (use statements), or
 /// - a *call* without local variables.
 ///
 /// Each one may have different items it stores (see [`StackFrame`]).

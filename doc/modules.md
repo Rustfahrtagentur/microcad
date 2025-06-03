@@ -1,10 +1,10 @@
-# Namespaces
+# Modules
 
-[![test](.test/namespaces_example.png)](.test/namespaces_example.log)
+[![test](.test/module_example.png)](.test/module_example.log)
 
-```µcad,namespaces_example
-namespace std {
-    namespace math {
+```µcad,module_example
+mod std {
+    mod math {
         // define PI as field
         pi = 3.14159;
 

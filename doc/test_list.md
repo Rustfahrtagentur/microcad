@@ -39,7 +39,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/std/algorithm/.test/intersection_operator.png)](../doc/std/algorithm/.test/intersection_operator.log) | [intersection_operator](../doc/std/algorithm/intersection.md) |
 | [![test](../doc/std/math/.test/math_abs.png)](../doc/std/math/.test/math_abs.log) | [math_abs](../doc/std/math/README.md) |
 | [![test](../doc/std/math/.test/math_trigonometric.png)](../doc/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/std/math/README.md) |
-| [![test](../doc/.test/namespaces_example.png)](../doc/.test/namespaces_example.log) | [namespaces_example](../doc/namespaces.md) |
+| [![test](../doc/.test/module_example.png)](../doc/.test/module_example.log) | [module_example](../doc/modules.md) |
 | [![test](../doc/.test/no_use_statement.png)](../doc/.test/no_use_statement.log) | [no_use_statement](../doc/use_statement.md) |
 | [![test](../doc/parts/.test/parameter_list.png)](../doc/parts/.test/parameter_list.log) | [parameter_list](../doc/parts/parameter_list.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_A.png)](../doc/.test/parameter_multiplicity_example_A.log) | [parameter_multiplicity_example_A](../doc/parameter_multiplicity.md) |
@@ -81,8 +81,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/.test/use_statement.png)](../doc/.test/use_statement.log) | [use_statement](../doc/use_statement.md) |
 | [![test](../doc/.test/use_statement_all.png)](../doc/.test/use_statement_all.log) | [use_statement_all](../doc/use_statement.md) |
 | [![test](../doc/.test/use_statement_as.png)](../doc/.test/use_statement_as.log) | [use_statement_as](../doc/use_statement.md) |
-| [![test](../doc/.test/use_statement_as_namespace.png)](../doc/.test/use_statement_as_namespace.log) | [use_statement_as_namespace](../doc/use_statement.md) |
-| [![test](../doc/.test/use_statement_namespace.png)](../doc/.test/use_statement_namespace.log) | [use_statement_namespace](../doc/use_statement.md) |
+| [![test](../doc/.test/use_statement_as_module.png)](../doc/.test/use_statement_as_module.log) | [use_statement_as_module](../doc/use_statement.md) |
+| [![test](../doc/.test/use_statement_module.png)](../doc/.test/use_statement_module.log) | [use_statement_module](../doc/use_statement.md) |
 | [![test](../doc/.test/use_statement_pub.png)](../doc/.test/use_statement_pub.log) | [use_statement_pub](../doc/use_statement.md) |
 | [![test](../doc/.test/verify_assert.png)](../doc/.test/verify_assert.log) | [verify_assert](../doc/verify.md) |
 | [![test](../doc/.test/verify_assert_fail.png)](../doc/.test/verify_assert_fail.log) | [verify_assert_fail](../doc/verify.md) |

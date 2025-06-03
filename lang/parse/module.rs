@@ -3,12 +3,12 @@
 
 use crate::{parse::*, parser::*, rc::*, syntax::*};
 
-impl Parse for Rc<NamespaceDefinition> {
+impl Parse for Rc<ModuleDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut pairs = pair.inner();
-        Ok(Rc::new(NamespaceDefinition {
-            id: Identifier::parse(pairs.next().expect("Identifier expected"))?,
-            body: Body::parse(pairs.next().expect("NamespaceBody expected"))?,
+        Ok(Rc::new(ModuleDefinition {
+            id: Identifier::parse(pairs.next().expect("identifier"))?,
+            body: Body::parse(pairs.next().expect("module body"))?,
             src_ref: pair.clone().into(),
         }))
     }

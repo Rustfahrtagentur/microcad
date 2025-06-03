@@ -29,7 +29,7 @@ mod function;
 mod identifier;
 mod lang_type;
 mod literal;
-mod namespace;
+mod module;
 mod parameter;
 mod part;
 mod source_file;

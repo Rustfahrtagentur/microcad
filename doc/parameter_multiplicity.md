@@ -80,7 +80,7 @@ part mountable_plate(
 
 part directions {}
 
-namespace hole_positions {
+mod hole_positions {
     top_left = (x = -100%, y =  100%);
     north = top_left;
     bottom_left = (x = -100%, y = -100%);

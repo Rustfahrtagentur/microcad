@@ -45,9 +45,9 @@ impl SourceCache {
         }
     }
 
-    /// Create initial namespace tree from externals.
-    pub fn create_namespaces(&self) -> SymbolMap {
-        self.externals.create_namespaces()
+    /// Create initial symbol map from externals.
+    pub fn create_modules(&self) -> SymbolMap {
+        self.externals.create_modules()
     }
 
     /// Insert a new source file (from externals) into source register.

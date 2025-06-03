@@ -43,12 +43,12 @@ impl SymbolTable {
         let mut globals = root.borrow().children.clone().detach_from_parent();
         globals.add_node(builtin);
 
-        // create namespaces for all files in search paths into symbol map
+        // create modules for all files in search paths into symbol map
         source_cache
-            .create_namespaces()
+            .create_modules()
             .iter()
-            .for_each(|(id, namespace)| {
-                globals.insert_node(id.clone(), namespace.clone());
+            .for_each(|(id, module)| {
+                globals.insert_node(id.clone(), module.clone());
             });
 
         let context = Self {
@@ -117,8 +117,8 @@ impl SymbolTable {
     /// Returns found symbol or error if `name` does not have a *source code reference* or symbol could not be found.
     fn lookup_relatively(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         if name.src_ref().is_some() {
-            if let Ok(namespace) = self.cache.get_name_by_hash(name.src_ref().source_hash()) {
-                let name = &name.with_prefix(namespace);
+            if let Ok(module) = self.cache.get_name_by_hash(name.src_ref().source_hash()) {
+                let name = &name.with_prefix(module);
                 log::trace!("lookup relatively for '{name}'");
                 if let Ok(symbol) = self.lookup_global(name) {
                     log::debug!(
@@ -149,11 +149,11 @@ impl SymbolTable {
                     SourceFile::load_with_name(path.clone(), self.cache.name_by_path(&path)?)?;
                 let source_name = self.cache.insert(source_file.clone())?;
                 let node = source_file.resolve(None);
-                // search namespace to place loaded source file into
+                // search module where to place loaded source file into
                 let target = self.globals.search(&source_name)?;
                 Symbol::move_children(&target, &node);
                 // mark target as "loaded" by changing the SymbolDefinition type
-                target.external_to_namespace();
+                target.external_to_module();
             }
             Ok(_) => (),
             _ => {
@@ -296,7 +296,7 @@ impl UseSymbol for SymbolTable {
 impl std::fmt::Display for SymbolTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "\nLoaded files:\n{}", self.cache)?;
-        writeln!(f, "\nNamespace: {}", self.stack.current_namespace())?;
+        writeln!(f, "\nModule: {}", self.stack.current_module_name())?;
         write!(f, "\nLocals Stack:\n{}", self.stack)?;
         writeln!(f, "\nCall Stack:")?;
         self.stack.pretty_print_call_trace(f, &self.cache)?;
