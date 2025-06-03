@@ -81,12 +81,12 @@ impl QualifiedName {
         self.0.len() == 1
     }
 
-    /// Tells if self is in a specified namespace
-    pub fn is_sub_of(&self, namespace: &QualifiedName) -> bool {
-        self.starts_with(namespace)
+    /// Tells if self is in a specified module
+    pub fn is_sub_of(&self, module: &QualifiedName) -> bool {
+        self.starts_with(module)
     }
 
-    /// Returns `true` if this name is in builtin namespace
+    /// Returns `true` if this name is in builtin module
     pub fn is_builtin(&self) -> bool {
         if let Some(first) = self.first() {
             first == "__builtin"
@@ -185,10 +185,9 @@ impl From<&Identifier> for QualifiedName {
 
 impl From<&std::path::Path> for QualifiedName {
     fn from(path: &std::path::Path) -> Self {
-        // check if this is a module file and remove doublet namespace generation
-        let path = if path.file_stem() == Some(std::ffi::OsStr::new("module")) {
-            path.parent()
-                .expect("module file in root path is not allowed")
+        // check if this is a module file and remove doublet module generation
+        let path = if path.file_stem() == Some(std::ffi::OsStr::new("mod")) {
+            path.parent().expect("mod file in root path is not allowed")
         } else {
             path
         };

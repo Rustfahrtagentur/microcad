@@ -11,7 +11,7 @@ points to.
 
 ## No use statement
 
-The following example which uses two *modules* of `geo3d` shows the problem:
+The following example which uses two *parts* of `geo3d` shows the problem:
 
 [![test](.test/no_use_statement.png)](.test/no_use_statement.log)
 
@@ -35,13 +35,13 @@ sphere(r = 4mm);
 cube(size = 40mm);
 ```
 
-## `use` a namespace to be implicit
+## `use` a module
 
-You may also use whole *namespaces* if the names you are using already exist as a symbol:
+You may also use whole *module* if the names you are using already exist as a symbol:
 
-[![test](.test/use_statement_namespace.png)](.test/use_statement_namespace.log)
+[![test](.test/use_statement_module.png)](.test/use_statement_module.log)
 
-```µcad,use_statement_namespace
+```µcad,use_statement_module
 sphere = 1;
 
 use std::geo3d;
@@ -64,11 +64,11 @@ use std::geo3d::sphere as ball;
 ball(r = 4mm);
 ```
 
-Or you may use `use as` with a *namespace*:
+Or you may use `use as` with a *module*:
 
-[![test](.test/use_statement_as_namespace.png)](.test/use_statement_as_namespace.log)
+[![test](.test/use_statement_as_module.png)](.test/use_statement_as_module.log)
 
-```µcad,use_statement_as_namespace
+```µcad,use_statement_as_module
 sphere = 1;
 
 use std::geo3d as geo;
@@ -78,7 +78,7 @@ geo::sphere(r = 4mm);
 
 ## `use *` statement
 
-The shortest way to use many symbols from one namespace is to put an `*` at the end.
+The shortest way to use many symbols from one module is to put an `*` at the end.
 The following example aliases **all** symbols of `std::geo3d` into the current scope.
 
 [![test](.test/use_statement_all.png)](.test/use_statement_all.log)
@@ -93,14 +93,14 @@ cube(size = 40mm);
 ## `pub use` statement
 
 This statement does not only make the *target symbol* visible on the current scope but in
-the symbol table where outside modules might use it too.
+the symbol table where outside code might use it too.
 
-`sphere` and `cube` will be made available for using them outside of namespace `my` in the following example:
+`sphere` and `cube` will be made available for using them outside of module `my` in the following example:
 
 [![test](.test/use_statement_pub.png)](.test/use_statement_pub.log)
 
 ```µcad,use_statement_pub
-namespace my {
+mod my {
     pub use std::geo3d::*;
 }
 

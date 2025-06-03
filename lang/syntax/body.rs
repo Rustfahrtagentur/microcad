@@ -1,14 +1,14 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Module body syntax element.
+//! Body syntax element.
 
 use crate::{eval::*, objects::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 /// A body is a list of statements inside `{}` brackets.
 #[derive(Clone, Debug, Default)]
 pub struct Body {
-    /// Module statements.
+    /// Body statements.
     pub statements: StatementList,
     /// Source code reference.
     pub src_ref: SrcRef,

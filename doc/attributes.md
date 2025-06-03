@@ -91,15 +91,15 @@ The following statements can have attributes:
   circle = std::geo2d::circle(2mm);
   ```
 
-* *module definition*: Add an attribute to all nodes created by this module definition. 
+* *part definition*: Add an attribute to all nodes created by this part definition.
 
-  For example, all instances created by this module have the part ID `MYPART`:
+  For example, all instances created by this part have the ID `MYPART`:
   
-  ```µcad,attributes_module_definition
+  ```µcad,attributes_part_definition
   PART = "A_CUSTOM_PART";
 
   #[part = PART] 
-  module my_part() { 
+  part my_part() { 
     std::geo2d::rect(2mm); 
   }
 
@@ -118,10 +118,10 @@ rect = std::geo2d::rect(3.0mm);
 std::debug::assert(rect.layer == id);
 ```
 
-The means you can parametrise attributes in modules:
+The means you can parametrize attributes in parts:
 
-```µcad,attributes_module_export
-module export(filename: String) {
+```µcad,attributes_part_export
+part export(filename: String) {
     #[export(filename)] {
         @children
     }

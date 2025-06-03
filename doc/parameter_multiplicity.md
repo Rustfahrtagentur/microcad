@@ -32,13 +32,13 @@ Normally, this would require 2 nested *for loops* which are not available in *µ
 use std::geo2d::circle;
 use std::translate;
 
-module rounded_rect(width: Length, height: Length, radius: Length) {
+part rounded_rect(width: Length, height: Length, radius: Length) {
     hull()
         translate(x = [-width, width]/2, y = [-height, height]/2)
             circle(radius);
 }
 
-module mountable_plate(width: Length, height: Length, corner_radius: Length, distance: Length, hole_diameter = 5mm) {
+part mountable_plate(width: Length, height: Length, corner_radius: Length, distance: Length, hole_diameter = 5mm) {
     rounded_rect(width, height, radius = corner_radius) - {
         hor = (width - distance) / 2;
         ver = (height - distance) / 2;
@@ -47,7 +47,7 @@ module mountable_plate(width: Length, height: Length, corner_radius: Length, dis
     }
 }
 
-module mountable_plate(
+part mountable_plate(
     width: Length,
     height: Length,
     corner_radius: Length,
@@ -63,7 +63,7 @@ module mountable_plate(
     plate - holes;
 }
 
-module mountable_plate(
+part mountable_plate(
     size: (Length, Length),
     corner_radius: Length,
     outer_distance: Length, 
@@ -78,9 +78,9 @@ module mountable_plate(
     plate - holes;
 }
 
-module directions {}
+part directions {}
 
-namespace hole_positions {
+mod hole_positions {
     top_left = (x = -100%, y =  100%);
     north = top_left;
     bottom_left = (x = -100%, y = -100%);

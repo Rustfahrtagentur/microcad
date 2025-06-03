@@ -2,7 +2,7 @@
 
 There are several algorithms which all convert a stack of objects into a resulting object.
 
-## Module form
+## Explicit form
 
 They all have the following form:
 

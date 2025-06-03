@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Module statement syntax elements
+//! statement syntax elements
 
 use crate::{rc::*, src_ref::*, syntax::*};
 
@@ -19,17 +19,17 @@ pub use marker_statement::*;
 pub use return_statement::*;
 pub use statement_list::*;
 
-/// Module statement
+/// Statement
 #[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum Statement {
+    /// Part definition
+    Part(Rc<PartDefinition>),
     /// Module definition
     Module(Rc<ModuleDefinition>),
-    /// Namespace definition
-    Namespace(Rc<NamespaceDefinition>),
     /// Function definition
     Function(Rc<FunctionDefinition>),
-    /// Module init definition
-    ModuleInit(Rc<ModuleInitDefinition>),
+    /// Init definition
+    Init(Rc<InitDefinition>),
 
     /// Use statement
     Use(UseStatement),
@@ -49,10 +49,10 @@ pub enum Statement {
 impl SrcReferrer for Statement {
     fn src_ref(&self) -> SrcRef {
         match self {
-            Self::Module(md) => md.src_ref(),
-            Self::Namespace(ns) => ns.src_ref(),
+            Self::Part(md) => md.src_ref(),
+            Self::Module(ns) => ns.src_ref(),
             Self::Function(fd) => fd.src_ref(),
-            Self::ModuleInit(mid) => mid.src_ref(),
+            Self::Init(mid) => mid.src_ref(),
 
             Self::Use(us) => us.src_ref(),
             Self::Return(r) => r.src_ref(),
@@ -68,16 +68,16 @@ impl SrcReferrer for Statement {
 impl std::fmt::Display for Statement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Module(m) => {
+            Self::Part(m) => {
                 write!(f, "{m}")
             }
-            Self::Namespace(ns) => {
+            Self::Module(ns) => {
                 write!(f, "{}", ns.id)
             }
             Self::Function(_f) => {
                 write!(f, "{}", _f.id)
             }
-            Self::ModuleInit(mi) => {
+            Self::Init(mi) => {
                 write!(f, "{mi}")
             }
 
@@ -96,10 +96,10 @@ impl PrintSyntax for Statement {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}Statement:", "")?;
         match self {
-            Self::Module(m) => m.print_syntax(f, depth + 1),
-            Self::Namespace(ns) => ns.print_syntax(f, depth + 1),
+            Self::Part(m) => m.print_syntax(f, depth + 1),
+            Self::Module(ns) => ns.print_syntax(f, depth + 1),
             Self::Function(func) => func.print_syntax(f, depth + 1),
-            Self::ModuleInit(mi) => mi.print_syntax(f, depth + 1),
+            Self::Init(mi) => mi.print_syntax(f, depth + 1),
 
             Self::Use(u) => u.print_syntax(f, depth + 1),
             Self::Return(r) => r.print_syntax(f, depth + 1),

@@ -105,24 +105,18 @@ impl Symbol {
         Symbol::new(SymbolDefinition::Builtin(Rc::new(Builtin { id, f })), None)
     }
 
-    /// Create a symbol for namespace ([`SymbolDefinition::Namespace`]).
+    /// Create a symbol for module.
     /// # Arguments
     /// - `id`: Name of the symbol
-    pub fn new_namespace(id: Identifier) -> Symbol {
-        Symbol::new(
-            SymbolDefinition::Namespace(NamespaceDefinition::new(id)),
-            None,
-        )
+    pub fn new_module(id: Identifier) -> Symbol {
+        Symbol::new(SymbolDefinition::Module(ModuleDefinition::new(id)), None)
     }
 
     /// Create a symbol for an external  ([`SymbolDefinition::External`])..
     /// # Arguments
     /// - `id`: Name of the symbol
     pub fn new_external(id: Identifier) -> Symbol {
-        Symbol::new(
-            SymbolDefinition::External(NamespaceDefinition::new(id)),
-            None,
-        )
+        Symbol::new(SymbolDefinition::External(ModuleDefinition::new(id)), None)
     }
 
     /// Create a new constant ([`SymbolDefinition::Constant`]).
@@ -231,20 +225,20 @@ impl Symbol {
         }
     }
 
-    /// Converts the *symbol definition* from [`SymbolDefinition::External`] into [`SymbolDefinition::Namespace`]
-    /// without changing the inner [`NamespaceDefinition`].
+    /// Converts the *symbol definition* from [`SymbolDefinition::External`] into [`SymbolDefinition::Module`]
+    /// without changing the inner [`ModuleDefinition`].
     ///
     /// Symbols which have not already been loaded from [`Externals`] into [`SourceCache`] will remain
     /// of type [`SymbolDefinition::External`] until they get loaded.
-    pub fn external_to_namespace(&self) {
+    pub fn external_to_module(&self) {
         let def = match &self.borrow().def {
-            SymbolDefinition::External(e) => SymbolDefinition::Namespace(e.clone()),
+            SymbolDefinition::External(e) => SymbolDefinition::Module(e.clone()),
             def => def.clone(),
         };
         self.borrow_mut().def = def
     }
 
-    /// Returns if symbol is an external namespace which must be loaded before using.
+    /// Returns if symbol is an external module which must be loaded before using.
     pub fn is_external(&self) -> bool {
         matches!(&self.borrow().def, SymbolDefinition::External(_))
     }
@@ -288,10 +282,10 @@ impl SrcReferrer for SymbolInner {
     fn src_ref(&self) -> SrcRef {
         match &self.def {
             SymbolDefinition::SourceFile(source_file) => source_file.src_ref(),
-            SymbolDefinition::Namespace(namespace) | SymbolDefinition::External(namespace) => {
-                namespace.src_ref()
+            SymbolDefinition::Module(module) | SymbolDefinition::External(module) => {
+                module.src_ref()
             }
-            SymbolDefinition::Module(module) => module.src_ref(),
+            SymbolDefinition::Part(part) => part.src_ref(),
             SymbolDefinition::Function(function) => function.src_ref(),
             SymbolDefinition::Builtin(_) => {
                 unreachable!("builtin has no source code reference")

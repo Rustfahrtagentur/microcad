@@ -11,7 +11,7 @@ pub struct Sphere {
     pub radius: Scalar,
 }
 
-impl BuiltinModuleDefinition for Sphere {
+impl BuiltinPartDefinition for Sphere {
     fn id() -> &'static str {
         "sphere"
     }

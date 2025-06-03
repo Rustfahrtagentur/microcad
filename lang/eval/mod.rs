@@ -9,14 +9,14 @@
 //! load and resolve the source file and build a context around it which then can be evaluated with [`Context::eval()`]:
 //!
 //! ```
-//! use microcad_builtin::builtin_namespace;
+//! use microcad_builtin::builtin_module;
 //! use microcad_lang::eval::Context;
 //! use std::io::stdout;
 //!
 //! // create a context for evaluation of the source file
 //! let mut context = Context::from_source(
 //!     "my.µcad",              // root file name
-//!     builtin_namespace(),    // `__builtin` library
+//!     builtin_module(),    // `__builtin` library
 //!     &["./lib".into()]       // list of library paths
 //! ).expect("successful load, parse and resolve");
 //!
@@ -38,11 +38,11 @@ mod expression;
 mod externals;
 mod format_string;
 mod function;
+mod init;
 mod literal;
-mod module;
-mod module_init;
 mod output;
 mod parameter;
+mod part;
 mod source_file;
 mod statement;
 mod symbols;
@@ -57,8 +57,8 @@ pub use context::*;
 pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
-pub use symbols::*;
 pub use r#use::*;
+pub use symbols::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 

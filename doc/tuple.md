@@ -9,27 +9,27 @@ Tuples are lists of items which might be of different types.
 (width=10cm, depth=10cm, volume=1l);
 ```
 
-## Tuple as module parameters
+## Tuple as part parameters
 
 [![test](.test/tuple_parameters_A.png)](.test/tuple_parameters_A.log)
 
 ```µcad,tuple_parameters_A#fail
-module box((x,y,z) = 0mm) {}
+part box((x,y,z) = 0mm) {}
 ```
 
 [![test](.test/tuple_parameters_B.png)](.test/tuple_parameters_B.log)
 
 ```µcad,tuple_parameters_B
-module box(x = 0mm, y = 0mm, z = 0mm) {}
+part box(x = 0mm, y = 0mm, z = 0mm) {}
 ```
 
 [![test](.test/tuple_parameters_C.png)](.test/tuple_parameters_C.log)
 
 ```µcad,tuple_parameters_C#fail
-module box(x,y,z = 0mm) {}
+part box(x,y,z = 0mm) {}
 ```
 
-## Field declaration for a module
+## Tuple declarations
 
 [![test](.test/tuple_fields_A.png)](.test/tuple_fields_A.log)
 

@@ -4,7 +4,7 @@
 use std::str::FromStr;
 
 #[cfg(test)]
-use crate::builtin_namespace;
+use crate::builtin_module;
 use microcad_lang::{diag::*, eval::*, resolve::*, syntax::*, value::*};
 
 pub fn assert() -> Symbol {
@@ -68,7 +68,7 @@ pub fn assert_invalid() -> Symbol {
 fn assert_ok() {
     let mut context = Context::from_source(
         "../tests/test_cases/syntax/assert_ok.µcad",
-        builtin_namespace(),
+        builtin_module(),
         &[],
     )
     .expect("resolvable file ../tests/test_cases/syntax/assert_ok.µcad");
@@ -80,7 +80,7 @@ fn assert_ok() {
 fn assert_fail() {
     let mut context = Context::from_source(
         "../tests/test_cases/syntax/assert_fail.µcad",
-        builtin_namespace(),
+        builtin_module(),
         &[],
     )
     .expect("resolvable file ../tests/test_cases/syntax/assert_fail.µcad");

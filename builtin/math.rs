@@ -27,7 +27,7 @@ fn abs() -> Symbol {
 }
 
 pub fn math() -> Symbol {
-    crate::NamespaceBuilder::new("math".try_into().expect("unexpected name error"))
+    crate::ModuleBuilder::new("math".try_into().expect("unexpected name error"))
         .symbol(Symbol::new_constant(
             Identifier::from_str("pi").expect("valid id"),
             Value::Scalar(std::f64::consts::PI),

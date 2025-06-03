@@ -28,7 +28,7 @@ pub use std::algorithm;
 assert_valid(algorithm);
 assert_invalid(use_test::algorithm);
 
-module my_module() {
+part my_part() {
     circle(radius=1);
     sphere(radius=1);
 }

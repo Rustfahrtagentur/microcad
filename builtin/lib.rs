@@ -28,8 +28,8 @@ pub(crate) use print::print;
 pub(crate) use transform::*;
 
 /// Build the standard module
-pub fn builtin_namespace() -> Symbol {
-    NamespaceBuilder::new("__builtin".try_into().expect("unexpected name error"))
+pub fn builtin_module() -> Symbol {
+    ModuleBuilder::new("__builtin".try_into().expect("unexpected name error"))
         .symbol(assert())
         .symbol(assert_valid())
         .symbol(assert_invalid())

@@ -11,7 +11,7 @@ pub struct Circle {
     pub radius: Scalar,
 }
 
-impl BuiltinModuleDefinition for Circle {
+impl BuiltinPartDefinition for Circle {
     fn id() -> &'static str {
         "circle"
     }

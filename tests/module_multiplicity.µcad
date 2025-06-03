@@ -1,4 +1,4 @@
-module m(a:Int=0) {
+part m(a:Int=0) {
     init(b:Int) {
         a = b;
         f(2.0);

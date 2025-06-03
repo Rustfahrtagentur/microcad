@@ -1,0 +1,13 @@
+error: Value Error: Missing arguments: radius
+
+  ---> <from_str>:1:1
+     |
+   1 | part torus(radius: length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol info not found.
+  ---> <from_str>:15:1
+     |
+  15 | info("{t.inner}");
+     | ^^^^^^^^^^^^^^^^^
+     |

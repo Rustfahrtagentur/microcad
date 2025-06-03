@@ -147,14 +147,14 @@ macro_rules! assert_eq_arg_map_value {
 fn call_get_matching_arguments() {
     use crate::{parameter_value, ty::*};
 
-    // module my_module(foo: Integer, bar: Integer, baz: Scalar = 4.0)
+    // my_part(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = ParameterValueList::new(vec![
         parameter_value!(foo: Integer),
         parameter_value!(bar: Integer),
         parameter_value!(baz: Scalar = 4.0),
     ]);
 
-    // my_module(1, bar = 2, baz = 3.0)
+    // my_part(1, bar = 2, baz = 3.0)
     let call_values = CallArgumentValueList::from(vec![
         call_argument_value!(Integer = 1),
         call_argument_value!(foo: Integer = 2),

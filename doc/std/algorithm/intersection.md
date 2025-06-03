@@ -10,11 +10,11 @@ In the following examples the intersection of two circles is calculated.
 std::geo2d::circle(radius = 3mm) & std::geo2d::rect(width = 3mm, height = 2mm);
 ```
 
-## Intersection module
+## Alternative intersection operator
 
-[![test](.test/intersection_module.png)](.test/intersection_module.log)
+[![test](.test/intersection_alt_operator.png)](.test/intersection_alt_operator.log)
 
-```µcad,intersection_module
+```µcad,intersection_alt_operator
 std::algorithm::intersection() {
     std::geo2d::circle(radius = 3mm);
     std::geo2d::rect(width = 3mm, height = 2mm);

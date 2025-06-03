@@ -85,9 +85,9 @@ pub enum ParseError {
     #[error("Invalid map key type: {0}")]
     InvalidMapKeyType(String),
 
-    /// Duplicated field name in map
-    #[error("Duplicated field name in map: {0}")]
-    DuplicatedMapField(Identifier),
+    /// Duplicated type name in map
+    #[error("Duplicated type name in map: {0}")]
+    DuplicatedMapType(Identifier),
 
     /// Duplicate identifier
     #[error("Duplicate identifier: {0}")]
@@ -99,7 +99,7 @@ pub enum ParseError {
 
     /// Statement between two init statements
     #[error("Statement between two init statements")]
-    StatementBetweenModuleInit,
+    StatementBetweenInit,
 
     /// Loading of a source file failed
     #[error("Loading of source file {0:?} failed")]

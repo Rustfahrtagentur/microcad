@@ -11,7 +11,7 @@ use microcad_lang::{eval::*, resolve::*};
 
 /// Builtin module for 2D geometry
 pub fn geo2d() -> Symbol {
-    crate::NamespaceBuilder::new("geo2d".try_into().expect("valid id"))
+    crate::ModuleBuilder::new("geo2d".try_into().expect("valid id"))
         .symbol(Circle::symbol())
         .symbol(Rect::symbol())
         .build()

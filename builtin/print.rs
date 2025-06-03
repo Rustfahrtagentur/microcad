@@ -21,7 +21,7 @@ pub fn print() -> Symbol {
 fn assert_ok() {
     let mut context = Context::from_source(
         "../tests/test_cases/print.µcad",
-        crate::builtin_namespace(),
+        crate::builtin_module(),
         &[],
     )
     .expect("resolvable file ../tests/test_cases/print.µcad");

@@ -12,7 +12,7 @@ pub struct Rect {
     y: Scalar,
 }
 
-impl BuiltinModuleDefinition for Rect {
+impl BuiltinPartDefinition for Rect {
     fn id() -> &'static str {
         "rect"
     }

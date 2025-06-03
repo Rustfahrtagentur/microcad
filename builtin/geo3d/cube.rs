@@ -15,7 +15,7 @@ pub struct Cube {
     pub size_z: Scalar,
 }
 
-impl BuiltinModuleDefinition for Cube {
+impl BuiltinPartDefinition for Cube {
     fn id() -> &'static str {
         "cube"
     }

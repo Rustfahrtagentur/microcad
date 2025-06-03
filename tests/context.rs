@@ -7,7 +7,7 @@ use microcad_lang::eval::*;
 fn use_statements() {
     let mut context = Context::from_source(
         "test_cases/context/use_test.µcad",
-        microcad_builtin::builtin_namespace(),
+        microcad_builtin::builtin_module(),
         &["../lib".into()],
     )
     .expect("context");
@@ -18,7 +18,7 @@ fn use_statements() {
 fn locals() {
     let mut context = Context::from_source(
         "test_cases/context/locals.µcad",
-        microcad_builtin::builtin_namespace(),
+        microcad_builtin::builtin_module(),
         &["../lib".into()],
     )
     .expect("context");

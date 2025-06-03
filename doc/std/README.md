@@ -7,13 +7,13 @@ To understand what exactly the *µcad standard library* is doing and what not on
 
 So generically spoken you will find all functionalities of `__builtin` within `std` but in a handier form.
 
-## Namespaces
+## Modules
 
-The main namespace of the µcad standard library `std` is into these top namespaces which group different kinds of functionalities together:
+The main module of the µcad standard library `std` consists of these modules which group different kinds of functionalities together:
 
-- [`geo2d`](geo2d/README.md): 2D object generator modules (e.g. `circle`, `rect`)
-- [`geo3d`](geo3d/README.md): 3D object generator modules (e.g. `sphere`, `cube`)
-- [`algorithm`](algorithm/README.md): Algorithms to manipulate 2D and 3D objects (e.g. `translate`, `difference`)
+- [`geo2d`](geo2d/README.md): 2D parts (e.g. `circle`, `rect`)
+- [`geo3d`](geo3d/README.md): 3D parts (e.g. `sphere`, `cube`)
+- [`algorithm`](algorithm/README.md): Algorithms to manipulate 2D and 3D parts (e.g. `translate`, `difference`)
 - [`math`](math/README.md): Mathematical solutions (e.g. `abs`, `pi`)
 
 ## Functions

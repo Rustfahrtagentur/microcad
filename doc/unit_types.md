@@ -25,7 +25,7 @@ This means that your will automatically get the following type if you use the be
 
 ```µcad,unit_types
 // function parameter `height` declared to be a `Length`
-function f( height: Length ) {}
+fn f( height: Length ) {}
 ```
 
 ### Units
@@ -37,7 +37,7 @@ function f( height: Length ) {}
 height = 1.4m;
 
 // use as *default* value in parameter list
-function f( height = 1m ) {}
+fn f( height = 1m ) {}
 
 // calculate a `Length` called `width` by multiplying the
 // `height` with `Scalar` `2` and add ten centimeters

@@ -9,7 +9,7 @@ use crate::{diag::*, eval::*, ord_map::*, src_ref::*, syntax::*, ty::*, value::*
 
 pub use parameter_list::*;
 
-/// A parameter for a function or module definition
+/// A parameter of a parameter list.
 #[derive(Clone, Debug, Default)]
 pub struct Parameter {
     /// Name of the parameter

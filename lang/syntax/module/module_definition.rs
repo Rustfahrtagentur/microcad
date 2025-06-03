@@ -3,17 +3,13 @@
 
 //! Module definition syntax element
 
-use crate::{src_ref::*, syntax::*};
+use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 
 /// Module definition
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub struct ModuleDefinition {
-    /// Module attributes.
-    pub attribute_list: AttributeList,
-    /// Module name.
+    /// Name of the module
     pub id: Identifier,
-    /// Module parameters (implicit initialization).
-    pub parameters: ParameterList,
     /// Module body
     pub body: Body,
     /// Source code reference
@@ -21,35 +17,20 @@ pub struct ModuleDefinition {
 }
 
 impl ModuleDefinition {
-    /// Return iterator over all initializers
-    pub fn inits(&self) -> Inits {
-        Inits::new(self)
+    /// Create a new module definition
+    pub fn new(id: Identifier) -> Rc<Self> {
+        Rc::new(Self {
+            id,
+            body: Body::default(),
+            src_ref: SrcRef(None),
+        })
     }
-}
 
-/// Iterator over modules init statements
-pub struct Inits<'a>(std::slice::Iter<'a, Statement>);
-
-impl<'a> Inits<'a> {
-    fn new(def: &'a ModuleDefinition) -> Self {
-        Self(def.body.statements.iter())
-    }
-}
-
-impl<'a> Iterator for Inits<'a> {
-    type Item = &'a ModuleInitDefinition;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        for statement in self.0.by_ref() {
-            match statement {
-                Statement::ModuleInit(module_init_definition) => {
-                    return Some(module_init_definition);
-                }
-                _ => continue,
-            }
-        }
-
-        None
+    /// Resolve into SymbolNode
+    pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
+        let node = Symbol::new(SymbolDefinition::Module(self.clone()), parent);
+        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
+        node
     }
 }
 
@@ -59,22 +40,9 @@ impl SrcReferrer for ModuleDefinition {
     }
 }
 
-impl std::fmt::Display for ModuleDefinition {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "module {name}({parameters}) {body}",
-            name = self.id,
-            parameters = self.parameters,
-            body = self.body
-        )
-    }
-}
-
 impl PrintSyntax for ModuleDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
-        self.parameters.print_syntax(f, depth + 1)?;
         self.body.print_syntax(f, depth + 1)
     }
 }

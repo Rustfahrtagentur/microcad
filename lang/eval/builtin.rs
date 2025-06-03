@@ -40,13 +40,13 @@ impl CallTrait for Builtin {
     }
 }
 
-/// Builtin module definition
-pub trait BuiltinModuleDefinition {
-    /// Get id of the builtin module
+/// Builtin part definition
+pub trait BuiltinPartDefinition {
+    /// Get id of the builtin part
     fn id() -> &'static str;
     /// Create node from argument map
     fn node(args: &ArgumentMap) -> EvalResult<ObjectNode>;
-    /// Module function
+    /// Part function
     fn function() -> &'static BuiltinFn {
         &|args, context| {
             let multi_args = args.get_multi_matching_arguments(context, &Self::parameters())?;
@@ -59,7 +59,7 @@ pub trait BuiltinModuleDefinition {
         }
     }
 
-    /// Module parameters
+    /// Part initialization parameters
     fn parameters() -> ParameterList;
 
     /// Create builtin symbol

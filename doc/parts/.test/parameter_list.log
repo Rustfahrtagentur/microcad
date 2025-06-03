@@ -1,0 +1,7 @@
+error: Value Error: Missing arguments: outer, inner
+
+  ---> <from_str>:2:1
+     |
+   2 | part donut(outer: length, inner: length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

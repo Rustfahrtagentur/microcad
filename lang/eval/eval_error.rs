@@ -161,7 +161,7 @@ pub enum EvalError {
     #[error("Unexpected {0} {1} within expression")]
     UnexpectedNested(&'static str, Identifier),
 
-    /// No variables allowed in namespaces
+    /// No variables allowed in definition
     #[error("No variables allowed in {0}")]
     NoVariablesAllowedIn(&'static str),
 

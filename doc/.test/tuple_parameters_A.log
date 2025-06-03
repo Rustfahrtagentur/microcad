@@ -1,6 +1,6 @@
-Parser error:  --> 1:12
+Parser error:  --> 1:10
   |
-1 | module box((x,y,z) = 0mm) {}
-  |            ^---
+1 | part box((x,y,z) = 0mm) {}
+  |          ^---
   |
   = expected COMMENT or identifier
