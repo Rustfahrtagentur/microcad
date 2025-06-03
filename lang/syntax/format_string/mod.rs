@@ -34,13 +34,13 @@ impl SrcReferrer for FormatStringInner {
 pub struct FormatString(pub Refer<Vec<FormatStringInner>>);
 
 impl FormatString {
-    /// Insert a string to this module
+    /// Insert a string
     pub fn push_string(&mut self, s: String, src_ref: SrcRef) {
         self.0
             .push(FormatStringInner::String(Refer::new(s, src_ref)));
     }
 
-    /// Insert a format expression to this module
+    /// Insert a format expression
     pub fn push_format_expr(&mut self, expr: FormatExpression) {
         self.0.push(FormatStringInner::FormatExpression(expr));
     }

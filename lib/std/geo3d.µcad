@@ -1,8 +1,8 @@
-/// Sphere module definition
+/// Sphere definition
 ///
 /// Examples:
 /// * with radius `r`: `sphere(r = 10.0mm);`
-module sphere(radius: Length) {
+part sphere(radius: Length) {
     init(r: Length) {
         radius = r;
     }
@@ -10,12 +10,12 @@ module sphere(radius: Length) {
     __builtin::geo3d::sphere(radius / 1mm);
 }
 
-/// Cube module definition
+/// Cube definition
 ///
 /// Examples:
 /// * with size `s`: `cube(s = 10.0mm);`
 /// * with size `x`, `y`, and `z`: `cube(size_x = 10.0mm, size_y = 5.0mm, size_z = 3.0mm);`
-module cube(size_x: Length, size_y: Length, size_z: Length) {
+part cube(size_x: Length, size_y: Length, size_z: Length) {
     init(size: Length) {
         size_x = size;
         size_y = size;
@@ -35,11 +35,11 @@ module cube(size_x: Length, size_y: Length, size_z: Length) {
     }
 }
 
-/// Cylinder module definition
+/// Cylinder definition
 ///
 /// Examples:
 /// * with radius `r` and height `h`: `cylinder(r = 10.0mm, h = 5.0mm);`
-module cylinder(radius_bottom: Length, radius_top: Length, height: Length, offset: Length = 0.0mm) {
+part cylinder(radius_bottom: Length, radius_top: Length, height: Length, offset: Length = 0.0mm) {
     /// Initialize by `radius` and `height`. Cylinder will be centered.
     init(radius: Length, height: Length) {
         radius_bottom = radius;

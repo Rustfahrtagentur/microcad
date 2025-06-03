@@ -3,23 +3,23 @@
 
 use crate::{parse::*, parser::*, rc::*, syntax::*};
 
-impl Parse for Rc<ModuleDefinition> {
+impl Parse for Rc<PartDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Ok(Rc::new(ModuleDefinition {
+        Ok(Rc::new(PartDefinition {
             attribute_list: pair.find(Rule::attribute_list).unwrap_or_default(),
-            id: pair.find(Rule::identifier).expect("Module id"),
+            id: pair.find(Rule::identifier).expect("Part id"),
             parameters: pair.find(Rule::parameter_list).expect("Parameters"),
-            body: pair.find(Rule::body).expect("Module body"),
+            body: pair.find(Rule::body).expect("Part body"),
             src_ref: pair.into(),
         }))
     }
 }
 
-impl Parse for ModuleInitDefinition {
+impl Parse for InitDefinition {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::module_init_definition);
+        Parser::ensure_rule(&pair, Rule::init_definition);
 
-        Ok(ModuleInitDefinition {
+        Ok(InitDefinition {
             parameters: pair.find(Rule::parameter_list).unwrap_or_default(),
             body: pair.find(Rule::body).unwrap_or_default(),
             src_ref: pair.into(),

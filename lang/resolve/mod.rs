@@ -34,13 +34,13 @@ pub trait FullyQualify {
 #[test]
 fn resolve_source_file() {
     let source_file =
-        SourceFile::load_from_str(r#"module a() { module b() {} } "#).expect("Valid source");
+        SourceFile::load_from_str(r#"part a() { part b() {} } "#).expect("Valid source");
 
     let symbol_node = source_file.resolve(None);
 
     // file <no file>
-    //  module a
-    //   module b
+    //  part a
+    //   part b
     assert!(symbol_node.get(&"a".into()).is_some());
     assert!(symbol_node.get(&"c".into()).is_none());
 
@@ -49,7 +49,7 @@ fn resolve_source_file() {
     assert!(symbol_node.search(&"a::b::c".into()).is_none());
 
     // use std::print; // Add symbol "print" to current symbol node
-    // module m() {
+    // part m() {
     //      print("test"); // Use symbol node from parent
     // }
 

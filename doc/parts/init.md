@@ -1,11 +1,11 @@
-# Module Initializers
+# Part Initializers
 
-- [Module Initializers](#module-initializers)
+- [Part Initializers](#part-initializers)
 - [Example](#example)
 - [Implicit Initializer](#implicit-initializer)
 - [Explicit Initializer](#explicit-initializer)
   - [Explicit Initializer overloading](#explicit-initializer-overloading)
-- [Calling Module Initializers](#calling-module-initializers)
+- [Calling Part Initializers](#calling-part-initializers)
   - [Call Implicit Initializer](#call-implicit-initializer)
   - [Call Explicit Initializer](#call-explicit-initializer)
   - [Call Implicit, Explicit Init \& Pre-Initialization Code](#call-implicit-explicit-init--pre-initialization-code)
@@ -15,8 +15,8 @@
 [![test](.test/init.png)](.test/init.log)
 
 ```µcad,init
-// begin module and declare implicit initializer
-module donut(radius_outer: Length, radius_inner: Length) {
+// begin part and declare implicit initializer
+part donut(radius_outer: Length, radius_inner: Length) {
 
     // alternative initialization with diameters
     init( diameter_outer: Length, diameter_inner: Length ) {
@@ -37,12 +37,12 @@ donut( diameter_outer = 4cm, diameter_inner = 2cm );
 
 ## Implicit Initializer
 
-A module with an *implicit initializer* which takes a `size: Length`:
+A part with an *implicit initializer* which takes a `size: Length`:
 
 [![test](.test/init_implicit.png)](.test/init_implicit.log)
 
 ```µcad,init_implicit
-module box(size: Length) {
+part box(size: Length) {
     std::geo2d::rect(width = size, height = size, x = 0mm, y = 0mm);
 }
 
@@ -51,12 +51,12 @@ box(size=2cm);
 
 ## Explicit Initializer
 
-A module with an *explicit initializer* which takes a `size: Length`:
+A part with an *explicit initializer* which takes a `size: Length`:
 
 [![test](.test/init_explicit.png)](.test/init_explicit.log)
 
 ```µcad,init_explicit
-module double_box(size: Length) {
+part double_box(size: Length) {
     init(half_the_size: Length) { size = half_the_size * 2; }
     rectangle(size);
 }
@@ -66,11 +66,11 @@ module double_box(size: Length) {
 
 ### Explicit Initializer overloading
 
-A module with *multiple explicit initializers* which takes different
+A part with *multiple explicit initializers* which takes different
 parameters:
 
 ```µcad,init_explicit_overloading
-module box(width: Length, height: Length) {
+part box(width: Length, height: Length) {
     init(size: Length) {
         rectangle(size);
     }
@@ -81,17 +81,17 @@ module box(width: Length, height: Length) {
 }
 ```
 
-## Calling Module Initializers
+## Calling Part Initializers
 
 ### Call Implicit Initializer
 
-Calling an explicit initializer of a module.
+Calling an explicit initializer of a part.
 
 [![test](.test/init_call_implicit.png)](.test/init_call_implicit.log)
 
 ```µcad,init_call_implicit
-// module with implicit initializer
-module m(l: Length) {
+// part with implicit initializer
+part m(l: Length) {
     // explicit initializer
     init(f: Length) { r = f/2; }
 }
@@ -102,13 +102,13 @@ m(l=1mm);
 
 ### Call Explicit Initializer
 
-Calling an explicit initializer of a module.
+Calling an explicit initializer of a part.
 
 [![test](.test/init_call_explicit.png)](.test/init_call_explicit.log)
 
 ```µcad,init_call_explicit
-// module with implicit initializer
-module m(l: Length) {
+// part with implicit initializer
+part m(l: Length) {
     // explicit initializer
     init(f: Length) { l = f/2; }
     std::geo2d::circle( r = l );
@@ -120,14 +120,14 @@ m(f=1mm);
 
 ### Call Implicit, Explicit Init & Pre-Initialization Code
 
-A module with both, *implicit and *explicit initializer* which takes different
+A part with both, *implicit and *explicit initializer* which takes different
 parameters and some *pre-initialization code*:
 
 [![test](.test/init_call_implicit_explicit.png)](.test/init_call_implicit_explicit.log)
 
 ```µcad,init_call_implicit_explicit
-// module with implicit initializer
-module m(area: (width: Length, height: Length) ) {
+// part with implicit initializer
+part m(area: (width: Length, height: Length) ) {
   // explicit initializer by height
   init(height: Length) { area = (width = 2m, height = height); }
 }

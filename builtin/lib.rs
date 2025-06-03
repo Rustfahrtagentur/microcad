@@ -27,7 +27,7 @@ pub(crate) use math::math;
 pub(crate) use print::print;
 pub(crate) use transform::*;
 
-/// Build the standard module
+/// Build the standard namespace
 pub fn builtin_namespace() -> Symbol {
     NamespaceBuilder::new("__builtin".try_into().expect("unexpected name error"))
         .symbol(assert())

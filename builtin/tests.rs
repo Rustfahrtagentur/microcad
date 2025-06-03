@@ -13,14 +13,14 @@ fn context_namespace() {
 
     let mut context = Context::default();
 
-    let module = NamespaceBuilder::new("math")
+    let namespace = NamespaceBuilder::new("math")
         .add(Symbol::Value(
             "pi".into(),
             Value::Scalar(Refer::none(std::f64::consts::PI)),
         ))
         .build();
 
-    context.add(module.into());
+    context.add(namespace.into());
 
     let symbols = context
         .fetch_symbols_by_qualified_name(&"math::pi".into())

@@ -3,15 +3,15 @@
 
 use crate::{eval::*, objects::*, syntax::*};
 
-impl ModuleInitDefinition {
-    /// Evaluate a call to the module init definition
+impl InitDefinition {
+    /// Evaluate a call to the init definition
     pub fn eval(
         &self,
         args: &ArgumentMap,
         object_builder: &mut ObjectBuilder,
         context: &mut Context,
     ) -> EvalResult<()> {
-        context.scope(StackFrame::ModuleInit(args.into()), |context| {
+        context.scope(StackFrame::Init(args.into()), |context| {
             for statement in self.body.statements.iter() {
                 match statement {
                     Statement::Assignment(assignment) => {

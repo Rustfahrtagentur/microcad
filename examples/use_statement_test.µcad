@@ -13,9 +13,9 @@ pub use std::algorithm;
 use std::debug;
 debug::assert(true);
 
-module my_module() {
+part my_part() {
     circle(radius=1);
     sphere(radius=1);
 }
 
-my_module();
+my_part();

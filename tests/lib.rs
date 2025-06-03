@@ -89,10 +89,10 @@ fn call_argument_value_list(s: &str, context: &mut Context) -> CallArgumentValue
 }
 
 #[test]
-fn module_implicit_init_call() {
+fn part_implicit_init_call() {
     use microcad_lang::*;
 
-    let mut context = evaluate_file("syntax/module/implicit_init.µcad");
+    let mut context = evaluate_file("syntax/part/implicit_init.µcad");
 
     let node = context.lookup(&qualified_name("a")).expect("Node expected");
 
@@ -104,14 +104,14 @@ fn module_implicit_init_call() {
         assert_eq!(id.id(), "a");
     }
 
-    // Get module definition for symbol `a`
-    let module_definition = match &node.borrow().def {
-        SymbolDefinition::Module(module_definition) => module_definition.clone(),
-        _ => panic!("Symbol is not a module"),
+    // Get part definition for symbol `a`
+    let definition = match &node.borrow().def {
+        SymbolDefinition::Part(definition) => definition.clone(),
+        _ => panic!("Symbol is not a part"),
     };
 
-    // Call module `a` with `b = 3.0`
-    let nodes = module_definition
+    // Call `a` with `b = 3.0`
+    let nodes = definition
         .call(
             &call_argument_value_list("b = 3.0", &mut context),
             &mut context,
@@ -137,8 +137,8 @@ fn module_implicit_init_call() {
     // Test if resulting object node has property `b` with value `3.0`
     check_node_property_b(nodes.first().expect("Node expected"), 3.0);
 
-    // Call module `a` with `b = [1.0, 2.0]` (multiplicity)
-    let nodes = module_definition
+    // Call `a` with `b = [1.0, 2.0]` (multiplicity)
+    let nodes = definition
         .call(
             &call_argument_value_list("b = [1.0, 2.0]", &mut context),
             &mut context,
@@ -153,19 +153,19 @@ fn module_implicit_init_call() {
 }
 
 #[test]
-fn module_explicit_init_call() {
+fn part_explicit_init_call() {
     use microcad_lang::diag::Diag;
     use microcad_lang::*;
 
-    let mut context = evaluate_file("syntax/module/explicit_init.µcad");
+    let mut context = evaluate_file("syntax/part/explicit_init.µcad");
     let node = context
         .lookup(&qualified_name("circle"))
         .expect("Node expected");
 
-    // Get module definition for symbol `a`
-    let module_definition = match &node.borrow().def {
-        SymbolDefinition::Module(module_definition) => module_definition.clone(),
-        _ => panic!("Symbol is not a module"),
+    // Get part definition for symbol `a`
+    let definition = match &node.borrow().def {
+        SymbolDefinition::Part(definition) => definition.clone(),
+        _ => panic!("Symbol is not a part"),
     };
 
     // Helper function to check if the object node contains a property radius with specified value
@@ -183,9 +183,9 @@ fn module_explicit_init_call() {
         }
     }
 
-    // Call module `circle(radius = 3.0)`
+    // Call `circle(radius = 3.0)`
     {
-        let nodes = module_definition
+        let nodes = definition
             .call(
                 &call_argument_value_list("radius = 3.0", &mut context),
                 &mut context,
@@ -196,9 +196,9 @@ fn module_explicit_init_call() {
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
 
-    // Call module `circle(r = 3.0)`
+    // Call `circle(r = 3.0)`
     {
-        let nodes = module_definition
+        let nodes = definition
             .call(
                 &call_argument_value_list("r = 3.0", &mut context),
                 &mut context,
@@ -209,9 +209,9 @@ fn module_explicit_init_call() {
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
 
-    // Call module `circle(d = 6.0)`
+    // Call circle(d = 6.0)`
     {
-        let nodes = module_definition
+        let nodes = definition
             .call(
                 &call_argument_value_list("d = 6.0", &mut context),
                 &mut context,
@@ -222,9 +222,9 @@ fn module_explicit_init_call() {
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
 
-    // Call module `circle(d = [1.0, 2.0])` (multiplicity)
+    // Call `circle(d = [1.0, 2.0])` (multiplicity)
     {
-        let nodes = module_definition
+        let nodes = definition
             .call(
                 &call_argument_value_list("d = [1.0, 2.0]", &mut context),
                 &mut context,
@@ -236,9 +236,9 @@ fn module_explicit_init_call() {
         check_node_property_radius(nodes.get(1).expect("Node expected"), 1.0);
     }
 
-    // Call module `circle()` (missing arguments)
+    // Call `circle()` (missing arguments)
     {
-        let nodes = module_definition
+        let nodes = definition
             .call(&CallArgumentValueList::default(), &mut context)
             .expect("Valid nodes")
             .fetch_nodes();

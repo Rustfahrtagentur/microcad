@@ -1,5 +1,5 @@
 // Define a module `circle` with two explicit initializers
-module circle(radius: Scalar) {
+part circle(radius: Scalar) {
     init(r: Scalar) {
         radius = r;
     }

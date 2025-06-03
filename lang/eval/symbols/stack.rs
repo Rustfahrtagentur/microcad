@@ -8,7 +8,7 @@ use crate::{eval::*, resolve::*};
 /// [`StackFrame`]s can have the following different types:
 /// - source file (bottom of stack)
 /// - namespaces ( e.g. `namespace my_lib { ... }`)
-/// - module calls (e.g. `std::geo2d::circle(radius = 1m)`)
+/// - init calls (e.g. `std::geo2d::circle(radius = 1m)`)
 /// - function calls (e.g. `std::print("µcad")`)
 /// - bodies (e.g. `{ ... }`)
 #[derive(Default)]
@@ -24,8 +24,8 @@ impl Stack {
             match frame {
                 StackFrame::Source(_, last)
                 | StackFrame::Body(last)
-                | StackFrame::Module(_, last)
-                | StackFrame::ModuleInit(last) => {
+                | StackFrame::Part(_, last)
+                | StackFrame::Init(last) => {
                     let op = if last.insert(id.clone(), symbol).is_some() {
                         "Added"
                     } else {
@@ -59,10 +59,10 @@ impl Stack {
         Err(EvalError::LocalStackEmpty(id))
     }
 
-    /// Return most top stack frame of type module
-    fn current_module_id(&self) -> Option<&Identifier> {
+    /// Return most top stack frame of type part
+    fn current_part_id(&self) -> Option<&Identifier> {
         self.0.iter().rev().find_map(|frame| {
-            if let StackFrame::Module(id, _) = frame {
+            if let StackFrame::Part(id, _) = frame {
                 Some(id)
             } else {
                 None
@@ -85,8 +85,8 @@ impl Stack {
     }
 
     /// Get name of current namespace.
-    pub fn current_module(&self) -> Option<QualifiedName> {
-        if let Some(id) = self.current_module_id() {
+    pub fn current_part(&self) -> Option<QualifiedName> {
+        if let Some(id) = self.current_part_id() {
             let name = QualifiedName::new(vec![id.clone()], id.src_ref());
             Some(name.with_prefix(&self.current_namespace()))
         } else {
@@ -163,8 +163,8 @@ impl Locals for Stack {
             match frame {
                 StackFrame::Source(_, locals)
                 | StackFrame::Body(locals)
-                | StackFrame::Module(_, locals)
-                | StackFrame::ModuleInit(locals) => {
+                | StackFrame::Part(_, locals)
+                | StackFrame::Init(locals) => {
                     if let Some(local) = locals.get(id) {
                         log::trace!("fetched {id} from locals");
                         return Ok(local.clone());

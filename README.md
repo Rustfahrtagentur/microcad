@@ -75,13 +75,13 @@ The resulting STL model looks like this: ![Lid](examples/lid.png)
 
 #### Source Code Explanation
 
-The source file defines a *module* called `lid`, which instantiates two cylinders with different diameters and geometrically subtracts them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
+The source file defines a *part* called `lid`, which instantiates two cylinders with different diameters and geometrically subtracts them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
 
 [![test](.test/first_example.png)](.test/first_example.log)
 
 ```µcad,first_example
-// We have module called `lid` with three parameters
-module lid(
+// We have part called `lid` with three parameters
+part lid(
     thickness = 1.6mm,
     inner_diameter = 16cm,
     height = 20mm,

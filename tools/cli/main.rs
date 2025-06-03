@@ -109,7 +109,7 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
                     r#"// µcad generated file
 use std::*;
 
-module main() {
+part main() {
   print( "Hello µcad" );
 }
 

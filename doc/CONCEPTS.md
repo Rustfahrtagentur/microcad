@@ -17,7 +17,7 @@ Any errors which occur within the parsing phase are related to file access or sy
 In the resolving phase, the following steps are done:
 
 1. the search paths will be recursively scanned for any external µcad files
-2. all symbols (modules, functions, constants and namespaces) in the source file will be put into a symbol tree
+2. all symbols (e,g, parts, functions, constants and namespaces) in the source file will be put into a symbol tree
 
 At the end all dependent files are loaded and syntax definitions are placed in the symbol tree and everything can be found by it's qualified name.
 
@@ -29,7 +29,7 @@ While this phase the following things will be done:
 
 - expressions will be calculated
 - functions will be called
-- modules will generate *object nodes*
+- parts will generate *object nodes*
 - user messages will be output on console
 
 Any errors which occur within the evaluation phase are related to semantic issues.

@@ -43,7 +43,7 @@ multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
 identifier_part = { alpha | "_" }
 identifier_body = { (alpha | "_") ~ (alpha | digit | "_")* }
-keywords = {"namespace" | "module" | "function" | "if" | "else" | "use" | "return"}
+keywords = {"namespace" | "part" | "function" | "if" | "else" | "use" | "return"}
 
 //`a`: ok
 //`a1`: ok
@@ -135,14 +135,12 @@ qualified_name = { identifier ~ ("::" ~ identifier)* }
 //`[scalar => scalar]`: ok # Map type
 //`(scalar, scalar)`: Unnamed tuple type
 //`(a: scalar, b: scalar)`: Named tuple type
-//`{}`: ok # Module type
 type = {
   qualified_name |
   list_type |
   map_type |
   named_tuple_type |
   unnamed_tuple_type |
-  module_type |
   unit
 }
 
@@ -160,9 +158,6 @@ list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 // Associative list, behaves like a map
 //`[Length => string]`: maps a Length to a string
 map_type = { "[" ~ ws* ~ type ~ ws* ~ "=>" ~ ws* ~ type ~ ws* ~ "]" }
-
-// Generic type for modules
-module_type = { "{" ~ ws* ~ "}" }
 
 //`(Length,scalar)`: ok # 2 unnamed fields
 //`(Length, a: Length)`: error # Cannot mix named and unnamed arguments
@@ -412,16 +407,16 @@ if_statement = { "if" ~ ws* ~ expression ~ ws* ~ body ~ ws* ~ ("else" ~ ws* ~ bo
 
 body_else = { body }
 
-//`module foo() { }`: ok # Module with no properties
-//`module foo(a: scalar) { }`: ok # Module with properties
-//`module foo(a: scalar, b: scalar) { }`: ok # Module with multiple properties
-//`module foo() { module bar() { } }`: ok # Nested module definition
-//`module foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
-//`module list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Module with module as properties
-//`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function
-//`module foo() { function bar(a: scalar) -> scalar { a } }`: ok # Module with function
-//`module donut(radius) { }`: error # Module property must have type annotations
-module_definition = { (attribute_list ~ ws+)? ~ "module" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
+//`part foo() { }`: ok # Part with no properties
+//`part foo(a: scalar) { }`: ok # Part with properties
+//`part foo(a: scalar, b: scalar) { }`: ok # Part with multiple properties
+//`part foo() { part bar() { } }`: ok # Nested part definition
+//`part foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
+//`part list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Part with part as properties
+//`part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
+//`part foo() { function bar(a: scalar) -> scalar { a } }`: ok # Part with function
+//`part donut(radius) { }`: error # Part property must have type annotations
+part_definition = { (attribute_list ~ ws+)? ~ "part" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
 //`{ translate() rotate(); }`: ok
 //`{}`: ok # Empty body
@@ -430,17 +425,17 @@ body = { "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
 //`init(d: Length) { r = d / 2; }`: ok
 //`init(size: Length) { size = size; }`: ok
 //`init(size: Length) { rectangle(size); }: ok
-module_init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ body }
+init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 
-//`namespace math { }`: ok # namespace (like module with no arguments)
+//`namespace math { }`: ok # namespace
 //`namespace math { function pi() -> scalar { return 3.14159; } }`: ok # namespace with function
 namespace_definition = { "namespace" ~ ws+ ~ identifier ~ ws* ~ body }
 
 statement = {
-  module_definition |
+  part_definition |
   namespace_definition |
   function_definition |
-  module_init_definition |
+  init_definition |
 
   use_statement |
   return_statement |
@@ -454,5 +449,5 @@ statement = {
 statement_list = { final_expression_statement | (statement ~ ws*)* ~ final_expression_statement? }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-//`module foo() { init(size: Length) { rectangle(size); } }`: ok # Module with init function
+//`part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
 source_file = { SOI ~ ws* ~ statement_list ~ ws* ~ EOI }

@@ -1,11 +1,11 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Module statement syntax elements
+//! Return statement syntax elements
 
 use crate::{src_ref::*, syntax::*};
 
-/// Module statement
+/// Return statement
 #[derive(Clone, Debug)]
 pub struct ReturnStatement {
     /// return value

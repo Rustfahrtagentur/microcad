@@ -11,7 +11,7 @@ points to.
 
 ## No use statement
 
-The following example which uses two *modules* of `geo3d` shows the problem:
+The following example which uses two *parts* of `geo3d` shows the problem:
 
 [![test](.test/no_use_statement.png)](.test/no_use_statement.log)
 
@@ -93,7 +93,7 @@ cube(size = 40mm);
 ## `pub use` statement
 
 This statement does not only make the *target symbol* visible on the current scope but in
-the symbol table where outside modules might use it too.
+the symbol table where outside code might use it too.
 
 `sphere` and `cube` will be made available for using them outside of namespace `my` in the following example:
 

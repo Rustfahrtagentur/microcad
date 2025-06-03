@@ -1,10 +1,10 @@
 
-/// Circle module definition
+/// Circle definition
 ///
 /// Examples:
 /// * with radius `r`: `circle(r = 10.0mm);`
 /// * with diameter `d`: `circle(d = 5.0mm);`
-module circle(radius: Length) {
+part circle(radius: Length) {
     init(r: Length) {
         radius = r;
     }
@@ -20,11 +20,11 @@ module circle(radius: Length) {
     __builtin::geo2d::circle(radius / 1mm);
 }
 
-/// Rectangle module definition
+/// Rectangle definition
 ///
 /// Examples:
 /// * centered rect with width `w` and height `h`: `rect(width = 10.0mm, height = 5.0mm);`
-module rect(width: Length, height: Length, x: Length, y: Length) {
+part rect(width: Length, height: Length, x: Length, y: Length) {
     init(width: Length, height: Length) {
         x = -width / 2.0; // center x
         y = -height / 2.0; // center y

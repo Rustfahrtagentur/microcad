@@ -38,11 +38,11 @@ mod expression;
 mod externals;
 mod format_string;
 mod function;
+mod init;
 mod literal;
-mod module;
-mod module_init;
 mod output;
 mod parameter;
+mod part;
 mod source_file;
 mod statement;
 mod symbols;
@@ -57,8 +57,8 @@ pub use context::*;
 pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
-pub use symbols::*;
 pub use r#use::*;
+pub use symbols::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 

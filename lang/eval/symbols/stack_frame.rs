@@ -20,17 +20,13 @@ pub enum StackFrame {
     Source(Identifier, SymbolMap),
     /// Namespace scope with locals.
     Namespace(Identifier, SymbolMap),
-    /// Module scope with locals.
-    ///
-    /// Symbol map is built from [`ParameterList`].
-    Module(Identifier, SymbolMap),
-    /// Module initializer scope with locals.
-    ///
-    /// Symbol map is built from [`ParameterList`].
-    ModuleInit(SymbolMap),
+    /// Part scope with locals.
+    Part(Identifier, SymbolMap),
+    /// initializer scope with locals.
+    Init(SymbolMap),
     /// Body (scope)  with locals.
     Body(SymbolMap),
-    /// A call of a built-in, function or module.
+    /// A call (e.g. og function or  part).
     Call {
         /// Symbol that was called.
         symbol: Symbol,
@@ -61,12 +57,12 @@ impl StackFrame {
                 writeln!(f, "{:depth$}{id} (source):", "")?;
                 map
             }
-            StackFrame::Module(id, symbols) => {
-                writeln!(f, "{:depth$}{id} (module)", "")?;
+            StackFrame::Part(id, symbols) => {
+                writeln!(f, "{:depth$}{id} (part)", "")?;
                 return symbols.print(f, depth + 4);
             }
-            StackFrame::ModuleInit(symbols) => {
-                writeln!(f, "{:depth$}(module init):", "")?;
+            StackFrame::Init(symbols) => {
+                writeln!(f, "{:depth$}(init):", "")?;
                 return symbols.print(f, depth + 4);
             }
             StackFrame::Namespace(id, symbols) => {
@@ -114,8 +110,8 @@ impl StackFrame {
         match self {
             StackFrame::Source(_identifier, _symbol_map) => todo!(),
             StackFrame::Namespace(_identifier, _symbol_map) => todo!(),
-            StackFrame::Module(_identifier, _symbol_map) => todo!(),
-            StackFrame::ModuleInit(_symbol_map) => todo!(),
+            StackFrame::Part(_identifier, _symbol_map) => todo!(),
+            StackFrame::Init(_symbol_map) => todo!(),
             StackFrame::Body(_symbol_map) => todo!(),
             StackFrame::Call {
                 symbol,

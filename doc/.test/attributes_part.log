@@ -1,0 +1,6 @@
+Parser error:  --> 1:7
+  |
+1 | #[part = 42]
+  |       ^---
+  |
+  = expected identifier_part

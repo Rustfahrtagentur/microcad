@@ -86,7 +86,7 @@ fn parse_source_file() {
     let source_file = Parser::parse_rule::<SourceFile>(
         Rule::source_file,
         r#"use std::io::println;
-            module foo(r: scalar) {
+            part foo(r: scalar) {
                 info("Hello, world, {r}!");
             }
             foo(20.0);

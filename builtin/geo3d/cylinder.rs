@@ -15,7 +15,7 @@ pub struct Cylinder {
     pub height: Scalar,
 }
 
-impl BuiltinModuleDefinition for Cylinder {
+impl BuiltinPartDefinition for Cylinder {
     fn id() -> &'static str {
         "cylinder"
     }

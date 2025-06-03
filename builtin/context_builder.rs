@@ -48,9 +48,9 @@ impl ContextBuilder {
         Ok(self)
     }
 
-    /// Add a module to the context
-    pub fn with_module(mut self, module: Rc<ModuleDefinition>) -> Self {
-        self.context.add(module.into());
+    /// Add a part to the context
+    pub fn with_part(mut self, part: Rc<PartDefinition>) -> Self {
+        self.context.add(part.into());
         self
     }
 

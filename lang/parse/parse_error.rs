@@ -99,7 +99,7 @@ pub enum ParseError {
 
     /// Statement between two init statements
     #[error("Statement between two init statements")]
-    StatementBetweenModuleInit,
+    StatementBetweenInit,
 
     /// Loading of a source file failed
     #[error("Loading of source file {0:?} failed")]

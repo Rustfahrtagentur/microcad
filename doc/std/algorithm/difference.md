@@ -10,11 +10,11 @@ In the following examples the difference of two circles is calculated.
 std::geo2d::circle(radius = 3mm) - std::geo2d::rect(width = 3mm, height = 2mm);
 ```
 
-## Difference module
+## Alternative difference operator
 
-[![test](.test/difference_module.png)](.test/difference_module.log)
+[![test](.test/difference_alt_operator.png)](.test/difference_alt_operator.log)
 
-```µcad,difference_module
+```µcad,difference_alt_operator
 use std::*;
 
 algorithm::difference() {

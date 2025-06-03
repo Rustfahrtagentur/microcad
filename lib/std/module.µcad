@@ -11,8 +11,8 @@ namespace debug {
 pub use transform::translate;
 pub use transform::rotate;
 
-/// Export helper module.
-module export(filename: String) {
+/// Export helper part.
+part export(filename: String) {
     #[export(filename)] {
         @children
     }

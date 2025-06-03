@@ -1,15 +1,15 @@
 # Examples
 
-## Parametric Module
+## Parts
 
-* Parametric modules have a parameter lists
+* Parts can have a parameter lists
 
 ### Calculation in Function
 
 [![test](.test/EXAMPLES_functions.png)](.test/EXAMPLES_functions.log)
 
 ```µcad,EXAMPLES_functions#todo
-module cube_with_volume(size: length) {
+part cube_with_volume(size: length) {
 
     function volume() {
         size*size*size
@@ -32,7 +32,7 @@ info("Cube weight: {my_cube.weight(40g/mm^3)}");
 [![test](.test/EXAMPLES_fields.png)](.test/EXAMPLES_fields.log)
 
 ```µcad,EXAMPLES_fields#todo
-module cube_with_volume(size: length) {
+part cube_with_volume(size: length) {
 
     volume = size*size*size;
 

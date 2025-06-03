@@ -1,4 +1,4 @@
-# Module Parameter List
+# Parameter List
 
 A 2D donut as circle with a hole.
 
@@ -6,8 +6,8 @@ A 2D donut as circle with a hole.
 
 ```µcad,parameter_list#todo
 // declare two parameters
-module donut(outer: length, inner: length) {
-    // parameters can be used anywhere within the module
+part donut(outer: length, inner: length) {
+    // parameters can be used anywhere within the part
     std::geo2d::circle(outer) - std::geo2d::circle(inner);
 }
 

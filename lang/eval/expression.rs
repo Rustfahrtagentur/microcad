@@ -178,8 +178,8 @@ impl Eval for NestedItem {
                 SymbolDefinition::Namespace(ns) => {
                     Err(EvalError::UnexpectedNested("namespace", ns.id.clone()))
                 }
-                SymbolDefinition::Module(md) => {
-                    Err(EvalError::UnexpectedNested("module", md.id.clone()))
+                SymbolDefinition::Part(md) => {
+                    Err(EvalError::UnexpectedNested("part", md.id.clone()))
                 }
                 SymbolDefinition::Function(f) => {
                     Err(EvalError::UnexpectedNested("function", f.id.clone()))

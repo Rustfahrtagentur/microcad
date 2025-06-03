@@ -1,35 +1,35 @@
-# Modules
+# Parts
 
-- [Modules](#modules)
+- [Parts](#parts)
   - [Declaration](#declaration)
     - [Pre-initialization code](#pre-initialization-code)
     - [Explicit Initializers](#explicit-initializers)
     - [Post-initialization code](#post-initialization-code)
-  - [Module Elements](#module-elements)
+  - [Part Elements](#part-elements)
   - [Examples](#examples)
 
-Modules in µcad are similar to so-called *classes* in other programming languages
+Parts in µcad are similar to so-called *classes* in other programming languages
 but also they differ quite a bit.
 
-A module consist of an *identifier*, some *initializers*, *fields*  and *code* which can be run by calling the module like a function.
-If code in a module gets complex it can be separated into functions.
+A part consist of an *identifier*, some *initializers*, *fields*  and *code* which can be run by calling the part like a function.
+If code in a part gets complex it can be separated into functions.
 
-The *parameters* of a module can be defined directly behind the module name (*implicitly*) as well as by several *init()* functions (*explicitly*) which are quite similar to *constructors* in other programming languages.
+The *parameters* of a part can be defined directly behind the part name (*implicitly*) as well as by several *init()* functions (*explicitly*) which are quite similar to *constructors* in other programming languages.
 
 ## Declaration
 
-A *module declaration* consists of...
+A *part declaration* consists of...
 
-- a header where one defines a name of the module and the parameters of the *implicit initializer*,
+- a header where one defines a name of the part and the parameters of the *implicit initializer*,
 - maybe some so-called *pre-initialization code*,
 - maybe some *explicit initializers*, and
 - some *post-initialization code* which sometimes is called just *code*.
 
-[![test](.test/modules_declaration.png)](.test/modules_declaration.log)
+[![test](.test/parts_declaration.png)](.test/parts_declaration.log)
 
-```µcad,modules_declaration
-// define custom module circle with an implicit initializer
-module small_disc(diameter: Length) {
+```µcad,parts_declaration
+// define custom part circle with an implicit initializer
+part small_disc(diameter: Length) {
     // explicit initializers 
     init(radius: Length) {
         diameter = radius * 2.0;
@@ -39,7 +39,7 @@ module small_disc(diameter: Length) {
     std::geo2d::circle(diameter);
 }
 
-// call module
+// call part
 std::debug::assert(small_disc(diameter = 1cm).diameter == 1cm);
 std::debug::assert(small_disc(radius = 1cm).diameter == 2cm);
 ```
@@ -55,10 +55,10 @@ It's not allowed to write code between them.
 
 ### Post-initialization code
 
-Post-initialization code is either the code of a module without any *explicit initializers* or the code after them.
+Post-initialization code is either the code of a part without any *explicit initializers* or the code after them.
 It can access all fields generated from implicit or explicit initialization or from any explicit initializer.
 
-## Module Elements
+## Part Elements
 
 - [Functions](functions.md)
 - [Explicit Initialization (`init`)](init.md)

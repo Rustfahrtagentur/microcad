@@ -5,12 +5,12 @@
 * immer call by value
 * Callables:
   * das kann Module oder Function
-  * module(a = 3)
-  * d = function(b = 4)
+  * m(a = 3)
+  * d = f(b = 4)
 * Function haben eigenen Scope
   * Können nur auf die Parameter zugreifen
 
-## Implicit Initializers from parameter list (also relates to module parameters)
+## Implicit Initializers from parameter list (also relates to part parameters)
 
 [![test](.test/README_implicit_init_by_parameter_A.png)](.test/README_implicit_init_by_parameter_A.log)
 

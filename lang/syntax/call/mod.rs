@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Syntax elements related to function or module calls.
+//! Syntax elements related to calls.
 
 mod call_argument;
 mod call_argument_list;
@@ -13,7 +13,7 @@ pub use method_call::*;
 
 use crate::{objects::*, src_ref::*, syntax::*, value::*};
 
-/// Call of a function or module initialization.
+/// Call of a function or init.
 #[derive(Clone, Debug, Default)]
 pub struct Call {
     /// Qualified name of the call.

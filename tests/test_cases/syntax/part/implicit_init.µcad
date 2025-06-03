@@ -1,5 +1,5 @@
 // Define a module `a` with `b` as property
-module a(b: Scalar) {}
+part a(b: Scalar) {}
 
 // Test if we can access `b` property
 __builtin::assert(a(b = 3.0).b == 3.0);

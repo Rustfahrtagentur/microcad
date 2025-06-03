@@ -10,11 +10,11 @@ Express union with binary operator `|`:
 std::geo2d::circle(radius = 3mm) | std::geo2d::rect(width = 3mm, height = 2mm);
 ```
 
-## Union module
+## Alternative union operator
 
-[![test](.test/union_module.png)](.test/union_module.log)
+[![test](.test/union_alt_operator.png)](.test/union_alt_operator.log)
 
-```µcad,union_module
+```µcad,union_alt_operator
 std::algorithm::union() {
     std::geo2d::circle(radius = 3mm);
     std::geo2d::rect(width = 3mm, height = 2mm);

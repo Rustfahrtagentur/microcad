@@ -2,11 +2,11 @@
 namespace a {
     namespace b {
         namespace c {
-            module m1() {}
+            part m1() {}
         }
     }
 
-    module m2() {}
+    part m2() {}
 }
 
 namespace d {

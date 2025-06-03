@@ -17,7 +17,7 @@ impl StatementList {
         // Iterate over all statement fetch definitions
         for statement in &self.0 {
             match statement {
-                Statement::Module(m) => {
+                Statement::Part(m) => {
                     symbol_map.insert(m.id.clone(), m.resolve(parent.clone()));
                 }
                 Statement::Namespace(n) => {

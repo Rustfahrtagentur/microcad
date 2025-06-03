@@ -1,17 +1,17 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Module definition syntax element evaluation
+//! Part definition syntax element evaluation
 
 use crate::{eval::*, objects::*, rc::*, syntax::*};
 
-impl ModuleDefinition {
+impl PartDefinition {
     /// Find a matching initializer for call argument list
     fn find_matching_initializer(
         &self,
         args: &CallArgumentValueList,
         context: &mut Context,
-    ) -> Option<(&ModuleInitDefinition, MultiArgumentMap)> {
+    ) -> Option<(&InitDefinition, MultiArgumentMap)> {
         self.inits().find_map(|init| {
             if let Ok(arg_map) = args.get_multi_matching_arguments(context, &init.parameters) {
                 Some((init, arg_map))
@@ -23,7 +23,7 @@ impl ModuleDefinition {
 
     /// Resolve into SymbolNode
     pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
-        let node = Symbol::new(SymbolDefinition::Module(self.clone()), parent);
+        let node = Symbol::new(SymbolDefinition::Part(self.clone()), parent);
         node.borrow_mut().children = self.body.resolve(Some(node.clone()));
         node
     }
@@ -32,53 +32,49 @@ impl ModuleDefinition {
     fn eval_to_node<'a>(
         &'a self,
         args: &ArgumentMap,
-        init: Option<&'a ModuleInitDefinition>,
+        init: Option<&'a InitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ObjectNode> {
         let mut object_builder = ObjectBuilder::default();
 
-        context.scope(
-            StackFrame::Module(self.id.clone(), args.into()),
-            |context| {
-                object_builder.init_properties(&self.parameters.eval(context)?, args);
-                object_builder
-                    .add_attributes(self.attribute_list.eval_to_object_attributes(context)?);
+        context.scope(StackFrame::Part(self.id.clone(), args.into()), |context| {
+            object_builder.init_properties(&self.parameters.eval(context)?, args);
+            object_builder.add_attributes(self.attribute_list.eval_to_object_attributes(context)?);
 
-                // Create the object node from initializer if present
-                if let Some(init) = init {
-                    init.eval(args, &mut object_builder, context)?;
-                }
+            // Create the object node from initializer if present
+            if let Some(init) = init {
+                init.eval(args, &mut object_builder, context)?;
+            }
 
-                object_builder.properties_to_scope(context)?;
+            object_builder.properties_to_scope(context)?;
 
-                // At this point, all properties must have a value
-                for statement in self.body.statements.iter() {
-                    match statement {
-                        Statement::Assignment(assignment) => {
-                            assignment.eval(context)?;
-                        }
-                        Statement::Expression(expression) => {
-                            let value = expression.eval(context)?;
-                            object_builder.append_children(&mut value.fetch_nodes());
-                        }
-                        _ => {}
+            // At this point, all properties must have a value
+            for statement in self.body.statements.iter() {
+                match statement {
+                    Statement::Assignment(assignment) => {
+                        assignment.eval(context)?;
                     }
+                    Statement::Expression(expression) => {
+                        let value = expression.eval(context)?;
+                        object_builder.append_children(&mut value.fetch_nodes());
+                    }
+                    _ => {}
                 }
+            }
 
-                Ok(object_builder.build_node())
-            },
-        )
+            Ok(object_builder.build_node())
+        })
     }
 }
 
-impl CallTrait for ModuleDefinition {
-    /// Evaluate the call of a module
+impl CallTrait for PartDefinition {
+    /// Evaluate the call of a part initialization
     ///
     /// The evaluation considers multiplicity, which means that multiple nodes maybe created.
     ///
     /// Example:
-    /// Consider the `module a(b: Scalar) { }`.
-    /// Calling the module `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
+    /// Consider the `part a(b: Scalar) { }`.
+    /// Calling the part `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
     fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value> {
         let mut nodes = Vec::new();
 

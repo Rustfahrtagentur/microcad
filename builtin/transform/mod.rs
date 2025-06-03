@@ -9,7 +9,7 @@ pub use translate::*;
 
 use microcad_lang::{eval::*, resolve::*};
 
-/// Builtin module for 2D geometry
+/// Builtin namespace for 2D geometry
 pub fn transform() -> Symbol {
     crate::NamespaceBuilder::new("transform".try_into().expect("valid id"))
         .symbol(Translate::symbol())

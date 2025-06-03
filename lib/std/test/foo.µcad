@@ -1,2 +1,2 @@
-module bar() {
+part bar() {
 }

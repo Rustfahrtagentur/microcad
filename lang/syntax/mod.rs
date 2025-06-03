@@ -15,9 +15,9 @@ pub mod function;
 pub mod identifier;
 pub mod lang_type;
 pub mod literal;
-pub mod module;
 pub mod namespace;
 pub mod parameter;
+pub mod part;
 pub mod source_file;
 pub mod statement;
 pub mod r#use;
@@ -32,12 +32,12 @@ pub use function::*;
 pub use identifier::*;
 pub use lang_type::*;
 pub use literal::*;
-pub use module::*;
 pub use namespace::*;
 pub use parameter::*;
+pub use part::*;
+pub use r#use::*;
 pub use source_file::*;
 pub use statement::*;
-pub use r#use::*;
 
 /// Trait for printing a syntax tree
 pub trait PrintSyntax {

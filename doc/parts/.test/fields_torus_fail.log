@@ -1,0 +1,6 @@
+Parser error:  --> 1:18
+  |
+1 | part torus(radius) {} // Missing radius' type
+  |                  ^---
+  |
+  = expected COMMENT

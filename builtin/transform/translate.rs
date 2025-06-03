@@ -8,7 +8,7 @@ use microcad_lang::{eval::*, objects::*, syntax::*, ty::*};
 #[derive(Debug)]
 pub struct Translate;
 
-impl BuiltinModuleDefinition for Translate {
+impl BuiltinPartDefinition for Translate {
     fn id() -> &'static str {
         "translate"
     }

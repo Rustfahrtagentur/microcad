@@ -20,7 +20,7 @@ Declarations without any unit is *not allowed* in µcad:
  x: Length;         // error
 ```
 
-This one is just needed, if you declare parameters of a function or a module without giving any default value:
+This one is just needed, if you declare parameters giving any default value:
 
 [![test](.test/types_bundles_functions.png)](.test/types_bundles_functions.log)
 

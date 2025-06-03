@@ -44,7 +44,7 @@ pub enum Type {
     UnnamedTuple(UnnamedTupleType),
     /// A named tuple of elements: `(x: scalar, y: string)`
     NamedTuple(NamedTupleType),
-    /// A custom type or a module node in the syntax tree
+    /// A custom type or a part node in the syntax tree
     Custom(QualifiedName),
     /// Node
     Node,

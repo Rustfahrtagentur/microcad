@@ -7,12 +7,12 @@ One just need to know all values of all the variables.
 ## Program Structure
 
 A **µcad program** can be just a sequence of instructions or a more complex construct of
-separate **modules** and **functions** which may depend on each other via **use statements**.
+separate **parts** and **functions** which may depend on each other via **use statements**.
 **Namespaces** help to bundle things into packages and solve naming collisions.
 
-* [Modules](modules/README.md)
+* [Parts](parts/README.md)
 * [Use Statement](use_statement.md)
-* [Namespaces](namespaces.md)
+* [Modules](modules.md)
 
 ## Data Types
 
@@ -35,7 +35,7 @@ programming concepts like for-loops or goto-jumps.
 
 ## Builtin Libraries
 
-A big advantage which µcad can take from it's strict module concept is that
+A big advantage which µcad can take from it's strict modular concept is that
 big parts of the basic functionalities can be written in the µcad language itself.
 
 * Standard Library (`std`)
