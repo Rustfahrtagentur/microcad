@@ -42,7 +42,10 @@ impl Body {
                     Statement::If(_) => todo!("if statement not implemented"),
                     statement => {
                         use crate::diag::PushDiag;
-                        context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
+                        context.error(
+                            self,
+                            EvalError::StatementNotSupported(statement.clone().into()),
+                        )?;
                         Value::None
                     }
                 };

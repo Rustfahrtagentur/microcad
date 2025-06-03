@@ -151,7 +151,7 @@ pub enum EvalError {
 
     /// Statement is not supported in this context.
     #[error("Statement not supported: {0}")]
-    StatementNotSupported(Statement),
+    StatementNotSupported(Box<Statement>),
 
     /// Properties are not initialized.
     #[error("Properties have not been initialized: {0}")]

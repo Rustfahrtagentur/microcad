@@ -30,7 +30,10 @@ impl ModuleInitDefinition {
                             .append_children(&mut expression.eval(context)?.fetch_nodes());
                     }
                     _ => {
-                        context.error(self, EvalError::StatementNotSupported(statement.clone()))?;
+                        context.error(
+                            self,
+                            EvalError::StatementNotSupported(statement.clone().into()),
+                        )?;
                     }
                 }
             }

@@ -18,7 +18,7 @@ pub enum AttributeError {
 
     /// Attribute cannot be assigned to an expression.
     #[error("Cannot assign attribute to expression `{0}`")]
-    CannotAssignToExpression(Expression),
+    CannotAssignToExpression(Box<Expression>),
 }
 
 impl Attribute {
