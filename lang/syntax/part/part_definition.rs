@@ -8,14 +8,14 @@ use crate::{src_ref::*, syntax::*};
 /// Part definition
 #[derive(Clone, Debug)]
 pub struct PartDefinition {
-    /// Part attributes.
-    pub attribute_list: AttributeList,
     /// Part name.
     pub id: Identifier,
-    /// Part parameters (implicit initialization).
-    pub parameters: ParameterList,
     /// Part body
     pub body: Body,
+    /// Part attributes.
+    pub attribute_list: AttributeList,
+    /// Part parameters (implicit initialization).
+    pub parameters: ParameterList,
     /// Part code reference
     pub src_ref: SrcRef,
 }
