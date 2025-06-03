@@ -1,0 +1,36 @@
+{
+  "name": "microcad",
+  "displayName": "µcad language support",
+  "description": "language support for microcad",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "microcad",
+        "aliases": [
+          "microcad",
+          "µcad",
+          "mcad"
+        ],
+        "extensions": [
+          "µcad",
+          "mcad"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "microcad",
+        "scopeName": "source.microcad",
+        "path": "./syntaxes/microcad.tmLanguage.json"
+      }
+    ]
+  }
+}
