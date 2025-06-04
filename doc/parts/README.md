@@ -31,6 +31,18 @@ The following (stupid) code demonstrates most of these elements:
 
 [![test](.test/part_declaration.png)](.test/part_declaration.log)
 
+```microcad
+part my_part() {}
+```
+
+```µcad
+part my_part() {}
+```
+
+```mcad
+part my_part() {}
+```
+
 ```µcad,part_declaration
 // define custom part circle with an implicit initializer
 part small_disc(diameter: Length) {
