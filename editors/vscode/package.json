@@ -1,0 +1,53 @@
+{
+  "name": "microcad-syntax",
+  "displayName": "µcad language support",
+  "description": "µcad (microcad) language support for visual code",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rustfahrtagentur/microcad"
+  },
+  "license": "AGPL-3.0-or-later",
+  "icon": "icon.png",
+  "publisher": "microcad",
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "microcad",
+        "aliases": [
+          "microcad",
+          "µcad",
+          "mcad"
+        ],
+        "extensions": [
+          ".µcad",
+          ".mcad"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "microcad",
+        "scopeName": "source.microcad",
+        "path": "./syntaxes/microcad.tmLanguage.json"
+      },
+      {
+        "scopeName": "markdown.microcad.codeblock",
+        "path": "./syntaxes/microcad.markdown-injection.json",
+        "injectTo": [
+          "text.html.markdown"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.microcad": "microcad"
+        }
+      }
+    ]
+  }
+}

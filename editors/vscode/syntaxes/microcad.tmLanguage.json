@@ -1,0 +1,109 @@
+{
+    "scopeName": "source.microcad",
+    "name": "microcad",
+    "patterns": [
+        {
+            "match": "//.*",
+            "name": "comment.line.microcad"
+        },
+        {
+            "match": "\\b(pub|part|use|fn|init|return|if|__builtin)\\b",
+            "name": "keyword.control.microcad"
+        },
+        {
+            "match": "\\+|-|\\*|/|%|\\=|\\==|\\!=|\\<|\\>|\\<=|\\>=|\\&&|\\|\\|",
+            "name": "keyword.operator.microcad"
+        },
+        {
+            "match": "\\b(Integer|Scalar|String|Color|Length|Area|Volume|Angle|Weight|Bool)\\b",
+            "name": "storage.type.microcad"
+        },
+        {
+            "match": "\\b([a-z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+            "name": "entity.name.function.microcad"
+        },
+        {
+            "match": "\\b([0-9]+(\\.[0-9]+)?)(cm|mm|m|km)?\\b",
+            "name": "constant.numeric.microcad"
+        },
+        {
+            "match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
+            "name": "variable.other.microcad"
+        },
+        {
+            "begin": "\\(",
+            "end": "\\)",
+            "name": "meta.brace.round.microcad",
+            "patterns": [
+                {
+                    "include": "#code"
+                }
+            ]
+        },
+        {
+            "begin": "\\{",
+            "end": "\\}",
+            "name": "meta.brace.curly.microcad",
+            "patterns": [
+                {
+                    "include": "#code"
+                }
+            ]
+        }
+    ],
+    "repository": {
+        "code": {
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "include": "#keywords"
+                },
+                {
+                    "include": "#functions"
+                },
+                {
+                    "include": "#numbers"
+                },
+                {
+                    "include": "#variables"
+                },
+                {
+                    "include": "#types"
+                },
+                {
+                    "include": "#operators"
+                }
+            ]
+        },
+        "comments": {
+            "match": "//.*",
+            "name": "comment.line.microcad"
+        },
+        "keywords": {
+            "match": "\\b(pub|part|use|fn|init|assert|return|__builtin)\\b",
+            "name": "keyword.control.microcad"
+        },
+        "functions": {
+            "match": "\\b([a-z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+            "name": "entity.name.function.microcad"
+        },
+        "numbers": {
+            "match": "\\b([0-9]+(\\.[0-9]+)?)(cm|mm|m|km)?\\b",
+            "name": "constant.numeric.microcad"
+        },
+        "variables": {
+            "match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
+            "name": "variable.other.microcad"
+        },
+        "operators": {
+            "match": "\\+|-|\\*|/|%|\\=|\\==|\\!=|\\<|\\>|\\<=|\\>=|\\&&|\\|\\|",
+            "name": "keyword.operator.microcad"
+        },
+        "types": {
+            "match": "\\b(Integer|Scalar|String|Color|Length|Area|Volume|Angle|Weight|Bool)\\b",
+            "name": "storage.type.microcad"
+        }
+    }
+}

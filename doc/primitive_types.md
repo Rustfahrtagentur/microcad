@@ -105,7 +105,6 @@ std::info(text);
 std::geo2d::text(text);
 ```
 
-
 ## Weight
 
 Weights can be calculated by applying volumes to materials.
