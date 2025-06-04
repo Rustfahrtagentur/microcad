@@ -7,7 +7,7 @@
             "name": "comment.line.microcad"
         },
         {
-            "match": "\\b(pub|part|use|fn|init|return|__builtin)\\b",
+            "match": "\\b(pub|part|use|fn|init|return|if|__builtin)\\b",
             "name": "keyword.control.microcad"
         },
         {
