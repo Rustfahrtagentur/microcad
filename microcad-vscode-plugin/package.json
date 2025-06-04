@@ -1,11 +1,18 @@
 {
   "name": "microcad-lang",
   "displayName": "µcad language support",
-  "description": "language support for microcad",
+  "description": "µcad (microcad) language support for visual code",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.100.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rustfahrtagentur/microcad"
+  },
+  "license": "AGPL-3.0-or-later",
+  "icon": "icon.png",
+  "publisher": "microcad",
   "categories": [
     "Programming Languages"
   ],
@@ -19,8 +26,8 @@
           "mcad"
         ],
         "extensions": [
-          "µcad",
-          "mcad"
+          ".µcad",
+          ".mcad"
         ],
         "configuration": "./language-configuration.json"
       }
