@@ -37,6 +37,16 @@
         "language": "microcad",
         "scopeName": "source.microcad",
         "path": "./syntaxes/microcad.tmLanguage.json"
+      },
+      {
+        "scopeName": "markdown.microcad.codeblock",
+        "path": "./syntaxes/microcad.markdown-injection.json",
+        "injectTo": [
+          "text.html.markdown"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.microcad": "microcad"
+        }
       }
     ]
   }
