@@ -68,6 +68,7 @@ impl CallMethod for Value {
             Value::Volume(_) => todo!(),
             Value::Angle(_) => todo!(),
             Value::Weight(_) => todo!(),
+            Value::Density(_) => todo!(),
             Value::Bool(_) => todo!(),
             Value::String(_) => todo!(),
             Value::Color(_) => todo!(),

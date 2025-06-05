@@ -28,6 +28,8 @@ pub enum Type {
     Angle,
     /// A physical weight, e.g. 4.0kg
     Weight,
+    /// A physical density, e.g. 1.0kg/m³
+    Density,
     /// A boolean: true, false
     Bool,
     /// A list of elements of the same type: `[scalar]`
@@ -82,6 +84,7 @@ impl std::fmt::Display for Type {
             Self::Volume => write!(f, "Volume"),
             Self::Angle => write!(f, "Angle"),
             Self::Weight => write!(f, "Weight"),
+            Self::Density => write!(f, "Density"),
             Self::Bool => write!(f, "Bool"),
             Self::List(t) => write!(f, "{}", t),
             Self::Map(t) => write!(f, "{}", t),
