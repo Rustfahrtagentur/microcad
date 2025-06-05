@@ -84,7 +84,7 @@ impl std::str::FromStr for Unit {
             "\"" => Ok(Self::Inch),
             "ft" => Ok(Self::Foot),
             "\'" => Ok(Self::Foot),
-            "yd" => Ok(Self::Foot),
+            "yd" => Ok(Self::Yard),
 
             // Angles
             "deg" => Ok(Self::Deg),
