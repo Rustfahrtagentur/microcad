@@ -63,10 +63,10 @@ impl crate::ty::Ty for Literal {
 impl std::fmt::Display for Literal {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Literal::Integer(i) => write!(f, "{}", i),
-            Literal::Number(n) => write!(f, "{}", n),
-            Literal::Bool(b) => write!(f, "{}", b),
-            Literal::Color(c) => write!(f, "{}", c),
+            Literal::Integer(i) => write!(f, "{i}"),
+            Literal::Number(n) => write!(f, "{n}"),
+            Literal::Bool(b) => write!(f, "{b}"),
+            Literal::Color(c) => write!(f, "{c}"),
         }
     }
 }
@@ -81,10 +81,10 @@ impl PrintSyntax for Literal {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         write!(f, "{:depth$}Literal: ", "")?;
         match self {
-            Literal::Integer(i) => writeln!(f, "{}", i),
-            Literal::Number(n) => writeln!(f, "{}", n),
-            Literal::Bool(b) => writeln!(f, "{}", b),
-            Literal::Color(c) => writeln!(f, "{}", c),
+            Literal::Integer(i) => writeln!(f, "{i}"),
+            Literal::Number(n) => writeln!(f, "{n}"),
+            Literal::Bool(b) => writeln!(f, "{b}"),
+            Literal::Color(c) => writeln!(f, "{c}"),
         }
     }
 }

@@ -16,7 +16,7 @@ impl std::fmt::Display for UnnamedTupleType {
             if i > 0 {
                 write!(f, ", ")?;
             }
-            write!(f, "{}", t)?;
+            write!(f, "{t}")?;
         }
         write!(f, ")")
     }

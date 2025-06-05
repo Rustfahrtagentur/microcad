@@ -29,9 +29,9 @@ impl SrcReferrer for NestedItem {
 impl std::fmt::Display for NestedItem {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Call(call) => write!(f, "{}", call),
-            Self::QualifiedName(qualified_name) => write!(f, "{}", qualified_name),
-            Self::Body(body) => write!(f, "{}", body),
+            Self::Call(call) => write!(f, "{call}"),
+            Self::QualifiedName(qualified_name) => write!(f, "{qualified_name}"),
+            Self::Body(body) => write!(f, "{body}"),
         }
     }
 }

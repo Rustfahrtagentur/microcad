@@ -69,10 +69,10 @@ fn main() -> std::io::Result<()> {
             let year_range = if min_year == max_year {
                 min_year.to_string()
             } else {
-                format!("{}-{}", min_year, max_year)
+                format!("{min_year}-{max_year}")
             };
 
-            let new_content = re.replace(&content, format!("Copyright © {}", year_range));
+            let new_content = re.replace(&content, format!("Copyright © {year_range}"));
 
             if new_content != content {
                 fs::write(&path, new_content.to_string())?;
