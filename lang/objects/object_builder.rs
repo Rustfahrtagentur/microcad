@@ -9,7 +9,7 @@ use crate::{eval::*, objects::*};
 #[derive(Default)]
 pub struct ObjectBuilder {
     object: Object,
-    children: Vec<ObjectNode>,
+    children: ObjectNodes,
 }
 
 impl ObjectBuilder {
@@ -42,8 +42,8 @@ impl ObjectBuilder {
     }
 
     /// Append child nodes to this object node.
-    pub fn append_children(&mut self, nodes: &mut Vec<ObjectNode>) -> &mut Self {
-        self.children.append(nodes);
+    pub fn append_children(&mut self, nodes: &mut ObjectNodes) -> &mut Self {
+        (*self.children).append(nodes);
         self
     }
 
@@ -75,9 +75,9 @@ impl ObjectBuilder {
 
     /// Build the [ObjectNode].
     pub fn build_node(self) -> ObjectNode {
-        let node = ObjectNode::new(ObjectNodeInner::Object(self.object));
-        for child in self.children {
-            node.append(child);
+        let node = ObjectNode::new_object(self.object);
+        for child in self.children.iter() {
+            node.append(child.clone());
         }
         node
     }

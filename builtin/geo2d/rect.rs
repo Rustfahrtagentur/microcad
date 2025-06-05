@@ -18,14 +18,14 @@ impl BuiltinPartDefinition for Rect {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
-        Ok(ObjectNode::new(ObjectNodeInner::Primitive2D(Rc::new(
-            Rect {
+        Ok(ObjectNode::new_from_content(
+            ObjectNodeContent::Primitive2D(Rc::new(Rect {
                 width: args.get_value::<Scalar>(&Identifier::no_ref("width")),
                 height: args.get_value::<Scalar>(&Identifier::no_ref("height")),
                 x: args.get_value::<Scalar>(&Identifier::no_ref("x")),
                 y: args.get_value::<Scalar>(&Identifier::no_ref("y")),
-            },
-        ))))
+            })),
+        ))
     }
 
     fn parameters() -> ParameterList {

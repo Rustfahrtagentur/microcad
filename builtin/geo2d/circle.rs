@@ -17,11 +17,11 @@ impl BuiltinPartDefinition for Circle {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
-        Ok(ObjectNode::new(ObjectNodeInner::Primitive2D(Rc::new(
-            Circle {
+        Ok(ObjectNode::new_from_content(
+            ObjectNodeContent::Primitive2D(Rc::new(Circle {
                 radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),
-            },
-        ))))
+            })),
+        ))
     }
 
     fn parameters() -> ParameterList {

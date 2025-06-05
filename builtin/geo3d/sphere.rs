@@ -17,11 +17,11 @@ impl BuiltinPartDefinition for Sphere {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
-        Ok(ObjectNode::new(ObjectNodeInner::Primitive3D(Rc::new(
-            Sphere {
+        Ok(ObjectNode::new_from_content(
+            ObjectNodeContent::Primitive3D(Rc::new(Sphere {
                 radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),
-            },
-        ))))
+            })),
+        ))
     }
 
     fn parameters() -> ParameterList {

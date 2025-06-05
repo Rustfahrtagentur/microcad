@@ -21,13 +21,13 @@ impl BuiltinPartDefinition for Cylinder {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
-        Ok(ObjectNode::new(ObjectNodeInner::Primitive3D(Rc::new(
-            Cylinder {
+        Ok(ObjectNode::new_from_content(
+            ObjectNodeContent::Primitive3D(Rc::new(Cylinder {
                 radius_bottom: args.get_value::<Scalar>(&Identifier::no_ref("radius_bottom")),
                 radius_top: args.get_value::<Scalar>(&Identifier::no_ref("radius_top")),
                 height: args.get_value::<Scalar>(&Identifier::no_ref("height")),
-            },
-        ))))
+            })),
+        ))
     }
 
     fn parameters() -> ParameterList {

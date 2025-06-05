@@ -14,14 +14,12 @@ impl BuiltinPartDefinition for Rotate {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
-        Ok(ObjectNode::new(ObjectNodeInner::Transform(
-            Transform::Rotation(
-                cgmath::Rad(args.get_value::<Scalar>(&Identifier::no_ref("angle"))),
-                Vec3::new(
-                    args.get_value::<Scalar>(&Identifier::no_ref("x")),
-                    args.get_value::<Scalar>(&Identifier::no_ref("y")),
-                    args.get_value::<Scalar>(&Identifier::no_ref("z")),
-                ),
+        Ok(ObjectNode::new_algorithm(AffineTransform::Rotation(
+            cgmath::Rad(args.get_value::<Scalar>(&Identifier::no_ref("angle"))),
+            Vec3::new(
+                args.get_value::<Scalar>(&Identifier::no_ref("x")),
+                args.get_value::<Scalar>(&Identifier::no_ref("y")),
+                args.get_value::<Scalar>(&Identifier::no_ref("z")),
             ),
         )))
     }

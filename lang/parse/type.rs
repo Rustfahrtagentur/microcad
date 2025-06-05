@@ -26,8 +26,6 @@ impl Parse for TypeAnnotation {
                 "Color" => Self(Refer::new(Type::Color, pair.into())),
                 "Length" => Self(Refer::new(Type::Length, pair.into())),
                 "Angle" => Self(Refer::new(Type::Angle, pair.into())),
-                "Vec2" => Self(Refer::new(Type::Vec2, pair.into())),
-                "Vec3" => Self(Refer::new(Type::Vec3, pair.into())),
                 "Bool" => Self(Refer::new(Type::Bool, pair.into())),
                 _ => Self(Refer::new(
                     Type::Custom(QualifiedName::parse(inner)?),

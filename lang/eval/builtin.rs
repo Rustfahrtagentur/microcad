@@ -55,7 +55,7 @@ pub trait BuiltinPartDefinition {
                 nodes.push(Self::node(&args)?);
             }
 
-            Ok(Value::NodeMultiplicity(nodes))
+            Ok(Value::Nodes(nodes.into()))
         }
     }
 

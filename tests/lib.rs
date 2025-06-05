@@ -122,7 +122,7 @@ fn part_implicit_init_call() {
     assert_eq!(nodes.len(), 1, "There should be one node");
 
     fn check_node_property_b(node: &objects::ObjectNode, value: f64) {
-        if let objects::ObjectNodeInner::Object(ref object) = *node.borrow() {
+        if let objects::ObjectNodeContent::Object(ref object) = *node.borrow().content() {
             assert_eq!(
                 object
                     .get_property_value(&Identifier(Refer::none("b".into())))
@@ -170,7 +170,7 @@ fn part_explicit_init_call() {
 
     // Helper function to check if the object node contains a property radius with specified value
     fn check_node_property_radius(node: &objects::ObjectNode, value: f64) {
-        if let objects::ObjectNodeInner::Object(ref object) = *node.borrow() {
+        if let objects::ObjectNodeContent::Object(ref object) = *node.borrow().content() {
             log::trace!("Object: {object}");
             assert_eq!(
                 object

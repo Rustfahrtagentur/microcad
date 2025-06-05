@@ -28,10 +28,10 @@ impl Body {
         Ok(Value::None)
     }
 
-    /// Evaluate the statement of this body into an ObjectNode.
+    /// Evaluate the statement of this body into an [`ObjectNode`].
     pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ObjectNode> {
         context.scope(StackFrame::Body(SymbolMap::default()), |context| {
-            let mut nodes = Vec::new();
+            let mut builder = ObjectBuilder::default();
 
             for statement in self.statements.iter() {
                 let value = match statement {
@@ -49,16 +49,10 @@ impl Body {
                         Value::None
                     }
                 };
-
-                nodes.append(&mut value.fetch_nodes());
+                builder.append_children(&mut value.fetch_nodes());
             }
 
-            let object = empty_object();
-            for node in nodes {
-                object.append(node);
-            }
-
-            Ok(object)
+            Ok(builder.build_node())
         })
     }
 }
