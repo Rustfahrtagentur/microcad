@@ -21,14 +21,14 @@ impl PartDefinition {
         })
     }
 
-    /// Resolve into SymbolNode
+    /// Resolve into SymbolNode.
     pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
         let node = Symbol::new(SymbolDefinition::Part(self.clone()), parent);
         node.borrow_mut().children = self.body.resolve(Some(node.clone()));
         node
     }
 
-    /// Try to evaluate a single call to an object
+    /// Try to evaluate a single call into a [`ModelNode`].
     fn eval_to_node<'a>(
         &'a self,
         args: &ArgumentMap,

@@ -5,14 +5,28 @@
 
 use crate::{eval::*, objects::*};
 
-/// Object builder to build up object nodes.
+/// Object builder to build up a [ModelNode] with an object element.
 #[derive(Default)]
 pub struct ObjectBuilder {
+    /// The object element to be built.
     object: Object,
+
+    /// Children to be placed in the node.
     children: ObjectNodes,
+
+    /// The [`SrcRef`] attached to the object element.
+    src_ref: SrcRef,
 }
 
 impl ObjectBuilder {
+    /// Create new [ObjectBuilder] with a [SrcRef].
+    pub fn new(src_ref: SrcRef) -> Self {
+        Self {
+            src_ref,
+            ..Default::default()
+        }
+    }
+
     /// Initialize the properties by parameters and arguments.
     pub fn init_properties(
         &mut self,
@@ -75,7 +89,7 @@ impl ObjectBuilder {
 
     /// Build the [ObjectNode].
     pub fn build_node(self) -> ModelNode {
-        let node = ModelNode::new_object(self.object);
+        let node = ModelNode::new_object(self.object, self.src_ref);
         for child in self.children.iter() {
             node.append(child.clone());
         }

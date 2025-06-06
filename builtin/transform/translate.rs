@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, objects::*, syntax::*, ty::*};
+use microcad_lang::{eval::*, objects::*, src_ref::*, syntax::*, ty::*};
 
 /// Builtin definition for a 2D circle
 #[derive(Debug)]
@@ -14,13 +14,14 @@ impl BuiltinPartDefinition for Translate {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
-        Ok(ModelNode::new_algorithm(AffineTransform::Translation(
-            Vec3::new(
+        Ok(ModelNode::new_transformation(
+            AffineTransform::Translation(Vec3::new(
                 args.get_value::<Scalar>(&Identifier::no_ref("x")),
                 args.get_value::<Scalar>(&Identifier::no_ref("y")),
                 args.get_value::<Scalar>(&Identifier::no_ref("z")),
-            ),
-        )))
+            )),
+            SrcRef(None),
+        ))
     }
 
     fn parameters() -> ParameterList {

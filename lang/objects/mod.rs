@@ -15,7 +15,7 @@ pub use object_attributes::*;
 pub use object_builder::*;
 pub use object_properties::*;
 
-use crate::{rc::*, resolve::Symbol, src_ref::SrcRef, syntax::*, value::*};
+use crate::{rc::*, resolve::Symbol, src_ref::*, syntax::*, value::*};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -26,7 +26,7 @@ pub enum Element {
     Object(Object),
 
     /// A special node after which children will be nested as siblings
-    ChildrenNodeMarker,
+    ChildrenPlaceholder,
 
     /// Generated 2D geometry.
     Primitive2D(Rc<Primitive2D>),
@@ -36,7 +36,7 @@ pub enum Element {
     Primitive3D(Rc<Primitive3D>),
 
     /// An algorithm trait that manipulates the node or its children
-    Algorithm(Rc<dyn Transformation>),
+    Transformation(Rc<dyn Transformation>),
 }
 
 impl Element {
@@ -74,7 +74,7 @@ impl std::fmt::Display for Element {
         write!(f, "{name}")?;
 
         match &self {
-            Element::Algorithm(algorithm) => {
+            Element::Transformation(algorithm) => {
                 write!(f, "({algorithm:?})")
             }
             Element::Primitive2D(primitive2d) => {
@@ -93,21 +93,18 @@ impl std::fmt::Display for Element {
 pub struct ModelNodeInner {
     /// Optional id.
     ///
-    /// The id is set when the object was created by an assignment: `a = cube(50mm)`.
+    /// The id is set when the model node was created by an assignment: `a = cube(50mm)`.
     id: Option<Identifier>,
 
     /// Parent object.
     #[debug(skip)]
     parent: Option<ModelNode>,
 
-    // Children created by expression statements `cube(50mm);`.
+    // Children of the model node.
     children: Vec<ModelNode>,
 
-    // Actual content of the node [Primitive], [Algorithm] etc
-    element: Element,
-
-    // Optional SrcRef from where the object has been created
-    src_ref: SrcRef,
+    /// Element of the node with [SrcRef].
+    element: Refer<Element>,
 
     // The symbol (e.g. [ModuleDefinition]) that created this object.
     symbol: Option<Symbol>,
@@ -195,7 +192,7 @@ pub struct ModelNode(RcMut<ModelNodeInner>);
 
 impl ModelNode {
     /// Create new object node from element.
-    pub fn new_element(element: Element) -> Self {
+    pub fn new_element(element: Refer<Element>) -> Self {
         Self(RcMut::new(ModelNodeInner {
             element,
             ..Default::default()
@@ -203,18 +200,24 @@ impl ModelNode {
     }
 
     /// Return a new empty object.
-    pub fn new_empty_object() -> Self {
-        Self(RcMut::new(ModelNodeInner::default()))
+    pub fn new_empty_object(src_ref: SrcRef) -> Self {
+        Self::new_element(Refer::new(Element::Object(Object::default()), src_ref))
     }
 
-    /// Return an object node containing an [Object].
-    pub fn new_object(object: Object) -> Self {
-        Self::new_element(Element::Object(object))
+    /// Return a model node containing an [Object].
+    pub fn new_object(object: Object, src_ref: SrcRef) -> Self {
+        Self::new_element(Refer::new(Element::Object(object), src_ref))
     }
 
-    /// Return an algorithm node.
-    pub fn new_algorithm<T: Transformation + 'static>(algorithm: T) -> Self {
-        Self::new_element(Element::Algorithm(std::rc::Rc::new(algorithm)))
+    /// Return an transformation node.
+    pub fn new_transformation<T: Transformation + 'static>(
+        transformation: T,
+        src_ref: SrcRef,
+    ) -> Self {
+        Self::new_element(Refer::new(
+            Element::Transformation(std::rc::Rc::new(transformation)),
+            src_ref,
+        ))
     }
 
     /// Return id of this object node.
@@ -317,20 +320,21 @@ impl ModelNode {
     /// Short cut to generate boolean operator as binary operation with two nodes.
     pub fn binary_op(self, op: BooleanOp, other: ModelNode) -> ModelNode {
         assert!(self != other, "lhs and rhs must be distinct.");
-        ModelNode::new_algorithm(op).append_children(vec![self.clone(), other].into())
+        ModelNode::new_transformation(op, SrcRef(None))
+            .append_children(vec![self.clone(), other].into())
     }
 
     /// Find children node marker in node descendants
     fn find_children_marker(&self) -> Option<ModelNode> {
         self.descendants().find(|n| {
-            n.id().is_some() && matches!(n.0.borrow().element, Element::ChildrenNodeMarker)
+            n.id().is_some() && matches!(n.0.borrow().element.value, Element::ChildrenPlaceholder)
         })
     }
 
     /// Return inner ObjectNode if we are in an object node.
     pub fn into_inner_object(self) -> Option<ModelNode> {
         self.children().next().and_then(|n| {
-            if let Element::Object(_) = n.0.borrow().element {
+            if let Element::Object(_) = n.0.borrow().element.value {
                 Some(n.clone())
             } else {
                 None
@@ -454,7 +458,7 @@ impl ObjectNodes {
         match self.single_node() {
             Some(node) => node,
             None => {
-                let union_node = ModelNode::new_algorithm(BooleanOp::Union);
+                let union_node = ModelNode::new_transformation(BooleanOp::Union, SrcRef(None));
                 union_node.append_children(self.clone())
             }
         }
@@ -510,7 +514,7 @@ impl std::fmt::Display for ObjectNodes {
 #[test]
 fn node_nest() {
     fn obj(id: &str) -> ModelNode {
-        ModelNode::new_empty_object().set_id(Identifier::no_ref(id))
+        ModelNode::new_empty_object(SrcRef(None)).set_id(Identifier::no_ref(id))
     }
 
     let nodes = vec![

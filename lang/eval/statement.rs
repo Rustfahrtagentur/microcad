@@ -14,9 +14,10 @@ impl Eval for Assignment {
 impl Eval for Marker {
     fn eval(&self, _: &mut Context) -> EvalResult<Value> {
         if self.is_children_marker() {
-            Ok(Value::from_single_node(ModelNode::new_element(
-                Element::ChildrenNodeMarker,
-            )))
+            Ok(Value::from_single_node(ModelNode::new_element(Refer::new(
+                Element::ChildrenPlaceholder,
+                self.src_ref(),
+            ))))
         } else {
             Ok(Value::None)
         }
