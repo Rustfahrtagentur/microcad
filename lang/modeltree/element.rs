@@ -3,7 +3,8 @@
 
 //! Element of a [`ModelNode`]
 
-use crate::modeltree::*;
+use crate::{modeltree::*, syntax::*, value::*};
+use microcad_core::*;
 use strum::IntoStaticStr;
 
 /// Inner of a node
@@ -16,14 +17,14 @@ pub enum Element {
     ChildrenPlaceholder,
 
     /// Generated 2D geometry.
-    Primitive2D(Rc<Primitive2D>),
+    Primitive2D(std::rc::Rc<Primitive2D>),
 
     /// Generated 3D geometry.
     #[cfg(feature = "geo3d")]
-    Primitive3D(Rc<Primitive3D>),
+    Primitive3D(std::rc::Rc<Primitive3D>),
 
     /// A transformation that manipulates the node or its children
-    Transformation(Rc<dyn Transformation>),
+    Transformation(std::rc::Rc<dyn Transformation>),
 }
 
 impl Element {
