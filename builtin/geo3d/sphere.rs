@@ -16,9 +16,9 @@ impl BuiltinPartDefinition for Sphere {
         "sphere"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
-        Ok(ObjectNode::new_from_content(
-            ObjectNodeContent::Primitive3D(Rc::new(Sphere {
+    fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
+        Ok(ModelNode::new_element(
+            Element::Primitive3D(Rc::new(Sphere {
                 radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),
             })),
         ))

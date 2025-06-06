@@ -36,7 +36,7 @@ impl ObjectBuilder {
     }
 
     /// Add attributes to object.
-    pub fn add_attributes(&mut self, attributes: ObjectAttributes) -> &mut Self {
+    pub fn add_attributes(&mut self, attributes: MetaData) -> &mut Self {
         self.object.attributes = attributes;
         self
     }
@@ -74,8 +74,8 @@ impl ObjectBuilder {
     }
 
     /// Build the [ObjectNode].
-    pub fn build_node(self) -> ObjectNode {
-        let node = ObjectNode::new_object(self.object);
+    pub fn build_node(self) -> ModelNode {
+        let node = ModelNode::new_object(self.object);
         for child in self.children.iter() {
             node.append(child.clone());
         }

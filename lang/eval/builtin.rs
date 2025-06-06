@@ -45,7 +45,7 @@ pub trait BuiltinPartDefinition {
     /// Get id of the builtin part
     fn id() -> &'static str;
     /// Create node from argument map
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode>;
+    fn node(args: &ArgumentMap) -> EvalResult<ModelNode>;
     /// Part function
     fn function() -> &'static BuiltinFn {
         &|args, context| {

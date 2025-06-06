@@ -6,9 +6,9 @@
 use crate::{diag::*, eval::*, objects::*, syntax::*, ty::*, value::*};
 
 /// Create built-in tag attribute.
-pub fn tag(id: &Identifier) -> EvalResult<Option<ObjectAttribute>> {
+pub fn tag(id: &Identifier) -> EvalResult<Option<MetaDataItem>> {
     match id.id().as_str() {
-        "aux" => Ok(Some(ObjectAttribute::Aux)),
+        "aux" => Ok(Some(MetaDataItem::Aux)),
         _ => Ok(None),
     }
 }
@@ -17,11 +17,11 @@ pub fn tag(id: &Identifier) -> EvalResult<Option<ObjectAttribute>> {
 pub fn export(
     arguments: &CallArgumentValueList,
     context: &mut Context,
-) -> EvalResult<Option<ObjectAttribute>> {
+) -> EvalResult<Option<MetaDataItem>> {
     // Convert the first argument to string and
     let arg_value = &arguments.get_single()?.value;
     match arg_value {
-        Value::String(s) => Ok(Some(ObjectAttribute::Export(
+        Value::String(s) => Ok(Some(MetaDataItem::Export(
             microcad_core::ExportSettings::with_filename(s.clone()),
         ))),
         value => {
@@ -36,9 +36,9 @@ pub fn color(
     id: &Identifier,
     expression: &Expression,
     context: &mut Context,
-) -> EvalResult<Option<ObjectAttribute>> {
+) -> EvalResult<Option<MetaDataItem>> {
     match expression.eval(context)?.try_color() {
-        Ok(color) => Ok(Some(ObjectAttribute::Color(id.clone(), color))),
+        Ok(color) => Ok(Some(MetaDataItem::Color(id.clone(), color))),
         Err(err) => {
             context.error(expression, err)?;
             Ok(None)
@@ -51,15 +51,15 @@ pub fn name_id(
     id: &Identifier,
     expression: &Expression,
     context: &mut Context,
-) -> EvalResult<Option<ObjectAttribute>> {
+) -> EvalResult<Option<MetaDataItem>> {
     let value = expression.eval(context)?;
     let id_str = id.id().as_str();
 
     match id_str {
         "layer" | "part" => match value {
             Value::Integer(_) | Value::String(_) => match id_str {
-                "part" => Ok(Some(ObjectAttribute::Part(value))),
-                "layer" => Ok(Some(ObjectAttribute::Layer(value))),
+                "part" => Ok(Some(MetaDataItem::Part(value))),
+                "layer" => Ok(Some(MetaDataItem::Layer(value))),
                 _ => Ok(None),
             },
             _ => {

@@ -87,7 +87,7 @@ impl Value {
     }
 
     /// Create a value from a single object node.
-    pub fn from_single_node(node: ObjectNode) -> Self {
+    pub fn from_single_node(node: ModelNode) -> Self {
         Self::Nodes(vec![node].into())
     }
 

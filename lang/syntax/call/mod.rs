@@ -48,7 +48,7 @@ impl PrintSyntax for Call {
 /// Result of a call.
 pub enum CallResult {
     /// Call returned nodes.
-    Nodes(Vec<ObjectNode>),
+    Nodes(Vec<ModelNode>),
 
     /// Call returned a single value.
     Value(Value),

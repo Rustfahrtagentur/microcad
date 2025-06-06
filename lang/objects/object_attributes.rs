@@ -8,7 +8,7 @@ use microcad_core::ExportSettings;
 
 /// A single object attribute.
 #[derive(Clone)]
-pub enum ObjectAttribute {
+pub enum MetaDataItem {
     /// Auxiliary object.
     Aux,
     /// A simple color attribute, e.g. `#[color = "#ff00ff", stroke_color = "blue", fill_color = std::colors::white]`.
@@ -21,15 +21,15 @@ pub enum ObjectAttribute {
     Layer(Value),
 }
 
-impl ObjectAttribute {
+impl MetaDataItem {
     /// Return id (name) of this object attribute.
     pub fn id(&self) -> Identifier {
         match self {
-            ObjectAttribute::Aux => Identifier::no_ref("aux"),
-            ObjectAttribute::Color(identifier, _) => identifier.clone(),
-            ObjectAttribute::Export(_) => Identifier::no_ref("export"),
-            ObjectAttribute::Layer(_) => Identifier::no_ref("layer"),
-            ObjectAttribute::Part(_) => Identifier::no_ref("part"),
+            MetaDataItem::Aux => Identifier::no_ref("aux"),
+            MetaDataItem::Color(identifier, _) => identifier.clone(),
+            MetaDataItem::Export(_) => Identifier::no_ref("export"),
+            MetaDataItem::Layer(_) => Identifier::no_ref("layer"),
+            MetaDataItem::Part(_) => Identifier::no_ref("part"),
         }
     }
 
@@ -38,8 +38,8 @@ impl ObjectAttribute {
     /// Tag and call attributes like [ObjectAttribute::Aux] will return [Value::None].
     pub fn value(&self) -> Value {
         match self {
-            ObjectAttribute::Color(_, color) => Value::Color(*color),
-            ObjectAttribute::Part(value) | ObjectAttribute::Layer(value) => value.clone(),
+            MetaDataItem::Color(_, color) => Value::Color(*color),
+            MetaDataItem::Part(value) | MetaDataItem::Layer(value) => value.clone(),
             _ => Value::None,
         }
     }
@@ -47,33 +47,33 @@ impl ObjectAttribute {
 
 /// Object attribute list.
 #[derive(Clone, Default)]
-pub struct ObjectAttributes(Vec<ObjectAttribute>);
+pub struct MetaData(Vec<MetaDataItem>);
 
-impl ObjectAttributes {
+impl MetaData {
     /// Merge two [ObjectAttribute] lists.
     ///
     /// # Todo
     /// * Sort this list by id and filter duplicates.
     /// * Decide whether attributes from `self` are updated by `other` or kept.
-    pub fn merge(&mut self, other: &mut ObjectAttributes) {
+    pub fn merge(&mut self, other: &mut MetaData) {
         self.0.append(&mut other.0);
     }
 
     /// Get attribute by id
-    pub fn get_by_id(&self, id: &Identifier) -> Option<&ObjectAttribute> {
+    pub fn get_by_id(&self, id: &Identifier) -> Option<&MetaDataItem> {
         self.0.iter().find(|attr| &attr.id() == id)
     }
 }
 
-impl std::ops::Deref for ObjectAttributes {
-    type Target = Vec<ObjectAttribute>;
+impl std::ops::Deref for MetaData {
+    type Target = Vec<MetaDataItem>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl std::ops::DerefMut for ObjectAttributes {
+impl std::ops::DerefMut for MetaData {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }

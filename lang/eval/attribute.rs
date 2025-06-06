@@ -28,7 +28,7 @@ impl Attribute {
     pub fn eval_to_object_attribute(
         &self,
         context: &mut Context,
-    ) -> EvalResult<Option<ObjectAttribute>> {
+    ) -> EvalResult<Option<MetaDataItem>> {
         let qualified_name = self.qualified_name();
         if let Some(id) = qualified_name.single_identifier() {
             let str = id.id().as_str();
@@ -67,8 +67,8 @@ impl Attribute {
 
 impl AttributeList {
     /// Evaluate the attribute list into [ObjectAttributes].
-    pub fn eval_to_object_attributes(&self, context: &mut Context) -> EvalResult<ObjectAttributes> {
-        let mut object_attributes = ObjectAttributes::default();
+    pub fn eval_to_object_attributes(&self, context: &mut Context) -> EvalResult<MetaData> {
+        let mut object_attributes = MetaData::default();
 
         for attribute in self.iter() {
             if let Some(attribute) = attribute.eval_to_object_attribute(context)? {

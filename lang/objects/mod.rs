@@ -21,7 +21,7 @@ use strum::IntoStaticStr;
 
 /// Inner of a node
 #[derive(Clone, IntoStaticStr, Debug)]
-pub enum ObjectNodeContent {
+pub enum Element {
     /// An object that contains children and holds properties
     Object(Object),
 
@@ -36,10 +36,10 @@ pub enum ObjectNodeContent {
     Primitive3D(Rc<Primitive3D>),
 
     /// An algorithm trait that manipulates the node or its children
-    Algorithm(Rc<dyn Algorithm>),
+    Algorithm(Rc<dyn Transformation>),
 }
 
-impl ObjectNodeContent {
+impl Element {
     /// Get a property from an object node.
     ///
     /// Only object nodes can have properties.
@@ -54,7 +54,7 @@ impl ObjectNodeContent {
     }
 
     /// Assign object attributes.
-    pub fn assign_object_attributes(&mut self, attributes: &mut ObjectAttributes) {
+    pub fn assign_object_attributes(&mut self, attributes: &mut MetaData) {
         if let Self::Object(object) = self {
             object.assign_object_attributes(attributes)
         }
@@ -62,25 +62,25 @@ impl ObjectNodeContent {
 }
 
 /// The default [`ObjectNodeContent`] is an empty [`Object`].
-impl Default for ObjectNodeContent {
+impl Default for Element {
     fn default() -> Self {
-        ObjectNodeContent::Object(Object::default())
+        Element::Object(Object::default())
     }
 }
 
-impl std::fmt::Display for ObjectNodeContent {
+impl std::fmt::Display for Element {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name: &'static str = self.into();
         write!(f, "{name}")?;
 
         match &self {
-            ObjectNodeContent::Algorithm(algorithm) => {
+            Element::Algorithm(algorithm) => {
                 write!(f, "({algorithm:?})")
             }
-            ObjectNodeContent::Primitive2D(primitive2d) => {
+            Element::Primitive2D(primitive2d) => {
                 write!(f, "({primitive2d:?})")
             }
-            ObjectNodeContent::Primitive3D(primitive3d) => {
+            Element::Primitive3D(primitive3d) => {
                 write!(f, "({primitive3d:?})")
             }
             _ => Ok(()),
@@ -90,7 +90,7 @@ impl std::fmt::Display for ObjectNodeContent {
 
 /// The actual node contents
 #[derive(custom_debug::Debug, Clone, Default)]
-pub struct ObjectNodeInner {
+pub struct ModelNodeInner {
     /// Optional id.
     ///
     /// The id is set when the object was created by an assignment: `a = cube(50mm)`.
@@ -98,13 +98,13 @@ pub struct ObjectNodeInner {
 
     /// Parent object.
     #[debug(skip)]
-    parent: Option<ObjectNode>,
+    parent: Option<ModelNode>,
 
     // Children created by expression statements `cube(50mm);`.
-    children: Vec<ObjectNode>,
+    children: Vec<ModelNode>,
 
     // Actual content of the node [Primitive], [Algorithm] etc
-    content: ObjectNodeContent,
+    element: Element,
 
     // Optional SrcRef from where the object has been created
     src_ref: SrcRef,
@@ -117,28 +117,28 @@ pub struct ObjectNodeInner {
     //precision: f64,
 }
 
-impl ObjectNodeInner {
+impl ModelNodeInner {
     /// Return content of this node.
-    pub fn content(&self) -> &ObjectNodeContent {
-        &self.content
+    pub fn content(&self) -> &Element {
+        &self.element
     }
 }
 
 /// Children iterator struct.
 pub struct Children {
-    node: ObjectNode,
+    node: ModelNode,
     index: usize,
 }
 
 impl Children {
     /// Create new [`Children`] iterator
-    pub fn new(node: ObjectNode) -> Self {
+    pub fn new(node: ModelNode) -> Self {
         Self { node, index: 0 }
     }
 }
 
 impl Iterator for Children {
-    type Item = ObjectNode;
+    type Item = ModelNode;
 
     fn next(&mut self) -> Option<Self::Item> {
         let node = self.node.0.borrow();
@@ -150,12 +150,12 @@ impl Iterator for Children {
 
 /// Iterator over all descendants.
 pub struct Descendants {
-    stack: Vec<(ObjectNode, usize)>,
+    stack: Vec<(ModelNode, usize)>,
 }
 
 impl Descendants {
     /// Create new descendants iterator
-    pub fn new(root: ObjectNode) -> Self {
+    pub fn new(root: ModelNode) -> Self {
         let mut stack = Vec::new();
         let children = &root.borrow().children;
         for child in children {
@@ -166,7 +166,7 @@ impl Descendants {
 }
 
 impl Iterator for Descendants {
-    type Item = ObjectNode;
+    type Item = ModelNode;
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some((node, index)) = self.stack.pop() {
@@ -191,30 +191,30 @@ impl Iterator for Descendants {
 
 /// A reference counted, mutable [ObjectNode].
 #[derive(Debug, Clone)]
-pub struct ObjectNode(RcMut<ObjectNodeInner>);
+pub struct ModelNode(RcMut<ModelNodeInner>);
 
-impl ObjectNode {
-    /// Create new object node from content.
-    pub fn new_from_content(content: ObjectNodeContent) -> Self {
-        Self(RcMut::new(ObjectNodeInner {
-            content,
+impl ModelNode {
+    /// Create new object node from element.
+    pub fn new_element(element: Element) -> Self {
+        Self(RcMut::new(ModelNodeInner {
+            element,
             ..Default::default()
         }))
     }
 
     /// Return a new empty object.
     pub fn new_empty_object() -> Self {
-        Self(RcMut::new(ObjectNodeInner::default()))
+        Self(RcMut::new(ModelNodeInner::default()))
     }
 
     /// Return an object node containing an [Object].
     pub fn new_object(object: Object) -> Self {
-        Self::new_from_content(ObjectNodeContent::Object(object))
+        Self::new_element(Element::Object(object))
     }
 
     /// Return an algorithm node.
-    pub fn new_algorithm<T: Algorithm + 'static>(algorithm: T) -> Self {
-        Self::new_from_content(ObjectNodeContent::Algorithm(std::rc::Rc::new(algorithm)))
+    pub fn new_algorithm<T: Transformation + 'static>(algorithm: T) -> Self {
+        Self::new_element(Element::Algorithm(std::rc::Rc::new(algorithm)))
     }
 
     /// Return id of this object node.
@@ -229,7 +229,7 @@ impl ObjectNode {
     }
 
     /// Get borrowed reference to the inner of this node.
-    pub fn borrow(&'_ self) -> std::cell::Ref<'_, ObjectNodeInner> {
+    pub fn borrow(&'_ self) -> std::cell::Ref<'_, ModelNodeInner> {
         self.0.borrow()
     }
 
@@ -253,12 +253,12 @@ impl ObjectNode {
     }
 
     /// Check if `other` is and `self` have the same address.
-    pub fn is_same_as(&self, other: &ObjectNode) -> bool {
+    pub fn is_same_as(&self, other: &ModelNode) -> bool {
         self.addr() == other.addr()
     }
 
     /// Remove child from this node.
-    pub fn remove_child(&self, child: &ObjectNode) {
+    pub fn remove_child(&self, child: &ModelNode) {
         let mut s = self.0.borrow_mut();
         s.children.retain(|node| !node.is_same_as(child));
     }
@@ -276,12 +276,12 @@ impl ObjectNode {
     }
 
     /// Set parent of this node.
-    pub fn set_parent(&mut self, parent: ObjectNode) {
+    pub fn set_parent(&mut self, parent: ModelNode) {
         self.0.borrow_mut().parent = Some(parent);
     }
 
     /// Return parent of this node.
-    pub fn parent(&self) -> Option<ObjectNode> {
+    pub fn parent(&self) -> Option<ModelNode> {
         self.0.borrow().parent.clone()
     }
 
@@ -298,7 +298,7 @@ impl ObjectNode {
     }
 
     /// Append a single node as child.
-    pub fn append(&self, node: ObjectNode) {
+    pub fn append(&self, node: ModelNode) {
         let mut node = node.clone();
         node.set_parent(self.clone());
         self.0.borrow_mut().children.push(node);
@@ -315,23 +315,22 @@ impl ObjectNode {
     }
 
     /// Short cut to generate boolean operator as binary operation with two nodes.
-    pub fn binary_op(self, op: BooleanOp, other: ObjectNode) -> ObjectNode {
+    pub fn binary_op(self, op: BooleanOp, other: ModelNode) -> ModelNode {
         assert!(self != other, "lhs and rhs must be distinct.");
-        ObjectNode::new_algorithm(op).append_children(vec![self.clone(), other].into())
+        ModelNode::new_algorithm(op).append_children(vec![self.clone(), other].into())
     }
 
     /// Find children node marker in node descendants
-    fn find_children_marker(&self) -> Option<ObjectNode> {
+    fn find_children_marker(&self) -> Option<ModelNode> {
         self.descendants().find(|n| {
-            n.id().is_some()
-                && matches!(n.0.borrow().content, ObjectNodeContent::ChildrenNodeMarker)
+            n.id().is_some() && matches!(n.0.borrow().element, Element::ChildrenNodeMarker)
         })
     }
 
     /// Return inner ObjectNode if we are in an object node.
-    pub fn into_inner_object(self) -> Option<ObjectNode> {
+    pub fn into_inner_object(self) -> Option<ModelNode> {
         self.children().next().and_then(|n| {
-            if let ObjectNodeContent::Object(_) = n.0.borrow().content {
+            if let Element::Object(_) = n.0.borrow().element {
                 Some(n.clone())
             } else {
                 None
@@ -348,21 +347,21 @@ impl ObjectNode {
     }
 
     /// Assign object attributes.
-    pub(crate) fn assign_object_attributes(&self, attributes: &mut ObjectAttributes) {
+    pub(crate) fn assign_object_attributes(&self, attributes: &mut MetaData) {
         self.0
             .borrow_mut()
-            .content
+            .element
             .assign_object_attributes(attributes);
     }
 }
 
-impl PartialEq for ObjectNode {
+impl PartialEq for ModelNode {
     fn eq(&self, other: &Self) -> bool {
         self.addr() == other.addr()
     }
 }
 
-impl std::fmt::Display for ObjectNode {
+impl std::fmt::Display for ModelNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f,)
     }
@@ -370,11 +369,11 @@ impl std::fmt::Display for ObjectNode {
 
 /// Object node multiplicities.
 #[derive(Debug, Default, Clone, PartialEq)]
-pub struct ObjectNodes(Vec<ObjectNode>);
+pub struct ObjectNodes(Vec<ModelNode>);
 
 impl ObjectNodes {
     /// Returns the first node if there is exactly one node in the list.
-    pub fn single_node(&self) -> Option<ObjectNode> {
+    pub fn single_node(&self) -> Option<ModelNode> {
         match self.0.len() {
             1 => self.0.first().cloned(),
             _ => None,
@@ -451,11 +450,11 @@ impl ObjectNodes {
     }
 
     /// Return an algorithm node that unites all children.
-    pub fn union(&self) -> ObjectNode {
+    pub fn union(&self) -> ModelNode {
         match self.single_node() {
             Some(node) => node,
             None => {
-                let union_node = ObjectNode::new_algorithm(BooleanOp::Union);
+                let union_node = ModelNode::new_algorithm(BooleanOp::Union);
                 union_node.append_children(self.clone())
             }
         }
@@ -480,7 +479,7 @@ impl ObjectNodes {
 }
 
 impl std::ops::Deref for ObjectNodes {
-    type Target = Vec<ObjectNode>;
+    type Target = Vec<ModelNode>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -493,8 +492,8 @@ impl std::ops::DerefMut for ObjectNodes {
     }
 }
 
-impl From<Vec<ObjectNode>> for ObjectNodes {
-    fn from(value: Vec<ObjectNode>) -> Self {
+impl From<Vec<ModelNode>> for ObjectNodes {
+    fn from(value: Vec<ModelNode>) -> Self {
         Self(value)
     }
 }
@@ -510,8 +509,8 @@ impl std::fmt::Display for ObjectNodes {
 
 #[test]
 fn node_nest() {
-    fn obj(id: &str) -> ObjectNode {
-        ObjectNode::new_empty_object().set_id(Identifier::no_ref(id))
+    fn obj(id: &str) -> ModelNode {
+        ModelNode::new_empty_object().set_id(Identifier::no_ref(id))
     }
 
     let nodes = vec![
@@ -547,7 +546,7 @@ fn node_nest() {
                 "{}{}",
                 "  ".repeat(n.depth()),
                 match n.0.borrow().content() {
-                    ObjectNodeContent::Object(_) => node.id().expect("Id").clone(),
+                    Element::Object(_) => node.id().expect("Id").clone(),
                     _ => panic!("Object with name expected"),
                 }
             )

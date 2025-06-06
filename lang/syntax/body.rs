@@ -29,7 +29,7 @@ impl Body {
     }
 
     /// Evaluate the statement of this body into an [`ObjectNode`].
-    pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ObjectNode> {
+    pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ModelNode> {
         context.scope(StackFrame::Body(SymbolMap::default()), |context| {
             let mut builder = ObjectBuilder::default();
 

@@ -34,7 +34,7 @@ impl PartDefinition {
         args: &ArgumentMap,
         init: Option<&'a InitDefinition>,
         context: &mut Context,
-    ) -> EvalResult<ObjectNode> {
+    ) -> EvalResult<ModelNode> {
         let mut object_builder = ObjectBuilder::default();
 
         context.scope(StackFrame::Part(self.id.clone(), args.into()), |context| {

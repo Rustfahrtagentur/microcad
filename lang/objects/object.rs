@@ -12,7 +12,7 @@ pub struct Object {
     pub props: ObjectProperties,
 
     /// Attributes
-    pub attributes: ObjectAttributes,
+    pub attributes: MetaData,
 }
 
 impl Object {
@@ -22,7 +22,7 @@ impl Object {
     }
 
     /// Assign new object attributes.
-    pub fn assign_object_attributes(&mut self, attributes: &mut ObjectAttributes) {
+    pub fn assign_object_attributes(&mut self, attributes: &mut MetaData) {
         self.attributes.merge(attributes);
     }
 

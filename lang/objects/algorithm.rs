@@ -7,13 +7,13 @@ use crate::objects::*;
 use microcad_core::*;
 
 /// Algorithm trait.
-pub trait Algorithm: std::fmt::Debug {
+pub trait Transformation: std::fmt::Debug {
     /// Process this object nodes
-    fn process(&self, node: ObjectNode);
+    fn process(&self, node: ModelNode);
 }
 
-impl Algorithm for BooleanOp {
-    fn process(&self, _node: ObjectNode) {
+impl Transformation for BooleanOp {
+    fn process(&self, _node: ModelNode) {
         todo!("Implement boolean operations");
     }
 }
@@ -53,8 +53,8 @@ impl AffineTransform {
     }
 }
 
-impl Algorithm for AffineTransform {
-    fn process(&self, _node: ObjectNode) {
+impl Transformation for AffineTransform {
+    fn process(&self, _node: ModelNode) {
         todo!("Implement affine transforms")
     }
 }

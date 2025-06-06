@@ -141,7 +141,7 @@ fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<Symbol> {
 fn eval(
     input: impl AsRef<std::path::Path>,
     search_paths: &[std::path::PathBuf],
-) -> anyhow::Result<ObjectNode> {
+) -> anyhow::Result<ModelNode> {
     let symbols = resolve(input)?;
     let mut context = Context::new(
         symbols.clone(),
