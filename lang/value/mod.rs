@@ -6,7 +6,6 @@
 //! Every evaluation of any *symbol* leads to a [`Value`] which then might continued
 //! to process or ends up as the overall evaluation result.
 
-mod into_value;
 mod list;
 mod map;
 mod map_key_value;
@@ -19,7 +18,6 @@ mod unnamed_tuple;
 mod value_error;
 mod value_list;
 
-pub use into_value::IntoValue;
 pub use list::*;
 pub use map::*;
 pub use map_key_value::*;
@@ -30,8 +28,7 @@ pub use unnamed_tuple::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{objects::*, src_ref::*, syntax::*, ty::*};
-use cgmath::InnerSpace;
+use crate::{modeltree::*, src_ref::*, syntax::*, ty::*};
 use microcad_core::*;
 
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
@@ -52,12 +49,6 @@ pub enum Value {
     Area(Scalar),
     /// Volume in mm³.
     Volume(Scalar),
-    /// A 2D vector with length.
-    Vec2(Vec2),
-    /// A 3D vector with length.
-    Vec3(Vec3),
-    /// A 4D vector with length.
-    Vec4(Vec4),
     /// An angle in radians.
     Angle(Scalar),
     /// Weight of a specific volume of material.
@@ -77,9 +68,7 @@ pub enum Value {
     /// A tuple of unnamed items.
     UnnamedTuple(UnnamedTuple),
     /// A node in the render tree.
-    Node(ObjectNode),
-    /// A node list in the render tree, result from multiplicity.
-    NodeMultiplicity(Vec<ObjectNode>),
+    Nodes(ObjectNodes),
 }
 
 impl Value {
@@ -95,12 +84,16 @@ impl Value {
         }
     }
 
+    /// Create a value from a single object node.
+    pub fn from_single_node(node: ModelNode) -> Self {
+        Self::Nodes(vec![node].into())
+    }
+
     /// Fetch nodes from this value.
-    pub fn fetch_nodes(self) -> Vec<ObjectNode> {
+    pub fn fetch_nodes(self) -> ObjectNodes {
         match self {
-            Self::Node(n) => vec![n],
-            Self::NodeMultiplicity(n) => n,
-            _ => vec![],
+            Self::Nodes(n) => n,
+            _ => ObjectNodes::default(),
         }
     }
 
@@ -110,36 +103,12 @@ impl Value {
     ///
     /// This function is used when accessing a property `p` of a value `v` with `p.v`.
     pub fn get_property_value(&self, identifier: &Identifier) -> Option<Value> {
-        let get = |value| Some(Value::Scalar(value));
-        let id = identifier.id().as_str();
         match self {
-            Value::Vec2(r) => match id {
-                "x" => get(r.x),
-                "y" => get(r.y),
-                _ => None,
-            },
-            Value::Vec3(r) => match id {
-                "x" => get(r.x),
-                "y" => get(r.y),
-                "z" => get(r.z),
-                _ => None,
-            },
-            Value::Vec4(r) => match id {
-                "x" => get(r.x),
-                "y" => get(r.y),
-                "z" => get(r.z),
-                "w" => get(r.w),
-                _ => None,
-            },
-            Value::Color(r) => match id {
-                "r" => get(r.r as f64),
-                "g" => get(r.g as f64),
-                "b" => get(r.b as f64),
-                "a" => get(r.a as f64),
-                _ => None,
-            },
             Value::NamedTuple(named_tuple) => named_tuple.get(identifier).cloned(),
-            Value::Node(node) => node.borrow().get_property_value(identifier),
+            Value::Nodes(nodes) => match nodes.single_node() {
+                Some(node) => node.get_property_value(identifier),
+                None => None,
+            },
             _ => None,
         }
     }
@@ -234,10 +203,6 @@ impl PartialOrd for Value {
             | (Value::Angle(lhs), Value::Scalar(rhs))
             | (Value::Scalar(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
 
-            // vector types
-            (Value::Vec2(lhs), Value::Vec2(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
-            (Value::Vec3(lhs), Value::Vec3(rhs)) => lhs.magnitude2().partial_cmp(&rhs.magnitude2()),
-
             _ => {
                 log::warn!("unhandled type mismatch between {self} and {other}");
                 None
@@ -255,9 +220,6 @@ impl crate::ty::Ty for Value {
             Value::Length(_) => Type::Length,
             Value::Area(_) => Type::Area,
             Value::Volume(_) => Type::Volume,
-            Value::Vec2(_) => Type::Vec2,
-            Value::Vec3(_) => Type::Vec3,
-            Value::Vec4(_) => Type::Vec4,
             Value::Angle(_) => Type::Angle,
             Value::Weight(_) => Type::Weight,
             Value::Bool(_) => Type::Bool,
@@ -267,8 +229,7 @@ impl crate::ty::Ty for Value {
             Value::Map(map) => map.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
-            Value::Node(_) => Type::Node,
-            Value::NodeMultiplicity(_) => Type::NodeMultiplicity,
+            Value::Nodes(_) => Type::Nodes,
         }
     }
 }
@@ -281,8 +242,6 @@ impl std::ops::Neg for Value {
             Value::Integer(n) => Ok(Value::Integer(-n)),
             Value::Scalar(n) => Ok(Value::Scalar(-n)),
             Value::Length(n) => Ok(Value::Length(-n)),
-            Value::Vec2(v) => Ok(Value::Vec2(-v)),
-            Value::Vec3(v) => Ok(Value::Vec3(-v)),
             Value::Angle(n) => Ok(Value::Angle(-n)),
             _ => Err(ValueError::InvalidOperator("-".into())),
         }
@@ -307,10 +266,6 @@ impl std::ops::Add for Value {
             (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Angle(lhs + rhs)),
             // Add two lengths
             (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs + rhs)),
-            // Add two Vec2
-            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(Value::Vec2(lhs + rhs)),
-            // Add two Vec3
-            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(Value::Vec3(lhs + rhs)),
             // Concatenate two strings
             (Value::String(lhs), Value::String(rhs)) => Ok(Value::String(lhs + &rhs)),
             // Concatenate two lists
@@ -341,46 +296,24 @@ impl std::ops::Sub for Value {
     type Output = ValueResult;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        match (self, rhs) {
+        match (&self, &rhs) {
             // Subtract two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs - rhs)),
             // Subtract an scalar and an integer
-            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs - rhs as Scalar)),
+            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs - *rhs as Scalar)),
             // Subtract an integer and a scalar
-            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar - rhs)),
+            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(*lhs as Scalar - rhs)),
             // Subtract two numbers
             (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs - rhs)),
             // Subtract two angles
             (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Angle(lhs - rhs)),
             // Subtract two lengths
             (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs - rhs)),
-            // Subtract two Vec2
-            (Value::Vec2(lhs), Value::Vec2(rhs)) => Ok(Value::Vec2(lhs - rhs)),
-            // Subtract two Vec3
-            (Value::Vec3(lhs), Value::Vec3(rhs)) => Ok(Value::Vec3(lhs - rhs)),
-            // Remove an elements from list `rhs` from list `lhs`
-            (Value::List(mut lhs), Value::List(rhs)) => {
-                if lhs.ty() == rhs.ty() {
-                    lhs.retain(|x| !rhs.contains(x));
-                    Ok(Value::List(lhs))
-                } else {
-                    Err(ValueError::CannotCombineVecOfDifferentType(
-                        lhs.ty(),
-                        rhs.ty(),
-                    ))
-                }
-            }
-            // Subtract values of two arrays of the same length
-            (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple((lhs - rhs)?))
-            }
-            (Value::Node(lhs), Value::Node(rhs)) => {
-                Ok(Value::Node(crate::objects::algorithm::binary_op(
-                    microcad_core::BooleanOp::Difference,
-                    lhs,
-                    rhs,
-                )))
-            }
+            // Boolean difference operator for nodes
+            (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
+                lhs.union()
+                    .binary_op(microcad_core::BooleanOp::Difference, rhs.union()),
+            )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} - {rhs}"))),
         }
     }
@@ -416,14 +349,6 @@ impl std::ops::Mul for Value {
             (Value::Length(lhs), Value::Integer(rhs)) => Ok(Value::Length(lhs * rhs as Scalar)),
             // Scale an integer with a length
             (Value::Integer(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs as Scalar * rhs)),
-            // Scale Vec2
-            (Value::Scalar(lhs), Value::Vec2(rhs)) | (Value::Vec2(rhs), Value::Scalar(lhs)) => {
-                Ok(Value::Vec2(Vec2::new(lhs * rhs.x, lhs * rhs.y)))
-            }
-            // Scale Vec3
-            (Value::Scalar(lhs), Value::Vec3(rhs)) | (Value::Vec3(rhs), Value::Scalar(lhs)) => Ok(
-                Value::Vec3(Vec3::new(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z)),
-            ),
             (Value::List(list), value) | (value, Value::List(list)) => Ok(list * value)?,
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
@@ -461,8 +386,8 @@ impl std::ops::BitOr for Value {
 
     fn bitor(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                crate::objects::algorithm::binary_op(BooleanOp::Union, lhs, rhs),
+            (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
+                ObjectNodes::merge(lhs, rhs).union(),
             )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} | {rhs}"))),
         }
@@ -475,8 +400,8 @@ impl std::ops::BitAnd for Value {
 
     fn bitand(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Node(lhs), Value::Node(rhs)) => Ok(Value::Node(
-                crate::objects::algorithm::binary_op(BooleanOp::Intersection, lhs, rhs),
+            (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
+                lhs.union().binary_op(BooleanOp::Intersection, rhs.union()),
             )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} & {rhs}"))),
         }
@@ -496,9 +421,6 @@ impl std::fmt::Display for Value {
             | Value::Weight(n) => {
                 write!(f, "{n}{}", self.ty().default_unit())
             }
-            Value::Vec2(v) => write!(f, "({}, {})", v.x, v.y),
-            Value::Vec3(v) => write!(f, "({}, {}, {})", v.x, v.y, v.z),
-            Value::Vec4(v) => write!(f, "({}, {}, {}, {})", v.x, v.y, v.z, v.w),
             Value::Bool(b) => write!(f, "{b}"),
             Value::String(s) => write!(f, "{s}"),
             Value::Color(c) => write!(f, "{c}"),
@@ -506,15 +428,7 @@ impl std::fmt::Display for Value {
             Value::Map(m) => write!(f, "{m}"),
             Value::NamedTuple(t) => write!(f, "{t}"),
             Value::UnnamedTuple(t) => write!(f, "{t}"),
-            Value::Node(n) => dump(f, n.clone()),
-            Value::NodeMultiplicity(nm) => {
-                writeln!(f, "Multiplicity [")?;
-                for n in nm {
-                    dump(f, n.clone())?;
-                    write!(f, ",")?;
-                }
-                writeln!(f, "]")
-            }
+            Value::Nodes(n) => n.dump(f),
         }
     }
 }
@@ -528,9 +442,6 @@ impl std::fmt::Debug for Value {
             Self::Length(arg0) => write!(f, "Length: {arg0}"),
             Self::Area(arg0) => write!(f, "Area: {arg0}"),
             Self::Volume(arg0) => write!(f, "Volume: {arg0}"),
-            Self::Vec2(arg0) => write!(f, "Vec2: {arg0:?}"),
-            Self::Vec3(arg0) => write!(f, "Vec3: {arg0:?}"),
-            Self::Vec4(arg0) => write!(f, "Vec4: {arg0:?}"),
             Self::Angle(arg0) => write!(f, "Angle: {arg0}"),
             Self::Weight(arg0) => write!(f, "Weight: {arg0}"),
             Self::Bool(arg0) => write!(f, "Bool: {arg0}"),
@@ -540,8 +451,7 @@ impl std::fmt::Debug for Value {
             Self::Map(arg0) => write!(f, "Map: {arg0}"),
             Self::NamedTuple(arg0) => write!(f, "NamedTuple: {arg0}"),
             Self::UnnamedTuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
-            Self::Node(arg0) => write!(f, "Node: {arg0}"),
-            Self::NodeMultiplicity(arg0) => write!(f, "NodeMultiplicity: {arg0:?}"),
+            Self::Nodes(arg0) => write!(f, "Node: {arg0}"),
         }
     }
 }
@@ -574,19 +484,15 @@ macro_rules! impl_try_from {
 
 impl_try_from!(Integer => i64);
 impl_try_from!(Scalar, Length, Angle => Scalar);
-impl_try_from!(Vec2 => Vec2);
-impl_try_from!(Vec3 => Vec3);
-impl_try_from!(Vec4 => Vec4);
 impl_try_from!(Bool => bool);
 impl_try_from!(String => String);
 impl_try_from!(Color => Color);
 
-impl From<Vec<ObjectNode>> for Value {
-    fn from(nodes: Vec<ObjectNode>) -> Self {
+impl From<ObjectNodes> for Value {
+    fn from(nodes: ObjectNodes) -> Self {
         match nodes.len() {
             0 => Value::None,
-            1 => Value::Node(nodes.first().expect("Node").clone()),
-            _ => Value::NodeMultiplicity(nodes),
+            _ => Value::Nodes(nodes),
         }
     }
 }

@@ -3,7 +3,7 @@
 
 //! Part definition syntax element evaluation
 
-use crate::{eval::*, objects::*, rc::*, syntax::*};
+use crate::{eval::*, modeltree::*, rc::*, syntax::*};
 
 impl PartDefinition {
     /// Find a matching initializer for call argument list
@@ -21,25 +21,25 @@ impl PartDefinition {
         })
     }
 
-    /// Resolve into SymbolNode
+    /// Resolve into SymbolNode.
     pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
         let node = Symbol::new(SymbolDefinition::Part(self.clone()), parent);
         node.borrow_mut().children = self.body.resolve(Some(node.clone()));
         node
     }
 
-    /// Try to evaluate a single call to an object
+    /// Try to evaluate a single call into a [`ModelNode`].
     fn eval_to_node<'a>(
         &'a self,
         args: &ArgumentMap,
         init: Option<&'a InitDefinition>,
         context: &mut Context,
-    ) -> EvalResult<ObjectNode> {
+    ) -> EvalResult<ModelNode> {
         let mut object_builder = ObjectBuilder::default();
 
         context.scope(StackFrame::Part(self.id.clone(), args.into()), |context| {
             object_builder.init_properties(&self.parameters.eval(context)?, args);
-            object_builder.add_attributes(self.attribute_list.eval_to_object_attributes(context)?);
+            object_builder.set_metadata(self.attribute_list.eval_to_metadata(context)?);
 
             // Create the object node from initializer if present
             if let Some(init) = init {
@@ -76,7 +76,7 @@ impl CallTrait for PartDefinition {
     /// Consider the `part a(b: Scalar) { }`.
     /// Calling the part `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
     fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value> {
-        let mut nodes = Vec::new();
+        let mut nodes = ObjectNodes::default();
 
         match self.find_matching_initializer(args, context) {
             Some((init, multi_args)) => {

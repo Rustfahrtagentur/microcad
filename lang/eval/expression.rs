@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, objects::*};
+use crate::{eval::*, modeltree::*};
 
 impl Eval for ListExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
@@ -37,15 +37,14 @@ impl Expression {
         context: &mut Context,
     ) -> EvalResult<Value> {
         let value = self.eval(context)?;
-        match &value {
-            Value::Node(_) | Value::NodeMultiplicity(_) => {
-                let nodes = value.fetch_nodes();
-                let object_attributes = attribute_list.eval_to_object_attributes(context)?;
-                for node in &nodes {
-                    node.borrow_mut()
-                        .assign_object_attributes(&mut object_attributes.clone())
+        match value {
+            Value::Nodes(mut nodes) => {
+                let metadata = attribute_list.eval_to_metadata(context)?;
+                use std::borrow::BorrowMut;
+                for node in nodes.iter_mut() {
+                    node.borrow_mut().set_metadata(metadata.clone())
                 }
-                Ok(Value::NodeMultiplicity(nodes))
+                Ok(Value::Nodes(nodes))
             }
             Value::None => Ok(Value::None),
             _ => {
@@ -149,7 +148,7 @@ impl Eval for Nested {
         for (index, item) in self.iter().enumerate() {
             let value = item.eval(context)?;
             let nodes = match value {
-                Value::Node(_) | Value::NodeMultiplicity(_) => value.fetch_nodes(),
+                Value::Nodes(nodes) => nodes,
                 Value::None => return Ok(Value::None),
                 value => {
                     if index == 0 && self.len() == 1 {
@@ -163,7 +162,7 @@ impl Eval for Nested {
             node_stack.push(nodes);
         }
 
-        Ok(nest_nodes(&node_stack).clone().into())
+        Ok(Value::Nodes(ObjectNodes::from_node_stack(&node_stack)))
     }
 }
 
@@ -200,7 +199,7 @@ impl Eval for NestedItem {
                     unreachable!("Unexpected unload source file {} in expression", ns.id)
                 }
             },
-            NestedItem::Body(body) => Ok(Value::Node(body.eval_to_node(context)?)),
+            NestedItem::Body(body) => Ok(Value::from_single_node(body.eval_to_node(context)?)),
         }
     }
 }

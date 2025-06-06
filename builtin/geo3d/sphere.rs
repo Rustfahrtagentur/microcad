@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, objects::*, rc::*, syntax::*, ty::Type};
+use microcad_lang::{eval::*, modeltree::*, rc::*, src_ref::*, syntax::*, ty::Type};
 
 /// The builtin sphere primitive, defined by its radius.
 #[derive(Debug)]
@@ -16,11 +16,11 @@ impl BuiltinPartDefinition for Sphere {
         "sphere"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
-        Ok(ObjectNode::new(ObjectNodeInner::Primitive3D(Rc::new(
-            Sphere {
+    fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
+        Ok(ModelNode::new_element(Refer::none(Element::Primitive3D(
+            Rc::new(Sphere {
                 radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),
-            },
+            }),
         ))))
     }
 

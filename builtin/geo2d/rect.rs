@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, objects::*, rc::*, syntax::*, ty::*};
+use microcad_lang::{eval::*, modeltree::*, rc::*, src_ref::*, syntax::*, ty::*};
 
 #[derive(Debug)]
 pub struct Rect {
@@ -17,14 +17,14 @@ impl BuiltinPartDefinition for Rect {
         "rect"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
-        Ok(ObjectNode::new(ObjectNodeInner::Primitive2D(Rc::new(
-            Rect {
+    fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
+        Ok(ModelNode::new_element(Refer::none(Element::Primitive2D(
+            Rc::new(Rect {
                 width: args.get_value::<Scalar>(&Identifier::no_ref("width")),
                 height: args.get_value::<Scalar>(&Identifier::no_ref("height")),
                 x: args.get_value::<Scalar>(&Identifier::no_ref("x")),
                 y: args.get_value::<Scalar>(&Identifier::no_ref("y")),
-            },
+            }),
         ))))
     }
 

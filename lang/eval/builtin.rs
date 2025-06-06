@@ -3,7 +3,7 @@
 
 //! Builtin function evaluation entity
 
-use crate::{eval::*, objects::*, syntax::*};
+use crate::{eval::*, modeltree::*, syntax::*};
 
 /// Builtin function type
 pub type BuiltinFn = dyn Fn(&CallArgumentValueList, &mut Context) -> EvalResult<Value>;
@@ -45,7 +45,7 @@ pub trait BuiltinPartDefinition {
     /// Get id of the builtin part
     fn id() -> &'static str;
     /// Create node from argument map
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode>;
+    fn node(args: &ArgumentMap) -> EvalResult<ModelNode>;
     /// Part function
     fn function() -> &'static BuiltinFn {
         &|args, context| {
@@ -55,7 +55,7 @@ pub trait BuiltinPartDefinition {
                 nodes.push(Self::node(&args)?);
             }
 
-            Ok(Value::NodeMultiplicity(nodes))
+            Ok(Value::Nodes(nodes.into()))
         }
     }
 

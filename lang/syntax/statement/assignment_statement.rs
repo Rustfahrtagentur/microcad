@@ -3,7 +3,7 @@
 
 //! Assignment statement syntax elements
 
-use crate::{src_ref::*, syntax::*};
+use crate::{modeltree::*, src_ref::*, syntax::*};
 
 /// An assignment statement, e.g. `#[aux] s = sphere(3.0mm);`.
 #[derive(Clone, Debug)]
@@ -59,5 +59,21 @@ impl Eval for AssignmentStatement {
             .eval_with_attribute_list(&self.attribute_list, context)?;
         context.set_local_value(self.assignment.id.clone(), value)?;
         Ok(Value::None)
+    }
+}
+
+impl AssignmentStatement {
+    /// Try to evaluate the assignment into nodes.
+    pub fn try_eval_to_nodes(&self, context: &mut Context) -> EvalResult<ObjectNodes> {
+        let value = self
+            .assignment
+            .expression
+            .eval_with_attribute_list(&self.attribute_list, context)?;
+
+        context.set_local_value(self.assignment.id.clone(), value)?;
+        Ok(context
+            .get_local_value(&self.assignment.id)
+            .expect("Local value")
+            .fetch_nodes())
     }
 }

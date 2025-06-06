@@ -66,9 +66,6 @@ impl CallMethod for Value {
             Value::Length(_) => todo!(),
             Value::Area(_) => todo!(),
             Value::Volume(_) => todo!(),
-            Value::Vec2(_) => todo!(),
-            Value::Vec3(_) => todo!(),
-            Value::Vec4(_) => todo!(),
             Value::Angle(_) => todo!(),
             Value::Weight(_) => todo!(),
             Value::Bool(_) => todo!(),
@@ -78,8 +75,7 @@ impl CallMethod for Value {
             Value::Map(_) => todo!(),
             Value::NamedTuple(_) => todo!(),
             Value::UnnamedTuple(_) => todo!(),
-            Value::Node(_) => todo!(),
-            Value::NodeMultiplicity(_) => todo!(),
+            Value::Nodes(_) => todo!(),
         }
     }
 }

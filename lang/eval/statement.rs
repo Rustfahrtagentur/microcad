@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, objects::*};
+use crate::{eval::*, modeltree::*};
 
 impl Eval for Assignment {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
@@ -14,9 +14,10 @@ impl Eval for Assignment {
 impl Eval for Marker {
     fn eval(&self, _: &mut Context) -> EvalResult<Value> {
         if self.is_children_marker() {
-            Ok(Value::Node(ObjectNode::new(
-                ObjectNodeInner::ChildrenNodeMarker,
-            )))
+            Ok(Value::from_single_node(ModelNode::new_element(Refer::new(
+                Element::ChildrenPlaceholder,
+                self.src_ref(),
+            ))))
         } else {
             Ok(Value::None)
         }

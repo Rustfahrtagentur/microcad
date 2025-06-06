@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, objects::*, rc::*, syntax::*, ty::*};
+use microcad_lang::{eval::*, modeltree::*, rc::*, src_ref::*, syntax::*, ty::*};
 
 /// Builtin definition for a 2D circle
 #[derive(Debug)]
@@ -16,11 +16,11 @@ impl BuiltinPartDefinition for Circle {
         "circle"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
-        Ok(ObjectNode::new(ObjectNodeInner::Primitive2D(Rc::new(
-            Circle {
+    fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
+        Ok(ModelNode::new_element(Refer::none(Element::Primitive2D(
+            Rc::new(Circle {
                 radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),
-            },
+            }),
         ))))
     }
 

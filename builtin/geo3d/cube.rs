@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, objects::*, rc::*, syntax::*, ty::Type};
+use microcad_lang::{eval::*, modeltree::*, rc::*, src_ref::*, syntax::*, ty::Type};
 
 /// The builtin cube primitive, defined by its size in the x, y, and z dimensions.
 #[derive(Debug)]
@@ -20,13 +20,13 @@ impl BuiltinPartDefinition for Cube {
         "cube"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ObjectNode> {
-        Ok(ObjectNode::new(ObjectNodeInner::Primitive3D(Rc::new(
-            Cube {
+    fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
+        Ok(ModelNode::new_element(Refer::none(Element::Primitive3D(
+            Rc::new(Cube {
                 size_x: args.get_value::<Scalar>(&Identifier::no_ref("size_x")),
                 size_y: args.get_value::<Scalar>(&Identifier::no_ref("size_y")),
                 size_z: args.get_value::<Scalar>(&Identifier::no_ref("size_z")),
-            },
+            }),
         ))))
     }
 

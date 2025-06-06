@@ -3,16 +3,33 @@
 
 //! Object builder module
 
-use crate::{eval::*, objects::*};
+use crate::{eval::*, modeltree::*};
 
-/// Object builder to build up object nodes.
+/// Object builder to build up a [ModelNode] with an object element.
 #[derive(Default)]
 pub struct ObjectBuilder {
+    /// The object element to be built.
     object: Object,
-    children: Vec<ObjectNode>,
+
+    /// Children to be placed in the node.
+    children: ObjectNodes,
+
+    /// Metadata for the object node.
+    metadata: Metadata,
+
+    /// The [`SrcRef`] attached to the object element.
+    src_ref: SrcRef,
 }
 
 impl ObjectBuilder {
+    /// Create new [ObjectBuilder] with a [SrcRef].
+    pub fn new(src_ref: SrcRef) -> Self {
+        Self {
+            src_ref,
+            ..Default::default()
+        }
+    }
+
     /// Initialize the properties by parameters and arguments.
     pub fn init_properties(
         &mut self,
@@ -36,14 +53,14 @@ impl ObjectBuilder {
     }
 
     /// Add attributes to object.
-    pub fn add_attributes(&mut self, attributes: ObjectAttributes) -> &mut Self {
-        self.object.attributes = attributes;
+    pub fn set_metadata(&mut self, metadata: Metadata) -> &mut Self {
+        self.metadata = metadata;
         self
     }
 
     /// Append child nodes to this object node.
-    pub fn append_children(&mut self, nodes: &mut Vec<ObjectNode>) -> &mut Self {
-        self.children.append(nodes);
+    pub fn append_children(&mut self, nodes: &mut ObjectNodes) -> &mut Self {
+        (*self.children).append(nodes);
         self
     }
 
@@ -73,12 +90,11 @@ impl ObjectBuilder {
         }
     }
 
-    /// Build the [ObjectNode].
-    pub fn build_node(self) -> ObjectNode {
-        let node = ObjectNode::new(ObjectNodeInner::Object(self.object));
-        for child in self.children {
-            node.append(child);
-        }
+    /// Build the [`ModelNode`].
+    pub fn build_node(self) -> ModelNode {
+        let node = ModelNode::new_object(self.object, self.src_ref);
+        node.append_children(self.children);
+        node.set_metadata(self.metadata);
         node
     }
 }

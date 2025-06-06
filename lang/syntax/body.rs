@@ -3,7 +3,7 @@
 
 //! Body syntax element.
 
-use crate::{eval::*, objects::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, modeltree::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 /// A body is a list of statements inside `{}` brackets.
 #[derive(Clone, Debug, Default)]
@@ -28,10 +28,10 @@ impl Body {
         Ok(Value::None)
     }
 
-    /// Evaluate the statement of this body into an ObjectNode.
-    pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ObjectNode> {
+    /// Evaluate the statement of this body into an [`ObjectNode`].
+    pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ModelNode> {
         context.scope(StackFrame::Body(SymbolMap::default()), |context| {
-            let mut nodes = Vec::new();
+            let mut builder = ObjectBuilder::default();
 
             for statement in self.statements.iter() {
                 let value = match statement {
@@ -49,16 +49,10 @@ impl Body {
                         Value::None
                     }
                 };
-
-                nodes.append(&mut value.fetch_nodes());
+                builder.append_children(&mut value.fetch_nodes());
             }
 
-            let object = empty_object();
-            for node in nodes {
-                object.append(node);
-            }
-
-            Ok(object)
+            Ok(builder.build_node())
         })
     }
 }

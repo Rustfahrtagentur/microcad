@@ -28,12 +28,6 @@ pub enum Type {
     Angle,
     /// A physical weight, e.g. 4.0kg
     Weight,
-    /// A two-dimensional vector, maps from named tuple (x: length, y: length)    
-    Vec2,
-    /// A three-dimensional vector, maps from named tuple (x: length, y: length, z: length)
-    Vec3,
-    /// A three-dimensional vector, maps from named tuple (x: length, y: length, z: length, w: length)
-    Vec4,
     /// A boolean: true, false
     Bool,
     /// A list of elements of the same type: `[scalar]`
@@ -46,10 +40,8 @@ pub enum Type {
     NamedTuple(NamedTupleType),
     /// A custom type or a part node in the syntax tree
     Custom(QualifiedName),
-    /// Node
-    Node,
-    /// Node multiplicity
-    NodeMultiplicity,
+    /// Nodes.
+    Nodes,
 }
 
 impl Type {
@@ -90,17 +82,13 @@ impl std::fmt::Display for Type {
             Self::Volume => write!(f, "Volume"),
             Self::Angle => write!(f, "Angle"),
             Self::Weight => write!(f, "Weight"),
-            Self::Vec2 => write!(f, "Vec2"),
-            Self::Vec3 => write!(f, "Vec3"),
-            Self::Vec4 => write!(f, "Vec4"),
             Self::Bool => write!(f, "Bool"),
-            Self::List(t) => write!(f, "{t}"),
-            Self::Map(t) => write!(f, "{t}"),
-            Self::UnnamedTuple(t) => write!(f, "{t}"),
-            Self::NamedTuple(t) => write!(f, "{t}"),
-            Self::Custom(qn) => write!(f, "{qn}"),
-            Self::Node => write!(f, "Node"),
-            Self::NodeMultiplicity => write!(f, "[Node]"),
+            Self::List(t) => write!(f, "{}", t),
+            Self::Map(t) => write!(f, "{}", t),
+            Self::UnnamedTuple(t) => write!(f, "{}", t),
+            Self::NamedTuple(t) => write!(f, "{}", t),
+            Self::Custom(qn) => write!(f, "{}", qn),
+            Self::Nodes => write!(f, "Nodes"),
         }
     }
 }

@@ -7,7 +7,7 @@ extern crate clap;
 extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{diag::*, eval::*, objects::*, parse::*, rc::*, resolve::*, syntax::*};
+use microcad_lang::{diag::*, eval::*, modeltree::*, parse::*, rc::*, resolve::*, syntax::*};
 use std::io::Write;
 
 /// µcad cli
@@ -141,7 +141,7 @@ fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<Symbol> {
 fn eval(
     input: impl AsRef<std::path::Path>,
     search_paths: &[std::path::PathBuf],
-) -> anyhow::Result<ObjectNode> {
+) -> anyhow::Result<ModelNode> {
     let symbols = resolve(input)?;
     let mut context = Context::new(
         symbols.clone(),
