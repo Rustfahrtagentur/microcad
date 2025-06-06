@@ -387,15 +387,14 @@ parameter_list = { "(" ~ ws* ~ (parameter ~ (ws* ~ "," ~ ws* ~ parameter)* ~ ws*
 //`(a: scalar = 2.0, b: scalar = 3.0)`: ok # Function signature without return type
 function_signature = { parameter_list ~ (ws* ~ "->" ~ ws* ~ type)? }
 
-//`fn foo() -> scalar { return math::pi; }`: ok
-//`fn foo() -> scalar {}`: ok # Empty function
+//`fn foo() -> Scalar { return math::pi; }`: ok
+//`fn foo() -> Scalar {}`: ok # Empty function
 //`fn foo() { return 5.0mm; }`: ok # Function return type is inferred
-//`fn foo(a: scalar) -> scalar { return a; }`: ok # Function with arguments
-//`fn foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
-//`fn foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
-//`fn test(a: scalar, b: scalar) -> scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
-//`fn weight(density: density = 20g/1mm^3) -> weight {}` ok # Function with default value
-//`fn bar(a: scalar) -> scalar { a }`: ok # Function with no return type
+//`fn foo(a: Scalar) -> Scalar { return a; }`: ok # Function with arguments
+//`fn foo(a: Scalar, b: Scalar) -> Scalar { return a + b; }`: ok # Function with multiple arguments
+//`fn foo(a: Scalar, b: Scalar) -> Scalar { return a + b; }`: ok # Function with multiple arguments
+//`fn test(a: Scalar, b: Scalar) -> Scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
+//`fn weight(density: density = 20g/1mm^3) -> Weight {}` ok # Function with default value
 function_definition = { "fn" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ body }
 
 //`return 5.0mm;`: ok
@@ -411,10 +410,10 @@ body_else = { body }
 //`part foo(a: scalar) { }`: ok # Part with properties
 //`part foo(a: scalar, b: scalar) { }`: ok # Part with multiple properties
 //`part foo() { part bar() { } }`: ok # Nested part definition
-//`part foo() { a: scalar = 5.0; function bar() -> scalar { return 1; } }`: ok # Parameter and nested function
+//`part foo() { a: scalar = 5.0; fn bar() -> scalar { return 1; } }`: ok # Parameter and nested function
 //`part list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Part with part as properties
 //`part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
-//`part foo() { function bar(a: scalar) -> scalar { a } }`: ok # Part with function
+//`part foo() { fn bar(a: scalar) -> scalar { a } }`: ok # Part with function
 //`part donut(radius) { }`: error # Part property must have type annotations
 part_definition = { (attribute_list ~ ws+)? ~ "part" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
