@@ -76,7 +76,7 @@ impl CallTrait for PartDefinition {
     /// Consider the `part a(b: Scalar) { }`.
     /// Calling the part `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
     fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value> {
-        let mut nodes = ObjectNodes::default();
+        let mut nodes = ModelNodes::default();
 
         match self.find_matching_initializer(args, context) {
             Some((init, multi_args)) => {

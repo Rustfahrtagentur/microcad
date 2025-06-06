@@ -12,7 +12,7 @@ pub struct ObjectBuilder {
     object: Object,
 
     /// Children to be placed in the node.
-    children: ObjectNodes,
+    children: ModelNodes,
 
     /// Metadata for the object node.
     metadata: Metadata,
@@ -59,7 +59,7 @@ impl ObjectBuilder {
     }
 
     /// Append child nodes to this object node.
-    pub fn append_children(&mut self, nodes: &mut ObjectNodes) -> &mut Self {
+    pub fn append_children(&mut self, nodes: &mut ModelNodes) -> &mut Self {
         (*self.children).append(nodes);
         self
     }

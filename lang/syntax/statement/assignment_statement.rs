@@ -64,7 +64,7 @@ impl Eval for AssignmentStatement {
 
 impl AssignmentStatement {
     /// Try to evaluate the assignment into nodes.
-    pub fn try_eval_to_nodes(&self, context: &mut Context) -> EvalResult<ObjectNodes> {
+    pub fn try_eval_to_nodes(&self, context: &mut Context) -> EvalResult<ModelNodes> {
         let value = self
             .assignment
             .expression

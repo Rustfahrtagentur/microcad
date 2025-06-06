@@ -162,7 +162,7 @@ impl Eval for Nested {
             node_stack.push(nodes);
         }
 
-        Ok(Value::Nodes(ObjectNodes::from_node_stack(&node_stack)))
+        Ok(Value::Nodes(ModelNodes::from_node_stack(&node_stack)))
     }
 }
 
