@@ -247,7 +247,7 @@ impl ModelNode {
     /// Append a multiple nodes as children.
     ///
     /// Return self.
-    pub fn append_children(&self, nodes: ObjectNodes) -> Self {
+    pub fn append_children(&self, nodes: ModelNodes) -> Self {
         for node in nodes.iter() {
             self.append(node.clone())
         }
@@ -327,9 +327,9 @@ impl std::fmt::Display for ModelNode {
 
 /// Object node multiplicities.
 #[derive(Debug, Default, Clone, PartialEq)]
-pub struct ObjectNodes(Vec<ModelNode>);
+pub struct ModelNodes(Vec<ModelNode>);
 
-impl ObjectNodes {
+impl ModelNodes {
     /// Returns the first node if there is exactly one node in the list.
     pub fn single_node(&self) -> Option<ModelNode> {
         match self.0.len() {
@@ -371,7 +371,7 @@ impl ObjectNodes {
     ///       d0
     ///     c2
     ///       d0
-    pub fn from_node_stack(node_stack: &[ObjectNodes]) -> Self {
+    pub fn from_node_stack(node_stack: &[ModelNodes]) -> Self {
         match node_stack.len() {
             0 => panic!("Node stack must not be empty"),
             1 => {}
@@ -421,7 +421,7 @@ impl ObjectNodes {
     }
 
     /// Merge two lists of [`ObjectNode`] into one by concatenation.
-    pub fn merge(lhs: ObjectNodes, rhs: ObjectNodes) -> Self {
+    pub fn merge(lhs: ModelNodes, rhs: ModelNodes) -> Self {
         lhs.iter()
             .chain(rhs.iter())
             .cloned()
@@ -438,7 +438,7 @@ impl ObjectNodes {
     }
 }
 
-impl std::ops::Deref for ObjectNodes {
+impl std::ops::Deref for ModelNodes {
     type Target = Vec<ModelNode>;
 
     fn deref(&self) -> &Self::Target {
@@ -446,19 +446,19 @@ impl std::ops::Deref for ObjectNodes {
     }
 }
 
-impl std::ops::DerefMut for ObjectNodes {
+impl std::ops::DerefMut for ModelNodes {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
 }
 
-impl From<Vec<ModelNode>> for ObjectNodes {
+impl From<Vec<ModelNode>> for ModelNodes {
     fn from(value: Vec<ModelNode>) -> Self {
         Self(value)
     }
 }
 
-impl std::fmt::Display for ObjectNodes {
+impl std::fmt::Display for ModelNodes {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for node in self.iter() {
             node.fmt(f)?;
@@ -497,7 +497,7 @@ fn node_nest() {
     //       d0
     //     c2
     //       d0
-    let nodes = ObjectNodes::from_node_stack(&nodes);
+    let nodes = ModelNodes::from_node_stack(&nodes);
     assert_eq!(nodes.len(), 2); // Contains a0 and a1 as root
 
     for node in nodes.iter() {
