@@ -4,14 +4,14 @@
 //! Object tree module
 
 pub mod algorithm;
+pub mod metadata;
 pub mod object;
-pub mod object_attributes;
 pub mod object_builder;
 pub mod object_properties;
 
 pub use algorithm::*;
+pub use metadata::*;
 pub use object::*;
-pub use object_attributes::*;
 pub use object_builder::*;
 pub use object_properties::*;
 
@@ -48,13 +48,13 @@ impl Element {
             Self::Object(object) => object
                 .get_property_value(id)
                 .cloned()
-                .or(object.get_attribute_value(id)),
+                .or(object.get_metadata_id(id)),
             _ => None,
         }
     }
 
     /// Assign object attributes.
-    pub fn assign_object_attributes(&mut self, attributes: &mut MetaData) {
+    pub fn assign_metadata(&mut self, attributes: &mut Metadata) {
         if let Self::Object(object) = self {
             object.assign_object_attributes(attributes)
         }
@@ -324,15 +324,15 @@ impl ModelNode {
             .append_children(vec![self.clone(), other].into())
     }
 
-    /// Find children node marker in node descendants
-    fn find_children_marker(&self) -> Option<ModelNode> {
+    /// Find children node placeholder in node descendants
+    fn find_children_placeholder(&self) -> Option<ModelNode> {
         self.descendants().find(|n| {
             n.id().is_some() && matches!(n.0.borrow().element.value, Element::ChildrenPlaceholder)
         })
     }
 
-    /// Return inner ObjectNode if we are in an object node.
-    pub fn into_inner_object(self) -> Option<ModelNode> {
+    /// Return inner node if we are in an [`Object`] node.
+    pub fn into_inner(self) -> Option<ModelNode> {
         self.children().next().and_then(|n| {
             if let Element::Object(_) = n.0.borrow().element.value {
                 Some(n.clone())
@@ -351,11 +351,8 @@ impl ModelNode {
     }
 
     /// Assign object attributes.
-    pub(crate) fn assign_object_attributes(&self, attributes: &mut MetaData) {
-        self.0
-            .borrow_mut()
-            .element
-            .assign_object_attributes(attributes);
+    pub(crate) fn assign_metadata(&self, metadata: &mut Metadata) {
+        self.0.borrow_mut().element.assign_metadata(metadata);
     }
 }
 
@@ -433,7 +430,9 @@ impl ObjectNodes {
 
                                 // Handle children marker.
                                 // If we have found a children marker node, use it's parent as new parent node.
-                                let new_parent_node = match new_parent_node.find_children_marker() {
+                                let new_parent_node = match new_parent_node
+                                    .find_children_placeholder()
+                                {
                                     Some(children_marker) => {
                                         let parent =
                                             children_marker.parent().expect("Must have a parent");

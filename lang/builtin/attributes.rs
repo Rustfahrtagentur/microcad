@@ -1,27 +1,27 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Export builtin attribute.
+//! Built-in metadata.
 
 use crate::{diag::*, eval::*, objects::*, syntax::*, ty::*, value::*};
 
-/// Create built-in tag attribute.
-pub fn tag(id: &Identifier) -> EvalResult<Option<MetaDataItem>> {
+/// Create built-in tag [`MetadataItem`].
+pub fn tag(id: &Identifier) -> EvalResult<Option<MetadataItem>> {
     match id.id().as_str() {
-        "aux" => Ok(Some(MetaDataItem::Aux)),
+        "aux" => Ok(Some(MetadataItem::Aux)),
         _ => Ok(None),
     }
 }
 
-/// Built-in export attribute: `#export("filename.svg")`.
+/// Built-in export [`MetadataItem`]: `#export("filename.svg")`.
 pub fn export(
     arguments: &CallArgumentValueList,
     context: &mut Context,
-) -> EvalResult<Option<MetaDataItem>> {
+) -> EvalResult<Option<MetadataItem>> {
     // Convert the first argument to string and
     let arg_value = &arguments.get_single()?.value;
     match arg_value {
-        Value::String(s) => Ok(Some(MetaDataItem::Export(
+        Value::String(s) => Ok(Some(MetadataItem::Export(
             microcad_core::ExportSettings::with_filename(s.clone()),
         ))),
         value => {
@@ -31,14 +31,14 @@ pub fn export(
     }
 }
 
-/// Built-in color attribute: `#[color = "blue", fill_color = "#00FF00"]`.
+/// Built-in color [`MetadataItem`]: `#[color = "blue", fill_color = "#00FF00"]`.
 pub fn color(
     id: &Identifier,
     expression: &Expression,
     context: &mut Context,
-) -> EvalResult<Option<MetaDataItem>> {
+) -> EvalResult<Option<MetadataItem>> {
     match expression.eval(context)?.try_color() {
-        Ok(color) => Ok(Some(MetaDataItem::Color(id.clone(), color))),
+        Ok(color) => Ok(Some(MetadataItem::Color(id.clone(), color))),
         Err(err) => {
             context.error(expression, err)?;
             Ok(None)
@@ -46,20 +46,20 @@ pub fn color(
     }
 }
 
-/// A name value attribute, like `#[part = 2]`, `#[layer = "layer"]`.
+/// A name value [`MetadataItem`], like `#[item_id = 2]`, `#[layer = "layer"]`.
 pub fn name_id(
     id: &Identifier,
     expression: &Expression,
     context: &mut Context,
-) -> EvalResult<Option<MetaDataItem>> {
+) -> EvalResult<Option<MetadataItem>> {
     let value = expression.eval(context)?;
     let id_str = id.id().as_str();
 
     match id_str {
-        "layer" | "part" => match value {
+        "layer" | "item_id" => match value {
             Value::Integer(_) | Value::String(_) => match id_str {
-                "part" => Ok(Some(MetaDataItem::Part(value))),
-                "layer" => Ok(Some(MetaDataItem::Layer(value))),
+                "item_id" => Ok(Some(MetadataItem::ItemId(value))),
+                "layer" => Ok(Some(MetadataItem::Layer(value))),
                 _ => Ok(None),
             },
             _ => {

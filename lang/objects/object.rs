@@ -12,7 +12,7 @@ pub struct Object {
     pub props: ObjectProperties,
 
     /// Attributes
-    pub attributes: MetaData,
+    pub attributes: Metadata,
 }
 
 impl Object {
@@ -22,12 +22,12 @@ impl Object {
     }
 
     /// Assign new object attributes.
-    pub fn assign_object_attributes(&mut self, attributes: &mut MetaData) {
+    pub fn assign_object_attributes(&mut self, attributes: &mut Metadata) {
         self.attributes.merge(attributes);
     }
 
     /// Get value for name-value attribute with `id`.
-    pub(crate) fn get_attribute_value(&self, id: &Identifier) -> Option<Value> {
+    pub(crate) fn get_metadata_id(&self, id: &Identifier) -> Option<Value> {
         self.attributes
             .get_by_id(id)
             .map(|attribute| attribute.value())

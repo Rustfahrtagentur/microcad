@@ -50,7 +50,7 @@ impl ObjectBuilder {
     }
 
     /// Add attributes to object.
-    pub fn add_attributes(&mut self, attributes: MetaData) -> &mut Self {
+    pub fn add_attributes(&mut self, attributes: Metadata) -> &mut Self {
         self.object.attributes = attributes;
         self
     }
