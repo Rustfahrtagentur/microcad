@@ -108,7 +108,7 @@ impl Value {
         match self {
             Value::NamedTuple(named_tuple) => named_tuple.get(identifier).cloned(),
             Value::Nodes(nodes) => match nodes.single_node() {
-                Some(node) => (&*node.borrow()).content().get_property_value(identifier),
+                Some(node) => (*node.borrow()).content().get_property_value(identifier),
                 None => None,
             },
             _ => None,
