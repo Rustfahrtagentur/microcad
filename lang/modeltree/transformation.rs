@@ -3,7 +3,7 @@
 
 //! Algorithm
 
-use crate::objects::*;
+use crate::modeltree::*;
 use microcad_core::*;
 
 /// Algorithm trait.
@@ -19,15 +19,15 @@ impl Transformation for BooleanOp {
 }
 
 /// Transformation matrix
-#[derive(Clone, Debug, IntoStaticStr)]
+#[derive(Clone, Debug)]
 pub enum AffineTransform {
-    /// Translation
+    /// Translation.
     Translation(Vec3),
-    /// Rotation
-    Rotation(Angle, Vec3),
-    /// Scale
+    /// Rotation around an axis.
+    RotationAroundAxis(Angle, Vec3),
+    /// Scale.
     Scale(Vec3),
-    /// Uniform scale
+    /// Uniform scale.
     UniformScale(Scalar),
 }
 
@@ -36,7 +36,7 @@ impl AffineTransform {
     pub fn mat2d(&self) -> Mat3 {
         match self {
             AffineTransform::Translation(v) => Mat3::from_translation(Vec2::new(v.x, v.y)),
-            AffineTransform::Rotation(a, _) => Mat3::from_angle_z(*a),
+            AffineTransform::RotationAroundAxis(a, _) => Mat3::from_angle_z(*a),
             AffineTransform::Scale(v) => Mat3::from_nonuniform_scale(v.x, v.y),
             AffineTransform::UniformScale(s) => Mat3::from_scale(*s),
         }
@@ -46,7 +46,7 @@ impl AffineTransform {
     pub fn mat3d(&self) -> Mat4 {
         match self {
             AffineTransform::Translation(v) => Mat4::from_translation(*v),
-            AffineTransform::Rotation(a, v) => Mat3::from_axis_angle(*v, *a).into(),
+            AffineTransform::RotationAroundAxis(a, v) => Mat3::from_axis_angle(*v, *a).into(),
             AffineTransform::Scale(v) => Mat4::from_nonuniform_scale(v.x, v.y, v.z),
             AffineTransform::UniformScale(s) => Mat4::from_scale(*s),
         }

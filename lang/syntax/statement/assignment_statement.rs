@@ -3,7 +3,7 @@
 
 //! Assignment statement syntax elements
 
-use crate::{objects::*, src_ref::*, syntax::*};
+use crate::{modeltree::*, src_ref::*, syntax::*};
 
 /// An assignment statement, e.g. `#[aux] s = sphere(3.0mm);`.
 #[derive(Clone, Debug)]

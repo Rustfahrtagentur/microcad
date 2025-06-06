@@ -3,7 +3,7 @@
 
 //! Object builder module
 
-use crate::{eval::*, objects::*};
+use crate::{eval::*, modeltree::*};
 
 /// Object builder to build up a [ModelNode] with an object element.
 #[derive(Default)]

@@ -3,7 +3,7 @@
 
 //! Builtin function evaluation entity
 
-use crate::{eval::*, objects::*, syntax::*};
+use crate::{eval::*, modeltree::*, syntax::*};
 
 /// Builtin function type
 pub type BuiltinFn = dyn Fn(&CallArgumentValueList, &mut Context) -> EvalResult<Value>;

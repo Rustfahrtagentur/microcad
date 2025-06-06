@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, objects::*, rc::*, src_ref::*, syntax::*, ty::Type};
+use microcad_lang::{eval::*, modeltree::*, rc::*, src_ref::*, syntax::*, ty::Type};
 /// The built-in cylinder primitive, defined by an bottom radius, top radius and height.
 /// The cylinder is oriented along the z-axis.
 #[derive(Debug)]

@@ -11,7 +11,7 @@ pub use call_argument::*;
 pub use call_argument_list::*;
 pub use method_call::*;
 
-use crate::{objects::*, src_ref::*, syntax::*, value::*};
+use crate::{modeltree::*, src_ref::*, syntax::*, value::*};
 
 /// Call of a function or init.
 #[derive(Clone, Debug, Default)]

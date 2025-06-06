@@ -3,7 +3,7 @@
 
 //! Built-in metadata.
 
-use crate::{diag::*, eval::*, objects::*, syntax::*, ty::*, value::*};
+use crate::{diag::*, eval::*, modeltree::*, syntax::*, ty::*, value::*};
 
 /// Create built-in tag [`MetadataItem`].
 pub fn tag(id: &Identifier) -> EvalResult<Option<MetadataItem>> {

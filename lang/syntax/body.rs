@@ -3,7 +3,7 @@
 
 //! Body syntax element.
 
-use crate::{eval::*, objects::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, modeltree::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 /// A body is a list of statements inside `{}` brackets.
 #[derive(Clone, Debug, Default)]

@@ -3,7 +3,7 @@
 
 //! Part definition syntax element evaluation
 
-use crate::{eval::*, objects::*, rc::*, syntax::*};
+use crate::{eval::*, modeltree::*, rc::*, syntax::*};
 
 impl PartDefinition {
     /// Find a matching initializer for call argument list
