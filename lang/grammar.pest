@@ -387,15 +387,15 @@ parameter_list = { "(" ~ ws* ~ (parameter ~ (ws* ~ "," ~ ws* ~ parameter)* ~ ws*
 //`(a: scalar = 2.0, b: scalar = 3.0)`: ok # Function signature without return type
 function_signature = { parameter_list ~ (ws* ~ "->" ~ ws* ~ type)? }
 
-//`function foo() -> scalar { return math::pi; }`: ok
-//`function foo() -> scalar {}`: ok # Empty function
-//`function foo() { return 5.0mm; }`: ok # Function return type is inferred
-//`function foo(a: scalar) -> scalar { return a; }`: ok # Function with arguments
-//`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
-//`function foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
-//`function test(a: scalar, b: scalar) -> scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
-//`function weight(density: density = 20g/1mm^3) -> weight {}` ok # Function with default value
-//`function bar(a: scalar) -> scalar { a }`: ok # Function with no return type
+//`fn foo() -> scalar { return math::pi; }`: ok
+//`fn foo() -> scalar {}`: ok # Empty function
+//`fn foo() { return 5.0mm; }`: ok # Function return type is inferred
+//`fn foo(a: scalar) -> scalar { return a; }`: ok # Function with arguments
+//`fn foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
+//`fn foo(a: scalar, b: scalar) -> scalar { return a + b; }`: ok # Function with multiple arguments
+//`fn test(a: scalar, b: scalar) -> scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
+//`fn weight(density: density = 20g/1mm^3) -> weight {}` ok # Function with default value
+//`fn bar(a: scalar) -> scalar { a }`: ok # Function with no return type
 function_definition = { "fn" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ body }
 
 //`return 5.0mm;`: ok
