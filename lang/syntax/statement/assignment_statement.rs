@@ -63,22 +63,17 @@ impl Eval for AssignmentStatement {
 }
 
 impl AssignmentStatement {
-    fn try_eval_to_nodes(&self, context: &mut Context) -> EvalResult<ObjectNodes> {
+    /// Try to evaluate the assignment into nodes.
+    pub fn try_eval_to_nodes(&self, context: &mut Context) -> EvalResult<ObjectNodes> {
         let value = self
             .assignment
             .expression
             .eval_with_attribute_list(&self.attribute_list, context)?;
 
-        match value {
-            Value::Nodes(ref nodes) => {
-                let nodes = nodes.clone();
-                context.set_local_value(self.assignment.id.clone(), value)?;
-                Ok(nodes)
-            }
-            _ => {
-                context.set_local_value(self.assignment.id.clone(), value)?;
-                Ok(ObjectNodes::default())
-            }
-        }
+        context.set_local_value(self.assignment.id.clone(), value)?;
+        Ok(context
+            .get_local_value(&self.assignment.id)
+            .expect("Local value")
+            .fetch_nodes())
     }
 }

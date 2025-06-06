@@ -40,23 +40,13 @@ pub enum Element {
 }
 
 impl Element {
-    /// Get a property from an object node.
+    /// Get a property value from an [`Element`].
     ///
-    /// Only object nodes can have properties.
-    pub fn get_property_value(&self, id: &Identifier) -> Option<Value> {
+    /// Only objects can have properties.
+    pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
         match self {
-            Self::Object(object) => object
-                .get_property_value(id)
-                .cloned()
-                .or(object.get_metadata_id(id)),
+            Self::Object(object) => object.get_property_value(id),
             _ => None,
-        }
-    }
-
-    /// Assign object attributes.
-    pub fn assign_metadata(&mut self, attributes: &mut Metadata) {
-        if let Self::Object(object) = self {
-            object.assign_object_attributes(attributes)
         }
     }
 }
@@ -106,6 +96,9 @@ pub struct ModelNodeInner {
     /// Element of the node with [SrcRef].
     element: Refer<Element>,
 
+    /// Metadata.
+    metadata: Metadata,
+
     // The symbol (e.g. [ModuleDefinition]) that created this object.
     symbol: Option<Symbol>,
     // Hash of the node, 0 by default
@@ -115,9 +108,19 @@ pub struct ModelNodeInner {
 }
 
 impl ModelNodeInner {
-    /// Return content of this node.
-    pub fn content(&self) -> &Element {
+    /// Return element of this node.
+    pub fn element(&self) -> &Element {
         &self.element
+    }
+
+    /// Return reference to the metadata of this node.
+    pub fn metadata(&self) -> &Metadata {
+        &self.metadata
+    }
+
+    /// Set metadata for this node.
+    pub fn set_metadata(&mut self, metadata: Metadata) {
+        self.metadata = metadata;
     }
 }
 
@@ -350,9 +353,29 @@ impl ModelNode {
             .try_for_each(|child| writeln!(f, "{}{}", " ".repeat(child.depth()), child))
     }
 
-    /// Assign object attributes.
-    pub(crate) fn assign_metadata(&self, metadata: &mut Metadata) {
-        self.0.borrow_mut().element.assign_metadata(metadata);
+    /// Set metadata.
+    pub(crate) fn set_metadata(&self, metadata: Metadata) {
+        self.0.borrow_mut().set_metadata(metadata);
+    }
+
+    /// Get value for name-value metadata with `id`.
+    pub(crate) fn get_metadata_by_id(&self, id: &Identifier) -> Option<Value> {
+        self.0
+            .borrow()
+            .metadata()
+            .get_by_id(id)
+            .map(|item| item.value())
+    }
+
+    /// Get a property from an object node.
+    ///
+    /// Only object nodes can have properties.
+    pub fn get_property_value(&self, id: &Identifier) -> Option<Value> {
+        self.borrow()
+            .element()
+            .get_property_value(id)
+            .cloned()
+            .or(self.get_metadata_by_id(id))
     }
 }
 
@@ -548,7 +571,7 @@ fn node_nest() {
             log::trace!(
                 "{}{}",
                 "  ".repeat(n.depth()),
-                match n.0.borrow().content() {
+                match n.0.borrow().element() {
                     Element::Object(_) => node.id().expect("Id").clone(),
                     _ => panic!("Object with name expected"),
                 }

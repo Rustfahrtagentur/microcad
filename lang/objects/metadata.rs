@@ -7,7 +7,7 @@ use crate::{syntax::*, value::*};
 use microcad_core::ExportSettings;
 
 /// A single [`MetaData`] item
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum MetadataItem {
     /// The node is auxiliary, it will not be exported.
     Aux,
@@ -46,7 +46,7 @@ impl MetadataItem {
 }
 
 /// Object attribute list.
-#[derive(Clone, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Metadata(Vec<MetadataItem>);
 
 impl Metadata {
