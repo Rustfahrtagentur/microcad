@@ -16,7 +16,7 @@ impl std::fmt::Display for NamedTupleType {
             if i > 0 {
                 write!(f, ", ")?;
             }
-            write!(f, "{}: {}", identifier, ty)?;
+            write!(f, "{identifier}: {ty}")?;
         }
         write!(f, ")")
     }

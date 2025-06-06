@@ -46,7 +46,7 @@ impl std::ops::Deref for StatementList {
 impl std::fmt::Display for StatementList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for statement in self.iter() {
-            writeln!(f, "{}", statement)?;
+            writeln!(f, "{statement}")?;
         }
         Ok(())
     }
