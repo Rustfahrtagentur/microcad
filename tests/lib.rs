@@ -121,8 +121,8 @@ fn part_implicit_init_call() {
 
     assert_eq!(nodes.len(), 1, "There should be one node");
 
-    fn check_node_property_b(node: &modeltree::ModelNode, value: f64) {
-        if let modeltree::Element::Object(ref object) = *node.borrow().element() {
+    fn check_node_property_b(node: &model_tree::ModelNode, value: f64) {
+        if let model_tree::Element::Object(ref object) = *node.borrow().element() {
             assert_eq!(
                 object
                     .get_property_value(&Identifier(Refer::none("b".into())))
@@ -169,8 +169,8 @@ fn part_explicit_init_call() {
     };
 
     // Helper function to check if the object node contains a property radius with specified value
-    fn check_node_property_radius(node: &modeltree::ModelNode, value: f64) {
-        if let modeltree::Element::Object(ref object) = *node.borrow().element() {
+    fn check_node_property_radius(node: &model_tree::ModelNode, value: f64) {
+        if let model_tree::Element::Object(ref object) = *node.borrow().element() {
             log::trace!("Object: {object}");
             assert_eq!(
                 object

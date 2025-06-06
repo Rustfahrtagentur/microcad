@@ -28,7 +28,7 @@ pub use unnamed_tuple::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{modeltree::*, src_ref::*, syntax::*, ty::*};
+use crate::{model_tree::*, src_ref::*, syntax::*, ty::*};
 use microcad_core::*;
 
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;

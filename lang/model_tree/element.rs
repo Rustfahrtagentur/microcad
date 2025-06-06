@@ -3,7 +3,7 @@
 
 //! Element of a [`ModelNode`]
 
-use crate::modeltree::*;
+use crate::model_tree::*;
 use strum::IntoStaticStr;
 
 /// Inner of a node

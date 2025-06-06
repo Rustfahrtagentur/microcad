@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, modeltree::*};
+use crate::{eval::*, model_tree::*};
 
 impl Eval for ListExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
