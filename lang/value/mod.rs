@@ -6,7 +6,6 @@
 //! Every evaluation of any *symbol* leads to a [`Value`] which then might continued
 //! to process or ends up as the overall evaluation result.
 
-mod into_value;
 mod list;
 mod map;
 mod map_key_value;
@@ -19,7 +18,6 @@ mod unnamed_tuple;
 mod value_error;
 mod value_list;
 
-pub use into_value::IntoValue;
 pub use list::*;
 pub use map::*;
 pub use map_key_value::*;
@@ -108,7 +106,7 @@ impl Value {
         match self {
             Value::NamedTuple(named_tuple) => named_tuple.get(identifier).cloned(),
             Value::Nodes(nodes) => match nodes.single_node() {
-                Some(node) => (*node.borrow()).content().get_property_value(identifier),
+                Some(node) => node.get_property_value(identifier),
                 None => None,
             },
             _ => None,
