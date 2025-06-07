@@ -3,8 +3,21 @@
 
 //! Model node
 
-use crate::{modeltree::*, rc::*, resolve::Symbol, src_ref::*, syntax::*, value::*};
+use crate::{
+    eval::ArgumentMap,
+    modeltree::*,
+    rc::*,
+    resolve::{FullyQualify, Symbol},
+    src_ref::*,
+    syntax::*,
+    value::*,
+};
 use microcad_core::*;
+
+pub struct ModelNodeCreator {
+    symbol: Symbol,
+    arguments: ArgumentMap,
+}
 
 /// The actual node contents
 #[derive(custom_debug::Debug, Clone, Default)]
@@ -19,7 +32,7 @@ pub struct ModelNodeInner {
     parent: Option<ModelNode>,
 
     // Children of the model node.
-    children: Vec<ModelNode>,
+    children: ModelNodes,
 
     /// Element of the node with [SrcRef].
     element: Refer<Element>,
@@ -27,8 +40,8 @@ pub struct ModelNodeInner {
     /// Metadata.
     metadata: Metadata,
 
-    // The symbol (e.g. [ModuleDefinition]) that created this object.
-    symbol: Option<Symbol>,
+    /// The symbol (e.g. [`PartDefinition`]) that created this [`ModelNode`].
+    creator: Option<Symbol>,
 }
 
 impl ModelNodeInner {
@@ -40,6 +53,11 @@ impl ModelNodeInner {
     /// Return reference to the metadata of this node.
     pub fn metadata(&self) -> &Metadata {
         &self.metadata
+    }
+
+    /// Return reference to the children of this node.
+    pub fn children(&self) -> &ModelNodes {
+        &self.children
     }
 
     /// Set metadata for this node.
@@ -65,8 +83,8 @@ impl Iterator for Children {
     type Item = ModelNode;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let node = self.node.0.borrow();
-        let child = node.children.get(self.index);
+        let node = self.node.borrow();
+        let child = node.children().get(self.index);
         self.index += 1;
         child.cloned()
     }
@@ -74,18 +92,15 @@ impl Iterator for Children {
 
 /// Iterator over all descendants.
 pub struct Descendants {
-    stack: Vec<(ModelNode, usize)>,
+    stack: Vec<Children>,
 }
 
 impl Descendants {
     /// Create new descendants iterator
     pub fn new(root: ModelNode) -> Self {
-        let mut stack = Vec::new();
-        let children = &root.borrow().children;
-        for child in children {
-            stack.push((child.clone(), 0));
+        Self {
+            stack: vec![Children::new(root)],
         }
-        Self { stack }
     }
 }
 
@@ -93,23 +108,27 @@ impl Iterator for Descendants {
     type Item = ModelNode;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some((node, index)) = self.stack.pop() {
-            let node_inner = node.0.borrow();
-            let children = &node_inner.children;
+        if self.stack.is_empty() {
+            None
+        } else {
+            let child = {
+                let children = self.stack.last_mut().expect("Non-empty stack");
+                children.next()
+            };
 
-            if index < children.len() {
-                // Push the current node back with the next index
-                self.stack.push((node.clone(), index + 1));
-
-                // Push the current child onto the stack to process its children
-                let child = &children[index];
-                self.stack.push((child.clone(), 0));
-
-                // Return the current child
-                return Some(child.clone());
+            match &child {
+                Some(child) => {
+                    if child.has_children() {
+                        self.stack.push(child.children());
+                    }
+                }
+                None => {
+                    self.stack.pop();
+                }
             }
+
+            child
         }
-        None
     }
 }
 
@@ -156,6 +175,11 @@ impl ModelNode {
     pub fn set_id(&mut self, id: Identifier) -> Self {
         self.0.borrow_mut().id = Some(id);
         self.clone()
+    }
+
+    /// Return the symbol that created this node.
+    pub fn creator(&self) -> Option<Symbol> {
+        self.borrow().creator.clone()
     }
 
     /// Get borrowed reference to the inner of this node.
@@ -213,6 +237,11 @@ impl ModelNode {
     /// Return parent of this node.
     pub fn parent(&self) -> Option<ModelNode> {
         self.0.borrow().parent.clone()
+    }
+
+    /// Returns `true` if this node has children.
+    pub fn has_children(&self) -> bool {
+        !self.borrow().children().is_empty()
     }
 
     /// Children iterator.
@@ -309,8 +338,33 @@ impl PartialEq for ModelNode {
     }
 }
 
+/// Prints the signature of a ModelNode.
+///
+/// A signature has the form "ElementType[ "id"][: creator][ => output_type]", for example:
+/// ```modelnode
+/// Object "id": std::geo2d::circle(radius = 3.0mm) => Geometry2D:
+///   Primitive: __builtin::geo2d::circle(radius = 3.0) => Geometry2D`
+/// ```
 impl std::fmt::Display for ModelNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f,)
+        let element_type = match self.borrow().element() {
+            Element::Object(_) => "Object",
+            Element::ChildrenPlaceholder => "ChildrenPlaceholder",
+            Element::AffineTransform(_) => "AffineTransform",
+            Element::Primitive2D(_) => "Primitive2D",
+            Element::Primitive3D(_) => "Primitive3D",
+            Element::Transformation(_) => "Transformation",
+        };
+
+        match (self.id(), self.creator()) {
+            (None, None) => write!(f, "{element_type}:"),
+            (None, Some(creator)) => write!(
+                f,
+                "{element_type}: {symbol_name}",
+                symbol_name = creator.full_name()
+            ),
+            (Some(id), None) => write!(f, "{element_type}({id})"),
+            (Some(id), Some(creator)) => todo!(),
+        }
     }
 }

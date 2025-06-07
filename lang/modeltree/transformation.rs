@@ -6,9 +6,14 @@
 use crate::modeltree::*;
 use microcad_core::*;
 
-/// Algorithm trait.
+/// Transformation trait.
 pub trait Transformation: std::fmt::Debug {
-    /// Process this object nodes
+    /*fn accepted_types(&self) -> GeometryType;
+
+    fn output_type(&self, node: ModelNode) -> GeometryType;
+    */
+
+    /// Process the model
     fn process(&self, node: ModelNode);
 }
 

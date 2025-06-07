@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Model tree module
-
 use microcad_core::BooleanOp;
 
 use crate::{modeltree::*, src_ref::*};
@@ -81,6 +80,7 @@ impl ModelNodes {
                                     None => new_parent_node.clone(),
                                 };
 
+                                log::trace!("Node: {}", node.id().unwrap_or_default());
                                 new_parent_node.append(node.make_deep_copy());
                             });
                         });
@@ -182,18 +182,22 @@ fn node_nest() {
     //     c2
     //       d0
     let nodes = ModelNodes::from_node_stack(&nodes);
-    assert_eq!(nodes.len(), 2); // Contains a0 and a1 as root
+    assert_eq!(nodes.len(), 2, "Must contain a0 and a1 as root");
+
+    let a0 = nodes.first().expect("a0");
+    let a1 = nodes.last().expect("a1");
+    assert_eq!(a0.id().expect("a0"), Identifier::no_ref("a0"));
+    assert_eq!(a1.id().expect("a1"), Identifier::no_ref("a1"));
+
+    assert_eq!(a0.children().count(), 1); // Contains b0
+    assert_eq!(
+        a0.children().next().expect("b0").id().expect("b0"),
+        Identifier::no_ref("b0")
+    );
 
     for node in nodes.iter() {
         node.descendants().for_each(|n| {
-            log::trace!(
-                "{}{}",
-                "  ".repeat(n.depth()),
-                match n.borrow().element() {
-                    Element::Object(_) => node.id().expect("Id").clone(),
-                    _ => panic!("Object with name expected"),
-                }
-            )
+            log::trace!("{}{}", "  ".repeat(n.depth()), n);
         });
     }
 }

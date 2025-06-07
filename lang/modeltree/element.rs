@@ -10,20 +10,28 @@ use strum::IntoStaticStr;
 /// Inner of a node
 #[derive(Clone, IntoStaticStr, Debug)]
 pub enum Element {
-    /// An object that contains children and holds properties
+    /// An object that contains children and holds properties.
+    ///
+    /// Objects can be created by builtins, assignments, expressions and parts.
     Object(Object),
 
-    /// A special node after which children will be nested as siblings
+    /// A special node after which children will be nested as siblings.
+    ///
+    /// This node is removed after the children have been inserted.
     ChildrenPlaceholder,
+
+    /// An affine transform.
+    ///
+    ///
+    AffineTransform(AffineTransform),
 
     /// Generated 2D geometry.
     Primitive2D(std::rc::Rc<Primitive2D>),
 
     /// Generated 3D geometry.
-    #[cfg(feature = "geo3d")]
     Primitive3D(std::rc::Rc<Primitive3D>),
 
-    /// A transformation that manipulates the node or its children
+    /// A transformation that generates a geometry.
     Transformation(std::rc::Rc<dyn Transformation>),
 }
 
@@ -57,9 +65,6 @@ impl std::fmt::Display for Element {
             }
             Element::Primitive2D(primitive2d) => {
                 write!(f, "({primitive2d:?})")
-            }
-            Element::Primitive3D(primitive3d) => {
-                write!(f, "({primitive3d:?})")
             }
             _ => Ok(()),
         }
