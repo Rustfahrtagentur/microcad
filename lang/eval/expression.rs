@@ -199,7 +199,7 @@ impl Eval for NestedItem {
                     unreachable!("Unexpected unload source file {} in expression", ns.id)
                 }
             },
-            NestedItem::Body(body) => Ok(Value::from_single_node(body.eval_to_node(context)?)),
+            NestedItem::Body(body) => Ok(Value::from_single_node(body.eval(context)?)),
         }
     }
 }

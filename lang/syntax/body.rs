@@ -27,34 +27,6 @@ impl Body {
         }
         Ok(Value::None)
     }
-
-    /// Evaluate the statement of this body into an [`ObjectNode`].
-    pub fn eval_to_node(&self, context: &mut Context) -> EvalResult<ModelNode> {
-        context.scope(StackFrame::Body(SymbolMap::default()), |context| {
-            let mut builder = ObjectBuilder::default();
-
-            for statement in self.statements.iter() {
-                let value = match statement {
-                    Statement::Use(_) => continue, // Use statements have been resolved at this point
-                    Statement::Assignment(assignment) => assignment.eval(context)?,
-                    Statement::Expression(expression) => expression.eval(context)?,
-                    Statement::Marker(marker) => marker.eval(context)?,
-                    Statement::If(_) => todo!("if statement not implemented"),
-                    statement => {
-                        use crate::diag::PushDiag;
-                        context.error(
-                            self,
-                            EvalError::StatementNotSupported(statement.clone().into()),
-                        )?;
-                        Value::None
-                    }
-                };
-                builder.append_children(&mut value.fetch_nodes());
-            }
-
-            Ok(builder.build_node())
-        })
-    }
 }
 
 impl SrcReferrer for Body {
