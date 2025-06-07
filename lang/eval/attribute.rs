@@ -57,7 +57,7 @@ impl Attribute {
             }
         }
 
-        context.warning(self, AttributeError::Unknown(qualified_name.clone()).into())?;
+        context.warning(self, AttributeError::Unknown(qualified_name.clone()))?;
         Ok(None)
     }
 }
