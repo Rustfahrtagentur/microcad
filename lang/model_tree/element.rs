@@ -3,7 +3,7 @@
 
 //! Element of a [`ModelNode`]
 
-use crate::{modeltree::*, syntax::*, value::*};
+use crate::{model_tree::*, syntax::*, value::*};
 use microcad_core::*;
 use strum::IntoStaticStr;
 

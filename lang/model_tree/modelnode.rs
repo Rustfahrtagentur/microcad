@@ -5,7 +5,7 @@
 
 use crate::{
     eval::ArgumentMap,
-    modeltree::*,
+    model_tree::*,
     rc::*,
     resolve::{FullyQualify, Symbol},
     src_ref::*,

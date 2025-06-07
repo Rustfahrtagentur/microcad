@@ -4,7 +4,7 @@
 //! Model tree module
 use microcad_core::BooleanOp;
 
-use crate::{modeltree::*, src_ref::*};
+use crate::{model_tree::*, src_ref::*};
 
 /// Model node multiplicities.
 #[derive(Debug, Default, Clone, PartialEq)]

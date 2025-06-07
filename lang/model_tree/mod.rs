@@ -37,6 +37,13 @@ enum ProcessingState {
     ///
     /// * The transformation matrices have been calculated.
     AffineTransformInfo,
+    /// Return self.
+    pub fn append_children(&self, nodes: ModelNodes) -> Self {
+        for node in nodes.iter() {
+            self.append(node.clone())
+        }
+        self.clone()
+    }
 
     /// Generate geometry for primitives.
     Primitives,
