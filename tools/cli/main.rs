@@ -7,7 +7,7 @@ extern crate clap;
 extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{diag::*, eval::*, modeltree::*, parse::*, rc::*, resolve::*, syntax::*};
+use microcad_lang::{diag::*, eval::*, model_tree::*, parse::*, rc::*, resolve::*, syntax::*};
 use std::io::Write;
 
 /// µcad cli

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, modeltree::*, rc::*, src_ref::*, syntax::*, ty::Type};
+use microcad_lang::{eval::*, model_tree::*, rc::*, src_ref::*, syntax::*, ty::Type};
 
 /// The builtin sphere primitive, defined by its radius.
 #[derive(Debug)]

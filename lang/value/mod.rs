@@ -28,7 +28,7 @@ pub use unnamed_tuple::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{modeltree::*, src_ref::*, syntax::*, ty::*};
+use crate::{model_tree::*, src_ref::*, syntax::*, ty::*};
 use microcad_core::*;
 
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
@@ -68,7 +68,7 @@ pub enum Value {
     /// A tuple of unnamed items.
     UnnamedTuple(UnnamedTuple),
     /// A node in the render tree.
-    Nodes(ObjectNodes),
+    Nodes(ModelNodes),
 }
 
 impl Value {
@@ -90,10 +90,10 @@ impl Value {
     }
 
     /// Fetch nodes from this value.
-    pub fn fetch_nodes(self) -> ObjectNodes {
+    pub fn fetch_nodes(self) -> ModelNodes {
         match self {
             Self::Nodes(n) => n,
-            _ => ObjectNodes::default(),
+            _ => ModelNodes::default(),
         }
     }
 
@@ -386,9 +386,9 @@ impl std::ops::BitOr for Value {
 
     fn bitor(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
-                ObjectNodes::merge(lhs, rhs).union(),
-            )),
+            (Value::Nodes(lhs), Value::Nodes(rhs)) => {
+                Ok(Value::from_single_node(ModelNodes::merge(lhs, rhs).union()))
+            }
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} | {rhs}"))),
         }
     }
@@ -488,8 +488,8 @@ impl_try_from!(Bool => bool);
 impl_try_from!(String => String);
 impl_try_from!(Color => Color);
 
-impl From<ObjectNodes> for Value {
-    fn from(nodes: ObjectNodes) -> Self {
+impl From<ModelNodes> for Value {
+    fn from(nodes: ModelNodes) -> Self {
         match nodes.len() {
             0 => Value::None,
             _ => Value::Nodes(nodes),

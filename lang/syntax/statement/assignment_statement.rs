@@ -3,7 +3,7 @@
 
 //! Assignment statement syntax elements
 
-use crate::{modeltree::*, src_ref::*, syntax::*};
+use crate::{model_tree::*, src_ref::*, syntax::*};
 
 /// An assignment statement, e.g. `#[aux] s = sphere(3.0mm);`.
 #[derive(Clone, Debug)]
@@ -64,7 +64,7 @@ impl Eval for AssignmentStatement {
 
 impl AssignmentStatement {
     /// Try to evaluate the assignment into nodes.
-    pub fn try_eval_to_nodes(&self, context: &mut Context) -> EvalResult<ObjectNodes> {
+    pub fn try_eval_to_nodes(&self, context: &mut Context) -> EvalResult<ModelNodes> {
         let value = self
             .assignment
             .expression

@@ -15,7 +15,7 @@
 pub mod builtin;
 pub mod diag;
 pub mod eval;
-pub mod modeltree;
+pub mod model_tree;
 pub mod ord_map;
 pub mod parse;
 pub mod parser;
