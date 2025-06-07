@@ -60,7 +60,7 @@ pub use output::*;
 pub use symbols::*;
 pub use r#use::*;
 
-use crate::{diag::*, model_tree::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
+use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
 /// Evaluation trait
 pub trait Eval<T = Value> {

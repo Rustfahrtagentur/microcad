@@ -35,15 +35,20 @@ impl std::fmt::Display for ModelNodeOrigin {
     }
 }
 
+/// The output type of the [`ModelNode`].
 #[derive(Debug, Clone, Default)]
 pub enum ModelNodeOutputType {
+    /// The output type not yet been determined.
     #[default]
     NotDetermined,
 
+    /// The [`ModelNode`] outputs a 2d geometry.
     Geometry2D,
 
+    /// The [`ModelNode`] outputs a 3d geometry.
     Geometry3D,
 
+    /// The [`ModelNode`] is invalid, you cannot mix 2d and 3d geometry.
     InvalidMixed,
 }
 
