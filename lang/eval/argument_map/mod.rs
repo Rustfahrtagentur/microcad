@@ -50,6 +50,30 @@ impl ArgumentMap {
         }
         symbols
     }
+
+    /// Print the [`ArgumentMap`] as one line, truncated if `max length > 0`.
+    pub fn to_oneline_string(&self, max_length: Option<usize>) -> String {
+        let mut sorted: Vec<_> = self.0.iter().collect();
+        sorted.sort_by(|a, b| a.0.cmp(b.0));
+
+        let mut output = String::new();
+
+        let max_length = max_length.unwrap_or_default();
+
+        for (i, (k, v)) in sorted.iter().enumerate() {
+            if i != 0 {
+                output.push_str(", ");
+            }
+            output.push_str(&format!("{}: {}", k, v));
+
+            if output.len() > max_length && max_length > 0 {
+                output = output.chars().take(32).collect::<String>();
+                break;
+            }
+        }
+
+        output
+    }
 }
 
 impl SrcReferrer for ArgumentMap {

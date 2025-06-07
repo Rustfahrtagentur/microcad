@@ -14,9 +14,52 @@ use crate::{
 };
 use microcad_core::*;
 
-pub struct ModelNodeCreator {
+/// The origin is the [`Symbol`] and [`ArgumentMap`] from which the node has been created.
+#[derive(Clone, Debug)]
+pub struct ModelNodeOrigin {
+    /// The original symbol that has been called.
     symbol: Symbol,
+
+    /// The original call arguments.
     arguments: ArgumentMap,
+}
+
+impl std::fmt::Display for ModelNodeOrigin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{symbol}({arguments})",
+            symbol = self.symbol.full_name(),
+            arguments = self.arguments.to_oneline_string(Some(32))
+        )
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub enum ModelNodeOutputType {
+    #[default]
+    NotDetermined,
+
+    Geometry2D,
+
+    Geometry3D,
+
+    InvalidMixed,
+}
+
+impl std::fmt::Display for ModelNodeOutputType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match &self {
+                ModelNodeOutputType::NotDetermined => "NotDetermined",
+                ModelNodeOutputType::Geometry2D => "Geometry2D",
+                ModelNodeOutputType::Geometry3D => "Geometry3D",
+                ModelNodeOutputType::InvalidMixed => "!Invalid!",
+            }
+        )
+    }
 }
 
 /// The actual node contents
@@ -41,7 +84,10 @@ pub struct ModelNodeInner {
     metadata: Metadata,
 
     /// The symbol (e.g. [`PartDefinition`]) that created this [`ModelNode`].
-    creator: Option<Symbol>,
+    origin: Option<ModelNodeOrigin>,
+
+    /// The output type of the this node.
+    output_type: ModelNodeOutputType,
 }
 
 impl ModelNodeInner {
@@ -177,9 +223,14 @@ impl ModelNode {
         self.clone()
     }
 
-    /// Return the symbol that created this node.
-    pub fn creator(&self) -> Option<Symbol> {
-        self.borrow().creator.clone()
+    /// Return the [`ModelNodeOrigin`] that created this node.
+    pub fn origin(&self) -> Option<ModelNodeOrigin> {
+        self.borrow().origin.clone()
+    }
+
+    /// Return output type.
+    pub fn output_type(&self) -> ModelNodeOutputType {
+        self.borrow().output_type.clone()
     }
 
     /// Get borrowed reference to the inner of this node.
@@ -338,33 +389,54 @@ impl PartialEq for ModelNode {
     }
 }
 
-/// Prints the signature of a ModelNode.
+/// Prints a [`ModelNode`].
 ///
-/// A signature has the form "ElementType[ "id"][: creator][ => output_type]", for example:
-/// ```modelnode
-/// Object "id": std::geo2d::circle(radius = 3.0mm) => Geometry2D:
-///   Primitive: __builtin::geo2d::circle(radius = 3.0) => Geometry2D`
+/// A [`ModelNode`] signature has the form "ElementType[ "id"][ = origin][ => result_type]".
+/// The examplary output will look like this:
+/// ```
+/// Object "id":
+///     Object = std::geo2d::circle(radius = 3.0mm) -> Geometry2D:
+///         Primitive = __builtin::geo2d::circle(radius = 3.0) -> Geometry2D`
 /// ```
 impl std::fmt::Display for ModelNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let element_type = match self.borrow().element() {
-            Element::Object(_) => "Object",
-            Element::ChildrenPlaceholder => "ChildrenPlaceholder",
-            Element::AffineTransform(_) => "AffineTransform",
-            Element::Primitive2D(_) => "Primitive2D",
-            Element::Primitive3D(_) => "Primitive3D",
-            Element::Transformation(_) => "Transformation",
-        };
+        let depth = self.depth();
+        write!(f, "{:depth$}", "")?;
+        write!(
+            f,
+            "{element_type}",
+            element_type = match self.borrow().element() {
+                Element::Object(_) => "Object",
+                Element::ChildrenPlaceholder => "ChildrenPlaceholder",
+                Element::AffineTransform(_) => "AffineTransform",
+                Element::Primitive2D(_) => "Primitive2D",
+                Element::Primitive3D(_) => "Primitive3D",
+                Element::Transformation(_) => "Transformation",
+            }
+        )?;
 
-        match (self.id(), self.creator()) {
-            (None, None) => write!(f, "{element_type}:"),
-            (None, Some(creator)) => write!(
-                f,
-                "{element_type}: {symbol_name}",
-                symbol_name = creator.full_name()
-            ),
-            (Some(id), None) => write!(f, "{element_type}({id})"),
-            (Some(id), Some(creator)) => todo!(),
+        if let Some(id) = self.id() {
+            write!(f, " \"{id}\"")?;
         }
+
+        if let Some(origin) = self.origin() {
+            write!(f, " = \"{origin}\"")?;
+        }
+
+        if matches!(self.output_type(), ModelNodeOutputType::NotDetermined) {
+            write!(f, " -> \"{output_type}\"", output_type = self.output_type())?;
+        }
+
+        if self.has_children() {
+            writeln!(f, ":")?;
+        } else {
+            writeln!(f)?;
+        }
+
+        for child in self.children() {
+            write!(f, "{child}")?;
+        }
+
+        Ok(())
     }
 }
