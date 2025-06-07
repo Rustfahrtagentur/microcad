@@ -451,7 +451,7 @@ impl std::fmt::Debug for Value {
             Self::Map(arg0) => write!(f, "Map: {arg0}"),
             Self::NamedTuple(arg0) => write!(f, "NamedTuple: {arg0}"),
             Self::UnnamedTuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
-            Self::Nodes(arg0) => write!(f, "Node: {arg0}"),
+            Self::Nodes(arg0) => write!(f, "Nodes:\n {arg0}"),
         }
     }
 }
