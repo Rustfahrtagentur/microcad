@@ -1,15 +1,16 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, syntax::*};
+use crate::{eval::*, model_tree::*, syntax::*};
 
-impl Eval for SourceFile {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        let value = context.scope(
+impl Eval<ModelNode> for SourceFile {
+    fn eval(&self, context: &mut Context) -> EvalResult<ModelNode> {
+        context.scope(
             StackFrame::Source(self.id(), SymbolMap::default()),
-            |context| Body::evaluate_vec(&self.statements, context),
-        );
-        log::trace!("Evaluated context:\n{context}");
-        value
+            |context| {
+                let nodes = self.statements.eval(context)?;
+                Ok(ModelNode::new_empty_object(self.src_ref()).append_children(nodes))
+            },
+        )
     }
 }

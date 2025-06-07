@@ -19,14 +19,6 @@ impl Body {
     pub fn resolve(&self, parent: Option<Symbol>) -> SymbolMap {
         self.statements.fetch_symbol_map(parent)
     }
-
-    /// Evaluate a vector of statements.
-    pub fn evaluate_vec(statements: &Vec<Statement>, context: &mut Context) -> EvalResult<Value> {
-        for s in statements {
-            s.eval(context)?;
-        }
-        Ok(Value::None)
-    }
 }
 
 impl SrcReferrer for Body {

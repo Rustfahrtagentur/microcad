@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, rc::*, resolve::*, syntax::*};
+use crate::{diag::*, eval::*, model_tree::ModelNode, rc::*, resolve::*, syntax::*};
 
 /// *Context* for *evaluation* of a resolved µcad file.
 ///
@@ -120,7 +120,7 @@ impl Context {
     }
 
     /// Evaluate context into a value.
-    pub fn eval(&mut self) -> EvalResult<Value> {
+    pub fn eval(&mut self) -> EvalResult<ModelNode> {
         let source_file = match &self.symbol_table.root.borrow().def {
             SymbolDefinition::SourceFile(source_file) => source_file.clone(),
             _ => todo!(),
