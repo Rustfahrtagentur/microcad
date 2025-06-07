@@ -405,8 +405,7 @@ impl PartialEq for ModelNode {
 /// ```
 impl std::fmt::Display for ModelNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let depth = self.depth();
-
+        let depth = self.depth() * 2;
         write!(f, "{:depth$}", "")?;
         if let Some(id) = self.id() {
             write!(f, "{id}: ")?;
@@ -428,7 +427,7 @@ impl std::fmt::Display for ModelNode {
             write!(f, " = \"{origin}\"")?;
         }
 
-        if matches!(self.output_type(), ModelNodeOutputType::NotDetermined) {
+        if !matches!(self.output_type(), ModelNodeOutputType::NotDetermined) {
             write!(f, " -> \"{output_type}\"", output_type = self.output_type())?;
         }
 

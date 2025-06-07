@@ -8,7 +8,7 @@ impl Eval<ModelNode> for SourceFile {
         context.scope(
             StackFrame::Source(self.id(), SymbolMap::default()),
             |context| {
-                let nodes = self.statements.eval(context)?;
+                let nodes: ModelNodes = self.statements.eval(context)?;
                 Ok(ModelNode::new_empty_object(self.src_ref()).append_children(nodes))
             },
         )

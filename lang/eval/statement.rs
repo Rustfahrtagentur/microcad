@@ -26,16 +26,14 @@ impl Eval for Marker {
 
 impl Eval for Statement {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        match self {
+        Ok(match self {
             Self::Use(u) => u.eval(context)?,
             Self::Assignment(a) => a.eval(context)?,
             Self::Expression(e) => e.eval(context)?,
             Self::Marker(m) => m.eval(context)?,
             Self::Part(_) | Self::Function(_) | Self::Module(_) => Value::None,
             statement => todo!("{statement}"),
-        };
-
-        Ok(Value::None)
+        })
     }
 }
 
@@ -43,7 +41,8 @@ impl Eval<ModelNodes> for StatementList {
     fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
         let mut model_nodes = ModelNodes::default();
         for s in self.iter() {
-            model_nodes.append(&mut s.eval(context)?.fetch_nodes());
+            let value = s.eval(context)?;
+            model_nodes.append(&mut value.fetch_nodes());
         }
         Ok(model_nodes)
     }

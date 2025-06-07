@@ -24,7 +24,7 @@ include!(concat!(env!("OUT_DIR"), "/microcad_source_file_test.rs"));
 include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 
 #[cfg(test)]
-fn evaluate_file(filename: &str) -> microcad_lang::eval::Context {
+fn context_for_file(filename: &str) -> microcad_lang::eval::Context {
     use microcad_lang::eval::*;
 
     let filename = format!("../tests/test_cases/{filename}");
@@ -33,17 +33,17 @@ fn evaluate_file(filename: &str) -> microcad_lang::eval::Context {
 
 #[test]
 fn modules() {
-    assert!(evaluate_file("syntax/module.µcad").eval().is_ok());
+    assert!(context_for_file("syntax/module.µcad").eval().is_ok());
 }
 
 #[test]
 fn scopes() {
-    assert!(evaluate_file("syntax/scopes.µcad").eval().is_ok());
+    assert!(context_for_file("syntax/scopes.µcad").eval().is_ok());
 }
 
 #[test]
 fn context_with_symbols() {
-    let mut context = evaluate_file("syntax/call.µcad");
+    let mut context = context_for_file("syntax/call.µcad");
 
     context
         .lookup(
@@ -92,7 +92,7 @@ fn call_argument_value_list(s: &str, context: &mut Context) -> CallArgumentValue
 fn part_implicit_init_call() {
     use microcad_lang::*;
 
-    let mut context = evaluate_file("syntax/part/implicit_init.µcad");
+    let mut context = context_for_file("syntax/part/implicit_init.µcad");
 
     let node = context.lookup(&qualified_name("a")).expect("Node expected");
 
@@ -157,7 +157,7 @@ fn part_explicit_init_call() {
     use microcad_lang::diag::Diag;
     use microcad_lang::*;
 
-    let mut context = evaluate_file("syntax/part/explicit_init.µcad");
+    let mut context = context_for_file("syntax/part/explicit_init.µcad");
     let node = context
         .lookup(&qualified_name("circle"))
         .expect("Node expected");
@@ -245,4 +245,14 @@ fn part_explicit_init_call() {
         assert_eq!(nodes.len(), 0, "There should no nodes");
         log::trace!("{}", context.diagnosis());
     }
+}
+
+#[test]
+fn model_node_output() {
+    let mut context = context_for_file("syntax/node_body.µcad");
+
+    let node = context.eval().expect("No error");
+
+    log::info!("Tree:\n{node}");
+    assert!(node.has_children());
 }

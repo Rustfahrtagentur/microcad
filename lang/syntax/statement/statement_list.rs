@@ -3,7 +3,7 @@
 
 //! Statement list syntax element.
 
-use crate::{eval::*, resolve::*, syntax::*, value::*};
+use crate::{resolve::*, syntax::*};
 
 /// A list of statements.
 #[derive(Clone, Default, Debug)]
@@ -49,14 +49,5 @@ impl std::fmt::Display for StatementList {
             writeln!(f, "{statement}")?;
         }
         Ok(())
-    }
-}
-
-impl Eval for StatementList {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        for s in &self.0 {
-            s.eval(context)?;
-        }
-        Ok(Value::None)
     }
 }
