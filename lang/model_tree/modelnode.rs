@@ -314,7 +314,7 @@ impl ModelNode {
         self.0.borrow_mut().children.push(node);
     }
 
-    /// Append a multiple nodes as children.
+    /// Append multiple nodes as children.
     ///
     /// Return self.
     pub fn append_children(&self, nodes: ModelNodes) -> Self {
@@ -391,7 +391,7 @@ impl PartialEq for ModelNode {
 
 /// Prints a [`ModelNode`].
 ///
-/// A [`ModelNode`] signature has the form "ElementType[ "id"][ = origin][ => result_type]".
+/// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ => result_type]".
 /// The examplary output will look like this:
 /// ```
 /// Object "id":
@@ -401,7 +401,11 @@ impl PartialEq for ModelNode {
 impl std::fmt::Display for ModelNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let depth = self.depth();
+
         write!(f, "{:depth$}", "")?;
+        if let Some(id) = self.id() {
+            write!(f, "{id}: ")?;
+        }
         write!(
             f,
             "{element_type}",
@@ -414,10 +418,6 @@ impl std::fmt::Display for ModelNode {
                 Element::Transformation(_) => "Transformation",
             }
         )?;
-
-        if let Some(id) = self.id() {
-            write!(f, " \"{id}\"")?;
-        }
 
         if let Some(origin) = self.origin() {
             write!(f, " = \"{origin}\"")?;
