@@ -21,11 +21,8 @@ pub enum AttributeError {
     CannotAssignToExpression(Box<Expression>),
 }
 
-impl Attribute {
-    /// Evaluate [`Attribute``] to [`MetadataItem`].
-    ///
-    /// This functions contains all built-in attributes for objects.
-    pub fn eval_to_metadata_item(&self, context: &mut Context) -> EvalResult<Option<MetadataItem>> {
+impl Eval<Option<MetadataItem>> for Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<MetadataItem>> {
         let qualified_name = self.qualified_name();
         if let Some(id) = qualified_name.single_identifier() {
             let str = id.id().as_str();
@@ -62,13 +59,11 @@ impl Attribute {
     }
 }
 
-impl AttributeList {
-    /// Evaluate the attribute list into [ObjectAttributes].
-    pub fn eval_to_metadata(&self, context: &mut Context) -> EvalResult<Metadata> {
+impl Eval<Metadata> for AttributeList {
+    fn eval(&self, context: &mut Context) -> EvalResult<Metadata> {
         let mut metadata = Metadata::default();
-
         for attribute in self.iter() {
-            if let Some(item) = attribute.eval_to_metadata_item(context)? {
+            if let Some(item) = attribute.eval(context)? {
                 metadata.push(item)
             }
         }
