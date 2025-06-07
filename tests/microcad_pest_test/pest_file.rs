@@ -82,14 +82,14 @@ impl PestFile {
                     PestResult::Ok(s) => {
                         r.writeln("Ok(pairs) =>  assert_eq!(input, pairs.as_str()),")?;
                         r.writeln(&format!(
-                            "Err(e) => error!(\"{{}} at `{{}}`:{{}} {}\", e, input, test_line),",
+                            "Err(e) => panic!(\"{{}} at `{{}}`:{{}} {}\", e, input, test_line),",
                             s
                         ))?;
                     }
                     PestResult::Err(s) => {
                         r.begin_scope("Ok(pairs) =>")?;
                         r.begin_scope("if input == pairs.as_str()")?;
-                        r.writeln(&format!("error!(\"Expected parsing error at `{{}}`:{{}}: {}\", input, test_line);", s))?;
+                        r.writeln(&format!("panic!(\"Expected parsing error at `{{}}`:{{}}: {}\", input, test_line);", s))?;
                         r.end_scope()?;
 
                         r.end_scope()?;
