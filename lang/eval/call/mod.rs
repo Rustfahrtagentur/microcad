@@ -19,9 +19,9 @@ use crate::{eval::*, syntax::*};
 
 use thiserror::Error;
 
-impl CallArgumentList {
+impl Eval<CallArgumentValueList> for CallArgumentList {
     /// Evaluate into a [`CallArgumentValueList`].
-    pub fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
+    fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
         let mut v = CallArgumentValueList::default();
         for call_arg in self.iter() {
             v.push(call_arg.eval_value(context)?)
