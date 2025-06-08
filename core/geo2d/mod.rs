@@ -3,8 +3,6 @@
 
 //! 2D Geometry
 
-pub mod tree;
-
 mod geometry;
 mod render;
 
