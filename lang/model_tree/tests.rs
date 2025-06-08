@@ -4,12 +4,10 @@
 //! Model tree tests
 
 #[cfg(test)]
-use crate::{model_tree::*, src_ref::SrcRef};
+use crate::{model_tree::*, src_ref::SrcRef, syntax::*};
 
-#[test]
-fn node_nest() {
-    use crate::syntax::*;
-
+#[cfg(test)]
+fn sample_nodes() -> ModelNodes {
     fn obj(id: &str) -> ModelNode {
         ModelNode::new_empty_object(SrcRef(None)).set_id(Identifier::no_ref(id))
     }
@@ -38,7 +36,17 @@ fn node_nest() {
     //       d0
     //     c2
     //       d0
-    let nodes = ModelNodes::from_node_stack(&nodes);
+    ModelNodes::from_node_stack(&nodes)
+}
+
+#[cfg(test)]
+fn sample_tree() -> ModelNode {
+    ModelNode::new_empty_object(SrcRef(None)).append_children(sample_nodes())
+}
+
+#[test]
+fn model_nodes_nest() {
+    let nodes = sample_nodes();
     assert_eq!(nodes.len(), 2, "Must contain a0 and a1 as root");
 
     let a0 = nodes.first().expect("a0");
@@ -52,5 +60,15 @@ fn node_nest() {
         Identifier::no_ref("b0")
     );
 
-    log::info!("Nodes:\n{nodes}");
+    log::trace!("Nodes:\n{nodes}");
+}
+
+#[test]
+fn model_node_iter_descendants() {
+    let node = sample_tree();
+
+    for node in node.descendants() {
+        let depth = node.depth() * 2;
+        log::info!("{:depth$}{signature}", "", signature = node.signature());
+    }
 }

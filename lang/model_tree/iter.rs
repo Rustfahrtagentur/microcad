@@ -3,6 +3,8 @@
 
 //! Model tree iterators
 
+use std::collections::VecDeque;
+
 use super::*;
 
 /// Children iterator struct.
@@ -31,14 +33,19 @@ impl Iterator for Children {
 
 /// Iterator over all descendants.
 pub struct Descendants {
-    stack: Vec<Children>,
+    stack: std::collections::VecDeque<ModelNode>,
 }
 
 impl Descendants {
     /// Create new descendants iterator
     pub fn new(root: ModelNode) -> Self {
         Self {
-            stack: vec![Children::new(root)],
+            stack: root
+                .borrow()
+                .children()
+                .iter()
+                .cloned()
+                .collect::<VecDeque<_>>(),
         }
     }
 }
@@ -47,26 +54,16 @@ impl Iterator for Descendants {
     type Item = ModelNode;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.stack.is_empty() {
-            None
-        } else {
-            let child = {
-                let children = self.stack.last_mut().expect("Non-empty stack");
-                children.next()
-            };
-
-            match &child {
-                Some(child) => {
-                    if child.has_children() {
-                        self.stack.push(child.children());
-                    }
-                }
-                None => {
-                    self.stack.pop();
-                }
+        // Pop a node from the front of the stack
+        if let Some(node) = self.stack.pop_front() {
+            // Push this node's children to the front of the stack (DFS)
+            let children = node.borrow().children().clone();
+            for child in children.iter().rev() {
+                self.stack.push_front(child.clone());
             }
-
-            child
+            Some(node)
+        } else {
+            None
         }
     }
 }
