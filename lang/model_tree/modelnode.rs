@@ -68,7 +68,7 @@ impl std::fmt::Display for ModelNodeOutputType {
 }
 
 /// The actual node contents
-#[derive(custom_debug::Debug, Clone, Default)]
+#[derive(custom_debug::Debug, Default)]
 pub struct ModelNodeInner {
     /// Optional id.
     ///
@@ -114,6 +114,19 @@ impl ModelNodeInner {
     /// Set metadata for this node.
     pub fn set_metadata(&mut self, metadata: Metadata) {
         self.metadata = metadata;
+    }
+
+    /// Clone only the content of this node without children and parent.
+    pub fn clone_content(&self) -> Self {
+        Self {
+            id: self.id.clone(),
+            parent: None,
+            children: ModelNodes::default(),
+            element: self.element.clone(),
+            metadata: self.metadata.clone(),
+            origin: self.origin.clone(),
+            output_type: self.output_type.clone(),
+        }
     }
 }
 
@@ -183,7 +196,7 @@ impl Iterator for Descendants {
     }
 }
 
-/// A reference counted, mutable [ObjectNode].
+/// A reference counted, mutable [`ModelNode`].
 #[derive(Debug, Clone)]
 pub struct ModelNode(RcMut<ModelNodeInner>);
 
@@ -254,7 +267,11 @@ impl ModelNode {
 
     /// Make a deep copy if this node.
     pub fn make_deep_copy(&self) -> Self {
-        Self(RcMut::new(self.0.borrow().clone()))
+        let copy = Self(RcMut::new(self.0.borrow().clone_content()));
+        for child in self.children() {
+            copy.append(child.make_deep_copy());
+        }
+        copy
     }
 
     /// Return address of this node.
@@ -313,10 +330,11 @@ impl ModelNode {
     }
 
     /// Append a single node as child.
-    pub fn append(&self, node: ModelNode) {
-        let mut node = node.clone();
+    pub fn append(&self, node: ModelNode) -> ModelNode {
+        let mut node = node;
         node.set_parent(self.clone());
-        self.0.borrow_mut().children.push(node);
+        self.0.borrow_mut().children.push(node.clone());
+        node
     }
 
     /// Append multiple nodes as children.
@@ -324,7 +342,7 @@ impl ModelNode {
     /// Return self.
     pub fn append_children(&self, nodes: ModelNodes) -> Self {
         for node in nodes.iter() {
-            self.append(node.clone())
+            self.append(node.clone());
         }
         self.clone()
     }

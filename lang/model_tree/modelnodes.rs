@@ -80,7 +80,6 @@ impl ModelNodes {
                                     None => new_parent_node.clone(),
                                 };
 
-                                log::trace!("Node: {}", node.id().unwrap_or_default());
                                 new_parent_node.append(node.make_deep_copy());
                             });
                         });
@@ -195,9 +194,5 @@ fn node_nest() {
         Identifier::no_ref("b0")
     );
 
-    for node in nodes.iter() {
-        node.descendants().for_each(|n| {
-            log::trace!("{}{}", "  ".repeat(n.depth()), n);
-        });
-    }
+    log::info!("Nodes:\n{nodes}");
 }

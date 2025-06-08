@@ -50,12 +50,12 @@ pub trait BuiltinPartDefinition {
     fn function() -> &'static BuiltinFn {
         &|args, context| {
             let multi_args = args.get_multi_matching_arguments(context, &Self::parameters())?;
-            let mut nodes = Vec::new();
+            let mut nodes = ModelNodes::default();
             for args in multi_args.combinations() {
                 nodes.push(Self::node(&args)?);
             }
 
-            Ok(Value::Nodes(nodes.into()))
+            Ok(Value::Nodes(nodes))
         }
     }
 
