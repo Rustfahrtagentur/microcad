@@ -7,7 +7,7 @@ use crate::{model_tree::*, syntax::*, value::*};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
-/// Inner of a node
+/// An element defines the entity of a [`ModelNode`].
 #[derive(Clone, IntoStaticStr, Debug)]
 pub enum Element {
     /// An object that contains children and holds properties.
@@ -32,7 +32,7 @@ pub enum Element {
     Primitive3D(std::rc::Rc<Primitive3D>),
 
     /// A transformation that generates a geometry.
-    Transformation(std::rc::Rc<dyn Transformation>),
+    Transformer(std::rc::Rc<dyn Transformer>),
 }
 
 impl Element {
@@ -60,7 +60,7 @@ impl std::fmt::Display for Element {
         write!(f, "{name}")?;
 
         match &self {
-            Element::Transformation(transformation) => {
+            Element::Transformer(transformation) => {
                 write!(f, "({transformation:?})")
             }
             Element::Primitive2D(primitive2d) => {

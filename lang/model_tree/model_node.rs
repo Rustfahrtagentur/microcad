@@ -13,6 +13,7 @@ use crate::{
     value::*,
 };
 use microcad_core::*;
+use strum::IntoStaticStr;
 
 /// The origin is the [`Symbol`] and [`ArgumentMap`] from which the node has been created.
 #[derive(Clone, Debug)]
@@ -36,9 +37,9 @@ impl std::fmt::Display for ModelNodeOrigin {
 }
 
 /// The output type of the [`ModelNode`].
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, IntoStaticStr, Default)]
 pub enum ModelNodeOutputType {
-    /// The output type not yet been determined.
+    /// The output type has not yet been determined.
     #[default]
     NotDetermined,
 
@@ -49,21 +50,13 @@ pub enum ModelNodeOutputType {
     Geometry3D,
 
     /// The [`ModelNode`] is invalid, you cannot mix 2d and 3d geometry.
-    InvalidMixed,
+    Invalid,
 }
 
 impl std::fmt::Display for ModelNodeOutputType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match &self {
-                ModelNodeOutputType::NotDetermined => "NotDetermined",
-                ModelNodeOutputType::Geometry2D => "Geometry2D",
-                ModelNodeOutputType::Geometry3D => "Geometry3D",
-                ModelNodeOutputType::InvalidMixed => "!Invalid!",
-            }
-        )
+        let name: &'static str = self.into();
+        write!(f, "{name}")
     }
 }
 
@@ -220,12 +213,12 @@ impl ModelNode {
     }
 
     /// Return an transformation node.
-    pub fn new_transformation<T: Transformation + 'static>(
+    pub fn new_transformation<T: Transformer + 'static>(
         transformation: T,
         src_ref: SrcRef,
     ) -> Self {
         Self::new_element(Refer::new(
-            Element::Transformation(std::rc::Rc::new(transformation)),
+            Element::Transformer(std::rc::Rc::new(transformation)),
             src_ref,
         ))
     }
