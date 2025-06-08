@@ -116,8 +116,7 @@ fn part_implicit_init_call() {
             &call_argument_value_list("b = 3.0", &mut context),
             &mut context,
         )
-        .expect("Valid nodes")
-        .fetch_nodes();
+        .expect("Valid nodes");
 
     assert_eq!(nodes.len(), 1, "There should be one node");
 
@@ -143,8 +142,7 @@ fn part_implicit_init_call() {
             &call_argument_value_list("b = [1.0, 2.0]", &mut context),
             &mut context,
         )
-        .expect("Valid nodes")
-        .fetch_nodes();
+        .expect("Valid nodes");
 
     assert_eq!(nodes.len(), 2, "There should be two nodes");
 
@@ -190,8 +188,7 @@ fn part_explicit_init_call() {
                 &call_argument_value_list("radius = 3.0", &mut context),
                 &mut context,
             )
-            .expect("A valid value")
-            .fetch_nodes();
+            .expect("A valid value");
         assert_eq!(nodes.len(), 1, "There should be one node");
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
@@ -203,8 +200,7 @@ fn part_explicit_init_call() {
                 &call_argument_value_list("r = 3.0", &mut context),
                 &mut context,
             )
-            .expect("Valid nodes")
-            .fetch_nodes();
+            .expect("Valid nodes");
         assert_eq!(nodes.len(), 1, "There should be one node");
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
@@ -216,8 +212,7 @@ fn part_explicit_init_call() {
                 &call_argument_value_list("d = 6.0", &mut context),
                 &mut context,
             )
-            .expect("Valid nodes")
-            .fetch_nodes();
+            .expect("Valid nodes");
         assert_eq!(nodes.len(), 1, "There should be one node");
         check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
     }
@@ -229,8 +224,7 @@ fn part_explicit_init_call() {
                 &call_argument_value_list("d = [1.0, 2.0]", &mut context),
                 &mut context,
             )
-            .expect("Valid nodes")
-            .fetch_nodes();
+            .expect("Valid nodes");
         assert_eq!(nodes.len(), 2, "There should be two nodes");
         check_node_property_radius(nodes.first().expect("Node expected"), 0.5);
         check_node_property_radius(nodes.get(1).expect("Node expected"), 1.0);
@@ -240,8 +234,7 @@ fn part_explicit_init_call() {
     {
         let nodes = definition
             .call(&CallArgumentValueList::default(), &mut context)
-            .expect("Valid nodes")
-            .fetch_nodes();
+            .expect("Valid nodes");
         assert_eq!(nodes.len(), 0, "There should no nodes");
         log::trace!("{}", context.diagnosis());
     }

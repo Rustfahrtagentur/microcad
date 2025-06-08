@@ -52,7 +52,7 @@ pub trait BuiltinPartDefinition {
             let multi_args = args.get_multi_matching_arguments(context, &Self::parameters())?;
             let mut nodes = ModelNodes::default();
             for args in multi_args.combinations() {
-                nodes.push(Self::node(&args)?);
+                nodes.push(Self::node(&args)?.set_original_arguments(args.clone()));
             }
 
             Ok(Value::Nodes(nodes))

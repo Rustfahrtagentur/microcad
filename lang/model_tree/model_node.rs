@@ -16,23 +16,31 @@ use microcad_core::*;
 use strum::IntoStaticStr;
 
 /// The origin is the [`Symbol`] and [`ArgumentMap`] from which the node has been created.
-#[derive(Clone, Debug)]
+#[derive(Clone, Default, Debug)]
 pub struct ModelNodeOrigin {
     /// The original symbol that has been called.
-    symbol: Symbol,
+    creator: Option<Symbol>,
 
     /// The original call arguments.
     arguments: ArgumentMap,
+
+    /// Source code reference of the call.
+    call_src_ref: SrcRef,
 }
 
 impl std::fmt::Display for ModelNodeOrigin {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{symbol}({arguments})",
-            symbol = self.symbol.full_name(),
-            arguments = self.arguments.to_oneline_string(Some(32))
-        )
+        match &self.creator {
+            Some(creator) => {
+                write!(
+                    f,
+                    "{symbol}({arguments})",
+                    symbol = creator.full_name(),
+                    arguments = self.arguments.to_oneline_string(Some(32))
+                )
+            }
+            None => Ok(()),
+        }
     }
 }
 
@@ -82,7 +90,7 @@ pub struct ModelNodeInner {
     metadata: Metadata,
 
     /// The symbol (e.g. [`PartDefinition`]) that created this [`ModelNode`].
-    origin: Option<ModelNodeOrigin>,
+    origin: ModelNodeOrigin,
 
     /// The output type of the this node.
     output_type: ModelNodeOutputType,
@@ -169,7 +177,7 @@ impl ModelNode {
     }
 
     /// Return the [`ModelNodeOrigin`] that created this node.
-    pub fn origin(&self) -> Option<ModelNodeOrigin> {
+    pub fn origin(&self) -> ModelNodeOrigin {
         self.borrow().origin.clone()
     }
 
@@ -308,8 +316,9 @@ impl ModelNode {
     }
 
     /// Set metadata.
-    pub(crate) fn set_metadata(&self, metadata: Metadata) {
+    pub(crate) fn set_metadata(&self, metadata: Metadata) -> Self {
         self.0.borrow_mut().set_metadata(metadata);
+        self.clone()
     }
 
     /// Get value for name-value metadata with `id`.
@@ -339,8 +348,8 @@ impl ModelNode {
             s += format!("{id}: ").as_str();
         }
         s += self.borrow().element().to_string().as_str();
-        if let Some(origin) = self.origin() {
-            s += format!(" = \"{origin}\"").as_str();
+        if self.origin().creator.is_some() {
+            s += format!(" = {origin}", origin = self.origin()).as_str();
         }
         if !matches!(self.output_type(), ModelNodeOutputType::NotDetermined) {
             s += format!(" -> \"{output_type}\"", output_type = self.output_type()).as_str();
@@ -349,6 +358,23 @@ impl ModelNode {
             s += ":";
         }
         s
+    }
+
+    /// Set the information about the creator of this node.
+    ///
+    /// This function is called after the resulting nodes of a call of a part
+    /// have been retrieved.   
+    pub(crate) fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
+        let origin = &mut self.0.borrow_mut().origin;
+        origin.creator = Some(creator);
+        origin.call_src_ref = call_src_ref;
+    }
+
+    /// Set the arguments with have been passed to this node.
+    pub(crate) fn set_original_arguments(&self, arguments: ArgumentMap) -> Self {
+        let origin = &mut self.0.borrow_mut().origin;
+        origin.arguments = arguments;
+        self.clone()
     }
 }
 

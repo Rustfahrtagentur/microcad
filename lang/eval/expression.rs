@@ -42,7 +42,7 @@ impl Expression {
                 let metadata = attribute_list.eval(context)?;
                 use std::borrow::BorrowMut;
                 for node in nodes.iter_mut() {
-                    node.borrow_mut().set_metadata(metadata.clone())
+                    node.borrow_mut().set_metadata(metadata.clone());
                 }
                 Ok(Value::Nodes(nodes))
             }

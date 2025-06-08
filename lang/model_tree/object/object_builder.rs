@@ -14,9 +14,6 @@ pub struct ObjectBuilder {
     /// Children to be placed in the node.
     children: ModelNodes,
 
-    /// Metadata for the object node.
-    metadata: Metadata,
-
     /// The [`SrcRef`] attached to the object element.
     src_ref: SrcRef,
 }
@@ -49,12 +46,6 @@ impl ObjectBuilder {
         }
 
         self.object.props = props;
-        self
-    }
-
-    /// Add attributes to object.
-    pub fn set_metadata(&mut self, metadata: Metadata) -> &mut Self {
-        self.metadata = metadata;
         self
     }
 
@@ -94,7 +85,6 @@ impl ObjectBuilder {
     pub fn build_node(self) -> ModelNode {
         let node = ModelNode::new_object(self.object, self.src_ref);
         node.append_children(self.children);
-        node.set_metadata(self.metadata);
         node
     }
 }

@@ -3,8 +3,6 @@
 
 //! Model tree iterators
 
-use std::collections::VecDeque;
-
 use super::*;
 
 /// Children iterator struct.

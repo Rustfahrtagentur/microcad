@@ -66,7 +66,7 @@ impl Eval for Call {
             },
             |context| match &symbol.borrow().def {
                 SymbolDefinition::Builtin(f) => f.call(&args, context),
-                SymbolDefinition::Part(m) => m.call(&args, context),
+                SymbolDefinition::Part(m) => Ok(Value::Nodes(m.call(&args, context)?)),
                 SymbolDefinition::Function(f) => f.call(&args, context),
                 _ => {
                     context.error(
@@ -81,11 +81,17 @@ impl Eval for Call {
                 }
             },
         ) {
-            Err(err) => {
-                context.error(self.src_ref(), err)?;
-                Ok(Value::None)
+            Ok(Value::Nodes(nodes)) => {
+                // Store the information, saying that these nodes have been created by this symbol.
+                nodes.set_creator(symbol, self.src_ref());
+
+                Ok(Value::Nodes(nodes))
             }
             Ok(value) => Ok(value),
+            Err(err) => {
+                context.error(self, err)?;
+                Ok(Value::None)
+            }
         }
     }
 }
