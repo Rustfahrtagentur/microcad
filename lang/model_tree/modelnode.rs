@@ -404,6 +404,25 @@ impl ModelNode {
             .cloned()
             .or(self.get_metadata_by_id(id))
     }
+
+    /// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
+    pub fn signature(&self) -> String {
+        let mut s = String::new();
+        if let Some(id) = self.id() {
+            s += format!("{id}: ").as_str();
+        }
+        s += self.borrow().element().to_string().as_str();
+        if let Some(origin) = self.origin() {
+            s += format!(" = \"{origin}\"").as_str();
+        }
+        if !matches!(self.output_type(), ModelNodeOutputType::NotDetermined) {
+            s += format!(" -> \"{output_type}\"", output_type = self.output_type()).as_str();
+        }
+        if self.has_children() {
+            s += ":";
+        }
+        s
+    }
 }
 
 impl PartialEq for ModelNode {
@@ -414,51 +433,20 @@ impl PartialEq for ModelNode {
 
 /// Prints a [`ModelNode`].
 ///
-/// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ => result_type]".
+/// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
 /// The examplary output will look like this:
 /// ```
-/// Object "id":
+/// id: Object:
 ///     Object = std::geo2d::circle(radius = 3.0mm) -> Geometry2D:
 ///         Primitive = __builtin::geo2d::circle(radius = 3.0) -> Geometry2D`
 /// ```
 impl std::fmt::Display for ModelNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let depth = self.depth() * 2;
-        write!(f, "{:depth$}", "")?;
-        if let Some(id) = self.id() {
-            write!(f, "{id}: ")?;
-        }
-        write!(
-            f,
-            "{element_type}",
-            element_type = match self.borrow().element() {
-                Element::Object(_) => "Object",
-                Element::ChildrenPlaceholder => "ChildrenPlaceholder",
-                Element::AffineTransform(_) => "AffineTransform",
-                Element::Primitive2D(_) => "Primitive2D",
-                Element::Primitive3D(_) => "Primitive3D",
-                Element::Transformation(_) => "Transformation",
-            }
-        )?;
-
-        if let Some(origin) = self.origin() {
-            write!(f, " = \"{origin}\"")?;
-        }
-
-        if !matches!(self.output_type(), ModelNodeOutputType::NotDetermined) {
-            write!(f, " -> \"{output_type}\"", output_type = self.output_type())?;
-        }
-
-        if self.has_children() {
-            writeln!(f, ":")?;
-        } else {
-            writeln!(f)?;
-        }
-
+        writeln!(f, "{:depth$}{signature}", "", signature = self.signature())?;
         for child in self.children() {
             write!(f, "{child}")?;
         }
-
         Ok(())
     }
 }
