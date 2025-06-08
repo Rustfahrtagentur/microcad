@@ -5,15 +5,15 @@
 
 pub mod element;
 pub mod metadata;
-pub mod modelnode;
-pub mod modelnodes;
+pub mod model_node;
+pub mod model_nodes;
 pub mod object;
 pub mod transformation;
 
 pub use element::*;
 pub use metadata::*;
-pub use modelnode::*;
-pub use modelnodes::*;
+pub use model_node::*;
+pub use model_nodes::*;
 pub use object::*;
 pub use transformation::*;
 
