@@ -104,8 +104,6 @@ impl ModelNodeInner {
         &self.children
     }
 
-    pub fn remove_child(&self, node: ModelNode) {}
-
     /// Set metadata for this node.
     pub fn set_metadata(&mut self, metadata: Metadata) {
         self.metadata = metadata;
