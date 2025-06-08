@@ -104,6 +104,8 @@ impl ModelNodeInner {
         &self.children
     }
 
+    pub fn remove_child(&self, node: ModelNode) {}
+
     /// Set metadata for this node.
     pub fn set_metadata(&mut self, metadata: Metadata) {
         self.metadata = metadata;
@@ -284,7 +286,7 @@ impl ModelNode {
     /// Find children node placeholder in node descendants
     pub fn find_children_placeholder(&self) -> Option<ModelNode> {
         self.descendants().find(|n| {
-            n.id().is_some() && matches!(n.0.borrow().element.value, Element::ChildrenPlaceholder)
+            n.id().is_none() && matches!(n.0.borrow().element.value, Element::ChildrenPlaceholder)
         })
     }
 
