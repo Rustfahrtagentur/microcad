@@ -249,7 +249,7 @@ fn part_explicit_init_call() {
 
 #[test]
 fn model_node_output() {
-    let mut context = context_for_file("syntax/node_body.µcad");
+    let mut context = context_for_file("syntax/children_marker.µcad");
 
     let node = context.eval().expect("No error");
 

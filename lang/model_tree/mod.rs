@@ -4,6 +4,7 @@
 //! Model tree module
 
 pub mod element;
+pub mod iter;
 pub mod metadata;
 pub mod model_node;
 pub mod model_nodes;
@@ -11,11 +12,15 @@ pub mod object;
 pub mod transformation;
 
 pub use element::*;
+pub use iter::*;
 pub use metadata::*;
 pub use model_node::*;
 pub use model_nodes::*;
 pub use object::*;
 pub use transformation::*;
+
+#[cfg(test)]
+mod tests;
 
 /*
 enum GeometryType {
@@ -32,18 +37,9 @@ enum ProcessingState {
     ///
     OutputType,
 
-
-    /// The Render
     ///
     /// * The transformation matrices have been calculated.
     AffineTransformInfo,
-    /// Return self.
-    pub fn append_children(&self, nodes: ModelNodes) -> Self {
-        for node in nodes.iter() {
-            self.append(node.clone())
-        }
-        self.clone()
-    }
 
     /// Generate geometry for primitives.
     Primitives,
