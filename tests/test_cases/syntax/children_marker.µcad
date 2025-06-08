@@ -19,7 +19,7 @@ a = geo2d::circle(1.0) {
 // Create a circle_difference node with three children
 circle_difference(4.0) {
     geo2d::circle(5.0);
-    geo2d::circle(6.0);
+    geo2d::circle([6.0, 7.0]);
     a;
 }
 
