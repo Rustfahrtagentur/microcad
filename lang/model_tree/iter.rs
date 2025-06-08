@@ -33,7 +33,7 @@ impl Iterator for Children {
 
 /// Iterator over all descendants.
 pub struct Descendants {
-    stack: std::collections::VecDeque<ModelNode>,
+    stack: ModelNodes,
 }
 
 impl Descendants {
@@ -44,8 +44,10 @@ impl Descendants {
                 .borrow()
                 .children()
                 .iter()
+                .rev()
                 .cloned()
-                .collect::<VecDeque<_>>(),
+                .collect::<Vec<_>>()
+                .into(),
         }
     }
 }
@@ -54,12 +56,10 @@ impl Iterator for Descendants {
     type Item = ModelNode;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // Pop a node from the front of the stack
-        if let Some(node) = self.stack.pop_front() {
-            // Push this node's children to the front of the stack (DFS)
+        if let Some(node) = self.stack.pop() {
             let children = node.borrow().children().clone();
             for child in children.iter().rev() {
-                self.stack.push_front(child.clone());
+                self.stack.push(child.clone());
             }
             Some(node)
         } else {
