@@ -129,7 +129,6 @@ impl Context {
     }
 
     /// Peek into root node for testing.
-    #[cfg(test)]
     pub fn root(&self) -> &Symbol {
         &self.symbol_table.root
     }
