@@ -61,13 +61,8 @@ impl Eval<Option<MetadataItem>> for Attribute {
 
 impl Eval<Metadata> for AttributeList {
     fn eval(&self, context: &mut Context) -> EvalResult<Metadata> {
-        let mut metadata = Metadata::default();
-        for attribute in self.iter() {
-            if let Some(item) = attribute.eval(context)? {
-                metadata.push(item)
-            }
-        }
-
-        Ok(metadata)
+        self.iter()
+            .filter_map(|attribute| attribute.eval(context).transpose())
+            .collect::<Result<Metadata, _>>()
     }
 }

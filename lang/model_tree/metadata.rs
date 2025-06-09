@@ -78,3 +78,9 @@ impl std::ops::DerefMut for Metadata {
         &mut self.0
     }
 }
+
+impl FromIterator<MetadataItem> for Metadata {
+    fn from_iter<T: IntoIterator<Item = MetadataItem>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
+    }
+}
