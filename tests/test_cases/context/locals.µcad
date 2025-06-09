@@ -1,6 +1,6 @@
 // This tests the local stack
 
-use std::debug::*;
+use __builtin::debug::*;
 
 // new local variable #1
 i = 1;
@@ -35,7 +35,7 @@ i = 3;
 // access #1
 assert(i == 3);
 
-p = std::math::pi;
+p = __builtin::math::pi;
 
 q = p > 3.;
 
