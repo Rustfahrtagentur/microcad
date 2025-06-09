@@ -156,3 +156,9 @@ impl std::fmt::Display for ModelNodes {
         Ok(())
     }
 }
+
+impl FromIterator<ModelNode> for ModelNodes {
+    fn from_iter<T: IntoIterator<Item = ModelNode>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
+    }
+}

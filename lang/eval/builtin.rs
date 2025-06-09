@@ -49,13 +49,14 @@ pub trait BuiltinPartDefinition {
     /// Part function
     fn function() -> &'static BuiltinFn {
         &|args, context| {
-            let multi_args = args.get_multi_matching_arguments(context, &Self::parameters())?;
-            let mut nodes = ModelNodes::default();
-            for args in multi_args.combinations() {
-                nodes.push(Self::node(&args)?.set_original_arguments(args.clone()));
-            }
-
-            Ok(Value::Nodes(nodes))
+            Ok(Value::Nodes(
+                args.get_multi_matching_arguments(context, &Self::parameters())?
+                    .combinations()
+                    .map(|args| {
+                        Self::node(&args).map(|node| node.set_original_arguments(args.clone()))
+                    })
+                    .collect::<Result<ModelNodes, _>>()?,
+            ))
         }
     }
 
