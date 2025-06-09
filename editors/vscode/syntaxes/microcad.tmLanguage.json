@@ -7,15 +7,11 @@
             "name": "comment.line.microcad"
         },
         {
-            "match": "\\b(pub|part|use|fn|init|return|if|__builtin)\\b",
+            "match": "\\b(pub|part|mod|use|fn|init|return|if|else|mat|__builtin)\\b",
             "name": "keyword.control.microcad"
         },
         {
-            "match": "\\+|-|\\*|/|%|\\=|\\==|\\!=|\\<|\\>|\\<=|\\>=|\\&&|\\|\\|",
-            "name": "keyword.operator.microcad"
-        },
-        {
-            "match": "\\b(Integer|Scalar|String|Color|Length|Area|Volume|Angle|Weight|Bool)\\b",
+            "match": "\\b(Integer|Scalar|String|Color|Length|Area|Volume|Angle|Weight|Density|Bool)\\b",
             "name": "storage.type.microcad"
         },
         {
@@ -23,12 +19,20 @@
             "name": "entity.name.function.microcad"
         },
         {
-            "match": "\\b([0-9]+(\\.[0-9]+)?)(cm|mm|m|km)?\\b",
+            "match": "\\+|-|\\*|/| %|\\=|\\==|\\!=|\\<|\\>|\\<=|\\>=|\\||:",
+            "name": "keyword.operator.microcad"
+        },
+        {
+            "match": "\\b(([0-9]+(\\.[0-9]+)?)(%|m|cm|mm|µm|in|ft|yd|deg|°|grad|turn|rad|g|kg|lb|oz|m²|cm²|mm²|µm²|in²|ft²|yd²|m³|cm³|mm³|µm³|in³|ft³|yd³|ml|cl|l|µl)?|true|false)\\b",
             "name": "constant.numeric.microcad"
         },
         {
             "match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
             "name": "variable.other.microcad"
+        },
+        {
+            "match": "\"[^\"]*\"",
+            "name": "string.quoted.single.microcad"
         },
         {
             "begin": "\\(",
@@ -64,6 +68,9 @@
                     "include": "#functions"
                 },
                 {
+                    "include": "#operators"
+                },
+                {
                     "include": "#numbers"
                 },
                 {
@@ -73,7 +80,7 @@
                     "include": "#types"
                 },
                 {
-                    "include": "#operators"
+                    "include": "#strings"
                 }
             ]
         },
@@ -82,28 +89,32 @@
             "name": "comment.line.microcad"
         },
         "keywords": {
-            "match": "\\b(pub|part|use|fn|init|assert|return|__builtin)\\b",
+            "match": "\\b(pub|part|mod|use|fn|init|return|if|else|mat|__builtin)\\b",
             "name": "keyword.control.microcad"
         },
         "functions": {
             "match": "\\b([a-z_][a-zA-Z0-9_]*)\\s*(?=\\()",
             "name": "entity.name.function.microcad"
         },
+        "operators": {
+            "match": "\\+|-|\\*|/| %|\\=|\\==|\\!=|\\<|\\>|\\<=|\\>=|\\&&|\\||:",
+            "name": "keyword.operator.microcad"
+        },
         "numbers": {
-            "match": "\\b([0-9]+(\\.[0-9]+)?)(cm|mm|m|km)?\\b",
+            "match": "\\b(([0-9]+(\\.[0-9]+)?)(%|m|cm|mm|µm|in|ft|yd|deg|°|grad|turn|rad|g|kg|lb|oz|m²|cm²|mm²|µm²|in²|ft²|yd²|m³|cm³|mm³|µm³|in³|ft³|yd³|ml|cl|l|µl)?)|true|false\\b",
             "name": "constant.numeric.microcad"
         },
         "variables": {
             "match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
             "name": "variable.other.microcad"
         },
-        "operators": {
-            "match": "\\+|-|\\*|/|%|\\=|\\==|\\!=|\\<|\\>|\\<=|\\>=|\\&&|\\|\\|",
-            "name": "keyword.operator.microcad"
-        },
         "types": {
-            "match": "\\b(Integer|Scalar|String|Color|Length|Area|Volume|Angle|Weight|Bool)\\b",
+            "match": "\\b(Integer|Scalar|String|Color|Length|Area|Volume|Angle|Weight|Density|Bool)\\b",
             "name": "storage.type.microcad"
+        },
+        "strings": {
+            "match": "\"[^\"]*\"",
+            "name": "string.quoted.single.microcad"
         }
     }
 }
