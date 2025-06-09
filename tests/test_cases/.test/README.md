@@ -1,1 +1,0 @@
-# The folder is reserved for test output files
