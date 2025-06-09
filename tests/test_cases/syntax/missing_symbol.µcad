@@ -1,4 +1,4 @@
-part double_box {
+part double_box() {
     init(half_the_size: Length) { size = half_the_size * 2.0; }
     rectangle(size);
 }

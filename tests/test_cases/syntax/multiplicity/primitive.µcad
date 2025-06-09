@@ -1,6 +1,6 @@
 use __builtin::*;
 
-export("{OUTPUT_FILE}.svg") {
+{
     // Multiplicity for a builtin circle
     geo2d::circle(radius = [1.0, 2.0]);
 }

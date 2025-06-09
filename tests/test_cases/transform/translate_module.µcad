@@ -10,15 +10,13 @@ part cyl(d: Length, h: Length) {
 }
 
 // Calculate the difference between two translated cylinders
-export("{OUTPUT_FILE}.stl") {
-    thickness = 1.6mm;
-    inner_diameter = 16.0cm;
-    outer_diameter = 2.0 * thickness + inner_diameter;
-    height = 20.0mm;
-    print("{thickness} {inner_diameter} {outer_diameter} {height}");
+thickness = 1.6mm;
+inner_diameter = 16.0cm;
+outer_diameter = 2.0 * thickness + inner_diameter;
+height = 20.0mm;
+print("{thickness} {inner_diameter} {outer_diameter} {height}");
 
-    outer = cyl(d = outer_diameter, h = height);
-    inner = transform::translate(x = 0.0, y = 0.0, z = thickness / 1mm) cyl(d = inner_diameter, h = height);
+outer = cyl(d = outer_diameter, h = height);
+inner = transform::translate(x = 0.0, y = 0.0, z = thickness / 1mm) cyl(d = inner_diameter, h = height);
  
-    outer - inner;
-}
+outer - inner;

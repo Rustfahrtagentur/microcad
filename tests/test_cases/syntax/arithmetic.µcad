@@ -1,4 +1,4 @@
-use __builtin::*;
+use __builtin::debug::*;
 
 // Integer + Scalar Arithmetic
 a = 2.0;
