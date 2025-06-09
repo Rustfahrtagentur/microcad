@@ -49,6 +49,8 @@ pub enum Value {
     Area(Scalar),
     /// Volume in mm³.
     Volume(Scalar),
+    /// Density in g/mm³
+    Density(Scalar),
     /// An angle in radians.
     Angle(Scalar),
     /// Weight of a specific volume of material.
@@ -222,6 +224,7 @@ impl crate::ty::Ty for Value {
             Value::Volume(_) => Type::Volume,
             Value::Angle(_) => Type::Angle,
             Value::Weight(_) => Type::Weight,
+            Value::Density(_) => Type::Density,
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
             Value::Color(_) => Type::Color,
@@ -418,7 +421,8 @@ impl std::fmt::Display for Value {
             | Value::Angle(n)
             | Value::Area(n)
             | Value::Volume(n)
-            | Value::Weight(n) => {
+            | Value::Weight(n)
+            | Value::Density(n) => {
                 write!(f, "{n}{}", self.ty().default_unit())
             }
             Value::Bool(b) => write!(f, "{b}"),
@@ -444,6 +448,7 @@ impl std::fmt::Debug for Value {
             Self::Volume(arg0) => write!(f, "Volume: {arg0}"),
             Self::Angle(arg0) => write!(f, "Angle: {arg0}"),
             Self::Weight(arg0) => write!(f, "Weight: {arg0}"),
+            Self::Density(arg0) => write!(f, "Density: {arg0}"),
             Self::Bool(arg0) => write!(f, "Bool: {arg0}"),
             Self::String(arg0) => write!(f, "String: {arg0}"),
             Self::Color(arg0) => write!(f, "Color: {arg0}"),
