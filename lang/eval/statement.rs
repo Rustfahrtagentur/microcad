@@ -39,11 +39,9 @@ impl Eval for Statement {
 
 impl Eval<ModelNodes> for StatementList {
     fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
-        let mut model_nodes = ModelNodes::default();
-        for s in self.iter() {
-            let value = s.eval(context)?;
-            model_nodes.append(&mut value.fetch_nodes());
-        }
-        Ok(model_nodes)
+        self.iter().try_fold(ModelNodes::default(), |mut nodes, s| {
+            nodes.append(&mut s.eval(context)?.fetch_nodes());
+            Ok::<_, EvalError>(nodes)
+        })
     }
 }
