@@ -22,7 +22,7 @@ impl CallArgumentValueList {
     pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
         let mut value = OrdMap::default();
         value
-            .push(CallArgumentValue::new(
+            .try_push(CallArgumentValue::new(
                 None,
                 Value::String(code),
                 referrer.src_ref(),

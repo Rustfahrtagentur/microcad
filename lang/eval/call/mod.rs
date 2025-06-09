@@ -24,7 +24,7 @@ impl Eval<CallArgumentValueList> for CallArgumentList {
     fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
         let mut v = CallArgumentValueList::default();
         for call_arg in self.iter() {
-            v.push(call_arg.eval_value(context)?)
+            v.try_push(call_arg.eval_value(context)?)
                 .expect("Could not insert call argument value");
         }
         Ok(v)

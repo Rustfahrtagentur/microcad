@@ -51,7 +51,7 @@ impl Parse for ParameterList {
 
         for pair in pair.inner() {
             parameters
-                .push(Parameter::parse(pair)?)
+                .try_push(Parameter::parse(pair)?)
                 .map_err(ParseError::DuplicateIdentifier)?;
         }
 
