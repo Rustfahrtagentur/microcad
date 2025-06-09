@@ -112,19 +112,15 @@ impl ModelNodes {
 
     /// Dump all nodes.
     pub fn dump(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        for node in self.iter() {
-            node.dump(f)?;
-        }
-        Ok(())
+        self.iter().try_for_each(|node| node.dump(f))
     }
 
     /// Set the information about the creator for all nodes.
     ///
     /// See [`ModelNode::set_creator`] for more info.
     pub fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
-        for node in self.iter() {
-            node.set_creator(creator.clone(), call_src_ref.clone());
-        }
+        self.iter()
+            .for_each(|node| node.set_creator(creator.clone(), call_src_ref.clone()))
     }
 }
 
@@ -150,10 +146,7 @@ impl From<Vec<ModelNode>> for ModelNodes {
 
 impl std::fmt::Display for ModelNodes {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for node in self.iter() {
-            node.fmt(f)?;
-        }
-        Ok(())
+        self.iter().try_for_each(|node| node.fmt(f))
     }
 }
 
