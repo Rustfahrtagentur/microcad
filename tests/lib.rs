@@ -44,7 +44,10 @@ fn reference_filename(filename: &str, extension: &str) -> String {
 /// `syntax/multiplicity.µcad` -> `./test/syntax_multiplicity.log`
 #[cfg(test)]
 fn output_filename(filename: &str, extension: &str) -> String {
-    let filename = filename.replace(['/', '\\'], "_");
+    let path = format!("../tests/.test/{}", filename);
+    let path = std::path::Path::new(&path);
+    std::fs::create_dir_all(path.parent().expect("Filename with parent"))
+        .expect("Create directory");
     format!(
         "../tests/.test/{}.{}",
         filename.trim_end_matches(".µcad"),
