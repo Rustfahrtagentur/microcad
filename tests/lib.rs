@@ -116,6 +116,8 @@ fn write_and_compare(value: impl std::fmt::Display, filename: &str, extension: &
 /// You can place `.log`, `.model_tree` and other reference files next to the respective `.µcad` files.
 #[cfg(test)]
 fn test_source_file(filename: &str) {
+    use microcad_lang::diag::Diag;
+
     let source_file =
         SourceFile::load(format!("../tests/test_cases/{filename}")).expect("Valid source file");
 
@@ -134,9 +136,7 @@ fn test_source_file(filename: &str) {
         }
     }
 
-    if let Some(output) = context.output() {
-        write_and_compare(output, filename, "log");
-    }
+    write_and_compare(context.diagnosis(), filename, "log");
 }
 
 /// Helper function to create a qualified name from &str
