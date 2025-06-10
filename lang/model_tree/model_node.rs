@@ -36,7 +36,7 @@ impl std::fmt::Display for ModelNodeOrigin {
                     f,
                     "{symbol}({arguments})",
                     symbol = creator.full_name(),
-                    arguments = self.arguments.to_oneline_string(Some(32))
+                    arguments = self.arguments.to_one_line_string(Some(32))
                 )
             }
             None => Ok(()),

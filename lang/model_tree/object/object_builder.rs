@@ -27,12 +27,13 @@ impl ObjectBuilder {
         }
     }
 
-    /// Initialize the properties by parameters and arguments.
-    pub fn init_properties(
-        &mut self,
+    /// Create a new object with the properties by parameters and arguments.
+    pub fn new_object_with_properties(
+        src_ref: SrcRef,
         parameters: &ParameterValueList,
         arguments: &ArgumentMap,
-    ) -> &mut Self {
+    ) -> Self {
+        let mut object_builder = ObjectBuilder::new(src_ref);
         let mut props = ObjectProperties::default();
 
         for parameter in parameters.iter() {
@@ -45,8 +46,8 @@ impl ObjectBuilder {
             );
         }
 
-        self.object.props = props;
-        self
+        object_builder.object.props = props;
+        object_builder
     }
 
     /// Append child nodes to this object node.

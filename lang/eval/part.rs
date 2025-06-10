@@ -36,8 +36,11 @@ impl PartDefinition {
         context: &mut Context,
     ) -> EvalResult<ModelNode> {
         context.scope(StackFrame::Part(self.id.clone(), args.into()), |context| {
-            let mut object_builder = ObjectBuilder::default();
-            object_builder.init_properties(&self.parameters.eval(context)?, args);
+            let mut object_builder = ObjectBuilder::new_object_with_properties(
+                self.src_ref.clone(),
+                &self.parameters.eval(context)?,
+                args,
+            );
 
             // Create the object node from initializer if present
             if let Some(init) = init {

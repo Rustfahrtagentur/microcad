@@ -52,7 +52,7 @@ impl ArgumentMap {
     }
 
     /// Print the [`ArgumentMap`] as one line, truncated if `max length > 0`.
-    pub fn to_oneline_string(&self, max_length: Option<usize>) -> String {
+    pub fn to_one_line_string(&self, max_length: Option<usize>) -> String {
         let mut sorted: Vec<_> = self.0.iter().collect();
         sorted.sort_by(|a, b| a.0.cmp(b.0));
 

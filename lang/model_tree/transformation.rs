@@ -17,11 +17,6 @@ pub enum Transformation {
 
 /// Transformation trait.
 pub trait Transformer: std::fmt::Debug {
-    /*fn accepted_types(&self) -> GeometryType;
-
-    fn output_type(&self, node: ModelNode) -> GeometryType;
-    */
-
     /// Process the model
     fn process(&self, node: ModelNode);
 }

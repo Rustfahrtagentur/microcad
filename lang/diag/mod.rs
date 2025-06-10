@@ -43,10 +43,7 @@ pub trait PushDiag {
         src: impl SrcReferrer,
         error: impl std::error::Error + 'static,
     ) -> EvalResult<()> {
-        self.push_diag(Diagnostic::Warning(Refer::new(
-            Box::new(error),
-            src.src_ref(),
-        )))
+        self.push_diag(Diagnostic::Warning(Refer::new(error.into(), src.src_ref())))
     }
     /// Push new error.
     fn error(
@@ -54,7 +51,7 @@ pub trait PushDiag {
         src: impl SrcReferrer,
         error: impl std::error::Error + 'static,
     ) -> EvalResult<()> {
-        let err = Diagnostic::Error(Refer::new(Box::new(error), src.src_ref()));
+        let err = Diagnostic::Error(Refer::new(error.into(), src.src_ref()));
         log::error!("{err}");
         self.push_diag(err)
     }
