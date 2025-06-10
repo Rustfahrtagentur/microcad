@@ -3,15 +3,7 @@
 
 //! Model node
 
-use crate::{
-    eval::ArgumentMap,
-    model_tree::*,
-    rc::*,
-    resolve::{FullyQualify, Symbol},
-    src_ref::*,
-    syntax::*,
-    value::*,
-};
+use crate::{eval::*, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -155,12 +147,9 @@ impl ModelNode {
     }
 
     /// Return an transformation node.
-    pub fn new_transformation<T: Transformer + 'static>(
-        transformation: T,
-        src_ref: SrcRef,
-    ) -> Self {
+    pub fn new_operation<T: Operation + 'static>(transformation: T, src_ref: SrcRef) -> Self {
         Self::new_element(Refer::new(
-            Element::Transformer(std::rc::Rc::new(transformation)),
+            Element::Operation(std::rc::Rc::new(transformation)),
             src_ref,
         ))
     }
@@ -285,8 +274,7 @@ impl ModelNode {
     /// Short cut to generate boolean operator as binary operation with two nodes.
     pub fn binary_op(self, op: BooleanOp, other: ModelNode) -> ModelNode {
         assert!(self != other, "lhs and rhs must be distinct.");
-        ModelNode::new_transformation(op, SrcRef(None))
-            .append_children(vec![self.clone(), other].into())
+        ModelNode::new_operation(op, SrcRef(None)).append_children(vec![self.clone(), other].into())
     }
 
     /// Find children node placeholder in node descendants

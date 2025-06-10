@@ -21,9 +21,7 @@ pub enum Element {
     ChildrenPlaceholder,
 
     /// An affine transform.
-    ///
-    ///
-    AffineTransform(AffineTransform),
+    Transformation(AffineTransform),
 
     /// Generated 2D geometry.
     Primitive2D(std::rc::Rc<Primitive2D>),
@@ -32,7 +30,7 @@ pub enum Element {
     Primitive3D(std::rc::Rc<Primitive3D>),
 
     /// A transformation that generates a geometry.
-    Transformer(std::rc::Rc<dyn Transformer>),
+    Operation(std::rc::Rc<dyn Operation>),
 }
 
 impl Element {
@@ -60,7 +58,7 @@ impl std::fmt::Display for Element {
         write!(f, "{name}")?;
 
         match &self {
-            Element::Transformer(transformation) => {
+            Element::Operation(transformation) => {
                 write!(f, "({transformation:?})")
             }
             Element::Primitive2D(primitive2d) => {

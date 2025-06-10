@@ -14,7 +14,7 @@ impl BuiltinPartDefinition for Translate {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
-        Ok(ModelNode::new_transformation(
+        Ok(ModelNode::new_operation(
             AffineTransform::Translation(Vec3::new(
                 args.get_value::<Scalar>(&Identifier::no_ref("x")),
                 args.get_value::<Scalar>(&Identifier::no_ref("y")),

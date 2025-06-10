@@ -95,7 +95,7 @@ impl ModelNodes {
         match self.single_node() {
             Some(node) => node,
             None => {
-                let union_node = ModelNode::new_transformation(BooleanOp::Union, SrcRef(None));
+                let union_node = ModelNode::new_operation(BooleanOp::Union, SrcRef(None));
                 union_node.append_children(self.clone())
             }
         }
