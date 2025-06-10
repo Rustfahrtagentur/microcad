@@ -39,10 +39,10 @@ impl Expression {
         let value = self.eval(context)?;
         match value {
             Value::Nodes(mut nodes) => {
-                let metadata = attribute_list.eval_to_metadata(context)?;
+                let metadata = attribute_list.eval(context)?;
                 use std::borrow::BorrowMut;
                 for node in nodes.iter_mut() {
-                    node.borrow_mut().set_metadata(metadata.clone())
+                    node.borrow_mut().set_metadata(metadata.clone());
                 }
                 Ok(Value::Nodes(nodes))
             }
@@ -199,7 +199,7 @@ impl Eval for NestedItem {
                     unreachable!("Unexpected unload source file {} in expression", ns.id)
                 }
             },
-            NestedItem::Body(body) => Ok(Value::from_single_node(body.eval_to_node(context)?)),
+            NestedItem::Body(body) => Ok(Value::from_single_node(body.eval(context)?)),
         }
     }
 }

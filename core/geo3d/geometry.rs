@@ -80,8 +80,3 @@ impl From<TriangleMesh> for Geometry {
         Geometry::Mesh(mesh)
     }
 }
-
-/// Create a new geometry node
-pub fn geometry(geometry: Rc<Geometry>) -> Node {
-    Node::new(NodeInner::Geometry(geometry))
-}

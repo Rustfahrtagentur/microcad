@@ -62,32 +62,4 @@ impl geo3d::Renderer for MeshRenderer {
             }
         }
     }
-
-    fn render_node(&mut self, node: crate::geo3d::Node) -> CoreResult<()> {
-        let inner = node.borrow();
-        use crate::geo3d::NodeInner;
-
-        match &*inner {
-            NodeInner::Group => {
-                for child in node.children() {
-                    self.render_node(child.clone())?;
-                }
-                return Ok(());
-            }
-            NodeInner::Geometry(geometry) => {
-                self.render_geometry(geometry)?;
-            }
-            NodeInner::Transform(transform) => {
-                let mut renderer = MeshRenderer::new(self.precision);
-
-                for child in node.children() {
-                    renderer.render_node(child)?;
-                }
-
-                self.mesh(&renderer.triangle_mesh.transform(transform))?;
-            }
-        }
-
-        Ok(())
-    }
 }

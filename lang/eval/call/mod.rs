@@ -19,12 +19,12 @@ use crate::{eval::*, syntax::*};
 
 use thiserror::Error;
 
-impl CallArgumentList {
+impl Eval<CallArgumentValueList> for CallArgumentList {
     /// Evaluate into a [`CallArgumentValueList`].
-    pub fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
+    fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
         let mut v = CallArgumentValueList::default();
         for call_arg in self.iter() {
-            v.push(call_arg.eval_value(context)?)
+            v.try_push(call_arg.eval_value(context)?)
                 .expect("Could not insert call argument value");
         }
         Ok(v)
@@ -66,7 +66,7 @@ impl Eval for Call {
             },
             |context| match &symbol.borrow().def {
                 SymbolDefinition::Builtin(f) => f.call(&args, context),
-                SymbolDefinition::Part(m) => m.call(&args, context),
+                SymbolDefinition::Part(m) => Ok(Value::Nodes(m.call(&args, context)?)),
                 SymbolDefinition::Function(f) => f.call(&args, context),
                 _ => {
                     context.error(
@@ -81,11 +81,17 @@ impl Eval for Call {
                 }
             },
         ) {
-            Err(err) => {
-                context.error(self.src_ref(), err)?;
-                Ok(Value::None)
+            Ok(Value::Nodes(nodes)) => {
+                // Store the information, saying that these nodes have been created by this symbol.
+                nodes.set_creator(symbol, self.src_ref());
+
+                Ok(Value::Nodes(nodes))
             }
             Ok(value) => Ok(value),
+            Err(err) => {
+                context.error(self, err)?;
+                Ok(Value::None)
+            }
         }
     }
 }

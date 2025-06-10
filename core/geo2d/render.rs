@@ -4,7 +4,6 @@
 //! 2D Primitive
 
 use crate::*;
-pub use geo2d::tree::{Node, NodeInner};
 use std::rc::Rc;
 
 /// A Primitive is a hashable renderable object that can be rendered by a Renderer2D
@@ -44,7 +43,4 @@ pub trait Renderer: crate::Renderer {
             _ => unimplemented!(),
         }
     }
-
-    /// Render node
-    fn render_node(&mut self, node: crate::geo2d::Node) -> CoreResult<()>;
 }

@@ -43,7 +43,4 @@ pub trait Renderer: crate::Renderer {
             _ => unimplemented!(),
         }
     }
-
-    /// Render node
-    fn render_node(&mut self, node: crate::geo3d::Node) -> CoreResult<()>;
 }

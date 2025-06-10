@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**81** tests from markdown.
+**77** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -42,13 +42,9 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/parts/.test/parameter_list.png)](../doc/parts/.test/parameter_list.log) | [parameter_list](../doc/parts/parameter_list.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_A.png)](../doc/.test/parameter_multiplicity_example_A.log) | [parameter_multiplicity_example_A](../doc/parameter_multiplicity.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_B.png)](../doc/.test/parameter_multiplicity_example_B.log) | [parameter_multiplicity_example_B](../doc/parameter_multiplicity.md) |
-| [![test](../doc/.test/parameter_multiplicity_example_D.png)](../doc/.test/parameter_multiplicity_example_D.log) | [parameter_multiplicity_example_D](../doc/parameter_multiplicity.md) |
 | [![test](../doc/parts/.test/part_declaration.png)](../doc/parts/.test/part_declaration.log) | [part_declaration](../doc/parts/README.md) |
 | [![test](../doc/parts/.test/property_torus.png)](../doc/parts/.test/property_torus.log) | [property_torus](../doc/parts/property.md) |
 | [![test](../doc/parts/.test/property_torus_fail.png)](../doc/parts/.test/property_torus_fail.log) | [property_torus_fail](../doc/parts/property.md) |
-| [![test](../doc/function/.test/README_implicit_init_by_parameter_A.png)](../doc/function/.test/README_implicit_init_by_parameter_A.log) | [README_implicit_init_by_parameter_A](../doc/function/README.md) |
-| [![test](../doc/function/.test/README_implicit_init_by_parameter_B.png)](../doc/function/.test/README_implicit_init_by_parameter_B.log) | [README_implicit_init_by_parameter_B](../doc/function/README.md) |
-| [![test](../doc/function/.test/README_implicit_init_by_parameter_C.png)](../doc/function/.test/README_implicit_init_by_parameter_C.log) | [README_implicit_init_by_parameter_C](../doc/function/README.md) |
 | [![test](../doc/.test/tuple_fields_A.png)](../doc/.test/tuple_fields_A.log) | [tuple_fields_A](../doc/tuple.md) |
 | [![test](../doc/.test/tuple_fields_B.png)](../doc/.test/tuple_fields_B.log) | [tuple_fields_B](../doc/tuple.md) |
 | [![test](../doc/.test/tuple_fields_C.png)](../doc/.test/tuple_fields_C.log) | [tuple_fields_C](../doc/tuple.md) |

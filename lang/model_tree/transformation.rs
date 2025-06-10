@@ -6,13 +6,22 @@
 use crate::model_tree::*;
 use microcad_core::*;
 
-/// Algorithm trait.
-pub trait Transformation: std::fmt::Debug {
-    /// Process this object nodes
+/// A transformation can be either a transform.
+pub enum Transformation {
+    /// An affine transform.
+    Affine(AffineTransform),
+
+    /// A custom transformer.
+    Transformer(std::boxed::Box<dyn Transformer>),
+}
+
+/// Transformation trait.
+pub trait Transformer: std::fmt::Debug {
+    /// Process the model
     fn process(&self, node: ModelNode);
 }
 
-impl Transformation for BooleanOp {
+impl Transformer for BooleanOp {
     fn process(&self, _node: ModelNode) {
         todo!("Implement boolean operations");
     }
@@ -53,7 +62,7 @@ impl AffineTransform {
     }
 }
 
-impl Transformation for AffineTransform {
+impl Transformer for AffineTransform {
     fn process(&self, _node: ModelNode) {
         todo!("Implement affine transforms")
     }

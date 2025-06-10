@@ -6,7 +6,6 @@
 mod geometry;
 mod mesh_renderer;
 mod render;
-pub mod tree;
 mod triangle_mesh;
 
 pub use manifold_rs::Manifold;
@@ -16,7 +15,6 @@ pub use mesh_renderer::MeshRenderer;
 
 pub use geometry::*;
 pub use render::*;
-pub use tree::{Node, NodeInner};
 
 use crate::BooleanOp;
 
@@ -29,16 +27,6 @@ impl From<&BooleanOp> for manifold_rs::BooleanOp {
             _ => unimplemented!(),
         }
     }
-}
-
-/// Create a new group node
-pub fn group() -> Node {
-    Node::new(NodeInner::Group)
-}
-
-/// Create a new transform node
-pub fn transform(transform: crate::Mat4) -> Node {
-    Node::new(NodeInner::Transform(transform))
 }
 
 #[test]

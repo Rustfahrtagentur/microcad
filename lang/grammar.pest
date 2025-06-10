@@ -298,7 +298,7 @@ expression_no_semicolon = { nested_with_body }
 expression_statement = { (attribute_list ~ ws+)? ~ (expression ~ ws* ~ ";" | expression_no_semicolon ~ (ws* ~ ";")? ) }
 
 // A statement that is a single expression, with optional semicolon
-final_expression_statement = { (attribute_list ~ ws+)? ~ expression_no_semicolon ~ (ws* ~ ";")? }
+final_expression_statement = { (attribute_list ~ ws+)? ~ expression ~ (ws* ~ ";")? }
 
 
 //`1..4`: ok
@@ -345,13 +345,12 @@ call = { qualified_name ~ ws* ~ call_op }
 //`foo::bar`: ok # Qualified name tag
 attribute_item = { qualified_name ~ ws* ~ "=" ~ ws* ~ expression | call | qualified_name }
 
-//`#foo`: ok # Simple tag
 //`#[foo, bar]`: ok # List of attributes
 //`#[bar = 42, foo = 32]`: ok # List of assignment attributes
 //`#[foo = 42, bar(32), baz]`: ok # List of mixed attributes
 attribute = { "#[" ~ attribute_item ~ ws* ~ ("," ~ ws* ~ attribute_item ~ ws*)* ~ "]" }
 
-//`#foo #bar`: ok # Multiple attributes
+//`#[foo] #[bar]`: ok # Multiple attributes
 attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
 //`r: Length = 5.0mm`: ok
@@ -411,9 +410,9 @@ body_else = { body }
 //`part foo(a: scalar, b: scalar) { }`: ok # Part with multiple properties
 //`part foo() { part bar() { } }`: ok # Nested part definition
 //`part foo() { a: scalar = 5.0; fn bar() -> scalar { return 1; } }`: ok # Parameter and nested function
-//`part list(count: int, delegate: {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Part with part as properties
+//`part list(count: int, delegate = {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Part with part as properties
 //`part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
-//`part foo() { fn bar(a: scalar) -> scalar { a } }`: ok # Part with function
+//`part foo() { fn bar(a: Scalar) -> Scalar { a } }`: ok # Part with function
 //`part donut(radius) { }`: error # Part property must have type annotations
 part_definition = { (attribute_list ~ ws+)? ~ "part" ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
@@ -426,8 +425,8 @@ body = { "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
 //`init(size: Length) { rectangle(size); }: ok
 init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 
-//`module math { }`: ok # module
-//`module math { function pi() -> scalar { return 3.14159; } }`: ok # module with function
+//`mod math { }`: ok # module
+//`mod math { fn pi() -> Scalar { return 3.14159; } }`: ok # module with function
 module_definition = { "mod" ~ ws+ ~ identifier ~ ws* ~ body }
 
 statement = {
@@ -445,7 +444,7 @@ statement = {
   expression_statement
 }
 
-statement_list = { final_expression_statement | (statement ~ ws*)* ~ final_expression_statement? }
+statement_list = { (statement ~ ws*)* ~ final_expression_statement? }
 
 //`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 //`part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function

@@ -35,9 +35,9 @@ pub use literal::*;
 pub use module::*;
 pub use parameter::*;
 pub use part::*;
-pub use r#use::*;
 pub use source_file::*;
 pub use statement::*;
+pub use r#use::*;
 
 /// Trait for printing a syntax tree
 pub trait PrintSyntax {

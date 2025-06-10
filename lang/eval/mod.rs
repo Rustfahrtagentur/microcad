@@ -57,15 +57,15 @@ pub use context::*;
 pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
-pub use r#use::*;
 pub use symbols::*;
+pub use r#use::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
 /// Evaluation trait
-pub trait Eval {
-    /// Evaluate the type into an expression
-    fn eval(&self, context: &mut Context) -> EvalResult<Value>;
+pub trait Eval<T = Value> {
+    /// Evaluate a syntax element into a type `T`.
+    fn eval(&self, context: &mut Context) -> EvalResult<T>;
 }
 
 impl MethodCall {

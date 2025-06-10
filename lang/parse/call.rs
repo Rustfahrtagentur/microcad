@@ -29,7 +29,7 @@ impl Parse for CallArgumentList {
             Rule::call_argument_list => {
                 for pair in pair.inner() {
                     call_argument_list
-                        .push(CallArgument::parse(pair)?)
+                        .try_push(CallArgument::parse(pair)?)
                         .map_err(ParseError::DuplicateCallArgument)?;
                 }
 

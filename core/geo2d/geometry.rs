@@ -126,55 +126,7 @@ impl Geometry {
     }
 }
 
-/// Dumps the tree structure of a node.
-///
-/// The depth of a node is marked by the number of white spaces
-pub fn dump(writer: &mut dyn std::io::Write, node: Node) -> std::io::Result<()> {
-    use crate::Depth;
-    node.descendants()
-        .try_for_each(|child| writeln!(writer, "{}{:?}", " ".repeat(child.depth()), child.borrow()))
-}
-
 /// Shortcut to create a MultiPolygon
 pub fn line_string_to_multi_polygon(line_string: LineString) -> MultiPolygon {
     MultiPolygon::new(vec![Polygon::new(line_string, vec![])])
-}
-
-/// Create a new geometry node
-pub fn geometry(geometry: Rc<Geometry>) -> Node {
-    Node::new(NodeInner::Geometry(geometry))
-}
-
-/// Create a new group node
-pub fn group() -> Node {
-    Node::new(NodeInner::Group)
-}
-
-/// Create a new transform node
-pub fn transform(transform: crate::Mat3) -> Node {
-    Node::new(NodeInner::Transform(transform))
-}
-
-#[test]
-fn test_transform() {
-    let geometry = Geometry::LineString(geo::LineString::from(vec![
-        geo::Point::new(0.0, 0.0),
-        geo::Point::new(2.0, 1.0),
-    ]));
-
-    let transform = crate::Mat3::from_translation(crate::Vec2::new(5.0, 10.0));
-
-    let transformed = geometry.transform(transform);
-
-    if let Geometry::LineString(l) = transformed {
-        let first = l.coords().next().expect("Expected first coordinate");
-        assert_eq!(first.x, 5.0);
-        assert_eq!(first.y, 10.0);
-
-        let second = l.coords().nth(1).expect("Expected second coordinate");
-        assert_eq!(second.x, 7.0);
-        assert_eq!(second.y, 11.0);
-    } else {
-        panic!("Expected LineString");
-    }
 }

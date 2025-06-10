@@ -71,10 +71,7 @@ impl std::ops::DerefMut for AttributeList {
 
 impl std::fmt::Display for AttributeList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for attribute in &self.0 {
-            writeln!(f, "{attribute}")?;
-        }
-        Ok(())
+        self.0.iter().try_for_each(|attr| writeln!(f, "{attr}"))
     }
 }
 

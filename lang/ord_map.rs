@@ -91,7 +91,7 @@ where
     }
 
     /// add new value
-    pub fn push(&mut self, item: V) -> Result<(), K> {
+    pub fn try_push(&mut self, item: V) -> Result<(), K> {
         if let Some(key) = item.key().clone() {
             if self.map.contains_key(&key) {
                 return Err(key);

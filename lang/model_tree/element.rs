@@ -3,27 +3,36 @@
 
 //! Element of a [`ModelNode`]
 
-use crate::model_tree::*;
+use crate::{model_tree::*, syntax::*, value::*};
+use microcad_core::*;
 use strum::IntoStaticStr;
 
-/// Inner of a node
+/// An element defines the entity of a [`ModelNode`].
 #[derive(Clone, IntoStaticStr, Debug)]
 pub enum Element {
-    /// An object that contains children and holds properties
+    /// An object that contains children and holds properties.
+    ///
+    /// Objects can be created by builtins, assignments, expressions and parts.
     Object(Object),
 
-    /// A special node after which children will be nested as siblings
+    /// A special node after which children will be nested as siblings.
+    ///
+    /// This node is removed after the children have been inserted.
     ChildrenPlaceholder,
 
+    /// An affine transform.
+    ///
+    ///
+    AffineTransform(AffineTransform),
+
     /// Generated 2D geometry.
-    Primitive2D(Rc<Primitive2D>),
+    Primitive2D(std::rc::Rc<Primitive2D>),
 
     /// Generated 3D geometry.
-    #[cfg(feature = "geo3d")]
-    Primitive3D(Rc<Primitive3D>),
+    Primitive3D(std::rc::Rc<Primitive3D>),
 
-    /// A transformation that manipulates the node or its children
-    Transformation(Rc<dyn Transformation>),
+    /// A transformation that generates a geometry.
+    Transformer(std::rc::Rc<dyn Transformer>),
 }
 
 impl Element {
@@ -51,14 +60,11 @@ impl std::fmt::Display for Element {
         write!(f, "{name}")?;
 
         match &self {
-            Element::Transformation(transformation) => {
+            Element::Transformer(transformation) => {
                 write!(f, "({transformation:?})")
             }
             Element::Primitive2D(primitive2d) => {
                 write!(f, "({primitive2d:?})")
-            }
-            Element::Primitive3D(primitive3d) => {
-                write!(f, "({primitive3d:?})")
             }
             _ => Ok(()),
         }

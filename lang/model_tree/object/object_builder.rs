@@ -3,7 +3,7 @@
 
 //! Object builder module
 
-use crate::{eval::*, model_tree::*};
+use crate::{eval::*, model_tree::*, src_ref::*, syntax::*, value::*};
 
 /// Object builder to build up a [ModelNode] with an object element.
 #[derive(Default)]
@@ -13,9 +13,6 @@ pub struct ObjectBuilder {
 
     /// Children to be placed in the node.
     children: ModelNodes,
-
-    /// Metadata for the object node.
-    metadata: Metadata,
 
     /// The [`SrcRef`] attached to the object element.
     src_ref: SrcRef,
@@ -30,12 +27,13 @@ impl ObjectBuilder {
         }
     }
 
-    /// Initialize the properties by parameters and arguments.
-    pub fn init_properties(
-        &mut self,
+    /// Create a new object with the properties by parameters and arguments.
+    pub fn new_object_with_properties(
+        src_ref: SrcRef,
         parameters: &ParameterValueList,
         arguments: &ArgumentMap,
-    ) -> &mut Self {
+    ) -> Self {
+        let mut object_builder = ObjectBuilder::new(src_ref);
         let mut props = ObjectProperties::default();
 
         for parameter in parameters.iter() {
@@ -48,14 +46,8 @@ impl ObjectBuilder {
             );
         }
 
-        self.object.props = props;
-        self
-    }
-
-    /// Add attributes to object.
-    pub fn set_metadata(&mut self, metadata: Metadata) -> &mut Self {
-        self.metadata = metadata;
-        self
+        object_builder.object.props = props;
+        object_builder
     }
 
     /// Append child nodes to this object node.
@@ -94,7 +86,6 @@ impl ObjectBuilder {
     pub fn build_node(self) -> ModelNode {
         let node = ModelNode::new_object(self.object, self.src_ref);
         node.append_children(self.children);
-        node.set_metadata(self.metadata);
         node
     }
 }

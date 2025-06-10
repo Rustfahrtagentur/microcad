@@ -35,11 +35,12 @@ impl PartDefinition {
         init: Option<&'a InitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ModelNode> {
-        let mut object_builder = ObjectBuilder::default();
-
         context.scope(StackFrame::Part(self.id.clone(), args.into()), |context| {
-            object_builder.init_properties(&self.parameters.eval(context)?, args);
-            object_builder.set_metadata(self.attribute_list.eval_to_metadata(context)?);
+            let mut object_builder = ObjectBuilder::new_object_with_properties(
+                self.src_ref.clone(),
+                &self.parameters.eval(context)?,
+                args,
+            );
 
             // Create the object node from initializer if present
             if let Some(init) = init {
@@ -62,12 +63,15 @@ impl PartDefinition {
                 }
             }
 
-            Ok(object_builder.build_node())
+            Ok(object_builder
+                .build_node()
+                .set_original_arguments(args.clone())
+                .set_metadata(self.attribute_list.eval(context)?))
         })
     }
 }
 
-impl CallTrait for PartDefinition {
+impl CallTrait<ModelNodes> for PartDefinition {
     /// Evaluate the call of a part initialization
     ///
     /// The evaluation considers multiplicity, which means that multiple nodes maybe created.
@@ -75,7 +79,7 @@ impl CallTrait for PartDefinition {
     /// Example:
     /// Consider the `part a(b: Scalar) { }`.
     /// Calling the part `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
-    fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value> {
+    fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<ModelNodes> {
         let mut nodes = ModelNodes::default();
 
         match self.find_matching_initializer(args, context) {
@@ -97,6 +101,6 @@ impl CallTrait for PartDefinition {
             },
         }
 
-        Ok(nodes.into())
+        Ok(nodes)
     }
 }
