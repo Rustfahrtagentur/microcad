@@ -1,1 +1,0 @@
-std::translate(x=1m,y=2m) std::geo2d::circle(radius=10cm);
