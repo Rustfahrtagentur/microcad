@@ -1,6 +1,6 @@
 // This tests the local stack
 
-use __builtin::debug::*;
+use __builtin::*;
 
 // new local variable #1
 i = 1;
