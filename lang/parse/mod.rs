@@ -6,15 +6,17 @@
 //! A source file on disc is just a bunch of UTF-8 encoded text which must be parsed
 //! before any processing:
 //!
-//! ```
-//! use microcad_lang::{syntax::*, parse::*}
+//! ```no_run
+//! use microcad_lang::{syntax::*, parse::*};
 //!
 //! let source_file = SourceFile::load("my.µcad").expect("parsing success");
 //! ```
 //!
 //! To read a source file from an already loaded string use:
 //!
-//! ```
+//! ```no_run
+//! use microcad_lang::{syntax::*, parse::*};
+//!
 //! let source_file = SourceFile::load_from_str(r#"std::print("hello world!");"#).expect("parsing success");
 //! ```
 //!

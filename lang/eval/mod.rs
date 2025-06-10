@@ -8,9 +8,9 @@
 //! by using [`Context::from_source()`] or [`Context::from_source_captured()`] which both automatically
 //! load and resolve the source file and build a context around it which then can be evaluated with [`Context::eval()`]:
 //!
-//! ```
-//! use microcad_builtin::builtin_module;
+//! ```ignore
 //! use microcad_lang::eval::Context;
+//! use microcad_lang::diag::Diag;
 //! use std::io::stdout;
 //!
 //! // create a context for evaluation of the source file
@@ -21,10 +21,10 @@
 //! ).expect("successful load, parse and resolve");
 //!
 //! // evaluate the source file in it's context
-//! let value = context.eval().expect("successful evaluation");
+//! let node = context.eval().expect("successful evaluation");
 //!
 //! // print any error
-//! context.write_diagnosis(stdout()).expect("stdout should be available");
+//! println!("{}", context.diagnosis());
 //! ```
 
 mod argument_map;

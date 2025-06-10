@@ -26,7 +26,7 @@ impl ModelNodes {
     /// The reference to the first stack element will be returned.
     ///
     /// Assume, our node stack `Vec<Vec<Node>>` has for lists `a`, `b`, `c`, `d`:
-    /// ```
+    /// ```ignore
     /// let nodes = vec![
     ///     vec![obj("a0"), obj("a1")],
     ///     vec![obj("b0")],

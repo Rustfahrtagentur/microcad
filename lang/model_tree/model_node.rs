@@ -388,7 +388,8 @@ impl PartialEq for ModelNode {
 ///
 /// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
 /// The examplary output will look like this:
-/// ```
+///
+/// ```custom
 /// id: Object:
 ///     Object = std::geo2d::circle(radius = 3.0mm) -> Geometry2D:
 ///         Primitive = __builtin::geo2d::circle(radius = 3.0) -> Geometry2D`

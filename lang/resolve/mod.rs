@@ -5,8 +5,8 @@
 //!
 //! After parsing a source file (see [`crate::parse`]) it must be resolved to get a symbol out of it:
 //!
-//! ```
-//! use microcad_lang::{syntax::*, parse::*, resolve::*}
+//! ```no_run
+//! use microcad_lang::{syntax::*, parse::*, resolve::*};
 //!
 //! let source_file = SourceFile::load("my.µcad").expect("parsing success");
 //!
