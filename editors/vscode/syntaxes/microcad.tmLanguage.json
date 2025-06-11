@@ -7,7 +7,7 @@
             "name": "comment.line.microcad"
         },
         {
-            "match": "\\b(pub|sketch|part|op|mod|use|fn|init|return|if|else|mat|__builtin)\\b",
+            "match": "\\b(pub|sketch|part|op|mod|use|fn|const|init|return|if|else|mat|__builtin)\\b",
             "name": "keyword.control.microcad"
         },
         {
@@ -95,6 +95,9 @@
                     "include": "#variables"
                 },
                 {
+                    "include": "#constants"
+                },
+                {
                     "include": "#types"
                 },
                 {
@@ -110,7 +113,7 @@
             "name": "comment.line.microcad"
         },
         "keywords": {
-            "match": "\\b(pub|sketch|part|op|mod|use|fn|init|return|if|else|mat|__builtin)\\b",
+            "match": "\\b(pub|sketch|part|op|mod|use|fn|const|init|return|if|else|mat|__builtin)\\b",
             "name": "keyword.control.microcad"
         },
         "functions": {
@@ -139,6 +142,10 @@
         "variables": {
             "match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
             "name": "variable.other.microcad"
+        },
+        "constants": {
+            "match": "\\b([A-Z_][A-Z0-9_]*)\\b",
+            "name": "constant.other.caps.microcad"
         },
         "types": {
             "match": "\\b(Integer|Scalar|String|Color|Length|Area|Volume|Angle|Weight|Density|Bool)\\b",
