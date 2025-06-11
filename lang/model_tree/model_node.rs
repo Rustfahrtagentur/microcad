@@ -147,11 +147,8 @@ impl ModelNode {
     }
 
     /// Return an transformation node.
-    pub fn new_operation<T: Operation + 'static>(transformation: T, src_ref: SrcRef) -> Self {
-        Self::new_element(Refer::new(
-            Element::Operation(std::rc::Rc::new(transformation)),
-            src_ref,
-        ))
+    pub fn new_operation<T: Operation + 'static>(operation: T, src_ref: SrcRef) -> Self {
+        Self::new_element(Refer::new(Element::Operation(Rc::new(operation)), src_ref))
     }
 
     /// Return id of this object node.
@@ -277,7 +274,7 @@ impl ModelNode {
         ModelNode::new_operation(op, SrcRef(None)).append_children(vec![self.clone(), other].into())
     }
 
-    /// Find children node placeholder in node descendants
+    /// Find children node placeholder in node descendants.
     pub fn find_children_placeholder(&self) -> Option<ModelNode> {
         self.descendants().find(|n| {
             n.id().is_none() && matches!(n.0.borrow().element.value, Element::ChildrenPlaceholder)
