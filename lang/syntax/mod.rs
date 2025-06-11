@@ -17,11 +17,11 @@ pub mod init_definition;
 pub mod literal;
 pub mod module;
 pub mod parameter;
-pub mod part_definition;
 pub mod source_file;
 pub mod statement;
 pub mod type_annotation;
 pub mod r#use;
+pub mod workbench;
 
 pub use assignment::*;
 pub use attribute::*;
@@ -35,11 +35,11 @@ pub use init_definition::*;
 pub use literal::*;
 pub use module::*;
 pub use parameter::*;
-pub use part_definition::*;
 pub use r#use::*;
 pub use source_file::*;
 pub use statement::*;
 pub use type_annotation::*;
+pub use workbench::*;
 
 /// Trait for printing a syntax tree
 pub trait PrintSyntax {

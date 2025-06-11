@@ -7,7 +7,7 @@
             "name": "comment.line.microcad"
         },
         {
-            "match": "\\b(pub|part|mod|use|fn|init|return|if|else|mat|__builtin)\\b",
+            "match": "\\b(pub|sketch|part|op|mod|use|fn|init|return|if|else|mat|__builtin)\\b",
             "name": "keyword.control.microcad"
         },
         {
@@ -89,7 +89,7 @@
             "name": "comment.line.microcad"
         },
         "keywords": {
-            "match": "\\b(pub|part|mod|use|fn|init|return|if|else|mat|__builtin)\\b",
+            "match": "\\b(pub|sketch|part|op|mod|use|fn|init|return|if|else|mat|__builtin)\\b",
             "name": "keyword.control.microcad"
         },
         "functions": {

@@ -17,8 +17,8 @@ impl StatementList {
         // Iterate over all statement fetch definitions
         for statement in &self.0 {
             match statement {
-                Statement::Part(m) => {
-                    symbol_map.insert(m.id.clone(), m.resolve(parent.clone()));
+                Statement::Workbench(w) => {
+                    symbol_map.insert(w.id.clone(), w.resolve(parent.clone()));
                 }
                 Statement::Module(n) => {
                     symbol_map.insert(n.id.clone(), n.resolve(parent.clone()));
@@ -27,7 +27,12 @@ impl StatementList {
                     symbol_map.insert(f.id.clone(), f.resolve(parent.clone()));
                 }
                 Statement::Use(u) => symbol_map.append(&mut u.resolve(parent.clone())),
-                _ => {}
+                Statement::Init(_)
+                | Statement::Return(_)
+                | Statement::If(_)
+                | Statement::Marker(_)
+                | Statement::Assignment(_)
+                | Statement::Expression(_) => {}
             }
         }
 

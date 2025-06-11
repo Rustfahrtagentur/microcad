@@ -34,11 +34,11 @@ mod lang_type;
 mod literal;
 mod module;
 mod parameter;
-mod part_definition;
 mod source_file;
 mod statement;
 mod r#type;
 mod r#use;
+mod workbench;
 
 pub mod parse_error;
 

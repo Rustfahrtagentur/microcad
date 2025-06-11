@@ -39,7 +39,9 @@ fn main() -> std::io::Result<()> {
             || !lines[0].starts_with(&format!("{prefix} Copyright"))
             || !lines[1].starts_with(&format!("{prefix} SPDX-License-Identifier"))
         {
-            let copyright_notice = format!("{prefix} Copyright © 2025 The µcad authors <info@ucad.xyz>\n{prefix} SPDX-License-Identifier: AGPL-3.0-or-later\n\n");
+            let copyright_notice = format!(
+                "{prefix} Copyright © 2025 The µcad authors <info@ucad.xyz>\n{prefix} SPDX-License-Identifier: AGPL-3.0-or-later\n\n"
+            );
 
             let mut new_content = String::new();
             new_content.push_str(&copyright_notice);

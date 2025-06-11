@@ -31,7 +31,7 @@ impl Eval for Statement {
             Self::Assignment(a) => a.eval(context)?,
             Self::Expression(e) => e.eval(context)?,
             Self::Marker(m) => m.eval(context)?,
-            Self::Part(_) | Self::Function(_) | Self::Module(_) => Value::None,
+            Self::Workbench(_) | Self::Function(_) | Self::Module(_) => Value::None,
             statement => todo!("{statement}"),
         })
     }

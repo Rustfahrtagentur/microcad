@@ -23,7 +23,7 @@ pub use statement_list::*;
 #[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum Statement {
     /// Part definition
-    Part(Rc<PartDefinition>),
+    Workbench(Rc<WorkbenchDefinition>),
     /// Module definition
     Module(Rc<ModuleDefinition>),
     /// Function definition
@@ -49,8 +49,8 @@ pub enum Statement {
 impl SrcReferrer for Statement {
     fn src_ref(&self) -> SrcRef {
         match self {
-            Self::Part(md) => md.src_ref(),
-            Self::Module(ns) => ns.src_ref(),
+            Self::Workbench(w) => w.src_ref(),
+            Self::Module(m) => m.src_ref(),
             Self::Function(fd) => fd.src_ref(),
             Self::Init(mid) => mid.src_ref(),
 
@@ -68,11 +68,11 @@ impl SrcReferrer for Statement {
 impl std::fmt::Display for Statement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Part(m) => {
-                write!(f, "{m}")
+            Self::Workbench(w) => {
+                write!(f, "{w}")
             }
-            Self::Module(ns) => {
-                write!(f, "{}", ns.id)
+            Self::Module(m) => {
+                write!(f, "{}", m.id)
             }
             Self::Function(_f) => {
                 write!(f, "{}", _f.id)
@@ -96,10 +96,10 @@ impl PrintSyntax for Statement {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}Statement:", "")?;
         match self {
-            Self::Part(m) => m.print_syntax(f, depth + 1),
-            Self::Module(ns) => ns.print_syntax(f, depth + 1),
+            Self::Workbench(w) => w.print_syntax(f, depth + 1),
+            Self::Module(m) => m.print_syntax(f, depth + 1),
             Self::Function(func) => func.print_syntax(f, depth + 1),
-            Self::Init(mi) => mi.print_syntax(f, depth + 1),
+            Self::Init(i) => i.print_syntax(f, depth + 1),
 
             Self::Use(u) => u.print_syntax(f, depth + 1),
             Self::Return(r) => r.print_syntax(f, depth + 1),

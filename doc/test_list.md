@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**66** tests from markdown.
+**67** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -38,6 +38,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/parts/.test/property_torus.png)](../doc/parts/.test/property_torus.log) | [property_torus](../doc/parts/property.md) |
 | [![test](../doc/parts/.test/property_torus_fail.png)](../doc/parts/.test/property_torus_fail.log) | [property_torus_fail](../doc/parts/property.md) |
 | [![test](../doc/types/.test/quantity_types_number_literals.png)](../doc/types/.test/quantity_types_number_literals.log) | [quantity_types_number_literals](../doc/types/quantity.md) |
+| [![test](../doc/parts/.test/sketch_basic.png)](../doc/parts/.test/sketch_basic.log) | [sketch_basic](../doc/parts/sketch.md) |
 | [![test](../doc/types/.test/tuple_fields_A.png)](../doc/types/.test/tuple_fields_A.log) | [tuple_fields_A](../doc/types/tuple.md) |
 | [![test](../doc/types/.test/tuple_fields_B.png)](../doc/types/.test/tuple_fields_B.log) | [tuple_fields_B](../doc/types/tuple.md) |
 | [![test](../doc/types/.test/tuple_fields_C.png)](../doc/types/.test/tuple_fields_C.log) | [tuple_fields_C](../doc/types/tuple.md) |

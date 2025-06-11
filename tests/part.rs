@@ -41,7 +41,7 @@ fn part_implicit_init_call() {
 
     // Get part definition for symbol `a`
     let definition = match &node.borrow().def {
-        SymbolDefinition::Part(definition) => definition.clone(),
+        SymbolDefinition::Workbench(definition) => definition.clone(),
         _ => panic!("Symbol is not a part"),
     };
 
@@ -97,7 +97,7 @@ fn part_explicit_init_call() {
 
     // Get part definition for symbol `a`
     let definition = match &node.borrow().def {
-        SymbolDefinition::Part(definition) => definition.clone(),
+        SymbolDefinition::Workbench(definition) => definition.clone(),
         _ => panic!("Symbol is not a part"),
     };
 

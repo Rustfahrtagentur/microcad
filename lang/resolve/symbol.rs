@@ -293,7 +293,7 @@ impl SrcReferrer for SymbolInner {
             SymbolDefinition::Module(module) | SymbolDefinition::External(module) => {
                 module.src_ref()
             }
-            SymbolDefinition::Part(part) => part.src_ref(),
+            SymbolDefinition::Workbench(workbench) => workbench.src_ref(),
             SymbolDefinition::Function(function) => function.src_ref(),
             SymbolDefinition::Builtin(_) => {
                 unreachable!("builtin has no source code reference")

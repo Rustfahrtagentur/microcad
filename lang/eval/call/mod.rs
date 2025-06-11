@@ -66,7 +66,7 @@ impl Eval for Call {
             },
             |context| match &symbol.borrow().def {
                 SymbolDefinition::Builtin(f) => f.call(&args, context),
-                SymbolDefinition::Part(m) => Ok(Value::Nodes(m.call(&args, context)?)),
+                SymbolDefinition::Workbench(w) => Ok(Value::Nodes(w.call(&args, context)?)),
                 SymbolDefinition::Function(f) => f.call(&args, context),
                 _ => {
                     context.error(
