@@ -1,6 +1,9 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+/// Struct with source file test, given as a filename
+///
+/// A test with a filename ending with `_fail.µcad` is supposed to fail.
 #[cfg(test)]
 pub(crate) struct SourceFileTest {
     filename: std::path::PathBuf,
@@ -47,9 +50,20 @@ impl SourceFileTest {
 
         self.write_and_compare(context.diagnosis(), "log");
 
-        if context.has_errors() {
-            panic!("Error evaluating");
+        match (context.has_errors(), self.is_failing()) {
+            (true, false) => panic!("Error evaluating"),
+            (true, true) => log::trace!("This test is supposed to fail."),
+            (false, true) => panic!("This test is supposed to fail but no errors occured"),
+            (false, false) => log::trace!("This test is ok"),
         }
+    }
+
+    /// A test is failing if the filename ends with `_fail.µcad`
+    fn is_failing(&self) -> bool {
+        self.filename
+            .to_str()
+            .expect("Valid path")
+            .ends_with("_fail.µcad")
     }
 
     /// Write the content of a `Display` to a file.
