@@ -8,6 +8,7 @@ impl Parse for WorkbenchKind {
         match pair.as_str() {
             "part" => Ok(Self::Part),
             "sketch" => Ok(Self::Sketch),
+            "op" => Ok(Self::Operation),
             _ => Err(ParseError::UnexpectedToken),
         }
     }

@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**67** tests from markdown.
+**68** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -31,6 +31,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/std/math/.test/math_trigonometric.png)](../doc/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/std/math/README.md) |
 | [![test](../doc/.test/module_example.png)](../doc/.test/module_example.log) | [module_example](../doc/modules.md) |
 | [![test](../doc/.test/no_use_statement.png)](../doc/.test/no_use_statement.log) | [no_use_statement](../doc/use_statement.md) |
+| [![test](../doc/parts/.test/op_basic.png)](../doc/parts/.test/op_basic.log) | [op_basic](../doc/parts/op.md) |
 | [![test](../doc/parts/.test/parameter_list.png)](../doc/parts/.test/parameter_list.log) | [parameter_list](../doc/parts/parameter_list.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_A.png)](../doc/.test/parameter_multiplicity_example_A.log) | [parameter_multiplicity_example_A](../doc/parameter_multiplicity.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_B.png)](../doc/.test/parameter_multiplicity_example_B.log) | [parameter_multiplicity_example_B](../doc/parameter_multiplicity.md) |

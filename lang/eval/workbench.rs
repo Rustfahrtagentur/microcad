@@ -3,7 +3,7 @@
 
 //! Workbench definition syntax element evaluation
 
-use crate::{eval::*, model_tree::*, rc::*, syntax::*};
+use crate::{eval::*, model_tree::*, syntax::*};
 
 impl WorkbenchDefinition {
     /// Find a matching initializer for call argument list
@@ -19,13 +19,6 @@ impl WorkbenchDefinition {
                 None
             }
         })
-    }
-
-    /// Resolve into SymbolNode.
-    pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
-        let node = Symbol::new(SymbolDefinition::Workbench(self.clone()), parent);
-        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
-        node
     }
 
     /// Try to evaluate a single call into a [`ModelNode`].

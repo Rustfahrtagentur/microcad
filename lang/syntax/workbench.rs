@@ -3,7 +3,7 @@
 
 //! Workbench definition syntax element
 
-use crate::{rc::*, src_ref::*, syntax::*};
+use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 use custom_debug::Debug;
 
 /// Kind of a [Workbench]
@@ -13,6 +13,8 @@ pub enum WorkbenchKind {
     Part,
     /// 2D sketch
     Sketch,
+    /// Operation
+    Operation,
 }
 
 impl WorkbenchKind {
@@ -21,6 +23,7 @@ impl WorkbenchKind {
         match self {
             WorkbenchKind::Part => "part",
             WorkbenchKind::Sketch => "sketch",
+            WorkbenchKind::Operation => "op",
         }
     }
 }
@@ -67,6 +70,13 @@ impl WorkbenchDefinition {
             src_ref,
         }
         .into()
+    }
+
+    /// Resolve into SymbolNode.
+    pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
+        let node = Symbol::new(SymbolDefinition::Workbench(self.clone()), parent);
+        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
+        node
     }
 }
 

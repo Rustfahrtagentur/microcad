@@ -43,7 +43,7 @@ multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
 identifier_part = { alpha | "_" }
 identifier_body = { (alpha | "_") ~ (alpha | digit | "_")* }
-keywords = {"mod" | "part" | "sketch" | "fn" | "if" | "else" | "use" | "return"}
+keywords = {"mod" | "part" | "sketch" | "op" | "fn" | "if" | "else" | "use" | "return"}
 
 //`a`: ok
 //`a1`: ok
@@ -405,7 +405,7 @@ if_statement = { "if" ~ ws* ~ expression ~ ws* ~ body ~ ws* ~ ("else" ~ ws* ~ bo
 
 body_else = { body }
 
-workbench_kind = { "sketch" | "part" }
+workbench_kind = { "sketch" | "part" | "op" }
 
 //`part foo() { }`: ok # Part with no properties
 //`part foo(a: scalar) { }`: ok # Part with properties
@@ -417,6 +417,7 @@ workbench_kind = { "sketch" | "part" }
 //`part foo() { fn bar(a: Scalar) -> Scalar { a } }`: ok # Part with function
 //`part donut(radius) { }`: error # Part property must have type annotations
 //`sketch foo() { }`: ok # Sketch with no properties
+//`op foo() { }`: ok # Sketch with no properties
 workbench_definition = { (attribute_list ~ ws+)? ~ workbench_kind ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
 //`{ translate() rotate(); }`: ok
