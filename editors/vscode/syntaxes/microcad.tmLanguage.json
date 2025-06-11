@@ -31,6 +31,10 @@
             "name": "variable.other.microcad"
         },
         {
+            "match": "\\b([A-Z_][A-Z0-9_]*)\\b",
+            "name": "constant.other.caps.microcad"
+        },
+        {
             "match": "\"[^\"]*\"",
             "name": "string.quoted.single.microcad"
         },
