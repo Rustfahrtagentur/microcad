@@ -14,7 +14,7 @@ impl BuiltinPartDefinition for Rotate {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
-        Ok(ModelNode::new_transformation(
+        Ok(ModelNode::new_operation(
             AffineTransform::RotationAroundAxis(
                 cgmath::Rad(args.get_value::<Scalar>(&Identifier::no_ref("angle"))),
                 Vec3::new(

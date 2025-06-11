@@ -67,7 +67,8 @@ impl ArgumentMap {
             output.push_str(&format!("{}: {} = {}", k, v.ty(), v));
 
             if output.len() > max_length && max_length > 0 {
-                output = output.chars().take(32).collect::<String>();
+                output = output.chars().take(max_length).collect::<String>();
+                output += "...";
                 break;
             }
         }

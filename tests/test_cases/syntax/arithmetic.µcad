@@ -1,4 +1,4 @@
-use __builtin::debug::*;
+use __builtin::*;
 
 // Integer + Scalar Arithmetic
 a = 2.0;
@@ -10,11 +10,11 @@ assert(c == 1.0);
 
 // Length arithmetic
 a = 2.0mm;
-assert([a, 2mm, 2.0mm].equal());
+assert([a, 2mm, 2.0mm].all_equal());
 b = 2 * a;
-assert([b, 4mm, 4.0mm].equal());
+assert([b, 4mm, 4.0mm].all_equal());
 c = a / 2;
-assert([c, 1mm, 1.0mm].equal());
+assert([c, 1mm, 1.0mm].all_equal());
 
 // List arithmetic
 a = [1, 2, 3];

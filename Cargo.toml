@@ -7,7 +7,6 @@ default-members = [
     "core",
     "lang",
     "tests",
-    "builtin-proc-macro",
     "tools/cli",
     "tools/update-copyright",
 ]
@@ -17,7 +16,6 @@ members = [
     "core",
     "lang",
     "tests",
-    "builtin-proc-macro",
     "tools/cli",
     "tools/update-copyright",
 ]
@@ -45,4 +43,3 @@ microcad-core = { path = "core", version = "0.1.0" }
 microcad-export = { path = "export", version = "0.1.0" }
 microcad-lang = { path = "lang", version = "0.1.0" }
 microcad-builtin = { path = "builtin", version = "0.1.0" }
-microcad-builtin-proc-macro = { path = "builtin-proc-macro", version = "0.1.0" }

@@ -38,8 +38,12 @@ impl TestGenerator {
         "#,
         );
 
+        code += "mod source_file {";
+
         // read all *Markdown files and write result into `code`
         self.scan(&mut code, self.root_path.as_ref(), "µcad")?;
+
+        code += "}";
 
         // reformat code and write into file
         match rustfmt_wrapper::rustfmt(code) {

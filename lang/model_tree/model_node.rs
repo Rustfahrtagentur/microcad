@@ -3,15 +3,7 @@
 
 //! Model node
 
-use crate::{
-    eval::ArgumentMap,
-    model_tree::*,
-    rc::*,
-    resolve::{FullyQualify, Symbol},
-    src_ref::*,
-    syntax::*,
-    value::*,
-};
+use crate::{eval::*, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -155,14 +147,8 @@ impl ModelNode {
     }
 
     /// Return an transformation node.
-    pub fn new_transformation<T: Transformer + 'static>(
-        transformation: T,
-        src_ref: SrcRef,
-    ) -> Self {
-        Self::new_element(Refer::new(
-            Element::Transformer(std::rc::Rc::new(transformation)),
-            src_ref,
-        ))
+    pub fn new_operation<T: Operation + 'static>(operation: T, src_ref: SrcRef) -> Self {
+        Self::new_element(Refer::new(Element::Operation(Rc::new(operation)), src_ref))
     }
 
     /// Return id of this object node.
@@ -285,11 +271,10 @@ impl ModelNode {
     /// Short cut to generate boolean operator as binary operation with two nodes.
     pub fn binary_op(self, op: BooleanOp, other: ModelNode) -> ModelNode {
         assert!(self != other, "lhs and rhs must be distinct.");
-        ModelNode::new_transformation(op, SrcRef(None))
-            .append_children(vec![self.clone(), other].into())
+        ModelNode::new_operation(op, SrcRef(None)).append_children(vec![self.clone(), other].into())
     }
 
-    /// Find children node placeholder in node descendants
+    /// Find children node placeholder in node descendants.
     pub fn find_children_placeholder(&self) -> Option<ModelNode> {
         self.descendants().find(|n| {
             n.id().is_none() && matches!(n.0.borrow().element.value, Element::ChildrenPlaceholder)
@@ -388,7 +373,8 @@ impl PartialEq for ModelNode {
 ///
 /// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
 /// The examplary output will look like this:
-/// ```
+///
+/// ```custom
 /// id: Object:
 ///     Object = std::geo2d::circle(radius = 3.0mm) -> Geometry2D:
 ///         Primitive = __builtin::geo2d::circle(radius = 3.0) -> Geometry2D`

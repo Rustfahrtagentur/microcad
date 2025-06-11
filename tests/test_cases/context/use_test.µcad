@@ -1,5 +1,5 @@
 // use debug from `std/module.µcad`
-use std::debug;
+use std::debug::assert;
 assert(true);
 
 // use all symbols from std::debug for test checks
@@ -33,4 +33,4 @@ part my_part() {
     sphere(radius=1);
 }
 
-assert_valid(my_module);
+assert_valid(my_part);

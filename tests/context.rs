@@ -1,26 +1,25 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::eval::*;
-
 #[test]
-fn use_statements() {
-    let mut context = Context::from_source(
-        "test_cases/context/use_test.µcad",
-        microcad_builtin::builtin_module(),
-        &["../lib".into()],
-    )
-    .expect("context");
-    context.eval().expect("successful evaluation");
-}
+fn context_with_symbols() {
+    use microcad_lang::eval::Lookup;
+    let mut context = crate::context_for_file("syntax/call.µcad");
 
-#[test]
-fn locals() {
-    let mut context = Context::from_source(
-        "test_cases/context/locals.µcad",
-        microcad_builtin::builtin_module(),
-        &["../lib".into()],
-    )
-    .expect("context");
-    context.eval().expect("successful evaluation");
+    context
+        .lookup(
+            &"__builtin::assert_valid"
+                .try_into()
+                .expect("unexpected name error"),
+        )
+        .expect("symbol not found");
+    context
+        .lookup(
+            &"__builtin::assert_invalid"
+                .try_into()
+                .expect("unexpected name error"),
+        )
+        .expect("symbol not found");
+
+    assert!(context.eval().is_ok());
 }

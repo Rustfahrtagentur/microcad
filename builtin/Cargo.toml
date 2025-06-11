@@ -25,7 +25,6 @@ ctor = "0.4"
 microcad-core = { workspace = true }
 microcad-lang = { workspace = true }
 #microcad-export = { workspace = true }
-microcad-builtin-proc-macro = { workspace = true }
 
 [features]
 default = ["geo3d"]
