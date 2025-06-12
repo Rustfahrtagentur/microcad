@@ -153,16 +153,21 @@ type_annotation = _{ ":" ~ ws* ~ type }
 //`[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
 list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 
-//`(Length,scalar)`: ok # 2 unnamed fields
-//`(Length, a: Length)`: error # Cannot mix named and unnamed arguments
-unnamed_tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ","? ~ ws* ~ ")" }
-
 //`(a: Length, b: scalar)`: ok
 //`(a: Length, )`: ok # Trailing comma
 named_tuple_type = { "(" ~ ws* ~ named_tuple_type_element ~ (ws* ~ "," ~ ws* ~ named_tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
 //`a: Length`: ok
 named_tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
+
+//`(Length,scalar)`: ok # 2 unnamed fields
+//`(Length, a: Length)`: error # Cannot mix named and unnamed arguments
+unnamed_tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ","? ~ ws* ~ ")" }
+
+//`Matrix4x3`: ok
+//`Matrix3`: ok
+matrix_type = { "Matrix" ~ int ~ ("x" ~ int)? }
+
 
 //`[1, 2, 3]`: ok
 //`[1, 2, 3,]`: error # Trailing comma
