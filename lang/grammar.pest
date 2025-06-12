@@ -137,7 +137,7 @@ qualified_name = { identifier ~ ("::" ~ identifier)* }
 type = {
   list_type |
   named_tuple_type |
-  unnamed_tuple_type |
+  tuple_type |
   matrix_type |
   qualified_name |
   unit
@@ -163,7 +163,7 @@ named_tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
 
 //`(Length,scalar)`: ok # 2 unnamed fields
 //`(Length, a: Length)`: error # Cannot mix named and unnamed arguments
-unnamed_tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ","? ~ ws* ~ ")" }
+tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
 //`Matrix4x3`: ok
 //`Matrix3`: ok

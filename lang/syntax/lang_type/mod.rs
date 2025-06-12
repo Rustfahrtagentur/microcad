@@ -6,11 +6,11 @@
 mod list_type;
 mod matrix_type;
 mod named_tuple_type;
+mod tuple_type;
 mod type_list;
-mod unnamed_tuple_type;
 
 pub use list_type::*;
 pub use matrix_type::*;
 pub use named_tuple_type::*;
+pub use tuple_type::*;
 pub use type_list::*;
-pub use unnamed_tuple_type::*;

@@ -74,7 +74,7 @@ impl CallMethod for Value {
             Value::Color(_) => todo!(),
             Value::List(list) => list.call_method(id, args, context),
             Value::NamedTuple(_) => todo!(),
-            Value::UnnamedTuple(_) => todo!(),
+            Value::Tuple(_) => todo!(),
             Value::Nodes(_) => todo!(),
         }
     }

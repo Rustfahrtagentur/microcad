@@ -36,7 +36,7 @@ impl Eval for TupleExpression {
                     .collect(),
             );
 
-            Ok(Value::UnnamedTuple(UnnamedTuple::new(values)))
+            Ok(Value::Tuple(Tuple::new(values)))
         }
     }
 }
