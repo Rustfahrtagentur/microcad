@@ -34,8 +34,6 @@ pub enum Type {
     Bool,
     /// A list of elements of the same type: `[scalar]`
     List(ListType),
-    /// A map of elements: `[string => scalar]`
-    Map(MapType),
     /// An unnamed tuple of elements: `(scalar, string)`
     UnnamedTuple(UnnamedTupleType),
     /// A named tuple of elements: `(x: scalar, y: string)`
@@ -87,10 +85,9 @@ impl std::fmt::Display for Type {
             Self::Density => write!(f, "Density"),
             Self::Bool => write!(f, "Bool"),
             Self::List(t) => write!(f, "{}", t),
-            Self::Map(t) => write!(f, "{}", t),
             Self::UnnamedTuple(t) => write!(f, "{}", t),
             Self::NamedTuple(t) => write!(f, "{}", t),
-            Self::Custom(qn) => write!(f, "{}", qn),
+            Self::Custom(n) => write!(f, "Custom({})", n),
             Self::Nodes => write!(f, "Nodes"),
         }
     }

@@ -132,13 +132,11 @@ qualified_name = { identifier ~ ("::" ~ identifier)* }
 //`int`: ok
 //`a::nested::typename`: ok
 //`[scalar]`: ok # List type
-//`[scalar => scalar]`: ok # Map type
 //`(scalar, scalar)`: Unnamed tuple type
 //`(a: scalar, b: scalar)`: Named tuple type
 type = {
   qualified_name |
   list_type |
-  map_type |
   named_tuple_type |
   unnamed_tuple_type |
   unit
@@ -154,10 +152,6 @@ type_annotation = _{ ":" ~ ws* ~ type }
 //`[scalar]`: ok list with elements of type `scalar`
 //`[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
 list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
-
-// Associative list, behaves like a map
-//`[Length => string]`: maps a Length to a string
-map_type = { "[" ~ ws* ~ type ~ ws* ~ "=>" ~ ws* ~ type ~ ws* ~ "]" }
 
 //`(Length,scalar)`: ok # 2 unnamed fields
 //`(Length, a: Length)`: error # Cannot mix named and unnamed arguments
