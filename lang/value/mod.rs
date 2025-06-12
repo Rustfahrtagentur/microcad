@@ -9,12 +9,13 @@
 mod list;
 mod named_tuple;
 
-#[macro_use]
+mod matrix;
 mod tuple;
 mod value_error;
 mod value_list;
 
 pub use list::*;
+pub use matrix::*;
 pub use named_tuple::*;
 pub use tuple::*;
 pub use value_error::*;
@@ -60,6 +61,8 @@ pub enum Value {
     NamedTuple(NamedTuple),
     /// A tuple of unnamed items.
     Tuple(Tuple),
+    /// A matrix.
+    Matrix(Box<Matrix>),
     /// A node in the render tree.
     Nodes(ModelNodes),
 }
@@ -222,6 +225,7 @@ impl crate::ty::Ty for Value {
             Value::List(list) => list.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::Tuple(unnamed_tuple) => unnamed_tuple.ty(),
+            Value::Matrix(matrix) => matrix.ty(),
             Value::Nodes(_) => Type::Nodes,
         }
     }
@@ -419,6 +423,7 @@ impl std::fmt::Display for Value {
             Value::List(l) => write!(f, "{l}"),
             Value::NamedTuple(t) => write!(f, "{t}"),
             Value::Tuple(t) => write!(f, "{t}"),
+            Value::Matrix(m) => write!(f, "{m}"),
             Value::Nodes(n) => n.dump(f),
         }
     }
@@ -442,6 +447,7 @@ impl std::fmt::Debug for Value {
             Self::List(arg0) => write!(f, "List: {arg0}"),
             Self::NamedTuple(arg0) => write!(f, "NamedTuple: {arg0}"),
             Self::Tuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
+            Self::Matrix(arg0) => write!(f, "Matrix: {arg0}"),
             Self::Nodes(arg0) => write!(f, "Nodes:\n {arg0}"),
         }
     }

@@ -12,6 +12,13 @@ pub struct MatrixType {
     pub columns: usize,
 }
 
+impl MatrixType {
+    /// Create new matrix type with rows and columns
+    pub fn new(rows: usize, columns: usize) -> Self {
+        Self { rows, columns }
+    }
+}
+
 impl std::fmt::Display for MatrixType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Matrix{}x{}", self.rows, self.columns)

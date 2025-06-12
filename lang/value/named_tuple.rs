@@ -5,15 +5,6 @@
 
 use crate::{ty::*, value::*};
 
-/// Short cut to create a NamedTuple
-#[cfg(test)]
-#[macro_export]
-macro_rules! named_tuple {
-    ($($name:ident: $ty:ident = $value:expr),*) => {
-        NamedTuple::from_vec(vec![$((stringify!($name).into(), Value::$ty($value)),)*])
-    };
-}
-
 /// Tuple with named values
 #[derive(Clone, Debug, PartialEq)]
 pub struct NamedTuple(std::collections::BTreeMap<Identifier, Value>);

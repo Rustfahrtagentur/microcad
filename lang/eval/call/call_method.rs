@@ -75,6 +75,7 @@ impl CallMethod for Value {
             Value::List(list) => list.call_method(id, args, context),
             Value::NamedTuple(_) => todo!(),
             Value::Tuple(_) => todo!(),
+            Value::Matrix(_) => todo!(),
             Value::Nodes(_) => todo!(),
         }
     }
