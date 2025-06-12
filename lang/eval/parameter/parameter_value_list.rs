@@ -91,6 +91,12 @@ impl From<Vec<ParameterValue>> for ParameterValueList {
     }
 }
 
+impl<'a> From<&'a [ParameterValue]> for ParameterValueList {
+    fn from(value: &'a [ParameterValue]) -> Self {
+        Self::new(value.into())
+    }
+}
+
 impl std::fmt::Display for ParameterValueList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(

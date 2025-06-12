@@ -5,35 +5,44 @@ use std::str::FromStr;
 
 #[cfg(test)]
 use crate::builtin_module;
-use microcad_lang::{diag::*, eval::*, resolve::*, syntax::*, value::*};
+use microcad_lang::{diag::*, eval::*, parameter_value, resolve::*, syntax::*, value::*};
 
 pub fn assert() -> Symbol {
     let id = Identifier::no_ref("assert");
-    Symbol::new_builtin(id, None, &|_params, args, context| {
-        match args.len() {
-            // assert(false)
-            1 => {
-                if let Ok(arg) = args.get_single() {
-                    if !arg.value.try_bool()? {
-                        context.error(arg, EvalError::AssertionFailed(format!("{arg}")))?;
+    Symbol::new_builtin(
+        id,
+        Some(
+            vec![
+                parameter_value!(x),                               // Parameter with any type
+                parameter_value!(message: String = String::new()), // Optional message
+            ]
+            .into(),
+        ),
+        &|params, args, context| {
+            match ArgumentMap::find_match(args, params.expect("ParameterList")) {
+                Ok(arg_map) => {
+                    if !arg_map[&Identifier::no_ref("x")].try_bool()? {
+                        let message = arg_map[&Identifier::no_ref("message")].try_string()?;
+                        let arg = args.first().expect("At least one argument");
+                        context.error(
+                            arg,
+                            EvalError::AssertionFailed(if message.is_empty() {
+                                format!("{arg}")
+                            } else {
+                                format!("{arg}: {message}")
+                            }),
+                        )?;
                     }
                 }
-            }
-            // assert(false, "A message that is shown when assertion failed")
-            2 => {
-                let (assertion, message) = (&args[0], &args[1].value);
-                if !assertion.value.try_bool()? {
-                    context.error(
-                        args,
-                        EvalError::AssertionFailed(format!("{assertion}: {message}")),
-                    )?;
+                Err(err) => {
+                    // Called `assert` with no or more than 2 parameters
+                    context.error(args, err)?
                 }
             }
-            // Called `assert` with no or more than 2 parameters
-            _ => context.error(args, EvalError::AssertWrongSignature(args.clone()))?,
-        }
-        Ok(Value::None)
-    })
+
+            Ok(Value::None)
+        },
+    )
 }
 
 pub fn assert_valid() -> Symbol {

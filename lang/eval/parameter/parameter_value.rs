@@ -94,31 +94,36 @@ impl SrcReferrer for ParameterValue {
 #[macro_export]
 macro_rules! parameter_value {
     ($id:ident) => {
-        $crate::value::ParameterValue {
-            name: $crate::syntax::Identifier::no_ref(stringify!($id)),
-            specified_type: None,
-            default_value: None,
-            SrcRef(None),
-        }
+        $crate::eval::ParameterValue::new(
+            $crate::syntax::Identifier::no_ref(stringify!($id)),
+            None,
+            None,
+            $crate::src_ref::SrcRef(None),
+        )
     };
     ($id:ident: $ty:ident) => {
         $crate::eval::ParameterValue::new(
             $crate::syntax::Identifier::no_ref(stringify!($id)),
             Some($crate::ty::Type::$ty),
             None,
-            SrcRef(None),
+            $crate::src_ref::SrcRef(None),
         )
     };
     ($id:ident: $ty:ident = $value:expr) => {
-        $crate::eval::parameter::ParameterValue::new(
+        $crate::eval::ParameterValue::new(
             $crate::syntax::Identifier::no_ref(stringify!($id)),
             Some($crate::ty::Type::$ty),
             Some($crate::value::Value::$ty($value)),
-            SrcRef(None),
+            $crate::src_ref::SrcRef(None),
         )
     };
     ($id:ident = $value:expr) => {
-        value::ParameterValue::new($crate::syntax::Identifier::no_ref(stringify!($id)), None, Some($value), SrcRef(None))
+        value::ParameterValue::new(
+            $crate::syntax::Identifier::no_ref(stringify!($id)),
+            None,
+            Some($value),
+            SrcRef(None),
+        )
     };
     () => {};
 }
