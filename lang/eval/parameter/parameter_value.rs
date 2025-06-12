@@ -91,35 +91,34 @@ impl SrcReferrer for ParameterValue {
 }
 
 /// Shortcut to create a `ParameterValue`
-#[cfg(test)]
 #[macro_export]
 macro_rules! parameter_value {
     ($id:ident) => {
         $crate::value::ParameterValue {
-            name: stringify!($id).into(),
+            name: $crate::syntax::Identifier::no_ref(stringify!($id)),
             specified_type: None,
             default_value: None,
             SrcRef(None),
         }
     };
     ($id:ident: $ty:ident) => {
-        $crate::eval::parameter::ParameterValue::new(
-            stringify!($id).into(),
-            Some(Type::$ty),
+        $crate::eval::ParameterValue::new(
+            $crate::syntax::Identifier::no_ref(stringify!($id)),
+            Some($crate::ty::Type::$ty),
             None,
             SrcRef(None),
         )
     };
     ($id:ident: $ty:ident = $value:expr) => {
         $crate::eval::parameter::ParameterValue::new(
-            stringify!($id).into(),
-            Some(Type::$ty),
+            $crate::syntax::Identifier::no_ref(stringify!($id)),
+            Some($crate::ty::Type::$ty),
             Some($crate::value::Value::$ty($value)),
             SrcRef(None),
         )
     };
     ($id:ident = $value:expr) => {
-        value::ParameterValue::new(stringify!($id).into(), None, Some($value), SrcRef(None))
+        value::ParameterValue::new($crate::syntax::Identifier::no_ref(stringify!($id)), None, Some($value), SrcRef(None))
     };
     () => {};
 }

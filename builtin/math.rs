@@ -7,7 +7,7 @@ use microcad_lang::{diag::*, eval::*, resolve::*, syntax::*, ty::*, value::*};
 /// Absolute value abs(x)
 fn abs() -> Symbol {
     let id = Identifier::no_ref("abs");
-    Symbol::new_builtin(id, &|args, ctx| {
+    Symbol::new_builtin(id, None, &|_params, args, ctx| {
         let arg = args.get_single()?;
         Ok(match &arg.value {
             Value::Integer(i) => Value::Integer(i.abs()),

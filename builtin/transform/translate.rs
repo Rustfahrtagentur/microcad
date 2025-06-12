@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, src_ref::*, syntax::*, ty::*};
+use microcad_lang::{eval::*, model_tree::*, parameter_value, src_ref::*, syntax::*};
 
 /// Builtin definition for a 2D circle
 #[derive(Debug)]
@@ -24,15 +24,13 @@ impl BuiltinPartDefinition for Translate {
         ))
     }
 
-    fn parameters() -> ParameterList {
-        ParameterList::new(
-            vec![
-                Parameter::no_ref("x", Type::Scalar),
-                Parameter::no_ref("y", Type::Scalar),
-                Parameter::no_ref("z", Type::Scalar),
-            ]
-            .into(),
-        )
+    fn parameters() -> ParameterValueList {
+        vec![
+            parameter_value!(x: Scalar),
+            parameter_value!(y: Scalar),
+            parameter_value!(z: Scalar),
+        ]
+        .into()
     }
 }
 

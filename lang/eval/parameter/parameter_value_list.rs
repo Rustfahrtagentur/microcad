@@ -18,7 +18,6 @@ pub struct ParameterValueList {
 
 impl ParameterValueList {
     /// Create new ParameterValueList
-    #[cfg(test)]
     pub fn new(parameters: Vec<ParameterValue>) -> Self {
         let mut by_id = std::collections::BTreeMap::new();
         for (i, parameter) in parameters.iter().enumerate() {
@@ -83,6 +82,12 @@ impl std::ops::Deref for ParameterValueList {
 
     fn deref(&self) -> &Self::Target {
         &self.parameters
+    }
+}
+
+impl From<Vec<ParameterValue>> for ParameterValueList {
+    fn from(parameters: Vec<ParameterValue>) -> Self {
+        Self::new(parameters)
     }
 }
 

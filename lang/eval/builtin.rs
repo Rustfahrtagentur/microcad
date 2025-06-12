@@ -6,13 +6,18 @@
 use crate::{eval::*, model_tree::*, syntax::*};
 
 /// Builtin function type
-pub type BuiltinFn = dyn Fn(&CallArgumentValueList, &mut Context) -> EvalResult<Value>;
+pub type BuiltinFn =
+    dyn Fn(Option<&ParameterValueList>, &CallArgumentValueList, &mut Context) -> EvalResult<Value>;
 
 /// Builtin function struct
 #[derive(Clone)]
 pub struct Builtin {
     /// Name of the builtin function
     pub id: Identifier,
+
+    /// Optional parameter value list to check the builtin signature.
+    pub parameters: Option<ParameterValueList>,
+
     /// Functor to evaluate this function
     pub f: &'static BuiltinFn,
 }
@@ -36,7 +41,7 @@ impl CallTrait for Builtin {
     /// - `args`: Function arguments
     /// - `context`: Execution context
     fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<Value> {
-        (self.f)(args, context)
+        (self.f)(self.parameters.as_ref(), args, context)
     }
 }
 
@@ -48,23 +53,28 @@ pub trait BuiltinPartDefinition {
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode>;
     /// Part function
     fn function() -> &'static BuiltinFn {
-        &|args, context| {
+        &|params, args, _| {
             Ok(Value::Nodes(
-                args.get_multi_matching_arguments(context, &Self::parameters())?
-                    .combinations()
-                    .map(|args| {
-                        Self::node(&args).map(|node| node.set_original_arguments(args.clone()))
-                    })
-                    .collect::<Result<ModelNodes, _>>()?,
+                MultiArgumentMap::find_match(
+                    args,
+                    params.expect("A built-in part must have a parameter list"),
+                )?
+                .combinations()
+                .map(|args| Self::node(&args).map(|node| node.set_original_arguments(args.clone())))
+                .collect::<Result<ModelNodes, _>>()?,
             ))
         }
     }
 
     /// Part initialization parameters
-    fn parameters() -> ParameterList;
+    fn parameters() -> ParameterValueList;
 
     /// Create builtin symbol
     fn symbol() -> Symbol {
-        Symbol::new_builtin(Identifier::no_ref(Self::id()), Self::function())
+        Symbol::new_builtin(
+            Identifier::no_ref(Self::id()),
+            Some(Self::parameters()),
+            Self::function(),
+        )
     }
 }

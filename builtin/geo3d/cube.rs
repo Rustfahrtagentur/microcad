@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, rc::*, src_ref::*, syntax::*, ty::Type};
+use microcad_lang::{eval::*, model_tree::*, parameter_value, rc::*, src_ref::*, syntax::*};
 
 /// The builtin cube primitive, defined by its size in the x, y, and z dimensions.
 #[derive(Debug)]
@@ -30,15 +30,13 @@ impl BuiltinPartDefinition for Cube {
         ))))
     }
 
-    fn parameters() -> ParameterList {
-        ParameterList::new(
-            vec![
-                Parameter::no_ref("size_x", Type::Scalar),
-                Parameter::no_ref("size_y", Type::Scalar),
-                Parameter::no_ref("size_z", Type::Scalar),
-            ]
-            .into(),
-        )
+    fn parameters() -> ParameterValueList {
+        vec![
+            parameter_value!(size_x: Scalar),
+            parameter_value!(size_y: Scalar),
+            parameter_value!(size_z: Scalar),
+        ]
+        .into()
     }
 }
 
