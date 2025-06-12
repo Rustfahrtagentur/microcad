@@ -35,7 +35,7 @@ pub enum Type {
     /// A list of elements of the same type: `[Scalar]`
     List(ListType),
     /// An unnamed tuple of elements: `(Scalar, String)`
-    UnnamedTuple(UnnamedTupleType),
+    Tuple(TupleType),
     /// A named tuple of elements: `(x: Scalar, y: String)`
     NamedTuple(NamedTupleType),
     /// Matrix type
@@ -86,12 +86,12 @@ impl std::fmt::Display for Type {
             Self::Weight => write!(f, "Weight"),
             Self::Density => write!(f, "Density"),
             Self::Bool => write!(f, "Bool"),
-            Self::List(t) => write!(f, "{}", t),
-            Self::UnnamedTuple(t) => write!(f, "{}", t),
-            Self::NamedTuple(t) => write!(f, "{}", t),
-            Self::Matrix(t) => write!(f, "{}", t),
+            Self::List(t) => write!(f, "{t}"),
+            Self::Tuple(t) => write!(f, "{t}"),
+            Self::NamedTuple(t) => write!(f, "{t}"),
+            Self::Matrix(t) => write!(f, "{t}"),
             Self::Nodes => write!(f, "Nodes"),
-            Self::Custom(n) => write!(f, "Custom({})", n),
+            Self::Custom(n) => write!(f, "Custom({n})"),
         }
     }
 }

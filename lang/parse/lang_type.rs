@@ -37,7 +37,7 @@ impl Parse for NamedTupleType {
     }
 }
 
-impl Parse for UnnamedTupleType {
+impl Parse for TupleType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let inner = pair.inner();
         let mut types = Vec::new();
@@ -101,6 +101,23 @@ fn unnamed_tuple_type() {
     assert_eq!(type_annotation.ty().to_string(), "(Integer, String)");
     assert_eq!(
         type_annotation.ty(),
-        Type::UnnamedTuple(UnnamedTupleType(vec![Type::Integer, Type::String]))
+        Type::Tuple(TupleType(vec![Type::Integer, Type::String]))
+    );
+}
+
+#[test]
+fn matrix_type() {
+    use crate::parser::*;
+    use crate::ty::Ty;
+
+    let type_annotation =
+        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "Matrix4x3", 0).expect("test error");
+    assert_eq!(type_annotation.ty().to_string(), "Matrix4x3");
+    assert_eq!(
+        type_annotation.ty(),
+        Type::Matrix(MatrixType {
+            rows: 4,
+            columns: 3,
+        })
     );
 }

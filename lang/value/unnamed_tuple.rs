@@ -61,9 +61,7 @@ impl std::fmt::Display for UnnamedTuple {
 
 impl crate::ty::Ty for UnnamedTuple {
     fn ty(&self) -> Type {
-        Type::UnnamedTuple(UnnamedTupleType(
-            self.0.iter().map(|v| v.ty().clone()).collect(),
-        ))
+        Type::Tuple(TupleType(self.0.iter().map(|v| v.ty().clone()).collect()))
     }
 }
 

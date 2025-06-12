@@ -135,10 +135,11 @@ qualified_name = { identifier ~ ("::" ~ identifier)* }
 //`(scalar, scalar)`: Unnamed tuple type
 //`(a: scalar, b: scalar)`: Named tuple type
 type = {
-  qualified_name |
   list_type |
   named_tuple_type |
   unnamed_tuple_type |
+  matrix_type |
+  qualified_name |
   unit
 }
 
