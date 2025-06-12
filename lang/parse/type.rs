@@ -18,8 +18,12 @@ impl Parse for TypeAnnotation {
                 Type::NamedTuple(NamedTupleType::parse(inner)?),
                 pair.into(),
             )),
+            Rule::matrix_type => Self(Refer::new(
+                Type::Matrix(MatrixType::parse(inner)?),
+                pair.into(),
+            )),
             Rule::qualified_name => match inner.as_str() {
-                "Int" => Self(Refer::new(Type::Integer, pair.into())),
+                "Integer" => Self(Refer::new(Type::Integer, pair.into())),
                 "Scalar" => Self(Refer::new(Type::Scalar, pair.into())),
                 "String" => Self(Refer::new(Type::String, pair.into())),
                 "Color" => Self(Refer::new(Type::Color, pair.into())),
@@ -44,9 +48,9 @@ fn named_tuple_type() {
     use crate::ty::Ty;
 
     let type_annotation =
-        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(x: Int, y: String)", 0)
+        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(x: Integer, y: String)", 0)
             .expect("test error");
-    assert_eq!(type_annotation.ty().to_string(), "(x: Int, y: String)");
+    assert_eq!(type_annotation.ty().to_string(), "(x: Integer, y: String)");
     assert_eq!(
         type_annotation.ty(),
         Type::NamedTuple(NamedTupleType(
