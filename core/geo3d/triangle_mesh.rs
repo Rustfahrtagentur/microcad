@@ -111,7 +111,7 @@ impl TriangleMesh {
     }
 
     /// Triangles iterator
-    pub fn triangles(&self) -> Triangles {
+    pub fn triangles(&'_ self) -> Triangles<'_> {
         Triangles {
             triangle_mesh: self,
             index: 0,

@@ -164,7 +164,7 @@ fn call_parameter_multiplicity() {
                 )
             })
             .collect::<Vec<_>>();
-        log::trace!("{:?}", items);
+        log::trace!("{items:?}");
         count += 1;
     }
 

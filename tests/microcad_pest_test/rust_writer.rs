@@ -30,7 +30,7 @@ impl<'a> RustWriter<'a> {
     /// Write code line
     pub fn writeln(&mut self, s: &str) -> Result<(), std::io::Error> {
         write!(self.w, "{}", "    ".repeat(self.indent))?;
-        writeln!(self.w, "{}", s)?;
+        writeln!(self.w, "{s}")?;
         Ok(())
     }
 
