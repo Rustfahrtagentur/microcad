@@ -35,7 +35,7 @@ i = 3;
 // access #1
 assert(i == 3);
 
-p = __builtin::math::pi;
+p = __builtin::math::PI;
 
 q = p > 3.;
 

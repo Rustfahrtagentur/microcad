@@ -44,7 +44,7 @@ Angles are used with rotations and in constrains when proving measures.
 [![test](.test/types_primitive_angle.png)](.test/types_primitive_angle.log)
 
 ```µcad,types_primitive_angle
-pi = std::math::pi;
+pi = std::math::PI;
 radian = 1rad * pi;
 degree = 180°;
 degree_ = 180deg;

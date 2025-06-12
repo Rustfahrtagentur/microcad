@@ -224,7 +224,7 @@ nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))
 //`-5.0mm`: ok # Negate
 //`(a+b)*(c-a)`: ok
 //`a + b + c`: ok
-//`math::pi`: ok # Singleton access with qualified name or module access
+//`math::PI`: ok # Singleton access with qualified name or module access
 //`! a`: ok # Unary operator with whitespace
 //`a-`: error # Unknown postfix operator `-`
 //`a[2]`: ok # List access
@@ -356,7 +356,7 @@ attribute_list = { attribute ~ (ws+ ~ attribute)* }
 //`r: Length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
 //`r: Length`: error # Default value is required
-//`r: Length = math::pi`: ok # Type specifier + Default value from constant
+//`r: Scalar = math::PI`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
 //`pub r = 5.0mm`: Make value of assignment public
 assignment = { (visibility ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
@@ -370,7 +370,7 @@ marker_statement = { "@" ~ identifier }
 //`r: Length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
 //`r: Length`: ok # Default value is NOT required
-//`r: Length = math::pi`: ok # Type specifier + Default value from constant
+//`r: Scalar = math::PI`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
 parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation  }
 
