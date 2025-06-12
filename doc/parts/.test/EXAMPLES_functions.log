@@ -1,4 +1,4 @@
-error: Value Error: Missing arguments: size
+error: Missing arguments: size
 
   ---> <from_str>:1:1
      |

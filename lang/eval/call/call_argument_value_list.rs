@@ -189,7 +189,7 @@ fn call_get_matching_arguments_missing() {
 
     let arg_map = ArgumentMap::find_match(&call_values, &param_values);
 
-    if let Err(EvalError::ValueError(ValueError::MissingArguments(missing))) = arg_map {
+    if let Err(EvalError::MissingArguments(missing)) = arg_map {
         assert_eq!(missing.len(), 1);
         assert_eq!(&missing[0].id, "bar");
     } else {

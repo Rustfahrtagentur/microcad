@@ -3,7 +3,7 @@
 
 //! Parameter value evaluation entity
 
-use crate::{src_ref::*, ty::*, value::*};
+use crate::{src_ref::*, syntax::*, ty::*, value::*};
 
 /// Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
@@ -103,7 +103,7 @@ macro_rules! parameter_value {
         }
     };
     ($id:ident: $ty:ident) => {
-        $crate::value::ParameterValue::new(
+        $crate::eval::parameter::ParameterValue::new(
             stringify!($id).into(),
             Some(Type::$ty),
             None,
@@ -111,7 +111,7 @@ macro_rules! parameter_value {
         )
     };
     ($id:ident: $ty:ident = $value:expr) => {
-        $crate::value::ParameterValue::new(
+        $crate::eval::parameter::ParameterValue::new(
             stringify!($id).into(),
             Some(Type::$ty),
             Some($crate::value::Value::$ty($value)),

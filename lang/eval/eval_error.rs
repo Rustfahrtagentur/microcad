@@ -168,6 +168,10 @@ pub enum EvalError {
     /// Error when evaluating attributes.
     #[error("Attribute error: {0}")]
     AttributeError(#[from] AttributeError),
+
+    /// Missing arguments
+    #[error("Missing arguments: {0}")]
+    MissingArguments(ParameterValueList),
 }
 
 /// Result type of any evaluation.
