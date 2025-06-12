@@ -30,6 +30,17 @@ impl std::ops::DerefMut for NamedTuple {
     }
 }
 
+impl From<Vec3> for NamedTuple {
+    fn from(value: Vec3) -> Self {
+        NamedTuple::new(
+            [("x", value.x), ("y", value.y), ("z", value.z)]
+                .iter()
+                .map(|(k, v)| (Identifier::no_ref(k), Value::Scalar(*v)))
+                .collect(),
+        )
+    }
+}
+
 impl std::fmt::Display for NamedTuple {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(

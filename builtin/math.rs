@@ -1,8 +1,8 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use microcad_core::Vec3;
 use microcad_lang::{diag::*, eval::*, resolve::*, syntax::*, ty::*, value::*};
-use std::str::FromStr;
 
 /// Absolute value abs(x)
 fn abs() -> Symbol {
@@ -31,6 +31,18 @@ pub fn math() -> Symbol {
         .symbol(Symbol::new_constant(
             Identifier::no_ref("PI"),
             Value::Scalar(std::f64::consts::PI),
+        ))
+        .symbol(Symbol::new_constant(
+            Identifier::no_ref("X"),
+            Value::NamedTuple(Vec3::unit_x().into()),
+        ))
+        .symbol(Symbol::new_constant(
+            Identifier::no_ref("Y"),
+            Value::NamedTuple(Vec3::unit_y().into()),
+        ))
+        .symbol(Symbol::new_constant(
+            Identifier::no_ref("Z"),
+            Value::NamedTuple(Vec3::unit_z().into()),
         ))
         .symbol(abs())
         .build()
