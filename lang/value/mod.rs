@@ -172,7 +172,7 @@ impl Value {
         Err(ValueError::CannotConvert(self.clone(), "Color".into()))
     }
 
-    /// Try to convert to [String].
+    /// Try to convert to [`String`].
     pub fn try_string(&self) -> Result<String, ValueError> {
         match self {
             Value::String(s) => return Ok(s.clone()),
@@ -181,6 +181,17 @@ impl Value {
         }
 
         Err(ValueError::CannotConvert(self.clone(), "String".into()))
+    }
+
+    /// Try to convert to [`Scalar`].
+    pub fn try_scalar(&self) -> Result<Scalar, ValueError> {
+        match self {
+            Value::Scalar(s) => return Ok(*s),
+            Value::Integer(i) => return Ok((*i) as f64),
+            _ => {}
+        }
+
+        Err(ValueError::CannotConvert(self.clone(), "Scalar".into()))
     }
 }
 
