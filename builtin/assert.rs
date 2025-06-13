@@ -8,12 +8,11 @@ use crate::builtin_module;
 use microcad_lang::{diag::*, eval::*, parameter_value, resolve::*, syntax::*, value::*};
 
 pub fn assert() -> Symbol {
-    let id = Identifier::no_ref("assert");
     Symbol::new_builtin(
-        id,
+        Identifier::no_ref("assert"),
         Some(
             vec![
-                parameter_value!(x),                               // Parameter with any type
+                parameter_value!(v),                               // Parameter with any type
                 parameter_value!(message: String = String::new()), // Optional message
             ]
             .into(),
@@ -21,8 +20,8 @@ pub fn assert() -> Symbol {
         &|params, args, context| {
             match ArgumentMap::find_match(args, params.expect("ParameterList")) {
                 Ok(arg_map) => {
-                    if !arg_map[&Identifier::no_ref("x")].try_bool()? {
-                        let message = arg_map[&Identifier::no_ref("message")].try_string()?;
+                    if !arg_map[&"v".try_into()?].try_bool()? {
+                        let message = arg_map[&"message".try_into()?].try_string()?;
                         let arg = args.first().expect("At least one argument");
                         context.error(
                             arg,
