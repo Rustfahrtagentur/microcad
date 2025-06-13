@@ -9,7 +9,7 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
+use crate::{Id, parse::*, parser::Parser, src_ref::*, syntax::*};
 
 /// µcad identifier
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
