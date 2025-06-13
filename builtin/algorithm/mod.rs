@@ -6,7 +6,7 @@ use microcad_lang::{model_tree::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 /// Creates a node containing a difference algorithm
 fn difference() -> Symbol {
-    Symbol::new_builtin(Identifier::no_ref("difference"), &|_, _| {
+    Symbol::new_builtin(Identifier::no_ref("difference"), None, &|_, _, _| {
         Ok(Value::from_single_node(ModelNode::new_operation(
             BooleanOp::Difference,
             SrcRef(None),
@@ -16,7 +16,7 @@ fn difference() -> Symbol {
 
 /// Creates a node containing a union algorithm
 fn union() -> Symbol {
-    Symbol::new_builtin(Identifier::no_ref("union"), &|_, _| {
+    Symbol::new_builtin(Identifier::no_ref("union"), None, &|_, _, _| {
         Ok(Value::from_single_node(ModelNode::new_operation(
             BooleanOp::Union,
             SrcRef(None),
@@ -26,7 +26,7 @@ fn union() -> Symbol {
 
 /// Creates a node containing an intersection algorithm
 fn intersection() -> Symbol {
-    Symbol::new_builtin(Identifier::no_ref("intersection"), &|_, _| {
+    Symbol::new_builtin(Identifier::no_ref("intersection"), None, &|_, _, _| {
         Ok(Value::from_single_node(ModelNode::new_operation(
             BooleanOp::Intersection,
             SrcRef(None),
@@ -36,7 +36,7 @@ fn intersection() -> Symbol {
 
 /// Creates a node containing a complement algorithm
 fn complement() -> Symbol {
-    Symbol::new_builtin(Identifier::no_ref("complement"), &|_, _| {
+    Symbol::new_builtin(Identifier::no_ref("complement"), None, &|_, _, _| {
         Ok(Value::from_single_node(ModelNode::new_operation(
             BooleanOp::Complement,
             SrcRef(None),

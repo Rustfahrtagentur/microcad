@@ -132,15 +132,14 @@ qualified_name = { identifier ~ ("::" ~ identifier)* }
 //`int`: ok
 //`a::nested::typename`: ok
 //`[scalar]`: ok # List type
-//`[scalar => scalar]`: ok # Map type
 //`(scalar, scalar)`: Unnamed tuple type
 //`(a: scalar, b: scalar)`: Named tuple type
 type = {
-  qualified_name |
   list_type |
-  map_type |
   named_tuple_type |
-  unnamed_tuple_type |
+  tuple_type |
+  matrix_type |
+  qualified_name |
   unit
 }
 
@@ -155,20 +154,21 @@ type_annotation = _{ ":" ~ ws* ~ type }
 //`[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
 list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 
-// Associative list, behaves like a map
-//`[Length => string]`: maps a Length to a string
-map_type = { "[" ~ ws* ~ type ~ ws* ~ "=>" ~ ws* ~ type ~ ws* ~ "]" }
-
-//`(Length,scalar)`: ok # 2 unnamed fields
-//`(Length, a: Length)`: error # Cannot mix named and unnamed arguments
-unnamed_tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ","? ~ ws* ~ ")" }
-
 //`(a: Length, b: scalar)`: ok
 //`(a: Length, )`: ok # Trailing comma
 named_tuple_type = { "(" ~ ws* ~ named_tuple_type_element ~ (ws* ~ "," ~ ws* ~ named_tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
 //`a: Length`: ok
 named_tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
+
+//`(Length,scalar)`: ok # 2 unnamed fields
+//`(Length, a: Length)`: error # Cannot mix named and unnamed arguments
+tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ","? ~ ws* ~ ")" }
+
+//`Matrix4x3`: ok
+//`Matrix3`: ok
+matrix_type = { "Matrix" ~ int ~ ("x" ~ int)? }
+
 
 //`[1, 2, 3]`: ok
 //`[1, 2, 3,]`: error # Trailing comma
@@ -224,7 +224,7 @@ nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))
 //`-5.0mm`: ok # Negate
 //`(a+b)*(c-a)`: ok
 //`a + b + c`: ok
-//`math::pi`: ok # Singleton access with qualified name or module access
+//`math::PI`: ok # Singleton access with qualified name or module access
 //`! a`: ok # Unary operator with whitespace
 //`a-`: error # Unknown postfix operator `-`
 //`a[2]`: ok # List access
@@ -356,7 +356,7 @@ attribute_list = { attribute ~ (ws+ ~ attribute)* }
 //`r: Length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
 //`r: Length`: error # Default value is required
-//`r: Length = math::pi`: ok # Type specifier + Default value from constant
+//`r: Scalar = math::PI`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
 //`pub r = 5.0mm`: Make value of assignment public
 assignment = { (visibility ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
@@ -370,7 +370,7 @@ marker_statement = { "@" ~ identifier }
 //`r: Length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
 //`r: Length`: ok # Default value is NOT required
-//`r: Length = math::pi`: ok # Type specifier + Default value from constant
+//`r: Scalar = math::PI`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
 parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation  }
 

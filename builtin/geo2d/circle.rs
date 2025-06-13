@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, rc::*, src_ref::*, syntax::*, ty::*};
+use microcad_lang::{eval::*, model_tree::*, parameter_value, rc::*, src_ref::*, syntax::*};
 
 /// Builtin definition for a 2D circle
 #[derive(Debug)]
@@ -24,8 +24,8 @@ impl BuiltinPartDefinition for Circle {
         ))))
     }
 
-    fn parameters() -> ParameterList {
-        ParameterList::new(vec![Parameter::no_ref("radius", Type::Scalar)].into())
+    fn parameters() -> ParameterValueList {
+        vec![parameter_value!(radius: Scalar)].into()
     }
 }
 

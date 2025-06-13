@@ -5,7 +5,7 @@
 
 use compact_str::CompactStringExt;
 
-use crate::value::*;
+use crate::{eval::*, value::*};
 
 /// List of parameter values
 #[derive(Clone, Debug, Default)]
@@ -18,7 +18,6 @@ pub struct ParameterValueList {
 
 impl ParameterValueList {
     /// Create new ParameterValueList
-    #[cfg(test)]
     pub fn new(parameters: Vec<ParameterValue>) -> Self {
         let mut by_id = std::collections::BTreeMap::new();
         for (i, parameter) in parameters.iter().enumerate() {
@@ -69,9 +68,9 @@ impl ParameterValueList {
     /// Check for missing arguments.
     ///
     /// Checks if parameter value list is not empty and wraps the list into an error
-    pub fn check_for_missing_arguments(self) -> Result<(), ValueError> {
+    pub fn check_for_missing_arguments(self) -> EvalResult<()> {
         if !self.is_empty() {
-            Err(ValueError::MissingArguments(self))
+            Err(EvalError::MissingArguments(self))
         } else {
             Ok(())
         }
@@ -83,6 +82,18 @@ impl std::ops::Deref for ParameterValueList {
 
     fn deref(&self) -> &Self::Target {
         &self.parameters
+    }
+}
+
+impl From<Vec<ParameterValue>> for ParameterValueList {
+    fn from(parameters: Vec<ParameterValue>) -> Self {
+        Self::new(parameters)
+    }
+}
+
+impl<'a> From<&'a [ParameterValue]> for ParameterValueList {
+    fn from(value: &'a [ParameterValue]) -> Self {
+        Self::new(value.into())
     }
 }
 

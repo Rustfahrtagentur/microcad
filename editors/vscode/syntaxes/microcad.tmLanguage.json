@@ -11,7 +11,7 @@
             "name": "keyword.control.microcad"
         },
         {
-            "match": "\\b(Integer|Scalar|String|Color|Length|Area|Volume|Angle|Weight|Density|Bool)\\b",
+            "match": "\\b(Integer|Scalar|String|Color|Length|Area|Volume|Angle|Weight|Density|Bool|Matrix[0-9])\\b",
             "name": "storage.type.microcad"
         },
         {

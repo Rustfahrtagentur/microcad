@@ -7,9 +7,9 @@ use crate::{ty::*, value::*};
 
 /// Unnamed tuple
 #[derive(Clone, Debug, PartialEq)]
-pub struct UnnamedTuple(ValueList);
+pub struct Tuple(ValueList);
 
-impl UnnamedTuple {
+impl Tuple {
     /// create a new unnamed tuple
     pub fn new(list: ValueList) -> Self {
         Self(list)
@@ -35,17 +35,17 @@ impl UnnamedTuple {
             result.push(add_result);
         }
 
-        Ok(UnnamedTuple(ValueList::new(result)))
+        Ok(Tuple(ValueList::new(result)))
     }
 }
 
-impl From<ValueList> for UnnamedTuple {
+impl From<ValueList> for Tuple {
     fn from(value: ValueList) -> Self {
         Self(value)
     }
 }
 
-impl std::fmt::Display for UnnamedTuple {
+impl std::fmt::Display for Tuple {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
@@ -59,24 +59,22 @@ impl std::fmt::Display for UnnamedTuple {
     }
 }
 
-impl crate::ty::Ty for UnnamedTuple {
+impl crate::ty::Ty for Tuple {
     fn ty(&self) -> Type {
-        Type::UnnamedTuple(UnnamedTupleType(
-            self.0.iter().map(|v| v.ty().clone()).collect(),
-        ))
+        Type::Tuple(TupleType(self.0.iter().map(|v| v.ty().clone()).collect()))
     }
 }
 
-impl std::ops::Add for UnnamedTuple {
-    type Output = std::result::Result<UnnamedTuple, ValueError>;
+impl std::ops::Add for Tuple {
+    type Output = std::result::Result<Tuple, ValueError>;
 
     fn add(self, rhs: Self) -> Self::Output {
         self.binary_op(rhs, '+', |lhs, rhs| lhs + rhs)
     }
 }
 
-impl std::ops::Sub for UnnamedTuple {
-    type Output = std::result::Result<UnnamedTuple, ValueError>;
+impl std::ops::Sub for Tuple {
+    type Output = std::result::Result<Tuple, ValueError>;
 
     fn sub(self, rhs: Self) -> Self::Output {
         self.binary_op(rhs, '-', |lhs, rhs| lhs - rhs)

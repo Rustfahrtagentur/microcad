@@ -5,15 +5,6 @@
 
 use crate::{ty::*, value::*};
 
-/// Short cut to create a NamedTuple
-#[cfg(test)]
-#[macro_export]
-macro_rules! named_tuple {
-    ($($name:ident: $ty:ident = $value:expr),*) => {
-        NamedTuple::from_vec(vec![$((stringify!($name).into(), Value::$ty($value)),)*])
-    };
-}
-
 /// Tuple with named values
 #[derive(Clone, Debug, PartialEq)]
 pub struct NamedTuple(std::collections::BTreeMap<Identifier, Value>);
@@ -36,6 +27,17 @@ impl std::ops::Deref for NamedTuple {
 impl std::ops::DerefMut for NamedTuple {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+impl From<Vec3> for NamedTuple {
+    fn from(value: Vec3) -> Self {
+        NamedTuple::new(
+            [("x", value.x), ("y", value.y), ("z", value.z)]
+                .iter()
+                .map(|(k, v)| (Identifier::no_ref(k), Value::Scalar(*v)))
+                .collect(),
+        )
     }
 }
 

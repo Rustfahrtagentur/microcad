@@ -2,7 +2,7 @@
 
 ## Declaration
 
-In µcad you will need to use units almost everywhere you use values.
+In µcad, you will need to use units almost everywhere you use values.
 This is intended and what you get in return is that declarations are quite handy:
 
 [![test](.test/types_def_vs_decl.png)](.test/types_def_vs_decl.log)
@@ -28,3 +28,15 @@ This one is just needed, if you declare parameters giving any default value:
 fn f( x = 4mm ) {}        // use unit (with default)
 fn f( x : Length ) {}     // use type (without default)
 ```
+
+## `Matrix` types
+
+Matrix types are built-in types and can be defined as:
+
+* `Matrix2`: A 2x2 matrix, commonly used for 2D rotations.
+* `Matrix3`: A 3x3 matrix, commonly used for rotations.
+* `Matrix4`: A 4x4 matrix, commonly used for affine transformations.
+
+
+
+

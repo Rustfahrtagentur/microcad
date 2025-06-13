@@ -32,18 +32,18 @@ pub enum Type {
     Density,
     /// A boolean: true, false
     Bool,
-    /// A list of elements of the same type: `[scalar]`
+    /// A list of elements of the same type: `[Scalar]`
     List(ListType),
-    /// A map of elements: `[string => scalar]`
-    Map(MapType),
-    /// An unnamed tuple of elements: `(scalar, string)`
-    UnnamedTuple(UnnamedTupleType),
-    /// A named tuple of elements: `(x: scalar, y: string)`
+    /// An unnamed tuple of elements: `(Scalar, String)`
+    Tuple(TupleType),
+    /// A named tuple of elements: `(x: Scalar, y: String)`
     NamedTuple(NamedTupleType),
-    /// A custom type or a part node in the syntax tree
-    Custom(QualifiedName),
+    /// Matrix type
+    Matrix(MatrixType),
     /// Nodes.
     Nodes,
+    /// A custom type or a part node in the syntax tree
+    Custom(QualifiedName),
 }
 
 impl Type {
@@ -75,7 +75,7 @@ impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Invalid => write!(f, "<invalid>"),
-            Self::Integer => write!(f, "Int"),
+            Self::Integer => write!(f, "Integer"),
             Self::Scalar => write!(f, "Scalar"),
             Self::String => write!(f, "String"),
             Self::Color => write!(f, "Color"),
@@ -86,12 +86,12 @@ impl std::fmt::Display for Type {
             Self::Weight => write!(f, "Weight"),
             Self::Density => write!(f, "Density"),
             Self::Bool => write!(f, "Bool"),
-            Self::List(t) => write!(f, "{}", t),
-            Self::Map(t) => write!(f, "{}", t),
-            Self::UnnamedTuple(t) => write!(f, "{}", t),
-            Self::NamedTuple(t) => write!(f, "{}", t),
-            Self::Custom(qn) => write!(f, "{}", qn),
+            Self::List(t) => write!(f, "{t}"),
+            Self::Tuple(t) => write!(f, "{t}"),
+            Self::NamedTuple(t) => write!(f, "{t}"),
+            Self::Matrix(t) => write!(f, "{t}"),
             Self::Nodes => write!(f, "Nodes"),
+            Self::Custom(n) => write!(f, "Custom({n})"),
         }
     }
 }
@@ -100,7 +100,7 @@ impl std::fmt::Display for Type {
 fn builtin_type() {
     use crate::parser::*;
 
-    let ty = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "Int", 0).expect("test error");
-    assert_eq!(ty.0.to_string(), "Int");
+    let ty = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "Integer", 0).expect("test error");
+    assert_eq!(ty.0.to_string(), "Integer");
     assert_eq!(ty.0.value, Type::Integer);
 }

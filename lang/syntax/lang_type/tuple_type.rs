@@ -7,9 +7,9 @@ use crate::ty::*;
 
 /// Unnamed tuple type (e.g. `(scalar,string)`
 #[derive(Debug, Clone, Default, PartialEq)]
-pub struct UnnamedTupleType(pub Vec<Type>);
+pub struct TupleType(pub Vec<Type>);
 
-impl std::fmt::Display for UnnamedTupleType {
+impl std::fmt::Display for TupleType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "(")?;
         for (i, t) in self.0.iter().enumerate() {

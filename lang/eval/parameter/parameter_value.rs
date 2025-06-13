@@ -3,7 +3,7 @@
 
 //! Parameter value evaluation entity
 
-use crate::{src_ref::*, ty::*, value::*};
+use crate::{src_ref::*, syntax::*, ty::*, value::*};
 
 /// Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
@@ -91,35 +91,39 @@ impl SrcReferrer for ParameterValue {
 }
 
 /// Shortcut to create a `ParameterValue`
-#[cfg(test)]
 #[macro_export]
 macro_rules! parameter_value {
     ($id:ident) => {
-        $crate::value::ParameterValue {
-            name: stringify!($id).into(),
-            specified_type: None,
-            default_value: None,
-            SrcRef(None),
-        }
+        $crate::eval::ParameterValue::new(
+            $crate::syntax::Identifier::no_ref(stringify!($id)),
+            None,
+            None,
+            $crate::src_ref::SrcRef(None),
+        )
     };
     ($id:ident: $ty:ident) => {
-        $crate::value::ParameterValue::new(
-            stringify!($id).into(),
-            Some(Type::$ty),
+        $crate::eval::ParameterValue::new(
+            $crate::syntax::Identifier::no_ref(stringify!($id)),
+            Some($crate::ty::Type::$ty),
             None,
-            SrcRef(None),
+            $crate::src_ref::SrcRef(None),
         )
     };
     ($id:ident: $ty:ident = $value:expr) => {
-        $crate::value::ParameterValue::new(
-            stringify!($id).into(),
-            Some(Type::$ty),
+        $crate::eval::ParameterValue::new(
+            $crate::syntax::Identifier::no_ref(stringify!($id)),
+            Some($crate::ty::Type::$ty),
             Some($crate::value::Value::$ty($value)),
-            SrcRef(None),
+            $crate::src_ref::SrcRef(None),
         )
     };
     ($id:ident = $value:expr) => {
-        value::ParameterValue::new(stringify!($id).into(), None, Some($value), SrcRef(None))
+        value::ParameterValue::new(
+            $crate::syntax::Identifier::no_ref(stringify!($id)),
+            None,
+            Some($value),
+            SrcRef(None),
+        )
     };
     () => {};
 }

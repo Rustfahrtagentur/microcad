@@ -1,4 +1,4 @@
-error: Value Error: Missing arguments: outer, inner
+error: Missing arguments: outer, inner
 
   ---> <from_str>:2:1
      |

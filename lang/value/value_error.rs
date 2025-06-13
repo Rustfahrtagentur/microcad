@@ -42,10 +42,6 @@ pub enum ValueError {
         rhs: usize,
     },
 
-    /// Missing arguments
-    #[error("Missing arguments: {0}")]
-    MissingArguments(ParameterValueList),
-
     /// Duplicate parameter
     #[error("Duplicate parameter: {0}")]
     DuplicateParameter(Identifier),

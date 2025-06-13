@@ -57,6 +57,7 @@ pub use context::*;
 pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
+pub use parameter::*;
 pub use symbols::*;
 pub use r#use::*;
 

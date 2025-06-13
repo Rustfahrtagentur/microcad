@@ -145,7 +145,7 @@ macro_rules! assert_eq_arg_map_value {
 
 #[test]
 fn call_get_matching_arguments() {
-    use crate::{parameter_value, ty::*};
+    use crate::parameter_value;
 
     // my_part(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = ParameterValueList::new(vec![
@@ -172,7 +172,7 @@ fn call_get_matching_arguments() {
 
 #[test]
 fn call_get_matching_arguments_missing() {
-    use crate::{parameter_value, ty::*};
+    use crate::parameter_value;
 
     // function f(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = ParameterValueList::new(vec![
@@ -189,7 +189,7 @@ fn call_get_matching_arguments_missing() {
 
     let arg_map = ArgumentMap::find_match(&call_values, &param_values);
 
-    if let Err(EvalError::ValueError(ValueError::MissingArguments(missing))) = arg_map {
+    if let Err(EvalError::MissingArguments(missing)) = arg_map {
         assert_eq!(missing.len(), 1);
         assert_eq!(&missing[0].id, "bar");
     } else {
@@ -199,7 +199,7 @@ fn call_get_matching_arguments_missing() {
 
 #[test]
 fn get_multi_matching_arguments() {
-    use crate::{parameter_value, ty::*};
+    use crate::parameter_value;
 
     let param_values = ParameterValueList::new(vec![
         parameter_value!(thickness: Scalar = 2.0),

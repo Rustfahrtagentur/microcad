@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, rc::*, src_ref::*, syntax::*, ty::*};
+use microcad_lang::{eval::*, model_tree::*, parameter_value, rc::*, src_ref::*, syntax::*};
 
 #[derive(Debug)]
 pub struct Rect {
@@ -28,16 +28,14 @@ impl BuiltinPartDefinition for Rect {
         ))))
     }
 
-    fn parameters() -> ParameterList {
-        ParameterList::new(
-            vec![
-                Parameter::no_ref("width", Type::Scalar),
-                Parameter::no_ref("height", Type::Scalar),
-                Parameter::no_ref("x", Type::Scalar),
-                Parameter::no_ref("y", Type::Scalar),
-            ]
-            .into(),
-        )
+    fn parameters() -> ParameterValueList {
+        vec![
+            parameter_value!(width: Scalar),
+            parameter_value!(height: Scalar),
+            parameter_value!(x: Scalar),
+            parameter_value!(y: Scalar),
+        ]
+        .into()
     }
 }
 

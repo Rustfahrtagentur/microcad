@@ -100,9 +100,17 @@ impl Symbol {
     /// Create a symbol node for a built-in.
     /// # Arguments
     /// - `id`: Name of the symbol
+    /// - `parameters`: Optional parameter list
     /// - `f`: The builtin function
-    pub fn new_builtin(id: Identifier, f: &'static BuiltinFn) -> Symbol {
-        Symbol::new(SymbolDefinition::Builtin(Rc::new(Builtin { id, f })), None)
+    pub fn new_builtin(
+        id: Identifier,
+        parameters: Option<ParameterValueList>,
+        f: &'static BuiltinFn,
+    ) -> Symbol {
+        Symbol::new(
+            SymbolDefinition::Builtin(Rc::new(Builtin { id, parameters, f })),
+            None,
+        )
     }
 
     /// Create a symbol for module.

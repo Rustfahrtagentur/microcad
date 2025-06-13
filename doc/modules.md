@@ -6,7 +6,7 @@
 mod std {
     mod math {
         // define PI as property
-        pi = 3.14159;
+        PI = 3.14159;
 
         // define calculation function
         fn abs(x: Scalar) -> Scalar {
@@ -16,5 +16,5 @@ mod std {
 }
 
 // call both
-x = std::math::abs(-1) * std::math::pi;
+x = std::math::abs(-1) * std::math::PI;
 ```

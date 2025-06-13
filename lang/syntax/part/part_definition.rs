@@ -22,7 +22,7 @@ pub struct PartDefinition {
 
 impl PartDefinition {
     /// Return iterator over all initializers
-    pub fn inits(&self) -> Inits {
+    pub fn inits(&'_ self) -> Inits<'_> {
         Inits::new(self)
     }
 }

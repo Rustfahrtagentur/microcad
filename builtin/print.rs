@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 pub fn print() -> Symbol {
     let id = Identifier::from_str("print").expect("valid id");
-    Symbol::new_builtin(id, &|args, context| {
+    Symbol::new_builtin(id, None, &|_params, args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
             context.print(format!("{value}", value = arg.value));
             Ok(())

@@ -7,28 +7,22 @@
 //! to process or ends up as the overall evaluation result.
 
 mod list;
-mod map;
-mod map_key_value;
 mod named_tuple;
 
-#[macro_use]
-mod parameter_value;
-mod parameter_value_list;
-mod unnamed_tuple;
+mod matrix;
+mod tuple;
 mod value_error;
 mod value_list;
 
 pub use list::*;
-pub use map::*;
-pub use map_key_value::*;
+pub use matrix::*;
 pub use named_tuple::*;
-pub use parameter_value::*;
-pub use parameter_value_list::*;
-pub use unnamed_tuple::*;
+pub use tuple::*;
 pub use value_error::*;
+
 pub use value_list::*;
 
-use crate::{model_tree::*, src_ref::*, syntax::*, ty::*};
+use crate::{model_tree::*, syntax::*, ty::*};
 use microcad_core::*;
 
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
@@ -63,12 +57,12 @@ pub enum Value {
     Color(Color),
     /// A list of values.
     List(List),
-    /// A map of values.
-    Map(Map),
     /// A tuple of named items.
     NamedTuple(NamedTuple),
     /// A tuple of unnamed items.
-    UnnamedTuple(UnnamedTuple),
+    Tuple(Tuple),
+    /// A matrix.
+    Matrix(Box<Matrix>),
     /// A node in the render tree.
     Nodes(ModelNodes),
 }
@@ -178,7 +172,7 @@ impl Value {
         Err(ValueError::CannotConvert(self.clone(), "Color".into()))
     }
 
-    /// Try to convert to [String].
+    /// Try to convert to [`String`].
     pub fn try_string(&self) -> Result<String, ValueError> {
         match self {
             Value::String(s) => return Ok(s.clone()),
@@ -187,6 +181,17 @@ impl Value {
         }
 
         Err(ValueError::CannotConvert(self.clone(), "String".into()))
+    }
+
+    /// Try to convert to [`Scalar`].
+    pub fn try_scalar(&self) -> Result<Scalar, ValueError> {
+        match self {
+            Value::Scalar(s) => return Ok(*s),
+            Value::Integer(i) => return Ok((*i) as f64),
+            _ => {}
+        }
+
+        Err(ValueError::CannotConvert(self.clone(), "Scalar".into()))
     }
 }
 
@@ -229,9 +234,9 @@ impl crate::ty::Ty for Value {
             Value::String(_) => Type::String,
             Value::Color(_) => Type::Color,
             Value::List(list) => list.ty(),
-            Value::Map(map) => map.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
-            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
+            Value::Tuple(unnamed_tuple) => unnamed_tuple.ty(),
+            Value::Matrix(matrix) => matrix.ty(),
             Value::Nodes(_) => Type::Nodes,
         }
     }
@@ -286,9 +291,7 @@ impl std::ops::Add for Value {
                 )))
             }
             // Add values of two tuples of the same length
-            (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple((lhs + rhs)?))
-            }
+            (Value::Tuple(lhs), Value::Tuple(rhs)) => Ok(Value::Tuple((lhs + rhs)?)),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} + {rhs}"))),
         }
     }
@@ -429,9 +432,9 @@ impl std::fmt::Display for Value {
             Value::String(s) => write!(f, "{s}"),
             Value::Color(c) => write!(f, "{c}"),
             Value::List(l) => write!(f, "{l}"),
-            Value::Map(m) => write!(f, "{m}"),
             Value::NamedTuple(t) => write!(f, "{t}"),
-            Value::UnnamedTuple(t) => write!(f, "{t}"),
+            Value::Tuple(t) => write!(f, "{t}"),
+            Value::Matrix(m) => write!(f, "{m}"),
             Value::Nodes(n) => n.dump(f),
         }
     }
@@ -453,9 +456,9 @@ impl std::fmt::Debug for Value {
             Self::String(arg0) => write!(f, "String: {arg0}"),
             Self::Color(arg0) => write!(f, "Color: {arg0}"),
             Self::List(arg0) => write!(f, "List: {arg0}"),
-            Self::Map(arg0) => write!(f, "Map: {arg0}"),
             Self::NamedTuple(arg0) => write!(f, "NamedTuple: {arg0}"),
-            Self::UnnamedTuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
+            Self::Tuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
+            Self::Matrix(arg0) => write!(f, "Matrix: {arg0}"),
             Self::Nodes(arg0) => write!(f, "Nodes:\n {arg0}"),
         }
     }

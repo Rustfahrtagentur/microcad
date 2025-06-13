@@ -1,6 +1,0 @@
-Parser error:  --> 3:9
-  |
-3 |   #[part = PART] 
-  |         ^---
-  |
-  = expected identifier_part

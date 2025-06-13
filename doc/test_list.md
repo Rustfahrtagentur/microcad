@@ -3,19 +3,10 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**77** tests from markdown.
+**68** tests from markdown.
 
 | Result | Name |
 |-------:|------|
-| [![test](../doc/.test/attributes_assignment.png)](../doc/.test/attributes_assignment.log) | [attributes_assignment](../doc/attributes.md) |
-| [![test](../doc/.test/attributes_call.png)](../doc/.test/attributes_call.log) | [attributes_call](../doc/attributes.md) |
-| [![test](../doc/.test/attributes_capture.png)](../doc/.test/attributes_capture.log) | [attributes_capture](../doc/attributes.md) |
-| [![test](../doc/.test/attributes_expression.png)](../doc/.test/attributes_expression.log) | [attributes_expression](../doc/attributes.md) |
-| [![test](../doc/.test/attributes_name_value.png)](../doc/.test/attributes_name_value.log) | [attributes_name_value](../doc/attributes.md) |
-| [![test](../doc/.test/attributes_part.png)](../doc/.test/attributes_part.log) | [attributes_part](../doc/attributes.md) |
-| [![test](../doc/.test/attributes_part_definition.png)](../doc/.test/attributes_part_definition.log) | [attributes_part_definition](../doc/attributes.md) |
-| [![test](../doc/.test/attributes_part_export.png)](../doc/.test/attributes_part_export.log) | [attributes_part_export](../doc/attributes.md) |
-| [![test](../doc/.test/attributes_tag.png)](../doc/.test/attributes_tag.log) | [attributes_tag](../doc/attributes.md) |
 | [![test](../doc/std/algorithm/.test/difference_alt_operator.png)](../doc/std/algorithm/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/std/algorithm/difference.md) |
 | [![test](../doc/std/algorithm/.test/difference_operator.png)](../doc/std/algorithm/.test/difference_operator.log) | [difference_operator](../doc/std/algorithm/difference.md) |
 | [![test](../doc/parts/.test/EXAMPLES_fields.png)](../doc/parts/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/parts/EXAMPLES.md) |
