@@ -24,11 +24,17 @@ impl Parse for TypeAnnotation {
             )),
             Rule::qualified_name => match inner.as_str() {
                 "Integer" => Self(Refer::new(Type::Integer, pair.into())),
-                "Scalar" => Self(Refer::new(Type::Scalar, pair.into())),
+                "Scalar" => Self(Refer::new(
+                    Type::Quantity(QuantityType::Scalar),
+                    pair.into(),
+                )),
+                "Length" => Self(Refer::new(
+                    Type::Quantity(QuantityType::Length),
+                    pair.into(),
+                )),
+                "Angle" => Self(Refer::new(Type::Quantity(QuantityType::Angle), pair.into())),
                 "String" => Self(Refer::new(Type::String, pair.into())),
                 "Color" => Self(Refer::new(Type::Color, pair.into())),
-                "Length" => Self(Refer::new(Type::Length, pair.into())),
-                "Angle" => Self(Refer::new(Type::Angle, pair.into())),
                 "Bool" => Self(Refer::new(Type::Bool, pair.into())),
                 _ => Self(Refer::new(
                     Type::Custom(QualifiedName::parse(inner)?),

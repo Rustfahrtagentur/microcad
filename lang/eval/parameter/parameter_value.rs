@@ -104,7 +104,7 @@ macro_rules! parameter_value {
     ($id:ident: $ty:ident) => {
         $crate::eval::ParameterValue::new(
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            Some($crate::ty::Type::$ty),
+            Some($crate::ty::BuiltinTypeWrapper::$ty.into()),
             None,
             $crate::src_ref::SrcRef(None),
         )
@@ -112,8 +112,8 @@ macro_rules! parameter_value {
     ($id:ident: $ty:ident = $value:expr) => {
         $crate::eval::ParameterValue::new(
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            Some($crate::ty::Type::$ty),
-            Some($crate::value::Value::$ty($value)),
+            Some($crate::ty::BuiltinTypeWrapper::$ty.into()),
+            Some($crate::value::BuiltinValueWrapper::$ty($value).into()),
             $crate::src_ref::SrcRef(None),
         )
     };
@@ -130,5 +130,8 @@ macro_rules! parameter_value {
 
 #[test]
 fn test_is_list_of() {
-    assert!(Type::List(ListType::new(Type::Scalar)).is_list_of(&Type::Scalar));
+    assert!(
+        Type::List(ListType::new(QuantityType::Scalar.into()))
+            .is_list_of(&QuantityType::Scalar.into())
+    );
 }

@@ -6,6 +6,7 @@
 mod list_type;
 mod matrix_type;
 mod named_tuple_type;
+mod quantity_type;
 mod tuple_type;
 mod r#type;
 mod type_list;
@@ -13,6 +14,7 @@ mod type_list;
 pub use list_type::*;
 pub use matrix_type::*;
 pub use named_tuple_type::*;
+pub use quantity_type::*;
 pub use tuple_type::*;
 pub use r#type::*;
 pub use type_list::*;

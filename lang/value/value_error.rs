@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::value::*;
+use crate::value::{error::QuantityError, *};
 use thiserror::Error;
 
 /// Value error
@@ -10,6 +10,10 @@ pub enum ValueError {
     /// Invalid operator
     #[error("Invalid operator: {0}")]
     InvalidOperator(String),
+
+    /// Quantity Error.
+    #[error("Quantity error: {0}")]
+    QuantityError(#[from] QuantityError),
 
     /// Type cannot be a key in a map
     #[error("Type cannot be a key in a map: {0}")]

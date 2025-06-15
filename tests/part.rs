@@ -61,7 +61,10 @@ fn part_implicit_init_call() {
                 object
                     .get_property_value(&Identifier(Refer::none("b".into())))
                     .expect("Property `b`"),
-                &Value::Scalar(value)
+                &Value::Quantity(Quantity::new(
+                    value,
+                    microcad_lang::ty::QuantityType::Scalar
+                ))
             );
         } else {
             panic!("Object node expected")
@@ -109,7 +112,7 @@ fn part_explicit_init_call() {
                 object
                     .get_property_value(&Identifier::no_ref("radius"))
                     .expect("Property `radius`"),
-                &value::Value::Scalar(value)
+                &value::Value::Quantity(Quantity::new(value, ty::QuantityType::Scalar))
             );
         } else {
             panic!("Object node expected")

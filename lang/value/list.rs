@@ -86,9 +86,10 @@ impl std::ops::Mul<Value> for List {
 
         match self.ty {
             // List * Scalar or List * Integer
-            Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => Ok(
-                Value::List(List::new(ValueList::new(values), rhs.ty().clone())),
-            ),
+            Type::Quantity(_) | Type::Integer => Ok(Value::List(List::new(
+                ValueList::new(values),
+                rhs.ty().clone(),
+            ))),
             _ => Err(ValueError::InvalidOperator("*".into())),
         }
     }
@@ -105,9 +106,10 @@ impl std::ops::Div<Value> for List {
 
         match self.ty {
             // List / Scalar or List / Integer
-            Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => {
-                Ok(Value::List(List::new(ValueList::new(values), Type::Scalar)))
-            }
+            Type::Quantity(_) | Type::Integer => Ok(Value::List(List::new(
+                ValueList::new(values),
+                Type::Quantity(QuantityType::Scalar),
+            ))),
             _ => Err(ValueError::InvalidOperator("/".into())),
         }
     }

@@ -3,7 +3,12 @@
 
 //! Number literal syntax element
 
-use crate::{src_ref::*, syntax::*, ty::*, value::Value};
+use crate::{
+    src_ref::*,
+    syntax::*,
+    ty::*,
+    value::{Quantity, Value},
+};
 
 /// Number literal
 #[derive(Debug, Clone, PartialEq)]
@@ -35,12 +40,9 @@ impl NumberLiteral {
     /// Return value for number literal
     pub fn value(&self) -> Value {
         match self.1.ty() {
-            Type::Scalar => Value::Scalar(self.normalized_value()),
-            Type::Angle => Value::Angle(self.normalized_value()),
-            Type::Length => Value::Length(self.normalized_value()),
-            Type::Weight => Value::Weight(self.normalized_value()),
-            Type::Area => Value::Area(self.normalized_value()),
-            Type::Volume => Value::Volume(self.normalized_value()),
+            Type::Quantity(quantity_type) => {
+                Value::Quantity(Quantity::new(self.normalized_value(), quantity_type))
+            }
             _ => unreachable!(),
         }
     }

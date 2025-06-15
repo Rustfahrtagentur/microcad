@@ -159,23 +159,27 @@ impl Unit {
     /// Return type to use with this unit
     pub fn ty(self) -> Type {
         match self {
-            Self::None | Self::Percent => Type::Scalar,
+            Self::None | Self::Percent => Type::Quantity(QuantityType::Scalar),
             Self::Meter
             | Self::Centimeter
             | Self::Millimeter
             | Self::Micrometer
             | Self::Inch
             | Self::Foot
-            | Self::Yard => Type::Length,
-            Self::Deg | Self::DegS | Self::Grad | Self::Turn | Self::Rad => Type::Angle,
-            Self::Gram | Self::Kilogram | Self::Pound | Self::Ounce => Type::Weight,
+            | Self::Yard => Type::Quantity(QuantityType::Length),
+            Self::Deg | Self::DegS | Self::Grad | Self::Turn | Self::Rad => {
+                Type::Quantity(QuantityType::Angle)
+            }
+            Self::Gram | Self::Kilogram | Self::Pound | Self::Ounce => {
+                Type::Quantity(QuantityType::Weight)
+            }
             Self::Meter2
             | Self::Centimeter2
             | Self::Millimeter2
             | Self::Micrometer2
             | Self::Inch2
             | Self::Foot2
-            | Self::Yard2 => Type::Area,
+            | Self::Yard2 => Type::Quantity(QuantityType::Area),
             Self::Meter3
             | Self::Centimeter3
             | Self::Millimeter3
@@ -186,10 +190,11 @@ impl Unit {
             | Self::Liter
             | Self::Centiliter
             | Self::Milliliter
-            | Self::Microliter => Type::Volume,
-            Self::KilogramPerMeter2 => Type::Density,
+            | Self::Microliter => Type::Quantity(QuantityType::Volume),
+            Self::KilogramPerMeter2 => Type::Quantity(QuantityType::Density),
         }
     }
+
     /// Normalize value to mm, rad or gram
     pub fn normalize(self, x: f64) -> f64 {
         match self {

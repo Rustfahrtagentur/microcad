@@ -138,7 +138,7 @@ macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
             $arg_map.get(&Identifier::no_ref(stringify!($name).into())).expect(&format!("Argument `{}` expected",stringify!($name))),
-            &Value::$ty($value)
+            &BuiltinValueWrapper::$ty($value).into()
         ));*
     };
 }
