@@ -3,7 +3,7 @@
 
 //! Matrix value type
 
-use crate::{syntax::MatrixType, ty::*};
+use crate::ty::*;
 
 /// Matrix type
 #[derive(Debug, Clone, PartialEq)]

@@ -3,7 +3,7 @@
 
 //! Typed list of values evaluation entity
 
-use crate::{syntax::*, ty::*, value::*};
+use crate::{ty::*, value::*};
 
 /// List of values of the same type
 #[derive(Clone, Debug)]

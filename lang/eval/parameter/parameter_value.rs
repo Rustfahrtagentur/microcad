@@ -130,7 +130,5 @@ macro_rules! parameter_value {
 
 #[test]
 fn test_is_list_of() {
-    use crate::syntax::*;
-
     assert!(Type::List(ListType::new(Type::Scalar)).is_list_of(&Type::Scalar));
 }
