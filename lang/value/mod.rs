@@ -63,7 +63,7 @@ impl Value {
                 Quantity::new(unit.normalize(i as Scalar), quantity_type),
             )),
             (Value::Quantity(quantity), Type::Quantity(quantity_type)) => Ok(Value::Quantity(
-                quantity * Quantity::new(unit.normalize(1.0), quantity_type),
+                (quantity * Quantity::new(unit.normalize(1.0), quantity_type))?,
             )),
             (value, Type::Quantity(QuantityType::Scalar)) | (value, Type::Integer) => Ok(value),
             (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
@@ -249,7 +249,7 @@ impl std::ops::Add for Value {
             // Add an integer to a quantity
             (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs + rhs)?)),
             // Add two scalars
-            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity(lhs + rhs)),
+            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs + rhs)?)),
             // Concatenate two strings
             (Value::String(lhs), Value::String(rhs)) => Ok(Value::String(lhs + &rhs)),
             // Concatenate two lists
@@ -286,7 +286,7 @@ impl std::ops::Sub for Value {
             // Subtract an integer and a scalar
             (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Subtract two numbers
-            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity(lhs - rhs)),
+            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Boolean difference operator for nodes
             (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
                 lhs.union()
@@ -306,11 +306,11 @@ impl std::ops::Mul for Value {
             // Multiply two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs * rhs)),
             // Multiply an integer and a scalar, result is scalar
-            (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity(lhs * rhs)),
+            (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             // Multiply a scalar and an integer, result is scalar
-            (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity(lhs * rhs)),
+            (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             // Multiply two scalars
-            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity(lhs * rhs)),
+            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             (Value::List(list), value) | (value, Value::List(list)) => Ok((list * value)?),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }

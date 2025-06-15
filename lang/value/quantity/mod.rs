@@ -40,7 +40,13 @@ impl PartialOrd for Quantity {
 
 impl From<Scalar> for Quantity {
     fn from(value: Scalar) -> Self {
-        Quantity::new(value, QuantityType::Scalar)
+        Self::new(value, QuantityType::Scalar)
+    }
+}
+
+impl From<Integer> for Quantity {
+    fn from(value: Integer) -> Self {
+        Self::new(value as Scalar, QuantityType::Scalar)
     }
 }
 
@@ -51,6 +57,12 @@ impl Ty for Quantity {
 }
 
 impl std::fmt::Display for Quantity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} = {}", self.quantity_type, self.value)
+    }
+}
+
+impl std::fmt::Debug for Quantity {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} = {}", self.quantity_type, self.value)
     }

@@ -1,9 +1,14 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_core::Integer;
+//! Quantity binery operators module.
 
-use crate::value::{Quantity, error::QuantityResult};
+use microcad_core::{Integer, Scalar};
+
+use crate::{
+    ty::QuantityType,
+    value::{Quantity, error::QuantityResult},
+};
 
 impl std::ops::Neg for Quantity {
     type Output = Quantity;
@@ -17,10 +22,16 @@ impl std::ops::Neg for Quantity {
 }
 
 impl std::ops::Add for Quantity {
-    type Output = Quantity;
+    type Output = QuantityResult;
 
     fn add(self, rhs: Self) -> Self::Output {
-        todo!()
+        if self.quantity_type == rhs.quantity_type {
+            Ok(Quantity::new(self.value + rhs.value, self.quantity_type))
+        } else {
+            Err(super::error::QuantityError::InvalidOperation(
+                self, '+', rhs,
+            ))
+        }
     }
 }
 
@@ -28,7 +39,18 @@ impl std::ops::Add<Integer> for Quantity {
     type Output = QuantityResult;
 
     fn add(self, rhs: Integer) -> Self::Output {
-        todo!()
+        if self.quantity_type == QuantityType::Scalar {
+            Ok(Quantity::new(
+                self.value + rhs as Scalar,
+                self.quantity_type,
+            ))
+        } else {
+            Err(super::error::QuantityError::InvalidOperation(
+                self,
+                '+',
+                rhs.into(),
+            ))
+        }
     }
 }
 
@@ -36,15 +58,29 @@ impl std::ops::Add<Quantity> for Integer {
     type Output = QuantityResult;
 
     fn add(self, rhs: Quantity) -> Self::Output {
-        todo!()
+        if rhs.quantity_type == QuantityType::Scalar {
+            Ok(Quantity::new(self as Scalar + rhs.value, rhs.quantity_type))
+        } else {
+            Err(super::error::QuantityError::InvalidOperation(
+                self.into(),
+                '+',
+                rhs,
+            ))
+        }
     }
 }
 
 impl std::ops::Sub for Quantity {
-    type Output = Quantity;
+    type Output = QuantityResult;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        todo!()
+        if self.quantity_type == rhs.quantity_type {
+            Ok(Quantity::new(self.value - rhs.value, self.quantity_type))
+        } else {
+            Err(super::error::QuantityError::InvalidOperation(
+                self, '-', rhs,
+            ))
+        }
     }
 }
 
@@ -52,7 +88,18 @@ impl std::ops::Sub<Integer> for Quantity {
     type Output = QuantityResult;
 
     fn sub(self, rhs: Integer) -> Self::Output {
-        todo!()
+        if self.quantity_type == QuantityType::Scalar {
+            Ok(Quantity::new(
+                self.value - rhs as Scalar,
+                self.quantity_type,
+            ))
+        } else {
+            Err(super::error::QuantityError::InvalidOperation(
+                self,
+                '-',
+                rhs.into(),
+            ))
+        }
     }
 }
 
@@ -60,31 +107,46 @@ impl std::ops::Sub<Quantity> for Integer {
     type Output = QuantityResult;
 
     fn sub(self, rhs: Quantity) -> Self::Output {
-        todo!()
+        if rhs.quantity_type == QuantityType::Scalar {
+            Ok(Quantity::new(self as Scalar - rhs.value, rhs.quantity_type))
+        } else {
+            Err(super::error::QuantityError::InvalidOperation(
+                self.into(),
+                '-',
+                rhs,
+            ))
+        }
     }
 }
 
 impl std::ops::Mul for Quantity {
-    type Output = Quantity;
+    type Output = QuantityResult;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        todo!()
+        let t = self.quantity_type.clone() * rhs.quantity_type.clone();
+        if t == QuantityType::Invalid {
+            Err(super::error::QuantityError::InvalidOperation(
+                self, '*', rhs,
+            ))
+        } else {
+            Ok(Self::new(self.value * rhs.value, t))
+        }
     }
 }
 
 impl std::ops::Mul<Integer> for Quantity {
-    type Output = Quantity;
+    type Output = QuantityResult;
 
     fn mul(self, rhs: Integer) -> Self::Output {
-        todo!()
+        self * Into::<Quantity>::into(rhs)
     }
 }
 
 impl std::ops::Mul<Quantity> for Integer {
-    type Output = Quantity;
+    type Output = QuantityResult;
 
     fn mul(self, rhs: Quantity) -> Self::Output {
-        todo!()
+        Into::<Quantity>::into(self) * rhs
     }
 }
 
@@ -92,7 +154,14 @@ impl std::ops::Div for Quantity {
     type Output = QuantityResult;
 
     fn div(self, rhs: Self) -> Self::Output {
-        todo!()
+        let t = self.quantity_type.clone() / rhs.quantity_type.clone();
+        if t == QuantityType::Invalid {
+            Err(super::error::QuantityError::InvalidOperation(
+                self, '/', rhs,
+            ))
+        } else {
+            Ok(Self::new(self.value / rhs.value, t))
+        }
     }
 }
 
@@ -100,7 +169,7 @@ impl std::ops::Div<Integer> for Quantity {
     type Output = QuantityResult;
 
     fn div(self, rhs: Integer) -> Self::Output {
-        todo!()
+        self / Into::<Quantity>::into(rhs)
     }
 }
 
@@ -108,6 +177,6 @@ impl std::ops::Div<Quantity> for Integer {
     type Output = QuantityResult;
 
     fn div(self, rhs: Quantity) -> Self::Output {
-        todo!()
+        Into::<Quantity>::into(self) / rhs
     }
 }
