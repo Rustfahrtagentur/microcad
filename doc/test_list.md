@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**65** tests from markdown.
+**67** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -54,9 +54,11 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/types_primitive_string.png)](../doc/types/.test/types_primitive_string.log) | [types_primitive_string](../doc/types/primitive_types.md) |
 | [![test](../doc/types/.test/types_quantity_angle.png)](../doc/types/.test/types_quantity_angle.log) | [types_quantity_angle](../doc/types/quantity.md) |
 | [![test](../doc/types/.test/types_quantity_area.png)](../doc/types/.test/types_quantity_area.log) | [types_quantity_area](../doc/types/quantity.md) |
+| [![test](../doc/types/.test/types_quantity_area_units.png)](../doc/types/.test/types_quantity_area_units.log) | [types_quantity_area_units](../doc/types/quantity.md) |
 | [![test](../doc/types/.test/types_quantity_length.png)](../doc/types/.test/types_quantity_length.log) | [types_quantity_length](../doc/types/quantity.md) |
 | [![test](../doc/types/.test/types_quantity_scalar.png)](../doc/types/.test/types_quantity_scalar.log) | [types_quantity_scalar](../doc/types/quantity.md) |
 | [![test](../doc/types/.test/types_quantity_volume.png)](../doc/types/.test/types_quantity_volume.log) | [types_quantity_volume](../doc/types/quantity.md) |
+| [![test](../doc/types/.test/types_quantity_volume_units.png)](../doc/types/.test/types_quantity_volume_units.log) | [types_quantity_volume_units](../doc/types/quantity.md) |
 | [![test](../doc/types/.test/types_quantity_weight.png)](../doc/types/.test/types_quantity_weight.log) | [types_quantity_weight](../doc/types/quantity.md) |
 | [![test](../doc/std/algorithm/.test/union_alt_operator.png)](../doc/std/algorithm/.test/union_alt_operator.log) | [union_alt_operator](../doc/std/algorithm/union.md) |
 | [![test](../doc/std/algorithm/.test/union_operator.png)](../doc/std/algorithm/.test/union_operator.log) | [union_operator](../doc/std/algorithm/union.md) |

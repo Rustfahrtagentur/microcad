@@ -87,7 +87,19 @@ An `Area` is a two-dimensional quantity. It is the result when multiplying two `
 
 [![test](.test/types_quantity_area.png)](.test/types_quantity_area.log)
 
+
 ```µcad,types_quantity_area
+a = 3cm;
+b = 2cm;
+area = a * b;
+std::debug::assert(area == 6cm²);
+```
+
+Here is an example of how to use different areal units:
+
+[![test](.test/types_quantity_area_units.png)](.test/types_quantity_area_units.log)
+
+```µcad,types_quantity_area_units
 square_millimeter = 100000mm²;
 square_centimeter = 1000cm²;
 square_meter = 0.1m²;
@@ -97,13 +109,26 @@ std::debug::assert(square_millimeter == 0.1m²);
 std::debug::assert(square_centimeter == 0.1m²);
 ```
 
-## Volume
+### Volume
 
 A `Volume` is a three-dimensional quantity. It is the result when multiplying three `Length`.
 
 [![test](.test/types_quantity_volume.png)](.test/types_quantity_volume.log)
-
 ```µcad,types_quantity_volume
+a = 3mm;
+b = 2mm;
+c = 4mm;
+
+volume = a * b * c;
+
+std::debug::assert(volume == 24mm³);
+```
+
+Here is an example for units:
+
+[![test](.test/types_quantity_volume_units.png)](.test/types_quantity_volume_units.log)
+
+```µcad,types_quantity_volume_units
 cubic_millimeter = 1000000.0mm³;
 cubic_centimeter = 100.0cl;
 cubic_meter = 0.001m³;
@@ -119,7 +144,7 @@ std::debug::assert(centiliter == 1.0l);
 std::debug::assert(milliliter == 1.0l);
 ```
 
-## Weight
+### Weight
 
 Weights can be calculated by applying volumes to materials.
 
