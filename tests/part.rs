@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #[cfg(test)]
-use microcad_lang::{eval::*, model_tree::*, resolve::*, src_ref::*, syntax::*, value::*};
+use microcad_lang::{eval::*, model_tree::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
 /// Helper function to create a qualified name from &str
 #[cfg(test)]
@@ -61,10 +61,7 @@ fn part_implicit_init_call() {
                 object
                     .get_property_value(&Identifier(Refer::none("b".into())))
                     .expect("Property `b`"),
-                &Value::Quantity(Quantity::new(
-                    value,
-                    microcad_lang::ty::QuantityType::Scalar
-                ))
+                &Value::Quantity(Quantity::new(value, QuantityType::Scalar))
             );
         } else {
             panic!("Object node expected")
@@ -112,7 +109,7 @@ fn part_explicit_init_call() {
                 object
                     .get_property_value(&Identifier::no_ref("radius"))
                     .expect("Property `radius`"),
-                &value::Value::Quantity(Quantity::new(value, ty::QuantityType::Scalar))
+                &Value::Quantity(Quantity::new(value, ty::QuantityType::Scalar))
             );
         } else {
             panic!("Object node expected")

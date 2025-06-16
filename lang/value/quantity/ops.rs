@@ -5,10 +5,7 @@
 
 use microcad_core::{Integer, Scalar};
 
-use crate::{
-    ty::QuantityType,
-    value::{Quantity, error::QuantityResult},
-};
+use crate::{ty::*, value::*};
 
 impl std::ops::Neg for Quantity {
     type Output = Quantity;
@@ -28,9 +25,7 @@ impl std::ops::Add for Quantity {
         if self.quantity_type == rhs.quantity_type {
             Ok(Quantity::new(self.value + rhs.value, self.quantity_type))
         } else {
-            Err(super::error::QuantityError::InvalidOperation(
-                self, '+', rhs,
-            ))
+            Err(QuantityError::InvalidOperation(self, '+', rhs))
         }
     }
 }
@@ -45,11 +40,7 @@ impl std::ops::Add<Integer> for Quantity {
                 self.quantity_type,
             ))
         } else {
-            Err(super::error::QuantityError::InvalidOperation(
-                self,
-                '+',
-                rhs.into(),
-            ))
+            Err(QuantityError::InvalidOperation(self, '+', rhs.into()))
         }
     }
 }
@@ -61,11 +52,7 @@ impl std::ops::Add<Quantity> for Integer {
         if rhs.quantity_type == QuantityType::Scalar {
             Ok(Quantity::new(self as Scalar + rhs.value, rhs.quantity_type))
         } else {
-            Err(super::error::QuantityError::InvalidOperation(
-                self.into(),
-                '+',
-                rhs,
-            ))
+            Err(QuantityError::InvalidOperation(self.into(), '+', rhs))
         }
     }
 }
@@ -77,9 +64,7 @@ impl std::ops::Sub for Quantity {
         if self.quantity_type == rhs.quantity_type {
             Ok(Quantity::new(self.value - rhs.value, self.quantity_type))
         } else {
-            Err(super::error::QuantityError::InvalidOperation(
-                self, '-', rhs,
-            ))
+            Err(QuantityError::InvalidOperation(self, '-', rhs))
         }
     }
 }
@@ -94,11 +79,7 @@ impl std::ops::Sub<Integer> for Quantity {
                 self.quantity_type,
             ))
         } else {
-            Err(super::error::QuantityError::InvalidOperation(
-                self,
-                '-',
-                rhs.into(),
-            ))
+            Err(QuantityError::InvalidOperation(self, '-', rhs.into()))
         }
     }
 }
@@ -110,11 +91,7 @@ impl std::ops::Sub<Quantity> for Integer {
         if rhs.quantity_type == QuantityType::Scalar {
             Ok(Quantity::new(self as Scalar - rhs.value, rhs.quantity_type))
         } else {
-            Err(super::error::QuantityError::InvalidOperation(
-                self.into(),
-                '-',
-                rhs,
-            ))
+            Err(QuantityError::InvalidOperation(self.into(), '-', rhs))
         }
     }
 }
@@ -125,9 +102,7 @@ impl std::ops::Mul for Quantity {
     fn mul(self, rhs: Self) -> Self::Output {
         let t = self.quantity_type.clone() * rhs.quantity_type.clone();
         if t == QuantityType::Invalid {
-            Err(super::error::QuantityError::InvalidOperation(
-                self, '*', rhs,
-            ))
+            Err(QuantityError::InvalidOperation(self, '*', rhs))
         } else {
             Ok(Self::new(self.value * rhs.value, t))
         }
@@ -156,9 +131,7 @@ impl std::ops::Div for Quantity {
     fn div(self, rhs: Self) -> Self::Output {
         let t = self.quantity_type.clone() / rhs.quantity_type.clone();
         if t == QuantityType::Invalid {
-            Err(super::error::QuantityError::InvalidOperation(
-                self, '/', rhs,
-            ))
+            Err(QuantityError::InvalidOperation(self, '/', rhs))
         } else {
             Ok(Self::new(self.value / rhs.value, t))
         }

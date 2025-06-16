@@ -18,64 +18,34 @@ These classes of built-in types are supported:
 | [*Nodes*](nodes.md)               | A node in the model tree.                                     | `h: Node = { cube(2mm); }`                       |   
 
 
-
 ## Declaration
 
-In µcad, you will need to use units almost everywhere you use values.
-This is intended and what you get in return is that declarations are quite handy:
+The examples in the table above declare the type explicitly.
+However, we can use units to declare the implicitly.
+Using units is recommended and what you get in return is that declarations are quite handy:
 
 [![test](.test/types_def_vs_decl.png)](.test/types_def_vs_decl.log)
 
 ```µcad,types_def_vs_decl
-x = 4mm;            // use unit
-x : Length = 4mm;   // use type
+x: Length = 4mm;   // explicit type declaration
+x = 4mm;           // implicit type declaration via units.
 ```
 
-Declarations without any unit is *not allowed* in µcad:
+Declarations without any initializations are *not allowed* in µcad.
+Hence, the following example will fail:
 
 [![test](.test/types_no_declaration.png)](.test/types_no_declaration.log)
 
 ```µcad,types_no_declaration#fail
- x: Length;         // error
+x: Length;         // error
 ```
 
-This one is just needed, if you declare parameters giving any default value:
+However, for parameter lists in functions and workbenches, you can declare the type only but also pass a default value: 
 
 [![test](.test/types_bundles_functions.png)](.test/types_bundles_functions.log)
 
 ```µcad,types_bundles_functions
-fn f( x = 4mm ) {}        // use unit (with default)
-fn f( x : Length ) {}     // use type (without default)
-```
-
-
-## Unit Bundling
-
-Units can be *bundled* in tuples or arrays:
-
-[![test](.test/unit_bundle_tuple.png)](.test/unit_bundle_tuple.log)
-
-```µcad,unit_bundle_tuple
-// without unit bundling
-p1 = (x=1mm, y=2mm, z=3mm);
-
-// with bundling
-p2 = (x=1, y=2, z=3)mm;
-
-// are the same
-std::debug::assert(p1 == p2, "Tuples should be equal");
-```
-
-[![test](.test/unit_bundle_list.png)](.test/unit_bundle_list.log)
-
-```µcad,unit_bundle_list
-// without bundling
-l1 = [1mm, 2mm, 3mm];
-
-// with bundling
-l2 = [1, 2, 3]mm;
-
-// are the same
-std::debug::assert(l1 == l2);
+fn f(x = 4mm) {}        // use unit (with default)
+fn f(x: Length) {}     // use type (without default)
 ```
 

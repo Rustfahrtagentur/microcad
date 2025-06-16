@@ -3,10 +3,11 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**67** tests from markdown.
+**68** tests from markdown.
 
 | Result | Name |
 |-------:|------|
+| [![test](../doc/types/.test/array_unit_bundling.png)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/array.md) |
 | [![test](../doc/std/algorithm/.test/difference_alt_operator.png)](../doc/std/algorithm/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/std/algorithm/difference.md) |
 | [![test](../doc/std/algorithm/.test/difference_operator.png)](../doc/std/algorithm/.test/difference_operator.log) | [difference_operator](../doc/std/algorithm/difference.md) |
 | [![test](../doc/parts/.test/EXAMPLES_fields.png)](../doc/parts/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/parts/EXAMPLES.md) |

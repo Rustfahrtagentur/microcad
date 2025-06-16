@@ -29,7 +29,7 @@ Text can be used to logging or to render text.
 
 ```µcad,types_primitive_string
 text = "Hello µcad!";
-std::debug::assert(text.count(11));
+std::debug::assert(text.count() == 11);
 
 // logging
 std::print(text);

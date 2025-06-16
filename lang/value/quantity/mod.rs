@@ -9,6 +9,8 @@ pub mod ops;
 use crate::ty::*;
 use microcad_core::*;
 
+pub use error::*;
+
 /// A numeric value
 #[derive(Clone, PartialEq)]
 pub struct Quantity {
