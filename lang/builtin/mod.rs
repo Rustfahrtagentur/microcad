@@ -4,7 +4,6 @@
 //! Builtin module
 
 pub mod attributes;
-pub mod color;
 pub mod module_builder;
 
 use microcad_core::*;

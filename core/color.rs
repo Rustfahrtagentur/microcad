@@ -1,17 +1,43 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Color built-ins.
+//! µcad color syntax element
 
 use std::str::FromStr;
 
-use crate::{parse::ParseError, syntax::Color};
+/// A color with RGBA channels
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct Color {
+    /// red value
+    pub r: f32,
+    /// green value
+    pub g: f32,
+    /// blue value
+    pub b: f32,
+    /// alpha value
+    pub a: f32,
+}
 
 impl Color {
+    /// Create new color.
+    pub fn new(r: f32, g: f32, b: f32, a: f32) -> Self {
+        Self { r, g, b, a }
+    }
+
+    /// Create new color from RGBA values.
+    pub fn rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
+        Self::new(r, g, b, a)
+    }
+
+    /// Create new color from RGB values. Alpha is 1.0.
+    pub fn rgb(r: f32, g: f32, b: f32) -> Self {
+        Self::rgba(r, g, b, 1.0_f32)
+    }
+
     /// Construct a color from a hex string like `#FFCCAA`.
-    pub fn from_hex_str(hex: &str) -> Result<Self, ParseError> {
+    pub fn from_hex_str(hex: &str) -> Result<Self, ParseColorError> {
         if !hex.starts_with("#") {
-            return Err(ParseError::ParseColorFromHex(hex.to_string()));
+            return Err(ParseColorError::ParseColorFromHex(hex.into()));
         }
         let hex = &hex[1..];
 
@@ -33,13 +59,19 @@ impl Color {
                 hex8bit(4)?,
                 if hex.len() == 8 { hex8bit(6)? } else { 1.0 },
             )),
-            _ => Err(ParseError::ParseColorFromHex(hex.into())),
+            _ => Err(ParseColorError::ParseColorFromHex(hex.into())),
         }
     }
 }
 
+impl std::fmt::Display for Color {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "rgba({}, {}, {}, {})", self.r, self.g, self.b, self.a)
+    }
+}
+
 impl FromStr for Color {
-    type Err = ParseError;
+    type Err = ParseColorError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -64,9 +96,27 @@ impl FromStr for Color {
                 if s.starts_with("#") {
                     Self::from_hex_str(s)
                 } else {
-                    Err(ParseError::UnknownColorName(s.to_string()))
+                    Err(ParseColorError::UnknownColorName(s.to_string()))
                 }
             }
         }
     }
+}
+
+use thiserror::Error;
+
+/// An error when parsing a color from a string
+#[derive(Error, Debug)]
+pub enum ParseColorError {
+    /// Unknown color name.
+    #[error("Unknown color name: {0}")]
+    UnknownColorName(String),
+
+    /// Unknown color name.
+    #[error("Could not parse color from hex string: {0}")]
+    ParseColorFromHex(String),
+
+    /// Error parsing integer.
+    #[error("Error parsing integer literal: {0}")]
+    ParseIntError(#[from] std::num::ParseIntError),
 }

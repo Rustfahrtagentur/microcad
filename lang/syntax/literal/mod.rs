@@ -3,11 +3,9 @@
 
 //! µcad literal syntax elements
 
-mod color;
 mod number_literal;
 mod units;
 
-pub use color::*;
 pub use number_literal::*;
 pub use units::*;
 
@@ -22,8 +20,6 @@ pub enum Literal {
     Number(NumberLiteral),
     /// Boolean literal
     Bool(Refer<bool>),
-    /// Color literal
-    Color(Refer<Color>),
 }
 
 impl Literal {
@@ -33,7 +29,6 @@ impl Literal {
             Self::Integer(value) => Value::Integer(*value.clone()),
             Self::Number(value) => value.value(),
             Self::Bool(value) => Value::Bool(*value.clone()),
-            Self::Color(value) => Value::Color(*value.clone()),
         }
     }
 }
@@ -44,7 +39,6 @@ impl SrcReferrer for Literal {
             Literal::Number(n) => n.src_ref(),
             Literal::Integer(i) => i.src_ref(),
             Literal::Bool(b) => b.src_ref(),
-            Literal::Color(c) => c.src_ref(),
         }
     }
 }
@@ -55,7 +49,6 @@ impl crate::ty::Ty for Literal {
             Literal::Integer(_) => Type::Integer,
             Literal::Number(n) => n.ty(),
             Literal::Bool(_) => Type::Bool,
-            Literal::Color(_) => Type::Color,
         }
     }
 }
@@ -66,7 +59,6 @@ impl std::fmt::Display for Literal {
             Literal::Integer(i) => write!(f, "{i}"),
             Literal::Number(n) => write!(f, "{n}"),
             Literal::Bool(b) => write!(f, "{b}"),
-            Literal::Color(c) => write!(f, "{c}"),
         }
     }
 }
@@ -84,7 +76,6 @@ impl PrintSyntax for Literal {
             Literal::Integer(i) => writeln!(f, "{i}"),
             Literal::Number(n) => writeln!(f, "{n}"),
             Literal::Bool(b) => writeln!(f, "{b}"),
-            Literal::Color(c) => writeln!(f, "{c}"),
         }
     }
 }

@@ -43,9 +43,6 @@ impl Eval<Option<MetadataItem>> for Attribute {
                     }
                 }
                 Attribute::NameValue(_, expression) => match str {
-                    "color" | "stroke_color" | "fill_color" => {
-                        return attributes::color(id, expression, context);
-                    }
                     "part" | "layer" => {
                         return attributes::name_id(id, expression, context);
                     }

@@ -65,7 +65,6 @@ impl CallMethod for Value {
             Value::Quantity(_) => eval_todo!(context, args, "call_method for Quantity"),
             Value::Bool(_) => eval_todo!(context, args, "call_method for Bool"),
             Value::String(_) => eval_todo!(context, args, "call_method for String"),
-            Value::Color(_) => eval_todo!(context, args, "call_method for Color"),
             Value::Array(list) => list.call_method(id, args, context),
             Value::NamedTuple(_) => eval_todo!(context, args, "call_method for NamedTuple"),
             Value::Tuple(_) => eval_todo!(context, args, "call_method for Tuple"),

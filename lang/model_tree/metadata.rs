@@ -4,7 +4,7 @@
 //! Object attributes module
 //!
 use crate::{syntax::*, value::*};
-use microcad_core::ExportSettings;
+use microcad_core::{Color, ExportSettings};
 
 /// A single [`MetaData`] item
 #[derive(Debug, Clone)]
@@ -38,7 +38,6 @@ impl MetadataItem {
     /// Tag and call attributes like [ObjectAttribute::Aux] will return [Value::None].
     pub fn value(&self) -> Value {
         match self {
-            MetadataItem::Color(_, color) => Value::Color(*color),
             MetadataItem::ItemId(value) | MetadataItem::Layer(value) => value.clone(),
             _ => Value::None,
         }

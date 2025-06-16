@@ -31,21 +31,6 @@ pub fn export(
     }
 }
 
-/// Built-in color [`MetadataItem`]: `#[color = "blue", fill_color = "#00FF00"]`.
-pub fn color(
-    id: &Identifier,
-    expression: &Expression,
-    context: &mut Context,
-) -> EvalResult<Option<MetadataItem>> {
-    match expression.eval(context)?.try_color() {
-        Ok(color) => Ok(Some(MetadataItem::Color(id.clone(), color))),
-        Err(err) => {
-            context.error(expression, err)?;
-            Ok(None)
-        }
-    }
-}
-
 /// A name value [`MetadataItem`], like `#[item_id = 2]`, `#[layer = "layer"]`.
 pub fn name_id(
     id: &Identifier,

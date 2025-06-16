@@ -16,8 +16,6 @@ pub enum Type {
     Quantity(QuantityType),
     /// A string
     String,
-    /// An RGBA color
-    Color,
     /// A boolean: true, false
     Bool,
     /// A list of elements of the same type: `[Scalar]`
@@ -35,9 +33,9 @@ pub enum Type {
 }
 
 impl Type {
-    /// Check if the type is a named tuple
-    pub fn is_named_tuple(&self) -> bool {
-        matches!(self, Self::NamedTuple(_))
+    /// Shortcut to create a scalar type.
+    pub fn scalar() -> Self {
+        Self::Quantity(QuantityType::Scalar)
     }
 
     /// Check if the type is a list of the given type `ty`
@@ -62,7 +60,6 @@ impl std::fmt::Display for Type {
             Self::Integer => write!(f, "Integer"),
             Self::Quantity(quantity) => write!(f, "{quantity}"),
             Self::String => write!(f, "String"),
-            Self::Color => write!(f, "Color"),
             Self::Bool => write!(f, "Bool"),
             Self::List(t) => write!(f, "{t}"),
             Self::Tuple(t) => write!(f, "{t}"),
