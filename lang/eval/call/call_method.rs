@@ -20,7 +20,7 @@ pub trait CallMethod {
     ) -> EvalResult<Value>;
 }
 
-impl CallMethod for List {
+impl CallMethod for Array {
     fn call_method(
         &self,
         id: &Identifier,
@@ -62,17 +62,11 @@ impl CallMethod for Value {
         match &self {
             Value::None => todo!(),
             Value::Integer(_) => todo!(),
-            Value::Scalar(_) => todo!(),
-            Value::Length(_) => todo!(),
-            Value::Area(_) => todo!(),
-            Value::Volume(_) => todo!(),
-            Value::Angle(_) => todo!(),
-            Value::Weight(_) => todo!(),
-            Value::Density(_) => todo!(),
+            Value::Quantity(_) => todo!(),
             Value::Bool(_) => todo!(),
             Value::String(_) => todo!(),
             Value::Color(_) => todo!(),
-            Value::List(list) => list.call_method(id, args, context),
+            Value::Array(list) => list.call_method(id, args, context),
             Value::NamedTuple(_) => todo!(),
             Value::Tuple(_) => todo!(),
             Value::Matrix(_) => todo!(),
@@ -83,13 +77,13 @@ impl CallMethod for Value {
 
 #[test]
 fn call_list_method() {
-    let list = List::new(
+    let list = Array::new(
         ValueList::new(vec![
-            Value::Scalar(3.0),
-            Value::Scalar(3.0),
-            Value::Scalar(3.0),
+            Value::Quantity(Quantity::new(3.0, QuantityType::Scalar)),
+            Value::Quantity(Quantity::new(3.0, QuantityType::Scalar)),
+            Value::Quantity(Quantity::new(3.0, QuantityType::Scalar)),
         ]),
-        crate::ty::Type::Scalar,
+        crate::ty::Type::Quantity(QuantityType::Scalar),
     );
 
     if let Value::Bool(result) = list

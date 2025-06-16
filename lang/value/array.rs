@@ -3,17 +3,17 @@
 
 //! Typed list of values evaluation entity
 
-use crate::{syntax::*, ty::*, value::*};
+use crate::{ty::*, value::*};
 
 /// List of values of the same type
 #[derive(Clone, Debug)]
-pub struct List {
+pub struct Array {
     /// List of values
     list: ValueList,
     ty: Type,
 }
 
-impl List {
+impl Array {
     /// Create new list
     pub fn new(list: ValueList, ty: Type) -> Self {
         Self { list, ty }
@@ -25,13 +25,13 @@ impl List {
     }
 }
 
-impl PartialEq for List {
+impl PartialEq for Array {
     fn eq(&self, other: &Self) -> bool {
         self.ty == other.ty && self.list == other.list
     }
 }
 
-impl std::ops::Deref for List {
+impl std::ops::Deref for Array {
     type Target = ValueList;
 
     fn deref(&self) -> &Self::Target {
@@ -39,13 +39,13 @@ impl std::ops::Deref for List {
     }
 }
 
-impl std::ops::DerefMut for List {
+impl std::ops::DerefMut for Array {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.list
     }
 }
 
-impl IntoIterator for List {
+impl IntoIterator for Array {
     type Item = Value;
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
@@ -54,7 +54,7 @@ impl IntoIterator for List {
     }
 }
 
-impl std::fmt::Display for List {
+impl std::fmt::Display for Array {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
@@ -69,13 +69,13 @@ impl std::fmt::Display for List {
     }
 }
 
-impl crate::ty::Ty for List {
+impl crate::ty::Ty for Array {
     fn ty(&self) -> Type {
         Type::List(ListType::new(self.ty.clone()))
     }
 }
 
-impl std::ops::Mul<Value> for List {
+impl std::ops::Mul<Value> for Array {
     type Output = ValueResult;
 
     fn mul(self, rhs: Value) -> Self::Output {
@@ -86,15 +86,16 @@ impl std::ops::Mul<Value> for List {
 
         match self.ty {
             // List * Scalar or List * Integer
-            Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => Ok(
-                Value::List(List::new(ValueList::new(values), rhs.ty().clone())),
-            ),
+            Type::Quantity(_) | Type::Integer => Ok(Value::Array(Array::new(
+                ValueList::new(values),
+                rhs.ty().clone(),
+            ))),
             _ => Err(ValueError::InvalidOperator("*".into())),
         }
     }
 }
 
-impl std::ops::Div<Value> for List {
+impl std::ops::Div<Value> for Array {
     type Output = ValueResult;
 
     fn div(self, rhs: Value) -> Self::Output {
@@ -105,9 +106,10 @@ impl std::ops::Div<Value> for List {
 
         match self.ty {
             // List / Scalar or List / Integer
-            Type::Scalar | Type::Integer | Type::Length | Type::Area | Type::Angle => {
-                Ok(Value::List(List::new(ValueList::new(values), Type::Scalar)))
-            }
+            Type::Quantity(_) | Type::Integer => Ok(Value::Array(Array::new(
+                ValueList::new(values),
+                Type::Quantity(QuantityType::Scalar),
+            ))),
             _ => Err(ValueError::InvalidOperator("/".into())),
         }
     }

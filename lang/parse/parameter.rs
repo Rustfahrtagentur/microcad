@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{parse::*, parser::*, ty::*};
+use crate::{parse::*, parser::*};
 
 /// Short cut to create a `ParameterList` instance
 impl Parse for Parameter {

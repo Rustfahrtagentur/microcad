@@ -1,13 +1,23 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad Basic Types
+//! µcad syntax elements of types
 
-pub mod r#type;
-pub mod type_annotation;
+mod list_type;
+mod matrix_type;
+mod named_tuple_type;
+mod quantity_type;
+mod tuple_type;
+mod r#type;
+mod type_list;
 
+pub use list_type::*;
+pub use matrix_type::*;
+pub use named_tuple_type::*;
+pub use quantity_type::*;
+pub use tuple_type::*;
 pub use r#type::*;
-pub use type_annotation::*;
+pub use type_list::*;
 
 /// Trait for structs and expressions that have a type
 pub trait Ty {

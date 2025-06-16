@@ -90,47 +90,10 @@ impl SrcReferrer for ParameterValue {
     }
 }
 
-/// Shortcut to create a `ParameterValue`
-#[macro_export]
-macro_rules! parameter_value {
-    ($id:ident) => {
-        $crate::eval::ParameterValue::new(
-            $crate::syntax::Identifier::no_ref(stringify!($id)),
-            None,
-            None,
-            $crate::src_ref::SrcRef(None),
-        )
-    };
-    ($id:ident: $ty:ident) => {
-        $crate::eval::ParameterValue::new(
-            $crate::syntax::Identifier::no_ref(stringify!($id)),
-            Some($crate::ty::Type::$ty),
-            None,
-            $crate::src_ref::SrcRef(None),
-        )
-    };
-    ($id:ident: $ty:ident = $value:expr) => {
-        $crate::eval::ParameterValue::new(
-            $crate::syntax::Identifier::no_ref(stringify!($id)),
-            Some($crate::ty::Type::$ty),
-            Some($crate::value::Value::$ty($value)),
-            $crate::src_ref::SrcRef(None),
-        )
-    };
-    ($id:ident = $value:expr) => {
-        value::ParameterValue::new(
-            $crate::syntax::Identifier::no_ref(stringify!($id)),
-            None,
-            Some($value),
-            SrcRef(None),
-        )
-    };
-    () => {};
-}
-
 #[test]
 fn test_is_list_of() {
-    use crate::syntax::*;
-
-    assert!(Type::List(ListType::new(Type::Scalar)).is_list_of(&Type::Scalar));
+    assert!(
+        Type::List(ListType::new(QuantityType::Scalar.into()))
+            .is_list_of(&QuantityType::Scalar.into())
+    );
 }

@@ -11,7 +11,9 @@ fn abs() -> Symbol {
         let arg = args.get_single()?;
         Ok(match &arg.value {
             Value::Integer(i) => Value::Integer(i.abs()),
-            Value::Scalar(s) => Value::Scalar(s.abs()),
+            Value::Quantity(q) => {
+                Value::Quantity(Quantity::new(q.value.abs(), q.quantity_type.clone()))
+            }
             value => {
                 ctx.error(
                     arg,
@@ -30,7 +32,10 @@ fn abs() -> Symbol {
 /// Helper function to get an angle from a field in an argument list.
 fn get_angle(args: &ArgumentMap, axis: &str) -> cgmath::Deg<f64> {
     match args[&axis.try_into().expect("Valid identifier")] {
-        Value::Angle(angle) => cgmath::Deg::<f64>(angle),
+        Value::Quantity(Quantity {
+            value,
+            quantity_type: QuantityType::Angle,
+        }) => cgmath::Deg::<f64>(value),
         _ => unreachable!(),
     }
 }
@@ -144,7 +149,7 @@ pub fn math() -> Symbol {
     crate::ModuleBuilder::new("math".try_into().expect("unexpected name error"))
         .symbol(Symbol::new_constant(
             Identifier::no_ref("PI"),
-            Value::Scalar(std::f64::consts::PI),
+            Value::Quantity(Quantity::new(std::f64::consts::PI, QuantityType::Scalar)),
         ))
         .symbol(Symbol::new_constant(
             Identifier::no_ref("X"),

@@ -3,8 +3,7 @@
 
 //! µcad Type annotation
 
-use super::Type;
-use crate::{src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*, ty::*};
 
 /// Type within source code
 #[derive(Debug, Clone, PartialEq)]

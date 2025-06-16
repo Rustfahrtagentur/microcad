@@ -6,20 +6,20 @@
 //! Every evaluation of any *symbol* leads to a [`Value`] which then might continued
 //! to process or ends up as the overall evaluation result.
 
-mod list;
-mod named_tuple;
-
+mod array;
 mod matrix;
+mod named_tuple;
+mod quantity;
 mod tuple;
 mod value_error;
 mod value_list;
 
-pub use list::*;
+pub use array::*;
 pub use matrix::*;
 pub use named_tuple::*;
+pub use quantity::*;
 pub use tuple::*;
 pub use value_error::*;
-
 pub use value_list::*;
 
 use crate::{model_tree::*, syntax::*, ty::*};
@@ -33,37 +33,25 @@ pub enum Value {
     /// Invalid value (used for error handling).
     #[default]
     None,
-    /// An integer value.
-    Integer(Integer),
-    /// A scalar value.
-    Scalar(Scalar),
-    /// Length in mm.
-    Length(Scalar),
-    /// Area in mm².
-    Area(Scalar),
-    /// Volume in mm³.
-    Volume(Scalar),
-    /// Density in g/mm³
-    Density(Scalar),
-    /// An angle in radians.
-    Angle(Scalar),
-    /// Weight of a specific volume of material.
-    Weight(Scalar),
+    /// A quantity value.
+    Quantity(Quantity),
     /// A boolean value.
     Bool(bool),
+    /// An integer value.
+    Integer(Integer),
     /// A string value.
     String(String),
     /// A color value.
     Color(Color),
-    /// A list of values.
-    List(List),
-    /// A tuple of named items.
-    NamedTuple(NamedTuple),
+    /// A list of values with a common type.
+    Array(Array),
     /// A tuple of unnamed items.
     Tuple(Tuple),
+    /// A tuple of named items.
+    NamedTuple(NamedTuple),
     /// A matrix.
     Matrix(Box<Matrix>),
-    /// A node in the render tree.
+    /// A node in the model tree.
     Nodes(ModelNodes),
 }
 
@@ -71,16 +59,18 @@ impl Value {
     /// Add a unit to a primitive value (Scalar or Integer).
     pub fn bundle_unit(self, unit: Unit) -> ValueResult {
         match (self, unit.ty()) {
-            (Value::Integer(i), Type::Length) => Ok(Value::Length(unit.normalize(i as Scalar))),
-            (Value::Integer(i), Type::Angle) => Ok(Value::Angle(unit.normalize(i as Scalar))),
-            (Value::Scalar(s), Type::Length) => Ok(Value::Length(unit.normalize(s))),
-            (Value::Scalar(s), Type::Angle) => Ok(Value::Angle(unit.normalize(s))),
-            (value, Type::Scalar) | (value, Type::Integer) => Ok(value),
+            (Value::Integer(i), Type::Quantity(quantity_type)) => Ok(Value::Quantity(
+                Quantity::new(unit.normalize(i as Scalar), quantity_type),
+            )),
+            (Value::Quantity(quantity), Type::Quantity(quantity_type)) => Ok(Value::Quantity(
+                (quantity * Quantity::new(unit.normalize(1.0), quantity_type))?,
+            )),
+            (value, Type::Quantity(QuantityType::Scalar)) | (value, Type::Integer) => Ok(value),
             (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
         }
     }
 
-    /// Create a value from a single object node.
+    /// Create a value from a single model node.
     pub fn from_single_node(node: ModelNode) -> Self {
         Self::Nodes(vec![node].into())
     }
@@ -186,7 +176,7 @@ impl Value {
     /// Try to convert to [`Scalar`].
     pub fn try_scalar(&self) -> Result<Scalar, ValueError> {
         match self {
-            Value::Scalar(s) => return Ok(*s),
+            Value::Quantity(q) => return Ok(q.value),
             Value::Integer(i) => return Ok((*i) as f64),
             _ => {}
         }
@@ -200,16 +190,14 @@ impl PartialOrd for Value {
         match (self, other) {
             // integer type
             (Value::Integer(lhs), Value::Integer(rhs)) => lhs.partial_cmp(rhs),
-
-            // floating point types
-            (Value::Scalar(lhs), Value::Scalar(rhs))
-            | (Value::Length(lhs), Value::Length(rhs))
-            | (Value::Area(lhs), Value::Area(rhs))
-            | (Value::Volume(lhs), Value::Volume(rhs))
-            | (Value::Angle(lhs), Value::Angle(rhs))
-            | (Value::Angle(lhs), Value::Scalar(rhs))
-            | (Value::Scalar(lhs), Value::Angle(rhs)) => lhs.partial_cmp(rhs),
-
+            (Value::Quantity(lhs), Value::Quantity(rhs)) => lhs.partial_cmp(rhs),
+            (
+                Value::Quantity(Quantity {
+                    value,
+                    quantity_type: QuantityType::Scalar,
+                }),
+                Value::Integer(rhs),
+            ) => value.partial_cmp(&(*rhs as Scalar)),
             _ => {
                 log::warn!("unhandled type mismatch between {self} and {other}");
                 None
@@ -223,17 +211,11 @@ impl crate::ty::Ty for Value {
         match self {
             Value::None => Type::Invalid,
             Value::Integer(_) => Type::Integer,
-            Value::Scalar(_) => Type::Scalar,
-            Value::Length(_) => Type::Length,
-            Value::Area(_) => Type::Area,
-            Value::Volume(_) => Type::Volume,
-            Value::Angle(_) => Type::Angle,
-            Value::Weight(_) => Type::Weight,
-            Value::Density(_) => Type::Density,
+            Value::Quantity(q) => q.ty(),
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
             Value::Color(_) => Type::Color,
-            Value::List(list) => list.ty(),
+            Value::Array(list) => list.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::Tuple(unnamed_tuple) => unnamed_tuple.ty(),
             Value::Matrix(matrix) => matrix.ty(),
@@ -248,9 +230,7 @@ impl std::ops::Neg for Value {
     fn neg(self) -> Self::Output {
         match self {
             Value::Integer(n) => Ok(Value::Integer(-n)),
-            Value::Scalar(n) => Ok(Value::Scalar(-n)),
-            Value::Length(n) => Ok(Value::Length(-n)),
-            Value::Angle(n) => Ok(Value::Angle(-n)),
+            Value::Quantity(q) => Ok(Value::Quantity(q.neg())),
             _ => Err(ValueError::InvalidOperator("-".into())),
         }
     }
@@ -264,20 +244,16 @@ impl std::ops::Add for Value {
         match (self, rhs) {
             // Add two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs + rhs)),
-            // Add a scalar to an integer
-            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar + rhs)),
-            // Add an integer to a scalar
-            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs + rhs as Scalar)),
+            // Add a quantity to an integer
+            (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs + rhs)?)),
+            // Add an integer to a quantity
+            (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs + rhs)?)),
             // Add two scalars
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs + rhs)),
-            // Add two angles
-            (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Angle(lhs + rhs)),
-            // Add two lengths
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs + rhs)),
+            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs + rhs)?)),
             // Concatenate two strings
             (Value::String(lhs), Value::String(rhs)) => Ok(Value::String(lhs + &rhs)),
             // Concatenate two lists
-            (Value::List(lhs), Value::List(rhs)) => {
+            (Value::Array(lhs), Value::Array(rhs)) => {
                 if lhs.ty() != rhs.ty() {
                     return Err(ValueError::CannotCombineVecOfDifferentType(
                         lhs.ty(),
@@ -285,7 +261,7 @@ impl std::ops::Add for Value {
                     ));
                 }
 
-                Ok(Value::List(List::new(
+                Ok(Value::Array(Array::new(
                     lhs.iter().chain(rhs.iter()).cloned().collect(),
                     lhs.ty(),
                 )))
@@ -302,19 +278,15 @@ impl std::ops::Sub for Value {
     type Output = ValueResult;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        match (&self, &rhs) {
+        match (self, rhs) {
             // Subtract two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs - rhs)),
             // Subtract an scalar and an integer
-            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs - *rhs as Scalar)),
+            (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Subtract an integer and a scalar
-            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(*lhs as Scalar - rhs)),
+            (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Subtract two numbers
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs - rhs)),
-            // Subtract two angles
-            (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Angle(lhs - rhs)),
-            // Subtract two lengths
-            (Value::Length(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs - rhs)),
+            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Boolean difference operator for nodes
             (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
                 lhs.union()
@@ -334,28 +306,12 @@ impl std::ops::Mul for Value {
             // Multiply two integers
             (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs * rhs)),
             // Multiply an integer and a scalar, result is scalar
-            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar * rhs)),
+            (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             // Multiply a scalar and an integer, result is scalar
-            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs * rhs as Scalar)),
+            (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             // Multiply two scalars
-            (Value::Scalar(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs * rhs)),
-            // Scale an angle with a scalar
-            (Value::Angle(lhs), Value::Scalar(rhs)) | (Value::Scalar(rhs), Value::Angle(lhs)) => {
-                Ok(Value::Angle(lhs * rhs))
-            }
-            // Scale an angle with an integer
-            (Value::Angle(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs * rhs as Scalar)),
-            // Scale an integer with an angle
-            (Value::Integer(lhs), Value::Angle(rhs)) => Ok(Value::Scalar(lhs as Scalar * rhs)),
-            // Scale a length with a scalar
-            (Value::Length(lhs), Value::Scalar(rhs)) | (Value::Scalar(rhs), Value::Length(lhs)) => {
-                Ok(Value::Length(lhs * rhs))
-            }
-            // Scale a length with an integer
-            (Value::Length(lhs), Value::Integer(rhs)) => Ok(Value::Length(lhs * rhs as Scalar)),
-            // Scale an integer with a length
-            (Value::Integer(lhs), Value::Length(rhs)) => Ok(Value::Length(lhs as Scalar * rhs)),
-            (Value::List(list), value) | (value, Value::List(list)) => Ok(list * value)?,
+            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
+            (Value::Array(list), value) | (value, Value::Array(list)) => Ok((list * value)?),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
     }
@@ -369,18 +325,12 @@ impl std::ops::Div for Value {
         match (self, rhs) {
             // Division with scalar result
             (Value::Integer(lhs), Value::Integer(rhs)) => {
-                Ok(Value::Scalar(lhs as Scalar / rhs as Scalar))
+                Ok(Value::Quantity((lhs as Scalar / rhs as Scalar).into()))
             }
-            (Value::Scalar(lhs), Value::Integer(rhs)) => Ok(Value::Scalar(lhs / rhs as Scalar)),
-            (Value::Integer(lhs), Value::Scalar(rhs)) => Ok(Value::Scalar(lhs as Scalar / rhs)),
-            (Value::Scalar(lhs), Value::Scalar(rhs))
-            | (Value::Length(lhs), Value::Length(rhs))
-            | (Value::Angle(lhs), Value::Angle(rhs)) => Ok(Value::Scalar(lhs / rhs)),
-            (Value::Length(lhs), Value::Scalar(rhs)) => Ok(Value::Length(lhs / rhs)),
-            (Value::Angle(lhs), Value::Scalar(rhs)) => Ok(Value::Angle(lhs / rhs)),
-            (Value::Length(lhs), Value::Integer(rhs)) => Ok(Value::Length(lhs / rhs as Scalar)),
-            (Value::Angle(lhs), Value::Integer(rhs)) => Ok(Value::Angle(lhs / rhs as Scalar)),
-            (Value::List(list), value) => Ok(list / value)?,
+            (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
+            (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
+            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
+            (Value::Array(list), value) => Ok((list / value)?),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} / {rhs}"))),
         }
     }
@@ -419,19 +369,11 @@ impl std::fmt::Display for Value {
         match self {
             Value::None => write!(f, "<invalid>"),
             Value::Integer(n) => write!(f, "{n}"),
-            Value::Scalar(n) => write!(f, "{n}"),
-            Value::Length(n)
-            | Value::Angle(n)
-            | Value::Area(n)
-            | Value::Volume(n)
-            | Value::Weight(n)
-            | Value::Density(n) => {
-                write!(f, "{n}{}", self.ty().default_unit())
-            }
+            Value::Quantity(q) => write!(f, "{q}"),
             Value::Bool(b) => write!(f, "{b}"),
             Value::String(s) => write!(f, "{s}"),
             Value::Color(c) => write!(f, "{c}"),
-            Value::List(l) => write!(f, "{l}"),
+            Value::Array(l) => write!(f, "{l}"),
             Value::NamedTuple(t) => write!(f, "{t}"),
             Value::Tuple(t) => write!(f, "{t}"),
             Value::Matrix(m) => write!(f, "{m}"),
@@ -445,17 +387,11 @@ impl std::fmt::Debug for Value {
         match self {
             Self::None => write!(f, "None"),
             Self::Integer(arg0) => write!(f, "Integer: {arg0}"),
-            Self::Scalar(arg0) => write!(f, "Scalar: {arg0}"),
-            Self::Length(arg0) => write!(f, "Length: {arg0}"),
-            Self::Area(arg0) => write!(f, "Area: {arg0}"),
-            Self::Volume(arg0) => write!(f, "Volume: {arg0}"),
-            Self::Angle(arg0) => write!(f, "Angle: {arg0}"),
-            Self::Weight(arg0) => write!(f, "Weight: {arg0}"),
-            Self::Density(arg0) => write!(f, "Density: {arg0}"),
+            Self::Quantity(arg0) => write!(f, "Quantity: {arg0}"),
             Self::Bool(arg0) => write!(f, "Bool: {arg0}"),
             Self::String(arg0) => write!(f, "String: {arg0}"),
             Self::Color(arg0) => write!(f, "Color: {arg0}"),
-            Self::List(arg0) => write!(f, "List: {arg0}"),
+            Self::Array(arg0) => write!(f, "List: {arg0}"),
             Self::NamedTuple(arg0) => write!(f, "NamedTuple: {arg0}"),
             Self::Tuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
             Self::Matrix(arg0) => write!(f, "Matrix: {arg0}"),
@@ -491,10 +427,37 @@ macro_rules! impl_try_from {
 }
 
 impl_try_from!(Integer => i64);
-impl_try_from!(Scalar, Length, Angle => Scalar);
 impl_try_from!(Bool => bool);
 impl_try_from!(String => String);
 impl_try_from!(Color => Color);
+
+impl TryFrom<&Value> for Scalar {
+    type Error = ValueError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Quantity(Quantity {
+                value,
+                quantity_type: QuantityType::Scalar,
+            }) => Ok(*value),
+            _ => Err(ValueError::CannotConvert(value.clone(), "Scalar".into())),
+        }
+    }
+}
+
+impl TryFrom<Value> for Scalar {
+    type Error = ValueError;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Quantity(Quantity {
+                value,
+                quantity_type: QuantityType::Scalar,
+            }) => Ok(value),
+            _ => Err(ValueError::CannotConvert(value.clone(), "Scalar".into())),
+        }
+    }
+}
 
 impl From<ModelNodes> for Value {
     fn from(nodes: ModelNodes) -> Self {
@@ -512,7 +475,7 @@ fn integer(value: i64) -> Value {
 
 #[cfg(test)]
 fn scalar(value: f64) -> Value {
-    Value::Scalar(value)
+    Value::Quantity(Quantity::new(value, QuantityType::Scalar))
 }
 
 #[cfg(test)]

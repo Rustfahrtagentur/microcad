@@ -35,7 +35,12 @@ impl From<Vec3> for NamedTuple {
         NamedTuple::new(
             [("x", value.x), ("y", value.y), ("z", value.z)]
                 .iter()
-                .map(|(k, v)| (Identifier::no_ref(k), Value::Scalar(*v)))
+                .map(|(k, v)| {
+                    (
+                        Identifier::no_ref(k),
+                        Value::Quantity(Quantity::new(*v, QuantityType::Scalar)),
+                    )
+                })
                 .collect(),
         )
     }

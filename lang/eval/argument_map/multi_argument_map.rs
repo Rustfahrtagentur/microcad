@@ -43,7 +43,7 @@ impl ArgumentMatch for MultiArgumentMap {
         let id = &parameter_value.id;
         match result {
             TypeCheckResult::MultiMatch => match &value {
-                Value::List(l) => {
+                Value::Array(l) => {
                     parameter_values.remove(id);
                     self.insert_multi(id.clone(), l.fetch());
                     Ok(result)

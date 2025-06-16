@@ -72,10 +72,10 @@ impl SourceFileTest {
         {
             let output_filename = self.output_filename(extension);
             let file = std::fs::File::create(&output_filename)
-                .unwrap_or_else(|_| panic!("Failed to create file: {}", output_filename));
+                .unwrap_or_else(|_| panic!("Failed to create file: {output_filename}"));
             use std::io::Write;
             let mut writer = std::io::BufWriter::new(file);
-            write!(writer, "{}", value).expect("Valid file write")
+            write!(writer, "{value}").expect("Valid file write")
         }
 
         // Compare
@@ -129,13 +129,12 @@ impl SourceFileTest {
     #[cfg(test)]
     fn compare_files(file1: &str, file2: &str) {
         let content1 = std::fs::read_to_string(file1)
-            .unwrap_or_else(|_| panic!("Failed to read file: {}", file1));
+            .unwrap_or_else(|_| panic!("Failed to read file: {file1}"));
         let content2 = std::fs::read_to_string(file2)
-            .unwrap_or_else(|_| panic!("Failed to read file: {}", file2));
+            .unwrap_or_else(|_| panic!("Failed to read file: {file2}"));
         assert_eq!(
             content1, content2,
-            "File contents differ: {} vs {}",
-            file1, file2
+            "File contents differ: {file1} vs {file2}"
         );
     }
 }

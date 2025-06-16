@@ -13,23 +13,11 @@ pub enum Type {
     /// A 64-bit integer number
     Integer,
     /// A 64-bit floating-point number
-    Scalar,
+    Quantity(QuantityType),
     /// A string
     String,
     /// An RGBA color
     Color,
-    /// A physical length, e.g. 4.0mm
-    Length,
-    /// A physical area, e.g. 4.0mm²
-    Area,
-    /// A physical volume, e.g. 4.0mm³
-    Volume,
-    /// An angle, e.g. 90°
-    Angle,
-    /// A physical weight, e.g. 4.0kg
-    Weight,
-    /// A physical density, e.g. 1.0kg/m³
-    Density,
     /// A boolean: true, false
     Bool,
     /// A list of elements of the same type: `[Scalar]`
@@ -47,16 +35,6 @@ pub enum Type {
 }
 
 impl Type {
-    /// Return default unit if primitive type or list of primitive types)
-    pub fn default_unit(&self) -> Unit {
-        match self {
-            Self::Length => Unit::Millimeter,
-            Self::Angle => Unit::Rad,
-            Self::List(t) => t.ty().default_unit(),
-            _ => Unit::None,
-        }
-    }
-
     /// Check if the type is a named tuple
     pub fn is_named_tuple(&self) -> bool {
         matches!(self, Self::NamedTuple(_))
@@ -71,20 +49,20 @@ impl Type {
     }
 }
 
+impl From<QuantityType> for Type {
+    fn from(value: QuantityType) -> Self {
+        Type::Quantity(value)
+    }
+}
+
 impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Invalid => write!(f, "<invalid>"),
             Self::Integer => write!(f, "Integer"),
-            Self::Scalar => write!(f, "Scalar"),
+            Self::Quantity(quantity) => write!(f, "{quantity}"),
             Self::String => write!(f, "String"),
             Self::Color => write!(f, "Color"),
-            Self::Length => write!(f, "Length"),
-            Self::Area => write!(f, "Area"),
-            Self::Volume => write!(f, "Volume"),
-            Self::Angle => write!(f, "Angle"),
-            Self::Weight => write!(f, "Weight"),
-            Self::Density => write!(f, "Density"),
             Self::Bool => write!(f, "Bool"),
             Self::List(t) => write!(f, "{t}"),
             Self::Tuple(t) => write!(f, "{t}"),
