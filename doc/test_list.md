@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**68** tests from markdown.
+**65** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -36,35 +36,32 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/parts/.test/part_declaration.png)](../doc/parts/.test/part_declaration.log) | [part_declaration](../doc/parts/README.md) |
 | [![test](../doc/parts/.test/property_torus.png)](../doc/parts/.test/property_torus.log) | [property_torus](../doc/parts/property.md) |
 | [![test](../doc/parts/.test/property_torus_fail.png)](../doc/parts/.test/property_torus_fail.log) | [property_torus_fail](../doc/parts/property.md) |
-| [![test](../doc/.test/tuple_fields_A.png)](../doc/.test/tuple_fields_A.log) | [tuple_fields_A](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_fields_B.png)](../doc/.test/tuple_fields_B.log) | [tuple_fields_B](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_fields_C.png)](../doc/.test/tuple_fields_C.log) | [tuple_fields_C](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_fields_D.png)](../doc/.test/tuple_fields_D.log) | [tuple_fields_D](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_fields_E.png)](../doc/.test/tuple_fields_E.log) | [tuple_fields_E](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_named_tuple.png)](../doc/.test/tuple_named_tuple.log) | [tuple_named_tuple](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_parameters_A.png)](../doc/.test/tuple_parameters_A.log) | [tuple_parameters_A](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_parameters_B.png)](../doc/.test/tuple_parameters_B.log) | [tuple_parameters_B](../doc/tuple.md) |
-| [![test](../doc/.test/tuple_parameters_C.png)](../doc/.test/tuple_parameters_C.log) | [tuple_parameters_C](../doc/tuple.md) |
-| [![test](../doc/.test/types_bundles_functions.png)](../doc/.test/types_bundles_functions.log) | [types_bundles_functions](../doc/types.md) |
-| [![test](../doc/.test/types_def_vs_decl.png)](../doc/.test/types_def_vs_decl.log) | [types_def_vs_decl](../doc/types.md) |
-| [![test](../doc/.test/types_no_declaration.png)](../doc/.test/types_no_declaration.log) | [types_no_declaration](../doc/types.md) |
-| [![test](../doc/.test/types_primitive_angle.png)](../doc/.test/types_primitive_angle.log) | [types_primitive_angle](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_area.png)](../doc/.test/types_primitive_area.log) | [types_primitive_area](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_bool.png)](../doc/.test/types_primitive_bool.log) | [types_primitive_bool](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_integer.png)](../doc/.test/types_primitive_integer.log) | [types_primitive_integer](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_length.png)](../doc/.test/types_primitive_length.log) | [types_primitive_length](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_scalar.png)](../doc/.test/types_primitive_scalar.log) | [types_primitive_scalar](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_string.png)](../doc/.test/types_primitive_string.log) | [types_primitive_string](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_vec2.png)](../doc/.test/types_primitive_vec2.log) | [types_primitive_vec2](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_vec3.png)](../doc/.test/types_primitive_vec3.log) | [types_primitive_vec3](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_volume.png)](../doc/.test/types_primitive_volume.log) | [types_primitive_volume](../doc/primitive_types.md) |
-| [![test](../doc/.test/types_primitive_weight.png)](../doc/.test/types_primitive_weight.log) | [types_primitive_weight](../doc/primitive_types.md) |
+| [![test](../doc/types/.test/quantity_types_number_literals.png)](../doc/types/.test/quantity_types_number_literals.log) | [quantity_types_number_literals](../doc/types/quantity.md) |
+| [![test](../doc/types/.test/tuple_fields_A.png)](../doc/types/.test/tuple_fields_A.log) | [tuple_fields_A](../doc/types/tuple.md) |
+| [![test](../doc/types/.test/tuple_fields_B.png)](../doc/types/.test/tuple_fields_B.log) | [tuple_fields_B](../doc/types/tuple.md) |
+| [![test](../doc/types/.test/tuple_fields_C.png)](../doc/types/.test/tuple_fields_C.log) | [tuple_fields_C](../doc/types/tuple.md) |
+| [![test](../doc/types/.test/tuple_fields_D.png)](../doc/types/.test/tuple_fields_D.log) | [tuple_fields_D](../doc/types/tuple.md) |
+| [![test](../doc/types/.test/tuple_fields_E.png)](../doc/types/.test/tuple_fields_E.log) | [tuple_fields_E](../doc/types/tuple.md) |
+| [![test](../doc/types/.test/tuple_named_tuple.png)](../doc/types/.test/tuple_named_tuple.log) | [tuple_named_tuple](../doc/types/tuple.md) |
+| [![test](../doc/types/.test/tuple_parameters_A.png)](../doc/types/.test/tuple_parameters_A.log) | [tuple_parameters_A](../doc/types/tuple.md) |
+| [![test](../doc/types/.test/tuple_parameters_B.png)](../doc/types/.test/tuple_parameters_B.log) | [tuple_parameters_B](../doc/types/tuple.md) |
+| [![test](../doc/types/.test/tuple_parameters_C.png)](../doc/types/.test/tuple_parameters_C.log) | [tuple_parameters_C](../doc/types/tuple.md) |
+| [![test](../doc/types/.test/types_bundles_functions.png)](../doc/types/.test/types_bundles_functions.log) | [types_bundles_functions](../doc/types/README.md) |
+| [![test](../doc/types/.test/types_def_vs_decl.png)](../doc/types/.test/types_def_vs_decl.log) | [types_def_vs_decl](../doc/types/README.md) |
+| [![test](../doc/types/.test/types_no_declaration.png)](../doc/types/.test/types_no_declaration.log) | [types_no_declaration](../doc/types/README.md) |
+| [![test](../doc/types/.test/types_primitive_bool.png)](../doc/types/.test/types_primitive_bool.log) | [types_primitive_bool](../doc/types/primitive_types.md) |
+| [![test](../doc/types/.test/types_primitive_integer.png)](../doc/types/.test/types_primitive_integer.log) | [types_primitive_integer](../doc/types/primitive_types.md) |
+| [![test](../doc/types/.test/types_primitive_string.png)](../doc/types/.test/types_primitive_string.log) | [types_primitive_string](../doc/types/primitive_types.md) |
+| [![test](../doc/types/.test/types_quantity_angle.png)](../doc/types/.test/types_quantity_angle.log) | [types_quantity_angle](../doc/types/quantity.md) |
+| [![test](../doc/types/.test/types_quantity_area.png)](../doc/types/.test/types_quantity_area.log) | [types_quantity_area](../doc/types/quantity.md) |
+| [![test](../doc/types/.test/types_quantity_length.png)](../doc/types/.test/types_quantity_length.log) | [types_quantity_length](../doc/types/quantity.md) |
+| [![test](../doc/types/.test/types_quantity_scalar.png)](../doc/types/.test/types_quantity_scalar.log) | [types_quantity_scalar](../doc/types/quantity.md) |
+| [![test](../doc/types/.test/types_quantity_volume.png)](../doc/types/.test/types_quantity_volume.log) | [types_quantity_volume](../doc/types/quantity.md) |
+| [![test](../doc/types/.test/types_quantity_weight.png)](../doc/types/.test/types_quantity_weight.log) | [types_quantity_weight](../doc/types/quantity.md) |
 | [![test](../doc/std/algorithm/.test/union_alt_operator.png)](../doc/std/algorithm/.test/union_alt_operator.log) | [union_alt_operator](../doc/std/algorithm/union.md) |
 | [![test](../doc/std/algorithm/.test/union_operator.png)](../doc/std/algorithm/.test/union_operator.log) | [union_operator](../doc/std/algorithm/union.md) |
-| [![test](../doc/.test/unit_bundle_list.png)](../doc/.test/unit_bundle_list.log) | [unit_bundle_list](../doc/unit_types.md) |
-| [![test](../doc/.test/unit_bundle_tuple.png)](../doc/.test/unit_bundle_tuple.log) | [unit_bundle_tuple](../doc/unit_types.md) |
-| [![test](../doc/.test/unit_types.png)](../doc/.test/unit_types.log) | [unit_types](../doc/unit_types.md) |
-| [![test](../doc/.test/unit_types_number_literals.png)](../doc/.test/unit_types_number_literals.log) | [unit_types_number_literals](../doc/unit_types.md) |
+| [![test](../doc/types/.test/unit_bundle_list.png)](../doc/types/.test/unit_bundle_list.log) | [unit_bundle_list](../doc/types/README.md) |
+| [![test](../doc/types/.test/unit_bundle_tuple.png)](../doc/types/.test/unit_bundle_tuple.log) | [unit_bundle_tuple](../doc/types/README.md) |
 | [![test](../doc/.test/use_statement.png)](../doc/.test/use_statement.log) | [use_statement](../doc/use_statement.md) |
 | [![test](../doc/.test/use_statement_all.png)](../doc/.test/use_statement_all.log) | [use_statement_all](../doc/use_statement.md) |
 | [![test](../doc/.test/use_statement_as.png)](../doc/.test/use_statement_as.log) | [use_statement_as](../doc/use_statement.md) |
