@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**93** tests from markdown.
+**97** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -73,6 +73,10 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/tuple_parameters_C.png)](../doc/types/.test/tuple_parameters_C.log) | [tuple_parameters_C](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/types_bundles_functions.png)](../doc/types/.test/types_bundles_functions.log) | [types_bundles_functions](../doc/types/README.md) |
 | [![test](../doc/types/.test/types_def_vs_decl.png)](../doc/types/.test/types_def_vs_decl.log) | [types_def_vs_decl](../doc/types/README.md) |
+| [![test](../doc/types/.test/types_named_tuple.png)](../doc/types/.test/types_named_tuple.log) | [types_named_tuple](../doc/types/named_tuple.md) |
+| [![test](../doc/types/.test/types_named_tuple_color.png)](../doc/types/.test/types_named_tuple_color.log) | [types_named_tuple_color](../doc/types/named_tuple.md) |
+| [![test](../doc/types/.test/types_named_tuple_vec2.png)](../doc/types/.test/types_named_tuple_vec2.log) | [types_named_tuple_vec2](../doc/types/named_tuple.md) |
+| [![test](../doc/types/.test/types_named_tuple_vec3.png)](../doc/types/.test/types_named_tuple_vec3.log) | [types_named_tuple_vec3](../doc/types/named_tuple.md) |
 | [![test](../doc/types/.test/types_no_declaration.png)](../doc/types/.test/types_no_declaration.log) | [types_no_declaration](../doc/types/README.md) |
 | [![test](../doc/types/.test/types_primitive_bool.png)](../doc/types/.test/types_primitive_bool.log) | [types_primitive_bool](../doc/types/primitive_types.md) |
 | [![test](../doc/types/.test/types_primitive_integer.png)](../doc/types/.test/types_primitive_integer.log) | [types_primitive_integer](../doc/types/primitive_types.md) |
