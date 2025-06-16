@@ -60,7 +60,7 @@ impl Parameter {
                 if specified_type.ty() != value.ty() {
                     context.error(
                         self.src_ref.clone(),
-                        EvalError::ParameterTypeMismatch {
+                        EvalError::TypeMismatch {
                             id: self.id.clone(),
                             expected: specified_type.ty(),
                             found: value.ty(),

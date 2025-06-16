@@ -21,7 +21,7 @@ impl Eval<ParameterValue> for Parameter {
                 if specified_type.ty() != default_value.ty() {
                     context.error(
                         self,
-                        EvalError::ParameterTypeMismatch {
+                        EvalError::TypeMismatch {
                             id: self.id.clone(),
                             expected: specified_type.ty(),
                             found: default_value.ty(),
