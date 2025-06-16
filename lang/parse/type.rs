@@ -24,10 +24,8 @@ impl Parse for TypeAnnotation {
             )),
             Rule::qualified_name => match inner.as_str() {
                 "Integer" => Self(Refer::new(Type::Integer, pair.into())),
-                "Scalar" => Self(Refer::new(
-                    Type::Quantity(QuantityType::Scalar),
-                    pair.into(),
-                )),
+                "Bool" => Self(Refer::new(Type::Bool, pair.into())),
+                "Scalar" => Self(Refer::new(Type::scalar(), pair.into())),
                 "Length" => Self(Refer::new(
                     Type::Quantity(QuantityType::Length),
                     pair.into(),
@@ -42,8 +40,21 @@ impl Parse for TypeAnnotation {
                     pair.into(),
                 )),
                 "String" => Self(Refer::new(Type::String, pair.into())),
-                "Color" => Self(Refer::new(Type::Color, pair.into())),
-                "Bool" => Self(Refer::new(Type::Bool, pair.into())),
+                // Type alias for built-in color type
+                "Color" => Self(Refer::new(
+                    Type::NamedTuple(NamedTupleType::new_color()),
+                    pair.into(),
+                )),
+                // Type alias for built-in Vec2 type
+                "Vec2" => Self(Refer::new(
+                    Type::NamedTuple(NamedTupleType::new_vec2()),
+                    pair.into(),
+                )),
+                // Type alias for built-in Vec3 type
+                "Vec3" => Self(Refer::new(
+                    Type::NamedTuple(NamedTupleType::new_vec3()),
+                    pair.into(),
+                )),
                 _ => Self(Refer::new(
                     Type::Custom(QualifiedName::parse(inner)?),
                     pair.into(),
