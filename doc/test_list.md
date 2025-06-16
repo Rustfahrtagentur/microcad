@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**68** tests from markdown.
+**66** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -63,8 +63,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/types_quantity_weight.png)](../doc/types/.test/types_quantity_weight.log) | [types_quantity_weight](../doc/types/quantity.md) |
 | [![test](../doc/std/algorithm/.test/union_alt_operator.png)](../doc/std/algorithm/.test/union_alt_operator.log) | [union_alt_operator](../doc/std/algorithm/union.md) |
 | [![test](../doc/std/algorithm/.test/union_operator.png)](../doc/std/algorithm/.test/union_operator.log) | [union_operator](../doc/std/algorithm/union.md) |
-| [![test](../doc/types/.test/unit_bundle_list.png)](../doc/types/.test/unit_bundle_list.log) | [unit_bundle_list](../doc/types/README.md) |
-| [![test](../doc/types/.test/unit_bundle_tuple.png)](../doc/types/.test/unit_bundle_tuple.log) | [unit_bundle_tuple](../doc/types/README.md) |
 | [![test](../doc/.test/use_statement.png)](../doc/.test/use_statement.log) | [use_statement](../doc/use_statement.md) |
 | [![test](../doc/.test/use_statement_all.png)](../doc/.test/use_statement_all.log) | [use_statement_all](../doc/use_statement.md) |
 | [![test](../doc/.test/use_statement_as.png)](../doc/.test/use_statement_as.log) | [use_statement_as](../doc/use_statement.md) |

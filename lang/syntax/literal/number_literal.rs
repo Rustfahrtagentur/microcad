@@ -3,12 +3,7 @@
 
 //! Number literal syntax element
 
-use crate::{
-    src_ref::*,
-    syntax::*,
-    ty::*,
-    value::{Quantity, Value},
-};
+use crate::{src_ref::*, syntax::*, ty::*, value::*};
 
 /// Number literal
 #[derive(Debug, Clone, PartialEq)]

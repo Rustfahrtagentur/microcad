@@ -10,9 +10,10 @@ The following quantity types are supported:
 | `Scalar`  | -, `%`                                      | -                              |
 | `Length`  | `µm`, `mm`, `cm`, `m`                       | `in` or `"`, `ft` or `'`, `yd` |
 | `Angle`   | `°` or `deg`, `grad`, `turn`,`rad`          |                                |
-| `Weight`  | `g`, `kg`                                   | `lb`, `oz`                     |
 | `Area`    | `µm²`,`mm²`,`cm²`,`m³`                      | `in²`, `ft²` , `yd²`           |
 | `Volume`  | `µm³`, `mm³`,`cm³`,`m³`,`ml`,`cl`,`l`, `µl` | `in³`, `ft³` , `yd³`           |
+| `Weight`  | `g`, `kg`                                   | `lb`, `oz`                     |
+| `Density` | `g/mm³`                                     | -                              |
 
 **Note**: More units [may be implemented](https://github.com/Rustfahrtagentur/microcad/issues/76).
 
@@ -39,7 +40,7 @@ width = height * 2 + 10cm;
 
 ### Scalar
 
-The type `Scalar` contains a floating number and must be written with at least one decimal place (or in percent).
+The type `Scalar` contains a floating number (without any *unit*) and must be written with at least one decimal place (or in percent).
 
 [![test](.test/types_quantity_scalar.png)](.test/types_quantity_scalar.log)
 
@@ -51,7 +52,7 @@ percent = 55%;
 
 ### Length
 
-`Length` is used to describe a one-dimensional quantity.
+`Length` is used to describe a concrete length.
 
 [![test](.test/types_quantity_length.png)](.test/types_quantity_length.log)
 
@@ -83,7 +84,7 @@ std::debug::assert( [degree, degree_, grad, turn, radian].all_equal() );
 
 ### Area
 
-An `Area` is a two-dimensional quantity. It is the result when multiplying two `Length`.
+An `Area` is a two-dimensional quantity. It is the result when multiplying two `Length`s.
 
 [![test](.test/types_quantity_area.png)](.test/types_quantity_area.log)
 
@@ -111,7 +112,7 @@ std::debug::assert(square_centimeter == 0.1m²);
 
 ### Volume
 
-A `Volume` is a three-dimensional quantity. It is the result when multiplying three `Length`.
+A `Volume` is a three-dimensional quantity. It is the result when multiplying three `Length`s.
 
 [![test](.test/types_quantity_volume.png)](.test/types_quantity_volume.log)
 ```µcad,types_quantity_volume
@@ -155,5 +156,5 @@ gram = 1000.0g;
 kilogram = 1.0kg;
 pound = 2.204623lb;
 
-std::debug::assert(gram == 1.0kg);
+std::debug::assert([gram, kilogram].all_equal());
 ```

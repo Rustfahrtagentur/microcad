@@ -10,10 +10,7 @@ pub mod module_builder;
 use microcad_core::*;
 pub use module_builder::*;
 
-use crate::{
-    ty::{QuantityType, Type},
-    value::{Quantity, Value},
-};
+use crate::{ty::*, value::*};
 
 /// This enum is used to declare parameter list for builtin symbols conveniently.
 ///

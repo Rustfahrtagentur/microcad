@@ -33,6 +33,14 @@ impl Parse for TypeAnnotation {
                     pair.into(),
                 )),
                 "Angle" => Self(Refer::new(Type::Quantity(QuantityType::Angle), pair.into())),
+                "Weight" => Self(Refer::new(
+                    Type::Quantity(QuantityType::Weight),
+                    pair.into(),
+                )),
+                "Density" => Self(Refer::new(
+                    Type::Quantity(QuantityType::Density),
+                    pair.into(),
+                )),
                 "String" => Self(Refer::new(Type::String, pair.into())),
                 "Color" => Self(Refer::new(Type::Color, pair.into())),
                 "Bool" => Self(Refer::new(Type::Bool, pair.into())),

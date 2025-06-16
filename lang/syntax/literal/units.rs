@@ -94,7 +94,7 @@ pub enum Unit {
     Microliter,
 
     /// Density
-    KilogramPerMeter2,
+    GramPerMeter3,
 }
 
 impl std::fmt::Display for Unit {
@@ -150,7 +150,7 @@ impl std::fmt::Display for Unit {
             Self::Microliter => write!(f, "µl"),
 
             // Density
-            Self::KilogramPerMeter2 => write!(f, "kg/m2"),
+            Self::GramPerMeter3 => write!(f, "g/mm³"),
         }
     }
 }
@@ -191,7 +191,7 @@ impl Unit {
             | Self::Centiliter
             | Self::Milliliter
             | Self::Microliter => Type::Quantity(QuantityType::Volume),
-            Self::KilogramPerMeter2 => Type::Quantity(QuantityType::Density),
+            Self::GramPerMeter3 => Type::Quantity(QuantityType::Density),
         }
     }
 
@@ -246,7 +246,7 @@ impl Unit {
             Self::Microliter => x * 1_000_000.0_f64,
 
             // Densities
-            Self::KilogramPerMeter2 => 1_f64,
+            Self::GramPerMeter3 => 1_f64,
         }
     }
 }
