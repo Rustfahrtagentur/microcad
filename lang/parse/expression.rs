@@ -35,13 +35,13 @@ lazy_static::lazy_static! {
         // Precedence is defined lowest to highest
         PrattParser::new()
             // Addition and subtract have equal precedence
+            .op(Op::infix(equal, Left) | Op::infix(not_equal, Left))
+            .op(Op::infix(greater_than, Left) | Op::infix(less_than, Left))
+            .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
             .op(Op::infix(add, Left) | Op::infix(subtract, Left))
             .op(Op::infix(multiply, Left) | Op::infix(divide, Left))
             .op(Op::infix(r#union, Left) | Op::infix(intersection, Left))
             .op(Op::infix(power_xor, Left))
-            .op(Op::infix(greater_than, Left) | Op::infix(less_than, Left))
-            .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
-            .op(Op::infix(equal, Left) | Op::infix(not_equal, Left))
             .op(Op::infix(near, Left))
             .op(Op::prefix(unary_minus))
             .op(Op::prefix(unary_plus))
