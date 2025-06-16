@@ -138,21 +138,22 @@ macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
             $arg_map.get(&Identifier::no_ref(stringify!($name).into())).expect(&format!("Argument `{}` expected",stringify!($name))),
-            &BuiltinValueWrapper::$ty($value).into()
+            &crate::builtin::BuiltinValueHelper::$ty($value).into()
         ));*
     };
 }
 
 #[test]
 fn call_get_matching_arguments() {
-    use crate::parameter_value;
+    use crate::{call_argument_value, parameter_value};
 
     // my_part(foo: Integer, bar: Integer, baz: Scalar = 4.0)
-    let param_values = ParameterValueList::new(vec![
+    let param_values = vec![
         parameter_value!(foo: Integer),
         parameter_value!(bar: Integer),
         parameter_value!(baz: Scalar = 4.0),
-    ]);
+    ]
+    .into();
 
     // my_part(1, bar = 2, baz = 3.0)
     let call_values = CallArgumentValueList::from(vec![
@@ -172,7 +173,7 @@ fn call_get_matching_arguments() {
 
 #[test]
 fn call_get_matching_arguments_missing() {
-    use crate::parameter_value;
+    use crate::{call_argument_value, parameter_value};
 
     // function f(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = ParameterValueList::new(vec![
@@ -199,7 +200,7 @@ fn call_get_matching_arguments_missing() {
 
 #[test]
 fn get_multi_matching_arguments() {
-    use crate::parameter_value;
+    use crate::{call_argument_value, parameter_value};
 
     let param_values = ParameterValueList::new(vec![
         parameter_value!(thickness: Scalar = 2.0),

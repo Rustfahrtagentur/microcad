@@ -43,24 +43,3 @@ impl CallArgumentValue {
         Self { id, value, src_ref }
     }
 }
-
-/// Shortcut to create a argument value
-#[macro_export]
-#[cfg(test)]
-macro_rules! call_argument_value {
-    ($name:ident: $ty:ident = $value:expr) => {
-        CallArgumentValue::new(
-            Some(stringify!($name).into()),
-            $crate::value::BuiltinValueWrapper::$ty($value).into(),
-            $crate::src_ref::SrcRef(None),
-        )
-    };
-    ($ty:ident = $value:expr) => {
-        CallArgumentValue::new(
-            None,
-            $crate::value::BuiltinValueWrapper::$ty($value).into(),
-            $crate::src_ref::SrcRef(None),
-        )
-    };
-    () => {};
-}

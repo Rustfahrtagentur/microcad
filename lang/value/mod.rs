@@ -468,28 +468,6 @@ impl From<ModelNodes> for Value {
     }
 }
 
-pub enum BuiltinValueWrapper {
-    Scalar(Scalar),
-    Integer(Integer),
-    Length(Scalar),
-    String(String),
-}
-
-impl From<BuiltinValueWrapper> for Value {
-    fn from(value: BuiltinValueWrapper) -> Self {
-        match value {
-            BuiltinValueWrapper::Scalar(v) => {
-                Value::Quantity(Quantity::new(v, QuantityType::Scalar))
-            }
-            BuiltinValueWrapper::Integer(i) => Value::Integer(i),
-            BuiltinValueWrapper::Length(v) => {
-                Value::Quantity(Quantity::new(v, QuantityType::Length))
-            }
-            BuiltinValueWrapper::String(s) => Value::String(s),
-        }
-    }
-}
-
 #[cfg(test)]
 fn integer(value: i64) -> Value {
     Value::Integer(value)

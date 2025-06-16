@@ -74,27 +74,6 @@ impl std::fmt::Display for Type {
     }
 }
 
-pub enum BuiltinTypeWrapper {
-    Integer,
-
-    Scalar,
-
-    Angle,
-
-    String,
-}
-
-impl From<BuiltinTypeWrapper> for Type {
-    fn from(value: BuiltinTypeWrapper) -> Self {
-        match value {
-            BuiltinTypeWrapper::Integer => Type::Integer,
-            BuiltinTypeWrapper::Scalar => Type::Quantity(QuantityType::Scalar),
-            BuiltinTypeWrapper::Angle => Type::Quantity(QuantityType::Angle),
-            BuiltinTypeWrapper::String => Type::String,
-        }
-    }
-}
-
 #[test]
 fn builtin_type() {
     use crate::parser::*;
