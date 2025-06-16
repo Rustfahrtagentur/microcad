@@ -6,7 +6,7 @@
 //! Every evaluation of any *symbol* leads to a [`Value`] which then might continued
 //! to process or ends up as the overall evaluation result.
 
-mod list;
+mod array;
 mod matrix;
 mod named_tuple;
 mod quantity;
@@ -14,7 +14,7 @@ mod tuple;
 mod value_error;
 mod value_list;
 
-pub use list::*;
+pub use array::*;
 pub use matrix::*;
 pub use named_tuple::*;
 pub use quantity::*;
@@ -33,25 +33,25 @@ pub enum Value {
     /// Invalid value (used for error handling).
     #[default]
     None,
-    /// An integer value.
-    Integer(Integer),
     /// A quantity value.
     Quantity(Quantity),
     /// A boolean value.
     Bool(bool),
+    /// An integer value.
+    Integer(Integer),
     /// A string value.
     String(String),
     /// A color value.
     Color(Color),
-    /// A list of values.
-    List(List),
-    /// A tuple of named items.
-    NamedTuple(NamedTuple),
+    /// A list of values with a common type.
+    Array(Array),
     /// A tuple of unnamed items.
     Tuple(Tuple),
+    /// A tuple of named items.
+    NamedTuple(NamedTuple),
     /// A matrix.
     Matrix(Box<Matrix>),
-    /// A node in the render tree.
+    /// A node in the model tree.
     Nodes(ModelNodes),
 }
 
@@ -215,7 +215,7 @@ impl crate::ty::Ty for Value {
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
             Value::Color(_) => Type::Color,
-            Value::List(list) => list.ty(),
+            Value::Array(list) => list.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::Tuple(unnamed_tuple) => unnamed_tuple.ty(),
             Value::Matrix(matrix) => matrix.ty(),
@@ -253,7 +253,7 @@ impl std::ops::Add for Value {
             // Concatenate two strings
             (Value::String(lhs), Value::String(rhs)) => Ok(Value::String(lhs + &rhs)),
             // Concatenate two lists
-            (Value::List(lhs), Value::List(rhs)) => {
+            (Value::Array(lhs), Value::Array(rhs)) => {
                 if lhs.ty() != rhs.ty() {
                     return Err(ValueError::CannotCombineVecOfDifferentType(
                         lhs.ty(),
@@ -261,7 +261,7 @@ impl std::ops::Add for Value {
                     ));
                 }
 
-                Ok(Value::List(List::new(
+                Ok(Value::Array(Array::new(
                     lhs.iter().chain(rhs.iter()).cloned().collect(),
                     lhs.ty(),
                 )))
@@ -311,7 +311,7 @@ impl std::ops::Mul for Value {
             (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             // Multiply two scalars
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
-            (Value::List(list), value) | (value, Value::List(list)) => Ok((list * value)?),
+            (Value::Array(list), value) | (value, Value::Array(list)) => Ok((list * value)?),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
     }
@@ -330,7 +330,7 @@ impl std::ops::Div for Value {
             (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
             (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
-            (Value::List(list), value) => Ok((list / value)?),
+            (Value::Array(list), value) => Ok((list / value)?),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} / {rhs}"))),
         }
     }
@@ -373,7 +373,7 @@ impl std::fmt::Display for Value {
             Value::Bool(b) => write!(f, "{b}"),
             Value::String(s) => write!(f, "{s}"),
             Value::Color(c) => write!(f, "{c}"),
-            Value::List(l) => write!(f, "{l}"),
+            Value::Array(l) => write!(f, "{l}"),
             Value::NamedTuple(t) => write!(f, "{t}"),
             Value::Tuple(t) => write!(f, "{t}"),
             Value::Matrix(m) => write!(f, "{m}"),
@@ -391,7 +391,7 @@ impl std::fmt::Debug for Value {
             Self::Bool(arg0) => write!(f, "Bool: {arg0}"),
             Self::String(arg0) => write!(f, "String: {arg0}"),
             Self::Color(arg0) => write!(f, "Color: {arg0}"),
-            Self::List(arg0) => write!(f, "List: {arg0}"),
+            Self::Array(arg0) => write!(f, "List: {arg0}"),
             Self::NamedTuple(arg0) => write!(f, "NamedTuple: {arg0}"),
             Self::Tuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
             Self::Matrix(arg0) => write!(f, "Matrix: {arg0}"),

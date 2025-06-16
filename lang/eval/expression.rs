@@ -14,7 +14,7 @@ impl Eval for ListExpression {
         .bundle_unit(self.unit)?;
 
         match value_list.types().common_type() {
-            Some(common_type) => Ok(Value::List(List::new(value_list, common_type))),
+            Some(common_type) => Ok(Value::Array(Array::new(value_list, common_type))),
             None => {
                 context.error(
                     self,
@@ -100,7 +100,7 @@ impl Eval for Expression {
                 let rhs = rhs.eval(context)?;
 
                 match (lhs, rhs) {
-                    (Value::List(list), Value::Integer(index)) => {
+                    (Value::Array(list), Value::Integer(index)) => {
                         let index = index as usize;
                         if index < list.len() {
                             match list.get(index) {
