@@ -13,10 +13,6 @@ pub enum ParseError {
     #[error("Expected identifier")]
     ExpectedIdentifier,
 
-    /// Invalid use statement
-    #[error("")]
-    InvalidUseStatement,
-
     /// Error parsing floating point literal
     #[error("Error parsing floating point literal: {0}")]
     ParseFloatError(#[from] std::num::ParseFloatError),
