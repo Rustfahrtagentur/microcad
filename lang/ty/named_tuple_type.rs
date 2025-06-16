@@ -50,10 +50,66 @@ impl NamedTupleType {
             ("a", Type::scalar()),
         ])
     }
+
+    /// Test if the named tuple has exactly the number of keys.
+    fn has_exact_keys(&self, keys: &[&str]) -> bool {
+        if self.0.len() != keys.len() {
+            return false;
+        }
+
+        for key in keys {
+            if !self.0.contains_key(&Identifier::no_ref(key)) {
+                return false;
+            }
+        }
+
+        true
+    }
+
+    /// Checks if the named tuple type only holds scalar values.
+    fn is_scalar_only(&self) -> bool {
+        self.common_type().is_some_and(|ty| ty == Type::scalar())
+    }
+
+    /// Test if all fields have a common type.
+    pub(crate) fn common_type(&self) -> Option<Type> {
+        let types = self.0.values().cloned().collect::<Vec<_>>();
+        if let Some(ty) = types.first() {
+            if types[1..].iter().all(|t| t == ty) {
+                return Some(ty.clone());
+            }
+        }
+        None
+    }
+
+    /// Check if the named tuple is a [`Color`].
+    pub(crate) fn is_color(&self) -> bool {
+        self.is_scalar_only() && self.has_exact_keys(&["r", "g", "b", "a"])
+    }
+
+    /// Check if the named tuple is a [`Vec2`].
+    pub(crate) fn is_vec2(&self) -> bool {
+        self.is_scalar_only() && self.has_exact_keys(&["x", "y"])
+    }
+
+    /// Check if the named tuple is a [`Vec3`].
+    pub(crate) fn is_vec3(&self) -> bool {
+        self.has_exact_keys(&["x", "y", "z"])
+    }
 }
 
 impl std::fmt::Display for NamedTupleType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if self.is_color() {
+            return write!(f, "Color");
+        }
+        if self.is_vec2() {
+            return write!(f, "Vec2");
+        }
+        if self.is_vec3() {
+            return write!(f, "Vec3");
+        }
+
         write!(f, "(")?;
         for (i, (identifier, ty)) in self.0.iter().enumerate() {
             if i > 0 {

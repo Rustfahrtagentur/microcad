@@ -17,7 +17,7 @@ fn abs() -> Symbol {
             value => {
                 ctx.error(
                     arg,
-                    EvalError::ParameterTypeMismatch {
+                    EvalError::TypeMismatch {
                         id: arg.id.clone().unwrap_or(Identifier::no_ref("x")),
                         expected: Type::Integer,
                         found: value.ty(),
