@@ -1,0 +1,7 @@
+error: Not implemented: call_method
+error: Assertion failed: <invalid>
+  ---> <from_str>:1:20
+     |
+   1 | __builtin::assert( std::geo2d::circle(radius=10mm).area() == 10mm * 10mm * std::math::PI);
+     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |

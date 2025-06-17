@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**70** tests from markdown.
+**71** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -28,6 +28,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/std/algorithm/.test/intersection_operator.png)](../doc/std/algorithm/.test/intersection_operator.log) | [intersection_operator](../doc/std/algorithm/intersection.md) |
 | [![test](../doc/std/math/.test/math_abs.png)](../doc/std/math/.test/math_abs.log) | [math_abs](../doc/std/math/README.md) |
 | [![test](../doc/std/math/.test/math_trigonometric.png)](../doc/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/std/math/README.md) |
+| [![test](../doc/.test/measure.png)](../doc/.test/measure.log) | [measure](../doc/measures.md) |
 | [![test](../doc/workbench/.test/missed_property.png)](../doc/workbench/.test/missed_property.log) | [missed_property](../doc/workbench/README.md) |
 | [![test](../doc/.test/module_example.png)](../doc/.test/module_example.log) | [module_example](../doc/modules.md) |
 | [![test](../doc/.test/no_use_statement.png)](../doc/.test/no_use_statement.log) | [no_use_statement](../doc/use_statement.md) |
