@@ -8,6 +8,7 @@
     - [Evaluation Phase](#evaluation-phase)
     - [Export Phase](#export-phase)
     - [Viewing](#viewing)
+  - [Elements](#elements)
 
 ## µcad Rules
 
@@ -73,3 +74,15 @@ Any errors which occur within the export phase are related to geometrical proces
 
 The viewing phase generates images which can be shown to visualize *object nodes* (e.g. in an IDE).
 Any errors which occur here are related to geometrical processing.
+
+## Elements
+
+| Method     | Input             | Output            | Usage      | Declaration           |
+| ---------- | ----------------- | ----------------- | ---------- | --------------------- |
+| Assignment | *value*           | *value*           | `v = ..;`  | -                     |
+| Function   | *values*          | *value*           | `f(..);`   | `fn f(..) { .. }`     |
+| Sketch     | *values*          | *2D object*       | `s(..);`   | `sketch s(..) { .. }` |
+| Part       | *values*          | *3D object*       | `p(..);`   | `part p(..) { .. }`   |
+| Operation  | *2D or 3D object* | *2D or 3D object* | `o(..) p;` | `op o(..) {..}`       |
+| Measure    | *2D or 3D object* | *value*           | `a.m();`   | *builtin only*        |
+
