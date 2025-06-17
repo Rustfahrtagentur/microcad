@@ -61,7 +61,7 @@ pub enum Expression {
     /// Access an element of a named tuple: `a.b`
     PropertyAccess(Box<Expression>, Identifier, SrcRef),
     /// Access an element of an unnamed tuple: `a.0`
-    UnnamedTupleElementAccess(Box<Expression>, u32, SrcRef),
+    TupleElementAccess(Box<Expression>, u32, SrcRef),
     /// Call to a method: `[2,3].len()`
     /// First expression must evaluate to a value
     MethodCall(Box<Expression>, MethodCall, SrcRef),
@@ -90,7 +90,7 @@ impl SrcReferrer for Expression {
             } => src_ref.clone(),
             Self::ListElementAccess(_, _, src_ref) => src_ref.clone(),
             Self::PropertyAccess(_, _, src_ref) => src_ref.clone(),
-            Self::UnnamedTupleElementAccess(_, _, src_ref) => src_ref.clone(),
+            Self::TupleElementAccess(_, _, src_ref) => src_ref.clone(),
             Self::MethodCall(_, _, src_ref) => src_ref.clone(),
         }
     }
@@ -117,7 +117,7 @@ impl std::fmt::Display for Expression {
             } => write!(f, "{op}{rhs}"),
             Self::ListElementAccess(lhs, rhs, _) => write!(f, "{lhs}[{rhs}]"),
             Self::PropertyAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
-            Self::UnnamedTupleElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
+            Self::TupleElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
             Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs}.{method_call}"),
             Self::Nested(nested) => write!(f, "{nested}"),
             _ => unimplemented!(),
@@ -168,7 +168,7 @@ impl PrintSyntax for Expression {
                 lhs.print_syntax(f, depth)?;
                 rhs.print_syntax(f, depth)
             }
-            Self::UnnamedTupleElementAccess(lhs, rhs, _) => {
+            Self::TupleElementAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}UnnamedTupleElementAccess:", "")?;
                 lhs.print_syntax(f, depth)?;
                 writeln!(f, "{:depth$}{rhs}", "")

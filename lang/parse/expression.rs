@@ -154,7 +154,7 @@ impl Parse for Expression {
                                 Identifier::parse(op)?,
                                 pair.clone().into(),
                             )),
-                            Rule::int => Ok(Self::UnnamedTupleElementAccess(
+                            Rule::int => Ok(Self::TupleElementAccess(
                                 Box::new(lhs?),
                                 op.as_str().parse().expect("Integer expression expected"),
                                 pair.clone().into(),
