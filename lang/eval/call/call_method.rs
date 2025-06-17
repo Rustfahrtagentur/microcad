@@ -70,7 +70,10 @@ impl CallMethod for Value {
             Value::NamedTuple(_) => todo!(),
             Value::Tuple(_) => todo!(),
             Value::Matrix(_) => todo!(),
-            Value::Nodes(_) => todo!(),
+            Value::Nodes(_) => {
+                context.error(args, EvalError::Todo("call_method".into()))?;
+                Ok(Value::None)
+            }
         }
     }
 }
