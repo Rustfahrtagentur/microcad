@@ -8,21 +8,18 @@ use crate::{src_ref::*, syntax::*};
 /// An attribute item.
 #[derive(Debug, Clone)]
 pub enum Attribute {
-    /// A tag attribute `foo::bar`
-    Tag(QualifiedName),
     /// A call attribute `foo::bar(baz = 32)`
-    Call(Call),
+    NamedTuple(Identifier, ArgumentList),
     /// A name value attribute `foo::baz = baz`
-    NameValue(QualifiedName, Expression),
+    NameValue(Identifier, Expression),
 }
 
 impl Attribute {
     /// Return qualified name for this attribute.
-    pub fn qualified_name(&self) -> &QualifiedName {
+    pub fn identifier(&self) -> &Identifier {
         match self {
-            Attribute::Tag(qualified_name) => qualified_name,
-            Attribute::Call(call) => &call.name,
-            Attribute::NameValue(qualified_name, _) => qualified_name,
+            Attribute::NamedTuple(id, _) => &id,
+            Attribute::NameValue(id, _) => id,
         }
     }
 }
@@ -30,10 +27,11 @@ impl Attribute {
 impl std::fmt::Display for Attribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Attribute::Tag(qualified_name) => writeln!(f, "#[{qualified_name}]"),
-            Attribute::Call(call) => writeln!(f, "#[{call}]"),
-            Attribute::NameValue(qualified_name, expression) => {
-                writeln!(f, "#[{qualified_name} = {expression}]")
+            Attribute::NamedTuple(id, argument_list) => {
+                writeln!(f, "#[{id}({argument_list})]")
+            }
+            Attribute::NameValue(id, expression) => {
+                writeln!(f, "#[{id} = {expression}]")
             }
         }
     }
@@ -42,11 +40,8 @@ impl std::fmt::Display for Attribute {
 impl SrcReferrer for Attribute {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         match self {
-            Attribute::Tag(qualified_name) => qualified_name.src_ref(),
-            Attribute::Call(call) => call.src_ref(),
-            Attribute::NameValue(qualified_name, expression) => {
-                SrcRef::merge(qualified_name, expression)
-            }
+            Attribute::NamedTuple(id, argument_list) => SrcRef::merge(id, argument_list),
+            Attribute::NameValue(id, expression) => SrcRef::merge(id, expression),
         }
     }
 }

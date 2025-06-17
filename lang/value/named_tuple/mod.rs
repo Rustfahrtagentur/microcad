@@ -10,7 +10,7 @@ pub use error::*;
 use crate::{ty::*, value::*};
 
 /// Tuple with named values
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub struct NamedTuple(std::collections::BTreeMap<Identifier, Value>);
 
 impl NamedTuple {

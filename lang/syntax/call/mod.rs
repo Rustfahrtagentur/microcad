@@ -3,12 +3,12 @@
 
 //! Syntax elements related to calls.
 
-mod call_argument;
-mod call_argument_list;
+mod argument;
+mod argument_list;
 mod method_call;
 
-pub use call_argument::*;
-pub use call_argument_list::*;
+pub use argument::*;
+pub use argument_list::*;
 pub use method_call::*;
 
 use crate::{model_tree::*, src_ref::*, syntax::*, value::*};
