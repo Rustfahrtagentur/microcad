@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter_value, rc::*, src_ref::*, syntax::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*, syntax::*};
 
 /// The built-in cylinder primitive, defined by an bottom radius, top radius and height.
 /// The cylinder is oriented along the z-axis.
@@ -33,9 +33,9 @@ impl BuiltinPartDefinition for Cylinder {
 
     fn parameters() -> ParameterValueList {
         vec![
-            parameter_value!(radius_bottom: Scalar),
-            parameter_value!(radius_top: Scalar),
-            parameter_value!(height: Scalar),
+            parameter!(radius_bottom: Scalar),
+            parameter!(radius_top: Scalar),
+            parameter!(height: Scalar),
         ]
         .into()
     }

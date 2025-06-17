@@ -5,15 +5,15 @@ use std::str::FromStr;
 
 #[cfg(test)]
 use crate::builtin_module;
-use microcad_lang::{diag::*, eval::*, parameter_value, resolve::*, syntax::*, value::*};
+use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, value::*};
 
 pub fn assert() -> Symbol {
     Symbol::new_builtin(
         Identifier::no_ref("assert"),
         Some(
             vec![
-                parameter_value!(v),                               // Parameter with any type
-                parameter_value!(message: String = String::new()), // Optional message
+                parameter!(v),                               // Parameter with any type
+                parameter!(message: String = String::new()), // Optional message
             ]
             .into(),
         ),

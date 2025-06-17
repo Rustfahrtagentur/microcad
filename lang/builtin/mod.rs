@@ -69,7 +69,7 @@ impl From<BuiltinValueHelper> for Value {
 
 /// Shortcut to create a `ParameterValue`
 #[macro_export]
-macro_rules! parameter_value {
+macro_rules! parameter {
     ($id:ident) => {
         $crate::eval::ParameterValue::new(
             $crate::syntax::Identifier::no_ref(stringify!($id)),
@@ -107,7 +107,7 @@ macro_rules! parameter_value {
 
 /// Shortcut to create a argument value
 #[macro_export]
-macro_rules! argument_value {
+macro_rules! argument {
     ($name:ident: $ty:ident = $value:expr) => {
         ArgumentValue::new(
             Some(stringify!($name).into()),

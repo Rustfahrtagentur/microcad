@@ -58,29 +58,3 @@ impl Parse for ParameterList {
         Ok(parameters)
     }
 }
-
-/// Short cut to create a `Parameter` instance
-#[macro_export]
-macro_rules! parameter {
-    ($name:ident) => {
-        microcad_lang::parse::Parameter::new(stringify!($name).into(), None, None, SrcRef(None))
-    };
-    ($name:ident: $ty:ident) => {
-        microcad_lang::syntax::Parameter::new(
-            Identifier(microcad_lang::src_ref::Refer::none(
-                stringify!($name).into(),
-            )),
-            Some(microcad_lang::ty::Type::$ty.into()),
-            None,
-            microcad_lang::src_ref::SrcRef(None),
-        )
-    };
-    ($name:ident: $ty:ident = $value:expr) => {
-        microcad_lang::parse::Parameter::new(
-            stringify!($name).into(),
-            Some(microcad_lang::r#type::Type::$ty.into()),
-            Some(Expression::literal_from_str(stringify!($value)).expect("Invalid literal")),
-            microcad_lang::src_ref::SrcRef(None),
-        )
-    };
-}

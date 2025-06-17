@@ -110,13 +110,11 @@ impl ArgumentMatch for ArgumentMap {
 
 #[test]
 fn argument_match_single() {
-    let parameter_values = ParameterValueList::new(vec![crate::parameter_value!(a: Scalar)]);
+    let parameters = ParameterValueList::new(vec![crate::parameter!(a: Scalar)]);
 
-    let argument_value_list =
-        ArgumentValueList::from(vec![crate::argument_value!(a: Scalar = 5.0)]);
+    let arguments = ArgumentValueList::from(vec![crate::argument!(a: Scalar = 5.0)]);
 
-    let arg_map =
-        ArgumentMap::find_match(&argument_value_list, &parameter_values).expect("Valid match");
+    let arg_map = ArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
 
     let a = arg_map.get(&Identifier::no_ref("a"));
     assert!(a.is_some());

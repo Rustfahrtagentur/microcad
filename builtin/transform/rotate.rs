@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter_value, src_ref::*, syntax::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, src_ref::*, syntax::*};
 
 /// Builtin definition for a 2D circle
 #[derive(Debug)]
@@ -29,10 +29,10 @@ impl BuiltinPartDefinition for Rotate {
 
     fn parameters() -> ParameterValueList {
         vec![
-            parameter_value!(angle: Angle),
-            parameter_value!(x: Scalar),
-            parameter_value!(y: Scalar),
-            parameter_value!(z: Scalar),
+            parameter!(angle: Angle),
+            parameter!(x: Scalar),
+            parameter!(y: Scalar),
+            parameter!(z: Scalar),
         ]
         .into()
     }

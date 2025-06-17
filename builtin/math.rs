@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::{Mat3, Vec3};
-use microcad_lang::{diag::*, eval::*, parameter_value, resolve::*, syntax::*, ty::*, value::*};
+use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, ty::*, value::*};
 
 /// Absolute value abs(x)
 fn abs() -> Symbol {
@@ -55,10 +55,10 @@ fn rotate_around_axis() -> Symbol {
         Identifier::no_ref("rotate_around_axis"),
         Some(
             vec![
-                parameter_value!(angle: Angle),
-                parameter_value!(x: Scalar),
-                parameter_value!(y: Scalar),
-                parameter_value!(z: Scalar),
+                parameter!(angle: Angle),
+                parameter!(x: Scalar),
+                parameter!(y: Scalar),
+                parameter!(z: Scalar),
             ]
             .into(),
         ),
@@ -91,9 +91,9 @@ fn rotate_xyz() -> Symbol {
         Identifier::no_ref("rotate_xyz"),
         Some(
             vec![
-                parameter_value!(x: Angle),
-                parameter_value!(y: Angle),
-                parameter_value!(z: Angle),
+                parameter!(x: Angle),
+                parameter!(y: Angle),
+                parameter!(z: Angle),
             ]
             .into(),
         ),
@@ -121,9 +121,9 @@ fn rotate_zyx() -> Symbol {
         Identifier::no_ref("rotate_zyx"),
         Some(
             vec![
-                parameter_value!(x: Angle),
-                parameter_value!(y: Angle),
-                parameter_value!(z: Angle),
+                parameter!(x: Angle),
+                parameter!(y: Angle),
+                parameter!(z: Angle),
             ]
             .into(),
         ),
