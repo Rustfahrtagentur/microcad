@@ -94,7 +94,7 @@ impl NamedTupleType {
 
     /// Check if the named tuple is a [`Vec3`].
     pub(crate) fn is_vec3(&self) -> bool {
-        self.has_exact_keys(&["x", "y", "z"])
+        self.is_scalar_only() && self.has_exact_keys(&["x", "y", "z"])
     }
 }
 
