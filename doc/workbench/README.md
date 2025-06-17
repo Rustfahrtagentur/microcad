@@ -108,7 +108,7 @@ One may define multiple initializers which must have different parameter lists.
 [![test](.test/initializers.png)](.test/initializers.log)
 
 ```µcad,initializers#fail
-sketch wheel(radius: Length) {
+part wheel(radius: Length) {
     // error: same parameters as in building plan
     init( radius: Length ) { }
 }
@@ -120,7 +120,7 @@ be initialized (except those with *default values*).
 [![test](.test/init_property.png)](.test/init_property.log)
 
 ```µcad,init_property
-sketch wheel(radius: Length, thickness: Length) {
+part wheel(radius: Length, thickness: Length) {
     // initializer with diameter
     init( diameter: Length, thickness: Length ) {
         // must set `radius` in code 
