@@ -28,8 +28,8 @@ fn call_argument_value_list(s: &str, context: &mut Context) -> CallArgumentValue
 }
 
 #[test]
-fn part_implicit_init_call() {
-    let mut context = crate::context_for_file("syntax/part/implicit_init.µcad");
+fn workbench_call() {
+    let mut context = crate::context_for_file("syntax/workbench/plan.µcad");
 
     let node = context.lookup(&qualified_name("a")).expect("Node expected");
 
@@ -39,10 +39,10 @@ fn part_implicit_init_call() {
         assert_eq!(id.id(), "a");
     }
 
-    // Get part definition for symbol `a`
+    // Get workbench definition for symbol `a`
     let definition = match &node.borrow().def {
-        SymbolDefinition::Part(definition) => definition.clone(),
-        _ => panic!("Symbol is not a part"),
+        SymbolDefinition::Workbench(definition) => definition.clone(),
+        _ => panic!("Symbol is not a workbench"),
     };
 
     // Call `a` with `b = 3.0`
@@ -86,19 +86,19 @@ fn part_implicit_init_call() {
 }
 
 #[test]
-fn part_explicit_init_call() {
+fn workbench_initializer_call() {
     use microcad_lang::diag::Diag;
     use microcad_lang::*;
 
-    let mut context = crate::context_for_file("syntax/part/explicit_init.µcad");
+    let mut context = crate::context_for_file("syntax/workbench/initializer.µcad");
     let node = context
         .lookup(&qualified_name("circle"))
         .expect("Node expected");
 
-    // Get part definition for symbol `a`
+    // Get workbench definition for symbol `a`
     let definition = match &node.borrow().def {
-        SymbolDefinition::Part(definition) => definition.clone(),
-        _ => panic!("Symbol is not a part"),
+        SymbolDefinition::Workbench(definition) => definition.clone(),
+        _ => panic!("Symbol is not a workbench"),
     };
 
     // Helper function to check if the object node contains a property radius with specified value

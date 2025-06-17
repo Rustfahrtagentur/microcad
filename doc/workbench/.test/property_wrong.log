@@ -1,0 +1,19 @@
+error: Missing arguments: outer
+
+  ---> <from_str>:1:1
+     |
+   1 | sketch wheel(outer: length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol info not found.
+  ---> <from_str>:14:1
+     |
+  14 | info("outer: {t.outer}");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol info not found.
+  ---> <from_str>:16:1
+     |
+  16 | info("inner: {t.inner}");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+     |

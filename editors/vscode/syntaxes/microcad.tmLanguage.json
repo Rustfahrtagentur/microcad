@@ -7,7 +7,7 @@
             "name": "comment.line.microcad"
         },
         {
-            "match": "\\b(pub|part|mod|use|fn|init|return|if|else|mat|__builtin)\\b",
+            "match": "\\b(pub|sketch|part|op|mod|use|fn|const|prop|init|return|if|else|mat|__builtin)\\b",
             "name": "keyword.control.microcad"
         },
         {
@@ -27,8 +27,23 @@
             "name": "constant.numeric.microcad"
         },
         {
+            "match": "([a-z_][a-z0-9_]*)(::)",
+            "captures": {
+                "1": {
+                    "name": "entity.name.namespace.microcad"
+                },
+                "2": {
+                    "name": "keyword.operator.namespace.microcad"
+                }
+            }
+        },
+        {
             "match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
             "name": "variable.other.microcad"
+        },
+        {
+            "match": "\\b([A-Z_][A-Z0-9_]*)\\b",
+            "name": "constant.other.caps.microcad"
         },
         {
             "match": "\"[^\"]*\"",
@@ -74,13 +89,22 @@
                     "include": "#numbers"
                 },
                 {
+                    "include": "#namespaces"
+                },
+                {
                     "include": "#variables"
+                },
+                {
+                    "include": "#constants"
                 },
                 {
                     "include": "#types"
                 },
                 {
                     "include": "#strings"
+                },
+                {
+                    "include": "#custom_types"
                 }
             ]
         },
@@ -89,7 +113,7 @@
             "name": "comment.line.microcad"
         },
         "keywords": {
-            "match": "\\b(pub|part|mod|use|fn|init|return|if|else|mat|__builtin)\\b",
+            "match": "\\b(pub|sketch|part|op|mod|use|fn|const|prop|init|return|if|else|mat|__builtin)\\b",
             "name": "keyword.control.microcad"
         },
         "functions": {
@@ -104,13 +128,32 @@
             "match": "\\b(([0-9]+(\\.[0-9]+)?)(%|m|cm|mm|µm|in|ft|yd|deg|°|grad|turn|rad|g|kg|lb|oz|m²|cm²|mm²|µm²|in²|ft²|yd²|m³|cm³|mm³|µm³|in³|ft³|yd³|ml|cl|l|µl)?)|true|false\\b",
             "name": "constant.numeric.microcad"
         },
+        "namespaces": {
+            "match": "([a-z_][a-z0-9_]*)(::)",
+            "captures": {
+                "1": {
+                    "name": "entity.name.namespace.microcad"
+                },
+                "2": {
+                    "name": "keyword.operator.namespace.microcad"
+                }
+            }
+        },
         "variables": {
             "match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
             "name": "variable.other.microcad"
         },
+        "constants": {
+            "match": "\\b([A-Z_][A-Z0-9_]*)\\b",
+            "name": "constant.other.caps.microcad"
+        },
         "types": {
             "match": "\\b(Integer|Scalar|String|Color|Length|Area|Volume|Angle|Weight|Density|Bool)\\b",
             "name": "storage.type.microcad"
+        },
+        "custom_types": {
+            "match": "\\b([A-Z_][a-zA-Z0-9_]*)\\b",
+            "name": "entity.name.type.microcad"
         },
         "strings": {
             "match": "\"[^\"]*\"",

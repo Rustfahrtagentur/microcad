@@ -177,8 +177,8 @@ impl Eval for NestedItem {
                 SymbolDefinition::Module(ns) => {
                     Err(EvalError::UnexpectedNested("mod", ns.id.clone()))
                 }
-                SymbolDefinition::Part(md) => {
-                    Err(EvalError::UnexpectedNested("part", md.id.clone()))
+                SymbolDefinition::Workbench(w) => {
+                    Err(EvalError::UnexpectedNested(w.kind.as_str(), w.id.clone()))
                 }
                 SymbolDefinition::Function(f) => {
                     Err(EvalError::UnexpectedNested("function", f.id.clone()))

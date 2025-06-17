@@ -42,12 +42,12 @@ mod init;
 mod literal;
 mod output;
 mod parameter;
-mod part;
 mod source_file;
 mod statement;
 mod symbols;
 mod tuple;
 mod r#use;
+mod workbench;
 
 pub use argument_map::*;
 pub use attribute::*;
@@ -58,8 +58,8 @@ pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
 pub use parameter::*;
-pub use symbols::*;
 pub use r#use::*;
+pub use symbols::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 

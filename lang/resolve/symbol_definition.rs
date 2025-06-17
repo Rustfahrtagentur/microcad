@@ -13,7 +13,7 @@ pub enum SymbolDefinition {
     /// External module symbol (not already loaded).
     External(Rc<ModuleDefinition>),
     /// Part symbol.
-    Part(Rc<PartDefinition>),
+    Workbench(Rc<WorkbenchDefinition>),
     /// Function symbol.
     Function(Rc<FunctionDefinition>),
     /// Builtin symbol.
@@ -30,8 +30,8 @@ impl SymbolDefinition {
     /// Returns ID of this definition.
     pub fn id(&self) -> Identifier {
         match &self {
-            Self::Module(n) | Self::External(n) => n.id.clone(),
-            Self::Part(m) => m.id.clone(),
+            Self::Workbench(w) => w.id.clone(),
+            Self::Module(m) | Self::External(m) => m.id.clone(),
             Self::Function(f) => f.id.clone(),
             Self::SourceFile(s) => s.id(),
             Self::Builtin(m) => m.id(),
@@ -42,8 +42,8 @@ impl SymbolDefinition {
     /// Resolve into SymbolNode.
     pub fn resolve(&self, parent: Option<Symbol>) -> Symbol {
         match self {
-            Self::Part(m) => m.resolve(parent),
-            Self::Module(n) => n.resolve(parent),
+            Self::Workbench(w) => w.resolve(parent),
+            Self::Module(m) => m.resolve(parent),
             Self::Function(f) => f.resolve(parent),
             Self::SourceFile(s) => s.resolve(parent),
             Self::External(e) => unreachable!("external {} must be loaded first", e.id),
@@ -57,7 +57,7 @@ impl SymbolDefinition {
 impl std::fmt::Display for SymbolDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Part(_) => write!(f, "(part)"),
+            Self::Workbench(w) => write!(f, "({})", w.kind),
             Self::Module(_) => write!(f, "(module)"),
             Self::External(_) => write!(f, "(external)"),
             Self::Function(_) => write!(f, "(function)"),

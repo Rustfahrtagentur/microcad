@@ -1,11 +1,11 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Part definition syntax element evaluation
+//! Workbench definition syntax element evaluation
 
-use crate::{eval::*, model_tree::*, rc::*, syntax::*};
+use crate::{eval::*, model_tree::*, syntax::*};
 
-impl PartDefinition {
+impl WorkbenchDefinition {
     /// Find a matching initializer for call argument list
     fn find_matching_initializer(
         &self,
@@ -21,13 +21,6 @@ impl PartDefinition {
         })
     }
 
-    /// Resolve into SymbolNode.
-    pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
-        let node = Symbol::new(SymbolDefinition::Part(self.clone()), parent);
-        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
-        node
-    }
-
     /// Try to evaluate a single call into a [`ModelNode`].
     fn eval_to_node<'a>(
         &'a self,
@@ -35,43 +28,46 @@ impl PartDefinition {
         init: Option<&'a InitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ModelNode> {
-        context.scope(StackFrame::Part(self.id.clone(), args.into()), |context| {
-            let mut object_builder = ObjectBuilder::new_object_with_properties(
-                self.src_ref.clone(),
-                &self.parameters.eval(context)?,
-                args,
-            );
+        context.scope(
+            StackFrame::Workbench(self.kind, self.id.clone(), args.into()),
+            |context| {
+                let mut object_builder = ObjectBuilder::new_object_with_properties(
+                    self.src_ref.clone(),
+                    &self.plan.eval(context)?,
+                    args,
+                );
 
-            // Create the object node from initializer if present
-            if let Some(init) = init {
-                init.eval(args, &mut object_builder, context)?;
-            }
-
-            object_builder.properties_to_scope(context)?;
-
-            // At this point, all properties must have a value
-            for statement in self.body.statements.iter() {
-                match statement {
-                    Statement::Assignment(assignment) => {
-                        assignment.eval(context)?;
-                    }
-                    Statement::Expression(expression) => {
-                        let value = expression.eval(context)?;
-                        object_builder.append_children(&mut value.fetch_nodes());
-                    }
-                    _ => {}
+                // Create the object node from initializer if present
+                if let Some(init) = init {
+                    init.eval(args, &mut object_builder, context)?;
                 }
-            }
 
-            Ok(object_builder
-                .build_node()
-                .set_original_arguments(args.clone())
-                .set_metadata(self.attribute_list.eval(context)?))
-        })
+                object_builder.properties_to_scope(context)?;
+
+                // At this point, all properties must have a value
+                for statement in self.body.statements.iter() {
+                    match statement {
+                        Statement::Assignment(assignment) => {
+                            assignment.eval(context)?;
+                        }
+                        Statement::Expression(expression) => {
+                            let value = expression.eval(context)?;
+                            object_builder.append_children(&mut value.fetch_nodes());
+                        }
+                        _ => {}
+                    }
+                }
+
+                Ok(object_builder
+                    .build_node()
+                    .set_original_arguments(args.clone())
+                    .set_metadata(self.attribute_list.eval(context)?))
+            },
+        )
     }
 }
 
-impl CallTrait<ModelNodes> for PartDefinition {
+impl CallTrait<ModelNodes> for WorkbenchDefinition {
     /// Evaluate the call of a part initialization
     ///
     /// The evaluation considers multiplicity, which means that multiple nodes maybe created.
@@ -89,7 +85,7 @@ impl CallTrait<ModelNodes> for PartDefinition {
                     nodes.push(self.eval_to_node(&args, Some(init), context)?);
                 }
             }
-            None => match args.get_multi_matching_arguments(context, &self.parameters) {
+            None => match args.get_multi_matching_arguments(context, &self.plan) {
                 Ok(multi_args) => {
                     for args in multi_args.combinations() {
                         nodes.push(self.eval_to_node(&args, None, context)?);

@@ -1,5 +1,5 @@
-// Define a module `circle` with two explicit initializers
-part circle(radius: Scalar) {
+// Define a sketch `circle` with two initializers
+sketch circle(radius: Scalar) {
     init(r: Scalar) {
         radius = r;
     }

@@ -21,7 +21,7 @@ pub enum StackFrame {
     /// Module scope with locals.
     Module(Identifier, SymbolMap),
     /// Part scope with locals.
-    Part(Identifier, SymbolMap),
+    Workbench(WorkbenchKind, Identifier, SymbolMap),
     /// initializer scope with locals.
     Init(SymbolMap),
     /// Body (scope)  with locals.
@@ -57,8 +57,8 @@ impl StackFrame {
                 writeln!(f, "{:depth$}{id} (source):", "")?;
                 map
             }
-            StackFrame::Part(id, symbols) => {
-                writeln!(f, "{:depth$}{id} (part)", "")?;
+            StackFrame::Workbench(kind, id, symbols) => {
+                writeln!(f, "{:depth$}{id} ({kind})", "")?;
                 return symbols.print(f, depth + 4);
             }
             StackFrame::Init(symbols) => {
@@ -110,7 +110,7 @@ impl StackFrame {
         match self {
             StackFrame::Source(_identifier, _symbol_map) => todo!(),
             StackFrame::Module(_identifier, _symbol_map) => todo!(),
-            StackFrame::Part(_identifier, _symbol_map) => todo!(),
+            StackFrame::Workbench(_kind, _identifier, _symbol_map) => todo!(),
             StackFrame::Init(_symbol_map) => todo!(),
             StackFrame::Body(_symbol_map) => todo!(),
             StackFrame::Call {
