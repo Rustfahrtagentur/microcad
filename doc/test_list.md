@@ -3,43 +3,45 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**68** tests from markdown.
+**70** tests from markdown.
 
 | Result | Name |
 |-------:|------|
 | [![test](../doc/types/.test/array_unit_bundling.png)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/array.md) |
+| [![test](../doc/workbench/.test/building_plan.png)](../doc/workbench/.test/building_plan.log) | [building_plan](../doc/workbench/README.md) |
+| [![test](../doc/workbench/.test/code.png)](../doc/workbench/.test/code.log) | [code](../doc/workbench/README.md) |
+| [![test](../doc/workbench/.test/code_between_initializers.png)](../doc/workbench/.test/code_between_initializers.log) | [code_between_initializers](../doc/workbench/README.md) |
+| [![test](../doc/workbench/.test/code_post_init.png)](../doc/workbench/.test/code_post_init.log) | [code_post_init](../doc/workbench/README.md) |
 | [![test](../doc/std/algorithm/.test/difference_alt_operator.png)](../doc/std/algorithm/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/std/algorithm/difference.md) |
 | [![test](../doc/std/algorithm/.test/difference_operator.png)](../doc/std/algorithm/.test/difference_operator.log) | [difference_operator](../doc/std/algorithm/difference.md) |
-| [![test](../doc/parts/.test/EXAMPLES_fields.png)](../doc/parts/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/parts/EXAMPLES.md) |
-| [![test](../doc/parts/.test/EXAMPLES_functions.png)](../doc/parts/.test/EXAMPLES_functions.log) | [EXAMPLES_functions](../doc/parts/EXAMPLES.md) |
+| [![test](../doc/workbench/.test/EXAMPLES_fields.png)](../doc/workbench/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/workbench/EXAMPLES.md) |
+| [![test](../doc/workbench/.test/EXAMPLES_functions.png)](../doc/workbench/.test/EXAMPLES_functions.log) | [EXAMPLES_functions](../doc/workbench/EXAMPLES.md) |
 | [![test](../doc/std/.test/export_multiple.png)](../doc/std/.test/export_multiple.log) | [export_multiple](../doc/std/export.md) |
 | [![test](../doc/std/.test/export_single.png)](../doc/std/.test/export_single.log) | [export_single](../doc/std/export.md) |
 | [![test](../.test/first_example.png)](../.test/first_example.log) | [first_example](../README.md) |
-| [![test](../doc/parts/.test/functions_donut.png)](../doc/parts/.test/functions_donut.log) | [functions_donut](../doc/parts/functions.md) |
+| [![test](../doc/workbench/.test/functions_donut.png)](../doc/workbench/.test/functions_donut.log) | [functions_donut](../doc/workbench/functions.md) |
 | [![test](../doc/std/algorithm/.test/hull_multiple.png)](../doc/std/algorithm/.test/hull_multiple.log) | [hull_multiple](../doc/std/algorithm/hull.md) |
 | [![test](../doc/std/algorithm/.test/hull_single.png)](../doc/std/algorithm/.test/hull_single.log) | [hull_single](../doc/std/algorithm/hull.md) |
-| [![test](../doc/parts/.test/init.png)](../doc/parts/.test/init.log) | [init](../doc/parts/init.md) |
-| [![test](../doc/parts/.test/init_call_explicit.png)](../doc/parts/.test/init_call_explicit.log) | [init_call_explicit](../doc/parts/init.md) |
-| [![test](../doc/parts/.test/init_call_implicit.png)](../doc/parts/.test/init_call_implicit.log) | [init_call_implicit](../doc/parts/init.md) |
-| [![test](../doc/parts/.test/init_call_implicit_explicit.png)](../doc/parts/.test/init_call_implicit_explicit.log) | [init_call_implicit_explicit](../doc/parts/init.md) |
-| [![test](../doc/parts/.test/init_explicit.png)](../doc/parts/.test/init_explicit.log) | [init_explicit](../doc/parts/init.md) |
-| [![test](../doc/parts/.test/init_explicit_overloading.png)](../doc/parts/.test/init_explicit_overloading.log) | [init_explicit_overloading](../doc/parts/init.md) |
-| [![test](../doc/parts/.test/init_implicit.png)](../doc/parts/.test/init_implicit.log) | [init_implicit](../doc/parts/init.md) |
+| [![test](../doc/workbench/.test/init_property.png)](../doc/workbench/.test/init_property.log) | [init_property](../doc/workbench/README.md) |
+| [![test](../doc/workbench/.test/initializers.png)](../doc/workbench/.test/initializers.log) | [initializers](../doc/workbench/README.md) |
 | [![test](../doc/std/algorithm/.test/intersection_alt_operator.png)](../doc/std/algorithm/.test/intersection_alt_operator.log) | [intersection_alt_operator](../doc/std/algorithm/intersection.md) |
 | [![test](../doc/std/algorithm/.test/intersection_operator.png)](../doc/std/algorithm/.test/intersection_operator.log) | [intersection_operator](../doc/std/algorithm/intersection.md) |
 | [![test](../doc/std/math/.test/math_abs.png)](../doc/std/math/.test/math_abs.log) | [math_abs](../doc/std/math/README.md) |
 | [![test](../doc/std/math/.test/math_trigonometric.png)](../doc/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/std/math/README.md) |
+| [![test](../doc/workbench/.test/missed_property.png)](../doc/workbench/.test/missed_property.log) | [missed_property](../doc/workbench/README.md) |
 | [![test](../doc/.test/module_example.png)](../doc/.test/module_example.log) | [module_example](../doc/modules.md) |
 | [![test](../doc/.test/no_use_statement.png)](../doc/.test/no_use_statement.log) | [no_use_statement](../doc/use_statement.md) |
-| [![test](../doc/parts/.test/op_basic.png)](../doc/parts/.test/op_basic.log) | [op_basic](../doc/parts/op.md) |
-| [![test](../doc/parts/.test/parameter_list.png)](../doc/parts/.test/parameter_list.log) | [parameter_list](../doc/parts/parameter_list.md) |
+| [![test](../doc/workbench/.test/op_basic.png)](../doc/workbench/.test/op_basic.log) | [op_basic](../doc/workbench/op.md) |
+| [![test](../doc/workbench/.test/parameter_list.png)](../doc/workbench/.test/parameter_list.log) | [parameter_list](../doc/workbench/parameter_list.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_A.png)](../doc/.test/parameter_multiplicity_example_A.log) | [parameter_multiplicity_example_A](../doc/parameter_multiplicity.md) |
 | [![test](../doc/.test/parameter_multiplicity_example_B.png)](../doc/.test/parameter_multiplicity_example_B.log) | [parameter_multiplicity_example_B](../doc/parameter_multiplicity.md) |
-| [![test](../doc/parts/.test/part_declaration.png)](../doc/parts/.test/part_declaration.log) | [part_declaration](../doc/parts/README.md) |
-| [![test](../doc/parts/.test/property_torus.png)](../doc/parts/.test/property_torus.log) | [property_torus](../doc/parts/property.md) |
-| [![test](../doc/parts/.test/property_torus_fail.png)](../doc/parts/.test/property_torus_fail.log) | [property_torus_fail](../doc/parts/property.md) |
+| [![test](../doc/workbench/.test/part_basic.png)](../doc/workbench/.test/part_basic.log) | [part_basic](../doc/workbench/part.md) |
+| [![test](../doc/workbench/.test/part_declaration.png)](../doc/workbench/.test/part_declaration.log) | [part_declaration](../doc/workbench/README.md) |
+| [![test](../doc/workbench/.test/pre_init_code.png)](../doc/workbench/.test/pre_init_code.log) | [pre_init_code](../doc/workbench/README.md) |
+| [![test](../doc/workbench/.test/property.png)](../doc/workbench/.test/property.log) | [property](../doc/workbench/README.md) |
+| [![test](../doc/workbench/.test/property_wrong.png)](../doc/workbench/.test/property_wrong.log) | [property_wrong](../doc/workbench/README.md) |
 | [![test](../doc/types/.test/quantity_types_number_literals.png)](../doc/types/.test/quantity_types_number_literals.log) | [quantity_types_number_literals](../doc/types/quantity.md) |
-| [![test](../doc/parts/.test/sketch_basic.png)](../doc/parts/.test/sketch_basic.log) | [sketch_basic](../doc/parts/sketch.md) |
+| [![test](../doc/workbench/.test/sketch_basic.png)](../doc/workbench/.test/sketch_basic.log) | [sketch_basic](../doc/workbench/sketch.md) |
 | [![test](../doc/types/.test/tuple_fields_A.png)](../doc/types/.test/tuple_fields_A.log) | [tuple_fields_A](../doc/types/tuple.md) |
 | [![test](../doc/types/.test/tuple_fields_B.png)](../doc/types/.test/tuple_fields_B.log) | [tuple_fields_B](../doc/types/tuple.md) |
 | [![test](../doc/types/.test/tuple_fields_C.png)](../doc/types/.test/tuple_fields_C.log) | [tuple_fields_C](../doc/types/tuple.md) |

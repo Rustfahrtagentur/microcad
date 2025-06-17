@@ -1,5 +1,26 @@
 # Basic Concepts
 
+- [Basic Concepts](#basic-concepts)
+  - [µcad Rules](#µcad-rules)
+  - [The Build Process](#the-build-process)
+    - [Parsing Phase](#parsing-phase)
+    - [Resolving Phase](#resolving-phase)
+    - [Evaluation Phase](#evaluation-phase)
+    - [Export Phase](#export-phase)
+    - [Viewing](#viewing)
+
+## µcad Rules
+
+To stay on course while continuing development of µcad we have expressed some rules that may guide us:
+
+1. µcad is a declarative markup language. This means µcad avoids imperative control flow statements: for, while, goto.
+2. Complex generic functionalities (like generating objects or mathematical functionalities)
+   shall be put into *builtin libraries* instead of implementing them within µcad itself.
+3. The *standard library* shall implement a convenient interface to the builtin library.
+4. µcad enforces a strict *modular concept* to improve code quality.
+5. Explicit naming of *arguments* (within in *calls*) is encouraged.
+6. Explicit writing of *units* at *values* is forced.
+
 ## The Build Process
 
 The *µcad* interpreter runs programs which generate geometry files.

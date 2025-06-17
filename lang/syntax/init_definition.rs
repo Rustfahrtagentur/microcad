@@ -50,7 +50,7 @@ impl PrintSyntax for InitDefinition {
 /// Iterator over part's init statements
 pub struct Inits<'a>(std::slice::Iter<'a, Statement>);
 
-/// Interface for elements which have (explicit) initializers
+/// Interface for elements which have initializers
 pub trait Initialized<'a> {
     /// return iterator of body statements
     fn statements(&'a self) -> std::slice::Iter<'a, Statement>;

@@ -33,7 +33,7 @@ impl WorkbenchDefinition {
             |context| {
                 let mut object_builder = ObjectBuilder::new_object_with_properties(
                     self.src_ref.clone(),
-                    &self.parameters.eval(context)?,
+                    &self.plan.eval(context)?,
                     args,
                 );
 
@@ -85,7 +85,7 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
                     nodes.push(self.eval_to_node(&args, Some(init), context)?);
                 }
             }
-            None => match args.get_multi_matching_arguments(context, &self.parameters) {
+            None => match args.get_multi_matching_arguments(context, &self.plan) {
                 Ok(multi_args) => {
                     for args in multi_args.combinations() {
                         nodes.push(self.eval_to_node(&args, None, context)?);

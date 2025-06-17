@@ -3,38 +3,43 @@
 - [µcad language](#µcad-language)
   - [Program Structure](#program-structure)
   - [Data Types](#data-types)
-  - [Obscure Features](#obscure-features)
-  - [Builtin Libraries](#builtin-libraries)
-  - [Builtin Functions](#builtin-functions)
+  - [Workbenches \& Objects](#workbenches--objects)
+  - [Exceptional Features](#exceptional-features)
+  - [Standard Library](#standard-library)
+  - [Builtin Library](#builtin-library)
   - [Debugging](#debugging)
 
-The *µcad* programming language is purely declarative so a *µcad* program can
-be calculated like a mathematical equation.
-One just need to know all values of all the variables.
+The *µcad programming language* is purely declarative, which means that a µcad program can be
+evaluated like a mathematical equation, resulting in a graphical output.
+One only needs to know the values of all the variables to obtain this result.
 
 ## Program Structure
 
-A **µcad program** can be just a sequence of instructions or a more complex construct of
-separate **parts** and **functions** which may depend on each other via **use statements**.
-**Modules** help to bundle things into packages and solve naming collisions.
+A **µcad program** can simply consist of a sequence of **statements** or more complex constructs
+such as **workbenches** and **functions**, which may depend on each other through **use statements**.
+Additionally, **modules** help bundle things into packages and resolve naming collision issues.
 
-- [Modules](modules.md) bundle together parts, (sub)modules or use statements
+- [Modules](modules.md) for modularization of complex code
 - [Workbenches](workbench/README.md) produce or manipulate 2D and 3D objects
 - [Materials](materials.md) describe materials of objects
 - [Statements](statements.md) actual running code
 
 ## Data Types
 
-There are several **primitive types** which are always linked to a unit (like `Length` in `mm` or an `Angle` in `°`)
-and some which just represent factors or counts (like `Scalar` and `Integer`).
+There are several **primitive types** which are always linked to a **unit** (like `Length` in `mm` or an `Angle` in `°`)
+and some which just represent scalar values or counts (like `Scalar` or `Integer`).
 
-**Collection types** (like `Tuple` or `Array`) can bundle other types into structured parameter sets.
+**Collection types** (like `Tuple` or `Array`) can bundle other types into structured sets.
 
 - [Primitive Types](primitive_types.md)
 - [Tuples](tuple.md)
 - [Arrays](arrays.md)
 
-## Obscure Features
+## Workbenches & Objects
+
+Workbenches like `sketch` and `part` produce 2D and 3D objects
+
+## Exceptional Features
 
 The µcad language has some more or less obscure features which replace common
 programming concepts like for-loops or goto-jumps.
@@ -42,19 +47,19 @@ programming concepts like for-loops or goto-jumps.
 - [Parameter Multiplicity](parameter_multiplicity.md)
 - [Unit Types](unit_types.md)
 
-## Builtin Libraries
+## Standard Library
 
 A big advantage which µcad can take from it's strict modular concept is that
-big parts of the basic functionalities can be written in the µcad language itself.
+big parts of functionalities can be written in the µcad language itself.
 
 - Standard Library (`std`)
   - [Mathematical Functions (`math`)](std/math.md)
   - [Geometric Algorithms (`algorithm`)](std/algorithm/README.md)
   - [Export Functions](std/export.md)
 
-## Builtin Functions
+## Builtin Library
 
-The *builtin libraries* rely on a few, very basic builtin functions which are
+The *builtin library* rely on a few, very basic builtin functions which are
 implemented in *Rust* to be fast and to cover internal complexities.
 
 - Export Statement (__builtin::export)

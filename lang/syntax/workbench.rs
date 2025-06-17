@@ -43,8 +43,8 @@ pub struct WorkbenchDefinition {
     pub kind: WorkbenchKind,
     /// Workbench name.
     pub id: Identifier,
-    /// Workbench parameters (implicit initialization).
-    pub parameters: ParameterList,
+    /// Workbench's building plan
+    pub plan: ParameterList,
     /// Workbench body
     pub body: Body,
     /// Workbench code reference
@@ -57,7 +57,7 @@ impl WorkbenchDefinition {
         attribute_list: AttributeList,
         kind: WorkbenchKind,
         id: Identifier,
-        parameters: ParameterList,
+        plan: ParameterList,
         body: Body,
         src_ref: SrcRef,
     ) -> Rc<Self> {
@@ -65,7 +65,7 @@ impl WorkbenchDefinition {
             attribute_list,
             kind,
             id,
-            parameters,
+            plan,
             body,
             src_ref,
         }
@@ -96,10 +96,10 @@ impl std::fmt::Display for WorkbenchDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{kind} {id}({parameters}) {body}",
+            "{kind} {id}({plan}) {body}",
             kind = self.kind,
             id = self.id,
-            parameters = self.parameters,
+            plan = self.plan,
             body = self.body
         )
     }
@@ -114,7 +114,7 @@ impl PrintSyntax for WorkbenchDefinition {
             kind = self.kind,
             id = self.id
         )?;
-        self.parameters.print_syntax(f, depth + 1)?;
+        self.plan.print_syntax(f, depth + 1)?;
         self.body.print_syntax(f, depth + 1)
     }
 }
