@@ -7,11 +7,17 @@ There can be multiple attributes for a node.
 For example:
 
 ```µcad,metadata_simple_example
-#[color = "red"]
+use std::debug::*;
+
+#[color = (r = 100%, b = 0%, g = 0%, a = 100%)]
 #[layer = "right_side"]
 c = std::geo2d::circle(42.0mm);
 
-std::debug::assert(c.meta.color == "red");
+std::debug::assert_eq(std::debug::type_of(c.meta.color), "Color");
+std::debug::assert_eq(std::debug::type_of(c.meta.layer), "String");
+
+std::debug::assert_eq(c.meta.color, (r = 100%, b = 0%, g = 0%, a = 100%));
+std::debug::assert_eq(c.meta.layer, "right_side");
 ```
 
 When viewed or exported, node `c` will have a red color.

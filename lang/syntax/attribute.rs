@@ -18,7 +18,7 @@ impl Attribute {
     /// Return qualified name for this attribute.
     pub fn identifier(&self) -> &Identifier {
         match self {
-            Attribute::NamedTuple(id, _) => &id,
+            Attribute::NamedTuple(id, _) => id,
             Attribute::NameValue(id, _) => id,
         }
     }
