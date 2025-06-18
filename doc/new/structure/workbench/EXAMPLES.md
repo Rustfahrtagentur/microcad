@@ -1,0 +1,49 @@
+# Examples
+
+## Parts
+
+* Parts can have a parameter lists
+
+### Calculation in Function
+
+[![test](.test/EXAMPLES_functions.png)](.test/EXAMPLES_functions.log)
+
+```µcad,EXAMPLES_functions#todo
+part cube_with_volume(size: length) {
+
+    fn volume() {
+        size*size*size
+    }
+
+    fn weight(density: density = 20g/1mm^3) {
+        volume() * density
+    }
+
+    cube(size);
+}
+
+my_cube = cube_with_volume(40mm);
+info("Cube volume: {my_cube.volume()}");
+info("Cube weight: {my_cube.weight(40g/mm^3)}");
+```
+
+### Calculation in Field Initialization
+
+[![test](.test/EXAMPLES_fields.png)](.test/EXAMPLES_fields.log)
+
+```µcad,EXAMPLES_fields#todo
+part cube_with_volume(size: length) {
+
+    volume = size*size*size;
+
+    fn weight(density: density = 20g/1mm^3) {
+        volume * density
+    }
+
+    cube(size);
+}
+
+my_cube = cube_with_volume(40mm);
+info("Cube volume: {my_cube.volume}");
+info("Cube weight: {my_cube.weight(40g/mm^3)}");
+```

@@ -9,7 +9,7 @@ The following example calculates the area of a circle by using the *measure* `ar
 ```µcad,measure
 __builtin::assert_eq( 
 
-    // use area() on a circle
+    // use measure area() on a circle
     std::geo2d::circle(radius=10mm).area(),
 
     // circle area formula for comparison
