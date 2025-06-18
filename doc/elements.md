@@ -1,0 +1,75 @@
+# µcad Language Elements
+
+- Structural
+  - Modularization
+    - Modules by file structure
+    - Modules with `mod`
+  - Workbenches
+    - Workbench Types
+      - Sketch
+      - Part
+      - Operation
+    - Workbench Declaration
+      - Building Plan
+      - Initializers
+      - Init Code
+      - Building Code
+    - Workbench Properties
+- (Materials)
+- Statements
+  - Use Statements
+    - Use Statement
+    - Use As Statement
+    - Use All Statement
+  - Assignments
+    - Constant Assignment
+    - Variable Assignment
+    - Property Assignment
+  - Functions
+    - Module Functions
+    - Workbench Functions
+  - (Conditionals)
+    - (If)
+- Data Types
+  - Primitive Types
+    - Bool Type
+    - Integer Type
+    - String Type
+    - Matrix Type
+  - Container Types
+    - Array Type
+    - Tuple Type
+    - Named Tuple Type
+    - Nodes Type
+  - Quantity Types
+    - Scalar Type
+    - Length Type
+    - Area Type
+    - Volume Type
+    - Density Type
+    - Weight Type
+  - (Custom Types)
+- Calls
+  - Workbench Call
+  - Function Call
+  - Parameters
+    - Parameter Multiplicity
+    - Parameter Matching
+- Nodes
+  - Measures
+    - 2D measures
+    - 3D measures
+- Attributes
+- Export
+- Libraries
+  - Standard Library
+    - debug
+    - transform
+    - math
+    - algorithm
+  - Builtin Library
+    - debug
+    - transform
+    - math
+    - algorithm
+  - (Plugin Libraries)
