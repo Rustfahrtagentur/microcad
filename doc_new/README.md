@@ -1,68 +1,57 @@
 # µcad language
 
 - [Program Structure](#program-structure)
-- [Materials](#materials)
 - [Data Types](#data-types)
 - [Calls](#calls)
-- [Nodes](#nodes)
-- [Attributes](#attributes)
+- [Objects](#objects)
 - [Libraries](#libraries)
 
 The *µcad programming language* is purely declarative, which means that a µcad program can be
 evaluated like a mathematical equation, resulting in a graphical output.
-One only needs to know the values of all the variables to obtain this result.
+It only needs to know the values of all the variables to obtain this result.
 
 ## Program Structure
 
-A **µcad program** can simply consist of a sequence of **statements** or more complex constructs
-such as **workbenches** and **functions**, which may depend on each other through **use statements**.
-Additionally, **modules** help bundle things into packages and resolve naming collision issues.
+A **µcad program** can simply consist of a sequence of [*statements*](structure/statements.md)  in a
+*source file* or more complex constructs such as [*workbenches*](structure/workbench.md) and
+[*functions*](structure/functions.md), which may depend on each other through **use statements**.
 
-- [Modularization](structure/modules.md) for modularization of complex code
-- [Workbenches](structure/workbench.md) produce or manipulate 2D and 3D objects
-- [Statements](structure/statements.md) actual running code
-
-## Materials
-
-(not available yet)
+Additionally, [*modules*](structure/modules.md) help bundle things into packages and resolve naming
+collision issues.
 
 ## Data Types
 
-There are several **primitive types** which are always linked to a **unit** (like `Length` in `mm` or an `Angle` in `°`)
-and some which just represent scalar values or counts (like `Scalar` or `Integer`).
+µcad knows several [*primitive types*](types/primitive_types.md) (like `String` and `Integer`)
+and [*quantity types*](types/quantity.md) which are always linked to a *unit* (like `Length` in
+`mm` or an `Angle` in `°`).
 
-**Collection types** (like `Tuple` or `Array`) can bundle other types into structured sets.
+[*Collections*](types/collections.md) (like [*tuples*](types/tuples.md) or [*arrays*](types/arrays.md))
+can bundle other types into structured sets.
 
-- [Primitive Types](types/primitive_types.md)
-- [Quantity Types](types/quantity.md)
-- [Collections](types/collections.md)
-- [Nodes Type](types/nodes.md)
-- [Custom Types](types/custom_types.md)
+Produced 3D and 2D objects are stored in [*nodes*](types/nodes.md).
+
+It's planned to implement [*custom types*](types/custom_types.md) in future.
 
 ## Calls
 
-TODO: Intro text
+In µcad you may call [*workbenches*](structure/calls.md#calling-workbenches) to produce *objects* from [sketches](structure/sketch.md)
+or [*parts*](structure/part.md) or you may call [*functions*](structure/calls.md#calling-functions).
 
-- [Calling Workbenches](calls/workbench_calls.md)
-- [Calling Functions](calls/function_calls.md)
-- [Call Parameters](calls/parameters.md)
+In both cases you shall read about [*parameter multiplicity*](structure/calls.md#parameter-multiplicity) and
+[*parameter matching*](structure/calls.md#parameter-matching) to understand how µcad is processing call arguments.
 
-## Nodes
+## Objects
 
-TODO: Intro text
-
-- [Measures](nodes/measures.md)
-
-## Attributes
-
-TODO: Intro text
-
-- [Export Attributes](attributes/export.md)
+The 2D or 3D objects produced with [*workbenches*](structure/calls.md#calling-workbenches) can be
+[measured](nodes/measures.md) or [export](attributes/export.md).
 
 ## Libraries
 
-TODO: Into text
+µcad knows two kinds of libraries: Those which are written µcad language and those which
+are written in *Rust*.
 
-- [Standard Library `std`](libs/std.md)
-- [Builtin Library `__builtin`](libs/builtin.md)
-- [Plugin Libraries](libs/plugins.md)
+The [standard library](libs/std/README.md) is a µcad library which encapsulates the
+[builtin library](libs/builtin.md) into a nice and convenient interface.
+
+If you want to make your own libraries put you µcad code into the search paths or create
+a [plugin](libs/plugins.md) to embed Rust code.

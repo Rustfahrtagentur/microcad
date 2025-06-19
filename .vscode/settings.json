@@ -50,5 +50,6 @@
     "errorLens.codeLensEnabled": true,
     "files.associations": {
         "memory": "cpp"
-    }
+    },
+    "markdown.extension.toc.levels": "2..6"
 }
