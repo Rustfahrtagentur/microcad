@@ -16,6 +16,7 @@ path = "lib.rs"
 microcad-core = { workspace = true }
 microcad-lang = { workspace = true }
 geo = "0.29"
+thiserror = "2.0.12"
 
 [lints.rust]
 missing_docs = "warn"

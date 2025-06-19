@@ -3,7 +3,4 @@
 
 //! Scalable Vector Graphics (SVG) export
 
-pub mod renderer;
 mod writer;
-
-pub use renderer::SvgRenderer;

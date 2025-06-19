@@ -46,6 +46,6 @@ impl<'a> StlWriter<'a> {
 
 impl Drop for StlWriter<'_> {
     fn drop(&mut self) {
-        writeln!(self.writer, "endsolid").unwrap();
+        writeln!(self.writer, "endsolid").expect("No error");
     }
 }
