@@ -77,7 +77,7 @@ Any errors which occur here are related to geometrical processing.
 
 ## Elements
 
-| Method     | Input             | Output            | Usage      | Declaration           |
+| Method     | Input             | Output            | Statement  | Declaration           |
 | ---------- | ----------------- | ----------------- | ---------- | --------------------- |
 | Assignment | *value*           | *value*           | `v = ..;`  | -                     |
 | Function   | *values*          | *value*           | `f(..);`   | `fn f(..) { .. }`     |
@@ -85,4 +85,3 @@ Any errors which occur here are related to geometrical processing.
 | Part       | *values*          | *3D object*       | `p(..);`   | `part p(..) { .. }`   |
 | Operation  | *2D or 3D object* | *2D or 3D object* | `o(..) p;` | `op o(..) {..}`       |
 | Measure    | *2D or 3D object* | *value*           | `a.m();`   | *builtin only*        |
-

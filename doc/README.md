@@ -2,9 +2,12 @@
 
 - [µcad language](#µcad-language)
   - [Program Structure](#program-structure)
+  - [Materials](#materials)
   - [Data Types](#data-types)
-  - [Workbenches \& Objects](#workbenches--objects)
-  - [Exceptional Features](#exceptional-features)
+  - [Calls](#calls)
+  - [Nodes](#nodes)
+  - [Attributes](#attributes)
+  - [Libraries](#libraries)
   - [Standard Library](#standard-library)
   - [Builtin Library](#builtin-library)
   - [Debugging](#debugging)
@@ -19,10 +22,13 @@ A **µcad program** can simply consist of a sequence of **statements** or more c
 such as **workbenches** and **functions**, which may depend on each other through **use statements**.
 Additionally, **modules** help bundle things into packages and resolve naming collision issues.
 
-- [Modules](modules.md) for modularization of complex code
-- [Workbenches](workbench/README.md) produce or manipulate 2D and 3D objects
-- [Materials](materials.md) describe materials of objects
-- [Statements](statements.md) actual running code
+- [Modules](structure/modules.md) for modularization of complex code
+- [Workbenches](structure/workbench/README.md) produce or manipulate 2D and 3D objects
+- [Statements](structure/statements.md) actual running code
+
+## Materials
+
+(not available yet)
 
 ## Data Types
 
@@ -31,15 +37,35 @@ and some which just represent scalar values or counts (like `Scalar` or `Integer
 
 **Collection types** (like `Tuple` or `Array`) can bundle other types into structured sets.
 
-- [Primitive Types](primitive_types.md)
-- [Tuples](tuple.md)
-- [Arrays](arrays.md)
+- [Primitive Types](data_types/primitive_types.md)
+- [Collections](data_types/collections.md)
+- [Tuples](data_types/tuple.md)
+- [Arrays](data_types/arrays.md)
 
-## Workbenches & Objects
+## Calls
 
-Workbenches like `sketch` and `part` produce 2D and 3D objects
+- [Calling Workbenches](calls/workbench_call.md)
+- [Calling Functions](calls/function_call.md)
+- [Call Parameters](calls/parameters.md)
 
-## Exceptional Features
+## Nodes
+
+## Attributes
+
+- [Export Attributes](attributes/export.md)
+
+## Libraries
+
+- [Standard Library `std`](libs/std.md) 
+- [Builtin Library `__builtin`](libs/builtin.md)
+- [Plugin Libraries](libs/plugins.md)
+
+
+
+
+
+
+
 
 The µcad language has some more or less obscure features which replace common
 programming concepts like for-loops or goto-jumps.
