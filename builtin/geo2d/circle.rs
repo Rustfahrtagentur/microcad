@@ -15,12 +15,17 @@ impl BuiltinPartDefinition for Circle {
         Ok(ModelNode::new_element(Refer::none(Element::Primitive2D(
             Rc::new(Geometry2D::Circle(geo2d::Circle {
                 radius: args.get("radius"),
-                offset: Vec2::new(0.0, 0.0),
+                offset: Vec2::new(args.get("cx"), args.get("cy")),
             })),
         ))))
     }
 
     fn parameters() -> ParameterValueList {
-        vec![parameter!(radius: Scalar)].into()
+        vec![
+            parameter!(radius: Scalar),
+            parameter!(cx: Scalar = 0.0),
+            parameter!(cy: Scalar = 0.0),
+        ]
+        .into()
     }
 }

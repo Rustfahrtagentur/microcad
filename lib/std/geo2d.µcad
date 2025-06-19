@@ -4,20 +4,21 @@
 /// Examples:
 /// * with radius `r`: `circle(r = 10.0mm);`
 /// * with diameter `d`: `circle(d = 5.0mm);`
-part circle(radius: Length) {
-    init(r: Length) {
+part circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
+    init(r: Length, c = (x = 0.0mm, y = 0.0mm)) {
         radius = r;
+        center = c;
     }
 
-    init(diameter: Length) {
+    init(diameter: Length, center = (x = 0.0mm, y = 0.0mm)) {
         radius = diameter / 2.0;
     }
 
-    init(d: Length) {
+    init(d: Length, center = (x = 0.0mm, y = 0.0mm)) {
         radius = d / 2.0;
     }
 
-    __builtin::geo2d::circle(radius / 1mm);
+    __builtin::geo2d::circle(radius = radius / 1mm, cx = center.x / 1mm, cy = center.y / 1mm);
 }
 
 /// Rectangle definition
