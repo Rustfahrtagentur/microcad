@@ -3,7 +3,7 @@
 
 use geo::coord;
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*, syntax::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*};
 
 pub struct Rect;
 
@@ -13,10 +13,10 @@ impl BuiltinPartDefinition for Rect {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
-        let width: Scalar = args.get_value(&Identifier::no_ref("width"));
-        let height: Scalar = args.get_value(&Identifier::no_ref("height"));
-        let x = args.get_value(&Identifier::no_ref("x"));
-        let y = args.get_value(&Identifier::no_ref("y"));
+        let width: Scalar = args.get("width");
+        let height: Scalar = args.get("height");
+        let x = args.get("x");
+        let y = args.get("y");
 
         Ok(ModelNode::new_element(Refer::none(Element::Primitive2D(
             Rc::new(Geometry2D::Rect(geo2d::Rect::new(

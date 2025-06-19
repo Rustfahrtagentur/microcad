@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*, syntax::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*};
 
 pub struct Cylinder;
 
@@ -14,9 +14,9 @@ impl BuiltinPartDefinition for Cylinder {
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
         Ok(ModelNode::new_element(Refer::none(Element::Primitive3D(
             Rc::new(Geometry3D::Cylinder(geo3d::Cylinder {
-                radius_bottom: args.get_value(&Identifier::no_ref("radius_bottom")),
-                radius_top: args.get_value(&Identifier::no_ref("radius_top")),
-                height: args.get_value(&Identifier::no_ref("height")),
+                radius_bottom: args.get("radius_bottom"),
+                radius_top: args.get("radius_top"),
+                height: args.get("height"),
             })),
         ))))
     }

@@ -23,17 +23,24 @@ impl ArgumentMap {
         Self(Refer::new(std::collections::HashMap::new(), src_ref))
     }
 
-    /// Fetch an argument by name
-    pub fn get_value<'a, T>(&'a self, id: &Identifier) -> T
+    /// Fetch an argument by name as `&str`.
+    ///
+    /// This method does not provide error handling and is supposed to be used for built-ins.
+    pub fn get<'a, T>(&'a self, id: &str) -> T
     where
         T: std::convert::TryFrom<&'a Value>,
         T::Error: std::fmt::Debug,
     {
         self.0
-            .get(id)
+            .get(&Identifier::no_ref(id))
             .expect("no name found")
             .try_into()
             .expect("cannot convert argument value")
+    }
+
+    /// Fetch an argument's value by name.
+    pub fn get_value(&self, id: &Identifier) -> Option<&Value> {
+        self.0.get(id)
     }
 
     /// Convert ArgumentMap into symbol map.
@@ -116,7 +123,7 @@ fn argument_match_single() {
 
     let arg_map = ArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
 
-    let a = arg_map.get(&Identifier::no_ref("a"));
+    let a = arg_map.get_value(&Identifier::no_ref("a"));
     assert!(a.is_some());
     let a = a.expect("internal test error");
     assert!(a == &Value::Quantity(Quantity::new(5.0, QuantityType::Scalar)));

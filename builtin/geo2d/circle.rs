@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*, syntax::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*};
 
 pub struct Circle;
 
@@ -14,7 +14,7 @@ impl BuiltinPartDefinition for Circle {
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
         Ok(ModelNode::new_element(Refer::none(Element::Primitive2D(
             Rc::new(Geometry2D::Circle(geo2d::Circle {
-                radius: args.get_value(&Identifier::no_ref("radius")),
+                radius: args.get("radius"),
                 offset: Vec2::new(0.0, 0.0),
             })),
         ))))

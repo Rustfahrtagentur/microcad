@@ -41,7 +41,10 @@ impl ObjectBuilder {
                 parameter.id.clone(),
                 match &parameter.default_value {
                     Some(value) => value.clone(),
-                    None => arguments.get(&parameter.id).unwrap_or(&Value::None).clone(),
+                    None => arguments
+                        .get_value(&parameter.id)
+                        .unwrap_or(&Value::None)
+                        .clone(),
                 },
             );
         }

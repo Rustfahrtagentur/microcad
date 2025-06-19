@@ -137,8 +137,8 @@ impl From<Vec<ArgumentValue>> for ArgumentValueList {
 macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
-            $arg_map.get(&Identifier::no_ref(stringify!($name).into())).expect(&format!("Argument `{}` expected",stringify!($name))),
-            &crate::builtin::BuiltinValueHelper::$ty($value).into()
+            $arg_map.get::<$ty>(stringify!($name)),
+            $value.into()
         ));*
     };
 }
@@ -164,6 +164,7 @@ fn call_get_matching_arguments() {
 
     let arg_map = ArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
 
+    use microcad_core::{Integer, Scalar};
     assert_eq_arg_map_value!(arg_map,
         foo: Integer = 2,
         bar: Integer = 1,
@@ -215,6 +216,7 @@ fn get_multi_matching_arguments() {
     let multi_argument_map =
         MultiArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
 
+    use microcad_core::Scalar;
     for argument_map in multi_argument_map.combinations() {
         assert_eq_arg_map_value!(argument_map,
             thickness: Scalar = 2.0,
