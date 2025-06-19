@@ -15,9 +15,9 @@ impl BuiltinPartDefinition for Cube {
         Ok(ModelNode::new_element(Refer::none(Element::Primitive3D(
             Rc::new(Geometry3D::Cube(geo3d::Cube {
                 size: Vec3::new(
-                    args.get_value::<Scalar>(&Identifier::no_ref("size_x")),
-                    args.get_value::<Scalar>(&Identifier::no_ref("size_y")),
-                    args.get_value::<Scalar>(&Identifier::no_ref("size_z")),
+                    args.get_value(&Identifier::no_ref("size_x")),
+                    args.get_value(&Identifier::no_ref("size_y")),
+                    args.get_value(&Identifier::no_ref("size_z")),
                 ),
             })),
         ))))

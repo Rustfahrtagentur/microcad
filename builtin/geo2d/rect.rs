@@ -13,10 +13,10 @@ impl BuiltinPartDefinition for Rect {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
-        let width = args.get_value::<Scalar>(&Identifier::no_ref("width"));
-        let height = args.get_value::<Scalar>(&Identifier::no_ref("height"));
-        let x = args.get_value::<Scalar>(&Identifier::no_ref("x"));
-        let y = args.get_value::<Scalar>(&Identifier::no_ref("y"));
+        let width: Scalar = args.get_value(&Identifier::no_ref("width"));
+        let height: Scalar = args.get_value(&Identifier::no_ref("height"));
+        let x = args.get_value(&Identifier::no_ref("x"));
+        let y = args.get_value(&Identifier::no_ref("y"));
 
         Ok(ModelNode::new_element(Refer::none(Element::Primitive2D(
             Rc::new(Geometry2D::Rect(geo2d::Rect::new(

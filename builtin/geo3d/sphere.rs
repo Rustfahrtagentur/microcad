@@ -14,7 +14,7 @@ impl BuiltinPartDefinition for Sphere {
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
         Ok(ModelNode::new_element(Refer::none(Element::Primitive3D(
             Rc::new(geo3d::Geometry::Sphere(geo3d::Sphere {
-                radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),
+                radius: args.get_value(&Identifier::no_ref("radius")),
             })),
         ))))
     }
