@@ -37,9 +37,3 @@ impl BuiltinPartDefinition for Rotate {
         .into()
     }
 }
-
-impl microcad_core::RenderHash for Rotate {
-    fn render_hash(&self) -> Option<u64> {
-        None
-    }
-}

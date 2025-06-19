@@ -33,9 +33,3 @@ impl BuiltinPartDefinition for Translate {
         .into()
     }
 }
-
-impl microcad_core::RenderHash for Translate {
-    fn render_hash(&self) -> Option<u64> {
-        None
-    }
-}

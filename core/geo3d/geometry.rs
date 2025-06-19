@@ -1,43 +1,56 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-pub use super::*;
+use crate::*;
+
 use std::rc::Rc;
 use strum::IntoStaticStr;
 
+use crate::geo3d::*;
+
 /// 3D Geometry
-#[derive(IntoStaticStr)]
+#[derive(IntoStaticStr, Clone)]
 pub enum Geometry {
-    /// Triangle mesh
+    /// Triangle mesh.
     Mesh(TriangleMesh),
-    /// Manifold
-    Manifold(Manifold),
+    /// Manifold.
+    Manifold(Rc<Manifold>),
+    /// Cube.
+    Cube(Cube),
+    /// Sphere.
+    Sphere(Sphere),
+    /// Cylinder.
+    Cylinder(Cylinder),
+}
+
+impl std::fmt::Debug for Geometry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let name: &'static str = self.into();
+        write!(f, "{name}")
+    }
 }
 
 impl Geometry {
-    /// Get the volume of the geometry
-    pub fn volume(&self) -> f64 {
-        match self {
-            Geometry::Mesh(mesh) => mesh.volume(),
-            Geometry::Manifold(manifold) => TriangleMesh::from(manifold.to_mesh()).volume(),
-        }
-    }
-
     /// Execute boolean operation
-    pub fn boolean_op(&self, other: &Geometry, op: &BooleanOp) -> Option<Self> {
+    pub fn boolean_op(
+        &self,
+        resolution: &RenderResolution,
+        other: &Geometry,
+        op: &BooleanOp,
+    ) -> Option<Self> {
         let op: manifold_rs::BooleanOp = op.into();
-        Some(Geometry::Manifold(match (self, other) {
-            (Geometry::Mesh(a), Geometry::Mesh(b)) => {
-                a.to_manifold().boolean_op(&b.to_manifold(), op)
-            }
-            (Geometry::Manifold(a), Geometry::Manifold(b)) => a.boolean_op(b, op),
-            (Geometry::Mesh(a), Geometry::Manifold(b)) => a.to_manifold().boolean_op(b, op),
-            (Geometry::Manifold(a), Geometry::Mesh(b)) => a.boolean_op(&b.to_manifold(), op),
-        }))
+        let a = self.clone().render_to_manifold(resolution);
+        let b = other.clone().render_to_manifold(resolution);
+
+        Some(Geometry::Manifold(Rc::new(a.boolean_op(&b, op))))
     }
 
     /// Execute multiple boolean operations
-    pub fn boolean_op_multi(geometries: Vec<Rc<Self>>, op: &BooleanOp) -> Option<Rc<Self>> {
+    pub fn boolean_op_multi(
+        geometries: Vec<Rc<Self>>,
+        resolution: &RenderResolution,
+        op: &BooleanOp,
+    ) -> Option<Rc<Self>> {
         if geometries.is_empty() {
             return None;
         }
@@ -46,7 +59,7 @@ impl Geometry {
             geometries[1..]
                 .iter()
                 .fold(geometries[0].clone(), |acc, geo| {
-                    if let Some(r) = acc.boolean_op(geo.as_ref(), op) {
+                    if let Some(r) = acc.boolean_op(resolution, geo.as_ref(), op) {
                         Rc::new(r)
                     } else {
                         acc
@@ -63,15 +76,22 @@ impl Geometry {
             Geometry::Manifold(manifold) => {
                 // TODO: Implement transform for manifold instead of converting to mesh
                 let mesh = TriangleMesh::from(manifold.to_mesh()).transform(transform);
-                Geometry::Manifold(mesh.to_manifold())
+                Geometry::Manifold(Rc::new(mesh.to_manifold()))
             }
+            _ => todo!(),
         }
     }
 }
 
-impl From<Manifold> for Geometry {
-    fn from(manifold: Manifold) -> Self {
-        Geometry::Manifold(manifold)
+impl RenderToMesh for Geometry {
+    fn render_to_manifold(self, resolution: &RenderResolution) -> Rc<Manifold> {
+        match self {
+            Geometry::Mesh(triangle_mesh) => Rc::new(triangle_mesh.to_manifold()),
+            Geometry::Manifold(manifold) => manifold,
+            Geometry::Cube(cube) => cube.render_to_manifold(resolution),
+            Geometry::Sphere(sphere) => sphere.render_to_manifold(resolution),
+            Geometry::Cylinder(cylinder) => cylinder.render_to_manifold(resolution),
+        }
     }
 }
 

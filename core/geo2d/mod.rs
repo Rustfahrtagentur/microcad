@@ -4,22 +4,50 @@
 //! 2D Geometry
 
 mod geometry;
-mod render;
+mod primitives;
 
-use crate::Scalar;
+use crate::*;
 
 pub use geometry::*;
-pub use render::*;
+pub use primitives::*;
 
-/// Line string
-pub type LineString = geo::LineString<Scalar>;
-/// Multiple line string
-pub type MultiLineString = geo::MultiLineString<Scalar>;
-/// Polygon
-pub type Polygon = geo::Polygon<Scalar>;
-/// Multiple polygons
-pub type MultiPolygon = geo::MultiPolygon<Scalar>;
-/// Rectangle
-pub type Rect = geo::Rect<Scalar>;
-/// Point
-pub type Point = geo::Point<Scalar>;
+/// Trait to render a [`Geometry2D`] into a multi polygon.
+///
+/// Implement this trait
+pub trait RenderToMultiPolygon: Sized {
+    /// Render geometry into a [`Polygon`].
+    ///
+    /// Implement this method if the geometry only returns a single polygon.
+    /// Line geometry returns [`None`].
+    fn render_to_polygon(self, _: &RenderResolution) -> Option<Polygon> {
+        None
+    }
+
+    /// Render a geometry into a new multi polygon.
+    ///
+    /// This method uses [`RenderToMultiPolygon::render_to_existing_multi_polygon`] and does not need to be reimplemented.  
+    fn render_to_multi_polygon(self, resolution: &RenderResolution) -> MultiPolygon {
+        let mut polygons = geo::MultiPolygon(vec![]);
+        self.render_to_existing_multi_polygon(resolution, &mut polygons);
+        polygons
+    }
+
+    /// Render a geometry into a new multi polygon and attaches it to a list of existing polygons.
+    ///
+    /// Reimplement this function preferably if the geometry returns more than one polygon.
+    fn render_to_existing_multi_polygon(
+        self,
+        resolution: &RenderResolution,
+        polygons: &mut MultiPolygon,
+    ) {
+        if let Some(polygon) = self.render_to_polygon(resolution) {
+            polygons.0.push(polygon);
+        }
+    }
+}
+
+/// Trait to return all points of 2D geometry.
+pub trait Points2D {
+    /// Returns all points.
+    fn points_2d(&self) -> Vec<Vec2>;
+}

@@ -4,19 +4,16 @@
 //! 3D Geometry
 
 mod geometry;
-mod mesh_renderer;
-mod render;
+mod primitives;
 mod triangle_mesh;
 
 pub use manifold_rs::Manifold;
 pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 
-pub use mesh_renderer::MeshRenderer;
-
 pub use geometry::*;
-pub use render::*;
+pub use primitives::*;
 
-use crate::BooleanOp;
+use crate::{BooleanOp, RenderResolution};
 
 impl From<&BooleanOp> for manifold_rs::BooleanOp {
     fn from(op: &BooleanOp) -> Self {
@@ -29,13 +26,32 @@ impl From<&BooleanOp> for manifold_rs::BooleanOp {
     }
 }
 
+/// Trait to render a 3D geometry into a mesh.
+pub trait RenderToMesh: Sized {
+    /// Render to manifold.
+    ///
+    /// Implement this method preferably.
+    fn render_to_manifold(self, resolution: &RenderResolution) -> std::rc::Rc<Manifold>;
+
+    /// Render to mesh.
+    ///
+    /// Implement only if [`RenderToMesh::render_to_manifold`] is not possible.
+    fn render_to_mesh(self, resolution: &RenderResolution) -> TriangleMesh {
+        self.render_to_manifold(resolution).to_mesh().into()
+    }
+}
+
 #[test]
 fn test_boolean_op_multi() {
     use std::rc::Rc;
-    let a = Rc::new(Geometry::Manifold(Manifold::sphere(2.0, 32)));
-    let b = Rc::new(Geometry::Manifold(Manifold::sphere(1.0, 32)));
+    let a = Rc::new(Geometry::Manifold(Rc::new(Manifold::sphere(2.0, 32))));
+    let b = Rc::new(Geometry::Manifold(Rc::new(Manifold::sphere(1.0, 32))));
 
-    let result = Geometry::boolean_op_multi(vec![a, b], &BooleanOp::Difference);
+    let result = Geometry::boolean_op_multi(
+        vec![a, b],
+        &RenderResolution::default(),
+        &BooleanOp::Difference,
+    );
     assert!(result.is_some());
 
     let result = result.expect("test error");

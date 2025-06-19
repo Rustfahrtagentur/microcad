@@ -4,17 +4,7 @@
 use microcad_core::*;
 use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*, syntax::*};
 
-/// The built-in cylinder primitive, defined by an bottom radius, top radius and height.
-/// The cylinder is oriented along the z-axis.
-#[derive(Debug)]
-pub struct Cylinder {
-    /// Bottom radius of the cylinder in millimeters
-    pub radius_bottom: Scalar,
-    /// Top radius of the cylinder in millimeters
-    pub radius_top: Scalar,
-    /// Height of the cylinder in millimeters
-    pub height: Scalar,
-}
+pub struct Cylinder;
 
 impl BuiltinPartDefinition for Cylinder {
     fn id() -> &'static str {
@@ -23,11 +13,11 @@ impl BuiltinPartDefinition for Cylinder {
 
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
         Ok(ModelNode::new_element(Refer::none(Element::Primitive3D(
-            Rc::new(Cylinder {
+            Rc::new(Geometry3D::Cylinder(geo3d::Cylinder {
                 radius_bottom: args.get_value::<Scalar>(&Identifier::no_ref("radius_bottom")),
                 radius_top: args.get_value::<Scalar>(&Identifier::no_ref("radius_top")),
                 height: args.get_value::<Scalar>(&Identifier::no_ref("height")),
-            }),
+            })),
         ))))
     }
 
@@ -38,28 +28,5 @@ impl BuiltinPartDefinition for Cylinder {
             parameter!(height: Scalar),
         ]
         .into()
-    }
-}
-
-impl RenderHash for Cylinder {
-    fn render_hash(&self) -> Option<u64> {
-        None
-    }
-}
-
-impl geo3d::Primitive for Cylinder {
-    fn render_geometry(
-        &self,
-        renderer: &mut dyn geo3d::Renderer,
-    ) -> microcad_core::CoreResult<geo3d::Geometry> {
-        use std::f64::consts::PI;
-        let n = (self.radius_bottom / renderer.precision() * PI * 0.5).max(3.0) as u32;
-
-        Ok(geo3d::Geometry::Manifold(geo3d::Manifold::cylinder(
-            self.radius_bottom,
-            self.radius_top,
-            self.height,
-            n,
-        )))
     }
 }

@@ -4,12 +4,7 @@
 use microcad_core::*;
 use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*, syntax::*};
 
-/// The builtin sphere primitive, defined by its radius.
-#[derive(Debug)]
-pub struct Sphere {
-    /// Radius of the sphere in millimeters
-    pub radius: Scalar,
-}
+pub struct Sphere;
 
 impl BuiltinPartDefinition for Sphere {
     fn id() -> &'static str {
@@ -18,34 +13,13 @@ impl BuiltinPartDefinition for Sphere {
 
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
         Ok(ModelNode::new_element(Refer::none(Element::Primitive3D(
-            Rc::new(Sphere {
+            Rc::new(geo3d::Geometry::Sphere(geo3d::Sphere {
                 radius: args.get_value::<Scalar>(&Identifier::no_ref("radius")),
-            }),
+            })),
         ))))
     }
 
     fn parameters() -> ParameterValueList {
         vec![parameter!(radius: Scalar)].into()
-    }
-}
-
-impl RenderHash for Sphere {
-    fn render_hash(&self) -> Option<u64> {
-        None
-    }
-}
-
-impl geo3d::Primitive for Sphere {
-    fn render_geometry(
-        &self,
-        renderer: &mut dyn geo3d::Renderer,
-    ) -> microcad_core::CoreResult<geo3d::Geometry> {
-        use std::f64::consts::PI;
-        let n = (self.radius / renderer.precision() * PI * 0.5).max(3.0) as u32;
-
-        Ok(geo3d::Geometry::Manifold(geo3d::Manifold::sphere(
-            self.radius,
-            n,
-        )))
     }
 }
