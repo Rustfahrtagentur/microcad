@@ -6,6 +6,7 @@ default-members = [
     "builtin",
     "core",
     "lang",
+    "export",
     "tests",
     "tools/cli",
     "tools/update-copyright",
@@ -16,6 +17,7 @@ members = [
     "core",
     "lang",
     "tests",
+    "export",
     "tools/cli",
     "tools/update-copyright",
 ]

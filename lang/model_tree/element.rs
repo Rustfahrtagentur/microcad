@@ -12,7 +12,7 @@ use strum::IntoStaticStr;
 pub enum Element {
     /// An object that contains children and holds properties.
     ///
-    /// Objects can be created by builtins, assignments, expressions and parts.
+    /// Objects can be created by builtins, assignments, expressions and workbenches.
     Object(Object),
 
     /// A special node after which children will be nested as siblings.
@@ -23,13 +23,13 @@ pub enum Element {
     /// An affine transform.
     Transformation(AffineTransform),
 
-    /// Generated 2D geometry.
-    Primitive2D(std::rc::Rc<Primitive2D>),
+    /// A 2D geometry.
+    Primitive2D(std::rc::Rc<Geometry2D>),
 
-    /// Generated 3D geometry.
-    Primitive3D(std::rc::Rc<Primitive3D>),
+    /// A 3D geometry.
+    Primitive3D(std::rc::Rc<Geometry3D>),
 
-    /// A transformation that generates a geometry.
+    /// An operation that generates a geometry from its children.
     Operation(std::rc::Rc<dyn Operation>),
 }
 
@@ -61,8 +61,8 @@ impl std::fmt::Display for Element {
             Element::Operation(transformation) => {
                 write!(f, "({transformation:?})")
             }
-            Element::Primitive2D(primitive2d) => {
-                write!(f, "({primitive2d:?})")
+            Element::Primitive2D(primitive) => {
+                write!(f, "({primitive:?})")
             }
             _ => Ok(()),
         }

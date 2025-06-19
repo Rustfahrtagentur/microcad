@@ -3,8 +3,6 @@
 
 //! STL Export
 
-mod exporter;
 mod writer;
 
-pub use exporter::*;
 pub use writer::*;

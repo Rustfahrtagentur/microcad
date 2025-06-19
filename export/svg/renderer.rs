@@ -4,7 +4,7 @@
 //! Scalable Vector Graphics (SVG) file writer and renderer
 
 use geo::CoordsIter;
-use microcad_core::{geo2d, CoreError, Scalar};
+use microcad_core::{CoreError, Scalar, geo2d};
 
 /// Write SVG
 pub struct SvgWriter {
@@ -203,62 +203,8 @@ impl Default for SvgRenderer {
     }
 }
 
-impl microcad_core::Renderer for SvgRenderer {
-    fn precision(&self) -> Scalar {
-        self.precision
-    }
-
-    fn change_render_state(&mut self, key: &str, value: &str) -> microcad_core::CoreResult<()> {
-        match key {
-            "fill" => self.state.fill = Some(value.to_string()),
-            "stroke" => self.state.stroke = Some(value.to_string()),
-            "stroke-width" => {
-                self.state.stroke_width = Some(value.parse()?);
-            }
-            _ => return Err(CoreError::NotImplemented),
-        }
-        Ok(())
-    }
-}
-
-impl geo2d::Renderer for SvgRenderer {
-    fn multi_polygon(
-        &mut self,
-        multi_polygon: &geo2d::MultiPolygon,
-    ) -> microcad_core::CoreResult<()> {
-        let style = self.render_state_to_style();
-        self.writer().multi_polygon(multi_polygon, &style)?;
-        Ok(())
-    }
-
-    fn render_node(&mut self, node: microcad_core::geo2d::Node) -> microcad_core::CoreResult<()> {
-        let inner = node.borrow();
-        use microcad_core::geo2d::NodeInner;
-
-        match &*inner {
-            NodeInner::Group => {
-                for child in node.children() {
-                    self.render_node(child.clone())?;
-                }
-            }
-            NodeInner::Geometry(geometry) => self.render_geometry(geometry)?,
-            NodeInner::Transform(transform) => {
-                self.writer().begin_transform(transform)?;
-                for child in node.children() {
-                    self.render_node(child.clone())?;
-                }
-                self.writer().end_transform()?;
-            }
-        };
-
-        Ok(())
-    }
-}
-
 #[test]
 fn svg_write() {
-    microcad_lang::env_logger_init();
-
     // Write to file test.svg
     let file = std::fs::File::create("svg_write.svg").expect("test error");
 
