@@ -6,12 +6,24 @@
 use geo::CoordsIter;
 use microcad_core::*;
 
-/// Write SVG
+/// SVG writer.
 pub struct SvgWriter {
     writer: Box<dyn std::io::Write>,
+    level: usize,
 }
 
-#[allow(dead_code)]
+/// Tag attributes for an SVG tag.
+#[derive(Debug, Clone, Default)]
+pub struct SvgTagAttributes {
+    pub style: String,
+}
+
+impl SvgTagAttributes {
+    fn new(style: String) -> Self {
+        Self { style }
+    }
+}
+
 impl SvgWriter {
     /// Create new SvgWriter
     /// # Arguments
@@ -32,23 +44,64 @@ impl SvgWriter {
             bounds.width() * scale,
             bounds.height() * scale
         )?;
+
         writeln!(&mut w, "<g transform='scale({scale})'>")?;
 
         Ok(Self {
             writer: Box::new(w),
+            level: 1,
         })
     }
 
-    /// Generate rectangle
-    pub fn rect(&mut self, rect: &geo2d::Rect, style: &str) -> std::io::Result<()> {
-        let x = rect.min().x;
-        let y = rect.min().y;
-        let width = rect.width();
-        let height = rect.height();
+    fn tag_inner(tag: &str, attr: &SvgTagAttributes) -> String {
+        format!(
+            "{tag}{attr}",
+            attr = if !attr.style.is_empty() {
+                format!(" style=\"{style}\"", style = attr.style)
+            } else {
+                String::new()
+            }
+        )
+    }
+
+    fn tag(&mut self, tag: &str, attr: &SvgTagAttributes) -> std::io::Result<()> {
         writeln!(
             self.writer,
-            "<rect x=\"{x}\" y=\"{y}\" width=\"{width}\" height=\"{height}\" style=\"{style}\"/>"
+            "{:indent$}<{tag_inner}/>",
+            "",
+            indent = 2 * self.level,
+            tag_inner = Self::tag_inner(tag, attr)
         )
+    }
+
+    fn begin_tag(&mut self, tag: &str, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        writeln!(
+            self.writer,
+            "{:indent$}<{tag_inner}/>",
+            "",
+            indent = 2 * self.level,
+            tag_inner = Self::tag_inner(tag, attr)
+        )?;
+        self.level += 1;
+        Ok(())
+    }
+
+    fn end_tag(&mut self, tag: &str) -> std::io::Result<()> {
+        self.level -= 1;
+        writeln!(
+            self.writer,
+            "{:indent$}</{tag}>",
+            "",
+            indent = 2 * self.level
+        )
+    }
+
+    pub fn begin_group(&mut self, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        self.begin_tag("g", attr)
+    }
+
+    pub fn end_group(&mut self) -> std::io::Result<()> {
+        self.end_tag("g")
     }
 
     /// Begin a SVG transformation <g>
@@ -61,81 +114,117 @@ impl SvgWriter {
             transform.z.x,
             transform.z.y,
         );
-        writeln!(
-            self.writer,
-            "<g transform=\"matrix({a} {b} {c} {d} {e} {f})\">"
+
+        self.begin_tag(
+            &format!("g transform=\"matrix({a} {b} {c} {d} {e} {f})\""),
+            &SvgTagAttributes::default(),
         )
     }
 
     /// End a SVG transformation </g>
     pub fn end_transform(&mut self) -> std::io::Result<()> {
-        writeln!(self.writer, "</g>")
+        self.end_group()
+    }
+
+    /// Generate rectangle
+    pub fn rect(&mut self, rect: &geo2d::Rect, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        let x = rect.min().x;
+        let y = rect.min().y;
+        let width = rect.width();
+        let height = rect.height();
+
+        self.tag(
+            &format!("rect x=\"{x}\" y=\"{y}\" width=\"{width}\" height=\"{height}\""),
+            attr,
+        )
     }
 
     /// Generate circle
     pub fn circle(
         &mut self,
-        center: &geo2d::Point,
-        radius: f64,
-        style: &str,
+        circle: &geo2d::Circle,
+        attr: &SvgTagAttributes,
     ) -> std::io::Result<()> {
-        let (cx, cy) = center.x_y();
-        writeln!(
-            self.writer,
-            "<circle cx=\"{cx}\" cy=\"{cy}\" r=\"{radius}\" style=\"{style}\"/>"
-        )
+        let r = circle.radius;
+        let (cx, cy) = (circle.offset.x, circle.offset.y);
+        self.tag(&format!("circle cx=\"{cx}\" cy=\"{cy}\" r=\"{r}\""), attr)
     }
 
     /// Generate line
-    pub fn line(&mut self, p1: geo2d::Point, p2: geo2d::Point, style: &str) -> std::io::Result<()> {
+    pub fn line(
+        &mut self,
+        p1: geo2d::Point,
+        p2: geo2d::Point,
+        attr: &SvgTagAttributes,
+    ) -> std::io::Result<()> {
         let ((x1, y1), (x2, y2)) = (p1.x_y(), p2.x_y());
-        writeln!(
-            self.writer,
-            "<line x1=\"{x1}\" y1=\"{y1}\" x2=\"{x2}\" y2=\"{y2}\" style=\"{style}\"/>"
+        self.tag(
+            &format!("line x1=\"{x1}\" y1=\"{y1}\" x2=\"{x2}\" y2=\"{y2}\""),
+            attr,
         )
     }
 
+    /// Generate line string
+    pub fn line_string(
+        &mut self,
+        line_string: &geo2d::LineString,
+        attr: &SvgTagAttributes,
+    ) -> std::io::Result<()> {
+        let points = line_string.coords().fold(String::new(), |acc, p| {
+            acc + &format!("{x},{y} ", x = p.x, y = p.y)
+        });
+        self.tag(&format!("polyline points=\"{points}\""), attr)
+    }
+
+    pub fn multi_line_string(
+        &mut self,
+        multi_line_string: &geo2d::MultiLineString,
+        attr: &SvgTagAttributes,
+    ) -> std::io::Result<()> {
+        multi_line_string
+            .iter()
+            .try_for_each(|line_string| self.line_string(line_string, attr))
+    }
+
     /// Generate polygon
-    pub fn polygon(&mut self, polygon: &geo2d::Polygon, style: &str) -> std::io::Result<()> {
-        write!(self.writer, "<path d=\"")?;
-        for (i, point) in polygon.exterior().points().enumerate() {
-            let (x, y) = point.x_y();
-            match i {
-                0 => write!(self.writer, "M")?,
-                _ => write!(self.writer, "L")?,
-            }
-
-            write!(self.writer, "{x},{y}")?;
-            if i == polygon.exterior().coords_count() - 1 {
-                write!(self.writer, " Z ")?;
-            }
-        }
-        for interior in polygon.interiors() {
-            for (i, point) in interior.points().enumerate() {
-                let (x, y) = point.x_y();
-                match i {
-                    0 => write!(self.writer, "M")?,
-                    _ => write!(self.writer, "L")?,
-                }
-
-                write!(self.writer, "{x},{y}")?;
-                if i == interior.coords_count() - 1 {
-                    write!(self.writer, " Z ")?;
-                }
-            }
+    pub fn polygon(
+        &mut self,
+        polygon: &geo2d::Polygon,
+        attr: &SvgTagAttributes,
+    ) -> std::io::Result<()> {
+        fn line_string_path(l: &geo2d::LineString) -> String {
+            l.points()
+                .enumerate()
+                .fold(String::new(), |acc, (i, point)| {
+                    let (x, y) = point.x_y();
+                    let mut s = String::new();
+                    s += if i == 0 { "M" } else { "L" };
+                    s += &format!("{x},{y}");
+                    if i == l.coords_count() - 1 {
+                        s += " Z ";
+                    }
+                    acc + &s
+                })
         }
 
-        writeln!(self.writer, "\" style=\"{style}\"/>")
+        let exterior = line_string_path(polygon.exterior());
+        let interior = polygon
+            .interiors()
+            .iter()
+            .map(line_string_path)
+            .fold(String::new(), |acc, s| acc + &s);
+
+        self.tag(&format!("path d=\"{exterior} {interior}\""), attr)
     }
 
     /// Generate multiple polygons
     pub fn multi_polygon(
         &mut self,
         multi_polygon: &geo2d::MultiPolygon,
-        style: &str,
+        attr: &SvgTagAttributes,
     ) -> std::io::Result<()> {
         for polygon in multi_polygon {
-            self.polygon(polygon, style)?;
+            self.polygon(polygon, attr)?;
         }
         Ok(())
     }
@@ -166,12 +255,21 @@ fn svg_write() {
     .expect("test error");
 
     let rect = geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0));
-    svg.rect(&rect, "fill:blue;").expect("test error");
+    svg.rect(&rect, &SvgTagAttributes::new("fill:blue;".into()))
+        .expect("test error");
 
-    let circle = geo::Point::new(50.0, 50.0);
-    svg.circle(&circle, 10.0, "fill:red;").expect("test error");
+    let circle = geo2d::Circle {
+        radius: 10.0,
+        offset: Vec2::new(50.0, 50.0),
+    };
+    svg.circle(&circle, &SvgTagAttributes::new("fill:red;".into()))
+        .expect("test error");
 
     let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
-    svg.line(line.0, line.1, "stroke:black;")
-        .expect("test error");
+    svg.line(
+        line.0,
+        line.1,
+        &SvgTagAttributes::new("stroke:black;".into()),
+    )
+    .expect("test error");
 }

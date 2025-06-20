@@ -3,4 +3,5 @@
 
 //! Scalable Vector Graphics (SVG) export
 
+pub mod exporter;
 mod writer;

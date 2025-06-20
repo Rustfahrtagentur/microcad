@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Object attributes module
-//!
+
 use crate::{syntax::*, value::*};
 
 /// Node metadata, from an evaluated attribute list.

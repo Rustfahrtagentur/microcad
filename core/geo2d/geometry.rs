@@ -10,17 +10,17 @@ use strum::IntoStaticStr;
 /// Geometry
 #[derive(IntoStaticStr, Clone, Debug)]
 pub enum Geometry {
-    /// Line string
+    /// Line string.
     LineString(LineString),
-    /// Multiple lirc::*ne string
+    /// Multiple line strings.
     MultiLineString(MultiLineString),
-    /// Polygon
+    /// Polygon.
     Polygon(Polygon),
-    /// Multiple polygon
+    /// Multiple polygons.
     MultiPolygon(MultiPolygon),
-    /// Rectangle
+    /// Rectangle.
     Rect(Rect),
-    /// Circle
+    /// Circle.
     Circle(Circle),
 }
 

@@ -30,6 +30,23 @@ impl NamedTuple {
                 .collect(),
         )
     }
+
+    /// Fetch a tuple field by name as `&str`.
+    ///
+    /// This method does not provide error handling and is supposed to be used for built-ins.
+    pub fn get<'a, T>(&'a self, id: &str) -> Option<T>
+    where
+        T: std::convert::TryFrom<&'a Value>,
+        T::Error: std::fmt::Debug,
+    {
+        self.get_by_id(&Identifier::no_ref(id))
+            .map(|v| v.try_into().expect("cannot convert value"))
+    }
+
+    /// Fetch a tuple field by name as `&str`.
+    pub fn get_by_id(&self, id: &Identifier) -> Option<&Value> {
+        self.0.get(id)
+    }
 }
 
 impl std::ops::Deref for NamedTuple {
@@ -66,6 +83,20 @@ impl From<Color> for NamedTuple {
             ("b", color.b),
             ("a", color.a),
         ])
+    }
+}
+
+impl<'a> TryFrom<&'a Value> for &'a NamedTuple {
+    type Error = ValueError;
+
+    fn try_from(value: &'a Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::NamedTuple(named_tuple) => Ok(named_tuple),
+            _ => Err(ValueError::CannotConvert(
+                value.clone(),
+                "NamedTuple".into(),
+            )),
+        }
     }
 }
 

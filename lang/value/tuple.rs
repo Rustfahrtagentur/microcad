@@ -34,6 +34,24 @@ impl Tuple {
     pub fn by_ty(&self, ty: &Type) -> Option<&Value> {
         self.unnamed.get(ty)
     }
+
+    /// Get value by identifier.
+    pub fn get_value_by_id(&self, id: &Identifier) -> Option<&Value> {
+        self.0.get(id)
+    }
+
+    /// Fetch an argument by name as `&str`.
+    ///
+    /// This method does not provide error handling and is supposed to be used for built-ins.
+    pub fn get<'a, T>(&'a self, id: &str) -> Option<T>
+    where
+        T: std::convert::TryFrom<&'a Value>,
+        T::Error: std::fmt::Debug,
+    {
+        self.0
+            .get(&Identifier::no_ref(id))
+            .map(|value| TryInto::try_into(value).expect("Value"))
+    }
 }
 
 // TODO impl FromIterator instead
@@ -67,6 +85,20 @@ impl From<Vec3> for Tuple {
 impl From<Color> for Tuple {
     fn from(color: Color) -> Self {
         tuple!(r = color.r, g = color.g, b = color.b, a = color.a)
+    }
+}
+
+impl<'a> TryFrom<&'a Value> for &'a Tuple {
+    type Error = ValueError;
+
+    fn try_from(value: &'a Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Tuple(tuple) => Ok(tuple),
+            _ => Err(ValueError::CannotConvert(
+                value.clone(),
+                "Tuple".to_string(),
+            )),
+        }
     }
 }
 
