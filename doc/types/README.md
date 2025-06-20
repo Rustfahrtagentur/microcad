@@ -5,18 +5,17 @@ The type system is static, which means a declared variable has a fixed type that
 
 These classes of built-in types are supported:
 
-| Built-in type                     | Description                                                   | Example                                          |
-| --------------------------------- | ------------------------------------------------------------- | ------------------------------------------------ |
-| [*Quantity*](quantity.md)         | Numeric values with an optional unit.                         | `a: Length = 4mm`                                | 
-| [*Bool*](primitive_type.md)       | A boolean value.                                              | `b: Bool = true`                                 |
-| [*Integer*](primitive_type.md)    | An integer value without a unit.                              | `c: Integer = 4`                                 |
-| [*String*](string.md)             | A string.                                                     | `d: String = "Hello World"`                      |
-| [*Array*](array.md)               | A list of values with a *common type*.                        | `e: [Integer] = [1,2,3]`                         |
-| [*Tuple*](tuple.md)               | A list of values with a *distinct types*.                     | `f: (Length, Scalar) = (4mm, 4.0)`               |
-| [*Named tuple*](named_tuples.md)  | A sorted list of key-value pairs with *distinct types*.       | `g: (x: Scalar, y: Length) = (x = 4.0, y = 4mm)` |
-| [*Matrix*](matrix.md)             | Matrix types for affine transforms, for internal usage.       | ---                                              |
-| [*Nodes*](nodes.md)               | A node in the model tree.                                     | `h: Node = { cube(2mm); }`                       |   
-
+| Built-in type                           | Description                                             | Example                                          |
+| --------------------------------------- | ------------------------------------------------------- | ------------------------------------------------ |
+| [*Quantity*](quantity.md)               | Numeric values with an optional unit.                   | `a: Length = 4mm`                                |
+| [*Bool*](primitive_types.md#bool)       | A boolean value.                                        | `b: Bool = true`                                 |
+| [*Integer*](primitive_types.md#integer) | An integer value without a unit.                        | `c: Integer = 4`                                 |
+| [*String*](primitive_types.md#string)   | A string.                                               | `d: String = "Hello World"`                      |
+| [*Matrix*](primitive_types.md#matrix)   | Matrix types for affine transforms, for internal usage. | ---                                              |
+| [*Array*](arrays.md)                    | A list of values with a *common type*.                  | `e: [Integer] = [1,2,3]`                         |
+| [*Tuple*](tuples.md#tuples)             | A list of values with a *distinct types*.               | `f: (Length, Scalar) = (4mm, 4.0)`               |
+| [*Named tuple*](tuples.md#named-tuples) | A sorted list of key-value pairs with *distinct types*. | `g: (x: Scalar, y: Length) = (x = 4.0, y = 4mm)` |
+| [*Nodes*](nodes.md)                     | A node in the model tree.                               | `h: Node = { cube(2mm); }`                       |
 
 ## Declaration
 
@@ -48,4 +47,3 @@ However, for parameter lists in functions and workbenches, you can declare the t
 fn f(x = 4mm) {}        // use unit (with default)
 fn f(x: Length) {}     // use type (without default)
 ```
-

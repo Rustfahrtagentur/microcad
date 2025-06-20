@@ -85,3 +85,18 @@ Any errors which occur here are related to geometrical processing.
 | Part       | *values*          | *3D object*       | `p(..);`   | `part p(..) { .. }`   |
 | Operation  | *2D or 3D object* | *2D or 3D object* | `o(..) p;` | `op o(..) {..}`       |
 | Measure    | *2D or 3D object* | *value*           | `a.m();`   | *builtin only*        |
+
+# Coding Conventions
+
+## Naming
+
+| Element   | Example              | Format                |
+| --------- | -------------------- | --------------------- |
+| type      | `MyType`             | pascal case           |
+| const     | `const MY_CONST = 1` | upper case snake case |
+| namespace | `namespace my_lib`   | snake case            |
+| function  | `fn my_func`         | snake case            |
+| sketch    | `sketch MyBench`     | pascal case           |
+| part      | `part MyBench`       | pascal case           |
+| operation | `op my_bench`        | snake case            |
+| variables | `my_var = 1`         | snake case            |

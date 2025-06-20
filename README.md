@@ -114,7 +114,9 @@ The STL file can now also be loaded into a slicer program like [Cura](https://ul
 ## Documentation
 
 - [Description of language features](doc/README.md)
+- [Language reference](doc/REFERENCE.md)
 - [Basic concepts](doc/CONCEPTS.md)
+- [Examples](doc/EXAMPLES.md)
 - Code documentation:
   - [`microcad-lang` module](https://docs.rs/microcad-lang)
   - [`microcad-core` module](https://docs.rs/microcad-core)
