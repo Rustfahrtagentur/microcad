@@ -1,17 +1,23 @@
 # Assignments
 
-- [Constant Assignment](#constant-assignment)
-- [Variable Assignment](#variable-assignment)
-- [Property Assignment](#property-assignment)
+Whenever you use a more complex *expression*, it is often worthwhile to store it in a variable so that it can
+be used once or multiple times elsewhere.
+In µcad, variables are always immutable which means that once they are set, their value cannot be reset in the same context.
+Therefore, they differ from the variables known in other programming languages.
 
-## Constant Assignment
+Every assignment in µcad is  a variable.
+So this example defines the variable `a` which from then is a reserved name within the scope in which it was defined.
 
-TODO
+```µcad,assignment
+a = 5;
+b = a * 2;
+std::assert_eq(a,5);
+std::assert_eq(b,10);
+```
 
-## Variable Assignment
+Another assignment of a variable with the same name is not allowed.
 
-TODO
-
-## Property Assignment
-
-TODO
+```µcad,assignment_immutable#fail
+a = 5;
+a = a * 2; // error: a already defined in this scope
+```

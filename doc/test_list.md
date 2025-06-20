@@ -3,11 +3,13 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**73** tests from markdown.
+**74** tests from markdown.
 
 | Result | Name |
 |-------:|------|
 | [![test](../doc/types/.test/array_unit_bundling.png)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/arrays.md) |
+| [![test](../doc/structure/.test/assignment.png)](../doc/structure/.test/assignment.log) | [assignment](../doc/structure/assignments.md) |
+| [![test](../doc/structure/.test/assignment_immutable.png)](../doc/structure/.test/assignment_immutable.log) | [assignment_immutable](../doc/structure/assignments.md) |
 | [![test](../doc/structure/.test/building_plan.png)](../doc/structure/.test/building_plan.log) | [building_plan](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code.png)](../doc/structure/.test/code.log) | [code](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code_between_initializers.png)](../doc/structure/.test/code_between_initializers.log) | [code_between_initializers](../doc/structure/workbench.md) |
@@ -33,7 +35,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/nodes/.test/measure.png)](../doc/nodes/.test/measure.log) | [measure](../doc/nodes/measures.md) |
 | [![test](../doc/structure/.test/missed_property.png)](../doc/structure/.test/missed_property.log) | [missed_property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/module_example.png)](../doc/structure/.test/module_example.log) | [module_example](../doc/structure/modules.md) |
-| [![test](../doc.x/.test/module_example.png)](../doc.x/.test/module_example.log) | [module_example](../doc.x/modules.md) |
 | [![test](../doc/structure/.test/no_use_statement.png)](../doc/structure/.test/no_use_statement.log) | [no_use_statement](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/op_basic.png)](../doc/structure/.test/op_basic.log) | [op_basic](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/parameter_multiplicity_example_A.png)](../doc/structure/.test/parameter_multiplicity_example_A.log) | [parameter_multiplicity_example_A](../doc/structure/calls.md) |

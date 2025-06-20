@@ -5,11 +5,8 @@
 - [Use All Statement](#use-all-statement)
 - [Public Use Statement](#public-use-statement)
 
-*Fully qualified names* of *symbols* (e.g. `std:geo3d::cube`) often produce much boiler plate code
-when using them often.
-But there is a powerful `use` statement in µcad to solve this problem.
-
-Generally `use` can be used to make long names shorter.
+When including code from other *modules* (like other files or libraries) *fully qualified names* of *symbols* (e.g. `std:geo3d::cube`) often produce much boiler plate code when using them often.
+The powerful `use` statement solves this problem and gives you an elegant method to import code from other sources.
 
 Internally every *use statement* builds one or more *aliases*, each with an *identifier* and a *target symbol* it
 points to.
