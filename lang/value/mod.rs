@@ -458,6 +458,12 @@ impl From<ModelNodes> for Value {
     }
 }
 
+impl From<ModelNode> for Value {
+    fn from(node: ModelNode) -> Self {
+        Self::from_single_node(node)
+    }
+}
+
 #[cfg(test)]
 fn integer(value: i64) -> Value {
     Value::Integer(value)
