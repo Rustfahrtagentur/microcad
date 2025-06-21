@@ -164,16 +164,6 @@ impl ModelNodeBuilder {
         Ok(child.output_type())
     }
 
-    /// Add a new child to the node if it matches.
-    ///
-    /// Outputs a warning if the child node does not match and if a context is present.
-    pub fn add_child(mut self, child: ModelNode) -> EvalResult<Self> {
-        self.output_type = self.determine_output_type(&child)?;
-
-        self.children.push(child);
-        Ok(self)
-    }
-
     /// Add multiple children to the node if it matches.
     pub fn add_children(&mut self, children: ModelNodes) -> EvalResult<&mut Self> {
         if let Some(child) = children.first() {

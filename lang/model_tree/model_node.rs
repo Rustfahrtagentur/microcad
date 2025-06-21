@@ -117,10 +117,6 @@ impl ModelNodeInner {
         &self.children
     }
 
-    pub fn add_child(&mut self, child: ModelNode) {
-        self.children.push(child);
-    }
-
     /// Set metadata for this node.
     pub fn set_metadata(&mut self, metadata: Metadata) {
         self.metadata = metadata;
