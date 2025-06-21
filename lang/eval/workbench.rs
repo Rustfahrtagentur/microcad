@@ -24,25 +24,26 @@ impl WorkbenchDefinition {
     /// Try to evaluate a single call into a [`ModelNode`].
     fn eval_to_node<'a>(
         &'a self,
-        args: &ArgumentMap,
+        arguments: &ArgumentMap,
         init: Option<&'a InitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ModelNode> {
         context.scope(
-            StackFrame::Workbench(self.kind, self.id.clone(), args.into()),
+            StackFrame::Workbench(self.kind, self.id.clone(), arguments.into()),
             |context| {
-                let mut object_builder = ObjectBuilder::new_object_with_properties(
-                    self.src_ref.clone(),
-                    &self.plan.eval(context)?,
-                    args,
+                let mut node_builder = ModelNodeBuilder::new_3d_object().properties(
+                    ObjectProperties::from_parameters_and_arguments(
+                        &self.plan.eval(context)?,
+                        arguments,
+                    ),
                 );
 
                 // Create the object node from initializer if present
                 if let Some(init) = init {
-                    init.eval(args, &mut object_builder, context)?;
+                    init.eval(arguments, &mut node_builder, context)?;
                 }
 
-                object_builder.properties_to_scope(context)?;
+                node_builder.properties.eval(context)?;
 
                 // At this point, all properties must have a value
                 for statement in self.body.statements.iter() {
@@ -52,15 +53,15 @@ impl WorkbenchDefinition {
                         }
                         Statement::Expression(expression) => {
                             let value = expression.eval(context)?;
-                            object_builder.append_children(&mut value.fetch_nodes());
+                            node_builder.add_children(value.fetch_nodes())?;
                         }
                         _ => {}
                     }
                 }
 
-                Ok(object_builder
-                    .build_node()
-                    .set_original_arguments(args.clone())
+                Ok(node_builder
+                    .build()
+                    .set_original_arguments(arguments.clone())
                     .set_metadata(self.attribute_list.eval(context)?))
             },
         )

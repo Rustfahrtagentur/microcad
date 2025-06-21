@@ -18,12 +18,13 @@ impl BuiltinPartDefinition for Rect {
         let x = args.get("x");
         let y = args.get("y");
 
-        Ok(ModelNode::new_element(Refer::none(Element::Primitive2D(
-            Rc::new(Geometry2D::Rect(geo2d::Rect::new(
+        Ok(
+            ModelNodeBuilder::new_2d_primitive(Rc::new(Geometry2D::Rect(geo2d::Rect::new(
                 coord! {x: x, y: y},
                 coord! {x: x + width, y: y + height},
-            ))),
-        ))))
+            ))))
+            .build(),
+        )
     }
 
     fn parameters() -> ParameterValueList {

@@ -3,16 +3,58 @@
 
 //! Object properties.
 
-use crate::{syntax::*, value::*};
+use crate::{diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*};
 
-/// A list of values sorted by id
+/// A list of object properties.
 ///
 /// It is required that properties are always sorted by their id.
 #[derive(Clone, Default, Debug)]
-pub struct ObjectProperties(std::collections::HashMap<Identifier, Value>);
+pub struct ObjectProperties(NamedTuple);
+
+impl ObjectProperties {
+    /// Create new object properties from a [`ParameterValueList`] and an [`ArgumentMap`].
+    pub fn from_parameters_and_arguments(
+        parameters: &ParameterValueList,
+        arguments: &ArgumentMap,
+    ) -> Self {
+        let mut props = ObjectProperties::default();
+
+        for parameter in parameters.iter() {
+            props.insert(
+                parameter.id.clone(),
+                match &parameter.default_value {
+                    Some(value) => value.clone(),
+                    None => arguments
+                        .get_value(&parameter.id)
+                        .unwrap_or(&Value::None)
+                        .clone(),
+                },
+            );
+        }
+
+        props
+    }
+}
+
+impl Eval<()> for ObjectProperties {
+    fn eval(&self, context: &mut Context) -> EvalResult<()> {
+        if self.is_valid() {
+            for (id, value) in self.iter() {
+                context.set_local_value(id.clone(), value.clone())?;
+            }
+        } else {
+            context.error(
+                SrcRef(None), // Hmm, where to get the src ref here?
+                EvalError::UninitializedProperties(self.get_ids_of_uninitialized().into()),
+            )?;
+        }
+
+        Ok(())
+    }
+}
 
 impl std::ops::Deref for ObjectProperties {
-    type Target = std::collections::HashMap<Identifier, Value>;
+    type Target = std::collections::BTreeMap<Identifier, Value>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -32,8 +74,8 @@ impl ObjectProperties {
     }
 
     /// Get value at id.
-    pub fn get_value(&self, id: &Identifier) -> Option<&Value> {
-        self.0.get(id)
+    pub fn get_value_by_id(&self, id: &Identifier) -> Option<&Value> {
+        self.0.get_value_by_id(id)
     }
 
     /// Get mutable value at id.

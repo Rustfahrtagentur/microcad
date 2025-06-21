@@ -8,7 +8,7 @@ impl InitDefinition {
     pub fn eval(
         &self,
         args: &ArgumentMap,
-        object_builder: &mut ObjectBuilder,
+        node_builder: &mut ModelNodeBuilder,
         context: &mut Context,
     ) -> EvalResult<()> {
         context.scope(StackFrame::Init(args.into()), |context| {
@@ -20,14 +20,13 @@ impl InitDefinition {
                         let value = assignment.expression.eval(context)?;
 
                         // Only change the property value, do not add new properties
-                        if object_builder.has_property(id) {
-                            object_builder.set_property(id.clone(), value.clone());
+                        if node_builder.has_property(id) {
+                            node_builder.set_property(id.clone(), value.clone());
                         }
                         context.set_local_value(id.clone(), value)?;
                     }
                     Statement::Expression(expression) => {
-                        object_builder
-                            .append_children(&mut expression.eval(context)?.fetch_nodes());
+                        node_builder.add_children(expression.eval(context)?.fetch_nodes())?;
                     }
                     _ => {
                         context.error(

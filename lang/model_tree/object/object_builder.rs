@@ -27,32 +27,6 @@ impl ObjectBuilder {
         }
     }
 
-    /// Create a new object with the properties by parameters and arguments.
-    pub fn new_object_with_properties(
-        src_ref: SrcRef,
-        parameters: &ParameterValueList,
-        arguments: &ArgumentMap,
-    ) -> Self {
-        let mut object_builder = ObjectBuilder::new(src_ref);
-        let mut props = ObjectProperties::default();
-
-        for parameter in parameters.iter() {
-            props.insert(
-                parameter.id.clone(),
-                match &parameter.default_value {
-                    Some(value) => value.clone(),
-                    None => arguments
-                        .get_value(&parameter.id)
-                        .unwrap_or(&Value::None)
-                        .clone(),
-                },
-            );
-        }
-
-        object_builder.object.props = props;
-        object_builder
-    }
-
     /// Append child nodes to this object node.
     pub fn append_children(&mut self, nodes: &mut ModelNodes) -> &mut Self {
         (*self.children).append(nodes);
@@ -68,21 +42,6 @@ impl ObjectBuilder {
     /// Return true if the object has a property with `id`.
     pub fn has_property(&mut self, id: &Identifier) -> bool {
         self.object.props.contains_key(id)
-    }
-
-    /// Add all object properties to scope
-    pub fn properties_to_scope(&mut self, context: &mut Context) -> EvalResult<()> {
-        if self.object.props.is_valid() {
-            for (id, value) in self.object.props.iter() {
-                context.set_local_value(id.clone(), value.clone())?;
-            }
-
-            Ok(())
-        } else {
-            Err(EvalError::UninitializedProperties(
-                self.object.props.get_ids_of_uninitialized().into(),
-            ))
-        }
     }
 
     /// Build the [`ModelNode`].

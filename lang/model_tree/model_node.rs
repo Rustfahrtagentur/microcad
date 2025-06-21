@@ -85,7 +85,7 @@ pub struct ModelNodeInner {
     origin: ModelNodeOrigin,
 
     /// The output type of the this node.
-    output_type: ModelNodeOutputType,
+    pub output_type: ModelNodeOutputType,
 }
 
 impl ModelNodeInner {
@@ -100,6 +100,11 @@ impl ModelNodeInner {
     /// Return element of this node.
     pub fn element(&self) -> &Element {
         &self.element
+    }
+
+    /// Return a mutable reference of the element of this node.
+    pub fn element_mut(&mut self) -> &mut Element {
+        &mut self.element
     }
 
     /// Return reference to the metadata of this node.

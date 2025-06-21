@@ -11,10 +11,14 @@ use crate::{
     eval::{Context, EvalResult},
     model_tree::*,
     src_ref::{Refer, SrcRef},
+    syntax::Identifier,
+    value::Value,
 };
 
 pub struct ModelNodeBuilder {
     inner: ModelNodeInner,
+    pub properties: ObjectProperties,
+    pub children: ModelNodes,
 
     output_type: ModelNodeOutputType,
     context: Option<Context>,
@@ -29,46 +33,56 @@ impl ModelNodeBuilder {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
             output_type: ModelNodeOutputType::NotDetermined,
+            properties: ObjectProperties::default(),
+            children: ModelNodes::default(),
             context: None,
         }
     }
 
     /// Create a new 2D object.
     ///
-    /// This function is used when a sketch is called.
+    /// This function is used when a call to a sketch is evaluated.
     fn new_2d_object() -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
             output_type: ModelNodeOutputType::Geometry2D,
+            properties: ObjectProperties::default(),
+            children: ModelNodes::default(),
             context: None,
         }
     }
 
     /// Create a new 3D object.
     ///
-    /// This function is used when a part is called.
+    /// This function is used when a call to a part is evaluated.
     pub fn new_3d_object() -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
             output_type: ModelNodeOutputType::Geometry3D,
+            properties: ObjectProperties::default(),
+            children: ModelNodes::default(),
             context: None,
         }
     }
 
     /// New 2D primitive.
-    pub fn new_2d_primitive(geometry: std::rc::Rc<Geometry2D>, src_ref: SrcRef) -> Self {
+    pub fn new_2d_primitive(geometry: std::rc::Rc<Geometry2D>) -> Self {
         Self {
-            inner: ModelNodeInner::new(Refer::new(Element::Primitive2D(geometry), src_ref)),
+            inner: ModelNodeInner::new(Refer::none(Element::Primitive2D(geometry))),
             output_type: ModelNodeOutputType::Geometry2D,
+            properties: ObjectProperties::default(),
+            children: ModelNodes::default(),
             context: None,
         }
     }
 
     /// New 3D primitive.
-    pub fn new_3d_primitive(geometry: std::rc::Rc<Geometry3D>, src_ref: SrcRef) -> Self {
+    pub fn new_3d_primitive(geometry: std::rc::Rc<Geometry3D>) -> Self {
         Self {
-            inner: ModelNodeInner::new(Refer::new(Element::Primitive3D(geometry), src_ref)),
+            inner: ModelNodeInner::new(Refer::none(Element::Primitive3D(geometry))),
             output_type: ModelNodeOutputType::Geometry3D,
+            properties: ObjectProperties::default(),
+            children: ModelNodes::default(),
             context: None,
         }
     }
@@ -78,6 +92,8 @@ impl ModelNodeBuilder {
         Self {
             inner: ModelNodeInner::new(Refer::new(Element::Transform(transform), src_ref)),
             output_type: ModelNodeOutputType::NotDetermined,
+            properties: ObjectProperties::default(),
+            children: ModelNodes::default(),
             context: None,
         }
     }
@@ -87,6 +103,8 @@ impl ModelNodeBuilder {
         Self {
             inner: ModelNodeInner::new(Refer::new(Element::Operation(Rc::new(operation)), src_ref)),
             output_type: ModelNodeOutputType::NotDetermined,
+            properties: ObjectProperties::default(),
+            children: ModelNodes::default(),
             context: None,
         }
     }
@@ -133,9 +151,11 @@ impl ModelNodeBuilder {
                     panic!("A transformation cannot have more than one child.")
                 }
             }
-            Element::Operation(_) => {
+            Element::Operation(op) => {
                 if !self.inner.children().is_empty() {
                     panic!("An operation cannot have more than one child.")
+                } else {
+                    return Ok(op.output_type(child));
                 }
             }
             _ => {}
@@ -150,29 +170,47 @@ impl ModelNodeBuilder {
     pub fn add_child(mut self, child: ModelNode) -> EvalResult<Self> {
         self.output_type = self.determine_output_type(&child)?;
 
-        self.inner.add_child(child);
+        self.children.push(child);
         Ok(self)
     }
 
     /// Add multiple children to the node if it matches.
-    pub fn add_children(mut self, children: ModelNodes) -> EvalResult<Self> {
+    pub fn add_children(&mut self, children: ModelNodes) -> EvalResult<&mut Self> {
         if let Some(child) = children.first() {
-            self.output_type = self.determine_output_type(child)?;
+            //  TODO Check child's output type
+            //  self.output_type = self.determine_output_type(child)?;
         }
 
         for child in children.iter() {
-            self.inner.add_child(child.clone());
+            self.children.push(child.clone());
         }
 
         Ok(self)
     }
 
-    pub fn add_metadata(mut self, metadata: Metadata) -> Self {
-        self.inner.set_metadata(metadata);
+    pub fn properties(mut self, properties: ObjectProperties) -> Self {
+        self.properties = properties;
         self
     }
 
-    pub fn build_node(self) -> ModelNode {
-        ModelNode::new(self.inner)
+    /// Set property value for object.
+    pub fn set_property(&mut self, id: Identifier, value: Value) -> &mut Self {
+        self.properties.insert(id, value);
+        self
+    }
+
+    /// Return true if the object has a property with `id`.
+    pub fn has_property(&mut self, id: &Identifier) -> bool {
+        self.properties.contains_key(id)
+    }
+
+    pub fn build(mut self) -> ModelNode {
+        if let Element::Object(object) = self.inner.element_mut() {
+            object.props = self.properties
+        }
+        self.inner.output_type = self.output_type;
+
+        let node = ModelNode::new(self.inner);
+        node.append_children(self.children)
     }
 }
