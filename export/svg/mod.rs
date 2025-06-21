@@ -4,4 +4,10 @@
 //! Scalable Vector Graphics (SVG) export
 
 pub mod exporter;
-mod writer;
+pub mod writer;
+
+#[cfg(test)]
+mod tests;
+
+pub use exporter::*;
+pub use writer::*;

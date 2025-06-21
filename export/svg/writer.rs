@@ -15,11 +15,13 @@ pub struct SvgWriter {
 /// Tag attributes for an SVG tag.
 #[derive(Debug, Clone, Default)]
 pub struct SvgTagAttributes {
+    /// Style attribute.
     pub style: String,
 }
 
 impl SvgTagAttributes {
-    fn new(style: String) -> Self {
+    /// New [`SvgTagAttributes`].
+    pub fn new(style: String) -> Self {
         Self { style }
     }
 }
@@ -96,10 +98,12 @@ impl SvgWriter {
         )
     }
 
+    /// Begin a new group `<g>`.
     pub fn begin_group(&mut self, attr: &SvgTagAttributes) -> std::io::Result<()> {
         self.begin_tag("g", attr)
     }
 
+    /// End a group `</g>`.
     pub fn end_group(&mut self) -> std::io::Result<()> {
         self.end_tag("g")
     }
@@ -176,6 +180,7 @@ impl SvgWriter {
         self.tag(&format!("polyline points=\"{points}\""), attr)
     }
 
+    /// Generate multi line string.
     pub fn multi_line_string(
         &mut self,
         multi_line_string: &geo2d::MultiLineString,
@@ -240,36 +245,4 @@ impl Drop for SvgWriter {
     fn drop(&mut self) {
         self.finish().expect("No error")
     }
-}
-
-#[test]
-fn svg_write() {
-    // Write to file test.svg
-    let file = std::fs::File::create("svg_write.svg").expect("test error");
-
-    let mut svg = SvgWriter::new(
-        Box::new(file),
-        geo::Rect::new(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0)),
-        1.0,
-    )
-    .expect("test error");
-
-    let rect = geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0));
-    svg.rect(&rect, &SvgTagAttributes::new("fill:blue;".into()))
-        .expect("test error");
-
-    let circle = geo2d::Circle {
-        radius: 10.0,
-        offset: Vec2::new(50.0, 50.0),
-    };
-    svg.circle(&circle, &SvgTagAttributes::new("fill:red;".into()))
-        .expect("test error");
-
-    let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
-    svg.line(
-        line.0,
-        line.1,
-        &SvgTagAttributes::new("stroke:black;".into()),
-    )
-    .expect("test error");
 }

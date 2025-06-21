@@ -301,7 +301,7 @@ impl ModelNode {
     }
 
     /// Set metadata.
-    pub(crate) fn set_metadata(&self, metadata: Metadata) -> Self {
+    pub fn set_metadata(&self, metadata: Metadata) -> Self {
         self.0.borrow_mut().set_metadata(metadata);
         self.clone()
     }
