@@ -134,7 +134,7 @@ impl ModelNodeBuilder {
 
         match child.output_type() {
             ModelNodeOutputType::NotDetermined => {
-                //   panic!("Child node's output type must have been determined: {child}")
+                return Ok(self.output_type.clone());
             }
             ModelNodeOutputType::Invalid => {
                 panic!("Child node's output type is invalid.")
