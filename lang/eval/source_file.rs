@@ -9,7 +9,9 @@ impl Eval<ModelNode> for SourceFile {
             StackFrame::Source(self.id(), SymbolMap::default()),
             |context| {
                 let nodes: ModelNodes = self.statements.eval(context)?;
-                Ok(ModelNode::new_empty_object(self.src_ref()).append_children(nodes))
+                let mut builder = ModelNodeBuilder::new_object_body();
+                builder.add_children(nodes)?;
+                Ok(builder.build())
             },
         )
     }

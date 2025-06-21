@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, rc::*};
 
 pub struct Cube;
 
@@ -12,11 +12,12 @@ impl BuiltinPartDefinition for Cube {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
-        Ok(ModelNode::new_element(Refer::none(Element::Primitive3D(
-            Rc::new(Geometry3D::Cube(geo3d::Cube {
+        Ok(
+            ModelNodeBuilder::new_3d_primitive(Rc::new(Geometry3D::Cube(geo3d::Cube {
                 size: Vec3::new(args.get("size_x"), args.get("size_y"), args.get("size_z")),
-            })),
-        ))))
+            })))
+            .build(),
+        )
     }
 
     fn parameters() -> ParameterValueList {

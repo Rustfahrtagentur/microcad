@@ -12,13 +12,14 @@ impl BuiltinPartDefinition for Cylinder {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
-        Ok(ModelNode::new_element(Refer::none(Element::Primitive3D(
-            Rc::new(Geometry3D::Cylinder(geo3d::Cylinder {
+        Ok(
+            ModelNodeBuilder::new_3d_primitive(Rc::new(Geometry3D::Cylinder(geo3d::Cylinder {
                 radius_bottom: args.get("radius_bottom"),
                 radius_top: args.get("radius_top"),
                 height: args.get("height"),
-            })),
-        ))))
+            })))
+            .build(),
+        )
     }
 
     fn parameters() -> ParameterValueList {

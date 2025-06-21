@@ -115,35 +115,6 @@ impl ModelNodeBuilder {
     ///
     /// TODO: Replace `panic!` with context warnings.
     pub fn determine_output_type(&self, child: &ModelNode) -> EvalResult<ModelNodeOutputType> {
-        match child.output_type() {
-            ModelNodeOutputType::NotDetermined => {
-                panic!("Child node's output type must have been determined")
-            }
-            ModelNodeOutputType::Invalid => {
-                panic!("Child node's output type is invalid.")
-            }
-            _ => {}
-        }
-
-        match self.output_type {
-            ModelNodeOutputType::NotDetermined => {
-                // Determine nodes output type by child output type.
-            }
-            ModelNodeOutputType::Geometry2D => {
-                if child.output_type() != self.output_type {
-                    panic!("Cannot nest a 2D geometry in a 3D geometry node.")
-                }
-            }
-            ModelNodeOutputType::Geometry3D => {
-                if child.output_type() != self.output_type {
-                    panic!("Cannot nest a 3D geometry in a 2D geometry node.")
-                }
-            }
-            ModelNodeOutputType::Invalid => {
-                panic!("Invalid output type.")
-            }
-        }
-
         match self.inner.element() {
             Element::ChildrenPlaceholder => panic!("A child placeholder cannot have children"),
             Element::Transform(_) => {
@@ -161,6 +132,35 @@ impl ModelNodeBuilder {
             _ => {}
         }
 
+        match child.output_type() {
+            ModelNodeOutputType::NotDetermined => {
+                //   panic!("Child node's output type must have been determined: {child}")
+            }
+            ModelNodeOutputType::Invalid => {
+                panic!("Child node's output type is invalid.")
+            }
+            _ => {}
+        }
+
+        match self.output_type {
+            ModelNodeOutputType::NotDetermined => {
+                // Determine nodes output type by child output type.
+            }
+            ModelNodeOutputType::Geometry2D => {
+                if child.output_type() == ModelNodeOutputType::Geometry3D {
+                    panic!("Cannot nest a 2D geometry in a 3D geometry node.")
+                }
+            }
+            ModelNodeOutputType::Geometry3D => {
+                if child.output_type() == ModelNodeOutputType::Geometry2D {
+                    panic!("Cannot nest a 3D geometry in a 2D geometry node.")
+                }
+            }
+            ModelNodeOutputType::Invalid => {
+                panic!("Invalid output type.")
+            }
+        }
+
         Ok(child.output_type())
     }
 
@@ -168,7 +168,7 @@ impl ModelNodeBuilder {
     pub fn add_children(&mut self, children: ModelNodes) -> EvalResult<&mut Self> {
         if let Some(child) = children.first() {
             //  TODO Check child's output type
-            //self.output_type = self.determine_output_type(child)?;
+            self.output_type = self.determine_output_type(child)?;
         }
 
         for child in children.iter() {

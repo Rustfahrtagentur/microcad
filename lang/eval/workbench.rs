@@ -31,12 +31,15 @@ impl WorkbenchDefinition {
         context.scope(
             StackFrame::Workbench(self.kind, self.id.clone(), arguments.into()),
             |context| {
-                let mut node_builder = ModelNodeBuilder::new_3d_object().properties(
-                    ObjectProperties::from_parameters_and_arguments(
-                        &self.plan.eval(context)?,
-                        arguments,
-                    ),
-                );
+                let mut node_builder = match self.kind {
+                    WorkbenchKind::Part => ModelNodeBuilder::new_3d_object(),
+                    WorkbenchKind::Sketch => ModelNodeBuilder::new_2d_object(),
+                    WorkbenchKind::Operation => ModelNodeBuilder::new_object_body(),
+                }
+                .properties(ObjectProperties::from_parameters_and_arguments(
+                    &self.plan.eval(context)?,
+                    arguments,
+                ));
 
                 // Create the object node from initializer if present
                 if let Some(init) = init {
