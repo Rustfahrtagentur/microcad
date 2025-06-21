@@ -8,6 +8,13 @@ use microcad_core::*;
 
 /// Transformation trait.
 pub trait Operation: std::fmt::Debug {
+    /// The output type of this operation.
+    ///
+    /// By default, the output type is the same as the input node's output type.
+    fn output_type(&self, node: ModelNode) -> ModelNodeOutputType {
+        node.output_type()
+    }
+
     /// Process the model
     fn process(&self, node: ModelNode);
 }

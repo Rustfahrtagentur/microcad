@@ -37,7 +37,7 @@ impl std::fmt::Display for ModelNodeOrigin {
 }
 
 /// The output type of the [`ModelNode`].
-#[derive(Debug, Clone, IntoStaticStr, Default)]
+#[derive(Debug, Clone, IntoStaticStr, Default, PartialEq)]
 pub enum ModelNodeOutputType {
     /// The output type has not yet been determined.
     #[default]
@@ -89,6 +89,14 @@ pub struct ModelNodeInner {
 }
 
 impl ModelNodeInner {
+    /// Create a new [`ModelNodeInner`] with a specific element.
+    pub fn new(element: Refer<Element>) -> Self {
+        Self {
+            element,
+            ..Default::default()
+        }
+    }
+
     /// Return element of this node.
     pub fn element(&self) -> &Element {
         &self.element
@@ -102,6 +110,10 @@ impl ModelNodeInner {
     /// Return reference to the children of this node.
     pub fn children(&self) -> &ModelNodes {
         &self.children
+    }
+
+    pub fn add_child(&mut self, child: ModelNode) {
+        self.children.push(child);
     }
 
     /// Set metadata for this node.
@@ -128,12 +140,14 @@ impl ModelNodeInner {
 pub struct ModelNode(RcMut<ModelNodeInner>);
 
 impl ModelNode {
+    /// Create new model node from inner.
+    pub fn new(inner: ModelNodeInner) -> Self {
+        Self(RcMut::new(inner))
+    }
+
     /// Create new object node from element.
     pub fn new_element(element: Refer<Element>) -> Self {
-        Self(RcMut::new(ModelNodeInner {
-            element,
-            ..Default::default()
-        }))
+        Self::new(ModelNodeInner::new(element))
     }
 
     /// Return a new empty object.

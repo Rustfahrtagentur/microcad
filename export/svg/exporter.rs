@@ -68,7 +68,7 @@ impl SvgExporter {
                     .try_for_each(|child| self._write_node(child))?;
                 self.writer.end_group()?;
             }
-            Element::Transformation(affine_transform) => {
+            Element::Transform(affine_transform) => {
                 self.writer.begin_transform(&affine_transform.mat2d())?;
                 node.children()
                     .try_for_each(|child| self._write_node(child))?;

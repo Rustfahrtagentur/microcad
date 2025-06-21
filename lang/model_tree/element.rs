@@ -21,7 +21,7 @@ pub enum Element {
     ChildrenPlaceholder,
 
     /// An affine transform.
-    Transformation(AffineTransform),
+    Transform(AffineTransform),
 
     /// A 2D geometry.
     Primitive2D(std::rc::Rc<Geometry2D>),
