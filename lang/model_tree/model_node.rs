@@ -246,10 +246,19 @@ impl ModelNode {
     }
 
     /// Append a single node as child.
+    ///
+    /// Also tries to set the output type if it has not been determined yet.
     pub fn append(&self, node: ModelNode) -> ModelNode {
         let mut node = node;
         node.set_parent(self.clone());
-        self.0.borrow_mut().children.push(node.clone());
+
+        let mut b = self.0.borrow_mut();
+        // If this node's output type has not been determined, try to get it from child node
+        if b.output_type == ModelNodeOutputType::NotDetermined {
+            b.output_type = node.output_type();
+        }
+        b.children.push(node.clone());
+
         node
     }
 

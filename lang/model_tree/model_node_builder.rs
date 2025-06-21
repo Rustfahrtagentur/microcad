@@ -22,7 +22,7 @@ pub struct ModelNodeBuilder<'a> {
     output_type: ModelNodeOutputType,
 
     /// An optional context for error handling.
-    context: Option<&'a mut Context>,
+    _context: Option<&'a mut Context>,
 }
 
 /// ModelNodeBuilder constructors.
@@ -89,7 +89,6 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn new_transform(transform: AffineTransform) -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Transform(transform))),
-            output_type: ModelNodeOutputType::NotDetermined,
             ..Default::default()
         }
     }
@@ -98,7 +97,6 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn new_operation<T: Operation + 'static>(operation: T, src_ref: SrcRef) -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::new(Element::Operation(Rc::new(operation)), src_ref)),
-            output_type: ModelNodeOutputType::NotDetermined,
             ..Default::default()
         }
     }
