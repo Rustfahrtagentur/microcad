@@ -4,7 +4,7 @@
 /// Examples:
 /// * with radius `r`: `circle(r = 10.0mm);`
 /// * with diameter `d`: `circle(d = 5.0mm);`
-part circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
+sketch circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
     init(r: Length, c = (x = 0.0mm, y = 0.0mm)) {
         radius = r;
         center = c;
@@ -25,7 +25,7 @@ part circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
 ///
 /// Examples:
 /// * centered rect with width `w` and height `h`: `rect(width = 10.0mm, height = 5.0mm);`
-part rect(width: Length, height: Length, x: Length, y: Length) {
+sketch rect(width: Length, height: Length, x: Length, y: Length) {
     init(width: Length, height: Length) {
         x = -width / 2.0; // center x
         y = -height / 2.0; // center y
