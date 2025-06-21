@@ -9,7 +9,7 @@ use super::*;
 use geo::coord;
 use microcad_core::{geo2d::Rect, *};
 use microcad_lang::{
-    model_tree::{Element, Metadata, ModelNode, ObjectBuilder},
+    model_tree::{Element, Metadata, ModelNode},
     src_ref::{Refer, SrcRef},
 };
 

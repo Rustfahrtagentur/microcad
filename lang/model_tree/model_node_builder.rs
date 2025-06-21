@@ -29,7 +29,7 @@ pub struct ModelNodeBuilder {
 /// All methods in this `impl` block are used to create a new model builder with a specific [`Element`] type.
 impl ModelNodeBuilder {
     /// Create a new object from a body `{ ... }`.
-    fn new_object_body() -> Self {
+    pub fn new_object_body() -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
             output_type: ModelNodeOutputType::NotDetermined,
@@ -42,7 +42,7 @@ impl ModelNodeBuilder {
     /// Create a new 2D object.
     ///
     /// This function is used when a call to a sketch is evaluated.
-    fn new_2d_object() -> Self {
+    pub fn new_2d_object() -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
             output_type: ModelNodeOutputType::Geometry2D,
@@ -178,7 +178,7 @@ impl ModelNodeBuilder {
     pub fn add_children(&mut self, children: ModelNodes) -> EvalResult<&mut Self> {
         if let Some(child) = children.first() {
             //  TODO Check child's output type
-            //  self.output_type = self.determine_output_type(child)?;
+            //self.output_type = self.determine_output_type(child)?;
         }
 
         for child in children.iter() {

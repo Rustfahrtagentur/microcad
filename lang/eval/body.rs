@@ -6,7 +6,7 @@ use crate::{eval::*, model_tree::*};
 impl Eval<ModelNode> for Body {
     fn eval(&self, context: &mut Context) -> EvalResult<ModelNode> {
         context.scope(StackFrame::Body(SymbolMap::default()), |context| {
-            let mut builder = ObjectBuilder::default();
+            let mut builder = ModelNodeBuilder::new_object_body();
 
             for statement in self.statements.iter() {
                 let value = match statement {
@@ -24,10 +24,10 @@ impl Eval<ModelNode> for Body {
                         Value::None
                     }
                 };
-                builder.append_children(&mut value.fetch_nodes());
+                builder.add_children(value.fetch_nodes())?;
             }
 
-            Ok(builder.build_node())
+            Ok(builder.build())
         })
     }
 }

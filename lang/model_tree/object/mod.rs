@@ -5,10 +5,8 @@
 
 use crate::{syntax::*, value::*};
 
-mod object_builder;
 mod object_properties;
 
-pub use object_builder::*;
 pub use object_properties::*;
 
 /// An object with properties.
