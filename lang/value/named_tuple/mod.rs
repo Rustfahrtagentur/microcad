@@ -39,12 +39,12 @@ impl NamedTuple {
         T: std::convert::TryFrom<&'a Value>,
         T::Error: std::fmt::Debug,
     {
-        self.get_by_id(&Identifier::no_ref(id))
+        self.get_value_by_id(&Identifier::no_ref(id))
             .map(|v| v.try_into().expect("cannot convert value"))
     }
 
     /// Fetch a tuple field by name as `&str`.
-    pub fn get_by_id(&self, id: &Identifier) -> Option<&Value> {
+    pub fn get_value_by_id(&self, id: &Identifier) -> Option<&Value> {
         self.0.get(id)
     }
 }
