@@ -146,26 +146,6 @@ impl ModelNode {
         Self(RcMut::new(inner))
     }
 
-    /// Create new object node from element.
-    pub fn new_element(element: Refer<Element>) -> Self {
-        Self::new(ModelNodeInner::new(element))
-    }
-
-    /// Return a new empty object.
-    pub fn new_empty_object(src_ref: SrcRef) -> Self {
-        Self::new_element(Refer::new(Element::Object(Object::default()), src_ref))
-    }
-
-    /// Return a model node containing an [Object].
-    pub fn new_object(object: Object, src_ref: SrcRef) -> Self {
-        Self::new_element(Refer::new(Element::Object(object), src_ref))
-    }
-
-    /// Return an transformation node.
-    pub fn new_operation<T: Operation + 'static>(operation: T, src_ref: SrcRef) -> Self {
-        Self::new_element(Refer::new(Element::Operation(Rc::new(operation)), src_ref))
-    }
-
     /// Return id of this object node.
     pub fn id(&self) -> Option<Identifier> {
         self.0.borrow().id.clone()
@@ -286,7 +266,9 @@ impl ModelNode {
     /// Short cut to generate boolean operator as binary operation with two nodes.
     pub fn binary_op(self, op: BooleanOp, other: ModelNode) -> ModelNode {
         assert!(self != other, "lhs and rhs must be distinct.");
-        ModelNode::new_operation(op, SrcRef(None)).append_children(vec![self.clone(), other].into())
+        let mut builder = ModelNodeBuilder::new_operation(op, SrcRef(None));
+        builder.add_children(vec![self.clone(), other].into());
+        builder.build()
     }
 
     /// Find children node placeholder in node descendants.

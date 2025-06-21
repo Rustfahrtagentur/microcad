@@ -9,7 +9,9 @@ use crate::{model_tree::*, src_ref::SrcRef, syntax::*};
 #[cfg(test)]
 fn sample_nodes() -> ModelNodes {
     fn obj(id: &str) -> ModelNode {
-        ModelNode::new_empty_object(SrcRef(None)).set_id(Identifier::no_ref(id))
+        ModelNodeBuilder::new_object_body()
+            .build()
+            .set_id(Identifier::no_ref(id))
     }
 
     let nodes = vec![
@@ -41,7 +43,9 @@ fn sample_nodes() -> ModelNodes {
 
 #[cfg(test)]
 fn sample_tree() -> ModelNode {
-    ModelNode::new_empty_object(SrcRef(None)).append_children(sample_nodes())
+    let mut builder = ModelNodeBuilder::new_object_body();
+    builder.add_children(sample_nodes());
+    builder.build()
 }
 
 #[test]

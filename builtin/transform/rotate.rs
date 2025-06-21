@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter, src_ref::*};
+use microcad_lang::{eval::*, model_tree::*, parameter};
 
 /// Builtin definition for a 2D circle
 #[derive(Debug)]
@@ -14,13 +14,13 @@ impl BuiltinPartDefinition for Rotate {
     }
 
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
-        Ok(ModelNode::new_operation(
-            AffineTransform::RotationAroundAxis(
+        Ok(
+            ModelNodeBuilder::new_transform(AffineTransform::RotationAroundAxis(
                 cgmath::Rad(args.get("angle")),
                 Vec3::new(args.get("x"), args.get("y"), args.get("z")),
-            ),
-            SrcRef(None),
-        ))
+            ))
+            .build(),
+        )
     }
 
     fn parameters() -> ParameterValueList {

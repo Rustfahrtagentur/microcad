@@ -7,35 +7,33 @@ use std::rc::Rc;
 
 use microcad_core::{Geometry2D, Geometry3D};
 
-use crate::{
-    eval::{Context, EvalResult},
-    model_tree::*,
-    src_ref::{Refer, SrcRef},
-    syntax::Identifier,
-    value::Value,
-};
+use crate::{eval::*, model_tree::*, src_ref::*, syntax::*, value::*};
 
-pub struct ModelNodeBuilder {
+/// A builder pattern to build model nodes
+#[derive(Default)]
+pub struct ModelNodeBuilder<'a> {
     inner: ModelNodeInner,
+    /// Properties to add to the model node if it is an [`Object`]
     pub properties: ObjectProperties,
+    /// Children to add to this node.
     pub children: ModelNodes,
 
+    /// The output type of this node.
     output_type: ModelNodeOutputType,
-    context: Option<Context>,
+
+    /// An optional context for error handling.
+    context: Option<&'a mut Context>,
 }
 
 /// ModelNodeBuilder constructors.
 ///
 /// All methods in this `impl` block are used to create a new model builder with a specific [`Element`] type.
-impl ModelNodeBuilder {
+impl<'a> ModelNodeBuilder<'a> {
     /// Create a new object from a body `{ ... }`.
     pub fn new_object_body() -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
-            output_type: ModelNodeOutputType::NotDetermined,
-            properties: ObjectProperties::default(),
-            children: ModelNodes::default(),
-            context: None,
+            ..Default::default()
         }
     }
 
@@ -46,9 +44,15 @@ impl ModelNodeBuilder {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
             output_type: ModelNodeOutputType::Geometry2D,
-            properties: ObjectProperties::default(),
-            children: ModelNodes::default(),
-            context: None,
+            ..Default::default()
+        }
+    }
+
+    /// Create a new children placeholder
+    pub fn new_children_placeholder() -> Self {
+        Self {
+            inner: ModelNodeInner::new(Refer::none(Element::ChildrenPlaceholder)),
+            ..Default::default()
         }
     }
 
@@ -59,9 +63,7 @@ impl ModelNodeBuilder {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
             output_type: ModelNodeOutputType::Geometry3D,
-            properties: ObjectProperties::default(),
-            children: ModelNodes::default(),
-            context: None,
+            ..Default::default()
         }
     }
 
@@ -70,9 +72,7 @@ impl ModelNodeBuilder {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Primitive2D(geometry))),
             output_type: ModelNodeOutputType::Geometry2D,
-            properties: ObjectProperties::default(),
-            children: ModelNodes::default(),
-            context: None,
+            ..Default::default()
         }
     }
 
@@ -81,20 +81,16 @@ impl ModelNodeBuilder {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Primitive3D(geometry))),
             output_type: ModelNodeOutputType::Geometry3D,
-            properties: ObjectProperties::default(),
-            children: ModelNodes::default(),
-            context: None,
+            ..Default::default()
         }
     }
 
     /// New transform.
-    pub fn new_transform(transform: AffineTransform, src_ref: SrcRef) -> Self {
+    pub fn new_transform(transform: AffineTransform) -> Self {
         Self {
-            inner: ModelNodeInner::new(Refer::new(Element::Transform(transform), src_ref)),
+            inner: ModelNodeInner::new(Refer::none(Element::Transform(transform))),
             output_type: ModelNodeOutputType::NotDetermined,
-            properties: ObjectProperties::default(),
-            children: ModelNodes::default(),
-            context: None,
+            ..Default::default()
         }
     }
 
@@ -103,14 +99,12 @@ impl ModelNodeBuilder {
         Self {
             inner: ModelNodeInner::new(Refer::new(Element::Operation(Rc::new(operation)), src_ref)),
             output_type: ModelNodeOutputType::NotDetermined,
-            properties: ObjectProperties::default(),
-            children: ModelNodes::default(),
-            context: None,
+            ..Default::default()
         }
     }
 }
 
-impl ModelNodeBuilder {
+impl<'a> ModelNodeBuilder<'a> {
     /// Determine the output type of this node by some child node.
     ///
     /// TODO: Replace `panic!` with context warnings.
