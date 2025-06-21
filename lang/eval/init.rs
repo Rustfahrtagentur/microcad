@@ -25,9 +25,6 @@ impl InitDefinition {
                         }
                         context.set_local_value(id.clone(), value)?;
                     }
-                    Statement::Expression(expression) => {
-                        node_builder.add_children(expression.eval(context)?.fetch_nodes())?;
-                    }
                     _ => {
                         context.error(
                             self,

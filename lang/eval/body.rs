@@ -24,7 +24,7 @@ impl Eval<ModelNode> for Body {
                         Value::None
                     }
                 };
-                builder.add_children(value.fetch_nodes())?;
+                builder = builder.add_children(value.fetch_nodes())?;
             }
 
             Ok(builder.build())

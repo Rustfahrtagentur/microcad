@@ -94,11 +94,10 @@ impl ModelNodes {
     pub fn union(&self) -> ModelNode {
         match self.single_node() {
             Some(node) => node,
-            None => {
-                let mut builder = ModelNodeBuilder::new_operation(BooleanOp::Union, SrcRef(None));
-                builder.add_children(self.clone());
-                builder.build()
-            }
+            None => ModelNodeBuilder::new_operation(BooleanOp::Union, SrcRef(None))
+                .add_children(self.clone())
+                .expect("No error")
+                .build(),
         }
     }
 

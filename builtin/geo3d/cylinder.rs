@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, rc::*};
 
 pub struct Cylinder;
 

@@ -8,10 +8,9 @@ impl Eval<ModelNode> for SourceFile {
         context.scope(
             StackFrame::Source(self.id(), SymbolMap::default()),
             |context| {
-                let nodes: ModelNodes = self.statements.eval(context)?;
-                let mut builder = ModelNodeBuilder::new_object_body();
-                builder.add_children(nodes)?;
-                Ok(builder.build())
+                Ok(ModelNodeBuilder::new_object_body()
+                    .add_children(self.statements.eval(context)?)?
+                    .build())
             },
         )
     }

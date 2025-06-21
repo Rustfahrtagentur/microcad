@@ -4,7 +4,7 @@
 //! Model tree tests
 
 #[cfg(test)]
-use crate::{model_tree::*, src_ref::SrcRef, syntax::*};
+use crate::{model_tree::*, syntax::*};
 
 #[cfg(test)]
 fn sample_nodes() -> ModelNodes {
@@ -43,9 +43,10 @@ fn sample_nodes() -> ModelNodes {
 
 #[cfg(test)]
 fn sample_tree() -> ModelNode {
-    let mut builder = ModelNodeBuilder::new_object_body();
-    builder.add_children(sample_nodes());
-    builder.build()
+    ModelNodeBuilder::new_object_body()
+        .add_children(sample_nodes())
+        .expect("No error")
+        .build()
 }
 
 #[test]

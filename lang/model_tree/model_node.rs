@@ -127,11 +127,11 @@ impl ModelNodeInner {
         Self {
             id: self.id.clone(),
             parent: None,
-            children: ModelNodes::default(),
             element: self.element.clone(),
             metadata: self.metadata.clone(),
             origin: self.origin.clone(),
             output_type: self.output_type.clone(),
+            ..Default::default()
         }
     }
 }
@@ -266,9 +266,16 @@ impl ModelNode {
     /// Short cut to generate boolean operator as binary operation with two nodes.
     pub fn binary_op(self, op: BooleanOp, other: ModelNode) -> ModelNode {
         assert!(self != other, "lhs and rhs must be distinct.");
-        let mut builder = ModelNodeBuilder::new_operation(op, SrcRef(None));
-        builder.add_children(vec![self.clone(), other].into());
-        builder.build()
+
+        let container = ModelNodeBuilder::new_object_body()
+            .add_children(vec![self.clone(), other].into())
+            .expect("No error")
+            .build();
+
+        ModelNodeBuilder::new_operation(op, SrcRef(None))
+            .add_children(vec![container].into())
+            .expect("No error")
+            .build()
     }
 
     /// Find children node placeholder in node descendants.

@@ -159,7 +159,7 @@ impl<'a> ModelNodeBuilder<'a> {
     }
 
     /// Add multiple children to the node if it matches.
-    pub fn add_children(&mut self, children: ModelNodes) -> EvalResult<&mut Self> {
+    pub fn add_children(mut self, children: ModelNodes) -> EvalResult<Self> {
         if let Some(child) = children.first() {
             //  TODO Check child's output type
             self.output_type = self.determine_output_type(child)?;
@@ -172,6 +172,7 @@ impl<'a> ModelNodeBuilder<'a> {
         Ok(self)
     }
 
+    /// Set object properties.
     pub fn properties(mut self, properties: ObjectProperties) -> Self {
         self.properties = properties;
         self
@@ -188,6 +189,7 @@ impl<'a> ModelNodeBuilder<'a> {
         self.properties.contains_key(id)
     }
 
+    /// Build a [`ModelNode`].
     pub fn build(mut self) -> ModelNode {
         if let Element::Object(object) = self.inner.element_mut() {
             object.props = self.properties

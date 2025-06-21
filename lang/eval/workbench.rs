@@ -56,7 +56,7 @@ impl WorkbenchDefinition {
                         }
                         Statement::Expression(expression) => {
                             let value = expression.eval(context)?;
-                            node_builder.add_children(value.fetch_nodes())?;
+                            node_builder = node_builder.add_children(value.fetch_nodes())?;
                         }
                         _ => {}
                     }
