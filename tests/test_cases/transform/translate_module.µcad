@@ -6,7 +6,7 @@ part cyl(d: Length, h: Length) {
         radius_bottom = d * 2.0 / 1mm,
         radius_top = d * 2.0 / 1mm,
         height = h / 1mm
-    );
+    )
 }
 
 // Calculate the difference between two translated cylinders
