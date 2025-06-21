@@ -5,7 +5,6 @@
 
 use crate::{eval::*, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use microcad_core::*;
-use strum::IntoStaticStr;
 
 /// The origin is the [`Symbol`] and [`ArgumentMap`] from which the node has been created.
 #[derive(Clone, Default, Debug)]
@@ -33,30 +32,6 @@ impl std::fmt::Display for ModelNodeOrigin {
             }
             None => Ok(()),
         }
-    }
-}
-
-/// The output type of the [`ModelNode`].
-#[derive(Debug, Clone, IntoStaticStr, Default, PartialEq)]
-pub enum ModelNodeOutputType {
-    /// The output type has not yet been determined.
-    #[default]
-    NotDetermined,
-
-    /// The [`ModelNode`] outputs a 2d geometry.
-    Geometry2D,
-
-    /// The [`ModelNode`] outputs a 3d geometry.
-    Geometry3D,
-
-    /// The [`ModelNode`] is invalid, you cannot mix 2d and 3d geometry.
-    Invalid,
-}
-
-impl std::fmt::Display for ModelNodeOutputType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let name: &'static str = self.into();
-        write!(f, "{name}")
     }
 }
 
