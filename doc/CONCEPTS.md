@@ -86,9 +86,9 @@ Any errors which occur here are related to geometrical processing.
 | Operation  | *2D or 3D object* | *2D or 3D object* | `o(..) p;` | `op o(..) {..}`       |
 | Measure    | *2D or 3D object* | *value*           | `a.m();`   | *builtin only*        |
 
-# Coding Conventions
+## Coding Conventions
 
-## Naming
+### Naming
 
 | Element   | Example              | Format                |
 | --------- | -------------------- | --------------------- |

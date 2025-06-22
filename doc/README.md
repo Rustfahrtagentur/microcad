@@ -14,10 +14,12 @@ It only needs to know the values of all the variables to obtain this result.
 
 A **µcad program** can simply consist of a sequence of [*statements*](structure/statements.md)  in a
 *source file* or more complex constructs such as [*workbenches*](structure/workbench.md) and
-[*functions*](structure/functions.md), which may depend on each other through **use statements**.
+[*functions*](structure/functions.md).
 
 Additionally, [*modules*](structure/modules.md) help bundle things into packages and resolve naming
 collision issues.
+
+With [*use statements*](structure/use.md) functionalities of a module can be used in other modules.
 
 ## Data Types
 
