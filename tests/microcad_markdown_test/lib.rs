@@ -378,6 +378,8 @@ fn create_test_code(
                     let _ = fs::remove_file(banner);
                     let _ = fs::remove_file(out_name);
 
+                    let _ = fs::hard_link("images/parse_fail.png", banner);
+
                     // create log file
                     let out = &mut fs::File::create(out_name).expect("cannot create log file");
                     let out = &mut io::BufWriter::new(out);
@@ -396,6 +398,7 @@ fn create_test_code(
                         // test expected to fail failed at parsing?
                         Err(err) => {
                             out.write_all(format!("{err}").as_bytes()).unwrap();
+                            let _ = fs::remove_file(banner);
                             let _ = fs::hard_link("images/fail_ok.png", banner);
                             log::debug!("{err}")
                         },
@@ -410,6 +413,8 @@ fn create_test_code(
 
                             // print any error
                             context.write_diagnosis(out).expect("internal error");
+
+                            let _ = fs::remove_file(banner);
 
                             // check if test expected to fail failed at evaluation
                             match (eval, context.has_errors()) {
@@ -436,6 +441,8 @@ fn create_test_code(
                 r##"{
                         // test awaited to succeed and parsing failed?
                         Err(err) => {
+                            let _ = fs::remove_file(banner);
+        
                             out.write_all(format!("{err}").as_bytes()).unwrap();
                             if todo {
                                 let _ = fs::hard_link("images/todo.png", banner);
@@ -455,6 +462,8 @@ fn create_test_code(
 
                             // print any error
                             context.write_diagnosis(out).expect("internal error");
+
+                            let _ = fs::remove_file(banner);
 
                             // check if test awaited to succeed but failed at evaluation
                             match (eval, context.has_errors(), todo) {
