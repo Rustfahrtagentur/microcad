@@ -60,20 +60,17 @@ impl CallMethod for Value {
         context: &mut Context,
     ) -> EvalResult<Value> {
         match &self {
-            Value::None => todo!(),
-            Value::Integer(_) => todo!(),
-            Value::Quantity(_) => todo!(),
-            Value::Bool(_) => todo!(),
-            Value::String(_) => todo!(),
-            Value::Color(_) => todo!(),
+            Value::None => unreachable!("None value cannot be called"),
+            Value::Integer(_) => eval_todo!(context, args, "call_method for Integer"),
+            Value::Quantity(_) => eval_todo!(context, args, "call_method for Quantity"),
+            Value::Bool(_) => eval_todo!(context, args, "call_method for Bool"),
+            Value::String(_) => eval_todo!(context, args, "call_method for String"),
+            Value::Color(_) => eval_todo!(context, args, "call_method for Color"),
             Value::Array(list) => list.call_method(id, args, context),
-            Value::NamedTuple(_) => todo!(),
-            Value::Tuple(_) => todo!(),
-            Value::Matrix(_) => todo!(),
-            Value::Nodes(_) => {
-                context.error(args, EvalError::Todo("call_method".into()))?;
-                Ok(Value::None)
-            }
+            Value::NamedTuple(_) => eval_todo!(context, args, "call_method for NamedTuple"),
+            Value::Tuple(_) => eval_todo!(context, args, "call_method for Tuple"),
+            Value::Matrix(_) => eval_todo!(context, args, "call_method for Matrix"),
+            Value::Nodes(_) => eval_todo!(context, args, "call_method for Nodes"),
         }
     }
 }

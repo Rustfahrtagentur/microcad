@@ -81,3 +81,16 @@ impl MethodCall {
             .call_method(&self.id, &self.argument_list, context)
     }
 }
+
+/// Like `todo!()` but within a evaluation context
+///
+/// emits a diagnostic error instead of panicking.
+#[macro_export]
+macro_rules! eval_todo {
+    ($context: ident, $refer: ident, $($arg:tt)*) => {{
+        $context.error($refer, EvalError::Todo(format_args!($($arg)*).to_string()))?;
+        Ok(Value::None)
+    }}
+}
+
+pub use eval_todo;
