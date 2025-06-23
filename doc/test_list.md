@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**74** tests from markdown.
+**78** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -23,10 +23,14 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/.test/export_multiple.png)](../doc/libs/std/.test/export_multiple.log) | [export_multiple](../doc/libs/std/export.md) |
 | [![test](../doc/libs/std/.test/export_single.png)](../doc/libs/std/.test/export_single.log) | [export_single](../doc/libs/std/export.md) |
 | [![test](../.test/first_example.png)](../.test/first_example.log) | [first_example](../README.md) |
+| [![test](../doc/structure/.test/function_code.png)](../doc/structure/.test/function_code.log) | [function_code](../doc/structure/statements.md) |
 | [![test](../doc/structure/.test/functions_donut.png)](../doc/structure/.test/functions_donut.log) | [functions_donut](../doc/structure/functions.md) |
 | [![test](../doc/libs/std/algorithm/.test/hull_multiple.png)](../doc/libs/std/algorithm/.test/hull_multiple.log) | [hull_multiple](../doc/libs/std/algorithm/hull.md) |
 | [![test](../doc/libs/std/algorithm/.test/hull_single.png)](../doc/libs/std/algorithm/.test/hull_single.log) | [hull_single](../doc/libs/std/algorithm/hull.md) |
 | [![test](../doc/structure/.test/init_property.png)](../doc/structure/.test/init_property.log) | [init_property](../doc/structure/workbench.md) |
+| [![test](../doc/structure/.test/initial_source_file_2D.png)](../doc/structure/.test/initial_source_file_2D.log) | [initial_source_file_2D](../doc/structure/statements.md) |
+| [![test](../doc/structure/.test/initial_source_file_3D.png)](../doc/structure/.test/initial_source_file_3D.log) | [initial_source_file_3D](../doc/structure/statements.md) |
+| [![test](../doc/structure/.test/initial_source_file_mixed.png)](../doc/structure/.test/initial_source_file_mixed.log) | [initial_source_file_mixed](../doc/structure/statements.md) |
 | [![test](../doc/structure/.test/initializers.png)](../doc/structure/.test/initializers.log) | [initializers](../doc/structure/workbench.md) |
 | [![test](../doc/libs/std/algorithm/.test/intersection_alt_operator.png)](../doc/libs/std/algorithm/.test/intersection_alt_operator.log) | [intersection_alt_operator](../doc/libs/std/algorithm/intersection.md) |
 | [![test](../doc/libs/std/algorithm/.test/intersection_operator.png)](../doc/libs/std/algorithm/.test/intersection_operator.log) | [intersection_operator](../doc/libs/std/algorithm/intersection.md) |
