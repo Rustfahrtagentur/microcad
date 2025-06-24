@@ -109,8 +109,7 @@ One may define multiple initializers which must have different parameter lists.
 
 ```µcad,initializers#fail
 part wheel(radius: Length) {
-    // error: same parameters as in building plan
-    init( radius: Length ) { }
+    init( radius: Length ) {} // error: same parameters as in building plan
 }
 ```
 
@@ -149,8 +148,7 @@ you will get an error:
 ```µcad,missed_property#fail
 sketch wheel(radius: Length) {
     init( width: Length ) { 
-        // misses to set `radius` from building plan
-        r = width / 2; 
+        // error: misses to set `radius` from building plan
     }
 }
 ```
