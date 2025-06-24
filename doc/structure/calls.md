@@ -2,52 +2,52 @@
 
 ## Calling Functions
 
-TODO
+A call of a function consists of just the *identifier* and an [argument list](arguments.md).
+and the result is a *value*:
+
+[![test](.test/call_function.png)](.test/call_function.log)
+
+```µcad,call_function
+// function definition
+fn square(x: Scalar) { x * x }
+
+// call function square with parameter 2 and store result in s
+s = square(x = 2)
+
+// check value
+std::assert_eq!( s, 4 );
+```
 
 ## Calling Workbenches
 
-TODO
+[Workbenches](workbench.md) can be called in the same way as functions
+except that the result is a object node.
 
-## Call Arguments
+[![test](.test/call_workbench.png)](.test/call_workbench.log)
 
-### Argument Matching
+```µcad,call_workbench
+// function definition
+sketch square(size: Length) { 
+    std::geo2d::rect(size);
+}
 
-TODO
+// call square with a size and store object node in s
+s = square(size=2cm);
 
-### Argument Multiplicity
-
-Each argument can also be given in a array of elements of a parameter's type.
-Each list element will then be evaluated for each of the array's values.
-This is called *argument multiplicity*.
-This way, we can intuitively express a call that is called for each argument variant.
-
-The following example will produce 4 rectangles on different positions:
-
-[![test](.test/multiplicity_arrays.png)](.test/multiplicity_arrays.log)
-
-```µcad,multiplicity_arrays
-std::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]) 
-    std::geo2d::rect(width = 2mm, height = 2mm);
+// translate object s
+std::translate(x = 1cm) s;
 ```
 
-The example results in the following calls:
+## Calling Operations
 
-[![test](.test/no_multiplicity.png)](.test/no_multiplicity.log)
+[Operations](op.md) are called differently:
 
-```µcad,no_multiplicity
-std::translate(x = -, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-std::translate(x = -4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-std::translate(x = 4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-std::translate(x = 4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-```
+[![test](.test/call_op.png)](.test/call_op.log)
 
-Normally, this would require 2 nested *for loops* which are not available in *µcad*.
+```µcad,call_op
+// function definition
+fn square(x: Scalar) { x * x }
 
-Another example uses an array of tuples and produces the same output:
-
-[![test](.test/multiplicity_tuple_array.png)](.test/multiplicity_tuple_array.log)
-
-```µcad,multiplicity_tuple_array
-std::translate([(x=-4mm, y=-4mm), (x=-4mm, y=4mm), (x=4mm, y=-4mm), (x=4mm, y=4mm)]) 
-    std::geo2d::rect(width = 2mm, height = 2mm);
+// call function square with parameter 2
+square(x = 2);
 ```

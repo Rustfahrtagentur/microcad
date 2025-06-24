@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**84** tests from markdown.
+**87** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -11,6 +11,9 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/assignment.png)](../doc/structure/.test/assignment.log) | [assignment](../doc/structure/assignments.md) |
 | [![test](../doc/structure/.test/assignment_immutable.png)](../doc/structure/.test/assignment_immutable.log) | [assignment_immutable](../doc/structure/assignments.md) |
 | [![test](../doc/structure/.test/building_plan.png)](../doc/structure/.test/building_plan.log) | [building_plan](../doc/structure/workbench.md) |
+| [![test](../doc/structure/.test/call_function.png)](../doc/structure/.test/call_function.log) | [call_function](../doc/structure/calls.md) |
+| [![test](../doc/structure/.test/call_op.png)](../doc/structure/.test/call_op.log) | [call_op](../doc/structure/calls.md) |
+| [![test](../doc/structure/.test/call_workbench.png)](../doc/structure/.test/call_workbench.log) | [call_workbench](../doc/structure/calls.md) |
 | [![test](../doc/structure/.test/children.png)](../doc/structure/.test/children.log) | [children](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/code.png)](../doc/structure/.test/code.log) | [code](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code_between_initializers.png)](../doc/structure/.test/code_between_initializers.log) | [code_between_initializers](../doc/structure/workbench.md) |
