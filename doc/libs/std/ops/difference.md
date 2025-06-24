@@ -17,7 +17,7 @@ std::geo2d::circle(radius = 3mm) - std::geo2d::rect(width = 3mm, height = 2mm);
 ```µcad,difference_alt_operator
 use std::*;
 
-algorithm::difference() {
+ops::difference() {
     geo2d::circle(radius = 3mm);
     geo2d::rect(width = 3mm, height = 2mm);
 };

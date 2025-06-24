@@ -90,7 +90,7 @@ impl ModelNodes {
         node_stack[0].clone()
     }
 
-    /// Return an algorithm node that unites all children.
+    /// Return an operation node that unites all children.
     pub fn union(&self) -> ModelNode {
         match self.single_node() {
             Some(node) => node,

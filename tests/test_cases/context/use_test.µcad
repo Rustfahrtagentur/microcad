@@ -23,10 +23,10 @@ use std::print;
 assert_valid(print);
 print("Hello");
 
-// public use algorithm from `std/module.µcad`
-pub use std::algorithm;
-assert_valid(algorithm);
-assert_invalid(use_test::algorithm);
+// public use operation from `std/module.µcad`
+pub use std::ops;
+assert_valid(ops);
+assert_invalid(use_test::ops);
 
 part my_part() {
     circle(radius=1);

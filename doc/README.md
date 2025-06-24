@@ -45,7 +45,7 @@ In both cases you shall read about [*argument multiplicity*](structure/arguments
 ## Objects
 
 The 2D or 3D objects produced with [*workbenches*](structure/calls.md#calling-workbenches) can be
-[measured](nodes/measures.md) or [export](attributes/export.md).
+[measured](nodes/measures.md) or [exported](attributes/export.md).
 
 ## Libraries
 

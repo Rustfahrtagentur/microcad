@@ -10,7 +10,7 @@ TODO: Add doc
 
 TODO: Add doc
 
-## `algorithm`
+## `ops`
 
 TODO: Add doc
 

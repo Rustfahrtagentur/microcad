@@ -1,5 +1,5 @@
 pub use __builtin::print;
-pub use __builtin::algorithm;
+pub use __builtin::ops;
 pub use __builtin::math;
 
 mod debug {

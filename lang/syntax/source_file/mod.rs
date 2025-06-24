@@ -113,7 +113,7 @@ impl<T: PrintSyntax> std::fmt::Display for FormatSyntax<'_, T> {
 
 #[test]
 fn load_source_file() {
-    let source_file = SourceFile::load(r#"../tests/test_cases/algorithm/difference.µcad"#);
+    let source_file = SourceFile::load(r#"../tests/test_cases/ops/difference.µcad"#);
     if let Err(ref err) = source_file {
         log::error!("{err}");
     }

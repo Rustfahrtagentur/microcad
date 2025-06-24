@@ -37,7 +37,7 @@ TODO
 -- Test result --
 OK
 
-========= ./doc/libs/std/algorithm/.test/hull_multiple.log =========
+========= ./doc/libs/std/ops/.test/hull_multiple.log =========
 
 -- Output --
 -- Errors --
@@ -50,14 +50,14 @@ error: Symbol hull not found.
 -- Test result --
 TODO
 
-========= ./doc/libs/std/algorithm/.test/union_operator.log =========
+========= ./doc/libs/std/ops/.test/union_operator.log =========
 
 -- Output --
 -- Errors --
 -- Test result --
 OK
 
-========= ./doc/libs/std/algorithm/.test/hull_single.log =========
+========= ./doc/libs/std/ops/.test/hull_single.log =========
 
 -- Output --
 -- Errors --
@@ -70,35 +70,35 @@ error: Symbol hull not found.
 -- Test result --
 TODO
 
-========= ./doc/libs/std/algorithm/.test/intersection_alt_operator.log =========
+========= ./doc/libs/std/ops/.test/intersection_alt_operator.log =========
 
 -- Output --
 -- Errors --
 -- Test result --
 OK
 
-========= ./doc/libs/std/algorithm/.test/difference_alt_operator.log =========
+========= ./doc/libs/std/ops/.test/difference_alt_operator.log =========
 
 -- Output --
 -- Errors --
 -- Test result --
 OK
 
-========= ./doc/libs/std/algorithm/.test/union_alt_operator.log =========
+========= ./doc/libs/std/ops/.test/union_alt_operator.log =========
 
 -- Output --
 -- Errors --
 -- Test result --
 OK
 
-========= ./doc/libs/std/algorithm/.test/intersection_operator.log =========
+========= ./doc/libs/std/ops/.test/intersection_operator.log =========
 
 -- Output --
 -- Errors --
 -- Test result --
 OK
 
-========= ./doc/libs/std/algorithm/.test/difference_operator.log =========
+========= ./doc/libs/std/ops/.test/difference_operator.log =========
 
 -- Output --
 -- Errors --

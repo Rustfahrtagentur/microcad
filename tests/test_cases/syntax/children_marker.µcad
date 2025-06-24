@@ -1,10 +1,10 @@
 use __builtin::*;
 
 // Define a part `circle_difference` with a radius as a parameter
-// If creates an algorithm node with a circle node as a child
-// The `@children` marker is used to display that all children of the part will be added to the algorithm node
+// If creates an operation node with a circle node as a child
+// The `@children` marker is used to display that all children of the part will be added to the operation node
 part circle_difference(radius: Scalar) {
-    algorithm::difference() {
+    ops::difference() {
         geo2d::circle(radius);
         @children
     }

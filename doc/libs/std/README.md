@@ -9,7 +9,7 @@ The main module of the µcad standard library `std` consists of these modules wh
 
 - [`geo2d`](geo2d/README.md): 2D parts (e.g. `circle`, `rect`)
 - [`geo3d`](geo3d/README.md): 3D parts (e.g. `sphere`, `cube`)
-- [`algorithm`](algorithm/README.md): Algorithms to manipulate 2D and 3D parts (e.g. `translate`, `difference`)
+- [`ops`](ops/README.md): Algorithms to manipulate 2D and 3D parts (e.g. `translate`, `difference`)
 - [`math`](math/README.md): Mathematical solutions (e.g. `abs`, `pi`)
 - [`debug`](debug/README.md): Debugging functions
 

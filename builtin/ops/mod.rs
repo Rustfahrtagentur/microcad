@@ -4,7 +4,7 @@
 use microcad_core::BooleanOp;
 use microcad_lang::{model_tree::*, resolve::*, src_ref::*, syntax::*, value::*};
 
-/// Creates a node containing a difference algorithm
+/// Creates a node containing a difference operation
 fn difference() -> Symbol {
     Symbol::new_builtin(Identifier::no_ref("difference"), None, &|_, _, _| {
         Ok(Value::from_single_node(ModelNode::new_operation(
@@ -14,7 +14,7 @@ fn difference() -> Symbol {
     })
 }
 
-/// Creates a node containing a union algorithm
+/// Creates a node containing a union operation
 fn union() -> Symbol {
     Symbol::new_builtin(Identifier::no_ref("union"), None, &|_, _, _| {
         Ok(Value::from_single_node(ModelNode::new_operation(
@@ -24,7 +24,7 @@ fn union() -> Symbol {
     })
 }
 
-/// Creates a node containing an intersection algorithm
+/// Creates a node containing an intersection operation
 fn intersection() -> Symbol {
     Symbol::new_builtin(Identifier::no_ref("intersection"), None, &|_, _, _| {
         Ok(Value::from_single_node(ModelNode::new_operation(
@@ -34,7 +34,7 @@ fn intersection() -> Symbol {
     })
 }
 
-/// Creates a node containing a complement algorithm
+/// Creates a node containing a complement operation
 fn complement() -> Symbol {
     Symbol::new_builtin(Identifier::no_ref("complement"), None, &|_, _, _| {
         Ok(Value::from_single_node(ModelNode::new_operation(
@@ -44,9 +44,9 @@ fn complement() -> Symbol {
     })
 }
 
-/// Creates the builtin `algorithm` module
-pub fn algorithm() -> Symbol {
-    crate::ModuleBuilder::new("algorithm".try_into().expect("valid id"))
+/// Creates the builtin `operation` module
+pub fn ops() -> Symbol {
+    crate::ModuleBuilder::new("ops".try_into().expect("valid id"))
         .symbol(difference())
         .symbol(union())
         .symbol(intersection())

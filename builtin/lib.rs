@@ -3,11 +3,11 @@
 
 //! µcad builtin library
 
-mod algorithm;
 mod assert;
 mod geo2d;
 mod geo3d;
 mod math;
+mod ops;
 mod print;
 mod transform;
 
@@ -21,9 +21,9 @@ fn init() {
 pub use microcad_lang::builtin::*;
 use microcad_lang::resolve::*;
 
-pub(crate) use algorithm::*;
 pub(crate) use assert::*;
 pub(crate) use math::*;
+pub(crate) use ops::*;
 pub(crate) use print::*;
 pub(crate) use transform::*;
 
@@ -37,7 +37,7 @@ pub fn builtin_module() -> Symbol {
         .symbol(error())
         .symbol(warning())
         .symbol(info())
-        .symbol(algorithm())
+        .symbol(ops())
         .symbol(transform())
         .symbol(math())
         .symbol(geo2d::geo2d())

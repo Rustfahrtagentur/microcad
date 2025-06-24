@@ -63,7 +63,7 @@ In the export phase the *object nodes* will be taken to generate 2D or 3D output
 (e.g. *SVG* or *STL*).
 While this phase the following things will be done:
 
-- geometric algorithms will be processed
+- geometric operations will be processed
 - geometries will be rendered
 - the output files will be written
 
