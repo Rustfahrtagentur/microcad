@@ -8,32 +8,33 @@ TODO
 
 TODO
 
-## Call Parameters
+## Call Arguments
 
-### Parameter Matching
+### Argument Matching
 
 TODO
 
-### Parameter Multiplicity
+### Argument Multiplicity
 
-Each parameter can also be given as a list with elements of the parameter's type.
-Each list element will be evaluated. This is called *parameter multiplicity*.
-This way, we can intuitively express a call that is called for each parameter variant.
+Each argument can also be given in a array of elements of a parameter's type.
+Each list element will then be evaluated for each of the array's values.
+This is called *argument multiplicity*.
+This way, we can intuitively express a call that is called for each argument variant.
 
 The following example will produce 4 rectangles on different positions:
 
-[![test](.test/parameter_multiplicity_example_A.png)](.test/parameter_multiplicity_example_A.log)
+[![test](.test/multiplicity_example_A.png)](.test/multiplicity_example_A.log)
 
-```µcad,parameter_multiplicity_example_A
+```µcad,multiplicity_example_A
 std::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]) 
     std::geo2d::rect(width = 2mm, height = 2mm);
 ```
 
 The example results in the following calls:
 
-[![test](.test/parameter_multiplicity_example_B.png)](.test/parameter_multiplicity_example_B.log)
+[![test](.test/multiplicity_example_B.png)](.test/multiplicity_example_B.log)
 
-```µcad,parameter_multiplicity_example_B
+```µcad,multiplicity_example_B
 std::translate(x = -4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
 std::translate(x = -4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
 std::translate(x = 4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);

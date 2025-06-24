@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**78** tests from markdown.
+**83** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -11,26 +11,24 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/assignment.png)](../doc/structure/.test/assignment.log) | [assignment](../doc/structure/assignments.md) |
 | [![test](../doc/structure/.test/assignment_immutable.png)](../doc/structure/.test/assignment_immutable.log) | [assignment_immutable](../doc/structure/assignments.md) |
 | [![test](../doc/structure/.test/building_plan.png)](../doc/structure/.test/building_plan.log) | [building_plan](../doc/structure/workbench.md) |
+| [![test](../doc/structure/.test/children.png)](../doc/structure/.test/children.log) | [children](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/code.png)](../doc/structure/.test/code.log) | [code](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code_between_initializers.png)](../doc/structure/.test/code_between_initializers.log) | [code_between_initializers](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code_post_init.png)](../doc/structure/.test/code_post_init.log) | [code_post_init](../doc/structure/workbench.md) |
 | [![test](../doc/libs/std/algorithm/.test/difference_alt_operator.png)](../doc/libs/std/algorithm/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/libs/std/algorithm/difference.md) |
 | [![test](../doc/libs/std/algorithm/.test/difference_operator.png)](../doc/libs/std/algorithm/.test/difference_operator.log) | [difference_operator](../doc/libs/std/algorithm/difference.md) |
-| [![test](../doc/structure/.test/EXAMPLES_fields.png)](../doc/structure/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/structure/EXAMPLES.md) |
+| [![test](../doc/structure/.test/example.png)](../doc/structure/.test/example.log) | [example](../doc/structure/functions.md) |
 | [![test](../doc/.test/EXAMPLES_fields.png)](../doc/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/EXAMPLES.md) |
-| [![test](../doc/structure/.test/EXAMPLES_functions.png)](../doc/structure/.test/EXAMPLES_functions.log) | [EXAMPLES_functions](../doc/structure/EXAMPLES.md) |
 | [![test](../doc/.test/EXAMPLES_functions.png)](../doc/.test/EXAMPLES_functions.log) | [EXAMPLES_functions](../doc/EXAMPLES.md) |
 | [![test](../doc/libs/std/.test/export_multiple.png)](../doc/libs/std/.test/export_multiple.log) | [export_multiple](../doc/libs/std/export.md) |
 | [![test](../doc/libs/std/.test/export_single.png)](../doc/libs/std/.test/export_single.log) | [export_single](../doc/libs/std/export.md) |
 | [![test](../.test/first_example.png)](../.test/first_example.log) | [first_example](../README.md) |
-| [![test](../doc/structure/.test/function_code.png)](../doc/structure/.test/function_code.log) | [function_code](../doc/structure/statements.md) |
-| [![test](../doc/structure/.test/functions_donut.png)](../doc/structure/.test/functions_donut.log) | [functions_donut](../doc/structure/functions.md) |
 | [![test](../doc/libs/std/algorithm/.test/hull_multiple.png)](../doc/libs/std/algorithm/.test/hull_multiple.log) | [hull_multiple](../doc/libs/std/algorithm/hull.md) |
 | [![test](../doc/libs/std/algorithm/.test/hull_single.png)](../doc/libs/std/algorithm/.test/hull_single.log) | [hull_single](../doc/libs/std/algorithm/hull.md) |
 | [![test](../doc/structure/.test/init_property.png)](../doc/structure/.test/init_property.log) | [init_property](../doc/structure/workbench.md) |
-| [![test](../doc/structure/.test/initial_source_file_2D.png)](../doc/structure/.test/initial_source_file_2D.log) | [initial_source_file_2D](../doc/structure/statements.md) |
-| [![test](../doc/structure/.test/initial_source_file_3D.png)](../doc/structure/.test/initial_source_file_3D.log) | [initial_source_file_3D](../doc/structure/statements.md) |
-| [![test](../doc/structure/.test/initial_source_file_mixed.png)](../doc/structure/.test/initial_source_file_mixed.log) | [initial_source_file_mixed](../doc/structure/statements.md) |
+| [![test](../doc/structure/.test/initial_source_file_2D.png)](../doc/structure/.test/initial_source_file_2D.log) | [initial_source_file_2D](../doc/structure/source_files.md) |
+| [![test](../doc/structure/.test/initial_source_file_3D.png)](../doc/structure/.test/initial_source_file_3D.log) | [initial_source_file_3D](../doc/structure/source_files.md) |
+| [![test](../doc/structure/.test/initial_source_file_mixed.png)](../doc/structure/.test/initial_source_file_mixed.log) | [initial_source_file_mixed](../doc/structure/source_files.md) |
 | [![test](../doc/structure/.test/initializers.png)](../doc/structure/.test/initializers.log) | [initializers](../doc/structure/workbench.md) |
 | [![test](../doc/libs/std/algorithm/.test/intersection_alt_operator.png)](../doc/libs/std/algorithm/.test/intersection_alt_operator.log) | [intersection_alt_operator](../doc/libs/std/algorithm/intersection.md) |
 | [![test](../doc/libs/std/algorithm/.test/intersection_operator.png)](../doc/libs/std/algorithm/.test/intersection_operator.log) | [intersection_operator](../doc/libs/std/algorithm/intersection.md) |
@@ -38,17 +36,21 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/math/.test/math_trigonometric.png)](../doc/libs/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/libs/std/math/README.md) |
 | [![test](../doc/nodes/.test/measure.png)](../doc/nodes/.test/measure.log) | [measure](../doc/nodes/measures.md) |
 | [![test](../doc/structure/.test/missed_property.png)](../doc/structure/.test/missed_property.log) | [missed_property](../doc/structure/workbench.md) |
-| [![test](../doc/structure/.test/module_example.png)](../doc/structure/.test/module_example.log) | [module_example](../doc/structure/modules.md) |
-| [![test](../doc/structure/.test/no_use_statement.png)](../doc/structure/.test/no_use_statement.log) | [no_use_statement](../doc/structure/use.md) |
-| [![test](../doc/structure/.test/op_basic.png)](../doc/structure/.test/op_basic.log) | [op_basic](../doc/structure/op.md) |
-| [![test](../doc/structure/.test/parameter_multiplicity_example_A.png)](../doc/structure/.test/parameter_multiplicity_example_A.log) | [parameter_multiplicity_example_A](../doc/structure/calls.md) |
-| [![test](../doc/structure/.test/parameter_multiplicity_example_B.png)](../doc/structure/.test/parameter_multiplicity_example_B.log) | [parameter_multiplicity_example_B](../doc/structure/calls.md) |
+| [![test](../doc/structure/.test/mod.png)](../doc/structure/.test/mod.log) | [mod](../doc/structure/functions.md) |
+| [![test](../doc/structure/.test/mod_example.png)](../doc/structure/.test/mod_example.log) | [mod_example](../doc/structure/modules.md) |
+| [![test](../doc/structure/.test/multiplicity_example_A.png)](../doc/structure/.test/multiplicity_example_A.log) | [multiplicity_example_A](../doc/structure/calls.md) |
+| [![test](../doc/structure/.test/multiplicity_example_B.png)](../doc/structure/.test/multiplicity_example_B.log) | [multiplicity_example_B](../doc/structure/calls.md) |
+| [![test](../doc/structure/.test/none.png)](../doc/structure/.test/none.log) | [none](../doc/structure/use.md) |
+| [![test](../doc/structure/.test/op_example.png)](../doc/structure/.test/op_example.log) | [op_example](../doc/structure/op.md) |
+| [![test](../doc/structure/.test/parameters.png)](../doc/structure/.test/parameters.log) | [parameters](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/part_basic.png)](../doc/structure/.test/part_basic.log) | [part_basic](../doc/structure/part.md) |
 | [![test](../doc/structure/.test/part_declaration.png)](../doc/structure/.test/part_declaration.log) | [part_declaration](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/pre_init_code.png)](../doc/structure/.test/pre_init_code.log) | [pre_init_code](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/property.png)](../doc/structure/.test/property.log) | [property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/property_wrong.png)](../doc/structure/.test/property_wrong.log) | [property_wrong](../doc/structure/workbench.md) |
 | [![test](../doc/types/.test/quantity_types_number_literals.png)](../doc/types/.test/quantity_types_number_literals.log) | [quantity_types_number_literals](../doc/types/quantity.md) |
+| [![test](../doc/structure/.test/return.png)](../doc/structure/.test/return.log) | [return](../doc/structure/functions.md) |
+| [![test](../doc/structure/.test/return_twice.png)](../doc/structure/.test/return_twice.log) | [return_twice](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/sketch_basic.png)](../doc/structure/.test/sketch_basic.log) | [sketch_basic](../doc/structure/sketch.md) |
 | [![test](../doc/types/.test/tuple_fields_A.png)](../doc/types/.test/tuple_fields_A.log) | [tuple_fields_A](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_fields_B.png)](../doc/types/.test/tuple_fields_B.log) | [tuple_fields_B](../doc/types/tuples.md) |
@@ -75,13 +77,16 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/types_quantity_weight.png)](../doc/types/.test/types_quantity_weight.log) | [types_quantity_weight](../doc/types/quantity.md) |
 | [![test](../doc/libs/std/algorithm/.test/union_alt_operator.png)](../doc/libs/std/algorithm/.test/union_alt_operator.log) | [union_alt_operator](../doc/libs/std/algorithm/union.md) |
 | [![test](../doc/libs/std/algorithm/.test/union_operator.png)](../doc/libs/std/algorithm/.test/union_operator.log) | [union_operator](../doc/libs/std/algorithm/union.md) |
-| [![test](../doc/structure/.test/use_statement.png)](../doc/structure/.test/use_statement.log) | [use_statement](../doc/structure/use.md) |
-| [![test](../doc/structure/.test/use_statement_all.png)](../doc/structure/.test/use_statement_all.log) | [use_statement_all](../doc/structure/use.md) |
-| [![test](../doc/structure/.test/use_statement_as.png)](../doc/structure/.test/use_statement_as.log) | [use_statement_as](../doc/structure/use.md) |
-| [![test](../doc/structure/.test/use_statement_as_module.png)](../doc/structure/.test/use_statement_as_module.log) | [use_statement_as_module](../doc/structure/use.md) |
-| [![test](../doc/structure/.test/use_statement_module.png)](../doc/structure/.test/use_statement_module.log) | [use_statement_module](../doc/structure/use.md) |
+| [![test](../doc/structure/.test/use.png)](../doc/structure/.test/use.log) | [use](../doc/structure/use.md) |
+| [![test](../doc/structure/.test/use_all.png)](../doc/structure/.test/use_all.log) | [use_all](../doc/structure/use.md) |
+| [![test](../doc/structure/.test/use_as.png)](../doc/structure/.test/use_as.log) | [use_as](../doc/structure/use.md) |
+| [![test](../doc/structure/.test/use_as_module.png)](../doc/structure/.test/use_as_module.log) | [use_as_module](../doc/structure/use.md) |
+| [![test](../doc/structure/.test/use_module.png)](../doc/structure/.test/use_module.log) | [use_module](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_statement_pub.png)](../doc/structure/.test/use_statement_pub.log) | [use_statement_pub](../doc/structure/use.md) |
 | [![test](../doc/debug/.test/verify_assert.png)](../doc/debug/.test/verify_assert.log) | [verify_assert](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_assert_fail.png)](../doc/debug/.test/verify_assert_fail.log) | [verify_assert_fail](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_panic.png)](../doc/debug/.test/verify_panic.log) | [verify_panic](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_todo.png)](../doc/debug/.test/verify_todo.log) | [verify_todo](../doc/debug/README.md) |
+| [![test](../doc/structure/.test/workbench_example.png)](../doc/structure/.test/workbench_example.log) | [workbench_example](../doc/structure/functions.md) |
+| [![test](../doc/structure/.test/workbench_fn_prop.png)](../doc/structure/.test/workbench_fn_prop.log) | [workbench_fn_prop](../doc/structure/functions.md) |
+| [![test](../doc/structure/.test/workbench_pub.png)](../doc/structure/.test/workbench_pub.log) | [workbench_pub](../doc/structure/functions.md) |

@@ -1,0 +1,6 @@
+Parser error:  --> 2:11
+  |
+2 |     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
+  |           ^---
+  |
+  = expected identifier_part

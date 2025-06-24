@@ -1,14 +1,15 @@
 # Basic Concepts
 
-- [Basic Concepts](#basic-concepts)
-  - [µcad Rules](#µcad-rules)
-  - [The Build Process](#the-build-process)
-    - [Parsing Phase](#parsing-phase)
-    - [Resolving Phase](#resolving-phase)
-    - [Evaluation Phase](#evaluation-phase)
-    - [Export Phase](#export-phase)
-    - [Viewing](#viewing)
-  - [Elements](#elements)
+- [µcad Rules](#µcad-rules)
+- [The Build Process](#the-build-process)
+  - [Parsing Phase](#parsing-phase)
+  - [Resolving Phase](#resolving-phase)
+  - [Evaluation Phase](#evaluation-phase)
+  - [Export Phase](#export-phase)
+  - [Viewing](#viewing)
+- [Elements](#elements)
+- [Coding Conventions](#coding-conventions)
+  - [Naming](#naming)
 
 ## µcad Rules
 

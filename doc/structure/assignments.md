@@ -8,6 +8,8 @@ Therefore, they differ from the variables known in other programming languages.
 Every assignment in µcad is  a variable.
 So this example defines the variable `a` which from then is a reserved name within the scope in which it was defined.
 
+[![test](.test/assignment.png)](.test/assignment.log)
+
 ```µcad,assignment
 a = 5;
 b = a * 2;

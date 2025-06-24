@@ -1,0 +1,6 @@
+Parser error:   --> 13:11
+   |
+13 |     pub fn square(x: Scalar) {
+   |           ^---
+   |
+   = expected identifier_part

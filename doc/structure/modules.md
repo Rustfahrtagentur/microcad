@@ -6,9 +6,9 @@ TODO
 
 ## Mod
 
-[![test](.test/module_example.png)](.test/module_example.log)
+[![test](.test/mod_example.png)](.test/mod_example.log)
 
-```µcad,module_example
+```µcad,mod_example
 mod std {
     mod math {
         // define PI as property
