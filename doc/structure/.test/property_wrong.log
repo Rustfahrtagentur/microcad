@@ -7,17 +7,19 @@ error: Missing arguments: outer
    1 | sketch wheel(outer: length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol info not found.
-  ---> <from_str>:14:1
+error: Property not found: outer
+  ---> <from_str>:14:20
      |
-  14 | info("outer: {t.outer}");
-     | ^^^^^^^^^^^^^^^^^^^^^^^^
+  14 | std::info("outer: {t.outer}");
+     |                    ^^^^^^^
      |
-error: Symbol info not found.
-  ---> <from_str>:16:1
+info: outer: <invalid>
+error: Property not found: inner
+  ---> <from_str>:16:20
      |
-  16 | info("inner: {t.inner}");
-     | ^^^^^^^^^^^^^^^^^^^^^^^^
+  16 | std::info("inner: {t.inner}");
+     |                    ^^^^^^^
      |
+info: inner: <invalid>
 -- Test result --
 FAILED AS EXPECTED

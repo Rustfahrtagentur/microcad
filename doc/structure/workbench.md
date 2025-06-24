@@ -280,10 +280,10 @@ sketch wheel(outer: length) {
     circle(radius) - circle(inner);
 }
 
-t = wheel(1cm);
+t = wheel(outer = 1cm);
 
 // you can still extract and display `outer`
-info("outer: {t.outer}");
+std::info("outer: {t.outer}");
 // error: but you cannot access `inner` anymore
-info("inner: {t.inner}");
+std::info("inner: {t.inner}");
 ```

@@ -14,7 +14,7 @@ So this would be a neutral operation:
 op nop() { @children }
 
 // use operation nop on a circle
-nop() std::circle(radius = 1cm);
+nop() std::geo2d::circle(radius = 1cm);
 ```
 
 ## `@children`
@@ -40,8 +40,8 @@ op punched_disk() {
 
 // use operation punch_disk with two circles
 punched_disk() {
-    std::circle(radius = 1cm);
-    std::circle(radius = 2cm);
+    std::geo2d::circle(radius = 1cm);
+    std::geo2d::circle(radius = 2cm);
 }
 ```
 
@@ -55,7 +55,7 @@ op punch_disk(radius: Length) {
     if @children.count() == 1 {
         difference() { 
             @children 
-            std::circle(radius)
+            std::geo2d::circle(radius)
         } 
     } else {
         std::error("punch_disk must get one object");
@@ -64,6 +64,6 @@ op punch_disk(radius: Length) {
 
 // use operation punch_disk on a circle
 punch_disk(radius = 1cm) {
-    std::circle(radius = 2cm);
+    std::geo2d::circle(radius = 2cm);
 }
 ```

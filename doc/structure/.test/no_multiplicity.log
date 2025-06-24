@@ -1,8 +1,4 @@
-Parser error:  --> 1:21
-  |
-1 | std::translate(x = -, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-  |                     ^---
-  |
-  = expected COMMENT, format_string, literal, list_expression, tuple_expression, nested, unary_minus, unary_plus, or unary_not
+-- Output --
+-- Errors --
 -- Test result --
-FAIL
+OK
