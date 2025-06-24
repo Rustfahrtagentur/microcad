@@ -23,8 +23,8 @@ use microcad_lang::resolve::*;
 
 pub(crate) use algorithm::*;
 pub(crate) use assert::*;
-pub(crate) use math::math;
-pub(crate) use print::print;
+pub(crate) use math::*;
+pub(crate) use print::*;
 pub(crate) use transform::*;
 
 /// Build the standard module
@@ -34,6 +34,8 @@ pub fn builtin_module() -> Symbol {
         .symbol(assert_valid())
         .symbol(assert_invalid())
         .symbol(print())
+        .symbol(error())
+        .symbol(warning())
         .symbol(algorithm())
         .symbol(transform())
         .symbol(math())

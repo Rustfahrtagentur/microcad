@@ -172,6 +172,10 @@ pub enum EvalError {
     /// Missing arguments
     #[error("Missing arguments: {0}")]
     MissingArguments(ParameterValueList),
+
+    /// Builtin error
+    #[error("Builtin error: {0}")]
+    BuiltinError(String),
 }
 
 /// Result type of any evaluation.
