@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**94** tests from markdown.
+**95** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -31,6 +31,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../.test/first_example.png)](../.test/first_example.log) | [first_example](../README.md) |
 | [![test](../doc/libs/std/algorithm/.test/hull_multiple.png)](../doc/libs/std/algorithm/.test/hull_multiple.log) | [hull_multiple](../doc/libs/std/algorithm/hull.md) |
 | [![test](../doc/libs/std/algorithm/.test/hull_single.png)](../doc/libs/std/algorithm/.test/hull_single.log) | [hull_single](../doc/libs/std/algorithm/hull.md) |
+| [![test](../doc/structure/.test/if.png)](../doc/structure/.test/if.log) | [if](../doc/structure/conditionals.md) |
 | [![test](../doc/structure/.test/init_property.png)](../doc/structure/.test/init_property.log) | [init_property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/initial_source_file_2D.png)](../doc/structure/.test/initial_source_file_2D.log) | [initial_source_file_2D](../doc/structure/source_files.md) |
 | [![test](../doc/structure/.test/initial_source_file_3D.png)](../doc/structure/.test/initial_source_file_3D.log) | [initial_source_file_3D](../doc/structure/source_files.md) |

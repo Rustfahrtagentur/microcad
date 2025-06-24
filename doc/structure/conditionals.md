@@ -1,7 +1,22 @@
 # Conditionals
 
-TODO
+Conditions lead to different executions paths for different cases.
 
 ## If Statement
 
-TODO
+```µcad,if#todo
+fn f( x: Scalar ) {
+    if x == 5 || x == 4 {
+        std::print("match");
+    } else if x > 0 && x < 4 {
+        std::print("no match");
+    } else {
+        std::print("invalid");
+    }
+}
+
+f(5);  // prints "match"
+f(1);  // prints "no match"
+f(-1); // prints "invalid"
+f(6);  // prints "invalid"
+```
