@@ -3,10 +3,13 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**87** tests from markdown.
+**94** tests from markdown.
 
 | Result | Name |
 |-------:|------|
+| [![test](../doc/structure/.test/argument_match_mix.png)](../doc/structure/.test/argument_match_mix.log) | [argument_match_mix](../doc/structure/arguments.md) |
+| [![test](../doc/structure/.test/argument_match_name.png)](../doc/structure/.test/argument_match_name.log) | [argument_match_name](../doc/structure/arguments.md) |
+| [![test](../doc/structure/.test/argument_match_type.png)](../doc/structure/.test/argument_match_type.log) | [argument_match_type](../doc/structure/arguments.md) |
 | [![test](../doc/types/.test/array_unit_bundling.png)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/arrays.md) |
 | [![test](../doc/structure/.test/assignment.png)](../doc/structure/.test/assignment.log) | [assignment](../doc/structure/assignments.md) |
 | [![test](../doc/structure/.test/assignment_immutable.png)](../doc/structure/.test/assignment_immutable.log) | [assignment_immutable](../doc/structure/assignments.md) |
@@ -41,9 +44,9 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/missed_property.png)](../doc/structure/.test/missed_property.log) | [missed_property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/mod.png)](../doc/structure/.test/mod.log) | [mod](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/mod_example.png)](../doc/structure/.test/mod_example.log) | [mod_example](../doc/structure/modules.md) |
-| [![test](../doc/structure/.test/multiplicity_arrays.png)](../doc/structure/.test/multiplicity_arrays.log) | [multiplicity_arrays](../doc/structure/calls.md) |
-| [![test](../doc/structure/.test/multiplicity_tuple_array.png)](../doc/structure/.test/multiplicity_tuple_array.log) | [multiplicity_tuple_array](../doc/structure/calls.md) |
-| [![test](../doc/structure/.test/no_multiplicity.png)](../doc/structure/.test/no_multiplicity.log) | [no_multiplicity](../doc/structure/calls.md) |
+| [![test](../doc/structure/.test/multiplicity_arrays.png)](../doc/structure/.test/multiplicity_arrays.log) | [multiplicity_arrays](../doc/structure/arguments.md) |
+| [![test](../doc/structure/.test/multiplicity_tuple_array.png)](../doc/structure/.test/multiplicity_tuple_array.log) | [multiplicity_tuple_array](../doc/structure/arguments.md) |
+| [![test](../doc/structure/.test/no_multiplicity.png)](../doc/structure/.test/no_multiplicity.log) | [no_multiplicity](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/none.png)](../doc/structure/.test/none.log) | [none](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/op_example.png)](../doc/structure/.test/op_example.log) | [op_example](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/parameters.png)](../doc/structure/.test/parameters.log) | [parameters](../doc/structure/op.md) |
@@ -61,6 +64,10 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/tuple_fields_C.png)](../doc/types/.test/tuple_fields_C.log) | [tuple_fields_C](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_fields_D.png)](../doc/types/.test/tuple_fields_D.log) | [tuple_fields_D](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_fields_E.png)](../doc/types/.test/tuple_fields_E.log) | [tuple_fields_E](../doc/types/tuples.md) |
+| [![test](../doc/structure/.test/tuple_match.png)](../doc/structure/.test/tuple_match.log) | [tuple_match](../doc/structure/arguments.md) |
+| [![test](../doc/structure/.test/tuple_match_errors.png)](../doc/structure/.test/tuple_match_errors.log) | [tuple_match_errors](../doc/structure/arguments.md) |
+| [![test](../doc/structure/.test/tuple_match_variants.png)](../doc/structure/.test/tuple_match_variants.log) | [tuple_match_variants](../doc/structure/arguments.md) |
+| [![test](../doc/structure/.test/tuple_match_warnings.png)](../doc/structure/.test/tuple_match_warnings.log) | [tuple_match_warnings](../doc/structure/arguments.md) |
 | [![test](../doc/types/.test/tuple_named_tuple.png)](../doc/types/.test/tuple_named_tuple.log) | [tuple_named_tuple](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_parameters_A.png)](../doc/types/.test/tuple_parameters_A.log) | [tuple_parameters_A](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_parameters_B.png)](../doc/types/.test/tuple_parameters_B.log) | [tuple_parameters_B](../doc/types/tuples.md) |
