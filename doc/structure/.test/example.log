@@ -1,2 +1,6 @@
+-- Output --
+-- Errors --
 error: Not implemented: Function evaluation
 error: Not implemented: Function evaluation
+-- Test result --
+FAIL

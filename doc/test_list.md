@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**95** tests from markdown.
+**93** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -24,8 +24,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/algorithm/.test/difference_alt_operator.png)](../doc/libs/std/algorithm/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/libs/std/algorithm/difference.md) |
 | [![test](../doc/libs/std/algorithm/.test/difference_operator.png)](../doc/libs/std/algorithm/.test/difference_operator.log) | [difference_operator](../doc/libs/std/algorithm/difference.md) |
 | [![test](../doc/structure/.test/example.png)](../doc/structure/.test/example.log) | [example](../doc/structure/functions.md) |
-| [![test](../doc/.test/EXAMPLES_fields.png)](../doc/.test/EXAMPLES_fields.log) | [EXAMPLES_fields](../doc/EXAMPLES.md) |
-| [![test](../doc/.test/EXAMPLES_functions.png)](../doc/.test/EXAMPLES_functions.log) | [EXAMPLES_functions](../doc/EXAMPLES.md) |
 | [![test](../doc/libs/std/.test/export_multiple.png)](../doc/libs/std/.test/export_multiple.log) | [export_multiple](../doc/libs/std/export.md) |
 | [![test](../doc/libs/std/.test/export_single.png)](../doc/libs/std/.test/export_single.log) | [export_single](../doc/libs/std/export.md) |
 | [![test](../.test/first_example.png)](../.test/first_example.log) | [first_example](../README.md) |

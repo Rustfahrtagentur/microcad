@@ -1,6 +1,10 @@
+-- Output --
+-- Errors --
 error: Assertion failed: false: this assertion fails
   ---> <from_str>:1:20
      |
    1 | std::debug::assert(false, "this assertion fails");
      |                    ^^^^^
      |
+-- Test result --
+FAILED AS EXPECTED

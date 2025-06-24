@@ -34,10 +34,21 @@ pub fn warning() -> Symbol {
     let id = Identifier::from_str("warning").expect("valid id");
     Symbol::new_builtin(id, None, &|_params, args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
-            context.error(
+            context.warning(
                 args,
                 EvalError::BuiltinError(format!("{value}", value = arg.value)),
             )
+        })?;
+        Ok(Value::None)
+    })
+}
+
+pub fn info() -> Symbol {
+    let id = Identifier::from_str("info").expect("valid id");
+    Symbol::new_builtin(id, None, &|_params, args, context| {
+        args.iter().try_for_each(|arg| -> Result<(), EvalError> {
+            context.info(args, format!("{value}", value = arg.value));
+            Ok(())
         })?;
         Ok(Value::None)
     })

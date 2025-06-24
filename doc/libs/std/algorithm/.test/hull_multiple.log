@@ -1,6 +1,10 @@
+-- Output --
+-- Errors --
 error: Symbol hull not found.
   ---> <from_str>:4:1
      |
    4 | hull() {
      | ^^^^^^
      |
+-- Test result --
+TODO

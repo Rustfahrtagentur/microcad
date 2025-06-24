@@ -1,6 +1,10 @@
+-- Output --
+-- Errors --
 error: Symbol std::circle not found.
   ---> <from_str>:5:7
      |
    5 | nop() std::circle(radius = 1cm);
      |       ^^^^^^^^^^^^^^^^^^^^^^^^^
      |
+-- Test result --
+FAIL

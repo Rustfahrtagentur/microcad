@@ -397,9 +397,11 @@ fn create_test_code(
                 r##"{
                         // test expected to fail failed at parsing?
                         Err(err) => {
-                            out.write_all(format!("{err}").as_bytes()).unwrap();
+                            out.write_all(format!("{err}").as_bytes()).expect("output error");
+                            writeln!(out).expect("output error");
                             let _ = fs::remove_file(banner);
                             let _ = fs::hard_link("images/fail_ok.png", banner);
+                            writeln!(out, "-- Test result --\nFAILED AS EXPECTED").expect("output error");
                             log::debug!("{err}")
                         },
                         // test expected to fail succeeded at parsing?
@@ -409,9 +411,10 @@ fn create_test_code(
                             let eval = context.eval();
 
                             // get print output
-                            write!(out, "{}", context.output().expect("capture error")).expect("output error");
+                            write!(out, "-- Output --\n{}", context.output().expect("capture error")).expect("output error");
 
                             // print any error
+                            writeln!(out, "-- Errors --").expect("internal error");
                             context.write_diagnosis(out).expect("internal error");
 
                             let _ = fs::remove_file(banner);
@@ -421,16 +424,19 @@ fn create_test_code(
                                 // evaluation had been aborted?
                                 (Err(err),_) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
+                                    writeln!(out, "-- Test result --\nFAILED AS EXPECTED").expect("output error");
                                     log::debug!("{err}");
                                 }
                                 // evaluation produced errors?
                                 (_,true) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
-                                   log::debug!("there were {error_count} errors (see {out_name})", error_count = context.error_count());
+                                    writeln!(out, "-- Test result --\nFAILED AS EXPECTED").expect("output error");
+                                    log::debug!("there were {error_count} errors (see {out_name})", error_count = context.error_count());
                                  }
                                 // test expected to fail but succeeds?
                                 (_,_) => {
                                     let _ = fs::hard_link("images/ok_fail.png", banner);
+                                    writeln!(out, "-- Test result --\nOK BUT SHOULD FAIL").expect("output error");
                                     panic!("ERROR: test is marked to fail but succeeded");
                                 }
                             }
@@ -444,10 +450,14 @@ fn create_test_code(
                             let _ = fs::remove_file(banner);
         
                             out.write_all(format!("{err}").as_bytes()).unwrap();
+                            writeln!(out).expect("output error");
+                            
                             if todo {
                                 let _ = fs::hard_link("images/todo.png", banner);
+                                writeln!(out, "-- Test result --\nFAIL (TODO)").expect("output error");
                             } else {
                                 let _ = fs::hard_link("images/fail.png", banner);
+                                writeln!(out, "-- Test result --\nFAIL").expect("output error");
                                 panic!("ERROR: {err}")
                             }
                         },
@@ -458,9 +468,10 @@ fn create_test_code(
                             let eval = context.eval();
                             
                             // get print output
-                            write!(out, "{}", context.output().expect("capture error")).expect("output error");
+                            write!(out, "-- Output --\n{}", context.output().expect("capture error")).expect("output error");
 
                             // print any error
+                            writeln!(out, "-- Errors --").expect("internal error");
                             context.write_diagnosis(out).expect("internal error");
 
                             let _ = fs::remove_file(banner);
@@ -468,22 +479,31 @@ fn create_test_code(
                             // check if test awaited to succeed but failed at evaluation
                             match (eval, context.has_errors(), todo) {
                                 // test expected to succeed and succeeds with no errors
-                                (Ok(_),false,false) => { let _ = fs::hard_link("images/ok.png", banner); }
+                                (Ok(_),false,false) => {
+                                    let _ = fs::hard_link("images/ok.png", banner); 
+                                    writeln!(out, "-- Test result --\nOK").expect("output error");
+                                }
                                 // test is todo but succeeds with no errors
-                                (Ok(_),false,true) => { let _ = fs::hard_link("images/not_todo.png", banner); }
+                                (Ok(_),false,true) => { 
+                                    let _ = fs::hard_link("images/not_todo.png", banner); 
+                                    writeln!(out, "-- Test result --\nOK BUT IS TODO").expect("output error");
+                                }
                                 // Any error but todo
                                 (_,_,true) => {
                                     let _ = fs::hard_link("images/todo.png", banner);
+                                    writeln!(out, "-- Test result --\nTODO").expect("output error");
                                 }
                                 // evaluation had been aborted?
                                 (Err(err),_,_) => {
                                     let _ = fs::hard_link("images/fail.png", banner);
                                     out.write_all(format!("{err}").as_bytes()).unwrap();
+                                    writeln!(out, "-- Test result --\nFAIL").expect("output error");
                                     panic!("ERROR: {err}")
                                 }
                                 // evaluation produced errors?
                                 (_,true,_) => {
                                     let _ = fs::hard_link("images/fail.png", banner);
+                                    writeln!(out, "-- Test result --\nFAIL").expect("output error");
                                     panic!("ERROR: there were {error_count} errors (see {out_name})", error_count = context.error_count());
                                 }
                             }

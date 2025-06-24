@@ -21,3 +21,4 @@ part export(filename: String) {
 pub use __builtin::print;
 pub use __builtin::error;
 pub use __builtin::warning;
+pub use __builtin::info;

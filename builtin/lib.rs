@@ -36,6 +36,7 @@ pub fn builtin_module() -> Symbol {
         .symbol(print())
         .symbol(error())
         .symbol(warning())
+        .symbol(info())
         .symbol(algorithm())
         .symbol(transform())
         .symbol(math())

@@ -1,0 +1,677 @@
+
+========= ./doc/libs/std/math/.test/math_trigonometric.log =========
+
+error: Symbol cos not found.
+  ---> <from_str>:4:8
+     |
+   4 | assert(cos(pi) == -1.);
+     |        ^^^^^^^
+     |
+error: Assertion failed: <invalid>
+  ---> <from_str>:4:8
+     |
+   4 | assert(cos(pi) == -1.);
+     |        ^^^^^^^^^^^^^^
+     |
+error: Symbol tan not found.
+  ---> <from_str>:5:8
+     |
+   5 | assert(tan(0) == 0.);
+     |        ^^^^^^
+     |
+error: Assertion failed: <invalid>
+  ---> <from_str>:5:8
+     |
+   5 | assert(tan(0) == 0.);
+     |        ^^^^^^^^^^^^
+     |
+
+-- TODO --
+
+========= ./doc/libs/std/math/.test/math_abs.log =========
+
+
+-- OK --
+
+========= ./doc/libs/std/algorithm/.test/hull_multiple.log =========
+
+error: Symbol hull not found.
+  ---> <from_str>:4:1
+     |
+   4 | hull() {
+     | ^^^^^^
+     |
+
+-- TODO --
+
+========= ./doc/libs/std/algorithm/.test/union_operator.log =========
+
+
+-- OK --
+
+========= ./doc/libs/std/algorithm/.test/hull_single.log =========
+
+error: Symbol hull not found.
+  ---> <from_str>:1:1
+     |
+   1 | hull()
+     | ^^^^^^
+     |
+
+-- TODO --
+
+========= ./doc/libs/std/algorithm/.test/intersection_alt_operator.log =========
+
+
+-- OK --
+
+========= ./doc/libs/std/algorithm/.test/difference_alt_operator.log =========
+
+
+-- OK --
+
+========= ./doc/libs/std/algorithm/.test/union_alt_operator.log =========
+
+
+-- OK --
+
+========= ./doc/libs/std/algorithm/.test/intersection_operator.log =========
+
+
+-- OK --
+
+========= ./doc/libs/std/algorithm/.test/difference_operator.log =========
+
+
+-- OK --
+
+========= ./doc/libs/std/.test/export_single.log =========
+
+
+-- OK --
+
+========= ./doc/libs/std/.test/export_multiple.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/initial_source_file_3D.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/part_basic.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/initial_source_file_mixed.log =========
+
+
+-- OK BUT SHOULD FAIL --
+
+========= ./doc/structure/.test/assignment_immutable.log =========
+
+
+-- OK BUT SHOULD FAIL --
+
+========= ./doc/structure/.test/initializers.log =========
+
+
+-- OK BUT SHOULD FAIL --
+
+========= ./doc/structure/.test/use_as.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/return_twice.log =========
+
+
+========= ./doc/structure/.test/use_all.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/property.log =========
+
+Parser error:  --> 8:16
+  |
+8 |     prop inner = outer / 2;
+  |                ^---
+  |
+  = expected COMMENT, identifier, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- FAIL (TODO)--
+
+========= ./doc/structure/.test/init_property.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/example.log =========
+
+error: Not implemented: Function evaluation
+error: Not implemented: Function evaluation
+
+-- FAIL --
+
+========= ./doc/structure/.test/if.log =========
+
+Parser error:  --> 2:16
+  |
+2 |     if x == 5 || x == 4 {
+  |                ^---
+  |
+  = expected COMMENT, format_string, literal, list_expression, tuple_expression, nested, unary_minus, unary_plus, or unary_not
+-- FAIL (TODO)--
+
+========= ./doc/structure/.test/parameters.log =========
+
+Parser error:  --> 3:8
+  |
+3 |     if @children.count() == 1 {
+  |        ^---
+  |
+  = expected COMMENT or expression
+-- FAIL --
+
+========= ./doc/structure/.test/mod_example.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/assignment.log =========
+
+error: Symbol std::assert_eq not found.
+  ---> <from_str>:3:1
+     |
+   3 | std::assert_eq(a,5);
+     | ^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol std::assert_eq not found.
+  ---> <from_str>:4:1
+     |
+   4 | std::assert_eq(b,10);
+     | ^^^^^^^^^^^^^^^^^^^^
+     |
+
+-- FAIL --
+
+========= ./doc/structure/.test/building_plan.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/call_workbench.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/use_statement_pub.log =========
+
+
+========= ./doc/structure/.test/multiplicity_tuple_array.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/call_function.log =========
+
+Parser error:  --> 8:15
+  |
+8 | std::assert_eq!( s, 4 );
+  |               ^---
+  |
+  = expected COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- FAIL --
+
+========= ./doc/structure/.test/code_between_initializers.log =========
+
+
+-- OK BUT SHOULD FAIL --
+
+========= ./doc/structure/.test/missed_property.log =========
+
+
+-- OK BUT SHOULD FAIL --
+
+========= ./doc/structure/.test/tuple_match_warnings.log =========
+
+error: Not implemented: Function evaluation
+
+-- FAILED AS EXPECTED --
+
+========= ./doc/structure/.test/tuple_match_variants.log =========
+
+error: Not implemented: Function evaluation
+error: Not implemented: Function evaluation
+error: Not implemented: Function evaluation
+error: Not implemented: Function evaluation
+error: Not implemented: Function evaluation
+error: Not implemented: Function evaluation
+
+-- FAIL --
+
+========= ./doc/structure/.test/none.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/tuple_match_errors.log =========
+
+error: Not implemented: Function evaluation
+
+-- FAILED AS EXPECTED --
+
+========= ./doc/structure/.test/code_post_init.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/workbench_fn_prop.log =========
+
+Parser error:  --> 2:11
+  |
+2 |     pub fn inner() { 
+  |           ^---
+  |
+  = expected identifier_part
+-- FAILED AS EXPECTED --
+
+========= ./doc/structure/.test/no_multiplicity.log =========
+
+Parser error:  --> 1:21
+  |
+1 | std::translate(x = -, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
+  |                     ^---
+  |
+  = expected COMMENT, format_string, literal, list_expression, tuple_expression, nested, unary_minus, unary_plus, or unary_not
+-- FAIL --
+
+========= ./doc/structure/.test/argument_match_mix.log =========
+
+Parser error:  --> 3:1
+  |
+3 | f(1.0, b=2cm, 3cm);
+  | ^---
+  |
+  = expected COMMENT or body
+-- FAIL --
+
+========= ./doc/structure/.test/sketch_basic.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/argument_match_type.log =========
+
+Parser error:  --> 3:1
+  |
+3 | f(1.0, 2cm, 3cm²);
+  | ^---
+  |
+  = expected COMMENT or body
+-- FAIL --
+
+========= ./doc/structure/.test/use_module.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/use.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/children.log =========
+
+Parser error:  --> 4:8
+  |
+4 |     if @children.count() == 2 && {
+  |        ^---
+  |
+  = expected COMMENT or expression
+-- FAIL --
+
+========= ./doc/structure/.test/use_as_module.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/code.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/op_example.log =========
+
+error: Symbol std::circle not found.
+  ---> <from_str>:5:7
+     |
+   5 | nop() std::circle(radius = 1cm);
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+
+-- FAIL --
+
+========= ./doc/structure/.test/call_op.log =========
+
+error: Not implemented: Function evaluation
+
+-- FAIL --
+
+========= ./doc/structure/.test/return.log =========
+
+
+========= ./doc/structure/.test/pre_init_code.log =========
+
+Parser error:  --> 3:18
+  |
+3 |     const FACTOR = 2.0;
+  |                  ^---
+  |
+  = expected COMMENT, identifier, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- FAIL --
+
+========= ./doc/structure/.test/initial_source_file_2D.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/property_wrong.log =========
+
+error: Missing arguments: outer
+
+  ---> <from_str>:1:1
+     |
+   1 | sketch wheel(outer: length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol info not found.
+  ---> <from_str>:14:1
+     |
+  14 | info("outer: {t.outer}");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol info not found.
+  ---> <from_str>:16:1
+     |
+  16 | info("inner: {t.inner}");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+
+-- FAILED AS EXPECTED --
+
+========= ./doc/structure/.test/workbench_example.log =========
+
+error: Symbol circle not found.
+  ---> <from_str>:8:5
+     |
+   8 |     circle(radius) - circle(inner());
+     |     ^^^^^^^^^^^^^^
+     |
+error: Symbol circle not found.
+  ---> <from_str>:8:22
+     |
+   8 |     circle(radius) - circle(inner());
+     |                      ^^^^^^^^^^^^^^^
+     |
+
+-- TODO --
+
+========= ./doc/structure/.test/tuple_match.log =========
+
+Parser error:  --> 9:1
+  |
+9 | f( plane, z=3cm);
+  | ^---
+  |
+  = expected COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
+-- FAIL --
+
+========= ./doc/structure/.test/part_declaration.log =========
+
+Parser error:  --> 5:18
+  |
+5 |     const FACTOR = 2;
+  |                  ^---
+  |
+  = expected COMMENT, identifier, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- FAIL --
+
+========= ./doc/structure/.test/multiplicity_arrays.log =========
+
+
+-- OK --
+
+========= ./doc/structure/.test/workbench_pub.log =========
+
+Parser error:  --> 2:11
+  |
+2 |     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
+  |           ^---
+  |
+  = expected identifier_part
+-- FAILED AS EXPECTED --
+
+========= ./doc/structure/.test/mod.log =========
+
+Parser error:   --> 13:11
+   |
+13 |     pub fn square(x: Scalar) {
+   |           ^---
+   |
+   = expected identifier_part
+-- FAIL --
+
+========= ./doc/structure/.test/argument_match_name.log =========
+
+Parser error:  --> 3:1
+  |
+3 | f(x = 1cm, y = 2cm, z = 3cm);
+  | ^---
+  |
+  = expected COMMENT or body
+-- FAIL --
+
+========= ./doc/types/.test/types_def_vs_decl.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_quantity_area_units.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_quantity_angle.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_quantity_scalar.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/array_unit_bundling.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/tuple_fields_D.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/tuple_parameters_C.log =========
+
+Parser error:  --> 1:11
+  |
+1 | part box(x,y,z = 0mm) {}
+  |           ^---
+  |
+  = expected COMMENT
+-- FAILED AS EXPECTED --
+
+========= ./doc/types/.test/tuple_fields_A.log =========
+
+Parser error:  --> 1:17
+  |
+1 | (width, height) = (1,2)mm;
+  |                 ^---
+  |
+  = expected EOI, COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
+-- FAILED AS EXPECTED --
+
+========= ./doc/types/.test/types_quantity_area.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_bundles_functions.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_quantity_weight.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/tuple_parameters_A.log =========
+
+Parser error:  --> 1:10
+  |
+1 | part box((x,y,z) = 0mm) {}
+  |          ^---
+  |
+  = expected COMMENT or identifier
+-- FAILED AS EXPECTED --
+
+========= ./doc/types/.test/tuple_named_tuple.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_primitive_string.log =========
+
+Hello µcad!
+error: Not implemented: call_method for String
+error: Assertion failed: <invalid>
+  ---> <from_str>:2:20
+     |
+   2 | std::debug::assert(text.count() == 11);
+     |                    ^^^^^^^^^^^^^^^^^^
+     |
+
+-- FAIL --
+
+========= ./doc/types/.test/tuple_parameters_B.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_primitive_bool.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_quantity_volume.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_primitive_integer.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_quantity_volume_units.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/tuple_fields_E.log =========
+
+Parser error:  --> 1:6
+  |
+1 | width, height = 0mm;
+  |      ^---
+  |
+  = expected EOI, COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- FAILED AS EXPECTED --
+
+========= ./doc/types/.test/tuple_fields_B.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/types_quantity_length.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/quantity_types_number_literals.log =========
+
+
+-- OK --
+
+========= ./doc/types/.test/tuple_fields_C.log =========
+
+Parser error:  --> 1:17
+  |
+1 | (width, height) = (0mm,0mm);
+  |                 ^---
+  |
+  = expected EOI, COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
+-- FAILED AS EXPECTED --
+
+========= ./doc/types/.test/types_no_declaration.log =========
+
+Parser error:  --> 1:10
+  |
+1 | x: Length;         // error
+  |          ^---
+  |
+  = expected COMMENT
+-- FAILED AS EXPECTED --
+
+========= ./doc/debug/.test/verify_todo.log =========
+
+Parser error:  --> 3:6
+  |
+3 | if a = 0 
+  |      ^---
+  |
+  = expected COMMENT, identifier, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- FAIL (TODO)--
+
+========= ./doc/debug/.test/verify_panic.log =========
+
+Parser error:  --> 4:5
+  |
+4 |     std::panic("this should not have happened");
+  |     ^---
+  |
+  = expected COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- FAIL (TODO)--
+
+========= ./doc/debug/.test/verify_assert.log =========
+
+
+-- OK --
+
+========= ./doc/debug/.test/verify_assert_fail.log =========
+
+error: Assertion failed: false: this assertion fails
+  ---> <from_str>:1:20
+     |
+   1 | std::debug::assert(false, "this assertion fails");
+     |                    ^^^^^
+     |
+
+-- FAILED AS EXPECTED --
+
+========= ./doc/nodes/.test/measure.log =========
+

@@ -1,3 +1,5 @@
+-- Output --
+-- Errors --
 error: Missing arguments: outer
 
   ---> <from_str>:1:1
@@ -17,3 +19,5 @@ error: Symbol info not found.
   16 | info("inner: {t.inner}");
      | ^^^^^^^^^^^^^^^^^^^^^^^^
      |
+-- Test result --
+FAILED AS EXPECTED

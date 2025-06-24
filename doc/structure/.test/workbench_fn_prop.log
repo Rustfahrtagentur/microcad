@@ -4,3 +4,5 @@ Parser error:  --> 2:11
   |           ^---
   |
   = expected identifier_part
+-- Test result --
+FAILED AS EXPECTED

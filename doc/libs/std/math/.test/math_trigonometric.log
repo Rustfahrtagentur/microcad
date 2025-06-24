@@ -1,3 +1,5 @@
+-- Output --
+-- Errors --
 error: Symbol cos not found.
   ---> <from_str>:4:8
      |
@@ -22,3 +24,5 @@ error: Assertion failed: <invalid>
    5 | assert(tan(0) == 0.);
      |        ^^^^^^^^^^^^
      |
+-- Test result --
+TODO

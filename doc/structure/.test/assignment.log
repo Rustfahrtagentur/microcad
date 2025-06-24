@@ -1,3 +1,5 @@
+-- Output --
+-- Errors --
 error: Symbol std::assert_eq not found.
   ---> <from_str>:3:1
      |
@@ -10,3 +12,5 @@ error: Symbol std::assert_eq not found.
    4 | std::assert_eq(b,10);
      | ^^^^^^^^^^^^^^^^^^^^
      |
+-- Test result --
+FAIL

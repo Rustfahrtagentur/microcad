@@ -4,3 +4,5 @@ Parser error:  --> 4:5
   |     ^---
   |
   = expected COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- Test result --
+FAIL (TODO)
