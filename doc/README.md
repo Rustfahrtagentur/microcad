@@ -36,8 +36,9 @@ It's planned to implement [*custom types*](types/custom_types.md) in future.
 
 ## Calls
 
-In µcad you may call [*workbenches*](structure/calls.md#calling-workbenches) to produce *objects* from [sketches](structure/sketch.md)
-or [*parts*](structure/part.md) or you may call [*functions*](structure/calls.md#calling-functions).
+In µcad you may [call](structure/calls.md) [*workbenches*](structure/calls.md#calling-workbenches) to produce
+*objects* from [sketches](structure/sketch.md) or [*parts*](structure/part.md) or you may call
+[*functions*](structure/calls.md#calling-functions).
 
 In both cases you shall read about [*argument multiplicity*](structure/arguments.md#argument-multiplicity) and
 [*argument matching*](structure/arguments.md#argument-matching) to understand how µcad is processing arguments.
