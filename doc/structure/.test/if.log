@@ -1,8 +1,8 @@
-Parser error:  --> 2:16
+Parser error:  --> 4:12
   |
-2 |     if x == 5 || x == 4 {
-  |                ^---
+4 |     } else if x > 0 and x < 4 {
+  |            ^---
   |
-  = expected COMMENT, format_string, literal, list_expression, tuple_expression, nested, unary_minus, unary_plus, or unary_not
+  = expected COMMENT or body
 -- Test result --
 FAIL (TODO)

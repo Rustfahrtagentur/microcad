@@ -1,6 +1,6 @@
 Parser error:  --> 4:8
   |
-4 |     if @children.count() == 2 && {
+4 |     if @children.count() == 2 {
   |        ^---
   |
   = expected COMMENT or expression

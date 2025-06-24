@@ -30,7 +30,7 @@ std::geo2d::circle(radius = 1cm);
 [![test](.test/initial_source_file_3D.png)](.test/initial_source_file_3D.log)
 
 ```µcad,initial_source_file_3D
-// simply draw a cube
+// simply draw a sphere
 std::geo3d::sphere(radius = 1cm);
 ```
 

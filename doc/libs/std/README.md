@@ -1,6 +1,6 @@
 # Standard Library
 
-The *Standard Library* is written in µcad and **covers builtin functionality** and adds more suffisticated interfaces to the core functionalities of the *Builtin Library*.
+The *Standard Library* is written in µcad and **covers builtin functionality** and adds more sophisticated interfaces to the core functionalities of the *Builtin Library*.
 So generically spoken you will find all functionalities of `__builtin` within `std` but in a handier form.
 
 ## Modules

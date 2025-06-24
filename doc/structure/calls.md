@@ -15,7 +15,7 @@ fn square(x: Scalar) { x * x }
 s = square(x = 2)
 
 // check value
-std::assert_eq!( s, 4 );
+std::debug::assert_eq( s, 4 );
 ```
 
 ## Calling Workbenches
@@ -26,7 +26,7 @@ except that the result is a object node.
 [![test](.test/call_workbench.png)](.test/call_workbench.log)
 
 ```µcad,call_workbench
-// function definition
+// definition of a sketch workbench
 sketch square(size: Length) { 
     std::geo2d::rect(size);
 }

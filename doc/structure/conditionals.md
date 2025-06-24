@@ -6,9 +6,9 @@ Conditions lead to different executions paths for different cases.
 
 ```µcad,if#todo
 fn f( x: Scalar ) {
-    if x == 5 || x == 4 {
+    if x == 5 or x == 4 {
         std::print("match");
-    } else if x > 0 && x < 4 {
+    } else if x > 0 and x < 4 {
         std::print("no match");
     } else {
         std::print("invalid");

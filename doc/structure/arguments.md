@@ -123,7 +123,8 @@ f( (x=1cm, y=2cm, v=5cm), z=3cm);  // warning: v is redundant
 
 ## Argument Multiplicity
 
-Each argument can also be provided as an *array* of elements of a parameter's type.
+Currently only [workbenches](workbench.md) support argument multiplicity.
+Each argument can be provided as an *array* of elements of a parameter's type.
 Each list element will then be evaluated for each of the array's values.
 This is known as *argument multiplicity*. This way, we can intuitively express a call that is executed for each argument variant.
 

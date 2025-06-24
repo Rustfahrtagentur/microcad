@@ -1,6 +1,8 @@
 # Builtin Library
 
-The *Builtin Library* is written in Rust and covers all **complicated tasks** (like drawing things and complexer calculations) and all communication with the compiler while the *evaluation*.
+The *Builtin library* is the bridge between µcad and Rust and covers all tasks that are not supposed to be in the µcad
+language itself (like drawing things and more complex calculations). It handles the communications with compiler and
+the geometry backend during evaluation.
 
 ## `geo2d`
 

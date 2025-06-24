@@ -19,7 +19,8 @@ nop() std::geo2d::circle(radius = 1cm);
 
 ## `@children`
 
-The *children keyword* gets the input object nodes.
+`@children` is a placeholder to tell where child nodes are nested.
+It can also be used to retrieve information about the tree structure
 In the above example `@children` will result in a `std::circle(radius = 1cm)`.
 
 An operation can have multiple children like in this example:
@@ -30,7 +31,7 @@ An operation can have multiple children like in this example:
 // define operation which takes multiple items
 op punched_disk() { 
     // check number of children
-    if @children.count() == 2 && {
+    if @children.count() == 2 {
         // make hole
         difference() { @children } 
     } else {
