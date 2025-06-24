@@ -82,7 +82,7 @@ pub enum EvalError {
     #[error("Argument count mismatch: expected {expected}, got {found} in {args}")]
     ArgumentCountMismatch {
         /// Argument list including the error
-        args: CallArgumentValueList,
+        args: ArgumentValueList,
         /// Expected number of arguments
         expected: usize,
         /// Found number of arguments
@@ -91,7 +91,7 @@ pub enum EvalError {
 
     /// Called assertion
     #[error("assert called with wrong number of arguments.")]
-    AssertWrongSignature(CallArgumentValueList),
+    AssertWrongSignature(ArgumentValueList),
 
     /// Invalid argument type.
     #[error("Invalid argument type: {0}")]

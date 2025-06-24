@@ -1,13 +1,13 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! A single call argument
+//! A single argument
 
 use crate::{ord_map::*, src_ref::*, syntax::*};
 
-/// Call argument
+/// Argument
 #[derive(Clone, Debug)]
-pub struct CallArgument {
+pub struct Argument {
     /// Name of the argument
     pub id: Option<Identifier>,
     /// Value of the argument
@@ -16,7 +16,7 @@ pub struct CallArgument {
     pub src_ref: SrcRef,
 }
 
-impl CallArgument {
+impl Argument {
     /// Returns the name, if self.name is some. If self.name is None, try to extract the name from the expression
     pub fn derived_name(&self) -> Option<Identifier> {
         match &self.id {
@@ -26,19 +26,19 @@ impl CallArgument {
     }
 }
 
-impl SrcReferrer for CallArgument {
+impl SrcReferrer for Argument {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()
     }
 }
 
-impl OrdMapValue<Identifier> for CallArgument {
+impl OrdMapValue<Identifier> for Argument {
     fn key(&self) -> Option<Identifier> {
         self.id.clone()
     }
 }
 
-impl std::fmt::Display for CallArgument {
+impl std::fmt::Display for Argument {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.id {
             Some(ref name) => write!(f, "{} = {}", name, self.value),
@@ -47,11 +47,11 @@ impl std::fmt::Display for CallArgument {
     }
 }
 
-impl PrintSyntax for CallArgument {
+impl PrintSyntax for Argument {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         match self.id {
-            Some(ref name) => writeln!(f, "{:depth$}CallArgument '{}':", "", name)?,
-            None => writeln!(f, "{:depth$}CallArgument:", "")?,
+            Some(ref name) => writeln!(f, "{:depth$}Argument '{}':", "", name)?,
+            None => writeln!(f, "{:depth$}Argument:", "")?,
         };
         self.value.print_syntax(f, depth)
     }

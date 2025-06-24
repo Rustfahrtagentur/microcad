@@ -20,8 +20,8 @@ pub enum SymbolDefinition {
     Builtin(Rc<Builtin>),
     /// Constant.
     Constant(Identifier, Value),
-    /// Call argument value.
-    CallArgument(Identifier, Value),
+    /// Argument value.
+    Argument(Identifier, Value),
     /// Alias of a pub use statement.
     Alias(Identifier, QualifiedName),
 }
@@ -35,7 +35,7 @@ impl SymbolDefinition {
             Self::Function(f) => f.id.clone(),
             Self::SourceFile(s) => s.id(),
             Self::Builtin(m) => m.id(),
-            Self::Constant(id, _) | Self::CallArgument(id, _) | Self::Alias(id, _) => id.clone(),
+            Self::Constant(id, _) | Self::Argument(id, _) | Self::Alias(id, _) => id.clone(),
         }
     }
 
@@ -64,7 +64,7 @@ impl std::fmt::Display for SymbolDefinition {
             Self::SourceFile(_) => write!(f, "(file)"),
             Self::Builtin(_) => write!(f, "(builtin)"),
             Self::Constant(_, value) => write!(f, "(constant) = {value}"),
-            Self::CallArgument(_, value) => write!(f, "(call_argument) = {value}"),
+            Self::Argument(_, value) => write!(f, "(call_argument) = {value}"),
             Self::Alias(_, name) => write!(f, "(alias) => {name}"),
         }
     }

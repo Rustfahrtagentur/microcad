@@ -13,7 +13,7 @@ pub struct ModelNodeOrigin {
     /// The original symbol that has been called.
     creator: Option<Symbol>,
 
-    /// The original call arguments.
+    /// The original arguments.
     arguments: ArgumentMap,
 
     /// Source code reference of the call.

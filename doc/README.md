@@ -40,7 +40,7 @@ In µcad you may call [*workbenches*](structure/calls.md#calling-workbenches) to
 or [*parts*](structure/part.md) or you may call [*functions*](structure/calls.md#calling-functions).
 
 In both cases you shall read about [*parameter multiplicity*](structure/calls.md#parameter-multiplicity) and
-[*parameter matching*](structure/calls.md#parameter-matching) to understand how µcad is processing call arguments.
+[*parameter matching*](structure/calls.md#parameter-matching) to understand how µcad is processing arguments.
 
 ## Objects
 

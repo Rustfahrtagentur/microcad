@@ -8,7 +8,7 @@ use crate::{eval::*, syntax::*};
 impl CallTrait for FunctionDefinition {
     fn call(
         &self,
-        args: &super::CallArgumentValueList,
+        args: &super::ArgumentValueList,
         context: &mut super::Context,
     ) -> super::EvalResult<crate::value::Value> {
         eval_todo!(context, args, "Function evaluation")

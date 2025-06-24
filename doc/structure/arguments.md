@@ -10,7 +10,7 @@
 
 ## Argument Matching
 
-To match *call arguments* with *function* or *workbench parameters*, µcad employs
+To match *arguments* with *function* or *workbench parameters*, µcad employs
 a process known as *argument matching*.
 
 ### Match by Name

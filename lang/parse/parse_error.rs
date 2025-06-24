@@ -79,7 +79,7 @@ pub enum ParseError {
 
     /// Duplicate argument
     #[error("Duplicate argument: {0}")]
-    DuplicateCallArgument(Identifier),
+    DuplicateArgument(Identifier),
 
     /// Invalid map key type
     #[error("Invalid map key type: {0}")]

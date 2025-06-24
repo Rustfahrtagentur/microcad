@@ -183,7 +183,7 @@ list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
 //`(1.0mm, 2.0mm)`: ok
 //`(1.0mm,)`: ok # Trailing comma
 //`(x = 1.0mm, y = 2.0mm)`: ok
-tuple_expression = { "(" ~ ws* ~ call_argument_list ~ ws* ~ ")" ~ unit? }
+tuple_expression = { "(" ~ ws* ~ argument_list ~ ws* ~ ")" ~ unit? }
 
 //`.0`: ok
 //`.height`: ok
@@ -312,23 +312,23 @@ unary_operator = { "-" }
 default_value = _{ "=" ~ ws* ~ expression }
 
 //`r = 5.0mm`: ok # Named argument
-call_named_argument = { identifier ~ ws* ~ "=" ~ ws* ~ expression }
+named_argument = { identifier ~ ws* ~ "=" ~ ws* ~ expression }
 
 //`2.0mm`: ok # Positional argument
-call_positional_argument = _{ expression }
+positional_argument = _{ expression }
 
-call_argument = _{
-  call_named_argument |
-  call_positional_argument
+argument = _{
+  named_argument |
+  positional_argument
 }
 
 //`a = 5.0mm, b = false`: ok
 //`4.0mm, a = false`: ok
 //`a = false, 4.0mm`: ok # Positional argument after named argument (Syntactically correct, semantically wrong)
 //`a = false, 4.0mm,`: ok # Trailing comma
-call_argument_list = { call_argument ~ (ws* ~ "," ~ ws* ~ call_argument)* ~ ws* ~ ","? }
+argument_list = { argument ~ (ws* ~ "," ~ ws* ~ argument)* ~ ws* ~ ","? }
 
-call_op = _{ "(" ~ ws* ~ call_argument_list? ~ ws* ~ ")" }
+call_op = _{ "(" ~ ws* ~ argument_list? ~ ws* ~ ")" }
 
 //`.sum()`: ok
 method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }

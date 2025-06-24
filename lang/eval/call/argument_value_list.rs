@@ -1,19 +1,19 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! *Call argument value list* evaluation entity.
+//! *Argument value list* evaluation entity.
 
 use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 
-/// Collection of *call argument values* (e.g. `( x=1, y=2 )`).
+/// Collection of *argument values* (e.g. `( x=1, y=2 )`).
 ///
 /// Also provides methods to find a matching call
 /// between it and a given *parameter list*.
 #[derive(Clone, Debug, Default)]
-pub struct CallArgumentValueList(Refer<OrdMap<Identifier, CallArgumentValue>>);
+pub struct ArgumentValueList(Refer<OrdMap<Identifier, ArgumentValue>>);
 
-impl CallArgumentValueList {
-    /// Create a *call argument value list*.
+impl ArgumentValueList {
+    /// Create a *argument value list*.
     ///
     /// Transports code into builtin in `impl` [`Eval`] for [`Call`].
     ///
@@ -22,7 +22,7 @@ impl CallArgumentValueList {
     pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
         let mut value = OrdMap::default();
         value
-            .try_push(CallArgumentValue::new(
+            .try_push(ArgumentValue::new(
                 None,
                 Value::String(code),
                 referrer.src_ref(),
@@ -37,7 +37,7 @@ impl CallArgumentValueList {
     /// Return a single argument.
     ///
     /// Returns error if there is no or more than one argument available.
-    pub fn get_single(&self) -> EvalResult<&CallArgumentValue> {
+    pub fn get_single(&self) -> EvalResult<&ArgumentValue> {
         if self.len() == 1 {
             if let Some(a) = self.0.first() {
                 return Ok(a);
@@ -53,7 +53,7 @@ impl CallArgumentValueList {
 
     /// Check for unexpected arguments.
     ///
-    /// This method will return an error if there is a call argument that
+    /// This method will return an error if there is a argument that
     /// is not in the parameter list.
     pub fn check_for_unexpected_arguments(
         &self,
@@ -68,7 +68,7 @@ impl CallArgumentValueList {
         }
     }
 
-    /// This functions checks if the call arguments match the given parameter definitions.
+    /// This functions checks if the arguments match the given parameter definitions.
     ///
     /// Returns a map of arguments that match the parameters.
     pub fn get_matching_arguments(
@@ -91,27 +91,27 @@ impl CallArgumentValueList {
     }
 }
 
-impl SrcReferrer for CallArgumentValueList {
+impl SrcReferrer for ArgumentValueList {
     fn src_ref(&self) -> SrcRef {
         self.0.src_ref()
     }
 }
 
-impl std::ops::Deref for CallArgumentValueList {
-    type Target = OrdMap<Identifier, CallArgumentValue>;
+impl std::ops::Deref for ArgumentValueList {
+    type Target = OrdMap<Identifier, ArgumentValue>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl std::ops::DerefMut for CallArgumentValueList {
+impl std::ops::DerefMut for ArgumentValueList {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
 }
 
-impl std::fmt::Display for CallArgumentValueList {
+impl std::fmt::Display for ArgumentValueList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -127,8 +127,8 @@ impl std::fmt::Display for CallArgumentValueList {
 }
 
 #[cfg(test)]
-impl From<Vec<CallArgumentValue>> for CallArgumentValueList {
-    fn from(value: Vec<CallArgumentValue>) -> Self {
+impl From<Vec<ArgumentValue>> for ArgumentValueList {
+    fn from(value: Vec<ArgumentValue>) -> Self {
         Self(Refer::none(value.into()))
     }
 }
@@ -145,7 +145,7 @@ macro_rules! assert_eq_arg_map_value {
 
 #[test]
 fn call_get_matching_arguments() {
-    use crate::{call_argument_value, parameter_value};
+    use crate::{argument_value, parameter_value};
 
     // my_part(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = vec![
@@ -156,10 +156,10 @@ fn call_get_matching_arguments() {
     .into();
 
     // my_part(1, bar = 2, baz = 3.0)
-    let call_values = CallArgumentValueList::from(vec![
-        call_argument_value!(Integer = 1),
-        call_argument_value!(foo: Integer = 2),
-        call_argument_value!(baz: Scalar = 3.0),
+    let call_values = ArgumentValueList::from(vec![
+        argument_value!(Integer = 1),
+        argument_value!(foo: Integer = 2),
+        argument_value!(baz: Scalar = 3.0),
     ]);
 
     let arg_map = ArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
@@ -173,7 +173,7 @@ fn call_get_matching_arguments() {
 
 #[test]
 fn call_get_matching_arguments_missing() {
-    use crate::{call_argument_value, parameter_value};
+    use crate::{argument_value, parameter_value};
 
     // function f(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = ParameterValueList::new(vec![
@@ -183,9 +183,9 @@ fn call_get_matching_arguments_missing() {
     ]);
 
     // f(1, baz = 3.0)
-    let call_values = CallArgumentValueList::from(vec![
-        call_argument_value!(Integer = 1),
-        call_argument_value!(baz: Scalar = 3.0),
+    let call_values = ArgumentValueList::from(vec![
+        argument_value!(Integer = 1),
+        argument_value!(baz: Scalar = 3.0),
     ]);
 
     let arg_map = ArgumentMap::find_match(&call_values, &param_values);
@@ -200,7 +200,7 @@ fn call_get_matching_arguments_missing() {
 
 #[test]
 fn get_multi_matching_arguments() {
-    use crate::{call_argument_value, parameter_value};
+    use crate::{argument_value, parameter_value};
 
     let param_values = ParameterValueList::new(vec![
         parameter_value!(thickness: Scalar = 2.0),
@@ -208,10 +208,10 @@ fn get_multi_matching_arguments() {
         parameter_value!(height: Scalar = 10.0),
     ]);
 
-    let call_values = CallArgumentValueList::from(vec![
-        call_argument_value!(Scalar = 2.0),
-        call_argument_value!(Scalar = 100.0),
-        call_argument_value!(Scalar = 10.0),
+    let call_values = ArgumentValueList::from(vec![
+        argument_value!(Scalar = 2.0),
+        argument_value!(Scalar = 100.0),
+        argument_value!(Scalar = 10.0),
     ]);
 
     let multi_argument_map =

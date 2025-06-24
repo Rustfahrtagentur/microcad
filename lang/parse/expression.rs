@@ -209,8 +209,7 @@ impl Parse for NestedItem {
 impl Parse for TupleExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
-        let call_argument_list =
-            CallArgumentList::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
+        let call_argument_list = ArgumentList::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
         if call_argument_list.is_empty() {
             return Err(ParseError::EmptyTupleExpression);
         }

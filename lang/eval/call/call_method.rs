@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Call argument value evaluation entity
+//! Argument value evaluation entity
 
 use crate::{eval::*, syntax::*};
 
@@ -15,7 +15,7 @@ pub trait CallMethod {
     fn call_method(
         &self,
         id: &Identifier,
-        args: &CallArgumentList,
+        args: &ArgumentList,
         context: &mut Context,
     ) -> EvalResult<Value>;
 }
@@ -24,7 +24,7 @@ impl CallMethod for Array {
     fn call_method(
         &self,
         id: &Identifier,
-        _: &CallArgumentList,
+        _: &ArgumentList,
         context: &mut Context,
     ) -> EvalResult<Value> {
         match id.id().as_str() {
@@ -56,7 +56,7 @@ impl CallMethod for Value {
     fn call_method(
         &self,
         id: &Identifier,
-        args: &CallArgumentList,
+        args: &ArgumentList,
         context: &mut Context,
     ) -> EvalResult<Value> {
         match &self {
@@ -89,7 +89,7 @@ fn call_list_method() {
     if let Value::Bool(result) = list
         .call_method(
             &"all_equal".into(),
-            &CallArgumentList::default(),
+            &ArgumentList::default(),
             &mut Context::default(),
         )
         .expect("test error")

@@ -171,7 +171,7 @@ impl Eval for NestedItem {
         match &self {
             NestedItem::Call(call) => Ok(call.eval(context)?),
             NestedItem::QualifiedName(name) => match &context.lookup(name)?.borrow().def {
-                SymbolDefinition::Constant(_, value) | SymbolDefinition::CallArgument(_, value) => {
+                SymbolDefinition::Constant(_, value) | SymbolDefinition::Argument(_, value) => {
                     Ok(value.clone())
                 }
                 SymbolDefinition::Module(ns) => {

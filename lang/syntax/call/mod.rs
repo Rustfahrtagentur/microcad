@@ -19,7 +19,7 @@ pub struct Call {
     /// Qualified name of the call.
     pub name: QualifiedName,
     /// Argument list of the call.
-    pub argument_list: CallArgumentList,
+    pub argument_list: ArgumentList,
     /// Source code reference.
     pub src_ref: SrcRef,
 }

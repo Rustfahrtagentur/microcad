@@ -5,9 +5,6 @@
 
 use crate::{src_ref::*, syntax::*};
 
-/// TODO: maybe CallArgumentList should be `ArgumentList` and get independent of module `call`?
-type ArgumentList = CallArgumentList;
-
 /// Tuple expression
 #[derive(Clone, Debug, Default)]
 pub struct TupleExpression {

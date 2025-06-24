@@ -1,35 +1,35 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! List of call arguments syntax entities.
+//! List of arguments syntax entities.
 
 use crate::{ord_map::*, src_ref::*, syntax::*};
 
-/// List (ordered map) of call arguments.
+/// List (ordered map) of arguments.
 #[derive(Clone, Debug, Default)]
-pub struct CallArgumentList(pub Refer<OrdMap<Identifier, CallArgument>>);
+pub struct ArgumentList(pub Refer<OrdMap<Identifier, Argument>>);
 
-impl SrcReferrer for CallArgumentList {
+impl SrcReferrer for ArgumentList {
     fn src_ref(&self) -> SrcRef {
         self.0.src_ref()
     }
 }
 
-impl std::ops::Deref for CallArgumentList {
-    type Target = OrdMap<Identifier, CallArgument>;
+impl std::ops::Deref for ArgumentList {
+    type Target = OrdMap<Identifier, Argument>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl std::ops::DerefMut for CallArgumentList {
+impl std::ops::DerefMut for ArgumentList {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
 }
 
-impl std::fmt::Display for CallArgumentList {
+impl std::fmt::Display for ArgumentList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -44,9 +44,9 @@ impl std::fmt::Display for CallArgumentList {
     }
 }
 
-impl PrintSyntax for CallArgumentList {
+impl PrintSyntax for ArgumentList {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}CallArgumentList:", "")?;
+        writeln!(f, "{:depth$}ArgumentList:", "")?;
         self.0
             .value
             .iter()
@@ -54,16 +54,16 @@ impl PrintSyntax for CallArgumentList {
     }
 }
 
-impl std::ops::Index<&Identifier> for CallArgumentList {
-    type Output = CallArgument;
+impl std::ops::Index<&Identifier> for ArgumentList {
+    type Output = Argument;
 
     fn index(&self, name: &Identifier) -> &Self::Output {
         self.0.get(name).expect("key not found")
     }
 }
 
-impl std::ops::Index<usize> for CallArgumentList {
-    type Output = CallArgument;
+impl std::ops::Index<usize> for ArgumentList {
+    type Output = Argument;
 
     fn index(&self, idx: usize) -> &Self::Output {
         &self.0.value[idx]

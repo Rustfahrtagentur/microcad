@@ -14,7 +14,7 @@ use crate::eval::*;
 ///   - an [`Identifier`]
 ///   - local variables in a [`SymbolMap`] (e.g. `i = 5;`)
 ///   - local aliases in a [`SymbolMap`] (e.g. `use std::print;`)
-///   - call argument value list (e.g. `f(x = 0, y = 1);`
+///   - argument value list (e.g. `f(x = 0, y = 1);`
 pub enum StackFrame {
     /// Source file with locals.
     Source(Identifier, SymbolMap),
@@ -30,8 +30,8 @@ pub enum StackFrame {
     Call {
         /// Symbol that was called.
         symbol: Symbol,
-        /// Evaluated call arguments.
-        args: CallArgumentValueList,
+        /// Evaluated arguments.
+        args: ArgumentValueList,
         /// Source code reference.
         src_ref: SrcRef,
     },
