@@ -34,7 +34,7 @@ op punched_disk() {
         // make hole
         difference() { @children } 
     } else {
-        error("punched_disk must get two objects");
+        std::error("punched_disk must get two objects");
     }
 }
 
@@ -58,7 +58,7 @@ op punch_disk(radius: Length) {
             std::circle(radius)
         } 
     } else {
-        error("punch_disk must get one object");
+        std::error("punch_disk must get one object");
     }
 }
 

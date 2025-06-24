@@ -17,3 +17,7 @@ part export(filename: String) {
         @children
     }
 }
+
+pub use __builtin::print;
+pub use __builtin::error;
+pub use __builtin::warning;

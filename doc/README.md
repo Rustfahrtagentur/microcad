@@ -39,8 +39,8 @@ It's planned to implement [*custom types*](types/custom_types.md) in future.
 In µcad you may call [*workbenches*](structure/calls.md#calling-workbenches) to produce *objects* from [sketches](structure/sketch.md)
 or [*parts*](structure/part.md) or you may call [*functions*](structure/calls.md#calling-functions).
 
-In both cases you shall read about [*parameter multiplicity*](structure/calls.md#parameter-multiplicity) and
-[*parameter matching*](structure/calls.md#parameter-matching) to understand how µcad is processing arguments.
+In both cases you shall read about [*argument multiplicity*](structure/arguments.md#argument-multiplicity) and
+[*argument matching*](structure/arguments.md#argument-matching) to understand how µcad is processing arguments.
 
 ## Objects
 
@@ -57,3 +57,7 @@ The [standard library](libs/std/README.md) is a µcad library which encapsulates
 
 If you want to make your own libraries put you µcad code into the search paths or create
 a [plugin](libs/plugins.md) to embed Rust code.
+
+## Debugging
+
+There are several builtin [debug functionalities](debug/README.md) which help you debugging your code.
