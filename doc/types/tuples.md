@@ -13,7 +13,7 @@ Each value in a *named tuple* must have a unique identifier.
 (width=10cm, depth=10cm, volume=1l);
 ```
 
-### Tuple as part parameters
+### Named Tuple as Part's Parameters
 
 [![test](.test/tuple_parameters_A.png)](.test/tuple_parameters_A.log)
 
@@ -33,7 +33,7 @@ part box(x = 0mm, y = 0mm, z = 0mm) {}
 part box(x,y,z = 0mm) {}
 ```
 
-### Tuple declarations
+### Named Tuple Declaration
 
 [![test](.test/tuple_fields_A.png)](.test/tuple_fields_A.log)
 

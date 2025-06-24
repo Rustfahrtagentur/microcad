@@ -2,9 +2,9 @@
 
 *Arrays* store multiple values of the same type
 
-- [Arrays](array.md)
+- [Arrays](arrays.md)
 
 *Tuples* can store multiple values of different types.
 
-- [Tuples](tuple.md)
-- [Named Tuples](named_tuple.md)
+- [Named Tuples](tuples.md#named-tuples)
+- [Unnamed Tuples](tuples.md#unnamed-tuples)
