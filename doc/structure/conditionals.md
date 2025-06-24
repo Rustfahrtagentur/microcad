@@ -4,6 +4,8 @@ Conditions lead to different executions paths for different cases.
 
 ## If Statement
 
+[![test](.test/if.png)](.test/if.log)
+
 ```µcad,if#todo
 fn f( x: Scalar ) {
     if x == 5 or x == 4 {

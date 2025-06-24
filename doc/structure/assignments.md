@@ -19,6 +19,8 @@ std::debug::assert_eq(b,10);
 
 Another assignment of a variable with the same name is not allowed.
 
+[![test](.test/assignment_immutable.png)](.test/assignment_immutable.log)
+
 ```µcad,assignment_immutable#fail
 a = 5;
 a = a * 2; // error: a already defined in this scope
