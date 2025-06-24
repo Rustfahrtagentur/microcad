@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**83** tests from markdown.
+**84** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -38,8 +38,9 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/missed_property.png)](../doc/structure/.test/missed_property.log) | [missed_property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/mod.png)](../doc/structure/.test/mod.log) | [mod](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/mod_example.png)](../doc/structure/.test/mod_example.log) | [mod_example](../doc/structure/modules.md) |
-| [![test](../doc/structure/.test/multiplicity_example_A.png)](../doc/structure/.test/multiplicity_example_A.log) | [multiplicity_example_A](../doc/structure/calls.md) |
-| [![test](../doc/structure/.test/multiplicity_example_B.png)](../doc/structure/.test/multiplicity_example_B.log) | [multiplicity_example_B](../doc/structure/calls.md) |
+| [![test](../doc/structure/.test/multiplicity_arrays.png)](../doc/structure/.test/multiplicity_arrays.log) | [multiplicity_arrays](../doc/structure/calls.md) |
+| [![test](../doc/structure/.test/multiplicity_tuple_array.png)](../doc/structure/.test/multiplicity_tuple_array.log) | [multiplicity_tuple_array](../doc/structure/calls.md) |
+| [![test](../doc/structure/.test/no_multiplicity.png)](../doc/structure/.test/no_multiplicity.log) | [no_multiplicity](../doc/structure/calls.md) |
 | [![test](../doc/structure/.test/none.png)](../doc/structure/.test/none.log) | [none](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/op_example.png)](../doc/structure/.test/op_example.log) | [op_example](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/parameters.png)](../doc/structure/.test/parameters.log) | [parameters](../doc/structure/op.md) |
