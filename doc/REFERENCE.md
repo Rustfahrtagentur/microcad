@@ -57,6 +57,8 @@
   - [Collections](types/primitive_types.md)
     - [Arrays](types/arrays.md)
     - [Tuples](types/tuples.md)
+      - [Partially Unnamed Tuples](types/tuples.md#partially-unnamed-tuples)
+      - [Tuple Assignments](types/tuples.md#tuple-assignments)
   - [Nodes Type](types/nodes.md)
   - [(Custom Types)](types/custom_types.md)
 - [Objects](README.md#objects)

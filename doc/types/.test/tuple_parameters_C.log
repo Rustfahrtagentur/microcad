@@ -1,8 +1,0 @@
-Parser error:  --> 1:11
-  |
-1 | part box(x,y,z = 0mm) {}
-  |           ^---
-  |
-  = expected COMMENT
--- Test result --
-FAILED AS EXPECTED

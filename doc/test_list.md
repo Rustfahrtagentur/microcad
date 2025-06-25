@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**98** tests from markdown.
+**95** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -46,6 +46,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/mod_example.png)](../doc/structure/.test/mod_example.log) | [mod_example](../doc/structure/modules.md) |
 | [![test](../doc/structure/.test/multiplicity_arrays.png)](../doc/structure/.test/multiplicity_arrays.log) | [multiplicity_arrays](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/multiplicity_tuple_array.png)](../doc/structure/.test/multiplicity_tuple_array.log) | [multiplicity_tuple_array](../doc/structure/arguments.md) |
+| [![test](../doc/types/.test/named_tuple.png)](../doc/types/.test/named_tuple.log) | [named_tuple](../doc/types/tuples.md) |
 | [![test](../doc/structure/.test/no_multiplicity.png)](../doc/structure/.test/no_multiplicity.log) | [no_multiplicity](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/none.png)](../doc/structure/.test/none.log) | [none](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/op_example.png)](../doc/structure/.test/op_example.log) | [op_example](../doc/structure/op.md) |
@@ -59,19 +60,13 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/return.png)](../doc/structure/.test/return.log) | [return](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/return_twice.png)](../doc/structure/.test/return_twice.log) | [return_twice](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/sketch_basic.png)](../doc/structure/.test/sketch_basic.log) | [sketch_basic](../doc/structure/sketch.md) |
-| [![test](../doc/types/.test/tuple_fields_A.png)](../doc/types/.test/tuple_fields_A.log) | [tuple_fields_A](../doc/types/tuples.md) |
-| [![test](../doc/types/.test/tuple_fields_B.png)](../doc/types/.test/tuple_fields_B.log) | [tuple_fields_B](../doc/types/tuples.md) |
-| [![test](../doc/types/.test/tuple_fields_C.png)](../doc/types/.test/tuple_fields_C.log) | [tuple_fields_C](../doc/types/tuples.md) |
-| [![test](../doc/types/.test/tuple_fields_D.png)](../doc/types/.test/tuple_fields_D.log) | [tuple_fields_D](../doc/types/tuples.md) |
-| [![test](../doc/types/.test/tuple_fields_E.png)](../doc/types/.test/tuple_fields_E.log) | [tuple_fields_E](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_assignment.png)](../doc/types/.test/tuple_assignment.log) | [tuple_assignment](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_assignment_bundle.png)](../doc/types/.test/tuple_assignment_bundle.log) | [tuple_assignment_bundle](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_assignment_convert.png)](../doc/types/.test/tuple_assignment_convert.log) | [tuple_assignment_convert](../doc/types/tuples.md) |
 | [![test](../doc/structure/.test/tuple_match.png)](../doc/structure/.test/tuple_match.log) | [tuple_match](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/tuple_match_errors.png)](../doc/structure/.test/tuple_match_errors.log) | [tuple_match_errors](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/tuple_match_variants.png)](../doc/structure/.test/tuple_match_variants.log) | [tuple_match_variants](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/tuple_match_warnings.png)](../doc/structure/.test/tuple_match_warnings.log) | [tuple_match_warnings](../doc/structure/arguments.md) |
-| [![test](../doc/types/.test/tuple_named_tuple.png)](../doc/types/.test/tuple_named_tuple.log) | [tuple_named_tuple](../doc/types/tuples.md) |
-| [![test](../doc/types/.test/tuple_parameters_A.png)](../doc/types/.test/tuple_parameters_A.log) | [tuple_parameters_A](../doc/types/tuples.md) |
-| [![test](../doc/types/.test/tuple_parameters_B.png)](../doc/types/.test/tuple_parameters_B.log) | [tuple_parameters_B](../doc/types/tuples.md) |
-| [![test](../doc/types/.test/tuple_parameters_C.png)](../doc/types/.test/tuple_parameters_C.log) | [tuple_parameters_C](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/types_bundles_functions.png)](../doc/types/.test/types_bundles_functions.log) | [types_bundles_functions](../doc/types/README.md) |
 | [![test](../doc/types/.test/types_def_vs_decl.png)](../doc/types/.test/types_def_vs_decl.log) | [types_def_vs_decl](../doc/types/README.md) |
 | [![test](../doc/types/.test/types_named_tuple.png)](../doc/types/.test/types_named_tuple.log) | [types_named_tuple](../doc/types/named_tuple.md) |
@@ -92,6 +87,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/types_quantity_weight.png)](../doc/types/.test/types_quantity_weight.log) | [types_quantity_weight](../doc/types/quantity.md) |
 | [![test](../doc/libs/std/ops/.test/union_alt_operator.png)](../doc/libs/std/ops/.test/union_alt_operator.log) | [union_alt_operator](../doc/libs/std/ops/union.md) |
 | [![test](../doc/libs/std/ops/.test/union_operator.png)](../doc/libs/std/ops/.test/union_operator.log) | [union_operator](../doc/libs/std/ops/union.md) |
+| [![test](../doc/types/.test/unnamed_tuple.png)](../doc/types/.test/unnamed_tuple.log) | [unnamed_tuple](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/unnamed_tuple_order.png)](../doc/types/.test/unnamed_tuple_order.log) | [unnamed_tuple_order](../doc/types/tuples.md) |
 | [![test](../doc/structure/.test/use.png)](../doc/structure/.test/use.log) | [use](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_all.png)](../doc/structure/.test/use_all.log) | [use_all](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_as.png)](../doc/structure/.test/use_as.log) | [use_as](../doc/structure/use.md) |

@@ -1,72 +1,75 @@
 
 # Tuples
 
-Tuples are lists of items which might be of different types.
+A *tuple* is a collection of *values*, each of which can be of different *types*.
+Typically, each value is paired with an identifier, allowing a tuple to function
+similarly to a key-value store.
 
-## Named Tuples
+[![test](.test/named_tuple.png)](.test/named_tuple.log)
 
-Each value in a *named tuple* must have a unique identifier.
-
-[![test](.test/tuple_named_tuple.png)](.test/tuple_named_tuple.log)
-
-```µcad,tuple_named_tuple
-(width=10cm, depth=10cm, volume=1l);
+```µcad,named_tuple
+tuple = (width=10cm, depth=10cm, volume=1l);
 ```
 
-### Named Tuple as Part's Parameters
+## Partially Unnamed Tuples
 
-[![test](.test/tuple_parameters_A.png)](.test/tuple_parameters_A.log)
+A tuple may lack identifiers for some or even all of its values.
+In such cases, these *unnamed values* within the tuple must all be of different types.
 
-```µcad,tuple_parameters_A#fail
-part box((x,y,z) = 0mm) {}
+[![test](.test/unnamed_tuple.png)](.test/unnamed_tuple.log)
+
+```µcad,unnamed_tuple
+tuple = (10cm, 10cm², 1l);
 ```
 
-[![test](.test/tuple_parameters_B.png)](.test/tuple_parameters_B.log)
+Otherwise, they would be indistinguishable since the values in a tuple do not adhere
+to a specific order.
 
-```µcad,tuple_parameters_B
-part box(x = 0mm, y = 0mm, z = 0mm) {}
+[![test](.test/unnamed_tuple_order.png)](.test/unnamed_tuple_order.log)
+
+```µcad,unnamed_tuple_order
+// these tuples are equal
+assert_eq((1l, 10cm, 10cm²), (10cm, 10cm², 1l));
 ```
 
-[![test](.test/tuple_parameters_C.png)](.test/tuple_parameters_C.log)
+A partially or fully unnamed tuple can only be utilized through
+[argument matching](../structure/arguments.md#argument-matching) or *tuple assignment*.
 
-```µcad,tuple_parameters_C#fail
-part box(x,y,z = 0mm) {}
+## Tuple Assignments
+
+Tuple syntax is also employed on the left side of *tuple assignments*.
+
+[![test](.test/tuple_assignment.png)](.test/tuple_assignment.log)
+
+```µcad,tuple_assignment#todo
+(width, height) = (1m,2m);
+// check values of width and height
+assert_eq(width,1m);
+assert_eq(height,2m);
 ```
 
-### Named Tuple Declaration
+Occasionally, it's practical to *group units* together, but this cannot be done directly
+with a tuple.
+Instead, you must use an *array*, which will be converted into a tuple during the assignment.
 
-[![test](.test/tuple_fields_A.png)](.test/tuple_fields_A.log)
+[![test](.test/tuple_assignment_bundle.png)](.test/tuple_assignment_bundle.log)
 
-```µcad,tuple_fields_A#fail
-(width, height) = (1,2)mm;
+```µcad,tuple_assignment_bundle#todo
+(width, height) = [1,2]m;
+assert_eq(width,1m);
+assert_eq(height,2m);
 ```
 
-[![test](.test/tuple_fields_B.png)](.test/tuple_fields_B.log)
+This method can generally be used to convert an *array* into a *tuple*:
 
-```µcad,tuple_fields_B
-width = 1.2mm;
-height = 2mm;
+[![test](.test/tuple_assignment_convert.png)](.test/tuple_assignment_convert.log)
+
+```µcad,tuple_assignment_convert#todo
+array = [1,2]m;
+(width, height) = array;
+tuple = (width, height);
+
+assert_eq(tuple,(1m,2m));
+assert_eq(tuple.width,1m);
+assert_eq(tuple.height,2m);
 ```
-
-[![test](.test/tuple_fields_C.png)](.test/tuple_fields_C.log)
-
-```µcad,tuple_fields_C#fail
-(width, height) = (0mm,0mm);
-```
-
-[![test](.test/tuple_fields_D.png)](.test/tuple_fields_D.log)
-
-```µcad,tuple_fields_D#todo
-width = (0, 0)mm;
-height = (0, 0)mm;
-```
-
-[![test](.test/tuple_fields_E.png)](.test/tuple_fields_E.log)
-
-```µcad,tuple_fields_E#fail
-width, height = 0mm;
-```
-
-## Unnamed Tuples
-
-TODO
