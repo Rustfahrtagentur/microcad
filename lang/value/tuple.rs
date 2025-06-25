@@ -1,47 +1,67 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Unnamed tuple evaluation entity
+//! Named tuple evaluation entity
 
 use crate::{ty::*, value::*};
 
-/// Unnamed tuple
-#[derive(Clone, Debug, PartialEq)]
-pub struct Tuple(ValueList);
+/// Tuple with named values
+#[derive(Clone, Default, Debug, PartialEq)]
+pub struct Tuple(std::collections::BTreeMap<Identifier, Value>);
 
 impl Tuple {
-    /// create a new unnamed tuple
-    pub fn new(list: ValueList) -> Self {
-        Self(list)
+    /// Create new named tuple instance.
+    pub fn new(map: std::collections::BTreeMap<Identifier, Value>) -> Self {
+        Self(map)
     }
 
-    /// evaluate the given operation
-    pub fn binary_op(
-        self,
-        rhs: Self,
-        op: char,
-        f: impl Fn(Value, Value) -> ValueResult,
-    ) -> std::result::Result<Self, ValueError> {
-        if self.0.len() != rhs.0.len() {
-            return Err(ValueError::TupleLengthMismatchForOperator {
-                operator: op,
-                lhs: self.0.len(),
-                rhs: rhs.0.len(),
-            });
-        }
-        let mut result = Vec::new();
-        for (l, r) in self.0.iter().zip(rhs.0.iter()) {
-            let add_result = f(l.clone(), r.clone())?;
-            result.push(add_result);
-        }
-
-        Ok(Tuple(ValueList::new(result)))
+    /// Create a new named tuple from a slice of values.
+    ///
+    /// This function is used to create named tuples from built-in types like `Vec3` and `Color`.
+    pub fn new_from_slice<T: Into<Value> + Copy>(values: &[(&'static str, T)]) -> Self {
+        Self::new(
+            values
+                .iter()
+                .map(|(k, v)| (Identifier::no_ref(k), (*v).into()))
+                .collect(),
+        )
     }
 }
 
-impl From<ValueList> for Tuple {
-    fn from(value: ValueList) -> Self {
-        Self(value)
+impl std::ops::Deref for Tuple {
+    type Target = std::collections::BTreeMap<Identifier, Value>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for Tuple {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl From<Vec2> for Tuple {
+    fn from(v: Vec2) -> Self {
+        Self::new_from_slice(&[("x", v.x), ("y", v.y)])
+    }
+}
+
+impl From<Vec3> for Tuple {
+    fn from(v: Vec3) -> Self {
+        Self::new_from_slice(&[("x", v.x), ("y", v.y), ("z", v.z)])
+    }
+}
+
+impl From<Color> for Tuple {
+    fn from(color: Color) -> Self {
+        Self::new_from_slice(&[
+            ("r", color.r),
+            ("g", color.g),
+            ("b", color.b),
+            ("a", color.a),
+        ])
     }
 }
 
@@ -49,11 +69,12 @@ impl std::fmt::Display for Tuple {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
-            "({})",
-            self.0
+            "({items})",
+            items = self
+                .0
                 .iter()
-                .map(|v| v.to_string())
-                .collect::<Vec<String>>()
+                .map(|(k, v)| format!("{k} => {v}"))
+                .collect::<Vec<_>>()
                 .join(", ")
         )
     }
@@ -61,22 +82,11 @@ impl std::fmt::Display for Tuple {
 
 impl crate::ty::Ty for Tuple {
     fn ty(&self) -> Type {
-        Type::Tuple(TupleType(self.0.iter().map(|v| v.ty().clone()).collect()))
-    }
-}
-
-impl std::ops::Add for Tuple {
-    type Output = std::result::Result<Tuple, ValueError>;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        self.binary_op(rhs, '+', |lhs, rhs| lhs + rhs)
-    }
-}
-
-impl std::ops::Sub for Tuple {
-    type Output = std::result::Result<Tuple, ValueError>;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        self.binary_op(rhs, '-', |lhs, rhs| lhs - rhs)
+        Type::Tuple(TupleType(
+            self.0
+                .iter()
+                .map(|(name, v)| (name.clone(), v.ty().clone()))
+                .collect(),
+        ))
     }
 }

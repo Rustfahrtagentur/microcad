@@ -4,12 +4,12 @@
 //! Named tuple error
 use thiserror::Error;
 
-use crate::value::NamedTuple;
+use crate::value::*;
 
 /// Value error
 #[derive(Debug, Error)]
-pub enum NamedTupleError {
+pub enum TupleError {
     /// Cannot convert to color.
     #[error("Cannot convert named tuple to color: {0}")]
-    CannotConvertToColor(NamedTuple),
+    CannotConvertToColor(Tuple),
 }

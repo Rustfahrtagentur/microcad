@@ -8,17 +8,17 @@
 
 mod array;
 mod matrix;
-mod named_tuple;
 mod quantity;
 mod tuple;
+mod unnamed_tuple;
 mod value_error;
 mod value_list;
 
 pub use array::*;
 pub use matrix::*;
-pub use named_tuple::*;
 pub use quantity::*;
 pub use tuple::*;
+pub use unnamed_tuple::*;
 pub use value_error::*;
 pub use value_list::*;
 
@@ -44,9 +44,9 @@ pub enum Value {
     /// A list of values with a common type.
     Array(Array),
     /// A tuple of unnamed items.
-    Tuple(Tuple),
+    UnnamedTuple(UnnamedTuple),
     /// A tuple of named items.
-    NamedTuple(NamedTuple),
+    Tuple(Tuple),
     /// A matrix.
     Matrix(Box<Matrix>),
     /// A node in the model tree.
@@ -88,7 +88,7 @@ impl Value {
     /// This function is used when accessing a property `p` of a value `v` with `p.v`.
     pub fn get_property_value(&self, identifier: &Identifier) -> Option<Value> {
         match self {
-            Value::NamedTuple(named_tuple) => named_tuple.get(identifier).cloned(),
+            Value::Tuple(named_tuple) => named_tuple.get(identifier).cloned(),
             Value::Nodes(nodes) => match nodes.single_node() {
                 Some(node) => node.get_property_value(identifier),
                 None => None,
@@ -198,8 +198,8 @@ impl crate::ty::Ty for Value {
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
             Value::Array(list) => list.ty(),
-            Value::NamedTuple(named_tuple) => named_tuple.ty(),
-            Value::Tuple(unnamed_tuple) => unnamed_tuple.ty(),
+            Value::Tuple(named_tuple) => named_tuple.ty(),
+            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
             Value::Matrix(matrix) => matrix.ty(),
             Value::Nodes(_) => Type::Nodes,
         }
@@ -249,7 +249,9 @@ impl std::ops::Add for Value {
                 )))
             }
             // Add values of two tuples of the same length
-            (Value::Tuple(lhs), Value::Tuple(rhs)) => Ok(Value::Tuple((lhs + rhs)?)),
+            (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
+                Ok(Value::UnnamedTuple((lhs + rhs)?))
+            }
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} + {rhs}"))),
         }
     }
@@ -355,8 +357,8 @@ impl std::fmt::Display for Value {
             Value::Bool(b) => write!(f, "{b}"),
             Value::String(s) => write!(f, "{s}"),
             Value::Array(l) => write!(f, "{l}"),
-            Value::NamedTuple(t) => write!(f, "{t}"),
             Value::Tuple(t) => write!(f, "{t}"),
+            Value::UnnamedTuple(t) => write!(f, "{t}"),
             Value::Matrix(m) => write!(f, "{m}"),
             Value::Nodes(n) => n.dump(f),
         }
@@ -372,8 +374,8 @@ impl std::fmt::Debug for Value {
             Self::Bool(arg0) => write!(f, "Bool: {arg0}"),
             Self::String(arg0) => write!(f, "String: {arg0}"),
             Self::Array(arg0) => write!(f, "List: {arg0}"),
-            Self::NamedTuple(arg0) => write!(f, "NamedTuple: {arg0}"),
-            Self::Tuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
+            Self::Tuple(arg0) => write!(f, "Tuple: {arg0}"),
+            Self::UnnamedTuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
             Self::Matrix(arg0) => write!(f, "Matrix: {arg0}"),
             Self::Nodes(arg0) => write!(f, "Nodes:\n {arg0}"),
         }

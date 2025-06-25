@@ -16,7 +16,7 @@ impl Parse for ListType {
     }
 }
 
-impl Parse for NamedTupleType {
+impl Parse for TupleType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         use crate::ty::Ty;
         Parser::ensure_rule(&pair, Rule::named_tuple_type);
@@ -37,7 +37,7 @@ impl Parse for NamedTupleType {
     }
 }
 
-impl Parse for TupleType {
+impl Parse for UnnamedTupleType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let inner = pair.inner();
         let mut types = Vec::new();
@@ -101,7 +101,7 @@ fn unnamed_tuple_type() {
     assert_eq!(type_annotation.ty().to_string(), "(Integer, String)");
     assert_eq!(
         type_annotation.ty(),
-        Type::Tuple(TupleType(vec![Type::Integer, Type::String]))
+        Type::UnnamedTuple(UnnamedTupleType(vec![Type::Integer, Type::String]))
     );
 }
 

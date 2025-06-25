@@ -28,9 +28,9 @@ pub enum AttributeError {
     AttributeAlreadySet(Identifier, Value),
 }
 
-impl From<ArgumentMap> for NamedTuple {
+impl From<ArgumentMap> for Tuple {
     fn from(argument_map: ArgumentMap) -> Self {
-        NamedTuple::new(
+        Tuple::new(
             argument_map
                 .iter()
                 .map(|(k, v)| (k.clone(), v.clone()))
@@ -52,12 +52,12 @@ impl Attribute {
 impl Eval<Option<(Identifier, Value)>> for Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<(Identifier, Value)>> {
         match self {
-            Attribute::NamedTuple(id, argument_list) => {
+            Attribute::Tuple(id, argument_list) => {
                 if let Some(params) = Self::parameter_list(id) {
                     let args = ArgumentMap::find_match(&argument_list.eval(context)?, &params);
                     match args {
                         Ok(args) => {
-                            return Ok(Some((id.clone(), Value::NamedTuple(args.into()))));
+                            return Ok(Some((id.clone(), Value::Tuple(args.into()))));
                         }
                         Err(err) => {
                             context.warning(self, err)?;
@@ -128,7 +128,7 @@ impl AttributeList {
     ) -> EvalResult<Vec<(Identifier, Value)>> {
         self.iter()
             .filter_map(|attr| {
-                if matches!(attr, Attribute::NamedTuple(_, _)) {
+                if matches!(attr, Attribute::Tuple(_, _)) {
                     attr.eval(context).transpose()
                 } else {
                     None

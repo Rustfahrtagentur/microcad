@@ -26,7 +26,7 @@ impl Eval for TupleExpression {
                 values.insert(key, value);
             }
 
-            Ok(Value::NamedTuple(NamedTuple::new(values)))
+            Ok(Value::Tuple(Tuple::new(values)))
         } else {
             let values = ValueList::new(
                 self.args
@@ -36,7 +36,7 @@ impl Eval for TupleExpression {
                     .collect(),
             );
 
-            Ok(Value::Tuple(Tuple::new(values)))
+            Ok(Value::UnnamedTuple(UnnamedTuple::new(values)))
         }
     }
 }

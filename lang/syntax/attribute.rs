@@ -9,7 +9,7 @@ use crate::{src_ref::*, syntax::*};
 #[derive(Debug, Clone)]
 pub enum Attribute {
     /// A call attribute `foo::bar(baz = 32)`
-    NamedTuple(Identifier, ArgumentList),
+    Tuple(Identifier, ArgumentList),
     /// A name value attribute `foo::baz = baz`
     NameValue(Identifier, Expression),
 }
@@ -18,7 +18,7 @@ impl Attribute {
     /// Return qualified name for this attribute.
     pub fn identifier(&self) -> &Identifier {
         match self {
-            Attribute::NamedTuple(id, _) => id,
+            Attribute::Tuple(id, _) => id,
             Attribute::NameValue(id, _) => id,
         }
     }
@@ -27,7 +27,7 @@ impl Attribute {
 impl std::fmt::Display for Attribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Attribute::NamedTuple(id, argument_list) => {
+            Attribute::Tuple(id, argument_list) => {
                 writeln!(f, "#[{id}({argument_list})]")
             }
             Attribute::NameValue(id, expression) => {
@@ -40,7 +40,7 @@ impl std::fmt::Display for Attribute {
 impl SrcReferrer for Attribute {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         match self {
-            Attribute::NamedTuple(id, argument_list) => SrcRef::merge(id, argument_list),
+            Attribute::Tuple(id, argument_list) => SrcRef::merge(id, argument_list),
             Attribute::NameValue(id, expression) => SrcRef::merge(id, expression),
         }
     }

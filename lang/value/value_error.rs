@@ -15,9 +15,9 @@ pub enum ValueError {
     #[error("Quantity error: {0}")]
     QuantityError(#[from] QuantityError),
 
-    /// Named tuple error.
-    #[error("Named tuple error: {0}")]
-    NamedTupleError(#[from] NamedTupleError),
+    /// Cannot convert to color.
+    #[error("Cannot convert named tuple to color: {0}")]
+    CannotConvertToColor(Tuple),
 
     /// Type cannot be a key in a map
     #[error("Type cannot be a key in a map: {0}")]

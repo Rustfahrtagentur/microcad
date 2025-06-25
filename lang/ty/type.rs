@@ -21,9 +21,9 @@ pub enum Type {
     /// A list of elements of the same type: `[Scalar]`
     List(ListType),
     /// An unnamed tuple of elements: `(Scalar, String)`
-    Tuple(TupleType),
+    UnnamedTuple(UnnamedTupleType),
     /// A named tuple of elements: `(x: Scalar, y: String)`
-    NamedTuple(NamedTupleType),
+    Tuple(TupleType),
     /// Matrix type
     Matrix(MatrixType),
     /// Nodes.
@@ -62,8 +62,8 @@ impl std::fmt::Display for Type {
             Self::String => write!(f, "String"),
             Self::Bool => write!(f, "Bool"),
             Self::List(t) => write!(f, "{t}"),
+            Self::UnnamedTuple(t) => write!(f, "{t}"),
             Self::Tuple(t) => write!(f, "{t}"),
-            Self::NamedTuple(t) => write!(f, "{t}"),
             Self::Matrix(t) => write!(f, "{t}"),
             Self::Nodes => write!(f, "Nodes"),
             Self::Custom(n) => write!(f, "Custom({n})"),

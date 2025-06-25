@@ -6,17 +6,17 @@
 use crate::{syntax::*, value::*};
 /// Node metadata, from an evaluated attribute list.
 #[derive(Clone, Debug, Default)]
-pub struct Metadata(NamedTuple);
+pub struct Metadata(Tuple);
 
 impl Metadata {
     /// Create new meta data from map.
     pub fn new(map: std::collections::BTreeMap<Identifier, Value>) -> Self {
-        Self(NamedTuple::new(map))
+        Self(Tuple::new(map))
     }
 }
 
 impl std::ops::Deref for Metadata {
-    type Target = NamedTuple;
+    type Target = Tuple;
 
     fn deref(&self) -> &Self::Target {
         &self.0

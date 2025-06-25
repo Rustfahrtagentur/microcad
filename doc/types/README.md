@@ -39,7 +39,7 @@ Hence, the following example will fail:
 x: Length;         // error
 ```
 
-However, for parameter lists in functions and workbenches, you can declare the type only but also pass a default value: 
+However, for parameter lists in functions and workbenches, you can declare the type only but also pass a default value:
 
 [![test](.test/types_bundles_functions.png)](.test/types_bundles_functions.log)
 

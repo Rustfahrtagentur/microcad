@@ -15,7 +15,7 @@ impl Parse for Attribute {
                 pair.find(Rule::identifier).expect("Identifier"),
                 pair.find(Rule::expression).expect("Expression"),
             )),
-            Rule::attribute_named_tuple => Ok(Self::NamedTuple(
+            Rule::attribute_named_tuple => Ok(Self::Tuple(
                 pair.find(Rule::identifier).expect("Identifier"),
                 pair.find(Rule::argument_list).unwrap_or_default(),
             )),

@@ -11,11 +11,11 @@ impl Parse for TypeAnnotation {
         let s = match inner.as_rule() {
             Rule::list_type => Self(Refer::new(Type::List(ListType::parse(inner)?), pair.into())),
             Rule::tuple_type => Self(Refer::new(
-                Type::Tuple(TupleType::parse(inner)?),
+                Type::UnnamedTuple(UnnamedTupleType::parse(inner)?),
                 pair.into(),
             )),
             Rule::named_tuple_type => Self(Refer::new(
-                Type::NamedTuple(NamedTupleType::parse(inner)?),
+                Type::Tuple(TupleType::parse(inner)?),
                 pair.into(),
             )),
             Rule::matrix_type => Self(Refer::new(
@@ -41,20 +41,11 @@ impl Parse for TypeAnnotation {
                 )),
                 "String" => Self(Refer::new(Type::String, pair.into())),
                 // Type alias for built-in color type
-                "Color" => Self(Refer::new(
-                    Type::NamedTuple(NamedTupleType::new_color()),
-                    pair.into(),
-                )),
+                "Color" => Self(Refer::new(Type::Tuple(TupleType::new_color()), pair.into())),
                 // Type alias for built-in Vec2 type
-                "Vec2" => Self(Refer::new(
-                    Type::NamedTuple(NamedTupleType::new_vec2()),
-                    pair.into(),
-                )),
+                "Vec2" => Self(Refer::new(Type::Tuple(TupleType::new_vec2()), pair.into())),
                 // Type alias for built-in Vec3 type
-                "Vec3" => Self(Refer::new(
-                    Type::NamedTuple(NamedTupleType::new_vec3()),
-                    pair.into(),
-                )),
+                "Vec3" => Self(Refer::new(Type::Tuple(TupleType::new_vec3()), pair.into())),
                 _ => Self(Refer::new(
                     Type::Custom(QualifiedName::parse(inner)?),
                     pair.into(),
@@ -78,7 +69,7 @@ fn named_tuple_type() {
     assert_eq!(type_annotation.ty().to_string(), "(x: Integer, y: String)");
     assert_eq!(
         type_annotation.ty(),
-        Type::NamedTuple(NamedTupleType(
+        Type::Tuple(TupleType(
             vec![("x".into(), Type::Integer), ("y".into(), Type::String)]
                 .into_iter()
                 .collect()
