@@ -15,40 +15,32 @@ impl TupleType {
         Self(map)
     }
 
-    /// Create a new named tuple type from a slice of type.
-    ///
-    /// This function is used to create named tuples from built-in types like `Vec3` and `Color`.
-    pub fn new_from_slice(values: &[(&'static str, Type)]) -> Self {
-        Self::new(
-            values
-                .iter()
-                .map(|(k, v)| (Identifier::no_ref(k), v.clone()))
-                .collect(),
-        )
-    }
-
     /// Create new Vec2 type.
     pub fn new_vec2() -> Self {
-        Self::new_from_slice(&[("x", Type::scalar()), ("y", Type::scalar())])
+        [("x", Type::scalar()), ("y", Type::scalar())].iter().into()
     }
 
     /// Create new Vec3 type.
     pub fn new_vec3() -> Self {
-        Self::new_from_slice(&[
+        [
             ("x", Type::scalar()),
             ("y", Type::scalar()),
             ("z", Type::scalar()),
-        ])
+        ]
+        .iter()
+        .into()
     }
 
     /// Create new Color type.
     pub fn new_color() -> Self {
-        Self::new_from_slice(&[
+        [
             ("r", Type::scalar()),
             ("g", Type::scalar()),
             ("b", Type::scalar()),
             ("a", Type::scalar()),
-        ])
+        ]
+        .iter()
+        .into()
     }
 
     /// Test if the named tuple has exactly the number of keys.
@@ -95,6 +87,16 @@ impl TupleType {
     /// Check if the named tuple is a [`Vec3`].
     pub(crate) fn is_vec3(&self) -> bool {
         self.is_scalar_only() && self.has_exact_keys(&["x", "y", "z"])
+    }
+}
+
+impl From<std::slice::Iter<'_, (&str, Type)>> for TupleType {
+    fn from(values: std::slice::Iter<'_, (&str, Type)>) -> Self {
+        Self::new(
+            values
+                .map(|(k, v)| (Identifier::no_ref(k), v.clone()))
+                .collect(),
+        )
     }
 }
 
