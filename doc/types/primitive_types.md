@@ -20,7 +20,6 @@ The type `integer` contains a natural number.
 i = 3;
 ```
 
-
 ## String
 
 Text can be used to logging or to render text.
@@ -35,3 +34,12 @@ std::debug::assert(text.count() == 11);
 std::print(text);
 ```
 
+## Matrix
+
+Matrix types are built-in types and can be defined as:
+
+- `Matrix2`: A 2x2 matrix, commonly used for 2D rotations.
+- `Matrix3`: A 3x3 matrix, commonly used for rotations.
+- `Matrix4`: A 4x4 matrix, commonly used for affine transformations.
+
+*Note: Currently, matrices are used only internally and cannot be instantiated from µcad code.*

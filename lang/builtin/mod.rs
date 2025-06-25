@@ -14,7 +14,7 @@ use crate::{ty::*, value::*};
 
 /// This enum is used to declare parameter list for builtin symbols conveniently.
 ///
-/// It is used in the [`parameter_value`] and [`call_argument_value`] macros to be able
+/// It is used in the [`parameter_value`] and [`argument_value`] macros to be able
 /// to declare parameters and arguments in µcad like way, for example: `a: Scalar = 4.0`.
 pub enum BuiltinTypeHelper {
     /// Integer type.
@@ -40,7 +40,7 @@ impl From<BuiltinTypeHelper> for Type {
 
 /// This enum is used to declare parameter list for builtin symbols conveniently.
 ///
-/// It is used in the [`parameter_value`] and [`call_argument_value`] macros to be able
+/// It is used in the [`parameter_value`] and [`argument_value`] macros to be able
 /// to declare parameters and arguments in µcad like way, for example: `a: Scalar = 4.0`.
 pub enum BuiltinValueHelper {
     /// Integer type.
@@ -108,16 +108,16 @@ macro_rules! parameter_value {
 
 /// Shortcut to create a argument value
 #[macro_export]
-macro_rules! call_argument_value {
+macro_rules! argument_value {
     ($name:ident: $ty:ident = $value:expr) => {
-        CallArgumentValue::new(
+        ArgumentValue::new(
             Some(stringify!($name).into()),
             $crate::builtin::BuiltinValueHelper::$ty($value).into(),
             $crate::src_ref::SrcRef(None),
         )
     };
     ($ty:ident = $value:expr) => {
-        CallArgumentValue::new(
+        ArgumentValue::new(
             None,
             $crate::builtin::BuiltinValueHelper::$ty($value).into(),
             $crate::src_ref::SrcRef(None),

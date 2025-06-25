@@ -13,7 +13,7 @@ pub use multiplicity::*;
 
 use crate::{eval::*, src_ref::*, value::*};
 
-/// Map of named call arguments
+/// Map of named arguments
 #[derive(Clone, Debug, Default)]
 pub struct ArgumentMap(Refer<std::collections::HashMap<Identifier, Value>>);
 
@@ -42,10 +42,7 @@ impl ArgumentMap {
         for (id, arg) in self.0.iter() {
             symbols.insert_node(
                 id.clone(),
-                Symbol::new(
-                    SymbolDefinition::CallArgument(id.clone(), arg.clone()),
-                    None,
-                ),
+                Symbol::new(SymbolDefinition::Argument(id.clone(), arg.clone()), None),
             )
         }
         symbols
@@ -115,11 +112,11 @@ impl ArgumentMatch for ArgumentMap {
 fn argument_match_single() {
     let parameter_values = ParameterValueList::new(vec![crate::parameter_value!(a: Scalar)]);
 
-    let call_argument_value_list =
-        CallArgumentValueList::from(vec![crate::call_argument_value!(a: Scalar = 5.0)]);
+    let argument_value_list =
+        ArgumentValueList::from(vec![crate::argument_value!(a: Scalar = 5.0)]);
 
     let arg_map =
-        ArgumentMap::find_match(&call_argument_value_list, &parameter_values).expect("Valid match");
+        ArgumentMap::find_match(&argument_value_list, &parameter_values).expect("Valid match");
 
     let a = arg_map.get(&Identifier::no_ref("a"));
     assert!(a.is_some());

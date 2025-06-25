@@ -12,56 +12,55 @@ impl Parse for Call {
         Ok(Call {
             name: QualifiedName::parse(first)?,
             argument_list: match inner.next() {
-                Some(pair) => CallArgumentList::parse(pair)?,
-                None => CallArgumentList::default(),
+                Some(pair) => ArgumentList::parse(pair)?,
+                None => ArgumentList::default(),
             },
             src_ref: pair.clone().into(),
         })
     }
 }
 
-impl Parse for CallArgumentList {
+impl Parse for ArgumentList {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut call_argument_list =
-            CallArgumentList(Refer::new(OrdMap::default(), pair.clone().into()));
+        let mut argument_list = ArgumentList(Refer::new(OrdMap::default(), pair.clone().into()));
 
         match pair.as_rule() {
-            Rule::call_argument_list => {
+            Rule::argument_list => {
                 for pair in pair.inner() {
-                    call_argument_list
-                        .try_push(CallArgument::parse(pair)?)
-                        .map_err(ParseError::DuplicateCallArgument)?;
+                    argument_list
+                        .try_push(Argument::parse(pair)?)
+                        .map_err(ParseError::DuplicateArgument)?;
                 }
 
-                Ok(call_argument_list)
+                Ok(argument_list)
             }
             rule => {
-                unreachable!("CallArgumentList::parse expected call argument list, found {rule:?}")
+                unreachable!("ArgumentList::parse expected argument list, found {rule:?}")
             }
         }
     }
 }
 
-impl Parse for CallArgument {
+impl Parse for Argument {
     fn parse(pair: Pair) -> ParseResult<Self> {
         match pair.clone().as_rule() {
-            Rule::call_named_argument => {
+            Rule::named_argument => {
                 let mut inner = pair.inner();
                 let first = inner.next().expect(INTERNAL_PARSE_ERROR);
                 let second = inner.next().expect(INTERNAL_PARSE_ERROR);
 
-                Ok(CallArgument {
+                Ok(Argument {
                     id: Some(Identifier::parse(first)?),
                     value: Expression::parse(second)?,
                     src_ref: pair.src_ref(),
                 })
             }
-            Rule::expression => Ok(CallArgument {
+            Rule::expression => Ok(Argument {
                 id: None,
                 value: Expression::parse(pair.clone())?,
                 src_ref: pair.into(),
             }),
-            rule => unreachable!("CallArgument::parse expected call argument, found {rule:?}"),
+            rule => unreachable!("Argument::parse expected argument, found {rule:?}"),
         }
     }
 }
@@ -73,9 +72,9 @@ impl Parse for MethodCall {
         Ok(MethodCall {
             id: Identifier::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?,
             argument_list: if let Some(pair) = inner.next() {
-                CallArgumentList::parse(pair)?
+                ArgumentList::parse(pair)?
             } else {
-                CallArgumentList::default()
+                ArgumentList::default()
             },
             src_ref: pair.clone().into(),
         })

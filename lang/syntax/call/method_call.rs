@@ -11,7 +11,7 @@ pub struct MethodCall {
     /// Name of the method.
     pub id: Identifier,
     /// List of arguments.
-    pub argument_list: CallArgumentList,
+    pub argument_list: ArgumentList,
     /// Source code reference.
     pub src_ref: SrcRef,
 }

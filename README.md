@@ -114,7 +114,9 @@ The STL file can now also be loaded into a slicer program like [Cura](https://ul
 ## Documentation
 
 - [Description of language features](doc/README.md)
+- [Language reference](doc/REFERENCE.md)
 - [Basic concepts](doc/CONCEPTS.md)
+- [Examples](doc/EXAMPLES.md)
 - Code documentation:
   - [`microcad-lang` module](https://docs.rs/microcad-lang)
   - [`microcad-core` module](https://docs.rs/microcad-core)
@@ -183,17 +185,18 @@ They can be included in the *markdown*, if you use this code:
 ```µcad,my_test
 ````
 
-| Image                                  | MD Code Type | Mark       | Code                            | What do do?            |
-| -------------------------------------- | ------------ | ---------- | ------------------------------- | ---------------------- |
-| ![ok](tests/images/ok.png)             | `µcad`       |            | succeeds                        | ok                     |
-| ![fail](tests/images/fail.png)         | `µcad`       |            | fails                           | fix test or code       |
-| ![ok_fail](tests/images/ok_fail.png)   | `µcad`       | `#fail`    | succeeds but should fail        | find out why           |
-| ![fail_ok](tests/images/fail_ok.png)   | `µcad`       | `#fail`    | fails intentionally             | ok                     |
-| ![todo](tests/images/todo.png)         | `µcad`       | `#todo`    | needs more work to succeed      | create issue/implement |
-| ![not_todo](tests/images/not_todo.png) | `µcad`       | `#todo`    | Succeeds but still marked to do | remove `#todo`         |
-| -                                      | `µcad`       | `#no-test` | Ignore completely               | yolo!                  |
-| -                                      | -            | `          | Ignore completely               | yolo!                  |
-| -                                      | *(other)*    | `          | Ignore completely               | yolo!                  |
+| Image                                      | MD Code Type | Mark       | Code                            | What do do?            |
+| ------------------------------------------ | ------------ | ---------- | ------------------------------- | ---------------------- |
+| ![ok](tests/images/ok.png)                 | `µcad`       |            | succeeds                        | ok                     |
+| ![fail](tests/images/fail.png)             | `µcad`       |            | fails                           | fix test or code       |
+| ![ok_fail](tests/images/ok_fail.png)       | `µcad`       | `#fail`    | succeeds but should fail        | find out why           |
+| ![fail_ok](tests/images/fail_ok.png)       | `µcad`       | `#fail`    | fails intentionally             | ok                     |
+| ![todo](tests/images/todo.png)             | `µcad`       | `#todo`    | needs more work to succeed      | create issue/implement |
+| ![not_todo](tests/images/not_todo.png)     | `µcad`       | `#todo`    | Succeeds but still marked to do | remove `#todo`         |
+| ![parse_fail](tests/images/parse_fail.png) | `µcad`       | -          | Parsing has failed              | fix grammar            |
+| -                                          | `µcad`       | `#no-test` | Ignore completely               | yolo!                  |
+| -                                          | -            | -          | Ignore completely               | yolo!                  |
+| -                                          | *(other)*    | -          | Ignore completely               | yolo!                  |
 
 You may also give the reader access to the logs by clicking on the banner with:
 

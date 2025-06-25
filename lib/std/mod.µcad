@@ -1,9 +1,10 @@
 pub use __builtin::print;
-pub use __builtin::algorithm;
+pub use __builtin::ops;
 pub use __builtin::math;
 
 mod debug {
     pub use __builtin::assert;
+    pub use __builtin::assert_eq;
     pub use __builtin::assert_invalid;
     pub use __builtin::assert_valid;
 }
@@ -17,3 +18,8 @@ part export(filename: String) {
         @children
     }
 }
+
+pub use __builtin::print;
+pub use __builtin::error;
+pub use __builtin::warning;
+pub use __builtin::info;

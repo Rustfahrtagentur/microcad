@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Call argument value evaluation entity
+//! Argument value evaluation entity
 
 use crate::{eval::*, syntax::*};
 
@@ -15,7 +15,7 @@ pub trait CallMethod {
     fn call_method(
         &self,
         id: &Identifier,
-        args: &CallArgumentList,
+        args: &ArgumentList,
         context: &mut Context,
     ) -> EvalResult<Value>;
 }
@@ -24,7 +24,7 @@ impl CallMethod for Array {
     fn call_method(
         &self,
         id: &Identifier,
-        _: &CallArgumentList,
+        _: &ArgumentList,
         context: &mut Context,
     ) -> EvalResult<Value> {
         match id.id().as_str() {
@@ -56,21 +56,21 @@ impl CallMethod for Value {
     fn call_method(
         &self,
         id: &Identifier,
-        args: &CallArgumentList,
+        args: &ArgumentList,
         context: &mut Context,
     ) -> EvalResult<Value> {
         match &self {
-            Value::None => todo!(),
-            Value::Integer(_) => todo!(),
-            Value::Quantity(_) => todo!(),
-            Value::Bool(_) => todo!(),
-            Value::String(_) => todo!(),
-            Value::Color(_) => todo!(),
+            Value::None => unreachable!("None value cannot be called"),
+            Value::Integer(_) => eval_todo!(context, args, "call_method for Integer"),
+            Value::Quantity(_) => eval_todo!(context, args, "call_method for Quantity"),
+            Value::Bool(_) => eval_todo!(context, args, "call_method for Bool"),
+            Value::String(_) => eval_todo!(context, args, "call_method for String"),
+            Value::Color(_) => eval_todo!(context, args, "call_method for Color"),
             Value::Array(list) => list.call_method(id, args, context),
-            Value::NamedTuple(_) => todo!(),
-            Value::Tuple(_) => todo!(),
-            Value::Matrix(_) => todo!(),
-            Value::Nodes(_) => todo!(),
+            Value::NamedTuple(_) => eval_todo!(context, args, "call_method for NamedTuple"),
+            Value::Tuple(_) => eval_todo!(context, args, "call_method for Tuple"),
+            Value::Matrix(_) => eval_todo!(context, args, "call_method for Matrix"),
+            Value::Nodes(_) => eval_todo!(context, args, "call_method for Nodes"),
         }
     }
 }
@@ -89,7 +89,7 @@ fn call_list_method() {
     if let Value::Bool(result) = list
         .call_method(
             &"all_equal".into(),
-            &CallArgumentList::default(),
+            &ArgumentList::default(),
             &mut Context::default(),
         )
         .expect("test error")

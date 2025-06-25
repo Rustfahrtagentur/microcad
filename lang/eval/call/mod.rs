@@ -4,14 +4,14 @@
 //! µcad Call related evaluation entities
 
 #[macro_use]
-mod call_argument_value;
-mod call_argument;
-mod call_argument_value_list;
+mod argument_value;
+mod argument;
+mod argument_value_list;
 mod call_method;
 mod call_trait;
 
-pub use call_argument_value::*;
-pub use call_argument_value_list::*;
+pub use argument_value::*;
+pub use argument_value_list::*;
 pub use call_method::*;
 pub use call_trait::*;
 
@@ -19,13 +19,13 @@ use crate::{eval::*, syntax::*};
 
 use thiserror::Error;
 
-impl Eval<CallArgumentValueList> for CallArgumentList {
-    /// Evaluate into a [`CallArgumentValueList`].
-    fn eval(&self, context: &mut Context) -> EvalResult<CallArgumentValueList> {
-        let mut v = CallArgumentValueList::default();
+impl Eval<ArgumentValueList> for ArgumentList {
+    /// Evaluate into a [`ArgumentValueList`].
+    fn eval(&self, context: &mut Context) -> EvalResult<ArgumentValueList> {
+        let mut v = ArgumentValueList::default();
         for call_arg in self.iter() {
             v.try_push(call_arg.eval_value(context)?)
-                .expect("Could not insert call argument value");
+                .expect("Could not insert argument value");
         }
         Ok(v)
     }
@@ -48,7 +48,7 @@ impl Eval for Call {
             Err(err) => {
                 // builtin functions get their argument list as string if it can't be evaluated
                 if let SymbolDefinition::Builtin(_) = &symbol.borrow().def {
-                    CallArgumentValueList::from_code(
+                    ArgumentValueList::from_code(
                         context.source_code(&self.argument_list)?,
                         &self.argument_list,
                     )

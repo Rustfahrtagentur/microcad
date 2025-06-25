@@ -1,0 +1,8 @@
+Parser error:  --> 3:8
+  |
+3 |     if @children.count() == 1 {
+  |        ^---
+  |
+  = expected COMMENT or expression
+-- Test result --
+FAIL

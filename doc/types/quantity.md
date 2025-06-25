@@ -12,8 +12,8 @@ The following quantity types are supported:
 | `Angle`   | `°` or `deg`, `grad`, `turn`,`rad`          |                                |
 | `Area`    | `µm²`,`mm²`,`cm²`,`m³`                      | `in²`, `ft²` , `yd²`           |
 | `Volume`  | `µm³`, `mm³`,`cm³`,`m³`,`ml`,`cl`,`l`, `µl` | `in³`, `ft³` , `yd³`           |
-| `Weight`  | `g`, `kg`                                   | `lb`, `oz`                     |
 | `Density` | `g/mm³`                                     | -                              |
+| `Weight`  | `g`, `kg`                                   | `lb`, `oz`                     |
 
 **Note**: More units [may be implemented](https://github.com/Rustfahrtagentur/microcad/issues/76).
 
@@ -88,7 +88,6 @@ An `Area` is a two-dimensional quantity. It is the result when multiplying two `
 
 [![test](.test/types_quantity_area.png)](.test/types_quantity_area.log)
 
-
 ```µcad,types_quantity_area
 a = 3cm;
 b = 2cm;
@@ -115,6 +114,7 @@ std::debug::assert(square_centimeter == 0.1m²);
 A `Volume` is a three-dimensional quantity. It is the result when multiplying three `Length`s.
 
 [![test](.test/types_quantity_volume.png)](.test/types_quantity_volume.log)
+
 ```µcad,types_quantity_volume
 a = 3mm;
 b = 2mm;
@@ -144,6 +144,10 @@ std::debug::assert(cubic_meter == 1.0l);
 std::debug::assert(centiliter == 1.0l);
 std::debug::assert(milliliter == 1.0l);
 ```
+
+### Density
+
+TODO
 
 ### Weight
 

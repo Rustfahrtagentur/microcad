@@ -135,9 +135,9 @@ impl Symbol {
         Symbol::new(SymbolDefinition::Constant(id, value), None)
     }
 
-    /// Create a new call argument ([`SymbolDefinition::CallArgument`]).
+    /// Create a new argument ([`SymbolDefinition::Argument`]).
     pub fn new_call_argument(id: Identifier, value: Value) -> Symbol {
-        Symbol::new(SymbolDefinition::CallArgument(id, value), None)
+        Symbol::new(SymbolDefinition::Argument(id, value), None)
     }
 
     /// Print out symbols from that point.
@@ -299,7 +299,7 @@ impl SrcReferrer for SymbolInner {
                 unreachable!("builtin has no source code reference")
             }
             SymbolDefinition::Constant(identifier, _)
-            | SymbolDefinition::CallArgument(identifier, _) => identifier.src_ref(),
+            | SymbolDefinition::Argument(identifier, _) => identifier.src_ref(),
             SymbolDefinition::Alias(identifier, _) => identifier.src_ref(),
         }
     }

@@ -1,0 +1,12 @@
+-- Output --
+Hello µcad!
+-- Errors --
+error: Not implemented: call_method for String
+error: Assertion failed: <invalid>
+  ---> <from_str>:2:20
+     |
+   2 | std::debug::assert(text.count() == 11);
+     |                    ^^^^^^^^^^^^^^^^^^
+     |
+-- Test result --
+FAIL

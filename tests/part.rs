@@ -14,17 +14,15 @@ fn qualified_name(s: &str) -> QualifiedName {
     )
 }
 
-/// Helper function to create a call argument list from &str
+/// Helper function to create a argument list from &str
 #[cfg(test)]
-fn call_argument_value_list(s: &str, context: &mut Context) -> CallArgumentValueList {
+fn call_argument_value_list(s: &str, context: &mut Context) -> ArgumentValueList {
     use microcad_lang::parser::*;
 
-    let call_argument_list = Parser::parse_rule::<CallArgumentList>(Rule::call_argument_list, s, 0)
-        .expect("Valid CallArgumentList");
+    let argument_list =
+        Parser::parse_rule::<ArgumentList>(Rule::argument_list, s, 0).expect("Valid ArgumentList");
 
-    call_argument_list
-        .eval(context)
-        .expect("Valid call argument list")
+    argument_list.eval(context).expect("Valid argument list")
 }
 
 #[test]
@@ -168,7 +166,7 @@ fn workbench_initializer_call() {
     // Call `circle()` (missing arguments)
     {
         let nodes = definition
-            .call(&CallArgumentValueList::default(), &mut context)
+            .call(&ArgumentValueList::default(), &mut context)
             .expect("Valid nodes");
         assert_eq!(nodes.len(), 0, "There should no nodes");
         log::trace!("{}", context.diagnosis());

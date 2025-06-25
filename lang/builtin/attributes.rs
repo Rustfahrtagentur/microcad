@@ -15,7 +15,7 @@ pub fn tag(id: &Identifier) -> EvalResult<Option<MetadataItem>> {
 
 /// Built-in export [`MetadataItem`]: `#export("filename.svg")`.
 pub fn export(
-    arguments: &CallArgumentValueList,
+    arguments: &ArgumentValueList,
     context: &mut Context,
 ) -> EvalResult<Option<MetadataItem>> {
     // Convert the first argument to string and

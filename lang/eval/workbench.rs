@@ -6,10 +6,10 @@
 use crate::{eval::*, model_tree::*, syntax::*};
 
 impl WorkbenchDefinition {
-    /// Find a matching initializer for call argument list
+    /// Find a matching initializer for argument list
     fn find_matching_initializer(
         &self,
-        args: &CallArgumentValueList,
+        args: &ArgumentValueList,
         context: &mut Context,
     ) -> Option<(&InitDefinition, MultiArgumentMap)> {
         self.inits().find_map(|init| {
@@ -75,7 +75,7 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
     /// Example:
     /// Consider the `part a(b: Scalar) { }`.
     /// Calling the part `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
-    fn call(&self, args: &CallArgumentValueList, context: &mut Context) -> EvalResult<ModelNodes> {
+    fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<ModelNodes> {
         let mut nodes = ModelNodes::default();
 
         match self.find_matching_initializer(args, context) {

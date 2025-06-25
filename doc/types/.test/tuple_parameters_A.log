@@ -4,3 +4,5 @@ Parser error:  --> 1:10
   |          ^---
   |
   = expected COMMENT or identifier
+-- Test result --
+FAILED AS EXPECTED

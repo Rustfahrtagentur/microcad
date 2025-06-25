@@ -6,8 +6,8 @@ use std::geo3d::*;
 use std::test::foo::bar as baz;
 // use print from `std/module.µcad`
 use std::print;
-// public use algorithm from `std/module.µcad`
-pub use std::algorithm;
+// public use operation from `std/module.µcad`
+pub use std::ops;
 
 // use debug from `std/module.µcad`
 use std::debug;

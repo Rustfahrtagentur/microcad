@@ -1,0 +1,8 @@
+Parser error:  --> 2:11
+  |
+2 |     pub fn inner() { 
+  |           ^---
+  |
+  = expected identifier_part
+-- Test result --
+FAILED AS EXPECTED
