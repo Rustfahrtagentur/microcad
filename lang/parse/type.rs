@@ -11,10 +11,6 @@ impl Parse for TypeAnnotation {
         let s = match inner.as_rule() {
             Rule::list_type => Self(Refer::new(Type::List(ListType::parse(inner)?), pair.into())),
             Rule::tuple_type => Self(Refer::new(
-                Type::UnnamedTuple(UnnamedTupleType::parse(inner)?),
-                pair.into(),
-            )),
-            Rule::named_tuple_type => Self(Refer::new(
                 Type::Tuple(TupleType::parse(inner)?),
                 pair.into(),
             )),

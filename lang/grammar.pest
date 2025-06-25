@@ -132,11 +132,11 @@ qualified_name = { identifier ~ ("::" ~ identifier)* }
 //`int`: ok
 //`a::nested::typename`: ok
 //`[scalar]`: ok # List type
-//`(scalar, scalar)`: Unnamed tuple type
-//`(a: scalar, b: scalar)`: Named tuple type
+//`(scalar, scalar)`: ok # Unnamed tuple type
+//`(a: scalar, scalar)`: ok # Partially named tuple type
+//`(a: scalar, b: scalar)`: ok # Named tuple type
 type = {
   list_type |
-  named_tuple_type |
   tuple_type |
   matrix_type |
   qualified_name |
@@ -156,14 +156,10 @@ list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 
 //`(a: Length, b: scalar)`: ok
 //`(a: Length, )`: ok # Trailing comma
-named_tuple_type = { "(" ~ ws* ~ named_tuple_type_element ~ (ws* ~ "," ~ ws* ~ named_tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")" }
+tuple_type = { "(" ~ ws* ~ tuple_type_element ~ (ws* ~ "," ~ ws* ~ tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
 //`a: Length`: ok
-named_tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
-
-//`(Length,scalar)`: ok # 2 unnamed fields
-//`(Length, a: Length)`: error # Cannot mix named and unnamed arguments
-tuple_type = { "(" ~ ws* ~ type ~ (ws* ~ "," ~ ws* ~ type)* ~ ws* ~ ","? ~ ws* ~ ")" }
+tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
 
 //`Matrix4x3`: ok
 //`Matrix3`: ok
@@ -179,7 +175,7 @@ list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" ~ unit? }
 //`["test"]`: ok # Associative lists, access value of `\"test\"`
 list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
 
-// An expression for both named and unnamed tuple
+// An expression for tuples
 //`(1.0mm, 2.0mm)`: ok
 //`(1.0mm,)`: ok # Trailing comma
 //`(x = 1.0mm, y = 2.0mm)`: ok

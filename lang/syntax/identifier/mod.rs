@@ -9,7 +9,7 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{Id, parse::*, parser::Parser, src_ref::*, syntax::*};
+use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 
 /// µcad identifier
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -19,6 +19,11 @@ impl Identifier {
     /// Make empty (invalid) id
     pub fn none() -> Self {
         Self(Refer::none("".into()))
+    }
+
+    /// Check if this was created with none()
+    pub fn is_none(&self) -> bool {
+        self.0.src_ref().is_empty() && self.0.is_empty()
     }
 
     /// Make empty (invalid) id

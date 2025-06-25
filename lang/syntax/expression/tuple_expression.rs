@@ -12,8 +12,6 @@ pub struct TupleExpression {
     pub args: ArgumentList,
     /// Common unit
     pub unit: Unit,
-    /// `true` if this is a named tuple
-    pub is_named: bool,
     /// Source code reference
     pub src_ref: SrcRef,
 }
@@ -31,12 +29,8 @@ impl std::fmt::Display for TupleExpression {
             "({})",
             self.args
                 .iter()
-                .map(|arg| if self.is_named {
-                    if let Some(name) = &arg.id {
-                        format!("{} = {}", &name, arg.value)
-                    } else {
-                        format!("{}", arg.value)
-                    }
+                .map(|arg| if let Some(name) = &arg.id {
+                    format!("{} = {}", &name, arg.value)
                 } else {
                     arg.to_string()
                 })

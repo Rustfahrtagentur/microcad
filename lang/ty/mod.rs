@@ -9,7 +9,6 @@ mod quantity_type;
 mod tuple_type;
 mod r#type;
 mod type_list;
-mod unnamed_tuple_type;
 
 pub use list_type::*;
 pub use matrix_type::*;
@@ -17,7 +16,6 @@ pub use quantity_type::*;
 pub use r#type::*;
 pub use tuple_type::*;
 pub use type_list::*;
-pub use unnamed_tuple_type::*;
 
 /// Trait for structs and expressions that have a type
 pub trait Ty {

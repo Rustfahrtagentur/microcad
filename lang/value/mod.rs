@@ -10,7 +10,6 @@ mod array;
 mod matrix;
 mod quantity;
 mod tuple;
-mod unnamed_tuple;
 mod value_error;
 mod value_list;
 
@@ -18,7 +17,6 @@ pub use array::*;
 pub use matrix::*;
 pub use quantity::*;
 pub use tuple::*;
-pub use unnamed_tuple::*;
 pub use value_error::*;
 pub use value_list::*;
 
@@ -43,8 +41,6 @@ pub enum Value {
     String(String),
     /// A list of values with a common type.
     Array(Array),
-    /// A tuple of unnamed items.
-    UnnamedTuple(UnnamedTuple),
     /// A tuple of named items.
     Tuple(Tuple),
     /// A matrix.
@@ -199,7 +195,6 @@ impl crate::ty::Ty for Value {
             Value::String(_) => Type::String,
             Value::Array(list) => list.ty(),
             Value::Tuple(named_tuple) => named_tuple.ty(),
-            Value::UnnamedTuple(unnamed_tuple) => unnamed_tuple.ty(),
             Value::Matrix(matrix) => matrix.ty(),
             Value::Nodes(_) => Type::Nodes,
         }
@@ -247,10 +242,6 @@ impl std::ops::Add for Value {
                     lhs.iter().chain(rhs.iter()).cloned().collect(),
                     lhs.ty(),
                 )))
-            }
-            // Add values of two tuples of the same length
-            (Value::UnnamedTuple(lhs), Value::UnnamedTuple(rhs)) => {
-                Ok(Value::UnnamedTuple((lhs + rhs)?))
             }
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} + {rhs}"))),
         }
@@ -358,7 +349,6 @@ impl std::fmt::Display for Value {
             Value::String(s) => write!(f, "{s}"),
             Value::Array(l) => write!(f, "{l}"),
             Value::Tuple(t) => write!(f, "{t}"),
-            Value::UnnamedTuple(t) => write!(f, "{t}"),
             Value::Matrix(m) => write!(f, "{m}"),
             Value::Nodes(n) => n.dump(f),
         }
@@ -375,7 +365,6 @@ impl std::fmt::Debug for Value {
             Self::String(arg0) => write!(f, "String: {arg0}"),
             Self::Array(arg0) => write!(f, "List: {arg0}"),
             Self::Tuple(arg0) => write!(f, "Tuple: {arg0}"),
-            Self::UnnamedTuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
             Self::Matrix(arg0) => write!(f, "Matrix: {arg0}"),
             Self::Nodes(arg0) => write!(f, "Nodes:\n {arg0}"),
         }

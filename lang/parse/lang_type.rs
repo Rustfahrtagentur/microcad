@@ -19,7 +19,7 @@ impl Parse for ListType {
 impl Parse for TupleType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         use crate::ty::Ty;
-        Parser::ensure_rule(&pair, Rule::named_tuple_type);
+        Parser::ensure_rule(&pair, Rule::tuple_type);
 
         let mut types = std::collections::BTreeMap::new();
 
@@ -31,19 +31,6 @@ impl Parse for TupleType {
                 return Err(ParseError::DuplicatedMapType(name.clone()));
             }
             types.insert(name, ty);
-        }
-
-        Ok(Self(types))
-    }
-}
-
-impl Parse for UnnamedTupleType {
-    fn parse(pair: Pair) -> ParseResult<Self> {
-        let inner = pair.inner();
-        let mut types = Vec::new();
-        use crate::ty::Ty;
-        for pair in inner {
-            types.push(TypeAnnotation::parse(pair)?.ty());
         }
 
         Ok(Self(types))
@@ -87,21 +74,6 @@ fn list_type() {
     assert_eq!(
         type_annotation.ty(),
         Type::List(ListType::new(Type::Integer))
-    );
-}
-
-#[test]
-fn unnamed_tuple_type() {
-    use crate::parser::*;
-    use crate::ty::Ty;
-
-    let type_annotation =
-        Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "(Integer, String)", 0)
-            .expect("test error");
-    assert_eq!(type_annotation.ty().to_string(), "(Integer, String)");
-    assert_eq!(
-        type_annotation.ty(),
-        Type::UnnamedTuple(UnnamedTupleType(vec![Type::Integer, Type::String]))
     );
 }
 

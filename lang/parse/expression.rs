@@ -225,7 +225,6 @@ impl Parse for TupleExpression {
         }
 
         Ok(TupleExpression {
-            is_named: named_count == argument_list.len(),
             args: argument_list,
             unit: match inner.next() {
                 Some(pair) => Unit::parse(pair)?,
