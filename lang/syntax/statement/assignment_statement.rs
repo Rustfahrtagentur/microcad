@@ -3,7 +3,7 @@
 
 //! Assignment statement syntax elements
 
-use crate::{model_tree::*, src_ref::*, syntax::*};
+use crate::{diag::*, model_tree::*, src_ref::*, syntax::*, ty::*};
 
 /// An assignment statement, e.g. `#[aux] s = sphere(3.0mm);`.
 #[derive(Clone, Debug)]
@@ -53,11 +53,16 @@ use crate::value::*;
 
 impl Eval for AssignmentStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        let value = self
-            .assignment
+        let assignment = &self.assignment;
+        let value = assignment
             .expression
             .eval_with_attribute_list(&self.attribute_list, context)?;
-        context.set_local_value(self.assignment.id.clone(), value)?;
+        if let Err(err) = assignment.type_check(value.ty()) {
+            context.error(self, err)?;
+            return Ok(Value::None);
+        }
+
+        context.set_local_value(assignment.id.clone(), value)?;
         Ok(Value::None)
     }
 }

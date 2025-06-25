@@ -31,8 +31,10 @@ pub(crate) use transform::*;
 pub fn builtin_module() -> Symbol {
     ModuleBuilder::new("__builtin".try_into().expect("unexpected name error"))
         .symbol(assert())
+        .symbol(assert_eq())
         .symbol(assert_valid())
         .symbol(assert_invalid())
+        .symbol(type_of())
         .symbol(print())
         .symbol(error())
         .symbol(warning())

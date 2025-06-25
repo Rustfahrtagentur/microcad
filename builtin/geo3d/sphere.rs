@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter_value, rc::*, src_ref::*, syntax::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*, syntax::*};
 
 /// The builtin sphere primitive, defined by its radius.
 #[derive(Debug)]
@@ -25,7 +25,7 @@ impl BuiltinPartDefinition for Sphere {
     }
 
     fn parameters() -> ParameterValueList {
-        vec![parameter_value!(radius: Scalar)].into()
+        vec![parameter!(radius: Scalar)].into()
     }
 }
 

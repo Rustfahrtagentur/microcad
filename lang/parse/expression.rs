@@ -35,13 +35,13 @@ lazy_static::lazy_static! {
         // Precedence is defined lowest to highest
         PrattParser::new()
             // Addition and subtract have equal precedence
+            .op(Op::infix(equal, Left) | Op::infix(not_equal, Left))
+            .op(Op::infix(greater_than, Left) | Op::infix(less_than, Left))
+            .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
             .op(Op::infix(add, Left) | Op::infix(subtract, Left))
             .op(Op::infix(multiply, Left) | Op::infix(divide, Left))
             .op(Op::infix(r#union, Left) | Op::infix(intersection, Left))
             .op(Op::infix(power_xor, Left))
-            .op(Op::infix(greater_than, Left) | Op::infix(less_than, Left))
-            .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
-            .op(Op::infix(equal, Left) | Op::infix(not_equal, Left))
             .op(Op::infix(near, Left))
             .op(Op::prefix(unary_minus))
             .op(Op::prefix(unary_plus))
@@ -154,7 +154,7 @@ impl Parse for Expression {
                                 Identifier::parse(op)?,
                                 pair.clone().into(),
                             )),
-                            Rule::int => Ok(Self::UnnamedTupleElementAccess(
+                            Rule::int => Ok(Self::TupleElementAccess(
                                 Box::new(lhs?),
                                 op.as_str().parse().expect("Integer expression expected"),
                                 pair.clone().into(),
@@ -209,24 +209,24 @@ impl Parse for NestedItem {
 impl Parse for TupleExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
-        let call_argument_list = ArgumentList::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
-        if call_argument_list.is_empty() {
+        let argument_list = ArgumentList::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
+        if argument_list.is_empty() {
             return Err(ParseError::EmptyTupleExpression);
         }
 
         // Count number of positional and named arguments
-        let named_count: usize = call_argument_list
+        let named_count: usize = argument_list
             .iter()
             .map(|c| if c.id.is_some() { 1 } else { 0 })
             .sum();
 
-        if named_count > 0 && named_count < call_argument_list.len() {
+        if named_count > 0 && named_count < argument_list.len() {
             return Err(ParseError::MixedTupleArguments);
         }
 
         Ok(TupleExpression {
-            is_named: named_count == call_argument_list.len(),
-            args: call_argument_list,
+            is_named: named_count == argument_list.len(),
+            args: argument_list,
             unit: match inner.next() {
                 Some(pair) => Unit::parse(pair)?,
                 None => Unit::None,

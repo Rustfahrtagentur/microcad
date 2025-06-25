@@ -3,8 +3,6 @@
 
 //! Builtin module
 
-pub mod attributes;
-pub mod color;
 pub mod module_builder;
 
 use microcad_core::*;
@@ -25,6 +23,8 @@ pub enum BuiltinTypeHelper {
     Angle,
     /// String type.
     String,
+    /// Color type
+    Color,
 }
 
 impl From<BuiltinTypeHelper> for Type {
@@ -34,6 +34,7 @@ impl From<BuiltinTypeHelper> for Type {
             BuiltinTypeHelper::Scalar => Type::Quantity(QuantityType::Scalar),
             BuiltinTypeHelper::Angle => Type::Quantity(QuantityType::Angle),
             BuiltinTypeHelper::String => Type::String,
+            BuiltinTypeHelper::Color => Type::NamedTuple(NamedTupleType::new_color()),
         }
     }
 }
@@ -51,6 +52,8 @@ pub enum BuiltinValueHelper {
     Length(Scalar),
     /// String type.
     String(String),
+    /// Color type
+    Color(Color),
 }
 
 impl From<BuiltinValueHelper> for Value {
@@ -64,13 +67,14 @@ impl From<BuiltinValueHelper> for Value {
                 Value::Quantity(Quantity::new(v, QuantityType::Length))
             }
             BuiltinValueHelper::String(s) => Value::String(s),
+            BuiltinValueHelper::Color(c) => Value::NamedTuple(c.into()),
         }
     }
 }
 
 /// Shortcut to create a `ParameterValue`
 #[macro_export]
-macro_rules! parameter_value {
+macro_rules! parameter {
     ($id:ident) => {
         $crate::eval::ParameterValue::new(
             $crate::syntax::Identifier::no_ref(stringify!($id)),
@@ -108,7 +112,7 @@ macro_rules! parameter_value {
 
 /// Shortcut to create a argument value
 #[macro_export]
-macro_rules! argument_value {
+macro_rules! argument {
     ($name:ident: $ty:ident = $value:expr) => {
         ArgumentValue::new(
             Some(stringify!($name).into()),

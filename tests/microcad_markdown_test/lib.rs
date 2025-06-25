@@ -356,7 +356,7 @@ fn create_test_code(
     let todo = mode == Some("todo");
 
     format!(
-        r##"#[test]
+        r###"#[test]
                 #[allow(non_snake_case)]
                 fn r#{name}() {{
                     use crate::rust_std::fs;
@@ -386,10 +386,10 @@ fn create_test_code(
 
                     // load and handle µcad source file
                     match SourceFile::load_from_str(
-                        r#"
-                        {code}"#,
+                        r##"
+                        {code}"##,
                     ) {handling};
-                }}"##,
+                }}"###,
         // generate handling code dependant of what result we are awaiting
         handling = match mode {
             // test is expected to fail?

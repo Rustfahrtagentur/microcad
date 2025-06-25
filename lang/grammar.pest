@@ -338,19 +338,20 @@ method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 //`a::nested::f(a = 3.0mm, b = 2.0mm)`: ok
 call = { qualified_name ~ ws* ~ call_op }
 
-//`foo::bar()`: ok # Empty call 
-//`foo::bar(baz = 42)`: ok # Call
 //`foo = bar`: ok # Assignment
-//`foo`: ok # Simple tag
-//`foo::bar`: ok # Qualified name tag
-attribute_item = { qualified_name ~ ws* ~ "=" ~ ws* ~ expression | call | qualified_name }
+attribute_name_value = { identifier ~ ws* ~ "=" ~ ws* ~ expression }
 
-//`#[foo, bar]`: ok # List of attributes
+//`bar()`: ok # Empty tuple
+//`bar(baz = 42)`: ok # Tuple with `baz` field
+attribute_named_tuple = { identifier ~ ws* ~ call_op }
+
+attribute_item = _{ attribute_name_value | attribute_named_tuple }
+
 //`#[bar = 42, foo = 32]`: ok # List of assignment attributes
-//`#[foo = 42, bar(32), baz]`: ok # List of mixed attributes
+//`#[foo = 42, bar(32)]`: ok # List of mixed attributes
 attribute = { "#[" ~ attribute_item ~ ws* ~ ("," ~ ws* ~ attribute_item ~ ws*)* ~ "]" }
 
-//`#[foo] #[bar]`: ok # Multiple attributes
+//`#[foo = 32] #[bar = 32]`: ok # Multiple attributes
 attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
 //`r: Length = 5.0mm`: ok

@@ -9,6 +9,8 @@ const DEFAULT_RENDERING_PRECISION: f64 = 0.1;
 pub const SEARCH_PATH: &str = "../lib";
 
 mod boolean_op;
+
+pub mod color;
 pub mod core_error;
 pub mod geo2d;
 #[cfg(feature = "geo3d")]
@@ -36,6 +38,7 @@ pub type Angle = cgmath::Rad<Scalar>;
 use std::str::FromStr;
 
 pub use boolean_op::BooleanOp;
+pub use color::*;
 pub use core_error::*;
 
 /// Trait to calculate depth for a node

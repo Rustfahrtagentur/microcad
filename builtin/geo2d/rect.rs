@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter_value, rc::*, src_ref::*, syntax::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, src_ref::*, syntax::*};
 
 #[derive(Debug)]
 pub struct Rect {
@@ -30,10 +30,10 @@ impl BuiltinPartDefinition for Rect {
 
     fn parameters() -> ParameterValueList {
         vec![
-            parameter_value!(width: Scalar),
-            parameter_value!(height: Scalar),
-            parameter_value!(x: Scalar),
-            parameter_value!(y: Scalar),
+            parameter!(width: Scalar),
+            parameter!(height: Scalar),
+            parameter!(x: Scalar),
+            parameter!(y: Scalar),
         ]
         .into()
     }

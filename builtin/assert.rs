@@ -5,15 +5,15 @@ use std::str::FromStr;
 
 #[cfg(test)]
 use crate::builtin_module;
-use microcad_lang::{diag::*, eval::*, parameter_value, resolve::*, syntax::*, value::*};
+use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, ty::Ty, value::*};
 
 pub fn assert() -> Symbol {
     Symbol::new_builtin(
         Identifier::no_ref("assert"),
         Some(
             vec![
-                parameter_value!(v),                               // Parameter with any type
-                parameter_value!(message: String = String::new()), // Optional message
+                parameter!(v),                               // Parameter with any type
+                parameter!(message: String = String::new()), // Optional message
             ]
             .into(),
         ),
@@ -29,6 +29,45 @@ pub fn assert() -> Symbol {
                                 format!("{arg}")
                             } else {
                                 format!("{arg}: {message}")
+                            }),
+                        )?;
+                    }
+                }
+                Err(err) => {
+                    // Called `assert` with no or more than 2 parameters
+                    context.error(args, err)?
+                }
+            }
+
+            Ok(Value::None)
+        },
+    )
+}
+
+pub fn assert_eq() -> Symbol {
+    Symbol::new_builtin(
+        Identifier::no_ref("assert_eq"),
+        Some(
+            vec![
+                parameter!(a),                               // Parameter with any type
+                parameter!(b),                               // Parameter with any type
+                parameter!(message: String = String::new()), // Optional message
+            ]
+            .into(),
+        ),
+        &|params, args, context| {
+            match ArgumentMap::find_match(args, params.expect("ParameterList")) {
+                Ok(arg_map) => {
+                    let a_value = &arg_map[&"a".try_into()?];
+                    let b_value = &arg_map[&"b".try_into()?];
+                    if a_value != b_value {
+                        let message = arg_map[&"message".try_into()?].try_string()?;
+                        context.error(
+                            args,
+                            EvalError::AssertionFailed(if message.is_empty() {
+                                format!("{a_value} != {b_value}")
+                            } else {
+                                format!("{a_value} != {b_value}: {message}")
                             }),
                         )?;
                     }
@@ -67,6 +106,17 @@ pub fn assert_invalid() -> Symbol {
                     context.error(name, EvalError::SymbolFound(symbol.full_name()))?;
                 }
             }
+        }
+        Ok(Value::None)
+    })
+}
+
+pub fn type_of() -> Symbol {
+    let id = Identifier::from_str("type_of").expect("valid id");
+    Symbol::new_builtin(id, None, &|_, args, _| {
+        if let Ok(arg) = args.get_single() {
+            let ty = arg.value.ty();
+            return Ok(Value::String(ty.to_string()));
         }
         Ok(Value::None)
     })

@@ -306,24 +306,15 @@ impl ModelNode {
         self.clone()
     }
 
-    /// Get value for name-value metadata with `id`.
-    pub(crate) fn get_metadata_by_id(&self, id: &Identifier) -> Option<Value> {
-        self.0
-            .borrow()
-            .metadata()
-            .get_by_id(id)
-            .map(|item| item.value())
-    }
-
     /// Get a property from an object node.
     ///
     /// Only object nodes can have properties.
     pub fn get_property_value(&self, id: &Identifier) -> Option<Value> {
-        self.borrow()
-            .element()
-            .get_property_value(id)
-            .cloned()
-            .or(self.get_metadata_by_id(id))
+        let s = id.id().as_str();
+        match s {
+            "meta" => Some(Value::NamedTuple((**self.0.borrow().metadata()).clone())),
+            _ => self.borrow().element().get_property_value(id).cloned(),
+        }
     }
 
     /// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".

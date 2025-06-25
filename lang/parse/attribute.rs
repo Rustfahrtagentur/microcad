@@ -5,20 +5,21 @@ use crate::{parse::*, parser::*};
 
 impl Parse for Attribute {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::attribute_item);
+        Parser::ensure_rules(
+            &pair,
+            &[Rule::attribute_name_value, Rule::attribute_named_tuple],
+        );
 
-        if let Some(call) = pair.find(Rule::call) {
-            return Ok(Self::Call(call));
-        }
-
-        if let Some(qualified_name) = pair.find(Rule::qualified_name) {
-            if let Some(expression) = pair.find(Rule::expression) {
-                Ok(Self::NameValue(qualified_name, expression))
-            } else {
-                Ok(Self::Tag(qualified_name))
-            }
-        } else {
-            unreachable!("Invalid attribute")
+        match pair.as_rule() {
+            Rule::attribute_name_value => Ok(Self::NameValue(
+                pair.find(Rule::identifier).expect("Identifier"),
+                pair.find(Rule::expression).expect("Expression"),
+            )),
+            Rule::attribute_named_tuple => Ok(Self::NamedTuple(
+                pair.find(Rule::identifier).expect("Identifier"),
+                pair.find(Rule::argument_list).unwrap_or_default(),
+            )),
+            _ => unreachable!(),
         }
     }
 }

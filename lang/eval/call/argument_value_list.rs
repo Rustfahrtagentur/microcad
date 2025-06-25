@@ -145,21 +145,21 @@ macro_rules! assert_eq_arg_map_value {
 
 #[test]
 fn call_get_matching_arguments() {
-    use crate::{argument_value, parameter_value};
+    use crate::{argument, parameter};
 
     // my_part(foo: Integer, bar: Integer, baz: Scalar = 4.0)
     let param_values = vec![
-        parameter_value!(foo: Integer),
-        parameter_value!(bar: Integer),
-        parameter_value!(baz: Scalar = 4.0),
+        parameter!(foo: Integer),
+        parameter!(bar: Integer),
+        parameter!(baz: Scalar = 4.0),
     ]
     .into();
 
     // my_part(1, bar = 2, baz = 3.0)
     let call_values = ArgumentValueList::from(vec![
-        argument_value!(Integer = 1),
-        argument_value!(foo: Integer = 2),
-        argument_value!(baz: Scalar = 3.0),
+        argument!(Integer = 1),
+        argument!(foo: Integer = 2),
+        argument!(baz: Scalar = 3.0),
     ]);
 
     let arg_map = ArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
@@ -173,22 +173,20 @@ fn call_get_matching_arguments() {
 
 #[test]
 fn call_get_matching_arguments_missing() {
-    use crate::{argument_value, parameter_value};
+    use crate::{argument, parameter};
 
     // function f(foo: Integer, bar: Integer, baz: Scalar = 4.0)
-    let param_values = ParameterValueList::new(vec![
-        parameter_value!(foo: Integer),
-        parameter_value!(bar: Integer),
-        parameter_value!(baz: Scalar = 4.0),
+    let parameters = ParameterValueList::new(vec![
+        parameter!(foo: Integer),
+        parameter!(bar: Integer),
+        parameter!(baz: Scalar = 4.0),
     ]);
 
     // f(1, baz = 3.0)
-    let call_values = ArgumentValueList::from(vec![
-        argument_value!(Integer = 1),
-        argument_value!(baz: Scalar = 3.0),
-    ]);
+    let arguments =
+        ArgumentValueList::from(vec![argument!(Integer = 1), argument!(baz: Scalar = 3.0)]);
 
-    let arg_map = ArgumentMap::find_match(&call_values, &param_values);
+    let arg_map = ArgumentMap::find_match(&arguments, &parameters);
 
     if let Err(EvalError::MissingArguments(missing)) = arg_map {
         assert_eq!(missing.len(), 1);
@@ -200,22 +198,22 @@ fn call_get_matching_arguments_missing() {
 
 #[test]
 fn get_multi_matching_arguments() {
-    use crate::{argument_value, parameter_value};
+    use crate::{argument, parameter};
 
-    let param_values = ParameterValueList::new(vec![
-        parameter_value!(thickness: Scalar = 2.0),
-        parameter_value!(inner_diameter: Scalar = 100.0),
-        parameter_value!(height: Scalar = 10.0),
+    let parameters = ParameterValueList::new(vec![
+        parameter!(thickness: Scalar = 2.0),
+        parameter!(inner_diameter: Scalar = 100.0),
+        parameter!(height: Scalar = 10.0),
     ]);
 
-    let call_values = ArgumentValueList::from(vec![
-        argument_value!(Scalar = 2.0),
-        argument_value!(Scalar = 100.0),
-        argument_value!(Scalar = 10.0),
+    let arguments = ArgumentValueList::from(vec![
+        argument!(Scalar = 2.0),
+        argument!(Scalar = 100.0),
+        argument!(Scalar = 10.0),
     ]);
 
     let multi_argument_map =
-        MultiArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
+        MultiArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
 
     for argument_map in multi_argument_map.combinations() {
         assert_eq_arg_map_value!(argument_map,

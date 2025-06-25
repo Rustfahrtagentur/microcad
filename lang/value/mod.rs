@@ -41,8 +41,6 @@ pub enum Value {
     Integer(Integer),
     /// A string value.
     String(String),
-    /// A color value.
-    Color(Color),
     /// A list of values with a common type.
     Array(Array),
     /// A tuple of unnamed items.
@@ -147,21 +145,6 @@ impl Value {
         }
     }
 
-    /// Try to convert into [Color].
-    pub fn try_color(&self) -> Result<Color, ValueError> {
-        match self {
-            Value::String(s) => {
-                if let Ok(color) = std::str::FromStr::from_str(s) {
-                    return Ok(color);
-                }
-            }
-            Value::Color(color) => return Ok(*color),
-            _ => {}
-        }
-
-        Err(ValueError::CannotConvert(self.clone(), "Color".into()))
-    }
-
     /// Try to convert to [`String`].
     pub fn try_string(&self) -> Result<String, ValueError> {
         match self {
@@ -214,7 +197,6 @@ impl crate::ty::Ty for Value {
             Value::Quantity(q) => q.ty(),
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
-            Value::Color(_) => Type::Color,
             Value::Array(list) => list.ty(),
             Value::NamedTuple(named_tuple) => named_tuple.ty(),
             Value::Tuple(unnamed_tuple) => unnamed_tuple.ty(),
@@ -372,7 +354,6 @@ impl std::fmt::Display for Value {
             Value::Quantity(q) => write!(f, "{q}"),
             Value::Bool(b) => write!(f, "{b}"),
             Value::String(s) => write!(f, "{s}"),
-            Value::Color(c) => write!(f, "{c}"),
             Value::Array(l) => write!(f, "{l}"),
             Value::NamedTuple(t) => write!(f, "{t}"),
             Value::Tuple(t) => write!(f, "{t}"),
@@ -390,7 +371,6 @@ impl std::fmt::Debug for Value {
             Self::Quantity(arg0) => write!(f, "Quantity: {arg0}"),
             Self::Bool(arg0) => write!(f, "Bool: {arg0}"),
             Self::String(arg0) => write!(f, "String: {arg0}"),
-            Self::Color(arg0) => write!(f, "Color: {arg0}"),
             Self::Array(arg0) => write!(f, "List: {arg0}"),
             Self::NamedTuple(arg0) => write!(f, "NamedTuple: {arg0}"),
             Self::Tuple(arg0) => write!(f, "UnnamedTuple: {arg0}"),
@@ -429,7 +409,6 @@ macro_rules! impl_try_from {
 impl_try_from!(Integer => i64);
 impl_try_from!(Bool => bool);
 impl_try_from!(String => String);
-impl_try_from!(Color => Color);
 
 impl TryFrom<&Value> for Scalar {
     type Error = ValueError;
@@ -456,6 +435,18 @@ impl TryFrom<Value> for Scalar {
             }) => Ok(value),
             _ => Err(ValueError::CannotConvert(value.clone(), "Scalar".into())),
         }
+    }
+}
+
+impl From<f32> for Value {
+    fn from(f: f32) -> Self {
+        Value::Quantity((f as Scalar).into())
+    }
+}
+
+impl From<Scalar> for Value {
+    fn from(scalar: Scalar) -> Self {
+        Value::Quantity(scalar.into())
     }
 }
 

@@ -3,10 +3,32 @@
 
 use crate::{eval::*, model_tree::*};
 
+impl Assignment {
+    /// Check if the specified type matches the found type.
+    pub fn type_check(&self, found: Type) -> EvalResult<()> {
+        if let Some(ty) = &self.specified_type {
+            if ty.ty() != found {
+                return Err(EvalError::TypeMismatch {
+                    id: self.id.clone(),
+                    expected: ty.ty(),
+                    found,
+                });
+            }
+        }
+
+        Ok(())
+    }
+}
+
 impl Eval for Assignment {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let value = self.expression.eval(context)?;
+        if let Err(err) = self.type_check(value.ty()) {
+            context.error(self, err)?;
+            return Ok(Value::None);
+        }
         context.set_local_value(self.id.clone(), value)?;
+
         Ok(Value::None)
     }
 }

@@ -23,8 +23,8 @@ pub enum EvalError {
     },
 
     /// Parameter type mismatch.
-    #[error("Type mismatch for parameter: expected {expected}, got {found}")]
-    ParameterTypeMismatch {
+    #[error("Type mismatch for `{id}`: expected {expected}, got {found}")]
+    TypeMismatch {
         /// Parameter name
         id: Identifier,
         /// Expected type
