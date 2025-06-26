@@ -1,4 +1,7 @@
+-- Test --
+  code_post_init
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:223
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

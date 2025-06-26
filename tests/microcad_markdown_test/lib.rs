@@ -252,8 +252,9 @@ fn scan_for_tests(
     let end = Regex::new(r#"```"#).expect("bad regex");
 
     let mut ignore = false;
+    let mut start_no = 0;
     // read all lines in the file
-    for line in md_content.lines() {
+    for (line_no, line) in md_content.lines().enumerate() {
         // ignore deeper markdown code
         if line.starts_with("````") {
             ignore = !ignore;
@@ -266,15 +267,26 @@ fn scan_for_tests(
                 if let Some(name) = start.name("name") {
                     // remember test name
                     test_name = name.as_str().to_string();
+                    start_no = line_no + 1;
                     // clear code
                     test_code.clear();
                 }
             } else if !test_name.is_empty() {
                 // match code end marker
                 if end.captures_iter(line).next().is_some() {
-                    if let Some(output) =
-                        create_test(output, file_path, test_name.as_str(), test_code.as_str())
-                    {
+                    if let Some(output) = create_test(
+                        output,
+                        file_path,
+                        test_name.as_str(),
+                        test_code.as_str(),
+                        &format!(
+                            "{}:{start_no}",
+                            file_path
+                                .canonicalize()
+                                .expect("existing path")
+                                .to_string_lossy()
+                        ),
+                    ) {
                         test_outputs.push(output);
                     }
 
@@ -300,6 +312,7 @@ fn create_test<'a>(
     file_path: &'a Path,
     name: &'a str,
     code: &str,
+    reference: &str,
 ) -> Option<Output> {
     // split name into `name` and optional `mode`
     let (name, mode) = if let Some((name, mode)) = name.split_once('#') {
@@ -332,7 +345,9 @@ fn create_test<'a>(
         return None;
     }
 
-    f.push_str(&create_test_code(name, mode, code, &banner, &log));
+    f.push_str(&create_test_code(
+        name, mode, code, &banner, &log, reference,
+    ));
 
     Some(Output::new(name.into(), file_path.into(), banner, log))
 }
@@ -350,6 +365,7 @@ fn create_test_code(
     code: &str,
     banner: &std::path::Path,
     out: &std::path::Path,
+    reference: &str,
 ) -> String {
     let banner = banner.to_string_lossy().escape_default().to_string();
     let out = out.to_string_lossy().escape_default().to_string();
@@ -384,6 +400,8 @@ fn create_test_code(
                     let out = &mut fs::File::create(out_name).expect("cannot create log file");
                     let out = &mut io::BufWriter::new(out);
 
+                    writeln!(out,"-- Test --\n  {name}\n  {reference}").expect("output error");
+
                     // load and handle µcad source file
                     match SourceFile::load_from_str(
                         r##"
@@ -397,11 +415,12 @@ fn create_test_code(
                 r##"{
                         // test expected to fail failed at parsing?
                         Err(err) => {
+                            writeln!(out, "-- Parse Error --").expect("output error");
                             out.write_all(format!("{err}").as_bytes()).expect("output error");
                             writeln!(out).expect("output error");
                             let _ = fs::remove_file(banner);
                             let _ = fs::hard_link("images/fail_ok.png", banner);
-                            writeln!(out, "-- Test result --\nFAILED AS EXPECTED").expect("output error");
+                            writeln!(out, "-- Test Result --\nFAILED AS EXPECTED").expect("output error");
                             log::debug!("{err}")
                         },
                         // test expected to fail succeeded at parsing?
@@ -424,19 +443,19 @@ fn create_test_code(
                                 // evaluation had been aborted?
                                 (Err(err),_) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
-                                    writeln!(out, "-- Test result --\nFAILED AS EXPECTED").expect("output error");
+                                    writeln!(out, "-- Test Result --\nFAILED AS EXPECTED").expect("output error");
                                     log::debug!("{err}");
                                 }
                                 // evaluation produced errors?
                                 (_,true) => {
                                     let _ = fs::hard_link("images/fail_ok.png", banner);
-                                    writeln!(out, "-- Test result --\nFAILED AS EXPECTED").expect("output error");
+                                    writeln!(out, "-- Test Result --\nFAILED AS EXPECTED").expect("output error");
                                     log::debug!("there were {error_count} errors (see {out_name})", error_count = context.error_count());
                                  }
                                 // test expected to fail but succeeds?
                                 (_,_) => {
                                     let _ = fs::hard_link("images/ok_fail.png", banner);
-                                    writeln!(out, "-- Test result --\nOK BUT SHOULD FAIL").expect("output error");
+                                    writeln!(out, "-- Test Result --\nOK BUT SHOULD FAIL").expect("output error");
                                     panic!("ERROR: test is marked to fail but succeeded");
                                 }
                             }
@@ -449,15 +468,16 @@ fn create_test_code(
                         Err(err) => {
                             let _ = fs::remove_file(banner);
         
+                            writeln!(out, "-- Parse Error --").expect("output error");
                             out.write_all(format!("{err}").as_bytes()).unwrap();
                             writeln!(out).expect("output error");
                             
                             if todo {
                                 let _ = fs::hard_link("images/todo.png", banner);
-                                writeln!(out, "-- Test result --\nFAIL (TODO)").expect("output error");
+                                writeln!(out, "-- Test Result --\nFAIL (TODO)").expect("output error");
                             } else {
                                 let _ = fs::hard_link("images/fail.png", banner);
-                                writeln!(out, "-- Test result --\nFAIL").expect("output error");
+                                writeln!(out, "-- Test Result --\nFAIL").expect("output error");
                                 panic!("ERROR: {err}")
                             }
                         },
@@ -481,29 +501,29 @@ fn create_test_code(
                                 // test expected to succeed and succeeds with no errors
                                 (Ok(_),false,false) => {
                                     let _ = fs::hard_link("images/ok.png", banner); 
-                                    writeln!(out, "-- Test result --\nOK").expect("output error");
+                                    writeln!(out, "-- Test Result --\nOK").expect("output error");
                                 }
                                 // test is todo but succeeds with no errors
                                 (Ok(_),false,true) => { 
                                     let _ = fs::hard_link("images/not_todo.png", banner); 
-                                    writeln!(out, "-- Test result --\nOK BUT IS TODO").expect("output error");
+                                    writeln!(out, "-- Test Result --\nOK BUT IS TODO").expect("output error");
                                 }
                                 // Any error but todo
                                 (_,_,true) => {
                                     let _ = fs::hard_link("images/todo.png", banner);
-                                    writeln!(out, "-- Test result --\nTODO").expect("output error");
+                                    writeln!(out, "-- Test Result --\nTODO").expect("output error");
                                 }
                                 // evaluation had been aborted?
                                 (Err(err),_,_) => {
                                     let _ = fs::hard_link("images/fail.png", banner);
                                     out.write_all(format!("{err}").as_bytes()).unwrap();
-                                    writeln!(out, "-- Test result --\nFAIL").expect("output error");
+                                    writeln!(out, "-- Test Result --\nFAIL").expect("output error");
                                     panic!("ERROR: {err}")
                                 }
                                 // evaluation produced errors?
                                 (_,true,_) => {
                                     let _ = fs::hard_link("images/fail.png", banner);
-                                    writeln!(out, "-- Test result --\nFAIL").expect("output error");
+                                    writeln!(out, "-- Test Result --\nFAIL").expect("output error");
                                     panic!("ERROR: there were {error_count} errors (see {out_name})", error_count = context.error_count());
                                 }
                             }

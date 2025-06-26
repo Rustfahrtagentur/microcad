@@ -1,3 +1,6 @@
+-- Test --
+  hull_single
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/hull.md:7
 -- Output --
 -- Errors --
 error: Symbol hull not found.
@@ -6,5 +9,5 @@ error: Symbol hull not found.
    1 | hull()
      | ^^^^^^
      |
--- Test result --
+-- Test Result --
 TODO

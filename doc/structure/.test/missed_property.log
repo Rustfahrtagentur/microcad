@@ -1,4 +1,7 @@
+-- Test --
+  missed_property
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:148
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK BUT SHOULD FAIL

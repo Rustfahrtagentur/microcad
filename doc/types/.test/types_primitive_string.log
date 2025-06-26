@@ -1,3 +1,6 @@
+-- Test --
+  types_primitive_string
+  /home/pat/git/rustfahrt/microcad/doc/types/primitive_types.md:29
 -- Output --
 Hello µcad!
 -- Errors --
@@ -8,5 +11,5 @@ error: Assertion failed: <invalid>
    2 | std::debug::assert(text.count() == 11);
      |                    ^^^^^^^^^^^^^^^^^^
      |
--- Test result --
+-- Test Result --
 FAIL

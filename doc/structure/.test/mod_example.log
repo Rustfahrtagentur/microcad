@@ -1,4 +1,7 @@
+-- Test --
+  mod_example
+  /home/pat/git/rustfahrt/microcad/doc/structure/modules.md:11
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

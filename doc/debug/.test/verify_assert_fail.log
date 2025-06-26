@@ -1,3 +1,6 @@
+-- Test --
+  verify_assert_fail
+  /home/pat/git/rustfahrt/microcad/doc/debug/README.md:21
 -- Output --
 -- Errors --
 error: Assertion failed: false: this assertion fails
@@ -6,5 +9,5 @@ error: Assertion failed: false: this assertion fails
    1 | std::debug::assert(false, "this assertion fails");
      |                    ^^^^^
      |
--- Test result --
+-- Test Result --
 FAILED AS EXPECTED

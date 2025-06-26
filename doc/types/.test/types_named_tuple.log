@@ -1,4 +1,7 @@
+-- Test --
+  types_named_tuple
+  /home/pat/git/rustfahrt/microcad/doc/types/named_tuple.md:9
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

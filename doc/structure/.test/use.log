@@ -1,4 +1,7 @@
+-- Test --
+  use
+  /home/pat/git/rustfahrt/microcad/doc/structure/use.md:33
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

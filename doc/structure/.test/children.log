@@ -1,8 +1,12 @@
+-- Test --
+  children
+  /home/pat/git/rustfahrt/microcad/doc/structure/op.md:30
+-- Parse Error --
 Parser error:  --> 4:8
   |
 4 |     if @children.count() == 2 {
   |        ^---
   |
   = expected COMMENT or expression
--- Test result --
+-- Test Result --
 FAIL

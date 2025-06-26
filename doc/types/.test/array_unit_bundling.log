@@ -1,4 +1,7 @@
+-- Test --
+  array_unit_bundling
+  /home/pat/git/rustfahrt/microcad/doc/types/arrays.md:11
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

@@ -1,8 +1,12 @@
+-- Test --
+  types_no_declaration
+  /home/pat/git/rustfahrt/microcad/doc/types/README.md:38
+-- Parse Error --
 Parser error:  --> 1:10
   |
 1 | x: Length;         // error
   |          ^---
   |
   = expected COMMENT
--- Test result --
+-- Test Result --
 FAILED AS EXPECTED

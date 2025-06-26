@@ -1,4 +1,7 @@
+-- Test --
+  no_multiplicity
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:144
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

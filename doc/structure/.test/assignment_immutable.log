@@ -1,4 +1,7 @@
+-- Test --
+  assignment_immutable
+  /home/pat/git/rustfahrt/microcad/doc/structure/assignments.md:24
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK BUT SHOULD FAIL

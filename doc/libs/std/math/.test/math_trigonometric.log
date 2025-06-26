@@ -1,3 +1,6 @@
+-- Test --
+  math_trigonometric
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/math/README.md:19
 -- Output --
 -- Errors --
 error: Symbol cos not found.
@@ -24,5 +27,5 @@ error: Assertion failed: <invalid>
    5 | assert(tan(0) == 0.);
      |        ^^^^^^^^^^^^
      |
--- Test result --
+-- Test Result --
 TODO

@@ -1,4 +1,7 @@
+-- Test --
+  sketch_basic
+  /home/pat/git/rustfahrt/microcad/doc/structure/sketch.md:6
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

@@ -214,16 +214,6 @@ impl Parse for TupleExpression {
             return Err(ParseError::EmptyTupleExpression);
         }
 
-        // Count number of positional and named arguments
-        let named_count: usize = argument_list
-            .iter()
-            .map(|c| if c.id.is_some() { 1 } else { 0 })
-            .sum();
-
-        if named_count > 0 && named_count < argument_list.len() {
-            return Err(ParseError::MixedTupleArguments);
-        }
-
         Ok(TupleExpression {
             args: argument_list,
             unit: match inner.next() {

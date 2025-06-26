@@ -1,4 +1,7 @@
+-- Test --
+  types_named_tuple_vec2
+  /home/pat/git/rustfahrt/microcad/doc/types/named_tuple.md:43
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

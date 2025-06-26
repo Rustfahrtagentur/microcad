@@ -1,3 +1,6 @@
+-- Test --
+  property_wrong
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:270
 -- Output --
 -- Errors --
 error: Missing arguments: outer
@@ -21,5 +24,5 @@ error: Property not found: inner
      |                    ^^^^^^^
      |
 info: inner: <invalid>
--- Test result --
+-- Test Result --
 FAILED AS EXPECTED

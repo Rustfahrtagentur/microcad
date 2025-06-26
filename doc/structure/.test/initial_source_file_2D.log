@@ -1,4 +1,7 @@
+-- Test --
+  initial_source_file_2D
+  /home/pat/git/rustfahrt/microcad/doc/structure/source_files.md:23
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

@@ -1,5 +1,8 @@
+-- Test --
+  call_function
+  /home/pat/git/rustfahrt/microcad/doc/structure/calls.md:10
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
--- Test result --
+-- Test Result --
 FAIL

@@ -1,8 +1,12 @@
+-- Test --
+  workbench_pub
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:120
+-- Parse Error --
 Parser error:  --> 2:11
   |
 2 |     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
   |           ^---
   |
   = expected identifier_part
--- Test result --
+-- Test Result --
 FAILED AS EXPECTED

@@ -1,4 +1,7 @@
+-- Test --
+  part_basic
+  /home/pat/git/rustfahrt/microcad/doc/structure/part.md:6
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

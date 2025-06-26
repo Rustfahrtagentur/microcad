@@ -1,4 +1,7 @@
+-- Test --
+  types_primitive_integer
+  /home/pat/git/rustfahrt/microcad/doc/types/primitive_types.md:19
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

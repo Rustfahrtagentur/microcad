@@ -1,4 +1,7 @@
+-- Test --
+  code_between_initializers
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:193
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK BUT SHOULD FAIL

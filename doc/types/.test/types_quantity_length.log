@@ -1,4 +1,7 @@
+-- Test --
+  types_quantity_length
+  /home/pat/git/rustfahrt/microcad/doc/types/quantity.md:59
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

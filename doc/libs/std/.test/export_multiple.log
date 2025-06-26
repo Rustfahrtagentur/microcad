@@ -1,4 +1,7 @@
+-- Test --
+  export_multiple
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/export.md:17
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

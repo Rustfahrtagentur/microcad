@@ -1,4 +1,7 @@
+-- Test --
+  call_workbench
+  /home/pat/git/rustfahrt/microcad/doc/structure/calls.md:28
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

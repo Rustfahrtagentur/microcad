@@ -1,4 +1,7 @@
+-- Test --
+  initializers
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:110
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK BUT SHOULD FAIL

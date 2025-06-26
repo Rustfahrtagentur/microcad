@@ -1,4 +1,7 @@
+-- Test --
+  init_property
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:121
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

@@ -1,4 +1,7 @@
+-- Test --
+  metadata_simple_example
+  /home/pat/git/rustfahrt/microcad/doc/attributes.md:9
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

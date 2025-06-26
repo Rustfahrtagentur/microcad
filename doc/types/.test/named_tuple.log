@@ -1,4 +1,7 @@
+-- Test --
+  named_tuple
+  /home/pat/git/rustfahrt/microcad/doc/types/tuples.md:10
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK

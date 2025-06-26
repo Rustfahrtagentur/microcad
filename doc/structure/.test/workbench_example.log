@@ -1,3 +1,6 @@
+-- Test --
+  workbench_example
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:98
 -- Output --
 -- Errors --
 error: Symbol circle not found.
@@ -12,5 +15,5 @@ error: Symbol circle not found.
    8 |     circle(radius) - circle(inner());
      |                      ^^^^^^^^^^^^^^^
      |
--- Test result --
+-- Test Result --
 TODO

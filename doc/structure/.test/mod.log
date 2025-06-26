@@ -1,8 +1,12 @@
+-- Test --
+  mod
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:66
+-- Parse Error --
 Parser error:   --> 13:11
    |
 13 |     pub fn square(x: Scalar) {
    |           ^---
    |
    = expected identifier_part
--- Test result --
+-- Test Result --
 FAIL

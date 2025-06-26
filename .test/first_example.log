@@ -1,3 +1,6 @@
+-- Test --
+  first_example
+  /home/pat/git/rustfahrt/microcad/README.md:82
 -- Output --
 Volume: <invalid>cm³
 -- Errors --
@@ -8,5 +11,5 @@ error: Symbol __builtin::export not found.
   25 | __builtin::export("lid.stl") l;
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
--- Test result --
+-- Test Result --
 FAIL
