@@ -6,6 +6,8 @@
 use crate::{ty::*, value::*};
 
 /// Tuple with named values
+///
+/// Names are optional, which means Identifiers can be empty.
 #[derive(Clone, Default, Debug, PartialEq)]
 pub struct Tuple(std::collections::BTreeMap<Identifier, Value>);
 
@@ -13,18 +15,6 @@ impl Tuple {
     /// Create new named tuple instance.
     pub fn new(map: std::collections::BTreeMap<Identifier, Value>) -> Self {
         Self(map)
-    }
-
-    /// Create a new named tuple from a slice of values.
-    ///
-    /// This function is used to create named tuples from built-in types like `Vec3` and `Color`.
-    pub fn new_from_slice<T: Into<Value> + Copy>(values: &[(&'static str, T)]) -> Self {
-        Self::new(
-            values
-                .iter()
-                .map(|(k, v)| (Identifier::no_ref(k), (*v).into()))
-                .collect(),
-        )
     }
 }
 
@@ -42,26 +32,38 @@ impl std::ops::DerefMut for Tuple {
     }
 }
 
+impl<T: Into<Value> + Clone> From<std::slice::Iter<'_, (&'static str, T)>> for Tuple {
+    fn from(values: std::slice::Iter<'_, (&'static str, T)>) -> Self {
+        Self::new(
+            values
+                .map(|(k, v)| (Identifier::no_ref(k), (*v).clone().into()))
+                .collect(),
+        )
+    }
+}
+
 impl From<Vec2> for Tuple {
     fn from(v: Vec2) -> Self {
-        Self::new_from_slice(&[("x", v.x), ("y", v.y)])
+        [("x", v.x), ("y", v.y)].iter().into()
     }
 }
 
 impl From<Vec3> for Tuple {
     fn from(v: Vec3) -> Self {
-        Self::new_from_slice(&[("x", v.x), ("y", v.y), ("z", v.z)])
+        [("x", v.x), ("y", v.y), ("z", v.z)].iter().into()
     }
 }
 
 impl From<Color> for Tuple {
     fn from(color: Color) -> Self {
-        Self::new_from_slice(&[
+        [
             ("r", color.r),
             ("g", color.g),
             ("b", color.b),
             ("a", color.a),
-        ])
+        ]
+        .iter()
+        .into()
     }
 }
 
