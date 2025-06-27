@@ -1,6 +1,6 @@
 -- Test --
   hull_multiple
-  /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/hull.md:15
+  /home/micha/Work/mcad/mcad/doc/libs/std/ops/hull.md:15
 -- Output --
 -- Errors --
 error: Symbol hull not found.

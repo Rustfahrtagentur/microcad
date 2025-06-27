@@ -1,6 +1,6 @@
 -- Test --
   tuple_assignment_convert
-  /home/pat/git/rustfahrt/microcad/doc/types/tuples.md:67
+  /home/micha/Work/mcad/mcad/doc/types/tuples.md:67
 -- Parse Error --
 Parser error:  --> 2:17
   |

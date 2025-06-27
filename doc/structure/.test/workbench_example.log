@@ -1,6 +1,6 @@
 -- Test --
   workbench_example
-  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:98
+  /home/micha/Work/mcad/mcad/doc/structure/functions.md:98
 -- Output --
 -- Errors --
 error: Symbol circle not found.

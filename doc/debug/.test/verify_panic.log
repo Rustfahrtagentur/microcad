@@ -1,6 +1,6 @@
 -- Test --
   verify_panic
-  /home/pat/git/rustfahrt/microcad/doc/debug/README.md:29
+  /home/micha/Work/mcad/mcad/doc/debug/README.md:29
 -- Parse Error --
 Parser error:  --> 4:5
   |
