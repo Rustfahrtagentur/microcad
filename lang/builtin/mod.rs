@@ -34,7 +34,7 @@ impl From<BuiltinTypeHelper> for Type {
             BuiltinTypeHelper::Scalar => Type::Quantity(QuantityType::Scalar),
             BuiltinTypeHelper::Angle => Type::Quantity(QuantityType::Angle),
             BuiltinTypeHelper::String => Type::String,
-            BuiltinTypeHelper::Color => Type::Tuple(TupleType::new_color()),
+            BuiltinTypeHelper::Color => Type::Tuple(TupleType::new_color().into()),
         }
     }
 }
@@ -67,7 +67,7 @@ impl From<BuiltinValueHelper> for Value {
                 Value::Quantity(Quantity::new(v, QuantityType::Length))
             }
             BuiltinValueHelper::String(s) => Value::String(s),
-            BuiltinValueHelper::Color(c) => Value::Tuple(c.into()),
+            BuiltinValueHelper::Color(_c) => todo!("convert c into value"),
         }
     }
 }

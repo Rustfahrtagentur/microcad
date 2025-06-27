@@ -153,15 +153,15 @@ pub fn math() -> Symbol {
         ))
         .symbol(Symbol::new_constant(
             Identifier::no_ref("X"),
-            Value::Tuple(Vec3::unit_x().into()),
+            Value::Tuple(Box::new(Vec3::unit_x().into())),
         ))
         .symbol(Symbol::new_constant(
             Identifier::no_ref("Y"),
-            Value::Tuple(Vec3::unit_y().into()),
+            Value::Tuple(Box::new(Vec3::unit_y().into())),
         ))
         .symbol(Symbol::new_constant(
             Identifier::no_ref("Z"),
-            Value::Tuple(Vec3::unit_z().into()),
+            Value::Tuple(Box::new(Vec3::unit_z().into())),
         ))
         .symbol(abs())
         .symbol(rotate_around_axis())

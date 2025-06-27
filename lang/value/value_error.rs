@@ -17,7 +17,7 @@ pub enum ValueError {
 
     /// Cannot convert to color.
     #[error("Cannot convert named tuple to color: {0}")]
-    CannotConvertToColor(Tuple),
+    CannotConvertToColor(Box<Tuple>),
 
     /// Type cannot be a key in a map
     #[error("Type cannot be a key in a map: {0}")]

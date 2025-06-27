@@ -1,7 +1,3 @@
 -- Test --
   intersection_alt_operator
   /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/intersection.md:17
--- Output --
--- Errors --
--- Test Result --
-OK

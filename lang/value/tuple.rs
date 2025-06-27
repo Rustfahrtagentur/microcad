@@ -9,36 +9,33 @@ use crate::{ty::*, value::*};
 ///
 /// Names are optional, which means Identifiers can be empty.
 #[derive(Clone, Default, Debug, PartialEq)]
-pub struct Tuple(std::collections::BTreeMap<Identifier, Value>);
+pub struct Tuple {
+    pub(crate) named: std::collections::HashMap<Identifier, Value>,
+    pub(crate) unnamed: std::collections::HashMap<Type, Value>,
+}
 
 impl Tuple {
-    /// Create new named tuple instance.
-    pub fn new(map: std::collections::BTreeMap<Identifier, Value>) -> Self {
-        Self(map)
+    /// Find named value by identifier.
+    pub fn by_id(&self, id: &Identifier) -> Option<&Value> {
+        self.named.get(id)
+    }
+
+    /// Find unnamed value by type.
+    pub fn by_ty(&self, ty: &Type) -> Option<&Value> {
+        self.unnamed.get(ty)
     }
 }
 
-impl std::ops::Deref for Tuple {
-    type Target = std::collections::BTreeMap<Identifier, Value>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for Tuple {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
+// TODO impl FromIterator instead
 impl<T: Into<Value> + Clone> From<std::slice::Iter<'_, (&'static str, T)>> for Tuple {
     fn from(values: std::slice::Iter<'_, (&'static str, T)>) -> Self {
-        Self::new(
-            values
-                .map(|(k, v)| (Identifier::no_ref(k), (*v).clone().into()))
-                .collect(),
-        )
+        let (unnamed, named) = values
+            .map(|(k, v)| (Identifier::no_ref(k), (*v).clone().into()))
+            .partition(|(k, _)| k.is_empty());
+        Self {
+            named,
+            unnamed: unnamed.into_values().map(|v| (v.ty(), v)).collect(),
+        }
     }
 }
 
@@ -73,10 +70,11 @@ impl std::fmt::Display for Tuple {
             f,
             "({items})",
             items = self
-                .0
+                .named
                 .iter()
-                .map(|(k, v)| format!("{k} => {v}"))
-                .collect::<Vec<_>>()
+                .map(|(id, v)| format!("{id} : {t}={v}", t = v.ty()))
+                .chain(self.unnamed.iter().map(|(ty, v)| format!("{v}: {ty}")))
+                .collect::<Vec<String>>()
                 .join(", ")
         )
     }
@@ -84,11 +82,16 @@ impl std::fmt::Display for Tuple {
 
 impl crate::ty::Ty for Tuple {
     fn ty(&self) -> Type {
-        Type::Tuple(TupleType(
-            self.0
-                .iter()
-                .map(|(name, v)| (name.clone(), v.ty().clone()))
-                .collect(),
-        ))
+        Type::Tuple(
+            TupleType {
+                named: self
+                    .named
+                    .iter()
+                    .map(|(id, v)| (id.clone(), v.ty()))
+                    .collect(),
+                unnamed: self.unnamed.values().map(|v| v.ty()).collect(),
+            }
+            .into(),
+        )
     }
 }

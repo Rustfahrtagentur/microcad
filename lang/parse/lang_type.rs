@@ -21,19 +21,34 @@ impl Parse for TupleType {
         use crate::ty::Ty;
         Parser::ensure_rule(&pair, Rule::tuple_type);
 
-        let mut types = std::collections::BTreeMap::new();
+        let mut named = std::collections::HashMap::new();
+        let mut unnamed = std::collections::HashSet::new();
 
-        for pair in pair.inner() {
+        pair.inner().try_for_each(|pair| {
             let mut inner = pair.inner();
-            let name = Identifier::parse(inner.next().expect("Identifier expected"))?;
-            let ty = TypeAnnotation::parse(inner.next().expect("Type annotation expected"))?.ty();
-            if types.contains_key(&name) {
-                return Err(ParseError::DuplicatedMapType(name.clone()));
+            let next = inner.next().expect("Identifier or type expected");
+            if let Ok(id) = Identifier::parse(next.clone()) {
+                if named
+                    .insert(
+                        id.clone(),
+                        TypeAnnotation::parse(inner.next().expect("Identifier or type expected"))?
+                            .ty(),
+                    )
+                    .is_some()
+                {
+                    return Err(ParseError::DuplicateTupleIdentifier(id));
+                }
+            } else {
+                let ty = TypeAnnotation::parse(next)?.ty();
+                if !unnamed.insert(ty.clone()) {
+                    return Err(ParseError::DuplicateTupleType(ty));
+                }
             }
-            types.insert(name, ty);
-        }
 
-        Ok(Self(types))
+            Ok::<(), ParseError>(())
+        })?;
+
+        Ok(Self { named, unnamed })
     }
 }
 

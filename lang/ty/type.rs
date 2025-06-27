@@ -6,7 +6,7 @@
 use crate::{syntax::*, ty::*};
 
 /// µcad Basic Types
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Type {
     /// Invalid type (used for error handling)
     Invalid,
@@ -21,7 +21,7 @@ pub enum Type {
     /// A list of elements of the same type: `[Scalar]`
     List(ListType),
     /// A named tuple of elements: `(x: Scalar, y: String)`
-    Tuple(TupleType),
+    Tuple(Box<TupleType>),
     /// Matrix type
     Matrix(MatrixType),
     /// Nodes.

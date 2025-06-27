@@ -3,7 +3,7 @@
 
 //! Parser errors
 
-use crate::parse::*;
+use crate::{parse::*, ty::*};
 use thiserror::Error;
 
 /// Parsing errors
@@ -88,6 +88,14 @@ pub enum ParseError {
     /// Duplicate identifier
     #[error("Duplicate identifier: {0}")]
     DuplicateIdentifier(Identifier),
+
+    /// Duplicate identifier in tuple
+    #[error("Duplicate identifier in tuple: {0}")]
+    DuplicateTupleIdentifier(Identifier),
+
+    /// Duplicate unnamed type in tuple
+    #[error("Duplicate unnamed type in tuple: {0}")]
+    DuplicateTupleType(Type),
 
     /// Missing format expression
     #[error("Missing format expression")]

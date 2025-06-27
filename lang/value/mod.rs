@@ -42,7 +42,7 @@ pub enum Value {
     /// A list of values with a common type.
     Array(Array),
     /// A tuple of named items.
-    Tuple(Tuple),
+    Tuple(Box<Tuple>),
     /// A matrix.
     Matrix(Box<Matrix>),
     /// A node in the model tree.
@@ -84,7 +84,7 @@ impl Value {
     /// This function is used when accessing a property `p` of a value `v` with `p.v`.
     pub fn get_property_value(&self, identifier: &Identifier) -> Option<Value> {
         match self {
-            Value::Tuple(named_tuple) => named_tuple.get(identifier).cloned(),
+            Value::Tuple(tuple) => tuple.by_id(identifier).cloned(),
             Value::Nodes(nodes) => match nodes.single_node() {
                 Some(node) => node.get_property_value(identifier),
                 None => None,

@@ -30,12 +30,13 @@ pub enum AttributeError {
 
 impl From<ArgumentMap> for Tuple {
     fn from(argument_map: ArgumentMap) -> Self {
-        Tuple::new(
-            argument_map
+        Self {
+            named: argument_map
                 .iter()
                 .map(|(k, v)| (k.clone(), v.clone()))
-                .collect::<BTreeMap<_, _>>(),
-        )
+                .collect(),
+            ..Default::default()
+        }
     }
 }
 
@@ -56,8 +57,8 @@ impl Eval<Option<(Identifier, Value)>> for Attribute {
                 if let Some(params) = Self::parameter_list(id) {
                     let args = ArgumentMap::find_match(&argument_list.eval(context)?, &params);
                     match args {
-                        Ok(args) => {
-                            return Ok(Some((id.clone(), Value::Tuple(args.into()))));
+                        Ok(_args) => {
+                            todo!() //return Ok(Some((id.clone(), Value::Tuple(args.into()))));
                         }
                         Err(err) => {
                             context.warning(self, err)?;
@@ -144,20 +145,20 @@ impl Eval<Metadata> for AttributeList {
         let name_value_attributes = self.eval_name_value_attributes(context)?;
         let named_tuple_attributes = self.eval_named_tuple_attributes(context)?;
 
-        let mut map = BTreeMap::new();
+        let mut tuple = BTreeMap::new();
         for (id, value) in name_value_attributes
             .iter()
             .chain(named_tuple_attributes.iter())
         {
-            if map.contains_key(id) {
+            if tuple.contains_key(id) {
                 context.warning(
                     self,
                     AttributeError::AttributeAlreadySet(id.clone(), value.clone()),
                 )?;
             }
-            map.insert(id.clone(), value.clone());
+            tuple.insert(id.clone(), value.clone());
         }
 
-        Ok(Metadata::new(map))
+        Ok(Metadata(tuple))
     }
 }

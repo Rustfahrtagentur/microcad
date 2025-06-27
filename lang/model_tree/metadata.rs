@@ -4,19 +4,13 @@
 //! Object attributes module
 //!
 use crate::{syntax::*, value::*};
+
 /// Node metadata, from an evaluated attribute list.
 #[derive(Clone, Debug, Default)]
-pub struct Metadata(Tuple);
-
-impl Metadata {
-    /// Create new meta data from map.
-    pub fn new(map: std::collections::BTreeMap<Identifier, Value>) -> Self {
-        Self(Tuple::new(map))
-    }
-}
+pub struct Metadata(pub(crate) std::collections::BTreeMap<Identifier, Value>);
 
 impl std::ops::Deref for Metadata {
-    type Target = Tuple;
+    type Target = std::collections::BTreeMap<Identifier, Value>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

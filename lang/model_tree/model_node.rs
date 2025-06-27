@@ -312,7 +312,7 @@ impl ModelNode {
     pub fn get_property_value(&self, id: &Identifier) -> Option<Value> {
         let s = id.id().as_str();
         match s {
-            "meta" => Some(Value::Tuple((**self.0.borrow().metadata()).clone())),
+            "meta" => todo!(), //Some(Value::Tuple((**self.0.borrow().metadata()).clone())),
             _ => self.borrow().element().get_property_value(id).cloned(),
         }
     }
