@@ -21,7 +21,7 @@ pub struct Object {
 impl Object {
     /// Get object property value.
     pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
-        self.props.get_value(id)
+        self.props.get_value_by_id(id)
     }
 }
 

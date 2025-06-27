@@ -9,7 +9,7 @@ use crate::{diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*};
 ///
 /// It is required that properties are always sorted by their id.
 #[derive(Clone, Default, Debug)]
-pub struct ObjectProperties(NamedTuple);
+pub struct ObjectProperties(Tuple);
 
 impl ObjectProperties {
     /// Create new object properties from a [`ParameterValueList`] and an [`ArgumentMap`].
