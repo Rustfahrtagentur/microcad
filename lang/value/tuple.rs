@@ -14,6 +14,24 @@ pub struct Tuple {
     pub(crate) unnamed: std::collections::HashMap<Type, Value>,
 }
 
+/// Create a Tuple from items
+#[macro_export]
+macro_rules! tuple {
+        ($($key:ident = $value:expr),*) => {
+                [$( (stringify!($key), $value) ),* ]
+                    .iter()
+                    .into()
+    };
+}
+
+/// Create a Value::Tuple from items
+#[macro_export]
+macro_rules! tuple_value {
+    ($($key:ident = $value:expr),*) => {
+        Value::Tuple(Box::new($crate::tuple!($( $key = $value ),*)))
+    };
+}
+
 impl Tuple {
     /// Find named value by identifier.
     pub fn by_id(&self, id: &Identifier) -> Option<&Value> {
@@ -27,7 +45,10 @@ impl Tuple {
 }
 
 // TODO impl FromIterator instead
-impl<T: Into<Value> + Clone> From<std::slice::Iter<'_, (&'static str, T)>> for Tuple {
+impl<T> From<std::slice::Iter<'_, (&'static str, T)>> for Tuple
+where
+    T: Into<Value> + Clone,
+{
     fn from(values: std::slice::Iter<'_, (&'static str, T)>) -> Self {
         let (unnamed, named) = values
             .map(|(k, v)| (Identifier::no_ref(k), (*v).clone().into()))
@@ -41,26 +62,19 @@ impl<T: Into<Value> + Clone> From<std::slice::Iter<'_, (&'static str, T)>> for T
 
 impl From<Vec2> for Tuple {
     fn from(v: Vec2) -> Self {
-        [("x", v.x), ("y", v.y)].iter().into()
+        tuple!(x = v.x, y = v.y)
     }
 }
 
 impl From<Vec3> for Tuple {
     fn from(v: Vec3) -> Self {
-        [("x", v.x), ("y", v.y), ("z", v.z)].iter().into()
+        tuple!(x = v.x, y = v.y, z = v.z)
     }
 }
 
 impl From<Color> for Tuple {
     fn from(color: Color) -> Self {
-        [
-            ("r", color.r),
-            ("g", color.g),
-            ("b", color.b),
-            ("a", color.a),
-        ]
-        .iter()
-        .into()
+        tuple!(r = color.r, g = color.g, b = color.b, a = color.a)
     }
 }
 

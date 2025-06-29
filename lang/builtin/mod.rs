@@ -67,7 +67,7 @@ impl From<BuiltinValueHelper> for Value {
                 Value::Quantity(Quantity::new(v, QuantityType::Length))
             }
             BuiltinValueHelper::String(s) => Value::String(s),
-            BuiltinValueHelper::Color(_c) => todo!("convert c into value"),
+            BuiltinValueHelper::Color(c) => crate::tuple_value!(r = c.r, g = c.g, b = c.b, a = c.a),
         }
     }
 }

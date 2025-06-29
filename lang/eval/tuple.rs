@@ -26,7 +26,7 @@ impl Eval for TupleExpression {
         Ok(Value::Tuple(
             Tuple {
                 named,
-                unnamed: unnamed.into_iter().map(|(_, v)| (v.ty(), v)).collect(),
+                unnamed: unnamed.into_values().map(|v| (v.ty(), v)).collect(),
             }
             .into(),
         ))
