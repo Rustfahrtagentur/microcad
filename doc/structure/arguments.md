@@ -65,7 +65,7 @@ fn f( x: Length, y: Length, z: Length ) {}
 
 // Since we do not want to change x and y in the following statements,
 // we prepare a tuple named plane:
-plane = (x=1cm, y=2cm)
+plane = (x=1cm, y=2cm);
 
 // Then we pass plane to f() three times with different z values
 f( plane, z=3cm);
