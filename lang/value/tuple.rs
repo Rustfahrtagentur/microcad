@@ -24,14 +24,6 @@ macro_rules! tuple {
     };
 }
 
-/// Create a Value::Tuple from items
-#[macro_export]
-macro_rules! tuple_value {
-    ($($key:ident = $value:expr),*) => {
-        Value::Tuple(Box::new($crate::tuple!($( $key = $value ),*)))
-    };
-}
-
 impl Tuple {
     /// Find named value by identifier.
     pub fn by_id(&self, id: &Identifier) -> Option<&Value> {

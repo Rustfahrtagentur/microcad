@@ -23,6 +23,14 @@ pub use value_list::*;
 use crate::{model_tree::*, syntax::*, ty::*};
 use microcad_core::*;
 
+/// Create a Value::Tuple from items
+#[macro_export]
+macro_rules! tuple_value {
+    ($($key:ident = $value:expr),*) => {
+        Value::Tuple(Box::new($crate::tuple!($( $key = $value ),*)))
+    };
+}
+
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
 
 /// A variant value with attached source code reference.
