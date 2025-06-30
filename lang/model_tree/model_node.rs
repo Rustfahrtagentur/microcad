@@ -15,6 +15,9 @@ pub struct ModelNodeOrigin {
     /// The original arguments.
     arguments: ArgumentMap,
 
+    /// The original source file.
+    source_file: Option<std::rc::Rc<SourceFile>>,
+
     /// Source code reference of the call.
     call_src_ref: SrcRef,
 }
@@ -53,8 +56,8 @@ pub struct ModelNodeInner {
     /// Element of the node with [SrcRef].
     element: Refer<Element>,
 
-    /// Metadata.
-    metadata: Metadata,
+    /// Attributes used for export.
+    attributes: Attributes,
 
     /// The symbol (e.g. [`PartDefinition`]) that created this [`ModelNode`].
     origin: ModelNodeOrigin,
@@ -101,9 +104,9 @@ impl ModelNodeInner {
         &self.children
     }
 
-    /// Set metadata for this node.
-    pub fn set_metadata(&mut self, metadata: Metadata) {
-        self.metadata = metadata;
+    /// Return a reference to the model node origin.
+    pub fn origin(&self) -> &ModelNodeOrigin {
+        &self.origin
     }
 
     /// Clone only the content of this node without children and parent.
@@ -112,7 +115,7 @@ impl ModelNodeInner {
             id: self.id.clone(),
             parent: None,
             element: self.element.clone(),
-            metadata: self.metadata.clone(),
+            attributes: self.attributes.clone(),
             origin: self.origin.clone(),
             output_type: self.output_type.clone(),
             ..Default::default()
@@ -156,13 +159,13 @@ impl ModelNode {
         self.0.borrow()
     }
 
+    /// Get mutable borrowed reference to the inner of this node.
+    pub fn borrow_mut(&'_ self) -> std::cell::RefMut<'_, ModelNodeInner> {
+        self.0.borrow_mut()
+    }
     /// Calculate Depth of the node.
     pub fn depth(&self) -> usize {
-        self.0
-            .borrow()
-            .parent
-            .as_ref()
-            .map_or(0, |parent| parent.depth() + 1)
+        self.parents().count()
     }
 
     /// Make a deep copy if this node.
@@ -205,28 +208,6 @@ impl ModelNode {
     /// Set parent of this node.
     pub fn set_parent(&mut self, parent: ModelNode) {
         self.0.borrow_mut().parent = Some(parent);
-    }
-
-    /// Return parent of this node.
-    pub fn parent(&self) -> Option<ModelNode> {
-        self.0.borrow().parent.clone()
-    }
-
-    /// Returns `true` if this node has children.
-    pub fn has_children(&self) -> bool {
-        !self.borrow().children().is_empty()
-    }
-
-    /// Children iterator.
-    pub fn children(&self) -> Children {
-        Children::new(self.clone())
-    }
-
-    /// Returns an iterator of nodes to this node and its unnamed descendants, in tree order.
-    ///
-    /// Includes the current node.
-    pub fn descendants(&self) -> Descendants {
-        Descendants::new(self.clone())
     }
 
     /// Append a single node as child.
@@ -278,6 +259,29 @@ impl ModelNode {
         })
     }
 
+    /// Find the original source file of this node
+    pub fn find_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
+        self.ancestors().find_map(|node| {
+            let b = node.borrow();
+            let origin = b.origin();
+            match origin.creator {
+                Some(ref symbol) => match &symbol.borrow().def {
+                    SymbolDefinition::SourceFile(source_file) => Some(source_file.clone()),
+                    _ => None,
+                },
+                None => None,
+            }
+        })
+    }
+
+    /// Test if the node has this specific source file.
+    pub fn has_source_file(&self, source_file: &std::rc::Rc<SourceFile>) -> bool {
+        match (source_file.as_ref(), self.find_source_file()) {
+            (a, Some(b)) => a.hash == b.hash,
+            _ => false,
+        }
+    }
+
     /// Return inner node if we are in an [`Object`] node.
     pub fn into_inner(self) -> Option<ModelNode> {
         self.children().next().and_then(|n| {
@@ -295,12 +299,6 @@ impl ModelNode {
     pub fn dump(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         self.descendants()
             .try_for_each(|child| writeln!(f, "{}{}", " ".repeat(child.depth()), child))
-    }
-
-    /// Set metadata.
-    pub fn set_metadata(&self, metadata: Metadata) -> Self {
-        self.0.borrow_mut().set_metadata(metadata);
-        self.clone()
     }
 
     /// Get a property from an object node.
@@ -332,7 +330,10 @@ impl ModelNode {
         }
         s
     }
+}
 
+/// Implementation to store information about the node origin.
+impl ModelNode {
     /// Set the information about the creator of this node.
     ///
     /// This function is called after the resulting nodes of a call of a part
@@ -347,6 +348,62 @@ impl ModelNode {
     pub(crate) fn set_original_arguments(&self, arguments: ArgumentMap) -> Self {
         let origin = &mut self.0.borrow_mut().origin;
         origin.arguments = arguments;
+        self.clone()
+    }
+
+    /// Set the original source file this node has been created from.
+    pub(crate) fn set_original_source_file(&self, source_file: Rc<SourceFile>) -> Self {
+        let origin = &mut self.0.borrow_mut().origin;
+        origin.source_file = Some(source_file);
+        self.clone()
+    }
+}
+
+/// Iterator methods.
+impl ModelNode {
+    /// Return parent of this node.
+    pub fn parent(&self) -> Option<ModelNode> {
+        self.0.borrow().parent.clone()
+    }
+
+    /// Returns `true` if this node has children.
+    pub fn has_children(&self) -> bool {
+        !self.borrow().children().is_empty()
+    }
+
+    /// Children iterator.
+    pub fn children(&self) -> Children {
+        Children::new(self.clone())
+    }
+
+    /// Returns an iterator of nodes to this node and its unnamed descendants, in tree order.
+    ///
+    /// Includes the current node.
+    pub fn descendants(&self) -> Descendants {
+        Descendants::new(self.clone())
+    }
+
+    /// Returns an iterator of nodes that belong to the same source file as this one
+    pub fn source_file_descendants(&self) -> SourceFileDescendants {
+        SourceFileDescendants::new(self.clone())
+    }
+
+    /// Parents iterator.
+    pub fn parents(&self) -> Parents {
+        Parents::new(self.clone())
+    }
+
+    /// Ancestors iterator.
+    pub fn ancestors(&self) -> Ancestors {
+        Ancestors::new(self.clone())
+    }
+}
+
+/// Model node attribute access
+impl ModelNode {
+    /// Set attributes.
+    pub fn set_attributes(&self, attributes: Attributes) -> Self {
+        self.0.borrow_mut().set_attributes(attributes);
         self.clone()
     }
 }

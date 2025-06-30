@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Model tree module
+
 use microcad_core::BooleanOp;
 
-use crate::{model_tree::*, resolve::*, src_ref::*};
+use crate::{model_tree::*, resolve::*, src_ref::*, syntax::SourceFile};
 
 /// Model node multiplicities.
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -121,6 +122,18 @@ impl ModelNodes {
     pub fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
         self.iter()
             .for_each(|node| node.set_creator(creator.clone(), call_src_ref.clone()))
+    }
+
+    /// Filter the nodes by source file.
+    pub fn filter_by_source_file(&self, source_file: &std::rc::Rc<SourceFile>) -> ModelNodes {
+        self.iter()
+            .filter(|node| match node.find_source_file() {
+                Some(other) => source_file.hash == other.hash,
+                None => false,
+            })
+            .cloned()
+            .collect::<Vec<_>>()
+            .into()
     }
 }
 
