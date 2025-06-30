@@ -39,10 +39,10 @@ impl Expression {
         let value = self.eval(context)?;
         match value {
             Value::Nodes(mut nodes) => {
-                let metadata = attribute_list.eval(context)?;
+                let attributes = attribute_list.eval(context)?;
                 use std::borrow::BorrowMut;
                 for node in nodes.iter_mut() {
-                    node.borrow_mut().set_metadata(metadata.clone());
+                    node.borrow_mut().set_attributes(attributes.clone());
                 }
                 Ok(Value::Nodes(nodes))
             }

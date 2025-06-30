@@ -139,8 +139,8 @@ impl AttributeList {
     }
 }
 
-impl Eval<Metadata> for AttributeList {
-    fn eval(&self, context: &mut Context) -> EvalResult<Metadata> {
+impl Eval<Attributes> for AttributeList {
+    fn eval(&self, context: &mut Context) -> EvalResult<Attributes> {
         // Split attribute list into named tuple and name value attributes
         let name_value_attributes = self.eval_name_value_attributes(context)?;
         let named_tuple_attributes = self.eval_named_tuple_attributes(context)?;
@@ -159,6 +159,6 @@ impl Eval<Metadata> for AttributeList {
             tuple.insert(id.clone(), value.clone());
         }
 
-        Ok(Metadata(tuple))
+        Ok(Attributes(tuple))
     }
 }

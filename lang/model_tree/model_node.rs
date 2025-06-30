@@ -82,11 +82,20 @@ impl ModelNodeInner {
         &mut self.element
     }
 
-    /// Return reference to the metadata of this node.
-    pub fn metadata(&self) -> &Metadata {
-        &self.metadata
+    /// Return reference to the attributes of this node.
+    pub fn attributes(&self) -> &Attributes {
+        &self.attributes
     }
 
+    /// Return mutable reference for the attributes of this node
+    pub fn attributes_mut(&mut self) -> &mut Attributes {
+        &mut self.attributes
+    }
+
+    /// Set metadata for this node.
+    pub fn set_attributes(&mut self, metadata: Attributes) {
+        self.attributes = metadata;
+    }
     /// Return reference to the children of this node.
     pub fn children(&self) -> &ModelNodes {
         &self.children

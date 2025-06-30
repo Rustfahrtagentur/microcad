@@ -6,13 +6,10 @@
 use std::rc::Rc;
 
 use microcad_core::Geometry2D;
-use microcad_lang::{
-    model_tree::{Element, ModelNode},
-    value::Tuple,
-};
+use microcad_lang::{model_tree::*, syntax::*, value::*};
 
 use crate::{
-    ExportError, Exporter,
+    Exporter,
     svg::writer::{SvgTagAttributes, SvgWriter},
 };
 
@@ -20,21 +17,16 @@ use crate::{
 struct SvgExporter {
     /// The SVG writer
     writer: SvgWriter,
+
+    /// Processed results only
+    processed_only: bool,
 }
 
 impl SvgExporter {
     fn fetch_svg_attributes(&mut self, node: &ModelNode) -> SvgTagAttributes {
         let b = node.borrow();
-
-        /*let metadata = b.metadata();
-        if let Some(svg) = metadata.get::<&Tuple>("svg") {
-            SvgTagAttributes {
-                style: svg.get("style").unwrap_or_default(),
-            }
-        } else {
-            SvgTagAttributes::default()
-        }*/
-        todo!()
+        let attributes = b.attributes();
+        attributes.get_as_tuple(&Identifier::no_ref("svg")).into()
     }
 
     fn write_geometry(
@@ -56,7 +48,7 @@ impl SvgExporter {
         }
     }
 
-    fn _write_node(&mut self, node: ModelNode) -> std::io::Result<()> {
+    fn write_node(&mut self, node: ModelNode) -> std::io::Result<()> {
         let b = node.borrow();
 
         let element = b.element();
@@ -66,13 +58,13 @@ impl SvgExporter {
             Element::Object(_) => {
                 self.writer.begin_group(&attributes)?;
                 node.children()
-                    .try_for_each(|child| self._write_node(child))?;
+                    .try_for_each(|child| self.write_node(child))?;
                 self.writer.end_group()?;
             }
             Element::Transform(affine_transform) => {
                 self.writer.begin_transform(&affine_transform.mat2d())?;
                 node.children()
-                    .try_for_each(|child| self._write_node(child))?;
+                    .try_for_each(|child| self.write_node(child))?;
                 self.writer.end_transform()?;
             }
             Element::Primitive2D(geometry) => self.write_geometry(geometry, &attributes)?,
@@ -85,24 +77,13 @@ impl SvgExporter {
 }
 
 impl Exporter for SvgExporter {
-    fn file_extensions(&self) -> Vec<&str> {
-        ["svg"].into()
+    fn id() -> &'static str {
+        "svg"
     }
 
-    fn fetch_export_metadata(&self, node: &ModelNode) -> Option<Tuple> {
-        let b = node.borrow();
-        let metadata = b.metadata();
-        todo!()
-    }
+    fn export(&mut self, node: ModelNode) -> Result<Value, crate::ExportError> {
+        self.write_node(node)?;
 
-    fn export(&mut self, node: ModelNode) -> Result<(), crate::ExportError> {
-        let export_metadata = self.fetch_export_metadata(&node);
-        if export_metadata.is_none() {
-            return Err(ExportError::NoExportMetadata);
-        }
-
-        self._write_node(node)?;
-
-        Ok(())
+        Ok(Value::None)
     }
 }
