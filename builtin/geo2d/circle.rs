@@ -6,7 +6,7 @@ use microcad_lang::{eval::*, model_tree::*, parameter, rc::*};
 
 pub struct Circle;
 
-impl BuiltinPartDefinition for Circle {
+impl BuiltinWorkbenchDefinition for Circle {
     fn id() -> &'static str {
         "circle"
     }

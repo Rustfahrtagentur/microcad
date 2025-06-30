@@ -8,7 +8,7 @@ use microcad_lang::{eval::*, model_tree::*, parameter};
 #[derive(Debug)]
 pub struct Rotate;
 
-impl BuiltinPartDefinition for Rotate {
+impl BuiltinWorkbenchDefinition for Rotate {
     fn id() -> &'static str {
         "rotate"
     }

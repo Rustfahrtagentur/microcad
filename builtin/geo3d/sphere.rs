@@ -6,7 +6,7 @@ use microcad_lang::{eval::*, model_tree::*, parameter, rc::*};
 
 pub struct Sphere;
 
-impl BuiltinPartDefinition for Sphere {
+impl BuiltinWorkbenchDefinition for Sphere {
     fn id() -> &'static str {
         "sphere"
     }

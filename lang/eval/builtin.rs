@@ -46,7 +46,7 @@ impl CallTrait for Builtin {
 }
 
 /// Builtin part definition
-pub trait BuiltinPartDefinition {
+pub trait BuiltinWorkbenchDefinition {
     /// Get id of the builtin part
     fn id() -> &'static str;
     /// Create node from argument map

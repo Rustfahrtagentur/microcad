@@ -6,7 +6,7 @@ use microcad_lang::{eval::*, model_tree::*, parameter, rc::*};
 
 pub struct Cube;
 
-impl BuiltinPartDefinition for Cube {
+impl BuiltinWorkbenchDefinition for Cube {
     fn id() -> &'static str {
         "cube"
     }

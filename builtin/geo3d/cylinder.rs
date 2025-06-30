@@ -6,7 +6,7 @@ use microcad_lang::{eval::*, model_tree::*, parameter, rc::*};
 
 pub struct Cylinder;
 
-impl BuiltinPartDefinition for Cylinder {
+impl BuiltinWorkbenchDefinition for Cylinder {
     fn id() -> &'static str {
         "cylinder"
     }

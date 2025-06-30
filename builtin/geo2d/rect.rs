@@ -7,7 +7,7 @@ use microcad_lang::{eval::*, model_tree::*, parameter, rc::*};
 
 pub struct Rect;
 
-impl BuiltinPartDefinition for Rect {
+impl BuiltinWorkbenchDefinition for Rect {
     fn id() -> &'static str {
         "rect"
     }
