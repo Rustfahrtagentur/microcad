@@ -75,15 +75,3 @@ impl SvgExporter {
         Ok(())
     }
 }
-
-impl Exporter for SvgExporter {
-    fn id() -> &'static str {
-        "svg"
-    }
-
-    fn export(&mut self, node: ModelNode) -> Result<Value, crate::ExportError> {
-        self.write_node(node)?;
-
-        Ok(Value::None)
-    }
-}
