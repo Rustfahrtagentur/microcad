@@ -5,7 +5,7 @@ use crate::eval::*;
 
 impl Eval for TupleExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        let (unnamed, named) = self
+        let (unnamed, named): (Vec<_>, _) = self
             .args
             .eval(context)?
             .iter()
@@ -25,8 +25,8 @@ impl Eval for TupleExpression {
 
         Ok(Value::Tuple(
             Tuple {
-                named,
-                unnamed: unnamed.into_values().map(|v| (v.ty(), v)).collect(),
+                named: named.into_iter().collect(),
+                unnamed: unnamed.into_iter().map(|(_, v)| (v.ty(), v)).collect(),
             }
             .into(),
         ))

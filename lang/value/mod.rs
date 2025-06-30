@@ -202,7 +202,7 @@ impl crate::ty::Ty for Value {
             Value::Bool(_) => Type::Bool,
             Value::String(_) => Type::String,
             Value::Array(list) => list.ty(),
-            Value::Tuple(named_tuple) => named_tuple.ty(),
+            Value::Tuple(tuple) => tuple.ty(),
             Value::Matrix(matrix) => matrix.ty(),
             Value::Nodes(_) => Type::Nodes,
         }

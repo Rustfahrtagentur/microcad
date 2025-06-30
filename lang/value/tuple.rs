@@ -39,15 +39,15 @@ impl Tuple {
 // TODO impl FromIterator instead
 impl<T> From<std::slice::Iter<'_, (&'static str, T)>> for Tuple
 where
-    T: Into<Value> + Clone,
+    T: Into<Value> + Clone + std::fmt::Debug,
 {
-    fn from(values: std::slice::Iter<'_, (&'static str, T)>) -> Self {
-        let (unnamed, named) = values
+    fn from(iter: std::slice::Iter<'_, (&'static str, T)>) -> Self {
+        let (unnamed, named): (Vec<_>, _) = iter
             .map(|(k, v)| (Identifier::no_ref(k), (*v).clone().into()))
             .partition(|(k, _)| k.is_empty());
         Self {
-            named,
-            unnamed: unnamed.into_values().map(|v| (v.ty(), v)).collect(),
+            named: named.into_iter().collect(),
+            unnamed: unnamed.into_iter().map(|(_, v)| (v.ty(), v)).collect(),
         }
     }
 }
@@ -100,4 +100,60 @@ impl crate::ty::Ty for Tuple {
             .into(),
         )
     }
+}
+
+#[test]
+fn tuple_equal() {
+    let tuple1: Tuple = [
+        (
+            "",
+            Value::Quantity(Quantity {
+                value: 1.0,
+                quantity_type: QuantityType::Volume,
+            }),
+        ),
+        (
+            "",
+            Value::Quantity(Quantity {
+                value: 1.0,
+                quantity_type: QuantityType::Length,
+            }),
+        ),
+        (
+            "",
+            Value::Quantity(Quantity {
+                value: 1.0,
+                quantity_type: QuantityType::Area,
+            }),
+        ),
+    ]
+    .iter()
+    .into();
+    let tuple2: Tuple = [
+        (
+            "",
+            Value::Quantity(Quantity {
+                value: 1.0,
+                quantity_type: QuantityType::Length,
+            }),
+        ),
+        (
+            "",
+            Value::Quantity(Quantity {
+                value: 1.0,
+                quantity_type: QuantityType::Area,
+            }),
+        ),
+        (
+            "",
+            Value::Quantity(Quantity {
+                value: 1.0,
+                quantity_type: QuantityType::Volume,
+            }),
+        ),
+    ]
+    .iter()
+    .into();
+
+    assert_eq!(tuple1, tuple2);
 }
