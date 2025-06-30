@@ -26,6 +26,21 @@ macro_rules! tuple {
     };
 }
 
+/// Create a Tuple from items
+#[macro_export]
+macro_rules! tuple_quantity {
+        ($($quantity:ident = $value:expr),*) => {
+            Into::<Tuple>::into([$((
+                "",
+                Value::Quantity(Quantity {
+                    value: $value,
+                    quantity_type: QuantityType::$quantity,
+                }),
+            )),*]
+            .iter())
+        };
+}
+
 impl Tuple {
     /// Create new named tuple.
     pub fn new_named(named: std::collections::HashMap<Identifier, Value>) -> Self {
@@ -62,7 +77,7 @@ impl Tuple {
 // TODO impl FromIterator instead
 impl<T> From<std::slice::Iter<'_, (&'static str, T)>> for Tuple
 where
-    T: Into<Value> + Clone + std::fmt::Debug,
+    T: Into<Value> + Clone,
 {
     fn from(iter: std::slice::Iter<'_, (&'static str, T)>) -> Self {
         let (unnamed, named): (Vec<_>, _) = iter
@@ -147,56 +162,20 @@ impl crate::ty::Ty for Tuple {
 
 #[test]
 fn tuple_equal() {
-    let tuple1: Tuple = [
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Volume,
-            }),
-        ),
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Length,
-            }),
-        ),
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Area,
-            }),
-        ),
-    ]
-    .iter()
-    .into();
-    let tuple2: Tuple = [
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Length,
-            }),
-        ),
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Area,
-            }),
-        ),
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Volume,
-            }),
-        ),
-    ]
-    .iter()
-    .into();
+    assert_eq!(
+        tuple_quantity!(Volume = 1.0, Length = 1.0, Area = 1.0),
+        tuple_quantity!(Length = 1.0, Area = 1.0, Volume = 1.0)
+    );
+}
 
-    assert_eq!(tuple1, tuple2);
+#[test]
+fn tuple_not_equal() {
+    assert_ne!(
+        tuple_quantity!(Density = 1.0, Length = 1.0, Area = 1.0),
+        tuple_quantity!(Length = 1.0, Area = 1.0, Volume = 1.0)
+    );
+    assert_ne!(
+        tuple_quantity!(Length = 1.0, Area = 1.0),
+        tuple_quantity!(Length = 1.0, Area = 1.0, Volume = 1.0)
+    );
 }
