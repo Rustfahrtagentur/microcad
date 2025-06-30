@@ -3,13 +3,15 @@
 
 //! Object properties.
 
+use std::collections::BTreeMap;
+
 use crate::{diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*};
 
 /// A list of object properties.
 ///
 /// It is required that properties are always sorted by their id.
 #[derive(Clone, Default, Debug)]
-pub struct ObjectProperties(Tuple);
+pub struct ObjectProperties(BTreeMap<Identifier, Value>);
 
 impl ObjectProperties {
     /// Create new object properties from a [`ParameterValueList`] and an [`ArgumentMap`].
@@ -75,7 +77,7 @@ impl ObjectProperties {
 
     /// Get value at id.
     pub fn get_value_by_id(&self, id: &Identifier) -> Option<&Value> {
-        self.0.get_value_by_id(id)
+        self.0.get(id)
     }
 
     /// Get mutable value at id.

@@ -26,14 +26,15 @@ impl SvgExporter {
     fn fetch_svg_attributes(&mut self, node: &ModelNode) -> SvgTagAttributes {
         let b = node.borrow();
 
-        let metadata = b.metadata();
+        /*let metadata = b.metadata();
         if let Some(svg) = metadata.get::<&Tuple>("svg") {
             SvgTagAttributes {
                 style: svg.get("style").unwrap_or_default(),
             }
         } else {
             SvgTagAttributes::default()
-        }
+        }*/
+        todo!()
     }
 
     fn write_geometry(
@@ -91,7 +92,7 @@ impl Exporter for SvgExporter {
     fn fetch_export_metadata(&self, node: &ModelNode) -> Option<Tuple> {
         let b = node.borrow();
         let metadata = b.metadata();
-        metadata.get::<&Tuple>("export").cloned()
+        todo!()
     }
 
     fn export(&mut self, node: ModelNode) -> Result<(), crate::ExportError> {

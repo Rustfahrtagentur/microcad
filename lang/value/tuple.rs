@@ -35,11 +35,6 @@ impl Tuple {
         self.unnamed.get(ty)
     }
 
-    /// Get value by identifier.
-    pub fn get_value_by_id(&self, id: &Identifier) -> Option<&Value> {
-        self.0.get(id)
-    }
-
     /// Fetch an argument by name as `&str`.
     ///
     /// This method does not provide error handling and is supposed to be used for built-ins.
@@ -48,7 +43,7 @@ impl Tuple {
         T: std::convert::TryFrom<&'a Value>,
         T::Error: std::fmt::Debug,
     {
-        self.0
+        self.named
             .get(&Identifier::no_ref(id))
             .map(|value| TryInto::try_into(value).expect("Value"))
     }
