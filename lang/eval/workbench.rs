@@ -65,7 +65,7 @@ impl WorkbenchDefinition {
                 Ok(node_builder
                     .build()
                     .set_original_arguments(arguments.clone())
-                    .set_metadata(self.attribute_list.eval(context)?))
+                    .set_attributes(self.attribute_list.eval(context)?))
             },
         )
     }
