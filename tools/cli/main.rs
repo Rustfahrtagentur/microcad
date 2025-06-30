@@ -7,7 +7,9 @@ extern crate clap;
 extern crate microcad_lang;
 
 use clap::{Parser, Subcommand};
-use microcad_lang::{diag::*, eval::*, model_tree::*, parse::*, rc::*, resolve::*, syntax::*};
+use microcad_lang::{
+    diag::*, eval::*, model_tree::*, parse::*, rc::*, resolve::*, syntax::*, value::Value,
+};
 use std::io::Write;
 
 /// µcad cli
@@ -41,14 +43,22 @@ enum Commands {
         /// Input µcad file
         input: std::path::PathBuf,
         /// Paths to search for files
-        #[arg(short = 'I', long = "input", action = clap::ArgAction::Append, default_value = "./lib")]
-        input_path: Vec<std::path::PathBuf>,
+        #[arg(short = 'L', long = "lib", action = clap::ArgAction::Append, default_value = "./lib")]
+        search_paths: Vec<std::path::PathBuf>,
     },
 
     /// Parse and evaluate and export a µcad file
     Export {
         /// Input µcad file
         input: String,
+
+        /// Paths to search for files
+        #[arg(short = 'L', long = "lib", action = clap::ArgAction::Append, default_value = "./lib")]
+        search_paths: Vec<std::path::PathBuf>,
+
+        /// List all export
+        #[arg(short)]
+        list: bool,
     },
 
     /// Create a new source file with µcad extension
@@ -78,21 +88,19 @@ fn run(cli: &Cli) -> anyhow::Result<()> {
         Commands::Resolve { input } => {
             resolve(input)?;
         }
-        Commands::Eval { input, input_path } => {
-            eval(input, input_path)?;
+        Commands::Eval {
+            input,
+            search_paths,
+        } => {
+            eval(input, search_paths)?;
         }
-        /*
-        Commands::Export { input } => {
-            let exports = export(eval(parse(input)?, &cli.std)?)?;
-            eprintln!(
-                "Exported {} successfully!",
-                exports
-                    .iter()
-                    .map(|f| f.to_string_lossy().to_string())
-                    .collect::<Vec<_>>()
-                    .join(",")
-            );
-        }*/
+        Commands::Export {
+            input,
+            search_paths,
+            list,
+        } => {
+            export(input, search_paths, *list)?;
+        }
         Commands::Create { path } => {
             use std::{fs::*, path::*};
             let mut path = PathBuf::from(path);
@@ -141,7 +149,7 @@ fn resolve(input: impl AsRef<std::path::Path>) -> ParseResult<Symbol> {
 fn eval(
     input: impl AsRef<std::path::Path>,
     search_paths: &[std::path::PathBuf],
-) -> anyhow::Result<ModelNode> {
+) -> anyhow::Result<(ModelNode, Context)> {
     let symbols = resolve(input)?;
     let mut context = Context::new(
         symbols.clone(),
@@ -149,10 +157,10 @@ fn eval(
         search_paths,
         Box::new(Stdout),
     );
-    let result = context.eval().map_err(|err| anyhow::anyhow!("{err}"))?;
+    let node = context.eval().map_err(|err| anyhow::anyhow!("{err}"))?;
 
     log::info!("Result:");
-    println!("{result}");
+    println!("{node}");
     match context.has_errors() {
         true => {
             log::warn!("Evaluated with errors:");
@@ -161,7 +169,31 @@ fn eval(
         false => log::info!("Evaluated successfully!"),
     }
 
-    todo!("object node output")
+    Ok((node, context))
+}
+
+fn export(
+    input: impl AsRef<std::path::Path>,
+    search_paths: &[std::path::PathBuf],
+    _list_only: bool,
+) -> anyhow::Result<Value> {
+    let (node, _context) = eval(input, search_paths)?;
+
+    let export_nodes = node
+        .source_file_descendants()
+        .filter_map(|node| {
+            let b = node.borrow();
+
+            if let Some(attributes) = b.attributes().get_as_tuple(&Identifier::no_ref("export")) {
+                Some((node.clone(), attributes.clone()))
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+    todo!("Export the nodes by finding a matching exporter from a filename");
+
+    Ok(Value::None)
 }
 
 /*

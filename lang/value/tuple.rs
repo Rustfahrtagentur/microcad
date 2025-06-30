@@ -83,6 +83,12 @@ impl From<Color> for Tuple {
     }
 }
 
+impl From<Tuple> for Value {
+    fn from(tuple: Tuple) -> Self {
+        Value::Tuple(Box::new(tuple))
+    }
+}
+
 impl<'a> TryFrom<&'a Value> for &'a Tuple {
     type Error = ValueError;
 

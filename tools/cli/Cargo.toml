@@ -27,6 +27,7 @@ log = "0.4"
 microcad-lang = { workspace = true }
 microcad-core = { workspace = true }
 microcad-builtin = { workspace = true }
+microcad-export = { workspace = true }
 
 [lints.rust]
 missing_docs = "warn"

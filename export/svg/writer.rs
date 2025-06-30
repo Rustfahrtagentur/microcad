@@ -5,6 +5,7 @@
 
 use geo::CoordsIter;
 use microcad_core::*;
+use microcad_lang::value::*;
 
 /// SVG writer.
 pub struct SvgWriter {
@@ -23,6 +24,15 @@ impl SvgTagAttributes {
     /// New [`SvgTagAttributes`].
     pub fn new(style: String) -> Self {
         Self { style }
+    }
+}
+
+impl From<Option<&Tuple>> for SvgTagAttributes {
+    fn from(tuple: Option<&Tuple>) -> Self {
+        match tuple.unwrap_or(&Tuple::default()).get::<String>("style") {
+            Some(string) => SvgTagAttributes { style: string },
+            None => SvgTagAttributes::default(),
+        }
     }
 }
 

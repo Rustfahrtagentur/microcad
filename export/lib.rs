@@ -7,7 +7,7 @@ pub mod ply;
 pub mod stl;
 pub mod svg;
 
-use microcad_lang::{model_tree::ModelNode, value::Tuple};
+use microcad_lang::{model_tree::*, syntax::*, value::*};
 use thiserror::Error;
 
 /// Export error stub.
@@ -24,12 +24,43 @@ pub enum ExportError {
 
 /// Exporter trait
 pub trait Exporter {
-    /// Return file extensions
-    fn file_extensions(&self) -> Vec<&str>;
+    fn id() -> &'static str;
 
-    /// Fetch export metadata from a single node.
-    fn fetch_export_metadata(&self, node: &ModelNode) -> Option<Tuple>;
+    /// Return file extensions
+    fn file_extensions() -> Vec<&'static str> {
+        vec![Self::id()]
+    }
+
+    fn fetch_attributes_by_id(node: &ModelNode, id: &Identifier) -> Option<Value> {
+        let b = node.borrow();
+        let attributes = b.attributes();
+
+        attributes.get(id).cloned()
+    }
+
+    fn fetch_export_attributes(node: &ModelNode) -> Option<Tuple> {
+        if let Some(value) = Self::fetch_attributes_by_id(node, &Identifier::no_ref("export")) {
+            match value {
+                Value::Tuple(tuple) => Some(*tuple.clone()),
+                _ => None,
+            }
+        } else {
+            None
+        }
+    }
+
+    /// Fetch attributes by exporters `id()`.
+    fn fetch_attributes(node: &ModelNode) -> Option<Value> {
+        let b = node.borrow();
+        let attributes = b.attributes();
+
+        attributes.get(&Identifier::no_ref(Self::id())).cloned()
+    }
 
     /// Export the node if the node is marked for export.
-    fn export(&mut self, node: ModelNode) -> Result<(), ExportError>;
+    fn export(&mut self, node: ModelNode) -> Result<Value, ExportError>;
+}
+
+pub fn export(node: ModelNode, settings: Tuple) {
+    node.borrow_mut().attributes_mut().set_export(settings);
 }
