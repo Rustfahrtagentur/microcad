@@ -56,7 +56,7 @@ enum Commands {
         #[arg(short = 'L', long = "lib", action = clap::ArgAction::Append, default_value = "./lib")]
         search_paths: Vec<std::path::PathBuf>,
 
-        /// List all export
+        /// List all export files.
         #[arg(short)]
         list: bool,
     },
@@ -150,13 +150,7 @@ fn eval(
     input: impl AsRef<std::path::Path>,
     search_paths: &[std::path::PathBuf],
 ) -> anyhow::Result<(ModelNode, Context)> {
-    let symbols = resolve(input)?;
-    let mut context = Context::new(
-        symbols.clone(),
-        microcad_builtin::builtin_module(),
-        search_paths,
-        Box::new(Stdout),
-    );
+    let mut context = microcad_builtin::builtin_context(resolve(input)?, search_paths);
     let node = context.eval().map_err(|err| anyhow::anyhow!("{err}"))?;
 
     log::info!("Result:");
@@ -183,21 +177,12 @@ fn export(
         .source_file_descendants()
         .filter_map(|node| {
             let b = node.borrow();
-
-            if let Some(attributes) = b.attributes().get_as_tuple(&Identifier::no_ref("export")) {
-                Some((node.clone(), attributes.clone()))
-            } else {
-                None
-            }
+            b.attributes()
+                .get_as_tuple(&Identifier::no_ref("export"))
+                .map(|attributes| (node.clone(), attributes.clone()))
         })
         .collect::<Vec<_>>();
     todo!("Export the nodes by finding a matching exporter from a filename");
 
     Ok(Value::None)
 }
-
-/*
-fn export(node: ObjectNode) -> anyhow::Result<Vec<std::path::PathBuf>> {
-    Ok(microcad_builtin::export(node)?)
-}
-*/
