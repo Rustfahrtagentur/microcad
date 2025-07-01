@@ -3,6 +3,8 @@
 
 //! Named tuple evaluation entity
 
+use std::collections::HashMap;
+
 use crate::{ty::*, value::*};
 
 /// Tuple with named values
@@ -25,6 +27,14 @@ macro_rules! tuple {
 }
 
 impl Tuple {
+    /// Create new named tuple.
+    pub fn new_named(named: std::collections::HashMap<Identifier, Value>) -> Self {
+        Self {
+            named,
+            unnamed: HashMap::default(),
+        }
+    }
+
     /// Find named value by identifier.
     pub fn by_id(&self, id: &Identifier) -> Option<&Value> {
         self.named.get(id)
