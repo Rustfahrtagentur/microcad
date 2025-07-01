@@ -20,7 +20,7 @@ pub use tuple::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{model_tree::*, syntax::*, ty::*};
+use crate::{GetAttributeValue, GetPropertyValue, model_tree::*, syntax::*, ty::*};
 use microcad_core::*;
 
 /// Create a Value::Tuple from items
@@ -82,22 +82,6 @@ impl Value {
         match self {
             Self::Nodes(n) => n,
             _ => ModelNodes::default(),
-        }
-    }
-
-    /// Get property value for a value.
-    ///
-    /// - `identifier`: Identifier of the property
-    ///
-    /// This function is used when accessing a property `p` of a value `v` with `p.v`.
-    pub fn get_property_value(&self, identifier: &Identifier) -> Option<Value> {
-        match self {
-            Value::Tuple(tuple) => tuple.by_id(identifier).cloned(),
-            Value::Nodes(nodes) => match nodes.single_node() {
-                Some(node) => node.get_property_value(identifier),
-                None => None,
-            },
-            _ => None,
         }
     }
 
@@ -461,6 +445,28 @@ impl From<ModelNodes> for Value {
 impl From<ModelNode> for Value {
     fn from(node: ModelNode) -> Self {
         Self::from_single_node(node)
+    }
+}
+
+impl GetPropertyValue for Value {
+    fn get_property_value(&self, identifier: &Identifier) -> Value {
+        match self {
+            Value::Tuple(tuple) => tuple.by_id(identifier).cloned().unwrap_or_default(),
+            Value::Nodes(nodes) => match nodes.single_node() {
+                Some(node) => node.get_property_value(identifier),
+                None => Value::None,
+            },
+            _ => Value::None,
+        }
+    }
+}
+
+impl GetAttributeValue for Value {
+    fn get_attribute_value(self, id: &Identifier) -> Value {
+        match self.fetch_nodes().single_node() {
+            Some(node) => node.get_attribute_value(id),
+            None => Value::None,
+        }
     }
 }
 

@@ -3,7 +3,10 @@
 
 //! Model node
 
-use crate::{eval::*, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{
+    GetAttributeValue, GetPropertyValue, eval::*, model_tree::*, rc::*, resolve::*, src_ref::*,
+    syntax::*, value::*,
+};
 use microcad_core::*;
 
 /// The origin is the [`Symbol`] and [`ArgumentMap`] from which the node has been created.
@@ -301,17 +304,6 @@ impl ModelNode {
             .try_for_each(|child| writeln!(f, "{}{}", " ".repeat(child.depth()), child))
     }
 
-    /// Get a property from an object node.
-    ///
-    /// Only object nodes can have properties.
-    pub fn get_property_value(&self, id: &Identifier) -> Option<Value> {
-        let s = id.id().as_str();
-        match s {
-            "meta" => todo!(), //Some(Value::Tuple((**self.0.borrow().metadata()).clone())),
-            _ => self.borrow().element().get_property_value(id).cloned(),
-        }
-    }
-
     /// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
     pub fn signature(&self) -> String {
         let mut s = String::new();
@@ -399,12 +391,25 @@ impl ModelNode {
     }
 }
 
-/// Model node attribute access
+/// Model node attribute setter
 impl ModelNode {
     /// Set attributes.
     pub fn set_attributes(&self, attributes: Attributes) -> Self {
         self.0.borrow_mut().set_attributes(attributes);
         self.clone()
+    }
+}
+
+impl GetPropertyValue for ModelNode {
+    fn get_property_value(&self, id: &Identifier) -> Value {
+        self.borrow().element().get_property_value(id)
+    }
+}
+
+impl GetAttributeValue for ModelNode {
+    fn get_attribute_value(self, id: &Identifier) -> Value {
+        let b = &*self.borrow();
+        b.attributes().get(id).cloned().unwrap_or_default()
     }
 }
 

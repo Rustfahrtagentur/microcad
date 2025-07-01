@@ -58,6 +58,8 @@ impl FileIoInterface for TomlImporter {
 
 #[test]
 fn toml_importer() {
+    use microcad_lang::GetPropertyValue;
+
     // Import a toml from `Cargo.toml` and convert it into a tuple.
     let toml_importer = TomlImporter;
 
@@ -73,9 +75,7 @@ fn toml_importer() {
         let package = tuple
             .by_id(&Identifier::no_ref("package"))
             .expect("Package info");
-        let name = package
-            .get_property_value(&Identifier::no_ref("name"))
-            .expect("Name");
+        let name = package.get_property_value(&Identifier::no_ref("name"));
 
         let name = name.try_string().expect("String value");
         println!("{name}");

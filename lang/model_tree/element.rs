@@ -3,7 +3,7 @@
 
 //! Element of a [`ModelNode`]
 
-use crate::{model_tree::*, syntax::*, value::*};
+use crate::{GetPropertyValue, model_tree::*, syntax::*, value::*};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -33,18 +33,6 @@ pub enum Element {
     Operation(std::rc::Rc<dyn Operation>),
 }
 
-impl Element {
-    /// Get a property value from an [`Element`].
-    ///
-    /// Only objects can have properties.
-    pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
-        match self {
-            Self::Object(object) => object.get_property_value(id),
-            _ => None,
-        }
-    }
-}
-
 /// The default [`ObjectNodeContent`] is an empty [`Object`].
 impl Default for Element {
     fn default() -> Self {
@@ -65,6 +53,15 @@ impl std::fmt::Display for Element {
                 write!(f, "({primitive:?})")
             }
             _ => Ok(()),
+        }
+    }
+}
+
+impl GetPropertyValue for Element {
+    fn get_property_value(&self, id: &Identifier) -> Value {
+        match self {
+            Self::Object(object) => object.get_property_value(id),
+            _ => Value::None,
         }
     }
 }

@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #[cfg(test)]
-use microcad_lang::{eval::*, model_tree::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
+use microcad_lang::{
+    GetPropertyValue, eval::*, model_tree::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*,
+};
 
 /// Helper function to create a qualified name from &str
 #[cfg(test)]
@@ -56,10 +58,8 @@ fn workbench_call() {
     fn check_node_property_b(node: &ModelNode, value: f64) {
         if let Element::Object(ref object) = *node.borrow().element() {
             assert_eq!(
-                object
-                    .get_property_value(&Identifier(Refer::none("b".into())))
-                    .expect("Property `b`"),
-                &Value::Quantity(Quantity::new(value, QuantityType::Scalar))
+                object.get_property_value(&Identifier(Refer::none("b".into()))),
+                Value::Quantity(Quantity::new(value, QuantityType::Scalar))
             );
         } else {
             panic!("Object node expected")
@@ -104,10 +104,8 @@ fn workbench_initializer_call() {
         if let model_tree::Element::Object(ref object) = *node.borrow().element() {
             log::trace!("Object: {object}");
             assert_eq!(
-                object
-                    .get_property_value(&Identifier::no_ref("radius"))
-                    .expect("Property `radius`"),
-                &Value::Quantity(Quantity::new(value, ty::QuantityType::Scalar))
+                object.get_property_value(&Identifier::no_ref("radius")),
+                Value::Quantity(Quantity::new(value, ty::QuantityType::Scalar))
             );
         } else {
             panic!("Object node expected")

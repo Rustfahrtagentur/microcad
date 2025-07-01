@@ -5,7 +5,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::{diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*};
+use crate::{GetPropertyValue, diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*};
 
 /// A list of object properties.
 ///
@@ -69,15 +69,16 @@ impl std::ops::DerefMut for ObjectProperties {
     }
 }
 
+impl GetPropertyValue for ObjectProperties {
+    fn get_property_value(&self, id: &Identifier) -> Value {
+        self.0.get(id).cloned().unwrap_or_default()
+    }
+}
+
 impl ObjectProperties {
     /// Test if each property has a value.
     pub fn is_valid(&self) -> bool {
         self.0.iter().all(|(_, value)| !value.is_invalid())
-    }
-
-    /// Get value at id.
-    pub fn get_value_by_id(&self, id: &Identifier) -> Option<&Value> {
-        self.0.get(id)
     }
 
     /// Get mutable value at id.

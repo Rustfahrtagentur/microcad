@@ -3,7 +3,7 @@
 
 //! Object.
 
-use crate::{syntax::*, value::*};
+use crate::{GetPropertyValue, syntax::*, value::*};
 
 mod object_properties;
 
@@ -16,10 +16,9 @@ pub struct Object {
     pub props: ObjectProperties,
 }
 
-impl Object {
-    /// Get object property value.
-    pub fn get_property_value(&self, id: &Identifier) -> Option<&Value> {
-        self.props.get_value_by_id(id)
+impl GetPropertyValue for Object {
+    fn get_property_value(&self, id: &Identifier) -> Value {
+        self.props.get_property_value(id)
     }
 }
 
