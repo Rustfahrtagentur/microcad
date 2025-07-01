@@ -1,14 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{
-    diag::*,
-    eval::*,
-    model_tree::{ExporterRegistry, ModelNode},
-    rc::*,
-    resolve::*,
-    syntax::*,
-};
+use crate::{builtin::*, diag::*, eval::*, model_tree::ModelNode, rc::*, resolve::*, syntax::*};
 
 /// *Context* for *evaluation* of a resolved µcad file.
 ///
@@ -27,11 +20,9 @@ pub struct Context {
     diag_handler: DiagHandler,
     /// Output channel for [__builtin::print].
     output: Box<dyn Output>,
-
-    /// Exporter database
+    /// Exporter registry.
     exporters: ExporterRegistry,
-
-    /// Importer registry
+    /// Importer registry.
     importers: ImporterRegistry,
 }
 
@@ -156,37 +147,14 @@ impl Context {
         result
     }
 
-    /// Import a value with parameters from an argument map.
-    ///
-    /// The argument map contains filename and importer id.
-    pub fn import(&mut self, arg_map: &ArgumentMap) -> EvalResult<Value> {
-        let filename: String = arg_map.get("filename");
-        let id: String = arg_map.get("id");
-        if let Some(value) = self.importers.get_cached(filename.clone(), id.clone()) {
-            return Ok(value);
-        }
+    /// Set importers
+    pub fn set_importers(&mut self, importers: ImporterRegistry) {
+        self.importers = importers;
+    }
 
-        let importer = if id.is_empty() {
-            self.importers.by_filename(&filename)
-        } else {
-            self.importers.by_id(&id.clone().into())
-        };
-
-        match importer {
-            Ok(importer) => match importer.import(arg_map) {
-                Ok(value) => {
-                    self.importers.cache(filename, id, value.clone());
-                    return Ok(value);
-                }
-                Err(err) => self.error(arg_map, err)?,
-            },
-
-            Err(err) => {
-                self.error(arg_map, err)?;
-            }
-        }
-
-        Ok(Value::None)
+    /// Set exporters
+    pub fn set_exporters(&mut self, exporters: ExporterRegistry) {
+        self.exporters = exporters;
     }
 }
 
@@ -271,6 +239,20 @@ impl std::fmt::Display for Context {
             self.diag_handler.pretty_print(f, &self.symbol_table)
         } else {
             write!(f, "{}", self.symbol_table)
+        }
+    }
+}
+
+impl ImporterRegistryAccess for Context {
+    type Error = EvalError;
+
+    fn import(&mut self, arg_map: &ArgumentMap) -> Result<Value, Self::Error> {
+        match self.importers.import(arg_map) {
+            Ok(value) => Ok(value),
+            Err(err) => {
+                self.error(arg_map, err)?;
+                Ok(Value::None)
+            }
         }
     }
 }
