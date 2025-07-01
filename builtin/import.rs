@@ -3,17 +3,11 @@
 
 //! µcad builtin library
 
-use microcad_lang::{
-    builtin::ImporterRegistryAccess,
-    diag::PushDiag,
-    eval::{ArgumentMap, ArgumentMatch},
-    parameter,
-    syntax::Identifier,
-    value::Value,
-};
+use microcad_lang::{builtin::*, diag::*, eval::*, parameter, syntax::*, value::*};
 
 use crate::Symbol;
 
+/// `__builtin::import` function.
 pub fn import() -> Symbol {
     Symbol::new_builtin(
         Identifier::no_ref("import"),

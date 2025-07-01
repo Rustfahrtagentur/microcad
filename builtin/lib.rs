@@ -7,7 +7,7 @@ mod assert;
 pub mod context_builder;
 mod geo2d;
 mod geo3d;
-mod import;
+pub mod import;
 mod math;
 mod ops;
 mod print;
