@@ -13,8 +13,8 @@ mod debug {
 pub use transform::translate;
 pub use transform::rotate;
 
-/// Export helper part.
-part export(filename: String) {
+/// Export helper op.
+op export(filename: String) {
     #[export(filename)] {
         @children
     }
@@ -24,3 +24,5 @@ pub use __builtin::print;
 pub use __builtin::error;
 pub use __builtin::warning;
 pub use __builtin::info;
+
+pub use __builtin::import;

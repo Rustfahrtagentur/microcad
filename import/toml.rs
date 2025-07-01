@@ -55,3 +55,31 @@ impl FileIoInterface for TomlImporter {
         Id::new("toml")
     }
 }
+
+#[test]
+fn toml_importer() {
+    // Import a toml from `Cargo.toml` and convert it into a tuple.
+    let toml_importer = TomlImporter;
+
+    let mut args = microcad_lang::eval::ArgumentMap::default();
+    args.insert(
+        Identifier::no_ref("filename"),
+        Value::String("Cargo.toml".into()),
+    );
+    let value = toml_importer.import(&args).expect("No error");
+    println!("{value}");
+
+    if let Value::Tuple(tuple) = value {
+        let package = tuple
+            .by_id(&Identifier::no_ref("package"))
+            .expect("Package info");
+        let name = package
+            .get_property_value(&Identifier::no_ref("name"))
+            .expect("Name");
+
+        let name = name.try_string().expect("String value");
+        println!("{name}");
+    } else {
+        panic!("Value must be a tuple!")
+    }
+}
