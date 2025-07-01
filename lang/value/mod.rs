@@ -7,7 +7,6 @@
 //! to process or ends up as the overall evaluation result.
 
 mod array;
-mod import;
 mod matrix;
 mod quantity;
 mod tuple;
@@ -15,7 +14,6 @@ mod value_error;
 mod value_list;
 
 pub use array::*;
-pub use import::*;
 pub use matrix::*;
 pub use quantity::*;
 pub use tuple::*;

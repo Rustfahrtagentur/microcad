@@ -4,7 +4,6 @@
 //! Model tree module
 
 pub mod element;
-pub mod export;
 pub mod iter;
 pub mod metadata;
 pub mod model_node;
@@ -15,7 +14,6 @@ pub mod object;
 pub mod transformation;
 
 pub use element::*;
-pub use export::*;
 pub use iter::*;
 pub use metadata::*;
 pub use model_node::*;

@@ -4,8 +4,10 @@
 //! µcad builtin library
 
 mod assert;
+pub mod context_builder;
 mod geo2d;
 mod geo3d;
+mod import;
 mod math;
 mod ops;
 mod print;
@@ -19,9 +21,10 @@ fn init() {
 }
 
 pub use microcad_lang::builtin::*;
-use microcad_lang::resolve::*;
+use microcad_lang::{eval::Stdout, resolve::*};
 
 pub(crate) use assert::*;
+pub(crate) use context_builder::*;
 pub(crate) use math::*;
 pub(crate) use ops::*;
 pub(crate) use print::*;
@@ -42,7 +45,29 @@ pub fn builtin_module() -> Symbol {
         .symbol(ops())
         .symbol(transform())
         .symbol(math())
+        .symbol(import::import())
         .symbol(geo2d::geo2d())
         .symbol(geo3d::geo3d())
+        .build()
+}
+
+/// Get built-in importers.
+pub fn builtin_importers() -> ImporterRegistry {
+    ImporterRegistry::default().insert(microcad_import::toml::TomlImporter)
+}
+
+/// Get built-in exporters.
+pub fn builtin_exporters() -> ExporterRegistry {
+    ExporterRegistry::new().insert(microcad_export::svg::SvgExporter)
+}
+
+/// Built-in context.
+pub fn builtin_context(
+    root: Symbol,
+    search_paths: &[std::path::PathBuf],
+) -> microcad_lang::eval::Context {
+    ContextBuilder::new(root, builtin_module(), search_paths, Box::new(Stdout))
+        .importers(builtin_importers())
+        .exporters(builtin_exporters())
         .build()
 }
