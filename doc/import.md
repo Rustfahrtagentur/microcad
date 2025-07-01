@@ -19,10 +19,12 @@ diameter = 10.0
 pitch = 1.5
 ```
 
-```µcad
+You can then load the TOML file by using `std::import` and access its values:
+
+```µcad,toml_import
 data = std::import("example.toml");
 
 std::debug::assert_eq(data.M10.diameter, 10.0);
-std::debug::assert_eq(data.M6.pitch, 1.5);
+std::debug::assert_eq(data.M6.pitch, 1.0);
 ```
 
