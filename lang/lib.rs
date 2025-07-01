@@ -27,7 +27,7 @@ pub mod ty;
 pub mod value;
 
 /// Id type (base of all identifiers)
-type Id = compact_str::CompactString;
+pub type Id = compact_str::CompactString;
 
 /// Global test initialization.
 #[cfg(test)]
