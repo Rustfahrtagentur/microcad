@@ -181,12 +181,14 @@ list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
 //`(x = 1.0mm, y = 2.0mm)`: ok
 tuple_expression = { "(" ~ ws* ~ argument_list ~ ws* ~ ")" ~ unit? }
 
-//`.0`: ok
 //`.height`: ok
 //`.=`: error # Neither an identifier nor an integer
-tuple_element_access = { "." ~ (identifier | int) }
+tuple_element_access = { "." ~ identifier }
 
-element_access = _{ list_element_access | tuple_element_access }
+//`#layer`: ok
+attribute_access = { "#" ~ identifier }
+
+element_access = _{ method_call | list_element_access | tuple_element_access | attribute_access }
 
 //`pub`: ok
 visibility = { "pub" }
@@ -276,7 +278,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_minus    =   { "-" }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
-postfix          =  _{ method_call | list_element_access | tuple_element_access }
+postfix          =  _{ element_access }
 primary          =  _{ literal | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
