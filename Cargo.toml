@@ -6,6 +6,7 @@ default-members = [
     "builtin",
     "core",
     "lang",
+    "import",
     "export",
     "tests",
     "tools/cli",
@@ -17,6 +18,7 @@ members = [
     "core",
     "lang",
     "tests",
+    "import",
     "export",
     "tools/cli",
     "tools/update-copyright",
@@ -42,6 +44,7 @@ keywords = ["cad", "geometry", "3d", "printing", "cnc", "openscad"]
 
 [workspace.dependencies]
 microcad-core = { path = "core", version = "0.1.0" }
+microcad-import = { path = "import", version = "0.1.0" }
 microcad-export = { path = "export", version = "0.1.0" }
 microcad-lang = { path = "lang", version = "0.1.0" }
 microcad-builtin = { path = "builtin", version = "0.1.0" }
