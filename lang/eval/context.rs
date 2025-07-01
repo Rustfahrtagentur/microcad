@@ -246,3 +246,9 @@ impl ImporterRegistryAccess for Context {
         }
     }
 }
+
+impl ExporterAccess for Context {
+    fn exporter_by_id(&self, id: &crate::Id) -> Option<Rc<dyn Exporter>> {
+        self.exporters.exporter_by_id(id)
+    }
+}

@@ -3,7 +3,13 @@
 
 use std::collections::BTreeMap;
 
-use crate::{eval::*, model_tree::*, parameter, syntax::*};
+use crate::{
+    builtin::{ExportError, ExporterAccess},
+    eval::*,
+    model_tree::*,
+    parameter,
+    syntax::*,
+};
 
 use microcad_core::Color;
 use thiserror::Error;
@@ -26,27 +32,20 @@ pub enum AttributeError {
     /// Warning when an attribute has already been set.
     #[error("The attribute is already set: {0} = {1}")]
     AttributeAlreadySet(Identifier, Value),
+
+    /// The attribute was not found.
+    #[error("Not found: {0}")]
+    NotFound(Identifier),
 }
 
 impl From<ArgumentMap> for Tuple {
     fn from(argument_map: ArgumentMap) -> Self {
-        Self {
-            named: argument_map
+        Tuple::new_named(
+            argument_map
                 .iter()
                 .map(|(k, v)| (k.clone(), v.clone()))
                 .collect(),
-            ..Default::default()
-        }
-    }
-}
-
-impl Attribute {
-    /// Return a parameter list for an attribute
-    fn parameter_list(id: &Identifier) -> Option<ParameterValueList> {
-        match id.id().as_str() {
-            "export" => Some(vec![parameter!(filename: String)].into()),
-            _ => None,
-        }
+        )
     }
 }
 
@@ -54,16 +53,20 @@ impl Eval<Option<(Identifier, Value)>> for Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<(Identifier, Value)>> {
         match self {
             Attribute::Tuple(id, argument_list) => {
-                if let Some(params) = Self::parameter_list(id) {
-                    let args = ArgumentMap::find_match(&argument_list.eval(context)?, &params);
-                    match args {
-                        Ok(_args) => {
-                            todo!() //return Ok(Some((id.clone(), Value::Tuple(args.into()))));
+                if let Some(exporter) = context.exporter_by_id(id.id()) {
+                    match ArgumentMap::find_match(
+                        &argument_list.eval(context)?,
+                        &exporter.parameters(),
+                    ) {
+                        Ok(args) => {
+                            return Ok(Some((id.clone(), Value::Tuple(Box::new(args.into())))));
                         }
                         Err(err) => {
                             context.warning(self, err)?;
                         }
                     }
+                } else {
+                    context.warning(id, ExportError::NoExporterWithId(id.id().clone()))?;
                 }
             }
             Attribute::NameValue(id, expression) => {

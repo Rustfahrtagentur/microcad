@@ -30,15 +30,17 @@ use std::debug::*;
 
 #[color = "#FFFFFF"]
 #[layer = "right_side"]
+#[export("filename.svg")]
 c = std::geo2d::circle(42.0mm);
 
 std::debug::assert_eq(c#color, "#FFFFFF");
 std::debug::assert_eq(c#layer, "right_side");
+std::debug::assert_eq(c#export.filename, "filename.svg");
 ```
 
 When viewed or exported, node `c` will have a red color.
 
-The metadata `color` can be accessed by using the `meta` property.
+The metadata `color` can be accessed by using the `#` notations.
 
 ## Syntax
 

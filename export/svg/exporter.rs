@@ -57,6 +57,8 @@ impl Exporter for SvgExporter {
         let f = std::fs::File::create(args.get::<String>("filename"))?;
 
         //node.process();
+        // TODO get bounds from a process node:
+        // let bounds = node.bounds();
         let bounds = geo::Rect::new(coord! { x: 0., y: 0. }, coord! { x: 100., y: 100. });
         let mut writer = SvgWriter::new(Box::new(BufWriter::new(f)), bounds, 1.0)?;
 

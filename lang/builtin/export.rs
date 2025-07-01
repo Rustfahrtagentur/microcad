@@ -37,6 +37,20 @@ pub enum ExportError {
 ///
 /// Implement this trait for your custom file exporter.
 pub trait Exporter: FileIoInterface {
+    /// Parameters that as exporter specific attributes to a node.
+    ///
+    /// Let's assume an exporter `foo` has a node parameter `bar = 23` as parameter value list.
+    /// The parameter `bar` can be set to `42` with:
+    ///
+    /// ```ucad
+    /// #[export("myfile.foo")]
+    /// #[foo(baz = 42)]
+    /// circle(42mm);
+    /// ```
+    fn parameters(&self) -> ParameterValueList {
+        ParameterValueList::default()
+    }
+
     /// Export the node if the node is marked for export.
     fn export(&mut self, node: ModelNode, args: &ArgumentMap) -> Result<Value, ExportError>;
 }
@@ -68,13 +82,6 @@ impl ExporterRegistry {
         self
     }
 
-    /// Get exporter by id.
-    pub fn by_id(&self, id: &Id) -> Result<Rc<dyn Exporter>, ExportError> {
-        self.io
-            .by_id(id)
-            .ok_or(ExportError::NoExporterWithId(id.clone()))
-    }
-
     /// Get exporter by filename.
     pub fn by_filename(
         &self,
@@ -90,5 +97,17 @@ impl ExporterRegistry {
                 importers.iter().map(|importer| importer.id()).collect(),
             )),
         }
+    }
+}
+
+/// Exporter access.
+pub trait ExporterAccess {
+    /// Get exporter by id.
+    fn exporter_by_id(&self, id: &Id) -> Option<Rc<dyn Exporter>>;
+}
+
+impl ExporterAccess for ExporterRegistry {
+    fn exporter_by_id(&self, id: &Id) -> Option<Rc<dyn Exporter>> {
+        self.io.by_id(id)
     }
 }
