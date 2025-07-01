@@ -381,7 +381,6 @@ fn create_test_code(
 
                     use microcad_builtin::*;
                     use microcad_lang::diag::*;
-                    use microcad_lang::eval::*;
                     use microcad_lang::syntax::*;
 
                     // get parameters from outside code
@@ -426,7 +425,7 @@ fn create_test_code(
                         // test expected to fail succeeded at parsing?
                         Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = Context::from_source_captured(source.clone(), builtin_module(), &["../lib".into()]);
+                            let mut context = ContextBuilder::from_source_captured(source.clone(), &["../lib".into(), "../doc/assets".into()]).build();
                             let eval = context.eval();
 
                             // get print output
@@ -484,7 +483,7 @@ fn create_test_code(
                         // test awaited to succeed and parsing succeeds?
                         Ok(source) => {
                             // evaluate the code including µcad std library
-                            let mut context = Context::from_source_captured(source.clone(), builtin_module(), &["../lib".into()]);
+                            let mut context = ContextBuilder::from_source_captured(source.clone(), &["../lib".into(), "../doc/assets".into()]).build();
                             let eval = context.eval();
                             
                             // get print output

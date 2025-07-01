@@ -24,7 +24,7 @@ pub use microcad_lang::builtin::*;
 use microcad_lang::{eval::Stdout, resolve::*};
 
 pub(crate) use assert::*;
-pub(crate) use context_builder::*;
+pub use context_builder::*;
 pub(crate) use math::*;
 pub(crate) use ops::*;
 pub(crate) use print::*;

@@ -3,7 +3,9 @@
 
 //! Builder pattern to build up a context
 
-use microcad_lang::{builtin::*, eval::*, resolve::Symbol};
+use std::rc::Rc;
+
+use microcad_lang::{builtin::*, eval::*, resolve::*, syntax::*};
 
 /// Context builder.
 pub struct ContextBuilder {
@@ -21,6 +23,23 @@ impl ContextBuilder {
         Self {
             context: Context::new(root, builtin, search_paths, output),
         }
+    }
+
+    /// Create a new context from a source file and capture output (see [`Self::output`]).
+    ///
+    /// # Arguments
+    /// - `root`: Resolved root source file.
+    /// - `builtin`: The builtin library.
+    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
+    pub fn from_source_captured(root: Rc<SourceFile>, search_paths: &[std::path::PathBuf]) -> Self {
+        Self::new(
+            root.resolve(None),
+            crate::builtin_module(),
+            search_paths,
+            Box::new(Capture::new()),
+        )
+        .importers(crate::builtin_importers())
+        .exporters(crate::builtin_exporters())
     }
 
     /// Set importers to context.
