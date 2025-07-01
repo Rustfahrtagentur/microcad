@@ -1,12 +1,7 @@
 -- Test --
   metadata_simple_example
   /home/micha/Work/mcad/mcad/doc/attributes.md:28
--- Parse Error --
-Parser error:  --> 7:24
-  |
-7 | std::debug::assert_eq(c#color, "#FFFFFF");
-  |                        ^---
-  |
-  = expected COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- Output --
+-- Errors --
 -- Test Result --
-FAIL
+OK

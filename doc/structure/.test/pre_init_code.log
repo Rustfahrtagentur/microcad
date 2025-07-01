@@ -7,6 +7,6 @@ Parser error:  --> 3:18
 3 |     const FACTOR = 2.0;
   |                  ^---
   |
-  = expected COMMENT, identifier, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+  = expected COMMENT, identifier, list_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
 -- Test Result --
 FAIL
