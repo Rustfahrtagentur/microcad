@@ -57,11 +57,13 @@ pub enum Expression {
         src_ref: SrcRef,
     },
     /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
-    ListElementAccess(Box<Expression>, Box<Expression>, SrcRef),
-    /// Access an element of a named tuple: `a.b`
+    ArrayElementAccess(Box<Expression>, Box<Expression>, SrcRef),
+    /// Access an element of a tuple: `a.b`
     PropertyAccess(Box<Expression>, Identifier, SrcRef),
-    /// Access an element of an unnamed tuple: `a.0`
-    TupleElementAccess(Box<Expression>, u32, SrcRef),
+
+    /// Access an attribute of a node: `a#b`
+    AttributeAccess(Box<Expression>, Identifier, SrcRef),
+
     /// Call to a method: `[2,3].len()`
     /// First expression must evaluate to a value
     MethodCall(Box<Expression>, MethodCall, SrcRef),
@@ -88,9 +90,9 @@ impl SrcReferrer for Expression {
                 rhs: _,
                 src_ref,
             } => src_ref.clone(),
-            Self::ListElementAccess(_, _, src_ref) => src_ref.clone(),
+            Self::ArrayElementAccess(_, _, src_ref) => src_ref.clone(),
             Self::PropertyAccess(_, _, src_ref) => src_ref.clone(),
-            Self::TupleElementAccess(_, _, src_ref) => src_ref.clone(),
+            Self::AttributeAccess(_, _, src_ref) => src_ref.clone(),
             Self::MethodCall(_, _, src_ref) => src_ref.clone(),
         }
     }
@@ -115,9 +117,9 @@ impl std::fmt::Display for Expression {
                 rhs,
                 src_ref: _,
             } => write!(f, "{op}{rhs}"),
-            Self::ListElementAccess(lhs, rhs, _) => write!(f, "{lhs}[{rhs}]"),
+            Self::ArrayElementAccess(lhs, rhs, _) => write!(f, "{lhs}[{rhs}]"),
             Self::PropertyAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
-            Self::TupleElementAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
+            Self::AttributeAccess(lhs, rhs, _) => write!(f, "{lhs}#{rhs}"),
             Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs}.{method_call}"),
             Self::Nested(nested) => write!(f, "{nested}"),
             _ => unimplemented!(),
@@ -158,20 +160,20 @@ impl PrintSyntax for Expression {
                 writeln!(f, "{:depth$}UnaryOp '{op}':", "")?;
                 rhs.print_syntax(f, depth)
             }
-            Self::ListElementAccess(lhs, rhs, _) => {
-                writeln!(f, "{:depth$}ListElementAccess:", "")?;
+            Self::ArrayElementAccess(lhs, rhs, _) => {
+                writeln!(f, "{:depth$}ArrayElementAccess:", "")?;
                 lhs.print_syntax(f, depth)?;
                 rhs.print_syntax(f, depth)
             }
             Self::PropertyAccess(lhs, rhs, _) => {
-                writeln!(f, "{:depth$}NamedTupleElementAccess:", "")?;
+                writeln!(f, "{:depth$}FieldAccess:", "")?;
                 lhs.print_syntax(f, depth)?;
                 rhs.print_syntax(f, depth)
             }
-            Self::TupleElementAccess(lhs, rhs, _) => {
-                writeln!(f, "{:depth$}UnnamedTupleElementAccess:", "")?;
+            Self::AttributeAccess(lhs, rhs, _) => {
+                writeln!(f, "{:depth$}AttributeAccess:", "")?;
                 lhs.print_syntax(f, depth)?;
-                writeln!(f, "{:depth$}{rhs}", "")
+                rhs.print_syntax(f, depth)
             }
             Self::MethodCall(lhs, method_call, _) => {
                 writeln!(f, "{:depth$}MethodCall:", "")?;

@@ -49,6 +49,7 @@ lazy_static::lazy_static! {
             .op(Op::postfix(method_call))
             .op(Op::postfix(list_element_access))
             .op(Op::postfix(tuple_element_access))
+            .op(Op::postfix(attribute_access))
     };
 }
 
@@ -141,22 +142,25 @@ impl Parse for Expression {
             })
             .map_postfix(|lhs, op| {
                 match (Pair::new(op.clone(), pair.source_hash()), op.as_rule()) {
-                    (op, Rule::list_element_access) => Ok(Self::ListElementAccess(
+                    (op, Rule::list_element_access) => Ok(Self::ArrayElementAccess(
                         Box::new(lhs?),
                         Box::new(Self::parse(op)?),
                         pair.clone().into(),
                     )),
+                    (op, Rule::attribute_access) => {
+                        let op = op.inner().next().expect(INTERNAL_PARSE_ERROR);
+                        Ok(Self::AttributeAccess(
+                            Box::new(lhs?),
+                            Identifier::parse(op)?,
+                            pair.clone().into(),
+                        ))
+                    }
                     (op, Rule::tuple_element_access) => {
                         let op = op.inner().next().expect(INTERNAL_PARSE_ERROR);
                         match op.as_rule() {
                             Rule::identifier => Ok(Self::PropertyAccess(
                                 Box::new(lhs?),
                                 Identifier::parse(op)?,
-                                pair.clone().into(),
-                            )),
-                            Rule::int => Ok(Self::TupleElementAccess(
-                                Box::new(lhs?),
-                                op.as_str().parse().expect("Integer expression expected"),
                                 pair.clone().into(),
                             )),
                             rule => unreachable!("Expected identifier or int, found {:?}", rule),
