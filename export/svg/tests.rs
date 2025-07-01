@@ -3,8 +3,6 @@
 
 //! Scalable Vector Graphics (SVG) export tests
 
-use std::rc::Rc;
-
 use super::*;
 use microcad_core::*;
 

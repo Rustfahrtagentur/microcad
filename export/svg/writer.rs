@@ -244,6 +244,24 @@ impl SvgWriter {
         Ok(())
     }
 
+    /// Generate geometry.
+    pub fn geometry(
+        &mut self,
+        geometry: &Geometry2D,
+        attr: &SvgTagAttributes,
+    ) -> std::io::Result<()> {
+        match geometry {
+            Geometry2D::LineString(line_string) => self.line_string(line_string, attr),
+            Geometry2D::MultiLineString(multi_line_string) => {
+                self.multi_line_string(multi_line_string, attr)
+            }
+            Geometry2D::Polygon(polygon) => self.polygon(polygon, attr),
+            Geometry2D::MultiPolygon(multi_polygon) => self.multi_polygon(multi_polygon, attr),
+            Geometry2D::Rect(rect) => self.rect(rect, attr),
+            Geometry2D::Circle(circle) => self.circle(circle, attr),
+        }
+    }
+
     /// Finish this SVG. This method is also called in the Drop trait implemetation.
     pub fn finish(&mut self) -> std::io::Result<()> {
         writeln!(self.writer, "</g>")?;

@@ -3,75 +3,70 @@
 
 //! Scalable Vector Graphics (SVG) export
 
-use std::rc::Rc;
+use std::io::BufWriter;
 
-use microcad_core::Geometry2D;
-use microcad_lang::{model_tree::*, syntax::*, value::*};
+use geo::coord;
+use microcad_lang::{Id, builtin::*, eval::ArgumentMap, model_tree::*, syntax::*, value::*};
 
-use crate::{
-    Exporter,
-    svg::writer::{SvgTagAttributes, SvgWriter},
-};
+use crate::svg::writer::{SvgTagAttributes, SvgWriter};
 
 /// SVG Exporter
-struct SvgExporter {
-    /// The SVG writer
-    writer: SvgWriter,
-
-    /// Processed results only
-    processed_only: bool,
-}
+pub struct SvgExporter;
 
 impl SvgExporter {
-    fn fetch_svg_attributes(&mut self, node: &ModelNode) -> SvgTagAttributes {
-        let b = node.borrow();
-        let attributes = b.attributes();
-        attributes.get_as_tuple(&Identifier::no_ref("svg")).into()
-    }
-
-    fn write_geometry(
-        &mut self,
-        geometry: &Rc<Geometry2D>,
-        attr: &SvgTagAttributes,
-    ) -> std::io::Result<()> {
-        match geometry.as_ref() {
-            Geometry2D::LineString(line_string) => self.writer.line_string(line_string, attr),
-            Geometry2D::MultiLineString(multi_line_string) => {
-                self.writer.multi_line_string(multi_line_string, attr)
-            }
-            Geometry2D::Polygon(polygon) => self.writer.polygon(polygon, attr),
-            Geometry2D::MultiPolygon(multi_polygon) => {
-                self.writer.multi_polygon(multi_polygon, attr)
-            }
-            Geometry2D::Rect(rect) => self.writer.rect(rect, attr),
-            Geometry2D::Circle(circle) => self.writer.circle(circle, attr),
+    fn write_node(writer: &mut SvgWriter, node: ModelNode) -> std::io::Result<()> {
+        fn fetch_svg_attributes(node: &ModelNode) -> SvgTagAttributes {
+            let b = node.borrow();
+            let attributes = b.attributes();
+            attributes.get_as_tuple(&Identifier::no_ref("svg")).into()
         }
-    }
 
-    fn write_node(&mut self, node: ModelNode) -> std::io::Result<()> {
         let b = node.borrow();
 
         let element = b.element();
-        let attributes = self.fetch_svg_attributes(&node);
+        let attributes = fetch_svg_attributes(&node);
 
         match element {
             Element::Object(_) => {
-                self.writer.begin_group(&attributes)?;
+                writer.begin_group(&attributes)?;
                 node.children()
-                    .try_for_each(|child| self.write_node(child))?;
-                self.writer.end_group()?;
+                    .try_for_each(|child| Self::write_node(writer, child))?;
+                writer.end_group()?;
             }
             Element::Transform(affine_transform) => {
-                self.writer.begin_transform(&affine_transform.mat2d())?;
+                writer.begin_transform(&affine_transform.mat2d())?;
                 node.children()
-                    .try_for_each(|child| self.write_node(child))?;
-                self.writer.end_transform()?;
+                    .try_for_each(|child| Self::write_node(writer, child))?;
+                writer.end_transform()?;
             }
-            Element::Primitive2D(geometry) => self.write_geometry(geometry, &attributes)?,
-            Element::Operation(_) => {}
+            Element::Primitive2D(geometry) => writer.geometry(geometry, &attributes)?,
+            Element::Operation(_) => {
+                todo!("Output processed operation results")
+            }
             _ => {}
         }
 
         Ok(())
+    }
+}
+
+impl Exporter for SvgExporter {
+    fn export(&mut self, node: ModelNode, args: &ArgumentMap) -> Result<Value, ExportError> {
+        assert_eq!(node.output_type(), ModelNodeOutputType::Geometry2D);
+
+        let f = std::fs::File::create(args.get::<String>("filename"))?;
+
+        //node.process();
+        let bounds = geo::Rect::new(coord! { x: 0., y: 0. }, coord! { x: 100., y: 100. });
+        let mut writer = SvgWriter::new(Box::new(BufWriter::new(f)), bounds, 1.0)?;
+
+        Self::write_node(&mut writer, node)?;
+        Ok(Value::None)
+    }
+}
+
+impl FileIoInterface for SvgExporter {
+    fn id(&self) -> Id {
+        Id::new("svg")
     }
 }
