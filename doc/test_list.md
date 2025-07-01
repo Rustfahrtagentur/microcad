@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**95** tests from markdown.
+**96** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -60,6 +60,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/return.png)](../doc/structure/.test/return.log) | [return](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/return_twice.png)](../doc/structure/.test/return_twice.log) | [return_twice](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/sketch_basic.png)](../doc/structure/.test/sketch_basic.log) | [sketch_basic](../doc/structure/sketch.md) |
+| [![test](../doc/.test/toml_import.png)](../doc/.test/toml_import.log) | [toml_import](../doc/import.md) |
 | [![test](../doc/types/.test/tuple_assignment.png)](../doc/types/.test/tuple_assignment.log) | [tuple_assignment](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_assignment_bundle.png)](../doc/types/.test/tuple_assignment_bundle.log) | [tuple_assignment_bundle](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_assignment_convert.png)](../doc/types/.test/tuple_assignment_convert.log) | [tuple_assignment_convert](../doc/types/tuples.md) |
