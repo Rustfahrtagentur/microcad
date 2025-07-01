@@ -24,6 +24,9 @@ pub struct SourceCache {
 
     /// Loaded, parsed and resolved source files.
     source_files: Vec<Rc<SourceFile>>,
+
+    /// Search paths.
+    search_paths: Vec<std::path::PathBuf>,
 }
 
 impl SourceCache {
@@ -42,6 +45,7 @@ impl SourceCache {
             by_path,
             // root shall not be found by name
             by_name: HashMap::new(),
+            search_paths: search_paths.to_vec(),
         }
     }
 
@@ -128,6 +132,11 @@ impl SourceCache {
             .iter()
             .find(|(_, i)| **i == index)
             .map(|(name, _)| name.clone())
+    }
+
+    /// Return search paths of this cache.
+    pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
+        &self.search_paths
     }
 }
 

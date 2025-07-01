@@ -22,7 +22,10 @@ pub fn import() -> Symbol {
             argument_values,
             parameter_values.expect("Parameter values"),
         ) {
-            Ok(arg_map) => context.import(&arg_map),
+            Ok(arg_map) => {
+                let search_paths = context.search_paths().clone();
+                context.import(&arg_map, &search_paths)
+            }
             Err(err) => {
                 context.error(argument_values, err)?;
                 Ok(Value::None)

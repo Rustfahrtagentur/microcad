@@ -5,12 +5,7 @@
 
 use std::rc::Rc;
 
-use crate::{
-    Id,
-    builtin::file_io::{FileIoInterface, FileIoRegistry},
-    eval::{ArgumentMap, ParameterValueList},
-    value::Value,
-};
+use crate::{Id, builtin::file_io::*, eval::*, syntax::*, value::*};
 
 use thiserror::Error;
 
@@ -21,7 +16,11 @@ pub enum ImportError {
     #[error("IO Error")]
     IoError(#[from] std::io::Error),
 
-    /// No importer found for file
+    /// The file was not found.
+    #[error("File not found: {0}")]
+    FileNotFound(std::path::PathBuf),
+
+    /// No importer found for file.
     #[error("No importer found for file `{0}`")]
     NoImporterForFile(std::path::PathBuf),
 
@@ -105,29 +104,56 @@ pub trait ImporterRegistryAccess {
     type Error;
 
     /// Import a value from an argument map
-    fn import(&mut self, arg_map: &ArgumentMap) -> Result<Value, Self::Error>;
+    fn import(
+        &mut self,
+        arg_map: &ArgumentMap,
+        search_paths: &[std::path::PathBuf],
+    ) -> Result<Value, Self::Error>;
 }
 
 impl ImporterRegistryAccess for ImporterRegistry {
     type Error = ImportError;
 
-    fn import(&mut self, arg_map: &ArgumentMap) -> Result<Value, Self::Error> {
+    fn import(
+        &mut self,
+        arg_map: &ArgumentMap,
+        search_paths: &[std::path::PathBuf],
+    ) -> Result<Value, Self::Error> {
         let filename: String = arg_map.get("filename");
-        let id: String = arg_map.get("id");
 
-        // Check if value is in cache
-        if let Some(value) = self.get_cached(filename.clone(), id.clone()) {
-            return Ok(value);
+        match [".".into()] // Search working dir first
+            .iter()
+            .chain(search_paths.iter())
+            .map(|path| path.join(&filename))
+            .find(|path| path.exists())
+        {
+            Some(path) => {
+                let mut arg_map = arg_map.clone();
+                let filename = path.to_string_lossy().to_string();
+                arg_map.insert(
+                    Identifier::no_ref("filename"),
+                    Value::String(filename.clone()),
+                );
+                let id: String = arg_map.get("id");
+
+                // Check if value is in cache
+                if let Some(value) = self.get_cached(filename.clone(), id.clone()) {
+                    return Ok(value);
+                }
+
+                let value = if id.is_empty() {
+                    self.by_filename(&filename)
+                } else {
+                    self.by_id(&id.clone().into())
+                }?
+                .import(&arg_map)?;
+                self.cache(filename, id, value.clone());
+                Ok(value)
+            }
+            None => Err(ImportError::FileNotFound(std::path::PathBuf::from(
+                &filename,
+            ))),
         }
-
-        let value = if id.is_empty() {
-            self.by_filename(&filename)
-        } else {
-            self.by_id(&id.clone().into())
-        }?
-        .import(arg_map)?;
-        self.cache(filename, id, value.clone());
-        Ok(value)
     }
 }
 

@@ -78,25 +78,6 @@ impl Context {
         ))
     }
 
-    /// Create a new context from a source file and capture output (see [`Self::output`]).
-    ///
-    /// # Arguments
-    /// - `root`: Resolved root source file.
-    /// - `builtin`: The builtin library.
-    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
-    pub fn from_source_captured(
-        root: Rc<SourceFile>,
-        builtin: Symbol,
-        search_paths: &[std::path::PathBuf],
-    ) -> Self {
-        Self::new(
-            root.resolve(None),
-            builtin,
-            search_paths,
-            Box::new(Capture::new()),
-        )
-    }
-
     /// Access captured output.
     pub fn output(&self) -> Option<String> {
         self.output.output()
@@ -155,6 +136,11 @@ impl Context {
     /// Set exporters
     pub fn set_exporters(&mut self, exporters: ExporterRegistry) {
         self.exporters = exporters;
+    }
+
+    /// Return search paths of this context.
+    pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
+        self.symbol_table.search_paths()
     }
 }
 
@@ -246,8 +232,12 @@ impl std::fmt::Display for Context {
 impl ImporterRegistryAccess for Context {
     type Error = EvalError;
 
-    fn import(&mut self, arg_map: &ArgumentMap) -> Result<Value, Self::Error> {
-        match self.importers.import(arg_map) {
+    fn import(
+        &mut self,
+        arg_map: &ArgumentMap,
+        search_paths: &[std::path::PathBuf],
+    ) -> Result<Value, Self::Error> {
+        match self.importers.import(arg_map, search_paths) {
             Ok(value) => Ok(value),
             Err(err) => {
                 self.error(arg_map, err)?;

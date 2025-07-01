@@ -175,6 +175,11 @@ impl SymbolTable {
             Ok(symbol.clone())
         }
     }
+
+    /// Return search paths of this symbol table.
+    pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
+        self.cache.search_paths()
+    }
 }
 
 impl Lookup for SymbolTable {
