@@ -1,46 +1,23 @@
 # Attributes
 
 Attributes are syntax elements that can be used to attach exporter-specific data to nodes.
-Assuming, you have two sketches and want to export each in a specific file.
-You assign an *export attribute* with a filename to each sketch:
-
 
 The attributes will not change the node geometry itself, but might change its appearance when if they are used for viewers or exporters.
-There can be multiple attributes for a node.
+There can be multiple attributes for a node, but each attribute needs to have a unique ID.
 
+## Simple example
 
-## Quick examples
+Let's define a node `c`.
 
-### Set Color 
+When viewed or exported, node `c` will have a red color, because the `color` attribute will be set:
 
-### Set Layer
-
-```
-
-### Set Precision
-
-### Mark as export
-
-
-
-
-
-```µcad,metadata_simple_example
-use std::debug::*;
-
+```µcad,attributes_simple_example
 #[color = "#FFFFFF"]
-#[layer = "right_side"]
-#[export("filename.svg")]
 c = std::geo2d::circle(42.0mm);
 
 std::debug::assert_eq(c#color, "#FFFFFF");
-std::debug::assert_eq(c#layer, "right_side");
-std::debug::assert_eq(c#export.filename, "filename.svg");
 ```
 
-When viewed or exported, node `c` will have a red color.
-
-The metadata `color` can be accessed by using the `#` notations.
 
 ## Syntax
 
@@ -48,19 +25,19 @@ Syntactically, an attribute consists of `#` prefix and an item.
 An attribute item can be a *tag*, a *name-value* pair or a *call*.
 This results in two ways to attach metadata:
 
-* *Name-value pairs*: `#[layer = "custom"]`, `#[precision = 200%]`, `#[color = rgb()]`. Store and retrieve arbitrary values.
+* *Name-value pairs*: `#[layer = "custom"]`, `#[precision = 200%]`, `#[color = "#FF00FF"]`. Store and retrieve arbitrary values.
 
-* *Calls*: `#[export("test.svg")`. Store export-specific values.
+* *Calls*: `#[export("test.svg")]`, `#[svg("style = fill:none")]`. Store export-specific values.
 
 ## Export attributes
 
 If you have created a part or a sketch and want to export it to a specific file, you can add the export attribute:
 
+```µcad,attributes_export_example
+#[export("circle.svg")]
+c = std::geo2d::circle(42.0mm);
+
+std::debug::assert_eq(c#export.filename, "circle.svg");
 ```
-#[export("test.svg")]
-circle(r = 42);
-```
 
-Let's annotate these nodes to be exported:
-
-
+See [export](export.md) for more information.
