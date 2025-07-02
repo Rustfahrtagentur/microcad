@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**96** tests from markdown.
+**98** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -13,6 +13,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/array_unit_bundling.png)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/arrays.md) |
 | [![test](../doc/structure/.test/assignment.png)](../doc/structure/.test/assignment.log) | [assignment](../doc/structure/assignments.md) |
 | [![test](../doc/structure/.test/assignment_immutable.png)](../doc/structure/.test/assignment_immutable.log) | [assignment_immutable](../doc/structure/assignments.md) |
+| [![test](../doc/.test/attributes_export_example.png)](../doc/.test/attributes_export_example.log) | [attributes_export_example](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_simple_example.png)](../doc/.test/attributes_simple_example.log) | [attributes_simple_example](../doc/attributes.md) |
 | [![test](../doc/structure/.test/building_plan.png)](../doc/structure/.test/building_plan.log) | [building_plan](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/call_function.png)](../doc/structure/.test/call_function.log) | [call_function](../doc/structure/calls.md) |
 | [![test](../doc/structure/.test/call_op.png)](../doc/structure/.test/call_op.log) | [call_op](../doc/structure/calls.md) |
@@ -24,6 +26,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/ops/.test/difference_alt_operator.png)](../doc/libs/std/ops/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/libs/std/ops/difference.md) |
 | [![test](../doc/libs/std/ops/.test/difference_operator.png)](../doc/libs/std/ops/.test/difference_operator.log) | [difference_operator](../doc/libs/std/ops/difference.md) |
 | [![test](../doc/structure/.test/example.png)](../doc/structure/.test/example.log) | [example](../doc/structure/functions.md) |
+| [![test](../doc/.test/export_attributes.png)](../doc/.test/export_attributes.log) | [export_attributes](../doc/export.md) |
 | [![test](../doc/libs/std/.test/export_multiple.png)](../doc/libs/std/.test/export_multiple.log) | [export_multiple](../doc/libs/std/export.md) |
 | [![test](../doc/libs/std/.test/export_single.png)](../doc/libs/std/.test/export_single.log) | [export_single](../doc/libs/std/export.md) |
 | [![test](../.test/first_example.png)](../.test/first_example.log) | [first_example](../README.md) |
@@ -40,7 +43,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/math/.test/math_abs.png)](../doc/libs/std/math/.test/math_abs.log) | [math_abs](../doc/libs/std/math/README.md) |
 | [![test](../doc/libs/std/math/.test/math_trigonometric.png)](../doc/libs/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/libs/std/math/README.md) |
 | [![test](../doc/nodes/.test/measure.png)](../doc/nodes/.test/measure.log) | [measure](../doc/nodes/measures.md) |
-| [![test](../doc/.test/metadata_simple_example.png)](../doc/.test/metadata_simple_example.log) | [metadata_simple_example](../doc/attributes.md) |
 | [![test](../doc/structure/.test/missed_property.png)](../doc/structure/.test/missed_property.log) | [missed_property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/mod.png)](../doc/structure/.test/mod.log) | [mod](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/mod_example.png)](../doc/structure/.test/mod_example.log) | [mod_example](../doc/structure/modules.md) |
