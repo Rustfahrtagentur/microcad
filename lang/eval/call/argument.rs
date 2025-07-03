@@ -9,7 +9,6 @@ impl Argument {
     /// Evaluate `Argument` and return `ArgumentValue`
     pub fn eval_value(&self, context: &mut Context) -> EvalResult<ArgumentValue> {
         Ok(ArgumentValue::new(
-            self.id.clone(),
             self.value.eval(context)?,
             self.src_ref.clone(),
         ))

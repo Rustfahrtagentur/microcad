@@ -61,7 +61,7 @@ pub trait ArgumentMatch: Default {
     ) -> EvalResult<Self> {
         let mut positional_index = 0;
 
-        for argument in arguments.iter().filter(|arg| arg.id.is_none()) {
+        for (id, argument) in arguments.iter().filter(|(id, _)| id.is_empty()) {
             let parameter = match parameters.get_by_type(argument.value.ty()) {
                 Ok(p) => p.clone(),
                 Err(_) => break,

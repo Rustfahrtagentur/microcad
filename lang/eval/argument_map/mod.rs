@@ -119,7 +119,8 @@ impl ArgumentMatch for ArgumentMap {
 fn argument_match_single() {
     let parameters = [crate::parameter!(a: Scalar)].into_iter().collect();
 
-    let arguments: ArgumentValueList = [crate::argument!(a: Scalar = 5.0)].into_iter().collect();
+    //let arguments = [crate::argument!(a: Scalar = 5.0)].into_iter().collect();
+    let arguments = [crate::argument!(a: Scalar = 5.0)].into_iter().collect()
 
     let arg_map = ArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
 

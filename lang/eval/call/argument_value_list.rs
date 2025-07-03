@@ -128,13 +128,6 @@ where
 }
 
 #[cfg(test)]
-impl From<Vec<ArgumentValue>> for ArgumentValueList {
-    fn from(value: Vec<ArgumentValue>) -> Self {
-        Self(Refer::none(value.into()))
-    }
-}
-
-#[cfg(test)]
 macro_rules! assert_eq_arg_map_value {
     ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
         $(assert_eq!(
@@ -183,15 +176,20 @@ fn call_get_matching_arguments_missing() {
     use crate::{argument, parameter};
 
     // function f(foo: Integer, bar: Integer, baz: Scalar = 4.0)
-    let parameters = ParameterValueList::new(vec![
+    let parameters = [
         parameter!(foo: Integer),
         parameter!(bar: Integer),
         parameter!(baz: Scalar = 4.0),
-    ]);
+    ]
+    .into_iter()
+    .collect();
 
     // f(1, baz = 3.0)
-    let arguments =
-        ArgumentValueList::from(vec![argument!(Integer = 1), argument!(baz: Scalar = 3.0)]);
+    let arguments = ArgumentValueList::from(
+        [argument!(Integer = 1), argument!(baz: Scalar = 3.0)]
+            .into_iter()
+            .collect(),
+    );
 
     let arg_map = ArgumentMap::find_match(&arguments, &parameters);
 
@@ -215,11 +213,13 @@ fn get_multi_matching_arguments() {
     .into_iter()
     .collect();
 
-    let arguments = ArgumentValueList::from(vec![
+    let arguments: ArgumentValueList = [
         argument!(Scalar = 2.0),
         argument!(Scalar = 100.0),
         argument!(Scalar = 10.0),
-    ]);
+    ]
+    .into_iter()
+    .collect();
 
     let multi_argument_map =
         MultiArgumentMap::find_match(&arguments, &parameters).expect("Valid match");

@@ -3,11 +3,11 @@
 
 //! List of arguments syntax entities.
 
-use crate::{ord_map::*, src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*};
 
 /// List (ordered map) of arguments.
 #[derive(Clone, Debug, Default)]
-pub struct ArgumentList(pub Refer<OrdMap<Identifier, Argument>>);
+pub struct ArgumentList(pub Refer<std::collections::HashMap<Identifier, Argument>>);
 
 impl SrcReferrer for ArgumentList {
     fn src_ref(&self) -> SrcRef {
@@ -16,7 +16,7 @@ impl SrcReferrer for ArgumentList {
 }
 
 impl std::ops::Deref for ArgumentList {
-    type Target = OrdMap<Identifier, Argument>;
+    type Target = std::collections::HashMap<Identifier, Argument>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -37,7 +37,7 @@ impl std::fmt::Display for ArgumentList {
             self.0
                 .value
                 .iter()
-                .map(|p| p.to_string())
+                .map(|(id, p)| format!("{id} = {p}"))
                 .collect::<Vec<_>>()
                 .join(", ")
         )
@@ -47,25 +47,9 @@ impl std::fmt::Display for ArgumentList {
 impl PrintSyntax for ArgumentList {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ArgumentList:", "")?;
-        self.0
-            .value
-            .iter()
-            .try_for_each(|p| p.print_syntax(f, depth + 1))
-    }
-}
-
-impl std::ops::Index<&Identifier> for ArgumentList {
-    type Output = Argument;
-
-    fn index(&self, name: &Identifier) -> &Self::Output {
-        self.0.get(name).expect("key not found")
-    }
-}
-
-impl std::ops::Index<usize> for ArgumentList {
-    type Output = Argument;
-
-    fn index(&self, idx: usize) -> &Self::Output {
-        &self.0.value[idx]
+        self.0.value.iter().try_for_each(|(id, p)| {
+            write!(f, "{id} = ");
+            p.print_syntax(f, depth + 1)
+        })
     }
 }
