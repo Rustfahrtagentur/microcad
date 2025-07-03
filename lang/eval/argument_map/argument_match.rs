@@ -25,16 +25,16 @@ pub trait ArgumentMatch: Default {
     /// Named arguments are arguments with a name, e.g. `bar` in `foo(bar = 42)`.
     /// The parameter is then removed from the list of parameters.
     fn find_and_insert_named_arguments(
-        &mut self,
+        mut self,
         argument_values: &ArgumentValueList,
         parameter_values: &mut ParameterValueList,
-    ) -> EvalResult<&mut Self> {
+    ) -> EvalResult<Self> {
         parameter_values
             // Clone the list of parameters because we want to remove elements from it while iterating
             .clone()
             .iter()
             // Filter out parameters that have a name and are present in the arguments
-            .filter_map(|p| argument_values.get(&p.id).map(|c| (p, c)))
+            .filter_map(|(id, p)| argument_values.get(&id).map(|c| (p, c)))
             // Insert the arguments into the map
             .try_for_each(|(parameter_value, argument_value)| {
                 self.insert_and_remove_from_parameters(
@@ -48,34 +48,30 @@ pub trait ArgumentMatch: Default {
             .map(|_| self)
     }
 
-    /// Find positional arguments and insert them into the map.
+    /// Find arguments by type and insert them into the map.
     ///
-    /// Try to match arguments by their position and insert them into the map.
-    /// Positional arguments are arguments without a name, e.g. `1, 2` in `foo(1, 2)`.
+    /// Try to match unnamed arguments by their type and insert them into the map.
     /// The parameter is then removed from the list of parameters.
     fn find_and_insert_unnamed_arguments(
-        &mut self,
-        argument_values: &ArgumentValueList,
-        parameter_values: &mut ParameterValueList,
-    ) -> EvalResult<&mut Self> {
-        if parameter_values.is_empty() {
-            return Ok(self);
-        }
+        mut self,
+        arguments: &ArgumentValueList,
+        parameters: &mut ParameterValueList,
+    ) -> EvalResult<Self> {
         let mut positional_index = 0;
 
-        for argument_value in argument_values.iter().filter(|arg| arg.id.is_none()) {
-            let parameter_value = match parameter_values.get_by_index(positional_index) {
-                Some(p) => p.clone(),
-                None => break,
+        for argument in arguments.iter().filter(|arg| arg.id.is_none()) {
+            let parameter = match parameters.get_by_type(argument.value.ty()) {
+                Ok(p) => p.clone(),
+                Err(_) => break,
             };
 
             match self.insert_and_remove_from_parameters(
-                argument_value.value.clone(),
-                &parameter_value,
-                parameter_values,
+                argument.value.clone(),
+                &parameter,
+                parameters,
             )? {
                 TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
-                    if positional_index >= parameter_values.len() {
+                    if positional_index >= parameters.len() {
                         break;
                     }
                 }
@@ -93,19 +89,21 @@ pub trait ArgumentMatch: Default {
     /// If a parameter has a default value and is not present in the arguments, insert the default value.
     /// The parameter is then removed from the list of parameters.
     fn find_and_insert_default_parameters(
-        &mut self,
+        mut self,
         argument_values: &ArgumentValueList,
         parameter_values: &mut ParameterValueList,
-    ) -> EvalResult<&mut Self> {
+    ) -> EvalResult<Self> {
         parameter_values
             // Clone the list of parameters because we want to remove elements from it while iterating
             .clone()
             .iter()
             // Filter out parameters that have a default value and are not present in the arguments
-            .filter_map(|p| match (argument_values.get(&p.id), &p.default_value) {
-                (None, Some(default_value)) => Some((p, default_value.clone())),
-                _ => None,
-            })
+            .filter_map(
+                |(id, p)| match (argument_values.get(&id), &p.default_value) {
+                    (None, Some(default_value)) => Some((p, default_value.clone())),
+                    _ => None,
+                },
+            )
             // Insert the default values into the map
             .try_for_each(|(parameter_value, default_value)| {
                 self.insert_and_remove_from_parameters(
@@ -129,9 +127,7 @@ pub trait ArgumentMatch: Default {
         argument_values.check_for_unexpected_arguments(parameter_values)?;
 
         let mut missing_parameter_values = parameter_values.clone();
-        let mut result = Self::default();
-
-        result
+        let result = Self::default()
             .find_and_insert_named_arguments(argument_values, &mut missing_parameter_values)?
             .find_and_insert_unnamed_arguments(argument_values, &mut missing_parameter_values)?
             .find_and_insert_default_parameters(argument_values, &mut missing_parameter_values)?;

@@ -82,35 +82,40 @@ impl From<BuiltinValueHelper> for Value {
 #[macro_export]
 macro_rules! parameter {
     ($id:ident) => {
-        $crate::eval::ParameterValue::new(
+        (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            None,
-            None,
-            $crate::src_ref::SrcRef(None),
+            $crate::eval::ParameterValue::new(None, None, $crate::src_ref::SrcRef(None)),
         )
     };
     ($id:ident: $ty:ident) => {
-        $crate::eval::ParameterValue::new(
+        (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            Some($crate::builtin::BuiltinTypeHelper::$ty.into()),
-            None,
-            $crate::src_ref::SrcRef(None),
+            $crate::eval::ParameterValue::new(
+                Some($crate::builtin::BuiltinTypeHelper::$ty.into()),
+                None,
+                $crate::src_ref::SrcRef(None),
+            ),
         )
     };
     ($id:ident: $ty:ident = $value:expr) => {
-        $crate::eval::ParameterValue::new(
+        (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            Some($crate::builtin::BuiltinTypeHelper::$ty.into()),
-            Some($crate::builtin::BuiltinValueHelper::$ty($value).into()),
-            $crate::src_ref::SrcRef(None),
+            $crate::eval::ParameterValue::new(
+                Some($crate::builtin::BuiltinTypeHelper::$ty.into()),
+                Some($crate::builtin::BuiltinValueHelper::$ty($value).into()),
+                $crate::src_ref::SrcRef(None),
+            ),
         )
     };
     ($id:ident = $value:expr) => {
-        value::ParameterValue::new(
+        (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            None,
-            Some($value),
-            SrcRef(None),
+            value::ParameterValue::new(
+                $crate::syntax::Identifier::no_ref(stringify!($id)),
+                None,
+                Some($value),
+                SrcRef(None),
+            ),
         )
     };
     () => {};

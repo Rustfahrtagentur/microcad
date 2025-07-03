@@ -59,10 +59,7 @@ impl ArgumentValueList {
         &self,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<()> {
-        match self
-            .keys()
-            .find(|id| parameter_values.get_by_id(id).is_none())
-        {
+        match self.keys().find(|id| parameter_values.get(id).is_none()) {
             Some(id) => Err(EvalError::UnexpectedArgument(id.clone())),
             None => Ok(()),
         }

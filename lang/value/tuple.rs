@@ -26,15 +26,15 @@ macro_rules! tuple {
     };
 }
 
-/// Create a Tuple from items
+/// Create a Tuple from Quantity items
 #[macro_export]
 macro_rules! tuple_quantity {
         ($($quantity:ident = $value:expr),*) => {
-            Into::<Tuple>::into([$((
+            Into::<$crate::value::Tuple>::into([$((
                 "",
-                Value::Quantity(Quantity {
+                $crate::value::Value::Quantity($crate::value::Quantity {
                     value: $value,
-                    quantity_type: QuantityType::$quantity,
+                    quantity_type: $crate::ty::QuantityType::$quantity,
                 }),
             )),*]
             .iter())
@@ -82,6 +82,19 @@ where
     fn from(iter: std::slice::Iter<'_, (&'static str, T)>) -> Self {
         let (unnamed, named): (Vec<_>, _) = iter
             .map(|(k, v)| (Identifier::no_ref(k), (*v).clone().into()))
+            .partition(|(k, _)| k.is_empty());
+        Self {
+            named: named.into_iter().collect(),
+            unnamed: unnamed.into_iter().map(|(_, v)| (v.ty(), v)).collect(),
+        }
+    }
+}
+
+impl FromIterator<(Identifier, Value)> for Tuple {
+    fn from_iter<T: IntoIterator<Item = (Identifier, Value)>>(iter: T) -> Self {
+        let (unnamed, named): (Vec<_>, _) = iter
+            .into_iter()
+            .map(|(k, v)| (k, v.clone()))
             .partition(|(k, _)| k.is_empty());
         Self {
             named: named.into_iter().collect(),

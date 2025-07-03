@@ -30,7 +30,7 @@ impl MultiArgumentMap {
         Combinations::new(&self.0)
     }
 }
-
+/*
 impl ArgumentMatch for MultiArgumentMap {
     /// Insert a value into the map and remove `parameter_value` from the list
     fn insert_and_remove_from_parameters(
@@ -59,3 +59,4 @@ impl ArgumentMatch for MultiArgumentMap {
         }
     }
 }
+*/

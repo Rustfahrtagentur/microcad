@@ -28,10 +28,9 @@ impl Eval<ParameterValue> for Parameter {
                         },
                     )?;
                     // Return an invalid parameter value in case evaluation failed
-                    Ok(ParameterValue::invalid(self.id.clone(), self.src_ref()))
+                    Ok(ParameterValue::invalid(self.src_ref()))
                 } else {
                     Ok(ParameterValue::new(
-                        self.id.clone(),
                         Some(specified_type.ty()),
                         Some(default_value),
                         self.src_ref(),
@@ -39,25 +38,19 @@ impl Eval<ParameterValue> for Parameter {
                 }
             }
             // Only type is specified
-            (Some(t), None) => Ok(ParameterValue::new(
-                self.id.clone(),
-                Some(t.ty()),
-                None,
-                self.src_ref(),
-            )),
+            (Some(t), None) => Ok(ParameterValue::new(Some(t.ty()), None, self.src_ref())),
             // Only value is specified
             (None, Some(expr)) => {
                 let default_value = expr.eval(context)?;
 
                 Ok(ParameterValue::new(
-                    self.id.clone(),
                     Some(default_value.ty().clone()),
                     Some(default_value),
                     self.src_ref(),
                 ))
             }
             // Neither type nor value is specified
-            (None, None) => Ok(ParameterValue::invalid(self.id.clone(), self.src_ref())),
+            (None, None) => Ok(ParameterValue::invalid(self.src_ref())),
         }
     }
 }
@@ -67,7 +60,7 @@ impl Eval<ParameterValueList> for ParameterList {
     fn eval(&self, context: &mut Context) -> EvalResult<ParameterValueList> {
         let mut values = ParameterValueList::default();
         for parameter in self.iter() {
-            values.push(parameter.eval(context)?)?;
+            values.insert(parameter.id.clone(), parameter.eval(context)?)?;
         }
 
         Ok(values)

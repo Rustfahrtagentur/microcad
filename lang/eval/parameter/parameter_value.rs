@@ -3,13 +3,11 @@
 
 //! Parameter value evaluation entity
 
-use crate::{src_ref::*, syntax::*, ty::*, value::*};
+use crate::{src_ref::*, ty::*, value::*};
 
 /// Parameter value is the result of evaluating a parameter
 #[derive(Clone, Debug)]
 pub struct ParameterValue {
-    /// Parameter name
-    pub id: Identifier,
     /// Parameter type
     pub specified_type: Option<Type>,
     /// Parameter default
@@ -25,29 +23,26 @@ pub enum TypeCheckResult {
     /// Self is list of that type
     MultiMatch,
     /// An error occurred
-    NoMatch(Identifier, Option<Type>, Type),
+    NoMatch(Option<Type>, Type),
 }
 
 impl ParameterValue {
     /// Create new parameter value
     pub fn new(
-        id: Identifier,
         specified_type: Option<Type>,
         default_value: Option<Value>,
         src_ref: SrcRef,
     ) -> Self {
         Self {
-            id,
             specified_type,
             default_value,
             src_ref,
         }
     }
 
-    /// Creates an invalid parameter value, in case an error occured during evaluation
-    pub fn invalid(id: Identifier, src_ref: SrcRef) -> Self {
+    /// Creates an invalid parameter value, in case an error occurred during evaluation
+    pub fn invalid(src_ref: SrcRef) -> Self {
         Self {
-            id,
             specified_type: None,
             default_value: None,
             src_ref,
@@ -68,10 +63,10 @@ impl ParameterValue {
             if ty.is_list_of(specified_type) {
                 TypeCheckResult::MultiMatch
             } else {
-                TypeCheckResult::NoMatch(self.id.clone(), Some(specified_type.clone()), ty.clone())
+                TypeCheckResult::NoMatch(Some(specified_type.clone()), ty.clone())
             }
         } else {
-            TypeCheckResult::NoMatch(self.id.clone(), None, ty.clone())
+            TypeCheckResult::NoMatch(None, ty.clone())
         }
     }
 
@@ -92,8 +87,6 @@ impl SrcReferrer for ParameterValue {
 
 #[test]
 fn test_is_list_of() {
-    assert!(
-        Type::List(ListType::new(QuantityType::Scalar.into()))
-            .is_list_of(&QuantityType::Scalar.into())
-    );
+    assert!(Type::List(ListType::new(QuantityType::Scalar.into()))
+        .is_list_of(&QuantityType::Scalar.into()));
 }

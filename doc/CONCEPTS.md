@@ -101,3 +101,20 @@ Any errors which occur here are related to geometrical processing.
 | part      | `part MyBench`       | pascal case           |
 | operation | `op my_bench`        | snake case            |
 | variables | `my_var = 1`         | snake case            |
+
+## Parameter Types
+
+| mod                  | Type                 | Items                                                                  | Parser Rule        | Usage                            |
+| -------------------- | -------------------- | ---------------------------------------------------------------------- | ------------------ | -------------------------------- |
+| `syntax::parameter`  | `Parameter`          | `Identifier`, `Option<TypeAnnotation>`, `Option<Expression>`, `SrcRef` | `parameter´        | Workbench or function definition |
+| `syntax::parameter`  | `ParameterList`      | `OrdMap<Identifier, Parameter>`                                        | `parameter_list`   | Workbench or function definition |
+| `syntax::call`       | `Argument`           | `Option<Identifier>`, `Expression`, `SrcRef`                           | `argument`         | Call to workbench or function    |
+| `syntax::call`       | `ArgumentList`       | `Refer<OrdMap<Identifier, Argument>>`                                  | `argument_list`    | Call to workbench or function    |
+| `syntax::expression` | `TupleExpression`    | `ArgumentList`, `Unit`, `SrcRef`                                       | `tuple_expression` |                                  |
+| `eval::call`         | `ArgumentValue`      | `Option<Identifier>`, `Value`, `SrcRef`                                | -                  |                                  |
+| `eval::call`         | `ArgumentValueList`  | `Refer<OrdMap<Identifier, ArgumentValue>>`                             | -                  |                                  |
+| `eval::parameter`    | `ParameterValue`     | *[`Identifier`]*, `Option<Type>`, `Option<Value>`, `SrcRef`            | -                  |                                  |
+| `eval::parameter`    | `ParameterValueList` | `HashMap<Identifier, ParameterValue>`                                  | -                  |                                  |
+| `eval::argument_map` | `ArgumentMap`        | `Refer<HashMap<Identifier, Value>>`                                    | -                  |                                  |
+| `eval::argument_map` | `MultiArgumentMap`   | `CombinationMap<Value>`                                                | -                  |                                  |
+| `value::tuple`       | `Tuple`              | `HashMap<Identifier, Value>`, `HashMap<Type, Value>`                   | -                  |                                  |

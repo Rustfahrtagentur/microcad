@@ -9,60 +9,33 @@ use crate::{eval::*, value::*};
 
 /// List of parameter values
 #[derive(Clone, Debug, Default)]
-pub struct ParameterValueList {
-    /// List of parameter values
-    parameters: Vec<ParameterValue>,
-    /// access map by id
-    pub by_id: std::collections::BTreeMap<Identifier, usize>,
-}
+pub struct ParameterValueList(std::collections::HashMap<Identifier, ParameterValue>);
 
 impl ParameterValueList {
-    /// Create new ParameterValueList
-    pub fn new(parameters: Vec<ParameterValue>) -> Self {
-        let mut by_id = std::collections::BTreeMap::new();
-        for (i, parameter) in parameters.iter().enumerate() {
-            by_id.insert(parameter.id.clone(), i);
-        }
-
-        Self { by_id, parameters }
-    }
-
     /// Push parameter value
-    pub fn push(&mut self, parameter: ParameterValue) -> std::result::Result<(), ValueError> {
-        if self.by_id.contains_key(&parameter.id) {
-            return Err(ValueError::DuplicateParameter(parameter.id.clone()));
+    pub fn insert(
+        &mut self,
+        id: Identifier,
+        parameter: ParameterValue,
+    ) -> std::result::Result<(), ValueError> {
+        if self.0.contains_key(&id) {
+            return Err(ValueError::DuplicateParameter(id.clone()));
         }
-
-        self.by_id
-            .insert(parameter.id.clone(), self.parameters.len());
-        self.parameters.push(parameter);
+        self.0.insert(id, parameter);
         Ok(())
     }
 
-    /// get ParameterValue by id
-    pub fn get_by_id(&self, id: &Identifier) -> Option<&ParameterValue> {
-        self.by_id.get(id).map(|i| &self.parameters[*i])
-    }
-
-    /// get ParameterValue by index
-    pub fn get_by_index(&self, index: usize) -> Option<&ParameterValue> {
-        self.parameters.get(index)
-    }
-
-    /// remove parameter value by id
-    pub fn remove(&mut self, id: &Identifier) {
-        if let Some(new_index) = self.by_id.remove(id) {
-            self.parameters.remove(new_index);
-            self.by_id
-                .values_mut()
-                .skip(new_index)
-                .for_each(|index| *index -= 1);
+    pub fn get_by_type(&self, ty: Type) -> EvalResult<&ParameterValue> {
+        let pv: Vec<_> = self
+            .0
+            .iter()
+            .filter(|(id, v)| id.is_none() && v.type_matches(&ty))
+            .collect();
+        match pv.len() {
+            0 => Err(EvalError::ParameterByTypeNotFound(ty)),
+            1 => Ok(pv.first().unwrap().1),
+            _ => unreachable!("Type '{ty}' is ambiguous in parameters"),
         }
-    }
-
-    /// Return `true` if empty
-    pub fn is_empty(&self) -> bool {
-        self.by_id.is_empty()
     }
 
     /// Check for missing arguments.
@@ -78,22 +51,16 @@ impl ParameterValueList {
 }
 
 impl std::ops::Deref for ParameterValueList {
-    type Target = Vec<ParameterValue>;
+    type Target = std::collections::HashMap<Identifier, ParameterValue>;
 
     fn deref(&self) -> &Self::Target {
-        &self.parameters
+        &self.0
     }
 }
 
-impl From<Vec<ParameterValue>> for ParameterValueList {
-    fn from(parameters: Vec<ParameterValue>) -> Self {
-        Self::new(parameters)
-    }
-}
-
-impl<'a> From<&'a [ParameterValue]> for ParameterValueList {
-    fn from(value: &'a [ParameterValue]) -> Self {
-        Self::new(value.into())
+impl std::ops::DerefMut for ParameterValueList {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
@@ -102,10 +69,16 @@ impl std::fmt::Display for ParameterValueList {
         writeln!(
             f,
             "{}",
-            self.parameters
+            self.0
                 .iter()
-                .map(|p| p.id.to_string())
+                .map(|(id, _)| id.to_string())
                 .join_compact(", ")
         )
+    }
+}
+
+impl<A: Into<ParameterValue>> FromIterator<(Identifier, A)> for ParameterValueList {
+    fn from_iter<T: IntoIterator<Item = (Identifier, A)>>(iter: T) -> Self {
+        ParameterValueList(iter.into_iter().map(|(id, pv)| (id, pv.into())).collect())
     }
 }
