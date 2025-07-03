@@ -83,11 +83,12 @@ impl AttributeList {
     ///
     /// Only name-value attributes that are in this list are allowed.
     fn default_parameter_list() -> ParameterValueList {
-        vec![
+        [
             parameter!(layer: String = "default".into()),
             parameter!(color: Color = Color::default()),
         ]
-        .into()
+        .into_iter()
+        .collect()
     }
 
     /// Evaluate name value attributes and check if they match with the default parameter list.

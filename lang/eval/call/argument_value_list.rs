@@ -145,12 +145,13 @@ fn call_get_matching_arguments() {
     use crate::{argument, parameter};
 
     // my_part(foo: Integer, bar: Integer, baz: Scalar = 4.0)
-    let param_values = vec![
+    let param_values: ParameterValueList = [
         parameter!(foo: Integer),
         parameter!(bar: Integer),
         parameter!(baz: Scalar = 4.0),
     ]
-    .into();
+    .into_iter()
+    .collect();
 
     // my_part(1, bar = 2, baz = 3.0)
     let call_values = ArgumentValueList::from(vec![
@@ -198,11 +199,13 @@ fn call_get_matching_arguments_missing() {
 fn get_multi_matching_arguments() {
     use crate::{argument, parameter};
 
-    let parameters = ParameterValueList::new(vec![
+    let parameters = [
         parameter!(thickness: Scalar = 2.0),
         parameter!(inner_diameter: Scalar = 100.0),
         parameter!(height: Scalar = 10.0),
-    ]);
+    ]
+    .into_iter()
+    .collect();
 
     let arguments = ArgumentValueList::from(vec![
         argument!(Scalar = 2.0),

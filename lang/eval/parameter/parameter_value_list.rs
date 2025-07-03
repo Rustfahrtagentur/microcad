@@ -77,8 +77,23 @@ impl std::fmt::Display for ParameterValueList {
     }
 }
 
+impl<I, P> FromIterator<(I, P)> for ParameterValueList
+where
+    I: Into<Identifier>,
+    P: Into<ParameterValue>,
+{
+    fn from_iter<T: IntoIterator<Item = (I, P)>>(iter: T) -> Self {
+        Self(
+            iter.into_iter()
+                .map(|(i, p)| (i.into(), p.into()))
+                .collect(),
+        )
+    }
+}
+/*h
 impl<A: Into<ParameterValue>> FromIterator<(Identifier, A)> for ParameterValueList {
     fn from_iter<T: IntoIterator<Item = (Identifier, A)>>(iter: T) -> Self {
         ParameterValueList(iter.into_iter().map(|(id, pv)| (id, pv.into())).collect())
     }
 }
+*/

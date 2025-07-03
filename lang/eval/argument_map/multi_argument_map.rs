@@ -30,17 +30,17 @@ impl MultiArgumentMap {
         Combinations::new(&self.0)
     }
 }
-/*
+
 impl ArgumentMatch for MultiArgumentMap {
     /// Insert a value into the map and remove `parameter_value` from the list
     fn insert_and_remove_from_parameters(
         &mut self,
         value: Value,
+        id: &Identifier,
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
     ) -> EvalResult<TypeCheckResult> {
         let result = parameter_value.type_check(&value.ty());
-        let id = &parameter_value.id;
         match result {
             TypeCheckResult::MultiMatch => match &value {
                 Value::Array(l) => {
@@ -59,4 +59,3 @@ impl ArgumentMatch for MultiArgumentMap {
         }
     }
 }
-*/
