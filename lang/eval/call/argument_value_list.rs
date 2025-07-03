@@ -10,7 +10,7 @@ use crate::{eval::*, ord_map::*, src_ref::*, value::*};
 /// Also provides methods to find a matching call
 /// between it and a given *parameter list*.
 #[derive(Clone, Debug, Default)]
-pub struct ArgumentValueList(Refer<OrdMap<Identifier, ArgumentValue>>);
+pub struct ArgumentValueList(Refer<std::collections::HashMap<Identifier, ArgumentValue>>);
 
 impl ArgumentValueList {
     /// Create a *argument value list*.
@@ -20,14 +20,10 @@ impl ArgumentValueList {
     /// Shall only be used for builtin symbols.
     /// # Arguments
     pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
-        let mut value = OrdMap::default();
-        value
-            .try_push(ArgumentValue::new(
-                None,
-                Value::String(code),
-                referrer.src_ref(),
-            ))
-            .expect("map with one element");
+        let value: std::collections::HashMap<Identifier, ArgumentValue> =
+            [ArgumentValue::new(Value::String(code), referrer.src_ref())]
+                .into_iter()
+                .collect();
         Self(Refer {
             value,
             src_ref: referrer.src_ref(),
@@ -37,9 +33,9 @@ impl ArgumentValueList {
     /// Return a single argument.
     ///
     /// Returns error if there is no or more than one argument available.
-    pub fn get_single(&self) -> EvalResult<&ArgumentValue> {
-        if self.len() == 1 {
-            if let Some(a) = self.0.first() {
+    pub fn get_single(&self) -> EvalResult<(&Identifier, &ArgumentValue)> {
+        if self.0.len() == 1 {
+            if let Some(a) = self.0.iter().next() {
                 return Ok(a);
             }
         }
@@ -47,7 +43,7 @@ impl ArgumentValueList {
         Err(EvalError::ArgumentCountMismatch {
             args: self.clone(),
             expected: 1,
-            found: self.len(),
+            found: self.0.len(),
         })
     }
 
@@ -59,7 +55,7 @@ impl ArgumentValueList {
         &self,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<()> {
-        match self.keys().find(|id| parameter_values.get(id).is_none()) {
+        match self.0.keys().find(|id| parameter_values.get(id).is_none()) {
             Some(id) => Err(EvalError::UnexpectedArgument(id.clone())),
             None => Ok(()),
         }
@@ -88,23 +84,17 @@ impl ArgumentValueList {
     }
 }
 
-impl SrcReferrer for ArgumentValueList {
-    fn src_ref(&self) -> SrcRef {
-        self.0.src_ref()
-    }
-}
-
 impl std::ops::Deref for ArgumentValueList {
-    type Target = OrdMap<Identifier, ArgumentValue>;
+    type Target = std::collections::HashMap<Identifier, ArgumentValue>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl std::ops::DerefMut for ArgumentValueList {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+impl SrcReferrer for ArgumentValueList {
+    fn src_ref(&self) -> SrcRef {
+        self.0.src_ref()
     }
 }
 
@@ -116,9 +106,23 @@ impl std::fmt::Display for ArgumentValueList {
             self.0
                 .value
                 .iter()
-                .map(|p| p.to_string())
+                .map(|(_, p)| p.to_string())
                 .collect::<Vec<_>>()
                 .join(", ")
+        )
+    }
+}
+
+impl<I, A> FromIterator<(I, A)> for ArgumentValueList
+where
+    I: Into<Identifier>,
+    A: Into<ArgumentValue>,
+{
+    fn from_iter<T: IntoIterator<Item = (I, A)>>(iter: T) -> Self {
+        Self(
+            iter.into_iter()
+                .map(|(i, a)| (i.into(), a.into()))
+                .collect(),
         )
     }
 }
@@ -154,11 +158,15 @@ fn call_get_matching_arguments() {
     .collect();
 
     // my_part(1, bar = 2, baz = 3.0)
-    let call_values = ArgumentValueList::from(vec![
-        argument!(Integer = 1),
-        argument!(foo: Integer = 2),
-        argument!(baz: Scalar = 3.0),
-    ]);
+    let call_values = ArgumentValueList::from(
+        [
+            argument!(Integer = 1),
+            argument!(foo: Integer = 2),
+            argument!(baz: Scalar = 3.0),
+        ]
+        .into_iter()
+        .collect(),
+    );
 
     let arg_map = ArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
 

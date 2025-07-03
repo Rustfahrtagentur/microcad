@@ -106,7 +106,7 @@ impl ArgumentMatch for ArgumentMap {
         &mut self,
         value: Value,
         id: &Identifier,
-        parameter_value: &ParameterValue,
+        _: &ParameterValue,
         parameter_values: &mut ParameterValueList,
     ) -> EvalResult<TypeCheckResult> {
         parameter_values.remove(id);
@@ -119,7 +119,7 @@ impl ArgumentMatch for ArgumentMap {
 fn argument_match_single() {
     let parameters = [crate::parameter!(a: Scalar)].into_iter().collect();
 
-    let arguments = ArgumentValueList::from(vec![crate::argument!(a: Scalar = 5.0)]);
+    let arguments: ArgumentValueList = [crate::argument!(a: Scalar = 5.0)].into_iter().collect();
 
     let arg_map = ArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
 

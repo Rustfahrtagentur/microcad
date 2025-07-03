@@ -124,18 +124,22 @@ macro_rules! parameter {
 /// Shortcut to create a argument value
 #[macro_export]
 macro_rules! argument {
-    ($name:ident: $ty:ident = $value:expr) => {
-        ArgumentValue::new(
-            Some(stringify!($name).into()),
-            $crate::builtin::BuiltinValueHelper::$ty($value).into(),
-            $crate::src_ref::SrcRef(None),
+    ($id:ident: $ty:ident = $value:expr) => {
+        (
+            stringify!($id).into(),
+            ArgumentValue::new(
+                $crate::builtin::BuiltinValueHelper::$ty($value).into(),
+                $crate::src_ref::SrcRef(None),
+            ),
         )
     };
     ($ty:ident = $value:expr) => {
-        ArgumentValue::new(
-            None,
-            $crate::builtin::BuiltinValueHelper::$ty($value).into(),
-            $crate::src_ref::SrcRef(None),
+        (
+            Identifier::none(),
+            ArgumentValue::new(
+                $crate::builtin::BuiltinValueHelper::$ty($value).into(),
+                $crate::src_ref::SrcRef(None),
+            ),
         )
     };
     () => {};

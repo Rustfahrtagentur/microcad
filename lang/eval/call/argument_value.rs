@@ -3,23 +3,15 @@
 
 //! Argument value evaluation entity
 
-use crate::{ord_map::*, src_ref::*, syntax::*, value::*};
+use crate::{src_ref::*, value::*};
 
 /// Argument value.
 #[derive(Clone, Debug)]
 pub struct ArgumentValue {
-    /// *id* of the argument.
-    pub id: Option<Identifier>,
     /// *value* of the argument.
     pub value: Value,
     /// Source code reference.
     src_ref: SrcRef,
-}
-
-impl OrdMapValue<Identifier> for ArgumentValue {
-    fn key(&self) -> Option<Identifier> {
-        self.id.clone()
-    }
 }
 
 impl SrcReferrer for ArgumentValue {
@@ -30,16 +22,13 @@ impl SrcReferrer for ArgumentValue {
 
 impl std::fmt::Display for ArgumentValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self.id {
-            Some(ref id) => write!(f, "{} = {}", id, self.value),
-            None => write!(f, "{}", self.value),
-        }
+        write!(f, "{}", self.value)
     }
 }
 
 impl ArgumentValue {
     /// Create new argument value
-    pub fn new(id: Option<Identifier>, value: Value, src_ref: SrcRef) -> Self {
-        Self { id, value, src_ref }
+    pub fn new(value: Value, src_ref: SrcRef) -> Self {
+        Self { value, src_ref }
     }
 }
