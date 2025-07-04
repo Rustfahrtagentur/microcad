@@ -26,7 +26,7 @@ impl ObjectProperties {
                 id.clone(),
                 match &parameter.default_value {
                     Some(value) => value.clone(),
-                    None => arguments.get_value(&id).unwrap_or(&Value::None).clone(),
+                    None => arguments.get_value(id).unwrap_or(&Value::None).clone(),
                 },
             );
         }

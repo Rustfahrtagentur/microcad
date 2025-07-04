@@ -24,10 +24,19 @@ impl Eval<ArgumentValueList> for ArgumentList {
     fn eval(&self, context: &mut Context) -> EvalResult<ArgumentValueList> {
         let result = self
             .iter()
-            .map(|call_arg| call_arg.eval_value(context))
-            .filter_map(|call_arg| {
-                if let Ok(call_arg) = call_arg {
-                    Some(call_arg)
+            .map(|arg| {
+                (
+                    if let Some(id) = &arg.id {
+                        id.clone()
+                    } else {
+                        Identifier::none()
+                    },
+                    arg.eval_value(context),
+                )
+            })
+            .filter_map(|(id, arg)| {
+                if let Ok(arg) = arg {
+                    Some((id.clone(), arg))
                 } else {
                     None
                 }

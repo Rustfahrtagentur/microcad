@@ -10,7 +10,7 @@ pub fn print() -> Symbol {
     let id = Identifier::from_str("print").expect("valid id");
     Symbol::new_builtin(id, None, &|_params, args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
-            context.print(format!("{value}", value = arg.value));
+            context.print(format!("{value}", value = arg.1));
             Ok(())
         })?;
         Ok(Value::None)
@@ -23,7 +23,7 @@ pub fn error() -> Symbol {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
             context.error(
                 args,
-                EvalError::BuiltinError(format!("{value}", value = arg.value)),
+                EvalError::BuiltinError(format!("{value}", value = arg.1)),
             )
         })?;
         Ok(Value::None)
@@ -36,7 +36,7 @@ pub fn warning() -> Symbol {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
             context.warning(
                 args,
-                EvalError::BuiltinError(format!("{value}", value = arg.value)),
+                EvalError::BuiltinError(format!("{value}", value = arg.1)),
             )
         })?;
         Ok(Value::None)
@@ -47,7 +47,7 @@ pub fn info() -> Symbol {
     let id = Identifier::from_str("info").expect("valid id");
     Symbol::new_builtin(id, None, &|_params, args, context| {
         args.iter().try_for_each(|arg| -> Result<(), EvalError> {
-            context.info(args, format!("{value}", value = arg.value));
+            context.info(args, format!("{value}", value = arg.1));
             Ok(())
         })?;
         Ok(Value::None)

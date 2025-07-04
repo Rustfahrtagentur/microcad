@@ -35,7 +35,7 @@ pub trait ArgumentMatch: Default {
             .clone()
             .iter()
             // Filter out parameters that have a name and are present in the arguments
-            .filter_map(|(id, p)| arguments.get(&id).map(|c| (id, p, c)))
+            .filter_map(|(id, p)| arguments.get(id).map(|c| (id, p, c)))
             // Insert the arguments into the map
             .try_for_each(|(id, parameter, argument)| {
                 self.insert_and_remove_from_parameters(
@@ -69,6 +69,7 @@ pub trait ArgumentMatch: Default {
 
             match self.insert_and_remove_from_parameters(
                 argument.value.clone(),
+                id,
                 &parameter,
                 parameters,
             )? {
@@ -100,13 +101,18 @@ pub trait ArgumentMatch: Default {
             .clone()
             .iter()
             // Filter out parameters that have a default value and are not present in the arguments
-            .filter_map(|(id, p)| match (arguments.get(&id), &p.default_value) {
-                (None, Some(default_value)) => Some((p, default_value.clone())),
+            .filter_map(|(id, p)| match (arguments.get(id), &p.default_value) {
+                (None, Some(default_value)) => Some((id, p, default_value.clone())),
                 _ => None,
             })
             // Insert the default values into the map
-            .try_for_each(|(parameter_value, default_value)| {
-                self.insert_and_remove_from_parameters(default_value, parameter_value, parameters)?;
+            .try_for_each(|(id, parameter_value, default_value)| {
+                self.insert_and_remove_from_parameters(
+                    default_value,
+                    id,
+                    parameter_value,
+                    parameters,
+                )?;
                 Ok(())
             })
             // Return self

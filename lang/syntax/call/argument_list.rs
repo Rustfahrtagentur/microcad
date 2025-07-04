@@ -7,7 +7,7 @@ use crate::{src_ref::*, syntax::*};
 
 /// List (ordered map) of arguments.
 #[derive(Clone, Debug, Default)]
-pub struct ArgumentList(pub Refer<std::collections::HashMap<Identifier, Argument>>);
+pub struct ArgumentList(pub Refer<Vec<Argument>>);
 
 impl SrcReferrer for ArgumentList {
     fn src_ref(&self) -> SrcRef {
@@ -16,7 +16,7 @@ impl SrcReferrer for ArgumentList {
 }
 
 impl std::ops::Deref for ArgumentList {
-    type Target = std::collections::HashMap<Identifier, Argument>;
+    type Target = Vec<Argument>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -37,7 +37,7 @@ impl std::fmt::Display for ArgumentList {
             self.0
                 .value
                 .iter()
-                .map(|(id, p)| format!("{id} = {p}"))
+                .map(|p| format!(" = {p}"))
                 .collect::<Vec<_>>()
                 .join(", ")
         )
@@ -47,8 +47,8 @@ impl std::fmt::Display for ArgumentList {
 impl PrintSyntax for ArgumentList {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ArgumentList:", "")?;
-        self.0.value.iter().try_for_each(|(id, p)| {
-            write!(f, "{id} = ");
+        self.0.value.iter().try_for_each(|p| {
+            write!(f, " = ")?;
             p.print_syntax(f, depth + 1)
         })
     }

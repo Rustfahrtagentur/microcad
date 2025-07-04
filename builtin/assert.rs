@@ -11,18 +11,19 @@ pub fn assert() -> Symbol {
     Symbol::new_builtin(
         Identifier::no_ref("assert"),
         Some(
-            vec![
+            [
                 parameter!(v),                               // Parameter with any type
                 parameter!(message: String = String::new()), // Optional message
             ]
-            .into(),
+            .into_iter()
+            .collect(),
         ),
         &|params, args, context| {
             match ArgumentMap::find_match(args, params.expect("ParameterList")) {
                 Ok(arg_map) => {
                     if !arg_map[&"v".try_into()?].try_bool()? {
                         let message = arg_map[&"message".try_into()?].try_string()?;
-                        let arg = args.first().expect("At least one argument");
+                        let arg = args.single_unnamed().expect("At least one argument");
                         context.error(
                             arg,
                             EvalError::AssertionFailed(if message.is_empty() {
@@ -48,12 +49,13 @@ pub fn assert_eq() -> Symbol {
     Symbol::new_builtin(
         Identifier::no_ref("assert_eq"),
         Some(
-            vec![
+            [
                 parameter!(a),                               // Parameter with any type
                 parameter!(b),                               // Parameter with any type
                 parameter!(message: String = String::new()), // Optional message
             ]
-            .into(),
+            .into_iter()
+            .collect(),
         ),
         &|params, args, context| {
             match ArgumentMap::find_match(args, params.expect("ParameterList")) {
@@ -87,9 +89,9 @@ pub fn assert_valid() -> Symbol {
     let id = Identifier::from_str("assert_valid").expect("valid id");
     Symbol::new_builtin(id, None, &|_, args, context| {
         if let Ok(arg) = args.get_single() {
-            if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
+            if let Ok(name) = QualifiedName::try_from(arg.1.to_string()) {
                 if let Err(err) = context.lookup(&name) {
-                    context.error(arg, err)?;
+                    context.error(arg.1, err)?;
                 }
             }
         }
@@ -101,7 +103,7 @@ pub fn assert_invalid() -> Symbol {
     let id = Identifier::from_str("assert_invalid").expect("valid id");
     Symbol::new_builtin(id, None, &|_, args, context| {
         if let Ok(arg) = args.get_single() {
-            if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
+            if let Ok(name) = QualifiedName::try_from(arg.1.to_string()) {
                 if let Ok(symbol) = context.lookup(&name) {
                     context.error(name, EvalError::SymbolFound(symbol.full_name()))?;
                 }
@@ -115,7 +117,7 @@ pub fn type_of() -> Symbol {
     let id = Identifier::from_str("type_of").expect("valid id");
     Symbol::new_builtin(id, None, &|_, args, _| {
         if let Ok(arg) = args.get_single() {
-            let ty = arg.value.ty();
+            let ty = arg.1.value.ty();
             return Ok(Value::String(ty.to_string()));
         }
         Ok(Value::None)

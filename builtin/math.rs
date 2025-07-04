@@ -9,16 +9,16 @@ fn abs() -> Symbol {
     let id = Identifier::no_ref("abs");
     Symbol::new_builtin(id, None, &|_params, args, ctx| {
         let arg = args.get_single()?;
-        Ok(match &arg.value {
+        Ok(match &arg.1.value {
             Value::Integer(i) => Value::Integer(i.abs()),
             Value::Quantity(q) => {
                 Value::Quantity(Quantity::new(q.value.abs(), q.quantity_type.clone()))
             }
             value => {
                 ctx.error(
-                    arg,
+                    arg.1,
                     EvalError::TypeMismatch {
-                        id: arg.id.clone().unwrap_or(Identifier::no_ref("x")),
+                        id: arg.0.clone(),
                         expected: Type::Integer,
                         found: value.ty(),
                     },
@@ -54,13 +54,14 @@ fn rotate_around_axis() -> Symbol {
     Symbol::new_builtin(
         Identifier::no_ref("rotate_around_axis"),
         Some(
-            vec![
+            [
                 parameter!(angle: Angle),
                 parameter!(x: Scalar),
                 parameter!(y: Scalar),
                 parameter!(z: Scalar),
             ]
-            .into(),
+            .into_iter()
+            .collect(),
         ),
         &|_params, args, ctx| match ArgumentMap::find_match(
             args,
@@ -90,12 +91,13 @@ fn rotate_xyz() -> Symbol {
     Symbol::new_builtin(
         Identifier::no_ref("rotate_xyz"),
         Some(
-            vec![
+            [
                 parameter!(x: Angle),
                 parameter!(y: Angle),
                 parameter!(z: Angle),
             ]
-            .into(),
+            .into_iter()
+            .collect(),
         ),
         &|_params, args, ctx| match ArgumentMap::find_match(
             args,
@@ -120,12 +122,13 @@ fn rotate_zyx() -> Symbol {
     Symbol::new_builtin(
         Identifier::no_ref("rotate_zyx"),
         Some(
-            vec![
+            [
                 parameter!(x: Angle),
                 parameter!(y: Angle),
                 parameter!(z: Angle),
             ]
-            .into(),
+            .into_iter()
+            .collect(),
         ),
         &|_params, args, ctx| match ArgumentMap::find_match(
             args,

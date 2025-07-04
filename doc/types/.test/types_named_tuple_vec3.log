@@ -1,7 +1,9 @@
 -- Test --
   types_named_tuple_vec3
-  /home/micha/Work/mcad/mcad/doc/types/named_tuple.md:56
+  /home/pat/git/rustfahrt/microcad/doc/types/named_tuple.md:56
 -- Output --
 -- Errors --
+error: Missing arguments: v
+
 -- Test Result --
-OK
+FAIL

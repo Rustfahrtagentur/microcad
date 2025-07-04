@@ -25,6 +25,7 @@ impl ParameterValueList {
         Ok(())
     }
 
+    /// Get (unnamed) parameter value by type
     pub fn get_by_type(&self, ty: Type) -> EvalResult<&ParameterValue> {
         let pv: Vec<_> = self
             .0
@@ -33,7 +34,7 @@ impl ParameterValueList {
             .collect();
         match pv.len() {
             0 => Err(EvalError::ParameterByTypeNotFound(ty)),
-            1 => Ok(pv.first().unwrap().1),
+            1 => Ok(pv.first().expect("one item").1),
             _ => unreachable!("Type '{ty}' is ambiguous in parameters"),
         }
     }
@@ -69,10 +70,7 @@ impl std::fmt::Display for ParameterValueList {
         writeln!(
             f,
             "{}",
-            self.0
-                .iter()
-                .map(|(id, _)| id.to_string())
-                .join_compact(", ")
+            self.0.keys().map(|id| id.to_string()).join_compact(", ")
         )
     }
 }

@@ -3,14 +3,17 @@
 
 //! *Argument value list* evaluation entity.
 
-use crate::{eval::*, ord_map::*, src_ref::*, value::*};
+use crate::{eval::*, src_ref::*, value::*};
 
 /// Collection of *argument values* (e.g. `( x=1, y=2 )`).
 ///
 /// Also provides methods to find a matching call
 /// between it and a given *parameter list*.
 #[derive(Clone, Debug, Default)]
-pub struct ArgumentValueList(Refer<std::collections::HashMap<Identifier, ArgumentValue>>);
+pub struct ArgumentValueList {
+    map: std::collections::HashMap<Identifier, ArgumentValue>,
+    src_ref: SrcRef,
+}
 
 impl ArgumentValueList {
     /// Create a *argument value list*.
@@ -20,22 +23,24 @@ impl ArgumentValueList {
     /// Shall only be used for builtin symbols.
     /// # Arguments
     pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
-        let value: std::collections::HashMap<Identifier, ArgumentValue> =
-            [ArgumentValue::new(Value::String(code), referrer.src_ref())]
-                .into_iter()
-                .collect();
-        Self(Refer {
-            value,
+        let map: std::collections::HashMap<Identifier, ArgumentValue> = [(
+            Identifier::none(),
+            (ArgumentValue::new(Value::String(code), referrer.src_ref())),
+        )]
+        .into_iter()
+        .collect();
+        Self {
+            map,
             src_ref: referrer.src_ref(),
-        })
+        }
     }
 
     /// Return a single argument.
     ///
     /// Returns error if there is no or more than one argument available.
     pub fn get_single(&self) -> EvalResult<(&Identifier, &ArgumentValue)> {
-        if self.0.len() == 1 {
-            if let Some(a) = self.0.iter().next() {
+        if self.map.len() == 1 {
+            if let Some(a) = self.map.iter().next() {
                 return Ok(a);
             }
         }
@@ -43,19 +48,23 @@ impl ArgumentValueList {
         Err(EvalError::ArgumentCountMismatch {
             args: self.clone(),
             expected: 1,
-            found: self.0.len(),
+            found: self.map.len(),
         })
     }
 
     /// Check for unexpected arguments.
     ///
-    /// This method will return an error if there is a argument that
+    /// This method will return an error if there is an argument that
     /// is not in the parameter list.
     pub fn check_for_unexpected_arguments(
         &self,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<()> {
-        match self.0.keys().find(|id| parameter_values.get(id).is_none()) {
+        match self
+            .map
+            .keys()
+            .find(|id| parameter_values.get(id).is_none())
+        {
             Some(id) => Err(EvalError::UnexpectedArgument(id.clone())),
             None => Ok(()),
         }
@@ -82,19 +91,33 @@ impl ArgumentValueList {
         let parameters = parameters.eval(context)?;
         MultiArgumentMap::find_match(self, &parameters)
     }
+
+    pub fn single_unnamed(&self) -> EvalResult<&ArgumentValue> {
+        let v: Vec<_> = self.iter().filter(|(id, _)| id.is_empty()).collect();
+        let len = v.len();
+        if len != 1 {
+            Err(EvalError::ArgumentCountMismatch {
+                args: self.clone(),
+                expected: 1,
+                found: len,
+            })
+        } else {
+            Ok(v.first().expect("existing argument").1)
+        }
+    }
 }
 
 impl std::ops::Deref for ArgumentValueList {
     type Target = std::collections::HashMap<Identifier, ArgumentValue>;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.map
     }
 }
 
 impl SrcReferrer for ArgumentValueList {
     fn src_ref(&self) -> SrcRef {
-        self.0.src_ref()
+        self.src_ref.clone()
     }
 }
 
@@ -103,10 +126,9 @@ impl std::fmt::Display for ArgumentValueList {
         write!(
             f,
             "{}",
-            self.0
-                .value
-                .iter()
-                .map(|(_, p)| p.to_string())
+            self.map
+                .values()
+                .map(|p| p.to_string())
                 .collect::<Vec<_>>()
                 .join(", ")
         )
@@ -119,11 +141,13 @@ where
     A: Into<ArgumentValue>,
 {
     fn from_iter<T: IntoIterator<Item = (I, A)>>(iter: T) -> Self {
-        Self(
-            iter.into_iter()
+        Self {
+            map: iter
+                .into_iter()
                 .map(|(i, a)| (i.into(), a.into()))
                 .collect(),
-        )
+            src_ref: SrcRef(None),
+        }
     }
 }
 
@@ -151,15 +175,13 @@ fn call_get_matching_arguments() {
     .collect();
 
     // my_part(1, bar = 2, baz = 3.0)
-    let call_values = ArgumentValueList::from(
-        [
-            argument!(Integer = 1),
-            argument!(foo: Integer = 2),
-            argument!(baz: Scalar = 3.0),
-        ]
-        .into_iter()
-        .collect(),
-    );
+    let call_values = [
+        argument!(Integer = 1),
+        argument!(foo: Integer = 2),
+        argument!(baz: Scalar = 3.0),
+    ]
+    .into_iter()
+    .collect();
 
     let arg_map = ArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
 
@@ -185,17 +207,15 @@ fn call_get_matching_arguments_missing() {
     .collect();
 
     // f(1, baz = 3.0)
-    let arguments = ArgumentValueList::from(
-        [argument!(Integer = 1), argument!(baz: Scalar = 3.0)]
-            .into_iter()
-            .collect(),
-    );
+    let arguments = [argument!(Integer = 1), argument!(baz: Scalar = 3.0)]
+        .into_iter()
+        .collect();
 
     let arg_map = ArgumentMap::find_match(&arguments, &parameters);
 
     if let Err(EvalError::MissingArguments(missing)) = arg_map {
         assert_eq!(missing.len(), 1);
-        assert_eq!(&missing[0].id, "bar");
+        assert!(missing.get(&"bar".into()).is_some());
     } else {
         panic!("Expected MissingArguments error");
     }

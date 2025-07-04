@@ -109,11 +109,10 @@ impl AttributeList {
         let attributes = attributes?;
 
         // Build a `ArgumentValueList` from the attributes...
-        let mut args = ArgumentValueList::default();
-        for (id, value) in attributes {
-            args.try_push(ArgumentValue::new(Some(id), value, SrcRef(None)))
-                .expect("Argument");
-        }
+        let args = attributes
+            .iter()
+            .map(|(id, value)| (id.clone(), ArgumentValue::new(value.clone(), SrcRef(None))))
+            .collect();
 
         // ... and check if it matches with the default parameter list.
         let args = ArgumentMap::find_match(&args, &Self::default_parameter_list());

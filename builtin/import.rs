@@ -12,11 +12,12 @@ pub fn import() -> Symbol {
     Symbol::new_builtin(
         Identifier::no_ref("import"),
         Some(
-            vec![
+            [
                 parameter!(filename: String),
                 parameter!(id: String = String::new()),
             ]
-            .into(),
+            .into_iter()
+            .collect(),
         ),
         &|parameter_values, argument_values, context| match ArgumentMap::find_match(
             argument_values,

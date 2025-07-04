@@ -21,7 +21,7 @@ fn init() {
 }
 
 pub use microcad_lang::builtin::*;
-use microcad_lang::{Id, eval::*, model_tree::*, parameter, resolve::*, value::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, resolve::*, value::*, Id};
 
 pub(crate) use assert::*;
 pub use context_builder::*;
@@ -61,11 +61,12 @@ pub struct Export;
 
 impl Exporter for Export {
     fn parameters(&self) -> ParameterValueList {
-        vec![
+        [
             parameter!(filename: String = String::new()),
             parameter!(id: String = String::new()),
         ]
-        .into()
+        .into_iter()
+        .collect()
     }
 
     fn export(&mut self, _: ModelNode, _: &ArgumentMap) -> Result<Value, ExportError> {

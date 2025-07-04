@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{ord_map::*, parse::*, parser::*, syntax::*};
+use crate::{parse::*, parser::*, syntax::*};
 
 impl Parse for Call {
     fn parse(pair: Pair) -> ParseResult<Self> {
@@ -22,14 +22,16 @@ impl Parse for Call {
 
 impl Parse for ArgumentList {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut argument_list = ArgumentList(Refer::new(OrdMap::default(), pair.clone().into()));
+        let mut argument_list = ArgumentList(Refer::new(Vec::new(), pair.clone().into()));
 
         match pair.as_rule() {
             Rule::argument_list => {
                 for pair in pair.inner() {
-                    argument_list
-                        .try_push(Argument::parse(pair)?)
-                        .map_err(ParseError::DuplicateArgument)?;
+                    let arg = Argument::parse(pair)?;
+                    if argument_list.iter().any(|a| a.id == arg.id) {
+                        return Err(ParseError::DuplicateArgument(arg.id.unwrap_or_default()));
+                    }
+                    argument_list.push(arg);
                 }
 
                 Ok(argument_list)
