@@ -6,14 +6,14 @@
 use crate::{src_ref::*, ty::*, value::*};
 
 /// Parameter value is the result of evaluating a parameter
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ParameterValue {
     /// Parameter type
     pub specified_type: Option<Type>,
     /// Parameter default
     pub default_value: Option<Value>,
     /// Source code reference
-    src_ref: SrcRef,
+    pub src_ref: SrcRef,
 }
 
 /// Result of a type check with `ParameterValue::type_check()`
@@ -27,19 +27,6 @@ pub enum TypeCheckResult {
 }
 
 impl ParameterValue {
-    /// Create new parameter value
-    pub fn new(
-        specified_type: Option<Type>,
-        default_value: Option<Value>,
-        src_ref: SrcRef,
-    ) -> Self {
-        Self {
-            specified_type,
-            default_value,
-            src_ref,
-        }
-    }
-
     /// Creates an invalid parameter value, in case an error occurred during evaluation
     pub fn invalid(src_ref: SrcRef) -> Self {
         Self {
@@ -75,6 +62,21 @@ impl ParameterValue {
         match &self.specified_type {
             Some(t) => t == ty,
             None => true, // Accept any type if none is specified
+        }
+    }
+
+    /// Return effective type
+    ///
+    /// Returns any `specified_type` or the type of the `default_value`.
+    /// Panics if neither of both is available.
+    pub fn ty(&self) -> Type {
+        if let Some(ty) = &self.specified_type {
+            ty.clone()
+        } else if let Some(def) = &self.default_value {
+            def.ty()
+        } else {
+            log::error!("type of parameter value cannot be achieved");
+            Type::Invalid
         }
     }
 }

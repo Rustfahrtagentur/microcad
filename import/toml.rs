@@ -3,7 +3,7 @@
 
 //! Import values from TOML
 
-use microcad_lang::{Id, builtin::*, syntax::*, value::*};
+use microcad_lang::{builtin::*, syntax::*, value::*, Id};
 
 /// Import TOML files into a tuple.
 pub struct TomlImporter;
@@ -40,7 +40,7 @@ impl Importer for TomlImporter {
         &self,
         args: &microcad_lang::eval::ArgumentMap,
     ) -> Result<microcad_lang::value::Value, microcad_lang::builtin::ImportError> {
-        let filename = args.get::<String>("filename");
+        let filename = args.get::<String>(&Identifier::no_ref("filename"));
         let content = std::fs::read_to_string(filename)?;
 
         Ok(Self::toml_to_value(

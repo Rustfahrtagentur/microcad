@@ -57,6 +57,14 @@ impl Identifier {
     }
 }
 
+#[cfg(feature = "id_macro")]
+#[macro_export]
+macro_rules! id {
+    ($id:literal) => {
+        $crate::syntax::Identifier::no_ref($id)
+    };
+}
+
 impl SrcReferrer for Identifier {
     fn src_ref(&self) -> SrcRef {
         self.0.src_ref.clone()
@@ -141,7 +149,7 @@ fn identifier_comparison() {
     use crate::syntax::*;
 
     // same id but different src refs
-    let id1 = Identifier::no_ref("x");
+    let id1 = id!("x");
     let id2 = Identifier(Refer::new("x".into(), SrcRef::new(0..5, 0, 1, 1)));
 
     // shall be equal

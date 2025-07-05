@@ -14,7 +14,7 @@ path = "lib.rs"
 
 [dependencies]
 microcad-core = { workspace = true }
-microcad-lang = { workspace = true }
+microcad-lang = { workspace = true, features = ["id_macro"] }
 geo = "0.29"
 thiserror = "2.0.12"
 

@@ -4,7 +4,7 @@
 //! Model tree tests
 
 #[cfg(test)]
-use crate::{model_tree::*, syntax::*};
+use crate::{model_tree::*, syntax::*, *};
 
 #[cfg(test)]
 fn sample_nodes() -> ModelNodes {
@@ -56,8 +56,8 @@ fn model_nodes_nest() {
 
     let a0 = nodes.first().expect("a0");
     let a1 = nodes.last().expect("a1");
-    assert_eq!(a0.id().expect("a0"), Identifier::no_ref("a0"));
-    assert_eq!(a1.id().expect("a1"), Identifier::no_ref("a1"));
+    assert_eq!(a0.id().expect("a0"), id!("a0"));
+    assert_eq!(a1.id().expect("a1"), id!("a1"));
 
     assert_eq!(a0.children().count(), 1); // Contains b0
     assert_eq!(

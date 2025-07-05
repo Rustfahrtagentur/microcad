@@ -54,7 +54,7 @@ impl Eval<Option<(Identifier, Value)>> for Attribute {
         match self {
             Attribute::Tuple(id, argument_list) => {
                 if let Some(exporter) = context.exporter_by_id(id.id()) {
-                    match ArgumentMap::find_match(
+                    match ArgumentMatch::find_match(
                         &argument_list.eval(context)?,
                         &exporter.parameters(),
                     ) {
@@ -115,7 +115,7 @@ impl AttributeList {
             .collect();
 
         // ... and check if it matches with the default parameter list.
-        let args = ArgumentMap::find_match(&args, &Self::default_parameter_list());
+        let args = ArgumentMatch::find_match(&args, &Self::default_parameter_list());
         match args {
             Ok(args) => Ok(args.iter().map(|(k, v)| (k.clone(), v.clone())).collect()),
             Err(err) => {

@@ -14,25 +14,23 @@ pub use multiplicity::*;
 use crate::{eval::*, src_ref::*, value::*};
 
 /// Map of named arguments
-#[derive(Clone, Debug, Default)]
-pub struct ArgumentMap(Refer<std::collections::HashMap<Identifier, Value>>);
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct ArgumentMap {
+    map: std::collections::HashMap<Identifier, Value>,
+    src_ref: SrcRef,
+}
 
 impl ArgumentMap {
-    /// Create empty argument map
-    pub fn new(src_ref: SrcRef) -> Self {
-        Self(Refer::new(std::collections::HashMap::new(), src_ref))
-    }
-
     /// Fetch an argument by name as `&str`.
     ///
     /// This method does not provide error handling and is supposed to be used for built-ins.
-    pub fn get<'a, T>(&'a self, id: &str) -> T
+    pub fn get<'a, T>(&'a self, id: &Identifier) -> T
     where
         T: std::convert::TryFrom<&'a Value>,
         T::Error: std::fmt::Debug,
     {
-        self.0
-            .get(&Identifier::no_ref(id))
+        self.map
+            .get(id)
             .expect("no name found")
             .try_into()
             .expect("cannot convert argument value")
@@ -40,13 +38,13 @@ impl ArgumentMap {
 
     /// Fetch an argument's value by name.
     pub fn get_value(&self, id: &Identifier) -> Option<&Value> {
-        self.0.get(id)
+        self.map.get(id)
     }
 
     /// Convert ArgumentMap into symbol map.
     pub fn into_symbols(self) -> SymbolMap {
         let mut symbols = SymbolMap::new();
-        for (id, arg) in self.0.iter() {
+        for (id, arg) in self.map.iter() {
             symbols.insert_node(
                 id.clone(),
                 Symbol::new(SymbolDefinition::Argument(id.clone(), arg.clone()), None),
@@ -57,7 +55,7 @@ impl ArgumentMap {
 
     /// Print the [`ArgumentMap`] as one line, truncated if `max length > 0`.
     pub fn to_one_line_string(&self, max_length: Option<usize>) -> String {
-        let mut sorted: Vec<_> = self.0.iter().collect();
+        let mut sorted: Vec<_> = self.map.iter().collect();
         sorted.sort_by(|a, b| a.0.cmp(b.0));
 
         let mut output = String::new();
@@ -83,7 +81,7 @@ impl ArgumentMap {
 
 impl SrcReferrer for ArgumentMap {
     fn src_ref(&self) -> SrcRef {
-        self.0.src_ref()
+        self.src_ref.clone()
     }
 }
 
@@ -91,42 +89,24 @@ impl std::ops::Deref for ArgumentMap {
     type Target = std::collections::HashMap<Identifier, Value>;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.map
     }
 }
 
 impl std::ops::DerefMut for ArgumentMap {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+        &mut self.map
     }
 }
 
-impl ArgumentMatch for ArgumentMap {
-    fn insert_and_remove_from_parameters(
-        &mut self,
-        value: Value,
-        id: &Identifier,
-        _: &ParameterValue,
-        parameter_values: &mut ParameterValueList,
-    ) -> EvalResult<TypeCheckResult> {
-        parameter_values.remove(id);
-        self.insert(id.clone(), value.clone());
-        Ok(TypeCheckResult::SingleMatch)
+impl<I> FromIterator<(I, Value)> for ArgumentMap
+where
+    I: Into<Identifier>,
+{
+    fn from_iter<T: IntoIterator<Item = (I, Value)>>(iter: T) -> Self {
+        Self {
+            map: iter.into_iter().map(|(i, v)| (i.into(), v)).collect(),
+            src_ref: SrcRef(None),
+        }
     }
 }
-/*
-#[test]
-fn argument_match_single() {
-    let parameters = [crate::parameter!(a: Scalar)].into_iter().collect();
-
-    //let arguments = [crate::argument!(a: Scalar = 5.0)].into_iter().collect();
-    let arguments = [crate::argument!(a: Scalar = 5.0)].into_iter().collect();
-
-    let arg_map = ArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
-
-    let a = arg_map.get_value(&Identifier::no_ref("a"));
-    assert!(a.is_some());
-    let a = a.expect("internal test error");
-    assert!(a == &Value::Quantity(Quantity::new(5.0, QuantityType::Scalar)));
-}
-*/

@@ -5,7 +5,7 @@
 
 use std::rc::Rc;
 
-use crate::{Id, builtin::file_io::*, eval::*, syntax::*, value::*};
+use crate::{builtin::file_io::*, eval::*, value::*, *};
 
 use thiserror::Error;
 
@@ -119,7 +119,7 @@ impl ImporterRegistryAccess for ImporterRegistry {
         arg_map: &ArgumentMap,
         search_paths: &[std::path::PathBuf],
     ) -> Result<Value, Self::Error> {
-        let filename: String = arg_map.get("filename");
+        let filename: String = arg_map.get(&id!("filename"));
 
         match [".".into()] // Search working dir first
             .iter()
@@ -130,11 +130,8 @@ impl ImporterRegistryAccess for ImporterRegistry {
             Some(path) => {
                 let mut arg_map = arg_map.clone();
                 let filename = path.to_string_lossy().to_string();
-                arg_map.insert(
-                    Identifier::no_ref("filename"),
-                    Value::String(filename.clone()),
-                );
-                let id: String = arg_map.get("id");
+                arg_map.insert(id!("filename").clone(), Value::String(filename.clone()));
+                let id: String = arg_map.get(&id!("id"));
 
                 // Check if value is in cache
                 if let Some(value) = self.get_cached(filename.clone(), id.clone()) {
@@ -170,7 +167,7 @@ fn importer() {
         }
 
         fn import(&self, args: &ArgumentMap) -> Result<Value, ImportError> {
-            let some_arg: Integer = args.get::<Integer>("some_arg");
+            let some_arg: Integer = args.get::<Integer>(&id!("some_arg"));
             if some_arg == 32 {
                 Ok(Value::Integer(32))
             } else {
@@ -193,15 +190,19 @@ fn importer() {
 
     let by_id = registry.by_id(&"dummy".into()).expect("Dummy importer");
 
-    let mut args = ArgumentMap::new(crate::src_ref::SrcRef(None));
-    args.insert(Identifier::no_ref("some_arg"), Value::Integer(32));
+    let args: ArgumentMap = [crate::property!(some_arg : Integer = 32)]
+        .into_iter()
+        .collect();
 
     let value = by_id.import(&args).expect("Value");
     assert!(matches!(value, Value::Integer(32)));
 
     let by_filename = registry.by_filename("test.dmy").expect("Filename");
 
-    args.insert(Identifier::no_ref("some_arg"), Value::Integer(42));
+    let args: ArgumentMap = [crate::property!(some_arg : Integer = 42)]
+        .into_iter()
+        .collect();
+
     let value = by_filename.import(&args).expect("Value");
 
     assert!(matches!(value, Value::Integer(42)));

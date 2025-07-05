@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter, rc::*};
+use microcad_lang::{eval::*, model_tree::*, rc::*, *};
 
 pub struct Circle;
 
@@ -14,8 +14,8 @@ impl BuiltinWorkbenchDefinition for Circle {
     fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
         Ok(
             ModelNodeBuilder::new_2d_primitive(Rc::new(Geometry2D::Circle(geo2d::Circle {
-                radius: args.get("radius"),
-                offset: Vec2::new(args.get("cx"), args.get("cy")),
+                radius: args.get(&id!("radius")),
+                offset: Vec2::new(args.get(&id!("cx")), args.get(&id!("cy"))),
             })))
             .build(),
         )

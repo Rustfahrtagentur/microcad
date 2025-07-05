@@ -3,7 +3,7 @@
 
 //! Object attributes module
 
-use crate::{syntax::*, value::*};
+use crate::{syntax::*, value::*, *};
 
 /// Node metadata, from an evaluated attribute list.
 #[derive(Clone, Debug, Default)]
@@ -26,7 +26,7 @@ impl Attributes {
     /// node.attributes_mut().put("export", tuple!("filename.svg"))
     /// ```
     pub fn set_export(&mut self, settings: Tuple) -> &mut Self {
-        self.put(&Identifier::no_ref("export"), settings)
+        self.put(&id!("export"), settings)
     }
 
     /// Put a value into the tuple.

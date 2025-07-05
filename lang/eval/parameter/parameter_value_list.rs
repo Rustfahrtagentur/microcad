@@ -21,6 +21,7 @@ impl ParameterValueList {
         if self.0.contains_key(&id) {
             return Err(ValueError::DuplicateParameter(id.clone()));
         }
+        assert!(id.is_empty(), "expecting valid id");
         self.0.insert(id, parameter);
         Ok(())
     }
@@ -36,17 +37,6 @@ impl ParameterValueList {
             0 => Err(EvalError::ParameterByTypeNotFound(ty)),
             1 => Ok(pv.first().expect("one item").1),
             _ => unreachable!("Type '{ty}' is ambiguous in parameters"),
-        }
-    }
-
-    /// Check for missing arguments.
-    ///
-    /// Checks if parameter value list is not empty and wraps the list into an error
-    pub fn check_for_missing_arguments(self) -> EvalResult<()> {
-        if !self.is_empty() {
-            Err(EvalError::MissingArguments(self))
-        } else {
-            Ok(())
         }
     }
 }
@@ -88,10 +78,3 @@ where
         )
     }
 }
-/*h
-impl<A: Into<ParameterValue>> FromIterator<(Identifier, A)> for ParameterValueList {
-    fn from_iter<T: IntoIterator<Item = (Identifier, A)>>(iter: T) -> Self {
-        ParameterValueList(iter.into_iter().map(|(id, pv)| (id, pv.into())).collect())
-    }
-}
-*/

@@ -30,24 +30,28 @@ impl Eval<ParameterValue> for Parameter {
                     // Return an invalid parameter value in case evaluation failed
                     Ok(ParameterValue::invalid(self.src_ref()))
                 } else {
-                    Ok(ParameterValue::new(
-                        Some(specified_type.ty()),
-                        Some(default_value),
-                        self.src_ref(),
-                    ))
+                    Ok(ParameterValue {
+                        specified_type: Some(specified_type.ty()),
+                        default_value: Some(default_value),
+                        src_ref: self.src_ref(),
+                    })
                 }
             }
             // Only type is specified
-            (Some(t), None) => Ok(ParameterValue::new(Some(t.ty()), None, self.src_ref())),
+            (Some(t), None) => Ok(ParameterValue {
+                specified_type: Some(t.ty()),
+                src_ref: self.src_ref(),
+                ..Default::default()
+            }),
             // Only value is specified
             (None, Some(expr)) => {
                 let default_value = expr.eval(context)?;
 
-                Ok(ParameterValue::new(
-                    Some(default_value.ty().clone()),
-                    Some(default_value),
-                    self.src_ref(),
-                ))
+                Ok(ParameterValue {
+                    specified_type: Some(default_value.ty().clone()),
+                    default_value: Some(default_value),
+                    src_ref: self.src_ref(),
+                })
             }
             // Neither type nor value is specified
             (None, None) => Ok(ParameterValue::invalid(self.src_ref())),

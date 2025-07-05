@@ -19,7 +19,7 @@ pub fn assert() -> Symbol {
             .collect(),
         ),
         &|params, args, context| {
-            match ArgumentMap::find_match(args, params.expect("ParameterList")) {
+            match ArgumentMatch::find_match(args, params.expect("ParameterList")) {
                 Ok(arg_map) => {
                     if !arg_map[&"v".try_into()?].try_bool()? {
                         let message = arg_map[&"message".try_into()?].try_string()?;
@@ -58,7 +58,7 @@ pub fn assert_eq() -> Symbol {
             .collect(),
         ),
         &|params, args, context| {
-            match ArgumentMap::find_match(args, params.expect("ParameterList")) {
+            match ArgumentMatch::find_match(args, params.expect("ParameterList")) {
                 Ok(arg_map) => {
                     let a_value = &arg_map[&"a".try_into()?];
                     let b_value = &arg_map[&"b".try_into()?];

@@ -6,7 +6,7 @@
 use std::io::BufWriter;
 
 use geo::coord;
-use microcad_lang::{Id, builtin::*, eval::ArgumentMap, model_tree::*, syntax::*, value::*};
+use microcad_lang::{builtin::*, eval::ArgumentMap, model_tree::*, syntax::*, value::*, Id};
 
 use crate::svg::writer::{SvgTagAttributes, SvgWriter};
 
@@ -54,7 +54,7 @@ impl Exporter for SvgExporter {
     fn export(&mut self, node: ModelNode, args: &ArgumentMap) -> Result<Value, ExportError> {
         assert_eq!(node.output_type(), ModelNodeOutputType::Geometry2D);
 
-        let f = std::fs::File::create(args.get::<String>("filename"))?;
+        let f = std::fs::File::create(args.get::<String>(&Identifier::no_ref("filename")))?;
 
         //node.process();
         // TODO get bounds from a process node:

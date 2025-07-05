@@ -38,6 +38,7 @@ derive_more = { version = "2.0.1", features = ["deref", "deref_mut"] }
 [features]
 default = ["geo3d"]
 geo3d = []
+id_macro = []
 
 [lints.rust]
 missing_docs = "warn"

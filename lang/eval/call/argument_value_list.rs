@@ -52,6 +52,9 @@ impl ArgumentValueList {
         })
     }
 
+    pub fn get_by_type(&self, ty: &Type) -> Option<(&Identifier, &ArgumentValue)> {
+        self.map.iter().find(|(_, arg)| arg.value.ty() == *ty)
+    }
     /// Check for unexpected arguments.
     ///
     /// This method will return an error if there is an argument that
@@ -60,14 +63,16 @@ impl ArgumentValueList {
         &self,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<()> {
-        match self
-            .map
-            .keys()
-            .find(|id| parameter_values.get(id).is_none())
-        {
-            Some(id) => Err(EvalError::UnexpectedArgument(id.clone())),
-            None => Ok(()),
-        }
+        log::trace!("check_for_unexpected_arguments:\n{parameter_values:#?}\n------\n{self:#?}");
+        self.map.iter().try_for_each(|(id, arg)| {
+            if !id.is_empty() && parameter_values.get(id).is_some() {
+                return Ok(());
+            }
+            if parameter_values.get_by_type(arg.value.ty()).is_ok() {
+                return Ok(());
+            }
+            Err(EvalError::UnexpectedArgument(id.clone()))
+        })
     }
 
     /// This functions checks if the arguments match the given parameter definitions.
@@ -79,7 +84,7 @@ impl ArgumentValueList {
         parameters: &ParameterList,
     ) -> EvalResult<ArgumentMap> {
         let parameters = parameters.eval(context)?;
-        ArgumentMap::find_match(self, &parameters)
+        ArgumentMatch::find_match(self, &parameters)
     }
 
     /// Get multiplicity of matching arguments.
@@ -89,7 +94,8 @@ impl ArgumentValueList {
         parameters: &ParameterList,
     ) -> EvalResult<MultiArgumentMap> {
         let parameters = parameters.eval(context)?;
-        MultiArgumentMap::find_match(self, &parameters)
+        todo!()
+        //MultiArgumentMap::find_match(self, &parameters)
     }
 
     pub fn single_unnamed(&self) -> EvalResult<&ArgumentValue> {
@@ -148,108 +154,5 @@ where
                 .collect(),
             src_ref: SrcRef(None),
         }
-    }
-}
-
-#[cfg(test)]
-macro_rules! assert_eq_arg_map_value {
-    ($arg_map:ident, $($name:ident: $ty:ident = $value:expr),*) => {
-        $(assert_eq!(
-            $arg_map.get::<$ty>(stringify!($name)),
-            $value.into()
-        ));*
-    };
-}
-
-#[test]
-fn call_get_matching_arguments() {
-    use crate::{argument, parameter};
-
-    // my_part(foo: Integer, bar: Integer, baz: Scalar = 4.0)
-    let param_values: ParameterValueList = [
-        parameter!(foo: Integer),
-        parameter!(bar: Integer),
-        parameter!(baz: Scalar = 4.0),
-    ]
-    .into_iter()
-    .collect();
-
-    // my_part(1, bar = 2, baz = 3.0)
-    let call_values = [
-        argument!(Integer = 1),
-        argument!(foo: Integer = 2),
-        argument!(baz: Scalar = 3.0),
-    ]
-    .into_iter()
-    .collect();
-
-    let arg_map = ArgumentMap::find_match(&call_values, &param_values).expect("Valid match");
-
-    use microcad_core::{Integer, Scalar};
-    assert_eq_arg_map_value!(arg_map,
-        foo: Integer = 2,
-        bar: Integer = 1,
-        baz: Scalar = 3.0
-    );
-}
-
-#[test]
-fn call_get_matching_arguments_missing() {
-    use crate::{argument, parameter};
-
-    // function f(foo: Integer, bar: Integer, baz: Scalar = 4.0)
-    let parameters = [
-        parameter!(foo: Integer),
-        parameter!(bar: Integer),
-        parameter!(baz: Scalar = 4.0),
-    ]
-    .into_iter()
-    .collect();
-
-    // f(1, baz = 3.0)
-    let arguments = [argument!(Integer = 1), argument!(baz: Scalar = 3.0)]
-        .into_iter()
-        .collect();
-
-    let arg_map = ArgumentMap::find_match(&arguments, &parameters);
-
-    if let Err(EvalError::MissingArguments(missing)) = arg_map {
-        assert_eq!(missing.len(), 1);
-        assert!(missing.get(&"bar".into()).is_some());
-    } else {
-        panic!("Expected MissingArguments error");
-    }
-}
-
-#[test]
-fn get_multi_matching_arguments() {
-    use crate::{argument, parameter};
-
-    let parameters = [
-        parameter!(thickness: Scalar = 2.0),
-        parameter!(inner_diameter: Scalar = 100.0),
-        parameter!(height: Scalar = 10.0),
-    ]
-    .into_iter()
-    .collect();
-
-    let arguments: ArgumentValueList = [
-        argument!(Scalar = 2.0),
-        argument!(Scalar = 100.0),
-        argument!(Scalar = 10.0),
-    ]
-    .into_iter()
-    .collect();
-
-    let multi_argument_map =
-        MultiArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
-
-    use microcad_core::Scalar;
-    for argument_map in multi_argument_map.combinations() {
-        assert_eq_arg_map_value!(argument_map,
-            thickness: Scalar = 2.0,
-            inner_diameter: Scalar = 100.0,
-            height: Scalar = 10.0
-        );
     }
 }

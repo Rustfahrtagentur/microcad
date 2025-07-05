@@ -20,7 +20,7 @@ pub use tuple::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{GetAttributeValue, GetPropertyValue, model_tree::*, syntax::*, ty::*};
+use crate::{model_tree::*, syntax::*, ty::*, GetAttributeValue, GetPropertyValue};
 use microcad_core::*;
 
 /// Create a Value::Tuple from items
@@ -424,6 +424,12 @@ impl TryFrom<Value> for Scalar {
 impl From<f32> for Value {
     fn from(f: f32) -> Self {
         Value::Quantity((f as Scalar).into())
+    }
+}
+
+impl From<i64> for Value {
+    fn from(i: i64) -> Self {
+        Value::Quantity((i as Integer).into())
     }
 }
 

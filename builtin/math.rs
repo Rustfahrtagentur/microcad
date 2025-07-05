@@ -63,7 +63,7 @@ fn rotate_around_axis() -> Symbol {
             .into_iter()
             .collect(),
         ),
-        &|_params, args, ctx| match ArgumentMap::find_match(
+        &|_params, args, ctx| match ArgumentMatch::find_match(
             args,
             _params.expect("ParameterValueList"),
         ) {
@@ -99,7 +99,7 @@ fn rotate_xyz() -> Symbol {
             .into_iter()
             .collect(),
         ),
-        &|_params, args, ctx| match ArgumentMap::find_match(
+        &|_params, args, ctx| match ArgumentMatch::find_match(
             args,
             _params.expect("ParameterValueList"),
         ) {
@@ -130,7 +130,7 @@ fn rotate_zyx() -> Symbol {
             .into_iter()
             .collect(),
         ),
-        &|_params, args, ctx| match ArgumentMap::find_match(
+        &|_params, args, ctx| match ArgumentMatch::find_match(
             args,
             _params.expect("ParameterValueList"),
         ) {

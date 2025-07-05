@@ -23,10 +23,20 @@ use crate::{ty::*, value::*};
 pub enum BuiltinTypeHelper {
     /// Integer type.
     Integer,
-    /// Scalar type.
+    /// A unitless scalar value.
     Scalar,
-    /// Angle type.
+    /// Length in mm.
+    Length,
+    /// Area in mm².
+    Area,
+    /// Volume in mm³.
+    Volume,
+    /// Density in g/mm³
+    Density,
+    /// An angle in radians.
     Angle,
+    /// Weight of a specific volume of material.
+    Weight,
     /// String type.
     String,
     /// Color type
@@ -38,7 +48,12 @@ impl From<BuiltinTypeHelper> for Type {
         match value {
             BuiltinTypeHelper::Integer => Type::Integer,
             BuiltinTypeHelper::Scalar => Type::Quantity(QuantityType::Scalar),
+            BuiltinTypeHelper::Length => Type::Quantity(QuantityType::Length),
+            BuiltinTypeHelper::Area => Type::Quantity(QuantityType::Area),
+            BuiltinTypeHelper::Volume => Type::Quantity(QuantityType::Volume),
+            BuiltinTypeHelper::Density => Type::Quantity(QuantityType::Density),
             BuiltinTypeHelper::Angle => Type::Quantity(QuantityType::Angle),
+            BuiltinTypeHelper::Weight => Type::Quantity(QuantityType::Weight),
             BuiltinTypeHelper::String => Type::String,
             BuiltinTypeHelper::Color => Type::Tuple(TupleType::new_color().into()),
         }
@@ -56,6 +71,16 @@ pub enum BuiltinValueHelper {
     Scalar(Scalar),
     /// Length type.
     Length(Scalar),
+    /// Area type
+    Area(Scalar),
+    /// Volume type
+    Volume(Scalar),
+    /// Density type
+    Density(Scalar),
+    /// Angle type
+    Angle(Scalar),
+    /// Weight type
+    Weight(Scalar),
     /// String type.
     String(String),
     /// Color type
@@ -72,6 +97,17 @@ impl From<BuiltinValueHelper> for Value {
             BuiltinValueHelper::Length(v) => {
                 Value::Quantity(Quantity::new(v, QuantityType::Length))
             }
+            BuiltinValueHelper::Area(v) => Value::Quantity(Quantity::new(v, QuantityType::Area)),
+            BuiltinValueHelper::Volume(v) => {
+                Value::Quantity(Quantity::new(v, QuantityType::Volume))
+            }
+            BuiltinValueHelper::Density(v) => {
+                Value::Quantity(Quantity::new(v, QuantityType::Density))
+            }
+            BuiltinValueHelper::Angle(v) => Value::Quantity(Quantity::new(v, QuantityType::Angle)),
+            BuiltinValueHelper::Weight(v) => {
+                Value::Quantity(Quantity::new(v, QuantityType::Weight))
+            }
             BuiltinValueHelper::String(s) => Value::String(s),
             BuiltinValueHelper::Color(c) => crate::tuple_value!(r = c.r, g = c.g, b = c.b, a = c.a),
         }
@@ -84,38 +120,39 @@ macro_rules! parameter {
     ($id:ident) => {
         (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            $crate::eval::ParameterValue::new(None, None, $crate::src_ref::SrcRef(None)),
+            $crate::eval::ParameterValue {
+                src_ref: $crate::src_ref::SrcRef(None),
+                ..Default::default()
+            },
         )
     };
     ($id:ident: $ty:ident) => {
         (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            $crate::eval::ParameterValue::new(
-                Some($crate::builtin::BuiltinTypeHelper::$ty.into()),
-                None,
-                $crate::src_ref::SrcRef(None),
-            ),
+            $crate::eval::ParameterValue {
+                specified_type: Some($crate::builtin::BuiltinTypeHelper::$ty.into()),
+                src_ref: $crate::src_ref::SrcRef(None),
+                ..Default::default()
+            },
         )
     };
     ($id:ident: $ty:ident = $value:expr) => {
         (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            $crate::eval::ParameterValue::new(
-                Some($crate::builtin::BuiltinTypeHelper::$ty.into()),
-                Some($crate::builtin::BuiltinValueHelper::$ty($value).into()),
-                $crate::src_ref::SrcRef(None),
-            ),
+            $crate::eval::ParameterValue {
+                specified_type: Some($crate::builtin::BuiltinTypeHelper::$ty.into()),
+                default_value: Some($crate::builtin::BuiltinValueHelper::$ty($value).into()),
+                src_ref: $crate::src_ref::SrcRef(None),
+            },
         )
     };
     ($id:ident = $value:expr) => {
         (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            value::ParameterValue::new(
-                $crate::syntax::Identifier::no_ref(stringify!($id)),
-                None,
-                Some($value),
-                SrcRef(None),
-            ),
+            $crate::eval::ParameterValue {
+                default_value: Some($value),
+                ..Default::default()
+            },
         )
     };
     () => {};
@@ -126,7 +163,7 @@ macro_rules! parameter {
 macro_rules! argument {
     ($id:ident: $ty:ident = $value:expr) => {
         (
-            stringify!($id).into(),
+            $crate::syntax::Identifier::no_ref(stringify!($id)),
             ArgumentValue::new(
                 $crate::builtin::BuiltinValueHelper::$ty($value).into(),
                 $crate::src_ref::SrcRef(None),
@@ -140,6 +177,18 @@ macro_rules! argument {
                 $crate::builtin::BuiltinValueHelper::$ty($value).into(),
                 $crate::src_ref::SrcRef(None),
             ),
+        )
+    };
+    () => {};
+}
+
+/// Create tuple of stringified `Identifier` and a `Value`
+#[macro_export]
+macro_rules! property {
+    ($id:ident : $ty:ident = $value:expr) => {
+        (
+            Identifier::no_ref(stringify!($id)),
+            $crate::builtin::BuiltinValueHelper::$ty($value).into(),
         )
     };
     () => {};

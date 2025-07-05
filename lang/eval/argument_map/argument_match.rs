@@ -3,139 +3,172 @@
 
 //! Argument match trait
 
-use crate::{eval::*, value::*};
+use crate::eval::*;
 
-/// The `ArgumentMatch` trait is used to match arguments to parameters.
-///
-/// It is implemented by `ArgumentMap` and `MultiArgumentMap`.
-pub trait ArgumentMatch: Default {
-    /// Inserts a value into the map and removes it from the parameter list
-    ///
-    /// This function must be implemented by the user.
-    fn insert_and_remove_from_parameters(
-        &mut self,
-        value: Value,
-        id: &Identifier,
-        parameter: &ParameterValue,
-        parameters: &mut ParameterValueList,
-    ) -> EvalResult<TypeCheckResult>;
+/// Matching of `ParameterList` with `ArgumentValueList` into ArgumentMap
+#[derive(Default)]
+pub struct ArgumentMatch<'a> {
+    missing: Vec<&'a Identifier>,
+    argument_map: ArgumentMap,
+}
 
-    /// Find named arguments and insert them into the map.
-    ///
-    /// Finds all arguments with the same name as the parameter and inserts them into the map.
-    /// Named arguments are arguments with a name, e.g. `bar` in `foo(bar = 42)`.
-    /// The parameter is then removed from the list of parameters.
-    fn find_and_insert_named_arguments(
-        mut self,
+impl<'a> ArgumentMatch<'a> {
+    /// Match a `ParameterList` with an `ArgumentValueList` into an ArgumentMap
+    pub fn find_match(
         arguments: &ArgumentValueList,
-        parameters: &mut ParameterValueList,
-    ) -> EvalResult<Self> {
-        parameters
-            // Clone the list of parameters because we want to remove elements from it while iterating
-            .clone()
-            .iter()
-            // Filter out parameters that have a name and are present in the arguments
-            .filter_map(|(id, p)| arguments.get(id).map(|c| (id, p, c)))
-            // Insert the arguments into the map
-            .try_for_each(|(id, parameter, argument)| {
-                self.insert_and_remove_from_parameters(
-                    argument.value.clone(),
-                    id,
-                    parameter,
-                    parameters,
-                )?;
-                Ok(())
-            })
-            // Return self
-            .map(|_| self)
+        parameters: &'a ParameterValueList,
+    ) -> EvalResult<ArgumentMap> {
+        let mut am = Self {
+            missing: parameters.keys().collect(),
+            argument_map: Default::default(),
+        };
+        am.match_ids(arguments, parameters);
+        am.match_types(arguments, parameters);
+        am.match_defaults(parameters);
+        am.match_multiplicity(arguments, parameters);
+        am.check_missing()?;
+        Ok(am.argument_map)
     }
 
-    /// Find arguments by type and insert them into the map.
-    ///
-    /// Try to match unnamed arguments by their type and insert them into the map.
-    /// The parameter is then removed from the list of parameters.
-    fn find_and_insert_unnamed_arguments(
-        mut self,
-        arguments: &ArgumentValueList,
-        parameters: &mut ParameterValueList,
-    ) -> EvalResult<Self> {
-        let mut positional_index = 0;
-
-        for (id, argument) in arguments.iter().filter(|(id, _)| id.is_empty()) {
-            let parameter = match parameters.get_by_type(argument.value.ty()) {
-                Ok(p) => p.clone(),
-                Err(_) => break,
-            };
-
-            match self.insert_and_remove_from_parameters(
-                argument.value.clone(),
-                id,
-                &parameter,
-                parameters,
-            )? {
-                TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
-                    if positional_index >= parameters.len() {
-                        break;
+    fn match_ids(&mut self, arguments: &ArgumentValueList, parameters: &ParameterValueList) {
+        // remove missing that can be found
+        self.missing.retain(|id| {
+            // find  parameter by id
+            if let Some(param) = &parameters.get(id) {
+                // find argument by id
+                if let Some(arg) = arguments.get(id) {
+                    // check if type is compatible
+                    if arg.value.ty() == param.ty() {
+                        log::trace!("found argument by id: {id} : {ty}", ty = param.ty());
+                        self.argument_map.insert((*id).clone(), arg.value.clone());
+                        return false;
                     }
                 }
-                _ => {
-                    positional_index += 1;
+            }
+            true
+        });
+    }
+
+    fn match_types(&mut self, arguments: &ArgumentValueList, parameters: &ParameterValueList) {
+        // remove missing that can be found
+        self.missing.retain(|id| {
+            // find  parameter by id
+            if let Some(param) = &parameters.get(id) {
+                // find argument by type
+                if let Some((_, arg)) = arguments.get_by_type(&param.ty()) {
+                    log::trace!("found argument by type: {id} : {ty}", ty = param.ty());
+                    self.argument_map.insert((*id).clone(), arg.value.clone());
+                    return false;
                 }
             }
-        }
-
-        Ok(self)
+            true
+        });
     }
 
-    /// Find default parameters and insert them into the map.
-    ///
-    /// If a parameter has a default value and is not present in the arguments, insert the default value.
-    /// The parameter is then removed from the list of parameters.
-    fn find_and_insert_default_parameters(
-        mut self,
-        arguments: &ArgumentValueList,
-        parameters: &mut ParameterValueList,
-    ) -> EvalResult<Self> {
-        parameters
-            // Clone the list of parameters because we want to remove elements from it while iterating
-            .clone()
-            .iter()
-            // Filter out parameters that have a default value and are not present in the arguments
-            .filter_map(|(id, p)| match (arguments.get(id), &p.default_value) {
-                (None, Some(default_value)) => Some((id, p, default_value.clone())),
-                _ => None,
-            })
-            // Insert the default values into the map
-            .try_for_each(|(id, parameter_value, default_value)| {
-                self.insert_and_remove_from_parameters(
-                    default_value,
-                    id,
-                    parameter_value,
-                    parameters,
-                )?;
-                Ok(())
-            })
-            // Return self
-            .map(|_| self)
+    fn match_defaults(&mut self, parameters: &ParameterValueList) {
+        // remove missing that can be found
+        self.missing.retain(|id| {
+            // find  parameter by id
+            if let Some(param) = &parameters.get(id) {
+                // check for any default value
+                if let Some(def) = &param.default_value {
+                    // paranoia check if type is compatible
+                    if def.ty() == param.ty() {
+                        log::trace!("found argument by default: {id} = {def}");
+                        self.argument_map.insert((*id).clone(), def.clone());
+                        return false;
+                    }
+                }
+            }
+            true
+        })
     }
 
-    /// Find a match between arguments and parameters.
-    ///
-    /// This function tries to find a match between the arguments and the parameters.
-    fn find_match(
+    fn match_multiplicity(
+        &mut self,
         arguments: &ArgumentValueList,
         parameters: &ParameterValueList,
-    ) -> EvalResult<Self> {
-        arguments.check_for_unexpected_arguments(parameters)?;
-
-        let mut missing_parameter_values = parameters.clone();
-        let result = Self::default()
-            .find_and_insert_named_arguments(arguments, &mut missing_parameter_values)?
-            .find_and_insert_unnamed_arguments(arguments, &mut missing_parameter_values)?
-            .find_and_insert_default_parameters(arguments, &mut missing_parameter_values)?;
-
-        missing_parameter_values.check_for_missing_arguments()?;
-
-        Ok(result)
+    ) {
+        // remove missing that can be found
+        self.missing.retain(|id| {
+            // find  parameter by id
+            if let Some(param) = &parameters.get(id) {
+                // find argument by id
+                if let Some(arg) = arguments.get(id) {
+                    // check if type is a list type
+                    if let Type::List(ty) = arg.value.ty() {
+                        // check if type is compatible
+                        if ty.ty() == param.ty() {
+                            log::trace!(
+                                "found list argument by id: [{id}] = {ty}",
+                                ty = param.ty()
+                            );
+                            self.argument_map.insert((*id).clone(), arg.value.clone());
+                            return false;
+                        }
+                    }
+                }
+            }
+            true
+        })
     }
+
+    fn check_missing(&self) -> EvalResult<()> {
+        if self.missing.is_empty() {
+            Ok(())
+        } else {
+            Err(EvalError::MissingArguments(
+                self.missing.iter().map(|p| (*p).clone()).collect(),
+            ))
+        }
+    }
+}
+
+#[test]
+fn argument_matching() {
+    let parameters: ParameterValueList = [
+        crate::parameter!(x: Scalar),
+        crate::parameter!(y: Length),
+        crate::parameter!(z: Area = 1.0),
+    ]
+    .into_iter()
+    .collect();
+    let arguments: ArgumentValueList = [
+        crate::argument!(x: Scalar = 1.0),
+        crate::argument!(Length = 1.0),
+    ]
+    .into_iter()
+    .collect();
+
+    let result =
+        ArgumentMatch::find_match(&arguments, &parameters).expect("expect valid arguments");
+
+    assert_eq!(
+        result,
+        [
+            crate::property!(x : Scalar = 1.0),
+            crate::property!(y : Length = 1.0),
+            crate::property!(z : Area = 1.0),
+        ]
+        .into_iter()
+        .collect()
+    );
+}
+
+#[test]
+fn argument_matching_fail() {
+    let parameters: ParameterValueList = [
+        crate::parameter!(x: Scalar),
+        crate::parameter!(y: Length),
+        crate::parameter!(z: Area),
+    ]
+    .into_iter()
+    .collect();
+    let arguments: ArgumentValueList = [
+        crate::argument!(x: Scalar = 1.0),
+        crate::argument!(Length = 1.0),
+    ]
+    .into_iter()
+    .collect();
+    assert!(ArgumentMatch::find_match(&arguments, &parameters).is_err());
 }

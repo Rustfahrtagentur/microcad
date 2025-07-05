@@ -19,7 +19,7 @@ pub fn import() -> Symbol {
             .into_iter()
             .collect(),
         ),
-        &|parameter_values, argument_values, context| match ArgumentMap::find_match(
+        &|parameter_values, argument_values, context| match ArgumentMatch::find_match(
             argument_values,
             parameter_values.expect("Parameter values"),
         ) {

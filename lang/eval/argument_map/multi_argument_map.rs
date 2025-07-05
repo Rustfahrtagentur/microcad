@@ -31,7 +31,7 @@ impl MultiArgumentMap {
     }
 }
 
-impl ArgumentMatch for MultiArgumentMap {
+impl MultiArgumentMap {
     /// Insert a value into the map and remove `parameter_value` from the list
     fn insert_and_remove_from_parameters(
         &mut self,
