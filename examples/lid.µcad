@@ -18,7 +18,4 @@ part lid(
 // `l` is the instance of the lid model
 l = lid();
 
-// Print out the volume of the model instance
-std::print("Volume: {l.volume() / 1000}cm³");
-
 std::export("lid.stl") l;
