@@ -52,8 +52,7 @@ pub trait Exporter: FileIoInterface {
     }
 
     /// Export the node if the node is marked for export.
-    fn export(&mut self, node: ModelNode, filename: &std::path::Path)
-    -> Result<Value, ExportError>;
+    fn export(&self, node: &ModelNode, filename: &std::path::Path) -> Result<Value, ExportError>;
 
     /// The expected node output type of this exporter.
     ///

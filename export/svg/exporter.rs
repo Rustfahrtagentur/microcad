@@ -18,12 +18,7 @@ impl Exporter for SvgExporter {
         vec![parameter!(style: String = String::new())].into()
     }
 
-    fn export(
-        &mut self,
-        node: ModelNode,
-        filename: &std::path::Path,
-    ) -> Result<Value, ExportError> {
-        assert_eq!(node.output_type(), ModelNodeOutputType::Geometry2D);
+    fn export(&self, node: &ModelNode, filename: &std::path::Path) -> Result<Value, ExportError> {
         let f = std::fs::File::create(filename)?;
 
         //node.process();
@@ -32,9 +27,13 @@ impl Exporter for SvgExporter {
         let bounds = geo::Rect::new(coord! { x: 0., y: 0. }, coord! { x: 100., y: 100. });
         let mut writer = SvgWriter::new(Box::new(BufWriter::new(f)), bounds, 1.0)?;
 
-        writer.node(&node)?;
+        writer.node(node)?;
 
         Ok(Value::None)
+    }
+
+    fn node_output_type(&self) -> ModelNodeOutputType {
+        ModelNodeOutputType::Geometry2D
     }
 }
 

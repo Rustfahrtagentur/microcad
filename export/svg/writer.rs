@@ -100,7 +100,7 @@ impl SvgWriter {
     fn begin_tag(&mut self, tag: &str, attr: &SvgTagAttributes) -> std::io::Result<()> {
         writeln!(
             self.writer,
-            "{:indent$}<{tag_inner}/>",
+            "{:indent$}<{tag_inner}>",
             "",
             indent = 2 * self.level,
             tag_inner = Self::tag_inner(tag, attr)

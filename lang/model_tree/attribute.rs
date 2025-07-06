@@ -14,9 +14,9 @@ use crate::{
 #[derive(Clone)]
 pub struct ExportAttribute {
     /// Filename.
-    filename: std::path::PathBuf,
+    pub filename: std::path::PathBuf,
     /// Exporter.
-    exporter: std::rc::Rc<dyn Exporter>,
+    pub exporter: std::rc::Rc<dyn Exporter>,
 }
 
 impl ExportAttribute {

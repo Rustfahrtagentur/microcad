@@ -50,9 +50,12 @@ impl Export {
         nodes
     }
 
-    fn export_targets(&self, _nodes: &Vec<(ModelNode, ExportAttribute)>) -> anyhow::Result<()> {
-        let _ = _nodes;
-        todo!()
+    fn export_targets(&self, nodes: &Vec<(ModelNode, ExportAttribute)>) -> anyhow::Result<()> {
+        for (node, attr) in nodes {
+            attr.exporter.export(node, &attr.filename)?;
+        }
+
+        Ok(())
     }
 
     fn list_targets(&self, nodes: &Vec<(ModelNode, ExportAttribute)>) -> anyhow::Result<()> {
