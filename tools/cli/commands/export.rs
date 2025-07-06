@@ -4,7 +4,7 @@
 //! µcad CLI export command
 
 use anyhow::anyhow;
-use microcad_builtin::{ExportError, Exporter, ExporterAccess, ExporterRegistry};
+use microcad_builtin::{Exporter, ExporterAccess, ExporterRegistry};
 use microcad_lang::model_tree::{ExportAttribute, GetAttribute, ModelNode, ModelNodeOutputType};
 
 use crate::{config::Config, *};
@@ -65,7 +65,7 @@ impl Export {
             Some(output) => Ok(ExportAttribute::new(
                 output.clone(),
                 exporters
-                    .exporter_by_filename(&output)
+                    .exporter_by_filename(output)
                     .or(default_exporter)?,
             )),
             None => {
