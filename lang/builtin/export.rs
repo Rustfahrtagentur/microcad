@@ -52,7 +52,15 @@ pub trait Exporter: FileIoInterface {
     }
 
     /// Export the node if the node is marked for export.
-    fn export(&mut self, node: ModelNode, args: &ArgumentMap) -> Result<Value, ExportError>;
+    fn export(&mut self, node: ModelNode, filename: &std::path::Path)
+    -> Result<Value, ExportError>;
+
+    /// The expected node output type of this exporter.
+    ///
+    /// Reimplement this function when your export output format only accepts specific node types.
+    fn node_output_type(&self) -> ModelNodeOutputType {
+        ModelNodeOutputType::NotDetermined
+    }
 }
 
 /// Exporter registry.
@@ -103,11 +111,39 @@ impl ExporterRegistry {
 /// Exporter access.
 pub trait ExporterAccess {
     /// Get exporter by id.
-    fn exporter_by_id(&self, id: &Id) -> Option<Rc<dyn Exporter>>;
+    fn exporter_by_id(&self, id: &Id) -> Result<Rc<dyn Exporter>, ExportError>;
+
+    /// Get exporter by filename.
+    fn exporter_by_filename(
+        &self,
+        filename: &std::path::Path,
+    ) -> Result<Rc<dyn Exporter>, ExportError>;
+
+    /// Find an exporter by filename, or by id.
+    fn find_exporter(
+        &self,
+        filename: &std::path::Path,
+        id: &Option<Id>,
+    ) -> Result<Rc<dyn Exporter>, ExportError> {
+        match id {
+            Some(id) => self.exporter_by_id(id),
+            None => self.exporter_by_filename(filename),
+        }
+    }
 }
 
 impl ExporterAccess for ExporterRegistry {
-    fn exporter_by_id(&self, id: &Id) -> Option<Rc<dyn Exporter>> {
-        self.io.by_id(id)
+    fn exporter_by_id(&self, id: &Id) -> Result<Rc<dyn Exporter>, ExportError> {
+        match self.io.by_id(id) {
+            Some(exporter) => Ok(exporter),
+            None => Err(ExportError::NoExporterWithId(id.clone())),
+        }
+    }
+
+    fn exporter_by_filename(
+        &self,
+        filename: &std::path::Path,
+    ) -> Result<Rc<dyn Exporter>, ExportError> {
+        self.by_filename(filename)
     }
 }

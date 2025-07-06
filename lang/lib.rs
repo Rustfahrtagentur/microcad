@@ -49,9 +49,3 @@ pub trait GetPropertyValue {
     /// This function is used when accessing a property `v` of a value `p` with `p.v`.
     fn get_property_value(&self, id: &Identifier) -> Value;
 }
-
-/// Access an attributes value by id.
-pub trait GetAttributeValue {
-    /// Get a value of attribute, of [`Value::None`] if the attribute does not exist.
-    fn get_attribute_value(self, id: &Identifier) -> Value;
-}

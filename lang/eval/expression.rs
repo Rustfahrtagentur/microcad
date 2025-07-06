@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{GetAttributeValue, GetPropertyValue, eval::*, model_tree::*};
+use crate::{GetPropertyValue, eval::*, model_tree::*};
 
 impl Eval for ListExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
@@ -135,7 +135,6 @@ impl Eval for Expression {
             }
             Self::AttributeAccess(lhs, identifier, src_ref) => {
                 let value = lhs.eval(context)?.get_attribute_value(identifier);
-
                 if value == Value::None {
                     context.error(src_ref, AttributeError::NotFound(identifier.clone()))?;
                 }

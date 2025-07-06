@@ -21,7 +21,7 @@ fn init() {
 }
 
 pub use microcad_lang::builtin::*;
-use microcad_lang::{Id, eval::*, model_tree::*, parameter, resolve::*, value::*};
+use microcad_lang::{eval::*, resolve::*};
 
 pub(crate) use assert::*;
 pub use context_builder::*;
@@ -56,38 +56,9 @@ pub fn builtin_importers() -> ImporterRegistry {
     ImporterRegistry::default().insert(microcad_import::toml::TomlImporter)
 }
 
-/// The `export` attribute.
-pub struct Export;
-
-impl Exporter for Export {
-    fn parameters(&self) -> ParameterValueList {
-        vec![
-            parameter!(filename: String = String::new()),
-            parameter!(id: String = String::new()),
-        ]
-        .into()
-    }
-
-    fn export(&mut self, _: ModelNode, _: &ArgumentMap) -> Result<Value, ExportError> {
-        unimplemented!()
-    }
-}
-
-impl FileIoInterface for Export {
-    fn id(&self) -> Id {
-        Id::new("export")
-    }
-
-    fn file_extensions(&self) -> Vec<Id> {
-        vec![]
-    }
-}
-
 /// Get built-in exporters.
 pub fn builtin_exporters() -> ExporterRegistry {
-    ExporterRegistry::new()
-        .insert(Export)
-        .insert(microcad_export::svg::SvgExporter)
+    ExporterRegistry::new().insert(microcad_export::svg::SvgExporter)
 }
 
 /// Built-in context.

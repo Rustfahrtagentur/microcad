@@ -4,9 +4,9 @@
 //! Model node
 
 use crate::{
-    GetAttributeValue, GetPropertyValue, eval::*, model_tree::*, rc::*, resolve::*, src_ref::*,
-    syntax::*, value::*,
+    GetPropertyValue, eval::*, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*,
 };
+
 use microcad_core::*;
 
 /// The origin is the [`Symbol`] and [`ArgumentMap`] from which the node has been created.
@@ -406,10 +406,9 @@ impl GetPropertyValue for ModelNode {
     }
 }
 
-impl GetAttributeValue for ModelNode {
-    fn get_attribute_value(self, id: &Identifier) -> Value {
-        let b = &*self.borrow();
-        b.attributes().get(id).cloned().unwrap_or_default()
+impl GetAttribute for ModelNode {
+    fn get_attribute(&self, id: &Identifier) -> Option<crate::model_tree::Attribute> {
+        self.borrow().attributes().get_attribute(id)
     }
 }
 

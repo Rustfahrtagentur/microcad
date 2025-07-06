@@ -5,7 +5,12 @@
 
 use geo::CoordsIter;
 use microcad_core::*;
-use microcad_lang::value::*;
+use microcad_lang::{
+    eval::ArgumentMap,
+    model_tree::{Element, GetAttribute, ModelNode, ModelNodeOutputType},
+    syntax::Identifier,
+    value::*,
+};
 
 /// SVG writer.
 pub struct SvgWriter {
@@ -27,12 +32,18 @@ impl SvgTagAttributes {
     }
 }
 
-impl From<Option<&Tuple>> for SvgTagAttributes {
-    fn from(tuple: Option<&Tuple>) -> Self {
-        match tuple.unwrap_or(&Tuple::default()).get::<String>("style") {
-            Some(string) => SvgTagAttributes { style: string },
-            None => SvgTagAttributes::default(),
+impl From<Option<ArgumentMap>> for SvgTagAttributes {
+    fn from(argument_map: Option<ArgumentMap>) -> Self {
+        if let Some(argument_map) = argument_map {
+            if let Some(Value::String(style)) = argument_map.get_value(&Identifier::no_ref("style"))
+            {
+                return SvgTagAttributes {
+                    style: style.clone(),
+                };
+            }
         }
+
+        SvgTagAttributes::default()
     }
 }
 
@@ -260,6 +271,38 @@ impl SvgWriter {
             Geometry2D::Rect(rect) => self.rect(rect, attr),
             Geometry2D::Circle(circle) => self.circle(circle, attr),
         }
+    }
+
+    /// Generate SVG for a node.
+    pub fn node(&mut self, node: &ModelNode) -> std::io::Result<()> {
+        assert_eq!(node.output_type(), ModelNodeOutputType::Geometry2D);
+
+        let attr: SvgTagAttributes = node
+            .get_exporter_attribute(&Identifier::no_ref("svg"))
+            .into();
+
+        let b = node.borrow();
+        let element = b.element();
+
+        match element {
+            Element::Object(_) => {
+                self.begin_group(&attr)?;
+                node.children().try_for_each(|child| self.node(&child))?;
+                self.end_group()?;
+            }
+            Element::Transform(affine_transform) => {
+                self.begin_transform(&affine_transform.mat2d())?;
+                node.children().try_for_each(|child| self.node(&child))?;
+                self.end_transform()?;
+            }
+            Element::Primitive2D(geometry) => self.geometry(geometry, &attr)?,
+            Element::Operation(_) => {
+                todo!("Output processed operation results")
+            }
+            _ => {}
+        }
+
+        Ok(())
     }
 
     /// Finish this SVG. This method is also called in the Drop trait implemetation.

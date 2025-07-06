@@ -58,8 +58,8 @@ pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
 pub use parameter::*;
-pub use r#use::*;
 pub use symbols::*;
+pub use r#use::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 

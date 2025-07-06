@@ -1,14 +1,13 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::collections::BTreeMap;
-
 use crate::{
-    builtin::{ExportError, ExporterAccess},
-    eval::*,
-    model_tree::*,
+    Id,
+    builtin::ExporterAccess,
+    eval::{self, *},
+    model_tree::{self, *},
     parameter,
-    syntax::*,
+    syntax::{self, *},
 };
 
 use microcad_core::Color;
@@ -49,28 +48,102 @@ impl From<ArgumentMap> for Tuple {
     }
 }
 
-impl Eval<Option<(Identifier, Value)>> for Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<(Identifier, Value)>> {
+impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<model_tree::ExportAttribute>> {
         match self {
-            Attribute::Tuple(id, argument_list) => {
-                if let Some(exporter) = context.exporter_by_id(id.id()) {
-                    match ArgumentMap::find_match(
-                        &argument_list.eval(context)?,
-                        &exporter.parameters(),
-                    ) {
-                        Ok(args) => {
-                            return Ok(Some((id.clone(), Value::Tuple(Box::new(args.into())))));
-                        }
-                        Err(err) => {
-                            context.warning(self, err)?;
+            syntax::Attribute::Tuple(id, argument_list) if id.id() == "export" => {
+                match ArgumentMap::find_match(
+                    &argument_list.eval(context)?,
+                    &vec![
+                        parameter!(filename: String),
+                        parameter!(id: String = String::new()),
+                    ]
+                    .into(),
+                ) {
+                    Ok(argument_map) => {
+                        let filename: std::path::PathBuf =
+                            argument_map.get::<String>("filename").into();
+                        let id: Id = argument_map.get::<String>("id").into();
+                        let id: Option<Id> = if id.is_empty() { None } else { Some(id) };
+
+                        match context.find_exporter(&filename, &id) {
+                            Ok(exporter) => {
+                                return Ok(Some(ExportAttribute::new(filename, exporter)));
+                            }
+                            Err(err) => context.warning(self, err)?,
                         }
                     }
-                } else {
-                    context.warning(id, ExportError::NoExporterWithId(id.id().clone()))?;
+                    Err(err) => context.warning(self, err)?,
                 }
             }
-            Attribute::NameValue(id, expression) => {
-                return Ok(Some((id.clone(), expression.eval(context)?)));
+            _ => unreachable!(),
+        }
+
+        Ok(None)
+    }
+}
+
+impl Eval<Option<model_tree::Attribute>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<model_tree::Attribute>> {
+        match self {
+            syntax::Attribute::Tuple(id, argument_list) => {
+                let name = id.id().as_str();
+                match name {
+                    // Parse export attribute `export("test.svg")`
+                    "export" => {
+                        if let Some(attr) =
+                            eval::Eval::<Option<ExportAttribute>>::eval(self, context)?
+                        {
+                            return Ok(Some(model_tree::Attribute::Export(attr)));
+                        }
+                    }
+                    // Parse exporter specific attribute, e.g. `svg(style = "fill:none")`
+                    _ => match context.exporter_by_id(id.id()) {
+                        Ok(exporter) => {
+                            match ArgumentMap::find_match(
+                                &argument_list.eval(context)?,
+                                &exporter.parameters(),
+                            ) {
+                                Ok(args) => {
+                                    return Ok(Some(model_tree::Attribute::ExporterSpecific(
+                                        id.clone(),
+                                        args,
+                                    )));
+                                }
+                                Err(err) => {
+                                    context.warning(self, err)?;
+                                }
+                            }
+                        }
+                        Err(err) => {
+                            context.warning(id, err)?;
+                        }
+                    },
+                }
+            }
+            syntax::Attribute::NameValue(id, expression) => {
+                let name = id.id().as_str();
+                let value = expression.eval(context)?;
+
+                match (name, value) {
+                    ("color", Value::Tuple(tuple)) => match tuple.as_ref().try_into() {
+                        Ok(color) => return Ok(Some(model_tree::Attribute::Color(color))),
+                        Err(err) => context.warning(self, err)?,
+                    },
+                    ("color", Value::String(string)) => match string.parse::<Color>() {
+                        Ok(color) => return Ok(Some(model_tree::Attribute::Color(color))),
+                        Err(err) => context.warning(self, err)?,
+                    },
+                    ("resolution", value) => match value.try_into() {
+                        Ok(resolution_attribute) => {
+                            return Ok(Some(model_tree::Attribute::Resolution(
+                                resolution_attribute,
+                            )));
+                        }
+                        Err(err) => context.warning(self, err)?,
+                    },
+                    _ => {}
+                }
             }
         }
 
@@ -78,90 +151,16 @@ impl Eval<Option<(Identifier, Value)>> for Attribute {
     }
 }
 
-impl AttributeList {
-    /// Default parameters for name-value attributes.
-    ///
-    /// Only name-value attributes that are in this list are allowed.
-    fn default_parameter_list() -> ParameterValueList {
-        vec![
-            parameter!(layer: String = "default".into()),
-            parameter!(color: Color = Color::default()),
-        ]
-        .into()
-    }
-
-    /// Evaluate name value attributes and check if they match with the default parameter list.
-    fn eval_name_value_attributes(
-        &self,
-        context: &mut Context,
-    ) -> EvalResult<Vec<(Identifier, Value)>> {
-        let attributes: Result<Vec<_>, _> = self
-            .iter()
-            .filter_map(|attr| {
-                if matches!(attr, Attribute::NameValue(_, _)) {
-                    attr.eval(context).transpose()
-                } else {
-                    None
-                }
-            })
-            .collect();
-        let attributes = attributes?;
-
-        // Build a `ArgumentValueList` from the attributes...
-        let mut args = ArgumentValueList::default();
-        for (id, value) in attributes {
-            args.try_push(ArgumentValue::new(Some(id), value, SrcRef(None)))
-                .expect("Argument");
-        }
-
-        // ... and check if it matches with the default parameter list.
-        let args = ArgumentMap::find_match(&args, &Self::default_parameter_list());
-        match args {
-            Ok(args) => Ok(args.iter().map(|(k, v)| (k.clone(), v.clone())).collect()),
-            Err(err) => {
-                context.warning(self, err)?;
-                Ok(vec![])
-            }
-        }
-    }
-
-    /// Evaluate named tuple attributes.
-    fn eval_named_tuple_attributes(
-        &self,
-        context: &mut Context,
-    ) -> EvalResult<Vec<(Identifier, Value)>> {
-        self.iter()
-            .filter_map(|attr| {
-                if matches!(attr, Attribute::Tuple(_, _)) {
-                    attr.eval(context).transpose()
-                } else {
-                    None
-                }
-            })
-            .collect()
-    }
-}
-
 impl Eval<Attributes> for AttributeList {
     fn eval(&self, context: &mut Context) -> EvalResult<Attributes> {
-        // Split attribute list into named tuple and name value attributes
-        let name_value_attributes = self.eval_name_value_attributes(context)?;
-        let named_tuple_attributes = self.eval_named_tuple_attributes(context)?;
+        let mut attributes = Vec::new();
 
-        let mut tuple = BTreeMap::new();
-        for (id, value) in name_value_attributes
-            .iter()
-            .chain(named_tuple_attributes.iter())
-        {
-            if tuple.contains_key(id) {
-                context.warning(
-                    self,
-                    AttributeError::AttributeAlreadySet(id.clone(), value.clone()),
-                )?;
+        for attribute in self.iter() {
+            if let Some(attribute) = attribute.eval(context)? {
+                attributes.push(attribute);
             }
-            tuple.insert(id.clone(), value.clone());
         }
 
-        Ok(Attributes(tuple))
+        Ok(model_tree::Attributes::new(attributes))
     }
 }

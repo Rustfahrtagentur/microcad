@@ -20,7 +20,7 @@ pub use tuple::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{GetAttributeValue, GetPropertyValue, model_tree::*, syntax::*, ty::*};
+use crate::{GetPropertyValue, model_tree::*, syntax::*, ty::*};
 use microcad_core::*;
 
 /// Create a Value::Tuple from items
@@ -78,9 +78,9 @@ impl Value {
     }
 
     /// Fetch nodes from this value.
-    pub fn fetch_nodes(self) -> ModelNodes {
+    pub fn fetch_nodes(&self) -> ModelNodes {
         match self {
-            Self::Nodes(n) => n,
+            Self::Nodes(n) => n.clone(),
             _ => ModelNodes::default(),
         }
     }
@@ -461,11 +461,11 @@ impl GetPropertyValue for Value {
     }
 }
 
-impl GetAttributeValue for Value {
-    fn get_attribute_value(self, id: &Identifier) -> Value {
+impl GetAttribute for Value {
+    fn get_attribute(&self, id: &Identifier) -> std::option::Option<crate::model_tree::Attribute> {
         match self.fetch_nodes().single_node() {
-            Some(node) => node.get_attribute_value(id),
-            None => Value::None,
+            Some(node) => node.get_attribute(id),
+            None => None,
         }
     }
 }
