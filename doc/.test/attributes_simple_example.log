@@ -3,6 +3,5 @@
   /home/micha/Work/mcad/mcad/doc/attributes.md:14
 -- Output --
 -- Errors --
-error: Assertion failed: (a : Scalar=Scalar = 1, b : Scalar=Scalar = 1, r : Scalar=Scalar = 1, g : Scalar=Scalar = 1) != #FFFFFF
 -- Test Result --
-FAIL
+OK

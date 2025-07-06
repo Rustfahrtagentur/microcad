@@ -3,12 +3,5 @@
   /home/micha/Work/mcad/mcad/doc/attributes.md:38
 -- Output --
 -- Errors --
-error: Missing arguments: b
-
-  ---> <from_str>:4:23
-     |
-   4 | std::debug::assert_eq(c#color, "#FFFFFF");
-     |                       ^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-FAIL
+OK
