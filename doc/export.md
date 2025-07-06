@@ -38,7 +38,7 @@ You assign an *export attribute* with a filename to each sketch.
 If you omit the file extension, the default export format will be picked automatically.
 
 ```µcad,export_attributes
-#[export("rect")] // Will be exported to `rect.svg`
+#[export("rect.svg")] // Will be exported to `rect.svg`
 std::geo2d::rect(42mm);
 
 #[export("circle.svg")]  // Will be exported to `circle.svg`

@@ -267,13 +267,7 @@ impl ModelNode {
         self.ancestors().find_map(|node| {
             let b = node.borrow();
             let origin = b.origin();
-            match origin.creator {
-                Some(ref symbol) => match &symbol.borrow().def {
-                    SymbolDefinition::SourceFile(source_file) => Some(source_file.clone()),
-                    _ => None,
-                },
-                None => None,
-            }
+            origin.source_file.clone()
         })
     }
 
