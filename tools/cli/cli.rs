@@ -13,11 +13,11 @@ use crate::commands::{self, Commands, RunCommand};
 #[command(version, about, long_about = None)]
 pub struct Cli {
     /// display processing time
-    #[arg(short, long, default_value = "false", global = true)]
+    #[arg(short = 'T', long, default_value = "false", action = clap::ArgAction::SetTrue, global = true)]
     time: bool,
 
     /// Paths to search for files.
-    #[arg(short = 'p', long = "search-path", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
+    #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
     search_paths: Vec<std::path::PathBuf>,
 
     #[command(subcommand)]
