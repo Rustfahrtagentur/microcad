@@ -65,11 +65,12 @@ Exporter specific attributes have a call-like syntax.
 The `export` defines the filename and the (optional) ID. 
 If you have created a part or a sketch and want to export it to a specific file, you can add the export attribute:
 
-```µcad,attributes_export_example
+```µcad,attributes_export
 #[export("circle.svg")]
 c = std::geo2d::circle(42.0mm);
 
 std::debug::assert_eq(c#export.filename, "circle.svg");
+std::debug::assert_eq(c#export.id, "svg");
 ```
 
 Additional, you can use the `id` parameter to use a specific exporter.
@@ -80,6 +81,7 @@ However, the exporter is detected automatically depending on the file extension.
 c = std::geo2d::circle(42.0mm);
 
 std::debug::assert_eq(c#export.filename, "circle.svg");
+std::debug::assert_eq(c#export.id, "svg");
 ```
 
 
