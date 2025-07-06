@@ -128,12 +128,17 @@ impl Context {
         result
     }
 
-    /// Set importers
+    /// Set importers.
     pub fn set_importers(&mut self, importers: ImporterRegistry) {
         self.importers = importers;
     }
 
-    /// Set exporters
+    /// All registered exporters.
+    pub fn exporters(&self) -> &ExporterRegistry {
+        &self.exporters
+    }
+
+    /// Set exporters.
     pub fn set_exporters(&mut self, exporters: ExporterRegistry) {
         self.exporters = exporters;
     }

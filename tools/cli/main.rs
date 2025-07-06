@@ -8,6 +8,7 @@ extern crate microcad_lang;
 
 mod cli;
 mod commands;
+mod config;
 
 pub use cli::*;
 use commands::*;

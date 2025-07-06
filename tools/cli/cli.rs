@@ -6,19 +6,23 @@
 use clap::Parser;
 use microcad_lang::{eval::Context, parse::ParseResult};
 
-use crate::commands::{self, Commands, RunCommand};
+use crate::commands::*;
+use crate::config::Config;
 
 /// µcad cli
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
-    /// display processing time
-    #[arg(short = 'T', long, default_value = "false", action = clap::ArgAction::SetTrue, global = true)]
+    /// Display processing time.
+    #[arg(short = 'T', long, default_value = "false", action = clap::ArgAction::SetTrue)]
     time: bool,
 
     /// Paths to search for files.
     #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
     search_paths: Vec<std::path::PathBuf>,
+
+    #[arg(short = 'C', long = "config")]
+    config: Option<std::path::PathBuf>,
 
     #[command(subcommand)]
     command: Commands,
@@ -46,11 +50,19 @@ impl Cli {
     /// Make a new context from an input file.
     pub fn make_context(&self, input: impl AsRef<std::path::Path>) -> ParseResult<Context> {
         Ok(microcad_builtin::builtin_context(
-            commands::Resolve {
+            crate::commands::Resolve {
                 input: input.as_ref().to_path_buf(),
             }
             .resolve()?,
             &self.search_paths,
         ))
+    }
+
+    /// Fetch a config from file or default config.
+    pub fn fetch_config(&self) -> anyhow::Result<Config> {
+        match &self.config {
+            Some(config) => Config::load(config),
+            None => Ok(Config::default()),
+        }
     }
 }
