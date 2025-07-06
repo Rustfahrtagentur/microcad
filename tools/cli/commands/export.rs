@@ -3,9 +3,9 @@
 
 //! µcad CLI export command
 
-use microcad_lang::model_tree::{ModelNode, ModelNodes};
+use microcad_lang::model_tree::{ExportAttribute, GetAttribute, ModelNode};
 
-use crate::commands::RunCommand;
+use crate::*;
 
 /// Parse and evaluate and export a µcad file.
 #[derive(clap::Parser)]
@@ -23,6 +23,12 @@ pub struct Export {
     /// Export a specific target.
     #[arg(short = 't', long = "target", action = clap::ArgAction::Append)]
     target: Vec<String>,
+
+    /// The resolution of this export.
+    ///
+    /// The resolution can changed relatively `200%` or to an absolute value `0.05mm`.
+    #[arg(short = 'r', long = "resolution", default_value = "0.1mm")]
+    resolution: String,
 }
 
 impl Export {
@@ -30,25 +36,39 @@ impl Export {
         todo!()
     }
 
-    fn target_nodes(_node: &ModelNode) -> ModelNodes {
+    fn target_nodes(&self, node: &ModelNode) -> Vec<(ModelNode, ExportAttribute)> {
+        let nodes: Vec<(ModelNode, ExportAttribute)> = node
+            .source_file_descendants()
+            .filter_map(|node| {
+                let b = node.borrow();
+                b.attributes()
+                    .get_export_attribute()
+                    .map(|attr| (node.clone(), attr))
+            })
+            .collect();
+
+        nodes
+    }
+
+    fn export_targets(&self, _nodes: &Vec<(ModelNode, ExportAttribute)>) -> anyhow::Result<()> {
+        let _ = _nodes;
         todo!()
     }
 
-    fn export_targets(&self, _nodes: &ModelNodes) -> anyhow::Result<()> {
-        todo!()
-    }
-
-    fn list_targets(&self, _nodes: &ModelNodes) -> anyhow::Result<()> {
-        todo!()
+    fn list_targets(&self, nodes: &Vec<(ModelNode, ExportAttribute)>) -> anyhow::Result<()> {
+        for (node, attr) in nodes {
+            println!("{node} => {attr}", node = node.signature());
+        }
+        Ok(())
     }
 }
 
 impl RunCommand for Export {
-    fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<()> {
+    fn run(&self, cli: &Cli) -> anyhow::Result<()> {
         let mut context = cli.make_context(&self.input)?;
         let node = context.eval().expect("Valid node");
 
-        let target_nodes = &Self::target_nodes(&node);
+        let target_nodes = &self.target_nodes(&node);
         if self.list {
             self.list_targets(target_nodes)
         } else {

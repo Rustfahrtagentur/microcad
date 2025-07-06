@@ -35,7 +35,7 @@ pub enum Commands {
     Create(Create),
 }
 
-/// Run this command for a cli
+/// Run this command for a CLI.
 pub trait RunCommand {
     fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<()>;
 }
