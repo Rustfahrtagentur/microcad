@@ -78,9 +78,11 @@ impl Default for ResolutionAttribute {
 impl From<ResolutionAttribute> for Value {
     fn from(resolution_attribute: ResolutionAttribute) -> Self {
         match resolution_attribute {
-            ResolutionAttribute::Linear(linear) => Self::Quantity(linear.into()),
+            ResolutionAttribute::Linear(linear) => {
+                Self::Quantity(Quantity::new(linear, QuantityType::Length))
+            }
             ResolutionAttribute::Relative(relative) => {
-                Self::Quantity(Quantity::new(relative, QuantityType::Length))
+                Self::Quantity(Quantity::new(relative, QuantityType::Scalar))
             }
         }
     }

@@ -15,7 +15,7 @@ When viewed or exported, node `c` will have a red color, because the `color` att
 #[color = "#FFFFFF"]
 c = std::geo2d::circle(42.0mm);
 
-std::debug::assert_eq(c#color, "#FFFFFF");
+std::debug::assert_eq(c#color, (r = 1.0, g = 1.0, b = 1.0, a = 1.0));
 ```
 
 ## Syntax
@@ -37,9 +37,9 @@ In viewer and when exported, the node will be drawn in the specified color.
 
 ```µcad,attributes_color
 #[color = "#FFFFFF"]
-std::geo2d::circle(42.0mm);
+c = std::geo2d::circle(42.0mm);
 
-std::debug::assert_eq(c#color, "#FFFFFF");
+std::debug::assert_eq(c#color, (r = 1.0, g = 1.0, b = 1.0, a = 1.0));
 ```
 
 ## Resolution attribute
@@ -53,7 +53,6 @@ This means the circle will be rendered with a resolution `0.05mm`.
 c = std::geo2d::circle(42.0mm);
 
 std::debug::assert_eq(c#resolution, 200%);
-std::debug::assert_eq(c#resolution, 0.05mm);
 ```
 
 ## Exporter specific attributes
