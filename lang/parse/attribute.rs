@@ -37,6 +37,7 @@ impl Parse for AttributeList {
                         attribute_list.push(Attribute::parse(pair)?);
                     }
                 }
+                Rule::COMMENT | Rule::doc_comment => {}
                 rule => unreachable!("Unexpected element {rule:?}"),
             }
         }
