@@ -113,6 +113,44 @@ impl<'a> TryFrom<&'a Value> for &'a Tuple {
     }
 }
 
+impl TryFrom<&Tuple> for Color {
+    type Error = ValueError;
+
+    fn try_from(tuple: &Tuple) -> Result<Self, Self::Error> {
+        let (r, g, b, a) = (
+            tuple.by_id(&Identifier::no_ref("r")),
+            tuple.by_id(&Identifier::no_ref("g")),
+            tuple.by_id(&Identifier::no_ref("b")),
+            tuple
+                .by_id(&Identifier::no_ref("a"))
+                .unwrap_or(&Value::Quantity(Quantity::new(1.0, QuantityType::Scalar)))
+                .clone(),
+        );
+
+        match (r, g, b, a) {
+            (
+                Some(Value::Quantity(Quantity {
+                    value: r,
+                    quantity_type: QuantityType::Scalar,
+                })),
+                Some(Value::Quantity(Quantity {
+                    value: g,
+                    quantity_type: QuantityType::Scalar,
+                })),
+                Some(Value::Quantity(Quantity {
+                    value: b,
+                    quantity_type: QuantityType::Scalar,
+                })),
+                Value::Quantity(Quantity {
+                    value: a,
+                    quantity_type: QuantityType::Scalar,
+                }),
+            ) => Ok(Color::new(*r as f32, *g as f32, *b as f32, a as f32)),
+            _ => Err(ValueError::CannotConvertToColor(Box::new(tuple.clone()))),
+        }
+    }
+}
+
 impl std::fmt::Display for Tuple {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
