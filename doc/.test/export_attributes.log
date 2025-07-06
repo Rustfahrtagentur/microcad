@@ -1,7 +1,13 @@
 -- Test --
   export_attributes
-  /home/micha/Work/mcad/mcad/doc/export.md:38
+  /home/micha/Work/mcad/mcad/doc/export.md:40
 -- Output --
 -- Errors --
+warning: No exporter found for file `rect`
+  ---> <from_str>:1:3
+     |
+   1 | #[export("rect")] // Will be exported to `rect.svg`
+     |   ^^^^^^^^^^^^^
+     |
 -- Test Result --
 OK

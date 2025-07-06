@@ -3,5 +3,11 @@
   /home/micha/Work/mcad/mcad/doc/libs/std/export.md:9
 -- Output --
 -- Errors --
+warning: No exporter found for file `cube.stl`
+  ---> ../lib/std/mod.µcad:18:7
+     |
+  18 |     #[export(filename)] {
+     |       ^^^^^^^^^^^^^^^
+     |
 -- Test Result --
 OK

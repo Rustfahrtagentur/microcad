@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**98** tests from markdown.
+**102** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -13,7 +13,11 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/array_unit_bundling.png)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/arrays.md) |
 | [![test](../doc/structure/.test/assignment.png)](../doc/structure/.test/assignment.log) | [assignment](../doc/structure/assignments.md) |
 | [![test](../doc/structure/.test/assignment_immutable.png)](../doc/structure/.test/assignment_immutable.log) | [assignment_immutable](../doc/structure/assignments.md) |
+| [![test](../doc/.test/attributes_color.png)](../doc/.test/attributes_color.log) | [attributes_color](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_export.png)](../doc/.test/attributes_export.log) | [attributes_export](../doc/attributes.md) |
 | [![test](../doc/.test/attributes_export_example.png)](../doc/.test/attributes_export_example.log) | [attributes_export_example](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_export_id.png)](../doc/.test/attributes_export_id.log) | [attributes_export_id](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_precision.png)](../doc/.test/attributes_precision.log) | [attributes_precision](../doc/attributes.md) |
 | [![test](../doc/.test/attributes_simple_example.png)](../doc/.test/attributes_simple_example.log) | [attributes_simple_example](../doc/attributes.md) |
 | [![test](../doc/structure/.test/building_plan.png)](../doc/structure/.test/building_plan.log) | [building_plan](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/call_function.png)](../doc/structure/.test/call_function.log) | [call_function](../doc/structure/calls.md) |

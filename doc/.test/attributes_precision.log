@@ -1,0 +1,9 @@
+-- Test --
+  attributes_precision
+  /home/micha/Work/mcad/mcad/doc/attributes.md:51
+-- Output --
+-- Errors --
+error: Assertion failed: Length = 2 != Scalar = 2
+error: Assertion failed: Length = 2 != Length = 0.05
+-- Test Result --
+FAIL
