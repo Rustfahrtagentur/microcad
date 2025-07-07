@@ -106,7 +106,9 @@ impl Export {
             })
             .collect();
 
+        // No nodes with export attributes have been found.
         if nodes.is_empty() {
+            // Add the root node with default exporters.
             nodes.push((
                 node.clone(),
                 self.default_export_attribute(node, config, exporters)?,
