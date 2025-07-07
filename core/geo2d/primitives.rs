@@ -20,9 +20,6 @@ pub type Rect = geo::Rect<Scalar>;
 /// Point.
 pub type Point = geo::Point<Scalar>;
 
-/// Bounding box.
-pub type Bounds = Rect;
-
 /// Circle with offset.
 #[derive(Debug, Clone)]
 pub struct Circle {
@@ -33,8 +30,8 @@ pub struct Circle {
     pub offset: Vec2,
 }
 
-impl Bounds2D for Circle {
-    fn bounds_2d(&self) -> Option<Rect> {
+impl FetchBounds2D for Circle {
+    fn fetch_bounds_2d(&self) -> Bounds2D {
         if self.radius > 0.0 {
             let r = Vec2::new(self.radius, self.radius);
             let min: (Scalar, Scalar) = (self.offset - r).into();
@@ -44,6 +41,7 @@ impl Bounds2D for Circle {
         } else {
             None
         }
+        .into()
     }
 }
 
@@ -72,8 +70,8 @@ impl RenderToMultiPolygon for Rect {
     }
 }
 
-impl Points2D for Rect {
-    fn points_2d(&self) -> Vec<Vec2> {
+impl FetchPoints2D for Rect {
+    fn fetch_points_2d(&self) -> Vec<Vec2> {
         let min = self.min();
         let max = self.max();
         vec![
@@ -103,8 +101,8 @@ impl RenderToMultiPolygon for Circle {
     }
 }
 
-impl Points2D for Circle {
-    fn points_2d(&self) -> Vec<Vec2> {
+impl FetchPoints2D for Circle {
+    fn fetch_points_2d(&self) -> Vec<Vec2> {
         vec![self.offset]
     }
 }

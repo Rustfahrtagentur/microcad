@@ -31,14 +31,10 @@ pub type Mat4 = cgmath::Matrix4<Scalar>;
 /// Primitive angle type
 pub type Angle = cgmath::Rad<Scalar>;
 
-/// 2D Geometry type.
-pub type Geometry2D = geo2d::Geometry;
-
-/// 3D Geometry type.
-pub type Geometry3D = geo3d::Geometry;
-
 pub use boolean_op::BooleanOp;
 use cgmath::InnerSpace;
 pub use color::*;
 pub use core_error::*;
+pub use geo2d::*;
+pub use geo3d::*;
 pub use render_resolution::*;

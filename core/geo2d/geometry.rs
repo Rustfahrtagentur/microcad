@@ -9,7 +9,7 @@ use strum::IntoStaticStr;
 
 /// Geometry
 #[derive(IntoStaticStr, Clone, Debug)]
-pub enum Geometry {
+pub enum Geometry2D {
     /// Line string.
     LineString(LineString),
     /// Multiple line strings.
@@ -24,7 +24,7 @@ pub enum Geometry {
     Circle(Circle),
 }
 
-impl Geometry {
+impl Geometry2D {
     /// Apply boolean operation.
     pub fn boolean_op(
         &self,
@@ -36,12 +36,15 @@ impl Geometry {
         let b = other.clone().render_to_multi_polygon(resolution);
         use geo::BooleanOps;
         let result = a.boolean_op(&b, op.into());
-        Some(Geometry::MultiPolygon(result))
+        Some(Geometry2D::MultiPolygon(result))
     }
 
     /// Returns true if this geometry fills an area (e.g. like a polygon or circle).
     pub fn is_areal(&self) -> bool {
-        !matches!(self, Geometry::LineString(_) | Geometry::MultiLineString(_))
+        !matches!(
+            self,
+            Geometry2D::LineString(_) | Geometry2D::MultiLineString(_)
+        )
     }
 
     /// Apply boolean operation to multiple geometries.
@@ -88,10 +91,10 @@ impl Geometry {
             Self::MultiPolygon(polygons)
         } else {
             match self {
-                Geometry::LineString(line_string) => {
+                Geometry2D::LineString(line_string) => {
                     Self::LineString(line_string.affine_transform(&transform))
                 }
-                Geometry::MultiLineString(multi_line_string) => {
+                Geometry2D::MultiLineString(multi_line_string) => {
                     Self::MultiLineString(multi_line_string.affine_transform(&transform))
                 }
                 _ => unreachable!(),
@@ -100,19 +103,19 @@ impl Geometry {
     }
 }
 
-impl RenderToMultiPolygon for Geometry {
+impl RenderToMultiPolygon for Geometry2D {
     fn render_to_existing_multi_polygon(
         self,
         resolution: &RenderResolution,
         polygons: &mut MultiPolygon,
     ) {
         match self {
-            Geometry::Polygon(polygon) => polygons.0.push(polygon),
-            Geometry::MultiPolygon(mut multi_polygon) => polygons.0.append(&mut multi_polygon.0),
-            Geometry::Rect(rect) => polygons
+            Geometry2D::Polygon(polygon) => polygons.0.push(polygon),
+            Geometry2D::MultiPolygon(mut multi_polygon) => polygons.0.append(&mut multi_polygon.0),
+            Geometry2D::Rect(rect) => polygons
                 .0
                 .push(rect.render_to_polygon(resolution).expect("Polygon")),
-            Geometry::Circle(circle) => polygons
+            Geometry2D::Circle(circle) => polygons
                 .0
                 .push(circle.render_to_polygon(resolution).expect("Polygon")),
             _ => {}

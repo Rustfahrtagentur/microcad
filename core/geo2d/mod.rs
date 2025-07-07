@@ -3,12 +3,15 @@
 
 //! 2D Geometry
 
+mod bounds;
+mod collection;
 mod geometry;
 mod primitives;
 
 use crate::*;
 
-use geo::BoundingRect;
+pub use bounds::*;
+pub use collection::*;
 pub use geometry::*;
 pub use primitives::*;
 
@@ -48,29 +51,24 @@ pub trait RenderToMultiPolygon: Sized {
 }
 
 /// Trait to return all points of 2D geometry.
-pub trait Points2D {
+pub trait FetchPoints2D {
     /// Returns all points.
-    fn points_2d(&self) -> Vec<Vec2>;
+    fn fetch_points_2d(&self) -> Vec<Vec2>;
 }
 
-/// Trait to return a bounding box of 2D geometry.
-pub trait Bounds2D {
-    fn bounds_2d(&self) -> Option<Rect>;
+impl FetchBounds2D for Geometry2D {
+    fn fetch_bounds_2d(&self) -> Bounds2D {
+        use geo::BoundingRect;
 
-    fn bounds_2d_multi(v: &[&Self]) -> Option<Rect> {
-        for s in v {}
-    }
-}
-
-impl Bounds2D for Geometry {
-    fn bounds_2d(&self) -> Option<Rect> {
         match &self {
-            Geometry::LineString(line_string) => line_string.bounding_rect(),
-            Geometry::MultiLineString(multi_line_string) => multi_line_string.bounding_rect(),
-            Geometry::Polygon(polygon) => polygon.bounding_rect(),
-            Geometry::MultiPolygon(multi_polygon) => multi_polygon.bounding_rect(),
-            Geometry::Rect(rect) => Some(*rect),
-            Geometry::Circle(circle) => circle.bounds_2d(),
+            Geometry2D::LineString(line_string) => line_string.bounding_rect().into(),
+            Geometry2D::MultiLineString(multi_line_string) => {
+                multi_line_string.bounding_rect().into()
+            }
+            Geometry2D::Polygon(polygon) => polygon.bounding_rect().into(),
+            Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.bounding_rect().into(),
+            Geometry2D::Rect(rect) => Some(*rect).into(),
+            Geometry2D::Circle(circle) => circle.fetch_bounds_2d(),
         }
     }
 }
