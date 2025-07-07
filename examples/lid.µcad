@@ -15,7 +15,6 @@ part lid(
     outer - inner;
 }
 
-// `l` is the instance of the lid model
-l = lid();
 
-std::export("lid.stl") l;
+// `l` is the instance of the lid model
+lid();
