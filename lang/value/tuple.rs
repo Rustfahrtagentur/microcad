@@ -72,6 +72,89 @@ impl Tuple {
             .get(&Identifier::no_ref(id))
             .map(|value| TryInto::try_into(value).expect("Value"))
     }
+
+    /// Dissolve unnamed them.
+    ///
+    /// Transparent tuples are unnamed tuple items of a tuple.
+    ///
+    /// ```,µcad
+    /// assert_eq!( (x=0, (y=0, z=0)), (x=0, y=0, z=0) );
+    /// ///               ^ unnamed tuple tem
+    pub fn ray(&mut self) {
+        self.unnamed.retain(|_, value| {
+            if let Value::Tuple(tuple) = value {
+                tuple.ray();
+                tuple.named.drain().for_each(|(k, v)| {
+                    self.named.insert(k, v);
+                });
+                false
+            } else {
+                true
+            }
+        });
+    }
+
+    /// Call a predicate for each tuple multiplicity.
+    ///
+    /// - `ids`: Items to multiply.
+    /// - `p`: Predicate to call for each resulting tuple.
+    ///
+    /// # Example
+    ///
+    /// | Input           | Predicate's Parameters |
+    /// |-----------------|------------------------|
+    /// | `([x₀, x₁], y)` | `(x₀, y)`, `(x₁, y)`   |
+    ///
+    pub fn multiplicity<P: Fn(Tuple)>(&self, ids: std::collections::HashSet<Identifier>, p: P) {
+        // count array indexes for items which shall be multiplied and number of overall combinations
+        let mut combinations = 1;
+        let mut counts: HashMap<Identifier, (_, _)> = ids
+            .into_iter()
+            .map(|id| {
+                let len = if let Value::Array(array) = &self.named[&id] {
+                    let len = array.len();
+                    combinations *= len;
+                    (len, len)
+                } else {
+                    panic!("'{id}' found in tuple but no list");
+                };
+                (id, len)
+            })
+            .collect();
+
+        // call predicate for each version of the tuple
+        while combinations > 0 {
+            let mut counted = false;
+            let tuple = self
+                .named
+                .iter()
+                .map(|(id, v)| match v {
+                    Value::Array(array) => {
+                        if let Some((count, len)) = counts.get_mut(id) {
+                            let item = (
+                                id.clone(),
+                                array.get(*count).expect("array index not found").clone(),
+                            );
+                            if !counted {
+                                if *count == 0 {
+                                    *count = *len
+                                } else {
+                                    *count -= 1
+                                }
+                                combinations -= 1;
+                                counted = false;
+                            }
+                            item
+                        } else {
+                            panic!("'{id}' found in tuple but no list");
+                        }
+                    }
+                    _ => (id.clone(), v.clone()),
+                })
+                .collect();
+            p(tuple);
+        }
+    }
 }
 
 // TODO impl FromIterator instead
