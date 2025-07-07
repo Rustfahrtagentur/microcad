@@ -21,6 +21,7 @@ pub struct Cli {
     #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
     search_paths: Vec<std::path::PathBuf>,
 
+    /// Load config from file.
     #[arg(short = 'C', long = "config")]
     config: Option<std::path::PathBuf>,
 
