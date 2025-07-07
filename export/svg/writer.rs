@@ -265,7 +265,7 @@ impl SvgWriter {
 
     /// Generate SVG for a node.
     pub fn node(&mut self, node: &ModelNode) -> std::io::Result<()> {
-        assert_eq!(node.output_type(), ModelNodeOutputType::Geometry2D);
+        assert_eq!(node.output_type(), ModelNodeOutput::Geometry2D);
 
         let attr: SvgTagAttributes = node
             .get_exporter_attribute(&Identifier::no_ref("svg"))

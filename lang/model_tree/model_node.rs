@@ -60,11 +60,11 @@ pub struct ModelNodeInner {
     /// Attributes used for export.
     attributes: Attributes,
 
-    /// The symbol (e.g. [`PartDefinition`]) that created this [`ModelNode`].
+    /// The symbol (e.g. [`WorkbenchDefinition`]) that created this [`ModelNode`].
     origin: ModelNodeOrigin,
 
     /// The output type of the this node.
-    pub output_type: ModelNodeOutputType,
+    pub output_type: ModelNodeOutput,
 }
 
 impl ModelNodeInner {
@@ -151,7 +151,7 @@ impl ModelNode {
     }
 
     /// Return output type.
-    pub fn output_type(&self) -> ModelNodeOutputType {
+    pub fn output_type(&self) -> ModelNodeOutput {
         self.borrow().output_type.clone()
     }
 
@@ -220,7 +220,7 @@ impl ModelNode {
 
         let mut b = self.0.borrow_mut();
         // If this node's output type has not been determined, try to get it from child node
-        if b.output_type == ModelNodeOutputType::NotDetermined {
+        if b.output_type == ModelNodeOutput::NotDetermined {
             b.output_type = node.output_type();
         }
         b.children.push(node.clone());
@@ -306,7 +306,7 @@ impl ModelNode {
         if self.origin().creator.is_some() {
             s += format!(" = {origin}", origin = self.origin()).as_str();
         }
-        if !matches!(self.output_type(), ModelNodeOutputType::NotDetermined) {
+        if !matches!(self.output_type(), ModelNodeOutput::NotDetermined) {
             s += format!(" -> \"{output_type}\"", output_type = self.output_type()).as_str();
         }
         if self.has_children() {

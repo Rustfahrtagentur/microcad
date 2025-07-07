@@ -3,6 +3,8 @@
 
 //! 2D primitives
 
+use geo::Coord;
+
 use crate::{geo2d::*, *};
 
 /// Line string.
@@ -18,6 +20,9 @@ pub type Rect = geo::Rect<Scalar>;
 /// Point.
 pub type Point = geo::Point<Scalar>;
 
+/// Bounding box.
+pub type Bounds = Rect;
+
 /// Circle with offset.
 #[derive(Debug, Clone)]
 pub struct Circle {
@@ -26,6 +31,20 @@ pub struct Circle {
 
     /// Offset.
     pub offset: Vec2,
+}
+
+impl Bounds2D for Circle {
+    fn bounds_2d(&self) -> Option<Rect> {
+        if self.radius > 0.0 {
+            let r = Vec2::new(self.radius, self.radius);
+            let min: (Scalar, Scalar) = (self.offset - r).into();
+            let max: (Scalar, Scalar) = (self.offset + r).into();
+
+            Some(Rect::new(Coord::from(min), Coord::from(max)))
+        } else {
+            None
+        }
+    }
 }
 
 impl RenderToMultiPolygon for LineString {}

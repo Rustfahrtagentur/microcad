@@ -11,7 +11,7 @@ pub trait Operation: std::fmt::Debug {
     /// The output type of this operation.
     ///
     /// By default, the output type is the same as the input node's output type.
-    fn output_type(&self, node: &ModelNode) -> ModelNodeOutputType {
+    fn output_type(&self, node: &ModelNode) -> ModelNodeOutput {
         node.output_type()
     }
 

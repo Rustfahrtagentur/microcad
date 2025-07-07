@@ -57,8 +57,8 @@ pub trait Exporter: FileIoInterface {
     /// The expected node output type of this exporter.
     ///
     /// Reimplement this function when your export output format only accepts specific node types.
-    fn node_output_type(&self) -> ModelNodeOutputType {
-        ModelNodeOutputType::NotDetermined
+    fn node_output_type(&self) -> ModelNodeOutput {
+        ModelNodeOutput::NotDetermined
     }
 }
 
