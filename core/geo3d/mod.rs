@@ -13,7 +13,7 @@ pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 pub use geometry::*;
 pub use primitives::*;
 
-use crate::{BooleanOp, RenderResolution};
+use crate::{BooleanOp, RenderResolution, Vec3};
 
 impl From<&BooleanOp> for manifold_rs::BooleanOp {
     fn from(op: &BooleanOp) -> Self {
@@ -24,6 +24,12 @@ impl From<&BooleanOp> for manifold_rs::BooleanOp {
             _ => unimplemented!(),
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct Bounds {
+    min: Vec3,
+    max: Vec3,
 }
 
 /// Trait to render a 3D geometry into a mesh.

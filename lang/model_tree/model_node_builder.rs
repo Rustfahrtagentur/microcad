@@ -19,7 +19,7 @@ pub struct ModelNodeBuilder<'a> {
     pub children: ModelNodes,
 
     /// The output type of this node.
-    output_type: ModelNodeOutputType,
+    output_type: ModelNodeOutput,
 
     /// An optional context for error handling.
     _context: Option<&'a mut Context>,
@@ -43,7 +43,7 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn new_2d_object() -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
-            output_type: ModelNodeOutputType::Geometry2D,
+            output_type: ModelNodeOutput::Geometry2D,
             ..Default::default()
         }
     }
@@ -62,7 +62,7 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn new_3d_object() -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
-            output_type: ModelNodeOutputType::Geometry3D,
+            output_type: ModelNodeOutput::Geometry3D,
             ..Default::default()
         }
     }
@@ -71,7 +71,7 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn new_2d_primitive(geometry: std::rc::Rc<Geometry2D>) -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Primitive2D(geometry))),
-            output_type: ModelNodeOutputType::Geometry2D,
+            output_type: ModelNodeOutput::Geometry2D,
             ..Default::default()
         }
     }
@@ -80,7 +80,7 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn new_3d_primitive(geometry: std::rc::Rc<Geometry3D>) -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Primitive3D(geometry))),
-            output_type: ModelNodeOutputType::Geometry3D,
+            output_type: ModelNodeOutput::Geometry3D,
             ..Default::default()
         }
     }
@@ -106,7 +106,7 @@ impl<'a> ModelNodeBuilder<'a> {
     /// Determine the output type of this node by some child node.
     ///
     /// TODO: Replace `panic!` with context warnings.
-    pub fn determine_output_type(&self, child: &ModelNode) -> EvalResult<ModelNodeOutputType> {
+    pub fn determine_output_type(&self, child: &ModelNode) -> EvalResult<ModelNodeOutput> {
         match self.inner.element() {
             Element::ChildrenPlaceholder => panic!("A child placeholder cannot have children"),
             Element::Transform(_) => {
@@ -125,30 +125,30 @@ impl<'a> ModelNodeBuilder<'a> {
         }
 
         match child.output_type() {
-            ModelNodeOutputType::NotDetermined => {
+            ModelNodeOutput::NotDetermined => {
                 return Ok(self.output_type.clone());
             }
-            ModelNodeOutputType::Invalid => {
+            ModelNodeOutput::Invalid => {
                 panic!("Child node's output type is invalid.")
             }
             _ => {}
         }
 
         match self.output_type {
-            ModelNodeOutputType::NotDetermined => {
+            ModelNodeOutput::NotDetermined => {
                 // Determine nodes output type by child output type.
             }
-            ModelNodeOutputType::Geometry2D => {
-                if child.output_type() == ModelNodeOutputType::Geometry3D {
+            ModelNodeOutput::Geometry2D => {
+                if child.output_type() == ModelNodeOutput::Geometry3D {
                     panic!("Cannot nest a 2D geometry in a 3D geometry node.")
                 }
             }
-            ModelNodeOutputType::Geometry3D => {
-                if child.output_type() == ModelNodeOutputType::Geometry2D {
+            ModelNodeOutput::Geometry3D => {
+                if child.output_type() == ModelNodeOutput::Geometry2D {
                     panic!("Cannot nest a 3D geometry in a 2D geometry node.")
                 }
             }
-            ModelNodeOutputType::Invalid => {
+            ModelNodeOutput::Invalid => {
                 panic!("Invalid output type.")
             }
         }

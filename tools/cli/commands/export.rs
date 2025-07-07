@@ -5,7 +5,7 @@
 
 use anyhow::anyhow;
 use microcad_builtin::{Exporter, ExporterAccess, ExporterRegistry};
-use microcad_lang::model_tree::{ExportAttribute, GetAttribute, ModelNode, ModelNodeOutputType};
+use microcad_lang::model_tree::{ExportAttribute, GetAttribute, ModelNode, ModelNodeOutput};
 
 use crate::{config::Config, *};
 
@@ -32,21 +32,19 @@ pub struct Export {
 impl Export {
     /// Get default exporter.
     fn default_exporter(
-        output_type: &ModelNodeOutputType,
+        output_type: &ModelNodeOutput,
         config: &Config,
         exporters: &ExporterRegistry,
     ) -> anyhow::Result<std::rc::Rc<dyn Exporter>> {
         match output_type {
-            ModelNodeOutputType::NotDetermined => {
-                Err(anyhow!("Could not determine node output type."))
-            }
-            ModelNodeOutputType::Geometry2D => {
+            ModelNodeOutput::NotDetermined => Err(anyhow!("Could not determine node output type.")),
+            ModelNodeOutput::Geometry2D => {
                 Ok(exporters.exporter_by_id(&(&config.export.sketch).into())?)
             }
-            ModelNodeOutputType::Geometry3D => {
+            ModelNodeOutput::Geometry3D => {
                 Ok(exporters.exporter_by_id(&(&config.export.part).into())?)
             }
-            ModelNodeOutputType::Invalid => Err(anyhow!(
+            ModelNodeOutput::Invalid => Err(anyhow!(
                 "Invalid node output type, the node cannot be exported."
             )),
         }

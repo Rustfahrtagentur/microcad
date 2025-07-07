@@ -3,12 +3,52 @@
 
 //! Scalable Vector Graphics (SVG) export
 
-use std::io::BufWriter;
+use std::{io::BufWriter, rc::Rc};
 
 use geo::coord;
+use microcad_core::Geometry2D;
 use microcad_lang::{Id, builtin::*, model_tree::*, parameter, value::*};
 
 use crate::svg::writer::SvgWriter;
+
+pub struct EntityList<T> {
+    entities: Vec<T>,
+}
+
+impl<T> EntityList<T> {
+    pub fn new() -> Self {
+        Self { entities: vec![] }
+    }
+}
+
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum GenerateError {}
+
+pub trait Generate<T> {
+    fn generate(&self, node: ModelNode) -> Result<EntityList<T>, GenerateError>;
+}
+
+impl Generate<Rc<Geometry2D>> for SvgExporter {
+    fn generate(&self, node: ModelNode) -> Result<EntityList<Rc<Geometry2D>>, GenerateError> {
+        let mut entities = EntityList::new();
+        let b = node.borrow_mut();
+
+        match b.element_mut() {
+            Element::Object(object) => todo!(),
+            Element::ChildrenPlaceholder => todo!(),
+            Element::Transform(affine_transform) => todo!(),
+            Element::Primitive2D(geometry) => todo!(),
+            Element::Primitive3D(geometry) => todo!(),
+            Element::Operation(operation) => {
+                operation.process(node);
+            }
+        }
+
+        Ok(entities)
+    }
+}
 
 /// SVG Exporter
 pub struct SvgExporter;
@@ -33,8 +73,8 @@ impl Exporter for SvgExporter {
         Ok(Value::None)
     }
 
-    fn node_output_type(&self) -> ModelNodeOutputType {
-        ModelNodeOutputType::Geometry2D
+    fn node_output_type(&self) -> ModelNodeOutput {
+        ModelNodeOutput::Geometry2D
     }
 }
 

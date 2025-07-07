@@ -7,7 +7,7 @@ use geo::CoordsIter;
 use microcad_core::*;
 use microcad_lang::{
     eval::ArgumentMap,
-    model_tree::{Element, GetAttribute, ModelNode, ModelNodeOutputType},
+    model_tree::{Element, GetAttribute, ModelNode, ModelNodeOutput},
     syntax::Identifier,
     value::*,
 };
@@ -275,7 +275,7 @@ impl SvgWriter {
 
     /// Generate SVG for a node.
     pub fn node(&mut self, node: &ModelNode) -> std::io::Result<()> {
-        assert_eq!(node.output_type(), ModelNodeOutputType::Geometry2D);
+        assert_eq!(node.output_type(), ModelNodeOutput::Geometry2D);
 
         let attr: SvgTagAttributes = node
             .get_exporter_attribute(&Identifier::no_ref("svg"))

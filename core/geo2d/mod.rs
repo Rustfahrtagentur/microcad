@@ -8,6 +8,7 @@ mod primitives;
 
 use crate::*;
 
+use geo::BoundingRect;
 pub use geometry::*;
 pub use primitives::*;
 
@@ -50,4 +51,26 @@ pub trait RenderToMultiPolygon: Sized {
 pub trait Points2D {
     /// Returns all points.
     fn points_2d(&self) -> Vec<Vec2>;
+}
+
+/// Trait to return a bounding box of 2D geometry.
+pub trait Bounds2D {
+    fn bounds_2d(&self) -> Option<Rect>;
+
+    fn bounds_2d_multi(v: &[&Self]) -> Option<Rect> {
+        for s in v {}
+    }
+}
+
+impl Bounds2D for Geometry {
+    fn bounds_2d(&self) -> Option<Rect> {
+        match &self {
+            Geometry::LineString(line_string) => line_string.bounding_rect(),
+            Geometry::MultiLineString(multi_line_string) => multi_line_string.bounding_rect(),
+            Geometry::Polygon(polygon) => polygon.bounding_rect(),
+            Geometry::MultiPolygon(multi_polygon) => multi_polygon.bounding_rect(),
+            Geometry::Rect(rect) => Some(*rect),
+            Geometry::Circle(circle) => circle.bounds_2d(),
+        }
+    }
 }
