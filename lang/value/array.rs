@@ -5,6 +5,15 @@
 
 use crate::{ty::*, value::*};
 
+#[macro_export]
+macro_rules! array_quantity {
+    ($($value:expr),+) => {
+        $crate::value::Value::Array(
+             [$($crate::value::Value::Quantity($value.into())),+ ].into_iter().collect()
+        )
+    };
+}
+
 /// List of values of the same type
 #[derive(Clone, Debug)]
 pub struct Array {
@@ -51,6 +60,20 @@ impl IntoIterator for Array {
 
     fn into_iter(self) -> Self::IntoIter {
         self.list.into_iter()
+    }
+}
+
+impl<V: Into<Value>> FromIterator<V> for Array {
+    fn from_iter<T: IntoIterator<Item = V>>(iter: T) -> Self {
+        let list: Vec<_> = iter.into_iter().map(|v| v.into()).collect();
+        if let Some(value) = &list.first() {
+            Array {
+                ty: value.ty(),
+                list: ValueList::new(list),
+            }
+        } else {
+            Array::new(ValueList::default(), Type::Invalid)
+        }
     }
 }
 

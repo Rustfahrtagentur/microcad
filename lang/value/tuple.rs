@@ -5,7 +5,7 @@
 
 use std::collections::HashMap;
 
-use crate::{ty::*, value::*};
+use crate::{ty::*, value::*, *};
 
 /// Tuple with named values
 ///
@@ -111,19 +111,21 @@ impl Tuple {
         let mut counts: HashMap<Identifier, (_, _)> = ids
             .into_iter()
             .map(|id| {
-                let len = if let Value::Array(array) = &self.named[&id] {
+                let counter = if let Value::Array(array) = &self.named[&id] {
                     let len = array.len();
                     combinations *= len;
-                    (len, len)
+                    (0, len)
                 } else {
                     panic!("'{id}' found in tuple but no list");
                 };
-                (id, len)
+                (id, counter)
             })
             .collect();
 
+        println!("{combinations} combinations:");
+
         // call predicate for each version of the tuple
-        while combinations > 0 {
+        for _ in 0..combinations {
             let mut counted = false;
             let tuple = self
                 .named
@@ -136,13 +138,12 @@ impl Tuple {
                                 array.get(*count).expect("array index not found").clone(),
                             );
                             if !counted {
-                                if *count == 0 {
-                                    *count = *len
+                                *count += 1;
+                                if *count == *len {
+                                    *count = 0
                                 } else {
-                                    *count -= 1
+                                    counted = true;
                                 }
-                                combinations -= 1;
-                                counted = false;
                             }
                             item
                         } else {
@@ -155,6 +156,18 @@ impl Tuple {
             p(tuple);
         }
     }
+}
+
+#[test]
+fn multiplicity_check() {
+    let tuple: Tuple = tuple!(
+        x = array_quantity![1, 2, 3],
+        y = array_quantity![1, 2],
+        z = Value::from(1)
+    );
+
+    let ids: std::collections::HashSet<Identifier> = ["x".into(), "y".into()].into_iter().collect();
+    tuple.multiplicity(ids, |tuple| println!("{tuple}"));
 }
 
 // TODO impl FromIterator instead
@@ -229,13 +242,16 @@ impl std::fmt::Display for Tuple {
         write!(
             f,
             "({items})",
-            items = self
-                .named
-                .iter()
-                .map(|(id, v)| format!("{id} : {t}={v}", t = v.ty()))
-                .chain(self.unnamed.iter().map(|(ty, v)| format!("{v}: {ty}")))
-                .collect::<Vec<String>>()
-                .join(", ")
+            items = {
+                let mut items = self
+                    .named
+                    .iter()
+                    .map(|(id, v)| format!("{id}: {v}"))
+                    .chain(self.unnamed.iter().map(|(ty, v)| format!("{v}: {ty}")))
+                    .collect::<Vec<String>>();
+                items.sort();
+                items.join(", ")
+            }
         )
     }
 }
