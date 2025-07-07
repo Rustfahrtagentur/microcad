@@ -1,7 +1,7 @@
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::Vec3;
+use crate::{Bounds3D, FetchBounds3D, Vec3};
 use manifold_rs::{Manifold, Mesh};
 
 /// Vertex
@@ -54,6 +54,7 @@ pub struct TriangleMesh {
     pub triangle_indices: Vec<Triangle<u32>>,
 }
 
+/// Triangle iterator state.
 pub struct Triangles<'a> {
     triangle_mesh: &'a TriangleMesh,
     index: usize,
@@ -78,13 +79,13 @@ impl<'a> Iterator for Triangles<'a> {
 }
 
 impl TriangleMesh {
-    /// Clear mesh
+    /// Clear mesh.
     pub fn clear(&mut self) {
         self.vertices.clear();
         self.triangle_indices.clear();
     }
 
-    /// Fetch triangles
+    /// Fetch triangles.
     pub fn fetch_triangles(&self) -> Vec<Triangle<Vertex>> {
         self.triangle_indices
             .iter()
@@ -98,7 +99,7 @@ impl TriangleMesh {
             .collect()
     }
 
-    /// Append a triangle mesh
+    /// Append a triangle mesh.
     pub fn append(&mut self, other: &TriangleMesh) {
         let offset = self.vertices.len() as u32;
         self.vertices.extend_from_slice(&other.vertices);
@@ -110,7 +111,7 @@ impl TriangleMesh {
         )
     }
 
-    /// Triangles iterator
+    /// Triangles iterator.
     pub fn triangles(&'_ self) -> Triangles<'_> {
         Triangles {
             triangle_mesh: self,
@@ -118,7 +119,7 @@ impl TriangleMesh {
         }
     }
 
-    /// convert into manifold
+    /// Convert mesh to manifold.
     pub fn to_manifold(&self) -> Manifold {
         let vertices = self
             .vertices
@@ -138,7 +139,7 @@ impl TriangleMesh {
         Manifold::from_mesh(Mesh::new(&vertices, &triangle_indices))
     }
 
-    /// Transform the mesh
+    /// Transform the mesh.
     ///
     /// # Arguments
     /// - `transform`: Transformation matrix
@@ -166,12 +167,18 @@ impl TriangleMesh {
         }
     }
 
-    /// Calculate volume of mesh
+    /// Calculate volume of mesh.
     pub fn volume(&self) -> f64 {
         self.triangles()
             .map(|t| t.signed_volume())
             .sum::<f64>()
             .abs()
+    }
+}
+
+impl FetchBounds3D for TriangleMesh {
+    fn fetch_bounds_3d(&self) -> Bounds3D {
+        self.vertices.iter().map(|vertex| vertex.pos).collect()
     }
 }
 

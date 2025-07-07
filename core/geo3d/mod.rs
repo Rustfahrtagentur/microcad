@@ -3,17 +3,20 @@
 
 //! 3D Geometry
 
+mod bounds;
+mod collection;
 mod geometry;
 mod primitives;
 mod triangle_mesh;
 
+pub use bounds::*;
+pub use collection::*;
+pub use geometry::*;
 pub use manifold_rs::Manifold;
+pub use primitives::*;
 pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 
-pub use geometry::*;
-pub use primitives::*;
-
-use crate::{BooleanOp, RenderResolution, Vec3};
+use crate::{BooleanOp, RenderResolution};
 
 impl From<&BooleanOp> for manifold_rs::BooleanOp {
     fn from(op: &BooleanOp) -> Self {
@@ -24,12 +27,6 @@ impl From<&BooleanOp> for manifold_rs::BooleanOp {
             _ => unimplemented!(),
         }
     }
-}
-
-#[derive(Debug, Clone)]
-pub struct Bounds {
-    min: Vec3,
-    max: Vec3,
 }
 
 /// Trait to render a 3D geometry into a mesh.
@@ -50,10 +47,10 @@ pub trait RenderToMesh: Sized {
 #[test]
 fn test_boolean_op_multi() {
     use std::rc::Rc;
-    let a = Rc::new(Geometry::Manifold(Rc::new(Manifold::sphere(2.0, 32))));
-    let b = Rc::new(Geometry::Manifold(Rc::new(Manifold::sphere(1.0, 32))));
+    let a = Rc::new(Geometry3D::Manifold(Rc::new(Manifold::sphere(2.0, 32))));
+    let b = Rc::new(Geometry3D::Manifold(Rc::new(Manifold::sphere(1.0, 32))));
 
-    let result = Geometry::boolean_op_multi(
+    let result = Geometry3D::boolean_op_multi(
         vec![a, b],
         &RenderResolution::default(),
         &BooleanOp::Difference,
@@ -62,7 +59,7 @@ fn test_boolean_op_multi() {
 
     let result = result.expect("test error");
 
-    if let Geometry::Manifold(manifold) = &*result {
+    if let Geometry3D::Manifold(manifold) = &*result {
         assert!(manifold.to_mesh().vertices().len() > 1);
     } else {
         panic!("Expected manifold");
@@ -71,7 +68,7 @@ fn test_boolean_op_multi() {
     let transform = crate::Mat4::from_translation(crate::Vec3::new(5.0, 10.0, 0.0));
     let result = result.transform(&transform);
 
-    if let Geometry::Manifold(manifold) = result {
+    if let Geometry3D::Manifold(manifold) = result {
         assert!(manifold.to_mesh().vertices().len() > 1);
     } else {
         panic!("Expected manifold");
