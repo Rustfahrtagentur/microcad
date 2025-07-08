@@ -15,7 +15,9 @@ path = "lib.rs"
 [dependencies]
 microcad-core = { workspace = true }
 microcad-lang = { workspace = true }
-geo = "0.29"
+
+cgmath = "0.18"
+geo = "0.30"
 thiserror = "2.0.12"
 
 [lints.rust]
