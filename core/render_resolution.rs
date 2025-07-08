@@ -5,11 +5,18 @@
 
 use crate::*;
 
-/// Render resolution when rendering things to polygons.
+/// Render resolution when rendering things to polygons or meshes.
 #[derive(Debug, Clone)]
 pub struct RenderResolution {
     /// Linear resolution in millimeters (Default = 0.1mm)
     pub linear: Scalar,
+}
+
+impl RenderResolution {
+    /// Create new render resolution.
+    pub fn new(linear: Scalar) -> Self {
+        Self { linear }
+    }
 }
 
 impl std::ops::Mul<Mat3> for RenderResolution {
