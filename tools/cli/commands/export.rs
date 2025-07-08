@@ -5,7 +5,8 @@
 
 use anyhow::anyhow;
 use microcad_builtin::{Exporter, ExporterAccess, ExporterRegistry};
-use microcad_lang::model_tree::{ExportAttribute, GetAttribute, ModelNode, ModelNodeOutput};
+use microcad_core::RenderResolution;
+use microcad_lang::{model_tree::*, ty::QuantityType, value::*};
 
 use crate::{config::Config, *};
 
@@ -32,21 +33,49 @@ pub struct Export {
 impl Export {
     /// Get default exporter.
     fn default_exporter(
-        output_type: &ModelNodeOutput,
+        output_type: &ModelNodeOutputType,
         config: &Config,
         exporters: &ExporterRegistry,
     ) -> anyhow::Result<std::rc::Rc<dyn Exporter>> {
         match output_type {
-            ModelNodeOutput::NotDetermined => Err(anyhow!("Could not determine node output type.")),
-            ModelNodeOutput::Geometry2D => {
+            ModelNodeOutputType::NotDetermined => {
+                Err(anyhow!("Could not determine node output type."))
+            }
+            ModelNodeOutputType::Geometry2D => {
                 Ok(exporters.exporter_by_id(&(&config.export.sketch).into())?)
             }
-            ModelNodeOutput::Geometry3D => {
+            ModelNodeOutputType::Geometry3D => {
                 Ok(exporters.exporter_by_id(&(&config.export.part).into())?)
             }
-            ModelNodeOutput::Invalid => Err(anyhow!(
+            ModelNodeOutputType::Invalid => Err(anyhow!(
                 "Invalid node output type, the node cannot be exported."
             )),
+        }
+    }
+
+    /// Parse render resolution.
+    fn resolution(&self) -> RenderResolution {
+        use microcad_lang::*;
+
+        use std::str::FromStr;
+        let value = syntax::NumberLiteral::from_str(&self.resolution)
+            .map(|literal| literal.value())
+            .unwrap_or(value::Value::None);
+
+        match value {
+            value::Value::Quantity(Quantity {
+                value,
+                quantity_type: QuantityType::Length,
+            }) => RenderResolution::new(value),
+            _ => {
+                let default = RenderResolution::default();
+                log::warn!(
+                    "Invalid resolution `{resolution}`. Using default resolution: {value}mm",
+                    resolution = self.resolution,
+                    value = default.linear
+                );
+                default
+            }
         }
     }
 
@@ -58,26 +87,32 @@ impl Export {
         exporters: &ExporterRegistry,
     ) -> anyhow::Result<ExportAttribute> {
         let default_exporter = Self::default_exporter(&node.output_type(), config, exporters);
+        let resolution = self.resolution();
 
         match &self.output {
-            Some(output) => Ok(ExportAttribute::new(
-                output.clone(),
-                exporters
-                    .exporter_by_filename(output)
+            Some(filename) => Ok(ExportAttribute {
+                filename: filename.to_path_buf(),
+                resolution,
+                exporter: exporters
+                    .exporter_by_filename(filename)
                     .or(default_exporter)?,
-            )),
+            }),
             None => {
-                let mut output = self.input.clone();
-                let default_exporter = default_exporter?;
+                let mut filename = self.input.clone();
+                let exporter = default_exporter?;
 
-                let ext = default_exporter
+                let ext = exporter
                     .file_extensions()
                     .first()
-                    .unwrap_or(&default_exporter.id())
+                    .unwrap_or(&exporter.id())
                     .to_string();
-                output.set_extension(&ext);
+                filename.set_extension(&ext);
 
-                Ok(ExportAttribute::new(output, default_exporter))
+                Ok(ExportAttribute {
+                    filename,
+                    exporter,
+                    resolution,
+                })
             }
         }
     }
@@ -116,11 +151,16 @@ impl Export {
         Ok(nodes)
     }
 
-    fn export_targets(&self, nodes: &Vec<(ModelNode, ExportAttribute)>) -> anyhow::Result<()> {
-        for (node, attr) in nodes {
-            attr.exporter.export(node, &attr.filename)?;
-        }
-
+    fn export_targets(&self, nodes: &[(ModelNode, ExportAttribute)]) -> anyhow::Result<()> {
+        nodes
+            .iter()
+            .try_for_each(|(node, attr)| -> anyhow::Result<()> {
+                let value = attr.export(node)?;
+                if !matches!(value, Value::None) {
+                    log::info!("{value}");
+                };
+                Ok(())
+            })?;
         Ok(())
     }
 

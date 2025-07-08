@@ -39,9 +39,9 @@ pub enum BuiltinTypeHelper {
     Weight,
     /// String type.
     String,
-    /// Bool type
+    /// Bool type.
     Bool,
-    /// Color type
+    /// Color type.
     Color,
 }
 

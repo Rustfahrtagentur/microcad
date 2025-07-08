@@ -37,25 +37,3 @@ fn svg_writer() {
     )
     .expect("test error");
 }
-
-#[test]
-fn svg_exporter() {
-    /*let root = ObjectBuilder::new(SrcRef(None))
-            .build_node()
-            .set_metadata(Metadata::new());
-
-        root.append(ModelNode::new_element(Refer::none(Element::Primitive2D(
-            Rc::new(Geometry2D::Rect(geo2d::Rect::new(
-                coord! {x: 0.0, y:0.0},
-                coord! {x: 10.0, y: 10.0},
-            ))),
-        ))));
-
-        root.append(ModelNode::new_element(Refer::none(Element::Primitive2D(
-            Rc::new(Geometry2D::Circle(geo2d::Circle {
-                radius: 5.0,
-                offset: Vec2::new(0.0, 0.0),
-            })),
-        ))));
-    */
-}

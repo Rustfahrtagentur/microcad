@@ -8,20 +8,20 @@ pub mod element;
 pub mod iter;
 pub mod model_node;
 pub mod model_node_builder;
-pub mod model_node_output;
 pub mod model_nodes;
 pub mod object;
-pub mod transformation;
+pub mod operation;
+pub mod output;
 
 pub use attribute::*;
 pub use element::*;
 pub use iter::*;
 pub use model_node::*;
 pub use model_node_builder::*;
-pub use model_node_output::*;
 pub use model_nodes::*;
 pub use object::*;
-pub use transformation::*;
+pub use operation::*;
+pub use output::*;
 
 #[cfg(test)]
 mod tests;

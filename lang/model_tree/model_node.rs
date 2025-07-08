@@ -46,25 +46,19 @@ pub struct ModelNodeInner {
     ///
     /// The id is set when the model node was created by an assignment: `a = cube(50mm)`.
     id: Option<Identifier>,
-
     /// Parent object.
     #[debug(skip)]
     parent: Option<ModelNode>,
-
     // Children of the model node.
     children: ModelNodes,
-
     /// Element of the node with [SrcRef].
     element: Refer<Element>,
-
     /// Attributes used for export.
     attributes: Attributes,
-
     /// The symbol (e.g. [`WorkbenchDefinition`]) that created this [`ModelNode`].
     origin: ModelNodeOrigin,
-
     /// The output type of the this node.
-    pub output_type: ModelNodeOutput,
+    output: ModelNodeOutput,
 }
 
 impl ModelNodeInner {
@@ -74,6 +68,11 @@ impl ModelNodeInner {
             element,
             ..Default::default()
         }
+    }
+
+    /// Return reference to the children of this node.
+    pub fn children(&self) -> &ModelNodes {
+        &self.children
     }
 
     /// Return element of this node.
@@ -96,13 +95,24 @@ impl ModelNodeInner {
         &mut self.attributes
     }
 
-    /// Set metadata for this node.
-    pub fn set_attributes(&mut self, metadata: Attributes) {
-        self.attributes = metadata;
+    /// Set attribute for this node.
+    pub fn set_attributes(&mut self, attributes: Attributes) {
+        self.attributes = attributes;
     }
-    /// Return reference to the children of this node.
-    pub fn children(&self) -> &ModelNodes {
-        &self.children
+
+    /// Return reference to the attributes of this node.
+    pub fn output(&self) -> &ModelNodeOutput {
+        &self.output
+    }
+
+    /// Return mutable reference for the attributes of this node
+    pub fn output_mut(&mut self) -> &mut ModelNodeOutput {
+        &mut self.output
+    }
+
+    /// Set output for this node.
+    pub fn set_output(&mut self, output: ModelNodeOutput) {
+        self.output = output;
     }
 
     /// Return a reference to the model node origin.
@@ -118,7 +128,7 @@ impl ModelNodeInner {
             element: self.element.clone(),
             attributes: self.attributes.clone(),
             origin: self.origin.clone(),
-            output_type: self.output_type.clone(),
+            output: self.output.clone(),
             ..Default::default()
         }
     }
@@ -151,8 +161,8 @@ impl ModelNode {
     }
 
     /// Return output type.
-    pub fn output_type(&self) -> ModelNodeOutput {
-        self.borrow().output_type.clone()
+    pub fn output_type(&self) -> ModelNodeOutputType {
+        self.borrow().output.model_node_output_type()
     }
 
     /// Get borrowed reference to the inner of this node.
@@ -220,8 +230,8 @@ impl ModelNode {
 
         let mut b = self.0.borrow_mut();
         // If this node's output type has not been determined, try to get it from child node
-        if b.output_type == ModelNodeOutput::NotDetermined {
-            b.output_type = node.output_type();
+        if b.output.model_node_output_type() == ModelNodeOutputType::NotDetermined {
+            b.set_output(ModelNodeOutput::new(node.output_type()));
         }
         b.children.push(node.clone());
 
@@ -269,6 +279,31 @@ impl ModelNode {
         })
     }
 
+    /// Set the transformation matrices for this node and its children.
+    pub fn set_matrix(&self, mat: Mat4) {
+        let mut b = self.borrow_mut();
+        let new_mat = match b.element() {
+            Element::Transform(affine_transform) => mat * affine_transform.mat3d(),
+            _ => mat,
+        };
+        b.output_mut().matrix = new_mat;
+
+        self.children().for_each(|node| {
+            node.set_matrix(new_mat);
+        });
+    }
+
+    /// Set the resolution for this node.
+    pub fn set_resolution(&self, resolution: RenderResolution) {
+        let mut b = self.borrow_mut();
+        let new_resolution = resolution * b.output().matrix;
+        b.output_mut().resolution = new_resolution.clone();
+
+        self.children().for_each(|node| {
+            node.set_resolution(new_resolution.clone());
+        });
+    }
+
     /// Test if the node has this specific source file.
     pub fn has_source_file(&self, source_file: &std::rc::Rc<SourceFile>) -> bool {
         match (source_file.as_ref(), self.find_source_file()) {
@@ -278,7 +313,7 @@ impl ModelNode {
     }
 
     /// Return inner node if we are in an [`Object`] node.
-    pub fn into_inner(self) -> Option<ModelNode> {
+    pub fn into_inner_object_node(&self) -> Option<ModelNode> {
         self.children().next().and_then(|n| {
             if let Element::Object(_) = n.0.borrow().element.value {
                 Some(n.clone())
@@ -306,7 +341,7 @@ impl ModelNode {
         if self.origin().creator.is_some() {
             s += format!(" = {origin}", origin = self.origin()).as_str();
         }
-        if !matches!(self.output_type(), ModelNodeOutput::NotDetermined) {
+        if !matches!(self.output_type(), ModelNodeOutputType::NotDetermined) {
             s += format!(" -> \"{output_type}\"", output_type = self.output_type()).as_str();
         }
         if self.has_children() {
@@ -389,6 +424,33 @@ impl ModelNode {
     pub fn set_attributes(&self, attributes: Attributes) -> Self {
         self.0.borrow_mut().set_attributes(attributes);
         self.clone()
+    }
+}
+
+impl Operation for ModelNode {
+    fn output_type(&self, node: &ModelNode) -> ModelNodeOutputType {
+        node.output_type()
+    }
+
+    fn process_2d(&self, node: &ModelNode) -> Geometries2D {
+        let mut geometries = Geometries2D::default();
+
+        let b = node.borrow();
+        match b.element() {
+            Element::Transform(_) | Element::Object(_) => {
+                node.children()
+                    .for_each(|node| geometries.append(node.process_2d(&node)));
+            }
+            Element::Primitive2D(geo) => {
+                geometries.push(geo.clone());
+                node.children()
+                    .for_each(|node| geometries.append(node.process_2d(&node)));
+            }
+            Element::Operation(operation) => geometries.append(operation.process_2d(node)),
+            _ => {}
+        }
+
+        geometries
     }
 }
 

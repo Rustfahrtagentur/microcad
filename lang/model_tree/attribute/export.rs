@@ -2,24 +2,33 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Export attribute.
-//!
-//!
 
-use crate::{builtin::Exporter, value::Value};
+use crate::{
+    builtin::{ExportError, Exporter},
+    model_tree::ModelNode,
+    value::Value,
+};
+use cgmath::SquareMatrix;
+use microcad_core::{Mat4, RenderResolution};
 
 /// Export attribute, e.g. `#[export("output.svg")`.
 #[derive(Clone)]
 pub struct ExportAttribute {
     /// Filename.
     pub filename: std::path::PathBuf,
+    /// Resolution
+    pub resolution: RenderResolution,
     /// Exporter.
     pub exporter: std::rc::Rc<dyn Exporter>,
 }
 
 impl ExportAttribute {
-    /// Create a new [`ExportAttribute`] with a filename and exporter.
-    pub fn new(filename: std::path::PathBuf, exporter: std::rc::Rc<dyn Exporter>) -> Self {
-        Self { filename, exporter }
+    /// Export the node. By the settings in the attribute.
+    pub fn export(&self, node: &ModelNode) -> Result<Value, ExportError> {
+        node.set_matrix(Mat4::identity());
+        node.set_resolution(self.resolution.clone());
+
+        self.exporter.export(node, &self.filename)
     }
 }
 

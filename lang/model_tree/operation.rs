@@ -6,22 +6,37 @@
 use crate::model_tree::*;
 use microcad_core::*;
 
-/// Transformation trait.
+/// Operation trait.
 pub trait Operation: std::fmt::Debug {
     /// The output type of this operation.
     ///
     /// By default, the output type is the same as the input node's output type.
-    fn output_type(&self, node: &ModelNode) -> ModelNodeOutput {
+    fn output_type(&self, node: &ModelNode) -> ModelNodeOutputType {
         node.output_type()
     }
 
-    /// Process the model
-    fn process(&self, node: ModelNode);
+    /// Process the model node.
+    fn process_2d(&self, _node: &ModelNode) -> Geometries2D {
+        unimplemented!()
+    }
+
+    /// Process the model node.
+    fn process_3d(&self, _node: &ModelNode) -> Geometries3D {
+        unimplemented!()
+    }
 }
 
 impl Operation for BooleanOp {
-    fn process(&self, _node: ModelNode) {
-        todo!("Implement boolean operations");
+    fn process_2d(&self, node: &ModelNode) -> Geometries2D {
+        let mut geometries = Geometries2D::default();
+
+        if let Some(node) = node.into_inner_object_node() {
+            node.children().for_each(|node| {
+                geometries.append(node.process_2d(&node));
+            });
+        }
+
+        geometries.boolean_op(&node.borrow().output().resolution, self)
     }
 }
 
@@ -57,11 +72,5 @@ impl AffineTransform {
             AffineTransform::Scale(v) => Mat4::from_nonuniform_scale(v.x, v.y, v.z),
             AffineTransform::UniformScale(s) => Mat4::from_scale(*s),
         }
-    }
-}
-
-impl Operation for AffineTransform {
-    fn process(&self, _node: ModelNode) {
-        todo!("Implement affine transforms")
     }
 }

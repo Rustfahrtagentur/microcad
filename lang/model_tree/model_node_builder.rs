@@ -19,7 +19,7 @@ pub struct ModelNodeBuilder<'a> {
     pub children: ModelNodes,
 
     /// The output type of this node.
-    output_type: ModelNodeOutput,
+    output: ModelNodeOutputType,
 
     /// An optional context for error handling.
     _context: Option<&'a mut Context>,
@@ -43,7 +43,7 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn new_2d_object() -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
-            output_type: ModelNodeOutput::Geometry2D,
+            output: ModelNodeOutputType::Geometry2D,
             ..Default::default()
         }
     }
@@ -62,7 +62,7 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn new_3d_object() -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
-            output_type: ModelNodeOutput::Geometry3D,
+            output: ModelNodeOutputType::Geometry3D,
             ..Default::default()
         }
     }
@@ -71,7 +71,7 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn new_2d_primitive(geometry: std::rc::Rc<Geometry2D>) -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Primitive2D(geometry))),
-            output_type: ModelNodeOutput::Geometry2D,
+            output: ModelNodeOutputType::Geometry2D,
             ..Default::default()
         }
     }
@@ -80,7 +80,7 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn new_3d_primitive(geometry: std::rc::Rc<Geometry3D>) -> Self {
         Self {
             inner: ModelNodeInner::new(Refer::none(Element::Primitive3D(geometry))),
-            output_type: ModelNodeOutput::Geometry3D,
+            output: ModelNodeOutputType::Geometry3D,
             ..Default::default()
         }
     }
@@ -106,7 +106,7 @@ impl<'a> ModelNodeBuilder<'a> {
     /// Determine the output type of this node by some child node.
     ///
     /// TODO: Replace `panic!` with context warnings.
-    pub fn determine_output_type(&self, child: &ModelNode) -> EvalResult<ModelNodeOutput> {
+    pub fn determine_output_type(&self, child: &ModelNode) -> EvalResult<ModelNodeOutputType> {
         match self.inner.element() {
             Element::ChildrenPlaceholder => panic!("A child placeholder cannot have children"),
             Element::Transform(_) => {
@@ -125,30 +125,30 @@ impl<'a> ModelNodeBuilder<'a> {
         }
 
         match child.output_type() {
-            ModelNodeOutput::NotDetermined => {
-                return Ok(self.output_type.clone());
+            ModelNodeOutputType::NotDetermined => {
+                return Ok(self.output.clone());
             }
-            ModelNodeOutput::Invalid => {
+            ModelNodeOutputType::Invalid => {
                 panic!("Child node's output type is invalid.")
             }
             _ => {}
         }
 
-        match self.output_type {
-            ModelNodeOutput::NotDetermined => {
+        match self.output {
+            ModelNodeOutputType::NotDetermined => {
                 // Determine nodes output type by child output type.
             }
-            ModelNodeOutput::Geometry2D => {
-                if child.output_type() == ModelNodeOutput::Geometry3D {
+            ModelNodeOutputType::Geometry2D => {
+                if child.output_type() == ModelNodeOutputType::Geometry3D {
                     panic!("Cannot nest a 2D geometry in a 3D geometry node.")
                 }
             }
-            ModelNodeOutput::Geometry3D => {
-                if child.output_type() == ModelNodeOutput::Geometry2D {
+            ModelNodeOutputType::Geometry3D => {
+                if child.output_type() == ModelNodeOutputType::Geometry2D {
                     panic!("Cannot nest a 3D geometry in a 2D geometry node.")
                 }
             }
-            ModelNodeOutput::Invalid => {
+            ModelNodeOutputType::Invalid => {
                 panic!("Invalid output type.")
             }
         }
@@ -160,7 +160,7 @@ impl<'a> ModelNodeBuilder<'a> {
     pub fn add_children(mut self, children: ModelNodes) -> EvalResult<Self> {
         if let Some(child) = children.first() {
             //  TODO Check child's output type
-            self.output_type = self.determine_output_type(child)?;
+            self.output = self.determine_output_type(child)?;
         }
 
         for child in children.iter() {
@@ -192,7 +192,7 @@ impl<'a> ModelNodeBuilder<'a> {
         if let Element::Object(object) = self.inner.element_mut() {
             object.props = self.properties
         }
-        self.inner.output_type = self.output_type;
+        self.inner.set_output(ModelNodeOutput::new(self.output));
 
         let node = ModelNode::new(self.inner);
         node.append_children(self.children)

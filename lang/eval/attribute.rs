@@ -10,7 +10,7 @@ use crate::{
     Id,
 };
 
-use microcad_core::Color;
+use microcad_core::{Color, RenderResolution};
 use thiserror::Error;
 
 /// Error type for attributes.
@@ -45,6 +45,7 @@ impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
                     &arguments.eval(context)?,
                     &[
                         parameter!(filename: String),
+                        parameter!(resolution: Length = 0.1 /*mm*/),
                         parameter!(id: String = String::new()),
                     ]
                     .into_iter()
@@ -55,10 +56,17 @@ impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
                             arguments.get::<String>("filename").into();
                         let id: Id = arguments.get::<String>("id").into();
                         let id: Option<Id> = if id.is_empty() { None } else { Some(id) };
+                        let resolution = RenderResolution::new(
+                            argument_map.get::<&Value>("resolution").try_scalar()?,
+                        );
 
                         match context.find_exporter(&filename, &id) {
                             Ok(exporter) => {
-                                return Ok(Some(ExportAttribute::new(filename, exporter)));
+                                return Ok(Some(ExportAttribute {
+                                    filename,
+                                    exporter,
+                                    resolution,
+                                }));
                             }
                             Err(err) => context.warning(self, err)?,
                         }

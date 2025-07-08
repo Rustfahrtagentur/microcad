@@ -29,7 +29,7 @@ pub enum Element {
     /// A 3D geometry.
     Primitive3D(std::rc::Rc<Geometry3D>),
 
-    /// An operation that generates a geometry from its children.
+    /// An operation that generates geometries from its children.
     Operation(std::rc::Rc<dyn Operation>),
 }
 
