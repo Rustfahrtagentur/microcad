@@ -131,10 +131,8 @@ qualified_name = { identifier ~ ("::" ~ identifier)* }
 
 //`int`: ok
 //`a::nested::typename`: ok
-//`[scalar]`: ok # List type
-//`(scalar, scalar)`: ok # Unnamed tuple type
-//`(a: scalar, scalar)`: ok # Partially named tuple type
-//`(a: scalar, b: scalar)`: ok # Named tuple type
+//`[Scalar]`: ok # List type
+//`(a: Scalar, b: Scalar)`: ok # Named tuple type
 type = {
   list_type |
   tuple_type |
