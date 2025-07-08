@@ -136,12 +136,12 @@ impl SvgWriter {
         )
     }
 
-    /// End a SVG transformation </g>
+    /// End a SVG transformation group `</g>`.
     pub fn end_transform(&mut self) -> std::io::Result<()> {
         self.end_group()
     }
 
-    /// Generate rectangle
+    /// Generate rectangle.
     pub fn rect(&mut self, rect: &geo2d::Rect, attr: &SvgTagAttributes) -> std::io::Result<()> {
         let x = rect.min().x;
         let y = rect.min().y;
@@ -154,7 +154,7 @@ impl SvgWriter {
         )
     }
 
-    /// Generate circle
+    /// Generate circle.
     pub fn circle(
         &mut self,
         circle: &geo2d::Circle,
@@ -165,7 +165,7 @@ impl SvgWriter {
         self.tag(&format!("circle cx=\"{cx}\" cy=\"{cy}\" r=\"{r}\""), attr)
     }
 
-    /// Generate line
+    /// Generate line.
     pub fn line(
         &mut self,
         p1: geo2d::Point,
@@ -179,7 +179,7 @@ impl SvgWriter {
         )
     }
 
-    /// Generate line string
+    /// Generate line string.
     pub fn line_string(
         &mut self,
         line_string: &geo2d::LineString,
@@ -202,7 +202,7 @@ impl SvgWriter {
             .try_for_each(|line_string| self.line_string(line_string, attr))
     }
 
-    /// Generate polygon
+    /// Generate polygon.
     pub fn polygon(
         &mut self,
         polygon: &geo2d::Polygon,
@@ -265,7 +265,7 @@ impl SvgWriter {
 
     /// Generate SVG for a node.
     pub fn node(&mut self, node: &ModelNode) -> std::io::Result<()> {
-        assert_eq!(node.output_type(), ModelNodeOutput::Geometry2D);
+        assert_eq!(node.output_type(), ModelNodeOutputType::Geometry2D);
 
         let attr: SvgTagAttributes = node
             .get_exporter_attribute(&Identifier::no_ref("svg"))
@@ -286,8 +286,11 @@ impl SvgWriter {
                 self.end_transform()?;
             }
             Element::Primitive2D(geometry) => self.geometry(geometry, &attr)?,
-            Element::Operation(_) => {
-                todo!("Output processed operation results")
+            Element::Operation(operation) => {
+                operation
+                    .process_2d(node)
+                    .iter()
+                    .try_for_each(|geometry| self.geometry(geometry, &attr))?;
             }
             _ => {}
         }
