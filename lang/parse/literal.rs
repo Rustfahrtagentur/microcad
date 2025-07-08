@@ -61,7 +61,7 @@ impl std::str::FromStr for NumberLiteral {
     type Err = ParseError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        Parser::parse_rule::<Self>(Rule::number_literal, s, 0)
+        Parser::parse_rule(Rule::number_literal, s, 0)
     }
 }
 
