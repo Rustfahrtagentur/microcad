@@ -40,10 +40,9 @@ impl Expression {
         match value {
             Value::Nodes(mut nodes) => {
                 let attributes = attribute_list.eval(context)?;
-                use std::borrow::BorrowMut;
-                for node in nodes.iter_mut() {
+                nodes.iter_mut().for_each(|node| {
                     node.borrow_mut().set_attributes(attributes.clone());
-                }
+                });
                 Ok(Value::Nodes(nodes))
             }
             Value::None => Ok(Value::None),
