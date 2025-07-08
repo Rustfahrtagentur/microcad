@@ -120,7 +120,11 @@ impl SvgWriter {
     }
 
     /// Begin a SVG transformation <g>
-    pub fn begin_transform(&mut self, transform: &microcad_core::Mat3) -> std::io::Result<()> {
+    pub fn begin_transform(
+        &mut self,
+        transform: &microcad_core::Mat3,
+        attr: &SvgTagAttributes,
+    ) -> std::io::Result<()> {
         let (a, b, c, d, e, f) = (
             transform.x.x,
             transform.x.y,
@@ -132,7 +136,7 @@ impl SvgWriter {
 
         self.begin_tag(
             &format!("g transform=\"matrix({a} {b} {c} {d} {e} {f})\""),
-            &SvgTagAttributes::default(),
+            attr,
         )
     }
 
@@ -284,7 +288,7 @@ impl SvgWriter {
             }
             Element::Transform(affine_transform) => {
                 if node.has_children() {
-                    self.begin_transform(&affine_transform.mat2d())?;
+                    self.begin_transform(&affine_transform.mat2d(), &attr)?;
                     node.children().try_for_each(|child| self.node(&child))?;
                     self.end_transform()?;
                 }
