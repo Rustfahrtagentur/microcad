@@ -11,7 +11,6 @@ pub mod import;
 mod math;
 mod ops;
 mod print;
-mod transform;
 
 /// Global test initialization.
 #[cfg(test)]
@@ -28,7 +27,6 @@ pub use context_builder::*;
 pub(crate) use math::*;
 pub(crate) use ops::*;
 pub(crate) use print::*;
-pub(crate) use transform::*;
 
 /// Build the standard module
 pub fn builtin_module() -> Symbol {
@@ -43,7 +41,6 @@ pub fn builtin_module() -> Symbol {
         .symbol(warning())
         .symbol(info())
         .symbol(ops())
-        .symbol(transform())
         .symbol(math())
         .symbol(import::import())
         .symbol(geo2d::geo2d())
