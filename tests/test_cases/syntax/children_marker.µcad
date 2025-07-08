@@ -1,10 +1,10 @@
 use __builtin::*;
 
-// Define a part `circle_difference` with a radius as a parameter
+// Define a part `circle_union` with a radius as a parameter
 // If creates an algorithm node with a circle node as a child
 // The `@children` marker is used to display that all children of the part will be added to the algorithm node
-sketch circle_difference(radius: Scalar) {
-    ops::difference() {
+sketch circle_union(radius: Scalar) {
+    ops::union() {
         geo2d::circle(radius);
         @children
     }
@@ -16,8 +16,8 @@ a = geo2d::circle(1.0) {
     geo2d::circle(3.0);
 };
 
-// Create a circle_difference node with three children
-circle_difference(4.0) {
+// Create a circle_union node with three children
+circle_union(4.0) {
     geo2d::circle(5.0);
     geo2d::circle([6.0, 7.0]); // Test multiplicity
     a;
