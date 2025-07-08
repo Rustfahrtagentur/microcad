@@ -281,12 +281,15 @@ impl ModelNode {
 
     /// Set the transformation matrices for this node and its children.
     pub fn set_matrix(&self, mat: Mat4) {
-        let mut b = self.borrow_mut();
-        let new_mat = match b.element() {
-            Element::Transform(affine_transform) => mat * affine_transform.mat3d(),
-            _ => mat,
+        let new_mat = {
+            let mut b = self.borrow_mut();
+            let new_mat = match b.element() {
+                Element::Transform(affine_transform) => mat * affine_transform.mat3d(),
+                _ => mat,
+            };
+            b.output_mut().matrix = new_mat;
+            new_mat
         };
-        b.output_mut().matrix = new_mat;
 
         self.children().for_each(|node| {
             node.set_matrix(new_mat);
@@ -295,9 +298,12 @@ impl ModelNode {
 
     /// Set the resolution for this node.
     pub fn set_resolution(&self, resolution: RenderResolution) {
-        let mut b = self.borrow_mut();
-        let new_resolution = resolution * b.output().matrix;
-        b.output_mut().resolution = new_resolution.clone();
+        let new_resolution = {
+            let mut b = self.borrow_mut();
+            let new_resolution = resolution * b.output().matrix;
+            b.output_mut().resolution = new_resolution.clone();
+            new_resolution
+        };
 
         self.children().for_each(|node| {
             node.set_resolution(new_resolution.clone());
