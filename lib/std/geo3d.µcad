@@ -22,7 +22,7 @@ part cube(size_x: Length, size_y: Length, size_z: Length) {
         size_z = size;
     }
 
-    __builtin::transform::translate(
+    __builtin::ops::translate(
             -size_x / 2.0 / 1mm,
             -size_y / 2.0 / 1mm,
             -size_z / 2.0 / 1mm
@@ -78,7 +78,7 @@ part cylinder(radius_bottom: Length, radius_top: Length, height: Length, offset:
         height = h;
     }
 
-    __builtin::transform::translate(x = 0.0, y = 0.0, z = offset / 1mm) {
+    __builtin::ops::translate(x = 0.0, y = 0.0, z = offset / 1mm) {
         __builtin::geo3d::cylinder(
             radius_bottom = radius_bottom / 1mm,
             radius_top = radius_top / 1mm,

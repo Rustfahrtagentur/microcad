@@ -17,6 +17,6 @@ height = 20.0mm;
 print("{thickness} {inner_diameter} {outer_diameter} {height}");
 
 outer = cyl(d = outer_diameter, h = height);
-inner = transform::translate(x = 0.0, y = 0.0, z = thickness / 1mm) cyl(d = inner_diameter, h = height);
+inner = ops::translate(x = 0.0, y = 0.0, z = thickness / 1mm) cyl(d = inner_diameter, h = height);
  
 outer - inner;
