@@ -286,16 +286,27 @@ impl SvgWriter {
 
         match element {
             Element::Object(_) => {
-                self.begin_group(&attr)?;
-                node.children().try_for_each(|child| self.node(&child))?;
-                self.end_group()?;
+                if node.has_children() {
+                    self.begin_group(&attr)?;
+                    node.children().try_for_each(|child| self.node(&child))?;
+                    self.end_group()?;
+                }
             }
             Element::Transform(affine_transform) => {
-                self.begin_transform(&affine_transform.mat2d())?;
-                node.children().try_for_each(|child| self.node(&child))?;
-                self.end_transform()?;
+                if node.has_children() {
+                    self.begin_transform(&affine_transform.mat2d())?;
+                    node.children().try_for_each(|child| self.node(&child))?;
+                    self.end_transform()?;
+                }
             }
-            Element::Primitive2D(geometry) => self.geometry(geometry, &attr)?,
+            Element::Primitive2D(geometry) => {
+                self.geometry(geometry, &attr)?;
+                if node.has_children() {
+                    self.begin_group(&attr)?;
+                    node.children().try_for_each(|child| self.node(&child))?;
+                    self.end_group()?;
+                }
+            }
             Element::Operation(operation) => {
                 operation
                     .process_2d(node)
