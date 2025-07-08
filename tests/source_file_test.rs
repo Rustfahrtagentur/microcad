@@ -40,8 +40,24 @@ impl SourceFileTest {
         self.write_and_compare(symbol_tree, "symbol_tree");
 
         match context.eval() {
-            Ok(model_tree) => {
-                self.write_and_compare(model_tree, "model_tree");
+            Ok(node) => {
+                use microcad_core::RenderResolution;
+                use microcad_lang::model_tree::{ExportAttribute as Export, ModelNodeOutputType};
+
+                self.write_and_compare(node.clone(), "model_tree");
+
+                if !context.has_errors() {
+                    // If we have a 2D node, export node to SVG
+                    if node.output_type() == ModelNodeOutputType::Geometry2D {
+                        Export {
+                            filename: self.output_filename("svg").into(),
+                            resolution: RenderResolution::default(),
+                            exporter: std::rc::Rc::new(microcad_export::svg::SvgExporter),
+                        }
+                        .export(&node)
+                        .expect("No error");
+                    }
+                }
             }
             Err(err) => {
                 panic!("Error evaluating context: {err}");
