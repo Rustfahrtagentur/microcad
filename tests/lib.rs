@@ -24,15 +24,13 @@ include!(concat!(env!("OUT_DIR"), "/microcad_markdown_test.rs"));
 /// Evaluate the context for a file in the `test_cases` folder.
 #[cfg(test)]
 fn context_for_file(filename: &str) -> microcad_lang::eval::Context {
-    use microcad_lang::eval::*;
-
     let filename = format!("../tests/test_cases/{filename}");
-    Context::from_source(
-        &filename,
-        microcad_builtin::builtin_module(),
+    microcad_builtin::builtin_context(
+        microcad_lang::syntax::SourceFile::load(filename)
+            .expect("Source file")
+            .resolve(None),
         &["../lib".into()],
     )
-    .expect(&filename)
 }
 
 /// Test a single source file.
