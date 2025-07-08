@@ -1,10 +1,8 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::rc::Rc;
-
 use super::*;
-/// Macro crate a 2d coordinate
+
 use strum::IntoStaticStr;
 
 /// Geometry
@@ -44,29 +42,6 @@ impl Geometry2D {
         !matches!(
             self,
             Geometry2D::LineString(_) | Geometry2D::MultiLineString(_)
-        )
-    }
-
-    /// Apply boolean operation to multiple geometries.
-    pub fn boolean_op_multi(
-        geometries: Vec<Rc<Self>>,
-        resolution: &RenderResolution,
-        op: &crate::BooleanOp,
-    ) -> Option<Rc<Self>> {
-        if geometries.is_empty() {
-            return None;
-        }
-
-        Some(
-            geometries[1..]
-                .iter()
-                .fold(geometries[0].clone(), |acc, geo| {
-                    if let Some(r) = acc.boolean_op(resolution, geo.as_ref(), op) {
-                        Rc::new(r)
-                    } else {
-                        acc
-                    }
-                }),
         )
     }
 

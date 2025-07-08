@@ -5,39 +5,57 @@
 
 use std::rc::Rc;
 
+use derive_more::{Deref, DerefMut};
+
 use crate::{
     geo2d::{FetchBounds2D, bounds::Bounds2D},
     *,
 };
 
-/// 2D geometry collection with bounding box.
-#[derive(Debug, Clone, Default)]
-pub struct Geometries2D {
-    /// Geometries.
-    geometries: Vec<Rc<Geometry2D>>,
-    /// Bounding rect.
-    bounds: Bounds2D,
-}
+/// 2D geometry collection.
+#[derive(Debug, Clone, Default, Deref, DerefMut)]
+pub struct Geometries2D(Vec<Rc<Geometry2D>>);
 
 impl Geometries2D {
     /// New geometry collection.
     pub fn new(geometries: Vec<Rc<Geometry2D>>) -> Self {
-        let bounds: Bounds2D = geometries.iter().fold(Bounds2D::default(), |acc, e| {
-            acc.extend(e.fetch_bounds_2d())
-        });
-
-        Self { geometries, bounds }
+        Self(geometries)
     }
 
-    /// Push a new geometry to the collection and update bounding box.
-    pub fn push(&mut self, geometry: Rc<Geometry2D>) {
-        self.bounds = self.bounds.clone().extend(geometry.fetch_bounds_2d());
-        self.geometries.push(geometry)
+    /// Append another geometry collection.
+    pub fn append(&mut self, mut geometries: Geometries2D) {
+        self.0.append(&mut geometries.0)
+    }
+
+    /// Apply boolean operation to multiple geometries.
+    pub fn boolean_op(&self, resolution: &RenderResolution, op: &crate::BooleanOp) -> Self {
+        if self.0.is_empty() {
+            return Geometries2D::default();
+        }
+
+        self.0[1..]
+            .iter()
+            .fold(self.0[0].clone(), |acc, geo| {
+                if let Some(r) = acc.boolean_op(resolution, geo.as_ref(), op) {
+                    Rc::new(r)
+                } else {
+                    acc
+                }
+            })
+            .into()
     }
 }
 
 impl FetchBounds2D for Geometries2D {
     fn fetch_bounds_2d(&self) -> Bounds2D {
-        self.bounds.clone()
+        self.0.iter().fold(Bounds2D::default(), |bounds, geometry| {
+            bounds.extend(geometry.fetch_bounds_2d())
+        })
+    }
+}
+
+impl From<std::rc::Rc<Geometry2D>> for Geometries2D {
+    fn from(geometry: std::rc::Rc<Geometry2D>) -> Self {
+        Self::new(vec![geometry])
     }
 }
