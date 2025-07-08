@@ -10,18 +10,6 @@ use crate::{src_ref::*, syntax::*, ty::*, value::*};
 pub struct NumberLiteral(pub f64, pub Unit, pub SrcRef);
 
 impl NumberLiteral {
-    /// Create from usize value
-    #[cfg(test)]
-    pub fn from_usize(value: usize) -> Self {
-        Self(value as f64, Unit::None, SrcRef(None))
-    }
-
-    /// Create from integer value
-    #[cfg(test)]
-    pub fn from_int(value: i64) -> Self {
-        Self(value as f64, Unit::None, SrcRef(None))
-    }
-
     /// Returns the actual value of the literal
     pub fn normalized_value(&self) -> f64 {
         self.1.normalize(self.0)
