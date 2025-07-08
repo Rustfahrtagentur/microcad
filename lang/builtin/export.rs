@@ -16,8 +16,8 @@ pub enum ExportError {
     #[error("IO Error")]
     IoError(#[from] std::io::Error),
 
-    /// The node does not contain any export metadata.
-    #[error("No export metadata found in node. Mark the node with `#[export(\"filename\")`")]
+    /// The node does not contain any export attribute.
+    #[error("No export attribute found in node. Mark the node with `#[export(\"filename\")`")]
     NoExportAttribute,
 
     /// No exporter found for file.
@@ -57,8 +57,8 @@ pub trait Exporter: FileIoInterface {
     /// The expected node output type of this exporter.
     ///
     /// Reimplement this function when your export output format only accepts specific node types.
-    fn node_output_type(&self) -> ModelNodeOutput {
-        ModelNodeOutput::NotDetermined
+    fn node_output_type(&self) -> ModelNodeOutputType {
+        ModelNodeOutputType::NotDetermined
     }
 }
 

@@ -7,7 +7,7 @@ use derive_more::{Deref, DerefMut};
 
 use crate::{model_tree::*, syntax::Identifier};
 
-/// Node metadata, from an evaluated attribute list.
+/// Node attributes, from an evaluated attribute list.
 #[derive(Clone, Debug, Default, Deref, DerefMut)]
 pub struct Attributes(Vec<Attribute>);
 

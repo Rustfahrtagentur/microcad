@@ -25,11 +25,13 @@ pub enum BuiltinTypeHelper {
     Integer,
     /// Scalar type.
     Scalar,
+    /// Length type.
+    Length,
     /// Angle type.
     Angle,
     /// String type.
     String,
-    /// Color type
+    /// Color type.
     Color,
 }
 
@@ -38,6 +40,7 @@ impl From<BuiltinTypeHelper> for Type {
         match value {
             BuiltinTypeHelper::Integer => Type::Integer,
             BuiltinTypeHelper::Scalar => Type::Quantity(QuantityType::Scalar),
+            BuiltinTypeHelper::Length => Type::Quantity(QuantityType::Length),
             BuiltinTypeHelper::Angle => Type::Quantity(QuantityType::Angle),
             BuiltinTypeHelper::String => Type::String,
             BuiltinTypeHelper::Color => Type::Tuple(TupleType::new_color().into()),
