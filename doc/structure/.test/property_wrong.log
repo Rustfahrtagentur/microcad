@@ -1,6 +1,6 @@
 -- Test --
   property_wrong
-  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:270
+  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:278
 -- Output --
 -- Errors --
 error: Missing arguments: outer

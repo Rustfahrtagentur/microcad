@@ -1,7 +1,7 @@
 -- Test --
   code_between_initializers
-  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:193
+  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:197
 -- Output --
 -- Errors --
 -- Test Result --
-OK BUT SHOULD FAIL
+OK

@@ -1,7 +1,7 @@
 -- Test --
   missed_property
-  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:148
+  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:150
 -- Output --
 -- Errors --
 -- Test Result --
-OK BUT SHOULD FAIL
+OK
