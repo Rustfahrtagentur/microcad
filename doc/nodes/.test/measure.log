@@ -1,3 +1,9 @@
 -- Test --
   measure
   /home/micha/Work/mcad/mcad/doc/nodes/measures.md:9
+-- Output --
+-- Errors --
+error: Not implemented: call_method for Nodes
+error: Assertion failed: <invalid> != Area = 314.1592653589793
+-- Test Result --
+TODO
