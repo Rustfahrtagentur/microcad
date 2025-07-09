@@ -369,7 +369,7 @@ fn create_test_code(
 ) -> String {
     let banner = banner.to_string_lossy().escape_default().to_string();
     let out = out.to_string_lossy().escape_default().to_string();
-    let todo = mode == Some("todo");
+    let todo = mode == Some("todo") || mode == Some("todo_fail");
 
     format!(
         r###"#[test]
