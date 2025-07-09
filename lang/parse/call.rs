@@ -11,10 +11,7 @@ impl Parse for Call {
 
         Ok(Call {
             name: QualifiedName::parse(first)?,
-            argument_list: match inner.next() {
-                Some(pair) => ArgumentList::parse(pair)?,
-                None => ArgumentList::default(),
-            },
+            argument_list: pair.find(Rule::argument_list).unwrap_or_default(),
             src_ref: pair.clone().into(),
         })
     }
@@ -22,14 +19,21 @@ impl Parse for Call {
 
 impl Parse for ArgumentList {
     fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rule(&pair, Rule::argument_list);
         let mut argument_list = ArgumentList(Refer::new(OrdMap::default(), pair.clone().into()));
 
         match pair.as_rule() {
             Rule::argument_list => {
                 for pair in pair.inner() {
-                    argument_list
-                        .try_push(Argument::parse(pair)?)
-                        .map_err(ParseError::DuplicateArgument)?;
+                    match pair.as_rule() {
+                        Rule::named_argument | Rule::expression => {
+                            argument_list
+                                .try_push(Argument::parse(pair)?)
+                                .map_err(ParseError::DuplicateArgument)?;
+                        }
+                        Rule::COMMENT => {}
+                        rule => unreachable!("Expected argument, found {rule:?}"),
+                    }
                 }
 
                 Ok(argument_list)
