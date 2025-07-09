@@ -176,7 +176,12 @@ impl Parse for Expression {
                     }
                 }
             })
-            .parse(pair.pest_pair().clone().into_inner())
+            .parse(
+                pair.pest_pair()
+                    .clone()
+                    .into_inner()
+                    .filter(|pair| pair.as_rule() != Rule::COMMENT), // Filter comments
+            )
     }
 }
 
