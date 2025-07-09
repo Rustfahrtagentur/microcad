@@ -111,17 +111,6 @@ pub fn assert_invalid() -> Symbol {
     })
 }
 
-pub fn type_of() -> Symbol {
-    let id = Identifier::from_str("type_of").expect("valid id");
-    Symbol::new_builtin(id, None, &|_, args, _| {
-        if let Ok(arg) = args.get_single() {
-            let ty = arg.value.ty();
-            return Ok(Value::String(ty.to_string()));
-        }
-        Ok(Value::None)
-    })
-}
-
 #[test]
 fn assert_ok() {
     let mut context = Context::from_source(

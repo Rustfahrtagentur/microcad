@@ -19,14 +19,43 @@ fn init() {
     env_logger::init();
 }
 
+use std::str::FromStr;
+
 pub use microcad_lang::builtin::*;
-use microcad_lang::{eval::*, resolve::*};
+use microcad_lang::{diag::*, eval::*, resolve::*, syntax::*, ty::Ty, value::*};
 
 pub(crate) use assert::*;
 pub use context_builder::*;
 pub(crate) use math::*;
 pub(crate) use ops::*;
 pub(crate) use print::*;
+
+/// Return type of argument.
+fn type_of() -> Symbol {
+    let id = Identifier::from_str("type_of").expect("valid id");
+    Symbol::new_builtin(id, None, &|_, args, _| {
+        if let Ok(arg) = args.get_single() {
+            let ty = arg.value.ty();
+            return Ok(Value::String(ty.to_string()));
+        }
+        Ok(Value::None)
+    })
+}
+
+/// Return the count of elements in an array or string.
+fn count() -> Symbol {
+    Symbol::new_builtin(Identifier::no_ref("count"), None, &|_params, args, ctx| {
+        let arg = args.get_single()?;
+        Ok(match &arg.value {
+            Value::String(s) => Value::Integer(s.chars().count() as i64),
+            Value::Array(a) => Value::Integer(a.len() as i64),
+            _ => {
+                ctx.error(arg, EvalError::BuiltinError("Value has no count.".into()))?;
+                Value::None
+            }
+        })
+    })
+}
 
 /// Build the standard module
 pub fn builtin_module() -> Symbol {
@@ -35,6 +64,7 @@ pub fn builtin_module() -> Symbol {
         .symbol(assert_eq())
         .symbol(assert_valid())
         .symbol(assert_invalid())
+        .symbol(count())
         .symbol(type_of())
         .symbol(print())
         .symbol(error())
