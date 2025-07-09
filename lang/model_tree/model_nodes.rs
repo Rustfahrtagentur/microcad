@@ -135,6 +135,22 @@ impl ModelNodes {
             .collect::<Vec<_>>()
             .into()
     }
+
+    /// Get common output type of model node collection.
+    pub fn output_type(&self) -> ModelNodeOutputType {
+        if self.is_empty() {
+            ModelNodeOutputType::NotDetermined
+        } else {
+            let first = self.first().expect("Node").output_type();
+            self.iter().fold(first, |output_type, node| {
+                if output_type != node.output_type() {
+                    ModelNodeOutputType::InvalidMixed
+                } else {
+                    output_type
+                }
+            })
+        }
+    }
 }
 
 impl std::ops::Deref for ModelNodes {

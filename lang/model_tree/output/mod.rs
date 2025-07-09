@@ -34,7 +34,7 @@ impl ModelNodeOutput {
             ModelNodeOutputType::Geometry3D => {
                 ModelNodeGeometryOutput::Geometries3D(Geometries3D::default())
             }
-            ModelNodeOutputType::Invalid => ModelNodeGeometryOutput::Invalid,
+            ModelNodeOutputType::InvalidMixed => ModelNodeGeometryOutput::Invalid,
         };
 
         Self {

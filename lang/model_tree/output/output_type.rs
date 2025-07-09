@@ -16,7 +16,7 @@ pub enum ModelNodeOutputType {
     /// The [`ModelNode`] outputs a 3d geometry.
     Geometry3D,
     /// The [`ModelNode`] is invalid, you cannot mix 2d and 3d geometry.
-    Invalid,
+    InvalidMixed,
 }
 
 impl std::fmt::Display for ModelNodeOutputType {

@@ -47,7 +47,7 @@ impl Export {
             ModelNodeOutputType::Geometry3D => {
                 Ok(exporters.exporter_by_id(&(&config.export.part).into())?)
             }
-            ModelNodeOutputType::Invalid => Err(anyhow!(
+            ModelNodeOutputType::InvalidMixed => Err(anyhow!(
                 "Invalid node output type, the node cannot be exported."
             )),
         }
