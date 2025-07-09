@@ -7,7 +7,7 @@ and the result is a *value*:
 
 [![test](.test/call_function.png)](.test/call_function.log)
 
-```µcad,call_function
+```µcad,call_function#todo
 // function definition
 fn square(x: Scalar) { x * x }
 
@@ -44,7 +44,7 @@ std::translate(x = 1cm) s;
 
 [![test](.test/call_op.png)](.test/call_op.log)
 
-```µcad,call_op
+```µcad,call_op#todo
 // function definition
 fn square(x: Scalar) { x * x }
 

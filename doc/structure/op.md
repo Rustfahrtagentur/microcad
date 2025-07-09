@@ -27,7 +27,7 @@ An operation can have multiple children like in this example:
 
 [![test](.test/children.png)](.test/children.log)
 
-```µcad,children
+```µcad,children#todo
 // define operation which takes multiple items
 op punched_disk() { 
     // check number of children
@@ -50,9 +50,9 @@ Like other workbenches operations can have parameters too:
 
 [![test](.test/parameters.png)](.test/parameters.log)
 
-```µcad,parameters
+```µcad,parameters#todo
 // define operation which takes multiple items
-op punch_disk(radius: Length) { 
+op punch_disk(radius: Length) {
     if @children.count() == 1 {
         difference() { 
             @children 

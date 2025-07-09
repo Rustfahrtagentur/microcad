@@ -6,9 +6,8 @@ The following example calculates the area of a circle by using the *measure* `ar
 
 [![test](.test/measure.png)](.test/measure.log)
 
-```µcad,measure
+```µcad,measure#todo
 __builtin::assert_eq([
-
     // use measure area() on a circle
     std::geo2d::circle(radius=10mm).area(),
 
