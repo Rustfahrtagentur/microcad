@@ -1,14 +1,13 @@
 # Workbenches
 
-- [Workbenches](#workbenches)
-  - [Workbench Types](#workbench-types)
+- [Workbench Types](#workbench-types)
+- [Workbench Declaration](#workbench-declaration)
   - [Workbench Elements](#workbench-elements)
-  - [Workbench Declaration](#workbench-declaration)
-    - [Building Plan](#building-plan)
-    - [Initializers](#initializers)
-    - [Init Code](#init-code)
-    - [Building Code](#building-code)
-  - [Properties](#properties)
+  - [Building Plan](#building-plan)
+  - [Initializers](#initializers)
+  - [Init Code](#init-code)
+  - [Building Code](#building-code)
+- [Properties](#properties)
 
 ## Workbench Types
 
@@ -97,7 +96,8 @@ sketch wheel(radius: Length) {
     // access property `radius` from the building plan
     std::geo2d::circle(radius);
 }
-__builtin::assert(wheel(5cm).radius == 5cm);
+
+std::debug::assert(wheel(5cm).radius == 5cm);
 ```
 
 ### Initializers
@@ -111,6 +111,8 @@ One may define multiple initializers which must have different parameter lists.
 part wheel(radius: Length) {
     init( radius: Length ) {} // error: same parameters as in building plan
 }
+
+wheel(radius = 1.0mm);
 ```
 
 However, if an initializer is used, all properties from the building plan must
@@ -145,12 +147,14 @@ you will get an error:
 
 [![test](.test/missed_property.png)](.test/missed_property.log)
 
-```µcad,missed_property#fail
+```µcad,missed_property
 sketch wheel(radius: Length) {
     init( width: Length ) { 
         // error: misses to set `radius` from building plan
     }
 }
+
+wheel(radius = 1.0mm);
 ```
 
 ### Init Code
@@ -190,7 +194,7 @@ It's **not allowed** to write any code between *initializers*.
 
 [![test](.test/code_between_initializers.png)](.test/code_between_initializers.log)
 
-```µcad,code_between_initializers#fail
+```µcad,code_between_initializers
 sketch wheel(radius: Length) {
     init( width:Length ) { radius = width / 2; }
     
@@ -199,6 +203,8 @@ sketch wheel(radius: Length) {
 
     init( height:Length ) { radius = height / 2; }
 }
+
+wheel(radius = 1.0mm);
 ```
 
 ### Building Code
@@ -214,6 +220,8 @@ sketch wheel(radius: Length) {
     // building code starts here
     std::geo2d::circle(radius);
 }
+
+wheel(radius = 1.0mm)
 ```
 
 If *initializers* were defined the *building code* starts below them.

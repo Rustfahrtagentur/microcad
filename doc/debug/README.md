@@ -29,8 +29,9 @@ std::debug::assert(false, "this assertion fails");
 ```µcad,verify_panic#todo
 a = 0;
 
-if a != 0
+if a != 0 {
     std::panic("this should not have happened");
+}
 ```
 
 ## Todo
@@ -42,8 +43,9 @@ if a != 0
 ```µcad,verify_todo#todo
 a = 0;
 
-if a = 0 
+if a == 0 {
     std::info("a is zero");
-else
+} else {
     std::todo("print proper message");
+}
 ```

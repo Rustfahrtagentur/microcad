@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**102** tests from markdown.
+**100** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -31,8 +31,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/ops/.test/difference_operator.png)](../doc/libs/std/ops/.test/difference_operator.log) | [difference_operator](../doc/libs/std/ops/difference.md) |
 | [![test](../doc/structure/.test/example.png)](../doc/structure/.test/example.log) | [example](../doc/structure/functions.md) |
 | [![test](../doc/.test/export_attributes.png)](../doc/.test/export_attributes.log) | [export_attributes](../doc/export.md) |
-| [![test](../doc/libs/std/.test/export_multiple.png)](../doc/libs/std/.test/export_multiple.log) | [export_multiple](../doc/libs/std/export.md) |
-| [![test](../doc/libs/std/.test/export_single.png)](../doc/libs/std/.test/export_single.log) | [export_single](../doc/libs/std/export.md) |
 | [![test](../.test/first_example.png)](../.test/first_example.log) | [first_example](../README.md) |
 | [![test](../doc/libs/std/ops/.test/hull_multiple.png)](../doc/libs/std/ops/.test/hull_multiple.log) | [hull_multiple](../doc/libs/std/ops/hull.md) |
 | [![test](../doc/libs/std/ops/.test/hull_single.png)](../doc/libs/std/ops/.test/hull_single.log) | [hull_single](../doc/libs/std/ops/hull.md) |

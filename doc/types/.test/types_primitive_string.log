@@ -12,4 +12,4 @@ error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
      |                    ^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
-FAIL
+OK
