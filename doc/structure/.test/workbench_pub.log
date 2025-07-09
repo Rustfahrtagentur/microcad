@@ -1,12 +1,7 @@
 -- Test --
   workbench_pub
   /home/micha/Work/mcad/mcad/doc/structure/functions.md:120
--- Parse Error --
-Parser error:  --> 2:11
-  |
-2 |     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
-  |           ^---
-  |
-  = expected identifier_part
+-- Output --
+-- Errors --
 -- Test Result --
-FAILED AS EXPECTED
+OK BUT IS TODO

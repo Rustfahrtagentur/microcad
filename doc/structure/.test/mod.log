@@ -1,12 +1,9 @@
 -- Test --
   mod
   /home/micha/Work/mcad/mcad/doc/structure/functions.md:66
--- Parse Error --
-Parser error:   --> 13:11
-   |
-13 |     pub fn square(x: Scalar) {
-   |           ^---
-   |
-   = expected identifier_part
+-- Output --
+-- Errors --
+error: Not implemented: Function evaluation
+error: Not implemented: Function evaluation
 -- Test Result --
-FAIL
+TODO

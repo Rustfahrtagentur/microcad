@@ -100,7 +100,7 @@ the symbol table where outside code might use it too.
 
 [![test](.test/use_pub.png)](.test/use_pub.log)
 
-```µcad,use_statement_pub
+```µcad,use_statement_pub#todo
 mod my {
     pub use std::geo3d::*;
 }

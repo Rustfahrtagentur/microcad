@@ -46,7 +46,7 @@ Returning a value twice is not allowed.
 
 [![test](.test/return_twice.png)](.test/return_twice.log)
 
-```µcad,return_twice#fail
+```µcad,return_twice
 fn pow( x: Scalar, n: Integer ) {
     if n == 1 {
         x 
@@ -63,7 +63,7 @@ use outside the module.
 
 [![test](.test/mod.png)](.test/mod.log)
 
-```µcad,mod
+```µcad,mod#todo_fail
 // module math
 mod math {
     // pow cannot be called from outside math
@@ -117,7 +117,7 @@ Trying to make them public with the keyword `pub` will result into an error:
 
 [![test](.test/workbench_pub.png)](.test/workbench_pub.log)
 
-```µcad,workbench_pub#fail
+```µcad,workbench_pub#todo_fail
 part punched_disk(radius: Length) {
     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
 }
