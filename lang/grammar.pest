@@ -391,7 +391,7 @@ function_signature = { parameter_list ~ (ws* ~ "->" ~ ws* ~ type)? }
 //`fn foo(a: Scalar, b: Scalar) -> Scalar { return a + b; }`: ok # Function with multiple arguments
 //`fn test(a: Scalar, b: Scalar) -> Scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
 //`fn weight(density: density = 20g/1mm^3) -> Weight {}` ok # Function with default value
-function_definition = { "fn" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ body }
+function_definition = { (visibility ~ ws+)? ~ "fn" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ body }
 
 //`return 5.0mm;`: ok
 return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }

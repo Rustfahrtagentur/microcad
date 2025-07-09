@@ -8,6 +8,8 @@ use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 /// Function definition
 #[derive(Debug)]
 pub struct FunctionDefinition {
+    /// Visibility
+    pub visibility: Visibility,
     /// Name of the function
     pub id: Identifier,
     /// Function signature
@@ -25,16 +27,6 @@ impl SrcReferrer for FunctionDefinition {
 }
 
 impl FunctionDefinition {
-    /// Create new function definition
-    pub fn new(id: Identifier, signature: FunctionSignature, body: Body, src_ref: SrcRef) -> Self {
-        Self {
-            id,
-            signature,
-            body,
-            src_ref,
-        }
-    }
-
     /// Resolve into SymbolNode
     pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
         let node = Symbol::new(SymbolDefinition::Function(self.clone()), parent);

@@ -6,15 +6,14 @@ use crate::{parse::*, parser::*, rc::*, syntax::*};
 impl Parse for Rc<FunctionDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::function_definition);
-        let mut inner = pair.inner();
-        let name = Identifier::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
-        let signature = FunctionSignature::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
-        let body = Body::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
 
         Ok(Rc::new(FunctionDefinition {
-            id: name,
-            signature,
-            body,
+            visibility: pair.find(Rule::visibility).unwrap_or_default(),
+            id: pair.find(Rule::identifier).expect("Identifier"),
+            signature: pair
+                .find(Rule::function_signature)
+                .expect("Function signature"),
+            body: pair.find(Rule::body).expect("Function body"),
             src_ref: pair.clone().into(),
         }))
     }
