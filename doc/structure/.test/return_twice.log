@@ -1,3 +1,7 @@
 -- Test --
   return_twice
-  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:49
+  /home/micha/Work/mcad/mcad/doc/structure/functions.md:49
+-- Output --
+-- Errors --
+-- Test Result --
+OK
