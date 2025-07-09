@@ -28,7 +28,7 @@ impl ModelNodeGeometryOutput {
             Self::None => ModelNodeOutputType::NotDetermined,
             Self::Geometries2D(_) => ModelNodeOutputType::Geometry2D,
             Self::Geometries3D(_) => ModelNodeOutputType::Geometry3D,
-            Self::Invalid => ModelNodeOutputType::Invalid,
+            Self::Invalid => ModelNodeOutputType::InvalidMixed,
         }
     }
 }

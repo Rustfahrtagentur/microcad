@@ -56,11 +56,34 @@ impl Eval for Statement {
     }
 }
 
+impl Eval<ModelNodes> for Statement {
+    fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
+        let value: Value = self.eval(context)?;
+        let nodes = value.fetch_nodes();
+        if nodes.output_type() == ModelNodeOutputType::InvalidMixed {
+            context.error(self, EvalError::CannotMixGeometry)?;
+        }
+        Ok(nodes)
+    }
+}
+
 impl Eval<ModelNodes> for StatementList {
     fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
-        self.iter().try_fold(ModelNodes::default(), |mut nodes, s| {
-            nodes.append(&mut s.eval(context)?.fetch_nodes());
-            Ok::<_, EvalError>(nodes)
-        })
+        let mut output_type = ModelNodeOutputType::NotDetermined;
+        let mut nodes = ModelNodes::default();
+
+        for statement in self.iter() {
+            let mut statement_nodes: ModelNodes = statement.eval(context)?;
+            let node_output_type = statement_nodes.output_type();
+            if output_type == ModelNodeOutputType::NotDetermined {
+                output_type = node_output_type;
+            } else if node_output_type != output_type {
+                context.error(statement, EvalError::CannotMixGeometry)?;
+                break;
+            }
+            nodes.append(&mut statement_nodes);
+        }
+
+        Ok(nodes)
     }
 }

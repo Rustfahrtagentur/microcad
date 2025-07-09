@@ -176,6 +176,10 @@ pub enum EvalError {
     /// Builtin error
     #[error("Builtin error: {0}")]
     BuiltinError(String),
+
+    /// An error if you try to mix 2d and 3d geometries.
+    #[error("Cannot mix 2d and 3d geometries")]
+    CannotMixGeometry,
 }
 
 /// Result type of any evaluation.

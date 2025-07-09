@@ -128,7 +128,7 @@ impl<'a> ModelNodeBuilder<'a> {
             ModelNodeOutputType::NotDetermined => {
                 return Ok(self.output.clone());
             }
-            ModelNodeOutputType::Invalid => {
+            ModelNodeOutputType::InvalidMixed => {
                 panic!("Child node's output type is invalid.")
             }
             _ => {}
@@ -148,7 +148,7 @@ impl<'a> ModelNodeBuilder<'a> {
                     panic!("Cannot nest a 3D geometry in a 2D geometry node.")
                 }
             }
-            ModelNodeOutputType::Invalid => {
+            ModelNodeOutputType::InvalidMixed => {
                 panic!("Invalid output type.")
             }
         }
