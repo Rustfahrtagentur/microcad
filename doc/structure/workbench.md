@@ -38,7 +38,7 @@ The following code demonstrates most of these elements:
 
 [![test](.test/part_declaration.png)](.test/part_declaration.log)
 
-```µcad,part_declaration
+```µcad,part_declaration#todo
 // sketch with a `radius` as building plan
 sketch wheel(radius: Length) {
 
@@ -107,7 +107,7 @@ One may define multiple initializers which must have different parameter lists.
 
 [![test](.test/initializers.png)](.test/initializers.log)
 
-```µcad,initializers#fail
+```µcad,initializers#todo_fail
 part wheel(radius: Length) {
     init( radius: Length ) {} // error: same parameters as in building plan
 }
@@ -167,7 +167,7 @@ in all following code (including code within *initializers* and *functions*).
 
 [![test](.test/pre_init_code.png)](.test/pre_init_code.log)
 
-```µcad,pre_init_code
+```µcad,pre_init_code#todo
 sketch wheel(radius: Length) {
     // init code
     const FACTOR = 2.0;
