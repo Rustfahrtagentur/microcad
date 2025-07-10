@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 #[cfg(test)]
 use crate::builtin_module;
-use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, ty::Ty, value::*};
+use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, value::*};
 
 pub fn assert() -> Symbol {
     Symbol::new_builtin(

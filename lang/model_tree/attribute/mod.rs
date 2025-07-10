@@ -78,6 +78,14 @@ pub trait GetAttribute {
         }
     }
 
+    /// Get color attribute.
+    fn get_color_attribute(&self) -> Option<Color> {
+        match self.get_attribute(&Identifier::no_ref("color")) {
+            Some(Attribute::Color(color)) => Some(color),
+            _ => None,
+        }
+    }
+
     /// Value for attribute.
     ///
     /// This function is used when accessing attributes in the µcad language via

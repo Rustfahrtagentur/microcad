@@ -62,6 +62,20 @@ impl Color {
             _ => Err(ParseColorError::ParseColorFromHex(hex.into())),
         }
     }
+
+    /// Return color as SVG color.
+    pub fn to_svg_color(&self) -> String {
+        let r = (self.r * 255.0) as u8;
+        let g = (self.g * 255.0) as u8;
+        let b = (self.b * 255.0) as u8;
+        let a = self.a;
+
+        if a < 1.0 {
+            format!("rgba({r}, {g}, {b}, {a:.2})")
+        } else {
+            format!("#{r:02X}{g:02X}{b:02X}")
+        }
+    }
 }
 
 impl Default for Color {

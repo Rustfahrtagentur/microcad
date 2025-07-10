@@ -15,9 +15,12 @@ pub struct SvgExporter;
 
 impl Exporter for SvgExporter {
     fn parameters(&self) -> microcad_lang::eval::ParameterValueList {
-        [parameter!(style: String = String::new())]
-            .into_iter()
-            .collect()
+        [
+            parameter!(style: String = String::new()),
+            parameter!(fill: String = String::new()),
+        ]
+        .into_iter()
+        .collect()
     }
 
     fn export(&self, node: &ModelNode, filename: &std::path::Path) -> Result<Value, ExportError> {

@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{
+    Id,
     builtin::ExporterAccess,
     eval::{self, *},
     model_tree::{self, *},
     parameter,
     syntax::{self, *},
-    Id,
 };
 
 use microcad_core::{Color, RenderResolution};
@@ -57,7 +57,7 @@ impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
                         let id: Id = arguments.get::<String>("id").into();
                         let id: Option<Id> = if id.is_empty() { None } else { Some(id) };
                         let resolution = RenderResolution::new(
-                            argument_map.get::<&Value>("resolution").try_scalar()?,
+                            arguments.get::<&Value>("resolution").try_scalar()?,
                         );
 
                         match context.find_exporter(&filename, &id) {
