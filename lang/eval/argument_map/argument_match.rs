@@ -25,7 +25,7 @@ pub trait ArgumentMatch: Default {
     /// Finds all arguments with the same name as the parameter and inserts them into the map.
     /// Named arguments are arguments with a name, e.g. `bar` in `foo(bar = 42)`.
     /// The parameter is then removed from the list of parameters.
-    fn find_and_insert_named_arguments(
+    fn match_named(
         &mut self,
         argument_values: &ArgumentValueList,
         parameter_values: &mut ParameterValueList,
@@ -55,51 +55,52 @@ pub trait ArgumentMatch: Default {
     /// Try to match arguments by their position and insert them into the map.
     /// Positional arguments are arguments without a name, e.g. `1, 2` in `foo(1, 2)`.
     /// The parameter is then removed from the list of parameters.
-    fn find_and_insert_unnamed_arguments(
+    fn match_unnamed(
         &mut self,
         argument_values: &ArgumentValueList,
         parameter_values: &mut ParameterValueList,
-    ) -> EvalResult<&mut Self> {
+    ) -> EvalResult<()> {
         if parameter_values.is_empty() {
-            return Ok(self);
+            return Ok(());
         }
-        let mut positional_index = 0;
+        let mut idx = parameter_values.len();
 
-        for (id, argument_value) in argument_values.iter().filter(|(id, _)| id.is_empty()) {
-            let parameter_value = match parameter_values.get_by_type(argument_value.ty()) {
-                Ok(p) => p.clone(),
-                Err(_) => break,
-            };
+        for (_, argument_value) in argument_values.iter().filter(|(id, _)| id.is_empty()) {
+            let (id, parameter_value) =
+                match parameter_values.get_by_type(argument_value.ty(), parameter_values.keys()) {
+                    Ok((id, p)) => (id.clone(), p.clone()),
+                    Err(_) => break,
+                };
 
             match self.insert_and_remove_from_parameters(
-                id,
+                &id,
                 argument_value.value.clone(),
                 &parameter_value,
                 parameter_values,
             )? {
                 TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
-                    if positional_index >= parameter_values.len() {
+                    if idx == 0 {
                         break;
                     }
                 }
                 _ => {
-                    positional_index += 1;
+                    idx -= 1;
                 }
             }
         }
 
-        Ok(self)
+        Ok(())
     }
 
     /// Find default parameters and insert them into the map.
     ///
     /// If a parameter has a default value and is not present in the arguments, insert the default value.
     /// The parameter is then removed from the list of parameters.
-    fn find_and_insert_default_parameters(
+    fn match_defaults(
         &mut self,
         argument_values: &ArgumentValueList,
         parameter_values: &mut ParameterValueList,
-    ) -> EvalResult<&mut Self> {
+    ) -> EvalResult<()> {
         parameter_values
             // Clone the list of parameters because we want to remove elements from it while iterating
             .clone()
@@ -121,8 +122,6 @@ pub trait ArgumentMatch: Default {
                 )?;
                 Ok(())
             })
-            // Return self
-            .map(|_| self)
     }
 
     /// Find a match between arguments and parameters.
@@ -132,17 +131,16 @@ pub trait ArgumentMatch: Default {
         argument_values: &ArgumentValueList,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<Self> {
-        argument_values.check_for_unexpected_arguments(parameter_values)?;
-
         let mut missing_parameter_values = parameter_values.clone();
         let mut result = Self::default();
 
-        result
-            .find_and_insert_named_arguments(argument_values, &mut missing_parameter_values)?
-            .find_and_insert_unnamed_arguments(argument_values, &mut missing_parameter_values)?
-            .find_and_insert_default_parameters(argument_values, &mut missing_parameter_values)?;
+        result.match_named(argument_values, &mut missing_parameter_values)?;
+        result.match_unnamed(argument_values, &mut missing_parameter_values)?;
+        result.match_defaults(argument_values, &mut missing_parameter_values)?;
 
-        missing_parameter_values.check_for_missing_arguments()?;
+        if !missing_parameter_values.is_empty() {
+            return Err(EvalError::MissingArguments(missing_parameter_values));
+        }
 
         Ok(result)
     }

@@ -39,6 +39,8 @@ pub enum BuiltinTypeHelper {
     Weight,
     /// String type.
     String,
+    /// Bool type
+    Bool,
     /// Color type
     Color,
 }
@@ -55,6 +57,7 @@ impl From<BuiltinTypeHelper> for Type {
             BuiltinTypeHelper::Angle => Type::Quantity(QuantityType::Angle),
             BuiltinTypeHelper::Weight => Type::Quantity(QuantityType::Weight),
             BuiltinTypeHelper::String => Type::String,
+            BuiltinTypeHelper::Bool => Type::Bool,
             BuiltinTypeHelper::Color => Type::Tuple(TupleType::new_color().into()),
         }
     }
@@ -83,6 +86,8 @@ pub enum BuiltinValueHelper {
     Weight(Scalar),
     /// String type.
     String(String),
+    /// Bool type
+    Bool(bool),
     /// Color type
     Color(Color),
 }
@@ -109,6 +114,7 @@ impl From<BuiltinValueHelper> for Value {
                 Value::Quantity(Quantity::new(v, QuantityType::Weight))
             }
             BuiltinValueHelper::String(s) => Value::String(s),
+            BuiltinValueHelper::Bool(b) => Value::Bool(b),
             BuiltinValueHelper::Color(c) => crate::tuple_value!(r = c.r, g = c.g, b = c.b, a = c.a),
         }
     }

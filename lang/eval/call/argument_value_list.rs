@@ -57,26 +57,6 @@ impl ArgumentValueList {
         self.map.iter().find(|(_, arg)| arg.value.ty() == *ty)
     }
 
-    /// Check for unexpected arguments.
-    ///
-    /// This method will return an error if there is an argument that
-    /// is not in the parameter list.
-    pub fn check_for_unexpected_arguments(
-        &self,
-        parameter_values: &ParameterValueList,
-    ) -> EvalResult<()> {
-        log::trace!("check_for_unexpected_arguments:\n{parameter_values:#?}\n------\n{self:#?}");
-        self.map.iter().try_for_each(|(id, arg)| {
-            if !id.is_empty() && parameter_values.get(id).is_some() {
-                return Ok(());
-            }
-            if parameter_values.get_by_type(arg.value.ty()).is_ok() {
-                return Ok(());
-            }
-            Err(EvalError::UnexpectedArgument(id.clone()))
-        })
-    }
-
     /// This functions checks if the arguments match the given parameter definitions.
     ///
     /// Returns a map of arguments that match the parameters.

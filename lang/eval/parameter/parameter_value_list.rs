@@ -27,15 +27,20 @@ impl ParameterValueList {
     }
 
     /// Get (unnamed) parameter value by type
-    pub fn get_by_type(&self, ty: Type) -> EvalResult<&ParameterValue> {
+    pub fn get_by_type<'a>(
+        &'a self,
+        ty: Type,
+        mut ids: impl Iterator<Item = &'a Identifier>,
+    ) -> EvalResult<(&Identifier, &ParameterValue)> {
         let pv: Vec<_> = self
             .0
             .iter()
-            .filter(|(id, v)| id.is_none() && v.type_matches(&ty))
+            // TODO id is never none in parameter list but in argument list
+            .filter(|(id, v)| ids.any(|i| i == *id) && v.type_matches(&ty))
             .collect();
         match pv.len() {
             0 => Err(EvalError::ParameterByTypeNotFound(ty)),
-            1 => Ok(pv.first().expect("one item").1),
+            1 => Ok(*pv.first().expect("one item")),
             _ => unreachable!("Type '{ty}' is ambiguous in parameters"),
         }
     }

@@ -12,7 +12,7 @@ pub fn assert() -> Symbol {
         Identifier::no_ref("assert"),
         Some(
             [
-                parameter!(v),                               // Parameter with any type
+                parameter!(v : Bool),                        // Parameter with any type
                 parameter!(message: String = String::new()), // Optional message
             ]
             .into_iter()

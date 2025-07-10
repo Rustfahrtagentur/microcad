@@ -102,8 +102,8 @@ pub enum EvalError {
     CannotNestItem(NestedItem),
 
     /// Unexpected argument.
-    #[error("Unexpected argument: {0}")]
-    UnexpectedArgument(Identifier),
+    #[error("Unexpected argument: {0}: {1}")]
+    UnexpectedArgument(Identifier, Type),
 
     /// Assertion failed.
     #[error("Assertion failed: {0}")]
