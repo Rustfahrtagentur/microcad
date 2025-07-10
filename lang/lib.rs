@@ -49,3 +49,25 @@ pub trait GetPropertyValue {
     /// This function is used when accessing a property `v` of a value `p` with `p.v`.
     fn get_property_value(&self, id: &Identifier) -> Value;
 }
+
+/// Parse a rule from given string into a syntax element
+/// - `ty`: Type of the output syntax element
+/// - `rule`: Parsing rule to use.
+/// - `code`: String slice of the code to parse
+#[macro_export]
+macro_rules! parse {
+    ($ty:path, $rule:path, $code:expr) => {
+        $crate::parser::Parser::parse_rule::<$ty>($rule, $code, 0).expect("bad inline code")
+    };
+}
+
+#[test]
+fn parse_macro() {
+    let y3 = 3;
+    let p = parse!(
+        syntax::ParameterList,
+        parser::Rule::parameter_list,
+        &format!("(x=0,y=[1,2,{y3},4],z=2)")
+    );
+    assert_eq!(p.to_string(), "x = 0, y = [1, 2, 3, 4], z = 2");
+}
