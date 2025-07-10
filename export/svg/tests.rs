@@ -19,21 +19,36 @@ fn svg_writer() {
     .expect("test error");
 
     let rect = geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0));
-    svg.rect(&rect, &SvgTagAttributes::new("fill:blue;".into()))
-        .expect("test error");
+    svg.rect(
+        &rect,
+        &SvgTagAttributes {
+            style: Some("fill:blue;".into()),
+            fill: None,
+        },
+    )
+    .expect("test error");
 
     let circle = geo2d::Circle {
         radius: 10.0,
         offset: Vec2::new(50.0, 50.0),
     };
-    svg.circle(&circle, &SvgTagAttributes::new("fill:red;".into()))
-        .expect("test error");
+    svg.circle(
+        &circle,
+        &SvgTagAttributes {
+            style: Some("fill:red;".into()),
+            fill: None,
+        },
+    )
+    .expect("test error");
 
     let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
     svg.line(
         line.0,
         line.1,
-        &SvgTagAttributes::new("stroke:black;".into()),
+        &SvgTagAttributes {
+            style: Some("stroke:black;".into()),
+            fill: None,
+        },
     )
     .expect("test error");
 }

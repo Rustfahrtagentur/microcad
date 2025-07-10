@@ -3,12 +3,12 @@ use __builtin::*;
 // Create two translated rectangles and export the result as an SVG file
 #[svg(style = "stroke:white; stroke-width:1")]
 {
-    #[svg(style = "fill:red")]
+    #[color = "#FF0000"]
     ops::translate(x = [0.0, 15.0], y = [0.0, 15.0], z = 0.0) {
         geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
     }
 
-    #[svg(style = "fill:blue")]
+    #[color = "#00FF00"]
     ops::translate(x = [30.0, 45.0], y = [30.0, 45.0], z = 0.0) {
         geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
     }

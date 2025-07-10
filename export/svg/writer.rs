@@ -6,10 +6,8 @@
 use geo::CoordsIter;
 use microcad_core::*;
 use microcad_lang::{
-    eval::ArgumentMap,
     model_tree::{Element, GetAttribute, ModelNode, ModelNodeOutputType},
     syntax::Identifier,
-    value::*,
 };
 
 /// SVG writer.
@@ -22,28 +20,49 @@ pub struct SvgWriter {
 #[derive(Debug, Clone, Default)]
 pub struct SvgTagAttributes {
     /// Style attribute.
-    pub style: String,
+    pub style: Option<String>,
+    /// Fill attribute. Used when color attribute of a node is set.
+    pub fill: Option<String>,
 }
 
 impl SvgTagAttributes {
-    /// New [`SvgTagAttributes`].
-    pub fn new(style: String) -> Self {
-        Self { style }
+    fn is_empty(&self) -> bool {
+        self.style.is_none() && self.fill.is_none()
     }
 }
 
-impl From<Option<ArgumentMap>> for SvgTagAttributes {
-    fn from(argument_map: Option<ArgumentMap>) -> Self {
-        if let Some(argument_map) = argument_map {
-            if let Some(Value::String(style)) = argument_map.get_value(&Identifier::no_ref("style"))
-            {
-                return SvgTagAttributes {
-                    style: style.clone(),
-                };
-            }
+impl From<&ModelNode> for SvgTagAttributes {
+    fn from(node: &ModelNode) -> Self {
+        match (
+            node.get_exporter_attribute(&Identifier::no_ref("svg")),
+            node.get_color_attribute(),
+        ) {
+            (None, None) => SvgTagAttributes::default(),
+            (None, Some(color)) => SvgTagAttributes {
+                style: None,
+                fill: Some(color.to_svg_color()),
+            },
+            // If boths attributes are present, get style and fill from attributes. Color attribute is ignored.
+            (Some(attributes), None) | (Some(attributes), Some(_)) => SvgTagAttributes {
+                style: attributes
+                    .get_value(&Identifier::no_ref("style"))
+                    .map(|value| value.try_string().unwrap_or_default()),
+                fill: attributes
+                    .get_value(&Identifier::no_ref("fill"))
+                    .map(|value| value.try_string().unwrap_or_default()),
+            },
         }
+    }
+}
 
-        SvgTagAttributes::default()
+impl std::fmt::Display for SvgTagAttributes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match (&self.style, &self.fill) {
+            (None, None) => Ok(()),
+            (None, Some(fill)) => write!(f, "fill=\"{fill}\""),
+            (Some(style), None) => write!(f, "style=\"{style}\""),
+            (Some(style), Some(fill)) => write!(f, "fill=\"{fill}\" style=\"{style}\""),
+        }
     }
 }
 
@@ -79,10 +98,10 @@ impl SvgWriter {
     fn tag_inner(tag: &str, attr: &SvgTagAttributes) -> String {
         format!(
             "{tag}{attr}",
-            attr = if !attr.style.is_empty() {
-                format!(" style=\"{style}\"", style = attr.style)
-            } else {
+            attr = if attr.is_empty() {
                 String::new()
+            } else {
+                format!(" {attr}")
             }
         )
     }
@@ -281,9 +300,7 @@ impl SvgWriter {
     pub fn node(&mut self, node: &ModelNode) -> std::io::Result<()> {
         assert_eq!(node.output_type(), ModelNodeOutputType::Geometry2D);
 
-        let attr: SvgTagAttributes = node
-            .get_exporter_attribute(&Identifier::no_ref("svg"))
-            .into();
+        let attr: SvgTagAttributes = node.into();
 
         let b = node.borrow();
         let element = b.element();
