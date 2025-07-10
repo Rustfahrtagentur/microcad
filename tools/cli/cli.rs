@@ -40,6 +40,7 @@ impl Cli {
             Commands::Eval(eval) => eval.run(self)?,
             Commands::Export(export) => export.run(self)?,
             Commands::Create(create) => create.run(self)?,
+            Commands::Watch(watch) => watch.run(self)?,
         }
 
         if self.time {

@@ -8,6 +8,7 @@ mod eval;
 mod export;
 mod parse;
 mod resolve;
+mod watch;
 
 use clap::Subcommand;
 
@@ -16,6 +17,7 @@ pub use eval::Eval;
 pub use export::Export;
 pub use parse::Parse;
 pub use resolve::Resolve;
+pub use watch::Watch;
 
 #[derive(Subcommand)]
 pub enum Commands {
@@ -33,6 +35,9 @@ pub enum Commands {
 
     /// Create a new source file with µcad extension.
     Create(Create),
+
+    /// Watch a µcad file
+    Watch(Watch),
 }
 
 /// Run this command for a CLI.

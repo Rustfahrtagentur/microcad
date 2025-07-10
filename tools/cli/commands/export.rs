@@ -12,22 +12,30 @@ use crate::{config::Config, *};
 
 /// Parse and evaluate and export a µcad file.
 #[derive(clap::Parser)]
-pub struct Export {
+pub struct ExportArgs {
     /// Input µcad file.
-    input: std::path::PathBuf,
+    pub input: std::path::PathBuf,
 
     /// Output file (e.g. an SVG or STL).
-    output: Option<std::path::PathBuf>,
+    pub output: Option<std::path::PathBuf>,
 
     /// List all export target files.
     #[arg(short = 'l', long = "list", action = clap::ArgAction::SetTrue)]
-    list: bool,
+    pub list: bool,
 
     /// The resolution of this export.
     ///
     /// The resolution can changed relatively `200%` or to an absolute value `0.05mm`.
     #[arg(short = 'r', long = "resolution", default_value = "0.1mm")]
-    resolution: String,
+    pub resolution: String,
+}
+
+/// Parse and evaluate and export a µcad file.
+#[derive(clap::Parser)]
+pub struct Export {
+    /// Input µcad file.
+    #[clap(flatten)]
+    args: ExportArgs,
 }
 
 impl Export {
@@ -58,7 +66,7 @@ impl Export {
         use microcad_lang::*;
 
         use std::str::FromStr;
-        let value = syntax::NumberLiteral::from_str(&self.resolution)
+        let value = syntax::NumberLiteral::from_str(&self.args.resolution)
             .map(|literal| literal.value())
             .unwrap_or(value::Value::None);
 
@@ -71,7 +79,7 @@ impl Export {
                 let default = RenderResolution::default();
                 log::warn!(
                     "Invalid resolution `{resolution}`. Using default resolution: {value}mm",
-                    resolution = self.resolution,
+                    resolution = self.args.resolution,
                     value = default.linear
                 );
                 default
@@ -89,7 +97,7 @@ impl Export {
         let default_exporter = Self::default_exporter(&node.output_type(), config, exporters);
         let resolution = self.resolution();
 
-        match &self.output {
+        match &self.args.output {
             Some(filename) => Ok(ExportAttribute {
                 filename: filename.to_path_buf(),
                 resolution,
@@ -98,7 +106,7 @@ impl Export {
                     .or(default_exporter)?,
             }),
             None => {
-                let mut filename = self.input.clone();
+                let mut filename = self.args.input.clone();
                 let exporter = default_exporter?;
 
                 let ext = exporter
@@ -174,12 +182,12 @@ impl Export {
 
 impl RunCommand for Export {
     fn run(&self, cli: &Cli) -> anyhow::Result<()> {
-        let mut context = cli.make_context(&self.input)?;
+        let mut context = cli.make_context(&self.args.input)?;
         let node = context.eval().expect("Valid node");
         let config = cli.fetch_config()?;
 
         let target_nodes = &self.target_nodes(&node, &config, context.exporters())?;
-        if self.list {
+        if self.args.list {
             self.list_targets(target_nodes)
         } else {
             self.export_targets(target_nodes)
