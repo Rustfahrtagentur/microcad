@@ -1,6 +1,6 @@
 -- Test --
   children
-  /home/micha/Work/mcad/mcad/doc/structure/op.md:30
+  /home/pat/git/rustfahrt/microcad/doc/structure/op.md:30
 -- Parse Error --
 Parser error:  --> 4:8
   |

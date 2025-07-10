@@ -25,11 +25,12 @@ impl BuiltinWorkbenchDefinition for Translate {
     }
 
     fn parameters() -> ParameterValueList {
-        vec![
+        [
             parameter!(x: Scalar),
             parameter!(y: Scalar),
             parameter!(z: Scalar),
         ]
-        .into()
+        .into_iter()
+        .collect()
     }
 }

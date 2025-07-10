@@ -176,6 +176,10 @@ pub enum EvalError {
     /// Builtin error
     #[error("Builtin error: {0}")]
     BuiltinError(String),
+
+    /// Parameter not found by type in ParameterValueList
+    #[error("Parameter not found by type '{0}'")]
+    ParameterByTypeNotFound(Type),
 }
 
 /// Result type of any evaluation.

@@ -5,7 +5,7 @@
 
 use std::rc::Rc;
 
-use crate::{Id, builtin::file_io::*, eval::*, syntax::*, value::*};
+use crate::{builtin::file_io::*, eval::*, syntax::*, value::*, Id};
 
 use thiserror::Error;
 
@@ -41,7 +41,7 @@ pub enum ImportError {
 pub trait Importer: FileIoInterface {
     /// The parameters this importer accepts (empty by default).
     fn parameters(&self) -> ParameterValueList {
-        vec![].into()
+        ParameterValueList::default()
     }
 
     /// Import a value with parameters as argument map.
@@ -166,7 +166,7 @@ fn importer() {
 
     impl Importer for DummyImporter {
         fn parameters(&self) -> ParameterValueList {
-            vec![parameter!(some_arg: Integer = 32)].into()
+            [parameter!(some_arg: Integer = 32)].into_iter().collect()
         }
 
         fn import(&self, args: &ArgumentMap) -> Result<Value, ImportError> {

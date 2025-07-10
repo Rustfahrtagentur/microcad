@@ -1,6 +1,6 @@
 -- Test --
   workbench_pub
-  /home/micha/Work/mcad/mcad/doc/structure/functions.md:120
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:120
 -- Parse Error --
 Parser error:  --> 2:11
   |

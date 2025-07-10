@@ -1,6 +1,6 @@
 -- Test --
   property
-  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:244
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:244
 -- Parse Error --
 Parser error:  --> 8:16
   |

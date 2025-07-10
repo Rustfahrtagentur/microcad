@@ -21,6 +21,6 @@ impl BuiltinWorkbenchDefinition for Sphere {
     }
 
     fn parameters() -> ParameterValueList {
-        vec![parameter!(radius: Scalar)].into()
+        [parameter!(radius: Scalar)].into_iter().collect()
     }
 }

@@ -9,10 +9,11 @@ use std::str::FromStr;
 pub fn print() -> Symbol {
     let id = Identifier::from_str("print").expect("valid id");
     Symbol::new_builtin(id, None, &|_params, args, context| {
-        args.iter().try_for_each(|arg| -> Result<(), EvalError> {
-            context.print(format!("{value}", value = arg.value));
-            Ok(())
-        })?;
+        args.iter()
+            .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                context.print(format!("{value}", value = arg.value));
+                Ok(())
+            })?;
         Ok(Value::None)
     })
 }
@@ -20,12 +21,13 @@ pub fn print() -> Symbol {
 pub fn error() -> Symbol {
     let id = Identifier::from_str("error").expect("valid id");
     Symbol::new_builtin(id, None, &|_params, args, context| {
-        args.iter().try_for_each(|arg| -> Result<(), EvalError> {
-            context.error(
-                args,
-                EvalError::BuiltinError(format!("{value}", value = arg.value)),
-            )
-        })?;
+        args.iter()
+            .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                context.error(
+                    args,
+                    EvalError::BuiltinError(format!("{value}", value = arg.value)),
+                )
+            })?;
         Ok(Value::None)
     })
 }
@@ -33,12 +35,13 @@ pub fn error() -> Symbol {
 pub fn warning() -> Symbol {
     let id = Identifier::from_str("warning").expect("valid id");
     Symbol::new_builtin(id, None, &|_params, args, context| {
-        args.iter().try_for_each(|arg| -> Result<(), EvalError> {
-            context.warning(
-                args,
-                EvalError::BuiltinError(format!("{value}", value = arg.value)),
-            )
-        })?;
+        args.iter()
+            .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                context.warning(
+                    args,
+                    EvalError::BuiltinError(format!("{value}", value = arg.value)),
+                )
+            })?;
         Ok(Value::None)
     })
 }
@@ -46,10 +49,11 @@ pub fn warning() -> Symbol {
 pub fn info() -> Symbol {
     let id = Identifier::from_str("info").expect("valid id");
     Symbol::new_builtin(id, None, &|_params, args, context| {
-        args.iter().try_for_each(|arg| -> Result<(), EvalError> {
-            context.info(args, format!("{value}", value = arg.value));
-            Ok(())
-        })?;
+        args.iter()
+            .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                context.info(args, format!("{value}", value = arg.value));
+                Ok(())
+            })?;
         Ok(Value::None)
     })
 }

@@ -1,6 +1,6 @@
 -- Test --
   tuple_assignment_bundle
-  /home/micha/Work/mcad/mcad/doc/types/tuples.md:57
+  /home/pat/git/rustfahrt/microcad/doc/types/tuples.md:57
 -- Parse Error --
 Parser error:  --> 1:17
   |

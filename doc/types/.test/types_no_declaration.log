@@ -1,6 +1,6 @@
 -- Test --
   types_no_declaration
-  /home/micha/Work/mcad/mcad/doc/types/README.md:38
+  /home/pat/git/rustfahrt/microcad/doc/types/README.md:38
 -- Parse Error --
 Parser error:  --> 1:10
   |

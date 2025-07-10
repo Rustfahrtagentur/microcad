@@ -23,11 +23,12 @@ impl BuiltinWorkbenchDefinition for Cylinder {
     }
 
     fn parameters() -> ParameterValueList {
-        vec![
+        [
             parameter!(radius_bottom: Scalar),
             parameter!(radius_top: Scalar),
             parameter!(height: Scalar),
         ]
-        .into()
+        .into_iter()
+        .collect()
     }
 }

@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{
-    Id,
     builtin::ExporterAccess,
     eval::{self, *},
     model_tree::{self, *},
     parameter,
     syntax::{self, *},
+    Id,
 };
 
 use microcad_core::Color;
@@ -54,11 +54,12 @@ impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
             syntax::Attribute::Tuple(id, argument_list) if id.id() == "export" => {
                 match ArgumentMap::find_match(
                     &argument_list.eval(context)?,
-                    &vec![
+                    &[
                         parameter!(filename: String),
                         parameter!(id: String = String::new()),
                     ]
-                    .into(),
+                    .into_iter()
+                    .collect(),
                 ) {
                     Ok(argument_map) => {
                         let filename: std::path::PathBuf =

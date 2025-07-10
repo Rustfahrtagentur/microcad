@@ -21,11 +21,12 @@ impl BuiltinWorkbenchDefinition for Cube {
     }
 
     fn parameters() -> ParameterValueList {
-        vec![
+        [
             parameter!(size_x: Scalar),
             parameter!(size_y: Scalar),
             parameter!(size_z: Scalar),
         ]
-        .into()
+        .into_iter()
+        .collect()
     }
 }

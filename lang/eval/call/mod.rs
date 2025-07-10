@@ -22,12 +22,23 @@ use thiserror::Error;
 impl Eval<ArgumentValueList> for ArgumentList {
     /// Evaluate into a [`ArgumentValueList`].
     fn eval(&self, context: &mut Context) -> EvalResult<ArgumentValueList> {
-        let mut v = ArgumentValueList::default();
-        for call_arg in self.iter() {
-            v.try_push(call_arg.eval_value(context)?)
-                .expect("Could not insert argument value");
-        }
-        Ok(v)
+        let result = self
+            .iter()
+            .map(|arg| {
+                (
+                    arg.id.clone().unwrap_or(Identifier::none()),
+                    arg.eval_value(context),
+                )
+            })
+            .filter_map(|(id, arg)| {
+                if let Ok(arg) = arg {
+                    Some((id.clone(), arg))
+                } else {
+                    None
+                }
+            })
+            .collect();
+        Ok(result)
     }
 }
 

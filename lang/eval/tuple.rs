@@ -9,9 +9,9 @@ impl Eval for TupleExpression {
             .args
             .eval(context)?
             .iter()
-            .map(|arg| {
+            .map(|(id, arg)| {
                 (
-                    arg.id.clone().unwrap_or_default(),
+                    id.clone(),
                     match arg.value.clone().bundle_unit(self.unit) {
                         Ok(value) => value.clone(),
                         Err(err) => {

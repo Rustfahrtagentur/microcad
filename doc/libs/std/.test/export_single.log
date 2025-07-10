@@ -1,6 +1,6 @@
 -- Test --
   export_single
-  /home/micha/Work/mcad/mcad/doc/libs/std/export.md:9
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/export.md:9
 -- Output --
 -- Errors --
 warning: No exporter found for file `cube.stl`

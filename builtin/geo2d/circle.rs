@@ -22,11 +22,11 @@ impl BuiltinWorkbenchDefinition for Circle {
     }
 
     fn parameters() -> ParameterValueList {
-        vec![
+        [
             parameter!(radius: Scalar),
             parameter!(cx: Scalar = 0.0),
             parameter!(cy: Scalar = 0.0),
         ]
-        .into()
+        .into_iter().collect()
     }
 }

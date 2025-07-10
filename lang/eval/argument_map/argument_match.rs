@@ -14,6 +14,7 @@ pub trait ArgumentMatch: Default {
     /// This function must be implemented by the user.
     fn insert_and_remove_from_parameters(
         &mut self,
+        id: &Identifier,
         value: Value,
         parameter_value: &ParameterValue,
         parameter_values: &mut ParameterValueList,
@@ -34,10 +35,11 @@ pub trait ArgumentMatch: Default {
             .clone()
             .iter()
             // Filter out parameters that have a name and are present in the arguments
-            .filter_map(|p| argument_values.get(&p.id).map(|c| (p, c)))
+            .filter_map(|(id, p)| argument_values.get(id).map(|c| (id, p, c)))
             // Insert the arguments into the map
-            .try_for_each(|(parameter_value, argument_value)| {
+            .try_for_each(|(id, parameter_value, argument_value)| {
                 self.insert_and_remove_from_parameters(
+                    id,
                     argument_value.value.clone(),
                     parameter_value,
                     parameter_values,
@@ -63,13 +65,14 @@ pub trait ArgumentMatch: Default {
         }
         let mut positional_index = 0;
 
-        for argument_value in argument_values.iter().filter(|arg| arg.id.is_none()) {
-            let parameter_value = match parameter_values.get_by_index(positional_index) {
-                Some(p) => p.clone(),
-                None => break,
+        for (id, argument_value) in argument_values.iter().filter(|(id, _)| id.is_empty()) {
+            let parameter_value = match parameter_values.get_by_type(argument_value.ty()) {
+                Ok(p) => p.clone(),
+                Err(_) => break,
             };
 
             match self.insert_and_remove_from_parameters(
+                id,
                 argument_value.value.clone(),
                 &parameter_value,
                 parameter_values,
@@ -102,13 +105,16 @@ pub trait ArgumentMatch: Default {
             .clone()
             .iter()
             // Filter out parameters that have a default value and are not present in the arguments
-            .filter_map(|p| match (argument_values.get(&p.id), &p.default_value) {
-                (None, Some(default_value)) => Some((p, default_value.clone())),
-                _ => None,
-            })
+            .filter_map(
+                |(id, p)| match (argument_values.get(id), &p.default_value) {
+                    (None, Some(default_value)) => Some((id, p, default_value.clone())),
+                    _ => None,
+                },
+            )
             // Insert the default values into the map
-            .try_for_each(|(parameter_value, default_value)| {
+            .try_for_each(|(id, parameter_value, default_value)| {
                 self.insert_and_remove_from_parameters(
+                    id,
                     default_value,
                     parameter_value,
                     parameter_values,

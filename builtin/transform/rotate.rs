@@ -24,12 +24,13 @@ impl BuiltinWorkbenchDefinition for Rotate {
     }
 
     fn parameters() -> ParameterValueList {
-        vec![
+        [
             parameter!(angle: Angle),
             parameter!(x: Scalar),
             parameter!(y: Scalar),
             parameter!(z: Scalar),
         ]
-        .into()
+        .into_iter()
+        .collect()
     }
 }

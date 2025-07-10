@@ -28,12 +28,13 @@ impl BuiltinWorkbenchDefinition for Rect {
     }
 
     fn parameters() -> ParameterValueList {
-        vec![
+        [
             parameter!(width: Scalar),
             parameter!(height: Scalar),
             parameter!(x: Scalar),
             parameter!(y: Scalar),
         ]
-        .into()
+        .into_iter()
+        .collect()
     }
 }

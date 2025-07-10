@@ -6,7 +6,7 @@
 use std::io::BufWriter;
 
 use geo::coord;
-use microcad_lang::{Id, builtin::*, model_tree::*, parameter, value::*};
+use microcad_lang::{builtin::*, model_tree::*, parameter, value::*, Id};
 
 use crate::svg::writer::SvgWriter;
 
@@ -15,7 +15,9 @@ pub struct SvgExporter;
 
 impl Exporter for SvgExporter {
     fn parameters(&self) -> microcad_lang::eval::ParameterValueList {
-        vec![parameter!(style: String = String::new())].into()
+        [parameter!(style: String = String::new())]
+            .into_iter()
+            .collect()
     }
 
     fn export(&self, node: &ModelNode, filename: &std::path::Path) -> Result<Value, ExportError> {

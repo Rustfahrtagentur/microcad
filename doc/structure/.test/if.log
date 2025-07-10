@@ -1,6 +1,6 @@
 -- Test --
   if
-  /home/micha/Work/mcad/mcad/doc/structure/conditionals.md:9
+  /home/pat/git/rustfahrt/microcad/doc/structure/conditionals.md:9
 -- Parse Error --
 Parser error:  --> 4:12
   |
