@@ -337,6 +337,9 @@ fn create_test<'a>(
     // log file of this test
     let log = test_path.join(format!("{name}.log"));
 
+    // svg output file of this test
+    let out = test_path.join(format!("{name}.svg"));
+
     // maybe create .test directory
     let _ = std::fs::create_dir_all(test_path);
 
@@ -346,7 +349,7 @@ fn create_test<'a>(
     }
 
     f.push_str(&create_test_code(
-        name, mode, code, &banner, &log, reference,
+        name, mode, code, &banner, &log, &out, reference,
     ));
 
     Some(Output::new(name.into(), file_path.into(), banner, log))
@@ -364,10 +367,12 @@ fn create_test_code(
     mode: Option<&str>,
     code: &str,
     banner: &std::path::Path,
+    log_out: &std::path::Path,
     out: &std::path::Path,
     reference: &str,
 ) -> String {
     let banner = &banner.to_string_lossy().escape_default().to_string();
+    let log_out = &log_out.to_string_lossy().escape_default().to_string();
     let out = &out.to_string_lossy().escape_default().to_string();
     let mode = mode.unwrap_or("ok");
 
@@ -376,7 +381,7 @@ fn create_test_code(
         #[test]
         #[allow(non_snake_case)]
         fn r#{name}() {{
-            crate::markdown_test::run_test("{name}", "{mode}", r##"{code}"##, "{banner}", "{out}", "{reference}");
+            crate::markdown_test::run_test("{name}", "{mode}", r##"{code}"##, "{banner}", "{log_out}", "{out}", "{reference}");
         }}"###
     )
 }
