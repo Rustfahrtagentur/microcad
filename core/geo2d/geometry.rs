@@ -44,35 +44,42 @@ impl Geometry2D {
             Geometry2D::LineString(_) | Geometry2D::MultiLineString(_)
         )
     }
+}
 
-    /// Return a new geometry with the given transform
-    pub fn transformed(self, resolution: &RenderResolution, mat: crate::Mat3) -> Self {
-        // Extract matrix components
-        let a = mat.x.x;
-        let b = mat.y.x;
-        let x_off = mat.z.x;
-        let d = mat.x.y;
-        let e = mat.y.y;
-        let y_off = mat.z.y;
+impl FetchBounds2D for Geometry2D {
+    fn fetch_bounds_2d(&self) -> Bounds2D {
+        use geo::BoundingRect;
 
-        use geo::AffineOps;
-        let transform = geo::AffineTransform::new(a, b, x_off, d, e, y_off);
+        match &self {
+            Geometry2D::LineString(line_string) => line_string.bounding_rect().into(),
+            Geometry2D::MultiLineString(multi_line_string) => {
+                multi_line_string.bounding_rect().into()
+            }
+            Geometry2D::Polygon(polygon) => polygon.bounding_rect().into(),
+            Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.bounding_rect().into(),
+            Geometry2D::Rect(rect) => Some(*rect).into(),
+            Geometry2D::Circle(circle) => circle.fetch_bounds_2d(),
+        }
+    }
+}
 
+impl Transformed2D for Geometry2D {
+    fn transformed_2d(&self, resolution: &RenderResolution, mat: &Mat3) -> Self {
         if self.is_areal() {
-            let polygons = self
-                .render_to_multi_polygon(resolution)
-                .affine_transform(&transform);
-
-            Self::MultiPolygon(polygons)
+            Self::MultiPolygon(
+                self.clone()
+                    .render_to_multi_polygon(resolution)
+                    .transformed_2d(resolution, mat),
+            )
         } else {
             match self {
                 Geometry2D::LineString(line_string) => {
-                    Self::LineString(line_string.affine_transform(&transform))
+                    Self::LineString(line_string.transformed_2d(resolution, mat))
                 }
                 Geometry2D::MultiLineString(multi_line_string) => {
-                    Self::MultiLineString(multi_line_string.affine_transform(&transform))
+                    Self::MultiLineString(multi_line_string.transformed_2d(resolution, mat))
                 }
-                _ => unreachable!(),
+                _ => unreachable!("Geometry type not supported"),
             }
         }
     }

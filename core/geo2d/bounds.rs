@@ -3,9 +3,9 @@
 
 //! 2D Geometry bounds.
 
-use geo::coord;
+use geo::{AffineOps, AffineTransform, coord};
 
-use crate::{Vec2, geo2d::Rect};
+use crate::{Scalar, Transformed2D, Vec2, geo2d::Rect, mat3_to_affine_transform};
 
 /// 2D bounds, essentially an optional bounding rect.
 #[derive(Debug, Default, Clone)]
@@ -30,6 +30,11 @@ impl Bounds2D {
         self.0.as_ref().map(|s| Vec2::new(s.max().x, s.max().y))
     }
 
+    /// Return rect.
+    pub fn rect(&self) -> &Option<Rect> {
+        &self.0
+    }
+
     /// Calculate extended bounds.
     pub fn extend(self, other: Bounds2D) -> Self {
         match (self.0, other.0) {
@@ -46,6 +51,27 @@ impl Bounds2D {
                 ),
             ),
         }
+    }
+}
+
+impl AffineOps<Scalar> for Bounds2D {
+    fn affine_transform(&self, transform: &AffineTransform<Scalar>) -> Self {
+        Self(match &self.0 {
+            Some(rect) => Some(rect.affine_transform(transform)),
+            None => None,
+        })
+    }
+
+    fn affine_transform_mut(&mut self, transform: &AffineTransform<Scalar>) {
+        if let Some(rect) = &mut self.0 {
+            rect.affine_transform_mut(transform)
+        }
+    }
+}
+
+impl Transformed2D for Bounds2D {
+    fn transformed_2d(&self, _: &crate::RenderResolution, mat: &crate::Mat3) -> Self {
+        self.affine_transform(&mat3_to_affine_transform(mat))
     }
 }
 
