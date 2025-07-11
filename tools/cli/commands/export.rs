@@ -30,15 +30,7 @@ pub struct ExportArgs {
     pub resolution: String,
 }
 
-/// Parse and evaluate and export a µcad file.
-#[derive(clap::Parser)]
-pub struct Export {
-    /// Input µcad file.
-    #[clap(flatten)]
-    args: ExportArgs,
-}
-
-impl Export {
+impl ExportArgs {
     /// Get default exporter.
     fn default_exporter(
         output_type: &ModelNodeOutputType,
@@ -66,7 +58,7 @@ impl Export {
         use microcad_lang::*;
 
         use std::str::FromStr;
-        let value = syntax::NumberLiteral::from_str(&self.args.resolution)
+        let value = syntax::NumberLiteral::from_str(&self.resolution)
             .map(|literal| literal.value())
             .unwrap_or(value::Value::None);
 
@@ -79,7 +71,7 @@ impl Export {
                 let default = RenderResolution::default();
                 log::warn!(
                     "Invalid resolution `{resolution}`. Using default resolution: {value}mm",
-                    resolution = self.args.resolution,
+                    resolution = self.resolution,
                     value = default.linear
                 );
                 default
@@ -97,7 +89,7 @@ impl Export {
         let default_exporter = Self::default_exporter(&node.output_type(), config, exporters);
         let resolution = self.resolution();
 
-        match &self.args.output {
+        match &self.output {
             Some(filename) => Ok(ExportAttribute {
                 filename: filename.to_path_buf(),
                 resolution,
@@ -106,7 +98,7 @@ impl Export {
                     .or(default_exporter)?,
             }),
             None => {
-                let mut filename = self.args.input.clone();
+                let mut filename = self.input.clone();
                 let exporter = default_exporter?;
 
                 let ext = exporter
@@ -159,7 +151,7 @@ impl Export {
         Ok(nodes)
     }
 
-    fn export_targets(&self, nodes: &[(ModelNode, ExportAttribute)]) -> anyhow::Result<()> {
+    pub fn export_targets(&self, nodes: &[(ModelNode, ExportAttribute)]) -> anyhow::Result<()> {
         nodes
             .iter()
             .try_for_each(|(node, attr)| -> anyhow::Result<()> {
@@ -172,12 +164,20 @@ impl Export {
         Ok(())
     }
 
-    fn list_targets(&self, nodes: &Vec<(ModelNode, ExportAttribute)>) -> anyhow::Result<()> {
+    pub fn list_targets(&self, nodes: &Vec<(ModelNode, ExportAttribute)>) -> anyhow::Result<()> {
         for (node, attr) in nodes {
             log::info!("{node} => {attr}", node = node.signature());
         }
         Ok(())
     }
+}
+
+/// Parse and evaluate and export a µcad file.
+#[derive(clap::Parser)]
+pub struct Export {
+    /// Input µcad file.
+    #[clap(flatten)]
+    args: ExportArgs,
 }
 
 impl RunCommand for Export {
@@ -186,11 +186,13 @@ impl RunCommand for Export {
         let node = context.eval().expect("Valid node");
         let config = cli.fetch_config()?;
 
-        let target_nodes = &self.target_nodes(&node, &config, context.exporters())?;
+        let target_nodes = &self
+            .args
+            .target_nodes(&node, &config, context.exporters())?;
         if self.args.list {
-            self.list_targets(target_nodes)
+            self.args.list_targets(target_nodes)
         } else {
-            self.export_targets(target_nodes)
+            self.args.export_targets(target_nodes)
         }
     }
 }
