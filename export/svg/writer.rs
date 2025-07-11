@@ -3,7 +3,7 @@
 
 //! Scalable Vector Graphics (SVG) file writer
 
-use geo::CoordsIter;
+use geo::{CoordsIter, coord};
 use microcad_core::*;
 use microcad_lang::{
     model_tree::{Element, GetAttribute, ModelNode, ModelNodeOutputType},
@@ -44,7 +44,7 @@ impl From<&ModelNode> for SvgTagAttributes {
                 style: None,
                 fill: Some(color.to_svg_color()),
             },
-            // If boths attributes are present, get style and fill from attributes. Color attribute is ignored.
+            // If boths attributes are present, get style and fill from exporter attributes. Color attribute is ignored.
             (Some(attributes), None) | (Some(attributes), Some(_)) => SvgTagAttributes {
                 style: attributes
                     .by_id(&Identifier::no_ref("style"))
@@ -76,17 +76,21 @@ impl SvgWriter {
     /// - `scale`: Scale of the output
     pub fn new(
         mut w: Box<dyn std::io::Write>,
-        bounds: geo2d::Rect,
+        bounds: geo2d::Bounds2D,
         scale: f64,
     ) -> std::io::Result<Self> {
+        let r = bounds.rect().unwrap_or(Rect::new(
+            coord! {x : 0.0, y: 0.0},
+            coord! {x : 10.0, y: 10.0},
+        ));
         writeln!(&mut w, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
             &mut w,
             "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='{} {} {} {}'>",
-            bounds.min().x * scale,
-            bounds.min().y * scale,
-            bounds.width() * scale,
-            bounds.height() * scale
+            r.min().x * scale,
+            r.min().y * scale,
+            r.width() * scale,
+            r.height() * scale
         )?;
 
         writeln!(&mut w, "<g transform='scale({scale})'>")?;

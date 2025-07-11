@@ -310,6 +310,46 @@ impl ModelNode {
         });
     }
 
+    pub fn get_output_geometries_2d(&self) -> Geometries2D {
+        let b = self.borrow();
+        match &b.output().geometry {
+            ModelNodeGeometryOutput::Geometries2D(geometries) => geometries.clone(),
+            _ => panic!("The node does not contain a 2D geometry."),
+        }
+    }
+
+    /// Render the node.
+    ///
+    /// Rendering the node means that all geometry is calculated and stored
+    /// in the respective model node output.
+    /// This means after rendering, the rendered geometry can be retrieved via:
+    /// * `get_output_geometries_2d()` for 2D geometries.
+    /// * `get_output_geometries_3d()` for 3D geometries.
+    pub fn render(&self) {
+        fn render_geometries_2d(node: &ModelNode) -> Geometries2D {
+            let b = node.borrow();
+            match b.element() {
+                Element::Primitive2D(geometry) => geometry.clone().into(),
+                Element::Operation(operation) => operation.process_2d(node),
+                _ => Geometries2D::default(),
+            }
+        }
+
+        match self.output_type() {
+            ModelNodeOutputType::Geometry2D => {
+                let geometries = render_geometries_2d(self);
+                self.children().for_each(|node| {
+                    node.render();
+                });
+
+                let mut b = self.borrow_mut();
+                b.output_mut().geometry = ModelNodeGeometryOutput::Geometries2D(geometries);
+            }
+            ModelNodeOutputType::Geometry3D => todo!(),
+            _ => unreachable!(),
+        }
+    }
+
     /// Test if the node has this specific source file.
     pub fn has_source_file(&self, source_file: &std::rc::Rc<SourceFile>) -> bool {
         match (source_file.as_ref(), self.find_source_file()) {
@@ -469,6 +509,33 @@ impl GetPropertyValue for ModelNode {
 impl GetAttribute for ModelNode {
     fn get_attribute(&self, id: &Identifier) -> Option<crate::model_tree::Attribute> {
         self.borrow().attributes().get_attribute(id)
+    }
+}
+
+impl FetchBounds2D for ModelNode {
+    fn fetch_bounds_2d(&self) -> Bounds2D {
+        let mut bounds = Bounds2D::default();
+
+        self.descendants().for_each(|node| {
+            let b = node.borrow();
+            let output = b.output();
+            if let ModelNodeGeometryOutput::Geometries2D(geometries) = &output.geometry {
+                let mat = output.matrix_2d();
+                let resolution = &output.resolution;
+                bounds = bounds.clone().extend(
+                    geometries
+                        .fetch_bounds_2d()
+                        .transformed_2d(resolution, &mat),
+                );
+                println!(
+                    "{signature}: {mat:?}: {bounds:?}: {count}",
+                    signature = node.signature(),
+                    count = geometries.len()
+                );
+            }
+        });
+
+        bounds
     }
 }
 

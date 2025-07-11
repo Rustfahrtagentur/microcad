@@ -13,7 +13,11 @@ fn svg_writer() {
 
     let mut svg = SvgWriter::new(
         Box::new(file),
-        geo::Rect::new(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0)),
+        Some(geo::Rect::new(
+            geo::Point::new(0.0, 0.0),
+            geo::Point::new(100.0, 100.0),
+        ))
+        .into(),
         1.0,
     )
     .expect("test error");
