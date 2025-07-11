@@ -8,7 +8,11 @@ use crate::{eval::*, value::*};
 /// The `ArgumentMatch` trait is used to match arguments to parameters.
 ///
 /// It is implemented by `ArgumentMap` and `MultiArgumentMap`.
-pub trait ArgumentMatch: Default {
+pub trait ArgumentMatch: Default + SrcReferrer {
+    /// Create new instance
+    /// - `src_ref`: source code reference for argument list
+    fn new(src_ref: SrcRef) -> Self;
+
     /// Inserts a value into the map and removes it from the parameter list
     ///
     /// This function must be implemented by the user.
@@ -38,6 +42,7 @@ pub trait ArgumentMatch: Default {
             .filter_map(|(id, p)| argument_values.get(id).map(|c| (id, p, c)))
             // Insert the arguments into the map
             .try_for_each(|(id, parameter_value, argument_value)| {
+                log::trace!("found match by id: {id}");
                 self.insert_and_remove_from_parameters(
                     id,
                     argument_value.value.clone(),
@@ -65,25 +70,31 @@ pub trait ArgumentMatch: Default {
         }
         let mut idx = parameter_values.len();
 
-        for (_, argument_value) in argument_values.iter().filter(|(id, _)| id.is_empty()) {
-            let (id, parameter_value) =
-                match parameter_values.get_by_type(argument_value.ty(), parameter_values.keys()) {
-                    Ok((id, p)) => (id.clone(), p.clone()),
-                    Err(_) => break,
-                };
+        for (_, argument_value) in argument_values.iter() {
+            let (id, parameter_value) = match parameter_values.get_by_type(
+                argument_value.ty(),
+                parameter_values
+                    .keys()
+                    .filter(|k| !argument_values.contains_key(k)),
+            ) {
+                Ok((id, p)) => (id.clone(), p.clone()),
+                Err(_) => continue,
+            };
 
+            assert!(!id.is_empty());
+
+            log::trace!("found match by type: {id} : {}", argument_value.ty());
             match self.insert_and_remove_from_parameters(
                 &id,
                 argument_value.value.clone(),
                 &parameter_value,
                 parameter_values,
             )? {
-                TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => {
+                TypeCheckResult::MultiMatch | TypeCheckResult::SingleMatch => (),
+                _ => {
                     if idx == 0 {
                         break;
                     }
-                }
-                _ => {
                     idx -= 1;
                 }
             }
@@ -101,6 +112,9 @@ pub trait ArgumentMatch: Default {
         argument_values: &ArgumentValueList,
         parameter_values: &mut ParameterValueList,
     ) -> EvalResult<()> {
+        if parameter_values.is_empty() {
+            return Ok(());
+        }
         parameter_values
             // Clone the list of parameters because we want to remove elements from it while iterating
             .clone()
@@ -114,6 +128,7 @@ pub trait ArgumentMatch: Default {
             )
             // Insert the default values into the map
             .try_for_each(|(id, parameter_value, default_value)| {
+                log::trace!("found match by default: {id} = {default_value}");
                 self.insert_and_remove_from_parameters(
                     id,
                     default_value,
@@ -131,8 +146,12 @@ pub trait ArgumentMatch: Default {
         argument_values: &ArgumentValueList,
         parameter_values: &ParameterValueList,
     ) -> EvalResult<Self> {
+        log::trace!(
+            "find match:\n   Arguments: {argument_values}\n  Parameters: {parameter_values}"
+        );
+
         let mut missing_parameter_values = parameter_values.clone();
-        let mut result = Self::default();
+        let mut result = Self::new(argument_values.src_ref());
 
         result.match_named(argument_values, &mut missing_parameter_values)?;
         result.match_unnamed(argument_values, &mut missing_parameter_values)?;
@@ -141,7 +160,6 @@ pub trait ArgumentMatch: Default {
         if !missing_parameter_values.is_empty() {
             return Err(EvalError::MissingArguments(missing_parameter_values));
         }
-
         Ok(result)
     }
 }

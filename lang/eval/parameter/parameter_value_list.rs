@@ -18,10 +18,10 @@ impl ParameterValueList {
         id: Identifier,
         parameter: ParameterValue,
     ) -> std::result::Result<(), ValueError> {
+        assert!(!id.is_empty(), "expecting valid id");
         if self.0.contains_key(&id) {
             return Err(ValueError::DuplicateParameter(id.clone()));
         }
-        assert!(id.is_empty(), "expecting valid id");
         self.0.insert(id, parameter);
         Ok(())
     }
@@ -31,28 +31,16 @@ impl ParameterValueList {
         &'a self,
         ty: Type,
         mut ids: impl Iterator<Item = &'a Identifier>,
-    ) -> EvalResult<(&Identifier, &ParameterValue)> {
+    ) -> EvalResult<(&'a Identifier, &'a ParameterValue)> {
         let pv: Vec<_> = self
             .0
             .iter()
-            // TODO id is never none in parameter list but in argument list
             .filter(|(id, v)| ids.any(|i| i == *id) && v.type_matches(&ty))
             .collect();
         match pv.len() {
             0 => Err(EvalError::ParameterByTypeNotFound(ty)),
             1 => Ok(*pv.first().expect("one item")),
             _ => unreachable!("Type '{ty}' is ambiguous in parameters"),
-        }
-    }
-
-    /// Check for missing arguments.
-    ///
-    /// Checks if parameter value list is not empty and wraps the list into an error
-    pub fn check_for_missing_arguments(self) -> EvalResult<()> {
-        if !self.is_empty() {
-            Err(EvalError::MissingArguments(self))
-        } else {
-            Ok(())
         }
     }
 }
@@ -73,11 +61,15 @@ impl std::ops::DerefMut for ParameterValueList {
 
 impl std::fmt::Display for ParameterValueList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(
-            f,
-            "{}",
-            self.0.keys().map(|id| id.to_string()).join_compact(", ")
-        )
+        writeln!(f, "{}", {
+            let mut v = self
+                .0
+                .iter()
+                .map(|(id, p)| format!("{id}: {p}"))
+                .collect::<Vec<_>>();
+            v.sort();
+            v.join_compact(", ")
+        })
     }
 }
 

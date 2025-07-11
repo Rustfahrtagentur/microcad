@@ -172,10 +172,51 @@ impl SrcRef {
         }
     }
 
+    /// Merge all given source references to one
+    ///
+    /// All  given source references must have the same hash otherwise panics!
+    pub fn merge_all<S: SrcReferrer>(referrers: impl Iterator<Item = S>) -> SrcRef {
+        let mut result = SrcRef(None);
+        for referrer in referrers {
+            if let Some(src_ref) = referrer.src_ref().0 {
+                if let SrcRef(Some(result)) = &mut result {
+                    if result.source_file_hash != src_ref.source_file_hash {
+                        panic!("can only merge source references of the same file");
+                    }
+                    if src_ref.range.start < result.range.start {
+                        result.range.start = src_ref.range.start;
+                        result.at = src_ref.at;
+                    }
+                    result.range.end = std::cmp::max(src_ref.range.end, result.range.end);
+                } else {
+                    result = SrcRef(Some(src_ref));
+                }
+            }
+        }
+        result
+    }
+
     /// Return line and column in source code or `None` if not available.
     pub fn at(&self) -> Option<LineCol> {
         self.0.as_ref().map(|s| s.at.clone())
     }
+}
+
+#[test]
+fn merge_all() {
+    use std::ops::Range;
+    assert_eq!(
+        SrcRef::merge_all(
+            [
+                SrcRef::new(Range { start: 5, end: 8 }, 1, 6, 123),
+                SrcRef::new(Range { start: 8, end: 10 }, 2, 1, 123),
+                SrcRef::new(Range { start: 12, end: 16 }, 3, 1, 123),
+                SrcRef::new(Range { start: 0, end: 10 }, 1, 1, 123),
+            ]
+            .iter(),
+        ),
+        SrcRef::new(Range { start: 0, end: 16 }, 1, 1, 123),
+    );
 }
 
 impl From<Pair<'_>> for SrcRef {

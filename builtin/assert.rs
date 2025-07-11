@@ -19,7 +19,7 @@ pub fn assert() -> Symbol {
             .collect(),
         ),
         &|params, args, context| {
-            match ArgumentMap::find_match(args, params.expect("ParameterList")) {
+            match ArgumentMap::find_match(args, params.expect("parameter list")) {
                 Ok(arg_map) => {
                     let v = arg_map[&"v".try_into()?].try_bool()?;
                     if !v {

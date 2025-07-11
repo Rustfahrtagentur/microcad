@@ -102,6 +102,10 @@ impl std::ops::DerefMut for ArgumentMap {
 }
 
 impl ArgumentMatch for ArgumentMap {
+    fn new(src_ref: SrcRef) -> Self {
+        Self(Refer::new(std::collections::HashMap::new(), src_ref))
+    }
+
     fn insert_and_remove_from_parameters(
         &mut self,
         id: &Identifier,

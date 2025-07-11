@@ -96,23 +96,24 @@ impl SrcReferrer for ArgumentValueList {
 
 impl std::fmt::Display for ArgumentValueList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            self.map
-                .values()
-                .map(|p| p.to_string())
-                .collect::<Vec<_>>()
-                .join(", ")
-        )
+        write!(f, "{}", {
+            let mut v = self
+                .map
+                .iter()
+                .map(|(id, p)| format!("{id}: {p}"))
+                .collect::<Vec<_>>();
+            v.sort();
+            v.join(", ")
+        })
     }
 }
 
 impl FromIterator<(Identifier, ArgumentValue)> for ArgumentValueList {
     fn from_iter<T: IntoIterator<Item = (Identifier, ArgumentValue)>>(iter: T) -> Self {
+        let map: std::collections::HashMap<_, _> = iter.into_iter().collect();
         Self {
-            map: iter.into_iter().collect(),
-            src_ref: SrcRef(None),
+            src_ref: SrcRef::merge_all(map.values().map(|a| a.src_ref())),
+            map,
         }
     }
 }

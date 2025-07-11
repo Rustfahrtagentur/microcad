@@ -81,6 +81,17 @@ impl ParameterValue {
     }
 }
 
+impl std::fmt::Display for ParameterValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(def) = &self.default_value {
+            write!(f, "{}={}", def.ty(), def.value_to_string())?;
+        } else if let Some(ty) = &self.specified_type {
+            write!(f, "{ty}")?;
+        }
+        Ok(())
+    }
+}
+
 impl SrcReferrer for ParameterValue {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()

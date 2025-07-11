@@ -30,6 +30,7 @@ impl Parameter {
         default_value: Option<Expression>,
         src_ref: SrcRef,
     ) -> Self {
+        assert!(!id.is_empty());
         Self {
             id,
             specified_type,

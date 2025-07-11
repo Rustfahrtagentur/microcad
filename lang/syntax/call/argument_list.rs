@@ -31,16 +31,16 @@ impl std::ops::DerefMut for ArgumentList {
 
 impl std::fmt::Display for ArgumentList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            self.0
+        write!(f, "{}", {
+            let mut v = self
+                .0
                 .value
                 .iter()
                 .map(|p| p.to_string())
-                .collect::<Vec<_>>()
-                .join(", ")
-        )
+                .collect::<Vec<_>>();
+            v.sort();
+            v.join(", ")
+        })
     }
 }
 

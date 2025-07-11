@@ -12,7 +12,7 @@ use crate::{eval::*, ty::*, value::*};
 /// * If you call `a(4.0)`, `a` will be stored as a single coefficient, because we passed a single scalar.
 /// * If you call `a([2.0, 4.0])`, `a` will be stored as a multi coefficient, because we passed a list of scalars.
 #[derive(Default)]
-pub struct MultiArgumentMap(CombinationMap<Value>);
+pub struct MultiArgumentMap(Refer<CombinationMap<Value>>);
 
 impl MultiArgumentMap {
     /// Insert a multi-value coefficient
@@ -31,8 +31,17 @@ impl MultiArgumentMap {
     }
 }
 
+impl SrcReferrer for MultiArgumentMap {
+    fn src_ref(&self) -> SrcRef {
+        self.0.src_ref()
+    }
+}
+
 impl ArgumentMatch for MultiArgumentMap {
-    /// Insert a value into the map and remove `parameter_value` from the list
+    fn new(src_ref: SrcRef) -> Self {
+        Self(Refer::new(std::collections::HashMap::new(), src_ref))
+    }
+
     fn insert_and_remove_from_parameters(
         &mut self,
         id: &Identifier,
