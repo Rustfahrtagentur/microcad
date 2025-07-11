@@ -111,11 +111,6 @@ impl ModelNodes {
             .into()
     }
 
-    /// Dump all nodes.
-    pub fn dump(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        self.iter().try_for_each(|node| node.dump(f))
-    }
-
     /// Set the information about the creator for all nodes.
     ///
     /// See [`ModelNode::set_creator`] for more info.

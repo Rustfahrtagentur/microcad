@@ -342,7 +342,7 @@ impl std::fmt::Display for Value {
             Value::Array(l) => write!(f, "{l}"),
             Value::Tuple(t) => write!(f, "{t}"),
             Value::Matrix(m) => write!(f, "{m}"),
-            Value::Nodes(n) => n.dump(f),
+            Value::Nodes(n) => write!(f, "{n}"),
         }
     }
 }

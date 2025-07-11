@@ -392,14 +392,6 @@ impl ModelNode {
         })
     }
 
-    /// Dumps the tree structure of a node.
-    ///
-    /// The depth of a node is marked by the number of white spaces
-    pub fn dump(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        self.descendants()
-            .try_for_each(|child| writeln!(f, "{}{}", " ".repeat(child.depth()), child))
-    }
-
     /// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
     pub fn signature(&self) -> String {
         let mut s = String::new();
