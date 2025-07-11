@@ -105,7 +105,7 @@ impl Value {
             "≤" => Ok(Value::Bool(lhs <= rhs)),
             "≥" => Ok(Value::Bool(lhs >= rhs)),
             "~" => todo!("implement near ~="),
-            "=" => Ok(Value::Bool(lhs == rhs)),
+            "==" => Ok(Value::Bool(lhs == rhs)),
             "!=" => Ok(Value::Bool(lhs != rhs)),
             _ => unimplemented!("{op:?}"),
         } {
@@ -153,6 +153,21 @@ impl Value {
         }
 
         Err(ValueError::CannotConvert(self.clone(), "Scalar".into()))
+    }
+
+    /// Stringify the value
+    pub fn value_to_string(&self) -> String {
+        match self {
+            Value::None => "<invalid>".to_string(),
+            Value::Integer(n) => format!("{n}"),
+            Value::Quantity(q) => format!("{q}"),
+            Value::Bool(b) => format!("{b}"),
+            Value::String(s) => format!(r#""{s}""#),
+            Value::Array(l) => format!("{l}"),
+            Value::Tuple(t) => format!("{t}"),
+            Value::Matrix(m) => format!("{m}"),
+            Value::Nodes(_n) => todo!(),
+        }
     }
 }
 

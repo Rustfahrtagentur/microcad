@@ -109,7 +109,7 @@ impl Parse for Expression {
                     Rule::less_than => "<",
                     Rule::less_equal => "≤",
                     Rule::greater_equal => "≥",
-                    Rule::equal => "=",
+                    Rule::equal => "==",
                     Rule::near => "~",
                     Rule::not_equal => "!=",
                     Rule::and => "&",
