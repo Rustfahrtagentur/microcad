@@ -42,20 +42,27 @@ impl SourceFileTest {
         match context.eval() {
             Ok(node) => {
                 use microcad_core::RenderResolution;
+                use microcad_export::svg::SvgExporter;
                 use microcad_lang::model_tree::{ExportAttribute as Export, ModelNodeOutputType};
+                use std::rc::Rc;
 
                 self.write_and_compare(node.clone(), "model_tree");
 
                 if !context.has_errors() {
                     // If we have a 2D node, export node to SVG
-                    if node.output_type() == ModelNodeOutputType::Geometry2D {
-                        Export {
-                            filename: self.output_filename("svg").into(),
-                            resolution: RenderResolution::default(),
-                            exporter: std::rc::Rc::new(microcad_export::svg::SvgExporter),
+                    match node.output_type() {
+                        ModelNodeOutputType::Geometry2D => {
+                            Export {
+                                filename: self.output_filename("svg").into(),
+                                resolution: RenderResolution::default(),
+                                exporter: Rc::new(SvgExporter),
+                            }
+                            .export(&node)
+                            .expect("No error");
                         }
-                        .export(&node)
-                        .expect("No error");
+                        ModelNodeOutputType::Geometry3D => todo!("Implement 3D export"),
+                        ModelNodeOutputType::NotDetermined => {}
+                        _ => panic!("Invalid geometry output"),
                     }
                 }
             }
