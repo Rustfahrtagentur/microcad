@@ -79,7 +79,6 @@ impl Eval<ModelNodes> for StatementList {
                 output_type = node_output_type;
             } else if node_output_type != output_type {
                 context.error(statement, EvalError::CannotMixGeometry)?;
-                break;
             }
             nodes.append(&mut statement_nodes);
         }
