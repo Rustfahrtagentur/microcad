@@ -312,11 +312,25 @@ impl ModelNode {
         });
     }
 
-    pub fn get_output_geometries_2d(&self) -> Geometries2D {
+    /// Fetch output 2d geometries.
+    ///
+    /// Panics if the node does not contain any 2d geometry.
+    pub fn fetch_output_geometries_2d(&self) -> Geometries2D {
         let b = self.borrow();
         match &b.output().geometry {
             ModelNodeGeometryOutput::Geometries2D(geometries) => geometries.clone(),
             _ => panic!("The node does not contain a 2D geometry."),
+        }
+    }
+
+    /// Fetch output 3d geometries.
+    ///
+    /// Panics if the node does not contain any 3d geometry.
+    pub fn fetch_output_geometries_3d(&self) -> Geometries3D {
+        let b = self.borrow();
+        match &b.output().geometry {
+            ModelNodeGeometryOutput::Geometries3D(geometries) => geometries.clone(),
+            _ => panic!("The node does not contain a 3D geometry."),
         }
     }
 
@@ -325,8 +339,8 @@ impl ModelNode {
     /// Rendering the node means that all geometry is calculated and stored
     /// in the respective model node output.
     /// This means after rendering, the rendered geometry can be retrieved via:
-    /// * `get_output_geometries_2d()` for 2D geometries.
-    /// * `get_output_geometries_3d()` for 3D geometries.
+    /// * `fetch_output_geometries_2d()` for 2D geometries.
+    /// * `fetch_output_geometries_3d()` for 3D geometries.
     pub fn render(&self) {
         fn render_geometries_2d(node: &ModelNode) -> Geometries2D {
             let b = node.borrow();
@@ -337,12 +351,19 @@ impl ModelNode {
             }
         }
 
+        fn is_operation(node: &ModelNode) -> bool {
+            let b = node.borrow();
+            matches!(b.element(), Element::Operation(_))
+        }
+
         match self.output_type() {
             ModelNodeOutputType::Geometry2D => {
                 let geometries = render_geometries_2d(self);
-                self.children().for_each(|node| {
-                    node.render();
-                });
+                if !is_operation(self) {
+                    self.children().for_each(|node| {
+                        node.render();
+                    });
+                }
 
                 let mut b = self.borrow_mut();
                 b.output_mut().geometry = ModelNodeGeometryOutput::Geometries2D(geometries);
@@ -528,11 +549,6 @@ impl FetchBounds2D for ModelNode {
                     geometries
                         .fetch_bounds_2d()
                         .transformed_2d(resolution, &mat),
-                );
-                println!(
-                    "{signature}: {mat:?}: {bounds:?}: {count}",
-                    signature = node.signature(),
-                    count = geometries.len()
                 );
             }
         });
