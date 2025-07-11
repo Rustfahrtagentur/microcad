@@ -9,6 +9,7 @@ fn init() {
 }
 
 mod context;
+mod markdown_test;
 mod part;
 mod source_file_test;
 
