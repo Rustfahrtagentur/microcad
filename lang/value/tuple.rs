@@ -159,8 +159,8 @@ impl std::fmt::Display for Tuple {
             items = self
                 .named
                 .iter()
-                .map(|(id, v)| format!("{id} : {t}={v}", t = v.ty()))
-                .chain(self.unnamed.iter().map(|(ty, v)| format!("{v}: {ty}")))
+                .map(|(id, v)| format!("{id}: {v}"))
+                .chain(self.unnamed.values().map(|v| format!("{v}")))
                 .collect::<Vec<String>>()
                 .join(", ")
         )
