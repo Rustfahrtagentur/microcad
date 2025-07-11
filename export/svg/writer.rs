@@ -308,11 +308,16 @@ impl SvgWriter {
 
         let attr: SvgTagAttributes = node.into();
 
+        // Render all output geometries.
+        node.fetch_output_geometries_2d()
+            .iter()
+            .try_for_each(|geometry| self.geometry(geometry, &attr))?;
+
         let b = node.borrow();
         let element = b.element();
 
         match element {
-            Element::Object(_) => {
+            Element::Object(_) | Element::Primitive2D(_) => {
                 if node.has_children() {
                     self.begin_group(&attr)?;
                     node.children().try_for_each(|child| self.node(&child))?;
@@ -325,20 +330,6 @@ impl SvgWriter {
                     node.children().try_for_each(|child| self.node(&child))?;
                     self.end_transform()?;
                 }
-            }
-            Element::Primitive2D(geometry) => {
-                self.geometry(geometry, &attr)?;
-                if node.has_children() {
-                    self.begin_group(&attr)?;
-                    node.children().try_for_each(|child| self.node(&child))?;
-                    self.end_group()?;
-                }
-            }
-            Element::Operation(operation) => {
-                operation
-                    .process_2d(node)
-                    .iter()
-                    .try_for_each(|geometry| self.geometry(geometry, &attr))?;
             }
             _ => {}
         }
