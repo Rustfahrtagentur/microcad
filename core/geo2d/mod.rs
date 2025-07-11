@@ -12,6 +12,7 @@ use crate::*;
 
 pub use bounds::*;
 pub use collection::*;
+use geo::AffineTransform;
 pub use geometry::*;
 pub use primitives::*;
 
@@ -56,19 +57,13 @@ pub trait FetchPoints2D {
     fn fetch_points_2d(&self) -> Vec<Vec2>;
 }
 
-impl FetchBounds2D for Geometry2D {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
-        use geo::BoundingRect;
+/// Transformed version of a 2D geometry.
+pub trait Transformed2D<T = Self> {
+    /// Transform from matrix.
+    fn transformed_2d(&self, render_resolution: &RenderResolution, mat: &Mat3) -> T;
+}
 
-        match &self {
-            Geometry2D::LineString(line_string) => line_string.bounding_rect().into(),
-            Geometry2D::MultiLineString(multi_line_string) => {
-                multi_line_string.bounding_rect().into()
-            }
-            Geometry2D::Polygon(polygon) => polygon.bounding_rect().into(),
-            Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.bounding_rect().into(),
-            Geometry2D::Rect(rect) => Some(*rect).into(),
-            Geometry2D::Circle(circle) => circle.fetch_bounds_2d(),
-        }
-    }
+/// Convert a [`Mat3`]` into an affine transform.
+pub(crate) fn mat3_to_affine_transform(mat: &Mat3) -> AffineTransform {
+    geo::AffineTransform::new(mat.x.x, mat.y.x, mat.z.x, mat.x.y, mat.y.y, mat.z.y)
 }
