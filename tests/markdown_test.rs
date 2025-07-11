@@ -1,16 +1,8 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-pub fn run_test(
-    name: &str,
-    mode: Option<&str>,
-    banner: &std::path::Path,
-    out: &std::path::Path,
-    reference: &str,
-) {
-    let banner = &banner.to_string_lossy().escape_default().to_string();
-    let out_name = &out.to_string_lossy().escape_default().to_string();
-    let todo = mode == Some("todo") || mode == Some("todo_fail");
+pub fn run_test(name: &str, mode: &str, code: &str, banner: &str, out_name: &str, reference: &str) {
+    let todo = mode == "todo" || mode == "todo_fail";
 
     use std::fs;
     use std::io;
@@ -33,11 +25,11 @@ pub fn run_test(
     writeln!(out, "-- Test --\n  {name}\n  {reference}").expect("output error");
 
     // load and handle µcad source file
-    let source_file_result = SourceFile::load_from_str(r##"{code}"##);
+    let source_file_result = SourceFile::load_from_str(code);
 
     match mode {
         // test is expected to fail?
-        Some("fail") => match source_file_result {
+        "fail" => match source_file_result {
             // test expected to fail failed at parsing?
             Err(err) => {
                 writeln!(out, "-- Parse Error --").expect("output error");
@@ -149,10 +141,10 @@ pub fn run_test(
                 // check if test awaited to succeed but failed at evaluation
                 match (eval, context.has_errors(), todo) {
                     // test expected to succeed and succeeds with no errors
-                    (Ok(node), false, false) => {
+                    (Ok(_node), false, false) => {
                         let _ = fs::hard_link("images/ok.png", banner);
                         writeln!(out, "-- Test Result --\nOK").expect("output error");
-                        todo!("Export node")
+                        //todo!("Export node")
                     }
                     // test is todo but succeeds with no errors
                     (Ok(_), false, true) => {
