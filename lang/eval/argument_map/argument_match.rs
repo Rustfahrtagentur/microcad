@@ -8,7 +8,7 @@ use crate::{eval::*, value::*};
 /// The `ArgumentMatch` trait is used to match arguments to parameters.
 ///
 /// It is implemented by `ArgumentMap` and `MultiArgumentMap`.
-pub trait ArgumentMatch: Default + SrcReferrer {
+pub trait ArgumentMatch: Default + std::fmt::Display + SrcReferrer {
     /// Create new instance
     /// - `src_ref`: source code reference for argument list
     fn new(src_ref: SrcRef) -> Self;
@@ -71,15 +71,15 @@ pub trait ArgumentMatch: Default + SrcReferrer {
         let mut idx = parameter_values.len();
 
         for (_, argument_value) in argument_values.iter() {
-            let (id, parameter_value) = match parameter_values.get_by_type(
-                argument_value.ty(),
-                parameter_values
-                    .keys()
-                    .filter(|k| !argument_values.contains_key(k)),
-            ) {
-                Ok((id, p)) => (id.clone(), p.clone()),
-                Err(_) => continue,
-            };
+            let unnamed: Vec<_> = parameter_values
+                .keys()
+                .filter(|k| !argument_values.contains_key(k))
+                .collect();
+            let (id, parameter_value) =
+                match parameter_values.get_by_type(argument_value.ty(), unnamed.into_iter()) {
+                    Ok((id, p)) => (id.clone(), p.clone()),
+                    Err(_) => continue,
+                };
 
             assert!(!id.is_empty());
 
@@ -160,6 +160,68 @@ pub trait ArgumentMatch: Default + SrcReferrer {
         if !missing_parameter_values.is_empty() {
             return Err(EvalError::MissingArguments(missing_parameter_values));
         }
+
+        log::trace!("found match:\n   Arguments: {result}");
         Ok(result)
     }
+}
+
+#[test]
+fn argument_match_single() {
+    // create parameters and arguments to test
+    let parameters: ParameterValueList = [crate::parameter!(a: Scalar)].into_iter().collect();
+    let arguments: ArgumentValueList = [crate::argument!(a: Scalar = 5.0)].into_iter().collect();
+
+    // test find_match
+    let arg_map = ArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
+
+    // check output
+    assert_eq!(
+        arg_map
+            .get_value(&Identifier::no_ref("a"))
+            .expect("internal test error"),
+        &Value::Quantity(Quantity::new(5.0, QuantityType::Scalar))
+    );
+}
+
+#[test]
+fn argument_match_unnamed() {
+    // create parameters and arguments to test
+    let parameters: ParameterValueList = [
+        crate::parameter!(a: Scalar),
+        crate::parameter!(b: Scalar),
+        crate::parameter!(c: Length),
+    ]
+    .into_iter()
+    .collect();
+    let arguments: ArgumentValueList = [
+        crate::argument!(Scalar = 1.0),
+        crate::argument!(Length = 3.0),
+        crate::argument!(b: Scalar = 2.0),
+    ]
+    .into_iter()
+    .collect();
+
+    // test find_match
+    let arg_map = ArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
+
+    // check output
+    assert_eq!(
+        arg_map
+            .get_value(&Identifier::no_ref("a"))
+            .expect("internal test error"),
+        &Value::Quantity(Quantity::new(1.0, QuantityType::Scalar))
+    );
+    assert_eq!(
+        arg_map
+            .get_value(&Identifier::no_ref("b"))
+            .expect("internal test error"),
+        &Value::Quantity(Quantity::new(2.0, QuantityType::Scalar))
+    );
+    assert_eq!(
+        arg_map
+            .get_value(&Identifier::no_ref("c"))
+            .expect("internal test error"),
+        &Value::Quantity(Quantity::new(3.0, QuantityType::Scalar))
+    );
 }

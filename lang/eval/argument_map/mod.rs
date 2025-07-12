@@ -119,15 +119,16 @@ impl ArgumentMatch for ArgumentMap {
     }
 }
 
-#[test]
-fn argument_match_single() {
-    let parameters: ParameterValueList = [crate::parameter!(a: Scalar)].into_iter().collect();
-    let arguments: ArgumentValueList = [crate::argument!(a: Scalar = 5.0)].into_iter().collect();
-
-    let arg_map = ArgumentMap::find_match(&arguments, &parameters).expect("Valid match");
-
-    let a = arg_map.get_value(&Identifier::no_ref("a"));
-    assert!(a.is_some());
-    let a = a.expect("internal test error");
-    assert!(a == &Value::Quantity(Quantity::new(5.0, QuantityType::Scalar)));
+impl std::fmt::Display for ArgumentMap {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "({items})",
+            items = self
+                .iter()
+                .map(|(id, v)| format!("{id}: {v}"))
+                .collect::<Vec<String>>()
+                .join(", ")
+        )
+    }
 }

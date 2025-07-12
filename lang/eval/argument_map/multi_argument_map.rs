@@ -68,3 +68,20 @@ impl ArgumentMatch for MultiArgumentMap {
         }
     }
 }
+
+impl std::fmt::Display for MultiArgumentMap {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "({items})",
+            items = &self
+                .combinations()
+                .flat_map(|args| args
+                    .iter()
+                    .map(|(id, v)| format!("{id}: {v}"))
+                    .collect::<Vec<String>>())
+                .collect::<Vec<String>>()
+                .join(", ")
+        )
+    }
+}

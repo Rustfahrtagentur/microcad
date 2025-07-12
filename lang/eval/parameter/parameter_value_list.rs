@@ -61,7 +61,7 @@ impl std::ops::DerefMut for ParameterValueList {
 
 impl std::fmt::Display for ParameterValueList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{}", {
+        write!(f, "{}", {
             let mut v = self
                 .0
                 .iter()
