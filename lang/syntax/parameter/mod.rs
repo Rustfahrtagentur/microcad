@@ -106,19 +106,15 @@ impl PrintSyntax for Parameter {
         match (&self.specified_type, &self.default_value) {
             (Some(specified_type), Some(default_value)) => writeln!(
                 f,
-                "{:depth$}Parameter: '{}: {} = {}'",
+                "{:depth$}Parameter: {}: {} = {}",
                 "", self.id, specified_type, default_value
             ),
-            (Some(specified_type), None) => writeln!(
-                f,
-                "{:depth$}Parameter: '{}: {}'",
-                "", self.id, specified_type
-            ),
-            (None, Some(default_value)) => writeln!(
-                f,
-                "{:depth$}Parameter: '{} = {}'",
-                "", self.id, default_value
-            ),
+            (Some(specified_type), None) => {
+                writeln!(f, "{:depth$}Parameter: {}: {}", "", self.id, specified_type)
+            }
+            (None, Some(default_value)) => {
+                writeln!(f, "{:depth$}Parameter: {} = {}", "", self.id, default_value)
+            }
             _ => unreachable!("impossible parameter declaration"),
         }
     }

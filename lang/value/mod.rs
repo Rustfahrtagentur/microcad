@@ -23,14 +23,6 @@ pub use value_list::*;
 use crate::{model_tree::*, syntax::*, ty::*, *};
 use microcad_core::*;
 
-/// Create a Value::Tuple from items
-#[macro_export]
-macro_rules! tuple_value {
-    ($($key:ident = $value:expr),*) => {
-        Value::Tuple(Box::new($crate::tuple!($( $key = $value ),*)))
-    };
-}
-
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
 
 /// A variant value with attached source code reference.
@@ -350,13 +342,13 @@ impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Value::None => write!(f, "<invalid>"),
-            Value::Integer(n) => write!(f, "Integer = {n}"),
+            Value::Integer(n) => write!(f, "{n}"),
             Value::Quantity(q) => write!(f, "{q}"),
-            Value::Bool(b) => write!(f, "Bool = {b}"),
-            Value::String(s) => write!(f, "String = {s}"),
-            Value::Array(l) => write!(f, "Array = {l}"),
-            Value::Tuple(t) => write!(f, "Tuple = {t}"),
-            Value::Matrix(m) => write!(f, "Matrix = {m}"),
+            Value::Bool(b) => write!(f, "{b}"),
+            Value::String(s) => write!(f, "{s}"),
+            Value::Array(l) => write!(f, "{l}"),
+            Value::Tuple(t) => write!(f, "{t}"),
+            Value::Matrix(m) => write!(f, "{m}"),
             Value::Nodes(n) => n.dump(f),
         }
     }
@@ -365,15 +357,15 @@ impl std::fmt::Display for Value {
 impl std::fmt::Debug for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::None => write!(f, "None"),
-            Self::Integer(arg0) => write!(f, "Integer: {arg0}"),
-            Self::Quantity(arg0) => write!(f, "Quantity: {arg0}"),
-            Self::Bool(arg0) => write!(f, "Bool: {arg0}"),
-            Self::String(arg0) => write!(f, "String: {arg0}"),
-            Self::Array(arg0) => write!(f, "List: {arg0}"),
-            Self::Tuple(arg0) => write!(f, "Tuple: {arg0}"),
-            Self::Matrix(arg0) => write!(f, "Matrix: {arg0}"),
-            Self::Nodes(arg0) => write!(f, "Nodes:\n {arg0}"),
+            Value::None => write!(f, "<invalid>"),
+            Value::Integer(n) => write!(f, "Integer = {n}"),
+            Value::Quantity(q) => write!(f, "{q}"),
+            Value::Bool(b) => write!(f, "Bool = {b}"),
+            Value::String(s) => write!(f, "String = {s}"),
+            Value::Array(l) => write!(f, "Array = {l}"),
+            Value::Tuple(t) => write!(f, "Tuple = {t}"),
+            Value::Matrix(m) => write!(f, "Matrix = {m}"),
+            Value::Nodes(n) => write!(f, "Nodes:\n {n}"),
         }
     }
 }

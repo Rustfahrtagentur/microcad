@@ -115,7 +115,9 @@ impl From<BuiltinValueHelper> for Value {
             }
             BuiltinValueHelper::String(s) => Value::String(s),
             BuiltinValueHelper::Bool(b) => Value::Bool(b),
-            BuiltinValueHelper::Color(c) => crate::tuple_value!(r = c.r, g = c.g, b = c.b, a = c.a),
+            BuiltinValueHelper::Color(c) => {
+                crate::create_tuple_value!(r = c.r, g = c.g, b = c.b, a = c.a)
+            }
         }
     }
 }

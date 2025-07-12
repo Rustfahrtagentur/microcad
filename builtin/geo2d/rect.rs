@@ -3,7 +3,7 @@
 
 use geo::coord;
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter, rc::*};
+use microcad_lang::{eval::*, model_tree::*, parameter, rc::*, value::*};
 
 pub struct Rect;
 
@@ -12,7 +12,7 @@ impl BuiltinWorkbenchDefinition for Rect {
         "rect"
     }
 
-    fn node(args: &ArgumentMap) -> EvalResult<ModelNode> {
+    fn node(args: &Tuple) -> EvalResult<ModelNode> {
         let width: Scalar = args.get("width");
         let height: Scalar = args.get("height");
         let x = args.get("x");

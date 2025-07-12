@@ -15,7 +15,7 @@ fn square(x: Scalar) { x * x }
 s = square(x = 2)
 
 // check value
-std::debug::assert_eq( s, 4 );
+std::debug::assert_eq( [s, 4] );
 ```
 
 ## Calling Workbenches

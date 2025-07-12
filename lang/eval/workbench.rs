@@ -6,25 +6,10 @@
 use crate::{eval::*, model_tree::*, syntax::*};
 
 impl WorkbenchDefinition {
-    /// Find a matching initializer for argument list
-    fn find_matching_initializer(
-        &self,
-        args: &ArgumentValueList,
-        context: &mut Context,
-    ) -> Option<(&InitDefinition, MultiArgumentMap)> {
-        self.inits().find_map(|init| {
-            if let Ok(arg_map) = args.get_multi_matching_arguments(context, &init.parameters) {
-                Some((init, arg_map))
-            } else {
-                None
-            }
-        })
-    }
-
     /// Try to evaluate a single call into a [`ModelNode`].
     fn eval_to_node<'a>(
         &'a self,
-        arguments: &ArgumentMap,
+        arguments: &Tuple,
         init: Option<&'a InitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ModelNode> {
@@ -82,23 +67,19 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
     fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<ModelNodes> {
         let mut nodes = ModelNodes::default();
 
-        match self.find_matching_initializer(args, context) {
-            Some((init, multi_args)) => {
-                // We have a found a matching initializer. Evaluate each argument combination into a node
-                for args in multi_args.combinations() {
-                    nodes.push(self.eval_to_node(&args, Some(init), context)?);
-                }
-            }
-            None => match args.get_multi_matching_arguments(context, &self.plan) {
-                Ok(multi_args) => {
-                    for args in multi_args.combinations() {
-                        nodes.push(self.eval_to_node(&args, None, context)?);
+        // call initializer
+        for init in self.inits() {
+            let params = init.parameters.eval(context)?;
+            match ArgumentMatch::find_match(args, &params) {
+                Ok(args) => {
+                    let multipliers = ArgumentMatch::multipliers(&args, &params);
+                    for args in args.combinations(multipliers) {
+                        nodes.push(self.eval_to_node(&args, Some(init), context)?);
                     }
+                    break;
                 }
-                Err(err) => {
-                    context.error(self, err)?;
-                }
-            },
+                Err(err) => context.error(self, err)?,
+            }
         }
 
         Ok(nodes)

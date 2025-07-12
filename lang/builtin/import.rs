@@ -45,7 +45,7 @@ pub trait Importer: FileIoInterface {
     }
 
     /// Import a value with parameters as argument map.
-    fn import(&self, args: &ArgumentMap) -> Result<Value, ImportError>;
+    fn import(&self, args: &Tuple) -> Result<Value, ImportError>;
 }
 
 /// Importer registry stores all importers.
@@ -106,7 +106,7 @@ pub trait ImporterRegistryAccess {
     /// Import a value from an argument map
     fn import(
         &mut self,
-        arg_map: &ArgumentMap,
+        args: &Tuple,
         search_paths: &[std::path::PathBuf],
     ) -> Result<Value, Self::Error>;
 }
@@ -116,10 +116,10 @@ impl ImporterRegistryAccess for ImporterRegistry {
 
     fn import(
         &mut self,
-        arg_map: &ArgumentMap,
+        args: &Tuple,
         search_paths: &[std::path::PathBuf],
     ) -> Result<Value, Self::Error> {
-        let filename: String = arg_map.get("filename");
+        let filename: String = args.get("filename");
 
         match [".".into()] // Search working dir first
             .iter()
@@ -128,7 +128,7 @@ impl ImporterRegistryAccess for ImporterRegistry {
             .find(|path| path.exists())
         {
             Some(path) => {
-                let mut arg_map = arg_map.clone();
+                let mut arg_map = args.clone();
                 let filename = path.to_string_lossy().to_string();
                 arg_map.insert(
                     Identifier::no_ref("filename"),
@@ -161,7 +161,7 @@ impl ImporterRegistryAccess for ImporterRegistry {
 fn importer() {
     struct DummyImporter;
 
-    use crate::{builtin::Importer, parameter, syntax::*};
+    use crate::{builtin::Importer, parameter};
     use microcad_core::Integer;
 
     impl Importer for DummyImporter {
@@ -169,8 +169,8 @@ fn importer() {
             [parameter!(some_arg: Integer = 32)].into_iter().collect()
         }
 
-        fn import(&self, args: &ArgumentMap) -> Result<Value, ImportError> {
-            let some_arg: Integer = args.get::<Integer>("some_arg");
+        fn import(&self, args: &Tuple) -> Result<Value, ImportError> {
+            let some_arg: Integer = args.get("some_arg");
             if some_arg == 32 {
                 Ok(Value::Integer(32))
             } else {
@@ -192,8 +192,9 @@ fn importer() {
     let registry = ImporterRegistry::default().insert(DummyImporter);
 
     let by_id = registry.by_id(&"dummy".into()).expect("Dummy importer");
-
-    let mut args = ArgumentMap::new(crate::src_ref::SrcRef(None));
+    todo!();
+    /*
+    let mut args = ArgumentMatch::new(crate::src_ref::SrcRef(None));
     args.insert(Identifier::no_ref("some_arg"), Value::Integer(32));
 
     let value = by_id.import(&args).expect("Value");
@@ -205,4 +206,5 @@ fn importer() {
     let value = by_filename.import(&args).expect("Value");
 
     assert!(matches!(value, Value::Integer(42)));
+    */
 }

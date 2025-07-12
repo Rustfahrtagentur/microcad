@@ -171,6 +171,17 @@ impl Locals for Context {
     }
 }
 
+impl Default for Context {
+    fn default() -> Self {
+        Self {
+            symbol_table: Default::default(),
+            diag_handler: Default::default(),
+            output: Box::new(Stdout),
+            exporters: Default::default(),
+            importers: Default::default(),
+        }
+    }
+}
 impl Lookup for Context {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         self.symbol_table.lookup(name)
@@ -205,18 +216,6 @@ impl PushDiag for Context {
     }
 }
 
-#[cfg(test)]
-impl Default for Context {
-    fn default() -> Self {
-        Context::new(
-            Symbol::new_source(SourceFile::load_from_str("").expect("Valid source file")),
-            Symbol::new_module("__builtin".into()),
-            &[],
-            Box::new(Stdout),
-        )
-    }
-}
-
 impl GetSourceByHash for Context {
     fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
         self.symbol_table.get_by_hash(hash)
@@ -239,7 +238,7 @@ impl ImporterRegistryAccess for Context {
 
     fn import(
         &mut self,
-        arg_map: &ArgumentMap,
+        arg_map: &Tuple,
         search_paths: &[std::path::PathBuf],
     ) -> Result<Value, Self::Error> {
         match self.importers.import(arg_map, search_paths) {

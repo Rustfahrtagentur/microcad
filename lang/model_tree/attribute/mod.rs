@@ -11,7 +11,7 @@ pub use attributes::Attributes;
 pub use export::ExportAttribute;
 pub use resolution::ResolutionAttribute;
 
-use crate::{eval::ArgumentMap, syntax::*, value::*};
+use crate::{syntax::*, value::*};
 
 use microcad_core::Color;
 
@@ -25,7 +25,7 @@ pub enum Attribute {
     /// Render resolution attribute.
     Resolution(ResolutionAttribute),
     /// Exporter specific attributes.
-    ExporterSpecific(Identifier, ArgumentMap),
+    ExporterSpecific(Identifier, Tuple),
 }
 
 impl Attribute {
@@ -46,9 +46,7 @@ impl From<Attribute> for Value {
             Attribute::Export(export_attribute) => export_attribute.into(),
             Attribute::Color(color) => Value::Tuple(Box::new(color.into())),
             Attribute::Resolution(resolution_attribute) => resolution_attribute.into(),
-            Attribute::ExporterSpecific(_, argument_map) => {
-                Value::Tuple(Box::new(argument_map.into()))
-            }
+            Attribute::ExporterSpecific(_, arguments) => Value::Tuple(Box::new(arguments)),
         }
     }
 }
@@ -73,9 +71,9 @@ pub trait GetAttribute {
     }
 
     /// Get specific exporter attributes by id.
-    fn get_exporter_attribute(&self, id: &Identifier) -> Option<ArgumentMap> {
+    fn get_exporter_attribute(&self, id: &Identifier) -> Option<Tuple> {
         match self.get_attribute(id) {
-            Some(Attribute::ExporterSpecific(_, argument_map)) => Some(argument_map),
+            Some(Attribute::ExporterSpecific(_, arguments)) => Some(arguments),
             _ => None,
         }
     }

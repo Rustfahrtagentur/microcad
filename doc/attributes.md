@@ -15,7 +15,7 @@ When viewed or exported, node `c` will have a red color, because the `color` att
 #[color = "#FFFFFF"]
 c = std::geo2d::circle(42.0mm);
 
-std::debug::assert_eq(c#color, (r = 1.0, g = 1.0, b = 1.0, a = 1.0));
+std::debug::assert_eq([c#color, (r = 1.0, g = 1.0, b = 1.0, a = 1.0)]);
 ```
 
 ## Syntax
@@ -28,7 +28,6 @@ This results in two ways to attach an attribute:
 
 * *Calls*: `#[export("test.svg")]`, `#[svg("style = fill:none")]`. Store export-specific values.
 
-
 ## Color attribute
 
 The `color` attribute attaches a color to a node.
@@ -39,7 +38,7 @@ In viewer and when exported, the node will be drawn in the specified color.
 #[color = "#FFFFFF"]
 c = std::geo2d::circle(42.0mm);
 
-std::debug::assert_eq(c#color, (r = 1.0, g = 1.0, b = 1.0, a = 1.0));
+std::debug::assert_eq([c#color, (r = 1.0, g = 1.0, b = 1.0, a = 1.0)]);
 ```
 
 ## Resolution attribute
@@ -52,7 +51,7 @@ This means the circle will be rendered with a resolution `0.05mm`.
 #[resolution = 200%]
 c = std::geo2d::circle(42.0mm);
 
-std::debug::assert_eq(c#resolution, 200%);
+std::debug::assert_eq([c#resolution, 200%]);
 ```
 
 ## Exporter specific attributes
@@ -61,15 +60,15 @@ Exporter specific attributes have a call-like syntax.
 
 ### Export attribute
 
-The `export` defines the filename and the (optional) ID. 
+The `export` defines the filename and the (optional) ID.
 If you have created a part or a sketch and want to export it to a specific file, you can add the export attribute:
 
 ```µcad,attributes_export
 #[export("circle.svg")]
 c = std::geo2d::circle(42.0mm);
 
-std::debug::assert_eq(c#export.filename, "circle.svg");
-std::debug::assert_eq(c#export.id, "svg");
+std::debug::assert_eq([c#export.filename, "circle.svg"]);
+std::debug::assert_eq([c#export.id, "svg"]);
 ```
 
 Additional, you can use the `id` parameter to use a specific exporter.
@@ -79,13 +78,11 @@ However, the exporter is detected automatically depending on the file extension.
 #[export("circle.svg", id = "svg")]
 c = std::geo2d::circle(42.0mm);
 
-std::debug::assert_eq(c#export.filename, "circle.svg");
-std::debug::assert_eq(c#export.id, "svg");
+std::debug::assert_eq([c#export.filename, "circle.svg"]);
+std::debug::assert_eq([c#export.id, "svg"]);
 ```
 
-
 See [export](export.md) for more information.
-
 
 ### SVG attribute
 
@@ -98,7 +95,5 @@ The `svg` exporter has these attributes:
 #[svg(style = "fill: skyblue; stroke: cadetblue; stroke-width: 2;")]
 c = std::geo2d::circle(42.0mm);
 
-std::debug::assert_eq(c#export.filename, "circle.svg");
+std::debug::assert_eq([c#export.filename, "circle.svg"]);
 ```
-
-

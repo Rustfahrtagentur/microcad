@@ -7,14 +7,14 @@ The following example calculates the area of a circle by using the *measure* `ar
 [![test](.test/measure.png)](.test/measure.log)
 
 ```µcad,measure
-__builtin::assert_eq( 
+__builtin::assert_eq([
 
     // use measure area() on a circle
     std::geo2d::circle(radius=10mm).area(),
 
     // circle area formula for comparison
     10mm * 10mm * std::math::PI
-);
+]);
 ```
 
 Currently it is not possible to declare measures in µcad.

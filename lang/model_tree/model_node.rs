@@ -4,19 +4,19 @@
 //! Model node
 
 use crate::{
-    GetPropertyValue, eval::*, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*,
+    eval::*, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*, GetPropertyValue,
 };
 
 use microcad_core::*;
 
-/// The origin is the [`Symbol`] and [`ArgumentMap`] from which the node has been created.
+/// The origin is the [`Symbol`] and [`Tuple`] from which the node has been created.
 #[derive(Clone, Default, Debug)]
 pub struct ModelNodeOrigin {
     /// The original symbol that has been called.
     creator: Option<Symbol>,
 
     /// The original arguments.
-    arguments: ArgumentMap,
+    arguments: Tuple,
 
     /// The original source file.
     source_file: Option<std::rc::Rc<SourceFile>>,
@@ -33,7 +33,7 @@ impl std::fmt::Display for ModelNodeOrigin {
                     f,
                     "{symbol}({arguments})",
                     symbol = creator.full_name(),
-                    arguments = self.arguments.to_one_line_string(Some(32))
+                    arguments = self.arguments
                 )
             }
             None => Ok(()),
@@ -331,7 +331,7 @@ impl ModelNode {
     }
 
     /// Set the arguments with have been passed to this node.
-    pub(crate) fn set_original_arguments(&self, arguments: ArgumentMap) -> Self {
+    pub(crate) fn set_original_arguments(&self, arguments: Tuple) -> Self {
         let origin = &mut self.0.borrow_mut().origin;
         origin.arguments = arguments;
         self.clone()

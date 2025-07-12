@@ -7,7 +7,7 @@ impl InitDefinition {
     /// Evaluate a call to the init definition
     pub fn eval(
         &self,
-        args: &ArgumentMap,
+        args: &Tuple,
         node_builder: &mut ModelNodeBuilder,
         context: &mut Context,
     ) -> EvalResult<()> {

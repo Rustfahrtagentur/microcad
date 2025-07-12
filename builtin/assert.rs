@@ -19,19 +19,21 @@ pub fn assert() -> Symbol {
             .collect(),
         ),
         &|params, args, context| {
-            match ArgumentMap::find_match(args, params.expect("parameter list")) {
-                Ok(arg_map) => {
-                    let v = arg_map[&"v".try_into()?].try_bool()?;
-                    if !v {
-                        let message = arg_map[&"message".try_into()?].try_string()?;
-                        context.error(
-                            arg_map,
-                            EvalError::AssertionFailed(if message.is_empty() {
-                                format!("{v}")
-                            } else {
-                                format!("{v}: {message}")
-                            }),
-                        )?;
+            match ArgumentMatch::find_multi_match(args, params.expect("parameter list")) {
+                Ok(multi_args) => {
+                    for a in multi_args {
+                        let v: bool = a.get("v");
+                        if !v {
+                            let message: String = a.get("message");
+                            context.error(
+                                a,
+                                EvalError::AssertionFailed(if message.is_empty() {
+                                    format!("{v}")
+                                } else {
+                                    format!("{v}: {message}")
+                                }),
+                            )?;
+                        }
                     }
                 }
                 Err(err) => {
@@ -45,33 +47,45 @@ pub fn assert() -> Symbol {
     )
 }
 
+fn all_equal<T: PartialEq>(mut iter: impl Iterator<Item = T>) -> bool {
+    if let Some(first) = iter.next() {
+        iter.all(|x| x == first)
+    } else {
+        // Wenn der Iterator leer ist, gibt es keine Elemente zum Vergleichen.
+        true
+    }
+}
+
 pub fn assert_eq() -> Symbol {
     Symbol::new_builtin(
         Identifier::no_ref("assert_eq"),
         Some(
             [
                 parameter!(a),                               // Parameter with any type
-                parameter!(b),                               // Parameter with any type
                 parameter!(message: String = String::new()), // Optional message
             ]
             .into_iter()
             .collect(),
         ),
         &|params, args, context| {
-            match ArgumentMap::find_match(args, params.expect("ParameterList")) {
-                Ok(arg_map) => {
-                    let a_value = &arg_map[&"a".try_into()?];
-                    let b_value = &arg_map[&"b".try_into()?];
-                    if a_value != b_value {
-                        let message = arg_map[&"message".try_into()?].try_string()?;
-                        context.error(
-                            args,
-                            EvalError::AssertionFailed(if message.is_empty() {
-                                format!("{a_value} != {b_value}")
-                            } else {
-                                format!("{a_value} != {b_value}: {message}")
-                            }),
-                        )?;
+            match ArgumentMatch::find_multi_match(args, params.expect("ParameterList")) {
+                Ok(multi_args) => {
+                    for a in multi_args {
+                        let a_value = &a.get_value("a");
+
+                        if let Value::Array(exprs) = a_value {
+                            if all_equal(exprs.iter()) {
+                                let message: String = a.get("message");
+                                context.error(
+                                    args,
+                                    EvalError::AssertionFailed(if message.is_empty() {
+                                        format!("Values differ: {exprs}")
+                                    } else {
+                                        "{message}".to_string()
+                                    }),
+                                )?;
+                            }
+                        }
                     }
                 }
                 Err(err) => {

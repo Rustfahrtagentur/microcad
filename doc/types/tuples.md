@@ -44,8 +44,8 @@ Tuple syntax is also employed on the left side of *tuple assignments*.
 ```µcad,tuple_assignment#todo
 (width, height) = (1m,2m);
 // check values of width and height
-assert_eq(width,1m);
-assert_eq(height,2m);
+assert_eq([width,1m]);
+assert_eq([height,2m]);
 ```
 
 Occasionally, it's practical to *group units* together, but this cannot be done directly
@@ -56,8 +56,8 @@ Instead, you must use an *array*, which will be converted into a tuple during th
 
 ```µcad,tuple_assignment_bundle#todo
 (width, height) = [1,2]m;
-assert_eq(width,1m);
-assert_eq(height,2m);
+assert_eq([width,1m]);
+assert_eq([height,2m]);
 ```
 
 This method can generally be used to convert an *array* into a *tuple*:
@@ -69,7 +69,7 @@ array = [1,2]m;
 (width, height) = array;
 tuple = (width, height);
 
-assert_eq(tuple,(1m,2m));
-assert_eq(tuple.width,1m);
-assert_eq(tuple.height,2m);
+assert_eq([tuple,(1m,2m)]);
+assert_eq([tuple.width,1m]);
+assert_eq([tuple.height,2m]);
 ```

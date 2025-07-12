@@ -14,10 +14,10 @@ use crate::{diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*, GetPr
 pub struct ObjectProperties(BTreeMap<Identifier, Value>);
 
 impl ObjectProperties {
-    /// Create new object properties from a [`ParameterValueList`] and an [`ArgumentMap`].
+    /// Create new object properties from a [`ParameterValueList`] and an [`Tuple`].
     pub fn from_parameters_and_arguments(
         parameters: &ParameterValueList,
-        arguments: &ArgumentMap,
+        arguments: &Tuple,
     ) -> Self {
         let mut props = ObjectProperties::default();
 
@@ -26,7 +26,7 @@ impl ObjectProperties {
                 id.clone(),
                 match &parameter.default_value {
                     Some(value) => value.clone(),
-                    None => arguments.get_value(id).unwrap_or(&Value::None).clone(),
+                    None => todo!("fix at merge"),
                 },
             );
         }

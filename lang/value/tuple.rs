@@ -5,7 +5,7 @@
 
 use std::collections::HashMap;
 
-use crate::{ty::*, value::*};
+use crate::{src_ref::*, ty::*, value::*};
 
 /// Tuple with named values
 ///
@@ -14,11 +14,36 @@ use crate::{ty::*, value::*};
 pub struct Tuple {
     pub(crate) named: std::collections::HashMap<Identifier, Value>,
     pub(crate) unnamed: std::collections::HashMap<Type, Value>,
+    pub(crate) src_ref: SrcRef,
+}
+
+/// Create Tuple from µcad code for tests
+#[cfg(test)]
+#[macro_export]
+macro_rules! tuple {
+    ($code:expr) => {{
+        use $crate::eval::*;
+        match $crate::tuple_expression!($code)
+            .eval(&mut Default::default())
+            .expect("evaluation error")
+        {
+            Value::Tuple(tuple) => *tuple,
+            _ => panic!(),
+        }
+    }};
+}
+
+/// Create a Value::Tuple from items
+#[macro_export]
+macro_rules! create_tuple_value {
+    ($($key:ident = $value:expr),*) => {
+        Value::Tuple(Box::new($crate::create_tuple!($( $key = $value ),*)))
+    };
 }
 
 /// Create a Tuple from items
 #[macro_export]
-macro_rules! tuple {
+macro_rules! create_tuple {
         ($($key:ident = $value:expr),*) => {
                 [$( (stringify!($key), $value) ),* ]
                     .iter()
@@ -32,30 +57,172 @@ impl Tuple {
         Self {
             named,
             unnamed: HashMap::default(),
+            src_ref: todo!(),
         }
     }
 
-    /// Find named value by identifier.
-    pub fn by_id(&self, id: &Identifier) -> Option<&Value> {
-        self.named.get(id)
+    /// Insert new value into tuple
+    pub fn insert(&mut self, id: Identifier, value: Value) {
+        if id.is_empty() {
+            self.unnamed.insert(value.ty(), value);
+        } else {
+            self.named.insert(id, value);
+        }
     }
+
+    /// Return the tuple type.
+    pub fn tuple_type(&self) -> TupleType {
+        TupleType {
+            named: self
+                .named
+                .iter()
+                .map(|(id, v)| (id.clone(), v.ty()))
+                .collect(),
+            unnamed: self.unnamed.values().map(|v| (v.ty())).collect(),
+        }
+    }
+
+    /// Dissolve unnamed them.
+    ///
+    /// Transparent tuples are unnamed tuple items of a tuple.
+    ///
+    /// ```,µcad
+    /// assert_eq!( (x=0, (y=0, z=0)), (x=0, y=0, z=0) );
+    /// ///               ^ unnamed tuple
+    pub fn ray(&mut self) {
+        self.unnamed.retain(|_, value| {
+            if let Value::Tuple(tuple) = value {
+                tuple.ray();
+                tuple.named.drain().for_each(|(k, v)| {
+                    self.named.insert(k, v);
+                });
+                false
+            } else {
+                true
+            }
+        });
+    }
+
+    /// Return a vector of all combinations of the given ids.
+    ///
+    /// - `ids`: Items to multiply.
+    pub fn combinations(&self, ids: std::collections::HashSet<Identifier>) -> Vec<Tuple> {
+        let mut result = Vec::new();
+        self.multiplicity(ids, |p| result.push(p));
+        result
+    }
+
+    /// Call a predicate for each tuple multiplicity.
+    ///
+    /// - `ids`: Items to multiply.
+    /// - `p`: Predicate to call for each resulting tuple.
+    ///
+    /// # Example
+    ///
+    /// | Input           | Predicate's Parameters |
+    /// |-----------------|------------------------|
+    /// | `([x₀, x₁], y)` | `(x₀, y)`, `(x₁, y)`   |
+    ///
+    pub fn multiplicity<P: FnMut(Tuple)>(
+        &self,
+        ids: std::collections::HashSet<Identifier>,
+        mut p: P,
+    ) {
+        log::trace!("combining: {ids:?}:");
+        // count array indexes for items which shall be multiplied and number of overall combinations
+        let mut combinations = 1;
+        let mut counts: HashMap<Identifier, (_, _)> = ids
+            .into_iter()
+            .map(|id| {
+                let counter = if let Some(Value::Array(array)) = &self.named.get(&id) {
+                    let len = array.len();
+                    combinations *= len;
+                    (0, len)
+                } else {
+                    panic!("'{id}' found in tuple but no list:\n{self:#?}");
+                };
+                (id, counter)
+            })
+            .collect();
+
+        log::trace!("multiplicity: {combinations} combinations:");
+
+        // call predicate for each version of the tuple
+        for _ in 0..combinations {
+            let mut counted = false;
+            let tuple = self
+                .named
+                .iter()
+                .map(|(id, v)| match v {
+                    Value::Array(array) => {
+                        if let Some((count, len)) = counts.get_mut(id) {
+                            let item = (
+                                id.clone(),
+                                array.get(*count).expect("array index not found").clone(),
+                            );
+                            if !counted {
+                                *count += 1;
+                                if *count == *len {
+                                    *count = 0
+                                } else {
+                                    counted = true;
+                                }
+                            }
+                            item
+                        } else {
+                            panic!("'{id}' found in tuple but no list");
+                        }
+                    }
+                    _ => (id.clone(), v.clone()),
+                })
+                .collect();
+            p(tuple);
+        }
+    }
+}
+
+/// Trait for Value Lists
+pub trait ValueAccess {
+    /// Find named value by identifier.
+    fn by_id(&self, id: &Identifier) -> Option<&Value>;
 
     /// Find unnamed value by type.
-    pub fn by_ty(&self, ty: &Type) -> Option<&Value> {
-        self.unnamed.get(ty)
-    }
+    fn by_ty(&self, ty: &Type) -> Option<&Value>;
 
-    /// Fetch an argument by name as `&str`.
+    /// Fetch an argument value by name as `&str`.
     ///
-    /// This method does not provide error handling and is supposed to be used for built-ins.
-    pub fn get<'a, T>(&'a self, id: &str) -> Option<T>
+    /// Panics if `id ` cannot be found.`
+    fn get<'a, T>(&'a self, id: &str) -> T
     where
         T: std::convert::TryFrom<&'a Value>,
         T::Error: std::fmt::Debug,
     {
-        self.named
-            .get(&Identifier::no_ref(id))
-            .map(|value| TryInto::try_into(value).expect("Value"))
+        self.by_id(&Identifier::no_ref(id))
+            .map(|t| TryInto::try_into(t).expect("Value"))
+            .expect("some value")
+    }
+
+    /// Fetch an argument value by name as `&str`.
+    ///
+    /// Panics if `id ` cannot be found.`
+    fn get_value(&self, id: &str) -> &Value {
+        self.by_id(&Identifier::no_ref(id)).expect("")
+    }
+}
+
+impl ValueAccess for Tuple {
+    fn by_id(&self, id: &Identifier) -> Option<&Value> {
+        self.named.get(id)
+    }
+
+    fn by_ty(&self, ty: &Type) -> Option<&Value> {
+        self.unnamed.get(ty)
+    }
+}
+
+impl SrcReferrer for Tuple {
+    fn src_ref(&self) -> SrcRef {
+        self.src_ref.clone()
     }
 }
 
@@ -71,31 +238,59 @@ where
         Self {
             named: named.into_iter().collect(),
             unnamed: unnamed.into_iter().map(|(_, v)| (v.ty(), v)).collect(),
+            src_ref: todo!(),
+        }
+    }
+}
+
+impl FromIterator<(Identifier, Value)> for Tuple {
+    fn from_iter<T: IntoIterator<Item = (Identifier, Value)>>(iter: T) -> Self {
+        let (unnamed, named): (Vec<_>, _) = iter
+            .into_iter()
+            .map(|(k, v)| (k, v.clone()))
+            .partition(|(k, _)| k.is_empty());
+        Self {
+            named: named.into_iter().collect(),
+            unnamed: unnamed.into_iter().map(|(_, v)| (v.ty(), v)).collect(),
+            src_ref: todo!(),
         }
     }
 }
 
 impl From<Vec2> for Tuple {
     fn from(v: Vec2) -> Self {
-        tuple!(x = v.x, y = v.y)
+        create_tuple!(x = v.x, y = v.y)
     }
 }
 
 impl From<Vec3> for Tuple {
     fn from(v: Vec3) -> Self {
-        tuple!(x = v.x, y = v.y, z = v.z)
+        create_tuple!(x = v.x, y = v.y, z = v.z)
     }
 }
 
 impl From<Color> for Tuple {
     fn from(color: Color) -> Self {
-        tuple!(r = color.r, g = color.g, b = color.b, a = color.a)
+        create_tuple!(r = color.r, g = color.g, b = color.b, a = color.a)
     }
 }
 
 impl From<Tuple> for Value {
     fn from(tuple: Tuple) -> Self {
         Value::Tuple(Box::new(tuple))
+    }
+}
+
+impl FromIterator<Tuple> for Tuple {
+    fn from_iter<T: IntoIterator<Item = Tuple>>(iter: T) -> Self {
+        Self {
+            named: Default::default(),
+            unnamed: iter
+                .into_iter()
+                .map(|t| (Type::Tuple(t.tuple_type().into()), Value::Tuple(t.into())))
+                .collect(),
+            src_ref: todo!(),
+        }
     }
 }
 
@@ -156,13 +351,16 @@ impl std::fmt::Display for Tuple {
         write!(
             f,
             "({items})",
-            items = self
-                .named
-                .iter()
-                .map(|(id, v)| format!("{id}: {v}"))
-                .chain(self.unnamed.values().map(|v| format!("{v}")))
-                .collect::<Vec<String>>()
-                .join(", ")
+            items = {
+                let mut items = self
+                    .named
+                    .iter()
+                    .map(|(id, v)| format!("{id}: {v}"))
+                    .chain(self.unnamed.values().map(|v| format!("{v}")))
+                    .collect::<Vec<String>>();
+                items.sort();
+                items.join(", ")
+            }
         )
     }
 }
@@ -185,56 +383,28 @@ impl crate::ty::Ty for Tuple {
 
 #[test]
 fn tuple_equal() {
-    let tuple1: Tuple = [
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Volume,
-            }),
-        ),
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Length,
-            }),
-        ),
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Area,
-            }),
-        ),
-    ]
-    .iter()
-    .into();
-    let tuple2: Tuple = [
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Length,
-            }),
-        ),
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Area,
-            }),
-        ),
-        (
-            "",
-            Value::Quantity(Quantity {
-                value: 1.0,
-                quantity_type: QuantityType::Volume,
-            }),
-        ),
-    ]
-    .iter()
-    .into();
+    assert_eq!(
+        tuple!("(v=1.0m³, l=1.0m, a=1.0m²)"),
+        tuple!("(l=1.0m, a=1.0m², v=1.0m³)")
+    );
+}
 
-    assert_eq!(tuple1, tuple2);
+#[test]
+fn tuple_not_equal() {
+    assert_ne!(
+        tuple!("(d=1.0g/m³, l=1.0m, a=1.0m²)"),
+        tuple!("(l=1.0m, a=1.0m², v=1.0m³)")
+    );
+    assert_ne!(
+        tuple!("(l=1.0m, a=1.0m²)"),
+        tuple!("(l=1.0m, a=1.0m², v=1.0m³)")
+    );
+}
+
+#[test]
+fn multiplicity_check() {
+    let tuple = tuple!("(x = [1, 2, 3], y = [1, 2], z = 1)");
+
+    let ids: std::collections::HashSet<Identifier> = ["x".into(), "y".into()].into_iter().collect();
+    tuple.multiplicity(ids, |tuple| println!("{tuple}"));
 }

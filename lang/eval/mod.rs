@@ -27,7 +27,7 @@
 //! println!("{}", context.diagnosis());
 //! ```
 
-mod argument_map;
+mod argument_match;
 mod attribute;
 mod body;
 mod builtin;
@@ -49,7 +49,7 @@ mod tuple;
 mod r#use;
 mod workbench;
 
-pub use argument_map::*;
+pub use argument_match::*;
 pub use attribute::*;
 pub use builtin::*;
 pub use call::*;
@@ -58,8 +58,8 @@ pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
 pub use parameter::*;
-pub use symbols::*;
 pub use r#use::*;
+pub use symbols::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 

@@ -22,7 +22,7 @@ impl SrcReferrer for ArgumentValue {
 
 impl std::fmt::Display for ArgumentValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value)
+        write!(f, "{:?}", self.value)
     }
 }
 
@@ -36,5 +36,14 @@ impl ArgumentValue {
     /// Create new argument value
     pub fn new(value: Value, src_ref: SrcRef) -> Self {
         Self { value, src_ref }
+    }
+
+    /// If argument is an array returns the inner type
+    pub fn ty_inner(&self) -> Type {
+        if let Type::List(ty) = self.ty() {
+            ty.ty()
+        } else {
+            Type::Invalid
+        }
     }
 }

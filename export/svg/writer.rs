@@ -6,7 +6,6 @@
 use geo::CoordsIter;
 use microcad_core::*;
 use microcad_lang::{
-    eval::ArgumentMap,
     model_tree::{Element, GetAttribute, ModelNode, ModelNodeOutputType},
     syntax::Identifier,
     value::*,
@@ -32,18 +31,9 @@ impl SvgTagAttributes {
     }
 }
 
-impl From<Option<ArgumentMap>> for SvgTagAttributes {
-    fn from(argument_map: Option<ArgumentMap>) -> Self {
-        if let Some(argument_map) = argument_map {
-            if let Some(Value::String(style)) = argument_map.get_value(&Identifier::no_ref("style"))
-            {
-                return SvgTagAttributes {
-                    style: style.clone(),
-                };
-            }
-        }
-
-        SvgTagAttributes::default()
+impl From<Option<Tuple>> for SvgTagAttributes {
+    fn from(argument_map: Option<Tuple>) -> Self {
+        todo!("fix at merge")
     }
 }
 
@@ -305,7 +295,7 @@ impl SvgWriter {
         Ok(())
     }
 
-    /// Finish this SVG. This method is also called in the Drop trait implemetation.
+    /// Finish this SVG. This method is also called in the Drop trait implementation.
     pub fn finish(&mut self) -> std::io::Result<()> {
         writeln!(self.writer, "</g>")?;
         writeln!(self.writer, "</svg>")

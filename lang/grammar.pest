@@ -179,7 +179,7 @@ list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
 //`(1.0mm, 2.0mm)`: ok
 //`(1.0mm,)`: ok # Trailing comma
 //`(x = 1.0mm, y = 2.0mm)`: ok
-tuple_expression = { "(" ~ ws* ~ argument_list ~ ws* ~ ")" ~ unit? }
+tuple_expression = { "(" ~ ws* ~ argument_list ~ ws* ~ ")" }
 
 //`.height`: ok
 //`.=`: error # Neither an identifier nor an integer

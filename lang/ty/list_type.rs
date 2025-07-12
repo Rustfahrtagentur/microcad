@@ -8,7 +8,7 @@ use crate::ty::*;
 #[allow(rustdoc::broken_intra_doc_links)]
 /// List type (e.g. '[scalar]')
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ListType(Box<Type>);
+pub struct ListType(pub Box<Type>);
 
 impl ListType {
     /// Generate `ListType` from `Type`

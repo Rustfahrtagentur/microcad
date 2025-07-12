@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, resolve::*, src_ref::SrcReferrer, syntax::*};
+use crate::{eval::*, resolve::*, src_ref::SrcReferrer, syntax::*, value::*};
 use std::collections::btree_map::BTreeMap;
 
 /// Map Id to SymbolNode reference
@@ -22,10 +22,10 @@ impl std::ops::DerefMut for SymbolMap {
     }
 }
 
-impl From<&ArgumentMap> for SymbolMap {
-    fn from(arg_map: &ArgumentMap) -> Self {
+impl From<&Tuple> for SymbolMap {
+    fn from(tuple: &Tuple) -> Self {
         let mut symbol_map = SymbolMap::default();
-        for (id, value) in arg_map.iter() {
+        for (id, value) in tuple.named.iter() {
             symbol_map.add_node(Symbol::new_call_argument(id.clone(), value.clone()))
         }
 

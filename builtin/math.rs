@@ -30,18 +30,18 @@ fn abs() -> Symbol {
 }
 
 /// Helper function to get an angle from a field in an argument list.
-fn get_angle(args: &ArgumentMap, axis: &str) -> cgmath::Deg<f64> {
-    match args[&axis.try_into().expect("Valid identifier")] {
+fn get_angle(args: &Tuple, axis: &str) -> cgmath::Deg<f64> {
+    match args.get_value(axis) {
         Value::Quantity(Quantity {
             value,
             quantity_type: QuantityType::Angle,
-        }) => cgmath::Deg::<f64>(value),
+        }) => cgmath::Deg::<f64>(*value),
         _ => unreachable!(),
     }
 }
 
-/// Helper function to return rotation X,Y,Z rotation matrices from an [`ArgumentMap`].
-fn rotation_matrices_xyz(args: &ArgumentMap) -> (Mat3, Mat3, Mat3) {
+/// Helper function to return rotation X,Y,Z rotation matrices from an [`Tuple`].
+fn rotation_matrices_xyz(args: &Tuple) -> (Mat3, Mat3, Mat3) {
     (
         Mat3::from_angle_x(get_angle(args, "x")),
         Mat3::from_angle_y(get_angle(args, "y")),
@@ -63,17 +63,13 @@ fn rotate_around_axis() -> Symbol {
             .into_iter()
             .collect(),
         ),
-        &|_params, args, ctx| match ArgumentMap::find_match(
+        &|_params, args, ctx| match ArgumentMatch::find_match(
             args,
             _params.expect("ParameterValueList"),
         ) {
             Ok(ref args) => {
                 let angle = get_angle(args, "angle");
-                let axis = Vec3::new(
-                    args[&"x".try_into()?].try_scalar()?,
-                    args[&"y".try_into()?].try_scalar()?,
-                    args[&"z".try_into()?].try_scalar()?,
-                );
+                let axis = Vec3::new(args.get("x"), args.get("y"), args.get("z"));
 
                 let matrix = Mat3::from_axis_angle(axis, angle);
                 Ok(Value::Matrix(Box::new(Matrix::Matrix3(matrix))))
@@ -99,7 +95,7 @@ fn rotate_xyz() -> Symbol {
             .into_iter()
             .collect(),
         ),
-        &|_params, args, ctx| match ArgumentMap::find_match(
+        &|_params, args, ctx| match ArgumentMatch::find_match(
             args,
             _params.expect("ParameterValueList"),
         ) {
@@ -130,7 +126,7 @@ fn rotate_zyx() -> Symbol {
             .into_iter()
             .collect(),
         ),
-        &|_params, args, ctx| match ArgumentMap::find_match(
+        &|_params, args, ctx| match ArgumentMatch::find_match(
             args,
             _params.expect("ParameterValueList"),
         ) {

@@ -37,23 +37,12 @@ pub enum AttributeError {
     NotFound(Identifier),
 }
 
-impl From<ArgumentMap> for Tuple {
-    fn from(argument_map: ArgumentMap) -> Self {
-        Tuple::new_named(
-            argument_map
-                .iter()
-                .map(|(k, v)| (k.clone(), v.clone()))
-                .collect(),
-        )
-    }
-}
-
 impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<model_tree::ExportAttribute>> {
         match self {
-            syntax::Attribute::Tuple(id, argument_list) if id.id() == "export" => {
-                match ArgumentMap::find_match(
-                    &argument_list.eval(context)?,
+            syntax::Attribute::Tuple(id, arguments) if id.id() == "export" => {
+                match ArgumentMatch::find_match(
+                    &arguments.eval(context)?,
                     &[
                         parameter!(filename: String),
                         parameter!(id: String = String::new()),
@@ -61,10 +50,10 @@ impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
                     .into_iter()
                     .collect(),
                 ) {
-                    Ok(argument_map) => {
+                    Ok(arguments) => {
                         let filename: std::path::PathBuf =
-                            argument_map.get::<String>("filename").into();
-                        let id: Id = argument_map.get::<String>("id").into();
+                            arguments.get::<String>("filename").into();
+                        let id: Id = arguments.get::<String>("id").into();
                         let id: Option<Id> = if id.is_empty() { None } else { Some(id) };
 
                         match context.find_exporter(&filename, &id) {
@@ -101,7 +90,7 @@ impl Eval<Option<model_tree::Attribute>> for syntax::Attribute {
                     // Parse exporter specific attribute, e.g. `svg(style = "fill:none")`
                     _ => match context.exporter_by_id(id.id()) {
                         Ok(exporter) => {
-                            match ArgumentMap::find_match(
+                            match ArgumentMatch::find_match(
                                 &argument_list.eval(context)?,
                                 &exporter.parameters(),
                             ) {

@@ -56,27 +56,15 @@ impl ArgumentValueList {
     pub fn get_by_type(&self, ty: &Type) -> Option<(&Identifier, &ArgumentValue)> {
         self.map.iter().find(|(_, arg)| arg.value.ty() == *ty)
     }
+}
 
-    /// This functions checks if the arguments match the given parameter definitions.
-    ///
-    /// Returns a map of arguments that match the parameters.
-    pub fn get_matching_arguments(
-        &self,
-        context: &mut Context,
-        parameters: &ParameterList,
-    ) -> EvalResult<ArgumentMap> {
-        let parameters = parameters.eval(context)?;
-        ArgumentMatch::find_match(self, &parameters)
+impl ValueAccess for ArgumentValueList {
+    fn by_id(&self, id: &Identifier) -> Option<&Value> {
+        self.map.get(id).map(|arg| &arg.value)
     }
 
-    /// Get multiplicity of matching arguments.
-    pub fn get_multi_matching_arguments(
-        &self,
-        context: &mut Context,
-        parameters: &ParameterList,
-    ) -> EvalResult<MultiArgumentMap> {
-        let parameters = parameters.eval(context)?;
-        MultiArgumentMap::find_match(self, &parameters)
+    fn by_ty(&self, ty: &Type) -> Option<&Value> {
+        self.get_by_type(ty).map(|(_, arg)| &arg.value)
     }
 }
 

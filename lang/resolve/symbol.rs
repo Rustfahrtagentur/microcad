@@ -44,6 +44,16 @@ impl std::ops::DerefMut for Symbol {
 #[derive(Debug)]
 pub struct Symbols(Vec<Symbol>);
 
+impl Default for Symbol {
+    fn default() -> Self {
+        Self(RcMut::new(SymbolInner {
+            def: SymbolDefinition::SourceFile(SourceFile::default().into()),
+            parent: Default::default(),
+            children: Default::default(),
+        }))
+    }
+}
+
 impl From<Vec<Symbol>> for Symbols {
     fn from(value: Vec<Symbol>) -> Self {
         Self(value)

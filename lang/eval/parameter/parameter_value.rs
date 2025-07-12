@@ -64,12 +64,14 @@ impl ParameterValue {
             None => true, // Accept any type if none is specified
         }
     }
+}
 
+impl Ty for ParameterValue {
     /// Return effective type
     ///
     /// Returns any `specified_type` or the type of the `default_value`.
     /// Panics if neither of both is available.
-    pub fn ty(&self) -> Type {
+    fn ty(&self) -> Type {
         if let Some(ty) = &self.specified_type {
             ty.clone()
         } else if let Some(def) = &self.default_value {
@@ -84,7 +86,7 @@ impl ParameterValue {
 impl std::fmt::Display for ParameterValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(def) = &self.default_value {
-            write!(f, "{}={}", def.ty(), def.value_to_string())?;
+            write!(f, "{} = {}", def.ty(), def.value_to_string())?;
         } else if let Some(ty) = &self.specified_type {
             write!(f, "{ty}")?;
         }

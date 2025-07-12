@@ -13,6 +13,7 @@ use crate::{eval::*, rc::*, resolve::*, syntax::*};
 /// - A [`SymbolMap`] of all *global symbols*.
 ///
 /// All these internal structures can be accessed by several implemented traits.
+#[derive(Default)]
 pub struct SymbolTable {
     /// Symbol of the initial source file.
     pub root: Symbol,

@@ -14,6 +14,11 @@ impl ParameterList {
     pub fn new(value: OrdMap<Identifier, Parameter>) -> Self {
         Self(value)
     }
+
+    /// Return ids of all parameters
+    pub fn ids(&self) -> impl Iterator<Item = Identifier> {
+        self.keys().cloned()
+    }
 }
 
 impl std::ops::Deref for ParameterList {

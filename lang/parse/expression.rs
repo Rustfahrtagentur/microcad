@@ -228,3 +228,15 @@ impl Parse for TupleExpression {
         })
     }
 }
+
+/// Create TupleExpression from µcad code
+#[macro_export]
+macro_rules! tuple_expression {
+    ($code:literal) => {{
+        $crate::parse!(
+            TupleExpression,
+            $crate::parser::Rule::tuple_expression,
+            $code
+        )
+    }};
+}

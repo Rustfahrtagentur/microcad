@@ -170,8 +170,12 @@ pub enum EvalError {
     AttributeError(#[from] AttributeError),
 
     /// Missing arguments
-    #[error("Missing arguments: {0}")]
-    MissingArguments(ParameterValueList),
+    #[error("Missing arguments: {0:?}")]
+    MissingArguments(Vec<Identifier>),
+
+    /// Missing arguments
+    #[error("Too many arguments: {0:?}")]
+    TooManyArguments(Vec<Identifier>),
 
     /// Builtin error
     #[error("Builtin error: {0}")]

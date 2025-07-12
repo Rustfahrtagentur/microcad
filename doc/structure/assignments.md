@@ -13,8 +13,8 @@ So this example defines the variable `a` which from then is a reserved name with
 ```µcad,assignment
 a = 5;
 b = a * 2;
-std::debug::assert_eq(a,5);
-std::debug::assert_eq(b,10);
+std::debug::assert_eq([a,5]);
+std::debug::assert_eq([b,10]);
 ```
 
 Another assignment of a variable with the same name is not allowed.

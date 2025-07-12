@@ -5,7 +5,7 @@
 //!
 //!
 
-use crate::{builtin::Exporter, tuple_value, value::Value};
+use crate::{builtin::Exporter, value::Value};
 
 /// Export attribute, e.g. `#[export("output.svg")`.
 #[derive(Clone)]
@@ -25,7 +25,7 @@ impl ExportAttribute {
 
 impl From<ExportAttribute> for Value {
     fn from(export_attribute: ExportAttribute) -> Self {
-        tuple_value!(
+        crate::create_tuple_value!(
             filename = Value::String(String::from(
                 export_attribute.filename.to_str().expect("PathBuf"),
             )),
