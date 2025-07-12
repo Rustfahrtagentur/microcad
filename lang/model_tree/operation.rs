@@ -10,9 +10,9 @@ use microcad_core::*;
 pub trait Operation: std::fmt::Debug {
     /// The output type of this operation.
     ///
-    /// By default, the output type is the same as the input node's output type.
-    fn output_type(&self, node: &ModelNode) -> ModelNodeOutputType {
-        node.output_type()
+    /// By default, the output type is undetermined.
+    fn output_type(&self) -> ModelNodeOutputType {
+        ModelNodeOutputType::NotDetermined
     }
 
     /// Process the model node.

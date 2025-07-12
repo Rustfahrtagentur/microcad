@@ -118,7 +118,7 @@ impl<'a> ModelNodeBuilder<'a> {
                 if !self.inner.children().is_empty() {
                     panic!("An operation cannot have more than one child.")
                 } else {
-                    return Ok(op.output_type(child));
+                    return Ok(op.output_type());
                 }
             }
             _ => {}

@@ -107,10 +107,6 @@ impl ModelNode {
 }
 
 impl Operation for ModelNode {
-    fn output_type(&self, node: &ModelNode) -> ModelNodeOutputType {
-        node.output_type()
-    }
-
     fn process_2d(&self, node: &ModelNode) -> Geometries2D {
         let mut geometries = Geometries2D::default();
 
