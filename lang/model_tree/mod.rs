@@ -13,6 +13,7 @@ pub mod object;
 pub mod operation;
 pub mod origin;
 pub mod output;
+pub mod render;
 
 pub use attribute::*;
 pub use element::*;
