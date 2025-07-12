@@ -3,7 +3,7 @@
 
 //! µcad CLI eval commands
 
-use microcad_lang::diag::Diag;
+use microcad_lang::diag::{Diag, WriteToFile};
 
 use crate::commands::RunCommand;
 
@@ -11,12 +11,14 @@ use crate::commands::RunCommand;
 pub struct Eval {
     /// Input µcad file.
     pub input: std::path::PathBuf,
+    /// Output model nodes.
+    pub output: Option<std::path::PathBuf>,
 }
 
 impl RunCommand for Eval {
     fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<()> {
         let mut context = cli.make_context(&self.input)?;
-        context.eval().expect("Valid node");
+        let node = context.eval().expect("Valid node");
 
         log::info!("Result:");
         match context.has_errors() {
@@ -25,6 +27,11 @@ impl RunCommand for Eval {
                 eprintln!("{}", context.diagnosis());
             }
             false => log::info!("Evaluated successfully!"),
+        }
+
+        match &self.output {
+            Some(filename) => node.write_to_file(&filename)?,
+            None => println!("{node}"),
         }
 
         Ok(())

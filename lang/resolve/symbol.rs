@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{diag::WriteToFile, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
 
 /// Symbol content
@@ -276,6 +276,8 @@ impl std::fmt::Display for Symbol {
         self.print_symbol(f, None, 0)
     }
 }
+
+impl WriteToFile for Symbol {}
 
 /// Print symbols via [std::fmt::Display]
 pub struct FormatSymbol<'a>(pub &'a Symbol);

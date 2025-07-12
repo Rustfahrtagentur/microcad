@@ -4,7 +4,8 @@
 //! Model node
 
 use crate::{
-    GetPropertyValue, eval::*, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*,
+    GetPropertyValue, diag::WriteToFile, eval::*, model_tree::*, rc::*, resolve::*, src_ref::*,
+    syntax::*, value::*,
 };
 
 use microcad_core::*;
@@ -575,3 +576,5 @@ impl std::fmt::Display for ModelNode {
         Ok(())
     }
 }
+
+impl WriteToFile for ModelNode {}

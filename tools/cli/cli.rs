@@ -54,6 +54,7 @@ impl Cli {
         Ok(microcad_builtin::builtin_context(
             crate::commands::Resolve {
                 input: input.as_ref().to_path_buf(),
+                output: None,
             }
             .resolve()?,
             &self.search_paths,
