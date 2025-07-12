@@ -54,6 +54,16 @@ impl FetchBounds2D for Geometries2D {
     }
 }
 
+impl Transformed2D for Geometries2D {
+    fn transformed_2d(&self, render_resolution: &RenderResolution, mat: &Mat3) -> Self {
+        Self(
+            self.iter()
+                .map(|geometry| std::rc::Rc::new(geometry.transformed_2d(render_resolution, mat)))
+                .collect::<Vec<_>>(),
+        )
+    }
+}
+
 impl From<std::rc::Rc<Geometry2D>> for Geometries2D {
     fn from(geometry: std::rc::Rc<Geometry2D>) -> Self {
         Self::new(vec![geometry])
