@@ -123,7 +123,7 @@ impl ExportArgs {
     /// that have an `export` attribute will be exported.
     ///
     /// If no nodes have been found, we simply export this node with the default export attribute.
-    fn target_nodes(
+    pub fn target_nodes(
         &self,
         node: &ModelNode,
         config: &Config,

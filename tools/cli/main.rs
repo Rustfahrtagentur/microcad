@@ -9,9 +9,12 @@ extern crate microcad_lang;
 mod cli;
 mod commands;
 mod config;
+pub mod watcher;
 
 pub use cli::*;
 use commands::*;
+
+pub use watcher::*;
 
 /// Main of the command line interpreter
 fn main() {
