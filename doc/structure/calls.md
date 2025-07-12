@@ -35,7 +35,7 @@ sketch square(size: Length) {
 s = square(size=2cm);
 
 // translate object s
-std::translate(x = 1cm) s;
+std::ops::translate(x = 1cm) s;
 ```
 
 ## Calling Operations

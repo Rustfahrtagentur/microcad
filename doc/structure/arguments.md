@@ -133,7 +133,7 @@ The following example will produce 4 rectangles at different positions:
 [![test](.test/multiplicity_arrays.png)](.test/multiplicity_arrays.log)
 
 ```µcad,multiplicity_arrays
-std::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]) 
+std::ops::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]) 
     std::geo2d::rect(width = 2mm, height = 2mm);
 ```
 
@@ -142,10 +142,10 @@ The example results in the following calls:
 [![test](.test/no_multiplicity.png)](.test/no_multiplicity.log)
 
 ```µcad,no_multiplicity
-std::translate(x = -4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-std::translate(x = -4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-std::translate(x = 4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
-std::translate(x = 4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
+std::ops::translate(x = -4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
+std::ops::translate(x = -4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
+std::ops::translate(x = 4mm, y = -4mm) std::geo2d::rect(width = 2mm, height = 2mm);
+std::ops::translate(x = 4mm, y = 4mm) std::geo2d::rect(width = 2mm, height = 2mm);
 ```
 
 Normally, this would require 2 nested *for loops*, which are not available in µcad.
@@ -155,6 +155,6 @@ Another example uses an array of tuples and produces the same output:
 [![test](.test/multiplicity_tuple_array.png)](.test/multiplicity_tuple_array.log)
 
 ```µcad,multiplicity_tuple_array
-std::translate([(x=-4mm, y=-4mm), (x=-4mm, y=4mm), (x=4mm, y=-4mm), (x=4mm, y=4mm)]) 
+std::ops::translate([(x=-4mm, y=-4mm), (x=-4mm, y=4mm), (x=4mm, y=-4mm), (x=4mm, y=4mm)]) 
     std::geo2d::rect(width = 2mm, height = 2mm);
 ```
