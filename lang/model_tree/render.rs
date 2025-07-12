@@ -101,7 +101,9 @@ impl ModelNode {
                 b.output_mut().geometry = ModelNodeGeometryOutput::Geometries2D(geometries);
             }
             ModelNodeOutputType::Geometry3D => todo!(),
-            output_type => println!("{output_type}"),
+            output_type => {
+                panic!("Output type must have been determined at this point: {output_type}")
+            }
         }
     }
 }
