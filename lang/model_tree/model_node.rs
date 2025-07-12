@@ -369,7 +369,7 @@ impl ModelNode {
                 b.output_mut().geometry = ModelNodeGeometryOutput::Geometries2D(geometries);
             }
             ModelNodeOutputType::Geometry3D => todo!(),
-            _ => unreachable!(),
+            output_type => println!("{output_type}"),
         }
     }
 

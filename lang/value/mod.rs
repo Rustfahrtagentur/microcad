@@ -309,9 +309,10 @@ impl std::ops::BitOr for Value {
 
     fn bitor(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Nodes(lhs), Value::Nodes(rhs)) => {
-                Ok(Value::from_single_node(ModelNodes::merge(lhs, rhs).union()))
-            }
+            (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
+                lhs.union()
+                    .binary_op(microcad_core::BooleanOp::Union, rhs.union()),
+            )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} | {rhs}"))),
         }
     }
