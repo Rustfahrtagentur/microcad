@@ -10,38 +10,6 @@ use crate::{
 
 use microcad_core::*;
 
-/// The origin is the [`Symbol`] and [`Tuple`] from which the node has been created.
-#[derive(Clone, Default, Debug)]
-pub struct ModelNodeOrigin {
-    /// The original symbol that has been called.
-    creator: Option<Symbol>,
-
-    /// The original arguments.
-    arguments: Tuple,
-
-    /// The original source file.
-    source_file: Option<std::rc::Rc<SourceFile>>,
-
-    /// Source code reference of the call.
-    call_src_ref: SrcRef,
-}
-
-impl std::fmt::Display for ModelNodeOrigin {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self.creator {
-            Some(creator) => {
-                write!(
-                    f,
-                    "{symbol}({arguments})",
-                    symbol = creator.full_name(),
-                    arguments = self.arguments
-                )
-            }
-            None => Ok(()),
-        }
-    }
-}
-
 /// The actual node contents
 #[derive(custom_debug::Debug, Default)]
 pub struct ModelNodeInner {
