@@ -51,7 +51,6 @@ pub fn generate(path: impl AsRef<Path>) -> Result<()> {
 // Copyright © 2024 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std as rust_std;
 
 "#,
     );
