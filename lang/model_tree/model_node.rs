@@ -3,7 +3,7 @@
 
 //! Model node
 
-use crate::{model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*, GetPropertyValue};
+use crate::{GetPropertyValue, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 use microcad_core::*;
 
@@ -573,3 +573,5 @@ impl std::fmt::Display for ModelNode {
         Ok(())
     }
 }
+
+impl WriteToFile for ModelNode {}

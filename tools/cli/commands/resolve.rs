@@ -3,7 +3,7 @@
 
 //! µcad CLI resolve command.
 
-use microcad_lang::{parse::ParseResult, resolve::Symbol};
+use microcad_lang::{diag::WriteToFile, parse::ParseResult, resolve::Symbol};
 
 use crate::*;
 
@@ -11,6 +11,8 @@ use crate::*;
 pub struct Resolve {
     /// Input µcad file.
     pub input: std::path::PathBuf,
+    /// Output symbol table.
+    pub output: Option<std::path::PathBuf>,
 }
 
 impl Resolve {
@@ -27,7 +29,13 @@ impl Resolve {
 
 impl RunCommand for Resolve {
     fn run(&self, _: &Cli) -> anyhow::Result<()> {
-        self.resolve()?;
+        let symbol = self.resolve()?;
+
+        match &self.output {
+            Some(filename) => symbol.write_to_file(&filename)?,
+            None => println!("{symbol}"),
+        }
+
         Ok(())
     }
 }

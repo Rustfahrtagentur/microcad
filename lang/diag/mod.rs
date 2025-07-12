@@ -82,3 +82,14 @@ pub trait Diag {
     /// Return number of occurred errors.
     fn error_count(&self) -> u32;
 }
+
+/// Trait to write something with Display trait into a file.
+pub trait WriteToFile: std::fmt::Display {
+    /// Write something to a file.
+    fn write_to_file(&self, filename: &impl AsRef<std::path::Path>) -> std::io::Result<()> {
+        use std::io::Write;
+        let file = std::fs::File::create(filename)?;
+        let mut writer = std::io::BufWriter::new(file);
+        write!(writer, "{self}")
+    }
+}
