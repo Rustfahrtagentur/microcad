@@ -11,6 +11,7 @@ pub mod model_node_builder;
 pub mod model_nodes;
 pub mod object;
 pub mod operation;
+pub mod origin;
 pub mod output;
 
 pub use attribute::*;
@@ -21,6 +22,7 @@ pub use model_node_builder::*;
 pub use model_nodes::*;
 pub use object::*;
 pub use operation::*;
+pub use origin::*;
 pub use output::*;
 
 #[cfg(test)]
