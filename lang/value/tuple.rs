@@ -57,12 +57,13 @@ impl Tuple {
         Self {
             named,
             unnamed: HashMap::default(),
-            src_ref: todo!(),
+            src_ref: SrcRef(None),
         }
     }
 
     /// Insert new value into tuple
     pub fn insert(&mut self, id: Identifier, value: Value) {
+        self.src_ref = SrcRef::merge(&self.src_ref, &id.src_ref());
         if id.is_empty() {
             self.unnamed.insert(value.ty(), value);
         } else {
@@ -236,9 +237,9 @@ where
             .map(|(k, v)| (Identifier::no_ref(k), (*v).clone().into()))
             .partition(|(k, _)| k.is_empty());
         Self {
+            src_ref: SrcRef(None),
             named: named.into_iter().collect(),
             unnamed: unnamed.into_iter().map(|(_, v)| (v.ty(), v)).collect(),
-            src_ref: todo!(),
         }
     }
 }
@@ -250,9 +251,14 @@ impl FromIterator<(Identifier, Value)> for Tuple {
             .map(|(k, v)| (k, v.clone()))
             .partition(|(k, _)| k.is_empty());
         Self {
+            src_ref: SrcRef::merge_all(
+                named
+                    .iter()
+                    .map(|(id, _)| id.src_ref())
+                    .chain(unnamed.iter().map(|(id, _)| id.src_ref())),
+            ),
             named: named.into_iter().collect(),
             unnamed: unnamed.into_iter().map(|(_, v)| (v.ty(), v)).collect(),
-            src_ref: todo!(),
         }
     }
 }
@@ -283,13 +289,14 @@ impl From<Tuple> for Value {
 
 impl FromIterator<Tuple> for Tuple {
     fn from_iter<T: IntoIterator<Item = Tuple>>(iter: T) -> Self {
+        let tuples: Vec<_> = iter.into_iter().collect();
         Self {
+            src_ref: SrcRef::merge_all(tuples.iter().map(|t| t.src_ref())),
             named: Default::default(),
-            unnamed: iter
+            unnamed: tuples
                 .into_iter()
                 .map(|t| (Type::Tuple(t.tuple_type().into()), Value::Tuple(t.into())))
                 .collect(),
-            src_ref: todo!(),
         }
     }
 }
