@@ -5,7 +5,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::{diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*, GetPropertyValue};
+use crate::{GetPropertyValue, diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*};
 
 /// A list of object properties.
 ///
@@ -26,7 +26,7 @@ impl ObjectProperties {
                 id.clone(),
                 match &parameter.default_value {
                     Some(value) => value.clone(),
-                    None => todo!("fix at merge"),
+                    None => arguments.by_id(id).unwrap_or(&Value::None).clone(),
                 },
             );
         }
