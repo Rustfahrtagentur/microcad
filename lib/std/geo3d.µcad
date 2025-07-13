@@ -23,14 +23,14 @@ part cube(size_x: Length, size_y: Length, size_z: Length) {
     }
 
     __builtin::ops::translate(
-            -size_x / 2.0 / 1mm,
-            -size_y / 2.0 / 1mm,
-            -size_z / 2.0 / 1mm
+            x = -size_x / 2.0 / 1mm,
+            y = -size_y / 2.0 / 1mm,
+            z = -size_z / 2.0 / 1mm
     ) {
         __builtin::geo3d::cube(
-            size_x / 1mm,
-            size_y / 1mm,
-            size_z / 1mm
+            size_x = size_x / 1mm,
+            size_y = size_y / 1mm,
+            size_z = size_z / 1mm
         );
     }
 }

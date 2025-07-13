@@ -3,11 +3,5 @@
   /home/micha/Work/mcad/mcad/doc/structure/use.md:21
 -- Output --
 -- Errors --
-error: Missing arguments: [Identifier: "x", Refer: <no_ref>, Identifier: "y", Refer: <no_ref>, Identifier: "z", Refer: <no_ref>]
-  ---> ../lib/std/geo3d.µcad:25:5
-     |
-  25 |     __builtin::ops::translate(
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-FAIL
+OK
