@@ -121,6 +121,9 @@ impl std::str::FromStr for Unit {
             "l" => Ok(Self::Liter),
             "µl" => Ok(Self::Microliter),
 
+            "g/mm³" => Ok(Self::GramPerMillimeter3),
+            "g/m³" => Ok(Self::GramPerMeter3),
+
             // Unknown
             _ => Err(ParseError::UnknownUnit(s.to_string())),
         }

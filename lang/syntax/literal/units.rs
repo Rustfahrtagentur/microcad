@@ -95,6 +95,8 @@ pub enum Unit {
 
     /// Density
     GramPerMeter3,
+    /// Density
+    GramPerMillimeter3,
 }
 
 impl std::fmt::Display for Unit {
@@ -150,7 +152,8 @@ impl std::fmt::Display for Unit {
             Self::Microliter => write!(f, "µl"),
 
             // Density
-            Self::GramPerMeter3 => write!(f, "g/mm³"),
+            Self::GramPerMeter3 => write!(f, "g/m³"),
+            Self::GramPerMillimeter3 => write!(f, "g/mm³"),
         }
     }
 }
@@ -191,11 +194,11 @@ impl Unit {
             | Self::Centiliter
             | Self::Milliliter
             | Self::Microliter => Type::Quantity(QuantityType::Volume),
-            Self::GramPerMeter3 => Type::Quantity(QuantityType::Density),
+            Self::GramPerMeter3 | Self::GramPerMillimeter3 => Type::Quantity(QuantityType::Density),
         }
     }
 
-    /// Normalize value to mm, rad or gram
+    /// Normalize value to base unit
     pub fn normalize(self, x: f64) -> f64 {
         match self {
             // Scalar
@@ -203,10 +206,10 @@ impl Unit {
             Self::Percent => x * 0.01_f64,
 
             // Lengths
-            Self::Meter => x * 1_000.0_f64,
-            Self::Centimeter => x * 10.0_f64,
+            Self::Meter => x * 1_000_f64,
+            Self::Centimeter => x * 10_f64,
             Self::Millimeter => x,
-            Self::Micrometer => x / 1_000.0_f64,
+            Self::Micrometer => x / 1_000_f64,
             Self::Inch => x * 25.4_f64,
             Self::Foot => x * 304.8_f64,
             Self::Yard => x * 914.4_f64,
@@ -219,13 +222,13 @@ impl Unit {
 
             // Weights
             Self::Gram => x,
-            Self::Kilogram => x * 1_000.0_f64,
+            Self::Kilogram => x * 1_000_f64,
             Self::Pound => x * 453.59237_f64,
             Self::Ounce => x * 28.349_523_125_f64,
 
             // Areas
-            Self::Meter2 => x * 1_000_000.0_f64,
-            Self::Centimeter2 => x * 100.0_f64,
+            Self::Meter2 => x * 1_000_000_f64,
+            Self::Centimeter2 => x * 100_f64,
             Self::Millimeter2 => x,
             Self::Micrometer2 => x * 0.000_000_1,
             Self::Inch2 => x * 645.16_f64,
@@ -233,20 +236,21 @@ impl Unit {
             Self::Yard2 => x * 836_127.36_f64,
 
             // Volumes
-            Self::Meter3 => x * 1_000_000_000.0_f64,
-            Self::Centimeter3 => x * 1_000.0_f64,
+            Self::Meter3 => x * 1_000_000_000_f64,
+            Self::Centimeter3 => x * 1_000_f64,
             Self::Millimeter3 => x,
             Self::Micrometer3 => x * 0.000_000_000_1,
             Self::Inch3 => x * 16_387.06_f64,
             Self::Foot3 => x * 28_316_846.592_f64,
             Self::Yard3 => x * 764_554_857.984_f64,
-            Self::Liter => x * 1_000_000.0_f64,
-            Self::Centiliter => x * 10_000.0_f64,
-            Self::Milliliter => x * 1_000.0_f64,
+            Self::Liter => x * 1_000_000_f64,
+            Self::Centiliter => x * 10_000_f64,
+            Self::Milliliter => x * 1_000_f64,
             Self::Microliter => x * 1_000_000.0_f64,
 
             // Densities
-            Self::GramPerMeter3 => 1_f64,
+            Self::GramPerMeter3 => 1_000_000_000_f64,
+            Self::GramPerMillimeter3 => 1_f64,
         }
     }
 }

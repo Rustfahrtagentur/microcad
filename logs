@@ -1,6 +1,9 @@
 
 ========= ./doc/libs/std/math/.test/math_trigonometric.log =========
 
+-- Test --
+  math_trigonometric
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/math/README.md:19
 -- Output --
 -- Errors --
 error: Symbol cos not found.
@@ -9,7 +12,7 @@ error: Symbol cos not found.
    4 | assert(cos(pi) == -1.);
      |        ^^^^^^^
      |
-error: Assertion failed: <invalid>
+error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
   ---> <from_str>:4:8
      |
    4 | assert(cos(pi) == -1.);
@@ -21,24 +24,30 @@ error: Symbol tan not found.
    5 | assert(tan(0) == 0.);
      |        ^^^^^^
      |
-error: Assertion failed: <invalid>
+error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
   ---> <from_str>:5:8
      |
    5 | assert(tan(0) == 0.);
      |        ^^^^^^^^^^^^
      |
--- Test result --
+-- Test Result --
 TODO
 
 ========= ./doc/libs/std/math/.test/math_abs.log =========
 
+-- Test --
+  math_abs
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/math/README.md:11
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/libs/std/ops/.test/hull_multiple.log =========
 
+-- Test --
+  hull_multiple
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/hull.md:15
 -- Output --
 -- Errors --
 error: Symbol hull not found.
@@ -47,18 +56,20 @@ error: Symbol hull not found.
    4 | hull() {
      | ^^^^^^
      |
--- Test result --
+-- Test Result --
 TODO
 
 ========= ./doc/libs/std/ops/.test/union_operator.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  union_operator
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/union.md:9
 
 ========= ./doc/libs/std/ops/.test/hull_single.log =========
 
+-- Test --
+  hull_single
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/hull.md:7
 -- Output --
 -- Errors --
 error: Symbol hull not found.
@@ -67,401 +78,540 @@ error: Symbol hull not found.
    1 | hull()
      | ^^^^^^
      |
--- Test result --
+-- Test Result --
 TODO
 
 ========= ./doc/libs/std/ops/.test/intersection_alt_operator.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  intersection_alt_operator
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/intersection.md:17
 
 ========= ./doc/libs/std/ops/.test/difference_alt_operator.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  difference_alt_operator
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/difference.md:17
 
 ========= ./doc/libs/std/ops/.test/union_alt_operator.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  union_alt_operator
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/union.md:17
 
 ========= ./doc/libs/std/ops/.test/intersection_operator.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  intersection_operator
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/intersection.md:9
 
 ========= ./doc/libs/std/ops/.test/difference_operator.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  difference_operator
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/ops/difference.md:9
 
 ========= ./doc/libs/std/.test/export_single.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  export_single
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/export.md:9
 
 ========= ./doc/libs/std/.test/export_multiple.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  export_multiple
+  /home/pat/git/rustfahrt/microcad/doc/libs/std/export.md:17
 
 ========= ./doc/structure/.test/initial_source_file_3D.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  initial_source_file_3D
+  /home/pat/git/rustfahrt/microcad/doc/structure/source_files.md:32
 
 ========= ./doc/structure/.test/part_basic.log =========
 
+-- Test --
+  part_basic
+  /home/pat/git/rustfahrt/microcad/doc/structure/part.md:6
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/structure/.test/initial_source_file_mixed.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK BUT SHOULD FAIL
+-- Test --
+  initial_source_file_mixed
+  /home/pat/git/rustfahrt/microcad/doc/structure/source_files.md:41
 
 ========= ./doc/structure/.test/assignment_immutable.log =========
 
+-- Test --
+  assignment_immutable
+  /home/pat/git/rustfahrt/microcad/doc/structure/assignments.md:24
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK BUT SHOULD FAIL
 
 ========= ./doc/structure/.test/initializers.log =========
 
+-- Test --
+  initializers
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:110
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK BUT SHOULD FAIL
 
 ========= ./doc/structure/.test/use_as.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  use_as
+  /home/pat/git/rustfahrt/microcad/doc/structure/use.md:60
 
 ========= ./doc/structure/.test/return_twice.log =========
 
+-- Test --
+  return_twice
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:49
 
 ========= ./doc/structure/.test/use_all.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  use_all
+  /home/pat/git/rustfahrt/microcad/doc/structure/use.md:87
 
 ========= ./doc/structure/.test/property.log =========
 
+-- Test --
+  property
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:244
+-- Parse Error --
 Parser error:  --> 8:16
   |
 8 |     prop inner = outer / 2;
   |                ^---
   |
-  = expected COMMENT, identifier, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
--- Test result --
+  = expected COMMENT, identifier, list_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- Test Result --
 FAIL (TODO)
 
 ========= ./doc/structure/.test/init_property.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  init_property
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:121
 
 ========= ./doc/structure/.test/example.log =========
 
+-- Test --
+  example
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:14
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
+  ---> <from_str>:7:13
+     |
+   7 | print_error("first");
+     |             ^^^^^^^
+     |
 error: Not implemented: Function evaluation
--- Test result --
+  ---> <from_str>:8:13
+     |
+   8 | print_error("second");
+     |             ^^^^^^^^
+     |
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/if.log =========
 
-Parser error:  --> 2:16
+-- Test --
+  if
+  /home/pat/git/rustfahrt/microcad/doc/structure/conditionals.md:9
+-- Parse Error --
+Parser error:  --> 4:12
   |
-2 |     if x == 5 || x == 4 {
-  |                ^---
+4 |     } else if x > 0 and x < 4 {
+  |            ^---
   |
-  = expected COMMENT, format_string, literal, list_expression, tuple_expression, nested, unary_minus, unary_plus, or unary_not
--- Test result --
+  = expected COMMENT or body
+-- Test Result --
 FAIL (TODO)
 
 ========= ./doc/structure/.test/parameters.log =========
 
+-- Test --
+  parameters
+  /home/pat/git/rustfahrt/microcad/doc/structure/op.md:53
+-- Parse Error --
 Parser error:  --> 3:8
   |
 3 |     if @children.count() == 1 {
   |        ^---
   |
   = expected COMMENT or expression
--- Test result --
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/mod_example.log =========
 
+-- Test --
+  mod_example
+  /home/pat/git/rustfahrt/microcad/doc/structure/modules.md:11
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/structure/.test/assignment.log =========
 
+-- Test --
+  assignment
+  /home/pat/git/rustfahrt/microcad/doc/structure/assignments.md:13
 -- Output --
 -- Errors --
-error: Symbol std::debug::assert_eq not found.
-  ---> <from_str>:3:1
-     |
-   3 | std::debug::assert_eq(a,5);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol std::debug::assert_eq not found.
-  ---> <from_str>:4:1
-     |
-   4 | std::debug::assert_eq(b,10);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
--- Test result --
-FAIL
+-- Test Result --
+OK
 
 ========= ./doc/structure/.test/building_plan.log =========
 
+-- Test --
+  building_plan
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:94
 -- Output --
 -- Errors --
--- Test result --
-OK
+error: Property not found: radius
+  ---> <from_str>:6:19
+     |
+   6 | __builtin::assert(wheel(5cm).radius == 5cm);
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
+  ---> <from_str>:6:19
+     |
+   6 | __builtin::assert(wheel(5cm).radius == 5cm);
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAIL
 
 ========= ./doc/structure/.test/call_workbench.log =========
 
+-- Test --
+  call_workbench
+  /home/pat/git/rustfahrt/microcad/doc/structure/calls.md:28
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/structure/.test/use_statement_pub.log =========
 
+-- Test --
+  use_statement_pub
+  /home/pat/git/rustfahrt/microcad/doc/structure/use.md:103
 
 ========= ./doc/structure/.test/multiplicity_tuple_array.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  multiplicity_tuple_array
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:157
 
 ========= ./doc/structure/.test/call_function.log =========
 
+-- Test --
+  call_function
+  /home/pat/git/rustfahrt/microcad/doc/structure/calls.md:10
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
--- Test result --
+  ---> <from_str>:5:12
+     |
+   5 | s = square(x = 2)
+     |            ^^^^^
+     |
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/code_between_initializers.log =========
 
+-- Test --
+  code_between_initializers
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:193
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK BUT SHOULD FAIL
 
 ========= ./doc/structure/.test/missed_property.log =========
 
+-- Test --
+  missed_property
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:148
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK BUT SHOULD FAIL
 
 ========= ./doc/structure/.test/tuple_match_warnings.log =========
 
+-- Test --
+  tuple_match_warnings
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:119
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
--- Test result --
+  ---> <from_str>:2:4
+     |
+   2 | f( (x=1cm, y=2cm, v=5cm), z=3cm);  // warning: v is redundant
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
 FAILED AS EXPECTED
 
 ========= ./doc/structure/.test/tuple_match_variants.log =========
 
+-- Test --
+  tuple_match_variants
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:80
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
+  ---> <from_str>:4:4
+     |
+   4 | f( x=1cm, y=2cm, z=3cm);
+     |    ^^^^^^^^^^^^^^^^^^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:7:4
+     |
+   7 | f( (x=1cm, y=2cm, z=3cm) );
+     |    ^^^^^^^^^^^^^^^^^^^^^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:11:4
+     |
+  11 | f( p );
+     |    ^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:14:4
+     |
+  14 | f( (x=1cm, y=2cm), z=3cm );
+     |    ^^^^^^^^^^^^^^^^^^^^^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:15:4
+     |
+  15 | f( y=2cm, (x=1cm, z=3cm) );
+     |    ^^^^^^^^^^^^^^^^^^^^^^
+     |
 error: Not implemented: Function evaluation
--- Test result --
+  ---> <from_str>:19:4
+     |
+  19 | f( q, z=3cm );
+     |    ^^^^^^^^^
+     |
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/none.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  none
+  /home/pat/git/rustfahrt/microcad/doc/structure/use.md:21
 
 ========= ./doc/structure/.test/tuple_match_errors.log =========
 
+-- Test --
+  tuple_match_errors
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:110
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
--- Test result --
+  ---> <from_str>:2:4
+     |
+   2 | f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
+     |    ^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
 FAILED AS EXPECTED
 
 ========= ./doc/structure/.test/code_post_init.log =========
 
+-- Test --
+  code_post_init
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:223
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/structure/.test/workbench_fn_prop.log =========
 
+-- Test --
+  workbench_fn_prop
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:130
+-- Parse Error --
 Parser error:  --> 2:11
   |
 2 |     pub fn inner() { 
   |           ^---
   |
   = expected identifier_part
--- Test result --
+-- Test Result --
 FAILED AS EXPECTED
 
 ========= ./doc/structure/.test/no_multiplicity.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  no_multiplicity
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:144
 
 ========= ./doc/structure/.test/argument_match_mix.log =========
 
+-- Test --
+  argument_match_mix
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:48
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
--- Test result --
+  ---> <from_str>:3:3
+     |
+   3 | f(1.0, b=2cm, 3cm);
+     |   ^^^^^^^^^^^^^^^
+     |
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/sketch_basic.log =========
 
+-- Test --
+  sketch_basic
+  /home/pat/git/rustfahrt/microcad/doc/structure/sketch.md:6
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/structure/.test/argument_match_type.log =========
 
+-- Test --
+  argument_match_type
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:36
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
--- Test result --
+  ---> <from_str>:3:3
+     |
+   3 | f(1.0, 2cm, 3cm²);
+     |   ^^^^^^^^^^^^^^^
+     |
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/use_module.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  use_module
+  /home/pat/git/rustfahrt/microcad/doc/structure/use.md:45
 
 ========= ./doc/structure/.test/use.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  use
+  /home/pat/git/rustfahrt/microcad/doc/structure/use.md:33
 
 ========= ./doc/structure/.test/children.log =========
 
+-- Test --
+  children
+  /home/pat/git/rustfahrt/microcad/doc/structure/op.md:30
+-- Parse Error --
 Parser error:  --> 4:8
   |
-4 |     if @children.count() == 2 && {
+4 |     if @children.count() == 2 {
   |        ^---
   |
   = expected COMMENT or expression
--- Test result --
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/use_as_module.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  use_as_module
+  /home/pat/git/rustfahrt/microcad/doc/structure/use.md:72
 
 ========= ./doc/structure/.test/code.log =========
 
+-- Test --
+  code
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:212
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/structure/.test/op_example.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  op_example
+  /home/pat/git/rustfahrt/microcad/doc/structure/op.md:12
 
 ========= ./doc/structure/.test/call_op.log =========
 
+-- Test --
+  call_op
+  /home/pat/git/rustfahrt/microcad/doc/structure/calls.md:47
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
--- Test result --
+  ---> <from_str>:5:8
+     |
+   5 | square(x = 2);
+     |        ^^^^^
+     |
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/return.log =========
 
+-- Test --
+  return
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:35
 
 ========= ./doc/structure/.test/pre_init_code.log =========
 
+-- Test --
+  pre_init_code
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:166
+-- Parse Error --
 Parser error:  --> 3:18
   |
 3 |     const FACTOR = 2.0;
   |                  ^---
   |
-  = expected COMMENT, identifier, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
--- Test result --
+  = expected COMMENT, identifier, list_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/initial_source_file_2D.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  initial_source_file_2D
+  /home/pat/git/rustfahrt/microcad/doc/structure/source_files.md:23
 
 ========= ./doc/structure/.test/property_wrong.log =========
 
+-- Test --
+  property_wrong
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:270
 -- Output --
 -- Errors --
-error: Missing arguments: outer
-
-  ---> <from_str>:1:1
-     |
-   1 | sketch wheel(outer: length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 error: Property not found: outer
   ---> <from_str>:14:20
      |
@@ -469,6 +619,11 @@ error: Property not found: outer
      |                    ^^^^^^^
      |
 info: outer: <invalid>
+  ---> <from_str>:14:11
+     |
+  14 | std::info("outer: {t.outer}");
+     |           ^^^^^^^^^^^^^^^^^^
+     |
 error: Property not found: inner
   ---> <from_str>:16:20
      |
@@ -476,335 +631,517 @@ error: Property not found: inner
      |                    ^^^^^^^
      |
 info: inner: <invalid>
--- Test result --
+  ---> <from_str>:16:11
+     |
+  16 | std::info("inner: {t.inner}");
+     |           ^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
 FAILED AS EXPECTED
 
 ========= ./doc/structure/.test/workbench_example.log =========
 
+-- Test --
+  workbench_example
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:98
 -- Output --
 -- Errors --
-error: Symbol circle not found.
-  ---> <from_str>:8:5
-     |
-   8 |     circle(radius) - circle(inner());
-     |     ^^^^^^^^^^^^^^
-     |
-error: Symbol circle not found.
-  ---> <from_str>:8:22
-     |
-   8 |     circle(radius) - circle(inner());
-     |                      ^^^^^^^^^^^^^^^
-     |
--- Test result --
-TODO
+-- Test Result --
+OK BUT IS TODO
 
 ========= ./doc/structure/.test/tuple_match.log =========
 
-Parser error:  --> 9:1
-  |
-9 | f( plane, z=3cm);
-  | ^---
-  |
-  = expected COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
--- Test result --
+-- Test --
+  tuple_match
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:62
+-- Output --
+-- Errors --
+error: Not implemented: Function evaluation
+  ---> <from_str>:9:4
+     |
+   9 | f( plane, z=3cm);
+     |    ^^^^^^^^^^^^
+     |
+error: Not implemented: Function evaluation
+  ---> <from_str>:10:4
+     |
+  10 | f( plane, z=6cm);
+     |    ^^^^^^^^^^^^
+     |
+error: Not implemented: Function evaluation
+  ---> <from_str>:11:4
+     |
+  11 | f( plane, z=9cm);
+     |    ^^^^^^^^^^^^
+     |
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/part_declaration.log =========
 
+-- Test --
+  part_declaration
+  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:42
+-- Parse Error --
 Parser error:  --> 5:18
   |
 5 |     const FACTOR = 2;
   |                  ^---
   |
-  = expected COMMENT, identifier, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
--- Test result --
+  = expected COMMENT, identifier, list_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/multiplicity_arrays.log =========
 
--- Output --
--- Errors --
--- Test result --
-OK
+-- Test --
+  multiplicity_arrays
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:135
 
 ========= ./doc/structure/.test/workbench_pub.log =========
 
+-- Test --
+  workbench_pub
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:120
+-- Parse Error --
 Parser error:  --> 2:11
   |
 2 |     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
   |           ^---
   |
   = expected identifier_part
--- Test result --
+-- Test Result --
 FAILED AS EXPECTED
 
 ========= ./doc/structure/.test/mod.log =========
 
+-- Test --
+  mod
+  /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:66
+-- Parse Error --
 Parser error:   --> 13:11
    |
 13 |     pub fn square(x: Scalar) {
    |           ^---
    |
    = expected identifier_part
--- Test result --
+-- Test Result --
 FAIL
 
 ========= ./doc/structure/.test/argument_match_name.log =========
 
+-- Test --
+  argument_match_name
+  /home/pat/git/rustfahrt/microcad/doc/structure/arguments.md:23
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
--- Test result --
+  ---> <from_str>:3:3
+     |
+   3 | f(x = 1cm, y = 2cm, z = 3cm);
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
 FAIL
 
 ========= ./doc/types/.test/types_def_vs_decl.log =========
 
+-- Test --
+  types_def_vs_decl
+  /home/pat/git/rustfahrt/microcad/doc/types/README.md:28
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/types_quantity_area_units.log =========
 
+-- Test --
+  types_quantity_area_units
+  /home/pat/git/rustfahrt/microcad/doc/types/quantity.md:102
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/types_quantity_angle.log =========
 
+-- Test --
+  types_quantity_angle
+  /home/pat/git/rustfahrt/microcad/doc/types/quantity.md:74
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/types_quantity_scalar.log =========
 
+-- Test --
+  types_quantity_scalar
+  /home/pat/git/rustfahrt/microcad/doc/types/quantity.md:47
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/array_unit_bundling.log =========
 
+-- Test --
+  array_unit_bundling
+  /home/pat/git/rustfahrt/microcad/doc/types/arrays.md:11
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
-
-========= ./doc/types/.test/tuple_fields_D.log =========
-
--- Output --
--- Errors --
--- Test result --
-OK
-
-========= ./doc/types/.test/tuple_parameters_C.log =========
-
-Parser error:  --> 1:11
-  |
-1 | part box(x,y,z = 0mm) {}
-  |           ^---
-  |
-  = expected COMMENT
--- Test result --
-FAILED AS EXPECTED
-
-========= ./doc/types/.test/tuple_fields_A.log =========
-
-Parser error:  --> 1:17
-  |
-1 | (width, height) = (1,2)mm;
-  |                 ^---
-  |
-  = expected EOI, COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
--- Test result --
-FAILED AS EXPECTED
 
 ========= ./doc/types/.test/types_quantity_area.log =========
 
+-- Test --
+  types_quantity_area
+  /home/pat/git/rustfahrt/microcad/doc/types/quantity.md:91
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
+
+========= ./doc/types/.test/tuple_assignment_bundle.log =========
+
+-- Test --
+  tuple_assignment_bundle
+  /home/pat/git/rustfahrt/microcad/doc/types/tuples.md:57
+-- Parse Error --
+Parser error:  --> 1:17
+  |
+1 | (width, height) = [1,2]m;
+  |                 ^---
+  |
+  = expected EOI, COMMENT, list_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
+-- Test Result --
+FAIL (TODO)
 
 ========= ./doc/types/.test/types_bundles_functions.log =========
 
+-- Test --
+  types_bundles_functions
+  /home/pat/git/rustfahrt/microcad/doc/types/README.md:46
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/types_quantity_weight.log =========
 
+-- Test --
+  types_quantity_weight
+  /home/pat/git/rustfahrt/microcad/doc/types/quantity.md:158
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
-========= ./doc/types/.test/tuple_parameters_A.log =========
+========= ./doc/types/.test/unnamed_tuple.log =========
 
-Parser error:  --> 1:10
-  |
-1 | part box((x,y,z) = 0mm) {}
-  |          ^---
-  |
-  = expected COMMENT or identifier
--- Test result --
-FAILED AS EXPECTED
-
-========= ./doc/types/.test/tuple_named_tuple.log =========
-
+-- Test --
+  unnamed_tuple
+  /home/pat/git/rustfahrt/microcad/doc/types/tuples.md:21
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
+OK
+
+========= ./doc/types/.test/named_tuple.log =========
+
+-- Test --
+  named_tuple
+  /home/pat/git/rustfahrt/microcad/doc/types/tuples.md:10
+-- Output --
+-- Errors --
+-- Test Result --
+OK
+
+========= ./doc/types/.test/types_named_tuple_vec3.log =========
+
+-- Test --
+  types_named_tuple_vec3
+  /home/pat/git/rustfahrt/microcad/doc/types/named_tuple.md:56
+-- Output --
+-- Errors --
+-- Test Result --
+OK
+
+========= ./doc/types/.test/unnamed_tuple_order.log =========
+
+-- Test --
+  unnamed_tuple_order
+  /home/pat/git/rustfahrt/microcad/doc/types/tuples.md:30
+-- Output --
+-- Errors --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/types_primitive_string.log =========
 
+-- Test --
+  types_primitive_string
+  /home/pat/git/rustfahrt/microcad/doc/types/primitive_types.md:29
 -- Output --
 Hello µcad!
 -- Errors --
 error: Not implemented: call_method for String
-error: Assertion failed: <invalid>
+error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
   ---> <from_str>:2:20
      |
    2 | std::debug::assert(text.count() == 11);
      |                    ^^^^^^^^^^^^^^^^^^
      |
--- Test result --
+-- Test Result --
 FAIL
 
-========= ./doc/types/.test/tuple_parameters_B.log =========
+========= ./doc/types/.test/types_named_tuple_vec2.log =========
 
+-- Test --
+  types_named_tuple_vec2
+  /home/pat/git/rustfahrt/microcad/doc/types/named_tuple.md:43
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/types_primitive_bool.log =========
 
+-- Test --
+  types_primitive_bool
+  /home/pat/git/rustfahrt/microcad/doc/types/primitive_types.md:9
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/types_quantity_volume.log =========
 
+-- Test --
+  types_quantity_volume
+  /home/pat/git/rustfahrt/microcad/doc/types/quantity.md:118
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/types_primitive_integer.log =========
 
+-- Test --
+  types_primitive_integer
+  /home/pat/git/rustfahrt/microcad/doc/types/primitive_types.md:19
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
+OK
+
+========= ./doc/types/.test/tuple_assignment.log =========
+
+-- Test --
+  tuple_assignment
+  /home/pat/git/rustfahrt/microcad/doc/types/tuples.md:44
+-- Parse Error --
+Parser error:  --> 1:17
+  |
+1 | (width, height) = (1m,2m);
+  |                 ^---
+  |
+  = expected EOI, COMMENT, list_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
+-- Test Result --
+FAIL (TODO)
+
+========= ./doc/types/.test/types_named_tuple_color.log =========
+
+-- Test --
+  types_named_tuple_color
+  /home/pat/git/rustfahrt/microcad/doc/types/named_tuple.md:30
+-- Output --
+-- Errors --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/types_quantity_volume_units.log =========
 
+-- Test --
+  types_quantity_volume_units
+  /home/pat/git/rustfahrt/microcad/doc/types/quantity.md:132
 -- Output --
 -- Errors --
--- Test result --
-OK
-
-========= ./doc/types/.test/tuple_fields_E.log =========
-
-Parser error:  --> 1:6
-  |
-1 | width, height = 0mm;
-  |      ^---
-  |
-  = expected EOI, COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
--- Test result --
-FAILED AS EXPECTED
-
-========= ./doc/types/.test/tuple_fields_B.log =========
-
--- Output --
--- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/types_quantity_length.log =========
 
+-- Test --
+  types_quantity_length
+  /home/pat/git/rustfahrt/microcad/doc/types/quantity.md:59
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/types/.test/quantity_types_number_literals.log =========
 
+-- Test --
+  quantity_types_number_literals
+  /home/pat/git/rustfahrt/microcad/doc/types/quantity.md:27
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
-========= ./doc/types/.test/tuple_fields_C.log =========
+========= ./doc/types/.test/types_named_tuple.log =========
 
-Parser error:  --> 1:17
+-- Test --
+  types_named_tuple
+  /home/pat/git/rustfahrt/microcad/doc/types/named_tuple.md:9
+-- Output --
+-- Errors --
+-- Test Result --
+OK
+
+========= ./doc/types/.test/tuple_assignment_convert.log =========
+
+-- Test --
+  tuple_assignment_convert
+  /home/pat/git/rustfahrt/microcad/doc/types/tuples.md:67
+-- Parse Error --
+Parser error:  --> 2:17
   |
-1 | (width, height) = (0mm,0mm);
+2 | (width, height) = array;
   |                 ^---
   |
-  = expected EOI, COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
--- Test result --
-FAILED AS EXPECTED
+  = expected EOI, COMMENT, list_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
+-- Test Result --
+FAIL (TODO)
 
 ========= ./doc/types/.test/types_no_declaration.log =========
 
+-- Test --
+  types_no_declaration
+  /home/pat/git/rustfahrt/microcad/doc/types/README.md:38
+-- Parse Error --
 Parser error:  --> 1:10
   |
 1 | x: Length;         // error
   |          ^---
   |
   = expected COMMENT
--- Test result --
+-- Test Result --
 FAILED AS EXPECTED
 
 ========= ./doc/debug/.test/verify_todo.log =========
 
+-- Test --
+  verify_todo
+  /home/pat/git/rustfahrt/microcad/doc/debug/README.md:42
+-- Parse Error --
 Parser error:  --> 3:6
   |
 3 | if a = 0 
   |      ^---
   |
-  = expected COMMENT, identifier, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
--- Test result --
+  = expected COMMENT, identifier, list_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- Test Result --
 FAIL (TODO)
 
 ========= ./doc/debug/.test/verify_panic.log =========
 
+-- Test --
+  verify_panic
+  /home/pat/git/rustfahrt/microcad/doc/debug/README.md:29
+-- Parse Error --
 Parser error:  --> 4:5
   |
 4 |     std::panic("this should not have happened");
   |     ^---
   |
-  = expected COMMENT, list_element_access, tuple_element_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
--- Test result --
+  = expected COMMENT, list_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- Test Result --
 FAIL (TODO)
 
 ========= ./doc/debug/.test/verify_assert.log =========
 
+-- Test --
+  verify_assert
+  /home/pat/git/rustfahrt/microcad/doc/debug/README.md:15
 -- Output --
 -- Errors --
--- Test result --
+-- Test Result --
 OK
 
 ========= ./doc/debug/.test/verify_assert_fail.log =========
 
+-- Test --
+  verify_assert_fail
+  /home/pat/git/rustfahrt/microcad/doc/debug/README.md:21
 -- Output --
 -- Errors --
 error: Assertion failed: false: this assertion fails
   ---> <from_str>:1:20
      |
    1 | std::debug::assert(false, "this assertion fails");
-     |                    ^^^^^
+     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
--- Test result --
+-- Test Result --
 FAILED AS EXPECTED
+
+========= ./doc/.test/toml_import.log =========
+
+-- Test --
+  toml_import
+  /home/pat/git/rustfahrt/microcad/doc/import.md:24
+-- Output --
+-- Errors --
+-- Test Result --
+OK
+
+========= ./doc/.test/attributes_export.log =========
+
+-- Test --
+  attributes_export
+  /home/pat/git/rustfahrt/microcad/doc/attributes.md:66
+
+========= ./doc/.test/attributes_export_example.log =========
+
+-- Test --
+  attributes_export_example
+  /home/pat/git/rustfahrt/microcad/doc/attributes.md:93
+
+========= ./doc/.test/attributes_color.log =========
+
+-- Test --
+  attributes_color
+  /home/pat/git/rustfahrt/microcad/doc/attributes.md:37
+
+========= ./doc/.test/attributes_export_id.log =========
+
+-- Test --
+  attributes_export_id
+  /home/pat/git/rustfahrt/microcad/doc/attributes.md:77
+
+========= ./doc/.test/attributes_precision.log =========
+
+-- Test --
+  attributes_precision
+  /home/pat/git/rustfahrt/microcad/doc/attributes.md:50
+
+========= ./doc/.test/export_attributes.log =========
+
+-- Test --
+  export_attributes
+  /home/pat/git/rustfahrt/microcad/doc/export.md:40
+
+========= ./doc/.test/attributes_simple_example.log =========
+
+-- Test --
+  attributes_simple_example
+  /home/pat/git/rustfahrt/microcad/doc/attributes.md:14
 
 ========= ./doc/nodes/.test/measure.log =========
 
+-- Test --
+  measure
+  /home/pat/git/rustfahrt/microcad/doc/nodes/measures.md:9

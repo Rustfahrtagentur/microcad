@@ -369,7 +369,7 @@ fn tuple_equal() {
 #[test]
 fn tuple_not_equal() {
     assert_ne!(
-        tuple!("(d=1.0g/m³, l=1.0m, a=1.0m²)"),
+        tuple!("(d=1.0g/mm³, l=1.0m, a=1.0m²)"),
         tuple!("(l=1.0m, a=1.0m², v=1.0m³)")
     );
     assert_ne!(
