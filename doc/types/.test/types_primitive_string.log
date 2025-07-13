@@ -4,11 +4,5 @@
 -- Output --
 Hello µcad!
 -- Errors --
-error: Too many arguments: [Identifier: "", Refer: <no_ref>]
-  ---> <from_str>:2:23
-     |
-   2 | std::debug::assert_eq(std::count(text), 11);
-     |                       ^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-FAIL
+OK
