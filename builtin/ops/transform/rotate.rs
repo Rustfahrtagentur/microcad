@@ -25,7 +25,7 @@ impl BuiltinWorkbenchDefinition for Rotate {
 
     fn parameters() -> ParameterValueList {
         [
-            parameter!(angle: Angle),
+            parameter!(angle: Scalar),
             parameter!(x: Scalar),
             parameter!(y: Scalar),
             parameter!(z: Scalar),
