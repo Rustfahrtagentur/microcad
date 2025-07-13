@@ -4,20 +4,20 @@
 //! Model node origin. Original source code information about a model node.
 
 use crate::{
-    eval::ArgumentMap,
     resolve::{FullyQualify, Symbol},
     src_ref::SrcRef,
     syntax::SourceFile,
+    value::*,
 };
 
-/// The origin is the [`Symbol`] and [`ArgumentMap`] from which the node has been created.
+/// The origin is the [`Symbol`] and [`Tuple`] from which the node has been created.
 #[derive(Clone, Default, Debug)]
 pub struct ModelNodeOrigin {
     /// The original symbol that has been called.
     pub creator: Option<Symbol>,
 
     /// The original arguments.
-    pub arguments: ArgumentMap,
+    pub arguments: Tuple,
 
     /// The original source file.
     pub source_file: Option<std::rc::Rc<SourceFile>>,
@@ -34,7 +34,7 @@ impl std::fmt::Display for ModelNodeOrigin {
                     f,
                     "{symbol}({arguments})",
                     symbol = creator.full_name(),
-                    arguments = self.arguments.to_one_line_string(Some(32))
+                    arguments = self.arguments,
                 )
             }
             None => Ok(()),

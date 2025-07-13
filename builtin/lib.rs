@@ -35,7 +35,7 @@ fn type_of() -> Symbol {
     let id = Identifier::from_str("type_of").expect("valid id");
     Symbol::new_builtin(id, None, &|_, args, _| {
         if let Ok(arg) = args.get_single() {
-            let ty = arg.value.ty();
+            let ty = arg.1.ty();
             return Ok(Value::String(ty.to_string()));
         }
         Ok(Value::None)
@@ -46,11 +46,11 @@ fn type_of() -> Symbol {
 fn count() -> Symbol {
     Symbol::new_builtin(Identifier::no_ref("count"), None, &|_params, args, ctx| {
         let arg = args.get_single()?;
-        Ok(match &arg.value {
+        Ok(match &arg.1.value {
             Value::String(s) => Value::Integer(s.chars().count() as i64),
             Value::Array(a) => Value::Integer(a.len() as i64),
             _ => {
-                ctx.error(arg, EvalError::BuiltinError("Value has no count.".into()))?;
+                ctx.error(arg.1, EvalError::BuiltinError("Value has no count.".into()))?;
                 Value::None
             }
         })
