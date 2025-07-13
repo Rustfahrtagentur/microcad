@@ -1,6 +1,8 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Value errors.
+
 use crate::value::{error::QuantityError, *};
 use thiserror::Error;
 
