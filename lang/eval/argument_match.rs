@@ -170,10 +170,7 @@ impl<'a> ArgumentMatch<'a> {
         let ids: std::collections::HashSet<_> = Self::multipliers(&self.result, params);
         if !ids.is_empty() {
             let mut result = Vec::new();
-            self.result.multiplicity(ids, |t| {
-                log::error!("multiplied: {t}");
-                result.push(t)
-            });
+            self.result.multiplicity(ids, |t| result.push(t));
             result
         } else {
             vec![self.result.clone()]
