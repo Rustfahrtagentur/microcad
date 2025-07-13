@@ -45,8 +45,9 @@ impl<'a> ArgumentMatch<'a> {
         };
 
         am.match_ids();
-        am.match_types();
+        am.match_types(true);
         am.match_defaults();
+        am.match_types(false);
         am.check_missing()?;
 
         Ok(am)
@@ -71,17 +72,48 @@ impl<'a> ArgumentMatch<'a> {
     }
 
     /// Match arguments by type
-    fn match_types(&mut self) {
+    fn match_types(&mut self, mut exclude_defaults: bool) {
         if !self.arguments.is_empty() {
-            log::trace!("find type match for:\n{self}");
+            if exclude_defaults {
+                log::trace!("find type matches for (defaults):\n{self}");
+            } else {
+                log::trace!("find type matches for:\n{self}");
+            }
             self.arguments.retain(|(_, arg)| {
-                if let Some(n) = self.params.iter().position(|(_, param)| {
-                    [Type::Invalid, arg.ty(), arg.ty_inner()].contains(&param.ty())
-                }) {
-                    let (id, _) = self.params.swap_remove(n);
-                    log::trace!("found parameter by type: {id}");
-                    self.result.insert((*id).clone(), arg.value.clone());
-                    return false;
+                // filter params by type
+                let same_type: Vec<_> = self
+                    .params
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(n, (id, param))| {
+                        if [Type::Invalid, arg.ty(), arg.ty_inner()].contains(&param.ty()) {
+                            Some((n, id, param))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+
+                // if type check is exact ignore exclusion
+                if same_type.len() == 1 {
+                    exclude_defaults = false;
+                }
+                // ignore params with defaults
+                let mut same_type = same_type
+                    .iter()
+                    .filter(|(_, _, param)| !exclude_defaults || param.default_value.is_none());
+
+                if let Some((n, id, _)) = same_type.next() {
+                    if same_type.next().is_none() {
+                        log::trace!("found parameter by type: {id}");
+                        self.result.insert((**id).clone(), arg.value.clone());
+                        self.params.swap_remove(*n);
+                        return false;
+                    } else {
+                        log::warn!("more than one parameter with that type")
+                    }
+                } else {
+                    log::warn!("no parameter with that type")
                 }
                 true
             })

@@ -363,7 +363,7 @@ impl std::fmt::Debug for Value {
             Value::Integer(n) => write!(f, "Integer = {n}"),
             Value::Quantity(q) => write!(f, "{q}"),
             Value::Bool(b) => write!(f, "Bool = {b}"),
-            Value::String(s) => write!(f, "String = {s}"),
+            Value::String(s) => write!(f, "String = \"{s}\""),
             Value::Array(l) => write!(f, "Array = {l}"),
             Value::Tuple(t) => write!(f, "Tuple = {t}"),
             Value::Matrix(m) => write!(f, "Matrix = {m}"),
