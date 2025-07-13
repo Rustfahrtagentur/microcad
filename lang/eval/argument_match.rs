@@ -9,60 +9,56 @@ use crate::eval::*;
 #[derive(Default)]
 pub struct ArgumentMatch<'a> {
     arguments: Vec<(&'a Identifier, &'a ArgumentValue)>,
-    parameters: Vec<(&'a Identifier, &'a ParameterValue)>,
+    params: Vec<(&'a Identifier, &'a ParameterValue)>,
     result: Tuple,
 }
 
 impl<'a> ArgumentMatch<'a> {
-    /// Match a `ParameterList` with an `ArgumentValueList` into an Tuple
+    /// Match a `ParameterList` with an `ArgumentValueList` into a tuple.
     ///
     /// Returns `Ok(Tuple)`` if matches or Err() if not
     pub fn find_match(
         arguments: &'a ArgumentValueList,
-        parameters: &'a ParameterValueList,
+        params: &'a ParameterValueList,
     ) -> EvalResult<Tuple> {
-        let mut am = Self {
-            arguments: arguments.iter().collect(),
-            parameters: parameters.iter().collect(),
-            result: Default::default(),
-        };
-        am.match_ids();
-        am.match_types();
-        am.match_defaults();
-
-        am.check_missing()?;
-
+        let am = Self::new(arguments, params)?;
+        am.check_exact_types(params)?;
         Ok(am.result)
     }
 
-    /// Match a `ParameterList` with an `ArgumentValueList` into an Tuple
+    /// Match a `ParameterList` with an `ArgumentValueList` into an vector of tuples.
     ///
     /// Returns `Ok(Tuple)`` if matches or Err() if not
     pub fn find_multi_match(
         arguments: &'a ArgumentValueList,
-        parameters: &'a ParameterValueList,
+        params: &'a ParameterValueList,
     ) -> EvalResult<Vec<Tuple>> {
+        Ok(Self::new(arguments, params)?.multiply(params))
+    }
+
+    /// Create new instance and start matching.
+    fn new(arguments: &'a ArgumentValueList, params: &'a ParameterValueList) -> EvalResult<Self> {
         let mut am = Self {
             arguments: arguments.iter().collect(),
-            parameters: parameters.iter().collect(),
+            params: params.iter().collect(),
             result: Default::default(),
         };
         am.match_ids();
         am.match_types();
         am.match_defaults();
-
         am.check_missing()?;
 
-        Ok(am.multiply(parameters))
+        Ok(am)
     }
 
+    /// Match arguments by id
     fn match_ids(&mut self) {
         if !self.arguments.is_empty() {
             log::trace!("find id match for:\n{self}");
             self.arguments.retain(|(id, arg)| {
                 if !id.is_empty() {
-                    if let Some(n) = self.parameters.iter().position(|(i, _)| i == id) {
-                        let (id, _) = self.parameters.swap_remove(n);
+                    if let Some(n) = self.params.iter().position(|(i, _)| i == id) {
+                        let (id, _) = self.params.swap_remove(n);
                         log::trace!("found parameter by id: {id}");
                         self.result.insert((*id).clone(), arg.value.clone());
                         return false;
@@ -73,16 +69,17 @@ impl<'a> ArgumentMatch<'a> {
         }
     }
 
+    /// Match arguments by type
     fn match_types(&mut self) {
         if !self.arguments.is_empty() {
             log::trace!("find type match for:\n{self}");
             self.arguments.retain(|(_, arg)| {
                 if let Some(n) = self
-                    .parameters
+                    .params
                     .iter()
                     .position(|(_, param)| param.ty() == arg.ty() || param.ty() == arg.ty_inner())
                 {
-                    let (id, _) = self.parameters.swap_remove(n);
+                    let (id, _) = self.params.swap_remove(n);
                     self.result.insert((*id).clone(), arg.value.clone());
                     return false;
                 }
@@ -91,11 +88,12 @@ impl<'a> ArgumentMatch<'a> {
         }
     }
 
+    /// Fill arguments with defaults
     fn match_defaults(&mut self) {
-        if !self.parameters.is_empty() {
+        if !self.params.is_empty() {
             log::trace!("find default match for:\n{self}");
             // remove missing that can be found
-            self.parameters.retain(|(id, param)| {
+            self.params.retain(|(id, param)| {
                 // check for any default value
                 if let Some(def) = &param.default_value {
                     // paranoia check if type is compatible
@@ -110,13 +108,11 @@ impl<'a> ArgumentMatch<'a> {
         }
     }
 
+    /// Return error if params are missing or arguments are to many
     fn check_missing(&self) -> EvalResult<()> {
-        if !self.parameters.is_empty() {
+        if !self.params.is_empty() {
             Err(EvalError::MissingArguments(
-                self.parameters
-                    .iter()
-                    .map(|(id, _)| (*id).clone())
-                    .collect(),
+                self.params.iter().map(|(id, _)| (*id).clone()).collect(),
             ))
         } else if !self.arguments.is_empty() {
             Err(EvalError::TooManyArguments(
@@ -127,7 +123,18 @@ impl<'a> ArgumentMatch<'a> {
         }
     }
 
-    fn multiply(&mut self, params: &ParameterValueList) -> Vec<Tuple> {
+    fn check_exact_types(&self, params: &ParameterValueList) -> EvalResult<()> {
+        let multipliers = Self::multipliers(&self.result, params);
+        if multipliers.is_empty() {
+            return Ok(());
+        }
+        Err(EvalError::MultiplicityNotAllowed(multipliers))
+    }
+
+    /// Process parameter multiplicity
+    ///
+    /// Return one or many tuples.
+    fn multiply(&self, params: &ParameterValueList) -> Vec<Tuple> {
         let ids: std::collections::HashSet<_> = Self::multipliers(&self.result, params);
         if !ids.is_empty() {
             let mut result = Vec::new();
@@ -142,7 +149,7 @@ impl<'a> ArgumentMatch<'a> {
     }
 
     /// Return the multipliers' ids in the arguments.
-    pub fn multipliers(
+    fn multipliers(
         args: &impl ValueAccess,
         params: &ParameterValueList,
     ) -> std::collections::HashSet<Identifier> {
@@ -171,7 +178,7 @@ impl std::fmt::Display for ArgumentMatch<'_> {
                 .map(|(id, arg)| format!("{id}: {arg}"))
                 .collect::<Vec<_>>()
                 .join(", "),
-            self.parameters
+            self.params
                 .iter()
                 .map(|(id, param)| format!("{id}: {param}"))
                 .collect::<Vec<_>>()
@@ -182,7 +189,7 @@ impl std::fmt::Display for ArgumentMatch<'_> {
 
 #[test]
 fn argument_matching() {
-    let parameters: ParameterValueList = [
+    let params: ParameterValueList = [
         crate::parameter!(a: Scalar),
         crate::parameter!(b: Length),
         crate::parameter!(c: Scalar),
@@ -199,15 +206,14 @@ fn argument_matching() {
     .into_iter()
     .collect();
 
-    let result =
-        ArgumentMatch::find_match(&arguments, &parameters).expect("expect valid arguments");
+    let result = ArgumentMatch::find_match(&arguments, &params).expect("expect valid arguments");
 
     assert_eq!(result, crate::tuple!("(a=1.0, b=2.0mm, c=3.0, d=4.0mm)"));
 }
 
 #[test]
 fn argument_match_fail() {
-    let parameters: ParameterValueList = [
+    let params: ParameterValueList = [
         crate::parameter!(x: Scalar),
         crate::parameter!(y: Length),
         crate::parameter!(z: Area),
@@ -220,5 +226,5 @@ fn argument_match_fail() {
     ]
     .into_iter()
     .collect();
-    assert!(ArgumentMatch::find_match(&arguments, &parameters).is_err());
+    assert!(ArgumentMatch::find_match(&arguments, &params).is_err());
 }

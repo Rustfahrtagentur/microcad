@@ -54,17 +54,11 @@ pub trait BuiltinWorkbenchDefinition {
     /// Part function
     fn function() -> &'static BuiltinFn {
         &|params, args, _| {
-            let multipliers = if let Some(params) = params {
-                ArgumentMatch::multipliers(args, params)
-            } else {
-                std::collections::HashSet::new()
-            };
             Ok(Value::Nodes(
-                ArgumentMatch::find_match(
+                ArgumentMatch::find_multi_match(
                     args,
                     params.expect("A built-in part must have a parameter list"),
                 )?
-                .combinations(multipliers)
                 .iter()
                 .map(|args| Self::node(args).map(|node| node.set_original_arguments(args.clone())))
                 .collect::<Result<ModelNodes, _>>()?,

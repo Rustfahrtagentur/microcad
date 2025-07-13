@@ -192,10 +192,8 @@ fn importer() {
     let registry = ImporterRegistry::default().insert(DummyImporter);
 
     let by_id = registry.by_id(&"dummy".into()).expect("Dummy importer");
-    todo!();
-    /*
-    let mut args = ArgumentMatch::new(crate::src_ref::SrcRef(None));
-    args.insert(Identifier::no_ref("some_arg"), Value::Integer(32));
+
+    let mut args = crate::tuple!("(some_arg=32)");
 
     let value = by_id.import(&args).expect("Value");
     assert!(matches!(value, Value::Integer(32)));
@@ -206,5 +204,4 @@ fn importer() {
     let value = by_filename.import(&args).expect("Value");
 
     assert!(matches!(value, Value::Integer(42)));
-    */
 }

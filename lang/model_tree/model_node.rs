@@ -3,9 +3,7 @@
 
 //! Model node
 
-use crate::{
-    eval::*, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*, GetPropertyValue,
-};
+use crate::{model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*, GetPropertyValue};
 
 use microcad_core::*;
 

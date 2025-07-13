@@ -67,18 +67,14 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
     fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<ModelNodes> {
         let mut nodes = ModelNodes::default();
 
-        // call initializer
         for init in self.inits() {
-            let params = init.parameters.eval(context)?;
-            match ArgumentMatch::find_match(args, &params) {
-                Ok(args) => {
-                    let multipliers = ArgumentMatch::multipliers(&args, &params);
-                    for args in args.combinations(multipliers) {
-                        nodes.push(self.eval_to_node(&args, Some(init), context)?);
-                    }
-                    break;
+            if let Ok(multi_args) =
+                ArgumentMatch::find_multi_match(args, &init.parameters.eval(context)?)
+            {
+                for args in multi_args {
+                    nodes.push(self.eval_to_node(&args, Some(init), context)?);
                 }
-                Err(err) => context.error(self, err)?,
+                break;
             }
         }
 

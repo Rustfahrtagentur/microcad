@@ -184,6 +184,10 @@ pub enum EvalError {
     /// Parameter not found by type in ParameterValueList
     #[error("Parameter not found by type '{0}'")]
     ParameterByTypeNotFound(Type),
+
+    /// Trying to use multiplicity where it is not allowed
+    #[error("Multiplicity not allowed '{0:?}'")]
+    MultiplicityNotAllowed(std::collections::HashSet<Identifier>),
 }
 
 /// Result type of any evaluation.

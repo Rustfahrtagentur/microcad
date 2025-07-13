@@ -28,7 +28,6 @@ impl From<&Tuple> for SymbolMap {
         for (id, value) in tuple.named.iter() {
             symbol_map.add_node(Symbol::new_call_argument(id.clone(), value.clone()))
         }
-
         symbol_map
     }
 }

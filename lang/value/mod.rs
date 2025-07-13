@@ -10,6 +10,7 @@ mod array;
 mod matrix;
 mod quantity;
 mod tuple;
+mod value_access;
 mod value_error;
 mod value_list;
 
@@ -17,6 +18,7 @@ pub use array::*;
 pub use matrix::*;
 pub use quantity::*;
 pub use tuple::*;
+pub use value_access::*;
 pub use value_error::*;
 pub use value_list::*;
 
