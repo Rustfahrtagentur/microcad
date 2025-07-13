@@ -3,7 +3,10 @@
 
 //! Model node
 
-use crate::{GetPropertyValue, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{
+    GetPropertyValue, diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*,
+    value::*,
+};
 
 use microcad_core::*;
 
