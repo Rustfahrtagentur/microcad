@@ -4,5 +4,10 @@
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
+  ---> <from_str>:3:8
+     |
+   3 | f(1.0, b=2cm, 3cm);
+     |        ^^^^^^^^^^
+     |
 -- Test Result --
 FAIL

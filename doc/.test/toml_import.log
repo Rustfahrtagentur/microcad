@@ -3,5 +3,17 @@
   /home/pat/git/rustfahrt/microcad/doc/import.md:24
 -- Output --
 -- Errors --
+error: Missing arguments: [Identifier: "a", Refer: <no_ref>]
+  ---> <from_str>:3:23
+     |
+   3 | std::debug::assert_eq([data.M10.diameter, 10.0]);
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Missing arguments: [Identifier: "a", Refer: <no_ref>]
+  ---> <from_str>:4:23
+     |
+   4 | std::debug::assert_eq([data.M6.pitch, 1.0]);
+     |                       ^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK
+FAIL

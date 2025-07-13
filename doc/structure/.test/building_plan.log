@@ -3,5 +3,17 @@
   /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:94
 -- Output --
 -- Errors --
+error: Property not found: radius
+  ---> <from_str>:6:19
+     |
+   6 | __builtin::assert(wheel(5cm).radius == 5cm);
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
+  ---> <from_str>:6:19
+     |
+   6 | __builtin::assert(wheel(5cm).radius == 5cm);
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK
+FAIL

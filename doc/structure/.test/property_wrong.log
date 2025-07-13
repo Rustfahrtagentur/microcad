@@ -3,13 +3,6 @@
   /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:270
 -- Output --
 -- Errors --
-error: Missing arguments: outer
-
-  ---> <from_str>:1:1
-     |
-   1 | sketch wheel(outer: length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 error: Property not found: outer
   ---> <from_str>:14:20
      |
@@ -17,6 +10,11 @@ error: Property not found: outer
      |                    ^^^^^^^
      |
 info: outer: <invalid>
+  ---> <from_str>:14:11
+     |
+  14 | std::info("outer: {t.outer}");
+     |           ^^^^^^^^^^^^^^^^^^
+     |
 error: Property not found: inner
   ---> <from_str>:16:20
      |
@@ -24,5 +22,10 @@ error: Property not found: inner
      |                    ^^^^^^^
      |
 info: inner: <invalid>
+  ---> <from_str>:16:11
+     |
+  16 | std::info("inner: {t.inner}");
+     |           ^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
 FAILED AS EXPECTED

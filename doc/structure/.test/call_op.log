@@ -4,5 +4,10 @@
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
+  ---> <from_str>:5:8
+     |
+   5 | square(x = 2);
+     |        ^^^^^
+     |
 -- Test Result --
 FAIL

@@ -4,7 +4,22 @@
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
+  ---> <from_str>:9:4
+     |
+   9 | f( plane, z=3cm);
+     |    ^^^^^^^^^^^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:10:4
+     |
+  10 | f( plane, z=6cm);
+     |    ^^^^^^^^^^^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:11:4
+     |
+  11 | f( plane, z=9cm);
+     |    ^^^^^^^^^^^^
+     |
 -- Test Result --
 FAIL

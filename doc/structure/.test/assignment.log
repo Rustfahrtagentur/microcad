@@ -3,5 +3,17 @@
   /home/pat/git/rustfahrt/microcad/doc/structure/assignments.md:13
 -- Output --
 -- Errors --
+error: Missing arguments: [Identifier: "a", Refer: <no_ref>]
+  ---> <from_str>:3:23
+     |
+   3 | std::debug::assert_eq([a,5]);
+     |                       ^^^^^
+     |
+error: Missing arguments: [Identifier: "a", Refer: <no_ref>]
+  ---> <from_str>:4:23
+     |
+   4 | std::debug::assert_eq([b,10]);
+     |                       ^^^^^^
+     |
 -- Test Result --
-OK
+FAIL

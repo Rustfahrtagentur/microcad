@@ -3,17 +3,5 @@
   /home/pat/git/rustfahrt/microcad/doc/structure/functions.md:98
 -- Output --
 -- Errors --
-error: Symbol circle not found.
-  ---> <from_str>:8:5
-     |
-   8 |     circle(radius) - circle(inner());
-     |     ^^^^^^^^^^^^^^
-     |
-error: Symbol circle not found.
-  ---> <from_str>:8:22
-     |
-   8 |     circle(radius) - circle(inner());
-     |                      ^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-TODO
+OK BUT IS TODO

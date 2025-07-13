@@ -4,5 +4,10 @@
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
+  ---> <from_str>:2:4
+     |
+   2 | f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
+     |    ^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
 FAILED AS EXPECTED

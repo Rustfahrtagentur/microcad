@@ -4,10 +4,40 @@
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
+  ---> <from_str>:4:4
+     |
+   4 | f( x=1cm, y=2cm, z=3cm);
+     |    ^^^^^^^^^^^^^^^^^^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:7:4
+     |
+   7 | f( (x=1cm, y=2cm, z=3cm) );
+     |    ^^^^^^^^^^^^^^^^^^^^^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:11:4
+     |
+  11 | f( p );
+     |    ^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:14:4
+     |
+  14 | f( (x=1cm, y=2cm), z=3cm );
+     |    ^^^^^^^^^^^^^^^^^^^^^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:15:4
+     |
+  15 | f( y=2cm, (x=1cm, z=3cm) );
+     |    ^^^^^^^^^^^^^^^^^^^^^^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:19:4
+     |
+  19 | f( q, z=3cm );
+     |    ^^^^^^^^^
+     |
 -- Test Result --
 FAIL

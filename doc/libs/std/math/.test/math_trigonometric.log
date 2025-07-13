@@ -9,7 +9,7 @@ error: Symbol cos not found.
    4 | assert(cos(pi) == -1.);
      |        ^^^^^^^
      |
-error: Assertion failed: <invalid>
+error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
   ---> <from_str>:4:8
      |
    4 | assert(cos(pi) == -1.);
@@ -21,7 +21,7 @@ error: Symbol tan not found.
    5 | assert(tan(0) == 0.);
      |        ^^^^^^
      |
-error: Assertion failed: <invalid>
+error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
   ---> <from_str>:5:8
      |
    5 | assert(tan(0) == 0.);

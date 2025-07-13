@@ -1,7 +1,3 @@
 -- Test --
   use_module
   /home/pat/git/rustfahrt/microcad/doc/structure/use.md:45
--- Output --
--- Errors --
--- Test Result --
-OK

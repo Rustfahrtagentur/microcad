@@ -1,7 +1,3 @@
 -- Test --
   initial_source_file_mixed
   /home/pat/git/rustfahrt/microcad/doc/structure/source_files.md:41
--- Output --
--- Errors --
--- Test Result --
-OK BUT SHOULD FAIL
