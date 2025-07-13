@@ -26,6 +26,22 @@ pub enum QuantityType {
     Invalid,
 }
 
+impl QuantityType {
+    /// Return base unit
+    pub fn base_unit(&self) -> &'static str {
+        match self {
+            QuantityType::Scalar => "",
+            QuantityType::Length => "mm",
+            QuantityType::Area => "mm²",
+            QuantityType::Volume => "mm³",
+            QuantityType::Density => "g/mm³",
+            QuantityType::Angle => "π",
+            QuantityType::Weight => "g",
+            QuantityType::Invalid => todo!(),
+        }
+    }
+}
+
 impl std::fmt::Display for QuantityType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let name: &'static str = self.into();

@@ -60,7 +60,7 @@ impl Ty for Quantity {
 
 impl std::fmt::Display for Quantity {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value)
+        write!(f, "{}{}", self.value, self.quantity_type.base_unit())
     }
 }
 

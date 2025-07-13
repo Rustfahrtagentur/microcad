@@ -47,7 +47,7 @@ pub fn assert() -> Symbol {
     )
 }
 
-fn all_equal<T: PartialEq>(mut iter: impl Iterator<Item = T>) -> bool {
+fn all_equal<T: PartialEq + std::fmt::Debug>(mut iter: impl Iterator<Item = T>) -> bool {
     if let Some(first) = iter.next() {
         iter.all(|x| x == first)
     } else {
@@ -74,7 +74,7 @@ pub fn assert_eq() -> Symbol {
                         let a_value = &a.get_value("a");
 
                         if let Value::Array(exprs) = a_value {
-                            if all_equal(exprs.iter()) {
+                            if !all_equal(exprs.iter()) {
                                 let message: String = a.get("message");
                                 context.error(
                                     args,
