@@ -1,13 +1,3 @@
 -- Test --
   initial_source_file_mixed
   /home/micha/Work/mcad/mcad/doc/structure/source_files.md:41
--- Output --
--- Errors --
-error: Cannot mix 2d and 3d geometries
-  ---> <from_str>:2:1
-     |
-   2 | std::geo3d::sphere(radius = 1cm);  // error: can't mix 2D and 3D
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
--- Test Result --
-FAILED AS EXPECTED

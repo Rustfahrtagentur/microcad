@@ -4,6 +4,16 @@
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
+  ---> <from_str>:20:14
+     |
+  20 | math::square(2);
+     |              ^
+     |
 error: Not implemented: Function evaluation
+  ---> <from_str>:21:11
+     |
+  21 | math::pow(2,5);  // error: pow is private
+     |           ^^^
+     |
 -- Test Result --
 TODO

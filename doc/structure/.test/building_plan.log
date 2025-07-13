@@ -1,19 +1,19 @@
 -- Test --
   building_plan
-  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:94
+  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:93
 -- Output --
 -- Errors --
 error: Property not found: radius
-  ---> <from_str>:6:19
+  ---> <from_str>:7:20
      |
-   6 | __builtin::assert(wheel(5cm).radius == 5cm);
-     |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+   7 | std::debug::assert(wheel(5cm).radius == 5cm);
+     |                    ^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
-  ---> <from_str>:6:19
+  ---> <from_str>:7:20
      |
-   6 | __builtin::assert(wheel(5cm).radius == 5cm);
-     |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+   7 | std::debug::assert(wheel(5cm).radius == 5cm);
+     |                    ^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAIL

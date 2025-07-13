@@ -1,6 +1,6 @@
 -- Test --
   part_declaration
-  /home/pat/git/rustfahrt/microcad/doc/structure/workbench.md:42
+  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:41
 -- Parse Error --
 Parser error:  --> 5:18
   |
