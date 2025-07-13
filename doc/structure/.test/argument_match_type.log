@@ -4,10 +4,10 @@
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation
-  ---> <from_str>:3:13
+  ---> <from_str>:3:3
      |
    3 | f(1.0, 2cm, 3cm²);
-     |             ^^^^^
+     |   ^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAIL

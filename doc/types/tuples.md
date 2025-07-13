@@ -29,7 +29,7 @@ to a specific order.
 
 ```µcad,unnamed_tuple_order
 // these tuples are equal
-std::debug::assert_eq((1l, 10cm, 10cm²), (10cm, 10cm², 1l));
+std::debug::assert_eq([(1l, 10cm, 10cm²), (10cm, 10cm², 1l)]);
 ```
 
 A partially or fully unnamed tuple can only be utilized through

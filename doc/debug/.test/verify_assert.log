@@ -3,11 +3,5 @@
   /home/pat/git/rustfahrt/microcad/doc/debug/README.md:15
 -- Output --
 -- Errors --
-error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
-  ---> <from_str>:1:26
-     |
-   1 | std::debug::assert(true, "You won't see this message");
-     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-FAIL
+OK
