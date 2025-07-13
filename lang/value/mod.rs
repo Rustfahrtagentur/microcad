@@ -55,13 +55,13 @@ impl Value {
     /// Add a unit to a primitive value (Scalar or Integer).
     pub fn bundle_unit(self, unit: Unit) -> ValueResult {
         match (self, unit.ty()) {
+            (value, Type::Quantity(QuantityType::Scalar)) | (value, Type::Integer) => Ok(value),
             (Value::Integer(i), Type::Quantity(quantity_type)) => Ok(Value::Quantity(
                 Quantity::new(unit.normalize(i as Scalar), quantity_type),
             )),
             (Value::Quantity(quantity), Type::Quantity(quantity_type)) => Ok(Value::Quantity(
                 (quantity * Quantity::new(unit.normalize(1.0), quantity_type))?,
             )),
-            (value, Type::Quantity(QuantityType::Scalar)) | (value, Type::Integer) => Ok(value),
             (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
         }
     }
