@@ -3,7 +3,7 @@
 
 //! Import values from TOML
 
-use microcad_lang::{builtin::*, syntax::*, value::*, Id};
+use microcad_lang::{builtin::*, src_ref::*, syntax::*, value::*, Id};
 
 /// Import TOML files into a tuple.
 pub struct TomlImporter;
@@ -30,6 +30,7 @@ impl TomlImporter {
                 map.iter()
                     .map(|(k, v)| (Identifier::no_ref(k), Self::toml_to_value(v)))
                     .collect(),
+                SrcRef(None),
             ))),
         }
     }

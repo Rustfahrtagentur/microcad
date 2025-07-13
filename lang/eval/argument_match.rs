@@ -41,8 +41,9 @@ impl<'a> ArgumentMatch<'a> {
         let mut am = Self {
             arguments: arguments.iter().collect(),
             params: params.iter().collect(),
-            result: Default::default(),
+            result: Tuple::new_named(std::collections::HashMap::new(), arguments.src_ref()),
         };
+
         am.match_ids();
         am.match_types();
         am.match_defaults();

@@ -53,17 +53,16 @@ macro_rules! create_tuple {
 
 impl Tuple {
     /// Create new named tuple.
-    pub fn new_named(named: std::collections::HashMap<Identifier, Value>) -> Self {
+    pub fn new_named(named: std::collections::HashMap<Identifier, Value>, src_ref: SrcRef) -> Self {
         Self {
             named,
             unnamed: HashMap::default(),
-            src_ref: SrcRef(None),
+            src_ref,
         }
     }
 
     /// Insert new value into tuple
     pub fn insert(&mut self, id: Identifier, value: Value) {
-        self.src_ref = SrcRef::merge(&self.src_ref, &id.src_ref());
         if id.is_empty() {
             self.unnamed.insert(value.ty(), value);
         } else {
