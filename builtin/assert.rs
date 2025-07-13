@@ -26,7 +26,7 @@ pub fn assert() -> Symbol {
                         if !v {
                             let message: String = a.get("message");
                             context.error(
-                                a,
+                                args,
                                 EvalError::AssertionFailed(if message.is_empty() {
                                     format!("{v}")
                                 } else {
