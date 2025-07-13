@@ -13,6 +13,7 @@ impl WorkbenchDefinition {
         init: Option<&'a InitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ModelNode> {
+        log::trace!("Workbench `{id}` {kind}", id = self.id, kind = self.kind);
         context.scope(
             StackFrame::Workbench(self.kind, self.id.clone(), arguments.into()),
             |context| {
@@ -65,6 +66,12 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
     /// Consider the `part a(b: Scalar) { }`.
     /// Calling the part `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
     fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<ModelNodes> {
+        log::trace!(
+            "Workbench call `{id}` {kind}",
+            id = self.id,
+            kind = self.kind
+        );
+
         let mut nodes = ModelNodes::default();
 
         for init in self.inits() {
