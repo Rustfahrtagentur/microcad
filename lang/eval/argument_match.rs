@@ -39,7 +39,7 @@ impl<'a> ArgumentMatch<'a> {
     /// Create new instance and start matching.
     fn new(arguments: &'a ArgumentValueList, params: &'a ParameterValueList) -> EvalResult<Self> {
         let mut am = Self {
-            arguments: arguments.iter().collect(),
+            arguments: arguments.iter().map(|(id, v)| (id, v)).collect(),
             params: params.iter().collect(),
             result: Tuple::new_named(std::collections::HashMap::new(), arguments.src_ref()),
         };
@@ -75,12 +75,11 @@ impl<'a> ArgumentMatch<'a> {
         if !self.arguments.is_empty() {
             log::trace!("find type match for:\n{self}");
             self.arguments.retain(|(_, arg)| {
-                if let Some(n) = self
-                    .params
-                    .iter()
-                    .position(|(_, param)| param.ty() == arg.ty() || param.ty() == arg.ty_inner())
-                {
+                if let Some(n) = self.params.iter().position(|(_, param)| {
+                    [Type::Invalid, arg.ty(), arg.ty_inner()].contains(&param.ty())
+                }) {
                     let (id, _) = self.params.swap_remove(n);
+                    log::trace!("found parameter by type: {id}");
                     self.result.insert((*id).clone(), arg.value.clone());
                     return false;
                 }

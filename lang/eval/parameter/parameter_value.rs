@@ -77,7 +77,6 @@ impl Ty for ParameterValue {
         } else if let Some(def) = &self.default_value {
             def.ty()
         } else {
-            log::error!("type of parameter value cannot be achieved");
             Type::Invalid
         }
     }

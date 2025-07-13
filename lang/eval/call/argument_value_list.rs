@@ -11,7 +11,7 @@ use crate::{eval::*, src_ref::*, value::*};
 /// between it and a given *parameter list*.
 #[derive(Clone, Debug, Default)]
 pub struct ArgumentValueList {
-    map: std::collections::HashMap<Identifier, ArgumentValue>,
+    map: Vec<(Identifier, ArgumentValue)>,
     src_ref: SrcRef,
 }
 
@@ -23,7 +23,7 @@ impl ArgumentValueList {
     /// Shall only be used for builtin symbols.
     /// # Arguments
     pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
-        let map: std::collections::HashMap<Identifier, ArgumentValue> = [(
+        let map = [(
             Identifier::none(),
             (ArgumentValue::new(Value::String(code), referrer.src_ref())),
         )]
@@ -40,8 +40,8 @@ impl ArgumentValueList {
     /// Returns error if there is no or more than one argument available.
     pub fn get_single(&self) -> EvalResult<(&Identifier, &ArgumentValue)> {
         if self.map.len() == 1 {
-            if let Some(a) = self.map.iter().next() {
-                return Ok(a);
+            if let Some(a) = self.map.first() {
+                return Ok((&a.0, &a.1));
             }
         }
 
@@ -54,13 +54,17 @@ impl ArgumentValueList {
 
     /// Get value by type
     pub fn get_by_type(&self, ty: &Type) -> Option<(&Identifier, &ArgumentValue)> {
-        self.map.iter().find(|(_, arg)| arg.value.ty() == *ty)
+        let arg = self.map.iter().find(|(_, arg)| arg.value.ty() == *ty);
+        arg.map(|arg| (&arg.0, &arg.1))
     }
 }
 
 impl ValueAccess for ArgumentValueList {
     fn by_id(&self, id: &Identifier) -> Option<&Value> {
-        self.map.get(id).map(|arg| &arg.value)
+        self.map
+            .iter()
+            .find(|(i, _)| i == id)
+            .map(|arg| &arg.1.value)
     }
 
     fn by_ty(&self, ty: &Type) -> Option<&Value> {
@@ -69,7 +73,7 @@ impl ValueAccess for ArgumentValueList {
 }
 
 impl std::ops::Deref for ArgumentValueList {
-    type Target = std::collections::HashMap<Identifier, ArgumentValue>;
+    type Target = Vec<(Identifier, ArgumentValue)>;
 
     fn deref(&self) -> &Self::Target {
         &self.map
@@ -98,9 +102,9 @@ impl std::fmt::Display for ArgumentValueList {
 
 impl FromIterator<(Identifier, ArgumentValue)> for ArgumentValueList {
     fn from_iter<T: IntoIterator<Item = (Identifier, ArgumentValue)>>(iter: T) -> Self {
-        let map: std::collections::HashMap<_, _> = iter.into_iter().collect();
+        let map: Vec<_> = iter.into_iter().collect();
         Self {
-            src_ref: SrcRef::merge_all(map.values().map(|a| a.src_ref())),
+            src_ref: SrcRef::merge_all(map.iter().map(|(_, v)| v.src_ref())),
             map,
         }
     }
