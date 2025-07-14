@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{GetPropertyValue, eval::*, model_tree::*};
+use crate::{eval::*, model_tree::*, GetPropertyValue};
 
 impl Eval for ListExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
@@ -21,6 +21,39 @@ impl Eval for ListExpression {
                     EvalError::ListElementsDifferentTypes(value_list.types()),
                 )?;
                 Ok(Value::None)
+            }
+        }
+    }
+}
+
+impl Expression {
+    /// Evaluate an expression together with an attribute list.
+    ///
+    /// The attribute list will be also evaluated and the resulting attributes
+    /// will be assigned to the resulting value.
+    pub fn eval_with_attribute_list(
+        &self,
+        attribute_list: &AttributeList,
+        context: &mut Context,
+    ) -> EvalResult<Value> {
+        let value = self.eval(context)?;
+        match value {
+            Value::Nodes(mut nodes) => {
+                let attributes = attribute_list.eval(context)?;
+                nodes.iter_mut().for_each(|node| {
+                    node.borrow_mut().attributes = attributes.clone();
+                });
+                Ok(Value::Nodes(nodes))
+            }
+            Value::None => Ok(Value::None),
+            _ => {
+                if !attribute_list.is_empty() {
+                    context.error(
+                        attribute_list,
+                        AttributeError::CannotAssignToExpression(self.clone().into()),
+                    )?;
+                }
+                Ok(value)
             }
         }
     }

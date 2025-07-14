@@ -1,6 +1,6 @@
 -- Test --
   verify_error
-  /home/micha/Work/mcad/mcad/doc/debug/README.md:29
+  ../doc/debug/README.md:29
 -- Output --
 -- Errors --
 error: Builtin error: this should not have happened
