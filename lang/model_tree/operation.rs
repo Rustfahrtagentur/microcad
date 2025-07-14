@@ -31,20 +31,23 @@ impl Operation for BooleanOp {
         let mut geometries = Geometries2D::default();
 
         if let Some(node) = node.into_inner_object_node() {
-            node.children().for_each(|node| {
-                let b = node.borrow();
-                match &b.element.value {
+            let self_ = node.borrow();
+            self_
+                .children
+                .iter()
+                .for_each(|node| match &self_.element.value {
                     Element::Transform(affine_transform) => {
                         geometries.append(
-                            node.process_2d(&node)
-                                .transformed_2d(&b.output.resolution, &affine_transform.mat2d()),
+                            node.process_2d(node).transformed_2d(
+                                &self_.output.resolution,
+                                &affine_transform.mat2d(),
+                            ),
                         );
                     }
                     _ => {
-                        geometries.append(node.process_2d(&node));
+                        geometries.append(node.process_2d(node));
                     }
-                }
-            });
+                });
         }
 
         geometries.boolean_op(&node.borrow().output.resolution, self)

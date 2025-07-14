@@ -69,17 +69,19 @@ impl ModelNodes {
 
                                 // Handle children marker.
                                 // If we have found a children marker node, use it's parent as new parent node.
-                                let new_parent_node = match new_parent_node
-                                    .find_children_placeholder()
-                                {
-                                    Some(children_marker) => {
-                                        let parent =
-                                            children_marker.parent().expect("Must have a parent");
-                                        children_marker.detach(); // Remove children marker from tree
-                                        parent
-                                    }
-                                    None => new_parent_node.clone(),
-                                };
+                                let new_parent_node =
+                                    match &new_parent_node.find_children_placeholder() {
+                                        Some(children_marker) => {
+                                            let parent = &children_marker
+                                                .borrow()
+                                                .parent
+                                                .clone()
+                                                .expect("Must have a parent");
+                                            children_marker.detach(); // Remove children marker from tree
+                                            parent.clone()
+                                        }
+                                        None => new_parent_node.clone(),
+                                    };
 
                                 new_parent_node.append(node.make_deep_copy());
                             });
@@ -102,12 +104,10 @@ impl ModelNodes {
             Some(node) => node,
             None => ModelNodeBuilder::new_operation(op, SrcRef(None))
                 .add_children(
-                    vec![
-                        ModelNodeBuilder::new_object_body()
-                            .add_children(self.clone())
-                            .expect("No error")
-                            .build(),
-                    ]
+                    vec![ModelNodeBuilder::new_object_body()
+                        .add_children(self.clone())
+                        .expect("No error")
+                        .build()]
                     .into(),
                 )
                 .expect("No error")

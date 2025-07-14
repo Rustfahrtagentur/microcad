@@ -59,9 +59,10 @@ fn model_nodes_nest() {
     assert_eq!(a0.borrow().id, Some(Identifier::no_ref("a0")));
     assert_eq!(a1.borrow().id, Some(Identifier::no_ref("a1")));
 
-    assert_eq!(a0.children().count(), 1); // Contains b0
+    let a0_ = a0.borrow();
+    assert_eq!(a0_.children().count(), 1); // Contains b0
     assert_eq!(
-        a0.children().next().expect("b0").borrow().id,
+        a0_.children().next().expect("b0").borrow().id,
         Some(Identifier::no_ref("b0"))
     );
 

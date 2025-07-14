@@ -86,7 +86,8 @@ impl Iterator for Parents {
     fn next(&mut self) -> Option<Self::Item> {
         match &self.node {
             Some(node) => {
-                self.node = node.parent();
+                let parent = node.borrow().parent.clone();
+                self.node = parent;
                 self.node.clone()
             }
             None => None,
@@ -115,7 +116,7 @@ impl Iterator for Ancestors {
             None => return None,
         };
 
-        self.node = node.parent();
+        self.node = node.borrow().parent.clone();
         Some(node.clone())
     }
 }

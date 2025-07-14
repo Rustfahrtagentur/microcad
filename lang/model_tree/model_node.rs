@@ -19,7 +19,7 @@ pub struct ModelNodeInner {
     pub id: Option<Identifier>,
     /// Parent object.
     #[debug(skip)]
-    parent: Option<ModelNode>,
+    pub parent: Option<ModelNode>,
     /// Children of the model node.
     pub children: ModelNodes,
     /// Element of the node with [SrcRef].
@@ -53,6 +53,15 @@ impl ModelNodeInner {
             ..Default::default()
         }
     }
+
+    /// Return iterator of children
+    pub fn children(&self) -> std::slice::Iter<'_, ModelNode> {
+        self.children.iter()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.children.is_empty()
+    }
 }
 
 /// A reference counted, mutable [`ModelNode`].
@@ -61,8 +70,8 @@ pub struct ModelNode(RcMut<ModelNodeInner>);
 
 impl ModelNode {
     /// Create new model node from inner.
-    pub fn new(inner: ModelNodeInner) -> Self {
-        Self(RcMut::new(inner))
+    pub fn new(inner: RcMut<ModelNodeInner>) -> Self {
+        Self(inner)
     }
 
     /// Calculate Depth of the node.
@@ -73,7 +82,7 @@ impl ModelNode {
     /// Make a deep copy if this node.
     pub fn make_deep_copy(&self) -> Self {
         let copy = Self(RcMut::new(self.0.borrow().clone_content()));
-        for child in self.children() {
+        for child in self.borrow().children.iter() {
             copy.append(child.make_deep_copy());
         }
         copy
@@ -107,24 +116,18 @@ impl ModelNode {
         self.0.borrow_mut().parent = None;
     }
 
-    /// Set parent of this node.
-    pub fn set_parent(&mut self, parent: ModelNode) {
-        self.0.borrow_mut().parent = Some(parent);
-    }
-
     /// Append a single node as child.
     ///
     /// Also tries to set the output type if it has not been determined yet.
     pub fn append(&self, node: ModelNode) -> ModelNode {
-        let mut node = node;
-        node.set_parent(self.clone());
+        node.borrow_mut().parent = Some(self.clone());
 
-        let mut b = self.0.borrow_mut();
+        let mut self_ = self.0.borrow_mut();
         // If this node's output type has not been determined, try to get it from child node
-        if b.output.model_node_output_type() == ModelNodeOutputType::NotDetermined {
-            b.output = ModelNodeOutput::new(node.output_type());
+        if self_.output.model_node_output_type() == ModelNodeOutputType::NotDetermined {
+            self_.output = ModelNodeOutput::new(node.output_type());
         }
-        b.children.push(node.clone());
+        self_.children.push(node.clone());
 
         node
     }
@@ -155,11 +158,8 @@ impl ModelNode {
 
     /// Find the original source file of this node
     pub fn find_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
-        self.ancestors().find_map(|node| {
-            let b = node.borrow();
-            let origin = &b.origin;
-            origin.source_file.clone()
-        })
+        self.ancestors()
+            .find_map(|node| node.borrow().origin.source_file.clone())
     }
 
     /// Test if the node has this specific source file.
@@ -172,7 +172,7 @@ impl ModelNode {
 
     /// Return inner node if we are in an [`Object`] node.
     pub fn into_inner_object_node(&self) -> Option<ModelNode> {
-        self.children().next().and_then(|n| {
+        self.borrow().children.iter().next().and_then(|n| {
             if let Element::Object(_) = n.0.borrow().element.value {
                 Some(n.clone())
             } else {
@@ -183,18 +183,19 @@ impl ModelNode {
 
     /// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
     pub fn signature(&self) -> String {
+        let self_ = self.borrow();
         let mut s = String::new();
-        if let Some(id) = &self.borrow().id {
+        if let Some(id) = &self_.id {
             s += format!("{id}: ").as_str();
         }
-        s += self.borrow().element.to_string().as_str();
-        if self.origin().creator.is_some() {
-            s += format!(" = {origin}", origin = self.origin()).as_str();
+        s += self_.element.to_string().as_str();
+        if self_.origin.creator.is_some() {
+            s += format!(" = {origin}", origin = self_.origin).as_str();
         }
         if !matches!(self.output_type(), ModelNodeOutputType::NotDetermined) {
             s += format!(" -> \"{output_type}\"", output_type = self.output_type()).as_str();
         }
-        if self.has_children() {
+        if !self_.is_empty() {
             s += ":";
         }
         s
@@ -203,53 +204,31 @@ impl ModelNode {
 
 /// Implementation to store information about the node origin.
 impl ModelNode {
-    /// Return the [`ModelNodeOrigin`] that created this node.
-    pub fn origin(&self) -> ModelNodeOrigin {
-        self.borrow().origin.clone()
-    }
-
     /// Set the information about the creator of this node.
     ///
     /// This function is called after the resulting nodes of a call of a part
     /// have been retrieved.   
     pub(crate) fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
-        let origin = &mut self.0.borrow_mut().origin;
-        origin.creator = Some(creator);
-        origin.call_src_ref = call_src_ref;
+        let origin_ = &mut self.borrow_mut().origin;
+        origin_.creator = Some(creator);
+        origin_.call_src_ref = call_src_ref;
     }
 
     /// Set the arguments with have been passed to this node.
     pub(crate) fn set_original_arguments(&self, arguments: Tuple) -> Self {
-        let origin = &mut self.0.borrow_mut().origin;
-        origin.arguments = arguments;
+        self.borrow_mut().origin.arguments = arguments;
         self.clone()
     }
 
     /// Set the original source file this node has been created from.
     pub(crate) fn set_original_source_file(&self, source_file: Rc<SourceFile>) -> Self {
-        let origin = &mut self.0.borrow_mut().origin;
-        origin.source_file = Some(source_file);
+        self.borrow_mut().origin.source_file = Some(source_file);
         self.clone()
     }
 }
 
 /// Iterator methods.
 impl ModelNode {
-    /// Return parent of this node.
-    pub fn parent(&self) -> Option<ModelNode> {
-        self.0.borrow().parent.clone()
-    }
-
-    /// Returns `true` if this node has children.
-    pub fn has_children(&self) -> bool {
-        !self.borrow().children.is_empty()
-    }
-
-    /// Children iterator.
-    pub fn children(&self) -> Children {
-        Children::new(self.clone())
-    }
-
     /// Returns an iterator of nodes to this node and its unnamed descendants, in tree order.
     ///
     /// Includes the current node.
@@ -317,7 +296,7 @@ impl PartialEq for ModelNode {
 /// Prints a [`ModelNode`].
 ///
 /// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
-/// The examplary output will look like this:
+/// The exemplary output will look like this:
 ///
 /// ```custom
 /// id: Object:
@@ -328,7 +307,7 @@ impl std::fmt::Display for ModelNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let depth = self.depth() * 2;
         writeln!(f, "{:depth$}{signature}", "", signature = self.signature())?;
-        for child in self.children() {
+        for child in self.borrow().children.iter() {
             write!(f, "{child}")?;
         }
         Ok(())

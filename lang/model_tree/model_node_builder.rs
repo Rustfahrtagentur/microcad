@@ -3,11 +3,9 @@
 
 //! Model node builder.
 
-use std::rc::Rc;
-
 use microcad_core::{Geometry2D, Geometry3D};
 
-use crate::{eval::*, model_tree::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, model_tree::*, rc::*, src_ref::*, syntax::*, value::*};
 
 /// A builder pattern to build model nodes
 #[derive(Default)]
@@ -110,12 +108,12 @@ impl<'a> ModelNodeBuilder<'a> {
         match &self.inner.element.value {
             Element::ChildrenPlaceholder => panic!("A child placeholder cannot have children"),
             Element::Transform(_) => {
-                if !self.inner.children.is_empty() {
+                if !self.inner.is_empty() {
                     panic!("A transformation cannot have more than one child.")
                 }
             }
             Element::Operation(op) => {
-                if !self.inner.children.is_empty() {
+                if !self.inner.is_empty() {
                     panic!("An operation cannot have more than one child.")
                 } else {
                     return Ok(op.output_type());
@@ -194,7 +192,7 @@ impl<'a> ModelNodeBuilder<'a> {
         }
         self.inner.output = ModelNodeOutput::new(self.output);
 
-        let node = ModelNode::new(self.inner);
+        let node = ModelNode::new(self.inner.into());
         node.append_children(self.children)
     }
 }

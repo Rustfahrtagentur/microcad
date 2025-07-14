@@ -35,3 +35,9 @@ impl<T> std::ops::DerefMut for RcMut<T> {
         &mut self.0
     }
 }
+
+impl<T> From<T> for RcMut<T> {
+    fn from(value: T) -> Self {
+        RcMut::new(value)
+    }
+}

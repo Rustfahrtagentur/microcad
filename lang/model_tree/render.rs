@@ -16,16 +16,16 @@ impl ModelNode {
     /// Set the transformation matrices for this node and its children.
     pub fn set_matrix(&self, mat: Mat4) {
         let new_mat = {
-            let mut b = self.borrow_mut();
-            let new_mat = match &b.element.value {
+            let mut self_ = self.borrow_mut();
+            let new_mat = match &self_.element.value {
                 Element::Transform(affine_transform) => mat * affine_transform.mat3d(),
                 _ => mat,
             };
-            b.output.matrix = new_mat;
+            self_.output.matrix = new_mat;
             new_mat
         };
 
-        self.children().for_each(|node| {
+        self.borrow().children.iter().for_each(|node| {
             node.set_matrix(new_mat);
         });
     }
@@ -33,13 +33,13 @@ impl ModelNode {
     /// Set the resolution for this node.
     pub fn set_resolution(&self, resolution: RenderResolution) {
         let new_resolution = {
-            let mut b = self.borrow_mut();
-            let new_resolution = resolution * b.output.matrix;
-            b.output.resolution = new_resolution.clone();
+            let mut self_ = self.borrow_mut();
+            let new_resolution = resolution * self_.output.matrix;
+            self_.output.resolution = new_resolution.clone();
             new_resolution
         };
 
-        self.children().for_each(|node| {
+        self.borrow().children.iter().for_each(|node| {
             node.set_resolution(new_resolution.clone());
         });
     }
@@ -48,8 +48,7 @@ impl ModelNode {
     ///
     /// Panics if the node does not contain any 2d geometry.
     pub fn fetch_output_geometries_2d(&self) -> Geometries2D {
-        let b = self.borrow();
-        match &b.output.geometry {
+        match &self.borrow().output.geometry {
             ModelNodeGeometryOutput::Geometries2D(geometries) => geometries.clone(),
             _ => panic!("The node does not contain a 2D geometry."),
         }
@@ -59,8 +58,7 @@ impl ModelNode {
     ///
     /// Panics if the node does not contain any 3d geometry.
     pub fn fetch_output_geometries_3d(&self) -> Geometries3D {
-        let b = self.borrow();
-        match &b.output.geometry {
+        match &self.borrow().output.geometry {
             ModelNodeGeometryOutput::Geometries3D(geometries) => geometries.clone(),
             _ => panic!("The node does not contain a 3D geometry."),
         }
@@ -75,8 +73,7 @@ impl ModelNode {
     /// * `fetch_output_geometries_3d()` for 3D geometries.
     pub fn render(&self) {
         fn render_geometries_2d(node: &ModelNode) -> Geometries2D {
-            let b = node.borrow();
-            match &b.element.value {
+            match &node.borrow().element.value {
                 Element::Primitive2D(geometry) => geometry.clone().into(),
                 Element::Operation(operation) => operation.process_2d(node),
                 _ => Geometries2D::default(),
@@ -84,21 +81,20 @@ impl ModelNode {
         }
 
         fn is_operation(node: &ModelNode) -> bool {
-            let b = node.borrow();
-            matches!(&b.element.value, Element::Operation(_))
+            matches!(&node.borrow().element.value, Element::Operation(_))
         }
 
         match self.output_type() {
             ModelNodeOutputType::Geometry2D => {
                 let geometries = render_geometries_2d(self);
                 if !is_operation(self) {
-                    self.children().for_each(|node| {
+                    self.borrow().children.iter().for_each(|node| {
                         node.render();
                     });
                 }
 
-                let mut b = self.borrow_mut();
-                b.output.geometry = ModelNodeGeometryOutput::Geometries2D(geometries);
+                self.borrow_mut().output.geometry =
+                    ModelNodeGeometryOutput::Geometries2D(geometries);
             }
             ModelNodeOutputType::Geometry3D => todo!(),
             output_type => {
@@ -112,16 +108,18 @@ impl Operation for ModelNode {
     fn process_2d(&self, node: &ModelNode) -> Geometries2D {
         let mut geometries = Geometries2D::default();
 
-        let b = node.borrow();
-        match &b.element.value {
+        let node_ = &node.borrow();
+        match &node_.element.value {
             Element::Transform(_) | Element::Object(_) => {
-                node.children()
-                    .for_each(|node| geometries.append(node.process_2d(&node)));
+                node_
+                    .children()
+                    .for_each(|n| geometries.append(n.process_2d(n)));
             }
             Element::Primitive2D(geo) => {
                 geometries.push(geo.clone());
-                node.children()
-                    .for_each(|node| geometries.append(node.process_2d(&node)));
+                node_
+                    .children()
+                    .for_each(|n| geometries.append(n.process_2d(n)));
             }
             Element::Operation(operation) => geometries.append(operation.process_2d(node)),
             _ => {}
@@ -136,8 +134,7 @@ impl FetchBounds2D for ModelNode {
         let mut bounds = Bounds2D::default();
 
         self.descendants().for_each(|node| {
-            let b = node.borrow();
-            let output = &b.output;
+            let output = &node.borrow().output;
             if let ModelNodeGeometryOutput::Geometries2D(geometries) = &output.geometry {
                 let mat = output.matrix_2d();
                 let resolution = &output.resolution;

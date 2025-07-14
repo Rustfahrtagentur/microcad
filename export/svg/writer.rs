@@ -313,21 +313,19 @@ impl SvgWriter {
             .iter()
             .try_for_each(|geometry| self.geometry(geometry, &attr))?;
 
-        let b = node.borrow();
-        let element = &b.element.value;
-
-        match element {
+        let node_ = node.borrow();
+        match &node_.element.value {
             Element::Object(_) | Element::Primitive2D(_) => {
-                if node.has_children() {
+                if !node_.is_empty() {
                     self.begin_group(&attr)?;
-                    node.children().try_for_each(|child| self.node(&child))?;
+                    node_.children().try_for_each(|child| self.node(child))?;
                     self.end_group()?;
                 }
             }
             Element::Transform(affine_transform) => {
-                if node.has_children() {
+                if !node_.is_empty() {
                     self.begin_transform(&affine_transform.mat2d(), &attr)?;
-                    node.children().try_for_each(|child| self.node(&child))?;
+                    node_.children().try_for_each(|child| self.node(child))?;
                     self.end_transform()?;
                 }
             }
