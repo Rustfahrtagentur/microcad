@@ -1,19 +1,7 @@
 -- Test --
   building_plan
-  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:93
+  ../doc/structure/workbench.md:93
 -- Output --
 -- Errors --
-error: Property not found: radius
-  ---> <from_str>:7:24
-     |
-   7 | std::debug::assert_eq([wheel(5cm).radius, 5cm]);
-     |                        ^^^^^^^^^^^^^^^^^
-     |
-error: Elements of list have different types: [<invalid>, Length]
-  ---> <from_str>:7:23
-     |
-   7 | std::debug::assert_eq([wheel(5cm).radius, 5cm]);
-     |                       ^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-FAIL
+OK

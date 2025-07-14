@@ -1,6 +1,6 @@
 -- Test --
   tuple_assignment
-  /home/micha/Work/mcad/mcad/doc/types/tuples.md:52
+  ../doc/types/tuples.md:52
 -- Parse Error --
 Parser error:  --> 1:17
   |

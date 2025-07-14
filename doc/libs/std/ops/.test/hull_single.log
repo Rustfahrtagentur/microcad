@@ -1,6 +1,6 @@
 -- Test --
   hull_single
-  /home/micha/Work/mcad/mcad/doc/libs/std/ops/hull.md:7
+  ../doc/libs/std/ops/hull.md:7
 -- Output --
 -- Errors --
 error: Symbol hull not found.

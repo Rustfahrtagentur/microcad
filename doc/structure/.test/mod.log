@@ -1,6 +1,6 @@
 -- Test --
   mod
-  /home/micha/Work/mcad/mcad/doc/structure/functions.md:66
+  ../doc/structure/functions.md:66
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation

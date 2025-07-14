@@ -1,6 +1,6 @@
 -- Test --
   types_primitive_string
-  /home/micha/Work/mcad/mcad/doc/types/primitive_types.md:29
+  ../doc/types/primitive_types.md:29
 -- Output --
 Hello µcad!
 -- Errors --

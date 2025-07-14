@@ -1,13 +1,3 @@
 -- Test --
   verify_todo
-  /home/micha/Work/mcad/mcad/doc/debug/README.md:39
--- Output --
--- Errors --
-info: a is zero
-  ---> <from_str>:4:15
-     |
-   4 |     std::info("a is zero");
-     |               ^^^^^^^^^^^
-     |
--- Test Result --
-OK
+  ../doc/debug/README.md:43

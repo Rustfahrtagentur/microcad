@@ -1,6 +1,6 @@
 -- Test --
   call_function
-  /home/micha/Work/mcad/mcad/doc/structure/calls.md:10
+  ../doc/structure/calls.md:10
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation

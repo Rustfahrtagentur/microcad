@@ -1,6 +1,6 @@
 -- Test --
   verify_assert
-  /home/micha/Work/mcad/mcad/doc/debug/README.md:15
+  ../doc/debug/README.md:15
 -- Output --
 -- Errors --
 -- Test Result --

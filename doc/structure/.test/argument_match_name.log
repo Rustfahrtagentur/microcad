@@ -1,6 +1,6 @@
 -- Test --
   argument_match_name
-  /home/micha/Work/mcad/mcad/doc/structure/arguments.md:23
+  ../doc/structure/arguments.md:23
 -- Output --
 -- Errors --
 error: Not implemented: Function evaluation

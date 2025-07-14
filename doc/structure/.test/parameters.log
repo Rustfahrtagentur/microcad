@@ -1,6 +1,6 @@
 -- Test --
   parameters
-  /home/micha/Work/mcad/mcad/doc/structure/op.md:53
+  ../doc/structure/op.md:53
 -- Parse Error --
 Parser error:  --> 3:8
   |

@@ -1,6 +1,6 @@
 -- Test --
   pre_init_code
-  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:170
+  ../doc/structure/workbench.md:170
 -- Parse Error --
 Parser error:  --> 3:18
   |

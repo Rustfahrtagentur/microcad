@@ -1,8 +1,7 @@
 -- Test --
   missed_property
-  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:150
+  ../doc/structure/workbench.md:150
 -- Output --
 -- Errors --
-error: Properties have not been initialized: radius
 -- Test Result --
-FAILED AS EXPECTED
+OK BUT SHOULD FAIL

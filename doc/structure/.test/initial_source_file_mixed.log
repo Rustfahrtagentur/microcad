@@ -1,6 +1,6 @@
 -- Test --
   initial_source_file_mixed
-  /home/micha/Work/mcad/mcad/doc/structure/source_files.md:41
+  ../doc/structure/source_files.md:41
 -- Output --
 -- Errors --
 error: Cannot mix 2d and 3d geometries

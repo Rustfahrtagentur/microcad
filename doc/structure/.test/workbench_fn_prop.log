@@ -1,6 +1,6 @@
 -- Test --
   workbench_fn_prop
-  /home/micha/Work/mcad/mcad/doc/structure/functions.md:130
+  ../doc/structure/functions.md:130
 -- Parse Error --
 Parser error:  --> 3:19
   |

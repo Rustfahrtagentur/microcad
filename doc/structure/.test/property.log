@@ -1,6 +1,6 @@
 -- Test --
   property
-  /home/micha/Work/mcad/mcad/doc/structure/workbench.md:252
+  ../doc/structure/workbench.md:252
 -- Parse Error --
 Parser error:  --> 8:16
   |

@@ -1,7 +1,3 @@
 -- Test --
   op_example
-  /home/micha/Work/mcad/mcad/doc/structure/op.md:12
--- Output --
--- Errors --
--- Test Result --
-OK
+  ../doc/structure/op.md:12

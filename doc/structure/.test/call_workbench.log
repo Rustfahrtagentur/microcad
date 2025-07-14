@@ -1,6 +1,6 @@
 -- Test --
   call_workbench
-  /home/micha/Work/mcad/mcad/doc/structure/calls.md:28
+  ../doc/structure/calls.md:28
 -- Output --
 -- Errors --
 -- Test Result --
