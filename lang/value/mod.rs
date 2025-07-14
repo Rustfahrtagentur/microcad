@@ -266,7 +266,7 @@ impl std::ops::Sub for Value {
             // Boolean difference operator for nodes
             (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
                 lhs.union()
-                    .binary_op(microcad_core::BooleanOp::Difference, rhs.union()),
+                    .boolean_op(microcad_core::BooleanOp::Difference, rhs.union()),
             )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} - {rhs}"))),
         }
@@ -320,7 +320,7 @@ impl std::ops::BitOr for Value {
         match (self, rhs) {
             (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
                 lhs.union()
-                    .binary_op(microcad_core::BooleanOp::Union, rhs.union()),
+                    .boolean_op(microcad_core::BooleanOp::Union, rhs.union()),
             )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} | {rhs}"))),
         }
@@ -334,7 +334,7 @@ impl std::ops::BitAnd for Value {
     fn bitand(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
-                lhs.union().binary_op(BooleanOp::Intersection, rhs.union()),
+                lhs.union().boolean_op(BooleanOp::Intersection, rhs.union()),
             )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} & {rhs}"))),
         }

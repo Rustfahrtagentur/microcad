@@ -91,12 +91,25 @@ impl ModelNodes {
         node_stack[0].clone()
     }
 
-    /// Return an operation node that unites all children.
+    /// A union operation node for this collection.
     pub fn union(&self) -> ModelNode {
+        self.boolean_op(microcad_core::BooleanOp::Union)
+    }
+
+    /// Return an boolean operation node for this collection.
+    pub fn boolean_op(&self, op: BooleanOp) -> ModelNode {
         match self.single_node() {
             Some(node) => node,
-            None => ModelNodeBuilder::new_operation(BooleanOp::Union, SrcRef(None))
-                .add_children(self.clone())
+            None => ModelNodeBuilder::new_operation(op, SrcRef(None))
+                .add_children(
+                    vec![
+                        ModelNodeBuilder::new_object_body()
+                            .add_children(self.clone())
+                            .expect("No error")
+                            .build(),
+                    ]
+                    .into(),
+                )
                 .expect("No error")
                 .build(),
         }
@@ -165,6 +178,12 @@ impl std::ops::DerefMut for ModelNodes {
 impl From<Vec<ModelNode>> for ModelNodes {
     fn from(value: Vec<ModelNode>) -> Self {
         Self(value)
+    }
+}
+
+impl From<Option<ModelNode>> for ModelNodes {
+    fn from(value: Option<ModelNode>) -> Self {
+        Self(value.into_iter().collect())
     }
 }
 

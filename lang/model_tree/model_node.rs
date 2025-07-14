@@ -210,18 +210,9 @@ impl ModelNode {
     }
 
     /// Short cut to generate boolean operator as binary operation with two nodes.
-    pub fn binary_op(self, op: BooleanOp, other: ModelNode) -> ModelNode {
+    pub fn boolean_op(self, op: BooleanOp, other: ModelNode) -> ModelNode {
         assert!(self != other, "lhs and rhs must be distinct.");
-
-        let container = ModelNodeBuilder::new_object_body()
-            .add_children(vec![self.clone(), other].into())
-            .expect("No error")
-            .build();
-
-        ModelNodeBuilder::new_operation(op, SrcRef(None))
-            .add_children(vec![container].into())
-            .expect("No error")
-            .build()
+        ModelNodes::from(vec![self.clone(), other]).boolean_op(op)
     }
 
     /// Find children node placeholder in node descendants.
