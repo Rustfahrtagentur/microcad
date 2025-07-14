@@ -13,7 +13,11 @@ impl WorkbenchDefinition {
         init: Option<&'a InitDefinition>,
         context: &mut Context,
     ) -> EvalResult<ModelNode> {
-        log::trace!("Workbench `{id}` {kind}", id = self.id, kind = self.kind);
+        log::debug!(
+            "Evaluating to node `{id}` {kind}",
+            id = self.id,
+            kind = self.kind
+        );
         context.scope(
             StackFrame::Workbench(self.kind, self.id.clone(), arguments.into()),
             |context| {
@@ -26,15 +30,18 @@ impl WorkbenchDefinition {
                     &self.plan.eval(context)?,
                     arguments,
                 ));
+                log::trace!("Prepared node builder:\n{node_builder}");
 
                 // Create the object node from initializer if present
                 if let Some(init) = init {
+                    log::trace!("Initializing`{id}` {kind}", id = self.id, kind = self.kind);
                     init.eval(arguments, &mut node_builder, context)?;
                 }
 
                 node_builder.properties.eval(context)?;
 
                 // At this point, all properties must have a value
+                log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
                 for statement in self.body.statements.iter() {
                     match statement {
                         Statement::Assignment(assignment) => {
@@ -43,7 +50,8 @@ impl WorkbenchDefinition {
                         Statement::Expression(expression) => {
                             node_builder = node_builder.add_children(expression.eval(context)?)?;
                         }
-                        _ => {}
+                        Statement::Init(_) => (),
+                        _ => todo!("Evaluate statement: {statement}"),
                     }
                 }
 
@@ -65,7 +73,7 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
     /// Consider the `part a(b: Scalar) { }`.
     /// Calling the part `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
     fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<ModelNodes> {
-        log::trace!(
+        log::debug!(
             "Workbench call `{id}` {kind}",
             id = self.id,
             kind = self.kind

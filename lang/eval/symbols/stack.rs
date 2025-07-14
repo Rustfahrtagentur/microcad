@@ -131,10 +131,12 @@ impl Stack {
 
 impl Locals for Stack {
     fn open(&mut self, frame: StackFrame) {
+        log::trace!("Opening stack frame");
         self.0.push(frame);
     }
 
     fn close(&mut self) {
+        log::trace!("Closing stack frame");
         self.0.pop();
     }
 
