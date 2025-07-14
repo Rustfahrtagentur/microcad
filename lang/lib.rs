@@ -71,3 +71,34 @@ fn parse_macro() {
     );
     assert_eq!(p.to_string(), "x = 0, y = [1, 2, 3, 4], z = 2");
 }
+
+/// Shortens given string to iz's first line and to MAX_LEN characters
+pub fn shorten(what: &str, max_chars: usize) -> String {
+    what.chars()
+        .enumerate()
+        .filter_map(|(p, ch)| {
+            if p == max_chars {
+                Some('…')
+            } else if p < max_chars {
+                if ch == '\n' {
+                    Some('⏎')
+                } else {
+                    Some(ch)
+                }
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
+/// Shortens given string to iz's first line and to MAX_LEN characters with default maximum length
+#[macro_export]
+macro_rules! shorten {
+    ($what:expr) => {
+        $crate::shorten(&format!("{}", $what), 80)
+    };
+    ($what:expr, $max_chars:literal) => {
+        shorten(format!("{}", $what).lines(), max_chars)
+    };
+}
