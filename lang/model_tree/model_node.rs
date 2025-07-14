@@ -16,7 +16,7 @@ pub struct ModelNodeInner {
     /// Optional id.
     ///
     /// The id is set when the model node was created by an assignment: `a = cube(50mm)`.
-    id: Option<Identifier>,
+    pub id: Option<Identifier>,
     /// Parent object.
     #[debug(skip)]
     parent: Option<ModelNode>,
@@ -63,17 +63,6 @@ impl ModelNode {
     /// Create new model node from inner.
     pub fn new(inner: ModelNodeInner) -> Self {
         Self(RcMut::new(inner))
-    }
-
-    /// Return id of this object node.
-    pub fn id(&self) -> Option<Identifier> {
-        self.0.borrow().id.clone()
-    }
-
-    /// Set new id for this node.
-    pub fn set_id(&mut self, id: Identifier) -> Self {
-        self.0.borrow_mut().id = Some(id);
-        self.clone()
     }
 
     /// Calculate Depth of the node.
@@ -159,7 +148,8 @@ impl ModelNode {
     /// Find children node placeholder in node descendants.
     pub fn find_children_placeholder(&self) -> Option<ModelNode> {
         self.descendants().find(|n| {
-            n.id().is_none() && matches!(n.0.borrow().element.value, Element::ChildrenPlaceholder)
+            n.borrow().id.is_none()
+                && matches!(n.0.borrow().element.value, Element::ChildrenPlaceholder)
         })
     }
 
@@ -194,7 +184,7 @@ impl ModelNode {
     /// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
     pub fn signature(&self) -> String {
         let mut s = String::new();
-        if let Some(id) = self.id() {
+        if let Some(id) = &self.borrow().id {
             s += format!("{id}: ").as_str();
         }
         s += self.borrow().element.to_string().as_str();

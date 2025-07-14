@@ -9,9 +9,9 @@ use crate::{model_tree::*, syntax::*};
 #[cfg(test)]
 fn sample_nodes() -> ModelNodes {
     fn obj(id: &str) -> ModelNode {
-        ModelNodeBuilder::new_object_body()
-            .build()
-            .set_id(Identifier::no_ref(id))
+        let node = ModelNodeBuilder::new_object_body().build();
+        node.borrow_mut().id = Some(Identifier::no_ref(id));
+        node
     }
 
     let nodes = vec![
@@ -56,13 +56,13 @@ fn model_nodes_nest() {
 
     let a0 = nodes.first().expect("a0");
     let a1 = nodes.last().expect("a1");
-    assert_eq!(a0.id().expect("a0"), Identifier::no_ref("a0"));
-    assert_eq!(a1.id().expect("a1"), Identifier::no_ref("a1"));
+    assert_eq!(a0.borrow().id, Some(Identifier::no_ref("a0")));
+    assert_eq!(a1.borrow().id, Some(Identifier::no_ref("a1")));
 
     assert_eq!(a0.children().count(), 1); // Contains b0
     assert_eq!(
-        a0.children().next().expect("b0").id().expect("b0"),
-        Identifier::no_ref("b0")
+        a0.children().next().expect("b0").borrow().id,
+        Some(Identifier::no_ref("b0"))
     );
 
     log::trace!("Nodes:\n{nodes}");
