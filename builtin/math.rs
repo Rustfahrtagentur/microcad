@@ -6,9 +6,8 @@ use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, ty::*, v
 
 /// Absolute value abs(x)
 fn abs() -> Symbol {
-    let id = Identifier::no_ref("abs");
-    Symbol::new_builtin(id, None, &|_params, args, ctx| {
-        let (id, arg) = args.get_single()?;
+    Symbol::new_builtin(Identifier::no_ref("abs"), None, &|_params, args, ctx| {
+        let (_, arg) = args.get_single()?;
         Ok(match &arg.value {
             Value::Integer(i) => Value::Integer(i.abs()),
             Value::Quantity(q) => {
@@ -17,15 +16,59 @@ fn abs() -> Symbol {
             value => {
                 ctx.error(
                     arg,
-                    EvalError::TypeMismatch {
-                        id: id.clone(),
-                        expected: Type::Integer,
-                        found: value.ty(),
-                    },
+                    EvalError::BuiltinError(format!("Cannot calculate abs({value})")),
                 )?;
                 Value::None
             }
         })
+    })
+}
+
+/// Implementation for a builtin trigonometric function.
+fn trigonometric(
+    name: &str,
+    args: &ArgumentValueList,
+    ctx: &mut Context,
+    f: impl FnOnce(f64) -> f64,
+) -> EvalResult<Value> {
+    let (_, arg) = args.get_single()?;
+    Ok(match &arg.value {
+        Value::Quantity(Quantity {
+            value,
+            quantity_type: QuantityType::Angle,
+        })
+        | Value::Quantity(Quantity {
+            value,
+            quantity_type: QuantityType::Scalar,
+        }) => Value::Quantity(Quantity::new(f(*value), QuantityType::Scalar)),
+        value => {
+            ctx.error(
+                arg,
+                EvalError::BuiltinError(format!("Cannot calculate {name}({value})")),
+            )?;
+            Value::None
+        }
+    })
+}
+
+/// Calculate cos(x).
+fn cos() -> Symbol {
+    Symbol::new_builtin(Identifier::no_ref("cos"), None, &|_params, args, ctx| {
+        trigonometric("cos", args, ctx, |v| v.cos())
+    })
+}
+
+/// Calculate sin(x).
+fn sin() -> Symbol {
+    Symbol::new_builtin(Identifier::no_ref("sin"), None, &|_params, args, ctx| {
+        trigonometric("sin", args, ctx, |v| v.sin())
+    })
+}
+
+/// Calculate tan(x).
+fn tan() -> Symbol {
+    Symbol::new_builtin(Identifier::no_ref("tan"), None, &|_params, args, ctx| {
+        trigonometric("tan", args, ctx, |v| v.tan())
     })
 }
 
@@ -163,6 +206,9 @@ pub fn math() -> Symbol {
             Value::Tuple(Box::new(Vec3::unit_z().into())),
         ))
         .symbol(abs())
+        .symbol(cos())
+        .symbol(sin())
+        .symbol(tan())
         .symbol(rotate_around_axis())
         .symbol(rotate_xyz())
         .symbol(rotate_zyx())
