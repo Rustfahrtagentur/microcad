@@ -22,25 +22,21 @@ std::debug::assert(true, "You won't see this message");
 std::debug::assert(false, "this assertion fails");
 ```
 
-## Panic
+## Error
 
-[![test](.test/verify_panic.png)](.test/verify_panic.log)
+[![test](.test/verify_error.png)](.test/verify_error.log)
 
-```µcad,verify_panic#todo
-a = 0;
-
-if a != 0 {
-    std::panic("this should not have happened");
-}
+```µcad,verify_error#fail
+std::error("this should not have happened");
 ```
 
 ## Todo
 
-`todo()` is like `panic()` but aims on reminding you to finish code later.
+`todo()` is like `error()` but aims at reminding you to finish code later.
 
 [![test](.test/verify_todo.png)](.test/verify_todo.log)
 
-```µcad,verify_todo#todo
+```µcad,verify_todo
 a = 0;
 
 if a == 0 {
