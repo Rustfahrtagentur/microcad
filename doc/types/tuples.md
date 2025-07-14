@@ -5,10 +5,18 @@ A *tuple* is a collection of *values*, each of which can be of different *types*
 Typically, each value is paired with an identifier, allowing a tuple to function
 similarly to a key-value store.
 
-[![test](.test/named_tuple.png)](.test/named_tuple.log)
+[![test](.test/named_tuple_access.png)](.test/named_tuple_access.log)
 
-```µcad,named_tuple
+```µcad,named_tuple_access
+use std::debug::assert_eq;
+
 tuple = (width=10cm, depth=10cm, volume=1l);
+
+assert_eq([tuple.width, 10cm]);
+assert_eq([tuple.depth, 10cm]);
+assert_eq([tuple.volume, 1l]);
+
+assert_eq([tuple, (width=10cm, depth=10cm, volume=1l)]);
 ```
 
 ## Partially Unnamed Tuples
