@@ -37,6 +37,8 @@ Assuming, you have two sketches and want to export each in a specific file.
 You assign an *export attribute* with a filename to each sketch.
 If you omit the file extension, the default export format will be picked automatically.
 
+[![test](.test/export_attributes.png)](.test/export_attributes.log)
+
 ```µcad,export_attributes
 #[export("rect.svg")] // Will be exported to `rect.svg`
 std::geo2d::rect(42mm);

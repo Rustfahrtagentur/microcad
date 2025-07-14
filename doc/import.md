@@ -21,6 +21,8 @@ pitch = 1.5
 
 You can then load the TOML file by using `std::import` and access its values:
 
+[![test](.test/toml_import.png)](.test/toml_import.log)
+
 ```µcad,toml_import
 data = std::import("example.toml");
 

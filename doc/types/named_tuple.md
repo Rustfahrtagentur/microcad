@@ -4,7 +4,7 @@ A *named* tuple is a sorted collection of key-value pairs.
 Essentially, named tuples act like structs.
 Tuples are constructed using parentheses `()`.
 
-[![test](.test/tuple_named_tuple.png)](.test/tuple_named_tuple.log)
+[![test](.test/types_named_tuple.png)](.test/types_named_tuple.log)
 
 ```µcad,types_named_tuple
 a = (width=10cm, depth=10cm, volume=1l);

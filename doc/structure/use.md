@@ -98,7 +98,7 @@ the symbol table where outside code might use it too.
 
 `sphere` and `cube` will be made available for using them outside of module `my` in the following example:
 
-[![test](.test/use_pub.png)](.test/use_pub.log)
+[![test](.test/use_statement_pub.png)](.test/use_statement_pub.log)
 
 ```µcad,use_statement_pub#todo
 mod my {
