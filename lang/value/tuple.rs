@@ -70,6 +70,11 @@ impl Tuple {
         }
     }
 
+    /// Return an iterator over all named values
+    pub fn named_iter(&self) -> std::collections::hash_map::Iter<'_, Identifier, Value> {
+        self.named.iter()
+    }
+
     /// Return the tuple type.
     pub fn tuple_type(&self) -> TupleType {
         TupleType {
@@ -268,6 +273,18 @@ impl FromIterator<Tuple> for Tuple {
                 .map(|t| (Type::Tuple(t.tuple_type().into()), Value::Tuple(t.into())))
                 .collect(),
         }
+    }
+}
+
+impl IntoIterator for Tuple {
+    type Item = (Identifier, Value);
+    type IntoIter = std::collections::hash_map::IntoIter<Identifier, Value>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        if !self.unnamed.is_empty() {
+            log::warn!("trying to iterate Tuple with unnamed items");
+        }
+        self.named.into_iter()
     }
 }
 

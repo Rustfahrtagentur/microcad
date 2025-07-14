@@ -79,16 +79,37 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
             kind = self.kind
         );
 
+        // prepare nodes
         let mut nodes = ModelNodes::default();
 
-        for init in self.inits() {
-            if let Ok(multi_args) =
-                ArgumentMatch::find_multi_match(args, &init.parameters.eval(context)?)
-            {
-                for args in multi_args {
-                    nodes.push(self.eval_to_node(&args, Some(init), context)?);
+        // prepare building plan
+        let plan = self.plan.eval(context)?;
+
+        if let Ok(multi_args) = ArgumentMatch::find_multi_match(args, &plan) {
+            for args in multi_args {
+                for (id, var) in args.named_iter() {
+                    context.set_local_value(id.clone(), var.clone())?;
                 }
-                break;
+                nodes.push(self.eval_to_node(&args, None, context)?);
+            }
+        } else {
+            // put all default parameters in the building plan into local variables
+            plan.iter().try_for_each(|(id, arg)| {
+                if let Some(def) = &arg.default_value {
+                    context.set_local_value(id.clone(), def.clone())?;
+                }
+                EvalResult::Ok(())
+            })?;
+
+            for init in self.inits() {
+                if let Ok(multi_args) =
+                    ArgumentMatch::find_multi_match(args, &init.parameters.eval(context)?)
+                {
+                    for args in multi_args {
+                        nodes.push(self.eval_to_node(&args, Some(init), context)?);
+                    }
+                    break;
+                }
             }
         }
 
