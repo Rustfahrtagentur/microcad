@@ -3,9 +3,8 @@
 
 //! Node attributes collection.
 
-use derive_more::{Deref, DerefMut};
-
 use crate::{model_tree::*, syntax::Identifier};
+use derive_more::{Deref, DerefMut};
 
 /// Node attributes, from an evaluated attribute list.
 #[derive(Clone, Debug, Default, Deref, DerefMut)]

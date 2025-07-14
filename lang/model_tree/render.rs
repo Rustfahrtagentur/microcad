@@ -7,48 +7,46 @@ use microcad_core::*;
 
 use crate::model_tree::*;
 
-impl ModelNode {
+impl ModelNodeInner {
     /// Return output type.
     pub fn output_type(&self) -> ModelNodeOutputType {
-        self.borrow().output.model_node_output_type()
+        self.output.model_node_output_type()
     }
 
     /// Set the transformation matrices for this node and its children.
-    pub fn set_matrix(&self, mat: Mat4) {
+    pub fn set_matrix(&mut self, mat: Mat4) {
         let new_mat = {
-            let mut self_ = self.borrow_mut();
-            let new_mat = match &self_.element.value {
+            let new_mat = match &self.element.value {
                 Element::Transform(affine_transform) => mat * affine_transform.mat3d(),
                 _ => mat,
             };
-            self_.output.matrix = new_mat;
+            self.output.matrix = new_mat;
             new_mat
         };
 
-        self.borrow().children.iter().for_each(|node| {
-            node.set_matrix(new_mat);
+        self.children.iter().for_each(|node| {
+            node.borrow_mut().set_matrix(new_mat);
         });
     }
 
     /// Set the resolution for this node.
-    pub fn set_resolution(&self, resolution: RenderResolution) {
+    pub fn set_resolution(&mut self, resolution: RenderResolution) {
         let new_resolution = {
-            let mut self_ = self.borrow_mut();
-            let new_resolution = resolution * self_.output.matrix;
-            self_.output.resolution = new_resolution.clone();
+            let new_resolution = resolution * self.output.matrix;
+            self.output.resolution = new_resolution.clone();
             new_resolution
         };
 
-        self.borrow().children.iter().for_each(|node| {
-            node.set_resolution(new_resolution.clone());
+        self.children.iter().for_each(|node| {
+            node.borrow_mut().set_resolution(new_resolution.clone());
         });
     }
 
     /// Fetch output 2d geometries.
     ///
     /// Panics if the node does not contain any 2d geometry.
-    pub fn fetch_output_geometries_2d(&self) -> Geometries2D {
-        match &self.borrow().output.geometry {
+    pub fn fetch_output_geometries_2d(&mut self) -> Geometries2D {
+        match &self.output.geometry {
             ModelNodeGeometryOutput::Geometries2D(geometries) => geometries.clone(),
             _ => panic!("The node does not contain a 2D geometry."),
         }
@@ -58,12 +56,14 @@ impl ModelNode {
     ///
     /// Panics if the node does not contain any 3d geometry.
     pub fn fetch_output_geometries_3d(&self) -> Geometries3D {
-        match &self.borrow().output.geometry {
+        match &self.output.geometry {
             ModelNodeGeometryOutput::Geometries3D(geometries) => geometries.clone(),
             _ => panic!("The node does not contain a 3D geometry."),
         }
     }
+}
 
+impl ModelNode {
     /// Render the node.
     ///
     /// Rendering the node means that all geometry is calculated and stored

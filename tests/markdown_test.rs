@@ -164,7 +164,7 @@ pub fn run_test(
 
                         let _ = fs::hard_link("images/ok.png", banner);
                         writeln!(log_out, "-- Test Result --\nOK").expect("output error");
-                        match node.output_type() {
+                        match node.borrow().output_type() {
                             ModelNodeOutputType::Geometry2D => {
                                 Export {
                                     filename: out_filename.to_string().into(),

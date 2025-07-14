@@ -3,11 +3,7 @@
 
 //! Export attribute.
 
-use crate::{
-    builtin::{ExportError, Exporter},
-    model_tree::ModelNode,
-    value::Value,
-};
+use crate::{builtin::*, model_tree::*, rc::*, value::*};
 use cgmath::SquareMatrix;
 use microcad_core::{Mat4, RenderResolution};
 
@@ -19,14 +15,15 @@ pub struct ExportAttribute {
     /// Resolution
     pub resolution: RenderResolution,
     /// Exporter.
-    pub exporter: std::rc::Rc<dyn Exporter>,
+    pub exporter: Rc<dyn Exporter>,
 }
 
 impl ExportAttribute {
     /// Export the node. By the settings in the attribute.
     pub fn export(&self, node: &ModelNode) -> Result<Value, ExportError> {
-        node.set_matrix(Mat4::identity());
-        node.set_resolution(self.resolution.clone());
+        let mut node_ = node.borrow_mut();
+        node_.set_matrix(Mat4::identity());
+        node_.set_resolution(self.resolution.clone());
         node.render();
 
         self.exporter.export(node, &self.filename)
