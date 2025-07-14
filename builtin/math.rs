@@ -33,6 +33,7 @@ fn trigonometric(
 ) -> EvalResult<Value> {
     let (_, arg) = args.get_single()?;
     Ok(match &arg.value {
+        Value::Integer(i) => Value::Quantity(Quantity::new(f(*i as f64), QuantityType::Scalar)),
         Value::Quantity(Quantity {
             value,
             quantity_type: QuantityType::Angle,

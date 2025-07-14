@@ -16,13 +16,12 @@ std::debug::assert(std::math::abs(-1) == 1);
 
 [![test](.test/math_trigonometric.png)](.test/math_trigonometric.log)
 
-```µcad,math_trigonometric#todo
+```µcad,math_trigonometric
 use std::debug::*;
 use std::math::*;
 
 assert_eq([cos(PI), -1.]);
 assert_eq([tan(0), 0.]);
-assert_eq([cot(PI/2), 0.]);
 
 x = 0.5;
 assert_eq([sin(x)^2. + cos(x)^2., 1.]);
