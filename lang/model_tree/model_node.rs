@@ -4,8 +4,8 @@
 //! Model node
 
 use crate::{
-    diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*,
-    GetPropertyValue,
+    GetPropertyValue, diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*,
+    value::*,
 };
 
 use microcad_core::*;
@@ -54,13 +54,23 @@ impl ModelNodeInner {
         }
     }
 
-    /// Return iterator of children
+    /// Return iterator of children.s
     pub fn children(&self) -> std::slice::Iter<'_, ModelNode> {
         self.children.iter()
     }
 
+    /// Return if node has no children.
     pub fn is_empty(&self) -> bool {
         self.children.is_empty()
+    }
+
+    /// Set the information about the creator of this node.
+    ///
+    /// This function is called after the resulting nodes of a call of a part
+    /// have been retrieved.   
+    pub(crate) fn set_creator(&mut self, creator: Symbol, call_src_ref: SrcRef) {
+        self.origin.creator = Some(creator);
+        self.origin.call_src_ref = call_src_ref;
     }
 }
 
@@ -80,6 +90,7 @@ impl ModelNode {
     }
 
     /// Make a deep copy if this node.
+    /// TODO: isn't this a Clone?
     pub fn make_deep_copy(&self) -> Self {
         let copy = Self(RcMut::new(self.0.borrow().clone_content()));
         for child in self.borrow().children.iter() {
@@ -202,31 +213,6 @@ impl ModelNode {
     }
 }
 
-/// Implementation to store information about the node origin.
-impl ModelNode {
-    /// Set the information about the creator of this node.
-    ///
-    /// This function is called after the resulting nodes of a call of a part
-    /// have been retrieved.   
-    pub(crate) fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
-        let origin_ = &mut self.borrow_mut().origin;
-        origin_.creator = Some(creator);
-        origin_.call_src_ref = call_src_ref;
-    }
-
-    /// Set the arguments with have been passed to this node.
-    pub(crate) fn set_original_arguments(&self, arguments: Tuple) -> Self {
-        self.borrow_mut().origin.arguments = arguments;
-        self.clone()
-    }
-
-    /// Set the original source file this node has been created from.
-    pub(crate) fn set_original_source_file(&self, source_file: Rc<SourceFile>) -> Self {
-        self.borrow_mut().origin.source_file = Some(source_file);
-        self.clone()
-    }
-}
-
 /// Iterator methods.
 impl ModelNode {
     /// Returns an iterator of nodes to this node and its unnamed descendants, in tree order.
@@ -249,15 +235,6 @@ impl ModelNode {
     /// Ancestors iterator.
     pub fn ancestors(&self) -> Ancestors {
         Ancestors::new(self.clone())
-    }
-}
-
-/// Model node attribute setter
-impl ModelNode {
-    /// Set attributes.
-    pub fn set_attributes(&self, attributes: Attributes) -> Self {
-        self.0.borrow_mut().attributes = attributes;
-        self.clone()
     }
 }
 

@@ -55,10 +55,13 @@ impl WorkbenchDefinition {
                     }
                 }
 
-                Ok(node_builder
-                    .build()
-                    .set_original_arguments(arguments.clone())
-                    .set_attributes(self.attribute_list.eval(context)?))
+                let node = node_builder.build();
+                {
+                    let mut node_ = node.borrow_mut();
+                    node_.origin.arguments = arguments.clone();
+                    node_.attributes = self.attribute_list.eval(context)?;
+                }
+                Ok(node)
             },
         )
     }

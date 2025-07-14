@@ -140,8 +140,7 @@ impl SourceFileDescendants {
                 .iter()
                 .rev()
                 .cloned()
-                .collect::<Vec<_>>()
-                .into(),
+                .collect(),
             source_file,
         }
     }

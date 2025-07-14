@@ -60,7 +60,11 @@ pub trait BuiltinWorkbenchDefinition {
                     params.expect("A built-in part must have a parameter list"),
                 )?
                 .iter()
-                .map(|args| Self::node(args).map(|node| node.set_original_arguments(args.clone())))
+                .map(|args| {
+                    Self::node(args).inspect(|node| {
+                        node.borrow_mut().origin.arguments = args.clone();
+                    })
+                })
                 .collect::<Result<ModelNodes, _>>()?,
             ))
         }

@@ -104,11 +104,12 @@ impl ModelNodes {
             Some(node) => node,
             None => ModelNodeBuilder::new_operation(op, SrcRef(None))
                 .add_children(
-                    vec![ModelNodeBuilder::new_object_body()
+                    [ModelNodeBuilder::new_object_body()
                         .add_children(self.clone())
                         .expect("No error")
                         .build()]
-                    .into(),
+                    .into_iter()
+                    .collect(),
                 )
                 .expect("No error")
                 .build(),
@@ -117,19 +118,17 @@ impl ModelNodes {
 
     /// Merge two lists of [`ObjectNode`] into one by concatenation.
     pub fn merge(lhs: ModelNodes, rhs: ModelNodes) -> Self {
-        lhs.iter()
-            .chain(rhs.iter())
-            .cloned()
-            .collect::<Vec<_>>()
-            .into()
+        lhs.iter().chain(rhs.iter()).cloned().collect()
     }
 
     /// Set the information about the creator for all nodes.
     ///
     /// See [`ModelNode::set_creator`] for more info.
     pub fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
-        self.iter()
-            .for_each(|node| node.set_creator(creator.clone(), call_src_ref.clone()))
+        self.iter().for_each(|node| {
+            node.borrow_mut()
+                .set_creator(creator.clone(), call_src_ref.clone())
+        })
     }
 
     /// Filter the nodes by source file.
@@ -140,8 +139,7 @@ impl ModelNodes {
                 None => false,
             })
             .cloned()
-            .collect::<Vec<_>>()
-            .into()
+            .collect()
     }
 
     /// Get common output type of model node collection.
