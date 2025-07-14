@@ -76,15 +76,6 @@ impl ModelNode {
         self.clone()
     }
 
-    /// Get borrowed reference to the inner of this node.
-    pub fn borrow(&'_ self) -> std::cell::Ref<'_, ModelNodeInner> {
-        self.0.borrow()
-    }
-
-    /// Get mutable borrowed reference to the inner of this node.
-    pub fn borrow_mut(&'_ self) -> std::cell::RefMut<'_, ModelNodeInner> {
-        self.0.borrow_mut()
-    }
     /// Calculate Depth of the node.
     pub fn depth(&self) -> usize {
         self.parents().count()
