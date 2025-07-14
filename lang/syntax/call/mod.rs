@@ -41,7 +41,7 @@ impl PrintSyntax for Call {
         writeln!(f, "{:depth$}Call '{}':", "", self.name)?;
         self.argument_list
             .iter()
-            .try_for_each(|a| a.print_syntax(f, depth + 1))
+            .try_for_each(|a| a.print_syntax(f, depth + Self::INDENT))
     }
 }
 

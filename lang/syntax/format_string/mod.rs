@@ -76,7 +76,7 @@ impl PrintSyntax for FormatString {
         writeln!(f, "{:depth$}FormatString:", "")?;
         self.0.iter().try_for_each(|fs| match fs {
             FormatStringInner::String(s) => writeln!(f, "{:depth$}String: \"{}\"", "", s.value),
-            FormatStringInner::FormatExpression(e) => e.print_syntax(f, depth + 1),
+            FormatStringInner::FormatExpression(e) => e.print_syntax(f, depth + Self::INDENT),
         })
     }
 }

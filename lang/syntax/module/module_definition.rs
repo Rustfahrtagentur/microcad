@@ -43,6 +43,6 @@ impl SrcReferrer for ModuleDefinition {
 impl PrintSyntax for ModuleDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
-        self.body.print_syntax(f, depth + 1)
+        self.body.print_syntax(f, depth + Self::INDENT)
     }
 }

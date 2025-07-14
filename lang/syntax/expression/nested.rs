@@ -73,6 +73,6 @@ impl PrintSyntax for Nested {
         writeln!(f, "{:depth$}Nested:", "")?;
         self.0
             .iter()
-            .try_for_each(|ni| ni.print_syntax(f, depth + 1))
+            .try_for_each(|ni| ni.print_syntax(f, depth + Self::INDENT))
     }
 }

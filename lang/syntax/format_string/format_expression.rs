@@ -48,10 +48,10 @@ impl PrintSyntax for FormatExpression {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}FormatExpression:", "")?;
         if let Some(spec) = &self.spec {
-            spec.print_syntax(f, depth + 1)?;
-            self.expression.print_syntax(f, depth + 1)
+            spec.print_syntax(f, depth + Self::INDENT)?;
+            self.expression.print_syntax(f, depth + Self::INDENT)
         } else {
-            self.expression.print_syntax(f, depth + 1)
+            self.expression.print_syntax(f, depth + Self::INDENT)
         }
     }
 }

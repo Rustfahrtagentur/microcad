@@ -40,9 +40,11 @@ impl PrintSyntax for NestedItem {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}NestedItem:", "")?;
         match self {
-            Self::Call(call) => call.print_syntax(f, depth + 1),
-            Self::QualifiedName(qualified_name) => qualified_name.print_syntax(f, depth + 1),
-            Self::Body(body) => body.print_syntax(f, depth + 1),
+            Self::Call(call) => call.print_syntax(f, depth + Self::INDENT),
+            Self::QualifiedName(qualified_name) => {
+                qualified_name.print_syntax(f, depth + Self::INDENT)
+            }
+            Self::Body(body) => body.print_syntax(f, depth + Self::INDENT),
         }
     }
 }

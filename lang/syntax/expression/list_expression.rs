@@ -60,6 +60,6 @@ impl PrintSyntax for ListExpression {
         }
         self.list
             .iter()
-            .try_for_each(|e| e.print_syntax(f, depth + 1))
+            .try_for_each(|e| e.print_syntax(f, depth + Self::INDENT))
     }
 }

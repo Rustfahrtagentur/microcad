@@ -41,6 +41,6 @@ impl PrintSyntax for Body {
         writeln!(f, "{:depth$}Body:", "")?;
         self.statements
             .iter()
-            .try_for_each(|s| s.print_syntax(f, depth + 1))
+            .try_for_each(|s| s.print_syntax(f, depth + Self::INDENT))
     }
 }

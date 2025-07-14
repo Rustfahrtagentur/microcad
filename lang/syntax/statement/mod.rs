@@ -94,20 +94,20 @@ impl std::fmt::Display for Statement {
 
 impl PrintSyntax for Statement {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}Statement:", "")?;
+        // statement is transparent
         match self {
-            Self::Workbench(w) => w.print_syntax(f, depth + 1),
-            Self::Module(m) => m.print_syntax(f, depth + 1),
-            Self::Function(func) => func.print_syntax(f, depth + 1),
-            Self::Init(i) => i.print_syntax(f, depth + 1),
+            Self::Workbench(w) => w.print_syntax(f, depth),
+            Self::Module(m) => m.print_syntax(f, depth),
+            Self::Function(func) => func.print_syntax(f, depth),
+            Self::Init(i) => i.print_syntax(f, depth),
 
-            Self::Use(u) => u.print_syntax(f, depth + 1),
-            Self::Return(r) => r.print_syntax(f, depth + 1),
-            Self::If(i) => i.print_syntax(f, depth + 1),
-            Self::Marker(m) => m.print_syntax(f, depth + 1),
+            Self::Use(u) => u.print_syntax(f, depth),
+            Self::Return(r) => r.print_syntax(f, depth),
+            Self::If(i) => i.print_syntax(f, depth),
+            Self::Marker(m) => m.print_syntax(f, depth),
 
-            Self::Assignment(a) => a.print_syntax(f, depth + 1),
-            Self::Expression(e) => e.print_syntax(f, depth + 1),
+            Self::Assignment(a) => a.print_syntax(f, depth),
+            Self::Expression(e) => e.print_syntax(f, depth),
         }
     }
 }

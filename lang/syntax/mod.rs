@@ -43,6 +43,8 @@ pub use workbench::*;
 
 /// Trait for printing a syntax tree
 pub trait PrintSyntax {
+    /// Indention size
+    const INDENT: usize = 2;
     /// Print a syntax tree
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result;
 }

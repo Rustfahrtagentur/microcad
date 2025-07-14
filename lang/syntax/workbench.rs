@@ -109,12 +109,12 @@ impl PrintSyntax for WorkbenchDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(
             f,
-            "{:depth$}Workbench({kind}) '{id}':",
+            "{:depth$}Workbench ({kind}) '{id}':",
             "",
             kind = self.kind,
             id = self.id
         )?;
-        self.plan.print_syntax(f, depth + 1)?;
-        self.body.print_syntax(f, depth + 1)
+        self.plan.print_syntax(f, depth + Self::INDENT)?;
+        self.body.print_syntax(f, depth + Self::INDENT)
     }
 }
