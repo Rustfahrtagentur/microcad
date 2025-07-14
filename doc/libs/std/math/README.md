@@ -20,10 +20,12 @@ std::debug::assert(std::math::abs(-1) == 1);
 use std::debug::*;
 use std::math::*;
 
-assert(cos(pi) == -1.);
-assert(tan(0) == 0.);
-//assert(cot(pi/2) == 0.);
-//assert(sin(x)^2. + cos(x)^2. == 1.);
+assert_eq([cos(PI), -1.]);
+assert_eq([tan(0), 0.]);
+assert_eq([cot(PI/2), 0.]);
+
+x = 0.5;
+assert_eq([sin(x)^2. + cos(x)^2., 1.]);
 ```
 
 ### Rotation matrices
@@ -44,4 +46,3 @@ These angles are also called `roll`, `pitch` and `yaw`.
 
 Returns a rotation matrix for an Euler rotation around an Z, Y, X angles (in that order.)
 These angles are also called `yaw`, `pitch` and `roll`.
-

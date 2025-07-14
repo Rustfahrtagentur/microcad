@@ -31,23 +31,23 @@ shorten things a lot:
 [![test](.test/use.png)](.test/use.log)
 
 ```µcad,use
-use std::geo3d::sphere;
-use std::geo3d::cube;
+use std::geo2d::circle;
+use std::geo2d::rect;
 
-sphere(r = 4mm);
-cube(size = 40mm);
+circle(r = 4mm);
+rect(size = 40mm);
 ```
 
-You may also use whole *module* if the names you are using already exist as a symbol:
+You may also use whole the *module* if the names you are using already exist as a symbol:
 
 [![test](.test/use_module.png)](.test/use_module.log)
 
 ```µcad,use_module
-sphere = 1;
+circle = 1;
 
-use std::geo3d;
+use std::geo2d;
 
-geo3d::sphere(r = 40mm);
+geo2d::circle(r = 40mm);
 ```
 
 ## Use As Statement
@@ -58,11 +58,11 @@ locally rename the *target symbol*:
 [![test](.test/use_as.png)](.test/use_as.log)
 
 ```µcad,use_as
-sphere = 1;
+circle = 1;
 
-use std::geo3d::sphere as ball;
+use std::geo2d::circle as disk;
 
-ball(r = 4mm);
+disk(r = 4mm);
 ```
 
 Or you may use `use as` with a *module*:
@@ -70,11 +70,11 @@ Or you may use `use as` with a *module*:
 [![test](.test/use_as_module.png)](.test/use_as_module.log)
 
 ```µcad,use_as_module
-sphere = 1;
+geo2d = 1;
 
-use std::geo3d as geo;
+use std::geo2d as geo;
 
-geo::sphere(r = 4mm);
+geo::circle(r = 4mm);
 ```
 
 ## Use All Statement
@@ -84,7 +84,7 @@ The following example aliases **all** symbols of `std::geo3d` into the current s
 
 [![test](.test/use_all.png)](.test/use_all.log)
 
-```µcad,use_all
+```µcad,use_all#todo
 use std::geo3d::*;
 
 sphere(r = 4mm);

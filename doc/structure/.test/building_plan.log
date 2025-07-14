@@ -4,16 +4,16 @@
 -- Output --
 -- Errors --
 error: Property not found: radius
-  ---> <from_str>:7:20
+  ---> <from_str>:7:24
      |
-   7 | std::debug::assert(wheel(5cm).radius == 5cm);
-     |                    ^^^^^^^^^^^^^^^^^^^^^^^^
+   7 | std::debug::assert_eq([wheel(5cm).radius, 5cm]);
+     |                        ^^^^^^^^^^^^^^^^^
      |
-error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
-  ---> <from_str>:7:20
+error: Elements of list have different types: [<invalid>, Length]
+  ---> <from_str>:7:23
      |
-   7 | std::debug::assert(wheel(5cm).radius == 5cm);
-     |                    ^^^^^^^^^^^^^^^^^^^^^^^^
+   7 | std::debug::assert_eq([wheel(5cm).radius, 5cm]);
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAIL

@@ -1,15 +1,7 @@
 -- Test --
   first_example
-  /home/micha/Work/mcad/mcad/README.md:82
+  /home/micha/Work/mcad/mcad/README.md:81
 -- Output --
-Volume: <invalid>cm³
 -- Errors --
-error: Not implemented: call_method for Nodes
-error: Symbol __builtin::export not found.
-  ---> <from_str>:25:1
-     |
-  25 | __builtin::export("lid.stl") l;
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-FAIL
+OK

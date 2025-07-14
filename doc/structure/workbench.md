@@ -72,12 +72,12 @@ use std::debug::assert;
 // call sketch with diameter
 d = wheel(diameter = 2cm)
 // check radius
-assert(d.radius == 1cm);
+assert_eq([d.radius, 1cm]);
 
 // call sketch with radius
 r = wheel(radius = 1cm)
 // check diameter
-assert(r.diameter == 2cm);
+assert([r.diameter, 2cm]);
 ```
 
 ### Building Plan
@@ -97,7 +97,7 @@ sketch wheel(radius: Length) {
     std::geo2d::circle(radius);
 }
 
-std::debug::assert(wheel(5cm).radius == 5cm);
+std::debug::assert_eq([wheel(5cm).radius, 5cm]);
 ```
 
 ### Initializers
@@ -147,7 +147,7 @@ you will get an error:
 
 [![test](.test/missed_property.png)](.test/missed_property.log)
 
-```µcad,missed_property
+```µcad,missed_property#fail
 sketch wheel(radius: Length) {
     init( width: Length ) { 
         // error: misses to set `radius` from building plan
@@ -194,7 +194,7 @@ It's **not allowed** to write any code between *initializers*.
 
 [![test](.test/code_between_initializers.png)](.test/code_between_initializers.log)
 
-```µcad,code_between_initializers
+```µcad,code_between_initializers#fail
 sketch wheel(radius: Length) {
     init( width:Length ) { radius = width / 2; }
     

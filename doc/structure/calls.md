@@ -40,14 +40,4 @@ std::ops::translate(x = 1cm) s;
 
 ## Calling Operations
 
-[Operations](op.md) are called differently:
-
-[![test](.test/call_op.png)](.test/call_op.log)
-
-```µcad,call_op#todo
-// function definition
-fn square(x: Scalar) { x * x }
-
-// call function square with parameter 2
-square(x = 2);
-```
+[Operations](op.md) are called differently.

@@ -95,7 +95,7 @@ Here is an example which generates a punched disk of a given radius using a func
 
 [![test](.test/workbench_example.png)](.test/workbench_example.log)
 
-```µcad,workbench_example#todo
+```µcad,workbench_example
 part punched_disk(radius: Length) {
     use std::geo2d::circle;
 

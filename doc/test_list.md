@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**100** tests from markdown.
+**99** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -21,7 +21,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/.test/attributes_simple_example.png)](../doc/.test/attributes_simple_example.log) | [attributes_simple_example](../doc/attributes.md) |
 | [![test](../doc/structure/.test/building_plan.png)](../doc/structure/.test/building_plan.log) | [building_plan](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/call_function.png)](../doc/structure/.test/call_function.log) | [call_function](../doc/structure/calls.md) |
-| [![test](../doc/structure/.test/call_op.png)](../doc/structure/.test/call_op.log) | [call_op](../doc/structure/calls.md) |
 | [![test](../doc/structure/.test/call_workbench.png)](../doc/structure/.test/call_workbench.log) | [call_workbench](../doc/structure/calls.md) |
 | [![test](../doc/structure/.test/children.png)](../doc/structure/.test/children.log) | [children](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/code.png)](../doc/structure/.test/code.log) | [code](../doc/structure/workbench.md) |
@@ -50,7 +49,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/mod_example.png)](../doc/structure/.test/mod_example.log) | [mod_example](../doc/structure/modules.md) |
 | [![test](../doc/structure/.test/multiplicity_arrays.png)](../doc/structure/.test/multiplicity_arrays.log) | [multiplicity_arrays](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/multiplicity_tuple_array.png)](../doc/structure/.test/multiplicity_tuple_array.log) | [multiplicity_tuple_array](../doc/structure/arguments.md) |
-| [![test](../doc/types/.test/named_tuple.png)](../doc/types/.test/named_tuple.log) | [named_tuple](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/named_tuple_access.png)](../doc/types/.test/named_tuple_access.log) | [named_tuple_access](../doc/types/tuples.md) |
 | [![test](../doc/structure/.test/no_multiplicity.png)](../doc/structure/.test/no_multiplicity.log) | [no_multiplicity](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/none.png)](../doc/structure/.test/none.log) | [none](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/op_example.png)](../doc/structure/.test/op_example.log) | [op_example](../doc/structure/op.md) |

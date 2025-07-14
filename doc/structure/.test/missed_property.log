@@ -5,4 +5,4 @@
 -- Errors --
 error: Properties have not been initialized: radius
 -- Test Result --
-FAIL
+FAILED AS EXPECTED

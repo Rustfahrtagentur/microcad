@@ -15,21 +15,20 @@ Simple basic shapes can be composed to create complex geometries which then can 
 
 ## Content
 
-- [µcad](#µcad)
-  - [Content](#content)
-  - [Quick Start](#quick-start)
-    - [Installation](#installation)
-    - [Basic Example](#basic-example)
-      - [Source Code Explanation](#source-code-explanation)
-  - [Documentation](#documentation)
-  - [Contribute](#contribute)
-    - [Get Source Code](#get-source-code)
-    - [Get External Libraries](#get-external-libraries)
-    - [Build µcad](#build-µcad)
-    - [Install µcad locally from source](#install-µcad-locally-from-source)
-    - [Contributing to Documentation](#contributing-to-documentation)
-      - [User Manual](#user-manual)
-  - [Test List](#test-list)
+- [Content](#content)
+- [Quick Start](#quick-start)
+  - [Installation](#installation)
+  - [Basic Example](#basic-example)
+    - [Source Code Explanation](#source-code-explanation)
+- [Documentation](#documentation)
+- [Contribute](#contribute)
+  - [Get Source Code](#get-source-code)
+  - [Get External Libraries](#get-external-libraries)
+  - [Build µcad](#build-µcad)
+  - [Install µcad locally from source](#install-µcad-locally-from-source)
+  - [Contributing to Documentation](#contributing-to-documentation)
+    - [User Manual](#user-manual)
+- [Test List](#test-list)
 
 ## Quick Start
 
@@ -98,13 +97,7 @@ part lid(
 }
 
 // `l` is the instance of the lid model
-l = lid();
-
-// Print out the volume of the model instance
-__builtin::print("Volume: {l.volume() / 1000}cm³");
-
-// Insert `l` into resulting object tree
-__builtin::export("lid.stl") l;
+lid();
 ```
 
 The STL file can now also be loaded into a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
