@@ -3,7 +3,7 @@
 
 //! Scalable Vector Graphics (SVG) file writer
 
-use geo::{CoordsIter, coord};
+use geo::{coord, CoordsIter};
 use microcad_core::*;
 use microcad_lang::{
     model_tree::{Element, GetAttribute, ModelNode, ModelNodeOutputType},
@@ -314,7 +314,7 @@ impl SvgWriter {
             .try_for_each(|geometry| self.geometry(geometry, &attr))?;
 
         let b = node.borrow();
-        let element = b.element();
+        let element = &b.element.value;
 
         match element {
             Element::Object(_) | Element::Primitive2D(_) => {

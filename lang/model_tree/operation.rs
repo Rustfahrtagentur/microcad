@@ -33,11 +33,11 @@ impl Operation for BooleanOp {
         if let Some(node) = node.into_inner_object_node() {
             node.children().for_each(|node| {
                 let b = node.borrow();
-                match b.element() {
+                match &b.element.value {
                     Element::Transform(affine_transform) => {
                         geometries.append(
                             node.process_2d(&node)
-                                .transformed_2d(&b.output().resolution, &affine_transform.mat2d()),
+                                .transformed_2d(&b.output.resolution, &affine_transform.mat2d()),
                         );
                     }
                     _ => {
@@ -47,7 +47,7 @@ impl Operation for BooleanOp {
             });
         }
 
-        geometries.boolean_op(&node.borrow().output().resolution, self)
+        geometries.boolean_op(&node.borrow().output.resolution, self)
     }
 }
 

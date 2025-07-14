@@ -107,15 +107,15 @@ impl<'a> ModelNodeBuilder<'a> {
     ///
     /// TODO: Replace `panic!` with context warnings.
     pub fn determine_output_type(&self, child: &ModelNode) -> EvalResult<ModelNodeOutputType> {
-        match self.inner.element() {
+        match &self.inner.element.value {
             Element::ChildrenPlaceholder => panic!("A child placeholder cannot have children"),
             Element::Transform(_) => {
-                if !self.inner.children().is_empty() {
+                if !self.inner.children.is_empty() {
                     panic!("A transformation cannot have more than one child.")
                 }
             }
             Element::Operation(op) => {
-                if !self.inner.children().is_empty() {
+                if !self.inner.children.is_empty() {
                     panic!("An operation cannot have more than one child.")
                 } else {
                     return Ok(op.output_type());
@@ -189,10 +189,10 @@ impl<'a> ModelNodeBuilder<'a> {
 
     /// Build a [`ModelNode`].
     pub fn build(mut self) -> ModelNode {
-        if let Element::Object(object) = self.inner.element_mut() {
+        if let Element::Object(object) = &mut self.inner.element.value {
             object.props = self.properties
         }
-        self.inner.set_output(ModelNodeOutput::new(self.output));
+        self.inner.output = ModelNodeOutput::new(self.output);
 
         let node = ModelNode::new(self.inner);
         node.append_children(self.children)

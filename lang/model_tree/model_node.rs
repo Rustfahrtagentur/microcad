@@ -4,8 +4,8 @@
 //! Model node
 
 use crate::{
-    GetPropertyValue, diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*,
-    value::*,
+    diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*,
+    GetPropertyValue,
 };
 
 use microcad_core::*;
@@ -20,16 +20,16 @@ pub struct ModelNodeInner {
     /// Parent object.
     #[debug(skip)]
     parent: Option<ModelNode>,
-    // Children of the model node.
-    children: ModelNodes,
+    /// Children of the model node.
+    pub children: ModelNodes,
     /// Element of the node with [SrcRef].
-    element: Refer<Element>,
+    pub element: Refer<Element>,
     /// Attributes used for export.
-    attributes: Attributes,
+    pub attributes: Attributes,
     /// The symbol (e.g. [`WorkbenchDefinition`]) that created this [`ModelNode`].
-    origin: ModelNodeOrigin,
+    pub origin: ModelNodeOrigin,
     /// The output type of the this node.
-    output: ModelNodeOutput,
+    pub output: ModelNodeOutput,
 }
 
 impl ModelNodeInner {
@@ -39,56 +39,6 @@ impl ModelNodeInner {
             element,
             ..Default::default()
         }
-    }
-
-    /// Return reference to the children of this node.
-    pub fn children(&self) -> &ModelNodes {
-        &self.children
-    }
-
-    /// Return element of this node.
-    pub fn element(&self) -> &Element {
-        &self.element
-    }
-
-    /// Return a mutable reference of the element of this node.
-    pub fn element_mut(&mut self) -> &mut Element {
-        &mut self.element
-    }
-
-    /// Return reference to the attributes of this node.
-    pub fn attributes(&self) -> &Attributes {
-        &self.attributes
-    }
-
-    /// Return mutable reference for the attributes of this node
-    pub fn attributes_mut(&mut self) -> &mut Attributes {
-        &mut self.attributes
-    }
-
-    /// Set attribute for this node.
-    pub fn set_attributes(&mut self, attributes: Attributes) {
-        self.attributes = attributes;
-    }
-
-    /// Return reference to the attributes of this node.
-    pub fn output(&self) -> &ModelNodeOutput {
-        &self.output
-    }
-
-    /// Return mutable reference for the attributes of this node
-    pub fn output_mut(&mut self) -> &mut ModelNodeOutput {
-        &mut self.output
-    }
-
-    /// Set output for this node.
-    pub fn set_output(&mut self, output: ModelNodeOutput) {
-        self.output = output;
-    }
-
-    /// Return a reference to the model node origin.
-    pub fn origin(&self) -> &ModelNodeOrigin {
-        &self.origin
     }
 
     /// Clone only the content of this node without children and parent.
@@ -192,7 +142,7 @@ impl ModelNode {
         let mut b = self.0.borrow_mut();
         // If this node's output type has not been determined, try to get it from child node
         if b.output.model_node_output_type() == ModelNodeOutputType::NotDetermined {
-            b.set_output(ModelNodeOutput::new(node.output_type()));
+            b.output = ModelNodeOutput::new(node.output_type());
         }
         b.children.push(node.clone());
 
@@ -226,7 +176,7 @@ impl ModelNode {
     pub fn find_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
         self.ancestors().find_map(|node| {
             let b = node.borrow();
-            let origin = b.origin();
+            let origin = &b.origin;
             origin.source_file.clone()
         })
     }
@@ -256,7 +206,7 @@ impl ModelNode {
         if let Some(id) = self.id() {
             s += format!("{id}: ").as_str();
         }
-        s += self.borrow().element().to_string().as_str();
+        s += self.borrow().element.to_string().as_str();
         if self.origin().creator.is_some() {
             s += format!(" = {origin}", origin = self.origin()).as_str();
         }
@@ -311,7 +261,7 @@ impl ModelNode {
 
     /// Returns `true` if this node has children.
     pub fn has_children(&self) -> bool {
-        !self.borrow().children().is_empty()
+        !self.borrow().children.is_empty()
     }
 
     /// Children iterator.
@@ -346,20 +296,34 @@ impl ModelNode {
 impl ModelNode {
     /// Set attributes.
     pub fn set_attributes(&self, attributes: Attributes) -> Self {
-        self.0.borrow_mut().set_attributes(attributes);
+        self.0.borrow_mut().attributes = attributes;
         self.clone()
+    }
+}
+
+impl std::ops::Deref for ModelNode {
+    type Target = RcMut<ModelNodeInner>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for ModelNode {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
 impl GetPropertyValue for ModelNode {
     fn get_property_value(&self, id: &Identifier) -> Value {
-        self.borrow().element().get_property_value(id)
+        self.borrow().element.get_property_value(id)
     }
 }
 
 impl GetAttribute for ModelNode {
     fn get_attribute(&self, id: &Identifier) -> Option<crate::model_tree::Attribute> {
-        self.borrow().attributes().get_attribute(id)
+        self.borrow().attributes.get_attribute(id)
     }
 }
 

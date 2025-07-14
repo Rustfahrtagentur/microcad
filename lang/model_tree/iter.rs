@@ -25,7 +25,7 @@ impl Iterator for Children {
 
     fn next(&mut self) -> Option<Self::Item> {
         let node = self.node.borrow();
-        let child = node.children().get(self.index);
+        let child = node.children.get(self.index);
         self.index += 1;
         child.cloned()
     }
@@ -42,7 +42,7 @@ impl Descendants {
         Self {
             stack: root
                 .borrow()
-                .children()
+                .children
                 .iter()
                 .rev()
                 .cloned()
@@ -57,7 +57,7 @@ impl Iterator for Descendants {
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(node) = self.stack.pop() {
-            let children = node.borrow().children().clone();
+            let children = node.borrow().children.clone();
             for child in children.iter().rev() {
                 self.stack.push(child.clone());
             }
@@ -134,7 +134,7 @@ impl SourceFileDescendants {
         Self {
             stack: root
                 .borrow()
-                .children()
+                .children
                 .filter_by_source_file(&source_file.clone())
                 .iter()
                 .rev()
@@ -153,7 +153,7 @@ impl Iterator for SourceFileDescendants {
         if let Some(node) = self.stack.pop() {
             let children = node
                 .borrow()
-                .children()
+                .children
                 .filter_by_source_file(&self.source_file);
             for child in children.iter().rev() {
                 self.stack.push(child.clone());

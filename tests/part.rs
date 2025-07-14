@@ -3,7 +3,7 @@
 
 #[cfg(test)]
 use microcad_lang::{
-    GetPropertyValue, eval::*, model_tree::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*,
+    eval::*, model_tree::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*, GetPropertyValue,
 };
 
 /// Helper function to create a qualified name from &str
@@ -56,7 +56,7 @@ fn workbench_call() {
     assert_eq!(nodes.len(), 1, "There should be one node");
 
     fn check_node_property_b(node: &ModelNode, value: f64) {
-        if let Element::Object(ref object) = *node.borrow().element() {
+        if let Element::Object(ref object) = node.borrow().element.value {
             assert_eq!(
                 object.get_property_value(&Identifier(Refer::none("b".into()))),
                 Value::Quantity(Quantity::new(value, QuantityType::Scalar))
@@ -101,7 +101,7 @@ fn workbench_initializer_call() {
 
     // Helper function to check if the object node contains a property radius with specified value
     fn check_node_property_radius(node: &model_tree::ModelNode, value: f64) {
-        if let model_tree::Element::Object(ref object) = *node.borrow().element() {
+        if let model_tree::Element::Object(ref object) = *node.borrow().element {
             log::trace!("Object: {object}");
             assert_eq!(
                 object.get_property_value(&Identifier::no_ref("radius")),

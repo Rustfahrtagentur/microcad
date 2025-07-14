@@ -133,7 +133,7 @@ impl ExportArgs {
             .source_file_descendants()
             .filter_map(|node| {
                 let b = node.borrow();
-                b.attributes()
+                b.attributes
                     .get_export_attribute()
                     .map(|attr| (node.clone(), attr))
             })
