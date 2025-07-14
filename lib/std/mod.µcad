@@ -27,5 +27,6 @@ pub use __builtin::print;
 pub use __builtin::error;
 pub use __builtin::warning;
 pub use __builtin::info;
+pub use __builtin::todo;
 
 pub use __builtin::import;
