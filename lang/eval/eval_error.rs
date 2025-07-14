@@ -192,6 +192,10 @@ pub enum EvalError {
     /// An error if you try to mix 2d and 3d geometries.
     #[error("Cannot mix 2d and 3d geometries")]
     CannotMixGeometry,
+
+    /// A condition of an if statement is not a boolean
+    #[error("If condition is not a boolean: {0}")]
+    IfConditionIsNotBool(Value),
 }
 
 /// Result type of any evaluation.

@@ -8,9 +8,12 @@ use crate::{src_ref::*, syntax::*};
 /// An assignment statement, e.g. `#[aux] s = sphere(3.0mm);`.
 #[derive(Debug, Clone)]
 pub struct ExpressionStatement {
-    attribute_list: AttributeList,
-    expression: Expression,
-    src_ref: SrcRef,
+    /// Optional attributes.
+    pub attribute_list: AttributeList,
+    /// The actual expression.
+    pub expression: Expression,
+    /// Source code reference.
+    pub src_ref: SrcRef,
 }
 
 impl SrcReferrer for ExpressionStatement {
@@ -36,30 +39,5 @@ impl std::fmt::Display for ExpressionStatement {
             writeln!(f, "{}", self.attribute_list)?;
         }
         writeln!(f, "{};", self.expression)
-    }
-}
-
-use crate::parser::*;
-
-impl Parse for ExpressionStatement {
-    fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
-        Ok(Self {
-            attribute_list: pair.find(Rule::attribute_list).unwrap_or_default(),
-            expression: pair
-                .find(Rule::expression)
-                .or(pair.find(Rule::expression_no_semicolon))
-                .expect("Expression"),
-            src_ref: pair.into(),
-        })
-    }
-}
-
-use crate::eval::*;
-use crate::value::*;
-
-impl Eval for ExpressionStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        self.expression
-            .eval_with_attribute_list(&self.attribute_list, context)
     }
 }

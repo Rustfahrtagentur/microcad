@@ -43,7 +43,7 @@ mod literal;
 mod output;
 mod parameter;
 mod source_file;
-mod statement;
+mod statements;
 mod symbols;
 mod tuple;
 mod r#use;
@@ -58,12 +58,26 @@ pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
 pub use parameter::*;
-pub use r#use::*;
 pub use symbols::*;
+pub use r#use::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
-/// Evaluation trait
+/// Evaluation trait.
+///
+/// The return type `T` defines to which output type the type is evaluated.
+/// Usually, these output types are used in specific context:
+///
+/// | Return type `T`     | Context / Scope                                     | Return value on error   | Description                                                             |
+/// | ------------------- | --------------------------------------------------- | ----------------------- | ----------------------------------------------------------------------- |
+/// | `()`                | [`Assignment`].                                     | `()`                    | An assignment returns nothing but alters the symbol table.              |
+/// |                     |                                                     |                         |
+/// | `Value`             | Function calls, module statements,                  | `Value::None`           | These trait implementations are   
+/// |                     | parameter lists, argument lists.                    |                         | mostly used when evaluating functions.
+/// |                     |                                                     |                         |
+/// | `Option<ModelNode>` | Workbenches, object bodies, source files, if.       | `None`                  | Something is evaluated into a single model node.                        |
+/// |                     |                                                     |                         |
+/// | `ModelNodes`        | Statement, statement list, body, multiplicities.    | `ModelNodes::default()` | A collection of nodes. |
 pub trait Eval<T = Value> {
     /// Evaluate a syntax element into a type `T`.
     fn eval(&self, context: &mut Context) -> EvalResult<T>;
@@ -77,8 +91,8 @@ impl MethodCall {
     /// assert([2.0, 2.0].all_equal(), "All elements in this list must be equal.");
     /// ```
     fn eval(&self, context: &mut Context, lhs: &Expression) -> EvalResult<Value> {
-        lhs.eval(context)?
-            .call_method(&self.id, &self.argument_list, context)
+        let value: Value = lhs.eval(context)?;
+        value.call_method(&self.id, &self.argument_list, context)
     }
 }
 

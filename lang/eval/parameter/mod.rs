@@ -17,7 +17,7 @@ impl Eval<ParameterValue> for Parameter {
         match (&self.specified_type, &self.default_value) {
             // Type and value are specified
             (Some(specified_type), Some(default_value)) => {
-                let default_value = default_value.eval(context)?;
+                let default_value: Value = default_value.eval(context)?;
                 if specified_type.ty() != default_value.ty() {
                     context.error(
                         self,
@@ -45,7 +45,7 @@ impl Eval<ParameterValue> for Parameter {
             }),
             // Only value is specified
             (None, Some(expr)) => {
-                let default_value = expr.eval(context)?;
+                let default_value: Value = expr.eval(context)?;
 
                 Ok(ParameterValue {
                     specified_type: Some(default_value.ty().clone()),

@@ -57,7 +57,7 @@ impl Parameter {
 
         match (&self.specified_type, &self.default_value) {
             (Some(specified_type), Some(default_value)) => {
-                let value = default_value.eval(context)?;
+                let value: Value = default_value.eval(context)?;
                 if specified_type.ty() != value.ty() {
                     context.error(
                         self.src_ref.clone(),

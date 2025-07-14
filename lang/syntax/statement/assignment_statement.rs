@@ -3,7 +3,7 @@
 
 //! Assignment statement syntax elements
 
-use crate::{diag::*, model_tree::*, src_ref::*, syntax::*, ty::*};
+use crate::{src_ref::*, syntax::*};
 
 /// An assignment statement, e.g. `#[aux] s = sphere(3.0mm);`.
 #[derive(Clone, Debug)]
@@ -12,7 +12,8 @@ pub struct AssignmentStatement {
     pub attribute_list: AttributeList,
     /// The actual assignment.
     pub assignment: Assignment,
-    src_ref: SrcRef,
+    /// Source code reference.
+    pub src_ref: SrcRef,
 }
 
 impl SrcReferrer for AssignmentStatement {
@@ -33,52 +34,5 @@ impl std::fmt::Display for AssignmentStatement {
             writeln!(f, "{}", self.attribute_list)?;
         }
         writeln!(f, "{};", self.assignment)
-    }
-}
-
-use crate::parser::*;
-
-impl Parse for AssignmentStatement {
-    fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
-        Ok(Self {
-            attribute_list: pair.find(Rule::attribute_list).unwrap_or_default(),
-            assignment: pair.find(Rule::assignment).expect("Assignment"),
-            src_ref: pair.into(),
-        })
-    }
-}
-
-use crate::eval::*;
-use crate::value::*;
-
-impl Eval for AssignmentStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        let assignment = &self.assignment;
-        let value = assignment
-            .expression
-            .eval_with_attribute_list(&self.attribute_list, context)?;
-        if let Err(err) = assignment.type_check(value.ty()) {
-            context.error(self, err)?;
-            return Ok(Value::None);
-        }
-
-        context.set_local_value(assignment.id.clone(), value)?;
-        Ok(Value::None)
-    }
-}
-
-impl AssignmentStatement {
-    /// Try to evaluate the assignment into nodes.
-    pub fn try_eval_to_nodes(&self, context: &mut Context) -> EvalResult<ModelNodes> {
-        let value = self
-            .assignment
-            .expression
-            .eval_with_attribute_list(&self.attribute_list, context)?;
-
-        context.set_local_value(self.assignment.id.clone(), value)?;
-        Ok(context
-            .get_local_value(&self.assignment.id)
-            .expect("Local value")
-            .fetch_nodes())
     }
 }

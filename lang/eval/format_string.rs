@@ -5,7 +5,8 @@ use crate::eval::*;
 
 impl Eval for FormatExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        Ok(Value::String(format!("{}", self.expression.eval(context)?)))
+        let value: Value = self.expression.eval(context)?;
+        Ok(Value::String(format!("{value}")))
     }
 }
 

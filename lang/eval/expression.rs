@@ -26,39 +26,6 @@ impl Eval for ListExpression {
     }
 }
 
-impl Expression {
-    /// Evaluate an expression together with an attribute list.
-    ///
-    /// The attribute list will be also evaluated and the resulting attributes
-    /// will be assigned to the resulting value.
-    pub fn eval_with_attribute_list(
-        &self,
-        attribute_list: &AttributeList,
-        context: &mut Context,
-    ) -> EvalResult<Value> {
-        let value = self.eval(context)?;
-        match value {
-            Value::Nodes(mut nodes) => {
-                let attributes = attribute_list.eval(context)?;
-                nodes.iter_mut().for_each(|node| {
-                    node.borrow_mut().set_attributes(attributes.clone());
-                });
-                Ok(Value::Nodes(nodes))
-            }
-            Value::None => Ok(Value::None),
-            _ => {
-                if !attribute_list.is_empty() {
-                    context.error(
-                        attribute_list,
-                        AttributeError::CannotAssignToExpression(self.clone().into()),
-                    )?;
-                }
-                Ok(value)
-            }
-        }
-    }
-}
-
 impl Eval for Expression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match self {
@@ -72,8 +39,8 @@ impl Eval for Expression {
                 rhs,
                 src_ref: _,
             } => {
-                let lhs = lhs.eval(context)?;
-                let rhs = rhs.eval(context)?;
+                let lhs: Value = lhs.eval(context)?;
+                let rhs: Value = rhs.eval(context)?;
                 if lhs.is_invalid() || rhs.is_invalid() {
                     return Ok(Value::None);
                 }
@@ -90,10 +57,10 @@ impl Eval for Expression {
                 op,
                 rhs,
                 src_ref: _,
-            } => rhs
-                .eval(context)?
-                .unary_op(op.as_str())
-                .map_err(EvalError::ValueError),
+            } => {
+                let value: Value = rhs.eval(context)?;
+                value.unary_op(op.as_str()).map_err(EvalError::ValueError)
+            }
             Self::ArrayElementAccess(lhs, rhs, _) => {
                 let lhs = lhs.eval(context)?;
                 let rhs = rhs.eval(context)?;
@@ -126,14 +93,16 @@ impl Eval for Expression {
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Nested(nested) => nested.eval(context),
             Self::PropertyAccess(lhs, identifier, src_ref) => {
-                let value = lhs.eval(context)?.get_property_value(identifier);
+                let value: Value = lhs.eval(context)?;
+                let value = value.get_property_value(identifier);
                 if value == Value::None {
                     context.error(src_ref, EvalError::PropertyNotFound(identifier.clone()))?;
                 }
                 Ok(value)
             }
             Self::AttributeAccess(lhs, identifier, src_ref) => {
-                let value = lhs.eval(context)?.get_attribute_value(identifier);
+                let value: Value = lhs.eval(context)?;
+                let value = value.get_attribute_value(identifier);
                 if value == Value::None {
                     context.error(src_ref, AttributeError::NotFound(identifier.clone()))?;
                 }
@@ -141,6 +110,13 @@ impl Eval for Expression {
             }
             expr => todo!("{expr:?}"),
         }
+    }
+}
+
+impl Eval<ModelNodes> for Expression {
+    fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
+        let value: Value = self.eval(context)?;
+        Ok(value.fetch_nodes())
     }
 }
 

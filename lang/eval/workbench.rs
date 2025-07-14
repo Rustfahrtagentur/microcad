@@ -41,8 +41,7 @@ impl WorkbenchDefinition {
                             assignment.eval(context)?;
                         }
                         Statement::Expression(expression) => {
-                            let value = expression.eval(context)?;
-                            node_builder = node_builder.add_children(value.fetch_nodes())?;
+                            node_builder = node_builder.add_children(expression.eval(context)?)?;
                         }
                         _ => {}
                     }

@@ -35,6 +35,16 @@ impl Parse for Assignment {
     }
 }
 
+impl Parse for AssignmentStatement {
+    fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
+        Ok(Self {
+            attribute_list: pair.find(Rule::attribute_list).unwrap_or_default(),
+            assignment: pair.find(Rule::assignment).expect("Assignment"),
+            src_ref: pair.into(),
+        })
+    }
+}
+
 impl Parse for IfStatement {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut cond = Default::default();
@@ -67,6 +77,19 @@ impl Parse for Marker {
         Ok(Self {
             id: Identifier::parse(pair.inner().next().expect(INTERNAL_PARSE_ERROR))?,
             src_ref: pair.src_ref(),
+        })
+    }
+}
+
+impl Parse for ExpressionStatement {
+    fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
+        Ok(Self {
+            attribute_list: pair.find(Rule::attribute_list).unwrap_or_default(),
+            expression: pair
+                .find(Rule::expression)
+                .or(pair.find(Rule::expression_no_semicolon))
+                .expect("Expression"),
+            src_ref: pair.into(),
         })
     }
 }

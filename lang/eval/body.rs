@@ -3,31 +3,52 @@
 
 use crate::{eval::*, model_tree::*};
 
-impl Eval<ModelNode> for Body {
-    fn eval(&self, context: &mut Context) -> EvalResult<ModelNode> {
-        context.scope(StackFrame::Body(SymbolMap::default()), |context| {
-            let mut builder = ModelNodeBuilder::new_object_body();
-
-            for statement in self.statements.iter() {
-                let value = match statement {
-                    Statement::Use(_) => continue, // Use statements have been resolved at this point
-                    Statement::Assignment(assignment) => assignment.eval(context)?,
-                    Statement::Expression(expression) => expression.eval(context)?,
-                    Statement::Marker(marker) => marker.eval(context)?,
-                    Statement::If(_) => todo!("if statement not implemented"),
+/// Evaluate the body into a collection of model nodes.
+impl Eval<ModelNodes> for Body {
+    fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
+        self.statements
+            .iter()
+            .map(|statement| -> EvalResult<ModelNodes> {
+                match statement {
+                    Statement::Use(_) => {} // Use statements have been resolved at this point
+                    Statement::Assignment(assignment) => {
+                        assignment.eval(context)?;
+                    }
+                    Statement::Expression(expression) => return expression.eval(context),
+                    Statement::Marker(marker) => return marker.eval(context),
+                    Statement::If(r#if) => {
+                        let node: Option<ModelNode> = r#if.eval(context)?;
+                        return Ok(node.into());
+                    }
                     statement => {
                         use crate::diag::PushDiag;
                         context.error(
                             self,
                             EvalError::StatementNotSupported(statement.clone().into()),
                         )?;
-                        Value::None
                     }
-                };
-                builder = builder.add_children(value.fetch_nodes())?;
-            }
+                }
 
-            Ok(builder.build())
+                Ok(ModelNodes::default())
+            })
+            .try_fold(ModelNodes::default(), |mut model_nodes, new| match new {
+                Ok(mut new_nodes) => {
+                    model_nodes.append(&mut new_nodes);
+
+                    Ok(model_nodes)
+                }
+                _ => todo!(),
+            })
+    }
+}
+
+/// Evaluate the body into a single object body node: `{}`.
+impl Eval<ModelNode> for Body {
+    fn eval(&self, context: &mut Context) -> EvalResult<ModelNode> {
+        context.scope(StackFrame::Body(SymbolMap::default()), |context| {
+            Ok(ModelNodeBuilder::new_object_body()
+                .add_children(self.eval(context)?)?
+                .build())
         })
     }
 }

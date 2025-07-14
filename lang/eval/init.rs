@@ -17,7 +17,7 @@ impl InitDefinition {
                     Statement::Assignment(assignment) => {
                         let assignment = &assignment.assignment;
                         let id = &assignment.id;
-                        let value = assignment.expression.eval(context)?;
+                        let value: Value = assignment.expression.eval(context)?;
 
                         // Only change the property value, do not add new properties
                         if node_builder.has_property(id) {
