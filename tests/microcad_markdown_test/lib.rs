@@ -278,13 +278,7 @@ fn scan_for_tests(
                         file_path,
                         test_name.as_str(),
                         test_code.as_str(),
-                        &format!(
-                            "{}:{start_no}",
-                            file_path
-                                .canonicalize()
-                                .expect("existing path")
-                                .to_string_lossy()
-                        ),
+                        &format!("{}:{start_no}", file_path.to_string_lossy()),
                     ) {
                         test_outputs.push(output);
                     }
