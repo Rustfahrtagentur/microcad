@@ -28,6 +28,36 @@ impl Quantity {
             quantity_type,
         }
     }
+
+    /// Calculate the power of quantity.
+    ///
+    /// *Note: This function has not been implemented completely.*
+    pub fn pow(&self, rhs: &Quantity) -> Self {
+        match (&self.quantity_type, &rhs.quantity_type) {
+            (QuantityType::Scalar, QuantityType::Scalar) => {
+                Quantity::new(self.value.powf(rhs.value), QuantityType::Scalar)
+            }
+            _ => todo!(),
+        }
+    }
+
+    /// Calculate the power of quantity and an integer.
+    ///
+    /// *Note: This function has not been implemented completely.*
+    pub fn pow_int(&self, rhs: &Integer) -> Self {
+        match &self.quantity_type {
+            QuantityType::Scalar => {
+                Quantity::new(self.value.powi(*rhs as i32), QuantityType::Scalar)
+            }
+            QuantityType::Length => todo!(),
+            QuantityType::Area => todo!(),
+            QuantityType::Volume => todo!(),
+            QuantityType::Density => todo!(),
+            QuantityType::Angle => todo!(),
+            QuantityType::Weight => todo!(),
+            QuantityType::Invalid => todo!(),
+        }
+    }
 }
 
 impl PartialOrd for Quantity {

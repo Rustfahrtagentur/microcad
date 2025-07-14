@@ -84,14 +84,24 @@ impl Value {
         matches!(self, Value::None)
     }
 
+    /// Calculate the power of two values, if possible.
+    pub fn pow(&self, rhs: &Value) -> ValueResult {
+        match (&self, rhs) {
+            (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity(lhs.pow(rhs))),
+            (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity(lhs.pow_int(rhs))),
+            (Value::Integer(lhs), Value::Integer(rhs)) => Ok(Value::Integer(lhs.pow(*rhs as u32))),
+            _ => Err(ValueError::InvalidOperator("^".to_string())),
+        }
+    }
+
     /// Binary operation
     pub fn binary_op(lhs: Value, rhs: Value, op: &str) -> ValueResult {
-        match match op {
+        match op {
             "+" => lhs + rhs,
             "-" => lhs - rhs,
             "*" => lhs * rhs,
             "/" => lhs / rhs,
-            "^" => unimplemented!(), // lhs.pow(&rhs),
+            "^" => lhs.pow(&rhs),
             "&" => lhs & rhs,
             "|" => lhs | rhs,
             ">" => Ok(Value::Bool(lhs > rhs)),
@@ -102,9 +112,6 @@ impl Value {
             "==" => Ok(Value::Bool(lhs == rhs)),
             "!=" => Ok(Value::Bool(lhs != rhs)),
             _ => unimplemented!("{op:?}"),
-        } {
-            Err(err) => Err(err),
-            result => result,
         }
     }
 
