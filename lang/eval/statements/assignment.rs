@@ -46,7 +46,7 @@ impl Eval<()> for AssignmentStatement {
             Value::Nodes(mut nodes) => {
                 let attributes = self.attribute_list.eval(context)?;
                 nodes.iter_mut().for_each(|node| {
-                    node.borrow_mut().set_attributes(attributes.clone());
+                    node.borrow_mut().attributes = attributes.clone();
                 });
                 Value::Nodes(nodes)
             }
