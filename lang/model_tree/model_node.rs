@@ -4,8 +4,8 @@
 //! Model node
 
 use crate::{
-    diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*,
-    GetPropertyValue,
+    GetPropertyValue, diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*,
+    value::*,
 };
 
 use microcad_core::*;
