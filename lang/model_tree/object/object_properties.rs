@@ -19,19 +19,24 @@ impl ObjectProperties {
         parameters: &ParameterValueList,
         arguments: &Tuple,
     ) -> Self {
-        let mut props = ObjectProperties::default();
+        parameters
+            .iter()
+            .map(|(id, param)| {
+                (
+                    id.clone(),
+                    match &param.default_value {
+                        Some(value) => value.clone(),
+                        None => arguments.by_id(id).unwrap_or(&Value::None).clone(),
+                    },
+                )
+            })
+            .collect()
+    }
+}
 
-        for (id, parameter) in parameters.iter() {
-            props.insert(
-                id.clone(),
-                match &parameter.default_value {
-                    Some(value) => value.clone(),
-                    None => arguments.by_id(id).unwrap_or(&Value::None).clone(),
-                },
-            );
-        }
-
-        props
+impl FromIterator<(Identifier, Value)> for ObjectProperties {
+    fn from_iter<T: IntoIterator<Item = (Identifier, Value)>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
     }
 }
 
