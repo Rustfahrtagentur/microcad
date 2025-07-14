@@ -11,6 +11,7 @@ default-members = [
     "tests",
     "tools/cli",
     "tools/update-copyright",
+    "tools/update-md-banner",
 ]
 
 members = [
@@ -22,6 +23,7 @@ members = [
     "export",
     "tools/cli",
     "tools/update-copyright",
+    "tools/update-md-banner",
 ]
 resolver = "2"
 
