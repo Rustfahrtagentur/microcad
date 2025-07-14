@@ -101,7 +101,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/use_statement_pub.png)](../doc/structure/.test/use_statement_pub.log) | [use_statement_pub](../doc/structure/use.md) |
 | [![test](../doc/debug/.test/verify_assert.png)](../doc/debug/.test/verify_assert.log) | [verify_assert](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_assert_fail.png)](../doc/debug/.test/verify_assert_fail.log) | [verify_assert_fail](../doc/debug/README.md) |
-| [![test](../doc/debug/.test/verify_panic.png)](../doc/debug/.test/verify_panic.log) | [verify_panic](../doc/debug/README.md) |
+| [![test](../doc/debug/.test/verify_error.png)](../doc/debug/.test/verify_error.log) | [verify_error](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_todo.png)](../doc/debug/.test/verify_todo.log) | [verify_todo](../doc/debug/README.md) |
 | [![test](../doc/structure/.test/workbench_example.png)](../doc/structure/.test/workbench_example.log) | [workbench_example](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/workbench_fn_prop.png)](../doc/structure/.test/workbench_fn_prop.log) | [workbench_fn_prop](../doc/structure/functions.md) |

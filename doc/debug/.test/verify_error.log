@@ -1,0 +1,13 @@
+-- Test --
+  verify_error
+  /home/micha/Work/mcad/mcad/doc/debug/README.md:29
+-- Output --
+-- Errors --
+error: Builtin error: this should not have happened
+  ---> <from_str>:1:12
+     |
+   1 | std::error("this should not have happened");
+     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

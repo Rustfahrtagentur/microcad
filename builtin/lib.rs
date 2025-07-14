@@ -67,6 +67,7 @@ pub fn builtin_module() -> Symbol {
         .symbol(count())
         .symbol(type_of())
         .symbol(print())
+        .symbol(todo())
         .symbol(error())
         .symbol(warning())
         .symbol(info())
