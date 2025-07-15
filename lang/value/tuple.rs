@@ -256,6 +256,15 @@ impl From<Color> for Tuple {
     }
 }
 
+impl From<Size2D> for Tuple {
+    fn from(size: Size2D) -> Self {
+        create_tuple!(
+            width = Value::from(Quantity::length(size.width)),
+            height = Value::from(Quantity::length(size.height))
+        )
+    }
+}
+
 impl From<Tuple> for Value {
     fn from(tuple: Tuple) -> Self {
         Value::Tuple(Box::new(tuple))
@@ -336,6 +345,37 @@ impl TryFrom<&Tuple> for Color {
                 }),
             ) => Ok(Color::new(*r as f32, *g as f32, *b as f32, a as f32)),
             _ => Err(ValueError::CannotConvertToColor(Box::new(tuple.clone()))),
+        }
+    }
+}
+
+impl TryFrom<&Tuple> for Size2D {
+    type Error = ValueError;
+
+    fn try_from(tuple: &Tuple) -> Result<Self, Self::Error> {
+        let (width, height) = (
+            tuple.by_id(&Identifier::no_ref("width")),
+            tuple.by_id(&Identifier::no_ref("height")),
+        );
+
+        match (width, height) {
+            (
+                Some(Value::Quantity(Quantity {
+                    value: width,
+                    quantity_type: QuantityType::Length,
+                })),
+                Some(Value::Quantity(Quantity {
+                    value: height,
+                    quantity_type: QuantityType::Length,
+                })),
+            ) => Ok(Size2D {
+                width: *width,
+                height: *height,
+            }),
+            _ => Err(ValueError::CannotConvert(
+                tuple.clone().into(),
+                "Size2D".into(),
+            )),
         }
     }
 }
