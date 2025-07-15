@@ -5,10 +5,14 @@
 
 mod attributes;
 mod export;
+mod layer;
+mod measure;
 mod resolution;
 
 pub use attributes::Attributes;
 pub use export::ExportAttribute;
+pub use layer::Layer;
+pub use measure::MeasureAttribute;
 pub use resolution::ResolutionAttribute;
 
 use crate::{syntax::*, value::*};
@@ -22,6 +26,8 @@ pub enum Attribute {
     Export(ExportAttribute),
     /// Color attribute.
     Color(Color),
+    /// Measure attribute.
+    Measure(MeasureAttribute),
     /// Render resolution attribute.
     Resolution(ResolutionAttribute),
     /// Exporter specific attributes.
@@ -35,6 +41,7 @@ impl Attribute {
             Attribute::Export(_) => Identifier::no_ref("export"),
             Attribute::Color(_) => Identifier::no_ref("color"),
             Attribute::Resolution(_) => Identifier::no_ref("resolution"),
+            Attribute::Measure(_) => Identifier::no_ref("measure"),
             Attribute::ExporterSpecific(identifier, _) => identifier.clone(),
         }
     }
@@ -46,6 +53,7 @@ impl From<Attribute> for Value {
             Attribute::Export(export_attribute) => export_attribute.into(),
             Attribute::Color(color) => Value::Tuple(Box::new(color.into())),
             Attribute::Resolution(resolution_attribute) => resolution_attribute.into(),
+            Attribute::Measure(measure) => measure.into(),
             Attribute::ExporterSpecific(_, arguments) => Value::Tuple(Box::new(arguments)),
         }
     }
