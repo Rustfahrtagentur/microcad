@@ -7,7 +7,7 @@
    viewBox="0 0 210 297"
    version="1.1"
    id="svg1"
-   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   inkscape:version="1.4.2 (ebf0e94, 2025-05-08)"
    sodipodi:docname="measure.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -24,14 +24,14 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
      inkscape:zoom="2.2677414"
-     inkscape:cx="348.8052"
-     inkscape:cy="422.44675"
-     inkscape:window-width="1888"
-     inkscape:window-height="1145"
-     inkscape:window-x="16"
-     inkscape:window-y="16"
+     inkscape:cx="346.37988"
+     inkscape:cy="415.83225"
+     inkscape:window-width="1920"
+     inkscape:window-height="1200"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer5"
+     inkscape:current-layer="svg1"
      showguides="false" />
   <defs
      id="defs1">
@@ -119,136 +119,6 @@
        height="45.063972"
        x="50.193546"
        y="87.393936" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer9"
-     inkscape:label="corners"
-     sodipodi:insensitive="true">
-    <text
-       xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;display:inline;fill:#ff00ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
-       x="53.978939"
-       y="91.745735"
-       id="text30"><tspan
-         sodipodi:role="line"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#ff00ff;stroke:none;stroke-width:0.6"
-         x="53.978939"
-         y="91.745735"
-         id="tspan30">B</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#ff00ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
-       x="54.056778"
-       y="130.17212"
-       id="text27-3"><tspan
-         sodipodi:role="line"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#ff00ff;stroke:none;stroke-width:0.6"
-         x="54.056778"
-         y="130.17212"
-         id="tspan27-7">A</tspan></text>
-    <g
-       id="g1"
-       transform="translate(36.436271,6.5629285)">
-      <text
-         xml:space="preserve"
-         style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#ff00ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
-         x="46.563305"
-         y="85.157188"
-         id="text30-3"><tspan
-           sodipodi:role="line"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#ff00ff;stroke:none;stroke-width:0.6"
-           x="46.563305"
-           y="85.157188"
-           id="tspan30-6">C</tspan></text>
-    </g>
-    <text
-       xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#ff00ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
-       x="105.97151"
-       y="114.41737"
-       id="text30-0-4"><tspan
-         sodipodi:role="line"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#ff00ff;stroke:none;stroke-width:0.6"
-         x="105.97151"
-         y="114.41737"
-         id="tspan30-9-9">D</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#ff00ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
-       x="105.74982"
-       y="130.36624"
-       id="text30-0"><tspan
-         sodipodi:role="line"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#ff00ff;stroke:none;stroke-width:0.6"
-         x="105.74982"
-         y="130.36624"
-         id="tspan30-9">E</tspan></text>
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer8"
-     inkscape:label="edges"
-     style="display:inline"
-     sodipodi:insensitive="true">
-    <text
-       xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;display:inline;fill:#0000ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
-       x="48.208321"
-       y="112.08389"
-       id="text27"><tspan
-         sodipodi:role="line"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#0000ff;stroke:none;stroke-width:0.6"
-         x="48.208321"
-         y="112.08389"
-         id="tspan27">a</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;white-space:pre;inline-size:4.0049;display:inline;fill:#0000ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
-       x="111.63244"
-       y="113.50571"
-       id="text28"
-       transform="translate(-31.110325,23.151484)"><tspan
-         x="111.63244"
-         y="113.50571"
-         id="tspan2"><tspan
-           style="font-style:italic;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'"
-           id="tspan1">d</tspan></tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#0000ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
-       x="68.617355"
-       y="85.129601"
-       id="text26"><tspan
-         sodipodi:role="line"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#0000ff;stroke:none;stroke-width:0.6"
-         x="68.617355"
-         y="85.129601"
-         id="tspan26">b</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;white-space:pre;inline-size:4.0049;display:inline;fill:#0000ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
-       x="111.63244"
-       y="113.50571"
-       id="text26-7"
-       transform="translate(-16.717453,-10.994323)"><tspan
-         x="111.63244"
-         y="113.50571"
-         id="tspan4"><tspan
-           style="font-style:italic;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'"
-           id="tspan3">c</tspan></tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;white-space:pre;inline-size:4.0049;display:inline;fill:#0000ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
-       x="111.63244"
-       y="113.50571"
-       id="text31"
-       transform="translate(-0.31282121,9.4091009)"><tspan
-         x="111.63244"
-         y="113.50571"
-         id="tspan6"><tspan
-           style="font-style:italic;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'"
-           id="tspan5">e</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -421,6 +291,135 @@
          d="M 167.89658,72.493735 H 18.599825"
          id="path71" />
     </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer9"
+     inkscape:label="corners"
+     sodipodi:insensitive="true">
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;display:inline;fill:#ff00ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="53.978939"
+       y="91.745735"
+       id="text30"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#ff00ff;stroke:none;stroke-width:0.6"
+         x="53.978939"
+         y="91.745735"
+         id="tspan30">B</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#ff00ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="54.056778"
+       y="130.17212"
+       id="text27-3"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#ff00ff;stroke:none;stroke-width:0.6"
+         x="54.056778"
+         y="130.17212"
+         id="tspan27-7">A</tspan></text>
+    <g
+       id="g1"
+       transform="translate(36.436271,6.5629285)">
+      <text
+         xml:space="preserve"
+         style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#ff00ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+         x="46.563305"
+         y="85.157188"
+         id="text30-3"><tspan
+           sodipodi:role="line"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#ff00ff;stroke:none;stroke-width:0.6"
+           x="46.563305"
+           y="85.157188"
+           id="tspan30-6">C</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#ff00ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="105.97151"
+       y="114.41737"
+       id="text30-0-4"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#ff00ff;stroke:none;stroke-width:0.6"
+         x="105.97151"
+         y="114.41737"
+         id="tspan30-9-9">D</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#ff00ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="105.74982"
+       y="130.36624"
+       id="text30-0"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#ff00ff;stroke:none;stroke-width:0.6"
+         x="105.74982"
+         y="130.36624"
+         id="tspan30-9">E</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer8"
+     inkscape:label="edges"
+     style="display:inline">
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;display:inline;fill:#0000ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="48.208321"
+       y="112.08389"
+       id="text27"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#0000ff;stroke:none;stroke-width:0.6"
+         x="48.208321"
+         y="112.08389"
+         id="tspan27">a</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;white-space:pre;inline-size:4.0049;display:inline;fill:#0000ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="111.63244"
+       y="113.50571"
+       id="text28"
+       transform="translate(-31.110325,23.151484)"><tspan
+         x="111.63244"
+         y="113.50571"
+         id="tspan8"><tspan
+           style="font-style:italic;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'"
+           id="tspan7">d</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#0000ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="68.617355"
+       y="85.129601"
+       id="text26"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#0000ff;stroke:none;stroke-width:0.6"
+         x="68.617355"
+         y="85.129601"
+         id="tspan26">b</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;white-space:pre;inline-size:4.0049;display:inline;fill:#0000ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="111.63244"
+       y="113.50571"
+       id="text31"
+       transform="translate(-0.31282121,9.4091009)"><tspan
+         x="111.63244"
+         y="113.50571"
+         id="tspan10"><tspan
+           style="font-style:italic;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'"
+           id="tspan9">e</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;white-space:pre;inline-size:4.0049;display:inline;fill:#0000ff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="111.63244"
+       y="113.50571"
+       id="text26-7"
+       transform="translate(-16.717453,-10.994323)"><tspan
+         x="111.63244"
+         y="113.50571"
+         id="tspan13"><tspan
+           style="font-style:italic;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'"
+           id="tspan11">c</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
