@@ -345,7 +345,7 @@ fn create_test<'a>(
         name, mode, code, &banner, &log, &out, reference,
     ));
 
-    Some(Output::new(name.into(), file_path.into(), banner, log))
+    Some(Output::new(name.into(), file_path.into(), banner, out, log))
 }
 
 /// create test code
