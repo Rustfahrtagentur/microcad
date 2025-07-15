@@ -101,70 +101,9 @@ impl<'a> ModelNodeBuilder<'a> {
 }
 
 impl<'a> ModelNodeBuilder<'a> {
-    /// Determine the output type of this node by some child node.
-    ///
-    /// TODO: Replace `panic!` with context warnings.
-    pub fn determine_output_type(&self, child: &ModelNode) -> EvalResult<ModelNodeOutputType> {
-        match &self.inner.element.value {
-            Element::ChildrenPlaceholder => panic!("A child placeholder cannot have children"),
-            Element::Transform(_) => {
-                if !self.inner.is_empty() {
-                    panic!("A transformation cannot have more than one child.")
-                }
-            }
-            Element::Operation(op) => {
-                if !self.inner.is_empty() {
-                    panic!("An operation cannot have more than one child.")
-                } else {
-                    return Ok(op.output_type());
-                }
-            }
-            _ => {}
-        }
-
-        match child.output_type() {
-            ModelNodeOutputType::NotDetermined => {
-                return Ok(self.output.clone());
-            }
-            ModelNodeOutputType::InvalidMixed => {
-                panic!("Child node's output type is invalid.")
-            }
-            _ => {}
-        }
-
-        match self.output {
-            ModelNodeOutputType::NotDetermined => {
-                // Determine nodes output type by child output type.
-            }
-            ModelNodeOutputType::Geometry2D => {
-                if child.output_type() == ModelNodeOutputType::Geometry3D {
-                    panic!("Cannot nest a 2D geometry in a 3D geometry node.")
-                }
-            }
-            ModelNodeOutputType::Geometry3D => {
-                if child.output_type() == ModelNodeOutputType::Geometry2D {
-                    panic!("Cannot nest a 3D geometry in a 2D geometry node.")
-                }
-            }
-            ModelNodeOutputType::InvalidMixed => {
-                panic!("Invalid output type.")
-            }
-        }
-
-        Ok(child.output_type())
-    }
-
     /// Add multiple children to the node if it matches.
-    pub fn add_children(mut self, children: ModelNodes) -> EvalResult<Self> {
-        if let Some(child) = children.first() {
-            //  TODO Check child's output type
-            self.output = self.determine_output_type(child)?;
-        }
-
-        for child in children.iter() {
-            self.children.push(child.clone());
-        }
-
+    pub fn add_children(mut self, mut children: ModelNodes) -> EvalResult<Self> {
+        self.children.append(&mut children);
         Ok(self)
     }
 
@@ -190,10 +129,11 @@ impl<'a> ModelNodeBuilder<'a> {
         if let Element::Object(object) = &mut self.inner.element.value {
             object.props = self.properties
         }
-        self.inner.output = ModelNodeOutput::new(self.output);
 
         let node = ModelNode::new(self.inner.into());
-        node.append_children(self.children)
+        node.append_children(self.children);
+        node.deduce_output_type();
+        node
     }
 }
 

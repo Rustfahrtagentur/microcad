@@ -142,20 +142,12 @@ impl ModelNodes {
             .collect()
     }
 
-    /// Get common output type of model node collection.
-    pub fn output_type(&self) -> ModelNodeOutputType {
-        if self.is_empty() {
-            ModelNodeOutputType::NotDetermined
-        } else {
-            let first = self.first().expect("Node").output_type();
-            self.iter().fold(first, |output_type, node| {
-                if output_type != node.output_type() {
-                    ModelNodeOutputType::InvalidMixed
-                } else {
-                    output_type
-                }
-            })
-        }
+    /// Deduce output type from nodes.
+    pub fn deduce_output_type(&self) -> ModelNodeOutputType {
+        self.iter().map(|node| node.deduce_output_type()).fold(
+            ModelNodeOutputType::NotDetermined,
+            |output_type, node_output_type| output_type.merge(&node_output_type),
+        )
     }
 }
 

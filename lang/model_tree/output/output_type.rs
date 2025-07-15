@@ -17,6 +17,24 @@ pub enum ModelNodeOutputType {
     InvalidMixed,
 }
 
+impl ModelNodeOutputType {
+    /// Merge this output type with another.
+    pub fn merge(&self, other: &Self) -> ModelNodeOutputType {
+        match (self, other) {
+            (ModelNodeOutputType::NotDetermined, node_output_type) => node_output_type.clone(),
+            (ModelNodeOutputType::Geometry2D, ModelNodeOutputType::NotDetermined)
+            | (ModelNodeOutputType::Geometry2D, ModelNodeOutputType::Geometry2D)
+            | (ModelNodeOutputType::Geometry3D, ModelNodeOutputType::NotDetermined)
+            | (ModelNodeOutputType::Geometry3D, ModelNodeOutputType::Geometry3D) => self.clone(),
+            (ModelNodeOutputType::Geometry2D, ModelNodeOutputType::Geometry3D)
+            | (ModelNodeOutputType::Geometry3D, ModelNodeOutputType::Geometry2D)
+            | (ModelNodeOutputType::Geometry2D, ModelNodeOutputType::InvalidMixed)
+            | (ModelNodeOutputType::Geometry3D, ModelNodeOutputType::InvalidMixed)
+            | (ModelNodeOutputType::InvalidMixed, _) => ModelNodeOutputType::InvalidMixed,
+        }
+    }
+}
+
 impl std::fmt::Display for ModelNodeOutputType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(

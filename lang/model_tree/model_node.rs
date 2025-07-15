@@ -4,8 +4,8 @@
 //! Model node
 
 use crate::{
-    diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*,
-    GetPropertyValue,
+    GetPropertyValue, diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*,
+    value::*,
 };
 
 use microcad_core::*;
@@ -134,10 +134,6 @@ impl ModelNode {
         node.borrow_mut().parent = Some(self.clone());
 
         let mut self_ = self.0.borrow_mut();
-        // If this node's output type has not been determined, try to get it from child node
-        if self_.output.model_node_output_type() == ModelNodeOutputType::NotDetermined {
-            self_.output = ModelNodeOutput::new(node.output_type());
-        }
         self_.children.push(node.clone());
 
         node
@@ -207,7 +203,7 @@ impl ModelNode {
                 Some(_) => format!(" = {origin}", origin = self_.origin),
                 None => String::new(),
             },
-            output_type = self.output_type()
+            output_type = self.final_output_type()
         )
     }
 }

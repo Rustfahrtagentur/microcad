@@ -3,7 +3,7 @@
 
 //! Scalable Vector Graphics (SVG) file writer
 
-use geo::{coord, CoordsIter};
+use geo::{CoordsIter, coord};
 use microcad_core::*;
 use microcad_lang::{
     model_tree::{Element, GetAttribute, ModelNode, ModelNodeOutputType},
@@ -304,7 +304,7 @@ impl SvgWriter {
 
     /// Generate SVG for a node.
     pub fn node(&mut self, node: &ModelNode) -> std::io::Result<()> {
-        assert_eq!(node.output_type(), ModelNodeOutputType::Geometry2D);
+        assert_eq!(node.final_output_type(), ModelNodeOutputType::Geometry2D);
 
         let attr: SvgTagAttributes = node.into();
 

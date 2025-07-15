@@ -9,8 +9,29 @@ use crate::model_tree::*;
 
 impl ModelNode {
     /// Return output type.
-    pub fn output_type(&self) -> ModelNodeOutputType {
+    pub fn final_output_type(&self) -> ModelNodeOutputType {
         self.borrow().output.model_node_output_type()
+    }
+
+    /// Deduce output type from children and set it and return it.
+    pub fn deduce_output_type(&self) -> ModelNodeOutputType {
+        let mut self_ = self.borrow_mut();
+        let mut output_type = match &*self_.element {
+            Element::Object(_) => ModelNodeOutputType::NotDetermined,
+            Element::ChildrenPlaceholder => ModelNodeOutputType::NotDetermined,
+            Element::Transform(_) => ModelNodeOutputType::NotDetermined,
+            Element::Primitive2D(_) => ModelNodeOutputType::Geometry2D,
+            Element::Primitive3D(_) => ModelNodeOutputType::Geometry3D,
+            Element::Operation(operation) => operation.output_type(),
+        };
+        if output_type == ModelNodeOutputType::NotDetermined {
+            let children = &self_.children;
+            output_type = children.deduce_output_type();
+        }
+
+        self_.output = ModelNodeOutput::new(output_type.clone());
+
+        output_type
     }
 
     /// Set the transformation matrices for this node and its children.
@@ -84,7 +105,7 @@ impl ModelNode {
             matches!(&node.borrow().element.value, Element::Operation(_))
         }
 
-        match self.output_type() {
+        match self.final_output_type() {
             ModelNodeOutputType::Geometry2D => {
                 let geometries = render_geometries_2d(self);
                 if !is_operation(self) {

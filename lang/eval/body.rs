@@ -34,7 +34,7 @@ impl Eval<ModelNodes> for Body {
             .try_fold(ModelNodes::default(), |mut model_nodes, new| match new {
                 Ok(mut new_nodes) => {
                     model_nodes.append(&mut new_nodes);
-
+                    model_nodes.deduce_output_type();
                     Ok(model_nodes)
                 }
                 _ => todo!(),

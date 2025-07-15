@@ -15,6 +15,13 @@ pub trait Operation: std::fmt::Debug {
         ModelNodeOutputType::NotDetermined
     }
 
+    /// The input type of this operation.
+    ///
+    /// By default, the input type is undetermined.
+    fn input_type(&self) -> ModelNodeOutputType {
+        ModelNodeOutputType::NotDetermined
+    }
+
     /// Process the model node.
     fn process_2d(&self, _node: &ModelNode) -> Geometries2D {
         unimplemented!()

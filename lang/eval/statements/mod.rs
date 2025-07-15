@@ -96,7 +96,7 @@ impl Eval<ModelNodes> for Statement {
             _ => ModelNodes::default(),
         };
 
-        if nodes.output_type() == ModelNodeOutputType::InvalidMixed {
+        if nodes.deduce_output_type() == ModelNodeOutputType::InvalidMixed {
             context.error(self, EvalError::CannotMixGeometry)?;
         }
         Ok(nodes)
@@ -105,18 +105,15 @@ impl Eval<ModelNodes> for Statement {
 
 impl Eval<ModelNodes> for StatementList {
     fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
-        let mut output_type = ModelNodeOutputType::NotDetermined;
         let mut nodes = ModelNodes::default();
 
         for statement in self.iter() {
             let mut statement_nodes: ModelNodes = statement.eval(context)?;
-            let node_output_type = statement_nodes.output_type();
-            if output_type == ModelNodeOutputType::NotDetermined {
-                output_type = node_output_type;
-            } else if node_output_type != output_type {
-                context.error(statement, EvalError::CannotMixGeometry)?;
-            }
             nodes.append(&mut statement_nodes);
+        }
+
+        if nodes.deduce_output_type() == ModelNodeOutputType::InvalidMixed {
+            //   context.error(self., EvalError::CannotMixGeometry)?;
         }
 
         Ok(nodes)

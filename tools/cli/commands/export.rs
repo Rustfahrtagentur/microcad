@@ -86,7 +86,7 @@ impl ExportArgs {
         config: &Config,
         exporters: &ExporterRegistry,
     ) -> anyhow::Result<ExportAttribute> {
-        let default_exporter = Self::default_exporter(&node.output_type(), config, exporters);
+        let default_exporter = Self::default_exporter(&node.final_output_type(), config, exporters);
         let resolution = self.resolution();
 
         match &self.output {

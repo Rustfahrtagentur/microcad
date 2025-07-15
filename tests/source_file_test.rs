@@ -50,7 +50,7 @@ impl SourceFileTest {
 
                 if !context.has_errors() {
                     // If we have a 2D node, export node to SVG
-                    match node.output_type() {
+                    match node.final_output_type() {
                         ModelNodeOutputType::Geometry2D => {
                             Export {
                                 filename: self.output_filename("svg").into(),
