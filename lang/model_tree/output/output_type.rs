@@ -3,10 +3,8 @@
 
 //! Export attribute.
 
-use strum::IntoStaticStr;
-
 /// The output type of the [`ModelNode`].
-#[derive(Debug, Clone, IntoStaticStr, Default, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub enum ModelNodeOutputType {
     /// The output type has not yet been determined.
     #[default]
@@ -21,7 +19,15 @@ pub enum ModelNodeOutputType {
 
 impl std::fmt::Display for ModelNodeOutputType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let name: &'static str = self.into();
-        write!(f, "{name}")
+        write!(
+            f,
+            "{}",
+            match &self {
+                Self::NotDetermined => "<unknown>",
+                Self::Geometry2D => "2D",
+                Self::Geometry3D => "3D",
+                Self::InvalidMixed => "<invalid>",
+            }
+        )
     }
 }

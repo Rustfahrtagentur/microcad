@@ -4,8 +4,8 @@
 //! Model node
 
 use crate::{
-    GetPropertyValue, diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*,
-    value::*,
+    diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*,
+    GetPropertyValue,
 };
 
 use microcad_core::*;
@@ -195,21 +195,20 @@ impl ModelNode {
     /// A [`ModelNode`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
     pub fn signature(&self) -> String {
         let self_ = self.borrow();
-        let mut s = String::new();
-        if let Some(id) = &self_.id {
-            s += format!("{id}: ").as_str();
-        }
-        s += self_.element.to_string().as_str();
-        if self_.origin.creator.is_some() {
-            s += format!(" = {origin}", origin = self_.origin).as_str();
-        }
-        if !matches!(self.output_type(), ModelNodeOutputType::NotDetermined) {
-            s += format!(" -> \"{output_type}\"", output_type = self.output_type()).as_str();
-        }
-        if !self_.is_empty() {
-            s += ":";
-        }
-        s
+
+        format!(
+            "{id}{element_type}{origin} -> {output_type}",
+            id = match &self_.id {
+                Some(id) => format!("{id}: "),
+                None => String::new(),
+            },
+            element_type = self_.element,
+            origin = match self_.origin.creator {
+                Some(_) => format!(" = {origin}", origin = self_.origin),
+                None => String::new(),
+            },
+            output_type = self.output_type()
+        )
     }
 }
 
