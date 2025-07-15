@@ -196,6 +196,10 @@ pub enum EvalError {
     /// A condition of an if statement is not a boolean
     #[error("If condition is not a boolean: {0}")]
     IfConditionIsNotBool(Value),
+
+    /// Workbench didn't find a initialization routine matching the given arguments
+    #[error("Workbench {0} cannot find initialization for those arguments")]
+    NoInitializationFound(Identifier),
 }
 
 /// Result type of any evaluation.

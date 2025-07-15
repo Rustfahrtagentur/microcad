@@ -77,7 +77,7 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
     /// Calling the part `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
     fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<ModelNodes> {
         log::debug!(
-            "Workbench call `{id}` {kind}",
+            "Workbench call {kind} {id}({args})",
             id = self.id,
             kind = self.kind
         );
@@ -88,6 +88,8 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
         // prepare building plan
         let plan = self.plan.eval(context)?;
 
+        let mut initialized = args.is_empty();
+
         if let Ok(multi_args) = ArgumentMatch::find_multi_match(args, &plan) {
             for args in multi_args {
                 for (id, var) in args.named_iter() {
@@ -95,6 +97,7 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
                 }
                 nodes.push(self.eval_to_node(&args, None, context)?);
             }
+            initialized = true;
         } else {
             // put all default parameters in the building plan into local variables
             plan.iter().try_for_each(|(id, arg)| {
@@ -111,9 +114,13 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
                     for args in multi_args {
                         nodes.push(self.eval_to_node(&args, Some(init), context)?);
                     }
+                    initialized = true;
                     break;
                 }
             }
+        }
+        if !initialized {
+            context.error(args, EvalError::NoInitializationFound(self.id.clone()))?;
         }
 
         Ok(nodes)

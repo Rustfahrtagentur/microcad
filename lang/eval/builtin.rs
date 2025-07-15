@@ -54,6 +54,7 @@ pub trait BuiltinWorkbenchDefinition {
     /// Part function
     fn function() -> &'static BuiltinFn {
         &|params, args, _| {
+            log::trace!("Built-in workbench call {id}({args})", id = Self::id());
             Ok(Value::Nodes(
                 ArgumentMatch::find_multi_match(
                     args,

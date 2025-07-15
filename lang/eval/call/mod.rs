@@ -54,20 +54,8 @@ impl Eval for Call {
         };
 
         // evaluate arguments
-        let args = match self.argument_list.eval(context) {
-            Ok(args) => args,
-            Err(err) => {
-                // builtin functions get their argument list as string if it can't be evaluated
-                if let SymbolDefinition::Builtin(_) = &symbol.borrow().def {
-                    ArgumentValueList::from_code(
-                        context.source_code(&self.argument_list)?,
-                        &self.argument_list,
-                    )
-                } else {
-                    return Err(err);
-                }
-            }
-        };
+        let args = self.argument_list.eval(context)?;
+        log::trace!("Call {name}({args})", name = self.name);
 
         match context.scope(
             StackFrame::Call {

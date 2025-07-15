@@ -5,7 +5,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::{GetPropertyValue, diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*};
+use crate::{diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*, GetPropertyValue};
 
 /// A list of object properties.
 ///
@@ -24,9 +24,9 @@ impl ObjectProperties {
             .map(|(id, param)| {
                 (
                     id.clone(),
-                    match &param.default_value {
+                    match arguments.by_id(id) {
                         Some(value) => value.clone(),
-                        None => arguments.by_id(id).unwrap_or(&Value::None).clone(),
+                        None => param.default_value.clone().unwrap_or(Value::None),
                     },
                 )
             })
