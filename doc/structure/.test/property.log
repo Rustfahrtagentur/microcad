@@ -1,6 +1,6 @@
 -- Test --
   property
-  ../doc/structure/workbench.md:252
+  ../doc/structure/workbench.md:268
 -- Parse Error --
 Parser error:  --> 8:16
   |
