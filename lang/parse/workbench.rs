@@ -17,13 +17,12 @@ impl Parse for WorkbenchKind {
 impl Parse for Rc<WorkbenchDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(WorkbenchDefinition::new(
-            pair.find(Rule::attribute_list).unwrap_or_default(),
-            pair.find(Rule::workbench_kind).expect("workbench kind"),
-            pair.find(Rule::identifier).expect("workbench identifier"),
-            pair.find(Rule::parameter_list)
-                .expect("workbench parameter_list"),
+            crate::find_rule!(pair, attribute_list)?,
+            crate::find_rule_exact!(pair, workbench_kind)?,
+            crate::find_rule!(pair, identifier)?,
+            crate::find_rule!(pair, parameter_list)?,
             {
-                let body = pair.find(Rule::body).expect("workbench body");
+                let body = crate::find_rule!(pair, body)?;
                 check_statements(&body)?;
                 body
             },

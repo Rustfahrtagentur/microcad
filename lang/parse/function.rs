@@ -8,12 +8,12 @@ impl Parse for Rc<FunctionDefinition> {
         Parser::ensure_rule(&pair, Rule::function_definition);
 
         Ok(Rc::new(FunctionDefinition {
-            visibility: pair.find(Rule::visibility).unwrap_or_default(),
-            id: pair.find(Rule::identifier).expect("Identifier"),
+            visibility: crate::find_rule!(pair, visibility)?,
+            id: crate::find_rule!(pair, identifier)?,
             signature: pair
                 .find(Rule::function_signature)
                 .expect("Function signature"),
-            body: pair.find(Rule::body).expect("Function body"),
+            body: crate::find_rule!(pair, body)?,
             src_ref: pair.clone().into(),
         }))
     }

@@ -136,6 +136,10 @@ pub enum ParseError {
     /// Statement not allowed prior initializers
     #[error("Statement not allowed prior initializers")]
     StatementNotAllowedPriorInitializers,
+
+    /// Element is not available
+    #[error("Element is not available")]
+    NotAvailable,
 }
 
 /// Result with parse error

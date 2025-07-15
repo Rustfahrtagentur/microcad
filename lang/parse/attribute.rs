@@ -12,12 +12,12 @@ impl Parse for Attribute {
 
         match pair.as_rule() {
             Rule::attribute_name_value => Ok(Self::NameValue(
-                pair.find(Rule::identifier).expect("Identifier"),
-                pair.find(Rule::expression).expect("Expression"),
+                crate::find_rule!(pair, identifier)?,
+                crate::find_rule!(pair, expression)?,
             )),
             Rule::attribute_named_tuple => Ok(Self::Tuple(
-                pair.find(Rule::identifier).expect("Identifier"),
-                pair.find(Rule::argument_list).unwrap_or_default(),
+                crate::find_rule!(pair, identifier)?,
+                crate::find_rule!(pair, argument_list)?,
             )),
             _ => unreachable!(),
         }

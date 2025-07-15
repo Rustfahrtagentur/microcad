@@ -7,7 +7,7 @@ impl Parse for Body {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rules(&pair, &[Rule::body, Rule::body_else]);
         Ok(Body {
-            statements: pair.find(Rule::statement_list).unwrap_or_default(),
+            statements: crate::find_rule!(pair, statement_list)?,
             src_ref: pair.into(),
         })
     }

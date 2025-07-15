@@ -70,17 +70,7 @@ impl Parse for SourceFile {
         pair.set_source_hash(hash);
 
         Ok(SourceFile {
-            statements: match pair
-                .inner()
-                .find(|pair| pair.as_rule() == Rule::statement_list)
-                .map(StatementList::parse)
-            {
-                Some(Ok(stmts)) => stmts,
-                Some(Err(err)) => {
-                    return Err(err);
-                }
-                None => StatementList::default(),
-            },
+            statements: crate::find_rule!(pair, statement_list)?,
             filename: Default::default(),
             source: pair.as_span().as_str().to_string(),
             hash,

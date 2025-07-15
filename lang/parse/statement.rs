@@ -38,8 +38,8 @@ impl Parse for Assignment {
 impl Parse for AssignmentStatement {
     fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
         Ok(Self {
-            attribute_list: pair.find(Rule::attribute_list).unwrap_or_default(),
-            assignment: pair.find(Rule::assignment).expect("Assignment"),
+            attribute_list: crate::find_rule!(pair, attribute_list)?,
+            assignment: crate::find_rule_opt!(pair, assignment).expect("Assignment"),
             src_ref: pair.into(),
         })
     }
@@ -84,10 +84,10 @@ impl Parse for Marker {
 impl Parse for ExpressionStatement {
     fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
         Ok(Self {
-            attribute_list: pair.find(Rule::attribute_list).unwrap_or_default(),
+            attribute_list: crate::find_rule!(pair, attribute_list)?,
             expression: pair
                 .find(Rule::expression)
-                .or(pair.find(Rule::expression_no_semicolon))
+                .or(crate::find_rule_opt!(pair, expression_no_semicolon))
                 .expect("Expression"),
             src_ref: pair.into(),
         })

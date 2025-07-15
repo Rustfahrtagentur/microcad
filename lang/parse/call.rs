@@ -11,7 +11,7 @@ impl Parse for Call {
 
         Ok(Call {
             name: QualifiedName::parse(first)?,
-            argument_list: pair.find(Rule::argument_list).unwrap_or_default(),
+            argument_list: crate::find_rule!(pair, argument_list)?,
             src_ref: pair.clone().into(),
         })
     }
