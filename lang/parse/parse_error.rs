@@ -124,6 +124,18 @@ pub enum ParseError {
     /// Qualified name cannot be converted into an Id
     #[error("Qualified name {0} cannot be converted into an Id")]
     QualifiedNameIsNoId(QualifiedName),
+
+    /// Statement not allowed within workbenches
+    #[error("Statement not allowed within workbenches")]
+    IllegalWorkbenchStatement,
+
+    /// Code Between initializers
+    #[error("Code between initializers is not allowed")]
+    CodeBetweenInitializers,
+
+    /// Statement not allowed prior initializers
+    #[error("Statement not allowed prior initializers")]
+    StatementNotAllowedPriorInitializers,
 }
 
 /// Result with parse error
