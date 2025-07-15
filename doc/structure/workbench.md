@@ -190,6 +190,8 @@ sketch wheel(radius: Length) {
 __builtin::assert(wheel(5cm).radius == 5cm);
 ```
 
+### Init Code Rules
+
 It's **not allowed** to write any code between *initializers*.
 
 [![test](.test/code_between_initializers.png)](.test/code_between_initializers.log)
@@ -236,6 +238,20 @@ sketch wheel(radius: Length) {
     // building code starts here
     std::geo2d::circle(radius);
 }
+```
+
+### Building Code Rules
+
+It's **not allowed** to use the `sketch`, `part`, `op`, `return` nor `mod` statements within workbench code:
+
+[![test](.test/illegal_workbench_statement.png)](.test/illegal_workbench_statement.log)
+
+```µcad,illegal_workbench_statement#fail
+sketch wheel(radius: Length) {
+    sketch axis(length: Length) {}
+}
+
+wheel(radius = 1.0mm);
 ```
 
 ## Properties

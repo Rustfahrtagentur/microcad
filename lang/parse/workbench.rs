@@ -50,17 +50,14 @@ fn check_statements(body: &Body) -> ParseResult<()> {
                 }
 
                 // RULE: Ony use or assignments before initializers
-                Statement::Use(_) | Statement::Assignment(_) => {
+                Statement::Function(_) | Statement::Use(_) | Statement::Assignment(_) => {
                     if n > first_init {
                         return Err(ParseError::CodeBetweenInitializers);
                     }
                 }
 
                 // Post init statements
-                Statement::Function(_)
-                | Statement::If(_)
-                | Statement::Marker(_)
-                | Statement::Expression(_) => {
+                Statement::If(_) | Statement::Marker(_) | Statement::Expression(_) => {
                     // RULE: No code between initializers
                     if n < last_init {
                         if n > first_init {
