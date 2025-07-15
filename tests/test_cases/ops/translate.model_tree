@@ -1,0 +1,6 @@
+Object -> 2D
+  Object = translate((x: 20mm, y: 20mm, z: 0mm)) -> 2D
+    Transform = __builtin::ops::translate((x: 20, y: 20, z: 0)) -> 2D
+      Object -> 2D
+        Object -> 2D
+          Primitive2D(Rect(RECT(-5.0 -5.0,5.0 5.0))) = __builtin::geo2d::rect((height: 10, width: 10, x: -5, y: -5)) -> 2D
