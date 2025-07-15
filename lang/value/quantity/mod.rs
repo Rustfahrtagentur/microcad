@@ -29,6 +29,16 @@ impl Quantity {
         }
     }
 
+    /// Create a new Scalar quantity.
+    pub fn scalar(value: Scalar) -> Self {
+        Quantity::new(value, QuantityType::Scalar)
+    }
+
+    /// Create a new Length quantity in millimeters.
+    pub fn length(length: Scalar) -> Self {
+        Quantity::new(length, QuantityType::Length)
+    }
+
     /// Calculate the power of quantity.
     ///
     /// *Note: This function has not been implemented completely.*
