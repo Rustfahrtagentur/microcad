@@ -42,6 +42,13 @@ impl TupleType {
         .collect()
     }
 
+    /// Create new Size2D type.
+    pub fn new_size2d() -> Self {
+        [("width", Type::length()), ("height", Type::length())]
+            .into_iter()
+            .collect()
+    }
+
     /// Test if the named tuple has exactly all the given keys
     fn matches(&self, keys: &[&str]) -> bool {
         if !self.unnamed.is_empty() && self.named.len() != keys.len() {
@@ -54,6 +61,11 @@ impl TupleType {
     /// Checks if the named tuple type only holds scalar values.
     fn is_scalar_only(&self) -> bool {
         self.common_type().is_some_and(|ty| *ty == Type::scalar())
+    }
+
+    /// Checks if the named tuple type only holds length values.
+    fn is_length_only(&self) -> bool {
+        self.common_type().is_some_and(|ty| *ty == Type::length())
     }
 
     /// Test if all fields have a common type.
@@ -80,6 +92,11 @@ impl TupleType {
     /// Check if the named tuple is a [`Vec3`].
     pub(crate) fn is_vec3(&self) -> bool {
         self.is_scalar_only() && self.matches(&["x", "y", "z"])
+    }
+
+    /// Check if the named tuple is a [`Size2D`]
+    pub(crate) fn is_size2d(&self) -> bool {
+        self.is_length_only() && self.matches(&["width", "height"])
     }
 }
 
@@ -126,6 +143,9 @@ impl std::fmt::Display for TupleType {
         }
         if self.is_vec3() {
             return write!(f, "Vec3");
+        }
+        if self.is_size2d() {
+            return write!(f, "Size2D");
         }
 
         write!(f, "({})", {
