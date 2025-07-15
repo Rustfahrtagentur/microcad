@@ -109,7 +109,7 @@ impl SourceFileTest {
     ///
     /// `syntax/multiplicity.µcad` -> `syntax/multiplicity.log`
     fn reference_filename(&self, extension: &str) -> String {
-        let mut path = self.filename.clone();
+        let mut path = std::path::PathBuf::from("../tests/test_cases").join(self.filename.clone());
         path.set_extension(extension);
         path.to_string_lossy().into_owned()
     }
@@ -134,6 +134,7 @@ impl SourceFileTest {
     fn compare_output_to_reference_file(&self, extension: &str) {
         let output = &self.output_filename(extension);
         let reference = &self.reference_filename(extension);
+        log::trace!("Compare \"{output}\" with \"{reference}\"");
 
         use std::path::Path;
         match (Path::new(output).exists(), Path::new(reference).exists()) {
