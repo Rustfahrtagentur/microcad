@@ -37,7 +37,7 @@ impl Eval<ModelNodes> for Body {
                     model_nodes.deduce_output_type();
                     Ok(model_nodes)
                 }
-                _ => todo!(),
+                Err(err) => Err(err),
             })
     }
 }
