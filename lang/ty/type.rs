@@ -36,6 +36,11 @@ impl Type {
         Self::Quantity(QuantityType::Scalar)
     }
 
+    /// Shortcut to create a length type.
+    pub fn length() -> Self {
+        Self::Quantity(QuantityType::Length)
+    }
+
     /// Check if the type is a list of the given type `ty`
     pub fn is_list_of(&self, ty: &Type) -> bool {
         match self {
