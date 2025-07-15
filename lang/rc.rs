@@ -3,10 +3,11 @@
 
 //! Short-cut definition of `Rc<std::cell::RefCell<T>>` and `Rc<T>`
 
+use derive_more::{Deref, DerefMut};
 pub use std::rc::Rc;
 
 /// Just a short cut definition
-#[derive(Debug)]
+#[derive(Debug, Deref, DerefMut)]
 pub struct RcMut<T>(Rc<std::cell::RefCell<T>>);
 
 impl<T> RcMut<T> {
@@ -19,20 +20,6 @@ impl<T> RcMut<T> {
 impl<T> Clone for RcMut<T> {
     fn clone(&self) -> Self {
         Self(self.0.clone())
-    }
-}
-
-impl<T> std::ops::Deref for RcMut<T> {
-    type Target = Rc<std::cell::RefCell<T>>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> std::ops::DerefMut for RcMut<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

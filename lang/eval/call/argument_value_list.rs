@@ -4,13 +4,15 @@
 //! *Argument value list* evaluation entity.
 
 use crate::{eval::*, src_ref::*, value::*};
+use derive_more::Deref;
 
 /// Collection of *argument values* (e.g. `( x=1, y=2 )`).
 ///
 /// Also provides methods to find a matching call
 /// between it and a given *parameter list*.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Deref)]
 pub struct ArgumentValueList {
+    #[deref]
     map: Vec<(Identifier, ArgumentValue)>,
     src_ref: SrcRef,
 }
@@ -69,14 +71,6 @@ impl ValueAccess for ArgumentValueList {
 
     fn by_ty(&self, ty: &Type) -> Option<&Value> {
         self.get_by_type(ty).map(|(_, arg)| &arg.value)
-    }
-}
-
-impl std::ops::Deref for ArgumentValueList {
-    type Target = Vec<(Identifier, ArgumentValue)>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.map
     }
 }
 

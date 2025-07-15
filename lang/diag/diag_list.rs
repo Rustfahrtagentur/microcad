@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::diag::*;
+use derive_more::Deref;
 
 /// Source file diagnostics.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Deref)]
 pub struct DiagList(Vec<Diagnostic>);
 
 impl DiagList {
@@ -17,14 +18,6 @@ impl DiagList {
         self.0
             .iter()
             .try_for_each(|diag| diag.pretty_print(f, source_by_hash))
-    }
-}
-
-impl std::ops::Deref for DiagList {
-    type Target = Vec<Diagnostic>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 

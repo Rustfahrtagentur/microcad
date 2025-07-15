@@ -4,6 +4,7 @@
 //! Attribute syntax entities.
 
 use crate::{src_ref::*, syntax::*};
+use derive_more::{Deref, DerefMut};
 
 /// An attribute item.
 #[derive(Debug, Clone)]
@@ -47,22 +48,8 @@ impl SrcReferrer for Attribute {
 }
 
 /// A list of attributes, e.g. `#foo #[bar, baz = 42]`
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Deref, DerefMut)]
 pub struct AttributeList(Vec<Attribute>);
-
-impl std::ops::Deref for AttributeList {
-    type Target = Vec<Attribute>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for AttributeList {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
 
 impl std::fmt::Display for AttributeList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

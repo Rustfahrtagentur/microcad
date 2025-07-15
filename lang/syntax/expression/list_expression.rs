@@ -4,30 +4,19 @@
 //! List of expression
 
 use crate::{src_ref::*, syntax::*};
+use derive_more::{Deref, DerefMut};
 
 /// List expression (expression list maybe with common unit)
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone, Debug, Deref, DerefMut)]
 pub struct ListExpression {
     /// Expression list
+    #[deref]
+    #[deref_mut]
     pub list: ExpressionList,
     /// Unit
     pub unit: Unit,
     /// Source code reference
     pub src_ref: SrcRef,
-}
-
-impl std::ops::Deref for ListExpression {
-    type Target = ExpressionList;
-
-    fn deref(&self) -> &Self::Target {
-        &self.list
-    }
-}
-
-impl std::ops::DerefMut for ListExpression {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.list
-    }
 }
 
 impl SrcReferrer for ListExpression {

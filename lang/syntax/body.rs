@@ -3,12 +3,15 @@
 
 //! Body syntax element.
 
+use derive_more::Deref;
+
 use crate::{resolve::*, src_ref::*, syntax::*};
 
 /// A body is a list of statements inside `{}` brackets.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Deref)]
 pub struct Body {
     /// Body statements.
+    #[deref]
     pub statements: StatementList,
     /// Source code reference.
     pub src_ref: SrcRef,

@@ -3,12 +3,12 @@
 
 //! Parameter value list evaluation entity
 
-use compact_str::CompactStringExt;
-
 use crate::{eval::*, value::*};
+use compact_str::CompactStringExt;
+use derive_more::Deref;
 
 /// List of parameter values
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Deref)]
 pub struct ParameterValueList(std::collections::HashMap<Identifier, ParameterValue>);
 
 impl ParameterValueList {
@@ -42,20 +42,6 @@ impl ParameterValueList {
             1 => Ok(*pv.first().expect("one item")),
             _ => unreachable!("Type '{ty}' is ambiguous in parameters"),
         }
-    }
-}
-
-impl std::ops::Deref for ParameterValueList {
-    type Target = std::collections::HashMap<Identifier, ParameterValue>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for ParameterValueList {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

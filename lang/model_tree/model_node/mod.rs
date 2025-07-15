@@ -13,11 +13,12 @@ pub use model_node_inner::*;
 pub use model_nodes::*;
 pub use origin::*;
 
-use crate::{GetPropertyValue, diag::WriteToFile, model_tree::*, rc::*, syntax::*, value::*};
+use crate::{diag::WriteToFile, model_tree::*, rc::*, syntax::*, value::*, GetPropertyValue};
+use derive_more::{Deref, DerefMut};
 use microcad_core::*;
 
 /// A reference counted, mutable [`ModelNode`].
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deref, DerefMut)]
 pub struct ModelNode(RcMut<ModelNodeInner>);
 
 impl ModelNode {
@@ -172,20 +173,6 @@ impl ModelNode {
     /// Ancestors iterator.
     pub fn ancestors(&self) -> Ancestors {
         Ancestors::new(self.clone())
-    }
-}
-
-impl std::ops::Deref for ModelNode {
-    type Target = RcMut<ModelNodeInner>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for ModelNode {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

@@ -4,12 +4,13 @@
 //! External files register
 
 use crate::{eval::*, syntax::*, MICROCAD_EXTENSIONS};
+use derive_more::Deref;
 
 /// External files register.
 ///
 /// A map of *qualified name* -> *source file path* which is generated at creation
 /// by scanning in the given `search_paths`.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Deref)]
 pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf>);
 
 impl Externals {
@@ -154,14 +155,6 @@ impl std::fmt::Display for Externals {
         v.sort();
         v.iter()
             .try_for_each(|file| writeln!(f, "{} => {}", file.0, file.1.to_string_lossy()))
-    }
-}
-
-impl std::ops::Deref for Externals {
-    type Target = std::collections::HashMap<QualifiedName, std::path::PathBuf>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 

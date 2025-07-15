@@ -4,13 +4,14 @@
 //! Nested item list syntax element
 
 use crate::{src_ref::*, syntax::*};
+use derive_more::Deref;
 
 /// Nested item list, e.g. an expression like `foo bar() {}`
 ///
 /// More examples for a nested item
 /// * translate() rotate() a
 /// * a::b
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deref)]
 pub struct Nested(pub Refer<Vec<NestedItem>>);
 
 impl Nested {
@@ -37,14 +38,6 @@ impl Nested {
         } else {
             None
         }
-    }
-}
-
-impl std::ops::Deref for Nested {
-    type Target = Refer<Vec<NestedItem>>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 

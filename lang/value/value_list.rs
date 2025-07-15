@@ -4,9 +4,10 @@
 //! Value list evaluation entity
 
 use crate::{ty::*, value::*};
+use derive_more::{Deref, DerefMut};
 
 /// List of values
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Deref, DerefMut)]
 pub struct ValueList(Vec<Value>);
 
 impl ValueList {
@@ -38,20 +39,6 @@ impl ValueList {
                 .into_iter()
                 .collect(),
         )
-    }
-}
-
-impl std::ops::Deref for ValueList {
-    type Target = Vec<Value>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for ValueList {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

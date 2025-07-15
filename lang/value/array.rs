@@ -4,11 +4,14 @@
 //! Typed list of values evaluation entity
 
 use crate::{ty::*, value::*};
+use derive_more::{Deref, DerefMut};
 
 /// List of values of the same type
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deref, DerefMut)]
 pub struct Array {
     /// List of values
+    #[deref]
+    #[deref_mut]
     list: ValueList,
     ty: Type,
 }
@@ -28,20 +31,6 @@ impl Array {
 impl PartialEq for Array {
     fn eq(&self, other: &Self) -> bool {
         self.ty == other.ty && self.list == other.list
-    }
-}
-
-impl std::ops::Deref for Array {
-    type Target = ValueList;
-
-    fn deref(&self) -> &Self::Target {
-        &self.list
-    }
-}
-
-impl std::ops::DerefMut for Array {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.list
     }
 }
 

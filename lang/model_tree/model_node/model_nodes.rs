@@ -3,12 +3,12 @@
 
 //! Model tree module
 
+use crate::{model_tree::*, resolve::*, src_ref::*, syntax::SourceFile};
+use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 
-use crate::{model_tree::*, resolve::*, src_ref::*, syntax::SourceFile};
-
 /// Model node multiplicities.
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq, Deref, DerefMut)]
 pub struct ModelNodes(Vec<ModelNode>);
 
 impl ModelNodes {
@@ -148,20 +148,6 @@ impl ModelNodes {
             ModelNodeOutputType::NotDetermined,
             |output_type, node_output_type| output_type.merge(&node_output_type),
         )
-    }
-}
-
-impl std::ops::Deref for ModelNodes {
-    type Target = Vec<ModelNode>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for ModelNodes {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

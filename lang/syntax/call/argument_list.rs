@@ -4,28 +4,15 @@
 //! List of arguments syntax entities.
 
 use crate::{ord_map::*, src_ref::*, syntax::*};
+use derive_more::{Deref, DerefMut};
 
 /// List (ordered map) of arguments.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Deref, DerefMut)]
 pub struct ArgumentList(pub Refer<OrdMap<Identifier, Argument>>);
 
 impl SrcReferrer for ArgumentList {
     fn src_ref(&self) -> SrcRef {
         self.0.src_ref()
-    }
-}
-
-impl std::ops::Deref for ArgumentList {
-    type Target = OrdMap<Identifier, Argument>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for ArgumentList {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

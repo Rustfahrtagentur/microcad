@@ -4,9 +4,10 @@
 //! Statement list syntax element.
 
 use crate::{resolve::*, syntax::*};
+use derive_more::Deref;
 
 /// A list of statements.
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, Deref)]
 pub struct StatementList(pub Vec<Statement>);
 
 impl StatementList {
@@ -37,14 +38,6 @@ impl StatementList {
         }
 
         symbol_map
-    }
-}
-
-impl std::ops::Deref for StatementList {
-    type Target = Vec<Statement>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 

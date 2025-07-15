@@ -2,14 +2,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{src_ref::*, syntax::*};
+use derive_more::{Deref, DerefMut};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
-#[derive(Debug, Default, Clone, PartialEq, Hash, Eq, Ord, PartialOrd)]
+#[derive(Debug, Default, Clone, PartialEq, Hash, Eq, Ord, PartialOrd, DerefMut, Deref)]
 pub struct QualifiedName(Refer<Vec<Identifier>>);
 
 /// List of qualified names which can pe displayed
-#[derive(Debug)]
+#[derive(Debug, Deref)]
 pub struct QualifiedNames(Vec<QualifiedName>);
 
 impl std::fmt::Display for QualifiedNames {
@@ -23,14 +24,6 @@ impl std::fmt::Display for QualifiedNames {
                 .collect::<Vec<_>>()
                 .join(", ")
         )
-    }
-}
-
-impl std::ops::Deref for QualifiedNames {
-    type Target = Vec<QualifiedName>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
@@ -138,20 +131,6 @@ impl QualifiedName {
         let mut full_name = prefix.clone();
         full_name.append(&mut self.clone());
         full_name
-    }
-}
-
-impl std::ops::Deref for QualifiedName {
-    type Target = Vec<Identifier>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for QualifiedName {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

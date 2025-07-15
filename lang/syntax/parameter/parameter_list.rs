@@ -4,9 +4,10 @@
 //! Parameter list syntax element
 
 use crate::{ord_map::*, syntax::*};
+use derive_more::{Deref, DerefMut};
 
 /// Parameter list
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Deref, DerefMut)]
 pub struct ParameterList(OrdMap<Identifier, Parameter>);
 
 impl ParameterList {
@@ -18,20 +19,6 @@ impl ParameterList {
     /// Return ids of all parameters
     pub fn ids(&self) -> impl Iterator<Item = Identifier> {
         self.keys().cloned()
-    }
-}
-
-impl std::ops::Deref for ParameterList {
-    type Target = OrdMap<Identifier, Parameter>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for ParameterList {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

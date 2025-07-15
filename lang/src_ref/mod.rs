@@ -22,11 +22,12 @@ pub use refer::*;
 pub use src_referrer::*;
 
 use crate::parser::*;
+use derive_more::Deref;
 
 /// Reference into a source file.
 ///
 /// *Hint*: Source file is not part of `SrcRef` and must be provided from outside
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Deref)]
 pub struct SrcRef(pub Option<Box<SrcRefInner>>);
 
 impl SrcRef {
@@ -56,14 +57,6 @@ pub struct SrcRefInner {
     pub at: LineCol,
     /// Hash of the source code file to map `SrcRef` -> `SourceFile`
     pub source_file_hash: u64,
-}
-
-impl std::ops::Deref for SrcRef {
-    type Target = Option<Box<SrcRefInner>>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
 }
 
 impl std::fmt::Display for SrcRef {

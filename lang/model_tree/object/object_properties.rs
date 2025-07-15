@@ -3,14 +3,14 @@
 
 //! Object properties.
 
-use std::collections::BTreeMap;
-
 use crate::{diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*, GetPropertyValue};
+use derive_more::{Deref, DerefMut};
+use std::collections::BTreeMap;
 
 /// A list of object properties.
 ///
 /// It is required that properties are always sorted by their id.
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, Deref, DerefMut)]
 pub struct ObjectProperties(BTreeMap<Identifier, Value>);
 
 impl ObjectProperties {
@@ -54,20 +54,6 @@ impl Eval<()> for ObjectProperties {
         }
 
         Ok(())
-    }
-}
-
-impl std::ops::Deref for ObjectProperties {
-    type Target = std::collections::BTreeMap<Identifier, Value>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for ObjectProperties {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

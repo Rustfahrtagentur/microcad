@@ -3,6 +3,7 @@
 
 use crate::{diag::WriteToFile, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
+use derive_more::{Deref, DerefMut};
 
 /// Symbol content
 #[derive(Debug, Clone)]
@@ -23,25 +24,11 @@ pub struct SymbolInner {
 /// the resolved symbols by it's original structure in the source code and by it's *id*.
 ///
 /// `SymbolNode` can be shared as mutable.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deref, DerefMut)]
 pub struct Symbol(RcMut<SymbolInner>);
 
-impl std::ops::Deref for Symbol {
-    type Target = RcMut<SymbolInner>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for Symbol {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
 /// List of qualified names which can pe displayed
-#[derive(Debug)]
+#[derive(Debug, Deref)]
 pub struct Symbols(Vec<Symbol>);
 
 impl Default for Symbol {
@@ -71,14 +58,6 @@ impl std::fmt::Display for Symbols {
                 .collect::<Vec<_>>()
                 .join("")
         )
-    }
-}
-
-impl std::ops::Deref for Symbols {
-    type Target = Vec<Symbol>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 

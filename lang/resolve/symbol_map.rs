@@ -2,25 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{eval::*, resolve::*, src_ref::SrcReferrer, syntax::*, value::*};
+use derive_more::{Deref, DerefMut};
 use std::collections::btree_map::BTreeMap;
 
 /// Map Id to SymbolNode reference
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Deref, DerefMut)]
 pub struct SymbolMap(BTreeMap<Identifier, Symbol>);
-
-impl std::ops::Deref for SymbolMap {
-    type Target = BTreeMap<Identifier, Symbol>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for SymbolMap {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
 
 impl From<&Tuple> for SymbolMap {
     fn from(tuple: &Tuple) -> Self {

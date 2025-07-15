@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{src_ref::*, syntax::*};
+use derive_more::Deref;
 
 /// A list of identifiers
 ///
 /// Used e.g. for multiple variable declarations.
 /// Cannot contain duplicates.
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq, Deref)]
 pub struct IdentifierList(pub Refer<Vec<Identifier>>);
 
 impl IdentifierList {
@@ -26,14 +27,6 @@ impl SrcReferrer for IdentifierList {
 impl From<Vec<Identifier>> for IdentifierList {
     fn from(value: Vec<Identifier>) -> Self {
         Self(Refer::new(value, SrcRef(None)))
-    }
-}
-
-impl std::ops::Deref for IdentifierList {
-    type Target = Vec<Identifier>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 

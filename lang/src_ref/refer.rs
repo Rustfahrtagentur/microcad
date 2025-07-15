@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::src_ref::*;
+use derive_more::{Deref, DerefMut};
 
 /// Packs any value together with a source reference
-#[derive(Clone, Default, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Default, Ord, PartialEq, PartialOrd, Deref, DerefMut)]
 pub struct Refer<T> {
     /// Value
+    #[deref]
+    #[deref_mut]
     pub value: T,
     /// Source code reference
     pub src_ref: SrcRef,
@@ -38,20 +41,6 @@ impl<T> Refer<T> {
             value: f(self.value),
             src_ref: self.src_ref,
         }
-    }
-}
-
-impl<T> std::ops::Deref for Refer<T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.value
-    }
-}
-
-impl<T> std::ops::DerefMut for Refer<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.value
     }
 }
 
