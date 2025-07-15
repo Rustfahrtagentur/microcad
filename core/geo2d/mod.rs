@@ -7,6 +7,7 @@ mod bounds;
 mod collection;
 mod geometry;
 mod primitives;
+mod size;
 
 use crate::*;
 
@@ -15,6 +16,7 @@ pub use collection::*;
 use geo::AffineTransform;
 pub use geometry::*;
 pub use primitives::*;
+pub use size::*;
 
 /// Trait to render a [`Geometry2D`] into a multi polygon.
 ///
