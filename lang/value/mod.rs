@@ -438,6 +438,17 @@ impl TryFrom<Value> for Scalar {
     }
 }
 
+impl TryFrom<&Value> for Size2D {
+    type Error = ValueError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Tuple(tuple) => Ok(tuple.as_ref().try_into()?),
+            _ => Err(ValueError::CannotConvert(value.clone(), "Size2D".into())),
+        }
+    }
+}
+
 impl From<f32> for Value {
     fn from(f: f32) -> Self {
         Value::Quantity((f as Scalar).into())
@@ -447,6 +458,18 @@ impl From<f32> for Value {
 impl From<Scalar> for Value {
     fn from(scalar: Scalar) -> Self {
         Value::Quantity(scalar.into())
+    }
+}
+
+impl From<Size2D> for Value {
+    fn from(value: Size2D) -> Self {
+        Value::Tuple(Box::new(value.into()))
+    }
+}
+
+impl From<Quantity> for Value {
+    fn from(qty: Quantity) -> Self {
+        Value::Quantity(qty)
     }
 }
 
