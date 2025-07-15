@@ -10,7 +10,7 @@ use crate::{
     syntax::{self, *},
 };
 
-use microcad_core::{Color, RenderResolution};
+use microcad_core::{Color, RenderResolution, Size2D};
 use thiserror::Error;
 
 /// Error type for attributes.
@@ -47,6 +47,16 @@ impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
                         parameter!(filename: String),
                         parameter!(resolution: Length = 0.1 /*mm*/),
                         parameter!(id: String = String::new()),
+                        (
+                            Identifier::no_ref("size"),
+                            eval::ParameterValue {
+                                specified_type: Some(Type::Tuple(
+                                    Box::new(TupleType::new_size2d()),
+                                )),
+                                default_value: Some(Value::Tuple(Box::new(Size2D::A4.into()))),
+                                src_ref: SrcRef(None),
+                            },
+                        ),
                     ]
                     .into_iter()
                     .collect(),
@@ -59,6 +69,7 @@ impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
                         let resolution = RenderResolution::new(
                             arguments.get::<&Value>("resolution").try_scalar()?,
                         );
+                        let size = arguments.get::<Size2D>("size");
 
                         match context.find_exporter(&filename, &id) {
                             Ok(exporter) => {
@@ -66,6 +77,8 @@ impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
                                     filename,
                                     exporter,
                                     resolution,
+                                    size,
+                                    layers: vec![], // TODO get layers
                                 }));
                             }
                             Err(err) => context.warning(self, err)?,
