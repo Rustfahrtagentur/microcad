@@ -54,6 +54,14 @@ impl IntoIterator for Array {
     }
 }
 
+impl FromIterator<Value> for Array {
+    fn from_iter<T: IntoIterator<Item = Value>>(iter: T) -> Self {
+        let list: ValueList = iter.into_iter().collect();
+        let ty = list.types().common_type().expect("Common type");
+        Self { ty, list }
+    }
+}
+
 impl std::fmt::Display for Array {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
