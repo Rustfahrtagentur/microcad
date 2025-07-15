@@ -9,7 +9,7 @@ use crate::{
     value::Value,
 };
 use cgmath::SquareMatrix;
-use microcad_core::{Mat4, RenderResolution};
+use microcad_core::{Mat4, RenderResolution, Size2D};
 
 /// Export attribute, e.g. `#[export("output.svg")]`.
 #[derive(Clone)]
@@ -20,6 +20,10 @@ pub struct ExportAttribute {
     pub resolution: RenderResolution,
     /// Exporter.
     pub exporter: std::rc::Rc<dyn Exporter>,
+    /// Layer selector.
+    pub layers: Vec<String>,
+    /// Size.
+    pub size: Size2D,
 }
 
 impl ExportAttribute {
@@ -39,7 +43,19 @@ impl From<ExportAttribute> for Value {
             filename = Value::String(String::from(
                 export_attribute.filename.to_str().expect("PathBuf"),
             )),
-            id = Value::String(export_attribute.exporter.id().to_string())
+            id = Value::String(export_attribute.exporter.id().to_string()),
+            layers = if export_attribute.layers.is_empty() {
+                Value::None
+            } else {
+                Value::Array(
+                    export_attribute
+                        .layers
+                        .iter()
+                        .map(|s| Value::String(s.clone()))
+                        .collect(),
+                )
+            },
+            size = export_attribute.size.into()
         )
     }
 }
@@ -59,9 +75,14 @@ impl std::fmt::Display for ExportAttribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(
             f,
-            "\"{filename}\" with exporter `{id}`",
+            "\"{filename}\" with exporter `{id}`{layers}",
             filename = self.filename.display(),
-            id = self.exporter.id()
+            id = self.exporter.id(),
+            layers = if self.layers.is_empty() {
+                String::from(" (all layers)")
+            } else {
+                format!(" (layers = [{layers}])", layers = self.layers.join(", "))
+            }
         )
     }
 }

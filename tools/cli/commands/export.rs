@@ -5,7 +5,7 @@
 
 use anyhow::anyhow;
 use microcad_builtin::{Exporter, ExporterAccess, ExporterRegistry};
-use microcad_core::RenderResolution;
+use microcad_core::{RenderResolution, Size2D};
 use microcad_lang::{model_tree::*, ty::QuantityType, value::*};
 
 use crate::{config::Config, *};
@@ -28,6 +28,10 @@ pub struct ExportArgs {
     /// The resolution can changed relatively `200%` or to an absolute value `0.05mm`.
     #[arg(short = 'r', long = "resolution", default_value = "0.1mm")]
     pub resolution: String,
+
+    /// Layers to export (or all layers).
+    #[arg(short = 'l', long = "layer", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
+    pub layers: Vec<String>,
 }
 
 impl ExportArgs {
@@ -79,6 +83,12 @@ impl ExportArgs {
         }
     }
 
+    /// Parse size from CLI.
+    fn size(&self) -> Size2D {
+        Size2D::A4
+        // TODO parse size from export
+    }
+
     /// Get default export attribute.
     fn default_export_attribute(
         &self,
@@ -88,11 +98,15 @@ impl ExportArgs {
     ) -> anyhow::Result<ExportAttribute> {
         let default_exporter = Self::default_exporter(&node.final_output_type(), config, exporters);
         let resolution = self.resolution();
+        let layers = self.layers.clone();
+        let size = self.size();
 
         match &self.output {
             Some(filename) => Ok(ExportAttribute {
                 filename: filename.to_path_buf(),
                 resolution,
+                layers,
+                size,
                 exporter: exporters
                     .exporter_by_filename(filename)
                     .or(default_exporter)?,
@@ -112,6 +126,8 @@ impl ExportArgs {
                     filename,
                     exporter,
                     resolution,
+                    layers,
+                    size,
                 })
             }
         }

@@ -41,7 +41,7 @@ impl SourceFileTest {
 
         match context.eval() {
             Ok(node) => {
-                use microcad_core::RenderResolution;
+                use microcad_core::*;
                 use microcad_export::svg::SvgExporter;
                 use microcad_lang::model_tree::{ExportAttribute as Export, ModelNodeOutputType};
                 use std::rc::Rc;
@@ -56,6 +56,8 @@ impl SourceFileTest {
                                 filename: self.output_filename("svg").into(),
                                 resolution: RenderResolution::default(),
                                 exporter: Rc::new(SvgExporter),
+                                layers: vec![],
+                                size: Size2D::A4,
                             }
                             .export(&node)
                             .expect("No error");
