@@ -30,7 +30,7 @@ pub struct ExportArgs {
     pub resolution: String,
 
     /// Layers to export (or all layers).
-    #[arg(short = 'l', long = "layer", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
+    #[arg(long = "layer", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
     pub layers: Vec<String>,
 }
 
