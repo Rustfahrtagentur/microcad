@@ -25,7 +25,7 @@ fn svg_writer() {
     let rect = geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0));
     svg.rect(
         &rect,
-        &SvgTagAttributes {
+        &SvgStyleAttributes {
             style: Some("fill:blue;".into()),
             fill: None,
         },
@@ -38,7 +38,7 @@ fn svg_writer() {
     };
     svg.circle(
         &circle,
-        &SvgTagAttributes {
+        &SvgStyleAttributes {
             style: Some("fill:red;".into()),
             fill: None,
         },
@@ -48,7 +48,7 @@ fn svg_writer() {
     let line = Edge2D(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
     svg.edge(
         &line,
-        &SvgTagAttributes {
+        &SvgStyleAttributes {
             style: Some("stroke:black;".into()),
             fill: None,
         },
@@ -60,7 +60,7 @@ fn svg_writer() {
     let arrow = Edge2D(geo::Point::new(100.0, 0.0), geo::Point::new(0.0, 100.0));
     svg.edge(
         &arrow.shorter(6.0),
-        &SvgTagAttributes {
+        &SvgStyleAttributes {
             style: Some("stroke:black;".into()),
             fill: None,
         },

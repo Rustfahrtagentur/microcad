@@ -18,20 +18,20 @@ pub struct SvgWriter {
 
 /// Tag attributes for an SVG tag.
 #[derive(Debug, Clone, Default)]
-pub struct SvgTagAttributes {
+pub struct SvgStyleAttributes {
     /// Style attribute.
     pub style: Option<String>,
     /// Fill attribute. Used when color attribute of a node is set.
     pub fill: Option<String>,
 }
 
-impl SvgTagAttributes {
+impl SvgStyleAttributes {
     fn is_empty(&self) -> bool {
         self.style.is_none() && self.fill.is_none()
     }
 }
 
-impl From<&ModelNode> for SvgTagAttributes {
+impl From<&ModelNode> for SvgStyleAttributes {
     fn from(node: &ModelNode) -> Self {
         use microcad_lang::value::ValueAccess;
 
@@ -39,13 +39,13 @@ impl From<&ModelNode> for SvgTagAttributes {
             node.get_exporter_attribute(&Identifier::no_ref("svg")),
             node.get_color_attribute(),
         ) {
-            (None, None) => SvgTagAttributes::default(),
-            (None, Some(color)) => SvgTagAttributes {
+            (None, None) => SvgStyleAttributes::default(),
+            (None, Some(color)) => SvgStyleAttributes {
                 style: None,
                 fill: Some(color.to_svg_color()),
             },
             // If boths attributes are present, get style and fill from exporter attributes. Color attribute is ignored.
-            (Some(attributes), None) | (Some(attributes), Some(_)) => SvgTagAttributes {
+            (Some(attributes), None) | (Some(attributes), Some(_)) => SvgStyleAttributes {
                 style: attributes
                     .by_id(&Identifier::no_ref("style"))
                     .map(|value| value.try_string().unwrap_or_default()),
@@ -57,7 +57,7 @@ impl From<&ModelNode> for SvgTagAttributes {
     }
 }
 
-impl std::fmt::Display for SvgTagAttributes {
+impl std::fmt::Display for SvgStyleAttributes {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match (&self.style, &self.fill) {
             (None, None) => Ok(()),
@@ -119,7 +119,7 @@ impl SvgWriter {
         })
     }
 
-    fn tag_inner(tag: &str, attr: &SvgTagAttributes) -> String {
+    fn tag_inner(tag: &str, attr: &SvgStyleAttributes) -> String {
         format!(
             "{tag}{attr}",
             attr = if attr.is_empty() {
@@ -130,53 +130,51 @@ impl SvgWriter {
         )
     }
 
-    fn tag(&mut self, tag: &str, attr: &SvgTagAttributes) -> std::io::Result<()> {
-        writeln!(
-            self.writer,
-            "{:indent$}<{tag_inner}/>",
-            "",
-            indent = 2 * self.level,
-            tag_inner = Self::tag_inner(tag, attr)
-        )
+    /// Write something into the SVG and consider indentation.
+    fn with_indent(&mut self, s: &str) -> std::io::Result<()> {
+        writeln!(self.writer, "{:indent$}{s}", "", indent = 2 * self.level)
     }
 
-    fn begin_tag(&mut self, tag: &str, attr: &SvgTagAttributes) -> std::io::Result<()> {
-        writeln!(
-            self.writer,
-            "{:indent$}<{tag_inner}>",
-            "",
-            indent = 2 * self.level,
+    /// Write a single tag `<tag>`.
+    fn tag(&mut self, tag: &str, attr: &SvgStyleAttributes) -> std::io::Result<()> {
+        self.with_indent(&format!(
+            "<{tag_inner}/>",
             tag_inner = Self::tag_inner(tag, attr)
-        )?;
+        ))
+    }
+
+    /// Open a tag `<tag>`
+    fn open_tag(&mut self, tag: &str, attr: &SvgStyleAttributes) -> std::io::Result<()> {
+        self.with_indent(&format!(
+            "<{tag_inner}>",
+            tag_inner = Self::tag_inner(tag, attr)
+        ))?;
+
         self.level += 1;
         Ok(())
     }
 
-    fn end_tag(&mut self, tag: &str) -> std::io::Result<()> {
+    /// Close a tag `</tag>`
+    fn close_tag(&mut self, tag: &str) -> std::io::Result<()> {
         self.level -= 1;
-        writeln!(
-            self.writer,
-            "{:indent$}</{tag}>",
-            "",
-            indent = 2 * self.level
-        )
+        self.with_indent(format!("</{tag}>").as_str())
     }
 
     /// Begin a new group `<g>`.
-    pub fn begin_group(&mut self, attr: &SvgTagAttributes) -> std::io::Result<()> {
-        self.begin_tag("g", attr)
+    pub fn begin_group(&mut self, attr: &SvgStyleAttributes) -> std::io::Result<()> {
+        self.open_tag("g", attr)
     }
 
     /// End a group `</g>`.
     pub fn end_group(&mut self) -> std::io::Result<()> {
-        self.end_tag("g")
+        self.close_tag("g")
     }
 
     /// Begin a SVG transformation <g>
     pub fn begin_transform(
         &mut self,
         transform: &microcad_core::Mat3,
-        attr: &SvgTagAttributes,
+        attr: &SvgStyleAttributes,
     ) -> std::io::Result<()> {
         let (a, b, c, d, e, f) = (
             transform.x.x,
@@ -187,7 +185,7 @@ impl SvgWriter {
             transform.z.y,
         );
 
-        self.begin_tag(
+        self.open_tag(
             &format!("g transform=\"matrix({a} {b} {c} {d} {e} {f})\""),
             attr,
         )
@@ -199,7 +197,7 @@ impl SvgWriter {
     }
 
     /// Generate rectangle.
-    pub fn rect(&mut self, rect: &geo2d::Rect, attr: &SvgTagAttributes) -> std::io::Result<()> {
+    pub fn rect(&mut self, rect: &geo2d::Rect, attr: &SvgStyleAttributes) -> std::io::Result<()> {
         let x = rect.min().x;
         let y = rect.min().y;
         let width = rect.width();
@@ -215,7 +213,7 @@ impl SvgWriter {
     pub fn circle(
         &mut self,
         circle: &geo2d::Circle,
-        attr: &SvgTagAttributes,
+        attr: &SvgStyleAttributes,
     ) -> std::io::Result<()> {
         let r = circle.radius;
         let (cx, cy) = (circle.offset.x, circle.offset.y);
@@ -226,7 +224,7 @@ impl SvgWriter {
     pub fn edge(
         &mut self,
         edge: &geo2d::Edge2D,
-        attr: &SvgTagAttributes,
+        attr: &SvgStyleAttributes,
         marker_start: Option<String>,
         marker_end: Option<String>,
     ) -> std::io::Result<()> {
@@ -251,7 +249,7 @@ impl SvgWriter {
     pub fn line_string(
         &mut self,
         line_string: &geo2d::LineString,
-        attr: &SvgTagAttributes,
+        attr: &SvgStyleAttributes,
     ) -> std::io::Result<()> {
         let points = line_string.coords().fold(String::new(), |acc, p| {
             acc + &format!("{x},{y} ", x = p.x, y = p.y)
@@ -263,7 +261,7 @@ impl SvgWriter {
     pub fn multi_line_string(
         &mut self,
         multi_line_string: &geo2d::MultiLineString,
-        attr: &SvgTagAttributes,
+        attr: &SvgStyleAttributes,
     ) -> std::io::Result<()> {
         multi_line_string
             .iter()
@@ -274,7 +272,7 @@ impl SvgWriter {
     pub fn polygon(
         &mut self,
         polygon: &geo2d::Polygon,
-        attr: &SvgTagAttributes,
+        attr: &SvgStyleAttributes,
     ) -> std::io::Result<()> {
         fn line_string_path(l: &geo2d::LineString) -> String {
             l.points()
@@ -305,7 +303,7 @@ impl SvgWriter {
     pub fn multi_polygon(
         &mut self,
         multi_polygon: &geo2d::MultiPolygon,
-        attr: &SvgTagAttributes,
+        attr: &SvgStyleAttributes,
     ) -> std::io::Result<()> {
         for polygon in multi_polygon {
             self.polygon(polygon, attr)?;
@@ -317,7 +315,7 @@ impl SvgWriter {
     pub fn geometry(
         &mut self,
         geometry: &Geometry2D,
-        attr: &SvgTagAttributes,
+        attr: &SvgStyleAttributes,
     ) -> std::io::Result<()> {
         match geometry {
             Geometry2D::LineString(line_string) => self.line_string(line_string, attr),
@@ -336,7 +334,7 @@ impl SvgWriter {
     pub fn node(&mut self, node: &ModelNode) -> std::io::Result<()> {
         assert_eq!(node.final_output_type(), ModelNodeOutputType::Geometry2D);
 
-        let attr: SvgTagAttributes = node.into();
+        let attr: SvgStyleAttributes = node.into();
 
         // Render all output geometries.
         node.fetch_output_geometries_2d()
@@ -363,6 +361,34 @@ impl SvgWriter {
         }
 
         Ok(())
+    }
+
+    /// Generate a text centered in a rect angle.
+    pub fn centered_text(
+        &mut self,
+        text: &str,
+        rect: &Rect,
+        font_size: Option<String>,
+        font_family: Option<String>,
+        attr: &SvgStyleAttributes,
+    ) -> std::io::Result<()> {
+        let (x, y) = rect.center().x_y();
+        self.open_tag(
+            format!(r#"text x="{x}" y="{y}" dominant-baseline="middle" text-anchor="middle" {font_size}{font_family}"#,
+                font_size = match font_size {
+                    Some(font_size) => format!(" font-size=\"{font_size}\""),
+                    None => String::new(),
+                },
+                font_family = match font_family {
+                    Some(font_family) => format!(" font-family=\"{font_family}\""),
+                    None => String::new(),
+                }
+        )
+                .as_str(),
+            attr,
+        )?;
+        self.with_indent(text)?;
+        self.close_tag("text")
     }
 
     /// Finish this SVG. This method is also called in the Drop trait implementation.
