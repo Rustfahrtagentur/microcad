@@ -24,15 +24,16 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
      inkscape:zoom="2.2677414"
-     inkscape:cx="350.34859"
-     inkscape:cy="415.1708"
+     inkscape:cx="297.65299"
+     inkscape:cy="425.31304"
      inkscape:window-width="1888"
-     inkscape:window-height="1127"
+     inkscape:window-height="1145"
      inkscape:window-x="16"
-     inkscape:window-y="34"
+     inkscape:window-y="16"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1"
-     showguides="false" />
+     inkscape:current-layer="layer5"
+     showguides="false"
+     showgrid="false" />
   <defs
      id="defs1">
     <marker
@@ -91,6 +92,82 @@
          d="M 0,0 5,-5 -12.5,0 5,5 Z"
          transform="scale(-0.5)"
          id="path6" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker11-7"
+       refX="6"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Dart arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         transform="scale(-0.5)"
+         id="path11-5" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="DartArrow-9"
+       refX="6"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Dart arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         transform="scale(-0.5)"
+         id="path6-2" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker11-9"
+       refX="6"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Dart arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         transform="scale(-0.5)"
+         id="path11-4" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="DartArrow-7"
+       refX="6"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Dart arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         transform="scale(-0.5)"
+         id="path6-8" />
     </marker>
   </defs>
   <g
@@ -393,75 +470,86 @@
        transform="translate(-21.909385,-5.919064)"><tspan
          x="111.63244"
          y="113.50571"
-         id="tspan4"><tspan
+         id="tspan6"><tspan
            style="font-style:italic;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'"
-           id="tspan3">c</tspan></tspan></text>
+           id="tspan5">c</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="measures"
-     style="display:inline"
-     sodipodi:insensitive="true">
+     style="display:inline">
     <path
-       style="fill:#f2f2f2;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;marker-end:url(#marker12);paint-order:markers fill stroke"
+       style="fill:#f2f2f2;stroke:#c3ffff;stroke-width:0.3;stroke-dasharray:none;marker-end:url(#marker12);paint-order:markers fill stroke;stroke-opacity:1"
        d="M 107.62743,87.393935 125.84498,72.087094"
        id="path3" />
     <text
        xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#00ffff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#c1ffff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke;fill-opacity:1"
        x="139.27632"
        y="84.594574"
        id="text3"><tspan
          sodipodi:role="line"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#00ffff;stroke:none;stroke-width:0.6"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#c1ffff;stroke:none;stroke-width:0.6;fill-opacity:1"
          x="139.27632"
          y="84.594574"
          id="tspan15">radius=10mm</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#00ffff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#c1ffff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke;fill-opacity:1"
        x="-99.804863"
        y="34.365089"
        id="text3-9"
        transform="rotate(-90)"><tspan
          sodipodi:role="line"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#00ffff;stroke:none;stroke-width:0.6"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#c1ffff;stroke:none;stroke-width:0.6;fill-opacity:1"
          x="-99.804863"
          y="34.365089"
          id="tspan4-2">height=20mm</tspan></text>
     <path
-       style="fill:#e6e6e6;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;paint-order:markers fill stroke"
+       style="fill:#e6e6e6;stroke:#c3ffff;stroke-width:0.3;stroke-dasharray:none;paint-order:markers fill stroke;stroke-opacity:1"
        d="m 32.364357,132.45806 h 18.12896"
        id="path8" />
     <path
-       style="fill:#e6e6e6;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;paint-order:markers fill stroke"
+       style="fill:#e6e6e6;stroke:#c3ffff;stroke-width:0.3;stroke-dasharray:none;paint-order:markers fill stroke;stroke-opacity:1"
        d="m 32.064359,87.394149 h 18.12896"
        id="path9" />
     <path
-       style="fill:#e6e6e6;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;marker-start:url(#marker11);marker-end:url(#DartArrow);paint-order:markers fill stroke"
+       style="fill:#e6e6e6;stroke:#c3ffff;stroke-width:0.3;stroke-dasharray:none;marker-start:url(#marker11);marker-end:url(#DartArrow);paint-order:markers fill stroke;stroke-opacity:1"
        d="M 35.854079,87.394147 V 132.45806"
        id="path10" />
     <path
-       style="fill:#e6e6e6;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;paint-order:markers fill stroke"
+       style="display:inline;fill:#e6e6e6;stroke:#00ffff;stroke-width:0.299999;stroke-dasharray:none;paint-order:markers fill stroke"
+       d="m 72.78002,110.62135 h 34.99752"
+       id="path8-0" />
+    <path
+       style="display:inline;fill:#e6e6e6;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;paint-order:markers fill stroke"
+       d="M 72.527746,87.668385 H 87.772883"
+       id="path9-3" />
+    <path
+       style="display:inline;fill:#e6e6e6;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;marker-start:url(#marker11-9);marker-end:url(#DartArrow-7);paint-order:markers fill stroke"
+       d="M 76.649851,87.864678 V 110.66675"
+       id="path10-6" />
+    <path
+       style="fill:#e6e6e6;stroke:#c3ffff;stroke-width:0.3;stroke-dasharray:none;paint-order:markers fill stroke;stroke-opacity:1"
        d="M 107.62743,150.58688 V 132.45792"
        id="path13" />
     <path
-       style="fill:#e6e6e6;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;paint-order:markers fill stroke"
+       style="fill:#e6e6e6;stroke:#c3ffff;stroke-width:0.3;stroke-dasharray:none;paint-order:markers fill stroke;stroke-opacity:1"
        d="M 50.343317,150.43702 V 132.30806"
        id="path14" />
     <path
-       style="fill:#e6e6e6;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;marker-start:url(#marker11);marker-end:url(#DartArrow);paint-order:markers fill stroke"
+       style="fill:#e6e6e6;stroke:#c3ffff;stroke-width:0.3;stroke-dasharray:none;marker-start:url(#marker11);marker-end:url(#DartArrow);paint-order:markers fill stroke;stroke-opacity:1"
        d="M 50.308229,146.6473 H 107.40243"
        id="path15" />
     <text
        xml:space="preserve"
-       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#00ffff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;fill:#c1ffff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke;fill-opacity:1"
        x="85.579964"
        y="150.75723"
        id="text12"><tspan
          sodipodi:role="line"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#00ffff;stroke:none;stroke-width:0.6"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#c1ffff;stroke:none;stroke-width:0.6;fill-opacity:1"
          x="85.579964"
          y="150.75723"
          id="tspan12">width=30mm</tspan></text>
@@ -478,6 +566,41 @@
        sodipodi:open="true"
        sodipodi:arc-type="arc"
        d="m 51.401096,132.31509 a 1.2077993,1.2077993 0 0 1 -1.21305,1.20076 1.2077993,1.2077993 0 0 1 -1.202523,-1.2113 1.2077993,1.2077993 0 0 1 1.209552,-1.20429 1.2077993,1.2077993 0 0 1 1.206042,1.2078" />
+    <path
+       style="display:inline;fill:#e6e6e6;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;paint-order:markers fill stroke"
+       d="M 107.77754,121.21302 V 110.62135"
+       id="path13-9" />
+    <path
+       style="display:inline;fill:#e6e6e6;stroke:#00ffff;stroke-width:0.300001;stroke-dasharray:none;paint-order:markers fill stroke"
+       d="M 84.138734,121.21302 V 87.518385"
+       id="path14-7" />
+    <path
+       style="display:inline;fill:#e6e6e6;stroke:#00ffff;stroke-width:0.3;stroke-dasharray:none;marker-start:url(#marker11-7);marker-end:url(#DartArrow-9);paint-order:markers fill stroke"
+       d="M 84.019704,117.41404 H 107.59657"
+       id="path15-3" />
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;display:inline;fill:#00ffff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="100.0466"
+       y="121.46918"
+       id="text12-6"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#00ffff;stroke:none;stroke-width:0.6"
+         x="100.0466"
+         y="121.46918"
+         id="tspan12-1">10mm</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.03586px;font-family:'&quot;Atari800&quot;';-inkscape-font-specification:'&quot;Atari800&quot;, Normal';text-align:end;text-anchor:end;display:inline;fill:#00ffff;stroke:none;stroke-width:0.6;paint-order:markers fill stroke"
+       x="-95.411224"
+       y="74.624718"
+       id="text12-6-2"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic';fill:#00ffff;stroke:none;stroke-width:0.6"
+         x="-95.411224"
+         y="74.624718"
+         id="tspan12-1-0">10mm</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
