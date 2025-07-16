@@ -45,14 +45,27 @@ fn svg_writer() {
     )
     .expect("test error");
 
-    let line = (geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
-    svg.line(
-        line.0,
-        line.1,
+    let line = Edge2D(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
+    svg.edge(
+        &line,
         &SvgTagAttributes {
             style: Some("stroke:black;".into()),
             fill: None,
         },
+        None,
+        None,
+    )
+    .expect("test error");
+
+    let arrow = Edge2D(geo::Point::new(100.0, 0.0), geo::Point::new(0.0, 100.0));
+    svg.edge(
+        &arrow.shorter(6.0),
+        &SvgTagAttributes {
+            style: Some("stroke:black;".into()),
+            fill: None,
+        },
+        Some("arrow".into()),
+        Some("arrow".into()),
     )
     .expect("test error");
 }

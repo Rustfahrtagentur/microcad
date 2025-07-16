@@ -92,6 +92,24 @@ impl SvgWriter {
             r.width() * scale,
             r.height() * scale
         )?;
+        writeln!(
+            &mut w,
+            r#"
+  <defs>
+    <!-- A marker to be used as an arrowhead -->
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="5"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+  </defs>
+            "#
+        )?;
 
         writeln!(&mut w, "<g transform='scale({scale})'>")?;
 
@@ -204,16 +222,27 @@ impl SvgWriter {
         self.tag(&format!("circle cx=\"{cx}\" cy=\"{cy}\" r=\"{r}\""), attr)
     }
 
-    /// Generate line.
-    pub fn line(
+    /// Generate edge with optional arrow heads.
+    pub fn edge(
         &mut self,
-        p1: geo2d::Point,
-        p2: geo2d::Point,
+        edge: &geo2d::Edge2D,
         attr: &SvgTagAttributes,
+        marker_start: Option<String>,
+        marker_end: Option<String>,
     ) -> std::io::Result<()> {
-        let ((x1, y1), (x2, y2)) = (p1.x_y(), p2.x_y());
+        let ((x1, y1), (x2, y2)) = (edge.0.x_y(), edge.1.x_y());
         self.tag(
-            &format!("line x1=\"{x1}\" y1=\"{y1}\" x2=\"{x2}\" y2=\"{y2}\""),
+            &format!(
+                "line x1=\"{x1}\" y1=\"{y1}\" x2=\"{x2}\" y2=\"{y2}\"{marker_start}{marker_end}",
+                marker_start = match marker_start {
+                    Some(marker_start) => format!(" marker-start=\"url(#{marker_start})\""),
+                    None => String::new(),
+                },
+                marker_end = match marker_end {
+                    Some(marker_end) => format!(" marker-end=\"url(#{marker_end})\""),
+                    None => String::new(),
+                }
+            ),
             attr,
         )
     }
@@ -299,6 +328,7 @@ impl SvgWriter {
             Geometry2D::MultiPolygon(multi_polygon) => self.multi_polygon(multi_polygon, attr),
             Geometry2D::Rect(rect) => self.rect(rect, attr),
             Geometry2D::Circle(circle) => self.circle(circle, attr),
+            Geometry2D::Edge(edge) => self.edge(edge, attr, None, None),
         }
     }
 
