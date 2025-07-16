@@ -206,7 +206,9 @@ impl Default for Grid {
 impl WriteSvg for Grid {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
         if let Some(rect) = self.bounds.rect().or(*writer.bounds().rect()) {
-            self.bounds.write_svg(writer, attr)?;
+            writer.begin_group(attr)?;
+
+            rect.write_svg(writer, &SvgTagAttributes::default())?;
 
             let mut left = rect.min().x;
             let right = rect.max().x;
@@ -215,7 +217,7 @@ impl WriteSvg for Grid {
                     geo::Point::new(left, rect.min().y),
                     geo::Point::new(left, rect.max().y),
                 )
-                .write_svg(writer, attr)?;
+                .write_svg(writer, &SvgTagAttributes::default())?;
                 left += self.cell_size.width;
             }
 
@@ -226,9 +228,11 @@ impl WriteSvg for Grid {
                     geo::Point::new(rect.min().x, bottom),
                     geo::Point::new(rect.max().x, bottom),
                 )
-                .write_svg(writer, attr)?;
+                .write_svg(writer, &SvgTagAttributes::default())?;
                 bottom += self.cell_size.height;
             }
+
+            writer.end_group()?;
         }
         Ok(())
     }
@@ -354,7 +358,7 @@ impl WriteSvg for RadiusMeasure {
 /// Size measure of a bounds.
 pub struct SizeMeasure {
     /// Bounds to measure.
-    bounds: Bounds2D,
+    _bounds: Bounds2D,
     /// Width measure
     width: Option<EdgeLengthMeasure>,
     /// Height measure
@@ -368,13 +372,13 @@ impl SizeMeasure {
 
         if let Some(rect) = bounds.rect() {
             Self {
-                bounds: bounds.clone(),
+                _bounds: bounds.clone(),
                 width: Some(EdgeLengthMeasure::width(rect, 10.0, None)),
                 height: Some(EdgeLengthMeasure::height(rect, 10.0, None)),
             }
         } else {
             Self {
-                bounds: bounds.clone(),
+                _bounds: bounds.clone(),
                 width: None,
                 height: None,
             }

@@ -3,7 +3,6 @@
 
 //! Scalable Vector Graphics (SVG) file writer
 
-use geo::coord;
 use microcad_core::*;
 
 use crate::svg::SvgTagAttributes;
@@ -19,28 +18,25 @@ impl SvgWriter {
     /// Create new SvgWriter
     /// # Arguments
     /// - `w`: Output writer
-    /// - `bounds`: Clipping
+    /// - `size`: Size of the canvas.
     /// - `scale`: Scale of the output
-    pub fn new(
-        mut w: Box<dyn std::io::Write>,
-        bounds: geo2d::Bounds2D,
-        scale: f64,
+    pub fn new_canvas(
+        mut writer: Box<dyn std::io::Write>,
+        bounds: Bounds2D,
+        _scale: Option<Scalar>,
     ) -> std::io::Result<Self> {
-        let r = bounds.rect().unwrap_or(Rect::new(
-            coord! {x : 0.0, y: 0.0},
-            coord! {x : 10.0, y: 10.0},
-        ));
-        writeln!(&mut w, "<?xml version='1.0' encoding='UTF-8'?>")?;
+        let x = bounds.rect().map(|r| r.min().x).unwrap_or_default() as i64;
+        let y = bounds.rect().map(|r| r.min().y).unwrap_or_default() as i64;
+        let w = bounds.width() as i64;
+        let h = bounds.height() as i64;
+
+        writeln!(&mut writer, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
-            &mut w,
-            "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='{} {} {} {}'>",
-            r.min().x * scale,
-            r.min().y * scale,
-            r.width() * scale,
-            r.height() * scale
+            &mut writer,
+            "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='{x} {y} {w} {h}' width='{w}' height='{h}'>",
         )?;
         writeln!(
-            &mut w,
+            &mut writer,
             r#"
   <defs>
     <!-- A marker to be used as an arrowhead -->
@@ -58,10 +54,8 @@ impl SvgWriter {
             "#
         )?;
 
-        writeln!(&mut w, "<g transform='scale({scale})'>")?;
-
         Ok(Self {
-            writer: Box::new(w),
+            writer: Box::new(writer),
             level: 1,
             bounds,
         })
@@ -125,7 +119,6 @@ impl SvgWriter {
 
     /// Finish this SVG. This method is also called in the Drop trait implementation.
     pub fn finish(&mut self) -> std::io::Result<()> {
-        writeln!(self.writer, "</g>")?;
         writeln!(self.writer, "</svg>")
     }
 }

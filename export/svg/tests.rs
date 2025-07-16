@@ -15,16 +15,8 @@ fn svg_writer() {
     // Write to file test.svg
     let file = std::fs::File::create("../target/svg_write.svg").expect("test error");
 
-    let mut svg = SvgWriter::new(
-        Box::new(file),
-        Some(geo::Rect::new(
-            geo::Point::new(0.0, 0.0),
-            geo::Point::new(100.0, 100.0),
-        ))
-        .into(),
-        1.0,
-    )
-    .expect("test error");
+    let mut svg = SvgWriter::new_canvas(Box::new(file), Size2D::A4.transposed().into(), None)
+        .expect("test error");
 
     geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0))
         .write_svg(
@@ -67,16 +59,8 @@ fn svg_writer() {
 fn svg_sample_sketch() -> std::io::Result<()> {
     let file = std::fs::File::create("../target/svg_sample_sketch.svg").expect("test error");
 
-    let mut svg = SvgWriter::new(
-        Box::new(file),
-        Some(geo::Rect::new(
-            geo::Point::new(0.0, 0.0),
-            geo::Point::new(100.0, 100.0),
-        ))
-        .into(),
-        1.0,
-    )
-    .expect("test error");
+    let mut svg = SvgWriter::new_canvas(Box::new(file), Size2D::A4.transposed().into(), None)
+        .expect("test error");
 
     let radius = 10.0;
     let width = 30.0;
@@ -92,14 +76,16 @@ fn svg_sample_sketch() -> std::io::Result<()> {
 
     Background.write_svg(
         &mut svg,
-        &attr.clone().fill(Color::from_str("white").unwrap()),
+        &attr
+            .clone()
+            .fill(Color::from_str("white").expect("A color")),
     )?;
     Grid::default().write_svg(&mut svg, &attr)?;
 
-    rect.write_svg(&mut svg, &attr);
+    rect.write_svg(&mut svg, &attr)?;
     CenteredText {
         text: "r".into(),
-        rect: rect.clone(),
+        rect,
         font_size: 12.0,
     }
     .write_svg(&mut svg, &attr)?;

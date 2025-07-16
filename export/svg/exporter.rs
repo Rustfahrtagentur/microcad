@@ -26,7 +26,7 @@ impl Exporter for SvgExporter {
         let f = std::fs::File::create(filename)?;
         use microcad_core::FetchBounds2D;
         let bounds = node.fetch_bounds_2d();
-        let mut writer = SvgWriter::new(Box::new(BufWriter::new(f)), bounds, 1.0)?;
+        let mut writer = SvgWriter::new_canvas(Box::new(BufWriter::new(f)), bounds, None)?;
 
         node.write_svg(&mut writer, &SvgTagAttributes::default())?;
         Ok(Value::None)
