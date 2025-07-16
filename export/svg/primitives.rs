@@ -3,7 +3,8 @@
 
 //! Scalable Vector Graphics (SVG) primitives (SvgWrite trait implementations).
 
-use geo::CoordsIter as _;
+use cgmath::{InnerSpace, Rad};
+use geo::{CoordsIter as _, Point, Rect, Translate};
 use microcad_core::*;
 use microcad_lang::model_tree::{Element, ModelNode, ModelNodeOutputType};
 
@@ -143,11 +144,12 @@ impl WriteSvg for ModelNode {
             }
             Element::Transform(affine_transform) => {
                 if !self_.is_empty() {
-                    writer.begin_transform(&affine_transform.mat2d(), &attr)?;
+                    writer
+                        .begin_group(&attr.clone().transform_matrix(&affine_transform.mat2d()))?;
                     self_
                         .children()
                         .try_for_each(|child| child.write_svg(writer, &attr))?;
-                    writer.end_transform()?;
+                    writer.end_group()?;
                 }
             }
             _ => {}
@@ -189,9 +191,21 @@ pub struct Grid {
     pub cell_size: Size2D,
 }
 
+impl Default for Grid {
+    fn default() -> Self {
+        Self {
+            bounds: Bounds2D::default(),
+            cell_size: Size2D {
+                width: 1.0,
+                height: 1.0,
+            },
+        }
+    }
+}
+
 impl WriteSvg for Grid {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
-        if let Some(rect) = self.bounds.rect() {
+        if let Some(rect) = self.bounds.rect().or(*writer.bounds().rect()) {
             self.bounds.write_svg(writer, attr)?;
 
             let mut left = rect.min().x;
@@ -210,11 +224,171 @@ impl WriteSvg for Grid {
             while bottom <= top {
                 Edge2D(
                     geo::Point::new(rect.min().x, bottom),
-                    geo::Point::new(rect.max().x, top),
+                    geo::Point::new(rect.max().x, bottom),
                 )
                 .write_svg(writer, attr)?;
                 bottom += self.cell_size.height;
             }
+        }
+        Ok(())
+    }
+}
+
+/// A struct for drawing a background.
+pub struct Background;
+
+impl WriteSvg for Background {
+    fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        let bounds = writer.bounds().clone();
+        bounds.write_svg(writer, attr)
+    }
+}
+
+/// A measure to measure a length of an edge.
+pub struct EdgeLengthMeasure {
+    // Optional name for this measure.
+    name: Option<String>,
+    // Edge.
+    edge: Edge2D,
+    // Offset (default = 10mm).
+    offset: Scalar,
+}
+
+impl EdgeLengthMeasure {
+    /// Height measure of a rect.
+    pub fn height(rect: &Rect, offset: Scalar, name: Option<&str>) -> Self {
+        Self {
+            name: name.map(|s| s.into()),
+            edge: Edge2D(
+                geo::Point::new(rect.min().x, rect.min().y),
+                geo::Point::new(rect.min().x, rect.max().y),
+            ),
+            offset,
+        }
+    }
+
+    /// Width measure of a rect.
+    pub fn width(rect: &Rect, offset: Scalar, name: Option<&str>) -> Self {
+        Self {
+            name: name.map(|s| s.into()),
+            edge: Edge2D(
+                geo::Point::new(rect.min().x, rect.min().y),
+                geo::Point::new(rect.max().x, rect.min().y),
+            ),
+            offset,
+        }
+    }
+}
+
+impl WriteSvg for EdgeLengthMeasure {
+    fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        let length = self.edge.vec().magnitude();
+
+        writer.begin_group(&attr.clone().transform_matrix(&self.edge.matrix()))?;
+
+        let center = self.offset / 2.0;
+        let bottom_left = Point::new(0.0, 0.0);
+        let bottom_right = Point::new(length, 0.0);
+        let top_left = Point::new(0.0, center);
+        let top_right = Point::new(length, center);
+
+        Edge2D(top_left, top_right).write_svg(
+            writer,
+            &attr.clone().marker_start("arrow").marker_end("arrow"),
+        )?;
+
+        Edge2D(bottom_left, Point::new(0.0, center * 1.5)).write_svg(writer, attr)?;
+        Edge2D(bottom_right, Point::new(length, center * 1.5)).write_svg(writer, attr)?;
+
+        CenteredText {
+            text: format!(
+                "{name}{length:.2}mm",
+                name = match &self.name {
+                    Some(name) => format!("{name} = "),
+                    None => String::new(),
+                },
+            ),
+            rect: Rect::new(bottom_left, top_right).translate(0.0, center),
+            font_size: 8.0,
+        }
+        .write_svg(writer, attr)?;
+
+        writer.end_group()
+    }
+}
+
+/// A radius measure with an offset.
+pub struct RadiusMeasure {
+    /// Name of this measurement.
+    pub name: Option<String>,
+    /// Circle to measure.
+    pub circle: Circle,
+    /// Angle of the measurement.
+    pub angle: Rad<Scalar>,
+}
+
+impl WriteSvg for RadiusMeasure {
+    fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        let edge = Edge2D::radius_edge(&self.circle, &self.angle);
+        edge.write_svg(writer, &attr.clone().marker_end("arrow"))?;
+        let center = edge.center();
+
+        CenteredText {
+            text: format!(
+                "{name}{radius:.2}mm",
+                name = match &self.name {
+                    Some(name) => format!("{name} = "),
+                    None => String::new(),
+                },
+                radius = self.circle.radius,
+            ),
+            rect: Rect::new(center, center),
+            font_size: 8.0,
+        }
+        .write_svg(writer, attr)?;
+
+        Ok(())
+    }
+}
+
+/// Size measure of a bounds.
+pub struct SizeMeasure {
+    /// Bounds to measure.
+    bounds: Bounds2D,
+    /// Width measure
+    width: Option<EdgeLengthMeasure>,
+    /// Height measure
+    height: Option<EdgeLengthMeasure>,
+}
+
+impl SizeMeasure {
+    /// Size measure for something that has bounds.
+    pub fn bounds<T: FetchBounds2D>(bounds: &T) -> Self {
+        let bounds = bounds.fetch_bounds_2d();
+
+        if let Some(rect) = bounds.rect() {
+            Self {
+                bounds: bounds.clone(),
+                width: Some(EdgeLengthMeasure::width(rect, 10.0, None)),
+                height: Some(EdgeLengthMeasure::height(rect, 10.0, None)),
+            }
+        } else {
+            Self {
+                bounds: bounds.clone(),
+                width: None,
+                height: None,
+            }
+        }
+    }
+}
+
+impl WriteSvg for SizeMeasure {
+    fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        if let Some(width) = &self.width {
+            width.write_svg(writer, attr)?;
+        }
+        if let Some(height) = &self.height {
+            height.write_svg(writer, attr)?;
         }
         Ok(())
     }

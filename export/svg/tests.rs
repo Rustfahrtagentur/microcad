@@ -3,7 +3,10 @@
 
 //! Scalable Vector Graphics (SVG) export tests
 
+use std::str::FromStr as _;
+
 use super::*;
+use cgmath::Rad;
 use geo::coord;
 use microcad_core::*;
 
@@ -61,7 +64,7 @@ fn svg_writer() {
 }
 
 #[test]
-fn svg_sample_sketch() {
+fn svg_sample_sketch() -> std::io::Result<()> {
     let file = std::fs::File::create("../target/svg_sample_sketch.svg").expect("test error");
 
     let mut svg = SvgWriter::new(
@@ -85,58 +88,55 @@ fn svg_sample_sketch() {
         offset: Vec2::new(width, height),
     };
 
-    /*
-    svg.background(Color::from_str("white"));
-    svg.grid(Grid::default());
+    let attr = SvgTagAttributes::default();
 
-    // Draw rectangle `r`.
-    svg.rect(&rect, attr);
-    svg.centered_text("r", &rect, Some("8mm".into()), None, attr);
+    Background.write_svg(
+        &mut svg,
+        &attr.clone().fill(Color::from_str("white").unwrap()),
+    )?;
+    Grid::default().write_svg(&mut svg, &attr)?;
+
+    rect.write_svg(&mut svg, &attr);
+    CenteredText {
+        text: "r".into(),
+        rect: rect.clone(),
+        font_size: 12.0,
+    }
+    .write_svg(&mut svg, &attr)?;
 
     // Draw rectangle measures
-    let offset = 15.0;
-    // Height measure.
-    svg.edge_measure(
-        &format!("height = {height}mm"),
-        Edge2D(rect.min(), rect.min() + geo::Point(0.0, rect.max().y)),
-        offset,
-        attr,
-    );
 
-    // Width measure.
-    svg.edge_measure(
-        &format!("height = {width}mm"),
-        Edge2D(rect.min(), rect.min() + geo::Point(rect.max().x, 0.0)),
-        offset,
-        attr,
-    );
+    // Height measure for rect.
+    EdgeLengthMeasure::height(&rect, 10.0, Some("height")).write_svg(&mut svg, &attr)?;
+    // Width measure for rect.
+    EdgeLengthMeasure::width(&rect, 10.0, Some("width")).write_svg(&mut svg, &attr)?;
 
     // Draw circle `c`.
-    svg.circle(&circle, attr);
-    svg.centered_text(
-        "c",
-        &circle.fetch_bounds_2d().rect().unwrap(),
-        Some("8mm".into()),
-        None,
-        attr,
-    );
+    circle.write_svg(&mut svg, &attr)?;
+    CenteredText {
+        text: "c".into(),
+        rect: circle.fetch_bounds_2d().rect().expect("Rect"),
+        font_size: 12.0,
+    }
+    .write_svg(&mut svg, &attr)?;
 
-    // Draw circle measures
-    svg.radius_measure(&format!("radius = {radius}mm"), &circle, 45.0);
+    RadiusMeasure {
+        name: Some("radius".into()),
+        circle: circle.clone(),
+        angle: Rad(45.0),
+    }
+    .write_svg(&mut svg, &attr)?;
 
     // Draw intersection.
     let intersection = Geometry2D::Rect(rect)
         .boolean_op(
             &RenderResolution::default(),
-            &Geometry2D::Circle(circle),
+            &Geometry2D::Circle(circle.clone()),
             &BooleanOp::Intersection,
         )
         .expect("Some geometry");
 
-    svg.geometry(&intersection, attr);
+    intersection.write_svg(&mut svg, &attr)?;
 
-    let bounds = geometry.fetch_bounds_2d();
-    svg.size_measure("mm", bounds);
-
-    */
+    SizeMeasure::bounds(&intersection).write_svg(&mut svg, &attr)
 }

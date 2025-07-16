@@ -123,32 +123,6 @@ impl SvgWriter {
         self.close_tag("g")
     }
 
-    /// Begin a SVG transformation <g>
-    pub fn begin_transform(
-        &mut self,
-        transform: &microcad_core::Mat3,
-        attr: &SvgTagAttributes,
-    ) -> std::io::Result<()> {
-        let (a, b, c, d, e, f) = (
-            transform.x.x,
-            transform.x.y,
-            transform.y.x,
-            transform.y.y,
-            transform.z.x,
-            transform.z.y,
-        );
-
-        self.open_tag(
-            &format!("g transform=\"matrix({a} {b} {c} {d} {e} {f})\""),
-            attr,
-        )
-    }
-
-    /// End a SVG transformation group `</g>`.
-    pub fn end_transform(&mut self) -> std::io::Result<()> {
-        self.end_group()
-    }
-
     /// Finish this SVG. This method is also called in the Drop trait implementation.
     pub fn finish(&mut self) -> std::io::Result<()> {
         writeln!(self.writer, "</g>")?;

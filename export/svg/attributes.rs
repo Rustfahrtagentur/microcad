@@ -4,7 +4,7 @@
 //! Scalable Vector Graphics (SVG) tag attributes
 
 use derive_more::Deref;
-use microcad_core::Scalar;
+use microcad_core::{Color, Scalar};
 use microcad_lang::{
     model_tree::{GetAttribute, ModelNode},
     syntax::Identifier,
@@ -14,6 +14,16 @@ use microcad_lang::{
 #[derive(Debug, Clone, Default, Deref)]
 pub struct SvgTagAttributes(std::collections::BTreeMap<String, String>);
 
+/// Generic methods.
+impl SvgTagAttributes {
+    /// Merge tags with others.
+    pub fn merge(mut self, mut other: Self) -> Self {
+        self.0.append(&mut other.0);
+        self
+    }
+}
+
+/// Methods for inserting specific tag attributes.
 impl SvgTagAttributes {
     fn _insert(mut self, attr: &str, value: String) -> Self {
         if !value.is_empty() {
@@ -37,10 +47,15 @@ impl SvgTagAttributes {
         self._insert("font-size", format!("{}mm", font_size as i64))
     }
 
-    /// Merge tags with others.
-    pub fn merge(mut self, mut other: Self) -> Self {
-        self.0.append(&mut other.0);
-        self
+    /// Fill attribute with a color.
+    pub fn fill(self, color: Color) -> Self {
+        self._insert("fill", color.to_svg_color())
+    }
+
+    /// Transform by mat3 matrix attribute.
+    pub fn transform_matrix(self, m: &microcad_core::Mat3) -> Self {
+        let (a, b, c, d, e, f) = (m.x.x, m.x.y, m.y.x, m.y.y, m.z.x, m.z.y);
+        self._insert("transform", format!("matrix({a} {b} {c} {d} {e} {f})"))
     }
 }
 
@@ -53,7 +68,7 @@ impl From<&ModelNode> for SvgTagAttributes {
             node.get_color_attribute(),
         ) {
             (None, None) => SvgTagAttributes::default(),
-            (None, Some(color)) => [("fill", Some(color.to_svg_color()))].into_iter().collect(),
+            (None, Some(color)) => SvgTagAttributes::default().fill(color),
             // If boths attributes are present, get style and fill from exporter attributes. Color attribute is ignored.
             (Some(attributes), None) | (Some(attributes), Some(_)) => [
                 (
