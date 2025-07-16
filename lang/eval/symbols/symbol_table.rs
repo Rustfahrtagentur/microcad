@@ -244,7 +244,7 @@ impl Locals for SymbolTable {
         self.stack.set_local_value(id, value)
     }
 
-    fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value> {
+    fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
         self.stack.get_local_value(id)
     }
 
@@ -258,6 +258,10 @@ impl Locals for SymbolTable {
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         self.stack.fetch(id)
+    }
+
+    fn get_node_builder(&self) -> EvalResult<RcMut<crate::model_tree::ModelNodeBuilder>> {
+        self.stack.get_node_builder()
     }
 }
 

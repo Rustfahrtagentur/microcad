@@ -4,7 +4,7 @@
 //! Export attribute.
 
 /// The output type of the [`ModelNode`].
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub enum ModelNodeOutputType {
     /// The output type has not yet been determined.
     #[default]
@@ -21,11 +21,11 @@ impl ModelNodeOutputType {
     /// Merge this output type with another.
     pub fn merge(&self, other: &Self) -> ModelNodeOutputType {
         match (self, other) {
-            (ModelNodeOutputType::NotDetermined, node_output_type) => node_output_type.clone(),
+            (ModelNodeOutputType::NotDetermined, node_output_type) => *node_output_type,
             (ModelNodeOutputType::Geometry2D, ModelNodeOutputType::NotDetermined)
             | (ModelNodeOutputType::Geometry2D, ModelNodeOutputType::Geometry2D)
             | (ModelNodeOutputType::Geometry3D, ModelNodeOutputType::NotDetermined)
-            | (ModelNodeOutputType::Geometry3D, ModelNodeOutputType::Geometry3D) => self.clone(),
+            | (ModelNodeOutputType::Geometry3D, ModelNodeOutputType::Geometry3D) => *self,
             (ModelNodeOutputType::Geometry2D, ModelNodeOutputType::Geometry3D)
             | (ModelNodeOutputType::Geometry3D, ModelNodeOutputType::Geometry2D)
             | (ModelNodeOutputType::Geometry2D, ModelNodeOutputType::InvalidMixed)

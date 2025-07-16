@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, resolve::*};
+use crate::{eval::*, model_tree::*, rc::*, resolve::*};
 
 /// A stack with a list of stack frames.
 ///
@@ -147,13 +147,20 @@ impl Locals for Stack {
         }
     }
 
-    fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value> {
+    fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
         match self.fetch(id) {
             Ok(symbol) => match &symbol.borrow().def {
                 SymbolDefinition::Constant(_, value) => Ok(value.clone()),
                 _ => Err(EvalError::LocalNotFound(id.clone())),
             },
             Err(_) => Err(EvalError::LocalNotFound(id.clone())),
+        }
+    }
+
+    fn get_node_builder(&self) -> EvalResult<RcMut<ModelNodeBuilder>> {
+        match self.current_frame() {
+            Some(StackFrame::Workbench(node_builder, _, _)) => Ok(node_builder.clone()),
+            _ => unreachable!("missing node builder"),
         }
     }
 

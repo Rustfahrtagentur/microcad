@@ -29,7 +29,7 @@ impl ModelNode {
             output_type = children.deduce_output_type();
         }
 
-        self_.output = ModelNodeOutput::new(output_type.clone());
+        self_.output = ModelNodeOutput::new(output_type);
 
         output_type
     }

@@ -18,44 +18,46 @@ impl WorkbenchDefinition {
             id = self.id,
             kind = self.kind
         );
-        context.scope(
-            StackFrame::Workbench(self.kind, self.id.clone(), arguments.into()),
-            |context| {
-                let mut node_builder = match self.kind {
-                    WorkbenchKind::Part => ModelNodeBuilder::new_3d_object(),
-                    WorkbenchKind::Sketch => ModelNodeBuilder::new_2d_object(),
-                    WorkbenchKind::Operation => ModelNodeBuilder::new_object_body(),
-                }
-                .properties(ObjectProperties::from_parameters_and_arguments(
-                    &self.plan.eval(context)?,
-                    arguments,
-                ));
-                log::trace!("Prepared node builder:\n{node_builder}");
+        let node_builder = match self.kind {
+            WorkbenchKind::Part => ModelNodeBuilder::new_3d_object(),
+            WorkbenchKind::Sketch => ModelNodeBuilder::new_2d_object(),
+            WorkbenchKind::Operation => ModelNodeBuilder::new_object_body(),
+        }
+        .properties(ObjectProperties::from_parameters_and_arguments(
+            &self.plan.eval(context)?,
+            arguments,
+        ));
 
+        context.scope(
+            StackFrame::Workbench(node_builder.into(), self.id.clone(), arguments.into()),
+            |context| {
                 // Create the object node from initializer if present
                 if let Some(init) = init {
                     log::trace!("Initializing`{id}` {kind}", id = self.id, kind = self.kind);
-                    init.eval(arguments, &mut node_builder, context)?;
+                    init.eval(arguments, context)?;
                 }
 
-                node_builder.properties.eval(context)?;
+                let node_builder = context.get_node_builder()?;
+                {
+                    let mut node_builder = node_builder.borrow_mut();
+                    node_builder.properties.eval(context)?;
 
-                // At this point, all properties must have a value
-                log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
-                for statement in self.body.statements.iter() {
-                    match statement {
-                        Statement::Assignment(assignment) => {
-                            assignment.eval(context)?;
+                    // At this point, all properties must have a value
+                    log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
+                    for statement in self.body.statements.iter() {
+                        match statement {
+                            Statement::Assignment(assignment) => {
+                                assignment.eval(context)?;
+                            }
+                            Statement::Expression(expression) => {
+                                node_builder.add_children2(expression.eval(context)?)?;
+                            }
+                            Statement::Init(_) => (),
+                            _ => todo!("Evaluate statement: {statement}"),
                         }
-                        Statement::Expression(expression) => {
-                            node_builder = node_builder.add_children(expression.eval(context)?)?;
-                        }
-                        Statement::Init(_) => (),
-                        _ => todo!("Evaluate statement: {statement}"),
                     }
                 }
-
-                let node = node_builder.build();
+                let node = node_builder.take().build();
                 {
                     let mut node_ = node.borrow_mut();
                     node_.origin.arguments = arguments.clone();

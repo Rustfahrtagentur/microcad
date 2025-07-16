@@ -11,7 +11,7 @@ pub use stack::*;
 pub use stack_frame::*;
 pub use symbol_table::*;
 
-use crate::{eval::*, syntax::*};
+use crate::{eval::*, model_tree::*, rc::*, syntax::*};
 
 /// Trait to handle symbol table.
 pub trait Lookup {
@@ -50,5 +50,8 @@ pub trait Locals {
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()>;
 
     /// Get a named local value from locals.
-    fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value>;
+    fn get_local_value(&self, id: &Identifier) -> EvalResult<Value>;
+
+    /// Get current model node builder
+    fn get_node_builder(&self) -> EvalResult<RcMut<ModelNodeBuilder>>;
 }

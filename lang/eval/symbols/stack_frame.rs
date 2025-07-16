@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::eval::*;
+use crate::{eval::*, model_tree::*, rc::*};
 
 /// Frame in [Stack] for *local variables*, *aliases* (*use statements*) and *calls*.
 ///
@@ -21,7 +21,7 @@ pub enum StackFrame {
     /// Module scope with locals.
     Module(Identifier, SymbolMap),
     /// Part scope with locals.
-    Workbench(WorkbenchKind, Identifier, SymbolMap),
+    Workbench(RcMut<ModelNodeBuilder>, Identifier, SymbolMap),
     /// initializer scope with locals.
     Init(SymbolMap),
     /// Body (scope)  with locals.
@@ -57,8 +57,13 @@ impl StackFrame {
                 writeln!(f, "{:depth$}{id} (source):", "")?;
                 map
             }
-            StackFrame::Workbench(kind, id, symbols) => {
-                writeln!(f, "{:depth$}{id} ({kind})", "")?;
+            StackFrame::Workbench(node_builder, id, symbols) => {
+                writeln!(
+                    f,
+                    "{:depth$}{id} ({kind})",
+                    "",
+                    kind = node_builder.borrow().kind()
+                )?;
                 return symbols.print(f, depth + 4);
             }
             StackFrame::Init(symbols) => {

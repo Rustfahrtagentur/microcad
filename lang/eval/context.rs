@@ -154,7 +154,7 @@ impl Locals for Context {
         self.symbol_table.set_local_value(id, value)
     }
 
-    fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value> {
+    fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
         self.symbol_table.get_local_value(id)
     }
 
@@ -168,6 +168,10 @@ impl Locals for Context {
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         self.symbol_table.fetch(id)
+    }
+
+    fn get_node_builder(&self) -> EvalResult<RcMut<crate::model_tree::ModelNodeBuilder>> {
+        self.symbol_table.get_node_builder()
     }
 }
 
