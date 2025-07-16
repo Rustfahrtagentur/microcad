@@ -18,4 +18,12 @@ impl Size2D {
         width: 210.0,
         height: 297.0,
     };
+
+    /// Calculate transposed version of this size.
+    pub fn transposed(self) -> Self {
+        Self {
+            width: self.height,
+            height: self.width,
+        }
+    }
 }

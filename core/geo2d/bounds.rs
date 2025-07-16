@@ -5,7 +5,7 @@
 
 use geo::{AffineOps, AffineTransform, coord};
 
-use crate::{Scalar, Transformed2D, Vec2, geo2d::Rect, mat3_to_affine_transform};
+use crate::{Scalar, Size2D, Transformed2D, Vec2, geo2d::Rect, mat3_to_affine_transform};
 
 /// 2D bounds, essentially an optional bounding rect.
 #[derive(Debug, Default, Clone)]
@@ -33,6 +33,16 @@ impl Bounds2D {
     /// Maximum corner.
     pub fn max(&self) -> Option<Vec2> {
         self.0.as_ref().map(|s| Vec2::new(s.max().x, s.max().y))
+    }
+
+    /// Calculate width of these bounds or 0 if bounds are invalid.
+    pub fn width(&self) -> Scalar {
+        self.0.as_ref().map(|r| r.width()).unwrap_or_default()
+    }
+
+    /// Calculate height of these bounds or 0 if bounds are invalid.
+    pub fn height(&self) -> Scalar {
+        self.0.as_ref().map(|r| r.height()).unwrap_or_default()
     }
 
     /// Return rect.
@@ -86,6 +96,12 @@ impl From<Option<Rect>> for Bounds2D {
             Some(rect) => Self::new(rect.min().x_y().into(), rect.max().x_y().into()),
             None => Self(None),
         }
+    }
+}
+
+impl From<Size2D> for Bounds2D {
+    fn from(value: Size2D) -> Self {
+        Self::new(Vec2::new(0.0, 0.0), Vec2::new(value.width, value.height))
     }
 }
 
