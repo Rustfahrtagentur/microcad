@@ -3,7 +3,8 @@
 
 //! Model node
 
-use crate::{model_tree::*, resolve::*, src_ref::*, syntax::*};
+use crate::{model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*};
+use microcad_core::{Geometry2D, Geometry3D};
 
 /// The actual node contents
 #[derive(custom_debug::Debug, Default)]
@@ -66,5 +67,29 @@ impl ModelNodeInner {
     pub(crate) fn set_creator(&mut self, creator: Symbol, call_src_ref: SrcRef) {
         self.origin.creator = Some(creator);
         self.origin.call_src_ref = call_src_ref;
+    }
+}
+
+impl From<Object> for ModelNodeInner {
+    fn from(object: Object) -> Self {
+        Self::new(Refer::none(Element::Object(object)))
+    }
+}
+
+impl From<Rc<Geometry2D>> for ModelNodeInner {
+    fn from(geometry: Rc<Geometry2D>) -> Self {
+        Self::new(Refer::none(Element::Primitive2D(geometry)))
+    }
+}
+
+impl From<Rc<Geometry3D>> for ModelNodeInner {
+    fn from(geometry: Rc<Geometry3D>) -> Self {
+        Self::new(Refer::none(Element::Primitive3D(geometry)))
+    }
+}
+
+impl From<AffineTransform> for ModelNodeInner {
+    fn from(transform: AffineTransform) -> Self {
+        ModelNodeInner::new(Refer::none(Element::Transform(transform)))
     }
 }

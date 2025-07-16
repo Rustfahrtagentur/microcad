@@ -30,7 +30,7 @@ impl<'a> ModelNodeBuilder<'a> {
     /// Create a new object from a body `{ ... }`.
     pub fn new_object_body() -> Self {
         Self {
-            inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
+            inner: Object::default().into(),
             ..Default::default()
         }
     }
@@ -40,7 +40,7 @@ impl<'a> ModelNodeBuilder<'a> {
     /// This function is used when a call to a sketch is evaluated.
     pub fn new_2d_object() -> Self {
         Self {
-            inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
+            inner: Object::default().into(),
             output: ModelNodeOutputType::Geometry2D,
             ..Default::default()
         }
@@ -59,7 +59,7 @@ impl<'a> ModelNodeBuilder<'a> {
     /// This function is used when a call to a part is evaluated.
     pub fn new_3d_object() -> Self {
         Self {
-            inner: ModelNodeInner::new(Refer::none(Element::Object(Object::default()))),
+            inner: Object::default().into(),
             output: ModelNodeOutputType::Geometry3D,
             ..Default::default()
         }
@@ -68,7 +68,7 @@ impl<'a> ModelNodeBuilder<'a> {
     /// New 2D primitive.
     pub fn new_2d_primitive(geometry: std::rc::Rc<Geometry2D>) -> Self {
         Self {
-            inner: ModelNodeInner::new(Refer::none(Element::Primitive2D(geometry))),
+            inner: geometry.into(),
             output: ModelNodeOutputType::Geometry2D,
             ..Default::default()
         }
@@ -77,7 +77,7 @@ impl<'a> ModelNodeBuilder<'a> {
     /// New 3D primitive.
     pub fn new_3d_primitive(geometry: std::rc::Rc<Geometry3D>) -> Self {
         Self {
-            inner: ModelNodeInner::new(Refer::none(Element::Primitive3D(geometry))),
+            inner: geometry.into(),
             output: ModelNodeOutputType::Geometry3D,
             ..Default::default()
         }
@@ -86,7 +86,7 @@ impl<'a> ModelNodeBuilder<'a> {
     /// New transform.
     pub fn new_transform(transform: AffineTransform) -> Self {
         Self {
-            inner: ModelNodeInner::new(Refer::none(Element::Transform(transform))),
+            inner: transform.into(),
             ..Default::default()
         }
     }
