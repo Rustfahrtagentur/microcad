@@ -3,76 +3,18 @@
 
 //! Model node
 
-use crate::{
-    GetPropertyValue, diag::WriteToFile, model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*,
-    value::*,
-};
+mod model_node_builder;
+mod model_node_inner;
+mod model_nodes;
+mod origin;
 
+pub use model_node_builder::*;
+pub use model_node_inner::*;
+pub use model_nodes::*;
+pub use origin::*;
+
+use crate::{GetPropertyValue, diag::WriteToFile, model_tree::*, rc::*, syntax::*, value::*};
 use microcad_core::*;
-
-/// The actual node contents
-#[derive(custom_debug::Debug, Default)]
-pub struct ModelNodeInner {
-    /// Optional id.
-    ///
-    /// The id is set when the model node was created by an assignment: `a = cube(50mm)`.
-    pub id: Option<Identifier>,
-    /// Parent object.
-    #[debug(skip)]
-    pub parent: Option<ModelNode>,
-    /// Children of the model node.
-    pub children: ModelNodes,
-    /// Element of the node with [SrcRef].
-    pub element: Refer<Element>,
-    /// Attributes used for export.
-    pub attributes: Attributes,
-    /// The symbol (e.g. [`WorkbenchDefinition`]) that created this [`ModelNode`].
-    pub origin: ModelNodeOrigin,
-    /// The output type of the this node.
-    pub output: ModelNodeOutput,
-}
-
-impl ModelNodeInner {
-    /// Create a new [`ModelNodeInner`] with a specific element.
-    pub fn new(element: Refer<Element>) -> Self {
-        Self {
-            element,
-            ..Default::default()
-        }
-    }
-
-    /// Clone only the content of this node without children and parent.
-    pub fn clone_content(&self) -> Self {
-        Self {
-            id: self.id.clone(),
-            parent: None,
-            element: self.element.clone(),
-            attributes: self.attributes.clone(),
-            origin: self.origin.clone(),
-            output: self.output.clone(),
-            ..Default::default()
-        }
-    }
-
-    /// Return iterator of children.s
-    pub fn children(&self) -> std::slice::Iter<'_, ModelNode> {
-        self.children.iter()
-    }
-
-    /// Return if node has no children.
-    pub fn is_empty(&self) -> bool {
-        self.children.is_empty()
-    }
-
-    /// Set the information about the creator of this node.
-    ///
-    /// This function is called after the resulting nodes of a call of a part
-    /// have been retrieved.   
-    pub(crate) fn set_creator(&mut self, creator: Symbol, call_src_ref: SrcRef) {
-        self.origin.creator = Some(creator);
-        self.origin.call_src_ref = call_src_ref;
-    }
-}
 
 /// A reference counted, mutable [`ModelNode`].
 #[derive(Debug, Clone)]
