@@ -3,11 +3,21 @@
 
 //! Scalable Vector Graphics (SVG) export
 
+mod attributes;
 pub mod exporter;
+mod primitives;
 pub mod writer;
 
 #[cfg(test)]
 mod tests;
 
+pub use attributes::SvgTagAttributes;
 pub use exporter::*;
+pub use primitives::*;
 pub use writer::*;
+
+/// Trait to write something into an SVG.
+pub trait WriteSvg {
+    /// Write SVG tags.
+    fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()>;
+}

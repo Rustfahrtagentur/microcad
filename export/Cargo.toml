@@ -17,6 +17,7 @@ microcad-core = { workspace = true }
 microcad-lang = { workspace = true }
 
 cgmath = "0.18"
+derive_more = { version = "2", features = ["deref", "deref_mut"] }
 geo = "0.30"
 thiserror = "2.0.12"
 

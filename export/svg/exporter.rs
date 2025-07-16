@@ -7,7 +7,7 @@ use std::io::BufWriter;
 
 use microcad_lang::{Id, builtin::*, model_tree::*, parameter, value::*};
 
-use crate::svg::writer::SvgWriter;
+use crate::svg::{SvgTagAttributes, WriteSvg, writer::SvgWriter};
 
 /// SVG Exporter
 pub struct SvgExporter;
@@ -28,8 +28,7 @@ impl Exporter for SvgExporter {
         let bounds = node.fetch_bounds_2d();
         let mut writer = SvgWriter::new(Box::new(BufWriter::new(f)), bounds, 1.0)?;
 
-        writer.node(node)?;
-
+        node.write_svg(&mut writer, &SvgTagAttributes::default())?;
         Ok(Value::None)
     }
 

@@ -23,44 +23,41 @@ fn svg_writer() {
     )
     .expect("test error");
 
-    let rect = geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0));
-    svg.rect(
-        &rect,
-        &[("style", Some("fill:blue;".into()))].into_iter().collect(),
-    )
-    .expect("test error");
+    geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0))
+        .write_svg(
+            &mut svg,
+            &[("style", Some("fill:blue;".into()))].into_iter().collect(),
+        )
+        .expect("test error");
 
-    let circle = geo2d::Circle {
+    geo2d::Circle {
         radius: 10.0,
         offset: Vec2::new(50.0, 50.0),
-    };
-    svg.circle(
-        &circle,
+    }
+    .write_svg(
+        &mut svg,
         &[("style", Some("fill:red;".into()))].into_iter().collect(),
     )
     .expect("test error");
 
-    let line = Edge2D(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
-    svg.edge(
-        &line,
-        &[("style", Some("stroke:black;".into()))]
-            .into_iter()
-            .collect(),
-        None,
-        None,
-    )
-    .expect("test error");
+    Edge2D(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0))
+        .write_svg(
+            &mut svg,
+            &[("style", Some("stroke:black;".into()))]
+                .into_iter()
+                .collect(),
+        )
+        .expect("test error");
 
-    let arrow = Edge2D(geo::Point::new(100.0, 0.0), geo::Point::new(0.0, 100.0));
-    svg.edge(
-        &arrow.shorter(6.0),
-        &[("style", Some("stroke:black;".into()))]
-            .into_iter()
-            .collect(),
-        Some("arrow".into()),
-        Some("arrow".into()),
-    )
-    .expect("test error");
+    Edge2D(geo::Point::new(100.0, 0.0), geo::Point::new(0.0, 100.0))
+        .shorter(6.0)
+        .write_svg(
+            &mut svg,
+            &[("style", Some("stroke:black;".into()))]
+                .into_iter()
+                .collect(),
+        )
+        .expect("test error");
 }
 
 #[test]
