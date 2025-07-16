@@ -3,6 +3,9 @@
 
 //! Scalable Vector Graphics (SVG) file writer
 
+use std::collections::BTreeMap;
+
+use derive_more::Deref;
 use geo::{CoordsIter, coord};
 use microcad_core::*;
 use microcad_lang::{
@@ -16,20 +19,15 @@ pub struct SvgWriter {
     level: usize,
 }
 
-/// Tag attributes for an SVG tag.
-#[derive(Debug, Clone, Default)]
-pub struct SvgStyleAttributes {
-    /// Style attribute.
-    pub style: Option<String>,
-    /// Fill attribute. Used when color attribute of a node is set.
-    pub fill: Option<String>,
+/// Trait to write something into an SVG.
+pub trait WriteSvg {
+    /// Write SVG tags.
+    fn write_svg(&self, writer: &mut SvgWriter) -> std::io::Result<()>;
 }
 
-impl SvgStyleAttributes {
-    fn is_empty(&self) -> bool {
-        self.style.is_none() && self.fill.is_none()
-    }
-}
+/// Tag attributes for an SVG tag.
+#[derive(Debug, Clone, Default, Deref)]
+pub struct SvgStyleAttributes(BTreeMap<String, String>);
 
 impl From<&ModelNode> for SvgStyleAttributes {
     fn from(node: &ModelNode) -> Self {
@@ -40,31 +38,49 @@ impl From<&ModelNode> for SvgStyleAttributes {
             node.get_color_attribute(),
         ) {
             (None, None) => SvgStyleAttributes::default(),
-            (None, Some(color)) => SvgStyleAttributes {
-                style: None,
-                fill: Some(color.to_svg_color()),
-            },
+            (None, Some(color)) => [("fill", Some(color.to_svg_color()))].into_iter().collect(),
             // If boths attributes are present, get style and fill from exporter attributes. Color attribute is ignored.
-            (Some(attributes), None) | (Some(attributes), Some(_)) => SvgStyleAttributes {
-                style: attributes
-                    .by_id(&Identifier::no_ref("style"))
-                    .map(|value| value.try_string().unwrap_or_default()),
-                fill: attributes
-                    .by_id(&Identifier::no_ref("fill"))
-                    .map(|value| value.try_string().unwrap_or_default()),
-            },
+            (Some(attributes), None) | (Some(attributes), Some(_)) => [
+                (
+                    "style",
+                    attributes
+                        .by_id(&Identifier::no_ref("style"))
+                        .map(|value| value.try_string().unwrap_or_default()),
+                ),
+                (
+                    "fill",
+                    attributes
+                        .by_id(&Identifier::no_ref("fill"))
+                        .map(|value| value.try_string().unwrap_or_default()),
+                ),
+            ]
+            .into_iter()
+            .collect(),
         }
     }
 }
 
 impl std::fmt::Display for SvgStyleAttributes {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match (&self.style, &self.fill) {
-            (None, None) => Ok(()),
-            (None, Some(fill)) => write!(f, "fill=\"{fill}\""),
-            (Some(style), None) => write!(f, "style=\"{style}\""),
-            (Some(style), Some(fill)) => write!(f, "fill=\"{fill}\" style=\"{style}\""),
-        }
+        write!(
+            f,
+            "{}",
+            self.0
+                .iter()
+                .map(|(attr, value)| { format!("{attr}=\"{value}\"") })
+                .collect::<Vec<_>>()
+                .join(" ")
+        )
+    }
+}
+
+impl<'a> FromIterator<(&'a str, Option<String>)> for SvgStyleAttributes {
+    fn from_iter<T: IntoIterator<Item = (&'a str, Option<String>)>>(iter: T) -> Self {
+        Self(
+            iter.into_iter()
+                .filter_map(|(attr, value)| value.map(|value| (attr.to_string(), value)))
+                .collect(),
+        )
     }
 }
 

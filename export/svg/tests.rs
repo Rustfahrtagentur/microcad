@@ -3,8 +3,6 @@
 
 //! Scalable Vector Graphics (SVG) export tests
 
-use std::str::FromStr;
-
 use super::*;
 use geo::coord;
 use microcad_core::*;
@@ -28,10 +26,7 @@ fn svg_writer() {
     let rect = geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0));
     svg.rect(
         &rect,
-        &SvgStyleAttributes {
-            style: Some("fill:blue;".into()),
-            fill: None,
-        },
+        &[("style", Some("fill:blue;".into()))].into_iter().collect(),
     )
     .expect("test error");
 
@@ -41,20 +36,16 @@ fn svg_writer() {
     };
     svg.circle(
         &circle,
-        &SvgStyleAttributes {
-            style: Some("fill:red;".into()),
-            fill: None,
-        },
+        &[("style", Some("fill:red;".into()))].into_iter().collect(),
     )
     .expect("test error");
 
     let line = Edge2D(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0));
     svg.edge(
         &line,
-        &SvgStyleAttributes {
-            style: Some("stroke:black;".into()),
-            fill: None,
-        },
+        &[("style", Some("stroke:black;".into()))]
+            .into_iter()
+            .collect(),
         None,
         None,
     )
@@ -63,10 +54,9 @@ fn svg_writer() {
     let arrow = Edge2D(geo::Point::new(100.0, 0.0), geo::Point::new(0.0, 100.0));
     svg.edge(
         &arrow.shorter(6.0),
-        &SvgStyleAttributes {
-            style: Some("stroke:black;".into()),
-            fill: None,
-        },
+        &[("style", Some("stroke:black;".into()))]
+            .into_iter()
+            .collect(),
         Some("arrow".into()),
         Some("arrow".into()),
     )
