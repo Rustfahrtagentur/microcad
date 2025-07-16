@@ -14,9 +14,14 @@ pub struct Bounds2D(Option<Rect>);
 impl Bounds2D {
     /// Create new 2D bounds.
     pub fn new(min: Vec2, max: Vec2) -> Self {
+        let min_x = min.x.min(max.x);
+        let min_y = min.y.min(max.y);
+        let max_x = min.x.max(max.x);
+        let max_y = min.y.max(max.y);
+
         Self(Some(Rect::new(
-            coord! { x: min.x, y: min.y},
-            coord! { x: max.x, y: max.y},
+            coord! { x: min_x, y: min_y},
+            coord! { x: max_x, y: max_y},
         )))
     }
 
