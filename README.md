@@ -29,6 +29,7 @@ Simple basic shapes can be composed to create complex geometries which then can 
   - [Contributing to Documentation](#contributing-to-documentation)
     - [User Manual](#user-manual)
 - [Test List](#test-list)
+- [💚 Funded by](#-funded-by)
 
 ## Quick Start
 
@@ -201,3 +202,13 @@ You may also give the reader access to the logs by clicking on the banner with:
 ## Test List
 
 There is a [list of all tests](doc/test_list.md) included in this documentation.
+
+## 💚 Funded by
+
+Thanks to the [Prototype Fund](https://www.prototypefund.de/) and the [Federal Ministry of Research, Technology and Space](https://www.bmbf.de/EN/) for funding this project in 2025.
+
+<a href="https://prototypefund.de/en/"><img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Prototype_Fund_Logo_2025.svg" alt="Logo of the Prototype Fund" style="height: 70px;"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://okfn.de/en/"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Open_Knowledge_Foundation_Deutschland_Logo.svg" alt="Logo of the Open Knowledge Foundation Germany" style="height: 100px;"></a>
+&nbsp;&nbsp;
+<a href="https://www.bmbf.de/EN/"><img src="https://upload.wikimedia.org/wikipedia/commons/d/df/BMFTR_Logo.svg" alt="Logo of the German Federal Ministry of Research, Technology and Space" style="height: 110px;"></a>
