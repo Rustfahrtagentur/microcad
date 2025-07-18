@@ -5,7 +5,7 @@
 
 use derive_more::{Deref, DerefMut};
 
-use crate::{model_tree::*, syntax::Identifier};
+use crate::{model::*, syntax::Identifier};
 
 /// Model attributes, from an evaluated attribute list.
 #[derive(Clone, Debug, Default, Deref, DerefMut)]

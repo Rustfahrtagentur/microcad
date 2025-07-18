@@ -3,7 +3,7 @@
 
 //! Algorithm
 
-use crate::model_tree::*;
+use crate::model::*;
 use microcad_core::*;
 
 /// Operation trait.

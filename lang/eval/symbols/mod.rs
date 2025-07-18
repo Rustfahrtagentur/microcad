@@ -11,7 +11,7 @@ pub use stack::*;
 pub use stack_frame::*;
 pub use symbol_table::*;
 
-use crate::{eval::*, model_tree::ModelBuilder, rc::RcMut, syntax::*};
+use crate::{eval::*, model::ModelBuilder, rc::RcMut, syntax::*};
 
 /// Trait to handle symbol table.
 pub trait Lookup {

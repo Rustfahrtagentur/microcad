@@ -17,7 +17,7 @@ use crate::{syntax::Identifier, value::Value};
 pub mod builtin;
 pub mod diag;
 pub mod eval;
-pub mod model_tree;
+pub mod model;
 pub mod ord_map;
 pub mod parse;
 pub mod parser;
@@ -80,11 +80,7 @@ pub fn shorten(what: &str, max_chars: usize) -> String {
             if p == max_chars {
                 Some('…')
             } else if p < max_chars {
-                if ch == '\n' {
-                    Some('⏎')
-                } else {
-                    Some(ch)
-                }
+                if ch == '\n' { Some('⏎') } else { Some(ch) }
             } else {
                 None
             }

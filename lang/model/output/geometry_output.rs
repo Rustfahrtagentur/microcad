@@ -5,7 +5,7 @@
 
 use microcad_core::{Geometries2D, Geometries3D};
 
-use crate::model_tree::OutputType;
+use crate::model::OutputType;
 
 /// Geometry output of the model.
 #[derive(Debug, Default, Clone)]

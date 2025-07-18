@@ -3,7 +3,7 @@
 
 //! Model tree module
 
-use crate::{model_tree::*, resolve::*, src_ref::*, syntax::SourceFile};
+use crate::{model::*, resolve::*, src_ref::*, syntax::SourceFile};
 use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 

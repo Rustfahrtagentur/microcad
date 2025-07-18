@@ -1,21 +1,45 @@
-// Copyright © 2025 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Model
+//! Model tree module
 
-mod model_builder;
-mod model_inner;
-mod models;
-mod origin;
+pub mod attribute;
+pub mod builder;
+pub mod element;
+mod inner;
+pub mod iter;
+pub mod models;
+pub mod object;
+pub mod operation;
+pub mod origin;
+pub mod output;
+pub mod render;
+
+pub use attribute::*;
+pub use builder::*;
+pub use element::*;
+pub use inner::*;
+pub use iter::*;
+pub use models::*;
+pub use object::*;
+pub use operation::*;
+pub use origin::*;
+pub use output::*;
 
 use derive_more::{Deref, DerefMut};
-pub use model_builder::*;
-pub use model_inner::*;
-pub use models::*;
-pub use origin::*;
 
-use crate::{GetPropertyValue, diag::WriteToFile, model_tree::*, rc::*, syntax::*, value::*};
-use microcad_core::*;
+use microcad_core::BooleanOp;
+
+use crate::{
+    GetPropertyValue,
+    diag::WriteToFile,
+    rc::RcMut,
+    syntax::{Identifier, SourceFile},
+    value::Value,
+};
+
+#[cfg(test)]
+mod tests;
 
 /// A reference counted, mutable [`Model`].
 #[derive(Debug, Clone, Deref, DerefMut)]
@@ -183,7 +207,7 @@ impl GetPropertyValue for Model {
 }
 
 impl GetAttribute for Model {
-    fn get_attribute(&self, id: &Identifier) -> Option<crate::model_tree::Attribute> {
+    fn get_attribute(&self, id: &Identifier) -> Option<crate::model::Attribute> {
         self.borrow().attributes.get_attribute(id)
     }
 }

@@ -5,7 +5,7 @@
 
 use microcad_core::*;
 
-use crate::model_tree::*;
+use crate::model::*;
 
 impl Model {
     /// Return output type.
