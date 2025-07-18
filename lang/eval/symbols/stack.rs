@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, resolve::*};
+use crate::{eval::*, model_tree::ModelBuilder, rc::RcMut, resolve::*};
 
 /// A stack with a list of stack frames.
 ///
@@ -147,13 +147,20 @@ impl Locals for Stack {
         }
     }
 
-    fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value> {
+    fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
         match self.fetch(id) {
             Ok(symbol) => match &symbol.borrow().def {
                 SymbolDefinition::Constant(_, value) => Ok(value.clone()),
                 _ => Err(EvalError::LocalNotFound(id.clone())),
             },
             Err(_) => Err(EvalError::LocalNotFound(id.clone())),
+        }
+    }
+
+    fn get_model_builder(&self) -> EvalResult<RcMut<ModelBuilder>> {
+        match self.current_frame() {
+            Some(StackFrame::Workbench(model_builder, _, _)) => Ok(model_builder.clone()),
+            _ => unreachable!("missing model builder"),
         }
     }
 
@@ -242,9 +249,11 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     // test alias
-    assert!(stack
-        .put_local(Some("x".into()), make_int("x".into(), 3))
-        .is_ok());
+    assert!(
+        stack
+            .put_local(Some("x".into()), make_int("x".into(), 3))
+            .is_ok()
+    );
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);

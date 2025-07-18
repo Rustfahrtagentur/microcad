@@ -11,9 +11,9 @@ impl BuiltinWorkbenchDefinition for Cube {
         "cube"
     }
 
-    fn node(args: &Tuple) -> EvalResult<ModelNode> {
+    fn model(args: &Tuple) -> EvalResult<Model> {
         Ok(
-            ModelNodeBuilder::new_3d_primitive(Rc::new(Geometry3D::Cube(geo3d::Cube {
+            ModelBuilder::new_3d_primitive(Rc::new(Geometry3D::Cube(geo3d::Cube {
                 size: Vec3::new(args.get("size_x"), args.get("size_y"), args.get("size_z")),
             })))
             .build(),

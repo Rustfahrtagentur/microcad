@@ -11,53 +11,53 @@ pub trait Operation: std::fmt::Debug {
     /// The output type of this operation.
     ///
     /// By default, the output type is undetermined.
-    fn output_type(&self) -> ModelNodeOutputType {
-        ModelNodeOutputType::NotDetermined
+    fn output_type(&self) -> OutputType {
+        OutputType::NotDetermined
     }
 
     /// The input type of this operation.
     ///
     /// By default, the input type is undetermined.
-    fn input_type(&self) -> ModelNodeOutputType {
-        ModelNodeOutputType::NotDetermined
+    fn input_type(&self) -> OutputType {
+        OutputType::NotDetermined
     }
 
-    /// Process the model node.
-    fn process_2d(&self, _node: &ModelNode) -> Geometries2D {
+    /// Process the model.
+    fn process_2d(&self, _model: &Model) -> Geometries2D {
         unimplemented!()
     }
 
-    /// Process the model node.
-    fn process_3d(&self, _node: &ModelNode) -> Geometries3D {
+    /// Process the model.
+    fn process_3d(&self, _model: &Model) -> Geometries3D {
         unimplemented!()
     }
 }
 
 impl Operation for BooleanOp {
-    fn process_2d(&self, node: &ModelNode) -> Geometries2D {
+    fn process_2d(&self, model: &Model) -> Geometries2D {
         let mut geometries = Geometries2D::default();
 
-        if let Some(node) = node.into_inner_object_node() {
-            let self_ = node.borrow();
+        if let Some(model) = model.into_inner_object_model() {
+            let self_ = model.borrow();
             self_
                 .children
                 .iter()
-                .for_each(|node| match &self_.element.value {
+                .for_each(|model| match &self_.element.value {
                     Element::Transform(affine_transform) => {
                         geometries.append(
-                            node.process_2d(node).transformed_2d(
+                            model.process_2d(model).transformed_2d(
                                 &self_.output.resolution,
                                 &affine_transform.mat2d(),
                             ),
                         );
                     }
                     _ => {
-                        geometries.append(node.process_2d(node));
+                        geometries.append(model.process_2d(model));
                     }
                 });
         }
 
-        geometries.boolean_op(&node.borrow().output.resolution, self)
+        geometries.boolean_op(&model.borrow().output.resolution, self)
     }
 }
 

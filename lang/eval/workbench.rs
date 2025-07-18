@@ -6,84 +6,86 @@
 use crate::{eval::*, model_tree::*, syntax::*};
 
 impl WorkbenchDefinition {
-    /// Try to evaluate a single call into a [`ModelNode`].
-    fn eval_to_node<'a>(
+    /// Try to evaluate a single call into a [`Model`].
+    fn eval_to_model<'a>(
         &'a self,
         arguments: &Tuple,
         init: Option<&'a InitDefinition>,
         context: &mut Context,
-    ) -> EvalResult<ModelNode> {
+    ) -> EvalResult<Model> {
         log::debug!(
-            "Evaluating to node `{id}` {kind}",
+            "Evaluating to model `{id}` {kind}",
             id = self.id,
             kind = self.kind
         );
-        context.scope(
-            StackFrame::Workbench(self.kind, self.id.clone(), arguments.into()),
-            |context| {
-                let mut node_builder = match self.kind {
-                    WorkbenchKind::Part => ModelNodeBuilder::new_3d_object(),
-                    WorkbenchKind::Sketch => ModelNodeBuilder::new_2d_object(),
-                    WorkbenchKind::Operation => ModelNodeBuilder::new_object_body(),
-                }
-                .properties(ObjectProperties::from_parameters_and_arguments(
-                    &self.plan.eval(context)?,
-                    arguments,
-                ));
-                log::trace!("Prepared node builder:\n{node_builder}");
+        let model_builder = match self.kind {
+            WorkbenchKind::Part => ModelBuilder::new_3d_object(),
+            WorkbenchKind::Sketch => ModelBuilder::new_2d_object(),
+            WorkbenchKind::Operation => ModelBuilder::new_object_body(),
+        }
+        .properties(ObjectProperties::from_parameters_and_arguments(
+            &self.plan.eval(context)?,
+            arguments,
+        ));
 
-                // Create the object node from initializer if present
+        context.scope(
+            StackFrame::Workbench(model_builder.into(), self.id.clone(), arguments.into()),
+            |context| {
+                // Create the object model from initializer if present
                 if let Some(init) = init {
                     log::trace!("Initializing`{id}` {kind}", id = self.id, kind = self.kind);
-                    init.eval(arguments, &mut node_builder, context)?;
+                    init.eval(arguments, context)?;
                 }
 
-                node_builder.properties.eval(context)?;
+                let model_builder = context.get_model_builder()?;
+                {
+                    let mut model_builder = model_builder.borrow_mut();
+                    model_builder.properties.eval(context)?;
 
-                // At this point, all properties must have a value
-                log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
-                for statement in self.body.statements.iter() {
-                    match statement {
-                        Statement::Assignment(assignment) => {
-                            assignment.eval(context)?;
+                    // At this point, all properties must have a value
+                    log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
+                    for statement in self.body.statements.iter() {
+                        match statement {
+                            Statement::Assignment(assignment) => {
+                                assignment.eval(context)?;
+                            }
+                            Statement::Expression(expression) => {
+                                model_builder.add_children2(expression.eval(context)?)?;
+                            }
+                            Statement::Init(_) => (),
+                            _ => todo!("Evaluate statement: {statement}"),
                         }
-                        Statement::Expression(expression) => {
-                            node_builder = node_builder.add_children(expression.eval(context)?)?;
-                        }
-                        Statement::Init(_) => (),
-                        _ => todo!("Evaluate statement: {statement}"),
                     }
                 }
-
-                let node = node_builder.build();
+                let model = model_builder.take().build();
                 {
-                    let mut node_ = node.borrow_mut();
-                    node_.origin.arguments = arguments.clone();
-                    node_.attributes = self.attribute_list.eval(context)?;
+                    let mut model_ = model.borrow_mut();
+                    model_.origin.arguments = arguments.clone();
+                    model_.attributes = self.attribute_list.eval(context)?;
                 }
-                Ok(node)
+                Ok(model)
             },
         )
     }
 }
 
-impl CallTrait<ModelNodes> for WorkbenchDefinition {
+impl CallTrait<Models> for WorkbenchDefinition {
     /// Evaluate the call of a part initialization
     ///
-    /// The evaluation considers multiplicity, which means that multiple nodes maybe created.
+    /// The evaluation considers multiplicity, which means that multiple models maybe created.
     ///
     /// Example:
     /// Consider the `part a(b: Scalar) { }`.
-    /// Calling the part `a([1.0, 2.0])` results in two nodes with `b = 1.0` and `b = 2.0`, respectively.
-    fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<ModelNodes> {
+    /// Calling the part `a([1.0, 2.0])` results in two models with `b = 1.0` and `b = 2.0`, respectively.
+    fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Models> {
         log::debug!(
             "Workbench call {kind} {id}({args})",
             id = self.id,
             kind = self.kind
         );
 
-        // prepare nodes
-        let mut nodes = ModelNodes::default();
+        // prepare models
+        let mut models = Models::default();
 
         // prepare building plan
         let plan = self.plan.eval(context)?;
@@ -95,7 +97,7 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
                 for (id, var) in args.named_iter() {
                     context.set_local_value(id.clone(), var.clone())?;
                 }
-                nodes.push(self.eval_to_node(&args, None, context)?);
+                models.push(self.eval_to_model(&args, None, context)?);
             }
             initialized = true;
         } else {
@@ -112,7 +114,7 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
                     ArgumentMatch::find_multi_match(args, &init.parameters.eval(context)?)
                 {
                     for args in multi_args {
-                        nodes.push(self.eval_to_node(&args, Some(init), context)?);
+                        models.push(self.eval_to_model(&args, Some(init), context)?);
                     }
                     initialized = true;
                     break;
@@ -123,6 +125,6 @@ impl CallTrait<ModelNodes> for WorkbenchDefinition {
             context.error(args, EvalError::NoInitializationFound(self.id.clone()))?;
         }
 
-        Ok(nodes)
+        Ok(models)
     }
 }

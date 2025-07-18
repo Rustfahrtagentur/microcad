@@ -58,8 +58,8 @@ pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
 pub use parameter::*;
-pub use symbols::*;
 pub use r#use::*;
+pub use symbols::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
@@ -75,9 +75,9 @@ use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 /// | `Value`             | Function calls, module statements,                  | `Value::None`           | These trait implementations are   
 /// |                     | parameter lists, argument lists.                    |                         | mostly used when evaluating functions.
 /// |                     |                                                     |                         |
-/// | `Option<ModelNode>` | Workbenches, object bodies, source files, if.       | `None`                  | Something is evaluated into a single model node.                        |
+/// | `Option<Model>`     | Workbenches, object bodies, source files, if.       | `None`                  | Something is evaluated into a single model.                              |
 /// |                     |                                                     |                         |
-/// | `ModelNodes`        | Statement, statement list, body, multiplicities.    | `ModelNodes::default()` | A collection of nodes. |
+/// | `Models`            | Statement, statement list, body, multiplicities.    | `Models::default()`     | A collection of models . |
 pub trait Eval<T = Value> {
     /// Evaluate a syntax element into a type `T`.
     fn eval(&self, context: &mut Context) -> EvalResult<T>;

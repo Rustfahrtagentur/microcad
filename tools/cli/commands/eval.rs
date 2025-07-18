@@ -11,14 +11,14 @@ use crate::commands::RunCommand;
 pub struct Eval {
     /// Input µcad file.
     pub input: std::path::PathBuf,
-    /// Output model nodes.
+    /// Output models.
     pub output: Option<std::path::PathBuf>,
 }
 
 impl RunCommand for Eval {
     fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<()> {
         let mut context = cli.make_context(&self.input)?;
-        let node = context.eval().expect("Valid node");
+        let model = context.eval().expect("Valid model");
 
         log::info!("Result:");
         match context.has_errors() {
@@ -30,8 +30,8 @@ impl RunCommand for Eval {
         }
 
         match &self.output {
-            Some(filename) => node.write_to_file(&filename)?,
-            None => println!("{node}"),
+            Some(filename) => model.write_to_file(&filename)?,
+            None => println!("{model}"),
         }
 
         Ok(())

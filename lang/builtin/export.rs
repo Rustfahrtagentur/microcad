@@ -1,11 +1,11 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Model node export
+//! Model export
 
 use std::rc::Rc;
 
-use crate::{Id, builtin::file_io::*, eval::*, model_tree::*, value::*};
+use crate::{builtin::file_io::*, eval::*, model_tree::*, value::*, Id};
 
 use thiserror::Error;
 
@@ -16,8 +16,8 @@ pub enum ExportError {
     #[error("IO Error")]
     IoError(#[from] std::io::Error),
 
-    /// The node does not contain any export attribute.
-    #[error("No export attribute found in node. Mark the node with `#[export(\"filename\")`")]
+    /// The model does not contain any export attribute.
+    #[error("No export attribute found in workbench (mark it with `#[export(\"filename\")`")]
     NoExportAttribute,
 
     /// No exporter found for file.
@@ -37,9 +37,9 @@ pub enum ExportError {
 ///
 /// Implement this trait for your custom file exporter.
 pub trait Exporter: FileIoInterface {
-    /// Parameters that as exporter specific attributes to a node.
+    /// Parameters that as exporter specific attributes to a model.
     ///
-    /// Let's assume an exporter `foo` has a node parameter `bar = 23` as parameter value list.
+    /// Let's assume an exporter `foo` has a model parameter `bar = 23` as parameter value list.
     /// The parameter `bar` can be set to `42` with:
     ///
     /// ```ucad
@@ -51,14 +51,14 @@ pub trait Exporter: FileIoInterface {
         ParameterValueList::default()
     }
 
-    /// Export the node if the node is marked for export.
-    fn export(&self, node: &ModelNode, filename: &std::path::Path) -> Result<Value, ExportError>;
+    /// Export the model if the model is marked for export.
+    fn export(&self, model: &Model, filename: &std::path::Path) -> Result<Value, ExportError>;
 
-    /// The expected node output type of this exporter.
+    /// The expected model output type of this exporter.
     ///
-    /// Reimplement this function when your export output format only accepts specific node types.
-    fn node_output_type(&self) -> ModelNodeOutputType {
-        ModelNodeOutputType::NotDetermined
+    /// Reimplement this function when your export output format only accepts specific model output types.
+    fn output_type(&self) -> OutputType {
+        OutputType::NotDetermined
     }
 }
 

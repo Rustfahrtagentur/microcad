@@ -1,15 +1,15 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Model node geometry output.
+//! Geometry model output.
 
 use microcad_core::{Geometries2D, Geometries3D};
 
-use crate::model_tree::ModelNodeOutputType;
+use crate::model_tree::OutputType;
 
-/// Geometry output of the model node.
+/// Geometry output of the model.
 #[derive(Debug, Default, Clone)]
-pub enum ModelNodeGeometryOutput {
+pub enum GeometryOutput {
     /// No geometry output.
     #[default]
     None,
@@ -21,14 +21,14 @@ pub enum ModelNodeGeometryOutput {
     Invalid,
 }
 
-impl ModelNodeGeometryOutput {
+impl GeometryOutput {
     /// Get output type from geometry output.
-    pub(crate) fn model_node_output_type(&self) -> ModelNodeOutputType {
+    pub(crate) fn model_output_type(&self) -> OutputType {
         match &self {
-            Self::None => ModelNodeOutputType::NotDetermined,
-            Self::Geometries2D(_) => ModelNodeOutputType::Geometry2D,
-            Self::Geometries3D(_) => ModelNodeOutputType::Geometry3D,
-            Self::Invalid => ModelNodeOutputType::InvalidMixed,
+            Self::None => OutputType::NotDetermined,
+            Self::Geometries2D(_) => OutputType::Geometry2D,
+            Self::Geometries3D(_) => OutputType::Geometry3D,
+            Self::Invalid => OutputType::InvalidMixed,
         }
     }
 }

@@ -47,8 +47,8 @@ pub enum Value {
     Tuple(Box<Tuple>),
     /// A matrix.
     Matrix(Box<Matrix>),
-    /// A node in the model tree.
-    Nodes(ModelNodes),
+    /// A model in the model tree.
+    Models(Models),
 }
 
 impl Value {
@@ -66,16 +66,16 @@ impl Value {
         }
     }
 
-    /// Create a value from a single model node.
-    pub fn from_single_node(node: ModelNode) -> Self {
-        Self::Nodes(vec![node].into())
+    /// Create a value from a single model.
+    pub fn from_single_model(model: Model) -> Self {
+        Self::Models(vec![model].into())
     }
 
-    /// Fetch nodes from this value.
-    pub fn fetch_nodes(&self) -> ModelNodes {
+    /// Fetch models from this value.
+    pub fn fetch_models(&self) -> Models {
         match self {
-            Self::Nodes(n) => n.clone(),
-            _ => ModelNodes::default(),
+            Self::Models(n) => n.clone(),
+            _ => Models::default(),
         }
     }
 
@@ -167,7 +167,7 @@ impl Value {
             Value::Array(l) => format!("{l}"),
             Value::Tuple(t) => format!("{t}"),
             Value::Matrix(m) => format!("{m}"),
-            Value::Nodes(_n) => todo!(),
+            Value::Models(_n) => todo!(),
         }
     }
 }
@@ -204,7 +204,7 @@ impl crate::ty::Ty for Value {
             Value::Array(list) => list.ty(),
             Value::Tuple(tuple) => tuple.ty(),
             Value::Matrix(matrix) => matrix.ty(),
-            Value::Nodes(_) => Type::Nodes,
+            Value::Models(_) => Type::Models,
         }
     }
 }
@@ -270,8 +270,8 @@ impl std::ops::Sub for Value {
             (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Subtract two numbers
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
-            // Boolean difference operator for nodes
-            (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
+            // Boolean difference operator for models
+            (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
                 lhs.union()
                     .boolean_op(microcad_core::BooleanOp::Difference, rhs.union()),
             )),
@@ -325,7 +325,7 @@ impl std::ops::BitOr for Value {
 
     fn bitor(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
+            (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
                 lhs.union()
                     .boolean_op(microcad_core::BooleanOp::Union, rhs.union()),
             )),
@@ -340,7 +340,7 @@ impl std::ops::BitAnd for Value {
 
     fn bitand(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Nodes(lhs), Value::Nodes(rhs)) => Ok(Value::from_single_node(
+            (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
                 lhs.union().boolean_op(BooleanOp::Intersection, rhs.union()),
             )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} & {rhs}"))),
@@ -359,7 +359,7 @@ impl std::fmt::Display for Value {
             Value::Array(l) => write!(f, "{l}"),
             Value::Tuple(t) => write!(f, "{t}"),
             Value::Matrix(m) => write!(f, "{m}"),
-            Value::Nodes(n) => write!(f, "{n}"),
+            Value::Models(n) => write!(f, "{n}"),
         }
     }
 }
@@ -375,7 +375,7 @@ impl std::fmt::Debug for Value {
             Value::Array(l) => write!(f, "Array = {l}"),
             Value::Tuple(t) => write!(f, "Tuple = {t}"),
             Value::Matrix(m) => write!(f, "Matrix = {m}"),
-            Value::Nodes(n) => write!(f, "Nodes:\n {n}"),
+            Value::Models(n) => write!(f, "Models:\n {n}"),
         }
     }
 }
@@ -473,18 +473,18 @@ impl From<Quantity> for Value {
     }
 }
 
-impl From<ModelNodes> for Value {
-    fn from(nodes: ModelNodes) -> Self {
-        match nodes.len() {
+impl From<Models> for Value {
+    fn from(models: Models) -> Self {
+        match models.len() {
             0 => Value::None,
-            _ => Value::Nodes(nodes),
+            _ => Value::Models(models),
         }
     }
 }
 
-impl From<ModelNode> for Value {
-    fn from(node: ModelNode) -> Self {
-        Self::from_single_node(node)
+impl From<Model> for Value {
+    fn from(model: Model) -> Self {
+        Self::from_single_model(model)
     }
 }
 
@@ -492,8 +492,8 @@ impl GetPropertyValue for Value {
     fn get_property_value(&self, identifier: &Identifier) -> Value {
         match self {
             Value::Tuple(tuple) => tuple.by_id(identifier).cloned().unwrap_or_default(),
-            Value::Nodes(nodes) => match nodes.single_node() {
-                Some(node) => node.get_property_value(identifier),
+            Value::Models(models) => match models.single_model() {
+                Some(model) => model.get_property_value(identifier),
                 None => Value::None,
             },
             _ => Value::None,
@@ -503,8 +503,8 @@ impl GetPropertyValue for Value {
 
 impl GetAttribute for Value {
     fn get_attribute(&self, id: &Identifier) -> std::option::Option<crate::model_tree::Attribute> {
-        match self.fetch_nodes().single_node() {
-            Some(node) => node.get_attribute(id),
+        match self.fetch_models().single_model() {
+            Some(model) => model.get_attribute(id),
             None => None,
         }
     }

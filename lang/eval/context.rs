@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{builtin::*, diag::*, eval::*, model_tree::ModelNode, rc::*, resolve::*, syntax::*};
+use crate::{builtin::*, diag::*, eval::*, model_tree::Model, rc::*, resolve::*, syntax::*};
 
 /// *Context* for *evaluation* of a resolved µcad file.
 ///
@@ -107,7 +107,7 @@ impl Context {
     }
 
     /// Evaluate context into a value.
-    pub fn eval(&mut self) -> EvalResult<ModelNode> {
+    pub fn eval(&mut self) -> EvalResult<Model> {
         let source_file = match &self.symbol_table.root.borrow().def {
             SymbolDefinition::SourceFile(source_file) => source_file.clone(),
             _ => todo!(),
@@ -154,7 +154,7 @@ impl Locals for Context {
         self.symbol_table.set_local_value(id, value)
     }
 
-    fn get_local_value(&mut self, id: &Identifier) -> EvalResult<Value> {
+    fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
         self.symbol_table.get_local_value(id)
     }
 
@@ -168,6 +168,10 @@ impl Locals for Context {
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         self.symbol_table.fetch(id)
+    }
+
+    fn get_model_builder(&self) -> EvalResult<RcMut<crate::model_tree::ModelBuilder>> {
+        self.symbol_table.get_model_builder()
     }
 }
 

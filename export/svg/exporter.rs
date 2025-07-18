@@ -5,9 +5,9 @@
 
 use std::io::BufWriter;
 
-use microcad_lang::{Id, builtin::*, model_tree::*, parameter, value::*};
+use microcad_lang::{builtin::*, model_tree::*, parameter, value::*, Id};
 
-use crate::svg::{SvgTagAttributes, WriteSvg, writer::SvgWriter};
+use crate::svg::{writer::SvgWriter, SvgTagAttributes, WriteSvg};
 
 /// SVG Exporter
 pub struct SvgExporter;
@@ -22,18 +22,18 @@ impl Exporter for SvgExporter {
         .collect()
     }
 
-    fn export(&self, node: &ModelNode, filename: &std::path::Path) -> Result<Value, ExportError> {
+    fn export(&self, model: &Model, filename: &std::path::Path) -> Result<Value, ExportError> {
         let f = std::fs::File::create(filename)?;
         use microcad_core::FetchBounds2D;
-        let bounds = node.fetch_bounds_2d();
+        let bounds = model.fetch_bounds_2d();
         let mut writer = SvgWriter::new_canvas(Box::new(BufWriter::new(f)), bounds, None)?;
 
-        node.write_svg(&mut writer, &SvgTagAttributes::default())?;
+        model.write_svg(&mut writer, &SvgTagAttributes::default())?;
         Ok(Value::None)
     }
 
-    fn node_output_type(&self) -> ModelNodeOutputType {
-        ModelNodeOutputType::Geometry2D
+    fn output_type(&self) -> OutputType {
+        OutputType::Geometry2D
     }
 }
 

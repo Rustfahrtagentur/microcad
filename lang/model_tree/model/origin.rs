@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Model node origin. Original source code information about a model node.
+//! Model origin. Original source code information about a model.
 
 use crate::{
     resolve::{FullyQualify, Symbol},
@@ -10,9 +10,9 @@ use crate::{
     value::*,
 };
 
-/// The origin is the [`Symbol`] and [`Tuple`] from which the node has been created.
+/// The origin is the [`Symbol`] and [`Tuple`] from which the model has been created.
 #[derive(Clone, Default, Debug)]
-pub struct ModelNodeOrigin {
+pub struct Origin {
     /// The original symbol that has been called.
     pub creator: Option<Symbol>,
 
@@ -26,7 +26,7 @@ pub struct ModelNodeOrigin {
     pub call_src_ref: SrcRef,
 }
 
-impl std::fmt::Display for ModelNodeOrigin {
+impl std::fmt::Display for Origin {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.creator {
             Some(creator) => {

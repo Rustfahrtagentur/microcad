@@ -68,7 +68,7 @@ impl CallMethod for Value {
             Value::Array(list) => list.call_method(id, args, context),
             Value::Tuple(_) => eval_todo!(context, args, "call_method for Tuple"),
             Value::Matrix(_) => eval_todo!(context, args, "call_method for Matrix"),
-            Value::Nodes(_) => eval_todo!(context, args, "call_method for Nodes"),
+            Value::Models(_) => eval_todo!(context, args, "call_method for Models"),
         }
     }
 }

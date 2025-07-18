@@ -7,21 +7,21 @@
 use crate::{model_tree::*, syntax::*};
 
 #[cfg(test)]
-fn sample_nodes() -> ModelNodes {
-    fn obj(id: &str) -> ModelNode {
-        let node = ModelNodeBuilder::new_object_body().build();
-        node.borrow_mut().id = Some(Identifier::no_ref(id));
-        node
+fn sample_models() -> Models {
+    fn obj(id: &str) -> Model {
+        let model = ModelBuilder::new_object_body().build();
+        model.borrow_mut().id = Some(Identifier::no_ref(id));
+        model
     }
 
-    let nodes = vec![
+    let models = vec![
         vec![obj("a0"), obj("a1")].into(),
         vec![obj("b0")].into(),
         vec![obj("c0"), obj("c1"), obj("c2")].into(),
         vec![obj("d0")].into(),
     ];
 
-    // This should result in following node multiplicity:
+    // This should result in following model multiplicity:
     // a0
     //   b0
     //     c0
@@ -38,24 +38,24 @@ fn sample_nodes() -> ModelNodes {
     //       d0
     //     c2
     //       d0
-    ModelNodes::from_node_stack(&nodes)
+    Models::from_stack(&models)
 }
 
 #[cfg(test)]
-fn sample_tree() -> ModelNode {
-    ModelNodeBuilder::new_object_body()
-        .add_children(sample_nodes())
+fn sample_tree() -> Model {
+    ModelBuilder::new_object_body()
+        .add_children(sample_models())
         .expect("No error")
         .build()
 }
 
 #[test]
-fn model_nodes_nest() {
-    let nodes = sample_nodes();
-    assert_eq!(nodes.len(), 2, "Must contain a0 and a1 as root");
+fn model_nest() {
+    let models = sample_models();
+    assert_eq!(models.len(), 2, "Must contain a0 and a1 as root");
 
-    let a0 = nodes.first().expect("a0");
-    let a1 = nodes.last().expect("a1");
+    let a0 = models.first().expect("a0");
+    let a1 = models.last().expect("a1");
     assert_eq!(a0.borrow().id, Some(Identifier::no_ref("a0")));
     assert_eq!(a1.borrow().id, Some(Identifier::no_ref("a1")));
 
@@ -66,15 +66,15 @@ fn model_nodes_nest() {
         Some(Identifier::no_ref("b0"))
     );
 
-    log::trace!("Nodes:\n{nodes}");
+    log::trace!("Models:\n{models}");
 }
 
 #[test]
-fn model_node_iter_descendants() {
-    let node = sample_tree();
+fn model_iter_descendants() {
+    let model = sample_tree();
 
-    for node in node.descendants() {
-        let depth = node.depth() * 2;
-        log::info!("{:depth$}{signature}", "", signature = node.signature());
+    for model in model.descendants() {
+        let depth = model.depth() * 2;
+        log::info!("{:depth$}{signature}", "", signature = model.signature());
     }
 }

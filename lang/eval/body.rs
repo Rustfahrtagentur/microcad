@@ -3,12 +3,12 @@
 
 use crate::{eval::*, model_tree::*};
 
-/// Evaluate the body into a collection of model nodes.
-impl Eval<ModelNodes> for Body {
-    fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
+/// Evaluate the body into a collection of models.
+impl Eval<Models> for Body {
+    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
         self.statements
             .iter()
-            .map(|statement| -> EvalResult<ModelNodes> {
+            .map(|statement| -> EvalResult<Models> {
                 match statement {
                     Statement::Use(_) => {} // Use statements have been resolved at this point
                     Statement::Assignment(assignment) => {
@@ -17,8 +17,8 @@ impl Eval<ModelNodes> for Body {
                     Statement::Expression(expression) => return expression.eval(context),
                     Statement::Marker(marker) => return marker.eval(context),
                     Statement::If(r#if) => {
-                        let node: Option<ModelNode> = r#if.eval(context)?;
-                        return Ok(node.into());
+                        let model: Option<Model> = r#if.eval(context)?;
+                        return Ok(model.into());
                     }
                     statement => {
                         use crate::diag::PushDiag;
@@ -29,24 +29,24 @@ impl Eval<ModelNodes> for Body {
                     }
                 }
 
-                Ok(ModelNodes::default())
+                Ok(Models::default())
             })
-            .try_fold(ModelNodes::default(), |mut model_nodes, new| match new {
-                Ok(mut new_nodes) => {
-                    model_nodes.append(&mut new_nodes);
-                    model_nodes.deduce_output_type();
-                    Ok(model_nodes)
+            .try_fold(Models::default(), |mut models, new| match new {
+                Ok(mut new_models) => {
+                    models.append(&mut new_models);
+                    models.deduce_output_type();
+                    Ok(models)
                 }
                 Err(err) => Err(err),
             })
     }
 }
 
-/// Evaluate the body into a single object body node: `{}`.
-impl Eval<ModelNode> for Body {
-    fn eval(&self, context: &mut Context) -> EvalResult<ModelNode> {
+/// Evaluate the body into a single object body model: `{}`.
+impl Eval<Model> for Body {
+    fn eval(&self, context: &mut Context) -> EvalResult<Model> {
         context.scope(StackFrame::Body(SymbolMap::default()), |context| {
-            Ok(ModelNodeBuilder::new_object_body()
+            Ok(ModelBuilder::new_object_body()
                 .add_children(self.eval(context)?)?
                 .build())
         })

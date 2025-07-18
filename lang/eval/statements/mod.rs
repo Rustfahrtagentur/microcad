@@ -14,12 +14,12 @@ impl Eval for ExpressionStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let value: Value = self.expression.eval(context)?;
         match value {
-            Value::Nodes(mut nodes) => {
+            Value::Models(mut models) => {
                 let attributes = self.attribute_list.eval(context)?;
-                nodes.iter_mut().for_each(|node| {
-                    node.borrow_mut().attributes = attributes.clone();
+                models.iter_mut().for_each(|model| {
+                    model.borrow_mut().attributes = attributes.clone();
                 });
-                Ok(Value::Nodes(nodes))
+                Ok(Value::Models(models))
             }
             Value::None => Ok(Value::None),
             _ => {
@@ -35,27 +35,27 @@ impl Eval for ExpressionStatement {
     }
 }
 
-impl Eval<ModelNodes> for ExpressionStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
+impl Eval<Models> for ExpressionStatement {
+    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
         let value: Value = self.eval(context)?;
-        Ok(value.fetch_nodes())
+        Ok(value.fetch_models())
     }
 }
 
-impl Eval<Option<ModelNode>> for Marker {
-    fn eval(&self, _: &mut Context) -> EvalResult<Option<ModelNode>> {
+impl Eval<Option<Model>> for Marker {
+    fn eval(&self, _: &mut Context) -> EvalResult<Option<Model>> {
         if self.is_children_marker() {
-            Ok(Some(ModelNodeBuilder::new_children_placeholder().build()))
+            Ok(Some(ModelBuilder::new_children_placeholder().build()))
         } else {
             Ok(None)
         }
     }
 }
 
-impl Eval<ModelNodes> for Marker {
-    fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
-        let node: Option<ModelNode> = self.eval(context)?;
-        Ok(node.into())
+impl Eval<Models> for Marker {
+    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
+        let model: Option<Model> = self.eval(context)?;
+        Ok(model.into())
     }
 }
 
@@ -77,47 +77,47 @@ impl Eval for Statement {
     }
 }
 
-impl Eval<ModelNodes> for Statement {
-    fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
-        let nodes: ModelNodes = match self {
+impl Eval<Models> for Statement {
+    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
+        let models: Models = match self {
             Self::Use(u) => {
                 u.eval(context)?;
-                ModelNodes::default()
+                Models::default()
             }
             Self::Assignment(a) => {
                 a.eval(context)?;
-                ModelNodes::default()
+                Models::default()
             }
             Self::If(i) => {
-                let node: Option<ModelNode> = i.eval(context)?;
-                node.into()
+                let model: Option<Model> = i.eval(context)?;
+                model.into()
             }
             Self::Expression(e) => e.eval(context)?,
-            _ => ModelNodes::default(),
+            _ => Models::default(),
         };
 
-        if nodes.deduce_output_type() == ModelNodeOutputType::InvalidMixed {
+        if models.deduce_output_type() == OutputType::InvalidMixed {
             context.error(self, EvalError::CannotMixGeometry)?;
         }
-        Ok(nodes)
+        Ok(models)
     }
 }
 
-impl Eval<ModelNodes> for StatementList {
-    fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
-        let mut nodes = ModelNodes::default();
-        let mut output_type = ModelNodeOutputType::NotDetermined;
+impl Eval<Models> for StatementList {
+    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
+        let mut models = Models::default();
+        let mut output_type = OutputType::NotDetermined;
 
         for statement in self.iter() {
-            let mut statement_nodes: ModelNodes = statement.eval(context)?;
-            output_type = output_type.merge(&statement_nodes.deduce_output_type());
-            if output_type == ModelNodeOutputType::InvalidMixed {
+            let mut statement_models: Models = statement.eval(context)?;
+            output_type = output_type.merge(&statement_models.deduce_output_type());
+            if output_type == OutputType::InvalidMixed {
                 context.error(statement, EvalError::CannotMixGeometry)?;
             }
 
-            nodes.append(&mut statement_nodes);
+            models.append(&mut statement_models);
         }
 
-        Ok(nodes)
+        Ok(models)
     }
 }

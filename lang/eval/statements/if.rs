@@ -11,8 +11,8 @@ impl Eval<Value> for IfStatement {
     }
 }
 
-impl Eval<Option<ModelNode>> for IfStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<ModelNode>> {
+impl Eval<Option<Model>> for IfStatement {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
         let cond = self.cond.eval(context)?;
         match cond {
             Value::Bool(true) => Ok(Some(self.body.eval(context)?)),

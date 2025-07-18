@@ -1,13 +1,13 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Element of a [`ModelNode`]
+//! Element of a [`Model`].
 
-use crate::{GetPropertyValue, model_tree::*, syntax::*, value::*};
+use crate::{model_tree::*, syntax::*, value::*, GetPropertyValue};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
-/// An element defines the entity of a [`ModelNode`].
+/// An element defines the entity of a [`Model`].
 #[derive(Clone, IntoStaticStr, Debug)]
 pub enum Element {
     /// An object that contains children and holds properties.
@@ -15,9 +15,9 @@ pub enum Element {
     /// Objects can be created by builtins, assignments, expressions and workbenches.
     Object(Object),
 
-    /// A special node after which children will be nested as siblings.
+    /// A special element after which children will be nested as siblings.
     ///
-    /// This node is removed after the children have been inserted.
+    /// This element is removed after the children have been inserted.
     ChildrenPlaceholder,
 
     /// An affine transform.
@@ -33,7 +33,6 @@ pub enum Element {
     Operation(std::rc::Rc<dyn Operation>),
 }
 
-/// The default [`ObjectNodeContent`] is an empty [`Object`].
 impl Default for Element {
     fn default() -> Self {
         Element::Object(Object::default())

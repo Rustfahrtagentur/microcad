@@ -13,9 +13,9 @@ impl BuiltinWorkbenchDefinition for Translate {
         "translate"
     }
 
-    fn node(args: &Tuple) -> EvalResult<ModelNode> {
+    fn model(args: &Tuple) -> EvalResult<Model> {
         Ok(
-            ModelNodeBuilder::new_transform(AffineTransform::Translation(Vec3::new(
+            ModelBuilder::new_transform(AffineTransform::Translation(Vec3::new(
                 args.get("x"),
                 args.get("y"),
                 args.get("z"),

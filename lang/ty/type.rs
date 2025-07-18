@@ -24,9 +24,9 @@ pub enum Type {
     Tuple(Box<TupleType>),
     /// Matrix type
     Matrix(MatrixType),
-    /// Nodes.
-    Nodes,
-    /// A custom type or a part node in the syntax tree
+    /// Models.
+    Models,
+    /// A custom type in the syntax tree
     Custom(QualifiedName),
 }
 
@@ -67,7 +67,7 @@ impl std::fmt::Display for Type {
             Self::List(t) => write!(f, "{t}"),
             Self::Tuple(t) => write!(f, "{t}"),
             Self::Matrix(t) => write!(f, "{t}"),
-            Self::Nodes => write!(f, "Nodes"),
+            Self::Models => write!(f, "Models"),
             Self::Custom(n) => write!(f, "Custom({n})"),
         }
     }

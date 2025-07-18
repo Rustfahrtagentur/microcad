@@ -37,22 +37,18 @@ pub struct ExportArgs {
 impl ExportArgs {
     /// Get default exporter.
     fn default_exporter(
-        output_type: &ModelNodeOutputType,
+        output_type: &OutputType,
         config: &Config,
         exporters: &ExporterRegistry,
     ) -> anyhow::Result<std::rc::Rc<dyn Exporter>> {
         match output_type {
-            ModelNodeOutputType::NotDetermined => {
-                Err(anyhow!("Could not determine node output type."))
-            }
-            ModelNodeOutputType::Geometry2D => {
+            OutputType::NotDetermined => Err(anyhow!("Could not determine output type.")),
+            OutputType::Geometry2D => {
                 Ok(exporters.exporter_by_id(&(&config.export.sketch).into())?)
             }
-            ModelNodeOutputType::Geometry3D => {
-                Ok(exporters.exporter_by_id(&(&config.export.part).into())?)
-            }
-            ModelNodeOutputType::InvalidMixed => Err(anyhow!(
-                "Invalid node output type, the node cannot be exported."
+            OutputType::Geometry3D => Ok(exporters.exporter_by_id(&(&config.export.part).into())?),
+            OutputType::InvalidMixed => Err(anyhow!(
+                "Invalid output type, the model cannot be exported."
             )),
         }
     }
@@ -92,11 +88,12 @@ impl ExportArgs {
     /// Get default export attribute.
     fn default_export_attribute(
         &self,
-        node: &ModelNode,
+        model: &Model,
         config: &Config,
         exporters: &ExporterRegistry,
     ) -> anyhow::Result<ExportAttribute> {
-        let default_exporter = Self::default_exporter(&node.final_output_type(), config, exporters);
+        let default_exporter =
+            Self::default_exporter(&model.final_output_type(), config, exporters);
         let resolution = self.resolution();
         let layers = self.layers.clone();
         let size = self.size();
@@ -133,45 +130,45 @@ impl ExportArgs {
         }
     }
 
-    /// Get all nodes that are supposed to be exported.
+    /// Get all models that are supposed to be exported.
     ///
-    /// All child nodes of `node` that are in the same source file and
+    /// All child models of `model` that are in the same source file and
     /// that have an `export` attribute will be exported.
     ///
-    /// If no nodes have been found, we simply export this node with the default export attribute.
-    pub fn target_nodes(
+    /// If no models have been found, we simply export this model with the default export attribute.
+    pub fn target_models(
         &self,
-        node: &ModelNode,
+        model: &Model,
         config: &Config,
         exporters: &ExporterRegistry,
-    ) -> anyhow::Result<Vec<(ModelNode, ExportAttribute)>> {
-        let mut nodes: Vec<(ModelNode, ExportAttribute)> = node
+    ) -> anyhow::Result<Vec<(Model, ExportAttribute)>> {
+        let mut models: Vec<(Model, ExportAttribute)> = model
             .source_file_descendants()
-            .filter_map(|node| {
-                let b = node.borrow();
+            .filter_map(|model| {
+                let b = model.borrow();
                 b.attributes
                     .get_export_attribute()
-                    .map(|attr| (node.clone(), attr))
+                    .map(|attr| (model.clone(), attr))
             })
             .collect();
 
-        // No nodes with export attributes have been found.
-        if nodes.is_empty() {
-            // Add the root node with default exporters.
-            nodes.push((
-                node.clone(),
-                self.default_export_attribute(node, config, exporters)?,
+        // No models with export attributes have been found.
+        if models.is_empty() {
+            // Add the root model with default exporters.
+            models.push((
+                model.clone(),
+                self.default_export_attribute(model, config, exporters)?,
             ))
         }
 
-        Ok(nodes)
+        Ok(models)
     }
 
-    pub fn export_targets(&self, nodes: &[(ModelNode, ExportAttribute)]) -> anyhow::Result<()> {
-        nodes
+    pub fn export_targets(&self, models: &[(Model, ExportAttribute)]) -> anyhow::Result<()> {
+        models
             .iter()
-            .try_for_each(|(node, attr)| -> anyhow::Result<()> {
-                let value = attr.export(node)?;
+            .try_for_each(|(model, attr)| -> anyhow::Result<()> {
+                let value = attr.export(model)?;
                 if !matches!(value, Value::None) {
                     log::info!("{value}");
                 };
@@ -180,9 +177,9 @@ impl ExportArgs {
         Ok(())
     }
 
-    pub fn list_targets(&self, nodes: &Vec<(ModelNode, ExportAttribute)>) -> anyhow::Result<()> {
-        for (node, attr) in nodes {
-            log::info!("{node} => {attr}", node = node.signature());
+    pub fn list_targets(&self, models: &Vec<(Model, ExportAttribute)>) -> anyhow::Result<()> {
+        for (model, attr) in models {
+            log::info!("{model} => {attr}", model = model.signature());
         }
         Ok(())
     }
@@ -199,16 +196,16 @@ pub struct Export {
 impl RunCommand for Export {
     fn run(&self, cli: &Cli) -> anyhow::Result<()> {
         let mut context = cli.make_context(&self.args.input)?;
-        let node = context.eval().expect("Valid node");
+        let model = context.eval().expect("Valid model");
         let config = cli.fetch_config()?;
 
-        let target_nodes = &self
+        let target_models = &self
             .args
-            .target_nodes(&node, &config, context.exporters())?;
+            .target_models(&model, &config, context.exporters())?;
         if self.args.list {
-            self.args.list_targets(target_nodes)
+            self.args.list_targets(target_models)
         } else {
-            self.args.export_targets(target_nodes)
+            self.args.export_targets(target_models)
         }
     }
 }
