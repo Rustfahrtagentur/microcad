@@ -11,6 +11,7 @@ pub mod geo2d;
 #[cfg(feature = "geo3d")]
 pub mod geo3d;
 pub mod render_resolution;
+pub mod theme;
 
 /// Primitive integer type
 pub type Integer = i64;
@@ -38,3 +39,4 @@ pub use core_error::*;
 pub use geo2d::*;
 pub use geo3d::*;
 pub use render_resolution::*;
+pub use theme::*;
