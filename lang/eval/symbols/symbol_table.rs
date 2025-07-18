@@ -260,8 +260,8 @@ impl Locals for SymbolTable {
         self.stack.fetch(id)
     }
 
-    fn get_node_builder(&self) -> EvalResult<RcMut<crate::model_tree::ModelNodeBuilder>> {
-        self.stack.get_node_builder()
+    fn get_model_builder(&self) -> EvalResult<RcMut<crate::model_tree::ModelBuilder>> {
+        self.stack.get_model_builder()
     }
 }
 

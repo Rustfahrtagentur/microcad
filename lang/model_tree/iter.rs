@@ -9,23 +9,23 @@ use super::*;
 
 /// Children iterator struct.
 pub struct Children {
-    node: ModelNode,
+    model: Model,
     index: usize,
 }
 
 impl Children {
     /// Create new [`Children`] iterator
-    pub fn new(node: ModelNode) -> Self {
-        Self { node, index: 0 }
+    pub fn new(model: Model) -> Self {
+        Self { model, index: 0 }
     }
 }
 
 impl Iterator for Children {
-    type Item = ModelNode;
+    type Item = Model;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let node = self.node.borrow();
-        let child = node.children.get(self.index);
+        let model = self.model.borrow();
+        let child = model.children.get(self.index);
         self.index += 1;
         child.cloned()
     }
@@ -33,12 +33,12 @@ impl Iterator for Children {
 
 /// Iterator over all descendants.
 pub struct Descendants {
-    stack: ModelNodes,
+    stack: Models,
 }
 
 impl Descendants {
     /// Create new descendants iterator
-    pub fn new(root: ModelNode) -> Self {
+    pub fn new(root: Model) -> Self {
         Self {
             stack: root
                 .borrow()
@@ -53,83 +53,83 @@ impl Descendants {
 }
 
 impl Iterator for Descendants {
-    type Item = ModelNode;
+    type Item = Model;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some(node) = self.stack.pop() {
-            let children = node.borrow().children.clone();
+        if let Some(model) = self.stack.pop() {
+            let children = model.borrow().children.clone();
             for child in children.iter().rev() {
                 self.stack.push(child.clone());
             }
-            Some(node)
+            Some(model)
         } else {
             None
         }
     }
 }
 
-/// Iterator over all parents of a [`ModelNode`].
+/// Iterator over all parents of a [`Model`].
 pub struct Parents {
-    node: Option<ModelNode>,
+    model: Option<Model>,
 }
 
 impl Parents {
     /// New parents iterator
-    pub fn new(node: ModelNode) -> Self {
-        Self { node: Some(node) }
+    pub fn new(model: Model) -> Self {
+        Self { model: Some(model) }
     }
 }
 
 impl Iterator for Parents {
-    type Item = ModelNode;
+    type Item = Model;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match &self.node {
-            Some(node) => {
-                let parent = node.borrow().parent.clone();
-                self.node = parent;
-                self.node.clone()
+        match &self.model {
+            Some(model) => {
+                let parent = model.borrow().parent.clone();
+                self.model = parent;
+                self.model.clone()
             }
             None => None,
         }
     }
 }
 
-/// Iterator over all ancestors (this node and its parents)
+/// Iterator over all ancestors (this model and its parents)
 pub struct Ancestors {
-    node: Option<ModelNode>,
+    model: Option<Model>,
 }
 
 impl Ancestors {
     /// New parents iterator
-    pub fn new(node: ModelNode) -> Self {
-        Self { node: Some(node) }
+    pub fn new(model: Model) -> Self {
+        Self { model: Some(model) }
     }
 }
 
 impl Iterator for Ancestors {
-    type Item = ModelNode;
+    type Item = Model;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let node = match &self.node {
-            Some(node) => node.clone(),
+        let model = match &self.model {
+            Some(model) => model.clone(),
             None => return None,
         };
 
-        self.node = node.borrow().parent.clone();
-        Some(node.clone())
+        self.model = model.borrow().parent.clone();
+        Some(model.clone())
     }
 }
 
 /// Iterator over all descendants.
 pub struct SourceFileDescendants {
-    stack: ModelNodes,
+    stack: Models,
     source_file: std::rc::Rc<SourceFile>,
 }
 
 impl SourceFileDescendants {
     /// Create a new source file descendants.
-    pub fn new(root: ModelNode) -> Self {
+    pub fn new(root: Model) -> Self {
         let source_file = root.find_source_file().expect("A source file");
 
         Self {
@@ -147,11 +147,11 @@ impl SourceFileDescendants {
 }
 
 impl Iterator for SourceFileDescendants {
-    type Item = ModelNode;
+    type Item = Model;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some(node) = self.stack.pop() {
-            let children = node
+        if let Some(model) = self.stack.pop() {
+            let children = model
                 .borrow()
                 .children
                 .filter_by_source_file(&self.source_file);
@@ -159,7 +159,7 @@ impl Iterator for SourceFileDescendants {
                 self.stack.push(child.clone());
             }
 
-            Some(node)
+            Some(model)
         } else {
             None
         }

@@ -157,10 +157,10 @@ impl Locals for Stack {
         }
     }
 
-    fn get_node_builder(&self) -> EvalResult<RcMut<ModelNodeBuilder>> {
+    fn get_model_builder(&self) -> EvalResult<RcMut<ModelBuilder>> {
         match self.current_frame() {
-            Some(StackFrame::Workbench(node_builder, _, _)) => Ok(node_builder.clone()),
-            _ => unreachable!("missing node builder"),
+            Some(StackFrame::Workbench(model_builder, _, _)) => Ok(model_builder.clone()),
+            _ => unreachable!("missing model builder"),
         }
     }
 

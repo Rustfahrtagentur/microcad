@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Node attributes module.
+//! Model attributes.
 
 mod attributes;
 mod export;
@@ -19,7 +19,7 @@ use crate::{syntax::*, value::*};
 
 use microcad_core::Color;
 
-/// An attribute for a model tree node.
+/// An attribute for a model.
 #[derive(Clone, Debug)]
 pub enum Attribute {
     /// Export attributes.

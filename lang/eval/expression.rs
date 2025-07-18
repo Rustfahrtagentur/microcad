@@ -38,12 +38,12 @@ impl Expression {
     ) -> EvalResult<Value> {
         let value = self.eval(context)?;
         match value {
-            Value::Nodes(mut nodes) => {
+            Value::Models(mut models) => {
                 let attributes = attribute_list.eval(context)?;
-                nodes.iter_mut().for_each(|node| {
-                    node.borrow_mut().attributes = attributes.clone();
+                models.iter_mut().for_each(|model| {
+                    model.borrow_mut().attributes = attributes.clone();
                 });
-                Ok(Value::Nodes(nodes))
+                Ok(Value::Models(models))
             }
             Value::None => Ok(Value::None),
             _ => {
@@ -146,21 +146,21 @@ impl Eval for Expression {
     }
 }
 
-impl Eval<ModelNodes> for Expression {
-    fn eval(&self, context: &mut Context) -> EvalResult<ModelNodes> {
+impl Eval<Models> for Expression {
+    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
         let value: Value = self.eval(context)?;
-        Ok(value.fetch_nodes())
+        Ok(value.fetch_models())
     }
 }
 
 impl Eval for Nested {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        let mut node_stack = Vec::new();
+        let mut model_stack = Vec::new();
 
         for (index, item) in self.iter().enumerate() {
             let value = item.eval(context)?;
-            let nodes = match value {
-                Value::Nodes(nodes) => nodes,
+            let models = match value {
+                Value::Models(models) => models,
                 Value::None => return Ok(Value::None),
                 value => {
                     if index == 0 && self.len() == 1 {
@@ -171,10 +171,10 @@ impl Eval for Nested {
                     }
                 }
             };
-            node_stack.push(nodes);
+            model_stack.push(models);
         }
 
-        Ok(Value::Nodes(ModelNodes::from_node_stack(&node_stack)))
+        Ok(Value::Models(Models::from_stack(&model_stack)))
     }
 }
 
@@ -211,7 +211,7 @@ impl Eval for NestedItem {
                     unreachable!("Unexpected unload source file {} in expression", ns.id)
                 }
             },
-            NestedItem::Body(body) => Ok(Value::from_single_node(body.eval(context)?)),
+            NestedItem::Body(body) => Ok(Value::from_single_model(body.eval(context)?)),
         }
     }
 }

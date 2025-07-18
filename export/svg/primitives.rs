@@ -6,7 +6,7 @@
 use cgmath::{InnerSpace, Rad};
 use geo::{CoordsIter as _, Point, Rect, Translate};
 use microcad_core::*;
-use microcad_lang::model_tree::{Element, ModelNode, ModelNodeOutputType};
+use microcad_lang::model_tree::{Element, Model, OutputType};
 
 use crate::svg::*;
 
@@ -119,9 +119,9 @@ impl WriteSvg for Geometry2D {
     }
 }
 
-impl WriteSvg for ModelNode {
+impl WriteSvg for Model {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
-        assert_eq!(self.final_output_type(), ModelNodeOutputType::Geometry2D);
+        assert_eq!(self.final_output_type(), OutputType::Geometry2D);
 
         let node_attr: SvgTagAttributes = self.into();
         let attr = node_attr.merge(attr.clone());

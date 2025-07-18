@@ -11,9 +11,9 @@ impl BuiltinWorkbenchDefinition for Sphere {
         "sphere"
     }
 
-    fn node(args: &Tuple) -> EvalResult<ModelNode> {
+    fn model(args: &Tuple) -> EvalResult<Model> {
         Ok(
-            ModelNodeBuilder::new_3d_primitive(Rc::new(geo3d::Geometry3D::Sphere(geo3d::Sphere {
+            ModelBuilder::new_3d_primitive(Rc::new(geo3d::Geometry3D::Sphere(geo3d::Sphere {
                 radius: args.get("radius"),
             })))
             .build(),

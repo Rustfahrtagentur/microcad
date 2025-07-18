@@ -11,9 +11,9 @@ impl BuiltinWorkbenchDefinition for Circle {
         "circle"
     }
 
-    fn node(args: &Tuple) -> EvalResult<ModelNode> {
+    fn model(args: &Tuple) -> EvalResult<Model> {
         Ok(
-            ModelNodeBuilder::new_2d_primitive(Rc::new(Geometry2D::Circle(geo2d::Circle {
+            ModelBuilder::new_2d_primitive(Rc::new(Geometry2D::Circle(geo2d::Circle {
                 radius: args.get("radius"),
                 offset: (args.get("cx"), args.get("cy")).into(),
             })))

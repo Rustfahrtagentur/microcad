@@ -1,13 +1,13 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Node attributes collection.
+//! Model attributes collection.
 
 use derive_more::{Deref, DerefMut};
 
 use crate::{model_tree::*, syntax::Identifier};
 
-/// Node attributes, from an evaluated attribute list.
+/// Model attributes, from an evaluated attribute list.
 #[derive(Clone, Debug, Default, Deref, DerefMut)]
 pub struct Attributes(Vec<Attribute>);
 

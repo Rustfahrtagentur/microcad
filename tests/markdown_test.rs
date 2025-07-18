@@ -157,15 +157,13 @@ pub fn run_test(
                 // check if test awaited to succeed but failed at evaluation
                 match (eval, context.has_errors(), todo) {
                     // test expected to succeed and succeeds with no errors
-                    (Ok(node), false, false) => {
-                        use microcad_lang::model_tree::{
-                            ExportAttribute as Export, ModelNodeOutputType,
-                        };
+                    (Ok(model), false, false) => {
+                        use microcad_lang::model_tree::{ExportAttribute as Export, OutputType};
 
                         let _ = fs::hard_link("images/ok.png", banner);
                         writeln!(log_out, "-- Test Result --\nOK").expect("output error");
-                        match node.final_output_type() {
-                            ModelNodeOutputType::Geometry2D => {
+                        match model.final_output_type() {
+                            OutputType::Geometry2D => {
                                 Export {
                                     filename: out_filename.to_string().into(),
                                     resolution: RenderResolution::default(),
@@ -173,11 +171,11 @@ pub fn run_test(
                                     layers: vec![],
                                     size: Size2D::A4,
                                 }
-                                .export(&node)
+                                .export(&model)
                                 .expect("No error");
                             }
-                            ModelNodeOutputType::Geometry3D => todo!("Implement 3D export"),
-                            ModelNodeOutputType::NotDetermined => {}
+                            OutputType::Geometry3D => todo!("Implement 3D export"),
+                            OutputType::NotDetermined => {}
                             _ => panic!("Invalid geometry output"),
                         }
                     }

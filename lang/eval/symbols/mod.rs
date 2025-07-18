@@ -52,6 +52,6 @@ pub trait Locals {
     /// Get a named local value from locals.
     fn get_local_value(&self, id: &Identifier) -> EvalResult<Value>;
 
-    /// Get current model node builder
-    fn get_node_builder(&self) -> EvalResult<RcMut<ModelNodeBuilder>>;
+    /// Get current model.
+    fn get_model_builder(&self) -> EvalResult<RcMut<ModelBuilder>>;
 }

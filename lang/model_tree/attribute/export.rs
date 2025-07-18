@@ -5,7 +5,7 @@
 
 use crate::{
     builtin::{ExportError, Exporter},
-    model_tree::ModelNode,
+    model_tree::Model,
     value::Value,
 };
 use cgmath::SquareMatrix;
@@ -27,13 +27,13 @@ pub struct ExportAttribute {
 }
 
 impl ExportAttribute {
-    /// Export the node. By the settings in the attribute.
-    pub fn export(&self, node: &ModelNode) -> Result<Value, ExportError> {
-        node.set_matrix(Mat4::identity());
-        node.set_resolution(self.resolution.clone());
-        node.render();
+    /// Export the model. By the settings in the attribute.
+    pub fn export(&self, model: &Model) -> Result<Value, ExportError> {
+        model.set_matrix(Mat4::identity());
+        model.set_resolution(self.resolution.clone());
+        model.render();
 
-        self.exporter.export(node, &self.filename)
+        self.exporter.export(model, &self.filename)
     }
 }
 

@@ -3,16 +3,16 @@
 
 use crate::{eval::*, model_tree::*, syntax::*};
 
-impl Eval<ModelNode> for std::rc::Rc<SourceFile> {
-    fn eval(&self, context: &mut Context) -> EvalResult<ModelNode> {
+impl Eval<Model> for std::rc::Rc<SourceFile> {
+    fn eval(&self, context: &mut Context) -> EvalResult<Model> {
         context.scope(
             StackFrame::Source(self.id(), SymbolMap::default()),
             |context| {
-                let node = ModelNodeBuilder::new_object_body()
+                let model = ModelBuilder::new_object_body()
                     .add_children(self.statements.eval(context)?)?
                     .build();
-                node.borrow_mut().origin.source_file = Some(self.clone());
-                Ok(node)
+                model.borrow_mut().origin.source_file = Some(self.clone());
+                Ok(model)
             },
         )
     }

@@ -6,8 +6,8 @@ use crate::{eval::*, syntax::*};
 impl InitDefinition {
     /// Evaluate a call to the init definition
     pub fn eval(&self, args: &Tuple, context: &mut Context) -> EvalResult<()> {
-        let node_builder = context.get_node_builder()?;
-        let mut node_builder = node_builder.borrow_mut();
+        let model_builder = context.get_model_builder()?;
+        let mut model_builder = model_builder.borrow_mut();
 
         context.scope(StackFrame::Init(args.into()), |context| {
             for statement in self.body.statements.iter() {
@@ -18,8 +18,8 @@ impl InitDefinition {
                         let value: Value = assignment.expression.eval(context)?;
 
                         // Only change the property value, do not add new properties
-                        if node_builder.has_property(id) {
-                            node_builder.set_property(id.clone(), value.clone());
+                        if model_builder.has_property(id) {
+                            model_builder.set_property(id.clone(), value.clone());
                         }
                         context.set_local_value(id.clone(), value)?;
                     }

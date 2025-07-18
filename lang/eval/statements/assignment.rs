@@ -46,12 +46,12 @@ impl Eval<()> for AssignmentStatement {
         }
 
         let value = match value {
-            Value::Nodes(mut nodes) => {
+            Value::Models(mut models) => {
                 let attributes = self.attribute_list.eval(context)?;
-                nodes.iter_mut().for_each(|node| {
-                    node.borrow_mut().attributes = attributes.clone();
+                models.iter_mut().for_each(|model| {
+                    model.borrow_mut().attributes = attributes.clone();
                 });
-                Value::Nodes(nodes)
+                Value::Models(models)
             }
             value => {
                 if !self.attribute_list.is_empty() {

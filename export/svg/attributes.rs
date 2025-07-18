@@ -6,7 +6,7 @@
 use derive_more::Deref;
 use microcad_core::{Color, Scalar};
 use microcad_lang::{
-    model_tree::{GetAttribute, ModelNode},
+    model_tree::{GetAttribute, Model},
     syntax::Identifier,
 };
 
@@ -59,13 +59,13 @@ impl SvgTagAttributes {
     }
 }
 
-impl From<&ModelNode> for SvgTagAttributes {
-    fn from(node: &ModelNode) -> Self {
+impl From<&Model> for SvgTagAttributes {
+    fn from(model: &Model) -> Self {
         use microcad_lang::value::ValueAccess;
 
         match (
-            node.get_exporter_attribute(&Identifier::no_ref("svg")),
-            node.get_color_attribute(),
+            model.get_exporter_attribute(&Identifier::no_ref("svg")),
+            model.get_color_attribute(),
         ) {
             (None, None) => SvgTagAttributes::default(),
             (None, Some(color)) => SvgTagAttributes::default().fill(color),

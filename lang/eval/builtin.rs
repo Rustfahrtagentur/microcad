@@ -49,24 +49,24 @@ impl CallTrait for Builtin {
 pub trait BuiltinWorkbenchDefinition {
     /// Get id of the builtin part
     fn id() -> &'static str;
-    /// Create node from argument map
-    fn node(args: &Tuple) -> EvalResult<ModelNode>;
+    /// Create model from argument map
+    fn model(args: &Tuple) -> EvalResult<Model>;
     /// Part function
     fn function() -> &'static BuiltinFn {
         &|params, args, _| {
             log::trace!("Built-in workbench call {id}({args})", id = Self::id());
-            Ok(Value::Nodes(
+            Ok(Value::Models(
                 ArgumentMatch::find_multi_match(
                     args,
                     params.expect("A built-in part must have a parameter list"),
                 )?
                 .iter()
                 .map(|args| {
-                    Self::node(args).inspect(|node| {
-                        node.borrow_mut().origin.arguments = args.clone();
+                    Self::model(args).inspect(|model| {
+                        model.borrow_mut().origin.arguments = args.clone();
                     })
                 })
-                .collect::<Result<ModelNodes, _>>()?,
+                .collect::<Result<Models, _>>()?,
             ))
         }
     }

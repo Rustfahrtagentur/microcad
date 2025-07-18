@@ -31,56 +31,58 @@ fn call_argument_value_list(s: &str, context: &mut Context) -> ArgumentValueList
 fn workbench_call() {
     let mut context = crate::context_for_file("syntax/workbench/plan.µcad");
 
-    let node = context.lookup(&qualified_name("a")).expect("Node expected");
+    let symbol = context
+        .lookup(&qualified_name("a"))
+        .expect("Symbol expected");
 
-    // Check node id
-    if let Ok(node) = context.lookup(&Identifier(Refer::none("a".into())).into()) {
-        let id = node.id();
+    // Check symbol id
+    if let Ok(symbol) = context.lookup(&Identifier(Refer::none("a".into())).into()) {
+        let id = symbol.id();
         assert_eq!(id.id(), "a");
     }
 
     // Get workbench definition for symbol `a`
-    let definition = match &node.borrow().def {
+    let definition = match &symbol.borrow().def {
         SymbolDefinition::Workbench(definition) => definition.clone(),
         _ => panic!("Symbol is not a workbench"),
     };
 
     // Call `a` with `b = 3.0`
-    let nodes = definition
+    let models = definition
         .call(
             &call_argument_value_list("b = 3.0", &mut context),
             &mut context,
         )
-        .expect("Valid nodes");
+        .expect("Valid models");
 
-    assert_eq!(nodes.len(), 1, "There should be one node");
+    assert_eq!(models.len(), 1, "There should be one model");
 
-    fn check_node_property_b(node: &ModelNode, value: f64) {
-        if let Element::Object(ref object) = node.borrow().element.value {
+    fn check_property_b(model: &Model, value: f64) {
+        if let Element::Object(ref object) = model.borrow().element.value {
             assert_eq!(
                 object.get_property_value(&Identifier(Refer::none("b".into()))),
                 Value::Quantity(Quantity::new(value, QuantityType::Scalar))
             );
         } else {
-            panic!("Object node expected")
+            panic!("Object model expected")
         }
     }
 
-    // Test if resulting object node has property `b` with value `3.0`
-    check_node_property_b(nodes.first().expect("Node expected"), 3.0);
+    // Test if resulting object model has property `b` with value `3.0`
+    check_property_b(models.first().expect("Model expected"), 3.0);
 
     // Call `a` with `b = [1.0, 2.0]` (multiplicity)
-    let nodes = definition
+    let models = definition
         .call(
             &call_argument_value_list("b = [1.0, 2.0]", &mut context),
             &mut context,
         )
-        .expect("Valid nodes");
+        .expect("Valid models");
 
-    assert_eq!(nodes.len(), 2, "There should be two nodes");
+    assert_eq!(models.len(), 2, "There should be two models");
 
-    check_node_property_b(nodes.first().expect("Node expected"), 1.0);
-    check_node_property_b(nodes.get(1).expect("Node expected"), 2.0);
+    check_property_b(models.first().expect("Model expected"), 1.0);
+    check_property_b(models.get(1).expect("Model expected"), 2.0);
 }
 
 #[test]
@@ -89,84 +91,84 @@ fn workbench_initializer_call() {
     use microcad_lang::*;
 
     let mut context = crate::context_for_file("syntax/workbench/initializer.µcad");
-    let node = context
+    let symbol = context
         .lookup(&qualified_name("circle"))
-        .expect("Node expected");
+        .expect("Symbol expected");
 
     // Get workbench definition for symbol `a`
-    let definition = match &node.borrow().def {
+    let definition = match &symbol.borrow().def {
         SymbolDefinition::Workbench(definition) => definition.clone(),
         _ => panic!("Symbol is not a workbench"),
     };
 
-    // Helper function to check if the object node contains a property radius with specified value
-    fn check_node_property_radius(node: &model_tree::ModelNode, value: f64) {
-        if let model_tree::Element::Object(ref object) = *node.borrow().element {
+    // Helper function to check if the object model contains a property radius with specified value
+    fn check_property_radius(model: &model_tree::Model, value: f64) {
+        if let model_tree::Element::Object(ref object) = *model.borrow().element {
             log::trace!("Object: {object}");
             assert_eq!(
                 object.get_property_value(&Identifier::no_ref("radius")),
                 Value::Quantity(Quantity::new(value, ty::QuantityType::Scalar))
             );
         } else {
-            panic!("Object node expected")
+            panic!("Model expected")
         }
     }
 
     // Call `circle(radius = 3.0)`
     {
-        let nodes = definition
+        let models = definition
             .call(
                 &call_argument_value_list("radius = 3.0", &mut context),
                 &mut context,
             )
             .expect("A valid value");
-        assert_eq!(nodes.len(), 1, "There should be one node");
-        check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
+        assert_eq!(models.len(), 1, "There should be one model");
+        check_property_radius(models.first().expect("Model expected"), 3.0);
     }
 
     // Call `circle(r = 3.0)`
     {
-        let nodes = definition
+        let models = definition
             .call(
                 &call_argument_value_list("r = 3.0", &mut context),
                 &mut context,
             )
-            .expect("Valid nodes");
-        assert_eq!(nodes.len(), 1, "There should be one node");
-        check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
+            .expect("Valid models");
+        assert_eq!(models.len(), 1, "There should be one model");
+        check_property_radius(models.first().expect("Model expected"), 3.0);
     }
 
     // Call circle(d = 6.0)`
     {
-        let nodes = definition
+        let models = definition
             .call(
                 &call_argument_value_list("d = 6.0", &mut context),
                 &mut context,
             )
-            .expect("Valid nodes");
-        assert_eq!(nodes.len(), 1, "There should be one node");
-        check_node_property_radius(nodes.first().expect("Node expected"), 3.0);
+            .expect("Valid models");
+        assert_eq!(models.len(), 1, "There should be one model");
+        check_property_radius(models.first().expect("Model expected"), 3.0);
     }
 
     // Call `circle(d = [1.0, 2.0])` (multiplicity)
     {
-        let nodes = definition
+        let models = definition
             .call(
                 &call_argument_value_list("d = [1.0, 2.0]", &mut context),
                 &mut context,
             )
-            .expect("Valid nodes");
-        assert_eq!(nodes.len(), 2, "There should be two nodes");
-        check_node_property_radius(nodes.first().expect("Node expected"), 0.5);
-        check_node_property_radius(nodes.get(1).expect("Node expected"), 1.0);
+            .expect("Valid models");
+        assert_eq!(models.len(), 2, "There should be two models");
+        check_property_radius(models.first().expect("Model expected"), 0.5);
+        check_property_radius(models.get(1).expect("Model expected"), 1.0);
     }
 
     // Call `circle()` (missing arguments)
     {
-        let nodes = definition
+        let models = definition
             .call(&ArgumentValueList::default(), &mut context)
-            .expect("Valid nodes");
-        assert_eq!(nodes.len(), 0, "There should no nodes");
+            .expect("Valid models");
+        assert_eq!(models.len(), 0, "There should no models");
         log::trace!("{}", context.diagnosis());
     }
 }

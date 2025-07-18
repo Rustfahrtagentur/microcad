@@ -11,9 +11,9 @@ impl BuiltinWorkbenchDefinition for Cylinder {
         "cylinder"
     }
 
-    fn node(args: &Tuple) -> EvalResult<ModelNode> {
+    fn model(args: &Tuple) -> EvalResult<Model> {
         Ok(
-            ModelNodeBuilder::new_3d_primitive(Rc::new(Geometry3D::Cylinder(geo3d::Cylinder {
+            ModelBuilder::new_3d_primitive(Rc::new(Geometry3D::Cylinder(geo3d::Cylinder {
                 radius_bottom: args.get("radius_bottom"),
                 radius_top: args.get("radius_top"),
                 height: args.get("height"),

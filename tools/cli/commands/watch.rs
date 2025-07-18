@@ -21,17 +21,18 @@ impl RunCommand for Watch {
 
         if export.list {
             let mut context = cli.make_context(&self.export_args.input)?;
-            let node = context.eval().expect("Valid node");
-            export.list_targets(&export.target_nodes(&node, &config, context.exporters())?)
+            let model = context.eval().expect("Valid model");
+            export.list_targets(&export.target_models(&model, &config, context.exporters())?)
         } else {
             // Recompile whenever something relevant happens.
             loop {
                 let mut context = cli.make_context(&self.export_args.input)?;
                 // Re-evaluate context.
-                if let Ok(node) = context.eval() {
-                    let target_nodes = &export.target_nodes(&node, &config, context.exporters())?;
+                if let Ok(model) = context.eval() {
+                    let target_models =
+                        &export.target_models(&model, &config, context.exporters())?;
 
-                    export.export_targets(target_nodes)?;
+                    export.export_targets(target_models)?;
                 }
 
                 // Watch all dependencies of the most recent compilation.

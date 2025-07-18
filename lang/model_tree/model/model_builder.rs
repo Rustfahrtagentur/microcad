@@ -1,31 +1,31 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Model node builder.
+//! Model builder.
 
 use microcad_core::{Geometry2D, Geometry3D};
 
 use crate::{eval::*, model_tree::*, rc::*, src_ref::*, syntax::*, value::*};
 
-/// A builder pattern to build model nodes
+/// A builder pattern to build models
 #[derive(Default)]
-pub struct ModelNodeBuilder {
-    root: ModelNodeInner,
-    /// Properties to add to the model node if it is an [`Object`]
+pub struct ModelBuilder {
+    root: ModelInner,
+    /// Properties to add to the model if it is an [`Object`]
     pub properties: ObjectProperties,
-    /// Children to add to this node.
-    pub children: ModelNodes,
+    /// Children to add to this model.
+    pub children: Models,
 
-    /// The output type of this node.
-    output: ModelNodeOutputType,
+    /// The output type of this model.
+    output: OutputType,
 }
 
-/// ModelNodeBuilder constructors.
+/// `ModelBuilder` creation.
 ///
 /// All methods in this `impl` block are used to create a new model builder with a specific [`Element`] type.
-impl ModelNodeBuilder {
+impl ModelBuilder {
     /// Return output type
-    pub fn kind(&self) -> ModelNodeOutputType {
+    pub fn kind(&self) -> OutputType {
         self.output
     }
 
@@ -43,7 +43,7 @@ impl ModelNodeBuilder {
     pub fn new_2d_object() -> Self {
         Self {
             root: Object::default().into(),
-            output: ModelNodeOutputType::Geometry2D,
+            output: OutputType::Geometry2D,
             ..Default::default()
         }
     }
@@ -51,7 +51,7 @@ impl ModelNodeBuilder {
     /// Create a new children placeholder
     pub fn new_children_placeholder() -> Self {
         Self {
-            root: ModelNodeInner::new(Refer::none(Element::ChildrenPlaceholder)),
+            root: ModelInner::new(Refer::none(Element::ChildrenPlaceholder)),
             ..Default::default()
         }
     }
@@ -62,7 +62,7 @@ impl ModelNodeBuilder {
     pub fn new_3d_object() -> Self {
         Self {
             root: Object::default().into(),
-            output: ModelNodeOutputType::Geometry3D,
+            output: OutputType::Geometry3D,
             ..Default::default()
         }
     }
@@ -71,7 +71,7 @@ impl ModelNodeBuilder {
     pub fn new_2d_primitive(geometry: std::rc::Rc<Geometry2D>) -> Self {
         Self {
             root: geometry.into(),
-            output: ModelNodeOutputType::Geometry2D,
+            output: OutputType::Geometry2D,
             ..Default::default()
         }
     }
@@ -80,7 +80,7 @@ impl ModelNodeBuilder {
     pub fn new_3d_primitive(geometry: std::rc::Rc<Geometry3D>) -> Self {
         Self {
             root: geometry.into(),
-            output: ModelNodeOutputType::Geometry3D,
+            output: OutputType::Geometry3D,
             ..Default::default()
         }
     }
@@ -96,21 +96,21 @@ impl ModelNodeBuilder {
     /// New operation.
     pub fn new_operation<T: Operation + 'static>(operation: T, src_ref: SrcRef) -> Self {
         Self {
-            root: ModelNodeInner::new(Refer::new(Element::Operation(Rc::new(operation)), src_ref)),
+            root: ModelInner::new(Refer::new(Element::Operation(Rc::new(operation)), src_ref)),
             ..Default::default()
         }
     }
 }
 
-impl ModelNodeBuilder {
-    /// Add multiple children to the node if it matches.
-    pub fn add_children(mut self, mut children: ModelNodes) -> EvalResult<Self> {
+impl ModelBuilder {
+    /// Add multiple children to the model if it matches.
+    pub fn add_children(mut self, mut children: Models) -> EvalResult<Self> {
         self.children.append(&mut children);
         Ok(self)
     }
 
-    /// Add multiple children to the node if it matches.
-    pub fn add_children2(&mut self, mut children: ModelNodes) -> EvalResult<()> {
+    /// Add multiple children to the model if it matches.
+    pub fn add_children2(&mut self, mut children: Models) -> EvalResult<()> {
         self.children.append(&mut children);
         Ok(())
     }
@@ -132,20 +132,20 @@ impl ModelNodeBuilder {
         self.properties.contains_key(id)
     }
 
-    /// Build a [`ModelNode`].
-    pub fn build(mut self) -> ModelNode {
+    /// Build a [`Model`].
+    pub fn build(mut self) -> Model {
         if let Element::Object(object) = &mut self.root.element.value {
             object.props = self.properties
         }
 
-        let node = ModelNode::new(self.root.into());
-        node.append_children(self.children);
-        node.deduce_output_type();
-        node
+        let model = Model::new(self.root.into());
+        model.append_children(self.children);
+        model.deduce_output_type();
+        model
     }
 }
 
-impl std::fmt::Display for ModelNodeBuilder {
+impl std::fmt::Display for ModelBuilder {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.properties)
     }

@@ -22,7 +22,7 @@ impl SourceFileTest {
     ///
     /// It will evaluate a `.µcad` file and generate:
     /// * `.symbol_tree`: A dump of the root symbol tree.
-    /// * `.model_tree`: A dump of the model node tree.
+    /// * `.model_tree`: A dump of the model tree.
     /// * `.log`: An error log file.
     /// * (TODO) `.svg`: An output SVG file, if the test produces a 2D geometry.
     /// * (TODO) `.stl`: An output STL file, if the test produces a 3D geometry.
@@ -40,18 +40,18 @@ impl SourceFileTest {
         self.write_and_compare(symbol_tree, "symbol_tree");
 
         match context.eval() {
-            Ok(node) => {
+            Ok(model) => {
                 use microcad_core::*;
                 use microcad_export::svg::SvgExporter;
-                use microcad_lang::model_tree::{ExportAttribute as Export, ModelNodeOutputType};
+                use microcad_lang::model_tree::{ExportAttribute as Export, OutputType};
                 use std::rc::Rc;
 
-                self.write_and_compare(node.clone(), "model_tree");
+                self.write_and_compare(model.clone(), "model_tree");
 
                 if !context.has_errors() {
-                    // If we have a 2D node, export node to SVG
-                    match node.final_output_type() {
-                        ModelNodeOutputType::Geometry2D => {
+                    // If we have a 2D model, export model to SVG
+                    match model.final_output_type() {
+                        OutputType::Geometry2D => {
                             Export {
                                 filename: self.output_filename("svg").into(),
                                 resolution: RenderResolution::default(),
@@ -59,11 +59,11 @@ impl SourceFileTest {
                                 layers: vec![],
                                 size: Size2D::A4,
                             }
-                            .export(&node)
+                            .export(&model)
                             .expect("No error");
                         }
-                        ModelNodeOutputType::Geometry3D => todo!("Implement 3D export"),
-                        ModelNodeOutputType::NotDetermined => {}
+                        OutputType::Geometry3D => todo!("Implement 3D export"),
+                        OutputType::NotDetermined => {}
                         _ => panic!("Invalid geometry output"),
                     }
                 }

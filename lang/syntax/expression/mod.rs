@@ -61,7 +61,7 @@ pub enum Expression {
     /// Access an element of a tuple: `a.b`
     PropertyAccess(Box<Expression>, Identifier, SrcRef),
 
-    /// Access an attribute of a node: `a#b`
+    /// Access an attribute of a model: `a#b`
     AttributeAccess(Box<Expression>, Identifier, SrcRef),
 
     /// Call to a method: `[2,3].len()`

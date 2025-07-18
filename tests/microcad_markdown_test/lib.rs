@@ -225,7 +225,7 @@ fn scan(
 
 /// Read single *Markdown* file and collect included tests in `tree`.
 ///
-/// Generates tree nodes if name can be split into several names which are separated by `.`.
+/// Generates tree models if name can be split into several names which are separated by `.`.
 fn scan_for_tests(
     output: &mut String,
     file_path: &Path,
