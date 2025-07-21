@@ -33,7 +33,7 @@ impl SvgWriter {
         writeln!(&mut writer, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
             &mut writer,
-            "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='{x} {y} {w} {h}' width='{w}' height='{h}'>",
+            "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='{x} {y} {w} {h}' width='{w}mm' height='{h}mm'>",
         )?;
         writeln!(
             &mut writer,
