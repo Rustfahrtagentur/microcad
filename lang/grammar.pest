@@ -339,13 +339,27 @@ attribute_name_value = { identifier ~ ws* ~ "=" ~ ws* ~ expression }
 
 //`bar()`: ok # Empty tuple
 //`bar(baz = 42)`: ok # Tuple with `baz` field
-attribute_named_tuple = { identifier ~ ws* ~ call_op }
+attribute_exporter = { identifier ~ ws* ~ call_op }
 
-attribute_item = _{ attribute_name_value | attribute_named_tuple }
+//`export`: ok # Command with no attributes
+//`export: "test.svg"`: ok # Command with string
+//`measure: width`: ok # Command with subcommand
+//`measure: width, height(offset = 30mm)`: ok # Command with multiple subcommands
+attribute_command = {
+  identifier ~ ws* ~ (":" ~ ws* ~ attribute_subcommand_list)? 
+}
 
-//`#[bar = 42, foo = 32]`: ok # List of assignment attributes
-//`#[foo = 42, bar(32)]`: ok # List of mixed attributes
-attribute = { "#[" ~ attribute_item ~ ws* ~ ("," ~ ws* ~ attribute_item ~ ws*)* ~ "]" }
+//`"test.svg"`: ok # Format string command
+//`width(offset = 30mm)`: ok # Command with argument tuple
+attribute_subcommand = { format_string | identifier ~ (ws* ~ call_op)? }
+
+//`width, height`: ok # Multiple commands.
+attribute_subcommand_list = { attribute_subcommand ~ (ws* ~ "," ~ ws* ~ attribute_subcommand)* ~ ws* ~ ","?  }
+
+//`#[bar = 42]`: ok # Name-value attribute
+//`#[foo = 42]`: ok # Command attribute
+//`#[svg()]`: ok # Exporter attribute
+attribute = { "#[" ~ ws* ~ (attribute_name_value | attribute_exporter | attribute_command) ~ ws* ~ "]" }
 
 //`#[foo = 32] #[bar = 32]`: ok # Multiple attributes
 attribute_list = { attribute ~ (ws+ ~ attribute)* }
