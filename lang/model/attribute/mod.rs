@@ -4,6 +4,7 @@
 //! Model attributes.
 
 mod attributes;
+mod command;
 mod export;
 mod layer;
 mod measure;

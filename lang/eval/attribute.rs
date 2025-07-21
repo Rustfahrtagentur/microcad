@@ -37,10 +37,16 @@ pub enum AttributeError {
     NotFound(Identifier),
 }
 
+impl Eval<Option<crate::model::Attribute>> for syntax::AttributeCommand {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<crate::model::Attribute>> {
+        todo!("Implement command attribute evaluation");
+    }
+}
+
 impl Eval<Option<ExportAttribute>> for syntax::Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<ExportAttribute>> {
         match self {
-            syntax::Attribute::Tuple(id, arguments) if id.id() == "export" => {
+            syntax::Attribute::Exporter(id, arguments) if id.id() == "export" => {
                 match ArgumentMatch::find_match(
                     &arguments.eval(context)?,
                     &[
@@ -97,39 +103,28 @@ impl Eval<Option<ExportAttribute>> for syntax::Attribute {
 impl Eval<Option<crate::model::Attribute>> for syntax::Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<crate::model::Attribute>> {
         match self {
-            syntax::Attribute::Tuple(id, argument_list) => {
-                let name = id.id().as_str();
-                match name {
-                    // Parse export attribute `export("test.svg")`
-                    "export" => {
-                        if let Some(attr) =
-                            eval::Eval::<Option<ExportAttribute>>::eval(self, context)?
-                        {
-                            return Ok(Some(crate::model::Attribute::Export(attr)));
-                        }
-                    }
-                    // Parse exporter specific attribute, e.g. `svg(style = "fill:none")`
-                    _ => match context.exporter_by_id(id.id()) {
-                        Ok(exporter) => {
-                            match ArgumentMatch::find_match(
-                                &argument_list.eval(context)?,
-                                &exporter.parameters(),
-                            ) {
-                                Ok(args) => {
-                                    return Ok(Some(crate::model::Attribute::ExporterSpecific(
-                                        id.clone(),
-                                        args,
-                                    )));
-                                }
-                                Err(err) => {
-                                    context.warning(self, err)?;
-                                }
+            syntax::Attribute::Exporter(id, argument_list) => {
+                // Parse exporter specific attribute, e.g. `svg(style = "fill:none")`
+                match context.exporter_by_id(id.id()) {
+                    Ok(exporter) => {
+                        match ArgumentMatch::find_match(
+                            &argument_list.eval(context)?,
+                            &exporter.parameters(),
+                        ) {
+                            Ok(args) => {
+                                return Ok(Some(crate::model::Attribute::ExporterSpecific(
+                                    id.clone(),
+                                    args,
+                                )));
+                            }
+                            Err(err) => {
+                                context.warning(self, err)?;
                             }
                         }
-                        Err(err) => {
-                            context.warning(id, err)?;
-                        }
-                    },
+                    }
+                    Err(err) => {
+                        context.warning(id, err)?;
+                    }
                 }
             }
             syntax::Attribute::NameValue(id, expression) => {
@@ -156,6 +151,7 @@ impl Eval<Option<crate::model::Attribute>> for syntax::Attribute {
                     _ => {}
                 }
             }
+            syntax::Attribute::Command(command) => return command.eval(context),
         }
 
         Ok(None)

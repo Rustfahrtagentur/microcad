@@ -60,8 +60,7 @@ impl Parse for Attribute {
                 inner.find(Rule::argument_list).unwrap_or_default(),
             ),
             Rule::attribute_command => Self::Command(
-                inner
-                    .find(Rule::attribute_command)
+                pair.find(Rule::attribute_command)
                     .expect("Attribute command"),
             ),
             _ => unreachable!(),
@@ -72,15 +71,12 @@ impl Parse for Attribute {
 impl Parse for AttributeList {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::attribute_list);
-
         let mut attribute_list = AttributeList::default();
 
         for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::attribute => {
-                    for pair in pair.inner() {
-                        attribute_list.push(Attribute::parse(pair)?);
-                    }
+                    attribute_list.push(Attribute::parse(pair)?);
                 }
                 Rule::COMMENT | Rule::doc_comment => {}
                 rule => unreachable!("Unexpected element {rule:?}"),

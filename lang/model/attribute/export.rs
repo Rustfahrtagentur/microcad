@@ -11,7 +11,7 @@ use crate::{
 use cgmath::SquareMatrix;
 use microcad_core::{Mat4, RenderResolution, Size2D};
 
-/// Export attribute, e.g. `#[export("output.svg")]`.
+/// Export attribute, e.g. `#[export: "output.svg"]`.
 #[derive(Clone)]
 pub struct ExportAttribute {
     /// Filename.
