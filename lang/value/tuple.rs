@@ -86,7 +86,7 @@ impl Tuple {
                 .iter()
                 .map(|(id, v)| (id.clone(), v.ty()))
                 .collect(),
-            unnamed: self.unnamed.values().map(|v| (v.ty())).collect(),
+            unnamed: self.unnamed.values().map(|v| v.ty()).collect(),
         }
     }
 

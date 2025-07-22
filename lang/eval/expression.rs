@@ -61,7 +61,7 @@ impl Expression {
 
 impl Eval for Expression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        log::trace!("Evaluating exception {self}");
+        log::trace!("Evaluating expression {self}");
         let result = match self {
             Self::Literal(literal) => literal.eval(context),
             Self::FormatString(format_string) => format_string.eval(context),

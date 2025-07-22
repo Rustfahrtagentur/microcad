@@ -44,8 +44,8 @@ mod tests;
 pub trait Properties {
     /// Get a value of property, or [`Value::None`] if the property does not exist.
     fn get_property(&self, id: &Identifier) -> Option<&Value>;
-    /// Set or create a property with the given id and value.
-    fn set_property(&mut self, id: Identifier, value: Value);
+    /// Set or create properties with the given ids and values.
+    fn set_properties(&mut self, props: ObjectProperties);
 }
 /// A reference counted, mutable [`Model`].
 #[derive(Debug, Clone, Deref, DerefMut)]

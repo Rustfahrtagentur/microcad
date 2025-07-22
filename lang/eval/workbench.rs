@@ -50,13 +50,16 @@ impl WorkbenchDefinition {
         context.scope(
             StackFrame::Workbench(model, self.id.clone(), arguments.clone().into()),
             |context| {
+                let model = context.get_model()?;
+
                 // run init code
                 if let Some(init) = init {
                     log::trace!("Initializing`{id}` {kind}", id = self.id, kind = self.kind);
-                    init.eval(arguments.clone(), context)?;
+                    if let Err(err) = init.eval(&self.plan, arguments.clone(), context) {
+                        context.error(init, err)?
+                    }
                 }
 
-                let model = context.get_model()?;
                 // At this point, all properties must have a value
                 log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
                 for statement in self.body.statements.iter() {

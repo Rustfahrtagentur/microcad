@@ -5,7 +5,7 @@ use crate::{eval::*, model::*, syntax::*};
 
 impl InitDefinition {
     /// Evaluate a call to the init definition
-    pub fn eval(&self, args: Tuple, context: &mut Context) -> EvalResult<()> {
+    pub fn eval(&self, plan: &ParameterList, args: Tuple, context: &mut Context) -> EvalResult<()> {
         let model = context.get_model()?;
         context.scope(StackFrame::Init(args.into()), |context| {
             for statement in self.body.statements.iter() {
@@ -14,13 +14,7 @@ impl InitDefinition {
                         let assignment = &assignment.assignment;
                         let id = &assignment.id;
                         let value: Value = assignment.expression.eval(context)?;
-
-                        // if assignment aims a property set it otherwise set local variable
-                        if model.borrow().get_property(id).is_some() {
-                            model.borrow_mut().set_property(id.clone(), value.clone());
-                        } else {
-                            context.set_local_value(id.clone(), value)?;
-                        }
+                        context.set_local_value(id.clone(), value)?;
                     }
                     _ => {
                         context.error(
@@ -31,7 +25,24 @@ impl InitDefinition {
                 }
             }
 
-            Ok(())
+            let (found, not_found): (Vec<_>, Vec<_>) = plan
+                .iter()
+                .map(|param| (&param.id, context.get_local_value(&param.id)))
+                .partition(|(_, v)| v.is_ok());
+
+            if not_found.is_empty() {
+                model.borrow_mut().set_properties(
+                    found
+                        .into_iter()
+                        .map(|(id, value)| ((*id).clone(), value.expect("ok")))
+                        .collect(),
+                );
+                Ok(())
+            } else {
+                Err(EvalError::BuildingPlanIncomplete(
+                    not_found.iter().map(|(id, _)| (*id).clone()).collect(),
+                ))
+            }
         })
     }
 }

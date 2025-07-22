@@ -200,6 +200,10 @@ pub enum EvalError {
     /// Workbench didn't find a initialization routine matching the given arguments
     #[error("Workbench {0} cannot find initialization for those arguments")]
     NoInitializationFound(Identifier),
+
+    /// Initializer missed to set a property from plan
+    #[error("Workbench plan incomplete. Missing properties: [:?]")]
+    BuildingPlanIncomplete(Vec<Identifier>),
 }
 
 /// Result type of any evaluation.

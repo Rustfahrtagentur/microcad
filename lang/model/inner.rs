@@ -80,8 +80,8 @@ impl Properties for ModelInner {
         self.element.get_property(id)
     }
 
-    fn set_property(&mut self, id: Identifier, value: Value) {
-        self.element.set_property(id, value);
+    fn set_properties(&mut self, props: ObjectProperties) {
+        self.element.set_properties(props);
     }
 }
 

@@ -59,14 +59,16 @@ impl std::fmt::Display for Element {
 impl Properties for Element {
     fn get_property(&self, id: &Identifier) -> Option<&Value> {
         match self {
-            Self::Object(object) => object.get_property(id),
+            Self::Object(object) => object.get(id),
             _ => unreachable!("not an object element"),
         }
     }
 
-    fn set_property(&mut self, id: Identifier, value: Value) {
+    fn set_properties(&mut self, props: ObjectProperties) {
         match self {
-            Self::Object(object) => object.set_property(id, value),
+            Self::Object(p) => {
+                p.extend(props.iter().map(|(id, prop)| (id.clone(), prop.clone())));
+            }
             _ => unreachable!("not an object element"),
         }
     }
