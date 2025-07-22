@@ -61,7 +61,8 @@ impl Expression {
 
 impl Eval for Expression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        match self {
+        log::trace!("Evaluating exception {self}");
+        let result = match self {
             Self::Literal(literal) => literal.eval(context),
             Self::FormatString(format_string) => format_string.eval(context),
             Self::ListExpression(list_expression) => list_expression.eval(context),
@@ -143,7 +144,13 @@ impl Eval for Expression {
                 Ok(value)
             }
             expr => todo!("{expr:?}"),
-        }
+        };
+        match &result {
+            Ok(Value::None) => log::warn!("Expression {self} resulted in invalid value!"),
+            Ok(result) => log::trace!("Evaluated expression {self} into {result}"),
+            Err(_) => log::trace!("Evaluation of expression {self} failed"),
+        };
+        result
     }
 }
 
