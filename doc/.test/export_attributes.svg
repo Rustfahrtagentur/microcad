@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='-42 -42 84 84'>
+<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='-42 -42 84 84' width='84' height='84'>
 
   <defs>
     <!-- A marker to be used as an arrowhead -->
@@ -15,7 +15,6 @@
     </marker>
   </defs>
             
-<g transform='scale(1)'>
   <g>
     <g>
       <rect x="-21" y="-21" width="42" height="42"/>
@@ -24,5 +23,4 @@
       <circle cx="0" cy="0" r="42"/>
     </g>
   </g>
-</g>
 </svg>
