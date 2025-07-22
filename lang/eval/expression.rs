@@ -126,13 +126,22 @@ impl Eval for Expression {
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Nested(nested) => nested.eval(context),
+
+            // Access a property `x` of an expression `circle.x`
             Self::PropertyAccess(lhs, id, src_ref) => {
-                if let Value::Models(models) = lhs.eval(context)? {
-                    match models.fetch_property(id) {
+                let value: Value = lhs.eval(context)?;
+                match value {
+                    Value::Tuple(tuple) => match tuple.by_id(id) {
+                        Some(value) => return Ok(value.clone()),
+                        None => context.error(src_ref, EvalError::PropertyNotFound(id.clone()))?,
+                    },
+                    Value::Models(models) => match models.fetch_property(id) {
                         Some(prop) => return Ok(prop),
                         None => context.error(src_ref, EvalError::PropertyNotFound(id.clone()))?,
-                    }
+                    },
+                    _ => {}
                 }
+
                 Ok(Value::None)
             }
             Self::AttributeAccess(lhs, identifier, src_ref) => {
