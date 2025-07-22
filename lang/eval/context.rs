@@ -170,8 +170,8 @@ impl Locals for Context {
         self.symbol_table.fetch(id)
     }
 
-    fn get_model_builder(&self) -> EvalResult<RcMut<crate::model::ModelBuilder>> {
-        self.symbol_table.get_model_builder()
+    fn get_model(&self) -> EvalResult<Model> {
+        self.symbol_table.get_model()
     }
 }
 

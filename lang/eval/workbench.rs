@@ -7,61 +7,69 @@ use crate::{eval::*, model::*, syntax::*};
 
 impl WorkbenchDefinition {
     /// Try to evaluate a single call into a [`Model`].
+    ///
+    /// - `arguments`: Single argument tuple (will not be multiplied).
+    /// - `init`: Initializer to call with given `arguments`.
+    /// - `context`: Current evaluation context.
     fn eval_to_model<'a>(
         &'a self,
-        arguments: &Tuple,
+        arguments: Tuple,
         init: Option<&'a InitDefinition>,
         context: &mut Context,
     ) -> EvalResult<Model> {
         log::debug!(
-            "Evaluating to model `{id}` {kind}",
+            "Evaluating model of `{id}` {kind}",
             id = self.id,
             kind = self.kind
         );
-        let model_builder = match self.kind {
-            WorkbenchKind::Part => ModelBuilder::new_3d_object(),
-            WorkbenchKind::Sketch => ModelBuilder::new_2d_object(),
-            WorkbenchKind::Operation => ModelBuilder::new_object_body(),
-        }
-        .properties(ObjectProperties::from_parameters_and_arguments(
-            &self.plan.eval(context)?,
-            arguments,
-        ));
+
+        // Create model
+        let model_builder: ModelBuilder = self.kind.into();
+        let model = model_builder
+            .origin(Origin {
+                arguments: arguments.clone(),
+                // TODO: where to get the rest?
+                ..Default::default()
+            })
+            .attributes(self.attribute_list.eval(context)?)
+            .properties(
+                // copy all arguments which are part of the building plan to properties
+                arguments
+                    .named_iter()
+                    .filter_map(|(id, arg)| {
+                        if self.plan.contains_key(id) {
+                            Some((id.clone(), arg.clone()))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect(),
+            )
+            .build();
 
         context.scope(
-            StackFrame::Workbench(model_builder.into(), self.id.clone(), arguments.into()),
+            StackFrame::Workbench(model, self.id.clone(), arguments.clone().into()),
             |context| {
-                // Create the object model from initializer if present
+                // run init code
                 if let Some(init) = init {
                     log::trace!("Initializing`{id}` {kind}", id = self.id, kind = self.kind);
-                    init.eval(arguments, context)?;
+                    init.eval(arguments.clone(), context)?;
                 }
 
-                let model_builder = context.get_model_builder()?;
-                {
-                    let mut model_builder = model_builder.borrow_mut();
-                    model_builder.properties.eval(context)?;
-
-                    // At this point, all properties must have a value
-                    log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
-                    for statement in self.body.statements.iter() {
-                        match statement {
-                            Statement::Assignment(assignment) => {
-                                assignment.eval(context)?;
-                            }
-                            Statement::Expression(expression) => {
-                                model_builder.add_children2(expression.eval(context)?)?;
-                            }
-                            Statement::Init(_) => (),
-                            _ => todo!("Evaluate statement: {statement}"),
+                let model = context.get_model()?;
+                // At this point, all properties must have a value
+                log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
+                for statement in self.body.statements.iter() {
+                    match statement {
+                        Statement::Assignment(assignment) => {
+                            assignment.eval(context)?;
                         }
+                        Statement::Expression(expression) => {
+                            model.borrow_mut().append(expression.eval(context)?);
+                        }
+                        Statement::Init(_) => (),
+                        _ => todo!("Evaluate statement: {statement}"),
                     }
-                }
-                let model = model_builder.take().build();
-                {
-                    let mut model_ = model.borrow_mut();
-                    model_.origin.arguments = arguments.clone();
-                    model_.attributes = self.attribute_list.eval(context)?;
                 }
                 Ok(model)
             },
@@ -70,13 +78,12 @@ impl WorkbenchDefinition {
 }
 
 impl CallTrait<Models> for WorkbenchDefinition {
-    /// Evaluate the call of a part initialization
+    /// Evaluate the call of a workbench with given arguments.
     ///
-    /// The evaluation considers multiplicity, which means that multiple models maybe created.
+    /// - `args`: Arguments which will be matched with the building plan and the initializers using parameter multiplicity.
+    /// - `context`: Current evaluation context.
     ///
-    /// Example:
-    /// Consider the `part a(b: Scalar) { }`.
-    /// Calling the part `a([1.0, 2.0])` results in two models with `b = 1.0` and `b = 2.0`, respectively.
+    /// Return evaluated nodes (multiple nodes might be created by parameter multiplicity).
     fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Models> {
         log::debug!(
             "Workbench call {kind} {id}({args})",
@@ -86,43 +93,56 @@ impl CallTrait<Models> for WorkbenchDefinition {
 
         // prepare models
         let mut models = Models::default();
-
         // prepare building plan
         let plan = self.plan.eval(context)?;
 
-        let mut initialized = args.is_empty();
-
-        if let Ok(multi_args) = ArgumentMatch::find_multi_match(args, &plan) {
-            for args in multi_args {
-                for (id, var) in args.named_iter() {
-                    context.set_local_value(id.clone(), var.clone())?;
+        // try to match arguments with the building plan
+        match ArgumentMatch::find_multi_match(args, &plan) {
+            Ok(matches) => {
+                log::debug!(
+                    "Building plan matches: {}",
+                    matches
+                        .iter()
+                        .map(|m| m.to_string())
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                );
+                // evaluate models for all multiplicity matches
+                for args in matches {
+                    models.push(self.eval_to_model(args, None, context)?);
                 }
-                models.push(self.eval_to_model(&args, None, context)?);
             }
-            initialized = true;
-        } else {
-            // put all default parameters in the building plan into local variables
-            plan.iter().try_for_each(|(id, arg)| {
-                if let Some(def) = &arg.default_value {
-                    context.set_local_value(id.clone(), def.clone())?;
-                }
-                EvalResult::Ok(())
-            })?;
+            _ => {
+                log::trace!("Building plan did not match, finding initializer");
 
-            for init in self.inits() {
-                if let Ok(multi_args) =
-                    ArgumentMatch::find_multi_match(args, &init.parameters.eval(context)?)
-                {
-                    for args in multi_args {
-                        models.push(self.eval_to_model(&args, Some(init), context)?);
+                // at the end: check if initialization was successful
+                let mut initialized = false;
+
+                // find an initializer that matches the arguments
+                for init in self.inits() {
+                    if let Ok(matches) =
+                        ArgumentMatch::find_multi_match(args, &init.parameters.eval(context)?)
+                    {
+                        log::debug!(
+                            "Initializer matches: {}",
+                            matches
+                                .iter()
+                                .map(|m| m.to_string())
+                                .collect::<Vec<_>>()
+                                .join("\n")
+                        );
+                        // evaluate models for all multiplicity matches
+                        for args in matches {
+                            models.push(self.eval_to_model(args, Some(init), context)?);
+                        }
+                        initialized = true;
+                        break;
                     }
-                    initialized = true;
-                    break;
+                }
+                if !initialized {
+                    context.error(args, EvalError::NoInitializationFound(self.id.clone()))?;
                 }
             }
-        }
-        if !initialized {
-            context.error(args, EvalError::NoInitializationFound(self.id.clone()))?;
         }
 
         Ok(models)

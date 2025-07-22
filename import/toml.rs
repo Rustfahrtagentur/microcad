@@ -59,7 +59,7 @@ impl FileIoInterface for TomlImporter {
 
 #[test]
 fn toml_importer() {
-    use microcad_lang::{value::Tuple, GetPropertyValue};
+    use microcad_lang::{model::*, value::Tuple};
 
     // Import a toml from `Cargo.toml` and convert it into a tuple.
     let toml_importer = TomlImporter;
@@ -73,13 +73,19 @@ fn toml_importer() {
     println!("{value}");
 
     if let Value::Tuple(tuple) = value {
-        let package = tuple
+        if let Value::Models(models) = tuple
             .by_id(&Identifier::no_ref("package"))
-            .expect("Package info");
-        let name = package.get_property_value(&Identifier::no_ref("name"));
-
-        let name = name.try_string().expect("String value");
-        println!("{name}");
+            .expect("Package info")
+        {
+            if let Some(model) = models.single_model() {
+                let model_ = model.borrow();
+                let name = model_
+                    .get_property(&Identifier::no_ref("name"))
+                    .expect("property");
+                let name = name.try_string().expect("String value");
+                println!("{name}");
+            }
+        }
     } else {
         panic!("Value must be a tuple!")
     }

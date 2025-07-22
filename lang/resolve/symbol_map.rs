@@ -9,8 +9,8 @@ use std::collections::btree_map::BTreeMap;
 #[derive(Debug, Default, Clone, Deref, DerefMut)]
 pub struct SymbolMap(BTreeMap<Identifier, Symbol>);
 
-impl From<&Tuple> for SymbolMap {
-    fn from(tuple: &Tuple) -> Self {
+impl From<Tuple> for SymbolMap {
+    fn from(tuple: Tuple) -> Self {
         let mut symbol_map = SymbolMap::default();
         for (id, value) in tuple.named.iter() {
             symbol_map.add_node(Symbol::new_call_argument(id.clone(), value.clone()))

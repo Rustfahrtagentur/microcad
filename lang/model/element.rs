@@ -3,7 +3,7 @@
 
 //! Element of a [`Model`].
 
-use crate::{GetPropertyValue, model::*, syntax::*, value::*};
+use crate::{model::*, syntax::*, value::*};
 use microcad_core::*;
 use strum::IntoStaticStr;
 
@@ -56,11 +56,18 @@ impl std::fmt::Display for Element {
     }
 }
 
-impl GetPropertyValue for Element {
-    fn get_property_value(&self, id: &Identifier) -> Value {
+impl Properties for Element {
+    fn get_property(&self, id: &Identifier) -> Option<&Value> {
         match self {
-            Self::Object(object) => object.get_property_value(id),
-            _ => Value::None,
+            Self::Object(object) => object.get_property(id),
+            _ => unreachable!("not an object element"),
+        }
+    }
+
+    fn set_property(&mut self, id: Identifier, value: Value) {
+        match self {
+            Self::Object(object) => object.set_property(id, value),
+            _ => unreachable!("not an object element"),
         }
     }
 }

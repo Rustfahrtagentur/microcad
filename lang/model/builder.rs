@@ -15,6 +15,10 @@ pub struct ModelBuilder {
     pub properties: ObjectProperties,
     /// Children to add to this model.
     pub children: Models,
+    /// Attributes used for export.
+    pub attributes: Attributes,
+    /// The symbol (e.g. [`WorkbenchDefinition`]) that created this [`Model`].
+    pub origin: Origin,
 
     /// The output type of this model.
     output: OutputType,
@@ -109,10 +113,16 @@ impl ModelBuilder {
         Ok(self)
     }
 
-    /// Add multiple children to the model if it matches.
-    pub fn add_children2(&mut self, mut children: Models) -> EvalResult<()> {
-        self.children.append(&mut children);
-        Ok(())
+    /// Set object origin.
+    pub fn origin(mut self, origin: Origin) -> Self {
+        self.origin = origin;
+        self
+    }
+
+    /// Set object attributes.
+    pub fn attributes(mut self, attributes: Attributes) -> Self {
+        self.attributes = attributes;
+        self
     }
 
     /// Set object properties.
@@ -148,5 +158,15 @@ impl ModelBuilder {
 impl std::fmt::Display for ModelBuilder {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.properties)
+    }
+}
+
+impl From<WorkbenchKind> for ModelBuilder {
+    fn from(kind: WorkbenchKind) -> Self {
+        match kind {
+            WorkbenchKind::Part => ModelBuilder::new_3d_object(),
+            WorkbenchKind::Sketch => ModelBuilder::new_2d_object(),
+            WorkbenchKind::Operation => ModelBuilder::new_object_body(),
+        }
     }
 }

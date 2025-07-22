@@ -20,6 +20,24 @@ impl Models {
         }
     }
 
+    /// Returns a property of the included models.
+    /// TODO is this correct behavior?
+    pub fn fetch_property(&self, id: &Identifier) -> Option<Value> {
+        if let Some(model) = self.single_model() {
+            model.borrow().get_property(id).cloned()
+        } else {
+            Some(
+                self.0
+                    .iter()
+                    .filter_map(|model| {
+                        let model_ = model.borrow();
+                        model_.get_property(id).cloned()
+                    })
+                    .collect(),
+            )
+        }
+    }
+
     /// Nest a Vec of model multiplicities
     ///
     /// * `model_stack`: A list of model lists.

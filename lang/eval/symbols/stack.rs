@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, model::*, rc::*, resolve::*};
+use crate::{eval::*, model::*, resolve::*};
 
 /// A stack with a list of stack frames.
 ///
@@ -57,8 +57,7 @@ impl Stack {
         Err(EvalError::LocalStackEmpty(id))
     }
 
-    /// Return most top stack frame of type part
-    fn current_workbench(&self) -> Option<&Identifier> {
+    fn current_workbench_name(&self) -> Option<&Identifier> {
         self.0.iter().rev().find_map(|frame| {
             if let StackFrame::Workbench(_, id, _) = frame {
                 Some(id)
@@ -84,7 +83,7 @@ impl Stack {
 
     /// Get name of current part.
     pub fn current_part_name(&self) -> Option<QualifiedName> {
-        if let Some(id) = self.current_workbench() {
+        if let Some(id) = self.current_workbench_name() {
             let name = QualifiedName::new(vec![id.clone()], id.src_ref());
             Some(name.with_prefix(&self.current_module_name()))
         } else {
@@ -157,10 +156,15 @@ impl Locals for Stack {
         }
     }
 
-    fn get_model_builder(&self) -> EvalResult<RcMut<ModelBuilder>> {
-        match self.current_frame() {
-            Some(StackFrame::Workbench(model_builder, _, _)) => Ok(model_builder.clone()),
-            _ => unreachable!("missing model builder"),
+    fn get_model(&self) -> EvalResult<Model> {
+        match self
+            .0
+            .iter()
+            .rev()
+            .find(|frame| matches!(frame, StackFrame::Workbench(_, _, _)))
+        {
+            Some(StackFrame::Workbench(model, _, _)) => Ok(model.clone()),
+            _ => unreachable!("missing model in workbench"),
         }
     }
 

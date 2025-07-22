@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{GetPropertyValue, eval::*, model::*};
+use crate::{eval::*, model::*};
 
 impl Eval for ListExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
@@ -125,13 +125,14 @@ impl Eval for Expression {
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Nested(nested) => nested.eval(context),
-            Self::PropertyAccess(lhs, identifier, src_ref) => {
-                let value: Value = lhs.eval(context)?;
-                let value = value.get_property_value(identifier);
-                if value == Value::None {
-                    context.error(src_ref, EvalError::PropertyNotFound(identifier.clone()))?;
+            Self::PropertyAccess(lhs, id, src_ref) => {
+                if let Value::Models(models) = lhs.eval(context)? {
+                    match models.fetch_property(id) {
+                        Some(prop) => return Ok(prop),
+                        None => context.error(src_ref, EvalError::PropertyNotFound(id.clone()))?,
+                    }
                 }
-                Ok(value)
+                Ok(Value::None)
             }
             Self::AttributeAccess(lhs, identifier, src_ref) => {
                 let value: Value = lhs.eval(context)?;

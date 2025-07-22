@@ -473,6 +473,12 @@ impl From<Quantity> for Value {
     }
 }
 
+impl FromIterator<Value> for Value {
+    fn from_iter<T: IntoIterator<Item = Value>>(iter: T) -> Self {
+        Self::Array(iter.into_iter().collect())
+    }
+}
+
 impl From<Models> for Value {
     fn from(models: Models) -> Self {
         match models.len() {
@@ -485,19 +491,6 @@ impl From<Models> for Value {
 impl From<Model> for Value {
     fn from(model: Model) -> Self {
         Self::from_single_model(model)
-    }
-}
-
-impl GetPropertyValue for Value {
-    fn get_property_value(&self, identifier: &Identifier) -> Value {
-        match self {
-            Value::Tuple(tuple) => tuple.by_id(identifier).cloned().unwrap_or_default(),
-            Value::Models(models) => match models.single_model() {
-                Some(model) => model.get_property_value(identifier),
-                None => Value::None,
-            },
-            _ => Value::None,
-        }
     }
 }
 

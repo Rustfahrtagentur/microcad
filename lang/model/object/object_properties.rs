@@ -3,7 +3,7 @@
 
 //! Object properties.
 
-use crate::{diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*, GetPropertyValue};
+use crate::{diag::PushDiag, eval::*, src_ref::SrcRef, syntax::*, value::*};
 use derive_more::{Deref, DerefMut};
 use std::collections::BTreeMap;
 
@@ -57,12 +57,6 @@ impl Eval<()> for ObjectProperties {
     }
 }
 
-impl GetPropertyValue for ObjectProperties {
-    fn get_property_value(&self, id: &Identifier) -> Value {
-        self.0.get(id).cloned().unwrap_or_default()
-    }
-}
-
 impl ObjectProperties {
     /// Test if each property has a value.
     pub fn is_valid(&self) -> bool {
@@ -91,6 +85,16 @@ impl ObjectProperties {
                 }
             })
             .collect()
+    }
+
+    /// Get value of property with given id or `None` if not found.
+    pub fn get_property(&self, id: &Identifier) -> Option<&Value> {
+        self.0.get(id)
+    }
+
+    /// Set or create property with given id and value-
+    pub fn set_property(&mut self, id: Identifier, value: Value) {
+        self.0.insert(id, value);
     }
 }
 

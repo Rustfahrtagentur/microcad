@@ -61,7 +61,7 @@ impl Tuple {
         }
     }
 
-    /// Insert new value into tuple
+    /// Insert new (or overwrite existing) value into tuple
     pub fn insert(&mut self, id: Identifier, value: Value) {
         if id.is_empty() {
             self.unnamed.insert(value.ty(), value);
@@ -72,6 +72,9 @@ impl Tuple {
 
     /// Return an iterator over all named values
     pub fn named_iter(&self) -> std::collections::hash_map::Iter<'_, Identifier, Value> {
+        if !self.unnamed.is_empty() {
+            log::warn!("using named_iter() on a tuple which has unnamed items too")
+        }
         self.named.iter()
     }
 

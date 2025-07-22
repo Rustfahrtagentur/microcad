@@ -50,6 +50,11 @@ impl ModelInner {
         }
     }
 
+    /// Append more children models.
+    pub fn append(&mut self, models: Models) {
+        self.children.extend(models.iter().cloned());
+    }
+
     /// Return iterator of children.s
     pub fn children(&self) -> std::slice::Iter<'_, Model> {
         self.children.iter()
@@ -67,6 +72,16 @@ impl ModelInner {
     pub(crate) fn set_creator(&mut self, creator: Symbol, call_src_ref: SrcRef) {
         self.origin.creator = Some(creator);
         self.origin.call_src_ref = call_src_ref;
+    }
+}
+
+impl Properties for ModelInner {
+    fn get_property(&self, id: &Identifier) -> Option<&Value> {
+        self.element.get_property(id)
+    }
+
+    fn set_property(&mut self, id: Identifier, value: Value) {
+        self.element.set_property(id, value);
     }
 }
 

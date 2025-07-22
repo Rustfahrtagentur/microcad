@@ -12,8 +12,6 @@
 //!
 //! The grammar of µcad can be found [here](../../../lang/grammar.pest).
 
-use crate::{syntax::Identifier, value::Value};
-
 pub mod builtin;
 pub mod diag;
 pub mod eval;
@@ -39,16 +37,6 @@ fn init() {
 }
 
 const MICROCAD_EXTENSIONS: &[&str] = &[".µcad", ".mcad"];
-
-/// Access a value of a property by id.
-pub trait GetPropertyValue {
-    /// Get a value of property, or [`Value::None`] if the property does not exist.
-    ///
-    /// - `id`: Identifier of the property
-    ///
-    /// This function is used when accessing a property `v` of a value `p` with `p.v`.
-    fn get_property_value(&self, id: &Identifier) -> Value;
-}
 
 /// Parse a rule from given string into a syntax element
 /// - `ty`: Type of the output syntax element
@@ -80,7 +68,11 @@ pub fn shorten(what: &str, max_chars: usize) -> String {
             if p == max_chars {
                 Some('…')
             } else if p < max_chars {
-                if ch == '\n' { Some('⏎') } else { Some(ch) }
+                if ch == '\n' {
+                    Some('⏎')
+                } else {
+                    Some(ch)
+                }
             } else {
                 None
             }

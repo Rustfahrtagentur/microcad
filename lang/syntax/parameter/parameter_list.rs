@@ -20,6 +20,11 @@ impl ParameterList {
     pub fn ids(&self) -> impl Iterator<Item = Identifier> {
         self.keys().cloned()
     }
+
+    /// Return if given identifier is in parameter list
+    pub fn contains_key(&self, id: &Identifier) -> bool {
+        self.iter().any(|p| *id == p.id)
+    }
 }
 
 impl std::fmt::Display for ParameterList {

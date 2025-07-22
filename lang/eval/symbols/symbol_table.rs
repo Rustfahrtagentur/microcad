@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, rc::*, resolve::*, syntax::*};
+use crate::{eval::*, model::*, rc::*, resolve::*, syntax::*};
 
 /// *Symbol table* holding global and local symbols.
 ///
@@ -260,8 +260,8 @@ impl Locals for SymbolTable {
         self.stack.fetch(id)
     }
 
-    fn get_model_builder(&self) -> EvalResult<RcMut<crate::model::ModelBuilder>> {
-        self.stack.get_model_builder()
+    fn get_model(&self) -> EvalResult<Model> {
+        self.stack.get_model()
     }
 }
 

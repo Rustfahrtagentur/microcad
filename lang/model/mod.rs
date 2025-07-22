@@ -35,12 +35,18 @@ use crate::{
     rc::RcMut,
     syntax::{Identifier, SourceFile},
     value::Value,
-    GetPropertyValue,
 };
 
 #[cfg(test)]
 mod tests;
 
+/// Access a value of a property by id.
+pub trait Properties {
+    /// Get a value of property, or [`Value::None`] if the property does not exist.
+    fn get_property(&self, id: &Identifier) -> Option<&Value>;
+    /// Set or create a property with the given id and value.
+    fn set_property(&mut self, id: Identifier, value: Value);
+}
 /// A reference counted, mutable [`Model`].
 #[derive(Debug, Clone, Deref, DerefMut)]
 pub struct Model(RcMut<ModelInner>);
@@ -197,12 +203,6 @@ impl Model {
     /// Ancestors iterator.
     pub fn ancestors(&self) -> Ancestors {
         Ancestors::new(self.clone())
-    }
-}
-
-impl GetPropertyValue for Model {
-    fn get_property_value(&self, id: &Identifier) -> Value {
-        self.borrow().element.get_property_value(id)
     }
 }
 

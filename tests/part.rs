@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #[cfg(test)]
-use microcad_lang::{
-    GetPropertyValue, eval::*, model::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*,
-};
+use microcad_lang::{eval::*, model::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
 /// Helper function to create a qualified name from &str
 #[cfg(test)]
@@ -58,14 +56,13 @@ fn workbench_call() {
     assert_eq!(models.len(), 1, "There should be one model");
 
     fn check_property_b(model: &Model, value: f64) {
-        if let Element::Object(ref object) = model.borrow().element.value {
-            assert_eq!(
-                object.get_property_value(&Identifier(Refer::none("b".into()))),
-                Value::Quantity(Quantity::new(value, QuantityType::Scalar))
-            );
-        } else {
-            panic!("Object model expected")
-        }
+        assert_eq!(
+            *model
+                .borrow()
+                .get_property(&Identifier(Refer::none("b".into())))
+                .expect("property"),
+            Value::Quantity(Quantity::new(value, QuantityType::Scalar))
+        );
     }
 
     // Test if resulting object model has property `b` with value `3.0`
@@ -103,15 +100,13 @@ fn workbench_initializer_call() {
 
     // Helper function to check if the object model contains a property radius with specified value
     fn check_property_radius(model: &model::Model, value: f64) {
-        if let model::Element::Object(ref object) = *model.borrow().element {
-            log::trace!("Object: {object}");
-            assert_eq!(
-                object.get_property_value(&Identifier::no_ref("radius")),
-                Value::Quantity(Quantity::new(value, ty::QuantityType::Scalar))
-            );
-        } else {
-            panic!("Model expected")
-        }
+        assert_eq!(
+            *model
+                .borrow()
+                .get_property(&Identifier(Refer::none("radius".into())))
+                .expect("property"),
+            Value::Quantity(Quantity::new(value, ty::QuantityType::Scalar))
+        );
     }
 
     // Call `circle(radius = 3.0)`

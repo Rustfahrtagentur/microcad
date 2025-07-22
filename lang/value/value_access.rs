@@ -32,4 +32,9 @@ pub trait ValueAccess {
     fn get_value(&self, id: &str) -> &Value {
         self.by_id(&Identifier::no_ref(id)).expect("")
     }
+
+    /// Return `true`, if tuple contains a value with that name
+    fn contains_id(&self, id: &Identifier) -> bool {
+        self.by_id(id).is_some()
+    }
 }

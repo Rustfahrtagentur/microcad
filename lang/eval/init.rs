@@ -1,14 +1,12 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, syntax::*};
+use crate::{eval::*, model::*, syntax::*};
 
 impl InitDefinition {
     /// Evaluate a call to the init definition
-    pub fn eval(&self, args: &Tuple, context: &mut Context) -> EvalResult<()> {
-        let model_builder = context.get_model_builder()?;
-        let mut model_builder = model_builder.borrow_mut();
-
+    pub fn eval(&self, args: Tuple, context: &mut Context) -> EvalResult<()> {
+        let model = context.get_model()?;
         context.scope(StackFrame::Init(args.into()), |context| {
             for statement in self.body.statements.iter() {
                 match statement {
@@ -17,11 +15,12 @@ impl InitDefinition {
                         let id = &assignment.id;
                         let value: Value = assignment.expression.eval(context)?;
 
-                        // Only change the property value, do not add new properties
-                        if model_builder.has_property(id) {
-                            model_builder.set_property(id.clone(), value.clone());
+                        // if assignment aims a property set it otherwise set local variable
+                        if model.borrow().get_property(id).is_some() {
+                            model.borrow_mut().set_property(id.clone(), value.clone());
+                        } else {
+                            context.set_local_value(id.clone(), value)?;
                         }
-                        context.set_local_value(id.clone(), value)?;
                     }
                     _ => {
                         context.error(
