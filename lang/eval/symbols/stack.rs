@@ -149,7 +149,9 @@ impl Locals for Stack {
     fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
         match self.fetch(id) {
             Ok(symbol) => match &symbol.borrow().def {
-                SymbolDefinition::Constant(_, value) => Ok(value.clone()),
+                SymbolDefinition::Constant(_, value) | SymbolDefinition::Argument(_, value) => {
+                    Ok(value.clone())
+                }
                 _ => Err(EvalError::LocalNotFound(id.clone())),
             },
             Err(_) => Err(EvalError::LocalNotFound(id.clone())),
@@ -253,9 +255,11 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     // test alias
-    assert!(stack
-        .put_local(Some("x".into()), make_int("x".into(), 3))
-        .is_ok());
+    assert!(
+        stack
+            .put_local(Some("x".into()), make_int("x".into(), 3))
+            .is_ok()
+    );
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);

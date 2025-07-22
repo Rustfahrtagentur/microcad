@@ -147,6 +147,11 @@ impl Context {
     pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
         self.symbol_table.search_paths()
     }
+
+    /// Access to stack.
+    pub fn stack(&self) -> &Stack {
+        &self.symbol_table.stack
+    }
 }
 
 impl Locals for Context {

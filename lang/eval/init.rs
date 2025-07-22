@@ -5,7 +5,12 @@ use crate::{eval::*, model::*, syntax::*};
 
 impl InitDefinition {
     /// Evaluate a call to the init definition
-    pub fn eval(&self, plan: &ParameterList, args: Tuple, context: &mut Context) -> EvalResult<()> {
+    pub fn eval(
+        &self,
+        plan: &ParameterList,
+        args: Tuple,
+        context: &mut Context,
+    ) -> EvalResult<ObjectProperties> {
         let model = context.get_model()?;
         context.scope(StackFrame::Init(args.into()), |context| {
             for statement in self.body.statements.iter() {
@@ -31,13 +36,13 @@ impl InitDefinition {
                 .partition(|(_, v)| v.is_ok());
 
             if not_found.is_empty() {
-                model.borrow_mut().set_properties(
-                    found
-                        .into_iter()
-                        .map(|(id, value)| ((*id).clone(), value.expect("ok")))
-                        .collect(),
-                );
-                Ok(())
+                let props: ObjectProperties = found
+                    .into_iter()
+                    .map(|(id, value)| ((*id).clone(), value.expect("ok")))
+                    .collect();
+
+                model.borrow_mut().set_properties(props.clone());
+                Ok(props)
             } else {
                 Err(EvalError::BuildingPlanIncomplete(
                     not_found.iter().map(|(id, _)| (*id).clone()).collect(),

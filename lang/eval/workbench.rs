@@ -55,9 +55,12 @@ impl WorkbenchDefinition {
                 // run init code
                 if let Some(init) = init {
                     log::trace!("Initializing`{id}` {kind}", id = self.id, kind = self.kind);
-                    if let Err(err) = init.eval(&self.plan, arguments.clone(), context) {
-                        context.error(init, err)?
-                    }
+                    match init.eval(&self.plan, arguments.clone(), context) {
+                        Ok(props) => props.iter().try_for_each(|(id, value)| {
+                            context.set_local_value(id.clone(), value.clone())
+                        }),
+                        Err(err) => context.error(init, err),
+                    }?
                 }
 
                 // At this point, all properties must have a value
@@ -75,6 +78,10 @@ impl WorkbenchDefinition {
                         _ => todo!("Evaluate statement: {statement}"),
                     }
                 }
+
+                // We have to deduce the output type of this model, otherwise the model is incomplete.
+                model.deduce_output_type();
+
                 Ok(model)
             },
         )

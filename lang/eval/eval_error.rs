@@ -202,7 +202,7 @@ pub enum EvalError {
     NoInitializationFound(Identifier),
 
     /// Initializer missed to set a property from plan
-    #[error("Workbench plan incomplete. Missing properties: [:?]")]
+    #[error("Workbench plan incomplete. Missing properties: {0:?}")]
     BuildingPlanIncomplete(Vec<Identifier>),
 }
 

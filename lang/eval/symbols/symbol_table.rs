@@ -20,7 +20,7 @@ pub struct SymbolTable {
     /// List of all global symbols.
     globals: SymbolMap,
     /// Stack of currently opened scopes with symbols while evaluation.
-    stack: Stack,
+    pub stack: Stack,
     /// Source file cache containing all source files loaded in the context and their syntax trees.
     cache: SourceCache,
 }
