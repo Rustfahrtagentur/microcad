@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model_tree::*, parameter, value::*};
+use microcad_lang::{eval::*, model::*, parameter, value::*};
 
 /// Builtin definition for a 2D circle
 #[derive(Debug)]

@@ -3,7 +3,7 @@
 
 //! Model
 
-use crate::{model_tree::*, rc::*, resolve::*, src_ref::*, syntax::*};
+use crate::{model::*, rc::*, resolve::*, src_ref::*, syntax::*};
 use microcad_core::{Geometry2D, Geometry3D};
 
 /// The actual model contents

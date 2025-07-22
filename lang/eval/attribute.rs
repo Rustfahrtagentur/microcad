@@ -5,7 +5,7 @@ use crate::{
     Id,
     builtin::ExporterAccess,
     eval::{self, *},
-    model_tree::{self, *},
+    model::ExportAttribute,
     parameter,
     syntax::{self, *},
 };
@@ -37,8 +37,8 @@ pub enum AttributeError {
     NotFound(Identifier),
 }
 
-impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<model_tree::ExportAttribute>> {
+impl Eval<Option<ExportAttribute>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<ExportAttribute>> {
         match self {
             syntax::Attribute::Tuple(id, arguments) if id.id() == "export" => {
                 match ArgumentMatch::find_match(
@@ -94,8 +94,8 @@ impl Eval<Option<model_tree::ExportAttribute>> for syntax::Attribute {
     }
 }
 
-impl Eval<Option<model_tree::Attribute>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<model_tree::Attribute>> {
+impl Eval<Option<crate::model::Attribute>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<crate::model::Attribute>> {
         match self {
             syntax::Attribute::Tuple(id, argument_list) => {
                 let name = id.id().as_str();
@@ -105,7 +105,7 @@ impl Eval<Option<model_tree::Attribute>> for syntax::Attribute {
                         if let Some(attr) =
                             eval::Eval::<Option<ExportAttribute>>::eval(self, context)?
                         {
-                            return Ok(Some(model_tree::Attribute::Export(attr)));
+                            return Ok(Some(crate::model::Attribute::Export(attr)));
                         }
                     }
                     // Parse exporter specific attribute, e.g. `svg(style = "fill:none")`
@@ -116,7 +116,7 @@ impl Eval<Option<model_tree::Attribute>> for syntax::Attribute {
                                 &exporter.parameters(),
                             ) {
                                 Ok(args) => {
-                                    return Ok(Some(model_tree::Attribute::ExporterSpecific(
+                                    return Ok(Some(crate::model::Attribute::ExporterSpecific(
                                         id.clone(),
                                         args,
                                     )));
@@ -138,16 +138,16 @@ impl Eval<Option<model_tree::Attribute>> for syntax::Attribute {
 
                 match (name, value) {
                     ("color", Value::Tuple(tuple)) => match tuple.as_ref().try_into() {
-                        Ok(color) => return Ok(Some(model_tree::Attribute::Color(color))),
+                        Ok(color) => return Ok(Some(crate::model::Attribute::Color(color))),
                         Err(err) => context.warning(self, err)?,
                     },
                     ("color", Value::String(string)) => match string.parse::<Color>() {
-                        Ok(color) => return Ok(Some(model_tree::Attribute::Color(color))),
+                        Ok(color) => return Ok(Some(crate::model::Attribute::Color(color))),
                         Err(err) => context.warning(self, err)?,
                     },
                     ("resolution", value) => match value.try_into() {
                         Ok(resolution_attribute) => {
-                            return Ok(Some(model_tree::Attribute::Resolution(
+                            return Ok(Some(crate::model::Attribute::Resolution(
                                 resolution_attribute,
                             )));
                         }
@@ -162,8 +162,8 @@ impl Eval<Option<model_tree::Attribute>> for syntax::Attribute {
     }
 }
 
-impl Eval<Attributes> for AttributeList {
-    fn eval(&self, context: &mut Context) -> EvalResult<Attributes> {
+impl Eval<crate::model::Attributes> for AttributeList {
+    fn eval(&self, context: &mut Context) -> EvalResult<crate::model::Attributes> {
         let mut attributes = Vec::new();
 
         for attribute in self.iter() {
@@ -172,6 +172,6 @@ impl Eval<Attributes> for AttributeList {
             }
         }
 
-        Ok(model_tree::Attributes::new(attributes))
+        Ok(crate::model::Attributes::new(attributes))
     }
 }

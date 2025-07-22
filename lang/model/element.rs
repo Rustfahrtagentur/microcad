@@ -3,7 +3,7 @@
 
 //! Element of a [`Model`].
 
-use crate::{model_tree::*, syntax::*, value::*, GetPropertyValue};
+use crate::{GetPropertyValue, model::*, syntax::*, value::*};
 use microcad_core::*;
 use strum::IntoStaticStr;
 

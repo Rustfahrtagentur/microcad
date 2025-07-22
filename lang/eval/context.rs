@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{builtin::*, diag::*, eval::*, model_tree::Model, rc::*, resolve::*, syntax::*};
+use crate::{builtin::*, diag::*, eval::*, model::Model, rc::*, resolve::*, syntax::*};
 
 /// *Context* for *evaluation* of a resolved µcad file.
 ///
@@ -170,7 +170,7 @@ impl Locals for Context {
         self.symbol_table.fetch(id)
     }
 
-    fn get_model_builder(&self) -> EvalResult<RcMut<crate::model_tree::ModelBuilder>> {
+    fn get_model_builder(&self) -> EvalResult<RcMut<crate::model::ModelBuilder>> {
         self.symbol_table.get_model_builder()
     }
 }

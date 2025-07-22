@@ -22,7 +22,7 @@ pub use value_access::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{model_tree::*, syntax::*, ty::*, *};
+use crate::{model::*, syntax::*, ty::*, *};
 use microcad_core::*;
 
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
@@ -502,7 +502,7 @@ impl GetPropertyValue for Value {
 }
 
 impl GetAttribute for Value {
-    fn get_attribute(&self, id: &Identifier) -> std::option::Option<crate::model_tree::Attribute> {
+    fn get_attribute(&self, id: &Identifier) -> std::option::Option<crate::model::Attribute> {
         match self.fetch_models().single_model() {
             Some(model) => model.get_attribute(id),
             None => None,

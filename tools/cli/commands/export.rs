@@ -6,7 +6,7 @@
 use anyhow::anyhow;
 use microcad_builtin::{Exporter, ExporterAccess, ExporterRegistry};
 use microcad_core::{RenderResolution, Size2D};
-use microcad_lang::{model_tree::*, ty::QuantityType, value::*};
+use microcad_lang::{model::*, ty::QuantityType, value::*};
 
 use crate::{config::Config, *};
 

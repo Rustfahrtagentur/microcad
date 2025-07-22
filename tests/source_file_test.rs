@@ -43,7 +43,7 @@ impl SourceFileTest {
             Ok(model) => {
                 use microcad_core::*;
                 use microcad_export::svg::SvgExporter;
-                use microcad_lang::model_tree::{ExportAttribute as Export, OutputType};
+                use microcad_lang::model::{ExportAttribute as Export, OutputType};
                 use std::rc::Rc;
 
                 self.write_and_compare(model.clone(), "model_tree");

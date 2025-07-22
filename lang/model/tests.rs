@@ -4,7 +4,7 @@
 //! Model tree tests
 
 #[cfg(test)]
-use crate::{model_tree::*, syntax::*};
+use crate::{model::*, syntax::*};
 
 #[cfg(test)]
 fn sample_models() -> Models {

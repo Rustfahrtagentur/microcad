@@ -5,7 +5,7 @@
 
 use crate::{
     builtin::{ExportError, Exporter},
-    model_tree::Model,
+    model::Model,
     value::Value,
 };
 use cgmath::SquareMatrix;

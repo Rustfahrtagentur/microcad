@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, model_tree::*, rc::*};
+use crate::{eval::*, model::ModelBuilder, rc::RcMut};
 
 /// Frame in [Stack] for *local variables*, *aliases* (*use statements*) and *calls*.
 ///

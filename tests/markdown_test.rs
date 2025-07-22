@@ -158,7 +158,7 @@ pub fn run_test(
                 match (eval, context.has_errors(), todo) {
                     // test expected to succeed and succeeds with no errors
                     (Ok(model), false, false) => {
-                        use microcad_lang::model_tree::{ExportAttribute as Export, OutputType};
+                        use microcad_lang::model::{ExportAttribute as Export, OutputType};
 
                         let _ = fs::hard_link("images/ok.png", banner);
                         writeln!(log_out, "-- Test Result --\nOK").expect("output error");

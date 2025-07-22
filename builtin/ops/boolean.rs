@@ -4,9 +4,7 @@
 //! Built-in boolean operations.
 
 use microcad_core::BooleanOp;
-use microcad_lang::{
-    eval::EvalError, model_tree::*, resolve::*, src_ref::*, syntax::*, value::Value,
-};
+use microcad_lang::{eval::EvalError, model::*, resolve::*, src_ref::*, syntax::*, value::Value};
 
 /// Creates a model containing a boolean operation.
 fn boolean_op_model(op: BooleanOp) -> Result<Value, EvalError> {

@@ -6,7 +6,7 @@
 use cgmath::{InnerSpace, Rad};
 use geo::{CoordsIter as _, Point, Rect, Translate};
 use microcad_core::*;
-use microcad_lang::model_tree::{Element, Model, OutputType};
+use microcad_lang::model::{Element, Model, OutputType};
 
 use crate::svg::*;
 

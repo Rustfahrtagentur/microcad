@@ -3,7 +3,7 @@
 
 #[cfg(test)]
 use microcad_lang::{
-    eval::*, model_tree::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*, GetPropertyValue,
+    GetPropertyValue, eval::*, model::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*,
 };
 
 /// Helper function to create a qualified name from &str
@@ -102,8 +102,8 @@ fn workbench_initializer_call() {
     };
 
     // Helper function to check if the object model contains a property radius with specified value
-    fn check_property_radius(model: &model_tree::Model, value: f64) {
-        if let model_tree::Element::Object(ref object) = *model.borrow().element {
+    fn check_property_radius(model: &model::Model, value: f64) {
+        if let model::Element::Object(ref object) = *model.borrow().element {
             log::trace!("Object: {object}");
             assert_eq!(
                 object.get_property_value(&Identifier::no_ref("radius")),

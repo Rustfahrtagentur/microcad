@@ -6,7 +6,7 @@
 use derive_more::Deref;
 use microcad_core::{Color, Scalar};
 use microcad_lang::{
-    model_tree::{GetAttribute, Model},
+    model::{GetAttribute, Model},
     syntax::Identifier,
 };
 

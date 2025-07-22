@@ -3,7 +3,7 @@
 
 //! If statement evaluation.
 
-use crate::{eval::*, model_tree::*, syntax::*, value::*};
+use crate::{eval::*, model::*, syntax::*, value::*};
 
 impl Eval<Value> for IfStatement {
     fn eval(&self, _context: &mut crate::eval::Context) -> crate::eval::EvalResult<Value> {

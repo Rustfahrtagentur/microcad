@@ -3,7 +3,7 @@
 
 //! Builtin function evaluation entity
 
-use crate::{eval::*, model_tree::*, syntax::*};
+use crate::{eval::*, model::*, syntax::*};
 
 /// Builtin function type
 pub type BuiltinFn =

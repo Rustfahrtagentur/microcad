@@ -3,7 +3,7 @@
 
 //! Workbench definition syntax element evaluation
 
-use crate::{eval::*, model_tree::*, syntax::*};
+use crate::{eval::*, model::*, syntax::*};
 
 impl WorkbenchDefinition {
     /// Try to evaluate a single call into a [`Model`].
