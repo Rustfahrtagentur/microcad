@@ -13,27 +13,6 @@ use std::collections::BTreeMap;
 #[derive(Clone, Default, Debug, Deref, DerefMut)]
 pub struct ObjectProperties(BTreeMap<Identifier, Value>);
 
-impl ObjectProperties {
-    /// Create new object properties from a [`ParameterValueList`] and an [`Tuple`].
-    pub fn from_parameters_and_arguments(
-        parameters: &ParameterValueList,
-        arguments: &Tuple,
-    ) -> Self {
-        parameters
-            .iter()
-            .map(|(id, param)| {
-                (
-                    id.clone(),
-                    match arguments.by_id(id) {
-                        Some(value) => value.clone(),
-                        None => param.default_value.clone().unwrap_or(Value::None),
-                    },
-                )
-            })
-            .collect()
-    }
-}
-
 impl FromIterator<(Identifier, Value)> for ObjectProperties {
     fn from_iter<T: IntoIterator<Item = (Identifier, Value)>>(iter: T) -> Self {
         Self(iter.into_iter().collect())

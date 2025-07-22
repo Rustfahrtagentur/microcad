@@ -65,7 +65,8 @@ impl WorkbenchDefinition {
                             assignment.eval(context)?;
                         }
                         Statement::Expression(expression) => {
-                            model.borrow_mut().append(expression.eval(context)?);
+                            let result = expression.eval(context)?;
+                            model.borrow_mut().append(result);
                         }
                         Statement::Init(_) => (),
                         _ => todo!("Evaluate statement: {statement}"),

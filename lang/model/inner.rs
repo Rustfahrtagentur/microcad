@@ -85,9 +85,9 @@ impl Properties for ModelInner {
     }
 }
 
-impl From<Object> for ModelInner {
-    fn from(object: Object) -> Self {
-        Self::new(Refer::none(Element::Object(object)))
+impl From<ObjectProperties> for ModelInner {
+    fn from(props: ObjectProperties) -> Self {
+        Self::new(Refer::none(Element::Object(props)))
     }
 }
 

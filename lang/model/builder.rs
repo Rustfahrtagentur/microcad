@@ -36,7 +36,7 @@ impl ModelBuilder {
     /// Create a new object from a body `{ ... }`.
     pub fn new_object_body() -> Self {
         Self {
-            root: Object::default().into(),
+            root: Default::default(),
             ..Default::default()
         }
     }
@@ -46,7 +46,6 @@ impl ModelBuilder {
     /// This function is used when a call to a sketch is evaluated.
     pub fn new_2d_object() -> Self {
         Self {
-            root: Object::default().into(),
             output: OutputType::Geometry2D,
             ..Default::default()
         }
@@ -65,7 +64,6 @@ impl ModelBuilder {
     /// This function is used when a call to a part is evaluated.
     pub fn new_3d_object() -> Self {
         Self {
-            root: Object::default().into(),
             output: OutputType::Geometry3D,
             ..Default::default()
         }
@@ -144,8 +142,8 @@ impl ModelBuilder {
 
     /// Build a [`Model`].
     pub fn build(mut self) -> Model {
-        if let Element::Object(object) = &mut self.root.element.value {
-            object.props = self.properties
+        if let Element::Object(props) = &mut self.root.element.value {
+            *props = self.properties
         }
 
         let model = Model::new(self.root.into());

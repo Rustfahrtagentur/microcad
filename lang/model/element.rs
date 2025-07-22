@@ -13,7 +13,7 @@ pub enum Element {
     /// An object that contains children and holds properties.
     ///
     /// Objects can be created by builtins, assignments, expressions and workbenches.
-    Object(Object),
+    Object(ObjectProperties),
 
     /// A special element after which children will be nested as siblings.
     ///
@@ -35,7 +35,7 @@ pub enum Element {
 
 impl Default for Element {
     fn default() -> Self {
-        Element::Object(Object::default())
+        Element::Object(Default::default())
     }
 }
 
