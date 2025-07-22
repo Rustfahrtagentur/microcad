@@ -10,6 +10,7 @@
 - [Elements](#elements)
 - [Coding Conventions](#coding-conventions)
   - [Naming](#naming)
+- [Statement Usage](#statement-usage)
 
 ## µcad Rules
 
@@ -101,3 +102,14 @@ Any errors which occur here are related to geometrical processing.
 | part      | `part MyBench`       | pascal case           |
 | operation | `op my_bench`        | snake case            |
 | variables | `my_var = 1`         | snake case            |
+
+## Statement Usage
+
+| Code           | workbench | module | function | init | use | return | if  | marker | assignment | expression |
+| -------------- | --------- | ------ | -------- | ---- | --- | ------ | --- | ------ | ---------- | ---------- |
+| Source File    | yes       | yes    | yes      |      | yes |        | yes |        | yes        | yes        |
+| Body (Scope)   |           |        |          |      | yes |        | yes | yes    | yes        | yes        |
+| Module         | yes       | yes    | yes      |      | yes |        |     |        | yes        |            |
+| Workbench Init |           |        |          |      | yes |        |     |        | yes        |            |
+| Workbench      |           |        |          | yes  | yes |        | yes | yes    | yes        | (model)    |
+| Function       |           |        |          |      | yes | yes    | yes |        | yes        | yes        |
