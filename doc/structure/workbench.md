@@ -189,7 +189,9 @@ sketch wheel(radius: Length) {
     // code body
     std::geo2d::circle(radius);
 }
+
 __builtin::assert(wheel(5cm).radius == 5cm);
+__builtin::assert(wheel(5cm).diameter == 10cm);
 ```
 
 ### Init Code Rules
