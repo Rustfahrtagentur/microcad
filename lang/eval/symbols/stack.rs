@@ -22,11 +22,12 @@ impl Stack {
         let name = symbol.full_name();
         for (pos, frame) in self.0.iter_mut().rev().enumerate() {
             match frame {
-                StackFrame::Source(_, last)
-                | StackFrame::Body(last)
-                | StackFrame::Workbench(_, _, last)
-                | StackFrame::Init(last) => {
-                    let op = if last.insert(id.clone(), symbol).is_some() {
+                StackFrame::Source(_, locals)
+                | StackFrame::Workbench(_, _, locals)
+                | StackFrame::Init(locals)
+                | StackFrame::Body(locals)
+                | StackFrame::Function(locals) => {
+                    let op = if locals.insert(id.clone(), symbol).is_some() {
                         "Added"
                     } else {
                         "Set"
@@ -177,7 +178,8 @@ impl Locals for Stack {
                 StackFrame::Source(_, locals)
                 | StackFrame::Body(locals)
                 | StackFrame::Workbench(_, _, locals)
-                | StackFrame::Init(locals) => {
+                | StackFrame::Init(locals)
+                | StackFrame::Function(locals) => {
                     if let Some(local) = locals.get(id) {
                         log::trace!("fetched {id} from locals");
                         return Ok(local.clone());
@@ -188,7 +190,7 @@ impl Locals for Stack {
                     log::trace!("stop at call frame");
                     break;
                 }
-                // skip any call frame
+                // skip any of these
                 StackFrame::Call {
                     symbol: _,
                     args: _,
@@ -255,9 +257,11 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     // test alias
-    assert!(stack
-        .put_local(Some("x".into()), make_int("x".into(), 3))
-        .is_ok());
+    assert!(
+        stack
+            .put_local(Some("x".into()), make_int("x".into(), 3))
+            .is_ok()
+    );
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);

@@ -38,7 +38,10 @@ impl Eval<()> for Assignment {
 
 impl Eval<Value> for AssignmentStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        context.grant(self)?;
+
         let assignment = &self.assignment;
+
         let value: Value = assignment.expression.eval(context)?;
         if let Err(err) = assignment.type_check(value.ty()) {
             context.error(self, err)?;

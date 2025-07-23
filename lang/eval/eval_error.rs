@@ -150,8 +150,8 @@ pub enum EvalError {
     ParseError(#[from] ParseError),
 
     /// Statement is not supported in this context.
-    #[error("Statement not supported: {0}")]
-    StatementNotSupported(Box<Statement>),
+    #[error("{0} statement not available here")]
+    StatementNotSupported(&'static str),
 
     /// Properties are not initialized.
     #[error("Properties have not been initialized: {0}")]

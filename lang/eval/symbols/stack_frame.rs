@@ -20,12 +20,14 @@ pub enum StackFrame {
     Source(Identifier, SymbolMap),
     /// Module scope with locals.
     Module(Identifier, SymbolMap),
-    /// Part scope with locals.
-    Workbench(Model, Identifier, SymbolMap),
     /// initializer scope with locals.
     Init(SymbolMap),
+    /// Part scope with locals.
+    Workbench(Model, Identifier, SymbolMap),
     /// Body (scope)  with locals.
     Body(SymbolMap),
+    /// Function body
+    Function(SymbolMap),
     /// A call (e.g. og function or  part).
     Call {
         /// Symbol that was called.
@@ -52,24 +54,25 @@ impl StackFrame {
         f: &mut std::fmt::Formatter<'_>,
         mut depth: usize,
     ) -> std::fmt::Result {
-        let map = match self {
-            StackFrame::Source(id, map) => {
+        let locals = match self {
+            StackFrame::Source(id, locals) => {
                 writeln!(f, "{:depth$}{id} (source):", "")?;
-                map
+                locals
             }
-            StackFrame::Workbench(_model, id, symbols) => {
-                writeln!(f, "{:depth$}{id}", "")?;
-                return symbols.print(f, depth + 4);
-            }
-            StackFrame::Init(symbols) => {
-                writeln!(f, "{:depth$}(init):", "")?;
-                return symbols.print(f, depth + 4);
-            }
-            StackFrame::Module(id, symbols) => {
+            StackFrame::Module(id, locals) => {
                 writeln!(f, "{:depth$}{id} (module):", "")?;
-                return symbols.print(f, depth + 4);
+                return locals.print(f, depth + 4);
             }
-            StackFrame::Body(map) => map,
+            StackFrame::Init(locals) => {
+                writeln!(f, "{:depth$}(init):", "")?;
+                return locals.print(f, depth + 4);
+            }
+            StackFrame::Workbench(_, id, locals) => {
+                writeln!(f, "{:depth$}{id}", "")?;
+                return locals.print(f, depth + 4);
+            }
+            StackFrame::Body(locals) => locals,
+            StackFrame::Function(locals) => locals,
             StackFrame::Call {
                 symbol,
                 args,
@@ -87,7 +90,7 @@ impl StackFrame {
 
         depth += 4;
 
-        for (id, symbol) in map.iter() {
+        for (id, symbol) in locals.iter() {
             let full_name = symbol.full_name();
             match &symbol.borrow().def {
                 SymbolDefinition::Constant(id, value) => {
@@ -108,11 +111,12 @@ impl StackFrame {
         idx: usize,
     ) -> std::fmt::Result {
         match self {
-            StackFrame::Source(_identifier, _symbol_map) => todo!(),
-            StackFrame::Module(_identifier, _symbol_map) => todo!(),
-            StackFrame::Workbench(_kind, _identifier, _symbol_map) => todo!(),
-            StackFrame::Init(_symbol_map) => todo!(),
-            StackFrame::Body(_symbol_map) => todo!(),
+            StackFrame::Source(_identifier, _locals) => todo!(),
+            StackFrame::Module(_identifier, _locals) => todo!(),
+            StackFrame::Init(_locals) => todo!(),
+            StackFrame::Workbench(_kind, _identifier, _locals) => todo!(),
+            StackFrame::Body(_locals) => todo!(),
+            StackFrame::Function(_locals) => todo!(),
             StackFrame::Call {
                 symbol,
                 args,

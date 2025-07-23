@@ -32,7 +32,7 @@ impl Parse for Assignment {
         }
 
         Ok(Self {
-            qualifier: qualifier.unwrap_or(Qualifier::LocalVar),
+            qualifier: qualifier.unwrap_or(Qualifier::Var),
             id,
             specified_type,
             expression: expression.expect(INTERNAL_PARSE_ERROR),
@@ -166,9 +166,9 @@ impl Parse for Qualifier {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::qualifier);
         match pair.as_str() {
-            "const" => Ok(Self::Constant),
-            "prop" => Ok(Self::Property),
-            _ => Ok(Self::LocalVar),
+            "const" => Ok(Self::Const),
+            "prop" => Ok(Self::Prop),
+            _ => Ok(Self::Var),
         }
     }
 }

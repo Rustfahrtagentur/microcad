@@ -3,6 +3,10 @@
 
 use crate::{builtin::*, diag::*, eval::*, model::Model, rc::*, resolve::*, syntax::*};
 
+pub trait Grant<T> {
+    fn grant(&self, t: &T) -> EvalResult<()>;
+}
+
 /// *Context* for *evaluation* of a resolved µcad file.
 ///
 /// The context is used to store the current state of the evaluation.
@@ -265,5 +269,105 @@ impl ExporterAccess for Context {
         filename: &std::path::Path,
     ) -> Result<Rc<dyn Exporter>, ExportError> {
         self.exporters.exporter_by_filename(filename)
+    }
+}
+
+impl Grant<UseStatement> for Context {
+    fn grant(&self, _: &UseStatement) -> EvalResult<()> {
+        if self.symbol_table.stack.current_frame().is_some() {
+            Ok(())
+        } else {
+            Err(EvalError::StatementNotSupported("Use"))
+        }
+    }
+}
+
+impl Grant<ReturnStatement> for Context {
+    fn grant(&self, _: &ReturnStatement) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
+            matches!(stack_frame, StackFrame::Function(_))
+        } else {
+            false
+        };
+        if granted {
+            Ok(())
+        } else {
+            Err(EvalError::StatementNotSupported("Return"))
+        }
+    }
+}
+
+impl Grant<IfStatement> for Context {
+    fn grant(&self, _: &IfStatement) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
+            matches!(
+                stack_frame,
+                StackFrame::Source(_, _)
+                    | StackFrame::Workbench(_, _, _)
+                    | StackFrame::Body(_)
+                    | StackFrame::Function(_)
+            )
+        } else {
+            false
+        };
+        if granted {
+            Ok(())
+        } else {
+            Err(EvalError::StatementNotSupported("If"))
+        }
+    }
+}
+
+impl Grant<AssignmentStatement> for Context {
+    fn grant(&self, assignment: &AssignmentStatement) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
+            match assignment.assignment.qualifier {
+                Qualifier::Var => {
+                    matches!(
+                        stack_frame,
+                        StackFrame::Source(_, _)
+                            | StackFrame::Body(_)
+                            | StackFrame::Module(_, _)
+                            | StackFrame::Workbench(_, _, _)
+                            | StackFrame::Init(_)
+                    )
+                }
+                Qualifier::Const => matches!(
+                    stack_frame,
+                    StackFrame::Source(_, _)
+                        | StackFrame::Module(_, _)
+                        | StackFrame::Workbench(_, _, _)
+                ),
+                Qualifier::Prop => matches!(stack_frame, StackFrame::Workbench(_, _, _)),
+            }
+        } else {
+            false
+        };
+        if granted {
+            Ok(())
+        } else {
+            Err(EvalError::StatementNotSupported("Assignment"))
+        }
+    }
+}
+
+impl Grant<ExpressionStatement> for Context {
+    fn grant(&self, _: &ExpressionStatement) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
+            matches!(
+                stack_frame,
+                StackFrame::Source(_, _)
+                    | StackFrame::Body(_)
+                    | StackFrame::Workbench(_, _, _)
+                    | StackFrame::Function(_)
+            )
+        } else {
+            false
+        };
+        if granted {
+            Ok(())
+        } else {
+            Err(EvalError::StatementNotSupported("Return"))
+        }
     }
 }

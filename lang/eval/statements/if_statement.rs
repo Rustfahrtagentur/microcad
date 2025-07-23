@@ -6,13 +6,15 @@
 use crate::{eval::*, model::*, syntax::*, value::*};
 
 impl Eval<Value> for IfStatement {
-    fn eval(&self, _context: &mut crate::eval::Context) -> crate::eval::EvalResult<Value> {
+    fn eval(&self, context: &mut crate::eval::Context) -> crate::eval::EvalResult<Value> {
+        context.grant(self)?;
         todo!("evaluate if statement in function")
     }
 }
 
 impl Eval<Option<Model>> for IfStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
+        context.grant(self)?;
         let cond = self.cond.eval(context)?;
         match cond {
             Value::Bool(true) => Ok(Some(self.body.eval(context)?)),
