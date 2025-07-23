@@ -79,12 +79,13 @@ impl<'a> ArgumentMatch<'a> {
             } else {
                 log::trace!("find type matches for:\n{self}");
             }
-            self.arguments.retain(|(_, arg)| {
+            self.arguments.retain(|(arg_id, arg)| {
                 // filter params by type
                 let same_type: Vec<_> = self
                     .params
                     .iter()
                     .enumerate()
+                    .filter(|(_, (_, _))| arg_id.is_empty())
                     .filter_map(|(n, (id, param))| {
                         if [Type::Invalid, arg.ty(), arg.ty_inner()].contains(&param.ty()) {
                             Some((n, id, param))

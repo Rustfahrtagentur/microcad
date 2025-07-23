@@ -152,11 +152,11 @@ you will get an error:
 ```µcad,missed_property#fail
 sketch wheel(radius: Length) {
     init( width: Length ) { 
-        // error: misses to set `radius` from building plan
+        // evaluation error: misses to set `radius` from building plan
     }
 }
 
-wheel(radius = 1.0mm);
+wheel(width = 1.0mm);
 ```
 
 ### Init Code
