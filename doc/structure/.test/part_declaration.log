@@ -77,6 +77,6 @@ error: Symbol into_diameter not found.
   21 |     prop diameter = into_diameter(radius);
      |                     ^^^^^^^^^^^^^^^^^^^^^
      |
-error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
+error: Missing arguments: [Identifier: "v", Refer: [103m[1m NO REF [49m[22m]
 -- Test Result --
 TODO

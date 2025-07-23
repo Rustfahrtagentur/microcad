@@ -35,7 +35,7 @@ error: Property not found: inner
   16 | std::info("inner: {t.inner}");
      |                    ^^^^^^^
      |
-info: inner: <invalid>
+info: inner: [101m[1m INVALID VALUE [49m[22m
   ---> <from_str>:16:11
      |
   16 | std::info("inner: {t.inner}");
