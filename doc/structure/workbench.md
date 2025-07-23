@@ -6,7 +6,9 @@
   - [Building Plan](#building-plan)
   - [Initializers](#initializers)
   - [Init Code](#init-code)
+  - [Init Code Rules](#init-code-rules)
   - [Building Code](#building-code)
+  - [Building Code Rules](#building-code-rules)
 - [Properties](#properties)
 
 ## Workbench Types
@@ -276,7 +278,7 @@ sketch wheel(outer: length) {
     prop inner = outer / 2;
 
     // generate wheel (and use property inner)
-    circle(radius) - circle(inner);
+    circle(outer) - circle(inner);
 }
 
 // evaluate wheel
@@ -299,7 +301,7 @@ sketch wheel(outer: length) {
     // from outside this workbench
     inner = outer / 2;
 
-    circle(radius) - circle(inner);
+    circle(outer) - circle(inner);
 }
 
 t = wheel(outer = 1cm);
