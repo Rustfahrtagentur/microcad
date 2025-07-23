@@ -3,5 +3,11 @@
   ../doc/structure/workbench.md:253
 -- Output --
 -- Errors --
+error: sketch statement not available here
+  ---> <from_str>:5:1
+     |
+   5 | wheel(radius = 1.0mm);
+     | ^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED
