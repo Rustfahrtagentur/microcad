@@ -16,7 +16,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/.test/attributes_color.png)](../doc/.test/attributes_color.log) | [attributes_color](../doc/attributes.md) |
 | [![test](../doc/.test/attributes_export.png)](../doc/.test/attributes_export.log) | [attributes_export](../doc/attributes.md) |
 | [![test](../doc/.test/attributes_export_example.png)](../doc/.test/attributes_export_example.log) | [attributes_export_example](../doc/attributes.md) |
-| [![test](../doc/.test/attributes_export_id.png)](../doc/.test/attributes_export_id.log) | [attributes_export_id](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_export_measure.png)](../doc/.test/attributes_export_measure.log) | [attributes_export_measure](../doc/attributes.md) |
+| [![test](../doc/.test/attributes_export_svg.png)](../doc/.test/attributes_export_svg.log) | [attributes_export_svg](../doc/attributes.md) |
 | [![test](../doc/.test/attributes_precision.png)](../doc/.test/attributes_precision.log) | [attributes_precision](../doc/attributes.md) |
 | [![test](../doc/.test/attributes_simple_example.png)](../doc/.test/attributes_simple_example.log) | [attributes_simple_example](../doc/attributes.md) |
 | [![test](../doc/tests/.test/body_assignment_const.png)](../doc/tests/.test/body_assignment_const.log) | [body_assignment_const](../doc/tests/README.md) |

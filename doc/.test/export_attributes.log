@@ -1,7 +1,3 @@
 -- Test --
   export_attributes
   ../doc/export.md:42
--- Output --
--- Errors --
--- Test Result --
-OK

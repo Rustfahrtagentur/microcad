@@ -1,7 +1,3 @@
 -- Test --
   attributes_export
-  ../doc/attributes.md:74
--- Output --
--- Errors --
--- Test Result --
-OK
+  ../doc/attributes.md:94

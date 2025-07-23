@@ -1,7 +1,25 @@
 -- Test --
   attributes_export_example
-  ../doc/attributes.md:105
+  ../doc/attributes.md:78
 -- Output --
 -- Errors --
+warning: No exporter found with id `export`
+  ---> <from_str>:1:3
+     |
+   1 | #[export("circle.svg")]
+     |   ^^^^^^
+     |
+error: Not found: export
+  ---> <from_str>:5:24
+     |
+   5 | std::debug::assert_eq([c#export.filename, "circle.svg"]);
+     |                        ^^^^^^^^^^^^^^^^^
+     |
+error: Elements of list have different types: [<invalid>, String]
+  ---> <from_str>:5:23
+     |
+   5 | std::debug::assert_eq([c#export.filename, "circle.svg"]);
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK
+FAIL
