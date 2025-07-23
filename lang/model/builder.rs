@@ -5,7 +5,7 @@
 
 use microcad_core::{Geometry2D, Geometry3D};
 
-use crate::{eval::*, model::*, rc::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, model::*, rc::*, src_ref::*, syntax::*};
 
 /// A builder pattern to build models
 #[derive(Default)]

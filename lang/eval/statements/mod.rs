@@ -26,7 +26,7 @@ impl Eval for Statement {
             Self::Expression(e) => e.eval(context),
             Self::Marker(_) => unreachable!(),
             Self::Init(_) => unreachable!(),
-            Self::Return(r) => todo!(),
+            Self::Return(_) => todo!(),
         }
     }
 }
