@@ -105,11 +105,13 @@ Any errors which occur here are related to geometrical processing.
 
 ## Statement Usage
 
-| Code           | workbench | module | function | init | use | return | if  | marker | assignment | expression |
-| -------------- | --------- | ------ | -------- | ---- | --- | ------ | --- | ------ | ---------- | ---------- |
-| Source File    | yes       | yes    | yes      |      | yes |        | yes |        | yes        | yes        |
-| Body (Scope)   |           |        |          |      | yes |        | yes | yes    | yes        | yes        |
-| Module         | yes       | yes    | yes      |      | yes |        |     |        | yes        |            |
-| Workbench Init |           |        |          |      | yes |        |     |        | yes        |            |
-| Workbench      |           |        |          | yes  | yes |        | yes | yes    | yes        | (model)    |
-| Function       |           |        |          |      | yes | yes    | yes |        | yes        | yes        |
+| Stack frame | workbench | module | function | init  |  use  | pub use | return |  if   | marker |    assignment    | expression |
+| :---------- | :-------: | :----: | :------: | :---: | :---: | :-----: | :----: | :---: | :----: | :--------------: | :--------: |
+| Source      |    yes    |  yes   |   yes    |   -   |  yes  |   yes   |   -    |  yes  |   -    |    const, var    |    yes     |
+| Module      |    yes    |  yes   |   yes    |   -   |  yes  |   yes   |   -    |   -   |   -    |    const, var    |     -      |
+| Pre-Init    |     -     |   -    |    -     |   -   |  yes  |    -    |   -    |   -   |   -    |      const       |     -      |
+| Init        |     -     |   -    |    -     |   -   |  yes  |    -    |   -    |   -   |   -    |       var        |     -      |
+| Workbench   |     -     |   -    |    -     |  yes  |  yes  |    -    |   -    |  yes  |  yes   | const, var, prop |  (model)   |
+| Body        |     -     |   -    |    -     |   -   |  yes  |    -    |   -    |  yes  |  yes   |       var        |    yes     |
+| Function    |     -     |   -    |    -     |   -   |  yes  |    -    |  yes   |  yes  |   -    |       var        |    yes     |
+| Call        |     -     |   -    |    -     |   -   |   -   |    -    |   -    |   -   |   -    |        -         |     -      |

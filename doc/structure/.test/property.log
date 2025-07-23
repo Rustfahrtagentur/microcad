@@ -1,12 +1,25 @@
 -- Test --
   property
   ../doc/structure/workbench.md:272
--- Parse Error --
-Parser error:  --> 8:16
-  |
-8 |     prop inner = outer / 2;
-  |                ^---
-  |
-  = expected COMMENT, identifier, list_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, method_call, or body
+-- Output --
+-- Errors --
+error: Workbench wheel cannot find initialization for those arguments
+  ---> <from_str>:15:11
+     |
+  15 | t = wheel(1cm);
+     |           ^^^
+     |
+error: Symbol info not found.
+  ---> <from_str>:18:1
+     |
+  18 | info("outer: {t.outer}");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol info not found.
+  ---> <from_str>:19:1
+     |
+  19 | info("inner: {t.inner}");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-FAIL (TODO)
+TODO

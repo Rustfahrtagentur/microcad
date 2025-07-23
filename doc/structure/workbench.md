@@ -174,14 +174,14 @@ sketch wheel(radius: Length) {
     // init code
     const FACTOR = 2.0;
 
+    // initializer
+    init(diameter: Length) { into_radius(radius); }
+
     // function
     fn into_radius( diameter: Length ) {
         // use constant FACTOR from init code
         return diameter / FACTOR;
     }
-
-    // initializer
-    init(diameter: Length) { into_radius(radius); }
 
     // set property diameter and use FACTOR from init code
     prop diameter = radius * FACTOR;
