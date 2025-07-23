@@ -135,13 +135,13 @@ part wheel(radius: Length, thickness: Length) {
     }
 
     // Now radius and thickness can be used
-    std::geo3d::cylinder(radius, height=thickness);
+    std::geo2d::circle(radius) - std::geo2d::circle(radius - thickness);
 }
 
 // call with building plan
 wheel(radius=5cm, thickness=1cm);
 // call with initializer
-wheel(diameter=5cm, thickness=1cm);
+wheel(diameter=10cm, thickness=1cm);
 ```
 
 If the *building plan* is not fully initialized by an initializer
