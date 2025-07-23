@@ -19,7 +19,9 @@ pub use use_statement::*;
 impl Eval for Statement {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match self {
-            Self::Workbench(_) | Self::Module(_) | Self::Function(_) => Ok(Value::None),
+            Self::Workbench(_) | Self::Module(_) | Self::Function(_) => {
+                unreachable!("no value statement")
+            }
             Self::Use(u) => u.eval(context),
             Self::Assignment(a) => a.eval(context),
             Self::If(i) => i.eval(context),
@@ -34,9 +36,23 @@ impl Eval for Statement {
 impl Eval<Models> for Statement {
     fn eval(&self, context: &mut Context) -> EvalResult<Models> {
         let models: Models = match self {
-            Self::Workbench(_) | Self::Module(_) | Self::Function(_) | Self::Init(_) => {
+            Self::Workbench(w) => {
+                context.grant(w)?;
                 Default::default()
             }
+            Self::Module(m) => {
+                context.grant(m)?;
+                Default::default()
+            }
+            Self::Function(f) => {
+                context.grant(f)?;
+                Default::default()
+            }
+            Self::Init(i) => {
+                context.grant(i)?;
+                Default::default()
+            }
+
             Self::Return(_) => {
                 todo!("error")
             }

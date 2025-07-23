@@ -3,7 +3,9 @@
 
 use crate::{builtin::*, diag::*, eval::*, model::Model, rc::*, resolve::*, syntax::*};
 
+/// Grant statements depending on context
 pub trait Grant<T> {
+    /// Check if given statement [`T`] is granted within the current context
     fn grant(&self, t: &T) -> EvalResult<()>;
 }
 
@@ -269,6 +271,76 @@ impl ExporterAccess for Context {
         filename: &std::path::Path,
     ) -> Result<Rc<dyn Exporter>, ExportError> {
         self.exporters.exporter_by_filename(filename)
+    }
+}
+
+impl Grant<Rc<WorkbenchDefinition>> for Context {
+    fn grant(&self, w: &Rc<WorkbenchDefinition>) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
+            matches!(
+                stack_frame,
+                StackFrame::Source(_, _) | StackFrame::Module(_, _)
+            )
+        } else {
+            false
+        };
+        if granted {
+            Ok(())
+        } else {
+            Err(EvalError::StatementNotSupported(w.kind.as_str()))
+        }
+    }
+}
+
+impl Grant<Rc<ModuleDefinition>> for Context {
+    fn grant(&self, _: &Rc<ModuleDefinition>) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
+            matches!(
+                stack_frame,
+                StackFrame::Source(_, _) | StackFrame::Module(_, _)
+            )
+        } else {
+            false
+        };
+        if granted {
+            Ok(())
+        } else {
+            Err(EvalError::StatementNotSupported("Module"))
+        }
+    }
+}
+
+impl Grant<Rc<FunctionDefinition>> for Context {
+    fn grant(&self, _: &Rc<FunctionDefinition>) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
+            matches!(
+                stack_frame,
+                StackFrame::Source(_, _)
+                    | StackFrame::Module(_, _)
+                    | StackFrame::Workbench(_, _, _)
+            )
+        } else {
+            false
+        };
+        if granted {
+            Ok(())
+        } else {
+            Err(EvalError::StatementNotSupported("Function"))
+        }
+    }
+}
+impl Grant<Rc<InitDefinition>> for Context {
+    fn grant(&self, _: &Rc<InitDefinition>) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
+            matches!(stack_frame, StackFrame::Workbench(_, _, _))
+        } else {
+            false
+        };
+        if granted {
+            Ok(())
+        } else {
+            Err(EvalError::StatementNotSupported("Init"))
+        }
     }
 }
 
