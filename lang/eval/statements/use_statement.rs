@@ -24,13 +24,13 @@ pub trait UseSymbol {
     fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<Symbol>;
 }
 
-impl Eval for UseStatement {
+impl Eval<Value> for UseStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         self.decl.eval(context)
     }
 }
 
-impl Eval for UseDeclaration {
+impl Eval<Value> for UseDeclaration {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match &self {
             UseDeclaration::Use(name) => {

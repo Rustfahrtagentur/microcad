@@ -13,22 +13,7 @@ impl InitDefinition {
     ) -> EvalResult<ObjectProperties> {
         let model = context.get_model()?;
         context.scope(StackFrame::Init(args.into()), |context| {
-            for statement in self.body.statements.iter() {
-                match statement {
-                    Statement::Assignment(assignment) => {
-                        let assignment = &assignment.assignment;
-                        let id = &assignment.id;
-                        let value: Value = assignment.expression.eval(context)?;
-                        context.set_local_value(id.clone(), value)?;
-                    }
-                    _ => {
-                        context.error(
-                            self,
-                            EvalError::StatementNotSupported(statement.clone().into()),
-                        )?;
-                    }
-                }
-            }
+            self.body.statements.eval(context)?;
 
             let (found, not_found): (Vec<_>, Vec<_>) = plan
                 .iter()

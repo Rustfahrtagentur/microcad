@@ -46,7 +46,6 @@ mod source_file;
 mod statements;
 mod symbols;
 mod tuple;
-mod r#use;
 mod workbench;
 
 pub use argument_match::*;
@@ -58,7 +57,7 @@ pub use eval_error::*;
 pub use externals::*;
 pub use output::*;
 pub use parameter::*;
-pub use r#use::*;
+pub use statements::*;
 pub use symbols::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};

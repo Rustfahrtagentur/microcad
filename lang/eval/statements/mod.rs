@@ -7,93 +7,53 @@
 
 use crate::{eval::*, model::*};
 
-mod assignment;
-mod r#if;
+mod assignment_statement;
+mod expression_statement;
+mod if_statement;
+mod marker;
+mod return_statement;
+mod use_statement;
 
-impl Eval for ExpressionStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        let value: Value = self.expression.eval(context)?;
-        match value {
-            Value::Models(mut models) => {
-                let attributes = self.attribute_list.eval(context)?;
-                models.iter_mut().for_each(|model| {
-                    model.borrow_mut().attributes = attributes.clone();
-                });
-                Ok(Value::Models(models))
-            }
-            Value::None => Ok(Value::None),
-            _ => {
-                if !self.attribute_list.is_empty() {
-                    context.error(
-                        &self.attribute_list,
-                        AttributeError::CannotAssignToExpression(self.expression.clone().into()),
-                    )?;
-                }
-                Ok(value)
-            }
-        }
-    }
-}
-
-impl Eval<Models> for ExpressionStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
-        let value: Value = self.eval(context)?;
-        Ok(value.fetch_models())
-    }
-}
-
-impl Eval<Option<Model>> for Marker {
-    fn eval(&self, _: &mut Context) -> EvalResult<Option<Model>> {
-        if self.is_children_marker() {
-            Ok(Some(ModelBuilder::new_children_placeholder().build()))
-        } else {
-            Ok(None)
-        }
-    }
-}
-
-impl Eval<Models> for Marker {
-    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
-        let model: Option<Model> = self.eval(context)?;
-        Ok(model.into())
-    }
-}
+pub use use_statement::*;
 
 impl Eval for Statement {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        Ok(match self {
-            Self::Use(u) => u.eval(context)?,
-            Self::Assignment(a) => {
-                a.eval(context)?;
-                Value::None
-            }
-            Self::If(i) => i.eval(context)?,
-            Self::Expression(e) => e.eval(context)?,
-            Self::Workbench(_) | Self::Function(_) | Self::Module(_) | Self::Marker(_) => {
-                Value::None
-            }
-            statement => todo!("{statement}"),
-        })
+        match self {
+            Self::Workbench(_) | Self::Module(_) | Self::Function(_) => Ok(Value::None),
+            Self::Use(u) => u.eval(context),
+            Self::Assignment(a) => a.eval(context),
+            Self::If(i) => i.eval(context),
+            Self::Expression(e) => e.eval(context),
+            Self::Marker(_) => unreachable!(),
+            Self::Init(_) => unreachable!(),
+            Self::Return(r) => todo!(),
+        }
     }
 }
 
 impl Eval<Models> for Statement {
     fn eval(&self, context: &mut Context) -> EvalResult<Models> {
         let models: Models = match self {
+            Self::Workbench(_) | Self::Module(_) | Self::Function(_) | Self::Init(_) => {
+                Default::default()
+            }
+            Self::Return(_) => {
+                todo!("error")
+            }
             Self::Use(u) => {
                 u.eval(context)?;
-                Models::default()
+                Default::default()
             }
             Self::Assignment(a) => {
                 a.eval(context)?;
-                Models::default()
+                Default::default()
             }
             Self::If(i) => {
                 let model: Option<Model> = i.eval(context)?;
                 model.into()
             }
             Self::Expression(e) => e.eval(context)?,
-            _ => Models::default(),
+            Self::Marker(m) => m.eval(context)?,
         };
 
         if models.deduce_output_type() == OutputType::InvalidMixed {
@@ -117,7 +77,7 @@ impl Eval<Models> for StatementList {
 
             models.append(&mut statement_models);
         }
-
+        models.deduce_output_type();
         Ok(models)
     }
 }

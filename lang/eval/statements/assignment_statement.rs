@@ -36,13 +36,13 @@ impl Eval<()> for Assignment {
     }
 }
 
-impl Eval<()> for AssignmentStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<()> {
+impl Eval<Value> for AssignmentStatement {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let assignment = &self.assignment;
         let value: Value = assignment.expression.eval(context)?;
         if let Err(err) = assignment.type_check(value.ty()) {
             context.error(self, err)?;
-            return Ok(());
+            return Ok(Value::None);
         }
 
         let value = match value {
@@ -68,6 +68,6 @@ impl Eval<()> for AssignmentStatement {
 
         context.set_local_value(assignment.id.clone(), value)?;
 
-        Ok(())
+        Ok(Value::None)
     }
 }

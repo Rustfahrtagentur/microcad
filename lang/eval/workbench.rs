@@ -65,19 +65,9 @@ impl WorkbenchDefinition {
 
                 // At this point, all properties must have a value
                 log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
-                for statement in self.body.statements.iter() {
-                    match statement {
-                        Statement::Assignment(assignment) => {
-                            assignment.eval(context)?;
-                        }
-                        Statement::Expression(expression) => {
-                            let result = expression.eval(context)?;
-                            model.borrow_mut().append(result);
-                        }
-                        Statement::Init(_) => (),
-                        _ => todo!("Evaluate statement: {statement}"),
-                    }
-                }
+                model
+                    .borrow_mut()
+                    .append(self.body.statements.eval(context)?);
 
                 // We have to deduce the output type of this model, otherwise the model is incomplete.
                 model.deduce_output_type();
