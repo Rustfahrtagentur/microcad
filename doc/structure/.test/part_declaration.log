@@ -1,6 +1,6 @@
 -- Test --
   part_declaration
-  ../doc/structure/workbench.md:41
+  ../doc/structure/workbench.md:43
 -- Parse Error --
 Parser error:  --> 5:18
   |

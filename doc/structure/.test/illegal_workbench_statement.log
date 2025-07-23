@@ -1,3 +1,7 @@
 -- Test --
   illegal_workbench_statement
-  ../doc/structure/workbench.md:249
+  ../doc/structure/workbench.md:251
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL
