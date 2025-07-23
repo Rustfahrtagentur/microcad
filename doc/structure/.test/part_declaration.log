@@ -3,12 +3,19 @@
   ../doc/structure/workbench.md:43
 -- Output --
 -- Errors --
+error: Symbol FACTOR not found.
+  ---> <from_str>:8:5
+     |
+   8 |     init(diameter: Length) {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 error: Symbol into_diameter not found.
   ---> <from_str>:21:21
      |
   21 |     prop diameter = into_diameter(radius);
      |                     ^^^^^^^^^^^^^^^^^^^^^
      |
+error: Workbench circle cannot find initialization for those arguments
 error: Symbol assert_eq not found.
   ---> <from_str>:34:1
      |

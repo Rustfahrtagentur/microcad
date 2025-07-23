@@ -3,5 +3,11 @@
   ../doc/structure/workbench.md:152
 -- Output --
 -- Errors --
+error: Workbench plan incomplete. Missing properties: [Identifier: "radius", Refer: 1:14 (13..19) in 0xf3cdaa8ec03331ff]
+  ---> <from_str>:2:5
+     |
+   2 |     init( width: Length ) { 
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED
