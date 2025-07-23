@@ -189,7 +189,7 @@ attribute_access = { "#" ~ identifier }
 element_access = _{ method_call | list_element_access | tuple_element_access | attribute_access }
 
 //`pub`: ok
-visibility = { "pub" }
+visibility = { "pub" | "prop" | "const" }
 
 //`use a;`: ok # Import a single module
 //`use ;`: error # Must import at least one module
