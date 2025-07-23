@@ -158,9 +158,9 @@ impl SourceFileTest {
             .unwrap_or_else(|_| panic!("Failed to read file: {file1}"));
         let content2 = std::fs::read_to_string(file2)
             .unwrap_or_else(|_| panic!("Failed to read file: {file2}"));
-        assert_eq!(
-            content1, content2,
-            "File contents differ: {file1} vs {file2}"
-        );
+        if content1 != content2 {
+            log::error!("\nFile {file1}:\n{content1}\nFile {file2}:\n{content2}");
+            panic!("File contents differ: {file1} vs {file2}");
+        }
     }
 }

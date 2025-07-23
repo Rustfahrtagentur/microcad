@@ -50,11 +50,6 @@ impl ModelInner {
         }
     }
 
-    /// Append more children models.
-    pub fn append(&mut self, models: Models) {
-        self.children.extend(models.iter().cloned());
-    }
-
     /// Return iterator of children.s
     pub fn children(&self) -> std::slice::Iter<'_, Model> {
         self.children.iter()

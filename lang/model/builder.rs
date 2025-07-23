@@ -15,10 +15,6 @@ pub struct ModelBuilder {
     pub properties: ObjectProperties,
     /// Children to add to this model.
     pub children: Models,
-    /// Attributes used for export.
-    pub attributes: Attributes,
-    /// The symbol (e.g. [`WorkbenchDefinition`]) that created this [`Model`].
-    pub origin: Origin,
 
     /// The output type of this model.
     output: OutputType,
@@ -113,37 +109,28 @@ impl ModelBuilder {
 
     /// Set object origin.
     pub fn origin(mut self, origin: Origin) -> Self {
-        self.origin = origin;
+        self.root.origin = origin;
         self
     }
 
     /// Set object attributes.
     pub fn attributes(mut self, attributes: Attributes) -> Self {
-        self.attributes = attributes;
+        self.root.attributes = attributes;
         self
     }
 
     /// Set object properties.
     pub fn properties(mut self, properties: ObjectProperties) -> Self {
+        log::trace!("Properties:\n{properties}");
         self.properties = properties;
         self
-    }
-
-    /// Set property value for object.
-    pub fn set_property(&mut self, id: Identifier, value: Value) -> &mut Self {
-        self.properties.insert(id, value);
-        self
-    }
-
-    /// Return true if the object has a property with `id`.
-    pub fn has_property(&self, id: &Identifier) -> bool {
-        self.properties.contains_key(id)
     }
 
     /// Build a [`Model`].
     pub fn build(mut self) -> Model {
         if let Element::Object(props) = &mut self.root.element.value {
-            *props = self.properties
+            log::trace!("Copy object properties:\n{}", self.properties);
+            *props = self.properties;
         }
 
         let model = Model::new(self.root.into());

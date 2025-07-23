@@ -65,9 +65,7 @@ impl WorkbenchDefinition {
 
                 // At this point, all properties must have a value
                 log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
-                model
-                    .borrow_mut()
-                    .append(self.body.statements.eval(context)?);
+                model.append_children(self.body.statements.eval(context)?);
 
                 // We have to deduce the output type of this model, otherwise the model is incomplete.
                 model.deduce_output_type();

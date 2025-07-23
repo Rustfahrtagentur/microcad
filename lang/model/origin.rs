@@ -32,7 +32,7 @@ impl std::fmt::Display for Origin {
             Some(creator) => {
                 write!(
                     f,
-                    "{symbol}({arguments})",
+                    "{symbol}{arguments}",
                     symbol = creator.full_name(),
                     arguments = self.arguments,
                 )

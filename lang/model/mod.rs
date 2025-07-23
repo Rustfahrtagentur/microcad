@@ -166,7 +166,7 @@ impl Model {
         let self_ = self.borrow();
 
         format!(
-            "{id}{element_type}{origin} -> {output_type}",
+            "{id}{element_type}{origin} -> {output_type}{is_root}",
             id = match &self_.id {
                 Some(id) => format!("{id}: "),
                 None => String::new(),
@@ -176,7 +176,12 @@ impl Model {
                 Some(_) => format!(" = {origin}", origin = self_.origin),
                 None => String::new(),
             },
-            output_type = self.final_output_type()
+            output_type = self.final_output_type(),
+            is_root = if self.parents().next().is_some() {
+                String::new()
+            } else {
+                " (root)".into()
+            }
         )
     }
 }
