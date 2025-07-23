@@ -189,7 +189,7 @@ attribute_access = { "#" ~ identifier }
 element_access = _{ method_call | list_element_access | tuple_element_access | attribute_access }
 
 //`pub`: ok
-visibility = { "pub" | "prop" | "const" }
+visibility = { "pub" }
 
 //`use a;`: ok # Import a single module
 //`use ;`: error # Must import at least one module
@@ -350,13 +350,18 @@ attribute = { "#[" ~ attribute_item ~ ws* ~ ("," ~ ws* ~ attribute_item ~ ws*)* 
 //`#[foo = 32] #[bar = 32]`: ok # Multiple attributes
 attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
+//`const`: ok
+//`prop`: ok
+qualifier = { "const" | "prop" }
+
 //`r: Length = 5.0mm`: ok
 //`r = 5.0mm`: ok # Type specifier with type inference
 //`r: Length`: error # Default value is required
 //`r: Scalar = math::PI`: ok # Type specifier + Default value from constant
 //`r`: error # neither type specifier or default value
-//`pub r = 5.0mm`: Make value of assignment public
-assignment = { (visibility ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
+//`const r = 5.0mm`: Make value of assignment a public constant
+//`prop r = 5.0mm`: Make value of assignment a public property
+assignment = { (qualifier ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
 
 assignment_statement = { (attribute_list ~ ws+)? ~ assignment ~ ws* ~ ";" }
 
@@ -391,6 +396,7 @@ function_signature = { parameter_list ~ (ws* ~ "->" ~ ws* ~ type)? }
 //`fn foo(a: Scalar, b: Scalar) -> Scalar { return a + b; }`: ok # Function with multiple arguments
 //`fn test(a: Scalar, b: Scalar) -> Scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
 //`fn weight(density: density = 20g/1mm^3) -> Weight {}` ok # Function with default value
+//`pub fn foo() {}` ok # Public function
 function_definition = { (visibility ~ ws+)? ~ "fn" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ body }
 
 //`return 5.0mm;`: ok
@@ -415,7 +421,8 @@ workbench_kind = { "sketch" | "part" | "op" }
 //`part donut(radius) { }`: error # Part property must have type annotations
 //`sketch foo() { }`: ok # Sketch with no properties
 //`op foo() { }`: ok # Sketch with no properties
-workbench_definition = { (attribute_list ~ ws+)? ~ workbench_kind ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
+//`pub sketch foo() { }`: ok # public sketch
+workbench_definition = { (attribute_list ~ ws+)? ~ (visibility ~ ws+)? ~ workbench_kind ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
 //`{ translate() rotate(); }`: ok
 //`{}`: ok # Empty body

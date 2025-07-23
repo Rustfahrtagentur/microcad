@@ -37,6 +37,8 @@ impl std::fmt::Display for WorkbenchKind {
 /// Workbench definition
 #[derive(Clone, Debug)]
 pub struct WorkbenchDefinition {
+    /// visibility from outside modules
+    pub visibility: Visibility,
     /// Workbench attributes.
     pub attribute_list: AttributeList,
     /// Workbench kind
@@ -52,26 +54,6 @@ pub struct WorkbenchDefinition {
 }
 
 impl WorkbenchDefinition {
-    /// Create new workbench
-    pub fn new(
-        attribute_list: AttributeList,
-        kind: WorkbenchKind,
-        id: Identifier,
-        plan: ParameterList,
-        body: Body,
-        src_ref: SrcRef,
-    ) -> Rc<Self> {
-        Self {
-            attribute_list,
-            kind,
-            id,
-            plan,
-            body,
-            src_ref,
-        }
-        .into()
-    }
-
     /// Resolve into SymbolNode.
     pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
         let node = Symbol::new(SymbolDefinition::Workbench(self.clone()), parent);

@@ -16,18 +16,20 @@ impl Parse for WorkbenchKind {
 
 impl Parse for Rc<WorkbenchDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Ok(WorkbenchDefinition::new(
-            crate::find_rule!(pair, attribute_list)?,
-            crate::find_rule_exact!(pair, workbench_kind)?,
-            crate::find_rule!(pair, identifier)?,
-            crate::find_rule!(pair, parameter_list)?,
-            {
+        Ok(WorkbenchDefinition {
+            visibility: crate::find_rule!(pair, visibility)?,
+            attribute_list: crate::find_rule!(pair, attribute_list)?,
+            kind: crate::find_rule_exact!(pair, workbench_kind)?,
+            id: crate::find_rule!(pair, identifier)?,
+            plan: crate::find_rule!(pair, parameter_list)?,
+            body: {
                 let body = crate::find_rule!(pair, body)?;
                 check_statements(&body)?;
                 body
             },
-            pair.into(),
-        ))
+            src_ref: pair.into(),
+        }
+        .into())
     }
 }
 

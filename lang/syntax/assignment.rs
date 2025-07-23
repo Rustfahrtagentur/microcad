@@ -8,6 +8,8 @@ use crate::{src_ref::*, syntax::*, ty::*};
 /// Assignment specifying an identifier, type and value
 #[derive(Clone, Debug)]
 pub struct Assignment {
+    /// Assignee qualifier
+    pub qualifier: Qualifier,
     /// Assignee
     pub id: Identifier,
     /// Type of the assignee

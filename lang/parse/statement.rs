@@ -8,7 +8,9 @@ impl Parse for Assignment {
         let mut id = Identifier::default();
         let mut specified_type = None;
         let mut expression = None;
+        let mut qualifier = None;
 
+        // TODO: use crate::find_rule!() and crate::find_rule_opt!() ??
         for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::identifier => {
@@ -16,6 +18,9 @@ impl Parse for Assignment {
                 }
                 Rule::r#type => {
                     specified_type = Some(TypeAnnotation::parse(pair)?);
+                }
+                Rule::qualifier => {
+                    qualifier = Some(Qualifier::parse(pair)?);
                 }
                 Rule::expression => {
                     expression = Some(Expression::parse(pair)?);
@@ -27,6 +32,7 @@ impl Parse for Assignment {
         }
 
         Ok(Self {
+            qualifier: qualifier.unwrap_or(Qualifier::LocalVar),
             id,
             specified_type,
             expression: expression.expect(INTERNAL_PARSE_ERROR),
@@ -153,5 +159,16 @@ impl Parse for StatementList {
         }
 
         Ok(Self(statements))
+    }
+}
+
+impl Parse for Qualifier {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rule(&pair, Rule::qualifier);
+        match pair.as_str() {
+            "const" => Ok(Self::Constant),
+            "prop" => Ok(Self::Property),
+            _ => Ok(Self::LocalVar),
+        }
     }
 }
