@@ -3,11 +3,5 @@
   ../doc/libs/std/ops/hull.md:7
 -- Output --
 -- Errors --
-error: Symbol hull not found.
-  ---> <from_str>:1:1
-     |
-   1 | hull()
-     | ^^^^^^
-     |
 -- Test Result --
-TODO
+OK

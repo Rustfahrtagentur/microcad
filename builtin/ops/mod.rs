@@ -4,6 +4,7 @@
 use microcad_lang::{eval::BuiltinWorkbenchDefinition, resolve::*};
 
 mod boolean;
+mod hull;
 mod transform;
 
 /// Creates the builtin `operation` module
@@ -12,6 +13,7 @@ pub fn ops() -> Symbol {
         .symbol(boolean::difference())
         .symbol(boolean::union())
         .symbol(boolean::intersection())
+        .symbol(hull::hull())
         .symbol(transform::Translate::symbol())
         .symbol(transform::Rotate::symbol())
         .build()

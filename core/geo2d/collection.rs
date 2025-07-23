@@ -6,6 +6,7 @@
 use std::rc::Rc;
 
 use derive_more::{Deref, DerefMut};
+use geo::{ConvexHull, MultiPolygon};
 
 use crate::{
     geo2d::{FetchBounds2D, bounds::Bounds2D},
@@ -43,6 +44,19 @@ impl Geometries2D {
                 }
             })
             .into()
+    }
+
+    /// Apply contex hull operation to geometries.
+    pub fn hull(&self, resolution: &RenderResolution) -> Self {
+        let mut polygons = MultiPolygon::new(vec![]);
+        self.iter().for_each(|geo| {
+            geo.as_ref()
+                .clone()
+                .hull()
+                .render_to_existing_multi_polygon(resolution, &mut polygons);
+        });
+
+        Rc::new(Geometry2D::Polygon(polygons.convex_hull())).into()
     }
 }
 

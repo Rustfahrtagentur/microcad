@@ -3,6 +3,7 @@
 
 use super::*;
 
+use geo::ConvexHull;
 use strum::IntoStaticStr;
 
 /// Geometry
@@ -37,6 +38,23 @@ impl Geometry2D {
         use geo::BooleanOps;
         let result = a.boolean_op(&b, op.into());
         Some(Geometry2D::MultiPolygon(result))
+    }
+
+    /// Apply hull operation.
+    pub fn hull(self) -> Self {
+        match self {
+            Geometry2D::LineString(line_string) => Geometry2D::Polygon(line_string.convex_hull()),
+            Geometry2D::MultiLineString(multi_line_string) => {
+                Geometry2D::Polygon(multi_line_string.convex_hull())
+            }
+            Geometry2D::Polygon(polygon) => Geometry2D::Polygon(polygon.convex_hull()),
+            Geometry2D::MultiPolygon(multi_polygon) => {
+                Geometry2D::Polygon(multi_polygon.convex_hull())
+            }
+            Geometry2D::Rect(rect) => Geometry2D::Rect(rect),
+            Geometry2D::Circle(circle) => Geometry2D::Circle(circle),
+            Geometry2D::Edge(edge2_d) => Geometry2D::Edge(edge2_d),
+        }
     }
 
     /// Returns true if this geometry fills an area (e.g. like a polygon or circle).

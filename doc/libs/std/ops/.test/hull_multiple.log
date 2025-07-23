@@ -1,13 +1,7 @@
 -- Test --
   hull_multiple
-  ../doc/libs/std/ops/hull.md:15
+  ../doc/libs/std/ops/hull.md:18
 -- Output --
 -- Errors --
-error: Symbol hull not found.
-  ---> <from_str>:4:1
-     |
-   4 | hull() {
-     | ^^^^^^
-     |
 -- Test Result --
-TODO
+OK
