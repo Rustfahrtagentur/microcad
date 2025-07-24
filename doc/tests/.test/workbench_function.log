@@ -3,5 +3,11 @@
   ../doc/tests/README.md:453
 -- Output --
 -- Errors --
+error: Symbol f not found.
+  ---> <from_str>:2:13
+     |
+   2 |   fn f() {} f();
+     |             ^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

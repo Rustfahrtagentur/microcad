@@ -1,6 +1,6 @@
 -- Test --
   workbench_return
-  ../doc/tests/README.md:487
+  ../doc/tests/README.md:493
 -- Output --
 -- Errors --
 error: return statement not available here
