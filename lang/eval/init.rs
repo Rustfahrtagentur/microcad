@@ -13,7 +13,9 @@ impl InitDefinition {
     ) -> EvalResult<ObjectProperties> {
         let model = context.get_model()?;
         context.scope(StackFrame::Init(args.into()), |context| {
-            self.body.statements.eval(context)?;
+            let result: Value = self.body.statements.eval(context)?;
+            // paranoia check
+            assert!(result == Value::None);
 
             let (found, not_found): (Vec<_>, Vec<_>) = plan
                 .iter()

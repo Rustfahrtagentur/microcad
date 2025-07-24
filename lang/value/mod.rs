@@ -49,6 +49,8 @@ pub enum Value {
     Matrix(Box<Matrix>),
     /// A model in the model tree.
     Models(Models),
+    /// Return value
+    Return(Box<Value>),
 }
 
 impl Value {
@@ -168,6 +170,7 @@ impl Value {
             Value::Tuple(t) => format!("{t}"),
             Value::Matrix(m) => format!("{m}"),
             Value::Models(_n) => todo!(),
+            Value::Return(r) => format!("{r}"),
         }
     }
 }
@@ -205,6 +208,7 @@ impl crate::ty::Ty for Value {
             Value::Tuple(tuple) => tuple.ty(),
             Value::Matrix(matrix) => matrix.ty(),
             Value::Models(_) => Type::Models,
+            Value::Return(r) => r.ty(),
         }
     }
 }
@@ -360,6 +364,7 @@ impl std::fmt::Display for Value {
             Value::Tuple(t) => write!(f, "{t}"),
             Value::Matrix(m) => write!(f, "{m}"),
             Value::Models(n) => write!(f, "{n}"),
+            Value::Return(r) => write!(f, "{r}"),
         }
     }
 }
@@ -376,6 +381,7 @@ impl std::fmt::Debug for Value {
             Value::Tuple(t) => write!(f, "Tuple = {t}"),
             Value::Matrix(m) => write!(f, "Matrix = {m}"),
             Value::Models(n) => write!(f, "Models:\n {n}"),
+            Value::Return(r) => write!(f, "Return = {r}"),
         }
     }
 }

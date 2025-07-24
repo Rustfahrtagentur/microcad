@@ -36,8 +36,8 @@ impl Eval<()> for Assignment {
     }
 }
 
-impl Eval<Value> for AssignmentStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+impl Eval<()> for AssignmentStatement {
+    fn eval(&self, context: &mut Context) -> EvalResult<()> {
         context.grant(self)?;
 
         let assignment = &self.assignment;
@@ -45,7 +45,7 @@ impl Eval<Value> for AssignmentStatement {
         let value: Value = assignment.expression.eval(context)?;
         if let Err(err) = assignment.type_check(value.ty()) {
             context.error(self, err)?;
-            return Ok(Value::None);
+            return Ok(());
         }
 
         let value = match value {
@@ -71,6 +71,6 @@ impl Eval<Value> for AssignmentStatement {
 
         context.set_local_value(assignment.id.clone(), value)?;
 
-        Ok(Value::None)
+        Ok(())
     }
 }

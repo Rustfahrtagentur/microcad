@@ -3,6 +3,15 @@
 
 use crate::{eval::*, model::*};
 
+/// Evaluate the body into a value.
+impl Eval<Value> for Body {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        context.scope(StackFrame::Body(SymbolMap::default()), |context| {
+            self.statements.eval(context)
+        })
+    }
+}
+
 /// Evaluate the body into a single object body model: `{}`.
 impl Eval<Model> for Body {
     fn eval(&self, context: &mut Context) -> EvalResult<Model> {

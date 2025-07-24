@@ -4,7 +4,13 @@
 use crate::eval::*;
 
 impl Eval<Value> for ReturnStatement {
-    fn eval(&self, _context: &mut Context) -> EvalResult<Value> {
-        todo!("implement return eval")
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        if let Some(result) = &self.result {
+            let result = result.eval(context)?;
+            log::debug!("returning {result}");
+            Ok(Value::Return(Box::new(result)))
+        } else {
+            Ok(Value::Return(Value::None.into()))
+        }
     }
 }
