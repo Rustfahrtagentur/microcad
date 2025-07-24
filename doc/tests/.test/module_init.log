@@ -1,6 +1,6 @@
 -- Test --
   module_init
-  ../doc/tests/README.md:119
+  ../doc/tests/README.md:128
 -- Output --
 -- Errors --
 -- Test Result --

@@ -1,7 +1,13 @@
 -- Test --
   workbench_workbench
-  ../doc/tests/README.md:437
+  ../doc/tests/README.md:446
 -- Output --
 -- Errors --
+error: sketch statement not available here
+  ---> <from_str>:3:3
+     |
+   3 | } k();
+     |   ^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

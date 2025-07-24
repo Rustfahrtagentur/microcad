@@ -1,6 +1,6 @@
 -- Test --
   source_return
-  ../doc/tests/README.md:45
+  ../doc/tests/README.md:54
 -- Output --
 -- Errors --
 error: return statement not available here

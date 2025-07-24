@@ -1,6 +1,6 @@
 -- Test --
   pre_init_workbench
-  ../doc/tests/README.md:209
+  ../doc/tests/README.md:218
 -- Parse Error --
 Statement not allowed within workbenches
 -- Test Result --

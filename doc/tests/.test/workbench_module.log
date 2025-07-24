@@ -1,7 +1,13 @@
 -- Test --
   workbench_module
-  ../doc/tests/README.md:445
+  ../doc/tests/README.md:454
 -- Output --
 -- Errors --
+error: Module statement not available here
+  ---> <from_str>:3:3
+     |
+   3 | } k();
+     |   ^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED
