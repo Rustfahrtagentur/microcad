@@ -1,6 +1,6 @@
 -- Test --
   body_workbench
-  ../doc/tests/README.md:560
+  ../doc/tests/statement_usage.md:560
 -- Output --
 -- Errors --
 -- Test Result --

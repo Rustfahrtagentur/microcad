@@ -116,4 +116,4 @@ Any errors which occur here are related to geometrical processing.
 | Function    |     -     |   -    |    -     |   -   |  yes  |    -    |  yes   |  yes  |   -    |       var        |    yes     |
 | Call        |     -     |   -    |    -     |   -   |   -   |    -    |   -    |   -   |   -    |        -         |     -      |
 
-[See tests](tests/README.md)
+[See tests](tests/statement_usage.md)

@@ -1,6 +1,6 @@
 -- Test --
   source_use
-  ../doc/tests/README.md:42
+  ../doc/tests/statement_usage.md:42
 -- Output --
 -- Errors --
 -- Test Result --

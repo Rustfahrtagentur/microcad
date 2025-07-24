@@ -1,6 +1,6 @@
 -- Test --
   source_marker
-  ../doc/tests/README.md:66
+  ../doc/tests/statement_usage.md:66
 -- Output --
 -- Errors --
 -- Test Result --

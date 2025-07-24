@@ -1,6 +1,6 @@
 -- Test --
   function_module
-  ../doc/tests/README.md:682
+  ../doc/tests/statement_usage.md:682
 -- Output --
 -- Errors --
 error: Module statement not available here

@@ -1,6 +1,6 @@
 -- Test --
   workbench_function
-  ../doc/tests/README.md:462
+  ../doc/tests/statement_usage.md:462
 -- Output --
 -- Errors --
 error: Symbol f not found.

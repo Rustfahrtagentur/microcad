@@ -1,6 +1,6 @@
 -- Test --
   source_function
-  ../doc/tests/README.md:30
+  ../doc/tests/statement_usage.md:30
 -- Output --
 -- Errors --
 -- Test Result --

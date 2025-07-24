@@ -1,6 +1,6 @@
 -- Test --
   body_init
-  ../doc/tests/README.md:584
+  ../doc/tests/statement_usage.md:584
 -- Output --
 -- Errors --
 -- Test Result --

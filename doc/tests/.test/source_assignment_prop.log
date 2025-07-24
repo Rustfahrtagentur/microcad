@@ -1,6 +1,6 @@
 -- Test --
   source_assignment_prop
-  ../doc/tests/README.md:84
+  ../doc/tests/statement_usage.md:84
 -- Output --
 -- Errors --
 -- Test Result --

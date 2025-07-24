@@ -1,6 +1,6 @@
 -- Test --
   pre_init_marker
-  ../doc/tests/README.md:282
+  ../doc/tests/statement_usage.md:282
 -- Parse Error --
 Statement not allowed prior initializers
 -- Test Result --

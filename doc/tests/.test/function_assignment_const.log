@@ -1,6 +1,6 @@
 -- Test --
   function_assignment_const
-  ../doc/tests/README.md:746
+  ../doc/tests/statement_usage.md:746
 -- Output --
 -- Errors --
 error: Assignment statement not available here

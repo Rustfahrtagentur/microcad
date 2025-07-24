@@ -1,6 +1,6 @@
 -- Test --
   function_if
-  ../doc/tests/README.md:730
+  ../doc/tests/statement_usage.md:730
 -- Output --
 -- Errors --
 error: Not implemented: evaluate if statement in function

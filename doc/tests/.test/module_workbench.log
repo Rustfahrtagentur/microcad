@@ -1,6 +1,6 @@
 -- Test --
   module_workbench
-  ../doc/tests/README.md:104
+  ../doc/tests/statement_usage.md:104
 -- Output --
 -- Errors --
 -- Test Result --

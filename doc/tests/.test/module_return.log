@@ -1,6 +1,6 @@
 -- Test --
   module_return
-  ../doc/tests/README.md:152
+  ../doc/tests/statement_usage.md:152
 -- Output --
 -- Errors --
 -- Test Result --

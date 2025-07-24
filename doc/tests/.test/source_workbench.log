@@ -1,6 +1,6 @@
 -- Test --
   source_workbench
-  ../doc/tests/README.md:18
+  ../doc/tests/statement_usage.md:18
 -- Output --
 -- Errors --
 -- Test Result --

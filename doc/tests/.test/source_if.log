@@ -1,6 +1,6 @@
 -- Test --
   source_if
-  ../doc/tests/README.md:60
+  ../doc/tests/statement_usage.md:60
 -- Output --
 -- Errors --
 -- Test Result --

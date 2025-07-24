@@ -1,6 +1,6 @@
 -- Test --
   function_pub_use
-  ../doc/tests/README.md:714
+  ../doc/tests/statement_usage.md:714
 -- Output --
 -- Errors --
 -- Test Result --

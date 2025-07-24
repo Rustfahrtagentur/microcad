@@ -1,6 +1,6 @@
 -- Test --
   pre_init_assignment_const
-  ../doc/tests/README.md:290
+  ../doc/tests/statement_usage.md:290
 -- Output --
 -- Errors --
 -- Test Result --
