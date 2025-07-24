@@ -3,5 +3,11 @@
   ../doc/tests/statement_usage.md:54
 -- Output --
 -- Errors --
+error: Return statement not available here
+  ---> <from_str>:1:1
+     |
+   1 | return 1;
+     | ^^^^^^^^^
+     |
 -- Test Result --
 FAILED AS EXPECTED

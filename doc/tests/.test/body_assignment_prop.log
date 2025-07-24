@@ -3,5 +3,11 @@
   ../doc/tests/statement_usage.md:648
 -- Output --
 -- Errors --
+error: Assignment statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   prop a = 1;
+     |   ^^^^^^^^^^^
+     |
 -- Test Result --
 FAILED AS EXPECTED
