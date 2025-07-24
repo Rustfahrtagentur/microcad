@@ -7,6 +7,7 @@ use crate::{eval::*, model::*, syntax::*, value::*};
 
 impl Eval<Value> for IfStatement {
     fn eval(&self, context: &mut crate::eval::Context) -> crate::eval::EvalResult<Value> {
+        log::debug!("Evaluating if statement to value: {self}");
         context.grant(self)?;
         todo!("evaluate if statement in function")
     }
@@ -14,6 +15,7 @@ impl Eval<Value> for IfStatement {
 
 impl Eval<Option<Model>> for IfStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
+        log::debug!("Evaluating if statement to model: {self}");
         context.grant(self)?;
         let cond = self.cond.eval(context)?;
         match cond {

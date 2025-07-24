@@ -26,6 +26,7 @@ pub trait UseSymbol {
 
 impl Eval<()> for UseStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<()> {
+        log::debug!("Evaluating use statement: {self}");
         self.decl.eval(context)
     }
 }

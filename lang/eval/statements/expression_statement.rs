@@ -5,6 +5,7 @@ use crate::{eval::*, model::*};
 
 impl Eval for ExpressionStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        log::debug!("Evaluating expression statement to value: {self}");
         context.grant(self)?;
         let value: Value = self.expression.eval(context)?;
         match value {
@@ -31,6 +32,7 @@ impl Eval for ExpressionStatement {
 
 impl Eval<Models> for ExpressionStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<Models> {
+        log::debug!("Evaluating expression statement to models: {self}");
         context.grant(self)?;
         let value: Value = self.eval(context)?;
         Ok(value.fetch_models())
