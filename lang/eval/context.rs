@@ -329,8 +329,8 @@ impl Grant<Rc<FunctionDefinition>> for Context {
         }
     }
 }
-impl Grant<Rc<InitDefinition>> for Context {
-    fn grant(&self, _: &Rc<InitDefinition>) -> EvalResult<()> {
+impl Grant<InitDefinition> for Context {
+    fn grant(&self, _: &InitDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(stack_frame, StackFrame::Workbench(_, _, _))
         } else {
