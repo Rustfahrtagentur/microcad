@@ -1,6 +1,6 @@
 # Tests
 
-## Statment Usage
+## Statement Usage
 
 ### Source
 
@@ -454,6 +454,8 @@ sketch k() {
 sketch k() {
   fn f() {} f();
 }
+
+k();
 ```
 
 [![test](.test/workbench_init.png)](.test/workbench_init.log)
@@ -462,6 +464,8 @@ sketch k() {
 sketch k() {
   init() {}
 }
+
+k();
 ```
 
 [![test](.test/workbench_use.png)](.test/workbench_use.log)
@@ -470,6 +474,8 @@ sketch k() {
 sketch k() {
   use std;
 }
+
+k();
 ```
 
 [![test](.test/workbench_pub_use.png)](.test/workbench_pub_use.log)
