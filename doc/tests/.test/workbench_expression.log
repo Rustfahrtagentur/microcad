@@ -3,11 +3,5 @@
   ../doc/tests/README.md:542
 -- Output --
 -- Errors --
-error: Symbol a not found.
-  ---> <from_str>:3:3
-     |
-   3 | } k();
-     |   ^^^
-     |
 -- Test Result --
-FAILED AS EXPECTED
+OK BUT SHOULD FAIL

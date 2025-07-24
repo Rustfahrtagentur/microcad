@@ -1,7 +1,3 @@
 -- Test --
   function_marker
   ../doc/tests/README.md:738
--- Output --
--- Errors --
--- Test Result --
-OK BUT SHOULD FAIL
