@@ -421,6 +421,7 @@ impl TryFrom<&Value> for Scalar {
 
     fn try_from(value: &Value) -> Result<Self, Self::Error> {
         match value {
+            Value::Integer(i) => Ok(*i as Scalar),
             Value::Quantity(Quantity {
                 value,
                 quantity_type: QuantityType::Scalar,
@@ -435,6 +436,7 @@ impl TryFrom<Value> for Scalar {
 
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
+            Value::Integer(i) => Ok(i as Scalar),
             Value::Quantity(Quantity {
                 value,
                 quantity_type: QuantityType::Scalar,
