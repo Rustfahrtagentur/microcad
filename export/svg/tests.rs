@@ -18,6 +18,7 @@ fn svg_writer() {
         Box::new(file),
         Size2D::A4.transposed().into(),
         Rect::new(coord! {x: 0.0, y: 0.0}, coord! {x: 100.0, y: 100.0}),
+        None,
     )
     .expect("test error");
 
@@ -63,15 +64,19 @@ fn svg_canvas() -> std::io::Result<()> {
     let file = std::fs::File::create("../target/svg_canvas.svg").expect("test error");
 
     let content_rect = Rect::new(coord! {x: 0.0, y: 0.0}, coord! {x: 100.0, y: 100.0});
-    let mut svg =
-        SvgWriter::new_canvas(Box::new(file), Size2D::A4.transposed().into(), content_rect)
-            .expect("test error");
+    let mut svg = SvgWriter::new_canvas(
+        Box::new(file),
+        Size2D::A4.transposed().into(),
+        content_rect,
+        Some(2.0),
+    )
+    .expect("test error");
 
-    assert_eq!(svg.canvas().scale(), 2.1); // The content is 100mm and the canvas height is 210mm.
+    assert_eq!(svg.canvas().scale(), 2.0); // The content is 100mm and the canvas height is 200mm.
 
     eprintln!("{:#?}", svg.canvas());
 
-    content_rect.write_svg(
+    content_rect.write_svg_mapped(
         &mut svg,
         &SvgTagAttributes::default().style(
             None,
@@ -80,48 +85,60 @@ fn svg_canvas() -> std::io::Result<()> {
         ),
     )?;
 
-    [(0.0, 0.0), (0.0, 100.0), (100.0, 0.0), (100.0, 100.0)]
-        .iter()
-        .map(|p| Circle {
-            radius: 2.0,
-            offset: Vec2::new(p.0, p.1),
-        })
-        .try_for_each(|c| {
-            c.write_svg(
-                &mut svg,
-                &SvgTagAttributes::default().style(
-                    Some(Color::from_str("red").expect("Color")),
-                    None,
-                    None,
-                ),
-            )?;
+    [
+        (0.0, 0.0),
+        (0.0, 100.0),
+        (100.0, 0.0),
+        (100.0, 100.0),
+        (50.0, 50.0),
+    ]
+    .iter()
+    .map(|p| Circle {
+        radius: 2.0,
+        offset: Vec2::new(p.0, p.1),
+    })
+    .try_for_each(|c| {
+        c.write_svg_mapped(
+            &mut svg,
+            &SvgTagAttributes::default().style(
+                Some(Color::from_str("blue").expect("Color")),
+                None,
+                None,
+            ),
+        )?;
 
-            let p = Point::new(c.offset.x, c.offset.y);
+        let p = Point::new(c.offset.x, c.offset.y);
 
-            CenteredText {
-                text: format!("({}mm,{}mm)", p.x(), p.y()),
-                rect: Rect::new(p, p),
-                font_size: 3.0,
-            }
-            .write_svg(
-                &mut svg,
-                &SvgTagAttributes::default().style(
-                    Some(Color::from_str("red").expect("Color")),
-                    None,
-                    None,
-                ),
-            )
-        })?;
+        CenteredText {
+            text: format!("({}mm,{}mm)", p.x(), p.y()),
+            rect: Rect::new(p, p),
+            font_size: 1.0,
+        }
+        .write_svg_mapped(
+            &mut svg,
+            &SvgTagAttributes::default().style(
+                Some(Color::from_str("gray").expect("Color")),
+                None,
+                None,
+            ),
+        )
+    })?;
 
     Ok(())
 }
 
-/*#[test]
+#[test]
 fn svg_sample_sketch() -> std::io::Result<()> {
     let file = std::fs::File::create("../target/svg_sample_sketch.svg").expect("test error");
 
-    let mut svg = SvgWriter::new_canvas(Box::new(file), Size2D::A4.transposed().into(), None)
-        .expect("test error");
+    let content_rect = Rect::new(coord! {x: 0.0, y: 0.0}, coord! {x: 50.0, y: 50.0});
+    let mut svg = SvgWriter::new_canvas(
+        Box::new(file),
+        Size2D::A4.transposed().into(),
+        content_rect,
+        Some(4.0),
+    )
+    .expect("test error");
 
     let radius = 10.0;
     let width = 30.0;
@@ -141,18 +158,22 @@ fn svg_sample_sketch() -> std::io::Result<()> {
             .clone()
             .fill(Color::from_str("white").expect("A color")),
     )?;
-    Grid::default().write_svg(&mut svg, &attr)?;
+    Grid::default().write_svg(
+        &mut svg,
+        &SvgTagAttributes::default().style(None, Some(Color::rgb(0.8, 0.8, 0.8)), Some(0.2)),
+    )?;
 
-    rect.write_svg(&mut svg, &attr)?;
+    rect.write_svg_mapped(&mut svg, &attr)?;
+
     CenteredText {
         text: "r".into(),
         rect,
-        font_size: 12.0,
+        font_size: 2.0,
     }
     .write_svg(&mut svg, &attr)?;
 
     // Draw rectangle measures
-
+    /*
     // Height measure for rect.
     EdgeLengthMeasure::height(&rect, 10.0, Some("height")).write_svg(&mut svg, &attr)?;
     // Width measure for rect.
@@ -163,14 +184,14 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     CenteredText {
         text: "c".into(),
         rect: circle.fetch_bounds_2d().rect().expect("Rect"),
-        font_size: 12.0,
+        font_size: 2.0,
     }
     .write_svg(&mut svg, &attr)?;
 
     RadiusMeasure {
         name: Some("radius".into()),
         circle: circle.clone(),
-        angle: Rad(45.0),
+        angle: cgmath::Rad(45.0),
     }
     .write_svg(&mut svg, &attr)?;
 
@@ -185,6 +206,7 @@ fn svg_sample_sketch() -> std::io::Result<()> {
 
     intersection.write_svg(&mut svg, &attr)?;
 
-    SizeMeasure::bounds(&intersection).write_svg(&mut svg, &attr)
+    SizeMeasure::bounds(&intersection).write_svg(&mut svg, &attr)*/
+
+    Ok(())
 }
-*/

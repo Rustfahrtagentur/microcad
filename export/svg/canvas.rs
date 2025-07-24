@@ -9,6 +9,8 @@ use microcad_core::{
     Scalar, Size2D, Vec2, geo2d,
 };
 
+use crate::svg::CenteredText;
+
 /// A canvas coordinate system.
 #[derive(Clone, Debug)]
 pub struct Canvas {
@@ -22,11 +24,20 @@ pub struct Canvas {
 
 impl Canvas {
     /// Create a new canvas with a size and center the content.
-    pub fn new_centered_content(size: Size2D, content_rect: geo2d::Rect) -> Self {
+    pub fn new_centered_content(
+        size: Size2D,
+        content_rect: geo2d::Rect,
+        scale: Option<Scalar>,
+    ) -> Self {
         // Compute scale to fit content inside canvas (preserving aspect ratio)
-        let scale_x = size.width / content_rect.width();
-        let scale_y = size.height / content_rect.height();
-        let scale = scale_x.min(scale_y);
+        let scale = match scale {
+            Some(scale) => scale,
+            None => {
+                let scale_x = size.width / content_rect.width();
+                let scale_y = size.height / content_rect.height();
+                scale_x.min(scale_y)
+            }
+        };
 
         // New content size after scaling
         let width = content_rect.width() * scale;
@@ -183,6 +194,16 @@ impl MapToCanvas for Geometry2D {
             Geometry2D::Rect(rect) => Geometry2D::Rect(rect.map_to_canvas(canvas)),
             Geometry2D::Circle(circle) => Geometry2D::Circle(circle.map_to_canvas(canvas)),
             Geometry2D::Edge(edge) => Geometry2D::Edge(edge.map_to_canvas(canvas)),
+        }
+    }
+}
+
+impl MapToCanvas for CenteredText {
+    fn map_to_canvas(&self, canvas: &Canvas) -> Self {
+        CenteredText {
+            text: self.text.clone(),
+            rect: self.rect.map_to_canvas(canvas),
+            font_size: self.font_size,
         }
     }
 }

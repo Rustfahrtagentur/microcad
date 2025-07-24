@@ -28,6 +28,7 @@ impl SvgWriter {
         mut writer: Box<dyn std::io::Write>,
         size: Option<Size2D>,
         content_rect: Rect,
+        scale: Option<Scalar>,
     ) -> std::io::Result<Self> {
         let size = match size {
             Some(size) => size,
@@ -40,7 +41,7 @@ impl SvgWriter {
         let y = 0;
         let w = size.width as i64;
         let h = size.height as i64;
-        let canvas = Canvas::new_centered_content(size, content_rect);
+        let canvas = Canvas::new_centered_content(size, content_rect, scale);
 
         writeln!(&mut writer, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
