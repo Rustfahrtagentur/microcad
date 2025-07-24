@@ -1,7 +1,3 @@
 -- Test --
   init_return
   ../doc/tests/statement_usage.md:380
--- Output --
--- Errors --
--- Test Result --
-OK BUT SHOULD FAIL
