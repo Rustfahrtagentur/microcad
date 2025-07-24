@@ -332,7 +332,7 @@ init(l:Length) {} }
 ```µcad,init_workbench#fail
 sketch k() { init(l:Length) {
   sketch f() {}
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_module.png)](.test/init_module.log)
@@ -340,7 +340,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_module#fail
 sketch k() { init(l:Length) {
   mod m {}
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_function.png)](.test/init_function.log)
@@ -348,7 +348,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_function#fail
 sketch k() { init(l:Length) {
   fn f() {}
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_init.png)](.test/init_init.log)
@@ -356,7 +356,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_init#fail
 sketch k() { init(l:Length) {
   init() {}
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_use.png)](.test/init_use.log)
@@ -364,15 +364,15 @@ sketch k() { init(l:Length) {
 ```µcad,init_use
 sketch k() { init(l:Length) {
   use std;
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_pub_use.png)](.test/init_pub_use.log)
 
-```µcad,init_pub_use#fail
+```µcad,init_pub_use#todo_fail
 sketch k() { init(l:Length) {
   pub use std;
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_return.png)](.test/init_return.log)
@@ -380,7 +380,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_return#fail
 sketch k() { init(l:Length) {
   return 1;
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_if.png)](.test/init_if.log)
@@ -388,7 +388,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_if#fail
 sketch k() { init(l:Length) {
   if std::math::PI == 3 { }
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_marker.png)](.test/init_marker.log)
@@ -396,7 +396,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_marker#fail
 sketch k() { init(l:Length) {
   @children
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_assignment_const.png)](.test/init_assignment_const.log)
@@ -404,7 +404,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_assignment_const#fail
 sketch k() { init(l:Length) {
   const B = 1;
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_assignment_var.png)](.test/init_assignment_var.log)
@@ -412,7 +412,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_assignment_var
 sketch k() { init(l:Length) {
   a = 1;
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_assignment_prop.png)](.test/init_assignment_prop.log)
@@ -420,7 +420,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_assignment_prop#fail
 sketch k() { init(l:Length) {
   prop a = 1;
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_expression.png)](.test/init_expression.log)
@@ -428,7 +428,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_expression#fail
 sketch k() { init(l:Length) {
   1 + 2;
-} } k();
+} } k(1cm);
 ```
 
 [![test](.test/init_expression_model.png)](.test/init_expression_model.log)
@@ -436,7 +436,7 @@ sketch k() { init(l:Length) {
 ```µcad,init_expression_model#fail
 sketch k() { init(l:Length) {
   __builtin::geo2d::circle(radius=1);
-} } k();
+} } k(1cm);
 ```
 
 ### Workbench
@@ -483,7 +483,7 @@ sketch k() {
 
 [![test](.test/workbench_pub_use.png)](.test/workbench_pub_use.log)
 
-```µcad,workbench_pub_use#todo
+```µcad,workbench_pub_use#todo_fail
 sketch k() {
   pub use std;
 } k();
@@ -531,7 +531,7 @@ sketch k() {
 
 [![test](.test/workbench_assignment_prop.png)](.test/workbench_assignment_prop.log)
 
-```µcad,workbench_assignment_prop#todo
+```µcad,workbench_assignment_prop
 sketch k() {
   prop a = 1;
 } k();
@@ -597,7 +597,7 @@ sketch k() {
 
 [![test](.test/body_pub_use.png)](.test/body_pub_use.log)
 
-```µcad,body_pub_use#todo
+```µcad,body_pub_use#todo_fail
 {
   pub use std;
 }
