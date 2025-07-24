@@ -31,8 +31,8 @@ impl PrintSyntax for AssignmentStatement {
 impl std::fmt::Display for AssignmentStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if !self.attribute_list.is_empty() {
-            writeln!(f, "{}", self.attribute_list)?;
+            write!(f, "{} ", self.attribute_list)?;
         }
-        writeln!(f, "{};", self.assignment)
+        write!(f, "{};", self.assignment)
     }
 }

@@ -36,8 +36,8 @@ impl PrintSyntax for ExpressionStatement {
 impl std::fmt::Display for ExpressionStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if !self.attribute_list.is_empty() {
-            writeln!(f, "{}", self.attribute_list)?;
+            write!(f, "{} ", self.attribute_list)?;
         }
-        writeln!(f, "{};", self.expression)
+        write!(f, "{};", self.expression)
     }
 }
