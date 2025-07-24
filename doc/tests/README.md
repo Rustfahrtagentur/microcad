@@ -49,7 +49,7 @@ return 1;
 [![test](.test/source_if.png)](.test/source_if.log)
 
 ```µcad,source_if
-if a == 1 { }
+if std::math::PI == 3 { }
 ```
 
 [![test](.test/source_marker.png)](.test/source_marker.log)
@@ -150,7 +150,7 @@ mod k {
 
 ```µcad,module_if#fail
 mod k {
-  if a == 1 { }
+  if std::math::PI == 3 { }
 }
 ```
 
@@ -264,7 +264,7 @@ init(l:Length) {} }
 
 ```µcad,pre_init_if#fail
 sketch k() { 
-  if a == 1 { }
+  if std::math::PI == 3 { }
 init(l:Length) {} }
 ```
 
@@ -378,7 +378,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_if#fail
 sketch k() { init(l:Length) {
-  if a == 1 { }
+  if std::math::PI == 3 { }
 } }
 ```
 
@@ -635,7 +635,7 @@ k();
 
 ```µcad,body_if
 {
-  if a == 1 { }
+  if std::math::PI == 3 { }
 }
 ```
 
@@ -761,7 +761,7 @@ f();
 
 ```µcad,function_if
 fn f() {
-  if a == 1 { }
+  if std::math::PI == 3 { }
 }
 
 f();
