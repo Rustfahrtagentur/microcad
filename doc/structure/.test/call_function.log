@@ -1,3 +1,7 @@
 -- Test --
   call_function
   ../doc/structure/calls.md:10
+-- Output --
+-- Errors --
+-- Test Result --
+OK
