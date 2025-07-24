@@ -7,12 +7,12 @@ and the result is a *value*:
 
 [![test](.test/call_function.png)](.test/call_function.log)
 
-```µcad,call_function#todo
+```µcad,call_function
 // function definition
-fn square(x: Scalar) { x * x }
+fn square(x: Scalar) { return x * x; }
 
 // call function square with parameter 2 and store result in s
-s = square(x = 2)
+s = square(x = 2);
 
 // check value
 std::debug::assert_eq( [s, 4] );

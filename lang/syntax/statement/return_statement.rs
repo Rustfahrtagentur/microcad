@@ -21,8 +21,12 @@ impl SrcReferrer for ReturnStatement {
 }
 
 impl std::fmt::Display for ReturnStatement {
-    fn fmt(&self, _f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        todo!()
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if let Some(result) = &self.result {
+            write!(f, "{result}")
+        } else {
+            write!(f, "<no result>")
+        }
     }
 }
 

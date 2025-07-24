@@ -21,7 +21,11 @@ impl CallTrait for FunctionDefinition {
                         self.body.eval(context)
                     })?);
                 }
-                Ok(Value::Array(result.into_iter().collect()))
+                if result.len() == 1 {
+                    Ok(result.first().expect("one result item").clone())
+                } else {
+                    Ok(Value::Array(result.into_iter().collect()))
+                }
             }
 
             Err(err) => {
