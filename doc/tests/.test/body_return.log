@@ -1,6 +1,6 @@
 -- Test --
   body_return
-  ../doc/tests/README.md:617
+  ../doc/tests/README.md:622
 -- Output --
 -- Errors --
 error: return statement not available here
