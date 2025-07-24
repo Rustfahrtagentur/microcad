@@ -20,15 +20,12 @@ impl Eval for Statement {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match self {
             Self::Workbench(w) => {
-                context.grant(w)?;
+                context.grant(w.as_ref())?;
                 Ok(Value::None)
             }
-            Self::Module(m) => {
-                context.grant(m)?;
-                Ok(Value::None)
-            }
+            Self::Module(m) => m.eval(context),
             Self::Function(f) => {
-                context.grant(f)?;
+                context.grant(f.as_ref())?;
                 Ok(Value::None)
             }
 
@@ -53,15 +50,12 @@ impl Eval<Models> for Statement {
     fn eval(&self, context: &mut Context) -> EvalResult<Models> {
         let models: Models = match self {
             Self::Workbench(w) => {
-                context.grant(w)?;
+                context.grant(w.as_ref())?;
                 Default::default()
             }
-            Self::Module(m) => {
-                context.grant(m)?;
-                Default::default()
-            }
+            Self::Module(m) => m.as_ref().eval(context)?,
             Self::Function(f) => {
-                context.grant(f)?;
+                context.grant(f.as_ref())?;
                 Default::default()
             }
             Self::Init(i) => {

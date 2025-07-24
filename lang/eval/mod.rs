@@ -40,6 +40,7 @@ mod format_string;
 mod function;
 mod init;
 mod literal;
+mod module_definition;
 mod output;
 mod parameter;
 mod source_file;
