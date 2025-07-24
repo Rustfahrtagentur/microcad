@@ -3,17 +3,17 @@
   ../doc/structure/functions.md:66
 -- Output --
 -- Errors --
-error: Missing arguments: [Identifier: "x", Refer: 13:19 (307..308) in 0xf50c4ab01c4f8ef5]
-  ---> <from_str>:20:14
+error: Symbol pow not found.
+  ---> <from_str>:15:9
      |
-  20 | math::square(2);
-     |              ^
+  15 |         pow(x, 2.0)
+     |         ^^^^^^^^^^^
      |
-error: Missing arguments: [Identifier: "x", Refer: 4:13 (84..85) in 0xf50c4ab01c4f8ef5]
-  ---> <from_str>:21:11
+error: Not implemented: evaluate if statement in function
+  ---> <from_str>:5:9
      |
-  21 | math::pow(2,5);  // error: pow is private
-     |           ^^^
+   5 |         if n == 1 {
+     |         ^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 TODO

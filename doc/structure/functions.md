@@ -71,20 +71,20 @@ mod math {
         if n == 1 {
             x   // return x
         } else {
-            x * pow(n-1) // return recursive product
+            x * pow(x, n-1) // return recursive product
         }
     }
 
     // square is callable from outside math
     pub fn square(x: Scalar) {
         // call internal pow
-        pow(x,2)
+        pow(x, 2.0)
     }
 }
 
 // call square in math
-math::square(2);
-math::pow(2,5);  // error: pow is private
+math::square(2.0);
+math::pow(2.0, 5);  // error: pow is private
 ```
 
 ## Workbench Functions
