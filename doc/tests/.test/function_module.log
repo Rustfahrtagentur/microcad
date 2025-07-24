@@ -4,10 +4,10 @@
 -- Output --
 -- Errors --
 error: Module statement not available here
-  ---> <from_str>:3:3
+  ---> <from_str>:2:3
      |
-   3 | } f();
-     |   ^^^
+   2 |   mod m {}
+     |   ^^^^^^^^
      |
 -- Test Result --
 FAILED AS EXPECTED

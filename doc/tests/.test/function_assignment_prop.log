@@ -4,10 +4,10 @@
 -- Output --
 -- Errors --
 error: Assignment statement not available here
-  ---> <from_str>:3:3
+  ---> <from_str>:2:3
      |
-   3 | } f();
-     |   ^^^
+   2 |   prop a = 1;
+     |   ^^^^^^^^^^^
      |
 -- Test Result --
 FAILED AS EXPECTED

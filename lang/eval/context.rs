@@ -6,7 +6,7 @@ use crate::{builtin::*, diag::*, eval::*, model::Model, rc::*, resolve::*, synta
 /// Grant statements depending on context
 pub trait Grant<T> {
     /// Check if given statement [`T`] is granted within the current context
-    fn grant(&self, t: &T) -> EvalResult<()>;
+    fn grant(&mut self, t: &T) -> EvalResult<()>;
 }
 
 /// *Context* for *evaluation* of a resolved µcad file.
@@ -275,7 +275,7 @@ impl ExporterAccess for Context {
 }
 
 impl Grant<Rc<WorkbenchDefinition>> for Context {
-    fn grant(&self, w: &Rc<WorkbenchDefinition>) -> EvalResult<()> {
+    fn grant(&mut self, statement: &Rc<WorkbenchDefinition>) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
@@ -287,13 +287,16 @@ impl Grant<Rc<WorkbenchDefinition>> for Context {
         if granted {
             Ok(())
         } else {
-            Err(EvalError::StatementNotSupported(w.kind.as_str()))
+            self.error(
+                statement.as_ref(),
+                EvalError::StatementNotSupported(statement.kind.as_str()),
+            )
         }
     }
 }
 
 impl Grant<Rc<ModuleDefinition>> for Context {
-    fn grant(&self, _: &Rc<ModuleDefinition>) -> EvalResult<()> {
+    fn grant(&mut self, statement: &Rc<ModuleDefinition>) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
@@ -305,13 +308,16 @@ impl Grant<Rc<ModuleDefinition>> for Context {
         if granted {
             Ok(())
         } else {
-            Err(EvalError::StatementNotSupported("Module"))
+            self.error(
+                statement.as_ref(),
+                EvalError::StatementNotSupported("Module"),
+            )
         }
     }
 }
 
 impl Grant<Rc<FunctionDefinition>> for Context {
-    fn grant(&self, _: &Rc<FunctionDefinition>) -> EvalResult<()> {
+    fn grant(&mut self, statement: &Rc<FunctionDefinition>) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
@@ -325,12 +331,15 @@ impl Grant<Rc<FunctionDefinition>> for Context {
         if granted {
             Ok(())
         } else {
-            Err(EvalError::StatementNotSupported("Function"))
+            self.error(
+                statement.as_ref(),
+                EvalError::StatementNotSupported("Function"),
+            )
         }
     }
 }
 impl Grant<InitDefinition> for Context {
-    fn grant(&self, _: &InitDefinition) -> EvalResult<()> {
+    fn grant(&mut self, statement: &InitDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(stack_frame, StackFrame::Workbench(_, _, _))
         } else {
@@ -339,23 +348,23 @@ impl Grant<InitDefinition> for Context {
         if granted {
             Ok(())
         } else {
-            Err(EvalError::StatementNotSupported("Init"))
+            self.error(statement, EvalError::StatementNotSupported("Init"))
         }
     }
 }
 
 impl Grant<UseStatement> for Context {
-    fn grant(&self, _: &UseStatement) -> EvalResult<()> {
+    fn grant(&mut self, statement: &UseStatement) -> EvalResult<()> {
         if self.symbol_table.stack.current_frame().is_some() {
             Ok(())
         } else {
-            Err(EvalError::StatementNotSupported("Use"))
+            self.error(statement, EvalError::StatementNotSupported("Use"))
         }
     }
 }
 
 impl Grant<ReturnStatement> for Context {
-    fn grant(&self, _: &ReturnStatement) -> EvalResult<()> {
+    fn grant(&mut self, statement: &ReturnStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(stack_frame, StackFrame::Function(_))
         } else {
@@ -364,13 +373,13 @@ impl Grant<ReturnStatement> for Context {
         if granted {
             Ok(())
         } else {
-            Err(EvalError::StatementNotSupported("Return"))
+            self.error(statement, EvalError::StatementNotSupported("Return"))
         }
     }
 }
 
 impl Grant<IfStatement> for Context {
-    fn grant(&self, _: &IfStatement) -> EvalResult<()> {
+    fn grant(&mut self, statement: &IfStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
@@ -385,15 +394,15 @@ impl Grant<IfStatement> for Context {
         if granted {
             Ok(())
         } else {
-            Err(EvalError::StatementNotSupported("If"))
+            self.error(statement, EvalError::StatementNotSupported("If"))
         }
     }
 }
 
 impl Grant<AssignmentStatement> for Context {
-    fn grant(&self, assignment: &AssignmentStatement) -> EvalResult<()> {
+    fn grant(&mut self, statement: &AssignmentStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
-            match assignment.assignment.qualifier {
+            match statement.assignment.qualifier {
                 Qualifier::Var => {
                     matches!(
                         stack_frame,
@@ -418,13 +427,13 @@ impl Grant<AssignmentStatement> for Context {
         if granted {
             Ok(())
         } else {
-            Err(EvalError::StatementNotSupported("Assignment"))
+            self.error(statement, EvalError::StatementNotSupported("Assignment"))
         }
     }
 }
 
 impl Grant<ExpressionStatement> for Context {
-    fn grant(&self, _: &ExpressionStatement) -> EvalResult<()> {
+    fn grant(&mut self, statement: &ExpressionStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
@@ -439,7 +448,7 @@ impl Grant<ExpressionStatement> for Context {
         if granted {
             Ok(())
         } else {
-            Err(EvalError::StatementNotSupported("Expression"))
+            self.error(statement, EvalError::StatementNotSupported("Expression"))
         }
     }
 }

@@ -4,10 +4,10 @@
 -- Output --
 -- Errors --
 error: Function statement not available here
-  ---> <from_str>:1:14
+  ---> <from_str>:2:3
      |
-   1 | sketch k() { init(l:Length) {
-     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   2 |   fn f() {}
+     |   ^^^^^^^^^
      |
 -- Test Result --
 FAILED AS EXPECTED
