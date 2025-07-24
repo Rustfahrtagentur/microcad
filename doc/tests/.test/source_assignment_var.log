@@ -1,0 +1,7 @@
+-- Test --
+  source_assignment_var
+  ../doc/tests/README.md:69
+-- Output --
+-- Errors --
+-- Test Result --
+OK

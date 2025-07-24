@@ -1,0 +1,7 @@
+-- Test --
+  function_assignment_var
+  ../doc/tests/README.md:745
+-- Output --
+-- Errors --
+-- Test Result --
+OK

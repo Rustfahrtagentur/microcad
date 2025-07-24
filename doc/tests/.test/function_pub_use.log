@@ -1,0 +1,7 @@
+-- Test --
+  function_pub_use
+  ../doc/tests/README.md:705
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

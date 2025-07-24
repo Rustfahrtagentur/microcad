@@ -1,0 +1,7 @@
+-- Test --
+  pre_init_assignment_prop
+  ../doc/tests/README.md:297
+-- Parse Error --
+Statement not allowed prior initializers
+-- Test Result --
+FAILED AS EXPECTED

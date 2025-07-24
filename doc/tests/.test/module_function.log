@@ -1,0 +1,7 @@
+-- Test --
+  module_function
+  ../doc/tests/README.md:111
+-- Output --
+-- Errors --
+-- Test Result --
+OK

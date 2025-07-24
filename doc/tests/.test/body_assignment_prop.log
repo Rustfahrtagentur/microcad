@@ -1,0 +1,7 @@
+-- Test --
+  body_assignment_prop
+  ../doc/tests/README.md:639
+-- Output --
+-- Errors --
+-- Test Result --
+FAILED AS EXPECTED

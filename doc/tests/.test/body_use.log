@@ -1,0 +1,7 @@
+-- Test --
+  body_use
+  ../doc/tests/README.md:583
+-- Output --
+-- Errors --
+-- Test Result --
+OK

@@ -1,0 +1,7 @@
+-- Test --
+  init_marker
+  ../doc/tests/README.md:387
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

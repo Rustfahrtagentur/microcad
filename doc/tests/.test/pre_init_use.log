@@ -1,0 +1,7 @@
+-- Test --
+  pre_init_use
+  ../doc/tests/README.md:241
+-- Output --
+-- Errors --
+-- Test Result --
+OK

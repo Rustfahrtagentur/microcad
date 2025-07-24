@@ -1,0 +1,7 @@
+-- Test --
+  source_assignment_prop
+  ../doc/tests/README.md:75
+-- Output --
+-- Errors --
+-- Test Result --
+FAILED AS EXPECTED

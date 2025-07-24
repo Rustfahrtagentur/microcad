@@ -1,0 +1,7 @@
+-- Test --
+  body_function
+  ../doc/tests/README.md:567
+-- Output --
+-- Errors --
+-- Test Result --
+FAILED AS EXPECTED

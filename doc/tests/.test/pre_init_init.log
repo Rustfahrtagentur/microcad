@@ -1,0 +1,7 @@
+-- Test --
+  pre_init_init
+  ../doc/tests/README.md:233
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

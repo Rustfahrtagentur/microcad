@@ -1,0 +1,7 @@
+-- Test --
+  module_assignment_prop
+  ../doc/tests/README.md:183
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

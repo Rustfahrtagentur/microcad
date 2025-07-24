@@ -1,0 +1,7 @@
+-- Test --
+  init_assignment_prop
+  ../doc/tests/README.md:411
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

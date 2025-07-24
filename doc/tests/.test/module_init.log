@@ -1,0 +1,7 @@
+-- Test --
+  module_init
+  ../doc/tests/README.md:119
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

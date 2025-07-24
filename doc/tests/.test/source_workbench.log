@@ -1,0 +1,7 @@
+-- Test --
+  source_workbench
+  ../doc/tests/README.md:9
+-- Output --
+-- Errors --
+-- Test Result --
+OK

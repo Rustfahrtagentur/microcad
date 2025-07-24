@@ -1,0 +1,7 @@
+-- Test --
+  source_marker
+  ../doc/tests/README.md:57
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

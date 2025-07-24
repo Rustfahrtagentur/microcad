@@ -1,0 +1,7 @@
+-- Test --
+  function_assignment_const
+  ../doc/tests/README.md:737
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

@@ -1,0 +1,7 @@
+-- Test --
+  function_init
+  ../doc/tests/README.md:689
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

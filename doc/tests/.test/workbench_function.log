@@ -1,0 +1,7 @@
+-- Test --
+  workbench_function
+  ../doc/tests/README.md:453
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

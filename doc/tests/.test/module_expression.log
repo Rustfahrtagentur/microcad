@@ -1,0 +1,7 @@
+-- Test --
+  module_expression
+  ../doc/tests/README.md:191
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

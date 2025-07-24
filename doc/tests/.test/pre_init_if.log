@@ -1,0 +1,7 @@
+-- Test --
+  pre_init_if
+  ../doc/tests/README.md:265
+-- Parse Error --
+Statement not allowed prior initializers
+-- Test Result --
+FAILED AS EXPECTED

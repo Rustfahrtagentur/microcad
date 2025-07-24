@@ -1,0 +1,7 @@
+-- Test --
+  source_if
+  ../doc/tests/README.md:51
+-- Output --
+-- Errors --
+Symbol a not found.-- Test Result --
+FAIL

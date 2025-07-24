@@ -1,0 +1,7 @@
+-- Test --
+  init_assignment_var
+  ../doc/tests/README.md:403
+-- Output --
+-- Errors --
+-- Test Result --
+OK

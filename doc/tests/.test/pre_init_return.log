@@ -1,0 +1,7 @@
+-- Test --
+  pre_init_return
+  ../doc/tests/README.md:257
+-- Parse Error --
+Statement not allowed within workbenches
+-- Test Result --
+FAILED AS EXPECTED

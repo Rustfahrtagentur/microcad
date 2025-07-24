@@ -1,0 +1,7 @@
+-- Test --
+  function_use
+  ../doc/tests/README.md:697
+-- Output --
+-- Errors --
+-- Test Result --
+OK

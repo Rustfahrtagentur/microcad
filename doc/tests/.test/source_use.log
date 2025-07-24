@@ -1,0 +1,7 @@
+-- Test --
+  source_use
+  ../doc/tests/README.md:33
+-- Output --
+-- Errors --
+-- Test Result --
+OK

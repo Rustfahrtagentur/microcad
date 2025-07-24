@@ -1,0 +1,7 @@
+-- Test --
+  workbench_return
+  ../doc/tests/README.md:485
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL
