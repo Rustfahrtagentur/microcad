@@ -88,7 +88,7 @@ prop a = 1;
 [![test](.test/source_expression.png)](.test/source_expression.log)
 
 ```µcad,source_expression#fail
-a + 1;
+1 + 2;
 ```
 
 [![test](.test/source_expression_model.png)](.test/source_expression_model.log)
@@ -199,7 +199,7 @@ mod k {
 
 ```µcad,module_expression#fail
 mod k {
-  a + 1;
+  1 + 2;
 }
 ```
 
@@ -313,7 +313,7 @@ init(l:Length) {} }
 
 ```µcad,pre_init_expression#fail
 sketch k() { 
-  a + 1;
+  1 + 2;
 init(l:Length) {} }
 ```
 
@@ -427,7 +427,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_expression#fail
 sketch k() { init(l:Length) {
-  a + 1;
+  1 + 2;
 } }
 ```
 
@@ -541,7 +541,7 @@ sketch k() {
 
 ```µcad,workbench_expression#fail
 sketch k() {
-  a + 1;
+  1 + 2;
 } k();
 ```
 
@@ -655,7 +655,7 @@ sketch k() {
 
 ```µcad,body_expression
 {
-  a + 1;
+  1 + 2;
 }
 ```
 
@@ -673,8 +673,8 @@ sketch k() {
 
 ```µcad,function_workbench#fail
 fn f() {
-  sketch f() {} f();
-}
+  sketch s() {}
+} f();
 ```
 
 [![test](.test/function_module.png)](.test/function_module.log)
@@ -682,15 +682,15 @@ fn f() {
 ```µcad,function_module#fail
 fn f() {
   mod m {}
-}
+} f();
 ```
 
 [![test](.test/function_function.png)](.test/function_function.log)
 
 ```µcad,function_function#fail
 fn f() {
-  fn f() {} f();
-}
+  fn f() {}
+} f();
 ```
 
 [![test](.test/function_init.png)](.test/function_init.log)
@@ -698,7 +698,7 @@ fn f() {
 ```µcad,function_init#fail
 fn f() {
   init() {}
-}
+} f();
 ```
 
 [![test](.test/function_use.png)](.test/function_use.log)
@@ -706,15 +706,15 @@ fn f() {
 ```µcad,function_use
 fn f() {
   use std;
-}
+} f();
 ```
 
 [![test](.test/function_pub_use.png)](.test/function_pub_use.log)
 
-```µcad,function_pub_use#fail
+```µcad,function_pub_use#todo
 fn f() {
   pub use std;
-}
+} f();
 ```
 
 [![test](.test/function_return.png)](.test/function_return.log)
@@ -722,7 +722,7 @@ fn f() {
 ```µcad,function_return
 fn f() {
   return 1;
-}
+} f();
 ```
 
 [![test](.test/function_if.png)](.test/function_if.log)
@@ -730,7 +730,7 @@ fn f() {
 ```µcad,function_if
 fn f() {
   if std::math::PI == 3 { }
-}
+} f();
 ```
 
 [![test](.test/function_marker.png)](.test/function_marker.log)
@@ -738,7 +738,7 @@ fn f() {
 ```µcad,function_marker#fail
 fn f() {
   @children
-}
+} f();
 ```
 
 [![test](.test/function_assignment_const.png)](.test/function_assignment_const.log)
@@ -746,7 +746,7 @@ fn f() {
 ```µcad,function_assignment_const#fail
 fn f() {
   const B = 1;
-}
+} f();
 ```
 
 [![test](.test/function_assignment_var.png)](.test/function_assignment_var.log)
@@ -754,7 +754,7 @@ fn f() {
 ```µcad,function_assignment_var
 fn f() {
   a = 1;
-}
+} f();
 ```
 
 [![test](.test/function_assignment_prop.png)](.test/function_assignment_prop.log)
@@ -762,15 +762,15 @@ fn f() {
 ```µcad,function_assignment_prop#fail
 fn f() {
   prop a = 1;
-}
+} f();
 ```
 
 [![test](.test/function_expression.png)](.test/function_expression.log)
 
 ```µcad,function_expression
 fn f() {
-  a + 1;
-}
+  1 + 2;
+} f();
 ```
 
 [![test](.test/function_expression_model.png)](.test/function_expression_model.log)
@@ -778,5 +778,5 @@ fn f() {
 ```µcad,function_expression_model
 fn f() {
   __builtin::geo2d::circle(radius=1);
-}
+} f();
 ```
