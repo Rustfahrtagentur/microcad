@@ -478,6 +478,8 @@ sketch k() {
 sketch k() {
   pub use std;
 }
+
+k();
 ```
 
 [![test](.test/workbench_return.png)](.test/workbench_return.log)
@@ -486,6 +488,8 @@ sketch k() {
 sketch k() {
   return 1;
 }
+
+k();
 ```
 
 [![test](.test/workbench_if.png)](.test/workbench_if.log)
@@ -494,6 +498,8 @@ sketch k() {
 sketch k() {
   if a == 1 { }
 }
+
+k();
 ```
 
 [![test](.test/workbench_marker.png)](.test/workbench_marker.log)
@@ -502,6 +508,8 @@ sketch k() {
 sketch k() {
   @children
 }
+
+k();
 ```
 
 [![test](.test/workbench_assignment_const.png)](.test/workbench_assignment_const.log)
@@ -510,6 +518,8 @@ sketch k() {
 sketch k() {
   const B = 1;
 }
+
+k();
 ```
 
 [![test](.test/workbench_assignment_var.png)](.test/workbench_assignment_var.log)
@@ -518,6 +528,8 @@ sketch k() {
 sketch k() {
   a = 1;
 }
+
+k();
 ```
 
 [![test](.test/workbench_assignment_prop.png)](.test/workbench_assignment_prop.log)
@@ -526,6 +538,8 @@ sketch k() {
 sketch k() {
   prop a = 1;
 }
+
+k();
 ```
 
 [![test](.test/workbench_expression.png)](.test/workbench_expression.log)
@@ -534,6 +548,8 @@ sketch k() {
 sketch k() {
   a + 1;
 }
+
+k();
 ```
 
 [![test](.test/workbench_expression_model.png)](.test/workbench_expression_model.log)
@@ -542,6 +558,8 @@ sketch k() {
 sketch k() {
   __builtin::geo2d::circle(radius=1)
 }
+
+k();
 ```
 
 ### Body
