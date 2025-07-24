@@ -3,5 +3,11 @@
   ../doc/tests/statement_usage.md:160
 -- Output --
 -- Errors --
+error: If statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

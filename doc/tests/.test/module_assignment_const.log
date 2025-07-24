@@ -3,5 +3,11 @@
   ../doc/tests/statement_usage.md:176
 -- Output --
 -- Errors --
+error: No variables allowed in modules
+  ---> <from_str>:2:3
+     |
+   2 |   const B = 1;
+     |   ^^^^^^^^^^^^
+     |
 -- Test Result --
-OK
+FAIL

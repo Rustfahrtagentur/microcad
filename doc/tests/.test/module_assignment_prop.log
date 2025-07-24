@@ -3,5 +3,17 @@
   ../doc/tests/statement_usage.md:192
 -- Output --
 -- Errors --
+error: Assignment statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   prop a = 1;
+     |   ^^^^^^^^^^^
+     |
+error: No variables allowed in modules
+  ---> <from_str>:2:3
+     |
+   2 |   prop a = 1;
+     |   ^^^^^^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

@@ -3,5 +3,11 @@
   ../doc/tests/statement_usage.md:200
 -- Output --
 -- Errors --
+error: Expression statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   1 + 2;
+     |   ^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED
