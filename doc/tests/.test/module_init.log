@@ -3,5 +3,11 @@
   ../doc/tests/statement_usage.md:128
 -- Output --
 -- Errors --
+error: Init statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   init() { }
+     |   ^^^^^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

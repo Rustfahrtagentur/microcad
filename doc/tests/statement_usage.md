@@ -103,7 +103,7 @@ __builtin::geo2d::circle(radius=1);
 
 ```µcad,module_workbench
 mod k {
-  sketch f() {} f();
+  sketch f() {}
 }
 ```
 
@@ -119,7 +119,7 @@ mod k {
 
 ```µcad,module_function
 mod k {
-  fn f() {} f();
+  fn f() {}
 }
 ```
 

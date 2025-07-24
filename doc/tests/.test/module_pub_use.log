@@ -3,5 +3,11 @@
   ../doc/tests/statement_usage.md:144
 -- Output --
 -- Errors --
+error: Unexpected stack frame of type 'module' cannot store std
+  ---> <from_str>:2:11
+     |
+   2 |   pub use std;
+     |           ^^^
+     |
 -- Test Result --
-OK BUT IS TODO
+TODO

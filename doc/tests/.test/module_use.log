@@ -3,5 +3,11 @@
   ../doc/tests/statement_usage.md:136
 -- Output --
 -- Errors --
+error: Unexpected stack frame of type 'module' cannot store std
+  ---> <from_str>:2:7
+     |
+   2 |   use std;
+     |       ^^^
+     |
 -- Test Result --
-OK
+FAIL
