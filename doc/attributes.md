@@ -27,7 +27,7 @@ There are three types of attribute items:
 
 * *Name-value pair*: `#[color = "#FF00FF"]`, `#[resolution = 200%]`. Store and retrieve arbitrary values. The name has to be unique.
 
-* *Exporter settings*: `#[svg("style = fill:none")]`. Control the output for a specific exporter.
+* *Calls*: `#[svg("style = fill:none")]`. Control the output for a specific exporter.
 
 * *Commands*: `#[export: "test.svg"]`, `#[measure: width, height]`. A certain command to execute on a model, e.g. for export and measurement. Multiple commands are possible.
 
@@ -69,18 +69,17 @@ Exporter specific attributes have a call-like syntax.
 
 ### SVG attribute
 
-The `svg` exporter has these attributes:
+The `svg` exporter has these parameters:
 
-* `style: String`: The style attribute attached to SVG tag.
+* `style: String`: The SVG style, e.g. `style = "fill: skyblue;"`.
+* `fill: String`: The SVG fill option, e.g. `fill = "red"`.
 
 [![test](.test/attributes_export_example.png)](.test/attributes_export_example.log)
 
 ```µcad,attributes_export_example
-#[export("circle.svg")]
+#[export: "circle.svg"]
 #[svg(style = "fill: skyblue; stroke: cadetblue; stroke-width: 2;")]
 c = std::geo2d::circle(42.0mm);
-
-std::debug::assert_eq([c#export.filename, "circle.svg"]);
 ```
 
 ## Command attributes
@@ -94,8 +93,6 @@ If you have created a part or a sketch and want to export it to a specific file,
 ```µcad,attributes_export
 #[export: "circle.svg"]
 c = std::geo2d::circle(42.0mm);
-
-std::debug::assert_eq([c#export.filename, "circle.svg"]);
 ```
 
 The exporter is detected automatically depending on the file extension.

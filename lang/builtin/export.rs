@@ -43,7 +43,7 @@ pub trait Exporter: FileIoInterface {
     /// The parameter `bar` can be set to `42` with:
     ///
     /// ```ucad
-    /// #[export("myfile.foo")]
+    /// #[export: "myfile.foo"]
     /// #[foo(baz = 42)]
     /// circle(42mm);
     /// ```
