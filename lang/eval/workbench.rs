@@ -55,12 +55,14 @@ impl WorkbenchDefinition {
                 // run init code
                 if let Some(init) = init {
                     log::trace!("Initializing`{id}` {kind}", id = self.id, kind = self.kind);
-                    match init.eval(&self.plan, arguments.clone(), context) {
+                    if let Err(err) = match init.eval(&self.plan, arguments.clone(), context) {
                         Ok(props) => props.iter().try_for_each(|(id, value)| {
                             context.set_local_value(id.clone(), value.clone())
                         }),
                         Err(err) => context.error(init, err),
-                    }?
+                    } {
+                        context.error(self, err)?;
+                    }
                 }
 
                 // At this point, all properties must have a value

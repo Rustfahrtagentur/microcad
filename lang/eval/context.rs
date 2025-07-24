@@ -274,8 +274,8 @@ impl ExporterAccess for Context {
     }
 }
 
-impl Grant<Rc<WorkbenchDefinition>> for Context {
-    fn grant(&mut self, statement: &Rc<WorkbenchDefinition>) -> EvalResult<()> {
+impl Grant<WorkbenchDefinition> for Context {
+    fn grant(&mut self, statement: &WorkbenchDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
@@ -288,15 +288,15 @@ impl Grant<Rc<WorkbenchDefinition>> for Context {
             Ok(())
         } else {
             self.error(
-                statement.as_ref(),
+                statement,
                 EvalError::StatementNotSupported(statement.kind.as_str()),
             )
         }
     }
 }
 
-impl Grant<Rc<ModuleDefinition>> for Context {
-    fn grant(&mut self, statement: &Rc<ModuleDefinition>) -> EvalResult<()> {
+impl Grant<ModuleDefinition> for Context {
+    fn grant(&mut self, statement: &ModuleDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
@@ -308,16 +308,13 @@ impl Grant<Rc<ModuleDefinition>> for Context {
         if granted {
             Ok(())
         } else {
-            self.error(
-                statement.as_ref(),
-                EvalError::StatementNotSupported("Module"),
-            )
+            self.error(statement, EvalError::StatementNotSupported("Module"))
         }
     }
 }
 
-impl Grant<Rc<FunctionDefinition>> for Context {
-    fn grant(&mut self, statement: &Rc<FunctionDefinition>) -> EvalResult<()> {
+impl Grant<FunctionDefinition> for Context {
+    fn grant(&mut self, statement: &FunctionDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
@@ -331,10 +328,7 @@ impl Grant<Rc<FunctionDefinition>> for Context {
         if granted {
             Ok(())
         } else {
-            self.error(
-                statement.as_ref(),
-                EvalError::StatementNotSupported("Function"),
-            )
+            self.error(statement, EvalError::StatementNotSupported("Function"))
         }
     }
 }

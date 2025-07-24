@@ -30,7 +30,10 @@ impl Eval<()> for Assignment {
             return Ok(());
         }
 
-        context.set_local_value(self.id.clone(), value)?;
+        if let Err(err) = context.set_local_value(self.id.clone(), value) {
+            context.error(self, err)?;
+            return Ok(());
+        }
 
         Ok(())
     }
@@ -70,7 +73,9 @@ impl Eval<()> for AssignmentStatement {
             }
         };
 
-        context.set_local_value(assignment.id.clone(), value)?;
+        if let Err(err) = context.set_local_value(assignment.id.clone(), value) {
+            context.error(self, err)?;
+        }
 
         Ok(())
     }
