@@ -703,6 +703,8 @@ fn f() {
 fn f() {
   mod m {}
 }
+
+f();
 ```
 
 [![test](.test/function_function.png)](.test/function_function.log)
@@ -711,6 +713,8 @@ fn f() {
 fn f() {
   fn f() {} f();
 }
+
+f();
 ```
 
 [![test](.test/function_init.png)](.test/function_init.log)
@@ -719,6 +723,8 @@ fn f() {
 fn f() {
   init() {}
 }
+
+f();
 ```
 
 [![test](.test/function_use.png)](.test/function_use.log)
@@ -727,6 +733,8 @@ fn f() {
 fn f() {
   use std;
 }
+
+f();
 ```
 
 [![test](.test/function_pub_use.png)](.test/function_pub_use.log)
@@ -735,6 +743,8 @@ fn f() {
 fn f() {
   pub use std;
 }
+
+f();
 ```
 
 [![test](.test/function_return.png)](.test/function_return.log)
@@ -743,6 +753,8 @@ fn f() {
 fn f() {
   return 1;
 }
+
+f();
 ```
 
 [![test](.test/function_if.png)](.test/function_if.log)
@@ -751,6 +763,8 @@ fn f() {
 fn f() {
   if a == 1 { }
 }
+
+f();
 ```
 
 [![test](.test/function_marker.png)](.test/function_marker.log)
@@ -759,6 +773,8 @@ fn f() {
 fn f() {
   @children
 }
+
+f();
 ```
 
 [![test](.test/function_assignment_const.png)](.test/function_assignment_const.log)
@@ -767,6 +783,8 @@ fn f() {
 fn f() {
   const B = 1;
 }
+
+f();
 ```
 
 [![test](.test/function_assignment_var.png)](.test/function_assignment_var.log)
@@ -775,6 +793,8 @@ fn f() {
 fn f() {
   a = 1;
 }
+
+f();
 ```
 
 [![test](.test/function_assignment_prop.png)](.test/function_assignment_prop.log)
@@ -783,6 +803,8 @@ fn f() {
 fn f() {
   prop a = 1;
 }
+
+f();
 ```
 
 [![test](.test/function_expression.png)](.test/function_expression.log)
@@ -791,6 +813,8 @@ fn f() {
 fn f() {
   a + 1;
 }
+
+f();
 ```
 
 [![test](.test/function_expression_model.png)](.test/function_expression_model.log)
@@ -799,4 +823,6 @@ fn f() {
 fn f() {
   __builtin::geo2d::circle(radius=1)
 }
+
+f();
 ```
