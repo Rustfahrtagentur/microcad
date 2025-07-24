@@ -1,7 +1,0 @@
--- Test --
-  mod_example
-  ../doc/structure/modules.md:11
--- Output --
--- Errors --
--- Test Result --
-OK

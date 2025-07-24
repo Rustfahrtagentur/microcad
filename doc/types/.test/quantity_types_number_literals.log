@@ -1,7 +1,0 @@
--- Test --
-  quantity_types_number_literals
-  ../doc/types/quantity.md:27
--- Output --
--- Errors --
--- Test Result --
-OK

@@ -1,7 +1,0 @@
--- Test --
-  named_tuple_access
-  ../doc/types/tuples.md:10
--- Output --
--- Errors --
--- Test Result --
-OK

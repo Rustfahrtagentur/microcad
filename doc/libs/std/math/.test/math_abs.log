@@ -1,7 +1,0 @@
--- Test --
-  math_abs
-  ../doc/libs/std/math/README.md:11
--- Output --
--- Errors --
--- Test Result --
-OK

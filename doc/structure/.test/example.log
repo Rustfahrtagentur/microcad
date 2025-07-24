@@ -1,9 +1,0 @@
--- Test --
-  example
-  ../doc/structure/functions.md:14
--- Output --
-ERROR: first
-ERROR: second
--- Errors --
--- Test Result --
-OK

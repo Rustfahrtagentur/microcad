@@ -1,7 +1,0 @@
--- Test --
-  intersection_alt_operator
-  ../doc/libs/std/ops/intersection.md:17
--- Output --
--- Errors --
--- Test Result --
-OK

@@ -1,7 +1,0 @@
--- Test --
-  code_between_initializers
-  ../doc/structure/workbench.md:203
--- Parse Error --
-Code between initializers is not allowed
--- Test Result --
-FAILED AS EXPECTED

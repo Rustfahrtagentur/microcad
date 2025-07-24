@@ -1,7 +1,0 @@
--- Test --
-  types_named_tuple_vec3
-  ../doc/types/named_tuple.md:56
--- Output --
--- Errors --
--- Test Result --
-OK

@@ -1,0 +1,27 @@
+# Test [`mod`](../doc/structure/functions.md#L66)
+
+## Output
+
+```,plain
+```
+
+## Errors
+
+```,plain
+error: Symbol pow not found.
+  ---> <from_str>:15:9
+     |
+  15 |         pow(x, 2.0)
+     |         ^^^^^^^^^^^
+     |
+error: Not implemented: evaluate if statement in function
+  ---> <from_str>:5:9
+     |
+   5 |         if n == 1 {
+     |         ^^^^^^^^^^^^^^^^^^^
+     |
+```
+
+## Test Result
+
+![TODO](../doc/structure/.test/mod.png)

@@ -1,7 +1,0 @@
--- Test --
-  return
-  ../doc/structure/functions.md:35
--- Output --
--- Errors --
--- Test Result --
-OK

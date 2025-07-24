@@ -1,7 +1,0 @@
--- Test --
-  argument_match_name
-  ../doc/structure/arguments.md:23
--- Output --
--- Errors --
--- Test Result --
-OK

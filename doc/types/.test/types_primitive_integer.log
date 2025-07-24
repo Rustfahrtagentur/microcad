@@ -1,7 +1,0 @@
--- Test --
-  types_primitive_integer
-  ../doc/types/primitive_types.md:19
--- Output --
--- Errors --
--- Test Result --
-OK
