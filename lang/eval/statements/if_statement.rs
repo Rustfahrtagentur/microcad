@@ -9,7 +9,7 @@ impl Eval<Value> for IfStatement {
     fn eval(&self, context: &mut crate::eval::Context) -> crate::eval::EvalResult<Value> {
         log::debug!("Evaluating if statement to value: {self}");
         context.grant(self)?;
-        todo!("evaluate if statement in function")
+        eval_todo!(context, self, "evaluate if statement in function")
     }
 }
 
