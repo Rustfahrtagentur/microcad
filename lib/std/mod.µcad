@@ -16,13 +16,6 @@ pub use __builtin::count;
 pub use transform::translate;
 pub use transform::rotate;
 
-/// Export helper op.
-op export(filename: String) {
-    #[export(filename)] {
-        @children
-    }
-}
-
 pub use __builtin::print;
 pub use __builtin::error;
 pub use __builtin::warning;
