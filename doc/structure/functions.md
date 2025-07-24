@@ -11,7 +11,7 @@ specific set of [parameters](parameters.md).
 
 [![test](.test/example.png)](.test/example.log)
 
-```µcad,example#todo
+```µcad,example
 // define function print_error with text as parameter of type String
 fn print_error( text: String ) {
     // code body

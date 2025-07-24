@@ -3,13 +3,13 @@
   ../doc/structure/functions.md:66
 -- Output --
 -- Errors --
-error: Not implemented: Function evaluation
+error: Missing arguments: [Identifier: "x", Refer: 13:19 (307..308) in 0xf50c4ab01c4f8ef5]
   ---> <from_str>:20:14
      |
   20 | math::square(2);
      |              ^
      |
-error: Not implemented: Function evaluation
+error: Missing arguments: [Identifier: "x", Refer: 4:13 (84..85) in 0xf50c4ab01c4f8ef5]
   ---> <from_str>:21:11
      |
   21 | math::pow(2,5);  // error: pow is private

@@ -3,11 +3,5 @@
   ../doc/structure/arguments.md:48
 -- Output --
 -- Errors --
-error: Not implemented: Function evaluation
-  ---> <from_str>:3:3
-     |
-   3 | f(1.0, b=2cm, 3cm);
-     |   ^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-TODO
+OK

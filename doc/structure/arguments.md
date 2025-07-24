@@ -20,7 +20,7 @@ specified by name:
 
 [![test](.test/argument_match_name.png)](.test/argument_match_name.log)
 
-```µcad,argument_match_name#todo
+```µcad,argument_match_name
 fn f( x: Length, y: Length, z: Length ) {}
 
 f(x = 1cm, y = 2cm, z = 3cm);
@@ -45,7 +45,7 @@ You can mix both methods if some parameters cannot be identified by type alone.
 
 [![test](.test/argument_match_mix.png)](.test/argument_match_mix.log)
 
-```µcad,argument_match_mix#todo
+```µcad,argument_match_mix
 fn f( a: Scalar, b: Length, c: Length ) {}
 // `a` is the only Scalar and `b` is named, so `c` does not need a name.
 f(1.0, b=2cm, 3cm);

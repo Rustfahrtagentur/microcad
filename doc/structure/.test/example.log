@@ -2,18 +2,8 @@
   example
   ../doc/structure/functions.md:14
 -- Output --
+ERROR: first
+ERROR: second
 -- Errors --
-error: Not implemented: Function evaluation
-  ---> <from_str>:7:13
-     |
-   7 | print_error("first");
-     |             ^^^^^^^
-     |
-error: Not implemented: Function evaluation
-  ---> <from_str>:8:13
-     |
-   8 | print_error("second");
-     |             ^^^^^^^^
-     |
 -- Test Result --
-TODO
+OK

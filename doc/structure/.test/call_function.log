@@ -1,13 +1,3 @@
 -- Test --
   call_function
   ../doc/structure/calls.md:10
--- Output --
--- Errors --
-error: Not implemented: Function evaluation
-  ---> <from_str>:5:12
-     |
-   5 | s = square(x = 2)
-     |            ^^^^^
-     |
--- Test Result --
-TODO
