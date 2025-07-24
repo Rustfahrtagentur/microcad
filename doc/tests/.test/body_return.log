@@ -1,3 +1,13 @@
 -- Test --
   body_return
-  ../doc/tests/README.md:599
+  ../doc/tests/README.md:617
+-- Output --
+-- Errors --
+error: return statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   return 1;
+     |   ^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

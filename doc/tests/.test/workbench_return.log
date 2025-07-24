@@ -1,7 +1,13 @@
 -- Test --
   workbench_return
-  ../doc/tests/README.md:485
+  ../doc/tests/README.md:487
 -- Output --
 -- Errors --
+error: return statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   return 1;
+     |   ^^^^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED
