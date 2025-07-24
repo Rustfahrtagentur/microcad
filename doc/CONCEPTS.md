@@ -109,7 +109,7 @@ Any errors which occur here are related to geometrical processing.
 | :---------- | :-------: | :----: | :------: | :---: | :---: | :-----: | :----: | :---: | :----: | :--------------: | :--------: |
 | Source      |    yes    |  yes   |   yes    |   -   |  yes  |   yes   |   -    |  yes  |   -    |    const, var    |   model    |
 | Module      |    yes    |  yes   |   yes    |   -   |  yes  |   yes   |   -    |   -   |   -    |    const, var    |     -      |
-| Pre-Init    |     -     |   -    |    -     |   -   |  yes  |    -    |   -    |   -   |   -    |      const       |     -      |
+| Pre-Init    |     -     |   -    |    -     |  yes  |  yes  |    -    |   -    |   -   |   -    |      const       |     -      |
 | Init        |     -     |   -    |    -     |   -   |  yes  |    -    |   -    |   -   |   -    |       var        |     -      |
 | Workbench   |     -     |   -    |    -     |  yes  |  yes  |    -    |   -    |  yes  |  yes   | const, var, prop |   model    |
 | Body        |     -     |   -    |    -     |   -   |  yes  |    -    |   -    |  yes  | ?yes?  |       var        |   ?yes?    |
