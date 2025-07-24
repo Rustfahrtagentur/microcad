@@ -144,13 +144,13 @@ impl<'a> ArgumentMatch<'a> {
     /// Return error if params are missing or arguments are to many
     fn check_missing(&self) -> EvalResult<()> {
         if !self.params.is_empty() {
-            Err(EvalError::MissingArguments(
-                self.params.iter().map(|(id, _)| (*id).clone()).collect(),
-            ))
+            let mut missing: Vec<_> = self.params.iter().map(|(id, _)| (*id).clone()).collect();
+            missing.sort();
+            Err(EvalError::MissingArguments(missing))
         } else if !self.arguments.is_empty() {
-            Err(EvalError::TooManyArguments(
-                self.arguments.iter().map(|(id, _)| (*id).clone()).collect(),
-            ))
+            let mut too_many: Vec<_> = self.arguments.iter().map(|(id, _)| (*id).clone()).collect();
+            too_many.sort();
+            Err(EvalError::TooManyArguments(too_many))
         } else {
             Ok(())
         }
