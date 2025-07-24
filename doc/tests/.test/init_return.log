@@ -1,3 +1,13 @@
 -- Test --
   init_return
   ../doc/tests/statement_usage.md:380
+-- Output --
+-- Errors --
+error: Return statement not available here
+  ---> <from_str>:1:14
+     |
+   1 | sketch k() { init(l:Length) {
+     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

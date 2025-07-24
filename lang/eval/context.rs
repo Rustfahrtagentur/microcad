@@ -439,7 +439,7 @@ impl Grant<ExpressionStatement> for Context {
         if granted {
             Ok(())
         } else {
-            Err(EvalError::StatementNotSupported("Return"))
+            Err(EvalError::StatementNotSupported("Expression"))
         }
     }
 }

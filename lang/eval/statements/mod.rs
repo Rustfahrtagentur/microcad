@@ -69,8 +69,8 @@ impl Eval<Models> for Statement {
                 Default::default()
             }
 
-            Self::Return(_) => {
-                context.error(self, EvalError::StatementNotSupported("return"))?;
+            Self::Return(r) => {
+                context.grant(r)?;
                 Default::default()
             }
             Self::Use(u) => {

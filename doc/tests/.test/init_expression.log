@@ -3,7 +3,7 @@
   ../doc/tests/statement_usage.md:428
 -- Output --
 -- Errors --
-error: Return statement not available here
+error: Expression statement not available here
   ---> <from_str>:1:14
      |
    1 | sketch k() { init(l:Length) {
