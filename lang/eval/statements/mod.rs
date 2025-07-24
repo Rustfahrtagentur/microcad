@@ -60,7 +60,8 @@ impl Eval<Models> for Statement {
             }
 
             Self::Return(_) => {
-                todo!("error")
+                context.error(self, EvalError::StatementNotSupported("return"))?;
+                Default::default()
             }
             Self::Use(u) => {
                 u.eval(context)?;
