@@ -16,16 +16,6 @@ pub struct ParameterValue {
     pub src_ref: SrcRef,
 }
 
-/// Result of a type check with `ParameterValue::type_check()`
-pub enum TypeCheckResult {
-    /// Self's type matched given type
-    SingleMatch,
-    /// Self is list of that type
-    MultiMatch,
-    /// An error occurred
-    NoMatch(Option<Type>, Type),
-}
-
 impl ParameterValue {
     /// Creates an invalid parameter value, in case an error occurred during evaluation
     pub fn invalid(src_ref: SrcRef) -> Self {
@@ -33,27 +23,6 @@ impl ParameterValue {
             specified_type: None,
             default_value: None,
             src_ref,
-        }
-    }
-
-    /// Check how the type of this parameter value relates to the given one
-    /// # Return
-    /// - `TypeCheckResult::Match`: Given type matches exactly
-    /// - `TypeCheckResult::List`: Given type is a list of items of a type that matches exactly
-    /// - `TypeCheckResult::NoMatch(err)`: Types do not match (`err` describes both type
-    pub fn type_check(&self, ty: &Type) -> TypeCheckResult {
-        if self.type_matches(ty) {
-            return TypeCheckResult::SingleMatch;
-        }
-
-        if let Some(specified_type) = self.specified_type.as_ref() {
-            if ty.is_list_of(specified_type) {
-                TypeCheckResult::MultiMatch
-            } else {
-                TypeCheckResult::NoMatch(Some(specified_type.clone()), ty.clone())
-            }
-        } else {
-            TypeCheckResult::NoMatch(None, ty.clone())
         }
     }
 
