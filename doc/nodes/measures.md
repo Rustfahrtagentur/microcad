@@ -4,7 +4,7 @@
 
 The following example calculates the area of a circle by using the *measure* `area`:
 
-[![test](.test/measure.png)](.test/measure.log)
+[![test](.test/measure.png)](.test/measure.md)
 
 ```µcad,measure#todo
 __builtin::assert_eq([

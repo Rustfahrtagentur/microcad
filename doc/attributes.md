@@ -11,7 +11,7 @@ Let's define a node `c`.
 
 When viewed or exported, node `c` will have a red color, because the `color` attribute will be set:
 
-[![test](.test/attributes_simple_example.png)](.test/attributes_simple_example.log)
+[![test](.test/attributes_simple_example.png)](.test/attributes_simple_example.md)
 
 ```µcad,attributes_simple_example
 #[color = "#FFFFFF"]
@@ -36,7 +36,7 @@ The `color` attribute attaches a color to a node.
 
 In viewer and when exported, the node will be drawn in the specified color.
 
-[![test](.test/attributes_color.png)](.test/attributes_color.log)
+[![test](.test/attributes_color.png)](.test/attributes_color.md)
 
 ```µcad,attributes_color
 #[color = "#FFFFFF"]
@@ -51,7 +51,7 @@ The `resolution` attribute sets the rendering resolution of this node.
 The node will be rendered in with 200% resolution than the default resolution of `0.1mm`.
 This means the circle will be rendered with a resolution `0.05mm`.
 
-[![test](.test/attributes_precision.png)](.test/attributes_precision.log)
+[![test](.test/attributes_precision.png)](.test/attributes_precision.md)
 
 ```µcad,attributes_precision
 #[resolution = 200%]
@@ -69,7 +69,7 @@ Exporter specific attributes have a call-like syntax.
 The `export` defines the filename and the (optional) ID.
 If you have created a part or a sketch and want to export it to a specific file, you can add the export attribute:
 
-[![test](.test/attributes_export.png)](.test/attributes_export.log)
+[![test](.test/attributes_export.png)](.test/attributes_export.md)
 
 ```µcad,attributes_export
 #[export("circle.svg")]
@@ -82,7 +82,7 @@ std::debug::assert_eq([c#export.id, "svg"]);
 Additional, you can use the `id` parameter to use a specific exporter.
 However, the exporter is detected automatically depending on the file extension.
 
-[![test](.test/attributes_export_id.png)](.test/attributes_export_id.log)
+[![test](.test/attributes_export_id.png)](.test/attributes_export_id.md)
 
 ```µcad,attributes_export_id
 #[export("circle.svg", id = "svg")]
@@ -100,7 +100,7 @@ The `svg` exporter has these attributes:
 
 * `style: String`: The style attribute attached to SVG tag.
 
-[![test](.test/attributes_export_example.png)](.test/attributes_export_example.log)
+[![test](.test/attributes_export_example.png)](.test/attributes_export_example.md)
 
 ```µcad,attributes_export_example
 #[export("circle.svg")]
