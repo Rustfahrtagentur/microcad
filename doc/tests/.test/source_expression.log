@@ -4,4 +4,4 @@
 -- Output --
 -- Errors --
 -- Test Result --
-FAILED AS EXPECTED
+OK BUT SHOULD FAIL

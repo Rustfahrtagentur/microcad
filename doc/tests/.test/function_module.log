@@ -1,7 +1,3 @@
 -- Test --
   function_module
   ../doc/tests/README.md:682
--- Output --
--- Errors --
--- Test Result --
-OK BUT SHOULD FAIL
