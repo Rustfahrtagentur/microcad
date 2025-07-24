@@ -50,6 +50,7 @@ impl FetchPoints2D for Circle {
         vec![self.offset]
     }
 }
+
 impl RenderToMultiPolygon for Circle {
     fn render_to_polygon(self, resolution: &RenderResolution) -> Option<Polygon> {
         use std::f64::consts::PI;

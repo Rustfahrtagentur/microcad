@@ -6,7 +6,6 @@
 use std::str::FromStr as _;
 
 use super::*;
-use cgmath::Rad;
 use geo::coord;
 use microcad_core::*;
 
@@ -15,8 +14,12 @@ fn svg_writer() {
     // Write to file test.svg
     let file = std::fs::File::create("../target/svg_write.svg").expect("test error");
 
-    let mut svg = SvgWriter::new_canvas(Box::new(file), Size2D::A4.transposed().into(), None)
-        .expect("test error");
+    let mut svg = SvgWriter::new_canvas(
+        Box::new(file),
+        Size2D::A4.transposed().into(),
+        Rect::new(coord! {x: 0.0, y: 0.0}, coord! {x: 100.0, y: 100.0}),
+    )
+    .expect("test error");
 
     geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0))
         .write_svg(
@@ -56,6 +59,64 @@ fn svg_writer() {
 }
 
 #[test]
+fn svg_canvas() -> std::io::Result<()> {
+    let file = std::fs::File::create("../target/svg_canvas.svg").expect("test error");
+
+    let content_rect = Rect::new(coord! {x: 0.0, y: 0.0}, coord! {x: 100.0, y: 100.0});
+    let mut svg =
+        SvgWriter::new_canvas(Box::new(file), Size2D::A4.transposed().into(), content_rect)
+            .expect("test error");
+
+    assert_eq!(svg.canvas().scale(), 2.1); // The content is 100mm and the canvas height is 210mm.
+
+    eprintln!("{:#?}", svg.canvas());
+
+    content_rect.write_svg(
+        &mut svg,
+        &SvgTagAttributes::default().style(
+            None,
+            Some(Color::from_str("black").expect("Black color")),
+            Some(1.0),
+        ),
+    )?;
+
+    [(0.0, 0.0), (0.0, 100.0), (100.0, 0.0), (100.0, 100.0)]
+        .iter()
+        .map(|p| Circle {
+            radius: 2.0,
+            offset: Vec2::new(p.0, p.1),
+        })
+        .try_for_each(|c| {
+            c.write_svg(
+                &mut svg,
+                &SvgTagAttributes::default().style(
+                    Some(Color::from_str("red").expect("Color")),
+                    None,
+                    None,
+                ),
+            )?;
+
+            let p = Point::new(c.offset.x, c.offset.y);
+
+            CenteredText {
+                text: format!("({}mm,{}mm)", p.x(), p.y()),
+                rect: Rect::new(p, p),
+                font_size: 3.0,
+            }
+            .write_svg(
+                &mut svg,
+                &SvgTagAttributes::default().style(
+                    Some(Color::from_str("red").expect("Color")),
+                    None,
+                    None,
+                ),
+            )
+        })?;
+
+    Ok(())
+}
+
+/*#[test]
 fn svg_sample_sketch() -> std::io::Result<()> {
     let file = std::fs::File::create("../target/svg_sample_sketch.svg").expect("test error");
 
@@ -126,3 +187,4 @@ fn svg_sample_sketch() -> std::io::Result<()> {
 
     SizeMeasure::bounds(&intersection).write_svg(&mut svg, &attr)
 }
+*/

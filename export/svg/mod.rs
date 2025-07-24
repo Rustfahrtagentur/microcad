@@ -4,6 +4,7 @@
 //! Scalable Vector Graphics (SVG) export
 
 mod attributes;
+mod canvas;
 pub mod exporter;
 mod primitives;
 pub mod writer;
@@ -12,6 +13,7 @@ pub mod writer;
 mod tests;
 
 pub use attributes::SvgTagAttributes;
+pub use canvas::*;
 pub use exporter::*;
 pub use primitives::*;
 pub use writer::*;

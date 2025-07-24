@@ -52,6 +52,33 @@ impl SvgTagAttributes {
         self._insert("fill", color.to_svg_color())
     }
 
+    /// Style attribute: `style = fill: skyblue; stroke: cadetblue; stroke-width: 2;`.
+    pub fn style(
+        self,
+        fill: Option<Color>,
+        stroke: Option<Color>,
+        stroke_width: Option<Scalar>,
+    ) -> Self {
+        self._insert(
+            "style",
+            format!(
+                "{fill}{stroke}{stroke_width}",
+                fill = match fill {
+                    Some(fill) => format!("fill: {}; ", fill.to_svg_color()),
+                    None => "fill: none; ".into(),
+                },
+                stroke = match stroke {
+                    Some(stroke) => format!("stroke: {}; ", stroke.to_svg_color()),
+                    None => "stroke: none; ".into(),
+                },
+                stroke_width = match stroke_width {
+                    Some(stroke_width) => format!("stroke-width: {stroke_width}"),
+                    None => String::new(),
+                }
+            ),
+        )
+    }
+
     /// Transform by mat3 matrix attribute.
     pub fn transform_matrix(self, m: &microcad_core::Mat3) -> Self {
         let (a, b, c, d, e, f) = (m.x.x, m.x.y, m.y.x, m.y.y, m.z.x, m.z.y);

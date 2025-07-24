@@ -5,6 +5,7 @@
 
 use std::io::BufWriter;
 
+use microcad_core::Size2D;
 use microcad_lang::{Id, builtin::*, model::*, parameter, value::*};
 
 use crate::svg::{SvgTagAttributes, WriteSvg, writer::SvgWriter};
@@ -25,10 +26,14 @@ impl Exporter for SvgExporter {
     fn export(&self, model: &Model, filename: &std::path::Path) -> Result<Value, ExportError> {
         let f = std::fs::File::create(filename)?;
         use microcad_core::FetchBounds2D;
-        let bounds = model.fetch_bounds_2d();
-        let mut writer = SvgWriter::new_canvas(Box::new(BufWriter::new(f)), bounds, None)?;
 
-        model.write_svg(&mut writer, &SvgTagAttributes::default())?;
+        if let Some(content_rect) = model.fetch_bounds_2d().rect() {
+            let size = Size2D::A4;
+            let mut writer =
+                SvgWriter::new_canvas(Box::new(BufWriter::new(f)), Some(size), *content_rect)?;
+
+            model.write_svg(&mut writer, &SvgTagAttributes::default())?;
+        }
         Ok(Value::None)
     }
 

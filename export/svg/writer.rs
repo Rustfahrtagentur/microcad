@@ -3,15 +3,19 @@
 
 //! Scalable Vector Graphics (SVG) file writer
 
+use geo::Point;
 use microcad_core::*;
 
-use crate::svg::SvgTagAttributes;
+use crate::svg::{SvgTagAttributes, canvas::Canvas};
 
 /// SVG writer.
 pub struct SvgWriter {
+    /// The writer (e.g. a file).
     writer: Box<dyn std::io::Write>,
+    /// Indentation level.
     level: usize,
-    bounds: geo2d::Bounds2D,
+    /// The canvas.
+    canvas: Canvas,
 }
 
 impl SvgWriter {
@@ -22,13 +26,21 @@ impl SvgWriter {
     /// - `scale`: Scale of the output
     pub fn new_canvas(
         mut writer: Box<dyn std::io::Write>,
-        bounds: Bounds2D,
-        _scale: Option<Scalar>,
+        size: Option<Size2D>,
+        content_rect: Rect,
     ) -> std::io::Result<Self> {
-        let x = bounds.rect().map(|r| r.min().x).unwrap_or_default() as i64;
-        let y = bounds.rect().map(|r| r.min().y).unwrap_or_default() as i64;
-        let w = bounds.width() as i64;
-        let h = bounds.height() as i64;
+        let size = match size {
+            Some(size) => size,
+            None => Size2D {
+                width: content_rect.width(),
+                height: content_rect.height(),
+            },
+        };
+        let x = 0;
+        let y = 0;
+        let w = size.width as i64;
+        let h = size.height as i64;
+        let canvas = Canvas::new_centered_content(size, content_rect);
 
         writeln!(&mut writer, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
@@ -57,13 +69,13 @@ impl SvgWriter {
         Ok(Self {
             writer: Box::new(writer),
             level: 1,
-            bounds,
+            canvas,
         })
     }
 
-    /// Return reference to bounds.
-    pub fn bounds(&self) -> &geo2d::Bounds2D {
-        &self.bounds
+    /// Return reference to canvas.
+    pub fn canvas(&self) -> &Canvas {
+        &self.canvas
     }
 
     fn tag_inner(tag: &str, attr: &SvgTagAttributes) -> String {
