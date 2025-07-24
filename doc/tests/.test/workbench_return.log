@@ -3,11 +3,11 @@
   ../doc/tests/statement_usage.md:494
 -- Output --
 -- Errors --
-error: return statement not available here
-  ---> <from_str>:2:3
+error: Return statement not available here
+  ---> <from_str>:3:3
      |
-   2 |   return 1;
-     |   ^^^^^^^^^
+   3 | } k();
+     |   ^^^
      |
 -- Test Result --
 FAILED AS EXPECTED
