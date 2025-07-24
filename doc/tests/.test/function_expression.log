@@ -1,7 +1,0 @@
--- Test --
-  function_expression
-  ../doc/tests/statement_usage.md:770
--- Output --
--- Errors --
--- Test Result --
-OK

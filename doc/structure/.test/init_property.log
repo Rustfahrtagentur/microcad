@@ -1,7 +1,0 @@
--- Test --
-  init_property
-  ../doc/structure/workbench.md:125
--- Output --
--- Errors --
--- Test Result --
-OK

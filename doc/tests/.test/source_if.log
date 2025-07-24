@@ -1,7 +1,0 @@
--- Test --
-  source_if
-  ../doc/tests/statement_usage.md:60
--- Output --
--- Errors --
--- Test Result --
-OK

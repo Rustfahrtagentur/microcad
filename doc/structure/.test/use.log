@@ -1,7 +1,0 @@
--- Test --
-  use
-  ../doc/structure/use.md:33
--- Output --
--- Errors --
--- Test Result --
-OK

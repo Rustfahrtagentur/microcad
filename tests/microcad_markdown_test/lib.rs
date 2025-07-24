@@ -12,10 +12,8 @@
 //! If test IDs include `.` name will be split into several names which will be
 //! used to crates sub modules.
 
-mod output;
-
 use anyhow::{Context, Result};
-use output::Output;
+use microcad_test_tools::Output;
 use std::{io::Write, path::Path};
 
 /// for debugging purpose
@@ -111,7 +109,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
         let mut tests = tests.iter().collect::<Vec<_>>().clone();
         tests.sort();
         tests.iter().for_each(|test| {
-            result.push_str(&test.to_string());
+            result.push_str(&test.banner());
         });
     }
 
@@ -278,7 +276,7 @@ fn scan_for_tests(
                         file_path,
                         test_name.as_str(),
                         test_code.as_str(),
-                        &format!("{}:{start_no}", file_path.to_string_lossy()),
+                        start_no,
                     ) {
                         test_outputs.push(output);
                     }
@@ -305,7 +303,7 @@ fn create_test<'a>(
     file_path: &'a Path,
     name: &'a str,
     code: &str,
-    reference: &str,
+    line_no: usize,
 ) -> Option<Output> {
     // split name into `name` and optional `mode`
     let (name, mode) = if let Some((name, mode)) = name.split_once('#') {
@@ -325,27 +323,25 @@ fn create_test<'a>(
 
     // where to store generated output
     let test_path = file_path.parent().unwrap().join(".test");
-    // banner image file of this test
-    let banner = test_path.join(format!("{name}.png"));
-    // log file of this test
-    let log = test_path.join(format!("{name}.log"));
-
-    // svg output file of this test
-    let out = test_path.join(format!("{name}.svg"));
 
     // maybe create .test directory
-    let _ = std::fs::create_dir_all(test_path);
+    let _ = std::fs::create_dir_all(test_path.clone());
+
+    let output = Output {
+        name: name.into(),
+        input_path: file_path.into(),
+        test_path,
+        line_no,
+    };
 
     // Early exit for "#no_test" and "#todo" suffixes
     if mode == Some("no_test") {
         return None;
     }
 
-    f.push_str(&create_test_code(
-        name, mode, code, &banner, &log, &out, reference,
-    ));
+    f.push_str(&create_test_code(name, mode, code, &output));
 
-    Some(Output::new(name.into(), file_path.into(), banner, out, log))
+    Some(output)
 }
 
 /// create test code
@@ -355,26 +351,23 @@ fn create_test<'a>(
 /// - `banner`: file for banner link
 /// - `log`: file for log output
 /// - `todo`:
-fn create_test_code(
-    name: &str,
-    mode: Option<&str>,
-    code: &str,
-    banner: &std::path::Path,
-    log_out: &std::path::Path,
-    out: &std::path::Path,
-    reference: &str,
-) -> String {
-    let banner = &banner.to_string_lossy().escape_default().to_string();
-    let log_out = &log_out.to_string_lossy().escape_default().to_string();
-    let out = &out.to_string_lossy().escape_default().to_string();
+fn create_test_code(name: &str, mode: Option<&str>, code: &str, output: &Output) -> String {
     let mode = mode.unwrap_or("ok");
-
     format!(
         r###"
         #[test]
         #[allow(non_snake_case)]
         fn r#{name}() {{
-            crate::markdown_test::run_test("{name}", "{mode}", r##"{code}"##, "{banner}", "{log_out}", "{out}", "{reference}");
-        }}"###
+            let output = microcad_test_tools::Output {{
+                name: "{name}".into(),
+                input_path: {input_path:?}.into(),
+                test_path: {test_path:?}.into(),
+                line_no: {line_no}
+            }};
+            crate::markdown_test::run_test("{name}", "{mode}", r##"{code}"##, &output);
+        }}"###,
+        input_path = output.input_path,
+        test_path = output.test_path,
+        line_no = output.line_no,
     )
 }

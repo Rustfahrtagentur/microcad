@@ -1,7 +1,0 @@
--- Test --
-  module_module
-  ../doc/tests/statement_usage.md:112
--- Output --
--- Errors --
--- Test Result --
-OK

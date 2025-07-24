@@ -1,7 +1,0 @@
--- Test --
-  hull_multiple
-  ../doc/libs/std/ops/hull.md:18
--- Output --
--- Errors --
--- Test Result --
-OK

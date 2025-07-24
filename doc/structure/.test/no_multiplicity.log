@@ -1,7 +1,0 @@
--- Test --
-  no_multiplicity
-  ../doc/structure/arguments.md:144
--- Output --
--- Errors --
--- Test Result --
-OK

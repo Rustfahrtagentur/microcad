@@ -1,7 +1,0 @@
--- Test --
-  intersection_operator
-  ../doc/libs/std/ops/intersection.md:9
--- Output --
--- Errors --
--- Test Result --
-OK

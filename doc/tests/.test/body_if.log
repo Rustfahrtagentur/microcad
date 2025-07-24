@@ -1,7 +1,0 @@
--- Test --
-  body_if
-  ../doc/tests/statement_usage.md:616
--- Output --
--- Errors --
--- Test Result --
-OK
