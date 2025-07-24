@@ -1,7 +1,13 @@
 -- Test --
   function_assignment_prop
-  ../doc/tests/README.md:782
+  ../doc/tests/README.md:802
 -- Output --
 -- Errors --
+error: Assignment statement not available here
+  ---> <from_str>:5:1
+     |
+   5 | f();
+     | ^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

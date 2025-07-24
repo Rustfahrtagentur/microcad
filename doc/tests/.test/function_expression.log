@@ -1,7 +1,13 @@
 -- Test --
   function_expression
-  ../doc/tests/README.md:790
+  ../doc/tests/README.md:812
 -- Output --
 -- Errors --
+error: Symbol a not found.
+  ---> <from_str>:5:1
+     |
+   5 | f();
+     | ^^^
+     |
 -- Test Result --
-OK
+FAIL

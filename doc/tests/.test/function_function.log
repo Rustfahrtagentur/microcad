@@ -1,7 +1,3 @@
 -- Test --
   function_function
-  ../doc/tests/README.md:710
--- Output --
--- Errors --
--- Test Result --
-OK BUT SHOULD FAIL
+  ../doc/tests/README.md:712
