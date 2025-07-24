@@ -1,6 +1,6 @@
 -- Test --
   pre_init_if
-  ../doc/tests/README.md:274
+  ../doc/tests/statement_usage.md:274
 -- Parse Error --
 Statement not allowed prior initializers
 -- Test Result --

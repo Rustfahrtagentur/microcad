@@ -1,6 +1,6 @@
 -- Test --
   init_init
-  ../doc/tests/README.md:356
+  ../doc/tests/statement_usage.md:356
 -- Output --
 -- Errors --
 -- Test Result --

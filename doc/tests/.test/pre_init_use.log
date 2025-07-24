@@ -1,6 +1,6 @@
 -- Test --
   pre_init_use
-  ../doc/tests/README.md:250
+  ../doc/tests/statement_usage.md:250
 -- Output --
 -- Errors --
 -- Test Result --

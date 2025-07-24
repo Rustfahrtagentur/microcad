@@ -1,6 +1,6 @@
 -- Test --
   init_workbench
-  ../doc/tests/README.md:332
+  ../doc/tests/statement_usage.md:332
 -- Output --
 -- Errors --
 -- Test Result --

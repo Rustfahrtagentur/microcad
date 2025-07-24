@@ -1,6 +1,6 @@
 -- Test --
   init_return
-  ../doc/tests/README.md:380
+  ../doc/tests/statement_usage.md:380
 -- Output --
 -- Errors --
 -- Test Result --

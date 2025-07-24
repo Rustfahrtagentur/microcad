@@ -1,6 +1,6 @@
 -- Test --
   init_marker
-  ../doc/tests/README.md:396
+  ../doc/tests/statement_usage.md:396
 -- Output --
 -- Errors --
 -- Test Result --

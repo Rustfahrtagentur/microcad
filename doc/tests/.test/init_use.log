@@ -1,6 +1,6 @@
 -- Test --
   init_use
-  ../doc/tests/README.md:364
+  ../doc/tests/statement_usage.md:364
 -- Output --
 -- Errors --
 -- Test Result --

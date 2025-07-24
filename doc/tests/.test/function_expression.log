@@ -1,6 +1,6 @@
 -- Test --
   function_expression
-  ../doc/tests/README.md:770
+  ../doc/tests/statement_usage.md:770
 -- Output --
 -- Errors --
 -- Test Result --

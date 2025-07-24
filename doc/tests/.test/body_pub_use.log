@@ -1,6 +1,6 @@
 -- Test --
   body_pub_use
-  ../doc/tests/README.md:600
+  ../doc/tests/statement_usage.md:600
 -- Output --
 -- Errors --
 -- Test Result --
