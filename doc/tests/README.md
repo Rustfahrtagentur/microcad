@@ -1,6 +1,15 @@
 # Tests
 
-## Statement Usage
+- [Statment Usage](#statment-usage)
+  - [Source](#source)
+  - [Module](#module)
+  - [Pre-Init](#pre-init)
+  - [Init](#init)
+  - [Workbench](#workbench)
+  - [Body](#body)
+  - [Function](#function)
+
+## Statment Usage
 
 ### Source
 
@@ -85,7 +94,7 @@ a + 1;
 [![test](.test/source_expression_model.png)](.test/source_expression_model.log)
 
 ```µcad,source_expression_model
-__builtin::geo2d::circle(radius=1)
+__builtin::geo2d::circle(radius=1);
 ```
 
 ### Module
@@ -198,7 +207,7 @@ mod k {
 
 ```µcad,module_expression_model#fail
 mod k {
-  __builtin::geo2d::circle(radius=1)
+  __builtin::geo2d::circle(radius=1);
 }
 ```
 
@@ -312,7 +321,7 @@ init(l:Length) {} }
 
 ```µcad,pre_init_expression_model#fail
 sketch k() { 
-  __builtin::geo2d::circle(radius=1)
+  __builtin::geo2d::circle(radius=1);
 init(l:Length) {} }
 ```
 
@@ -426,7 +435,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_expression_model#fail
 sketch k() { init(l:Length) {
-  __builtin::geo2d::circle(radius=1)
+  __builtin::geo2d::circle(radius=1);
 } }
 ```
 
@@ -437,7 +446,7 @@ sketch k() { init(l:Length) {
 ```µcad,workbench_workbench#fail
 sketch k() {
   sketch f() {} f();
-}
+} k();
 ```
 
 [![test](.test/workbench_module.png)](.test/workbench_module.log)
@@ -445,7 +454,7 @@ sketch k() {
 ```µcad,workbench_module#fail
 sketch k() {
   mod m {}
-}
+} k();
 ```
 
 [![test](.test/workbench_function.png)](.test/workbench_function.log)
@@ -453,9 +462,7 @@ sketch k() {
 ```µcad,workbench_function#fail
 sketch k() {
   fn f() {} f();
-}
-
-k();
+} k();
 ```
 
 [![test](.test/workbench_init.png)](.test/workbench_init.log)
@@ -463,9 +470,7 @@ k();
 ```µcad,workbench_init
 sketch k() {
   init() {}
-}
-
-k();
+} k();
 ```
 
 [![test](.test/workbench_use.png)](.test/workbench_use.log)
@@ -473,9 +478,7 @@ k();
 ```µcad,workbench_use
 sketch k() {
   use std;
-}
-
-k();
+} k();
 ```
 
 [![test](.test/workbench_pub_use.png)](.test/workbench_pub_use.log)
@@ -483,9 +486,7 @@ k();
 ```µcad,workbench_pub_use#fail
 sketch k() {
   pub use std;
-}
-
-k();
+} k();
 ```
 
 [![test](.test/workbench_return.png)](.test/workbench_return.log)
@@ -493,24 +494,15 @@ k();
 ```µcad,workbench_return#fail
 sketch k() {
   return 1;
-}
-
-k();
+} k();
 ```
 
 [![test](.test/workbench_if.png)](.test/workbench_if.log)
 
 ```µcad,workbench_if
-sketch k(a: Integer) {
-  if a == 1 {
-    __builtin::geo2d::circle(radius=1)
-  } else {
-    __builtin::geo2d::circle(radius=4)
-  }
-}
-
-k(1);
-k(2);
+sketch k() {
+  if std::math::PI == 3 { }
+} k();
 ```
 
 [![test](.test/workbench_marker.png)](.test/workbench_marker.log)
@@ -518,9 +510,7 @@ k(2);
 ```µcad,workbench_marker
 sketch k() {
   @children
-}
-
-k();
+} k();
 ```
 
 [![test](.test/workbench_assignment_const.png)](.test/workbench_assignment_const.log)
@@ -528,9 +518,7 @@ k();
 ```µcad,workbench_assignment_const
 sketch k() {
   const B = 1;
-}
-
-k();
+} k();
 ```
 
 [![test](.test/workbench_assignment_var.png)](.test/workbench_assignment_var.log)
@@ -538,9 +526,7 @@ k();
 ```µcad,workbench_assignment_var
 sketch k() {
   a = 1;
-}
-
-k();
+} k();
 ```
 
 [![test](.test/workbench_assignment_prop.png)](.test/workbench_assignment_prop.log)
@@ -548,9 +534,7 @@ k();
 ```µcad,workbench_assignment_prop#todo
 sketch k() {
   prop a = 1;
-}
-
-k();
+} k();
 ```
 
 [![test](.test/workbench_expression.png)](.test/workbench_expression.log)
@@ -558,19 +542,15 @@ k();
 ```µcad,workbench_expression#fail
 sketch k() {
   a + 1;
-}
-
-k();
+} k();
 ```
 
 [![test](.test/workbench_expression_model.png)](.test/workbench_expression_model.log)
 
 ```µcad,workbench_expression_model
 sketch k() {
-  __builtin::geo2d::circle(radius=1)
-}
-
-k();
+  __builtin::geo2d::circle(radius=1);
+} k();
 ```
 
 ### Body
@@ -683,7 +663,7 @@ k();
 
 ```µcad,body_expression_model
 {
-  __builtin::geo2d::circle(radius=1)
+  __builtin::geo2d::circle(radius=1);
 }
 ```
 
@@ -703,8 +683,6 @@ fn f() {
 fn f() {
   mod m {}
 }
-
-f();
 ```
 
 [![test](.test/function_function.png)](.test/function_function.log)
@@ -713,8 +691,6 @@ f();
 fn f() {
   fn f() {} f();
 }
-
-f();
 ```
 
 [![test](.test/function_init.png)](.test/function_init.log)
@@ -723,8 +699,6 @@ f();
 fn f() {
   init() {}
 }
-
-f();
 ```
 
 [![test](.test/function_use.png)](.test/function_use.log)
@@ -733,8 +707,6 @@ f();
 fn f() {
   use std;
 }
-
-f();
 ```
 
 [![test](.test/function_pub_use.png)](.test/function_pub_use.log)
@@ -743,8 +715,6 @@ f();
 fn f() {
   pub use std;
 }
-
-f();
 ```
 
 [![test](.test/function_return.png)](.test/function_return.log)
@@ -753,8 +723,6 @@ f();
 fn f() {
   return 1;
 }
-
-f();
 ```
 
 [![test](.test/function_if.png)](.test/function_if.log)
@@ -763,8 +731,6 @@ f();
 fn f() {
   if std::math::PI == 3 { }
 }
-
-f();
 ```
 
 [![test](.test/function_marker.png)](.test/function_marker.log)
@@ -773,8 +739,6 @@ f();
 fn f() {
   @children
 }
-
-f();
 ```
 
 [![test](.test/function_assignment_const.png)](.test/function_assignment_const.log)
@@ -783,8 +747,6 @@ f();
 fn f() {
   const B = 1;
 }
-
-f();
 ```
 
 [![test](.test/function_assignment_var.png)](.test/function_assignment_var.log)
@@ -793,8 +755,6 @@ f();
 fn f() {
   a = 1;
 }
-
-f();
 ```
 
 [![test](.test/function_assignment_prop.png)](.test/function_assignment_prop.log)
@@ -803,8 +763,6 @@ f();
 fn f() {
   prop a = 1;
 }
-
-f();
 ```
 
 [![test](.test/function_expression.png)](.test/function_expression.log)
@@ -813,16 +771,12 @@ f();
 fn f() {
   a + 1;
 }
-
-f();
 ```
 
 [![test](.test/function_expression_model.png)](.test/function_expression_model.log)
 
 ```µcad,function_expression_model
 fn f() {
-  __builtin::geo2d::circle(radius=1)
+  __builtin::geo2d::circle(radius=1);
 }
-
-f();
 ```
