@@ -58,7 +58,7 @@ return 1;
 [![test](.test/source_if.png)](.test/source_if.log)
 
 ```µcad,source_if
-if std::math::PI == 3 { }
+if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
 ```
 
 [![test](.test/source_marker.png)](.test/source_marker.log)
@@ -127,7 +127,7 @@ mod k {
 
 ```µcad,module_init#fail
 mod k {
-  init() {}
+  init() { }
 }
 ```
 
@@ -159,7 +159,7 @@ mod k {
 
 ```µcad,module_if#fail
 mod k {
-  if std::math::PI == 3 { }
+  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
 }
 ```
 
@@ -218,7 +218,7 @@ mod k {
 ```µcad,pre_init_workbench#fail
 sketch k() { 
   sketch f() {} f();
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_module.png)](.test/pre_init_module.log)
@@ -226,7 +226,7 @@ init(l:Length) {} }
 ```µcad,pre_init_module#fail
 sketch k() { 
   mod m {}
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_function.png)](.test/pre_init_function.log)
@@ -234,15 +234,15 @@ init(l:Length) {} }
 ```µcad,pre_init_function#fail
 sketch k() { 
   fn f() {} f();
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_init.png)](.test/pre_init_init.log)
 
-```µcad,pre_init_init#fail
+```µcad,pre_init_init
 sketch k() { 
   init() {}
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_use.png)](.test/pre_init_use.log)
@@ -250,15 +250,15 @@ init(l:Length) {} }
 ```µcad,pre_init_use
 sketch k() { 
   use std;
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_pub_use.png)](.test/pre_init_pub_use.log)
 
-```µcad,pre_init_pub_use#fail
+```µcad,pre_init_pub_use
 sketch k() { 
   pub use std;
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_return.png)](.test/pre_init_return.log)
@@ -266,7 +266,7 @@ init(l:Length) {} }
 ```µcad,pre_init_return#fail
 sketch k() { 
   return 1;
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_if.png)](.test/pre_init_if.log)
@@ -274,7 +274,7 @@ init(l:Length) {} }
 ```µcad,pre_init_if#fail
 sketch k() { 
   if std::math::PI == 3 { }
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_marker.png)](.test/pre_init_marker.log)
@@ -282,7 +282,7 @@ init(l:Length) {} }
 ```µcad,pre_init_marker#fail
 sketch k() { 
   @children
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_assignment_const.png)](.test/pre_init_assignment_const.log)
@@ -290,7 +290,7 @@ init(l:Length) {} }
 ```µcad,pre_init_assignment_const
 sketch k() { 
   const B = 1;
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_assignment_var.png)](.test/pre_init_assignment_var.log)
@@ -298,7 +298,7 @@ init(l:Length) {} }
 ```µcad,pre_init_assignment_var#fail
 sketch k() { 
   a = 1;
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_assignment_prop.png)](.test/pre_init_assignment_prop.log)
@@ -306,7 +306,7 @@ init(l:Length) {} }
 ```µcad,pre_init_assignment_prop#fail
 sketch k() { 
   prop a = 1;
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_expression.png)](.test/pre_init_expression.log)
@@ -314,7 +314,7 @@ init(l:Length) {} }
 ```µcad,pre_init_expression#fail
 sketch k() { 
   1 + 2;
-init(l:Length) {} }
+init(l:Length) {} } k();
 ```
 
 [![test](.test/pre_init_expression_model.png)](.test/pre_init_expression_model.log)
@@ -483,7 +483,7 @@ sketch k() {
 
 [![test](.test/workbench_pub_use.png)](.test/workbench_pub_use.log)
 
-```µcad,workbench_pub_use#fail
+```µcad,workbench_pub_use#todo
 sketch k() {
   pub use std;
 } k();
@@ -597,7 +597,7 @@ sketch k() {
 
 [![test](.test/body_pub_use.png)](.test/body_pub_use.log)
 
-```µcad,body_pub_use#fail
+```µcad,body_pub_use#todo
 {
   pub use std;
 }
@@ -711,7 +711,7 @@ fn f() {
 
 [![test](.test/function_pub_use.png)](.test/function_pub_use.log)
 
-```µcad,function_pub_use#todo
+```µcad,function_pub_use
 fn f() {
   pub use std;
 } f();
@@ -729,7 +729,7 @@ fn f() {
 
 ```µcad,function_if
 fn f() {
-  if std::math::PI == 3 { }
+  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
 } f();
 ```
 
