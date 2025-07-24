@@ -1,3 +1,13 @@
 -- Test --
   function_workbench
   ../doc/tests/README.md:674
+-- Output --
+-- Errors --
+error: sketch statement not available here
+  ---> <from_str>:3:3
+     |
+   3 | } f();
+     |   ^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED
