@@ -6,8 +6,8 @@
 error: Not implemented: evaluate if statement in function
   ---> <from_str>:2:3
      |
-   2 |   if std::math::PI == 3 { }
-     |   ^^^^^^^^^^^^^^^^^^^^^^^^^
+   2 |   if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAIL
