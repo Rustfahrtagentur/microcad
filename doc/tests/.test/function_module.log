@@ -1,3 +1,13 @@
 -- Test --
   function_module
   ../doc/tests/README.md:682
+-- Output --
+-- Errors --
+error: Module statement not available here
+  ---> <from_str>:3:3
+     |
+   3 | } f();
+     |   ^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED
