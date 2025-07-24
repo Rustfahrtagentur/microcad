@@ -1,7 +1,3 @@
 -- Test --
   init_marker
   ../doc/tests/statement_usage.md:396
--- Output --
--- Errors --
--- Test Result --
-OK BUT SHOULD FAIL

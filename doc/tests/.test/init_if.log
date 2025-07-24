@@ -3,5 +3,11 @@
   ../doc/tests/statement_usage.md:388
 -- Output --
 -- Errors --
+error: If statement not available here
+  ---> <from_str>:1:14
+     |
+   1 | sketch k() { init(l:Length) {
+     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED
