@@ -495,11 +495,16 @@ k();
 [![test](.test/workbench_if.png)](.test/workbench_if.log)
 
 ```µcad,workbench_if
-sketch k() {
-  if a == 1 { }
+sketch k(a: Integer) {
+  if a == 1 {
+    __builtin::geo2d::circle(radius=1)
+  } else {
+    __builtin::geo2d::circle(radius=4)
+  }
 }
 
-k();
+k(1);
+k(2);
 ```
 
 [![test](.test/workbench_marker.png)](.test/workbench_marker.log)

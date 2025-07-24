@@ -54,19 +54,24 @@ impl Parse for AssignmentStatement {
 impl Parse for IfStatement {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut cond = Default::default();
-        let mut body = Body::default();
+        let mut body = None;
         let mut body_else = None;
 
         for pair in pair.inner() {
             match pair.as_rule() {
                 Rule::expression => cond = Expression::parse(pair)?,
-                Rule::body => body = Body::parse(pair)?,
-                Rule::body_else => {
-                    body_else = Some(Body::parse(pair.clone())?);
+                Rule::body => {
+                    if body.is_none() {
+                        body = Some(Body::parse(pair)?)
+                    } else {
+                        body_else = Some(Body::parse(pair)?)
+                    }
                 }
                 rule => unreachable!("Unexpected rule in if, got {:?}", rule),
             }
         }
+
+        let body = body.expect("Body");
 
         Ok(IfStatement {
             cond,

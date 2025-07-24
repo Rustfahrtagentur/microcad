@@ -118,7 +118,7 @@ impl Model {
             }
             OutputType::Geometry3D => todo!(),
             output_type => {
-                panic!("Output type must have been determined at this point: {output_type}")
+                panic!("Output type must have been determined at this point: {output_type}\n{self}")
             }
         }
     }
