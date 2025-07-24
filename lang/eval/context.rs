@@ -318,6 +318,7 @@ impl Grant<FunctionDefinition> for Context {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
+                // TODO: check if expression generates models (see test `source_expression``)
                 StackFrame::Source(_, _)
                     | StackFrame::Module(_, _)
                     | StackFrame::Workbench(_, _, _)
