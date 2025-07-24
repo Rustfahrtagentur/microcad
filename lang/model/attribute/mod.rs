@@ -11,9 +11,9 @@ mod measure;
 mod resolution;
 
 pub use attributes::Attributes;
-pub use export::ExportAttribute;
+pub use export::ExportCommand;
 pub use layer::Layer;
-pub use measure::MeasureAttribute;
+pub use measure::MeasureCommand;
 pub use resolution::ResolutionAttribute;
 
 use crate::{syntax::*, value::*};
@@ -24,11 +24,11 @@ use microcad_core::Color;
 #[derive(Clone, Debug)]
 pub enum Attribute {
     /// Export attributes.
-    Export(ExportAttribute),
+    Export(ExportCommand),
     /// Color attribute.
     Color(Color),
     /// Measure attribute.
-    Measure(MeasureAttribute),
+    Measure(MeasureCommand),
     /// Render resolution attribute.
     Resolution(ResolutionAttribute),
     /// Exporter specific attributes.
@@ -72,7 +72,7 @@ pub trait GetAttribute {
     fn get_attribute(&self, id: &Identifier) -> Option<Attribute>;
 
     /// Get export attributes.
-    fn get_export_attribute(&self) -> Option<ExportAttribute> {
+    fn get_export_attribute(&self) -> Option<ExportCommand> {
         match self.get_attribute(&Identifier::no_ref("export")) {
             Some(Attribute::Export(export_attribute)) => Some(export_attribute),
             _ => None,

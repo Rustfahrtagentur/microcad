@@ -13,7 +13,7 @@ use microcad_core::{Mat4, RenderResolution, Size2D};
 
 /// Export attribute, e.g. `#[export: "output.svg"]`.
 #[derive(Clone)]
-pub struct ExportAttribute {
+pub struct ExportCommand {
     /// Filename.
     pub filename: std::path::PathBuf,
     /// Resolution
@@ -26,7 +26,7 @@ pub struct ExportAttribute {
     pub size: Size2D,
 }
 
-impl ExportAttribute {
+impl ExportCommand {
     /// Export the model. By the settings in the attribute.
     pub fn export(&self, model: &Model) -> Result<Value, ExportError> {
         model.set_matrix(Mat4::identity());
@@ -37,8 +37,8 @@ impl ExportAttribute {
     }
 }
 
-impl From<ExportAttribute> for Value {
-    fn from(export_attribute: ExportAttribute) -> Self {
+impl From<ExportCommand> for Value {
+    fn from(export_attribute: ExportCommand) -> Self {
         crate::create_tuple_value!(
             filename = Value::String(String::from(
                 export_attribute.filename.to_str().expect("PathBuf"),
@@ -60,7 +60,7 @@ impl From<ExportAttribute> for Value {
     }
 }
 
-impl std::fmt::Debug for ExportAttribute {
+impl std::fmt::Debug for ExportCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(
             f,
@@ -71,7 +71,7 @@ impl std::fmt::Debug for ExportAttribute {
     }
 }
 
-impl std::fmt::Display for ExportAttribute {
+impl std::fmt::Display for ExportCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(
             f,

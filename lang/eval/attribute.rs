@@ -5,7 +5,7 @@ use crate::{
     Id,
     builtin::ExporterAccess,
     eval::{self, *},
-    model::ExportAttribute,
+    model::ExportCommand,
     parameter,
     syntax::{self, *},
 };
@@ -43,8 +43,8 @@ impl Eval<Option<crate::model::Attribute>> for syntax::AttributeCommand {
     }
 }
 
-impl Eval<Option<ExportAttribute>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<ExportAttribute>> {
+impl Eval<Option<ExportCommand>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<ExportCommand>> {
         match self {
             syntax::Attribute::Exporter(id, arguments) if id.id() == "export" => {
                 match ArgumentMatch::find_match(
@@ -79,7 +79,7 @@ impl Eval<Option<ExportAttribute>> for syntax::Attribute {
 
                         match context.find_exporter(&filename, &id) {
                             Ok(exporter) => {
-                                return Ok(Some(ExportAttribute {
+                                return Ok(Some(ExportCommand {
                                     filename,
                                     exporter,
                                     resolution,

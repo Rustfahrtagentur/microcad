@@ -7,14 +7,14 @@ use crate::value::Value;
 
 /// Measure attribute.
 #[derive(Clone, Debug, Default)]
-pub enum MeasureAttribute {
+pub enum MeasureCommand {
     /// Measure the size of a geometry (for each dimension).
     #[default]
     Size,
 }
 
-impl From<MeasureAttribute> for Value {
-    fn from(_: MeasureAttribute) -> Self {
+impl From<MeasureCommand> for Value {
+    fn from(_: MeasureCommand) -> Self {
         Value::String("size".into())
     }
 }

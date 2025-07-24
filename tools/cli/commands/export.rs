@@ -91,7 +91,7 @@ impl ExportArgs {
         model: &Model,
         config: &Config,
         exporters: &ExporterRegistry,
-    ) -> anyhow::Result<ExportAttribute> {
+    ) -> anyhow::Result<ExportCommand> {
         let default_exporter =
             Self::default_exporter(&model.final_output_type(), config, exporters);
         let resolution = self.resolution();
@@ -99,7 +99,7 @@ impl ExportArgs {
         let size = self.size();
 
         match &self.output {
-            Some(filename) => Ok(ExportAttribute {
+            Some(filename) => Ok(ExportCommand {
                 filename: filename.to_path_buf(),
                 resolution,
                 layers,
@@ -119,7 +119,7 @@ impl ExportArgs {
                     .to_string();
                 filename.set_extension(&ext);
 
-                Ok(ExportAttribute {
+                Ok(ExportCommand {
                     filename,
                     exporter,
                     resolution,
@@ -141,8 +141,8 @@ impl ExportArgs {
         model: &Model,
         config: &Config,
         exporters: &ExporterRegistry,
-    ) -> anyhow::Result<Vec<(Model, ExportAttribute)>> {
-        let mut models: Vec<(Model, ExportAttribute)> = model
+    ) -> anyhow::Result<Vec<(Model, ExportCommand)>> {
+        let mut models: Vec<(Model, ExportCommand)> = model
             .source_file_descendants()
             .filter_map(|model| {
                 let b = model.borrow();
@@ -164,7 +164,7 @@ impl ExportArgs {
         Ok(models)
     }
 
-    pub fn export_targets(&self, models: &[(Model, ExportAttribute)]) -> anyhow::Result<()> {
+    pub fn export_targets(&self, models: &[(Model, ExportCommand)]) -> anyhow::Result<()> {
         models
             .iter()
             .try_for_each(|(model, attr)| -> anyhow::Result<()> {
@@ -177,7 +177,7 @@ impl ExportArgs {
         Ok(())
     }
 
-    pub fn list_targets(&self, models: &Vec<(Model, ExportAttribute)>) -> anyhow::Result<()> {
+    pub fn list_targets(&self, models: &Vec<(Model, ExportCommand)>) -> anyhow::Result<()> {
         for (model, attr) in models {
             log::info!("{model} => {attr}", model = model.signature());
         }
