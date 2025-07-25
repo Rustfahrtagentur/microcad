@@ -405,6 +405,7 @@ impl Grant<AssignmentStatement> for Context {
                             | StackFrame::Body(_)
                             | StackFrame::Workbench(_, _, _)
                             | StackFrame::Init(_)
+                            | StackFrame::Function(_)
                     )
                 }
                 Qualifier::Const => matches!(
@@ -412,6 +413,7 @@ impl Grant<AssignmentStatement> for Context {
                     StackFrame::Source(_, _)
                         | StackFrame::Module(_, _)
                         | StackFrame::Workbench(_, _, _)
+                        | StackFrame::Function(_)
                 ),
                 Qualifier::Prop => matches!(stack_frame, StackFrame::Workbench(_, _, _)),
             }

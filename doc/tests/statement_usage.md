@@ -743,7 +743,7 @@ fn f() {
 
 [![test](.test/function_assignment_const.png)](.test/function_assignment_const.log)
 
-```µcad,function_assignment_const#fail
+```µcad,function_assignment_const
 fn f() {
   const B = 1;
 } f();

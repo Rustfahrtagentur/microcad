@@ -5,6 +5,16 @@
 
 use crate::{eval::*, syntax::*, value::*};
 
+impl Eval for FunctionDefinition {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        context.grant(self)?;
+        context.scope(StackFrame::Function(Default::default()), |context| {
+            // avoid body frame
+            self.body.statements.eval(context)
+        })
+    }
+}
+
 impl CallTrait for FunctionDefinition {
     fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Value> {
         match ArgumentMatch::find_multi_match(args, &self.signature.parameters.eval(context)?) {
