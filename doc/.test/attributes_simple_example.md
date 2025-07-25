@@ -1,4 +1,4 @@
-# Test [`attributes_simple_example`](../doc/attributes.md#L16)
+# Test [`attributes_simple_example`](/doc/attributes.md#L16)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/.test/attributes_simple_example.png)
+![OK](/doc/.test/attributes_simple_example.png)

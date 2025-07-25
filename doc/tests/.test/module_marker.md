@@ -1,4 +1,4 @@
-# Test [`module_marker`](../doc/tests/statement_usage.md#L168)
+# Test [`module_marker`](/doc/tests/statement_usage.md#L168)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK BUT SHOULD FAIL](../doc/tests/.test/module_marker.png)
+![OK BUT SHOULD FAIL](/doc/tests/.test/module_marker.png)

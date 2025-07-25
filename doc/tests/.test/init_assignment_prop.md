@@ -1,4 +1,4 @@
-# Test [`init_assignment_prop`](../doc/tests/statement_usage.md#L420)
+# Test [`init_assignment_prop`](/doc/tests/statement_usage.md#L420)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Assignment statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/init_assignment_prop.png)
+![FAILED AS EXPECTED](/doc/tests/.test/init_assignment_prop.png)

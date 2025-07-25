@@ -1,4 +1,4 @@
-# Test [`union_operator`](../doc/libs/std/ops/union.md#L9)
+# Test [`union_operator`](/doc/libs/std/ops/union.md#L9)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/libs/std/ops/.test/union_operator.png)
+![OK](/doc/libs/std/ops/.test/union_operator.png)

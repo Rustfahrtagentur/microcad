@@ -1,4 +1,4 @@
-# Test [`module_if`](../doc/tests/statement_usage.md#L160)
+# Test [`module_if`](/doc/tests/statement_usage.md#L160)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: If statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/module_if.png)
+![FAILED AS EXPECTED](/doc/tests/.test/module_if.png)

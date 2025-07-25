@@ -1,4 +1,4 @@
-# Test [`init_function`](../doc/tests/statement_usage.md#L348)
+# Test [`init_function`](/doc/tests/statement_usage.md#L348)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Function statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/init_function.png)
+![FAILED AS EXPECTED](/doc/tests/.test/init_function.png)

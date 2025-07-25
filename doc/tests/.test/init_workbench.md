@@ -1,4 +1,4 @@
-# Test [`init_workbench`](../doc/tests/statement_usage.md#L332)
+# Test [`init_workbench`](/doc/tests/statement_usage.md#L332)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: sketch statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/init_workbench.png)
+![FAILED AS EXPECTED](/doc/tests/.test/init_workbench.png)

@@ -1,4 +1,4 @@
-# Test [`use_as`](../doc/structure/use.md#L60)
+# Test [`use_as`](/doc/structure/use.md#L60)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/use_as.png)
+![OK](/doc/structure/.test/use_as.png)

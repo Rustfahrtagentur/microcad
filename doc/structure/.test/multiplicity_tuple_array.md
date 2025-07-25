@@ -1,4 +1,4 @@
-# Test [`multiplicity_tuple_array`](../doc/structure/arguments.md#L157)
+# Test [`multiplicity_tuple_array`](/doc/structure/arguments.md#L157)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Workbench translate cannot find initialization for those arguments
 
 ## Test Result
 
-![TODO](../doc/structure/.test/multiplicity_tuple_array.png)
+![TODO](/doc/structure/.test/multiplicity_tuple_array.png)

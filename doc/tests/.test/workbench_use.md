@@ -1,4 +1,4 @@
-# Test [`workbench_use`](../doc/tests/statement_usage.md#L478)
+# Test [`workbench_use`](/doc/tests/statement_usage.md#L478)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/workbench_use.png)
+![OK](/doc/tests/.test/workbench_use.png)

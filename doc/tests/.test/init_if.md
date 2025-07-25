@@ -1,4 +1,4 @@
-# Test [`init_if`](../doc/tests/statement_usage.md#L388)
+# Test [`init_if`](/doc/tests/statement_usage.md#L388)
 
 ## Output
 
@@ -24,4 +24,4 @@ error: Not implemented: evaluate if statement in function
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/init_if.png)
+![FAILED AS EXPECTED](/doc/tests/.test/init_if.png)

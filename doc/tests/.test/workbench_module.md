@@ -1,4 +1,4 @@
-# Test [`workbench_module`](../doc/tests/statement_usage.md#L454)
+# Test [`workbench_module`](/doc/tests/statement_usage.md#L454)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Module statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/workbench_module.png)
+![FAILED AS EXPECTED](/doc/tests/.test/workbench_module.png)

@@ -1,4 +1,4 @@
-# Test [`body_use`](../doc/tests/statement_usage.md#L592)
+# Test [`body_use`](/doc/tests/statement_usage.md#L592)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/body_use.png)
+![OK](/doc/tests/.test/body_use.png)

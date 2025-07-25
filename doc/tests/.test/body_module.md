@@ -1,4 +1,4 @@
-# Test [`body_module`](../doc/tests/statement_usage.md#L568)
+# Test [`body_module`](/doc/tests/statement_usage.md#L568)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Module statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/body_module.png)
+![FAILED AS EXPECTED](/doc/tests/.test/body_module.png)

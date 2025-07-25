@@ -1,4 +1,4 @@
-# Test [`illegal_workbench_statement`](../doc/structure/workbench.md#L253)
+# Test [`illegal_workbench_statement`](/doc/structure/workbench.md#L253)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: sketch statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/structure/.test/illegal_workbench_statement.png)
+![FAILED AS EXPECTED](/doc/structure/.test/illegal_workbench_statement.png)

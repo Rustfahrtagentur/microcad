@@ -1,4 +1,4 @@
-# Test [`source_marker`](../doc/tests/statement_usage.md#L66)
+# Test [`source_marker`](/doc/tests/statement_usage.md#L66)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK BUT SHOULD FAIL](../doc/tests/.test/source_marker.png)
+![OK BUT SHOULD FAIL](/doc/tests/.test/source_marker.png)

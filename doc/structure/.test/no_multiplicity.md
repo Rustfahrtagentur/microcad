@@ -1,4 +1,4 @@
-# Test [`no_multiplicity`](../doc/structure/arguments.md#L144)
+# Test [`no_multiplicity`](/doc/structure/arguments.md#L144)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/no_multiplicity.png)
+![OK](/doc/structure/.test/no_multiplicity.png)

@@ -1,4 +1,4 @@
-# Test [`if`](../doc/structure/conditionals.md#L9)
+# Test [`if`](/doc/structure/conditionals.md#L9)
 
 ## Parse Error
 
@@ -18,4 +18,4 @@ Parser error:  --> 4:12
   = expected COMMENT or body
 ## Test Result
 
-![FAIL (TODO)](../doc/structure/.test/if.png)
+![FAIL (TODO)](/doc/structure/.test/if.png)

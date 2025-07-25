@@ -1,4 +1,4 @@
-# Test [`function_assignment_var`](../doc/tests/statement_usage.md#L754)
+# Test [`function_assignment_var`](/doc/tests/statement_usage.md#L754)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Assignment statement not available here
 
 ## Test Result
 
-![FAIL](../doc/tests/.test/function_assignment_var.png)
+![FAIL](/doc/tests/.test/function_assignment_var.png)

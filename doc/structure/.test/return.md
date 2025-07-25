@@ -1,4 +1,4 @@
-# Test [`return`](../doc/structure/functions.md#L35)
+# Test [`return`](/doc/structure/functions.md#L35)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/return.png)
+![OK](/doc/structure/.test/return.png)

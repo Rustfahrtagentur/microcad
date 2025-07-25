@@ -1,4 +1,4 @@
-# Test [`source_assignment_prop`](../doc/tests/statement_usage.md#L84)
+# Test [`source_assignment_prop`](/doc/tests/statement_usage.md#L84)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Assignment statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/source_assignment_prop.png)
+![FAILED AS EXPECTED](/doc/tests/.test/source_assignment_prop.png)

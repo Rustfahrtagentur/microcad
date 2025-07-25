@@ -1,4 +1,4 @@
-# Test [`argument_match_type`](../doc/structure/arguments.md#L36)
+# Test [`argument_match_type`](/doc/structure/arguments.md#L36)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Missing arguments: [Identifier: "c", Refer: 1:29 (28..29) in 0x7856403303
 
 ## Test Result
 
-![TODO](../doc/structure/.test/argument_match_type.png)
+![TODO](/doc/structure/.test/argument_match_type.png)

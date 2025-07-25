@@ -1,4 +1,4 @@
-# Test [`workbench_assignment_const`](../doc/tests/statement_usage.md#L518)
+# Test [`workbench_assignment_const`](/doc/tests/statement_usage.md#L518)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/workbench_assignment_const.png)
+![OK](/doc/tests/.test/workbench_assignment_const.png)

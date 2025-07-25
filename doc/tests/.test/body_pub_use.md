@@ -1,4 +1,4 @@
-# Test [`body_pub_use`](../doc/tests/statement_usage.md#L600)
+# Test [`body_pub_use`](/doc/tests/statement_usage.md#L600)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK BUT IS TODO](../doc/tests/.test/body_pub_use.png)
+![OK BUT IS TODO](/doc/tests/.test/body_pub_use.png)

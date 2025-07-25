@@ -1,4 +1,4 @@
-# Test [`return_twice`](../doc/structure/functions.md#L49)
+# Test [`return_twice`](/doc/structure/functions.md#L49)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/return_twice.png)
+![OK](/doc/structure/.test/return_twice.png)

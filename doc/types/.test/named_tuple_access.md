@@ -1,4 +1,4 @@
-# Test [`named_tuple_access`](../doc/types/tuples.md#L10)
+# Test [`named_tuple_access`](/doc/types/tuples.md#L10)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/types/.test/named_tuple_access.png)
+![OK](/doc/types/.test/named_tuple_access.png)

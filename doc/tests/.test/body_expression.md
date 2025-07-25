@@ -1,4 +1,4 @@
-# Test [`body_expression`](../doc/tests/statement_usage.md#L656)
+# Test [`body_expression`](/doc/tests/statement_usage.md#L656)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/body_expression.png)
+![OK](/doc/tests/.test/body_expression.png)

@@ -1,4 +1,4 @@
-# Test [`hull_single`](../doc/libs/std/ops/hull.md#L7)
+# Test [`hull_single`](/doc/libs/std/ops/hull.md#L7)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/libs/std/ops/.test/hull_single.png)
+![OK](/doc/libs/std/ops/.test/hull_single.png)

@@ -1,4 +1,4 @@
-# Test [`module_assignment_var`](../doc/tests/statement_usage.md#L184)
+# Test [`module_assignment_var`](/doc/tests/statement_usage.md#L184)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: No variables allowed in modules
 
 ## Test Result
 
-![FAIL](../doc/tests/.test/module_assignment_var.png)
+![FAIL](/doc/tests/.test/module_assignment_var.png)

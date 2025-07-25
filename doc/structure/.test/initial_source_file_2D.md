@@ -1,4 +1,4 @@
-# Test [`initial_source_file_2D`](../doc/structure/source_files.md#L23)
+# Test [`initial_source_file_2D`](/doc/structure/source_files.md#L23)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/initial_source_file_2D.png)
+![OK](/doc/structure/.test/initial_source_file_2D.png)

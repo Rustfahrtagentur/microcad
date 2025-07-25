@@ -1,4 +1,4 @@
-# Test [`mod`](../doc/structure/functions.md#L66)
+# Test [`mod`](/doc/structure/functions.md#L66)
 
 ## Output
 
@@ -24,4 +24,4 @@ error: Not implemented: evaluate if statement in function
 
 ## Test Result
 
-![TODO](../doc/structure/.test/mod.png)
+![TODO](/doc/structure/.test/mod.png)

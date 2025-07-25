@@ -1,4 +1,4 @@
-# Test [`source_init`](../doc/tests/statement_usage.md#L36)
+# Test [`source_init`](/doc/tests/statement_usage.md#L36)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Init statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/source_init.png)
+![FAILED AS EXPECTED](/doc/tests/.test/source_init.png)

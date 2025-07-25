@@ -1,4 +1,4 @@
-# Test [`verify_error`](../doc/debug/README.md#L29)
+# Test [`verify_error`](/doc/debug/README.md#L29)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Builtin error: this should not have happened
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/debug/.test/verify_error.png)
+![FAILED AS EXPECTED](/doc/debug/.test/verify_error.png)

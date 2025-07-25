@@ -1,4 +1,4 @@
-# Test [`types_quantity_area`](../doc/types/quantity.md#L91)
+# Test [`types_quantity_area`](/doc/types/quantity.md#L91)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/types/.test/types_quantity_area.png)
+![OK](/doc/types/.test/types_quantity_area.png)

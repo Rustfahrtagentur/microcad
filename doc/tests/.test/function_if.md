@@ -1,4 +1,4 @@
-# Test [`function_if`](../doc/tests/statement_usage.md#L730)
+# Test [`function_if`](/doc/tests/statement_usage.md#L730)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Not implemented: evaluate if statement in function
 
 ## Test Result
 
-![FAIL](../doc/tests/.test/function_if.png)
+![FAIL](/doc/tests/.test/function_if.png)

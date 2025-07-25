@@ -1,4 +1,4 @@
-# Test [`attributes_color`](../doc/attributes.md#L41)
+# Test [`attributes_color`](/doc/attributes.md#L41)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/.test/attributes_color.png)
+![OK](/doc/.test/attributes_color.png)

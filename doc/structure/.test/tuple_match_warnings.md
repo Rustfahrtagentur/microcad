@@ -1,4 +1,4 @@
-# Test [`tuple_match_warnings`](../doc/structure/arguments.md#L119)
+# Test [`tuple_match_warnings`](/doc/structure/arguments.md#L119)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Missing arguments: [Identifier: "x", Refer: 1:7 (6..7) in 0x2b1194551c0fb
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/structure/.test/tuple_match_warnings.png)
+![FAILED AS EXPECTED](/doc/structure/.test/tuple_match_warnings.png)

@@ -1,4 +1,4 @@
-# Test [`property`](../doc/structure/workbench.md#L272)
+# Test [`property`](/doc/structure/workbench.md#L272)
 
 ## Output
 
@@ -30,4 +30,4 @@ error: Symbol info not found.
 
 ## Test Result
 
-![TODO](../doc/structure/.test/property.png)
+![TODO](/doc/structure/.test/property.png)

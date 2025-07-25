@@ -1,4 +1,4 @@
-# Test [`body_function`](../doc/tests/statement_usage.md#L576)
+# Test [`body_function`](/doc/tests/statement_usage.md#L576)
 
 ## Output
 
@@ -24,4 +24,4 @@ error: Symbol f not found.
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/body_function.png)
+![FAILED AS EXPECTED](/doc/tests/.test/body_function.png)

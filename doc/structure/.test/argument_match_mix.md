@@ -1,4 +1,4 @@
-# Test [`argument_match_mix`](../doc/structure/arguments.md#L48)
+# Test [`argument_match_mix`](/doc/structure/arguments.md#L48)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/argument_match_mix.png)
+![OK](/doc/structure/.test/argument_match_mix.png)

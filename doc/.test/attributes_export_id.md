@@ -1,4 +1,4 @@
-# Test [`attributes_export_id`](../doc/attributes.md#L87)
+# Test [`attributes_export_id`](/doc/attributes.md#L87)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/.test/attributes_export_id.png)
+![OK](/doc/.test/attributes_export_id.png)

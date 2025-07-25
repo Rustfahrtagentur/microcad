@@ -1,4 +1,4 @@
-# Test [`property_wrong`](../doc/structure/workbench.md#L298)
+# Test [`property_wrong`](/doc/structure/workbench.md#L298)
 
 ## Output
 
@@ -30,4 +30,4 @@ info: inner: <invalid>
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/structure/.test/property_wrong.png)
+![FAILED AS EXPECTED](/doc/structure/.test/property_wrong.png)

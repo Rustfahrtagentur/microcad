@@ -1,4 +1,4 @@
-# Test [`assignment`](../doc/structure/assignments.md#L13)
+# Test [`assignment`](/doc/structure/assignments.md#L13)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/assignment.png)
+![OK](/doc/structure/.test/assignment.png)

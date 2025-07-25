@@ -49,8 +49,8 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
                 let _ = fs::hard_link("images/fail_ok.png", output.banner_path());
                 writeln!(
                     log,
-                    "## Test Result\n\n![FAILED AS EXPECTED]({banner_path})",
-                    banner_path = output.banner_path_str()
+                    "## Test Result\n\n![FAILED AS EXPECTED]({banner_link})",
+                    banner_link = output.banner_link()
                 )
                 .expect("output error");
                 log::debug!("{err}")
@@ -86,8 +86,8 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
                         let _ = fs::hard_link("images/fail_ok.png", output.banner_path());
                         writeln!(
                             log,
-                            "## Test Result\n\n![FAILED AS EXPECTED]({banner_path})",
-                            banner_path = output.banner_path_str()
+                            "## Test Result\n\n![FAILED AS EXPECTED]({banner_link})",
+                            banner_link = output.banner_link()
                         )
                         .expect("output error");
                         log::debug!("{err}");
@@ -97,8 +97,8 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
                         let _ = fs::hard_link("images/fail_ok.png", output.banner_path());
                         writeln!(
                             log,
-                            "## Test Result\n\n![FAILED AS EXPECTED]({banner_path})",
-                            banner_path = output.banner_path_str()
+                            "## Test Result\n\n![FAILED AS EXPECTED]({banner_link})",
+                            banner_link = output.banner_link()
                         )
                         .expect("output error");
                         log::debug!(
@@ -112,8 +112,8 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
                         let _ = fs::hard_link("images/ok_fail.png", output.banner_path());
                         writeln!(
                             log,
-                            "## Test Result\n\n![OK BUT SHOULD FAIL]({banner_path})",
-                            banner_path = output.banner_path_str()
+                            "## Test Result\n\n![OK BUT SHOULD FAIL]({banner_link})",
+                            banner_link = output.banner_link()
                         )
                         .expect("output error");
                         panic!("ERROR: test is marked to fail but succeeded");
@@ -136,16 +136,16 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
                     let _ = fs::hard_link("images/todo.png", output.banner_path());
                     writeln!(
                         log,
-                        "## Test Result\n\n![FAIL (TODO)]({banner_path})",
-                        banner_path = output.banner_path_str()
+                        "## Test Result\n\n![FAIL (TODO)]({banner_link})",
+                        banner_link = output.banner_link()
                     )
                     .expect("output error");
                 } else {
                     let _ = fs::hard_link("images/fail.png", output.banner_path());
                     writeln!(
                         log,
-                        "## Test Result\n\n![FAIL]({banner_path})",
-                        banner_path = output.banner_path_str()
+                        "## Test Result\n\n![FAIL]({banner_link})",
+                        banner_link = output.banner_link()
                     )
                     .expect("output error");
                     panic!("ERROR: {err}")
@@ -185,8 +185,8 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
                         let _ = fs::hard_link("images/ok.png", output.banner_path());
                         writeln!(
                             log,
-                            "## Test Result\n\n![OK]({banner_path})",
-                            banner_path = output.banner_path_str()
+                            "## Test Result\n\n![OK]({banner_link})",
+                            banner_link = output.banner_link()
                         )
                         .expect("output error");
                         match model.final_output_type() {
@@ -211,8 +211,8 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
                         let _ = fs::hard_link("images/not_todo.png", output.banner_path());
                         writeln!(
                             log,
-                            "## Test Result\n\n![OK BUT IS TODO]({banner_path})",
-                            banner_path = output.banner_path_str()
+                            "## Test Result\n\n![OK BUT IS TODO]({banner_link})",
+                            banner_link = output.banner_link()
                         )
                         .expect("output error");
                     }
@@ -221,8 +221,8 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
                         let _ = fs::hard_link("images/todo.png", output.banner_path());
                         writeln!(
                             log,
-                            "## Test Result\n\n![TODO]({banner_path})",
-                            banner_path = output.banner_path_str()
+                            "## Test Result\n\n![TODO]({banner_link})",
+                            banner_link = output.banner_link()
                         )
                         .expect("output error");
                     }
@@ -233,8 +233,8 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
                             .expect("No output error");
                         writeln!(
                             log,
-                            "## Test Result\n\n![FAIL]({banner_path})",
-                            banner_path = output.banner_path_str()
+                            "## Test Result\n\n![FAIL]({banner_link})",
+                            banner_link = output.banner_link()
                         )
                         .expect("output error");
                         panic!("ERROR: {err}")
@@ -244,8 +244,8 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
                         let _ = fs::hard_link("images/fail.png", output.banner_path());
                         writeln!(
                             log,
-                            "## Test Result\n\n![FAIL]({banner_path})",
-                            banner_path = output.banner_path_str()
+                            "## Test Result\n\n![FAIL]({banner_link})",
+                            banner_link = output.banner_link()
                         )
                         .expect("output error");
                         panic!(

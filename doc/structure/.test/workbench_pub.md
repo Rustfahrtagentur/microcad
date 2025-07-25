@@ -1,4 +1,4 @@
-# Test [`workbench_pub`](../doc/structure/functions.md#L120)
+# Test [`workbench_pub`](/doc/structure/functions.md#L120)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK BUT IS TODO](../doc/structure/.test/workbench_pub.png)
+![OK BUT IS TODO](/doc/structure/.test/workbench_pub.png)

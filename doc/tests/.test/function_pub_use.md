@@ -1,4 +1,4 @@
-# Test [`function_pub_use`](../doc/tests/statement_usage.md#L714)
+# Test [`function_pub_use`](/doc/tests/statement_usage.md#L714)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/function_pub_use.png)
+![OK](/doc/tests/.test/function_pub_use.png)

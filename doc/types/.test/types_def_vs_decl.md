@@ -1,4 +1,4 @@
-# Test [`types_def_vs_decl`](../doc/types/README.md#L28)
+# Test [`types_def_vs_decl`](/doc/types/README.md#L28)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/types/.test/types_def_vs_decl.png)
+![OK](/doc/types/.test/types_def_vs_decl.png)

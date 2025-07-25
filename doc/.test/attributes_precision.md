@@ -1,4 +1,4 @@
-# Test [`attributes_precision`](../doc/attributes.md#L56)
+# Test [`attributes_precision`](/doc/attributes.md#L56)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/.test/attributes_precision.png)
+![OK](/doc/.test/attributes_precision.png)

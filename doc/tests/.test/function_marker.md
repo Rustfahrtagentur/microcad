@@ -1,2 +1,2 @@
-# Test [`function_marker`](../doc/tests/statement_usage.md#L738)
+# Test [`function_marker`](/doc/tests/statement_usage.md#L738)
 

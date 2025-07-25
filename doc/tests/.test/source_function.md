@@ -1,4 +1,4 @@
-# Test [`source_function`](../doc/tests/statement_usage.md#L30)
+# Test [`source_function`](/doc/tests/statement_usage.md#L30)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/source_function.png)
+![OK](/doc/tests/.test/source_function.png)

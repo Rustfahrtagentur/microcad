@@ -1,4 +1,4 @@
-# Test [`code`](../doc/structure/workbench.md#L224)
+# Test [`code`](/doc/structure/workbench.md#L224)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/code.png)
+![OK](/doc/structure/.test/code.png)

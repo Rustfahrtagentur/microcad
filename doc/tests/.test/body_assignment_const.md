@@ -1,4 +1,4 @@
-# Test [`body_assignment_const`](../doc/tests/statement_usage.md#L632)
+# Test [`body_assignment_const`](/doc/tests/statement_usage.md#L632)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Assignment statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/body_assignment_const.png)
+![FAILED AS EXPECTED](/doc/tests/.test/body_assignment_const.png)

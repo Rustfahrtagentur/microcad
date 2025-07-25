@@ -1,4 +1,4 @@
-# Test [`module_return`](../doc/tests/statement_usage.md#L152)
+# Test [`module_return`](/doc/tests/statement_usage.md#L152)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Return statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/module_return.png)
+![FAILED AS EXPECTED](/doc/tests/.test/module_return.png)

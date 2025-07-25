@@ -1,4 +1,4 @@
-# Test [`module_init`](../doc/tests/statement_usage.md#L128)
+# Test [`module_init`](/doc/tests/statement_usage.md#L128)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Init statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/module_init.png)
+![FAILED AS EXPECTED](/doc/tests/.test/module_init.png)

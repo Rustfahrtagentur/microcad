@@ -1,4 +1,4 @@
-# Test [`workbench_return`](../doc/tests/statement_usage.md#L494)
+# Test [`workbench_return`](/doc/tests/statement_usage.md#L494)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Return statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/workbench_return.png)
+![FAILED AS EXPECTED](/doc/tests/.test/workbench_return.png)

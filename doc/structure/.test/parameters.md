@@ -1,4 +1,4 @@
-# Test [`parameters`](../doc/structure/op.md#L53)
+# Test [`parameters`](/doc/structure/op.md#L53)
 
 ## Parse Error
 
@@ -18,4 +18,4 @@ Parser error:  --> 3:8
   = expected COMMENT or expression
 ## Test Result
 
-![FAIL (TODO)](../doc/structure/.test/parameters.png)
+![FAIL (TODO)](/doc/structure/.test/parameters.png)

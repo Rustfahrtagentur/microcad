@@ -1,4 +1,4 @@
-# Test [`intersection_alt_operator`](../doc/libs/std/ops/intersection.md#L17)
+# Test [`intersection_alt_operator`](/doc/libs/std/ops/intersection.md#L17)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/libs/std/ops/.test/intersection_alt_operator.png)
+![OK](/doc/libs/std/ops/.test/intersection_alt_operator.png)

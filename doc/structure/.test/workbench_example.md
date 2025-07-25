@@ -1,4 +1,4 @@
-# Test [`workbench_example`](../doc/structure/functions.md#L98)
+# Test [`workbench_example`](/doc/structure/functions.md#L98)
 
 ## Output
 
@@ -24,4 +24,4 @@ error: Workbench circle cannot find initialization for those arguments
 
 ## Test Result
 
-![FAIL](../doc/structure/.test/workbench_example.png)
+![FAIL](/doc/structure/.test/workbench_example.png)

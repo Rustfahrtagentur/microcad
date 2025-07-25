@@ -1,4 +1,4 @@
-# Test [`module_use`](../doc/tests/statement_usage.md#L136)
+# Test [`module_use`](/doc/tests/statement_usage.md#L136)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Unexpected stack frame of type 'module' cannot store std
 
 ## Test Result
 
-![FAIL](../doc/tests/.test/module_use.png)
+![FAIL](/doc/tests/.test/module_use.png)

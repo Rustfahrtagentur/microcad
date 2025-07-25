@@ -1,4 +1,4 @@
-# Test [`pre_init_code`](../doc/structure/workbench.md#L172)
+# Test [`pre_init_code`](/doc/structure/workbench.md#L172)
 
 ## Output
 
@@ -24,4 +24,4 @@ error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
 
 ## Test Result
 
-![TODO](../doc/structure/.test/pre_init_code.png)
+![TODO](/doc/structure/.test/pre_init_code.png)

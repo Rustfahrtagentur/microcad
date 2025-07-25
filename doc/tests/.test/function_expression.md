@@ -1,4 +1,4 @@
-# Test [`function_expression`](../doc/tests/statement_usage.md#L770)
+# Test [`function_expression`](/doc/tests/statement_usage.md#L770)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/function_expression.png)
+![OK](/doc/tests/.test/function_expression.png)

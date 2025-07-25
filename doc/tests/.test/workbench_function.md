@@ -1,4 +1,4 @@
-# Test [`workbench_function`](../doc/tests/statement_usage.md#L462)
+# Test [`workbench_function`](/doc/tests/statement_usage.md#L462)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Symbol f not found.
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/workbench_function.png)
+![FAILED AS EXPECTED](/doc/tests/.test/workbench_function.png)

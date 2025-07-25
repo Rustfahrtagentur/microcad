@@ -1,4 +1,4 @@
-# Test [`module_expression`](../doc/tests/statement_usage.md#L200)
+# Test [`module_expression`](/doc/tests/statement_usage.md#L200)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Expression statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/module_expression.png)
+![FAILED AS EXPECTED](/doc/tests/.test/module_expression.png)

@@ -1,4 +1,4 @@
-# Test [`initial_source_file_mixed`](../doc/structure/source_files.md#L41)
+# Test [`initial_source_file_mixed`](/doc/structure/source_files.md#L41)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Cannot mix 2d and 3d geometries
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/structure/.test/initial_source_file_mixed.png)
+![FAILED AS EXPECTED](/doc/structure/.test/initial_source_file_mixed.png)

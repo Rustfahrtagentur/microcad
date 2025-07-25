@@ -1,4 +1,4 @@
-# Test [`example`](../doc/structure/functions.md#L14)
+# Test [`example`](/doc/structure/functions.md#L14)
 
 ## Output
 
@@ -14,4 +14,4 @@ ERROR: second
 
 ## Test Result
 
-![OK](../doc/structure/.test/example.png)
+![OK](/doc/structure/.test/example.png)

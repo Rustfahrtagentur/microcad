@@ -1,4 +1,4 @@
-# Test [`verify_assert_fail`](../doc/debug/README.md#L21)
+# Test [`verify_assert_fail`](/doc/debug/README.md#L21)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Assertion failed: false: this assertion fails
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/debug/.test/verify_assert_fail.png)
+![FAILED AS EXPECTED](/doc/debug/.test/verify_assert_fail.png)

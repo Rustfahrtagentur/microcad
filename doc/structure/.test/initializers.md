@@ -1,4 +1,4 @@
-# Test [`initializers`](../doc/structure/workbench.md#L112)
+# Test [`initializers`](/doc/structure/workbench.md#L112)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK BUT IS TODO](../doc/structure/.test/initializers.png)
+![OK BUT IS TODO](/doc/structure/.test/initializers.png)

@@ -1,4 +1,4 @@
-# Test [`source_return`](../doc/tests/statement_usage.md#L54)
+# Test [`source_return`](/doc/tests/statement_usage.md#L54)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Return statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/source_return.png)
+![FAILED AS EXPECTED](/doc/tests/.test/source_return.png)

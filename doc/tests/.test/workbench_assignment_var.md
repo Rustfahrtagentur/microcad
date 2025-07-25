@@ -1,4 +1,4 @@
-# Test [`workbench_assignment_var`](../doc/tests/statement_usage.md#L526)
+# Test [`workbench_assignment_var`](/doc/tests/statement_usage.md#L526)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/workbench_assignment_var.png)
+![OK](/doc/tests/.test/workbench_assignment_var.png)

@@ -1,4 +1,4 @@
-# Test [`init_expression_model`](../doc/tests/statement_usage.md#L436)
+# Test [`init_expression_model`](/doc/tests/statement_usage.md#L436)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Expression statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/init_expression_model.png)
+![FAILED AS EXPECTED](/doc/tests/.test/init_expression_model.png)

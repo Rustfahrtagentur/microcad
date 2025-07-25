@@ -1,4 +1,4 @@
-# Test [`part_basic`](../doc/structure/part.md#L8)
+# Test [`part_basic`](/doc/structure/part.md#L8)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/part_basic.png)
+![OK](/doc/structure/.test/part_basic.png)

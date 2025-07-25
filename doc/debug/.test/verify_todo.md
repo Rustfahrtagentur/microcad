@@ -1,4 +1,4 @@
-# Test [`verify_todo`](../doc/debug/README.md#L39)
+# Test [`verify_todo`](/doc/debug/README.md#L39)
 
 ## Output
 
@@ -18,4 +18,4 @@ info: a is zero
 
 ## Test Result
 
-![OK](../doc/debug/.test/verify_todo.png)
+![OK](/doc/debug/.test/verify_todo.png)

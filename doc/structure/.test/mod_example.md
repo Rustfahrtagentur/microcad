@@ -1,4 +1,4 @@
-# Test [`mod_example`](../doc/structure/modules.md#L11)
+# Test [`mod_example`](/doc/structure/modules.md#L11)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: No variables allowed in modules
 
 ## Test Result
 
-![FAIL](../doc/structure/.test/mod_example.png)
+![FAIL](/doc/structure/.test/mod_example.png)

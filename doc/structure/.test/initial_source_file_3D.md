@@ -1,4 +1,4 @@
-# Test [`initial_source_file_3D`](../doc/structure/source_files.md#L32)
+# Test [`initial_source_file_3D`](/doc/structure/source_files.md#L32)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK BUT IS TODO](../doc/structure/.test/initial_source_file_3D.png)
+![OK BUT IS TODO](/doc/structure/.test/initial_source_file_3D.png)

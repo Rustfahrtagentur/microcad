@@ -1,4 +1,4 @@
-# Test [`function_assignment_prop`](../doc/tests/statement_usage.md#L762)
+# Test [`function_assignment_prop`](/doc/tests/statement_usage.md#L762)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Assignment statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/function_assignment_prop.png)
+![FAILED AS EXPECTED](/doc/tests/.test/function_assignment_prop.png)

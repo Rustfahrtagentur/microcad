@@ -1,4 +1,4 @@
-# Test [`call_function`](../doc/structure/calls.md#L10)
+# Test [`call_function`](/doc/structure/calls.md#L10)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/call_function.png)
+![OK](/doc/structure/.test/call_function.png)

@@ -1,4 +1,4 @@
-# Test [`quantity_types_number_literals`](../doc/types/quantity.md#L27)
+# Test [`quantity_types_number_literals`](/doc/types/quantity.md#L27)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/types/.test/quantity_types_number_literals.png)
+![OK](/doc/types/.test/quantity_types_number_literals.png)

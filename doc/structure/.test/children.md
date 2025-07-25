@@ -1,4 +1,4 @@
-# Test [`children`](../doc/structure/op.md#L30)
+# Test [`children`](/doc/structure/op.md#L30)
 
 ## Parse Error
 
@@ -18,4 +18,4 @@ Parser error:  --> 4:8
   = expected COMMENT or expression
 ## Test Result
 
-![FAIL (TODO)](../doc/structure/.test/children.png)
+![FAIL (TODO)](/doc/structure/.test/children.png)

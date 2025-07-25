@@ -1,4 +1,4 @@
-# Test [`code_post_init`](../doc/structure/workbench.md#L237)
+# Test [`code_post_init`](/doc/structure/workbench.md#L237)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/code_post_init.png)
+![OK](/doc/structure/.test/code_post_init.png)

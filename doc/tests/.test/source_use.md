@@ -1,4 +1,4 @@
-# Test [`source_use`](../doc/tests/statement_usage.md#L42)
+# Test [`source_use`](/doc/tests/statement_usage.md#L42)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/source_use.png)
+![OK](/doc/tests/.test/source_use.png)

@@ -1,4 +1,4 @@
-# Test [`body_init`](../doc/tests/statement_usage.md#L584)
+# Test [`body_init`](/doc/tests/statement_usage.md#L584)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Init statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/body_init.png)
+![FAILED AS EXPECTED](/doc/tests/.test/body_init.png)

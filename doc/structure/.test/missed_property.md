@@ -1,4 +1,4 @@
-# Test [`missed_property`](../doc/structure/workbench.md#L152)
+# Test [`missed_property`](/doc/structure/workbench.md#L152)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Workbench plan incomplete. Missing properties: [Identifier: "radius", Ref
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/structure/.test/missed_property.png)
+![FAILED AS EXPECTED](/doc/structure/.test/missed_property.png)

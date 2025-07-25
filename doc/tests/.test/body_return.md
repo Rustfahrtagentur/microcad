@@ -1,4 +1,4 @@
-# Test [`body_return`](../doc/tests/statement_usage.md#L608)
+# Test [`body_return`](/doc/tests/statement_usage.md#L608)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Return statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/body_return.png)
+![FAILED AS EXPECTED](/doc/tests/.test/body_return.png)

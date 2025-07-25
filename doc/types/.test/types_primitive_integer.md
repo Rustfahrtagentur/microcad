@@ -1,4 +1,4 @@
-# Test [`types_primitive_integer`](../doc/types/primitive_types.md#L19)
+# Test [`types_primitive_integer`](/doc/types/primitive_types.md#L19)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/types/.test/types_primitive_integer.png)
+![OK](/doc/types/.test/types_primitive_integer.png)

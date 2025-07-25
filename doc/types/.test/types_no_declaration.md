@@ -1,4 +1,4 @@
-# Test [`types_no_declaration`](../doc/types/README.md#L38)
+# Test [`types_no_declaration`](/doc/types/README.md#L38)
 
 ## Parse Error
 
@@ -12,4 +12,4 @@ Parser error:  --> 1:10
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/types/.test/types_no_declaration.png)
+![FAILED AS EXPECTED](/doc/types/.test/types_no_declaration.png)

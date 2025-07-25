@@ -1,4 +1,4 @@
-# Test [`verify_assert`](../doc/debug/README.md#L15)
+# Test [`verify_assert`](/doc/debug/README.md#L15)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/debug/.test/verify_assert.png)
+![OK](/doc/debug/.test/verify_assert.png)

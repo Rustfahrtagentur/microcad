@@ -1,4 +1,4 @@
-# Test [`module_function`](../doc/tests/statement_usage.md#L120)
+# Test [`module_function`](/doc/tests/statement_usage.md#L120)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/module_function.png)
+![OK](/doc/tests/.test/module_function.png)

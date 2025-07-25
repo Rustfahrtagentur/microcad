@@ -1,4 +1,4 @@
-# Test [`types_named_tuple`](../doc/types/named_tuple.md#L9)
+# Test [`types_named_tuple`](/doc/types/named_tuple.md#L9)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/types/.test/types_named_tuple.png)
+![OK](/doc/types/.test/types_named_tuple.png)

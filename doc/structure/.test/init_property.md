@@ -1,4 +1,4 @@
-# Test [`init_property`](../doc/structure/workbench.md#L125)
+# Test [`init_property`](/doc/structure/workbench.md#L125)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/init_property.png)
+![OK](/doc/structure/.test/init_property.png)

@@ -1,4 +1,4 @@
-# Test [`math_trigonometric`](../doc/libs/std/math/README.md#L19)
+# Test [`math_trigonometric`](/doc/libs/std/math/README.md#L19)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/libs/std/math/.test/math_trigonometric.png)
+![OK](/doc/libs/std/math/.test/math_trigonometric.png)

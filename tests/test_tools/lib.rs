@@ -3,7 +3,7 @@
 
 #![allow(missing_docs)]
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub struct Output {
     pub name: String,
@@ -35,6 +35,14 @@ impl Output {
             .to_string_lossy()
             .escape_default()
             .to_string()
+    }
+    pub fn banner_link(&self) -> String {
+        format!(
+            "/{}",
+            Self::remove_first_component(&self.banner_path())
+                .to_string_lossy()
+                .escape_default()
+        )
     }
 
     pub fn out_name(&self) -> String {
@@ -75,7 +83,19 @@ impl Output {
     }
 
     pub fn reference(&self) -> String {
-        format!("{}#L{}", self.input_path.to_string_lossy(), self.line_no)
+        format!(
+            "/{}#L{}",
+            Self::remove_first_component(&self.input_path)
+                .to_string_lossy()
+                .escape_default(),
+            self.line_no
+        )
+    }
+
+    fn remove_first_component(path: &Path) -> PathBuf {
+        let mut components = path.components();
+        components.next(); // Entfernt die erste Komponente, z.B. ".."
+        components.collect() // Baut einen neuen PathBuf ohne die erste Komponente
     }
 }
 

@@ -1,4 +1,4 @@
-# Test [`function_return`](../doc/tests/statement_usage.md#L722)
+# Test [`function_return`](/doc/tests/statement_usage.md#L722)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/function_return.png)
+![OK](/doc/tests/.test/function_return.png)

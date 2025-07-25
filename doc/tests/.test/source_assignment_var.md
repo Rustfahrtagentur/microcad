@@ -1,4 +1,4 @@
-# Test [`source_assignment_var`](../doc/tests/statement_usage.md#L78)
+# Test [`source_assignment_var`](/doc/tests/statement_usage.md#L78)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/source_assignment_var.png)
+![OK](/doc/tests/.test/source_assignment_var.png)

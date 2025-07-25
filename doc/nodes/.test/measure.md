@@ -1,2 +1,2 @@
-# Test [`measure`](../doc/nodes/measures.md#L9)
+# Test [`measure`](/doc/nodes/measures.md#L9)
 

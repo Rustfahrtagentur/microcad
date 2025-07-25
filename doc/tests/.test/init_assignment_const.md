@@ -1,4 +1,4 @@
-# Test [`init_assignment_const`](../doc/tests/statement_usage.md#L404)
+# Test [`init_assignment_const`](/doc/tests/statement_usage.md#L404)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Assignment statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/init_assignment_const.png)
+![FAILED AS EXPECTED](/doc/tests/.test/init_assignment_const.png)

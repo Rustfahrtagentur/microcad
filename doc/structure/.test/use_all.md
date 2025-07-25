@@ -1,4 +1,4 @@
-# Test [`use_all`](../doc/structure/use.md#L87)
+# Test [`use_all`](/doc/structure/use.md#L87)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK BUT IS TODO](../doc/structure/.test/use_all.png)
+![OK BUT IS TODO](/doc/structure/.test/use_all.png)

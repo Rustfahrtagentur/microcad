@@ -1,4 +1,4 @@
-# Test [`workbench_expression`](../doc/tests/statement_usage.md#L542)
+# Test [`workbench_expression`](/doc/tests/statement_usage.md#L542)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK BUT SHOULD FAIL](../doc/tests/.test/workbench_expression.png)
+![OK BUT SHOULD FAIL](/doc/tests/.test/workbench_expression.png)

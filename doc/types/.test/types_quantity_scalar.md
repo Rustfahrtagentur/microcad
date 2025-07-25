@@ -1,4 +1,4 @@
-# Test [`types_quantity_scalar`](../doc/types/quantity.md#L47)
+# Test [`types_quantity_scalar`](/doc/types/quantity.md#L47)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/types/.test/types_quantity_scalar.png)
+![OK](/doc/types/.test/types_quantity_scalar.png)

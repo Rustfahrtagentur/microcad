@@ -1,4 +1,4 @@
-# Test [`function_module`](../doc/tests/statement_usage.md#L682)
+# Test [`function_module`](/doc/tests/statement_usage.md#L682)
 
 ## Output
 
@@ -18,4 +18,4 @@ error: Module statement not available here
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/function_module.png)
+![FAILED AS EXPECTED](/doc/tests/.test/function_module.png)

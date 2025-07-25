@@ -1,2 +1,2 @@
-# Test [`init_marker`](../doc/tests/statement_usage.md#L396)
+# Test [`init_marker`](/doc/tests/statement_usage.md#L396)
 

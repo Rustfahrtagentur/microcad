@@ -1,4 +1,4 @@
-# Test [`part_declaration`](../doc/structure/workbench.md#L43)
+# Test [`part_declaration`](/doc/structure/workbench.md#L43)
 
 ## Output
 
@@ -38,4 +38,4 @@ error: Missing arguments: [Identifier: "v", Refer: <no_ref>]
 
 ## Test Result
 
-![TODO](../doc/structure/.test/part_declaration.png)
+![TODO](/doc/structure/.test/part_declaration.png)

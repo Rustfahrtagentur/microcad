@@ -1,4 +1,4 @@
-# Test [`building_plan`](../doc/structure/workbench.md#L95)
+# Test [`building_plan`](/doc/structure/workbench.md#L95)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/building_plan.png)
+![OK](/doc/structure/.test/building_plan.png)

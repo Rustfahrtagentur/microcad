@@ -1,4 +1,4 @@
-# Test [`tuple_match`](../doc/structure/arguments.md#L62)
+# Test [`tuple_match`](/doc/structure/arguments.md#L62)
 
 ## Output
 
@@ -30,4 +30,4 @@ error: Missing arguments: [Identifier: "x", Refer: 2:7 (53..54) in 0x8c3d267be16
 
 ## Test Result
 
-![TODO](../doc/structure/.test/tuple_match.png)
+![TODO](/doc/structure/.test/tuple_match.png)

@@ -1,4 +1,4 @@
-# Test [`difference_operator`](../doc/libs/std/ops/difference.md#L9)
+# Test [`difference_operator`](/doc/libs/std/ops/difference.md#L9)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/libs/std/ops/.test/difference_operator.png)
+![OK](/doc/libs/std/ops/.test/difference_operator.png)

@@ -1,4 +1,4 @@
-# Test [`workbench_expression_model`](../doc/tests/statement_usage.md#L550)
+# Test [`workbench_expression_model`](/doc/tests/statement_usage.md#L550)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/workbench_expression_model.png)
+![OK](/doc/tests/.test/workbench_expression_model.png)

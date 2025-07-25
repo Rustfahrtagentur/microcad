@@ -1,4 +1,4 @@
-# Test [`types_bundles_functions`](../doc/types/README.md#L46)
+# Test [`types_bundles_functions`](/doc/types/README.md#L46)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/types/.test/types_bundles_functions.png)
+![OK](/doc/types/.test/types_bundles_functions.png)

@@ -1,4 +1,4 @@
-# Test [`call_workbench`](../doc/structure/calls.md#L28)
+# Test [`call_workbench`](/doc/structure/calls.md#L28)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/call_workbench.png)
+![OK](/doc/structure/.test/call_workbench.png)

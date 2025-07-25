@@ -1,4 +1,4 @@
-# Test [`op_example`](../doc/structure/op.md#L12)
+# Test [`op_example`](/doc/structure/op.md#L12)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/op_example.png)
+![OK](/doc/structure/.test/op_example.png)

@@ -1,4 +1,4 @@
-# Test [`math_abs`](../doc/libs/std/math/README.md#L11)
+# Test [`math_abs`](/doc/libs/std/math/README.md#L11)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/libs/std/math/.test/math_abs.png)
+![OK](/doc/libs/std/math/.test/math_abs.png)

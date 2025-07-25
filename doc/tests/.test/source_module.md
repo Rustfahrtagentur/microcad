@@ -1,4 +1,4 @@
-# Test [`source_module`](../doc/tests/statement_usage.md#L24)
+# Test [`source_module`](/doc/tests/statement_usage.md#L24)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/tests/.test/source_module.png)
+![OK](/doc/tests/.test/source_module.png)

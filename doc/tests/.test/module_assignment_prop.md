@@ -1,4 +1,4 @@
-# Test [`module_assignment_prop`](../doc/tests/statement_usage.md#L192)
+# Test [`module_assignment_prop`](/doc/tests/statement_usage.md#L192)
 
 ## Output
 
@@ -24,4 +24,4 @@ error: No variables allowed in modules
 
 ## Test Result
 
-![FAILED AS EXPECTED](../doc/tests/.test/module_assignment_prop.png)
+![FAILED AS EXPECTED](/doc/tests/.test/module_assignment_prop.png)

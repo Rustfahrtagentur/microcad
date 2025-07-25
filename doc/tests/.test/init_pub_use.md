@@ -1,4 +1,4 @@
-# Test [`init_pub_use`](../doc/tests/statement_usage.md#L372)
+# Test [`init_pub_use`](/doc/tests/statement_usage.md#L372)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK BUT IS TODO](../doc/tests/.test/init_pub_use.png)
+![OK BUT IS TODO](/doc/tests/.test/init_pub_use.png)

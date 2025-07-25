@@ -1,4 +1,4 @@
-# Test [`sketch_basic`](../doc/structure/sketch.md#L8)
+# Test [`sketch_basic`](/doc/structure/sketch.md#L8)
 
 ## Output
 
@@ -12,4 +12,4 @@
 
 ## Test Result
 
-![OK](../doc/structure/.test/sketch_basic.png)
+![OK](/doc/structure/.test/sketch_basic.png)
