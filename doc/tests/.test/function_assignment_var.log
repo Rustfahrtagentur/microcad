@@ -10,11 +10,5 @@ fn f() {
 
 -- Output --
 -- Errors --
-error: Assignment statement not available here
-  ---> <from_str>:2:3
-     |
-   2 |   a = 1;
-     |   ^^^^^^
-     |
 -- Test Result --
-FAIL
+OK
