@@ -1,6 +1,13 @@
 -- Test --
   workbench_workbench
   ../doc/tests/statement_usage.md:446
+
+-- Code --
+
+sketch k() {
+  sketch f() {} f();
+} k();
+
 -- Output --
 -- Errors --
 error: sketch statement not available here

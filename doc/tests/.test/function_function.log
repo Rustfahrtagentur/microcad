@@ -1,6 +1,13 @@
 -- Test --
   function_function
   ../doc/tests/statement_usage.md:690
+
+-- Code --
+
+fn f() {
+  fn f() {}
+} f();
+
 -- Output --
 -- Errors --
 error: Function statement not available here

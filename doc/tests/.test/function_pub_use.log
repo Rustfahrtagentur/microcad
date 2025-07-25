@@ -1,6 +1,13 @@
 -- Test --
   function_pub_use
   ../doc/tests/statement_usage.md:714
+
+-- Code --
+
+fn f() {
+  pub use std;
+} f();
+
 -- Output --
 -- Errors --
 -- Test Result --

@@ -1,6 +1,11 @@
 -- Test --
   source_if
   ../doc/tests/statement_usage.md:60
+
+-- Code --
+
+if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+
 -- Output --
 -- Errors --
 -- Test Result --

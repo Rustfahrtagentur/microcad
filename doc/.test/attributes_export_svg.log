@@ -1,3 +1,9 @@
 -- Test --
   attributes_export_svg
   ../doc/attributes.md:104
+
+-- Code --
+
+#[export: svg("circle.svg")]
+c = std::geo2d::circle(42.0mm);
+

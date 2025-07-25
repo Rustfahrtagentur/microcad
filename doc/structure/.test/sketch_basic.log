@@ -1,6 +1,11 @@
 -- Test --
   sketch_basic
   ../doc/structure/sketch.md:8
+
+-- Code --
+
+sketch my_sketch() {}
+
 -- Output --
 -- Errors --
 -- Test Result --

@@ -1,6 +1,11 @@
 -- Test --
   unnamed_tuple
   ../doc/types/tuples.md:29
+
+-- Code --
+
+tuple = (10cm, 10cm², 1l);
+
 -- Output --
 -- Errors --
 -- Test Result --

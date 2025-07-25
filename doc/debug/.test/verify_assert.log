@@ -1,6 +1,11 @@
 -- Test --
   verify_assert
   ../doc/debug/README.md:15
+
+-- Code --
+
+std::debug::assert(true, "You won't see this message");
+
 -- Output --
 -- Errors --
 -- Test Result --

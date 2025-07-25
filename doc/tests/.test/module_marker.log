@@ -1,6 +1,13 @@
 -- Test --
   module_marker
   ../doc/tests/statement_usage.md:168
+
+-- Code --
+
+mod k {
+  @children
+}
+
 -- Output --
 -- Errors --
 -- Test Result --

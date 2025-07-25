@@ -1,6 +1,17 @@
 -- Test --
   missed_property
   ../doc/structure/workbench.md:152
+
+-- Code --
+
+sketch wheel(radius: Length) {
+    init( width: Length ) { 
+        // evaluation error: misses to set `radius` from building plan
+    }
+}
+
+wheel(width = 1.0mm);
+
 -- Output --
 -- Errors --
 error: Workbench plan incomplete. Missing properties: [Identifier: "radius", Refer: 1:14 (13..19) in 0xf3cdaa8ec03331ff]

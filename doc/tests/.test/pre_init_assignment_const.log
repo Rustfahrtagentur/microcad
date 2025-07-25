@@ -1,6 +1,13 @@
 -- Test --
   pre_init_assignment_const
   ../doc/tests/statement_usage.md:290
+
+-- Code --
+
+sketch k() { 
+  const B = 1;
+init(l:Length) {} } k();
+
 -- Output --
 -- Errors --
 -- Test Result --

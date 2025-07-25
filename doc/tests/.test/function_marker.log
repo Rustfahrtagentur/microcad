@@ -1,6 +1,13 @@
 -- Test --
   function_marker
   ../doc/tests/statement_usage.md:738
+
+-- Code --
+
+fn f() {
+  @children
+} f();
+
 -- Output --
 -- Errors --
 error: @children statement not available here

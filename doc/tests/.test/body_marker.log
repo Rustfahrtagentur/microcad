@@ -1,6 +1,13 @@
 -- Test --
   body_marker
   ../doc/tests/statement_usage.md:624
+
+-- Code --
+
+{
+  @children
+}
+
 -- Output --
 -- Errors --
 -- Test Result --

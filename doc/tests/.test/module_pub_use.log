@@ -1,6 +1,13 @@
 -- Test --
   module_pub_use
   ../doc/tests/statement_usage.md:144
+
+-- Code --
+
+mod k {
+  pub use std;
+}
+
 -- Output --
 -- Errors --
 error: Unexpected stack frame of type 'module' cannot store std

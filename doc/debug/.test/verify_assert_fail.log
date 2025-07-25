@@ -1,6 +1,11 @@
 -- Test --
   verify_assert_fail
   ../doc/debug/README.md:21
+
+-- Code --
+
+std::debug::assert(false, "this assertion fails");
+
 -- Output --
 -- Errors --
 error: Assertion failed: false: this assertion fails

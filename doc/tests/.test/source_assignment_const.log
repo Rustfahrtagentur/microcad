@@ -1,6 +1,11 @@
 -- Test --
   source_assignment_const
   ../doc/tests/statement_usage.md:72
+
+-- Code --
+
+const B = 1;
+
 -- Output --
 -- Errors --
 -- Test Result --

@@ -1,7 +1,20 @@
 -- Test --
   body_expression
   ../doc/tests/statement_usage.md:656
+
+-- Code --
+
+{
+  1 + 2;
+}
+
 -- Output --
 -- Errors --
+warning: This expression statement did not produce any model
+  ---> <from_str>:2:3
+     |
+   2 |   1 + 2;
+     |   ^^^^^^
+     |
 -- Test Result --
 OK

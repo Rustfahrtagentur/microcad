@@ -1,6 +1,13 @@
 -- Test --
   workbench_assignment_prop
   ../doc/tests/statement_usage.md:534
+
+-- Code --
+
+sketch k() {
+  prop a = 1;
+} k();
+
 -- Output --
 -- Errors --
 -- Test Result --

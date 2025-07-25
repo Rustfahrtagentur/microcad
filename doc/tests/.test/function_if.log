@@ -1,6 +1,13 @@
 -- Test --
   function_if
   ../doc/tests/statement_usage.md:730
+
+-- Code --
+
+fn f() {
+  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+} f();
+
 -- Output --
 -- Errors --
 error: Not implemented: evaluate if statement in function

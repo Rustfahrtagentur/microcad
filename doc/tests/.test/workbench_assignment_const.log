@@ -1,6 +1,13 @@
 -- Test --
   workbench_assignment_const
   ../doc/tests/statement_usage.md:518
+
+-- Code --
+
+sketch k() {
+  const B = 1;
+} k();
+
 -- Output --
 -- Errors --
 -- Test Result --

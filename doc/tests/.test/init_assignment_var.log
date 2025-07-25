@@ -1,6 +1,13 @@
 -- Test --
   init_assignment_var
   ../doc/tests/statement_usage.md:412
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  a = 1;
+} } k(1cm);
+
 -- Output --
 -- Errors --
 -- Test Result --

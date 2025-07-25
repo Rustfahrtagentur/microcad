@@ -1,6 +1,13 @@
 -- Test --
   pre_init_marker
   ../doc/tests/statement_usage.md:282
+
+-- Code --
+
+sketch k() { 
+  @children
+init(l:Length) {} } k();
+
 -- Parse Error --
 Statement not allowed prior initializers
 -- Test Result --

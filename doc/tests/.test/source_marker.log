@@ -1,6 +1,11 @@
 -- Test --
   source_marker
   ../doc/tests/statement_usage.md:66
+
+-- Code --
+
+@children
+
 -- Output --
 -- Errors --
 -- Test Result --

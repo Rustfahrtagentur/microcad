@@ -1,6 +1,13 @@
 -- Test --
   pre_init_init
   ../doc/tests/statement_usage.md:242
+
+-- Code --
+
+sketch k() { 
+  init() {}
+init(l:Length) {} } k();
+
 -- Output --
 -- Errors --
 -- Test Result --

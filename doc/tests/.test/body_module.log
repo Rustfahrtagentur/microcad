@@ -1,6 +1,13 @@
 -- Test --
   body_module
   ../doc/tests/statement_usage.md:568
+
+-- Code --
+
+{
+  mod m {}
+}
+
 -- Output --
 -- Errors --
 error: Module statement not available here

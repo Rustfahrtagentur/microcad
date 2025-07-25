@@ -1,6 +1,11 @@
 -- Test --
   math_abs
   ../doc/libs/std/math/README.md:11
+
+-- Code --
+
+std::debug::assert(std::math::abs(-1) == 1);
+
 -- Output --
 -- Errors --
 -- Test Result --

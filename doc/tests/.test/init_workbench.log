@@ -1,6 +1,13 @@
 -- Test --
   init_workbench
   ../doc/tests/statement_usage.md:332
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  sketch f() {}
+} } k(1cm);
+
 -- Output --
 -- Errors --
 error: sketch statement not available here

@@ -1,6 +1,13 @@
 -- Test --
   init_function
   ../doc/tests/statement_usage.md:348
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  fn f() {}
+} } k(1cm);
+
 -- Output --
 -- Errors --
 error: Function statement not available here

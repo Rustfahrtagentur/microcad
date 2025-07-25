@@ -1,9 +1,22 @@
 -- Test --
   module_expression
   ../doc/tests/statement_usage.md:200
+
+-- Code --
+
+mod k {
+  1 + 2;
+}
+
 -- Output --
 -- Errors --
 error: Expression statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   1 + 2;
+     |   ^^^^^^
+     |
+warning: This expression statement did not produce any model
   ---> <from_str>:2:3
      |
    2 |   1 + 2;

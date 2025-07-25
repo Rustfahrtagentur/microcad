@@ -1,6 +1,13 @@
 -- Test --
   body_assignment_var
   ../doc/tests/statement_usage.md:640
+
+-- Code --
+
+{
+  a = 1;
+}
+
 -- Output --
 -- Errors --
 -- Test Result --

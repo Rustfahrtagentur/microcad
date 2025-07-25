@@ -1,6 +1,29 @@
 -- Test --
   tuple_match_variants
   ../doc/structure/arguments.md:80
+
+-- Code --
+
+fn f( x: Length, y: Length, z: Length ) {}
+
+// Every parameter given by name
+f( x=1cm, y=2cm, z=3cm);
+
+// Parameters given by named tuple
+f( (x=1cm, y=2cm, z=3cm) );
+
+// Parameters given by named tuple variable
+p = (x=1cm, y=2cm, z=3cm);
+f( p );
+
+// Parameters given by named tuple and a single value
+f( (x=1cm, y=2cm), z=3cm );
+f( y=2cm, (x=1cm, z=3cm) );
+
+// Parameters given by named tuple variable and a single value
+q = (x=1cm, y=2cm);
+f( q, z=3cm );
+
 -- Output --
 -- Errors --
 error: Missing arguments: [Identifier: "x", Refer: 1:7 (6..7) in 0x8db139f92f453785, Identifier: "y", Refer: 1:18 (17..18) in 0x8db139f92f453785, Identifier: "z", Refer: 1:29 (28..29) in 0x8db139f92f453785]

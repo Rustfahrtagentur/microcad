@@ -1,6 +1,13 @@
 -- Test --
   argument_match_type
   ../doc/structure/arguments.md:36
+
+-- Code --
+
+fn f( a: Scalar, b: Length, c: Area ) {}
+// Who needs names?
+f(1.0, 2cm, 3cm²);
+
 -- Output --
 -- Errors --
 error: Missing arguments: [Identifier: "c", Refer: 1:29 (28..29) in 0x78564033032ddc09]

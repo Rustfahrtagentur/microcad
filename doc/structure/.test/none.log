@@ -1,6 +1,12 @@
 -- Test --
   none
   ../doc/structure/use.md:21
+
+-- Code --
+
+std::geo3d::sphere(radius = 40mm);
+std::geo3d::cube(size = 40mm);
+
 -- Output --
 -- Errors --
 -- Test Result --

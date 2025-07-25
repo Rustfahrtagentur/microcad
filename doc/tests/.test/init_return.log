@@ -1,6 +1,13 @@
 -- Test --
   init_return
   ../doc/tests/statement_usage.md:380
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  return 1;
+} } k(1cm);
+
 -- Output --
 -- Errors --
 error: Return statement not available here

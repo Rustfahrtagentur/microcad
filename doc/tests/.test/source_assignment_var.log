@@ -1,6 +1,11 @@
 -- Test --
   source_assignment_var
   ../doc/tests/statement_usage.md:78
+
+-- Code --
+
+a = 1;
+
 -- Output --
 -- Errors --
 -- Test Result --

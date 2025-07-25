@@ -1,6 +1,16 @@
 -- Test --
   types_quantity_length
   ../doc/types/quantity.md:59
+
+-- Code --
+
+millimeters = 1000mm;
+centimeters = 100cm;
+meters = 1m;
+inches = 39.37007874015748in;
+
+std::debug::assert( [millimeters, centimeters, meters, inches].all_equal() );
+
 -- Output --
 -- Errors --
 -- Test Result --

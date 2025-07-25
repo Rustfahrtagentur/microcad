@@ -1,6 +1,13 @@
 -- Test --
   module_workbench
   ../doc/tests/statement_usage.md:104
+
+-- Code --
+
+mod k {
+  sketch f() {}
+}
+
 -- Output --
 -- Errors --
 -- Test Result --

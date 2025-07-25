@@ -1,6 +1,29 @@
 -- Test --
   init_property
   ../doc/structure/workbench.md:125
+
+-- Code --
+
+part wheel(radius: Length, thickness: Length) {
+    // initializer with diameter
+    init( diameter: Length, thickness: Length ) {
+        // must set `radius` in code 
+        radius = diameter / 2;
+
+        // thickness (from the building plan) does not need 
+        // to be set, because it was automatically set by 
+        // parameter of this initializer
+    }
+
+    // Now radius and thickness can be used
+    std::geo2d::circle(radius) - std::geo2d::circle(radius - thickness);
+}
+
+// call with building plan
+wheel(radius=5cm, thickness=1cm);
+// call with initializer
+wheel(diameter=10cm, thickness=1cm);
+
 -- Output --
 -- Errors --
 -- Test Result --

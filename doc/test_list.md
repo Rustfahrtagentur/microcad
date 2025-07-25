@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**199** tests from markdown.
+**200** tests from markdown.
 
 | Result | Name |
 |-------:|------|
