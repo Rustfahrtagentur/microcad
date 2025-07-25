@@ -1,6 +1,6 @@
 # Tests
 
-- [Statment Usage](#statment-usage)
+- [Statement Usage](#statement-usage)
   - [Source](#source)
   - [Module](#module)
   - [Pre-Init](#pre-init)
@@ -9,7 +9,7 @@
   - [Body](#body)
   - [Function](#function)
 
-## Statment Usage
+## Statement Usage
 
 ### Source
 
