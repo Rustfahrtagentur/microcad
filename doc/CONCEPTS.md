@@ -107,12 +107,12 @@ Any errors which occur here are related to geometrical processing.
 
 | Stack frame | workbench | module | function | init  |  use  | pub use | return |  if   | marker |    assignment    | expression |
 | :---------- | :-------: | :----: | :------: | :---: | :---: | :-----: | :----: | :---: | :----: | :--------------: | :--------: |
-| Source      |    yes    |  yes   |   yes    |   -   |  yes  |   yes   |   -    |  yes  |   -    |    const, var    |   model    |
+| Source      |    yes    |  yes   |   yes    |   -   |  yes  |   yes   |   -    |  yes  |   -    |    const, var    |    yes     |
 | Module      |    yes    |  yes   |   yes    |   -   |  yes  |   yes   |   -    |   -   |   -    |    const, var    |     -      |
 | Pre-Init    |     -     |   -    |    -     |  yes  |  yes  |    -    |   -    |   -   |   -    |      const       |     -      |
 | Init        |     -     |   -    |    -     |   -   |  yes  |    -    |   -    |   -   |   -    |       var        |     -      |
-| Workbench   |     -     |   -    |    -     |  yes  |  yes  |    -    |   -    |  yes  |  yes   | const, var, prop |   model    |
-| Body        |     -     |   -    |    -     |   -   |  yes  |    -    |   -    |  yes  | ?yes?  |    const, var    |   ?yes?    |
+| Workbench   |     -     |   -    |    -     |  yes  |  yes  |    -    |   -    |  yes  |  yes   | const, var, prop |    yes     |
+| Body        |     -     |   -    |    -     |   -   |  yes  |    -    |   -    |  yes  | ?yes?  |    const, var    |    yes     |
 | Function    |     -     |   -    |    -     |   -   |  yes  |    -    |  yes   |  yes  |   -    |       var        |    yes     |
 | Call        |     -     |   -    |    -     |   -   |   -   |    -    |   -    |   -   |   -    |        -         |     -      |
 

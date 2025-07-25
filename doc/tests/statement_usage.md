@@ -87,7 +87,7 @@ prop a = 1;
 
 [![test](.test/source_expression.png)](.test/source_expression.log)
 
-```µcad,source_expression#fail
+```µcad,source_expression
 1 + 2;
 ```
 
