@@ -1,5 +1,12 @@
 # Test [`source_assignment_prop`](/doc/tests/statement_usage.md#L84)
 
+## Code
+
+```µcad
+prop a = 1;
+
+```
+
 ## Output
 
 ```,plain

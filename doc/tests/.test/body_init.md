@@ -1,5 +1,14 @@
 # Test [`body_init`](/doc/tests/statement_usage.md#L584)
 
+## Code
+
+```µcad
+{
+  init() {}
+}
+
+```
+
 ## Output
 
 ```,plain

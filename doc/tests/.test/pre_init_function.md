@@ -1,5 +1,14 @@
 # Test [`pre_init_function`](/doc/tests/statement_usage.md#L234)
 
+## Code
+
+```µcad
+sketch k() { 
+  fn f() {} f();
+init(l:Length) {} } k();
+
+```
+
 ## Parse Error
 
 ```,plain

@@ -1,5 +1,14 @@
 # Test [`module_assignment_prop`](/doc/tests/statement_usage.md#L192)
 
+## Code
+
+```µcad
+mod k {
+  prop a = 1;
+}
+
+```
+
 ## Output
 
 ```,plain

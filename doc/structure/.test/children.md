@@ -1,5 +1,27 @@
 # Test [`children`](/doc/structure/op.md#L30)
 
+## Code
+
+```µcad
+// define operation which takes multiple items
+op punched_disk() { 
+    // check number of children
+    if @children.count() == 2 {
+        // make hole
+        difference() { @children } 
+    } else {
+        std::error("punched_disk must get two objects");
+    }
+}
+
+// use operation punch_disk with two circles
+punched_disk() {
+    std::geo2d::circle(radius = 1cm);
+    std::geo2d::circle(radius = 2cm);
+}
+
+```
+
 ## Parse Error
 
 ```,plain

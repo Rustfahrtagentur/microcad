@@ -1,5 +1,12 @@
 # Test [`source_init`](/doc/tests/statement_usage.md#L36)
 
+## Code
+
+```µcad
+init() {}
+
+```
+
 ## Output
 
 ```,plain

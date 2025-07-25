@@ -1,5 +1,22 @@
 # Test [`tuple_match`](/doc/structure/arguments.md#L62)
 
+## Code
+
+```µcad
+// Function with three parameters: x, y, and z
+fn f( x: Length, y: Length, z: Length ) {}
+
+// Since we do not want to change x and y in the following statements,
+// we prepare a tuple named plane:
+plane = (x=1cm, y=2cm);
+
+// Then we pass plane to f() three times with different z values
+f( plane, z=3cm);
+f( plane, z=6cm);
+f( plane, z=9cm);
+
+```
+
 ## Output
 
 ```,plain

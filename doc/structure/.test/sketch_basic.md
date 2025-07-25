@@ -1,5 +1,12 @@
 # Test [`sketch_basic`](/doc/structure/sketch.md#L8)
 
+## Code
+
+```µcad
+sketch my_sketch() {}
+
+```
+
 ## Output
 
 ```,plain

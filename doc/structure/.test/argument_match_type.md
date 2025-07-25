@@ -1,5 +1,14 @@
 # Test [`argument_match_type`](/doc/structure/arguments.md#L36)
 
+## Code
+
+```µcad
+fn f( a: Scalar, b: Length, c: Area ) {}
+// Who needs names?
+f(1.0, 2cm, 3cm²);
+
+```
+
 ## Output
 
 ```,plain

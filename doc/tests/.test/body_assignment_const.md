@@ -1,5 +1,14 @@
 # Test [`body_assignment_const`](/doc/tests/statement_usage.md#L632)
 
+## Code
+
+```µcad
+{
+  const B = 1;
+}
+
+```
+
 ## Output
 
 ```,plain

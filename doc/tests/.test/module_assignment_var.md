@@ -1,5 +1,14 @@
 # Test [`module_assignment_var`](/doc/tests/statement_usage.md#L184)
 
+## Code
+
+```µcad
+mod k {
+  a = 1;
+}
+
+```
+
 ## Output
 
 ```,plain

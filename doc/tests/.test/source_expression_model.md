@@ -1,5 +1,12 @@
 # Test [`source_expression_model`](/doc/tests/statement_usage.md#L96)
 
+## Code
+
+```µcad
+__builtin::geo2d::circle(radius=1);
+
+```
+
 ## Output
 
 ```,plain

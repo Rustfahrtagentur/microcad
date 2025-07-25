@@ -1,5 +1,16 @@
 # Test [`illegal_workbench_statement`](/doc/structure/workbench.md#L253)
 
+## Code
+
+```µcad
+sketch wheel(radius: Length) {
+    sketch axis(length: Length) {}
+}
+
+wheel(radius = 1.0mm);
+
+```
+
 ## Output
 
 ```,plain

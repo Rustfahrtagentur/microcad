@@ -1,5 +1,18 @@
 # Test [`verify_todo`](/doc/debug/README.md#L39)
 
+## Code
+
+```µcad
+a = 0;
+
+if a == 0 {
+    std::info("a is zero");
+} else {
+    std::todo("print proper message");
+}
+
+```
+
 ## Output
 
 ```,plain

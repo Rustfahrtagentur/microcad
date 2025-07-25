@@ -1,5 +1,14 @@
 # Test [`module_expression_model`](/doc/tests/statement_usage.md#L208)
 
+## Code
+
+```µcad
+mod k {
+  __builtin::geo2d::circle(radius=1);
+}
+
+```
+
 ## Output
 
 ```,plain

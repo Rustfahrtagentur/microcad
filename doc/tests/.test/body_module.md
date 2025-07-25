@@ -1,5 +1,14 @@
 # Test [`body_module`](/doc/tests/statement_usage.md#L568)
 
+## Code
+
+```µcad
+{
+  mod m {}
+}
+
+```
+
 ## Output
 
 ```,plain

@@ -1,5 +1,18 @@
 # Test [`missed_property`](/doc/structure/workbench.md#L152)
 
+## Code
+
+```µcad
+sketch wheel(radius: Length) {
+    init( width: Length ) { 
+        // evaluation error: misses to set `radius` from building plan
+    }
+}
+
+wheel(width = 1.0mm);
+
+```
+
 ## Output
 
 ```,plain

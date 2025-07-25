@@ -1,5 +1,30 @@
 # Test [`property`](/doc/structure/workbench.md#L272)
 
+## Code
+
+```µcad
+// `outer` will automatically become a property because
+// it is declared in the building plan:
+sketch wheel(outer: length) {
+    use std::geo2d::circle;
+
+    // `inner` is declared as property and maybe read from 
+    // outside this workbench
+    prop inner = outer / 2;
+
+    // generate wheel (and use property inner)
+    circle(outer) - circle(inner);
+}
+
+// evaluate wheel
+t = wheel(1cm);
+
+// extract and display `outer` and `inner` from generated wheel
+info("outer: {t.outer}");
+info("inner: {t.inner}");
+
+```
+
 ## Output
 
 ```,plain

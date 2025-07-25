@@ -1,5 +1,14 @@
 # Test [`module_init`](/doc/tests/statement_usage.md#L128)
 
+## Code
+
+```µcad
+mod k {
+  init() { }
+}
+
+```
+
 ## Output
 
 ```,plain

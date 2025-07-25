@@ -1,5 +1,18 @@
 # Test [`tuple_assignment_convert`](/doc/types/tuples.md#L75)
 
+## Code
+
+```µcad
+array = [1,2]m;
+(width, height) = array;
+tuple = (width, height);
+
+assert_eq([tuple,(1m,2m)]);
+assert_eq([tuple.width,1m]);
+assert_eq([tuple.height,2m]);
+
+```
+
 ## Parse Error
 
 ```,plain

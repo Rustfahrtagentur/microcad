@@ -1,5 +1,14 @@
 # Test [`init_module`](/doc/tests/statement_usage.md#L340)
 
+## Code
+
+```µcad
+sketch k() { init(l:Length) {
+  mod m {}
+} } k(1cm);
+
+```
+
 ## Output
 
 ```,plain

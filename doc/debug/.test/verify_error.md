@@ -1,5 +1,12 @@
 # Test [`verify_error`](/doc/debug/README.md#L29)
 
+## Code
+
+```µcad
+std::error("this should not have happened");
+
+```
+
 ## Output
 
 ```,plain

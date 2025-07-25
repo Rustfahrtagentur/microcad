@@ -1,5 +1,12 @@
 # Test [`types_no_declaration`](/doc/types/README.md#L38)
 
+## Code
+
+```µcad
+x: Length;         // error
+
+```
+
 ## Parse Error
 
 ```,plain

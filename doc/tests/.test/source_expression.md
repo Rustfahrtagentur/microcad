@@ -1,5 +1,12 @@
 # Test [`source_expression`](/doc/tests/statement_usage.md#L90)
 
+## Code
+
+```µcad
+1 + 2;
+
+```
+
 ## Output
 
 ```,plain

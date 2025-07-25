@@ -1,5 +1,25 @@
 # Test [`mod_example`](/doc/structure/modules.md#L11)
 
+## Code
+
+```µcad
+mod std {
+    mod math {
+        // define PI as property
+        PI = 3.14159;
+
+        // define calculation function
+        fn abs(x: Scalar) -> Scalar {
+            if x < 0 { return -x; } else { return x; }
+        }
+    }
+}
+
+// call both
+x = std::math::abs(-1) * std::math::PI;
+
+```
+
 ## Output
 
 ```,plain

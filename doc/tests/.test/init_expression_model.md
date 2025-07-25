@@ -1,5 +1,14 @@
 # Test [`init_expression_model`](/doc/tests/statement_usage.md#L436)
 
+## Code
+
+```µcad
+sketch k() { init(l:Length) {
+  __builtin::geo2d::circle(radius=1);
+} } k(1cm);
+
+```
+
 ## Output
 
 ```,plain

@@ -1,5 +1,14 @@
 # Test [`init_assignment_prop`](/doc/tests/statement_usage.md#L420)
 
+## Code
+
+```µcad
+sketch k() { init(l:Length) {
+  prop a = 1;
+} } k(1cm);
+
+```
+
 ## Output
 
 ```,plain

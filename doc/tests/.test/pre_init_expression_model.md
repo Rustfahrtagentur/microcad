@@ -1,5 +1,14 @@
 # Test [`pre_init_expression_model`](/doc/tests/statement_usage.md#L322)
 
+## Code
+
+```µcad
+sketch k() { 
+  __builtin::geo2d::circle(radius=1);
+init(l:Length) {} }
+
+```
+
 ## Parse Error
 
 ```,plain

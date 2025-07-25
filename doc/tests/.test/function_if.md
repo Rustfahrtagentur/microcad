@@ -1,5 +1,14 @@
 # Test [`function_if`](/doc/tests/statement_usage.md#L730)
 
+## Code
+
+```µcad
+fn f() {
+  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+} f();
+
+```
+
 ## Output
 
 ```,plain

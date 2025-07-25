@@ -31,7 +31,7 @@ pub fn run_test(name: &str, mode: &str, code: &str, output: &Output) {
 
     writeln!(
         log,
-        "# Test [`{name}`]({reference})\n",
+        "# Test [`{name}`]({reference})\n\n## Code\n\n```µcad\n{code}\n```\n",
         reference = output.reference()
     )
     .expect("output error");

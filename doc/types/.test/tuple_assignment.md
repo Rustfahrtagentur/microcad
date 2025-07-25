@@ -1,5 +1,15 @@
 # Test [`tuple_assignment`](/doc/types/tuples.md#L52)
 
+## Code
+
+```µcad
+(width, height) = (1m,2m);
+// check values of width and height
+assert_eq([width,1m]);
+assert_eq([height,2m]);
+
+```
+
 ## Parse Error
 
 ```,plain

@@ -1,5 +1,12 @@
 # Test [`verify_assert_fail`](/doc/debug/README.md#L21)
 
+## Code
+
+```µcad
+std::debug::assert(false, "this assertion fails");
+
+```
+
 ## Output
 
 ```,plain

@@ -1,5 +1,14 @@
 # Test [`body_use`](/doc/tests/statement_usage.md#L592)
 
+## Code
+
+```µcad
+{
+  use std;
+}
+
+```
+
 ## Output
 
 ```,plain

@@ -1,5 +1,14 @@
 # Test [`body_return`](/doc/tests/statement_usage.md#L608)
 
+## Code
+
+```µcad
+{
+  return 1;
+}
+
+```
+
 ## Output
 
 ```,plain

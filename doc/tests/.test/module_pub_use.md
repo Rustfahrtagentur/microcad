@@ -1,5 +1,14 @@
 # Test [`module_pub_use`](/doc/tests/statement_usage.md#L144)
 
+## Code
+
+```µcad
+mod k {
+  pub use std;
+}
+
+```
+
 ## Output
 
 ```,plain

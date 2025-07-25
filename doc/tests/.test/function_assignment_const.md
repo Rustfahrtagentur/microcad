@@ -1,5 +1,14 @@
 # Test [`function_assignment_const`](/doc/tests/statement_usage.md#L746)
 
+## Code
+
+```µcad
+fn f() {
+  const B = 1;
+} f();
+
+```
+
 ## Output
 
 ```,plain

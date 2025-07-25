@@ -1,5 +1,14 @@
 # Test [`function_assignment_prop`](/doc/tests/statement_usage.md#L762)
 
+## Code
+
+```µcad
+fn f() {
+  prop a = 1;
+} f();
+
+```
+
 ## Output
 
 ```,plain

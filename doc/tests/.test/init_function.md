@@ -1,5 +1,14 @@
 # Test [`init_function`](/doc/tests/statement_usage.md#L348)
 
+## Code
+
+```µcad
+sketch k() { init(l:Length) {
+  fn f() {}
+} } k(1cm);
+
+```
+
 ## Output
 
 ```,plain

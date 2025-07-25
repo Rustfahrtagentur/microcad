@@ -1,5 +1,14 @@
 # Test [`module_marker`](/doc/tests/statement_usage.md#L168)
 
+## Code
+
+```µcad
+mod k {
+  @children
+}
+
+```
+
 ## Output
 
 ```,plain

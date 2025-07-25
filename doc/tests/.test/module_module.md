@@ -1,5 +1,14 @@
 # Test [`module_module`](/doc/tests/statement_usage.md#L112)
 
+## Code
+
+```µcad
+mod k {
+  mod m {}
+}
+
+```
+
 ## Output
 
 ```,plain

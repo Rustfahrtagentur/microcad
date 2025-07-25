@@ -1,5 +1,14 @@
 # Test [`body_function`](/doc/tests/statement_usage.md#L576)
 
+## Code
+
+```µcad
+{
+  fn f() {} f();
+}
+
+```
+
 ## Output
 
 ```,plain

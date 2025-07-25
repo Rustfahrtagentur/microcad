@@ -1,5 +1,12 @@
 # Test [`source_marker`](/doc/tests/statement_usage.md#L66)
 
+## Code
+
+```µcad
+@children
+
+```
+
 ## Output
 
 ```,plain

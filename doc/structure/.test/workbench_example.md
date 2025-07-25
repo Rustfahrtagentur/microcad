@@ -1,5 +1,22 @@
 # Test [`workbench_example`](/doc/structure/functions.md#L98)
 
+## Code
+
+```µcad
+part punched_disk(radius: Length) {
+    use std::geo2d::circle;
+
+    // calculate inner from radius in a method
+    fn inner() { radius/2 }
+
+    // generate donut (and call inner)
+    circle(radius) - circle(inner());
+}
+
+punched_disk(radius = 1cm);
+
+```
+
 ## Output
 
 ```,plain

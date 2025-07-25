@@ -1,5 +1,14 @@
 # Test [`workbench_workbench`](/doc/tests/statement_usage.md#L446)
 
+## Code
+
+```µcad
+sketch k() {
+  sketch f() {} f();
+} k();
+
+```
+
 ## Output
 
 ```,plain

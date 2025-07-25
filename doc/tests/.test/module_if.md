@@ -1,5 +1,14 @@
 # Test [`module_if`](/doc/tests/statement_usage.md#L160)
 
+## Code
+
+```µcad
+mod k {
+  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+}
+
+```
+
 ## Output
 
 ```,plain

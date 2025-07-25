@@ -1,5 +1,14 @@
 # Test [`body_workbench`](/doc/tests/statement_usage.md#L560)
 
+## Code
+
+```µcad
+{
+  sketch f() {} f();
+}
+
+```
+
 ## Output
 
 ```,plain

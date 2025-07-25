@@ -1,5 +1,30 @@
 # Test [`tuple_match_variants`](/doc/structure/arguments.md#L80)
 
+## Code
+
+```µcad
+fn f( x: Length, y: Length, z: Length ) {}
+
+// Every parameter given by name
+f( x=1cm, y=2cm, z=3cm);
+
+// Parameters given by named tuple
+f( (x=1cm, y=2cm, z=3cm) );
+
+// Parameters given by named tuple variable
+p = (x=1cm, y=2cm, z=3cm);
+f( p );
+
+// Parameters given by named tuple and a single value
+f( (x=1cm, y=2cm), z=3cm );
+f( y=2cm, (x=1cm, z=3cm) );
+
+// Parameters given by named tuple variable and a single value
+q = (x=1cm, y=2cm);
+f( q, z=3cm );
+
+```
+
 ## Output
 
 ```,plain

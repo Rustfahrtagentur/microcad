@@ -1,5 +1,14 @@
 # Test [`workbench_pub_use`](/doc/tests/statement_usage.md#L486)
 
+## Code
+
+```µcad
+sketch k() {
+  pub use std;
+} k();
+
+```
+
 ## Output
 
 ```,plain

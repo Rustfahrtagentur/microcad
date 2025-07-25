@@ -1,5 +1,12 @@
 # Test [`source_return`](/doc/tests/statement_usage.md#L54)
 
+## Code
+
+```µcad
+return 1;
+
+```
+
 ## Output
 
 ```,plain

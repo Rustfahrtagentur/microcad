@@ -1,5 +1,14 @@
 # Test [`pre_init_expression`](/doc/tests/statement_usage.md#L314)
 
+## Code
+
+```µcad
+sketch k() { 
+  1 + 2;
+init(l:Length) {} } k();
+
+```
+
 ## Parse Error
 
 ```,plain

@@ -1,5 +1,13 @@
 # Test [`tuple_match_errors`](/doc/structure/arguments.md#L110)
 
+## Code
+
+```µcad
+fn f( x: Length, y: Length, z: Length ) {}
+f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
+
+```
+
 ## Output
 
 ```,plain

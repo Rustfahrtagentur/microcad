@@ -1,5 +1,13 @@
 # Test [`tuple_match_warnings`](/doc/structure/arguments.md#L119)
 
+## Code
+
+```µcad
+fn f( x: Length, y: Length, z: Length ) {}
+f( (x=1cm, y=2cm, v=5cm), z=3cm);  // warning: v is redundant
+
+```
+
 ## Output
 
 ```,plain

@@ -1,5 +1,14 @@
 # Test [`init_if`](/doc/tests/statement_usage.md#L388)
 
+## Code
+
+```µcad
+sketch k() { init(l:Length) {
+  if std::math::PI == 3 { }
+} } k(1cm);
+
+```
+
 ## Output
 
 ```,plain
