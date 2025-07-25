@@ -124,9 +124,12 @@ impl Tuple {
     ///
     pub fn multiplicity<P: FnMut(Tuple)>(&self, mut ids: Vec<Identifier>, mut p: P) {
         log::trace!("combining: {ids:?}:");
+
+        // sort ids for persistent order
+        ids.sort();
+
         // count array indexes for items which shall be multiplied and number of overall combinations
         let mut combinations = 1;
-        ids.sort();
         let mut counts: HashMap<Identifier, (_, _)> = ids
             .into_iter()
             .map(|id| {
@@ -146,8 +149,11 @@ impl Tuple {
         // call predicate for each version of the tuple
         for _ in 0..combinations {
             let mut counted = false;
+
+            // sort multiplier ids for persistent order
             let mut named: Vec<_> = self.named.iter().collect();
             named.sort_by(|lhs, rhs| lhs.0.cmp(rhs.0));
+
             let tuple = named
                 .into_iter()
                 .map(|(id, v)| match v {
