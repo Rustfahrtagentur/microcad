@@ -22,7 +22,7 @@ impl SrcReferrer for ArgumentValue {
 
 impl std::fmt::Display for ArgumentValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.value)
+        write!(f, "{:?} ({})", self.value, self.value.ty())
     }
 }
 
