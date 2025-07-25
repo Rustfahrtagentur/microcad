@@ -1,3 +1,13 @@
 -- Test --
   function_marker
   ../doc/tests/statement_usage.md:738
+-- Output --
+-- Errors --
+error: @children statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   @children
+     |   ^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED
