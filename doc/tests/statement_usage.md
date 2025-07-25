@@ -45,7 +45,7 @@ use std;
 
 [![test](.test/source_pub_use.png)](.test/source_pub_use.log)
 
-```µcad,source_pub_use#todo
+```µcad,source_pub_use
 pub use std;
 ```
 
