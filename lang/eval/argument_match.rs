@@ -168,7 +168,7 @@ impl<'a> ArgumentMatch<'a> {
     ///
     /// Return one or many tuples.
     fn multiply(&self, params: &ParameterValueList) -> Vec<Tuple> {
-        let ids: std::collections::HashSet<_> = Self::multipliers(&self.result, params);
+        let ids: Vec<_> = Self::multipliers(&self.result, params);
         if !ids.is_empty() {
             let mut result = Vec::new();
             self.result.multiplicity(ids, |t| result.push(t));
@@ -179,11 +179,8 @@ impl<'a> ArgumentMatch<'a> {
     }
 
     /// Return the multipliers' ids in the arguments.
-    fn multipliers(
-        args: &impl ValueAccess,
-        params: &ParameterValueList,
-    ) -> std::collections::HashSet<Identifier> {
-        params
+    fn multipliers(args: &impl ValueAccess, params: &ParameterValueList) -> Vec<Identifier> {
+        let mut result: Vec<_> = params
             .iter()
             .filter_map(|(id, param)| {
                 if let Some(a) = args.by_id(id) {
@@ -194,7 +191,9 @@ impl<'a> ArgumentMatch<'a> {
                 None
             })
             .cloned()
-            .collect()
+            .collect();
+        result.sort();
+        result
     }
 }
 

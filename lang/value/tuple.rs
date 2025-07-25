@@ -111,15 +111,6 @@ impl Tuple {
         });
     }
 
-    /// Return a vector of all combinations of the given ids.
-    ///
-    /// - `ids`: Items to multiply.
-    pub fn combinations(&self, ids: std::collections::HashSet<Identifier>) -> Vec<Tuple> {
-        let mut result = Vec::new();
-        self.multiplicity(ids, |p| result.push(p));
-        result
-    }
-
     /// Call a predicate for each tuple multiplicity.
     ///
     /// - `ids`: Items to multiply.
@@ -131,14 +122,11 @@ impl Tuple {
     /// |-----------------|------------------------|
     /// | `([x₀, x₁], y)` | `(x₀, y)`, `(x₁, y)`   |
     ///
-    pub fn multiplicity<P: FnMut(Tuple)>(
-        &self,
-        ids: std::collections::HashSet<Identifier>,
-        mut p: P,
-    ) {
+    pub fn multiplicity<P: FnMut(Tuple)>(&self, mut ids: Vec<Identifier>, mut p: P) {
         log::trace!("combining: {ids:?}:");
         // count array indexes for items which shall be multiplied and number of overall combinations
         let mut combinations = 1;
+        ids.sort();
         let mut counts: HashMap<Identifier, (_, _)> = ids
             .into_iter()
             .map(|id| {
@@ -158,9 +146,10 @@ impl Tuple {
         // call predicate for each version of the tuple
         for _ in 0..combinations {
             let mut counted = false;
-            let tuple = self
-                .named
-                .iter()
+            let mut named: Vec<_> = self.named.iter().collect();
+            named.sort_by(|lhs, rhs| lhs.0.cmp(rhs.0));
+            let tuple = named
+                .into_iter()
                 .map(|(id, v)| match v {
                     Value::Array(array) => {
                         if let Some((count, len)) = counts.get_mut(id) {
@@ -442,6 +431,6 @@ fn tuple_not_equal() {
 fn multiplicity_check() {
     let tuple = tuple!("(x = [1, 2, 3], y = [1, 2], z = 1)");
 
-    let ids: std::collections::HashSet<Identifier> = ["x".into(), "y".into()].into_iter().collect();
+    let ids: Vec<Identifier> = ["x".into(), "y".into()].into_iter().collect();
     tuple.multiplicity(ids, |tuple| println!("{tuple}"));
 }

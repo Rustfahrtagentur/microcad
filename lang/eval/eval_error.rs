@@ -187,7 +187,7 @@ pub enum EvalError {
 
     /// Trying to use multiplicity where it is not allowed
     #[error("Multiplicity not allowed '{0:?}'")]
-    MultiplicityNotAllowed(std::collections::HashSet<Identifier>),
+    MultiplicityNotAllowed(Vec<Identifier>),
 
     /// An error if you try to mix 2d and 3d geometries.
     #[error("Cannot mix 2d and 3d geometries")]
