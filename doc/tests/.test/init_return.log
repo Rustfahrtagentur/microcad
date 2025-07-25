@@ -1,3 +1,13 @@
 -- Test --
   init_return
   ../doc/tests/statement_usage.md:380
+-- Output --
+-- Errors --
+error: Return statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   return 1;
+     |   ^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED
