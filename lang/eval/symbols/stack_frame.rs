@@ -48,6 +48,23 @@ impl StackFrame {
         }
     }
 
+    /// Return stack frame kind as str
+    pub fn kind_str(&self) -> &'static str {
+        match self {
+            StackFrame::Source(_, _) => "source",
+            StackFrame::Module(_, _) => "module",
+            StackFrame::Init(_) => "init",
+            StackFrame::Workbench(_, _, _) => "workbench",
+            StackFrame::Body(_) => "body",
+            StackFrame::Function(_) => "function",
+            StackFrame::Call {
+                symbol: _,
+                args: _,
+                src_ref: _,
+            } => "call",
+        }
+    }
+
     /// Print stack frame.
     pub fn print_locals(
         &self,
