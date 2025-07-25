@@ -34,6 +34,11 @@ impl Eval<Models> for ExpressionStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<Models> {
         log::debug!("Evaluating expression statement to models:\n{self}");
         let value: Value = self.eval(context)?;
+        let models = value.fetch_models();
+        if models.is_empty() && value != Value::None {
+            context.warning(self, EvalError::EmptyModelExpression)?;
+        }
+
         Ok(value.fetch_models())
     }
 }
