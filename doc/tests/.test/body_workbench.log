@@ -1,6 +1,13 @@
 -- Test --
   body_workbench
   ../doc/tests/statement_usage.md:560
+
+-- Code --
+
+{
+  sketch f() {} f();
+}
+
 -- Output --
 -- Errors --
 error: sketch statement not available here

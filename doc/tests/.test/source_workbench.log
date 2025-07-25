@@ -1,6 +1,11 @@
 -- Test --
   source_workbench
   ../doc/tests/statement_usage.md:18
+
+-- Code --
+
+sketch f() {} f();
+
 -- Output --
 -- Errors --
 -- Test Result --

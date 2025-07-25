@@ -1,6 +1,13 @@
 -- Test --
   workbench_function
   ../doc/tests/statement_usage.md:462
+
+-- Code --
+
+sketch k() {
+  fn f() {} f();
+} k();
+
 -- Output --
 -- Errors --
 error: Symbol f not found.

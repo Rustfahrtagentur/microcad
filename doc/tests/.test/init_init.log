@@ -1,6 +1,13 @@
 -- Test --
   init_init
   ../doc/tests/statement_usage.md:356
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  init() {}
+} } k(1cm);
+
 -- Output --
 -- Errors --
 error: init statement not available here

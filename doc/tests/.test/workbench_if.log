@@ -1,6 +1,13 @@
 -- Test --
   workbench_if
   ../doc/tests/statement_usage.md:502
+
+-- Code --
+
+sketch k() {
+  if std::math::PI == 3 { }
+} k();
+
 -- Output --
 -- Errors --
 -- Test Result --

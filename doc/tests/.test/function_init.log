@@ -1,6 +1,13 @@
 -- Test --
   function_init
   ../doc/tests/statement_usage.md:698
+
+-- Code --
+
+fn f() {
+  init() {}
+} f();
+
 -- Output --
 -- Errors --
 error: init statement not available here

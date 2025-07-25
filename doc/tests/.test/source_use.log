@@ -1,6 +1,11 @@
 -- Test --
   source_use
   ../doc/tests/statement_usage.md:42
+
+-- Code --
+
+use std;
+
 -- Output --
 -- Errors --
 -- Test Result --

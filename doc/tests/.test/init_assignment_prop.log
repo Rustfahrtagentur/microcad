@@ -1,6 +1,13 @@
 -- Test --
   init_assignment_prop
   ../doc/tests/statement_usage.md:420
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  prop a = 1;
+} } k(1cm);
+
 -- Output --
 -- Errors --
 error: Assignment statement not available here

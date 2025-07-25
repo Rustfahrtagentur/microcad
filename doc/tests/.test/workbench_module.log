@@ -1,6 +1,13 @@
 -- Test --
   workbench_module
   ../doc/tests/statement_usage.md:454
+
+-- Code --
+
+sketch k() {
+  mod m {}
+} k();
+
 -- Output --
 -- Errors --
 error: Module statement not available here

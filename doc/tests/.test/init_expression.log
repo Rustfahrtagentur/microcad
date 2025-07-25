@@ -1,6 +1,13 @@
 -- Test --
   init_expression
   ../doc/tests/statement_usage.md:428
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  1 + 2;
+} } k(1cm);
+
 -- Output --
 -- Errors --
 error: Expression statement not available here

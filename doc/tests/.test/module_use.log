@@ -1,6 +1,13 @@
 -- Test --
   module_use
   ../doc/tests/statement_usage.md:136
+
+-- Code --
+
+mod k {
+  use std;
+}
+
 -- Output --
 -- Errors --
 error: Unexpected stack frame of type 'module' cannot store std

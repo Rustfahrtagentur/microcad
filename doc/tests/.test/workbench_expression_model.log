@@ -1,6 +1,13 @@
 -- Test --
   workbench_expression_model
   ../doc/tests/statement_usage.md:550
+
+-- Code --
+
+sketch k() {
+  __builtin::geo2d::circle(radius=1);
+} k();
+
 -- Output --
 -- Errors --
 -- Test Result --

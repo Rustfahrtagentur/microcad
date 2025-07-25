@@ -1,6 +1,14 @@
 -- Test --
   types_quantity_area
   ../doc/types/quantity.md:91
+
+-- Code --
+
+a = 3cm;
+b = 2cm;
+area = a * b;
+std::debug::assert(area == 6cm²);
+
 -- Output --
 -- Errors --
 -- Test Result --

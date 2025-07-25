@@ -1,6 +1,13 @@
 -- Test --
   module_assignment_prop
   ../doc/tests/statement_usage.md:192
+
+-- Code --
+
+mod k {
+  prop a = 1;
+}
+
 -- Output --
 -- Errors --
 error: Assignment statement not available here

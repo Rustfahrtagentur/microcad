@@ -1,6 +1,26 @@
 -- Test --
   parameters
   ../doc/structure/op.md:53
+
+-- Code --
+
+// define operation which takes multiple items
+op punch_disk(radius: Length) {
+    if @children.count() == 1 {
+        difference() { 
+            @children 
+            std::geo2d::circle(radius)
+        } 
+    } else {
+        std::error("punch_disk must get one object");
+    }
+}
+
+// use operation punch_disk on a circle
+punch_disk(radius = 1cm) {
+    std::geo2d::circle(radius = 2cm);
+}
+
 -- Parse Error --
 Parser error:  --> 3:8
   |

@@ -1,6 +1,11 @@
 -- Test --
   source_init
   ../doc/tests/statement_usage.md:36
+
+-- Code --
+
+init() {}
+
 -- Output --
 -- Errors --
 error: Init statement not available here

@@ -1,6 +1,13 @@
 -- Test --
   init_if
   ../doc/tests/statement_usage.md:388
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  if std::math::PI == 3 { }
+} } k(1cm);
+
 -- Output --
 -- Errors --
 error: If statement not available here

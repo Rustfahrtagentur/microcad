@@ -1,6 +1,13 @@
 -- Test --
   body_assignment_prop
   ../doc/tests/statement_usage.md:648
+
+-- Code --
+
+{
+  prop a = 1;
+}
+
 -- Output --
 -- Errors --
 error: Assignment statement not available here

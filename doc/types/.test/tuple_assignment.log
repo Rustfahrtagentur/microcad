@@ -1,6 +1,14 @@
 -- Test --
   tuple_assignment
   ../doc/types/tuples.md:52
+
+-- Code --
+
+(width, height) = (1m,2m);
+// check values of width and height
+assert_eq([width,1m]);
+assert_eq([height,2m]);
+
 -- Parse Error --
 Parser error:  --> 1:17
   |

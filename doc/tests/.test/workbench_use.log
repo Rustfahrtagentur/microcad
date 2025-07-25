@@ -1,6 +1,13 @@
 -- Test --
   workbench_use
   ../doc/tests/statement_usage.md:478
+
+-- Code --
+
+sketch k() {
+  use std;
+} k();
+
 -- Output --
 -- Errors --
 -- Test Result --

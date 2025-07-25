@@ -1,6 +1,11 @@
 -- Test --
   source_assignment_prop
   ../doc/tests/statement_usage.md:84
+
+-- Code --
+
+prop a = 1;
+
 -- Output --
 -- Errors --
 error: Assignment statement not available here

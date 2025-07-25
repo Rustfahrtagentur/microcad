@@ -1,6 +1,13 @@
 -- Test --
   body_use
   ../doc/tests/statement_usage.md:592
+
+-- Code --
+
+{
+  use std;
+}
+
 -- Output --
 -- Errors --
 -- Test Result --

@@ -1,6 +1,13 @@
 -- Test --
   body_init
   ../doc/tests/statement_usage.md:584
+
+-- Code --
+
+{
+  init() {}
+}
+
 -- Output --
 -- Errors --
 error: Init statement not available here

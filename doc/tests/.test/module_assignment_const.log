@@ -1,6 +1,13 @@
 -- Test --
   module_assignment_const
   ../doc/tests/statement_usage.md:176
+
+-- Code --
+
+mod k {
+  const B = 1;
+}
+
 -- Output --
 -- Errors --
 error: No variables allowed in modules

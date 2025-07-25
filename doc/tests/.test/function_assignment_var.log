@@ -1,6 +1,13 @@
 -- Test --
   function_assignment_var
   ../doc/tests/statement_usage.md:754
+
+-- Code --
+
+fn f() {
+  a = 1;
+} f();
+
 -- Output --
 -- Errors --
 error: Assignment statement not available here

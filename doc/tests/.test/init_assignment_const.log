@@ -1,6 +1,13 @@
 -- Test --
   init_assignment_const
   ../doc/tests/statement_usage.md:404
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  const B = 1;
+} } k(1cm);
+
 -- Output --
 -- Errors --
 error: Assignment statement not available here

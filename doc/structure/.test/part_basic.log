@@ -1,6 +1,11 @@
 -- Test --
   part_basic
   ../doc/structure/part.md:8
+
+-- Code --
+
+part my_part() {}
+
 -- Output --
 -- Errors --
 -- Test Result --

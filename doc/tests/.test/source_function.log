@@ -1,6 +1,11 @@
 -- Test --
   source_function
   ../doc/tests/statement_usage.md:30
+
+-- Code --
+
+fn f() {} f();
+
 -- Output --
 -- Errors --
 -- Test Result --

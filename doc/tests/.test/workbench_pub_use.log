@@ -1,6 +1,13 @@
 -- Test --
   workbench_pub_use
   ../doc/tests/statement_usage.md:486
+
+-- Code --
+
+sketch k() {
+  pub use std;
+} k();
+
 -- Output --
 -- Errors --
 -- Test Result --

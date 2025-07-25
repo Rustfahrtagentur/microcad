@@ -1,6 +1,13 @@
 -- Test --
   function_use
   ../doc/tests/statement_usage.md:706
+
+-- Code --
+
+fn f() {
+  use std;
+} f();
+
 -- Output --
 -- Errors --
 -- Test Result --

@@ -1,3 +1,14 @@
 -- Test --
   arrays_and_comments
   ../doc/structure/arrays.md:4
+
+-- Code --
+
+[
+    // First element
+    1,
+
+    // Second element
+    2
+];
+

@@ -1,6 +1,13 @@
 -- Test --
   init_marker
   ../doc/tests/statement_usage.md:396
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  @children
+} } k(1cm);
+
 -- Output --
 -- Errors --
 error: @children statement not available here

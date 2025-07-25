@@ -1,6 +1,13 @@
 -- Test --
   pre_init_workbench
   ../doc/tests/statement_usage.md:218
+
+-- Code --
+
+sketch k() { 
+  sketch f() {} f();
+init(l:Length) {} } k();
+
 -- Parse Error --
 Statement not allowed within workbenches
 -- Test Result --

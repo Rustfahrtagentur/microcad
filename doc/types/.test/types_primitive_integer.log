@@ -1,6 +1,11 @@
 -- Test --
   types_primitive_integer
   ../doc/types/primitive_types.md:19
+
+-- Code --
+
+i = 3;
+
 -- Output --
 -- Errors --
 -- Test Result --

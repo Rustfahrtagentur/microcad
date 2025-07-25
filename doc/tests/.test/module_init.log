@@ -1,6 +1,13 @@
 -- Test --
   module_init
   ../doc/tests/statement_usage.md:128
+
+-- Code --
+
+mod k {
+  init() { }
+}
+
 -- Output --
 -- Errors --
 error: Init statement not available here

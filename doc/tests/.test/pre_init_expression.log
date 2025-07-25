@@ -1,6 +1,13 @@
 -- Test --
   pre_init_expression
   ../doc/tests/statement_usage.md:314
+
+-- Code --
+
+sketch k() { 
+  1 + 2;
+init(l:Length) {} } k();
+
 -- Parse Error --
 Statement not allowed prior initializers
 -- Test Result --

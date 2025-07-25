@@ -1,6 +1,13 @@
 -- Test --
   init_module
   ../doc/tests/statement_usage.md:340
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  mod m {}
+} } k(1cm);
+
 -- Output --
 -- Errors --
 error: Module statement not available here

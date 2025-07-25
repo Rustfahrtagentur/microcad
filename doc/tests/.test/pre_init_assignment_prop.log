@@ -1,6 +1,13 @@
 -- Test --
   pre_init_assignment_prop
   ../doc/tests/statement_usage.md:306
+
+-- Code --
+
+sketch k() { 
+  prop a = 1;
+init(l:Length) {} } k();
+
 -- Parse Error --
 Statement not allowed prior initializers
 -- Test Result --

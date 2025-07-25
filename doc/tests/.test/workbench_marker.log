@@ -1,6 +1,13 @@
 -- Test --
   workbench_marker
   ../doc/tests/statement_usage.md:510
+
+-- Code --
+
+sketch k() {
+  @children
+} k();
+
 -- Output --
 -- Errors --
 -- Test Result --

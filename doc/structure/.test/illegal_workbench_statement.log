@@ -1,6 +1,15 @@
 -- Test --
   illegal_workbench_statement
   ../doc/structure/workbench.md:253
+
+-- Code --
+
+sketch wheel(radius: Length) {
+    sketch axis(length: Length) {}
+}
+
+wheel(radius = 1.0mm);
+
 -- Output --
 -- Errors --
 error: sketch statement not available here
