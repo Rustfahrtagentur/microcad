@@ -26,7 +26,12 @@ impl Parse for TypeAnnotation {
                     Type::Quantity(QuantityType::Length),
                     pair.into(),
                 )),
+                "Area" => Self(Refer::new(Type::Quantity(QuantityType::Area), pair.into())),
                 "Angle" => Self(Refer::new(Type::Quantity(QuantityType::Angle), pair.into())),
+                "Volume" => Self(Refer::new(
+                    Type::Quantity(QuantityType::Volume),
+                    pair.into(),
+                )),
                 "Weight" => Self(Refer::new(
                     Type::Quantity(QuantityType::Weight),
                     pair.into(),
@@ -51,10 +56,13 @@ impl Parse for TypeAnnotation {
                     Type::Tuple(TupleType::new_vec3().into()),
                     pair.into(),
                 )),
-                _ => Self(Refer::new(
-                    Type::Custom(QualifiedName::parse(inner)?),
-                    pair.into(),
-                )),
+                t => {
+                    log::warn!("found custom type {t}!");
+                    Self(Refer::new(
+                        Type::Custom(QualifiedName::parse(inner)?),
+                        pair.into(),
+                    ))
+                }
             },
             _ => unreachable!("Expected type, found {:?}", inner.as_rule()),
         };
