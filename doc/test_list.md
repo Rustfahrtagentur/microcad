@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**198** tests from markdown.
+**199** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -11,6 +11,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/argument_match_name.png)](../doc/structure/.test/argument_match_name.log) | [argument_match_name](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/argument_match_type.png)](../doc/structure/.test/argument_match_type.log) | [argument_match_type](../doc/structure/arguments.md) |
 | [![test](../doc/types/.test/array_unit_bundling.png)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/arrays.md) |
+| [![test](../doc/structure/.test/arrays_and_comments.png)](../doc/structure/.test/arrays_and_comments.log) | [arrays_and_comments](../doc/structure/arrays.md) |
 | [![test](../doc/structure/.test/assignment.png)](../doc/structure/.test/assignment.log) | [assignment](../doc/structure/assignments.md) |
 | [![test](../doc/structure/.test/assignment_immutable.png)](../doc/structure/.test/assignment_immutable.log) | [assignment_immutable](../doc/structure/assignments.md) |
 | [![test](../doc/.test/attributes_color.png)](../doc/.test/attributes_color.log) | [attributes_color](../doc/attributes.md) |
