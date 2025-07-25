@@ -131,13 +131,14 @@ impl Stack {
 
 impl Locals for Stack {
     fn open(&mut self, frame: StackFrame) {
-        log::trace!("Opening stack frame");
+        log::trace!("Opening {} stack frame", frame.kind_str());
         self.0.push(frame);
     }
 
     fn close(&mut self) {
-        log::trace!("Closing stack frame");
-        self.0.pop();
+        if let Some(frame) = self.0.pop() {
+            log::trace!("Closing {} stack frame", frame.kind_str());
+        }
     }
 
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
@@ -257,11 +258,9 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     // test alias
-    assert!(
-        stack
-            .put_local(Some("x".into()), make_int("x".into(), 3))
-            .is_ok()
-    );
+    assert!(stack
+        .put_local(Some("x".into()), make_int("x".into(), 3))
+        .is_ok());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);
