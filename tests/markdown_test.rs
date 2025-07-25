@@ -36,7 +36,8 @@ pub fn run_test(
     let log_out = &mut fs::File::create(log_filename).expect("cannot create log file");
     let log_out = &mut io::BufWriter::new(log_out);
 
-    writeln!(log_out, "-- Test --\n  {name}\n  {reference}").expect("output error");
+    writeln!(log_out, "-- Test --\n  {name}\n  {reference}\n").expect("output error");
+    writeln!(log_out, "-- Code --\n\n{code}").expect("output error");
 
     // load and handle µcad source file
     let source_file_result = SourceFile::load_from_str(code);
