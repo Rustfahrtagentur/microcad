@@ -15,4 +15,4 @@ warning: This expression statement did not produce any model
      | ^^^^^^
      |
 -- Test Result --
-OK BUT SHOULD FAIL
+OK
