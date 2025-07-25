@@ -1,7 +1,0 @@
--- Test --
-  unnamed_tuple
-  ../doc/types/tuples.md:29
--- Output --
--- Errors --
--- Test Result --
-OK

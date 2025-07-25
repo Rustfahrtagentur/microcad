@@ -1,7 +1,0 @@
--- Test --
-  body_assignment_var
-  ../doc/tests/statement_usage.md:640
--- Output --
--- Errors --
--- Test Result --
-OK

@@ -1,7 +1,0 @@
--- Test --
-  body_expression
-  ../doc/tests/statement_usage.md:656
--- Output --
--- Errors --
--- Test Result --
-OK

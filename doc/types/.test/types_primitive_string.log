@@ -1,8 +1,0 @@
--- Test --
-  types_primitive_string
-  ../doc/types/primitive_types.md:29
--- Output --
-Hello µcad!
--- Errors --
--- Test Result --
-OK

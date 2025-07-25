@@ -1,7 +1,0 @@
--- Test --
-  hull_single
-  ../doc/libs/std/ops/hull.md:7
--- Output --
--- Errors --
--- Test Result --
-OK

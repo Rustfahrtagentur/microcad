@@ -4,7 +4,7 @@
 
 Boolean is the result type of boolean expressions which may just be `true` or `false`.
 
-[![test](.test/types_primitive_bool.png)](.test/types_primitive_bool.log)
+[![test](.test/types_primitive_bool.png)](.test/types_primitive_bool.md)
 
 ```µcad,types_primitive_bool
 std::debug::assert( true != false );
@@ -14,7 +14,7 @@ std::debug::assert( true != false );
 
 The type `integer` contains a natural number.
 
-[![test](.test/types_primitive_integer.png)](.test/types_primitive_integer.log)
+[![test](.test/types_primitive_integer.png)](.test/types_primitive_integer.md)
 
 ```µcad,types_primitive_integer
 i = 3;
@@ -24,7 +24,7 @@ i = 3;
 
 Text can be used to logging or to render text.
 
-[![test](.test/types_primitive_string.png)](.test/types_primitive_string.log)
+[![test](.test/types_primitive_string.png)](.test/types_primitive_string.md)
 
 ```µcad,types_primitive_string
 text = "Hello µcad!";

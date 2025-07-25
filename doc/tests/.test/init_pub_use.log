@@ -1,7 +1,0 @@
--- Test --
-  init_pub_use
-  ../doc/tests/statement_usage.md:372
--- Output --
--- Errors --
--- Test Result --
-OK BUT IS TODO

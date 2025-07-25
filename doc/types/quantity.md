@@ -22,7 +22,7 @@ The following quantity types are supported:
 Quantities can be declared by *literals*.
 This means that your will automatically get the following type if you use the beside units:
 
-[![test](.test/quantity_types_number_literals.png)](.test/quantity_types_number_literals.log)
+[![test](.test/quantity_types_number_literals.png)](.test/quantity_types_number_literals.md)
 
 ```µcad,quantity_types_number_literals
 // declare variable `height` of type `Length` to 1.4 Meters
@@ -42,7 +42,7 @@ width = height * 2 + 10cm;
 
 The type `Scalar` contains a floating number (without any *unit*) and must be written with at least one decimal place (or in percent).
 
-[![test](.test/types_quantity_scalar.png)](.test/types_quantity_scalar.log)
+[![test](.test/types_quantity_scalar.png)](.test/types_quantity_scalar.md)
 
 ```µcad,types_quantity_scalar
 zero = 0;
@@ -54,7 +54,7 @@ percent = 55%;
 
 `Length` is used to describe a concrete length.
 
-[![test](.test/types_quantity_length.png)](.test/types_quantity_length.log)
+[![test](.test/types_quantity_length.png)](.test/types_quantity_length.md)
 
 ```µcad,types_quantity_length
 millimeters = 1000mm;
@@ -69,7 +69,7 @@ std::debug::assert( [millimeters, centimeters, meters, inches].all_equal() );
 
 Angles are used with rotations and in constrains when proving measures.
 
-[![test](.test/types_quantity_angle.png)](.test/types_quantity_angle.log)
+[![test](.test/types_quantity_angle.png)](.test/types_quantity_angle.md)
 
 ```µcad,types_quantity_angle
 pi = std::math::PI;
@@ -86,7 +86,7 @@ std::debug::assert( [degree, degree_, grad, turn, radian].all_equal() );
 
 An `Area` is a two-dimensional quantity. It is the result when multiplying two `Length`s.
 
-[![test](.test/types_quantity_area.png)](.test/types_quantity_area.log)
+[![test](.test/types_quantity_area.png)](.test/types_quantity_area.md)
 
 ```µcad,types_quantity_area
 a = 3cm;
@@ -97,7 +97,7 @@ std::debug::assert(area == 6cm²);
 
 Here is an example of how to use different areal units:
 
-[![test](.test/types_quantity_area_units.png)](.test/types_quantity_area_units.log)
+[![test](.test/types_quantity_area_units.png)](.test/types_quantity_area_units.md)
 
 ```µcad,types_quantity_area_units
 square_millimeter = 100000mm²;
@@ -113,7 +113,7 @@ std::debug::assert(square_centimeter == 0.1m²);
 
 A `Volume` is a three-dimensional quantity. It is the result when multiplying three `Length`s.
 
-[![test](.test/types_quantity_volume.png)](.test/types_quantity_volume.log)
+[![test](.test/types_quantity_volume.png)](.test/types_quantity_volume.md)
 
 ```µcad,types_quantity_volume
 a = 3mm;
@@ -127,7 +127,7 @@ std::debug::assert(volume == 24mm³);
 
 Here is an example for units:
 
-[![test](.test/types_quantity_volume_units.png)](.test/types_quantity_volume_units.log)
+[![test](.test/types_quantity_volume_units.png)](.test/types_quantity_volume_units.md)
 
 ```µcad,types_quantity_volume_units
 cubic_millimeter = 1000000.0mm³;
@@ -153,7 +153,7 @@ TODO
 
 Weights can be calculated by applying volumes to materials.
 
-[![test](.test/types_quantity_weight.png)](.test/types_quantity_weight.log)
+[![test](.test/types_quantity_weight.png)](.test/types_quantity_weight.md)
 
 ```µcad,types_quantity_weight
 gram = 1000.0g;

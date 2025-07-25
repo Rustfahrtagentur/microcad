@@ -1,0 +1,36 @@
+# Test [`workbench_workbench`](/doc/tests/statement_usage.md#L446)
+
+## Code
+
+```µcad
+sketch k() {
+  sketch f() {} f();
+} k();
+
+```
+
+## Output
+
+```,plain
+```
+
+## Errors
+
+```,plain
+error: sketch statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   sketch f() {} f();
+     |   ^^^^^^^^^^^^^
+     |
+error: Symbol f not found.
+  ---> <from_str>:2:17
+     |
+   2 |   sketch f() {} f();
+     |                 ^^^
+     |
+```
+
+## Test Result
+
+![FAILED AS EXPECTED](/doc/tests/.test/workbench_workbench.png)

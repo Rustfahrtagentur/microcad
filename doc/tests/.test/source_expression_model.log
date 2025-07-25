@@ -1,7 +1,0 @@
--- Test --
-  source_expression_model
-  ../doc/tests/statement_usage.md:96
--- Output --
--- Errors --
--- Test Result --
-OK

@@ -2,7 +2,7 @@
 
 In the following examples the convex hull of circles is calculated.
 
-[![test](.test/hull_single.png)](.test/hull_single.log)
+[![test](.test/hull_single.png)](.test/hull_single.md)
 
 ```µcad,hull_single
 use std::geo2d::*;
@@ -13,7 +13,7 @@ hull()
         circle(1mm);
 ```
 
-[![test](.test/hull_multiple.png)](.test/hull_multiple.log)
+[![test](.test/hull_multiple.png)](.test/hull_multiple.md)
 
 ```µcad,hull_multiple
 use std::geo2d::*;

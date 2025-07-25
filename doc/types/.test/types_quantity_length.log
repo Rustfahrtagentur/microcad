@@ -1,7 +1,0 @@
--- Test --
-  types_quantity_length
-  ../doc/types/quantity.md:59
--- Output --
--- Errors --
--- Test Result --
-OK

@@ -1,7 +1,0 @@
--- Test --
-  workbench_init
-  ../doc/tests/statement_usage.md:470
--- Output --
--- Errors --
--- Test Result --
-OK

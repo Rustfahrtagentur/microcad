@@ -1,7 +1,0 @@
--- Test --
-  workbench_fn_prop
-  ../doc/structure/functions.md:130
--- Output --
--- Errors --
--- Test Result --
-OK BUT SHOULD FAIL

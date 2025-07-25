@@ -1,7 +1,0 @@
--- Test --
-  toml_import
-  ../doc/import.md:26
--- Output --
--- Errors --
--- Test Result --
-OK

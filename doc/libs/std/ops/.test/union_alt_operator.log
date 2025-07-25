@@ -1,7 +1,0 @@
--- Test --
-  union_alt_operator
-  ../doc/libs/std/ops/union.md:17
--- Output --
--- Errors --
--- Test Result --
-OK

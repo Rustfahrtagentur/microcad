@@ -1,7 +1,0 @@
--- Test --
-  unnamed_tuple_order
-  ../doc/types/tuples.md:38
--- Output --
--- Errors --
--- Test Result --
-OK

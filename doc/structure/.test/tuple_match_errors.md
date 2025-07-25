@@ -1,0 +1,29 @@
+# Test [`tuple_match_errors`](/doc/structure/arguments.md#L110)
+
+## Code
+
+```µcad
+fn f( x: Length, y: Length, z: Length ) {}
+f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
+
+```
+
+## Output
+
+```,plain
+```
+
+## Errors
+
+```,plain
+error: Missing arguments: [Identifier: "x", Refer: 1:7 (6..7) in 0xb2031dc11153ac6f, Identifier: "y", Refer: 1:18 (17..18) in 0xb2031dc11153ac6f]
+  ---> <from_str>:2:4
+     |
+   2 | f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
+     |    ^^^^^^^^^^^^^^^^^^^^^
+     |
+```
+
+## Test Result
+
+![FAILED AS EXPECTED](/doc/structure/.test/tuple_match_errors.png)

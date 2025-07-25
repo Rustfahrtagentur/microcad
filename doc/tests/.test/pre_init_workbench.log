@@ -1,7 +1,0 @@
--- Test --
-  pre_init_workbench
-  ../doc/tests/statement_usage.md:218
--- Parse Error --
-Statement not allowed within workbenches
--- Test Result --
-FAILED AS EXPECTED

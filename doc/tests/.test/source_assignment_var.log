@@ -1,7 +1,0 @@
--- Test --
-  source_assignment_var
-  ../doc/tests/statement_usage.md:78
--- Output --
--- Errors --
--- Test Result --
-OK

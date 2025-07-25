@@ -1,7 +1,0 @@
--- Test --
-  argument_match_mix
-  ../doc/structure/arguments.md:48
--- Output --
--- Errors --
--- Test Result --
-OK

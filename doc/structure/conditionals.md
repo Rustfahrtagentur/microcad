@@ -4,7 +4,7 @@ Conditions lead to different executions paths for different cases.
 
 ## If Statement
 
-[![test](.test/if.png)](.test/if.log)
+[![test](.test/if.png)](.test/if.md)
 
 ```µcad,if#todo
 fn f( x: Scalar ) {

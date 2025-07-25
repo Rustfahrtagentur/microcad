@@ -1,7 +1,0 @@
--- Test --
-  types_def_vs_decl
-  ../doc/types/README.md:28
--- Output --
--- Errors --
--- Test Result --
-OK

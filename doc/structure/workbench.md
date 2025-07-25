@@ -38,7 +38,7 @@ A *workbench* consists of the following elements:
 
 The following code demonstrates most of these elements:
 
-[![test](.test/part_declaration.png)](.test/part_declaration.log)
+[![test](.test/part_declaration.png)](.test/part_declaration.md)
 
 ```µcad,part_declaration#todo
 // sketch with a `radius` as building plan
@@ -90,7 +90,7 @@ All *parameters* in that list become *properties* of the workbench when it is in
 These properties can be accessed within the *building code*, inside functions,
 or externally.
 
-[![test](.test/building_plan.png)](.test/building_plan.log)
+[![test](.test/building_plan.png)](.test/building_plan.md)
 
 ```µcad,building_plan
 // sketch with a `radius` as building plan
@@ -107,7 +107,7 @@ std::debug::assert_eq([wheel(5cm).radius, 5cm]);
 *Initializers* are defined with the keyword `init` and a following *parameter list*.
 One may define multiple initializers which must have different parameter lists.
 
-[![test](.test/initializers.png)](.test/initializers.log)
+[![test](.test/initializers.png)](.test/initializers.md)
 
 ```µcad,initializers#todo_fail
 part wheel(radius: Length) {
@@ -120,7 +120,7 @@ wheel(radius = 1.0mm);
 However, if an initializer is used, all properties from the building plan must
 be initialized (except those with *default values*).
 
-[![test](.test/init_property.png)](.test/init_property.log)
+[![test](.test/init_property.png)](.test/init_property.md)
 
 ```µcad,init_property
 part wheel(radius: Length, thickness: Length) {
@@ -147,7 +147,7 @@ wheel(diameter=10cm, thickness=1cm);
 If the *building plan* is not fully initialized by an initializer
 you will get an error:
 
-[![test](.test/missed_property.png)](.test/missed_property.log)
+[![test](.test/missed_property.png)](.test/missed_property.md)
 
 ```µcad,missed_property#fail
 sketch wheel(radius: Length) {
@@ -167,7 +167,7 @@ which must be placed on top of the workbench's body (before any *initializers*).
 The *init code* is just allowed to define some *constants* which then can be used
 in all following code (including code within *initializers* and *functions*).
 
-[![test](.test/pre_init_code.png)](.test/pre_init_code.log)
+[![test](.test/pre_init_code.png)](.test/pre_init_code.md)
 
 ```µcad,pre_init_code#todo
 sketch wheel(radius: Length) {
@@ -198,7 +198,7 @@ __builtin::assert(wheel(5cm).diameter == 10cm);
 
 It's **not allowed** to write any code between *initializers*.
 
-[![test](.test/code_between_initializers.png)](.test/code_between_initializers.log)
+[![test](.test/code_between_initializers.png)](.test/code_between_initializers.md)
 
 ```µcad,code_between_initializers#fail
 sketch wheel(radius: Length) {
@@ -219,7 +219,7 @@ The *building code* is executed after any initialization.
 Usually it produces one or many 2D or 3D objects on base of the given
 *building plan*.
 
-[![test](.test/code.png)](.test/code.log)
+[![test](.test/code.png)](.test/code.md)
 
 ```µcad,code
 sketch wheel(radius: Length) {
@@ -232,7 +232,7 @@ wheel(radius = 1.0mm)
 
 If *initializers* were defined the *building code* starts below them.
 
-[![test](.test/code_post_init.png)](.test/code_post_init.log)
+[![test](.test/code_post_init.png)](.test/code_post_init.md)
 
 ```µcad,code_post_init
 sketch wheel(radius: Length) {
@@ -248,7 +248,7 @@ sketch wheel(radius: Length) {
 
 It's **not allowed** to use the `sketch`, `part`, `op`, `return` nor `mod` statements within workbench code:
 
-[![test](.test/illegal_workbench_statement.png)](.test/illegal_workbench_statement.log)
+[![test](.test/illegal_workbench_statement.png)](.test/illegal_workbench_statement.md)
 
 ```µcad,illegal_workbench_statement#fail
 sketch wheel(radius: Length) {
@@ -267,7 +267,7 @@ There are two ways to declare *Properties*:
 
 In the following example we declare a building plan which consists of a `radius` which will automatically be a property:
 
-[![test](.test/property.png)](.test/property.log)
+[![test](.test/property.png)](.test/property.md)
 
 ```µcad,property#todo
 // `outer` will automatically become a property because
@@ -293,7 +293,7 @@ info("inner: {t.inner}");
 
 If you remove the `prop` keyword you will fail at accessing `inner`:
 
-[![test](.test/property_wrong.png)](.test/property_wrong.log)
+[![test](.test/property_wrong.png)](.test/property_wrong.md)
 
 ```µcad,property_wrong#fail
 sketch wheel(outer: length) {

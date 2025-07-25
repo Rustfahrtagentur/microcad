@@ -23,7 +23,7 @@ The examples in the table above declare the type explicitly.
 However, we can use units to declare the implicitly.
 Using units is recommended and what you get in return is that declarations are quite handy:
 
-[![test](.test/types_def_vs_decl.png)](.test/types_def_vs_decl.log)
+[![test](.test/types_def_vs_decl.png)](.test/types_def_vs_decl.md)
 
 ```µcad,types_def_vs_decl
 x: Length = 4mm;   // explicit type declaration
@@ -33,7 +33,7 @@ x = 4mm;           // implicit type declaration via units.
 Declarations without any initializations are *not allowed* in µcad.
 Hence, the following example will fail:
 
-[![test](.test/types_no_declaration.png)](.test/types_no_declaration.log)
+[![test](.test/types_no_declaration.png)](.test/types_no_declaration.md)
 
 ```µcad,types_no_declaration#fail
 x: Length;         // error
@@ -41,7 +41,7 @@ x: Length;         // error
 
 However, for parameter lists in functions and workbenches, you can declare the type only but also pass a default value:
 
-[![test](.test/types_bundles_functions.png)](.test/types_bundles_functions.log)
+[![test](.test/types_bundles_functions.png)](.test/types_bundles_functions.md)
 
 ```µcad,types_bundles_functions
 fn f(x = 4mm) {}        // use unit (with default)

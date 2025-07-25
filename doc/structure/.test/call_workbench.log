@@ -1,7 +1,0 @@
--- Test --
-  call_workbench
-  ../doc/structure/calls.md:28
--- Output --
--- Errors --
--- Test Result --
-OK

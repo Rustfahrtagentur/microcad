@@ -1,7 +1,0 @@
--- Test --
-  pre_init_assignment_var
-  ../doc/tests/statement_usage.md:298
--- Parse Error --
-Statement not allowed prior initializers
--- Test Result --
-FAILED AS EXPECTED

@@ -1,7 +1,0 @@
--- Test --
-  return_twice
-  ../doc/structure/functions.md:49
--- Output --
--- Errors --
--- Test Result --
-OK

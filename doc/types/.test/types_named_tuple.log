@@ -1,7 +1,0 @@
--- Test --
-  types_named_tuple
-  ../doc/types/named_tuple.md:9
--- Output --
--- Errors --
--- Test Result --
-OK

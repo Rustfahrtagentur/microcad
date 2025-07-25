@@ -1,7 +1,0 @@
--- Test --
-  init_assignment_var
-  ../doc/tests/statement_usage.md:412
--- Output --
--- Errors --
--- Test Result --
-OK

@@ -1,7 +1,0 @@
--- Test --
-  array_unit_bundling
-  ../doc/types/arrays.md:11
--- Output --
--- Errors --
--- Test Result --
-OK

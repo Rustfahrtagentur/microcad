@@ -5,7 +5,7 @@ A *tuple* is a collection of *values*, each of which can be of different *types*
 Typically, each value is paired with an identifier, allowing a tuple to function
 similarly to a key-value store.
 
-[![test](.test/named_tuple_access.png)](.test/named_tuple_access.log)
+[![test](.test/named_tuple_access.png)](.test/named_tuple_access.md)
 
 ```µcad,named_tuple_access
 use std::debug::assert_eq;
@@ -24,7 +24,7 @@ assert_eq([tuple, (width=10cm, depth=10cm, volume=1l)]);
 A tuple may lack identifiers for some or even all of its values.
 In such cases, these *unnamed values* within the tuple must all be of different types.
 
-[![test](.test/unnamed_tuple.png)](.test/unnamed_tuple.log)
+[![test](.test/unnamed_tuple.png)](.test/unnamed_tuple.md)
 
 ```µcad,unnamed_tuple
 tuple = (10cm, 10cm², 1l);
@@ -33,7 +33,7 @@ tuple = (10cm, 10cm², 1l);
 Otherwise, they would be indistinguishable since the values in a tuple do not adhere
 to a specific order.
 
-[![test](.test/unnamed_tuple_order.png)](.test/unnamed_tuple_order.log)
+[![test](.test/unnamed_tuple_order.png)](.test/unnamed_tuple_order.md)
 
 ```µcad,unnamed_tuple_order
 // these tuples are equal
@@ -47,7 +47,7 @@ A partially or fully unnamed tuple can only be utilized through
 
 Tuple syntax is also employed on the left side of *tuple assignments*.
 
-[![test](.test/tuple_assignment.png)](.test/tuple_assignment.log)
+[![test](.test/tuple_assignment.png)](.test/tuple_assignment.md)
 
 ```µcad,tuple_assignment#todo
 (width, height) = (1m,2m);
@@ -60,7 +60,7 @@ Occasionally, it's practical to *group units* together, but this cannot be done 
 with a tuple.
 Instead, you must use an *array*, which will be converted into a tuple during the assignment.
 
-[![test](.test/tuple_assignment_bundle.png)](.test/tuple_assignment_bundle.log)
+[![test](.test/tuple_assignment_bundle.png)](.test/tuple_assignment_bundle.md)
 
 ```µcad,tuple_assignment_bundle#todo
 (width, height) = [1,2]m;
@@ -70,7 +70,7 @@ assert_eq([height,2m]);
 
 This method can generally be used to convert an *array* into a *tuple*:
 
-[![test](.test/tuple_assignment_convert.png)](.test/tuple_assignment_convert.log)
+[![test](.test/tuple_assignment_convert.png)](.test/tuple_assignment_convert.md)
 
 ```µcad,tuple_assignment_convert#todo
 array = [1,2]m;

@@ -1,7 +1,0 @@
--- Test --
-  source_use
-  ../doc/tests/statement_usage.md:42
--- Output --
--- Errors --
--- Test Result --
-OK
