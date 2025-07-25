@@ -39,8 +39,14 @@ impl Eval for Statement {
             }
             Self::If(i) => i.eval(context),
             Self::Expression(e) => e.eval(context),
-            Self::Marker(_) => unreachable!(),
-            Self::Init(_) => unreachable!(),
+            Self::Marker(_) => {
+                context.error(self, EvalError::StatementNotSupported("@children"))?;
+                Ok(Value::None)
+            }
+            Self::Init(_) => {
+                context.error(self, EvalError::StatementNotSupported("init"))?;
+                Ok(Value::None)
+            }
             Self::Return(r) => r.eval(context),
         }
     }
