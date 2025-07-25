@@ -16,11 +16,5 @@ error: Assignment statement not available here
    2 |   prop a = 1;
      |   ^^^^^^^^^^^
      |
-error: No variables allowed in modules
-  ---> <from_str>:2:3
-     |
-   2 |   prop a = 1;
-     |   ^^^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

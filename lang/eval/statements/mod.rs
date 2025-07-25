@@ -39,12 +39,12 @@ impl Eval for Statement {
             }
             Self::If(i) => i.eval(context),
             Self::Expression(e) => e.eval(context),
-            Self::Marker(_) => {
-                context.error(self, EvalError::StatementNotSupported("@children"))?;
+            Self::Marker(m) => {
+                context.grant(m)?;
                 Ok(Value::None)
             }
-            Self::Init(_) => {
-                context.error(self, EvalError::StatementNotSupported("init"))?;
+            Self::Init(i) => {
+                context.grant(i.as_ref())?;
                 Ok(Value::None)
             }
             Self::Return(r) => r.eval(context),

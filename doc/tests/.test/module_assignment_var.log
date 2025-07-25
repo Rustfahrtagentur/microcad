@@ -10,11 +10,11 @@ mod k {
 
 -- Output --
 -- Errors --
-error: No variables allowed in modules
+error: Assignment statement not available here
   ---> <from_str>:2:3
      |
    2 |   a = 1;
      |   ^^^^^^
      |
 -- Test Result --
-FAIL
+FAILED AS EXPECTED

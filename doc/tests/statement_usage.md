@@ -181,7 +181,7 @@ mod k {
 
 [![test](.test/module_assignment_var.png)](.test/module_assignment_var.log)
 
-```µcad,module_assignment_var
+```µcad,module_assignment_var#fail
 mod k {
   a = 1;
 }

@@ -403,7 +403,6 @@ impl Grant<AssignmentStatement> for Context {
                         stack_frame,
                         StackFrame::Source(_, _)
                             | StackFrame::Body(_)
-                            | StackFrame::Module(_, _)
                             | StackFrame::Workbench(_, _, _)
                             | StackFrame::Init(_)
                     )
@@ -437,6 +436,21 @@ impl Grant<ExpressionStatement> for Context {
                     | StackFrame::Workbench(_, _, _)
                     | StackFrame::Function(_)
             )
+        } else {
+            false
+        };
+        if granted {
+            Ok(())
+        } else {
+            self.error(statement, EvalError::StatementNotSupported("Expression"))
+        }
+    }
+}
+
+impl Grant<Marker> for Context {
+    fn grant(&mut self, statement: &Marker) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
+            matches!(stack_frame, StackFrame::Workbench(_, _, _))
         } else {
             false
         };

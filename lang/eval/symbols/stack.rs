@@ -26,6 +26,7 @@ impl Stack {
                 | StackFrame::Workbench(_, _, locals)
                 | StackFrame::Init(locals)
                 | StackFrame::Body(locals)
+                | StackFrame::Module(_, locals)
                 | StackFrame::Function(locals) => {
                     let op = if locals.insert(id.clone(), symbol).is_some() {
                         "Added"
@@ -41,8 +42,6 @@ impl Stack {
                     log::trace!("Local Stack:\n{self}");
                     return Ok(());
                 }
-                // RULE: no locals available on module frame
-                StackFrame::Module(_, _) => return Err(EvalError::WrongStackFrame(id, "module")),
                 StackFrame::Call {
                     symbol: _,
                     args: _,
@@ -142,10 +141,7 @@ impl Locals for Stack {
     }
 
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        match &self.current_frame() {
-            Some(StackFrame::Module(_, _)) => Err(EvalError::NoVariablesAllowedIn("modules")),
-            _ => self.put_local(Some(id.clone()), Symbol::new_constant(id, value)),
-        }
+        self.put_local(Some(id.clone()), Symbol::new_constant(id, value))
     }
 
     fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {

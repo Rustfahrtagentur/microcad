@@ -10,11 +10,5 @@ mod k {
 
 -- Output --
 -- Errors --
-error: Unexpected stack frame of type 'module' cannot store std
-  ---> <from_str>:2:11
-     |
-   2 |   pub use std;
-     |           ^^^
-     |
 -- Test Result --
-TODO
+OK BUT IS TODO
