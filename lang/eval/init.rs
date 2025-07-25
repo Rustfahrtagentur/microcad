@@ -15,9 +15,7 @@ impl InitDefinition {
         let model = context.get_model()?;
         context.scope(StackFrame::Init(args.into()), |context| {
             // avoid body stack frame
-            let result: Value = self.body.statements.eval(context)?;
-            // paranoia check
-            assert!(result == Value::None);
+            let _: Value = self.body.statements.eval(context)?;
 
             let (found, not_found): (Vec<_>, Vec<_>) = plan
                 .iter()
