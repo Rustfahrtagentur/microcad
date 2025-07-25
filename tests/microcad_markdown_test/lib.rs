@@ -109,7 +109,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
         let mut tests = tests.iter().collect::<Vec<_>>().clone();
         tests.sort();
         tests.iter().for_each(|test| {
-            result.push_str(&test.banner());
+            result.push_str(&format!("{}\n", test.banner()));
         });
     }
 
