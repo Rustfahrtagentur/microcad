@@ -280,6 +280,8 @@ impl WriteSvg for Background {
 pub struct EdgeLengthMeasure {
     // Optional name for this measure.
     name: Option<String>,
+    // Original Length
+    length: Scalar,
     // Edge.
     edge: Edge2D,
     // Offset (default = 10mm).
@@ -289,48 +291,59 @@ pub struct EdgeLengthMeasure {
 impl EdgeLengthMeasure {
     /// Height measure of a rect.
     pub fn height(rect: &Rect, offset: Scalar, name: Option<&str>) -> Self {
+        let edge = Edge2D(
+            geo::Point::new(rect.min().x, rect.min().y),
+            geo::Point::new(rect.min().x, rect.max().y),
+        );
         Self {
             name: name.map(|s| s.into()),
-            edge: Edge2D(
-                geo::Point::new(rect.min().x, rect.min().y),
-                geo::Point::new(rect.min().x, rect.max().y),
-            ),
-            offset,
+            length: edge.vec().magnitude(),
+            edge,
+            offset: -offset,
         }
     }
 
     /// Width measure of a rect.
     pub fn width(rect: &Rect, offset: Scalar, name: Option<&str>) -> Self {
+        let edge = Edge2D(
+            geo::Point::new(rect.min().x, rect.min().y),
+            geo::Point::new(rect.max().x, rect.min().y),
+        );
+
         Self {
             name: name.map(|s| s.into()),
-            edge: Edge2D(
-                geo::Point::new(rect.min().x, rect.min().y),
-                geo::Point::new(rect.max().x, rect.min().y),
-            ),
+            length: edge.vec().magnitude(),
+            edge,
             offset,
+        }
+    }
+}
+
+impl MapToCanvas for EdgeLengthMeasure {
+    fn map_to_canvas(&self, canvas: &Canvas) -> Self {
+        Self {
+            name: self.name.clone(),
+            length: self.length,
+            edge: self.edge.map_to_canvas(canvas),
+            offset: self.offset.map_to_canvas(canvas),
         }
     }
 }
 
 impl WriteSvg for EdgeLengthMeasure {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
-        let length = self.edge.vec().magnitude();
+        let edge_length = self.edge.vec().magnitude();
 
         writer.begin_group(&attr.clone().transform_matrix(&self.edge.matrix()))?;
 
         let center = self.offset / 2.0;
         let bottom_left = Point::new(0.0, 0.0);
-        let bottom_right = Point::new(length, 0.0);
+        let bottom_right = Point::new(edge_length, 0.0);
         let top_left = Point::new(0.0, center);
-        let top_right = Point::new(length, center);
-
-        Edge2D(top_left, top_right).write_svg(
-            writer,
-            &attr.clone().marker_start("arrow").marker_end("arrow"),
-        )?;
+        let top_right = Point::new(edge_length, center);
 
         Edge2D(bottom_left, Point::new(0.0, center * 1.5)).write_svg(writer, attr)?;
-        Edge2D(bottom_right, Point::new(length, center * 1.5)).write_svg(writer, attr)?;
+        Edge2D(bottom_right, Point::new(edge_length, center * 1.5)).write_svg(writer, attr)?;
 
         CenteredText {
             text: format!(
@@ -339,15 +352,23 @@ impl WriteSvg for EdgeLengthMeasure {
                     Some(name) => format!("{name} = "),
                     None => String::new(),
                 },
+                length = self.length
             ),
             rect: Rect::new(bottom_left, top_right).translate(0.0, center),
             font_size: 2.0,
         }
         .write_svg(writer, attr)?;
 
+        Edge2D(top_left, top_right).shorter(1.0).write_svg(
+            writer,
+            &attr.clone().marker_start("arrow").marker_end("arrow"),
+        )?;
+
         writer.end_group()
     }
 }
+
+impl WriteSvgMapped for EdgeLengthMeasure {}
 
 /// A radius measure with an offset.
 pub struct RadiusMeasure {

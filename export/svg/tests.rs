@@ -136,7 +136,7 @@ fn svg_sample_sketch() -> std::io::Result<()> {
         Box::new(file),
         Size2D::A4.transposed().into(),
         content_rect,
-        Some(4.0),
+        Some(3.0),
     )
     .expect("test error");
 
@@ -170,15 +170,29 @@ fn svg_sample_sketch() -> std::io::Result<()> {
         rect,
         font_size: 2.0,
     }
-    .write_svg(&mut svg, &attr)?;
+    .write_svg_mapped(&mut svg, &attr)?;
 
     // Draw rectangle measures
-    /*
-    // Height measure for rect.
-    EdgeLengthMeasure::height(&rect, 10.0, Some("height")).write_svg(&mut svg, &attr)?;
-    // Width measure for rect.
-    EdgeLengthMeasure::width(&rect, 10.0, Some("width")).write_svg(&mut svg, &attr)?;
 
+    // Height measure for rect.
+    EdgeLengthMeasure::height(&rect, 10.0, Some("height")).write_svg_mapped(
+        &mut svg,
+        &SvgTagAttributes::default().style(
+            Some(Color::rgb(0.8, 0.8, 0.8)),
+            Some(Color::rgb(0.8, 0.8, 0.8)),
+            Some(0.2),
+        ),
+    )?;
+    // Width measure for rect.
+    EdgeLengthMeasure::width(&rect, 10.0, Some("width")).write_svg_mapped(
+        &mut svg,
+        &SvgTagAttributes::default().style(
+            Some(Color::rgb(0.8, 0.8, 0.8)),
+            Some(Color::rgb(0.8, 0.8, 0.8)),
+            Some(0.2),
+        ),
+    )?;
+    /*
     // Draw circle `c`.
     circle.write_svg(&mut svg, &attr)?;
     CenteredText {
