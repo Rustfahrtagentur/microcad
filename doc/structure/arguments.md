@@ -33,7 +33,7 @@ function (or workbench) differ in their types.
 
 [![test](.test/argument_match_type.png)](.test/argument_match_type.log)
 
-```µcad,argument_match_type#todo
+```µcad,argument_match_type
 fn f( a: Scalar, b: Length, c: Area ) {}
 // Who needs names?
 f(1.0, 2cm, 3cm²);
