@@ -539,7 +539,7 @@ sketch k() {
 
 [![test](.test/workbench_expression.png)](.test/workbench_expression.log)
 
-```µcad,workbench_expression#fail
+```µcad,workbench_expression
 sketch k() {
   1 + 2;
 } k();

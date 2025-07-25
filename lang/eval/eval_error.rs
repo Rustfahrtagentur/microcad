@@ -204,6 +204,10 @@ pub enum EvalError {
     /// Initializer missed to set a property from plan
     #[error("Workbench plan incomplete. Missing properties: {0:?}")]
     BuildingPlanIncomplete(Vec<Identifier>),
+
+    /// This errors happens if the expression is supposed to produce models but did not.
+    #[error("This expression statement did not produce any model")]
+    EmptyModelExpression,
 }
 
 /// Result type of any evaluation.
