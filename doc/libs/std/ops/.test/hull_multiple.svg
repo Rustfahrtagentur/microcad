@@ -5,17 +5,17 @@
     <!-- A marker to be used as an arrowhead -->
     <marker
       id="arrow"
-      viewBox="0 0 10 10"
-      refX="5"
-      refY="5"
-      markerWidth="6"
-      markerHeight="6"
+      viewBox="0 0 16 16"
+      refX="8"
+      refY="8"
+      markerWidth="9"
+      markerHeight="9"
       orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" stroke="context-stroke" fill="context-fill" />
+      <path d="M 0 0 L 16 8 L 0 16 z" stroke="context-stroke" fill="context-fill" />
     </marker>
   </defs>
             
   <g>
-    <path d="M0.9999999999999998,0.0000000000000002220446049250313L-0.5000000000000002,0.8660254031419756L-0.5000000000000002,-0.8660254031419752L0.9999999999999998,0.0000000000000002220446049250313 Z  "/>
+    <path d="M210,269.74355643987656L0,148.49999999999997L0,390.9871128797531L210,269.74355643987656 Z  "/>
   </g>
 </svg>
