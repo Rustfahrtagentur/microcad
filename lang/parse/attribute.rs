@@ -10,9 +10,9 @@ impl Parse for AttributeCommand {
         for inner in pair.inner() {
             match inner.as_rule() {
                 Rule::expression => return Ok(Self::Expression(Expression::parse(inner)?)),
-                Rule::identifier => {
+                Rule::identifier | Rule::argument_list => {
                     return Ok(Self::Call(
-                        pair.find(Rule::identifier).expect("Identifier"),
+                        pair.find(Rule::identifier),
                         pair.find(Rule::argument_list),
                     ));
                 }

@@ -7,12 +7,12 @@ use crate::{
     Id,
     builtin::ExporterAccess,
     eval::{self, *},
-    model::{Attributes, ExportCommand},
+    model::{Attributes, CustomCommand, ExportCommand, MeasureCommand, ResolutionAttribute},
     parameter,
     syntax::{self, *},
 };
 
-use microcad_core::{Color, RenderResolution, Size2D};
+use microcad_core::{Color, RenderResolution, Size2D, theme::Theme};
 use thiserror::Error;
 
 /// Error type for attributes.
@@ -105,6 +105,18 @@ impl Eval<Option<ExportCommand>> for syntax::Attribute {
     }
 }
 
+impl Eval<Option<MeasureCommand>> for syntax::Attribute {
+    fn eval(&self, _: &mut Context) -> EvalResult<Option<MeasureCommand>> {
+        todo!("MeasureCommand")
+    }
+}
+
+impl Eval<Option<CustomCommand>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<CustomCommand>> {
+        todo!("CustomCommand")
+    }
+}
+
 impl Eval<Option<Color>> for syntax::AttributeCommand {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<Color>> {
         match self {
@@ -113,6 +125,7 @@ impl Eval<Option<Color>> for syntax::AttributeCommand {
             AttributeCommand::Expression(expression) => {
                 let value: Value = expression.eval(context)?;
                 match value {
+                    // Color from string: color = "red"
                     Value::String(s) => match Color::from_str(&s) {
                         Ok(color) => Ok(Some(color)),
                         Err(err) => {
@@ -120,6 +133,7 @@ impl Eval<Option<Color>> for syntax::AttributeCommand {
                             Ok(None)
                         }
                     },
+                    // Color from tuple: color = (r = 1.0, g = 1.0, b = 1.0, a = 1.0)
                     Value::Tuple(tuple) => match Color::try_from(tuple.as_ref()) {
                         Ok(color) => Ok(Some(color)),
                         Err(err) => {
@@ -140,18 +154,73 @@ impl Eval<Option<Color>> for syntax::AttributeCommand {
     }
 }
 
-impl Eval<Option<Color>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<Color>> {
-        assert_eq!(self.id.id().as_str(), "color");
-        match self.single_command() {
-            Some(command) => Ok(command.eval(context)?),
-            None => {
-                context.warning(self, AttributeError::InvalidCommand(self.id.clone()))?;
+impl Eval<Option<ResolutionAttribute>> for syntax::AttributeCommand {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<ResolutionAttribute>> {
+        match self {
+            AttributeCommand::Expression(expression) => {
+                let value: Value = expression.eval(context)?;
+                match value {
+                    Value::Quantity(qty) => match qty.quantity_type {
+                        QuantityType::Scalar => Ok(Some(ResolutionAttribute::Relative(qty.value))),
+                        QuantityType::Length => Ok(Some(ResolutionAttribute::Linear(qty.value))),
+                        _ => unimplemented!(),
+                    },
+                    _ => todo!("Error handling"),
+                }
+            }
+            AttributeCommand::Call(_, _) => {
+                context.warning(
+                    self,
+                    AttributeError::InvalidCommand(Identifier::no_ref("resolution")),
+                )?;
                 Ok(None)
             }
         }
     }
 }
+
+impl Eval<Option<std::rc::Rc<Theme>>> for syntax::AttributeCommand {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<std::rc::Rc<Theme>>> {
+        match self {
+            AttributeCommand::Expression(_) => todo!(),
+            AttributeCommand::Call(_, _) => {
+                context.warning(
+                    self,
+                    AttributeError::InvalidCommand(Identifier::no_ref("resolution")),
+                )?;
+                Ok(None)
+            }
+        }
+    }
+}
+
+impl Eval<Option<Size2D>> for syntax::AttributeCommand {
+    fn eval(&self, _: &mut Context) -> EvalResult<Option<Size2D>> {
+        todo!("Get Size2D, e.g. `size = (width = 10mm, height = 10mm) from AttributeCommand")
+    }
+}
+
+macro_rules! eval_to_attribute {
+    ($id:ident: $ty:ty) => {
+        impl Eval<Option<$ty>> for syntax::Attribute {
+            fn eval(&self, context: &mut Context) -> EvalResult<Option<$ty>> {
+                assert_eq!(self.id.id().as_str(), stringify!($id));
+                match self.single_command() {
+                    Some(command) => Ok(command.eval(context)?),
+                    None => {
+                        context.warning(self, AttributeError::InvalidCommand(self.id.clone()))?;
+                        Ok(None)
+                    }
+                }
+            }
+        }
+    };
+}
+
+eval_to_attribute!(color: Color);
+eval_to_attribute!(resolution: ResolutionAttribute);
+eval_to_attribute!(theme: std::rc::Rc<Theme>);
+eval_to_attribute!(size: Size2D);
 
 impl Eval<Option<crate::model::Attribute>> for syntax::Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<crate::model::Attribute>> {
@@ -162,16 +231,30 @@ impl Eval<Option<crate::model::Attribute>> for syntax::Attribute {
                 let color: Option<Color> = self.eval(context)?;
                 color.map(Attr::Color)
             }
+            "resolution" => {
+                let resolution: Option<ResolutionAttribute> = self.eval(context)?;
+                resolution.map(Attr::Resolution)
+            }
+            "theme" => {
+                let theme: Option<std::rc::Rc<Theme>> = self.eval(context)?;
+                theme.map(Attr::Theme)
+            }
+            "size" => {
+                let size: Option<Size2D> = self.eval(context)?;
+                size.map(Attr::Size)
+            }
             "export" => {
                 let export: Option<ExportCommand> = self.eval(context)?;
                 export.map(Attr::Export)
             }
-            _ => todo!(), /*             "resolution" => Attr::Resolution(self.eval(context)?),
-                          "theme" => Attr::Theme(self.eval(context)?),
-                          "size" => Attr::Size(self.eval(context)?),
-                          "export" => Attr::Export(self.eval(context)?),
-                          "measure" => Attr::Measure(self.eval(context)?),
-                          _ => Attr::Custom(self.id.clone(), self.eval(context)?), */
+            "measure" => {
+                let measure: Option<MeasureCommand> = self.eval(context)?;
+                measure.map(Attr::Measure)
+            }
+            _ => {
+                let custom_command: Option<CustomCommand> = self.eval(context)?;
+                custom_command.map(Attr::Custom)
+            }
         })
     }
 }

@@ -9,8 +9,8 @@ use derive_more::{Deref, DerefMut};
 /// A subcommand for an [`AttributeCommand`].
 #[derive(Debug, Clone)]
 pub enum AttributeCommand {
-    /// A command with an identifier and optional arguments: `width(offset = 30mm)`.
-    Call(Identifier, Option<ArgumentList>),
+    /// A command with an optional identifier and optional arguments: `width(offset = 30mm)`.
+    Call(Option<Identifier>, Option<ArgumentList>),
     /// A format string subcommand: `"test.svg"`.
     Expression(Expression),
 }
@@ -22,6 +22,10 @@ impl std::fmt::Display for AttributeCommand {
                 write!(
                     f,
                     "{id}{argument_list}",
+                    id = match id {
+                        Some(id) => format!("{id}"),
+                        None => String::new(),
+                    },
                     argument_list = match argument_list {
                         Some(argument_list) => format!("({argument_list})"),
                         None => String::new(),
@@ -36,12 +40,14 @@ impl std::fmt::Display for AttributeCommand {
 impl SrcReferrer for AttributeCommand {
     fn src_ref(&self) -> SrcRef {
         match &self {
-            AttributeCommand::Call(identifier, argument_list) => match argument_list {
-                Some(argument_list) => {
-                    SrcRef::merge(&identifier.src_ref(), &argument_list.src_ref())
+            AttributeCommand::Call(identifier, argument_list) => {
+                match (identifier, argument_list) {
+                    (None, None) => unreachable!("Invalid AttributeCommand::Call"),
+                    (None, Some(arguments)) => arguments.src_ref(),
+                    (Some(identifier), None) => identifier.src_ref(),
+                    (Some(identifier), Some(arguments)) => SrcRef::merge(identifier, arguments),
                 }
-                None => identifier.src_ref(),
-            },
+            }
             AttributeCommand::Expression(expression) => expression.src_ref(),
         }
     }

@@ -21,6 +21,15 @@ use crate::{create_tuple_value, syntax::*, value::*};
 
 use microcad_core::{Color, Size2D, theme::Theme};
 
+/// A custom command attribute from an exporter, e.g.: `svg = (style = "fill:none")`
+#[derive(Clone, Debug)]
+pub struct CustomCommand {
+    /// Attribute id.
+    id: Identifier,
+    /// Argument tuple.
+    arguments: Box<Tuple>,
+}
+
 /// An attribute for a model.
 #[derive(Clone, Debug)]
 pub enum Attribute {
@@ -37,7 +46,7 @@ pub enum Attribute {
     /// Measure command: `measure = width, height`
     Measure(MeasureCommand),
     /// Custom non-builtin attribute with tuples: svg = (fill = "color"))
-    Custom(Identifier, Tuple),
+    Custom(CustomCommand),
 }
 
 impl Attribute {
@@ -50,7 +59,7 @@ impl Attribute {
             Attribute::Size(_) => Identifier::no_ref("size"),
             Attribute::Export(_) => Identifier::no_ref("export"),
             Attribute::Measure(_) => Identifier::no_ref("measure"),
-            Attribute::Custom(id, _) => id.clone(),
+            Attribute::Custom(attr) => attr.id.clone(),
         }
     }
 
@@ -76,7 +85,7 @@ impl From<Attribute> for Value {
             Attribute::Size(size) => size.into(),
             Attribute::Export(e) => e.into(),
             Attribute::Measure(m) => m.into(),
-            Attribute::Custom(_, tuple) => tuple.into(),
+            Attribute::Custom(attr) => Value::Tuple(attr.arguments.clone()),
         }
     }
 }
@@ -162,7 +171,7 @@ pub trait AttributesAccess {
             .iter()
             .fold(Vec::new(), |mut attributes, attribute| {
                 match attribute {
-                    Attribute::Custom(_, tuple) => attributes.push(tuple.clone()),
+                    Attribute::Custom(attr) => attributes.push(attr.arguments.as_ref().clone()),
                     _ => unreachable!(),
                 }
                 attributes
