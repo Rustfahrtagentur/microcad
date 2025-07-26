@@ -277,7 +277,7 @@ unary_op         =  _{ unary_minus | unary_plus | unary_not }
   unary_plus     =   { "+" }
   unary_not      =   { "!" }
 postfix          =  _{ element_access }
-primary          =  _{ literal | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
+primary          =  _{ literal | marker | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
 
 //`a, b, c`: ok
 //`1+2, 4*3, 3.2`: ok
@@ -377,7 +377,7 @@ assignment = { (qualifier ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ 
 assignment_statement = { (attribute_list ~ ws+)? ~ assignment ~ ws* ~ ";" }
 
 //`@children`: ok
-marker_statement = { "@" ~ identifier }
+marker = { "@" ~ identifier }
 
 // Rule for a single parameter of a definition
 //`r: Length = 5.0mm`: ok
@@ -455,7 +455,6 @@ statement = {
   use_statement |
   return_statement |
   if_statement |
-  marker_statement |
 
   inner_attribute_statement |
 

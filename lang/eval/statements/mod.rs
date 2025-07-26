@@ -35,10 +35,6 @@ impl Eval for Statement {
             }
             Self::If(i) => i.eval(context),
             Self::Expression(e) => e.eval(context),
-            Self::Marker(m) => {
-                context.grant(m)?;
-                Ok(Value::None)
-            }
             Self::InnerAttribute(i) => {
                 context.grant(i)?;
                 Ok(Value::None)
@@ -86,7 +82,6 @@ impl Eval<Models> for Statement {
                 model.into()
             }
             Self::Expression(e) => e.eval(context)?,
-            Self::Marker(m) => m.eval(context)?,
             Self::InnerAttribute(a) => {
                 context.grant(a)?;
                 Default::default()

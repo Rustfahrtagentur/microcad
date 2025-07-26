@@ -126,7 +126,10 @@ impl Eval for Expression {
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Nested(nested) => nested.eval(context),
-
+            Self::Marker(marker) => {
+                let model: Option<Model> = marker.eval(context)?;
+                Ok(Value::Models(model.into_iter().collect()))
+            }
             // Access a property `x` of an expression `circle.x`
             Self::PropertyAccess(lhs, id, src_ref) => {
                 let value: Value = lhs.eval(context)?;

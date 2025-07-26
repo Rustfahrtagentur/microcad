@@ -82,16 +82,6 @@ impl Parse for IfStatement {
     }
 }
 
-impl Parse for Marker {
-    fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::marker_statement);
-        Ok(Self {
-            id: Identifier::parse(pair.inner().next().expect(INTERNAL_PARSE_ERROR))?,
-            src_ref: pair.src_ref(),
-        })
-    }
-}
-
 impl Parse for ExpressionStatement {
     fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
         Ok(Self {
@@ -118,7 +108,6 @@ impl Parse for Statement {
             Rule::use_statement => Self::Use(UseStatement::parse(first)?),
             Rule::return_statement => Self::Return(ReturnStatement::parse(first)?),
             Rule::if_statement => Self::If(IfStatement::parse(first)?),
-            Rule::marker_statement => Self::Marker(Marker::parse(first)?),
             Rule::inner_attribute => Self::InnerAttribute(Attribute::parse(first)?),
 
             Rule::assignment_statement => Self::Assignment(AssignmentStatement::parse(first)?),

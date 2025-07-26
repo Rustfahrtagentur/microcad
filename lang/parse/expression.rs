@@ -25,6 +25,16 @@ impl Parse for ListExpression {
     }
 }
 
+impl Parse for Marker {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rule(&pair, Rule::marker);
+        Ok(Self {
+            id: Identifier::parse(pair.inner().next().expect(INTERNAL_PARSE_ERROR))?,
+            src_ref: pair.src_ref(),
+        })
+    }
+}
+
 lazy_static::lazy_static! {
     /// Expression parser
     static ref PRATT_PARSER: pest::pratt_parser::PrattParser<Rule> = {
@@ -89,6 +99,7 @@ impl Parse for Expression {
                         Ok(Self::FormatString(FormatString::parse(primary)?))
                     }
                     (primary, Rule::nested) => Ok(Self::Nested(Nested::parse(primary)?)),
+                    (primary, Rule::marker) => Ok(Self::Marker(Marker::parse(primary)?)),
                     rule => unreachable!(
                         "Expression::parse expected atom, found {:?} {:?}",
                         rule,

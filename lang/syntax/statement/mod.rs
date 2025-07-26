@@ -8,14 +8,12 @@ use crate::{rc::*, src_ref::*, syntax::*};
 mod assignment_statement;
 mod expression_statement;
 mod if_statement;
-mod marker_statement;
 mod return_statement;
 mod statement_list;
 
 pub use assignment_statement::*;
 pub use expression_statement::*;
 pub use if_statement::*;
-pub use marker_statement::*;
 pub use return_statement::*;
 pub use statement_list::*;
 
@@ -37,8 +35,6 @@ pub enum Statement {
     Return(ReturnStatement),
     /// If statement
     If(IfStatement),
-    /// Marker statement
-    Marker(Marker),
     /// Inner attribute statement: `#![size = std::A4]`.
     InnerAttribute(Attribute),
 
@@ -59,7 +55,6 @@ impl SrcReferrer for Statement {
             Self::Use(us) => us.src_ref(),
             Self::Return(r) => r.src_ref(),
             Self::If(i) => i.src_ref(),
-            Self::Marker(m) => m.src_ref(),
             Self::InnerAttribute(i) => i.src_ref(),
 
             Self::Assignment(a) => a.src_ref(),
@@ -87,7 +82,6 @@ impl std::fmt::Display for Statement {
             Self::Use(u) => write!(f, "{u};"),
             Self::Return(r) => write!(f, "{r};"),
             Self::If(i) => write!(f, "{i}"),
-            Self::Marker(m) => write!(f, "{m};"),
             Self::InnerAttribute(i) => write!(f, "{i}"),
 
             Self::Assignment(a) => write!(f, "{a}"),
@@ -108,7 +102,6 @@ impl PrintSyntax for Statement {
             Self::Use(u) => u.print_syntax(f, depth),
             Self::Return(r) => r.print_syntax(f, depth),
             Self::If(i) => i.print_syntax(f, depth),
-            Self::Marker(m) => m.print_syntax(f, depth),
             Self::InnerAttribute(i) => i.print_syntax(f, depth),
 
             Self::Assignment(a) => a.print_syntax(f, depth),

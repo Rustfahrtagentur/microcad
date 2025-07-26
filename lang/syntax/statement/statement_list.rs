@@ -31,7 +31,6 @@ impl StatementList {
                 Statement::Init(_)
                 | Statement::Return(_)
                 | Statement::If(_)
-                | Statement::Marker(_)
                 | Statement::InnerAttribute(_)
                 | Statement::Assignment(_)
                 | Statement::Expression(_) => {}

@@ -4,11 +4,13 @@
 //! µcad syntax elements related to expressions
 
 mod list_expression;
+mod marker;
 mod nested;
 mod nested_item;
 mod tuple_expression;
 
 pub use list_expression::*;
+pub use marker::*;
 pub use nested::*;
 pub use nested_item::*;
 pub use tuple_expression::*;
@@ -36,7 +38,9 @@ pub enum Expression {
     TupleExpression(TupleExpression),
     /// A list whitespace separated of nested items: `translate() rotate()`, `b c`, `a b() {}`
     Nested(Nested),
-    /// A binary operation: a + b
+    /// A marker expression: `@children`.
+    Marker(Marker),
+    /// A binary operation: `a + b`
     BinaryOp {
         /// Left-hand side
         lhs: Box<Expression>,
@@ -78,7 +82,8 @@ impl SrcReferrer for Expression {
             Self::FormatString(fs) => fs.src_ref(),
             Self::ListExpression(le) => le.src_ref(),
             Self::TupleExpression(te) => te.src_ref(),
-            Self::Nested(n) => n.src_ref().clone(),
+            Self::Nested(n) => n.src_ref(),
+            Self::Marker(m) => m.src_ref(),
             Self::BinaryOp {
                 lhs: _,
                 op: _,
