@@ -1,6 +1,6 @@
 -- Test --
   source_assignment_const
-  ../doc/tests/statement_usage.md:72
+  ../doc/tests/statement_usage.md:66
 
 -- Code --
 

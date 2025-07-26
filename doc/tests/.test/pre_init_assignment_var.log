@@ -1,6 +1,6 @@
 -- Test --
   pre_init_assignment_var
-  ../doc/tests/statement_usage.md:298
+  ../doc/tests/statement_usage.md:276
 
 -- Code --
 

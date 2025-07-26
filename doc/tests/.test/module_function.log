@@ -1,6 +1,6 @@
 -- Test --
   module_function
-  ../doc/tests/statement_usage.md:120
+  ../doc/tests/statement_usage.md:114
 
 -- Code --
 

@@ -1,6 +1,6 @@
 -- Test --
   module_if
-  ../doc/tests/statement_usage.md:160
+  ../doc/tests/statement_usage.md:154
 
 -- Code --
 

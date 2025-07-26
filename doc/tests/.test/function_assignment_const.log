@@ -1,6 +1,6 @@
 -- Test --
   function_assignment_const
-  ../doc/tests/statement_usage.md:746
+  ../doc/tests/statement_usage.md:708
 
 -- Code --
 

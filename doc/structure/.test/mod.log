@@ -34,11 +34,11 @@ error: Symbol pow not found.
   15 |         pow(x, 2.0)
      |         ^^^^^^^^^^^
      |
-error: Not implemented: evaluate if statement in function
-  ---> <from_str>:5:9
+error: Symbol pow not found.
+  ---> <from_str>:8:17
      |
-   5 |         if n == 1 {
-     |         ^^^^^^^^^^^^^^^^^^^
+   8 |             x * pow(x, n-1) // return recursive product
+     |                 ^^^^^^^^^^^
      |
 -- Test Result --
 TODO

@@ -1,6 +1,6 @@
 -- Test --
   pre_init_use
-  ../doc/tests/statement_usage.md:250
+  ../doc/tests/statement_usage.md:236
 
 -- Code --
 

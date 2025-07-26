@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**200** tests from markdown.
+**196** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -35,6 +35,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/body_return.png)](../doc/tests/.test/body_return.log) | [body_return](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/body_use.png)](../doc/tests/.test/body_use.log) | [body_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/body_workbench.png)](../doc/tests/.test/body_workbench.log) | [body_workbench](../doc/tests/statement_usage.md) |
+| [![test](../doc/types/.test/boolean.png)](../doc/types/.test/boolean.log) | [boolean](../doc/types/primitive_types.md) |
 | [![test](../doc/structure/.test/building_plan.png)](../doc/structure/.test/building_plan.log) | [building_plan](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/call_function.png)](../doc/structure/.test/call_function.log) | [call_function](../doc/structure/calls.md) |
 | [![test](../doc/structure/.test/call_workbench.png)](../doc/structure/.test/call_workbench.log) | [call_workbench](../doc/structure/calls.md) |
@@ -55,7 +56,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/function_function.png)](../doc/tests/.test/function_function.log) | [function_function](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/function_if.png)](../doc/tests/.test/function_if.log) | [function_if](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/function_init.png)](../doc/tests/.test/function_init.log) | [function_init](../doc/tests/statement_usage.md) |
-| [![test](../doc/tests/.test/function_marker.png)](../doc/tests/.test/function_marker.log) | [function_marker](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/function_module.png)](../doc/tests/.test/function_module.log) | [function_module](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/function_pub_use.png)](../doc/tests/.test/function_pub_use.log) | [function_pub_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/function_return.png)](../doc/tests/.test/function_return.log) | [function_return](../doc/tests/statement_usage.md) |
@@ -73,7 +73,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/init_function.png)](../doc/tests/.test/init_function.log) | [init_function](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/init_if.png)](../doc/tests/.test/init_if.log) | [init_if](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/init_init.png)](../doc/tests/.test/init_init.log) | [init_init](../doc/tests/statement_usage.md) |
-| [![test](../doc/tests/.test/init_marker.png)](../doc/tests/.test/init_marker.log) | [init_marker](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/init_module.png)](../doc/tests/.test/init_module.log) | [init_module](../doc/tests/statement_usage.md) |
 | [![test](../doc/structure/.test/init_property.png)](../doc/structure/.test/init_property.log) | [init_property](../doc/structure/workbench.md) |
 | [![test](../doc/tests/.test/init_pub_use.png)](../doc/tests/.test/init_pub_use.log) | [init_pub_use](../doc/tests/statement_usage.md) |
@@ -100,7 +99,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/module_function.png)](../doc/tests/.test/module_function.log) | [module_function](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/module_if.png)](../doc/tests/.test/module_if.log) | [module_if](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/module_init.png)](../doc/tests/.test/module_init.log) | [module_init](../doc/tests/statement_usage.md) |
-| [![test](../doc/tests/.test/module_marker.png)](../doc/tests/.test/module_marker.log) | [module_marker](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/module_module.png)](../doc/tests/.test/module_module.log) | [module_module](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/module_pub_use.png)](../doc/tests/.test/module_pub_use.log) | [module_pub_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/module_return.png)](../doc/tests/.test/module_return.log) | [module_return](../doc/tests/statement_usage.md) |
@@ -124,7 +122,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/pre_init_function.png)](../doc/tests/.test/pre_init_function.log) | [pre_init_function](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/pre_init_if.png)](../doc/tests/.test/pre_init_if.log) | [pre_init_if](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/pre_init_init.png)](../doc/tests/.test/pre_init_init.log) | [pre_init_init](../doc/tests/statement_usage.md) |
-| [![test](../doc/tests/.test/pre_init_marker.png)](../doc/tests/.test/pre_init_marker.log) | [pre_init_marker](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/pre_init_module.png)](../doc/tests/.test/pre_init_module.log) | [pre_init_module](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/pre_init_pub_use.png)](../doc/tests/.test/pre_init_pub_use.log) | [pre_init_pub_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/pre_init_return.png)](../doc/tests/.test/pre_init_return.log) | [pre_init_return](../doc/tests/statement_usage.md) |
@@ -144,7 +141,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/source_function.png)](../doc/tests/.test/source_function.log) | [source_function](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_if.png)](../doc/tests/.test/source_if.log) | [source_if](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_init.png)](../doc/tests/.test/source_init.log) | [source_init](../doc/tests/statement_usage.md) |
-| [![test](../doc/tests/.test/source_marker.png)](../doc/tests/.test/source_marker.log) | [source_marker](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_module.png)](../doc/tests/.test/source_module.log) | [source_module](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_pub_use.png)](../doc/tests/.test/source_pub_use.log) | [source_pub_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_return.png)](../doc/tests/.test/source_return.log) | [source_return](../doc/tests/statement_usage.md) |

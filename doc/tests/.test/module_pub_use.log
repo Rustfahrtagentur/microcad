@@ -1,6 +1,6 @@
 -- Test --
   module_pub_use
-  ../doc/tests/statement_usage.md:144
+  ../doc/tests/statement_usage.md:138
 
 -- Code --
 

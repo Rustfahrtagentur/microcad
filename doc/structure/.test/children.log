@@ -21,12 +21,14 @@ punched_disk() {
     std::geo2d::circle(radius = 2cm);
 }
 
--- Parse Error --
-Parser error:  --> 4:8
-  |
-4 |     if @children.count() == 2 {
-  |        ^---
-  |
-  = expected COMMENT or expression
+-- Output --
+-- Errors --
+error: Not implemented: call_method for Models
+error: If condition is not a boolean: [101m[1m INVALID VALUE [49m[22m
+  ---> <from_str>:4:5
+     |
+   4 |     if @children.count() == 2 {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-FAIL (TODO)
+TODO

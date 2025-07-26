@@ -4,7 +4,7 @@
 
 -- Code --
 
-std::debug::assert( true != false );
+std::debug::assert(true != false);
 
 -- Output --
 -- Errors --

@@ -1,6 +1,6 @@
 -- Test --
   init_assignment_const
-  ../doc/tests/statement_usage.md:404
+  ../doc/tests/statement_usage.md:374
 
 -- Code --
 

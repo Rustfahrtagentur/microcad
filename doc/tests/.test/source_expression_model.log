@@ -1,6 +1,6 @@
 -- Test --
   source_expression_model
-  ../doc/tests/statement_usage.md:96
+  ../doc/tests/statement_usage.md:90
 
 -- Code --
 
