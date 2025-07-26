@@ -46,12 +46,11 @@ impl SourceFile {
 
         // TODO: Would not the hash be calculated in SourceFile::parse anyway?
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        crate::invalid!(SOURCE).hash(&mut hasher);
+        "<from_str>".hash(&mut hasher);
         let hash = hasher.finish();
 
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, hash)?;
-        source_file.filename =
-            std::path::PathBuf::from_str(crate::invalid!(SOURCE)).expect("filename error");
+        source_file.filename = std::path::PathBuf::from_str("<from_str>").expect("filename error");
         log::debug!("loaded string successfully",);
         Ok(Rc::new(source_file))
     }
