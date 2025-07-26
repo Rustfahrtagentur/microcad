@@ -6,8 +6,8 @@ Conditions lead to different executions paths for different cases.
 
 [![test](.test/if.png)](.test/if.log)
 
-```µcad,if#todo
-fn f( x: Scalar ) {
+```µcad,if
+fn f(x: Integer) {
     if x == 5 or x == 4 {
         std::print("match");
     } else if x > 0 and x < 4 {
