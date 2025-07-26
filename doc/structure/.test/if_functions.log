@@ -1,6 +1,6 @@
 -- Test --
-  if
-  ../doc/structure/conditionals.md:9
+  if_functions
+  ../doc/structure/conditionals.md:24
 
 -- Code --
 

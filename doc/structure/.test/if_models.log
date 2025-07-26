@@ -1,0 +1,21 @@
+-- Test --
+  if_models
+  ../doc/structure/conditionals.md:7
+
+-- Code --
+
+sketch my_sketch(a: Integer) {
+    if a == 1 {
+        std::geo2d::circle(radius = 1mm)
+    } else {
+        std::geo2d::circle(radius = 4mm)
+    }
+}
+
+my_sketch(1);
+my_sketch(2);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**196** tests from markdown.
+**197** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -63,7 +63,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/function_workbench.png)](../doc/tests/.test/function_workbench.log) | [function_workbench](../doc/tests/statement_usage.md) |
 | [![test](../doc/libs/std/ops/.test/hull_multiple.png)](../doc/libs/std/ops/.test/hull_multiple.log) | [hull_multiple](../doc/libs/std/ops/hull.md) |
 | [![test](../doc/libs/std/ops/.test/hull_single.png)](../doc/libs/std/ops/.test/hull_single.log) | [hull_single](../doc/libs/std/ops/hull.md) |
-| [![test](../doc/structure/.test/if.png)](../doc/structure/.test/if.log) | [if](../doc/structure/conditionals.md) |
+| [![test](../doc/structure/.test/if_functions.png)](../doc/structure/.test/if_functions.log) | [if_functions](../doc/structure/conditionals.md) |
+| [![test](../doc/structure/.test/if_models.png)](../doc/structure/.test/if_models.log) | [if_models](../doc/structure/conditionals.md) |
 | [![test](../doc/structure/.test/illegal_workbench_statement.png)](../doc/structure/.test/illegal_workbench_statement.log) | [illegal_workbench_statement](../doc/structure/workbench.md) |
 | [![test](../doc/tests/.test/init_assignment_const.png)](../doc/tests/.test/init_assignment_const.log) | [init_assignment_const](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/init_assignment_prop.png)](../doc/tests/.test/init_assignment_prop.log) | [init_assignment_prop](../doc/tests/statement_usage.md) |
