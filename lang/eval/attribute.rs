@@ -45,11 +45,15 @@ impl Eval<ArgumentValueList> for syntax::Attribute {
 
         for command in &self.commands {
             match command {
-                AttributeCommand::Call(_, _) => todo!(),
+                AttributeCommand::Call(None, Some(argument_list)) => {
+                    let argument_value_list: ArgumentValueList = argument_list.eval(context)?;
+                    arguments.append(&mut argument_value_list.iter().cloned().collect())
+                }
                 AttributeCommand::Expression(expression) => arguments.push((
                     Identifier::default(),
                     ArgumentValue::new(expression.eval(context)?, expression.src_ref()),
                 )),
+                _ => unimplemented!(),
             }
         }
 
@@ -113,7 +117,25 @@ impl Eval<Option<MeasureCommand>> for syntax::Attribute {
 
 impl Eval<Option<CustomCommand>> for syntax::Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<CustomCommand>> {
-        todo!("CustomCommand")
+        match context.exporters().exporter_by_id(self.id.id()) {
+            Ok(exporter) => {
+                let arguments: ArgumentValueList = self.eval(context)?;
+                match ArgumentMatch::find_match(&arguments, &exporter.parameters()) {
+                    Ok(tuple) => Ok(Some(CustomCommand {
+                        id: self.id.clone(),
+                        arguments: Box::new(tuple),
+                    })),
+                    Err(err) => {
+                        context.warning(self, err)?;
+                        Ok(None)
+                    }
+                }
+            }
+            Err(err) => {
+                context.warning(self, err)?;
+                Ok(None)
+            }
+        }
     }
 }
 

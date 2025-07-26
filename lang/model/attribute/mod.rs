@@ -25,9 +25,9 @@ use microcad_core::{Color, Size2D, theme::Theme};
 #[derive(Clone, Debug)]
 pub struct CustomCommand {
     /// Attribute id.
-    id: Identifier,
+    pub id: Identifier,
     /// Argument tuple.
-    arguments: Box<Tuple>,
+    pub arguments: Box<Tuple>,
 }
 
 /// An attribute for a model.
