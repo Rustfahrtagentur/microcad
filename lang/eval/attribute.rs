@@ -63,6 +63,8 @@ impl Eval<ArgumentValueList> for syntax::Attribute {
 
 impl Eval<Option<ExportCommand>> for syntax::Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<ExportCommand>> {
+        assert_eq!(self.id.id().as_str(), "export");
+
         match ArgumentMatch::find_match(
             &self.eval(context)?,
             &[
@@ -109,31 +111,56 @@ impl Eval<Option<ExportCommand>> for syntax::Attribute {
     }
 }
 
-impl Eval<Option<MeasureCommand>> for syntax::Attribute {
-    fn eval(&self, _: &mut Context) -> EvalResult<Option<MeasureCommand>> {
-        todo!("MeasureCommand")
+impl Eval<Vec<MeasureCommand>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Vec<MeasureCommand>> {
+        let mut commands = Vec::new();
+
+        for command in &self.commands {
+            match command {
+                AttributeCommand::Call(Some(id), _) => match id.id().as_str() {
+                    "width" => commands.push(MeasureCommand::Width),
+                    "height" => commands.push(MeasureCommand::Height),
+                    "size" => commands.push(MeasureCommand::Size),
+                    _ => context.warning(self, AttributeError::InvalidCommand(id.clone()))?,
+                },
+                _ => unimplemented!(),
+            }
+        }
+
+        Ok(commands)
     }
 }
 
-impl Eval<Option<CustomCommand>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<CustomCommand>> {
+impl Eval<Vec<CustomCommand>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Vec<CustomCommand>> {
         match context.exporters().exporter_by_id(self.id.id()) {
             Ok(exporter) => {
-                let arguments: ArgumentValueList = self.eval(context)?;
-                match ArgumentMatch::find_match(&arguments, &exporter.parameters()) {
-                    Ok(tuple) => Ok(Some(CustomCommand {
-                        id: self.id.clone(),
-                        arguments: Box::new(tuple),
-                    })),
-                    Err(err) => {
-                        context.warning(self, err)?;
-                        Ok(None)
+                let mut commands = Vec::new();
+                for command in &self.commands {
+                    match command {
+                        AttributeCommand::Call(None, Some(argument_list)) => {
+                            match ArgumentMatch::find_match(
+                                &argument_list.eval(context)?,
+                                &exporter.parameters(),
+                            ) {
+                                Ok(tuple) => commands.push(CustomCommand {
+                                    id: self.id.clone(),
+                                    arguments: Box::new(tuple),
+                                }),
+                                Err(err) => {
+                                    context.warning(self, err)?;
+                                }
+                            }
+                        }
+                        _ => unimplemented!(),
                     }
                 }
+
+                Ok(commands)
             }
             Err(err) => {
                 context.warning(self, err)?;
-                Ok(None)
+                Ok(Vec::default())
             }
         }
     }
@@ -244,38 +271,38 @@ eval_to_attribute!(resolution: ResolutionAttribute);
 eval_to_attribute!(theme: std::rc::Rc<Theme>);
 eval_to_attribute!(size: Size2D);
 
-impl Eval<Option<crate::model::Attribute>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<crate::model::Attribute>> {
+impl Eval<Vec<crate::model::Attribute>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Vec<crate::model::Attribute>> {
         let id = self.id.id().as_str();
         use crate::model::Attribute as Attr;
         Ok(match id {
-            "color" => {
-                let color: Option<Color> = self.eval(context)?;
-                color.map(Attr::Color)
-            }
-            "resolution" => {
-                let resolution: Option<ResolutionAttribute> = self.eval(context)?;
-                resolution.map(Attr::Resolution)
-            }
-            "theme" => {
-                let theme: Option<std::rc::Rc<Theme>> = self.eval(context)?;
-                theme.map(Attr::Theme)
-            }
-            "size" => {
-                let size: Option<Size2D> = self.eval(context)?;
-                size.map(Attr::Size)
-            }
-            "export" => {
-                let export: Option<ExportCommand> = self.eval(context)?;
-                export.map(Attr::Export)
-            }
+            "color" => match self.eval(context)? {
+                Some(color) => vec![Attr::Color(color)],
+                None => Default::default(),
+            },
+            "resolution" => match self.eval(context)? {
+                Some(resolution) => vec![Attr::Resolution(resolution)],
+                None => Default::default(),
+            },
+            "theme" => match self.eval(context)? {
+                Some(theme) => vec![Attr::Theme(theme)],
+                None => Default::default(),
+            },
+            "size" => match self.eval(context)? {
+                Some(size) => vec![Attr::Size(size)],
+                None => Default::default(),
+            },
+            "export" => match self.eval(context)? {
+                Some(export) => vec![Attr::Export(export)],
+                None => Default::default(),
+            },
             "measure" => {
-                let measure: Option<MeasureCommand> = self.eval(context)?;
-                measure.map(Attr::Measure)
+                let measures: Vec<MeasureCommand> = self.eval(context)?;
+                measures.iter().cloned().map(Attr::Measure).collect()
             }
             _ => {
-                let custom_command: Option<CustomCommand> = self.eval(context)?;
-                custom_command.map(Attr::Custom)
+                let commands: Vec<CustomCommand> = self.eval(context)?;
+                commands.iter().cloned().map(Attr::Custom).collect()
             }
         })
     }
@@ -283,14 +310,12 @@ impl Eval<Option<crate::model::Attribute>> for syntax::Attribute {
 
 impl Eval<crate::model::Attributes> for AttributeList {
     fn eval(&self, context: &mut Context) -> EvalResult<crate::model::Attributes> {
-        let mut attributes = Vec::new();
-
-        for attribute in self.iter() {
-            if let Some(attribute) = attribute.eval(context)? {
-                attributes.push(attribute);
-            }
-        }
-
-        Ok(Attributes(attributes))
+        Ok(Attributes(self.iter().try_fold(
+            Vec::new(),
+            |mut attributes, attribute| -> EvalResult<_> {
+                attributes.append(&mut attribute.eval(context)?);
+                Ok(attributes)
+            },
+        )?))
     }
 }

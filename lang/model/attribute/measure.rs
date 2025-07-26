@@ -11,10 +11,20 @@ pub enum MeasureCommand {
     /// Measure the size of a geometry (for each dimension).
     #[default]
     Size,
+
+    /// Width command
+    Width,
+
+    /// Height command
+    Height,
 }
 
 impl From<MeasureCommand> for Value {
-    fn from(_: MeasureCommand) -> Self {
-        Value::String("size".into())
+    fn from(command: MeasureCommand) -> Self {
+        match command {
+            MeasureCommand::Size => Value::String("size".into()),
+            MeasureCommand::Width => Value::String("width".into()),
+            MeasureCommand::Height => Value::String("height".into()),
+        }
     }
 }

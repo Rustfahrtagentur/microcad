@@ -43,7 +43,7 @@ pub enum Attribute {
     Size(Size2D),
     /// Export command: `export = "test.svg"`.
     Export(ExportCommand),
-    /// Measure command: `measure = width, height`
+    /// Measure command: `measure = width`
     Measure(MeasureCommand),
     /// Custom non-builtin attribute with tuples: svg = (fill = "color"))
     Custom(CustomCommand),
