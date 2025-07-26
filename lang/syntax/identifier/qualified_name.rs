@@ -137,7 +137,7 @@ impl QualifiedName {
 impl std::fmt::Display for QualifiedName {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.is_empty() {
-            write!(f, "<none>")
+            write!(f, crate::invalid!(NAME))
         } else {
             write!(f, "{}", join_identifiers(&self.0, "::"))
         }

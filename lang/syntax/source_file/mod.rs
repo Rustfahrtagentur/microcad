@@ -25,9 +25,6 @@ pub struct SourceFile {
 }
 
 impl SourceFile {
-    /// Printed instead of a file name if file name could not be retrieved
-    pub const NO_FILE: &str = "<no file>";
-
     /// Return filename of loaded file or `<no file>`
     pub fn filename_as_str(&self) -> &str {
         self.filename

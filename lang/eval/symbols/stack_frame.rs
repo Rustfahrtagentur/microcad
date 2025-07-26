@@ -149,7 +149,7 @@ impl StackFrame {
                         filename = source_file
                             .as_ref()
                             .map(|sf| sf.filename_as_str())
-                            .unwrap_or(SourceFile::NO_FILE),
+                            .unwrap_or(crate::invalid!(FILE)),
                     )?;
                 }
             }

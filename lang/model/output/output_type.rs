@@ -41,10 +41,10 @@ impl std::fmt::Display for OutputType {
             f,
             "{}",
             match &self {
-                Self::NotDetermined => "<unknown>",
+                Self::NotDetermined => crate::invalid!(UNKNOWN),
                 Self::Geometry2D => "2D",
                 Self::Geometry3D => "3D",
-                Self::InvalidMixed => "<invalid>",
+                Self::InvalidMixed => crate::invalid!(OUTPUT),
             }
         )
     }

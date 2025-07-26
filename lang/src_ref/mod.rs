@@ -63,7 +63,7 @@ impl std::fmt::Display for SrcRef {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.0 {
             Some(s) => write!(f, "{}", s.at),
-            _ => write!(f, "<no_ref>"),
+            _ => write!(f, crate::invalid!(REF)),
         }
     }
 }
@@ -76,7 +76,7 @@ impl std::fmt::Debug for SrcRef {
                 "{} ({}..{}) in {:#x}",
                 s.at, s.range.start, s.range.end, s.source_file_hash
             ),
-            _ => write!(f, "<no_ref>"),
+            _ => write!(f, crate::invalid!(REF)),
         }
     }
 }

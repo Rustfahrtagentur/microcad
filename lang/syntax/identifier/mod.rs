@@ -102,7 +102,7 @@ impl<'a> From<&'a Identifier> for &'a str {
 impl std::fmt::Display for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.is_empty() {
-            write!(f, "<none>")
+            write!(f, crate::invalid!(ID))
         } else {
             write!(f, "{}", self.0)
         }

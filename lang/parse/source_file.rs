@@ -37,7 +37,7 @@ impl SourceFile {
     }
 
     /// Create `SourceFile` from string
-    /// The hash of the result will be of `"<from_str>"`.
+    /// The hash of the result will be of `crate::from_str!()`.
     pub fn load_from_str(s: &str) -> ParseResult<Rc<Self>> {
         use std::{
             hash::{Hash, Hasher},
@@ -46,11 +46,12 @@ impl SourceFile {
 
         // TODO: Would not the hash be calculated in SourceFile::parse anyway?
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        "<from_str>".hash(&mut hasher);
+        crate::invalid!(SOURCE).hash(&mut hasher);
         let hash = hasher.finish();
 
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, hash)?;
-        source_file.filename = std::path::PathBuf::from_str("<from_str>").expect("filename error");
+        source_file.filename =
+            std::path::PathBuf::from_str(crate::invalid!(SOURCE)).expect("filename error");
         log::debug!("loaded string successfully",);
         Ok(Rc::new(source_file))
     }

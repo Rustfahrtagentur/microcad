@@ -122,7 +122,7 @@ impl Stack {
             frame.print_stack(f, source_by_hash, idx)?;
         }
         if none {
-            writeln!(f, "<empty>")?
+            writeln!(f, crate::invalid!(STACK))?
         }
         Ok(())
     }
@@ -202,7 +202,7 @@ impl Locals for Stack {
 impl std::fmt::Display for Stack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.0.is_empty() {
-            writeln!(f, "<empty stack>")
+            writeln!(f, crate::invalid!(STACK))
         } else {
             for (n, locals) in self.0.iter().enumerate() {
                 locals.print_locals(f, n * 4)?;

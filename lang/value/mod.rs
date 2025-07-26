@@ -161,7 +161,7 @@ impl Value {
     /// Stringify the value
     pub fn value_to_string(&self) -> String {
         match self {
-            Value::None => "<invalid>".to_string(),
+            Value::None => invalid!(VALUE).to_string(),
             Value::Integer(n) => format!("{n}"),
             Value::Quantity(q) => format!("{q}"),
             Value::Bool(b) => format!("{b}"),
@@ -355,7 +355,7 @@ impl std::ops::BitAnd for Value {
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Value::None => write!(f, "<invalid>"),
+            Value::None => write!(f, crate::invalid!(VALUE)),
             Value::Integer(n) => write!(f, "{n}"),
             Value::Quantity(q) => write!(f, "{q}"),
             Value::Bool(b) => write!(f, "{b}"),
@@ -372,7 +372,7 @@ impl std::fmt::Display for Value {
 impl std::fmt::Debug for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Value::None => write!(f, "<invalid>"),
+            Value::None => write!(f, crate::invalid!(VALUE)),
             Value::Integer(n) => write!(f, "Integer = {n}"),
             Value::Quantity(q) => write!(f, "{q}"),
             Value::Bool(b) => write!(f, "Bool = {b}"),

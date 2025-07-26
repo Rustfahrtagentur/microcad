@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, src_ref::*, syntax::*};
+use crate::{diag::*, src_ref::*};
 
 /// Diagnostic message with source code reference attached.
 #[derive(Debug)]
@@ -82,15 +82,18 @@ impl Diagnostic {
                     source_file
                         .as_ref()
                         .map(|sf| make_relative(&sf.filename))
-                        .unwrap_or(SourceFile::NO_FILE.to_string()),
+                        .unwrap_or(crate::invalid!(FILE).to_string()),
                     src_ref.at
                 )?;
                 writeln!(f, "     |",)?;
 
                 let line = source_file
                     .as_ref()
-                    .map(|sf| sf.get_line(src_ref.at.line - 1).unwrap_or("<no line>"))
-                    .unwrap_or(SourceFile::NO_FILE);
+                    .map(|sf| {
+                        sf.get_line(src_ref.at.line - 1)
+                            .unwrap_or(crate::invalid!(LINE))
+                    })
+                    .unwrap_or(crate::invalid!(FILE));
 
                 writeln!(f, "{: >4} | {}", src_ref.at.line, line)?;
                 writeln!(

@@ -15,6 +15,7 @@
 pub mod builtin;
 pub mod diag;
 pub mod eval;
+pub mod invalid;
 pub mod model;
 pub mod ord_map;
 pub mod parse;

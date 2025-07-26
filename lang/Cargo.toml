@@ -30,14 +30,16 @@ scan_dir = "0.3"
 delegate = "0.13"
 pathdiff = "0.2"
 ctor = "0.4"
+color-print = { version = "0.3", optional = true }
 
 microcad-core = { workspace = true }
 custom_debug = "0.6.2"
 derive_more = { version = "2.0.1", features = ["deref", "deref_mut"] }
 
 [features]
-default = ["geo3d"]
+default = ["geo3d", "ansi-color"]
 geo3d = []
+ansi-color = ["dep:color-print"]
 
 [lints.rust]
 missing_docs = "warn"

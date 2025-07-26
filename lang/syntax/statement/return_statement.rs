@@ -25,7 +25,7 @@ impl std::fmt::Display for ReturnStatement {
         if let Some(result) = &self.result {
             write!(f, "{result}")
         } else {
-            write!(f, "<no result>")
+            write!(f, crate::invalid!(RESULT))
         }
     }
 }
