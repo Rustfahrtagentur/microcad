@@ -61,12 +61,6 @@ return 1;
 if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
 ```
 
-[![test](.test/source_marker.png)](.test/source_marker.log)
-
-```µcad,source_marker#fail
-@children
-```
-
 [![test](.test/source_assignment_const.png)](.test/source_assignment_const.log)
 
 ```µcad,source_assignment_const
@@ -160,14 +154,6 @@ mod k {
 ```µcad,module_if#fail
 mod k {
   if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
-}
-```
-
-[![test](.test/module_marker.png)](.test/module_marker.log)
-
-```µcad,module_marker#fail
-mod k {
-  @children
 }
 ```
 
@@ -277,14 +263,6 @@ sketch k() {
 init(l:Length) {} } k();
 ```
 
-[![test](.test/pre_init_marker.png)](.test/pre_init_marker.log)
-
-```µcad,pre_init_marker#fail
-sketch k() { 
-  @children
-init(l:Length) {} } k();
-```
-
 [![test](.test/pre_init_assignment_const.png)](.test/pre_init_assignment_const.log)
 
 ```µcad,pre_init_assignment_const
@@ -388,14 +366,6 @@ sketch k() { init(l:Length) {
 ```µcad,init_if#fail
 sketch k() { init(l:Length) {
   if std::math::PI == 3 { }
-} } k(1cm);
-```
-
-[![test](.test/init_marker.png)](.test/init_marker.log)
-
-```µcad,init_marker#fail
-sketch k() { init(l:Length) {
-  @children
 } } k(1cm);
 ```
 
@@ -730,14 +700,6 @@ fn f() {
 ```µcad,function_if
 fn f() {
   if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
-} f();
-```
-
-[![test](.test/function_marker.png)](.test/function_marker.log)
-
-```µcad,function_marker#fail
-fn f() {
-  @children
 } f();
 ```
 
