@@ -3,13 +3,13 @@
 
 use crate::{parse::*, parser::*};
 
-impl Parse for AttributeSubcommand {
+impl Parse for AttributeCommand {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::attribute_subcommand);
+        Parser::ensure_rule(&pair, Rule::attribute_command);
 
         for inner in pair.inner() {
             match inner.as_rule() {
-                Rule::format_string => return Ok(Self::FormatString(FormatString::parse(inner)?)),
+                Rule::expression => return Ok(Self::Expression(Expression::parse(inner)?)),
                 Rule::identifier => {
                     return Ok(Self::Call(
                         pair.find(Rule::identifier).expect("Identifier"),
@@ -24,46 +24,22 @@ impl Parse for AttributeSubcommand {
     }
 }
 
-impl Parse for AttributeCommand {
+impl Parse for Attribute {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::attribute_command);
+        Parser::ensure_rules(&pair, &[Rule::attribute, Rule::inner_attribute]);
 
-        // TODO: Use try_collect() once this iterator is a stable feature.
-        let mut subcommands = Vec::new();
+        let mut commands = Vec::new();
         for pair in pair.inner() {
-            if pair.as_rule() == Rule::attribute_subcommand {
-                subcommands.push(AttributeSubcommand::parse(pair)?);
+            if pair.as_rule() == Rule::attribute_command {
+                commands.push(AttributeCommand::parse(pair)?);
             }
         }
 
         Ok(Self {
-            id: pair.find(Rule::identifier).expect("Identifier"),
-            subcommands,
+            id: pair.find(Rule::identifier).expect("Id"),
+            commands,
+            is_inner: pair.as_rule() == Rule::inner_attribute,
             src_ref: pair.src_ref(),
-        })
-    }
-}
-
-impl Parse for Attribute {
-    fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::attribute);
-
-        let inner = pair.inner().next().expect("pair");
-
-        Ok(match inner.as_rule() {
-            Rule::attribute_name_value => Self::NameValue(
-                inner.find(Rule::identifier).expect("Identifier"),
-                inner.find(Rule::expression).expect("Expression"),
-            ),
-            Rule::attribute_exporter => Self::Exporter(
-                inner.find(Rule::identifier).expect("Identifier"),
-                inner.find(Rule::argument_list).unwrap_or_default(),
-            ),
-            Rule::attribute_command => Self::Command(
-                pair.find(Rule::attribute_command)
-                    .expect("Attribute command"),
-            ),
-            _ => unreachable!(),
         })
     }
 }

@@ -40,10 +40,10 @@ If you omit the file extension, the default export format will be picked automat
 [![test](.test/export_attributes.png)](.test/export_attributes.log)
 
 ```µcad,export_attributes
-#[export: "rect.svg"] // Will be exported to `rect.svg`
+#[export = "rect.svg"] // Will be exported to `rect.svg`
 std::geo2d::rect(42mm);
 
-#[export: "circle.svg"]  // Will be exported to `circle.svg`
+#[export = "circle.svg"]  // Will be exported to `circle.svg`
 std::geo2d::circle(r = 42mm);
 ```
 

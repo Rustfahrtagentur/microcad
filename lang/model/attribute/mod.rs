@@ -4,11 +4,12 @@
 //! Model attributes.
 
 mod attributes;
-mod command;
 mod export;
 mod layer;
 mod measure;
 mod resolution;
+
+use std::rc::Rc;
 
 pub use attributes::Attributes;
 pub use export::ExportCommand;
@@ -16,46 +17,66 @@ pub use layer::Layer;
 pub use measure::MeasureCommand;
 pub use resolution::ResolutionAttribute;
 
-use crate::{syntax::*, value::*};
+use crate::{create_tuple_value, syntax::*, value::*};
 
-use microcad_core::Color;
+use microcad_core::{Color, Size2D, theme::Theme};
 
 /// An attribute for a model.
 #[derive(Clone, Debug)]
 pub enum Attribute {
-    /// Export attributes.
-    Export(ExportCommand),
-    /// Color attribute.
+    /// Color attribute: `color = "red"`
     Color(Color),
-    /// Measure attribute.
-    Measure(MeasureCommand),
-    /// Render resolution attribute.
+    /// Render resolution attribute: `resolution = 200%`.
     Resolution(ResolutionAttribute),
-    /// Exporter specific attributes.
-    ExporterSpecific(Identifier, Tuple),
+    /// Theme attribute: `theme = "default/dark"`.
+    Theme(Rc<Theme>),
+    /// Size attribute: `size = std::A4`.
+    Size(Size2D),
+    /// Export command: `export = "test.svg"`.
+    Export(ExportCommand),
+    /// Measure command: `measure = width, height`
+    Measure(MeasureCommand),
+    /// Custom non-builtin attribute with tuples: svg = (fill = "color"))
+    Custom(Identifier, Tuple),
 }
 
 impl Attribute {
     /// Return an id for the attribute.
     fn id(&self) -> Identifier {
         match &self {
-            Attribute::Export(_) => Identifier::no_ref("export"),
             Attribute::Color(_) => Identifier::no_ref("color"),
             Attribute::Resolution(_) => Identifier::no_ref("resolution"),
+            Attribute::Theme(_) => Identifier::no_ref("theme"),
+            Attribute::Size(_) => Identifier::no_ref("size"),
+            Attribute::Export(_) => Identifier::no_ref("export"),
             Attribute::Measure(_) => Identifier::no_ref("measure"),
-            Attribute::ExporterSpecific(identifier, _) => identifier.clone(),
+            Attribute::Custom(id, _) => id.clone(),
         }
+    }
+
+    /// If this method returns true, the attribute can only be set once.
+    pub fn is_unique(&self) -> bool {
+        matches!(
+            self,
+            Attribute::Color(_)
+                | Attribute::Resolution(_)
+                | Attribute::Theme(_)
+                | Attribute::Size(_)
+        )
     }
 }
 
+/// This trait implementation is used to access values from an attribute.
 impl From<Attribute> for Value {
     fn from(value: Attribute) -> Self {
         match value {
-            Attribute::Export(export_attribute) => export_attribute.into(),
             Attribute::Color(color) => Value::Tuple(Box::new(color.into())),
             Attribute::Resolution(resolution_attribute) => resolution_attribute.into(),
-            Attribute::Measure(measure) => measure.into(),
-            Attribute::ExporterSpecific(_, arguments) => Value::Tuple(Box::new(arguments)),
+            Attribute::Theme(theme) => theme.into(),
+            Attribute::Size(size) => size.into(),
+            Attribute::Export(e) => e.into(),
+            Attribute::Measure(m) => m.into(),
+            Attribute::Custom(_, tuple) => tuple.into(),
         }
     }
 }
@@ -66,43 +87,85 @@ impl PartialEq for Attribute {
     }
 }
 
+impl From<Rc<Theme>> for Value {
+    fn from(theme: Rc<Theme>) -> Self {
+        create_tuple_value!(
+            background = theme.background,
+            name = theme.name.clone(),
+            filename = theme.filename.clone().unwrap_or_default()
+        )
+    }
+}
+
 /// Access an attributes value by id.
-pub trait GetAttribute {
-    /// Get an attribute if the attribute does not exist.
-    fn get_attribute(&self, id: &Identifier) -> Option<Attribute>;
+pub trait AttributesAccess {
+    /// Get a value attribute by id.
+    fn get_attributes_by_id(&self, id: &Identifier) -> Vec<Attribute>;
 
-    /// Get export attributes.
-    fn get_export_attribute(&self) -> Option<ExportCommand> {
-        match self.get_attribute(&Identifier::no_ref("export")) {
-            Some(Attribute::Export(export_attribute)) => Some(export_attribute),
+    /// Get a single attributes.
+    fn get_single_attribute(&self, id: &Identifier) -> Option<Attribute> {
+        let attributes = self.get_attributes_by_id(id);
+        match attributes.len() {
+            1 => attributes.first().cloned(),
             _ => None,
         }
     }
 
-    /// Get specific exporter attributes by id.
-    fn get_exporter_attribute(&self, id: &Identifier) -> Option<Tuple> {
-        match self.get_attribute(id) {
-            Some(Attribute::ExporterSpecific(_, arguments)) => Some(arguments),
-            _ => None,
-        }
-    }
-
-    /// Get color attribute.
-    fn get_color_attribute(&self) -> Option<Color> {
-        match self.get_attribute(&Identifier::no_ref("color")) {
-            Some(Attribute::Color(color)) => Some(color),
-            _ => None,
-        }
-    }
-
-    /// Value for attribute.
-    ///
-    /// This function is used when accessing attributes in the µcad language via
-    /// the attribute access operator `#`.
+    /// Get single attribute as value.
     fn get_attribute_value(&self, id: &Identifier) -> Value {
-        match self.get_attribute(id) {
+        match self.get_single_attribute(id) {
             Some(attribute) => attribute.into(),
             None => Value::None,
         }
+    }
+
+    /// Color value (builtin attribute).
+    fn get_color(&self) -> Option<Color> {
+        match self.get_single_attribute(&Identifier::no_ref("color")) {
+            Some(value) => match value {
+                Attribute::Color(color) => Some(color),
+                _ => unreachable!(),
+            },
+            None => None,
+        }
+    }
+
+    /// Get all export commands.
+    fn get_exports(&self) -> Vec<ExportCommand> {
+        self.get_attributes_by_id(&Identifier::no_ref("export"))
+            .into_iter()
+            .fold(Vec::new(), |mut exports, command| {
+                match command {
+                    Attribute::Export(export_command) => exports.push(export_command.clone()),
+                    _ => unreachable!(),
+                }
+                exports
+            })
+    }
+
+    /// Get all measure commands.
+    fn get_measures(&self) -> Vec<MeasureCommand> {
+        self.get_attributes_by_id(&Identifier::no_ref("measure"))
+            .iter()
+            .fold(Vec::new(), |mut measures, attribute| {
+                match attribute {
+                    Attribute::Measure(measure_command) => measures.push(measure_command.clone()),
+                    _ => unreachable!(),
+                }
+                measures
+            })
+    }
+
+    /// Get custom attributes.
+    fn get_custom_attributes(&self, id: &Identifier) -> Vec<Tuple> {
+        self.get_attributes_by_id(id)
+            .iter()
+            .fold(Vec::new(), |mut attributes, attribute| {
+                match attribute {
+                    Attribute::Custom(_, tuple) => attributes.push(tuple.clone()),
+                    _ => unreachable!(),
+                }
+                attributes
+            })
     }
 }

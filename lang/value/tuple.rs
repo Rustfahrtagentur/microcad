@@ -45,7 +45,7 @@ macro_rules! create_tuple_value {
 #[macro_export]
 macro_rules! create_tuple {
         ($($key:ident = $value:expr),*) => {
-                [$( (stringify!($key), $value) ),* ]
+                [$( (stringify!($key), $crate::value::Value::try_from($value).expect("Valid value")) ),* ]
                     .iter()
                     .into()
     };
@@ -344,6 +344,19 @@ impl TryFrom<&Tuple> for Color {
             ) => Ok(Color::new(*r as f32, *g as f32, *b as f32, a as f32)),
             _ => Err(ValueError::CannotConvertToColor(Box::new(tuple.clone()))),
         }
+    }
+}
+
+impl TryFrom<Color> for Value {
+    type Error = ValueError;
+
+    fn try_from(c: Color) -> Result<Self, Self::Error> {
+        Ok(crate::create_tuple_value!(
+            r = c.r,
+            g = c.g,
+            b = c.b,
+            a = c.a
+        ))
     }
 }
 

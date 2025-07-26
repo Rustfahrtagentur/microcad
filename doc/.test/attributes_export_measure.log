@@ -1,9 +1,9 @@
 -- Test --
   attributes_export_measure
-  ../doc/attributes.md:116
+  ../doc/attributes.md:92
 
 -- Code --
 
-#[measure: width, height]
+#[measure = width, height]
 r = std::geo2d::circle(42mm);
 

@@ -142,15 +142,20 @@ impl ExportArgs {
         config: &Config,
         exporters: &ExporterRegistry,
     ) -> anyhow::Result<Vec<(Model, ExportCommand)>> {
-        let mut models: Vec<(Model, ExportCommand)> = model
+        let mut models = model
             .source_file_descendants()
-            .filter_map(|model| {
+            .fold(Vec::new(), |mut models, model| {
                 let b = model.borrow();
-                b.attributes
-                    .get_export_attribute()
-                    .map(|attr| (model.clone(), attr))
-            })
-            .collect();
+                models.append(
+                    &mut b
+                        .attributes
+                        .get_exports()
+                        .iter()
+                        .map(|attr| (model.clone(), attr.clone()))
+                        .collect(),
+                );
+                models
+            });
 
         // No models with export attributes have been found.
         if models.is_empty() {

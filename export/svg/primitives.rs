@@ -141,32 +141,34 @@ impl WriteSvg for Model {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
         assert_eq!(self.final_output_type(), OutputType::Geometry2D);
 
-        let node_attr: SvgTagAttributes = self.into();
-        let attr = node_attr.merge(attr.clone());
+        let node_attr = attr.clone().apply_from_model(self);
 
         // Render all output geometries.
         self.fetch_output_geometries_2d()
             .iter()
-            .try_for_each(|geometry| geometry.write_svg(writer, &attr))?;
+            .try_for_each(|geometry| geometry.write_svg(writer, &node_attr))?;
 
         let self_ = self.borrow();
         match &self_.element.value {
             Element::Object(_) | Element::Primitive2D(_) => {
                 if !self_.is_empty() {
-                    writer.begin_group(&attr)?;
+                    writer.begin_group(&node_attr)?;
                     self_
                         .children()
-                        .try_for_each(|child| child.write_svg(writer, &attr))?;
+                        .try_for_each(|child| child.write_svg(writer, &node_attr))?;
                     writer.end_group()?;
                 }
             }
             Element::Transform(affine_transform) => {
                 if !self_.is_empty() {
-                    writer
-                        .begin_group(&attr.clone().transform_matrix(&affine_transform.mat2d()))?;
+                    writer.begin_group(
+                        &node_attr
+                            .clone()
+                            .transform_matrix(&affine_transform.mat2d()),
+                    )?;
                     self_
                         .children()
-                        .try_for_each(|child| child.write_svg(writer, &attr))?;
+                        .try_for_each(|child| child.write_svg(writer, &node_attr))?;
                     writer.end_group()?;
                 }
             }

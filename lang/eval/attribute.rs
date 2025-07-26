@@ -1,11 +1,13 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use std::str::FromStr;
+
 use crate::{
     Id,
     builtin::ExporterAccess,
     eval::{self, *},
-    model::ExportCommand,
+    model::{Attributes, ExportCommand},
     parameter,
     syntax::{self, *},
 };
@@ -18,11 +20,7 @@ use thiserror::Error;
 pub enum AttributeError {
     /// Unknown attribute.
     #[error("Attribute not supported: {0}")]
-    NotSupported(QualifiedName),
-
-    /// The attribute expected a different type.
-    #[error("Expected one of types `{0}` for attribute `{1}`, got `{2}`")]
-    ExpectedType(TypeList, QualifiedName, Type),
+    NotSupported(Identifier),
 
     /// Attribute cannot be assigned to an expression.
     #[error("Cannot assign attribute to expression `{0}`")]
@@ -35,126 +33,146 @@ pub enum AttributeError {
     /// The attribute was not found.
     #[error("Not found: {0}")]
     NotFound(Identifier),
+
+    /// Invalid command.
+    #[error("Invalid command list for attribute `{0}`")]
+    InvalidCommand(Identifier),
 }
 
-impl Eval<Option<crate::model::Attribute>> for syntax::AttributeCommand {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<crate::model::Attribute>> {
-        todo!("Implement command attribute evaluation");
+impl Eval<ArgumentValueList> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<ArgumentValueList> {
+        let mut arguments = Vec::new();
+
+        for command in &self.commands {
+            match command {
+                AttributeCommand::Call(_, _) => todo!(),
+                AttributeCommand::Expression(expression) => arguments.push((
+                    Identifier::default(),
+                    ArgumentValue::new(expression.eval(context)?, expression.src_ref()),
+                )),
+            }
+        }
+
+        Ok(ArgumentValueList::new(arguments, self.src_ref()))
     }
 }
 
 impl Eval<Option<ExportCommand>> for syntax::Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<ExportCommand>> {
-        match self {
-            syntax::Attribute::Exporter(id, arguments) if id.id() == "export" => {
-                match ArgumentMatch::find_match(
-                    &arguments.eval(context)?,
-                    &[
-                        parameter!(filename: String),
-                        parameter!(resolution: Length = 0.1 /*mm*/),
-                        parameter!(id: String = String::new()),
-                        (
-                            Identifier::no_ref("size"),
-                            eval::ParameterValue {
-                                specified_type: Some(Type::Tuple(
-                                    Box::new(TupleType::new_size2d()),
-                                )),
-                                default_value: Some(Value::Tuple(Box::new(Size2D::A4.into()))),
-                                src_ref: SrcRef(None),
-                            },
-                        ),
-                    ]
-                    .into_iter()
-                    .collect(),
-                ) {
-                    Ok(arguments) => {
-                        let filename: std::path::PathBuf =
-                            arguments.get::<String>("filename").into();
-                        let id: Id = arguments.get::<String>("id").into();
-                        let id: Option<Id> = if id.is_empty() { None } else { Some(id) };
-                        let resolution = RenderResolution::new(
-                            arguments.get::<&Value>("resolution").try_scalar()?,
-                        );
-                        let size = arguments.get::<Size2D>("size");
+        match ArgumentMatch::find_match(
+            &self.eval(context)?,
+            &[
+                parameter!(filename: String),
+                parameter!(resolution: Length = 0.1 /*mm*/),
+                parameter!(id: String = String::new()),
+                (
+                    Identifier::no_ref("size"),
+                    eval::ParameterValue {
+                        specified_type: Some(Type::Tuple(Box::new(TupleType::new_size2d()))),
+                        default_value: Some(Value::Tuple(Box::new(Size2D::A4.into()))),
+                        src_ref: SrcRef(None),
+                    },
+                ),
+            ]
+            .into_iter()
+            .collect(),
+        ) {
+            Ok(arguments) => {
+                let filename: std::path::PathBuf = arguments.get::<String>("filename").into();
+                let id: Id = arguments.get::<String>("id").into();
+                let id: Option<Id> = if id.is_empty() { None } else { Some(id) };
+                let resolution =
+                    RenderResolution::new(arguments.get::<&Value>("resolution").try_scalar()?);
+                let size = arguments.get::<Size2D>("size");
 
-                        match context.find_exporter(&filename, &id) {
-                            Ok(exporter) => {
-                                return Ok(Some(ExportCommand {
-                                    filename,
-                                    exporter,
-                                    resolution,
-                                    size,
-                                    layers: vec![], // TODO get layers
-                                }));
-                            }
-                            Err(err) => context.warning(self, err)?,
-                        }
+                match context.find_exporter(&filename, &id) {
+                    Ok(exporter) => {
+                        return Ok(Some(ExportCommand {
+                            filename,
+                            exporter,
+                            resolution,
+                            size,
+                            layers: vec![], // TODO get layers
+                        }));
                     }
                     Err(err) => context.warning(self, err)?,
                 }
             }
-            _ => unreachable!(),
+            Err(err) => context.warning(self, err)?,
         }
 
         Ok(None)
     }
 }
 
+impl Eval<Option<Color>> for syntax::AttributeCommand {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<Color>> {
+        match self {
+            AttributeCommand::Call(_, _) => todo!(),
+            // Get color from a tuple or string.
+            AttributeCommand::Expression(expression) => {
+                let value: Value = expression.eval(context)?;
+                match value {
+                    Value::String(s) => match Color::from_str(&s) {
+                        Ok(color) => Ok(Some(color)),
+                        Err(err) => {
+                            context.warning(self, err)?;
+                            Ok(None)
+                        }
+                    },
+                    Value::Tuple(tuple) => match Color::try_from(tuple.as_ref()) {
+                        Ok(color) => Ok(Some(color)),
+                        Err(err) => {
+                            context.warning(self, err)?;
+                            Ok(None)
+                        }
+                    },
+                    _ => {
+                        context.warning(
+                            self,
+                            AttributeError::InvalidCommand(Identifier::no_ref("color")),
+                        )?;
+                        Ok(None)
+                    }
+                }
+            }
+        }
+    }
+}
+
+impl Eval<Option<Color>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<Color>> {
+        assert_eq!(self.id.id().as_str(), "color");
+        match self.single_command() {
+            Some(command) => Ok(command.eval(context)?),
+            None => {
+                context.warning(self, AttributeError::InvalidCommand(self.id.clone()))?;
+                Ok(None)
+            }
+        }
+    }
+}
+
 impl Eval<Option<crate::model::Attribute>> for syntax::Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<crate::model::Attribute>> {
-        match self {
-            syntax::Attribute::Exporter(id, argument_list) => {
-                // Parse exporter specific attribute, e.g. `svg(style = "fill:none")`
-                match context.exporter_by_id(id.id()) {
-                    Ok(exporter) => {
-                        match ArgumentMatch::find_match(
-                            &argument_list.eval(context)?,
-                            &exporter.parameters(),
-                        ) {
-                            Ok(args) => {
-                                return Ok(Some(crate::model::Attribute::ExporterSpecific(
-                                    id.clone(),
-                                    args,
-                                )));
-                            }
-                            Err(err) => {
-                                context.warning(self, err)?;
-                            }
-                        }
-                    }
-                    Err(err) => {
-                        context.warning(id, err)?;
-                    }
-                }
+        let id = self.id.id().as_str();
+        use crate::model::Attribute as Attr;
+        Ok(match id {
+            "color" => {
+                let color: Option<Color> = self.eval(context)?;
+                color.map(Attr::Color)
             }
-            syntax::Attribute::NameValue(id, expression) => {
-                let name = id.id().as_str();
-                let value = expression.eval(context)?;
-
-                match (name, value) {
-                    ("color", Value::Tuple(tuple)) => match tuple.as_ref().try_into() {
-                        Ok(color) => return Ok(Some(crate::model::Attribute::Color(color))),
-                        Err(err) => context.warning(self, err)?,
-                    },
-                    ("color", Value::String(string)) => match string.parse::<Color>() {
-                        Ok(color) => return Ok(Some(crate::model::Attribute::Color(color))),
-                        Err(err) => context.warning(self, err)?,
-                    },
-                    ("resolution", value) => match value.try_into() {
-                        Ok(resolution_attribute) => {
-                            return Ok(Some(crate::model::Attribute::Resolution(
-                                resolution_attribute,
-                            )));
-                        }
-                        Err(err) => context.warning(self, err)?,
-                    },
-                    _ => {}
-                }
+            "export" => {
+                let export: Option<ExportCommand> = self.eval(context)?;
+                export.map(Attr::Export)
             }
-            syntax::Attribute::Command(command) => return command.eval(context),
-        }
-
-        Ok(None)
+            _ => todo!(), /*             "resolution" => Attr::Resolution(self.eval(context)?),
+                          "theme" => Attr::Theme(self.eval(context)?),
+                          "size" => Attr::Size(self.eval(context)?),
+                          "export" => Attr::Export(self.eval(context)?),
+                          "measure" => Attr::Measure(self.eval(context)?),
+                          _ => Attr::Custom(self.id.clone(), self.eval(context)?), */
+        })
     }
 }
 
@@ -168,6 +186,6 @@ impl Eval<crate::model::Attributes> for AttributeList {
             }
         }
 
-        Ok(crate::model::Attributes::new(attributes))
+        Ok(Attributes(attributes))
     }
 }

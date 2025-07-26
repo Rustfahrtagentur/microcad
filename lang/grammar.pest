@@ -335,31 +335,26 @@ method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 call = { qualified_name ~ ws* ~ call_op }
 
 //`foo = bar`: ok # Assignment
-attribute_name_value = { identifier ~ ws* ~ "=" ~ ws* ~ expression }
-
-//`bar()`: ok # Empty tuple
-//`bar(baz = 42)`: ok # Tuple with `baz` field
-attribute_exporter = { identifier ~ ws* ~ call_op }
-
-//`export`: ok # Command with no attributes
-//`export: "test.svg"`: ok # Command with string
-//`measure: width`: ok # Command with subcommand
-//`measure: width, height(offset = 30mm)`: ok # Command with multiple subcommands
-attribute_command = {
-  identifier ~ ws* ~ (":" ~ ws* ~ attribute_subcommand_list)? 
-}
+//`export`: ok # Command with no commands
+//`export = "test.svg"`: ok # Command as string
+//`measure = width`: ok # Command as identifier without arguments
+//`measure = width, height(offset = 30mm)`: ok # Item with multiple commands
+attribute_item = _{ identifier ~ (ws* ~ "=" ~ ws* ~ attribute_command_list)? }
 
 //`"test.svg"`: ok # Format string command
-//`width(offset = 30mm)`: ok # Command with argument tuple
-attribute_subcommand = { format_string | identifier ~ (ws* ~ call_op)? }
+//`width(offset = 30mm)`: ok # Command with argument list.
+//`(style = "fill:none"): ok # Anonymous argument list.
+attribute_command = { identifier ~ (ws* ~ call_op)? | call_op | expression }
 
 //`width, height`: ok # Multiple commands.
-attribute_subcommand_list = { attribute_subcommand ~ (ws* ~ "," ~ ws* ~ attribute_subcommand)* ~ ws* ~ ","?  }
+attribute_command_list = _{ attribute_command ~ (ws* ~ "," ~ ws* ~ attribute_command)* ~ ws* ~ ","?  }
 
-//`#[bar = 42]`: ok # Name-value attribute
-//`#[foo = 42]`: ok # Command attribute
-//`#[svg()]`: ok # Exporter attribute
-attribute = { "#[" ~ ws* ~ (attribute_name_value | attribute_exporter | attribute_command) ~ ws* ~ "]" }
+//`#[bar = width]`: ok # An attribute with command.
+//`#[svg = (style = "test")]`: ok # Expression attribute
+attribute = { "#[" ~ ws* ~ attribute_item ~ ws* ~ "]" }
+
+//`#![size = A4]`: ok # Name-value attribute
+inner_attribute = { "#![" ~ ws* ~ attribute_item ~ ws* ~ "]" }
 
 //`#[foo = 32] #[bar = 32]`: ok # Multiple attributes
 attribute_list = { attribute ~ (ws+ ~ attribute)* }

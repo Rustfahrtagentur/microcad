@@ -8,21 +8,18 @@ use derive_more::{Deref, DerefMut};
 use crate::{model::*, syntax::Identifier};
 
 /// Model attributes, from an evaluated attribute list.
+///
+/// The model attributes can be produced from:
+/// * outer attributes: #[export = "test.svg"]
+/// * inner attributes: #![export = "test.svg"]
 #[derive(Clone, Debug, Default, Deref, DerefMut)]
-pub struct Attributes(Vec<Attribute>);
+pub struct Attributes(pub Vec<Attribute>);
 
-impl Attributes {
-    /// Create new attributes from attribute.
-    pub fn new(attributes: Vec<Attribute>) -> Self {
-        Self(attributes)
-    }
-}
-
-impl GetAttribute for Attributes {
-    fn get_attribute(&self, id: &Identifier) -> Option<Attribute> {
-        self.0
-            .iter()
-            .find(|attribute| *id == attribute.id())
+impl AttributesAccess for Attributes {
+    fn get_attributes_by_id(&self, id: &Identifier) -> Vec<Attribute> {
+        self.iter()
+            .filter(|attribute| attribute.id() == *id)
             .cloned()
+            .collect()
     }
 }

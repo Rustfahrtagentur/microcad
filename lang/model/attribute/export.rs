@@ -55,7 +55,7 @@ impl From<ExportCommand> for Value {
                         .collect(),
                 )
             },
-            size = export_attribute.size.into()
+            size = Value::from(export_attribute.size)
         )
     }
 }

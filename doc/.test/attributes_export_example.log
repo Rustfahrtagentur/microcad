@@ -1,10 +1,10 @@
 -- Test --
   attributes_export_example
-  ../doc/attributes.md:79
+  ../doc/attributes.md:120
 
 -- Code --
 
-#[export: "circle.svg"]
-#[svg(style = "fill: skyblue; stroke: cadetblue; stroke-width: 2;")]
+#[export = "circle.svg"]
+#[svg = (style = "fill: skyblue; stroke: cadetblue; stroke-width: 2;")]
 c = std::geo2d::circle(42.0mm);
 

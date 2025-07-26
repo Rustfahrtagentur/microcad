@@ -3,7 +3,11 @@
 
 //! *Argument value list* evaluation entity.
 
-use crate::{eval::*, src_ref::*, value::*};
+use crate::{
+    eval::*,
+    src_ref::{self, *},
+    value::*,
+};
 use derive_more::Deref;
 
 /// Collection of *argument values* (e.g. `( x=1, y=2 )`).
@@ -18,6 +22,11 @@ pub struct ArgumentValueList {
 }
 
 impl ArgumentValueList {
+    /// Create new [`ArgumentValueList`]
+    pub fn new(map: Vec<(Identifier, ArgumentValue)>, src_ref: SrcRef) -> Self {
+        Self { map, src_ref }
+    }
+
     /// Create a *argument value list*.
     ///
     /// Transports code into builtin in `impl` [`Eval`] for [`Call`].

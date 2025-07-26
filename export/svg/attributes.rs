@@ -6,8 +6,9 @@
 use derive_more::Deref;
 use microcad_core::{Color, Scalar};
 use microcad_lang::{
-    model::{GetAttribute, Model},
+    model::{AttributesAccess, Model},
     syntax::Identifier,
+    value::{Value, ValueAccess},
 };
 
 /// Tag attributes for an SVG tag.
@@ -84,36 +85,25 @@ impl SvgTagAttributes {
         let (a, b, c, d, e, f) = (m.x.x, m.x.y, m.y.x, m.y.y, m.z.x, m.z.y);
         self._insert("transform", format!("matrix({a} {b} {c} {d} {e} {f})"))
     }
-}
 
-impl From<&Model> for SvgTagAttributes {
-    fn from(model: &Model) -> Self {
-        use microcad_lang::value::ValueAccess;
-
-        match (
-            model.get_exporter_attribute(&Identifier::no_ref("svg")),
-            model.get_color_attribute(),
-        ) {
-            (None, None) => SvgTagAttributes::default(),
-            (None, Some(color)) => SvgTagAttributes::default().fill(color),
-            // If boths attributes are present, get style and fill from exporter attributes. Color attribute is ignored.
-            (Some(attributes), None) | (Some(attributes), Some(_)) => [
-                (
-                    "style",
-                    attributes
-                        .by_id(&Identifier::no_ref("style"))
-                        .map(|value| value.try_string().unwrap_or_default()),
-                ),
-                (
-                    "fill",
-                    attributes
-                        .by_id(&Identifier::no_ref("fill"))
-                        .map(|value| value.try_string().unwrap_or_default()),
-                ),
-            ]
-            .into_iter()
-            .collect(),
+    /// Apply SVG attributes from model attributes
+    pub fn apply_from_model(mut self, model: &Model) -> Self {
+        if let Some(color) = model.get_color() {
+            self = self.fill(color);
         }
+
+        model
+            .get_custom_attributes(&Identifier::no_ref("svg"))
+            .iter()
+            .for_each(|tuple| {
+                if let Some(Value::String(style)) = tuple.by_id(&Identifier::no_ref("style")) {
+                    self = self.clone()._insert("style", style.clone());
+                }
+                if let Some(Value::String(style)) = tuple.by_id(&Identifier::no_ref("fill")) {
+                    self = self.clone()._insert("fill", style.clone());
+                }
+            });
+        self
     }
 }
 

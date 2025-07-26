@@ -211,9 +211,9 @@ impl Model {
     }
 }
 
-impl GetAttribute for Model {
-    fn get_attribute(&self, id: &Identifier) -> Option<crate::model::Attribute> {
-        self.borrow().attributes.get_attribute(id)
+impl AttributesAccess for Model {
+    fn get_attributes_by_id(&self, id: &Identifier) -> Vec<Attribute> {
+        self.borrow().attributes.get_attributes_by_id(id)
     }
 }
 

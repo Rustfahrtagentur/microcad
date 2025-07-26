@@ -37,11 +37,6 @@ impl<'i> Pair<'i> {
         self.0.clone().into_inner().map(|p| Self(p, self.1))
     }
 
-    /// Map and collect inner pairs into a `Vec<T>`
-    pub fn map_collect<T: Parse>(&'i self, f: fn(Self) -> ParseResult<T>) -> ParseResult<Vec<T>> {
-        self.inner().map(f).collect::<ParseResult<_>>()
-    }
-
     /// Find an inner pair by rule
     pub fn find<T: Parse>(&'i self, rule: Rule) -> Option<T> {
         match self

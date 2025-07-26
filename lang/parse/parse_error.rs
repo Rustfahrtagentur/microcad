@@ -34,8 +34,8 @@ pub enum ParseError {
     Parser(#[from] Box<pest::error::Error<crate::parser::Rule>>),
 
     /// Error parsing color literal
-    #[error("Error parsing color from hex: {0}")]
-    ParseColorFromHex(String),
+    #[error("Error parsing color: {0}")]
+    ParseColorError(#[from] microcad_core::ParseColorError),
 
     /// Unknown color name
     #[error("Unknown color: {0}")]

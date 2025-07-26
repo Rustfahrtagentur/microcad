@@ -481,6 +481,12 @@ impl From<Quantity> for Value {
     }
 }
 
+impl From<String> for Value {
+    fn from(value: String) -> Self {
+        Value::String(value)
+    }
+}
+
 impl FromIterator<Value> for Value {
     fn from_iter<T: IntoIterator<Item = Value>>(iter: T) -> Self {
         Self::Array(iter.into_iter().collect())
@@ -502,11 +508,11 @@ impl From<Model> for Value {
     }
 }
 
-impl GetAttribute for Value {
-    fn get_attribute(&self, id: &Identifier) -> std::option::Option<crate::model::Attribute> {
+impl AttributesAccess for Value {
+    fn get_attributes_by_id(&self, id: &Identifier) -> Vec<crate::model::Attribute> {
         match self.fetch_models().single_model() {
-            Some(model) => model.get_attribute(id),
-            None => None,
+            Some(model) => model.get_attributes_by_id(id),
+            None => Vec::default(),
         }
     }
 }

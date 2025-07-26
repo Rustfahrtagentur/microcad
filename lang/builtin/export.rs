@@ -43,8 +43,8 @@ pub trait Exporter: FileIoInterface {
     /// The parameter `bar` can be set to `42` with:
     ///
     /// ```ucad
-    /// #[export: "myfile.foo"]
-    /// #[foo(baz = 42)]
+    /// #[export = "myfile.foo"]
+    /// #[foo = (bar = 42)]
     /// circle(42mm);
     /// ```
     fn parameters(&self) -> ParameterValueList {
