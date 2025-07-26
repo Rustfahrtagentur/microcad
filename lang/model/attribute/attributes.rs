@@ -10,8 +10,9 @@ use crate::{model::*, syntax::Identifier};
 /// Model attributes, from an evaluated attribute list.
 ///
 /// The model attributes can be produced from:
-/// * outer attributes: #[export = "test.svg"]
-/// * inner attributes: #![export = "test.svg"]
+/// * outer attributes: `#[export = "test.svg"]`
+/// * inner attributes: `#![export = "test.svg"]`
+///
 #[derive(Clone, Debug, Default, Deref, DerefMut)]
 pub struct Attributes(pub Vec<Attribute>);
 
@@ -21,5 +22,11 @@ impl AttributesAccess for Attributes {
             .filter(|attribute| attribute.id() == *id)
             .cloned()
             .collect()
+    }
+}
+
+impl FromIterator<Attribute> for Attributes {
+    fn from_iter<T: IntoIterator<Item = Attribute>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
     }
 }

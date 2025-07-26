@@ -39,6 +39,10 @@ impl Eval for Statement {
                 context.grant(m)?;
                 Ok(Value::None)
             }
+            Self::InnerAttribute(i) => {
+                context.grant(i)?;
+                Ok(Value::None)
+            }
             Self::Init(i) => {
                 context.grant(i.as_ref())?;
                 Ok(Value::None)
@@ -83,6 +87,10 @@ impl Eval<Models> for Statement {
             }
             Self::Expression(e) => e.eval(context)?,
             Self::Marker(m) => m.eval(context)?,
+            Self::InnerAttribute(a) => {
+                context.grant(a)?;
+                Default::default()
+            }
         };
 
         if models.deduce_output_type() == OutputType::InvalidMixed {
@@ -100,6 +108,20 @@ impl Eval<Value> for StatementList {
             }
         }
         Ok(Value::None)
+    }
+}
+
+/// Parse inner attributes of a statement list.
+impl Eval<Attributes> for StatementList {
+    fn eval(&self, context: &mut Context) -> EvalResult<Attributes> {
+        let mut attributes = Vec::new();
+        for statement in self.iter() {
+            if let Statement::InnerAttribute(attribute) = statement {
+                attributes.append(&mut attribute.eval(context)?);
+            }
+        }
+
+        Ok(Attributes(attributes))
     }
 }
 

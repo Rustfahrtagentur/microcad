@@ -77,6 +77,7 @@ fn check_statements(body: &Body) -> ParseResult<()> {
                 // Post init statements
                 Statement::If(_)
                 | Statement::Marker(_)
+                | Statement::InnerAttribute(_)
                 | Statement::Expression(_)
                 | Statement::Function(_) => {
                     // RULE: No code between initializers

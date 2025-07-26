@@ -463,3 +463,24 @@ impl Grant<Marker> for Context {
         }
     }
 }
+
+impl Grant<crate::syntax::Attribute> for Context {
+    fn grant(&mut self, statement: &crate::syntax::Attribute) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
+            matches!(
+                stack_frame,
+                StackFrame::Source(_, _) | StackFrame::Body(_) | StackFrame::Workbench(_, _, _)
+            )
+        } else {
+            false
+        };
+        if granted {
+            Ok(())
+        } else {
+            self.error(
+                statement,
+                EvalError::StatementNotSupported("InnerAttribute"),
+            )
+        }
+    }
+}

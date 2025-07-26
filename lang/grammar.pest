@@ -356,6 +356,8 @@ attribute = { "#[" ~ ws* ~ attribute_item ~ ws* ~ "]" }
 //`#![size = A4]`: ok # Name-value attribute
 inner_attribute = { "#![" ~ ws* ~ attribute_item ~ ws* ~ "]" }
 
+inner_attribute_statement = _{ inner_attribute }
+
 //`#[foo = 32] #[bar = 32]`: ok # Multiple attributes
 attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
@@ -454,6 +456,8 @@ statement = {
   return_statement |
   if_statement |
   marker_statement |
+
+  inner_attribute_statement |
 
   assignment_statement |
   expression_statement

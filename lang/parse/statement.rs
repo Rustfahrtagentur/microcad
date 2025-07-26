@@ -119,6 +119,7 @@ impl Parse for Statement {
             Rule::return_statement => Self::Return(ReturnStatement::parse(first)?),
             Rule::if_statement => Self::If(IfStatement::parse(first)?),
             Rule::marker_statement => Self::Marker(Marker::parse(first)?),
+            Rule::inner_attribute => Self::InnerAttribute(Attribute::parse(first)?),
 
             Rule::assignment_statement => Self::Assignment(AssignmentStatement::parse(first)?),
             Rule::expression_statement | Rule::final_expression_statement => {

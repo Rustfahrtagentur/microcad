@@ -76,6 +76,12 @@ impl Attribute {
     }
 }
 
+impl PrintSyntax for Attribute {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$} Attribute: {}", "", self.to_string())
+    }
+}
+
 impl std::fmt::Display for Attribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.is_inner {

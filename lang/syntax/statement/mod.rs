@@ -39,6 +39,8 @@ pub enum Statement {
     If(IfStatement),
     /// Marker statement
     Marker(Marker),
+    /// Inner attribute statement: `#![size = std::A4]`.
+    InnerAttribute(Attribute),
 
     /// Assignment statement.
     Assignment(AssignmentStatement),
@@ -58,6 +60,7 @@ impl SrcReferrer for Statement {
             Self::Return(r) => r.src_ref(),
             Self::If(i) => i.src_ref(),
             Self::Marker(m) => m.src_ref(),
+            Self::InnerAttribute(i) => i.src_ref(),
 
             Self::Assignment(a) => a.src_ref(),
             Self::Expression(e) => e.src_ref(),
@@ -85,6 +88,7 @@ impl std::fmt::Display for Statement {
             Self::Return(r) => write!(f, "{r};"),
             Self::If(i) => write!(f, "{i}"),
             Self::Marker(m) => write!(f, "{m};"),
+            Self::InnerAttribute(i) => write!(f, "{i}"),
 
             Self::Assignment(a) => write!(f, "{a}"),
             Self::Expression(e) => write!(f, "{e}"),
@@ -105,6 +109,7 @@ impl PrintSyntax for Statement {
             Self::Return(r) => r.print_syntax(f, depth),
             Self::If(i) => i.print_syntax(f, depth),
             Self::Marker(m) => m.print_syntax(f, depth),
+            Self::InnerAttribute(i) => i.print_syntax(f, depth),
 
             Self::Assignment(a) => a.print_syntax(f, depth),
             Self::Expression(e) => e.print_syntax(f, depth),

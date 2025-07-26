@@ -18,6 +18,7 @@ impl Eval<Model> for Body {
         context.scope(StackFrame::Body(SymbolMap::default()), |context| {
             Ok(ModelBuilder::new_object_body()
                 .add_children(self.statements.eval(context)?)?
+                .attributes(self.statements.eval(context)?)
                 .build())
         })
     }
