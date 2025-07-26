@@ -146,7 +146,7 @@ impl WriteSvg for Model {
         // Render all output geometries.
         self.fetch_output_geometries_2d()
             .iter()
-            .try_for_each(|geometry| geometry.write_svg(writer, &node_attr))?;
+            .try_for_each(|geometry| geometry.write_svg_mapped(writer, &node_attr))?;
 
         let self_ = self.borrow();
         match &self_.element.value {
