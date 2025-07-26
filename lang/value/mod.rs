@@ -333,6 +333,7 @@ impl std::ops::BitOr for Value {
                 lhs.union()
                     .boolean_op(microcad_core::BooleanOp::Union, rhs.union()),
             )),
+            (Value::Bool(lhs), Value::Bool(rhs)) => Ok(Value::Bool(lhs | rhs)),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} | {rhs}"))),
         }
     }
@@ -347,6 +348,7 @@ impl std::ops::BitAnd for Value {
             (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
                 lhs.union().boolean_op(BooleanOp::Intersection, rhs.union()),
             )),
+            (Value::Bool(lhs), Value::Bool(rhs)) => Ok(Value::Bool(lhs & rhs)),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} & {rhs}"))),
         }
     }
