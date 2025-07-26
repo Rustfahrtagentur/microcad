@@ -5,7 +5,7 @@
 
 use std::rc::Rc;
 
-use crate::{Id, builtin::file_io::*, eval::*, model::*, value::*};
+use crate::{Id, builtin::file_io::*, eval::*, model::*, parameter, value::*};
 
 use thiserror::Error;
 
@@ -37,7 +37,7 @@ pub enum ExportError {
 ///
 /// Implement this trait for your custom file exporter.
 pub trait Exporter: FileIoInterface {
-    /// Parameters that as exporter specific attributes to a model.
+    /// Parameters that add exporter specific attributes to a model.
     ///
     /// Let's assume an exporter `foo` has a model parameter `bar = 23` as parameter value list.
     /// The parameter `bar` can be set to `42` with:
@@ -47,8 +47,18 @@ pub trait Exporter: FileIoInterface {
     /// #[foo = (bar = 42)]
     /// circle(42mm);
     /// ```
-    fn parameters(&self) -> ParameterValueList {
+    fn model_parameters(&self) -> ParameterValueList {
         ParameterValueList::default()
+    }
+
+    /// Parameters for the export attribute: `export = svg("filename.svg")`
+    fn export_parameters(&self) -> ParameterValueList {
+        [
+            parameter!(filename: String),
+            parameter!(resolution: Length = 0.1 /*mm*/),
+        ]
+        .into_iter()
+        .collect()
     }
 
     /// Export the model if the model is marked for export.

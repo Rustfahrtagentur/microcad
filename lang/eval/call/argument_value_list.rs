@@ -3,11 +3,7 @@
 
 //! *Argument value list* evaluation entity.
 
-use crate::{
-    eval::*,
-    src_ref::{self, *},
-    value::*,
-};
+use crate::{eval::*, src_ref::*, value::*};
 use derive_more::Deref;
 
 /// Collection of *argument values* (e.g. `( x=1, y=2 )`).

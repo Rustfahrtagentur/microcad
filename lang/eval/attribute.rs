@@ -4,7 +4,6 @@
 use std::str::FromStr;
 
 use crate::{
-    Id,
     builtin::ExporterAccess,
     eval::{self, *},
     model::{Attributes, CustomCommand, ExportCommand, MeasureCommand, ResolutionAttribute},
@@ -39,75 +38,99 @@ pub enum AttributeError {
     InvalidCommand(Identifier),
 }
 
-impl Eval<ArgumentValueList> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<ArgumentValueList> {
-        let mut arguments = Vec::new();
+impl Eval<Option<ExportCommand>> for syntax::AttributeCommand {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<ExportCommand>> {
+        match self {
+            AttributeCommand::Call(id, Some(argument_list)) => {
+                match ArgumentMatch::find_match(
+                    &argument_list.eval(context)?,
+                    &[
+                        parameter!(filename: String),
+                        parameter!(resolution: Length = 0.1 /*mm*/),
+                        (
+                            Identifier::no_ref("size"),
+                            eval::ParameterValue {
+                                specified_type: Some(Type::Tuple(
+                                    Box::new(TupleType::new_size2d()),
+                                )),
+                                default_value: Some(Value::Tuple(Box::new(Size2D::A4.into()))),
+                                src_ref: SrcRef(None),
+                            },
+                        ),
+                    ]
+                    .into_iter()
+                    .collect(),
+                ) {
+                    Ok(arguments) => {
+                        let filename: std::path::PathBuf =
+                            arguments.get::<String>("filename").into();
+                        let resolution = RenderResolution::new(
+                            arguments.get::<&Value>("resolution").try_scalar()?,
+                        );
+                        let size = arguments.get::<Size2D>("size");
+                        let id = id.clone().map(|id| id.id().clone());
 
-        for command in &self.commands {
-            match command {
-                AttributeCommand::Call(None, Some(argument_list)) => {
-                    let argument_value_list: ArgumentValueList = argument_list.eval(context)?;
-                    arguments.append(&mut argument_value_list.iter().cloned().collect())
+                        match context.find_exporter(&filename, &id) {
+                            Ok(exporter) => {
+                                Ok(Some(ExportCommand {
+                                    filename,
+                                    exporter,
+                                    resolution,
+                                    size,
+                                    layers: vec![], // TODO get layers
+                                }))
+                            }
+                            Err(err) => {
+                                context.warning(self, err)?;
+                                Ok(None)
+                            }
+                        }
+                    }
+                    Err(err) => {
+                        context.warning(self, err)?;
+                        Ok(None)
+                    }
                 }
-                AttributeCommand::Expression(expression) => arguments.push((
-                    Identifier::default(),
-                    ArgumentValue::new(expression.eval(context)?, expression.src_ref()),
-                )),
-                _ => unimplemented!(),
             }
+            AttributeCommand::Expression(expression) => {
+                let value: Value = expression.eval(context)?;
+                match value {
+                    Value::String(filename) => {
+                        let filename = std::path::PathBuf::from(filename);
+                        match context.find_exporter(&filename, &None) {
+                            Ok(exporter) => Ok(Some(ExportCommand {
+                                filename,
+                                resolution: RenderResolution::default(),
+                                exporter,
+                                layers: vec![],
+                                size: Size2D::default(),
+                            })),
+                            Err(err) => {
+                                context.warning(self, err)?;
+                                Ok(None)
+                            }
+                        }
+                    }
+                    _ => unimplemented!(),
+                }
+            }
+            _ => Ok(None),
         }
-
-        Ok(ArgumentValueList::new(arguments, self.src_ref()))
     }
 }
 
-impl Eval<Option<ExportCommand>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<ExportCommand>> {
+impl Eval<Vec<ExportCommand>> for syntax::Attribute {
+    fn eval(&self, context: &mut Context) -> EvalResult<Vec<ExportCommand>> {
         assert_eq!(self.id.id().as_str(), "export");
 
-        match ArgumentMatch::find_match(
-            &self.eval(context)?,
-            &[
-                parameter!(filename: String),
-                parameter!(resolution: Length = 0.1 /*mm*/),
-                parameter!(id: String = String::new()),
-                (
-                    Identifier::no_ref("size"),
-                    eval::ParameterValue {
-                        specified_type: Some(Type::Tuple(Box::new(TupleType::new_size2d()))),
-                        default_value: Some(Value::Tuple(Box::new(Size2D::A4.into()))),
-                        src_ref: SrcRef(None),
-                    },
-                ),
-            ]
-            .into_iter()
-            .collect(),
-        ) {
-            Ok(arguments) => {
-                let filename: std::path::PathBuf = arguments.get::<String>("filename").into();
-                let id: Id = arguments.get::<String>("id").into();
-                let id: Option<Id> = if id.is_empty() { None } else { Some(id) };
-                let resolution =
-                    RenderResolution::new(arguments.get::<&Value>("resolution").try_scalar()?);
-                let size = arguments.get::<Size2D>("size");
-
-                match context.find_exporter(&filename, &id) {
-                    Ok(exporter) => {
-                        return Ok(Some(ExportCommand {
-                            filename,
-                            exporter,
-                            resolution,
-                            size,
-                            layers: vec![], // TODO get layers
-                        }));
-                    }
-                    Err(err) => context.warning(self, err)?,
+        self.commands
+            .iter()
+            .try_fold(Vec::new(), |mut commands, attribute| {
+                if let Some(export_command) = attribute.eval(context)? {
+                    commands.push(export_command)
                 }
-            }
-            Err(err) => context.warning(self, err)?,
-        }
-
-        Ok(None)
+                Ok(commands)
+            })
     }
 }
 
@@ -141,7 +164,7 @@ impl Eval<Vec<CustomCommand>> for syntax::Attribute {
                         AttributeCommand::Call(None, Some(argument_list)) => {
                             match ArgumentMatch::find_match(
                                 &argument_list.eval(context)?,
-                                &exporter.parameters(),
+                                &exporter.model_parameters(),
                             ) {
                                 Ok(tuple) => commands.push(CustomCommand {
                                     id: self.id.clone(),
@@ -292,10 +315,10 @@ impl Eval<Vec<crate::model::Attribute>> for syntax::Attribute {
                 Some(size) => vec![Attr::Size(size)],
                 None => Default::default(),
             },
-            "export" => match self.eval(context)? {
-                Some(export) => vec![Attr::Export(export)],
-                None => Default::default(),
-            },
+            "export" => {
+                let exports: Vec<ExportCommand> = self.eval(context)?;
+                exports.iter().cloned().map(Attr::Export).collect()
+            }
             "measure" => {
                 let measures: Vec<MeasureCommand> = self.eval(context)?;
                 measures.iter().cloned().map(Attr::Measure).collect()

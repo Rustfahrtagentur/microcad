@@ -14,7 +14,7 @@ use crate::svg::{SvgTagAttributes, WriteSvg, writer::SvgWriter};
 pub struct SvgExporter;
 
 impl Exporter for SvgExporter {
-    fn parameters(&self) -> microcad_lang::eval::ParameterValueList {
+    fn model_parameters(&self) -> microcad_lang::eval::ParameterValueList {
         [
             parameter!(style: String = String::new()),
             parameter!(fill: String = String::new()),
