@@ -7,7 +7,7 @@ use std::str::FromStr as _;
 
 use super::*;
 use geo::coord;
-use microcad_core::*;
+use microcad_core::{theme::Theme, *};
 
 #[test]
 fn svg_writer() {
@@ -144,33 +144,37 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     let width = 30.0;
     let height = 20.0;
 
+    let theme = Theme::default();
+
     let rect = Rect::new(coord! {x: 0.0, y: 0.0}, coord! {x: width, y: height});
     let circle = Circle {
         radius,
         offset: Vec2::new(width, height),
     };
 
-    let attr = SvgTagAttributes::default();
-
     Background.write_svg(
         &mut svg,
-        &attr
-            .clone()
-            .fill(Color::from_str("white").expect("A color")),
+        &SvgTagAttributes::default().fill(theme.background),
     )?;
     Grid::default().write_svg(
         &mut svg,
-        &SvgTagAttributes::default().style(None, Some(Color::rgb(0.8, 0.8, 0.8)), Some(0.2)),
+        &SvgTagAttributes::default().style(None, Some(theme.grid), Some(0.2)),
     )?;
 
-    rect.write_svg_mapped(&mut svg, &attr)?;
+    rect.write_svg_mapped(
+        &mut svg,
+        &SvgTagAttributes::default().style(None, Some(theme.inactive), Some(0.4)),
+    )?;
 
     CenteredText {
         text: "r".into(),
         rect,
-        font_size: 2.0,
+        font_size: 4.0,
     }
-    .write_svg_mapped(&mut svg, &attr)?;
+    .write_svg_mapped(
+        &mut svg,
+        &SvgTagAttributes::default().style(Some(theme.inactive), None, None),
+    )?;
 
     // Draw rectangle measures
 
@@ -178,8 +182,8 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     EdgeLengthMeasure::height(&rect, 10.0, Some("height")).write_svg_mapped(
         &mut svg,
         &SvgTagAttributes::default().style(
-            Some(Color::rgb(0.8, 0.8, 0.8)),
-            Some(Color::rgb(0.8, 0.8, 0.8)),
+            Some(theme.measure.make_transparent(0.5)),
+            Some(theme.measure.make_transparent(0.5)),
             Some(0.2),
         ),
     )?;
@@ -187,27 +191,35 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     EdgeLengthMeasure::width(&rect, 10.0, Some("width")).write_svg_mapped(
         &mut svg,
         &SvgTagAttributes::default().style(
-            Some(Color::rgb(0.8, 0.8, 0.8)),
-            Some(Color::rgb(0.8, 0.8, 0.8)),
+            Some(theme.measure.make_transparent(0.5)),
+            Some(theme.measure.make_transparent(0.5)),
             Some(0.2),
         ),
     )?;
-    /*
+
     // Draw circle `c`.
-    circle.write_svg(&mut svg, &attr)?;
+    circle.write_svg_mapped(
+        &mut svg,
+        &SvgTagAttributes::default().style(None, Some(theme.inactive), Some(0.4)),
+    )?;
     CenteredText {
         text: "c".into(),
         rect: circle.fetch_bounds_2d().rect().expect("Rect"),
-        font_size: 2.0,
+        font_size: 4.0,
     }
-    .write_svg(&mut svg, &attr)?;
+    .write_svg_mapped(
+        &mut svg,
+        &SvgTagAttributes::default().style(Some(theme.inactive), None, None),
+    )?;
 
-    RadiusMeasure {
-        name: Some("radius".into()),
-        circle: circle.clone(),
-        angle: cgmath::Rad(45.0),
-    }
-    .write_svg(&mut svg, &attr)?;
+    RadiusMeasure::new(circle.clone(), Some("radius".into()), None).write_svg_mapped(
+        &mut svg,
+        &SvgTagAttributes::default().style(
+            Some(theme.measure.make_transparent(0.5)),
+            Some(theme.measure.make_transparent(0.5)),
+            Some(0.2),
+        ),
+    )?;
 
     // Draw intersection.
     let intersection = Geometry2D::Rect(rect)
@@ -218,9 +230,15 @@ fn svg_sample_sketch() -> std::io::Result<()> {
         )
         .expect("Some geometry");
 
-    intersection.write_svg(&mut svg, &attr)?;
+    intersection.write_svg_mapped(
+        &mut svg,
+        &SvgTagAttributes::default().style(None, Some(theme.active), Some(0.4)),
+    )?;
 
-    SizeMeasure::bounds(&intersection).write_svg(&mut svg, &attr)*/
+    SizeMeasure::bounds(&intersection).write_svg_mapped(
+        &mut svg,
+        &SvgTagAttributes::default().style(Some(theme.measure), Some(theme.measure), Some(0.2)),
+    )?;
 
     Ok(())
 }

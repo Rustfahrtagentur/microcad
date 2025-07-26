@@ -3,7 +3,7 @@
 
 //! Scalable Vector Graphics (SVG) primitives (SvgWrite trait implementations).
 
-use cgmath::{InnerSpace, Rad};
+use cgmath::{Deg, InnerSpace};
 use geo::{CoordsIter as _, Point, Rect, Translate};
 use microcad_core::*;
 use microcad_lang::model::{Element, Model, OutputType};
@@ -361,7 +361,7 @@ impl WriteSvg for EdgeLengthMeasure {
         }
         .write_svg(writer, attr)?;
 
-        Edge2D(top_left, top_right).shorter(1.0).write_svg(
+        Edge2D(top_left, top_right).shorter(1.5).write_svg(
             writer,
             &attr.clone().marker_start("arrow").marker_end("arrow"),
         )?;
@@ -374,18 +374,44 @@ impl WriteSvgMapped for EdgeLengthMeasure {}
 
 /// A radius measure with an offset.
 pub struct RadiusMeasure {
-    /// Name of this measurement.
-    pub name: Option<String>,
     /// Circle to measure.
     pub circle: Circle,
+    /// Original radius to measure.
+    pub radius: Scalar,
+    /// Name of this measurement.
+    pub name: Option<String>,
     /// Angle of the measurement.
-    pub angle: Rad<Scalar>,
+    pub angle: Deg<Scalar>,
+}
+
+impl RadiusMeasure {
+    /// Create new radius measure.
+    pub fn new(circle: Circle, name: Option<String>, angle: Option<Deg<Scalar>>) -> Self {
+        Self {
+            radius: circle.radius,
+            circle,
+            name,
+            angle: angle.unwrap_or(Deg(-45.0)),
+        }
+    }
+}
+
+impl MapToCanvas for RadiusMeasure {
+    fn map_to_canvas(&self, canvas: &Canvas) -> Self {
+        Self {
+            radius: self.radius,
+            circle: self.circle.map_to_canvas(canvas),
+            name: self.name.clone(),
+            angle: self.angle,
+        }
+    }
 }
 
 impl WriteSvg for RadiusMeasure {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
-        let edge = Edge2D::radius_edge(&self.circle, &self.angle);
-        edge.write_svg(writer, &attr.clone().marker_end("arrow"))?;
+        let edge = Edge2D::radius_edge(&self.circle, &self.angle.into());
+        edge.shorter(1.5)
+            .write_svg(writer, &attr.clone().marker_end("arrow"))?;
         let center = edge.center();
 
         CenteredText {
@@ -395,7 +421,7 @@ impl WriteSvg for RadiusMeasure {
                     Some(name) => format!("{name} = "),
                     None => String::new(),
                 },
-                radius = self.circle.radius,
+                radius = self.radius,
             ),
             rect: Rect::new(center, center),
             font_size: 2.0,
@@ -406,10 +432,11 @@ impl WriteSvg for RadiusMeasure {
     }
 }
 
+impl WriteSvgMapped for RadiusMeasure {}
+
 /// Size measure of a bounds.
 pub struct SizeMeasure {
-    /// Bounds to measure.
-    _bounds: Bounds2D,
+    bounds: Bounds2D,
     /// Width measure
     width: Option<EdgeLengthMeasure>,
     /// Height measure
@@ -423,16 +450,29 @@ impl SizeMeasure {
 
         if let Some(rect) = bounds.rect() {
             Self {
-                _bounds: bounds.clone(),
-                width: Some(EdgeLengthMeasure::width(rect, 10.0, None)),
-                height: Some(EdgeLengthMeasure::height(rect, 10.0, None)),
+                bounds: bounds.clone(),
+                width: Some(EdgeLengthMeasure::width(rect, 7.0, None)),
+                height: Some(EdgeLengthMeasure::height(rect, 7.0, None)),
             }
         } else {
             Self {
-                _bounds: bounds.clone(),
+                bounds: bounds.clone(),
                 width: None,
                 height: None,
             }
+        }
+    }
+}
+
+impl MapToCanvas for SizeMeasure {
+    fn map_to_canvas(&self, canvas: &Canvas) -> Self {
+        Self {
+            bounds: self.bounds.map_to_canvas(canvas),
+            width: self.width.as_ref().map(|width| width.map_to_canvas(canvas)),
+            height: self
+                .height
+                .as_ref()
+                .map(|height| height.map_to_canvas(canvas)),
         }
     }
 }
@@ -448,3 +488,5 @@ impl WriteSvg for SizeMeasure {
         Ok(())
     }
 }
+
+impl WriteSvgMapped for SizeMeasure {}

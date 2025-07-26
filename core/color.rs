@@ -34,6 +34,13 @@ impl Color {
         Self::rgba(r, g, b, 1.0_f32)
     }
 
+    /// Make color transparent.
+    pub fn make_transparent(self, a: f32) -> Self {
+        let mut new = self;
+        new.a = a;
+        new
+    }
+
     /// Construct a color from a hex string like `#FFCCAA`.
     pub fn from_hex_str(hex: &str) -> Result<Self, ParseColorError> {
         if !hex.starts_with("#") {

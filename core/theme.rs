@@ -22,10 +22,12 @@ pub struct Theme {
     pub highlight: Color,
     /// Default color for entities
     pub entity: Color,
-    /// Color used for construction lines
-    pub construction: Color,
+    /// Color used for active construction lines
+    pub active: Color,
+    /// Color used for inactive construction lines
+    pub inactive: Color,
     /// Color for dimensions and annotations
-    pub annotation: Color,
+    pub measure: Color,
     /// Color for snapping indicators
     pub snap_indicator: Color,
     /// Color for guidelines (e.g. inference lines)
@@ -43,8 +45,9 @@ impl Theme {
             selection: Color::rgb(1.0, 0.6, 0.0),
             highlight: Color::rgb(1.0, 1.0, 0.0),
             entity: Color::rgb(0.9, 0.9, 0.9),
-            construction: Color::rgb(0.4, 0.4, 0.8),
-            annotation: Color::rgb(0.8, 0.8, 0.3),
+            active: Color::rgb(0.8, 0.8, 0.8),
+            inactive: Color::rgb(0.4, 0.4, 0.4),
+            measure: Color::rgb(0.0, 0.8, 0.8),
             snap_indicator: Color::rgb(0.0, 1.0, 1.0),
             guide: Color::rgb(0.6, 0.6, 0.6),
         }
@@ -60,8 +63,9 @@ impl Theme {
             selection: Color::rgb(0.0, 0.4, 0.8),
             highlight: Color::rgb(1.0, 0.6, 0.0),
             entity: Color::rgb(0.1, 0.1, 0.1),
-            construction: Color::rgb(0.4, 0.4, 0.8),
-            annotation: Color::rgb(0.5, 0.5, 0.0),
+            active: Color::rgb(0.2, 0.2, 0.2),
+            inactive: Color::rgb(0.8, 0.8, 0.8),
+            measure: Color::rgb(0.0, 0.8, 0.8),
             snap_indicator: Color::rgb(0.0, 0.8, 0.8),
             guide: Color::rgb(0.6, 0.6, 0.6),
         }
