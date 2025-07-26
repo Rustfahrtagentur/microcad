@@ -3,13 +3,14 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**197** tests from markdown.
+**198** tests from markdown.
 
 | Result | Name |
 |-------:|------|
 | [![test](../doc/structure/.test/argument_match_mix.png)](../doc/structure/.test/argument_match_mix.log) | [argument_match_mix](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/argument_match_name.png)](../doc/structure/.test/argument_match_name.log) | [argument_match_name](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/argument_match_type.png)](../doc/structure/.test/argument_match_type.log) | [argument_match_type](../doc/structure/arguments.md) |
+| [![test](../doc/structure/.test/array_expressions.png)](../doc/structure/.test/array_expressions.log) | [array_expressions](../doc/structure/arrays.md) |
 | [![test](../doc/types/.test/array_unit_bundling.png)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/arrays.md) |
 | [![test](../doc/structure/.test/arrays_and_comments.png)](../doc/structure/.test/arrays_and_comments.log) | [arrays_and_comments](../doc/structure/arrays.md) |
 | [![test](../doc/structure/.test/assignment.png)](../doc/structure/.test/assignment.log) | [assignment](../doc/structure/assignments.md) |

@@ -1,6 +1,6 @@
 -- Test --
   arrays_and_comments
-  ../doc/structure/arrays.md:4
+  ../doc/structure/arrays.md:6
 
 -- Code --
 
@@ -12,3 +12,13 @@
     2
 ];
 
+-- Output --
+-- Errors --
+warning: This expression statement did not produce any model
+  ---> <from_str>:1:1
+     |
+   1 | [
+     | ^
+     |
+-- Test Result --
+OK

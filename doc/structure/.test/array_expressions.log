@@ -1,0 +1,12 @@
+-- Test --
+  array_expressions
+  ../doc/structure/arrays.md:18
+
+-- Code --
+
+std::debug::assert_eq([std::count([1,2,3]), 3]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK
