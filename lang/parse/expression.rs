@@ -45,6 +45,7 @@ lazy_static::lazy_static! {
         // Precedence is defined lowest to highest
         PrattParser::new()
             // Addition and subtract have equal precedence
+            .op(Op::infix(or, Left) | Op::infix(and, Left))
             .op(Op::infix(equal, Left) | Op::infix(not_equal, Left))
             .op(Op::infix(greater_than, Left) | Op::infix(less_than, Left))
             .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
@@ -124,6 +125,7 @@ impl Parse for Expression {
                     Rule::near => "~",
                     Rule::not_equal => "!=",
                     Rule::and => "&",
+                    Rule::or => "|",
 
                     rule => unreachable!(
                         "Expression::parse expected infix operation, found {:?}",

@@ -56,6 +56,7 @@ impl Parse for IfStatement {
         let mut cond = Default::default();
         let mut body = None;
         let mut body_else = None;
+        let mut next_if = None;
 
         for pair in pair.inner() {
             match pair.as_rule() {
@@ -65,6 +66,11 @@ impl Parse for IfStatement {
                         body = Some(Body::parse(pair)?)
                     } else {
                         body_else = Some(Body::parse(pair)?)
+                    }
+                }
+                Rule::if_statement => {
+                    if next_if.is_none() {
+                        next_if = Some(Box::new(IfStatement::parse(pair)?));
                     }
                 }
                 rule => unreachable!("Unexpected rule in if, got {:?}", rule),
@@ -77,6 +83,7 @@ impl Parse for IfStatement {
             cond,
             body,
             body_else,
+            next_if,
             src_ref: pair.into(),
         })
     }

@@ -9,7 +9,21 @@ impl Eval<Value> for IfStatement {
     fn eval(&self, context: &mut crate::eval::Context) -> crate::eval::EvalResult<Value> {
         log::debug!("Evaluating if statement to value: {self}");
         context.grant(self)?;
-        eval_todo!(context, self, "evaluate if statement in function")
+        let cond = self.cond.eval(context)?;
+        match cond {
+            Value::Bool(true) => Ok(self.body.eval(context)?),
+            Value::Bool(false) => {
+                if let Some(body) = &self.body_else {
+                    Ok(body.eval(context)?)
+                } else {
+                    Ok(Value::None)
+                }
+            }
+            _ => {
+                context.error(self, EvalError::IfConditionIsNotBool(cond.clone()))?;
+                Ok(Value::None)
+            }
+        }
     }
 }
 

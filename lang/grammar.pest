@@ -415,7 +415,7 @@ return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 
 //`if a > 5.0mm { return 5.0mm; }`: ok
 //`if a > 5.0mm { return 5.0mm; } else { return 4.0mm; }`: ok
-if_statement = { "if" ~ ws* ~ expression ~ ws* ~ body ~ (ws* ~"else" ~ ws* ~ body)? }
+if_statement = { "if" ~ ws* ~ expression ~ ws* ~ body ~ (ws* ~"else" ~ ws* ~ (body | if_statement))? }
 
 workbench_kind = { "sketch" | "part" | "op" }
 

@@ -14,6 +14,8 @@ pub struct IfStatement {
     pub body: Body,
     /// body if false
     pub body_else: Option<Body>,
+    /// next if statement: `else if x == 1`
+    pub next_if: Option<Box<IfStatement>>,
     /// Source code reference
     pub src_ref: SrcRef,
 }
