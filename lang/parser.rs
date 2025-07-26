@@ -118,6 +118,9 @@ impl Parser {
             }
         }
 
-        panic!("Unexpected rules: {rules:?}");
+        panic!(
+            "Unexpected rules: expected {rules:?}, got {rule:?}",
+            rule = pair.as_rule()
+        );
     }
 }

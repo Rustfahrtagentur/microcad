@@ -91,6 +91,11 @@ impl Parse for IfStatement {
 
 impl Parse for ExpressionStatement {
     fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
+        Parser::ensure_rules(
+            &pair,
+            &[Rule::expression_statement, Rule::final_expression_statement],
+        );
+
         Ok(Self {
             attribute_list: crate::find_rule!(pair, attribute_list)?,
             expression: pair

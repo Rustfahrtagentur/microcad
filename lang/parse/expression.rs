@@ -6,20 +6,21 @@ use crate::{parse::*, parser::*, syntax::*};
 impl Parse for ExpressionList {
     fn parse(pair: Pair) -> ParseResult<Self> {
         pair.inner()
-            .map(Expression::parse)
+            .filter_map(|pair| match pair.as_rule() {
+                Rule::expression | Rule::expression_no_semicolon => Some(Expression::parse(pair)),
+                _ => None,
+            })
             .collect::<Result<Vec<_>, _>>()
     }
 }
 
 impl Parse for ListExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut inner = pair.inner();
         Ok(Self {
-            list: ExpressionList::parse(inner.next().expect("list_expression expected"))?,
-            unit: match inner.next() {
-                Some(pair) => Unit::parse(pair)?,
-                None => Unit::None,
-            },
+            list: pair
+                .find(Rule::expression_list)
+                .expect("expression_list expected"),
+            unit: pair.find(Rule::unit).unwrap_or_default(),
             src_ref: pair.clone().into(),
         })
     }
@@ -78,6 +79,8 @@ impl Expression {
 
 impl Parse for Expression {
     fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rules(&pair, &[Rule::expression_no_semicolon, Rule::expression]);
+
         if pair.as_rule() == Rule::expression_no_semicolon {
             return Ok(Self::Nested(Nested::parse(pair)?));
         }

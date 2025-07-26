@@ -127,6 +127,7 @@ impl std::fmt::Display for Expression {
             Self::AttributeAccess(lhs, rhs, _) => write!(f, "{lhs}#{rhs}"),
             Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs}.{method_call}"),
             Self::Nested(nested) => write!(f, "{nested}"),
+            Self::Marker(marker) => write!(f, "{marker}"),
             _ => unimplemented!(),
         }
     }
