@@ -7,3 +7,7 @@
 #[measure = width, height]
 r = std::geo2d::circle(42mm);
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK
