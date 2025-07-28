@@ -38,8 +38,8 @@ impl SvgWriter {
         };
         let x = 0;
         let y = 0;
-        let w = size.width as i64;
-        let h = size.height as i64;
+        let w = size.width.ceil() as i64;
+        let h = size.height.ceil() as i64;
         let canvas = Canvas::new_centered_content(size, content_rect, scale);
 
         writeln!(&mut writer, "<?xml version='1.0' encoding='UTF-8'?>")?;
