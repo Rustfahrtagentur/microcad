@@ -1,4 +1,3 @@
-use __builtin::*;
 
 
 op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
@@ -7,8 +6,17 @@ op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
     }
 }
 
-translate(x = 20.0mm, y = 20.0mm) {
-    geo2d::rect(x = -5.0, y = -5.0, width = 10.0, height = 10.0);
-}
+r = __builtin::geo2d::rect(x = 0, y = 0, width = 3, height = 3);
 
+#[color = "red"]
+translate(x = 0.0mm, y = 0.0mm) r;
+
+#[color = "blue"]
+translate(x = 4.0mm, y = 0.0mm) r;
+
+#[color = "green"]
+translate(x = 0.0mm, y = 4.0mm) r;
+
+#[color = "gray"]
+translate(x = 4.0mm, y = 4.0mm) r;
 
