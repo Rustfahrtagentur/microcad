@@ -141,7 +141,6 @@ impl PrintSyntax for Value {
 
 impl PrintSyntax for Expression {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        let depth = depth + Self::INDENT;
         match self {
             Self::Value(value) => value.print_syntax(f, depth),
             Self::Literal(literal) => literal.print_syntax(f, depth),
