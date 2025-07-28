@@ -9,5 +9,5 @@ c = std::geo2d::circle(42.0mm);
 
 -- Output --
 -- Errors --
-Value Error: Identifier not found: id-- Test Result --
-FAIL
+-- Test Result --
+OK
