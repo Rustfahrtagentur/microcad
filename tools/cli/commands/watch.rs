@@ -26,13 +26,19 @@ impl RunCommand for Watch {
         } else {
             // Recompile whenever something relevant happens.
             loop {
-                let mut context = cli.make_context(&self.export_args.input)?;
-                // Re-evaluate context.
-                if let Ok(model) = context.eval() {
-                    let target_models =
-                        &export.target_models(&model, &config, context.exporters())?;
+                match cli.make_context(&self.export_args.input) {
+                    Ok(mut context) => {
+                        // Re-evaluate context.
+                        if let Ok(model) = context.eval() {
+                            let target_models =
+                                &export.target_models(&model, &config, context.exporters())?;
 
-                    export.export_targets(target_models)?;
+                            export.export_targets(target_models)?;
+                        }
+                    }
+                    Err(err) => {
+                        log::error!("{err}");
+                    }
                 }
 
                 // Watch all dependencies of the most recent compilation.
