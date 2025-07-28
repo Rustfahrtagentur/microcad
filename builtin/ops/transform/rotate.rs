@@ -16,8 +16,8 @@ impl BuiltinWorkbenchDefinition for Rotate {
     fn model(args: &Tuple) -> EvalResult<Model> {
         Ok(
             ModelBuilder::new_transform(AffineTransform::RotationAroundAxis(
-                cgmath::Rad(args.get("angle")),
-                Vec3::new(args.get("x"), args.get("y"), args.get("z")),
+                cgmath::Rad(args.get("angle")?),
+                Vec3::new(args.get("x")?, args.get("y")?, args.get("z")?),
             ))
             .build(),
         )

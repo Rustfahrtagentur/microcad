@@ -157,22 +157,6 @@ impl Value {
 
         Err(ValueError::CannotConvert(self.clone(), "Scalar".into()))
     }
-
-    /// Stringify the value
-    pub fn value_to_string(&self) -> String {
-        match self {
-            Value::None => invalid!(VALUE).to_string(),
-            Value::Integer(n) => format!("{n}"),
-            Value::Quantity(q) => format!("{q}"),
-            Value::Bool(b) => format!("{b}"),
-            Value::String(s) => format!(r#""{s}""#),
-            Value::Array(l) => format!("{l}"),
-            Value::Tuple(t) => format!("{t}"),
-            Value::Matrix(m) => format!("{m}"),
-            Value::Models(_n) => todo!(),
-            Value::Return(r) => format!("{r}"),
-        }
-    }
 }
 
 impl PartialOrd for Value {
@@ -357,7 +341,7 @@ impl std::ops::BitAnd for Value {
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Value::None => write!(f, crate::invalid!(VALUE)),
+            Value::None => write!(f, crate::invalid_no_ansi!(VALUE)),
             Value::Integer(n) => write!(f, "{n}"),
             Value::Quantity(q) => write!(f, "{q}"),
             Value::Bool(b) => write!(f, "{b}"),

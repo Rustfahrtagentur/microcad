@@ -22,9 +22,9 @@ pub fn assert() -> Symbol {
             match ArgumentMatch::find_multi_match(args, params.expect("parameter list")) {
                 Ok(multi_args) => {
                     for a in multi_args {
-                        let v: bool = a.get("v");
+                        let v: bool = a.get("v")?;
                         if !v {
-                            let message: String = a.get("message");
+                            let message: String = a.get("message")?;
                             context.error(
                                 args,
                                 EvalError::AssertionFailed(if message.is_empty() {
@@ -71,11 +71,11 @@ pub fn assert_eq() -> Symbol {
             match ArgumentMatch::find_multi_match(args, params.expect("ParameterList")) {
                 Ok(multi_args) => {
                     for a in multi_args {
-                        let a_value = &a.get_value("a");
+                        let a_value = &a.get_value("a").expect("missing parameter");
 
                         if let Value::Array(exprs) = a_value {
                             if !all_equal(exprs.iter()) {
-                                let message: String = a.get("message");
+                                let message: String = a.get("message")?;
                                 context.error(
                                     args,
                                     EvalError::AssertionFailed(if message.is_empty() {
