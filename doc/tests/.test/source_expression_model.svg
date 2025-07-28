@@ -11,11 +11,90 @@
       markerWidth="9"
       markerHeight="9"
       orient="auto-start-reverse">
-      <path d="M 0 0 L 16 8 L 0 16 z" stroke="context-stroke" fill="context-fill" />
+      <path d="M 0 0 L 16 8 L 0 16 z" stroke="none" fill="context-fill" />
     </marker>
   </defs>
             
-  <g>
+  <style>
+     
+        .background-fill {
+            fill: #FFFFFF;
+            stroke: none;
+        }
+         
+        .grid {
+            fill: #D8D8D8;
+            stroke: #D8D8D8;
+            stroke-width: 0.2;
+        }
+         
+        .grid-stroke {
+            fill: none;
+            stroke: #D8D8D8;
+            stroke-width: 0.2;
+        }
+         
+        .grid-fill {
+            fill: #D8D8D8;
+            stroke: none;
+        }
+         
+        .measure {
+            fill: #00CCCC;
+            stroke: #00CCCC;
+            stroke-width: 0.2;
+        }
+         
+        .measure-stroke {
+            fill: none;
+            stroke: #00CCCC;
+            stroke-width: 0.2;
+        }
+         
+        .measure-fill {
+            fill: #00CCCC;
+            stroke: none;
+        }
+         
+        .highlight {
+            fill: #FF9900;
+            stroke: #FF9900;
+            stroke-width: 0.2;
+        }
+         
+        .highlight-stroke {
+            fill: none;
+            stroke: #FF9900;
+            stroke-width: 0.2;
+        }
+         
+        .highlight-fill {
+            fill: #FF9900;
+            stroke: none;
+        }
+         
+        .entity {
+            fill: #191919;
+            stroke: #191919;
+            stroke-width: 0.4;
+        }
+         
+        .entity-stroke {
+            fill: none;
+            stroke: #191919;
+            stroke-width: 0.4;
+        }
+         
+        .entity-fill {
+            fill: #191919;
+            stroke: none;
+        }
+        
+            .active { fill-opacity: 1.0; stroke-opacity: 1.0; }
+            .inactive { fill-opacity: 0.3; stroke-opacity: 0.3; }
+        
+  </style>
+  <g class="entity">
     <circle cx="1" cy="1" r="1"/>
   </g>
 </svg>
