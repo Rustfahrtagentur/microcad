@@ -102,7 +102,7 @@ impl<'a> From<&'a Identifier> for &'a str {
 impl std::fmt::Display for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.is_empty() {
-            write!(f, crate::invalid!(ID))
+            write!(f, crate::invalid_no_ansi!(ID))
         } else {
             write!(f, "{}", self.0)
         }
@@ -111,7 +111,11 @@ impl std::fmt::Display for Identifier {
 
 impl std::fmt::Debug for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Identifier: {:?}", self.0)
+        if self.is_empty() {
+            write!(f, "Identifier: {}", crate::invalid!(ID))
+        } else {
+            write!(f, "Identifier: {:?}", self.0)
+        }
     }
 }
 

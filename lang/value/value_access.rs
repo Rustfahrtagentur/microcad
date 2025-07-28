@@ -14,23 +14,36 @@ pub trait ValueAccess {
     fn by_ty(&self, ty: &Type) -> Option<&Value>;
 
     /// Fetch an argument value by name as `&str`.
-    ///
-    /// Panics if `id ` cannot be found.`
-    fn get<'a, T>(&'a self, id: &str) -> T
+    fn get<'a, T>(&'a self, id: &str) -> ValueResult<T>
     where
         T: std::convert::TryFrom<&'a Value>,
         T::Error: std::fmt::Debug,
     {
-        self.by_id(&Identifier::no_ref(id))
-            .map(|t| TryInto::try_into(t).expect("Value"))
-            .expect("some value")
+        let id = &Identifier::no_ref(id);
+        if let Some(val) = self.by_id(id) {
+            if let Ok(val) = TryInto::try_into(val) {
+                Ok(val)
+            } else {
+                Err(ValueError::CannotConvert(
+                    val.clone(),
+                    std::any::type_name::<T>().into(),
+                ))
+            }
+        } else {
+            Err(ValueError::IdNotFound(id.clone()))
+        }
     }
 
     /// Fetch an argument value by name as `&str`.
     ///
     /// Panics if `id ` cannot be found.`
-    fn get_value(&self, id: &str) -> &Value {
-        self.by_id(&Identifier::no_ref(id)).expect("")
+    fn get_value(&self, id: &str) -> ValueResult<&Value> {
+        let id = Identifier::no_ref(id);
+        if let Some(value) = self.by_id(&id) {
+            Ok(value)
+        } else {
+            Err(ValueError::IdNotFound(id))
+        }
     }
 
     /// Return `true`, if tuple contains a value with that name

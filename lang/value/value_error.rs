@@ -55,4 +55,8 @@ pub enum ValueError {
     /// Duplicate parameter
     #[error("Duplicate parameter: {0}")]
     DuplicateParameter(Identifier),
+
+    /// Could not find identifier
+    #[error("Identifier not found: {0}")]
+    IdNotFound(Identifier),
 }

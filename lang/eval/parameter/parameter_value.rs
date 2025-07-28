@@ -54,7 +54,7 @@ impl Ty for ParameterValue {
 impl std::fmt::Display for ParameterValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(def) = &self.default_value {
-            write!(f, "{} = {}", def.ty(), def.value_to_string())?;
+            write!(f, "{} = {def}", def.ty())?;
         } else if let Some(ty) = &self.specified_type {
             write!(f, "{ty}")?;
         }

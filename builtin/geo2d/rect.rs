@@ -13,10 +13,10 @@ impl BuiltinWorkbenchDefinition for Rect {
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {
-        let width: Scalar = args.get("width");
-        let height: Scalar = args.get("height");
-        let x = args.get("x");
-        let y = args.get("y");
+        let width: Scalar = args.get("width")?;
+        let height: Scalar = args.get("height")?;
+        let x = args.get("x")?;
+        let y = args.get("y")?;
 
         Ok(
             ModelBuilder::new_2d_primitive(Rc::new(Geometry2D::Rect(geo2d::Rect::new(
