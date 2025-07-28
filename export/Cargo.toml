@@ -15,6 +15,8 @@ path = "lib.rs"
 [dependencies]
 microcad-core = { workspace = true }
 microcad-lang = { workspace = true }
+log = "0.4"
+env_logger = "0.11"
 
 cgmath = "0.18"
 derive_more = { version = "2", features = ["deref", "deref_mut"] }
