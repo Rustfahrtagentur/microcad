@@ -28,13 +28,8 @@ impl Exporter for SvgExporter {
         use microcad_core::FetchBounds2D;
 
         if let Some(content_rect) = model.fetch_bounds_2d().rect() {
-            let size = Size2D::A4;
-            let mut writer = SvgWriter::new_canvas(
-                Box::new(BufWriter::new(f)),
-                Some(size),
-                *content_rect,
-                None,
-            )?;
+            let mut writer =
+                SvgWriter::new_canvas(Box::new(BufWriter::new(f)), None, *content_rect, None)?;
 
             model.write_svg(&mut writer, &SvgTagAttributes::default())?;
         }

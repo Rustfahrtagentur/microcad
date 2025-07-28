@@ -161,11 +161,10 @@ impl WriteSvg for Model {
             }
             Element::Transform(affine_transform) => {
                 if !self_.is_empty() {
-                    writer.begin_group(
-                        &node_attr
-                            .clone()
-                            .transform_matrix(&affine_transform.mat2d()),
-                    )?;
+                    let mut mat = affine_transform.mat2d();
+                    mat.z.y = -mat.z.y;
+
+                    writer.begin_group(&node_attr.clone().transform_matrix(&mat))?;
                     self_
                         .children()
                         .try_for_each(|child| child.write_svg(writer, &node_attr))?;
