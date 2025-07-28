@@ -138,7 +138,7 @@ impl Tuple {
                     combinations *= len;
                     (0, len)
                 } else {
-                    panic!("'{id}' found in tuple but no list:\n{self:#?}");
+                    panic!("{id:?} found in tuple but no list:\n{self:#?}");
                 };
                 (id, counter)
             })
@@ -173,7 +173,7 @@ impl Tuple {
                             }
                             item
                         } else {
-                            panic!("'{id}' found in tuple but no list");
+                            panic!("{id:?} found in tuple but no list");
                         }
                     }
                     _ => (id.clone(), v.clone()),
