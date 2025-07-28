@@ -11,7 +11,7 @@ use crate::value::Quantity;
 #[derive(Debug, Error)]
 pub enum QuantityError {
     /// Error adding two quantities.
-    #[error("Invalid operation: `{0}` {1} `{2}`")]
+    #[error("Invalid operation: `{0}` {1} `{2}` (try `{2}` {1} `{0}`)")]
     InvalidOperation(Quantity, char, Quantity),
 }
 
