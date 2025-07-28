@@ -1,6 +1,6 @@
 -- Test --
   hull_multiple
-  ../doc/libs/std/ops/hull.md:18
+  ../doc/libs/std/ops/hull.md:19
 
 -- Code --
 
@@ -8,12 +8,8 @@ use std::geo2d::*;
 use std::ops::*;
 
 hull() {
-    union() {
-        translate(x = [-10, 10]mm, y = [-10, 10]mm)
-            circle(1mm);
-        translate(x = [-20, 20]mm, y = 0mm)
-            circle(1mm);
-    }
+    translate(x = [-10, 10]mm, y = [-10, 10]mm)
+        circle(4mm);
 }
 
 -- Output --
