@@ -108,6 +108,16 @@ format_spec_width = { "0" ~ int }
 // `False`: error
 bool_literal = @{ "true" | "false" }
 
+// `m`: ok
+// `mm`: ok
+// `µm`: ok
+// `m²`: ok
+// `mm³`: ok
+// `kg/m²`: ok
+// `kg/`: fail
+// `kg/²`: fail
+// `/kg`: fail
+// `/1m`: fail
 unit = @{ (alpha_lower+ ~ ((("/" ~ alpha_lower+)? ~ ("²" | "³")))?) | "°" | "%" | "\"" | "'" }
 
 // `1`: ok # Integer
