@@ -3,6 +3,7 @@
 
 //! Model methods and trait implementations for rendering.
 
+use cgmath::SquareMatrix;
 use microcad_core::*;
 
 use crate::model::*;
@@ -39,11 +40,12 @@ impl Model {
         let new_mat = {
             let mut self_ = self.borrow_mut();
             let new_mat = match &self_.element.value {
-                Element::Transform(affine_transform) => mat * affine_transform.mat3d(),
-                _ => mat,
+                Element::Transform(affine_transform) => affine_transform.mat3d(),
+                _ => Mat4::identity(),
             };
-            self_.output.matrix = new_mat;
-            new_mat
+            self_.output.world_matrix = mat * new_mat;
+            self_.output.local_matrix = new_mat;
+            mat * new_mat
         };
 
         self.borrow().children.iter().for_each(|model| {
@@ -55,7 +57,7 @@ impl Model {
     pub fn set_resolution(&self, resolution: RenderResolution) {
         let new_resolution = {
             let mut self_ = self.borrow_mut();
-            let new_resolution = resolution * self_.output.matrix;
+            let new_resolution = resolution * self_.output.world_matrix;
             self_.output.resolution = new_resolution.clone();
             new_resolution
         };
@@ -156,7 +158,7 @@ impl FetchBounds2D for Model {
         self.descendants().for_each(|model| {
             let output = &model.borrow().output;
             if let GeometryOutput::Geometries2D(geometries) = &output.geometry {
-                let mat = output.matrix_2d();
+                let mat = output.world_matrix_2d();
                 let resolution = &output.resolution;
                 bounds = bounds.clone().extend(
                     geometries

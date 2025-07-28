@@ -52,7 +52,13 @@ impl Operation for BooleanOp {
                         );
                     }
                     _ => {
-                        geometries.append(model.process_2d(model));
+                        let b = model.borrow();
+                        let mat = b.output.local_matrix_2d();
+                        geometries.append(
+                            model
+                                .process_2d(model)
+                                .transformed_2d(&self_.output.resolution, &mat),
+                        );
                     }
                 });
         }

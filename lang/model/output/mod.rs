@@ -17,8 +17,10 @@ use microcad_core::{Geometries2D, Geometries3D, Mat3, Mat4, RenderResolution};
 pub struct ModelOutput {
     /// The output geometry.
     pub geometry: GeometryOutput,
-    /// Transformation matrix.
-    pub matrix: Mat4,
+    /// World transformation matrix.
+    pub world_matrix: Mat4,
+    /// Local transformation matrix.
+    pub local_matrix: Mat4,
     /// The render resolution, calculated from transformation matrix.
     pub resolution: RenderResolution,
 }
@@ -44,15 +46,25 @@ impl ModelOutput {
         self.geometry.model_output_type()
     }
 
-    /// 2D transformation matrix (from 3D matrix).
-    pub fn matrix_2d(&self) -> Mat3 {
-        let m = &self.matrix;
+    /// Local 2D transformation matrix (from 3D matrix).
+    pub fn local_matrix_2d(&self) -> Mat3 {
+        let m = &self.local_matrix;
         Mat3::from_cols(m.x.truncate_n(2), m.y.truncate_n(2), m.w.truncate_n(2))
     }
 
-    /// 3D transformation matrix.
-    pub fn matrix_3d(&self) -> Mat4 {
-        self.matrix
+    /// World 2D transformation matrix (from 3D matrix).
+    pub fn world_matrix_2d(&self) -> Mat3 {
+        let m = &self.world_matrix;
+        Mat3::from_cols(m.x.truncate_n(2), m.y.truncate_n(2), m.w.truncate_n(2))
+    }
+    /// Local 3D transformation matrix.
+    pub fn local_matrix_3d(&self) -> Mat4 {
+        self.local_matrix
+    }
+
+    /// World 3D transformation matrix.
+    pub fn world_matrix_3d(&self) -> Mat4 {
+        self.world_matrix
     }
 }
 
@@ -60,7 +72,8 @@ impl Default for ModelOutput {
     fn default() -> Self {
         Self {
             geometry: Default::default(),
-            matrix: microcad_core::Mat4::identity(),
+            world_matrix: microcad_core::Mat4::identity(),
+            local_matrix: microcad_core::Mat4::identity(),
             resolution: Default::default(),
         }
     }
