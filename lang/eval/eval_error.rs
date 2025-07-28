@@ -170,12 +170,12 @@ pub enum EvalError {
     AttributeError(#[from] AttributeError),
 
     /// Missing arguments
-    #[error("Missing arguments: {0:?}")]
-    MissingArguments(Vec<Identifier>),
+    #[error("Missing arguments: {0}")]
+    MissingArguments(IdentifierList),
 
     /// Missing arguments
-    #[error("Too many arguments: {0:?}")]
-    TooManyArguments(Vec<Identifier>),
+    #[error("Too many arguments: {0}")]
+    TooManyArguments(IdentifierList),
 
     /// Builtin error
     #[error("Builtin error: {0}")]
@@ -186,8 +186,8 @@ pub enum EvalError {
     ParameterByTypeNotFound(Type),
 
     /// Trying to use multiplicity where it is not allowed
-    #[error("Multiplicity not allowed '{0:?}'")]
-    MultiplicityNotAllowed(Vec<Identifier>),
+    #[error("Multiplicity not allowed '{0}'")]
+    MultiplicityNotAllowed(IdentifierList),
 
     /// An error if you try to mix 2d and 3d geometries.
     #[error("Cannot mix 2d and 3d geometries")]
@@ -202,8 +202,8 @@ pub enum EvalError {
     NoInitializationFound(Identifier),
 
     /// Initializer missed to set a property from plan
-    #[error("Workbench plan incomplete. Missing properties: {0:?}")]
-    BuildingPlanIncomplete(Vec<Identifier>),
+    #[error("Workbench plan incomplete. Missing properties: {0}")]
+    BuildingPlanIncomplete(IdentifierList),
 
     /// This errors happens if the expression is supposed to produce models but did not.
     #[error("This expression statement did not produce any model")]

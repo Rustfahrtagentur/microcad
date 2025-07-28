@@ -64,7 +64,7 @@ impl std::fmt::Debug for ExportCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(
             f,
-            "Export: {id} => {filename}",
+            "Export: {id:?} => {filename}",
             id = self.exporter.id(),
             filename = self.filename.display()
         )

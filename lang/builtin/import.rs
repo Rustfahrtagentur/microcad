@@ -35,6 +35,10 @@ pub enum ImportError {
     /// Custom error.
     #[error("{0}")]
     CustomError(Box<dyn std::error::Error>),
+
+    /// IO Error.
+    #[error("Value Error")]
+    ValueError(#[from] ValueError),
 }
 
 /// An importer trait to import files of a specific type.
@@ -119,7 +123,7 @@ impl ImporterRegistryAccess for ImporterRegistry {
         args: &Tuple,
         search_paths: &[std::path::PathBuf],
     ) -> Result<Value, Self::Error> {
-        let filename: String = args.get("filename");
+        let filename: String = args.get("filename")?;
 
         match [".".into()] // Search working dir first
             .iter()
@@ -134,7 +138,7 @@ impl ImporterRegistryAccess for ImporterRegistry {
                     Identifier::no_ref("filename"),
                     Value::String(filename.clone()),
                 );
-                let id: String = arg_map.get("id");
+                let id: String = arg_map.get("id")?;
 
                 // Check if value is in cache
                 if let Some(value) = self.get_cached(filename.clone(), id.clone()) {
@@ -170,7 +174,7 @@ fn importer() {
         }
 
         fn import(&self, args: &Tuple) -> Result<Value, ImportError> {
-            let some_arg: Integer = args.get("some_arg");
+            let some_arg: Integer = args.get("some_arg").expect("test error");
             if some_arg == 32 {
                 Ok(Value::Integer(32))
             } else {

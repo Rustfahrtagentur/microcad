@@ -14,12 +14,11 @@ impl BuiltinWorkbenchDefinition for Translate {
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {
-        log::error!("Args: {args}");
         Ok(
             ModelBuilder::new_transform(AffineTransform::Translation(Vec3::new(
-                args.get("x"),
-                args.get("y"),
-                args.get("z"),
+                args.get("x")?,
+                args.get("y")?,
+                args.get("z")?,
             )))
             .build(),
         )

@@ -9,9 +9,10 @@ use crate::{
     model::{Attributes, CustomCommand, ExportCommand, MeasureCommand, ResolutionAttribute},
     parameter,
     syntax::{self, *},
+    Id,
 };
 
-use microcad_core::{Color, RenderResolution, Size2D, theme::Theme};
+use microcad_core::{theme::Theme, Color, RenderResolution, Size2D};
 use thiserror::Error;
 
 /// Error type for attributes.
@@ -41,7 +42,7 @@ pub enum AttributeError {
 impl Eval<Option<ExportCommand>> for syntax::AttributeCommand {
     fn eval(&self, context: &mut Context) -> EvalResult<Option<ExportCommand>> {
         match self {
-            AttributeCommand::Call(id, Some(argument_list)) => {
+            AttributeCommand::Call(_, Some(argument_list)) => {
                 match ArgumentMatch::find_match(
                     &argument_list.eval(context)?,
                     &[
@@ -63,12 +64,13 @@ impl Eval<Option<ExportCommand>> for syntax::AttributeCommand {
                 ) {
                     Ok(arguments) => {
                         let filename: std::path::PathBuf =
-                            arguments.get::<String>("filename").into();
+                            arguments.get::<String>("filename")?.into();
+                        let id: Id = arguments.get::<String>("id")?.into();
+                        let id: Option<Id> = if id.is_empty() { None } else { Some(id) };
                         let resolution = RenderResolution::new(
-                            arguments.get::<&Value>("resolution").try_scalar()?,
+                            arguments.get::<&Value>("resolution")?.try_scalar()?,
                         );
-                        let size = arguments.get::<Size2D>("size");
-                        let id = id.clone().map(|id| id.id().clone());
+                        let size = arguments.get::<Size2D>("size")?;
 
                         match context.find_exporter(&filename, &id) {
                             Ok(exporter) => {
