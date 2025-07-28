@@ -147,7 +147,7 @@ impl Operation for Model {
             _ => {}
         }
 
-        geometries
+        geometries.transformed_2d(&model_.output.resolution, &model_.output.local_matrix_2d())
     }
 }
 

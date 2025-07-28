@@ -20,7 +20,7 @@ impl Operation for Hull {
                 geometries.append(
                     model
                         .process_2d(model)
-                        .transformed_2d(&self_.output.resolution, &mat),
+                        .transformed_2d(&b.output.resolution, &mat),
                 );
             });
         }
