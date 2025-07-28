@@ -7,8 +7,8 @@
 use std::*;
 
 ops::difference() {
-    geo2d::circle(radius = 3mm);
-    geo2d::rect(width = 3mm, height = 2mm);
+    geo2d::circle(radius = 10mm);
+    geo2d::rect(size = 2mm);
 };
 
 -- Output --

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 210 297' width='210mm' height='297mm'>
+<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 84 84' width='84mm' height='84mm'>
 
   <defs>
     <!-- A marker to be used as an arrowhead -->
@@ -17,10 +17,10 @@
             
   <g>
     <g>
-      <rect x="52.5" y="201" width="105" height="105"/>
+      <rect x="21" y="21" width="42" height="42"/>
     </g>
     <g>
-      <circle cx="105" cy="253.5" r="105"/>
+      <circle cx="42" cy="42" r="42"/>
     </g>
   </g>
 </svg>
