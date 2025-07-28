@@ -61,7 +61,7 @@ impl<'a> ArgumentMatch<'a> {
                 if !id.is_empty() {
                     if let Some(n) = self.params.iter().position(|(i, _)| i == id) {
                         let (id, _) = self.params.swap_remove(n);
-                        log::trace!("found parameter by id: {id}");
+                        log::trace!("found parameter by id: {id:?}");
                         self.result.insert((*id).clone(), arg.value.clone());
                         return false;
                     }
@@ -106,7 +106,7 @@ impl<'a> ArgumentMatch<'a> {
 
                 if let Some((n, id, _)) = same_type.next() {
                     if same_type.next().is_none() {
-                        log::trace!("found parameter by type: {id}");
+                        log::trace!("found parameter by type: {id:?}");
                         self.result.insert((**id).clone(), arg.value.clone());
                         self.params.swap_remove(*n);
                         return false;
@@ -131,7 +131,7 @@ impl<'a> ArgumentMatch<'a> {
                 if let Some(def) = &param.default_value {
                     // paranoia check if type is compatible
                     if def.ty() == param.ty() {
-                        log::trace!("found argument by default: {id} = {def}");
+                        log::trace!("found argument by default: {id:?} = {def}");
                         self.result.insert((*id).clone(), def.clone());
                         return false;
                     }

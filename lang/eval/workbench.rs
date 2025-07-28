@@ -18,7 +18,7 @@ impl WorkbenchDefinition {
         context: &mut Context,
     ) -> EvalResult<Model> {
         log::debug!(
-            "Evaluating model of `{id}` {kind}",
+            "Evaluating model of `{id:?}` {kind}",
             id = self.id,
             kind = self.kind
         );
@@ -54,7 +54,11 @@ impl WorkbenchDefinition {
 
                 // run init code
                 if let Some(init) = init {
-                    log::trace!("Initializing`{id}` {kind}", id = self.id, kind = self.kind);
+                    log::trace!(
+                        "Initializing`{id:?}` {kind}",
+                        id = self.id,
+                        kind = self.kind
+                    );
                     if let Err(err) = match init.eval(&self.plan, arguments.clone(), context) {
                         Ok(props) => props.iter().try_for_each(|(id, value)| {
                             context.set_local_value(id.clone(), value.clone())
@@ -66,7 +70,7 @@ impl WorkbenchDefinition {
                 }
 
                 // At this point, all properties must have a value
-                log::trace!("Run body`{id}` {kind}", id = self.id, kind = self.kind);
+                log::trace!("Run body`{id:?}` {kind}", id = self.id, kind = self.kind);
                 model.append_children(self.body.statements.eval(context)?);
 
                 // We have to deduce the output type of this model, otherwise the model is incomplete.
@@ -87,7 +91,7 @@ impl CallTrait<Models> for WorkbenchDefinition {
     /// Return evaluated nodes (multiple nodes might be created by parameter multiplicity).
     fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Models> {
         log::debug!(
-            "Workbench call {kind} {id}({args})",
+            "Workbench call {kind} {id:?}({args})",
             id = self.id,
             kind = self.kind
         );
