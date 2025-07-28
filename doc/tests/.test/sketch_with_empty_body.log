@@ -1,0 +1,14 @@
+-- Test --
+  sketch_with_empty_body
+  ../doc/tests/semicolon.md:37
+
+-- Code --
+
+use std::geo2d::circle;
+
+circle( radius = 5mm ) {} // error: sketch with body
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL
