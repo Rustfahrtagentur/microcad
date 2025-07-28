@@ -33,7 +33,6 @@ pub type Mat4 = cgmath::Matrix4<Scalar>;
 pub type Angle = cgmath::Rad<Scalar>;
 
 pub use boolean_op::BooleanOp;
-use cgmath::InnerSpace;
 pub use color::*;
 pub use core_error::*;
 pub use geo2d::*;
