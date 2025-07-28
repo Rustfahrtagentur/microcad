@@ -12,6 +12,8 @@ std::debug::assert(true != false);
 
 Boolean values can be combined with `or` and `and` operators:
 
+[![test](.test/boolean.png)](.test/boolean.log)
+
 ```µcad,boolean
 std::debug::assert_eq([true or false, true]);
 std::debug::assert_eq([true and false, false]);
