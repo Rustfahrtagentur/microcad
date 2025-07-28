@@ -1,0 +1,16 @@
+-- Test --
+  operation_no_body
+  ../doc/tests/semicolon.md:16
+
+-- Code --
+
+use std::geo2d::circle;
+use std::ops::translate;
+
+translate( y=[-34mm/2 , 34mm/2] ) // op without body
+    circle( radius = 5mm );
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK
