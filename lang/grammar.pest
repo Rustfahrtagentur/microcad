@@ -85,11 +85,11 @@ bracket_escape       =  { "{{" | "}}" }
 escape               = @{ "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | unicode) }
 unicode              = @{ "u" ~ ASCII_HEX_DIGIT{4} }
 
-/// `{a}`: ok
-/// `{a + b}`: ok
+// `{a}`: ok
+// `{a + b}`: ok
 format_expression = { "{" ~ ws* ~ (format_spec ~ ws* ~ ":")? ~ ws* ~ expression ~ ws* ~ "}" }
 
-/// `05.5`: ok # Five leading zeros with 5 precision
+// `05.5`: ok # Five leading zeros with 5 precision
 format_spec = {
     format_spec_width ~ format_spec_precision
   | format_spec_width
