@@ -24,7 +24,7 @@ punched_disk() {
 -- Output --
 -- Errors --
 error: Not implemented: call_method for Models
-error: If condition is not a boolean: [101m[1m INVALID VALUE [49m[22m
+error: If condition is not a boolean: <INVALID VALUE>
   ---> <from_str>:4:5
      |
    4 |     if @children.count() == 2 {

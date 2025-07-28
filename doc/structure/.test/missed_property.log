@@ -14,7 +14,7 @@ wheel(width = 1.0mm);
 
 -- Output --
 -- Errors --
-error: Workbench plan incomplete. Missing properties: [Identifier: "radius", Refer: 1:14 (13..19) in 0xf3cdaa8ec03331ff]
+error: Workbench plan incomplete. Missing properties: radius
   ---> <from_str>:2:5
      |
    2 |     init( width: Length ) { 
