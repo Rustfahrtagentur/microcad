@@ -60,7 +60,7 @@ impl SvgWriter {
       markerWidth="9"
       markerHeight="9"
       orient="auto-start-reverse">
-      <path d="M 0 0 L 16 8 L 0 16 z" stroke="context-stroke" fill="context-fill" />
+      <path d="M 0 0 L 16 8 L 0 16 z" stroke="none" fill="context-fill" />
     </marker>
   </defs>
             "#
@@ -127,6 +127,20 @@ impl SvgWriter {
     /// End a group `</g>`.
     pub fn end_group(&mut self) -> std::io::Result<()> {
         self.close_tag("g")
+    }
+
+    /// Defs tag.
+    pub fn defs(&mut self, inner: &str) -> std::io::Result<()> {
+        self.open_tag("defs", &Default::default())?;
+        self.with_indent(inner)?;
+        self.close_tag("defs")
+    }
+
+    /// Style tag.
+    pub fn style(&mut self, inner: &str) -> std::io::Result<()> {
+        self.open_tag("style", &Default::default())?;
+        self.with_indent(inner)?;
+        self.close_tag("style")
     }
 
     /// Finish this SVG. This method is also called in the Drop trait implementation.

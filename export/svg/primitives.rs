@@ -8,7 +8,7 @@ use geo::{CoordsIter as _, Point, Rect, Translate};
 use microcad_core::*;
 use microcad_lang::model::{Element, Model, OutputType};
 
-use crate::svg::*;
+use crate::svg::{attributes::SvgTagAttribute, *};
 
 impl WriteSvg for Edge2D {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
@@ -141,21 +141,26 @@ impl WriteSvg for Model {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
         assert_eq!(self.final_output_type(), OutputType::Geometry2D);
 
-        let node_attr = attr.clone().apply_from_model(self);
+        let node_attr = attr
+            .clone()
+            .apply_from_model(self)
+            .insert(SvgTagAttribute::class("entity"));
 
         // Render all output geometries.
         self.fetch_output_geometries_2d()
             .iter()
-            .try_for_each(|geometry| geometry.write_svg_mapped(writer, &node_attr))?;
+            .try_for_each(|geometry| {
+                geometry.write_svg_mapped(writer, &SvgTagAttributes::default())
+            })?;
 
         let self_ = self.borrow();
         match &self_.element.value {
             Element::Object(_) | Element::Primitive2D(_) => {
                 if !self_.is_empty() {
                     writer.begin_group(&node_attr)?;
-                    self_
-                        .children()
-                        .try_for_each(|child| child.write_svg(writer, &node_attr))?;
+                    self_.children().try_for_each(|child| {
+                        child.write_svg(writer, &SvgTagAttributes::default())
+                    })?;
                     writer.end_group()?;
                 }
             }
@@ -164,10 +169,14 @@ impl WriteSvg for Model {
                     let mut mat = affine_transform.mat2d();
                     mat.z.y = -mat.z.y;
 
-                    writer.begin_group(&node_attr.clone().transform_matrix(&mat))?;
-                    self_
-                        .children()
-                        .try_for_each(|child| child.write_svg(writer, &node_attr))?;
+                    writer.begin_group(
+                        &node_attr
+                            .clone()
+                            .insert(attributes::SvgTagAttribute::Transform(mat)),
+                    )?;
+                    self_.children().try_for_each(|child| {
+                        child.write_svg(writer, &SvgTagAttributes::default())
+                    })?;
                     writer.end_group()?;
                 }
             }
@@ -194,7 +203,9 @@ impl WriteSvg for CenteredText {
         writer.open_tag(
             format!(r#"text x="{x}" y="{y}" dominant-baseline="middle" text-anchor="middle""#,)
                 .as_str(),
-            &attr.clone().font_size_mm(self.font_size),
+            &attr
+                .clone()
+                .insert(attributes::SvgTagAttribute::FontSizeMM(self.font_size)),
         )?;
         writer.with_indent(&self.text)?;
         writer.close_tag("text")
@@ -227,8 +238,7 @@ impl Default for Grid {
 impl WriteSvg for Grid {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
         let rect = self.bounds.rect().unwrap_or(writer.canvas().rect);
-        eprintln!("Grid: {rect:?}");
-        writer.begin_group(attr)?;
+        writer.begin_group(&attr.clone().insert(SvgTagAttribute::class("grid-stroke")))?;
 
         rect.write_svg(writer, &SvgTagAttributes::default())?;
 
@@ -271,7 +281,7 @@ impl WriteSvg for Background {
         let height = writer.canvas().size.height;
 
         writer.tag(
-            &format!("rect x=\"{x}\" y=\"{y}\" width=\"{width}\" height=\"{height}\""),
+            &format!("rect class=\"background-fill\" x=\"{x}\" y=\"{y}\" width=\"{width}\" height=\"{height}\""),
             attr,
         )
     }
@@ -335,7 +345,9 @@ impl WriteSvg for EdgeLengthMeasure {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
         let edge_length = self.edge.vec().magnitude();
 
-        writer.begin_group(&attr.clone().transform_matrix(&self.edge.matrix()))?;
+        use attributes::SvgTagAttribute::*;
+
+        writer.begin_group(&attr.clone().insert(Transform(self.edge.matrix())))?;
 
         let center = self.offset / 2.0;
         let bottom_left = Point::new(0.0, 0.0);
@@ -343,8 +355,17 @@ impl WriteSvg for EdgeLengthMeasure {
         let top_left = Point::new(0.0, center);
         let top_right = Point::new(edge_length, center);
 
+        writer.begin_group(&attr.clone().insert(SvgTagAttribute::class("measure")))?;
         Edge2D(bottom_left, Point::new(0.0, center * 1.5)).write_svg(writer, attr)?;
         Edge2D(bottom_right, Point::new(edge_length, center * 1.5)).write_svg(writer, attr)?;
+        Edge2D(top_left, top_right).shorter(1.5).write_svg(
+            writer,
+            &attr
+                .clone()
+                .insert(MarkerStart("arrow".into()))
+                .insert(MarkerEnd("arrow".into())),
+        )?;
+        writer.end_group()?;
 
         CenteredText {
             text: format!(
@@ -358,12 +379,7 @@ impl WriteSvg for EdgeLengthMeasure {
             rect: Rect::new(bottom_left, top_right).translate(0.0, center),
             font_size: 2.0,
         }
-        .write_svg(writer, attr)?;
-
-        Edge2D(top_left, top_right).shorter(1.5).write_svg(
-            writer,
-            &attr.clone().marker_start("arrow").marker_end("arrow"),
-        )?;
+        .write_svg(writer, &SvgTagAttribute::class("measure-fill").into())?;
 
         writer.end_group()
     }
@@ -408,9 +424,16 @@ impl MapToCanvas for RadiusMeasure {
 
 impl WriteSvg for RadiusMeasure {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        writer.begin_group(attr)?;
+
         let edge = Edge2D::radius_edge(&self.circle, &self.angle.into());
-        edge.shorter(1.5)
-            .write_svg(writer, &attr.clone().marker_end("arrow"))?;
+        edge.shorter(1.5).write_svg(
+            writer,
+            &attr
+                .clone()
+                .insert(SvgTagAttribute::MarkerEnd("arrow".into()))
+                .insert(SvgTagAttribute::class("measure")),
+        )?;
         let center = edge.center();
 
         CenteredText {
@@ -425,7 +448,9 @@ impl WriteSvg for RadiusMeasure {
             rect: Rect::new(center, center),
             font_size: 2.0,
         }
-        .write_svg(writer, attr)?;
+        .write_svg(writer, &SvgTagAttribute::class("measure-fill").into())?;
+
+        writer.end_group()?;
 
         Ok(())
     }

@@ -128,7 +128,7 @@ pub trait AttributesAccess {
         }
     }
 
-    /// Color value (builtin attribute).
+    /// Color (builtin attribute).
     fn get_color(&self) -> Option<Color> {
         match self.get_single_attribute(&Identifier::no_ref("color")) {
             Some(value) => match value {
@@ -137,6 +137,24 @@ pub trait AttributesAccess {
             },
             None => None,
         }
+    }
+
+    /// Color theme (builtin attribute).
+    fn get_theme(&self) -> Option<std::rc::Rc<Theme>> {
+        self.get_single_attribute(&Identifier::no_ref("theme"))
+            .map(|attr| match attr {
+                Attribute::Theme(theme) => theme,
+                _ => unreachable!(),
+            })
+    }
+
+    /// Get size.
+    fn get_size(&self) -> Option<Size2D> {
+        self.get_single_attribute(&Identifier::no_ref("size"))
+            .map(|attr| match attr {
+                Attribute::Size(size) => size,
+                _ => unreachable!(),
+            })
     }
 
     /// Get all export commands.

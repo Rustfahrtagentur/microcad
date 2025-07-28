@@ -5,6 +5,8 @@
 
 use std::str::FromStr as _;
 
+use crate::svg::attributes::SvgTagAttribute;
+
 use super::*;
 use geo::coord;
 use microcad_core::{theme::Theme, *};
@@ -23,28 +25,20 @@ fn svg_writer() {
     .expect("test error");
 
     geo::Rect::new(geo::Point::new(10.0, 10.0), geo::Point::new(20.0, 20.0))
-        .write_svg(
-            &mut svg,
-            &[("style", Some("fill:blue;".into()))].into_iter().collect(),
-        )
+        .write_svg(&mut svg, &[("style", "fill:blue")].into_iter().collect())
         .expect("test error");
 
     geo2d::Circle {
         radius: 10.0,
         offset: Vec2::new(50.0, 50.0),
     }
-    .write_svg(
-        &mut svg,
-        &[("style", Some("fill:red;".into()))].into_iter().collect(),
-    )
+    .write_svg(&mut svg, &[("style", ("fill:red;"))].into_iter().collect())
     .expect("test error");
 
     Edge2D(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0))
         .write_svg(
             &mut svg,
-            &[("style", Some("stroke:black;".into()))]
-                .into_iter()
-                .collect(),
+            &[("style", "stroke:black;")].into_iter().collect(),
         )
         .expect("test error");
 
@@ -52,9 +46,7 @@ fn svg_writer() {
         .shorter(6.0)
         .write_svg(
             &mut svg,
-            &[("style", Some("stroke:black;".into()))]
-                .into_iter()
-                .collect(),
+            &[("style", "stroke:black;")].into_iter().collect(),
         )
         .expect("test error");
 }
@@ -78,11 +70,13 @@ fn svg_canvas() -> std::io::Result<()> {
 
     content_rect.write_svg_mapped(
         &mut svg,
-        &SvgTagAttributes::default().style(
+        &[SvgTagAttribute::style(
             None,
             Some(Color::from_str("black").expect("Black color")),
             Some(1.0),
-        ),
+        )]
+        .into_iter()
+        .collect(),
     )?;
 
     [
@@ -100,11 +94,13 @@ fn svg_canvas() -> std::io::Result<()> {
     .try_for_each(|c| {
         c.write_svg_mapped(
             &mut svg,
-            &SvgTagAttributes::default().style(
+            &[SvgTagAttribute::style(
                 Some(Color::from_str("blue").expect("Color")),
                 None,
                 None,
-            ),
+            )]
+            .into_iter()
+            .collect(),
         )?;
 
         let p = Point::new(c.offset.x, c.offset.y);
@@ -116,11 +112,13 @@ fn svg_canvas() -> std::io::Result<()> {
         }
         .write_svg_mapped(
             &mut svg,
-            &SvgTagAttributes::default().style(
+            &[SvgTagAttribute::style(
                 Some(Color::from_str("gray").expect("Color")),
                 None,
                 None,
-            ),
+            )]
+            .into_iter()
+            .collect(),
         )
     })?;
 
@@ -140,11 +138,11 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     )
     .expect("test error");
 
+    svg.style(&SvgExporter::theme_to_svg_style(&Theme::default()))?;
+
     let radius = 10.0;
     let width = 30.0;
     let height = 20.0;
-
-    let theme = Theme::default();
 
     let rect = Rect::new(coord! {x: 0.0, y: 0.0}, coord! {x: width, y: height});
     let circle = Circle {
@@ -152,18 +150,12 @@ fn svg_sample_sketch() -> std::io::Result<()> {
         offset: Vec2::new(width, height),
     };
 
-    Background.write_svg(
-        &mut svg,
-        &SvgTagAttributes::default().fill(theme.background),
-    )?;
-    Grid::default().write_svg(
-        &mut svg,
-        &SvgTagAttributes::default().style(None, Some(theme.grid), Some(0.2)),
-    )?;
+    Background.write_svg(&mut svg, &Default::default())?;
+    Grid::default().write_svg(&mut svg, &Default::default())?;
 
     rect.write_svg_mapped(
         &mut svg,
-        &SvgTagAttributes::default().style(None, Some(theme.inactive), Some(0.4)),
+        &SvgTagAttribute::class("entity-stroke inactive").into(),
     )?;
 
     CenteredText {
@@ -173,7 +165,7 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     }
     .write_svg_mapped(
         &mut svg,
-        &SvgTagAttributes::default().style(Some(theme.inactive), None, None),
+        &SvgTagAttribute::class("entity-fill inactive").into(),
     )?;
 
     // Draw rectangle measures
@@ -181,26 +173,30 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     // Height measure for rect.
     EdgeLengthMeasure::height(&rect, 10.0, Some("height")).write_svg_mapped(
         &mut svg,
-        &SvgTagAttributes::default().style(
-            Some(theme.measure.make_transparent(0.5)),
-            Some(theme.measure.make_transparent(0.5)),
-            Some(0.2),
-        ),
+        &[
+            SvgTagAttribute::class("measure"),
+            SvgTagAttribute::class("inactive"),
+        ]
+        .into_iter()
+        .collect(),
     )?;
     // Width measure for rect.
     EdgeLengthMeasure::width(&rect, 10.0, Some("width")).write_svg_mapped(
         &mut svg,
-        &SvgTagAttributes::default().style(
-            Some(theme.measure.make_transparent(0.5)),
-            Some(theme.measure.make_transparent(0.5)),
-            Some(0.2),
-        ),
+        &[
+            SvgTagAttribute::class("measure"),
+            SvgTagAttribute::class("inactive"),
+        ]
+        .into_iter()
+        .collect(),
     )?;
 
     // Draw circle `c`.
     circle.write_svg_mapped(
         &mut svg,
-        &SvgTagAttributes::default().style(None, Some(theme.inactive), Some(0.4)),
+        &[SvgTagAttribute::class("entity-stroke inactive")]
+            .into_iter()
+            .collect(),
     )?;
     CenteredText {
         text: "c".into(),
@@ -209,16 +205,22 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     }
     .write_svg_mapped(
         &mut svg,
-        &SvgTagAttributes::default().style(Some(theme.inactive), None, None),
+        &[
+            SvgTagAttribute::class("entity-fill"),
+            SvgTagAttribute::class("inactive"),
+        ]
+        .into_iter()
+        .collect(),
     )?;
 
     RadiusMeasure::new(circle.clone(), Some("radius".into()), None).write_svg_mapped(
         &mut svg,
-        &SvgTagAttributes::default().style(
-            Some(theme.measure.make_transparent(0.5)),
-            Some(theme.measure.make_transparent(0.5)),
-            Some(0.2),
-        ),
+        &[
+            SvgTagAttribute::class("measure"),
+            SvgTagAttribute::class("inactive"),
+        ]
+        .into_iter()
+        .collect(),
     )?;
 
     // Draw intersection.
@@ -232,12 +234,19 @@ fn svg_sample_sketch() -> std::io::Result<()> {
 
     intersection.write_svg_mapped(
         &mut svg,
-        &SvgTagAttributes::default().style(None, Some(theme.active), Some(0.4)),
+        &[SvgTagAttribute::class("entity-stroke active")]
+            .into_iter()
+            .collect(),
     )?;
 
     SizeMeasure::bounds(&intersection).write_svg_mapped(
         &mut svg,
-        &SvgTagAttributes::default().style(Some(theme.measure), Some(theme.measure), Some(0.2)),
+        &[
+            SvgTagAttribute::class("measure"),
+            SvgTagAttribute::class("active"),
+        ]
+        .into_iter()
+        .collect(),
     )?;
 
     Ok(())
