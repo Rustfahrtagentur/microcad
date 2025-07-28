@@ -8,27 +8,24 @@ use microcad_lang::{model::*, resolve::*, src_ref::*, syntax::*};
 struct Hull;
 
 impl Operation for Hull {
-    fn process_2d(&self, node: &Model) -> microcad_core::Geometries2D {
+    fn process_2d(&self, model: &Model) -> microcad_core::Geometries2D {
         let mut geometries = Geometries2D::default();
 
-        if let Some(node) = node.into_inner_object_model() {
-            node.borrow().children().for_each(|node| {
-                let b = node.borrow();
-                match &b.element.value {
-                    Element::Transform(affine_transform) => {
-                        geometries.append(
-                            node.process_2d(node)
-                                .transformed_2d(&b.output.resolution, &affine_transform.mat2d()),
-                        );
-                    }
-                    _ => {
-                        geometries.append(node.process_2d(node));
-                    }
-                }
+        if let Some(model) = model.into_inner_object_model() {
+            let self_ = model.borrow();
+
+            self_.children.iter().for_each(|model| {
+                let b = model.borrow();
+                let mat = b.output.local_matrix_2d();
+                geometries.append(
+                    model
+                        .process_2d(model)
+                        .transformed_2d(&self_.output.resolution, &mat),
+                );
             });
         }
 
-        geometries.hull(&node.borrow().output.resolution)
+        geometries.hull(&model.borrow().output.resolution)
     }
 
     fn process_3d(&self, _node: &microcad_lang::model::Model) -> microcad_core::Geometries3D {

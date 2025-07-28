@@ -39,28 +39,15 @@ impl Operation for BooleanOp {
 
         if let Some(model) = model.into_inner_object_model() {
             let self_ = model.borrow();
-            self_
-                .children
-                .iter()
-                .for_each(|model| match &self_.element.value {
-                    Element::Transform(affine_transform) => {
-                        geometries.append(
-                            model.process_2d(model).transformed_2d(
-                                &self_.output.resolution,
-                                &affine_transform.mat2d(),
-                            ),
-                        );
-                    }
-                    _ => {
-                        let b = model.borrow();
-                        let mat = b.output.local_matrix_2d();
-                        geometries.append(
-                            model
-                                .process_2d(model)
-                                .transformed_2d(&self_.output.resolution, &mat),
-                        );
-                    }
-                });
+            self_.children.iter().for_each(|model| {
+                let b = model.borrow();
+                let mat = b.output.local_matrix_2d();
+                geometries.append(
+                    model
+                        .process_2d(model)
+                        .transformed_2d(&self_.output.resolution, &mat),
+                );
+            });
         }
 
         geometries.boolean_op(&model.borrow().output.resolution, self)
