@@ -37,19 +37,19 @@ impl Model {
 
     /// Set the transformation matrices for this model and its children.
     pub fn set_matrix(&self, mat: Mat4) {
-        let new_mat = {
+        let world_matrix = {
             let mut self_ = self.borrow_mut();
-            let new_mat = match &self_.element.value {
+            let local_matrix = match &self_.element.value {
                 Element::Transform(affine_transform) => affine_transform.mat3d(),
                 _ => Mat4::identity(),
             };
-            self_.output.world_matrix = mat * new_mat;
-            self_.output.local_matrix = new_mat;
-            mat * new_mat
+            self_.output.world_matrix = mat * local_matrix;
+            self_.output.local_matrix = local_matrix;
+            self_.output.world_matrix
         };
 
         self.borrow().children.iter().for_each(|model| {
-            model.set_matrix(new_mat);
+            model.set_matrix(world_matrix);
         });
     }
 
