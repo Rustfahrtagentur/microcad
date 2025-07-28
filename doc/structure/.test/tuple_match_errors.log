@@ -9,7 +9,7 @@ f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
 
 -- Output --
 -- Errors --
-error: Missing arguments: [Identifier: "x", Refer: 1:7 (6..7) in 0xb2031dc11153ac6f, Identifier: "y", Refer: 1:18 (17..18) in 0xb2031dc11153ac6f]
+error: Missing arguments: x,y
   ---> <from_str>:2:4
      |
    2 | f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
