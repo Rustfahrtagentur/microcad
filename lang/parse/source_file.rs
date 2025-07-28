@@ -52,6 +52,7 @@ impl SourceFile {
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, hash)?;
         source_file.filename = std::path::PathBuf::from_str("<from_str>").expect("filename error");
         log::debug!("loaded string successfully",);
+        log::trace!("Syntax tree:\n{}", FormatSyntax(&source_file));
         Ok(Rc::new(source_file))
     }
 
