@@ -1,17 +1,17 @@
-Object -> 2D (root)
-  Object = translate(x: 0mm, y: 0mm, z: 0mm) -> 2D
+Workpiece -> 2D (root)
+  Workpiece = translate(x: 0mm, y: 0mm, z: 0mm) -> 2D
     Transform = __builtin::ops::translate(x: 0, y: 0, z: 0) -> 2D
-      Object -> 2D
+      Workpiece -> 2D
         Primitive2D(Rect(RECT(0.0 0.0,3.0 3.0))) = __builtin::geo2d::rect(height: 3, width: 3, x: 0, y: 0) -> 2D
-  Object = translate(x: 4mm, y: 0mm, z: 0mm) -> 2D
+  Workpiece = translate(x: 4mm, y: 0mm, z: 0mm) -> 2D
     Transform = __builtin::ops::translate(x: 4, y: 0, z: 0) -> 2D
-      Object -> 2D
+      Workpiece -> 2D
         Primitive2D(Rect(RECT(0.0 0.0,3.0 3.0))) = __builtin::geo2d::rect(height: 3, width: 3, x: 0, y: 0) -> 2D
-  Object = translate(x: 0mm, y: 4mm, z: 0mm) -> 2D
+  Workpiece = translate(x: 0mm, y: 4mm, z: 0mm) -> 2D
     Transform = __builtin::ops::translate(x: 0, y: 4, z: 0) -> 2D
-      Object -> 2D
+      Workpiece -> 2D
         Primitive2D(Rect(RECT(0.0 0.0,3.0 3.0))) = __builtin::geo2d::rect(height: 3, width: 3, x: 0, y: 0) -> 2D
-  Object = translate(x: 4mm, y: 4mm, z: 0mm) -> 2D
+  Workpiece = translate(x: 4mm, y: 4mm, z: 0mm) -> 2D
     Transform = __builtin::ops::translate(x: 4, y: 4, z: 0) -> 2D
-      Object -> 2D
+      Workpiece -> 2D
         Primitive2D(Rect(RECT(0.0 0.0,3.0 3.0))) = __builtin::geo2d::rect(height: 3, width: 3, x: 0, y: 0) -> 2D
