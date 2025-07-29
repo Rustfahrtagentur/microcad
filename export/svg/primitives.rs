@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Scalable Vector Graphics (SVG) primitives (SvgWrite trait implementations).
+//! Scalable Vector Graphics (SVG) primitives ([`WriteSvg`] trait implementations).
 
 use cgmath::{Deg, InnerSpace};
 use geo::{CoordsIter as _, Point, Rect, Translate};
