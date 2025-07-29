@@ -9,7 +9,10 @@ impl Parse for TypeAnnotation {
         let inner = pair.inner().next().expect("Expected type");
 
         let s = match inner.as_rule() {
-            Rule::list_type => Self(Refer::new(Type::List(ListType::parse(inner)?), pair.into())),
+            Rule::array_type => Self(Refer::new(
+                Type::Array(ArrayType::parse(inner)?),
+                pair.into(),
+            )),
             Rule::tuple_type => Self(Refer::new(
                 Type::Tuple(TupleType::parse(inner)?.into()),
                 pair.into(),

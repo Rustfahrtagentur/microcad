@@ -3,13 +3,13 @@
 
 //! µcad syntax elements related to expressions
 
-mod list_expression;
+mod array_expression;
 mod marker;
 mod nested;
 mod nested_item;
 mod tuple_expression;
 
-pub use list_expression::*;
+pub use array_expression::*;
 pub use marker::*;
 pub use nested::*;
 pub use nested_item::*;
@@ -26,14 +26,14 @@ pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
     Invalid,
-    /// A processed value, a result from calling lower()
+    /// A processed value.
     Value(Value),
     /// An integer, float, color or bool literal: 1, 1.0, #00FF00, false
     Literal(Literal),
     /// A string that contains format expressions: "value = {a}"
     FormatString(FormatString),
     /// A list: [a, b, c]
-    ListExpression(ListExpression),
+    ArrayExpression(ArrayExpression),
     /// A tuple: (a, b, c)
     TupleExpression(TupleExpression),
     /// A list whitespace separated of nested items: `translate() rotate()`, `b c`, `a b() {}`
@@ -80,7 +80,7 @@ impl SrcReferrer for Expression {
             Self::Value(_) => SrcRef(None),
             Self::Literal(l) => l.src_ref(),
             Self::FormatString(fs) => fs.src_ref(),
-            Self::ListExpression(le) => le.src_ref(),
+            Self::ArrayExpression(le) => le.src_ref(),
             Self::TupleExpression(te) => te.src_ref(),
             Self::Nested(n) => n.src_ref(),
             Self::Marker(m) => m.src_ref(),
@@ -109,7 +109,7 @@ impl std::fmt::Display for Expression {
             Self::Value(value) => write!(f, "{value}"),
             Self::Literal(literal) => write!(f, "{literal}"),
             Self::FormatString(format_string) => write!(f, "{format_string}"),
-            Self::ListExpression(list_expression) => write!(f, "{list_expression}"),
+            Self::ArrayExpression(array_expression) => write!(f, "{array_expression}"),
             Self::TupleExpression(tuple_expression) => write!(f, "{tuple_expression}"),
             Self::BinaryOp {
                 lhs,
@@ -145,7 +145,9 @@ impl PrintSyntax for Expression {
             Expression::Value(value) => value.print_syntax(f, depth),
             Expression::Literal(literal) => literal.print_syntax(f, depth),
             Expression::FormatString(format_string) => format_string.print_syntax(f, depth),
-            Expression::ListExpression(list_expression) => list_expression.print_syntax(f, depth),
+            Expression::ArrayExpression(array_expression) => {
+                array_expression.print_syntax(f, depth)
+            }
             Expression::TupleExpression(tuple_expression) => {
                 tuple_expression.print_syntax(f, depth)
             }

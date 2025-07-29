@@ -68,7 +68,7 @@ impl std::fmt::Display for Array {
 
 impl crate::ty::Ty for Array {
     fn ty(&self) -> Type {
-        Type::List(ListType::new(self.ty.clone()))
+        Type::Array(ArrayType::new(self.ty.clone()))
     }
 }
 

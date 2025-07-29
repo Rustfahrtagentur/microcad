@@ -8,7 +8,7 @@ use derive_more::{Deref, DerefMut};
 
 /// List expression (expression list maybe with common unit)
 #[derive(Default, Clone, Debug, Deref, DerefMut)]
-pub struct ListExpression {
+pub struct ArrayExpression {
     /// Expression list
     #[deref]
     #[deref_mut]
@@ -19,13 +19,13 @@ pub struct ListExpression {
     pub src_ref: SrcRef,
 }
 
-impl SrcReferrer for ListExpression {
+impl SrcReferrer for ArrayExpression {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         self.src_ref.clone()
     }
 }
 
-impl std::fmt::Display for ListExpression {
+impl std::fmt::Display for ArrayExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
@@ -40,7 +40,7 @@ impl std::fmt::Display for ListExpression {
     }
 }
 
-impl PrintSyntax for ListExpression {
+impl PrintSyntax for ArrayExpression {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         if !matches!(self.unit, Unit::None) {
             writeln!(f, "{:depth$}ListExpression {unit}:", "", unit = self.unit)?

@@ -6,12 +6,12 @@
 // Comments starting with //` generate tests for the grammar
 // The strings inside the backticks (``) are the test input.
 // 
-// Example, the following comment generates two tests for the rule "list_type":
+// Example, the following comment generates two tests for the rule "array_type":
 // 
 // ```pest
-// //`[scalar]`: ok # list with elements of type `scalar`
+// //`[Scalar]`: ok # Array with elements of type `Scalar`
 // //`[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
-// list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
+// array_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 // ```
 // 
 // See the crate microcad-pest-test for more info.
@@ -142,7 +142,7 @@ qualified_name = { identifier ~ ("::" ~ identifier)* }
 // `[Scalar]`: ok # List type
 // `(a: Scalar, b: Scalar)`: ok # Named tuple type
 type = {
-    list_type
+    array_type
   | tuple_type
   | matrix_type
   | qualified_name
@@ -153,7 +153,7 @@ type_annotation = _{ ":" ~ ws* ~ type }
 
 // `[scalar]`: ok list with elements of type `scalar`
 // `[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
-list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
+array_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 
 // `(a: Length, b: scalar)`: ok
 // `(a: Length, )`: ok # Trailing comma
@@ -169,11 +169,11 @@ matrix_type = { "Matrix" ~ int ~ ("x" ~ int)? }
 // `[1, 2, 3]`: ok
 // `[1, 2, 3,]`: error # Trailing comma
 // `[]`: ok
-list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" ~ unit? }
+array_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" ~ unit? }
 
 // `[0]`: ok # Access first element
 // `["test"]`: ok # Associative lists, access value of `\"test\"`
-list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
+array_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
 
 // An expression for tuples
 // `(1.0mm, 2.0mm)`: ok
@@ -188,7 +188,7 @@ tuple_element_access = { "." ~ identifier }
 // `#layer`: ok
 attribute_access = { "#" ~ identifier }
 
-element_access = _{ method_call | list_element_access | tuple_element_access | attribute_access }
+element_access = _{ method_call | array_element_access | tuple_element_access | attribute_access }
 
 // `pub`: ok
 visibility = { "pub" }
@@ -279,7 +279,7 @@ unary_minus =  { "-" }
 unary_plus  =  { "+" }
 unary_not   =  { "!" }
 postfix     = _{ element_access }
-primary     = _{ literal | marker | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
+primary     = _{ literal | marker | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | array_expression }
 
 // `a, b, c`: ok
 // `1+2, 4*3, 3.2`: ok
