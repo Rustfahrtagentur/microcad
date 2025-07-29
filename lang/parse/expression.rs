@@ -233,18 +233,8 @@ impl Parse for NestedItem {
 
 impl Parse for TupleExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut inner = pair.inner();
-        let argument_list = ArgumentList::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?;
-        if argument_list.is_empty() {
-            return Err(ParseError::EmptyTupleExpression);
-        }
-
         Ok(TupleExpression {
-            args: argument_list,
-            unit: match inner.next() {
-                Some(pair) => Unit::parse(pair)?,
-                None => Unit::None,
-            },
+            args: crate::find_rule!(pair, argument_list)?,
             src_ref: pair.clone().into(),
         })
     }
