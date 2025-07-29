@@ -188,7 +188,8 @@ impl PrintSyntax for Expression {
                 method_call.print_syntax(f, depth + Self::INDENT)
             }
             Expression::Nested(nested) => nested.print_syntax(f, depth),
-            _ => unimplemented!(),
+            Expression::Marker(marker) => marker.print_syntax(f, depth),
+            Expression::Invalid => write!(f, "{}", crate::invalid!(EXPRESSION)),
         }
     }
 }
