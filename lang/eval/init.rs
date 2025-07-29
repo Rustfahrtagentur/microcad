@@ -10,7 +10,7 @@ impl InitDefinition {
         plan: &ParameterList,
         args: Tuple,
         context: &mut Context,
-    ) -> EvalResult<ObjectProperties> {
+    ) -> EvalResult<Properties> {
         context.grant(self)?;
         let model = context.get_model()?;
         context.scope(StackFrame::Init(args.into()), |context| {
@@ -23,7 +23,7 @@ impl InitDefinition {
                 .partition(|(_, v)| v.is_ok());
 
             if not_found.is_empty() {
-                let props: ObjectProperties = found
+                let props: Properties = found
                     .into_iter()
                     .map(|(id, value)| ((*id).clone(), value.expect("ok")))
                     .collect();

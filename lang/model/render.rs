@@ -18,7 +18,7 @@ impl Model {
     pub fn deduce_output_type(&self) -> OutputType {
         let mut self_ = self.borrow_mut();
         let mut output_type = match &*self_.element {
-            Element::Object(_) => OutputType::NotDetermined,
+            Element::Workpiece(_) => OutputType::NotDetermined,
             Element::ChildrenPlaceholder => OutputType::NotDetermined,
             Element::Transform(_) => OutputType::NotDetermined,
             Element::Primitive2D(_) => OutputType::Geometry2D,
@@ -132,7 +132,7 @@ impl Operation for Model {
 
         let model_ = &model.borrow();
         match &model_.element.value {
-            Element::Transform(_) | Element::Object(_) => {
+            Element::Transform(_) | Element::Workpiece(_) => {
                 model_
                     .children()
                     .for_each(|n| geometries.append(n.process_2d(n)));

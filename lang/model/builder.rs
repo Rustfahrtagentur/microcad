@@ -12,7 +12,7 @@ use crate::{eval::*, model::*, rc::*, src_ref::*, syntax::*};
 pub struct ModelBuilder {
     root: ModelInner,
     /// Properties to add to the model if it is an [`Object`]
-    pub properties: ObjectProperties,
+    pub properties: Properties,
     /// Children to add to this model.
     pub children: Models,
 
@@ -120,7 +120,7 @@ impl ModelBuilder {
     }
 
     /// Set object properties.
-    pub fn properties(mut self, properties: ObjectProperties) -> Self {
+    pub fn properties(mut self, properties: Properties) -> Self {
         log::trace!("Properties:\n{properties}");
         self.properties = properties;
         self
@@ -128,7 +128,7 @@ impl ModelBuilder {
 
     /// Build a [`Model`].
     pub fn build(mut self) -> Model {
-        if let Element::Object(props) = &mut self.root.element.value {
+        if let Element::Workpiece(props) = &mut self.root.element.value {
             log::trace!("Copy object properties:\n{}", self.properties);
             *props = self.properties;
         }

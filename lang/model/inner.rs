@@ -70,19 +70,19 @@ impl ModelInner {
     }
 }
 
-impl Properties for ModelInner {
+impl PropertiesAccess for ModelInner {
     fn get_property(&self, id: &Identifier) -> Option<&Value> {
         self.element.get_property(id)
     }
 
-    fn set_properties(&mut self, props: ObjectProperties) {
+    fn set_properties(&mut self, props: Properties) {
         self.element.set_properties(props);
     }
 }
 
-impl From<ObjectProperties> for ModelInner {
-    fn from(props: ObjectProperties) -> Self {
-        Self::new(Refer::none(Element::Object(props)))
+impl From<Properties> for ModelInner {
+    fn from(props: Properties) -> Self {
+        Self::new(Refer::none(Element::Workpiece(props)))
     }
 }
 

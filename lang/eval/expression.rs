@@ -199,7 +199,7 @@ impl Eval for Nested {
             model_stack.push(models);
         }
 
-        Ok(Value::Models(Models::from_stack(&model_stack)))
+        Ok(Value::Models(Models::from_nested_items(&model_stack)))
     }
 }
 

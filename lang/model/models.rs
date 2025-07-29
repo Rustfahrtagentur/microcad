@@ -71,20 +71,24 @@ impl Models {
     ///       d0
     ///     c2
     ///       d0
-    pub fn from_stack(stack: &[Models]) -> Self {
-        match stack.len() {
+    pub fn from_nested_items(items: &[Models]) -> Self {
+        match items.len() {
             0 => panic!("Model stack must not be empty"),
             1 => {}
             n => {
-                (1..n).rev().map(|i| (&stack[i], &stack[i - 1])).for_each(
-                    |(prev_list, next_list)| {
-                        // Insert a copy of each element `model` from `prev_list` as child to each element `new_parent` in `next_list`
-                        next_list.iter().for_each(|new_parent| {
-                            prev_list.iter().for_each(|model| {
+                (1..n)
+                    .rev()
+                    .map(|i| (&items[i], &items[i - 1]))
+                    .for_each(|(prev, curr)| {
+                        // Insert a copy of each element `model` from `prev`
+                        // as child to each element `new_parent` in `curr`
+                        curr.iter().for_each(|new_parent| {
+                            prev.iter().for_each(|model| {
                                 model.detach();
 
                                 // Handle children marker.
-                                // If we have found a children marker model, use it's parent as new parent model.
+                                // If we have found a children marker model, use it's parent as
+                                // new parent model.
                                 let new_parent = match &new_parent.find_children_placeholder() {
                                     Some(children_marker) => {
                                         let parent = &children_marker
@@ -101,12 +105,11 @@ impl Models {
                                 new_parent.append(model.make_deep_copy());
                             });
                         });
-                    },
-                );
+                    });
             }
         }
 
-        stack[0].clone()
+        items[0].clone()
     }
 
     /// A union operation model for this collection.
