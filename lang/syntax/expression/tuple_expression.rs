@@ -1,17 +1,15 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Tuple expression
+//! Tuple expression.
 
 use crate::{src_ref::*, syntax::*};
 
 /// Tuple expression
 #[derive(Clone, Debug, Default)]
 pub struct TupleExpression {
-    /// List of tuple members
+    /// List of tuple members.
     pub args: ArgumentList,
-    /// Common unit
-    pub unit: Unit,
     /// Source code reference
     pub src_ref: SrcRef,
 }
@@ -37,15 +35,14 @@ impl std::fmt::Display for TupleExpression {
                 .collect::<Vec<String>>()
                 .join(", ")
         )?;
-        if !matches!(self.unit, Unit::None) {
-            write!(f, "{}", self.unit)?;
-        }
         Ok(())
     }
 }
 
 impl PrintSyntax for TupleExpression {
-    fn print_syntax(&self, _f: &mut std::fmt::Formatter, _depth: usize) -> std::fmt::Result {
-        todo!()
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        writeln!(f, "{:depth$}TupleExpression:", "")?;
+        let depth = depth + Self::INDENT;
+        self.args.print_syntax(f, depth)
     }
 }

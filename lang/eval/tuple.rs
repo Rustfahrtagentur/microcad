@@ -9,18 +9,7 @@ impl Eval for TupleExpression {
             .args
             .eval(context)?
             .iter()
-            .map(|(id, arg)| {
-                (
-                    id.clone(),
-                    match arg.value.clone().bundle_unit(self.unit) {
-                        Ok(value) => value.clone(),
-                        Err(err) => {
-                            context.error(self, err).expect("diag error");
-                            Value::None
-                        }
-                    },
-                )
-            })
+            .map(|(id, arg)| (id.clone(), arg.value.clone()))
             .partition(|(id, _)| id.is_none());
 
         Ok(Value::Tuple(
