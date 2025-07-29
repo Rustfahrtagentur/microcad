@@ -69,8 +69,8 @@ use std::geo2d::circle;
 use std::ops::translate;
 
 // assignment + group
-a = { 
+a := { 
     circle(radius = 1mm); 
     circle(radius = 2mm); 
-}
+};
 ```

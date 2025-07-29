@@ -90,8 +90,8 @@ part lid(
     outer_diameter = 2 * thickness + inner_diameter;
 
     // Create two cylinders, one for the outer and one for the inner
-    outer = std::geo3d::cylinder(d = outer_diameter, h = height);
-    inner = std::ops::translate(z = thickness) std::geo3d::cylinder(d = inner_diameter, h = height);
+    outer := std::geo3d::cylinder(d = outer_diameter, h = height);
+    inner := std::ops::translate(z = thickness) std::geo3d::cylinder(d = inner_diameter, h = height);
 
     // Calculate the difference between two translated cylinders and output them
     outer - inner;

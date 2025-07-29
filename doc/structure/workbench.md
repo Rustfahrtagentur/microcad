@@ -72,12 +72,12 @@ sketch wheel(radius: Length) {
 use std::debug::assert;
 
 // call sketch with diameter
-d = wheel(diameter = 2cm)
+d := wheel(diameter = 2cm);
 // check radius
 assert_eq([d.radius, 1cm]);
 
 // call sketch with radius
-r = wheel(radius = 1cm)
+r := wheel(radius = 1cm);
 // check diameter
 assert([r.diameter, 2cm]);
 ```
@@ -272,7 +272,7 @@ In the following example we declare a building plan which consists of a `radius`
 ```µcad,property#todo
 // `outer` will automatically become a property because
 // it is declared in the building plan:
-sketch wheel(outer: length) {
+sketch wheel(outer: Length) {
     use std::geo2d::circle;
 
     // `inner` is declared as property and maybe read from 
@@ -284,7 +284,7 @@ sketch wheel(outer: length) {
 }
 
 // evaluate wheel
-t = wheel(1cm);
+t := wheel(1cm);
 
 // extract and display `outer` and `inner` from generated wheel
 info("outer: {t.outer}");
@@ -296,7 +296,7 @@ If you remove the `prop` keyword you will fail at accessing `inner`:
 [![test](.test/property_wrong.png)](.test/property_wrong.log)
 
 ```µcad,property_wrong#fail
-sketch wheel(outer: length) {
+sketch wheel(outer: Length) {
     use std::geo2d::circle;
 
     // `inner` is declared as variable and may not be read
@@ -306,7 +306,7 @@ sketch wheel(outer: length) {
     circle(outer) - circle(inner);
 }
 
-t = wheel(outer = 1cm);
+t := wheel(outer = 1cm);
 
 // you can still extract and display `outer`
 std::info("outer: {t.outer}");

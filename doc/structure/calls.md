@@ -12,7 +12,7 @@ and the result is a *value*:
 fn square(x: Scalar) { return x * x; }
 
 // call function square with parameter 2 and store result in s
-s = square(x = 2);
+s := square(x = 2);
 
 // check value
 std::debug::assert_eq( [s, 4] );
@@ -32,7 +32,7 @@ sketch square(size: Length) {
 }
 
 // call square with a size and store object node in s
-s = square(size=2cm);
+s := square(size=2cm);
 
 // translate object s
 std::ops::translate(x = 1cm) s;
