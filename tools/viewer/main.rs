@@ -6,89 +6,7 @@ use slint::{Model, SharedString};
 
 mod slint_bevy_adapter;
 
-slint::slint! {
-import { Palette, Button, ComboBox, GroupBox, GridBox, Slider, HorizontalBox, VerticalBox, ProgressIndicator } from "std-widgets.slint";
-
-export component AppWindow inherits Window {
-    in property <image> texture <=> i.source;
-    out property <length> requested-texture-width: i.width;
-    out property <length> requested-texture-height: i.height;
-
-    in property <bool> show-loading-screen: false;
-    in property <string> download-url;
-    in property <percent> download-progress;
-
-    in property <[string]> available-models;
-    callback load-model(index: int);
-
-    title: @tr("Slint & Bevy");
-    preferred-width: 500px;
-    preferred-height: 600px;
-
-    VerticalBox {
-        alignment: start;
-        Rectangle {
-            background: Palette.alternate-background;
-
-            VerticalBox {
-                Text {
-                    text: "This text is rendered using Slint. The animation below is rendered using Bevy code.";
-                    wrap: word-wrap;
-                }
-
-                HorizontalBox {
-                    Text {
-                        text: "Select Model:";
-                        vertical-alignment: center;
-                    }
-                    ComboBox {
-                        model: root.available-models;
-                        selected(current-value) => { root.load-model(self.current-index) }
-                    }
-                }
-            }
-        }
-
-        Rectangle {
-            width: 100%;
-            height: 100%;
-            if !show-loading-screen: Text {
-                y: 80px;
-                width: 450px;
-                font-size: 14px;
-                text: "This text is also rendered using Slint. It can be seen because Bevy is rendering with a transparent background.";
-                wrap: word-wrap;
-            }
-            i := Image {
-                image-fit: fill;
-                width: 100%;
-                height: 100%;
-                preferred-width: self.source.width * 1px;
-                preferred-height: self.source.height * 1px;
-
-                if show-loading-screen: Rectangle {
-                    VerticalBox {
-                        alignment: start;
-                        Text {
-                            horizontal-alignment: center;
-                            text: "Downloading Assets";
-                        }
-                        Text {
-                            text: download-url;
-                            overflow: elide;
-                        }
-                        ProgressIndicator {
-                            indeterminate: download-url.is-empty;
-                            progress: root.download-progress;
-                        }
-                    }
-                }
-            }
-
-        }
-    }
-}
-}
+slint::include_modules!();
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (model_selector_sender, model_selector_receiver) = smol::channel::bounded::<GLTFModel>(1);
@@ -114,7 +32,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             },
         ))?;
 
-    let app_window = AppWindow::new().unwrap();
+    let app_window = MainWindow::new().unwrap();
     let app2 = app_window.as_weak();
 
     app_window

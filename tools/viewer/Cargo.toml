@@ -34,3 +34,6 @@ microcad-lang = { workspace = true }
 microcad-core = { workspace = true }
 microcad-builtin = { workspace = true }
 microcad-export = { workspace = true }
+
+[build-dependencies]
+slint-build = "1.12"
