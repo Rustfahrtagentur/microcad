@@ -154,8 +154,8 @@ impl PrintSyntax for Expression {
                 src_ref: _,
             } => {
                 writeln!(f, "{:depth$}BinaryOp '{op}':", "")?;
-                lhs.print_syntax(f, depth)?;
-                rhs.print_syntax(f, depth)
+                lhs.print_syntax(f, depth + Self::INDENT)?;
+                rhs.print_syntax(f, depth + Self::INDENT)
             }
             Self::UnaryOp {
                 op,
@@ -163,27 +163,27 @@ impl PrintSyntax for Expression {
                 src_ref: _,
             } => {
                 writeln!(f, "{:depth$}UnaryOp '{op}':", "")?;
-                rhs.print_syntax(f, depth)
+                rhs.print_syntax(f, depth + Self::INDENT)
             }
             Self::ArrayElementAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}ArrayElementAccess:", "")?;
-                lhs.print_syntax(f, depth)?;
-                rhs.print_syntax(f, depth)
+                lhs.print_syntax(f, depth + Self::INDENT)?;
+                rhs.print_syntax(f, depth + Self::INDENT)
             }
             Self::PropertyAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}FieldAccess:", "")?;
-                lhs.print_syntax(f, depth)?;
-                rhs.print_syntax(f, depth)
+                lhs.print_syntax(f, depth + Self::INDENT)?;
+                rhs.print_syntax(f, depth + Self::INDENT)
             }
             Self::AttributeAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}AttributeAccess:", "")?;
-                lhs.print_syntax(f, depth)?;
-                rhs.print_syntax(f, depth)
+                lhs.print_syntax(f, depth + Self::INDENT)?;
+                rhs.print_syntax(f, depth + Self::INDENT)
             }
             Self::MethodCall(lhs, method_call, _) => {
                 writeln!(f, "{:depth$}MethodCall:", "")?;
-                lhs.print_syntax(f, depth)?;
-                method_call.print_syntax(f, depth)
+                lhs.print_syntax(f, depth + Self::INDENT)?;
+                method_call.print_syntax(f, depth + Self::INDENT)
             }
             Self::Nested(nested) => nested.print_syntax(f, depth),
             _ => unimplemented!(),

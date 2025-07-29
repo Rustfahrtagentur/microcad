@@ -73,23 +73,29 @@ impl StackFrame {
     ) -> std::fmt::Result {
         let locals = match self {
             StackFrame::Source(id, locals) => {
-                writeln!(f, "{:depth$}{id} (source):", "")?;
+                writeln!(f, "{:depth$}Source: {id}", "")?;
                 locals
             }
             StackFrame::Module(id, locals) => {
-                writeln!(f, "{:depth$}{id} (module):", "")?;
-                return locals.print(f, depth + 4);
+                writeln!(f, "{:depth$}Module: {id}", "")?;
+                locals
             }
             StackFrame::Init(locals) => {
-                writeln!(f, "{:depth$}(init):", "")?;
-                return locals.print(f, depth + 4);
+                writeln!(f, "{:depth$}Init", "")?;
+                locals
             }
             StackFrame::Workbench(_, id, locals) => {
-                writeln!(f, "{:depth$}{id}", "")?;
-                return locals.print(f, depth + 4);
+                writeln!(f, "{:depth$}Workbench: {id}", "")?;
+                locals
             }
-            StackFrame::Body(locals) => locals,
-            StackFrame::Function(locals) => locals,
+            StackFrame::Body(locals) => {
+                writeln!(f, "{:depth$}Body", "")?;
+                locals
+            }
+            StackFrame::Function(locals) => {
+                writeln!(f, "{:depth$}Function", "")?;
+                locals
+            }
             StackFrame::Call {
                 symbol,
                 args,
@@ -97,7 +103,7 @@ impl StackFrame {
             } => {
                 return writeln!(
                     f,
-                    "{:depth$}{name}({args}) (call)",
+                    "{:depth$}Call: {name}({args})",
                     "",
                     args = args,
                     name = symbol.full_name()
@@ -109,11 +115,55 @@ impl StackFrame {
 
         for (id, symbol) in locals.iter() {
             let full_name = symbol.full_name();
+            let full_name = if full_name != id.into() {
+                format!(" [{full_name}]")
+            } else {
+                String::new()
+            };
             match &symbol.borrow().def {
-                SymbolDefinition::Constant(id, value) => {
-                    writeln!(f, "{:depth$}{id} = {value} [{full_name}]", "")?
+                SymbolDefinition::Constant(id, value) => writeln!(
+                    f,
+                    "{:depth$}Constant: {id}: {ty} = {value}{full_name}",
+                    "",
+                    ty = value.ty()
+                )?,
+                SymbolDefinition::Argument(id, value) => writeln!(
+                    f,
+                    "{:depth$}Argument: {id}: {ty} = {value}{full_name}",
+                    "",
+                    ty = value.ty()
+                )?,
+                SymbolDefinition::SourceFile(source_file) => {
+                    writeln!(f, "{:depth$}Source: {:?}", "", source_file.filename)?
                 }
-                _ => writeln!(f, "{:depth$}{id} [{full_name}]", "")?,
+                SymbolDefinition::Module(module_definition) => writeln!(
+                    f,
+                    "{:depth$}Module: {}{full_name}",
+                    "", module_definition.id
+                )?,
+                SymbolDefinition::External(module_definition) => writeln!(
+                    f,
+                    "{:depth$}External: {}{full_name}",
+                    "", module_definition.id
+                )?,
+                SymbolDefinition::Workbench(workbench_definition) => writeln!(
+                    f,
+                    "{:depth$}Workbench: {}{full_name}",
+                    "", workbench_definition.id
+                )?,
+                SymbolDefinition::Function(function_definition) => writeln!(
+                    f,
+                    "{:depth$}Function: {}{full_name}",
+                    "", function_definition.id
+                )?,
+                SymbolDefinition::Builtin(builtin) => {
+                    writeln!(f, "{:depth$}Builtin: {}{full_name}", "", builtin.id)?
+                }
+                SymbolDefinition::Alias(identifier, qualified_name) => writeln!(
+                    f,
+                    "{:depth$}Alias: {identifier}{full_name} -> {qualified_name}",
+                    ""
+                )?,
             }
         }
 

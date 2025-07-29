@@ -39,11 +39,9 @@ impl std::fmt::Display for InitDefinition {
 
 impl PrintSyntax for InitDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$}PartDefinition:", "")?;
-        writeln!(f, "{:depth$} Parameters:", "")?;
-        self.parameters.print_syntax(f, depth + 2)?;
-        writeln!(f, "{:depth$} Body:", "")?;
-        self.body.print_syntax(f, depth + 2)
+        writeln!(f, "{:depth$}InitDefinition:", "")?;
+        self.parameters.print_syntax(f, depth + Self::INDENT)?;
+        self.body.print_syntax(f, depth + Self::INDENT)
     }
 }
 
