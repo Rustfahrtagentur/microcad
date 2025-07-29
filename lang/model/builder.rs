@@ -15,20 +15,12 @@ pub struct ModelBuilder {
     pub properties: Properties,
     /// Children to add to this model.
     pub children: Models,
-
-    /// The output type of this model.
-    output: OutputType,
 }
 
 /// `ModelBuilder` creation.
 ///
 /// All methods in this `impl` block are used to create a new model builder with a specific [`Element`] type.
 impl ModelBuilder {
-    /// Return output type
-    pub fn kind(&self) -> OutputType {
-        self.output
-    }
-
     /// Create a new object from a body `{ ... }`.
     pub fn new_object_body() -> Self {
         Self {
@@ -42,7 +34,6 @@ impl ModelBuilder {
     /// This function is used when a call to a sketch is evaluated.
     pub fn new_2d_object() -> Self {
         Self {
-            output: OutputType::Geometry2D,
             ..Default::default()
         }
     }
@@ -60,7 +51,6 @@ impl ModelBuilder {
     /// This function is used when a call to a part is evaluated.
     pub fn new_3d_object() -> Self {
         Self {
-            output: OutputType::Geometry3D,
             ..Default::default()
         }
     }
@@ -69,7 +59,6 @@ impl ModelBuilder {
     pub fn new_2d_primitive(geometry: std::rc::Rc<Geometry2D>) -> Self {
         Self {
             root: geometry.into(),
-            output: OutputType::Geometry2D,
             ..Default::default()
         }
     }
@@ -78,7 +67,6 @@ impl ModelBuilder {
     pub fn new_3d_primitive(geometry: std::rc::Rc<Geometry3D>) -> Self {
         Self {
             root: geometry.into(),
-            output: OutputType::Geometry3D,
             ..Default::default()
         }
     }
