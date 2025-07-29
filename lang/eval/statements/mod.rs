@@ -33,6 +33,7 @@ impl Eval for Statement {
                 a.eval(context)?;
                 Ok(Value::None)
             }
+            Self::ModelAssignment(_) => unreachable!(),
             Self::If(i) => i.eval(context),
             Self::Expression(e) => e.eval(context),
             Self::InnerAttribute(i) => {
@@ -77,6 +78,7 @@ impl Eval<Models> for Statement {
                 a.eval(context)?;
                 Default::default()
             }
+            Self::ModelAssignment(_) => todo!(),
             Self::If(i) => {
                 let model: Option<Model> = i.eval(context)?;
                 model.into()

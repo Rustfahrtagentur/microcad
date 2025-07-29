@@ -33,6 +33,7 @@ impl StatementList {
                 | Statement::If(_)
                 | Statement::InnerAttribute(_)
                 | Statement::Assignment(_)
+                | Statement::ModelAssignment(_)
                 | Statement::Expression(_) => {}
             }
         }

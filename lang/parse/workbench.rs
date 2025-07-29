@@ -73,6 +73,7 @@ fn check_statements(body: &Body) -> ParseResult<()> {
                         }
                     }
                 },
+                Statement::ModelAssignment(_) => todo!(),
 
                 // Post init statements
                 Statement::If(_)
