@@ -5,37 +5,11 @@ use crate::{parse::*, parser::*, rc::*, syntax::*};
 
 impl Parse for Assignment {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut id = Identifier::default();
-        let mut specified_type = None;
-        let mut expression = None;
-        let mut qualifier = None;
-
-        // TODO: use crate::find_rule!() and crate::find_rule_opt!() ??
-        for pair in pair.inner() {
-            match pair.as_rule() {
-                Rule::identifier => {
-                    id = Identifier::parse(pair)?;
-                }
-                Rule::r#type => {
-                    specified_type = Some(TypeAnnotation::parse(pair)?);
-                }
-                Rule::qualifier => {
-                    qualifier = Some(Qualifier::parse(pair)?);
-                }
-                Rule::expression => {
-                    expression = Some(Expression::parse(pair)?);
-                }
-                rule => {
-                    unreachable!("Unexpected token in assignment: {:?}", rule);
-                }
-            }
-        }
-
         Ok(Self {
-            qualifier: qualifier.unwrap_or(Qualifier::Var),
-            id,
-            specified_type,
-            expression: expression.expect(INTERNAL_PARSE_ERROR),
+            qualifier: crate::find_rule_opt!(pair, qualifier).unwrap_or(Qualifier::Var),
+            id: crate::find_rule!(pair, identifier)?,
+            specified_type: crate::find_rule_opt!(pair, r#type),
+            expression: crate::find_rule!(pair, expression)?,
             src_ref: pair.into(),
         })
     }
