@@ -3,6 +3,15 @@
 
 //! STL Export
 
+mod exporter;
+mod primitives;
 mod writer;
 
+pub use exporter::*;
 pub use writer::*;
+
+/// Trait to write something into an SVG.
+pub trait WriteStl {
+    /// Write SVG tags.
+    fn write_stl(&self, writer: &mut StlWriter) -> std::io::Result<()>;
+}

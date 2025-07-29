@@ -5,39 +5,49 @@
 
 use std::rc::Rc;
 
+use derive_more::{Deref, DerefMut};
+
 use crate::{
     geo3d::{FetchBounds3D, bounds::Bounds3D},
     *,
 };
 
-/// 2D geometry collection with bounding box.
-#[derive(Debug, Clone, Default)]
-pub struct Geometries3D {
-    /// Geometries.
-    geometries: Vec<Rc<Geometry3D>>,
-    /// Bounding rect.
-    bounds: Bounds3D,
-}
+/// 3D geometry collection with bounding box.
+#[derive(Debug, Clone, Default, Deref, DerefMut)]
+pub struct Geometries3D(Vec<Rc<Geometry3D>>);
 
 impl Geometries3D {
     /// New geometry collection.
     pub fn new(geometries: Vec<Rc<Geometry3D>>) -> Self {
-        let bounds: Bounds3D = geometries.iter().fold(Bounds3D::default(), |acc, e| {
-            acc.extend(e.fetch_bounds_3d())
-        });
-
-        Self { geometries, bounds }
+        Self(geometries)
     }
 
-    /// Push a new geometry to the collection and update bounding box.
-    pub fn push(&mut self, geometry: Rc<Geometry3D>) {
-        self.bounds = self.bounds.clone().extend(geometry.fetch_bounds_3d());
-        self.geometries.push(geometry)
+    /// Append another geometry collection.
+    pub fn append(&mut self, mut geometries: Geometries3D) {
+        self.0.append(&mut geometries.0)
     }
 }
 
 impl FetchBounds3D for Geometries3D {
     fn fetch_bounds_3d(&self) -> Bounds3D {
-        self.bounds.clone()
+        self.0.iter().fold(Bounds3D::default(), |bounds, geometry| {
+            bounds.extend(geometry.fetch_bounds_3d())
+        })
+    }
+}
+
+impl Transformed3D for Geometries3D {
+    fn transformed_3d(&self, render_resolution: &RenderResolution, mat: &Mat4) -> Self {
+        Self(
+            self.iter()
+                .map(|geometry| std::rc::Rc::new(geometry.transformed_3d(render_resolution, mat)))
+                .collect::<Vec<_>>(),
+        )
+    }
+}
+
+impl From<std::rc::Rc<Geometry3D>> for Geometries3D {
+    fn from(geometry: std::rc::Rc<Geometry3D>) -> Self {
+        Self::new(vec![geometry])
     }
 }

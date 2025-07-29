@@ -103,6 +103,14 @@ impl Model {
             }
         }
 
+        fn render_geometries_3d(model: &Model) -> Geometries3D {
+            match &model.borrow().element.value {
+                Element::Primitive3D(geometry) => geometry.clone().into(),
+                Element::Operation(operation) => operation.process_3d(model),
+                _ => Geometries3D::default(),
+            }
+        }
+
         fn is_operation(model: &Model) -> bool {
             matches!(&model.borrow().element.value, Element::Operation(_))
         }
@@ -118,7 +126,16 @@ impl Model {
 
                 self.borrow_mut().output.geometry = GeometryOutput::Geometries2D(geometries);
             }
-            OutputType::Geometry3D => todo!(),
+            OutputType::Geometry3D => {
+                let geometries = render_geometries_3d(self);
+                if !is_operation(self) {
+                    self.borrow().children.iter().for_each(|model| {
+                        model.render();
+                    });
+                }
+
+                self.borrow_mut().output.geometry = GeometryOutput::Geometries3D(geometries);
+            }
             output_type => {
                 panic!("Output type must have been determined at this point: {output_type}\n{self}")
             }
@@ -169,5 +186,24 @@ impl FetchBounds2D for Model {
         });
 
         bounds
+    }
+}
+
+impl FetchBounds3D for Model {
+    fn fetch_bounds_3d(&self) -> Bounds3D {
+        self.descendants()
+            .fold(Bounds3D::default(), |mut bounds, model| {
+                let output = &model.borrow().output;
+                if let GeometryOutput::Geometries3D(geometries) = &output.geometry {
+                    let mat = output.world_matrix_3d();
+                    let resolution = &output.resolution;
+                    bounds = bounds.clone().extend(
+                        geometries
+                            .fetch_bounds_3d()
+                            .transformed_3d(resolution, &mat),
+                    );
+                }
+                bounds
+            })
     }
 }

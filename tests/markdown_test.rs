@@ -4,7 +4,7 @@
 use std::rc::Rc;
 
 use microcad_core::{RenderResolution, Size2D};
-use microcad_export::svg::SvgExporter;
+use microcad_export::{stl::StlExporter, svg::SvgExporter};
 
 #[allow(dead_code)]
 pub fn run_test(
@@ -175,7 +175,17 @@ pub fn run_test(
                                 .export(&model)
                                 .expect("No error");
                             }
-                            OutputType::Geometry3D => todo!("Implement 3D export"),
+                            OutputType::Geometry3D => {
+                                Export {
+                                    filename: out_filename.to_string().into(),
+                                    resolution: RenderResolution::default(),
+                                    exporter: Rc::new(StlExporter),
+                                    layers: vec![],
+                                    size: Size2D::A4,
+                                }
+                                .export(&model)
+                                .expect("No error");
+                            }
                             OutputType::NotDetermined => {}
                             _ => panic!("Invalid geometry output"),
                         }

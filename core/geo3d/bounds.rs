@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::Vec3;
+use crate::{Mat4, RenderResolution, Vec3};
 
 /// Inner struct for bounds.
 #[derive(Debug, Clone)]
@@ -10,6 +10,43 @@ struct BoundsInner {
     min: Vec3,
     /// Maximum corner.
     max: Vec3,
+}
+
+/// Corners iterator struct.
+pub struct Bounds3DCorners {
+    bounds: BoundsInner,
+    index: u8, // Only goes from 0 to 7
+}
+
+impl Iterator for Bounds3DCorners {
+    type Item = Vec3;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index >= 8 {
+            return None;
+        }
+
+        let i = self.index;
+        self.index += 1;
+
+        let x = if i & 1 == 0 {
+            self.bounds.min.x
+        } else {
+            self.bounds.max.x
+        };
+        let y = if i & 2 == 0 {
+            self.bounds.min.y
+        } else {
+            self.bounds.max.y
+        };
+        let z = if i & 4 == 0 {
+            self.bounds.min.z
+        } else {
+            self.bounds.max.z
+        };
+
+        Some(Vec3 { x, y, z })
+    }
 }
 
 /// A 3D bounds is a 3D bounding box with a minimum and maximum corner.
@@ -32,6 +69,11 @@ impl Bounds3D {
         self.0.as_ref().map(|s| s.max)
     }
 
+    /// Minimum and maximum corner.
+    pub fn min_max(&self) -> Option<(Vec3, Vec3)> {
+        self.0.as_ref().map(|s| (s.min, s.max))
+    }
+
     /// Calculate extended bounds.
     pub fn extend(self, other: Bounds3D) -> Self {
         match (self.0, other.0) {
@@ -49,6 +91,35 @@ impl Bounds3D {
                     b1.max.z.max(b2.max.z),
                 ),
             ),
+        }
+    }
+
+    /// Extend these bounds by point.
+    pub fn extend_by_point(&mut self, p: Vec3) {
+        match &mut self.0 {
+            Some(bounds) => {
+                *bounds = BoundsInner {
+                    min: Vec3::new(
+                        bounds.min.x.min(p.x),
+                        bounds.min.y.min(p.y),
+                        bounds.min.z.min(p.z),
+                    ),
+                    max: Vec3::new(
+                        bounds.max.x.max(p.x),
+                        bounds.max.y.max(p.y),
+                        bounds.max.z.max(p.z),
+                    ),
+                }
+            }
+            None => *self = Self::new(p, p),
+        }
+    }
+
+    /// Corner iterator.
+    pub fn corners(&self) -> Bounds3DCorners {
+        Bounds3DCorners {
+            bounds: self.0.clone().expect("Bounds"),
+            index: 0,
         }
     }
 }
@@ -78,8 +149,24 @@ impl FromIterator<Vec3> for Bounds3D {
     }
 }
 
+impl Transformed3D for Bounds3D {
+    fn transformed_3d(&self, _: &crate::RenderResolution, mat: &crate::Mat4) -> Self {
+        let mut bounds = Bounds3D::default();
+        self.corners()
+            .for_each(|corner| bounds.extend_by_point((mat * corner.extend(1.0)).truncate()));
+
+        bounds
+    }
+}
+
 /// Trait to return a bounding box of 3D geometry.
 pub trait FetchBounds3D {
     /// Fetch bounds.
     fn fetch_bounds_3d(&self) -> Bounds3D;
+}
+
+/// Transformed version of a 3D geometry.
+pub trait Transformed3D<T = Self> {
+    /// Transform from matrix.
+    fn transformed_3d(&self, render_resolution: &RenderResolution, mat: &Mat4) -> T;
 }
