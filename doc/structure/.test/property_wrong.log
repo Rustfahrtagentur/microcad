@@ -4,7 +4,7 @@
 
 -- Code --
 
-sketch wheel(outer: length) {
+sketch wheel(outer: Length) {
     use std::geo2d::circle;
 
     // `inner` is declared as variable and may not be read
@@ -14,7 +14,7 @@ sketch wheel(outer: length) {
     circle(outer) - circle(inner);
 }
 
-t = wheel(outer = 1cm);
+t := wheel(outer = 1cm);
 
 // you can still extract and display `outer`
 std::info("outer: {t.outer}");

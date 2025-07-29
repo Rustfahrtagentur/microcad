@@ -10,7 +10,7 @@ sketch square(size: Length) {
 }
 
 // call square with a size and store object node in s
-s = square(size=2cm);
+s := square(size=2cm);
 
 // translate object s
 std::ops::translate(x = 1cm) s;

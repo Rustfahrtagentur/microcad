@@ -6,7 +6,7 @@
 
 // `outer` will automatically become a property because
 // it is declared in the building plan:
-sketch wheel(outer: length) {
+sketch wheel(outer: Length) {
     use std::geo2d::circle;
 
     // `inner` is declared as property and maybe read from 
@@ -18,7 +18,7 @@ sketch wheel(outer: length) {
 }
 
 // evaluate wheel
-t = wheel(1cm);
+t := wheel(1cm);
 
 // extract and display `outer` and `inner` from generated wheel
 info("outer: {t.outer}");
@@ -26,12 +26,6 @@ info("inner: {t.inner}");
 
 -- Output --
 -- Errors --
-error: Workbench wheel cannot find initialization for those arguments
-  ---> <from_str>:15:11
-     |
-  15 | t = wheel(1cm);
-     |           ^^^
-     |
 error: Symbol info not found.
   ---> <from_str>:18:1
      |

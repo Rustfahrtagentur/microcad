@@ -5,7 +5,7 @@
 -- Code --
 
 #[measure = width, height]
-r = std::geo2d::circle(42mm);
+r := std::geo2d::circle(42mm);
 
 -- Output --
 -- Errors --
