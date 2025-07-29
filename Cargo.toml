@@ -24,6 +24,7 @@ members = [
     "tools/cli",
     "tools/update-copyright",
     "tools/update-md-banner",
+    "tools/viewer",
 ]
 resolver = "2"
 
