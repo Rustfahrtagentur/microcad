@@ -11,6 +11,7 @@ mod assignment_statement;
 mod expression_statement;
 mod if_statement;
 mod marker;
+mod model_assignment_statement;
 mod return_statement;
 mod use_statement;
 
@@ -78,7 +79,10 @@ impl Eval<Models> for Statement {
                 a.eval(context)?;
                 Default::default()
             }
-            Self::ModelAssignment(_) => todo!(),
+            Self::ModelAssignment(ma) => {
+                ma.eval(context)?;
+                Default::default()
+            }
             Self::If(i) => {
                 let model: Option<Model> = i.eval(context)?;
                 model.into()
