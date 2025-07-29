@@ -155,7 +155,7 @@ impl WriteSvg for Model {
 
         let self_ = self.borrow();
         match &self_.element.value {
-            Element::Object(_) | Element::Primitive2D(_) => {
+            Element::Workpiece(_) | Element::Primitive2D(_) => {
                 if !self_.is_empty() {
                     writer.begin_group(&node_attr)?;
                     self_.children().try_for_each(|child| {

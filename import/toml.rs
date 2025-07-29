@@ -41,7 +41,7 @@ impl Importer for TomlImporter {
         &self,
         args: &microcad_lang::value::Tuple,
     ) -> Result<microcad_lang::value::Value, microcad_lang::builtin::ImportError> {
-        let filename = args.get::<String>("filename");
+        let filename = args.get::<String>("filename")?;
         let content = std::fs::read_to_string(filename)?;
 
         Ok(Self::toml_to_value(

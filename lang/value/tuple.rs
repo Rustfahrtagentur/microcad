@@ -122,7 +122,7 @@ impl Tuple {
     /// |-----------------|------------------------|
     /// | `([x₀, x₁], y)` | `(x₀, y)`, `(x₁, y)`   |
     ///
-    pub fn multiplicity<P: FnMut(Tuple)>(&self, mut ids: Vec<Identifier>, mut p: P) {
+    pub fn multiplicity<P: FnMut(Tuple)>(&self, mut ids: IdentifierList, mut p: P) {
         log::trace!("combining: {ids:?}:");
 
         // sort ids for persistent order
@@ -138,7 +138,7 @@ impl Tuple {
                     combinations *= len;
                     (0, len)
                 } else {
-                    panic!("'{id}' found in tuple but no list:\n{self:#?}");
+                    panic!("{id:?} found in tuple but no list:\n{self:#?}");
                 };
                 (id, counter)
             })
@@ -173,7 +173,7 @@ impl Tuple {
                             }
                             item
                         } else {
-                            panic!("'{id}' found in tuple but no list");
+                            panic!("{id:?} found in tuple but no list");
                         }
                     }
                     _ => (id.clone(), v.clone()),
@@ -450,6 +450,6 @@ fn tuple_not_equal() {
 fn multiplicity_check() {
     let tuple = tuple!("(x = [1, 2, 3], y = [1, 2], z = 1)");
 
-    let ids: Vec<Identifier> = ["x".into(), "y".into()].into_iter().collect();
+    let ids: IdentifierList = ["x".into(), "y".into()].into_iter().collect();
     tuple.multiplicity(ids, |tuple| println!("{tuple}"));
 }

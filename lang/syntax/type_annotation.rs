@@ -29,6 +29,6 @@ impl crate::ty::Ty for TypeAnnotation {
 
 impl PrintSyntax for TypeAnnotation {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(f, "{:depth$} TypeAnnotation: {}", "", self.0.value)
+        writeln!(f, "{:depth$}TypeAnnotation: {}", "", self.0.value)
     }
 }

@@ -10,10 +10,10 @@ use strum::IntoStaticStr;
 /// An element defines the entity of a [`Model`].
 #[derive(Clone, IntoStaticStr, Debug)]
 pub enum Element {
-    /// An object that contains children and holds properties.
+    /// An workpiece that contains children and holds properties.
     ///
-    /// Objects can be created by builtins, assignments, expressions and workbenches.
-    Object(ObjectProperties),
+    /// Workpiece can be created by builtins, assignments, expressions and workbenches.
+    Workpiece(Properties),
 
     /// A special element after which children will be nested as siblings.
     ///
@@ -35,7 +35,7 @@ pub enum Element {
 
 impl Default for Element {
     fn default() -> Self {
-        Element::Object(Default::default())
+        Element::Workpiece(Default::default())
     }
 }
 
@@ -56,17 +56,17 @@ impl std::fmt::Display for Element {
     }
 }
 
-impl Properties for Element {
+impl PropertiesAccess for Element {
     fn get_property(&self, id: &Identifier) -> Option<&Value> {
         match self {
-            Self::Object(object) => object.get(id),
+            Self::Workpiece(object) => object.get(id),
             _ => unreachable!("not an object element"),
         }
     }
 
-    fn set_properties(&mut self, props: ObjectProperties) {
+    fn set_properties(&mut self, props: Properties) {
         match self {
-            Self::Object(p) => {
+            Self::Workpiece(p) => {
                 p.extend(props.iter().map(|(id, prop)| (id.clone(), prop.clone())));
             }
             _ => unreachable!("not an object element"),

@@ -89,6 +89,8 @@ See [export](export.md) for more information.
 For certain nodes, you want to measure certain properties and display them.
 For example, you want to display the measure for the width and height of a circle:
 
+[![test](.test/attributes_export_measure.png)](.test/attributes_export_measure.log)
+
 ```µcad,attributes_export_measure
 #[measure = width, height]
 r = std::geo2d::circle(42mm);

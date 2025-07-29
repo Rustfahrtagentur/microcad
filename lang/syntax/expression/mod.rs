@@ -3,13 +3,13 @@
 
 //! µcad syntax elements related to expressions
 
-mod list_expression;
+mod array_expression;
 mod marker;
 mod nested;
 mod nested_item;
 mod tuple_expression;
 
-pub use list_expression::*;
+pub use array_expression::*;
 pub use marker::*;
 pub use nested::*;
 pub use nested_item::*;
@@ -26,14 +26,14 @@ pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
     Invalid,
-    /// A processed value, a result from calling lower()
+    /// A processed value.
     Value(Value),
     /// An integer, float, color or bool literal: 1, 1.0, #00FF00, false
     Literal(Literal),
     /// A string that contains format expressions: "value = {a}"
     FormatString(FormatString),
     /// A list: [a, b, c]
-    ListExpression(ListExpression),
+    ArrayExpression(ArrayExpression),
     /// A tuple: (a, b, c)
     TupleExpression(TupleExpression),
     /// A list whitespace separated of nested items: `translate() rotate()`, `b c`, `a b() {}`
@@ -80,7 +80,7 @@ impl SrcReferrer for Expression {
             Self::Value(_) => SrcRef(None),
             Self::Literal(l) => l.src_ref(),
             Self::FormatString(fs) => fs.src_ref(),
-            Self::ListExpression(le) => le.src_ref(),
+            Self::ArrayExpression(le) => le.src_ref(),
             Self::TupleExpression(te) => te.src_ref(),
             Self::Nested(n) => n.src_ref(),
             Self::Marker(m) => m.src_ref(),
@@ -109,7 +109,7 @@ impl std::fmt::Display for Expression {
             Self::Value(value) => write!(f, "{value}"),
             Self::Literal(literal) => write!(f, "{literal}"),
             Self::FormatString(format_string) => write!(f, "{format_string}"),
-            Self::ListExpression(list_expression) => write!(f, "{list_expression}"),
+            Self::ArrayExpression(array_expression) => write!(f, "{array_expression}"),
             Self::TupleExpression(tuple_expression) => write!(f, "{tuple_expression}"),
             Self::BinaryOp {
                 lhs,
@@ -141,53 +141,57 @@ impl PrintSyntax for Value {
 
 impl PrintSyntax for Expression {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        let depth = depth + Self::INDENT;
         match self {
-            Self::Value(value) => value.print_syntax(f, depth),
-            Self::Literal(literal) => literal.print_syntax(f, depth),
-            Self::FormatString(format_string) => format_string.print_syntax(f, depth),
-            Self::ListExpression(list_expression) => list_expression.print_syntax(f, depth),
-            Self::TupleExpression(tuple_expression) => tuple_expression.print_syntax(f, depth),
-            Self::BinaryOp {
+            Expression::Value(value) => value.print_syntax(f, depth),
+            Expression::Literal(literal) => literal.print_syntax(f, depth),
+            Expression::FormatString(format_string) => format_string.print_syntax(f, depth),
+            Expression::ArrayExpression(array_expression) => {
+                array_expression.print_syntax(f, depth)
+            }
+            Expression::TupleExpression(tuple_expression) => {
+                tuple_expression.print_syntax(f, depth)
+            }
+            Expression::BinaryOp {
                 lhs,
                 op,
                 rhs,
                 src_ref: _,
             } => {
                 writeln!(f, "{:depth$}BinaryOp '{op}':", "")?;
-                lhs.print_syntax(f, depth)?;
-                rhs.print_syntax(f, depth)
+                lhs.print_syntax(f, depth + Self::INDENT)?;
+                rhs.print_syntax(f, depth + Self::INDENT)
             }
-            Self::UnaryOp {
+            Expression::UnaryOp {
                 op,
                 rhs,
                 src_ref: _,
             } => {
                 writeln!(f, "{:depth$}UnaryOp '{op}':", "")?;
-                rhs.print_syntax(f, depth)
+                rhs.print_syntax(f, depth + Self::INDENT)
             }
-            Self::ArrayElementAccess(lhs, rhs, _) => {
+            Expression::ArrayElementAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}ArrayElementAccess:", "")?;
-                lhs.print_syntax(f, depth)?;
-                rhs.print_syntax(f, depth)
+                lhs.print_syntax(f, depth + Self::INDENT)?;
+                rhs.print_syntax(f, depth + Self::INDENT)
             }
-            Self::PropertyAccess(lhs, rhs, _) => {
+            Expression::PropertyAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}FieldAccess:", "")?;
-                lhs.print_syntax(f, depth)?;
-                rhs.print_syntax(f, depth)
+                lhs.print_syntax(f, depth + Self::INDENT)?;
+                rhs.print_syntax(f, depth + Self::INDENT)
             }
-            Self::AttributeAccess(lhs, rhs, _) => {
+            Expression::AttributeAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}AttributeAccess:", "")?;
-                lhs.print_syntax(f, depth)?;
-                rhs.print_syntax(f, depth)
+                lhs.print_syntax(f, depth + Self::INDENT)?;
+                rhs.print_syntax(f, depth + Self::INDENT)
             }
-            Self::MethodCall(lhs, method_call, _) => {
+            Expression::MethodCall(lhs, method_call, _) => {
                 writeln!(f, "{:depth$}MethodCall:", "")?;
-                lhs.print_syntax(f, depth)?;
-                method_call.print_syntax(f, depth)
+                lhs.print_syntax(f, depth + Self::INDENT)?;
+                method_call.print_syntax(f, depth + Self::INDENT)
             }
-            Self::Nested(nested) => nested.print_syntax(f, depth),
-            _ => unimplemented!(),
+            Expression::Nested(nested) => nested.print_syntax(f, depth),
+            Expression::Marker(marker) => marker.print_syntax(f, depth),
+            Expression::Invalid => write!(f, "{}", crate::invalid!(EXPRESSION)),
         }
     }
 }

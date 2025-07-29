@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**198** tests from markdown.
+**205** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -62,6 +62,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/function_return.png)](../doc/tests/.test/function_return.log) | [function_return](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/function_use.png)](../doc/tests/.test/function_use.log) | [function_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/function_workbench.png)](../doc/tests/.test/function_workbench.log) | [function_workbench](../doc/tests/statement_usage.md) |
+| [![test](../doc/tests/.test/group.png)](../doc/tests/.test/group.log) | [group](../doc/tests/semicolon.md) |
+| [![test](../doc/tests/.test/group_assignment.png)](../doc/tests/.test/group_assignment.log) | [group_assignment](../doc/tests/semicolon.md) |
 | [![test](../doc/libs/std/ops/.test/hull_multiple.png)](../doc/libs/std/ops/.test/hull_multiple.log) | [hull_multiple](../doc/libs/std/ops/hull.md) |
 | [![test](../doc/libs/std/ops/.test/hull_single.png)](../doc/libs/std/ops/.test/hull_single.log) | [hull_single](../doc/libs/std/ops/hull.md) |
 | [![test](../doc/structure/.test/if_functions.png)](../doc/structure/.test/if_functions.log) | [if_functions](../doc/structure/conditionals.md) |
@@ -112,6 +114,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/no_multiplicity.png)](../doc/structure/.test/no_multiplicity.log) | [no_multiplicity](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/none.png)](../doc/structure/.test/none.log) | [none](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/op_example.png)](../doc/structure/.test/op_example.log) | [op_example](../doc/structure/op.md) |
+| [![test](../doc/tests/.test/operation_no_body.png)](../doc/tests/.test/operation_no_body.log) | [operation_no_body](../doc/tests/semicolon.md) |
+| [![test](../doc/tests/.test/operation_with_body.png)](../doc/tests/.test/operation_with_body.log) | [operation_with_body](../doc/tests/semicolon.md) |
 | [![test](../doc/structure/.test/parameters.png)](../doc/structure/.test/parameters.log) | [parameters](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/part_basic.png)](../doc/structure/.test/part_basic.log) | [part_basic](../doc/structure/part.md) |
 | [![test](../doc/structure/.test/part_declaration.png)](../doc/structure/.test/part_declaration.log) | [part_declaration](../doc/structure/workbench.md) |
@@ -135,6 +139,9 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/return.png)](../doc/structure/.test/return.log) | [return](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/return_twice.png)](../doc/structure/.test/return_twice.log) | [return_twice](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/sketch_basic.png)](../doc/structure/.test/sketch_basic.log) | [sketch_basic](../doc/structure/sketch.md) |
+| [![test](../doc/tests/.test/sketch_missing_semicolon.png)](../doc/tests/.test/sketch_missing_semicolon.log) | [sketch_missing_semicolon](../doc/tests/semicolon.md) |
+| [![test](../doc/tests/.test/sketch_with_body.png)](../doc/tests/.test/sketch_with_body.log) | [sketch_with_body](../doc/tests/semicolon.md) |
+| [![test](../doc/tests/.test/sketch_with_empty_body.png)](../doc/tests/.test/sketch_with_empty_body.log) | [sketch_with_empty_body](../doc/tests/semicolon.md) |
 | [![test](../doc/tests/.test/source_assignment_const.png)](../doc/tests/.test/source_assignment_const.log) | [source_assignment_const](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_assignment_prop.png)](../doc/tests/.test/source_assignment_prop.log) | [source_assignment_prop](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_assignment_var.png)](../doc/tests/.test/source_assignment_var.log) | [source_assignment_var](../doc/tests/statement_usage.md) |

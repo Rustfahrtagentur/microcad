@@ -24,12 +24,7 @@ impl SrcReferrer for ExpressionStatement {
 
 impl PrintSyntax for ExpressionStatement {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        writeln!(
-            f,
-            "{:depth$}Expression {}",
-            "",
-            crate::shorten!(self.expression)
-        )
+        self.expression.print_syntax(f, depth)
     }
 }
 

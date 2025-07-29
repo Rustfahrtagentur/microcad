@@ -3,7 +3,7 @@
 
 use crate::{parse::*, parser::*, syntax::*, ty::*};
 
-impl Parse for ListType {
+impl Parse for ArrayType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut inner = pair.inner();
         use crate::ty::Ty;
@@ -88,7 +88,7 @@ fn list_type() {
     assert_eq!(type_annotation.ty().to_string(), "[Integer]");
     assert_eq!(
         type_annotation.ty(),
-        Type::List(ListType::new(Type::Integer))
+        Type::Array(ArrayType::new(Type::Integer))
     );
 }
 

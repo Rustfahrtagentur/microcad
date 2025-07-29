@@ -36,57 +36,67 @@ mod macros {
             color_print::cstr!("<bg:c!><s> FROM STR </s></bg:c!>")
         };
         (UNKNOWN) => {
-            color_print::cstr!("<bg:m!> UNKNOWN </bg:m!>")
+            color_print::cstr!("<bg:m!><s> UNKNOWN </s></bg:m!>")
         };
         (ID) => {
-            color_print::cstr!("<bg:m!> NO ID </bg:m!>")
+            color_print::cstr!("<bg:m!><s> NO ID </s></bg:m!>")
         };
         (NAME) => {
-            color_print::cstr!("<bg:m!> NO NAME </bg:m!>")
+            color_print::cstr!("<bg:m!><s> NO NAME </s></bg:m!>")
+        };
+        (EXPRESSION) => {
+            color_print::cstr!("<bg:r!><s> INVALID EXPRESSION </s></bg:r!>")
+        };
+    }
+
+    /// Generate string literal "INVALID XXX"
+    #[macro_export]
+    macro_rules! invalid_no_ansi {
+        (VALUE) => {
+            "<INVALID VALUE>"
+        };
+        (TYPE) => {
+            "<INVALID TYPE>"
+        };
+        (OUTPUT) => {
+            "<INVALID OUTPUT>"
+        };
+        (STACK) => {
+            "<INVALID STACK>"
+        };
+        (REF) => {
+            "<INVALID REF>"
+        };
+        (FILE) => {
+            "<INVALID FILE>"
+        };
+        (RESULT) => {
+            "<INVALID RESULT>"
+        };
+        (LINE) => {
+            "<INVALID LINE>"
+        };
+        (SOURCE) => {
+            "<INVALID STR>"
+        };
+        (UNKNOWN) => {
+            "<INVALID UNKNOWN>"
+        };
+        (ID) => {
+            "<INVALID ID>"
+        };
+        (NAME) => {
+            "<INVALID NAME>"
+        };
+        (EXPRESSION) => {
+            color_print::cstr!("<INVALID EXPRESSION>")
         };
     }
 }
 
 #[cfg(not(feature = "ansi-color"))]
-mod macros {
-    /// Generate string literal "INVALID XXX"
-    #[macro_export]
-    macro_rules! invalid {
-        (VALUE) => {
-            "VALUE"
-        };
-        (TYPE) => {
-            "TYPE"
-        };
-        (OUTPUT) => {
-            "OUTPUT"
-        };
-        (STACK) => {
-            "STACK"
-        };
-        (REF) => {
-            "REF"
-        };
-        (FILE) => {
-            "FILE"
-        };
-        (RESULT) => {
-            "RESULT"
-        };
-        (LINE) => {
-            "LINE"
-        };
-        (SOURCE) => {
-            "STR"
-        };
-        (UNKNOWN) => {
-            "UNKNOWN"
-        };
-        (ID) => {
-            "ID"
-        };
-        (NAME) => {
-            "NAME"
-        };
-    }
+macro_rules! invalid {
+    ($x:literal) => {
+        invalid_no_ansi!($x)
+    };
 }

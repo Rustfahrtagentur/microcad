@@ -54,7 +54,7 @@ impl Ty for ParameterValue {
 impl std::fmt::Display for ParameterValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(def) = &self.default_value {
-            write!(f, "{} = {}", def.ty(), def.value_to_string())?;
+            write!(f, "{} = {def}", def.ty())?;
         } else if let Some(ty) = &self.specified_type {
             write!(f, "{ty}")?;
         }
@@ -70,6 +70,8 @@ impl SrcReferrer for ParameterValue {
 
 #[test]
 fn test_is_list_of() {
-    assert!(Type::List(ListType::new(QuantityType::Scalar.into()))
-        .is_list_of(&QuantityType::Scalar.into()));
+    assert!(
+        Type::Array(ArrayType::new(QuantityType::Scalar.into()))
+            .is_array_of(&QuantityType::Scalar.into())
+    );
 }

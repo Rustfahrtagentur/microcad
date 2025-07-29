@@ -75,7 +75,7 @@ fn tan() -> Symbol {
 
 /// Helper function to get an angle from a field in an argument list.
 fn get_angle(args: &Tuple, axis: &str) -> cgmath::Deg<f64> {
-    match args.get_value(axis) {
+    match args.get_value(axis).expect("angle missing") {
         Value::Quantity(Quantity {
             value,
             quantity_type: QuantityType::Angle,
@@ -113,7 +113,7 @@ fn rotate_around_axis() -> Symbol {
         ) {
             Ok(ref args) => {
                 let angle = get_angle(args, "angle");
-                let axis = Vec3::new(args.get("x"), args.get("y"), args.get("z"));
+                let axis = Vec3::new(args.get("x")?, args.get("y")?, args.get("z")?);
 
                 let matrix = Mat3::from_axis_angle(axis, angle);
                 Ok(Value::Matrix(Box::new(Matrix::Matrix3(matrix))))

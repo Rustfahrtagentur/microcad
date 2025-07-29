@@ -38,7 +38,7 @@ fn sample_models() -> Models {
     //       d0
     //     c2
     //       d0
-    Models::from_stack(&models)
+    Models::from_nested_items(&models)
 }
 
 #[cfg(test)]

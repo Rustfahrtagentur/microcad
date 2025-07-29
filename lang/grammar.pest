@@ -2,468 +2,455 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Grammar for the µcad language
-//
+// 
 // Comments starting with //` generate tests for the grammar
 // The strings inside the backticks (``) are the test input.
-//
-// Example, the following comment generates two tests for the rule "list_type":
-//
+// 
+// Example, the following comment generates two tests for the rule "array_type":
+// 
 // ```pest
-//     //`[scalar]`: ok # list with elements of type `scalar`
-//     //`[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
-//     list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
+// //`[Scalar]`: ok # Array with elements of type `Scalar`
+// //`[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
+// array_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 // ```
-//
+// 
 // See the crate microcad-pest-test for more info.
 
-ws = _{ " " | "\n" | "\t" | "\r" } // Whitespace
+ws = _{ " " | "\n" | "\t" | "\r" }
+// Whitespace
 
 alpha_lower = _{ 'a'..'z' }
 alpha_upper = _{ 'A'..'Z' }
-alpha = _{ alpha_lower | alpha_upper }
-digit = _{ '0'..'9' }
+alpha       = _{ alpha_lower | alpha_upper }
+digit       = _{ '0'..'9' }
 
 COMMENT = {
-  doc_comment |
-  single_line_comment |
-  multi_line_comment
+    doc_comment
+  | single_line_comment
+  | multi_line_comment
 }
 
-//`// ok`: ok
-//`/ err` error
+// `// ok`: ok
+// `/ err` error
 single_line_comment = ${ "//" ~ (!"\n" ~ ANY)* }
 
 // Documentation comments for µcad language
-//`/// ok`: ok
-//`// err` error
+// `/// ok`: ok
+// `// err` error
 doc_comment = { "///" ~ (!"\n" ~ ANY)* }
 
-//`/* ok */`: ok
+// `/* ok */`: ok
 multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
 identifier_part = { alpha | "_" }
 identifier_body = { (alpha | "_") ~ (alpha | digit | "_")* }
-keywords = {"mod" | "part" | "sketch" | "op" | "fn" | "if" | "else" | "use" | "return"}
+keywords        = { "mod" | "part" | "sketch" | "op" | "fn" | "if" | "else" | "use" | "return" }
 
-//`a`: ok
-//`a1`: ok
-//`a_`: ok
-//`_a`: ok
-//`_`: ok
-//`1`: error
-//`.test`: error
+// `a`: ok
+// `a1`: ok
+// `a_`: ok
+// `_a`: ok
+// `_`: ok
+// `1`: error
+// `.test`: error
 identifier = { !(keywords ~ !identifier_part) ~ identifier_body }
 
-//`a,b`: ok # A comma-separated list of identifier
-identifier_list = { identifier ~ (ws* ~ "," ~ ws* ~ identifier)*}
-
-//`1.0`: ok
-//`.1`: ok
-//`0.`: ok
-//`1`: error: Missing decimal point
-//`qwqeaq`: error
-number = @{ "-"? ~ (((int ~ "." ~ ASCII_DIGIT+) | (int ~ ".") | ("." ~ ASCII_DIGIT+)) ~  exp?) | exp }
+// `1.0`: ok
+// `.1`: ok
+// `0.`: ok
+// `1`: error: Missing decimal point
+// `deadbeef`: error
+number = @{ "-"? ~ (((int ~ "." ~ ASCII_DIGIT+) | (int ~ ".") | ("." ~ ASCII_DIGIT+)) ~ exp?) | exp }
 int    = @{ "0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
 exp    = @{ ("E" | "e") ~ ("+" | "-")? ~ ASCII_DIGIT+ }
 
-//`90°`: ok, with `°` unit
-//`5.0mm`: ok, with `mm` unit
-//`90.0`: ok, no unit
-//`mm`: error
+// `90°`: ok, with `°` unit
+// `5.0mm`: ok, with `mm` unit
+// `90.0`: ok, no unit
+// `mm`: error
 number_literal = { number ~ unit? | integer_literal ~ unit }
 
-//`-1`: ok
-//`1`: ok
-//`-1.0`: error # Is float
+// `-1`: ok
+// `1`: ok
+// `-1.0`: error # Is float
 integer_literal = { "-" ~ int | int }
 
-//`"a"`: ok
-//`"a\n"`: ok
-//`"a\""`: ok
-//`"hello{10}world": ok
-format_string = { "\"" ~ string_literal_inner? ~ (format_expression ~ string_literal_inner?)* ~ "\"" }
-string_literal_inner   = { (!("\"" | "\\" | "{" | "}" ) ~ ANY)* ~ ((bracket_escape | escape) ~ string_literal_inner)? }
-bracket_escape = { "{{" | "}}" }
-escape  = @{ "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | unicode) }
-unicode = @{ "u" ~ ASCII_HEX_DIGIT{4} }
+// `"a"`: ok
+// `"a\n"`: ok
+// `"a\""`: ok
+// `"hello{10}world": ok
+format_string        =  { "\"" ~ string_literal_inner? ~ (format_expression ~ string_literal_inner?)* ~ "\"" }
+string_literal_inner =  { (!("\"" | "\\" | "{" | "}") ~ ANY)* ~ ((bracket_escape | escape) ~ string_literal_inner)? }
+bracket_escape       =  { "{{" | "}}" }
+escape               = @{ "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | unicode) }
+unicode              = @{ "u" ~ ASCII_HEX_DIGIT{4} }
 
-///`{a}`: ok
-///`{a + b}`: ok
-format_expression = { "{" ~ ws* ~ (format_spec ~ ws* ~ ":" )? ~ ws* ~ expression ~ ws* ~ "}" }
+// `{a}`: ok
+// `{a + b}`: ok
+format_expression = { "{" ~ ws* ~ (format_spec ~ ws* ~ ":")? ~ ws* ~ expression ~ ws* ~ "}" }
 
-///`05.5`: ok # Five leading zeros with 5 precision
+// `05.5`: ok # Five leading zeros with 5 precision
 format_spec = {
-  format_spec_width ~ format_spec_precision |
-  format_spec_width |
-  format_spec_precision
+    format_spec_width ~ format_spec_precision
+  | format_spec_width
+  | format_spec_precision
 }
 
-//`.5`: print with precision = 5
+// `.5`: print with precision = 5
 format_spec_precision = { "." ~ int }
 
-//`05`: print with 5 leading zeros and precision = 0
+// `05`: print with 5 leading zeros and precision = 0
 format_spec_width = { "0" ~ int }
 
-//`true`: ok
-//`false`: ok
-//`True`: error
-//`False`: error
+// `true`: ok
+// `false`: ok
+// `True`: error
+// `False`: error
 bool_literal = @{ "true" | "false" }
 
-unit = @{ (alpha_lower ~ (alpha_lower | "/")* ~ ("²" | "³")?) | "°" | "%" | "\"" | "'" }
+// `m`: ok
+// `mm`: ok
+// `µm`: ok
+// `m²`: ok
+// `mm³`: ok
+// `kg/m²`: ok
+// `kg/`: fail
+// `kg/²`: fail
+// `/kg`: fail
+// `/1m`: fail
+unit = @{ (alpha_lower+ ~ ((("/" ~ alpha_lower+)? ~ ("²" | "³")))?) | "°" | "%" | "\"" | "'" }
 
-//`1`: ok # Integer
-//`1mm`: ok # Number (Length)
-//`1.0mm`: ok # Number (Length)
-//`1.0`: ok # Scalar
-//`true`: ok # Boolean
+// `1`: ok # Integer
+// `1mm`: ok # Number (Length)
+// `1.0mm`: ok # Number (Length)
+// `1.0`: ok # Scalar
+// `true`: ok # Boolean
 literal = {
-  number_literal |
-  integer_literal |
-  bool_literal
+    number_literal
+  | integer_literal
+  | bool_literal
 }
 
-//`a`: ok # Single identifier
-//`a::b`: ok # Nested identifiers
-//`a::b ::c`: error # No whitespace between identifiers
-//`a::b::c::`: error # No trailing ::
+// `a`: ok # Single identifier
+// `a::b`: ok # Nested identifiers
+// `a::b ::c`: error # No whitespace between identifiers
+// `a::b::c::`: error # No trailing ::
 qualified_name = { identifier ~ ("::" ~ identifier)* }
 
-//`int`: ok
-//`a::nested::typename`: ok
-//`[Scalar]`: ok # List type
-//`(a: Scalar, b: Scalar)`: ok # Named tuple type
+// `int`: ok
+// `a::nested::typename`: ok
+// `[Scalar]`: ok # List type
+// `(a: Scalar, b: Scalar)`: ok # Named tuple type
 type = {
-  list_type |
-  tuple_type |
-  matrix_type |
-  qualified_name |
-  unit
+    array_type
+  | tuple_type
+  | matrix_type
+  | qualified_name
+  | unit
 }
-
-//`type a = scalar`: ok
-type_declaration = { "type" ~ ws* ~ identifier ~ ws* ~ "=" ~ ws* ~ type }
-
-type_declaration_statement = _{ type_declaration ~ ws* ~ ";"}
 
 type_annotation = _{ ":" ~ ws* ~ type }
 
-//`[scalar]`: ok list with elements of type `scalar`
-//`[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
-list_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
+// `[scalar]`: ok list with elements of type `scalar`
+// `[]`: error # List must have a type, lists of elements with arbitrary type are not allowed
+array_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 
-//`(a: Length, b: scalar)`: ok
-//`(a: Length, )`: ok # Trailing comma
+// `(a: Length, b: scalar)`: ok
+// `(a: Length, )`: ok # Trailing comma
 tuple_type = { "(" ~ ws* ~ tuple_type_element ~ (ws* ~ "," ~ ws* ~ tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")" }
 
-//`a: Length`: ok
+// `a: Length`: ok
 tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
 
-//`Matrix4x3`: ok
-//`Matrix3`: ok
+// `Matrix4x3`: ok
+// `Matrix3`: ok
 matrix_type = { "Matrix" ~ int ~ ("x" ~ int)? }
 
+// `[1, 2, 3]`: ok
+// `[1, 2, 3,]`: error # Trailing comma
+// `[]`: ok
+array_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" ~ unit? }
 
-//`[1, 2, 3]`: ok
-//`[1, 2, 3,]`: error # Trailing comma
-//`[]`: ok
-list_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" ~ unit? }
-
-//`[0]`: ok # Access first element
-//`["test"]`: ok # Associative lists, access value of `\"test\"`
-list_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
+// `[0]`: ok # Access first element
+// `["test"]`: ok # Associative lists, access value of `\"test\"`
+array_element_access = { "[" ~ ws* ~ expression ~ ws* ~ "]" }
 
 // An expression for tuples
-//`(1.0mm, 2.0mm)`: ok
-//`(1.0mm,)`: ok # Trailing comma
-//`(x = 1.0mm, y = 2.0mm)`: ok
+// `(1.0mm, 2.0mm)`: ok
+// `(1.0mm,)`: ok # Trailing comma
+// `(x = 1.0mm, y = 2.0mm)`: ok
 tuple_expression = { "(" ~ ws* ~ argument_list ~ ws* ~ ")" }
 
-//`.height`: ok
-//`.=`: error # Neither an identifier nor an integer
+// `.height`: ok
+// `.=`: error # Neither an identifier nor an integer
 tuple_element_access = { "." ~ identifier }
 
-//`#layer`: ok
+// `#layer`: ok
 attribute_access = { "#" ~ identifier }
 
-element_access = _{ method_call | list_element_access | tuple_element_access | attribute_access }
+element_access = _{ method_call | array_element_access | tuple_element_access | attribute_access }
 
-//`pub`: ok
+// `pub`: ok
 visibility = { "pub" }
 
-//`use a;`: ok # Import a single module
-//`use ;`: error # Must import at least one module
-//`use foo::*;`: ok # Import all modules from foo
-//`use foo as bar;`: ok # Import foo as bar
-//`pub use foo;`: ok # Import and re-export foo
+// `use a;`: ok # Import a single module
+// `use ;`: error # Must import at least one module
+// `use foo::*;`: ok # Import all modules from foo
+// `use foo as bar;`: ok # Import foo as bar
+// `pub use foo;`: ok # Import and re-export foo
 use_statement = { visibility? ~ ws* ~ "use" ~ ws+ ~ use_declaration ~ ws* ~ ";" }
 
 use_declaration = { use_all | use_alias | qualified_name }
 
-//`std::*`: ok # Import everything from std
+// `std::*`: ok # Import everything from std
 use_all = { qualified_name ~ ws* ~ "::" ~ ws* ~ "*" }
 
-//`std::math as my_math`: ok # Import math from std as my_math
+// `std::math as my_math`: ok # Import math from std as my_math
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 
-//`translate() rotate()`: ok
-//`translate() rotate() { translate() rotate() {} }`: ok
-//`rotate() {}`: ok
-//`{}`: ok # Empty body
-//`{ translate() rotate(); }`: ok
-//`{} {}`: error # Cannot nest bodies
-//`holes.edges`: error # No tuple access in nested module
+// `translate() rotate()`: ok
+// `translate() rotate() { translate() rotate() {} }`: ok
+// `rotate() {}`: ok
+// `{}`: ok # Empty body
+// `{ translate() rotate(); }`: ok
+// `{} {}`: error # Cannot nest bodies
+// `holes.edges`: error # No tuple access in nested module
 nested = { nested_with_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
 
 nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ body }
 
-//`-5.0mm`: ok # Negate
-//`(a+b)*(c-a)`: ok
-//`a + b + c`: ok
-//`math::PI`: ok # Singleton access with qualified name or module access
-//`! a`: ok # Unary operator with whitespace
-//`a-`: error # Unknown postfix operator `-`
-//`a[2]`: ok # List access
-//`a.b`: ok # Tuple access
-//`(b = 3.0).b`: ok # Tuple access
-//`a::b()`: ok # Method call
-//`a::b().c`: ok # Nested method call
-//`a::b.c`: ok # Nested tuple access
-//`a and b`: ok # Binary operator
-//`[3,5,5]`: ok # List expression
-//`1 if 3 > 2 else 0`: ok # Ternary operator
-//`a()`: ok # Simple call
-//`translate() rotate()`: ok # Nested call
-//`translate() rotate() { translate() rotate() {} }`: ok # Nested call
-//`a | a::b()`: ok
-//`a | b & c`: ok
-//`a() b() | b & c | d`: ok
-//`circle(r = 5.0mm)`: ok
-//`circle(r = 5.0mm) {}`: ok
-//`translate(x = 5.0mm) { rectangle(width = 5.0mm); }`: ok
-//`translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
-//`translate(r = 5.0mm) circle(r = 5.0mm)`: ok
-//`{}`: ok # Empty body
-//`{ rectangle(width = 5.0mm); }`: ok # Single statement body
-//`translate(x = 5mm)`: ok
-//`[hole_positions.bottom]`: ok # List access with tuple access
-//`mountable_plate(hole_positions = hole_positions.edges - [hole_positions.bottom])`: ok # Tuple access
-//`1000mm == 1m`: ok # Comparison
-//`1000mm == 1m == 100cm`: ok # Multi comparison
-expression       =   { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
-bin_op           =  _{ add | subtract | multiply | divide | union | intersection | power_xor | greater_equal | less_equal | greater_than | less_than | equal | near | not_equal | and | or | xor | if_binary_op | else_binary_op }
-  add            =   { "+" }
-  subtract       =   { "-" }
-  multiply       =   { "*" }
-  divide         =   { "/" }
-  union          =   { "|" }
-  intersection   =   { "&" }
-  power_xor      =   { "^" }
-  greater_than   =   { ">" }
-  less_than      =   { "<" }
-  greater_equal  =   { ">=" }
-  less_equal     =   { "<=" }
-  equal          =   { "==" }
-  near           =   { "~" }
-  not_equal      =   { "!=" }
-  and            =   { "and" }
-  or             =   { "or" }
-  xor            =   { "xor" }
-  if_binary_op   =   { "if" }
-  else_binary_op =   { "else" }
+// `-5.0mm`: ok # Negate
+// `(a+b)*(c-a)`: ok
+// `a + b + c`: ok
+// `math::PI`: ok # Singleton access with qualified name or module access
+// `! a`: ok # Unary operator with whitespace
+// `a-`: error # Unknown postfix operator `-`
+// `a[2]`: ok # List access
+// `a.b`: ok # Tuple access
+// `(b = 3.0).b`: ok # Tuple access
+// `a::b()`: ok # Method call
+// `a::b().c`: ok # Nested method call
+// `a::b.c`: ok # Nested tuple access
+// `a and b`: ok # Binary operator
+// `[3,5,5]`: ok # List expression
+// `1 if 3 > 2 else 0`: ok # Ternary operator
+// `a()`: ok # Simple call
+// `translate() rotate()`: ok # Nested call
+// `translate() rotate() { translate() rotate() {} }`: ok # Nested call
+// `a | a::b()`: ok
+// `a | b & c`: ok
+// `a() b() | b & c | d`: ok
+// `circle(r = 5.0mm)`: ok
+// `circle(r = 5.0mm) {}`: ok
+// `translate(x = 5.0mm) { rectangle(width = 5.0mm); }`: ok
+// `translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
+// `translate(r = 5.0mm) circle(r = 5.0mm)`: ok
+// `{}`: ok # Empty body
+// `{ rectangle(width = 5.0mm); }`: ok # Single statement body
+// `translate(x = 5mm)`: ok
+// `[hole_positions.bottom]`: ok # List access with tuple access
+// `mountable_plate(hole_positions = hole_positions.edges - [hole_positions.bottom])`: ok # Tuple access
+// `1000mm == 1m`: ok # Comparison
+// `1000mm == 1m == 100cm`: ok # Multi comparison
+expression     =  { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
+bin_op         = _{ add | subtract | multiply | divide | union | intersection | power_xor | greater_equal | less_equal | greater_than | less_than | equal | near | not_equal | and | or | xor | if_binary_op | else_binary_op }
+add            =  { "+" }
+subtract       =  { "-" }
+multiply       =  { "*" }
+divide         =  { "/" }
+union          =  { "|" }
+intersection   =  { "&" }
+power_xor      =  { "^" }
+greater_than   =  { ">" }
+less_than      =  { "<" }
+greater_equal  =  { ">=" }
+less_equal     =  { "<=" }
+equal          =  { "==" }
+near           =  { "~" }
+not_equal      =  { "!=" }
+and            =  { "and" }
+or             =  { "or" }
+xor            =  { "xor" }
+if_binary_op   =  { "if" }
+else_binary_op =  { "else" }
 
-unary_op         =  _{ unary_minus | unary_plus | unary_not }
-  unary_minus    =   { "-" }
-  unary_plus     =   { "+" }
-  unary_not      =   { "!" }
-postfix          =  _{ element_access }
-primary          =  _{ literal | marker | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | list_expression }
+unary_op    = _{ unary_minus | unary_plus | unary_not }
+unary_minus =  { "-" }
+unary_plus  =  { "+" }
+unary_not   =  { "!" }
+postfix     = _{ element_access }
+primary     = _{ literal | marker | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | array_expression }
 
-//`a, b, c`: ok
-//`1+2, 4*3, 3.2`: ok
-//`,,`: error # No expression
+// `a, b, c`: ok
+// `1+2, 4*3, 3.2`: ok
+// `,,`: error # No expression
 expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
 // A nested expression that does end with a body
-//`a {}`: ok # Body at the end
-//`b c`: error # No body at the end
-//`a b()`: error # No body at the end
+// `a {}`: ok # Body at the end
+// `b c`: error # No body at the end
+// `a b()`: error # No body at the end
 expression_no_semicolon = { nested_with_body }
 
 // A statement that is a single expression
-expression_statement = { (attribute_list ~ ws+)? ~ (expression ~ ws* ~ ";" | expression_no_semicolon ~ (ws* ~ ";")? ) }
+expression_statement = { (attribute_list ~ ws+)? ~ ((expression ~ ws* ~ ";") | expression_no_semicolon) }
 
 // A statement that is a single expression, with optional semicolon
 final_expression_statement = { (attribute_list ~ ws+)? ~ expression ~ (ws* ~ ";")? }
 
-
-//`1..4`: ok
-//`a..b`: ok
-range_expression = { (integer_literal | expression) ~ ws* ~ ".." ~ ws* ~ (integer_literal | expression) }
-
-unary_expression = { unary_operator ~ ws* ~ expression }
-unary_operator = { "-" }
-
-// Default value collapses to a single expression
-default_value = _{ "=" ~ ws* ~ expression }
-
-//`r = 5.0mm`: ok # Named argument
+// `r = 5.0mm`: ok # Named argument
 named_argument = { identifier ~ ws* ~ "=" ~ ws* ~ expression }
 
-//`2.0mm`: ok # Positional argument
+// `2.0mm`: ok # Positional argument
 positional_argument = _{ expression }
 
 argument = _{
-  named_argument |
-  positional_argument
+    named_argument
+  | positional_argument
 }
 
-//`a = 5.0mm, b = false`: ok
-//`4.0mm, a = false`: ok
-//`a = false, 4.0mm`: ok # Positional argument after named argument (Syntactically correct, semantically wrong)
-//`a = false, 4.0mm,`: ok # Trailing comma
+// `a = 5.0mm, b = false`: ok
+// `4.0mm, a = false`: ok
+// `a = false, 4.0mm`: ok # Positional argument after named argument (Syntactically correct, semantically wrong)
+// `a = false, 4.0mm,`: ok # Trailing comma
 argument_list = { argument ~ (ws* ~ "," ~ ws* ~ argument)* ~ ws* ~ ","? }
 
 call_op = _{ "(" ~ ws* ~ argument_list? ~ ws* ~ ")" }
 
-//`.sum()`: ok
+// `.sum()`: ok
 method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
 
-//`f(a = 3.0mm)`: ok
-//`f(a = 3.0mm, b = 2.0mm)`: ok
-//`a::nested::f(a = 3.0mm, b = 2.0mm)`: ok
+// `f(a = 3.0mm)`: ok
+// `f(a = 3.0mm, b = 2.0mm)`: ok
+// `a::nested::f(a = 3.0mm, b = 2.0mm)`: ok
 call = { qualified_name ~ ws* ~ call_op }
 
-//`foo = bar`: ok # Assignment
-//`export`: ok # Command with no commands
-//`export = "test.svg"`: ok # Command as string
-//`measure = width`: ok # Command as identifier without arguments
-//`measure = width, height(offset = 30mm)`: ok # Item with multiple commands
+// `foo = bar`: ok # Assignment
+// `export`: ok # Command with no commands
+// `export = "test.svg"`: ok # Command as string
+// `measure = width`: ok # Command as identifier without arguments
+// `measure = width, height(offset = 30mm)`: ok # Item with multiple commands
 attribute_item = _{ identifier ~ (ws* ~ "=" ~ ws* ~ attribute_command_list)? }
 
-//`"test.svg"`: ok # Format string command
-//`width(offset = 30mm)`: ok # Command with argument list.
-//`(style = "fill:none"): ok # Anonymous argument list.
+// `"test.svg"`: ok # Format string command
+// `width(offset = 30mm)`: ok # Command with argument list.
+// `(style = "fill:none"): ok # Anonymous argument list.
 attribute_command = { identifier ~ (ws* ~ call_op)? | call_op | expression }
 
-//`width, height`: ok # Multiple commands.
-attribute_command_list = _{ attribute_command ~ (ws* ~ "," ~ ws* ~ attribute_command)* ~ ws* ~ ","?  }
+// `width, height`: ok # Multiple commands.
+attribute_command_list = _{ attribute_command ~ (ws* ~ "," ~ ws* ~ attribute_command)* ~ ws* ~ ","? }
 
-//`#[bar = width]`: ok # An attribute with command.
-//`#[svg = (style = "test")]`: ok # Expression attribute
+// `#[bar = width]`: ok # An attribute with command.
+// `#[svg = (style = "test")]`: ok # Expression attribute
 attribute = { "#[" ~ ws* ~ attribute_item ~ ws* ~ "]" }
 
-//`#![size = A4]`: ok # Name-value attribute
+// `#![size = A4]`: ok # Name-value attribute
 inner_attribute = { "#![" ~ ws* ~ attribute_item ~ ws* ~ "]" }
 
 inner_attribute_statement = _{ inner_attribute }
 
-//`#[foo = 32] #[bar = 32]`: ok # Multiple attributes
+// `#[foo = 32] #[bar = 32]`: ok # Multiple attributes
 attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
-//`const`: ok
-//`prop`: ok
+// `const`: ok
+// `prop`: ok
 qualifier = { "const" | "prop" }
 
-//`r: Length = 5.0mm`: ok
-//`r = 5.0mm`: ok # Type specifier with type inference
-//`r: Length`: error # Default value is required
-//`r: Scalar = math::PI`: ok # Type specifier + Default value from constant
-//`r`: error # neither type specifier or default value
-//`const r = 5.0mm`: Make value of assignment a public constant
-//`prop r = 5.0mm`: Make value of assignment a public property
+// `r: Length = 5.0mm`: ok
+// `r = 5.0mm`: ok # Type specifier with type inference
+// `r: Length`: error # Default value is required
+// `r: Scalar = math::PI`: ok # Type specifier + Default value from constant
+// `r`: error # neither type specifier or default value
+// `const r = 5.0mm`: Make value of assignment a public constant
+// `prop r = 5.0mm`: Make value of assignment a public property
 assignment = { (qualifier ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
 
 assignment_statement = { (attribute_list ~ ws+)? ~ assignment ~ ws* ~ ";" }
 
-//`@children`: ok
+// `@children`: ok
 marker = { "@" ~ identifier }
 
 // Rule for a single parameter of a definition
-//`r: Length = 5.0mm`: ok
-//`r = 5.0mm`: ok # Type specifier with type inference
-//`r: Length`: ok # Default value is NOT required
-//`r: Scalar = math::PI`: ok # Type specifier + Default value from constant
-//`r`: error # neither type specifier or default value
-parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation  }
+// `r: Length = 5.0mm`: ok
+// `r = 5.0mm`: ok # Type specifier with type inference
+// `r: Length`: ok # Default value is NOT required
+// `r: Scalar = math::PI`: ok # Type specifier + Default value from constant
+// `r`: error # neither type specifier or default value
+parameter = { identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression | identifier ~ ws* ~ type_annotation }
 
-//`(r = 5.0mm, b = 4.0mm)`: ok
-//`(r = 5.0mm, b = 4.0mm, )`: ok
+// `(r = 5.0mm, b = 4.0mm)`: ok
+// `(r = 5.0mm, b = 4.0mm, )`: ok
 parameter_list = { "(" ~ ws* ~ (parameter ~ (ws* ~ "," ~ ws* ~ parameter)* ~ ws*)? ~ ","? ~ ws* ~ ")" }
 
-
-//`(a: scalar) -> scalar`: ok # Function signature with arguments
-//`() -> scalar`: ok # Function signature with no arguments
-//`(a: scalar, b: scalar) -> scalar`: ok # Function signature with multiple arguments
-//`(a: scalar = 2.0, b: scalar = 3.0) -> scalar`: ok # Function signature with default values
-//`(a: scalar = 2.0, b: scalar = 3.0)`: ok # Function signature without return type
+// `(a: scalar) -> scalar`: ok # Function signature with arguments
+// `() -> scalar`: ok # Function signature with no arguments
+// `(a: scalar, b: scalar) -> scalar`: ok # Function signature with multiple arguments
+// `(a: scalar = 2.0, b: scalar = 3.0) -> scalar`: ok # Function signature with default values
+// `(a: scalar = 2.0, b: scalar = 3.0)`: ok # Function signature without return type
 function_signature = { parameter_list ~ (ws* ~ "->" ~ ws* ~ type)? }
 
-//`fn foo() -> Scalar { return math::pi; }`: ok
-//`fn foo() -> Scalar {}`: ok # Empty function
-//`fn foo() { return 5.0mm; }`: ok # Function return type is inferred
-//`fn foo(a: Scalar) -> Scalar { return a; }`: ok # Function with arguments
-//`fn foo(a: Scalar, b: Scalar) -> Scalar { return a + b; }`: ok # Function with multiple arguments
-//`fn foo(a: Scalar, b: Scalar) -> Scalar { return a + b; }`: ok # Function with multiple arguments
-//`fn test(a: Scalar, b: Scalar) -> Scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
-//`fn weight(density: density = 20g/1mm^3) -> Weight {}` ok # Function with default value
-//`pub fn foo() {}` ok # Public function
+// `fn foo() -> Scalar { return math::pi; }`: ok
+// `fn foo() -> Scalar {}`: ok # Empty function
+// `fn foo() { return 5.0mm; }`: ok # Function return type is inferred
+// `fn foo(a: Scalar) -> Scalar { return a; }`: ok # Function with arguments
+// `fn foo(a: Scalar, b: Scalar) -> Scalar { return a + b; }`: ok # Function with multiple arguments
+// `fn foo(a: Scalar, b: Scalar) -> Scalar { return a + b; }`: ok # Function with multiple arguments
+// `fn test(a: Scalar, b: Scalar) -> Scalar { c = 1.0; return a + b + c; }`: ok # Function with multiple arguments and local variable
+// `fn weight(density: density = 20g/1mm^3) -> Weight {}` ok # Function with default value
+// `pub fn foo() {}` ok # Public function
 function_definition = { (visibility ~ ws+)? ~ "fn" ~ ws+ ~ identifier ~ ws* ~ function_signature ~ ws* ~ body }
 
-//`return 5.0mm;`: ok
+// `return 5.0mm;`: ok
 return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 
-//`if a > 5.0mm { return 5.0mm; }`: ok
-//`if a > 5.0mm { return 5.0mm; } else { return 4.0mm; }`: ok
-if_statement = { "if" ~ ws* ~ expression ~ ws* ~ body ~ (ws* ~"else" ~ ws* ~ (body | if_statement))? }
+// `if a > 5.0mm { return 5.0mm; }`: ok
+// `if a > 5.0mm { return 5.0mm; } else { return 4.0mm; }`: ok
+if_statement = { "if" ~ ws* ~ expression ~ ws* ~ body ~ (ws* ~ "else" ~ ws* ~ (body | if_statement))? }
 
 workbench_kind = { "sketch" | "part" | "op" }
 
-//`part foo() { }`: ok # Part with no properties
-//`part foo(a: scalar) { }`: ok # Part with properties
-//`part foo(a: scalar, b: scalar) { }`: ok # Part with multiple properties
-//`part foo() { part bar() { } }`: ok # Nested part definition
-//`part foo() { a: scalar = 5.0; fn bar() -> scalar { return 1; } }`: ok # Parameter and nested function
-//`part list(count: int, delegate = {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Part with part as properties
-//`part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
-//`part foo() { fn bar(a: Scalar) -> Scalar { a } }`: ok # Part with function
-//`part donut(radius) { }`: error # Part property must have type annotations
-//`sketch foo() { }`: ok # Sketch with no properties
-//`op foo() { }`: ok # Sketch with no properties
-//`pub sketch foo() { }`: ok # public sketch
+// `part foo() { }`: ok # Part with no properties
+// `part foo(a: scalar) { }`: ok # Part with properties
+// `part foo(a: scalar, b: scalar) { }`: ok # Part with multiple properties
+// `part foo() { part bar() { } }`: ok # Nested part definition
+// `part foo() { a: scalar = 5.0; fn bar() -> scalar { return 1; } }`: ok # Parameter and nested function
+// `part list(count: int, delegate = {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Part with part as properties
+// `part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
+// `part foo() { fn bar(a: Scalar) -> Scalar { a } }`: ok # Part with function
+// `part donut(radius) { }`: error # Part property must have type annotations
+// `sketch foo() { }`: ok # Sketch with no properties
+// `op foo() { }`: ok # Sketch with no properties
+// `pub sketch foo() { }`: ok # public sketch
 workbench_definition = { (attribute_list ~ ws+)? ~ (visibility ~ ws+)? ~ workbench_kind ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
-//`{ translate() rotate(); }`: ok
-//`{}`: ok # Empty body
+// `{ translate() rotate(); }`: ok
+// `{}`: ok # Empty body
 body = { "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
 
-//`init(d: Length) { r = d / 2; }`: ok
-//`init(size: Length) { size = size; }`: ok
-//`init(size: Length) { rectangle(size); }: ok
+// `init(d: Length) { r = d / 2; }`: ok
+// `init(size: Length) { size = size; }`: ok
+// `init(size: Length) { rectangle(size); }: ok
 init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 
-//`mod math { }`: ok # module
-//`mod math { fn pi() -> Scalar { return 3.14159; } }`: ok # module with function
+// `mod math { }`: ok # module
+// `mod math { fn pi() -> Scalar { return 3.14159; } }`: ok # module with function
 module_definition = { "mod" ~ ws+ ~ identifier ~ ws* ~ body }
 
 statement = {
-  workbench_definition |
-  module_definition |
-  function_definition |
-  init_definition |
-
-  use_statement |
-  return_statement |
-  if_statement |
-
-  inner_attribute_statement |
-
-  assignment_statement |
-  expression_statement
+    workbench_definition
+  | module_definition
+  | function_definition
+  | init_definition
+  | use_statement
+  | return_statement
+  | if_statement
+  | inner_attribute_statement
+  | assignment_statement
+  | expression_statement
 }
 
 statement_list = { (statement ~ ws*)* ~ final_expression_statement? }
 
-//`translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-//`part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
+// `translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
+// `part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
 source_file = { SOI ~ ws* ~ statement_list ~ ws* ~ EOI }

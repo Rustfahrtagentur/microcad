@@ -3,7 +3,7 @@
 
 use crate::{eval::*, model::*};
 
-impl Eval for ListExpression {
+impl Eval for ArrayExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let value_list = ValueList::new(
             self.list
@@ -65,7 +65,7 @@ impl Eval for Expression {
         let result = match self {
             Self::Literal(literal) => literal.eval(context),
             Self::FormatString(format_string) => format_string.eval(context),
-            Self::ListExpression(list_expression) => list_expression.eval(context),
+            Self::ArrayExpression(array_expression) => array_expression.eval(context),
             Self::TupleExpression(tuple_expression) => tuple_expression.eval(context),
             Self::BinaryOp {
                 lhs,
@@ -199,7 +199,7 @@ impl Eval for Nested {
             model_stack.push(models);
         }
 
-        Ok(Value::Models(Models::from_stack(&model_stack)))
+        Ok(Value::Models(Models::from_nested_items(&model_stack)))
     }
 }
 

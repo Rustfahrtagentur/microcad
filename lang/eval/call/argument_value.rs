@@ -40,7 +40,7 @@ impl ArgumentValue {
 
     /// If argument is an array returns the inner type
     pub fn ty_inner(&self) -> Type {
-        if let Type::List(ty) = self.ty() {
+        if let Type::Array(ty) = self.ty() {
             ty.ty()
         } else {
             Type::Invalid

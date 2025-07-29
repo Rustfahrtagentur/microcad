@@ -34,9 +34,9 @@ impl Stack {
                         "Set"
                     };
                     if name.is_qualified() {
-                        log::debug!("{op} {name} as {id} to local stack");
+                        log::debug!("{op} {name} as {id:?} to local stack");
                     } else {
-                        log::debug!("{op} {id} to local stack");
+                        log::debug!("{op} {id:?} to local stack");
                     }
 
                     log::trace!("Local Stack:\n{self}");
@@ -178,7 +178,7 @@ impl Locals for Stack {
                 | StackFrame::Init(locals)
                 | StackFrame::Function(locals) => {
                     if let Some(local) = locals.get(id) {
-                        log::trace!("fetched {id} from locals");
+                        log::trace!("fetched {id:?} from locals");
                         return Ok(local.clone());
                     }
                 }

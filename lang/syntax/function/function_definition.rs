@@ -38,9 +38,10 @@ impl FunctionDefinition {
 impl PrintSyntax for FunctionDefinition {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$}FunctionDefinition '{}':", "", self.id)?;
-        writeln!(f, "{:depth$} Signature:", "")?;
-        self.signature.print_syntax(f, depth + 2)?;
-        writeln!(f, "{:depth$} Body:", "")?;
-        self.body.print_syntax(f, depth + 2)
+        let depth = depth + Self::INDENT;
+        writeln!(f, "{:depth$}Signature:", "")?;
+        self.signature.print_syntax(f, depth)?;
+        writeln!(f, "{:depth$}Body:", "")?;
+        self.body.print_syntax(f, depth)
     }
 }

@@ -4,6 +4,8 @@ Conditions lead to different executions paths for different cases.
 
 ## If Statement for models
 
+[![test](.test/if_models.png)](.test/if_models.log)
+
 ```µcad,if_models
 sketch my_sketch(a: Integer) {
     if a == 1 {
@@ -19,7 +21,7 @@ my_sketch(2);
 
 ## If Statement for functions
 
-[![test](.test/if.png)](.test/if.log)
+[![test](.test/if_functions.png)](.test/if_functions.log)
 
 ```µcad,if_functions
 fn f(x: Integer) {

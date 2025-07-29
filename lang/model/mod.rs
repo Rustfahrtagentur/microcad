@@ -9,10 +9,10 @@ pub mod element;
 mod inner;
 pub mod iter;
 pub mod models;
-pub mod object_properties;
 pub mod operation;
 pub mod origin;
 pub mod output;
+pub mod properties;
 pub mod render;
 
 pub use attribute::*;
@@ -21,10 +21,10 @@ pub use element::*;
 pub use inner::*;
 pub use iter::*;
 pub use models::*;
-pub use object_properties::*;
 pub use operation::*;
 pub use origin::*;
 pub use output::*;
+pub use properties::*;
 
 use derive_more::{Deref, DerefMut};
 
@@ -41,11 +41,11 @@ use crate::{
 mod tests;
 
 /// Access a value of a property by id.
-pub trait Properties {
+pub trait PropertiesAccess {
     /// Get a value of property, or [`Value::None`] if the property does not exist.
     fn get_property(&self, id: &Identifier) -> Option<&Value>;
     /// Set or create properties with the given ids and values.
-    fn set_properties(&mut self, props: ObjectProperties);
+    fn set_properties(&mut self, props: Properties);
 }
 /// A reference counted, mutable [`Model`].
 #[derive(Debug, Clone, Deref, DerefMut)]
@@ -153,7 +153,7 @@ impl Model {
     /// Return inner model if we are in an [`Object`].
     pub fn into_inner_object_model(&self) -> Option<Model> {
         self.borrow().children.iter().next().and_then(|n| {
-            if let Element::Object(_) = n.0.borrow().element.value {
+            if let Element::Workpiece(_) = n.0.borrow().element.value {
                 Some(n.clone())
             } else {
                 None

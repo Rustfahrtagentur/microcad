@@ -3,6 +3,8 @@
 
 An array is an ordered collection of values.
 
+[![test](.test/arrays_and_comments.png)](.test/arrays_and_comments.log)
+
 ```µcad,arrays_and_comments
 [
     // First element
@@ -14,6 +16,8 @@ An array is an ordered collection of values.
 ```
 
 You can count the number of elements in an array using `std::count`:
+
+[![test](.test/array_expressions.png)](.test/array_expressions.log)
 
 ```µcad,array_expressions
 std::debug::assert_eq([std::count([1,2,3]), 3]);

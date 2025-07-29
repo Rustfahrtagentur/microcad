@@ -61,7 +61,7 @@ impl<'a> ArgumentMatch<'a> {
                 if !id.is_empty() {
                     if let Some(n) = self.params.iter().position(|(i, _)| i == id) {
                         let (id, _) = self.params.swap_remove(n);
-                        log::trace!("found parameter by id: {id}");
+                        log::trace!("found parameter by id: {id:?}");
                         self.result.insert((*id).clone(), arg.value.clone());
                         return false;
                     }
@@ -106,7 +106,7 @@ impl<'a> ArgumentMatch<'a> {
 
                 if let Some((n, id, _)) = same_type.next() {
                     if same_type.next().is_none() {
-                        log::trace!("found parameter by type: {id}");
+                        log::trace!("found parameter by type: {id:?}");
                         self.result.insert((**id).clone(), arg.value.clone());
                         self.params.swap_remove(*n);
                         return false;
@@ -131,7 +131,7 @@ impl<'a> ArgumentMatch<'a> {
                 if let Some(def) = &param.default_value {
                     // paranoia check if type is compatible
                     if def.ty() == param.ty() {
-                        log::trace!("found argument by default: {id} = {def}");
+                        log::trace!("found argument by default: {id:?} = {def}");
                         self.result.insert((*id).clone(), def.clone());
                         return false;
                     }
@@ -144,11 +144,13 @@ impl<'a> ArgumentMatch<'a> {
     /// Return error if params are missing or arguments are to many
     fn check_missing(&self) -> EvalResult<()> {
         if !self.params.is_empty() {
-            let mut missing: Vec<_> = self.params.iter().map(|(id, _)| (*id).clone()).collect();
+            let mut missing: IdentifierList =
+                self.params.iter().map(|(id, _)| (*id).clone()).collect();
             missing.sort();
             Err(EvalError::MissingArguments(missing))
         } else if !self.arguments.is_empty() {
-            let mut too_many: Vec<_> = self.arguments.iter().map(|(id, _)| (*id).clone()).collect();
+            let mut too_many: IdentifierList =
+                self.arguments.iter().map(|(id, _)| (*id).clone()).collect();
             too_many.sort();
             Err(EvalError::TooManyArguments(too_many))
         } else {
@@ -168,7 +170,7 @@ impl<'a> ArgumentMatch<'a> {
     ///
     /// Return one or many tuples.
     fn multiply(&self, params: &ParameterValueList) -> Vec<Tuple> {
-        let ids: Vec<_> = Self::multipliers(&self.result, params);
+        let ids: IdentifierList = Self::multipliers(&self.result, params);
         if !ids.is_empty() {
             let mut result = Vec::new();
             self.result.multiplicity(ids, |t| result.push(t));
@@ -179,12 +181,12 @@ impl<'a> ArgumentMatch<'a> {
     }
 
     /// Return the multipliers' ids in the arguments.
-    fn multipliers(args: &impl ValueAccess, params: &ParameterValueList) -> Vec<Identifier> {
-        let mut result: Vec<_> = params
+    fn multipliers(args: &impl ValueAccess, params: &ParameterValueList) -> IdentifierList {
+        let mut result: IdentifierList = params
             .iter()
             .filter_map(|(id, param)| {
                 if let Some(a) = args.by_id(id) {
-                    if a.ty().is_list_of(&param.ty()) {
+                    if a.ty().is_array_of(&param.ty()) {
                         return Some(id);
                     }
                 }
