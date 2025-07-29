@@ -367,6 +367,13 @@ assignment = { (qualifier ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ 
 
 assignment_statement = { (attribute_list ~ ws+)? ~ assignment ~ ws* ~ ";" }
 
+// `r:=circle();`: ok
+// `r:=translate() circle();`: ok
+// `r:=translate() { circle() }`: ok
+model_assignment = { identifier ~ ws* ~ ":=" ~ ws* ~ expression }
+
+model_assignment_statement = { (attribute_list ~ ws+)? ~ model_assignment ~ ws* ~ ";" }
+
 // `@children`: ok
 marker = { "@" ~ identifier }
 
@@ -446,6 +453,7 @@ statement = {
   | if_statement
   | inner_attribute_statement
   | assignment_statement
+  | model_assignment_statement
   | expression_statement
 }
 
