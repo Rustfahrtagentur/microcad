@@ -215,9 +215,11 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 // `{ translate() rotate(); }`: ok
 // `{} {}`: error # Cannot nest bodies
 // `holes.edges`: error # No tuple access in nested module
-nested = { nested_with_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
+nested = { nested_with_body | nested_item ~ (ws+ ~ nested_item)* }
 
-nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ body }
+nested_with_body = _{ (nested_item ~ (ws+ ~ nested_item)*)? ~ ws* ~ body }
+
+nested_item = _{ call | qualified_name }
 
 // `-5.0mm`: ok # Negate
 // `(a+b)*(c-a)`: ok
@@ -235,19 +237,6 @@ nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))
 // `[3,5,5]`: ok # List expression
 // `1 if 3 > 2 else 0`: ok # Ternary operator
 // `a()`: ok # Simple call
-// `translate() rotate()`: ok # Nested call
-// `translate() rotate() { translate() rotate() {} }`: ok # Nested call
-// `a | a::b()`: ok
-// `a | b & c`: ok
-// `a() b() | b & c | d`: ok
-// `circle(r = 5.0mm)`: ok
-// `circle(r = 5.0mm) {}`: ok
-// `translate(x = 5.0mm) { rectangle(width = 5.0mm); }`: ok
-// `translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
-// `translate(r = 5.0mm) circle(r = 5.0mm)`: ok
-// `{}`: ok # Empty body
-// `{ rectangle(width = 5.0mm); }`: ok # Single statement body
-// `translate(x = 5mm)`: ok
 // `[hole_positions.bottom]`: ok # List access with tuple access
 // `mountable_plate(hole_positions = hole_positions.edges - [hole_positions.bottom])`: ok # Tuple access
 // `1000mm == 1m`: ok # Comparison
@@ -279,7 +268,26 @@ unary_minus =  { "-" }
 unary_plus  =  { "+" }
 unary_not   =  { "!" }
 postfix     = _{ element_access }
-primary     = _{ literal | marker | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | array_expression }
+primary     = _{ literal | marker | call | qualified_name | format_string | tuple_expression | array_expression | "(" ~ ws* ~ expression ~ ws* ~ ")" }
+
+// `translate() rotate()`: ok # Nested call
+// `translate() rotate() { translate() rotate() {} }`: ok # Nested call
+// `a | a::b()`: ok
+// `a | b & c`: ok
+// `a() b() | b & c | d`: ok
+// `circle(r = 5.0mm)`: ok
+// `circle(r = 5.0mm) {}`: ok
+// `translate(x = 5.0mm) { rectangle(width = 5.0mm); }`: ok
+// `translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
+// `translate(r = 5.0mm) circle(r = 5.0mm)`: ok
+// `{}`: ok # Empty body
+// `{ rectangle(width = 5.0mm); }`: ok # Single statement body
+// `translate(x = 5mm)`: ok
+model_expression =  { model_unary_op* ~ ws* ~ model_primary ~ ws* ~ postfix* ~ (ws* ~ model_bin_op ~ ws* ~ model_unary_op* ~ ws* ~ model_primary ~ ws* ~ model_postfix*)* }
+model_unary_op   =  { nested_item }
+model_bin_op     = _{ union | intersection | subtract }
+model_postfix    = _{ element_access }
+model_primary    = _{ marker | nested_item | "(" ~ ws* ~ model_expression ~ ws* ~ ")" }
 
 // `a, b, c`: ok
 // `1+2, 4*3, 3.2`: ok
