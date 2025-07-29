@@ -23,7 +23,7 @@ impl std::ops::Mul<Mat3> for RenderResolution {
     type Output = RenderResolution;
 
     fn mul(self, rhs: Mat3) -> Self::Output {
-        let scale = rhs.x.x * rhs.y.y;
+        let scale = (rhs.x.x * rhs.y.y).sqrt();
         Self {
             linear: self.linear / scale,
         }
@@ -34,7 +34,7 @@ impl std::ops::Mul<Mat4> for RenderResolution {
     type Output = RenderResolution;
 
     fn mul(self, rhs: Mat4) -> Self::Output {
-        let scale = rhs.x.x * rhs.y.y * rhs.z.z;
+        let scale = (rhs.x.x * rhs.y.y * rhs.z.z).powf(1.0 / 3.0);
         Self {
             linear: self.linear / scale,
         }
