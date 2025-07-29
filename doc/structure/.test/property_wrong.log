@@ -21,25 +21,3 @@ std::info("outer: {t.outer}");
 // error: but you cannot access `inner` anymore
 std::info("inner: {t.inner}");
 
--- Output --
--- Errors --
-info: outer: 10mm
-  ---> <from_str>:14:11
-     |
-  14 | std::info("outer: {t.outer}");
-     |           ^^^^^^^^^^^^^^^^^^
-     |
-error: Property not found: inner
-  ---> <from_str>:16:20
-     |
-  16 | std::info("inner: {t.inner}");
-     |                    ^^^^^^^
-     |
-info: inner: <INVALID VALUE>
-  ---> <from_str>:16:11
-     |
-  16 | std::info("inner: {t.inner}");
-     |           ^^^^^^^^^^^^^^^^^^
-     |
--- Test Result --
-FAILED AS EXPECTED

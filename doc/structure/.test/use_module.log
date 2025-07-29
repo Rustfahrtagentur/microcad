@@ -10,7 +10,3 @@ use std::geo2d;
 
 geo2d::circle(r = 40mm);
 
--- Output --
--- Errors --
--- Test Result --
-OK

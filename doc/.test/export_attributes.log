@@ -10,7 +10,3 @@ std::geo2d::rect(42mm);
 #[export = "circle.svg"]  // Will be exported to `circle.svg`
 std::geo2d::circle(r = 42mm);
 
--- Output --
--- Errors --
--- Test Result --
-OK

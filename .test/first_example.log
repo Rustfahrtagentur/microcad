@@ -24,7 +24,3 @@ part lid(
 // `l` is the instance of the lid model
 lid();
 
--- Output --
--- Errors --
--- Test Result --
-OK

@@ -10,7 +10,3 @@ use std::geo2d::circle as disk;
 
 disk(r = 4mm);
 
--- Output --
--- Errors --
--- Test Result --
-OK

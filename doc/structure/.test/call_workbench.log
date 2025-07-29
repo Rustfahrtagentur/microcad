@@ -15,7 +15,3 @@ s = square(size=2cm);
 // translate object s
 std::ops::translate(x = 1cm) s;
 
--- Output --
--- Errors --
--- Test Result --
-OK

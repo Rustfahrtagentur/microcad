@@ -11,7 +11,3 @@ ops::difference() {
     geo2d::rect(size = 2mm);
 };
 
--- Output --
--- Errors --
--- Test Result --
-OK

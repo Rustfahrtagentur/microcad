@@ -12,7 +12,3 @@ sketch wheel(radius: Length) {
 
 std::debug::assert_eq([wheel(5cm).radius, 5cm]);
 
--- Output --
--- Errors --
--- Test Result --
-OK

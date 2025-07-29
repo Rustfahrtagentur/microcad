@@ -9,7 +9,3 @@ use std::geo3d::*;
 sphere(r = 4mm);
 cube(size = 40mm);
 
--- Output --
--- Errors --
--- Test Result --
-OK BUT IS TODO

@@ -9,7 +9,3 @@ std::ops::union() {
     std::geo2d::rect(width = 3mm, height = 2mm);
 }
 
--- Output --
--- Errors --
--- Test Result --
-OK

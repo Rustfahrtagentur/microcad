@@ -24,7 +24,3 @@ wheel(radius=5cm, thickness=1cm);
 // call with initializer
 wheel(diameter=10cm, thickness=1cm);
 
--- Output --
--- Errors --
--- Test Result --
-OK

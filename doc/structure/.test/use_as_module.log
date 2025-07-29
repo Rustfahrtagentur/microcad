@@ -10,7 +10,3 @@ use std::geo2d as geo;
 
 geo::circle(r = 4mm);
 
--- Output --
--- Errors --
--- Test Result --
-OK
