@@ -53,6 +53,6 @@ impl PrintSyntax for Argument {
             Some(ref name) => writeln!(f, "{:depth$}Argument '{}':", "", name)?,
             None => writeln!(f, "{:depth$}Argument:", "")?,
         };
-        self.value.print_syntax(f, depth)
+        self.value.print_syntax(f, depth + Self::INDENT)
     }
 }

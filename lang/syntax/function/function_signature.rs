@@ -32,10 +32,10 @@ impl FunctionSignature {
 impl PrintSyntax for FunctionSignature {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         writeln!(f, "{:depth$} Parameters:", "")?;
-        self.parameters.print_syntax(f, depth + 2)?;
+        self.parameters.print_syntax(f, depth + Self::INDENT)?;
         if let Some(return_type) = &self.return_type {
             writeln!(f, "{:depth$} Return:", "")?;
-            return_type.print_syntax(f, depth + 2)?;
+            return_type.print_syntax(f, depth + Self::INDENT)?;
         };
         Ok(())
     }
