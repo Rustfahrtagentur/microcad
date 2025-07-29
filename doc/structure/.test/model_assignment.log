@@ -1,0 +1,12 @@
+-- Test --
+  model_assignment
+  ../doc/structure/model_assignments.md:5
+
+-- Code --
+
+c := std::geo2d::circle(r = 42mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

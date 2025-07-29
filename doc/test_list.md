@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**205** tests from markdown.
+**206** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -95,6 +95,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/missed_property.png)](../doc/structure/.test/missed_property.log) | [missed_property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/mod.png)](../doc/structure/.test/mod.log) | [mod](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/mod_example.png)](../doc/structure/.test/mod_example.log) | [mod_example](../doc/structure/modules.md) |
+| [![test](../doc/structure/.test/model_assignment.png)](../doc/structure/.test/model_assignment.log) | [model_assignment](../doc/structure/model_assignments.md) |
 | [![test](../doc/tests/.test/module_assignment_const.png)](../doc/tests/.test/module_assignment_const.log) | [module_assignment_const](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/module_assignment_prop.png)](../doc/tests/.test/module_assignment_prop.log) | [module_assignment_prop](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/module_assignment_var.png)](../doc/tests/.test/module_assignment_var.log) | [module_assignment_var](../doc/tests/statement_usage.md) |
