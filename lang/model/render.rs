@@ -19,7 +19,7 @@ impl Model {
         let mut self_ = self.borrow_mut();
         let mut output_type = match &*self_.element {
             Element::Workpiece(_) => OutputType::NotDetermined,
-            Element::ChildrenPlaceholder => OutputType::NotDetermined,
+            Element::ChildrenMarker => OutputType::NotDetermined,
             Element::Transform(_) => OutputType::NotDetermined,
             Element::Primitive2D(_) => OutputType::Geometry2D,
             Element::Primitive3D(_) => OutputType::Geometry3D,

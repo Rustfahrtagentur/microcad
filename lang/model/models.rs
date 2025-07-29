@@ -21,7 +21,6 @@ impl Models {
     }
 
     /// Returns a property of the included models.
-    /// TODO is this correct behavior?
     pub fn fetch_property(&self, id: &Identifier) -> Option<Value> {
         if let Some(model) = self.single_model() {
             model.borrow().get_property(id).cloned()

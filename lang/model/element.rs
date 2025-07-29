@@ -18,7 +18,7 @@ pub enum Element {
     /// A special element after which children will be nested as siblings.
     ///
     /// This element is removed after the children have been inserted.
-    ChildrenPlaceholder,
+    ChildrenMarker,
 
     /// An affine transform.
     Transform(AffineTransform),

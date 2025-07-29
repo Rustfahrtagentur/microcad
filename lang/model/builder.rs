@@ -41,7 +41,7 @@ impl ModelBuilder {
     /// Create a new children placeholder
     pub fn new_children_placeholder() -> Self {
         Self {
-            root: ModelInner::new(Refer::none(Element::ChildrenPlaceholder)),
+            root: ModelInner::new(Refer::none(Element::ChildrenMarker)),
             ..Default::default()
         }
     }

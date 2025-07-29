@@ -131,8 +131,7 @@ impl Model {
     /// Find children model placeholder in model descendants.
     pub fn find_children_placeholder(&self) -> Option<Model> {
         self.descendants().find(|n| {
-            n.borrow().id.is_none()
-                && matches!(n.0.borrow().element.value, Element::ChildrenPlaceholder)
+            n.borrow().id.is_none() && matches!(n.0.borrow().element.value, Element::ChildrenMarker)
         })
     }
 
