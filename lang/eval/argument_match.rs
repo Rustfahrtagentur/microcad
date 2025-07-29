@@ -186,7 +186,7 @@ impl<'a> ArgumentMatch<'a> {
             .iter()
             .filter_map(|(id, param)| {
                 if let Some(a) = args.by_id(id) {
-                    if a.ty().is_list_of(&param.ty()) {
+                    if a.ty().is_array_of(&param.ty()) {
                         return Some(id);
                     }
                 }
