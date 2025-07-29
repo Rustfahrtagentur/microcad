@@ -142,12 +142,14 @@ impl PrintSyntax for Value {
 impl PrintSyntax for Expression {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         match self {
-            Self::Value(value) => value.print_syntax(f, depth),
-            Self::Literal(literal) => literal.print_syntax(f, depth),
-            Self::FormatString(format_string) => format_string.print_syntax(f, depth),
-            Self::ListExpression(list_expression) => list_expression.print_syntax(f, depth),
-            Self::TupleExpression(tuple_expression) => tuple_expression.print_syntax(f, depth),
-            Self::BinaryOp {
+            Expression::Value(value) => value.print_syntax(f, depth),
+            Expression::Literal(literal) => literal.print_syntax(f, depth),
+            Expression::FormatString(format_string) => format_string.print_syntax(f, depth),
+            Expression::ListExpression(list_expression) => list_expression.print_syntax(f, depth),
+            Expression::TupleExpression(tuple_expression) => {
+                tuple_expression.print_syntax(f, depth)
+            }
+            Expression::BinaryOp {
                 lhs,
                 op,
                 rhs,
@@ -157,7 +159,7 @@ impl PrintSyntax for Expression {
                 lhs.print_syntax(f, depth + Self::INDENT)?;
                 rhs.print_syntax(f, depth + Self::INDENT)
             }
-            Self::UnaryOp {
+            Expression::UnaryOp {
                 op,
                 rhs,
                 src_ref: _,
@@ -165,27 +167,27 @@ impl PrintSyntax for Expression {
                 writeln!(f, "{:depth$}UnaryOp '{op}':", "")?;
                 rhs.print_syntax(f, depth + Self::INDENT)
             }
-            Self::ArrayElementAccess(lhs, rhs, _) => {
+            Expression::ArrayElementAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}ArrayElementAccess:", "")?;
                 lhs.print_syntax(f, depth + Self::INDENT)?;
                 rhs.print_syntax(f, depth + Self::INDENT)
             }
-            Self::PropertyAccess(lhs, rhs, _) => {
+            Expression::PropertyAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}FieldAccess:", "")?;
                 lhs.print_syntax(f, depth + Self::INDENT)?;
                 rhs.print_syntax(f, depth + Self::INDENT)
             }
-            Self::AttributeAccess(lhs, rhs, _) => {
+            Expression::AttributeAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}AttributeAccess:", "")?;
                 lhs.print_syntax(f, depth + Self::INDENT)?;
                 rhs.print_syntax(f, depth + Self::INDENT)
             }
-            Self::MethodCall(lhs, method_call, _) => {
+            Expression::MethodCall(lhs, method_call, _) => {
                 writeln!(f, "{:depth$}MethodCall:", "")?;
                 lhs.print_syntax(f, depth + Self::INDENT)?;
                 method_call.print_syntax(f, depth + Self::INDENT)
             }
-            Self::Nested(nested) => nested.print_syntax(f, depth),
+            Expression::Nested(nested) => nested.print_syntax(f, depth),
             _ => unimplemented!(),
         }
     }

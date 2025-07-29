@@ -11,22 +11,22 @@ use std::collections::BTreeMap;
 ///
 /// It is required that properties are always sorted by their id.
 #[derive(Clone, Default, Debug, Deref, DerefMut)]
-pub struct ObjectProperties(BTreeMap<Identifier, Value>);
+pub struct Properties(BTreeMap<Identifier, Value>);
 
-impl FromIterator<(Identifier, Value)> for ObjectProperties {
+impl FromIterator<(Identifier, Value)> for Properties {
     fn from_iter<T: IntoIterator<Item = (Identifier, Value)>>(iter: T) -> Self {
         Self(iter.into_iter().collect())
     }
 }
 
-impl ObjectProperties {
+impl Properties {
     /// Test if each property has a value.
     pub fn is_valid(&self) -> bool {
         self.0.iter().all(|(_, value)| !value.is_invalid())
     }
 }
 
-impl std::fmt::Display for ObjectProperties {
+impl std::fmt::Display for Properties {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "ObjectProperties:")?;
         for (id, value) in self.0.iter() {
