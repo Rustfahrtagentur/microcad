@@ -44,7 +44,7 @@ impl PrintSyntax for IfStatement {
         self.cond.print_syntax(f, depth + Self::INDENT)?;
         self.body.print_syntax(f, depth + Self::INDENT)?;
         if let Some(body_else) = &self.body_else {
-            writeln!(f, "{:depth$} Else:", "")?;
+            writeln!(f, "{:depth$}Else:", "")?;
             body_else.print_syntax(f, depth + Self::INDENT)?;
         }
         Ok(())

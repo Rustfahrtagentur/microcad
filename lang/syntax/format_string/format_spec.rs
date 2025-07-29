@@ -37,10 +37,10 @@ impl PrintSyntax for FormatSpec {
     fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
         match (self.width, self.precision) {
             (Some(width), Some(precision)) => {
-                writeln!(f, "{:depth$} FormatSpec: 0{width}.{precision}", "")
+                writeln!(f, "{:depth$}FormatSpec: 0{width}.{precision}", "")
             }
-            (None, Some(precision)) => writeln!(f, "{:depth$} FormatSpec: .{precision}", ""),
-            (Some(width), None) => writeln!(f, "{:depth$} FormatSpec:  0{width}", ""),
+            (None, Some(precision)) => writeln!(f, "{:depth$}FormatSpec: .{precision}", ""),
+            (Some(width), None) => writeln!(f, "{:depth$}FormatSpec:  0{width}", ""),
             _ => Ok(()),
         }
     }
