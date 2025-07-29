@@ -25,6 +25,26 @@ impl Parse for AssignmentStatement {
     }
 }
 
+impl Parse for ModelAssignment {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Ok(Self {
+            id: crate::find_rule!(pair, identifier)?,
+            expression: crate::find_rule!(pair, expression)?,
+            src_ref: pair.into(),
+        })
+    }
+}
+
+impl Parse for ModelAssignmentStatement {
+    fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
+        Ok(Self {
+            attribute_list: crate::find_rule!(pair, attribute_list)?,
+            assignment: crate::find_rule_opt!(pair, model_assignment).expect("ModelAssignment"),
+            src_ref: pair.into(),
+        })
+    }
+}
+
 impl Parse for IfStatement {
     fn parse(pair: Pair) -> ParseResult<Self> {
         let mut cond = Default::default();
@@ -97,6 +117,9 @@ impl Parse for Statement {
             Rule::inner_attribute => Self::InnerAttribute(Attribute::parse(first)?),
 
             Rule::assignment_statement => Self::Assignment(AssignmentStatement::parse(first)?),
+            Rule::model_assignment_statement => {
+                Self::ModelAssignment(ModelAssignmentStatement::parse(first)?)
+            }
             Rule::expression_statement | Rule::final_expression_statement => {
                 Self::Expression(ExpressionStatement::parse(first)?)
             }
