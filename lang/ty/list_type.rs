@@ -8,22 +8,22 @@ use crate::ty::*;
 #[allow(rustdoc::broken_intra_doc_links)]
 /// List type (e.g. '[scalar]')
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ListType(pub Box<Type>);
+pub struct ArrayType(pub Box<Type>);
 
-impl ListType {
+impl ArrayType {
     /// Generate `ListType` from `Type`
     pub fn new(t: Type) -> Self {
         Self(Box::new(t))
     }
 }
 
-impl crate::ty::Ty for ListType {
+impl crate::ty::Ty for ArrayType {
     fn ty(&self) -> Type {
         self.0.as_ref().clone()
     }
 }
 
-impl std::fmt::Display for ListType {
+impl std::fmt::Display for ArrayType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "[{}]", self.0)
     }

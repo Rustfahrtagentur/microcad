@@ -10,19 +10,19 @@ use crate::{syntax::*, ty::*};
 pub enum Type {
     /// Invalid type (used for error handling)
     Invalid,
-    /// A 64-bit integer number
+    /// A 64-bit integer number: `Interger: 10`.
     Integer,
-    /// A 64-bit floating-point number
+    /// A quantity type: `Scalar: 1.0`, `Length: 1.0mm`
     Quantity(QuantityType),
-    /// A string
+    /// A string.
     String,
-    /// A boolean: true, false
+    /// A boolean: `true`, `false`.
     Bool,
-    /// A list of elements of the same type: `[Scalar]`
-    List(ListType),
-    /// A named tuple of elements: `(x: Scalar, y: String)`
+    /// An array of elements of the same type: `[Scalar]`.
+    Array(ArrayType),
+    /// A named tuple of elements: `(x: Scalar, y: String)`.
     Tuple(Box<TupleType>),
-    /// Matrix type
+    /// Matrix type: `Matrix3x3`.
     Matrix(MatrixType),
     /// Models.
     Models,
@@ -42,9 +42,9 @@ impl Type {
     }
 
     /// Check if the type is a list of the given type `ty`
-    pub fn is_list_of(&self, ty: &Type) -> bool {
+    pub fn is_array_of(&self, ty: &Type) -> bool {
         match self {
-            Self::List(list_type) => &list_type.ty() == ty,
+            Self::Array(list_type) => &list_type.ty() == ty,
             _ => false,
         }
     }
@@ -64,7 +64,7 @@ impl std::fmt::Display for Type {
             Self::Quantity(quantity) => write!(f, "{quantity}"),
             Self::String => write!(f, "String"),
             Self::Bool => write!(f, "Bool"),
-            Self::List(t) => write!(f, "{t}"),
+            Self::Array(t) => write!(f, "{t}"),
             Self::Tuple(t) => write!(f, "{t}"),
             Self::Matrix(t) => write!(f, "{t}"),
             Self::Models => write!(f, "Models"),

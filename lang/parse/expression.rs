@@ -14,7 +14,7 @@ impl Parse for ExpressionList {
     }
 }
 
-impl Parse for ListExpression {
+impl Parse for ArrayExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self {
             list: pair
@@ -59,7 +59,7 @@ lazy_static::lazy_static! {
             .op(Op::prefix(unary_plus))
             .op(Op::prefix(unary_not))
             .op(Op::postfix(method_call))
-            .op(Op::postfix(list_element_access))
+            .op(Op::postfix(array_element_access))
             .op(Op::postfix(tuple_element_access))
             .op(Op::postfix(attribute_access))
     };
@@ -93,8 +93,8 @@ impl Parse for Expression {
                 ) {
                     (primary, Rule::literal) => Ok(Self::Literal(Literal::parse(primary)?)),
                     (primary, Rule::expression) => Ok(Self::parse(primary)?),
-                    (primary, Rule::list_expression) => {
-                        Ok(Self::ListExpression(ListExpression::parse(primary)?))
+                    (primary, Rule::array_expression) => {
+                        Ok(Self::ArrayExpression(ArrayExpression::parse(primary)?))
                     }
                     (primary, Rule::tuple_expression) => {
                         Ok(Self::TupleExpression(TupleExpression::parse(primary)?))
@@ -158,7 +158,7 @@ impl Parse for Expression {
             })
             .map_postfix(|lhs, op| {
                 match (Pair::new(op.clone(), pair.source_hash()), op.as_rule()) {
-                    (op, Rule::list_element_access) => Ok(Self::ArrayElementAccess(
+                    (op, Rule::array_element_access) => Ok(Self::ArrayElementAccess(
                         Box::new(lhs?),
                         Box::new(Self::parse(op)?),
                         pair.clone().into(),
