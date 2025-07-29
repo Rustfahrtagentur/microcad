@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**212** tests from markdown.
+**205** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -44,13 +44,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/code.png)](../doc/structure/.test/code.log) | [code](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code_between_initializers.png)](../doc/structure/.test/code_between_initializers.log) | [code_between_initializers](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code_post_init.png)](../doc/structure/.test/code_post_init.log) | [code_post_init](../doc/structure/workbench.md) |
-| [![test](../doc/examples/.test/complex1_1.png)](../doc/examples/.test/complex1_1.log) | [complex1_1](../doc/examples/complex.md) |
-| [![test](../doc/examples/.test/complex1_2.png)](../doc/examples/.test/complex1_2.log) | [complex1_2](../doc/examples/complex.md) |
-| [![test](../doc/examples/.test/complex1_3.png)](../doc/examples/.test/complex1_3.log) | [complex1_3](../doc/examples/complex.md) |
-| [![test](../doc/examples/.test/complex1_4.png)](../doc/examples/.test/complex1_4.log) | [complex1_4](../doc/examples/complex.md) |
-| [![test](../doc/examples/.test/complex1_5.png)](../doc/examples/.test/complex1_5.log) | [complex1_5](../doc/examples/complex.md) |
-| [![test](../doc/examples/.test/complex1_6.png)](../doc/examples/.test/complex1_6.log) | [complex1_6](../doc/examples/complex.md) |
-| [![test](../doc/examples/.test/complex1_7.png)](../doc/examples/.test/complex1_7.log) | [complex1_7](../doc/examples/complex.md) |
 | [![test](../doc/libs/std/ops/.test/difference_alt_operator.png)](../doc/libs/std/ops/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/libs/std/ops/difference.md) |
 | [![test](../doc/libs/std/ops/.test/difference_operator.png)](../doc/libs/std/ops/.test/difference_operator.log) | [difference_operator](../doc/libs/std/ops/difference.md) |
 | [![test](../doc/structure/.test/example.png)](../doc/structure/.test/example.log) | [example](../doc/structure/functions.md) |
