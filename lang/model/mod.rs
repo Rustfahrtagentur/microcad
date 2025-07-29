@@ -150,10 +150,10 @@ impl Model {
         }
     }
 
-    /// Return inner model if we are in an [`Object`].
-    pub fn into_inner_object_model(&self) -> Option<Model> {
+    /// Return group node if this node contains a model with a Group element as child.
+    pub fn reach_into_group(&self) -> Option<Model> {
         self.borrow().children.iter().next().and_then(|n| {
-            if let Element::Workpiece(_) = n.0.borrow().element.value {
+            if let Element::Group = n.0.borrow().element.value {
                 Some(n.clone())
             } else {
                 None

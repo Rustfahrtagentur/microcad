@@ -80,12 +80,6 @@ impl PropertiesAccess for ModelInner {
     }
 }
 
-impl From<Properties> for ModelInner {
-    fn from(props: Properties) -> Self {
-        Self::new(Refer::none(Element::Workpiece(props)))
-    }
-}
-
 impl From<Rc<Geometry2D>> for ModelInner {
     fn from(geometry: Rc<Geometry2D>) -> Self {
         Self::new(Refer::none(Element::Primitive2D(geometry)))

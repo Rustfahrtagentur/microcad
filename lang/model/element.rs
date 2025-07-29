@@ -8,12 +8,15 @@ use microcad_core::*;
 use strum::IntoStaticStr;
 
 /// An element defines the entity of a [`Model`].
-#[derive(Clone, IntoStaticStr, Debug)]
+#[derive(Clone, IntoStaticStr, Debug, Default)]
 pub enum Element {
-    /// An workpiece that contains children and holds properties.
+    /// A group element is created by a body.
+    #[default]
+    Group,
+    /// An workpiece created by a workbench of a certain kind. Holds accessible properties.
     ///
     /// Workpiece can be created by builtins, assignments, expressions and workbenches.
-    Workpiece(Properties),
+    Workpiece(WorkbenchKind, Properties),
 
     /// A special element after which children will be nested as siblings.
     ///
@@ -31,12 +34,6 @@ pub enum Element {
 
     /// An operation that generates geometries from its children.
     Operation(std::rc::Rc<dyn Operation>),
-}
-
-impl Default for Element {
-    fn default() -> Self {
-        Element::Workpiece(Default::default())
-    }
 }
 
 impl std::fmt::Display for Element {
@@ -59,17 +56,17 @@ impl std::fmt::Display for Element {
 impl PropertiesAccess for Element {
     fn get_property(&self, id: &Identifier) -> Option<&Value> {
         match self {
-            Self::Workpiece(object) => object.get(id),
-            _ => unreachable!("not an object element"),
+            Self::Workpiece(_, object) => object.get(id),
+            _ => unreachable!("not a workpiece element"),
         }
     }
 
     fn set_properties(&mut self, props: Properties) {
         match self {
-            Self::Workpiece(p) => {
+            Self::Workpiece(_, p) => {
                 p.extend(props.iter().map(|(id, prop)| (id.clone(), prop.clone())));
             }
-            _ => unreachable!("not an object element"),
+            element => unreachable!("not a workpiece element: {element}"),
         }
     }
 }

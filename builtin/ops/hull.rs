@@ -11,7 +11,7 @@ impl Operation for Hull {
     fn process_2d(&self, model: &Model) -> microcad_core::Geometries2D {
         let mut geometries = Geometries2D::default();
 
-        if let Some(model) = model.into_inner_object_model() {
+        if let Some(model) = model.reach_into_group() {
             let self_ = model.borrow();
 
             self_.children.iter().for_each(|model| {

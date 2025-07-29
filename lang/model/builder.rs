@@ -10,7 +10,10 @@ use crate::{eval::*, model::*, rc::*, src_ref::*, syntax::*};
 /// A builder pattern to build models
 #[derive(Default)]
 pub struct ModelBuilder {
+    /// The content of the model node to be built.
     root: ModelInner,
+    /// Optional workpiece kind, used if we build a workpiece.
+    kind: Option<WorkbenchKind>,
     /// Properties to add to the model if it is an [`Object`]
     pub properties: Properties,
     /// Children to add to this model.
@@ -109,16 +112,22 @@ impl ModelBuilder {
 
     /// Set object properties.
     pub fn properties(mut self, properties: Properties) -> Self {
-        log::trace!("Properties:\n{properties}");
         self.properties = properties;
+        self
+    }
+
+    /// Set workpiece kind if we build a workpiece.
+    pub fn kind(mut self, kind: WorkbenchKind) -> Self {
+        self.kind = Some(kind);
         self
     }
 
     /// Build a [`Model`].
     pub fn build(mut self) -> Model {
-        if let Element::Workpiece(props) = &mut self.root.element.value {
+        if let Element::Workpiece(kind, props) = &mut self.root.element.value {
             log::trace!("Copy object properties:\n{}", self.properties);
             *props = self.properties;
+            *kind = self.kind.expect("Workpiece kind");
         }
 
         let model = Model::new(self.root.into());
