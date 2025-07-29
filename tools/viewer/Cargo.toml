@@ -27,6 +27,7 @@ bevy = { version = "0.16.0", default-features = false, features = [
 ] }
 smol = { version = "2.0.0" }
 async-compat = { version = "0.2.4" }
+spin_on = { version = "0.1" }
 
 cgmath = { version = "0.18.0", optional = true }
 microcad-lang = { workspace = true }
