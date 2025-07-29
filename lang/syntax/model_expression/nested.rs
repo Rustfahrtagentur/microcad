@@ -12,7 +12,7 @@ use derive_more::Deref;
 /// * translate() rotate() a
 /// * a::b
 #[derive(Clone, Debug, Deref)]
-pub struct Nested(pub Refer<Vec<NestedItem>>);
+pub struct Nested(pub Refer<Vec<model_expression::nested_item::NestedItem>>);
 
 impl Nested {
     /// Returns an identifier if the nested item is a single identifier, e.g. "foo"
@@ -32,7 +32,9 @@ impl Nested {
     pub fn single_qualified_name(&self) -> Option<QualifiedName> {
         if self.0.len() == 1 {
             match self.0.first() {
-                Some(NestedItem::QualifiedName(name)) => Some(name.clone()),
+                Some(model_expression::nested_item::NestedItem::QualifiedName(name)) => {
+                    Some(name.clone())
+                }
                 _ => None,
             }
         } else {
@@ -42,7 +44,7 @@ impl Nested {
 }
 
 impl SrcReferrer for Nested {
-    fn src_ref(&self) -> expression::SrcRef {
+    fn src_ref(&self) -> model_expression::SrcRef {
         self.0.src_ref()
     }
 }

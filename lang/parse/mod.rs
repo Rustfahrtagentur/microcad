@@ -32,6 +32,7 @@ mod identifier;
 mod init_definition;
 mod lang_type;
 mod literal;
+mod model_expression;
 mod module;
 mod parameter;
 mod source_file;

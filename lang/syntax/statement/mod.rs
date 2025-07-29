@@ -9,6 +9,7 @@ mod assignment_statement;
 mod expression_statement;
 mod if_statement;
 mod model_assignment_statement;
+mod model_expression_statement;
 mod return_statement;
 mod statement_list;
 
@@ -16,6 +17,7 @@ pub use assignment_statement::*;
 pub use expression_statement::*;
 pub use if_statement::*;
 pub use model_assignment_statement::*;
+pub use model_expression_statement::*;
 pub use return_statement::*;
 pub use statement_list::*;
 
@@ -46,6 +48,8 @@ pub enum Statement {
     ModelAssignment(ModelAssignmentStatement),
     /// Expression statement.
     Expression(ExpressionStatement),
+    /// Model expression statement.
+    ModelExpression(ModelExpressionStatement),
 }
 
 impl SrcReferrer for Statement {
@@ -64,6 +68,7 @@ impl SrcReferrer for Statement {
             Self::Assignment(a) => a.src_ref(),
             Self::ModelAssignment(ma) => ma.src_ref(),
             Self::Expression(e) => e.src_ref(),
+            Self::ModelExpression(me) => me.src_ref(),
         }
     }
 }
@@ -92,6 +97,7 @@ impl std::fmt::Display for Statement {
             Self::Assignment(a) => write!(f, "{a}"),
             Self::ModelAssignment(ma) => write!(f, "{ma}"),
             Self::Expression(e) => write!(f, "{e}"),
+            Self::ModelExpression(me) => write!(f, "{me}"),
         }
     }
 }
@@ -113,6 +119,7 @@ impl PrintSyntax for Statement {
             Self::Assignment(a) => a.print_syntax(f, depth),
             Self::ModelAssignment(ma) => ma.print_syntax(f, depth),
             Self::Expression(e) => e.print_syntax(f, depth),
+            Self::ModelExpression(me) => me.print_syntax(f, depth),
         }
     }
 }

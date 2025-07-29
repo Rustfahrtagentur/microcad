@@ -4,15 +4,9 @@
 //! µcad syntax elements related to expressions
 
 mod array_expression;
-mod marker;
-mod nested;
-mod nested_item;
 mod tuple_expression;
 
 pub use array_expression::*;
-pub use marker::*;
-pub use nested::*;
-pub use nested_item::*;
 pub use tuple_expression::*;
 
 use crate::{src_ref::*, syntax::*, value::*};
@@ -36,10 +30,6 @@ pub enum Expression {
     ArrayExpression(ArrayExpression),
     /// A tuple: (a, b, c)
     TupleExpression(TupleExpression),
-    /// A list whitespace separated of nested items: `translate() rotate()`, `b c`, `a b() {}`
-    Nested(Nested),
-    /// A marker expression: `@children`.
-    Marker(Marker),
     /// A binary operation: `a + b`
     BinaryOp {
         /// Left-hand side
@@ -82,8 +72,6 @@ impl SrcReferrer for Expression {
             Self::FormatString(fs) => fs.src_ref(),
             Self::ArrayExpression(le) => le.src_ref(),
             Self::TupleExpression(te) => te.src_ref(),
-            Self::Nested(n) => n.src_ref(),
-            Self::Marker(m) => m.src_ref(),
             Self::BinaryOp {
                 lhs: _,
                 op: _,
@@ -126,8 +114,6 @@ impl std::fmt::Display for Expression {
             Self::PropertyAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
             Self::AttributeAccess(lhs, rhs, _) => write!(f, "{lhs}#{rhs}"),
             Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs}.{method_call}"),
-            Self::Nested(nested) => write!(f, "{nested}"),
-            Self::Marker(marker) => write!(f, "{marker}"),
             _ => unimplemented!(),
         }
     }
@@ -189,19 +175,7 @@ impl PrintSyntax for Expression {
                 lhs.print_syntax(f, depth + Self::INDENT)?;
                 method_call.print_syntax(f, depth + Self::INDENT)
             }
-            Expression::Nested(nested) => nested.print_syntax(f, depth),
-            Expression::Marker(marker) => marker.print_syntax(f, depth),
             Expression::Invalid => write!(f, "{}", crate::invalid!(EXPRESSION)),
-        }
-    }
-}
-
-impl Expression {
-    /// If the expression consists of a single identifier, e.g. `a`
-    pub fn single_identifier(&self) -> Option<Identifier> {
-        match &self {
-            Self::Nested(nested) => nested.single_identifier(),
-            _ => None,
         }
     }
 }

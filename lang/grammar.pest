@@ -235,31 +235,20 @@ nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))
 // `[3,5,5]`: ok # List expression
 // `1 if 3 > 2 else 0`: ok # Ternary operator
 // `a()`: ok # Simple call
-// `translate() rotate()`: ok # Nested call
-// `translate() rotate() { translate() rotate() {} }`: ok # Nested call
 // `a | a::b()`: ok
 // `a | b & c`: ok
 // `a() b() | b & c | d`: ok
-// `circle(r = 5.0mm)`: ok
-// `circle(r = 5.0mm) {}`: ok
-// `translate(x = 5.0mm) { rectangle(width = 5.0mm); }`: ok
-// `translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
-// `translate(r = 5.0mm) circle(r = 5.0mm)`: ok
 // `{}`: ok # Empty body
-// `{ rectangle(width = 5.0mm); }`: ok # Single statement body
-// `translate(x = 5mm)`: ok
 // `[hole_positions.bottom]`: ok # List access with tuple access
 // `mountable_plate(hole_positions = hole_positions.edges - [hole_positions.bottom])`: ok # Tuple access
 // `1000mm == 1m`: ok # Comparison
 // `1000mm == 1m == 100cm`: ok # Multi comparison
 expression     =  { unary_op* ~ ws* ~ primary ~ ws* ~ postfix* ~ (ws* ~ bin_op ~ ws* ~ unary_op* ~ ws* ~ primary ~ ws* ~ postfix*)* }
-bin_op         = _{ add | subtract | multiply | divide | union | intersection | power_xor | greater_equal | less_equal | greater_than | less_than | equal | near | not_equal | and | or | xor | if_binary_op | else_binary_op }
+bin_op         = _{ add | subtract | multiply | divide | power_xor | greater_equal | less_equal | greater_than | less_than | equal | near | not_equal | and | or | xor | if_binary_op | else_binary_op }
 add            =  { "+" }
 subtract       =  { "-" }
 multiply       =  { "*" }
 divide         =  { "/" }
-union          =  { "|" }
-intersection   =  { "&" }
 power_xor      =  { "^" }
 greater_than   =  { ">" }
 less_than      =  { "<" }
@@ -279,7 +268,7 @@ unary_minus =  { "-" }
 unary_plus  =  { "+" }
 unary_not   =  { "!" }
 postfix     = _{ element_access }
-primary     = _{ literal | marker | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | array_expression }
+primary     = _{ literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | array_expression }
 
 // `a, b, c`: ok
 // `1+2, 4*3, 3.2`: ok
@@ -293,13 +282,36 @@ expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 expression_no_semicolon = { nested_with_body }
 
 // A statement that is a single expression
-expression_statement = { (attribute_list ~ ws+)? ~ ((expression ~ ws* ~ ";") | expression_no_semicolon) }
+expression_statement = { (expression ~ ws* ~ ";") | expression_no_semicolon }
 
 // A statement that is a single expression, with optional semicolon
 final_expression_statement = { (attribute_list ~ ws+)? ~ expression ~ (ws* ~ ";")? }
 
+// `translate() rotate()`: ok # Nested call
+// `translate() rotate() { translate() rotate() {} }`: ok # Nested call
+// `a | b & c`: ok
+// `circle(r = 5.0mm)`: ok
+// `circle(r = 5.0mm) {}`: ok
+// `translate(x = 5.0mm) { rectangle(width = 5.0mm); }`: ok
+// `translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0mm); } }`: ok
+// `translate(r = 5.0mm) circle(r = 5.0mm)`: ok
+// `{}`: ok # Empty body
+// `{ rectangle(width = 5.0mm); }`: ok # Single statement body
+// `translate(x = 5mm)`: ok
+model_expression = { model_primary ~ (ws* ~ model_bin_op ~ ws* ~ model_primary)* }
+
+model_bin_op = _{ difference | union | intersection }
+union        =  { "|" }
+intersection =  { "&" }
+difference   =  { "-" }
+
+model_primary = _{ marker | nested | "(" ~ ws* ~ model_expression ~ ws* ~ ")" }
+
 // `r = 5.0mm`: ok # Named argument
 named_argument = { identifier ~ ws* ~ "=" ~ ws* ~ expression }
+
+// A statement that is a single expression
+model_expression_statement = { (attribute_list ~ ws+)? ~ (model_expression ~ ws* ~ ";") }
 
 // `2.0mm`: ok # Positional argument
 positional_argument = _{ expression }
@@ -455,6 +467,7 @@ statement = {
   | assignment_statement
   | model_assignment_statement
   | expression_statement
+  | model_expression_statement
 }
 
 statement_list = { (statement ~ ws*)* ~ final_expression_statement? }

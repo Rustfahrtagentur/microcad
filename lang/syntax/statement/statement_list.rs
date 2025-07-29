@@ -34,7 +34,8 @@ impl StatementList {
                 | Statement::InnerAttribute(_)
                 | Statement::Assignment(_)
                 | Statement::ModelAssignment(_)
-                | Statement::Expression(_) => {}
+                | Statement::Expression(_)
+                | Statement::ModelExpression(_) => {}
             }
         }
 

@@ -123,6 +123,9 @@ impl Parse for Statement {
             Rule::expression_statement | Rule::final_expression_statement => {
                 Self::Expression(ExpressionStatement::parse(first)?)
             }
+            Rule::model_expression_statement => {
+                Self::ModelExpression(ModelExpressionStatement::parse(first)?)
+            }
             rule => unreachable!("Unexpected statement, got {:?} {:?}", rule, first.clone()),
         })
     }
@@ -174,5 +177,17 @@ impl Parse for Qualifier {
             "prop" => Ok(Self::Prop),
             _ => Ok(Self::Var),
         }
+    }
+}
+
+impl Parse for ModelExpressionStatement {
+    fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
+        Parser::ensure_rules(&pair, &[Rule::model_expression_statement]);
+
+        Ok(Self {
+            attribute_list: crate::find_rule!(pair, attribute_list)?,
+            expression: pair.find(Rule::model_expression).expect("ModelExpression"),
+            src_ref: pair.into(),
+        })
     }
 }

@@ -26,16 +26,6 @@ impl Parse for ArrayExpression {
     }
 }
 
-impl Parse for Marker {
-    fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::marker);
-        Ok(Self {
-            id: Identifier::parse(pair.inner().next().expect(INTERNAL_PARSE_ERROR))?,
-            src_ref: pair.src_ref(),
-        })
-    }
-}
-
 lazy_static::lazy_static! {
     /// Expression parser
     static ref PRATT_PARSER: pest::pratt_parser::PrattParser<Rule> = {
@@ -52,7 +42,6 @@ lazy_static::lazy_static! {
             .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
             .op(Op::infix(add, Left) | Op::infix(subtract, Left))
             .op(Op::infix(multiply, Left) | Op::infix(divide, Left))
-            .op(Op::infix(r#union, Left) | Op::infix(intersection, Left))
             .op(Op::infix(power_xor, Left))
             .op(Op::infix(near, Left))
             .op(Op::prefix(unary_minus))
@@ -81,10 +70,6 @@ impl Parse for Expression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rules(&pair, &[Rule::expression_no_semicolon, Rule::expression]);
 
-        if pair.as_rule() == Rule::expression_no_semicolon {
-            return Ok(Self::Nested(Nested::parse(pair)?));
-        }
-
         PRATT_PARSER
             .map_primary(|primary| {
                 match (
@@ -102,8 +87,6 @@ impl Parse for Expression {
                     (primary, Rule::format_string) => {
                         Ok(Self::FormatString(FormatString::parse(primary)?))
                     }
-                    (primary, Rule::nested) => Ok(Self::Nested(Nested::parse(primary)?)),
-                    (primary, Rule::marker) => Ok(Self::Marker(Marker::parse(primary)?)),
                     rule => unreachable!(
                         "Expression::parse expected atom, found {:?} {:?}",
                         rule,
@@ -117,8 +100,6 @@ impl Parse for Expression {
                     Rule::subtract => "-",
                     Rule::multiply => "*",
                     Rule::divide => "/",
-                    Rule::r#union => "|",
-                    Rule::intersection => "&",
                     Rule::power_xor => "^",
                     Rule::greater_than => ">",
                     Rule::less_than => "<",
@@ -163,14 +144,6 @@ impl Parse for Expression {
                         Box::new(Self::parse(op)?),
                         pair.clone().into(),
                     )),
-                    (op, Rule::attribute_access) => {
-                        let op = op.inner().next().expect(INTERNAL_PARSE_ERROR);
-                        Ok(Self::AttributeAccess(
-                            Box::new(lhs?),
-                            Identifier::parse(op)?,
-                            pair.clone().into(),
-                        ))
-                    }
                     (op, Rule::tuple_element_access) => {
                         let op = op.inner().next().expect(INTERNAL_PARSE_ERROR);
                         match op.as_rule() {
@@ -198,36 +171,6 @@ impl Parse for Expression {
                     .into_inner()
                     .filter(|pair| pair.as_rule() != Rule::COMMENT), // Filter comments
             )
-    }
-}
-
-impl Parse for Nested {
-    fn parse(pair: Pair) -> ParseResult<Self> {
-        assert!(pair.as_rule() == Rule::nested || pair.as_rule() == Rule::expression_no_semicolon);
-
-        Ok(Self(Refer::new(
-            pair.inner()
-                .filter(|pair| {
-                    [Rule::qualified_name, Rule::call, Rule::body].contains(&pair.as_rule())
-                })
-                .map(NestedItem::parse)
-                .collect::<ParseResult<_>>()?,
-            pair.src_ref(),
-        )))
-    }
-}
-
-impl Parse for NestedItem {
-    fn parse(pair: Pair) -> ParseResult<Self> {
-        match pair.clone().as_rule() {
-            Rule::call => Ok(Self::Call(Call::parse(pair.clone())?)),
-            Rule::qualified_name => Ok(Self::QualifiedName(QualifiedName::parse(pair.clone())?)),
-            Rule::body => Ok(Self::Body(Body::parse(pair.clone())?)),
-            rule => unreachable!(
-                "NestedItem::parse expected call or qualified name, found {:?}",
-                rule
-            ),
-        }
     }
 }
 

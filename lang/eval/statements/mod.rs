@@ -37,6 +37,7 @@ impl Eval for Statement {
             Self::ModelAssignment(_) => unreachable!(),
             Self::If(i) => i.eval(context),
             Self::Expression(e) => e.eval(context),
+            Self::ModelExpression(_) => unreachable!("no model expression allowed"),
             Self::InnerAttribute(i) => {
                 context.grant(i)?;
                 Ok(Value::None)
@@ -87,7 +88,8 @@ impl Eval<Models> for Statement {
                 let model: Option<Model> = i.eval(context)?;
                 model.into()
             }
-            Self::Expression(e) => e.eval(context)?,
+            Self::Expression(_) => unreachable!("no non-model expression allowed"),
+            Self::ModelExpression(_e) => todo!(),
             Self::InnerAttribute(a) => {
                 context.grant(a)?;
                 Default::default()

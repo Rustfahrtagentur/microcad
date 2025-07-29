@@ -79,6 +79,7 @@ fn check_statements(body: &Body) -> ParseResult<()> {
                 Statement::If(_)
                 | Statement::InnerAttribute(_)
                 | Statement::Expression(_)
+                | Statement::ModelExpression(_)
                 | Statement::Function(_) => {
                     // RULE: No code between initializers
                     if n < last_init {

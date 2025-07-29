@@ -47,6 +47,9 @@ mod macros {
         (EXPRESSION) => {
             color_print::cstr!("<bg:r!><s> INVALID EXPRESSION </s></bg:r!>")
         };
+        (MODEL_EXPRESSION) => {
+            color_print::cstr!("<bg:r!><s> INVALID MODEL EXPRESSION </s></bg:r!>")
+        };
     }
 
     /// Generate string literal "INVALID XXX"
@@ -90,6 +93,9 @@ mod macros {
         };
         (EXPRESSION) => {
             color_print::cstr!("<INVALID EXPRESSION>")
+        };
+        (MODEL_EXPRESSION) => {
+            "<INVALID MODEL EXPRESSION>"
         };
     }
 }
