@@ -1,0 +1,18 @@
+-- Test --
+  workbench_fn_prop
+  ../doc/structure/functions.md:130
+
+-- Code --
+
+part punched_disk(radius: Length) {
+    fn inner() { 
+        prop hole = radius/2;  // eval error: prop not allowed in function
+    }
+}
+
+punched_disk(1cm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

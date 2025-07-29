@@ -1,0 +1,14 @@
+-- Test --
+  module_module
+  ../doc/tests/statement_usage.md:106
+
+-- Code --
+
+mod k {
+  mod m {}
+}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

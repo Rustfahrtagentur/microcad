@@ -1,0 +1,40 @@
+-- Test --
+  tuple_match
+  ../doc/structure/arguments.md:62
+
+-- Code --
+
+// Function with three parameters: x, y, and z
+fn f( x: Length, y: Length, z: Length ) {}
+
+// Since we do not want to change x and y in the following statements,
+// we prepare a tuple named plane:
+plane = (x=1cm, y=2cm);
+
+// Then we pass plane to f() three times with different z values
+f( plane, z=3cm);
+f( plane, z=6cm);
+f( plane, z=9cm);
+
+-- Output --
+-- Errors --
+error: Missing arguments: x,y
+  ---> <from_str>:9:4
+     |
+   9 | f( plane, z=3cm);
+     |    ^^^^^^^^^^^^
+     |
+error: Missing arguments: x,y
+  ---> <from_str>:10:4
+     |
+  10 | f( plane, z=6cm);
+     |    ^^^^^^^^^^^^
+     |
+error: Missing arguments: x,y
+  ---> <from_str>:11:4
+     |
+  11 | f( plane, z=9cm);
+     |    ^^^^^^^^^^^^
+     |
+-- Test Result --
+TODO

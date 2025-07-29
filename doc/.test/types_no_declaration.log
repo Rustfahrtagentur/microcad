@@ -1,6 +1,0 @@
-Parser error:  --> 1:10
-  |
-1 | x: Length;         // error
-  |          ^---
-  |
-  = expected COMMENT

@@ -1,0 +1,18 @@
+-- Test --
+  hull_single
+  ../doc/libs/std/ops/hull.md:7
+
+-- Code --
+
+use std::geo2d::*;
+use std::ops::*;
+
+hull() {
+    translate(x = 10mm, y =  0mm) circle(10mm);
+    translate(x =  0mm, y = 10mm) circle(10mm);
+}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

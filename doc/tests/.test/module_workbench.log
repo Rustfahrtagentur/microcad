@@ -1,0 +1,14 @@
+-- Test --
+  module_workbench
+  ../doc/tests/statement_usage.md:98
+
+-- Code --
+
+mod k {
+  sketch f() {}
+}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

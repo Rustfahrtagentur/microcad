@@ -1,0 +1,14 @@
+-- Test --
+  pre_init_pub_use
+  ../doc/tests/statement_usage.md:244
+
+-- Code --
+
+sketch k() { 
+  pub use std;
+init(l:Length) {} } k();
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

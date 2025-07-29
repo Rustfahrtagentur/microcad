@@ -1,36 +1,50 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad source code parse entities
+//! Source code parsing
+//!
+//! A source file on disc is just a bunch of UTF-8 encoded text which must be parsed
+//! before any processing:
+//!
+//! ```no_run
+//! use microcad_lang::{syntax::*, parse::*};
+//!
+//! let source_file = SourceFile::load("my.µcad").expect("parsing success");
+//! ```
+//!
+//! To read a source file from an already loaded string use:
+//!
+//! ```no_run
+//! use microcad_lang::{syntax::*, parse::*};
+//!
+//! let source_file = SourceFile::load_from_str(r#"std::print("hello world!");"#).expect("parsing success");
+//! ```
+//!
+//! To "run" the source file (and get the expected output) it must now be resolved and evaluated (see [`crate::resolve`] and [`crate::eval`])  .
 
-pub mod assignment;
-pub mod call;
-pub mod expression;
-pub mod format_string;
-pub mod function;
-pub mod identifier;
-pub mod lang_type;
-pub mod literal;
-pub mod module;
-pub mod namespace;
-pub mod parameter;
-pub mod parse_error;
-pub mod source_file;
-pub mod r#use;
+mod attribute;
+mod body;
+mod call;
+mod expression;
+mod format_string;
+mod function;
+mod identifier;
+mod init_definition;
+mod lang_type;
+mod literal;
+mod module;
+mod parameter;
+mod source_file;
+mod statement;
+mod r#type;
+mod r#use;
+mod workbench;
 
-pub use assignment::*;
-pub use call::*;
-pub use expression::*;
-pub use format_string::*;
-pub use function::*;
-pub use identifier::*;
-pub use lang_type::*;
-pub use literal::*;
-pub use module::*;
-pub use namespace::*;
-pub use parameter::*;
+pub(crate) mod find_rule;
+pub(crate) mod parse_error;
+
+pub use find_rule::*;
 pub use parse_error::*;
-pub use r#use::*;
-pub use source_file::*;
 
+use crate::{src_ref::*, syntax::*};
 const INTERNAL_PARSE_ERROR: &str = "internal parse error";

@@ -1,0 +1,14 @@
+-- Test --
+  workbench_marker
+  ../doc/tests/statement_usage.md:480
+
+-- Code --
+
+sketch k() {
+  @children
+} k();
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

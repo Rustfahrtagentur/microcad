@@ -1,0 +1,14 @@
+-- Test --
+  pre_init_module
+  ../doc/tests/statement_usage.md:212
+
+-- Code --
+
+sketch k() { 
+  mod m {}
+init(l:Length) {} } k();
+
+-- Parse Error --
+Statement not allowed within workbenches
+-- Test Result --
+FAILED AS EXPECTED

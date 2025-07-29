@@ -1,0 +1,14 @@
+-- Test --
+  pre_init_expression_model
+  ../doc/tests/statement_usage.md:300
+
+-- Code --
+
+sketch k() { 
+  __builtin::geo2d::circle(radius=1);
+init(l:Length) {} }
+
+-- Parse Error --
+Statement not allowed prior initializers
+-- Test Result --
+FAILED AS EXPECTED

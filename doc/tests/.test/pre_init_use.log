@@ -1,0 +1,14 @@
+-- Test --
+  pre_init_use
+  ../doc/tests/statement_usage.md:236
+
+-- Code --
+
+sketch k() { 
+  use std;
+init(l:Length) {} } k();
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

@@ -1,0 +1,14 @@
+-- Test --
+  function_assignment_var
+  ../doc/tests/statement_usage.md:716
+
+-- Code --
+
+fn f() {
+  a = 1;
+} f();
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

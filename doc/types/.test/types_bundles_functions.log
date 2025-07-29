@@ -1,0 +1,13 @@
+-- Test --
+  types_bundles_functions
+  ../doc/types/README.md:46
+
+-- Code --
+
+fn f(x = 4mm) {}        // use unit (with default)
+fn f(x: Length) {}     // use type (without default)
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

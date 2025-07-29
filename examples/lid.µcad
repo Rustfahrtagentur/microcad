@@ -1,5 +1,5 @@
-// We have module called `lid` with three parameters
-module lid(
+// We have part called `lid` with three parameters
+part lid(
     thickness = 1.6mm,
     inner_diameter = 16.0cm,
     height = 20.0mm,
@@ -15,10 +15,6 @@ module lid(
     outer - inner;
 }
 
+
 // `l` is the instance of the lid model
-l = lid();
-
-// Print out the volume of the model instance
-std::print("Volume: {l.volume() / 1000}cm³");
-
-std::export("lid.stl") l;
+lid();

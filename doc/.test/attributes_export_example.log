@@ -1,0 +1,14 @@
+-- Test --
+  attributes_export_example
+  ../doc/attributes.md:122
+
+-- Code --
+
+#[export = "circle.svg"]
+#[svg = (style = "fill: skyblue; stroke: cadetblue; stroke-width: 2;")]
+c = std::geo2d::circle(42.0mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

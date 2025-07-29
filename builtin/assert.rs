@@ -1,42 +1,164 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{
-    eval::{BuiltinFunction, EvalError},
-    function_signature, parameter, parameter_list,
-    parse::{Expression, GetSourceFileByHash},
-    src_ref::SrcReferrer,
-};
+use std::str::FromStr;
 
-pub fn builtin_fn() -> BuiltinFunction {
-    BuiltinFunction::new(
-        "assert".into(),
-        function_signature!(parameter_list![
-            parameter!(condition: Bool),
-            parameter!(message: String = "Assertion failed")
-        ]),
-        &|args, ctx| {
-            let message: String = if let Some(m) = args.get("message") {
-                m.clone().try_into()?
-            } else {
-                return Err(EvalError::GrammarRuleError("cannot fetch `message`".into()));
-            };
+#[cfg(test)]
+use crate::builtin_module;
+use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, value::*};
 
-            let condition: bool = args["condition"].clone().try_into()?;
-            if !condition {
-                if let Some(condition_src) = ctx.get_source_string(args["condition"].src_ref()) {
-                    ctx.error_with_stack_trace(
-                        args.src_ref(),
-                        EvalError::AssertionFailedWithCondition(message, condition_src.into()),
-                    )?;
-                } else {
-                    ctx.error_with_stack_trace(
-                        args.src_ref(),
-                        EvalError::AssertionFailed(message),
-                    )?;
+pub fn assert() -> Symbol {
+    Symbol::new_builtin(
+        Identifier::no_ref("assert"),
+        Some(
+            [
+                parameter!(v : Bool),                        // Parameter with any type
+                parameter!(message: String = String::new()), // Optional message
+            ]
+            .into_iter()
+            .collect(),
+        ),
+        &|params, args, context| {
+            match ArgumentMatch::find_multi_match(args, params.expect("parameter list")) {
+                Ok(multi_args) => {
+                    for a in multi_args {
+                        let v: bool = a.get("v")?;
+                        if !v {
+                            let message: String = a.get("message")?;
+                            context.error(
+                                args,
+                                EvalError::AssertionFailed(if message.is_empty() {
+                                    format!("{v}")
+                                } else {
+                                    format!("{v}: {message}")
+                                }),
+                            )?;
+                        }
+                    }
+                }
+                Err(err) => {
+                    // Called `assert` with no or more than 2 parameters
+                    context.error(args, err)?
                 }
             }
-            Ok(None)
+
+            Ok(Value::None)
         },
     )
+}
+
+fn all_equal<T: PartialEq + std::fmt::Debug>(mut iter: impl Iterator<Item = T>) -> bool {
+    if let Some(first) = iter.next() {
+        iter.all(|x| x == first)
+    } else {
+        // Wenn der Iterator leer ist, gibt es keine Elemente zum Vergleichen.
+        true
+    }
+}
+
+pub fn assert_eq() -> Symbol {
+    Symbol::new_builtin(
+        Identifier::no_ref("assert_eq"),
+        Some(
+            [
+                parameter!(a),                               // Parameter with any type
+                parameter!(message: String = String::new()), // Optional message
+            ]
+            .into_iter()
+            .collect(),
+        ),
+        &|params, args, context| {
+            match ArgumentMatch::find_multi_match(args, params.expect("ParameterList")) {
+                Ok(multi_args) => {
+                    for a in multi_args {
+                        let a_value = &a.get_value("a").expect("missing parameter");
+
+                        if let Value::Array(exprs) = a_value {
+                            if !all_equal(exprs.iter()) {
+                                let message: String = a.get("message")?;
+                                context.error(
+                                    args,
+                                    EvalError::AssertionFailed(if message.is_empty() {
+                                        format!("Values differ: {exprs}")
+                                    } else {
+                                        "{message}".to_string()
+                                    }),
+                                )?;
+                            }
+                        }
+                    }
+                }
+                Err(err) => {
+                    // Called `assert` with no or more than 2 parameters
+                    context.error(args, err)?
+                }
+            }
+
+            Ok(Value::None)
+        },
+    )
+}
+
+pub fn assert_valid() -> Symbol {
+    let id = Identifier::from_str("assert_valid").expect("valid id");
+    Symbol::new_builtin(id, None, &|_, args, context| {
+        if let Ok((_, arg)) = args.get_single() {
+            if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
+                if let Err(err) = context.lookup(&name) {
+                    context.error(arg, err)?;
+                }
+            }
+        }
+        Ok(Value::None)
+    })
+}
+
+pub fn assert_invalid() -> Symbol {
+    let id = Identifier::from_str("assert_invalid").expect("valid id");
+    Symbol::new_builtin(id, None, &|_, args, context| {
+        if let Ok((_, arg)) = args.get_single() {
+            if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
+                if let Ok(symbol) = context.lookup(&name) {
+                    context.error(name, EvalError::SymbolFound(symbol.full_name()))?;
+                }
+            }
+        }
+        Ok(Value::None)
+    })
+}
+
+#[test]
+fn assert_ok() {
+    let mut context = Context::from_source(
+        "../tests/test_cases/syntax/assert_ok.µcad",
+        builtin_module(),
+        &[],
+    )
+    .expect("resolvable file ../tests/test_cases/syntax/assert_ok.µcad");
+
+    assert!(context.eval().is_ok());
+}
+
+#[test]
+fn assert_fail() {
+    let mut context = Context::from_source(
+        "../tests/test_cases/syntax/assert_fail.µcad",
+        builtin_module(),
+        &[],
+    )
+    .expect("resolvable file ../tests/test_cases/syntax/assert_fail.µcad");
+
+    assert!(context.eval().is_ok());
+    assert!(context.error_count() > 0);
+
+    assert_eq!(
+        context.diagnosis(),
+        "error: Assertion failed: false
+  ---> ../tests/test_cases/syntax/assert_fail.µcad:1:19
+     |
+   1 | __builtin::assert(false);
+     |                   ^^^^^
+     |
+"
+    );
 }

@@ -1,0 +1,19 @@
+-- Test --
+  call_function
+  ../doc/structure/calls.md:10
+
+-- Code --
+
+// function definition
+fn square(x: Scalar) { return x * x; }
+
+// call function square with parameter 2 and store result in s
+s = square(x = 2);
+
+// check value
+std::debug::assert_eq( [s, 4] );
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

@@ -1,0 +1,12 @@
+-- Test --
+  source_module
+  ../doc/tests/statement_usage.md:24
+
+-- Code --
+
+mod m {}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

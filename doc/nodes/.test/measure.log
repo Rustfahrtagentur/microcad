@@ -1,0 +1,25 @@
+-- Test --
+  measure
+  ../doc/nodes/measures.md:9
+
+-- Code --
+
+__builtin::assert_eq([
+    // use measure area() on a circle
+    std::geo2d::circle(radius=10mm).area(),
+
+    // circle area formula for comparison
+    10mm * 10mm * std::math::PI
+]);
+
+-- Output --
+-- Errors --
+error: Not implemented: call_method for Models
+error: Elements of list have different types: [[101m[1m INVALID TYPE [49m[22m, Area]
+  ---> <from_str>:1:22
+     |
+   1 | __builtin::assert_eq([
+     |                      ^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+TODO

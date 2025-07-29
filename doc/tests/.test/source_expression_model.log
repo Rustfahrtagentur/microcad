@@ -1,0 +1,12 @@
+-- Test --
+  source_expression_model
+  ../doc/tests/statement_usage.md:90
+
+-- Code --
+
+__builtin::geo2d::circle(radius=1);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

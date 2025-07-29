@@ -1,0 +1,14 @@
+-- Test --
+  pre_init_assignment_var
+  ../doc/tests/statement_usage.md:276
+
+-- Code --
+
+sketch k() { 
+  a = 1;
+init(l:Length) {} } k();
+
+-- Parse Error --
+Statement not allowed prior initializers
+-- Test Result --
+FAILED AS EXPECTED

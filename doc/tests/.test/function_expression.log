@@ -1,0 +1,14 @@
+-- Test --
+  function_expression
+  ../doc/tests/statement_usage.md:732
+
+-- Code --
+
+fn f() {
+  1 + 2;
+} f();
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

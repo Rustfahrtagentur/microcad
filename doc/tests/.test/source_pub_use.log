@@ -1,0 +1,12 @@
+-- Test --
+  source_pub_use
+  ../doc/tests/statement_usage.md:48
+
+-- Code --
+
+pub use std;
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

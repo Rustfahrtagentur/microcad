@@ -1,97 +1,56 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Parameter value list evaluation entity
 
-use crate::{eval::*, src_ref::*};
+use crate::{eval::*, value::*};
+use compact_str::CompactStringExt;
+use derive_more::Deref;
 
 /// List of parameter values
-#[derive(Clone, Debug, Default)]
-pub struct ParameterValueList {
-    /// List of parameter values
-    parameters: Vec<ParameterValue>,
-    /// access map by name
-    pub by_name: std::collections::BTreeMap<Id, usize>,
-    /// Source code reference
-    src_ref: SrcRef,
-}
+#[derive(Clone, Debug, Default, Deref)]
+pub struct ParameterValueList(std::collections::HashMap<Identifier, ParameterValue>);
 
 impl ParameterValueList {
-    /// Create new ParameterValueList
-    #[cfg(test)]
-    pub fn new(parameters: Vec<ParameterValue>) -> Self {
-        let mut by_name = std::collections::BTreeMap::new();
-        for (i, parameter) in parameters.iter().enumerate() {
-            by_name.insert(parameter.name.clone(), i);
-        }
-
-        Self {
-            by_name,
-            src_ref: SrcRef::from_vec(&parameters),
-            parameters,
-        }
-    }
-
     /// Push parameter value
-    pub fn push(&mut self, parameter: ParameterValue) -> std::result::Result<(), EvalError> {
-        if self.by_name.contains_key(&parameter.name) {
-            return Err(EvalError::DuplicateParameter(parameter.name.clone()));
+    pub fn insert(
+        &mut self,
+        id: Identifier,
+        parameter: ParameterValue,
+    ) -> std::result::Result<(), ValueError> {
+        assert!(!id.is_empty(), "expecting valid id");
+        if self.0.contains_key(&id) {
+            return Err(ValueError::DuplicateParameter(id.clone()));
         }
-
-        self.by_name
-            .insert(parameter.name.clone(), self.parameters.len());
-        self.parameters.push(parameter);
+        self.0.insert(id, parameter);
         Ok(())
     }
+}
 
-    /// get ParameterValue by name
-    pub fn get_by_name(&self, name: &Id) -> Option<&ParameterValue> {
-        self.by_name.get(name).map(|i| &self.parameters[*i])
-    }
-
-    /// get ParameterValue by index
-    pub fn get_by_index(&self, index: usize) -> Option<&ParameterValue> {
-        self.parameters.get(index)
-    }
-
-    /// remove parameter value by name
-    pub fn remove(&mut self, name: &Id) {
-        if let Some(new_index) = self.by_name.remove(name) {
-            self.parameters.remove(new_index);
-            self.by_name
-                .values_mut()
-                .skip(new_index)
-                .for_each(|index| *index -= 1);
-        }
-    }
-
-    /// Return `true` if empty
-    pub fn is_empty(&self) -> bool {
-        self.by_name.is_empty()
-    }
-
-    /// Check for missing arguments.
-    ///
-    /// Checks if parameter value list is not empty and wraps the list into an error
-    pub fn check_for_missing_arguments(self) -> EvalResult<()> {
-        if !self.is_empty() {
-            Err(EvalError::MissingArguments(self))
-        } else {
-            Ok(())
-        }
+impl std::fmt::Display for ParameterValueList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", {
+            let mut v = self
+                .0
+                .iter()
+                .map(|(id, p)| format!("{id}: {p}"))
+                .collect::<Vec<_>>();
+            v.sort();
+            v.join_compact(", ")
+        })
     }
 }
 
-impl SrcReferrer for ParameterValueList {
-    fn src_ref(&self) -> SrcRef {
-        self.src_ref.clone()
-    }
-}
-
-impl std::ops::Deref for ParameterValueList {
-    type Target = Vec<ParameterValue>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.parameters
+impl<I, P> FromIterator<(I, P)> for ParameterValueList
+where
+    I: Into<Identifier>,
+    P: Into<ParameterValue>,
+{
+    fn from_iter<T: IntoIterator<Item = (I, P)>>(iter: T) -> Self {
+        Self(
+            iter.into_iter()
+                .map(|(i, p)| (i.into(), p.into()))
+                .collect(),
+        )
     }
 }

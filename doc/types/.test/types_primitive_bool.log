@@ -1,0 +1,12 @@
+-- Test --
+  types_primitive_bool
+  ../doc/types/primitive_types.md:9
+
+-- Code --
+
+std::debug::assert(true != false);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

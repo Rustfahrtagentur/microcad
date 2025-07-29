@@ -1,149 +1,156 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Scalable Vector Graphics (SVG) file writer
 
-use geo::CoordsIter;
 use microcad_core::*;
 
-/// Write SVG
+use crate::svg::{SvgTagAttributes, canvas::Canvas};
+
+/// SVG writer.
 pub struct SvgWriter {
+    /// The writer (e.g. a file).
     writer: Box<dyn std::io::Write>,
+    /// Indentation level.
+    level: usize,
+    /// The canvas.
+    canvas: Canvas,
 }
 
-#[allow(dead_code)]
 impl SvgWriter {
     /// Create new SvgWriter
     /// # Arguments
     /// - `w`: Output writer
-    /// - `bounds`: Clipping
+    /// - `size`: Size of the canvas.
     /// - `scale`: Scale of the output
-    pub fn new(
-        mut w: Box<dyn std::io::Write>,
-        bounds: geo2d::Rect,
-        scale: f64,
+    pub fn new_canvas(
+        mut writer: Box<dyn std::io::Write>,
+        size: Option<Size2D>,
+        content_rect: Rect,
+        scale: Option<Scalar>,
     ) -> std::io::Result<Self> {
-        writeln!(&mut w, "<?xml version='1.0' encoding='UTF-8'?>")?;
+        let size = match size {
+            Some(size) => size,
+            None => Size2D {
+                width: content_rect.width(),
+                height: content_rect.height(),
+            },
+        };
+        let x = 0;
+        let y = 0;
+        let w = size.width.ceil() as i64;
+        let h = size.height.ceil() as i64;
+        let canvas = Canvas::new_centered_content(size, content_rect, scale);
+
+        writeln!(&mut writer, "<?xml version='1.0' encoding='UTF-8'?>")?;
         writeln!(
-            &mut w,
-            "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='{} {} {} {}'>",
-            bounds.min().x * scale,
-            bounds.min().y * scale,
-            bounds.width() * scale,
-            bounds.height() * scale
+            &mut writer,
+            "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='{x} {y} {w} {h}' width='{w}mm' height='{h}mm'>",
         )?;
-        writeln!(&mut w, "<g transform='scale({scale})'>")?;
+        writeln!(
+            &mut writer,
+            r#"
+  <defs>
+    <!-- A marker to be used as an arrowhead -->
+    <marker
+      id="arrow"
+      viewBox="0 0 16 16"
+      refX="8"
+      refY="8"
+      markerWidth="9"
+      markerHeight="9"
+      orient="auto-start-reverse">
+      <path d="M 0 0 L 16 8 L 0 16 z" stroke="none" fill="context-fill" />
+    </marker>
+  </defs>
+            "#
+        )?;
 
         Ok(Self {
-            writer: Box::new(w),
+            writer: Box::new(writer),
+            level: 1,
+            canvas,
         })
     }
 
-    /// Generate rectangle
-    pub fn rect(&mut self, rect: &geo2d::Rect, style: &str) -> std::io::Result<()> {
-        let x = rect.min().x;
-        let y = rect.min().y;
-        let width = rect.width();
-        let height = rect.height();
-        writeln!(
-            self.writer,
-            "<rect x=\"{x}\" y=\"{y}\" width=\"{width}\" height=\"{height}\" style=\"{style}\"/>"
-        )
+    /// Return reference to canvas.
+    pub fn canvas(&self) -> &Canvas {
+        &self.canvas
     }
 
-    /// Begin a SVG transformation <g>
-    pub fn begin_transform(&mut self, transform: &microcad_core::Mat3) -> std::io::Result<()> {
-        let (a, b, c, d, e, f) = (
-            transform.x.x,
-            transform.x.y,
-            transform.y.x,
-            transform.y.y,
-            transform.z.x,
-            transform.z.y,
-        );
-        writeln!(
-            self.writer,
-            "<g transform=\"matrix({a} {b} {c} {d} {e} {f})\">"
-        )
-    }
-
-    /// End a SVG transformation </g>
-    pub fn end_transform(&mut self) -> std::io::Result<()> {
-        writeln!(self.writer, "</g>")
-    }
-
-    /// Generate circle
-    pub fn circle(
-        &mut self,
-        center: &geo2d::Point,
-        radius: f64,
-        style: &str,
-    ) -> std::io::Result<()> {
-        let (cx, cy) = center.x_y();
-        writeln!(
-            self.writer,
-            "<circle cx=\"{cx}\" cy=\"{cy}\" r=\"{radius}\" style=\"{style}\"/>"
-        )
-    }
-
-    /// Generate line
-    pub fn line(&mut self, p1: geo2d::Point, p2: geo2d::Point, style: &str) -> std::io::Result<()> {
-        let ((x1, y1), (x2, y2)) = (p1.x_y(), p2.x_y());
-        writeln!(
-            self.writer,
-            "<line x1=\"{x1}\" y1=\"{y1}\" x2=\"{x2}\" y2=\"{y2}\" style=\"{style}\"/>"
-        )
-    }
-
-    /// Generate polygon
-    pub fn polygon(&mut self, polygon: &geo2d::Polygon, style: &str) -> std::io::Result<()> {
-        write!(self.writer, "<path d=\"")?;
-        for (i, point) in polygon.exterior().points().enumerate() {
-            let (x, y) = point.x_y();
-            match i {
-                0 => write!(self.writer, "M")?,
-                _ => write!(self.writer, "L")?,
+    fn tag_inner(tag: &str, attr: &SvgTagAttributes) -> String {
+        format!(
+            "{tag}{attr}",
+            attr = if attr.is_empty() {
+                String::new()
+            } else {
+                format!(" {attr}")
             }
-
-            write!(self.writer, "{x},{y}", x = x, y = y)?;
-            if i == polygon.exterior().coords_count() - 1 {
-                write!(self.writer, " Z ")?;
-            }
-        }
-        for interior in polygon.interiors() {
-            for (i, point) in interior.points().enumerate() {
-                let (x, y) = point.x_y();
-                match i {
-                    0 => write!(self.writer, "M")?,
-                    _ => write!(self.writer, "L")?,
-                }
-
-                write!(self.writer, "{x},{y}", x = x, y = y)?;
-                if i == interior.coords_count() - 1 {
-                    write!(self.writer, " Z ")?;
-                }
-            }
-        }
-
-        writeln!(self.writer, "\" style=\"{style}\"/>")
+        )
     }
 
-    /// Generate multiple polygons
-    pub fn multi_polygon(
-        &mut self,
-        multi_polygon: &geo2d::MultiPolygon,
-        style: &str,
-    ) -> std::io::Result<()> {
-        for polygon in multi_polygon {
-            self.polygon(polygon, style)?;
-        }
+    /// Write something into the SVG and consider indentation.
+    pub fn with_indent(&mut self, s: &str) -> std::io::Result<()> {
+        writeln!(self.writer, "{:indent$}{s}", "", indent = 2 * self.level)
+    }
+
+    /// Write a single tag `<tag>`.
+    pub fn tag(&mut self, tag: &str, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        self.with_indent(&format!(
+            "<{tag_inner}/>",
+            tag_inner = Self::tag_inner(tag, attr)
+        ))
+    }
+
+    /// Open a tag `<tag>`
+    pub fn open_tag(&mut self, tag: &str, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        self.with_indent(&format!(
+            "<{tag_inner}>",
+            tag_inner = Self::tag_inner(tag, attr)
+        ))?;
+
+        self.level += 1;
         Ok(())
+    }
+
+    /// Close a tag `</tag>`
+    pub fn close_tag(&mut self, tag: &str) -> std::io::Result<()> {
+        self.level -= 1;
+        self.with_indent(format!("</{tag}>").as_str())
+    }
+
+    /// Begin a new group `<g>`.
+    pub fn begin_group(&mut self, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        self.open_tag("g", attr)
+    }
+
+    /// End a group `</g>`.
+    pub fn end_group(&mut self) -> std::io::Result<()> {
+        self.close_tag("g")
+    }
+
+    /// Defs tag.
+    pub fn defs(&mut self, inner: &str) -> std::io::Result<()> {
+        self.open_tag("defs", &Default::default())?;
+        self.with_indent(inner)?;
+        self.close_tag("defs")
+    }
+
+    /// Style tag.
+    pub fn style(&mut self, inner: &str) -> std::io::Result<()> {
+        self.open_tag("style", &Default::default())?;
+        self.with_indent(inner)?;
+        self.close_tag("style")
+    }
+
+    /// Finish this SVG. This method is also called in the Drop trait implementation.
+    pub fn finish(&mut self) -> std::io::Result<()> {
+        writeln!(self.writer, "</svg>")
     }
 }
 
 impl Drop for SvgWriter {
     fn drop(&mut self) {
-        writeln!(self.writer, "</g>").unwrap();
-        writeln!(self.writer, "</svg>").unwrap();
+        self.finish().expect("No error")
     }
 }

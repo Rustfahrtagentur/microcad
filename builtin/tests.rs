@@ -1,17 +1,19 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{ContextBuilder, NamespaceBuilder};
+use crate::{ContextBuilder, ModuleBuilder};
 use log::info;
 use microcad_lang::{eval::*, sym::*};
 
 #[test]
-fn context_namespace() {
+fn context_module() {
+    microcad_lang::env_logger_init();
+
     use microcad_lang::src_ref::*;
 
-    let mut context = EvalContext::default();
+    let mut context = Context::default();
 
-    let module = NamespaceBuilder::new("math")
+    let module = ModuleBuilder::new("math")
         .add(Symbol::Value(
             "pi".into(),
             Value::Scalar(Refer::none(std::f64::consts::PI)),
@@ -29,6 +31,8 @@ fn context_namespace() {
 
 #[test]
 fn test_assert() {
+    microcad_lang::env_logger_init();
+
     use microcad_lang::parse::source_file::SourceFile;
 
     let source_file = match SourceFile::load_from_str(

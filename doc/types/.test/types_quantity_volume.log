@@ -1,0 +1,18 @@
+-- Test --
+  types_quantity_volume
+  ../doc/types/quantity.md:118
+
+-- Code --
+
+a = 3mm;
+b = 2mm;
+c = 4mm;
+
+volume = a * b * c;
+
+std::debug::assert(volume == 24mm³);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

@@ -1,61 +1,61 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{eval::*, parse::*, sym::*};
+//! Builder pattern to build up a context
 
-/// Builder for a context
+use std::rc::Rc;
+
+use microcad_lang::{builtin::*, eval::*, resolve::*, syntax::*};
+
+/// Context builder.
 pub struct ContextBuilder {
-    context: EvalContext,
+    context: Context,
 }
 
 impl ContextBuilder {
-    /// Create a new context builder from a source file
-    ///
-    /// - `source_file`: source file to build the context from
-    ///
-    /// # Returns
-    ///
-    /// A new context builder
-    pub fn new(source_file: SourceFile) -> Self {
+    /// Create new context.
+    pub fn new(
+        root: Symbol,
+        builtin: Symbol,
+        search_paths: &[std::path::PathBuf],
+        output: Box<dyn Output>,
+    ) -> Self {
         Self {
-            context: EvalContext::from_source_file(source_file),
+            context: Context::new(root, builtin, search_paths, output),
         }
     }
 
-    /// Add the standard library to the context
-    pub fn with_builtin(mut self) -> ParseResult<Self> {
-        self.context.add(crate::builtin_module()?.into());
-        Ok(self)
-    }
-
-    /// Add std library to context
+    /// Create a new context from a source file and capture output (see [`Self::output`]).
     ///
-    /// - `search_path`: path to search for the std library, usually the directory containing the std.µcad file
-    pub fn with_std(mut self, search_path: impl AsRef<std::path::Path>) -> ParseResult<Self> {
-        self = self.with_builtin()?;
-
-        let std_source_file = SourceFile::load(search_path.as_ref().join("std.µcad"))?;
-        let context = Self::new(std_source_file.clone()).with_builtin()?.build();
-        let namespace = context
-            .current_source_file()
-            .expect("std library missing")
-            .eval_as_namespace(&mut self.context, "std".into())
-            .expect("failure evaluating std library");
-
-        self.context.add_source_file(std_source_file);
-        self.context.add(Symbol::Namespace(namespace));
-
-        Ok(self)
+    /// # Arguments
+    /// - `root`: Resolved root source file.
+    /// - `builtin`: The builtin library.
+    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
+    pub fn from_source_captured(root: Rc<SourceFile>, search_paths: &[std::path::PathBuf]) -> Self {
+        Self::new(
+            root.resolve(None),
+            crate::builtin_module(),
+            search_paths,
+            Box::new(Capture::new()),
+        )
+        .importers(crate::builtin_importers())
+        .exporters(crate::builtin_exporters())
     }
 
-    /// Add a module to the context
-    pub fn with_module(mut self, module: std::rc::Rc<ModuleDefinition>) -> Self {
-        self.context.add(module.into());
+    /// Set importers to context.
+    pub fn importers(mut self, importers: ImporterRegistry) -> Self {
+        self.context.set_importers(importers);
         self
     }
 
-    /// Build the context
-    pub fn build(self) -> EvalContext {
+    /// Set exporters to context.
+    pub fn exporters(mut self, exporters: ExporterRegistry) -> Self {
+        self.context.set_exporters(exporters);
+        self
+    }
+
+    /// Build context.
+    pub fn build(self) -> Context {
         self.context
     }
 }

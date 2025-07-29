@@ -1,5 +1,5 @@
 /target
 /tree/*.svg
 /Cargo.lock
-/tests/output
+/tests/.test
 /lid.stl

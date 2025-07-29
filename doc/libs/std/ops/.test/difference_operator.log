@@ -1,0 +1,12 @@
+-- Test --
+  difference_operator
+  ../doc/libs/std/ops/difference.md:9
+
+-- Code --
+
+std::geo2d::circle(radius = 10mm) - std::geo2d::rect(size = 2mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

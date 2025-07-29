@@ -1,23 +1,28 @@
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use std::path::PathBuf;
 
 pub struct Output {
     name: String,
     input: PathBuf,
     banner: PathBuf,
+    out: PathBuf,
     log: PathBuf,
 }
 
 impl Output {
-    pub fn new(name: String, input: PathBuf, banner: PathBuf, log: PathBuf) -> Self {
+    pub fn new(name: String, input: PathBuf, banner: PathBuf, out: PathBuf, log: PathBuf) -> Self {
         Self {
             name,
             input,
             banner,
+            out,
             log,
         }
     }
     pub fn has_path(&self, path: &PathBuf) -> bool {
-        self.banner == *path || self.log == *path
+        self.banner == *path || self.out == *path || self.log == *path
     }
 }
 
@@ -29,6 +34,7 @@ impl std::fmt::Display for Output {
             "| [![test]({banner})]({log}) | [{name}]({path}) |",
             name = self.name,
             banner = self.banner.as_os_str().to_str().expect(M),
+            // TODO: out = self.out.as_os_str().to_str().expect(M),
             path = self.input.as_os_str().to_str().expect(M),
             log = self.log.as_os_str().to_str().expect(M)
         )

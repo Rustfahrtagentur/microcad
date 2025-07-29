@@ -1,0 +1,14 @@
+-- Test --
+  types_quantity_scalar
+  ../doc/types/quantity.md:47
+
+-- Code --
+
+zero = 0;
+pi =  3.1415;
+percent = 55%;
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

@@ -1,0 +1,13 @@
+-- Test --
+  assignment_immutable
+  ../doc/structure/assignments.md:24
+
+-- Code --
+
+a = 5;
+a = a * 2; // error: a already defined in this scope
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT IS TODO

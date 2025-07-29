@@ -1,4 +1,4 @@
-# Copyright © 2024 The µcad authors <info@ucad.xyz>
+# Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [package]
@@ -17,22 +17,29 @@ version.workspace = true
 path = "lib.rs"
 
 [dependencies]
-pest = "2.7"
-pest_derive = "2.7"
-compact_str = "0.8"
+pest = "2.8"
+pest_derive = "2.8"
+compact_str = "0.9"
 log = "0.4"
-rctree = "0.6.0"
 lazy_static = "1.5"
 cgmath = "0.18"
 thiserror = "2.0"
 env_logger = "0.11"
-strum = { version = "0.26", features = ["derive"] }
+strum = { version = "0.27", features = ["derive"] }
+scan_dir = "0.3"
+delegate = "0.13"
+pathdiff = "0.2"
+ctor = "0.4"
+color-print = { version = "0.3", optional = true }
 
 microcad-core = { workspace = true }
+custom_debug = "0.6.2"
+derive_more = { version = "2.0.1", features = ["deref", "deref_mut"] }
 
 [features]
-default = ["geo3d"]
+default = ["geo3d", "ansi-color"]
 geo3d = []
+ansi-color = ["dep:color-print"]
 
 [lints.rust]
 missing_docs = "warn"

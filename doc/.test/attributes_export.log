@@ -1,0 +1,13 @@
+-- Test --
+  attributes_export
+  ../doc/attributes.md:69
+
+-- Code --
+
+#[export = "circle.svg"]
+c = std::geo2d::circle(42.0mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

@@ -1,0 +1,14 @@
+-- Test --
+  module_pub_use
+  ../doc/tests/statement_usage.md:138
+
+-- Code --
+
+mod k {
+  pub use std;
+}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT IS TODO

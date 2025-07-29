@@ -1,0 +1,31 @@
+-- Test --
+  mod_example
+  ../doc/structure/modules.md:11
+
+-- Code --
+
+mod std {
+    mod math {
+        // define PI as property
+        PI = 3.14159;
+
+        // define calculation function
+        fn abs(x: Scalar) -> Scalar {
+            if x < 0 { return -x; } else { return x; }
+        }
+    }
+}
+
+// call both
+x = std::math::abs(-1) * std::math::PI;
+
+-- Output --
+-- Errors --
+error: Assignment statement not available here
+  ---> <from_str>:4:9
+     |
+   4 |         PI = 3.14159;
+     |         ^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAIL

@@ -1,4 +1,4 @@
-# Copyright © 2024 The µcad authors <info@ucad.xyz>
+# Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [package]
@@ -21,10 +21,17 @@ path = "main.rs"
 [dependencies]
 clap = { version = "4", features = ["derive"] }
 anyhow = "1.0"
+env_logger = "0.11"
+log = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "1.0"
+toml = "0.9"
+notify = "8"
 
-microcad-builtin = { workspace = true }
 microcad-lang = { workspace = true }
 microcad-core = { workspace = true }
+microcad-builtin = { workspace = true }
+microcad-export = { workspace = true }
 
 [lints.rust]
 missing_docs = "warn"

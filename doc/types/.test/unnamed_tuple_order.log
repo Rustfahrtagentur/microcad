@@ -1,0 +1,13 @@
+-- Test --
+  unnamed_tuple_order
+  ../doc/types/tuples.md:38
+
+-- Code --
+
+// these tuples are equal
+std::debug::assert_eq([(1l, 10cm, 10cm²), (10cm, 10cm², 1l)]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

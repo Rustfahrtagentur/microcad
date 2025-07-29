@@ -1,4 +1,4 @@
-# Copyright © 2024 The µcad authors <info@ucad.xyz>
+# Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [package]
@@ -12,6 +12,8 @@ path = "lib.rs"
 [dependencies]
 pest = "2.7"
 pest_derive = "2.7"
+log = "0.4"
+env_logger = "0.11"
 
 [lints.rust]
 missing_docs = "warn"

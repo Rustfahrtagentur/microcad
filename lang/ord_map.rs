@@ -1,7 +1,9 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Ordered Map
+
+use std::ops::Index;
 
 /// trait of an value in an `OrdMap`
 /// # Types
@@ -89,7 +91,7 @@ where
     }
 
     /// add new value
-    pub fn push(&mut self, item: V) -> Result<(), K> {
+    pub fn try_push(&mut self, item: V) -> Result<(), K> {
         if let Some(key) = item.key().clone() {
             if self.map.contains_key(&key) {
                 return Err(key);
@@ -108,5 +110,34 @@ where
     /// get list of all keys
     pub fn keys(&self) -> std::collections::hash_map::Keys<'_, K, usize> {
         self.map.keys()
+    }
+
+    /// get first element
+    pub fn first(&self) -> Option<&V> {
+        self.vec.first()
+    }
+}
+
+impl<K, V> Index<usize> for OrdMap<K, V>
+where
+    V: OrdMapValue<K>,
+    K: std::cmp::Eq + std::hash::Hash + Clone,
+{
+    type Output = V;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.vec[index]
+    }
+}
+
+impl<K, V> Index<&K> for OrdMap<K, V>
+where
+    V: OrdMapValue<K>,
+    K: std::cmp::Eq + std::hash::Hash + Clone,
+{
+    type Output = V;
+
+    fn index(&self, key: &K) -> &Self::Output {
+        &self.vec[*self.map.get(key).expect("key not found")]
     }
 }

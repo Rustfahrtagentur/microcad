@@ -1,24 +1,22 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! 3D Geometry
 
+mod bounds;
+mod collection;
 mod geometry;
-mod mesh_renderer;
-mod render;
-pub mod tree;
+mod primitives;
 mod triangle_mesh;
 
+pub use bounds::*;
+pub use collection::*;
+pub use geometry::*;
 pub use manifold_rs::Manifold;
+pub use primitives::*;
 pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 
-pub use mesh_renderer::MeshRenderer;
-
-pub use geometry::*;
-pub use render::*;
-pub use tree::{Node, NodeInner};
-
-use crate::BooleanOp;
+use crate::{BooleanOp, RenderResolution};
 
 impl From<&BooleanOp> for manifold_rs::BooleanOp {
     fn from(op: &BooleanOp) -> Self {
@@ -31,27 +29,37 @@ impl From<&BooleanOp> for manifold_rs::BooleanOp {
     }
 }
 
-/// Create a new group node
-pub fn group() -> Node {
-    Node::new(NodeInner::Group)
-}
+/// Trait to render a 3D geometry into a mesh.
+pub trait RenderToMesh: Sized {
+    /// Render to manifold.
+    ///
+    /// Implement this method preferably.
+    fn render_to_manifold(self, resolution: &RenderResolution) -> std::rc::Rc<Manifold>;
 
-/// Create a new transform node
-pub fn transform(transform: crate::Mat4) -> Node {
-    Node::new(NodeInner::Transform(transform))
+    /// Render to mesh.
+    ///
+    /// Implement only if [`RenderToMesh::render_to_manifold`] is not possible.
+    fn render_to_mesh(self, resolution: &RenderResolution) -> TriangleMesh {
+        self.render_to_manifold(resolution).to_mesh().into()
+    }
 }
 
 #[test]
 fn test_boolean_op_multi() {
-    let a = std::rc::Rc::new(Geometry::Manifold(Manifold::sphere(2.0, 32)));
-    let b = std::rc::Rc::new(Geometry::Manifold(Manifold::sphere(1.0, 32)));
+    use std::rc::Rc;
+    let a = Rc::new(Geometry3D::Manifold(Rc::new(Manifold::sphere(2.0, 32))));
+    let b = Rc::new(Geometry3D::Manifold(Rc::new(Manifold::sphere(1.0, 32))));
 
-    let result = Geometry::boolean_op_multi(vec![a, b], &BooleanOp::Difference);
+    let result = Geometry3D::boolean_op_multi(
+        vec![a, b],
+        &RenderResolution::default(),
+        &BooleanOp::Difference,
+    );
     assert!(result.is_some());
 
     let result = result.expect("test error");
 
-    if let Geometry::Manifold(manifold) = &*result {
+    if let Geometry3D::Manifold(manifold) = &*result {
         assert!(manifold.to_mesh().vertices().len() > 1);
     } else {
         panic!("Expected manifold");
@@ -60,7 +68,7 @@ fn test_boolean_op_multi() {
     let transform = crate::Mat4::from_translation(crate::Vec3::new(5.0, 10.0, 0.0));
     let result = result.transform(&transform);
 
-    if let Geometry::Manifold(manifold) = result {
+    if let Geometry3D::Manifold(manifold) = result {
         assert!(manifold.to_mesh().vertices().len() > 1);
     } else {
         panic!("Expected manifold");

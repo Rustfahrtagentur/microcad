@@ -1,0 +1,13 @@
+
+mod a {
+    mod b {
+        mod c {
+            part m1() {}
+        }
+    }
+
+    part m2() {}
+}
+
+a::b::c::m1();
+a::m2();

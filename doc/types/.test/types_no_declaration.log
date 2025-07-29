@@ -1,0 +1,17 @@
+-- Test --
+  types_no_declaration
+  ../doc/types/README.md:38
+
+-- Code --
+
+x: Length;         // error
+
+-- Parse Error --
+Parser error:  --> 1:10
+  |
+1 | x: Length;         // error
+  |          ^---
+  |
+  = expected COMMENT
+-- Test Result --
+FAILED AS EXPECTED

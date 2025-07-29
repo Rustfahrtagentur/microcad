@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Test code writer
@@ -30,7 +30,7 @@ impl<'a> RustWriter<'a> {
     /// Write code line
     pub fn writeln(&mut self, s: &str) -> Result<(), std::io::Error> {
         write!(self.w, "{}", "    ".repeat(self.indent))?;
-        writeln!(self.w, "{}", s)?;
+        writeln!(self.w, "{s}")?;
         Ok(())
     }
 

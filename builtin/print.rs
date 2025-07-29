@@ -1,31 +1,96 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Builtin print method
 
-use std::sync::Mutex;
+use microcad_lang::{diag::*, eval::*, resolve::*, syntax::*, value::*};
 
-use lazy_static::lazy_static;
-use microcad_lang::{eval::*, function_signature, parameter, parameter_list};
-
-lazy_static! {
-    /// Alternate print output buffer
-    pub static ref output: Mutex<String> = Mutex::new(String::new());
-}
-
-/// Create print function
-pub fn builtin_fn() -> BuiltinFunction {
-    output.lock().expect("sync error").clear();
-    BuiltinFunction::new(
-        "print".into(),
-        function_signature!(parameter_list![parameter!(message: String)]),
-        &|args, _| {
-            let message: String = args["message"].clone().try_into()?;
-            // print on terminal...
-            println!("{message}");
-            // ..and write into output buffer
-            output.lock().expect("sync error").push_str(&message);
-            Ok(None)
+pub fn print() -> Symbol {
+    Symbol::new_builtin(
+        Identifier::no_ref("print"),
+        None,
+        &|_params, args, context| {
+            args.iter()
+                .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                    context.print(format!("{value}", value = arg.value));
+                    Ok(())
+                })?;
+            Ok(Value::None)
         },
     )
+}
+
+pub fn error() -> Symbol {
+    Symbol::new_builtin(
+        Identifier::no_ref("error"),
+        None,
+        &|_params, args, context| {
+            args.iter()
+                .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                    context.error(
+                        args,
+                        EvalError::BuiltinError(format!("{value}", value = arg.value)),
+                    )
+                })?;
+            Ok(Value::None)
+        },
+    )
+}
+
+pub fn warning() -> Symbol {
+    Symbol::new_builtin(
+        Identifier::no_ref("warning"),
+        None,
+        &|_params, args, context| {
+            args.iter()
+                .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                    context.warning(
+                        args,
+                        EvalError::BuiltinError(format!("{value}", value = arg.value)),
+                    )
+                })?;
+            Ok(Value::None)
+        },
+    )
+}
+
+pub fn info() -> Symbol {
+    Symbol::new_builtin(
+        Identifier::no_ref("info"),
+        None,
+        &|_params, args, context| {
+            args.iter()
+                .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                    context.info(args, format!("{value}", value = arg.value));
+                    Ok(())
+                })?;
+            Ok(Value::None)
+        },
+    )
+}
+
+pub fn todo() -> Symbol {
+    Symbol::new_builtin(
+        Identifier::no_ref("todo"),
+        None,
+        &|_params, args, context| {
+            args.iter()
+                .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                    context.error(args, EvalError::Todo(format!("{value}", value = arg.value)))
+                })?;
+            Ok(Value::None)
+        },
+    )
+}
+
+#[test]
+fn assert_ok() {
+    let mut context = Context::from_source(
+        "../tests/test_cases/print.µcad",
+        crate::builtin_module(),
+        &[],
+    )
+    .expect("resolvable file ../tests/test_cases/print.µcad");
+
+    assert!(context.eval().is_ok());
 }

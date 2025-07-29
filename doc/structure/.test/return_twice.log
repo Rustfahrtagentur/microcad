@@ -1,0 +1,17 @@
+-- Test --
+  return_twice
+  ../doc/structure/functions.md:49
+
+-- Code --
+
+fn pow( x: Scalar, n: Integer ) {
+    if n == 1 {
+        x 
+    }
+    x * pow(n-1)  // error: unexpected code
+}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

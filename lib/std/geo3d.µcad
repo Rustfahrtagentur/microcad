@@ -1,10 +1,8 @@
-/// Sphere module definition
+/// Sphere definition
 ///
 /// Examples:
 /// * with radius `r`: `sphere(r = 10.0mm);`
-module sphere {
-    init(radius: Length) {}
-
+part sphere(radius: Length) {
     init(r: Length) {
         radius = r;
     }
@@ -12,71 +10,78 @@ module sphere {
     __builtin::geo3d::sphere(radius / 1mm);
 }
 
-/// Cube module definition
+/// Cube definition
 ///
 /// Examples:
 /// * with size `s`: `cube(s = 10.0mm);`
 /// * with size `x`, `y`, and `z`: `cube(size_x = 10.0mm, size_y = 5.0mm, size_z = 3.0mm);`
-module cube {
+part cube(size_x: Length, size_y: Length, size_z: Length) {
     init(size: Length) {
         size_x = size;
         size_y = size;
         size_z = size;
     }
 
-    init(size_x: Length, size_y: Length, size_z: Length) { }
-
-    __builtin::transform::translate(
-            -size_x / 2.0 / 1mm,
-            -size_y / 2.0 / 1mm,
-            -size_z / 2.0 / 1mm
+    __builtin::ops::translate(
+            x = -size_x / 2.0 / 1mm,
+            y = -size_y / 2.0 / 1mm,
+            z = -size_z / 2.0 / 1mm
     ) {
         __builtin::geo3d::cube(
-            size_x / 1mm,
-            size_y / 1mm,
-            size_z / 1mm
+            size_x = size_x / 1mm,
+            size_y = size_y / 1mm,
+            size_z = size_z / 1mm
         );
     }
 }
 
-/// Cylinder module definition
+/// Cylinder definition
 ///
 /// Examples:
 /// * with radius `r` and height `h`: `cylinder(r = 10.0mm, h = 5.0mm);`
-module cylinder {
+part cylinder(radius_bottom: Length, radius_top: Length, height: Length, offset: Length = 0.0mm) {
+    /// Initialize by `radius` and `height`. Cylinder will be centered.
     init(radius: Length, height: Length) {
-        top = height / 2.0;
-        bottom = -top;
+        radius_bottom = radius;
+        radius_top = radius;
+        offset = -height / 2;
     }
 
-    init(r: Length, h: Length) {
-        radius = r;
-        height = h;
-        top = height / 2.0;
-        bottom = -top;
+    /// Initialize by `radius`, `height` and `offset`.
+    init(radius: Length, height: Length, offset: Length) {
+        radius_bottom = radius;
+        radius_top = radius;
     }
 
-    init(r: Length, bottom: Length, top: Length) {
-        radius = r;
+    /// Initialize by `radius`, `bottom` and `top`.
+    init(radius: Length, bottom: Length, top: Length) {
+        radius_bottom = radius;
+        radius_top = radius;
         height = top - bottom;
+        offset = bottom;
     }
 
-    init(d: Length, bottom: Length, height: Length) {
-        radius = d / 2.0;
-        top = bottom + height;
+    /// Initialize by `diameter` and `height`. Cylinder will be centered.
+    init(diameter: Length, height: Length) {
+        r = diameter / 2.0;
+        radius_bottom = r;
+        radius_top = r;
+        offset = -height / 2;
     }
 
+    /// Initialize by `diameter` and `height`. Cylinder will be centered.
     init(d: Length, h: Length) {
-        radius = d / 2.0;
+        r = d / 2.0;
+        radius_bottom = r;
+        radius_top = r;
+        offset = -h / 2;
         height = h;
-        top = height / 2.0;
-        bottom = -top;
     }
 
-    __builtin::transform::translate(x = 0.0, y = 0.0, z = bottom / 1mm) {
+    __builtin::ops::translate(x = 0.0, y = 0.0, z = offset / 1mm) {
         __builtin::geo3d::cylinder(
-            radius_bottom = radius / 1mm,
-            radius_top = radius / 1mm,
+            radius_bottom = radius_bottom / 1mm,
+            radius_top = radius_top / 1mm,
             height = height / 1mm
         );
     }

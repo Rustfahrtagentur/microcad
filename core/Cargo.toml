@@ -1,4 +1,4 @@
-# Copyright © 2024 The µcad authors <info@ucad.xyz>
+# Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [package]
@@ -17,14 +17,15 @@ version.workspace = true
 path = "lib.rs"
 
 [dependencies]
-strum = { version = "0.26", features = ["derive"] }
-log = "0.4"
 cgmath = "0.18"
-thiserror = "2.0"
-geo = "0.29"
-rctree = "0.6"
-toml = "0.8"
+derive_more = { version = "2", features = ["deref", "deref_mut"] }
+geo = "0.30"
+log = "0.4"
 manifold-rs = { version = "0.4", optional = true }
+rctree = "0.6"
+strum = { version = "0.27", features = ["derive"] }
+thiserror = "2.0"
+toml = "0.8"
 
 [features]
 default = ["geo3d"]

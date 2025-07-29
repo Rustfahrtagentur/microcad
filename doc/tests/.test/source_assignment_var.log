@@ -1,0 +1,12 @@
+-- Test --
+  source_assignment_var
+  ../doc/tests/statement_usage.md:72
+
+-- Code --
+
+a = 1;
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

@@ -1,8 +1,0 @@
-// Translate a rectangle twice in the x and y directions.
-
-use __builtin::*;
-
-export("{OUTPUT_FILE}.svg")
-    transform::translate(x = 15.0, y = 0.0, z = 0.0)
-        transform::translate(x = 0.0, y = 15.0, z = 0.0)
-            geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);

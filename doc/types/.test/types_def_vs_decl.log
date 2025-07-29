@@ -1,0 +1,13 @@
+-- Test --
+  types_def_vs_decl
+  ../doc/types/README.md:28
+
+-- Code --
+
+x: Length = 4mm;   // explicit type declaration
+x = 4mm;           // implicit type declaration via units.
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

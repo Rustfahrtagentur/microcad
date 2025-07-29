@@ -1,0 +1,21 @@
+-- Test --
+  code_between_initializers
+  ../doc/structure/workbench.md:203
+
+-- Code --
+
+sketch wheel(radius: Length) {
+    init( width:Length ) { radius = width / 2; }
+    
+    // error: code between initializers not allowed
+    radius = 1;
+
+    init( height:Length ) { radius = height / 2; }
+}
+
+wheel(radius = 1.0mm);
+
+-- Parse Error --
+Code between initializers is not allowed
+-- Test Result --
+FAILED AS EXPECTED

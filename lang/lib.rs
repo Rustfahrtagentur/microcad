@@ -1,24 +1,93 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad source code parser
+//! Processing of µcad source code.
+//!
+//! This module includes all components to parse, resolve and evaluate µcad code.and diagnose errors.
+//!
+//! - Load and parse source files in [`parse`] and [`syntax`]
+//! - Resolve parsed sources in [`resolve`]
+//! - Evaluate resolved sources in [`eval`]
+//! - Diagnose any evaluation errors in [`diag`]
+//!
+//! The grammar of µcad can be found [here](../../../lang/grammar.pest).
 
+pub mod builtin;
 pub mod diag;
 pub mod eval;
-pub mod objects;
+pub mod invalid;
+pub mod model;
 pub mod ord_map;
 pub mod parse;
 pub mod parser;
-pub mod source_file_cache;
+pub mod rc;
+pub mod resolve;
 pub mod src_ref;
-pub mod sym;
-pub mod r#type;
+pub mod syntax;
+pub mod ty;
+pub mod value;
 
-use std::sync::Once;
+/// Id type (base of all identifiers)
+pub type Id = compact_str::CompactString;
 
-static INIT_EVENT_LOGGER: Once = Once::new();
+/// Global test initialization.
+#[cfg(test)]
+#[ctor::ctor]
+fn init() {
+    env_logger::init();
+}
 
-/// Initialize env_logger
-pub fn env_logger_init() {
-    INIT_EVENT_LOGGER.call_once(env_logger::init);
+const MICROCAD_EXTENSIONS: &[&str] = &[".µcad", ".mcad"];
+
+/// Parse a rule from given string into a syntax element
+/// - `ty`: Type of the output syntax element
+/// - `rule`: Parsing rule to use.
+/// - `code`: String slice of the code to parse
+#[macro_export]
+macro_rules! parse {
+    ($ty:path, $rule:path, $code:expr) => {
+        $crate::parser::Parser::parse_rule::<$ty>($rule, $code, 0).expect("bad inline code")
+    };
+}
+
+#[test]
+fn parse_macro() {
+    let y3 = 3;
+    let p = parse!(
+        syntax::ParameterList,
+        parser::Rule::parameter_list,
+        &format!("(x=0,y=[1,2,{y3},4],z=2)")
+    );
+    assert_eq!(p.to_string(), "x = 0, y = [1, 2, 3, 4], z = 2");
+}
+
+/// Shortens given string to iz's first line and to MAX_LEN characters
+pub fn shorten(what: &str, max_chars: usize) -> String {
+    what.chars()
+        .enumerate()
+        .filter_map(|(p, ch)| {
+            if p == max_chars {
+                Some('…')
+            } else if p < max_chars {
+                if ch == '\n' {
+                    Some('⏎')
+                } else {
+                    Some(ch)
+                }
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
+/// Shortens given string to iz's first line and to MAX_LEN characters with default maximum length
+#[macro_export]
+macro_rules! shorten {
+    ($what:expr) => {
+        $crate::shorten(&format!("{}", $what), 80)
+    };
+    ($what:expr, $max_chars:literal) => {
+        shorten(format!("{}", $what).lines(), max_chars)
+    };
 }

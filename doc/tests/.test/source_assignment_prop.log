@@ -1,0 +1,18 @@
+-- Test --
+  source_assignment_prop
+  ../doc/tests/statement_usage.md:78
+
+-- Code --
+
+prop a = 1;
+
+-- Output --
+-- Errors --
+error: Assignment statement not available here
+  ---> <from_str>:1:1
+     |
+   1 | prop a = 1;
+     | ^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

@@ -1,0 +1,6 @@
+use __builtin::*;
+
+ops::difference() {
+    geo3d::sphere(radius = 3.0);
+    geo3d::cube(size_x = 3.0, size_y = 3.0, size_z = 3.0);
+}

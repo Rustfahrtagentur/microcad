@@ -1,0 +1,14 @@
+-- Test --
+  module_function
+  ../doc/tests/statement_usage.md:114
+
+-- Code --
+
+mod k {
+  fn f() {}
+}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

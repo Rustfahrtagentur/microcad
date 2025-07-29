@@ -15,22 +15,21 @@ Simple basic shapes can be composed to create complex geometries which then can 
 
 ## Content
 
-- [µcad](#µcad)
-  - [Content](#content)
-  - [Quick Start](#quick-start)
-    - [Installation](#installation)
-    - [Basic Example](#basic-example)
-      - [Source Code Explanation](#source-code-explanation)
-  - [Documentation](#documentation)
-  - [Contribute](#contribute)
-    - [Get Source Code](#get-source-code)
-    - [Get External Libraries](#get-external-libraries)
-    - [Build µcad](#build-µcad)
-    - [Install µcad locally from source](#install-µcad-locally-from-source)
-    - [Contributing to Documentation](#contributing-to-documentation)
-      - [User Manual](#user-manual)
-  - [Test List](#test-list)
-
+- [Content](#content)
+- [Quick Start](#quick-start)
+  - [Installation](#installation)
+  - [Basic Example](#basic-example)
+    - [Source Code Explanation](#source-code-explanation)
+- [Documentation](#documentation)
+- [Contribute](#contribute)
+  - [Get Source Code](#get-source-code)
+  - [Get External Libraries](#get-external-libraries)
+  - [Build µcad](#build-µcad)
+  - [Install µcad locally from source](#install-µcad-locally-from-source)
+  - [Contributing to Documentation](#contributing-to-documentation)
+    - [User Manual](#user-manual)
+- [Test List](#test-list)
+- [💚 Funded by](#-funded-by)
 
 ## Quick Start
 
@@ -83,13 +82,13 @@ The resulting STL model looks like this: ![Lid](examples/lid.png)
 
 #### Source Code Explanation
 
-The source file defines a *module* called `lid`, which instantiates two cylinders with different diameters and geometrically subtracts them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
+The source file defines a *part* called `lid`, which instantiates two cylinders with different diameters and geometrically subtracts them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
 
 [![test](.test/first_example.png)](.test/first_example.log)
 
 ```µcad,first_example
-// We have module called `lid` with three parameters
-module lid(
+// We have part called `lid` with three parameters
+part lid(
     thickness = 1.6mm,
     inner_diameter = 16cm,
     height = 20mm,
@@ -99,20 +98,14 @@ module lid(
 
     // Create two cylinders, one for the outer and one for the inner
     outer = std::geo3d::cylinder(d = outer_diameter, h = height);
-    inner = std::translate(z = thickness) std::geo3d::cylinder(d = inner_diameter, h = height);
+    inner = std::ops::translate(z = thickness) std::geo3d::cylinder(d = inner_diameter, h = height);
 
     // Calculate the difference between two translated cylinders and output them
     outer - inner;
 }
 
 // `l` is the instance of the lid model
-l = lid();
-
-// Print out the volume of the model instance
-std::print("Volume: {l.volume() / 1000}cm³");
-
-// Insert `l` into resulting object tree
-std::export("lid.stl") l;
+lid();
 ```
 
 The STL file can now also be loaded into a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
@@ -122,7 +115,9 @@ The STL file can now also be loaded into a slicer program like [Cura](https://ul
 ## Documentation
 
 - [Description of language features](doc/README.md)
+- [Language reference](doc/REFERENCE.md)
 - [Basic concepts](doc/CONCEPTS.md)
+- [Examples](doc/EXAMPLES.md)
 - Code documentation:
   - [`microcad-lang` module](https://docs.rs/microcad-lang)
   - [`microcad-core` module](https://docs.rs/microcad-core)
@@ -191,17 +186,18 @@ They can be included in the *markdown*, if you use this code:
 ```µcad,my_test
 ````
 
-| Image                                  | MD Code Type | Mark       | Code                            | What do do?            |
-| -------------------------------------- | ------------ | ---------- | ------------------------------- | ---------------------- |
-| ![ok](tests/images/ok.png)             | `µcad`       |            | succeeds                        | ok                     |
-| ![fail](tests/images/fail.png)         | `µcad`       |            | fails                           | fix test or code       |
-| ![ok_fail](tests/images/ok_fail.png)   | `µcad`       | `#fail`    | succeeds but should fail        | find out why           |
-| ![fail_ok](tests/images/fail_ok.png)   | `µcad`       | `#fail`    | fails intentionally             | ok                     |
-| ![todo](tests/images/todo.png)         | `µcad`       | `#todo`    | needs more work to succeed      | create issue/implement |
-| ![not_todo](tests/images/not_todo.png) | `µcad`       | `#todo`    | Succeeds but still marked to do | remove `#todo`         |
-| -                                      | `µcad`       | `#no-test` | Ignore completely               | yolo!                  |
-| -                                      | -            | `          | Ignore completely               | yolo!                  |
-| -                                      | *(other)*    | `          | Ignore completely               | yolo!                  |
+| Image                                      | MD Code Type | Mark       | Code                            | What do do?            |
+| ------------------------------------------ | ------------ | ---------- | ------------------------------- | ---------------------- |
+| ![ok](tests/images/ok.png)                 | `µcad`       |            | succeeds                        | ok                     |
+| ![fail](tests/images/fail.png)             | `µcad`       |            | fails                           | fix test or code       |
+| ![ok_fail](tests/images/ok_fail.png)       | `µcad`       | `#fail`    | succeeds but should fail        | find out why           |
+| ![fail_ok](tests/images/fail_ok.png)       | `µcad`       | `#fail`    | fails intentionally             | ok                     |
+| ![todo](tests/images/todo.png)             | `µcad`       | `#todo`    | needs more work to succeed      | create issue/implement |
+| ![not_todo](tests/images/not_todo.png)     | `µcad`       | `#todo`    | Succeeds but still marked to do | remove `#todo`         |
+| ![parse_fail](tests/images/parse_fail.png) | `µcad`       | -          | Parsing has failed              | fix grammar            |
+| -                                          | `µcad`       | `#no-test` | Ignore completely               | yolo!                  |
+| -                                          | -            | -          | Ignore completely               | yolo!                  |
+| -                                          | *(other)*    | -          | Ignore completely               | yolo!                  |
 
 You may also give the reader access to the logs by clicking on the banner with:
 
@@ -213,3 +209,13 @@ You may also give the reader access to the logs by clicking on the banner with:
 ## Test List
 
 There is a [list of all tests](doc/test_list.md) included in this documentation.
+
+## 💚 Funded by
+
+Thanks to the [Prototype Fund](https://www.prototypefund.de/) and the [Federal Ministry of Research, Technology and Space](https://www.bmbf.de/EN/) for funding this project in 2025.
+
+<a href="https://prototypefund.de/en/"><img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Prototype_Fund_Logo_2025.svg" alt="Logo of the Prototype Fund" style="height: 70px;"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://okfn.de/en/"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Open_Knowledge_Foundation_Deutschland_Logo.svg" alt="Logo of the Open Knowledge Foundation Germany" style="height: 100px;"></a>
+&nbsp;&nbsp;
+<a href="https://www.bmbf.de/EN/"><img src="https://upload.wikimedia.org/wikipedia/commons/d/df/BMFTR_Logo.svg" alt="Logo of the German Federal Ministry of Research, Technology and Space" style="height: 110px;"></a>

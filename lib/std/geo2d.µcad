@@ -1,29 +1,31 @@
-/// Circle module definition
+
+/// Circle definition
 ///
 /// Examples:
 /// * with radius `r`: `circle(r = 10.0mm);`
 /// * with diameter `d`: `circle(d = 5.0mm);`
-module circle(radius: Length) {
-    init(r: Length) {
+sketch circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
+    init(r: Length, c = (x = 0.0mm, y = 0.0mm)) {
         radius = r;
+        center = c;
     }
 
-    init(diameter: Length) {
+    init(diameter: Length, center = (x = 0.0mm, y = 0.0mm)) {
         radius = diameter / 2.0;
     }
 
-    init(d: Length) {
+    init(d: Length, center = (x = 0.0mm, y = 0.0mm)) {
         radius = d / 2.0;
     }
 
-    __builtin::geo2d::circle(radius / 1mm);
+    __builtin::geo2d::circle(radius = radius / 1mm, cx = center.x / 1mm, cy = center.y / 1mm);
 }
 
-/// Rectangle module definition
-/// 
+/// Rectangle definition
+///
 /// Examples:
 /// * centered rect with width `w` and height `h`: `rect(width = 10.0mm, height = 5.0mm);`
-module rect {
+sketch rect(width: Length, height: Length, x: Length, y: Length) {
     init(width: Length, height: Length) {
         x = -width / 2.0; // center x
         y = -height / 2.0; // center y
@@ -35,11 +37,11 @@ module rect {
         x = -size / 2.0; // center x
         y = -size / 2.0; // center y
     }
-    
+
     __builtin::geo2d::rect(
-            width / 1mm,
-            height / 1mm,
-            x / 1mm,
-            y / 1mm
+            width = width / 1mm,
+            height = height / 1mm,
+            x = x / 1mm,
+            y = y / 1mm
     );
 }

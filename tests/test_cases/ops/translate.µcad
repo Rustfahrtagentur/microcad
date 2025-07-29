@@ -1,0 +1,22 @@
+
+
+op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
+    __builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm) {
+        @children
+    }
+}
+
+r = __builtin::geo2d::rect(x = 0, y = 0, width = 3, height = 3);
+
+#[color = "red"]
+translate(x = 0.0mm, y = 0.0mm) r;
+
+#[color = "blue"]
+translate(x = 4.0mm, y = 0.0mm) r;
+
+#[color = "green"]
+translate(x = 0.0mm, y = 4.0mm) r;
+
+#[color = "gray"]
+translate(x = 4.0mm, y = 4.0mm) r;
+

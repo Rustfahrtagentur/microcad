@@ -1,0 +1,42 @@
+// This tests the local stack
+
+use __builtin::*;
+
+// new local variable #1
+i = 1;
+
+{
+    // accessing #1
+    assert(i == 1);
+
+    // new local variable #2 with same name
+    i = 2;
+
+    // accessing #2
+    assert(i == 2);
+}
+
+// accessing #1
+assert(i == 1);
+
+// concentric scopes
+{
+    {
+        {
+            // accessing #1
+            assert(i == 1);
+        }
+    }
+}
+
+// overwrite #1
+i = 3;
+
+// access #1
+assert(i == 3);
+
+p = __builtin::math::PI;
+
+q = p > 3.;
+
+assert(q);

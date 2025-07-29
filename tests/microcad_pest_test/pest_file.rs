@@ -1,11 +1,9 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Pest rule
 
-use std::ops::Deref;
-
-use crate::*;
+use crate::{PestResult, PestTest, RustWriter};
 
 /// Single pest rule with several tests
 pub struct PestRule {
@@ -20,7 +18,7 @@ pub struct PestRule {
 /// Pest grammar file
 pub struct PestFile(Vec<PestRule>);
 
-impl Deref for PestFile {
+impl std::ops::Deref for PestFile {
     type Target = Vec<PestRule>;
 
     fn deref(&self) -> &Self::Target {
@@ -53,7 +51,6 @@ impl PestFile {
     ) -> Result<(), std::io::Error> {
         let mut r = RustWriter::new(w);
         r.writeln("mod grammar {")?;
-        r.writeln("use log::error;")?;
 
         // Generate tests for each rule
         for rule in self.iter() {
@@ -84,14 +81,13 @@ impl PestFile {
                     PestResult::Ok(s) => {
                         r.writeln("Ok(pairs) =>  assert_eq!(input, pairs.as_str()),")?;
                         r.writeln(&format!(
-                            "Err(e) => error!(\"{{}} at `{{}}`:{{}} {}\", e, input, test_line),",
-                            s
+                            "Err(e) => panic!(\"{{}} at `{{}}`:{{}} {s}\", e, input, test_line),"
                         ))?;
                     }
                     PestResult::Err(s) => {
                         r.begin_scope("Ok(pairs) =>")?;
                         r.begin_scope("if input == pairs.as_str()")?;
-                        r.writeln(&format!("error!(\"Expected parsing error at `{{}}`:{{}}: {}\", input, test_line);", s))?;
+                        r.writeln(&format!("panic!(\"Expected parsing error at `{{}}`:{{}}: {s}\", input, test_line);"))?;
                         r.end_scope()?;
 
                         r.end_scope()?;

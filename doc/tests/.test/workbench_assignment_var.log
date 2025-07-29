@@ -1,0 +1,14 @@
+-- Test --
+  workbench_assignment_var
+  ../doc/tests/statement_usage.md:496
+
+-- Code --
+
+sketch k() {
+  a = 1;
+} k();
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! STL Export
@@ -46,6 +46,6 @@ impl<'a> StlWriter<'a> {
 
 impl Drop for StlWriter<'_> {
     fn drop(&mut self) {
-        writeln!(self.writer, "endsolid").unwrap();
+        writeln!(self.writer, "endsolid").expect("No error");
     }
 }

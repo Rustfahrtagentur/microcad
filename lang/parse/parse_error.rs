@@ -1,9 +1,9 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Parser errors
 
-use crate::parse::*;
+use crate::{parse::*, ty::*};
 use thiserror::Error;
 
 /// Parsing errors
@@ -12,10 +12,6 @@ pub enum ParseError {
     /// Expected identifier
     #[error("Expected identifier")]
     ExpectedIdentifier,
-
-    /// Invalid use statement
-    #[error("")]
-    InvalidUseStatement,
 
     /// Error parsing floating point literal
     #[error("Error parsing floating point literal: {0}")]
@@ -38,8 +34,12 @@ pub enum ParseError {
     Parser(#[from] Box<pest::error::Error<crate::parser::Rule>>),
 
     /// Error parsing color literal
-    #[error("Error parsing color literal: {0}")]
-    ParseColorError(String),
+    #[error("Error parsing color: {0}")]
+    ParseColorError(#[from] microcad_core::ParseColorError),
+
+    /// Unknown color name
+    #[error("Unknown color: {0}")]
+    UnknownColorName(String),
 
     /// Unknown unit
     #[error("Unknown unit: {0}")]
@@ -75,19 +75,27 @@ pub enum ParseError {
 
     /// Duplicate argument
     #[error("Duplicate argument: {0}")]
-    DuplicateCallArgument(Identifier),
+    DuplicateArgument(Identifier),
 
     /// Invalid map key type
     #[error("Invalid map key type: {0}")]
     InvalidMapKeyType(String),
 
-    /// Duplicated field name in map
-    #[error("Duplicated field name in map: {0}")]
-    DuplicatedMapField(Identifier),
+    /// Duplicated type name in map
+    #[error("Duplicated type name in map: {0}")]
+    DuplicatedMapType(Identifier),
 
     /// Duplicate identifier
     #[error("Duplicate identifier: {0}")]
     DuplicateIdentifier(Identifier),
+
+    /// Duplicate identifier in tuple
+    #[error("Duplicate identifier in tuple: {0}")]
+    DuplicateTupleIdentifier(Identifier),
+
+    /// Duplicate unnamed type in tuple
+    #[error("Duplicate unnamed type in tuple: {0}")]
+    DuplicateTupleType(Type),
 
     /// Missing format expression
     #[error("Missing format expression")]
@@ -95,15 +103,43 @@ pub enum ParseError {
 
     /// Statement between two init statements
     #[error("Statement between two init statements")]
-    StatementBetweenModuleInit,
+    StatementBetweenInit,
 
     /// Loading of a source file failed
     #[error("Loading of source file {0:?} failed")]
     LoadSource(std::path::PathBuf),
 
     /// Grammar rule error
-    #[error("Grammar rule error")]
+    #[error("Grammar rule error {0}")]
     GrammarRuleError(String),
+
+    /// Grammar rule error
+    #[error("Invalid qualified name '{0}'")]
+    InvalidQualifiedName(String),
+
+    /// Grammar rule error
+    #[error("Invalid identifier '{0}'")]
+    InvalidIdentifier(String),
+
+    /// Qualified name cannot be converted into an Id
+    #[error("Qualified name {0} cannot be converted into an Id")]
+    QualifiedNameIsNoId(QualifiedName),
+
+    /// Statement not allowed within workbenches
+    #[error("Statement not allowed within workbenches")]
+    IllegalWorkbenchStatement,
+
+    /// Code Between initializers
+    #[error("Code between initializers is not allowed")]
+    CodeBetweenInitializers,
+
+    /// Statement not allowed prior initializers
+    #[error("Statement not allowed prior initializers")]
+    StatementNotAllowedPriorInitializers,
+
+    /// Element is not available
+    #[error("Element is not available")]
+    NotAvailable,
 }
 
 /// Result with parse error

@@ -1,0 +1,14 @@
+-- Test --
+  pre_init_if
+  ../doc/tests/statement_usage.md:260
+
+-- Code --
+
+sketch k() { 
+  if std::math::PI == 3 { }
+init(l:Length) {} } k();
+
+-- Parse Error --
+Statement not allowed prior initializers
+-- Test Result --
+FAILED AS EXPECTED

@@ -1,58 +1,64 @@
 # µcad language
 
-The *µcad* programming language is purely declarative so a *µcad* program can
-be calculated like a mathematical equation.
-One just need to know all values of all the variables.
+- [Program Structure](#program-structure)
+- [Data Types](#data-types)
+- [Calls](#calls)
+- [Objects](#objects)
+- [Libraries](#libraries)
+
+The *µcad programming language* is purely declarative, which means that a µcad program can be
+evaluated like a mathematical equation, resulting in a graphical output.
+It only needs to know the values of all the variables to obtain this result.
 
 ## Program Structure
 
-A **µcad program** can be just a sequence of instructions or a more complex construct of
-separate **modules** and **functions** which may depend on each other via **use statements**.
-**Namespaces** help to bundle things into packages and solve naming collisions.
+A **µcad program** can simply consist of a sequence of [*statements*](structure/statements.md)  in a
+*source file* or more complex constructs such as [*workbenches*](structure/workbench.md) and
+[*functions*](structure/functions.md).
 
-* [Modules](modules/README.md)
-* [Use Statement](use_statement.md)
-* [Namespaces](namespaces.md)
+Additionally, [*modules*](structure/modules.md) help bundle things into packages and resolve naming
+collision issues.
+
+With [*use statements*](structure/use.md) functionalities of a module can be used in other modules.
 
 ## Data Types
 
-There are several **primitive types** which are always linked to a unit (like `Length` in `mm` or an `Angle` in `°`)
-and some which just represent factors or counts (like `Scalar` and `Integer`).
+µcad knows several [*primitive types*](types/primitive_types.md) (like `String` and `Integer`)
+and [*quantity types*](types/quantity.md) which are always linked to a *unit* (like `Length` in
+`mm` or an `Angle` in `°`).
 
-**Collection types** (like `Tuple` or `Array`) can bundle other types into structured parameter sets.
+[*Collections*](types/collections.md) (like [*tuples*](types/tuples.md) or [*arrays*](types/arrays.md))
+can bundle other types into structured sets.
 
-* [Primitive Types](primitive_types.md)
-* [Tuples](tuple.md)
-* [Arrays](arrays.md)
+Produced 3D and 2D objects are stored in [*nodes*](types/nodes.md).
 
-## Obscure Features
+It's planned to implement [*custom types*](types/custom_types.md) in future.
 
-The µcad language has some more or less obscure features which replace common
-programming concepts like for-loops or goto-jumps.
+## Calls
 
-* [Parameter Multiplicity](parameter_multiplicity.md)
-* [Unit Types](unit_types.md)
+In µcad you may [call](structure/calls.md) [*workbenches*](structure/calls.md#calling-workbenches) to produce
+*objects* from [sketches](structure/sketch.md) or [*parts*](structure/part.md) or you may call
+[*functions*](structure/calls.md#calling-functions).
 
-## Builtin Libraries
+In both cases you shall read about [*argument multiplicity*](structure/arguments.md#argument-multiplicity) and
+[*argument matching*](structure/arguments.md#argument-matching) to understand how µcad is processing arguments.
 
-A big advantage which µcad can take from it's strict module concept is that
-big parts of the basic functionalities can be written in the µcad language itself.
+## Objects
 
-* Standard Library (`std`)
-  * [Mathematical Functions (`math`)](std/math.md)
-  * [Geometric Algorithms (`algorithm`)](std/algorithm/README.md)
-  * [Export Functions](std/export.md)
+The 2D or 3D objects produced with [*workbenches*](structure/calls.md#calling-workbenches) can be
+[measured](nodes/measures.md) or [exported](attributes/export.md).
 
-## Builtin Functions
+## Libraries
 
-The *builtin libraries* rely on a few, very basic builtin functions which are
-implemented in *Rust* to be fast and to cover internal complexities.
+µcad knows two kinds of libraries: Those which are written µcad language and those which
+are written in *Rust*.
 
-* Export Statement (__builtin::export)
-* Basic 2D Primitives (`__builtin::geo2d`)
-* Basic 3D Primitives (`__builtin::geo3d`)
+The [standard library](libs/std/README.md) is a µcad library which encapsulates the
+[builtin library](libs/builtin.md) into a nice and convenient interface.
+
+If you want to make your own libraries put you µcad code into the search paths or create
+a [plugin](libs/plugins.md) to embed Rust code.
 
 ## Debugging
 
-* [Diagnostics](diag/README.md)
-* [Verification](verify.md)
+There are several builtin [debug functionalities](debug/README.md) which help you debugging your code.

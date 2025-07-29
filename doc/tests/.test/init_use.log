@@ -1,0 +1,14 @@
+-- Test --
+  init_use
+  ../doc/tests/statement_usage.md:342
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  use std;
+} } k(1cm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

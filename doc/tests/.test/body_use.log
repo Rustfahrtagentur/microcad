@@ -1,0 +1,14 @@
+-- Test --
+  body_use
+  ../doc/tests/statement_usage.md:562
+
+-- Code --
+
+{
+  use std;
+}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

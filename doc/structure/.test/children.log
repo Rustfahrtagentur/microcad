@@ -1,0 +1,34 @@
+-- Test --
+  children
+  ../doc/structure/op.md:30
+
+-- Code --
+
+// define operation which takes multiple items
+op punched_disk() { 
+    // check number of children
+    if @children.count() == 2 {
+        // make hole
+        difference() { @children } 
+    } else {
+        std::error("punched_disk must get two objects");
+    }
+}
+
+// use operation punch_disk with two circles
+punched_disk() {
+    std::geo2d::circle(radius = 1cm);
+    std::geo2d::circle(radius = 2cm);
+}
+
+-- Output --
+-- Errors --
+error: Not implemented: call_method for Models
+error: If condition is not a boolean: <INVALID VALUE>
+  ---> <from_str>:4:5
+     |
+   4 |     if @children.count() == 2 {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+TODO

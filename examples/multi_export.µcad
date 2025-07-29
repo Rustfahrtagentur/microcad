@@ -1,0 +1,7 @@
+#[export = "rect.svg"]
+#[svg = (style="fill: skyblue; stroke: cadetblue; stroke-width: 2;")]
+std::geo2d::rect(42mm);
+
+#[export = "circle.svg"]  // Will be exported to `circle.svg`
+#[svg = (style="fill: none; stroke: red;")]
+std::geo2d::circle(r = 42mm, c = (x = 50mm, y = 50mm));

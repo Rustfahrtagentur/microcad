@@ -1,40 +1,33 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Source code reference
+//! Source code references.
+//!
+//! All errors which occur while *parsing* or *evaluating* µcad code need to be reported and
+//! therefore need to address a place in the code where they did appear.
+//! A bunch of structs from this module provide this functionality:
+//!
+//! - [`SrcRef`] boxes a [`SrcRefInner`] which itself includes all necessary reference
+//!   information like *line*/*column* and a hash to identify the source file.
+//! - [`Refer`] encapsulates any syntax element and puts a [`SrcRef`] beside it.
+//! - [`SrcReferrer`] is a trait which provides unified access to the [`SrcRef`]
+//!   (e.g. implemented by [`Refer`]).
 
 mod line_col;
 mod refer;
+mod src_referrer;
 
 pub use line_col::*;
 pub use refer::*;
+pub use src_referrer::*;
 
 use crate::parser::*;
+use derive_more::Deref;
 
-/// Elements holding a source code reference shall implement this trait
-pub trait SrcReferrer {
-    /// return source code reference
-    fn src_ref(&self) -> SrcRef;
-}
-
-/// We want to be able to use SrcRef directly in functions with `impl SrcReferrer` argument
-impl SrcReferrer for SrcRef {
-    fn src_ref(&self) -> SrcRef {
-        self.clone()
-    }
-}
-
-/// We want to be able to use type references as well
-impl<T: SrcReferrer> SrcReferrer for &T {
-    fn src_ref(&self) -> SrcRef {
-        (*self).src_ref()
-    }
-}
-
-/// Reference into a source file
+/// Reference into a source file.
 ///
 /// *Hint*: Source file is not part of `SrcRef` and must be provided from outside
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default, Deref)]
 pub struct SrcRef(pub Option<Box<SrcRefInner>>);
 
 impl SrcRef {
@@ -42,45 +35,21 @@ impl SrcRef {
     /// - `range`: Position in file
     /// - `line`: Line number within file
     /// - `col`: Column number within file
-    pub fn new(range: std::ops::Range<usize>, line: u32, col: u32, source_file_hash: u64) -> Self {
+    pub fn new(
+        range: std::ops::Range<usize>,
+        line: usize,
+        col: usize,
+        source_file_hash: u64,
+    ) -> Self {
         Self(Some(Box::new(SrcRefInner {
             range,
             at: LineCol { line, col },
             source_file_hash,
         })))
     }
-
-    /// return length of `SrcRef`
-    pub fn len(&self) -> usize {
-        self.0.as_ref().map(|s| s.range.len()).unwrap_or(0)
-    }
-
-    /// return true if code base is empty
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    /// return source file hash
-    /// - `0` if not `SrcRefInner` is none
-    /// - `u64` if `SrcRefInner` is some
-    ///
-    /// This is used to map `SrcRef` -> `SourceFile`
-    pub fn source_hash(&self) -> u64 {
-        self.0.as_ref().map(|s| s.source_file_hash).unwrap_or(0)
-    }
 }
-
-impl std::ops::Deref for SrcRef {
-    type Target = Option<Box<SrcRefInner>>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-/// A reference in the source code
-#[derive(Clone, Debug, Default)]
+/// A reference into the source code
+#[derive(Clone, Default)]
 pub struct SrcRefInner {
     /// Range in bytes
     pub range: std::ops::Range<usize>,
@@ -94,7 +63,20 @@ impl std::fmt::Display for SrcRef {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.0 {
             Some(s) => write!(f, "{}", s.at),
-            _ => write!(f, "<no_ref>"),
+            _ => write!(f, crate::invalid_no_ansi!(REF)),
+        }
+    }
+}
+
+impl std::fmt::Debug for SrcRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.0 {
+            Some(s) => write!(
+                f,
+                "{} ({}..{}) in {:#x}",
+                s.at, s.range.start, s.range.end, s.source_file_hash
+            ),
+            _ => write!(f, crate::invalid!(REF)),
         }
     }
 }
@@ -120,60 +102,114 @@ impl Ord for SrcRef {
 }
 
 impl SrcRef {
-    /// return slice to code base
+    /// return length of `SrcRef`
+    pub fn len(&self) -> usize {
+        self.0.as_ref().map(|s| s.range.len()).unwrap_or(0)
+    }
+
+    /// return true if code base is empty
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    /// return source file hash
+    /// - `0` if not `SrcRefInner` is none
+    /// - `u64` if `SrcRefInner` is some
+    ///
+    /// This is used to map `SrcRef` -> `SourceFile`
+    pub fn source_hash(&self) -> u64 {
+        self.0.as_ref().map(|s| s.source_file_hash).unwrap_or(0)
+    }
+
+    /// Return slice to code base.
     pub fn source_slice<'a>(&self, src: &'a str) -> &'a str {
         &src[self.0.as_ref().expect("SrcRef").range.to_owned()]
     }
 
-    /// merge two `SrcRef` into a single one by
-    pub fn merge(lhs: impl SrcReferrer, rhs: impl SrcReferrer) -> SrcRef {
+    /// Merge two `SrcRef` into a single one.
+    ///
+    /// `SrcRef(None)` is returned if:
+    /// - ranges not in correct order (warning in log),
+    /// - references are not in the same file (warning in log),
+    /// - or `lhs` and `rhs` are both `None`.
+    pub fn merge(lhs: &impl SrcReferrer, rhs: &impl SrcReferrer) -> SrcRef {
         match (lhs.src_ref(), rhs.src_ref()) {
             (SrcRef(Some(lhs)), SrcRef(Some(rhs))) => {
-                let source_file_hash = {
-                    if lhs.source_file_hash != rhs.source_file_hash {
-                        todo!("Implement SrcRef with different files")
+                if lhs.source_file_hash == rhs.source_file_hash {
+                    let source_file_hash = lhs.source_file_hash;
+
+                    if lhs.range.end > rhs.range.start || lhs.range.start > rhs.range.end {
+                        log::warn!("ranges not in correct order");
+                        SrcRef(None)
                     } else {
-                        lhs.source_file_hash
+                        SrcRef(Some(Box::new(SrcRefInner {
+                            range: {
+                                // paranoia check
+                                assert!(lhs.range.end <= rhs.range.end);
+                                assert!(lhs.range.start <= rhs.range.start);
+
+                                lhs.range.start..rhs.range.end
+                            },
+                            at: lhs.at,
+                            source_file_hash,
+                        })))
                     }
-                };
-
-                // TODO Not sure if this is correct.
-                // Can we actually merge two ranges of SrcRef?
-                if lhs.range.end > rhs.range.start || lhs.range.start > rhs.range.end {
-                    return SrcRef(Some(lhs));
+                } else {
+                    log::warn!("references are not in the same file");
+                    SrcRef(None)
                 }
-
-                SrcRef(Some(Box::new(SrcRefInner {
-                    range: {
-                        // paranoia check
-                        assert!(lhs.range.end <= rhs.range.end);
-                        assert!(lhs.range.start <= rhs.range.start);
-
-                        lhs.range.start..rhs.range.end
-                    },
-                    at: lhs.at,
-                    source_file_hash,
-                })))
             }
             (SrcRef(Some(hs)), SrcRef(None)) | (SrcRef(None), SrcRef(Some(hs))) => SrcRef(Some(hs)),
             _ => SrcRef(None),
         }
     }
 
-    /// Return a `Src` from from `Vec`, by looking at first at and last element only.
-    /// Assume that position of SrcRefs in v is sorted
-    pub fn from_vec<T: SrcReferrer>(v: &[T]) -> SrcRef {
-        match (v.first(), v.last()) {
-            (None, None) => SrcRef(None),
-            (Some(first), Some(last)) => Self::merge(first.src_ref(), last.src_ref()),
-            _ => unreachable!(),
+    /// Merge all given source references to one
+    ///
+    /// All  given source references must have the same hash otherwise panics!
+    pub fn merge_all<S: SrcReferrer>(referrers: impl Iterator<Item = S>) -> SrcRef {
+        let mut result = SrcRef(None);
+        for referrer in referrers {
+            if let Some(src_ref) = referrer.src_ref().0 {
+                if let SrcRef(Some(result)) = &mut result {
+                    if result.source_file_hash != src_ref.source_file_hash {
+                        panic!("can only merge source references of the same file");
+                    }
+                    if src_ref.range.start < result.range.start {
+                        result.range.start = src_ref.range.start;
+                        result.at = src_ref.at;
+                    }
+                    result.range.end = std::cmp::max(src_ref.range.end, result.range.end);
+                } else {
+                    result = SrcRef(Some(src_ref));
+                }
+            }
         }
+        result
     }
 
-    /// Return line (0..) and column (0..) in source code or `None` if not available
+    /// Return line and column in source code or `None` if not available.
     pub fn at(&self) -> Option<LineCol> {
         self.0.as_ref().map(|s| s.at.clone())
     }
+}
+
+#[test]
+fn merge_all() {
+    use std::ops::Range;
+    assert_eq!(
+        SrcRef::merge_all(
+            [
+                SrcRef::new(Range { start: 5, end: 8 }, 1, 6, 123),
+                SrcRef::new(Range { start: 8, end: 10 }, 2, 1, 123),
+                SrcRef::new(Range { start: 12, end: 16 }, 3, 1, 123),
+                SrcRef::new(Range { start: 0, end: 10 }, 1, 1, 123),
+            ]
+            .iter(),
+        ),
+        SrcRef::new(Range { start: 0, end: 16 }, 1, 1, 123),
+    );
 }
 
 impl From<Pair<'_>> for SrcRef {
@@ -181,8 +217,8 @@ impl From<Pair<'_>> for SrcRef {
         let (line, col) = pair.line_col();
         Self::new(
             pair.as_span().start()..pair.as_span().end(),
-            line as u32,
-            col as u32,
+            line,
+            col,
             pair.source_hash(),
         )
     }

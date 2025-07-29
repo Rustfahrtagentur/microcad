@@ -1,4 +1,4 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! µcad Code Parser
@@ -37,11 +37,6 @@ impl<'i> Pair<'i> {
         self.0.clone().into_inner().map(|p| Self(p, self.1))
     }
 
-    /// Map and collect inner pairs into a `Vec<T>`
-    pub fn map_collect<T: Parse>(&'i self, f: fn(Self) -> ParseResult<T>) -> ParseResult<Vec<T>> {
-        self.inner().map(f).collect::<ParseResult<_>>()
-    }
-
     /// Find an inner pair by rule
     pub fn find<T: Parse>(&'i self, rule: Rule) -> Option<T> {
         match self
@@ -61,8 +56,8 @@ impl SrcReferrer for Pair<'_> {
         let (line, col) = pair.line_col();
         SrcRef::new(
             pair.as_span().start()..pair.as_span().end(),
-            line as u32,
-            col as u32,
+            line,
+            col,
             self.1,
         )
     }
@@ -114,5 +109,18 @@ impl Parser {
     pub fn ensure_rule(pair: &Pair, expected: Rule) {
         let rule = pair.as_rule();
         assert_eq!(rule, expected, "Unexpected rule: {rule:?}");
+    }
+
+    pub fn ensure_rules(pair: &Pair, rules: &[Rule]) {
+        for rule in rules {
+            if *rule == pair.as_rule() {
+                return;
+            }
+        }
+
+        panic!(
+            "Unexpected rules: expected {rules:?}, got {rule:?}",
+            rule = pair.as_rule()
+        );
     }
 }

@@ -1,53 +1,101 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad Standard library
+//! µcad builtin library
 
 mod assert;
-mod context_builder;
-mod export;
+pub mod context_builder;
+mod geo2d;
+mod geo3d;
+pub mod import;
 mod math;
-mod namespace_builder;
-pub mod print;
-mod transform;
+mod ops;
+mod print;
 
-/// Algorithm module, e.g. `std::algorithm::difference`
-pub mod algorithm;
-/// Module containing builtin 2D geometries like `circle` or `rect`
-pub mod geo2d;
-/// Module containing builtin 3D geometries like `sphere` or `cube`
-#[cfg(feature = "geo3d")]
-pub mod geo3d;
-
+/// Global test initialization.
 #[cfg(test)]
-mod tests;
+#[ctor::ctor]
+fn init() {
+    env_logger::init();
+}
 
-use microcad_lang::{builtin_module, eval::*, parse::*, sym::*};
+use std::str::FromStr;
 
-pub use context_builder::ContextBuilder;
-pub use export::export;
+pub use microcad_lang::builtin::*;
+use microcad_lang::{diag::*, eval::*, resolve::*, syntax::*, ty::Ty, value::*};
 
-use microcad_core::ExportSettings;
-use namespace_builder::NamespaceBuilder;
+pub(crate) use assert::*;
+pub use context_builder::*;
+pub(crate) use math::*;
+pub(crate) use ops::*;
+pub(crate) use print::*;
+
+/// Return type of argument.
+fn type_of() -> Symbol {
+    let id = Identifier::from_str("type_of").expect("valid id");
+    Symbol::new_builtin(id, None, &|_, args, _| {
+        if let Ok(arg) = args.get_single() {
+            let ty = arg.1.ty();
+            return Ok(Value::String(ty.to_string()));
+        }
+        Ok(Value::None)
+    })
+}
+
+/// Return the count of elements in an array or string.
+fn count() -> Symbol {
+    Symbol::new_builtin(Identifier::no_ref("count"), None, &|_params, args, ctx| {
+        let arg = args.get_single()?;
+        Ok(match &arg.1.value {
+            Value::String(s) => Value::Integer(s.chars().count() as i64),
+            Value::Array(a) => Value::Integer(a.len() as i64),
+            _ => {
+                ctx.error(arg.1, EvalError::BuiltinError("Value has no count.".into()))?;
+                Value::None
+            }
+        })
+    })
+}
 
 /// Build the standard module
-pub fn builtin_module() -> ParseResult<std::rc::Rc<NamespaceDefinition>> {
-    Ok(NamespaceBuilder::new("__builtin")
-        // TODO: is this correct= Shouldn't this use add_builtin_module() =
-        .add(math::builtin_module()?.into())
-        .add(geo2d::builtin_module().into())
-        .add(geo3d::builtin_module().into())
-        .add(algorithm::builtin_module().into())
-        .add(transform::builtin_namespace().into())
-        .add(assert::builtin_fn().into())
-        .add(print::builtin_fn().into())
-        .add(
-            builtin_module!(export(filename: String) {
-                let export_settings = ExportSettings::with_filename(filename.clone());
+pub fn builtin_module() -> Symbol {
+    ModuleBuilder::new("__builtin".try_into().expect("unexpected name error"))
+        .symbol(assert())
+        .symbol(assert_eq())
+        .symbol(assert_valid())
+        .symbol(assert_invalid())
+        .symbol(count())
+        .symbol(type_of())
+        .symbol(print())
+        .symbol(todo())
+        .symbol(error())
+        .symbol(warning())
+        .symbol(info())
+        .symbol(ops())
+        .symbol(math())
+        .symbol(import::import())
+        .symbol(geo2d::geo2d())
+        .symbol(geo3d::geo3d())
+        .build()
+}
 
-                Ok(microcad_export::export(export_settings))
-            })
-            .into(),
-        )
-        .build())
+/// Get built-in importers.
+pub fn builtin_importers() -> ImporterRegistry {
+    ImporterRegistry::default().insert(microcad_import::toml::TomlImporter)
+}
+
+/// Get built-in exporters.
+pub fn builtin_exporters() -> ExporterRegistry {
+    ExporterRegistry::new().insert(microcad_export::svg::SvgExporter)
+}
+
+/// Built-in context.
+pub fn builtin_context(
+    root: Symbol,
+    search_paths: &[std::path::PathBuf],
+) -> microcad_lang::eval::Context {
+    ContextBuilder::new(root, builtin_module(), search_paths, Box::new(Stdout))
+        .importers(builtin_importers())
+        .exporters(builtin_exporters())
+        .build()
 }

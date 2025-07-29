@@ -1,0 +1,19 @@
+-- Test --
+  group
+  ../doc/tests/semicolon.md:54
+
+-- Code --
+
+use std::geo2d::circle;
+use std::ops::translate;
+
+// group
+{ 
+    circle(radius = 1mm); 
+    circle(radius = 2mm); 
+}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

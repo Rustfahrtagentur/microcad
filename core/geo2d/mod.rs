@@ -1,27 +1,73 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! 2D Geometry
 
-pub mod tree;
-
+mod bounds;
+mod collection;
+mod edge;
 mod geometry;
-mod render;
+mod primitives;
+mod size;
 
-use crate::Scalar;
+use crate::*;
 
+pub use bounds::*;
+pub use collection::*;
+pub use edge::*;
+use geo::AffineTransform;
 pub use geometry::*;
-pub use render::*;
+pub use primitives::*;
+pub use size::*;
 
-/// Line string
-pub type LineString = geo::LineString<Scalar>;
-/// Multiple line string
-pub type MultiLineString = geo::MultiLineString<Scalar>;
-/// Polygon
-pub type Polygon = geo::Polygon<Scalar>;
-/// Multiple polygons
-pub type MultiPolygon = geo::MultiPolygon<Scalar>;
-/// Rectangle
-pub type Rect = geo::Rect<Scalar>;
-/// Point
-pub type Point = geo::Point<Scalar>;
+/// Trait to render a [`Geometry2D`] into a multi polygon.
+///
+/// Implement this trait
+pub trait RenderToMultiPolygon: Sized {
+    /// Render geometry into a [`Polygon`].
+    ///
+    /// Implement this method if the geometry only returns a single polygon.
+    /// Line geometry returns [`None`].
+    fn render_to_polygon(self, _: &RenderResolution) -> Option<Polygon> {
+        None
+    }
+
+    /// Render a geometry into a new multi polygon.
+    ///
+    /// This method uses [`RenderToMultiPolygon::render_to_existing_multi_polygon`] and does not need to be reimplemented.  
+    fn render_to_multi_polygon(self, resolution: &RenderResolution) -> MultiPolygon {
+        let mut polygons = geo::MultiPolygon(vec![]);
+        self.render_to_existing_multi_polygon(resolution, &mut polygons);
+        polygons
+    }
+
+    /// Render a geometry into a new multi polygon and attaches it to a list of existing polygons.
+    ///
+    /// Reimplement this function preferably if the geometry returns more than one polygon.
+    fn render_to_existing_multi_polygon(
+        self,
+        resolution: &RenderResolution,
+        polygons: &mut MultiPolygon,
+    ) {
+        if let Some(polygon) = self.render_to_polygon(resolution) {
+            polygons.0.push(polygon);
+        }
+    }
+}
+
+/// Trait to return all points of 2D geometry.
+pub trait FetchPoints2D {
+    /// Returns all points.
+    fn fetch_points_2d(&self) -> Vec<Vec2>;
+}
+
+/// Transformed version of a 2D geometry.
+pub trait Transformed2D<T = Self> {
+    /// Transform from matrix.
+    fn transformed_2d(&self, render_resolution: &RenderResolution, mat: &Mat3) -> T;
+}
+
+/// Convert a [`Mat3`]` into an affine transform.
+pub(crate) fn mat3_to_affine_transform(mat: &Mat3) -> AffineTransform {
+    geo::AffineTransform::new(mat.x.x, mat.y.x, mat.z.x, mat.x.y, mat.y.y, mat.z.y)
+}

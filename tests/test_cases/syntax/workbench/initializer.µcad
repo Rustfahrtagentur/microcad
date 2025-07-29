@@ -1,0 +1,10 @@
+// Define a sketch `circle` with two initializers
+sketch circle(radius: Scalar) {
+    init(r: Scalar) {
+        radius = r;
+    }
+
+    init(d: Scalar) {
+        radius = d / 2.0;
+    }
+}

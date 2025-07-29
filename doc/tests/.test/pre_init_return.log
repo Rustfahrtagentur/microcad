@@ -1,0 +1,14 @@
+-- Test --
+  pre_init_return
+  ../doc/tests/statement_usage.md:252
+
+-- Code --
+
+sketch k() { 
+  return 1;
+init(l:Length) {} } k();
+
+-- Parse Error --
+Statement not allowed within workbenches
+-- Test Result --
+FAILED AS EXPECTED

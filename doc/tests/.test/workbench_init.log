@@ -1,0 +1,14 @@
+-- Test --
+  workbench_init
+  ../doc/tests/statement_usage.md:440
+
+-- Code --
+
+sketch k() {
+  init() {}
+} k();
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

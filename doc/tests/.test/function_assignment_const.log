@@ -1,0 +1,14 @@
+-- Test --
+  function_assignment_const
+  ../doc/tests/statement_usage.md:708
+
+-- Code --
+
+fn f() {
+  const B = 1;
+} f();
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

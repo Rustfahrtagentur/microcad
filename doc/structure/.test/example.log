@@ -1,0 +1,21 @@
+-- Test --
+  example
+  ../doc/structure/functions.md:14
+
+-- Code --
+
+// define function print_error with text as parameter of type String
+fn print_error( text: String ) {
+    // code body
+    std::print("ERROR: {text}");
+}
+
+print_error("first");
+print_error("second");
+
+-- Output --
+ERROR: first
+ERROR: second
+-- Errors --
+-- Test Result --
+OK

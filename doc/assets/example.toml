@@ -1,0 +1,10 @@
+# Copyright © 2025 The µcad authors <info@ucad.xyz>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[M6]
+diameter = 6.0
+pitch = 1.0
+
+[M10]
+diameter = 10.0
+pitch = 1.5

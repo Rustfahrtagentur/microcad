@@ -1,3 +1,6 @@
+// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 use std::io::Write;
 
 /// Generate the header of the test summary
@@ -43,7 +46,7 @@ fn generate_table_row(w: &mut impl Write, test_case: &str) -> std::io::Result<()
     println!("Current directory: {:?}", std::env::current_dir()?);
 
     // Get absolute path of the reference tree file
-    println!("Reference tree file: {:?}", reference_tree_file);
+    println!("Reference tree file: {reference_tree_file:?}");
 
     let test_case_column = format!("[{test_case}.µcad](tests/test_cases/{test_case}.µcad)",);
 

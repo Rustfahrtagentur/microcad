@@ -1,0 +1,14 @@
+-- Test --
+  module_assignment_const
+  ../doc/tests/statement_usage.md:162
+
+-- Code --
+
+mod k {
+  const B = 1;
+}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

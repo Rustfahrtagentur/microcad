@@ -1,0 +1,16 @@
+-- Test --
+  use_module
+  ../doc/structure/use.md:45
+
+-- Code --
+
+circle = 1;
+
+use std::geo2d;
+
+geo2d::circle(r = 40mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

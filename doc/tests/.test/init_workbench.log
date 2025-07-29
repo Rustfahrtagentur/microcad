@@ -1,0 +1,20 @@
+-- Test --
+  init_workbench
+  ../doc/tests/statement_usage.md:310
+
+-- Code --
+
+sketch k() { init(l:Length) {
+  sketch f() {}
+} } k(1cm);
+
+-- Output --
+-- Errors --
+error: sketch statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   sketch f() {}
+     |   ^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

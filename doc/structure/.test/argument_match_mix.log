@@ -1,0 +1,14 @@
+-- Test --
+  argument_match_mix
+  ../doc/structure/arguments.md:48
+
+-- Code --
+
+fn f( a: Scalar, b: Length, c: Length ) {}
+// `a` is the only Scalar and `b` is named, so `c` does not need a name.
+f(1.0, b=2cm, 3cm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

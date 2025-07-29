@@ -1,4 +1,4 @@
-# Copyright © 2024 The µcad authors <info@ucad.xyz>
+# Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [package]
@@ -17,15 +17,17 @@ path = "source_file_test_summary/main.rs"
 
 
 [dependencies]
-pest = "2.7"
-pest_derive = "2.7"
+pest = "2.8"
+pest_derive = "2.8"
 anyhow = "1"
 log = "0.4"
+ctor = "0.4"
+env_logger = "0.11"
 
 microcad-core = { workspace = true }
-microcad-export = { workspace = true }
 microcad-lang = { workspace = true }
 microcad-builtin = { workspace = true }
+microcad-export = { workspace = true }
 
 [build-dependencies]
 microcad_markdown_test = { path = "microcad_markdown_test", version = "0.1.0" }

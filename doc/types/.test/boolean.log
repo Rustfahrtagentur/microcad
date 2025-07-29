@@ -1,0 +1,18 @@
+-- Test --
+  boolean
+  ../doc/types/primitive_types.md:17
+
+-- Code --
+
+std::debug::assert_eq([true or false, true]);
+std::debug::assert_eq([true and false, false]);
+
+std::debug::assert_eq([4 == 4, true]);
+std::debug::assert_eq([4 == 5, false]);
+std::debug::assert_eq([4 == 5 or 4 == 4, true]);
+std::debug::assert_eq([4 == 5 and 4 == 4, false]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

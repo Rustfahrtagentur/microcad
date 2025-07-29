@@ -1,0 +1,20 @@
+-- Test --
+  module_expression_model
+  ../doc/tests/statement_usage.md:194
+
+-- Code --
+
+mod k {
+  __builtin::geo2d::circle(radius=1);
+}
+
+-- Output --
+-- Errors --
+error: Expression statement not available here
+  ---> <from_str>:2:3
+     |
+   2 |   __builtin::geo2d::circle(radius=1);
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

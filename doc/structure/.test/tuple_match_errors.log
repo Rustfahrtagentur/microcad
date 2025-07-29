@@ -1,0 +1,19 @@
+-- Test --
+  tuple_match_errors
+  ../doc/structure/arguments.md:110
+
+-- Code --
+
+fn f( x: Length, y: Length, z: Length ) {}
+f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
+
+-- Output --
+-- Errors --
+error: Missing arguments: x,y
+  ---> <from_str>:2:4
+     |
+   2 | f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
+     |    ^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

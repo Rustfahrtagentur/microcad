@@ -1,0 +1,14 @@
+-- Test --
+  workbench_pub
+  ../doc/structure/functions.md:120
+
+-- Code --
+
+part punched_disk(radius: Length) {
+    pub fn inner() { radius/2 }   // error: cant use pub inside workbench
+}
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT IS TODO
