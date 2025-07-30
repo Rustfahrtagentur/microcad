@@ -77,26 +77,6 @@ impl Parse for ModelExpression {
                     src_ref: pair.clone().into(),
                 })
             })
-            .map_postfix(|lhs, op| {
-                match (Pair::new(op.clone(), pair.source_hash()), op.as_rule()) {
-                    (op, Rule::attribute_access) => {
-                        let op = op.inner().next().expect(INTERNAL_PARSE_ERROR);
-                        Ok(Self::AttributeAccess(
-                            Box::new(lhs?),
-                            Identifier::parse(op)?,
-                            pair.clone().into(),
-                        ))
-                    }
-                    (op, Rule::method_call) => Ok(Self::MethodCall(
-                        Box::new(lhs?),
-                        MethodCall::parse(op)?,
-                        pair.clone().into(),
-                    )),
-                    rule => {
-                        unreachable!("Expr::parse expected postfix operation, found {:?}", rule)
-                    }
-                }
-            })
             .parse(
                 pair.pest_pair()
                     .clone()

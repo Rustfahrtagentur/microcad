@@ -12,6 +12,7 @@ mod expression_statement;
 mod if_statement;
 mod marker;
 mod model_assignment_statement;
+mod model_expression_statement;
 mod return_statement;
 mod use_statement;
 

@@ -37,13 +37,6 @@ pub enum ModelExpression {
         /// Source code reference
         src_ref: SrcRef,
     },
-    /// Access an element of a tuple: `a.b`
-    PropertyAccess(Box<ModelExpression>, Identifier, SrcRef),
-    /// Access an attribute of a model: `a#b`
-    AttributeAccess(Box<ModelExpression>, Identifier, SrcRef),
-    /// Call to a method: `[2,3].len()`
-    /// First expression must evaluate to a value
-    MethodCall(Box<ModelExpression>, MethodCall, SrcRef),
 }
 
 impl SrcReferrer for ModelExpression {
@@ -58,9 +51,6 @@ impl SrcReferrer for ModelExpression {
                 rhs: _,
                 src_ref,
             } => src_ref.clone(),
-            Self::PropertyAccess(_, _, src_ref) => src_ref.clone(),
-            Self::AttributeAccess(_, _, src_ref) => src_ref.clone(),
-            Self::MethodCall(_, _, src_ref) => src_ref.clone(),
         }
     }
 }
@@ -74,9 +64,6 @@ impl std::fmt::Display for ModelExpression {
                 rhs,
                 src_ref: _,
             } => write!(f, "{lhs} {op} {rhs}"),
-            Self::PropertyAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
-            Self::AttributeAccess(lhs, rhs, _) => write!(f, "{lhs}#{rhs}"),
-            Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs}.{method_call}"),
             Self::Nested(nested) => write!(f, "{nested}"),
             Self::Marker(marker) => write!(f, "{marker}"),
             _ => unimplemented!(),
@@ -96,21 +83,6 @@ impl PrintSyntax for ModelExpression {
                 writeln!(f, "{:depth$}BinaryOp '{op}':", "")?;
                 lhs.print_syntax(f, depth + Self::INDENT)?;
                 rhs.print_syntax(f, depth + Self::INDENT)
-            }
-            Self::PropertyAccess(lhs, rhs, _) => {
-                writeln!(f, "{:depth$}FieldAccess:", "")?;
-                lhs.print_syntax(f, depth + Self::INDENT)?;
-                rhs.print_syntax(f, depth + Self::INDENT)
-            }
-            Self::AttributeAccess(lhs, rhs, _) => {
-                writeln!(f, "{:depth$}AttributeAccess:", "")?;
-                lhs.print_syntax(f, depth + Self::INDENT)?;
-                rhs.print_syntax(f, depth + Self::INDENT)
-            }
-            Self::MethodCall(lhs, method_call, _) => {
-                writeln!(f, "{:depth$}MethodCall:", "")?;
-                lhs.print_syntax(f, depth + Self::INDENT)?;
-                method_call.print_syntax(f, depth + Self::INDENT)
             }
             Self::Nested(nested) => nested.print_syntax(f, depth),
             Self::Marker(marker) => marker.print_syntax(f, depth),

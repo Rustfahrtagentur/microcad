@@ -46,11 +46,17 @@ pub trait Locals {
     /// Fetch a local variable from current stack frame.
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol>;
 
-    /// Set/add a named local value to current locals.
+    /// Set/add a named value to current locals.
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()>;
 
     /// Get a named local value from locals.
     fn get_local_value(&self, id: &Identifier) -> EvalResult<Value>;
+
+    /// Set/add named models to current locals.
+    fn set_local_models(&mut self, id: Identifier, models: Models) -> EvalResult<()>;
+
+    /// Get named models from locals.
+    fn get_local_models(&mut self, id: &Identifier) -> EvalResult<Models>;
 
     /// Get a property value from current model.
     fn get_model(&self) -> EvalResult<Model>;

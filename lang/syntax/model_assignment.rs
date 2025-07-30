@@ -11,7 +11,7 @@ pub struct ModelAssignment {
     /// Assignee
     pub id: Identifier,
     /// Value to assign
-    pub expression: Expression,
+    pub expression: ModelExpression,
     /// Source code reference
     pub src_ref: SrcRef,
 }

@@ -22,10 +22,8 @@ pub use value_access::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{model::*, syntax::*, ty::*, *};
+use crate::{syntax::*, ty::*, *};
 use microcad_core::*;
-
-pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
 
 /// A variant value with attached source code reference.
 #[derive(Clone, Default, PartialEq)]
@@ -47,8 +45,6 @@ pub enum Value {
     Tuple(Box<Tuple>),
     /// A matrix.
     Matrix(Box<Matrix>),
-    /// A model in the model tree.
-    Models(Models),
     /// Return value
     Return(Box<Value>),
 }
@@ -65,19 +61,6 @@ impl Value {
                 (quantity * Quantity::new(unit.normalize(1.0), quantity_type))?,
             )),
             (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
-        }
-    }
-
-    /// Create a value from a single model.
-    pub fn from_single_model(model: Model) -> Self {
-        Self::Models(vec![model].into())
-    }
-
-    /// Fetch models from this value.
-    pub fn fetch_models(&self) -> Models {
-        match self {
-            Self::Models(n) => n.clone(),
-            _ => Models::default(),
         }
     }
 
@@ -191,7 +174,6 @@ impl crate::ty::Ty for Value {
             Value::Array(list) => list.ty(),
             Value::Tuple(tuple) => tuple.ty(),
             Value::Matrix(matrix) => matrix.ty(),
-            Value::Models(_) => Type::Models,
             Value::Return(r) => r.ty(),
         }
     }
@@ -258,11 +240,6 @@ impl std::ops::Sub for Value {
             (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Subtract two numbers
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
-            // Boolean difference operator for models
-            (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
-                lhs.union()
-                    .boolean_op(microcad_core::BooleanOp::Difference, rhs.union()),
-            )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} - {rhs}"))),
         }
     }
@@ -313,10 +290,6 @@ impl std::ops::BitOr for Value {
 
     fn bitor(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
-                lhs.union()
-                    .boolean_op(microcad_core::BooleanOp::Union, rhs.union()),
-            )),
             (Value::Bool(lhs), Value::Bool(rhs)) => Ok(Value::Bool(lhs | rhs)),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} | {rhs}"))),
         }
@@ -329,9 +302,6 @@ impl std::ops::BitAnd for Value {
 
     fn bitand(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
-                lhs.union().boolean_op(BooleanOp::Intersection, rhs.union()),
-            )),
             (Value::Bool(lhs), Value::Bool(rhs)) => Ok(Value::Bool(lhs & rhs)),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} & {rhs}"))),
         }
@@ -349,7 +319,6 @@ impl std::fmt::Display for Value {
             Value::Array(l) => write!(f, "{l}"),
             Value::Tuple(t) => write!(f, "{t}"),
             Value::Matrix(m) => write!(f, "{m}"),
-            Value::Models(n) => write!(f, "{n}"),
             Value::Return(r) => write!(f, "{r}"),
         }
     }
@@ -366,7 +335,6 @@ impl std::fmt::Debug for Value {
             Value::Array(l) => write!(f, "Array = {l}"),
             Value::Tuple(t) => write!(f, "Tuple = {t}"),
             Value::Matrix(m) => write!(f, "Matrix = {m}"),
-            Value::Models(n) => write!(f, "Models:\n {n}"),
             Value::Return(r) => write!(f, "Return = {r}"),
         }
     }
@@ -476,30 +444,6 @@ impl From<String> for Value {
 impl FromIterator<Value> for Value {
     fn from_iter<T: IntoIterator<Item = Value>>(iter: T) -> Self {
         Self::Array(iter.into_iter().collect())
-    }
-}
-
-impl From<Models> for Value {
-    fn from(models: Models) -> Self {
-        match models.len() {
-            0 => Value::None,
-            _ => Value::Models(models),
-        }
-    }
-}
-
-impl From<Model> for Value {
-    fn from(model: Model) -> Self {
-        Self::from_single_model(model)
-    }
-}
-
-impl AttributesAccess for Value {
-    fn get_attributes_by_id(&self, id: &Identifier) -> Vec<crate::model::Attribute> {
-        match self.fetch_models().single_model() {
-            Some(model) => model.get_attributes_by_id(id),
-            None => Vec::default(),
-        }
     }
 }
 

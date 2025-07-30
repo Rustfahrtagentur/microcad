@@ -54,10 +54,8 @@ pub enum Expression {
     ArrayElementAccess(Box<Expression>, Box<Expression>, SrcRef),
     /// Access an element of a tuple: `a.b`
     PropertyAccess(Box<Expression>, Identifier, SrcRef),
-
     /// Access an attribute of a model: `a#b`
     AttributeAccess(Box<Expression>, Identifier, SrcRef),
-
     /// Call to a method: `[2,3].len()`
     /// First expression must evaluate to a value
     MethodCall(Box<Expression>, MethodCall, SrcRef),

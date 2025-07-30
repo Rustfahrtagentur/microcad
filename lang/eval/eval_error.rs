@@ -3,7 +3,7 @@
 
 //! Evaluation error
 
-use crate::{eval::*, parse::*, resolve::*, src_ref::SrcRef, syntax::*, ty::*, value::*};
+use crate::{eval::*, model::*, parse::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 use thiserror::Error;
 
 /// Evaluation error.
@@ -124,6 +124,10 @@ pub enum EvalError {
     /// Value Error.
     #[error("Value Error: {0}")]
     ValueError(#[from] ValueError),
+
+    /// Model Error.
+    #[error("Model Error: {0}")]
+    ModelError(#[from] ModelError),
 
     /// Name of external symbol is unknown.
     #[error("External symbol `{0}` not found")]

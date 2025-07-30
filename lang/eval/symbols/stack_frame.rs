@@ -133,6 +133,9 @@ impl StackFrame {
                     "",
                     ty = value.ty()
                 )?,
+                SymbolDefinition::Models(id, models) => {
+                    writeln!(f, "{:depth$}Models: {id} = {models}{full_name}", "")?
+                }
                 SymbolDefinition::SourceFile(source_file) => {
                     writeln!(f, "{:depth$}Source: {:?}", "", source_file.filename)?
                 }

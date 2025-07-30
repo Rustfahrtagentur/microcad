@@ -156,6 +156,20 @@ impl Locals for Stack {
         }
     }
 
+    fn set_local_models(&mut self, id: Identifier, models: Models) -> EvalResult<()> {
+        self.put_local(Some(id.clone()), Symbol::new_models(id, models))
+    }
+
+    fn get_local_models(&mut self, id: &Identifier) -> EvalResult<Models> {
+        match self.fetch(id) {
+            Ok(symbol) => match &symbol.borrow().def {
+                SymbolDefinition::Models(_, value) => Ok(value.clone()),
+                _ => Err(EvalError::LocalNotFound(id.clone())),
+            },
+            Err(_) => Err(EvalError::LocalNotFound(id.clone())),
+        }
+    }
+
     fn get_model(&self) -> EvalResult<Model> {
         match self
             .0

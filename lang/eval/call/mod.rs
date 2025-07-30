@@ -15,7 +15,7 @@ pub use argument_value_list::*;
 pub use call_method::*;
 pub use call_trait::*;
 
-use crate::{eval::*, syntax::*};
+use crate::{eval::*, model::*, syntax::*};
 
 use thiserror::Error;
 
@@ -65,7 +65,6 @@ impl Eval for Call {
             },
             |context| match &symbol.borrow().def {
                 SymbolDefinition::Builtin(f) => f.call(&args, context),
-                SymbolDefinition::Workbench(w) => Ok(Value::Models(w.call(&args, context)?)),
                 SymbolDefinition::Function(f) => f.call(&args, context),
                 _ => {
                     context.error(
@@ -80,12 +79,6 @@ impl Eval for Call {
                 }
             },
         ) {
-            Ok(Value::Models(models)) => {
-                // Store the information, saying that these models have been created by this symbol.
-                models.set_creator(symbol, self.src_ref());
-
-                Ok(Value::Models(models))
-            }
             Ok(value) => Ok(value),
             Err(err) => {
                 context.error(self, err)?;
@@ -95,7 +88,52 @@ impl Eval for Call {
     }
 }
 
-/// An error that occurred when looking for matching arguments between a call and a parameter definition.
+impl Eval<Models> for Call {
+    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
+        // find self in symbol table by own name
+        let symbol = match context.lookup(&self.name) {
+            Ok(symbol) => symbol,
+            Err(err) => {
+                context.error(self, err)?;
+                return Ok(Default::default());
+            }
+        };
+
+        // evaluate arguments
+        let args = self.argument_list.eval(context)?;
+        log::trace!("Call {name}({args})", name = self.name);
+
+        let models = context.scope(
+            StackFrame::Call {
+                symbol: symbol.clone(),
+                args: args.clone(),
+                src_ref: self.src_ref(),
+            },
+            |context| match &symbol.borrow().def {
+                SymbolDefinition::Builtin(_f) => todo!(),
+                SymbolDefinition::Workbench(w) => EvalResult::Ok(w.call(&args, context)?),
+                _ => {
+                    context.error(
+                        self,
+                        EvalError::Todo(format!(
+                            "cannot evaluate call of {} at {}",
+                            self,
+                            context.locate(self)?
+                        )),
+                    )?;
+                    Ok(Default::default())
+                }
+            },
+        )?;
+
+        // Store the information, saying that these models have been created by this symbol.
+        models.set_creator(symbol, self.src_ref());
+
+        Ok(models)
+    }
+}
+
+// An error that occurred when looking for matching arguments between a call and a parameter definition.
 #[derive(Error, Debug)]
 pub enum MatchError {
     /// Duplicated argument.

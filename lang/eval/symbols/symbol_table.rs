@@ -248,6 +248,14 @@ impl Locals for SymbolTable {
         self.stack.get_local_value(id)
     }
 
+    fn set_local_models(&mut self, id: Identifier, models: Models) -> EvalResult<()> {
+        self.stack.set_local_models(id, models)
+    }
+
+    fn get_local_models(&mut self, id: &Identifier) -> EvalResult<Models> {
+        self.stack.get_local_models(id)
+    }
+
     fn open(&mut self, frame: StackFrame) {
         self.stack.open(frame);
     }

@@ -60,3 +60,5 @@ pub enum ValueError {
     #[error("Identifier not found: {0}")]
     IdNotFound(Identifier),
 }
+
+pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;

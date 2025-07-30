@@ -164,6 +164,14 @@ impl Locals for Context {
         self.symbol_table.get_local_value(id)
     }
 
+    fn set_local_models(&mut self, id: Identifier, models: crate::model::Models) -> EvalResult<()> {
+        self.symbol_table.set_local_models(id, models)
+    }
+
+    fn get_local_models(&mut self, id: &Identifier) -> EvalResult<crate::model::Models> {
+        self.symbol_table.get_local_models(id)
+    }
+
     fn open(&mut self, frame: StackFrame) {
         self.symbol_table.open(frame);
     }

@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, rc::*, resolve::*, syntax::*, value::*};
+use crate::{eval::*, model::*, rc::*, resolve::*, syntax::*, value::*};
 
 /// Symbol definition
 #[derive(Debug, Clone)]
@@ -24,6 +24,8 @@ pub enum SymbolDefinition {
     Argument(Identifier, Value),
     /// Alias of a pub use statement.
     Alias(Identifier, QualifiedName),
+    /// Models variable
+    Models(Identifier, Models),
 }
 
 impl SymbolDefinition {
@@ -35,7 +37,10 @@ impl SymbolDefinition {
             Self::Function(f) => f.id.clone(),
             Self::SourceFile(s) => s.id(),
             Self::Builtin(m) => m.id(),
-            Self::Constant(id, _) | Self::Argument(id, _) | Self::Alias(id, _) => id.clone(),
+            Self::Constant(id, _)
+            | Self::Argument(id, _)
+            | Self::Models(id, _)
+            | Self::Alias(id, _) => id.clone(),
         }
     }
 
@@ -65,6 +70,7 @@ impl std::fmt::Display for SymbolDefinition {
             Self::Builtin(_) => write!(f, "(builtin)"),
             Self::Constant(_, value) => write!(f, "(constant) = {value}"),
             Self::Argument(_, value) => write!(f, "(call_argument) = {value}"),
+            Self::Models(_, models) => write!(f, "(models) = {models}"),
             Self::Alias(_, name) => write!(f, "(alias) => {name}"),
         }
     }

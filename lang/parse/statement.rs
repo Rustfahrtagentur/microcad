@@ -18,7 +18,6 @@ impl Parse for Assignment {
 impl Parse for AssignmentStatement {
     fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
         Ok(Self {
-            attribute_list: crate::find_rule!(pair, attribute_list)?,
             assignment: crate::find_rule_opt!(pair, assignment).expect("Assignment"),
             src_ref: pair.into(),
         })
@@ -85,17 +84,11 @@ impl Parse for IfStatement {
 
 impl Parse for ExpressionStatement {
     fn parse(pair: Pair) -> crate::parse::ParseResult<Self> {
-        Parser::ensure_rules(
-            &pair,
-            &[Rule::expression_statement, Rule::final_expression_statement],
-        );
+        Parser::ensure_rules(&pair, &[Rule::expression_statement]);
 
         Ok(Self {
             attribute_list: crate::find_rule!(pair, attribute_list)?,
-            expression: pair
-                .find(Rule::expression)
-                .or(crate::find_rule_opt!(pair, expression_no_semicolon))
-                .expect("Expression"),
+            expression: pair.find(Rule::expression).expect("Expression"),
             src_ref: pair.into(),
         })
     }
@@ -120,9 +113,7 @@ impl Parse for Statement {
             Rule::model_assignment_statement => {
                 Self::ModelAssignment(ModelAssignmentStatement::parse(first)?)
             }
-            Rule::expression_statement | Rule::final_expression_statement => {
-                Self::Expression(ExpressionStatement::parse(first)?)
-            }
+            Rule::expression_statement => Self::Expression(ExpressionStatement::parse(first)?),
             Rule::model_expression_statement => {
                 Self::ModelExpression(ModelExpressionStatement::parse(first)?)
             }
@@ -155,9 +146,6 @@ impl Parse for StatementList {
 
         for pair in pair.inner() {
             match pair.as_rule() {
-                Rule::final_expression_statement => {
-                    statements.push(Statement::Expression(ExpressionStatement::parse(pair)?));
-                }
                 Rule::statement => {
                     statements.push(Statement::parse(pair)?);
                 }

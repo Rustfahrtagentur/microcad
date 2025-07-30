@@ -8,8 +8,6 @@ use crate::{src_ref::*, syntax::*};
 /// An assignment statement, e.g. `#[aux] s = sphere(3.0mm);`.
 #[derive(Clone, Debug)]
 pub struct AssignmentStatement {
-    /// List of attributes.
-    pub attribute_list: AttributeList,
     /// The actual assignment.
     pub assignment: Assignment,
     /// Source code reference.
@@ -30,9 +28,6 @@ impl PrintSyntax for AssignmentStatement {
 
 impl std::fmt::Display for AssignmentStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if !self.attribute_list.is_empty() {
-            write!(f, "{} ", self.attribute_list)?;
-        }
         write!(f, "{};", self.assignment)
     }
 }

@@ -170,6 +170,16 @@ impl Models {
             |output_type, model_output_type| output_type.merge(&model_output_type),
         )
     }
+
+    /// Binary operation
+    pub fn binary_op(lhs: Models, rhs: Models, op: &str) -> ModelResult {
+        match op {
+            "-" => lhs - rhs,
+            "&" => lhs & rhs,
+            "|" => lhs | rhs,
+            _ => unimplemented!("{op:?}"),
+        }
+    }
 }
 
 impl From<Vec<Model>> for Models {
@@ -193,5 +203,38 @@ impl std::fmt::Display for Models {
 impl FromIterator<Model> for Models {
     fn from_iter<T: IntoIterator<Item = Model>>(iter: T) -> Self {
         Self(iter.into_iter().collect())
+    }
+}
+
+/// Rules for operator `-`.
+impl std::ops::Sub for Models {
+    type Output = ModelResult;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Ok(self
+            .union()
+            .boolean_op(microcad_core::BooleanOp::Difference, rhs.union()))
+    }
+}
+
+/// Rules for operator `|`` (union).
+impl std::ops::BitOr for Models {
+    type Output = ModelResult;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Ok(self
+            .union()
+            .boolean_op(microcad_core::BooleanOp::Union, rhs.union()))
+    }
+}
+
+/// Rules for operator `&` (intersection).
+impl std::ops::BitAnd for Models {
+    type Output = ModelResult;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        Ok(self
+            .union()
+            .boolean_op(BooleanOp::Intersection, rhs.union()))
     }
 }

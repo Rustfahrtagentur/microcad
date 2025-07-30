@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::WriteToFile, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{diag::*, eval::*, model::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
 use derive_more::{Deref, DerefMut};
 
@@ -127,6 +127,11 @@ impl Symbol {
     /// Create a new argument ([`SymbolDefinition::Argument`]).
     pub fn new_call_argument(id: Identifier, value: Value) -> Symbol {
         Symbol::new(SymbolDefinition::Argument(id, value), None)
+    }
+
+    /// Create a new argument ([`SymbolDefinition::Argument`]).
+    pub fn new_models(id: Identifier, models: Models) -> Symbol {
+        Symbol::new(SymbolDefinition::Models(id, models), None)
     }
 
     /// Print out symbols from that point.
@@ -290,6 +295,7 @@ impl SrcReferrer for SymbolInner {
                 unreachable!("builtin has no source code reference")
             }
             SymbolDefinition::Constant(identifier, _)
+            | SymbolDefinition::Models(identifier, _)
             | SymbolDefinition::Argument(identifier, _) => identifier.src_ref(),
             SymbolDefinition::Alias(identifier, _) => identifier.src_ref(),
         }

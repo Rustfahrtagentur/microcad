@@ -275,17 +275,8 @@ primary     = _{ literal | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | 
 // `,,`: error # No expression
 expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
-// A nested expression that does end with a body
-// `a {}`: ok # Body at the end
-// `b c`: error # No body at the end
-// `a b()`: error # No body at the end
-expression_no_semicolon = { nested_with_body }
-
 // A statement that is a single expression
-expression_statement = { (expression ~ ws* ~ ";") | expression_no_semicolon }
-
-// A statement that is a single expression, with optional semicolon
-final_expression_statement = { (attribute_list ~ ws+)? ~ expression ~ (ws* ~ ";")? }
+expression_statement = { expression ~ ws* ~ ";" }
 
 // `translate() rotate()`: ok # Nested call
 // `translate() rotate() { translate() rotate() {} }`: ok # Nested call
@@ -377,7 +368,7 @@ qualifier = { "const" | "prop" }
 // `prop r = 5.0mm`: Make value of assignment a public property
 assignment = { (qualifier ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
 
-assignment_statement = { (attribute_list ~ ws+)? ~ assignment ~ ws* ~ ";" }
+assignment_statement = { assignment ~ ws* ~ ";" }
 
 // `r:=circle();`: ok
 // `r:=translate() circle();`: ok
@@ -470,7 +461,7 @@ statement = {
   | model_expression_statement
 }
 
-statement_list = { (statement ~ ws*)* ~ final_expression_statement? }
+statement_list = { (statement ~ ws*)* }
 
 // `translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 // `part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function

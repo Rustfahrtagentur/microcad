@@ -5,9 +5,17 @@
 
 use crate::{eval::*, model::*, syntax::*};
 
+enum BuiltinReturn {
+    Value(Value),
+    Models(Models),
+}
+
 /// Builtin function type
-pub type BuiltinFn =
-    dyn Fn(Option<&ParameterValueList>, &ArgumentValueList, &mut Context) -> EvalResult<Value>;
+pub type BuiltinFn = dyn Fn(
+    Option<&ParameterValueList>,
+    &ArgumentValueList,
+    &mut Context,
+) -> EvalResult<BuiltinReturn>;
 
 /// Builtin function struct
 #[derive(Clone)]
@@ -55,19 +63,17 @@ pub trait BuiltinWorkbenchDefinition {
     fn function() -> &'static BuiltinFn {
         &|params, args, _| {
             log::trace!("Built-in workbench call {id:?}({args})", id = Self::id());
-            Ok(Value::Models(
-                ArgumentMatch::find_multi_match(
-                    args,
-                    params.expect("A built-in part must have a parameter list"),
-                )?
-                .iter()
-                .map(|args| {
-                    Self::model(args).inspect(|model| {
-                        model.borrow_mut().origin.arguments = args.clone();
-                    })
+            ArgumentMatch::find_multi_match(
+                args,
+                params.expect("A built-in part must have a parameter list"),
+            )?
+            .iter()
+            .map(|args| {
+                Self::model(args).inspect(|model| {
+                    model.borrow_mut().origin.arguments = args.clone();
                 })
-                .collect::<Result<Models, _>>()?,
-            ))
+            })
+            .collect::<Result<Models, _>>()
         }
     }
 

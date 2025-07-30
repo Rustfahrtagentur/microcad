@@ -68,7 +68,6 @@ impl CallMethod for Value {
             Value::Array(list) => list.call_method(id, args, context),
             Value::Tuple(_) => eval_todo!(context, args, "call_method for Tuple"),
             Value::Matrix(_) => eval_todo!(context, args, "call_method for Matrix"),
-            Value::Models(_) => eval_todo!(context, args, "call_method for Models"),
             Value::Return(_) => unreachable!("Return value cannot be called"),
         }
     }
