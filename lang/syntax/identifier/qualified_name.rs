@@ -156,6 +156,12 @@ impl From<Refer<Vec<Identifier>>> for QualifiedName {
     }
 }
 
+impl FromIterator<Identifier> for QualifiedName {
+    fn from_iter<T: IntoIterator<Item = Identifier>>(iter: T) -> Self {
+        Self(Refer::none(iter.into_iter().collect()))
+    }
+}
+
 impl From<&Identifier> for QualifiedName {
     fn from(id: &Identifier) -> Self {
         Self(Refer::none(vec![id.clone()]))

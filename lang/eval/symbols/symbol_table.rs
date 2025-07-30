@@ -76,7 +76,7 @@ impl SymbolTable {
 
     /// Lookup a symbol from local stack.
     fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("lookup local for '{name}'");
+        log::trace!("looking up locally for '{name}'");
         let symbol = if let Some(id) = name.single_identifier() {
             self.stack.fetch(id)
         } else {
@@ -93,7 +93,7 @@ impl SymbolTable {
 
         match symbol {
             Ok(symbol) => {
-                log::debug!("lookup local found '{name}' = '{}'", symbol.full_name());
+                log::trace!("local found '{name}' = '{}'", symbol.full_name());
                 Ok(symbol)
             }
             Err(err) => Err(err),
@@ -102,12 +102,12 @@ impl SymbolTable {
 
     /// Lookup a symbol from global symbols.
     fn lookup_global(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("lookup global for '{name}'");
+        log::trace!("looking up globally for '{name}'");
         let symbol = match self.globals.search(name) {
             Ok(symbol) => symbol.clone(),
             _ => self.load_symbol(name)?,
         };
-        log::debug!("lookup global found '{name}' = '{}'", symbol.full_name());
+        log::debug!("global found '{name}' = '{}'", symbol.full_name());
         Ok(symbol)
     }
 
@@ -131,6 +131,22 @@ impl SymbolTable {
             }
         }
         Err(EvalError::SymbolNotFound(name.clone()))
+    }
+
+    fn de_alias(&mut self, name: &QualifiedName) -> QualifiedName {
+        log::trace!("de-alias: {name}..");
+        for p in (1..name.len()).rev() {
+            if let Ok(symbol) = self.lookup_global(&QualifiedName::no_ref(name[0..p].to_vec())) {
+                if let SymbolDefinition::Alias(_, alias) = &symbol.borrow().def {
+                    let suffix: QualifiedName = name[p..].iter().cloned().collect();
+                    let new_name = suffix.with_prefix(alias);
+                    log::debug!("de-aliased: {name} into {new_name}");
+                    return new_name;
+                }
+            }
+        }
+        log::trace!("not de-aliased: {name}..");
+        name.clone()
     }
 
     /// Load a symbol from a qualified name.
@@ -185,7 +201,9 @@ impl SymbolTable {
 
 impl Lookup for SymbolTable {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::debug!("Lookup {name}");
+        log::trace!("looking up {name}");
+
+        let name = &self.de_alias(name);
 
         // collect all symbols that can be found
         let result = [
@@ -231,6 +249,7 @@ impl Lookup for SymbolTable {
                         others: found.into(),
                     })
                 } else {
+                    log::debug!("lookup of {name} successful");
                     Ok(first.clone())
                 }
             }
