@@ -272,7 +272,7 @@ In the following example we declare a building plan which consists of a `radius`
 ```µcad,property#todo
 // `outer` will automatically become a property because
 // it is declared in the building plan:
-sketch wheel(outer: length) {
+sketch wheel(outer: Length) {
     use std::geo2d::circle;
 
     // `inner` is declared as property and maybe read from 
@@ -287,8 +287,8 @@ sketch wheel(outer: length) {
 t = wheel(1cm);
 
 // extract and display `outer` and `inner` from generated wheel
-info("outer: {t.outer}");
-info("inner: {t.inner}");
+std::print("outer: {t.outer}");
+std::print("inner: {t.inner}");
 ```
 
 If you remove the `prop` keyword you will fail at accessing `inner`:
@@ -309,7 +309,7 @@ sketch wheel(outer: length) {
 t = wheel(outer = 1cm);
 
 // you can still extract and display `outer`
-std::info("outer: {t.outer}");
+std::print("outer: {t.outer}");
 // error: but you cannot access `inner` anymore
-std::info("inner: {t.inner}");
+std::print("inner: {t.inner}");
 ```
