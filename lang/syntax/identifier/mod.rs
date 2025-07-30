@@ -15,10 +15,24 @@ use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(pub Refer<Id>);
 
+static UNIQUE_ID_NEXT: std::sync::Mutex<usize> = std::sync::Mutex::new(0);
+
 impl Identifier {
     /// Make empty (invalid) id
     pub fn none() -> Self {
         Self(Refer::none("".into()))
+    }
+
+    /// Create new identifier with a new unique name.
+    ///
+    /// Every call will return a new identifier (which is a `$` followed by an counter)
+    pub fn unique() -> Self {
+        let mut num = UNIQUE_ID_NEXT
+            .lock()
+            .expect("lock on UNIQUE_ID_NEXT failed");
+        let id = format!("${num}");
+        *num += 1;
+        Identifier::no_ref(&id)
     }
 
     /// Check if this was created with none()

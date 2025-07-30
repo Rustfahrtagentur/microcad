@@ -235,6 +235,9 @@ impl Eval for NestedItem {
                 SymbolDefinition::External(ns) => {
                     unreachable!("Unexpected unload source file {} in expression", ns.id)
                 }
+                SymbolDefinition::UseAll(name) => {
+                    todo!()
+                }
             },
             NestedItem::Body(body) => Ok(Value::from_single_model(body.eval(context)?)),
         }

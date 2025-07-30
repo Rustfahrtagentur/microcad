@@ -41,7 +41,10 @@ impl UseDeclaration {
                     ),
                 )
             }
-            UseDeclaration::UseAll(_name) => todo!(),
+            UseDeclaration::UseAll(name) => (
+                Identifier::unique(),
+                Symbol::new(SymbolDefinition::UseAll(name.clone()), None),
+            ),
             UseDeclaration::UseAlias(name, alias) => (
                 alias.clone(),
                 Symbol::new(SymbolDefinition::Alias(alias.clone(), name.clone()), parent),
