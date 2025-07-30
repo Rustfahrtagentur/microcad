@@ -179,6 +179,10 @@ impl Locals for Context {
     fn get_model(&self) -> EvalResult<Model> {
         self.symbol_table.get_model()
     }
+
+    fn current_name(&self) -> QualifiedName {
+        self.symbol_table.current_name()
+    }
 }
 
 impl Default for Context {
@@ -213,8 +217,12 @@ impl UseSymbol for Context {
         self.symbol_table.use_symbol(name, id)
     }
 
-    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        self.symbol_table.use_symbols_of(name)
+    fn use_symbols_of(
+        &mut self,
+        name: &QualifiedName,
+        within: &QualifiedName,
+    ) -> EvalResult<Symbol> {
+        self.symbol_table.use_symbols_of(name, within)
     }
 }
 

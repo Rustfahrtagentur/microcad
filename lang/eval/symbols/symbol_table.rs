@@ -263,6 +263,10 @@ impl Locals for SymbolTable {
     fn get_model(&self) -> EvalResult<Model> {
         self.stack.get_model()
     }
+
+    fn current_name(&self) -> QualifiedName {
+        self.stack.current_name()
+    }
 }
 
 impl UseSymbol for SymbolTable {
@@ -276,7 +280,11 @@ impl UseSymbol for SymbolTable {
         Ok(symbol)
     }
 
-    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+    fn use_symbols_of(
+        &mut self,
+        name: &QualifiedName,
+        within: &QualifiedName,
+    ) -> EvalResult<Symbol> {
         log::debug!("Using all symbols in {name}");
 
         let symbol = match self.lookup(name) {
@@ -296,6 +304,11 @@ impl UseSymbol for SymbolTable {
         } else {
             for (id, symbol) in symbol.borrow().children.iter() {
                 self.stack.put_local(Some(id.clone()), symbol.clone())?;
+                self.globals
+                    .search(within)?
+                    .borrow_mut()
+                    .children
+                    .insert(id.clone(), symbol.clone());
             }
             log::trace!("Local Stack:\n{}", self.stack);
             Ok(symbol)
