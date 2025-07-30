@@ -40,8 +40,8 @@ std::error("this should not have happened");
 a = 0;
 
 if a == 0 {
-    std::info("a is zero");
+    std::log::info("a is zero");
 } else {
-    std::todo("print proper message");
+    std::log::todo("print proper message");
 }
 ```
