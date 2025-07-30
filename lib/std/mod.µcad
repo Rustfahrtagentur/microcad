@@ -1,8 +1,12 @@
-pub use __builtin::print;
 pub use __builtin::ops;
 pub use __builtin::math;
 pub use __builtin::string;
+pub use __builtin::print;
+pub use __builtin::type_of;
+pub use __builtin::count;
+pub use __builtin::import;
 
+// debugging 
 mod debug {
     pub use __builtin::assert;
     pub use __builtin::assert_eq;
@@ -10,16 +14,10 @@ mod debug {
     pub use __builtin::assert_valid;
 }
 
-pub use __builtin::type_of;
-pub use __builtin::count;
-
-pub use transform::translate;
-pub use transform::rotate;
-
-pub use __builtin::print;
-pub use __builtin::error;
-pub use __builtin::warning;
-pub use __builtin::info;
-pub use __builtin::todo;
-
-pub use __builtin::import;
+// logging
+mod log {
+    pub use __builtin::error;
+    pub use __builtin::warning;
+    pub use __builtin::info;
+    pub use __builtin::todo;
+}
