@@ -27,7 +27,11 @@ impl StatementList {
                 Statement::Function(f) => {
                     symbol_map.insert(f.id.clone(), f.resolve(parent.clone()));
                 }
-                Statement::Use(u) => symbol_map.append(&mut u.resolve(parent.clone())),
+                Statement::Use(u) => {
+                    if let Some((id, symbol)) = u.resolve(parent.clone()) {
+                        symbol_map.insert(id, symbol);
+                    }
+                }
                 Statement::Init(_)
                 | Statement::Return(_)
                 | Statement::If(_)
