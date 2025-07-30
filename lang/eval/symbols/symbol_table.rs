@@ -65,7 +65,7 @@ impl SymbolTable {
     /// Fetch global symbol from symbol map (for testing only).
     #[cfg(test)]
     pub fn fetch_global(&self, qualified_name: &QualifiedName) -> EvalResult<Symbol> {
-        self.globals.search(&qualified_name.clone())
+        self.globals.search(qualified_name)
     }
 
     /// Fetch local variable from local stack (for testing only).
@@ -304,11 +304,15 @@ impl UseSymbol for SymbolTable {
         } else {
             for (id, symbol) in symbol.borrow().children.iter() {
                 self.stack.put_local(Some(id.clone()), symbol.clone())?;
-                self.globals
-                    .search(within)?
-                    .borrow_mut()
-                    .children
-                    .insert(id.clone(), symbol.clone());
+                if within.is_empty() {
+                    self.globals.insert(id.clone(), symbol.clone());
+                } else {
+                    self.globals
+                        .search(within)?
+                        .borrow_mut()
+                        .children
+                        .insert(id.clone(), symbol.clone());
+                }
             }
             log::trace!("Local Stack:\n{}", self.stack);
             Ok(symbol)
