@@ -341,7 +341,6 @@ impl Eval<crate::model::Attributes> for AttributeList {
         Ok(Attributes(self.iter().try_fold(
             Vec::new(),
             |mut attributes, attribute| -> EvalResult<_> {
-                log::error!("{attribute:?}");
                 attributes.append(&mut attribute.eval(context)?);
                 Ok(attributes)
             },
