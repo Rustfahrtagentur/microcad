@@ -330,8 +330,9 @@ fn create_test<'a>(
     // log file of this test
     let log = test_path.join(format!("{name}.log"));
 
-    // svg output file of this test
-    let out = test_path.join(format!("{name}.svg"));
+    // output file of this test, without extension.
+    // This file extension is added later by the respective exporter.
+    let out = test_path.join(name);
 
     // maybe create .test directory
     let _ = std::fs::create_dir_all(test_path);

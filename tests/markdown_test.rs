@@ -166,7 +166,7 @@ pub fn run_test(
                         match model.final_output_type() {
                             OutputType::Geometry2D => {
                                 Export {
-                                    filename: out_filename.to_string().into(),
+                                    filename: format!("{out_filename}.svg").into(),
                                     resolution: RenderResolution::default(),
                                     exporter: Rc::new(SvgExporter),
                                     layers: vec![],
@@ -177,7 +177,7 @@ pub fn run_test(
                             }
                             OutputType::Geometry3D => {
                                 Export {
-                                    filename: out_filename.to_string().into(),
+                                    filename: format!("{out_filename}.stl").into(),
                                     resolution: RenderResolution::default(),
                                     exporter: Rc::new(StlExporter),
                                     layers: vec![],
