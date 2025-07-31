@@ -27,7 +27,7 @@ std::debug::assert(false, "this assertion fails");
 [![test](.test/verify_error.png)](.test/verify_error.log)
 
 ```µcad,verify_error#fail
-std::error("this should not have happened");
+std::log::error("this should not have happened");
 ```
 
 ## Todo
