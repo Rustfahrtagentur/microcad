@@ -7,18 +7,18 @@
 a = 0;
 
 if a == 0 {
-    std::info("a is zero");
+    std::log::info("a is zero");
 } else {
-    std::todo("print proper message");
+    std::log::todo("print proper message");
 }
 
 -- Output --
 -- Errors --
 info: a is zero
-  ---> <from_str>:4:15
+  ---> <from_str>:4:20
      |
-   4 |     std::info("a is zero");
-     |               ^^^^^^^^^^^
+   4 |     std::log::info("a is zero");
+     |                    ^^^^^^^^^^^
      |
 -- Test Result --
 OK
