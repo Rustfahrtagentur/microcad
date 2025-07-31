@@ -4,15 +4,15 @@
 use std::str::FromStr;
 
 use crate::{
+    Id,
     builtin::ExporterAccess,
     eval::{self, *},
     model::{Attributes, CustomCommand, ExportCommand, MeasureCommand, ResolutionAttribute},
     parameter,
     syntax::{self, *},
-    Id,
 };
 
-use microcad_core::{theme::Theme, Color, RenderResolution, Size2D};
+use microcad_core::{Color, RenderResolution, Size2D, theme::Theme};
 use thiserror::Error;
 
 /// Error type for attributes.
@@ -341,6 +341,7 @@ impl Eval<crate::model::Attributes> for AttributeList {
         Ok(Attributes(self.iter().try_fold(
             Vec::new(),
             |mut attributes, attribute| -> EvalResult<_> {
+                log::error!("{attribute:?}");
                 attributes.append(&mut attribute.eval(context)?);
                 Ok(attributes)
             },
