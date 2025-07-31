@@ -42,7 +42,6 @@ impl SourceFileTest {
         match context.eval() {
             Ok(model) => {
                 use microcad_core::*;
-                use microcad_export::svg::SvgExporter;
                 use microcad_lang::model::{ExportCommand as Export, OutputType};
                 use std::rc::Rc;
 
@@ -55,14 +54,20 @@ impl SourceFileTest {
                             Export {
                                 filename: self.output_filename("svg").into(),
                                 resolution: RenderResolution::default(),
-                                exporter: Rc::new(SvgExporter),
-                                layers: vec![],
-                                size: Size2D::A4,
+                                exporter: Rc::new(microcad_export::svg::SvgExporter),
                             }
                             .export(&model)
                             .expect("No error");
                         }
-                        OutputType::Geometry3D => todo!("Implement 3D export"),
+                        OutputType::Geometry3D => {
+                            Export {
+                                filename: self.output_filename("stl").into(),
+                                resolution: RenderResolution::default(),
+                                exporter: Rc::new(microcad_export::stl::StlExporter),
+                            }
+                            .export(&model)
+                            .expect("No error");
+                        }
                         OutputType::NotDetermined => {}
                         _ => panic!("Invalid geometry output"),
                     }

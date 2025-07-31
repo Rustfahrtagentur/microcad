@@ -3,7 +3,7 @@
 
 use std::rc::Rc;
 
-use microcad_core::{RenderResolution, Size2D};
+use microcad_core::RenderResolution;
 use microcad_export::{stl::StlExporter, svg::SvgExporter};
 
 #[allow(dead_code)]
@@ -169,8 +169,6 @@ pub fn run_test(
                                     filename: format!("{out_filename}.svg").into(),
                                     resolution: RenderResolution::default(),
                                     exporter: Rc::new(SvgExporter),
-                                    layers: vec![],
-                                    size: Size2D::A4,
                                 }
                                 .export(&model)
                                 .expect("No error");
@@ -180,8 +178,6 @@ pub fn run_test(
                                     filename: format!("{out_filename}.stl").into(),
                                     resolution: RenderResolution::default(),
                                     exporter: Rc::new(StlExporter),
-                                    layers: vec![],
-                                    size: Size2D::A4,
                                 }
                                 .export(&model)
                                 .expect("No error");
