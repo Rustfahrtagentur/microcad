@@ -166,6 +166,29 @@ impl Operation for Model {
 
         geometries.transformed_2d(&model_.output.resolution, &model_.output.local_matrix_2d())
     }
+
+    fn process_3d(&self, model: &Model) -> Geometries3D {
+        let mut geometries = Geometries3D::default();
+
+        let model_ = &model.borrow();
+        match &model_.element.value {
+            Element::Transform(_) | Element::Workpiece(_) => {
+                model_
+                    .children()
+                    .for_each(|n| geometries.append(n.process_3d(n)));
+            }
+            Element::Primitive3D(geo) => {
+                geometries.push(geo.clone());
+                model_
+                    .children()
+                    .for_each(|n| geometries.append(n.process_3d(n)));
+            }
+            Element::Operation(operation) => geometries.append(operation.process_3d(model)),
+            _ => {}
+        }
+
+        geometries.transformed_3d(&model_.output.resolution, &model_.output.local_matrix_3d())
+    }
 }
 
 impl FetchBounds2D for Model {

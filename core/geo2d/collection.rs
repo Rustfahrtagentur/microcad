@@ -29,7 +29,7 @@ impl Geometries2D {
     }
 
     /// Apply boolean operation to multiple geometries.
-    pub fn boolean_op(&self, resolution: &RenderResolution, op: &crate::BooleanOp) -> Self {
+    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> Self {
         if self.0.is_empty() {
             return Geometries2D::default();
         }

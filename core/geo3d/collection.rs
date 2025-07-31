@@ -12,7 +12,7 @@ use crate::{
     *,
 };
 
-/// 3D geometry collection with bounding box.
+/// 3D geometry collection.
 #[derive(Debug, Clone, Default, Deref, DerefMut)]
 pub struct Geometries3D(Vec<Rc<Geometry3D>>);
 
@@ -25,6 +25,24 @@ impl Geometries3D {
     /// Append another geometry collection.
     pub fn append(&mut self, mut geometries: Geometries3D) {
         self.0.append(&mut geometries.0)
+    }
+
+    /// Apply boolean operation to geometry collection.
+    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> Geometries3D {
+        if self.0.is_empty() {
+            return Geometries3D::default();
+        }
+
+        self.0[1..]
+            .iter()
+            .fold(self.0[0].clone(), |acc, geo| {
+                if let Some(r) = acc.boolean_op(resolution, geo.as_ref(), op) {
+                    Rc::new(r)
+                } else {
+                    acc
+                }
+            })
+            .into()
     }
 }
 
