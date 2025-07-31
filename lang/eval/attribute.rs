@@ -4,15 +4,15 @@
 use std::str::FromStr;
 
 use crate::{
+    Id,
     builtin::ExporterAccess,
     eval::{self, *},
     model::{Attributes, CustomCommand, ExportCommand, MeasureCommand, ResolutionAttribute},
     parameter,
     syntax::{self, *},
-    Id,
 };
 
-use microcad_core::{theme::Theme, Color, RenderResolution, Size2D};
+use microcad_core::{Color, RenderResolution, Size2D, theme::Theme};
 use thiserror::Error;
 
 /// Error type for attributes.
@@ -73,18 +73,13 @@ impl Eval<Option<ExportCommand>> for syntax::AttributeCommand {
                         let resolution = RenderResolution::new(
                             arguments.get::<&Value>("resolution")?.try_scalar()?,
                         );
-                        let size = arguments.get::<Size2D>("size")?;
 
                         match context.find_exporter(&filename, &id) {
-                            Ok(exporter) => {
-                                Ok(Some(ExportCommand {
-                                    filename,
-                                    exporter,
-                                    resolution,
-                                    size,
-                                    layers: vec![], // TODO get layers
-                                }))
-                            }
+                            Ok(exporter) => Ok(Some(ExportCommand {
+                                filename,
+                                exporter,
+                                resolution,
+                            })),
                             Err(err) => {
                                 context.warning(self, err)?;
                                 Ok(None)
@@ -107,8 +102,6 @@ impl Eval<Option<ExportCommand>> for syntax::AttributeCommand {
                                 filename,
                                 resolution: RenderResolution::default(),
                                 exporter,
-                                layers: vec![],
-                                size: Size2D::default(),
                             })),
                             Err(err) => {
                                 context.warning(self, err)?;
