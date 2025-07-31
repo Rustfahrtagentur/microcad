@@ -12,7 +12,10 @@ impl Eval for ExpressionStatement {
             Value::Models(mut models) => {
                 let attributes = self.attribute_list.eval(context)?;
                 models.iter_mut().for_each(|model| {
-                    model.borrow_mut().attributes = attributes.clone();
+                    model
+                        .borrow_mut()
+                        .attributes
+                        .append(&mut attributes.clone());
                 });
                 Ok(Value::Models(models))
             }
