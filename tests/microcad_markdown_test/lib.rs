@@ -331,7 +331,7 @@ fn create_test<'a>(
     let log = test_path.join(format!("{name}.log"));
 
     // output file of this test, without extension.
-    // This file extension is added later by the respective exporter.
+    // The file extension is added later by the respective exporter.
     let out = test_path.join(name);
 
     // maybe create .test directory
