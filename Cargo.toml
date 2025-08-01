@@ -45,7 +45,7 @@ keywords = ["cad", "geometry", "3d", "printing", "cnc", "openscad"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
-debug-cell = { git = "https://github.com/alexcrichton/debug-cell.git" }
+debug-cell = { git = "https://github.com/fightling/debug-cell.git" }
 microcad-core = { path = "core", version = "0.1.0" }
 microcad-import = { path = "import", version = "0.1.0" }
 microcad-export = { path = "export", version = "0.1.0" }
