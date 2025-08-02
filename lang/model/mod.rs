@@ -149,9 +149,17 @@ impl Model {
         }
     }
 
-    /// Return inner model if we are in an [`Object`].
-    pub fn into_inner_object_model(&self) -> Option<Model> {
-        self.borrow().children.iter().next().and_then(|n| {
+    /// Return inner group if this model only contains a group as single child.
+    ///
+    /// This function is used when we evaluate operations like `difference() {}` or `hull() {}`.
+    /// When evaluating these operations, we want to iterate over the group's children.
+    pub fn into_group(&self) -> Option<Model> {
+        let children = &self.borrow().children;
+        if children.len() != 1 {
+            return None;
+        }
+
+        children.first().and_then(|n| {
             if let Element::Group = n.0.borrow().element {
                 Some(n.clone())
             } else {

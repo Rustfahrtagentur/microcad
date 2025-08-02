@@ -11,7 +11,7 @@ impl Operation for BooleanOp {
     fn process_2d(&self, model: &Model) -> Geometries2D {
         let mut geometries = Geometries2D::default();
 
-        if let Some(model) = model.into_inner_object_model() {
+        if let Some(model) = model.into_group() {
             let self_ = model.borrow();
             self_.children.iter().for_each(|model| {
                 let b = model.borrow();
@@ -30,7 +30,7 @@ impl Operation for BooleanOp {
     fn process_3d(&self, model: &Model) -> microcad_core::Geometries3D {
         let mut geometries = Geometries3D::default();
 
-        if let Some(model) = model.into_inner_object_model() {
+        if let Some(model) = model.into_group() {
             let self_ = model.borrow();
             self_.children.iter().for_each(|model| {
                 let b = model.borrow();
