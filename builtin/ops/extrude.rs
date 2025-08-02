@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{model::*, resolve::*, src_ref::*, syntax::*};
+use microcad_lang::{model::*, resolve::*, syntax::*};
 
 #[derive(Debug)]
 struct Extrude;
@@ -16,8 +16,6 @@ impl Operation for Extrude {
 /// Creates a symbol containing a difference operation.
 pub fn extrude() -> Symbol {
     Symbol::new_builtin(Identifier::no_ref("extrude"), None, &|_, _, _| {
-        Ok(ModelBuilder::new_operation(Extrude, SrcRef(None))
-            .build()
-            .into())
+        Ok(ModelBuilder::new_operation(Extrude).build().into())
     })
 }

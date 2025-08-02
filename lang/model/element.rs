@@ -8,8 +8,12 @@ use microcad_core::*;
 use strum::IntoStaticStr;
 
 /// An element defines the entity of a [`Model`].
-#[derive(Clone, IntoStaticStr, Debug)]
+#[derive(Clone, IntoStaticStr, Debug, Default)]
 pub enum Element {
+    #[default]
+    /// A group element is created by a body `{}`.
+    Group,
+
     /// An workpiece that contains children and holds properties.
     ///
     /// Workpiece can be created by builtins, assignments, expressions and workbenches.
@@ -31,12 +35,6 @@ pub enum Element {
 
     /// An operation that generates geometries from its children.
     Operation(std::rc::Rc<dyn Operation>),
-}
-
-impl Default for Element {
-    fn default() -> Self {
-        Element::Workpiece(Default::default())
-    }
 }
 
 impl std::fmt::Display for Element {

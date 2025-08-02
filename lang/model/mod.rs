@@ -131,7 +131,7 @@ impl Model {
     /// Find children model placeholder in model descendants.
     pub fn find_children_placeholder(&self) -> Option<Model> {
         self.descendants().find(|n| {
-            n.borrow().id.is_none() && matches!(n.0.borrow().element.value, Element::ChildrenMarker)
+            n.borrow().id.is_none() && matches!(n.0.borrow().element, Element::ChildrenMarker)
         })
     }
 
@@ -152,7 +152,7 @@ impl Model {
     /// Return inner model if we are in an [`Object`].
     pub fn into_inner_object_model(&self) -> Option<Model> {
         self.borrow().children.iter().next().and_then(|n| {
-            if let Element::Workpiece(_) = n.0.borrow().element.value {
+            if let Element::Group = n.0.borrow().element {
                 Some(n.clone())
             } else {
                 None

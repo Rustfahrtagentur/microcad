@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{model::*, resolve::*, src_ref::*, syntax::*};
+use microcad_lang::{model::*, resolve::*, syntax::*};
 
 #[derive(Debug)]
 struct Hull;
@@ -36,8 +36,6 @@ impl Operation for Hull {
 /// Creates a symbol containing a hull operation.
 pub fn hull() -> Symbol {
     Symbol::new_builtin(Identifier::no_ref("hull"), None, &|_, _, _| {
-        Ok(ModelBuilder::new_operation(Hull, SrcRef(None))
-            .build()
-            .into())
+        Ok(ModelBuilder::new_operation(Hull).build().into())
     })
 }

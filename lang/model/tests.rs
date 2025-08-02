@@ -9,7 +9,7 @@ use crate::{model::*, syntax::*};
 #[cfg(test)]
 fn sample_models() -> Models {
     fn obj(id: &str) -> Model {
-        let model = ModelBuilder::new_object_body().build();
+        let model = ModelBuilder::new_group().build();
         model.borrow_mut().id = Some(Identifier::no_ref(id));
         model
     }
@@ -43,7 +43,7 @@ fn sample_models() -> Models {
 
 #[cfg(test)]
 fn sample_tree() -> Model {
-    ModelBuilder::new_object_body()
+    ModelBuilder::new_group()
         .add_children(sample_models())
         .expect("No error")
         .build()

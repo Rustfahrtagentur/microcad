@@ -19,7 +19,7 @@ pub struct ModelInner {
     /// Children of the model.
     pub children: Models,
     /// Element of the model with [SrcRef].
-    pub element: Refer<Element>,
+    pub element: Element,
     /// Attributes used for export.
     pub attributes: Attributes,
     /// The symbol (e.g. [`WorkbenchDefinition`]) that created this [`Model`].
@@ -30,7 +30,7 @@ pub struct ModelInner {
 
 impl ModelInner {
     /// Create a new [`ModelInner`] with a specific element.
-    pub fn new(element: Refer<Element>) -> Self {
+    pub fn new(element: Element) -> Self {
         Self {
             element,
             ..Default::default()
@@ -82,24 +82,24 @@ impl PropertiesAccess for ModelInner {
 
 impl From<Properties> for ModelInner {
     fn from(props: Properties) -> Self {
-        Self::new(Refer::none(Element::Workpiece(props)))
+        Self::new(Element::Workpiece(props))
     }
 }
 
 impl From<Rc<Geometry2D>> for ModelInner {
     fn from(geometry: Rc<Geometry2D>) -> Self {
-        Self::new(Refer::none(Element::Primitive2D(geometry)))
+        Self::new(Element::Primitive2D(geometry))
     }
 }
 
 impl From<Rc<Geometry3D>> for ModelInner {
     fn from(geometry: Rc<Geometry3D>) -> Self {
-        Self::new(Refer::none(Element::Primitive3D(geometry)))
+        Self::new(Element::Primitive3D(geometry))
     }
 }
 
 impl From<AffineTransform> for ModelInner {
     fn from(transform: AffineTransform) -> Self {
-        ModelInner::new(Refer::none(Element::Transform(transform)))
+        ModelInner::new(Element::Transform(transform))
     }
 }
