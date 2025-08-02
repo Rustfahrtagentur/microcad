@@ -16,6 +16,7 @@ pub fn ops() -> Symbol {
         .symbol(boolean::union())
         .symbol(boolean::intersection())
         .symbol(hull::hull())
+        .symbol(extrude::extrude())
         .symbol(translate::Translate::symbol())
         .symbol(rotate::Rotate::symbol())
         .build()

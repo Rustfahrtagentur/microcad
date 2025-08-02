@@ -33,7 +33,7 @@ impl Operation for Hull {
     }
 }
 
-/// Creates a symbol containing a difference operation.
+/// Creates a symbol containing a hull operation.
 pub fn hull() -> Symbol {
     Symbol::new_builtin(Identifier::no_ref("hull"), None, &|_, _, _| {
         Ok(ModelBuilder::new_operation(Hull, SrcRef(None))
