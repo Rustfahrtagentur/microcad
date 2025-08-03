@@ -4,7 +4,8 @@
 //! Work piece element
 
 use crate::{
-    model::{Properties, PropertiesAccess},
+    eval::{EvalError, EvalResult},
+    model::{OutputType, Properties, PropertiesAccess},
     syntax::{Identifier, WorkbenchKind},
     value::Value,
 };
@@ -13,9 +14,34 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct Workpiece {
     /// Workpiece kind: `op`, `sketch`, `part`.
-    kind: WorkbenchKind,
+    pub kind: WorkbenchKind,
     /// Workpiece properties.
-    properties: Properties,
+    pub properties: Properties,
+}
+
+impl Workpiece {
+    /// Check the output type of the workpiece.
+    pub fn check_output_type(&self, output_type: OutputType) -> EvalResult<()> {
+        match (self.kind, output_type) {
+            (WorkbenchKind::Part, OutputType::NotDetermined)
+            | (WorkbenchKind::Sketch, OutputType::NotDetermined) => Err(
+                EvalError::WorkbenchNoOutput(self.kind, OutputType::Geometry2D),
+            ),
+            (WorkbenchKind::Part, OutputType::Geometry3D)
+            | (WorkbenchKind::Sketch, OutputType::Geometry2D)
+            | (WorkbenchKind::Operation, _) => Ok(()),
+            (WorkbenchKind::Sketch, _) => Err(EvalError::WorkbenchInvalidOutput(
+                self.kind,
+                output_type,
+                OutputType::Geometry2D,
+            )),
+            (WorkbenchKind::Part, _) => Err(EvalError::WorkbenchInvalidOutput(
+                self.kind,
+                output_type,
+                OutputType::Geometry3D,
+            )),
+        }
+    }
 }
 
 impl PropertiesAccess for Workpiece {
