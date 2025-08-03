@@ -1,0 +1,6 @@
+use __builtin::*;
+
+ops::revolve(circular_segments = 64, revolve_degrees = 360.0) {
+    ops::translate(x = 20.0, y = 0.0, z = 0.0) std::geo2d::circle(10mm);
+}
+
