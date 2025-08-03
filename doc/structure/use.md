@@ -108,3 +108,19 @@ mod my {
 my::circle(r = 4mm);
 my::rect(size = 40mm);
 ```
+
+[![test](.test/use_statement_pub_extra.png)](.test/use_statement_pub_extra.log)
+
+```µcad,use_statement_pub_extra
+mod my {
+    mod name {
+        mod space {
+            pub use std::geo2d::*;
+        }
+    }
+    pub use name::space::*;
+}
+
+my::circle(r = 4mm);
+my::rect(size = 40mm);
+```
