@@ -44,14 +44,13 @@ impl Workpiece {
     }
 }
 
-impl PropertiesAccess for Workpiece {
-    fn get_property(&self, id: &Identifier) -> Option<&Value> {
-        self.properties.get(id)
-    }
-
-    fn add_properties(&mut self, props: Properties) {
-        self.properties
-            .extend(props.iter().map(|(id, prop)| (id.clone(), prop.clone())));
+impl std::fmt::Display for Workpiece {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.kind {
+            WorkbenchKind::Part => write!(f, "Part"),
+            WorkbenchKind::Sketch => write!(f, "Sketch"),
+            WorkbenchKind::Operation => write!(f, "Operation"),
+        }
     }
 }
 
@@ -61,5 +60,16 @@ impl From<WorkbenchKind> for Workpiece {
             kind,
             properties: Default::default(),
         }
+    }
+}
+
+impl PropertiesAccess for Workpiece {
+    fn get_property(&self, id: &Identifier) -> Option<&Value> {
+        self.properties.get(id)
+    }
+
+    fn add_properties(&mut self, props: Properties) {
+        self.properties
+            .extend(props.iter().map(|(id, prop)| (id.clone(), prop.clone())));
     }
 }

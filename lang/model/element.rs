@@ -40,16 +40,18 @@ pub enum Element {
 impl std::fmt::Display for Element {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name: &'static str = self.into();
-        write!(f, "{name}")?;
-
         match &self {
-            Element::Operation(transformation) => {
-                write!(f, "({transformation:?})")
-            }
+            Element::Workpiece(workpiece) => write!(f, "{workpiece}"),
             Element::Primitive2D(primitive) => {
-                write!(f, "({primitive:?})")
+                write!(f, "{name}({primitive:?})")
             }
-            _ => Ok(()),
+            Element::Primitive3D(primitive) => {
+                write!(f, "{name}({primitive:?})")
+            }
+            Element::Operation(transformation) => {
+                write!(f, "{name}({transformation:?})")
+            }
+            _ => write!(f, "{name}"),
         }
     }
 }
