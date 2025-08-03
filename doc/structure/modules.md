@@ -12,7 +12,7 @@ TODO
 mod std {
     mod math {
         // define PI as property
-        PI = 3.14159;
+        const PI = 3.14159;
 
         // define calculation function
         fn abs(x: Scalar) -> Scalar {
