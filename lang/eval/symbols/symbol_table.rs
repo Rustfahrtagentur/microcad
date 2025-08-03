@@ -111,6 +111,21 @@ impl SymbolTable {
         Ok(symbol)
     }
 
+    fn lookup_current(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+        let name = &name.with_prefix(&self.stack.current_module_name());
+        log::trace!("lookup in current module for '{name}'");
+        if let Ok(symbol) = self.lookup_global(name) {
+            if symbol.full_name() != *name {
+                log::debug!(
+                    "lookup in current module found '{name}' = '{}'",
+                    symbol.full_name()
+                );
+                return self.follow_alias(symbol);
+            }
+        }
+        Err(EvalError::SymbolNotFound(name.clone()))
+    }
+
     /// Lookup a symbol from global symbols but relatively to the file the given `name` came from.
     ///
     /// - `name`: *Qualified`name* to search for (must have a proper *source code reference*.
@@ -208,6 +223,7 @@ impl Lookup for SymbolTable {
         // collect all symbols that can be found
         let result = [
             self.lookup_local(name),
+            self.lookup_current(name),
             self.lookup_global(name),
             self.lookup_relatively(name),
         ]
