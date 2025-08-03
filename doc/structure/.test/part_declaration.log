@@ -65,6 +65,12 @@ warning: This expression statement did not produce any model
   26 |     std::geo2d::circle(radius);
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
+warning: The sketch workbench will produce no 2D output.
+  ---> <from_str>:2:1
+     |
+   2 | sketch wheel(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 error: Symbol assert_eq not found.
   ---> <from_str>:34:1
      |

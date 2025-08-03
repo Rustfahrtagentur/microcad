@@ -1,0 +1,13 @@
+-- Test --
+  extrude
+  ../doc/libs/std/ops/extrude.md:7
+
+-- Code --
+
+std::ops::extrude(height = 20mm)
+    std::geo2d::circle(radius = 20mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

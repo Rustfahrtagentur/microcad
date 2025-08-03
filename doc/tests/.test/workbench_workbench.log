@@ -22,5 +22,11 @@ error: Symbol f not found.
    2 |   sketch f() {} f();
      |                 ^^^
      |
+warning: The sketch workbench will produce no 2D output.
+  ---> <from_str>:1:1
+     |
+   1 | sketch k() {
+     | ^^^^^^^^^^^^
+     |
 -- Test Result --
 FAILED AS EXPECTED

@@ -18,5 +18,11 @@ error: sketch statement not available here
    2 |     sketch axis(length: Length) {}
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
+warning: The sketch workbench will produce no 2D output.
+  ---> <from_str>:1:1
+     |
+   1 | sketch wheel(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
 FAILED AS EXPECTED
