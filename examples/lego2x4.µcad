@@ -1,0 +1,32 @@
+use std::*;
+use std::geo2d::*;
+use std::ops::extrude;
+use std::ops::translate;
+
+part lego2x4_brick() {
+    width = 31.8mm;
+    height = 15.8mm;
+    wall = 1.2mm;
+
+    extrude(height = 8.6mm) {
+        translate(x = [-8,0,8]mm) {
+            circle(d = 6.51mm) - circle(d = 4.8mm)
+        }
+
+        rect(width = width, height = height) - rect(width = width - wall * 2, height = height - wall * 2);
+    } 
+
+    translate(z = 8.6mm)
+    extrude(height = 1.0mm) {
+        rect(width = width, height = height);
+    }
+    
+    translate(z = 9.6mm)
+    extrude(height = 1.8mm) {
+        translate(x = [-12,-4,4,12]mm, y = [-4,4]mm)
+            circle(d = 4.8mm)
+    }
+
+}
+
+lego2x4_brick();
