@@ -17,7 +17,7 @@ pub enum Element {
     /// A workpiece that holds properties.
     ///
     /// A workpiece is created by workbenches.
-    Workpiece(Properties),
+    Workpiece(Workpiece),
 
     /// A special element after which children will be nested as siblings.
     ///
@@ -57,17 +57,17 @@ impl std::fmt::Display for Element {
 impl PropertiesAccess for Element {
     fn get_property(&self, id: &Identifier) -> Option<&Value> {
         match self {
-            Self::Workpiece(object) => object.get(id),
-            _ => unreachable!("not an object element"),
+            Self::Workpiece(workpiece) => workpiece.get_property(id),
+            _ => unreachable!("not a workpiece element"),
         }
     }
 
-    fn set_properties(&mut self, props: Properties) {
+    fn add_properties(&mut self, props: Properties) {
         match self {
-            Self::Workpiece(p) => {
-                p.extend(props.iter().map(|(id, prop)| (id.clone(), prop.clone())));
+            Self::Workpiece(workpiece) => {
+                workpiece.add_properties(props);
             }
-            _ => unreachable!("not an object element"),
+            _ => unreachable!("not a workpiece element"),
         }
     }
 }

@@ -29,22 +29,12 @@ impl ModelBuilder {
         }
     }
 
-    /// Create a new 2D model.
+    /// Create a new workpiece.
     ///
-    /// This function is used when a call to a sketch is evaluated.
-    pub fn new_2d_workpiece() -> Self {
+    /// This function is used when a call to a workbench definition is evaluated.
+    pub fn new_workpiece(workpiece_kind: WorkbenchKind) -> Self {
         Self {
-            root: ModelInner::new(Element::Workpiece(Properties::default())),
-            ..Default::default()
-        }
-    }
-
-    /// Create a new 3D object.
-    ///
-    /// This function is used when a call to a part is evaluated.
-    pub fn new_3d_workpiece() -> Self {
-        Self {
-            root: ModelInner::new(Element::Workpiece(Properties::default())),
+            root: ModelInner::new(Element::Workpiece(workpiece_kind.into())),
             ..Default::default()
         }
     }
@@ -118,9 +108,8 @@ impl ModelBuilder {
 
     /// Build a [`Model`].
     pub fn build(mut self) -> Model {
-        if let Element::Workpiece(props) = &mut self.root.element {
-            log::trace!("Copy object properties:\n{}", self.properties);
-            *props = self.properties;
+        if let Element::Workpiece(workpiece) = &mut self.root.element {
+            workpiece.add_properties(self.properties);
         }
 
         let model = Model::new(self.root.into());
@@ -133,15 +122,5 @@ impl ModelBuilder {
 impl std::fmt::Display for ModelBuilder {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.properties)
-    }
-}
-
-impl From<WorkbenchKind> for ModelBuilder {
-    fn from(kind: WorkbenchKind) -> Self {
-        match kind {
-            WorkbenchKind::Part => ModelBuilder::new_3d_workpiece(),
-            WorkbenchKind::Sketch => ModelBuilder::new_2d_workpiece(),
-            WorkbenchKind::Operation => ModelBuilder::new_group(),
-        }
     }
 }

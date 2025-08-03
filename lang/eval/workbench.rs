@@ -24,8 +24,7 @@ impl WorkbenchDefinition {
         );
 
         // Create model
-        let model_builder: ModelBuilder = self.kind.into();
-        let model = model_builder
+        let model = ModelBuilder::new_workpiece(self.kind)
             .origin(Origin {
                 arguments: arguments.clone(),
                 // TODO: where to get the rest?

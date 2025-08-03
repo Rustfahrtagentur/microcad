@@ -28,7 +28,7 @@ impl InitDefinition {
                     .map(|(id, value)| ((*id).clone(), value.expect("ok")))
                     .collect();
 
-                model.borrow_mut().set_properties(props.clone());
+                model.borrow_mut().add_properties(props.clone());
                 Ok(props)
             } else {
                 Err(EvalError::BuildingPlanIncomplete(

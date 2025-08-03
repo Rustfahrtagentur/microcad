@@ -14,6 +14,7 @@ pub mod origin;
 pub mod output;
 pub mod properties;
 pub mod render;
+pub mod workpiece;
 
 pub use attribute::*;
 pub use builder::*;
@@ -25,6 +26,7 @@ pub use operation::*;
 pub use origin::*;
 pub use output::*;
 pub use properties::*;
+pub use workpiece::*;
 
 use derive_more::{Deref, DerefMut};
 

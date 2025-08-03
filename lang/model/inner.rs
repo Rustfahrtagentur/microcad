@@ -75,14 +75,8 @@ impl PropertiesAccess for ModelInner {
         self.element.get_property(id)
     }
 
-    fn set_properties(&mut self, props: Properties) {
-        self.element.set_properties(props);
-    }
-}
-
-impl From<Properties> for ModelInner {
-    fn from(props: Properties) -> Self {
-        Self::new(Element::Workpiece(props))
+    fn add_properties(&mut self, props: Properties) {
+        self.element.add_properties(props);
     }
 }
 
