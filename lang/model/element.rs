@@ -14,9 +14,9 @@ pub enum Element {
     /// A group element is created by a body `{}`.
     Group,
 
-    /// An workpiece that contains children and holds properties.
+    /// A workpiece that holds properties.
     ///
-    /// Workpiece can be created by builtins, assignments, expressions and workbenches.
+    /// A workpiece is created by workbenches.
     Workpiece(Properties),
 
     /// A special element after which children will be nested as siblings.
