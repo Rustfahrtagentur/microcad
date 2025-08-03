@@ -147,27 +147,20 @@ impl Transformed2D<Polygon> for Rect {
 }
 
 /// Convert a line string to a vector of [`Scalar`].
-pub fn line_string_to_vec(line_string: &LineString, ccw: bool) -> Vec<Scalar> {
-    match ccw {
-        true => line_string
-            .points()
-            .rev()
-            .flat_map(|point| vec![point.x(), point.y()])
-            .collect(),
-        false => line_string
-            .points()
-            .flat_map(|point| vec![point.x(), point.y()])
-            .collect(),
-    }
+pub fn line_string_to_vec(line_string: &LineString) -> Vec<Scalar> {
+    line_string
+        .points()
+        .flat_map(|point| vec![point.x(), point.y()])
+        .collect()
 }
 
 /// Convert a polygon to a vector of [`Scalar`].
 ///
 /// Exterior polygon has CW winding order, interior polygon have CCW winding order.
 pub fn polygon_to_vec(polygon: &Polygon) -> Vec<Scalar> {
-    let mut vec = line_string_to_vec(polygon.exterior(), false);
+    let mut vec = line_string_to_vec(polygon.exterior());
     polygon.interiors().iter().for_each(|interior| {
-        vec.append(&mut line_string_to_vec(interior, true));
+        vec.append(&mut line_string_to_vec(interior));
     });
     vec
 }

@@ -27,21 +27,16 @@ impl Operation for Extrude {
         use std::rc::Rc;
         let mut geometries = Geometries2D::default();
 
-        match model.into_group() {
-            Some(model) => {
-                let self_ = model.borrow();
-                self_.children.iter().for_each(|model| {
-                    let b = model.borrow();
-                    let mat = b.output.local_matrix_2d();
-                    geometries.append(
-                        model
-                            .process_2d(model)
-                            .transformed_2d(&b.output.resolution, &mat),
-                    );
-                });
-            }
-            None => geometries.append(model.process_2d(model)),
-        }
+        let self_ = model.borrow();
+        self_.children.iter().for_each(|model| {
+            let b = model.borrow();
+            let mat = b.output.local_matrix_2d();
+            geometries.append(
+                model
+                    .process_2d(model)
+                    .transformed_2d(&b.output.resolution, &mat),
+            );
+        });
 
         let multi_polygon = microcad_core::geo2d::multi_polygon_to_vec(
             &geometries.render_to_multi_polygon(&model.borrow().output.resolution),
