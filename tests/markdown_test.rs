@@ -26,6 +26,8 @@ pub fn run_test(
     use microcad_lang::diag::*;
     use microcad_lang::syntax::*;
 
+    log::info!("Running test '{name}':\n\n{code}");
+
     // remove generated files before updating
     let _ = fs::remove_file(banner);
     let _ = fs::remove_file(log_filename);
