@@ -20,7 +20,7 @@ pub use tuple_expression::*;
 use crate::{src_ref::*, syntax::*, value::*};
 
 /// List of expression
-pub type ExpressionList = Vec<Expression>;
+pub type ListExpression = Vec<Expression>;
 
 /// Expressions
 #[derive(Clone, Debug, Default)]

@@ -3,24 +3,88 @@
 
 use crate::{eval::*, model::*};
 
-impl Eval for ArrayExpression {
+impl Eval for RangeStart {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        let value_list = ValueList::new(
-            self.list
-                .iter()
-                .map(|expr| expr.eval(context))
-                .collect::<Result<_, _>>()?,
-        )
-        .bundle_unit(self.unit)?;
-
-        match value_list.types().common_type() {
-            Some(common_type) => Ok(Value::Array(Array::new(value_list, common_type))),
-            None => {
+        let value: Value = self.0.eval(context)?;
+        Ok(match value {
+            Value::Integer(_) => value,
+            value => {
                 context.error(
                     self,
-                    EvalError::ListElementsDifferentTypes(value_list.types()),
+                    EvalError::ExpectedType {
+                        expected: Type::Integer,
+                        found: value.ty(),
+                    },
                 )?;
-                Ok(Value::None)
+
+                Value::None
+            }
+        })
+    }
+}
+
+impl Eval for RangeEnd {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        let value: Value = self.0.eval(context)?;
+        Ok(match value {
+            Value::Integer(_) => value,
+            value => {
+                context.error(
+                    self,
+                    EvalError::ExpectedType {
+                        expected: Type::Integer,
+                        found: value.ty(),
+                    },
+                )?;
+
+                Value::None
+            }
+        })
+    }
+}
+
+impl Eval for RangeExpression {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        Ok(match (self.start.eval(context)?, self.end.eval(context)?) {
+            (Value::Integer(start), Value::Integer(end)) => Value::Array(Array::new(
+                (start..end).map(Value::Integer).collect(),
+                Type::Integer,
+            )),
+            (_, _) => Value::None,
+        })
+    }
+}
+
+impl Eval for ArrayExpression {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        match &self.inner {
+            ArrayExpressionInner::Range(range_expression) => range_expression.eval(context),
+            ArrayExpressionInner::List(expressions) => {
+                let value_list = ValueList::new(
+                    expressions
+                        .iter()
+                        .map(|expr| expr.eval(context))
+                        .collect::<Result<_, _>>()?,
+                );
+
+                match value_list.types().common_type() {
+                    Some(common_type) => {
+                        match Value::Array(Array::new(value_list, common_type)) * self.unit {
+                            Ok(value) => Ok(value),
+                            Err(err) => {
+                                context.error(self, err)?;
+                                Ok(Value::None)
+                            }
+                        }
+                    }
+                    None => {
+                        context.error(
+                            self,
+                            EvalError::ListElementsDifferentTypes(value_list.types()),
+                        )?;
+                        Ok(Value::None)
+                    }
+                }
             }
         }
     }
