@@ -5,10 +5,10 @@
 -- Code --
 
 mod k {
-  pub use std;
+  pub use std::geo2d;
 }
 
 -- Output --
 -- Errors --
 -- Test Result --
-OK BUT IS TODO
+OK

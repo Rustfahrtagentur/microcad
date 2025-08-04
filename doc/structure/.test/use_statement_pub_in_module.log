@@ -1,0 +1,22 @@
+-- Test --
+  use_statement_pub_in_module
+  ../doc/structure/use.md:116
+
+-- Code --
+
+mod my {
+    mod name {
+        mod space {
+            pub use std::geo2d::*;
+        }
+    }
+    pub use name::space::*;
+}
+
+my::circle(r = 4mm);
+my::rect(size = 40mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

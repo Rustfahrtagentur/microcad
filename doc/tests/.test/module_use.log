@@ -5,7 +5,7 @@
 -- Code --
 
 mod k {
-  use std;
+  use std::geo2d;
 }
 
 -- Output --
