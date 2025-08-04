@@ -109,9 +109,11 @@ my::circle(r = 4mm);
 my::rect(size = 40mm);
 ```
 
-[![test](.test/use_statement_pub_extra.png)](.test/use_statement_pub_extra.log)
+## Tests
 
-```µcad,use_statement_pub_extra
+[![test](.test/use_statement_pub_in_module.png)](.test/use_statement_pub_in_module.log)
+
+```µcad,use_statement_pub_in_module
 mod my {
     mod name {
         mod space {

@@ -113,9 +113,9 @@ impl SymbolTable {
 
     fn lookup_current(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         let name = &name.with_prefix(&self.stack.current_module_name());
-        log::trace!("lookup in current module for '{name}'");
+        log::trace!("lookup current in for '{name}'");
         if let Ok(symbol) = self.lookup_global(name) {
-            if symbol.full_name() != *name {
+            if symbol.full_name() == *name {
                 log::debug!(
                     "lookup in current module found '{name}' = '{}'",
                     symbol.full_name()
@@ -358,6 +358,7 @@ impl UseSymbol for SymbolTable {
 impl std::fmt::Display for SymbolTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "\nLoaded files:\n{}", self.cache)?;
+        writeln!(f, "\nCurrent: {}", self.stack.current_name())?;
         writeln!(f, "\nModule: {}", self.stack.current_module_name())?;
         write!(f, "\nLocals Stack:\n{}", self.stack)?;
         writeln!(f, "\nCall Stack:")?;
