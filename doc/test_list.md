@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**206** tests from markdown.
+**209** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -138,6 +138,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/property.png)](../doc/structure/.test/property.log) | [property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/property_wrong.png)](../doc/structure/.test/property_wrong.log) | [property_wrong](../doc/structure/workbench.md) |
 | [![test](../doc/types/.test/quantity_types_number_literals.png)](../doc/types/.test/quantity_types_number_literals.log) | [quantity_types_number_literals](../doc/types/quantity.md) |
+| [![test](../doc/structure/.test/range_expressions.png)](../doc/structure/.test/range_expressions.log) | [range_expressions](../doc/structure/arrays.md) |
 | [![test](../doc/structure/.test/return.png)](../doc/structure/.test/return.log) | [return](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/return_twice.png)](../doc/structure/.test/return_twice.log) | [return_twice](../doc/structure/functions.md) |
 | [![test](../doc/libs/std/ops/.test/revolve.png)](../doc/libs/std/ops/.test/revolve.log) | [revolve](../doc/libs/std/ops/revolve.md) |
