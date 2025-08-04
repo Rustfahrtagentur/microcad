@@ -6,31 +6,32 @@
 use crate::{ty::*, value::*};
 use derive_more::{Deref, DerefMut};
 
-/// List of values of the same type
+/// Collection of values of the same type.
 #[derive(Clone, Debug, Deref, DerefMut)]
 pub struct Array {
     /// List of values
     #[deref]
     #[deref_mut]
-    list: ValueList,
+    items: ValueList,
+    /// Element type.
     ty: Type,
 }
 
 impl Array {
     /// Create new list
-    pub fn new(list: ValueList, ty: Type) -> Self {
-        Self { list, ty }
+    pub fn new(items: ValueList, ty: Type) -> Self {
+        Self { items, ty }
     }
 
     /// Fetch all values as `Vec<Value>`
     pub fn fetch(&self) -> Vec<Value> {
-        self.list.iter().cloned().collect::<Vec<_>>()
+        self.items.iter().cloned().collect::<Vec<_>>()
     }
 }
 
 impl PartialEq for Array {
     fn eq(&self, other: &Self) -> bool {
-        self.ty == other.ty && self.list == other.list
+        self.ty == other.ty && self.items == other.items
     }
 }
 
@@ -39,7 +40,7 @@ impl IntoIterator for Array {
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.list.into_iter()
+        self.items.into_iter()
     }
 }
 
@@ -47,7 +48,7 @@ impl FromIterator<Value> for Array {
     fn from_iter<T: IntoIterator<Item = Value>>(iter: T) -> Self {
         let list: ValueList = iter.into_iter().collect();
         let ty = list.types().common_type().expect("Common type");
-        Self { ty, list }
+        Self { ty, items: list }
     }
 }
 
@@ -57,7 +58,7 @@ impl std::fmt::Display for Array {
             f,
             "[{items}]",
             items = self
-                .list
+                .items
                 .iter()
                 .map(|v| v.to_string())
                 .collect::<Vec<_>>()
@@ -69,6 +70,46 @@ impl std::fmt::Display for Array {
 impl crate::ty::Ty for Array {
     fn ty(&self) -> Type {
         Type::Array(ArrayType::new(self.ty.clone()))
+    }
+}
+
+impl std::ops::Add<Value> for Array {
+    type Output = ValueResult;
+
+    fn add(self, rhs: Value) -> Self::Output {
+        if rhs.ty() == self.ty {
+            Ok(Value::Array(Self::new(
+                ValueList::new(
+                    self.items
+                        .iter()
+                        .map(|value| value.clone() + rhs.clone())
+                        .collect::<Result<Vec<_>, _>>()?,
+                ),
+                self.ty,
+            )))
+        } else {
+            Err(ValueError::InvalidOperator("+".into()))
+        }
+    }
+}
+
+impl std::ops::Sub<Value> for Array {
+    type Output = ValueResult;
+
+    fn sub(self, rhs: Value) -> Self::Output {
+        if rhs.ty() == self.ty {
+            Ok(Value::Array(Self::new(
+                ValueList::new(
+                    self.items
+                        .iter()
+                        .map(|value| value.clone() - rhs.clone())
+                        .collect::<Result<Vec<_>, _>>()?,
+                ),
+                self.ty,
+            )))
+        } else {
+            Err(ValueError::InvalidOperator("-".into()))
+        }
     }
 }
 

@@ -225,6 +225,7 @@ impl std::ops::Add for Value {
                     lhs.ty(),
                 )))
             }
+            (Value::Array(lhs), rhs) => Ok((lhs + rhs)?),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} + {rhs}"))),
         }
     }
@@ -244,6 +245,8 @@ impl std::ops::Sub for Value {
             (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Subtract two numbers
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
+            // Subtract value to an array: `[1,2,3] - 1 = [0,1,2]`.
+            (Value::Array(lhs), rhs) => Ok((lhs - rhs)?),
             // Boolean difference operator for models
             (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
                 lhs.union()
