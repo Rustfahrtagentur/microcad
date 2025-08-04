@@ -93,13 +93,30 @@ impl Model {
         self.borrow()
             .children
             .iter()
-            .fold(Geometries2D::default(), |mut geometries, model| {
+            .fold(Default::default(), |mut geometries, model| {
                 let model_ = model.borrow();
                 let mat = model_.output.local_matrix_2d();
                 geometries.append(
                     model
                         .process_2d(model)
                         .transformed_2d(&model_.output.resolution, &mat),
+                );
+                geometries
+            })
+    }
+
+    /// Render geometries in 3D.
+    pub fn render_geometries_3d(&self) -> Geometries3D {
+        self.borrow()
+            .children
+            .iter()
+            .fold(Default::default(), |mut geometries, model| {
+                let model_ = model.borrow();
+                let mat = model_.output.local_matrix_3d();
+                geometries.append(
+                    model
+                        .process_3d(model)
+                        .transformed_3d(&model_.output.resolution, &mat),
                 );
                 geometries
             })

@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{
-    eval::{BuiltinWorkbenchDefinition, EvalResult},
-    model::*,
-    parameter,
-    value::{Tuple, ValueAccess},
-};
+use microcad_lang::{eval::*, model::*, parameter, value::*};
 
 #[derive(Debug)]
 pub struct Revolve {
@@ -20,26 +15,17 @@ impl Operation for Revolve {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, model: &microcad_lang::model::Model) -> microcad_core::Geometries3D {
+    fn process_3d(&self, model: &Model) -> Geometries3D {
         use std::rc::Rc;
-        let mut geometries = Geometries2D::default();
+        let geometries = model.render_geometries_2d();
 
-        let self_ = model.borrow();
-        self_.children.iter().for_each(|model| {
-            let b = model.borrow();
-            let mat = b.output.local_matrix_2d();
-            geometries.append(
-                model
-                    .process_2d(model)
-                    .transformed_2d(&b.output.resolution, &mat),
-            );
-        });
-
-        let multi_polygon = microcad_core::geo2d::multi_polygon_to_vec(
+        let multi_polygon_data = geo2d::multi_polygon_to_vec(
             &geometries.render_to_multi_polygon(&model.borrow().output.resolution),
         );
-
-        let multi_polygon_data: Vec<_> = multi_polygon.iter().map(|ring| ring.as_slice()).collect();
+        let multi_polygon_data: Vec<_> = multi_polygon_data
+            .iter()
+            .map(|ring| ring.as_slice())
+            .collect();
 
         Rc::new(Geometry3D::Manifold(Rc::new(Manifold::revolve(
             &multi_polygon_data,
@@ -63,7 +49,7 @@ impl BuiltinWorkbenchDefinition for Revolve {
         .build())
     }
 
-    fn parameters() -> microcad_lang::eval::ParameterValueList {
+    fn parameters() -> ParameterValueList {
         [
             parameter!(circular_segments: Integer),
             parameter!(revolve_degrees: Scalar),

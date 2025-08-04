@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{
-    eval::{BuiltinWorkbenchDefinition, EvalResult},
-    model::*,
-    parameter,
-    value::{Tuple, ValueAccess},
-};
+use microcad_lang::{eval::*, model::*, parameter, value::*};
 
 #[derive(Debug)]
 pub struct Extrude {
@@ -27,11 +22,13 @@ impl Operation for Extrude {
         use std::rc::Rc;
         let geometries = model.render_geometries_2d();
 
-        let multi_polygon = geo2d::multi_polygon_to_vec(
+        let multi_polygon_data = geo2d::multi_polygon_to_vec(
             &geometries.render_to_multi_polygon(&model.borrow().output.resolution),
         );
-
-        let multi_polygon_data: Vec<_> = multi_polygon.iter().map(|ring| ring.as_slice()).collect();
+        let multi_polygon_data: Vec<_> = multi_polygon_data
+            .iter()
+            .map(|ring| ring.as_slice())
+            .collect();
 
         Rc::new(Geometry3D::Manifold(Rc::new(Manifold::extrude(
             &multi_polygon_data,
