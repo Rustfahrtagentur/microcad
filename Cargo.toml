@@ -12,6 +12,7 @@ default-members = [
     "tools/cli",
     "tools/update-copyright",
     "tools/update-md-banner",
+    "editors/lsp",
 ]
 
 members = [
@@ -24,6 +25,7 @@ members = [
     "tools/cli",
     "tools/update-copyright",
     "tools/update-md-banner",
+    "editors/lsp",
 ]
 resolver = "2"
 
