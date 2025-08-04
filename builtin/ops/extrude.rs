@@ -23,22 +23,11 @@ impl Operation for Extrude {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, model: &microcad_lang::model::Model) -> microcad_core::Geometries3D {
+    fn process_3d(&self, model: &Model) -> Geometries3D {
         use std::rc::Rc;
-        let mut geometries = Geometries2D::default();
+        let geometries = model.render_geometries_2d();
 
-        let self_ = model.borrow();
-        self_.children.iter().for_each(|model| {
-            let b = model.borrow();
-            let mat = b.output.local_matrix_2d();
-            geometries.append(
-                model
-                    .process_2d(model)
-                    .transformed_2d(&b.output.resolution, &mat),
-            );
-        });
-
-        let multi_polygon = microcad_core::geo2d::multi_polygon_to_vec(
+        let multi_polygon = geo2d::multi_polygon_to_vec(
             &geometries.render_to_multi_polygon(&model.borrow().output.resolution),
         );
 
