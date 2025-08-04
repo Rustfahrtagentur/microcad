@@ -16,19 +16,6 @@ impl ValueList {
         Self(list)
     }
 
-    /// add unit to values of primitive types ([Scalar] or [Integer]).
-    pub fn bundle_unit(self, unit: Unit) -> ValueResult<Self> {
-        if unit == Unit::None {
-            return Ok(self);
-        }
-        let mut values = Vec::new();
-        for value in self.0 {
-            values.push(value.bundle_unit(unit)?);
-        }
-
-        Ok(Self(values))
-    }
-
     /// Return list with types of values.
     pub fn types(&self) -> TypeList {
         TypeList::new(

@@ -166,6 +166,12 @@ tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
 // `Matrix3`: ok
 matrix_type = { "Matrix" ~ int ~ ("x" ~ int)? }
 
+range_start = { expression }
+range_end = { expression }
+
+// `1..3`: ok
+range_expression = { range_start ~ ws* ~ ".." ~ ws* ~ range_end }
+
 // `[1, 2, 3]`: ok
 // `[1, 2, 3,]`: error # Trailing comma
 // `[]`: ok
