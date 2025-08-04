@@ -76,10 +76,6 @@ pub enum EvalError {
     #[error("Property not found: {0}")]
     PropertyNotFound(Identifier),
 
-    /// Expected iterable, a list or a range.
-    #[error("Expected iterable, got {0}")]
-    ExpectedIterable(Type),
-
     /// Argument count mismatch.
     #[error("Argument count mismatch: expected {expected}, got {found} in {args}")]
     ArgumentCountMismatch {
@@ -110,6 +106,15 @@ pub enum EvalError {
     /// Assertion failed.
     #[error("Assertion failed: {0}")]
     AssertionFailed(String),
+
+    /// Different type expected.
+    #[error("Expected type `{expected}`, found type `{found}")]
+    ExpectedType {
+        /// Expected type.
+        expected: Type,
+        /// Found type.
+        found: Type,
+    },
 
     /// Cannot continue evaluation after error limit has been reached.
     #[error("Error limit reached: Stopped evaluation after {0} errors")]
