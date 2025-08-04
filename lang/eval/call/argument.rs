@@ -10,6 +10,7 @@ impl Argument {
     pub fn eval_value(&self, context: &mut Context) -> EvalResult<ArgumentValue> {
         Ok(ArgumentValue::new(
             self.value.eval(context)?,
+            self.value.single_identifier(),
             self.src_ref.clone(),
         ))
     }

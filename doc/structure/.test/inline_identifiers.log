@@ -1,0 +1,14 @@
+-- Test --
+  inline_identifiers
+  ../doc/structure/arguments.md:164
+
+-- Code --
+
+width = 2mm;
+height = 2mm;
+std::geo2d::rect(width, height);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK
