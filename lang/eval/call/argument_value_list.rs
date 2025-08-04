@@ -23,25 +23,6 @@ impl ArgumentValueList {
         Self { map, src_ref }
     }
 
-    /// Create a *argument value list*.
-    ///
-    /// Transports code into builtin in `impl` [`Eval`] for [`Call`].
-    ///
-    /// Shall only be used for builtin symbols.
-    /// # Arguments
-    pub fn from_code(code: String, referrer: impl SrcReferrer) -> Self {
-        let map = [(
-            Identifier::none(),
-            (ArgumentValue::new(Value::String(code), referrer.src_ref())),
-        )]
-        .into_iter()
-        .collect();
-        Self {
-            map,
-            src_ref: referrer.src_ref(),
-        }
-    }
-
     /// Return a single argument.
     ///
     /// Returns error if there is no or more than one argument available.
