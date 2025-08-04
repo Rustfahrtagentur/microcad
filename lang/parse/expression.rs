@@ -6,7 +6,11 @@ use crate::{parse::*, parser::*, syntax::*};
 impl Parse for RangeStart {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self(Box::new(
-            pair.find(Rule::expression).expect("Expression"),
+            pair.find(Rule::expression)
+                .or(pair
+                    .find(Rule::integer_literal)
+                    .map(|i| Expression::Literal(Literal::Integer(i))))
+                .expect("Expression"),
         )))
     }
 }
@@ -14,7 +18,11 @@ impl Parse for RangeStart {
 impl Parse for RangeEnd {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self(Box::new(
-            pair.find(Rule::expression).expect("Expression"),
+            pair.find(Rule::expression)
+                .or(pair
+                    .find(Rule::integer_literal)
+                    .map(|i| Expression::Literal(Literal::Integer(i))))
+                .expect("Expression"),
         )))
     }
 }

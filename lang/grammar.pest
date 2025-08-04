@@ -166,8 +166,8 @@ tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
 // `Matrix3`: ok
 matrix_type = { "Matrix" ~ int ~ ("x" ~ int)? }
 
-range_start = { expression }
-range_end = { expression }
+range_start = { integer_literal | expression }
+range_end = { integer_literal | expression }
 
 // `1..3`: ok
 range_expression = { range_start ~ ws* ~ ".." ~ ws* ~ range_end }

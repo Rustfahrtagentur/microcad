@@ -1,7 +1,15 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use microcad_core::Integer;
+
 use crate::{parse::*, parser::*, syntax::*};
+
+impl Parse for Refer<Integer> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Ok(Refer::new(pair.as_str().parse::<i64>()?, pair.into()))
+    }
+}
 
 impl Parse for Literal {
     fn parse(pair: Pair) -> ParseResult<Self> {
@@ -11,9 +19,7 @@ impl Parse for Literal {
 
         let s = match inner.as_rule() {
             Rule::number_literal => Literal::Number(NumberLiteral::parse(inner)?),
-            Rule::integer_literal => {
-                Literal::Integer(Refer::new(inner.as_str().parse::<i64>()?, pair.into()))
-            }
+            Rule::integer_literal => Literal::Integer(Refer::<Integer>::parse(inner)?),
             Rule::bool_literal => match inner.as_str() {
                 "true" => Literal::Bool(Refer::new(true, pair.into())),
                 "false" => Literal::Bool(Refer::new(false, pair.into())),
