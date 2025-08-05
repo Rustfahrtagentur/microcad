@@ -96,7 +96,7 @@ Here is an example which generates a punched disk of a given radius using a func
 [![test](.test/workbench_example.png)](.test/workbench_example.log)
 
 ```µcad,workbench_example
-part punched_disk(radius: Length) {
+sketch punched_disk(radius: Length) {
     use std::geo2d::circle;
 
     // calculate inner from radius in a method
@@ -117,10 +117,12 @@ Trying to make them public with the keyword `pub` will result into an error:
 
 [![test](.test/workbench_pub.png)](.test/workbench_pub.log)
 
-```µcad,workbench_pub#todo_fail
+```µcad,workbench_pub#fail
 part punched_disk(radius: Length) {
     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
 }
+
+punched_disk(4.0mm);
 ```
 
 You cannot create *workbench properties* within the code body.
