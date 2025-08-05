@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**205** tests from markdown.
+**206** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -87,6 +87,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/initial_source_file_3D.png)](../doc/structure/.test/initial_source_file_3D.log) | [initial_source_file_3D](../doc/structure/source_files.md) |
 | [![test](../doc/structure/.test/initial_source_file_mixed.png)](../doc/structure/.test/initial_source_file_mixed.log) | [initial_source_file_mixed](../doc/structure/source_files.md) |
 | [![test](../doc/structure/.test/initializers.png)](../doc/structure/.test/initializers.log) | [initializers](../doc/structure/workbench.md) |
+| [![test](../doc/structure/.test/inline_identifiers.png)](../doc/structure/.test/inline_identifiers.log) | [inline_identifiers](../doc/structure/arguments.md) |
 | [![test](../doc/libs/std/ops/.test/intersection_alt_operator.png)](../doc/libs/std/ops/.test/intersection_alt_operator.log) | [intersection_alt_operator](../doc/libs/std/ops/intersection.md) |
 | [![test](../doc/libs/std/ops/.test/intersection_operator.png)](../doc/libs/std/ops/.test/intersection_operator.log) | [intersection_operator](../doc/libs/std/ops/intersection.md) |
 | [![test](../doc/libs/std/math/.test/math_abs.png)](../doc/libs/std/math/.test/math_abs.log) | [math_abs](../doc/libs/std/math/README.md) |

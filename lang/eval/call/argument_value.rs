@@ -3,13 +3,15 @@
 
 //! Argument value evaluation entity
 
-use crate::{src_ref::*, ty::*, value::*};
+use crate::{src_ref::*, syntax::*, ty::*, value::*};
 
 /// Argument value.
 #[derive(Clone, Debug)]
 pub struct ArgumentValue {
     /// *value* of the argument.
     pub value: Value,
+    /// If expression of value is a single identifier, this item catches it.
+    pub inline_id: Option<Identifier>,
     /// Source code reference.
     src_ref: SrcRef,
 }
@@ -34,8 +36,12 @@ impl Ty for ArgumentValue {
 
 impl ArgumentValue {
     /// Create new argument value
-    pub fn new(value: Value, src_ref: SrcRef) -> Self {
-        Self { value, src_ref }
+    pub fn new(value: Value, inline_id: Option<Identifier>, src_ref: SrcRef) -> Self {
+        Self {
+            value,
+            inline_id,
+            src_ref,
+        }
     }
 
     /// If argument is an array returns the inner type

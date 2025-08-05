@@ -58,8 +58,13 @@ impl<'a> ArgumentMatch<'a> {
         if !self.arguments.is_empty() {
             log::trace!("find id match for:\n{self}");
             self.arguments.retain(|(id, arg)| {
+                let id = match (id.is_empty(), &arg.inline_id) {
+                    (true, Some(id)) => id,
+                    _ => id,
+                };
+
                 if !id.is_empty() {
-                    if let Some(n) = self.params.iter().position(|(i, _)| i == id) {
+                    if let Some(n) = self.params.iter().position(|(i, _)| *i == id) {
                         let (id, _) = self.params.swap_remove(n);
                         log::trace!("found parameter by id: {id:?}");
                         self.result.insert((*id).clone(), arg.value.clone());
