@@ -62,7 +62,7 @@ impl SourceFileTest {
                         OutputType::Geometry3D => {
                             Export {
                                 filename: self.output_filename("stl").into(),
-                                resolution: RenderResolution::default(),
+                                resolution: RenderResolution::coarse(),
                                 exporter: Rc::new(microcad_export::stl::StlExporter),
                             }
                             .export(&model)

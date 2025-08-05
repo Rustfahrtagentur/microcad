@@ -178,7 +178,7 @@ pub fn run_test(
                             OutputType::Geometry3D => {
                                 Export {
                                     filename: format!("{out_filename}.stl").into(),
-                                    resolution: RenderResolution::default(),
+                                    resolution: RenderResolution::coarse(),
                                     exporter: Rc::new(StlExporter),
                                 }
                                 .export(&model)

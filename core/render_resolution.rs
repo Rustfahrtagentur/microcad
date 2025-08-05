@@ -17,6 +17,11 @@ impl RenderResolution {
     pub fn new(linear: Scalar) -> Self {
         Self { linear }
     }
+
+    /// Coarse render resolution of 1.0mm.
+    pub fn coarse() -> Self {
+        Self { linear: 1.0 }
+    }
 }
 
 impl std::ops::Mul<Mat3> for RenderResolution {
