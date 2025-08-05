@@ -5,7 +5,7 @@ use crate::{Bounds3D, FetchBounds3D, Vec3};
 use manifold_rs::{Manifold, Mesh};
 
 /// Vertex
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Vertex {
     /// position
     pub pos: Vec3,
@@ -14,7 +14,7 @@ pub struct Vertex {
 }
 
 /// Triangle
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Triangle<T>(pub T, pub T, pub T);
 
 impl Triangle<Vertex> {
@@ -46,11 +46,11 @@ impl Triangle<&Vertex> {
 }
 
 /// Triangle mesh
-#[derive(Default, Clone)]
+#[derive(Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TriangleMesh {
     /// Mesh Vertices
     pub vertices: Vec<Vertex>,
-    /// Triangle indicies
+    /// Triangle indices
     pub triangle_indices: Vec<Triangle<u32>>,
 }
 

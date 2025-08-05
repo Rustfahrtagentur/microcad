@@ -11,7 +11,7 @@ use derive_more::Deref;
 /// More examples for a nested item
 /// * translate() rotate() a
 /// * a::b
-#[derive(Clone, Debug, Deref)]
+#[derive(Clone, Debug, Deref, serde::Serialize, serde::Deserialize)]
 pub struct Nested(pub Refer<Vec<NestedItem>>);
 
 impl Nested {

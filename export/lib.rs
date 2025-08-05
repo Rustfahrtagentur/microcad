@@ -3,6 +3,7 @@
 
 //! Export models to files  
 
+pub mod json;
 pub mod ply;
 pub mod stl;
 pub mod svg;

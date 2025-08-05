@@ -8,7 +8,7 @@ use derive_more::Deref;
 use crate::{resolve::*, src_ref::*, syntax::*};
 
 /// A body is a list of statements inside `{}` brackets.
-#[derive(Clone, Debug, Default, Deref)]
+#[derive(Clone, Debug, Default, Deref, serde::Serialize, serde::Deserialize)]
 pub struct Body {
     /// Body statements.
     #[deref]

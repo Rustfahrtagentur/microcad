@@ -6,7 +6,7 @@
 use crate::{src_ref::*, ty::*, value::*};
 
 /// Parameter value is the result of evaluating a parameter
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct ParameterValue {
     /// Parameter type
     pub specified_type: Option<Type>,
@@ -70,8 +70,6 @@ impl SrcReferrer for ParameterValue {
 
 #[test]
 fn test_is_list_of() {
-    assert!(
-        Type::Array(Box::new(QuantityType::Scalar.into()))
-            .is_array_of(&QuantityType::Scalar.into())
-    );
+    assert!(Type::Array(Box::new(QuantityType::Scalar.into()))
+        .is_array_of(&QuantityType::Scalar.into()));
 }

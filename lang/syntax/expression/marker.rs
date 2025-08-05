@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Node marker, e.g. `@children`
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Marker {
     /// Marker name, e.g. `children`
     pub id: Identifier,

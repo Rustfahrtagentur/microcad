@@ -17,10 +17,10 @@ version.workspace = true
 path = "lib.rs"
 
 [dependencies]
+compact_str = { version = "0.9", features = ["serde"] }
+log = "0.4"
 pest = "2.8"
 pest_derive = "2.8"
-compact_str = "0.9"
-log = "0.4"
 lazy_static = "1.5"
 cgmath = "0.18"
 thiserror = "2.0"
@@ -32,6 +32,7 @@ pathdiff = "0.2"
 ctor = "0.4"
 color-print = { version = "0.3", optional = true }
 sqids = "0.4"
+serde = { version = "1", features = ["derive", "rc"] }
 
 microcad-core = { workspace = true }
 custom_debug = "0.6.2"

@@ -6,7 +6,20 @@ use derive_more::{Deref, DerefMut};
 
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
-#[derive(Debug, Default, Clone, PartialEq, Hash, Eq, Ord, PartialOrd, DerefMut, Deref)]
+#[derive(
+    Debug,
+    Default,
+    Clone,
+    PartialEq,
+    Hash,
+    Eq,
+    Ord,
+    PartialOrd,
+    DerefMut,
+    Deref,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct QualifiedName(Refer<Vec<Identifier>>);
 
 /// List of qualified names which can pe displayed

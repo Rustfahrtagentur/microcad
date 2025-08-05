@@ -8,12 +8,12 @@ use std::rc::Rc;
 use derive_more::{Deref, DerefMut};
 
 use crate::{
-    geo3d::{FetchBounds3D, bounds::Bounds3D},
+    geo3d::{bounds::Bounds3D, FetchBounds3D},
     *,
 };
 
 /// 3D geometry collection.
-#[derive(Debug, Clone, Default, Deref, DerefMut)]
+#[derive(Debug, Clone, Default, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Geometries3D(Vec<Rc<Geometry3D>>);
 
 impl Geometries3D {

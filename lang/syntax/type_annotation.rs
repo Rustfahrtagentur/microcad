@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*, ty::*};
 
 /// Type within source code
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct TypeAnnotation(pub Refer<Type>);
 
 impl SrcReferrer for TypeAnnotation {

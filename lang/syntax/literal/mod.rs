@@ -12,7 +12,7 @@ pub use units::*;
 use crate::{src_ref::*, syntax::*, ty::*, value::Value};
 
 /// Literal entity
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum Literal {
     /// Integer literal
     Integer(Refer<i64>),

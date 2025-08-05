@@ -6,7 +6,18 @@
 use crate::{syntax::PrintSyntax, ty::*};
 
 /// The units that can be used after numbers in the language"
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub enum Unit {
     // Scalar
     /// No unit was given

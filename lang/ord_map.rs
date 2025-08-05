@@ -17,7 +17,7 @@ where
 }
 
 /// Map whose values cam be accessed in original insert order
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct OrdMap<K, V>
 where
     V: OrdMapValue<K>,

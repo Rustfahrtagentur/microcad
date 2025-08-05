@@ -6,7 +6,18 @@
 use strum::IntoStaticStr;
 
 /// A quantity type with
-#[derive(Clone, Debug, IntoStaticStr, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Clone,
+    Debug,
+    IntoStaticStr,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub enum QuantityType {
     /// A unitless scalar value.
     Scalar,

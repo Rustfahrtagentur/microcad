@@ -8,7 +8,9 @@ use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 
 /// Model multiplicities.
-#[derive(Debug, Default, Clone, PartialEq, Deref, DerefMut)]
+#[derive(
+    Debug, Default, Clone, PartialEq, Deref, DerefMut, serde::Serialize, serde::Deserialize,
+)]
 pub struct Models(Vec<Model>);
 
 impl Models {

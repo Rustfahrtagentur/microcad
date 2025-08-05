@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Nested item
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub enum NestedItem {
     /// Call
     Call(Call),

@@ -9,12 +9,12 @@ use derive_more::{Deref, DerefMut};
 use geo::{CoordsIter, LineString, Polygon};
 
 use crate::{
-    geo2d::{FetchBounds2D, bounds::Bounds2D},
+    geo2d::{bounds::Bounds2D, FetchBounds2D},
     *,
 };
 
 /// 2D geometry collection.
-#[derive(Debug, Clone, Default, Deref, DerefMut)]
+#[derive(Debug, Clone, Default, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Geometries2D(Vec<Rc<Geometry2D>>);
 
 impl Geometries2D {

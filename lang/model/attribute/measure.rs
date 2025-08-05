@@ -6,7 +6,7 @@
 use crate::value::Value;
 
 /// Measure attribute.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub enum MeasureCommand {
     /// Measure the size of a geometry (for each dimension).
     #[default]

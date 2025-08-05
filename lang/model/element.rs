@@ -8,7 +8,7 @@ use microcad_core::*;
 use strum::IntoStaticStr;
 
 /// An element defines the entity of a [`Model`].
-#[derive(Clone, IntoStaticStr, Debug, Default)]
+#[derive(Clone, IntoStaticStr, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub enum Element {
     #[default]
     /// A group element is created by a body `{}`.
@@ -34,6 +34,7 @@ pub enum Element {
     Primitive3D(std::rc::Rc<Geometry3D>),
 
     /// An operation that generates geometries from its children.
+    #[serde(skip)]
     Operation(std::rc::Rc<dyn Operation>),
 }
 

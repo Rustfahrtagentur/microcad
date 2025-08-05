@@ -28,7 +28,7 @@ use microcad_core::*;
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
 
 /// A variant value with attached source code reference.
-#[derive(Clone, Default, PartialEq)]
+#[derive(Clone, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum Value {
     /// Invalid value (used for error handling).
     #[default]

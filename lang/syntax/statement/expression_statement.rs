@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// An assignment statement, e.g. `#[aux] s = sphere(3.0mm);`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ExpressionStatement {
     /// Optional attributes.
     pub attribute_list: AttributeList,

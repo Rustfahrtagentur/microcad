@@ -9,7 +9,7 @@ use crate::{
 };
 
 /// Range start.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct RangeStart(pub Box<Expression>);
 
 impl SrcReferrer for RangeStart {
@@ -32,7 +32,7 @@ impl PrintSyntax for RangeStart {
 }
 
 /// Range end.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct RangeEnd(pub Box<Expression>);
 
 impl SrcReferrer for RangeEnd {
@@ -55,7 +55,7 @@ impl PrintSyntax for RangeEnd {
 }
 
 /// Range expression: `a..b`.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct RangeExpression {
     /// Start of the range.
     pub start: RangeStart,

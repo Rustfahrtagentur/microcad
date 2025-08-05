@@ -11,7 +11,7 @@ use crate::{
 };
 
 /// The origin is the [`Symbol`] and [`Tuple`] from which the model has been created.
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Origin {
     /// The original symbol that has been called.
     pub creator: Option<Symbol>,

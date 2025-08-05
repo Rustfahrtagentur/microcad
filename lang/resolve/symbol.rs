@@ -6,15 +6,25 @@ use custom_debug::Debug;
 use derive_more::{Deref, DerefMut};
 
 /// Symbol content
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct SymbolInner {
     /// Symbol definition
     pub def: SymbolDefinition,
     /// Symbol's parent
     #[debug(skip)]
+    #[serde(skip)]
     pub parent: Option<Symbol>,
     /// Symbol's children
     pub children: SymbolMap,
+}
+
+impl serde::Serialize for SymbolInner {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_bool(v)
+    }
 }
 
 /// Symbol
@@ -24,7 +34,7 @@ pub struct SymbolInner {
 /// the resolved symbols by it's original structure in the source code and by it's *id*.
 ///
 /// `SymbolNode` can be shared as mutable.
-#[derive(Debug, Clone, Deref, DerefMut)]
+#[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Symbol(RcMut<SymbolInner>);
 
 /// List of qualified names which can pe displayed

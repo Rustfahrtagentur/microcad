@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Method call syntax entity.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct MethodCall {
     /// Name of the method.
     pub id: QualifiedName,

@@ -17,7 +17,7 @@ use strum::IntoStaticStr;
 /// use std::print as p;
 /// ```
 ///
-#[derive(Clone, Debug, IntoStaticStr)]
+#[derive(Clone, Debug, IntoStaticStr, serde::Serialize, serde::Deserialize)]
 pub enum UseDeclaration {
     /// Import symbols given as qualified names: `use a, b`
     Use(QualifiedName),

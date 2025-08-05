@@ -6,7 +6,7 @@
 use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 
 /// µcad source file
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct SourceFile {
     /// Qualified name of the file if loaded from externals
     pub name: QualifiedName,

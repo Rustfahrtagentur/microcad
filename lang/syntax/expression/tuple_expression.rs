@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Tuple expression
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct TupleExpression {
     /// List of tuple members.
     pub args: ArgumentList,

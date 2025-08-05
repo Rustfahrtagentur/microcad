@@ -7,7 +7,7 @@ use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 use custom_debug::Debug;
 
 /// Kind of a [Workbench]
-#[derive(Clone, Debug, Copy, PartialEq)]
+#[derive(Clone, Debug, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum WorkbenchKind {
     /// 3D part
     Part,
@@ -35,7 +35,7 @@ impl std::fmt::Display for WorkbenchKind {
 }
 
 /// Workbench definition
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct WorkbenchDefinition {
     /// visibility from outside modules
     pub visibility: Visibility,

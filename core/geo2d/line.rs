@@ -9,7 +9,7 @@ use geo::AffineOps;
 use crate::*;
 
 /// A 2D edge type.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Line(pub geo2d::Point, pub geo2d::Point);
 
 impl Line {

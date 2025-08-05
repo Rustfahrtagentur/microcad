@@ -12,7 +12,7 @@ pub use format_spec::*;
 use crate::{src_ref::*, syntax::*};
 
 /// Format string item
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub enum FormatStringInner {
     /// String literal
     String(Refer<String>),
@@ -30,7 +30,7 @@ impl SrcReferrer for FormatStringInner {
 }
 
 /// Format string
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FormatString(pub Refer<Vec<FormatStringInner>>);
 
 impl FormatString {

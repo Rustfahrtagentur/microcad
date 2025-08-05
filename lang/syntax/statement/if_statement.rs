@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// If statement
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct IfStatement {
     /// if condition
     pub cond: Expression,

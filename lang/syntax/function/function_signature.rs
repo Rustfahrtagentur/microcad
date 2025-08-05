@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Parameters and return type of a function
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FunctionSignature {
     /// Function's parameters
     pub parameters: ParameterList,

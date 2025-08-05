@@ -17,15 +17,16 @@ version.workspace = true
 path = "lib.rs"
 
 [dependencies]
-cgmath = "0.18"
+cgmath = { version = "0.18", features = ["serde"] }
 derive_more = { version = "2", features = ["deref", "deref_mut"] }
-geo = "0.30"
+geo = { version = "0.30", features = ["use-serde"] }
 log = "0.4"
 manifold-rs = { version = "0.6", optional = true }
 rctree = "0.6"
 strum = { version = "0.27", features = ["derive"] }
 thiserror = "2.0"
 toml = "0.9"
+serde = { version = "1", features = ["derive", "rc"] }
 
 [features]
 default = ["geo3d"]
