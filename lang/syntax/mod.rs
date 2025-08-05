@@ -38,10 +38,10 @@ pub use literal::*;
 pub use module::*;
 pub use parameter::*;
 pub use qualifier::*;
-pub use r#use::*;
 pub use source_file::*;
 pub use statement::*;
 pub use type_annotation::*;
+pub use r#use::*;
 pub use visibility::*;
 pub use workbench::*;
 

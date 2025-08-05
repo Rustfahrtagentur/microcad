@@ -4,8 +4,11 @@
 use microcad_lang::{eval::BuiltinWorkbenchDefinition, resolve::*};
 
 mod boolean;
+mod extrude;
 mod hull;
-mod transform;
+mod revolve;
+mod rotate;
+mod translate;
 
 /// Creates the builtin `operation` module
 pub fn ops() -> Symbol {
@@ -14,7 +17,9 @@ pub fn ops() -> Symbol {
         .symbol(boolean::union())
         .symbol(boolean::intersection())
         .symbol(hull::hull())
-        .symbol(transform::Translate::symbol())
-        .symbol(transform::Rotate::symbol())
+        .symbol(extrude::Extrude::symbol())
+        .symbol(revolve::Revolve::symbol())
+        .symbol(translate::Translate::symbol())
+        .symbol(rotate::Rotate::symbol())
         .build()
 }

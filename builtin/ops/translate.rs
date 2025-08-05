@@ -4,7 +4,7 @@
 use microcad_core::*;
 use microcad_lang::{eval::*, model::*, parameter, value::*};
 
-/// Builtin definition for a 2D circle
+/// Builtin definition for a translation.
 #[derive(Debug)]
 pub struct Translate;
 

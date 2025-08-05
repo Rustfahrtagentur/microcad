@@ -173,6 +173,7 @@ macro_rules! argument {
             $crate::syntax::Identifier::no_ref(stringify!($id)),
             ArgumentValue::new(
                 $crate::builtin::BuiltinValueHelper::$ty($value).into(),
+                None,
                 $crate::src_ref::SrcRef(None),
             ),
         )
@@ -182,6 +183,7 @@ macro_rules! argument {
             Identifier::none(),
             ArgumentValue::new(
                 $crate::builtin::BuiltinValueHelper::$ty($value).into(),
+                None,
                 $crate::src_ref::SrcRef(None),
             ),
         )

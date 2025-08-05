@@ -3,7 +3,7 @@
 
 //! µcad unit syntax element
 
-use crate::ty::*;
+use crate::{syntax::PrintSyntax, ty::*};
 
 /// The units that can be used after numbers in the language"
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -251,6 +251,16 @@ impl Unit {
             // Densities
             Self::GramPerMeter3 => 1_000_000_000_f64,
             Self::GramPerMillimeter3 => 1_f64,
+        }
+    }
+}
+
+impl PrintSyntax for Unit {
+    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+        if !matches!(self, Unit::None) {
+            writeln!(f, "{:depth$}Unit: {}", "", self)
+        } else {
+            Ok(())
         }
     }
 }

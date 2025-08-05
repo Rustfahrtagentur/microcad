@@ -16,5 +16,11 @@ error: Expression statement not available here
    2 |   __builtin::geo2d::circle(radius=1);
      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
+warning: The sketch workbench will produce no 2D output.
+  ---> <from_str>:1:1
+     |
+   1 | sketch k() { init(l:Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
 FAILED AS EXPECTED

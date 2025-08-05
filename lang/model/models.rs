@@ -120,9 +120,9 @@ impl Models {
     pub fn boolean_op(&self, op: BooleanOp) -> Model {
         match self.single_model() {
             Some(model) => model,
-            None => ModelBuilder::new_operation(op, SrcRef(None))
+            None => ModelBuilder::new_operation(op)
                 .add_children(
-                    [ModelBuilder::new_object_body()
+                    [ModelBuilder::new_group()
                         .add_children(self.clone())
                         .expect("No error")
                         .build()]

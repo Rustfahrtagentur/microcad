@@ -158,3 +158,17 @@ Another example uses an array of tuples and produces the same output:
 std::ops::translate([(x=-4mm, y=-4mm), (x=-4mm, y=4mm), (x=4mm, y=-4mm), (x=4mm, y=4mm)]) 
     std::geo2d::rect(width = 2mm, height = 2mm);
 ```
+
+## Inline Identifiers
+
+Argument names can be skipped if the parameter expression is a single identifier.
+Like in the following example, where the variables `width` and `height` have the 
+exact same name as the parameters of `circle()`.
+
+[![test](.test/inline_identifiers.png)](.test/inline_identifiers.log)
+
+```µcad,inline_identifiers
+width = 2mm;
+height = 2mm;
+std::geo2d::rect(width, height);
+```

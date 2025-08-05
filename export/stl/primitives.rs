@@ -49,7 +49,7 @@ impl WriteStl for Model {
                     .write_stl(writer)
             })?;
 
-        if !matches!(self_.element.value, Element::Operation(_)) {
+        if !matches!(self_.element, Element::Operation(_)) {
             self_
                 .children()
                 .try_for_each(|child| child.write_stl(writer))?;

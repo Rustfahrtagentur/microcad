@@ -7,18 +7,20 @@ mod array_expression;
 mod marker;
 mod nested;
 mod nested_item;
+mod range_expression;
 mod tuple_expression;
 
 pub use array_expression::*;
 pub use marker::*;
 pub use nested::*;
 pub use nested_item::*;
+pub use range_expression::*;
 pub use tuple_expression::*;
 
 use crate::{src_ref::*, syntax::*, value::*};
 
 /// List of expression
-pub type ExpressionList = Vec<Expression>;
+pub type ListExpression = Vec<Expression>;
 
 /// Expressions
 #[derive(Clone, Debug, Default)]

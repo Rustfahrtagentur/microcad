@@ -3,46 +3,24 @@
 
 //! Builtin operations.
 
-use microcad_core::{BooleanOp, Geometries2D, Geometries3D, Transformed2D, Transformed3D};
+use microcad_core::{BooleanOp, Geometries2D, Geometries3D};
 
 use crate::model::*;
 
 impl Operation for BooleanOp {
     fn process_2d(&self, model: &Model) -> Geometries2D {
-        let mut geometries = Geometries2D::default();
-
-        if let Some(model) = model.into_inner_object_model() {
-            let self_ = model.borrow();
-            self_.children.iter().for_each(|model| {
-                let b = model.borrow();
-                let mat = b.output.local_matrix_2d();
-                geometries.append(
-                    model
-                        .process_2d(model)
-                        .transformed_2d(&self_.output.resolution, &mat),
-                );
-            });
+        match model.into_group() {
+            Some(model) => model.render_geometries_2d(),
+            None => model.render_geometries_2d(),
         }
-
-        geometries.boolean_op(&model.borrow().output.resolution, self)
+        .boolean_op(&model.borrow().output.resolution, self)
     }
 
-    fn process_3d(&self, model: &Model) -> microcad_core::Geometries3D {
-        let mut geometries = Geometries3D::default();
-
-        if let Some(model) = model.into_inner_object_model() {
-            let self_ = model.borrow();
-            self_.children.iter().for_each(|model| {
-                let b = model.borrow();
-                let mat = b.output.local_matrix_3d();
-                geometries.append(
-                    model
-                        .process_3d(model)
-                        .transformed_3d(&self_.output.resolution, &mat),
-                );
-            });
+    fn process_3d(&self, model: &Model) -> Geometries3D {
+        match model.into_group() {
+            Some(model) => model.render_geometries_3d(),
+            None => model.render_geometries_3d(),
         }
-
-        geometries.boolean_op(&model.borrow().output.resolution, self)
+        .boolean_op(&model.borrow().output.resolution, self)
     }
 }

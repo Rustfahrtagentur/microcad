@@ -4,7 +4,7 @@
 
 -- Code --
 
-part wheel(radius: Length, thickness: Length) {
+sketch wheel(radius: Length, thickness: Length) {
     // initializer with diameter
     init( diameter: Length, thickness: Length ) {
         // must set `radius` in code 

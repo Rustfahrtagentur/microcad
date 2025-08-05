@@ -145,3 +145,27 @@ impl Transformed2D<Polygon> for Rect {
             .transformed_2d(render_resolution, mat)
     }
 }
+
+/// Convert a line string to a vector of [`Scalar`].
+pub fn line_string_to_vec(line_string: &LineString) -> Vec<Scalar> {
+    line_string
+        .points()
+        .flat_map(|point| vec![point.x(), point.y()])
+        .collect()
+}
+
+/// Convert a polygon to a vector of [`Scalar`].
+///
+/// Exterior polygon has CW winding order, interior polygon have CCW winding order.
+pub fn polygon_to_vec(polygon: &Polygon) -> Vec<Scalar> {
+    let mut vec = line_string_to_vec(polygon.exterior());
+    polygon.interiors().iter().for_each(|interior| {
+        vec.append(&mut line_string_to_vec(interior));
+    });
+    vec
+}
+
+/// Convert a multi polygon into a vector of coordinates.
+pub fn multi_polygon_to_vec(multi_polygon: &MultiPolygon) -> Vec<Vec<Scalar>> {
+    multi_polygon.0.iter().map(polygon_to_vec).collect()
+}

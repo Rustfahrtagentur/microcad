@@ -8,7 +8,7 @@ impl Eval<Model> for std::rc::Rc<SourceFile> {
         context.scope(
             StackFrame::Source(self.id(), SymbolMap::default()),
             |context| {
-                let model = ModelBuilder::new_object_body()
+                let model = ModelBuilder::new_group()
                     .add_children(self.statements.eval(context)?)?
                     .attributes(self.statements.eval(context)?)
                     .build();

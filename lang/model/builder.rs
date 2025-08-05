@@ -5,7 +5,7 @@
 
 use microcad_core::{Geometry2D, Geometry3D};
 
-use crate::{eval::*, model::*, rc::*, src_ref::*, syntax::*};
+use crate::{eval::*, model::*, rc::*, syntax::*};
 
 /// A builder pattern to build models
 #[derive(Default)]
@@ -21,19 +21,20 @@ pub struct ModelBuilder {
 ///
 /// All methods in this `impl` block are used to create a new model builder with a specific [`Element`] type.
 impl ModelBuilder {
-    /// Create a new object from a body `{ ... }`.
-    pub fn new_object_body() -> Self {
+    /// Create a new group from a body `{ ... }`.
+    pub fn new_group() -> Self {
         Self {
             root: Default::default(),
             ..Default::default()
         }
     }
 
-    /// Create a new 2D object.
+    /// Create a new workpiece.
     ///
-    /// This function is used when a call to a sketch is evaluated.
-    pub fn new_2d_object() -> Self {
+    /// This function is used when a call to a workbench definition is evaluated.
+    pub fn new_workpiece(workpiece_kind: WorkbenchKind) -> Self {
         Self {
+            root: ModelInner::new(Element::Workpiece(workpiece_kind.into())),
             ..Default::default()
         }
     }
@@ -41,16 +42,7 @@ impl ModelBuilder {
     /// Create a new children placeholder
     pub fn new_children_placeholder() -> Self {
         Self {
-            root: ModelInner::new(Refer::none(Element::ChildrenMarker)),
-            ..Default::default()
-        }
-    }
-
-    /// Create a new 3D object.
-    ///
-    /// This function is used when a call to a part is evaluated.
-    pub fn new_3d_object() -> Self {
-        Self {
+            root: ModelInner::new(Element::ChildrenMarker),
             ..Default::default()
         }
     }
@@ -80,9 +72,9 @@ impl ModelBuilder {
     }
 
     /// New operation.
-    pub fn new_operation<T: Operation + 'static>(operation: T, src_ref: SrcRef) -> Self {
+    pub fn new_operation<T: Operation + 'static>(operation: T) -> Self {
         Self {
-            root: ModelInner::new(Refer::new(Element::Operation(Rc::new(operation)), src_ref)),
+            root: ModelInner::new(Element::Operation(Rc::new(operation))),
             ..Default::default()
         }
     }
@@ -116,9 +108,8 @@ impl ModelBuilder {
 
     /// Build a [`Model`].
     pub fn build(mut self) -> Model {
-        if let Element::Workpiece(props) = &mut self.root.element.value {
-            log::trace!("Copy object properties:\n{}", self.properties);
-            *props = self.properties;
+        if let Element::Workpiece(workpiece) = &mut self.root.element {
+            workpiece.add_properties(self.properties);
         }
 
         let model = Model::new(self.root.into());
@@ -131,15 +122,5 @@ impl ModelBuilder {
 impl std::fmt::Display for ModelBuilder {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.properties)
-    }
-}
-
-impl From<WorkbenchKind> for ModelBuilder {
-    fn from(kind: WorkbenchKind) -> Self {
-        match kind {
-            WorkbenchKind::Part => ModelBuilder::new_3d_object(),
-            WorkbenchKind::Sketch => ModelBuilder::new_2d_object(),
-            WorkbenchKind::Operation => ModelBuilder::new_object_body(),
-        }
     }
 }

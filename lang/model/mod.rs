@@ -14,6 +14,7 @@ pub mod origin;
 pub mod output;
 pub mod properties;
 pub mod render;
+pub mod workpiece;
 
 pub use attribute::*;
 pub use builder::*;
@@ -25,6 +26,7 @@ pub use operation::*;
 pub use origin::*;
 pub use output::*;
 pub use properties::*;
+pub use workpiece::*;
 
 use derive_more::{Deref, DerefMut};
 
@@ -40,13 +42,6 @@ use crate::{
 #[cfg(test)]
 mod tests;
 
-/// Access a value of a property by id.
-pub trait PropertiesAccess {
-    /// Get a value of property, or [`Value::None`] if the property does not exist.
-    fn get_property(&self, id: &Identifier) -> Option<&Value>;
-    /// Set or create properties with the given ids and values.
-    fn set_properties(&mut self, props: Properties);
-}
 /// A reference counted, mutable [`Model`].
 #[derive(Debug, Clone, Deref, DerefMut)]
 pub struct Model(RcMut<ModelInner>);
@@ -131,7 +126,7 @@ impl Model {
     /// Find children model placeholder in model descendants.
     pub fn find_children_placeholder(&self) -> Option<Model> {
         self.descendants().find(|n| {
-            n.borrow().id.is_none() && matches!(n.0.borrow().element.value, Element::ChildrenMarker)
+            n.borrow().id.is_none() && matches!(n.0.borrow().element, Element::ChildrenMarker)
         })
     }
 
@@ -149,10 +144,18 @@ impl Model {
         }
     }
 
-    /// Return inner model if we are in an [`Object`].
-    pub fn into_inner_object_model(&self) -> Option<Model> {
-        self.borrow().children.iter().next().and_then(|n| {
-            if let Element::Workpiece(_) = n.0.borrow().element.value {
+    /// Return inner group if this model only contains a group as single child.
+    ///
+    /// This function is used when we evaluate operations like `difference() {}` or `hull() {}`.
+    /// When evaluating these operations, we want to iterate over the group's children.
+    pub fn into_group(&self) -> Option<Model> {
+        let children = &self.borrow().children;
+        if children.len() != 1 {
+            return None;
+        }
+
+        children.first().and_then(|n| {
+            if let Element::Group = n.0.borrow().element {
                 Some(n.clone())
             } else {
                 None

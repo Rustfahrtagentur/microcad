@@ -24,8 +24,7 @@ impl WorkbenchDefinition {
         );
 
         // Create model
-        let model_builder: ModelBuilder = self.kind.into();
-        let model = model_builder
+        let model = ModelBuilder::new_workpiece(self.kind)
             .origin(Origin {
                 arguments: arguments.clone(),
                 // TODO: where to get the rest?
@@ -74,7 +73,25 @@ impl WorkbenchDefinition {
                 model.append_children(self.body.statements.eval(context)?);
 
                 // We have to deduce the output type of this model, otherwise the model is incomplete.
-                model.deduce_output_type();
+                {
+                    let output_type = model.deduce_output_type();
+                    let model_ = model.borrow();
+                    match &model_.element {
+                        Element::Workpiece(workpiece) => {
+                            let result = workpiece.check_output_type(output_type);
+                            match result {
+                                Ok(()) => {}
+                                Err(EvalError::WorkbenchNoOutput(_, _)) => {
+                                    context.warning(self, result.expect_err("Error"))?;
+                                }
+                                result => {
+                                    context.error(self, result.expect_err("Error"))?;
+                                }
+                            }
+                        }
+                        _ => panic!("A workbench must produce a workpiece."),
+                    }
+                }
 
                 Ok(model)
             },

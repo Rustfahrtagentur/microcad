@@ -17,10 +17,11 @@ impl Model {
     /// Deduce output type from children and set it and return it.
     pub fn deduce_output_type(&self) -> OutputType {
         let mut self_ = self.borrow_mut();
-        let mut output_type = match &*self_.element {
-            Element::Workpiece(_) => OutputType::NotDetermined,
-            Element::ChildrenMarker => OutputType::NotDetermined,
-            Element::Transform(_) => OutputType::NotDetermined,
+        let mut output_type = match &self_.element {
+            Element::Group
+            | Element::Workpiece(_)
+            | Element::ChildrenMarker
+            | Element::Transform(_) => OutputType::NotDetermined,
             Element::Primitive2D(_) => OutputType::Geometry2D,
             Element::Primitive3D(_) => OutputType::Geometry3D,
             Element::Operation(operation) => operation.output_type(),
@@ -39,7 +40,7 @@ impl Model {
     pub fn set_matrix(&self, mat: Mat4) {
         let world_matrix = {
             let mut self_ = self.borrow_mut();
-            let local_matrix = match &self_.element.value {
+            let local_matrix = match &self_.element {
                 Element::Transform(affine_transform) => affine_transform.mat3d(),
                 _ => Mat4::identity(),
             };
@@ -87,6 +88,40 @@ impl Model {
         }
     }
 
+    /// Render geometries in 2D.
+    pub fn render_geometries_2d(&self) -> Geometries2D {
+        self.borrow()
+            .children
+            .iter()
+            .fold(Default::default(), |mut geometries, model| {
+                let model_ = model.borrow();
+                let mat = model_.output.local_matrix_2d();
+                geometries.append(
+                    model
+                        .process_2d(model)
+                        .transformed_2d(&model_.output.resolution, &mat),
+                );
+                geometries
+            })
+    }
+
+    /// Render geometries in 3D.
+    pub fn render_geometries_3d(&self) -> Geometries3D {
+        self.borrow()
+            .children
+            .iter()
+            .fold(Default::default(), |mut geometries, model| {
+                let model_ = model.borrow();
+                let mat = model_.output.local_matrix_3d();
+                geometries.append(
+                    model
+                        .process_3d(model)
+                        .transformed_3d(&model_.output.resolution, &mat),
+                );
+                geometries
+            })
+    }
+
     /// Render the model.
     ///
     /// Rendering the model means that all geometry is calculated and stored
@@ -96,7 +131,7 @@ impl Model {
     /// * `fetch_output_geometries_3d()` for 3D geometries.
     pub fn render(&self) {
         fn render_geometries_2d(model: &Model) -> Geometries2D {
-            match &model.borrow().element.value {
+            match &model.borrow().element {
                 Element::Primitive2D(geometry) => geometry.clone().into(),
                 Element::Operation(operation) => operation.process_2d(model),
                 _ => Geometries2D::default(),
@@ -104,7 +139,7 @@ impl Model {
         }
 
         fn render_geometries_3d(model: &Model) -> Geometries3D {
-            match &model.borrow().element.value {
+            match &model.borrow().element {
                 Element::Primitive3D(geometry) => geometry.clone().into(),
                 Element::Operation(operation) => operation.process_3d(model),
                 _ => Geometries3D::default(),
@@ -112,7 +147,7 @@ impl Model {
         }
 
         fn is_operation(model: &Model) -> bool {
-            matches!(&model.borrow().element.value, Element::Operation(_))
+            matches!(&model.borrow().element, Element::Operation(_))
         }
 
         match self.final_output_type() {
@@ -148,8 +183,8 @@ impl Operation for Model {
         let mut geometries = Geometries2D::default();
 
         let model_ = &model.borrow();
-        match &model_.element.value {
-            Element::Transform(_) | Element::Workpiece(_) => {
+        match &model_.element {
+            Element::Group | Element::Workpiece(_) | Element::Transform(_) => {
                 model_
                     .children()
                     .for_each(|n| geometries.append(n.process_2d(n)));
@@ -171,8 +206,8 @@ impl Operation for Model {
         let mut geometries = Geometries3D::default();
 
         let model_ = &model.borrow();
-        match &model_.element.value {
-            Element::Transform(_) | Element::Workpiece(_) => {
+        match &model_.element {
+            Element::Group | Element::Workpiece(_) | Element::Transform(_) => {
                 model_
                     .children()
                     .for_each(|n| geometries.append(n.process_3d(n)));

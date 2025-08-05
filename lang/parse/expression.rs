@@ -3,7 +3,41 @@
 
 use crate::{parse::*, parser::*, syntax::*};
 
-impl Parse for ExpressionList {
+impl Parse for RangeStart {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Ok(Self(Box::new(
+            pair.find(Rule::expression)
+                .or(pair
+                    .find(Rule::integer_literal)
+                    .map(|i| Expression::Literal(Literal::Integer(i))))
+                .expect("Expression"),
+        )))
+    }
+}
+
+impl Parse for RangeEnd {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Ok(Self(Box::new(
+            pair.find(Rule::expression)
+                .or(pair
+                    .find(Rule::integer_literal)
+                    .map(|i| Expression::Literal(Literal::Integer(i))))
+                .expect("Expression"),
+        )))
+    }
+}
+
+impl Parse for RangeExpression {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Ok(Self {
+            start: pair.find(Rule::range_start).expect("Range start"),
+            end: pair.find(Rule::range_end).expect("Range end"),
+            src_ref: pair.src_ref(),
+        })
+    }
+}
+
+impl Parse for ListExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         pair.inner()
             .filter_map(|pair| match pair.as_rule() {
@@ -17,9 +51,13 @@ impl Parse for ExpressionList {
 impl Parse for ArrayExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self {
-            list: pair
-                .find(Rule::expression_list)
-                .expect("expression_list expected"),
+            inner: pair
+                .find(Rule::range_expression)
+                .map(ArrayExpressionInner::Range)
+                .or(pair
+                    .find(Rule::list_expression)
+                    .map(ArrayExpressionInner::List))
+                .unwrap_or_default(),
             unit: pair.find(Rule::unit).unwrap_or_default(),
             src_ref: pair.clone().into(),
         })
