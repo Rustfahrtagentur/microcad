@@ -54,20 +54,6 @@ pub enum Value {
 }
 
 impl Value {
-    /// Add a unit to a primitive value (Scalar or Integer).
-    pub fn bundle_unit(self, unit: Unit) -> ValueResult {
-        match (self, unit.ty()) {
-            (value, Type::Quantity(QuantityType::Scalar)) | (value, Type::Integer) => Ok(value),
-            (Value::Integer(i), Type::Quantity(quantity_type)) => Ok(Value::Quantity(
-                Quantity::new(unit.normalize(i as Scalar), quantity_type),
-            )),
-            (Value::Quantity(quantity), Type::Quantity(quantity_type)) => Ok(Value::Quantity(
-                (quantity * Quantity::new(unit.normalize(1.0), quantity_type))?,
-            )),
-            (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
-        }
-    }
-
     /// Create a value from a single model.
     pub fn from_single_model(model: Model) -> Self {
         Self::Models(vec![model].into())
@@ -239,6 +225,7 @@ impl std::ops::Add for Value {
                     lhs.ty(),
                 )))
             }
+            (Value::Array(lhs), rhs) => Ok((lhs + rhs)?),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} + {rhs}"))),
         }
     }
@@ -258,6 +245,8 @@ impl std::ops::Sub for Value {
             (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Subtract two numbers
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
+            // Subtract value to an array: `[1,2,3] - 1 = [0,1,2]`.
+            (Value::Array(lhs), rhs) => Ok((lhs - rhs)?),
             // Boolean difference operator for models
             (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
                 lhs.union()
@@ -284,6 +273,29 @@ impl std::ops::Mul for Value {
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             (Value::Array(list), value) | (value, Value::Array(list)) => Ok((list * value)?),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
+        }
+    }
+}
+
+/// Multiply a Unit with a value. Used for unit bundling: `[1,2,3]mm`.
+///
+/// `[1,2,3]mm` is a shortcut for `[1,2,3] * 1mm`.
+impl std::ops::Mul<Unit> for Value {
+    type Output = ValueResult;
+
+    fn mul(self, unit: Unit) -> Self::Output {
+        match (self, unit.ty()) {
+            (value, Type::Quantity(QuantityType::Scalar)) | (value, Type::Integer) => Ok(value),
+            (Value::Integer(i), Type::Quantity(quantity_type)) => Ok(Value::Quantity(
+                Quantity::new(unit.normalize(i as Scalar), quantity_type),
+            )),
+            (Value::Quantity(quantity), Type::Quantity(quantity_type)) => Ok(Value::Quantity(
+                (quantity * Quantity::new(unit.normalize(1.0), quantity_type))?,
+            )),
+            (Value::Array(array), Type::Quantity(quantity_type)) => {
+                Ok((array * Value::Quantity(Quantity::new(unit.normalize(1.0), quantity_type)))?)
+            }
+            (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
         }
     }
 }

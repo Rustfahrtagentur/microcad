@@ -72,5 +72,5 @@ use std::ops::translate;
 a = { 
     circle(radius = 1mm); 
     circle(radius = 2mm); 
-}
+};
 ```

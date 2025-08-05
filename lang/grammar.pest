@@ -166,10 +166,16 @@ tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
 // `Matrix3`: ok
 matrix_type = { "Matrix" ~ int ~ ("x" ~ int)? }
 
+range_start = { integer_literal | expression }
+range_end = { integer_literal | expression }
+
+// `1..3`: ok
+range_expression = { range_start ~ ws* ~ ".." ~ ws* ~ range_end }
+
 // `[1, 2, 3]`: ok
 // `[1, 2, 3,]`: error # Trailing comma
 // `[]`: ok
-array_expression = { "[" ~ ws* ~ expression_list? ~ ws* ~ "]" ~ unit? }
+array_expression = { "[" ~ ws* ~ (range_expression | list_expression?) ~ ws* ~ "]" ~ unit? }
 
 // `[0]`: ok # Access first element
 // `["test"]`: ok # Associative lists, access value of `\"test\"`
@@ -284,7 +290,7 @@ primary     = _{ literal | marker | nested | format_string | "(" ~ ws* ~ express
 // `a, b, c`: ok
 // `1+2, 4*3, 3.2`: ok
 // `,,`: error # No expression
-expression_list = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
+list_expression = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
 // A nested expression that does end with a body
 // `a {}`: ok # Body at the end

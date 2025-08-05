@@ -7,6 +7,7 @@ pub mod export;
 pub mod file_io;
 pub mod import;
 pub mod module_builder;
+pub mod operation;
 
 pub use export::*;
 pub use file_io::*;

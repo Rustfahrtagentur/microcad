@@ -36,3 +36,11 @@ impl std::fmt::Display for Properties {
         Ok(())
     }
 }
+
+/// Access a value of a property by id.
+pub trait PropertiesAccess {
+    /// Get a value of property, or [`Value::None`] if the property does not exist.
+    fn get_property(&self, id: &Identifier) -> Option<&Value>;
+    /// Set or create properties with the given ids and values.
+    fn add_properties(&mut self, props: Properties);
+}

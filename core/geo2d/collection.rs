@@ -29,7 +29,7 @@ impl Geometries2D {
     }
 
     /// Apply boolean operation to multiple geometries.
-    pub fn boolean_op(&self, resolution: &RenderResolution, op: &crate::BooleanOp) -> Self {
+    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> Self {
         if self.0.is_empty() {
             return Geometries2D::default();
         }
@@ -81,5 +81,20 @@ impl Transformed2D for Geometries2D {
 impl From<std::rc::Rc<Geometry2D>> for Geometries2D {
     fn from(geometry: std::rc::Rc<Geometry2D>) -> Self {
         Self::new(vec![geometry])
+    }
+}
+
+impl RenderToMultiPolygon for Geometries2D {
+    fn render_to_existing_multi_polygon(
+        self,
+        resolution: &RenderResolution,
+        polygons: &mut geo2d::MultiPolygon,
+    ) {
+        self.iter().for_each(|geometry| {
+            geometry
+                .as_ref()
+                .clone()
+                .render_to_existing_multi_polygon(resolution, polygons);
+        });
     }
 }

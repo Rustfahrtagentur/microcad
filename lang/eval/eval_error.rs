@@ -3,7 +3,9 @@
 
 //! Evaluation error
 
-use crate::{eval::*, parse::*, resolve::*, src_ref::SrcRef, syntax::*, ty::*, value::*};
+use crate::{
+    eval::*, model::OutputType, parse::*, resolve::*, src_ref::SrcRef, syntax::*, ty::*, value::*,
+};
 use thiserror::Error;
 
 /// Evaluation error.
@@ -74,10 +76,6 @@ pub enum EvalError {
     #[error("Property not found: {0}")]
     PropertyNotFound(Identifier),
 
-    /// Expected iterable, a list or a range.
-    #[error("Expected iterable, got {0}")]
-    ExpectedIterable(Type),
-
     /// Argument count mismatch.
     #[error("Argument count mismatch: expected {expected}, got {found} in {args}")]
     ArgumentCountMismatch {
@@ -108,6 +106,15 @@ pub enum EvalError {
     /// Assertion failed.
     #[error("Assertion failed: {0}")]
     AssertionFailed(String),
+
+    /// Different type expected.
+    #[error("Expected type `{expected}`, found type `{found}")]
+    ExpectedType {
+        /// Expected type.
+        expected: Type,
+        /// Found type.
+        found: Type,
+    },
 
     /// Cannot continue evaluation after error limit has been reached.
     #[error("Error limit reached: Stopped evaluation after {0} errors")]
@@ -208,6 +215,14 @@ pub enum EvalError {
     /// This errors happens if the expression is supposed to produce models but did not.
     #[error("This expression statement did not produce any model")]
     EmptyModelExpression,
+
+    /// This error happens if the workbench produced a different output type.
+    #[error("The {0} workbench produced a 2D output, but expected {2} output.")]
+    WorkbenchInvalidOutput(WorkbenchKind, OutputType, OutputType),
+
+    /// This error happens if the workbench produced a different output type.
+    #[error("The {0} workbench will produce no {1} output.")]
+    WorkbenchNoOutput(WorkbenchKind, OutputType),
 }
 
 /// Result type of any evaluation.

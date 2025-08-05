@@ -21,8 +21,6 @@ pub use primitives::*;
 pub use size::*;
 
 /// Trait to render a [`Geometry2D`] into a multi polygon.
-///
-/// Implement this trait
 pub trait RenderToMultiPolygon: Sized {
     /// Render geometry into a [`Polygon`].
     ///

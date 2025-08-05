@@ -20,5 +20,11 @@ error: Workbench plan incomplete. Missing properties: radius
    2 |     init( width: Length ) { 
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
+warning: The sketch workbench will produce no 2D output.
+  ---> <from_str>:1:1
+     |
+   1 | sketch wheel(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
 FAILED AS EXPECTED

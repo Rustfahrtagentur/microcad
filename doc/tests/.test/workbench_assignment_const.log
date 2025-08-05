@@ -10,5 +10,11 @@ sketch k() {
 
 -- Output --
 -- Errors --
+warning: The sketch workbench will produce no 2D output.
+  ---> <from_str>:1:1
+     |
+   1 | sketch k() {
+     | ^^^^^^^^^^^^
+     |
 -- Test Result --
 OK

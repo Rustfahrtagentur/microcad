@@ -12,11 +12,11 @@ impl Eval<Value> for Body {
     }
 }
 
-/// Evaluate the body into a single object body model: `{}`.
+/// Evaluate the body into a single group: `{}`.
 impl Eval<Model> for Body {
     fn eval(&self, context: &mut Context) -> EvalResult<Model> {
         context.scope(StackFrame::Body(SymbolMap::default()), |context| {
-            Ok(ModelBuilder::new_object_body()
+            Ok(ModelBuilder::new_group()
                 .add_children(self.statements.eval(context)?)?
                 .attributes(self.statements.eval(context)?)
                 .build())

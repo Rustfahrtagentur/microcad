@@ -101,6 +101,18 @@ impl FetchBounds3D for Geometry3D {
     }
 }
 
+impl Transformed3D for Geometry3D {
+    fn transformed_3d(&self, render_resolution: &RenderResolution, mat: &Mat4) -> Self {
+        Self::Mesh(match self {
+            Geometry3D::Mesh(triangle_mesh) => triangle_mesh.transform(mat),
+            geometry => geometry
+                .clone()
+                .render_to_mesh(render_resolution)
+                .transform(mat),
+        })
+    }
+}
+
 impl RenderToMesh for Geometry3D {
     fn render_to_manifold(self, resolution: &RenderResolution) -> Rc<Manifold> {
         match self {

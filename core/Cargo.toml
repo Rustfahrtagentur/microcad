@@ -21,11 +21,11 @@ cgmath = "0.18"
 derive_more = { version = "2", features = ["deref", "deref_mut"] }
 geo = "0.30"
 log = "0.4"
-manifold-rs = { version = "0.4", optional = true }
+manifold-rs = { version = "0.6", optional = true }
 rctree = "0.6"
 strum = { version = "0.27", features = ["derive"] }
 thiserror = "2.0"
-toml = "0.8"
+toml = "0.9"
 
 [features]
 default = ["geo3d"]

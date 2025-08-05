@@ -8,12 +8,16 @@ use microcad_core::*;
 use strum::IntoStaticStr;
 
 /// An element defines the entity of a [`Model`].
-#[derive(Clone, IntoStaticStr, Debug)]
+#[derive(Clone, IntoStaticStr, Debug, Default)]
 pub enum Element {
-    /// An workpiece that contains children and holds properties.
+    #[default]
+    /// A group element is created by a body `{}`.
+    Group,
+
+    /// A workpiece that holds properties.
     ///
-    /// Workpiece can be created by builtins, assignments, expressions and workbenches.
-    Workpiece(Properties),
+    /// A workpiece is created by workbenches.
+    Workpiece(Workpiece),
 
     /// A special element after which children will be nested as siblings.
     ///
@@ -33,25 +37,21 @@ pub enum Element {
     Operation(std::rc::Rc<dyn Operation>),
 }
 
-impl Default for Element {
-    fn default() -> Self {
-        Element::Workpiece(Default::default())
-    }
-}
-
 impl std::fmt::Display for Element {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name: &'static str = self.into();
-        write!(f, "{name}")?;
-
         match &self {
-            Element::Operation(transformation) => {
-                write!(f, "({transformation:?})")
-            }
+            Element::Workpiece(workpiece) => write!(f, "{workpiece}"),
             Element::Primitive2D(primitive) => {
-                write!(f, "({primitive:?})")
+                write!(f, "{name}({primitive:?})")
             }
-            _ => Ok(()),
+            Element::Primitive3D(primitive) => {
+                write!(f, "{name}({primitive:?})")
+            }
+            Element::Operation(transformation) => {
+                write!(f, "{name}({transformation:?})")
+            }
+            _ => write!(f, "{name}"),
         }
     }
 }
@@ -59,17 +59,17 @@ impl std::fmt::Display for Element {
 impl PropertiesAccess for Element {
     fn get_property(&self, id: &Identifier) -> Option<&Value> {
         match self {
-            Self::Workpiece(object) => object.get(id),
-            _ => unreachable!("not an object element"),
+            Self::Workpiece(workpiece) => workpiece.get_property(id),
+            _ => unreachable!("not a workpiece element"),
         }
     }
 
-    fn set_properties(&mut self, props: Properties) {
+    fn add_properties(&mut self, props: Properties) {
         match self {
-            Self::Workpiece(p) => {
-                p.extend(props.iter().map(|(id, prop)| (id.clone(), prop.clone())));
+            Self::Workpiece(workpiece) => {
+                workpiece.add_properties(props);
             }
-            _ => unreachable!("not an object element"),
+            _ => unreachable!("not a workpiece element"),
         }
     }
 }

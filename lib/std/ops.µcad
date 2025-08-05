@@ -3,6 +3,21 @@ pub use __builtin::ops::intersection;
 pub use __builtin::ops::union;
 pub use __builtin::ops::hull;
 
+
+op revolve(angle = 360°) {
+    __builtin::ops::revolve(
+        circular_segments = 64, // TODO: Make this adaptive to resolution 
+        revolve_degrees = angle / 1°) {
+        @children
+    }
+}
+
+op extrude(height: Length) {
+    __builtin::ops::extrude(height = height / 1mm, n_divisions = 0, twist_degrees = 0.0, scale_top_x = 1.0, scale_top_y = 1.0) {
+        @children
+    }
+}
+
 op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
     __builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm) {
         @children

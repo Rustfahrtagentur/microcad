@@ -86,7 +86,9 @@ pub fn builtin_importers() -> ImporterRegistry {
 
 /// Get built-in exporters.
 pub fn builtin_exporters() -> ExporterRegistry {
-    ExporterRegistry::new().insert(microcad_export::svg::SvgExporter)
+    ExporterRegistry::new()
+        .insert(microcad_export::svg::SvgExporter)
+        .insert(microcad_export::stl::StlExporter)
 }
 
 /// Built-in context.
