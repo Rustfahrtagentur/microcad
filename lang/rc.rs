@@ -6,14 +6,20 @@
 use derive_more::{Deref, DerefMut};
 pub use std::rc::Rc;
 
+#[cfg(feature = "debug-cell")]
+use debug_cell::RefCell;
+
+#[cfg(not(feature = "debug-cell"))]
+use std::cell::RefCell;
+
 /// Just a short cut definition
-#[derive(Debug, Deref, DerefMut)]
-pub struct RcMut<T>(Rc<std::cell::RefCell<T>>);
+#[derive(Deref, DerefMut)]
+pub struct RcMut<T>(Rc<RefCell<T>>);
 
 impl<T> RcMut<T> {
     /// Create new instance
     pub fn new(t: T) -> Self {
-        Self(Rc::new(std::cell::RefCell::new(t)))
+        Self(Rc::new(RefCell::new(t)))
     }
 }
 
@@ -26,5 +32,11 @@ impl<T> Clone for RcMut<T> {
 impl<T> From<T> for RcMut<T> {
     fn from(value: T) -> Self {
         RcMut::new(value)
+    }
+}
+
+impl<T: std::fmt::Debug> std::fmt::Debug for RcMut<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("RcMut").field(&self.0.borrow()).finish()
     }
 }

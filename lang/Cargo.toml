@@ -35,11 +35,13 @@ color-print = { version = "0.3", optional = true }
 microcad-core = { workspace = true }
 custom_debug = "0.6.2"
 derive_more = { version = "2.0.1", features = ["deref", "deref_mut"] }
+debug-cell = { workspace = true, optional = true }
 
 [features]
 default = ["geo3d", "ansi-color"]
 geo3d = []
 ansi-color = ["dep:color-print"]
+debug-cell = ["dep:debug-cell"]
 
 [lints.rust]
 missing_docs = "warn"
