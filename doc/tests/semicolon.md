@@ -44,9 +44,15 @@ circle( radius = 5mm ) {} // error: sketch with body
 
 ```µcad,sketch_with_body#fail
 use std::geo2d::circle;
-use std::ops::translate;
 
 circle(radius = 2mm) { circle(radius = 1mm); } // error: sketch with body
+```
+
+[![test](.test/empty_op.png)](.test/empty_op.log)
+
+```µcad,empty_op#fail
+std::ops::translate(x = 3.0mm); // Error: Translate no geometry. 
+std::ops::translate(x = 3.0mm) {} // Error: Translate empty geometry.
 ```
 
 [![test](.test/group.png)](.test/group.log)
