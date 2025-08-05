@@ -19,12 +19,6 @@ pub enum SvgTagAttribute {
     /// `marker-end` attribute, e.g. for arrow heads.
     MarkerEnd(String),
 
-    /// Tag for font size in millimeters.
-    FontSizeMM(Scalar),
-
-    /// Fill attribute with a color.
-    Fill(Color),
-
     /// Style attribute: `style = "fill: skyblue; stroke: cadetblue; stroke-width: 2;"`.
     Style {
         fill: Option<Color>,
@@ -61,8 +55,6 @@ impl SvgTagAttribute {
         match &self {
             SvgTagAttribute::MarkerStart(_) => "marker-start",
             SvgTagAttribute::MarkerEnd(_) => "marker-end",
-            SvgTagAttribute::FontSizeMM(_) => "font-size",
-            SvgTagAttribute::Fill(_) => "fill",
             SvgTagAttribute::Style {
                 fill: _,
                 stroke: _,
@@ -81,8 +73,6 @@ impl std::fmt::Display for SvgTagAttribute {
             SvgTagAttribute::MarkerStart(marker_name) | SvgTagAttribute::MarkerEnd(marker_name) => {
                 format!("url(#{marker_name})")
             }
-            SvgTagAttribute::FontSizeMM(font_size) => format!("{}mm", *font_size as i64),
-            SvgTagAttribute::Fill(color) => color.to_svg_color(),
             SvgTagAttribute::Style {
                 fill,
                 stroke,
@@ -149,7 +139,11 @@ impl SvgTagAttributes {
     /// Apply SVG attributes from model attributes
     pub fn apply_from_model(mut self, model: &Model) -> Self {
         if let Some(color) = model.get_color() {
-            self = self.insert(SvgTagAttribute::Fill(color));
+            self = self.insert(SvgTagAttribute::Style {
+                fill: Some(color),
+                stroke: None,
+                stroke_width: None,
+            });
         }
 
         model

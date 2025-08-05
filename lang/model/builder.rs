@@ -117,7 +117,6 @@ impl ModelBuilder {
     /// Build a [`Model`].
     pub fn build(mut self) -> Model {
         if let Element::Workpiece(props) = &mut self.root.element.value {
-            log::trace!("Copy object properties:\n{}", self.properties);
             *props = self.properties;
         }
 

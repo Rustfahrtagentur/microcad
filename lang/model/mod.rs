@@ -236,10 +236,17 @@ impl std::fmt::Display for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let depth = self.depth() * 2;
         writeln!(f, "{:depth$}{signature}", "", signature = self.signature())?;
-        for child in self.borrow().children.iter() {
-            write!(f, "{child}")?;
-        }
-        Ok(())
+        let self_ = self.borrow();
+
+        self_
+            .attributes
+            .iter()
+            .try_for_each(|attribute| writeln!(f, "{:depth$}{attribute}", ""))?;
+
+        self_
+            .children
+            .iter()
+            .try_for_each(|child| write!(f, "{child}"))
     }
 }
 

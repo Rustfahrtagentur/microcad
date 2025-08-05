@@ -30,10 +30,10 @@ impl RunCommand for Watch {
                     Ok(mut context) => {
                         // Re-evaluate context.
                         if let Ok(model) = context.eval() {
-                            let target_models =
-                                &export.target_models(&model, &config, context.exporters())?;
-
-                            export.export_targets(target_models)?;
+                            match export.target_models(&model, &config, context.exporters()) {
+                                Ok(target_models) => export.export_targets(&target_models)?,
+                                Err(err) => log::error!("{err}"),
+                            }
                         }
                     }
                     Err(err) => {

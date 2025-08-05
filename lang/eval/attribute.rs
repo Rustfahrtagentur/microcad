@@ -4,15 +4,15 @@
 use std::str::FromStr;
 
 use crate::{
+    Id,
     builtin::ExporterAccess,
     eval::{self, *},
     model::{Attributes, CustomCommand, ExportCommand, MeasureCommand, ResolutionAttribute},
     parameter,
     syntax::{self, *},
-    Id,
 };
 
-use microcad_core::{theme::Theme, Color, RenderResolution, Size2D};
+use microcad_core::{Color, RenderResolution, Size2D, theme::Theme};
 use thiserror::Error;
 
 /// Error type for attributes.

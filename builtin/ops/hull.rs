@@ -15,12 +15,12 @@ impl Operation for Hull {
             let self_ = model.borrow();
 
             self_.children.iter().for_each(|model| {
-                let b = model.borrow();
-                let mat = b.output.local_matrix_2d();
+                let model_ = model.borrow();
+                let mat = model_.output.local_matrix_2d();
                 geometries.append(
                     model
                         .process_2d(model)
-                        .transformed_2d(&b.output.resolution, &mat),
+                        .transformed_2d(&model_.output.resolution, &mat),
                 );
             });
         }

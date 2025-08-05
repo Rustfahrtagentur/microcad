@@ -203,9 +203,7 @@ impl WriteSvg for CenteredText {
         writer.open_tag(
             format!(r#"text x="{x}" y="{y}" dominant-baseline="middle" text-anchor="middle""#,)
                 .as_str(),
-            &attr
-                .clone()
-                .insert(attributes::SvgTagAttribute::FontSizeMM(self.font_size)),
+            attr,
         )?;
         writer.with_indent(&self.text)?;
         writer.close_tag("text")

@@ -75,6 +75,26 @@ impl Attribute {
     }
 }
 
+impl std::fmt::Display for Attribute {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "#[{id} = {value}]",
+            id = self.id(),
+            value = match &self {
+                // TODO: Do not use debug outputs, implement proper Display traits instead.
+                Attribute::Color(color) => format!("{color}"),
+                Attribute::Resolution(resolution) => format!("{resolution:?}"),
+                Attribute::Theme(theme) => theme.name.clone(),
+                Attribute::Size(size) => format!("{size:?}"),
+                Attribute::Export(export) => format!("{export:?}"),
+                Attribute::Measure(measure) => format!("{measure:?}"),
+                Attribute::Custom(command) => format!("{command:?}"),
+            }
+        )
+    }
+}
+
 /// This trait implementation is used to access values from an attribute.
 impl From<Attribute> for Value {
     fn from(value: Attribute) -> Self {
