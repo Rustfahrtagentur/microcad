@@ -242,28 +242,41 @@ impl Eval<Models> for Expression {
     }
 }
 
+impl Eval<Models> for Nested {
+    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
+        let model_stack =
+            self.iter()
+                .try_fold(Vec::new(), |mut model_stack, item| -> EvalResult<_> {
+                    let models: Models = item.eval(context)?;
+                    model_stack.push(models);
+
+                    Ok(model_stack)
+                })?;
+
+        // Check model_stack here.
+        //context.error(item, EvalError::CannotNestItem(item.clone()))?;
+
+        Ok(Models::from_nested_items(&model_stack))
+    }
+}
+
 impl Eval for Nested {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        let mut model_stack = Vec::new();
-
-        for (index, item) in self.iter().enumerate() {
-            let value = item.eval(context)?;
-            let models = match value {
-                Value::Models(models) => models,
-                Value::None => return Ok(Value::None),
-                value => {
-                    if index == 0 && self.len() == 1 {
-                        return Ok(value);
-                    } else {
-                        context.error(item, EvalError::CannotNestItem(item.clone()))?;
-                        break;
-                    }
-                }
-            };
-            model_stack.push(models);
+        match self.len() {
+            0 => Ok(Value::None),
+            1 => self.first().expect("Item").eval(context),
+            _ => {
+                let models: Models = self.eval(context)?;
+                Ok(Value::Models(models))
+            }
         }
+    }
+}
 
-        Ok(Value::Models(Models::from_nested_items(&model_stack)))
+impl Eval<Models> for NestedItem {
+    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
+        let value: Value = self.eval(context)?;
+        Ok(value.fetch_models())
     }
 }
 
