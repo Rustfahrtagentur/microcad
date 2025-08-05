@@ -37,6 +37,15 @@ impl Models {
         }
     }
 
+    /// Check if we can nest a model collection.
+    pub fn can_nest(&self) -> bool {
+        if self.is_empty() {
+            false
+        } else {
+            self.iter().all(|model| model.can_nest())
+        }
+    }
+
     /// Nest a Vec of model multiplicities
     ///
     /// * `model_stack`: A list of model lists.

@@ -77,6 +77,15 @@ impl Model {
         self.addr() == other.addr()
     }
 
+    /// Check if we can nest a model.
+    pub fn can_nest(&self) -> bool {
+        if self.borrow().element.can_nest() {
+            true
+        } else {
+            self.find_children_placeholder().is_some()
+        }
+    }
+
     /// Remove child from this model.
     pub fn remove_child(&self, child: &Model) {
         let mut s = self.0.borrow_mut();

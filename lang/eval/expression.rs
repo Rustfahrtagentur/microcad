@@ -254,7 +254,23 @@ impl Eval<Models> for Nested {
                 })?;
 
         // Check model_stack here.
-        //context.error(item, EvalError::CannotNestItem(item.clone()))?;
+        if model_stack.len() > 1 {
+            let (first_n, _) = model_stack.split_at(model_stack.len() - 1);
+            let mut could_not_nest = false;
+            for (index, models) in first_n.iter().enumerate() {
+                if !models.can_nest() {
+                    context.error(
+                        self[index].clone(),
+                        EvalError::CannotNestItem(self[index].clone()),
+                    )?;
+                    could_not_nest = true;
+                }
+            }
+
+            if could_not_nest {
+                return Ok(Models::default());
+            }
+        }
 
         Ok(Models::from_nested_items(&model_stack))
     }
@@ -263,7 +279,7 @@ impl Eval<Models> for Nested {
 impl Eval for Nested {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match self.len() {
-            0 => Ok(Value::None),
+            0 => unreachable!("A nested collection should have at least one item."),
             1 => self.first().expect("Item").eval(context),
             _ => {
                 let models: Models = self.eval(context)?;
