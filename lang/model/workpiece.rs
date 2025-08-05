@@ -23,8 +23,11 @@ impl Workpiece {
     /// Check the output type of the workpiece.
     pub fn check_output_type(&self, output_type: OutputType) -> EvalResult<()> {
         match (self.kind, output_type) {
-            (WorkbenchKind::Part, OutputType::NotDetermined)
-            | (WorkbenchKind::Sketch, OutputType::NotDetermined) => Err(
+            (WorkbenchKind::Part, OutputType::NotDetermined) => Err(EvalError::WorkbenchNoOutput(
+                self.kind,
+                OutputType::Geometry3D,
+            )),
+            (WorkbenchKind::Sketch, OutputType::NotDetermined) => Err(
                 EvalError::WorkbenchNoOutput(self.kind, OutputType::Geometry2D),
             ),
             (WorkbenchKind::Part, OutputType::Geometry3D)
