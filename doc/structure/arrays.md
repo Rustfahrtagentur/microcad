@@ -29,6 +29,8 @@ std::debug::assert_eq([std::count([1,2,3]), 3]);
 
 You can generate an array via range expressions: `[1..3]`.
 
+[![test](.test/range_expressions.png)](.test/range_expressions.log)
+
 ```µcad,range_expressions
 std::debug::assert_eq([std::count([1,2,3]), 3]);
 ```
