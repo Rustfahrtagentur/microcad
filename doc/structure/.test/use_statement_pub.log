@@ -5,9 +5,13 @@
 -- Code --
 
 mod my {
-    pub use std::geo3d::*;
+    pub use std::geo2d::*;
 }
 
-my::sphere(r = 4mm);
-my::cube(size = 40mm);
+my::circle(r = 4mm);
+my::rect(size = 40mm);
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK

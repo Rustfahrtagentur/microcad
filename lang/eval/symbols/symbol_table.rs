@@ -65,7 +65,7 @@ impl SymbolTable {
     /// Fetch global symbol from symbol map (for testing only).
     #[cfg(test)]
     pub fn fetch_global(&self, qualified_name: &QualifiedName) -> EvalResult<Symbol> {
-        self.globals.search(&qualified_name.clone())
+        self.globals.search(qualified_name)
     }
 
     /// Fetch local variable from local stack (for testing only).
@@ -76,7 +76,7 @@ impl SymbolTable {
 
     /// Lookup a symbol from local stack.
     fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("lookup local for '{name}'");
+        log::trace!("looking up locally for '{name}'");
         let symbol = if let Some(id) = name.single_identifier() {
             self.stack.fetch(id)
         } else {
@@ -93,7 +93,7 @@ impl SymbolTable {
 
         match symbol {
             Ok(symbol) => {
-                log::debug!("lookup local found '{name}' = '{}'", symbol.full_name());
+                log::trace!("local found '{name}' = '{}'", symbol.full_name());
                 Ok(symbol)
             }
             Err(err) => Err(err),
@@ -102,13 +102,28 @@ impl SymbolTable {
 
     /// Lookup a symbol from global symbols.
     fn lookup_global(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("lookup global for '{name}'");
+        log::trace!("looking up globally for '{name}'");
         let symbol = match self.globals.search(name) {
             Ok(symbol) => symbol.clone(),
             _ => self.load_symbol(name)?,
         };
-        log::debug!("lookup global found '{name}' = '{}'", symbol.full_name());
+        log::debug!("global found '{name}' = '{}'", symbol.full_name());
         Ok(symbol)
+    }
+
+    fn lookup_current(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+        let name = &name.with_prefix(&self.stack.current_module_name());
+        log::trace!("lookup current in for '{name}'");
+        if let Ok(symbol) = self.lookup_global(name) {
+            if symbol.full_name() == *name {
+                log::debug!(
+                    "lookup in current module found '{name}' = '{}'",
+                    symbol.full_name()
+                );
+                return self.follow_alias(symbol);
+            }
+        }
+        Err(EvalError::SymbolNotFound(name.clone()))
     }
 
     /// Lookup a symbol from global symbols but relatively to the file the given `name` came from.
@@ -131,6 +146,22 @@ impl SymbolTable {
             }
         }
         Err(EvalError::SymbolNotFound(name.clone()))
+    }
+
+    fn de_alias(&mut self, name: &QualifiedName) -> QualifiedName {
+        log::trace!("de-alias: {name}..");
+        for p in (1..name.len()).rev() {
+            if let Ok(symbol) = self.lookup_global(&QualifiedName::no_ref(name[0..p].to_vec())) {
+                if let SymbolDefinition::Alias(_, alias) = &symbol.borrow().def {
+                    let suffix: QualifiedName = name[p..].iter().cloned().collect();
+                    let new_name = suffix.with_prefix(alias);
+                    log::debug!("de-aliased: {name} into {new_name}");
+                    return new_name;
+                }
+            }
+        }
+        log::trace!("not de-aliased: {name}..");
+        name.clone()
     }
 
     /// Load a symbol from a qualified name.
@@ -185,11 +216,14 @@ impl SymbolTable {
 
 impl Lookup for SymbolTable {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::debug!("Lookup {name}");
+        log::trace!("looking up {name}");
+
+        let name = &self.de_alias(name);
 
         // collect all symbols that can be found
         let result = [
             self.lookup_local(name),
+            self.lookup_current(name),
             self.lookup_global(name),
             self.lookup_relatively(name),
         ]
@@ -231,6 +265,7 @@ impl Lookup for SymbolTable {
                         others: found.into(),
                     })
                 } else {
+                    log::debug!("lookup of {name} successful");
                     Ok(first.clone())
                 }
             }
@@ -263,6 +298,10 @@ impl Locals for SymbolTable {
     fn get_model(&self) -> EvalResult<Model> {
         self.stack.get_model()
     }
+
+    fn current_name(&self) -> QualifiedName {
+        self.stack.current_name()
+    }
 }
 
 impl UseSymbol for SymbolTable {
@@ -276,7 +315,11 @@ impl UseSymbol for SymbolTable {
         Ok(symbol)
     }
 
-    fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+    fn use_symbols_of(
+        &mut self,
+        name: &QualifiedName,
+        within: &QualifiedName,
+    ) -> EvalResult<Symbol> {
         log::debug!("Using all symbols in {name}");
 
         let symbol = match self.lookup(name) {
@@ -296,6 +339,15 @@ impl UseSymbol for SymbolTable {
         } else {
             for (id, symbol) in symbol.borrow().children.iter() {
                 self.stack.put_local(Some(id.clone()), symbol.clone())?;
+                if within.is_empty() {
+                    self.globals.insert(id.clone(), symbol.clone());
+                } else {
+                    self.globals
+                        .search(within)?
+                        .borrow_mut()
+                        .children
+                        .insert(id.clone(), symbol.clone());
+                }
             }
             log::trace!("Local Stack:\n{}", self.stack);
             Ok(symbol)
@@ -306,6 +358,7 @@ impl UseSymbol for SymbolTable {
 impl std::fmt::Display for SymbolTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "\nLoaded files:\n{}", self.cache)?;
+        writeln!(f, "\nCurrent: {}", self.stack.current_name())?;
         writeln!(f, "\nModule: {}", self.stack.current_module_name())?;
         write!(f, "\nLocals Stack:\n{}", self.stack)?;
         writeln!(f, "\nCall Stack:")?;

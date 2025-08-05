@@ -192,6 +192,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/use_as_module.png)](../doc/structure/.test/use_as_module.log) | [use_as_module](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_module.png)](../doc/structure/.test/use_module.log) | [use_module](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_statement_pub.png)](../doc/structure/.test/use_statement_pub.log) | [use_statement_pub](../doc/structure/use.md) |
+| [![test](../doc/structure/.test/use_statement_pub_in_module.png)](../doc/structure/.test/use_statement_pub_in_module.log) | [use_statement_pub_in_module](../doc/structure/use.md) |
 | [![test](../doc/debug/.test/verify_assert.png)](../doc/debug/.test/verify_assert.log) | [verify_assert](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_assert_fail.png)](../doc/debug/.test/verify_assert_fail.log) | [verify_assert_fail](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_error.png)](../doc/debug/.test/verify_error.log) | [verify_error](../doc/debug/README.md) |

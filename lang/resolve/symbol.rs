@@ -292,6 +292,7 @@ impl SrcReferrer for SymbolInner {
             SymbolDefinition::Constant(identifier, _)
             | SymbolDefinition::Argument(identifier, _) => identifier.src_ref(),
             SymbolDefinition::Alias(identifier, _) => identifier.src_ref(),
+            SymbolDefinition::UseAll(name) => name.src_ref(),
         }
     }
 }

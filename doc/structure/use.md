@@ -100,11 +100,29 @@ the symbol table where outside code might use it too.
 
 [![test](.test/use_statement_pub.png)](.test/use_statement_pub.log)
 
-```µcad,use_statement_pub#todo
+```µcad,use_statement_pub
 mod my {
-    pub use std::geo3d::*;
+    pub use std::geo2d::*;
 }
 
-my::sphere(r = 4mm);
-my::cube(size = 40mm);
+my::circle(r = 4mm);
+my::rect(size = 40mm);
+```
+
+## Tests
+
+[![test](.test/use_statement_pub_in_module.png)](.test/use_statement_pub_in_module.log)
+
+```µcad,use_statement_pub_in_module
+mod my {
+    mod name {
+        mod space {
+            pub use std::geo2d::*;
+        }
+    }
+    pub use name::space::*;
+}
+
+my::circle(r = 4mm);
+my::rect(size = 40mm);
 ```

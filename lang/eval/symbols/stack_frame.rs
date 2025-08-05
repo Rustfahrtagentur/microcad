@@ -164,6 +164,9 @@ impl StackFrame {
                     "{:depth$}Alias: {identifier}{full_name} -> {qualified_name}",
                     ""
                 )?,
+                SymbolDefinition::UseAll(name) => {
+                    writeln!(f, "{:depth$}UseAll: {name}{full_name}", "")?
+                }
             }
         }
 

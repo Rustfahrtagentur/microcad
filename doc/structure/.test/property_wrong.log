@@ -17,29 +17,19 @@ sketch wheel(outer: length) {
 t = wheel(outer = 1cm);
 
 // you can still extract and display `outer`
-std::info("outer: {t.outer}");
+std::print("outer: {t.outer}");
 // error: but you cannot access `inner` anymore
-std::info("inner: {t.inner}");
+std::print("inner: {t.inner}");
 
 -- Output --
+outer: 10mm
+inner: <INVALID VALUE>
 -- Errors --
-info: outer: 10mm
-  ---> <from_str>:14:11
-     |
-  14 | std::info("outer: {t.outer}");
-     |           ^^^^^^^^^^^^^^^^^^
-     |
 error: Property not found: inner
-  ---> <from_str>:16:20
+  ---> <from_str>:16:21
      |
-  16 | std::info("inner: {t.inner}");
-     |                    ^^^^^^^
-     |
-info: inner: <INVALID VALUE>
-  ---> <from_str>:16:11
-     |
-  16 | std::info("inner: {t.inner}");
-     |           ^^^^^^^^^^^^^^^^^^
+  16 | std::print("inner: {t.inner}");
+     |                     ^^^^^^^
      |
 -- Test Result --
 FAILED AS EXPECTED

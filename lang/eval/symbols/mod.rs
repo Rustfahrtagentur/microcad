@@ -54,4 +54,7 @@ pub trait Locals {
 
     /// Get a property value from current model.
     fn get_model(&self) -> EvalResult<Model>;
+
+    /// Return qualified name of current module or workbench.
+    fn current_name(&self) -> QualifiedName;
 }

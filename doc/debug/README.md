@@ -27,7 +27,7 @@ std::debug::assert(false, "this assertion fails");
 [![test](.test/verify_error.png)](.test/verify_error.log)
 
 ```µcad,verify_error#fail
-std::error("this should not have happened");
+std::log::error("this should not have happened");
 ```
 
 ## Todo
@@ -40,8 +40,8 @@ std::error("this should not have happened");
 a = 0;
 
 if a == 0 {
-    std::info("a is zero");
+    std::log::info("a is zero");
 } else {
-    std::todo("print proper message");
+    std::log::todo("print proper message");
 }
 ```

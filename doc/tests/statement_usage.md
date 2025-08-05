@@ -129,15 +129,15 @@ mod k {
 
 ```µcad,module_use
 mod k {
-  use std;
+  use std::geo2d;
 }
 ```
 
 [![test](.test/module_pub_use.png)](.test/module_pub_use.log)
 
-```µcad,module_pub_use#todo
+```µcad,module_pub_use
 mod k {
-  pub use std;
+  pub use std::geo2d;
 }
 ```
 

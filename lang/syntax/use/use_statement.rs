@@ -3,11 +3,7 @@
 
 //! Use statement syntax element
 
-use crate::{
-    resolve::{Symbol, SymbolMap},
-    src_ref::*,
-    syntax::*,
-};
+use crate::{resolve::*, src_ref::*, syntax::*};
 
 /// Use statement:
 ///
@@ -27,17 +23,12 @@ pub struct UseStatement {
 
 impl UseStatement {
     /// Resolve use statement to multiple symbols
-    pub fn resolve(&self, parent: Option<Symbol>) -> SymbolMap {
+    pub fn resolve(&self, parent: Option<Symbol>) -> Option<(Identifier, Symbol)> {
         match self.visibility {
             // Private symbols are processed later in `Context::use_symbol`
-            Visibility::Private => SymbolMap::new(),
+            Visibility::Private => None,
             // Public symbols are put into resolving symbol map
-            Visibility::Public => {
-                let mut symbols = SymbolMap::new();
-                let (id, symbol) = self.decl.resolve(parent.clone());
-                symbols.insert(id, symbol);
-                symbols
-            }
+            Visibility::Public => self.decl.resolve(parent.clone()),
         }
     }
 }

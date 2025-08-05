@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, rc::*, resolve::*, syntax::*, value::*};
+use crate::{eval::*, rc::*, syntax::*, value::*};
 
 /// Symbol definition
 #[derive(Debug, Clone)]
@@ -24,6 +24,8 @@ pub enum SymbolDefinition {
     Argument(Identifier, Value),
     /// Alias of a pub use statement.
     Alias(Identifier, QualifiedName),
+    /// Use all available symbols in the module with the given name.
+    UseAll(QualifiedName),
 }
 
 impl SymbolDefinition {
@@ -36,20 +38,7 @@ impl SymbolDefinition {
             Self::SourceFile(s) => s.id(),
             Self::Builtin(m) => m.id(),
             Self::Constant(id, _) | Self::Argument(id, _) | Self::Alias(id, _) => id.clone(),
-        }
-    }
-
-    /// Resolve into SymbolNode.
-    pub fn resolve(&self, parent: Option<Symbol>) -> Symbol {
-        match self {
-            Self::Workbench(w) => w.resolve(parent),
-            Self::Module(m) => m.resolve(parent),
-            Self::Function(f) => f.resolve(parent),
-            Self::SourceFile(s) => s.resolve(parent),
-            Self::External(e) => unreachable!("external {} must be loaded first", e.id),
-            // A builtin symbols and constants cannot have child symbols,
-            // hence the resolve trait does not need to be implemented
-            symbol_definition => Symbol::new(symbol_definition.clone(), parent),
+            Self::UseAll(_) => Identifier::none(),
         }
     }
 }
@@ -66,6 +55,7 @@ impl std::fmt::Display for SymbolDefinition {
             Self::Constant(_, value) => write!(f, "(constant) = {value}"),
             Self::Argument(_, value) => write!(f, "(call_argument) = {value}"),
             Self::Alias(_, name) => write!(f, "(alias) => {name}"),
+            Self::UseAll(name) => write!(f, "(use all) => {name}"),
         }
     }
 }
