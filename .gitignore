@@ -2,4 +2,4 @@
 /tree/*.svg
 /Cargo.lock
 /tests/.test
-/lid.stl
+*.stl
