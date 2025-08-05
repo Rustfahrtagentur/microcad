@@ -333,6 +333,13 @@ impl Eval for NestedItem {
                 }
             },
             NestedItem::Body(body) => Ok(Value::from_single_model(body.eval(context)?)),
+            NestedItem::Marker(marker) => {
+                let model: Option<Model> = marker.eval(context)?;
+                match model {
+                    Some(model) => Ok(Value::from_single_model(model)),
+                    None => Ok(Value::None),
+                }
+            }
         }
     }
 }

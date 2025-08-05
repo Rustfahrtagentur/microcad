@@ -246,7 +246,8 @@ impl Parse for Nested {
         Ok(Self(Refer::new(
             pair.inner()
                 .filter(|pair| {
-                    [Rule::qualified_name, Rule::call, Rule::body].contains(&pair.as_rule())
+                    [Rule::qualified_name, Rule::call, Rule::body, Rule::marker]
+                        .contains(&pair.as_rule())
                 })
                 .map(NestedItem::parse)
                 .collect::<ParseResult<_>>()?,
@@ -261,6 +262,7 @@ impl Parse for NestedItem {
             Rule::call => Ok(Self::Call(Call::parse(pair.clone())?)),
             Rule::qualified_name => Ok(Self::QualifiedName(QualifiedName::parse(pair.clone())?)),
             Rule::body => Ok(Self::Body(Body::parse(pair.clone())?)),
+            Rule::marker => Ok(Self::Marker(Marker::parse(pair.clone())?)),
             rule => unreachable!(
                 "NestedItem::parse expected call or qualified name, found {:?}",
                 rule

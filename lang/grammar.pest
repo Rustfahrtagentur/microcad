@@ -223,7 +223,7 @@ use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 // `holes.edges`: error # No tuple access in nested module
 nested = { nested_with_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
 
-nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ body }
+nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ (body | marker) | body | marker }
 
 // `-5.0mm`: ok # Negate
 // `(a+b)*(c-a)`: ok
@@ -299,7 +299,7 @@ list_expression = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 expression_no_semicolon = { nested_with_body }
 
 // A statement that is a single expression
-expression_statement = { (attribute_list ~ ws+)? ~ ((expression ~ ws* ~ ";") | expression_no_semicolon) }
+expression_statement = { (attribute_list ~ ws+)? ~ (expression_no_semicolon ~ (ws* ~ ";")? | (expression ~ ws* ~ ";")) }
 
 // A statement that is a single expression, with optional semicolon
 final_expression_statement = { (attribute_list ~ ws+)? ~ expression ~ (ws* ~ ";")? }
@@ -455,7 +455,7 @@ statement = {
   | expression_statement
 }
 
-statement_list = { (statement ~ ws*)* ~ final_expression_statement? }
+statement_list = { (statement ~ ws*)* }
 
 // `translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
 // `part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
