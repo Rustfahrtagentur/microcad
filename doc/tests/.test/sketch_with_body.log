@@ -5,7 +5,6 @@
 -- Code --
 
 use std::geo2d::circle;
-use std::ops::translate;
 
 circle(radius = 2mm) { circle(radius = 1mm); } // error: sketch with body
 

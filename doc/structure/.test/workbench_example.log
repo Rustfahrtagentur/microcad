@@ -4,7 +4,7 @@
 
 -- Code --
 
-part punched_disk(radius: Length) {
+sketch punched_disk(radius: Length) {
     use std::geo2d::circle;
 
     // calculate inner from radius in a method
@@ -29,12 +29,6 @@ error: Workbench circle cannot find initialization for those arguments
      |
    8 |     circle(radius) - circle(inner());
      |                             ^^^^^^^
-     |
-error: The part workbench produced a 2D output, but expected 3D output.
-  ---> <from_str>:1:1
-     |
-   1 | part punched_disk(radius: Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAIL
