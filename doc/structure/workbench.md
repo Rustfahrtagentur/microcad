@@ -72,12 +72,12 @@ sketch wheel(radius: Length) {
 use std::debug::assert;
 
 // call sketch with diameter
-d = wheel(diameter = 2cm)
+d = wheel(diameter = 2cm);
 // check radius
 assert_eq([d.radius, 1cm]);
 
 // call sketch with radius
-r = wheel(radius = 1cm)
+r = wheel(radius = 1cm);
 // check diameter
 assert([r.diameter, 2cm]);
 ```
@@ -227,7 +227,7 @@ sketch wheel(radius: Length) {
     std::geo2d::circle(radius);
 }
 
-wheel(radius = 1.0mm)
+wheel(radius = 1.0mm);
 ```
 
 If *initializers* were defined the *building code* starts below them.

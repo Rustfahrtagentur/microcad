@@ -11,7 +11,7 @@ sketch circle_union(radius: Scalar) {
 }
 
 // Create a circle node with two children
-a = geo2d::circle(1.0) {
+a = ops::translate(x = 1.0, y = 0.0, z = 0.0) {
     geo2d::circle(2.0);
     geo2d::circle(3.0);
 };

@@ -35,9 +35,9 @@ Functions can also return a value as *result*:
 ```µcad,return
 fn pow( x: Scalar, n: Integer ) {
     if n == 1 {
-        x   // return x
+        x;   // return x
     } else {
-        x * pow(n-1) // return recursive product
+        x * pow(n-1); // return recursive product
     }
 }
 ```
@@ -49,9 +49,9 @@ Returning a value twice is not allowed.
 ```µcad,return_twice
 fn pow( x: Scalar, n: Integer ) {
     if n == 1 {
-        x 
+        x;
     }
-    x * pow(n-1)  // error: unexpected code
+    x * pow(n-1);  // error: unexpected code
 }
 ```
 
