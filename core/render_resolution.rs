@@ -3,6 +3,8 @@
 
 //! Render resolution
 
+use cgmath::InnerSpace;
+
 use crate::*;
 
 /// Render resolution when rendering things to polygons or meshes.
@@ -28,7 +30,7 @@ impl std::ops::Mul<Mat3> for RenderResolution {
     type Output = RenderResolution;
 
     fn mul(self, rhs: Mat3) -> Self::Output {
-        let scale = (rhs.x.x * rhs.y.y).sqrt();
+        let scale = (rhs.x.magnitude() * rhs.y.magnitude()).sqrt();
         Self {
             linear: self.linear / scale,
         }
@@ -39,7 +41,7 @@ impl std::ops::Mul<Mat4> for RenderResolution {
     type Output = RenderResolution;
 
     fn mul(self, rhs: Mat4) -> Self::Output {
-        let scale = (rhs.x.x * rhs.y.y * rhs.z.z).powf(1.0 / 3.0);
+        let scale = (rhs.x.magnitude() * rhs.y.magnitude() * rhs.z.magnitude()).powf(1.0 / 3.0);
         Self {
             linear: self.linear / scale,
         }
