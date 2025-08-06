@@ -35,12 +35,12 @@ sketch wheel(radius: Length) {
 use std::debug::assert;
 
 // call sketch with diameter
-d = wheel(diameter = 2cm)
+d = wheel(diameter = 2cm);
 // check radius
 assert_eq([d.radius, 1cm]);
 
 // call sketch with radius
-r = wheel(radius = 1cm)
+r = wheel(radius = 1cm);
 // check diameter
 assert([r.diameter, 2cm]);
 
@@ -83,6 +83,23 @@ error: Symbol into_diameter not found.
   21 |     prop diameter = into_diameter(radius);
      |                     ^^^^^^^^^^^^^^^^^^^^^
      |
+error: Property not found: diameter
+  ---> <from_str>:39:9
+     |
+  39 | assert([r.diameter, 2cm]);
+     |         ^^^^^^^^^^
+     |
+error: Elements of list have different types: [[101m[1m INVALID TYPE [49m[22m, Length]
+  ---> <from_str>:39:8
+     |
+  39 | assert([r.diameter, 2cm]);
+     |        ^^^^^^^^^^^^^^^^^
+     |
 error: Missing arguments: v
+  ---> <from_str>:39:8
+     |
+  39 | assert([r.diameter, 2cm]);
+     |        ^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
 TODO

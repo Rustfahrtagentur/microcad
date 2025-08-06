@@ -15,6 +15,12 @@ error: Workbench translate cannot find initialization for those arguments
    1 | std::ops::translate([(x=-4mm, y=-4mm), (x=-4mm, y=4mm), (x=4mm, y=-4mm), (x=4mm, y=4mm)]) 
      |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
+error: Cannot nest item: std::ops::translate([(x = -4mm, y = -4mm), (x = -4mm, y = 4mm), (x = 4mm, y = -4mm), (x = 4mm, y = 4mm)])
+  ---> <from_str>:1:1
+     |
+   1 | std::ops::translate([(x=-4mm, y=-4mm), (x=-4mm, y=4mm), (x=4mm, y=-4mm), (x=4mm, y=4mm)]) 
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 warning: This expression statement did not produce any model
   ---> <from_str>:1:1
      |

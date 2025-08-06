@@ -5,11 +5,22 @@
 -- Code --
 
 use std::geo2d::circle;
-use std::ops::translate;
 
 circle(radius = 2mm) { circle(radius = 1mm); } // error: sketch with body
 
 -- Output --
 -- Errors --
+error: Cannot nest item: circle(radius = 2mm)
+  ---> <from_str>:3:1
+     |
+   3 | circle(radius = 2mm) { circle(radius = 1mm); } // error: sketch with body
+     | ^^^^^^^^^^^^^^^^^^^^
+     |
+warning: This expression statement did not produce any model
+  ---> <from_str>:3:1
+     |
+   3 | circle(radius = 2mm) { circle(radius = 1mm); } // error: sketch with body
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

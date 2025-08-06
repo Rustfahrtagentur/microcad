@@ -9,7 +9,7 @@ sketch wheel(radius: Length) {
     std::geo2d::circle(radius);
 }
 
-wheel(radius = 1.0mm)
+wheel(radius = 1.0mm);
 
 -- Output --
 -- Errors --

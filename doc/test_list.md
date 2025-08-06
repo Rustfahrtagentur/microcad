@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**210** tests from markdown.
+**211** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -46,6 +46,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/code_post_init.png)](../doc/structure/.test/code_post_init.log) | [code_post_init](../doc/structure/workbench.md) |
 | [![test](../doc/libs/std/ops/.test/difference_alt_operator.png)](../doc/libs/std/ops/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/libs/std/ops/difference.md) |
 | [![test](../doc/libs/std/ops/.test/difference_operator.png)](../doc/libs/std/ops/.test/difference_operator.log) | [difference_operator](../doc/libs/std/ops/difference.md) |
+| [![test](../doc/tests/.test/empty_op.png)](../doc/tests/.test/empty_op.log) | [empty_op](../doc/tests/semicolon.md) |
 | [![test](../doc/structure/.test/example.png)](../doc/structure/.test/example.log) | [example](../doc/structure/functions.md) |
 | [![test](../doc/.test/export_attributes.png)](../doc/.test/export_attributes.log) | [export_attributes](../doc/export.md) |
 | [![test](../doc/libs/std/ops/.test/extrude.png)](../doc/libs/std/ops/.test/extrude.log) | [extrude](../doc/libs/std/ops/extrude.md) |

@@ -6,9 +6,9 @@
 
 fn pow( x: Scalar, n: Integer ) {
     if n == 1 {
-        x   // return x
+        x;   // return x
     } else {
-        x * pow(n-1) // return recursive product
+        x * pow(n-1); // return recursive product
     }
 }
 

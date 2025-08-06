@@ -1,6 +1,6 @@
 -- Test --
   workbench_fn_prop
-  ../doc/structure/functions.md:130
+  ../doc/structure/functions.md:132
 
 -- Code --
 
@@ -14,7 +14,7 @@ punched_disk(1cm);
 
 -- Output --
 -- Errors --
-warning: The part workbench will produce no 2D output.
+warning: The part workbench will produce no 3D output.
   ---> <from_str>:1:1
      |
    1 | part punched_disk(radius: Length) {
