@@ -69,7 +69,7 @@ impl std::fmt::Display for Array {
 
 impl crate::ty::Ty for Array {
     fn ty(&self) -> Type {
-        Type::Array(ArrayType::new(self.ty.clone()))
+        Type::Array(Box::new(self.ty.clone()))
     }
 }
 

@@ -3,19 +3,6 @@
 
 use crate::{parse::*, parser::*, syntax::*, ty::*};
 
-impl Parse for ArrayType {
-    fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut inner = pair.inner();
-        use crate::ty::Ty;
-
-        let pair = inner.next().expect("Expected type");
-        match pair.as_rule() {
-            Rule::r#type => Ok(Self::new(TypeAnnotation::parse(pair.clone())?.ty())),
-            _ => unreachable!("Expected type, found {:?}", pair.as_rule()),
-        }
-    }
-}
-
 impl Parse for TupleType {
     fn parse(pair: Pair) -> ParseResult<Self> {
         use crate::ty::Ty;
@@ -79,17 +66,14 @@ impl Parse for MatrixType {
 }
 
 #[test]
-fn list_type() {
+fn array_type() {
     use crate::parser::{Parser, Rule};
     use crate::ty::Ty;
 
     let type_annotation =
         Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "[Integer]", 0).expect("test error");
     assert_eq!(type_annotation.ty().to_string(), "[Integer]");
-    assert_eq!(
-        type_annotation.ty(),
-        Type::Array(ArrayType::new(Type::Integer))
-    );
+    assert_eq!(type_annotation.ty(), Type::Array(Box::new(Type::Integer)));
 }
 
 #[test]
