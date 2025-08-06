@@ -79,11 +79,14 @@ impl Model {
 
     /// Check if we can nest a model.
     pub fn can_nest(&self) -> bool {
-        if self.borrow().element.can_nest() {
-            true
-        } else {
-            self.find_children_placeholder().is_some()
-        }
+        let self_ = self.borrow();
+        self_.element.can_nest() || self.find_children_placeholder().is_some()
+    }
+
+    /// Check if the model or any of its children contains a primitive.
+    pub fn produces_geometry(&self) -> bool {
+        let self_ = self.borrow();
+        self_.element.produces_geometry() || self_.children.produces_geometry()
     }
 
     /// Remove child from this model.

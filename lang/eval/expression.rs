@@ -244,7 +244,7 @@ impl Eval<Models> for Expression {
 
 impl Eval<Models> for Nested {
     fn eval(&self, context: &mut Context) -> EvalResult<Models> {
-        let model_stack =
+        let models_to_nest =
             self.iter()
                 .try_fold(Vec::new(), |mut model_stack, item| -> EvalResult<_> {
                     let models: Models = item.eval(context)?;
@@ -253,26 +253,33 @@ impl Eval<Models> for Nested {
                     Ok(model_stack)
                 })?;
 
-        // Check model_stack here.
-        if model_stack.len() > 1 {
-            let (first_n, _) = model_stack.split_at(model_stack.len() - 1);
-            let mut could_not_nest = false;
-            for (index, models) in first_n.iter().enumerate() {
-                if !models.can_nest() {
-                    context.error(
-                        self[index].clone(),
-                        EvalError::CannotNestItem(self[index].clone()),
-                    )?;
-                    could_not_nest = true;
-                }
-            }
-
-            if could_not_nest {
-                return Ok(Models::default());
+        let (first_n, last) = models_to_nest.split_at(models_to_nest.len() - 1);
+        let mut could_not_nest = false;
+        // Error check 1: `circle() circle()`.
+        // Check if can nest the first n-1 nested models.
+        for (index, models) in first_n.iter().enumerate() {
+            if !models.can_nest() {
+                context.error(
+                    self[index].clone(),
+                    EvalError::CannotNestItem(self[index].clone()),
+                )?;
+                could_not_nest = true;
             }
         }
 
-        Ok(Models::from_nested_items(&model_stack))
+        // Error check 2: `translate(x = 3.0) {}`
+        // Check if the nth model actually produces a geometry.
+        if last.iter().any(|models| !models.produces_geometry()) {
+            log::error!("{self}");
+
+            context.error(self, EvalError::ExpressionWillNotProduceAnyGeometry)?;
+        }
+
+        if could_not_nest {
+            return Ok(Models::default());
+        }
+
+        Ok(Models::from_nested_items(&models_to_nest))
     }
 }
 

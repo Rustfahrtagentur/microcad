@@ -38,6 +38,23 @@ pub enum Element {
 }
 
 impl Element {
+    /// Check if this element is expected to produce a geometry.
+    pub fn produces_geometry(&self) -> bool {
+        match &self {
+            Element::Group => false,
+            Element::Workpiece(workpiece) => match workpiece.kind {
+                WorkbenchKind::Part => true,
+                WorkbenchKind::Sketch => true,
+                WorkbenchKind::Operation => false,
+            },
+            Element::ChildrenMarker => true,
+            Element::Transform(_) => false,
+            Element::Primitive2D(_) => true,
+            Element::Primitive3D(_) => true,
+            Element::Operation(_) => false,
+        }
+    }
+
     /// Check if this element can nest other elements.
     pub fn can_nest(&self) -> bool {
         match &self {

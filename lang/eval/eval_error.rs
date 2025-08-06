@@ -223,6 +223,10 @@ pub enum EvalError {
     /// This error happens if the workbench produced a different output type.
     #[error("The {0} workbench will produce no {1} output.")]
     WorkbenchNoOutput(WorkbenchKind, OutputType),
+
+    /// The model does not contain any primitives and hence, there will be no output.
+    #[error("This expression will produce no geometry.")]
+    ExpressionWillNotProduceAnyGeometry,
 }
 
 /// Result type of any evaluation.

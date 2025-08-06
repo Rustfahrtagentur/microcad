@@ -46,6 +46,11 @@ impl Models {
         }
     }
 
+    /// Check if any of the models contains a primitive.
+    pub fn produces_geometry(&self) -> bool {
+        self.iter().any(|model| model.produces_geometry())
+    }
+
     /// Nest a Vec of model multiplicities
     ///
     /// * `model_stack`: A list of model lists.
