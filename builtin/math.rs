@@ -74,12 +74,12 @@ fn tan() -> Symbol {
 }
 
 /// Helper function to get an angle from a field in an argument list.
-fn get_angle(args: &Tuple, axis: &str) -> cgmath::Deg<f64> {
+fn get_angle(args: &Tuple, axis: &str) -> cgmath::Rad<f64> {
     match args.get_value(axis).expect("angle missing") {
         Value::Quantity(Quantity {
             value,
             quantity_type: QuantityType::Angle,
-        }) => cgmath::Deg::<f64>(*value),
+        }) => cgmath::Rad::<f64>(*value),
         _ => unreachable!(),
     }
 }

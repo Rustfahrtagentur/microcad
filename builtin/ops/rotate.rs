@@ -1,8 +1,13 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{
+    eval::*,
+    model::*,
+    syntax::Identifier,
+    ty::{MatrixType, Type},
+    value::*,
+};
 
 /// Builtin definition for a 2D circle
 #[derive(Debug)]
@@ -14,22 +19,17 @@ impl BuiltinWorkbenchDefinition for Rotate {
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {
-        Ok(
-            ModelBuilder::new_transform(AffineTransform::RotationAroundAxis(
-                cgmath::Rad(args.get("angle")?),
-                Vec3::new(args.get("x")?, args.get("y")?, args.get("z")?),
-            ))
-            .build(),
-        )
+        Ok(ModelBuilder::new_transform(AffineTransform::Rotation(args.get("matrix")?)).build())
     }
 
     fn parameters() -> ParameterValueList {
-        [
-            parameter!(angle: Scalar),
-            parameter!(x: Scalar),
-            parameter!(y: Scalar),
-            parameter!(z: Scalar),
-        ]
+        [(
+            Identifier::no_ref("matrix"),
+            ParameterValue {
+                specified_type: Some(Type::Matrix(MatrixType::new(3, 3))),
+                ..Default::default()
+            },
+        )]
         .into_iter()
         .collect()
     }

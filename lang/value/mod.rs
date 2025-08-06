@@ -455,6 +455,20 @@ impl TryFrom<&Value> for Size2D {
     }
 }
 
+impl TryFrom<&Value> for Mat3 {
+    type Error = ValueError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        if let Value::Matrix(m) = value {
+            if let Matrix::Matrix3(matrix3) = m.as_ref() {
+                return Ok(*matrix3);
+            }
+        }
+
+        Err(ValueError::CannotConvert(value.clone(), "Matrix3".into()))
+    }
+}
+
 impl From<f32> for Value {
     fn from(f: f32) -> Self {
         Value::Quantity((f as Scalar).into())
