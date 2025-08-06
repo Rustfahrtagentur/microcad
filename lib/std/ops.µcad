@@ -85,3 +85,11 @@ op rotate(matrix: Mat3) {
         @children
     }
 }
+
+
+/// Orient an object towards a vector.
+op orient(v: Vec3) {
+    __builtin::ops::orient(x = v.x, y = v.y, z = v.z) {
+        @children
+    }
+}
