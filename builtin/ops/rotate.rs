@@ -9,7 +9,7 @@ use microcad_lang::{
     value::*,
 };
 
-/// Builtin definition for a 2D circle
+/// Builtin definition for a rotation in 2D and 3D.
 #[derive(Debug)]
 pub struct Rotate;
 

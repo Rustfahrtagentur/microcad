@@ -4,7 +4,7 @@
 use microcad_core::Vec3;
 use microcad_lang::{eval::*, model::*, parameter, value::*};
 
-/// Builtin definition for a 2D circle
+/// Builtin definition to orient an object towards an axis.
 #[derive(Debug)]
 pub struct Orient;
 
