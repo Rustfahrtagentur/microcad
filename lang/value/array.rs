@@ -126,7 +126,7 @@ impl std::ops::Mul<Value> for Array {
             // List * Scalar or List * Integer
             Type::Quantity(_) | Type::Integer => Ok(Value::Array(Array::new(
                 ValueList::new(values),
-                rhs.ty().clone(),
+                self.ty * rhs.ty().clone(),
             ))),
             _ => Err(ValueError::InvalidOperator("*".into())),
         }

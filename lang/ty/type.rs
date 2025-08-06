@@ -41,11 +41,30 @@ impl Type {
         Self::Quantity(QuantityType::Length)
     }
 
-    /// Check if the type is a list of the given type `ty`
+    /// Check if the type is an array of the given type `ty`
     pub fn is_array_of(&self, ty: &Type) -> bool {
         match self {
-            Self::Array(list_type) => &list_type.ty() == ty,
+            Self::Array(array_type) => &array_type.ty() == ty,
             _ => false,
+        }
+    }
+}
+
+impl std::ops::Mul for Type {
+    type Output = Type;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        if self == Self::Invalid || rhs == Self::Invalid {
+            return Self::Invalid;
+        }
+
+        match (self, rhs) {
+            (Type::Integer, ty) | (ty, Type::Integer) => ty,
+            (Type::Quantity(lhs), Type::Quantity(rhs)) => Type::Quantity(lhs * rhs),
+            (ty, Type::Array(array_type)) | (Type::Array(array_type), ty) => array_type.ty() * ty,
+            (Type::Tuple(_), _) | (_, Type::Tuple(_)) => todo!(),
+            (Type::Matrix(_), _) | (_, Type::Matrix(_)) => todo!(),
+            (lhs, rhs) => unimplemented!("Multiplication for {lhs} * {rhs}"),
         }
     }
 }

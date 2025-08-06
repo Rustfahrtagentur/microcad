@@ -271,7 +271,7 @@ impl std::ops::Mul for Value {
             (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             // Multiply two scalars
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
-            (Value::Array(list), value) | (value, Value::Array(list)) => Ok((list * value)?),
+            (Value::Array(array), value) | (value, Value::Array(array)) => Ok((array * value)?),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
     }
