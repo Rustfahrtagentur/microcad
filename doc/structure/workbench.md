@@ -296,7 +296,7 @@ If you remove the `prop` keyword you will fail at accessing `inner`:
 [![test](.test/property_wrong.png)](.test/property_wrong.log)
 
 ```µcad,property_wrong#fail
-sketch wheel(outer: length) {
+sketch wheel(outer: Length) {
     use std::geo2d::circle;
 
     // `inner` is declared as variable and may not be read

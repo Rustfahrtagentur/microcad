@@ -4,7 +4,7 @@
 
 -- Code --
 
-sketch wheel(outer: length) {
+sketch wheel(outer: Length) {
     use std::geo2d::circle;
 
     // `inner` is declared as variable and may not be read
@@ -21,3 +21,15 @@ std::print("outer: {t.outer}");
 // error: but you cannot access `inner` anymore
 std::print("inner: {t.inner}");
 
+-- Output --
+outer: 10mm
+inner: <INVALID VALUE>
+-- Errors --
+error: Property not found: inner
+  ---> <from_str>:16:21
+     |
+  16 | std::print("inner: {t.inner}");
+     |                     ^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED
