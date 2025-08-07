@@ -14,27 +14,31 @@ impl Parse for Type {
             }
             Rule::tuple_type => Type::Tuple(TupleType::parse(inner)?.into()),
             Rule::matrix_type => Type::Matrix(MatrixType::parse(inner)?),
-            Rule::qualified_name => match inner.as_str() {
+            _ => match inner.as_str() {
                 // Builtin types.
                 "Integer" => Type::Integer,
                 "Bool" => Type::Bool,
-                "Scalar" => Type::scalar(),
-                "Length" => Type::length(),
-                "Area" => Type::Quantity(QuantityType::Area),
-                "Angle" => Type::Quantity(QuantityType::Angle),
-                "Volume" => Type::Quantity(QuantityType::Volume),
-                "Weight" => Type::Quantity(QuantityType::Weight),
-                "Density" => Type::Quantity(QuantityType::Density),
                 "String" => Type::String,
                 "Color" => Type::Tuple(TupleType::new_color().into()),
                 "Vec2" => Type::Tuple(TupleType::new_vec2().into()),
                 "Vec3" => Type::Tuple(TupleType::new_vec3().into()),
-                t => {
-                    log::warn!("found unknown builtin type {t}!");
-                    Type::Custom(QualifiedName::parse(inner)?)
-                }
+                _ => Type::Quantity(QuantityType::parse(inner)?),
             },
-            _ => unreachable!("Expected type, found {:?}", inner.as_rule()),
+        })
+    }
+}
+
+impl Parse for QuantityType {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Ok(match pair.as_str() {
+            "Scalar" => QuantityType::Scalar,
+            "Length" => QuantityType::Length,
+            "Area" => QuantityType::Area,
+            "Angle" => QuantityType::Angle,
+            "Volume" => QuantityType::Volume,
+            "Weight" => QuantityType::Weight,
+            "Density" => QuantityType::Density,
+            _ => unreachable!("Expected type, found {:?}", pair.as_str()),
         })
     }
 }
