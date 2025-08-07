@@ -146,7 +146,7 @@ pub enum EvalError {
 
     /// Unknown method.
     #[error("Unknown method `{0}`")]
-    UnknownMethod(Identifier),
+    UnknownMethod(QualifiedName),
 
     /// Can't find a project file by it's path.
     #[error("Could not find a file with path {0}")]

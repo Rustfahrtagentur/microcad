@@ -119,10 +119,6 @@ impl Parse for Expression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rules(&pair, &[Rule::expression_no_semicolon, Rule::expression]);
 
-        if pair.as_rule() == Rule::expression_no_semicolon {
-            return Ok(Self::Nested(Nested::parse(pair)?));
-        }
-
         PRATT_PARSER
             .map_primary(|primary| {
                 match (
@@ -140,7 +136,11 @@ impl Parse for Expression {
                     (primary, Rule::format_string) => {
                         Ok(Self::FormatString(FormatString::parse(primary)?))
                     }
-                    (primary, Rule::nested) => Ok(Self::Nested(Nested::parse(primary)?)),
+                    (primary, Rule::body) => Ok(Self::Body(Body::parse(primary)?)),
+                    (primary, Rule::call) => Ok(Self::Call(Call::parse(primary)?)),
+                    (primary, Rule::qualified_name) => {
+                        Ok(Self::QualifiedName(QualifiedName::parse(primary)?))
+                    }
                     (primary, Rule::marker) => Ok(Self::Marker(Marker::parse(primary)?)),
                     rule => unreachable!(
                         "Expression::parse expected atom, found {:?} {:?}",
@@ -219,6 +219,9 @@ impl Parse for Expression {
                             )),
                             rule => unreachable!("Expected identifier or int, found {:?}", rule),
                         }
+                    }
+                    (op, Rule::call) => {
+                        todo!("{op:?}");
                     }
                     (op, Rule::method_call) => Ok(Self::MethodCall(
                         Box::new(lhs?),

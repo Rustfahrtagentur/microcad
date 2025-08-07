@@ -38,8 +38,12 @@ pub enum Expression {
     ArrayExpression(ArrayExpression),
     /// A tuple: (a, b, c)
     TupleExpression(TupleExpression),
-    /// A list whitespace separated of nested items: `translate() rotate()`, `b c`, `a b() {}`
-    Nested(Nested),
+    /// A body: `{}`.
+    Body(Body),
+    /// A call: `ops::difference()`.
+    Call(Call),
+    /// A qualified name: `foo::bar`.
+    QualifiedName(QualifiedName),
     /// A marker expression: `@children`.
     Marker(Marker),
     /// A binary operation: `a + b`
@@ -64,10 +68,10 @@ pub enum Expression {
     },
     /// Access an element of a list (`a[0]`) or a tuple (`a.0` or `a.b`)
     ArrayElementAccess(Box<Expression>, Box<Expression>, SrcRef),
-    /// Access an element of a tuple: `a.b`
+    /// Access an element of a tuple: `a.b`.
     PropertyAccess(Box<Expression>, Identifier, SrcRef),
 
-    /// Access an attribute of a model: `a#b`
+    /// Access an attribute of a model: `a#b`.
     AttributeAccess(Box<Expression>, Identifier, SrcRef),
 
     /// Call to a method: `[2,3].len()`
@@ -84,7 +88,9 @@ impl SrcReferrer for Expression {
             Self::FormatString(fs) => fs.src_ref(),
             Self::ArrayExpression(le) => le.src_ref(),
             Self::TupleExpression(te) => te.src_ref(),
-            Self::Nested(n) => n.src_ref(),
+            Self::Call(c) => c.src_ref(),
+            Self::Body(b) => b.src_ref(),
+            Self::QualifiedName(q) => q.src_ref(),
             Self::Marker(m) => m.src_ref(),
             Self::BinaryOp {
                 lhs: _,
@@ -128,7 +134,9 @@ impl std::fmt::Display for Expression {
             Self::PropertyAccess(lhs, rhs, _) => write!(f, "{lhs}.{rhs}"),
             Self::AttributeAccess(lhs, rhs, _) => write!(f, "{lhs}#{rhs}"),
             Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs}.{method_call}"),
-            Self::Nested(nested) => write!(f, "{nested}"),
+            Self::Call(call) => write!(f, "{call}"),
+            Self::Body(body) => write!(f, "{body}"),
+            Self::QualifiedName(qualified_name) => write!(f, "{qualified_name}"),
             Self::Marker(marker) => write!(f, "{marker}"),
             _ => unimplemented!(),
         }
@@ -191,7 +199,9 @@ impl PrintSyntax for Expression {
                 lhs.print_syntax(f, depth + Self::INDENT)?;
                 method_call.print_syntax(f, depth + Self::INDENT)
             }
-            Expression::Nested(nested) => nested.print_syntax(f, depth),
+            Expression::Call(call) => call.print_syntax(f, depth),
+            Expression::Body(body) => body.print_syntax(f, depth),
+            Expression::QualifiedName(qualified_name) => qualified_name.print_syntax(f, depth),
             Expression::Marker(marker) => marker.print_syntax(f, depth),
             Expression::Invalid => write!(f, "{}", crate::invalid!(EXPRESSION)),
         }
@@ -200,9 +210,9 @@ impl PrintSyntax for Expression {
 
 impl Expression {
     /// If the expression consists of a single identifier, e.g. `a`
-    pub fn single_identifier(&self) -> Option<Identifier> {
+    pub fn single_identifier(&self) -> Option<&Identifier> {
         match &self {
-            Self::Nested(nested) => nested.single_identifier(),
+            Self::QualifiedName(qualified_name) => qualified_name.single_identifier(),
             _ => None,
         }
     }

@@ -71,15 +71,9 @@ impl Parse for Argument {
 
 impl Parse for MethodCall {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut inner = pair.inner();
-
         Ok(MethodCall {
-            id: Identifier::parse(inner.next().expect(INTERNAL_PARSE_ERROR))?,
-            argument_list: if let Some(pair) = inner.next() {
-                ArgumentList::parse(pair)?
-            } else {
-                ArgumentList::default()
-            },
+            id: pair.find(Rule::qualified_name).expect(INTERNAL_PARSE_ERROR),
+            argument_list: pair.find(Rule::argument_list).unwrap_or_default(),
             src_ref: pair.clone().into(),
         })
     }

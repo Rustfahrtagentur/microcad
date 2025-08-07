@@ -3,10 +3,10 @@
 
 //! Argument value evaluation entity
 
-use crate::{eval::*, syntax::*};
+use crate::{eval::*, model::Models, syntax::*};
 
 /// Trait for calling methods of values
-pub trait CallMethod {
+pub trait CallMethod<T = Value> {
     /// Evaluate method call into a value (if possible)
     ///
     /// - `name`: Name of the method
@@ -14,20 +14,20 @@ pub trait CallMethod {
     /// - `context`: Evaluation context
     fn call_method(
         &self,
-        id: &Identifier,
-        args: &ArgumentList,
+        id: &QualifiedName,
+        args: &ArgumentValueList,
         context: &mut Context,
-    ) -> EvalResult<Value>;
+    ) -> EvalResult<T>;
 }
 
 impl CallMethod for Array {
     fn call_method(
         &self,
-        id: &Identifier,
-        _: &ArgumentList,
+        id: &QualifiedName,
+        _: &ArgumentValueList,
         context: &mut Context,
     ) -> EvalResult<Value> {
-        match id.id().as_str() {
+        match id.single_identifier().expect("Single id").id().as_str() {
             "count" => Ok(Value::Integer(self.len() as i64)),
             "all_equal" => {
                 let is_equal = match self.first() {
@@ -52,11 +52,35 @@ impl CallMethod for Array {
     }
 }
 
+impl CallMethod<Models> for Models {
+    fn call_method(
+        &self,
+        id: &QualifiedName,
+        args: &ArgumentValueList,
+        context: &mut Context,
+    ) -> EvalResult<Models> {
+        if let Some(symbol) = id.eval(context)? {
+            Ok(match &symbol.borrow().def {
+                SymbolDefinition::Workbench(workbench_definition) => {
+                    workbench_definition.call(args, context)?.nest(self)
+                }
+                SymbolDefinition::Builtin(builtin) => match builtin.call(&args, context)? {
+                    Value::Models(models) => models.nest(self),
+                    value => panic!("Builtin call returned {value} but no models."),
+                },
+                def => panic!("Cannot call {def}"),
+            })
+        } else {
+            Ok(Models::default())
+        }
+    }
+}
+
 impl CallMethod for Value {
     fn call_method(
         &self,
-        id: &Identifier,
-        args: &ArgumentList,
+        id: &QualifiedName,
+        args: &ArgumentValueList,
         context: &mut Context,
     ) -> EvalResult<Value> {
         match &self {
@@ -68,7 +92,8 @@ impl CallMethod for Value {
             Value::Array(list) => list.call_method(id, args, context),
             Value::Tuple(_) => eval_todo!(context, args, "call_method for Tuple"),
             Value::Matrix(_) => eval_todo!(context, args, "call_method for Matrix"),
-            Value::Models(_) => eval_todo!(context, args, "call_method for Models"),
+            Value::Models(models) => Ok(Value::Models(models.call_method(id, args, context)?)),
+
             Value::Return(_) => unreachable!("Return value cannot be called"),
         }
     }
@@ -88,7 +113,7 @@ fn call_list_method() {
     if let Value::Bool(result) = list
         .call_method(
             &"all_equal".into(),
-            &ArgumentList::default(),
+            &ArgumentValueList::default(),
             &mut Context::default(),
         )
         .expect("test error")

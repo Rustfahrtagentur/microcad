@@ -37,6 +37,34 @@ impl Models {
         }
     }
 
+    pub fn nest(self, op: &Models) -> Self {
+        self.iter().for_each(|new_parent| {
+            op.iter().for_each(|model| {
+                model.detach();
+
+                // Handle children marker.
+                // If we have found a children marker model, use it's parent as
+                // new parent model.
+                let new_parent = match &new_parent.find_children_placeholder() {
+                    Some(children_marker) => {
+                        let parent = &children_marker
+                            .borrow()
+                            .parent
+                            .clone()
+                            .expect("Must have a parent");
+                        children_marker.detach(); // Remove children marker from tree
+                        parent.clone()
+                    }
+                    None => new_parent.clone(),
+                };
+
+                new_parent.append(model.make_deep_copy());
+            });
+        });
+
+        self
+    }
+
     /// Nest a Vec of model multiplicities
     ///
     /// * `model_stack`: A list of model lists.

@@ -21,7 +21,7 @@ impl Argument {
     pub fn derived_name(&self) -> Option<Identifier> {
         match &self.id {
             Some(name) => Some(name.clone()),
-            None => self.value.single_identifier(),
+            None => self.value.single_identifier().cloned(),
         }
     }
 }

@@ -1,9 +1,21 @@
 use __builtin::*;
 
-// Translate the difference of two rectangles in the x direction.
-ops::translate(x = 15.0, y = 0.0, z = 0.0)
-    ops::difference() {
-        geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
-        geo2d::rect(x = 0.0, y = 0.0, width = 5.0, height = 5.0);
-    }
+a = {
+    geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
+    geo2d::rect(x = 0.0, y = 0.0, width = 5.0, height = 5.0);
+};
 
+a.ops::difference();
+
+// Translate the difference of two rectangles in the x direction.
+{
+    geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
+    geo2d::rect(x = 0.0, y = 0.0, width = 5.0, height = 5.0);
+}.ops::difference().ops::translate(x = 0.0, y = 0.0, z = [0.0, 1.0]);
+
+b = (
+    geo2d::rect(x = 0.0, y = 0.0, width = 5.0, height = 5.0) &
+    geo2d::rect(x = 0.0, y = 0.0, width = 5.0, height = 5.0)
+).ops::difference();
+
+b;
