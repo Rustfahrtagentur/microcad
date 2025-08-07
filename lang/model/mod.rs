@@ -174,7 +174,7 @@ impl Model {
                 None => String::new(),
             },
             element_type = self_.element,
-            origin = match self_.origin.creator {
+            origin = match self_.origin.get_creator() {
                 Some(_) => format!(" = {origin}", origin = self_.origin),
                 None => String::new(),
             },

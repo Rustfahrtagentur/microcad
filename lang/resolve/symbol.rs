@@ -1,12 +1,12 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::WriteToFile, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{diag::*, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
 use derive_more::{Deref, DerefMut};
 
 /// Symbol content
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SymbolInner {
     /// Symbol definition
     pub def: SymbolDefinition,
@@ -18,15 +18,6 @@ pub struct SymbolInner {
     pub children: SymbolMap,
 }
 
-impl serde::Serialize for SymbolInner {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_bool(v)
-    }
-}
-
 /// Symbol
 ///
 /// Every `symbol` has a [`SymbolDefinition`], a *parent* and *children* stored within a `Rc<RefCell<`[`SymbolInner`]`>`.
@@ -36,6 +27,12 @@ impl serde::Serialize for SymbolInner {
 /// `SymbolNode` can be shared as mutable.
 #[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Symbol(RcMut<SymbolInner>);
+
+impl Linkable<QualifiedName> for Symbol {
+    fn link(&self) -> QualifiedName {
+        self.full_name()
+    }
+}
 
 /// List of qualified names which can pe displayed
 #[derive(Debug, Deref)]

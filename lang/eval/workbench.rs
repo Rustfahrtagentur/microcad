@@ -25,11 +25,7 @@ impl WorkbenchDefinition {
 
         // Create model
         let model = ModelBuilder::new_workpiece(self.kind)
-            .origin(Origin {
-                arguments: arguments.clone(),
-                // TODO: where to get the rest?
-                ..Default::default()
-            })
+            .origin(Origin::new(arguments.clone()))
             .attributes(self.attribute_list.eval(context)?)
             .properties(
                 // copy all arguments which are part of the building plan to properties
