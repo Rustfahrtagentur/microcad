@@ -227,6 +227,10 @@ pub enum EvalError {
     /// This error happens if the workbench produced a different output type.
     #[error("The {0} workbench will produce no {1} output.")]
     WorkbenchNoOutput(WorkbenchKind, OutputType),
+
+    /// Unexpected source file in expression
+    #[error("Unexpected source file {0} in expression")]
+    InvalidSelfReference(Identifier),
 }
 
 /// Result type of any evaluation.
