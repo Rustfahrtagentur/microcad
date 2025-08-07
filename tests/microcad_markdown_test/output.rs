@@ -7,22 +7,43 @@ pub struct Output {
     name: String,
     input: PathBuf,
     banner: PathBuf,
+    exports: Vec<PathBuf>,
     out: PathBuf,
     log: PathBuf,
 }
 
 impl Output {
-    pub fn new(name: String, input: PathBuf, banner: PathBuf, out: PathBuf, log: PathBuf) -> Self {
+    pub fn new(
+        name: String,
+        input: PathBuf,
+        banner: PathBuf,
+        out: PathBuf,
+        log: PathBuf,
+        export_ext: &[&str],
+    ) -> Self {
         Self {
             name,
             input,
             banner,
+            exports: {
+                export_ext
+                    .iter()
+                    .map(|ext| {
+                        let mut export_path = out.clone();
+                        export_path.set_extension(ext);
+                        export_path
+                    })
+                    .collect()
+            },
             out,
             log,
         }
     }
     pub fn has_path(&self, path: &PathBuf) -> bool {
-        self.banner == *path || self.out == *path || self.log == *path
+        self.banner == *path
+            || self.out == *path
+            || self.log == *path
+            || self.exports.contains(path)
     }
 }
 
