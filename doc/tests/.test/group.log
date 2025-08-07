@@ -1,6 +1,6 @@
 -- Test --
   group
-  ../doc/tests/semicolon.md:60
+  ../doc/tests/semicolon.md:61
 
 -- Code --
 
@@ -13,7 +13,3 @@ use std::ops::translate;
     circle(radius = 2mm); 
 }
 
--- Output --
--- Errors --
--- Test Result --
-OK

@@ -1,6 +1,6 @@
 -- Test --
   group_assignment
-  ../doc/tests/semicolon.md:73
+  ../doc/tests/semicolon.md:74
 
 -- Code --
 
@@ -13,7 +13,3 @@ a = {
     circle(radius = 2mm); 
 };
 
--- Output --
--- Errors --
--- Test Result --
-OK

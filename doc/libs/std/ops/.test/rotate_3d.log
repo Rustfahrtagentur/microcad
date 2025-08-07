@@ -10,7 +10,3 @@ cylinder.std::ops::rotate(x = 90°);
 cylinder.std::ops::rotate(y = 90°);
 cylinder.std::ops::rotate(z = 90°);
 
--- Output --
--- Errors --
--- Test Result --
-OK

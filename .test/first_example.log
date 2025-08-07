@@ -1,6 +1,6 @@
 -- Test --
   first_example
-  ../README.md:48
+  ../README.md:50
 
 -- Code --
 
@@ -16,7 +16,3 @@ part csg_cube(size: Length) {
 
 csg_cube(50mm);
 
--- Output --
--- Errors --
--- Test Result --
-OK
