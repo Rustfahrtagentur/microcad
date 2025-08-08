@@ -9,17 +9,20 @@ part buffer_stand() {
     base = (circle(d = width) & rect(width, height = size / 2))
         .extrude(4.0in);
 
-    side = (rect(w = 0.001in, h = size/2) | circle(d = 1.5in).translate(x = -3.25in))
-        .hull()
-        .extrude(width)
-        .orient(X)
-        .translate(x = -width / 2);
+    side = {
+        line(height = size/2);
+        circle(d = 1.5in).translate(x = -3.25in);
+    }
+    .hull()
+    .extrude(width)
+    .orient(X)
+    .translate(x = -width / 2);
 
     front = {
         w = 4.25in;
         d = w * 0.5 - 0.5in;
 
-        circle(r = 0.5in).translate(x = [d,-d]);
+        circle(r = 0.5in, c = (x = [d,-d], y = 0in));
         rect(x = -w * 0.5, y = -4.0in, width = w, height = 0.0in);
     }
     .hull()
@@ -37,11 +40,14 @@ part buffer_stand() {
         .orient(X)
         .translate(x = [2.0, -2.0]in, z = 3.25in);
     
-    bottom_bar = (circle(d = 0.15in).translate(x = -1.35in) | rect(width = 0.001in, height = 0.5in))
-        .hull()
-        .extrude(width)
-        .orient(X)
-        .translate(x = -width / 2);
+    bottom_bar = {
+        circle(d = 0.15in).translate(x = -1.35in);
+        line(height = 0.5in);
+    }
+    .hull()
+    .extrude(width)
+    .orient(X)
+    .translate(x = -width / 2);
 
     base & (side - front) | (base & bottom_bar) | mount - bearing;
 }
