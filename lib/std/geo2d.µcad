@@ -45,3 +45,17 @@ sketch rect(width: Length, height: Length, x: Length, y: Length) {
             y = y / 1mm
     );
 }
+
+sketch line(p1: Vec2, p2: Vec2) {
+    init(width: Length, y = 0.0mm) {
+        p1 = (x = -width/2mm, y = y / 1mm);
+        p2 = (x =  width/2mm, y = y / 1mm);
+    }
+
+    init(height: Length, x = 0.0mm) {
+        p1 = (x = x / 1mm, y = -height/2mm);
+        p2 = (x = x / 1mm, y =  height/2mm);
+    }
+
+    __builtin::geo2d::line(p1.x, p1.y, p2.x, p2.y);
+} 
