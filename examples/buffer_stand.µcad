@@ -32,12 +32,10 @@ part buffer_stand() {
         .orient(X)
         .translate(z = 3.25in);
 
-    mount = {
-        rect(height = 4.25in - 3.5in, width = 1.5in).translate(y = [2.0, -2.0]in);
-    }
-    .revolve()
-    .orient(X)
-    .translate(z = 3.25in);
+    mount = rect(height = 4.25in - 3.5in, width = 1.5in)
+        .revolve()
+        .orient(X)
+        .translate(x = [2.0, -2.0]in, z = 3.25in);
     
     bottom_bar = (circle(d = 0.15in).translate(x = -1.35in) | rect(width = 0.001in, height = 0.5in))
         .hull()
