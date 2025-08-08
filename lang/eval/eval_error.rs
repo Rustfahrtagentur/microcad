@@ -55,6 +55,10 @@ pub enum EvalError {
     #[error("Unexpectedly found symbol {0}")]
     SymbolFound(QualifiedName),
 
+    /// The symbol cannot be called, e.g. when it is a source file or a module.
+    #[error("Symbol `{0}` cannot be called {1}.")]
+    SymbolCannotBeCalled(QualifiedName, Box<SymbolDefinition>),
+
     /// Found ambiguous symbols.
     #[error("Ambiguous symbol {ambiguous} might be one of the following:\n{others}")]
     AmbiguousSymbol {

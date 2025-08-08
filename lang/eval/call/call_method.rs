@@ -64,11 +64,17 @@ impl CallMethod<Models> for Models {
                 SymbolDefinition::Workbench(workbench_definition) => {
                     workbench_definition.call(args, context)?.nest(self)
                 }
-                SymbolDefinition::Builtin(builtin) => match builtin.call(&args, context)? {
+                SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
                     Value::Models(models) => models.nest(self),
                     value => panic!("Builtin call returned {value} but no models."),
                 },
-                def => panic!("Cannot call {def}"),
+                def => {
+                    context.error(
+                        id,
+                        EvalError::SymbolCannotBeCalled(id.clone(), Box::new(def.clone())),
+                    )?;
+                    Models::default()
+                }
             })
         } else {
             Ok(Models::default())
@@ -83,18 +89,19 @@ impl CallMethod for Value {
         args: &ArgumentValueList,
         context: &mut Context,
     ) -> EvalResult<Value> {
-        match &self {
-            Value::None => unreachable!("None value cannot be called"),
-            Value::Integer(_) => eval_todo!(context, args, "call_method for Integer"),
-            Value::Quantity(_) => eval_todo!(context, args, "call_method for Quantity"),
-            Value::Bool(_) => eval_todo!(context, args, "call_method for Bool"),
-            Value::String(_) => eval_todo!(context, args, "call_method for String"),
+        match self {
+            Value::Integer(_) => eval_todo!(context, id, "call_method for Integer"),
+            Value::Quantity(_) => eval_todo!(context, id, "call_method for Quantity"),
+            Value::Bool(_) => eval_todo!(context, id, "call_method for Bool"),
+            Value::String(_) => eval_todo!(context, id, "call_method for String"),
+            Value::Tuple(_) => eval_todo!(context, id, "call_method for Tuple"),
+            Value::Matrix(_) => eval_todo!(context, id, "call_method for Matrix"),
             Value::Array(list) => list.call_method(id, args, context),
-            Value::Tuple(_) => eval_todo!(context, args, "call_method for Tuple"),
-            Value::Matrix(_) => eval_todo!(context, args, "call_method for Matrix"),
             Value::Models(models) => Ok(Value::Models(models.call_method(id, args, context)?)),
-
-            Value::Return(_) => unreachable!("Return value cannot be called"),
+            _ => {
+                context.error(id, EvalError::UnknownMethod(id.clone()))?;
+                Ok(Value::None)
+            }
         }
     }
 }
