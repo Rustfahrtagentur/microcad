@@ -6,9 +6,9 @@
 use std::geo2d::circle;
 use std::ops::translate;
 
-translate( y=[-34mm/2 , 34mm/2] ) { // op with body
-    circle( radius = 5mm );
-}
+{ // op with body
+    circle(radius = 5mm);
+}.translate(y=[-34mm/2 , 34mm/2]);
 ```
 
 [![test](.test/operation_no_body.png)](.test/operation_no_body.log)
@@ -17,8 +17,9 @@ translate( y=[-34mm/2 , 34mm/2] ) { // op with body
 use std::geo2d::circle;
 use std::ops::translate;
 
-translate( y=[-34mm/2 , 34mm/2] ) // op without body
-    circle( radius = 5mm );
+ // op without body
+circle( radius = 5mm )
+    .translate(y = [-34mm/2 , 34mm/2]);
 ```
 
 [![test](.test/sketch_missing_semicolon.png)](.test/sketch_missing_semicolon.log)
@@ -27,9 +28,9 @@ translate( y=[-34mm/2 , 34mm/2] ) // op without body
 use std::geo2d::circle;
 use std::ops::translate;
 
-translate( y=[-34mm/2 , 34mm/2] ) {
-    circle( radius = 5mm ) // error: missing semicolon
-}
+{
+    circle(radius = 5mm) // error: missing semicolon
+}.translate(y=[-34mm/2 , 34mm/2]);
 ```
 
 [![test](.test/sketch_with_empty_body.png)](.test/sketch_with_empty_body.log)
@@ -37,7 +38,7 @@ translate( y=[-34mm/2 , 34mm/2] ) {
 ```µcad,sketch_with_empty_body#fail
 use std::geo2d::circle;
 
-circle( radius = 5mm ) {} // error: sketch with body
+{}.circle(radius = 5mm) // error: sketch with body
 ```
 
 [![test](.test/sketch_with_body.png)](.test/sketch_with_body.log)
@@ -52,7 +53,7 @@ circle(radius = 2mm) { circle(radius = 1mm); } // error: sketch with body
 
 ```µcad,empty_op#fail
 std::ops::translate(x = 3.0mm); // Error: Translate no geometry. 
-std::ops::translate(x = 3.0mm) {} // Error: Translate empty geometry.
+{}.std::ops::translate(x = 3.0mm);  // Error: Translate empty geometry.
 ```
 
 [![test](.test/group.png)](.test/group.log)

@@ -17,9 +17,9 @@ Simple basic shapes can be composed to create complex geometries which then can 
 
 - [Content](#content)
 - [Quick Start](#quick-start)
+- [Hello World example](#hello-world-example)
   - [Installation](#installation)
   - [Basic Example](#basic-example)
-    - [Source Code Explanation](#source-code-explanation)
 - [Documentation](#documentation)
 - [Contribute](#contribute)
   - [Get Source Code](#get-source-code)
@@ -38,6 +38,26 @@ You can try it out with an example by using the command line tool `microcad-cli`
 which can be installed from [crates.io](https://crates.io) by using `cargo`.
 
 **Note**: Currently µcad has no binary install packages so the only ways to install it are with [`cargo install`](#installation) or from the source code (see section [Contribute](#contribute)).
+
+## Hello World example
+
+The following µcad source code defines a *part* called `csg_cube`, which has a body of a cube with rounded corners and three cylinders as holes:
+
+[![test](.test/first_example.png)](.test/first_example.log)
+
+```µcad,first_example
+use std::math::*;
+use std::ops::*;
+use std::geo3d::*;
+
+part csg_cube(size: Length) {
+    body = sphere(r = size / 1.5) & cube(size);
+    holes = cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
+    body - holes;
+}
+
+csg_cube(50mm);
+```
 
 ### Installation
 
@@ -59,58 +79,20 @@ cargo install microcad-cli
 After installing, you can run a basic example by typing:
 
 ```sh
-microcad eval ./examples/lid.µcad
+microcad eval ./examples/lego_brick.µcad
 ```
 
-This will *evaluate* the input file and will calculate and output the volume of the geometry:
-
-```console
-Volume: 48.415571412489506cm³
-```
-
-The *evaluate* command will not export the output geometry. Instead, it will simply run the program,
-which prints out the volume.
+This will *evaluate* the input file and will output the model tree.
+The *evaluate* command will not export the output geometry.
 
 To generate an STL model file use the `export` command with an additional output file name:
 
 ```sh
-microcad export ./examples/lid.µcad
+microcad export ./examples/lego_brick.µcad
 ```
 
-The output file `lid.stl` can be displayed e.g. with [MeshLab](https://www.meshlab.net/).
-The resulting STL model looks like this: ![Lid](examples/lid.png)
-
-#### Source Code Explanation
-
-The source file defines a *part* called `lid`, which instantiates two cylinders with different diameters and geometrically subtracts them with each other to generate a round [lid](https://rust.services/blog/20242511-mcad-lid/).
-
-[![test](.test/first_example.png)](.test/first_example.log)
-
-```µcad,first_example
-// We have part called `lid` with three parameters
-part lid(
-    thickness = 1.6mm,
-    inner_diameter = 16cm,
-    height = 20mm,
-) {
-    // Calculate the outer diameter
-    outer_diameter = 2 * thickness + inner_diameter;
-
-    // Create two cylinders, one for the outer and one for the inner
-    outer = std::geo3d::cylinder(d = outer_diameter, h = height);
-    inner = std::ops::translate(z = thickness) std::geo3d::cylinder(d = inner_diameter, h = height);
-
-    // Calculate the difference between two translated cylinders and output them
-    outer - inner;
-}
-
-// `l` is the instance of the lid model
-lid();
-```
-
-The STL file can now also be loaded into a slicer program like [Cura](https://ultimaker.com/software/ultimaker-cura) and print it on a 3D printer.
-
-![Cura](doc/images/cura.png)
+The output file `lego_brick.stl` can be displayed e.g. with [MeshLab](https://www.meshlab.net/).
+The resulting STL model looks like this: ![Lid](examples/lego_brick.png)
 
 ## Documentation
 

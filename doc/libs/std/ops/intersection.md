@@ -15,8 +15,8 @@ std::geo2d::circle(radius = 3mm) & std::geo2d::rect(width = 3mm, height = 2mm);
 [![test](.test/intersection_alt_operator.png)](.test/intersection_alt_operator.log)
 
 ```µcad,intersection_alt_operator
-std::ops::intersection() {
+{
     std::geo2d::circle(radius = 3mm);
     std::geo2d::rect(width = 3mm, height = 2mm);
-}
+}.std::ops::intersection();
 ```
