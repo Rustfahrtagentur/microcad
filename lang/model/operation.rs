@@ -38,8 +38,8 @@ pub trait Operation: std::fmt::Debug {
 pub enum AffineTransform {
     /// Translation.
     Translation(Vec3),
-    /// Rotation around an axis.
-    RotationAroundAxis(Angle, Vec3),
+    /// Generic rotation.
+    Rotation(Mat3),
     /// Scale.
     Scale(Vec3),
     /// Uniform scale.
@@ -51,7 +51,11 @@ impl AffineTransform {
     pub fn mat2d(&self) -> Mat3 {
         match self {
             AffineTransform::Translation(v) => Mat3::from_translation(Vec2::new(v.x, v.y)),
-            AffineTransform::RotationAroundAxis(a, _) => Mat3::from_angle_z(*a),
+            AffineTransform::Rotation(m) => Mat3::from_cols(
+                Vec3::new(m.x.x, m.x.y, 0.0),
+                Vec3::new(m.y.x, m.y.y, 0.0),
+                Vec3::new(0.0, 0.0, 1.0),
+            ),
             AffineTransform::Scale(v) => Mat3::from_nonuniform_scale(v.x, v.y),
             AffineTransform::UniformScale(s) => Mat3::from_scale(*s),
         }
@@ -61,7 +65,12 @@ impl AffineTransform {
     pub fn mat3d(&self) -> Mat4 {
         match self {
             AffineTransform::Translation(v) => Mat4::from_translation(*v),
-            AffineTransform::RotationAroundAxis(a, v) => Mat3::from_axis_angle(*v, *a).into(),
+            AffineTransform::Rotation(a) => Mat4::from_cols(
+                a.x.extend(0.0),
+                a.y.extend(0.0),
+                a.z.extend(0.0),
+                Vec3::new(0.0, 0.0, 0.0).extend(1.0),
+            ),
             AffineTransform::Scale(v) => Mat4::from_nonuniform_scale(v.x, v.y, v.z),
             AffineTransform::UniformScale(s) => Mat4::from_scale(*s),
         }

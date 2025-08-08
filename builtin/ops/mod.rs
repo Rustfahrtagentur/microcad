@@ -6,6 +6,7 @@ use microcad_lang::{eval::BuiltinWorkbenchDefinition, resolve::*};
 mod boolean;
 mod extrude;
 mod hull;
+mod orient;
 mod revolve;
 mod rotate;
 mod translate;
@@ -18,8 +19,9 @@ pub fn ops() -> Symbol {
         .symbol(boolean::intersection())
         .symbol(hull::hull())
         .symbol(extrude::Extrude::symbol())
+        .symbol(orient::Orient::symbol())
         .symbol(revolve::Revolve::symbol())
-        .symbol(translate::Translate::symbol())
         .symbol(rotate::Rotate::symbol())
+        .symbol(translate::Translate::symbol())
         .build()
 }

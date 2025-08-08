@@ -1,0 +1,48 @@
+use std::ops::*;
+use std::geo2d::*;
+use std::math::*;
+
+part buffer_stand() {
+    size = 5.25in;
+    width = 5.875in;
+
+    base = extrude(4.0in) {
+            circle(d = width) & rect(width, height = size / 2);
+    };
+
+    side = translate(x = -width / 2) orient(X) extrude(width) {
+            hull() {
+                rect(width = 0.0in, height = size/2)
+                translate(x = -3.25in) circle(d = 1.5in);
+            }
+    };
+
+    front = translate(y = -width / 4, z = 0.75in) orient(Y) extrude(width) {
+        hull() {
+            w = 4.25in;
+            d = w * 0.5 - 0.5in;
+
+            translate(x = [d,-d]) circle(r = 0.5in);
+            rect(x = -w * 0.5, y = -4.0in, width = w, height = 0.0in);
+        }
+    };
+
+    bearing = translate(z = 3.25in) orient(X) revolve() {
+        rect(width = 1.25in, height = width - 1in) | rect(height = width, width = 0.5in);
+    };
+
+    mount = translate(z = 3.25in) orient(X) revolve() {
+        translate(y = [2.0, -2.0]in) rect(height = 4.25in - 3.5in, width = 1.5in);
+    };
+
+    bottom_bar = translate(x = -width / 2) orient(X) extrude(width) {
+        hull() {
+            translate(x = -1.35in) circle(d = 0.15in);
+            rect(width = 0.0in, height = 0.5in);
+        }
+    };
+
+    (side - front) & base | (base & bottom_bar) | mount - bearing;
+}
+
+buffer_stand();
