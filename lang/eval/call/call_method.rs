@@ -62,10 +62,16 @@ impl CallMethod<Models> for Models {
         if let Some(symbol) = id.eval(context)? {
             Ok(match &symbol.borrow().def {
                 SymbolDefinition::Workbench(workbench_definition) => {
-                    workbench_definition.call(args, context)?.nest(self)
+                    let models = workbench_definition.call(args, context)?.nest(self);
+                    models.set_creator(symbol.clone(), SrcRef::merge(id, args));
+                    models
                 }
                 SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
-                    Value::Models(models) => models.nest(self),
+                    Value::Models(models) => {
+                        let models = models.nest(self);
+                        models.set_creator(symbol.clone(), SrcRef::merge(id, args));
+                        models
+                    }
                     value => panic!("Builtin call returned {value} but no models."),
                 },
                 def => {
