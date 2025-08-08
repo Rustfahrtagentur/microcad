@@ -67,14 +67,10 @@ impl Eval for Call {
                 SymbolDefinition::Builtin(f) => f.call(&args, context),
                 SymbolDefinition::Workbench(w) => Ok(Value::Models(w.call(&args, context)?)),
                 SymbolDefinition::Function(f) => f.call(&args, context),
-                _ => {
+                def => {
                     context.error(
                         self,
-                        EvalError::Todo(format!(
-                            "cannot evaluate call of {} at {}",
-                            self,
-                            context.locate(self)?
-                        )),
+                        EvalError::SymbolCannotBeCalled(symbol.full_name(), Box::new(def.clone())),
                     )?;
                     Ok(Value::None)
                 }
@@ -83,7 +79,6 @@ impl Eval for Call {
             Ok(Value::Models(models)) => {
                 // Store the information, saying that these models have been created by this symbol.
                 models.set_creator(symbol, self.src_ref());
-
                 Ok(Value::Models(models))
             }
             Ok(value) => Ok(value),
