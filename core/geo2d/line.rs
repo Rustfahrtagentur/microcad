@@ -4,14 +4,15 @@
 //! 2D edge geometry.
 
 use cgmath::{Angle, InnerSpace, Rad};
+use geo::AffineOps;
 
-use crate::{Circle, FetchBounds2D, Mat2, Mat3, Scalar, Vec2, Vec3, geo2d};
+use crate::*;
 
 /// A 2D edge type.
 #[derive(Debug, Clone)]
-pub struct Edge2D(pub geo2d::Point, pub geo2d::Point);
+pub struct Line(pub geo2d::Point, pub geo2d::Point);
 
-impl Edge2D {
+impl Line {
     /// Shorten edge on both ends by a certain amount.
     pub fn shorter(&self, amount: Scalar) -> Self {
         let d = self.vec();
@@ -61,8 +62,18 @@ impl Edge2D {
     }
 }
 
-impl FetchBounds2D for Edge2D {
+impl FetchBounds2D for Line {
     fn fetch_bounds_2d(&self) -> geo2d::Bounds2D {
         geo2d::Bounds2D::new(self.0.x_y().into(), self.1.x_y().into())
+    }
+}
+
+impl Transformed2D for Line {
+    fn transformed_2d(&self, _: &RenderResolution, mat: &Mat3) -> Self {
+        let transform = &geo2d::mat3_to_affine_transform(mat);
+        Self(
+            self.0.affine_transform(transform),
+            self.1.affine_transform(transform),
+        )
     }
 }

@@ -6,7 +6,7 @@
 use std::rc::Rc;
 
 use derive_more::{Deref, DerefMut};
-use geo::{ConvexHull, MultiPolygon};
+use geo::{ConvexHull, CoordsIter, LineString, Polygon};
 
 use crate::{
     geo2d::{FetchBounds2D, bounds::Bounds2D},
@@ -48,15 +48,38 @@ impl Geometries2D {
 
     /// Apply contex hull operation to geometries.
     pub fn hull(&self, resolution: &RenderResolution) -> Self {
-        let mut polygons = MultiPolygon::new(vec![]);
-        self.iter().for_each(|geo| {
-            geo.as_ref()
-                .clone()
-                .hull()
-                .render_to_existing_multi_polygon(resolution, &mut polygons);
+        let coords = self.iter().fold(Vec::new(), |mut coords, geo| {
+            match geo.as_ref() {
+                Geometry2D::LineString(line_string) => {
+                    coords.append(&mut line_string.coords_iter().collect())
+                }
+                Geometry2D::MultiLineString(multi_line_string) => {
+                    coords.append(&mut multi_line_string.coords_iter().collect())
+                }
+                Geometry2D::Polygon(polygon) => {
+                    coords.append(&mut polygon.exterior_coords_iter().collect())
+                }
+                Geometry2D::MultiPolygon(multi_polygon) => {
+                    coords.append(&mut multi_polygon.exterior_coords_iter().collect())
+                }
+                Geometry2D::Rect(rect) => coords.append(&mut rect.exterior_coords_iter().collect()),
+                Geometry2D::Circle(circle) => coords.append(
+                    &mut circle
+                        .clone()
+                        .render_to_polygon(resolution)
+                        .unwrap_or(Polygon::new(LineString(vec![]), vec![]))
+                        .exterior_coords_iter()
+                        .collect(),
+                ),
+                Geometry2D::Line(line) => {
+                    coords.push(line.0.into());
+                    coords.push(line.1.into());
+                }
+            }
+            coords
         });
 
-        Rc::new(Geometry2D::Polygon(polygons.convex_hull())).into()
+        Rc::new(Geometry2D::Polygon(LineString(coords).convex_hull())).into()
     }
 }
 

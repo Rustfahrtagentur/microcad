@@ -21,8 +21,8 @@ pub enum Geometry2D {
     Rect(Rect),
     /// Circle.
     Circle(Circle),
-    /// Edge.
-    Edge(Edge2D),
+    /// Line.
+    Line(Line),
 }
 
 impl Geometry2D {
@@ -53,7 +53,9 @@ impl Geometry2D {
             }
             Geometry2D::Rect(rect) => Geometry2D::Rect(rect),
             Geometry2D::Circle(circle) => Geometry2D::Circle(circle),
-            Geometry2D::Edge(edge2_d) => Geometry2D::Edge(edge2_d),
+            Geometry2D::Line(line) => Geometry2D::Polygon(
+                LineString::new(vec![line.0.into(), line.1.into()]).convex_hull(),
+            ),
         }
     }
 
@@ -61,7 +63,7 @@ impl Geometry2D {
     pub fn is_areal(&self) -> bool {
         !matches!(
             self,
-            Geometry2D::LineString(_) | Geometry2D::MultiLineString(_)
+            Geometry2D::LineString(_) | Geometry2D::MultiLineString(_) | Geometry2D::Line(_)
         )
     }
 }
@@ -79,7 +81,7 @@ impl FetchBounds2D for Geometry2D {
             Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.bounding_rect().into(),
             Geometry2D::Rect(rect) => Some(*rect).into(),
             Geometry2D::Circle(circle) => circle.fetch_bounds_2d(),
-            Geometry2D::Edge(edge) => edge.fetch_bounds_2d(),
+            Geometry2D::Line(edge) => edge.fetch_bounds_2d(),
         }
     }
 }
@@ -100,6 +102,7 @@ impl Transformed2D for Geometry2D {
                 Geometry2D::MultiLineString(multi_line_string) => {
                     Self::MultiLineString(multi_line_string.transformed_2d(resolution, mat))
                 }
+                Geometry2D::Line(line) => Self::Line(line.transformed_2d(resolution, mat)),
                 _ => unreachable!("Geometry type not supported"),
             }
         }
