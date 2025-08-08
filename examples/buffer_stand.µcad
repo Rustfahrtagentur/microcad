@@ -2,46 +2,50 @@ use std::ops::*;
 use std::geo2d::*;
 use std::math::*;
 
-part buffer_stand(
-    size = 5.25in, 
-    width = 5.875in, 
-    inner_width = 4.25in
-) {
-    base = (circle(d = w) & rect(w = width, h = size / 2))
+part buffer_stand() {
+    size = 5.25in;
+    width = 5.875in;
+
+    base = (circle(d = width) & rect(width, height = size / 2))
         .extrude(4.0in);
 
-    side = (line(w = size/2) | circle(d = 1.5in, x = -3.25in))
+    side = (rect(w = 0.001in, h = size/2) | circle(d = 1.5in).translate(x = -3.25in))
         .hull()
-        .extrude(w)
+        .extrude(width)
         .orient(X)
-        .translate(x = -w / 2);
+        .translate(x = -width / 2);
 
     front = {
-        w = inner_width / 2;
-        circle(r = 0.5in, x = [-w,w] - 0.5in) | line(x = -w, y = -4.0in, w);
+        w = 4.25in;
+        d = w * 0.5 - 0.5in;
+
+        circle(r = 0.5in).translate(x = [d,-d]);
+        rect(x = -w * 0.5, y = -4.0in, width = w, height = 0.0in);
     }
     .hull()
-    .extrude(w)
+    .extrude(width)
     .orient(Y)
-    .translate(y = -w / 4, z = 0.75in);
+    .translate(y = -width / 4, z = 0.75in);
+
+    bearing = (rect(width = 1.25in, height = width - 1in) | rect(height = width, width = 0.5in))
+        .revolve()
+        .orient(X)
+        .translate(z = 3.25in);
+
+    mount = {
+        rect(height = 4.25in - 3.5in, width = 1.5in).translate(y = [2.0, -2.0]in);
+    }
+    .revolve()
+    .orient(X)
+    .translate(z = 3.25in);
     
-    bearing = (rect(w = 1.25in, h = w - 1in) | rect(w = 0.5in, h = w))
-        .revolve()
-        .orient(X)
-        .translate(z = 3.25in);
-
-    mount = rect(h = inner_width - 3.5in, w = 1.5in, y = [2.0, -2.0]in)
-        .revolve()
-        .orient(X)
-        .translate(z = 3.25in);
-
-    bottom_bar = (circle(d = 0.15in, x = -1.35in) | line(h = 0.5in))
+    bottom_bar = (circle(d = 0.15in).translate(x = -1.35in) | rect(width = 0.001in, height = 0.5in))
         .hull()
-        .extrude(w)
+        .extrude(width)
         .orient(X)
-        .translate(x = -w / 2);
+        .translate(x = -width / 2);
 
-    (side - front) & base | (base & bottom_bar) | mount - bearing;
+    base & (side - front) | (base & bottom_bar) | mount - bearing;
 }
 
 buffer_stand();
