@@ -2,17 +2,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 mod circle;
+mod line;
 mod rect;
 
 pub use circle::*;
+pub use line::*;
 pub use rect::*;
 
 use microcad_lang::{eval::*, resolve::*};
 
-/// Builtin module for 2D geometry
+/// Module for built-in 2D geometries.
 pub fn geo2d() -> Symbol {
     crate::ModuleBuilder::new("geo2d".try_into().expect("valid id"))
         .symbol(Circle::symbol())
         .symbol(Rect::symbol())
+        .symbol(Line::symbol())
         .build()
 }
