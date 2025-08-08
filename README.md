@@ -18,8 +18,8 @@ Simple basic shapes can be composed to create complex geometries which then can 
 - [Content](#content)
 - [Quick Start](#quick-start)
 - [Hello World example](#hello-world-example)
-  - [Installation](#installation)
-  - [Basic Example](#basic-example)
+- [Installation](#installation)
+- [Command line usage](#command-line-usage)
 - [Documentation](#documentation)
 - [Contribute](#contribute)
   - [Get Source Code](#get-source-code)
@@ -43,6 +43,8 @@ which can be installed from [crates.io](https://crates.io) by using `cargo`.
 
 The following µcad source code defines a *part* called `csg_cube`, which has a body of a cube with rounded corners and three cylinders as holes:
 
+![csg_cube](examples/csg_cube.png)
+
 [![test](.test/first_example.png)](.test/first_example.log)
 
 ```µcad,first_example
@@ -59,7 +61,7 @@ part csg_cube(size: Length) {
 csg_cube(50mm);
 ```
 
-### Installation
+## Installation
 
 First, install [Ninja Build](https://github.com/ninja-build/ninja) which is needed to compile the [manifold geometry library](https://github.com/elalish/manifold).
 For example, *Debian* based *Linux* distributions use the following line:
@@ -74,7 +76,7 @@ To install the latest release of *µcad* via *cargo*, type:
 cargo install microcad-cli
 ```
 
-### Basic Example
+## Command line usage
 
 After installing, you can run a basic example by typing:
 
