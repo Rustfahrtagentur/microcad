@@ -15,7 +15,9 @@ pub struct JsonExporter;
 
 impl Exporter for JsonExporter {
     fn export(&self, model: &Model, filename: &std::path::Path) -> Result<Value, ExportError> {
+        log::debug!("Exporting model into {filename:?}");
         let mut f = std::fs::File::create(filename)?;
+        log::trace!("Model to export:\n{model}");
         let writer = std::io::BufWriter::new(&mut f);
         match serde_json::to_writer_pretty(writer, model) {
             Ok(_) => Ok(Value::None),
