@@ -18,12 +18,12 @@ part buffer_stand() {
     .orient(X)
     .translate(x = -width / 2);
 
-    front = {
+    front_cut_off = {
         w = 4.25in;
         d = w * 0.5 - 0.5in;
 
         circle(r = 0.5in, c = (x = [d,-d], y = 0in));
-        rect(x = -w * 0.5, y = -4.0in, width = w, height = 0.0in);
+        line(width = w, p = (x = -w * 0.5, y = -4.0in));
     }
     .hull()
     .extrude(width)
@@ -49,7 +49,7 @@ part buffer_stand() {
     .orient(X)
     .translate(x = -width / 2);
 
-    base & (side - front) | (base & bottom_bar) | mount - bearing;
+    base & (side - front_cut_off) | (base & bottom_bar) | mount - bearing;
 }
 
 buffer_stand();
