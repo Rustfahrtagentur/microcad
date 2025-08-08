@@ -3,18 +3,16 @@
 
 //! µcad syntax elements of types
 
-mod list_type;
 mod matrix_type;
 mod quantity_type;
 mod tuple_type;
 mod r#type;
 mod type_list;
 
-pub use list_type::*;
 pub use matrix_type::*;
 pub use quantity_type::*;
-pub use r#type::*;
 pub use tuple_type::*;
+pub use r#type::*;
 pub use type_list::*;
 
 /// Trait for structs and expressions that have a type

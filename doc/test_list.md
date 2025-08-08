@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**210** tests from markdown.
+**215** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -11,6 +11,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/argument_match_name.png)](../doc/structure/.test/argument_match_name.log) | [argument_match_name](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/argument_match_type.png)](../doc/structure/.test/argument_match_type.log) | [argument_match_type](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/array_expressions.png)](../doc/structure/.test/array_expressions.log) | [array_expressions](../doc/structure/arrays.md) |
+| [![test](../doc/structure/.test/array_operations.png)](../doc/structure/.test/array_operations.log) | [array_operations](../doc/structure/arrays.md) |
 | [![test](../doc/types/.test/array_unit_bundling.png)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/arrays.md) |
 | [![test](../doc/structure/.test/arrays_and_comments.png)](../doc/structure/.test/arrays_and_comments.log) | [arrays_and_comments](../doc/structure/arrays.md) |
 | [![test](../doc/structure/.test/assignment.png)](../doc/structure/.test/assignment.log) | [assignment](../doc/structure/assignments.md) |
@@ -46,6 +47,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/code_post_init.png)](../doc/structure/.test/code_post_init.log) | [code_post_init](../doc/structure/workbench.md) |
 | [![test](../doc/libs/std/ops/.test/difference_alt_operator.png)](../doc/libs/std/ops/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/libs/std/ops/difference.md) |
 | [![test](../doc/libs/std/ops/.test/difference_operator.png)](../doc/libs/std/ops/.test/difference_operator.log) | [difference_operator](../doc/libs/std/ops/difference.md) |
+| [![test](../doc/tests/.test/empty_op.png)](../doc/tests/.test/empty_op.log) | [empty_op](../doc/tests/semicolon.md) |
 | [![test](../doc/structure/.test/example.png)](../doc/structure/.test/example.log) | [example](../doc/structure/functions.md) |
 | [![test](../doc/.test/export_attributes.png)](../doc/.test/export_attributes.log) | [export_attributes](../doc/export.md) |
 | [![test](../doc/libs/std/ops/.test/extrude.png)](../doc/libs/std/ops/.test/extrude.log) | [extrude](../doc/libs/std/ops/extrude.md) |
@@ -118,6 +120,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/op_example.png)](../doc/structure/.test/op_example.log) | [op_example](../doc/structure/op.md) |
 | [![test](../doc/tests/.test/operation_no_body.png)](../doc/tests/.test/operation_no_body.log) | [operation_no_body](../doc/tests/semicolon.md) |
 | [![test](../doc/tests/.test/operation_with_body.png)](../doc/tests/.test/operation_with_body.log) | [operation_with_body](../doc/tests/semicolon.md) |
+| [![test](../doc/libs/std/ops/.test/orient_3d.png)](../doc/libs/std/ops/.test/orient_3d.log) | [orient_3d](../doc/libs/std/ops/orient.md) |
 | [![test](../doc/structure/.test/parameters.png)](../doc/structure/.test/parameters.log) | [parameters](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/part_basic.png)](../doc/structure/.test/part_basic.log) | [part_basic](../doc/structure/part.md) |
 | [![test](../doc/structure/.test/part_declaration.png)](../doc/structure/.test/part_declaration.log) | [part_declaration](../doc/structure/workbench.md) |
@@ -142,6 +145,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/return.png)](../doc/structure/.test/return.log) | [return](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/return_twice.png)](../doc/structure/.test/return_twice.log) | [return_twice](../doc/structure/functions.md) |
 | [![test](../doc/libs/std/ops/.test/revolve.png)](../doc/libs/std/ops/.test/revolve.log) | [revolve](../doc/libs/std/ops/revolve.md) |
+| [![test](../doc/libs/std/ops/.test/rotate_2d.png)](../doc/libs/std/ops/.test/rotate_2d.log) | [rotate_2d](../doc/libs/std/ops/rotate.md) |
+| [![test](../doc/libs/std/ops/.test/rotate_3d.png)](../doc/libs/std/ops/.test/rotate_3d.log) | [rotate_3d](../doc/libs/std/ops/rotate.md) |
 | [![test](../doc/structure/.test/sketch_basic.png)](../doc/structure/.test/sketch_basic.log) | [sketch_basic](../doc/structure/sketch.md) |
 | [![test](../doc/tests/.test/sketch_missing_semicolon.png)](../doc/tests/.test/sketch_missing_semicolon.log) | [sketch_missing_semicolon](../doc/tests/semicolon.md) |
 | [![test](../doc/tests/.test/sketch_with_body.png)](../doc/tests/.test/sketch_with_body.log) | [sketch_with_body](../doc/tests/semicolon.md) |

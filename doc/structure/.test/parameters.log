@@ -7,26 +7,33 @@
 // define operation which takes multiple items
 op punch_disk(radius: Length) {
     if @children.count() == 1 {
-        difference() { 
-            @children 
-            std::geo2d::circle(radius)
-        } 
+        { 
+            @children;
+            std::geo2d::circle(radius);
+        }.difference();
     } else {
         std::error("punch_disk must get one object");
     }
 }
 
 // use operation punch_disk on a circle
-punch_disk(radius = 1cm) {
+{
     std::geo2d::circle(radius = 2cm);
-}
+}.punch_disk(radius = 1cm);
 
--- Parse Error --
-Parser error:  --> 6:13
-  |
-6 |             std::geo2d::circle(radius)
-  |             ^---
-  |
-  = expected COMMENT, array_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
+-- Output --
+-- Errors --
+error: Symbol count not found.
+  ---> <from_str>:3:18
+     |
+   3 |     if @children.count() == 1 {
+     |                  ^^^^^
+     |
+error: Symbol std::error not found.
+  ---> <from_str>:9:9
+     |
+   9 |         std::error("punch_disk must get one object");
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-FAIL (TODO)
+TODO

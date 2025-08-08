@@ -5,7 +5,7 @@
 -- Code --
 
 std::ops::translate(x = 3.0mm); // Error: Translate no geometry. 
-std::ops::translate(x = 3.0mm) {} // Error: Translate empty geometry.
+{}.std::ops::translate(x = 3.0mm);  // Error: Translate empty geometry.
 
 -- Output --
 -- Errors --

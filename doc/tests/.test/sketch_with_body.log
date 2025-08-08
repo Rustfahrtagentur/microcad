@@ -1,6 +1,6 @@
 -- Test --
   sketch_with_body
-  ../doc/tests/semicolon.md:45
+  ../doc/tests/semicolon.md:46
 
 -- Code --
 
@@ -8,7 +8,3 @@ use std::geo2d::circle;
 
 circle(radius = 2mm) { circle(radius = 1mm); } // error: sketch with body
 
--- Output --
--- Errors --
--- Test Result --
-OK BUT SHOULD FAIL

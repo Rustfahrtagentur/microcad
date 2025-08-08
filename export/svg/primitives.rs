@@ -10,7 +10,7 @@ use microcad_lang::model::{Element, Model, OutputType};
 
 use crate::svg::{attributes::SvgTagAttribute, *};
 
-impl WriteSvg for Edge2D {
+impl WriteSvg for Line {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
         let ((x1, y1), (x2, y2)) = (self.0.x_y(), self.1.x_y());
         writer.tag(
@@ -20,7 +20,7 @@ impl WriteSvg for Edge2D {
     }
 }
 
-impl WriteSvgMapped for Edge2D {}
+impl WriteSvgMapped for Line {}
 
 impl WriteSvg for Rect {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
@@ -130,7 +130,7 @@ impl WriteSvg for Geometry2D {
             Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.write_svg(writer, attr),
             Geometry2D::Rect(rect) => rect.write_svg(writer, attr),
             Geometry2D::Circle(circle) => circle.write_svg(writer, attr),
-            Geometry2D::Edge(edge) => edge.write_svg(writer, attr),
+            Geometry2D::Line(edge) => edge.write_svg(writer, attr),
         }
     }
 }
@@ -243,7 +243,7 @@ impl WriteSvg for Grid {
         let mut left = rect.min().x;
         let right = rect.max().x;
         while left <= right {
-            Edge2D(
+            Line(
                 geo::Point::new(left, rect.min().y),
                 geo::Point::new(left, rect.max().y),
             )
@@ -254,7 +254,7 @@ impl WriteSvg for Grid {
         let mut bottom = rect.min().y;
         let top = rect.max().y;
         while bottom <= top {
-            Edge2D(
+            Line(
                 geo::Point::new(rect.min().x, bottom),
                 geo::Point::new(rect.max().x, bottom),
             )
@@ -292,7 +292,7 @@ pub struct EdgeLengthMeasure {
     // Original Length
     length: Scalar,
     // Edge.
-    edge: Edge2D,
+    edge: Line,
     // Offset (default = 10mm).
     offset: Scalar,
 }
@@ -300,7 +300,7 @@ pub struct EdgeLengthMeasure {
 impl EdgeLengthMeasure {
     /// Height measure of a rect.
     pub fn height(rect: &Rect, offset: Scalar, name: Option<&str>) -> Self {
-        let edge = Edge2D(
+        let edge = Line(
             geo::Point::new(rect.min().x, rect.min().y),
             geo::Point::new(rect.min().x, rect.max().y),
         );
@@ -314,7 +314,7 @@ impl EdgeLengthMeasure {
 
     /// Width measure of a rect.
     pub fn width(rect: &Rect, offset: Scalar, name: Option<&str>) -> Self {
-        let edge = Edge2D(
+        let edge = Line(
             geo::Point::new(rect.min().x, rect.min().y),
             geo::Point::new(rect.max().x, rect.min().y),
         );
@@ -354,9 +354,9 @@ impl WriteSvg for EdgeLengthMeasure {
         let top_right = Point::new(edge_length, center);
 
         writer.begin_group(&attr.clone().insert(SvgTagAttribute::class("measure")))?;
-        Edge2D(bottom_left, Point::new(0.0, center * 1.5)).write_svg(writer, attr)?;
-        Edge2D(bottom_right, Point::new(edge_length, center * 1.5)).write_svg(writer, attr)?;
-        Edge2D(top_left, top_right).shorter(1.5).write_svg(
+        Line(bottom_left, Point::new(0.0, center * 1.5)).write_svg(writer, attr)?;
+        Line(bottom_right, Point::new(edge_length, center * 1.5)).write_svg(writer, attr)?;
+        Line(top_left, top_right).shorter(1.5).write_svg(
             writer,
             &attr
                 .clone()
@@ -424,7 +424,7 @@ impl WriteSvg for RadiusMeasure {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
         writer.begin_group(attr)?;
 
-        let edge = Edge2D::radius_edge(&self.circle, &self.angle.into());
+        let edge = Line::radius_edge(&self.circle, &self.angle.into());
         edge.shorter(1.5).write_svg(
             writer,
             &attr

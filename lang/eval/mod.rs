@@ -92,7 +92,8 @@ impl MethodCall {
     /// ```
     fn eval(&self, context: &mut Context, lhs: &Expression) -> EvalResult<Value> {
         let value: Value = lhs.eval(context)?;
-        value.call_method(&self.id, &self.argument_list, context)
+        let args = self.argument_list.eval(context)?;
+        value.call_method(&self.id, &args, context)
     }
 }
 

@@ -1,0 +1,55 @@
+use std::ops::*;
+use std::geo2d::*;
+use std::math::*;
+
+part buffer_stand() {
+    size = 5.25in;
+    width = 5.875in;
+
+    base = (circle(d = width) & rect(width, height = size / 2))
+        .extrude(4.0in);
+
+    side = {
+        line(height = size/2);
+        circle(d = 1.5in).translate(x = -3.25in);
+    }
+    .hull()
+    .extrude(width)
+    .orient(X)
+    .translate(x = -width / 2);
+
+    front_cut_off = {
+        w = 4.25in;
+        d = w * 0.5 - 0.5in;
+
+        circle(r = 0.5in, c = (x = [d,-d], y = 0in));
+        line(width = w, p = (x = -w * 0.5, y = -4.0in));
+    }
+    .hull()
+    .extrude(width)
+    .orient(Y)
+    .translate(y = -width / 4, z = 0.75in);
+
+    bearing = (rect(width = 1.25in, height = width - 1in) | rect(height = width, width = 0.5in))
+        .revolve()
+        .orient(X)
+        .translate(z = 3.25in);
+
+    mount = rect(height = 4.25in - 3.5in, width = 1.5in)
+        .revolve()
+        .orient(X)
+        .translate(x = [2.0, -2.0]in, z = 3.25in);
+    
+    bottom_bar = {
+        circle(d = 0.15in).translate(x = -1.35in);
+        line(height = 0.5in);
+    }
+    .hull()
+    .extrude(width)
+    .orient(X)
+    .translate(x = -width / 2);
+
+    base & (side - front_cut_off) | (base & bottom_bar) | mount - bearing;
+}
+
+buffer_stand();

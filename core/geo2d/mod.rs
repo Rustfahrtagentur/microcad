@@ -5,8 +5,8 @@
 
 mod bounds;
 mod collection;
-mod edge;
 mod geometry;
+mod line;
 mod primitives;
 mod size;
 
@@ -14,9 +14,9 @@ use crate::*;
 
 pub use bounds::*;
 pub use collection::*;
-pub use edge::*;
 use geo::AffineTransform;
 pub use geometry::*;
+pub use line::*;
 pub use primitives::*;
 pub use size::*;
 

@@ -9,26 +9,31 @@ op punched_disk() {
     // check number of children
     if @children.count() == 2 {
         // make hole
-        difference() { @children } 
+        @children.difference(); 
     } else {
         std::error("punched_disk must get two objects");
     }
 }
 
 // use operation punch_disk with two circles
-punched_disk() {
+{
     std::geo2d::circle(radius = 1cm);
     std::geo2d::circle(radius = 2cm);
-}
+}.punched_disk();
 
 -- Output --
 -- Errors --
-error: Not implemented: call_method for Models
-error: If condition is not a boolean: <INVALID VALUE>
-  ---> <from_str>:4:5
+error: Symbol count not found.
+  ---> <from_str>:4:18
      |
    4 |     if @children.count() == 2 {
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |                  ^^^^^
+     |
+error: Symbol std::error not found.
+  ---> <from_str>:8:9
+     |
+   8 |         std::error("punched_disk must get two objects");
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 TODO

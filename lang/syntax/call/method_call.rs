@@ -9,7 +9,7 @@ use crate::{src_ref::*, syntax::*};
 #[derive(Clone, Debug)]
 pub struct MethodCall {
     /// Name of the method.
-    pub id: Identifier,
+    pub id: QualifiedName,
     /// List of arguments.
     pub argument_list: ArgumentList,
     /// Source code reference.

@@ -44,45 +44,12 @@ r = wheel(radius = 1cm)
 // check diameter
 assert([r.diameter, 2cm]);
 
--- Output --
--- Errors --
-error: Symbol FACTOR not found.
-  ---> <from_str>:8:5
-     |
-   8 |     init(diameter: Length) {
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol into_diameter not found.
-  ---> <from_str>:21:21
-     |
-  21 |     prop diameter = into_diameter(radius);
-     |                     ^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Workbench circle cannot find initialization for those arguments
-warning: This expression statement did not produce any model
-  ---> <from_str>:26:5
-     |
-  26 |     std::geo2d::circle(radius);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:2:1
-     |
-   2 | sketch wheel(radius: Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol assert_eq not found.
-  ---> <from_str>:34:1
-     |
-  34 | assert_eq([d.radius, 1cm]);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol into_diameter not found.
-  ---> <from_str>:21:21
-     |
-  21 |     prop diameter = into_diameter(radius);
-     |                     ^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Missing arguments: v
+-- Parse Error --
+Parser error:   --> 34:1
+   |
+34 | assert_eq([d.radius, 1cm]);
+   | ^---
+   |
+   = expected COMMENT, array_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
 -- Test Result --
-TODO
+FAIL (TODO)

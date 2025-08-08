@@ -3,7 +3,7 @@
 
 //! 2D Geometry bounds.
 
-use geo::{AffineOps, AffineTransform, coord};
+use geo::{AffineOps, AffineTransform, CoordsIter, coord};
 
 use crate::{Scalar, Size2D, Transformed2D, Vec2, geo2d::Rect, mat3_to_affine_transform};
 
@@ -67,14 +67,39 @@ impl Bounds2D {
             ),
         }
     }
+
+    /// Extend these bounds by point.
+    pub fn extend_by_point(&mut self, p: Vec2) {
+        match &mut self.0 {
+            Some(rect) => {
+                *rect = Rect::new(
+                    coord! {
+                        x: rect.min().x.min(p.x),
+                        y: rect.min().y.min(p.y),
+                    },
+                    coord! {
+                        x: rect.max().x.max(p.x),
+                        y: rect.max().y.max(p.y),
+                    },
+                )
+            }
+            None => *self = Self::new(p, p),
+        }
+    }
 }
 
 impl AffineOps<Scalar> for Bounds2D {
     fn affine_transform(&self, transform: &AffineTransform<Scalar>) -> Self {
-        Self(match &self.0 {
-            Some(rect) => Some(rect.affine_transform(transform)),
-            None => None,
-        })
+        match &self.0 {
+            Some(rect) => rect
+                .coords_iter()
+                .fold(Bounds2D::default(), |mut bounds, p| {
+                    let p = transform.apply(p);
+                    bounds.extend_by_point(Vec2::new(p.x, p.y));
+                    bounds
+                }),
+            None => Self(None),
+        }
     }
 
     fn affine_transform_mut(&mut self, transform: &AffineTransform<Scalar>) {

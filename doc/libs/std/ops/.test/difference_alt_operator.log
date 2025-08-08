@@ -6,10 +6,10 @@
 
 use std::*;
 
-ops::difference() {
+{
     geo2d::circle(radius = 10mm);
     geo2d::rect(size = 2mm);
-};
+}.ops::difference();
 
 -- Output --
 -- Errors --

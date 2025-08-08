@@ -99,9 +99,7 @@
       <g class="entity" transform="matrix(1 0 0 1 10 -0)">
         <g class="entity">
           <g class="entity">
-            <g class="entity">
-              <rect x="-10" y="0" width="20" height="20"/>
-            </g>
+            <rect x="-10" y="0" width="20" height="20"/>
           </g>
         </g>
       </g>

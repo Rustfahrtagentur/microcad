@@ -335,7 +335,7 @@ fn create_test<'a>(
     let out = test_path.join(name);
 
     // maybe create .test directory
-    let _ = std::fs::create_dir_all(test_path);
+    let _ = std::fs::create_dir_all(test_path.clone());
 
     // Early exit for "#no_test" and "#todo" suffixes
     if mode == Some("no_test") {
@@ -346,7 +346,14 @@ fn create_test<'a>(
         name, mode, code, &banner, &log, &out, reference,
     ));
 
-    Some(Output::new(name.into(), file_path.into(), banner, out, log))
+    Some(Output::new(
+        name.into(),
+        file_path.into(),
+        banner,
+        out,
+        log,
+        &["svg", "stl"],
+    ))
 }
 
 /// create test code

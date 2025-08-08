@@ -71,7 +71,7 @@ impl SrcReferrer for ParameterValue {
 #[test]
 fn test_is_list_of() {
     assert!(
-        Type::Array(ArrayType::new(QuantityType::Scalar.into()))
+        Type::Array(Box::new(QuantityType::Scalar.into()))
             .is_array_of(&QuantityType::Scalar.into())
     );
 }

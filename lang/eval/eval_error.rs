@@ -55,6 +55,10 @@ pub enum EvalError {
     #[error("Unexpectedly found symbol {0}")]
     SymbolFound(QualifiedName),
 
+    /// The symbol cannot be called, e.g. when it is a source file or a module.
+    #[error("Symbol `{0}` cannot be called {1}.")]
+    SymbolCannotBeCalled(QualifiedName, Box<SymbolDefinition>),
+
     /// Found ambiguous symbols.
     #[error("Ambiguous symbol {ambiguous} might be one of the following:\n{others}")]
     AmbiguousSymbol {
@@ -146,7 +150,7 @@ pub enum EvalError {
 
     /// Unknown method.
     #[error("Unknown method `{0}`")]
-    UnknownMethod(Identifier),
+    UnknownMethod(QualifiedName),
 
     /// Can't find a project file by it's path.
     #[error("Could not find a file with path {0}")]

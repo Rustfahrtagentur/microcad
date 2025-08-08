@@ -5,8 +5,8 @@
 
 use geo::MultiPolygon;
 use microcad_core::{
-    Bounds2D, Circle, Edge2D, Geometry2D, LineString, MultiLineString, Point, Polygon, Rect,
-    Scalar, Size2D, Vec2, geo2d,
+    Bounds2D, Circle, Geometry2D, Line, LineString, MultiLineString, Point, Polygon, Rect, Scalar,
+    Size2D, Vec2, geo2d,
 };
 
 use crate::svg::CenteredText;
@@ -102,7 +102,7 @@ impl MapToCanvas for Vec2 {
     }
 }
 
-impl MapToCanvas for Edge2D {
+impl MapToCanvas for Line {
     fn map_to_canvas(&self, canvas: &Canvas) -> Self {
         Self(self.0.map_to_canvas(canvas), self.1.map_to_canvas(canvas))
     }
@@ -193,7 +193,7 @@ impl MapToCanvas for Geometry2D {
             }
             Geometry2D::Rect(rect) => Geometry2D::Rect(rect.map_to_canvas(canvas)),
             Geometry2D::Circle(circle) => Geometry2D::Circle(circle.map_to_canvas(canvas)),
-            Geometry2D::Edge(edge) => Geometry2D::Edge(edge.map_to_canvas(canvas)),
+            Geometry2D::Line(edge) => Geometry2D::Line(edge.map_to_canvas(canvas)),
         }
     }
 }

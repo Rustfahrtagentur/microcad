@@ -1,28 +1,20 @@
 -- Test --
   first_example
-  ../README.md:89
+  ../README.md:48
 
 -- Code --
 
-// We have part called `lid` with three parameters
-part lid(
-    thickness = 1.6mm,
-    inner_diameter = 16cm,
-    height = 20mm,
-) {
-    // Calculate the outer diameter
-    outer_diameter = 2 * thickness + inner_diameter;
+use std::math::*;
+use std::ops::*;
+use std::geo3d::*;
 
-    // Create two cylinders, one for the outer and one for the inner
-    outer = std::geo3d::cylinder(d = outer_diameter, h = height);
-    inner = std::ops::translate(z = thickness) std::geo3d::cylinder(d = inner_diameter, h = height);
-
-    // Calculate the difference between two translated cylinders and output them
-    outer - inner;
+part csg_cube(size: Length) {
+    body = sphere(r = size / 1.5) & cube(size);
+    holes = cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
+    body - holes;
 }
 
-// `l` is the instance of the lid model
-lid();
+csg_cube(50mm);
 
 -- Output --
 -- Errors --

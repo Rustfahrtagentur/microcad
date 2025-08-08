@@ -34,3 +34,10 @@ You can generate an array via range expressions: `[1..3]`.
 ```µcad,range_expressions
 std::debug::assert_eq([std::count([1,2,3]), 3]);
 ```
+
+## Array operations
+
+```µcad,array_operations
+d = 0.5mm;
+std::debug::assert_eq([[-d,d]*2, [-1,1]mm]);
+```
