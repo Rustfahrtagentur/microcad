@@ -35,12 +35,13 @@ impl std::fmt::Display for Assignment {
     }
 }
 
-impl PrintSyntax for Assignment {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Assignment {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}Assignment {}:", "", self.id)?;
+        depth.indent();
         if let Some(specified_type) = &self.specified_type {
-            specified_type.print_syntax(f, depth + Self::INDENT)?;
+            specified_type.tree_print(f, depth)?;
         }
-        self.expression.print_syntax(f, depth + Self::INDENT)
+        self.expression.tree_print(f, depth)
     }
 }

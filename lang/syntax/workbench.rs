@@ -87,8 +87,8 @@ impl std::fmt::Display for WorkbenchDefinition {
     }
 }
 
-impl PrintSyntax for WorkbenchDefinition {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for WorkbenchDefinition {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(
             f,
             "{:depth$}Workbench ({kind}) '{id}':",
@@ -96,7 +96,8 @@ impl PrintSyntax for WorkbenchDefinition {
             kind = self.kind,
             id = self.id
         )?;
-        self.plan.print_syntax(f, depth + Self::INDENT)?;
-        self.body.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.plan.tree_print(f, depth)?;
+        self.body.tree_print(f, depth)
     }
 }

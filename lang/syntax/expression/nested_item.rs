@@ -36,15 +36,14 @@ impl std::fmt::Display for NestedItem {
     }
 }
 
-impl PrintSyntax for NestedItem {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for NestedItem {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}NestedItem:", "")?;
+        depth.indent();
         match self {
-            Self::Call(call) => call.print_syntax(f, depth + Self::INDENT),
-            Self::QualifiedName(qualified_name) => {
-                qualified_name.print_syntax(f, depth + Self::INDENT)
-            }
-            Self::Body(body) => body.print_syntax(f, depth + Self::INDENT),
+            Self::Call(call) => call.tree_print(f, depth),
+            Self::QualifiedName(qualified_name) => qualified_name.tree_print(f, depth),
+            Self::Body(body) => body.tree_print(f, depth),
         }
     }
 }

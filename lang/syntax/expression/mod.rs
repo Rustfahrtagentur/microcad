@@ -143,24 +143,20 @@ impl std::fmt::Display for Expression {
     }
 }
 
-impl PrintSyntax for Value {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Value {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         write!(f, "{:depth$}Value: {value}", "", value = self)
     }
 }
 
-impl PrintSyntax for Expression {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Expression {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         match self {
-            Expression::Value(value) => value.print_syntax(f, depth),
-            Expression::Literal(literal) => literal.print_syntax(f, depth),
-            Expression::FormatString(format_string) => format_string.print_syntax(f, depth),
-            Expression::ArrayExpression(array_expression) => {
-                array_expression.print_syntax(f, depth)
-            }
-            Expression::TupleExpression(tuple_expression) => {
-                tuple_expression.print_syntax(f, depth)
-            }
+            Expression::Value(value) => value.tree_print(f, depth),
+            Expression::Literal(literal) => literal.tree_print(f, depth),
+            Expression::FormatString(format_string) => format_string.tree_print(f, depth),
+            Expression::ArrayExpression(array_expression) => array_expression.tree_print(f, depth),
+            Expression::TupleExpression(tuple_expression) => tuple_expression.tree_print(f, depth),
             Expression::BinaryOp {
                 lhs,
                 op,
@@ -168,8 +164,9 @@ impl PrintSyntax for Expression {
                 src_ref: _,
             } => {
                 writeln!(f, "{:depth$}BinaryOp '{op}':", "")?;
-                lhs.print_syntax(f, depth + Self::INDENT)?;
-                rhs.print_syntax(f, depth + Self::INDENT)
+                depth.indent();
+                lhs.tree_print(f, depth)?;
+                rhs.tree_print(f, depth)
             }
             Expression::UnaryOp {
                 op,
@@ -177,32 +174,37 @@ impl PrintSyntax for Expression {
                 src_ref: _,
             } => {
                 writeln!(f, "{:depth$}UnaryOp '{op}':", "")?;
-                rhs.print_syntax(f, depth + Self::INDENT)
+                depth.indent();
+                rhs.tree_print(f, depth)
             }
             Expression::ArrayElementAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}ArrayElementAccess:", "")?;
-                lhs.print_syntax(f, depth + Self::INDENT)?;
-                rhs.print_syntax(f, depth + Self::INDENT)
+                depth.indent();
+                lhs.tree_print(f, depth)?;
+                rhs.tree_print(f, depth)
             }
             Expression::PropertyAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}FieldAccess:", "")?;
-                lhs.print_syntax(f, depth + Self::INDENT)?;
-                rhs.print_syntax(f, depth + Self::INDENT)
+                depth.indent();
+                lhs.tree_print(f, depth)?;
+                rhs.tree_print(f, depth)
             }
             Expression::AttributeAccess(lhs, rhs, _) => {
                 writeln!(f, "{:depth$}AttributeAccess:", "")?;
-                lhs.print_syntax(f, depth + Self::INDENT)?;
-                rhs.print_syntax(f, depth + Self::INDENT)
+                depth.indent();
+                lhs.tree_print(f, depth)?;
+                rhs.tree_print(f, depth)
             }
             Expression::MethodCall(lhs, method_call, _) => {
                 writeln!(f, "{:depth$}MethodCall:", "")?;
-                lhs.print_syntax(f, depth + Self::INDENT)?;
-                method_call.print_syntax(f, depth + Self::INDENT)
+                depth.indent();
+                lhs.tree_print(f, depth)?;
+                method_call.tree_print(f, depth)
             }
-            Expression::Call(call) => call.print_syntax(f, depth),
-            Expression::Body(body) => body.print_syntax(f, depth),
-            Expression::QualifiedName(qualified_name) => qualified_name.print_syntax(f, depth),
-            Expression::Marker(marker) => marker.print_syntax(f, depth),
+            Expression::Call(call) => call.tree_print(f, depth),
+            Expression::Body(body) => body.tree_print(f, depth),
+            Expression::QualifiedName(qualified_name) => qualified_name.tree_print(f, depth),
+            Expression::Marker(marker) => marker.tree_print(f, depth),
             Expression::Invalid => write!(f, "{}", crate::invalid!(EXPRESSION)),
         }
     }

@@ -101,8 +101,8 @@ impl std::fmt::Display for Parameter {
     }
 }
 
-impl PrintSyntax for Parameter {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Parameter {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         match (&self.specified_type, &self.default_value) {
             (Some(specified_type), Some(default_value)) => writeln!(
                 f,

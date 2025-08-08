@@ -22,8 +22,8 @@ impl SrcReferrer for AssignmentStatement {
     }
 }
 
-impl PrintSyntax for AssignmentStatement {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for AssignmentStatement {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}Assignment '{}'", "", self.assignment)
     }
 }

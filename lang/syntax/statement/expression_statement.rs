@@ -22,9 +22,9 @@ impl SrcReferrer for ExpressionStatement {
     }
 }
 
-impl PrintSyntax for ExpressionStatement {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        self.expression.print_syntax(f, depth)
+impl TreeDisplay for ExpressionStatement {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+        self.expression.tree_print(f, depth)
     }
 }
 

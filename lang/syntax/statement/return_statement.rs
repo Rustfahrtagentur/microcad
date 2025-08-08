@@ -30,11 +30,12 @@ impl std::fmt::Display for ReturnStatement {
     }
 }
 
-impl PrintSyntax for ReturnStatement {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for ReturnStatement {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}ReturnStatement:", "")?;
+        depth.indent();
         if let Some(result) = &self.result {
-            result.print_syntax(f, depth + Self::INDENT)?;
+            result.tree_print(f, depth)?;
         }
         Ok(())
     }

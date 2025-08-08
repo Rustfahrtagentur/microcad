@@ -50,9 +50,10 @@ impl std::fmt::Display for UseStatement {
     }
 }
 
-impl PrintSyntax for UseStatement {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for UseStatement {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}UseStatement", "")?;
-        self.decl.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.decl.tree_print(f, depth)
     }
 }

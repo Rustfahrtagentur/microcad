@@ -37,11 +37,12 @@ impl std::fmt::Display for InitDefinition {
     }
 }
 
-impl PrintSyntax for InitDefinition {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for InitDefinition {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}InitDefinition:", "")?;
-        self.parameters.print_syntax(f, depth + Self::INDENT)?;
-        self.body.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.parameters.tree_print(f, depth)?;
+        self.body.tree_print(f, depth)
     }
 }
 

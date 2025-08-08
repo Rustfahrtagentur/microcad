@@ -90,22 +90,22 @@ impl std::fmt::Display for Statement {
     }
 }
 
-impl PrintSyntax for Statement {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Statement {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         // statement is transparent
         match self {
-            Self::Workbench(w) => w.print_syntax(f, depth),
-            Self::Module(m) => m.print_syntax(f, depth),
-            Self::Function(func) => func.print_syntax(f, depth),
-            Self::Init(i) => i.print_syntax(f, depth),
+            Self::Workbench(w) => w.tree_print(f, depth),
+            Self::Module(m) => m.tree_print(f, depth),
+            Self::Function(func) => func.tree_print(f, depth),
+            Self::Init(i) => i.tree_print(f, depth),
 
-            Self::Use(u) => u.print_syntax(f, depth),
-            Self::Return(r) => r.print_syntax(f, depth),
-            Self::If(i) => i.print_syntax(f, depth),
-            Self::InnerAttribute(i) => i.print_syntax(f, depth),
+            Self::Use(u) => u.tree_print(f, depth),
+            Self::Return(r) => r.tree_print(f, depth),
+            Self::If(i) => i.tree_print(f, depth),
+            Self::InnerAttribute(i) => i.tree_print(f, depth),
 
-            Self::Assignment(a) => a.print_syntax(f, depth),
-            Self::Expression(e) => e.print_syntax(f, depth),
+            Self::Assignment(a) => a.tree_print(f, depth),
+            Self::Expression(e) => e.tree_print(f, depth),
         }
     }
 }

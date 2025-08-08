@@ -76,8 +76,8 @@ impl Attribute {
     }
 }
 
-impl PrintSyntax for Attribute {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Attribute {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}Attribute: {self}", "")
     }
 }

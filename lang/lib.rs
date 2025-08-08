@@ -24,6 +24,7 @@ pub mod rc;
 pub mod resolve;
 pub mod src_ref;
 pub mod syntax;
+pub mod tree_display;
 pub mod ty;
 pub mod value;
 

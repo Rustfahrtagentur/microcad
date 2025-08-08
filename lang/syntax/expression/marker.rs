@@ -33,8 +33,8 @@ impl std::fmt::Display for Marker {
     }
 }
 
-impl PrintSyntax for Marker {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Marker {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}Marker '{}'", "", self.id)
     }
 }

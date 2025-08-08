@@ -36,12 +36,13 @@ impl std::fmt::Display for Call {
     }
 }
 
-impl PrintSyntax for Call {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Call {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}Call '{}':", "", self.name)?;
+        depth.indent();
         self.argument_list
             .iter()
-            .try_for_each(|a| a.print_syntax(f, depth + Self::INDENT))
+            .try_for_each(|a| a.tree_print(f, depth))
     }
 }
 

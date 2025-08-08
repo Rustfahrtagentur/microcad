@@ -258,8 +258,8 @@ impl From<QualifiedName> for String {
     }
 }
 
-impl PrintSyntax for QualifiedName {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for QualifiedName {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         writeln!(
             f,
             "{:depth$}QualifiedName: '{}'",

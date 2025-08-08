@@ -40,9 +40,10 @@ impl SrcReferrer for ModuleDefinition {
     }
 }
 
-impl PrintSyntax for ModuleDefinition {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for ModuleDefinition {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
-        self.body.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.body.tree_print(f, depth)
     }
 }

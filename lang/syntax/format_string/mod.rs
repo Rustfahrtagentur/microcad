@@ -71,12 +71,13 @@ impl std::fmt::Display for FormatString {
     }
 }
 
-impl PrintSyntax for FormatString {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for FormatString {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}FormatString:", "")?;
+        depth.indent();
         self.0.iter().try_for_each(|fs| match fs {
             FormatStringInner::String(s) => writeln!(f, "{:depth$}String: \"{}\"", "", s.value),
-            FormatStringInner::FormatExpression(e) => e.print_syntax(f, depth + Self::INDENT),
+            FormatStringInner::FormatExpression(e) => e.tree_print(f, depth),
         })
     }
 }

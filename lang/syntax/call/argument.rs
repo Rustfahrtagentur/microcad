@@ -47,12 +47,13 @@ impl std::fmt::Display for Argument {
     }
 }
 
-impl PrintSyntax for Argument {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Argument {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         match self.id {
             Some(ref name) => writeln!(f, "{:depth$}Argument '{}':", "", name)?,
             None => writeln!(f, "{:depth$}Argument:", "")?,
         };
-        self.value.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.value.tree_print(f, depth)
     }
 }

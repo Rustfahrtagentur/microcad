@@ -61,11 +61,10 @@ impl std::fmt::Display for Nested {
     }
 }
 
-impl PrintSyntax for Nested {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Nested {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}Nested:", "")?;
-        self.0
-            .iter()
-            .try_for_each(|ni| ni.print_syntax(f, depth + Self::INDENT))
+        depth.indent();
+        self.0.iter().try_for_each(|ni| ni.tree_print(f, depth))
     }
 }

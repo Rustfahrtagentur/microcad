@@ -69,8 +69,8 @@ impl From<Literal> for Value {
     }
 }
 
-impl PrintSyntax for Literal {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Literal {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         write!(f, "{:depth$}Literal: ", "")?;
         match self {
             Literal::Integer(i) => writeln!(f, "{i}"),

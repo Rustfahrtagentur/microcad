@@ -3,7 +3,7 @@
 
 //! µcad unit syntax element
 
-use crate::{syntax::PrintSyntax, ty::*};
+use crate::{syntax::*, ty::*};
 
 /// The units that can be used after numbers in the language"
 #[derive(
@@ -266,8 +266,8 @@ impl Unit {
     }
 }
 
-impl PrintSyntax for Unit {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Unit {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         if !matches!(self, Unit::None) {
             writeln!(f, "{:depth$}Unit: {}", "", self)
         } else {

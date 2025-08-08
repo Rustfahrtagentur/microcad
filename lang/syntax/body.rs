@@ -39,11 +39,12 @@ impl std::fmt::Display for Body {
     }
 }
 
-impl PrintSyntax for Body {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Body {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}Body:", "")?;
+        depth.indent();
         self.statements
             .iter()
-            .try_for_each(|s| s.print_syntax(f, depth + Self::INDENT))
+            .try_for_each(|s| s.tree_print(f, depth))
     }
 }

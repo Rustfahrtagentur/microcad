@@ -78,8 +78,8 @@ impl std::fmt::Display for SourceFile {
     }
 }
 
-impl PrintSyntax for SourceFile {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for SourceFile {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(
             f,
             "{:depth$}SourceFile '{}' ({}):",
@@ -87,9 +87,10 @@ impl PrintSyntax for SourceFile {
             self.id(),
             self.filename_as_str()
         )?;
+        depth.indent();
         self.statements
             .iter()
-            .try_for_each(|s| s.print_syntax(f, depth + Self::INDENT))
+            .try_for_each(|s| s.tree_print(f, depth))
     }
 }
 
@@ -100,11 +101,11 @@ impl SrcReferrer for SourceFile {
 }
 
 /// print syntax via std::fmt::Display
-pub struct FormatSyntax<'a, T: PrintSyntax>(pub &'a T);
+pub struct FormatSyntax<'a, T: TreeDisplay>(pub &'a T);
 
-impl<T: PrintSyntax> std::fmt::Display for FormatSyntax<'_, T> {
+impl<T: TreeDisplay> std::fmt::Display for FormatSyntax<'_, T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.print_syntax(f, 2)
+        self.0.tree_print(f, 2.into())
     }
 }
 

@@ -70,8 +70,9 @@ impl std::fmt::Display for UseDeclaration {
     }
 }
 
-impl PrintSyntax for UseDeclaration {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for UseDeclaration {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+        // use declaration is transparent
         match self {
             UseDeclaration::Use(name) => writeln!(f, "{:depth$}Use {name}", ""),
             UseDeclaration::UseAll(name) => writeln!(f, "{:depth$}Use {name}::*", ""),

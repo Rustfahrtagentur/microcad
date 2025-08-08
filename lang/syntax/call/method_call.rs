@@ -28,9 +28,10 @@ impl std::fmt::Display for MethodCall {
     }
 }
 
-impl PrintSyntax for MethodCall {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for MethodCall {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}MethodCall '{}':", "", self.id)?;
-        self.argument_list.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.argument_list.tree_print(f, depth)
     }
 }

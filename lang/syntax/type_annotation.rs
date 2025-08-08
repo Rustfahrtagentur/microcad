@@ -27,8 +27,8 @@ impl crate::ty::Ty for TypeAnnotation {
     }
 }
 
-impl PrintSyntax for TypeAnnotation {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for TypeAnnotation {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}TypeAnnotation: {}", "", self.0.value)
     }
 }

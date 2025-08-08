@@ -39,10 +39,10 @@ impl std::fmt::Display for TupleExpression {
     }
 }
 
-impl PrintSyntax for TupleExpression {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for TupleExpression {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}TupleExpression:", "")?;
-        let depth = depth + Self::INDENT;
-        self.args.print_syntax(f, depth)
+        depth.indent();
+        self.args.tree_print(f, depth)
     }
 }

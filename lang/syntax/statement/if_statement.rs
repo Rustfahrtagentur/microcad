@@ -36,16 +36,17 @@ impl std::fmt::Display for IfStatement {
     }
 }
 
-impl PrintSyntax for IfStatement {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for IfStatement {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}IfStatement:", "")?;
-        let depth = depth + Self::INDENT;
+        depth.indent();
         writeln!(f, "{:depth$}Condition:", "")?;
-        self.cond.print_syntax(f, depth + Self::INDENT)?;
-        self.body.print_syntax(f, depth + Self::INDENT)?;
+        self.cond.tree_print(f, depth.indented())?;
+        writeln!(f, "{:depth$}If:", "")?;
+        self.body.tree_print(f, depth.indented())?;
         if let Some(body_else) = &self.body_else {
             writeln!(f, "{:depth$}Else:", "")?;
-            body_else.print_syntax(f, depth + Self::INDENT)?;
+            body_else.tree_print(f, depth.indented())?;
         }
         Ok(())
     }

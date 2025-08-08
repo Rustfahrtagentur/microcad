@@ -139,8 +139,8 @@ impl PartialEq<str> for Identifier {
     }
 }
 
-impl PrintSyntax for Identifier {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Identifier {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}Identifier: {}", "", self.id())
     }
 }

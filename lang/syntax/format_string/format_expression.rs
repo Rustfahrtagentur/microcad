@@ -44,14 +44,15 @@ impl SrcReferrer for FormatExpression {
     }
 }
 
-impl PrintSyntax for FormatExpression {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for FormatExpression {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(f, "{:depth$}FormatExpression:", "")?;
+        depth.indent();
         if let Some(spec) = &self.spec {
-            spec.print_syntax(f, depth + Self::INDENT)?;
-            self.expression.print_syntax(f, depth + Self::INDENT)
+            spec.tree_print(f, depth)?;
+            self.expression.tree_print(f, depth)
         } else {
-            self.expression.print_syntax(f, depth + Self::INDENT)
+            self.expression.tree_print(f, depth)
         }
     }
 }
