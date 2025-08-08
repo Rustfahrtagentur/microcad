@@ -220,9 +220,6 @@ impl Parse for Expression {
                             rule => unreachable!("Expected identifier or int, found {:?}", rule),
                         }
                     }
-                    (op, Rule::call) => {
-                        todo!("{op:?}");
-                    }
                     (op, Rule::method_call) => Ok(Self::MethodCall(
                         Box::new(lhs?),
                         MethodCall::parse(op)?,
