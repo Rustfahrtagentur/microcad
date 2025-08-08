@@ -7,7 +7,10 @@ use std::rc::Rc;
 
 use crate::*;
 
-use microcad_lang::{parse::ParseResult, syntax::SourceFile};
+use microcad_lang::{
+    parse::ParseResult,
+    syntax::{FormatSyntax, SourceFile},
+};
 
 #[derive(clap::Parser)]
 pub struct Parse {
@@ -25,7 +28,8 @@ impl Parse {
 
 impl RunCommand for Parse {
     fn run(&self, _cli: &Cli) -> anyhow::Result<()> {
-        self.parse()?;
+        let source_file = self.parse()?;
+        println!("{}", FormatSyntax(source_file.as_ref()));
         Ok(())
     }
 }
