@@ -5,23 +5,18 @@ pub use __builtin::ops::hull;
 
 
 op revolve(angle = 360°) {
-    __builtin::ops::revolve(
+    @children.__builtin::ops::revolve(
         circular_segments = 64, // TODO: Make this adaptive to resolution 
-        revolve_degrees = angle / 1°) {
-        @children
-    }
+        revolve_degrees = angle / 1°
+    );
 }
 
 op extrude(height: Length) {
-    __builtin::ops::extrude(height = height / 1mm, n_divisions = 0, twist_degrees = 0.0, scale_top_x = 1.0, scale_top_y = 1.0) {
-        @children
-    }
+    @children.__builtin::ops::extrude(height = height / 1mm, n_divisions = 0, twist_degrees = 0.0, scale_top_x = 1.0, scale_top_y = 1.0);
 }
 
 op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
-    __builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm) {
-        @children
-    }
+    @children.__builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm);
 }
 
 /// A transformer that rotates a part.
@@ -81,15 +76,11 @@ op rotate(matrix: Mat3) {
 		matrix = __builtin::math::rotate_zyx(zyx.z, zyx.y, zyx.x);
 	}
 
-	__builtin::ops::rotate(matrix) {
-        @children
-    }
+	@children.__builtin::ops::rotate(matrix);
 }
 
 
 /// Orient an object towards a vector.
 op orient(v: Vec3) {
-    __builtin::ops::orient(x = v.x, y = v.y, z = v.z) {
-        @children
-    }
+    @children.__builtin::ops::orient(x = v.x, y = v.y, z = v.z);
 }
