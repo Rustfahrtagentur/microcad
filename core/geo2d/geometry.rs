@@ -81,7 +81,7 @@ impl FetchBounds2D for Geometry2D {
             Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.bounding_rect().into(),
             Geometry2D::Rect(rect) => Some(*rect).into(),
             Geometry2D::Circle(circle) => circle.fetch_bounds_2d(),
-            Geometry2D::Line(edge) => edge.fetch_bounds_2d(),
+            Geometry2D::Line(line) => line.fetch_bounds_2d(),
         }
     }
 }

@@ -37,9 +37,10 @@ impl Models {
         }
     }
 
-    pub fn nest(self, op: &Models) -> Self {
+    /// Nest models in self.
+    pub fn nest(self, models: &Models) -> Self {
         self.iter().for_each(|new_parent| {
-            op.iter().for_each(|model| {
+            models.iter().for_each(|model| {
                 model.detach();
 
                 // Handle children marker.

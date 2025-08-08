@@ -6,7 +6,7 @@
 use std::rc::Rc;
 
 use derive_more::{Deref, DerefMut};
-use geo::{ConvexHull, CoordsIter, LineString, Polygon};
+use geo::{CoordsIter, LineString, Polygon};
 
 use crate::{
     geo2d::{FetchBounds2D, bounds::Bounds2D},
