@@ -36,6 +36,7 @@ use crate::{
     diag::WriteToFile,
     rc::RcMut,
     syntax::{Identifier, SourceFile},
+    tree_display::*,
     value::Value,
 };
 
@@ -237,19 +238,26 @@ impl PartialEq for Model {
 /// ```
 impl std::fmt::Display for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let depth = self.depth() * 2;
-        writeln!(f, "{:depth$}{signature}", "", signature = self.signature())?;
+        writeln!(
+            f,
+            "{signature}",
+            signature = crate::shorten!(self.signature())
+        )
+    }
+}
+
+impl TreeDisplay for Model {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+        writeln!(
+            f,
+            "{:depth$}{signature}",
+            "",
+            signature = crate::shorten!(self.signature())
+        )?;
+        depth.indent();
         let self_ = self.borrow();
-
-        self_
-            .attributes
-            .iter()
-            .try_for_each(|attribute| writeln!(f, "{:depth$}{attribute}", ""))?;
-
-        self_
-            .children
-            .iter()
-            .try_for_each(|child| write!(f, "{child}"))
+        self_.attributes.tree_print(f, depth)?;
+        self_.children.tree_print(f, depth)
     }
 }
 

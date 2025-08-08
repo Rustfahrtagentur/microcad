@@ -8,6 +8,12 @@ pub trait TreeDisplay {
     /// Write item into [`f`] and use `{:depth$}` syntax in front of your single line
     /// output to get proper indention.
     fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result;
+
+    /// Display as tree starting at depth `0`.
+    fn print_tree(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let depth = 0.into();
+        self.tree_print(f, depth)
+    }
 }
 
 /// Indention size

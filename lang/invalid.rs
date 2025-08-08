@@ -9,43 +9,43 @@ mod macros {
     #[macro_export]
     macro_rules! invalid {
         (VALUE) => {
-            color_print::cstr!("<bg:r!><s> INVALID VALUE </s></bg:r!>")
+            color_print::cstr!("<bg:r,s> INVALID VALUE </>")
         };
         (TYPE) => {
-            color_print::cstr!("<bg:r!><s> INVALID TYPE </s></bg:r!>")
+            color_print::cstr!("<bg:r!,s> INVALID TYPE </>")
         };
         (OUTPUT) => {
-            color_print::cstr!("<bg:r!><s> INVALID OUTPUT </s></bg:r!>")
+            color_print::cstr!("<bg:r!,s> INVALID OUTPUT </>")
         };
         (STACK) => {
-            color_print::cstr!("<bg:w><s> EMPTY STACK </s></bg:w>")
+            color_print::cstr!("<bg:w,s> EMPTY STACK </>")
         };
         (REF) => {
-            color_print::cstr!("<bg:y!><s> NO REF </s></bg:y!>")
+            color_print::cstr!("<bg:y!,s> NO REF </>")
         };
         (FILE) => {
-            color_print::cstr!("<bg:y!><s> NO FILE </s></bg:y!>")
+            color_print::cstr!("<bg:y!,s> NO FILE </>")
         };
         (RESULT) => {
-            color_print::cstr!("<bg:y!><s> NO RESULT </s></bg:y!>")
+            color_print::cstr!("<bg:y!,s> NO RESULT </>")
         };
         (LINE) => {
-            color_print::cstr!("<bg:y!><s> NO LINE </s></bg:y!>")
+            color_print::cstr!("<bg:y!,s> NO LINE </>")
         };
         (SOURCE) => {
-            color_print::cstr!("<bg:c!><s> FROM STR </s></bg:c!>")
+            color_print::cstr!("<bg:c!,s> FROM STR </>")
         };
         (UNKNOWN) => {
-            color_print::cstr!("<bg:m!><s> UNKNOWN </s></bg:m!>")
+            color_print::cstr!("<bg:m!,s> UNKNOWN </>")
         };
         (ID) => {
-            color_print::cstr!("<bg:m!><s> NO ID </s></bg:m!>")
+            color_print::cstr!("<bg:m!,s> NO ID </>")
         };
         (NAME) => {
-            color_print::cstr!("<bg:m!><s> NO NAME </s></bg:m!>")
+            color_print::cstr!("<bg:m!,s> NO NAME </>")
         };
         (EXPRESSION) => {
-            color_print::cstr!("<bg:r!><s> INVALID EXPRESSION </s></bg:r!>")
+            color_print::cstr!("<bg:r!,s> INVALID EXPRESSION </>")
         };
     }
 

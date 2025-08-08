@@ -64,7 +64,8 @@ fn parse_macro() {
 
 /// Shortens given string to iz's first line and to MAX_LEN characters
 pub fn shorten(what: &str, max_chars: usize) -> String {
-    what.chars()
+    let short: String = what
+        .chars()
         .enumerate()
         .filter_map(|(p, ch)| {
             if p == max_chars {
@@ -79,7 +80,13 @@ pub fn shorten(what: &str, max_chars: usize) -> String {
                 None
             }
         })
-        .collect()
+        .collect();
+
+    if cfg!(feature = "ansi-color") {
+        short + "\x1b[0m"
+    } else {
+        short
+    }
 }
 
 /// Shortens given string to iz's first line and to MAX_LEN characters with default maximum length
