@@ -7,9 +7,9 @@
 use std::geo2d::circle;
 use std::ops::translate;
 
-translate( y=[-34mm/2 , 34mm/2] ) { // op with body
-    circle( radius = 5mm );
-}
+{ // op with body
+    circle(radius = 5mm);
+}.translate(y=[-34mm/2 , 34mm/2]);
 
 -- Output --
 -- Errors --

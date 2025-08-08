@@ -1,0 +1,13 @@
+-- Test --
+  empty_op
+  ../doc/tests/semicolon.md:54
+
+-- Code --
+
+std::ops::translate(x = 3.0mm); // Error: Translate no geometry. 
+{}.std::ops::translate(x = 3.0mm);  // Error: Translate empty geometry.
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK BUT SHOULD FAIL

@@ -99,9 +99,7 @@
       <g class="entity" transform="matrix(1 0 0 1 0 17)">
         <g class="entity">
           <g class="entity">
-            <g class="entity">
-              <circle cx="5" cy="22" r="5"/>
-            </g>
+            <circle cx="5" cy="22" r="5"/>
           </g>
         </g>
       </g>
@@ -110,9 +108,7 @@
       <g class="entity" transform="matrix(1 0 0 1 0 -17)">
         <g class="entity">
           <g class="entity">
-            <g class="entity">
-              <circle cx="5" cy="22" r="5"/>
-            </g>
+            <circle cx="5" cy="22" r="5"/>
           </g>
         </g>
       </g>

@@ -8,7 +8,15 @@ part punched_disk(radius: Length) {
     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
 }
 
+punched_disk(4.0mm);
+
 -- Output --
 -- Errors --
+warning: The part workbench will produce no 3D output.
+  ---> <from_str>:1:1
+     |
+   1 | part punched_disk(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK BUT IS TODO
+OK BUT SHOULD FAIL

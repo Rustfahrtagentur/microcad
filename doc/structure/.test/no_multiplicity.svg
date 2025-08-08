@@ -98,36 +98,28 @@
     <g class="entity">
       <g class="entity" transform="matrix(1 0 0 1 -4 4)">
         <g class="entity">
-          <g class="entity">
-            <rect x="4" y="4" width="2" height="2"/>
-          </g>
+          <rect x="4" y="4" width="2" height="2"/>
         </g>
       </g>
     </g>
     <g class="entity">
       <g class="entity" transform="matrix(1 0 0 1 -4 -4)">
         <g class="entity">
-          <g class="entity">
-            <rect x="4" y="4" width="2" height="2"/>
-          </g>
+          <rect x="4" y="4" width="2" height="2"/>
         </g>
       </g>
     </g>
     <g class="entity">
       <g class="entity" transform="matrix(1 0 0 1 4 4)">
         <g class="entity">
-          <g class="entity">
-            <rect x="4" y="4" width="2" height="2"/>
-          </g>
+          <rect x="4" y="4" width="2" height="2"/>
         </g>
       </g>
     </g>
     <g class="entity">
       <g class="entity" transform="matrix(1 0 0 1 4 -4)">
         <g class="entity">
-          <g class="entity">
-            <rect x="4" y="4" width="2" height="2"/>
-          </g>
+          <rect x="4" y="4" width="2" height="2"/>
         </g>
       </g>
     </g>

@@ -14,8 +14,13 @@ __builtin::assert_eq([
 
 -- Output --
 -- Errors --
-error: Not implemented: call_method for Models
-error: Elements of list have different types: [[101m[1m INVALID TYPE [49m[22m, Area]
+error: Symbol area not found.
+  ---> <from_str>:3:37
+     |
+   3 |     std::geo2d::circle(radius=10mm).area(),
+     |                                     ^^^^
+     |
+error: Elements of list have different types: [Models, Area]
   ---> <from_str>:1:22
      |
    1 | __builtin::assert_eq([

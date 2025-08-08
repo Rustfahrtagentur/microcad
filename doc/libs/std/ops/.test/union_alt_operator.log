@@ -4,10 +4,10 @@
 
 -- Code --
 
-std::ops::union() {
+{
     std::geo2d::circle(radius = 3mm);
     std::geo2d::rect(width = 3mm, height = 2mm);
-}
+}.std::ops::union();
 
 -- Output --
 -- Errors --
