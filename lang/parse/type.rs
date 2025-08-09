@@ -23,6 +23,7 @@ impl Parse for Type {
                 "Color" => Ok(Type::Tuple(TupleType::new_color().into())),
                 "Vec2" => Ok(Type::Tuple(TupleType::new_vec2().into())),
                 "Vec3" => Ok(Type::Tuple(TupleType::new_vec3().into())),
+                "Size2D" => Ok(Type::Tuple(TupleType::new_size2d().into())),
                 _ => Err(ParseError::UnknownType(inner.to_string())),
             },
             _ => Err(ParseError::UnknownType(inner.to_string())),
