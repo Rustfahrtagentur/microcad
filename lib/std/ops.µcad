@@ -85,3 +85,18 @@ op orient(v: Vec3) {
     @children.__builtin::ops::orient(x = v.x, y = v.y, z = v.z);
 }
 
+/// Positions child objects using polar coordinates around the Z axis.
+///
+/// This operator places each child at a specified polar coordinate,
+/// converting an angle and radius into a cartesian transformation.
+/// An optional `shift` moves the object perpendicular to the radius direction
+/// (i.e., along the local Y-axis after rotation).
+///
+/// # Parameters
+/// - `angle`: The polar angle (in degrees or radians depending on context) from the positive X-axis.
+/// - `radius`: Distance from the origin along the direction of the angle.
+/// - `shift`: Optional distance to shift along the local Y-axis after rotation.
+///            Defaults to `0.0mm`, meaning no shift.
+op polar(angle: Angle, radius: Length, shift: Length = 0.0mm) {
+    @children.translate(x = radius, y = shift).rotate(angle);
+}
