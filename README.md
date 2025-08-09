@@ -99,19 +99,23 @@ To generate an STL model file use the `export` command with an additional output
 microcad export ./examples/lego_brick.µcad
 ```
 
-The output file `lego_brick.stl` can be displayed e.g. with [MeshLab](https://www.meshlab.net/).
-The resulting STL model looks like this: ![Lid](examples/lego_brick.png)
+The file [`lego_brick.µcad`](examples/lego_brick.µcad) generate a file called`lego_brick.stl` which can be displayed e.g. with [MeshLab](https://www.meshlab.net/).
+
+The resulting STL model looks like this:
+
+![Parametric Lego Brick](examples/lego_brick.png)
 
 ## Documentation
 
 - [Description of language features](doc/README.md)
 - [Language reference](doc/REFERENCE.md)
 - [Basic concepts](doc/CONCEPTS.md)
-- [Examples](doc/EXAMPLES.md)
 - Code documentation:
   - [`microcad-lang` module](https://docs.rs/microcad-lang)
   - [`microcad-core` module](https://docs.rs/microcad-core)
   - [`microcad-export` module](https://docs.rs/microcad-export)
+- [Markdown Tests](doc/test_list.md)
+- [File Tests](TEST_SUMMARY.md)
 - [Glossary](doc/GLOSSARY.md)
 
 ## Contribute
