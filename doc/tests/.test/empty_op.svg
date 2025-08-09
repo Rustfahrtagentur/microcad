@@ -20,14 +20,14 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="8.0689407"
-     inkscape:cx="54.344184"
+     inkscape:cx="54.282218"
      inkscape:cy="22.493659"
      inkscape:window-width="1888"
      inkscape:window-height="1127"
      inkscape:window-x="16"
      inkscape:window-y="34"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g8" />
+     inkscape:current-layer="svg8" />
   <defs
      id="defs8" />
   <linearGradient
@@ -69,7 +69,7 @@
        fill="#dfb317"
        id="rect9"
        y="0"
-       style="display:inline;fill:#ff0000;stroke-width:0.999996"
+       style="display:inline;fill:#d40000;stroke-width:0.999996;fill-opacity:1"
        ry="3" />
     <rect
        width="46.68108"
