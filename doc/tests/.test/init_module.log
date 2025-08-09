@@ -5,7 +5,7 @@
 -- Code --
 
 sketch k() { init(l:Length) {
-  mod m {}
+  mod m {} // error
 } } k(1cm);
 
 -- Output --
@@ -13,7 +13,7 @@ sketch k() { init(l:Length) {
 error: Module statement not available here
   ---> <from_str>:2:3
      |
-   2 |   mod m {}
+   2 |   mod m {} // error
      |   ^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.

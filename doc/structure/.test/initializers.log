@@ -6,17 +6,12 @@
 
 sketch wheel(radius: Length) {
     init( radius: Length ) {} // error: same parameters as in building plan
+    std::geo2d::circle(1mm);
 }
 
 wheel(radius = 1.0mm);
 
 -- Output --
 -- Errors --
-warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
-     |
-   1 | sketch wheel(radius: Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
 FAIL(TODO)

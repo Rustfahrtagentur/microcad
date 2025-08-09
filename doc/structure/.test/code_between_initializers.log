@@ -1,6 +1,6 @@
 -- Test --
   code_between_initializers
-  ../doc/structure/workbench.md:203
+  ../doc/structure/workbench.md:202
 
 -- Code --
 
@@ -18,4 +18,4 @@ wheel(radius = 1.0mm);
 -- Parse Error --
 Code between initializers is not allowed
 -- Test Result --
-FAILED AS EXPECTED
+FAILED AS EXPECTED (PARSE: Cannot check error line)

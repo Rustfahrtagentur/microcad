@@ -5,7 +5,7 @@
 -- Code --
 
 mod k {
-  init() { }
+  init() { }  // error
 }
 
 -- Output --
@@ -13,7 +13,7 @@ mod k {
 error: Init statement not available here
   ---> <from_str>:2:3
      |
-   2 |   init() { }
+   2 |   init() { }  // error
      |   ^^^^^^^^^^
      |
 -- Test Result --

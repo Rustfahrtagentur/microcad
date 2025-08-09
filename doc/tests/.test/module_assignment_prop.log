@@ -5,7 +5,7 @@
 -- Code --
 
 mod k {
-  prop a = 1;
+  prop a = 1;  // error
 }
 
 -- Output --
@@ -13,7 +13,7 @@ mod k {
 error: Assignment statement not available here
   ---> <from_str>:2:3
      |
-   2 |   prop a = 1;
+   2 |   prop a = 1;  // error
      |   ^^^^^^^^^^^
      |
 -- Test Result --

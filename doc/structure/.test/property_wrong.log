@@ -18,8 +18,8 @@ t = wheel(outer = 1cm);
 
 // you can still extract and display `outer`
 std::print("outer: {t.outer}");
-// error: but you cannot access `inner` anymore
-std::print("inner: {t.inner}");
+// but you cannot access `inner` anymore
+std::print("inner: {t.inner}"); // error
 
 -- Output --
 outer: 10mm
@@ -28,7 +28,7 @@ inner: <INVALID VALUE>
 error: Property not found: inner
   ---> <from_str>:16:21
      |
-  16 | std::print("inner: {t.inner}");
+  16 | std::print("inner: {t.inner}"); // error
      |                     ^^^^^^^
      |
 -- Test Result --

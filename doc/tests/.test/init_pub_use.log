@@ -5,7 +5,7 @@
 -- Code --
 
 sketch k() { init(l:Length) {
-  pub use std;
+  pub use std; // error
 } } k(1cm);
 
 -- Output --

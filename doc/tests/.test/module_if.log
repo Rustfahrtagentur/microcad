@@ -5,7 +5,7 @@
 -- Code --
 
 mod k {
-  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }  // error
 }
 
 -- Output --
@@ -13,7 +13,7 @@ mod k {
 error: If statement not available here
   ---> <from_str>:2:3
      |
-   2 |   if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+   2 |   if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }  // error
      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --

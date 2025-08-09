@@ -5,7 +5,7 @@
 -- Code --
 
 sketch k() { init(l:Length) {
-  if std::math::PI == 3 { }
+  if std::math::PI == 3 { } // error
 } } k(1cm);
 
 -- Output --
@@ -13,7 +13,7 @@ sketch k() { init(l:Length) {
 error: If statement not available here
   ---> <from_str>:2:3
      |
-   2 |   if std::math::PI == 3 { }
+   2 |   if std::math::PI == 3 { } // error
      |   ^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.

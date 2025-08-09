@@ -5,7 +5,7 @@
 -- Code --
 
 fn f() {
-  mod m {}
+  mod m {} // error
 } f();
 
 -- Output --
@@ -13,7 +13,7 @@ fn f() {
 error: Module statement not available here
   ---> <from_str>:2:3
      |
-   2 |   mod m {}
+   2 |   mod m {} // error
      |   ^^^^^^^^
      |
 -- Test Result --

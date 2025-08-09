@@ -5,7 +5,7 @@
 -- Code --
 
 fn f() {
-  init() {}
+  init() {} // error
 } f();
 
 -- Output --
@@ -13,7 +13,7 @@ fn f() {
 error: Init statement not available here
   ---> <from_str>:2:3
      |
-   2 |   init() {}
+   2 |   init() {} // error
      |   ^^^^^^^^^
      |
 -- Test Result --

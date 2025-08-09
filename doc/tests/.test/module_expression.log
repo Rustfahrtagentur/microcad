@@ -5,7 +5,7 @@
 -- Code --
 
 mod k {
-  1 + 2;
+  1 + 2; // error
 }
 
 -- Output --
@@ -13,13 +13,13 @@ mod k {
 error: Expression statement not available here
   ---> <from_str>:2:3
      |
-   2 |   1 + 2;
+   2 |   1 + 2; // error
      |   ^^^^^^
      |
 warning: This expression statement did not produce any model
   ---> <from_str>:2:3
      |
-   2 |   1 + 2;
+   2 |   1 + 2; // error
      |   ^^^^^^
      |
 -- Test Result --

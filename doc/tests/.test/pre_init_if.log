@@ -5,10 +5,10 @@
 -- Code --
 
 sketch k() { 
-  if std::math::PI == 3 { }
+  if std::math::PI == 3 { } // error
 init(l:Length) {} } k();
 
 -- Parse Error --
 Statement not allowed prior initializers
 -- Test Result --
-FAILED AS EXPECTED
+FAILED AS EXPECTED (PARSE: Cannot check error line)

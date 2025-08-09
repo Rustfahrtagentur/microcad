@@ -41,4 +41,6 @@ error: Symbol pow not found.
      |                 ^^^^^^^^^^^
      |
 -- Test Result --
+FAIL(TODO)
+-- Test Result --
 FAILED AS EXPECTED BUT IS TODO

@@ -5,7 +5,7 @@
 -- Code --
 
 {
-  fn f() {} f();
+  fn f() {} f(); // error
 }
 
 -- Output --
@@ -13,13 +13,13 @@
 error: Function statement not available here
   ---> <from_str>:2:3
      |
-   2 |   fn f() {} f();
+   2 |   fn f() {} f(); // error
      |   ^^^^^^^^^
      |
 error: Symbol f not found.
   ---> <from_str>:2:13
      |
-   2 |   fn f() {} f();
+   2 |   fn f() {} f(); // error
      |             ^^^
      |
 -- Test Result --

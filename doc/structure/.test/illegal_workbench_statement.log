@@ -1,11 +1,12 @@
 -- Test --
   illegal_workbench_statement
-  ../doc/structure/workbench.md:253
+  ../doc/structure/workbench.md:252
 
 -- Code --
 
 sketch wheel(radius: Length) {
-    sketch axis(length: Length) {}
+    sketch axis(length: Length) {}  // error
+    std::geo2d::circle(radius);
 }
 
 wheel(radius = 1.0mm);
@@ -15,14 +16,8 @@ wheel(radius = 1.0mm);
 error: sketch statement not available here
   ---> <from_str>:2:5
      |
-   2 |     sketch axis(length: Length) {}
+   2 |     sketch axis(length: Length) {}  // error
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
-     |
-   1 | sketch wheel(radius: Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAILED AS EXPECTED

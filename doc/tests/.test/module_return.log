@@ -5,7 +5,7 @@
 -- Code --
 
 mod k {
-  return 1;
+  return 1;  // error
 }
 
 -- Output --
@@ -13,7 +13,7 @@ mod k {
 error: Return statement not available here
   ---> <from_str>:2:3
      |
-   2 |   return 1;
+   2 |   return 1;  // error
      |   ^^^^^^^^^
      |
 -- Test Result --

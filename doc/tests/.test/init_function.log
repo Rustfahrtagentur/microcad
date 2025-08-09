@@ -5,7 +5,7 @@
 -- Code --
 
 sketch k() { init(l:Length) {
-  fn f() {}
+  fn f() {} // error
 } } k(1cm);
 
 -- Output --
@@ -13,7 +13,7 @@ sketch k() { init(l:Length) {
 error: Function statement not available here
   ---> <from_str>:2:3
      |
-   2 |   fn f() {}
+   2 |   fn f() {} // error
      |   ^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.

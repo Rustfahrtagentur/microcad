@@ -5,10 +5,10 @@
 -- Code --
 
 sketch k() { 
-  a = 1;
+  a = 1; // error
 init(l:Length) {} } k();
 
 -- Parse Error --
 Statement not allowed prior initializers
 -- Test Result --
-FAILED AS EXPECTED
+FAILED AS EXPECTED (PARSE: Cannot check error line)

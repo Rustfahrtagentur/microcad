@@ -5,7 +5,7 @@
 -- Code --
 
 sketch k() {
-  pub use std;
+  pub use std; // error
 } k();
 
 -- Output --

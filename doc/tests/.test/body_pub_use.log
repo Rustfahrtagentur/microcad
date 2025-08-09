@@ -5,7 +5,7 @@
 -- Code --
 
 {
-  pub use std;
+  pub use std; // error
 }
 
 -- Output --
