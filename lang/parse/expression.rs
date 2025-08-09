@@ -241,7 +241,7 @@ impl Parse for Expression {
 
 impl Parse for Nested {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        assert!(pair.as_rule() == Rule::nested || pair.as_rule() == Rule::expression_no_semicolon);
+        assert!(pair.as_rule() == Rule::expression_no_semicolon);
 
         Ok(Self(Refer::new(
             pair.inner()

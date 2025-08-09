@@ -222,15 +222,6 @@ use_all = { qualified_name ~ ws* ~ "::" ~ ws* ~ "*" }
 // `std::math as my_math`: ok # Import math from std as my_math
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 
-// `translate() rotate()`: ok
-// `translate() rotate() { translate() rotate() {} }`: ok
-// `rotate() {}`: ok
-// `{}`: ok # Empty body
-// `{ translate() rotate(); }`: ok
-// `{} {}`: error # Cannot nest bodies
-// `holes.edges`: error # No tuple access in nested module
-nested = { nested_with_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
-
 nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ body }
 
 // `-5.0mm`: ok # Negate
