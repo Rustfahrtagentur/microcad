@@ -118,12 +118,16 @@ impl SourceCache {
             Ok(self.source_files[*index].clone())
         } else {
             // if not found in symbol tree we try to find an external file to load
-            let (name, path) = self.externals.fetch_external(name)?;
-            if self.get_by_path(&path).is_err() {
-                Err(EvalError::SymbolMustBeLoaded(name, path))
-            } else {
-                Err(EvalError::SymbolNotFound(name))
+            match self.externals.fetch_external(name) {
+                Ok((name, path)) => {
+                    if self.get_by_path(&path).is_err() {
+                        return Err(EvalError::SymbolMustBeLoaded(name, path));
+                    }
+                }
+                Err(EvalError::ExternalSymbolNotFound(_)) => (),
+                Err(err) => return Err(err),
             }
+            Err(EvalError::SymbolNotFound(name.clone()))
         }
     }
 
@@ -151,6 +155,8 @@ impl GetSourceByHash for SourceCache {
     fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
         if let Some(index) = self.by_hash.get(&hash) {
             Ok(self.source_files[*index].clone())
+        } else if hash == 0 {
+            Err(EvalError::NulHash)
         } else {
             Err(EvalError::UnknownHash(hash))
         }

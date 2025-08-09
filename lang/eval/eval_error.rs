@@ -148,6 +148,10 @@ pub enum EvalError {
     #[error("Could not find a file with hash {0}")]
     UnknownHash(u64),
 
+    /// Hash is zero
+    #[error("Hash is zero")]
+    NulHash,
+
     /// Unknown method.
     #[error("Unknown method `{0}`")]
     UnknownMethod(QualifiedName),

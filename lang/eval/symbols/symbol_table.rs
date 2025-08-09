@@ -81,14 +81,11 @@ impl SymbolTable {
             self.stack.fetch(id)
         } else {
             let (id, mut tail) = name.split_first();
-            if let Ok(local) = self.stack.fetch(&id) {
-                let mut alias = local.full_name();
-                alias.append(&mut tail);
-                log::trace!("Following alias {alias}");
-                self.lookup(&alias)
-            } else {
-                Err(EvalError::SymbolNotFound(name.clone()))
-            }
+            let local = self.stack.fetch(&id)?;
+            let mut alias = local.full_name();
+            alias.append(&mut tail);
+            log::trace!("Following alias {alias}");
+            self.lookup(&alias)
         };
 
         match symbol {
@@ -105,7 +102,8 @@ impl SymbolTable {
         log::trace!("looking up globally for '{name}'");
         let symbol = match self.globals.search(name) {
             Ok(symbol) => symbol.clone(),
-            _ => self.load_symbol(name)?,
+            Err(EvalError::SymbolNotFound(_)) => self.load_symbol(name)?,
+            err => return err,
         };
         log::debug!("global found '{name}' = '{}'", symbol.full_name());
         Ok(symbol)
@@ -114,15 +112,18 @@ impl SymbolTable {
     fn lookup_current(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         let name = &name.with_prefix(&self.stack.current_module_name());
         log::trace!("lookup current in for '{name}'");
-        if let Ok(symbol) = self.lookup_global(name) {
-            if symbol.full_name() == *name {
-                log::debug!(
-                    "lookup in current module found '{name}' = '{}'",
-                    symbol.full_name()
-                );
-                return self.follow_alias(symbol);
+        match self.lookup_global(name) {
+            Ok(symbol) => {
+                if symbol.full_name() == *name {
+                    log::debug!(
+                        "lookup in current module found '{name}' = '{}'",
+                        symbol.full_name()
+                    );
+                    return self.follow_alias(symbol);
+                }
             }
-        }
+            err => return err,
+        };
         Err(EvalError::SymbolNotFound(name.clone()))
     }
 
@@ -133,17 +134,15 @@ impl SymbolTable {
     /// Returns found symbol or error if `name` does not have a *source code reference* or symbol could not be found.
     fn lookup_relatively(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         if name.src_ref().is_some() {
-            if let Ok(module) = self.cache.get_name_by_hash(name.src_ref().source_hash()) {
-                let name = &name.with_prefix(module);
-                log::trace!("lookup relatively for '{name}'");
-                if let Ok(symbol) = self.lookup_global(name) {
-                    log::debug!(
-                        "lookup relatively found '{name}' = '{}'",
-                        symbol.full_name()
-                    );
-                    return self.follow_alias(symbol);
-                }
-            }
+            let name =
+                &name.with_prefix(self.cache.get_name_by_hash(name.src_ref().source_hash())?);
+            log::trace!("lookup relatively for '{name}'");
+            let symbol = self.lookup_global(name)?;
+            log::debug!(
+                "lookup relatively found '{name}' = '{}'",
+                symbol.full_name()
+            );
+            return self.follow_alias(symbol);
         }
         Err(EvalError::SymbolNotFound(name.clone()))
     }
@@ -188,9 +187,10 @@ impl SymbolTable {
                 target.external_to_module();
             }
             Ok(_) => (),
-            _ => {
-                return Err(EvalError::SymbolNotFound(name.clone()));
+            Err(EvalError::SymbolNotFound(_)) => {
+                return Err(EvalError::SymbolNotFound(name.clone()))
             }
+            Err(err) => return Err(err),
         }
 
         // get symbol from symbol map
@@ -229,6 +229,8 @@ impl Lookup for SymbolTable {
         ]
         .into_iter();
 
+        let mut errors = Vec::new();
+
         // collect ok-results and ambiguity errors
         let (found, mut ambiguous) =
             result.fold((Vec::new(), Vec::new()), |(mut oks, mut ambiguity), r| {
@@ -237,11 +239,24 @@ impl Lookup for SymbolTable {
                     Err(EvalError::AmbiguousSymbol { ambiguous, others }) => {
                         ambiguity.push(EvalError::AmbiguousSymbol { ambiguous, others })
                     }
-
-                    Err(_) => (),
+                    Err(
+                        EvalError::SymbolNotFound(_)
+                        | EvalError::LocalNotFound(_)
+                        | EvalError::ExternalPathNotFound(_)
+                        | EvalError::NulHash,
+                    ) => (),
+                    Err(err) => errors.push(err),
                 }
                 (oks, ambiguity)
             });
+
+        // log any unexpected errors and return early
+        if !errors.is_empty() {
+            errors
+                .iter()
+                .for_each(|err| log::error!("lookup error: {err}"));
+            return Err(errors.remove(0));
+        }
 
         // early emit any ambiguity error
         if !ambiguous.is_empty() {
