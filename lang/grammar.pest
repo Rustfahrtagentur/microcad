@@ -25,22 +25,21 @@ alpha       = _{ alpha_lower | alpha_upper }
 digit       = _{ '0'..'9' }
 
 COMMENT = {
-    doc_comment
-  | single_line_comment
+  single_line_comment
   | multi_line_comment
 }
 
 // `// ok`: ok
 // `/ err` error
-single_line_comment = ${ "//" ~ (!"\n" ~ ANY)* }
+single_line_comment = ${ "//" ~ !"/" ~ (!"\n" ~ ANY)* }
 
 // Documentation comments for µcad language
 // `/// ok`: ok
 // `// err` error
-doc_comment = { "///" ~ (!"\n" ~ ANY)* }
+doc_comment = ${ "///" ~ (!"\n" ~ ANY)* }
 
 // `/* ok */`: ok
-multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
+multi_line_comment = { "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
 identifier_part = { alpha | "_" }
 identifier_body = { (alpha | "_") ~ (alpha | digit | "_")* }
@@ -413,6 +412,9 @@ return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 // `if a > 5.0mm { return 5.0mm; } else { return 4.0mm; }`: ok
 if_statement = { "if" ~ ws* ~ expression ~ ws* ~ body ~ (ws* ~ "else" ~ ws* ~ (body | if_statement))? }
 
+// Documentation block.
+doc_block = { (doc_comment ~ ws+)+ }
+
 workbench_kind = { "sketch" | "part" | "op" }
 
 // `part foo() { }`: ok # Part with no properties
@@ -427,7 +429,7 @@ workbench_kind = { "sketch" | "part" | "op" }
 // `sketch foo() { }`: ok # Sketch with no properties
 // `op foo() { }`: ok # Sketch with no properties
 // `pub sketch foo() { }`: ok # public sketch
-workbench_definition = { (attribute_list ~ ws+)? ~ (visibility ~ ws+)? ~ workbench_kind ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
+workbench_definition = { doc_block? ~ (attribute_list ~ ws+)? ~ (visibility ~ ws+)? ~ workbench_kind ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
 // `{ translate() rotate(); }`: ok
 // `{}`: ok # Empty body
@@ -436,7 +438,7 @@ body = { "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
 // `init(d: Length) { r = d / 2; }`: ok
 // `init(size: Length) { size = size; }`: ok
 // `init(size: Length) { rectangle(size); }: ok
-init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ body }
+init_definition = { doc_block? ~ "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 
 // `mod math { }`: ok # module
 // `mod math { fn pi() -> Scalar { return 3.14159; } }`: ok # module with function
@@ -453,6 +455,7 @@ statement = {
   | inner_attribute_statement
   | assignment_statement
   | expression_statement
+  | doc_block
 }
 
 statement_list = { (statement ~ ws*)* ~ final_expression_statement? }

@@ -37,15 +37,17 @@ impl std::fmt::Display for WorkbenchKind {
 /// Workbench definition
 #[derive(Clone, Debug)]
 pub struct WorkbenchDefinition {
-    /// visibility from outside modules
-    pub visibility: Visibility,
+    /// Documentation.
+    pub doc: DocBlock,
     /// Workbench attributes.
     pub attribute_list: AttributeList,
-    /// Workbench kind
+    /// Visibility from outside modules.
+    pub visibility: Visibility,
+    /// Workbench kind.
     pub kind: WorkbenchKind,
     /// Workbench name.
     pub id: Identifier,
-    /// Workbench's building plan
+    /// Workbench's building plan.
     pub plan: ParameterList,
     /// Workbench body
     pub body: Body,
@@ -96,7 +98,9 @@ impl PrintSyntax for WorkbenchDefinition {
             kind = self.kind,
             id = self.id
         )?;
-        self.plan.print_syntax(f, depth + Self::INDENT)?;
-        self.body.print_syntax(f, depth + Self::INDENT)
+        let depth = depth + Self::INDENT;
+        self.doc.print_syntax(f, depth)?;
+        self.plan.print_syntax(f, depth)?;
+        self.body.print_syntax(f, depth)
     }
 }
