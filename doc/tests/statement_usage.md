@@ -34,7 +34,7 @@ fn f() {} f();
 [![test](.test/source_init.svg)](.test/source_init.log)
 
 ```µcad,source_init#fail
-init() {}
+init() {} // error
 ```
 
 [![test](.test/source_use.svg)](.test/source_use.log)
@@ -52,7 +52,7 @@ pub use std;
 [![test](.test/source_return.svg)](.test/source_return.log)
 
 ```µcad,source_return#fail
-return 1;
+return 1;  // error
 ```
 
 [![test](.test/source_if.svg)](.test/source_if.log)
@@ -76,7 +76,7 @@ a = 1;
 [![test](.test/source_assignment_prop.svg)](.test/source_assignment_prop.log)
 
 ```µcad,source_assignment_prop#fail
-prop a = 1;
+prop a = 1;  // error
 ```
 
 [![test](.test/source_expression.svg)](.test/source_expression.log)
@@ -121,7 +121,7 @@ mod k {
 
 ```µcad,module_init#fail
 mod k {
-  init() { }
+  init() { }  // error
 }
 ```
 
@@ -145,7 +145,7 @@ mod k {
 
 ```µcad,module_return#fail
 mod k {
-  return 1;
+  return 1;  // error
 }
 ```
 
@@ -153,7 +153,7 @@ mod k {
 
 ```µcad,module_if#fail
 mod k {
-  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }  // error
 }
 ```
 
@@ -169,7 +169,7 @@ mod k {
 
 ```µcad,module_assignment_var#fail
 mod k {
-  a = 1;
+  a = 1; // error
 }
 ```
 
@@ -177,7 +177,7 @@ mod k {
 
 ```µcad,module_assignment_prop#fail
 mod k {
-  prop a = 1;
+  prop a = 1;  // error
 }
 ```
 
@@ -185,7 +185,7 @@ mod k {
 
 ```µcad,module_expression#fail
 mod k {
-  1 + 2;
+  1 + 2; // error
 }
 ```
 
@@ -193,7 +193,7 @@ mod k {
 
 ```µcad,module_expression_model#fail
 mod k {
-  __builtin::geo2d::circle(radius=1);
+  __builtin::geo2d::circle(radius=1); // error
 }
 ```
 
@@ -203,7 +203,7 @@ mod k {
 
 ```µcad,pre_init_workbench#fail
 sketch k() { 
-  sketch f() {} f();
+  sketch f() {} f();  // error
 init(l:Length) {} } k();
 ```
 
@@ -211,7 +211,7 @@ init(l:Length) {} } k();
 
 ```µcad,pre_init_module#fail
 sketch k() { 
-  mod m {}
+  mod m {}   // error
 init(l:Length) {} } k();
 ```
 
@@ -219,7 +219,7 @@ init(l:Length) {} } k();
 
 ```µcad,pre_init_function#fail
 sketch k() { 
-  fn f() {} f();
+  fn f() {} f();   // error
 init(l:Length) {} } k();
 ```
 
@@ -251,7 +251,7 @@ init(l:Length) {} } k();
 
 ```µcad,pre_init_return#fail
 sketch k() { 
-  return 1;
+  return 1; // error
 init(l:Length) {} } k();
 ```
 
@@ -259,7 +259,7 @@ init(l:Length) {} } k();
 
 ```µcad,pre_init_if#fail
 sketch k() { 
-  if std::math::PI == 3 { }
+  if std::math::PI == 3 { } // error
 init(l:Length) {} } k();
 ```
 
@@ -275,7 +275,7 @@ init(l:Length) {} } k();
 
 ```µcad,pre_init_assignment_var#fail
 sketch k() { 
-  a = 1;
+  a = 1; // error
 init(l:Length) {} } k();
 ```
 
@@ -283,7 +283,7 @@ init(l:Length) {} } k();
 
 ```µcad,pre_init_assignment_prop#fail
 sketch k() { 
-  prop a = 1;
+  prop a = 1; // error
 init(l:Length) {} } k();
 ```
 
@@ -291,7 +291,7 @@ init(l:Length) {} } k();
 
 ```µcad,pre_init_expression#fail
 sketch k() { 
-  1 + 2;
+  1 + 2; // error
 init(l:Length) {} } k();
 ```
 
@@ -299,7 +299,7 @@ init(l:Length) {} } k();
 
 ```µcad,pre_init_expression_model#fail
 sketch k() { 
-  __builtin::geo2d::circle(radius=1);
+  __builtin::geo2d::circle(radius=1); // error
 init(l:Length) {} }
 ```
 
@@ -309,7 +309,7 @@ init(l:Length) {} }
 
 ```µcad,init_workbench#fail
 sketch k() { init(l:Length) {
-  sketch f() {}
+  sketch f() {} // error
 } } k(1cm);
 ```
 
@@ -317,7 +317,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_module#fail
 sketch k() { init(l:Length) {
-  mod m {}
+  mod m {} // error
 } } k(1cm);
 ```
 
@@ -325,7 +325,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_function#fail
 sketch k() { init(l:Length) {
-  fn f() {}
+  fn f() {} // error
 } } k(1cm);
 ```
 
@@ -333,7 +333,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_init#fail
 sketch k() { init(l:Length) {
-  init() {}
+  init() {} // error
 } } k(1cm);
 ```
 
@@ -349,7 +349,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_pub_use#todo_fail
 sketch k() { init(l:Length) {
-  pub use std;
+  pub use std; // error
 } } k(1cm);
 ```
 
@@ -357,7 +357,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_return#fail
 sketch k() { init(l:Length) {
-  return 1;
+  return 1; // error
 } } k(1cm);
 ```
 
@@ -365,7 +365,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_if#fail
 sketch k() { init(l:Length) {
-  if std::math::PI == 3 { }
+  if std::math::PI == 3 { } // error
 } } k(1cm);
 ```
 
@@ -373,7 +373,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_assignment_const#fail
 sketch k() { init(l:Length) {
-  const B = 1;
+  const B = 1; // error
 } } k(1cm);
 ```
 
@@ -389,7 +389,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_assignment_prop#fail
 sketch k() { init(l:Length) {
-  prop a = 1;
+  prop a = 1; // error
 } } k(1cm);
 ```
 
@@ -397,7 +397,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_expression#fail
 sketch k() { init(l:Length) {
-  1 + 2;
+  1 + 2; // error
 } } k(1cm);
 ```
 
@@ -405,7 +405,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_expression_model#fail
 sketch k() { init(l:Length) {
-  __builtin::geo2d::circle(radius=1);
+  __builtin::geo2d::circle(radius=1); // error
 } } k(1cm);
 ```
 
@@ -415,7 +415,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,workbench_workbench#fail
 sketch k() {
-  sketch f() {} f();
+  sketch f() {} f(); // error
 } k();
 ```
 
@@ -423,7 +423,7 @@ sketch k() {
 
 ```µcad,workbench_module#fail
 sketch k() {
-  mod m {}
+  mod m {} // error
 } k();
 ```
 
@@ -431,7 +431,7 @@ sketch k() {
 
 ```µcad,workbench_function#fail
 sketch k() {
-  fn f() {} f();
+  fn f() {} f(); // error
 } k();
 ```
 
@@ -455,7 +455,7 @@ sketch k() {
 
 ```µcad,workbench_pub_use#todo_fail
 sketch k() {
-  pub use std;
+  pub use std; // error
 } k();
 ```
 
@@ -463,7 +463,7 @@ sketch k() {
 
 ```µcad,workbench_return#fail
 sketch k() {
-  return 1;
+  return 1; // error
 } k();
 ```
 
@@ -529,7 +529,7 @@ sketch k() {
 
 ```µcad,body_workbench#fail
 {
-  sketch f() {} f();
+  sketch f() {} f(); // error
 }
 ```
 
@@ -537,7 +537,7 @@ sketch k() {
 
 ```µcad,body_module#fail
 {
-  mod m {}
+  mod m {} // error
 }
 ```
 
@@ -545,7 +545,7 @@ sketch k() {
 
 ```µcad,body_function#fail
 {
-  fn f() {} f();
+  fn f() {} f(); // error
 }
 ```
 
@@ -553,7 +553,7 @@ sketch k() {
 
 ```µcad,body_init#fail
 {
-  init() {}
+  init() {} // error
 }
 ```
 
@@ -569,7 +569,7 @@ sketch k() {
 
 ```µcad,body_pub_use#todo_fail
 {
-  pub use std;
+  pub use std; // error
 }
 ```
 
@@ -577,7 +577,7 @@ sketch k() {
 
 ```µcad,body_return#fail
 {
-  return 1;
+  return 1; // error
 }
 ```
 
@@ -601,7 +601,7 @@ sketch k() {
 
 ```µcad,body_assignment_const#fail
 {
-  const B = 1;
+  const B = 1; // error
 }
 ```
 
@@ -617,7 +617,7 @@ sketch k() {
 
 ```µcad,body_assignment_prop#fail
 {
-  prop a = 1;
+  prop a = 1; // error
 }
 ```
 
@@ -643,7 +643,7 @@ sketch k() {
 
 ```µcad,function_workbench#fail
 fn f() {
-  sketch s() {}
+  sketch s() {} // error
 } f();
 ```
 
@@ -651,7 +651,7 @@ fn f() {
 
 ```µcad,function_module#fail
 fn f() {
-  mod m {}
+  mod m {} // error
 } f();
 ```
 
@@ -659,7 +659,7 @@ fn f() {
 
 ```µcad,function_function#fail
 fn f() {
-  fn f() {}
+  fn f() {} // error
 } f();
 ```
 
@@ -667,7 +667,7 @@ fn f() {
 
 ```µcad,function_init#fail
 fn f() {
-  init() {}
+  init() {} // error
 } f();
 ```
 
@@ -723,7 +723,7 @@ fn f() {
 
 ```µcad,function_assignment_prop#fail
 fn f() {
-  prop a = 1;
+  prop a = 1; // error
 } f();
 ```
 

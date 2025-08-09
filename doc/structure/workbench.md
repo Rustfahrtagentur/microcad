@@ -112,6 +112,7 @@ One may define multiple initializers which must have different parameter lists.
 ```µcad,initializers#todo_fail
 sketch wheel(radius: Length) {
     init( radius: Length ) {} // error: same parameters as in building plan
+    std::geo2d::circle(1mm);
 }
 
 wheel(radius = 1.0mm);
@@ -150,10 +151,8 @@ you will get an error:
 [![test](.test/missed_property.svg)](.test/missed_property.log)
 
 ```µcad,missed_property#fail
-sketch wheel(radius: Length) {
-    init( width: Length ) { 
-        // evaluation error: misses to set `radius` from building plan
-    }
+sketch wheel(radius: Length) { // warning (no output)
+    init( width: Length ) { } // error: misses to set `radius` from building plan
 }
 
 wheel(width = 1.0mm);
@@ -252,7 +251,8 @@ It's **not allowed** to use the `sketch`, `part`, `op`, `return` nor `mod` state
 
 ```µcad,illegal_workbench_statement#fail
 sketch wheel(radius: Length) {
-    sketch axis(length: Length) {}
+    sketch axis(length: Length) {}  // error
+    std::geo2d::circle(radius);
 }
 
 wheel(radius = 1.0mm);
@@ -310,6 +310,6 @@ t = wheel(outer = 1cm);
 
 // you can still extract and display `outer`
 std::print("outer: {t.outer}");
-// error: but you cannot access `inner` anymore
-std::print("inner: {t.inner}");
+// but you cannot access `inner` anymore
+std::print("inner: {t.inner}"); // error
 ```

@@ -211,6 +211,14 @@ impl Diag for Context {
     fn error_count(&self) -> u32 {
         self.diag_handler.error_count()
     }
+
+    fn error_lines(&self) -> std::collections::HashSet<usize> {
+        self.diag_handler.error_lines()
+    }
+
+    fn warning_lines(&self) -> std::collections::HashSet<usize> {
+        self.diag_handler.warning_lines()
+    }
 }
 
 impl UseSymbol for Context {

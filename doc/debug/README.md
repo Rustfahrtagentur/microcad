@@ -19,7 +19,7 @@ std::debug::assert(true, "You won't see this message");
 [![test](.test/verify_assert_fail.svg)](.test/verify_assert_fail.log)
 
 ```µcad,verify_assert_fail#fail
-std::debug::assert(false, "this assertion fails");
+std::debug::assert(false, "this assertion fails"); // error
 ```
 
 ## Error
@@ -27,7 +27,7 @@ std::debug::assert(false, "this assertion fails");
 [![test](.test/verify_error.svg)](.test/verify_error.log)
 
 ```µcad,verify_error#fail
-std::log::error("this should not have happened");
+std::log::error("this should not have happened"); // error
 ```
 
 ## Todo

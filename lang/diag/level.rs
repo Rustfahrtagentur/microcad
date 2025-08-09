@@ -4,7 +4,7 @@
 /// The level of the diagnostic.
 ///
 /// Levels have a priority in order.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Level {
     /// Trace message (highest diagnosis level).
     Trace,

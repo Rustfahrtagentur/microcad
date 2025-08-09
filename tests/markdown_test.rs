@@ -6,6 +6,19 @@ use std::rc::Rc;
 use microcad_core::RenderResolution;
 use microcad_export::{stl::StlExporter, svg::SvgExporter};
 
+fn lines_with(code: &str, marker: &str) -> std::collections::HashSet<usize> {
+    code.lines()
+        .enumerate()
+        .filter_map(|line| {
+            if line.1.contains(marker) {
+                Some(line.0 + 1)
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
 #[allow(dead_code)]
 pub fn run_test(
     name: &str,
@@ -56,7 +69,11 @@ pub fn run_test(
                 writeln!(log_out).expect("output error");
                 let _ = fs::remove_file(banner);
                 let _ = fs::hard_link("images/fail_ok.svg", banner);
-                writeln!(log_out, "-- Test Result --\nFAILED AS EXPECTED").expect("output error");
+                writeln!(
+                    log_out,
+                    "-- Test Result --\nFAILED AS EXPECTED (PARSE: Cannot check error line)"
+                )
+                .expect("output error");
                 log::debug!("{err}")
             }
             // test expected to fail succeeded at parsing?
@@ -80,6 +97,23 @@ pub fn run_test(
                 // print any error
                 writeln!(log_out, "-- Errors --").expect("internal error");
                 context.write_diagnosis(log_out).expect("internal error");
+
+                if context.has_errors()
+                    && (lines_with(code, "// error") != context.error_lines()
+                        || lines_with(code, "// warning")
+                            .iter()
+                            .any(|l| !context.warning_lines().contains(l)))
+                {
+                    if todo {
+                        let _ = fs::hard_link("images/todo_fail.svg", banner);
+                        writeln!(log_out, "-- Test Result --\nFAIL(TODO)").expect("output error");
+                    } else {
+                        let _ = fs::hard_link("images/fail_wrong.svg", banner);
+                        writeln!(log_out, "-- Test Result --\nFAILED BUT WITH WRONG ERRORS")
+                            .expect("output error");
+                        panic!("ERROR: test is marked to fail but fails with wrong errors");
+                    }
+                }
 
                 let _ = fs::remove_file(banner);
 
