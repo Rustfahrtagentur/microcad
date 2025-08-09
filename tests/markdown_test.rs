@@ -46,7 +46,7 @@ pub fn run_test(
 
     match mode {
         // test is expected to fail?
-        "fail" => match source_file_result {
+        "fail" | "todo_fail" => match source_file_result {
             // test expected to fail failed at parsing?
             Err(err) => {
                 writeln!(log_out, "-- Parse Error --").expect("output error");
@@ -84,16 +84,16 @@ pub fn run_test(
                 let _ = fs::remove_file(banner);
 
                 // check if test expected to fail failed at evaluation
-                match (eval, context.has_errors()) {
+                match (eval, context.has_errors(), todo) {
                     // evaluation had been aborted?
-                    (Err(err), _) => {
+                    (Err(err), _, false) => {
                         let _ = fs::hard_link("images/fail_ok.svg", banner);
                         writeln!(log_out, "-- Test Result --\nFAILED AS EXPECTED")
                             .expect("output error");
                         log::debug!("{err}");
                     }
                     // evaluation produced errors?
-                    (_, true) => {
+                    (_, true, false) => {
                         let _ = fs::hard_link("images/fail_ok.svg", banner);
                         writeln!(log_out, "-- Test Result --\nFAILED AS EXPECTED")
                             .expect("output error");
@@ -102,8 +102,19 @@ pub fn run_test(
                             error_count = context.error_count()
                         );
                     }
+                    // test fails as expected but is todo
+                    (Err(_), _, true) | (_, true, true) => {
+                        let _ = fs::hard_link("images/not_todo_fail.svg", banner);
+                        writeln!(log_out, "-- Test Result --\nFAILED AS EXPECTED BUT IS TODO")
+                            .expect("output error");
+                    }
+                    // test expected to fail but succeeds and is todo to fail?
+                    (_, _, true) => {
+                        let _ = fs::hard_link("images/todo_fail.svg", banner);
+                        writeln!(log_out, "-- Test Result --\nFAIL(TODO)").expect("output error");
+                    }
                     // test expected to fail but succeeds?
-                    (_, _) => {
+                    (_, _, false) => {
                         let _ = fs::hard_link("images/ok_fail.svg", banner);
                         writeln!(log_out, "-- Test Result --\nOK BUT SHOULD FAIL")
                             .expect("output error");
