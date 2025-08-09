@@ -6,39 +6,13 @@ use crate::{parse::*, parser::*};
 /// Short cut to create a `ParameterList` instance
 impl Parse for Parameter {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        let mut name = Identifier::default();
-        let mut specified_type = None;
-        let mut default_value = None;
-
-        for pair in pair.inner() {
-            match pair.as_rule() {
-                Rule::identifier => {
-                    name = Identifier::parse(pair)?;
-                }
-                Rule::r#type => {
-                    specified_type = Some(TypeAnnotation::parse(pair)?);
-                }
-                Rule::expression => {
-                    default_value = Some(Expression::parse(pair)?);
-                }
-                rule => {
-                    unreachable!(
-                        "Unexpected token in parameter: {:?} {:?}",
-                        rule,
-                        pair.as_span().as_str()
-                    );
-                }
-            }
-        }
-
-        if specified_type.is_none() && default_value.is_none() {
-            return Err(ParseError::ParameterMissingTypeOrValue(name.clone()));
-        }
-
+        Parser::ensure_rule(&pair, Rule::parameter);
         Ok(Self {
-            id: name,
-            specified_type,
-            default_value,
+            id: pair.find(Rule::identifier).expect("Identifier"),
+            specified_type: pair
+                .find(Rule::r#type)
+                .map(|ty| TypeAnnotation(Refer::new(ty, pair.src_ref()))),
+            default_value: pair.find(Rule::expression),
             src_ref: pair.into(),
         })
     }
@@ -50,9 +24,11 @@ impl Parse for ParameterList {
         let mut parameters = ParameterList::default();
 
         for pair in pair.inner() {
-            parameters
-                .try_push(Parameter::parse(pair)?)
-                .map_err(ParseError::DuplicateIdentifier)?;
+            if pair.as_rule() == Rule::parameter {
+                parameters
+                    .try_push(Parameter::parse(pair)?)
+                    .map_err(ParseError::DuplicateIdentifier)?;
+            }
         }
 
         Ok(parameters)
