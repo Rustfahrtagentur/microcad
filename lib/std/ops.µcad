@@ -16,13 +16,13 @@ op extrude(height: Length) {
 }
 
 op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
-    @children.__builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm);
+	@children.__builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm);
 }
 
 /// A transformer that rotates a part.
 ///
 /// See the `init`s for examples on how to use this transformer. 
-op rotate(matrix: Mat3) {
+op rotate(matrix: Matrix3) {
 	/// Rotate around an axis by an angle using a 3D vector.
 	/// 
 	/// The `axis` vector will be normalized. 
