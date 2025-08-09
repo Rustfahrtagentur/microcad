@@ -198,17 +198,14 @@ impl Parse for Expression {
                 match (Pair::new(op.clone(), pair.source_hash()), op.as_rule()) {
                     (op, Rule::array_element_access) => Ok(Self::ArrayElementAccess(
                         Box::new(lhs?),
-                        Box::new(Self::parse(op)?),
+                        Box::new(op.find(Rule::expression).expect("Expression")),
                         pair.clone().into(),
                     )),
-                    (op, Rule::attribute_access) => {
-                        let op = op.inner().next().expect(INTERNAL_PARSE_ERROR);
-                        Ok(Self::AttributeAccess(
-                            Box::new(lhs?),
-                            Identifier::parse(op)?,
-                            pair.clone().into(),
-                        ))
-                    }
+                    (op, Rule::attribute_access) => Ok(Self::AttributeAccess(
+                        Box::new(lhs?),
+                        op.find(Rule::identifier).expect("Identifier"),
+                        pair.clone().into(),
+                    )),
                     (op, Rule::tuple_element_access) => {
                         let op = op.inner().next().expect(INTERNAL_PARSE_ERROR);
                         match op.as_rule() {

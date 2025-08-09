@@ -232,7 +232,7 @@ impl Eval for Expression {
                             Ok(Value::None)
                         }
                     }
-                    _ => unimplemented!(),
+                    (lhs, rhs) => unimplemented!("{lhs}[{rhs}] not implemented"),
                 }
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
