@@ -32,8 +32,8 @@ op rotate(matrix: Mat3) {
 	///
 	/// Examples:
 	/// * `rect(42mm).rotate(45°);`: 2D rotation of a square by 45°.
-	/// * `rotate(45°, (x = 1, y = 1, z = 1)) cube(42mm);`: Rotates a cube by 45° around a diagonal axis.
-	/// * `rotate(30°, Y) cube(42mm);`: Rotates a cube by 30° around Y axis.
+	/// * `cube(42mm).rotate(45°, (x = 1, y = 1, z = 1));`: Rotates a cube by 45° around a diagonal axis.
+	/// * `cube(42mm).rotate(30°, Y);`: Rotates a cube by 30° around Y axis.
 	init(angle: Angle, axis = __builtin::math::Z) {
 		matrix = __builtin::math::rotate_around_axis(angle, x = axis.x, y = axis.y, z = axis.z);
 	}
@@ -45,7 +45,7 @@ op rotate(matrix: Mat3) {
 	/// * `z` - Z angle.
 	///
 	/// Examples:
-	/// * `rotate(45°, (1, 0, 0)) cube(42mm);`: Rotates a cylinder by 45° around X axis (unnamed tuple).
+	/// * `cube(42mm).rotate(x = 45°);`: Rotates a cylinder by 45° around X axis (unnamed tuple).
 	init(x = 0°, y = 0°, z = 0°) {
 		matrix = __builtin::math::rotate_xyz(x, y, z);		
 	}
@@ -57,21 +57,21 @@ op rotate(matrix: Mat3) {
 	/// * `yaw` - Yaw angle, rotates around Z axis.
 	///
 	/// Example:
-	/// * `rotate(roll = 30°) cube(42mm)`: Rotates a cylinder by 45° around X axis.
+	/// * `cube(42mm).rotate(roll = 30°)`: Rotates a cylinder by 45° around X axis.
 	init(roll = 0°, pitch = 0°, yaw = 0°) {
 		matrix = __builtin::math::rotate_xyz(roll, pitch, yaw);
 	}
 	
 	/// Euler rotation around X, Y and Z axis (with a vector of angles)
 	///
-	/// * `rotate(xyz = (30°,20°,10°)) cube(42mm);`: Euler rotation for a cube around X, Y, Z axis.
+	/// * `cube(42mm).rotate(xyz = (30°,20°,10°))`: Euler rotation for a cube around X, Y, Z axis.
 	init(xyz = (x = 0°,y = 0°,z = 0°)) {
 		matrix = __builtin::math::rotate_xyz(xyz.x, xyz.y, xyz.z);
 	}
 	
 	/// Euler rotation around Z, Y and X axis (with a vector of angles)
 	///
-	/// * `rotate(zyx = (30°,20°,10°)) cube(42mm);`: Euler rotation for a cube around Z, Y, X axis.
+	/// * `cube(42mm).rotate(zyx = (30°,20°,10°))`: Euler rotation for a cube around Z, Y, X axis.
 	init(zyx = (x = 0°, y = 0°, z = 0°)) {
 		matrix = __builtin::math::rotate_zyx(zyx.z, zyx.y, zyx.x);
 	}
@@ -84,3 +84,4 @@ op rotate(matrix: Mat3) {
 op orient(v: Vec3) {
     @children.__builtin::ops::orient(x = v.x, y = v.y, z = v.z);
 }
+
