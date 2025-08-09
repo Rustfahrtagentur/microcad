@@ -145,9 +145,14 @@ type = {
     array_type
   | tuple_type
   | matrix_type
-  | qualified_name
+  | base_type
+  | quantity_type
   | unit
 }
+
+base_type = { "Integer" | "String" | "Bool" | "Models" }
+
+quantity_type = { "Scalar" | "Length" | "Area" | "Volume" | "Density" | "Angle" | "Weight" }
 
 type_annotation = _{ ":" ~ ws* ~ type }
 
@@ -157,7 +162,10 @@ array_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 
 // `(a: Length, b: scalar)`: ok
 // `(a: Length, )`: ok # Trailing comma
-tuple_type = { "(" ~ ws* ~ tuple_type_element ~ (ws* ~ "," ~ ws* ~ tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")" }
+tuple_type = {
+    ("(" ~ ws* ~ tuple_type_element ~ (ws* ~ "," ~ ws* ~ tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")")
+  | ("Color" | "Vec2" | "Vec3" | "Size2D")
+}
 
 // `a: Length`: ok
 tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
@@ -167,7 +175,7 @@ tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
 matrix_type = { "Matrix" ~ int ~ ("x" ~ int)? }
 
 range_start = { integer_literal | expression }
-range_end = { integer_literal | expression }
+range_end   = { integer_literal | expression }
 
 // `1..3`: ok
 range_expression = { range_start ~ ws* ~ ".." ~ ws* ~ range_end }

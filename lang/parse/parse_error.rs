@@ -140,6 +140,10 @@ pub enum ParseError {
     /// Element is not available
     #[error("Element is not available")]
     NotAvailable,
+
+    /// Unknown type
+    #[error("Unknown type: {0}")]
+    UnknownType(String),
 }
 
 /// Result with parse error

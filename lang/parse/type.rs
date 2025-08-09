@@ -8,28 +8,31 @@ impl Parse for Type {
         Parser::ensure_rule(&pair, Rule::r#type);
         let inner = pair.inner().next().expect("Expected type");
 
-        Ok(match inner.as_rule() {
-            Rule::array_type => {
-                Type::Array(Box::new(Type::parse(inner.inner().next().expect("Type"))?))
-            }
-            Rule::tuple_type => Type::Tuple(TupleType::parse(inner)?.into()),
-            Rule::matrix_type => Type::Matrix(MatrixType::parse(inner)?),
-            _ => match inner.as_str() {
+        match inner.as_rule() {
+            Rule::array_type => Ok(Type::Array(Box::new(Type::parse(
+                inner.inner().next().expect("Type"),
+            )?))),
+            Rule::tuple_type => Ok(Type::Tuple(TupleType::parse(inner)?.into())),
+            Rule::matrix_type => Ok(Type::Matrix(MatrixType::parse(inner)?)),
+            Rule::quantity_type => Ok(Type::Quantity(QuantityType::parse(inner)?)),
+            Rule::base_type => match inner.as_str() {
                 // Builtin types.
-                "Integer" => Type::Integer,
-                "Bool" => Type::Bool,
-                "String" => Type::String,
-                "Color" => Type::Tuple(TupleType::new_color().into()),
-                "Vec2" => Type::Tuple(TupleType::new_vec2().into()),
-                "Vec3" => Type::Tuple(TupleType::new_vec3().into()),
-                _ => Type::Quantity(QuantityType::parse(inner)?),
+                "Integer" => Ok(Type::Integer),
+                "Bool" => Ok(Type::Bool),
+                "String" => Ok(Type::String),
+                "Color" => Ok(Type::Tuple(TupleType::new_color().into())),
+                "Vec2" => Ok(Type::Tuple(TupleType::new_vec2().into())),
+                "Vec3" => Ok(Type::Tuple(TupleType::new_vec3().into())),
+                _ => Err(ParseError::UnknownType(inner.to_string())),
             },
-        })
+            _ => Err(ParseError::UnknownType(inner.to_string())),
+        }
     }
 }
 
 impl Parse for QuantityType {
     fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rule(&pair, Rule::quantity_type);
         Ok(match pair.as_str() {
             "Scalar" => QuantityType::Scalar,
             "Length" => QuantityType::Length,
@@ -45,7 +48,6 @@ impl Parse for QuantityType {
 
 impl Parse for TypeAnnotation {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rule(&pair, Rule::r#type);
         Ok(Self(Refer::new(Type::parse(pair.clone())?, pair.into())))
     }
 }
