@@ -12,6 +12,6 @@ Parser error:  --> 1:10
 1 | x: Length;         // error
   |          ^---
   |
-  = expected COMMENT
+  = expected single_line_comment
 -- Test Result --
 FAILED AS EXPECTED (PARSE: Cannot check error line)

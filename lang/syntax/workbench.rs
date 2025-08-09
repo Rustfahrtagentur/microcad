@@ -37,15 +37,17 @@ impl std::fmt::Display for WorkbenchKind {
 /// Workbench definition
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct WorkbenchDefinition {
-    /// visibility from outside modules
-    pub visibility: Visibility,
+    /// Documentation.
+    pub doc: DocBlock,
     /// Workbench attributes.
     pub attribute_list: AttributeList,
-    /// Workbench kind
+    /// Visibility from outside modules.
+    pub visibility: Visibility,
+    /// Workbench kind.
     pub kind: WorkbenchKind,
     /// Workbench name.
     pub id: Identifier,
-    /// Workbench's building plan
+    /// Workbench's building plan.
     pub plan: ParameterList,
     /// Workbench body
     pub body: Body,
@@ -97,6 +99,7 @@ impl TreeDisplay for WorkbenchDefinition {
             id = self.id
         )?;
         depth.indent();
+        self.doc.tree_print(f, depth)?;
         self.plan.tree_print(f, depth)?;
         self.body.tree_print(f, depth)
     }
