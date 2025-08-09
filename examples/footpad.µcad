@@ -1,0 +1,60 @@
+use std::ops::*;
+use std::geo2d::*;
+use std::math::*;
+
+part foot_pad(
+    height = 45mm,
+    base = (x = 155mm, y = 101mm, z = 18mm),
+    slot = (x = 8mm, y = 13mm),
+    center_hole = (inner_d = 42mm, outer_d = 55mm),
+    corner_hole = (lower_d = 14mm, upper_d = 22mm),
+    corner_radius = 15mm,
+) {
+    s = (x = base.x / 2 - corner_radius, y = base.y / 2 - corner_radius);
+    hole_pos = (x = [-s.x,s.x], y = [-s.y,s.y]);
+    r = corner_radius;
+    
+
+    base_lower = {
+        circle(r, c = hole_pos);
+    }
+    .hull()
+    .extrude(12mm);
+
+    base_upper_height = slot.x;
+    base_lower_height = base.z - base_upper_height;
+
+    base_upper = {
+        top_left = (x = -s.x, y = s.y);
+        top_right = (x = s.x, y = s.y);
+        bottom_left = (x = -s.x, y = -s.y);
+        bottom_right = (x = s.x, y = -s.y);
+        (circle(r, c = [top_left, bottom_right]).hull() | circle(r, c = [top_right, bottom_left]).hull());
+    }
+    .extrude(base_upper_height)
+    .translate(z = base_lower_height);
+    
+    center = {
+        (circle(d = center_hole.outer_d) - circle(d = center_hole.inner_d))
+            .extrude(height);
+        
+        rect(height = slot.x, width = center_hole.outer_d)
+            .extrude(slot.y)
+            .translate(z = height - slot.y);
+        
+    }.difference();
+
+    holes = {
+        circle(d = corner_hole.lower_d, c = hole_pos)
+            .extrude(height = base_lower_height);
+        circle(d = corner_hole.upper_d, c = hole_pos)
+            .extrude(height = base.z * 2)
+            .translate(z = base_lower_height);
+        circle(d = 42mm)
+            .extrude(height);
+    }.union();
+
+    base_lower | base_upper | center - holes;
+}
+
+foot_pad();
