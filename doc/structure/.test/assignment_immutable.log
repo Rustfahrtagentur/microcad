@@ -10,4 +10,4 @@ a = a * 2; // error: a already defined in this scope
 -- Output --
 -- Errors --
 -- Test Result --
-OK BUT IS TODO
+FAIL(TODO)

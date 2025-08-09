@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="87.311142"
+   width="79.068619"
    height="20"
    version="1.1"
    id="svg8"
@@ -12,7 +12,7 @@
      id="smooth"
      x2="0"
      y2="61.967735"
-     gradientTransform="scale(3.0031053,0.32274861)"
+     gradientTransform="scale(3.0983867,0.32274861)"
      x1="0"
      y1="0"
      gradientUnits="userSpaceOnUse">
@@ -39,17 +39,15 @@
   </mask>
   <g
      mask="url(#round)"
-     id="g5"
-     transform="scale(1.0317276,1)"
-     style="stroke-width:0.984504">
+     id="g5">
     <rect
-       width="49.773388"
+       width="38.887543"
        height="20"
-       x="34.852768"
+       x="40.181076"
        fill="#dfb317"
        id="rect9"
        y="0"
-       style="display:inline;fill:#88aa00;stroke-width:0.984505"
+       style="display:inline;fill:#44aa00;stroke-width:0.999996"
        ry="3" />
     <rect
        width="46.68108"
@@ -58,13 +56,13 @@
        id="rect3"
        x="0"
        y="0"
-       style="display:inline;stroke-width:0.984504" />
+       style="display:inline;stroke-width:1" />
     <rect
-       width="84.369133"
+       width="79.068619"
        height="20"
        fill="url(#smooth)"
        id="rect5"
-       style="display:inline;fill:url(#smooth);stroke-width:0.984504"
+       style="display:inline;fill:url(#smooth);stroke-width:0.999999"
        x="0"
        y="0" />
   </g>
@@ -74,8 +72,7 @@
      font-family="'DejaVu Sans', Verdana, Geneva, sans-serif"
      font-size="11px"
      text-rendering="geometricPrecision"
-     id="g8"
-     transform="translate(1.816229)">
+     id="g8">
     <text
        x="30.777098"
        y="15"
@@ -87,23 +84,19 @@
        y="14"
        id="text6">test</text>
     <text
-       x="66.050537"
+       x="62.770634"
        y="15"
        fill="#010101"
        fill-opacity="0.3"
-       id="text7"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11px;font-family:'DejaVu Sans', Verdana, Geneva, sans-serif;-inkscape-font-specification:'DejaVu Sans, Verdana, Geneva, sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#010101;fill-opacity:0.3"><tspan
-         id="tspan10"
-         x="66.050537"
-         y="15">TODO</tspan></text>
+       id="text7">OK</text>
     <text
-       x="66.050537"
+       x="62.770634"
        y="14"
-       id="text8">TODO</text>
+       id="text8">OK</text>
   </g>
   <g
      id="g20"
-     transform="matrix(0.25631065,0,0,0.25631065,-48.475706,-62.386852)"
+     transform="matrix(0.25631065,0,0,0.25631065,-50.291934,-62.386852)"
      style="stroke-width:14.7459">
     <path
        id="path1"
@@ -138,8 +131,4 @@
        d="m 224.74248,257.85814 v 11.27032 h 11.27413 a 11.270559,11.270559 0 0 0 11.20165,11.26978 h 0.0654 v -11.26978 -11.26924 -10e-4 z"
        id="path13" />
   </g>
-  <path
-     style="fill:#ff0000;stroke:#ff0000;stroke-width:3.202;stroke-dasharray:none;paint-order:markers fill stroke"
-     d="M 51.015475,16.868915 84.280557,4.131085"
-     id="path11" />
 </svg>

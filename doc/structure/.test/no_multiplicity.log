@@ -11,3 +11,7 @@ r.std::ops::translate(x = -4mm, y = 4mm);
 r.std::ops::translate(x = 4mm, y = -4mm);
 r.std::ops::translate(x = 4mm, y = 4mm);
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK

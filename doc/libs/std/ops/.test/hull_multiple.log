@@ -11,3 +11,7 @@ circle(r = 4mm)
     .translate(x = [-10, 10]mm, y = [-10, 10]mm)
     .hull();
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK

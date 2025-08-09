@@ -11,3 +11,7 @@ use std::*;
     geo2d::rect(size = 2mm);
 }.ops::difference();
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK

@@ -10,3 +10,19 @@ use std::geo3d::*;
 
 cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
 
+-- Output --
+-- Errors --
+error: Workbench orient cannot find initialization for those arguments
+  ---> <from_str>:5:37
+     |
+   5 | cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
+     |                                     ^^^^^^^
+     |
+warning: This expression statement did not produce any model
+  ---> <from_str>:5:1
+     |
+   5 | cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAIL

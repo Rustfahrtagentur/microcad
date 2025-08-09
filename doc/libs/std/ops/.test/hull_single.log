@@ -12,3 +12,7 @@ use std::ops::*;
     circle(10mm).translate(x =  0mm, y = 10mm);
 }.hull();
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK

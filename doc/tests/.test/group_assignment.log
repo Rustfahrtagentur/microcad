@@ -13,3 +13,7 @@ a = {
     circle(radius = 2mm); 
 };
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK

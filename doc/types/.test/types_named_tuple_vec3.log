@@ -10,5 +10,12 @@ std::debug::assert(v.x + v.y + v.z == 9.0);
 
 -- Output --
 -- Errors --
+error: Type mismatch for `v`: expected (), got Vec2
+  ---> <from_str>:1:1
+     |
+   1 | v: Vec3 = (x = 2.0, y = 3.0, z = 4.0);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Missing arguments: v
 -- Test Result --
-OK
+FAIL

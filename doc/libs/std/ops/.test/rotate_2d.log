@@ -6,3 +6,7 @@
 
 std::geo2d::rect(30mm).std::ops::rotate(45°);
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK

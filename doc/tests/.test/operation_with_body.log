@@ -11,3 +11,7 @@ use std::ops::translate;
     circle(radius = 5mm);
 }.translate(y=[-34mm/2 , 34mm/2]);
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK

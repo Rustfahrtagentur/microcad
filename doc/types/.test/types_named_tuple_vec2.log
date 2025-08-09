@@ -10,5 +10,12 @@ std::debug::assert(v.x + v.y == 5.0);
 
 -- Output --
 -- Errors --
+error: Type mismatch for `v`: expected (), got Vec2
+  ---> <from_str>:1:1
+     |
+   1 | v: Vec2 = (x = 2.0, y = 3.0);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Missing arguments: v
 -- Test Result --
-OK
+FAIL

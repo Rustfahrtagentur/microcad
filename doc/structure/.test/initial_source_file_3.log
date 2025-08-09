@@ -1,5 +1,5 @@
 -- Test --
-  initial_source_file_3D
+  initial_source_file_3
   ../doc/structure/source_files.md:32
 
 -- Code --
@@ -10,4 +10,4 @@ std::geo3d::sphere(radius = 1cm);
 -- Output --
 -- Errors --
 -- Test Result --
-OK BUT IS TODO
+OK

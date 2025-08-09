@@ -8,3 +8,7 @@ r = std::geo2d::rect(width = 2mm, height = 2mm);
 
 r.std::ops::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]);
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK

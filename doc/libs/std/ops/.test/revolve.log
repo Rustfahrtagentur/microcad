@@ -9,3 +9,7 @@ std::geo2d::circle(radius = 10mm)
     .std::ops::translate(x = 40mm)
     .std::ops::revolve(180°);
 
+-- Output --
+-- Errors --
+-- Test Result --
+OK

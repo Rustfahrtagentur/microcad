@@ -16,3 +16,13 @@ part csg_cube(size: Length) {
 
 csg_cube(50mm);
 
+-- Output --
+-- Errors --
+error: Workbench orient cannot find initialization for those arguments
+  ---> <from_str>:7:55
+     |
+   7 |     holes = cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
+     |                                                       ^^^^^^^
+     |
+-- Test Result --
+FAIL
