@@ -81,7 +81,7 @@ fn get_angle(args: &Tuple, axis: &str) -> cgmath::Rad<f64> {
             value,
             quantity_type: QuantityType::Angle,
         }) => cgmath::Rad::<f64>(*value),
-        _ => unreachable!(),
+        value => unreachable!("Not an angle: {value}"),
     }
 }
 
