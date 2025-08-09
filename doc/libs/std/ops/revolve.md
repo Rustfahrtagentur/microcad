@@ -2,7 +2,7 @@
 
 The revolve operation revolves a 2D geometry into a 3D geometry.
 
-[![test](.test/revolve.png)](.test/revolve.log)
+[![test](.test/revolve.svg)](.test/revolve.log)
 
 ```µcad,revolve
 // Construct half of a torus. 

@@ -19,7 +19,7 @@ a process known as *argument matching*.
 The following example demonstrates a call to function `f` with each argument
 specified by name:
 
-[![test](.test/argument_match_name.png)](.test/argument_match_name.log)
+[![test](.test/argument_match_name.svg)](.test/argument_match_name.log)
 
 ```µcad,argument_match_name
 fn f( x: Length, y: Length, z: Length ) {}
@@ -32,7 +32,7 @@ f(x = 1cm, y = 2cm, z = 3cm);
 It is possible to use nameless values if all the *parameter types* of a called
 function (or workbench) differ in their types.
 
-[![test](.test/argument_match_type.png)](.test/argument_match_type.log)
+[![test](.test/argument_match_type.svg)](.test/argument_match_type.log)
 
 ```µcad,argument_match_type
 fn f( a: Scalar, b: Length, c: Area ) {}
@@ -44,7 +44,7 @@ f(1.0, 2cm, 3cm²);
 
 You can mix both methods if some parameters cannot be identified by type alone.
 
-[![test](.test/argument_match_mix.png)](.test/argument_match_mix.log)
+[![test](.test/argument_match_mix.svg)](.test/argument_match_mix.log)
 
 ```µcad,argument_match_mix
 fn f( a: Scalar, b: Length, c: Length ) {}
@@ -58,7 +58,7 @@ The concept behind named tuple argument matching is to allow functions to accept
 subsets of parameters in a bundle.
 This makes it easy to pre-configure parts of arguments:
 
-[![test](.test/tuple_match.png)](.test/tuple_match.log)
+[![test](.test/tuple_match.svg)](.test/tuple_match.log)
 
 ```µcad,tuple_match#todo
 // Function with three parameters: x, y, and z
@@ -76,7 +76,7 @@ f( plane, z=9cm);
 
 The same function can be called in various ways using named tuples:
 
-[![test](.test/tuple_match_variants.png)](.test/tuple_match_variants.log)
+[![test](.test/tuple_match_variants.svg)](.test/tuple_match_variants.log)
 
 ```µcad,tuple_match_variants#todo
 fn f( x: Length, y: Length, z: Length ) {}
@@ -106,7 +106,7 @@ As you can see, the possibilities are endless.
 
 If you do not provide all parameters, you will get an error:
 
-[![test](.test/tuple_match_errors.png)](.test/tuple_match_errors.log)
+[![test](.test/tuple_match_errors.svg)](.test/tuple_match_errors.log)
 
 ```µcad,tuple_match_errors#fail
 fn f( x: Length, y: Length, z: Length ) {}
@@ -115,7 +115,7 @@ f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
 
 When you provide all parameters but some are redundant, you will get a warning:
 
-[![test](.test/tuple_match_warnings.png)](.test/tuple_match_warnings.log)
+[![test](.test/tuple_match_warnings.svg)](.test/tuple_match_warnings.log)
 
 ```µcad,tuple_match_warnings#fail
 fn f( x: Length, y: Length, z: Length ) {}
@@ -130,7 +130,7 @@ This is known as *argument multiplicity*. This way, we can intuitively express a
 
 The following example will produce 4 rectangles at different positions:
 
-[![test](.test/multiplicity_arrays.png)](.test/multiplicity_arrays.log)
+[![test](.test/multiplicity_arrays.svg)](.test/multiplicity_arrays.log)
 
 ```µcad,multiplicity_arrays
 r = std::geo2d::rect(width = 2mm, height = 2mm);
@@ -140,7 +140,7 @@ r.std::ops::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]);
 
 The example results in the following calls:
 
-[![test](.test/no_multiplicity.png)](.test/no_multiplicity.log)
+[![test](.test/no_multiplicity.svg)](.test/no_multiplicity.log)
 
 ```µcad,no_multiplicity
 r = std::geo2d::rect(width = 2mm, height = 2mm);
@@ -155,7 +155,7 @@ Normally, this would require 2 nested *for loops*, which are not available in µ
 
 Another example uses an array of tuples and produces the same output:
 
-[![test](.test/multiplicity_tuple_array.png)](.test/multiplicity_tuple_array.log)
+[![test](.test/multiplicity_tuple_array.svg)](.test/multiplicity_tuple_array.log)
 
 ```µcad,multiplicity_tuple_array#todo
 r = std::geo2d::rect(width = 2mm, height = 2mm);
@@ -169,7 +169,7 @@ Argument names can be skipped if the parameter expression is a single identifier
 Like in the following example, where the variables `width` and `height` have the
 exact same name as the parameters of `circle()`.
 
-[![test](.test/inline_identifiers.png)](.test/inline_identifiers.log)
+[![test](.test/inline_identifiers.svg)](.test/inline_identifiers.log)
 
 ```µcad,inline_identifiers
 width = 2mm;

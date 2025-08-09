@@ -11,7 +11,7 @@ Let's define a model node `c`.
 
 When viewed or exported, model node `c` will have a red color, because the `color` attribute will be set:
 
-[![test](.test/attributes_simple_example.png)](.test/attributes_simple_example.log)
+[![test](.test/attributes_simple_example.svg)](.test/attributes_simple_example.log)
 
 ```µcad,attributes_simple_example
 #[color = "#FF0000"]
@@ -36,7 +36,7 @@ The `color` attribute attaches a color to a model node.
 
 In viewer and when exported, the model will be drawn in the specified color.
 
-[![test](.test/attributes_color.png)](.test/attributes_color.log)
+[![test](.test/attributes_color.svg)](.test/attributes_color.log)
 
 ```µcad,attributes_color
 #[color = "#FFFFFF"]
@@ -51,7 +51,7 @@ The `resolution` attribute sets the rendering resolution of the model.
 The model will be rendered in with 200% resolution than the default resolution of `0.1mm`.
 This means the circle will be rendered with a resolution `0.05mm`.
 
-[![test](.test/attributes_precision.png)](.test/attributes_precision.log)
+[![test](.test/attributes_precision.svg)](.test/attributes_precision.log)
 
 ```µcad,attributes_precision
 #[resolution = 200%]
@@ -64,7 +64,7 @@ std::debug::assert_eq([c#resolution, 200%]);
 
 If you have created a part or a sketch and want to export it to a specific file, you can add an `export` command:
 
-[![test](.test/attributes_export.png)](.test/attributes_export.log)
+[![test](.test/attributes_export.svg)](.test/attributes_export.log)
 
 ```µcad,attributes_export
 #[export = "circle.svg"]
@@ -75,7 +75,7 @@ The exporter is detected automatically depending on the file extension.
 
 However, you can select a specific exporter using the tuple syntax:
 
-[![test](.test/attributes_export_svg.png)](.test/attributes_export_svg.log)
+[![test](.test/attributes_export_svg.svg)](.test/attributes_export_svg.log)
 
 ```µcad,attributes_export_svg
 #[export = svg("circle.svg")]
@@ -89,7 +89,7 @@ See [export](export.md) for more information.
 For certain nodes, you want to measure certain properties and display them.
 For example, you want to display the measure for the width and height of a circle:
 
-[![test](.test/attributes_export_measure.png)](.test/attributes_export_measure.log)
+[![test](.test/attributes_export_measure.svg)](.test/attributes_export_measure.log)
 
 ```µcad,attributes_export_measure
 #[measure = width, height]
@@ -117,7 +117,7 @@ The `svg` exporter has these parameters:
 * `style: String`: The SVG style, e.g. `style = "fill: skyblue;"`.
 * `fill: String`: The SVG fill option, e.g. `fill = "red"`.
 
-[![test](.test/attributes_export_example.png)](.test/attributes_export_example.log)
+[![test](.test/attributes_export_example.svg)](.test/attributes_export_example.log)
 
 ```µcad,attributes_export_example
 #[export = "circle.svg"]

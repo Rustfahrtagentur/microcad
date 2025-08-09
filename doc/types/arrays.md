@@ -6,7 +6,7 @@ Arrays are lists of values with a common type.
 
 Array support unit bundling, which means the you can write the unit after the `[]` brackets.
 
-[![test](.test/array_unit_bundling.png)](.test/array_unit_bundling.log)
+[![test](.test/array_unit_bundling.svg)](.test/array_unit_bundling.log)
 
 ```µcad,array_unit_bundling
 // without bundling

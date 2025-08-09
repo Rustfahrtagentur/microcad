@@ -18,7 +18,7 @@ If you create objects within this code a workbench will implicitly be created wh
 
 ### Example 2D Source File
 
-[![test](.test/initial_source_file_2D.png)](.test/initial_source_file_2D.log)
+[![test](.test/initial_source_file_2D.svg)](.test/initial_source_file_2D.log)
 
 ```µcad,initial_source_file_2D
 // simply draw a circle
@@ -27,7 +27,7 @@ std::geo2d::circle(radius = 1cm);
 
 ### Example 3D Source File
 
-[![test](.test/initial_source_file_3D.png)](.test/initial_source_file_3D.log)
+[![test](.test/initial_source_file_3D.svg)](.test/initial_source_file_3D.log)
 
 ```µcad,initial_source_file_3D#todo
 // simply draw a sphere
@@ -36,7 +36,7 @@ std::geo3d::sphere(radius = 1cm);
 
 Mixing both will lead to an error:
 
-[![test](.test/initial_source_file_mixed.png)](.test/initial_source_file_mixed.log)
+[![test](.test/initial_source_file_mixed.svg)](.test/initial_source_file_mixed.log)
 
 ```µcad,initial_source_file_mixed#fail
 std::geo2d::circle(radius = 1cm);

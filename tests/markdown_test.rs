@@ -32,7 +32,7 @@ pub fn run_test(
     let _ = fs::remove_file(banner);
     let _ = fs::remove_file(log_filename);
 
-    let _ = fs::hard_link("images/parse_fail.png", banner);
+    let _ = fs::hard_link("images/parse_fail.svg", banner);
 
     // create log file
     let log_out = &mut fs::File::create(log_filename).expect("cannot create log file");
@@ -55,7 +55,7 @@ pub fn run_test(
                     .expect("output error");
                 writeln!(log_out).expect("output error");
                 let _ = fs::remove_file(banner);
-                let _ = fs::hard_link("images/fail_ok.png", banner);
+                let _ = fs::hard_link("images/fail_ok.svg", banner);
                 writeln!(log_out, "-- Test Result --\nFAILED AS EXPECTED").expect("output error");
                 log::debug!("{err}")
             }
@@ -87,14 +87,14 @@ pub fn run_test(
                 match (eval, context.has_errors()) {
                     // evaluation had been aborted?
                     (Err(err), _) => {
-                        let _ = fs::hard_link("images/fail_ok.png", banner);
+                        let _ = fs::hard_link("images/fail_ok.svg", banner);
                         writeln!(log_out, "-- Test Result --\nFAILED AS EXPECTED")
                             .expect("output error");
                         log::debug!("{err}");
                     }
                     // evaluation produced errors?
                     (_, true) => {
-                        let _ = fs::hard_link("images/fail_ok.png", banner);
+                        let _ = fs::hard_link("images/fail_ok.svg", banner);
                         writeln!(log_out, "-- Test Result --\nFAILED AS EXPECTED")
                             .expect("output error");
                         log::debug!(
@@ -104,7 +104,7 @@ pub fn run_test(
                     }
                     // test expected to fail but succeeds?
                     (_, _) => {
-                        let _ = fs::hard_link("images/ok_fail.png", banner);
+                        let _ = fs::hard_link("images/ok_fail.svg", banner);
                         writeln!(log_out, "-- Test Result --\nOK BUT SHOULD FAIL")
                             .expect("output error");
                         panic!("ERROR: test is marked to fail but succeeded");
@@ -125,10 +125,10 @@ pub fn run_test(
                 writeln!(log_out).expect("output error");
 
                 if todo {
-                    let _ = fs::hard_link("images/todo.png", banner);
+                    let _ = fs::hard_link("images/todo.svg", banner);
                     writeln!(log_out, "-- Test Result --\nFAIL (TODO)").expect("output error");
                 } else {
-                    let _ = fs::hard_link("images/fail.png", banner);
+                    let _ = fs::hard_link("images/fail.svg", banner);
                     writeln!(log_out, "-- Test Result --\nFAIL").expect("output error");
                     panic!("ERROR: {err}")
                 }
@@ -163,7 +163,7 @@ pub fn run_test(
                     (Ok(model), false, false) => {
                         use microcad_lang::model::{ExportCommand as Export, OutputType};
 
-                        let _ = fs::hard_link("images/ok.png", banner);
+                        let _ = fs::hard_link("images/ok.svg", banner);
                         writeln!(log_out, "-- Test Result --\nOK").expect("output error");
                         match model.final_output_type() {
                             OutputType::Geometry2D => {
@@ -190,18 +190,18 @@ pub fn run_test(
                     }
                     // test is todo but succeeds with no errors
                     (Ok(_), false, true) => {
-                        let _ = fs::hard_link("images/not_todo.png", banner);
+                        let _ = fs::hard_link("images/not_todo.svg", banner);
                         writeln!(log_out, "-- Test Result --\nOK BUT IS TODO")
                             .expect("output error");
                     }
                     // Any error but todo
                     (_, _, true) => {
-                        let _ = fs::hard_link("images/todo.png", banner);
+                        let _ = fs::hard_link("images/todo.svg", banner);
                         writeln!(log_out, "-- Test Result --\nTODO").expect("output error");
                     }
                     // evaluation had been aborted?
                     (Err(err), _, _) => {
-                        let _ = fs::hard_link("images/fail.png", banner);
+                        let _ = fs::hard_link("images/fail.svg", banner);
                         log_out
                             .write_all(format!("{err}").as_bytes())
                             .expect("No output error");
@@ -210,7 +210,7 @@ pub fn run_test(
                     }
                     // evaluation produced errors?
                     (_, true, _) => {
-                        let _ = fs::hard_link("images/fail.png", banner);
+                        let _ = fs::hard_link("images/fail.svg", banner);
                         writeln!(log_out, "-- Test Result --\nFAIL").expect("output error");
                         panic!(
                             "ERROR: there were {error_count} errors (see {log_filename})",

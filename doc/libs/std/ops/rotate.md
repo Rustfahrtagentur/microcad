@@ -2,7 +2,7 @@
 
 We can rotate objects in 2D and 3D using `std::ops::rotate`:
 
-[![test](.test/rotate_2d.png)](.test/rotate_2d.log)
+[![test](.test/rotate_2d.svg)](.test/rotate_2d.log)
 
 ```µcad,rotate_2d
 std::geo2d::rect(30mm).std::ops::rotate(45°);
@@ -10,7 +10,7 @@ std::geo2d::rect(30mm).std::ops::rotate(45°);
 
 ## Rotations in 3D
 
-[![test](.test/rotate_3d.png)](.test/rotate_3d.log)
+[![test](.test/rotate_3d.svg)](.test/rotate_3d.log)
 
 ```µcad,rotate_3d
 cylinder = std::geo3d::cylinder(h = 50mm, d = 20mm);

@@ -35,12 +35,12 @@ fn main() -> std::io::Result<()> {
             if let Some(cap) = re_code_head.captures(replacement) {
                 result.push_str(&match (cap.get(1), cap.get(3)) {
                     (Some(name), Some(mode)) => format!(
-                        "[![test](.test/{name}.png)](.test/{name}.log)\n\n```µcad,{name}#{mode}",
+                        "[![test](.test/{name}.svg)](.test/{name}.log)\n\n```µcad,{name}#{mode}",
                         name = name.as_str(),
                         mode = mode.as_str()
                     ),
                     (Some(name), None) => format!(
-                        "[![test](.test/{name}.png)](.test/{name}.log)\n\n```µcad,{name}",
+                        "[![test](.test/{name}.svg)](.test/{name}.log)\n\n```µcad,{name}",
                         name = name.as_str(),
                     ),
                     _ => replacement.to_string(),

@@ -45,7 +45,7 @@ The following µcad source code defines a *part* called `csg_cube`, which has a 
 
 ![csg_cube](examples/csg_cube.png)
 
-[![test](.test/first_example.png)](.test/first_example.log)
+[![test](.test/first_example.svg)](.test/first_example.log)
 
 ```µcad,first_example
 use std::math::*;
@@ -162,23 +162,23 @@ beside the name you may add a test mode (see table below):
 ````
 
 The tests will create `.test` folders beside the *markdown* files.
-The tests will then copy an [image file (`*.png`)](https://github.com/Rustfahrtagentur/microcad/tree/master/tests/images) for every test which signals the test result into the `.test` folder.
+The tests will then copy an [image file (`*.svg`)](https://github.com/Rustfahrtagentur/microcad/tree/master/tests/images) for every test which signals the test result into the `.test` folder.
 They can be included in the *markdown*, if you use this code:
 
 ````md
-![test](.test/my_test.png)
+![test](.test/my_test.svg)
 ```µcad,my_test
 ````
 
 | Image                                      | MD Code Type | Mark       | Code                            | What do do?            |
 | ------------------------------------------ | ------------ | ---------- | ------------------------------- | ---------------------- |
-| ![ok](tests/images/ok.png)                 | `µcad`       |            | succeeds                        | ok                     |
-| ![fail](tests/images/fail.png)             | `µcad`       |            | fails                           | fix test or code       |
-| ![ok_fail](tests/images/ok_fail.png)       | `µcad`       | `#fail`    | succeeds but should fail        | find out why           |
-| ![fail_ok](tests/images/fail_ok.png)       | `µcad`       | `#fail`    | fails intentionally             | ok                     |
-| ![todo](tests/images/todo.png)             | `µcad`       | `#todo`    | needs more work to succeed      | create issue/implement |
-| ![not_todo](tests/images/not_todo.png)     | `µcad`       | `#todo`    | Succeeds but still marked to do | remove `#todo`         |
-| ![parse_fail](tests/images/parse_fail.png) | `µcad`       | -          | Parsing has failed              | fix grammar            |
+| ![ok](tests/images/ok.svg)                 | `µcad`       |            | succeeds                        | ok                     |
+| ![fail](tests/images/fail.svg)             | `µcad`       |            | fails                           | fix test or code       |
+| ![ok_fail](tests/images/ok_fail.svg)       | `µcad`       | `#fail`    | succeeds but should fail        | find out why           |
+| ![fail_ok](tests/images/fail_ok.svg)       | `µcad`       | `#fail`    | fails intentionally             | ok                     |
+| ![todo](tests/images/todo.svg)             | `µcad`       | `#todo`    | needs more work to succeed      | create issue/implement |
+| ![not_todo](tests/images/not_todo.svg)     | `µcad`       | `#todo`    | Succeeds but still marked to do | remove `#todo`         |
+| ![parse_fail](tests/images/parse_fail.svg) | `µcad`       | -          | Parsing has failed              | fix grammar            |
 | -                                          | `µcad`       | `#no-test` | Ignore completely               | yolo!                  |
 | -                                          | -            | -          | Ignore completely               | yolo!                  |
 | -                                          | *(other)*    | -          | Ignore completely               | yolo!                  |
@@ -186,7 +186,7 @@ They can be included in the *markdown*, if you use this code:
 You may also give the reader access to the logs by clicking on the banner with:
 
 ````md
-[![test](.test/my_test.png)](.test/my_test.log)
+[![test](.test/my_test.svg)](.test/my_test.log)
 ```µcad,my_test
 ````
 

@@ -2,7 +2,7 @@
 
 Orients an object along a specified axis:
 
-[![test](.test/orient_3d.png)](.test/orient_3d.log)
+[![test](.test/orient_3d.svg)](.test/orient_3d.log)
 
 ```µcad,orient_3d
 use std::math::*;
