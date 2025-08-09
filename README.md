@@ -28,6 +28,12 @@ Simple basic shapes can be composed to create complex geometries which then can 
   - [Install µcad locally from source](#install-µcad-locally-from-source)
   - [Contributing to Documentation](#contributing-to-documentation)
     - [User Manual](#user-manual)
+      - [Documentation driven tests](#documentation-driven-tests)
+      - [Test modes](#test-modes)
+      - [Accessing test logs](#accessing-test-logs)
+      - [Automatically update test banners](#automatically-update-test-banners)
+      - [Test results and marks](#test-results-and-marks)
+      - [Mark errors and warnings](#mark-errors-and-warnings)
 - [Test List](#test-list)
 - [💚 Funded by](#-funded-by)
 
@@ -147,13 +153,20 @@ cargo install --path tools/cli
 
 The user manual consists of several *markdown* files stored in the `/doc` folder, starting with the inside [`README.md`](doc/README.md).
 
- One may insert *µcad* code into the *markdown* files, which then will get tested automatically if you run `cargo test` and name them like:
+The user manual is the *point of truth* about what µcad is capable to do and what not.
+This *document driven* approach guarantees to test each proper marked (see below) code example and show the test result in a banner above the test.
+
+##### Documentation driven tests
+
+One may insert *µcad* code into the *markdown* files, which then will get tested automatically if you run `cargo test` and name them like:
 
 ````md
 ```µcad,my_test
 ````
 
 The *markdown* will be searched for any *µcad* code and appropriate *rust* tests will be  [generated](https://github.com/Rustfahrtagentur/microcad/tree/master/tests/microcad_markdown_test).
+
+##### Test modes
 
 beside the name you may add a test mode (see table below):
 
@@ -170,24 +183,52 @@ They can be included in the *markdown*, if you use this code:
 ```µcad,my_test
 ````
 
-| Image                                      | MD Code Type | Mark       | Code                            | What do do?            |
-| ------------------------------------------ | ------------ | ---------- | ------------------------------- | ---------------------- |
-| ![ok](tests/images/ok.svg)                 | `µcad`       |            | succeeds                        | ok                     |
-| ![fail](tests/images/fail.svg)             | `µcad`       |            | fails                           | fix test or code       |
-| ![ok_fail](tests/images/ok_fail.svg)       | `µcad`       | `#fail`    | succeeds but should fail        | find out why           |
-| ![fail_ok](tests/images/fail_ok.svg)       | `µcad`       | `#fail`    | fails intentionally             | ok                     |
-| ![todo](tests/images/todo.svg)             | `µcad`       | `#todo`    | needs more work to succeed      | create issue/implement |
-| ![not_todo](tests/images/not_todo.svg)     | `µcad`       | `#todo`    | Succeeds but still marked to do | remove `#todo`         |
-| ![parse_fail](tests/images/parse_fail.svg) | `µcad`       | -          | Parsing has failed              | fix grammar            |
-| -                                          | `µcad`       | `#no-test` | Ignore completely               | yolo!                  |
-| -                                          | -            | -          | Ignore completely               | yolo!                  |
-| -                                          | *(other)*    | -          | Ignore completely               | yolo!                  |
+##### Accessing test logs
 
 You may also give the reader access to the logs by clicking on the banner with:
 
 ````md
 [![test](.test/my_test.svg)](.test/my_test.log)
 ```µcad,my_test
+````
+
+##### Automatically update test banners
+
+There is a [script](https://github.com/Rustfahrtagentur/microcad/tree/master/update_md_banner.sh) which updates all banners automatically 
+
+##### Test results and marks
+
+| Image                                            | MD Code Type | Mark         | Code                                     | What do do?            |
+| ------------------------------------------------ | ------------ | ------------ | ---------------------------------------- | ---------------------- |
+| ![fail_ok](tests/images/fail_ok.svg)             | `µcad`       | `#fail`      | fails intentionally                      | ok                     |
+| ![fail_wrong](tests/images/fail_wrong.svg)       | `µcad`       | `#fail`      | fails but with wrong errors              | fix test or code       |
+| ![fail](tests/images/fail.svg)                   | `µcad`       |              | fails                                    | fix test or code       |
+| ![not_todo_fail](tests/images/not_todo_fail.svg) | `µcad`       | `#todo_fail` | Fails as expected but still marked to do | remove `#todo_`        |
+| ![not_todo](tests/images/not_todo.svg)           | `µcad`       | `#todo`      | Succeeds but still marked to do          | remove `#todo`         |
+| ![ok_fail](tests/images/ok_fail.svg)             | `µcad`       | `#fail`      | succeeds but should fail                 | find out why           |
+| ![ok](tests/images/ok.svg)                       | `µcad`       |              | succeeds                                 | ok                     |
+| ![parse_fail](tests/images/parse_fail.svg)       | `µcad`       | -            | Parsing has failed                       | fix grammar            |
+| ![todo_fail](tests/images/todo_fail.svg)         | `µcad`       | `#todo_fail` | needs more work to fail                  | create issue/implement |
+| ![todo](tests/images/todo.svg)                   | `µcad`       | `#todo`      | needs more work to succeed               | create issue/implement |
+| -                                                | `µcad`       | `#no-test`   | Ignore completely                        | yolo!                  |
+| -                                                | -            | -            | Ignore completely                        | yolo!                  |
+| -                                                | *(other)*    | -            | Ignore completely                        | yolo!                  |
+
+##### Mark errors and warnings
+
+Code lines which intentionally produce errors must be marked with `// error` to make the test succeed.
+Code lines which shall produce warnings can be marked with `// warning` to check if those warnings are happening.
+Any unmarked warnings will be ignored.
+
+In the following example a warning and an error are marked with comments:
+
+````md
+```µcad,missed_property#fail
+sketch wheel(radius: Length) { // warning (no output)
+    init( width: Length ) { } // error: misses to set `radius` from building plan
+}
+wheel(width = 1.0mm);
+```
 ````
 
 ## Test List
