@@ -127,9 +127,7 @@ impl Eval for QualifiedName {
                     sf.filename_as_str()
                 )
             }
-            SymbolDefinition::External(ns) => {
-                unreachable!("Unexpected unload source file {} in expression", ns.id)
-            }
+            SymbolDefinition::External(ns) => ns.eval(context),
             SymbolDefinition::UseAll(name) => {
                 unreachable!("Unexpected use {name} in expression")
             }
