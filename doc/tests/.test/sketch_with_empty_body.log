@@ -4,9 +4,9 @@
 
 -- Code --
 
-use std::geo2d::circle;
-
-{}.circle(radius = 5mm) // error: sketch with body
+ 1: use std::geo2d::circle;
+ 2: 
+ 3: {}.circle(radius = 5mm) // error: sketch with body
 
 -- Parse Error --
 Parser error:  --> 3:51

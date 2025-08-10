@@ -4,9 +4,9 @@
 
 -- Code --
 
-mod k {
-  prop a = 1;  // error
-}
+ 1: mod k {
+ 2:   prop a = 1;  // error
+ 3: }
 
 -- Output --
 -- Errors --

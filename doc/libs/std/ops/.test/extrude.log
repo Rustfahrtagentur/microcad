@@ -4,8 +4,8 @@
 
 -- Code --
 
-std::geo2d::circle(radius = 20mm)
-    .std::ops::extrude(height = 20mm);
+ 1: std::geo2d::circle(radius = 20mm)
+ 2:     .std::ops::extrude(height = 20mm);
 
 -- Output --
 -- Errors --

@@ -4,9 +4,9 @@
 
 -- Code --
 
-sketch k() { 
-  1 + 2; // error
-init(l:Length) {} } k();
+ 1: sketch k() { 
+ 2:   1 + 2; // error
+ 3: init(l:Length) {} } k();
 
 -- Parse Error --
 Statement not allowed prior initializers

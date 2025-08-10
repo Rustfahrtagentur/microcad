@@ -4,9 +4,9 @@
 
 -- Code --
 
-{
-  const B = 1; // error
-}
+ 1: {
+ 2:   const B = 1; // error
+ 3: }
 
 -- Output --
 -- Errors --

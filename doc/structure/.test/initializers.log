@@ -4,12 +4,12 @@
 
 -- Code --
 
-sketch wheel(radius: Length) {
-    init( radius: Length ) {} // error: same parameters as in building plan
-    std::geo2d::circle(1mm);
-}
-
-wheel(radius = 1.0mm);
+ 1: sketch wheel(radius: Length) {
+ 2:     init( radius: Length ) {} // error: same parameters as in building plan
+ 3:     std::geo2d::circle(1mm);
+ 4: }
+ 5: 
+ 6: wheel(radius = 1.0mm);
 
 -- Output --
 -- Errors --

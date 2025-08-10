@@ -4,9 +4,9 @@
 
 -- Code --
 
-zero = 0;
-pi =  3.1415;
-percent = 55%;
+ 1: zero = 0;
+ 2: pi =  3.1415;
+ 3: percent = 55%;
 
 -- Output --
 -- Errors --

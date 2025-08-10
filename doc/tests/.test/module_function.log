@@ -4,9 +4,9 @@
 
 -- Code --
 
-mod k {
-  fn f() {}
-}
+ 1: mod k {
+ 2:   fn f() {}
+ 3: }
 
 -- Output --
 -- Errors --

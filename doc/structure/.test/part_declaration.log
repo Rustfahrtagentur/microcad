@@ -4,45 +4,45 @@
 
 -- Code --
 
-// sketch with a `radius` as building plan
-sketch wheel(radius: Length) {
-
-    // init code
-    const FACTOR = 2;
-
-    // initializer
-    init(diameter: Length) {
-        // set `radius`
-        radius = diameter / FACTOR;
-    }
-
-    // function (sub routine)
-    fn into_diameter(radius: Length) {
-        return radius * FACTOR;
-    }
-
-    // building code begins
-
-    // set a property which can be seen from outside
-    prop diameter = into_diameter(radius);
-    // local variable
-    i = 1;
-    
-    // create circle
-    std::geo2d::circle(radius);
-}
-
-use std::debug::assert;
-
-// call sketch with diameter
-d = wheel(diameter = 2cm)
-// check radius
-assert_eq([d.radius, 1cm]);
-
-// call sketch with radius
-r = wheel(radius = 1cm)
-// check diameter
-assert([r.diameter, 2cm]);
+ 1: // sketch with a `radius` as building plan
+ 2: sketch wheel(radius: Length) {
+ 3: 
+ 4:     // init code
+ 5:     const FACTOR = 2;
+ 6: 
+ 7:     // initializer
+ 8:     init(diameter: Length) {
+ 9:         // set `radius`
+10:         radius = diameter / FACTOR;
+11:     }
+12: 
+13:     // function (sub routine)
+14:     fn into_diameter(radius: Length) {
+15:         return radius * FACTOR;
+16:     }
+17: 
+18:     // building code begins
+19: 
+20:     // set a property which can be seen from outside
+21:     prop diameter = into_diameter(radius);
+22:     // local variable
+23:     i = 1;
+24:     
+25:     // create circle
+26:     std::geo2d::circle(radius);
+27: }
+28: 
+29: use std::debug::assert;
+30: 
+31: // call sketch with diameter
+32: d = wheel(diameter = 2cm)
+33: // check radius
+34: assert_eq([d.radius, 1cm]);
+35: 
+36: // call sketch with radius
+37: r = wheel(radius = 1cm)
+38: // check diameter
+39: assert([r.diameter, 2cm]);
 
 -- Parse Error --
 Parser error:   --> 34:1

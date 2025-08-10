@@ -4,22 +4,22 @@
 
 -- Code --
 
-// define operation which takes multiple items
-op punched_disk() { 
-    // check number of children
-    if @children.count() == 2 {
-        // make hole
-        @children.difference(); 
-    } else {
-        std::error("punched_disk must get two objects");
-    }
-}
-
-// use operation punch_disk with two circles
-{
-    std::geo2d::circle(radius = 1cm);
-    std::geo2d::circle(radius = 2cm);
-}.punched_disk();
+ 1: // define operation which takes multiple items
+ 2: op punched_disk() { 
+ 3:     // check number of children
+ 4:     if @children.count() == 2 {
+ 5:         // make hole
+ 6:         @children.difference(); 
+ 7:     } else {
+ 8:         std::error("punched_disk must get two objects");
+ 9:     }
+10: }
+11: 
+12: // use operation punch_disk with two circles
+13: {
+14:     std::geo2d::circle(radius = 1cm);
+15:     std::geo2d::circle(radius = 2cm);
+16: }.punched_disk();
 
 -- Output --
 -- Errors --

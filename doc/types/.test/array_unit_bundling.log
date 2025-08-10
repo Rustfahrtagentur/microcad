@@ -4,14 +4,14 @@
 
 -- Code --
 
-// without bundling
-l1 = [1mm, 2mm, 3mm];
-
-// with bundling
-l2 = [1, 2, 3]mm;
-
-// are the same
-std::debug::assert(l1 == l2);
+ 1: // without bundling
+ 2: l1 = [1mm, 2mm, 3mm];
+ 3: 
+ 4: // with bundling
+ 5: l2 = [1, 2, 3]mm;
+ 6: 
+ 7: // are the same
+ 8: std::debug::assert(l1 == l2);
 
 -- Output --
 -- Errors --

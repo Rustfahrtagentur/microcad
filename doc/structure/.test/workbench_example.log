@@ -4,17 +4,17 @@
 
 -- Code --
 
-sketch punched_disk(radius: Length) {
-    use std::geo2d::circle;
-
-    // calculate inner from radius in a method
-    fn inner() { radius/2 }
-
-    // generate donut (and call inner)
-    circle(radius) - circle(inner());
-}
-
-punched_disk(radius = 1cm);
+ 1: sketch punched_disk(radius: Length) {
+ 2:     use std::geo2d::circle;
+ 3: 
+ 4:     // calculate inner from radius in a method
+ 5:     fn inner() { radius/2 }
+ 6: 
+ 7:     // generate donut (and call inner)
+ 8:     circle(radius) - circle(inner());
+ 9: }
+10: 
+11: punched_disk(radius = 1cm);
 
 -- Output --
 -- Errors --

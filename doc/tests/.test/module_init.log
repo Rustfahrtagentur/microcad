@@ -4,9 +4,9 @@
 
 -- Code --
 
-mod k {
-  init() { }  // error
-}
+ 1: mod k {
+ 2:   init() { }  // error
+ 3: }
 
 -- Output --
 -- Errors --

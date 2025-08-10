@@ -4,9 +4,9 @@
 
 -- Code --
 
-sketch k() { 
-  sketch f() {} f();  // error
-init(l:Length) {} } k();
+ 1: sketch k() { 
+ 2:   sketch f() {} f();  // error
+ 3: init(l:Length) {} } k();
 
 -- Parse Error --
 Statement not allowed within workbenches

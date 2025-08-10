@@ -4,13 +4,13 @@
 
 -- Code --
 
-__builtin::debug::assert_eq([
-    // use measure area() on a circle
-    std::geo2d::circle(radius=10mm).area(),
-
-    // circle area formula for comparison
-    10mm * 10mm * std::math::PI
-]);
+ 1: __builtin::debug::assert_eq([
+ 2:     // use measure area() on a circle
+ 3:     std::geo2d::circle(radius=10mm).area(),
+ 4: 
+ 5:     // circle area formula for comparison
+ 6:     10mm * 10mm * std::math::PI
+ 7: ]);
 
 -- Output --
 -- Errors --

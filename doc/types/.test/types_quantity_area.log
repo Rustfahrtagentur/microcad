@@ -4,10 +4,10 @@
 
 -- Code --
 
-a = 3cm;
-b = 2cm;
-area = a * b;
-std::debug::assert(area == 6cm²);
+ 1: a = 3cm;
+ 2: b = 2cm;
+ 3: area = a * b;
+ 4: std::debug::assert(area == 6cm²);
 
 -- Output --
 -- Errors --

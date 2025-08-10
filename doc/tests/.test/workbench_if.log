@@ -4,9 +4,9 @@
 
 -- Code --
 
-sketch k() {
-  if std::math::PI == 3 { }
-} k();
+ 1: sketch k() {
+ 2:   if std::math::PI == 3 { }
+ 3: } k();
 
 -- Output --
 -- Errors --

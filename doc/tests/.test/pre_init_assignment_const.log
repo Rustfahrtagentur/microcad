@@ -4,9 +4,9 @@
 
 -- Code --
 
-sketch k() { 
-  const B = 1;
-init(l:Length) {} } k();
+ 1: sketch k() { 
+ 2:   const B = 1;
+ 3: init(l:Length) {} } k();
 
 -- Output --
 -- Errors --

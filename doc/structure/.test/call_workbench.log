@@ -4,16 +4,16 @@
 
 -- Code --
 
-// definition of a sketch workbench
-sketch square(size: Length) { 
-    std::geo2d::rect(size);
-}
-
-// call square with a size and store object node in s
-s = square(size=2cm);
-
-// translate object s
-s.std::ops::translate(x = 1cm);
+ 1: // definition of a sketch workbench
+ 2: sketch square(size: Length) { 
+ 3:     std::geo2d::rect(size);
+ 4: }
+ 5: 
+ 6: // call square with a size and store object node in s
+ 7: s = square(size=2cm);
+ 8: 
+ 9: // translate object s
+10: s.std::ops::translate(x = 1cm);
 
 -- Output --
 -- Errors --

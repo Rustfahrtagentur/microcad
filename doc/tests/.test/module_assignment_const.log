@@ -4,9 +4,9 @@
 
 -- Code --
 
-mod k {
-  const B = 1;
-}
+ 1: mod k {
+ 2:   const B = 1;
+ 3: }
 
 -- Output --
 -- Errors --

@@ -4,9 +4,9 @@
 
 -- Code --
 
-{
-  fn f() {} f(); // error
-}
+ 1: {
+ 2:   fn f() {} f(); // error
+ 3: }
 
 -- Output --
 -- Errors --

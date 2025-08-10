@@ -4,8 +4,8 @@
 
 -- Code --
 
-x: Length = 4mm;   // explicit type declaration
-x = 4mm;           // implicit type declaration via units.
+ 1: x: Length = 4mm;   // explicit type declaration
+ 2: x = 4mm;           // implicit type declaration via units.
 
 -- Output --
 -- Errors --

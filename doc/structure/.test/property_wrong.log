@@ -4,22 +4,22 @@
 
 -- Code --
 
-sketch wheel(outer: Length) {
-    use std::geo2d::circle;
-
-    // `inner` is declared as variable and may not be read
-    // from outside this workbench
-    inner = outer / 2;
-
-    circle(outer) - circle(inner);
-}
-
-t = wheel(outer = 1cm);
-
-// you can still extract and display `outer`
-std::print("outer: {t.outer}");
-// but you cannot access `inner` anymore
-std::print("inner: {t.inner}"); // error
+ 1: sketch wheel(outer: Length) {
+ 2:     use std::geo2d::circle;
+ 3: 
+ 4:     // `inner` is declared as variable and may not be read
+ 5:     // from outside this workbench
+ 6:     inner = outer / 2;
+ 7: 
+ 8:     circle(outer) - circle(inner);
+ 9: }
+10: 
+11: t = wheel(outer = 1cm);
+12: 
+13: // you can still extract and display `outer`
+14: std::print("outer: {t.outer}");
+15: // but you cannot access `inner` anymore
+16: std::print("inner: {t.inner}"); // error
 
 -- Output --
 outer: 10mm

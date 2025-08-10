@@ -4,9 +4,9 @@
 
 -- Code --
 
-sketch k() {
-  1 + 2;
-} k();
+ 1: sketch k() {
+ 2:   1 + 2;
+ 3: } k();
 
 -- Output --
 -- Errors --

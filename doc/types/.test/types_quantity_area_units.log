@@ -4,13 +4,13 @@
 
 -- Code --
 
-square_millimeter = 100000mm²;
-square_centimeter = 1000cm²;
-square_meter = 0.1m²;
-square_inch = 155in²;
-
-std::debug::assert(square_millimeter == 0.1m²);
-std::debug::assert(square_centimeter == 0.1m²);
+ 1: square_millimeter = 100000mm²;
+ 2: square_centimeter = 1000cm²;
+ 3: square_meter = 0.1m²;
+ 4: square_inch = 155in²;
+ 5: 
+ 6: std::debug::assert(square_millimeter == 0.1m²);
+ 7: std::debug::assert(square_centimeter == 0.1m²);
 
 -- Output --
 -- Errors --

@@ -4,9 +4,9 @@
 
 -- Code --
 
-sketch k() { 
-  init() {}
-init(l:Length) {} } k();
+ 1: sketch k() { 
+ 2:   init() {}
+ 3: init(l:Length) {} } k();
 
 -- Output --
 -- Errors --

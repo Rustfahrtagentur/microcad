@@ -4,11 +4,11 @@
 
 -- Code --
 
-sketch wheel(radius: Length) { // warning (no output)
-    init( width: Length ) { } // error: misses to set `radius` from building plan
-}
-
-wheel(width = 1.0mm);
+ 1: sketch wheel(radius: Length) { // warning (no output)
+ 2:     init( width: Length ) { } // error: misses to set `radius` from building plan
+ 3: }
+ 4: 
+ 5: wheel(width = 1.0mm);
 
 -- Output --
 -- Errors --

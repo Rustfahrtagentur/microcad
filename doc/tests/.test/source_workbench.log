@@ -4,7 +4,7 @@
 
 -- Code --
 
-sketch f() {} f();
+ 1: sketch f() {} f();
 
 -- Output --
 -- Errors --

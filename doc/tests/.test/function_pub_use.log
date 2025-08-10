@@ -4,9 +4,9 @@
 
 -- Code --
 
-fn f() {
-  pub use std;
-} f();
+ 1: fn f() {
+ 2:   pub use std;
+ 3: } f();
 
 -- Output --
 -- Errors --

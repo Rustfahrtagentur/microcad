@@ -4,9 +4,9 @@
 
 -- Code --
 
-{
-  @children
-}
+ 1: {
+ 2:   @children
+ 3: }
 
 -- Output --
 -- Errors --

@@ -4,11 +4,11 @@
 
 -- Code --
 
-circle = 1;
-
-use std::geo2d::circle as disk;
-
-disk(r = 4mm);
+ 1: circle = 1;
+ 2: 
+ 3: use std::geo2d::circle as disk;
+ 4: 
+ 5: disk(r = 4mm);
 
 -- Output --
 -- Errors --

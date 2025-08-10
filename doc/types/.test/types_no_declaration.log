@@ -4,7 +4,7 @@
 
 -- Code --
 
-x: Length;         // error
+ 1: x: Length;         // error
 
 -- Parse Error --
 Parser error:  --> 1:10

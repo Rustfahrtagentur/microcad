@@ -4,9 +4,9 @@
 
 -- Code --
 
-sketch k() {
-  const B = 1;
-} k();
+ 1: sketch k() {
+ 2:   const B = 1;
+ 3: } k();
 
 -- Output --
 -- Errors --

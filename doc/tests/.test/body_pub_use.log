@@ -4,9 +4,9 @@
 
 -- Code --
 
-{
-  pub use std; // error
-}
+ 1: {
+ 2:   pub use std; // error
+ 3: }
 
 -- Output --
 -- Errors --

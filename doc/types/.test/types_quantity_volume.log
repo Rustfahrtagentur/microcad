@@ -4,13 +4,13 @@
 
 -- Code --
 
-a = 3mm;
-b = 2mm;
-c = 4mm;
-
-volume = a * b * c;
-
-std::debug::assert(volume == 24mm³);
+ 1: a = 3mm;
+ 2: b = 2mm;
+ 3: c = 4mm;
+ 4: 
+ 5: volume = a * b * c;
+ 6: 
+ 7: std::debug::assert(volume == 24mm³);
 
 -- Output --
 -- Errors --

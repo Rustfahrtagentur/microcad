@@ -4,8 +4,8 @@
 
 -- Code --
 
-fn f( x: Length, y: Length, z: Length ) {}
-f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
+ 1: fn f( x: Length, y: Length, z: Length ) {}
+ 2: f( (x=1cm, v=2cm), z=3cm); // error: y is missing here
 
 -- Output --
 -- Errors --

@@ -4,9 +4,9 @@
 
 -- Code --
 
-{
-  init() {} // error
-}
+ 1: {
+ 2:   init() {} // error
+ 3: }
 
 -- Output --
 -- Errors --

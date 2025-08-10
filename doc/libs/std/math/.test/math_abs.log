@@ -4,7 +4,7 @@
 
 -- Code --
 
-std::debug::assert(std::math::abs(-1) == 1);
+ 1: std::debug::assert(std::math::abs(-1) == 1);
 
 -- Output --
 -- Errors --

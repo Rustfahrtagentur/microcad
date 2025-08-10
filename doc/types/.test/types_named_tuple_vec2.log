@@ -4,9 +4,9 @@
 
 -- Code --
 
-v: Vec2 = (x = 2.0, y = 3.0);
-
-std::debug::assert(v.x + v.y == 5.0);
+ 1: v: Vec2 = (x = 2.0, y = 3.0);
+ 2: 
+ 3: std::debug::assert(v.x + v.y == 5.0);
 
 -- Output --
 -- Errors --

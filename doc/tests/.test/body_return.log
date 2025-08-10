@@ -4,9 +4,9 @@
 
 -- Code --
 
-{
-  return 1; // error
-}
+ 1: {
+ 2:   return 1; // error
+ 3: }
 
 -- Output --
 -- Errors --

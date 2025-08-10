@@ -4,11 +4,11 @@
 
 -- Code --
 
-circle = 1;
-
-use std::geo2d;
-
-geo2d::circle(r = 40mm);
+ 1: circle = 1;
+ 2: 
+ 3: use std::geo2d;
+ 4: 
+ 5: geo2d::circle(r = 40mm);
 
 -- Output --
 -- Errors --

@@ -4,7 +4,7 @@
 
 -- Code --
 
-std::log::error("this should not have happened"); // error
+ 1: std::log::error("this should not have happened"); // error
 
 -- Output --
 -- Errors --

@@ -4,11 +4,11 @@
 
 -- Code --
 
-cylinder = std::geo3d::cylinder(h = 50mm, d = 20mm);
-
-cylinder.std::ops::rotate(x = 90°);
-cylinder.std::ops::rotate(y = 90°);
-cylinder.std::ops::rotate(z = 90°);
+ 1: cylinder = std::geo3d::cylinder(h = 50mm, d = 20mm);
+ 2: 
+ 3: cylinder.std::ops::rotate(x = 90°);
+ 4: cylinder.std::ops::rotate(y = 90°);
+ 5: cylinder.std::ops::rotate(z = 90°);
 
 -- Output --
 -- Errors --

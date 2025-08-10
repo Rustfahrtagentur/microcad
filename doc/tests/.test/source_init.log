@@ -4,7 +4,7 @@
 
 -- Code --
 
-init() {} // error
+ 1: init() {} // error
 
 -- Output --
 -- Errors --

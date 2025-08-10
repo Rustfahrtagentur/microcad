@@ -4,11 +4,11 @@
 
 -- Code --
 
-part punched_disk(radius: Length) {
-    pub fn inner() { radius/2 }   // error: cant use pub inside workbench
-}
-
-punched_disk(4.0mm);
+ 1: part punched_disk(radius: Length) {
+ 2:     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
+ 3: }
+ 4: 
+ 5: punched_disk(4.0mm);
 
 -- Output --
 -- Errors --

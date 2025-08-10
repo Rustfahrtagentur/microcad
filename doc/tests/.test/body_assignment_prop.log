@@ -4,9 +4,9 @@
 
 -- Code --
 
-{
-  prop a = 1; // error
-}
+ 1: {
+ 2:   prop a = 1; // error
+ 3: }
 
 -- Output --
 -- Errors --

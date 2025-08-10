@@ -4,16 +4,16 @@
 
 -- Code --
 
-sketch my_sketch(a: Integer) {
-    if a == 1 {
-        std::geo2d::circle(radius = 1mm)
-    } else {
-        std::geo2d::circle(radius = 4mm)
-    }
-}
-
-my_sketch(1);
-my_sketch(2);
+ 1: sketch my_sketch(a: Integer) {
+ 2:     if a == 1 {
+ 3:         std::geo2d::circle(radius = 1mm)
+ 4:     } else {
+ 5:         std::geo2d::circle(radius = 4mm)
+ 6:     }
+ 7: }
+ 8: 
+ 9: my_sketch(1);
+10: my_sketch(2);
 
 -- Output --
 -- Errors --

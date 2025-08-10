@@ -4,9 +4,9 @@
 
 -- Code --
 
-width = 2mm;
-height = 2mm;
-std::geo2d::rect(width, height);
+ 1: width = 2mm;
+ 2: height = 2mm;
+ 3: std::geo2d::rect(width, height);
 
 -- Output --
 -- Errors --

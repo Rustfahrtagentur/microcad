@@ -4,9 +4,9 @@
 
 -- Code --
 
-{
-  mod m {} // error
-}
+ 1: {
+ 2:   mod m {} // error
+ 3: }
 
 -- Output --
 -- Errors --

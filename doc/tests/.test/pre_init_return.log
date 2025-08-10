@@ -4,9 +4,9 @@
 
 -- Code --
 
-sketch k() { 
-  return 1; // error
-init(l:Length) {} } k();
+ 1: sketch k() { 
+ 2:   return 1; // error
+ 3: init(l:Length) {} } k();
 
 -- Parse Error --
 Statement not allowed within workbenches

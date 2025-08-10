@@ -4,9 +4,9 @@
 
 -- Code --
 
-sketch k() {
-  fn f() {} f(); // error
-} k();
+ 1: sketch k() {
+ 2:   fn f() {} f(); // error
+ 3: } k();
 
 -- Output --
 -- Errors --

@@ -4,9 +4,9 @@
 
 -- Code --
 
-sketch k() { 
-  pub use std;
-init(l:Length) {} } k();
+ 1: sketch k() { 
+ 2:   pub use std;
+ 3: init(l:Length) {} } k();
 
 -- Output --
 -- Errors --

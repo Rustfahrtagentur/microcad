@@ -4,7 +4,7 @@
 
 -- Code --
 
-std::debug::assert(true, "You won't see this message");
+ 1: std::debug::assert(true, "You won't see this message");
 
 -- Output --
 -- Errors --

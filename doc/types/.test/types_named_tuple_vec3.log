@@ -4,9 +4,9 @@
 
 -- Code --
 
-v: Vec3 = (x = 2.0, y = 3.0, z = 4.0);
-
-std::debug::assert(v.x + v.y + v.z == 9.0);
+ 1: v: Vec3 = (x = 2.0, y = 3.0, z = 4.0);
+ 2: 
+ 3: std::debug::assert(v.x + v.y + v.z == 9.0);
 
 -- Output --
 -- Errors --

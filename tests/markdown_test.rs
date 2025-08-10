@@ -52,7 +52,17 @@ pub fn run_test(
     let log_out = &mut io::BufWriter::new(log_out);
 
     writeln!(log_out, "-- Test --\n  {name}\n  {reference}\n").expect("output error");
-    writeln!(log_out, "-- Code --\n\n{code}").expect("output error");
+    writeln!(
+        log_out,
+        "-- Code --\n\n{}",
+        code.lines()
+            .enumerate()
+            .map(|(n, line)| format!("{n:2}: {line}", n = n + 1))
+            .collect::<Vec<_>>()
+            .join("\n")
+    )
+    .expect("output error");
+    writeln!(log_out).expect("output error");
 
     // load and handle µcad source file
     let source_file_result = SourceFile::load_from_str(code);

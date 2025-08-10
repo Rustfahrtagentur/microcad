@@ -4,19 +4,19 @@
 
 -- Code --
 
-cubic_millimeter = 1000000.0mm³;
-cubic_centimeter = 100.0cl;
-cubic_meter = 0.001m³;
-cubic_inch = 61.0237in³;
-liter = 1.0l;
-centiliter = 100.0cl;
-milliliter = 1000.0ml;
-
-std::debug::assert(cubic_millimeter == 1.0l);
-std::debug::assert(cubic_centimeter == 1.0l);
-std::debug::assert(cubic_meter == 1.0l);
-std::debug::assert(centiliter == 1.0l);
-std::debug::assert(milliliter == 1.0l);
+ 1: cubic_millimeter = 1000000.0mm³;
+ 2: cubic_centimeter = 100.0cl;
+ 3: cubic_meter = 0.001m³;
+ 4: cubic_inch = 61.0237in³;
+ 5: liter = 1.0l;
+ 6: centiliter = 100.0cl;
+ 7: milliliter = 1000.0ml;
+ 8: 
+ 9: std::debug::assert(cubic_millimeter == 1.0l);
+10: std::debug::assert(cubic_centimeter == 1.0l);
+11: std::debug::assert(cubic_meter == 1.0l);
+12: std::debug::assert(centiliter == 1.0l);
+13: std::debug::assert(milliliter == 1.0l);
 
 -- Output --
 -- Errors --

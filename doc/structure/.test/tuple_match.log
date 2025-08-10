@@ -4,17 +4,17 @@
 
 -- Code --
 
-// Function with three parameters: x, y, and z
-fn f( x: Length, y: Length, z: Length ) {}
-
-// Since we do not want to change x and y in the following statements,
-// we prepare a tuple named plane:
-plane = (x=1cm, y=2cm);
-
-// Then we pass plane to f() three times with different z values
-f( plane, z=3cm);
-f( plane, z=6cm);
-f( plane, z=9cm);
+ 1: // Function with three parameters: x, y, and z
+ 2: fn f( x: Length, y: Length, z: Length ) {}
+ 3: 
+ 4: // Since we do not want to change x and y in the following statements,
+ 5: // we prepare a tuple named plane:
+ 6: plane = (x=1cm, y=2cm);
+ 7: 
+ 8: // Then we pass plane to f() three times with different z values
+ 9: f( plane, z=3cm);
+10: f( plane, z=6cm);
+11: f( plane, z=9cm);
 
 -- Output --
 -- Errors --

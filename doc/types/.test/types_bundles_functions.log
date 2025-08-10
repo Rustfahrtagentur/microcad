@@ -4,8 +4,8 @@
 
 -- Code --
 
-fn f(x = 4mm) {}        // use unit (with default)
-fn f(x: Length) {}     // use type (without default)
+ 1: fn f(x = 4mm) {}        // use unit (with default)
+ 2: fn f(x: Length) {}     // use type (without default)
 
 -- Output --
 -- Errors --

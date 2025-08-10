@@ -4,7 +4,7 @@
 
 -- Code --
 
-std::debug::assert(false, "this assertion fails"); // error
+ 1: std::debug::assert(false, "this assertion fails"); // error
 
 -- Output --
 -- Errors --

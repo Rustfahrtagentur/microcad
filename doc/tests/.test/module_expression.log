@@ -4,9 +4,9 @@
 
 -- Code --
 
-mod k {
-  1 + 2; // error
-}
+ 1: mod k {
+ 2:   1 + 2; // error
+ 3: }
 
 -- Output --
 -- Errors --

@@ -4,9 +4,9 @@
 
 -- Code --
 
-fn f( a: Scalar, b: Length, c: Area ) {}
-// Who needs names?
-f(1.0, 2cm, 3cm²);
+ 1: fn f( a: Scalar, b: Length, c: Area ) {}
+ 2: // Who needs names?
+ 3: f(1.0, 2cm, 3cm²);
 
 -- Output --
 -- Errors --

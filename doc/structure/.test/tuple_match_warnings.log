@@ -4,8 +4,8 @@
 
 -- Code --
 
-fn f( x: Length, y: Length, z: Length ) {}
-f( (x=1cm, y=2cm, v=5cm), z=3cm);  // warning: v is redundant
+ 1: fn f( x: Length, y: Length, z: Length ) {}
+ 2: f( (x=1cm, y=2cm, v=5cm), z=3cm);  // warning: v is redundant
 
 -- Output --
 -- Errors --

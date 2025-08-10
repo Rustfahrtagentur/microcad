@@ -4,7 +4,7 @@
 
 -- Code --
 
-fn f() {} f();
+ 1: fn f() {} f();
 
 -- Output --
 -- Errors --

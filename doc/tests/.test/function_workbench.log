@@ -4,9 +4,9 @@
 
 -- Code --
 
-fn f() {
-  sketch s() {} // error
-} f();
+ 1: fn f() {
+ 2:   sketch s() {} // error
+ 3: } f();
 
 -- Output --
 -- Errors --

@@ -4,10 +4,10 @@
 
 -- Code --
 
-(width, height) = (1m,2m);
-// check values of width and height
-assert_eq([width,1m]);
-assert_eq([height,2m]);
+ 1: (width, height) = (1m,2m);
+ 2: // check values of width and height
+ 3: assert_eq([width,1m]);
+ 4: assert_eq([height,2m]);
 
 -- Parse Error --
 Parser error:  --> 1:17

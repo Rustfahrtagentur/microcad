@@ -4,13 +4,13 @@
 
 -- Code --
 
-part punched_disk(radius: Length) {
-    fn inner() { 
-        prop hole = radius/2;  // eval error: prop not allowed in function
-    }
-}
-
-punched_disk(1cm);
+ 1: part punched_disk(radius: Length) {
+ 2:     fn inner() { 
+ 3:         prop hole = radius/2;  // eval error: prop not allowed in function
+ 4:     }
+ 5: }
+ 6: 
+ 7: punched_disk(1cm);
 
 -- Output --
 -- Errors --

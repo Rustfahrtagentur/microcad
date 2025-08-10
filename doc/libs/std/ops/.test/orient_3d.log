@@ -4,11 +4,11 @@
 
 -- Code --
 
-use std::math::*;
-use std::ops::*;
-use std::geo3d::*;
-
-cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
+ 1: use std::math::*;
+ 2: use std::ops::*;
+ 3: use std::geo3d::*;
+ 4: 
+ 5: cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
 
 -- Output --
 -- Errors --

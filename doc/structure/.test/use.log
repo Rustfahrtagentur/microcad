@@ -4,11 +4,11 @@
 
 -- Code --
 
-use std::geo2d::circle;
-use std::geo2d::rect;
-
-circle(r = 4mm);
-rect(size = 40mm);
+ 1: use std::geo2d::circle;
+ 2: use std::geo2d::rect;
+ 3: 
+ 4: circle(r = 4mm);
+ 5: rect(size = 40mm);
 
 -- Output --
 -- Errors --

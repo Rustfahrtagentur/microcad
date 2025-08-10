@@ -4,9 +4,9 @@
 
 -- Code --
 
-mod k {
-  __builtin::geo2d::circle(radius=1); // error
-}
+ 1: mod k {
+ 2:   __builtin::geo2d::circle(radius=1); // error
+ 3: }
 
 -- Output --
 -- Errors --

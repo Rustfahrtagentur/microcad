@@ -4,15 +4,15 @@
 
 -- Code --
 
-use std::debug::assert_eq;
-
-tuple = (width=10cm, depth=10cm, volume=1l);
-
-assert_eq([tuple.width, 10cm]);
-assert_eq([tuple.depth, 10cm]);
-assert_eq([tuple.volume, 1l]);
-
-assert_eq([tuple, (width=10cm, depth=10cm, volume=1l)]);
+ 1: use std::debug::assert_eq;
+ 2: 
+ 3: tuple = (width=10cm, depth=10cm, volume=1l);
+ 4: 
+ 5: assert_eq([tuple.width, 10cm]);
+ 6: assert_eq([tuple.depth, 10cm]);
+ 7: assert_eq([tuple.volume, 1l]);
+ 8: 
+ 9: assert_eq([tuple, (width=10cm, depth=10cm, volume=1l)]);
 
 -- Output --
 -- Errors --

@@ -4,9 +4,9 @@
 
 -- Code --
 
-fn f( x: Length, y: Length, z: Length ) {}
-
-f(x = 1cm, y = 2cm, z = 3cm);
+ 1: fn f( x: Length, y: Length, z: Length ) {}
+ 2: 
+ 3: f(x = 1cm, y = 2cm, z = 3cm);
 
 -- Output --
 -- Errors --

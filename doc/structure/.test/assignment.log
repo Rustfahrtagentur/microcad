@@ -4,10 +4,10 @@
 
 -- Code --
 
-a = 5;
-b = a * 2;
-std::debug::assert_eq([a,5]);
-std::debug::assert_eq([b,10]);
+ 1: a = 5;
+ 2: b = a * 2;
+ 3: std::debug::assert_eq([a,5]);
+ 4: std::debug::assert_eq([b,10]);
 
 -- Output --
 -- Errors --

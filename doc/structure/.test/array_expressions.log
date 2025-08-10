@@ -4,7 +4,7 @@
 
 -- Code --
 
-std::debug::assert_eq([std::count([1,2,3]), 3]);
+ 1: std::debug::assert_eq([std::count([1,2,3]), 3]);
 
 -- Output --
 -- Errors --

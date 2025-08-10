@@ -4,7 +4,7 @@
 
 -- Code --
 
-return 1;  // error
+ 1: return 1;  // error
 
 -- Output --
 -- Errors --
