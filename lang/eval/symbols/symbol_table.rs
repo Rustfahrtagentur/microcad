@@ -205,7 +205,10 @@ impl SymbolTable {
         // if symbol could not be found in symbol tree, try to load it from external file
         match self.cache.get_by_name(name) {
             Err(EvalError::SymbolMustBeLoaded(_, path)) => {
-                log::trace!("Loading symbol {name} from {path:?}");
+                log::trace!(
+                    "{load} symbol {name} from {path:?}",
+                    load = crate::mark!(LOAD)
+                );
                 let source_file =
                     SourceFile::load_with_name(path.clone(), self.cache.name_by_path(&path)?)?;
                 let source_name = self.cache.insert(source_file.clone())?;

@@ -124,6 +124,9 @@ macro_rules! mark {
     (CALL) => {
         color_print::cformat!("<B,k,s> CALL </>")
     };
+    (LOAD) => {
+        color_print::cformat!("<Y,k,s> LOADING </>")
+    };
 }
 
 #[cfg(not(feature = "ansi-color"))]
@@ -140,6 +143,9 @@ macro_rules! found {
     };
     (CALL) => {
         "Call"
+    };
+    (LOAD) => {
+        "Loading"
     };
 }
 /// Generate string literal ` INVALID `*XXX*` ` with ANSI color.
