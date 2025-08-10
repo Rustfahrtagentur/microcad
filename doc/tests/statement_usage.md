@@ -429,9 +429,9 @@ sketch k() {
 
 [![test](.test/workbench_function.svg)](.test/workbench_function.log)
 
-```µcad,workbench_function#fail
+```µcad,workbench_function
 sketch k() {
-  fn f() {} f(); // error
+  fn f() {} f();
 } k();
 ```
 

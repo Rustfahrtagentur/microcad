@@ -16,11 +16,11 @@ error: sketch statement not available here
    2 |   sketch f() {} f(); // error
      |   ^^^^^^^^^^^^^
      |
-error: Symbol f not found.
-  ---> <FROM STR>:2:17
+warning: The sketch workbench will produce no 2D output.
+  ---> <FROM STR>:2:3
      |
    2 |   sketch f() {} f(); // error
-     |                 ^^^
+     |   ^^^^^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.
   ---> <FROM STR>:1:1

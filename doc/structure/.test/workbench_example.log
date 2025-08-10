@@ -18,12 +18,6 @@
 
 -- Output --
 -- Errors --
-error: Symbol inner not found.
-  ---> <FROM STR>:8:29
-     |
-   8 |     circle(radius) - circle(inner());
-     |                             ^^^^^^^
-     |
 error: Workbench circle cannot find initialization for those arguments
   ---> <FROM STR>:8:29
      |
