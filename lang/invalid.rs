@@ -9,43 +9,43 @@ mod macros {
     #[macro_export]
     macro_rules! invalid {
         (VALUE) => {
-            color_print::cstr!("<bg:r,s> INVALID VALUE </>")
+            color_print::cstr!("<R!,k,s> INVALID VALUE </>")
         };
         (TYPE) => {
-            color_print::cstr!("<bg:r!,s> INVALID TYPE </>")
+            color_print::cstr!("<R!,k,s> INVALID TYPE </>")
         };
         (OUTPUT) => {
-            color_print::cstr!("<bg:r!,s> INVALID OUTPUT </>")
+            color_print::cstr!("<R!,k,s> INVALID OUTPUT </>")
         };
         (STACK) => {
-            color_print::cstr!("<bg:w,s> EMPTY STACK </>")
+            color_print::cstr!("<W,k,s> EMPTY STACK </>")
         };
         (REF) => {
-            color_print::cstr!("<bg:y!,s> NO REF </>")
+            color_print::cstr!("<Y!,k,s> NO REF </>")
         };
         (FILE) => {
-            color_print::cstr!("<bg:y!,s> NO FILE </>")
+            color_print::cstr!("<Y!,k,s> NO FILE </>")
         };
         (RESULT) => {
-            color_print::cstr!("<bg:y!,s> NO RESULT </>")
+            color_print::cstr!("<Y!,k,s> NO RESULT </>")
         };
         (LINE) => {
-            color_print::cstr!("<bg:y!,s> NO LINE </>")
+            color_print::cstr!("<Y!,k,s> NO LINE </>")
         };
         (SOURCE) => {
-            color_print::cstr!("<bg:c!,s> FROM STR </>")
+            color_print::cstr!("<C!,k,s> FROM STR </>")
         };
         (UNKNOWN) => {
-            color_print::cstr!("<bg:m!,s> UNKNOWN </>")
+            color_print::cstr!("<M!,k,s> UNKNOWN </>")
         };
         (ID) => {
-            color_print::cstr!("<bg:m!,s> NO ID </>")
+            color_print::cstr!("<M!,k,s> NO ID </>")
         };
         (NAME) => {
-            color_print::cstr!("<bg:m!,s> NO NAME </>")
+            color_print::cstr!("<M!,k,s> NO NAME </>")
         };
         (EXPRESSION) => {
-            color_print::cstr!("<bg:r!,s> INVALID EXPRESSION </>")
+            color_print::cstr!("<R!,k,s> INVALID EXPRESSION </>")
         };
     }
 
