@@ -94,9 +94,10 @@ impl Tuple {
     ///
     /// Transparent tuples are unnamed tuple items of a tuple.
     ///
-    /// ```,µcad
+    /// ```,ucad
     /// assert_eq!( (x=0, (y=0, z=0)), (x=0, y=0, z=0) );
     /// ///               ^ unnamed tuple
+    /// ```
     pub fn ray(&mut self) {
         self.unnamed.retain(|_, value| {
             if let Value::Tuple(tuple) = value {

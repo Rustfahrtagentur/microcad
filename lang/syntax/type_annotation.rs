@@ -1,11 +1,11 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad Type annotation
+//! µcad Type annotation.
 
 use crate::{src_ref::*, syntax::*, ty::*};
 
-/// Type within source code
+/// Type within source code.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct TypeAnnotation(pub Refer<Type>);
 

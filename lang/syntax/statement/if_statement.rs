@@ -1,22 +1,22 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! If statement syntax elements
-//!
+//! If statement syntax elements.
+
 use crate::{src_ref::*, syntax::*};
 
-/// If statement
+/// If statement.
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct IfStatement {
-    /// if condition
+    /// If condition.
     pub cond: Expression,
-    /// body if true
+    /// Body if `true`.
     pub body: Body,
-    /// body if false
+    /// Body if `false`.
     pub body_else: Option<Body>,
-    /// next if statement: `else if x == 1`
+    /// Next if statement: `else if x == 1`.
     pub next_if: Option<Box<IfStatement>>,
-    /// Source code reference
+    /// Source code reference.
     pub src_ref: SrcRef,
 }
 

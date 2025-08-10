@@ -1,11 +1,11 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad unit syntax element
+//! µcad unit syntax element.
 
 use crate::{syntax::*, ty::*};
 
-/// The units that can be used after numbers in the language"
+/// Definition of type & scale of numbers.
 #[derive(
     Debug,
     Default,
@@ -20,7 +20,7 @@ use crate::{syntax::*, ty::*};
 )]
 pub enum Unit {
     // Scalar
-    /// No unit was given
+    /// No unit was given.
     #[default]
     None,
     /// Percents
@@ -170,7 +170,7 @@ impl std::fmt::Display for Unit {
 }
 
 impl Unit {
-    /// Return type to use with this unit
+    /// Return type to use with this unit.
     pub fn ty(self) -> Type {
         match self {
             Self::None | Self::Percent => Type::Quantity(QuantityType::Scalar),
@@ -209,7 +209,7 @@ impl Unit {
         }
     }
 
-    /// Normalize value to base unit
+    /// Normalize value to base unit.
     pub fn normalize(self, x: f64) -> f64 {
         match self {
             // Scalar

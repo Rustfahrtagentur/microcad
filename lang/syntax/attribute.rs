@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
-/// A subcommand for an [`AttributeCommand`].
+/// *Command syntax* within an attribute.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub enum AttributeCommand {
     /// A command with an optional identifier and optional arguments: `width(offset = 30mm)`.

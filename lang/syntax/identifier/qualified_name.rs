@@ -4,7 +4,7 @@
 use crate::{src_ref::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
-/// A qualifier name consists of a . separated list of identifiers
+/// A *qualified name* consists of a list of *identifiers*, separated by `::`,
 /// e.g. `a::b::c`
 #[derive(
     Default,
@@ -21,7 +21,7 @@ use derive_more::{Deref, DerefMut};
 )]
 pub struct QualifiedName(Refer<Vec<Identifier>>);
 
-/// List of qualified names which can pe displayed
+/// List of *qualified names* which can be displayed.
 #[derive(Debug, Deref)]
 pub struct QualifiedNames(Vec<QualifiedName>);
 

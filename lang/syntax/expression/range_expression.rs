@@ -52,7 +52,7 @@ impl TreeDisplay for RangeEnd {
     }
 }
 
-/// Range expression: `a..b`.
+/// Range expression, e.g. `a..b`.
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct RangeExpression {
     /// Start of the range.

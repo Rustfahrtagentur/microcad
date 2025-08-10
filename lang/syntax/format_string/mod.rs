@@ -11,12 +11,12 @@ pub use format_spec::*;
 
 use crate::{src_ref::*, syntax::*};
 
-/// Format string item
+/// Format string item.
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub enum FormatStringInner {
-    /// String literal
+    /// String literal.
     String(Refer<String>),
-    /// Format expression
+    /// Format expression.
     FormatExpression(FormatExpression),
 }
 
@@ -29,12 +29,12 @@ impl SrcReferrer for FormatStringInner {
     }
 }
 
-/// Format string
+/// Format string.
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FormatString(pub Refer<Vec<FormatStringInner>>);
 
 impl FormatString {
-    /// Insert a string
+    /// Insert a string.
     pub fn push_string(&mut self, s: String, src_ref: SrcRef) {
         self.0
             .push(FormatStringInner::String(Refer::new(s, src_ref)));

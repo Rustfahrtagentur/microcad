@@ -31,10 +31,10 @@ impl Origin {
             call_src_ref: SrcRef(None),
         }
     }
-    /// Get [`creator`] if available.
+    /// Get creator, if available.
     ///
     /// If a creator is available returns a `Link` to it which might need to be
-    /// loaded before accessing it (see [`load_creator()`]).
+    /// loaded before accessing it (see [`Self::load_creator()`]).
     pub fn get_creator(&self) -> &Option<Link<Symbol, QualifiedName>> {
         &self.creator
     }
@@ -42,7 +42,7 @@ impl Origin {
     pub fn set_creator(&mut self, creator: Symbol) {
         self.creator = Some(creator.into())
     }
-    /// Get the original symbol which might be loaded at first access from given [`symbol_table`].
+    /// Get the original symbol which might be loaded at first access from given `symbol_table`.
     pub fn load_creator(&mut self, symbol_table: &mut impl Lookup) -> EvalResult<Option<&Symbol>> {
         if let Some(creator) = &mut self.creator {
             Ok(Some(creator.load(|name| symbol_table.lookup(name))?))

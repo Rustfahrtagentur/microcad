@@ -173,8 +173,8 @@ impl Models {
 
     /// Set the information about the creator for all models.
     ///
-    /// See [`Model::set_creator`] for more info.
-    pub fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
+    /// See [`ModelInner::set_creator`] for more info.
+    pub(crate) fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
         self.iter().for_each(|model| {
             model
                 .borrow_mut()

@@ -1,16 +1,13 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad CLI parse command
+//! µcad CLI parse command.
 
 use std::rc::Rc;
 
 use crate::*;
 
-use microcad_lang::{
-    parse::ParseResult,
-    syntax::{FormatSyntax, SourceFile},
-};
+use microcad_lang::{parse::*, syntax::*, tree_display::*};
 
 #[derive(clap::Parser)]
 pub struct Parse {
@@ -29,7 +26,7 @@ impl Parse {
 impl RunCommand for Parse {
     fn run(&self, _cli: &Cli) -> anyhow::Result<()> {
         let source_file = self.parse()?;
-        println!("{}", FormatSyntax(source_file.as_ref()));
+        println!("{}", FormatTree(source_file.as_ref()));
         Ok(())
     }
 }

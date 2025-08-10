@@ -164,7 +164,7 @@ impl Model {
         })
     }
 
-    /// A [`Model`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
+    /// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
     pub fn signature(&self) -> String {
         let self_ = self.borrow();
 
@@ -228,7 +228,7 @@ impl PartialEq for Model {
 
 /// Prints a [`Model`].
 ///
-/// A [`Model`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
+/// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
 /// The exemplary output will look like this:
 ///
 /// ```custom

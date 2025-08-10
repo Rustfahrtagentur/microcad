@@ -74,7 +74,7 @@ impl TreeDisplay for ArrayExpressionInner {
     }
 }
 
-/// List expression (expression list maybe with common unit)
+/// Array of expressions with common result unit, e.g. `[1+2,4,9]`.
 #[derive(Default, Clone, Debug, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct ArrayExpression {
     /// Expression list.

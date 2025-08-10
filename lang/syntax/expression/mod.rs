@@ -19,10 +19,10 @@ pub use tuple_expression::*;
 
 use crate::{src_ref::*, syntax::*, value::*};
 
-/// List of expression
+/// List of expressions.
 pub type ListExpression = Vec<Expression>;
 
-/// Expressions
+/// Any expression.
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub enum Expression {
     /// Something went wrong (and an error will be reported)

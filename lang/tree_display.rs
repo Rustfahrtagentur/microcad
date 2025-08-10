@@ -5,7 +5,7 @@
 
 /// Trait for displaying a tree
 pub trait TreeDisplay {
-    /// Write item into [`f`] and use `{:depth$}` syntax in front of your single line
+    /// Write item into `f` and use `{:depth$}` syntax in front of your single line
     /// output to get proper indention.
     fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result;
 
@@ -48,7 +48,7 @@ pub struct TreeState {
 
 impl TreeState {
     /// Create new tree state
-    /// - [`shorten`]: If `true` content will be shortened to one line
+    /// - `shorten`: If `true` content will be shortened to one line
     pub fn new(shorten: bool) -> Self {
         Self { depth: 0, shorten }
     }
@@ -73,5 +73,14 @@ impl From<usize> for TreeState {
             depth,
             shorten: true,
         }
+    }
+}
+
+/// print syntax via std::fmt::Display
+pub struct FormatTree<'a, T: TreeDisplay>(pub &'a T);
+
+impl<T: TreeDisplay> std::fmt::Display for FormatTree<'_, T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.tree_print(f, 2.into())
     }
 }

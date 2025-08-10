@@ -19,7 +19,7 @@ use crate::{ty::*, value::*};
 
 /// This enum is used to declare parameter list for builtin symbols conveniently.
 ///
-/// It is used in the [`parameter_value`] and [`argument_value`] macros to be able
+/// It is used in the `parameter!` and `argument!` macros to be able
 /// to declare parameters and arguments in µcad like way, for example: `a: Scalar = 4.0`.
 pub enum BuiltinTypeHelper {
     /// Integer type.
@@ -66,7 +66,7 @@ impl From<BuiltinTypeHelper> for Type {
 
 /// This enum is used to declare parameter list for builtin symbols conveniently.
 ///
-/// It is used in the [`parameter_value`] and [`argument_value`] macros to be able
+/// It is used in the `parameter!` and `argument!` macros to be able
 /// to declare parameters and arguments in µcad like way, for example: `a: Scalar = 4.0`.
 pub enum BuiltinValueHelper {
     /// Integer type.

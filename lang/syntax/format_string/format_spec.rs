@@ -5,14 +5,14 @@
 
 use crate::{src_ref::*, syntax::*};
 
-/// Format specification
+/// Format specification.
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct FormatSpec {
-    /// Precision for number formatting
+    /// Precision for number formatting.
     pub precision: Option<u32>,
-    /// Alignment width (leading zeros)
+    /// Alignment width (leading zeros).
     pub width: Option<u32>,
-    /// Source code reference
+    /// Source code reference.
     pub src_ref: SrcRef,
 }
 

@@ -1,14 +1,14 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Use statement syntax element
+//! Use statement syntax element.
 
 use crate::{resolve::*, src_ref::*, syntax::*};
 
-/// Use statement:
+/// Use statement.
 ///
+/// # Example
 /// ```ucad
-///
 /// use std::*;
 /// ```
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]

@@ -14,12 +14,12 @@ pub trait Linkable<L> {
 /// Item which is either loaded or not loaded.
 ///
 /// Access a loaded item via `Deref` or get a panic when accessing an unloaded item.
-/// By using [`load()`] unloaded items can be loaded from a *loader*.
+/// By using [`Self::load()`] unloaded items can be loaded from a *loader*.
 #[derive(Clone, Debug)]
 pub struct Link<T, L>(LinkInner<T, L>);
 
 impl<T, L> Link<T, L> {
-    /// Load unloaded item  from [`loader`].
+    /// Load unloaded item using given  loader function `f`.
     ///
     /// Does nothing if object was already loaded.
     pub fn load<F: FnMut(&L) -> EvalResult<T>>(&mut self, mut f: F) -> EvalResult<&T> {
@@ -28,7 +28,7 @@ impl<T, L> Link<T, L> {
         }
         Ok(&*self)
     }
-    /// Return `true` if loaded
+    /// Return `true` if loaded.
     pub fn is_loaded(&self) -> bool {
         match &self.0 {
             LinkInner::Unloaded(_) => false,

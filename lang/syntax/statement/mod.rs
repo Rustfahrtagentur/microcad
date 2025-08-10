@@ -17,7 +17,7 @@ pub use if_statement::*;
 pub use return_statement::*;
 pub use statement_list::*;
 
-/// Statement
+/// Any statement.
 #[derive(Clone, Debug, strum::IntoStaticStr, serde::Serialize, serde::Deserialize)]
 pub enum Statement {
     /// Part definition

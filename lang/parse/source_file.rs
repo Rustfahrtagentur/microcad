@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{parse::*, parser::*, rc::*};
+use crate::{parse::*, parser::*, rc::*, tree_display::*};
 use std::io::Read;
 
 impl SourceFile {
@@ -31,7 +31,7 @@ impl SourceFile {
             "Successfully loaded file {}",
             path.as_ref().to_string_lossy(),
         );
-        log::trace!("Syntax tree:\n{}", FormatSyntax(&source_file));
+        log::trace!("Syntax tree:\n{}", FormatTree(&source_file));
 
         Ok(Rc::new(source_file))
     }
@@ -42,7 +42,7 @@ impl SourceFile {
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, 0)?;
         source_file.filename = None;
         log::debug!("loaded string successfully",);
-        log::trace!("Syntax tree:\n{}", FormatSyntax(&source_file));
+        log::trace!("Syntax tree:\n{}", FormatTree(&source_file));
         Ok(Rc::new(source_file))
     }
 

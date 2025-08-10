@@ -5,7 +5,7 @@
 
 use crate::{src_ref::*, syntax::*};
 
-/// Format expression including format specification
+/// Format expression including format specification.
 #[allow(dead_code)]
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FormatExpression {
@@ -18,7 +18,7 @@ pub struct FormatExpression {
 }
 
 impl FormatExpression {
-    /// Create new format expression
+    /// Create new format expression.
     pub fn new(spec: Option<FormatSpec>, expression: Expression, src_ref: SrcRef) -> Self {
         Self {
             src_ref,

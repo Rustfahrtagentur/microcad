@@ -5,7 +5,7 @@ use crate::{builtin::*, diag::*, eval::*, model::Model, rc::*, resolve::*, synta
 
 /// Grant statements depending on context
 pub trait Grant<T> {
-    /// Check if given statement [`T`] is granted within the current context
+    /// Check if given statement `T` is granted within the current context
     fn grant(&mut self, t: &T) -> EvalResult<()>;
 }
 

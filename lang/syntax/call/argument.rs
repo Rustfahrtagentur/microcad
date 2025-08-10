@@ -5,7 +5,7 @@
 
 use crate::{ord_map::*, src_ref::*, syntax::*};
 
-/// Argument
+/// Argument in a [`Call`].
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Argument {
     /// Name of the argument

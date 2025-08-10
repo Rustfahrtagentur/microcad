@@ -5,7 +5,7 @@
 
 use crate::{src_ref::*, syntax::*};
 
-/// Initialization definition
+/// Workbench *initializer* definition
 ///
 /// Example:
 ///
@@ -46,15 +46,15 @@ impl TreeDisplay for InitDefinition {
     }
 }
 
-/// Iterator over part's init statements
+/// Iterator over part's *initializers*.
 pub struct Inits<'a>(std::slice::Iter<'a, Statement>);
 
-/// Interface for elements which have initializers
+/// Interface for elements which have *initializers*.
 pub trait Initialized<'a> {
-    /// return iterator of body statements
+    /// return iterator of body statements.
     fn statements(&'a self) -> std::slice::Iter<'a, Statement>;
 
-    /// Return iterator over all initializers
+    /// Return iterator over all initializers.
     fn inits(&'a self) -> Inits<'a>
     where
         Self: std::marker::Sized,
@@ -64,7 +64,7 @@ pub trait Initialized<'a> {
 }
 
 impl<'a> Inits<'a> {
-    /// Create new init for a part
+    /// Create new init for a part.
     pub fn new(def: &'a impl Initialized<'a>) -> Self {
         Self(def.statements())
     }

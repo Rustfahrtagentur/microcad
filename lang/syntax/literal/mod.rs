@@ -11,7 +11,7 @@ pub use units::*;
 
 use crate::{src_ref::*, syntax::*, ty::*, value::Value};
 
-/// Literal entity
+/// Literal of any kind.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum Literal {
     /// Integer literal
@@ -23,7 +23,7 @@ pub enum Literal {
 }
 
 impl Literal {
-    /// Return value of literal
+    /// Return value of literal.
     pub fn value(&self) -> Value {
         match self {
             Self::Integer(value) => Value::Integer(*value.clone()),
