@@ -118,6 +118,9 @@ macro_rules! mark {
     (FINAL) => {
         color_print::cformat!("<G!,k,s> FOUND </>")
     };
+    (MATCH) => {
+        color_print::cformat!("<Y!,k,s> MATCH </>")
+    };
     (CALL) => {
         color_print::cformat!("<B,k,s> CALL </>")
     };
@@ -131,6 +134,9 @@ macro_rules! found {
     };
     (FINAL) => {
         "Found"
+    };
+    (MATCH) => {
+        "Match"
     };
     (CALL) => {
         "Call"
