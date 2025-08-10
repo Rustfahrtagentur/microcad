@@ -32,7 +32,7 @@ impl std::fmt::Display for ArgumentList {
 }
 
 impl TreeDisplay for ArgumentList {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}ArgumentList:", "")?;
         depth.indent();
         self.0.value.iter().try_for_each(|p| p.tree_print(f, depth))

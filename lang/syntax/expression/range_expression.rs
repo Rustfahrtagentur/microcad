@@ -22,7 +22,7 @@ impl std::fmt::Display for RangeStart {
 }
 
 impl TreeDisplay for RangeStart {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}RangeStart:", "")?;
         depth.indent();
         self.0.tree_print(f, depth)
@@ -45,7 +45,7 @@ impl std::fmt::Display for RangeEnd {
     }
 }
 impl TreeDisplay for RangeEnd {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}RangeEnd:", "")?;
         depth.indent();
         self.0.tree_print(f, depth)
@@ -75,7 +75,7 @@ impl std::fmt::Display for RangeExpression {
     }
 }
 impl TreeDisplay for RangeExpression {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}RangeExpression:", "")?;
         depth.indent();
         self.start.tree_print(f, depth)?;

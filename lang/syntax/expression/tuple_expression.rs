@@ -40,7 +40,7 @@ impl std::fmt::Display for TupleExpression {
 }
 
 impl TreeDisplay for TupleExpression {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}TupleExpression:", "")?;
         depth.indent();
         self.args.tree_print(f, depth)

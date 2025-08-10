@@ -102,7 +102,7 @@ impl std::fmt::Display for Parameter {
 }
 
 impl TreeDisplay for Parameter {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         match (&self.specified_type, &self.default_value) {
             (Some(specified_type), Some(default_value)) => writeln!(
                 f,

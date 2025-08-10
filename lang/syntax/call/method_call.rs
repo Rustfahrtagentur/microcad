@@ -29,7 +29,7 @@ impl std::fmt::Display for MethodCall {
 }
 
 impl TreeDisplay for MethodCall {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}MethodCall '{}':", "", self.id)?;
         depth.indent();
         self.argument_list.tree_print(f, depth)

@@ -38,7 +38,7 @@ impl std::fmt::Display for InitDefinition {
 }
 
 impl TreeDisplay for InitDefinition {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}InitDefinition:", "")?;
         depth.indent();
         self.parameters.tree_print(f, depth)?;

@@ -91,7 +91,7 @@ impl std::fmt::Display for Statement {
 }
 
 impl TreeDisplay for Statement {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         // statement is transparent
         match self {
             Self::Workbench(w) => w.tree_print(f, depth),

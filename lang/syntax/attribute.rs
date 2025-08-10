@@ -77,7 +77,7 @@ impl Attribute {
 }
 
 impl TreeDisplay for Attribute {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Attribute: {self}", "")
     }
 }

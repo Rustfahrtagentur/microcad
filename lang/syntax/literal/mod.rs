@@ -70,7 +70,7 @@ impl From<Literal> for Value {
 }
 
 impl TreeDisplay for Literal {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         write!(f, "{:depth$}Literal: ", "")?;
         match self {
             Literal::Integer(i) => writeln!(f, "{i}"),

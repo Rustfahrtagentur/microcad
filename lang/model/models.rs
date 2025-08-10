@@ -228,7 +228,7 @@ impl FromIterator<Model> for Models {
 }
 
 impl TreeDisplay for Models {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         self.iter().try_for_each(|child| child.tree_print(f, depth))
     }
 }

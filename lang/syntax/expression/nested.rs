@@ -62,7 +62,7 @@ impl std::fmt::Display for Nested {
 }
 
 impl TreeDisplay for Nested {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Nested:", "")?;
         depth.indent();
         self.0.iter().try_for_each(|ni| ni.tree_print(f, depth))

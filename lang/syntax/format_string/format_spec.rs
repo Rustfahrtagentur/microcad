@@ -34,7 +34,7 @@ impl std::fmt::Display for FormatSpec {
 }
 
 impl TreeDisplay for FormatSpec {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         match (self.width, self.precision) {
             (Some(width), Some(precision)) => {
                 writeln!(f, "{:depth$}FormatSpec: 0{width}.{precision}", "")

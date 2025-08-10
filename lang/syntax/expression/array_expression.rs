@@ -60,7 +60,7 @@ impl SrcReferrer for ArrayExpressionInner {
 }
 
 impl TreeDisplay for ArrayExpressionInner {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         match &self {
             ArrayExpressionInner::List(expressions) => {
                 writeln!(f, "{:depth$}List:", "")?;
@@ -100,7 +100,7 @@ impl std::fmt::Display for ArrayExpression {
 }
 
 impl TreeDisplay for ArrayExpression {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}ArrayExpression:", "")?;
         depth.indent();
         self.inner.tree_print(f, depth)?;

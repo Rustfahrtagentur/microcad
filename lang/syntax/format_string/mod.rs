@@ -72,7 +72,7 @@ impl std::fmt::Display for FormatString {
 }
 
 impl TreeDisplay for FormatString {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}FormatString:", "")?;
         depth.indent();
         self.0.iter().try_for_each(|fs| match fs {

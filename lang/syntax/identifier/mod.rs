@@ -140,7 +140,7 @@ impl PartialEq<str> for Identifier {
 }
 
 impl TreeDisplay for Identifier {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Identifier: {}", "", self.id())
     }
 }

@@ -45,7 +45,7 @@ impl SrcReferrer for FormatExpression {
 }
 
 impl TreeDisplay for FormatExpression {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}FormatExpression:", "")?;
         depth.indent();
         if let Some(spec) = &self.spec {

@@ -51,7 +51,7 @@ impl std::fmt::Display for UseStatement {
 }
 
 impl TreeDisplay for UseStatement {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}UseStatement", "")?;
         depth.indent();
         self.decl.tree_print(f, depth)

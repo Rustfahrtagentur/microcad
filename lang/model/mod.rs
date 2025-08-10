@@ -247,17 +247,21 @@ impl std::fmt::Display for Model {
 }
 
 impl TreeDisplay for Model {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(
+        &self,
+        f: &mut std::fmt::Formatter,
+        mut tree_state: TreeState,
+    ) -> std::fmt::Result {
         writeln!(
             f,
-            "{:depth$}{signature}",
+            "{:tree_state$}{signature}",
             "",
-            signature = crate::shorten!(self.signature())
+            signature = crate::shorten!(self.signature(), tree_state.shorten)
         )?;
-        depth.indent();
+        tree_state.indent();
         let self_ = self.borrow();
-        self_.attributes.tree_print(f, depth)?;
-        self_.children.tree_print(f, depth)
+        self_.attributes.tree_print(f, tree_state)?;
+        self_.children.tree_print(f, tree_state)
     }
 }
 

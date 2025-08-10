@@ -48,7 +48,7 @@ impl std::fmt::Display for Argument {
 }
 
 impl TreeDisplay for Argument {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         match self.id {
             Some(ref id) => writeln!(f, "{:depth$}Argument '{id:?}':", "")?,
             None => writeln!(f, "{:depth$}Argument:", "")?,

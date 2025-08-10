@@ -36,7 +36,7 @@ impl FunctionDefinition {
 }
 
 impl TreeDisplay for FunctionDefinition {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}FunctionDefinition '{}':", "", self.id)?;
         depth.indent();
         writeln!(f, "{:depth$}Signature:", "")?;

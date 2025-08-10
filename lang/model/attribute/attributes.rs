@@ -32,7 +32,7 @@ impl FromIterator<Attribute> for Attributes {
 }
 
 impl TreeDisplay for Attributes {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         self.iter()
             .try_for_each(|attribute| writeln!(f, "{:depth$}{attribute}", ""))
     }

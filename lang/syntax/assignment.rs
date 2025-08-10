@@ -36,7 +36,7 @@ impl std::fmt::Display for Assignment {
 }
 
 impl TreeDisplay for Assignment {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Assignment {}:", "", self.id)?;
         depth.indent();
         if let Some(specified_type) = &self.specified_type {

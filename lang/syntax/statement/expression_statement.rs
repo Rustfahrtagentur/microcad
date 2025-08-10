@@ -23,7 +23,7 @@ impl SrcReferrer for ExpressionStatement {
 }
 
 impl TreeDisplay for ExpressionStatement {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         self.expression.tree_print(f, depth)
     }
 }

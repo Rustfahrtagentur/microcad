@@ -23,7 +23,7 @@ impl SrcReferrer for AssignmentStatement {
 }
 
 impl TreeDisplay for AssignmentStatement {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Assignment '{}'", "", self.assignment)
     }
 }

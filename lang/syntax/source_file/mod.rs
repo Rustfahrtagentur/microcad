@@ -90,7 +90,7 @@ impl std::fmt::Display for SourceFile {
 }
 
 impl TreeDisplay for SourceFile {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(
             f,
             "{:depth$}SourceFile '{:?}' ({}):",

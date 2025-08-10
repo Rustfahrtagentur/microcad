@@ -144,13 +144,13 @@ impl std::fmt::Display for Expression {
 }
 
 impl TreeDisplay for Value {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         write!(f, "{:depth$}Value: {value}", "", value = self)
     }
 }
 
 impl TreeDisplay for Expression {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         match self {
             Expression::Value(value) => value.tree_print(f, depth),
             Expression::Literal(literal) => literal.tree_print(f, depth),

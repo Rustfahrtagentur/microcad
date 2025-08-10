@@ -267,7 +267,7 @@ impl Unit {
 }
 
 impl TreeDisplay for Unit {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         if !matches!(self, Unit::None) {
             writeln!(f, "{:depth$}Unit: {}", "", self)
         } else {

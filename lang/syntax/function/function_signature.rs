@@ -30,7 +30,7 @@ impl FunctionSignature {
 }
 
 impl TreeDisplay for FunctionSignature {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Parameters:", "")?;
         depth.indent();
         self.parameters.tree_print(f, depth)?;

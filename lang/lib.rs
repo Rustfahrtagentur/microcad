@@ -82,7 +82,7 @@ pub fn shorten(what: &str, max_chars: usize) -> String {
         })
         .collect();
 
-    if cfg!(feature = "ansi-color") {
+    if cfg!(feature = "ansi-color") && short.contains('\x1b') {
         short + "\x1b[0m"
     } else {
         short
@@ -94,6 +94,13 @@ pub fn shorten(what: &str, max_chars: usize) -> String {
 macro_rules! shorten {
     ($what:expr) => {
         $crate::shorten(&format!("{}", $what), 80)
+    };
+    ($what:expr,$shorten:expr) => {
+        if $shorten {
+            $crate::shorten!($what)
+        } else {
+            $what
+        }
     };
     ($what:expr, $max_chars:literal) => {
         shorten(format!("{}", $what).lines(), max_chars)

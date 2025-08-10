@@ -37,7 +37,7 @@ impl std::fmt::Display for Call {
 }
 
 impl TreeDisplay for Call {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Call '{}':", "", self.name)?;
         depth.indent();
         self.argument_list

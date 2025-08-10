@@ -37,7 +37,7 @@ impl std::fmt::Display for IfStatement {
 }
 
 impl TreeDisplay for IfStatement {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}IfStatement:", "")?;
         depth.indent();
         writeln!(f, "{:depth$}Condition:", "")?;

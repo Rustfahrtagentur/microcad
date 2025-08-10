@@ -71,7 +71,7 @@ impl std::fmt::Display for UseDeclaration {
 }
 
 impl TreeDisplay for UseDeclaration {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         // use declaration is transparent
         match self {
             UseDeclaration::Use(name) => writeln!(f, "{:depth$}Use {name}", ""),

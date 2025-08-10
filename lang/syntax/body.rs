@@ -40,7 +40,7 @@ impl std::fmt::Display for Body {
 }
 
 impl TreeDisplay for Body {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Body:", "")?;
         depth.indent();
         self.statements

@@ -7,12 +7,30 @@
 pub trait TreeDisplay {
     /// Write item into [`f`] and use `{:depth$}` syntax in front of your single line
     /// output to get proper indention.
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeIndent) -> std::fmt::Result;
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result;
 
     /// Display as tree starting at depth `0`.
-    fn print_tree(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let depth = 0.into();
-        self.tree_print(f, depth)
+    fn print_tree(&self, f: &mut std::fmt::Formatter, shorten: bool) -> std::fmt::Result {
+        self.tree_print(f, TreeState { depth: 0, shorten })
+    }
+
+    /// Display as tree starting at depth `0`.
+    fn write_tree(&self, f: &mut impl std::io::Write) -> std::io::Result<()> {
+        write!(f, "{}", WriteFmt(|f| self.print_tree(f, false)))
+    }
+}
+
+/// Helper to write into io from fmt writers
+struct WriteFmt<F>(pub F)
+where
+    F: Fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result;
+
+impl<F> std::fmt::Display for WriteFmt<F>
+where
+    F: Fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0(f)
     }
 }
 
@@ -21,22 +39,39 @@ const INDENT: usize = 2;
 
 /// Indention depth counter
 #[derive(derive_more::Deref, Clone, Copy)]
-pub struct TreeIndent(usize);
+pub struct TreeState {
+    #[deref]
+    depth: usize,
+    /// Data shall be shortened to one-line if `true`
+    pub shorten: bool,
+}
 
-impl TreeIndent {
+impl TreeState {
+    /// Create new tree state
+    /// - [`shorten`]: If `true` content will be shortened to one line
+    pub fn new(shorten: bool) -> Self {
+        Self { depth: 0, shorten }
+    }
+
     /// Change indention one step deeper
     pub fn indent(&mut self) {
-        self.0 += INDENT
+        self.depth += INDENT
     }
 
     /// Return a indention which is one step deeper
     pub fn indented(&self) -> Self {
-        Self(self.0 + INDENT)
+        Self {
+            depth: self.depth + INDENT,
+            shorten: self.shorten,
+        }
     }
 }
 
-impl From<usize> for TreeIndent {
+impl From<usize> for TreeState {
     fn from(depth: usize) -> Self {
-        TreeIndent(depth)
+        TreeState {
+            depth,
+            shorten: true,
+        }
     }
 }

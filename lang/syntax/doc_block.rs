@@ -29,7 +29,7 @@ impl std::fmt::Display for DocBlock {
 }
 
 impl TreeDisplay for DocBlock {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}DocBlock:", "")?;
         depth.indent();
         self.lines
