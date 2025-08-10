@@ -198,7 +198,6 @@ impl Default for Context {
 }
 impl Lookup for Context {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::debug!("Lookup {name}");
         self.symbol_table.lookup(name)
     }
 }

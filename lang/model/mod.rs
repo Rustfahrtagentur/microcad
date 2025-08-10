@@ -181,9 +181,9 @@ impl Model {
             },
             output_type = self.final_output_type(),
             is_root = if self.parents().next().is_some() {
-                String::new()
+                ""
             } else {
-                " (root)".into()
+                " (root)"
             }
         )
     }
@@ -238,7 +238,7 @@ impl PartialEq for Model {
 /// ```
 impl std::fmt::Display for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(
+        write!(
             f,
             "{signature}",
             signature = crate::shorten!(self.signature())

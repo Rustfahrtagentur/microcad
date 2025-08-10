@@ -76,7 +76,7 @@ impl SymbolTable {
 
     /// Lookup a symbol from local stack.
     fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("looking up locally for '{name}'");
+        log::trace!("Looking for local symbol '{name}'");
         let symbol = if let Some(id) = name.single_identifier() {
             self.stack.fetch(id)
         } else {
@@ -90,7 +90,7 @@ impl SymbolTable {
 
         match symbol {
             Ok(symbol) => {
-                log::trace!("local found '{name}' = '{}'", symbol.full_name());
+                log::trace!("Found local symbol: '{name}' = '{}'", symbol.full_name());
                 Ok(symbol)
             }
             Err(err) => Err(err),
@@ -99,27 +99,28 @@ impl SymbolTable {
 
     /// Lookup a symbol from global symbols.
     fn lookup_global(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("looking up globally for '{name}'");
+        log::trace!("Looking for global symbol '{name}'");
         let symbol = match self.globals.search(name) {
             Ok(symbol) => symbol.clone(),
             Err(EvalError::SymbolNotFound(_)) => self.load_symbol(name)?,
             err => return err,
         };
-        log::debug!("global found '{name}' = '{}'", symbol.full_name());
+        log::trace!("Found global symbol '{name}': = '{}'", symbol.full_name());
         Ok(symbol)
     }
 
     fn lookup_current(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        let name = &name.with_prefix(&self.stack.current_module_name());
-        log::trace!("lookup current in for '{name}'");
+        let module = &self.stack.current_module_name();
+        log::trace!("looking for symbol '{name}' in current module '{module}'");
+        let name = &name.with_prefix(module);
         match self.lookup_global(name) {
             Ok(symbol) => {
                 if symbol.full_name() == *name {
-                    log::debug!(
-                        "lookup in current module found '{name}' = '{}'",
+                    log::trace!(
+                        "Found symbol in current module: '{name}' = '{}'",
                         symbol.full_name()
                     );
-                    return self.follow_alias(symbol);
+                    return self.follow_alias(&symbol);
                 }
             }
             err => return err,
@@ -136,30 +137,28 @@ impl SymbolTable {
         if name.src_ref().is_some() {
             let name =
                 &name.with_prefix(self.cache.get_name_by_hash(name.src_ref().source_hash())?);
-            log::trace!("lookup relatively for '{name}'");
+            log::trace!("Looking relatively for symbol '{name}'");
             let symbol = self.lookup_global(name)?;
-            log::debug!(
-                "lookup relatively found '{name}' = '{}'",
+            log::trace!(
+                "Found symbol relatively: '{name}' = '{}'",
                 symbol.full_name()
             );
-            return self.follow_alias(symbol);
+            return self.follow_alias(&symbol);
         }
         Err(EvalError::SymbolNotFound(name.clone()))
     }
 
     fn de_alias(&mut self, name: &QualifiedName) -> QualifiedName {
-        log::trace!("de-alias: {name}..");
         for p in (1..name.len()).rev() {
             if let Ok(symbol) = self.lookup_global(&QualifiedName::no_ref(name[0..p].to_vec())) {
                 if let SymbolDefinition::Alias(_, alias) = &symbol.borrow().def {
                     let suffix: QualifiedName = name[p..].iter().cloned().collect();
                     let new_name = suffix.with_prefix(alias);
-                    log::debug!("de-aliased: {name} into {new_name}");
+                    log::trace!("De-aliased name: {name} into {new_name}");
                     return new_name;
                 }
             }
         }
-        log::trace!("not de-aliased: {name}..");
         name.clone()
     }
 
@@ -170,12 +169,12 @@ impl SymbolTable {
     /// # Arguments
     /// - `name`: Name of the symbol to load
     fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("trying to load symbol {name}");
+        log::trace!("Trying to load symbol {name}");
 
         // if symbol could not be found in symbol tree, try to load it from external file
         match self.cache.get_by_name(name) {
             Err(EvalError::SymbolMustBeLoaded(_, path)) => {
-                log::debug!("loading symbol {name} from {path:?}");
+                log::trace!("Loading symbol {name} from {path:?}");
                 let source_file =
                     SourceFile::load_with_name(path.clone(), self.cache.name_by_path(&path)?)?;
                 let source_name = self.cache.insert(source_file.clone())?;
@@ -197,7 +196,7 @@ impl SymbolTable {
         self.globals.search(name)
     }
 
-    fn follow_alias(&mut self, symbol: Symbol) -> EvalResult<Symbol> {
+    fn follow_alias(&mut self, symbol: &Symbol) -> EvalResult<Symbol> {
         // execute alias from any use statement
         let def = &symbol.borrow().def;
         if let SymbolDefinition::Alias(_, name) = def {
@@ -216,28 +215,29 @@ impl SymbolTable {
 
 impl Lookup for SymbolTable {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("looking up {name}");
+        log::debug!("Lookup symbol '{name}'");
 
         let name = &self.de_alias(name);
 
-        // collect all symbols that can be found
+        // collect all symbols that can be found and remember origin
         let result = [
-            self.lookup_local(name),
-            self.lookup_current(name),
-            self.lookup_global(name),
-            self.lookup_relatively(name),
+            ("local", self.lookup_local(name)),
+            ("current", self.lookup_current(name)),
+            ("global", self.lookup_global(name)),
+            ("relative", self.lookup_relatively(name)),
         ]
         .into_iter();
 
         let mut errors = Vec::new();
 
         // collect ok-results and ambiguity errors
-        let (found, mut ambiguous) =
-            result.fold((Vec::new(), Vec::new()), |(mut oks, mut ambiguity), r| {
+        let (found, mut ambiguous) = result.fold(
+            (Vec::new(), Vec::new()),
+            |(mut oks, mut ambiguity), (origin, r)| {
                 match r {
-                    Ok(symbol) => oks.push(symbol),
+                    Ok(symbol) => oks.push((origin, symbol)),
                     Err(EvalError::AmbiguousSymbol { ambiguous, others }) => {
-                        ambiguity.push(EvalError::AmbiguousSymbol { ambiguous, others })
+                        ambiguity.push((origin, EvalError::AmbiguousSymbol { ambiguous, others }))
                     }
                     Err(
                         EvalError::SymbolNotFound(_)
@@ -245,42 +245,58 @@ impl Lookup for SymbolTable {
                         | EvalError::ExternalPathNotFound(_)
                         | EvalError::NulHash,
                     ) => (),
-                    Err(err) => errors.push(err),
+                    Err(err) => errors.push((origin, err)),
                 }
                 (oks, ambiguity)
-            });
+            },
+        );
 
         // log any unexpected errors and return early
         if !errors.is_empty() {
+            log::debug!("Unexpected errors while lookup symbol '{name}':");
             errors
                 .iter()
-                .for_each(|err| log::error!("lookup error: {err}"));
-            return Err(errors.remove(0));
+                .for_each(|(origin, err)| log::error!("Lookup ({origin}) error: {err}"));
+
+            return Err(errors.remove(0).1);
         }
 
         // early emit any ambiguity error
         if !ambiguous.is_empty() {
-            return Err(ambiguous.remove(0));
+            log::debug!(
+                "Ambiguous Symbol '{name}':\n{}",
+                ambiguous
+                    .iter()
+                    .map(|(origin, err)| format!("{origin}: {err}"))
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            );
+            return Err(ambiguous.remove(0).1);
         }
 
         // follow aliases
-        let found: Vec<Symbol> = found
+        let found: Vec<_> = found
             .into_iter()
-            .map(|symbol| self.follow_alias(symbol))
-            .filter_map(Result::ok)
+            .filter_map(|(origin, symbol)| {
+                if self.follow_alias(&symbol).is_ok() {
+                    Some((origin, symbol))
+                } else {
+                    None
+                }
+            })
             .collect();
 
         // check for ambiguity in what's left
         match found.first() {
-            Some(first) => {
+            Some((origin, first)) => {
                 // check if all findings point to the same symbol
-                if !found.iter().all(|x| Rc::ptr_eq(x, first)) {
+                if !found.iter().all(|(_, x)| Rc::ptr_eq(x, first)) {
                     Err(EvalError::AmbiguousSymbol {
                         ambiguous: name.clone(),
-                        others: found.into(),
+                        others: found.iter().map(|(_, x)| x.clone()).collect(),
                     })
                 } else {
-                    log::debug!("lookup of {name} successful");
+                    log::debug!("Symbol '{name}' found in {origin}");
                     Ok(first.clone())
                 }
             }
