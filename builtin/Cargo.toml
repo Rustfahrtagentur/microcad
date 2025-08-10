@@ -20,7 +20,7 @@ cgmath = "0.18"
 geo = "0.30"
 anyhow = "1.0"
 env_logger = "0.11"
-ctor = "0.4"
+ctor = "0.5"
 
 microcad-core = { workspace = true }
 microcad-lang = { workspace = true }
