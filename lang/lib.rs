@@ -3,7 +3,7 @@
 
 //! Processing of µcad source code.
 //!
-//! This module includes all components to parse, resolve and evaluate µcad code.and diagnose errors.
+//! This module includes all components to parse, resolve and evaluate µcad code and diagnose errors.
 //!
 //! - Load and parse source files in [`parse`] and [`syntax`]
 //! - Resolve parsed sources in [`resolve`]
