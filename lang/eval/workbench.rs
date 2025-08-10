@@ -104,7 +104,8 @@ impl CallTrait<Models> for WorkbenchDefinition {
     /// Return evaluated nodes (multiple nodes might be created by parameter multiplicity).
     fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Models> {
         log::debug!(
-            "Workbench call {kind} {id:?}({args})",
+            "Workbench {call} {kind} {id:?}({args})",
+            call = crate::mark!(CALL),
             id = self.id,
             kind = self.kind
         );
