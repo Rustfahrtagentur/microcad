@@ -87,7 +87,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/init_use.svg)](../doc/tests/.test/init_use.log) | [init_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/init_workbench.svg)](../doc/tests/.test/init_workbench.log) | [init_workbench](../doc/tests/statement_usage.md) |
 | [![test](../doc/structure/.test/initial_source_file_2D.svg)](../doc/structure/.test/initial_source_file_2D.log) | [initial_source_file_2D](../doc/structure/source_files.md) |
-| [![test](../doc/structure/.test/initial_source_file_3.svg)](../doc/structure/.test/initial_source_file_3.log) | [initial_source_file_3](../doc/structure/source_files.md) |
+| [![test](../doc/structure/.test/initial_source_file_3D.svg)](../doc/structure/.test/initial_source_file_3D.log) | [initial_source_file_3D](../doc/structure/source_files.md) |
 | [![test](../doc/structure/.test/initial_source_file_mixed.svg)](../doc/structure/.test/initial_source_file_mixed.log) | [initial_source_file_mixed](../doc/structure/source_files.md) |
 | [![test](../doc/structure/.test/initializers.svg)](../doc/structure/.test/initializers.log) | [initializers](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/inline_identifiers.svg)](../doc/structure/.test/inline_identifiers.log) | [inline_identifiers](../doc/structure/arguments.md) |

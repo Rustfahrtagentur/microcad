@@ -6,10 +6,11 @@
 
  1: r = std::geo2d::rect(width = 2mm, height = 2mm);
  2: 
- 3: r.std::ops::translate(x = -4mm, y = -4mm);
- 4: r.std::ops::translate(x = -4mm, y = 4mm);
- 5: r.std::ops::translate(x = 4mm, y = -4mm);
- 6: r.std::ops::translate(x = 4mm, y = 4mm);
+ 3: use std::ops::translate;
+ 4: r.translate(x = -4mm, y = -4mm);
+ 5: r.translate(x = -4mm, y = 4mm);
+ 6: r.translate(x = 4mm, y = -4mm);
+ 7: r.translate(x = 4mm, y = 4mm);
 
 -- Output --
 -- Errors --

@@ -145,10 +145,11 @@ The example results in the following calls:
 ```µcad,no_multiplicity
 r = std::geo2d::rect(width = 2mm, height = 2mm);
 
-r.std::ops::translate(x = -4mm, y = -4mm);
-r.std::ops::translate(x = -4mm, y = 4mm);
-r.std::ops::translate(x = 4mm, y = -4mm);
-r.std::ops::translate(x = 4mm, y = 4mm);
+use std::ops::translate;
+r.translate(x = -4mm, y = -4mm);
+r.translate(x = -4mm, y = 4mm);
+r.translate(x = 4mm, y = -4mm);
+r.translate(x = 4mm, y = 4mm);
 ```
 
 Normally, this would require 2 nested *for loops*, which are not available in µcad.
