@@ -106,3 +106,32 @@ macro_rules! shorten {
         shorten(format!("{}", $what).lines(), max_chars)
     };
 }
+
+/// Create a marker string which is colored with ANSI.
+#[cfg(feature = "ansi-color")]
+#[macro_export]
+macro_rules! mark {
+    (FOUND) => {
+        color_print::cformat!("<W!,k,s> FOUND </>")
+    };
+    (FINAL) => {
+        color_print::cformat!("<G!,k,s> FOUND </>")
+    };
+    (CALL) => {
+        color_print::cformat!("<B,k,s> CALL </>")
+    };
+}
+
+#[cfg(not(feature = "ansi-color"))]
+#[macro_export]
+macro_rules! found {
+    (FOUND) => {
+        "Found"
+    };
+    (FINAL) => {
+        "Found"
+    };
+    (CALL) => {
+        "Call"
+    };
+}

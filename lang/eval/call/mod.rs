@@ -55,7 +55,11 @@ impl Eval for Call {
 
         // evaluate arguments
         let args = self.argument_list.eval(context)?;
-        log::trace!("Call {name}({args})", name = self.name);
+        log::debug!(
+            "{call} {name}({args})",
+            name = self.name,
+            call = crate::mark!(CALL),
+        );
 
         match context.scope(
             StackFrame::Call {

@@ -3,23 +3,6 @@
 
 use crate::{eval::*, model::*, rc::*, resolve::*, syntax::*};
 
-#[cfg(feature = "ansi-color")]
-macro_rules! mark {
-    (FOUND) => {
-        color_print::cformat!("<W!,k,s> FOUND </>")
-    };
-    (FINAL) => {
-        color_print::cformat!("<G!,k,s> FOUND </>")
-    };
-}
-
-#[cfg(not(feature = "ansi-color"))]
-macro_rules! found {
-    (*) => {
-        "Found"
-    };
-}
-
 /// *Symbol table* holding global and local symbols.
 ///
 /// The symbol table consists of the following members:
@@ -109,7 +92,7 @@ impl SymbolTable {
             Ok(symbol) => {
                 log::trace!(
                     "{found} local symbol: '{name}' = '{full_name}'",
-                    found = mark!(FOUND),
+                    found = crate::mark!(FOUND),
                     full_name = symbol.full_name()
                 );
                 Ok(symbol)
@@ -128,7 +111,7 @@ impl SymbolTable {
         };
         log::trace!(
             "{found} global symbol '{name}': = '{full_name}'",
-            found = mark!(FOUND),
+            found = crate::mark!(FOUND),
             full_name = symbol.full_name()
         );
         Ok(symbol)
@@ -143,7 +126,7 @@ impl SymbolTable {
                 if symbol.full_name() == *name {
                     log::trace!(
                         "{found} symbol in current module: '{name}' = '{full_name}'",
-                        found = mark!(FOUND),
+                        found = crate::mark!(FOUND),
                         full_name = symbol.full_name()
                     );
                     return self.follow_alias(&symbol);
@@ -163,7 +146,7 @@ impl SymbolTable {
                     if symbol.full_name() == *name {
                         log::trace!(
                             "{found} symbol in current module: '{name}' = '{full_name}'",
-                            found = mark!(FOUND),
+                            found = crate::mark!(FOUND),
                             full_name = symbol.full_name()
                         );
                         return self.follow_alias(&symbol);
@@ -188,7 +171,7 @@ impl SymbolTable {
             let symbol = self.lookup_global(name)?;
             log::trace!(
                 "{found} symbol relatively: '{name}' = '{full_name}'",
-                found = mark!(FOUND),
+                found = crate::mark!(FOUND),
                 full_name = symbol.full_name()
             );
             return self.follow_alias(&symbol);
@@ -248,7 +231,7 @@ impl SymbolTable {
         // execute alias from any use statement
         let def = &symbol.borrow().def;
         if let SymbolDefinition::Alias(_, name) = def {
-            log::trace!("{found} alias => {name}", found = mark!(FOUND));
+            log::trace!("{found} alias => {name}", found = crate::mark!(FOUND));
             Ok(self.lookup(name)?)
         } else {
             Ok(symbol.clone())
@@ -345,7 +328,7 @@ impl Lookup for SymbolTable {
                         others: found.iter().map(|(_, x)| x.clone()).collect(),
                     })
                 } else {
-                    log::debug!("{} symbol '{name}' found in {origin}", mark!(FINAL));
+                    log::debug!("{} symbol '{name}' found in {origin}", crate::mark!(FINAL));
                     Ok(first.clone())
                 }
             }
