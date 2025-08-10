@@ -54,7 +54,7 @@ The 2D or 3D objects produced with [*workbenches*](structure/calls.md#calling-wo
 are written in *Rust*.
 
 The [standard library](libs/std/README.md) is a µcad library which encapsulates the
-[builtin library](libs/builtin.md) into a nice and convenient interface.
+[builtin library](libs/builtin/README.md) into a nice and convenient interface.
 
 If you want to make your own libraries put you µcad code into the search paths or create
 a [plugin](libs/plugins.md) to embed Rust code.
