@@ -154,10 +154,10 @@ fn assert_fail() {
     assert_eq!(
         context.diagnosis(),
         "error: Assertion failed: false
-  ---> ../tests/test_cases/syntax/assert_fail.µcad:1:19
+  ---> ../tests/test_cases/syntax/assert_fail.µcad:1:26
      |
-   1 | __builtin::assert(false);
-     |                   ^^^^^
+   1 | __builtin::debug::assert(false);
+     |                          ^^^^^
      |
 "
     );

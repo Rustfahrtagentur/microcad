@@ -3,11 +3,12 @@
 
 //! µcad builtin library
 
-mod assert;
 pub mod context_builder;
+mod debug;
 mod geo2d;
 mod geo3d;
 pub mod import;
+mod log;
 mod math;
 mod ops;
 mod print;
@@ -24,11 +25,7 @@ use std::str::FromStr;
 pub use microcad_lang::builtin::*;
 use microcad_lang::{diag::*, eval::*, resolve::*, syntax::*, ty::Ty, value::*};
 
-pub(crate) use assert::*;
 pub use context_builder::*;
-pub(crate) use math::*;
-pub(crate) use ops::*;
-pub(crate) use print::*;
 
 /// Return type of argument.
 fn type_of() -> Symbol {
@@ -60,19 +57,13 @@ fn count() -> Symbol {
 /// Build the standard module
 pub fn builtin_module() -> Symbol {
     ModuleBuilder::new("__builtin".try_into().expect("unexpected name error"))
-        .symbol(assert())
-        .symbol(assert_eq())
-        .symbol(assert_valid())
-        .symbol(assert_invalid())
+        .symbol(debug::debug())
+        .symbol(log::log())
         .symbol(count())
         .symbol(type_of())
-        .symbol(print())
-        .symbol(todo())
-        .symbol(error())
-        .symbol(warning())
-        .symbol(info())
-        .symbol(ops())
-        .symbol(math())
+        .symbol(print::print())
+        .symbol(ops::ops())
+        .symbol(math::math())
         .symbol(import::import())
         .symbol(geo2d::geo2d())
         .symbol(geo3d::geo3d())

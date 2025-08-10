@@ -37,7 +37,7 @@ fn test_assert() {
 
     let source_file = match SourceFile::load_from_str(
         r#"
-            __builtin::assert(__builtin::math::abs(-1.0) == 1.0);
+            __builtin::debug::assert(__builtin::math::abs(-1.0) == 1.0);
         "#,
     ) {
         Ok(source_file) => source_file,

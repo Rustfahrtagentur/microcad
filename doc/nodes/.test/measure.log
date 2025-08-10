@@ -4,7 +4,7 @@
 
 -- Code --
 
-__builtin::assert_eq([
+__builtin::debug::assert_eq([
     // use measure area() on a circle
     std::geo2d::circle(radius=10mm).area(),
 
@@ -21,10 +21,10 @@ error: Symbol area not found.
      |                                     ^^^^
      |
 error: Elements of list have different types: [Models, Area]
-  ---> <FROM STR>:1:22
+  ---> <FROM STR>:1:29
      |
-   1 | __builtin::assert_eq([
-     |                      ^^^^^^^^^^^^^^^^^^^^^^
+   1 | __builtin::debug::assert_eq([
+     |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 TODO

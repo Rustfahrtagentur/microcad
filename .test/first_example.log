@@ -18,12 +18,11 @@ csg_cube(50mm);
 
 -- Output --
 -- Errors --
-error: Symbol std::math not found.
-  ---> <FROM STR>:1:5
-     |
-   1 | use std::math::*;
-     |     ^^^^^^^^^
-     |
 error: Workbench orient cannot find initialization for those arguments
+  ---> <FROM STR>:7:55
+     |
+   7 |     holes = cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
+     |                                                       ^^^^^^^
+     |
 -- Test Result --
 FAIL
