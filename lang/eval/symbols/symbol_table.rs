@@ -154,6 +154,27 @@ impl SymbolTable {
         Err(EvalError::SymbolNotFound(name.clone()))
     }
 
+    fn lookup_workbench(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+        if let Some(workbench) = &self.stack.current_workbench_name() {
+            log::trace!("Looking for symbol '{name}' in current workbench '{workbench}'");
+            let name = &name.with_prefix(workbench);
+            match self.lookup_global(name) {
+                Ok(symbol) => {
+                    if symbol.full_name() == *name {
+                        log::trace!(
+                            "{found} symbol in current module: '{name}' = '{full_name}'",
+                            found = mark!(FOUND),
+                            full_name = symbol.full_name()
+                        );
+                        return self.follow_alias(&symbol);
+                    }
+                }
+                err => return err,
+            };
+        }
+        Err(EvalError::SymbolNotFound(name.clone()))
+    }
+
     /// Lookup a symbol from global symbols but relatively to the file the given `name` came from.
     ///
     /// - `name`: *Qualified`name* to search for (must have a proper *source code reference*.
@@ -250,6 +271,7 @@ impl Lookup for SymbolTable {
         let result = [
             ("local", self.lookup_local(name)),
             ("current", self.lookup_current(name)),
+            ("workbench", self.lookup_workbench(name)),
             ("global", self.lookup_global(name)),
             ("relative", self.lookup_relatively(name)),
         ]
