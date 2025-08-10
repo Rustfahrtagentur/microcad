@@ -9,7 +9,7 @@ init() {} // error
 -- Output --
 -- Errors --
 error: Init statement not available here
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | init() {} // error
      | ^^^^^^^^^

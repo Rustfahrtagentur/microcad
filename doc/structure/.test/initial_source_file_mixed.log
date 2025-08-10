@@ -10,7 +10,7 @@ std::geo3d::sphere(radius = 1cm);  // error: can't mix 2D and 3D
 -- Output --
 -- Errors --
 error: Cannot mix 2d and 3d geometries
-  ---> <from_str>:2:1
+  ---> <FROM STR>:2:1
      |
    2 | std::geo3d::sphere(radius = 1cm);  // error: can't mix 2D and 3D
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

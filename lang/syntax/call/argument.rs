@@ -41,7 +41,7 @@ impl OrdMapValue<Identifier> for Argument {
 impl std::fmt::Display for Argument {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.id {
-            Some(ref name) => write!(f, "{} = {}", name, self.value),
+            Some(ref id) => write!(f, "{id:?} = {}", self.value),
             None => write!(f, "{}", self.value),
         }
     }
@@ -50,7 +50,7 @@ impl std::fmt::Display for Argument {
 impl TreeDisplay for Argument {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         match self.id {
-            Some(ref name) => writeln!(f, "{:depth$}Argument '{}':", "", name)?,
+            Some(ref id) => writeln!(f, "{:depth$}Argument '{id:?}':", "")?,
             None => writeln!(f, "{:depth$}Argument:", "")?,
         };
         depth.indent();

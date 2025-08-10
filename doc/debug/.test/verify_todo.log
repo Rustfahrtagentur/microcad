@@ -15,7 +15,7 @@ if a == 0 {
 -- Output --
 -- Errors --
 info: a is zero
-  ---> <from_str>:4:20
+  ---> <FROM STR>:4:20
      |
    4 |     std::log::info("a is zero");
      |                    ^^^^^^^^^^^

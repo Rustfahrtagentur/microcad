@@ -15,13 +15,13 @@ __builtin::assert_eq([
 -- Output --
 -- Errors --
 error: Symbol area not found.
-  ---> <from_str>:3:37
+  ---> <FROM STR>:3:37
      |
    3 |     std::geo2d::circle(radius=10mm).area(),
      |                                     ^^^^
      |
 error: Elements of list have different types: [Models, Area]
-  ---> <from_str>:1:22
+  ---> <FROM STR>:1:22
      |
    1 | __builtin::assert_eq([
      |                      ^^^^^^^^^^^^^^^^^^^^^^

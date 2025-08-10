@@ -11,7 +11,7 @@ mod k {
 -- Output --
 -- Errors --
 error: Expression statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
    2 |   __builtin::geo2d::circle(radius=1); // error
      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

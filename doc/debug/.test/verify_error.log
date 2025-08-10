@@ -9,7 +9,7 @@ std::log::error("this should not have happened"); // error
 -- Output --
 -- Errors --
 error: Builtin error: this should not have happened
-  ---> <from_str>:1:17
+  ---> <FROM STR>:1:17
      |
    1 | std::log::error("this should not have happened"); // error
      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

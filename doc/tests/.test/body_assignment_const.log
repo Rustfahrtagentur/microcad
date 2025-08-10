@@ -11,7 +11,7 @@
 -- Output --
 -- Errors --
 error: Assignment statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
    2 |   const B = 1; // error
      |   ^^^^^^^^^^^^

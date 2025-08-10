@@ -73,11 +73,11 @@ impl StackFrame {
     ) -> std::fmt::Result {
         let locals = match self {
             StackFrame::Source(id, locals) => {
-                writeln!(f, "{:depth$}Source: {id}", "")?;
+                writeln!(f, "{:depth$}Source: {id:?}", "")?;
                 locals
             }
             StackFrame::Module(id, locals) => {
-                writeln!(f, "{:depth$}Module: {id}", "")?;
+                writeln!(f, "{:depth$}Module: {id:?}", "")?;
                 locals
             }
             StackFrame::Init(locals) => {
@@ -85,7 +85,7 @@ impl StackFrame {
                 locals
             }
             StackFrame::Workbench(_, id, locals) => {
-                writeln!(f, "{:depth$}Workbench: {id}", "")?;
+                writeln!(f, "{:depth$}Workbench: {id:?}", "")?;
                 locals
             }
             StackFrame::Body(locals) => {
@@ -123,47 +123,37 @@ impl StackFrame {
             match &symbol.borrow().def {
                 SymbolDefinition::Constant(id, value) => writeln!(
                     f,
-                    "{:depth$}Constant: {id}: {ty} = {value}{full_name}",
+                    "{:depth$}Constant: {id:?}: {ty} = {value}{full_name}",
                     "",
                     ty = value.ty()
                 )?,
                 SymbolDefinition::Argument(id, value) => writeln!(
                     f,
-                    "{:depth$}Argument: {id}: {ty} = {value}{full_name}",
+                    "{:depth$}Argument: {id:?}: {ty} = {value}{full_name}",
                     "",
                     ty = value.ty()
                 )?,
-                SymbolDefinition::SourceFile(source_file) => {
-                    writeln!(f, "{:depth$}Source: {:?}", "", source_file.filename)?
+                SymbolDefinition::SourceFile(source) => {
+                    writeln!(f, "{:depth$}Source: {:?}", "", source.filename())?
                 }
-                SymbolDefinition::Module(module_definition) => writeln!(
-                    f,
-                    "{:depth$}Module: {}{full_name}",
-                    "", module_definition.id
-                )?,
-                SymbolDefinition::External(module_definition) => writeln!(
-                    f,
-                    "{:depth$}External: {}{full_name}",
-                    "", module_definition.id
-                )?,
-                SymbolDefinition::Workbench(workbench_definition) => writeln!(
-                    f,
-                    "{:depth$}Workbench: {}{full_name}",
-                    "", workbench_definition.id
-                )?,
-                SymbolDefinition::Function(function_definition) => writeln!(
-                    f,
-                    "{:depth$}Function: {}{full_name}",
-                    "", function_definition.id
-                )?,
+                SymbolDefinition::Module(def) => {
+                    writeln!(f, "{:depth$}Module: {:?}{full_name}", "", def.id)?
+                }
+                SymbolDefinition::External(def) => {
+                    writeln!(f, "{:depth$}External: {:?}{full_name}", "", def.id)?
+                }
+                SymbolDefinition::Workbench(def) => {
+                    writeln!(f, "{:depth$}Workbench: {:?}{full_name}", "", def.id)?
+                }
+                SymbolDefinition::Function(def) => {
+                    writeln!(f, "{:depth$}Function: {:?}{full_name}", "", def.id)?
+                }
                 SymbolDefinition::Builtin(builtin) => {
-                    writeln!(f, "{:depth$}Builtin: {}{full_name}", "", builtin.id)?
+                    writeln!(f, "{:depth$}Builtin: {:?}{full_name}", "", builtin.id)?
                 }
-                SymbolDefinition::Alias(identifier, qualified_name) => writeln!(
-                    f,
-                    "{:depth$}Alias: {identifier}{full_name} -> {qualified_name}",
-                    ""
-                )?,
+                SymbolDefinition::Alias(id, name) => {
+                    writeln!(f, "{:depth$}Alias: {id:?}{full_name} -> {name}", "")?
+                }
                 SymbolDefinition::UseAll(name) => {
                     writeln!(f, "{:depth$}UseAll: {name}{full_name}", "")?
                 }

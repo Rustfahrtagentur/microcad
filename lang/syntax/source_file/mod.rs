@@ -13,7 +13,7 @@ pub struct SourceFile {
     /// Root code body.
     pub statements: StatementList,
     /// Name of loaded file.
-    pub filename: std::path::PathBuf,
+    pub filename: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
     pub source: String,
 
@@ -26,23 +26,34 @@ pub struct SourceFile {
 
 impl SourceFile {
     /// Return filename of loaded file or `<no file>`
+    pub fn filename(&self) -> std::path::PathBuf {
+        self.filename
+            .clone()
+            .unwrap_or(std::path::PathBuf::from(crate::invalid_no_ansi!(SOURCE)))
+    }
+
+    /// Return filename of loaded file or `<no file>`
     pub fn filename_as_str(&self) -> &str {
         self.filename
-            .to_str()
-            .expect("File name error {filename:?}")
+            .as_ref()
+            .map(|f| f.to_str().expect("File name error {filename:?}"))
+            .unwrap_or(crate::invalid!(SOURCE))
     }
 
     /// Return the module name from the file name
     pub fn id(&self) -> Identifier {
-        Identifier(Refer::new(
-            self.filename
-                .file_stem()
-                .expect("cannot get file stem")
-                .to_str()
-                .expect("File name error {filename:?}")
-                .into(),
-            SrcRef::new(0..0, 0, 0, self.hash),
-        ))
+        match &self.filename {
+            Some(filename) => Identifier(Refer::new(
+                filename
+                    .file_stem()
+                    .expect("cannot get file stem")
+                    .to_str()
+                    .expect("File name error {filename:?}")
+                    .into(),
+                SrcRef::new(0..0, 0, 0, self.hash),
+            )),
+            None => Identifier::none(),
+        }
     }
 
     /// get a specific line
@@ -66,10 +77,10 @@ impl SourceFile {
     pub fn resolve_rc(self: Rc<Self>, parent: Option<Symbol>) -> Symbol {
         let name = self.filename_as_str();
         log::debug!("Resolving source file {name}");
-        let node = Symbol::new(SymbolDefinition::SourceFile(self.clone()), parent);
-        node.borrow_mut().children = self.statements.fetch_symbol_map(Some(node.clone()));
-        log::trace!("Resolved source file {name}:\n{node}");
-        node
+        let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone()), parent);
+        symbol.borrow_mut().children = self.statements.fetch_symbol_map(Some(symbol.clone()));
+        log::trace!("Resolved source file {name}:\n{symbol}");
+        symbol
     }
 }
 impl std::fmt::Display for SourceFile {
@@ -82,7 +93,7 @@ impl TreeDisplay for SourceFile {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeIndent) -> std::fmt::Result {
         writeln!(
             f,
-            "{:depth$}SourceFile '{}' ({}):",
+            "{:depth$}SourceFile '{:?}' ({}):",
             "",
             self.id(),
             self.filename_as_str()

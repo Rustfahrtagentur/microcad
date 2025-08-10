@@ -72,7 +72,7 @@ impl std::fmt::Display for ArgumentValueList {
             let mut v = self
                 .map
                 .iter()
-                .map(|(id, p)| format!("{id}: {p}"))
+                .map(|(id, p)| format!("{id:?}: {p}"))
                 .collect::<Vec<_>>();
             v.sort();
             v.join(", ")

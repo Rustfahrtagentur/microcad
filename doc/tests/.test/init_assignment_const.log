@@ -11,13 +11,13 @@ sketch k() { init(l:Length) {
 -- Output --
 -- Errors --
 error: Assignment statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
    2 |   const B = 1; // error
      |   ^^^^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | sketch k() { init(l:Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -11,7 +11,7 @@ fn f() {
 -- Output --
 -- Errors --
 error: Module statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
    2 |   mod m {} // error
      |   ^^^^^^^^

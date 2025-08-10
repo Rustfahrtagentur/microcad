@@ -126,9 +126,9 @@ impl std::fmt::Display for Identifier {
 impl std::fmt::Debug for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.is_empty() {
-            write!(f, "Identifier: {}", crate::invalid!(ID))
+            write!(f, "{}", crate::invalid!(ID))
         } else {
-            write!(f, "Identifier: {:?}", self.0)
+            write!(f, "{}", self.0)
         }
     }
 }
@@ -149,7 +149,7 @@ impl TreeDisplay for Identifier {
 pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
     identifiers
         .iter()
-        .map(|ident| ident.to_string())
+        .map(|ident| format!("{ident:?}"))
         .collect::<Vec<_>>()
         .join(separator)
 }

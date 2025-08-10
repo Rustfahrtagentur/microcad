@@ -25,7 +25,7 @@ impl SourceFile {
 
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)?;
         assert_ne!(source_file.hash, 0);
-        source_file.filename = path.as_ref().to_path_buf();
+        source_file.filename = Some(path.as_ref().to_path_buf());
         source_file.name = name;
         log::debug!(
             "Successfully loaded file {}",
@@ -39,18 +39,8 @@ impl SourceFile {
     /// Create `SourceFile` from string
     /// The hash of the result will be of `crate::from_str!()`.
     pub fn load_from_str(s: &str) -> ParseResult<Rc<Self>> {
-        use std::{
-            hash::{Hash, Hasher},
-            str::FromStr,
-        };
-
-        // TODO: Would not the hash be calculated in SourceFile::parse anyway?
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        "<from_str>".hash(&mut hasher);
-        let hash = hasher.finish();
-
-        let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, hash)?;
-        source_file.filename = std::path::PathBuf::from_str("<from_str>").expect("filename error");
+        let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, 0)?;
+        source_file.filename = None;
         log::debug!("loaded string successfully",);
         log::trace!("Syntax tree:\n{}", FormatSyntax(&source_file));
         Ok(Rc::new(source_file))

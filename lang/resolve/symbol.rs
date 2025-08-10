@@ -151,7 +151,7 @@ impl Symbol {
         let id = id.unwrap_or(self_id);
         writeln!(
             f,
-            "{:depth$}{id} {} [{}]",
+            "{:depth$}{id:?} {} [{}]",
             "",
             self.0.borrow().def,
             self.full_name()

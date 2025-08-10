@@ -19,13 +19,13 @@ punched_disk(radius = 1cm);
 -- Output --
 -- Errors --
 error: Symbol inner not found.
-  ---> <from_str>:8:29
+  ---> <FROM STR>:8:29
      |
    8 |     circle(radius) - circle(inner());
      |                             ^^^^^^^
      |
 error: Workbench circle cannot find initialization for those arguments
-  ---> <from_str>:8:29
+  ---> <FROM STR>:8:29
      |
    8 |     circle(radius) - circle(inner());
      |                             ^^^^^^^

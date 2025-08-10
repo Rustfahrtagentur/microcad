@@ -14,7 +14,7 @@ wheel(radius = 1.0mm);
 -- Output --
 -- Errors --
 error: sketch statement not available here
-  ---> <from_str>:2:5
+  ---> <FROM STR>:2:5
      |
    2 |     sketch axis(length: Length) {}  // error
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

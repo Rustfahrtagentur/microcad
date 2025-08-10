@@ -7,7 +7,6 @@ use derive_more::{Deref, DerefMut};
 /// A qualifier name consists of a . separated list of identifiers
 /// e.g. `a::b::c`
 #[derive(
-    Debug,
     Default,
     Clone,
     PartialEq,
@@ -148,6 +147,16 @@ impl QualifiedName {
 }
 
 impl std::fmt::Display for QualifiedName {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if self.is_empty() {
+            write!(f, crate::invalid!(NAME))
+        } else {
+            write!(f, "{}", join_identifiers(&self.0, "::"))
+        }
+    }
+}
+
+impl std::fmt::Debug for QualifiedName {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.is_empty() {
             write!(f, crate::invalid!(NAME))

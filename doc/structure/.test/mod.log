@@ -29,13 +29,13 @@ math::pow(2.0, 5);  // error: pow is private
 -- Output --
 -- Errors --
 error: Symbol pow not found.
-  ---> <from_str>:15:9
+  ---> <FROM STR>:15:9
      |
   15 |         pow(x, 2.0)
      |         ^^^^^^^^^^^
      |
 error: Symbol pow not found.
-  ---> <from_str>:8:17
+  ---> <FROM STR>:8:17
      |
    8 |             x * pow(x, n-1) // return recursive product
      |                 ^^^^^^^^^^^

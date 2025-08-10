@@ -27,31 +27,31 @@ f( q, z=3cm );
 -- Output --
 -- Errors --
 error: Missing arguments: x,y,z
-  ---> <from_str>:7:4
+  ---> <FROM STR>:7:4
      |
    7 | f( (x=1cm, y=2cm, z=3cm) );
      |    ^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Missing arguments: x,y,z
-  ---> <from_str>:11:4
+  ---> <FROM STR>:11:4
      |
   11 | f( p );
      |    ^^
      |
 error: Missing arguments: x,y
-  ---> <from_str>:14:4
+  ---> <FROM STR>:14:4
      |
   14 | f( (x=1cm, y=2cm), z=3cm );
      |    ^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Missing arguments: x,z
-  ---> <from_str>:15:4
+  ---> <FROM STR>:15:4
      |
   15 | f( y=2cm, (x=1cm, z=3cm) );
      |    ^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Missing arguments: x,y
-  ---> <from_str>:19:4
+  ---> <FROM STR>:19:4
      |
   19 | f( q, z=3cm );
      |    ^^^^^^^^^

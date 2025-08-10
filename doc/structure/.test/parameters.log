@@ -24,13 +24,13 @@ op punch_disk(radius: Length) {
 -- Output --
 -- Errors --
 error: Symbol count not found.
-  ---> <from_str>:3:18
+  ---> <FROM STR>:3:18
      |
    3 |     if @children.count() == 1 {
      |                  ^^^^^
      |
 error: Symbol std::error not found.
-  ---> <from_str>:9:9
+  ---> <FROM STR>:9:9
      |
    9 |         std::error("punch_disk must get one object");
      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

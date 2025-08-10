@@ -11,13 +11,13 @@ sketch k() {
 -- Output --
 -- Errors --
 error: Symbol f not found.
-  ---> <from_str>:2:13
+  ---> <FROM STR>:2:13
      |
    2 |   fn f() {} f(); // error
      |             ^^^
      |
 warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | sketch k() {
      | ^^^^^^^^^^^^

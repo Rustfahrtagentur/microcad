@@ -11,13 +11,13 @@ sketch k() { init(l:Length) {
 -- Output --
 -- Errors --
 error: sketch statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
    2 |   sketch f() {} // error
      |   ^^^^^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | sketch k() { init(l:Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

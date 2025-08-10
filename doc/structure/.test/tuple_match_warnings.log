@@ -10,7 +10,7 @@ f( (x=1cm, y=2cm, v=5cm), z=3cm);  // warning: v is redundant
 -- Output --
 -- Errors --
 error: Missing arguments: x,y
-  ---> <from_str>:2:4
+  ---> <FROM STR>:2:4
      |
    2 | f( (x=1cm, y=2cm, v=5cm), z=3cm);  // warning: v is redundant
      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

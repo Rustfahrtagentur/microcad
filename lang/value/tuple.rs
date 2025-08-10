@@ -400,7 +400,7 @@ impl std::fmt::Display for Tuple {
                 let mut items = self
                     .named
                     .iter()
-                    .map(|(id, v)| format!("{id}: {v}"))
+                    .map(|(id, v)| format!("{id:?}: {v}"))
                     .chain(self.unnamed.values().map(|v| format!("{v}")))
                     .collect::<Vec<String>>();
                 items.sort();

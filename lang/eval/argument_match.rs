@@ -119,7 +119,7 @@ impl<'a> ArgumentMatch<'a> {
                         log::warn!("more than one parameter with that type")
                     }
                 } else {
-                    log::warn!("no parameter with that type")
+                    log::warn!("no parameter with that type (or id mismatch)")
                 }
                 true
             })
@@ -211,12 +211,12 @@ impl std::fmt::Display for ArgumentMatch<'_> {
             "   Arguments: {}\n  Parameters: {}",
             self.arguments
                 .iter()
-                .map(|(id, arg)| format!("{id}: {arg}"))
+                .map(|(id, arg)| format!("{id:?}: {arg}"))
                 .collect::<Vec<_>>()
                 .join(", "),
             self.params
                 .iter()
-                .map(|(id, param)| format!("{id}: {param}"))
+                .map(|(id, param)| format!("{id:?}: {param}"))
                 .collect::<Vec<_>>()
                 .join(", "),
         )

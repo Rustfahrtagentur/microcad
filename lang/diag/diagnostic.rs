@@ -92,7 +92,7 @@ impl Diagnostic {
                     "  ---> {}:{}",
                     source_file
                         .as_ref()
-                        .map(|sf| make_relative(&sf.filename))
+                        .map(|sf| make_relative(&sf.filename()))
                         .unwrap_or(crate::invalid!(FILE).to_string()),
                     src_ref.at
                 )?;

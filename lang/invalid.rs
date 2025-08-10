@@ -77,7 +77,7 @@ mod macros {
             "<INVALID LINE>"
         };
         (SOURCE) => {
-            "<INVALID STR>"
+            "<FROM STR>"
         };
         (UNKNOWN) => {
             "<INVALID UNKNOWN>"

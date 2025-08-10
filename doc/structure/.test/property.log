@@ -29,7 +29,7 @@ outer: 10mm
 inner: <INVALID VALUE>
 -- Errors --
 error: Property not found: inner
-  ---> <from_str>:19:21
+  ---> <FROM STR>:19:21
      |
   19 | std::print("inner: {t.inner}");
      |                     ^^^^^^^

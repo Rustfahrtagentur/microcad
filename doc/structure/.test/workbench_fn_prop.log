@@ -15,7 +15,7 @@ punched_disk(1cm);
 -- Output --
 -- Errors --
 warning: The part workbench will produce no 3D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | part punched_disk(radius: Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
