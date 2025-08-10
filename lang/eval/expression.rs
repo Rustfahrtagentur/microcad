@@ -276,7 +276,7 @@ impl Eval for Expression {
         match &result {
             Ok(Value::None) => {
                 log::warn!(
-                    "Expression resulted in invalid value:\n{self}\n--- into ---\n{}",
+                    "Expression resulted in invalid value:\n{self}\n--- into ---\n{:?}",
                     Value::None
                 )
             }
