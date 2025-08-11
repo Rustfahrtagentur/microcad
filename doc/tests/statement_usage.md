@@ -241,10 +241,17 @@ init(l:Length) {} } K();
 
 [![test](.test/pre_init_pub_use.svg)](.test/pre_init_pub_use.log)
 
+<<<<<<< HEAD
 ```µcad,pre_init_pub_use
 sketch K() { 
   pub use std;
 init(l:Length) {} } K();
+=======
+```µcad,pre_init_pub_use#fail
+sketch k() { 
+  pub use std; // error
+init(l:Length) {} } k();
+>>>>>>> f14fa203 (fix statement usage tests)
 ```
 
 [![test](.test/pre_init_return.svg)](.test/pre_init_return.log)
@@ -347,8 +354,13 @@ sketch K() { init(l:Length) {
 
 [![test](.test/init_pub_use.svg)](.test/init_pub_use.log)
 
+<<<<<<< HEAD
 ```µcad,init_pub_use#todo_fail
 sketch K() { init(l:Length) {
+=======
+```µcad,init_pub_use#fail
+sketch k() { init(l:Length) {
+>>>>>>> f14fa203 (fix statement usage tests)
   pub use std; // error
 } } K(1cm);
 ```
@@ -453,7 +465,7 @@ sketch K() {
 
 [![test](.test/workbench_pub_use.svg)](.test/workbench_pub_use.log)
 
-```µcad,workbench_pub_use#todo_fail
+```µcad,workbench_pub_use#fail
 sketch K() {
   pub use std; // error
 } K();
@@ -567,7 +579,7 @@ sketch K() {
 
 [![test](.test/body_pub_use.svg)](.test/body_pub_use.log)
 
-```µcad,body_pub_use#todo_fail
+```µcad,body_pub_use#fail
 {
   pub use std; // error
 }
@@ -681,9 +693,9 @@ fn f() {
 
 [![test](.test/function_pub_use.svg)](.test/function_pub_use.log)
 
-```µcad,function_pub_use
+```µcad,function_pub_use#fail
 fn f() {
-  pub use std;
+  pub use std; // error
 } f();
 ```
 

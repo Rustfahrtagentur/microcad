@@ -10,6 +10,12 @@
 
 -- Output --
 -- Errors --
+error: Use statement not available here
+  ---> <FROM STR>:2:3
+     |
+   2 |   pub use std; // error
+     |   ^^^^^^^^^^^^
+     |
 warning: The sketch workbench will produce no 2D output.
   ---> <FROM STR>:1:1
      |
@@ -17,4 +23,4 @@ warning: The sketch workbench will produce no 2D output.
      | ^^^^^^^^^^^^
      |
 -- Test Result --
-FAIL(TODO)
+FAILED AS EXPECTED

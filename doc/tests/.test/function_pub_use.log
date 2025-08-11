@@ -5,10 +5,16 @@
 -- Code --
 
  1: fn f() {
- 2:   pub use std;
+ 2:   pub use std; // error
  3: } f();
 
 -- Output --
 -- Errors --
+error: Use statement not available here
+  ---> <FROM STR>:2:3
+     |
+   2 |   pub use std; // error
+     |   ^^^^^^^^^^^^
+     |
 -- Test Result --
-OK
+FAILED AS EXPECTED
