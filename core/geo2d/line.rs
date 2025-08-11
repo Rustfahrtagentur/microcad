@@ -77,3 +77,20 @@ impl Transformed2D for Line {
         )
     }
 }
+
+impl bincode::Encode for Line {
+    fn encode<E: bincode::enc::Encoder>(
+        &self,
+        encoder: &mut E,
+    ) -> Result<(), bincode::error::EncodeError> {
+        todo!()
+    }
+}
+
+impl<C> bincode::Decode<C> for Line {
+    fn decode<D: bincode::de::Decoder<Context = C>>(
+        decoder: &mut D,
+    ) -> Result<Self, bincode::error::DecodeError> {
+        todo!()
+    }
+}

@@ -12,7 +12,18 @@ pub use qualified_name::*;
 use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 
 /// µcad identifier
-#[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Default,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    bincode::Encode,
+    bincode::Decode,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct Identifier(pub Refer<Id>);
 
 static UNIQUE_ID_NEXT: std::sync::Mutex<usize> = std::sync::Mutex::new(0);

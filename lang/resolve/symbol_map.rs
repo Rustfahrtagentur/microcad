@@ -6,7 +6,17 @@ use derive_more::{Deref, DerefMut};
 use std::collections::btree_map::BTreeMap;
 
 /// Map Id to SymbolNode reference
-#[derive(Debug, Default, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Default,
+    Clone,
+    Deref,
+    DerefMut,
+    bincode::Encode,
+    bincode::Decode,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct SymbolMap(BTreeMap<Identifier, Symbol>);
 
 impl From<Tuple> for SymbolMap {

@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Return statement.
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
 pub struct ReturnStatement {
     /// Return value.
     pub result: Option<Expression>,

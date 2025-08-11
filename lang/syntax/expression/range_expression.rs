@@ -6,7 +6,9 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Range start.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Clone, Debug, Default, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
+)]
 pub struct RangeStart(pub Box<Expression>);
 
 impl SrcReferrer for RangeStart {
@@ -30,7 +32,9 @@ impl TreeDisplay for RangeStart {
 }
 
 /// Range end.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Clone, Debug, Default, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
+)]
 pub struct RangeEnd(pub Box<Expression>);
 
 impl SrcReferrer for RangeEnd {
@@ -53,7 +57,9 @@ impl TreeDisplay for RangeEnd {
 }
 
 /// Range expression, e.g. `a..b`.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Clone, Debug, Default, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
+)]
 pub struct RangeExpression {
     /// Start of the range.
     pub start: RangeStart,

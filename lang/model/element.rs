@@ -8,7 +8,16 @@ use microcad_core::*;
 use strum::IntoStaticStr;
 
 /// An element defines the entity of a [`Model`].
-#[derive(Clone, IntoStaticStr, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Clone,
+    IntoStaticStr,
+    Debug,
+    Default,
+    bincode::Encode,
+    bincode::Decode,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub enum Element {
     #[default]
     /// A group element is created by a body `{}`.

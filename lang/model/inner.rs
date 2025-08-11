@@ -7,7 +7,14 @@ use crate::{model::*, rc::*, resolve::*, src_ref::*, syntax::*};
 use microcad_core::{Geometry2D, Geometry3D};
 
 /// The actual model contents
-#[derive(custom_debug::Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(
+    custom_debug::Debug,
+    Default,
+    bincode::Encode,
+    bincode::Decode,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct ModelInner {
     /// Optional id.
     ///

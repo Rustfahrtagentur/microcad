@@ -4,7 +4,7 @@
 use crate::{eval::*, rc::*, syntax::*, value::*};
 
 /// Symbol definition
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
 pub enum SymbolDefinition {
     /// Source file symbol.
     SourceFile(Rc<SourceFile>),

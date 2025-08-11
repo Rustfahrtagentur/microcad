@@ -13,7 +13,9 @@ use debug_cell::RefCell;
 use std::cell::RefCell;
 
 /// Just a short cut definition
-#[derive(Deref, DerefMut, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Deref, DerefMut, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
+)]
 pub struct RcMut<T>(Rc<RefCell<T>>);
 
 impl<T> RcMut<T> {

@@ -13,8 +13,27 @@ pub struct Vertex {
     pub normal: Vec3,
 }
 
+impl bincode::Encode for Vertex {
+    fn encode<E: bincode::enc::Encoder>(
+        &self,
+        encoder: &mut E,
+    ) -> Result<(), bincode::error::EncodeError> {
+        todo!()
+    }
+}
+
+impl<C> bincode::Decode<C> for Vertex {
+    fn decode<D: bincode::de::Decoder<Context = C>>(
+        decoder: &mut D,
+    ) -> Result<Self, bincode::error::DecodeError> {
+        todo!()
+    }
+}
+
 /// Triangle
-#[derive(Clone, Copy, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Clone, Copy, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
+)]
 pub struct Triangle<T>(pub T, pub T, pub T);
 
 impl Triangle<Vertex> {
@@ -52,6 +71,23 @@ pub struct TriangleMesh {
     pub vertices: Vec<Vertex>,
     /// Triangle indices
     pub triangle_indices: Vec<Triangle<u32>>,
+}
+
+impl bincode::Encode for TriangleMesh {
+    fn encode<E: bincode::enc::Encoder>(
+        &self,
+        encoder: &mut E,
+    ) -> Result<(), bincode::error::EncodeError> {
+        todo!()
+    }
+}
+
+impl<C> bincode::Decode<C> for TriangleMesh {
+    fn decode<D: bincode::de::Decoder<Context = C>>(
+        decoder: &mut D,
+    ) -> Result<Self, bincode::error::DecodeError> {
+        todo!()
+    }
 }
 
 /// Triangle iterator state.

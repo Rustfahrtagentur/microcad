@@ -6,7 +6,9 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Block of documentation comments, starting with `/// `.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Clone, Debug, Default, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
+)]
 pub struct DocBlock {
     /// Doc comment lines.
     pub lines: Vec<String>,

@@ -7,7 +7,7 @@ use crate::{src_ref::*, syntax::*};
 
 /// Format expression including format specification.
 #[allow(dead_code)]
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
 pub struct FormatExpression {
     /// Format specifier
     pub spec: Option<FormatSpec>,

@@ -128,3 +128,20 @@ impl RenderToMultiPolygon for Geometries2D {
         });
     }
 }
+
+impl bincode::Encode for Geometries2D {
+    fn encode<E: bincode::enc::Encoder>(
+        &self,
+        encoder: &mut E,
+    ) -> Result<(), bincode::error::EncodeError> {
+        todo!()
+    }
+}
+
+impl<C> bincode::Decode<C> for Geometries2D {
+    fn decode<D: bincode::de::Decoder<Context = C>>(
+        decoder: &mut D,
+    ) -> Result<Self, bincode::error::DecodeError> {
+        todo!()
+    }
+}

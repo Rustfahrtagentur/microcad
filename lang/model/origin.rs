@@ -6,7 +6,9 @@
 use crate::{eval::*, resolve::*, src_ref::*, syntax::*, value::*};
 
 /// The origin is the [`Symbol`] and [`Tuple`] from which the model has been created.
-#[derive(Clone, Default, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Clone, Default, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
+)]
 pub struct Origin {
     /// The original symbol that has been called.
     creator: Option<Link<Symbol, QualifiedName>>,

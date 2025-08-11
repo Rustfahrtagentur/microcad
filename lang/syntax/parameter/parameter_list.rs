@@ -7,7 +7,17 @@ use crate::{ord_map::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
 /// Parameter list
-#[derive(Clone, Debug, Default, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Clone,
+    Debug,
+    Default,
+    Deref,
+    DerefMut,
+    bincode::Encode,
+    bincode::Decode,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct ParameterList(OrdMap<Identifier, Parameter>);
 
 impl ParameterList {

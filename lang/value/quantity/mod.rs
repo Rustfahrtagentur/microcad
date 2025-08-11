@@ -12,7 +12,9 @@ use microcad_core::*;
 pub use error::*;
 
 /// A numeric value
-#[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Clone, PartialEq, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
+)]
 pub struct Quantity {
     /// The numeric value of the quantity.
     pub value: Scalar,

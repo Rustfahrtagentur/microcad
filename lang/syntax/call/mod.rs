@@ -14,7 +14,9 @@ pub use method_call::*;
 use crate::{model::*, src_ref::*, syntax::*, value::*};
 
 /// Call of a *workbench* or *function*.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Clone, Debug, Default, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
+)]
 pub struct Call {
     /// Qualified name of the call.
     pub name: QualifiedName,

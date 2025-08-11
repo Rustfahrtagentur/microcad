@@ -6,7 +6,7 @@ use custom_debug::Debug;
 use derive_more::{Deref, DerefMut};
 
 /// Symbol content
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
 pub struct SymbolInner {
     /// Symbol definition
     pub def: SymbolDefinition,
@@ -25,7 +25,16 @@ pub struct SymbolInner {
 /// the resolved symbols by it's original structure in the source code and by it's *id*.
 ///
 /// `SymbolNode` can be shared as mutable.
-#[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Deref,
+    DerefMut,
+    bincode::Encode,
+    bincode::Decode,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct Symbol(RcMut<SymbolInner>);
 
 impl Linkable<QualifiedName> for Symbol {
