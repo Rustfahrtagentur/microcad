@@ -4,18 +4,18 @@
 
 -- Code --
 
-[
-    // First element
-    1,
-
-    // Second element
-    2
-];
+ 1: [
+ 2:     // First element
+ 3:     1,
+ 4: 
+ 5:     // Second element
+ 6:     2
+ 7: ];
 
 -- Output --
 -- Errors --
 warning: This expression statement did not produce any model
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | [
      | ^

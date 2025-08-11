@@ -1,23 +1,23 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Module definition syntax element
+//! Module definition syntax element.
 
 use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 
-/// Module definition
-#[derive(Debug, Clone)]
+/// Module definition.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ModuleDefinition {
-    /// Name of the module
+    /// Name of the module.
     pub id: Identifier,
-    /// Module body
+    /// Module body.
     pub body: Body,
-    /// Source code reference
+    /// Source code reference.
     pub src_ref: SrcRef,
 }
 
 impl ModuleDefinition {
-    /// Create a new module definition
+    /// Create a new module definition.
     pub fn new(id: Identifier) -> Rc<Self> {
         Rc::new(Self {
             id,
@@ -26,7 +26,7 @@ impl ModuleDefinition {
         })
     }
 
-    /// Resolve into SymbolNode
+    /// Resolve into SymbolNode.
     pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
         let node = Symbol::new(SymbolDefinition::Module(self.clone()), parent);
         node.borrow_mut().children = self.body.resolve(Some(node.clone()));
@@ -40,9 +40,10 @@ impl SrcReferrer for ModuleDefinition {
     }
 }
 
-impl PrintSyntax for ModuleDefinition {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for ModuleDefinition {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
-        self.body.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.body.tree_print(f, depth)
     }
 }

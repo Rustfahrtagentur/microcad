@@ -6,8 +6,8 @@
 use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 use custom_debug::Debug;
 
-/// Kind of a [Workbench]
-#[derive(Clone, Debug, Copy, PartialEq)]
+/// Kind of a [`WorkbenchDefinition`].
+#[derive(Clone, Debug, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum WorkbenchKind {
     /// 3D part
     Part,
@@ -34,18 +34,20 @@ impl std::fmt::Display for WorkbenchKind {
     }
 }
 
-/// Workbench definition
-#[derive(Clone, Debug)]
+/// Workbench definition, e.g `sketch`, `part` or `op`.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct WorkbenchDefinition {
-    /// visibility from outside modules
-    pub visibility: Visibility,
+    /// Documentation.
+    pub doc: DocBlock,
     /// Workbench attributes.
     pub attribute_list: AttributeList,
-    /// Workbench kind
+    /// Visibility from outside modules.
+    pub visibility: Visibility,
+    /// Workbench kind.
     pub kind: WorkbenchKind,
     /// Workbench name.
     pub id: Identifier,
-    /// Workbench's building plan
+    /// Workbench's building plan.
     pub plan: ParameterList,
     /// Workbench body
     pub body: Body,
@@ -87,8 +89,8 @@ impl std::fmt::Display for WorkbenchDefinition {
     }
 }
 
-impl PrintSyntax for WorkbenchDefinition {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for WorkbenchDefinition {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(
             f,
             "{:depth$}Workbench ({kind}) '{id}':",
@@ -96,7 +98,9 @@ impl PrintSyntax for WorkbenchDefinition {
             kind = self.kind,
             id = self.id
         )?;
-        self.plan.print_syntax(f, depth + Self::INDENT)?;
-        self.body.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.doc.tree_print(f, depth)?;
+        self.plan.tree_print(f, depth)?;
+        self.body.tree_print(f, depth)
     }
 }

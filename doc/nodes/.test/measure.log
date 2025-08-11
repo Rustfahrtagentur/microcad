@@ -4,22 +4,27 @@
 
 -- Code --
 
-__builtin::assert_eq([
-    // use measure area() on a circle
-    std::geo2d::circle(radius=10mm).area(),
-
-    // circle area formula for comparison
-    10mm * 10mm * std::math::PI
-]);
+ 1: __builtin::debug::assert_eq([
+ 2:     // use measure area() on a circle
+ 3:     std::geo2d::circle(radius=10mm).area(),
+ 4: 
+ 5:     // circle area formula for comparison
+ 6:     10mm * 10mm * std::math::PI
+ 7: ]);
 
 -- Output --
 -- Errors --
-error: Not implemented: call_method for Models
-error: Elements of list have different types: [[101m[1m INVALID TYPE [49m[22m, Area]
-  ---> <from_str>:1:22
+error: Symbol area not found.
+  ---> <FROM STR>:3:37
      |
-   1 | __builtin::assert_eq([
-     |                      ^^^^^^^^^^^^^^^^^^^^^^
+   3 |     std::geo2d::circle(radius=10mm).area(),
+     |                                     ^^^^
+     |
+error: Elements of list have different types: [Models, Area]
+  ---> <FROM STR>:1:29
+     |
+   1 | __builtin::debug::assert_eq([
+     |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 TODO

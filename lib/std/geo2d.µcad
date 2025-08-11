@@ -14,8 +14,9 @@ sketch circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
         radius = diameter / 2.0;
     }
 
-    init(d: Length, center = (x = 0.0mm, y = 0.0mm)) {
+    init(d: Length, c = (x = 0.0mm, y = 0.0mm)) {
         radius = d / 2.0;
+        center = c;
     }
 
     __builtin::geo2d::circle(radius = radius / 1mm, cx = center.x / 1mm, cy = center.y / 1mm);
@@ -31,6 +32,13 @@ sketch rect(width: Length, height: Length, x: Length, y: Length) {
         y = -height / 2.0; // center y
     }
 
+    init(w: Length, h: Length) {
+        width = w;
+        height = h;
+        x = -w / 2.0; // center x
+        y = -h / 2.0; // center y
+    }
+
     init(size: Length) {
         width = size;
         height = size;
@@ -44,4 +52,23 @@ sketch rect(width: Length, height: Length, x: Length, y: Length) {
             x = x / 1mm,
             y = y / 1mm
     );
+}
+
+sketch line(p0: Vec2, p1: Vec2) {
+    init(width: Length, y = 0.0mm) {
+        p0 = (x = -width / 2mm, y = y / 1mm);
+        p1 = (x =  width / 2mm , y = y / 1mm);
+    }
+
+    init(height: Length, x = 0.0mm) {
+        p0 = (x = x / 1mm, y = -height / 2mm);
+        p1 = (x = x / 1mm, y =  height / 2mm);
+    }
+
+    init(width: Length, p: (x: Length, y: Length)) {
+        p0 = (x = p.x / 1mm, y = p.y / 1mm);
+        p1 = (x = (p.x + width) / 1mm , y = p.y / 1mm);
+    }
+
+    __builtin::geo2d::line(x0 = p0.x, y0 = p0.y, x1 = p1.x, y1 = p1.y);
 }

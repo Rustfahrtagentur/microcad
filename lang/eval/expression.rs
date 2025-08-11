@@ -90,6 +90,51 @@ impl Eval for ArrayExpression {
     }
 }
 
+impl Eval<Option<Symbol>> for QualifiedName {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<Symbol>> {
+        match context.lookup(self) {
+            Ok(symbol) => Ok(Some(symbol.clone())),
+            Err(error) => {
+                context.error(self, error)?;
+                Ok(None)
+            }
+        }
+    }
+}
+
+impl Eval for QualifiedName {
+    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+        match &context.lookup(self)?.borrow().def {
+            SymbolDefinition::Constant(_, value) | SymbolDefinition::Argument(_, value) => {
+                Ok(value.clone())
+            }
+            SymbolDefinition::Module(ns) => Err(EvalError::UnexpectedNested("mod", ns.id.clone())),
+            SymbolDefinition::Workbench(w) => {
+                Err(EvalError::UnexpectedNested(w.kind.as_str(), w.id.clone()))
+            }
+            SymbolDefinition::Function(f) => {
+                Err(EvalError::UnexpectedNested("function", f.id.clone()))
+            }
+            SymbolDefinition::Builtin(bm) => {
+                Err(EvalError::UnexpectedNested("builtin", bm.id.clone()))
+            }
+            SymbolDefinition::Alias(id, _) => {
+                unreachable!("Unexpected alias {id} in expression")
+            }
+            SymbolDefinition::SourceFile(sf) => {
+                unreachable!(
+                    "Unexpected source file {} in expression",
+                    sf.filename_as_str()
+                )
+            }
+            SymbolDefinition::External(ns) => ns.eval(context),
+            SymbolDefinition::UseAll(name) => {
+                unreachable!("Unexpected use {name} in expression")
+            }
+        }
+    }
+}
+
 impl Expression {
     /// Evaluate an expression together with an attribute list.
     ///
@@ -189,7 +234,12 @@ impl Eval for Expression {
                 }
             }
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
-            Self::Nested(nested) => nested.eval(context),
+            Self::Call(call) => call.eval(context),
+            Self::Body(body) => {
+                let model: Model = body.eval(context)?;
+                Ok(Value::from_single_model(model))
+            }
+            Self::QualifiedName(qualified_name) => qualified_name.eval(context),
             Self::Marker(marker) => {
                 let model: Option<Model> = marker.eval(context)?;
                 Ok(Value::Models(model.into_iter().collect()))
@@ -224,7 +274,7 @@ impl Eval for Expression {
         match &result {
             Ok(Value::None) => {
                 log::warn!(
-                    "Expression resulted in invalid value:\n{self}\n--- into ---\n{}",
+                    "Expression resulted in invalid value:\n{self}\n--- into ---\n{:?}",
                     Value::None
                 )
             }
@@ -270,39 +320,8 @@ impl Eval for Nested {
 impl Eval for NestedItem {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match &self {
-            NestedItem::Call(call) => Ok(call.eval(context)?),
-            NestedItem::QualifiedName(name) => match &context.lookup(name)?.borrow().def {
-                SymbolDefinition::Constant(_, value) | SymbolDefinition::Argument(_, value) => {
-                    Ok(value.clone())
-                }
-                SymbolDefinition::Module(ns) => {
-                    Err(EvalError::UnexpectedNested("mod", ns.id.clone()))
-                }
-                SymbolDefinition::Workbench(w) => {
-                    Err(EvalError::UnexpectedNested(w.kind.as_str(), w.id.clone()))
-                }
-                SymbolDefinition::Function(f) => {
-                    Err(EvalError::UnexpectedNested("function", f.id.clone()))
-                }
-                SymbolDefinition::Builtin(bm) => {
-                    Err(EvalError::UnexpectedNested("builtin", bm.id.clone()))
-                }
-                SymbolDefinition::Alias(id, _) => {
-                    unreachable!("Unexpected alias {id} in expression")
-                }
-                SymbolDefinition::SourceFile(sf) => {
-                    unreachable!(
-                        "Unexpected source file {} in expression",
-                        sf.filename_as_str()
-                    )
-                }
-                SymbolDefinition::External(ns) => {
-                    unreachable!("Unexpected unload source file {} in expression", ns.id)
-                }
-                SymbolDefinition::UseAll(name) => {
-                    unreachable!("Unexpected use {name} in expression")
-                }
-            },
+            NestedItem::Call(call) => call.eval(context),
+            NestedItem::QualifiedName(name) => name.eval(context),
             NestedItem::Body(body) => Ok(Value::from_single_model(body.eval(context)?)),
         }
     }

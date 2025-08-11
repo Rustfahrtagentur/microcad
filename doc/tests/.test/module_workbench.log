@@ -4,9 +4,9 @@
 
 -- Code --
 
-mod k {
-  sketch f() {}
-}
+ 1: mod k {
+ 2:   sketch f() {}
+ 3: }
 
 -- Output --
 -- Errors --

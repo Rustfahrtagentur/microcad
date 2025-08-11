@@ -4,41 +4,43 @@
 
 -- Code --
 
-// module math
-mod math {
-    // pow cannot be called from outside math
-    fn pow( x: Scalar, n: Integer ) {
-        if n == 1 {
-            x   // return x
-        } else {
-            x * pow(x, n-1) // return recursive product
-        }
-    }
-
-    // square is callable from outside math
-    pub fn square(x: Scalar) {
-        // call internal pow
-        pow(x, 2.0)
-    }
-}
-
-// call square in math
-math::square(2.0);
-math::pow(2.0, 5);  // error: pow is private
+ 1: // module math
+ 2: mod math {
+ 3:     // pow cannot be called from outside math
+ 4:     fn pow( x: Scalar, n: Integer ) {
+ 5:         if n == 1 {
+ 6:             x   // return x
+ 7:         } else {
+ 8:             x * pow(x, n-1) // return recursive product
+ 9:         }
+10:     }
+11: 
+12:     // square is callable from outside math
+13:     pub fn square(x: Scalar) {
+14:         // call internal pow
+15:         pow(x, 2.0)
+16:     }
+17: }
+18: 
+19: // call square in math
+20: math::square(2.0);
+21: math::pow(2.0, 5);  // error: pow is private
 
 -- Output --
 -- Errors --
 error: Symbol pow not found.
-  ---> <from_str>:15:9
+  ---> <FROM STR>:15:9
      |
   15 |         pow(x, 2.0)
      |         ^^^^^^^^^^^
      |
 error: Symbol pow not found.
-  ---> <from_str>:8:17
+  ---> <FROM STR>:8:17
      |
    8 |             x * pow(x, n-1) // return recursive product
      |                 ^^^^^^^^^^^
      |
 -- Test Result --
-TODO
+FAIL(TODO)
+-- Test Result --
+FAILED AS EXPECTED BUT IS TODO

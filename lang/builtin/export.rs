@@ -5,7 +5,7 @@
 
 use std::rc::Rc;
 
-use crate::{Id, builtin::file_io::*, eval::*, model::*, parameter, value::*};
+use crate::{builtin::file_io::*, eval::*, model::*, parameter, value::*, Id};
 
 use thiserror::Error;
 

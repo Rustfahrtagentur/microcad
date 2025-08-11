@@ -1,30 +1,28 @@
 -- Test --
   first_example
-  ../README.md:89
+  ../README.md:43
 
 -- Code --
 
-// We have part called `lid` with three parameters
-part lid(
-    thickness = 1.6mm,
-    inner_diameter = 16cm,
-    height = 20mm,
-) {
-    // Calculate the outer diameter
-    outer_diameter = 2 * thickness + inner_diameter;
-
-    // Create two cylinders, one for the outer and one for the inner
-    outer = std::geo3d::cylinder(d = outer_diameter, h = height);
-    inner = std::ops::translate(z = thickness) std::geo3d::cylinder(d = inner_diameter, h = height);
-
-    // Calculate the difference between two translated cylinders and output them
-    outer - inner;
-}
-
-// `l` is the instance of the lid model
-lid();
+ 1: use std::math::*;
+ 2: use std::ops::*;
+ 3: use std::geo3d::*;
+ 4: 
+ 5: part csg_cube(size: Length) {
+ 6:     body = sphere(r = size / 1.5) & cube(size);
+ 7:     holes = cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
+ 8:     body - holes;
+ 9: }
+10: 
+11: csg_cube(50mm);
 
 -- Output --
 -- Errors --
+error: Workbench orient cannot find initialization for those arguments
+  ---> <FROM STR>:7:55
+     |
+   7 |     holes = cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
+     |                                                       ^^^^^^^
+     |
 -- Test Result --
-OK
+FAIL

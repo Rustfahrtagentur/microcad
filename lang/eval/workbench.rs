@@ -25,11 +25,7 @@ impl WorkbenchDefinition {
 
         // Create model
         let model = ModelBuilder::new_workpiece(self.kind)
-            .origin(Origin {
-                arguments: arguments.clone(),
-                // TODO: where to get the rest?
-                ..Default::default()
-            })
+            .origin(Origin::new(arguments.clone()))
             .attributes(self.attribute_list.eval(context)?)
             .properties(
                 // copy all arguments which are part of the building plan to properties
@@ -108,7 +104,8 @@ impl CallTrait<Models> for WorkbenchDefinition {
     /// Return evaluated nodes (multiple nodes might be created by parameter multiplicity).
     fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Models> {
         log::debug!(
-            "Workbench call {kind} {id:?}({args})",
+            "Workbench {call} {kind} {id:?}({args})",
+            call = crate::mark!(CALL),
             id = self.id,
             kind = self.kind
         );

@@ -36,7 +36,7 @@ impl SourceCache {
         by_hash.insert(root.hash, 0);
 
         let mut by_path = HashMap::new();
-        by_path.insert(root.filename.clone(), 0);
+        by_path.insert(root.filename(), 0);
 
         Self {
             externals: Externals::new(search_paths),
@@ -61,7 +61,7 @@ impl SourceCache {
     /// # Arguments
     /// - `source_file`: The loaded source file to store.
     pub fn insert(&mut self, source_file: Rc<SourceFile>) -> EvalResult<QualifiedName> {
-        let filename = source_file.filename.clone();
+        let filename = source_file.filename();
         let name = self.externals.get_name(&filename)?;
         let hash = source_file.hash;
         let index = self.source_files.len();
@@ -107,7 +107,7 @@ impl SourceCache {
     /// Get *qualified name* of a file by *hash value*.
     pub fn get_name_by_hash(&self, hash: u64) -> EvalResult<&QualifiedName> {
         match self.get_by_hash(hash) {
-            Ok(file) => self.externals.get_name(&file.filename),
+            Ok(file) => self.externals.get_name(&file.filename()),
             Err(err) => Err(err),
         }
     }
@@ -118,12 +118,16 @@ impl SourceCache {
             Ok(self.source_files[*index].clone())
         } else {
             // if not found in symbol tree we try to find an external file to load
-            let (name, path) = self.externals.fetch_external(name)?;
-            if self.get_by_path(&path).is_err() {
-                Err(EvalError::SymbolMustBeLoaded(name, path))
-            } else {
-                Err(EvalError::SymbolNotFound(name))
+            match self.externals.fetch_external(name) {
+                Ok((name, path)) => {
+                    if self.get_by_path(&path).is_err() {
+                        return Err(EvalError::SymbolMustBeLoaded(name, path));
+                    }
+                }
+                Err(EvalError::ExternalSymbolNotFound(_)) => (),
+                Err(err) => return Err(err),
             }
+            Err(EvalError::SymbolNotFound(name.clone()))
         }
     }
 
@@ -151,6 +155,8 @@ impl GetSourceByHash for SourceCache {
     fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
         if let Some(index) = self.by_hash.get(&hash) {
             Ok(self.source_files[*index].clone())
+        } else if hash == 0 {
+            Err(EvalError::NulHash)
         } else {
             Err(EvalError::UnknownHash(hash))
         }
@@ -160,12 +166,12 @@ impl GetSourceByHash for SourceCache {
 impl std::fmt::Display for SourceCache {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (index, source_file) in self.source_files.iter().enumerate() {
-            let filename = source_file.filename.clone();
+            let filename = source_file.filename_as_str();
             let name = self
                 .name_from_index(index)
                 .unwrap_or(QualifiedName::no_ref(vec![]));
             let hash = source_file.hash;
-            writeln!(f, "[{index}] {name} {hash:#x} {filename:?}")?;
+            writeln!(f, "[{index}] {name} {hash:#x} {filename}")?;
         }
         Ok(())
     }

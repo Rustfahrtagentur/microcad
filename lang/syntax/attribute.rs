@@ -6,8 +6,8 @@
 use crate::{src_ref::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
-/// A subcommand for an [`AttributeCommand`].
-#[derive(Debug, Clone)]
+/// *Command syntax* within an attribute.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub enum AttributeCommand {
     /// A command with an optional identifier and optional arguments: `width(offset = 30mm)`.
     Call(Option<Identifier>, Option<ArgumentList>),
@@ -54,7 +54,7 @@ impl SrcReferrer for AttributeCommand {
 }
 
 /// An attribute item.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Attribute {
     /// The id of the attribute.
     pub id: Identifier,
@@ -76,8 +76,8 @@ impl Attribute {
     }
 }
 
-impl PrintSyntax for Attribute {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Attribute {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Attribute: {self}", "")
     }
 }
@@ -112,7 +112,7 @@ impl SrcReferrer for Attribute {
 }
 
 /// A list of attributes, e.g. `#foo #[bar, baz = 42]`
-#[derive(Debug, Clone, Default, Deref, DerefMut)]
+#[derive(Debug, Clone, Default, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct AttributeList(Vec<Attribute>);
 
 impl std::fmt::Display for AttributeList {

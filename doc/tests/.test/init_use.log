@@ -4,14 +4,14 @@
 
 -- Code --
 
-sketch k() { init(l:Length) {
-  use std;
-} } k(1cm);
+ 1: sketch k() { init(l:Length) {
+ 2:   use std;
+ 3: } } k(1cm);
 
 -- Output --
 -- Errors --
 warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | sketch k() { init(l:Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

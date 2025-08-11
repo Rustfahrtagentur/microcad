@@ -1,45 +1,45 @@
 -- Test --
   pre_init_code
-  ../doc/structure/workbench.md:172
+  ../doc/structure/workbench.md:171
 
 -- Code --
 
-sketch wheel(radius: Length) {
-    // init code
-    const FACTOR = 2.0;
-
-    // initializer
-    init(diameter: Length) { into_radius(radius); }
-
-    // function
-    fn into_radius( diameter: Length ) {
-        // use constant FACTOR from init code
-        return diameter / FACTOR;
-    }
-
-    // set property diameter and use FACTOR from init code
-    prop diameter = radius * FACTOR;
-    
-    // code body
-    std::geo2d::circle(radius);
-}
-
-__builtin::assert(wheel(5cm).radius == 5cm);
-__builtin::assert(wheel(5cm).diameter == 10cm);
+ 1: sketch wheel(radius: Length) {
+ 2:     // init code
+ 3:     const FACTOR = 2.0;
+ 4: 
+ 5:     // initializer
+ 6:     init(diameter: Length) { into_radius(radius); }
+ 7: 
+ 8:     // function
+ 9:     fn into_radius( diameter: Length ) {
+10:         // use constant FACTOR from init code
+11:         return diameter / FACTOR;
+12:     }
+13: 
+14:     // set property diameter and use FACTOR from init code
+15:     prop diameter = radius * FACTOR;
+16:     
+17:     // code body
+18:     std::geo2d::circle(radius);
+19: }
+20: 
+21: __builtin::debug::assert(wheel(5cm).radius == 5cm);
+22: __builtin::debug::assert(wheel(5cm).diameter == 10cm);
 
 -- Output --
 -- Errors --
 error: Property not found: diameter
-  ---> <from_str>:22:19
+  ---> <FROM STR>:22:26
      |
-  22 | __builtin::assert(wheel(5cm).diameter == 10cm);
-     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  22 | __builtin::debug::assert(wheel(5cm).diameter == 10cm);
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Missing arguments: v
-  ---> <from_str>:22:19
+  ---> <FROM STR>:22:26
      |
-  22 | __builtin::assert(wheel(5cm).diameter == 10cm);
-     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  22 | __builtin::debug::assert(wheel(5cm).diameter == 10cm);
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 TODO

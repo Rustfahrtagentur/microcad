@@ -4,12 +4,12 @@
 
 -- Code --
 
-1 + 2;
+ 1: 1 + 2;
 
 -- Output --
 -- Errors --
 warning: This expression statement did not produce any model
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | 1 + 2;
      | ^^^^^^

@@ -4,16 +4,16 @@
 
 -- Code --
 
-fn f() {
-  mod m {}
-} f();
+ 1: fn f() {
+ 2:   mod m {} // error
+ 3: } f();
 
 -- Output --
 -- Errors --
 error: Module statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
-   2 |   mod m {}
+   2 |   mod m {} // error
      |   ^^^^^^^^
      |
 -- Test Result --

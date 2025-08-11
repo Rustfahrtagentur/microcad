@@ -1,1 +1,1 @@
-__builtin::assert(false);
+__builtin::debug::assert(false);

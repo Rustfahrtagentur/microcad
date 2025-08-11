@@ -4,24 +4,24 @@ use __builtin::*;
 // If creates an algorithm node with a circle node as a child
 // The `@children` marker is used to display that all children of the part will be added to the algorithm node
 sketch circle_union(radius: Scalar) {
-    ops::union() {
+    {
         geo2d::circle(radius);
-        @children
-    }
+        @children;
+    }.ops::union();
 }
 
 // Create a circle node with two children
-a = geo2d::circle(1.0) {
+a = {
     geo2d::circle(2.0);
     geo2d::circle(3.0);
-};
+}.geo2d::circle(1.0);
 
 // Create a circle_union node with three children
-circle_union(4.0) {
+{
     geo2d::circle(5.0);
     geo2d::circle([6.0, 7.0]); // Test multiplicity
     a;
-}
+}.circle_union(4.0);
 
 // a is instantiated a second time, make sure nodes are deep copied
 a;

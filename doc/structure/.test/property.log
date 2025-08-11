@@ -4,32 +4,32 @@
 
 -- Code --
 
-// `outer` will automatically become a property because
-// it is declared in the building plan:
-sketch wheel(outer: Length) {
-    use std::geo2d::circle;
-
-    // `inner` is declared as property and maybe read from 
-    // outside this workbench
-    prop inner = outer / 2;
-
-    // generate wheel (and use property inner)
-    circle(outer) - circle(inner);
-}
-
-// evaluate wheel
-t = wheel(1cm);
-
-// extract and display `outer` and `inner` from generated wheel
-std::print("outer: {t.outer}");
-std::print("inner: {t.inner}");
+ 1: // `outer` will automatically become a property because
+ 2: // it is declared in the building plan:
+ 3: sketch wheel(outer: Length) {
+ 4:     use std::geo2d::circle;
+ 5: 
+ 6:     // `inner` is declared as property and maybe read from 
+ 7:     // outside this workbench
+ 8:     prop inner = outer / 2;
+ 9: 
+10:     // generate wheel (and use property inner)
+11:     circle(outer) - circle(inner);
+12: }
+13: 
+14: // evaluate wheel
+15: t = wheel(1cm);
+16: 
+17: // extract and display `outer` and `inner` from generated wheel
+18: std::print("outer: {t.outer}");
+19: std::print("inner: {t.inner}");
 
 -- Output --
 outer: 10mm
 inner: <INVALID VALUE>
 -- Errors --
 error: Property not found: inner
-  ---> <from_str>:19:21
+  ---> <FROM STR>:19:21
      |
   19 | std::print("inner: {t.inner}");
      |                     ^^^^^^^

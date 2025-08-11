@@ -16,7 +16,7 @@ Internally every *use statement* builds one or more *aliases*, each with an
 
 The following example which uses two *parts* of `geo3d` shows the problem:
 
-[![test](.test/none.png)](.test/none.log)
+[![test](.test/none.svg)](.test/none.log)
 
 ```µcad,none
 std::geo3d::sphere(radius = 40mm);
@@ -28,7 +28,7 @@ std::geo3d::cube(size = 40mm);
 With `use` it first seems not shorter, but if we would use `sphere` and `cube` more often this would
 shorten things a lot:
 
-[![test](.test/use.png)](.test/use.log)
+[![test](.test/use.svg)](.test/use.log)
 
 ```µcad,use
 use std::geo2d::circle;
@@ -40,7 +40,7 @@ rect(size = 40mm);
 
 You may also use whole the *module* if the names you are using already exist as a symbol:
 
-[![test](.test/use_module.png)](.test/use_module.log)
+[![test](.test/use_module.svg)](.test/use_module.log)
 
 ```µcad,use_module
 circle = 1;
@@ -55,7 +55,7 @@ geo2d::circle(r = 40mm);
 Another way to be explicit when name conflicts exist is to use `use as` where you can
 locally rename the *target symbol*:
 
-[![test](.test/use_as.png)](.test/use_as.log)
+[![test](.test/use_as.svg)](.test/use_as.log)
 
 ```µcad,use_as
 circle = 1;
@@ -67,7 +67,7 @@ disk(r = 4mm);
 
 Or you may use `use as` with a *module*:
 
-[![test](.test/use_as_module.png)](.test/use_as_module.log)
+[![test](.test/use_as_module.svg)](.test/use_as_module.log)
 
 ```µcad,use_as_module
 geo2d = 1;
@@ -82,7 +82,7 @@ geo::circle(r = 4mm);
 The shortest way to use many symbols from one module is to put an `*` at the end.
 The following example aliases **all** symbols of `std::geo3d` into the current scope.
 
-[![test](.test/use_all.png)](.test/use_all.log)
+[![test](.test/use_all.svg)](.test/use_all.log)
 
 ```µcad,use_all#todo
 use std::geo3d::*;
@@ -98,7 +98,7 @@ the symbol table where outside code might use it too.
 
 `sphere` and `cube` will be made available for using them outside of module `my` in the following example:
 
-[![test](.test/use_statement_pub.png)](.test/use_statement_pub.log)
+[![test](.test/use_statement_pub.svg)](.test/use_statement_pub.log)
 
 ```µcad,use_statement_pub
 mod my {
@@ -111,7 +111,7 @@ my::rect(size = 40mm);
 
 ## Tests
 
-[![test](.test/use_statement_pub_in_module.png)](.test/use_statement_pub_in_module.log)
+[![test](.test/use_statement_pub_in_module.svg)](.test/use_statement_pub_in_module.log)
 
 ```µcad,use_statement_pub_in_module
 mod my {

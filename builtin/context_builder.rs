@@ -25,7 +25,7 @@ impl ContextBuilder {
         }
     }
 
-    /// Create a new context from a source file and capture output (see [`Self::output`]).
+    /// Create a new context from a source file and capture output (see [`Output`]).
     ///
     /// # Arguments
     /// - `root`: Resolved root source file.

@@ -36,6 +36,7 @@ use crate::{
     diag::WriteToFile,
     rc::RcMut,
     syntax::{Identifier, SourceFile},
+    tree_display::*,
     value::Value,
 };
 
@@ -43,7 +44,7 @@ use crate::{
 mod tests;
 
 /// A reference counted, mutable [`Model`].
-#[derive(Debug, Clone, Deref, DerefMut)]
+#[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Model(RcMut<ModelInner>);
 
 impl Model {
@@ -163,7 +164,7 @@ impl Model {
         })
     }
 
-    /// A [`Model`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
+    /// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
     pub fn signature(&self) -> String {
         let self_ = self.borrow();
 
@@ -174,15 +175,15 @@ impl Model {
                 None => String::new(),
             },
             element_type = self_.element,
-            origin = match self_.origin.creator {
+            origin = match self_.origin.get_creator() {
                 Some(_) => format!(" = {origin}", origin = self_.origin),
                 None => String::new(),
             },
             output_type = self.final_output_type(),
             is_root = if self.parents().next().is_some() {
-                String::new()
+                ""
             } else {
-                " (root)".into()
+                " (root)"
             }
         )
     }
@@ -227,7 +228,7 @@ impl PartialEq for Model {
 
 /// Prints a [`Model`].
 ///
-/// A [`Model`] signature has the form "[id: ]ElementType[ = origin][ -> result_type]".
+/// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
 /// The exemplary output will look like this:
 ///
 /// ```custom
@@ -237,19 +238,30 @@ impl PartialEq for Model {
 /// ```
 impl std::fmt::Display for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let depth = self.depth() * 2;
-        writeln!(f, "{:depth$}{signature}", "", signature = self.signature())?;
+        write!(
+            f,
+            "{signature}",
+            signature = crate::shorten!(self.signature())
+        )
+    }
+}
+
+impl TreeDisplay for Model {
+    fn tree_print(
+        &self,
+        f: &mut std::fmt::Formatter,
+        mut tree_state: TreeState,
+    ) -> std::fmt::Result {
+        writeln!(
+            f,
+            "{:tree_state$}{signature}",
+            "",
+            signature = crate::shorten!(self.signature(), tree_state.shorten)
+        )?;
+        tree_state.indent();
         let self_ = self.borrow();
-
-        self_
-            .attributes
-            .iter()
-            .try_for_each(|attribute| writeln!(f, "{:depth$}{attribute}", ""))?;
-
-        self_
-            .children
-            .iter()
-            .try_for_each(|child| write!(f, "{child}"))
+        self_.attributes.tree_print(f, tree_state)?;
+        self_.children.tree_print(f, tree_state)
     }
 }
 

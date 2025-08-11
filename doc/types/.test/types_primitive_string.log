@@ -4,11 +4,11 @@
 
 -- Code --
 
-text = "Hello µcad!";
-std::debug::assert_eq([std::count(text), 11]);
-
-// logging
-std::print(text);
+ 1: text = "Hello µcad!";
+ 2: std::debug::assert_eq([std::count(text), 11]);
+ 3: 
+ 4: // logging
+ 5: std::print(text);
 
 -- Output --
 Hello µcad!

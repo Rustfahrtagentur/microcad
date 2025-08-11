@@ -5,7 +5,7 @@
 
 use std::ops::Index;
 
-/// trait of an value in an `OrdMap`
+/// Trait a value in an `OrdMap` must implement.
 /// # Types
 /// `K`: key type
 pub trait OrdMapValue<K>
@@ -16,8 +16,8 @@ where
     fn key(&self) -> Option<K>;
 }
 
-/// Map whose values cam be accessed in original insert order
-#[derive(Clone)]
+/// Map whose values can be accessed via index in original insert order.
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct OrdMap<K, V>
 where
     V: OrdMapValue<K>,

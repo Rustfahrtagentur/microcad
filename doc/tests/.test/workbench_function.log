@@ -4,23 +4,17 @@
 
 -- Code --
 
-sketch k() {
-  fn f() {} f();
-} k();
+ 1: sketch k() {
+ 2:   fn f() {} f();
+ 3: } k();
 
 -- Output --
 -- Errors --
-error: Symbol f not found.
-  ---> <from_str>:2:13
-     |
-   2 |   fn f() {} f();
-     |             ^^^
-     |
 warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | sketch k() {
      | ^^^^^^^^^^^^
      |
 -- Test Result --
-FAILED AS EXPECTED
+OK

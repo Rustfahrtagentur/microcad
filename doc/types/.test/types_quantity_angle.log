@@ -4,14 +4,14 @@
 
 -- Code --
 
-pi = std::math::PI;
-radian = 1rad * pi;
-degree = 180°;
-degree_ = 180deg;
-grad = 200grad;
-turn = 0.5turn;
-
-std::debug::assert( [degree, degree_, grad, turn, radian].all_equal() );
+ 1: pi = std::math::PI;
+ 2: radian = 1rad * pi;
+ 3: degree = 180°;
+ 4: degree_ = 180deg;
+ 5: grad = 200grad;
+ 6: turn = 0.5turn;
+ 7: 
+ 8: std::debug::assert( [degree, degree_, grad, turn, radian].all_equal() );
 
 -- Output --
 -- Errors --

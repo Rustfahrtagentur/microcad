@@ -326,16 +326,16 @@ fn create_test<'a>(
     // where to store generated output
     let test_path = file_path.parent().unwrap().join(".test");
     // banner image file of this test
-    let banner = test_path.join(format!("{name}.png"));
+    let banner = test_path.join(format!("{name}.svg"));
     // log file of this test
     let log = test_path.join(format!("{name}.log"));
 
     // output file of this test, without extension.
     // The file extension is added later by the respective exporter.
-    let out = test_path.join(name);
+    let out = test_path.join(format!("{name}-out"));
 
     // maybe create .test directory
-    let _ = std::fs::create_dir_all(test_path);
+    let _ = std::fs::create_dir_all(test_path.clone());
 
     // Early exit for "#no_test" and "#todo" suffixes
     if mode == Some("no_test") {
@@ -346,7 +346,14 @@ fn create_test<'a>(
         name, mode, code, &banner, &log, &out, reference,
     ));
 
-    Some(Output::new(name.into(), file_path.into(), banner, out, log))
+    Some(Output::new(
+        name.into(),
+        file_path.into(),
+        banner,
+        out,
+        log,
+        &["svg", "stl"],
+    ))
 }
 
 /// create test code

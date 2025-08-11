@@ -7,7 +7,7 @@ use crate::{resolve::*, syntax::*};
 use derive_more::Deref;
 
 /// A list of statements.
-#[derive(Clone, Default, Debug, Deref)]
+#[derive(Clone, Default, Debug, Deref, serde::Serialize, serde::Deserialize)]
 pub struct StatementList(pub Vec<Statement>);
 
 impl StatementList {

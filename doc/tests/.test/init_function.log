@@ -4,20 +4,20 @@
 
 -- Code --
 
-sketch k() { init(l:Length) {
-  fn f() {}
-} } k(1cm);
+ 1: sketch k() { init(l:Length) {
+ 2:   fn f() {} // error
+ 3: } } k(1cm);
 
 -- Output --
 -- Errors --
 error: Function statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
-   2 |   fn f() {}
+   2 |   fn f() {} // error
      |   ^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | sketch k() { init(l:Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

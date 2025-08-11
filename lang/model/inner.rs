@@ -7,7 +7,7 @@ use crate::{model::*, rc::*, resolve::*, src_ref::*, syntax::*};
 use microcad_core::{Geometry2D, Geometry3D};
 
 /// The actual model contents
-#[derive(custom_debug::Debug, Default)]
+#[derive(custom_debug::Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct ModelInner {
     /// Optional id.
     ///
@@ -15,6 +15,7 @@ pub struct ModelInner {
     pub id: Option<Identifier>,
     /// Parent object.
     #[debug(skip)]
+    #[serde(skip)]
     pub parent: Option<Model>,
     /// Children of the model.
     pub children: Models,
@@ -65,7 +66,7 @@ impl ModelInner {
     /// This function is called after the resulting models of a call of a part
     /// have been retrieved.   
     pub(crate) fn set_creator(&mut self, creator: Symbol, call_src_ref: SrcRef) {
-        self.origin.creator = Some(creator);
+        self.origin.set_creator(creator);
         self.origin.call_src_ref = call_src_ref;
     }
 }

@@ -5,14 +5,14 @@
 
 use crate::{src_ref::*, syntax::*};
 
-/// Format specification
-#[derive(Clone, Debug, Default)]
+/// Format specification.
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct FormatSpec {
-    /// Precision for number formatting
+    /// Precision for number formatting.
     pub precision: Option<u32>,
-    /// Alignment width (leading zeros)
+    /// Alignment width (leading zeros).
     pub width: Option<u32>,
-    /// Source code reference
+    /// Source code reference.
     pub src_ref: SrcRef,
 }
 
@@ -33,8 +33,8 @@ impl std::fmt::Display for FormatSpec {
     }
 }
 
-impl PrintSyntax for FormatSpec {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for FormatSpec {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         match (self.width, self.precision) {
             (Some(width), Some(precision)) => {
                 writeln!(f, "{:depth$}FormatSpec: 0{width}.{precision}", "")

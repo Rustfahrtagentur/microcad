@@ -4,11 +4,18 @@
 
 -- Code --
 
-color: Color = (r = 100%, g = 50%, b = 25%, a = 100%);
-
-std::debug::assert(color.r == 100%);
+ 1: color: Color = (r = 100%, g = 50%, b = 25%, a = 100%);
+ 2: 
+ 3: std::debug::assert(color.r == 100%);
 
 -- Output --
 -- Errors --
+error: Type mismatch for `color`: expected (), got Color
+  ---> <FROM STR>:1:1
+     |
+   1 | color: Color = (r = 100%, g = 50%, b = 25%, a = 100%);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Missing arguments: v
 -- Test Result --
-OK
+FAIL

@@ -4,18 +4,18 @@
 
 -- Code --
 
-a = 0;
-
-if a == 0 {
-    std::log::info("a is zero");
-} else {
-    std::log::todo("print proper message");
-}
+ 1: a = 0;
+ 2: 
+ 3: if a == 0 {
+ 4:     std::log::info("a is zero");
+ 5: } else {
+ 6:     std::log::todo("print proper message");
+ 7: }
 
 -- Output --
 -- Errors --
 info: a is zero
-  ---> <from_str>:4:20
+  ---> <FROM STR>:4:20
      |
    4 |     std::log::info("a is zero");
      |                    ^^^^^^^^^^^

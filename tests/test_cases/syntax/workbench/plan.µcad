@@ -2,4 +2,4 @@
 part a(b: Scalar) {}
 
 // Test if we can access `b` property
-__builtin::assert(a(b = 3.0).b == 3.0);
+__builtin::debug::assert(a(b = 3.0).b == 3.0);

@@ -7,7 +7,7 @@ use crate::{ord_map::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
 /// Parameter list
-#[derive(Clone, Debug, Default, Deref, DerefMut)]
+#[derive(Clone, Debug, Default, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct ParameterList(OrdMap<Identifier, Parameter>);
 
 impl ParameterList {
@@ -41,11 +41,10 @@ impl std::fmt::Display for ParameterList {
     }
 }
 
-impl PrintSyntax for ParameterList {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for ParameterList {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}ParameterList:", "")?;
-        self.0
-            .iter()
-            .try_for_each(|p| p.print_syntax(f, depth + Self::INDENT))
+        depth.indent();
+        self.0.iter().try_for_each(|p| p.tree_print(f, depth))
     }
 }

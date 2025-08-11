@@ -4,9 +4,9 @@
 
 -- Code --
 
-fn f() {
-  const B = 1;
-} f();
+ 1: fn f() {
+ 2:   const B = 1;
+ 3: } f();
 
 -- Output --
 -- Errors --

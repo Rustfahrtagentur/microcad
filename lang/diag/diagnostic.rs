@@ -35,6 +35,17 @@ impl Diagnostic {
         }
     }
 
+    /// Return line of the error
+    pub fn line(&self) -> Option<usize> {
+        let src_ref = match self {
+            Diagnostic::Trace(r) => r.src_ref(),
+            Diagnostic::Info(r) => r.src_ref(),
+            Diagnostic::Warning(r) => r.src_ref(),
+            Diagnostic::Error(r) => r.src_ref(),
+        };
+        src_ref.as_ref().map(|r| r.at.line)
+    }
+
     /// Pretty print the diagnostic.
     ///
     /// This will print the diagnostic to the given writer, including the source code reference.
@@ -81,7 +92,7 @@ impl Diagnostic {
                     "  ---> {}:{}",
                     source_file
                         .as_ref()
-                        .map(|sf| make_relative(&sf.filename))
+                        .map(|sf| make_relative(&sf.filename()))
                         .unwrap_or(crate::invalid!(FILE).to_string()),
                     src_ref.at
                 )?;

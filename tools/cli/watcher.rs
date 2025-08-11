@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad CLI watcher. Most parts proudly taken from https://github.com/typst/typst/blob/main/crates/typst-cli/src/watch.rs
+//! µcad CLI watcher. Most parts proudly taken from [typst](https://github.com/typst/typst/blob/main/crates/typst-cli/src/watch.rs)
 
 use std::{iter, path::PathBuf, sync::mpsc::Receiver, time::Duration};
 

@@ -1,15 +1,15 @@
 -- Test --
   code
-  ../doc/structure/workbench.md:224
+  ../doc/structure/workbench.md:223
 
 -- Code --
 
-sketch wheel(radius: Length) {
-    // building code starts here
-    std::geo2d::circle(radius);
-}
-
-wheel(radius = 1.0mm)
+ 1: sketch wheel(radius: Length) {
+ 2:     // building code starts here
+ 3:     std::geo2d::circle(radius);
+ 4: }
+ 5: 
+ 6: wheel(radius = 1.0mm)
 
 -- Output --
 -- Errors --

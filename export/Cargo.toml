@@ -17,6 +17,7 @@ microcad-core = { workspace = true }
 microcad-lang = { workspace = true }
 log = "0.4"
 env_logger = "0.11"
+serde_json = "1"
 
 cgmath = "0.18"
 derive_more = { version = "2", features = ["deref", "deref_mut"] }

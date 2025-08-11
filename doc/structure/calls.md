@@ -5,7 +5,7 @@
 A call of a function consists of just the *identifier* and an [argument list](arguments.md).
 and the result is a *value*:
 
-[![test](.test/call_function.png)](.test/call_function.log)
+[![test](.test/call_function.svg)](.test/call_function.log)
 
 ```µcad,call_function
 // function definition
@@ -23,7 +23,7 @@ std::debug::assert_eq( [s, 4] );
 [Workbenches](workbench.md) can be called in the same way as functions
 except that the result is a object node.
 
-[![test](.test/call_workbench.png)](.test/call_workbench.log)
+[![test](.test/call_workbench.svg)](.test/call_workbench.log)
 
 ```µcad,call_workbench
 // definition of a sketch workbench
@@ -35,7 +35,7 @@ sketch square(size: Length) {
 s = square(size=2cm);
 
 // translate object s
-std::ops::translate(x = 1cm) s;
+s.std::ops::translate(x = 1cm);
 ```
 
 ## Calling Operations

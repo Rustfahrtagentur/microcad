@@ -4,9 +4,9 @@
 
 -- Code --
 
-{
-  use std;
-}
+ 1: {
+ 2:   use std;
+ 3: }
 
 -- Output --
 -- Errors --

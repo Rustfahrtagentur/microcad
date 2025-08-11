@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// An assignment statement, e.g. `#[aux] s = sphere(3.0mm);`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ExpressionStatement {
     /// Optional attributes.
     pub attribute_list: AttributeList,
@@ -22,9 +22,9 @@ impl SrcReferrer for ExpressionStatement {
     }
 }
 
-impl PrintSyntax for ExpressionStatement {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
-        self.expression.print_syntax(f, depth)
+impl TreeDisplay for ExpressionStatement {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
+        self.expression.tree_print(f, depth)
     }
 }
 

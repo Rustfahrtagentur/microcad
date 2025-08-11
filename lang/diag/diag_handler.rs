@@ -43,6 +43,34 @@ impl DiagHandler {
     pub fn error_count(&self) -> u32 {
         self.error_count
     }
+
+    /// return lines with errors
+    pub fn error_lines(&self) -> std::collections::HashSet<usize> {
+        self.diag_list
+            .iter()
+            .filter_map(|d| {
+                if d.level() == Level::Error {
+                    d.line()
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+
+    /// return lines with warnings
+    pub fn warning_lines(&self) -> std::collections::HashSet<usize> {
+        self.diag_list
+            .iter()
+            .filter_map(|d| {
+                if d.level() == Level::Warning {
+                    d.line()
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
 }
 
 impl PushDiag for DiagHandler {

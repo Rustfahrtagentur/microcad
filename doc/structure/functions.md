@@ -9,7 +9,7 @@
 These sub-routines can then be [called](calls.md) to execute their code with a
 specific set of [parameters](parameters.md).
 
-[![test](.test/example.png)](.test/example.log)
+[![test](.test/example.svg)](.test/example.log)
 
 ```µcad,example
 // define function print_error with text as parameter of type String
@@ -30,7 +30,7 @@ A *function declaration* starts with the keyword `fn`, followed by an *identifie
 a *parameter list*, and a *function body*.
 Functions can also return a value as *result*:
 
-[![test](.test/return.png)](.test/return.log)
+[![test](.test/return.svg)](.test/return.log)
 
 ```µcad,return
 fn pow( x: Scalar, n: Integer ) {
@@ -44,7 +44,7 @@ fn pow( x: Scalar, n: Integer ) {
 
 Returning a value twice is not allowed.
 
-[![test](.test/return_twice.png)](.test/return_twice.log)
+[![test](.test/return_twice.svg)](.test/return_twice.log)
 
 ```µcad,return_twice
 fn pow( x: Scalar, n: Integer ) {
@@ -61,7 +61,7 @@ A [module](modules.md) can contain functions that are accessible within the modu
 By declaring a function as *public* using the keyword `pub`, it becomes available for
 use outside the module.
 
-[![test](.test/mod.png)](.test/mod.log)
+[![test](.test/mod.svg)](.test/mod.log)
 
 ```µcad,mod#todo_fail
 // module math
@@ -93,7 +93,7 @@ A [workbench](workbench.md) can contain functions that are accessible within the
 
 Here is an example which generates a punched disk of a given radius using a function `inner()`:
 
-[![test](.test/workbench_example.png)](.test/workbench_example.log)
+[![test](.test/workbench_example.svg)](.test/workbench_example.log)
 
 ```µcad,workbench_example
 sketch punched_disk(radius: Length) {
@@ -115,7 +115,7 @@ There are some restrictions for *workbench functions*:
 
 Trying to make them public with the keyword `pub` will result into an error:
 
-[![test](.test/workbench_pub.png)](.test/workbench_pub.log)
+[![test](.test/workbench_pub.svg)](.test/workbench_pub.log)
 
 ```µcad,workbench_pub#fail
 part punched_disk(radius: Length) {
@@ -127,7 +127,7 @@ punched_disk(4.0mm);
 
 You cannot create *workbench properties* within the code body.
 
-[![test](.test/workbench_fn_prop.png)](.test/workbench_fn_prop.log)
+[![test](.test/workbench_fn_prop.svg)](.test/workbench_fn_prop.log)
 
 ```µcad,workbench_fn_prop#fail
 part punched_disk(radius: Length) {

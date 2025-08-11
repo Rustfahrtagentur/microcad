@@ -5,8 +5,8 @@
 
 use crate::{src_ref::*, syntax::*};
 
-/// Tuple expression
-#[derive(Clone, Debug, Default)]
+/// Tuple expression, e.g. `(x=1+2,4,z=9)`.
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct TupleExpression {
     /// List of tuple members.
     pub args: ArgumentList,
@@ -39,10 +39,10 @@ impl std::fmt::Display for TupleExpression {
     }
 }
 
-impl PrintSyntax for TupleExpression {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for TupleExpression {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}TupleExpression:", "")?;
-        let depth = depth + Self::INDENT;
-        self.args.print_syntax(f, depth)
+        depth.indent();
+        self.args.tree_print(f, depth)
     }
 }

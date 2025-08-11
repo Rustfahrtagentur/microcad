@@ -45,7 +45,7 @@ impl SourceFileTest {
                 use microcad_lang::model::{ExportCommand as Export, OutputType};
                 use std::rc::Rc;
 
-                self.write_and_compare(model.clone(), "model_tree");
+                self.write_and_compare_model(&model, "model_tree");
 
                 if !context.has_errors() {
                     // If we have a 2D model, export model to SVG
@@ -112,6 +112,22 @@ impl SourceFileTest {
         self.compare_output_to_reference_file(extension);
     }
 
+    /// Write the content of a `Display` to a file.
+    fn write_and_compare_model(&self, model: &microcad_lang::model::Model, extension: &str) {
+        // Write value to file
+        {
+            let output_filename = self.output_filename(extension);
+            let file = std::fs::File::create(&output_filename)
+                .unwrap_or_else(|_| panic!("Failed to create file: {output_filename}"));
+
+            use microcad_lang::tree_display::TreeDisplay;
+            let mut writer = std::io::BufWriter::new(file);
+            model.write_tree(&mut writer).expect("Valid file write")
+        }
+
+        // Compare
+        self.compare_output_to_reference_file(extension);
+    }
     /// Generate a reference filename from `filename` with `extension`.
     ///
     /// `syntax/multiplicity.µcad` -> `syntax/multiplicity.log`

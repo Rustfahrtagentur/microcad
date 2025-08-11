@@ -4,8 +4,8 @@
 
 -- Code --
 
-#[export = svg("circle.svg")]
-c = std::geo2d::circle(42.0mm);
+ 1: #[export = svg("circle.svg")]
+ 2: c = std::geo2d::circle(42.0mm);
 
 -- Output --
 -- Errors --

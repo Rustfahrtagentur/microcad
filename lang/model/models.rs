@@ -8,7 +8,9 @@ use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 
 /// Model multiplicities.
-#[derive(Debug, Default, Clone, PartialEq, Deref, DerefMut)]
+#[derive(
+    Debug, Default, Clone, PartialEq, Deref, DerefMut, serde::Serialize, serde::Deserialize,
+)]
 pub struct Models(Vec<Model>);
 
 impl Models {
@@ -35,6 +37,35 @@ impl Models {
                     .collect(),
             )
         }
+    }
+
+    /// Nest models in self.
+    pub fn nest(self, models: &Models) -> Self {
+        self.iter().for_each(|new_parent| {
+            models.iter().for_each(|model| {
+                model.detach();
+
+                // Handle children marker.
+                // If we have found a children marker model, use it's parent as
+                // new parent model.
+                let new_parent = match &new_parent.find_children_placeholder() {
+                    Some(children_marker) => {
+                        let parent = &children_marker
+                            .borrow()
+                            .parent
+                            .clone()
+                            .expect("Must have a parent");
+                        children_marker.detach(); // Remove children marker from tree
+                        parent.clone()
+                    }
+                    None => new_parent.clone(),
+                };
+
+                new_parent.append(model.make_deep_copy());
+            });
+        });
+
+        self
     }
 
     /// Nest a Vec of model multiplicities
@@ -142,8 +173,8 @@ impl Models {
 
     /// Set the information about the creator for all models.
     ///
-    /// See [`Model::set_creator`] for more info.
-    pub fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
+    /// See [`ModelInner::set_creator`] for more info.
+    pub(crate) fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
         self.iter().for_each(|model| {
             model
                 .borrow_mut()
@@ -193,5 +224,11 @@ impl std::fmt::Display for Models {
 impl FromIterator<Model> for Models {
     fn from_iter<T: IntoIterator<Item = Model>>(iter: T) -> Self {
         Self(iter.into_iter().collect())
+    }
+}
+
+impl TreeDisplay for Models {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
+        self.iter().try_for_each(|child| child.tree_print(f, depth))
     }
 }

@@ -1,17 +1,18 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::WriteToFile, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{diag::*, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
 use derive_more::{Deref, DerefMut};
 
 /// Symbol content
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SymbolInner {
     /// Symbol definition
     pub def: SymbolDefinition,
     /// Symbol's parent
     #[debug(skip)]
+    #[serde(skip)]
     pub parent: Option<Symbol>,
     /// Symbol's children
     pub children: SymbolMap,
@@ -24,8 +25,14 @@ pub struct SymbolInner {
 /// the resolved symbols by it's original structure in the source code and by it's *id*.
 ///
 /// `SymbolNode` can be shared as mutable.
-#[derive(Debug, Clone, Deref, DerefMut)]
+#[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Symbol(RcMut<SymbolInner>);
+
+impl Linkable<QualifiedName> for Symbol {
+    fn link(&self) -> QualifiedName {
+        self.full_name()
+    }
+}
 
 /// List of qualified names which can pe displayed
 #[derive(Debug, Deref)]
@@ -144,7 +151,7 @@ impl Symbol {
         let id = id.unwrap_or(self_id);
         writeln!(
             f,
-            "{:depth$}{id} {} [{}]",
+            "{:depth$}{id:?} {} [{}]",
             "",
             self.0.borrow().def,
             self.full_name()

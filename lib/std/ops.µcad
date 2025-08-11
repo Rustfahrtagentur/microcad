@@ -5,27 +5,82 @@ pub use __builtin::ops::hull;
 
 
 op revolve(angle = 360°) {
-    __builtin::ops::revolve(
+    @children.__builtin::ops::revolve(
         circular_segments = 64, // TODO: Make this adaptive to resolution 
-        revolve_degrees = angle / 1°) {
-        @children
-    }
+        revolve_degrees = angle / 1°
+    );
 }
 
 op extrude(height: Length) {
-    __builtin::ops::extrude(height = height / 1mm, n_divisions = 0, twist_degrees = 0.0, scale_top_x = 1.0, scale_top_y = 1.0) {
-        @children
-    }
+    @children.__builtin::ops::extrude(height = height / 1mm, n_divisions = 0, twist_degrees = 0.0, scale_top_x = 1.0, scale_top_y = 1.0);
 }
 
 op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
-    __builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm) {
-        @children
-    }
+	@children.__builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm);
 }
 
-op rotate(angle = 0°, x = 0.0mm, y = 0.0mm, z = 0.0mm) {
-    __builtin::ops::rotate(angle / 1°, x = x / 1mm, y = y / 1mm, z = z / 1mm) {
-        @children
-    }
+/// A transformer that rotates a part.
+///
+/// See the `init`s for examples on how to use this transformer. 
+op rotate(matrix: Matrix3) {
+	/// Rotate around an axis by an angle using a 3D vector.
+	/// 
+	/// The `axis` vector will be normalized. 
+	///
+	/// * `angle` - An angle.
+	/// * `axis` - An axis to rotate around (Z axis is default).
+	///
+	/// Examples:
+	/// * `rect(42mm).rotate(45°);`: 2D rotation of a square by 45°.
+	/// * `rotate(45°, (x = 1, y = 1, z = 1)) cube(42mm);`: Rotates a cube by 45° around a diagonal axis.
+	/// * `rotate(30°, Y) cube(42mm);`: Rotates a cube by 30° around Y axis.
+	init(angle: Angle, axis = __builtin::math::Z) {
+		matrix = __builtin::math::rotate_around_axis(angle, x = axis.x, y = axis.y, z = axis.z);
+	}
+	
+	/// Euler rotation around X, Y, Z.
+	///
+	/// * `x` - X angle.
+	/// * `y` - Y angle.
+	/// * `z` - Z angle.
+	///
+	/// Examples:
+	/// * `rotate(45°, (1, 0, 0)) cube(42mm);`: Rotates a cylinder by 45° around X axis (unnamed tuple).
+	init(x = 0°, y = 0°, z = 0°) {
+		matrix = __builtin::math::rotate_xyz(x, y, z);		
+	}
+	
+	/// Euler rotation around X, Y, Z (nautical angles)
+	///
+	/// * `roll` - Roll angle, rotates around X axis.
+	/// * `pitch` - Pitch angle, rotates around Y axis.
+	/// * `yaw` - Yaw angle, rotates around Z axis.
+	///
+	/// Example:
+	/// * `rotate(roll = 30°) cube(42mm)`: Rotates a cylinder by 45° around X axis.
+	init(roll = 0°, pitch = 0°, yaw = 0°) {
+		matrix = __builtin::math::rotate_xyz(roll, pitch, yaw);
+	}
+	
+	/// Euler rotation around X, Y and Z axis (with a vector of angles)
+	///
+	/// * `rotate(xyz = (30°,20°,10°)) cube(42mm);`: Euler rotation for a cube around X, Y, Z axis.
+	init(xyz = (x = 0°,y = 0°,z = 0°)) {
+		matrix = __builtin::math::rotate_xyz(xyz.x, xyz.y, xyz.z);
+	}
+	
+	/// Euler rotation around Z, Y and X axis (with a vector of angles)
+	///
+	/// * `rotate(zyx = (30°,20°,10°)) cube(42mm);`: Euler rotation for a cube around Z, Y, X axis.
+	init(zyx = (x = 0°, y = 0°, z = 0°)) {
+		matrix = __builtin::math::rotate_zyx(zyx.z, zyx.y, zyx.x);
+	}
+
+	@children.__builtin::ops::rotate(matrix);
+}
+
+
+/// Orient an object towards a vector.
+op orient(v: Vec3) {
+    @children.__builtin::ops::orient(x = v.x, y = v.y, z = v.z);
 }

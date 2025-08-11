@@ -4,12 +4,12 @@
 
 -- Code --
 
-sketch f() {} f();
+ 1: sketch f() {} f();
 
 -- Output --
 -- Errors --
 warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | sketch f() {} f();
      | ^^^^^^^^^^^^^

@@ -1,0 +1,13 @@
+-- Test --
+  array_operations
+  ../doc/structure/arrays.md:42
+
+-- Code --
+
+ 1: d = 0.5mm;
+ 2: std::debug::assert_eq([[-d,d]*2, [-1,1]mm]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

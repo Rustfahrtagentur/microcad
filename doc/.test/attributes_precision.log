@@ -4,10 +4,10 @@
 
 -- Code --
 
-#[resolution = 200%]
-c = std::geo2d::circle(42.0mm);
-
-std::debug::assert_eq([c#resolution, 200%]);
+ 1: #[resolution = 200%]
+ 2: c = std::geo2d::circle(42.0mm);
+ 3: 
+ 4: std::debug::assert_eq([c#resolution, 200%]);
 
 -- Output --
 -- Errors --

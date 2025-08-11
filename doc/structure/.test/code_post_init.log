@@ -1,16 +1,16 @@
 -- Test --
   code_post_init
-  ../doc/structure/workbench.md:237
+  ../doc/structure/workbench.md:236
 
 -- Code --
 
-sketch wheel(radius: Length) {
-    // initializer
-    init( diameter: Length ) { radius = diameter / 2; }
-
-    // building code starts here
-    std::geo2d::circle(radius);
-}
+ 1: sketch wheel(radius: Length) {
+ 2:     // initializer
+ 3:     init( diameter: Length ) { radius = diameter / 2; }
+ 4: 
+ 5:     // building code starts here
+ 6:     std::geo2d::circle(radius);
+ 7: }
 
 -- Output --
 -- Errors --

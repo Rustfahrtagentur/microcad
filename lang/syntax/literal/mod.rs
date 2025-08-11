@@ -11,8 +11,8 @@ pub use units::*;
 
 use crate::{src_ref::*, syntax::*, ty::*, value::Value};
 
-/// Literal entity
-#[derive(Debug, Clone, PartialEq)]
+/// Literal of any kind.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum Literal {
     /// Integer literal
     Integer(Refer<i64>),
@@ -23,7 +23,7 @@ pub enum Literal {
 }
 
 impl Literal {
-    /// Return value of literal
+    /// Return value of literal.
     pub fn value(&self) -> Value {
         match self {
             Self::Integer(value) => Value::Integer(*value.clone()),
@@ -69,8 +69,8 @@ impl From<Literal> for Value {
     }
 }
 
-impl PrintSyntax for Literal {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Literal {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         write!(f, "{:depth$}Literal: ", "")?;
         match self {
             Literal::Integer(i) => writeln!(f, "{i}"),

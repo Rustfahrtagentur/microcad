@@ -35,14 +35,14 @@ fn svg_writer() {
     .write_svg(&mut svg, &[("style", ("fill:red;"))].into_iter().collect())
     .expect("test error");
 
-    Edge2D(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0))
+    Line(geo::Point::new(0.0, 0.0), geo::Point::new(100.0, 100.0))
         .write_svg(
             &mut svg,
             &[("style", "stroke:black;")].into_iter().collect(),
         )
         .expect("test error");
 
-    Edge2D(geo::Point::new(100.0, 0.0), geo::Point::new(0.0, 100.0))
+    Line(geo::Point::new(100.0, 0.0), geo::Point::new(0.0, 100.0))
         .shorter(6.0)
         .write_svg(
             &mut svg,

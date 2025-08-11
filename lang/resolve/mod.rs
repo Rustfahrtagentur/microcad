@@ -3,7 +3,7 @@
 
 //! Single symbol resolving
 //!
-//! After parsing a source file (see [`crate::parse`]) it must be resolved to get a symbol out of it:
+//! After parsing a source file (see [`mod@crate::parse`]) it must be resolved to get a symbol out of it:
 //!
 //! ```no_run
 //! use microcad_lang::{syntax::*, parse::*, resolve::*};

@@ -4,22 +4,22 @@
 
 -- Code --
 
-mod k {
-  1 + 2;
-}
+ 1: mod k {
+ 2:   1 + 2; // error
+ 3: }
 
 -- Output --
 -- Errors --
 error: Expression statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
-   2 |   1 + 2;
+   2 |   1 + 2; // error
      |   ^^^^^^
      |
 warning: This expression statement did not produce any model
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
-   2 |   1 + 2;
+   2 |   1 + 2; // error
      |   ^^^^^^
      |
 -- Test Result --

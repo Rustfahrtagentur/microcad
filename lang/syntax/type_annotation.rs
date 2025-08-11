@@ -1,12 +1,12 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad Type annotation
+//! µcad Type annotation.
 
 use crate::{src_ref::*, syntax::*, ty::*};
 
-/// Type within source code
-#[derive(Debug, Clone, PartialEq)]
+/// Type within source code.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct TypeAnnotation(pub Refer<Type>);
 
 impl SrcReferrer for TypeAnnotation {
@@ -27,8 +27,8 @@ impl crate::ty::Ty for TypeAnnotation {
     }
 }
 
-impl PrintSyntax for TypeAnnotation {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for TypeAnnotation {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}TypeAnnotation: {}", "", self.0.value)
     }
 }

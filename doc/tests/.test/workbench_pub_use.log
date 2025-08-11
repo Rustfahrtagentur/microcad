@@ -4,17 +4,17 @@
 
 -- Code --
 
-sketch k() {
-  pub use std;
-} k();
+ 1: sketch k() {
+ 2:   pub use std; // error
+ 3: } k();
 
 -- Output --
 -- Errors --
 warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | sketch k() {
      | ^^^^^^^^^^^^
      |
 -- Test Result --
-OK BUT IS TODO
+FAIL(TODO)

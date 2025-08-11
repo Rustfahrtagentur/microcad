@@ -6,7 +6,7 @@ TODO
 
 ## Mod
 
-[![test](.test/mod_example.png)](.test/mod_example.log)
+[![test](.test/mod_example.svg)](.test/mod_example.log)
 
 ```µcad,mod_example
 mod std {

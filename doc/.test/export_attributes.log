@@ -4,11 +4,11 @@
 
 -- Code --
 
-#[export = "rect.svg"] // Will be exported to `rect.svg`
-std::geo2d::rect(42mm);
-
-#[export = "circle.svg"]  // Will be exported to `circle.svg`
-std::geo2d::circle(r = 42mm);
+ 1: #[export = "rect.svg"] // Will be exported to `rect.svg`
+ 2: std::geo2d::rect(42mm);
+ 3: 
+ 4: #[export = "circle.svg"]  // Will be exported to `circle.svg`
+ 5: std::geo2d::circle(r = 42mm);
 
 -- Output --
 -- Errors --

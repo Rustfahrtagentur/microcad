@@ -4,11 +4,11 @@
 
 -- Code --
 
-{
-  pub use std;
-}
+ 1: {
+ 2:   pub use std; // error
+ 3: }
 
 -- Output --
 -- Errors --
 -- Test Result --
-OK BUT IS TODO
+FAIL(TODO)

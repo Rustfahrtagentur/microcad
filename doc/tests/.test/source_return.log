@@ -4,14 +4,14 @@
 
 -- Code --
 
-return 1;
+ 1: return 1;  // error
 
 -- Output --
 -- Errors --
 error: Return statement not available here
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
-   1 | return 1;
+   1 | return 1;  // error
      | ^^^^^^^^^
      |
 -- Test Result --

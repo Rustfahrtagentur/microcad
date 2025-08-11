@@ -4,14 +4,14 @@
 
 -- Code --
 
-prop a = 1;
+ 1: prop a = 1;  // error
 
 -- Output --
 -- Errors --
 error: Assignment statement not available here
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
-   1 | prop a = 1;
+   1 | prop a = 1;  // error
      | ^^^^^^^^^^^
      |
 -- Test Result --

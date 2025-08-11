@@ -5,7 +5,7 @@ use crate::{builtin::*, diag::*, eval::*, model::Model, rc::*, resolve::*, synta
 
 /// Grant statements depending on context
 pub trait Grant<T> {
-    /// Check if given statement [`T`] is granted within the current context
+    /// Check if given statement `T` is granted within the current context
     fn grant(&mut self, t: &T) -> EvalResult<()>;
 }
 
@@ -198,7 +198,6 @@ impl Default for Context {
 }
 impl Lookup for Context {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::debug!("Lookup {name}");
         self.symbol_table.lookup(name)
     }
 }
@@ -210,6 +209,14 @@ impl Diag for Context {
 
     fn error_count(&self) -> u32 {
         self.diag_handler.error_count()
+    }
+
+    fn error_lines(&self) -> std::collections::HashSet<usize> {
+        self.diag_handler.error_lines()
+    }
+
+    fn warning_lines(&self) -> std::collections::HashSet<usize> {
+        self.diag_handler.warning_lines()
     }
 }
 

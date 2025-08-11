@@ -25,22 +25,21 @@ alpha       = _{ alpha_lower | alpha_upper }
 digit       = _{ '0'..'9' }
 
 COMMENT = {
-    doc_comment
-  | single_line_comment
+  single_line_comment
   | multi_line_comment
 }
 
 // `// ok`: ok
 // `/ err` error
-single_line_comment = ${ "//" ~ (!"\n" ~ ANY)* }
+single_line_comment = ${ "//" ~ !"/" ~ (!"\n" ~ ANY)* }
 
 // Documentation comments for µcad language
 // `/// ok`: ok
 // `// err` error
-doc_comment = { "///" ~ (!"\n" ~ ANY)* }
+doc_comment = ${ "///" ~ (!"\n" ~ ANY)* }
 
 // `/* ok */`: ok
-multi_line_comment = ${ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
+multi_line_comment = { "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
 identifier_part = { alpha | "_" }
 identifier_body = { (alpha | "_") ~ (alpha | digit | "_")* }
@@ -145,9 +144,14 @@ type = {
     array_type
   | tuple_type
   | matrix_type
-  | qualified_name
+  | base_type
+  | quantity_type
   | unit
 }
+
+base_type = { "Integer" | "String" | "Bool" | "Models" }
+
+quantity_type = { "Scalar" | "Length" | "Area" | "Volume" | "Density" | "Angle" | "Weight" }
 
 type_annotation = _{ ":" ~ ws* ~ type }
 
@@ -157,7 +161,10 @@ array_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 
 // `(a: Length, b: scalar)`: ok
 // `(a: Length, )`: ok # Trailing comma
-tuple_type = { "(" ~ ws* ~ tuple_type_element ~ (ws* ~ "," ~ ws* ~ tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")" }
+tuple_type = {
+    ("(" ~ ws* ~ tuple_type_element ~ (ws* ~ "," ~ ws* ~ tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")")
+  | ("Color" | "Vec2" | "Vec3" | "Size2D")
+}
 
 // `a: Length`: ok
 tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
@@ -167,7 +174,7 @@ tuple_type_element = { identifier ~ ws* ~ ":" ~ ws* ~ type }
 matrix_type = { "Matrix" ~ int ~ ("x" ~ int)? }
 
 range_start = { integer_literal | expression }
-range_end = { integer_literal | expression }
+range_end   = { integer_literal | expression }
 
 // `1..3`: ok
 range_expression = { range_start ~ ws* ~ ".." ~ ws* ~ range_end }
@@ -213,15 +220,6 @@ use_all = { qualified_name ~ ws* ~ "::" ~ ws* ~ "*" }
 
 // `std::math as my_math`: ok # Import math from std as my_math
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
-
-// `translate() rotate()`: ok
-// `translate() rotate() { translate() rotate() {} }`: ok
-// `rotate() {}`: ok
-// `{}`: ok # Empty body
-// `{ translate() rotate(); }`: ok
-// `{} {}`: error # Cannot nest bodies
-// `holes.edges`: error # No tuple access in nested module
-nested = { nested_with_body | (call | qualified_name) ~ (ws+ ~ (call | qualified_name))* }
 
 nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ body }
 
@@ -285,7 +283,7 @@ unary_minus =  { "-" }
 unary_plus  =  { "+" }
 unary_not   =  { "!" }
 postfix     = _{ element_access }
-primary     = _{ literal | marker | nested | format_string | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression | array_expression }
+primary     = _{ literal | marker | body | call | qualified_name | format_string | array_expression | "(" ~ ws* ~ expression ~ ws* ~ ")" | tuple_expression }
 
 // `a, b, c`: ok
 // `1+2, 4*3, 3.2`: ok
@@ -324,7 +322,7 @@ argument_list = { argument ~ (ws* ~ "," ~ ws* ~ argument)* ~ ws* ~ ","? }
 call_op = _{ "(" ~ ws* ~ argument_list? ~ ws* ~ ")" }
 
 // `.sum()`: ok
-method_call = { "." ~ ws* ~ identifier ~ ws* ~ call_op }
+method_call = { "." ~ ws* ~ qualified_name ~ ws* ~ call_op ~ ws* }
 
 // `f(a = 3.0mm)`: ok
 // `f(a = 3.0mm, b = 2.0mm)`: ok
@@ -413,6 +411,9 @@ return_statement = { "return" ~ ws* ~ expression ~ ws* ~ ";" }
 // `if a > 5.0mm { return 5.0mm; } else { return 4.0mm; }`: ok
 if_statement = { "if" ~ ws* ~ expression ~ ws* ~ body ~ (ws* ~ "else" ~ ws* ~ (body | if_statement))? }
 
+// Documentation block.
+doc_block = { (doc_comment ~ ws+)+ }
+
 workbench_kind = { "sketch" | "part" | "op" }
 
 // `part foo() { }`: ok # Part with no properties
@@ -427,7 +428,7 @@ workbench_kind = { "sketch" | "part" | "op" }
 // `sketch foo() { }`: ok # Sketch with no properties
 // `op foo() { }`: ok # Sketch with no properties
 // `pub sketch foo() { }`: ok # public sketch
-workbench_definition = { (attribute_list ~ ws+)? ~ (visibility ~ ws+)? ~ workbench_kind ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
+workbench_definition = { doc_block? ~ (attribute_list ~ ws+)? ~ (visibility ~ ws+)? ~ workbench_kind ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
 // `{ translate() rotate(); }`: ok
 // `{}`: ok # Empty body
@@ -436,7 +437,7 @@ body = { "{" ~ ws* ~ statement_list ~ ws* ~ "}" }
 // `init(d: Length) { r = d / 2; }`: ok
 // `init(size: Length) { size = size; }`: ok
 // `init(size: Length) { rectangle(size); }: ok
-init_definition = { "init" ~ ws* ~ parameter_list ~ ws* ~ body }
+init_definition = { doc_block? ~ "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 
 // `mod math { }`: ok # module
 // `mod math { fn pi() -> Scalar { return 3.14159; } }`: ok # module with function
@@ -453,6 +454,7 @@ statement = {
   | inner_attribute_statement
   | assignment_statement
   | expression_statement
+  | doc_block
 }
 
 statement_list = { (statement ~ ws*)* ~ final_expression_statement? }

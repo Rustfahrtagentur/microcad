@@ -3,17 +3,17 @@
 
 //! Export attribute.
 
-/// The output type of the [`Model`].
+/// The output type of the [`crate::model::Model`].
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub enum OutputType {
     /// The output type has not yet been determined.
     #[default]
     NotDetermined,
-    /// The [`Model`] outputs a 2d geometry.
+    /// The [`crate::model::Model`] outputs a 2d geometry.
     Geometry2D,
-    /// The [`Model`] outputs a 3d geometry.
+    /// The [`crate::model::Model`] outputs a 3d geometry.
     Geometry3D,
-    /// The [`Model`] is invalid, you cannot mix 2d and 3d geometry.
+    /// The [`crate::model::Model`] is invalid, you cannot mix 2d and 3d geometry.
     InvalidMixed,
 }
 

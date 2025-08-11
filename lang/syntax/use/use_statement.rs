@@ -1,17 +1,17 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Use statement syntax element
+//! Use statement syntax element.
 
 use crate::{resolve::*, src_ref::*, syntax::*};
 
-/// Use statement:
+/// Use statement.
 ///
+/// # Example
 /// ```ucad
-///
 /// use std::*;
 /// ```
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct UseStatement {
     /// export of use
     pub visibility: Visibility,
@@ -50,9 +50,10 @@ impl std::fmt::Display for UseStatement {
     }
 }
 
-impl PrintSyntax for UseStatement {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for UseStatement {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}UseStatement", "")?;
-        self.decl.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.decl.tree_print(f, depth)
     }
 }

@@ -55,6 +55,10 @@ pub enum EvalError {
     #[error("Unexpectedly found symbol {0}")]
     SymbolFound(QualifiedName),
 
+    /// The symbol cannot be called, e.g. when it is a source file or a module.
+    #[error("Symbol `{0}` cannot be called {1}.")]
+    SymbolCannotBeCalled(QualifiedName, Box<SymbolDefinition>),
+
     /// Found ambiguous symbols.
     #[error("Ambiguous symbol {ambiguous} might be one of the following:\n{others}")]
     AmbiguousSymbol {
@@ -144,9 +148,13 @@ pub enum EvalError {
     #[error("Could not find a file with hash {0}")]
     UnknownHash(u64),
 
+    /// Hash is zero
+    #[error("Hash is zero")]
+    NulHash,
+
     /// Unknown method.
     #[error("Unknown method `{0}`")]
-    UnknownMethod(Identifier),
+    UnknownMethod(QualifiedName),
 
     /// Can't find a project file by it's path.
     #[error("Could not find a file with path {0}")]
@@ -223,6 +231,10 @@ pub enum EvalError {
     /// This error happens if the workbench produced a different output type.
     #[error("The {0} workbench will produce no {1} output.")]
     WorkbenchNoOutput(WorkbenchKind, OutputType),
+
+    /// Unexpected source file in expression
+    #[error("Unexpected source file {0} in expression")]
+    InvalidSelfReference(Identifier),
 }
 
 /// Result type of any evaluation.

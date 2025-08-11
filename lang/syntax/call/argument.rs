@@ -5,8 +5,8 @@
 
 use crate::{ord_map::*, src_ref::*, syntax::*};
 
-/// Argument
-#[derive(Clone, Debug)]
+/// Argument in a [`Call`].
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Argument {
     /// Name of the argument
     pub id: Option<Identifier>,
@@ -21,7 +21,7 @@ impl Argument {
     pub fn derived_name(&self) -> Option<Identifier> {
         match &self.id {
             Some(name) => Some(name.clone()),
-            None => self.value.single_identifier(),
+            None => self.value.single_identifier().cloned(),
         }
     }
 }
@@ -41,18 +41,19 @@ impl OrdMapValue<Identifier> for Argument {
 impl std::fmt::Display for Argument {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.id {
-            Some(ref name) => write!(f, "{} = {}", name, self.value),
+            Some(ref id) => write!(f, "{id:?} = {}", self.value),
             None => write!(f, "{}", self.value),
         }
     }
 }
 
-impl PrintSyntax for Argument {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Argument {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         match self.id {
-            Some(ref name) => writeln!(f, "{:depth$}Argument '{}':", "", name)?,
+            Some(ref id) => writeln!(f, "{:depth$}Argument '{id:?}':", "")?,
             None => writeln!(f, "{:depth$}Argument:", "")?,
         };
-        self.value.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.value.tree_print(f, depth)
     }
 }

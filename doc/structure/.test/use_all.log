@@ -4,10 +4,10 @@
 
 -- Code --
 
-use std::geo3d::*;
-
-sphere(r = 4mm);
-cube(size = 40mm);
+ 1: use std::geo3d::*;
+ 2: 
+ 3: sphere(r = 4mm);
+ 4: cube(size = 40mm);
 
 -- Output --
 -- Errors --

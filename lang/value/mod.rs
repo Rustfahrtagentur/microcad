@@ -28,7 +28,7 @@ use microcad_core::*;
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
 
 /// A variant value with attached source code reference.
-#[derive(Clone, Default, PartialEq)]
+#[derive(Clone, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum Value {
     /// Invalid value (used for error handling).
     #[default]
@@ -271,7 +271,7 @@ impl std::ops::Mul for Value {
             (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             // Multiply two scalars
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
-            (Value::Array(list), value) | (value, Value::Array(list)) => Ok((list * value)?),
+            (Value::Array(array), value) | (value, Value::Array(array)) => Ok((array * value)?),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
     }
@@ -452,6 +452,20 @@ impl TryFrom<&Value> for Size2D {
             Value::Tuple(tuple) => Ok(tuple.as_ref().try_into()?),
             _ => Err(ValueError::CannotConvert(value.clone(), "Size2D".into())),
         }
+    }
+}
+
+impl TryFrom<&Value> for Mat3 {
+    type Error = ValueError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        if let Value::Matrix(m) = value {
+            if let Matrix::Matrix3(matrix3) = m.as_ref() {
+                return Ok(*matrix3);
+            }
+        }
+
+        Err(ValueError::CannotConvert(value.clone(), "Matrix3".into()))
     }
 }
 

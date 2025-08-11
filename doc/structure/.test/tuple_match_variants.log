@@ -1,57 +1,57 @@
 -- Test --
   tuple_match_variants
-  ../doc/structure/arguments.md:80
+  ../doc/structure/arguments.md:81
 
 -- Code --
 
-fn f( x: Length, y: Length, z: Length ) {}
-
-// Every parameter given by name
-f( x=1cm, y=2cm, z=3cm);
-
-// Parameters given by named tuple
-f( (x=1cm, y=2cm, z=3cm) );
-
-// Parameters given by named tuple variable
-p = (x=1cm, y=2cm, z=3cm);
-f( p );
-
-// Parameters given by named tuple and a single value
-f( (x=1cm, y=2cm), z=3cm );
-f( y=2cm, (x=1cm, z=3cm) );
-
-// Parameters given by named tuple variable and a single value
-q = (x=1cm, y=2cm);
-f( q, z=3cm );
+ 1: fn f( x: Length, y: Length, z: Length ) {}
+ 2: 
+ 3: // Every parameter given by name
+ 4: f( x=1cm, y=2cm, z=3cm);
+ 5: 
+ 6: // Parameters given by named tuple
+ 7: f( (x=1cm, y=2cm, z=3cm) );
+ 8: 
+ 9: // Parameters given by named tuple variable
+10: p = (x=1cm, y=2cm, z=3cm);
+11: f( p );
+12: 
+13: // Parameters given by named tuple and a single value
+14: f( (x=1cm, y=2cm), z=3cm );
+15: f( y=2cm, (x=1cm, z=3cm) );
+16: 
+17: // Parameters given by named tuple variable and a single value
+18: q = (x=1cm, y=2cm);
+19: f( q, z=3cm );
 
 -- Output --
 -- Errors --
 error: Missing arguments: x,y,z
-  ---> <from_str>:7:4
+  ---> <FROM STR>:7:4
      |
    7 | f( (x=1cm, y=2cm, z=3cm) );
      |    ^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Missing arguments: x,y,z
-  ---> <from_str>:11:4
+  ---> <FROM STR>:11:4
      |
   11 | f( p );
      |    ^^
      |
 error: Missing arguments: x,y
-  ---> <from_str>:14:4
+  ---> <FROM STR>:14:4
      |
   14 | f( (x=1cm, y=2cm), z=3cm );
      |    ^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Missing arguments: x,z
-  ---> <from_str>:15:4
+  ---> <FROM STR>:15:4
      |
   15 | f( y=2cm, (x=1cm, z=3cm) );
      |    ^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Missing arguments: x,y
-  ---> <from_str>:19:4
+  ---> <FROM STR>:19:4
      |
   19 | f( q, z=3cm );
      |    ^^^^^^^^^

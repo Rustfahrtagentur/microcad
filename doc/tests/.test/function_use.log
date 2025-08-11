@@ -4,9 +4,9 @@
 
 -- Code --
 
-fn f() {
-  use std;
-} f();
+ 1: fn f() {
+ 2:   use std;
+ 3: } f();
 
 -- Output --
 -- Errors --

@@ -4,13 +4,13 @@
 
 -- Code --
 
-use std::geo2d::*;
-use std::ops::*;
-
-hull() {
-    translate(x = 10mm, y =  0mm) circle(10mm);
-    translate(x =  0mm, y = 10mm) circle(10mm);
-}
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: {
+ 5:     circle(10mm).translate(x = 10mm, y =  0mm);
+ 6:     circle(10mm).translate(x =  0mm, y = 10mm);
+ 7: }.hull();
 
 -- Output --
 -- Errors --

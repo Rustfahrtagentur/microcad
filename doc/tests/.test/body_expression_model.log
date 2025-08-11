@@ -4,9 +4,9 @@
 
 -- Code --
 
-{
-  __builtin::geo2d::circle(radius=1);
-}
+ 1: {
+ 2:   __builtin::geo2d::circle(radius=1);
+ 3: }
 
 -- Output --
 -- Errors --

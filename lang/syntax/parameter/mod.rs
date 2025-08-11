@@ -10,7 +10,7 @@ use crate::{diag::*, eval::*, ord_map::*, src_ref::*, syntax::*, ty::*, value::*
 pub use parameter_list::*;
 
 /// A parameter of a parameter list.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct Parameter {
     /// Name of the parameter
     pub id: Identifier,
@@ -101,8 +101,8 @@ impl std::fmt::Display for Parameter {
     }
 }
 
-impl PrintSyntax for Parameter {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Parameter {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         match (&self.specified_type, &self.default_value) {
             (Some(specified_type), Some(default_value)) => writeln!(
                 f,

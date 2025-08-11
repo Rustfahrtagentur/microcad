@@ -6,8 +6,8 @@
 use crate::{ord_map::*, src_ref::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
-/// List (ordered map) of arguments.
-#[derive(Clone, Debug, Default, Deref, DerefMut)]
+/// *Ordered map* of arguments in a [`Call`].
+#[derive(Clone, Debug, Default, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct ArgumentList(pub Refer<OrdMap<Identifier, Argument>>);
 
 impl SrcReferrer for ArgumentList {
@@ -31,13 +31,11 @@ impl std::fmt::Display for ArgumentList {
     }
 }
 
-impl PrintSyntax for ArgumentList {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for ArgumentList {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}ArgumentList:", "")?;
-        self.0
-            .value
-            .iter()
-            .try_for_each(|p| p.print_syntax(f, depth + Self::INDENT))
+        depth.indent();
+        self.0.value.iter().try_for_each(|p| p.tree_print(f, depth))
     }
 }
 

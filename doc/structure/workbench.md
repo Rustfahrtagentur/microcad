@@ -38,7 +38,7 @@ A *workbench* consists of the following elements:
 
 The following code demonstrates most of these elements:
 
-[![test](.test/part_declaration.png)](.test/part_declaration.log)
+[![test](.test/part_declaration.svg)](.test/part_declaration.log)
 
 ```µcad,part_declaration#todo
 // sketch with a `radius` as building plan
@@ -90,7 +90,7 @@ All *parameters* in that list become *properties* of the workbench when it is in
 These properties can be accessed within the *building code*, inside functions,
 or externally.
 
-[![test](.test/building_plan.png)](.test/building_plan.log)
+[![test](.test/building_plan.svg)](.test/building_plan.log)
 
 ```µcad,building_plan
 // sketch with a `radius` as building plan
@@ -107,11 +107,12 @@ std::debug::assert_eq([wheel(5cm).radius, 5cm]);
 *Initializers* are defined with the keyword `init` and a following *parameter list*.
 One may define multiple initializers which must have different parameter lists.
 
-[![test](.test/initializers.png)](.test/initializers.log)
+[![test](.test/initializers.svg)](.test/initializers.log)
 
 ```µcad,initializers#todo_fail
 sketch wheel(radius: Length) {
     init( radius: Length ) {} // error: same parameters as in building plan
+    std::geo2d::circle(1mm);
 }
 
 wheel(radius = 1.0mm);
@@ -120,7 +121,7 @@ wheel(radius = 1.0mm);
 However, if an initializer is used, all properties from the building plan must
 be initialized (except those with *default values*).
 
-[![test](.test/init_property.png)](.test/init_property.log)
+[![test](.test/init_property.svg)](.test/init_property.log)
 
 ```µcad,init_property
 sketch wheel(radius: Length, thickness: Length) {
@@ -147,13 +148,11 @@ wheel(diameter=10cm, thickness=1cm);
 If the *building plan* is not fully initialized by an initializer
 you will get an error:
 
-[![test](.test/missed_property.png)](.test/missed_property.log)
+[![test](.test/missed_property.svg)](.test/missed_property.log)
 
 ```µcad,missed_property#fail
-sketch wheel(radius: Length) {
-    init( width: Length ) { 
-        // evaluation error: misses to set `radius` from building plan
-    }
+sketch wheel(radius: Length) { // warning (no output)
+    init( width: Length ) { } // error: misses to set `radius` from building plan
 }
 
 wheel(width = 1.0mm);
@@ -167,7 +166,7 @@ which must be placed on top of the workbench's body (before any *initializers*).
 The *init code* is just allowed to define some *constants* which then can be used
 in all following code (including code within *initializers* and *functions*).
 
-[![test](.test/pre_init_code.png)](.test/pre_init_code.log)
+[![test](.test/pre_init_code.svg)](.test/pre_init_code.log)
 
 ```µcad,pre_init_code#todo
 sketch wheel(radius: Length) {
@@ -190,15 +189,15 @@ sketch wheel(radius: Length) {
     std::geo2d::circle(radius);
 }
 
-__builtin::assert(wheel(5cm).radius == 5cm);
-__builtin::assert(wheel(5cm).diameter == 10cm);
+__builtin::debug::assert(wheel(5cm).radius == 5cm);
+__builtin::debug::assert(wheel(5cm).diameter == 10cm);
 ```
 
 ### Init Code Rules
 
 It's **not allowed** to write any code between *initializers*.
 
-[![test](.test/code_between_initializers.png)](.test/code_between_initializers.log)
+[![test](.test/code_between_initializers.svg)](.test/code_between_initializers.log)
 
 ```µcad,code_between_initializers#fail
 sketch wheel(radius: Length) {
@@ -219,7 +218,7 @@ The *building code* is executed after any initialization.
 Usually it produces one or many 2D or 3D objects on base of the given
 *building plan*.
 
-[![test](.test/code.png)](.test/code.log)
+[![test](.test/code.svg)](.test/code.log)
 
 ```µcad,code
 sketch wheel(radius: Length) {
@@ -232,7 +231,7 @@ wheel(radius = 1.0mm)
 
 If *initializers* were defined the *building code* starts below them.
 
-[![test](.test/code_post_init.png)](.test/code_post_init.log)
+[![test](.test/code_post_init.svg)](.test/code_post_init.log)
 
 ```µcad,code_post_init
 sketch wheel(radius: Length) {
@@ -248,11 +247,12 @@ sketch wheel(radius: Length) {
 
 It's **not allowed** to use the `sketch`, `part`, `op`, `return` nor `mod` statements within workbench code:
 
-[![test](.test/illegal_workbench_statement.png)](.test/illegal_workbench_statement.log)
+[![test](.test/illegal_workbench_statement.svg)](.test/illegal_workbench_statement.log)
 
 ```µcad,illegal_workbench_statement#fail
 sketch wheel(radius: Length) {
-    sketch axis(length: Length) {}
+    sketch axis(length: Length) {}  // error
+    std::geo2d::circle(radius);
 }
 
 wheel(radius = 1.0mm);
@@ -267,7 +267,7 @@ There are two ways to declare *Properties*:
 
 In the following example we declare a building plan which consists of a `radius` which will automatically be a property:
 
-[![test](.test/property.png)](.test/property.log)
+[![test](.test/property.svg)](.test/property.log)
 
 ```µcad,property#todo
 // `outer` will automatically become a property because
@@ -293,10 +293,10 @@ std::print("inner: {t.inner}");
 
 If you remove the `prop` keyword you will fail at accessing `inner`:
 
-[![test](.test/property_wrong.png)](.test/property_wrong.log)
+[![test](.test/property_wrong.svg)](.test/property_wrong.log)
 
 ```µcad,property_wrong#fail
-sketch wheel(outer: length) {
+sketch wheel(outer: Length) {
     use std::geo2d::circle;
 
     // `inner` is declared as variable and may not be read
@@ -310,6 +310,6 @@ t = wheel(outer = 1cm);
 
 // you can still extract and display `outer`
 std::print("outer: {t.outer}");
-// error: but you cannot access `inner` anymore
-std::print("inner: {t.inner}");
+// but you cannot access `inner` anymore
+std::print("inner: {t.inner}"); // error
 ```

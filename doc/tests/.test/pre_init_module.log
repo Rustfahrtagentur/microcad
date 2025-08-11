@@ -4,11 +4,11 @@
 
 -- Code --
 
-sketch k() { 
-  mod m {}
-init(l:Length) {} } k();
+ 1: sketch k() { 
+ 2:   mod m {}   // error
+ 3: init(l:Length) {} } k();
 
 -- Parse Error --
 Statement not allowed within workbenches
 -- Test Result --
-FAILED AS EXPECTED
+FAILED AS EXPECTED (PARSE: Cannot check error line)

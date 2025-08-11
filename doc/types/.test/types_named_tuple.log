@@ -4,11 +4,11 @@
 
 -- Code --
 
-a = (width=10cm, depth=10cm, volume=1l);
-
-std::debug::assert(a.width == 10cm);
-std::debug::assert(a.depth == 10cm);
-std::debug::assert(a.volume == 1l);
+ 1: a = (width=10cm, depth=10cm, volume=1l);
+ 2: 
+ 3: std::debug::assert(a.width == 10cm);
+ 4: std::debug::assert(a.depth == 10cm);
+ 5: std::debug::assert(a.volume == 1l);
 
 -- Output --
 -- Errors --

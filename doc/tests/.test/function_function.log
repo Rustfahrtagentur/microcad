@@ -4,16 +4,16 @@
 
 -- Code --
 
-fn f() {
-  fn f() {}
-} f();
+ 1: fn f() {
+ 2:   fn f() {} // error
+ 3: } f();
 
 -- Output --
 -- Errors --
 error: Function statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
-   2 |   fn f() {}
+   2 |   fn f() {} // error
      |   ^^^^^^^^^
      |
 -- Test Result --

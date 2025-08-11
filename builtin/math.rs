@@ -1,6 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use cgmath::{InnerSpace, SquareMatrix};
 use microcad_core::{Mat3, Vec3};
 use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, ty::*, value::*};
 
@@ -74,12 +75,12 @@ fn tan() -> Symbol {
 }
 
 /// Helper function to get an angle from a field in an argument list.
-fn get_angle(args: &Tuple, axis: &str) -> cgmath::Deg<f64> {
+fn get_angle(args: &Tuple, axis: &str) -> cgmath::Rad<f64> {
     match args.get_value(axis).expect("angle missing") {
         Value::Quantity(Quantity {
             value,
             quantity_type: QuantityType::Angle,
-        }) => cgmath::Deg::<f64>(*value),
+        }) => cgmath::Rad::<f64>(*value),
         _ => unreachable!(),
     }
 }
@@ -91,6 +92,29 @@ fn rotation_matrices_xyz(args: &Tuple) -> (Mat3, Mat3, Mat3) {
         Mat3::from_angle_y(get_angle(args, "y")),
         Mat3::from_angle_z(get_angle(args, "z")),
     )
+}
+
+pub fn orient_z_to(target: Vec3) -> Mat3 {
+    let z_axis = Vec3::unit_z();
+    let target_dir = target.normalize();
+
+    // Handle edge case where target is already Z
+    if (target_dir - z_axis).magnitude2() < 1e-6 {
+        return Mat3::identity();
+    }
+
+    // Handle 180-degree rotation
+    if (target_dir + z_axis).magnitude2() < 1e-6 {
+        // Rotate 180 degrees around any axis perpendicular to Z
+        return Mat3::identity();
+    }
+
+    // Axis to rotate around is cross product of z and target
+    let rotation_axis = z_axis.cross(target_dir).normalize();
+    let dot = z_axis.dot(target_dir);
+    let angle = cgmath::Rad(dot.acos());
+
+    Mat3::from_axis_angle(rotation_axis, angle)
 }
 
 /// Rotate a vector around an axis.

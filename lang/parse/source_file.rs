@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{parse::*, parser::*, rc::*};
+use crate::{parse::*, parser::*, rc::*, tree_display::*};
 use std::io::Read;
 
 impl SourceFile {
@@ -25,13 +25,13 @@ impl SourceFile {
 
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)?;
         assert_ne!(source_file.hash, 0);
-        source_file.filename = path.as_ref().to_path_buf();
+        source_file.filename = Some(path.as_ref().to_path_buf());
         source_file.name = name;
         log::debug!(
             "Successfully loaded file {}",
             path.as_ref().to_string_lossy(),
         );
-        log::trace!("Syntax tree:\n{}", FormatSyntax(&source_file));
+        log::trace!("Syntax tree:\n{}", FormatTree(&source_file));
 
         Ok(Rc::new(source_file))
     }
@@ -39,20 +39,10 @@ impl SourceFile {
     /// Create `SourceFile` from string
     /// The hash of the result will be of `crate::from_str!()`.
     pub fn load_from_str(s: &str) -> ParseResult<Rc<Self>> {
-        use std::{
-            hash::{Hash, Hasher},
-            str::FromStr,
-        };
-
-        // TODO: Would not the hash be calculated in SourceFile::parse anyway?
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        "<from_str>".hash(&mut hasher);
-        let hash = hasher.finish();
-
-        let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, hash)?;
-        source_file.filename = std::path::PathBuf::from_str("<from_str>").expect("filename error");
+        let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, 0)?;
+        source_file.filename = None;
         log::debug!("loaded string successfully",);
-        log::trace!("Syntax tree:\n{}", FormatSyntax(&source_file));
+        log::trace!("Syntax tree:\n{}", FormatTree(&source_file));
         Ok(Rc::new(source_file))
     }
 
@@ -84,8 +74,8 @@ impl Parse for SourceFile {
 fn parse_source_file() {
     let source_file = Parser::parse_rule::<SourceFile>(
         Rule::source_file,
-        r#"use std::io::println;
-            part foo(r: scalar) {
+        r#"use std::log::info;
+            part foo(r: Scalar) {
                 info("Hello, world, {r}!");
             }
             foo(20.0);

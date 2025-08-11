@@ -4,7 +4,7 @@
 
 -- Code --
 
-part my_part() {}
+ 1: part my_part() {}
 
 -- Output --
 -- Errors --

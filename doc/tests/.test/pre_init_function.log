@@ -4,11 +4,11 @@
 
 -- Code --
 
-sketch k() { 
-  fn f() {} f();
-init(l:Length) {} } k();
+ 1: sketch k() { 
+ 2:   fn f() {} f();   // error
+ 3: init(l:Length) {} } k();
 
 -- Parse Error --
 Statement not allowed prior initializers
 -- Test Result --
-FAILED AS EXPECTED
+FAILED AS EXPECTED (PARSE: Cannot check error line)

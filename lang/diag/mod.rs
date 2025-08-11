@@ -81,6 +81,12 @@ pub trait Diag {
 
     /// Return number of occurred errors.
     fn error_count(&self) -> u32;
+
+    /// Return all lines with errors
+    fn error_lines(&self) -> std::collections::HashSet<usize>;
+
+    /// Return all lines with warnings
+    fn warning_lines(&self) -> std::collections::HashSet<usize>;
 }
 
 /// Trait to write something with Display trait into a file.

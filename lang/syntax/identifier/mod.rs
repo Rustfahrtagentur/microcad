@@ -12,7 +12,7 @@ pub use qualified_name::*;
 use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 
 /// µcad identifier
-#[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct Identifier(pub Refer<Id>);
 
 static UNIQUE_ID_NEXT: std::sync::Mutex<usize> = std::sync::Mutex::new(0);
@@ -126,9 +126,9 @@ impl std::fmt::Display for Identifier {
 impl std::fmt::Debug for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.is_empty() {
-            write!(f, "Identifier: {}", crate::invalid!(ID))
+            write!(f, "{}", crate::invalid!(ID))
         } else {
-            write!(f, "Identifier: {:?}", self.0)
+            write!(f, "{}", self.0)
         }
     }
 }
@@ -139,8 +139,8 @@ impl PartialEq<str> for Identifier {
     }
 }
 
-impl PrintSyntax for Identifier {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Identifier {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Identifier: {}", "", self.id())
     }
 }
@@ -149,7 +149,7 @@ impl PrintSyntax for Identifier {
 pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
     identifiers
         .iter()
-        .map(|ident| ident.to_string())
+        .map(|ident| format!("{ident:?}"))
         .collect::<Vec<_>>()
         .join(separator)
 }

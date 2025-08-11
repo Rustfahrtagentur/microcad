@@ -4,14 +4,14 @@
 
 -- Code --
 
-// define function print_error with text as parameter of type String
-fn print_error( text: String ) {
-    // code body
-    std::print("ERROR: {text}");
-}
-
-print_error("first");
-print_error("second");
+ 1: // define function print_error with text as parameter of type String
+ 2: fn print_error( text: String ) {
+ 3:     // code body
+ 4:     std::print("ERROR: {text}");
+ 5: }
+ 6: 
+ 7: print_error("first");
+ 8: print_error("second");
 
 -- Output --
 ERROR: first

@@ -4,17 +4,17 @@
 
 -- Code --
 
-mod my {
-    mod name {
-        mod space {
-            pub use std::geo2d::*;
-        }
-    }
-    pub use name::space::*;
-}
-
-my::circle(r = 4mm);
-my::rect(size = 40mm);
+ 1: mod my {
+ 2:     mod name {
+ 3:         mod space {
+ 4:             pub use std::geo2d::*;
+ 5:         }
+ 6:     }
+ 7:     pub use name::space::*;
+ 8: }
+ 9: 
+10: my::circle(r = 4mm);
+11: my::rect(size = 40mm);
 
 -- Output --
 -- Errors --

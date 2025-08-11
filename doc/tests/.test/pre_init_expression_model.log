@@ -4,11 +4,11 @@
 
 -- Code --
 
-sketch k() { 
-  __builtin::geo2d::circle(radius=1);
-init(l:Length) {} }
+ 1: sketch k() { 
+ 2:   __builtin::geo2d::circle(radius=1); // error
+ 3: init(l:Length) {} }
 
 -- Parse Error --
 Statement not allowed prior initializers
 -- Test Result --
-FAILED AS EXPECTED
+FAILED AS EXPECTED (PARSE: Cannot check error line)

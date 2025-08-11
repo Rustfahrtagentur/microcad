@@ -4,10 +4,10 @@
 
 -- Code --
 
-// Construct half of a torus. 
-std::ops::revolve(180°)
-    std::ops::translate(x = 40mm)
-        std::geo2d::circle(radius = 10mm);
+ 1: // Construct half of a torus. 
+ 2: std::geo2d::circle(radius = 10mm)
+ 3:     .std::ops::translate(x = 40mm)
+ 4:     .std::ops::revolve(180°);
 
 -- Output --
 -- Errors --

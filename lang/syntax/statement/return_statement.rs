@@ -1,16 +1,16 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Return statement syntax elements
+//! Return statement syntax elements.
 
 use crate::{src_ref::*, syntax::*};
 
-/// Return statement
-#[derive(Clone, Debug)]
+/// Return statement.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ReturnStatement {
-    /// return value
+    /// Return value.
     pub result: Option<Expression>,
-    /// Source code reference
+    /// Source code reference.
     pub src_ref: SrcRef,
 }
 
@@ -30,11 +30,12 @@ impl std::fmt::Display for ReturnStatement {
     }
 }
 
-impl PrintSyntax for ReturnStatement {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for ReturnStatement {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}ReturnStatement:", "")?;
+        depth.indent();
         if let Some(result) = &self.result {
-            result.print_syntax(f, depth + Self::INDENT)?;
+            result.tree_print(f, depth)?;
         }
         Ok(())
     }

@@ -4,16 +4,16 @@
 
 -- Code --
 
-fn f() {
-  init() {}
-} f();
+ 1: fn f() {
+ 2:   init() {} // error
+ 3: } f();
 
 -- Output --
 -- Errors --
 error: Init statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
-   2 |   init() {}
+   2 |   init() {} // error
      |   ^^^^^^^^^
      |
 -- Test Result --

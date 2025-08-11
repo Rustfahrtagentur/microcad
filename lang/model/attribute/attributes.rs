@@ -13,7 +13,7 @@ use crate::{model::*, syntax::Identifier};
 /// * outer attributes: `#[export = "test.svg"]`
 /// * inner attributes: `#![export = "test.svg"]`
 ///
-#[derive(Clone, Debug, Default, Deref, DerefMut)]
+#[derive(Clone, Debug, Default, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Attributes(pub Vec<Attribute>);
 
 impl AttributesAccess for Attributes {
@@ -28,5 +28,12 @@ impl AttributesAccess for Attributes {
 impl FromIterator<Attribute> for Attributes {
     fn from_iter<T: IntoIterator<Item = Attribute>>(iter: T) -> Self {
         Self(iter.into_iter().collect())
+    }
+}
+
+impl TreeDisplay for Attributes {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
+        self.iter()
+            .try_for_each(|attribute| writeln!(f, "{:depth$}{attribute}", ""))
     }
 }

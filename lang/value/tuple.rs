@@ -10,7 +10,7 @@ use crate::{src_ref::*, ty::*, value::*};
 /// Tuple with named values
 ///
 /// Names are optional, which means Identifiers can be empty.
-#[derive(Clone, Default, Debug, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Tuple {
     pub(crate) named: std::collections::HashMap<Identifier, Value>,
     pub(crate) unnamed: std::collections::HashMap<Type, Value>,
@@ -94,9 +94,10 @@ impl Tuple {
     ///
     /// Transparent tuples are unnamed tuple items of a tuple.
     ///
-    /// ```,µcad
+    /// ```,ucad
     /// assert_eq!( (x=0, (y=0, z=0)), (x=0, y=0, z=0) );
     /// ///               ^ unnamed tuple
+    /// ```
     pub fn ray(&mut self) {
         self.unnamed.retain(|_, value| {
             if let Value::Tuple(tuple) = value {
@@ -400,7 +401,7 @@ impl std::fmt::Display for Tuple {
                 let mut items = self
                     .named
                     .iter()
-                    .map(|(id, v)| format!("{id}: {v}"))
+                    .map(|(id, v)| format!("{id:?}: {v}"))
                     .chain(self.unnamed.values().map(|v| format!("{v}")))
                     .collect::<Vec<String>>();
                 items.sort();

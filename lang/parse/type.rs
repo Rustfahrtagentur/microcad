@@ -3,74 +3,53 @@
 
 use crate::{parse::*, parser::*, src_ref::*, ty::*};
 
-impl Parse for TypeAnnotation {
+impl Parse for Type {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::r#type);
         let inner = pair.inner().next().expect("Expected type");
 
-        let s = match inner.as_rule() {
-            Rule::array_type => Self(Refer::new(
-                Type::Array(ArrayType::parse(inner)?),
-                pair.into(),
-            )),
-            Rule::tuple_type => Self(Refer::new(
-                Type::Tuple(TupleType::parse(inner)?.into()),
-                pair.into(),
-            )),
-            Rule::matrix_type => Self(Refer::new(
-                Type::Matrix(MatrixType::parse(inner)?),
-                pair.into(),
-            )),
-            Rule::qualified_name => match inner.as_str() {
-                "Integer" => Self(Refer::new(Type::Integer, pair.into())),
-                "Bool" => Self(Refer::new(Type::Bool, pair.into())),
-                "Scalar" => Self(Refer::new(Type::scalar(), pair.into())),
-                "Length" => Self(Refer::new(
-                    Type::Quantity(QuantityType::Length),
-                    pair.into(),
-                )),
-                "Area" => Self(Refer::new(Type::Quantity(QuantityType::Area), pair.into())),
-                "Angle" => Self(Refer::new(Type::Quantity(QuantityType::Angle), pair.into())),
-                "Volume" => Self(Refer::new(
-                    Type::Quantity(QuantityType::Volume),
-                    pair.into(),
-                )),
-                "Weight" => Self(Refer::new(
-                    Type::Quantity(QuantityType::Weight),
-                    pair.into(),
-                )),
-                "Density" => Self(Refer::new(
-                    Type::Quantity(QuantityType::Density),
-                    pair.into(),
-                )),
-                "String" => Self(Refer::new(Type::String, pair.into())),
-                // Type alias for built-in color type
-                "Color" => Self(Refer::new(
-                    Type::Tuple(TupleType::new_color().into()),
-                    pair.into(),
-                )),
-                // Type alias for built-in Vec2 type
-                "Vec2" => Self(Refer::new(
-                    Type::Tuple(TupleType::new_vec2().into()),
-                    pair.into(),
-                )),
-                // Type alias for built-in Vec3 type
-                "Vec3" => Self(Refer::new(
-                    Type::Tuple(TupleType::new_vec3().into()),
-                    pair.into(),
-                )),
-                t => {
-                    log::warn!("found custom type {t}!");
-                    Self(Refer::new(
-                        Type::Custom(QualifiedName::parse(inner)?),
-                        pair.into(),
-                    ))
-                }
+        match inner.as_rule() {
+            Rule::array_type => Ok(Type::Array(Box::new(Type::parse(
+                inner.inner().next().expect("Type"),
+            )?))),
+            Rule::tuple_type => Ok(Type::Tuple(TupleType::parse(inner)?.into())),
+            Rule::matrix_type => Ok(Type::Matrix(MatrixType::parse(inner)?)),
+            Rule::quantity_type => Ok(Type::Quantity(QuantityType::parse(inner)?)),
+            Rule::base_type => match inner.as_str() {
+                // Builtin types.
+                "Integer" => Ok(Type::Integer),
+                "Bool" => Ok(Type::Bool),
+                "String" => Ok(Type::String),
+                "Color" => Ok(Type::Tuple(TupleType::new_color().into())),
+                "Vec2" => Ok(Type::Tuple(TupleType::new_vec2().into())),
+                "Vec3" => Ok(Type::Tuple(TupleType::new_vec3().into())),
+                "Size2D" => Ok(Type::Tuple(TupleType::new_size2d().into())),
+                _ => Err(ParseError::UnknownType(inner.to_string())),
             },
-            _ => unreachable!("Expected type, found {:?}", inner.as_rule()),
-        };
+            _ => Err(ParseError::UnknownType(inner.to_string())),
+        }
+    }
+}
 
-        Ok(s)
+impl Parse for QuantityType {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rule(&pair, Rule::quantity_type);
+        Ok(match pair.as_str() {
+            "Scalar" => QuantityType::Scalar,
+            "Length" => QuantityType::Length,
+            "Area" => QuantityType::Area,
+            "Angle" => QuantityType::Angle,
+            "Volume" => QuantityType::Volume,
+            "Weight" => QuantityType::Weight,
+            "Density" => QuantityType::Density,
+            _ => unreachable!("Expected type, found {:?}", pair.as_str()),
+        })
+    }
+}
+
+impl Parse for TypeAnnotation {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Ok(Self(Refer::new(Type::parse(pair.clone())?, pair.into())))
     }
 }
 

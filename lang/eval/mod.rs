@@ -5,7 +5,7 @@
 //!
 //! To be able to evaluate (run) a source file, it must be loaded, parsed and resolved.
 //! To do so a [`Context`] can be created with [`Context::new()`] based on an already resolved symbol or
-//! by using [`Context::from_source()`] or [`Context::from_source_captured()`] which both automatically
+//! by using [`Context::from_source()`] or `ContextBuilder::from_source_captured()` which both automatically
 //! load and resolve the source file and build a context around it which then can be evaluated with [`Context::eval()`]:
 //!
 //! ```ignore
@@ -39,6 +39,7 @@ mod externals;
 mod format_string;
 mod function;
 mod init;
+mod link;
 mod literal;
 mod module_definition;
 mod output;
@@ -56,6 +57,7 @@ pub use call::*;
 pub use context::*;
 pub use eval_error::*;
 pub use externals::*;
+pub use link::*;
 pub use output::*;
 pub use parameter::*;
 pub use statements::*;
@@ -92,7 +94,8 @@ impl MethodCall {
     /// ```
     fn eval(&self, context: &mut Context, lhs: &Expression) -> EvalResult<Value> {
         let value: Value = lhs.eval(context)?;
-        value.call_method(&self.id, &self.argument_list, context)
+        let args = self.argument_list.eval(context)?;
+        value.call_method(&self.id, &args, context)
     }
 }
 

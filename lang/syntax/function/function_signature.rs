@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Parameters and return type of a function
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FunctionSignature {
     /// Function's parameters
     pub parameters: ParameterList,
@@ -29,13 +29,14 @@ impl FunctionSignature {
     }
 }
 
-impl PrintSyntax for FunctionSignature {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for FunctionSignature {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Parameters:", "")?;
-        self.parameters.print_syntax(f, depth + Self::INDENT)?;
+        depth.indent();
+        self.parameters.tree_print(f, depth)?;
         if let Some(return_type) = &self.return_type {
             writeln!(f, "{:depth$}Return:", "")?;
-            return_type.print_syntax(f, depth + Self::INDENT)?;
+            return_type.tree_print(f, depth)?;
         };
         Ok(())
     }

@@ -7,13 +7,13 @@ use microcad_core::{Geometry2D, Geometry3D};
 
 use crate::{eval::*, model::*, rc::*, syntax::*};
 
-/// A builder pattern to build models
+/// A builder pattern to build models.
 #[derive(Default)]
 pub struct ModelBuilder {
     root: ModelInner,
-    /// Properties to add to the model if it is an [`Object`]
+    /// Properties of the model.
     pub properties: Properties,
-    /// Children to add to this model.
+    /// Children models of this model.
     pub children: Models,
 }
 

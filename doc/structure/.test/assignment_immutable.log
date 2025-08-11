@@ -4,10 +4,10 @@
 
 -- Code --
 
-a = 5;
-a = a * 2; // error: a already defined in this scope
+ 1: a = 5;
+ 2: a = a * 2; // error: a already defined in this scope
 
 -- Output --
 -- Errors --
 -- Test Result --
-OK BUT IS TODO
+FAIL(TODO)

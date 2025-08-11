@@ -4,16 +4,16 @@
 
 -- Code --
 
-mod k {
-  __builtin::geo2d::circle(radius=1);
-}
+ 1: mod k {
+ 2:   __builtin::geo2d::circle(radius=1); // error
+ 3: }
 
 -- Output --
 -- Errors --
 error: Expression statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
-   2 |   __builtin::geo2d::circle(radius=1);
+   2 |   __builtin::geo2d::circle(radius=1); // error
      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --

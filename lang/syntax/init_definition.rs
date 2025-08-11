@@ -5,7 +5,7 @@
 
 use crate::{src_ref::*, syntax::*};
 
-/// Initialization definition
+/// Workbench *initializer* definition
 ///
 /// Example:
 ///
@@ -14,7 +14,7 @@ use crate::{src_ref::*, syntax::*};
 ///     init(b: Length) { a = 2.0*b; } // The init definition
 /// }
 /// ```
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct InitDefinition {
     /// Parameter list for this init definition
     pub parameters: ParameterList,
@@ -37,23 +37,24 @@ impl std::fmt::Display for InitDefinition {
     }
 }
 
-impl PrintSyntax for InitDefinition {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for InitDefinition {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}InitDefinition:", "")?;
-        self.parameters.print_syntax(f, depth + Self::INDENT)?;
-        self.body.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.parameters.tree_print(f, depth)?;
+        self.body.tree_print(f, depth)
     }
 }
 
-/// Iterator over part's init statements
+/// Iterator over part's *initializers*.
 pub struct Inits<'a>(std::slice::Iter<'a, Statement>);
 
-/// Interface for elements which have initializers
+/// Interface for elements which have *initializers*.
 pub trait Initialized<'a> {
-    /// return iterator of body statements
+    /// return iterator of body statements.
     fn statements(&'a self) -> std::slice::Iter<'a, Statement>;
 
-    /// Return iterator over all initializers
+    /// Return iterator over all initializers.
     fn inits(&'a self) -> Inits<'a>
     where
         Self: std::marker::Sized,
@@ -63,7 +64,7 @@ pub trait Initialized<'a> {
 }
 
 impl<'a> Inits<'a> {
-    /// Create new init for a part
+    /// Create new init for a part.
     pub fn new(def: &'a impl Initialized<'a>) -> Self {
         Self(def.statements())
     }

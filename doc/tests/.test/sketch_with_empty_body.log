@@ -1,14 +1,19 @@
 -- Test --
   sketch_with_empty_body
-  ../doc/tests/semicolon.md:37
+  ../doc/tests/semicolon.md:38
 
 -- Code --
 
-use std::geo2d::circle;
+ 1: use std::geo2d::circle;
+ 2: 
+ 3: {}.circle(radius = 5mm) // error: sketch with body
 
-circle( radius = 5mm ) {} // error: sketch with body
-
--- Output --
--- Errors --
+-- Parse Error --
+Parser error:  --> 3:51
+  |
+3 | {}.circle(radius = 5mm) // error: sketch with body
+  |                                                   ^---
+  |
+  = expected single_line_comment, array_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED (PARSE: Cannot check error line)

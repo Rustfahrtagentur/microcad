@@ -6,7 +6,7 @@
 use crate::{syntax::*, ty::*};
 
 /// µcad Basic Types
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum Type {
     /// Invalid type (used for error handling)
     Invalid,
@@ -19,7 +19,7 @@ pub enum Type {
     /// A boolean: `true`, `false`.
     Bool,
     /// An array of elements of the same type: `[Scalar]`.
-    Array(ArrayType),
+    Array(Box<Type>),
     /// A named tuple of elements: `(x: Scalar, y: String)`.
     Tuple(Box<TupleType>),
     /// Matrix type: `Matrix3x3`.
@@ -41,11 +41,30 @@ impl Type {
         Self::Quantity(QuantityType::Length)
     }
 
-    /// Check if the type is a list of the given type `ty`
+    /// Check if the type is an array of the given type `ty`
     pub fn is_array_of(&self, ty: &Type) -> bool {
         match self {
-            Self::Array(list_type) => &list_type.ty() == ty,
+            Self::Array(array_type) => array_type.as_ref() == ty,
             _ => false,
+        }
+    }
+}
+
+impl std::ops::Mul for Type {
+    type Output = Type;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        if self == Self::Invalid || rhs == Self::Invalid {
+            return Self::Invalid;
+        }
+
+        match (self, rhs) {
+            (Type::Integer, ty) | (ty, Type::Integer) => ty,
+            (Type::Quantity(lhs), Type::Quantity(rhs)) => Type::Quantity(lhs * rhs),
+            (ty, Type::Array(array_type)) | (Type::Array(array_type), ty) => *array_type * ty,
+            (Type::Tuple(_), _) | (_, Type::Tuple(_)) => todo!(),
+            (Type::Matrix(_), _) | (_, Type::Matrix(_)) => todo!(),
+            (lhs, rhs) => unimplemented!("Multiplication for {lhs} * {rhs}"),
         }
     }
 }
@@ -59,12 +78,12 @@ impl From<QuantityType> for Type {
 impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Invalid => write!(f, crate::invalid!(TYPE)),
+            Self::Invalid => write!(f, crate::invalid_no_ansi!(TYPE)),
             Self::Integer => write!(f, "Integer"),
             Self::Quantity(quantity) => write!(f, "{quantity}"),
             Self::String => write!(f, "String"),
             Self::Bool => write!(f, "Bool"),
-            Self::Array(t) => write!(f, "{t}"),
+            Self::Array(t) => write!(f, "[{t}]"),
             Self::Tuple(t) => write!(f, "{t}"),
             Self::Matrix(t) => write!(f, "{t}"),
             Self::Models => write!(f, "Models"),

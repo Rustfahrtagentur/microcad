@@ -4,16 +4,16 @@
 
 -- Code --
 
-fn f() {
-  prop a = 1;
-} f();
+ 1: fn f() {
+ 2:   prop a = 1; // error
+ 3: } f();
 
 -- Output --
 -- Errors --
 error: Assignment statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
-   2 |   prop a = 1;
+   2 |   prop a = 1; // error
      |   ^^^^^^^^^^^
      |
 -- Test Result --

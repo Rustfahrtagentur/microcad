@@ -1,12 +1,12 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Use statement syntax element
+//! Use statement syntax element.
 
 use crate::{resolve::*, src_ref::*, syntax::*};
 use strum::IntoStaticStr;
 
-/// Use declaration
+/// Use declaration.
 ///
 /// A use declaration is an element of a use statement.
 /// It can be a single symbol, all symbols from a module, or an alias.
@@ -17,7 +17,7 @@ use strum::IntoStaticStr;
 /// use std::print as p;
 /// ```
 ///
-#[derive(Clone, Debug, IntoStaticStr)]
+#[derive(Clone, Debug, IntoStaticStr, serde::Serialize, serde::Deserialize)]
 pub enum UseDeclaration {
     /// Import symbols given as qualified names: `use a, b`
     Use(QualifiedName),
@@ -70,8 +70,9 @@ impl std::fmt::Display for UseDeclaration {
     }
 }
 
-impl PrintSyntax for UseDeclaration {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for UseDeclaration {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
+        // use declaration is transparent
         match self {
             UseDeclaration::Use(name) => writeln!(f, "{:depth$}Use {name}", ""),
             UseDeclaration::UseAll(name) => writeln!(f, "{:depth$}Use {name}::*", ""),

@@ -10,7 +10,7 @@ use crate::{
 use derive_more::{Deref, DerefMut};
 
 /// Inner of an [`ArrayExpression`].
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub enum ArrayExpressionInner {
     /// List: `a,b,c`.
     List(ListExpression),
@@ -59,25 +59,23 @@ impl SrcReferrer for ArrayExpressionInner {
     }
 }
 
-impl PrintSyntax for ArrayExpressionInner {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for ArrayExpressionInner {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         match &self {
             ArrayExpressionInner::List(expressions) => {
                 writeln!(f, "{:depth$}List:", "")?;
-                let depth = depth + Self::INDENT;
+                depth.indent();
                 expressions
                     .iter()
-                    .try_for_each(|expression| expression.print_syntax(f, depth))
+                    .try_for_each(|expression| expression.tree_print(f, depth))
             }
-            ArrayExpressionInner::Range(range_expression) => {
-                range_expression.print_syntax(f, depth)
-            }
+            ArrayExpressionInner::Range(range_expression) => range_expression.tree_print(f, depth),
         }
     }
 }
 
-/// List expression (expression list maybe with common unit)
-#[derive(Default, Clone, Debug, Deref, DerefMut)]
+/// Array of expressions with common result unit, e.g. `[1+2,4,9]`.
+#[derive(Default, Clone, Debug, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct ArrayExpression {
     /// Expression list.
     #[deref]
@@ -101,11 +99,11 @@ impl std::fmt::Display for ArrayExpression {
     }
 }
 
-impl PrintSyntax for ArrayExpression {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for ArrayExpression {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}ArrayExpression:", "")?;
-        let depth = depth + Self::INDENT;
-        self.inner.print_syntax(f, depth)?;
-        self.unit.print_syntax(f, depth)
+        depth.indent();
+        self.inner.tree_print(f, depth)?;
+        self.unit.tree_print(f, depth)
     }
 }

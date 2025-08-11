@@ -1,3 +1,3 @@
 a = 1;
-__builtin::assert_valid(a);
-__builtin::assert_invalid(x);
+__builtin::debug::assert_valid(a);
+__builtin::debug::assert_invalid(x);

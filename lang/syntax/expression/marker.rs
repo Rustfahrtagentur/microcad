@@ -5,8 +5,8 @@
 
 use crate::{src_ref::*, syntax::*};
 
-/// Node marker, e.g. `@children`
-#[derive(Clone, Debug)]
+/// Node marker, e.g. `@children`.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Marker {
     /// Marker name, e.g. `children`
     pub id: Identifier,
@@ -33,8 +33,8 @@ impl std::fmt::Display for Marker {
     }
 }
 
-impl PrintSyntax for Marker {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Marker {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Marker '{}'", "", self.id)
     }
 }

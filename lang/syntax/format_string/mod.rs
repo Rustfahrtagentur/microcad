@@ -11,12 +11,12 @@ pub use format_spec::*;
 
 use crate::{src_ref::*, syntax::*};
 
-/// Format string item
-#[derive(Clone, Debug)]
+/// Format string item.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub enum FormatStringInner {
-    /// String literal
+    /// String literal.
     String(Refer<String>),
-    /// Format expression
+    /// Format expression.
     FormatExpression(FormatExpression),
 }
 
@@ -29,12 +29,12 @@ impl SrcReferrer for FormatStringInner {
     }
 }
 
-/// Format string
-#[derive(Default, Clone, Debug)]
+/// Format string.
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FormatString(pub Refer<Vec<FormatStringInner>>);
 
 impl FormatString {
-    /// Insert a string
+    /// Insert a string.
     pub fn push_string(&mut self, s: String, src_ref: SrcRef) {
         self.0
             .push(FormatStringInner::String(Refer::new(s, src_ref)));
@@ -71,12 +71,13 @@ impl std::fmt::Display for FormatString {
     }
 }
 
-impl PrintSyntax for FormatString {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for FormatString {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}FormatString:", "")?;
+        depth.indent();
         self.0.iter().try_for_each(|fs| match fs {
             FormatStringInner::String(s) => writeln!(f, "{:depth$}String: \"{}\"", "", s.value),
-            FormatStringInner::FormatExpression(e) => e.print_syntax(f, depth + Self::INDENT),
+            FormatStringInner::FormatExpression(e) => e.tree_print(f, depth),
         })
     }
 }

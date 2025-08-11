@@ -9,6 +9,7 @@ pub mod assignment;
 pub mod attribute;
 pub mod body;
 pub mod call;
+pub mod doc_block;
 pub mod expression;
 pub mod format_string;
 pub mod function;
@@ -29,6 +30,7 @@ pub use assignment::*;
 pub use attribute::*;
 pub use body::*;
 pub use call::*;
+pub use doc_block::*;
 pub use expression::*;
 pub use format_string::*;
 pub use function::*;
@@ -38,17 +40,11 @@ pub use literal::*;
 pub use module::*;
 pub use parameter::*;
 pub use qualifier::*;
+pub use r#use::*;
 pub use source_file::*;
 pub use statement::*;
 pub use type_annotation::*;
-pub use r#use::*;
 pub use visibility::*;
 pub use workbench::*;
 
-/// Trait for printing a syntax tree
-pub trait PrintSyntax {
-    /// Indention size
-    const INDENT: usize = 2;
-    /// Print a syntax tree
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result;
-}
+use crate::tree_display::*;

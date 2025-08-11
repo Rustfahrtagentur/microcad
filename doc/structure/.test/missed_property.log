@@ -1,30 +1,28 @@
 -- Test --
   missed_property
-  ../doc/structure/workbench.md:152
+  ../doc/structure/workbench.md:153
 
 -- Code --
 
-sketch wheel(radius: Length) {
-    init( width: Length ) { 
-        // evaluation error: misses to set `radius` from building plan
-    }
-}
-
-wheel(width = 1.0mm);
+ 1: sketch wheel(radius: Length) { // warning (no output)
+ 2:     init( width: Length ) { } // error: misses to set `radius` from building plan
+ 3: }
+ 4: 
+ 5: wheel(width = 1.0mm);
 
 -- Output --
 -- Errors --
 error: Workbench plan incomplete. Missing properties: radius
-  ---> <from_str>:2:5
+  ---> <FROM STR>:2:5
      |
-   2 |     init( width: Length ) { 
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   2 |     init( width: Length ) { } // error: misses to set `radius` from building plan
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
-   1 | sketch wheel(radius: Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   1 | sketch wheel(radius: Length) { // warning (no output)
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAILED AS EXPECTED

@@ -5,8 +5,8 @@
 
 use crate::{src_ref::*, syntax::*, ty::*, value::*};
 
-/// Number literal
-#[derive(Debug, Clone, PartialEq)]
+/// Number literal.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct NumberLiteral(pub f64, pub Unit, pub SrcRef);
 
 impl NumberLiteral {

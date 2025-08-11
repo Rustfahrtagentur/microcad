@@ -4,7 +4,7 @@
 
 -- Code --
 
-std::geo2d::circle(radius = 10mm) - std::geo2d::rect(size = 2mm);
+ 1: std::geo2d::circle(radius = 10mm) - std::geo2d::rect(size = 2mm);
 
 -- Output --
 -- Errors --

@@ -4,12 +4,12 @@
 
 -- Code --
 
-fn pow( x: Scalar, n: Integer ) {
-    if n == 1 {
-        x 
-    }
-    x * pow(n-1)  // error: unexpected code
-}
+ 1: fn pow( x: Scalar, n: Integer ) {
+ 2:     if n == 1 {
+ 3:         x 
+ 4:     }
+ 5:     x * pow(n-1)  // error: unexpected code
+ 6: }
 
 -- Output --
 -- Errors --

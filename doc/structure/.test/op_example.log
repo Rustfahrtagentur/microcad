@@ -4,11 +4,11 @@
 
 -- Code --
 
-// define operation nop without parameters
-op nop() { @children }
-
-// use operation nop on a circle
-nop() std::geo2d::circle(radius = 1cm);
+ 1: // define operation nop without parameters
+ 2: op nop() { @children }
+ 3: 
+ 4: // use operation nop on a circle
+ 5: std::geo2d::circle(radius = 1cm).nop();
 
 -- Output --
 -- Errors --

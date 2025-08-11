@@ -4,12 +4,24 @@
 use crate::{src_ref::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
-/// A qualifier name consists of a . separated list of identifiers
+/// A *qualified name* consists of a list of *identifiers*, separated by `::`,
 /// e.g. `a::b::c`
-#[derive(Debug, Default, Clone, PartialEq, Hash, Eq, Ord, PartialOrd, DerefMut, Deref)]
+#[derive(
+    Default,
+    Clone,
+    PartialEq,
+    Hash,
+    Eq,
+    Ord,
+    PartialOrd,
+    DerefMut,
+    Deref,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct QualifiedName(Refer<Vec<Identifier>>);
 
-/// List of qualified names which can pe displayed
+/// List of *qualified names* which can be displayed.
 #[derive(Debug, Deref)]
 pub struct QualifiedNames(Vec<QualifiedName>);
 
@@ -144,6 +156,16 @@ impl std::fmt::Display for QualifiedName {
     }
 }
 
+impl std::fmt::Debug for QualifiedName {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if self.is_empty() {
+            write!(f, crate::invalid!(NAME))
+        } else {
+            write!(f, "{}", join_identifiers(&self.0, "::"))
+        }
+    }
+}
+
 impl SrcReferrer for QualifiedName {
     fn src_ref(&self) -> SrcRef {
         self.0.src_ref()
@@ -245,8 +267,8 @@ impl From<QualifiedName> for String {
     }
 }
 
-impl PrintSyntax for QualifiedName {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for QualifiedName {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         writeln!(
             f,
             "{:depth$}QualifiedName: '{}'",

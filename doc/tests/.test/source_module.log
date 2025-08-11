@@ -4,7 +4,7 @@
 
 -- Code --
 
-mod m {}
+ 1: mod m {}
 
 -- Output --
 -- Errors --

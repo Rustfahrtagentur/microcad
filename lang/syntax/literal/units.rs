@@ -1,15 +1,26 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad unit syntax element
+//! µcad unit syntax element.
 
-use crate::{syntax::PrintSyntax, ty::*};
+use crate::{syntax::*, ty::*};
 
-/// The units that can be used after numbers in the language"
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+/// Definition of type & scale of numbers.
+#[derive(
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub enum Unit {
     // Scalar
-    /// No unit was given
+    /// No unit was given.
     #[default]
     None,
     /// Percents
@@ -159,7 +170,7 @@ impl std::fmt::Display for Unit {
 }
 
 impl Unit {
-    /// Return type to use with this unit
+    /// Return type to use with this unit.
     pub fn ty(self) -> Type {
         match self {
             Self::None | Self::Percent => Type::Quantity(QuantityType::Scalar),
@@ -198,7 +209,7 @@ impl Unit {
         }
     }
 
-    /// Normalize value to base unit
+    /// Normalize value to base unit.
     pub fn normalize(self, x: f64) -> f64 {
         match self {
             // Scalar
@@ -255,8 +266,8 @@ impl Unit {
     }
 }
 
-impl PrintSyntax for Unit {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for Unit {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         if !matches!(self, Unit::None) {
             writeln!(f, "{:depth$}Unit: {}", "", self)
         } else {

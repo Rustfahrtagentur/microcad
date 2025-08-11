@@ -1,15 +1,15 @@
 -- Test --
   sketch_missing_semicolon
-  ../doc/tests/semicolon.md:26
+  ../doc/tests/semicolon.md:27
 
 -- Code --
 
-use std::geo2d::circle;
-use std::ops::translate;
-
-translate( y=[-34mm/2 , 34mm/2] ) {
-    circle( radius = 5mm ) // error: missing semicolon
-}
+ 1: use std::geo2d::circle;
+ 2: use std::ops::translate;
+ 3: 
+ 4: {
+ 5:     circle(radius = 5mm) // error: missing semicolon
+ 6: }.translate(y=[-34mm/2 , 34mm/2]);
 
 -- Output --
 -- Errors --

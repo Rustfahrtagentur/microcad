@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{parse::*, parser::*, rc::*, syntax::*};
+use crate::{find_rule, find_rule_exact, parse::*, parser::*, rc::*, syntax::*};
 
 impl Parse for WorkbenchKind {
     fn parse(pair: Pair) -> ParseResult<Self> {
@@ -17,11 +17,12 @@ impl Parse for WorkbenchKind {
 impl Parse for Rc<WorkbenchDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(WorkbenchDefinition {
-            visibility: crate::find_rule!(pair, visibility)?,
-            attribute_list: crate::find_rule!(pair, attribute_list)?,
-            kind: crate::find_rule_exact!(pair, workbench_kind)?,
-            id: crate::find_rule!(pair, identifier)?,
-            plan: crate::find_rule!(pair, parameter_list)?,
+            doc: find_rule!(pair, doc_block)?,
+            visibility: find_rule!(pair, visibility)?,
+            attribute_list: find_rule!(pair, attribute_list)?,
+            kind: find_rule_exact!(pair, workbench_kind)?,
+            id: find_rule!(pair, identifier)?,
+            plan: find_rule!(pair, parameter_list)?,
             body: {
                 let body = crate::find_rule!(pair, body)?;
                 check_statements(&body)?;

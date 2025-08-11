@@ -4,11 +4,11 @@
 
 -- Code --
 
-gram = 1000.0g;
-kilogram = 1.0kg;
-pound = 2.204623lb;
-
-std::debug::assert([gram, kilogram].all_equal());
+ 1: gram = 1000.0g;
+ 2: kilogram = 1.0kg;
+ 3: pound = 2.204623lb;
+ 4: 
+ 5: std::debug::assert([gram, kilogram].all_equal());
 
 -- Output --
 -- Errors --

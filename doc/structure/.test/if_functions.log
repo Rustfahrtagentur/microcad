@@ -4,20 +4,20 @@
 
 -- Code --
 
-fn f(x: Integer) {
-    if x == 5 or x == 4 {
-        std::print("match");
-    } else if x > 0 and x < 4 {
-        std::print("no match");
-    } else {
-        std::print("invalid");
-    }
-}
-
-f(5);  // prints "match"
-f(1);  // prints "no match"
-f(-1); // prints "invalid"
-f(6);  // prints "invalid"
+ 1: fn f(x: Integer) {
+ 2:     if x == 5 or x == 4 {
+ 3:         std::print("match");
+ 4:     } else if x > 0 and x < 4 {
+ 5:         std::print("no match");
+ 6:     } else {
+ 7:         std::print("invalid");
+ 8:     }
+ 9: }
+10: 
+11: f(5);  // prints "match"
+12: f(1);  // prints "no match"
+13: f(-1); // prints "invalid"
+14: f(6);  // prints "invalid"
 
 -- Output --
 match

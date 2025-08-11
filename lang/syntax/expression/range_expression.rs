@@ -3,13 +3,10 @@
 
 //! Range expression
 
-use crate::{
-    src_ref::{SrcRef, SrcReferrer},
-    syntax::{Expression, PrintSyntax},
-};
+use crate::{src_ref::*, syntax::*};
 
 /// Range start.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct RangeStart(pub Box<Expression>);
 
 impl SrcReferrer for RangeStart {
@@ -23,16 +20,17 @@ impl std::fmt::Display for RangeStart {
         write!(f, "{}", self.0)
     }
 }
-impl PrintSyntax for RangeStart {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+
+impl TreeDisplay for RangeStart {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}RangeStart:", "")?;
-        let depth = depth + Self::INDENT;
-        self.0.print_syntax(f, depth)
+        depth.indent();
+        self.0.tree_print(f, depth)
     }
 }
 
 /// Range end.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct RangeEnd(pub Box<Expression>);
 
 impl SrcReferrer for RangeEnd {
@@ -46,16 +44,16 @@ impl std::fmt::Display for RangeEnd {
         write!(f, "{}", self.0)
     }
 }
-impl PrintSyntax for RangeEnd {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for RangeEnd {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}RangeEnd:", "")?;
-        let depth = depth + Self::INDENT;
-        self.0.print_syntax(f, depth)
+        depth.indent();
+        self.0.tree_print(f, depth)
     }
 }
 
-/// Range expression: `a..b`.
-#[derive(Clone, Debug, Default)]
+/// Range expression, e.g. `a..b`.
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct RangeExpression {
     /// Start of the range.
     pub start: RangeStart,
@@ -76,11 +74,11 @@ impl std::fmt::Display for RangeExpression {
         write!(f, "{}..{}", self.start, self.end)
     }
 }
-impl PrintSyntax for RangeExpression {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for RangeExpression {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}RangeExpression:", "")?;
-        let depth = depth + Self::INDENT;
-        self.start.print_syntax(f, depth)?;
-        self.end.print_syntax(f, depth)
+        depth.indent();
+        self.start.tree_print(f, depth)?;
+        self.end.tree_print(f, depth)
     }
 }

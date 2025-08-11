@@ -7,7 +7,7 @@ use crate::{ty::*, value::*};
 use derive_more::{Deref, DerefMut};
 
 /// Collection of values of the same type.
-#[derive(Clone, Debug, Deref, DerefMut)]
+#[derive(Clone, Debug, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Array {
     /// List of values
     #[deref]
@@ -69,7 +69,7 @@ impl std::fmt::Display for Array {
 
 impl crate::ty::Ty for Array {
     fn ty(&self) -> Type {
-        Type::Array(ArrayType::new(self.ty.clone()))
+        Type::Array(Box::new(self.ty.clone()))
     }
 }
 
@@ -126,7 +126,7 @@ impl std::ops::Mul<Value> for Array {
             // List * Scalar or List * Integer
             Type::Quantity(_) | Type::Integer => Ok(Value::Array(Array::new(
                 ValueList::new(values),
-                rhs.ty().clone(),
+                self.ty * rhs.ty().clone(),
             ))),
             _ => Err(ValueError::InvalidOperator("*".into())),
         }

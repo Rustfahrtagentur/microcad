@@ -4,10 +4,10 @@
 
 The following example calculates the area of a circle by using the *measure* `area`:
 
-[![test](.test/measure.png)](.test/measure.log)
+[![test](.test/measure.svg)](.test/measure.log)
 
 ```µcad,measure#todo
-__builtin::assert_eq([
+__builtin::debug::assert_eq([
     // use measure area() on a circle
     std::geo2d::circle(radius=10mm).area(),
 

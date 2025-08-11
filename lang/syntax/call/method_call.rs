@@ -6,10 +6,10 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Method call syntax entity.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct MethodCall {
     /// Name of the method.
-    pub id: Identifier,
+    pub id: QualifiedName,
     /// List of arguments.
     pub argument_list: ArgumentList,
     /// Source code reference.
@@ -28,9 +28,10 @@ impl std::fmt::Display for MethodCall {
     }
 }
 
-impl PrintSyntax for MethodCall {
-    fn print_syntax(&self, f: &mut std::fmt::Formatter, depth: usize) -> std::fmt::Result {
+impl TreeDisplay for MethodCall {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}MethodCall '{}':", "", self.id)?;
-        self.argument_list.print_syntax(f, depth + Self::INDENT)
+        depth.indent();
+        self.argument_list.tree_print(f, depth)
     }
 }

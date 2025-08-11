@@ -8,14 +8,14 @@ fn context_with_symbols() {
 
     context
         .lookup(
-            &"__builtin::assert_valid"
+            &"__builtin::debug::assert_valid"
                 .try_into()
                 .expect("unexpected name error"),
         )
         .expect("symbol not found");
     context
         .lookup(
-            &"__builtin::assert_invalid"
+            &"__builtin::debug::assert_invalid"
                 .try_into()
                 .expect("unexpected name error"),
         )

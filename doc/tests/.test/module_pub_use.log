@@ -4,9 +4,9 @@
 
 -- Code --
 
-mod k {
-  pub use std::geo2d;
-}
+ 1: mod k {
+ 2:   pub use std::geo2d;
+ 3: }
 
 -- Output --
 -- Errors --

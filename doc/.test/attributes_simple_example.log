@@ -4,10 +4,10 @@
 
 -- Code --
 
-#[color = "#FF0000"]
-c = std::geo2d::circle(42.0mm);
-
-std::debug::assert_eq([c#color, (r = 1.0, g = 0.0, b = 0.0, a = 1.0)]);
+ 1: #[color = "#FF0000"]
+ 2: c = std::geo2d::circle(42.0mm);
+ 3: 
+ 4: std::debug::assert_eq([c#color, (r = 1.0, g = 0.0, b = 0.0, a = 1.0)]);
 
 -- Output --
 -- Errors --

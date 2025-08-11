@@ -4,26 +4,26 @@
 
 -- Code --
 
-sketch k() {
-  sketch f() {} f();
-} k();
+ 1: sketch k() {
+ 2:   sketch f() {} f(); // error
+ 3: } k();
 
 -- Output --
 -- Errors --
 error: sketch statement not available here
-  ---> <from_str>:2:3
+  ---> <FROM STR>:2:3
      |
-   2 |   sketch f() {} f();
+   2 |   sketch f() {} f(); // error
      |   ^^^^^^^^^^^^^
      |
-error: Symbol f not found.
-  ---> <from_str>:2:17
+warning: The sketch workbench will produce no 2D output.
+  ---> <FROM STR>:2:3
      |
-   2 |   sketch f() {} f();
-     |                 ^^^
+   2 |   sketch f() {} f(); // error
+     |   ^^^^^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.
-  ---> <from_str>:1:1
+  ---> <FROM STR>:1:1
      |
    1 | sketch k() {
      | ^^^^^^^^^^^^
