@@ -6,7 +6,7 @@ op polar(angle: Angle, radius: Length, shift: Length = 0.0mm) {
     @children.translate(x = radius, y = shift).rotate(z = angle);
 }
 
-/*sketch gear(
+/*sketch Gear(
     d_a: Length,
     d: Length,
     d_b: Length,
@@ -26,10 +26,10 @@ op polar(angle: Angle, radius: Length, shift: Length = 0.0mm) {
 }
 
 
-gear(d_a = 40mm, d = 30mm, d_b = 25mm, d_f = 20mm).extrude(4mm);
+Gear(d_a = 40mm, d = 30mm, d_b = 25mm, d_f = 20mm).extrude(4mm);
 */
 
-sketch gear(
+sketch Gear(
     d_0: Length,
     m: Integer,
     z: Integer
@@ -38,4 +38,4 @@ sketch gear(
 }
 
 
-gear(d_0 = 40mm, m = 1, z = 100).extrude(4mm);
+Gear(d_0 = 40mm, m = 1, z = 100).extrude(4mm);

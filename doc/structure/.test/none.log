@@ -4,8 +4,8 @@
 
 -- Code --
 
- 1: std::geo3d::sphere(radius = 40mm);
- 2: std::geo3d::cube(size = 40mm);
+ 1: std::geo3d::Sphere(radius = 40mm);
+ 2: std::geo3d::Cube(size = 40mm);
 
 -- Output --
 -- Errors --

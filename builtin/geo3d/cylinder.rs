@@ -8,7 +8,7 @@ pub struct Cylinder;
 
 impl BuiltinWorkbenchDefinition for Cylinder {
     fn id() -> &'static str {
-        "cylinder"
+        "Cylinder"
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

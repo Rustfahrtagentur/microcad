@@ -5,14 +5,14 @@
 -- Code --
 
  1: std::geo2d::Circle(radius = 1cm);
- 2: std::geo3d::sphere(radius = 1cm);  // error: can't mix 2D and 3D
+ 2: std::geo3d::Sphere(radius = 1cm);  // error: can't mix 2D and 3D
 
 -- Output --
 -- Errors --
 error: Cannot mix 2d and 3d geometries
   ---> <FROM STR>:2:1
      |
-   2 | std::geo3d::sphere(radius = 1cm);  // error: can't mix 2D and 3D
+   2 | std::geo3d::Sphere(radius = 1cm);  // error: can't mix 2D and 3D
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --

@@ -8,13 +8,13 @@
  2: use std::ops::*;
  3: use std::geo3d::*;
  4: 
- 5: part csg_cube(size: Length) {
- 6:     body = sphere(r = size / 1.5) & cube(size);
- 7:     holes = cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
+ 5: part CsgCube(size: Length) {
+ 6:     body = Sphere(r = size / 1.5) & Cube(size);
+ 7:     holes = Cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
  8:     body - holes;
  9: }
 10: 
-11: csg_cube(50mm);
+11: CsgCube(50mm);
 
 -- Output --
 -- Errors --

@@ -11,7 +11,7 @@ use microcad_core::{Geometry2D, Geometry3D};
 pub struct ModelInner {
     /// Optional id.
     ///
-    /// The id is set when the model was created by an assignment: `a = cube(50mm)`.
+    /// The id is set when the model was created by an assignment: `a = Cube(50mm)`.
     pub id: Option<Identifier>,
     /// Parent object.
     #[debug(skip)]

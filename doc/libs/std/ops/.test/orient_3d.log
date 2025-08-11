@@ -8,7 +8,7 @@
  2: use std::ops::*;
  3: use std::geo3d::*;
  4: 
- 5: cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
+ 5: Cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
 
 -- Output --
 -- Errors --

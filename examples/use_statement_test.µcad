@@ -15,7 +15,7 @@ debug::assert(true);
 
 part my_part() {
     Circle(radius=1);
-    sphere(radius=1);
+    Sphere(radius=1);
 }
 
 my_part();

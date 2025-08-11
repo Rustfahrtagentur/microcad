@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**215** tests from markdown.
+**216** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -96,6 +96,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/math/.test/math_abs.svg)](../doc/libs/std/math/.test/math_abs.log) | [math_abs](../doc/libs/std/math/README.md) |
 | [![test](../doc/libs/std/math/.test/math_trigonometric.svg)](../doc/libs/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/libs/std/math/README.md) |
 | [![test](../doc/nodes/.test/measure.svg)](../doc/nodes/.test/measure.log) | [measure](../doc/nodes/measures.md) |
+| [![test](../doc/libs/std/ops/.test/mirror_3d.svg)](../doc/libs/std/ops/.test/mirror_3d.log) | [mirror_3d](../doc/libs/std/ops/mirror.md) |
 | [![test](../doc/structure/.test/missed_property.svg)](../doc/structure/.test/missed_property.log) | [missed_property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/mod.svg)](../doc/structure/.test/mod.log) | [mod](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/mod_example.svg)](../doc/structure/.test/mod_example.log) | [mod_example](../doc/structure/modules.md) |

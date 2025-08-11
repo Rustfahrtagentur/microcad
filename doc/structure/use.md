@@ -20,8 +20,8 @@ The following example which uses two *parts* of `geo3d` shows the problem:
 [![test](.test/none.svg)](.test/none.log)
 
 ```µcad,none
-std::geo3d::sphere(radius = 40mm);
-std::geo3d::cube(size = 40mm);
+std::geo3d::Sphere(radius = 40mm);
+std::geo3d::Cube(size = 40mm);
 ```
 
 ## Use Statement
@@ -88,8 +88,8 @@ The following example aliases **all** symbols of `std::geo3d` into the current s
 ```µcad,use_all#todo
 use std::geo3d::*;
 
-sphere(r = 4mm);
-cube(size = 40mm);
+Sphere(r = 4mm);
+Cube(size = 40mm);
 ```
 
 ## Public Use Statement
@@ -97,7 +97,7 @@ cube(size = 40mm);
 This statement does not only make the *target symbol* visible on the current scope but in
 the symbol table where outside code might use it too.
 
-`sphere` and `cube` will be made available for using them outside of module `my` in the following example:
+`Sphere` and `Cube` will be made available for using them outside of module `my` in the following example:
 
 [![test](.test/use_statement_pub.svg)](.test/use_statement_pub.log)
 

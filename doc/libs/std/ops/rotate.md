@@ -13,7 +13,7 @@ std::geo2d::Rect(30mm).std::ops::rotate(45°);
 [![test](.test/rotate_3d.svg)](.test/rotate_3d.log)
 
 ```µcad,rotate_3d
-cylinder = std::geo3d::cylinder(h = 50mm, d = 20mm);
+cylinder = std::geo3d::Cylinder(h = 50mm, d = 20mm);
 
 cylinder.std::ops::rotate(x = 90°);
 cylinder.std::ops::rotate(y = 90°);

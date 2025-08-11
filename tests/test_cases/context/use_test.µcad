@@ -30,7 +30,7 @@ assert_invalid(use_test::ops);
 
 part my_part() {
     Circle(radius=1);
-    sphere(radius=1);
+    Sphere(radius=1);
 }
 
 assert_valid(my_part);

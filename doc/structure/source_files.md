@@ -31,7 +31,7 @@ std::geo2d::Circle(radius = 1cm);
 
 ```µcad,initial_source_file_3D
 // simply draw a sphere
-std::geo3d::sphere(radius = 1cm);
+std::geo3d::Sphere(radius = 1cm);
 ```
 
 Mixing both will lead to an error:
@@ -40,7 +40,7 @@ Mixing both will lead to an error:
 
 ```µcad,initial_source_file_mixed#fail
 std::geo2d::Circle(radius = 1cm);
-std::geo3d::sphere(radius = 1cm);  // error: can't mix 2D and 3D
+std::geo3d::Sphere(radius = 1cm);  // error: can't mix 2D and 3D
 ```
 
 ## Module Source Files

@@ -2,7 +2,7 @@ use __builtin::*;
 
 // The part `cyl` creates a cylinder with the given diameter and height
 part cyl(d: Length, h: Length) {
-    geo3d::cylinder(
+    geo3d::Cylinder(
         radius_bottom = d * 2.0 / 1mm,
         radius_top = d * 2.0 / 1mm,
         height = h / 1mm
