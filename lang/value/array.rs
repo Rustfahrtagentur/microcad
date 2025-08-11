@@ -146,11 +146,7 @@ impl std::ops::Div<Value> for Array {
             // Integer / Integer => Scalar
             (Type::Integer, Type::Integer) => Ok(Value::Array(Array::new(
                 ValueList::new(values),
-                Type::scalar(),
-            ))),
-            (Type::Quantity(_), rty) => Ok(Value::Array(Array::new(
-                ValueList::new(values),
-                self.ty / rty.clone(),
+                self.ty / rhs.ty().clone(),
             ))),
             _ => Err(ValueError::InvalidOperator("/".into())),
         }
