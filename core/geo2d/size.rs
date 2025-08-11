@@ -5,16 +5,16 @@ use crate::Scalar;
 
 /// 2D size in millimeters.  
 #[derive(Clone, Default, Debug, serde::Serialize, serde::Deserialize)]
-pub struct Size2D {
+pub struct Size2 {
     /// Width in mm.
     pub width: Scalar,
     /// Height in mm.
     pub height: Scalar,
 }
 
-impl Size2D {
+impl Size2 {
     /// A4 sheet.
-    pub const A4: Size2D = Size2D {
+    pub const A4: Size2 = Size2 {
         width: 210.0,
         height: 297.0,
     };

@@ -163,7 +163,7 @@ array_type = { "[" ~ ws* ~ type ~ ws* ~ "]" }
 // `(a: Length, )`: ok # Trailing comma
 tuple_type = {
     ("(" ~ ws* ~ tuple_type_element ~ (ws* ~ "," ~ ws* ~ tuple_type_element)* ~ ws* ~ ","? ~ ws* ~ ")")
-  | ("Color" | "Vec2" | "Vec3" | "Size2D")
+  | ("Color" | "Vec2" | "Vec3" | "Size2")
 }
 
 // `a: Length`: ok
