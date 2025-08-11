@@ -31,6 +31,7 @@ pub trait UseSymbol {
 
 impl Eval<()> for UseStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<()> {
+        context.grant(self)?;
         log::debug!("Evaluating use statement: {self}");
         if matches!(self.decl, UseDeclaration::UseAll(_)) || self.visibility == Visibility::Private
         {

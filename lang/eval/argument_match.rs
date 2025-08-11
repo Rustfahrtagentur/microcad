@@ -93,7 +93,7 @@ impl<'a> ArgumentMatch<'a> {
                     .params
                     .iter()
                     .enumerate()
-                    .filter(|(_, (_, _))| arg_id.is_empty())
+                    .filter(|(..)| arg_id.is_empty())
                     .filter_map(|(n, (id, param))| {
                         if [Type::Invalid, arg.ty(), arg.ty_inner()].contains(&param.ty()) {
                             Some((n, id, param))
@@ -110,7 +110,7 @@ impl<'a> ArgumentMatch<'a> {
                 // ignore params with defaults
                 let mut same_type = same_type
                     .iter()
-                    .filter(|(_, _, param)| !exclude_defaults || param.default_value.is_none());
+                    .filter(|(.., param)| !exclude_defaults || param.default_value.is_none());
 
                 if let Some((n, id, _)) = same_type.next() {
                     if same_type.next().is_none() {
