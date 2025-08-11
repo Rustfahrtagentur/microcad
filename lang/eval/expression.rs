@@ -80,7 +80,7 @@ impl Eval for ArrayExpression {
                     None => {
                         context.error(
                             self,
-                            EvalError::ListElementsDifferentTypes(value_list.types()),
+                            EvalError::ArrayElementsDifferentTypes(value_list.types()),
                         )?;
                         Ok(Value::None)
                     }

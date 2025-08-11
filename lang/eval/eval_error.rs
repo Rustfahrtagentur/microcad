@@ -35,9 +35,9 @@ pub enum EvalError {
         found: Type,
     },
 
-    /// Elements of list have different types.
-    #[error("Elements of list have different types: {0}")]
-    ListElementsDifferentTypes(TypeList),
+    /// Array elements have different types.
+    #[error("Array elements have different types: {0}")]
+    ArrayElementsDifferentTypes(TypeList),
 
     /// Symbol not found.
     #[error("Symbol {0} not found.")]

@@ -142,11 +142,15 @@ impl std::ops::Div<Value> for Array {
             values.push((value.clone() / rhs.clone())?);
         }
 
-        match self.ty {
-            // List / Scalar or List / Integer
-            Type::Quantity(_) | Type::Integer => Ok(Value::Array(Array::new(
+        match (&self.ty, rhs.ty()) {
+            // Integer / Integer => Scalar
+            (Type::Integer, Type::Integer) => Ok(Value::Array(Array::new(
                 ValueList::new(values),
-                self.ty / rhs.ty().clone(),
+                Type::scalar(),
+            ))),
+            (Type::Quantity(_), rty) => Ok(Value::Array(Array::new(
+                ValueList::new(values),
+                self.ty / rty.clone(),
             ))),
             _ => Err(ValueError::InvalidOperator("/".into())),
         }

@@ -78,7 +78,7 @@ impl std::ops::Div for Type {
         }
 
         match (self, rhs) {
-            (Type::Integer, ty) | (ty, Type::Integer) => ty,
+            (ty, Type::Integer) => ty,
             (Type::Quantity(lhs), Type::Quantity(rhs)) => Type::Quantity(lhs / rhs),
             (Type::Array(array_type), ty) => *array_type / ty,
             (Type::Tuple(_), _) => todo!(),
