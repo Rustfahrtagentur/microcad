@@ -1,0 +1,13 @@
+-- Test --
+  array_add
+  ../doc/types/arrays.md:62
+
+-- Code --
+
+ 1: d = 0.5mm;
+ 2: std::debug::assert_eq([[1,2]mm + 2mm, [3,4]mm]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK
