@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: sketch wheel(radius: Length) {
+ 1: sketch Wheel(radius: Length) {
  2:     // init code
  3:     const FACTOR = 2.0;
  4: 
@@ -24,21 +24,21 @@
 18:     std::geo2d::Circle(radius);
 19: }
 20: 
-21: __builtin::debug::assert(wheel(5cm).radius == 5cm);
-22: __builtin::debug::assert(wheel(5cm).diameter == 10cm);
+21: __builtin::debug::assert(Wheel(5cm).radius == 5cm);
+22: __builtin::debug::assert(Wheel(5cm).diameter == 10cm);
 
 -- Output --
 -- Errors --
 error: Property not found: diameter
   ---> <FROM STR>:22:26
      |
-  22 | __builtin::debug::assert(wheel(5cm).diameter == 10cm);
+  22 | __builtin::debug::assert(Wheel(5cm).diameter == 10cm);
      |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 error: Missing arguments: v
   ---> <FROM STR>:22:26
      |
-  22 | __builtin::debug::assert(wheel(5cm).diameter == 10cm);
+  22 | __builtin::debug::assert(Wheel(5cm).diameter == 10cm);
      |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --

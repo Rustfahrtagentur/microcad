@@ -7,7 +7,7 @@ Conditions lead to different executions paths for different cases.
 [![test](.test/if_models.svg)](.test/if_models.log)
 
 ```µcad,if_models
-sketch my_sketch(a: Integer) {
+sketch MySketch(a: Integer) {
     if a == 1 {
         std::geo2d::Circle(radius = 1mm)
     } else {
@@ -15,8 +15,8 @@ sketch my_sketch(a: Integer) {
     }
 }
 
-my_sketch(1);
-my_sketch(2);
+MySketch(1);
+MySketch(2);
 ```
 
 ## If Statement for functions

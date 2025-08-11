@@ -30,13 +30,13 @@ fn workbench_call() {
     let mut context = crate::context_for_file("syntax/workbench/plan.µcad");
 
     let symbol = context
-        .lookup(&qualified_name("a"))
+        .lookup(&qualified_name("A"))
         .expect("Symbol expected");
 
     // Check symbol id
-    if let Ok(symbol) = context.lookup(&Identifier(Refer::none("a".into())).into()) {
+    if let Ok(symbol) = context.lookup(&Identifier(Refer::none("A".into())).into()) {
         let id = symbol.id();
-        assert_eq!(id.id(), "a");
+        assert_eq!(id.id(), "A");
     }
 
     // Get workbench definition for symbol `a`

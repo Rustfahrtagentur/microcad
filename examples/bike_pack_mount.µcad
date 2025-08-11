@@ -6,7 +6,7 @@ use std::math::*;
 
 
 
-sketch rounded_rect(
+sketch RoundedRect(
     width: Length,
     height: Length,
     radius: Length) {
@@ -18,15 +18,15 @@ sketch rounded_rect(
 
 
 mod bike_pack_mount {
-    sketch base(
+    sketch Base(
         width = 130.0mm,
         height = 23.5mm,
         radius = 3mm,
     ) {
-        rounded_rect(width, height, radius);
+        RoundedRect(width, height, radius);
     }
 
-    part rack_rails(
+    part RackRails(
         rack_rail_distance = 100mm,
         rack_rail_diameter = 10.5mm,
     ) {
@@ -40,7 +40,7 @@ mod bike_pack_mount {
         .translate(y = -15mm);
     }
 
-    part mount(
+    part Mount(
         height: Length,
         screw_distance = 94mm,
         screw_hole_diameter = 6mm,
@@ -54,17 +54,17 @@ mod bike_pack_mount {
         base().extrude(height) - screws.extrude(height + 10mm) - bike_pack_mount::rack_rails();
     }
 
-    part lower() {
-        bike_pack_mount::mount(height = 15mm);
+    part Lower() {
+        bike_pack_mount::Mount(height = 15mm);
     }
 
-    part upper() {
-        bike_pack_mount::mount(height = 55mm);
+    part Upper() {
+        bike_pack_mount::Mount(height = 55mm);
     }
 }
 
-bike_pack_mount::lower();
-//bike_pack_mount::upper().translate(y = 40mm);
+bike_pack_mount::Lower();
+//bike_pack_mount::Upper().translate(y = 40mm);
 
 
 

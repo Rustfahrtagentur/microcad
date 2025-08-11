@@ -2,12 +2,12 @@
 mod a {
     mod b {
         mod c {
-            part m1() {}
+            part M1() {}
         }
     }
 
-    part m2() {}
+    part M2() {}
 }
 
-a::b::c::m1();
-a::m2();
+a::b::c::M1();
+a::M2();

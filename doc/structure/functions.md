@@ -96,7 +96,7 @@ Here is an example which generates a punched disk of a given radius using a func
 [![test](.test/workbench_example.svg)](.test/workbench_example.log)
 
 ```µcad,workbench_example
-sketch punched_disk(radius: Length) {
+sketch PunchedDisk(radius: Length) {
     use std::geo2d::Circle;
 
     // calculate inner from radius in a method
@@ -106,7 +106,7 @@ sketch punched_disk(radius: Length) {
     Circle(radius) - Circle(inner());
 }
 
-punched_disk(radius = 1cm);
+PunchedDisk(radius = 1cm);
 ```
 
 ### Restrictions
@@ -118,11 +118,11 @@ Trying to make them public with the keyword `pub` will result into an error:
 [![test](.test/workbench_pub.svg)](.test/workbench_pub.log)
 
 ```µcad,workbench_pub#fail
-part punched_disk(radius: Length) {
+part PunchedDisk(radius: Length) {
     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
 }
 
-punched_disk(4.0mm);
+PunchedDisk(4.0mm);
 ```
 
 You cannot create *workbench properties* within the code body.
@@ -130,11 +130,11 @@ You cannot create *workbench properties* within the code body.
 [![test](.test/workbench_fn_prop.svg)](.test/workbench_fn_prop.log)
 
 ```µcad,workbench_fn_prop#fail
-part punched_disk(radius: Length) {
+part PunchedDisk(radius: Length) {
     fn inner() { 
         prop hole = radius/2;  // eval error: prop not allowed in function
     }
 }
 
-punched_disk(1cm);
+PunchedDisk(1cm);
 ```

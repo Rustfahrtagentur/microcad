@@ -16,7 +16,7 @@
 [![test](.test/source_workbench.svg)](.test/source_workbench.log)
 
 ```µcad,source_workbench
-sketch f() {} f();
+sketch F() {} F();
 ```
 
 [![test](.test/source_module.svg)](.test/source_module.log)
@@ -97,7 +97,7 @@ __builtin::geo2d::Circle(radius=1);
 
 ```µcad,module_workbench
 mod k {
-  sketch f() {}
+  sketch F() {}
 }
 ```
 
@@ -202,103 +202,103 @@ mod k {
 [![test](.test/pre_init_workbench.svg)](.test/pre_init_workbench.log)
 
 ```µcad,pre_init_workbench#fail
-sketch k() { 
-  sketch f() {} f();  // error
-init(l:Length) {} } k();
+sketch K() { 
+  sketch F() {} K();  // error
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_module.svg)](.test/pre_init_module.log)
 
 ```µcad,pre_init_module#fail
-sketch k() { 
+sketch K() { 
   mod m {}   // error
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_function.svg)](.test/pre_init_function.log)
 
 ```µcad,pre_init_function#fail
-sketch k() { 
+sketch K() { 
   fn f() {} f();   // error
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_init.svg)](.test/pre_init_init.log)
 
 ```µcad,pre_init_init
-sketch k() { 
+sketch K() { 
   init() {}
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_use.svg)](.test/pre_init_use.log)
 
 ```µcad,pre_init_use
-sketch k() { 
+sketch K() { 
   use std;
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_pub_use.svg)](.test/pre_init_pub_use.log)
 
 ```µcad,pre_init_pub_use
-sketch k() { 
+sketch K() { 
   pub use std;
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_return.svg)](.test/pre_init_return.log)
 
 ```µcad,pre_init_return#fail
-sketch k() { 
+sketch K() { 
   return 1; // error
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_if.svg)](.test/pre_init_if.log)
 
 ```µcad,pre_init_if#fail
-sketch k() { 
+sketch K() { 
   if std::math::PI == 3 { } // error
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_assignment_const.svg)](.test/pre_init_assignment_const.log)
 
 ```µcad,pre_init_assignment_const
-sketch k() { 
+sketch K() { 
   const B = 1;
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_assignment_var.svg)](.test/pre_init_assignment_var.log)
 
 ```µcad,pre_init_assignment_var#fail
-sketch k() { 
+sketch K() { 
   a = 1; // error
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_assignment_prop.svg)](.test/pre_init_assignment_prop.log)
 
 ```µcad,pre_init_assignment_prop#fail
-sketch k() { 
+sketch K() {
   prop a = 1; // error
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_expression.svg)](.test/pre_init_expression.log)
 
 ```µcad,pre_init_expression#fail
-sketch k() { 
+sketch K() { 
   1 + 2; // error
-init(l:Length) {} } k();
+init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_expression_model.svg)](.test/pre_init_expression_model.log)
 
 ```µcad,pre_init_expression_model#fail
-sketch k() { 
+sketch K() { 
   __builtin::geo2d::Circle(radius=1); // error
 init(l:Length) {} }
 ```
@@ -308,105 +308,105 @@ init(l:Length) {} }
 [![test](.test/init_workbench.svg)](.test/init_workbench.log)
 
 ```µcad,init_workbench#fail
-sketch k() { init(l:Length) {
-  sketch f() {} // error
-} } k(1cm);
+sketch K() { init(l:Length) {
+  sketch F() {} // error
+} } K(1cm);
 ```
 
 [![test](.test/init_module.svg)](.test/init_module.log)
 
 ```µcad,init_module#fail
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   mod m {} // error
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_function.svg)](.test/init_function.log)
 
 ```µcad,init_function#fail
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   fn f() {} // error
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_init.svg)](.test/init_init.log)
 
 ```µcad,init_init#fail
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   init() {} // error
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_use.svg)](.test/init_use.log)
 
 ```µcad,init_use
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   use std;
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_pub_use.svg)](.test/init_pub_use.log)
 
 ```µcad,init_pub_use#todo_fail
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   pub use std; // error
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_return.svg)](.test/init_return.log)
 
 ```µcad,init_return#fail
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   return 1; // error
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_if.svg)](.test/init_if.log)
 
 ```µcad,init_if#fail
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   if std::math::PI == 3 { } // error
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_assignment_const.svg)](.test/init_assignment_const.log)
 
 ```µcad,init_assignment_const#fail
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   const B = 1; // error
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_assignment_var.svg)](.test/init_assignment_var.log)
 
 ```µcad,init_assignment_var
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   a = 1;
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_assignment_prop.svg)](.test/init_assignment_prop.log)
 
 ```µcad,init_assignment_prop#fail
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   prop a = 1; // error
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_expression.svg)](.test/init_expression.log)
 
 ```µcad,init_expression#fail
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   1 + 2; // error
-} } k(1cm);
+} } K(1cm);
 ```
 
 [![test](.test/init_expression_model.svg)](.test/init_expression_model.log)
 
 ```µcad,init_expression_model#fail
-sketch k() { init(l:Length) {
+sketch K() { init(l:Length) {
   __builtin::geo2d::Circle(radius=1); // error
-} } k(1cm);
+} } K(1cm);
 ```
 
 ### Workbench
@@ -414,113 +414,113 @@ sketch k() { init(l:Length) {
 [![test](.test/workbench_workbench.svg)](.test/workbench_workbench.log)
 
 ```µcad,workbench_workbench#fail
-sketch k() {
-  sketch f() {} f(); // error
-} k();
+sketch K() {
+  sketch F() {} F(); // error
+} K();
 ```
 
 [![test](.test/workbench_module.svg)](.test/workbench_module.log)
 
 ```µcad,workbench_module#fail
-sketch k() {
+sketch K() {
   mod m {} // error
-} k();
+} K();
 ```
 
 [![test](.test/workbench_function.svg)](.test/workbench_function.log)
 
 ```µcad,workbench_function
-sketch k() {
+sketch K() {
   fn f() {} f();
-} k();
+} K();
 ```
 
 [![test](.test/workbench_init.svg)](.test/workbench_init.log)
 
 ```µcad,workbench_init
-sketch k() {
+sketch K() {
   init() {}
-} k();
+} K();
 ```
 
 [![test](.test/workbench_use.svg)](.test/workbench_use.log)
 
 ```µcad,workbench_use
-sketch k() {
+sketch K() {
   use std;
-} k();
+} K();
 ```
 
 [![test](.test/workbench_pub_use.svg)](.test/workbench_pub_use.log)
 
 ```µcad,workbench_pub_use#todo_fail
-sketch k() {
+sketch K() {
   pub use std; // error
-} k();
+} K();
 ```
 
 [![test](.test/workbench_return.svg)](.test/workbench_return.log)
 
 ```µcad,workbench_return#fail
-sketch k() {
+sketch K() {
   return 1; // error
-} k();
+} K();
 ```
 
 [![test](.test/workbench_if.svg)](.test/workbench_if.log)
 
 ```µcad,workbench_if
-sketch k() {
+sketch K() {
   if std::math::PI == 3 { }
-} k();
+} K();
 ```
 
 [![test](.test/workbench_marker.svg)](.test/workbench_marker.log)
 
 ```µcad,workbench_marker
-sketch k() {
+sketch K() {
   @children
-} k();
+} K();
 ```
 
 [![test](.test/workbench_assignment_const.svg)](.test/workbench_assignment_const.log)
 
 ```µcad,workbench_assignment_const
-sketch k() {
+sketch K() {
   const B = 1;
-} k();
+} K();
 ```
 
 [![test](.test/workbench_assignment_var.svg)](.test/workbench_assignment_var.log)
 
 ```µcad,workbench_assignment_var
-sketch k() {
+sketch K() {
   a = 1;
-} k();
+} K();
 ```
 
 [![test](.test/workbench_assignment_prop.svg)](.test/workbench_assignment_prop.log)
 
 ```µcad,workbench_assignment_prop
-sketch k() {
+sketch K() {
   prop a = 1;
-} k();
+} K();
 ```
 
 [![test](.test/workbench_expression.svg)](.test/workbench_expression.log)
 
 ```µcad,workbench_expression
-sketch k() {
+sketch K() {
   1 + 2;
-} k();
+} K();
 ```
 
 [![test](.test/workbench_expression_model.svg)](.test/workbench_expression_model.log)
 
 ```µcad,workbench_expression_model
-sketch k() {
+sketch K() {
   __builtin::geo2d::Circle(radius=1);
-} k();
+} K();
 ```
 
 ### Body
@@ -529,7 +529,7 @@ sketch k() {
 
 ```µcad,body_workbench#fail
 {
-  sketch f() {} f(); // error
+  sketch F() {} F(); // error
 }
 ```
 
@@ -643,7 +643,7 @@ sketch k() {
 
 ```µcad,function_workbench#fail
 fn f() {
-  sketch s() {} // error
+  sketch S() {} // error
 } f();
 ```
 

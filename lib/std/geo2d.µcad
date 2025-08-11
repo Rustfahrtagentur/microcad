@@ -54,7 +54,7 @@ sketch Rect(width: Length, height: Length, x: Length, y: Length) {
     );
 }
 
-sketch line(p0: Vec2, p1: Vec2) {
+sketch Line(p0: Vec2, p1: Vec2) {
     init(width: Length, y = 0.0mm) {
         p0 = (x = -width / 2mm, y = y / 1mm);
         p1 = (x =  width / 2mm , y = y / 1mm);
@@ -70,5 +70,5 @@ sketch line(p0: Vec2, p1: Vec2) {
         p1 = (x = (p.x + width) / 1mm , y = p.y / 1mm);
     }
 
-    __builtin::geo2d::line(x0 = p0.x, y0 = p0.y, x1 = p1.x, y1 = p1.y);
+    __builtin::geo2d::Line(x0 = p0.x, y0 = p0.y, x1 = p1.x, y1 = p1.y);
 }

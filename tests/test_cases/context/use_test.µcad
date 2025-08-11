@@ -15,7 +15,7 @@ assert_valid(sphere);
 assert_valid(cube);
 
 // alias `bar` in `std/text/foo.µcad` into `baz`
-use std::test::foo::bar as baz;
+use std::test::foo::Bar as baz;
 assert_valid(baz);
 
 // use print from `std/module.µcad`
@@ -28,9 +28,9 @@ pub use std::ops;
 assert_valid(ops);
 assert_invalid(use_test::ops);
 
-part my_part() {
+part MyPart() {
     Circle(radius=1);
     Sphere(radius=1);
 }
 
-assert_valid(my_part);
+assert_valid(MyPart);

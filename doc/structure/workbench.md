@@ -42,7 +42,7 @@ The following code demonstrates most of these elements:
 
 ```µcad,part_declaration#todo
 // sketch with a `radius` as building plan
-sketch wheel(radius: Length) {
+sketch Wheel(radius: Length) {
 
     // init code
     const FACTOR = 2;
@@ -72,12 +72,12 @@ sketch wheel(radius: Length) {
 use std::debug::assert;
 
 // call sketch with diameter
-d = wheel(diameter = 2cm)
+d = Wheel(diameter = 2cm)
 // check radius
 assert_eq([d.radius, 1cm]);
 
 // call sketch with radius
-r = wheel(radius = 1cm)
+r = Wheel(radius = 1cm)
 // check diameter
 assert([r.diameter, 2cm]);
 ```
@@ -94,12 +94,12 @@ or externally.
 
 ```µcad,building_plan
 // sketch with a `radius` as building plan
-sketch wheel(radius: Length) {
+sketch Wheel(radius: Length) {
     // access property `radius` from the building plan
     std::geo2d::Circle(radius);
 }
 
-std::debug::assert_eq([wheel(5cm).radius, 5cm]);
+std::debug::assert_eq([Wheel(5cm).radius, 5cm]);
 ```
 
 ### Initializers
@@ -110,12 +110,12 @@ One may define multiple initializers which must have different parameter lists.
 [![test](.test/initializers.svg)](.test/initializers.log)
 
 ```µcad,initializers#todo_fail
-sketch wheel(radius: Length) {
+sketch Wheel(radius: Length) {
     init( radius: Length ) {} // error: same parameters as in building plan
     std::geo2d::Circle(1mm);
 }
 
-wheel(radius = 1.0mm);
+Wheel(radius = 1.0mm);
 ```
 
 However, if an initializer is used, all properties from the building plan must
@@ -124,7 +124,7 @@ be initialized (except those with *default values*).
 [![test](.test/init_property.svg)](.test/init_property.log)
 
 ```µcad,init_property
-sketch wheel(radius: Length, thickness: Length) {
+sketch Wheel(radius: Length, thickness: Length) {
     // initializer with diameter
     init( diameter: Length, thickness: Length ) {
         // must set `radius` in code 
@@ -140,9 +140,9 @@ sketch wheel(radius: Length, thickness: Length) {
 }
 
 // call with building plan
-wheel(radius=5cm, thickness=1cm);
+Wheel(radius=5cm, thickness=1cm);
 // call with initializer
-wheel(diameter=10cm, thickness=1cm);
+Wheel(diameter=10cm, thickness=1cm);
 ```
 
 If the *building plan* is not fully initialized by an initializer
@@ -151,11 +151,11 @@ you will get an error:
 [![test](.test/missed_property.svg)](.test/missed_property.log)
 
 ```µcad,missed_property#fail
-sketch wheel(radius: Length) { // warning (no output)
+sketch Wheel(radius: Length) { // warning (no output)
     init( width: Length ) { } // error: misses to set `radius` from building plan
 }
 
-wheel(width = 1.0mm);
+Wheel(width = 1.0mm);
 ```
 
 ### Init Code
@@ -169,7 +169,7 @@ in all following code (including code within *initializers* and *functions*).
 [![test](.test/pre_init_code.svg)](.test/pre_init_code.log)
 
 ```µcad,pre_init_code#todo
-sketch wheel(radius: Length) {
+sketch Wheel(radius: Length) {
     // init code
     const FACTOR = 2.0;
 
@@ -189,8 +189,8 @@ sketch wheel(radius: Length) {
     std::geo2d::Circle(radius);
 }
 
-__builtin::debug::assert(wheel(5cm).radius == 5cm);
-__builtin::debug::assert(wheel(5cm).diameter == 10cm);
+__builtin::debug::assert(Wheel(5cm).radius == 5cm);
+__builtin::debug::assert(Wheel(5cm).diameter == 10cm);
 ```
 
 ### Init Code Rules
@@ -200,7 +200,7 @@ It's **not allowed** to write any code between *initializers*.
 [![test](.test/code_between_initializers.svg)](.test/code_between_initializers.log)
 
 ```µcad,code_between_initializers#fail
-sketch wheel(radius: Length) {
+sketch Wheel(radius: Length) {
     init( width:Length ) { radius = width / 2; }
     
     // error: code between initializers not allowed
@@ -209,7 +209,7 @@ sketch wheel(radius: Length) {
     init( height:Length ) { radius = height / 2; }
 }
 
-wheel(radius = 1.0mm);
+Wheel(radius = 1.0mm);
 ```
 
 ### Building Code
@@ -221,12 +221,12 @@ Usually it produces one or many 2D or 3D objects on base of the given
 [![test](.test/code.svg)](.test/code.log)
 
 ```µcad,code
-sketch wheel(radius: Length) {
+sketch Wheel(radius: Length) {
     // building code starts here
     std::geo2d::Circle(radius);
 }
 
-wheel(radius = 1.0mm)
+Wheel(radius = 1.0mm)
 ```
 
 If *initializers* were defined the *building code* starts below them.
@@ -234,7 +234,7 @@ If *initializers* were defined the *building code* starts below them.
 [![test](.test/code_post_init.svg)](.test/code_post_init.log)
 
 ```µcad,code_post_init
-sketch wheel(radius: Length) {
+sketch Wheel(radius: Length) {
     // initializer
     init( diameter: Length ) { radius = diameter / 2; }
 
@@ -250,12 +250,12 @@ It's **not allowed** to use the `sketch`, `part`, `op`, `return` nor `mod` state
 [![test](.test/illegal_workbench_statement.svg)](.test/illegal_workbench_statement.log)
 
 ```µcad,illegal_workbench_statement#fail
-sketch wheel(radius: Length) {
-    sketch axis(length: Length) {}  // error
+sketch Wheel(radius: Length) {
+    sketch Axis(length: Length) {}  // error
     std::geo2d::Circle(radius);
 }
 
-wheel(radius = 1.0mm);
+Wheel(radius = 1.0mm);
 ```
 
 ## Properties
@@ -272,7 +272,7 @@ In the following example we declare a building plan which consists of a `radius`
 ```µcad,property#todo
 // `outer` will automatically become a property because
 // it is declared in the building plan:
-sketch wheel(outer: Length) {
+sketch Wheel(outer: Length) {
     use std::geo2d::Circle;
 
     // `inner` is declared as property and maybe read from 
@@ -284,7 +284,7 @@ sketch wheel(outer: Length) {
 }
 
 // evaluate wheel
-t = wheel(1cm);
+t = Wheel(1cm);
 
 // extract and display `outer` and `inner` from generated wheel
 std::print("outer: {t.outer}");
@@ -296,7 +296,7 @@ If you remove the `prop` keyword you will fail at accessing `inner`:
 [![test](.test/property_wrong.svg)](.test/property_wrong.log)
 
 ```µcad,property_wrong#fail
-sketch wheel(outer: Length) {
+sketch Wheel(outer: Length) {
     use std::geo2d::Circle;
 
     // `inner` is declared as variable and may not be read
@@ -306,7 +306,7 @@ sketch wheel(outer: Length) {
     Circle(outer) - Circle(inner);
 }
 
-t = wheel(outer = 1cm);
+t = Wheel(outer = 1cm);
 
 // you can still extract and display `outer`
 std::print("outer: {t.outer}");

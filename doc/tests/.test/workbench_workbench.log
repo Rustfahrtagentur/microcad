@@ -4,28 +4,28 @@
 
 -- Code --
 
- 1: sketch k() {
- 2:   sketch f() {} f(); // error
- 3: } k();
+ 1: sketch K() {
+ 2:   sketch F() {} F(); // error
+ 3: } K();
 
 -- Output --
 -- Errors --
 error: sketch statement not available here
   ---> <FROM STR>:2:3
      |
-   2 |   sketch f() {} f(); // error
+   2 |   sketch F() {} F(); // error
      |   ^^^^^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.
   ---> <FROM STR>:2:3
      |
-   2 |   sketch f() {} f(); // error
+   2 |   sketch F() {} F(); // error
      |   ^^^^^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.
   ---> <FROM STR>:1:1
      |
-   1 | sketch k() {
+   1 | sketch K() {
      | ^^^^^^^^^^^^
      |
 -- Test Result --

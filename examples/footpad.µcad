@@ -2,7 +2,7 @@ use std::ops::*;
 use std::geo2d::*;
 use std::math::*;
 
-part foot_pad(
+part FootPad(
     height = 45mm,
     base = (x = 155mm, y = 101mm, z = 18mm),
     slot = (x = 8mm, y = 13mm),
@@ -54,4 +54,4 @@ part foot_pad(
     base_lower | base_upper | center - holes;
 }
 
-foot_pad();
+FootPad();

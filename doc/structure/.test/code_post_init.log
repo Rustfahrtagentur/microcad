@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: sketch wheel(radius: Length) {
+ 1: sketch Wheel(radius: Length) {
  2:     // initializer
  3:     init( diameter: Length ) { radius = diameter / 2; }
  4: 

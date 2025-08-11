@@ -27,12 +27,12 @@ except that the result is a object node.
 
 ```µcad,call_workbench
 // definition of a sketch workbench
-sketch square(size: Length) { 
+sketch Square(size: Length) { 
     std::geo2d::Rect(size);
 }
 
 // call square with a size and store object node in s
-s = square(size=2cm);
+s = Square(size=2cm);
 
 // translate object s
 s.std::ops::translate(x = 1cm);

@@ -5,7 +5,7 @@
 -- Code --
 
  1: fn f() {
- 2:   sketch s() {} // error
+ 2:   sketch S() {} // error
  3: } f();
 
 -- Output --
@@ -13,7 +13,7 @@
 error: sketch statement not available here
   ---> <FROM STR>:2:3
      |
-   2 |   sketch s() {} // error
+   2 |   sketch S() {} // error
      |   ^^^^^^^^^^^^^
      |
 -- Test Result --

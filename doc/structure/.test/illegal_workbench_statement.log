@@ -4,19 +4,19 @@
 
 -- Code --
 
- 1: sketch wheel(radius: Length) {
- 2:     sketch axis(length: Length) {}  // error
+ 1: sketch Wheel(radius: Length) {
+ 2:     sketch Axis(length: Length) {}  // error
  3:     std::geo2d::Circle(radius);
  4: }
  5: 
- 6: wheel(radius = 1.0mm);
+ 6: Wheel(radius = 1.0mm);
 
 -- Output --
 -- Errors --
 error: sketch statement not available here
   ---> <FROM STR>:2:5
      |
-   2 |     sketch axis(length: Length) {}  // error
+   2 |     sketch Axis(length: Length) {}  // error
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --

@@ -132,9 +132,9 @@ In the following example a warning and an error are marked with comments:
 
 ````md
 ```µcad,missed_property#fail
-sketch wheel(radius: Length) { // warning (no output)
+sketch Wheel(radius: Length) { // warning (no output)
     init( width: Length ) { } // error: misses to set `radius` from building plan
 }
-wheel(width = 1.0mm);
+Wheel(width = 1.0mm);
 ```
 ````

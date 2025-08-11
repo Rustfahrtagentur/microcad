@@ -410,18 +410,18 @@ doc_block = { (doc_comment ~ ws+)+ }
 
 workbench_kind = { "sketch" | "part" | "op" }
 
-// `part foo() { }`: ok # Part with no properties
-// `part foo(a: scalar) { }`: ok # Part with properties
-// `part foo(a: scalar, b: scalar) { }`: ok # Part with multiple properties
-// `part foo() { part bar() { } }`: ok # Nested part definition
-// `part foo() { a: scalar = 5.0; fn bar() -> scalar { return 1; } }`: ok # Parameter and nested function
-// `part list(count: int, delegate = {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Part with part as properties
-// `part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
-// `part foo() { fn bar(a: Scalar) -> Scalar { a } }`: ok # Part with function
-// `part donut(radius) { }`: error # Part property must have type annotations
-// `sketch foo() { }`: ok # Sketch with no properties
+// `part Foo() { }`: ok # Part with no properties
+// `part Foo(a: scalar) { }`: ok # Part with properties
+// `part Foo(a: scalar, b: scalar) { }`: ok # Part with multiple properties
+// `part Foo() { part Bar() { } }`: ok # Nested part definition
+// `part Foo() { a: scalar = 5.0; fn bar() -> scalar { return 1; } }`: ok # Parameter and nested function
+// `part List(count: int, delegate = {}) { translate(x = [0..count]*5mm) delegate; }`: ok # Part with part as properties
+// `part Foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
+// `part Foo() { fn bar(a: Scalar) -> Scalar { a } }`: ok # Part with function
+// `part Donut(radius) { }`: error # Part property must have type annotations
+// `sketch Foo() { }`: ok # Sketch with no properties
 // `op foo() { }`: ok # Sketch with no properties
-// `pub sketch foo() { }`: ok # public sketch
+// `pub sketch Foo() { }`: ok # public sketch
 workbench_definition = { doc_block? ~ (attribute_list ~ ws+)? ~ (visibility ~ ws+)? ~ workbench_kind ~ ws+ ~ identifier ~ ws* ~ parameter_list ~ ws* ~ body }
 
 // `{ translate() rotate(); }`: ok
@@ -453,6 +453,6 @@ statement = {
 
 statement_list = { (statement ~ ws*)* ~ final_expression_statement? }
 
-// `translate(x = 5.0mm) { rectangle(width = 5.0mm); } translate(x = 5.0mm) { rotate(angle = 90°) { rectangle(width = 5.0); } }`: ok
-// `part foo() { init(size: Length) { rectangle(size); } }`: ok # Part with init function
+// `Rect(width = 5.0mm).translate(x = 5.0mm); Rect(width = 5.0).translate(x = 5.0mm).rotate(angle = 90°);`: ok
+// `part Foo() { init(size: Length) {} Rectangle(size); }`: ok # Part with init function
 source_file = { SOI ~ ws* ~ statement_list ~ ws* ~ EOI }
