@@ -158,7 +158,10 @@ impl std::ops::Div<Value> for Array {
 
         match (&self.ty, rhs.ty()) {
             // Integer / Integer => Scalar
-            (Type::Integer, Type::Integer) => Ok(Value::Array(values.try_into()?)),
+            (Type::Integer, Type::Integer) => Ok(Value::Array(Array::new(
+                values,
+                self.ty / rhs.ty().clone(),
+            ))),
             (Type::Quantity(_), _) => Ok(Value::Array(values.try_into()?)),
             _ => Err(ValueError::InvalidOperator("/".into())),
         }
