@@ -55,29 +55,48 @@ impl CallMethod for Array {
 impl CallMethod<Models> for Models {
     fn call_method(
         &self,
-        id: &QualifiedName,
+        name: &QualifiedName,
         args: &ArgumentValueList,
         context: &mut Context,
     ) -> EvalResult<Models> {
-        if let Some(symbol) = id.eval(context)? {
+        // Try nest models for an operation: models.op()
+        fn try_nest(
+            name: &QualifiedName,
+            args: &ArgumentValueList,
+            context: &mut Context,
+            models: &Models,
+            op: Models,
+            symbol: &Symbol,
+        ) -> EvalResult<Models> {
+            if !models.contains_geometry() {
+                context.warning(name, EvalError::OperationOnEmptyGeometry)?;
+            }
+
+            if op.is_operation() {
+                let models = op.nest(models);
+                models.set_creator(symbol.clone(), SrcRef::merge(name, args));
+                return Ok(models);
+            } else {
+                context.error(name, EvalError::NotAnOperation(name.clone()))?;
+            }
+
+            Ok(models.clone())
+        }
+
+        if let Some(symbol) = name.eval(context)? {
             Ok(match &symbol.borrow().def {
                 SymbolDefinition::Workbench(workbench_definition) => {
-                    let models = workbench_definition.call(args, context)?.nest(self);
-                    models.set_creator(symbol.clone(), SrcRef::merge(id, args));
-                    models
+                    let op = workbench_definition.call(args, context)?;
+                    try_nest(name, args, context, self, op, &symbol)?
                 }
                 SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
-                    Value::Models(models) => {
-                        let models = models.nest(self);
-                        models.set_creator(symbol.clone(), SrcRef::merge(id, args));
-                        models
-                    }
+                    Value::Models(models) => try_nest(name, args, context, self, models, &symbol)?,
                     value => panic!("Builtin call returned {value} but no models."),
                 },
                 def => {
                     context.error(
-                        id,
-                        EvalError::SymbolCannotBeCalled(id.clone(), Box::new(def.clone())),
+                        name,
+                        EvalError::SymbolCannotBeCalled(name.clone(), Box::new(def.clone())),
                     )?;
                     Models::default()
                 }
