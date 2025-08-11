@@ -18,11 +18,5 @@
 
 -- Output --
 -- Errors --
-error: Workbench orient cannot find initialization for those arguments
-  ---> <FROM STR>:7:55
-     |
-   7 |     holes = cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
-     |                                                       ^^^^^^^
-     |
 -- Test Result --
-FAIL
+OK

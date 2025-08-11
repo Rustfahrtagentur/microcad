@@ -15,7 +15,7 @@ When viewed or exported, model node `c` will have a red color, because the `colo
 
 ```µcad,attributes_simple_example
 #[color = "#FF0000"]
-c = std::geo2d::circle(42.0mm);
+c = std::geo2d::Circle(42.0mm);
 
 std::debug::assert_eq([c#color, (r = 1.0, g = 0.0, b = 0.0, a = 1.0)]);
 ```
@@ -40,7 +40,7 @@ In viewer and when exported, the model will be drawn in the specified color.
 
 ```µcad,attributes_color
 #[color = "#FFFFFF"]
-c = std::geo2d::circle(42.0mm);
+c = std::geo2d::Circle(42.0mm);
 
 std::debug::assert_eq([c#color, (r = 1.0, g = 1.0, b = 1.0, a = 1.0)]);
 ```
@@ -55,7 +55,7 @@ This means the circle will be rendered with a resolution `0.05mm`.
 
 ```µcad,attributes_precision
 #[resolution = 200%]
-c = std::geo2d::circle(42.0mm);
+c = std::geo2d::Circle(42.0mm);
 
 std::debug::assert_eq([c#resolution, 200%]);
 ```
@@ -68,7 +68,7 @@ If you have created a part or a sketch and want to export it to a specific file,
 
 ```µcad,attributes_export
 #[export = "circle.svg"]
-c = std::geo2d::circle(42.0mm);
+c = std::geo2d::Circle(42.0mm);
 ```
 
 The exporter is detected automatically depending on the file extension.
@@ -79,7 +79,7 @@ However, you can select a specific exporter using the tuple syntax:
 
 ```µcad,attributes_export_svg
 #[export = svg("circle.svg")]
-c = std::geo2d::circle(42.0mm);
+c = std::geo2d::Circle(42.0mm);
 ```
 
 See [export](export.md) for more information.
@@ -93,7 +93,7 @@ For example, you want to display the measure for the width and height of a circl
 
 ```µcad,attributes_export_measure
 #[measure = width, height]
-r = std::geo2d::circle(42mm);
+r = std::geo2d::Circle(42mm);
 ```
 
 `width` and `height` are sub-commands for the measures.
@@ -122,5 +122,5 @@ The `svg` exporter has these parameters:
 ```µcad,attributes_export_example
 #[export = "circle.svg"]
 #[svg = (style = "fill: skyblue; stroke: cadetblue; stroke-width: 2;")]
-c = std::geo2d::circle(42.0mm);
+c = std::geo2d::Circle(42.0mm);
 ```

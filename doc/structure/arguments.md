@@ -168,7 +168,7 @@ r.std::ops::translate([(x=-4mm, y=-4mm), (x=-4mm, y=4mm), (x=4mm, y=-4mm), (x=4m
 
 Argument names can be skipped if the parameter expression is a single identifier.
 Like in the following example, where the variables `width` and `height` have the
-exact same name as the parameters of `circle()`.
+exact same name as the parameters of `Circle()`.
 
 [![test](.test/inline_identifiers.svg)](.test/inline_identifiers.log)
 

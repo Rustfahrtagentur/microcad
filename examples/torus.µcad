@@ -5,7 +5,7 @@ use std::ops::translate;
 
 part torus(major_radius: Length, minor_radius: Length) {
     revolve(240°) {
-        translate(x = major_radius) std::geo2d::circle(minor_radius);
+        translate(x = major_radius) std::geo2d::Circle(minor_radius);
     }
 }
 

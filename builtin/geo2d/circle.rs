@@ -8,7 +8,7 @@ pub struct Circle;
 
 impl BuiltinWorkbenchDefinition for Circle {
     fn id() -> &'static str {
-        "circle"
+        "Circle"
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

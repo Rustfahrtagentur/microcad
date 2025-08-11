@@ -8,7 +8,7 @@ use crate::{eval::*, model::*, resolve::*};
 /// [`StackFrame`]s can have the following different types:
 /// - source file (bottom of stack)
 /// - modules ( e.g. `mod my_lib { ... }`)
-/// - init calls (e.g. `std::geo2d::circle(radius = 1m)`)
+/// - init calls (e.g. `std::geo2d::Circle(radius = 1m)`)
 /// - function calls (e.g. `std::print("µcad")`)
 /// - bodies (e.g. `{ ... }`)
 #[derive(Default)]
@@ -264,9 +264,11 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     // test alias
-    assert!(stack
-        .put_local(Some("x".into()), make_int("x".into(), 3))
-        .is_ok());
+    assert!(
+        stack
+            .put_local(Some("x".into()), make_int("x".into(), 3))
+            .is_ok()
+    );
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);

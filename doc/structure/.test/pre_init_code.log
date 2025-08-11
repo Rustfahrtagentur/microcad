@@ -21,7 +21,7 @@
 15:     prop diameter = radius * FACTOR;
 16:     
 17:     // code body
-18:     std::geo2d::circle(radius);
+18:     std::geo2d::Circle(radius);
 19: }
 20: 
 21: __builtin::debug::assert(wheel(5cm).radius == 5cm);

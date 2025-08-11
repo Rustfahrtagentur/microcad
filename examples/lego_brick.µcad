@@ -11,7 +11,7 @@ part lego_brick(rows: Integer, columns: Integer, a = 8mm, base_height = 9.6mm) {
 
     base = {
         frame = rect(width, height) - rect(width = width - wall * 2, height = height - wall * 2);
-        struts = (circle(d = 6.51mm) - circle(d = 4.8mm))
+        struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
             .translate(x = [0..rows-1] * a - a * (rows-2) / 2, y = [0..columns-1] * a - a * (columns-2) / 2);
         frame | struts;
     }
@@ -21,7 +21,7 @@ part lego_brick(rows: Integer, columns: Integer, a = 8mm, base_height = 9.6mm) {
         .extrude(height = top_thickness)
         .translate(z = base_height - top_thickness);
     
-    knobs = circle(d = 4.8mm, c = (x = [0..rows] * a, y = [0..columns] * a))
+    knobs = Circle(d = 4.8mm, c = (x = [0..rows] * a, y = [0..columns] * a))
         .extrude(height = 1.7mm)
         .translate(x = -(width - a) / 2, y = -(height - a) / 2, z = base_height);
 

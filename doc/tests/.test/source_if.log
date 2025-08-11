@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+ 1: if std::math::PI == 3 { __builtin::geo2d::Circle(radius=1); }
 
 -- Output --
 -- Errors --

@@ -97,13 +97,13 @@ Here is an example which generates a punched disk of a given radius using a func
 
 ```µcad,workbench_example
 sketch punched_disk(radius: Length) {
-    use std::geo2d::circle;
+    use std::geo2d::Circle;
 
     // calculate inner from radius in a method
     fn inner() { radius/2 }
 
     // generate donut (and call inner)
-    circle(radius) - circle(inner());
+    Circle(radius) - Circle(inner());
 }
 
 punched_disk(radius = 1cm);

@@ -9,8 +9,8 @@ use std::geo2d::*;
 use std::ops::*;
 
 {
-    circle(10mm).translate(x = 10mm, y =  0mm);
-    circle(10mm).translate(x =  0mm, y = 10mm);
+    Circle(10mm).translate(x = 10mm, y =  0mm);
+    Circle(10mm).translate(x =  0mm, y = 10mm);
 }.hull();
 ```
 
@@ -20,7 +20,7 @@ use std::ops::*;
 use std::geo2d::*;
 use std::ops::*;
 
-circle(r = 4mm)
+Circle(r = 4mm)
     .translate(x = [-10, 10]mm, y = [-10, 10]mm)
     .hull();
 ```

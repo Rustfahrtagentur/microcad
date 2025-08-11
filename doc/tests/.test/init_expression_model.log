@@ -5,7 +5,7 @@
 -- Code --
 
  1: sketch k() { init(l:Length) {
- 2:   __builtin::geo2d::circle(radius=1); // error
+ 2:   __builtin::geo2d::Circle(radius=1); // error
  3: } } k(1cm);
 
 -- Output --
@@ -13,7 +13,7 @@
 error: Expression statement not available here
   ---> <FROM STR>:2:3
      |
-   2 |   __builtin::geo2d::circle(radius=1); // error
+   2 |   __builtin::geo2d::Circle(radius=1); // error
      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 warning: The sketch workbench will produce no 2D output.

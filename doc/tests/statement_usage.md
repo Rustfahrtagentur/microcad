@@ -58,7 +58,7 @@ return 1;  // error
 [![test](.test/source_if.svg)](.test/source_if.log)
 
 ```µcad,source_if
-if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+if std::math::PI == 3 { __builtin::geo2d::Circle(radius=1); }
 ```
 
 [![test](.test/source_assignment_const.svg)](.test/source_assignment_const.log)
@@ -88,7 +88,7 @@ prop a = 1;  // error
 [![test](.test/source_expression_model.svg)](.test/source_expression_model.log)
 
 ```µcad,source_expression_model
-__builtin::geo2d::circle(radius=1);
+__builtin::geo2d::Circle(radius=1);
 ```
 
 ### Module
@@ -153,7 +153,7 @@ mod k {
 
 ```µcad,module_if#fail
 mod k {
-  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }  // error
+  if std::math::PI == 3 { __builtin::geo2d::Circle(radius=1); }  // error
 }
 ```
 
@@ -193,7 +193,7 @@ mod k {
 
 ```µcad,module_expression_model#fail
 mod k {
-  __builtin::geo2d::circle(radius=1); // error
+  __builtin::geo2d::Circle(radius=1); // error
 }
 ```
 
@@ -299,7 +299,7 @@ init(l:Length) {} } k();
 
 ```µcad,pre_init_expression_model#fail
 sketch k() { 
-  __builtin::geo2d::circle(radius=1); // error
+  __builtin::geo2d::Circle(radius=1); // error
 init(l:Length) {} }
 ```
 
@@ -405,7 +405,7 @@ sketch k() { init(l:Length) {
 
 ```µcad,init_expression_model#fail
 sketch k() { init(l:Length) {
-  __builtin::geo2d::circle(radius=1); // error
+  __builtin::geo2d::Circle(radius=1); // error
 } } k(1cm);
 ```
 
@@ -519,7 +519,7 @@ sketch k() {
 
 ```µcad,workbench_expression_model
 sketch k() {
-  __builtin::geo2d::circle(radius=1);
+  __builtin::geo2d::Circle(radius=1);
 } k();
 ```
 
@@ -633,7 +633,7 @@ sketch k() {
 
 ```µcad,body_expression_model
 {
-  __builtin::geo2d::circle(radius=1);
+  __builtin::geo2d::Circle(radius=1);
 }
 ```
 
@@ -699,7 +699,7 @@ fn f() {
 
 ```µcad,function_if
 fn f() {
-  if std::math::PI == 3 { __builtin::geo2d::circle(radius=1); }
+  if std::math::PI == 3 { __builtin::geo2d::Circle(radius=1); }
 } f();
 ```
 
@@ -739,6 +739,6 @@ fn f() {
 
 ```µcad,function_expression_model
 fn f() {
-  __builtin::geo2d::circle(radius=1);
+  __builtin::geo2d::Circle(radius=1);
 } f();
 ```

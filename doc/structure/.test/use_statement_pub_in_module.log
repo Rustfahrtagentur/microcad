@@ -13,7 +13,7 @@
  7:     pub use name::space::*;
  8: }
  9: 
-10: my::circle(r = 4mm);
+10: my::Circle(r = 4mm);
 11: my::rect(size = 40mm);
 
 -- Output --

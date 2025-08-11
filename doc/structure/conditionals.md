@@ -9,9 +9,9 @@ Conditions lead to different executions paths for different cases.
 ```µcad,if_models
 sketch my_sketch(a: Integer) {
     if a == 1 {
-        std::geo2d::circle(radius = 1mm)
+        std::geo2d::Circle(radius = 1mm)
     } else {
-        std::geo2d::circle(radius = 4mm)
+        std::geo2d::Circle(radius = 4mm)
     }
 }
 

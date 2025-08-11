@@ -29,7 +29,7 @@
 23:     i = 1;
 24:     
 25:     // create circle
-26:     std::geo2d::circle(radius);
+26:     std::geo2d::Circle(radius);
 27: }
 28: 
 29: use std::debug::assert;

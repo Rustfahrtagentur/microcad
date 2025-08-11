@@ -66,7 +66,7 @@ sketch wheel(radius: Length) {
     i = 1;
     
     // create circle
-    std::geo2d::circle(radius);
+    std::geo2d::Circle(radius);
 }
 
 use std::debug::assert;
@@ -96,7 +96,7 @@ or externally.
 // sketch with a `radius` as building plan
 sketch wheel(radius: Length) {
     // access property `radius` from the building plan
-    std::geo2d::circle(radius);
+    std::geo2d::Circle(radius);
 }
 
 std::debug::assert_eq([wheel(5cm).radius, 5cm]);
@@ -112,7 +112,7 @@ One may define multiple initializers which must have different parameter lists.
 ```µcad,initializers#todo_fail
 sketch wheel(radius: Length) {
     init( radius: Length ) {} // error: same parameters as in building plan
-    std::geo2d::circle(1mm);
+    std::geo2d::Circle(1mm);
 }
 
 wheel(radius = 1.0mm);
@@ -136,7 +136,7 @@ sketch wheel(radius: Length, thickness: Length) {
     }
 
     // Now radius and thickness can be used
-    std::geo2d::circle(radius) - std::geo2d::circle(radius - thickness);
+    std::geo2d::Circle(radius) - std::geo2d::Circle(radius - thickness);
 }
 
 // call with building plan
@@ -186,7 +186,7 @@ sketch wheel(radius: Length) {
     prop diameter = radius * FACTOR;
     
     // code body
-    std::geo2d::circle(radius);
+    std::geo2d::Circle(radius);
 }
 
 __builtin::debug::assert(wheel(5cm).radius == 5cm);
@@ -223,7 +223,7 @@ Usually it produces one or many 2D or 3D objects on base of the given
 ```µcad,code
 sketch wheel(radius: Length) {
     // building code starts here
-    std::geo2d::circle(radius);
+    std::geo2d::Circle(radius);
 }
 
 wheel(radius = 1.0mm)
@@ -239,7 +239,7 @@ sketch wheel(radius: Length) {
     init( diameter: Length ) { radius = diameter / 2; }
 
     // building code starts here
-    std::geo2d::circle(radius);
+    std::geo2d::Circle(radius);
 }
 ```
 
@@ -252,7 +252,7 @@ It's **not allowed** to use the `sketch`, `part`, `op`, `return` nor `mod` state
 ```µcad,illegal_workbench_statement#fail
 sketch wheel(radius: Length) {
     sketch axis(length: Length) {}  // error
-    std::geo2d::circle(radius);
+    std::geo2d::Circle(radius);
 }
 
 wheel(radius = 1.0mm);
@@ -273,14 +273,14 @@ In the following example we declare a building plan which consists of a `radius`
 // `outer` will automatically become a property because
 // it is declared in the building plan:
 sketch wheel(outer: Length) {
-    use std::geo2d::circle;
+    use std::geo2d::Circle;
 
     // `inner` is declared as property and maybe read from 
     // outside this workbench
     prop inner = outer / 2;
 
     // generate wheel (and use property inner)
-    circle(outer) - circle(inner);
+    Circle(outer) - Circle(inner);
 }
 
 // evaluate wheel
@@ -297,13 +297,13 @@ If you remove the `prop` keyword you will fail at accessing `inner`:
 
 ```µcad,property_wrong#fail
 sketch wheel(outer: Length) {
-    use std::geo2d::circle;
+    use std::geo2d::Circle;
 
     // `inner` is declared as variable and may not be read
     // from outside this workbench
     inner = outer / 2;
 
-    circle(outer) - circle(inner);
+    Circle(outer) - Circle(inner);
 }
 
 t = wheel(outer = 1cm);

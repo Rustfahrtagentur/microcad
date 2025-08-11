@@ -8,7 +8,7 @@
  2: 
  3: use std::geo2d;
  4: 
- 5: geo2d::circle(r = 40mm);
+ 5: geo2d::Circle(r = 40mm);
 
 -- Output --
 -- Errors --

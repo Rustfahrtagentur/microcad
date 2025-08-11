@@ -6,7 +6,7 @@ assert(true);
 use std::debug::*;
 
 // use symbol `circle` in file `geo2d.µcad`
-use std::geo2d::circle;
+use std::geo2d::Circle;
 assert_valid(circle);
 
 // use all symbols in file `geo3d.µcad`
@@ -29,7 +29,7 @@ assert_valid(ops);
 assert_invalid(use_test::ops);
 
 part my_part() {
-    circle(radius=1);
+    Circle(radius=1);
     sphere(radius=1);
 }
 

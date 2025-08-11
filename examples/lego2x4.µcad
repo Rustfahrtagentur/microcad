@@ -10,7 +10,7 @@ part lego2x4_brick() {
 
     extrude(height = 8.6mm) {
         translate(x = [-8,0,8]mm) {
-            circle(d = 6.51mm) - circle(d = 4.8mm);
+            Circle(d = 6.51mm) - Circle(d = 4.8mm);
         }
 
         rect(width, height) - rect(width = width - wall * 2, height = height - wall * 2);
@@ -24,7 +24,7 @@ part lego2x4_brick() {
     translate(z = 9.6mm)
     extrude(height = 1.8mm) {
         translate(x = [-12,-4,4,12]mm, y = [-4,4]mm)
-            circle(d = 4.8mm);
+            Circle(d = 4.8mm);
     }
 
 }

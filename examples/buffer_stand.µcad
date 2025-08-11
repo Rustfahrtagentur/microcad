@@ -6,12 +6,12 @@ part buffer_stand() {
     size = 5.25in;
     width = 5.875in;
 
-    base = (circle(d = width) & rect(width, height = size / 2))
+    base = (Circle(d = width) & rect(width, height = size / 2))
         .extrude(4.0in);
 
     side = {
         line(height = size/2);
-        circle(d = 1.5in).translate(x = -3.25in);
+        Circle(d = 1.5in).translate(x = -3.25in);
     }
     .hull()
     .extrude(width)
@@ -22,7 +22,7 @@ part buffer_stand() {
         w = 4.25in;
         d = w * 0.5 - 0.5in;
 
-        circle(r = 0.5in, c = (x = [d,-d], y = 0in));
+        Circle(r = 0.5in, c = (x = [d,-d], y = 0in));
         line(width = w, p = (x = -w * 0.5, y = -4.0in));
     }
     .hull()
@@ -41,7 +41,7 @@ part buffer_stand() {
         .translate(x = [2.0, -2.0]in, z = 3.25in);
     
     bottom_bar = {
-        circle(d = 0.15in).translate(x = -1.35in);
+        Circle(d = 0.15in).translate(x = -1.35in);
         line(height = 0.5in);
     }
     .hull()

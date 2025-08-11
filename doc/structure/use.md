@@ -31,10 +31,10 @@ shorten things a lot:
 [![test](.test/use.svg)](.test/use.log)
 
 ```µcad,use
-use std::geo2d::circle;
+use std::geo2d::Circle;
 use std::geo2d::rect;
 
-circle(r = 4mm);
+Circle(r = 4mm);
 rect(size = 40mm);
 ```
 
@@ -47,7 +47,7 @@ circle = 1;
 
 use std::geo2d;
 
-geo2d::circle(r = 40mm);
+geo2d::Circle(r = 40mm);
 ```
 
 ## Use As Statement
@@ -60,7 +60,7 @@ locally rename the *target symbol*:
 ```µcad,use_as
 circle = 1;
 
-use std::geo2d::circle as disk;
+use std::geo2d::Circle as disk;
 
 disk(r = 4mm);
 ```
@@ -74,7 +74,7 @@ geo2d = 1;
 
 use std::geo2d as geo;
 
-geo::circle(r = 4mm);
+geo::Circle(r = 4mm);
 ```
 
 ## Use All Statement
@@ -105,7 +105,7 @@ mod my {
     pub use std::geo2d::*;
 }
 
-my::circle(r = 4mm);
+my::Circle(r = 4mm);
 my::rect(size = 40mm);
 ```
 
@@ -123,6 +123,6 @@ mod my {
     pub use name::space::*;
 }
 
-my::circle(r = 4mm);
+my::Circle(r = 4mm);
 my::rect(size = 40mm);
 ```

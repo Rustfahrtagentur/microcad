@@ -5,21 +5,21 @@ use __builtin::*;
 // The `@children` marker is used to display that all children of the part will be added to the algorithm node
 sketch circle_union(radius: Scalar) {
     {
-        geo2d::circle(radius);
+        geo2d::Circle(radius);
         @children;
     }.ops::union();
 }
 
 // Create a circle node with two children
 a = {
-    geo2d::circle(2.0);
-    geo2d::circle(3.0);
-}.geo2d::circle(1.0);
+    geo2d::Circle(2.0);
+    geo2d::Circle(3.0);
+}.geo2d::Circle(1.0);
 
 // Create a circle_union node with three children
 {
-    geo2d::circle(5.0);
-    geo2d::circle([6.0, 7.0]); // Test multiplicity
+    geo2d::Circle(5.0);
+    geo2d::Circle([6.0, 7.0]); // Test multiplicity
     a;
 }.circle_union(4.0);
 

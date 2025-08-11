@@ -7,7 +7,7 @@
  1: use std::geo2d::*;
  2: use std::ops::*;
  3: 
- 4: circle(r = 4mm)
+ 4: Circle(r = 4mm)
  5:     .translate(x = [-10, 10]mm, y = [-10, 10]mm)
  6:     .hull();
 

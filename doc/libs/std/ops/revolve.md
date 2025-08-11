@@ -6,7 +6,7 @@ The revolve operation revolves a 2D geometry into a 3D geometry.
 
 ```µcad,revolve
 // Construct half of a torus. 
-std::geo2d::circle(radius = 10mm)
+std::geo2d::Circle(radius = 10mm)
     .std::ops::translate(x = 40mm)
     .std::ops::revolve(180°);
 ```
