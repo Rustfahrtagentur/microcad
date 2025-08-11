@@ -3,7 +3,7 @@ use __builtin::*;
 // Define a part `circle_union` with a radius as a parameter
 // If creates an algorithm node with a circle node as a child
 // The `@children` marker is used to display that all children of the part will be added to the algorithm node
-sketch CircleUnion(radius: Scalar) {
+op CircleUnion(radius: Scalar) {
     {
         geo2d::Circle(radius);
         @children;
@@ -14,7 +14,7 @@ sketch CircleUnion(radius: Scalar) {
 a = {
     geo2d::Circle(2.0);
     geo2d::Circle(3.0);
-}.geo2d::Circle(1.0);
+}.ops::translate(x = 1.0, y = 0.0, z = 0.0);
 
 // Create a circle_union node with three children
 {
