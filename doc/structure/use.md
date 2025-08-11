@@ -4,6 +4,7 @@
 - [Use As Statement](#use-as-statement)
 - [Use All Statement](#use-all-statement)
 - [Public Use Statement](#public-use-statement)
+- [Tests](#tests)
 
 When including code from other *modules* or [other files](modules.md#file-modules)
 *fully qualified names* of *symbols* (e.g. `std:geo3d::cube`) often produce much
@@ -32,10 +33,10 @@ shorten things a lot:
 
 ```µcad,use
 use std::geo2d::Circle;
-use std::geo2d::rect;
+use std::geo2d::Rect;
 
 Circle(r = 4mm);
-rect(size = 40mm);
+Rect(size = 40mm);
 ```
 
 You may also use whole the *module* if the names you are using already exist as a symbol:
@@ -106,7 +107,7 @@ mod my {
 }
 
 my::Circle(r = 4mm);
-my::rect(size = 40mm);
+my::Rect(size = 40mm);
 ```
 
 ## Tests
@@ -124,5 +125,5 @@ mod my {
 }
 
 my::Circle(r = 4mm);
-my::rect(size = 40mm);
+my::Rect(size = 40mm);
 ```

@@ -7,7 +7,7 @@ In the following examples the intersection of two circles is calculated.
 [![test](.test/intersection_operator.svg)](.test/intersection_operator.log)
 
 ```µcad,intersection_operator
-std::geo2d::Circle(radius = 3mm) & std::geo2d::rect(width = 3mm, height = 2mm);
+std::geo2d::Circle(radius = 3mm) & std::geo2d::Rect(width = 3mm, height = 2mm);
 ```
 
 ## Alternative intersection operator
@@ -17,6 +17,6 @@ std::geo2d::Circle(radius = 3mm) & std::geo2d::rect(width = 3mm, height = 2mm);
 ```µcad,intersection_alt_operator
 {
     std::geo2d::Circle(radius = 3mm);
-    std::geo2d::rect(width = 3mm, height = 2mm);
+    std::geo2d::Rect(width = 3mm, height = 2mm);
 }.std::ops::intersection();
 ```

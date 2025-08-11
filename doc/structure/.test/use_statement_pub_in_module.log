@@ -1,6 +1,6 @@
 -- Test --
   use_statement_pub_in_module
-  ../doc/structure/use.md:116
+  ../doc/structure/use.md:117
 
 -- Code --
 
@@ -14,7 +14,7 @@
  8: }
  9: 
 10: my::Circle(r = 4mm);
-11: my::rect(size = 40mm);
+11: my::Rect(size = 40mm);
 
 -- Output --
 -- Errors --

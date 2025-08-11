@@ -28,7 +28,7 @@ except that the result is a object node.
 ```µcad,call_workbench
 // definition of a sketch workbench
 sketch square(size: Length) { 
-    std::geo2d::rect(size);
+    std::geo2d::Rect(size);
 }
 
 // call square with a size and store object node in s

@@ -6,7 +6,7 @@
 
  1: // definition of a sketch workbench
  2: sketch square(size: Length) { 
- 3:     std::geo2d::rect(size);
+ 3:     std::geo2d::Rect(size);
  4: }
  5: 
  6: // call square with a size and store object node in s

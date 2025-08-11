@@ -2,5 +2,5 @@ use __builtin::*;
 
 {
     geo2d::Circle(radius = 3.0);
-    geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
+    geo2d::Rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0);
 }

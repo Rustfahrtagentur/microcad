@@ -133,7 +133,7 @@ The following example will produce 4 rectangles at different positions:
 [![test](.test/multiplicity_arrays.svg)](.test/multiplicity_arrays.log)
 
 ```µcad,multiplicity_arrays
-r = std::geo2d::rect(width = 2mm, height = 2mm);
+r = std::geo2d::Rect(width = 2mm, height = 2mm);
 
 r.std::ops::translate(x = [-4mm, 4mm], y = [-4mm, 4mm]);
 ```
@@ -143,7 +143,7 @@ The example results in the following calls:
 [![test](.test/no_multiplicity.svg)](.test/no_multiplicity.log)
 
 ```µcad,no_multiplicity
-r = std::geo2d::rect(width = 2mm, height = 2mm);
+r = std::geo2d::Rect(width = 2mm, height = 2mm);
 
 use std::ops::translate;
 r.translate(x = -4mm, y = -4mm);
@@ -159,7 +159,7 @@ Another example uses an array of tuples and produces the same output:
 [![test](.test/multiplicity_tuple_array.svg)](.test/multiplicity_tuple_array.log)
 
 ```µcad,multiplicity_tuple_array#todo
-r = std::geo2d::rect(width = 2mm, height = 2mm);
+r = std::geo2d::Rect(width = 2mm, height = 2mm);
 
 r.std::ops::translate([(x=-4mm, y=-4mm), (x=-4mm, y=4mm), (x=4mm, y=-4mm), (x=4mm, y=4mm)]);
 ```
@@ -175,5 +175,5 @@ exact same name as the parameters of `Circle()`.
 ```µcad,inline_identifiers
 width = 2mm;
 height = 2mm;
-std::geo2d::rect(width, height);
+std::geo2d::Rect(width, height);
 ```

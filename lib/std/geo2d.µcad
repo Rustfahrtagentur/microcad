@@ -26,7 +26,7 @@ sketch Circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
 ///
 /// Examples:
 /// * centered rect with width `w` and height `h`: `rect(width = 10.0mm, height = 5.0mm);`
-sketch rect(width: Length, height: Length, x: Length, y: Length) {
+sketch Rect(width: Length, height: Length, x: Length, y: Length) {
     init(width: Length, height: Length) {
         x = -width / 2.0; // center x
         y = -height / 2.0; // center y
@@ -46,7 +46,7 @@ sketch rect(width: Length, height: Length, x: Length, y: Length) {
         y = -size / 2.0; // center y
     }
 
-    __builtin::geo2d::rect(
+    __builtin::geo2d::Rect(
             width = width / 1mm,
             height = height / 1mm,
             x = x / 1mm,

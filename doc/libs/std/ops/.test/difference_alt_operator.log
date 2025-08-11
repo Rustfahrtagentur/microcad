@@ -8,7 +8,7 @@
  2: 
  3: {
  4:     geo2d::Circle(radius = 10mm);
- 5:     geo2d::rect(size = 2mm);
+ 5:     geo2d::Rect(size = 2mm);
  6: }.ops::difference();
 
 -- Output --
