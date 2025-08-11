@@ -68,11 +68,11 @@ impl CallMethod<Models> for Models {
             op: Models,
             symbol: &Symbol,
         ) -> EvalResult<Models> {
-            if !models.contains_geometry() {
-                context.warning(name, EvalError::OperationOnEmptyGeometry)?;
-            }
-
             if op.is_operation() {
+                if !models.contains_geometry() {
+                    context.warning(name, EvalError::OperationOnEmptyGeometry)?;
+                }
+
                 let models = op.nest(models);
                 models.set_creator(symbol.clone(), SrcRef::merge(name, args));
                 return Ok(models);
