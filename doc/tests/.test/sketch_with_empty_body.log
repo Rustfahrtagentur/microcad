@@ -1,14 +1,20 @@
 -- Test --
   sketch_with_empty_body
-  ../doc/tests/semicolon.md:38
+  ../doc/tests/semicolon.md:36
 
 -- Code --
 
  1: use std::geo2d::Circle;
  2: 
- 3: {}.Circle(radius = 5mm) // error: sketch with body
+ 3: {}.std::ops::translate(x = 5mm) // warning: Translating empty body.
 
 -- Output --
 -- Errors --
+warning: Calling operation on empty geometry
+  ---> <FROM STR>:3:4
+     |
+   3 | {}.std::ops::translate(x = 5mm) // warning: Translating empty body.
+     |    ^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
 OK BUT SHOULD FAIL

@@ -119,6 +119,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/multiplicity_arrays.svg)](../doc/structure/.test/multiplicity_arrays.log) | [multiplicity_arrays](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/multiplicity_tuple_array.svg)](../doc/structure/.test/multiplicity_tuple_array.log) | [multiplicity_tuple_array](../doc/structure/arguments.md) |
 | [![test](../doc/types/.test/named_tuple_access.svg)](../doc/types/.test/named_tuple_access.log) | [named_tuple_access](../doc/types/tuples.md) |
+| [![test](../doc/tests/.test/nested_workbench.svg)](../doc/tests/.test/nested_workbench.log) | [nested_workbench](../doc/tests/semicolon.md) |
 | [![test](../doc/structure/.test/no_multiplicity.svg)](../doc/structure/.test/no_multiplicity.log) | [no_multiplicity](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/none.svg)](../doc/structure/.test/none.log) | [none](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/op_example.svg)](../doc/structure/.test/op_example.log) | [op_example](../doc/structure/op.md) |
@@ -153,7 +154,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/ops/.test/rotate_3d.svg)](../doc/libs/std/ops/.test/rotate_3d.log) | [rotate_3d](../doc/libs/std/ops/rotate.md) |
 | [![test](../doc/structure/.test/sketch_basic.svg)](../doc/structure/.test/sketch_basic.log) | [sketch_basic](../doc/structure/sketch.md) |
 | [![test](../doc/tests/.test/sketch_missing_semicolon.svg)](../doc/tests/.test/sketch_missing_semicolon.log) | [sketch_missing_semicolon](../doc/tests/semicolon.md) |
-| [![test](../doc/tests/.test/sketch_with_body.svg)](../doc/tests/.test/sketch_with_body.log) | [sketch_with_body](../doc/tests/semicolon.md) |
 | [![test](../doc/tests/.test/sketch_with_empty_body.svg)](../doc/tests/.test/sketch_with_empty_body.log) | [sketch_with_empty_body](../doc/tests/semicolon.md) |
 | [![test](../doc/tests/.test/source_assignment_const.svg)](../doc/tests/.test/source_assignment_const.log) | [source_assignment_const](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_assignment_prop.svg)](../doc/tests/.test/source_assignment_prop.log) | [source_assignment_prop](../doc/tests/statement_usage.md) |

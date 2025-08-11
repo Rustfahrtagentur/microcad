@@ -1,0 +1,20 @@
+-- Test --
+  nested_workbench
+  ../doc/tests/semicolon.md:44
+
+-- Code --
+
+ 1: use std::geo2d::Circle;
+ 2: 
+ 3: Circle(radius = 2mm).Circle(radius = 1mm); // error: sketch with body
+
+-- Output --
+-- Errors --
+error: Circle is not operation.
+  ---> <FROM STR>:3:22
+     |
+   3 | Circle(radius = 2mm).Circle(radius = 1mm); // error: sketch with body
+     |                      ^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

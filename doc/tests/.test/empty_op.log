@@ -1,6 +1,6 @@
 -- Test --
   empty_op
-  ../doc/tests/semicolon.md:54
+  ../doc/tests/semicolon.md:52
 
 -- Code --
 
@@ -9,5 +9,11 @@
 
 -- Output --
 -- Errors --
+warning: Calling operation on empty geometry
+  ---> <FROM STR>:2:4
+     |
+   2 | {}.std::ops::translate(x = 3.0mm);  // Error: Translate empty geometry.
+     |    ^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
 OK BUT SHOULD FAIL
