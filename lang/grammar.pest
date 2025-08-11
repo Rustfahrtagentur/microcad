@@ -290,14 +290,8 @@ primary     = _{ literal | marker | body | call | qualified_name | format_string
 // `,,`: error # No expression
 list_expression = { expression ~ (ws* ~ "," ~ ws* ~ expression)* }
 
-// A nested expression that does end with a body
-// `a {}`: ok # Body at the end
-// `b c`: error # No body at the end
-// `a b()`: error # No body at the end
-expression_no_semicolon = { nested_with_body }
-
 // A statement that is a single expression
-expression_statement = { (attribute_list ~ ws+)? ~ ((expression ~ ws* ~ ";") | expression_no_semicolon) }
+expression_statement = { (attribute_list ~ ws+)? ~ (expression ~ ws* ~ ";") }
 
 // A statement that is a single expression, with optional semicolon
 final_expression_statement = { (attribute_list ~ ws+)? ~ expression ~ (ws* ~ ";")? }

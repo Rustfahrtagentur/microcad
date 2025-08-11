@@ -40,9 +40,6 @@ use crate::{
     value::Value,
 };
 
-#[cfg(test)]
-mod tests;
-
 /// A reference counted, mutable [`Model`].
 #[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Model(RcMut<ModelInner>);

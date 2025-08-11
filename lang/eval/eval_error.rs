@@ -99,10 +99,6 @@ pub enum EvalError {
     #[error("Invalid argument type: {0}")]
     InvalidArgumentType(Type),
 
-    /// Cannot nest item.
-    #[error("Cannot nest item: {0}")]
-    CannotNestItem(NestedItem),
-
     /// Unexpected argument.
     #[error("Unexpected argument: {0}: {1}")]
     UnexpectedArgument(Identifier, Type),
