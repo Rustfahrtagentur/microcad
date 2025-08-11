@@ -231,6 +231,14 @@ pub enum EvalError {
     /// Unexpected source file in expression
     #[error("Unexpected source file {0} in expression")]
     InvalidSelfReference(Identifier),
+
+    /// Unexpected source file in expression
+    #[error("{0} is not operation.")]
+    NotAnOperation(QualifiedName),
+
+    /// Calling an operation on an empty geometry, e.g.: `{}.op()`.
+    #[error("Calling operation on empty geometry")]
+    OperationOnEmptyGeometry,
 }
 
 /// Result type of any evaluation.

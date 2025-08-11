@@ -50,9 +50,20 @@ impl Model {
         Self(inner)
     }
 
-    /// Calculate Depth of the model.
+    /// Calculate depth of the model.
     pub fn depth(&self) -> usize {
         self.parents().count()
+    }
+
+    /// Check if a model contains an operation element.
+    pub fn is_operation(&self) -> bool {
+        self.borrow().element.is_operation()
+    }
+
+    /// Check if this model contains geometry.
+    pub fn contains_geometry(&self) -> bool {
+        let self_ = &self.borrow();
+        self_.element.contains_geometry() || self_.children.contains_geometry()
     }
 
     /// Make a deep copy if this model.

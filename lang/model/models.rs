@@ -22,6 +22,16 @@ impl Models {
         }
     }
 
+    /// Check if all models contain an operation element.
+    pub fn is_operation(&self) -> bool {
+        self.iter().all(Model::is_operation)
+    }
+
+    /// Check if any model in the collection contains a geometry.
+    pub fn contains_geometry(&self) -> bool {
+        self.iter().any(Model::contains_geometry)
+    }
+
     /// Returns a property of the included models.
     pub fn fetch_property(&self, id: &Identifier) -> Option<Value> {
         if let Some(model) = self.single_model() {
@@ -40,9 +50,9 @@ impl Models {
     }
 
     /// Nest models in self.
-    pub fn nest(self, models: &Models) -> Self {
+    pub fn nest(self, op: &Models) -> Self {
         self.iter().for_each(|new_parent| {
-            models.iter().for_each(|model| {
+            op.iter().for_each(|model| {
                 model.detach();
 
                 // Handle children marker.
