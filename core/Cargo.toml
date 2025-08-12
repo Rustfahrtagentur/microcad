@@ -27,7 +27,6 @@ strum = { version = "0.27", features = ["derive"] }
 thiserror = "2.0"
 toml = "0.9"
 serde = { version = "1", features = ["derive", "rc"] }
-bincode = { version = "2.0", features = ["serde"] }
 
 [features]
 default = ["geo3d"]

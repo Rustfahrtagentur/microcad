@@ -131,20 +131,3 @@ impl From<TriangleMesh> for Geometry3D {
         Geometry3D::Mesh(mesh)
     }
 }
-
-impl bincode::Encode for Geometry3D {
-    fn encode<E: bincode::enc::Encoder>(
-        &self,
-        encoder: &mut E,
-    ) -> Result<(), bincode::error::EncodeError> {
-        todo!()
-    }
-}
-
-impl<C> bincode::Decode<C> for Geometry3D {
-    fn decode<D: bincode::de::Decoder<Context = C>>(
-        decoder: &mut D,
-    ) -> Result<Self, bincode::error::DecodeError> {
-        todo!()
-    }
-}

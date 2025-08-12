@@ -4,9 +4,7 @@
 use crate::Scalar;
 
 /// 2D size in millimeters.  
-#[derive(
-    Clone, Default, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
-)]
+#[derive(Clone, Default, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Size2 {
     /// Width in mm.
     pub width: Scalar,

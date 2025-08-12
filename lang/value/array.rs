@@ -7,16 +7,7 @@ use crate::{ty::*, value::*};
 use derive_more::{Deref, DerefMut};
 
 /// Collection of values of the same type.
-#[derive(
-    Clone,
-    Debug,
-    Deref,
-    DerefMut,
-    bincode::Encode,
-    bincode::Decode,
-    serde::Serialize,
-    serde::Deserialize,
-)]
+#[derive(Clone, Debug, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Array {
     /// List of values
     #[deref]

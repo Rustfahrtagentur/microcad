@@ -169,20 +169,3 @@ pub fn polygon_to_vec(polygon: &Polygon) -> Vec<Scalar> {
 pub fn multi_polygon_to_vec(multi_polygon: &MultiPolygon) -> Vec<Vec<Scalar>> {
     multi_polygon.0.iter().map(polygon_to_vec).collect()
 }
-
-impl bincode::Encode for Circle {
-    fn encode<E: bincode::enc::Encoder>(
-        &self,
-        encoder: &mut E,
-    ) -> Result<(), bincode::error::EncodeError> {
-        todo!()
-    }
-}
-
-impl<C> bincode::Decode<C> for Circle {
-    fn decode<D: bincode::de::Decoder<Context = C>>(
-        decoder: &mut D,
-    ) -> Result<Self, bincode::error::DecodeError> {
-        todo!()
-    }
-}

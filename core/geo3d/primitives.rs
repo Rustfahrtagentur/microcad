@@ -28,25 +28,8 @@ impl FetchBounds3D for Cube {
     }
 }
 
-impl bincode::Encode for Cube {
-    fn encode<E: bincode::enc::Encoder>(
-        &self,
-        encoder: &mut E,
-    ) -> Result<(), bincode::error::EncodeError> {
-        todo!()
-    }
-}
-
-impl<C> bincode::Decode<C> for Cube {
-    fn decode<D: bincode::de::Decoder<Context = C>>(
-        decoder: &mut D,
-    ) -> Result<Self, bincode::error::DecodeError> {
-        todo!()
-    }
-}
-
 /// The builtin sphere primitive, defined by its radius.
-#[derive(Debug, Clone, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Sphere {
     /// Radius of the sphere in millimeters.
     pub radius: Scalar,
@@ -70,7 +53,7 @@ impl RenderToMesh for Sphere {
 
 /// The built-in cylinder primitive, defined by an bottom radius, top radius and height.
 /// The cylinder is oriented along the z-axis.
-#[derive(Debug, Clone, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Cylinder {
     /// Bottom radius of the cylinder in millimeters.
     pub radius_bottom: Scalar,

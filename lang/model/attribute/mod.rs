@@ -22,7 +22,7 @@ use crate::{create_tuple_value, syntax::*, value::*};
 use microcad_core::{Color, Size2, theme::Theme};
 
 /// A custom command attribute from an exporter, e.g.: `svg = (style = "fill:none")`
-#[derive(Clone, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct CustomCommand {
     /// Attribute id.
     pub id: Identifier,
@@ -31,7 +31,7 @@ pub struct CustomCommand {
 }
 
 /// An attribute for a model.
-#[derive(Clone, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub enum Attribute {
     /// Color attribute: `color = "red"`
     Color(Color),

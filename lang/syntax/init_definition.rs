@@ -14,7 +14,7 @@ use crate::{src_ref::*, syntax::*};
 ///     init(b: Length) { a = 2.0*b; } // The init definition
 /// }
 /// ```
-#[derive(Clone, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct InitDefinition {
     /// Parameter list for this init definition
     pub parameters: ParameterList,

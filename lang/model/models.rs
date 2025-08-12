@@ -9,16 +9,7 @@ use microcad_core::BooleanOp;
 
 /// Model multiplicities.
 #[derive(
-    Debug,
-    Default,
-    Clone,
-    PartialEq,
-    Deref,
-    DerefMut,
-    bincode::Encode,
-    bincode::Decode,
-    serde::Serialize,
-    serde::Deserialize,
+    Debug, Default, Clone, PartialEq, Deref, DerefMut, serde::Serialize, serde::Deserialize,
 )]
 pub struct Models(Vec<Model>);
 

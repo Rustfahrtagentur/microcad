@@ -8,7 +8,7 @@ use cgmath::InnerSpace;
 use crate::*;
 
 /// Render resolution when rendering things to polygons or meshes.
-#[derive(Debug, Clone, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RenderResolution {
     /// Linear resolution in millimeters (Default = 0.1mm)
     pub linear: Scalar,

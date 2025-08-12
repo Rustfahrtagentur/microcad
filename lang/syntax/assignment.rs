@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*, ty::*};
 
 /// Assignment specifying an identifier, type and value
-#[derive(Clone, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Assignment {
     /// Assignee qualifier
     pub qualifier: Qualifier,

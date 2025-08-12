@@ -10,17 +10,7 @@ use std::collections::BTreeMap;
 /// A list of object properties.
 ///
 /// It is required that properties are always sorted by their id.
-#[derive(
-    Clone,
-    Default,
-    Debug,
-    Deref,
-    DerefMut,
-    bincode::Encode,
-    bincode::Decode,
-    serde::Serialize,
-    serde::Deserialize,
-)]
+#[derive(Clone, Default, Debug, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Properties(BTreeMap<Identifier, Value>);
 
 impl FromIterator<(Identifier, Value)> for Properties {

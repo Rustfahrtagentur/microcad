@@ -6,16 +6,7 @@
 use std::str::FromStr;
 
 /// A color with RGBA channels
-#[derive(
-    Copy,
-    Clone,
-    Debug,
-    PartialEq,
-    bincode::Encode,
-    bincode::Decode,
-    serde::Serialize,
-    serde::Deserialize,
-)]
+#[derive(Copy, Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Color {
     /// red value
     pub r: f32,

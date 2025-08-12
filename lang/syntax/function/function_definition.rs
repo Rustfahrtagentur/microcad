@@ -6,7 +6,7 @@
 use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 
 /// Function definition
-#[derive(Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct FunctionDefinition {
     /// Visibility
     pub visibility: Visibility,

@@ -6,9 +6,7 @@
 use crate::color::Color;
 
 /// Represents a color theme.
-#[derive(
-    Clone, Debug, PartialEq, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Theme {
     /// Name of the theme.
     pub name: String,

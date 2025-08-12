@@ -6,9 +6,7 @@
 use crate::{src_ref::*, ty::*, value::*};
 
 /// Parameter value is the result of evaluating a parameter
-#[derive(
-    Clone, Debug, Default, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
-)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct ParameterValue {
     /// Parameter type
     pub specified_type: Option<Type>,

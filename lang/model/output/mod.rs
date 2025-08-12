@@ -13,7 +13,7 @@ use cgmath::SquareMatrix;
 use microcad_core::{Geometries2D, Geometries3D, Mat3, Mat4, RenderResolution};
 
 /// The model output when a model has been processed.
-#[derive(Debug, Clone, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ModelOutput {
     /// The output geometry.
     pub geometry: GeometryOutput,

@@ -8,9 +8,7 @@ use microcad_core::{Geometries2D, Geometries3D};
 use crate::model::OutputType;
 
 /// Geometry output of the model.
-#[derive(
-    Debug, Default, Clone, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize,
-)]
+#[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub enum GeometryOutput {
     /// No geometry output.
     #[default]

@@ -84,7 +84,7 @@ where
 }
 
 /// Either a loaded *type* or a unloaded *link*
-#[derive(Clone, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub enum LinkInner<T, L> {
     /// Loaded type
     Loaded(T),

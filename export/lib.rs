@@ -3,7 +3,6 @@
 
 //! Export models to files  
 
-pub mod bincode;
 pub mod json;
 pub mod ply;
 pub mod stl;

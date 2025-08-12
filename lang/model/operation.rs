@@ -34,7 +34,7 @@ pub trait Operation: std::fmt::Debug {
 }
 
 /// Transformation matrix
-#[derive(Clone, Debug, bincode::Encode, bincode::Decode, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub enum AffineTransform {
     /// Translation.
     Translation(Vec3),
