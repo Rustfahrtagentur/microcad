@@ -21,10 +21,6 @@ pub enum ValueError {
     #[error("Cannot convert named tuple to color: {0}")]
     CannotConvertToColor(Box<Tuple>),
 
-    /// Type cannot be a key in a map
-    #[error("Type cannot be a key in a map: {0}")]
-    InvalidMapKeyType(Type),
-
     /// Cannot add unit to a value that has already a unit
     #[error("Cannot add unit to a value that has already a unit: {0}")]
     CannotAddUnitToValueWithUnit(Value),
@@ -42,14 +38,12 @@ pub enum ValueError {
     CannotCombineVecOfDifferentType(Type, Type),
 
     /// Tuple length mismatch
-    #[error("Tuple length mismatch for operator {operator}: lhs={lhs}, rhs={rhs}")]
-    TupleLengthMismatchForOperator {
-        /// Operator
-        operator: char,
-        /// Left hand operand
-        lhs: usize,
-        /// Right hand operand
-        rhs: usize,
+    #[error("Tuple type mismatch: lhs={lhs}, rhs={rhs}")]
+    TupleTypeMismatch {
+        /// Left hand operand.
+        lhs: Type,
+        /// Right hand operand.
+        rhs: Type,
     },
 
     /// Duplicate parameter
