@@ -213,6 +213,10 @@ pub enum EvalError {
     /// Calling an operation on an empty geometry, e.g.: `{}.op()`.
     #[error("Calling operation on empty geometry")]
     OperationOnEmptyGeometry,
+
+    /// Cannot call operation without workpiece, e.g. `op()`.
+    #[error("Cannot call operation without workpiece.")]
+    CannotCallOperationWithoutWorkpiece,
 }
 
 /// Result type of any evaluation.
