@@ -17,8 +17,8 @@
 11: 
 12: // use operation punch_disk with two circles
 13: {
-14:     std::geo2d::circle(radius = 1cm);
-15:     std::geo2d::circle(radius = 2cm);
+14:     std::geo2d::Circle(radius = 1cm);
+15:     std::geo2d::Circle(radius = 2cm);
 16: }.punched_disk();
 
 -- Output --

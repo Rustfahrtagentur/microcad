@@ -10,7 +10,7 @@ use crate::{src_ref::*, syntax::*};
 /// Example:
 ///
 /// ```uCAD
-/// part a(a: Length) {
+/// part A(a: Length) {
 ///     init(b: Length) { a = 2.0*b; } // The init definition
 /// }
 /// ```

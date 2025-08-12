@@ -5,12 +5,12 @@
 -- Code --
 
  1: // sketch with a `radius` as building plan
- 2: sketch wheel(radius: Length) {
+ 2: sketch Wheel(radius: Length) {
  3:     // access property `radius` from the building plan
- 4:     std::geo2d::circle(radius);
+ 4:     std::geo2d::Circle(radius);
  5: }
  6: 
- 7: std::debug::assert_eq([wheel(5cm).radius, 5cm]);
+ 7: std::debug::assert_eq([Wheel(5cm).radius, 5cm]);
 
 -- Output --
 -- Errors --

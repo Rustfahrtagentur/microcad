@@ -1,5 +1,5 @@
-// We have part called `lid` with three parameters
-part lid(
+// We have part called `Lid` with three parameters
+part Lid(
     thickness = 1.6mm,
     inner_diameter = 16.0cm,
     height = 20.0mm,
@@ -8,8 +8,8 @@ part lid(
     outer_diameter = 2.0 * thickness + inner_diameter;
 
     // Create two cylinders, one for the outer and one for the inner
-    outer = std::geo3d::cylinder(d = outer_diameter, h = height);
-    inner = std::translate(z = thickness) std::geo3d::cylinder(d = inner_diameter, h = height);
+    outer = std::geo3d::Cylinder(d = outer_diameter, h = height);
+    inner = std::ops::translate(z = thickness) std::geo3d::Cylinder(d = inner_diameter, h = height);
 
     // Calculate the difference between two translated cylinders and output them
     outer - inner;
@@ -17,4 +17,4 @@ part lid(
 
 
 // `l` is the instance of the lid model
-lid();
+Lid();

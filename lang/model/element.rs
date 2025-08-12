@@ -38,6 +38,35 @@ pub enum Element {
     Operation(std::rc::Rc<dyn Operation>),
 }
 
+impl Element {
+    /// Check if an element is an operation.
+    pub fn is_operation(&self) -> bool {
+        match self {
+            Element::Primitive2D(_)
+            | Element::Primitive3D(_)
+            | Element::ChildrenMarker
+            | Element::Group => false,
+            Element::Workpiece(workpiece) => match workpiece.kind {
+                WorkbenchKind::Part | WorkbenchKind::Sketch => false,
+                WorkbenchKind::Operation => true,
+            },
+            Element::Transform(_) | Element::Operation(_) => true,
+        }
+    }
+
+    /// Contains geometry.
+    pub fn contains_geometry(&self) -> bool {
+        match self {
+            Element::ChildrenMarker | Element::Primitive2D(_) | Element::Primitive3D(_) => true,
+            Element::Workpiece(workpiece) => match workpiece.kind {
+                WorkbenchKind::Part | WorkbenchKind::Sketch => false,
+                WorkbenchKind::Operation => false,
+            },
+            Element::Group | Element::Transform(_) | Element::Operation(_) => false,
+        }
+    }
+}
+
 impl std::fmt::Display for Element {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name: &'static str = self.into();

@@ -8,7 +8,7 @@ pub struct Cube;
 
 impl BuiltinWorkbenchDefinition for Cube {
     fn id() -> &'static str {
-        "cube"
+        "Cube"
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

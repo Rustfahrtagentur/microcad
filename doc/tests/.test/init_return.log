@@ -4,9 +4,9 @@
 
 -- Code --
 
- 1: sketch k() { init(l:Length) {
+ 1: sketch K() { init(l:Length) {
  2:   return 1; // error
- 3: } } k(1cm);
+ 3: } } K(1cm);
 
 -- Output --
 -- Errors --
@@ -19,7 +19,7 @@ error: Return statement not available here
 warning: The sketch workbench will produce no 2D output.
   ---> <FROM STR>:1:1
      |
-   1 | sketch k() { init(l:Length) {
+   1 | sketch K() { init(l:Length) {
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --

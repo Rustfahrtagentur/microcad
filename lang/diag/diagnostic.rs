@@ -61,7 +61,7 @@ impl Diagnostic {
     /// error: This is an error
     ///   ---> filename:1:8
     ///     |
-    ///  1  | part circle(radius: length) {}
+    ///  1  | part Circle(radius: length) {}
     ///     |        ^^^^^^
     /// ```
     pub fn pretty_print(

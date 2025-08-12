@@ -81,3 +81,57 @@ assert_eq([tuple,(1m,2m)]);
 assert_eq([tuple.width,1m]);
 assert_eq([tuple.height,2m]);
 ```
+
+## Tuple operators
+
+### Addition `*`
+
+#### Adding two tuples of the same type
+
+```µcad,tuple_add_same
+a = (x = 1.0mm, y = 2.0mm);
+b = (x = 3.0mm, y = 4.0mm);
+std::debug::assert_eq([a + b, (x = 4.0mm, y = 6.0mm)]);
+```
+
+```µcad,tuple_add_different#fail
+a = (x = 1.0mm, y = 2.0mm);
+b = (x = 3.0mm, z = 4.0mm);
+c = a + b; // error: Tuple type mismatch for +: lhs=(x: Length, y: Length), rhs=(x: Length, z: Length)
+std::debug::assert_eq([c, (x = 4.0mm, y = 6.0mm)]); // error: Array elements have different types: [<INVALID TYPE>, (x: Length, y: Length)]
+```
+
+### Subtraction `-`
+
+#### Subtracting a quantity
+
+```µcad,tuple_sub
+a = (x = 2.0mm, y = 3.0mm);
+b = (x = 1.0mm, y = 4.0mm);
+std::debug::assert_eq([a - b, (x = 1.0mm, y = -1.0mm)]);
+```
+
+### Multiplication `*`
+
+#### Scaling a tuple
+
+```µcad,tuple_mul_scale
+v = (x = 1.0mm, y = 2.0mm);
+std::debug::assert_eq([v*2, (x = 2.0mm, y = 4.0mm)]);
+```
+
+### Division `/`
+
+#### Dividing a tuple by a value
+
+```µcad,tuple_div
+v = (x = 1.0mm, y = 2.0mm);
+std::debug::assert_eq([v/2, (x = 0.5mm, y = 1.0mm)]);
+```
+
+### Negation `-`
+
+```µcad,tuple_neg
+v = (x = 1.0mm, y = 2.0mm);
+std::debug::assert_eq([-v, (x = -1.0mm, y = -2.0mm)]);
+```

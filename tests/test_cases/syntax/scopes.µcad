@@ -20,7 +20,7 @@ __builtin::debug::assert_invalid(c);
     __builtin::debug::assert_valid(a);
     __builtin::debug::assert_valid(b);
     __builtin::debug::assert_valid(c);
-}
+};
 
 __builtin::debug::assert_valid(a);
 __builtin::debug::assert_invalid(b);

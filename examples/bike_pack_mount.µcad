@@ -1,0 +1,70 @@
+use std::geo2d::*;
+use std::ops::*;
+use std::math::*;
+
+
+
+
+
+sketch RoundedRect(
+    width: Length,
+    height: Length,
+    radius: Length) {
+    
+    w = width / 2 - radius;
+    h = height / 2 - radius;
+    Circle(radius, c = (x = [w,-w], y = [h, -h])).hull();
+}
+
+
+mod bike_pack_mount {
+    sketch Base(
+        width = 130.0mm,
+        height = 23.5mm,
+        radius = 3mm,
+    ) {
+        RoundedRect(width, height, radius);
+    }
+
+    part RackRails(
+        rack_rail_distance = 100mm,
+        rack_rail_diameter = 10.5mm,
+    ) {
+        {
+            rd = (rack_rail_distance + rack_rail_diameter) / 2; 
+            Circle(d = rack_rail_diameter, c = (x = [-0.5,0.5]mm, y = 0mm)).hull()
+                .translate(x = [-rd, rd]);
+        }
+        .extrude(40mm)
+        .orient(Y)
+        .translate(y = -15mm);
+    }
+
+    part Mount(
+        height: Length,
+        screw_distance = 94mm,
+        screw_hole_diameter = 6mm,
+        rack_rail_distance = 100mm,
+        rack_rail_diameter = 10.5mm,
+    ) {
+        use bike_pack_mount::*;
+        d = screw_distance / 2;
+        screws = Circle(d = screw_hole_diameter, c = (x = [-d,d], y = 0.0mm));
+
+        base().extrude(height) - screws.extrude(height + 10mm) - bike_pack_mount::rack_rails();
+    }
+
+    part Lower() {
+        bike_pack_mount::Mount(height = 15mm);
+    }
+
+    part Upper() {
+        bike_pack_mount::Mount(height = 55mm);
+    }
+}
+
+bike_pack_mount::Lower();
+//bike_pack_mount::Upper().translate(y = 40mm);
+
+
+

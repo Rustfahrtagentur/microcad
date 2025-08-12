@@ -3,17 +3,21 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**215** tests from markdown.
+**226** tests from markdown.
 
 | Result | Name |
 |-------:|------|
 | [![test](../doc/structure/.test/argument_match_mix.svg)](../doc/structure/.test/argument_match_mix.log) | [argument_match_mix](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/argument_match_name.svg)](../doc/structure/.test/argument_match_name.log) | [argument_match_name](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/argument_match_type.svg)](../doc/structure/.test/argument_match_type.log) | [argument_match_type](../doc/structure/arguments.md) |
-| [![test](../doc/structure/.test/array_expressions.svg)](../doc/structure/.test/array_expressions.log) | [array_expressions](../doc/structure/arrays.md) |
-| [![test](../doc/structure/.test/array_operations.svg)](../doc/structure/.test/array_operations.log) | [array_operations](../doc/structure/arrays.md) |
+| [![test](../doc/types/.test/array_add.svg)](../doc/types/.test/array_add.log) | [array_add](../doc/types/arrays.md) |
+| [![test](../doc/types/.test/array_div.svg)](../doc/types/.test/array_div.log) | [array_div](../doc/types/arrays.md) |
+| [![test](../doc/types/.test/array_expressions.svg)](../doc/types/.test/array_expressions.log) | [array_expressions](../doc/types/arrays.md) |
+| [![test](../doc/types/.test/array_mul_scale.svg)](../doc/types/.test/array_mul_scale.log) | [array_mul_scale](../doc/types/arrays.md) |
+| [![test](../doc/types/.test/array_neg.svg)](../doc/types/.test/array_neg.log) | [array_neg](../doc/types/arrays.md) |
+| [![test](../doc/types/.test/array_sub.svg)](../doc/types/.test/array_sub.log) | [array_sub](../doc/types/arrays.md) |
 | [![test](../doc/types/.test/array_unit_bundling.svg)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/arrays.md) |
-| [![test](../doc/structure/.test/arrays_and_comments.svg)](../doc/structure/.test/arrays_and_comments.log) | [arrays_and_comments](../doc/structure/arrays.md) |
+| [![test](../doc/types/.test/arrays_and_comments.svg)](../doc/types/.test/arrays_and_comments.log) | [arrays_and_comments](../doc/types/arrays.md) |
 | [![test](../doc/structure/.test/assignment.svg)](../doc/structure/.test/assignment.log) | [assignment](../doc/structure/assignments.md) |
 | [![test](../doc/structure/.test/assignment_immutable.svg)](../doc/structure/.test/assignment_immutable.log) | [assignment_immutable](../doc/structure/assignments.md) |
 | [![test](../doc/.test/attributes_color.svg)](../doc/.test/attributes_color.log) | [attributes_color](../doc/attributes.md) |
@@ -96,6 +100,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/math/.test/math_abs.svg)](../doc/libs/std/math/.test/math_abs.log) | [math_abs](../doc/libs/std/math/README.md) |
 | [![test](../doc/libs/std/math/.test/math_trigonometric.svg)](../doc/libs/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/libs/std/math/README.md) |
 | [![test](../doc/nodes/.test/measure.svg)](../doc/nodes/.test/measure.log) | [measure](../doc/nodes/measures.md) |
+| [![test](../doc/libs/std/ops/.test/mirror_3d.svg)](../doc/libs/std/ops/.test/mirror_3d.log) | [mirror_3d](../doc/libs/std/ops/mirror.md) |
 | [![test](../doc/structure/.test/missed_property.svg)](../doc/structure/.test/missed_property.log) | [missed_property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/mod.svg)](../doc/structure/.test/mod.log) | [mod](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/mod_example.svg)](../doc/structure/.test/mod_example.log) | [mod_example](../doc/structure/modules.md) |
@@ -115,6 +120,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/multiplicity_arrays.svg)](../doc/structure/.test/multiplicity_arrays.log) | [multiplicity_arrays](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/multiplicity_tuple_array.svg)](../doc/structure/.test/multiplicity_tuple_array.log) | [multiplicity_tuple_array](../doc/structure/arguments.md) |
 | [![test](../doc/types/.test/named_tuple_access.svg)](../doc/types/.test/named_tuple_access.log) | [named_tuple_access](../doc/types/tuples.md) |
+| [![test](../doc/tests/.test/nested_workbench.svg)](../doc/tests/.test/nested_workbench.log) | [nested_workbench](../doc/tests/semicolon.md) |
 | [![test](../doc/structure/.test/no_multiplicity.svg)](../doc/structure/.test/no_multiplicity.log) | [no_multiplicity](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/none.svg)](../doc/structure/.test/none.log) | [none](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/op_example.svg)](../doc/structure/.test/op_example.log) | [op_example](../doc/structure/op.md) |
@@ -141,7 +147,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/property.svg)](../doc/structure/.test/property.log) | [property](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/property_wrong.svg)](../doc/structure/.test/property_wrong.log) | [property_wrong](../doc/structure/workbench.md) |
 | [![test](../doc/types/.test/quantity_types_number_literals.svg)](../doc/types/.test/quantity_types_number_literals.log) | [quantity_types_number_literals](../doc/types/quantity.md) |
-| [![test](../doc/structure/.test/range_expressions.svg)](../doc/structure/.test/range_expressions.log) | [range_expressions](../doc/structure/arrays.md) |
+| [![test](../doc/types/.test/range_expressions.svg)](../doc/types/.test/range_expressions.log) | [range_expressions](../doc/types/arrays.md) |
 | [![test](../doc/structure/.test/return.svg)](../doc/structure/.test/return.log) | [return](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/return_twice.svg)](../doc/structure/.test/return_twice.log) | [return_twice](../doc/structure/functions.md) |
 | [![test](../doc/libs/std/ops/.test/revolve.svg)](../doc/libs/std/ops/.test/revolve.log) | [revolve](../doc/libs/std/ops/revolve.md) |
@@ -149,7 +155,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/ops/.test/rotate_3d.svg)](../doc/libs/std/ops/.test/rotate_3d.log) | [rotate_3d](../doc/libs/std/ops/rotate.md) |
 | [![test](../doc/structure/.test/sketch_basic.svg)](../doc/structure/.test/sketch_basic.log) | [sketch_basic](../doc/structure/sketch.md) |
 | [![test](../doc/tests/.test/sketch_missing_semicolon.svg)](../doc/tests/.test/sketch_missing_semicolon.log) | [sketch_missing_semicolon](../doc/tests/semicolon.md) |
-| [![test](../doc/tests/.test/sketch_with_body.svg)](../doc/tests/.test/sketch_with_body.log) | [sketch_with_body](../doc/tests/semicolon.md) |
 | [![test](../doc/tests/.test/sketch_with_empty_body.svg)](../doc/tests/.test/sketch_with_empty_body.log) | [sketch_with_empty_body](../doc/tests/semicolon.md) |
 | [![test](../doc/tests/.test/source_assignment_const.svg)](../doc/tests/.test/source_assignment_const.log) | [source_assignment_const](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_assignment_prop.svg)](../doc/tests/.test/source_assignment_prop.log) | [source_assignment_prop](../doc/tests/statement_usage.md) |
@@ -165,13 +170,19 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/source_use.svg)](../doc/tests/.test/source_use.log) | [source_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_workbench.svg)](../doc/tests/.test/source_workbench.log) | [source_workbench](../doc/tests/statement_usage.md) |
 | [![test](../doc/.test/toml_import.svg)](../doc/.test/toml_import.log) | [toml_import](../doc/import.md) |
+| [![test](../doc/types/.test/tuple_add_different.svg)](../doc/types/.test/tuple_add_different.log) | [tuple_add_different](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_add_same.svg)](../doc/types/.test/tuple_add_same.log) | [tuple_add_same](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_assignment.svg)](../doc/types/.test/tuple_assignment.log) | [tuple_assignment](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_assignment_bundle.svg)](../doc/types/.test/tuple_assignment_bundle.log) | [tuple_assignment_bundle](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_assignment_convert.svg)](../doc/types/.test/tuple_assignment_convert.log) | [tuple_assignment_convert](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_div.svg)](../doc/types/.test/tuple_div.log) | [tuple_div](../doc/types/tuples.md) |
 | [![test](../doc/structure/.test/tuple_match.svg)](../doc/structure/.test/tuple_match.log) | [tuple_match](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/tuple_match_errors.svg)](../doc/structure/.test/tuple_match_errors.log) | [tuple_match_errors](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/tuple_match_variants.svg)](../doc/structure/.test/tuple_match_variants.log) | [tuple_match_variants](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/tuple_match_warnings.svg)](../doc/structure/.test/tuple_match_warnings.log) | [tuple_match_warnings](../doc/structure/arguments.md) |
+| [![test](../doc/types/.test/tuple_mul_scale.svg)](../doc/types/.test/tuple_mul_scale.log) | [tuple_mul_scale](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_neg.svg)](../doc/types/.test/tuple_neg.log) | [tuple_neg](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_sub.svg)](../doc/types/.test/tuple_sub.log) | [tuple_sub](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/types_bundles_functions.svg)](../doc/types/.test/types_bundles_functions.log) | [types_bundles_functions](../doc/types/README.md) |
 | [![test](../doc/types/.test/types_def_vs_decl.svg)](../doc/types/.test/types_def_vs_decl.log) | [types_def_vs_decl](../doc/types/README.md) |
 | [![test](../doc/types/.test/types_named_tuple.svg)](../doc/types/.test/types_named_tuple.log) | [types_named_tuple](../doc/types/named_tuple.md) |

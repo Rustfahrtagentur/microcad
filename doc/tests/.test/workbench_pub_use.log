@@ -4,16 +4,16 @@
 
 -- Code --
 
- 1: sketch k() {
+ 1: sketch K() {
  2:   pub use std; // error
- 3: } k();
+ 3: } K();
 
 -- Output --
 -- Errors --
 warning: The sketch workbench will produce no 2D output.
   ---> <FROM STR>:1:1
      |
-   1 | sketch k() {
+   1 | sketch K() {
      | ^^^^^^^^^^^^
      |
 -- Test Result --

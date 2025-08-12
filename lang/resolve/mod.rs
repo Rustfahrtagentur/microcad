@@ -34,29 +34,29 @@ pub trait FullyQualify {
 #[test]
 fn resolve_source_file() {
     let source_file =
-        SourceFile::load_from_str(r#"part a() { part b() {} } "#).expect("Valid source");
+        SourceFile::load_from_str(r#"part A() { part B() {} } "#).expect("Valid source");
 
     let symbol_node = source_file.resolve(None);
 
     // file <no file>
     //  part a
     //   part b
-    assert!(symbol_node.get(&"a".into()).is_some());
+    assert!(symbol_node.get(&"A".into()).is_some());
     assert!(symbol_node.get(&"c".into()).is_none());
 
-    assert!(symbol_node.search(&"a".into()).is_some());
-    assert!(symbol_node.search(&"a::b".into()).is_some());
-    assert!(symbol_node.search(&"a::b::c".into()).is_none());
+    assert!(symbol_node.search(&"A".into()).is_some());
+    assert!(symbol_node.search(&"A::B".into()).is_some());
+    assert!(symbol_node.search(&"A::B::C".into()).is_none());
 
     // use std::print; // Add symbol "print" to current symbol node
-    // part m() {
+    // part M() {
     //      print("test"); // Use symbol node from parent
     // }
 
     log::trace!("Symbol node:\n{symbol_node}");
 
-    let b = symbol_node.search(&"a::b".into()).expect("cant find node");
-    assert!(b.search(&"a".into()).is_none());
+    let b = symbol_node.search(&"A::B".into()).expect("cant find node");
+    assert!(b.search(&"A".into()).is_none());
 
     //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
 

@@ -75,10 +75,10 @@ fn parse_source_file() {
     let source_file = Parser::parse_rule::<SourceFile>(
         Rule::source_file,
         r#"use std::log::info;
-            part foo(r: Scalar) {
+            part Foo(r: Scalar) {
                 info("Hello, world, {r}!");
             }
-            foo(20.0);
+            Foo(20.0);
             "#,
         0,
     )

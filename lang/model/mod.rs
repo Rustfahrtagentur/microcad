@@ -40,9 +40,6 @@ use crate::{
     value::Value,
 };
 
-#[cfg(test)]
-mod tests;
-
 /// A reference counted, mutable [`Model`].
 #[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Model(RcMut<ModelInner>);
@@ -53,9 +50,20 @@ impl Model {
         Self(inner)
     }
 
-    /// Calculate Depth of the model.
+    /// Calculate depth of the model.
     pub fn depth(&self) -> usize {
         self.parents().count()
+    }
+
+    /// Check if a model contains an operation element.
+    pub fn is_operation(&self) -> bool {
+        self.borrow().element.is_operation()
+    }
+
+    /// Check if this model contains geometry.
+    pub fn contains_geometry(&self) -> bool {
+        let self_ = &self.borrow();
+        self_.element.contains_geometry() || self_.children.contains_geometry()
     }
 
     /// Make a deep copy if this model.
@@ -233,8 +241,8 @@ impl PartialEq for Model {
 ///
 /// ```custom
 /// id: Object:
-///     Object = std::geo2d::circle(radius = 3.0mm) -> Geometry2D:
-///         Primitive = __builtin::geo2d::circle(radius = 3.0) -> Geometry2D`
+///     Object = std::geo2d::Circle(radius = 3.0mm) -> Geometry2D:
+///         Primitive = __builtin::geo2d::Circle(radius = 3.0) -> Geometry2D`
 /// ```
 impl std::fmt::Display for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

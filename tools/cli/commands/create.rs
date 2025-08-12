@@ -28,11 +28,11 @@ impl RunCommand for Create {
                 r#"// µcad generated file
 use std::*;
 
-sketch main() {
+sketch Main() {
   print("Hello µcad");
 }
 
-main();
+Main();
 "#
                 .as_bytes(),
             )?;

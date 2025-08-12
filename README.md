@@ -45,13 +45,13 @@ use std::math::*;
 use std::ops::*;
 use std::geo3d::*;
 
-part csg_cube(size: Length) {
-    body = sphere(r = size / 1.5) & cube(size);
-    holes = cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
+part CsgCube(size: Length) {
+    body = Sphere(r = size / 1.5) & Cube(size);
+    holes = Cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
     body - holes;
 }
 
-csg_cube(50mm);
+CsgCube(50mm);
 ```
 
 ## Installation

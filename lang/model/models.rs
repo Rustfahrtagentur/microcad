@@ -22,6 +22,16 @@ impl Models {
         }
     }
 
+    /// Check if all models contain an operation element.
+    pub fn is_operation(&self) -> bool {
+        self.iter().all(Model::is_operation)
+    }
+
+    /// Check if any model in the collection contains a geometry.
+    pub fn contains_geometry(&self) -> bool {
+        self.iter().any(Model::contains_geometry)
+    }
+
     /// Returns a property of the included models.
     pub fn fetch_property(&self, id: &Identifier) -> Option<Value> {
         if let Some(model) = self.single_model() {
@@ -40,9 +50,9 @@ impl Models {
     }
 
     /// Nest models in self.
-    pub fn nest(self, models: &Models) -> Self {
+    pub fn nest(self, op: &Models) -> Self {
         self.iter().for_each(|new_parent| {
-            models.iter().for_each(|model| {
+            op.iter().for_each(|model| {
                 model.detach();
 
                 // Handle children marker.
@@ -66,80 +76,6 @@ impl Models {
         });
 
         self
-    }
-
-    /// Nest a Vec of model multiplicities
-    ///
-    /// * `model_stack`: A list of model lists.
-    ///
-    /// The reference to the first stack element will be returned.
-    ///
-    /// Assume, our model stack `Vec<Vec<Model>>` has for lists `a`, `b`, `c`, `d`:
-    /// ```ignore
-    /// let models = vec![
-    ///     vec![obj("a0"), obj("a1")],
-    ///     vec![obj("b0")],
-    ///     vec![obj("c0"), obj("c1"), obj("c2")],
-    ///     vec![obj("d0")],
-    /// ];
-    /// ```
-    ///
-    /// This should result in following model multiplicity:
-    /// a0
-    ///   b0
-    ///     c0
-    ///       d0
-    ///     c1
-    ///       d0
-    ///     c2
-    ///       d0
-    /// a1
-    ///   b0
-    ///     c0
-    ///       d0
-    ///     c1
-    ///       d0
-    ///     c2
-    ///       d0
-    pub fn from_nested_items(items: &[Models]) -> Self {
-        match items.len() {
-            0 => panic!("Model stack must not be empty"),
-            1 => {}
-            n => {
-                (1..n)
-                    .rev()
-                    .map(|i| (&items[i], &items[i - 1]))
-                    .for_each(|(prev, curr)| {
-                        // Insert a copy of each element `model` from `prev`
-                        // as child to each element `new_parent` in `curr`
-                        curr.iter().for_each(|new_parent| {
-                            prev.iter().for_each(|model| {
-                                model.detach();
-
-                                // Handle children marker.
-                                // If we have found a children marker model, use it's parent as
-                                // new parent model.
-                                let new_parent = match &new_parent.find_children_placeholder() {
-                                    Some(children_marker) => {
-                                        let parent = &children_marker
-                                            .borrow()
-                                            .parent
-                                            .clone()
-                                            .expect("Must have a parent");
-                                        children_marker.detach(); // Remove children marker from tree
-                                        parent.clone()
-                                    }
-                                    None => new_parent.clone(),
-                                };
-
-                                new_parent.append(model.make_deep_copy());
-                            });
-                        });
-                    });
-            }
-        }
-
-        items[0].clone()
     }
 
     /// A union operation model for this collection.

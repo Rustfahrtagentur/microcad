@@ -5,8 +5,8 @@
 -- Code --
 
  1: {
- 2:     std::geo2d::circle(radius = 3mm);
- 3:     std::geo2d::rect(width = 3mm, height = 2mm);
+ 2:     std::geo2d::Circle(radius = 3mm);
+ 3:     std::geo2d::Rect(width = 3mm, height = 2mm);
  4: }.std::ops::intersection();
 
 -- Output --

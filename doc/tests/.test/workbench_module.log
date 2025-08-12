@@ -4,9 +4,9 @@
 
 -- Code --
 
- 1: sketch k() {
+ 1: sketch K() {
  2:   mod m {} // error
- 3: } k();
+ 3: } K();
 
 -- Output --
 -- Errors --
@@ -19,7 +19,7 @@ error: Module statement not available here
 warning: The sketch workbench will produce no 2D output.
   ---> <FROM STR>:1:1
      |
-   1 | sketch k() {
+   1 | sketch K() {
      | ^^^^^^^^^^^^
      |
 -- Test Result --

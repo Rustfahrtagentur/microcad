@@ -6,7 +6,7 @@
 
  1: __builtin::debug::assert_eq([
  2:     // use measure area() on a circle
- 3:     std::geo2d::circle(radius=10mm).area(),
+ 3:     std::geo2d::Circle(radius=10mm).area(),
  4: 
  5:     // circle area formula for comparison
  6:     10mm * 10mm * std::math::PI
@@ -17,10 +17,10 @@
 error: Symbol area not found.
   ---> <FROM STR>:3:37
      |
-   3 |     std::geo2d::circle(radius=10mm).area(),
+   3 |     std::geo2d::Circle(radius=10mm).area(),
      |                                     ^^^^
      |
-error: Elements of list have different types: [Models, Area]
+error: Array elements have different types: [Models, Area]
   ---> <FROM STR>:1:29
      |
    1 | __builtin::debug::assert_eq([

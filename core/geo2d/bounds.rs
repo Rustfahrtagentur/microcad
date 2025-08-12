@@ -5,7 +5,7 @@
 
 use geo::{AffineOps, AffineTransform, CoordsIter, coord};
 
-use crate::{Scalar, Size2D, Transformed2D, Vec2, geo2d::Rect, mat3_to_affine_transform};
+use crate::{Scalar, Size2, Transformed2D, Vec2, geo2d::Rect, mat3_to_affine_transform};
 
 /// 2D bounds, essentially an optional bounding rect.
 #[derive(Debug, Default, Clone)]
@@ -124,8 +124,8 @@ impl From<Option<Rect>> for Bounds2D {
     }
 }
 
-impl From<Size2D> for Bounds2D {
-    fn from(value: Size2D) -> Self {
+impl From<Size2> for Bounds2D {
+    fn from(value: Size2) -> Self {
         Self::new(Vec2::new(0.0, 0.0), Vec2::new(value.width, value.height))
     }
 }

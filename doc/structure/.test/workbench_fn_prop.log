@@ -4,21 +4,21 @@
 
 -- Code --
 
- 1: part punched_disk(radius: Length) {
+ 1: part PunchedDisk(radius: Length) {
  2:     fn inner() { 
  3:         prop hole = radius/2;  // eval error: prop not allowed in function
  4:     }
  5: }
  6: 
- 7: punched_disk(1cm);
+ 7: PunchedDisk(1cm);
 
 -- Output --
 -- Errors --
 warning: The part workbench will produce no 3D output.
   ---> <FROM STR>:1:1
      |
-   1 | part punched_disk(radius: Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   1 | part PunchedDisk(radius: Length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 OK BUT SHOULD FAIL

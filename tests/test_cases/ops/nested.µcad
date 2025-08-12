@@ -3,7 +3,7 @@
 use __builtin::*;
 
 #[svg = (style = "fill:red")]
-geo2d::rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0)
+geo2d::Rect(x = 0.0, y = 0.0, width = 10.0, height = 10.0)
     .ops::translate(x = 0.0, y = 15.0, z = 0.0)
     .ops::translate(x = 15.0, y = 0.0, z = 0.0);
         
