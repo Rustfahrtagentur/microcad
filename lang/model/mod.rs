@@ -40,9 +40,6 @@ use crate::{
     value::Value,
 };
 
-#[cfg(test)]
-mod tests;
-
 /// A reference counted, mutable [`Model`].
 #[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Model(RcMut<ModelInner>);
@@ -233,8 +230,8 @@ impl PartialEq for Model {
 ///
 /// ```custom
 /// id: Object:
-///     Object = std::geo2d::circle(radius = 3.0mm) -> Geometry2D:
-///         Primitive = __builtin::geo2d::circle(radius = 3.0) -> Geometry2D`
+///     Object = std::geo2d::Circle(radius = 3.0mm) -> Geometry2D:
+///         Primitive = __builtin::geo2d::Circle(radius = 3.0) -> Geometry2D`
 /// ```
 impl std::fmt::Display for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

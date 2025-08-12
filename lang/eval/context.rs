@@ -335,9 +335,7 @@ impl Grant<FunctionDefinition> for Context {
             matches!(
                 stack_frame,
                 // TODO: check if expression generates models (see test `source_expression``)
-                StackFrame::Source(_, _)
-                    | StackFrame::Module(_, _)
-                    | StackFrame::Workbench(_, _, _)
+                StackFrame::Source(..) | StackFrame::Module(..) | StackFrame::Workbench(..)
             )
         } else {
             false
@@ -352,7 +350,7 @@ impl Grant<FunctionDefinition> for Context {
 impl Grant<InitDefinition> for Context {
     fn grant(&mut self, statement: &InitDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
-            matches!(stack_frame, StackFrame::Workbench(_, _, _))
+            matches!(stack_frame, StackFrame::Workbench(..))
         } else {
             false
         };
@@ -366,10 +364,13 @@ impl Grant<InitDefinition> for Context {
 
 impl Grant<UseStatement> for Context {
     fn grant(&mut self, statement: &UseStatement) -> EvalResult<()> {
-        if self.symbol_table.stack.current_frame().is_some() {
-            Ok(())
-        } else {
-            self.error(statement, EvalError::StatementNotSupported("Use"))
+        match (
+            &statement.visibility,
+            self.symbol_table.stack.current_frame(),
+        ) {
+            (Visibility::Private, _) => Ok(()),
+            (Visibility::Public, Some(StackFrame::Source(..) | StackFrame::Module(..))) => Ok(()),
+            _ => self.error(statement, EvalError::StatementNotSupported("Use")),
         }
     }
 }

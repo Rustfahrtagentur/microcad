@@ -4,12 +4,12 @@
 
 -- Code --
 
- 1: sketch wheel(radius: Length) {
+ 1: sketch Wheel(radius: Length) {
  2:     // building code starts here
- 3:     std::geo2d::circle(radius);
+ 3:     std::geo2d::Circle(radius);
  4: }
  5: 
- 6: wheel(radius = 1.0mm)
+ 6: Wheel(radius = 1.0mm)
 
 -- Output --
 -- Errors --

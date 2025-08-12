@@ -4,24 +4,24 @@
 
 -- Code --
 
- 1: sketch punched_disk(radius: Length) {
- 2:     use std::geo2d::circle;
+ 1: sketch PunchedDisk(radius: Length) {
+ 2:     use std::geo2d::Circle;
  3: 
  4:     // calculate inner from radius in a method
  5:     fn inner() { radius/2 }
  6: 
  7:     // generate donut (and call inner)
- 8:     circle(radius) - circle(inner());
+ 8:     Circle(radius) - Circle(inner());
  9: }
 10: 
-11: punched_disk(radius = 1cm);
+11: PunchedDisk(radius = 1cm);
 
 -- Output --
 -- Errors --
-error: Workbench circle cannot find initialization for those arguments
+error: Workbench Circle cannot find initialization for those arguments
   ---> <FROM STR>:8:29
      |
-   8 |     circle(radius) - circle(inner());
+   8 |     Circle(radius) - Circle(inner());
      |                             ^^^^^^^
      |
 -- Test Result --

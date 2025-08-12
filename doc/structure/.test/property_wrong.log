@@ -4,17 +4,17 @@
 
 -- Code --
 
- 1: sketch wheel(outer: Length) {
- 2:     use std::geo2d::circle;
+ 1: sketch Wheel(outer: Length) {
+ 2:     use std::geo2d::Circle;
  3: 
  4:     // `inner` is declared as variable and may not be read
  5:     // from outside this workbench
  6:     inner = outer / 2;
  7: 
- 8:     circle(outer) - circle(inner);
+ 8:     Circle(outer) - Circle(inner);
  9: }
 10: 
-11: t = wheel(outer = 1cm);
+11: t = Wheel(outer = 1cm);
 12: 
 13: // you can still extract and display `outer`
 14: std::print("outer: {t.outer}");

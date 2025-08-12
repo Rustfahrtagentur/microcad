@@ -6,7 +6,7 @@
 use geo::MultiPolygon;
 use microcad_core::{
     Bounds2D, Circle, Geometry2D, Line, LineString, MultiLineString, Point, Polygon, Rect, Scalar,
-    Size2D, Vec2, geo2d,
+    Size2, Vec2, geo2d,
 };
 
 use crate::svg::CenteredText;
@@ -18,14 +18,14 @@ pub struct Canvas {
     pub rect: geo2d::Rect,
     /// The content rect.
     pub content_rect: geo2d::Rect,
-    /// Size2D.
-    pub size: Size2D,
+    /// Size2.
+    pub size: Size2,
 }
 
 impl Canvas {
     /// Create a new canvas with a size and center the content.
     pub fn new_centered_content(
-        size: Size2D,
+        size: Size2,
         content_rect: geo2d::Rect,
         scale: Option<Scalar>,
     ) -> Self {

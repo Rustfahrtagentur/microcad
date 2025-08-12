@@ -5,7 +5,7 @@
 
 use crate::{syntax::*, ty::*};
 
-/// (Partially named) tuple (e.g. `(n: Scalar, m: String. Integer)`)
+/// (Partially named) tuple (e.g. `(n: Scalar, m: String, Integer)`)
 #[derive(Debug, Clone, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct TupleType {
     pub(crate) named: std::collections::HashMap<Identifier, Type>,
@@ -42,8 +42,8 @@ impl TupleType {
         .collect()
     }
 
-    /// Create new Size2D type.
-    pub fn new_size2d() -> Self {
+    /// Create new Size2 type.
+    pub fn new_size2() -> Self {
         [("width", Type::length()), ("height", Type::length())]
             .into_iter()
             .collect()
@@ -94,8 +94,8 @@ impl TupleType {
         self.is_scalar_only() && self.matches(&["x", "y", "z"])
     }
 
-    /// Check if the named tuple is a [`Size2D`]
-    pub(crate) fn is_size2d(&self) -> bool {
+    /// Check if the named tuple is a [`Size2`]
+    pub(crate) fn is_size2(&self) -> bool {
         self.is_length_only() && self.matches(&["width", "height"])
     }
 }
@@ -144,8 +144,8 @@ impl std::fmt::Display for TupleType {
         if self.is_vec3() {
             return write!(f, "Vec3");
         }
-        if self.is_size2d() {
-            return write!(f, "Size2D");
+        if self.is_size2() {
+            return write!(f, "Size2");
         }
 
         write!(f, "({})", {

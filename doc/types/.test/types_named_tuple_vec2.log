@@ -10,12 +10,5 @@
 
 -- Output --
 -- Errors --
-error: Type mismatch for `v`: expected (), got Vec2
-  ---> <FROM STR>:1:1
-     |
-   1 | v: Vec2 = (x = 2.0, y = 3.0);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Missing arguments: v
 -- Test Result --
-FAIL
+OK

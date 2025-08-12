@@ -15,7 +15,7 @@ These classes of built-in types are supported:
 | [*Array*](arrays.md)                    | A list of values with a *common type*.                  | `e: [Integer] = [1,2,3]`                         |
 | [*Tuple*](tuples.md#tuples)             | A list of values with a *distinct types*.               | `f: (Length, Scalar) = (4mm, 4.0)`               |
 | [*Named tuple*](tuples.md#named-tuples) | A sorted list of key-value pairs with *distinct types*. | `g: (x: Scalar, y: Length) = (x = 4.0, y = 4mm)` |
-| [*Nodes*](nodes.md)                     | A node in the model tree.                               | `h: Node = { cube(2mm); }`                       |
+| [*Models*](nodes.md)                    | Nodes in the model tree.                                | `h: Models = { Cube(2mm); }`                     |
 
 ## Declaration
 

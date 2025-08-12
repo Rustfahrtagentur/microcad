@@ -9,7 +9,7 @@ pub struct Line;
 
 impl BuiltinWorkbenchDefinition for Line {
     fn id() -> &'static str {
-        "line"
+        "Line"
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

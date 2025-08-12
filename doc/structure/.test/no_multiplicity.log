@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: r = std::geo2d::rect(width = 2mm, height = 2mm);
+ 1: r = std::geo2d::Rect(width = 2mm, height = 2mm);
  2: 
  3: use std::ops::translate;
  4: r.translate(x = -4mm, y = -4mm);

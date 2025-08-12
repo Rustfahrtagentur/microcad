@@ -4,11 +4,11 @@
 
 -- Code --
 
- 1: use std::geo2d::circle;
+ 1: use std::geo2d::Circle;
  2: use std::ops::translate;
  3: 
  4: { // op with body
- 5:     circle(radius = 5mm);
+ 5:     Circle(radius = 5mm);
  6: }.translate(y=[-34mm/2 , 34mm/2]);
 
 -- Output --

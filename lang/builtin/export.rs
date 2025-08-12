@@ -45,7 +45,7 @@ pub trait Exporter: FileIoInterface {
     /// ```ucad
     /// #[export = "myfile.foo"]
     /// #[foo = (bar = 42)]
-    /// circle(42mm);
+    /// Circle(42mm);
     /// ```
     fn model_parameters(&self) -> ParameterValueList {
         ParameterValueList::default()

@@ -8,7 +8,7 @@ pub struct Sphere;
 
 impl BuiltinWorkbenchDefinition for Sphere {
     fn id() -> &'static str {
-        "sphere"
+        "Sphere"
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

@@ -4,9 +4,9 @@
 
 -- Code --
 
- 1: sketch k() {
- 2:   __builtin::geo2d::circle(radius=1);
- 3: } k();
+ 1: sketch K() {
+ 2:   __builtin::geo2d::Circle(radius=1);
+ 3: } K();
 
 -- Output --
 -- Errors --

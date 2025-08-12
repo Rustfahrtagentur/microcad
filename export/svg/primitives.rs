@@ -218,14 +218,14 @@ pub struct Grid {
     pub bounds: Bounds2D,
 
     /// Grid cell size.
-    pub cell_size: Size2D,
+    pub cell_size: Size2,
 }
 
 impl Default for Grid {
     fn default() -> Self {
         Self {
             bounds: Bounds2D::default(),
-            cell_size: Size2D {
+            cell_size: Size2 {
                 width: 10.0,
                 height: 10.0,
             },

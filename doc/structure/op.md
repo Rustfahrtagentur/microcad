@@ -14,14 +14,14 @@ So this would be a neutral operation:
 op nop() { @children }
 
 // use operation nop on a circle
-std::geo2d::circle(radius = 1cm).nop();
+std::geo2d::Circle(radius = 1cm).nop();
 ```
 
 ## `@children`
 
 `@children` is a placeholder to tell where child nodes are nested.
 It can also be used to retrieve information about the tree structure
-In the above example `@children` will result in a `std::circle(radius = 1cm)`.
+In the above example `@children` will result in a `std::geo2d::Circle(radius = 1cm)`.
 
 An operation can have multiple children like in this example:
 
@@ -41,8 +41,8 @@ op punched_disk() {
 
 // use operation punch_disk with two circles
 {
-    std::geo2d::circle(radius = 1cm);
-    std::geo2d::circle(radius = 2cm);
+    std::geo2d::Circle(radius = 1cm);
+    std::geo2d::Circle(radius = 2cm);
 }.punched_disk();
 ```
 
@@ -56,7 +56,7 @@ op punch_disk(radius: Length) {
     if @children.count() == 1 {
         { 
             @children;
-            std::geo2d::circle(radius);
+            std::geo2d::Circle(radius);
         }.difference();
     } else {
         std::error("punch_disk must get one object");
@@ -65,6 +65,6 @@ op punch_disk(radius: Length) {
 
 // use operation punch_disk on a circle
 {
-    std::geo2d::circle(radius = 2cm);
+    std::geo2d::Circle(radius = 2cm);
 }.punch_disk(radius = 1cm);
 ```

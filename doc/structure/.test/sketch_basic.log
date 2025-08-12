@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: sketch my_sketch() {}
+ 1: sketch MySketch() {}
 
 -- Output --
 -- Errors --

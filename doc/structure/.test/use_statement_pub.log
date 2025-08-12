@@ -1,6 +1,6 @@
 -- Test --
   use_statement_pub
-  ../doc/structure/use.md:103
+  ../doc/structure/use.md:104
 
 -- Code --
 
@@ -8,8 +8,8 @@
  2:     pub use std::geo2d::*;
  3: }
  4: 
- 5: my::circle(r = 4mm);
- 6: my::rect(size = 40mm);
+ 5: my::Circle(r = 4mm);
+ 6: my::Rect(size = 40mm);
 
 -- Output --
 -- Errors --

@@ -9,7 +9,7 @@ pub struct Rect;
 
 impl BuiltinWorkbenchDefinition for Rect {
     fn id() -> &'static str {
-        "rect"
+        "Rect"
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: sketch wheel(radius: Length) {
+ 1: sketch Wheel(radius: Length) {
  2:     init( width:Length ) { radius = width / 2; }
  3:     
  4:     // error: code between initializers not allowed
@@ -13,7 +13,7 @@
  7:     init( height:Length ) { radius = height / 2; }
  8: }
  9: 
-10: wheel(radius = 1.0mm);
+10: Wheel(radius = 1.0mm);
 
 -- Parse Error --
 Code between initializers is not allowed

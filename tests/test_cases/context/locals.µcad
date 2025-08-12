@@ -14,7 +14,7 @@ i = 1;
 
     // accessing #2
     assert(i == 2);
-}
+};
 
 // accessing #1
 assert(i == 1);
@@ -27,7 +27,7 @@ assert(i == 1);
             assert(i == 1);
         }
     }
-}
+};
 
 // overwrite #1
 i = 3;

@@ -226,7 +226,7 @@ impl From<Pair<'_>> for SrcRef {
 
 #[test]
 fn test_src_ref() {
-    let input = "geo3d::cube(size_x = 3.0, size_y = 3.0, size_z = 3.0);";
+    let input = "geo3d::Cube(size_x = 3.0, size_y = 3.0, size_z = 3.0);";
 
     let cube = 7..11;
     let size_y = 26..32;
@@ -234,6 +234,6 @@ fn test_src_ref() {
     let cube = SrcRef::new(cube, 1, 0, 0);
     let size_y = SrcRef::new(size_y, 1, 0, 0);
 
-    assert_eq!(cube.source_slice(input), "cube");
+    assert_eq!(cube.source_slice(input), "Cube");
     assert_eq!(size_y.source_slice(input), "size_y");
 }

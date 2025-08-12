@@ -255,8 +255,8 @@ impl From<Color> for Tuple {
     }
 }
 
-impl From<Size2D> for Tuple {
-    fn from(size: Size2D) -> Self {
+impl From<Size2> for Tuple {
+    fn from(size: Size2) -> Self {
         create_tuple!(
             width = Value::from(Quantity::length(size.width)),
             height = Value::from(Quantity::length(size.height))
@@ -361,7 +361,7 @@ impl TryFrom<Color> for Value {
     }
 }
 
-impl TryFrom<&Tuple> for Size2D {
+impl TryFrom<&Tuple> for Size2 {
     type Error = ValueError;
 
     fn try_from(tuple: &Tuple) -> Result<Self, Self::Error> {
@@ -380,13 +380,13 @@ impl TryFrom<&Tuple> for Size2D {
                     value: height,
                     quantity_type: QuantityType::Length,
                 })),
-            ) => Ok(Size2D {
+            ) => Ok(Size2 {
                 width: *width,
                 height: *height,
             }),
             _ => Err(ValueError::CannotConvert(
                 tuple.clone().into(),
-                "Size2D".into(),
+                "Size2".into(),
             )),
         }
     }

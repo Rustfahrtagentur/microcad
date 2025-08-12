@@ -72,10 +72,7 @@ impl Parse for ExpressionStatement {
 
         Ok(Self {
             attribute_list: crate::find_rule!(pair, attribute_list)?,
-            expression: pair
-                .find(Rule::expression)
-                .or(crate::find_rule_opt!(pair, expression_no_semicolon))
-                .expect("Expression"),
+            expression: pair.find(Rule::expression).expect("Expression"),
             src_ref: pair.into(),
         })
     }
