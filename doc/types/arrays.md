@@ -90,3 +90,10 @@ std::debug::assert_eq([[-d,d]*2, [-1,1]mm]);
 d = 1.0mm;
 std::debug::assert_eq([[-d,d]/2, [-0.5, 0.5]mm]);
 ```
+
+### Negation `-`
+
+```µcad,array_neg
+d = 1.0mm;
+std::debug::assert_eq([[-d,d], -[d, -d]]);
+```
