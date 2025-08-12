@@ -70,7 +70,7 @@ impl CallMethod<Models> for Models {
         ) -> EvalResult<Models> {
             if op.is_operation() {
                 if !models.contains_geometry() {
-                    context.warning(name, EvalError::OperationOnEmptyGeometry)?;
+                    context.error(name, EvalError::OperationOnEmptyGeometry)?;
                 }
 
                 let models = op.nest(models);

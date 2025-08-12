@@ -36,7 +36,7 @@ use std::ops::translate;
 ```µcad,sketch_with_empty_body#fail
 use std::geo2d::Circle;
 
-{}.std::ops::translate(x = 5mm) // warning: Translating empty body.
+{}.std::ops::translate(x = 5mm) // error: Calling operation on empty geometry
 ```
 
 [![test](.test/sketch_with_body.svg)](.test/sketch_with_body.log)
@@ -50,8 +50,8 @@ Circle(radius = 2mm).Circle(radius = 1mm); // error: sketch with body
 [![test](.test/empty_op.svg)](.test/empty_op.log)
 
 ```µcad,empty_op#fail
-std::ops::translate(x = 3.0mm); // Error: Translate no geometry. 
-{}.std::ops::translate(x = 3.0mm);  // Error: Translate empty geometry.
+std::ops::translate(x = 3.0mm); // error: Cannot call operation without workpiece. 
+{}.std::ops::translate(x = 3.0mm);  // error: Calling operation on empty geometry
 ```
 
 [![test](.test/group.svg)](.test/group.log)
