@@ -1,0 +1,13 @@
+-- Test --
+  tuple_div
+  ../doc/types/tuples.md:127
+
+-- Code --
+
+ 1: v = (x = 1.0mm, y = 2.0mm);
+ 2: std::debug::assert_eq([v/2, (x = 0.5mm, y = 1.0mm)]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

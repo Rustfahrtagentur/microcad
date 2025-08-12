@@ -1,0 +1,13 @@
+-- Test --
+  tuple_neg
+  ../doc/types/tuples.md:134
+
+-- Code --
+
+ 1: v = (x = 1.0mm, y = 2.0mm);
+ 2: std::debug::assert_eq([-v, (x = -1.0mm, y = -2.0mm)]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

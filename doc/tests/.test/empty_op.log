@@ -4,16 +4,22 @@
 
 -- Code --
 
- 1: std::ops::translate(x = 3.0mm); // Error: Translate no geometry. 
- 2: {}.std::ops::translate(x = 3.0mm);  // Error: Translate empty geometry.
+ 1: std::ops::translate(x = 3.0mm); // error: Cannot call operation without workpiece. 
+ 2: {}.std::ops::translate(x = 3.0mm);  // error: Calling operation on empty geometry
 
 -- Output --
 -- Errors --
-warning: Calling operation on empty geometry
+error: Cannot call operation without workpiece.
+  ---> <FROM STR>:1:1
+     |
+   1 | std::ops::translate(x = 3.0mm); // error: Cannot call operation without workpiece. 
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Calling operation on empty geometry
   ---> <FROM STR>:2:4
      |
-   2 | {}.std::ops::translate(x = 3.0mm);  // Error: Translate empty geometry.
+   2 | {}.std::ops::translate(x = 3.0mm);  // error: Calling operation on empty geometry
      |    ^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

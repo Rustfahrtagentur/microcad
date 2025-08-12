@@ -6,15 +6,15 @@
 
  1: use std::geo2d::Circle;
  2: 
- 3: {}.std::ops::translate(x = 5mm) // warning: Translating empty body.
+ 3: {}.std::ops::translate(x = 5mm) // error: Calling operation on empty geometry
 
 -- Output --
 -- Errors --
-warning: Calling operation on empty geometry
+error: Calling operation on empty geometry
   ---> <FROM STR>:3:4
      |
-   3 | {}.std::ops::translate(x = 5mm) // warning: Translating empty body.
+   3 | {}.std::ops::translate(x = 5mm) // error: Calling operation on empty geometry
      |    ^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED
