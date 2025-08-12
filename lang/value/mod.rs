@@ -190,6 +190,7 @@ impl std::ops::Neg for Value {
         match self {
             Value::Integer(n) => Ok(Value::Integer(-n)),
             Value::Quantity(q) => Ok(Value::Quantity(q.neg())),
+            Value::Array(a) => -a,
             _ => Err(ValueError::InvalidOperator("-".into())),
         }
     }

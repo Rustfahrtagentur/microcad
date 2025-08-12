@@ -411,7 +411,7 @@ impl std::fmt::Display for Tuple {
     }
 }
 
-impl crate::ty::Ty for Tuple {
+impl Ty for Tuple {
     fn ty(&self) -> Type {
         Type::Tuple(
             TupleType {

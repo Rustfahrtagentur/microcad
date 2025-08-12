@@ -59,4 +59,8 @@ pub enum ValueError {
     /// Could not find identifier
     #[error("Identifier not found: {0}")]
     IdNotFound(Identifier),
+
+    /// Expected a common type, e.g. for a [`ValueList`].
+    #[error("Common type expected")]
+    CommonTypeExpected,
 }
