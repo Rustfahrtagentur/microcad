@@ -34,7 +34,7 @@ You can generate an array via range expressions: `[1..3]`.
 std::debug::assert_eq([std::count([1,2,3]), 3]);
 ```
 
-## Array operations
+## Array operators
 
 [![test](.test/array_operations.svg)](.test/array_operations.log)
 
@@ -55,7 +55,7 @@ l2 = [1, 2, 3]mm;
 std::debug::assert(l1 == l2);
 ```
 
-### Addition `*`
+### Addition `+`
 
 #### Adding a quantity
 
