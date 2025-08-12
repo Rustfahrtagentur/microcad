@@ -90,6 +90,94 @@ impl Tuple {
         }
     }
 
+    /// Combine two tuples of the same type with an operation.
+    ///
+    /// This function is used for `+` and `-` builtin operators.
+    pub fn combine(
+        self,
+        rhs: Tuple,
+        op: impl Fn(Value, Value) -> ValueResult,
+    ) -> ValueResult<Self> {
+        if self.ty() == rhs.ty() {
+            let mut named = self.named;
+
+            for (key, rhs_val) in rhs.named {
+                named
+                    .entry(key)
+                    .and_modify(|lhs_val| {
+                        *lhs_val = op(lhs_val.clone(), rhs_val.clone()).unwrap_or_default()
+                    })
+                    .or_insert(rhs_val);
+            }
+
+            let mut unnamed = self.unnamed;
+
+            for (key, rhs_val) in rhs.unnamed {
+                unnamed
+                    .entry(key)
+                    .and_modify(|lhs_val| {
+                        *lhs_val = op(lhs_val.clone(), rhs_val.clone()).unwrap_or_default()
+                    })
+                    .or_insert(rhs_val);
+            }
+
+            Ok(Tuple {
+                named,
+                unnamed,
+                src_ref: self.src_ref,
+            })
+        } else {
+            Err(ValueError::TupleTypeMismatch {
+                lhs: self.ty(),
+                rhs: rhs.ty(),
+            })
+        }
+    }
+
+    /// Apply value with an operation to a tuple.
+    ///
+    /// This function is used for `*` and `/` builtin operators.
+    pub fn apply(
+        self,
+        value: Value,
+        op: impl Fn(Value, Value) -> ValueResult,
+    ) -> ValueResult<Self> {
+        let mut named = HashMap::new();
+        for (key, lhs_val) in self.named {
+            named.insert(key, op(lhs_val, value.clone()).unwrap_or_default());
+        }
+
+        let mut unnamed = HashMap::new();
+        for (key, lhs_val) in self.unnamed {
+            unnamed.insert(key, op(lhs_val, value.clone()).unwrap_or_default());
+        }
+
+        Ok(Tuple {
+            named,
+            unnamed,
+            src_ref: self.src_ref,
+        })
+    }
+
+    /// Transform each value in the tuple.
+    pub fn transform(self, op: impl Fn(Value) -> ValueResult) -> ValueResult<Self> {
+        let mut named = HashMap::new();
+        for (key, value) in self.named {
+            named.insert(key, op(value).unwrap_or_default());
+        }
+
+        let mut unnamed = HashMap::new();
+        for (key, value) in self.unnamed {
+            unnamed.insert(key, op(value).unwrap_or_default());
+        }
+
+        Ok(Tuple {
+            named,
+            unnamed,
+            src_ref: self.src_ref,
+        })
+    }
+
     /// Dissolve unnamed them.
     ///
     /// Transparent tuples are unnamed tuple items of a tuple.
@@ -411,19 +499,49 @@ impl std::fmt::Display for Tuple {
     }
 }
 
+impl std::ops::Add<Tuple> for Tuple {
+    type Output = ValueResult<Tuple>;
+
+    fn add(self, rhs: Tuple) -> Self::Output {
+        self.combine(rhs, |lhs, rhs| lhs.clone() + rhs.clone())
+    }
+}
+
+impl std::ops::Sub<Tuple> for Tuple {
+    type Output = ValueResult<Tuple>;
+
+    fn sub(self, rhs: Tuple) -> Self::Output {
+        self.combine(rhs, |lhs, rhs| lhs.clone() - rhs.clone())
+    }
+}
+
+impl std::ops::Mul<Value> for Tuple {
+    type Output = ValueResult<Tuple>;
+
+    fn mul(self, rhs: Value) -> Self::Output {
+        self.apply(rhs, |lhs, rhs| lhs * rhs)
+    }
+}
+
+impl std::ops::Div<Value> for Tuple {
+    type Output = ValueResult<Tuple>;
+
+    fn div(self, rhs: Value) -> Self::Output {
+        self.apply(rhs, |lhs, rhs| lhs / rhs)
+    }
+}
+
+impl std::ops::Neg for Tuple {
+    type Output = ValueResult;
+
+    fn neg(self) -> Self::Output {
+        Ok(Value::Tuple(Box::new(self.transform(|value| -value)?)))
+    }
+}
+
 impl Ty for Tuple {
     fn ty(&self) -> Type {
-        Type::Tuple(
-            TupleType {
-                named: self
-                    .named
-                    .iter()
-                    .map(|(id, v)| (id.clone(), v.ty()))
-                    .collect(),
-                unnamed: self.unnamed.values().map(|v| v.ty()).collect(),
-            }
-            .into(),
-        )
+        Type::Tuple(Box::new(self.tuple_type()))
     }
 }
 

@@ -191,6 +191,7 @@ impl std::ops::Neg for Value {
             Value::Integer(n) => Ok(Value::Integer(-n)),
             Value::Quantity(q) => Ok(Value::Quantity(q.neg())),
             Value::Array(a) => -a,
+            Value::Tuple(t) => -t.as_ref().clone(),
             _ => Err(ValueError::InvalidOperator("-".into())),
         }
     }
@@ -226,7 +227,10 @@ impl std::ops::Add for Value {
                     lhs.ty(),
                 )))
             }
+            // Add a value to an array.
             (Value::Array(lhs), rhs) => Ok((lhs + rhs)?),
+            // Add two tuples of the same type: (x = 1., y = 2.) + (x = 3., y = 4.)
+            (Value::Tuple(lhs), Value::Tuple(rhs)) => Ok((*lhs + *rhs)?.into()),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} + {rhs}"))),
         }
     }
@@ -248,6 +252,9 @@ impl std::ops::Sub for Value {
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Subtract value to an array: `[1,2,3] - 1 = [0,1,2]`.
             (Value::Array(lhs), rhs) => Ok((lhs - rhs)?),
+            // Subtract two tuples of the same type: (x = 1., y = 2.) - (x = 3., y = 4.)
+            (Value::Tuple(lhs), Value::Tuple(rhs)) => Ok((*lhs - *rhs)?.into()),
+
             // Boolean difference operator for models
             (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
                 lhs.union()
@@ -273,6 +280,9 @@ impl std::ops::Mul for Value {
             // Multiply two scalars
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             (Value::Array(array), value) | (value, Value::Array(array)) => Ok((array * value)?),
+            (Value::Tuple(tuple), value) | (value, Value::Tuple(tuple)) => {
+                Ok((tuple.as_ref().clone() * value)?.into())
+            }
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
     }
@@ -314,7 +324,8 @@ impl std::ops::Div for Value {
             (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
             (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
-            (Value::Array(list), value) => Ok((list / value)?),
+            (Value::Array(array), value) => Ok((array / value)?),
+            (Value::Tuple(tuple), value) => Ok((tuple.as_ref().clone() / value)?.into()),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} / {rhs}"))),
         }
     }
