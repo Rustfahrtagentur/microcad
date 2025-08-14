@@ -1,6 +1,6 @@
 -- Test --
   init_module
-  ../doc/tests/statement_usage.md:318
+  ../doc/tests/statement_usage.md:325
 
 -- Code --
 
