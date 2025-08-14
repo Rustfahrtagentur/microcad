@@ -3,7 +3,7 @@
 
 //! Use statement syntax element.
 
-use crate::{resolve::*, src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*};
 
 /// Use statement.
 ///
@@ -19,18 +19,6 @@ pub struct UseStatement {
     pub decl: UseDeclaration,
     /// source code reference
     pub src_ref: SrcRef,
-}
-
-impl UseStatement {
-    /// Resolve use statement to multiple symbols
-    pub fn resolve(&self, parent: Option<Symbol>) -> Option<(Identifier, Symbol)> {
-        match self.visibility {
-            // Private symbols are processed later in `Context::use_symbol`
-            Visibility::Private => None,
-            // Public symbols are put into resolving symbol map
-            Visibility::Public => self.decl.resolve(parent.clone()),
-        }
-    }
 }
 
 impl SrcReferrer for UseStatement {

@@ -212,7 +212,7 @@ impl SymbolTable {
                 let source_file =
                     SourceFile::load_with_name(path.clone(), self.cache.name_by_path(&path)?)?;
                 let source_name = self.cache.insert(source_file.clone())?;
-                let node = source_file.resolve(None);
+                let node = source_file.resolve(None)?;
                 // search module where to place loaded source file into
                 let target = self.globals.search(&source_name)?;
                 Symbol::move_children(&target, &node);

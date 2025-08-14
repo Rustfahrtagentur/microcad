@@ -156,7 +156,7 @@ pub enum EvalError {
     #[error("Could not find a file with path {0}")]
     UnknownPath(std::path::PathBuf),
 
-    /// Can't find a project file by it's qualified name.
+    /// Parser Error
     #[error("Parsing error {0}")]
     ParseError(#[from] ParseError),
 
@@ -231,6 +231,10 @@ pub enum EvalError {
     /// Unexpected source file in expression
     #[error("Unexpected source file {0} in expression")]
     InvalidSelfReference(Identifier),
+
+    /// Resolve Error
+    #[error("Resolve error {0}")]
+    ResolveError(#[from] ResolveError),
 }
 
 /// Result type of any evaluation.

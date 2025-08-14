@@ -77,7 +77,7 @@ impl Context {
         search_paths: &[std::path::PathBuf],
     ) -> EvalResult<Self> {
         Ok(Self::new(
-            SourceFile::load(root)?.resolve(None),
+            SourceFile::load(root)?.resolve(None)?,
             builtin,
             search_paths,
             Box::new(Stdout),

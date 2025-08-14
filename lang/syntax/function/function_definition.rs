@@ -3,10 +3,10 @@
 
 //! Function definition syntax element
 
-use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*};
 
 /// Function definition
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FunctionDefinition {
     /// Visibility
     pub visibility: Visibility,
@@ -23,15 +23,6 @@ pub struct FunctionDefinition {
 impl SrcReferrer for FunctionDefinition {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()
-    }
-}
-
-impl FunctionDefinition {
-    /// Resolve into SymbolNode
-    pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
-        let node = Symbol::new(SymbolDefinition::Function(self.clone()), parent);
-        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
-        node
     }
 }
 

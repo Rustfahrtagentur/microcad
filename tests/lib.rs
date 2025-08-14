@@ -29,7 +29,8 @@ fn context_for_file(filename: &str) -> microcad_lang::eval::Context {
     microcad_builtin::builtin_context(
         microcad_lang::syntax::SourceFile::load(filename)
             .expect("Source file")
-            .resolve(None),
+            .resolve(None)
+            .expect("resolve error"),
         &["../lib".into()],
     )
 }
