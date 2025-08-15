@@ -1,6 +1,6 @@
 -- Test --
   pre_init_assignment_const
-  ../doc/tests/statement_usage.md:268
+  ../doc/tests/statement_usage.md:275
 
 -- Code --
 

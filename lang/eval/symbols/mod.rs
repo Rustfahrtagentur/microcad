@@ -1,12 +1,10 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-mod source_cache;
 mod stack;
 mod stack_frame;
 mod symbol_table;
 
-pub use source_cache::*;
 pub use stack::*;
 pub use stack_frame::*;
 pub use symbol_table::*;

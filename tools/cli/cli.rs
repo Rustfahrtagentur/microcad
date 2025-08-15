@@ -4,7 +4,7 @@
 //! µcad CLI.
 
 use clap::Parser;
-use microcad_lang::{eval::Context, parse::ParseResult};
+use microcad_lang::{eval::Context, resolve::*};
 
 use crate::commands::*;
 use crate::config::Config;
@@ -50,7 +50,7 @@ impl Cli {
     }
 
     /// Make a new context from an input file.
-    pub fn make_context(&self, input: impl AsRef<std::path::Path>) -> ParseResult<Context> {
+    pub fn make_context(&self, input: impl AsRef<std::path::Path>) -> ResolveResult<Context> {
         Ok(microcad_builtin::builtin_context(
             crate::commands::Resolve {
                 input: input.as_ref().to_path_buf(),

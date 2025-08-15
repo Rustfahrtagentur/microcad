@@ -31,15 +31,18 @@ impl ContextBuilder {
     /// - `root`: Resolved root source file.
     /// - `builtin`: The builtin library.
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
-    pub fn from_source_captured(root: Rc<SourceFile>, search_paths: &[std::path::PathBuf]) -> Self {
-        Self::new(
-            root.resolve(None),
+    pub fn from_source_captured(
+        root: Rc<SourceFile>,
+        search_paths: &[std::path::PathBuf],
+    ) -> ResolveResult<Self> {
+        Ok(Self::new(
+            root.resolve(None)?,
             crate::builtin_module(),
             search_paths,
             Box::new(Capture::new()),
         )
         .importers(crate::builtin_importers())
-        .exporters(crate::builtin_exporters())
+        .exporters(crate::builtin_exporters()))
     }
 
     /// Set importers to context.

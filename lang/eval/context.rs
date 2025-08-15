@@ -77,7 +77,7 @@ impl Context {
         search_paths: &[std::path::PathBuf],
     ) -> EvalResult<Self> {
         Ok(Self::new(
-            SourceFile::load(root)?.resolve(None),
+            SourceFile::load(root)?.resolve(None)?,
             builtin,
             search_paths,
             Box::new(Stdout),
@@ -243,7 +243,7 @@ impl PushDiag for Context {
 }
 
 impl GetSourceByHash for Context {
-    fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
+    fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>> {
         self.symbol_table.get_by_hash(hash)
     }
 }

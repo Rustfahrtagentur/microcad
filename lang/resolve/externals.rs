@@ -3,7 +3,7 @@
 
 //! External files register
 
-use crate::{MICROCAD_EXTENSIONS, eval::*, syntax::*};
+use crate::{resolve::*, syntax::*, MICROCAD_EXTENSIONS};
 use derive_more::Deref;
 
 /// External files register.
@@ -76,7 +76,7 @@ impl Externals {
     pub fn fetch_external(
         &self,
         name: &QualifiedName,
-    ) -> EvalResult<(QualifiedName, std::path::PathBuf)> {
+    ) -> ResolveResult<(QualifiedName, std::path::PathBuf)> {
         log::trace!("fetching {name} from externals");
 
         if let Some(found) = self
@@ -92,17 +92,17 @@ impl Externals {
             return Ok(found);
         }
 
-        Err(EvalError::ExternalSymbolNotFound(name.clone()))
+        Err(ResolveError::ExternalSymbolNotFound(name.clone()))
     }
 
     /// Get qualified name by path
-    pub fn get_name(&self, path: &std::path::Path) -> EvalResult<&QualifiedName> {
+    pub fn get_name(&self, path: &std::path::Path) -> ResolveResult<&QualifiedName> {
         match self.0.iter().find(|(_, p)| p.as_path() == path) {
             Some((name, _)) => {
                 log::trace!("got name of {path:?} => {name}");
                 Ok(name)
             }
-            None => Err(EvalError::ExternalPathNotFound(path.to_path_buf())),
+            None => Err(ResolveError::ExternalPathNotFound(path.to_path_buf())),
         }
     }
 
@@ -166,17 +166,13 @@ fn resolve_external_file() {
 
     log::trace!("{externals}");
 
-    assert!(
-        externals
-            .fetch_external(&"std::geo2d::Circle".into())
-            .is_ok()
-    );
+    assert!(externals
+        .fetch_external(&"std::geo2d::Circle".into())
+        .is_ok());
 
-    assert!(
-        externals
-            .fetch_external(&"non_std::geo2d::Circle".into())
-            .is_err()
-    );
+    assert!(externals
+        .fetch_external(&"non_std::geo2d::Circle".into())
+        .is_err());
 }
 
 #[test]

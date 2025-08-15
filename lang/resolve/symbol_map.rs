@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, resolve::*, src_ref::SrcReferrer, syntax::*, value::*};
+use crate::{resolve::*, src_ref::SrcReferrer, syntax::*, value::*};
 use derive_more::{Deref, DerefMut};
 use std::collections::btree_map::BTreeMap;
 
@@ -37,9 +37,9 @@ impl SymbolMap {
     }
 
     /// Search for a symbol in symbol map.
-    pub fn search(&self, name: &QualifiedName) -> EvalResult<Symbol> {
+    pub fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         if name.is_empty() {
-            return Err(EvalError::NotAName(name.src_ref()));
+            return Err(ResolveError::NotAName(name.src_ref()));
         }
 
         let (id, leftover) = name.split_first();
@@ -52,7 +52,7 @@ impl SymbolMap {
             }
         }
 
-        Err(EvalError::SymbolNotFound(name.clone()))
+        Err(ResolveError::SymbolNotFound(name.clone()))
     }
 
     /// detach children from their parent

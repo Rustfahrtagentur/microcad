@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, src_ref::*};
+use crate::{diag::*, resolve::*, src_ref::*};
 
 /// Diagnostic message with source code reference attached.
 #[derive(Debug)]

@@ -1,6 +1,6 @@
 -- Test --
   pre_init_if
-  ../doc/tests/statement_usage.md:260
+  ../doc/tests/statement_usage.md:267
 
 -- Code --
 
