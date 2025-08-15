@@ -35,7 +35,7 @@ mod call;
 mod context;
 mod eval_error;
 mod expression;
-mod externals;
+
 mod format_string;
 mod function;
 mod init;
@@ -56,7 +56,6 @@ pub use builtin::*;
 pub use call::*;
 pub use context::*;
 pub use eval_error::*;
-pub use externals::*;
 pub use link::*;
 pub use output::*;
 pub use parameter::*;

@@ -43,10 +43,6 @@ pub enum EvalError {
     #[error("Symbol {0} not found.")]
     SymbolNotFound(QualifiedName),
 
-    /// Symbol not found (retry to load from external).
-    #[error("Symbol {0} must be loaded from {1}")]
-    SymbolMustBeLoaded(QualifiedName, std::path::PathBuf),
-
     /// Given symbol has not children which can be used.
     #[error("No symbols found to use in {0}")]
     NoSymbolsToUse(QualifiedName),
@@ -132,29 +128,9 @@ pub enum EvalError {
     #[error("Value Error: {0}")]
     ValueError(#[from] ValueError),
 
-    /// Name of external symbol is unknown.
-    #[error("External symbol `{0}` not found")]
-    ExternalSymbolNotFound(QualifiedName),
-
-    /// Path of external file is unknown.
-    #[error("External path `{0}` not found")]
-    ExternalPathNotFound(std::path::PathBuf),
-
-    /// Can't find a project file by hash.
-    #[error("Could not find a file with hash {0}")]
-    UnknownHash(u64),
-
-    /// Hash is zero
-    #[error("Hash is zero")]
-    NulHash,
-
     /// Unknown method.
     #[error("Unknown method `{0}`")]
     UnknownMethod(QualifiedName),
-
-    /// Can't find a project file by it's path.
-    #[error("Could not find a file with path {0}")]
-    UnknownPath(std::path::PathBuf),
 
     /// Parser Error
     #[error("Parsing error {0}")]

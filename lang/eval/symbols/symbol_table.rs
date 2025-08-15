@@ -204,7 +204,7 @@ impl SymbolTable {
 
         // if symbol could not be found in symbol tree, try to load it from external file
         match self.cache.get_by_name(name) {
-            Err(EvalError::SymbolMustBeLoaded(_, path)) => {
+            Err(ResolveError::SymbolMustBeLoaded(_, path)) => {
                 log::trace!(
                     "{load} symbol {name} from {path:?}",
                     load = crate::mark!(LOAD)
@@ -220,10 +220,10 @@ impl SymbolTable {
                 target.external_to_module();
             }
             Ok(_) => (),
-            Err(EvalError::SymbolNotFound(_)) => {
+            Err(ResolveError::SymbolNotFound(_)) => {
                 return Err(EvalError::SymbolNotFound(name.clone()))
             }
-            Err(err) => return Err(err),
+            Err(err) => return Err(err)?,
         }
 
         // get symbol from symbol map
@@ -276,9 +276,10 @@ impl Lookup for SymbolTable {
                     }
                     Err(
                         EvalError::SymbolNotFound(_)
+                        | EvalError::ResolveError(ResolveError::SymbolNotFound(_))
                         | EvalError::LocalNotFound(_)
-                        | EvalError::ExternalPathNotFound(_)
-                        | EvalError::NulHash,
+                        | EvalError::ResolveError(ResolveError::ExternalPathNotFound(_))
+                        | EvalError::ResolveError(ResolveError::NulHash),
                     ) => (),
                     Err(err) => errors.push((origin, err)),
                 }
@@ -434,7 +435,7 @@ impl std::fmt::Display for SymbolTable {
 }
 
 impl GetSourceByHash for SymbolTable {
-    fn get_by_hash(&self, hash: u64) -> EvalResult<std::rc::Rc<SourceFile>> {
+    fn get_by_hash(&self, hash: u64) -> ResolveResult<std::rc::Rc<SourceFile>> {
         self.cache.get_by_hash(hash)
     }
 }

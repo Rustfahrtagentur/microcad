@@ -3,7 +3,7 @@
 
 //! Source file cache
 
-use crate::{eval::*, rc::*, src_ref::*, syntax::*};
+use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
 use std::collections::HashMap;
 
 /// Register of loaded source files and their syntax trees.
@@ -60,7 +60,7 @@ impl SourceCache {
     ///
     /// # Arguments
     /// - `source_file`: The loaded source file to store.
-    pub fn insert(&mut self, source_file: Rc<SourceFile>) -> EvalResult<QualifiedName> {
+    pub fn insert(&mut self, source_file: Rc<SourceFile>) -> ResolveResult<QualifiedName> {
         let filename = source_file.filename();
         let name = self.externals.get_name(&filename)?;
         let hash = source_file.hash;
@@ -74,12 +74,12 @@ impl SourceCache {
     }
 
     /// Return the qualified name of a file by it's path
-    pub fn name_by_path(&mut self, filename: &std::path::Path) -> EvalResult<QualifiedName> {
+    pub fn name_by_path(&mut self, filename: &std::path::Path) -> ResolveResult<QualifiedName> {
         Ok(self.externals.get_name(filename)?.clone())
     }
 
     /// Convenience function to get a source file by from a `SrcReferrer`.
-    pub fn get_by_src_ref(&self, referrer: &impl SrcReferrer) -> EvalResult<Rc<SourceFile>> {
+    pub fn get_by_src_ref(&self, referrer: &impl SrcReferrer) -> ResolveResult<Rc<SourceFile>> {
         self.get_by_hash(referrer.src_ref().source_hash())
     }
 
@@ -95,17 +95,17 @@ impl SourceCache {
     }
 
     /// Find a project file by it's file path.
-    pub fn get_by_path(&self, path: &std::path::Path) -> EvalResult<Rc<SourceFile>> {
+    pub fn get_by_path(&self, path: &std::path::Path) -> ResolveResult<Rc<SourceFile>> {
         let path = path.to_path_buf();
         if let Some(index) = self.by_path.get(&path) {
             Ok(self.source_files[*index].clone())
         } else {
-            Err(EvalError::UnknownPath(path))
+            Err(ResolveError::FileNotFound(path))
         }
     }
 
     /// Get *qualified name* of a file by *hash value*.
-    pub fn get_name_by_hash(&self, hash: u64) -> EvalResult<&QualifiedName> {
+    pub fn get_name_by_hash(&self, hash: u64) -> ResolveResult<&QualifiedName> {
         match self.get_by_hash(hash) {
             Ok(file) => self.externals.get_name(&file.filename()),
             Err(err) => Err(err),
@@ -113,7 +113,7 @@ impl SourceCache {
     }
 
     /// Find a project file by the qualified name which represents the file path.
-    pub fn get_by_name(&self, name: &QualifiedName) -> EvalResult<Rc<SourceFile>> {
+    pub fn get_by_name(&self, name: &QualifiedName) -> ResolveResult<Rc<SourceFile>> {
         if let Some(index) = self.by_name.get(name) {
             Ok(self.source_files[*index].clone())
         } else {
@@ -121,13 +121,13 @@ impl SourceCache {
             match self.externals.fetch_external(name) {
                 Ok((name, path)) => {
                     if self.get_by_path(&path).is_err() {
-                        return Err(EvalError::SymbolMustBeLoaded(name, path));
+                        return Err(ResolveError::SymbolMustBeLoaded(name, path));
                     }
                 }
-                Err(EvalError::ExternalSymbolNotFound(_)) => (),
+                Err(ResolveError::ExternalSymbolNotFound(_)) => (),
                 Err(err) => return Err(err),
             }
-            Err(EvalError::SymbolNotFound(name.clone()))
+            Err(ResolveError::SymbolNotFound(name.clone()))
         }
     }
 
@@ -147,18 +147,18 @@ impl SourceCache {
 /// Trait that can fetch for a file by it's hash value.
 pub trait GetSourceByHash {
     /// Find a project file by it's hash value.
-    fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>>;
+    fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>>;
 }
 
 impl GetSourceByHash for SourceCache {
     /// Find a project file by it's hash value.
-    fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
+    fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>> {
         if let Some(index) = self.by_hash.get(&hash) {
             Ok(self.source_files[*index].clone())
         } else if hash == 0 {
-            Err(EvalError::NulHash)
+            Err(ResolveError::NulHash)
         } else {
-            Err(EvalError::UnknownHash(hash))
+            Err(ResolveError::UnknownHash(hash))
         }
     }
 }

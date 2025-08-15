@@ -15,12 +15,16 @@
 //!
 //! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .
 
+mod externals;
 mod resolve_error;
+mod source_cache;
 mod symbol;
 mod symbol_definition;
 mod symbol_map;
 
+pub use externals::*;
 pub use resolve_error::*;
+pub use source_cache::*;
 pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
@@ -84,6 +88,7 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
             Statement::Module(md) => Ok(Some((md.id.clone(), md.resolve(parent)?))),
             Statement::Function(fd) => Ok(Some((fd.id.clone(), fd.resolve(parent)?))),
             Statement::Use(us) => us.resolve(parent),
+            // Not producing any symbols
             Statement::Init(_)
             | Statement::Return(_)
             | Statement::If(_)

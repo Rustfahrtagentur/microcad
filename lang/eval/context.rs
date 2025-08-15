@@ -243,7 +243,7 @@ impl PushDiag for Context {
 }
 
 impl GetSourceByHash for Context {
-    fn get_by_hash(&self, hash: u64) -> EvalResult<Rc<SourceFile>> {
+    fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>> {
         self.symbol_table.get_by_hash(hash)
     }
 }
